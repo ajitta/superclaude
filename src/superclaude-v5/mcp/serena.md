@@ -28,4 +28,15 @@ Symbol navigation and codebase exploration.
 - Start with high-level entry points
 - Combine with ripgrep for raw search
 
+## Example
+
+```xml
+<draft>
+step1: symbol -> AuthService
+step2: find -> references
+step3: trace -> call graph
+result: 8 usages mapped
+</draft>
+```
+
 </document>

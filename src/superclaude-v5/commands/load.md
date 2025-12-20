@@ -34,4 +34,15 @@ Load a saved session or note set.
   <output>Lists available saves</output>
 </example>
 
+## Success Criteria
+- Context restored accurately
+- Missing saves reported
+
+## Boundaries
+
+| Will | Won't |
+|---|---|
+| Restore saved context | Override current work |
+| List available saves | Auto-merge conflicts |
+
 </document>

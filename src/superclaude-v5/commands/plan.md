@@ -40,4 +40,17 @@ Planning, estimation, and spec outlines.
   <output>Detailed plan with dependencies</output>
 </example>
 
+## Success Criteria
+- Clear step breakdown
+- Dependencies identified
+- Risks and mitigations noted
+
+## Boundaries
+
+| Will | Won't |
+|---|---|
+| Break down into steps | Execute the plan |
+| Estimate effort | Guarantee timelines |
+| Identify risks | Make scope decisions |
+
 </document>

@@ -51,4 +51,17 @@ result: shortlist
   <output>Idea list + risks</output>
 </example>
 
+## Success Criteria
+- 3+ distinct options presented
+- Pros/cons for each option
+- Clear next questions or steps
+
+## Boundaries
+
+| Will | Won't |
+|---|---|
+| Generate diverse options | Make final decisions |
+| Surface trade-offs | Implement without approval |
+| Ask clarifying questions | Over-commit to one path early |
+
 </document>

@@ -28,4 +28,15 @@ Web search for current information.
 - Prefer authoritative domains
 - Cite sources for claims
 
+## Example
+
+```xml
+<draft>
+step1: query -> "Next.js 15 release notes"
+step2: filter -> last 30 days
+step3: summarize -> key changes
+result: sources + summary
+</draft>
+```
+
 </document>

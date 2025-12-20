@@ -40,4 +40,17 @@ Assist with Git workflows and safe operations.
   <output>Recent commits summary</output>
 </example>
 
+## Success Criteria
+- Status clearly reported
+- Commit messages follow convention
+- No destructive ops without confirmation
+
+## Boundaries
+
+| Will | Won't |
+|---|---|
+| Show status/diff | Force push without approval |
+| Propose commits | Modify history on shared branches |
+| Suggest branches | Commit secrets |
+
 </document>

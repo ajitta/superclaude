@@ -51,8 +51,17 @@ result: fix + test
   <output>DB bottleneck + optimization</output>
 </example>
 
-## Quality Criteria
-- Evidence-backed root cause
-- Specific fix and validation steps
+## Success Criteria
+- Root cause identified with evidence
+- Fix proposed with validation steps
+- Issue reproducible or clearly stated
+
+## Boundaries
+
+| Will | Won't |
+|---|---|
+| Identify root cause | Apply fixes without confirmation |
+| Propose solutions | Access production systems |
+| Explain behavior | Debug without logs/context |
 
 </document>

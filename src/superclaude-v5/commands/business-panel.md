@@ -34,4 +34,17 @@ Multi-expert business analysis and synthesis.
   <output>Executive-ready summary</output>
 </example>
 
+## Success Criteria
+- Multi-perspective analysis
+- Risks identified
+- Actionable recommendations
+
+## Boundaries
+
+| Will | Won't |
+|---|---|
+| Synthesize viewpoints | Make final decisions |
+| Identify risks | Guarantee outcomes |
+| Propose actions | Execute strategy |
+
 </document>

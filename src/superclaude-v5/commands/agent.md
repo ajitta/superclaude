@@ -48,4 +48,17 @@ Invoke a specialized agent.
   <output>Structured documentation</output>
 </example>
 
+## Success Criteria
+- Agent responds in character
+- Output matches agent's specialty
+- Boundaries respected
+
+## Boundaries
+
+| Will | Won't |
+|---|---|
+| Route to specialist | Override agent expertise |
+| Provide context | Mix multiple agents |
+| Respect agent scope | Hallucinate capabilities |
+
 </document>

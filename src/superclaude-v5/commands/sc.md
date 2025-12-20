@@ -40,4 +40,15 @@ Show available SuperClaude commands and quick usage.
   <output>List commands with short descriptions</output>
 </example>
 
+## Success Criteria
+- Commands listed clearly
+- Usage examples provided
+
+## Boundaries
+
+| Will | Won't |
+|---|---|
+| List commands | Execute commands |
+| Show usage | Provide deep tutorials |
+
 </document>

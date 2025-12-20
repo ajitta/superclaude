@@ -29,4 +29,15 @@ UI component generation and layout assistance.
 - Validate a11y basics
 - Avoid over-customization unless requested
 
+## Example
+
+```xml
+<draft>
+step1: component -> login form
+step2: framework -> React + Tailwind
+step3: constraints -> mobile-first
+result: accessible component
+</draft>
+```
+
 </document>

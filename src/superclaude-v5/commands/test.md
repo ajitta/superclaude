@@ -40,4 +40,17 @@ Run tests and report results.
   <output>Runs unit tests only</output>
 </example>
 
+## Success Criteria
+- Tests executed with output
+- Failures summarized
+- Next steps proposed
+
+## Boundaries
+
+| Will | Won't |
+|---|---|
+| Run test suites | Modify tests without request |
+| Summarize results | Skip failing tests |
+| Suggest fixes | Auto-fix without approval |
+
 </document>

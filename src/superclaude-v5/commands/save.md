@@ -34,4 +34,15 @@ Save session context or notes.
   <output>Prompts for a name</output>
 </example>
 
+## Success Criteria
+- Context captured with timestamp
+- Named for easy retrieval
+
+## Boundaries
+
+| Will | Won't |
+|---|---|
+| Save session context | Persist sensitive data |
+| Store decisions | Auto-save without request |
+
 </document>

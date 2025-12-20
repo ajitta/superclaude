@@ -40,4 +40,17 @@ Create or update documentation.
   <output>Step-by-step guide</output>
 </example>
 
+## Success Criteria
+- Audience-appropriate content
+- Examples validated
+- Consistent formatting
+
+## Boundaries
+
+| Will | Won't |
+|---|---|
+| Draft documentation | Publish without review |
+| Validate examples | Invent features |
+| Follow templates | Override style guides |
+
 </document>

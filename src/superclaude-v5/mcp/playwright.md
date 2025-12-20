@@ -28,4 +28,15 @@ Browser automation and E2E validation.
 - Use for user-critical paths
 - Keep flows deterministic
 
+## Example
+
+```xml
+<draft>
+step1: url -> /login
+step2: steps -> fill + submit
+step3: assert -> redirect to /dashboard
+result: test passes
+</draft>
+```
+
 </document>

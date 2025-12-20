@@ -28,4 +28,15 @@ Pattern-based bulk edits across files.
 - Constrain scope first
 - Verify with tests after batch edits
 
+## Example
+
+```xml
+<draft>
+step1: pattern -> rename oldFunc to newFunc
+step2: scope -> src/**/*.ts
+step3: execute -> batch apply
+result: 12 files updated
+</draft>
+```
+
 </document>

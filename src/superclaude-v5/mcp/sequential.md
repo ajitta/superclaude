@@ -28,4 +28,15 @@ Structured multi-step reasoning.
 - Keep steps explicit
 - Verify assumptions
 
+## Example
+
+```xml
+<draft>
+step1: problem -> auth failing
+step2: analyze -> token + session
+step3: hypothesis -> expired refresh
+result: root cause identified
+</draft>
+```
+
 </document>

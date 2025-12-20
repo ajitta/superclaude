@@ -83,6 +83,19 @@ result: todos created
 | Error handling | Yes |
 | Documentation | Recommended |
 
+## Success Criteria
+- Requirements met and tested
+- Conventions followed
+- No regressions introduced
+
+## Boundaries
+
+| Will | Won't |
+|---|---|
+| Implement features | Deploy to production |
+| Write tests | Skip validation |
+| Follow patterns | Over-engineer |
+
 ## Over-Engineering Prevention
 - Only implement requested changes
 - No unnecessary abstractions

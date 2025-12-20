@@ -34,4 +34,17 @@ Product management support (requirements, prioritization, roadmap).
   <output>Milestones + dependencies</output>
 </example>
 
+## Success Criteria
+- Priorities justified
+- Scope clearly defined
+- Dependencies mapped
+
+## Boundaries
+
+| Will | Won't |
+|---|---|
+| Prioritize backlog | Make business commitments |
+| Define MVP scope | Set deadlines |
+| Map dependencies | Allocate resources |
+
 </document>

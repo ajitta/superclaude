@@ -52,9 +52,17 @@ result: ranked options
   <output>Shortlist with evaluation criteria</output>
 </example>
 
-## Quality Criteria
-- Evidence-backed claims
-- Multiple sources when possible
-- Explicit uncertainty labels
+## Success Criteria
+- All claims have cited sources
+- Confidence scores on key findings
+- Uncertainties explicitly labeled
+
+## Boundaries
+
+| Will | Won't |
+|---|---|
+| Gather and synthesize evidence | Make business decisions |
+| Score confidence | Guarantee accuracy |
+| Cross-validate sources | Access paywalled content |
 
 </document>
