@@ -43,41 +43,44 @@ make sync-plugin-repo # Sync artifacts to ../SuperClaude_Plugin
 
 ## Architecture Overview
 
-SuperClaude is a **Python package** (v4.1.9) providing a pytest plugin and CLI for AI-enhanced development.
+SuperClaude is a **Python package** providing a pytest plugin and CLI for AI-enhanced development.
+
+### Dual Architecture
+
+The project has two parallel structures:
+
+1. **`src/superclaude/`** - Active Python package (v4.1.9)
+   - pytest plugin with PM Agent patterns
+   - CLI tools (`superclaude` command)
+   - Core execution patterns (confidence, self-check, reflexion)
+
+2. **`plugins/superclaude/`** - Plugin source for v5.0 (in development)
+   - 30 slash commands (markdown definitions)
+   - 16 specialized agents
+   - 7 behavioral modes
+   - MCP server configs
+
+### Key Component Relationships
 
 ```
-src/superclaude/                    # Main package
-├── pytest_plugin.py                # Auto-loaded via entry point
-├── pm_agent/                       # PM Agent patterns
-│   ├── confidence.py               # Pre-execution confidence check (≥90% proceed, 70-89% investigate, <70% STOP)
-│   ├── self_check.py               # Post-implementation validation (no hallucinations)
-│   ├── reflexion.py                # Error learning and cross-session pattern matching
-│   └── token_budget.py             # Token allocation (simple: 200, medium: 1000, complex: 2500)
-├── execution/                      # Execution patterns
-│   ├── parallel.py                 # Wave → Checkpoint → Wave (3.5x speedup)
-│   ├── reflection.py               # Meta-reasoning
-│   └── self_correction.py          # Error recovery
-└── cli/                            # CLI tools
-    ├── main.py                     # superclaude command entry point
-    ├── doctor.py                   # Health checks
-    ├── install_commands.py         # Slash command installation
-    └── install_mcp.py              # MCP server installation
-
-plugins/superclaude/                # Plugin source (v5.0 - builds to dist/)
-├── commands/                       # 30 slash commands (.md files)
-├── agents/                         # 16 specialized agent definitions (.md files)
-├── modes/                          # 7 behavioral modes (.md files)
-├── hooks/                          # Hook configurations (hooks.json)
-├── skills/                         # Skill implementations
-├── mcp/                            # MCP documentation and configs
-│   └── configs/                    # JSON configs for each MCP server
-└── core/                           # Core rules, flags, principles
-
-tests/
-├── unit/                           # Auto-marked @pytest.mark.unit
-├── integration/                    # Auto-marked @pytest.mark.integration
-└── conftest.py                     # Shared fixtures
+pytest_plugin.py  ← Entry point registered in pyproject.toml
+    ↓
+pm_agent/         ← Pre/post implementation patterns
+├── confidence.py    → ConfidenceChecker fixture (≥90% proceed, 70-89% investigate, <70% STOP)
+├── self_check.py    → SelfCheckProtocol fixture (validate with evidence)
+├── reflexion.py     → ReflexionPattern fixture (cross-session learning)
+└── token_budget.py  → TokenBudgetManager fixture (simple: 200, medium: 1000, complex: 2500)
+    ↓
+execution/        ← Parallel execution patterns
+└── parallel.py      → Wave → Checkpoint → Wave (3.5x speedup)
 ```
+
+### CLI Entry Point
+
+`superclaude.cli.main:main` handles all CLI subcommands:
+- `install` - copies slash commands from `plugins/superclaude/commands/` to `~/.claude/commands/`
+- `mcp` - installs MCP server configs from `plugins/superclaude/mcp/configs/`
+- `doctor` - health checks
 
 ## Pytest Plugin
 
@@ -162,8 +165,7 @@ Install via: `superclaude mcp --servers tavily context7`
 
 ## Version Info
 
-- **Framework version**: 4.1.9 (VERSION file, user-facing)
-- **Python package**: 0.4.0 (pyproject.toml, library semantic version)
+- **Version**: 4.1.9 (VERSION file, pyproject.toml, package.json)
 - **Python**: >=3.10
 - **Build**: hatchling (PEP 517)
 - **Entry points**: CLI (`superclaude`), pytest plugin (auto-loaded)
