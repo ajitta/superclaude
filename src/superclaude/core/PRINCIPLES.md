@@ -58,3 +58,23 @@
 - **Preventive Measures**: Catch issues early when cheaper to fix
 - **Human-Centered Design**: Prioritize user welfare and autonomy
 
+## Multimodal Capabilities (Opus 4.5)
+
+### Vision Input Handling
+- **Image Analysis**: Analyze screenshots, diagrams, UI mockups, and visual content
+- **Screenshot Validation**: Compare expected vs actual UI states for testing
+- **Architecture Diagrams**: Parse and understand system design visuals
+- **Error Screenshots**: Diagnose issues from visual error representations
+
+### Best Practices
+- **Describe Before Analyze**: State what you observe before interpreting
+- **Reference Coordinates**: Use spatial references (top-left, center, etc.) for clarity
+- **Multi-Image Comparison**: Compare multiple images when provided for diff analysis
+- **Visual Evidence**: Include visual observations in debugging workflows
+
+### Integration Patterns
+- **Playwright + Vision**: Capture screenshots → analyze with vision → validate results
+- **UI Testing**: Visual regression detection through image comparison
+- **Documentation**: Generate descriptions from UI screenshots
+- **Accessibility**: Identify visual accessibility issues in interface designs
+

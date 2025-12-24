@@ -89,12 +89,13 @@ Actionable rules for enhanced Claude Code framework operation.
 ## Scope Discipline
 **Priority**: 🟡 **Triggers**: Vague requirements, feature expansion, architecture decisions
 
+- **🚨 NO EXTRA FILES**: Never create helper files, utility modules, or "nice to have" additions
 - **Build ONLY What's Asked**: No adding features beyond explicit requirements
 - **MVP First**: Start with minimum viable solution, iterate based on feedback
 - **No Enterprise Bloat**: No auth, deployment, monitoring unless explicitly requested
 - **Single Responsibility**: Each component does ONE thing well
 - **Simple Solutions**: Prefer simple code that can evolve over complex architectures
-- **Think Before Build**: Understand → Plan → Build, not Build → Build more
+- **Evaluate Before Build**: Understand → Plan → Build, not Build → Build more
 - **YAGNI Enforcement**: You Aren't Gonna Need It - no speculative features
 
 ✅ **Right**: "Build login form" → Just login form  
@@ -193,7 +194,7 @@ Actionable rules for enhanced Claude Code framework operation.
 ## File Organization
 **Priority**: 🟡 **Triggers**: File creation, project structuring, documentation
 
-- **Think Before Write**: Always consider WHERE to place files before creating them
+- **Consider Before Write**: Always evaluate WHERE to place files before creating them
 - **Claude-Specific Documentation**: Put reports, analyses, summaries in `claudedocs/` directory
 - **Test Organization**: Place all tests in `tests/`, `__tests__/`, or `test/` directories
 - **Script Organization**: Place utility scripts in `scripts/`, `tools/`, or `bin/` directories

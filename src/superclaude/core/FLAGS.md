@@ -84,6 +84,16 @@ Behavioral flags for Claude Code to enable specific execution modes and tool sel
 - Trigger: Critical system redesign, legacy modernization, complex debugging
 - Behavior: Maximum depth analysis (~32K tokens), enables all MCP servers
 
+## Effort Control Flag
+
+**--effort [low|medium|high]**
+- Trigger: Reasoning depth control, token optimization needs
+- Behavior: Control extended thinking depth
+  - `low`: Minimal reasoning overhead, fastest responses (~76% fewer tokens)
+  - `medium`: Balanced analysis depth (default for most tasks)
+  - `high`: Maximum reasoning depth for complex problems
+- Note: Opus 4.5 specific - controls computational effort allocation
+
 ## Execution Control Flags
 
 **--delegate [auto|files|folders]**
