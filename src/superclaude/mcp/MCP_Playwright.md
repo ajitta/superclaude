@@ -1,49 +1,29 @@
----
-name: playwright
-type: mcp
-triggers: [browser, E2E, test, screenshot, validation, accessibility, WCAG, playwright]
-description: Browser automation and E2E testing with real browser interaction
-category: testing
----
+<component name="playwright" type="mcp">
+  <config style="Telegraphic|Imperative|XML" eval="true"/>
+  <triggers>browser|E2E|test|screenshot|validation|accessibility|WCAG|playwright</triggers>
 
-<document type="mcp" name="playwright"
-          triggers="browser, E2E, test, screenshot, validation, accessibility, WCAG, playwright">
+  <role>
+    <mission>Browser automation and E2E testing with real browser interaction</mission>
+  </role>
 
-# Playwright MCP Server
+  <choose>
+    <use context="real browser">Actual rendering, not just code</use>
+    <use context="integration testing">User journeys, visual validation over unit tests</use>
+    <use context="E2E">Login flows, form submissions, multi-page workflows</use>
+    <use context="visual testing">Screenshots, responsive design validation</use>
+    <avoid context="code analysis">Static review, syntax, logic validation</avoid>
+  </choose>
 
-**Purpose**: Browser automation and E2E testing with real browser interaction
+  <synergy>
+    <with n="Sequential">Sequential plans test strategy → Playwright executes</with>
+    <with n="Magic">Magic creates UI → Playwright validates accessibility</with>
+  </synergy>
 
-## Triggers
-
-- Browser testing and E2E test scenarios
-- Visual testing, screenshot, or UI validation requests
-- Form submission and user interaction testing
-- Cross-browser compatibility validation
-- Performance testing requiring real browser rendering
-- Accessibility testing with automated WCAG compliance
-
-## Choose When
-
-- **For real browser interaction**: When you need actual rendering, not just code
-- **Over unit tests**: For integration testing, user journeys, visual validation
-- **For E2E scenarios**: Login flows, form submissions, multi-page workflows
-- **For visual testing**: Screenshot comparisons, responsive design validation
-- **Not for code analysis**: Static code review, syntax checking, logic validation
-
-## Works Best With
-
-- **Sequential**: Sequential plans test strategy → Playwright executes browser automation
-- **Magic**: Magic creates UI components → Playwright validates accessibility and behavior
-
-## Examples
-
-```
-"test the login flow" → Playwright (browser automation)
-"check if form validation works" → Playwright (real user interaction)
-"take screenshots of responsive design" → Playwright (visual testing)
-"validate accessibility compliance" → Playwright (automated WCAG testing)
-"review this function's logic" → Native Claude (static analysis)
-"explain the authentication code" → Native Claude (code review)
-```
-
-</document>
+  <examples>
+    <ex i="test login flow" o="Playwright" r="browser automation"/>
+    <ex i="form validation works" o="Playwright" r="real user interaction"/>
+    <ex i="screenshots responsive design" o="Playwright" r="visual testing"/>
+    <ex i="accessibility compliance" o="Playwright" r="automated WCAG"/>
+    <ex i="review function logic" o="Native Claude" r="static analysis"/>
+  </examples>
+</component>

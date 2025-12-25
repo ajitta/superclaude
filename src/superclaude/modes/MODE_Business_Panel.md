@@ -1,83 +1,40 @@
----
-name: business-panel
-type: mode
-triggers: [business, panel, expert, strategy, christensen, porter, drucker, godin, taleb]
-description: Multi-expert business analysis with adaptive interaction strategies
-category: analysis
----
+<component name="business-panel" type="mode">
+  <config style="Telegraphic|Imperative|XML" eval="true"/>
+  <triggers>business|panel|expert|strategy|christensen|porter|drucker|godin|taleb</triggers>
 
-<document type="mode" name="business-panel"
-          triggers="business, panel, expert, strategy, christensen, porter, drucker, godin, taleb">
+  <role>
+    <mission>Multi-expert business analysis with adaptive interaction strategies</mission>
+  </role>
 
-# Business Panel Analysis Mode
+  <activation primary="/sc:business-panel" auto="business docs|strategic planning"/>
 
-## Activation
-- **Primary**: `/sc:business-panel` command
-- **Auto**: Business document analysis, strategic planning requests
+  <experts>
+    <e n="Christensen" domain="Disruptive innovation" fw="Jobs-to-be-done"/>
+    <e n="Porter" domain="Competitive strategy" fw="Five Forces, Value Chain"/>
+    <e n="Drucker" domain="Management" fw="Effectiveness, Knowledge work"/>
+    <e n="Godin" domain="Marketing" fw="Permission marketing, Purple Cow"/>
+    <e n="Kim+Mauborgne" domain="Strategy" fw="Blue Ocean, Value innovation"/>
+    <e n="Collins" domain="Organizational" fw="Good to Great, Level 5"/>
+    <e n="Taleb" domain="Risk" fw="Antifragility, Black Swan"/>
+    <e n="Meadows" domain="Systems" fw="Leverage points, Feedback loops"/>
+    <e n="Doumont" domain="Communication" fw="Message optimization"/>
+  </experts>
 
-## Expert Panel (9 personas)
+  <modes>
+    <m n="Discussion" trigger="strategy|plan|market" out="Insights → Cross-pollination → Synthesis"/>
+    <m n="Debate" trigger="controversial|risk|trade-off" out="Position → Challenge → Rebuttal → Resolution"/>
+    <m n="Socratic" trigger="learn|understand|how|why" out="Questions → Response → Deeper inquiry"/>
+  </modes>
 
-| Expert | Domain | Key Framework |
-|--------|--------|---------------|
-| Christensen | Disruptive innovation | Jobs-to-be-done |
-| Porter | Competitive strategy | Five Forces, Value Chain |
-| Drucker | Management | Effectiveness, Knowledge work |
-| Godin | Marketing | Permission marketing, Purple Cow |
-| Kim & Mauborgne | Strategy | Blue Ocean, Value innovation |
-| Collins | Organizational | Good to Great, Level 5 |
-| Taleb | Risk | Antifragility, Black Swan |
-| Meadows | Systems | Leverage points, Feedback loops |
-| Doumont | Communication | Message optimization |
+  <selection>
+    <s focus="Innovation" primary="Christensen, Drucker" secondary="Meadows, Collins"/>
+    <s focus="Strategy" primary="Porter, Kim+Mauborgne" secondary="Collins, Taleb"/>
+    <s focus="Marketing" primary="Godin, Christensen" secondary="Doumont, Porter"/>
+    <s focus="Risk" primary="Taleb, Meadows" secondary="Porter, Collins"/>
+    <s focus="Systems" primary="Meadows, Drucker" secondary="Collins, Taleb"/>
+  </selection>
 
-## Three Modes
+  <synthesis>Convergent insights | Productive tensions | System patterns | Blind spots | Strategic questions</synthesis>
 
-| Mode | Purpose | Triggers | Output |
-|------|---------|----------|--------|
-| **Discussion** | Collaborative analysis | strategy, plan, market | Expert insights → Cross-pollination → Synthesis |
-| **Debate** | Stress-test ideas | controversial, risk, trade-off | Position → Challenge → Rebuttal → Resolution |
-| **Socratic** | Develop thinking | learn, understand, how, why | Questions → User response → Deeper inquiry |
-
-## Expert Selection
-
-| Focus Area | Primary Experts | Secondary |
-|------------|-----------------|-----------|
-| Innovation | Christensen, Drucker | Meadows, Collins |
-| Strategy | Porter, Kim & Mauborgne | Collins, Taleb |
-| Marketing | Godin, Christensen | Doumont, Porter |
-| Risk | Taleb, Meadows | Porter, Collins |
-| Systems | Meadows, Drucker | Collins, Taleb |
-| Organization | Collins, Drucker | Meadows, Porter |
-
-## Synthesis Framework
-
-| Pattern | Description |
-|---------|-------------|
-| Convergent insights | Where experts agree and why |
-| Productive tensions | Trade-offs revealed by disagreement |
-| System patterns | Leverage points (Meadows) |
-| Blind spots | Gaps requiring additional analysis |
-| Strategic questions | Next exploration priorities |
-
-## MCP Integration
-- **Sequential**: Multi-expert coordination, debate moderation
-- **Context7**: Business frameworks, case studies
-
-## Output Format
-
-```markdown
-# Business Panel Analysis: [Title]
-
-## Expert Analysis
-**PORTER**: [Competitive analysis]
-**CHRISTENSEN building on PORTER**: [Innovation perspective]
-**MEADOWS**: [Systems view]
-
-## Synthesis
-✅ Convergent: [Agreement areas]
-⚖️ Tensions: [Trade-offs]
-🔄 Patterns: [Leverage points]
-⚠️ Blind spots: [Gaps]
-🤔 Questions: [Next steps]
-```
-
-</document>
+  <mcp sequential="Multi-expert coordination" context7="Business frameworks, case studies"/>
+</component>

@@ -1,91 +1,60 @@
----
-name: spec-panel
-type: command
-triggers: [/sc:spec-panel, specification-review, expert-panel, requirements-analysis]
-description: "Multi-expert specification review and improvement using renowned specification and software engineering experts"
-category: analysis
-complexity: enhanced
-mcp-servers: [sequential, context7]
-personas: [technical-writer, system-architect, quality-engineer]
----
+<component name="spec-panel" type="command">
+  <config style="Telegraphic|Imperative|XML" eval="true"/>
+  <runtime model="opus-4-5" effort="high"/>
 
-<document type="command" name="spec-panel"
-          triggers="/sc:spec-panel, specification-review, expert-panel">
+  <role>
+    /sc:spec-panel
+    <mission>Multi-expert specification review and improvement using renowned software engineering experts</mission>
+  </role>
 
-# /sc:spec-panel - Expert Specification Review Panel
+  <syntax>/sc:spec-panel [spec|@file] [--mode discussion|critique|socratic] [--experts "name1,name2"] [--focus requirements|architecture|testing|compliance] [--iterations N]</syntax>
 
-## Usage
-```
-/sc:spec-panel [spec|@file] [--mode discussion|critique|socratic] [--experts "name1,name2"] [--focus requirements|architecture|testing|compliance] [--iterations N]
-```
+  <triggers>
+    <t>Specification review requests</t>
+    <t>Expert panel analysis</t>
+    <t>Requirements quality assessment</t>
+  </triggers>
 
-## Behavioral Flow
-Analyze spec → Assemble experts → Multi-expert review → Collaborate → Synthesize → Improve
+  <flow>
+    <s n="1">Analyze: Parse spec content</s>
+    <s n="2">Assemble: Select relevant experts</s>
+    <s n="3">Review: Multi-expert analysis</s>
+    <s n="4">Collaborate: Expert dialogue</s>
+    <s n="5">Synthesize: Improvement roadmap</s>
+  </flow>
 
-## Expert Panel
+  <mcp servers="seq:coordination|c7:patterns"/>
+  <personas p="tech-writer|sys-arch|qual-eng"/>
 
-| Expert | Domain | Key Question |
-|--------|--------|--------------|
-| **Karl Wiegers** | Requirements quality, SMART criteria | "How would you validate this in production?" |
-| **Gojko Adzic** | BDD, Given/When/Then | "Can you provide concrete examples?" |
-| **Alistair Cockburn** | Use cases, goals | "Who is the primary stakeholder?" |
-| **Martin Fowler** | API design, patterns | "Consider separating concerns here." |
-| **Michael Nygard** | Production reliability | "What happens when this fails?" |
-| **Sam Newman** | Microservices | "How does this handle service evolution?" |
-| **Lisa Crispin** | Testing strategies | "How would testing validate this?" |
-| **Kelsey Hightower** | Cloud native, K8s | "How does this handle cloud deployment?" |
+  <experts>
+    <e n="Wiegers" domain="Requirements quality, SMART" q="How would you validate this?"/>
+    <e n="Adzic" domain="BDD, Given/When/Then" q="Concrete examples?"/>
+    <e n="Cockburn" domain="Use cases, goals" q="Primary stakeholder?"/>
+    <e n="Fowler" domain="API design, patterns" q="Separation of concerns?"/>
+    <e n="Nygard" domain="Production reliability" q="What happens when this fails?"/>
+    <e n="Newman" domain="Microservices" q="Service evolution?"/>
+    <e n="Crispin" domain="Testing strategies" q="How to validate?"/>
+    <e n="Hightower" domain="Cloud native, K8s" q="Cloud deployment?"/>
+  </experts>
 
-## Analysis Modes
+  <modes>
+    <m n="discussion">Sequential expert dialogue building insights</m>
+    <m n="critique">Issue → Severity → Recommendation → Priority</m>
+    <m n="socratic">Deep questioning to surface assumptions</m>
+  </modes>
 
-| Mode | Purpose | Pattern |
-|------|---------|---------|
-| `discussion` | Collaborative improvement | Sequential expert dialogue building on insights |
-| `critique` | Systematic review | Issue identification → Severity → Recommendation → Priority |
-| `socratic` | Learning-focused | Deep questioning to surface assumptions |
+  <focus_areas>
+    <f n="requirements" experts="Wiegers,Adzic,Cockburn">Clarity, testability, acceptance</f>
+    <f n="architecture" experts="Fowler,Newman,Nygard">Interfaces, boundaries, patterns</f>
+    <f n="testing" experts="Crispin,Adzic">Strategy, edge cases, validation</f>
+    <f n="compliance" experts="Wiegers,Nygard">Security, regulatory, audit</f>
+  </focus_areas>
 
-## Focus Areas
+  <examples>
+    <ex i="@auth_api.yml --mode critique --focus requirements,architecture" o="Multi-focus review"/>
+    <ex i="'user story' --mode discussion --experts 'wiegers,adzic'" o="Expert dialogue"/>
+    <ex i="@system.yml --mode socratic --iterations 3" o="Deep questioning"/>
+  </examples>
 
-| Focus | Lead Experts | Analysis |
-|-------|-------------|----------|
-| `requirements` | Wiegers, Adzic, Cockburn | Clarity, testability, acceptance criteria |
-| `architecture` | Fowler, Newman, Nygard | Interface design, boundaries, patterns |
-| `testing` | Crispin, Adzic | Test strategy, edge cases, validation |
-| `compliance` | Wiegers, Nygard | Security, regulatory, audit trails |
-
-## MCP Integration
-- **Sequential**: Expert panel coordination
-- **Context7**: Specification patterns and best practices
-
-## Output Format
-
-```yaml
-quality_assessment:
-  overall_score: 7.2/10
-  requirements_quality: 8.1/10
-  testability_score: 7.5/10
-
-critical_issues:
-  - severity: high
-    expert: wiegers
-    issue: "Timeout not specified"
-    recommendation: "Define session timeout"
-
-improvement_roadmap:
-  immediate: ["Define timeouts", "Add error scenarios"]
-  short_term: ["Monitoring requirements"]
-```
-
-## Examples
-
-```bash
-/sc:spec-panel @auth_api.yml --mode critique --focus requirements,architecture
-/sc:spec-panel "user story" --mode discussion --experts "wiegers,adzic"
-/sc:spec-panel @system.yml --mode socratic --iterations 3
-```
-
-## Boundaries
-
-**Will**: Expert-level review, actionable recommendations, multi-mode analysis
-**Will Not**: Replace human judgment, modify without consent, provide legal guarantees
-
-</document>
+  <bounds will="expert-level review|actionable recs|multi-mode analysis" wont="replace human judgment|modify without consent|legal guarantees"/>
+</component>

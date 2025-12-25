@@ -1,50 +1,30 @@
----
-name: sequential
-type: mcp
-triggers: [think, think-hard, ultrathink, debug, architecture, analysis, reasoning, sequential]
-description: Multi-step reasoning engine for complex analysis and systematic problem solving
-category: reasoning
----
+<component name="sequential" type="mcp">
+  <config style="Telegraphic|Imperative|XML" eval="true"/>
+  <triggers>think|think-hard|ultrathink|debug|architecture|analysis|reasoning|sequential</triggers>
 
-<document type="mcp" name="sequential"
-          triggers="think, think-hard, ultrathink, debug, architecture, analysis, reasoning, sequential">
+  <role>
+    <mission>Multi-step reasoning engine for complex analysis and systematic problem solving</mission>
+  </role>
 
-# Sequential MCP Server
+  <choose>
+    <use context="complex problems">3+ interconnected components</use>
+    <use context="systematic analysis">Root cause, architecture review, security assessment</use>
+    <use context="structured approach">Decomposition, evidence gathering</use>
+    <use context="cross-domain">Frontend + backend + database + infrastructure</use>
+    <avoid context="simple tasks">Basic explanations, single-file, straightforward fixes</avoid>
+  </choose>
 
-**Purpose**: Multi-step reasoning engine for complex analysis and systematic problem solving
+  <synergy>
+    <with n="Context7">Sequential coordinates → Context7 provides patterns</with>
+    <with n="Magic">Sequential analyzes UI logic → Magic implements</with>
+    <with n="Playwright">Sequential identifies test strategy → Playwright executes</with>
+  </synergy>
 
-## Triggers
-
-- Complex debugging scenarios with multiple layers
-- Architectural analysis and system design questions
-- `--think`, `--think-hard`, `--ultrathink` flags
-- Problems requiring hypothesis testing and validation
-- Multi-component failure investigation
-- Performance bottleneck identification requiring methodical approach
-
-## Choose When
-
-- **Over native reasoning**: When problems have 3+ interconnected components
-- **For systematic analysis**: Root cause analysis, architecture review, security assessment
-- **When structure matters**: Problems benefit from decomposition and evidence gathering
-- **For cross-domain issues**: Problems spanning frontend, backend, database, infrastructure
-- **Not for simple tasks**: Basic explanations, single-file changes, straightforward fixes
-
-## Works Best With
-
-- **Context7**: Sequential coordinates analysis → Context7 provides official patterns
-- **Magic**: Sequential analyzes UI logic → Magic implements structured components
-- **Playwright**: Sequential identifies testing strategy → Playwright executes validation
-
-## Examples
-
-```
-"why is this API slow?" → Sequential (systematic performance analysis)
-"design a microservices architecture" → Sequential (structured system design)
-"debug this authentication flow" → Sequential (multi-component investigation)
-"analyze security vulnerabilities" → Sequential (comprehensive threat modeling)
-"explain this function" → Native Claude (simple explanation)
-"fix this typo" → Native Claude (straightforward change)
-```
-
-</document>
+  <examples>
+    <ex i="why is API slow" o="Sequential" r="systematic perf analysis"/>
+    <ex i="design microservices" o="Sequential" r="structured system design"/>
+    <ex i="debug auth flow" o="Sequential" r="multi-component investigation"/>
+    <ex i="security vulnerabilities" o="Sequential" r="comprehensive threat modeling"/>
+    <ex i="explain this function" o="Native Claude" r="simple explanation"/>
+  </examples>
+</component>

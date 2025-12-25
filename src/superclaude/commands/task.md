@@ -1,96 +1,51 @@
----
-name: task
-type: command
-triggers: [/sc:task, task-management, workflow-execution, multi-agent-coordination]
-description: "Execute complex tasks with intelligent workflow management and delegation"
-category: special
-complexity: advanced
-mcp-servers: [sequential, context7, magic, playwright, morphllm, serena]
-personas: [architect, analyzer, frontend, backend, security, devops, project-manager]
----
+<component name="task" type="command">
+  <config style="Telegraphic|Imperative|XML" eval="true"/>
+  <runtime model="opus-4-5" effort="high"/>
 
-<document type="command" name="task"
-          triggers="/sc:task, task-management, workflow-execution, multi-agent-coordination">
+  <role>
+    /sc:task
+    <mission>Execute complex tasks with intelligent workflow management and delegation</mission>
+  </role>
 
-# /sc:task - Enhanced Task Management
+  <syntax>/sc:task [action] [target] [--strategy systematic|agile|enterprise] [--parallel] [--delegate]</syntax>
 
-## Triggers
-- Complex tasks requiring multi-agent coordination and delegation
-- Projects needing structured workflow management and cross-session persistence
-- Operations requiring intelligent MCP server routing and domain expertise
-- Tasks benefiting from systematic execution and progressive enhancement
+  <triggers>
+    <t>Complex multi-agent coordination</t>
+    <t>Structured workflow management</t>
+    <t>Intelligent MCP routing needs</t>
+    <t>Systematic execution requirements</t>
+  </triggers>
 
-## Usage
-```
-/sc:task [action] [target] [--strategy systematic|agile|enterprise] [--parallel] [--delegate]
-```
+  <flow>
+    <s n="1">Analyze: Parse requirements + optimal strategy</s>
+    <s n="2">Delegate: Route to MCP + activate personas</s>
+    <s n="3">Coordinate: Intelligent workflow + parallel</s>
+    <s n="4">Validate: Quality gates + completion verification</s>
+    <s n="5">Optimize: Performance analysis + recs</s>
+  </flow>
 
-## Behavioral Flow
-1. **Analyze**: Parse task requirements and determine optimal execution strategy
-2. **Delegate**: Route to appropriate MCP servers and activate relevant personas
-3. **Coordinate**: Execute tasks with intelligent workflow management and parallel processing
-4. **Validate**: Apply quality gates and comprehensive task completion verification
-5. **Optimize**: Analyze performance and provide enhancement recommendations
+  <mcp servers="seq:analysis|c7:patterns|magic:UI|play:testing|morph:transform|serena:persistence"/>
+  <personas p="arch|anal|fe|be|sec|ops|pm"/>
 
-Key behaviors:
-- Multi-persona coordination across architect, frontend, backend, security, devops domains
-- Intelligent MCP server routing (Sequential, Context7, Magic, Playwright, Morphllm, Serena)
-- Systematic execution with progressive task enhancement and cross-session persistence
-- Advanced task delegation with hierarchical breakdown and dependency management
+  <tools>
+    <t n="TodoWrite">Epic → Story → Task hierarchy</t>
+    <t n="Task">Multi-agent delegation</t>
+    <t n="Read/Write/Edit">Documentation + coordination</t>
+    <t n="sequentialthinking">Dependency analysis</t>
+  </tools>
 
-## MCP Integration
-- **Sequential MCP**: Complex multi-step task analysis and systematic execution planning
-- **Context7 MCP**: Framework-specific patterns and implementation best practices
-- **Magic MCP**: UI/UX task coordination and design system integration
-- **Playwright MCP**: Testing workflow integration and validation automation
-- **Morphllm MCP**: Large-scale task transformation and pattern-based optimization
-- **Serena MCP**: Cross-session task persistence and project memory management
+  <patterns>
+    <p n="Hierarchy">Epic → Story → Task → Subtask</p>
+    <p n="Strategy">Systematic (comprehensive) | Agile (iterative) | Enterprise (governance)</p>
+    <p n="Multi-Agent">Persona → MCP → parallel → integration</p>
+    <p n="Cross-Session">Persistence → continuity → enhancement</p>
+  </patterns>
 
-## Tool Coordination
-- **TodoWrite**: Hierarchical task breakdown and progress tracking across Epic → Story → Task levels
-- **Task**: Advanced delegation for complex multi-agent coordination and sub-task management
-- **Read/Write/Edit**: Task documentation and implementation coordination
-- **sequentialthinking**: Structured reasoning for complex task dependency analysis
+  <examples>
+    <ex i="create 'enterprise auth' --strategy systematic --parallel" o="Multi-domain coordination"/>
+    <ex i="execute 'feature backlog' --strategy agile --delegate" o="Iterative + delegation"/>
+    <ex i="execute 'microservices platform' --strategy enterprise --parallel" o="Enterprise scale"/>
+  </examples>
 
-## Key Patterns
-- **Task Hierarchy**: Epic-level objectives → Story coordination → Task execution → Subtask granularity
-- **Strategy Selection**: Systematic (comprehensive) → Agile (iterative) → Enterprise (governance)
-- **Multi-Agent Coordination**: Persona activation → MCP routing → parallel execution → result integration
-- **Cross-Session Management**: Task persistence → context continuity → progressive enhancement
-
-## Examples
-
-### Complex Feature Development
-```
-/sc:task create "enterprise authentication system" --strategy systematic --parallel
-# Comprehensive task breakdown with multi-domain coordination
-# Activates architect, security, backend, frontend personas
-```
-
-### Agile Sprint Coordination
-```
-/sc:task execute "feature backlog" --strategy agile --delegate
-# Iterative task execution with intelligent delegation
-# Cross-session persistence for sprint continuity
-```
-
-### Multi-Domain Integration
-```
-/sc:task execute "microservices platform" --strategy enterprise --parallel
-# Enterprise-scale coordination with compliance validation
-# Parallel execution across multiple technical domains
-```
-
-## Boundaries
-
-**Will:**
-- Execute complex tasks with multi-agent coordination and intelligent delegation
-- Provide hierarchical task breakdown with cross-session persistence
-- Coordinate multiple MCP servers and personas for optimal task outcomes
-
-**Will Not:**
-- Execute simple tasks that don't require advanced orchestration
-- Compromise quality standards for speed or convenience
-- Operate without proper validation and quality gates
-
-</document>
+  <bounds will="complex task coordination|hierarchical breakdown|MCP+persona orchestration" wont="simple tasks|compromise quality|operate without validation"/>
+</component>

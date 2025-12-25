@@ -1,100 +1,51 @@
----
-name: load
-type: command
-triggers: [/sc:load, session-load, project-load, context-restore]
-description: "Session lifecycle management with Serena MCP integration for project context loading"
-category: session
-complexity: standard
-mcp-servers: [serena]
-personas: []
----
+<component name="load" type="command">
+  <config style="Telegraphic|Imperative|XML" eval="true"/>
+  <runtime model="opus-4-5" effort="low"/>
 
-<document type="command" name="load"
-          triggers="/sc:load, session-load, project-load, context-restore">
+  <role>
+    /sc:load
+    <mission>Session lifecycle management with Serena MCP integration for project context loading</mission>
+  </role>
 
-# /sc:load - Project Context Loading
+  <syntax>/sc:load [target] [--type project|config|deps|checkpoint] [--refresh] [--analyze]</syntax>
 
-## Triggers
-- Session initialization and project context loading requests
-- Cross-session persistence and memory retrieval needs
-- Project activation and context management requirements
-- Session lifecycle management and checkpoint loading scenarios
+  <triggers>
+    <t>Session initialization</t>
+    <t>Cross-session persistence</t>
+    <t>Project activation</t>
+    <t>Checkpoint loading</t>
+  </triggers>
 
-## Usage
-```
-/sc:load [target] [--type project|config|deps|checkpoint] [--refresh] [--analyze]
-```
+  <flow>
+    <s n="1">Initialize: Serena MCP + session context</s>
+    <s n="2">Discover: Project structure + requirements</s>
+    <s n="3">Load: Memories + checkpoints + persistence data</s>
+    <s n="4">Activate: Project context + workflow prep</s>
+    <s n="5">Validate: Context integrity + session readiness</s>
+  </flow>
 
-## Behavioral Flow
-1. **Initialize**: Establish Serena MCP connection and session context management
-2. **Discover**: Analyze project structure and identify context loading requirements
-3. **Load**: Retrieve project memories, checkpoints, and cross-session persistence data
-4. **Activate**: Establish project context and prepare for development workflow
-5. **Validate**: Ensure loaded context integrity and session readiness
+  <mcp servers="serena:memory|serena:persistence"/>
 
-Key behaviors:
-- Serena MCP integration for memory management and cross-session persistence
-- Project activation with comprehensive context loading and validation
-- Performance-critical operation with <500ms initialization target
-- Session lifecycle management with checkpoint and memory coordination
+  <tools>
+    <t n="activate_project">Core project activation</t>
+    <t n="list_memories/read_memory">Memory retrieval</t>
+    <t n="Read/Grep/Glob">Structure analysis</t>
+    <t n="Write">Checkpoint creation</t>
+  </tools>
 
-## MCP Integration
-- **Serena MCP**: Mandatory integration for project activation, memory retrieval, and session management
-- **Memory Operations**: Cross-session persistence, checkpoint loading, and context restoration
-- **Performance Critical**: <200ms for core operations, <1s for checkpoint creation
+  <patterns>
+    <p n="Activation">Directory → memory → context establish</p>
+    <p n="Restoration">Checkpoint → validation → workflow prep</p>
+    <p n="Memory">Cross-session → continuity → efficiency</p>
+    <p n="Performance">&lt;500ms init | &lt;200ms core | &lt;1s checkpoint</p>
+  </patterns>
 
-## Tool Coordination
-- **activate_project**: Core project activation and context establishment
-- **list_memories/read_memory**: Memory retrieval and session context loading
-- **Read/Grep/Glob**: Project structure analysis and configuration discovery
-- **Write**: Session context documentation and checkpoint creation
+  <examples>
+    <ex i="/sc:load" o="Current dir + Serena memory"/>
+    <ex i="/path/to/project --type project --analyze" o="Specific project + analysis"/>
+    <ex i="--type checkpoint --checkpoint session_123" o="Restore checkpoint"/>
+    <ex i="--type deps --refresh" o="Fresh dependency analysis"/>
+  </examples>
 
-## Key Patterns
-- **Project Activation**: Directory analysis → memory retrieval → context establishment
-- **Session Restoration**: Checkpoint loading → context validation → workflow preparation
-- **Memory Management**: Cross-session persistence → context continuity → development efficiency
-- **Performance Critical**: Fast initialization → immediate productivity → session readiness
-
-## Examples
-
-### Basic Project Loading
-```
-/sc:load
-# Loads current directory project context with Serena memory integration
-# Establishes session context and prepares for development workflow
-```
-
-### Specific Project Loading
-```
-/sc:load /path/to/project --type project --analyze
-# Loads specific project with comprehensive analysis
-# Activates project context and retrieves cross-session memories
-```
-
-### Checkpoint Restoration
-```
-/sc:load --type checkpoint --checkpoint session_123
-# Restores specific checkpoint with session context
-# Continues previous work session with full context preservation
-```
-
-### Dependency Context Loading
-```
-/sc:load --type deps --refresh
-# Loads dependency context with fresh analysis
-# Updates project understanding and dependency mapping
-```
-
-## Boundaries
-
-**Will:**
-- Load project context using Serena MCP integration for memory management
-- Provide session lifecycle management with cross-session persistence
-- Establish project activation with comprehensive context loading
-
-**Will Not:**
-- Modify project structure or configuration without explicit permission
-- Load context without proper Serena MCP integration and validation
-- Override existing session context without checkpoint preservation
-
-</document>
+  <bounds will="Serena integration|cross-session persistence|context loading" wont="modify structure|load without validation|override without checkpoint"/>
+</component>

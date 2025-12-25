@@ -1,100 +1,52 @@
----
-name: cleanup
-type: command
-triggers: [/sc:cleanup, code-cleanup, dead-code, refactor, technical-debt]
-description: "Systematically clean up code, remove dead code, and optimize project structure"
-category: workflow
-complexity: standard
-mcp-servers: [sequential, context7]
-personas: [architect, quality, security]
----
+<component name="cleanup" type="command">
+  <config style="Telegraphic|Imperative|XML" eval="true"/>
+  <runtime model="opus-4-5" effort="medium"/>
 
-<document type="command" name="cleanup"
-          triggers="/sc:cleanup, code-cleanup, dead-code, refactor, technical-debt">
+  <role>
+    /sc:cleanup
+    <mission>Systematically clean up code, remove dead code, and optimize project structure</mission>
+  </role>
 
-# /sc:cleanup - Code and Project Cleanup
+  <syntax>/sc:cleanup [target] [--type code|imports|files|all] [--safe|--aggressive] [--interactive]</syntax>
 
-## Triggers
-- Code maintenance and technical debt reduction requests
-- Dead code removal and import optimization needs
-- Project structure improvement and organization requirements
-- Codebase hygiene and quality improvement initiatives
+  <triggers>
+    <t>Code maintenance + tech debt</t>
+    <t>Dead code removal</t>
+    <t>Project structure improvement</t>
+    <t>Codebase hygiene</t>
+  </triggers>
 
-## Usage
-```
-/sc:cleanup [target] [--type code|imports|files|all] [--safe|--aggressive] [--interactive]
-```
+  <flow>
+    <s n="1">Analyze: Cleanup opportunities + safety</s>
+    <s n="2">Plan: Choose approach + activate personas</s>
+    <s n="3">Execute: Systematic dead code detection</s>
+    <s n="4">Validate: Ensure no functionality loss</s>
+    <s n="5">Report: Summary + maintenance recs</s>
+  </flow>
 
-## Behavioral Flow
-1. **Analyze**: Assess cleanup opportunities and safety considerations across target scope
-2. **Plan**: Choose cleanup approach and activate relevant personas for domain expertise
-3. **Execute**: Apply systematic cleanup with intelligent dead code detection and removal
-4. **Validate**: Ensure no functionality loss through testing and safety verification
-5. **Report**: Generate cleanup summary with recommendations for ongoing maintenance
+  <mcp servers="seq:analysis|c7:patterns"/>
+  <personas p="arch|qual|sec"/>
 
-Key behaviors:
-- Multi-persona coordination (architect, quality, security) based on cleanup type
-- Framework-specific cleanup patterns via Context7 MCP integration
-- Systematic analysis via Sequential MCP for complex cleanup operations
-- Safety-first approach with backup and rollback capabilities
+  <tools>
+    <t n="Read/Grep/Glob">Analysis + pattern detection</t>
+    <t n="Edit/MultiEdit">Safe modification</t>
+    <t n="TodoWrite">Progress tracking</t>
+    <t n="Task">Large-scale delegation</t>
+  </tools>
 
-## MCP Integration
-- **Sequential MCP**: Auto-activated for complex multi-step cleanup analysis and planning
-- **Context7 MCP**: Framework-specific cleanup patterns and best practices
-- **Persona Coordination**: Architect (structure), Quality (debt), Security (credentials)
+  <patterns>
+    <p n="DeadCode">Usage analysis → safe removal</p>
+    <p n="Imports">Dependency analysis → optimization</p>
+    <p n="Structure">Arch analysis → modular improvements</p>
+    <p n="Safety">Pre/during/post checks</p>
+  </patterns>
 
-## Tool Coordination
-- **Read/Grep/Glob**: Code analysis and pattern detection for cleanup opportunities
-- **Edit/MultiEdit**: Safe code modification and structure optimization
-- **TodoWrite**: Progress tracking for complex multi-file cleanup operations
-- **Task**: Delegation for large-scale cleanup workflows requiring systematic coordination
+  <examples>
+    <ex i="src/ --type code --safe" o="Conservative cleanup"/>
+    <ex i="--type imports --preview" o="Unused import analysis"/>
+    <ex i="--type all --interactive" o="Multi-domain with guidance"/>
+    <ex i="components/ --aggressive" o="Thorough cleanup"/>
+  </examples>
 
-## Key Patterns
-- **Dead Code Detection**: Usage analysis → safe removal with dependency validation
-- **Import Optimization**: Dependency analysis → unused import removal and organization
-- **Structure Cleanup**: Architectural analysis → file organization and modular improvements
-- **Safety Validation**: Pre/during/post checks → preserve functionality throughout cleanup
-
-## Examples
-
-### Safe Code Cleanup
-```
-/sc:cleanup src/ --type code --safe
-# Conservative cleanup with automatic safety validation
-# Removes dead code while preserving all functionality
-```
-
-### Import Optimization
-```
-/sc:cleanup --type imports --preview
-# Analyzes and shows unused import cleanup without execution
-# Framework-aware optimization via Context7 patterns
-```
-
-### Comprehensive Project Cleanup
-```
-/sc:cleanup --type all --interactive
-# Multi-domain cleanup with user guidance for complex decisions
-# Activates all personas for comprehensive analysis
-```
-
-### Framework-Specific Cleanup
-```
-/sc:cleanup components/ --aggressive
-# Thorough cleanup with Context7 framework patterns
-# Sequential analysis for complex dependency management
-```
-
-## Boundaries
-
-**Will:**
-- Systematically clean code, remove dead code, and optimize project structure
-- Provide comprehensive safety validation with backup and rollback capabilities
-- Apply intelligent cleanup algorithms with framework-specific pattern recognition
-
-**Will Not:**
-- Remove code without thorough safety analysis and validation
-- Override project-specific cleanup exclusions or architectural constraints
-- Apply cleanup operations that compromise functionality or introduce bugs
-
-</document>
+  <bounds will="systematic cleanup|safety validation|intelligent algorithms" wont="remove without analysis|override exclusions|compromise functionality"/>
+</component>

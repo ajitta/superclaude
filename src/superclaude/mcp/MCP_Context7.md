@@ -1,47 +1,28 @@
----
-name: context7
-type: mcp
-triggers: [library, docs, framework, documentation, import, require]
-description: Official library documentation lookup and framework pattern guidance
-category: mcp
----
+<component name="context7" type="mcp">
+  <config style="Telegraphic|Imperative|XML" eval="true"/>
+  <triggers>library|docs|framework|documentation|import|require</triggers>
 
-<document type="mcp" name="context7"
-          triggers="library, docs, framework, documentation, import, require">
+  <role>
+    <mission>Official library documentation lookup and framework pattern guidance</mission>
+  </role>
 
-# Context7 MCP Server
+  <choose>
+    <use context="curated docs">Version-specific documentation over WebSearch</use>
+    <use context="official patterns">Implementation must follow official patterns</use>
+    <use context="frameworks">React hooks, Vue composition API, Angular services</use>
+    <use context="libraries">Correct API usage, auth flows, configuration</use>
+    <use context="compliance">Adherence to official standards</use>
+  </choose>
 
-**Purpose**: Official library documentation lookup and framework pattern guidance
+  <synergy>
+    <with n="Sequential">Context7 provides docs → Sequential analyzes strategy</with>
+    <with n="Magic">Context7 supplies patterns → Magic generates components</with>
+  </synergy>
 
-## Triggers
-
-- Import statements: `import`, `require`, `from`, `use`
-- Framework keywords: React, Vue, Angular, Next.js, Express, etc.
-- Library-specific questions about APIs or best practices
-- Need for official documentation patterns vs generic solutions
-- Version-specific implementation requirements
-
-## Choose When
-
-- **Over WebSearch**: When you need curated, version-specific documentation
-- **Over native knowledge**: When implementation should follow official patterns
-- **For frameworks**: React hooks, Vue composition API, Angular services
-- **For libraries**: Correct API usage, authentication flows, configuration
-- **For compliance**: When adherence to official standards is recommended
-
-## Works Best With
-
-- **Sequential**: Context7 provides docs → Sequential analyzes implementation strategy
-- **Magic**: Context7 supplies patterns → Magic generates framework-compliant components
-
-## Examples
-
-```
-"implement React useEffect" → Context7 (official React patterns)
-"add authentication with Auth0" → Context7 (official Auth0 docs)
-"migrate to Vue 3" → Context7 (official migration guide)
-"optimize Next.js performance" → Context7 (official optimization patterns)
-"just explain this function" → Native Claude (no external docs needed)
-```
-
-</document>
+  <examples>
+    <ex i="implement React useEffect" o="Context7" r="official React patterns"/>
+    <ex i="add Auth0 authentication" o="Context7" r="official Auth0 docs"/>
+    <ex i="migrate to Vue 3" o="Context7" r="official migration guide"/>
+    <ex i="just explain this function" o="Native Claude" r="no external docs needed"/>
+  </examples>
+</component>

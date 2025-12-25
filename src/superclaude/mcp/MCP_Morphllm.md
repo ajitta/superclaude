@@ -1,48 +1,29 @@
----
-name: morphllm
-type: mcp
-triggers: [pattern, bulk, edit, transform, style, framework, text-replacement, morphllm]
-description: Pattern-based code editing engine with token optimization for bulk transformations
-category: code-editing
----
+<component name="morphllm" type="mcp">
+  <config style="Telegraphic|Imperative|XML" eval="true"/>
+  <triggers>pattern|bulk|edit|transform|style|framework|text-replacement|morphllm</triggers>
 
-<document type="mcp" name="morphllm"
-          triggers="pattern, bulk, edit, transform, style, framework, text-replacement, morphllm">
+  <role>
+    <mission>Pattern-based code editing engine with token optimization for bulk transformations</mission>
+  </role>
 
-# Morphllm MCP Server
+  <choose>
+    <use context="pattern-based edits">For bulk ops, not symbol ops (use Serena)</use>
+    <use context="bulk operations">Style enforcement, framework updates, text replacements</use>
+    <use context="token efficiency">Fast Apply with compression (30-50% gains)</use>
+    <use context="moderate complexity">&lt;10 files, straightforward transformations</use>
+    <avoid context="semantic operations">Symbol renames, dependency tracking, LSP</avoid>
+  </choose>
 
-**Purpose**: Pattern-based code editing engine with token optimization for bulk transformations
+  <synergy>
+    <with n="Serena">Serena analyzes semantic → Morphllm executes edits</with>
+    <with n="Sequential">Sequential plans strategy → Morphllm applies changes</with>
+  </synergy>
 
-## Triggers
-
-- Multi-file edit operations requiring consistent patterns
-- Framework updates, style guide enforcement, code cleanup
-- Bulk text replacements across multiple files
-- Natural language edit instructions with specific scope
-- Token optimization needed (efficiency gains 30-50%)
-
-## Choose When
-
-- **Over Serena**: For pattern-based edits, not symbol operations
-- **For bulk operations**: Style enforcement, framework updates, text replacements
-- **When token efficiency matters**: Fast Apply scenarios with compression needs
-- **For simple to moderate complexity**: <10 files, straightforward transformations
-- **Not for semantic operations**: Symbol renames, dependency tracking, LSP integration
-
-## Works Best With
-
-- **Serena**: Serena analyzes semantic context → Morphllm executes precise edits
-- **Sequential**: Sequential plans edit strategy → Morphllm applies systematic changes
-
-## Examples
-
-```
-"update all React class components to hooks" → Morphllm (pattern transformation)
-"enforce ESLint rules across project" → Morphllm (style guide application)
-"replace all console.log with logger calls" → Morphllm (bulk text replacement)
-"rename getUserData function everywhere" → Serena (symbol operation)
-"analyze code architecture" → Sequential (complex analysis)
-"explain this algorithm" → Native Claude (simple explanation)
-```
-
-</document>
+  <examples>
+    <ex i="update React class to hooks" o="Morphllm" r="pattern transformation"/>
+    <ex i="enforce ESLint rules" o="Morphllm" r="style guide application"/>
+    <ex i="replace console.log with logger" o="Morphllm" r="bulk text replacement"/>
+    <ex i="rename getUserData everywhere" o="Serena" r="symbol operation"/>
+    <ex i="analyze code architecture" o="Sequential" r="complex analysis"/>
+  </examples>
+</component>

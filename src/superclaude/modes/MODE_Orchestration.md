@@ -1,83 +1,42 @@
----
-name: orchestration
-type: mode
-triggers: [orchestrate, coordinate, parallel, multi-tool, resource, efficiency]
-description: Intelligent tool selection mindset for optimal task routing and resource efficiency
-category: coordination
----
+<component name="orchestration" type="mode">
+  <config style="Telegraphic|Imperative|XML" eval="true"/>
+  <triggers>orchestrate|coordinate|parallel|multi-tool|resource|efficiency</triggers>
 
-<document type="mode" name="orchestration"
-          triggers="orchestrate, coordinate, parallel, multi-tool, resource, efficiency">
+  <role>
+    <mission>Intelligent tool selection mindset for optimal task routing and resource efficiency</mission>
+  </role>
 
-# Orchestration Mode
+  <behaviors>
+    <b n="Smart-Tool">Choose most powerful tool per task type</b>
+    <b n="Resource-Aware">Adapt based on system constraints</b>
+    <b n="Parallel-Thinking">ID independent ops for concurrent execution</b>
+    <b n="Efficiency">Optimize tool usage for speed+effectiveness</b>
+  </behaviors>
 
-**Purpose**: Intelligent tool selection mindset for optimal task routing and resource efficiency
+  <tool_matrix>
+    <r task="UI components" best="Magic MCP" alt="Manual coding"/>
+    <r task="Deep analysis" best="Sequential MCP" alt="Native reasoning"/>
+    <r task="Symbol ops" best="Serena MCP" alt="Manual search"/>
+    <r task="Pattern edits" best="Morphllm MCP" alt="Individual edits"/>
+    <r task="Docs" best="Context7 MCP" alt="Web search"/>
+    <r task="Browser test" best="Playwright MCP" alt="Unit tests"/>
+    <r task="Multi-file" best="MultiEdit" alt="Sequential Edits"/>
+    <r task="Infra config" best="WebFetch (official docs)" alt="Assumption (❌)"/>
+  </tool_matrix>
 
-## Activation Triggers
+  <infra_validation>
+    <rule>Infra/config changes → consult official docs first</rule>
+    <keywords>Traefik|nginx|Apache|HAProxy|Caddy|Docker|K8s|Terraform|Ansible</keywords>
+    <patterns>*.toml|*.conf|traefik.yml|nginx.conf|*.tf|Dockerfile</patterns>
+    <actions>WebFetch official docs | Activate DeepResearch | Block assumption-based changes</actions>
+    <rationale>Misconfig → production outages. Enforces "Evidence > assumptions"</rationale>
+  </infra_validation>
 
-- Multi-tool operations requiring coordination
-- Performance constraints (>75% resource usage)
-- Parallel execution opportunities (>3 files)
-- Complex routing decisions with multiple valid approaches
+  <resources>
+    <zone n="Green" range="0-75%">Full capabilities | All tools | Normal verbosity</zone>
+    <zone n="Yellow" range="75-85%">Efficiency mode | Reduce verbosity | Defer non-critical</zone>
+    <zone n="Red" range="85%+">Essential only | Minimal output | Fail fast</zone>
+  </resources>
 
-## Behavioral Changes
-
-- **Smart Tool Selection**: Choose most powerful tool for each task type
-- **Resource Awareness**: Adapt approach based on system constraints
-- **Parallel Thinking**: Identify independent operations for concurrent execution
-- **Efficiency Focus**: Optimize tool usage for speed and effectiveness
-
-## Tool Selection Matrix
-
-| Task Type | Best Tool | Alternative |
-|-----------|-----------|-------------|
-| UI components | Magic MCP | Manual coding |
-| Deep analysis | Sequential MCP | Native reasoning |
-| Symbol operations | Serena MCP | Manual search |
-| Pattern edits | Morphllm MCP | Individual edits |
-| Documentation | Context7 MCP | Web search |
-| Browser testing | Playwright MCP | Unit tests |
-| Multi-file edits | MultiEdit | Sequential Edits |
-| Infrastructure config | WebFetch (official docs) | Assumption-based (❌ forbidden) |
-
-## Infrastructure Configuration Validation
-
-**Key Rule**: Infrastructure and technical configuration changes should consult official documentation before making recommendations.
-
-**Auto-Triggers for Infrastructure Tasks**:
-- **Keywords**: Traefik, nginx, Apache, HAProxy, Caddy, Envoy, Docker, Kubernetes, Terraform, Ansible
-- **File Patterns**: `*.toml`, `*.conf`, `traefik.yml`, `nginx.conf`, `*.tf`, `Dockerfile`
-- **Recommended Actions**:
-  1. **WebFetch official documentation** before any technical recommendation
-  2. Activate MODE_DeepResearch for infrastructure investigation
-  3. Avoid assumption-based configuration changes
-
-**Rationale**: Infrastructure misconfiguration can cause production outages. Verify against official documentation (e.g., Traefik docs for port configuration, nginx docs for proxy settings).
-
-**Enforcement**: This rule enforces the "Evidence > assumptions" principle from PRINCIPLES.md for infrastructure operations.
-
-## Resource Management
-
-**🟢 Green Zone (0-75%)**
-- Full capabilities available
-- Use all tools and features
-- Normal verbosity
-
-**🟡 Yellow Zone (75-85%)**
-- Activate efficiency mode
-- Reduce verbosity
-- Defer non-critical operations
-
-**🔴 Red Zone (85%+)**
-- Essential operations only
-- Minimal output
-- Fail fast on complex requests
-
-## Parallel Execution Triggers
-
-- **3+ files**: Auto-suggest parallel processing
-- **Independent operations**: Batch Read calls, parallel edits
-- **Multi-directory scope**: Enable delegation mode
-- **Performance requests**: Parallel-first approach
-
-</document>
+  <parallel>3+ files → suggest parallel | Independent ops → batch | Multi-dir → delegation | Perf requests → parallel-first</parallel>
+</component>
