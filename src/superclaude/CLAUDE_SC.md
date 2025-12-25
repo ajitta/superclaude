@@ -83,41 +83,41 @@ Agents are delegable specialists activated via Task tool or `/sc:agent`.
 
 ## Architecture & Design
 
-@agents/system-architect.md
-@agents/backend-architect.md
-@agents/frontend-architect.md
-@agents/devops-architect.md
+@../agents/system-architect.md
+@../agents/backend-architect.md
+@../agents/frontend-architect.md
+@../agents/devops-architect.md
 
 ## Quality & Security
 
-@agents/quality-engineer.md
-@agents/security-engineer.md
-@agents/performance-engineer.md
+@../agents/quality-engineer.md
+@../agents/security-engineer.md
+@../agents/performance-engineer.md
 
 ## Development
 
-@agents/python-expert.md
-@agents/refactoring-expert.md
-@agents/technical-writer.md
+@../agents/python-expert.md
+@../agents/refactoring-expert.md
+@../agents/technical-writer.md
 
 ## Analysis & Research
 
-@agents/deep-research-agent.md
-@agents/deep-research.md
-@agents/requirements-analyst.md
-@agents/root-cause-analyst.md
+@../agents/deep-research-agent.md
+@../agents/deep-research.md
+@../agents/requirements-analyst.md
+@../agents/root-cause-analyst.md
 
 ## Project Management
 
-@agents/pm-agent.md
-@agents/repo-index.md
-@agents/self-review.md
+@../agents/pm-agent.md
+@../agents/repo-index.md
+@../agents/self-review.md
 
 ## Education & Collaboration
 
-@agents/learning-guide.md
-@agents/socratic-mentor.md
-@agents/business-panel-experts.md
+@../agents/learning-guide.md
+@../agents/socratic-mentor.md
+@../agents/business-panel-experts.md
 
 ---
 

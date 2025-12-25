@@ -44,31 +44,47 @@ def main():
     is_flag=True,
     help="List all components and their installation status",
 )
-def install(force: bool, list_only: bool, list_all: bool):
+@click.option(
+    "--scope",
+    default="user",
+    type=click.Choice(["user", "project"]),
+    help="Installation scope: user (~/.claude/) or project (./.claude/)",
+)
+def install(force: bool, list_only: bool, list_all: bool, scope: str):
     """
     Install all SuperClaude components to Claude Code
 
     Installs:
-    - Slash commands to ~/.claude/commands/sc/
-    - Framework files to ~/.claude/superclaude/ (agents, core, modes, mcp, skills)
+    - Slash commands to commands/sc/
+    - Agent definitions to agents/
+    - Skills to skills/
+    - Framework files to superclaude/ (core, modes, mcp)
+
+    Scopes:
+    - user (default): Install to ~/.claude/
+    - project: Install to ./.claude/ (current directory)
 
     Examples:
         superclaude install
         superclaude install --force
+        superclaude install --scope project
         superclaude install --list
-        superclaude install --list-all
     """
     from .install_commands import (
         install_all,
         list_available_commands,
         list_installed_commands,
         list_all_components,
+        get_base_path,
     )
+
+    # Get base path based on scope
+    base_path = get_base_path(scope)
 
     # List all components mode
     if list_all:
-        components = list_all_components()
-        click.echo("📋 SuperClaude Components:\n")
+        components = list_all_components(base_path=base_path)
+        click.echo(f"📋 SuperClaude Components (scope: {scope}):\n")
         for name, info in components.items():
             status = f"{info['installed']}/{info['available']}"
             icon = "✅" if info['installed'] == info['available'] and info['available'] > 0 else "⬜"
@@ -79,9 +95,9 @@ def install(force: bool, list_only: bool, list_all: bool):
     # List commands only mode
     if list_only:
         available = list_available_commands()
-        installed = list_installed_commands()
+        installed = list_installed_commands(base_path=base_path)
 
-        click.echo("📋 Available Commands:")
+        click.echo(f"📋 Available Commands (scope: {scope}):")
         for cmd in available:
             status = "✅ installed" if cmd in installed else "⬜ not installed"
             click.echo(f"   /{cmd:20} {status}")
@@ -90,10 +106,10 @@ def install(force: bool, list_only: bool, list_all: bool):
         return
 
     # Install all components
-    click.echo("📦 Installing SuperClaude components...")
+    click.echo(f"📦 Installing SuperClaude components (scope: {scope})...")
     click.echo()
 
-    success, message = install_all(force=force)
+    success, message = install_all(base_path=base_path, force=force)
 
     click.echo(message)
 

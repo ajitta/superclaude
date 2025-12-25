@@ -1,10 +1,16 @@
 """
 SuperClaude Installation
 
-Installs all SuperClaude components to ~/.claude/ directory:
+Installs all SuperClaude components to ~/.claude/ or ./.claude/ directory:
 - commands/sc/     : Slash commands
-- superclaude/     : Framework files (agents, core, modes, mcp, skills)
+- agents/          : Agent definitions
+- skills/          : Skills
+- superclaude/     : Framework files (core, modes, mcp, CLAUDE_SC.md)
 - CLAUDE.md        : Auto-configured to import CLAUDE_SC.md
+
+Supports two scopes:
+- user: ~/.claude/ (default)
+- project: ./.claude/ (current directory)
 """
 
 import re
@@ -15,14 +21,30 @@ from typing import Dict, List, Tuple
 # Import line to add to CLAUDE.md
 CLAUDE_SC_IMPORT = "@superclaude/CLAUDE_SC.md"
 
+
+def get_base_path(scope: str = "user") -> Path:
+    """
+    Get base installation path based on scope.
+
+    Args:
+        scope: "user" for ~/.claude/ or "project" for ./.claude/
+
+    Returns:
+        Path to base installation directory
+    """
+    if scope == "project":
+        return Path.cwd() / ".claude"
+    else:  # user (default)
+        return Path.home() / ".claude"
+
 # Component definitions: (source_subdir, target_subdir, description)
 COMPONENTS = {
     "commands": ("commands", "commands/sc", "Slash commands"),
-    "agents": ("agents", "superclaude/agents", "Agent definitions"),
+    "agents": ("agents", "agents", "Agent definitions"),
     "core": ("core", "superclaude/core", "Core framework (PRINCIPLES, FLAGS, RULES)"),
     "modes": ("modes", "superclaude/modes", "Behavioral modes"),
     "mcp": ("mcp", "superclaude/mcp", "MCP server documentation"),
-    "skills": ("skills", "superclaude/skills", "Skills"),
+    "skills": ("skills", "skills", "Skills"),
 }
 
 
@@ -380,14 +402,20 @@ def list_available_commands() -> List[str]:
     return sorted(commands)
 
 
-def list_installed_commands() -> List[str]:
+def list_installed_commands(base_path: Path = None) -> List[str]:
     """
-    List installed commands in ~/.claude/commands/sc/
+    List installed commands.
+
+    Args:
+        base_path: Base installation path (default: ~/.claude)
 
     Returns:
         List of installed command names
     """
-    commands_dir = Path.home() / ".claude" / "commands" / "sc"
+    if base_path is None:
+        base_path = Path.home() / ".claude"
+
+    commands_dir = base_path / "commands" / "sc"
 
     if not commands_dir.exists():
         return []
@@ -400,18 +428,24 @@ def list_installed_commands() -> List[str]:
     return sorted(installed)
 
 
-def list_all_components() -> Dict[str, Dict[str, any]]:
+def list_all_components(base_path: Path = None) -> Dict[str, Dict[str, any]]:
     """
     List all components with their installation status.
+
+    Args:
+        base_path: Base installation path (default: ~/.claude)
 
     Returns:
         Dict with component info and status
     """
+    if base_path is None:
+        base_path = Path.home() / ".claude"
+
     result = {}
 
     for component, (_, _, description) in COMPONENTS.items():
         source_dir = _get_source_dir(component)
-        target_dir = _get_target_dir(component)
+        target_dir = _get_target_dir(component, base_path)
 
         # Count source files (excluding README.md)
         if component == "skills":

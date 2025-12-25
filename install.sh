@@ -8,12 +8,10 @@
 #   1. Checks prerequisites (Python 3.10+, UV package manager)
 #   2. Installs SuperClaude package in editable mode
 #   3. Installs all components to ~/.claude/:
-#      - commands/sc/        : 30+ slash commands
-#      - superclaude/agents/ : Agent definitions
-#      - superclaude/core/   : PRINCIPLES, FLAGS, RULES, etc.
-#      - superclaude/modes/  : Behavioral modes
-#      - superclaude/mcp/    : MCP server documentation
-#      - superclaude/skills/ : Skills
+#      - commands/sc/   : 30+ slash commands
+#      - agents/        : Agent definitions
+#      - skills/        : Skills
+#      - superclaude/   : Core framework (core, modes, mcp, CLAUDE_SC.md)
 #   4. Verifies installation
 #   5. Provides next steps guidance
 #
@@ -206,26 +204,17 @@ install_package() {
 install_commands() {
     print_step "Installing SuperClaude components..."
 
-    # Check if superclaude command is available
-    if ! command -v superclaude &> /dev/null; then
-        print_error "superclaude command not found"
-        print_info "Package installation may have failed"
-        exit 1
-    fi
-
     print_info "Installing all components to ~/.claude/"
-    print_info "  - commands/sc/        : Slash commands"
-    print_info "  - superclaude/agents/ : Agent definitions"
-    print_info "  - superclaude/core/   : Core framework"
-    print_info "  - superclaude/modes/  : Behavioral modes"
-    print_info "  - superclaude/mcp/    : MCP documentation"
-    print_info "  - superclaude/skills/ : Skills"
+    print_info "  - commands/sc/   : Slash commands"
+    print_info "  - agents/        : Agent definitions"
+    print_info "  - skills/        : Skills"
+    print_info "  - superclaude/   : Core framework (core, modes, mcp)"
     echo ""
-    if superclaude install; then
+    if uv run superclaude install; then
         print_success "All components installed successfully"
     else
         print_error "Failed to install components"
-        print_info "Try running manually: superclaude install"
+        print_info "Try running manually: uv run superclaude install"
         exit 1
     fi
 }
@@ -234,21 +223,21 @@ verify_installation() {
     print_step "Verifying installation..."
 
     # Check package version
-    local version=$(superclaude --version 2>&1)
+    local version=$(uv run superclaude --version 2>&1)
     print_info "Installed version: $version"
 
     # Run doctor command
     print_info "Running health check..."
-    if superclaude doctor; then
+    if uv run superclaude doctor; then
         print_success "Installation verified successfully"
     else
         print_warning "Health check completed with warnings"
-        print_info "You can run 'superclaude doctor' anytime to check status"
+        print_info "You can run 'uv run superclaude doctor' anytime to check status"
     fi
 
     # List all installed components
     print_info "Installed components:"
-    superclaude install --list-all
+    uv run superclaude install --list
 }
 
 ################################################################################
@@ -353,19 +342,20 @@ main() {
     print_success "SuperClaude Framework is now installed!"
     echo ""
     print_info "Next Steps:"
-    echo "  1. Run health check:        superclaude doctor"
-    echo "  2. View all components:     superclaude install --list-all"
-    echo "  3. View commands only:      superclaude install --list"
-    echo "  4. Try a command:           /sc:help"
+    echo "  1. Run health check:        uv run superclaude doctor"
+    echo "  2. View all components:     uv run superclaude install --list"
+    echo "  3. Try a command:           /sc:help"
     echo ""
     print_info "Installed locations:"
     echo "  • Commands:   ~/.claude/commands/sc/"
+    echo "  • Agents:     ~/.claude/agents/"
+    echo "  • Skills:     ~/.claude/skills/"
     echo "  • Framework:  ~/.claude/superclaude/"
     echo ""
     print_info "Optional - Install MCP Servers for enhanced features:"
-    echo "  • List available servers:   superclaude mcp --list"
-    echo "  • Interactive installation: superclaude mcp"
-    echo "  • Specific servers:         superclaude mcp --servers tavily context7"
+    echo "  • List available servers:   uv run superclaude mcp --list"
+    echo "  • Interactive installation: uv run superclaude mcp"
+    echo "  • Specific servers:         uv run superclaude mcp --servers tavily context7"
     echo ""
     print_info "Documentation:"
     echo "  • Quick Start:  docs/getting-started/quick-start.md"
