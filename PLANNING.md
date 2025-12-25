@@ -360,6 +360,98 @@ Before releasing a new version:
 
 ---
 
+## 🎯 **Token Optimization Plan (Opus 4.5)**
+
+### **Current State Analysis**
+
+| Metric | Value |
+|--------|-------|
+| Total tokens | 85,108 |
+| Context usage | 42.6% of 200K |
+| Target | 60,000 (30%) |
+| Savings goal | ~25,000 tokens (-29%) |
+
+### **Token Distribution by Category**
+
+| Category | Tokens | % | Priority |
+|----------|--------|---|----------|
+| commands | 37,978 | 44.6% | 🔴 HIGH |
+| agents | 18,667 | 21.9% | 🔴 HIGH |
+| core | 12,154 | 14.3% | 🟡 MEDIUM |
+| modes | 6,201 | 7.3% | 🟢 LOW |
+| mcp | 5,138 | 6.0% | 🟢 LOW |
+| examples | 2,780 | 3.3% | 🟢 LOW |
+| root | 1,363 | 1.6% | 🟢 LOW |
+| skills | 827 | 1.0% | 🟢 LOW |
+
+### **Top Offenders**
+
+1. `commands/recommend.md`: 8,428 tokens (10%)
+2. `commands/pm.md`: 5,106 tokens (6%)
+3. `agents/pm-agent.md`: 4,993 tokens (5.9%)
+4. `commands/spec-panel.md`: 3,546 tokens (4.2%)
+5. `core/RULES.md`: 3,536 tokens (4.2%)
+
+### **Optimization Targets**
+
+**Phase 0: Quick Wins (~10,000 tokens)**
+1. **recommend.md compression** (8,428 → 3,000 = -5,428 tokens)
+   - Reduce 9 examples to 3 essential (ML beginner, Web perf, E-commerce)
+   - Remove "Comprehensive Final Example" (duplicates earlier content)
+   - Consolidate redundant YAML mappings
+
+2. **PM file deduplication** (10,099 → 6,000 = -4,099 tokens)
+   - `pm.md` and `pm-agent.md` share ~5,000 tokens of identical content
+   - Keep full implementation in `pm-agent.md`
+   - Make `pm.md` a brief command reference
+
+**Phase 1: Content Compression (~8,000 tokens)**
+1. **Verbose explanation compression** across all files
+   - Apply research: Bold/Italic has LOW LLM impact
+   - Keep XML structure for semantic boundaries (HIGH impact)
+   - Compress multi-paragraph explanations to bullet points
+
+2. **Example standardization**
+   - Max 3 examples per command/agent
+   - Use terse format: input → command → reason
+
+**Phase 2: Structural Optimization (~5,000 tokens)**
+1. **Selective loading** via `--uc` flag
+   - Runtime stripping of decorative markdown
+   - Load agent docs only when delegating
+
+2. **Shared patterns extraction**
+   - Common YAML frontmatter templates
+   - Reusable XML component definitions
+
+### **Research-Backed Decisions**
+
+Based on arXiv findings (see PRINCIPLES.md "Document Format Design"):
+- **Keep**: XML tags, headings, lists, code blocks (HIGH LLM impact)
+- **Keep for maintainability**: Bold (LOW LLM impact, HIGH human readability)
+- **Remove/compress**: Verbose prose, duplicate examples, redundant explanations
+
+### **Success Metrics**
+
+| Metric | Before | Target | Method |
+|--------|--------|--------|--------|
+| Total tokens | 85,108 | 60,000 | `scripts/compare_token_usage.py` |
+| Context usage | 42.6% | 30% | Calculated |
+| Largest file | 8,428 | 3,500 | Per-file analysis |
+| Duplicate content | ~10K | 0 | Pattern detection |
+
+### **Implementation Schedule**
+
+- [x] Token usage analysis per category
+- [x] Duplicate pattern identification
+- [x] Document optimization plan
+- [ ] Execute recommend.md compression
+- [ ] Deduplicate pm.md/pm-agent.md
+- [ ] Compress verbose explanations
+- [ ] Validate with token comparison script
+
+---
+
 ## 🤝 **Contributing Guidelines**
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed contribution guidelines.
