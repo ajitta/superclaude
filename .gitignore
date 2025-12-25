@@ -98,10 +98,8 @@ Pipfile.lock
 # Poetry
 poetry.lock
 
-# Claude Code - only ignore user-specific files
-.claude/history/
-.claude/cache/
-.claude/*.lock
+# Claude Code - ignore project-local installation
+.claude/
 
 # SuperClaude specific
 .serena/
@@ -199,4 +197,3 @@ TODO.txt
 # Development artifacts (should not be in repo)
 package-lock.json
 uv.lock
-.claude/settings.local.json
