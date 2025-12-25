@@ -131,3 +131,5 @@ The TypeScript implementation is available in `confidence.ts` for reference, con
 **Token Savings**: Spend 100-200 tokens on confidence check to save 5,000-50,000 tokens on wrong-direction work.
 
 **Success Rate**: 100% precision and recall in production testing.
+
+</document>
