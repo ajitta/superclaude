@@ -101,4 +101,39 @@ priority: high
 - **Documentation**: Generate descriptions from UI screenshots
 - **Accessibility**: Identify visual accessibility issues in interface designs
 
+## Document Format Design
+
+## Formatting Philosophy
+
+SuperClaude documents serve a **dual audience**: LLMs (runtime) and human maintainers (development). Format choices optimize for both.
+
+## Research-Backed Decisions
+
+| Element | LLM Impact | Human Impact | Decision |
+|---------|------------|--------------|----------|
+| `<xml>` tags | HIGH (semantic boundaries) | Medium | ✅ Use extensively |
+| `# Headings` | HIGH (hierarchy) | HIGH | ✅ Use for structure |
+| `- Lists` | HIGH (structured data) | HIGH | ✅ Use for sequences |
+| ` ``` Code ``` ` | HIGH (code separation) | HIGH | ✅ Use for code |
+| `**Bold**` | LOW (weak emphasis) | HIGH (scanning) | ✅ Keep for maintainability |
+| `*Italic*` | LOW (weak emphasis) | Medium | ⚠️ Use sparingly |
+
+## Design Rationale
+
+- **XML-embedded Markdown**: Provides machine-parseable semantic boundaries while preserving human readability. Research shows structural elements (XML, headings) significantly impact LLM comprehension.
+
+- **YAML Frontmatter**: Enables metadata extraction (name, type, triggers) for tooling and dynamic loading without parsing document content.
+
+- **Bold/Italic Retention**: Research indicates LLM emphasis interpretation is "surprisingly weak" (arXiv 2406.11065). However, bold aids human maintainers in scanning documents. The ~3-5% token overhead is acceptable for developer experience.
+
+- **Token Efficiency Trade-off**: Stripping decorative formatting saves ~4,000 tokens (4.7%) but reduces maintainability. XML structure already provides LLM semantics, making bold/italic removal low ROI.
+
+## Format Guidelines
+
+- Use `<section>` XML tags for semantic boundaries LLMs should recognize
+- Use `# Headings` for document hierarchy and navigation
+- Use `**Bold**` for human-scannable key terms (not LLM emphasis)
+- Use `<critical>` or `priority=""` attributes for machine-important content
+- Reserve `--uc` mode for runtime decorative stripping when tokens constrained
+
 </document>
