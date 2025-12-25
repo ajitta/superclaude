@@ -340,13 +340,20 @@ def install_commands(target_path: Path = None, force: bool = False) -> Tuple[boo
     Now installs ALL components, not just commands.
 
     Args:
-        target_path: Ignored (kept for backwards compatibility)
+        target_path: Base installation path (default: ~/.claude)
+                     Note: Commands are installed to {base_path}/commands/sc/
         force: Force reinstall if commands exist
 
     Returns:
         Tuple of (success: bool, message: str)
     """
-    return install_all(force=force)
+    # If target_path is provided, use its parent as base_path
+    # (legacy behavior expected commands in target_path directly)
+    if target_path is not None:
+        base_path = target_path.parent if target_path.name == "commands" else target_path
+    else:
+        base_path = None
+    return install_all(base_path=base_path, force=force)
 
 
 def list_available_commands() -> List[str]:

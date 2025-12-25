@@ -30,16 +30,19 @@ class TestInstallCommands:
         success, message = install_commands(target_path=target_dir, force=False)
 
         assert success is True
-        assert "Installed" in message
-        assert target_dir.exists()
+        assert "installed" in message.lower()
+
+        # Commands are installed to commands/sc/ subdirectory
+        commands_dir = tmp_path / "commands" / "sc"
+        assert commands_dir.exists()
 
         # Check that command files were copied
-        command_files = list(target_dir.glob("*.md"))
+        command_files = list(commands_dir.glob("*.md"))
         assert len(command_files) > 0
 
         # Verify specific commands
-        assert (target_dir / "research.md").exists()
-        assert (target_dir / "index-repo.md").exists()
+        assert (commands_dir / "research.md").exists()
+        assert (commands_dir / "index-repo.md").exists()
 
     def test_install_commands_skip_existing(self, tmp_path):
         """Test that existing commands are skipped without --force"""
@@ -52,7 +55,7 @@ class TestInstallCommands:
         # Second install without force
         success2, message2 = install_commands(target_path=target_dir, force=False)
         assert success2 is True
-        assert "Skipped" in message2
+        assert "skipped" in message2.lower()
 
     def test_install_commands_force_reinstall(self, tmp_path):
         """Test force reinstall of existing commands"""
@@ -62,15 +65,18 @@ class TestInstallCommands:
         success1, message1 = install_commands(target_path=target_dir, force=False)
         assert success1 is True
 
+        # Commands are in commands/sc/ subdirectory
+        commands_dir = tmp_path / "commands" / "sc"
+        research_file = commands_dir / "research.md"
+
         # Modify a file
-        research_file = target_dir / "research.md"
         research_file.write_text("modified")
         assert research_file.read_text() == "modified"
 
         # Force reinstall
         success2, message2 = install_commands(target_path=target_dir, force=True)
         assert success2 is True
-        assert "Installed" in message2
+        assert "installed" in message2.lower()
 
         # Verify file was overwritten
         content = research_file.read_text()
@@ -81,8 +87,7 @@ class TestInstallCommands:
         """Test listing installed commands"""
         target_dir = tmp_path / "commands"
 
-        # Before install
-        # Note: list_installed_commands checks ~/.claude/commands by default
+        # Note: list_installed_commands checks ~/.claude/commands/sc by default
         # We can't easily test this without mocking, so just verify it returns a list
         installed = list_installed_commands()
         assert isinstance(installed, list)
@@ -90,8 +95,11 @@ class TestInstallCommands:
         # After install to temp dir
         install_commands(target_path=target_dir, force=False)
 
+        # Commands are in commands/sc/ subdirectory
+        commands_dir = tmp_path / "commands" / "sc"
+
         # Verify files exist
-        command_files = list(target_dir.glob("*.md"))
+        command_files = list(commands_dir.glob("*.md"))
         assert len(command_files) > 0
 
     def test_install_commands_creates_target_directory(self, tmp_path):
@@ -103,7 +111,9 @@ class TestInstallCommands:
         success, message = install_commands(target_path=target_dir, force=False)
 
         assert success is True
-        assert target_dir.exists()
+        # Commands are in commands/sc/ subdirectory
+        commands_dir = tmp_path / "nested" / "commands" / "sc"
+        assert commands_dir.exists()
 
     def test_available_commands_format(self):
         """Test that available commands have expected format"""
@@ -124,7 +134,9 @@ class TestInstallCommands:
 
         install_commands(target_path=target_dir, force=False)
 
-        research_file = target_dir / "research.md"
+        # Commands are in commands/sc/ subdirectory
+        commands_dir = tmp_path / "commands" / "sc"
+        research_file = commands_dir / "research.md"
         assert research_file.exists()
 
         content = research_file.read_text()
@@ -153,7 +165,9 @@ class TestInstallCommandsEdgeCases:
         success, message = install_commands(target_path=target_dir, force=False)
 
         assert success is True
-        assert target_dir.exists()
+        # Commands are in commands/sc/ subdirectory
+        commands_dir = tmp_path / "a" / "b" / "c" / "commands" / "sc"
+        assert commands_dir.exists()
 
     def test_empty_target_directory_ok(self, tmp_path):
         """Test that installation works with empty target directory"""
