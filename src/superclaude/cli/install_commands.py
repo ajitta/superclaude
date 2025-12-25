@@ -127,8 +127,12 @@ def install_component(
                     failed += 1
                     failed_names.append(f"{skill_dir.name}: {e}")
     else:
-        # Copy .md files
+        # Copy .md files (excluding README.md)
         for source_file in source_dir.glob("*.md"):
+            # Skip README files
+            if source_file.stem.upper() == "README":
+                continue
+
             target_file = target_dir / source_file.name
             if target_file.exists() and not force:
                 skipped += 1
@@ -402,13 +406,13 @@ def list_all_components() -> Dict[str, Dict[str, any]]:
         source_dir = _get_source_dir(component)
         target_dir = _get_target_dir(component)
 
-        # Count source files
+        # Count source files (excluding README.md)
         if component == "skills":
             source_count = sum(1 for d in source_dir.iterdir() if d.is_dir()) if source_dir.exists() else 0
             installed_count = sum(1 for d in target_dir.iterdir() if d.is_dir()) if target_dir.exists() else 0
         else:
-            source_count = len(list(source_dir.glob("*.md"))) if source_dir.exists() else 0
-            installed_count = len(list(target_dir.glob("*.md"))) if target_dir.exists() else 0
+            source_count = sum(1 for f in source_dir.glob("*.md") if f.stem.upper() != "README") if source_dir.exists() else 0
+            installed_count = sum(1 for f in target_dir.glob("*.md") if f.stem.upper() != "README") if target_dir.exists() else 0
 
         result[component] = {
             "description": description,
