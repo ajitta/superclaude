@@ -1,3 +1,6 @@
+---
+description: Generate focused documentation for components, functions, APIs, and features
+---
 <component name="document" type="command">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
   <runtime model="opus-4-5" effort="low"/>

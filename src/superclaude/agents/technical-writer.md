@@ -1,3 +1,6 @@
+---
+description: Create clear, comprehensive technical documentation tailored to specific audiences with focus on ...
+---
 <component name="technical-writer" type="agent">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
   <triggers>documentation|api-docs|user-guide|tutorial|technical-writing|accessibility</triggers>

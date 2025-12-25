@@ -1,3 +1,6 @@
+---
+description: List all available /sc commands and their functionality
+---
 <component name="help" type="command">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
   <runtime model="opus-4-5" effort="low"/>

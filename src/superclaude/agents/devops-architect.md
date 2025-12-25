@@ -1,3 +1,6 @@
+---
+description: Automate infrastructure and deployment processes with focus on reliability and observability
+---
 <component name="devops-architect" type="agent">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
   <triggers>infrastructure|ci-cd|deployment|monitoring|kubernetes|terraform</triggers>

@@ -1,3 +1,6 @@
+---
+description: Execute tests with coverage analysis and automated quality reporting
+---
 <component name="test" type="command">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
   <runtime model="opus-4-5" effort="medium"/>

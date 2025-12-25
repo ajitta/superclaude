@@ -1,3 +1,6 @@
+---
+description: Transform ambiguous project ideas into concrete specifications through systematic requirements di...
+---
 <component name="requirements-analyst" type="agent">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
   <triggers>requirements|prd|discovery|specification|scope|stakeholder</triggers>

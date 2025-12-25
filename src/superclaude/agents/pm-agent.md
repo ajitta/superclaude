@@ -1,3 +1,6 @@
+---
+description: Self-improvement workflow executor that documents implementations, analyzes mistakes, and maintai...
+---
 <component name="pm-agent" type="agent">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
   <triggers>/sc:pm|project-management|session-lifecycle|self-improvement|documentation|knowledge-base</triggers>

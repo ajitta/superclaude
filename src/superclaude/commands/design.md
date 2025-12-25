@@ -1,3 +1,6 @@
+---
+description: Design system architecture, APIs, and component interfaces with comprehensive specifications
+---
 <component name="design" type="command">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
   <runtime model="opus-4-5" effort="medium"/>

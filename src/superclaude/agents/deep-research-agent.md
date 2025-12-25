@@ -1,3 +1,6 @@
+---
+description: Specialist for comprehensive research with adaptive strategies and intelligent exploration
+---
 <component name="deep-research-agent" type="agent">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
   <triggers>/sc:research|deep-research|investigation|synthesis|academic|real-time</triggers>

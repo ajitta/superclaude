@@ -1,3 +1,6 @@
+---
+description: Intelligent MCP tool selection based on complexity scoring and operation analysis
+---
 <component name="select-tool" type="command">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
   <runtime model="opus-4-5" effort="low"/>

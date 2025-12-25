@@ -1,3 +1,6 @@
+---
+description: Multi-expert business strategy panel synthesizing renowned frameworks
+---
 <component name="business-panel-experts" type="agent">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
   <triggers>business|strategy|disruption|competitive|innovation|systems-thinking</triggers>

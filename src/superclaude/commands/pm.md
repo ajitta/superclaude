@@ -1,3 +1,6 @@
+---
+description: Project Manager Agent - Default orchestration that coordinates sub-agents and manages workflows
+---
 <component name="pm" type="command">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
   <runtime model="opus-4-5" effort="high"/>

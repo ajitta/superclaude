@@ -1,3 +1,6 @@
+---
+description: Diagnose and resolve issues in code, builds, deployments, and system behavior
+---
 <component name="troubleshoot" type="command">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
   <runtime model="opus-4-5" effort="medium"/>

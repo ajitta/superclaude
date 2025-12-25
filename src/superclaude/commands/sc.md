@@ -1,3 +1,6 @@
+---
+description: SuperClaude command dispatcher - main entry point for all features
+---
 <component name="sc" type="command">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
   <runtime model="opus-4-5" effort="low"/>

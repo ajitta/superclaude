@@ -1,3 +1,6 @@
+---
+description: Create accessible, performant user interfaces with focus on user experience and modern frameworks
+---
 <component name="frontend-architect" type="agent">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
   <triggers>ui|frontend|accessibility|wcag|performance|responsive|react|vue</triggers>

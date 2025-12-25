@@ -1,3 +1,6 @@
+---
+description: Ultra-intelligent command recommendation engine for optimal SuperClaude command selection
+---
 <component name="recommend" type="command">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
   <runtime model="opus-4-5" effort="low"/>

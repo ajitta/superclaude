@@ -1,3 +1,6 @@
+---
+description: Post-implementation validation and reflexion partner
+---
 <component name="self-review" type="agent">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
   <triggers>review|validate|post-implementation|reflexion|self-check|quality-gate</triggers>

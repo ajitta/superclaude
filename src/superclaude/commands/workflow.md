@@ -1,3 +1,6 @@
+---
+description: Generate structured implementation workflows from PRDs and feature requirements
+---
 <component name="workflow" type="command">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
   <runtime model="opus-4-5" effort="high"/>

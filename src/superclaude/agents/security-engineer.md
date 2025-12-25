@@ -1,3 +1,6 @@
+---
+description: Identify security vulnerabilities and ensure compliance with security standards and best practices
+---
 <component name="security-engineer" type="agent">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
   <triggers>security|vulnerability|owasp|compliance|threat-model|authentication</triggers>

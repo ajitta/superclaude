@@ -1,3 +1,6 @@
+---
+description: Session controller orchestrating investigation, implementation, and review workflows
+---
 <component name="sc:agent" type="command">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
   <runtime model="opus-4-5" effort="medium"/>

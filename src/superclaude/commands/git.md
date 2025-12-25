@@ -1,3 +1,6 @@
+---
+description: Git operations with intelligent commit messages and workflow optimization
+---
 <component name="git" type="command">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
   <runtime model="opus-4-5" effort="low"/>

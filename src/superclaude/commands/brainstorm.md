@@ -1,3 +1,6 @@
+---
+description: Interactive requirements discovery through Socratic dialogue and systematic exploration
+---
 <component name="brainstorm" type="command">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
   <runtime model="opus-4-5" effort="high"/>

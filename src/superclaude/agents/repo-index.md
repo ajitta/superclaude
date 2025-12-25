@@ -1,3 +1,6 @@
+---
+description: Repository indexing and codebase briefing assistant
+---
 <component name="repo-index" type="agent">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
   <triggers>index|repository|codebase|structure|discovery|project-index</triggers>

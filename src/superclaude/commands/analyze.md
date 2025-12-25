@@ -1,3 +1,6 @@
+---
+description: Comprehensive code analysis across quality, security, performance, and architecture domains
+---
 <component name="analyze" type="command">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
   <runtime model="opus-4-5" effort="low"/>

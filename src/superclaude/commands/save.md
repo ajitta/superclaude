@@ -1,3 +1,6 @@
+---
+description: Session lifecycle management with Serena MCP integration for context persistence
+---
 <component name="save" type="command">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
   <runtime model="opus-4-5" effort="low"/>

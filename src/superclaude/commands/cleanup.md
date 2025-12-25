@@ -1,3 +1,6 @@
+---
+description: Systematically clean up code, remove dead code, and optimize project structure
+---
 <component name="cleanup" type="command">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
   <runtime model="opus-4-5" effort="medium"/>

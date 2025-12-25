@@ -1,3 +1,6 @@
+---
+description: Generate comprehensive project documentation and knowledge base with intelligent organization
+---
 <component name="index" type="command">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
   <runtime model="opus-4-5" effort="medium"/>

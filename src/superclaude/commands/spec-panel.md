@@ -1,3 +1,6 @@
+---
+description: Multi-expert specification review and improvement using renowned software engineering experts
+---
 <component name="spec-panel" type="command">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
   <runtime model="opus-4-5" effort="high"/>

@@ -1,3 +1,6 @@
+---
+description: Task reflection and validation using Serena MCP analysis capabilities
+---
 <component name="reflect" type="command">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
   <runtime model="opus-4-5" effort="low"/>

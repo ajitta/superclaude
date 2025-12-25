@@ -1,3 +1,6 @@
+---
+description: Feature and code implementation with intelligent persona activation and MCP integration
+---
 <component name="implement" type="command">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
   <runtime model="opus-4-5" effort="medium"/>

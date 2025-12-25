@@ -1,3 +1,6 @@
+---
+description: Teach programming concepts and explain code with focus on understanding through progressive learn...
+---
 <component name="learning-guide" type="agent">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
   <triggers>teach|explain|tutorial|learn|education|concept|algorithm</triggers>

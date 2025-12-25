@@ -1,3 +1,6 @@
+---
+description: Systematically investigate complex problems to identify underlying causes through evidence-based ...
+---
 <component name="root-cause-analyst" type="agent">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
   <triggers>root-cause|debug|investigate|hypothesis|evidence|problem-solving</triggers>

@@ -1,3 +1,6 @@
+---
+description: Design scalable system architecture with focus on maintainability and long-term technical decisions
+---
 <component name="system-architect" type="agent">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
   <triggers>architecture|system-design|scalability|components|boundaries|long-term</triggers>

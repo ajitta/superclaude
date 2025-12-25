@@ -1,3 +1,6 @@
+---
+description: Improve code quality and reduce technical debt through systematic refactoring and clean code prin...
+---
 <component name="refactoring-expert" type="agent">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
   <triggers>refactor|technical-debt|solid|clean-code|complexity|simplify</triggers>
