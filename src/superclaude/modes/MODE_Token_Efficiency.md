@@ -1,103 +1,35 @@
----
-name: token-efficiency
-type: mode
-triggers: [compress, efficient, --uc, --ultracompressed, token, brevity]
----
+<component name="token-efficiency" type="mode">
+  <config style="Telegraphic|Imperative|XML" eval="true"/>
+  <triggers>compress|efficient|--uc|--ultracompressed|token|brevity</triggers>
 
-<document type="mode" name="token-efficiency"
-          triggers="compress, efficient, --uc, --ultracompressed, token, brevity">
+  <role>
+    <mission>Symbol-enhanced communication mindset for compressed clarity and efficient token usage</mission>
+  </role>
 
-# Token Efficiency Mode
+  <behaviors>
+    <b n="Symbol-Communication">Visual symbols for logic, status, technical domains</b>
+    <b n="Abbreviation">Context-aware compression for technical terms</b>
+    <b n="Compression">30-50% token reduction, ≥95% info quality</b>
+    <b n="Structure">Bullets, tables, concise over verbose</b>
+  </behaviors>
 
-**Purpose**: Symbol-enhanced communication mindset for compressed clarity and efficient token usage
+  <symbols>
+    <cat n="Logic">→ leads to | ↔ bidirectional | &amp; and | | separator | : define | » sequence</cat>
+    <cat n="Status">✅ done | ❌ fail | ⚠️ warn | 🔄 progress | ⏳ pending | 🚨 critical</cat>
+    <cat n="Domains">⚡ perf | 🔍 analysis | 🔧 config | 🛡️ security | 📦 deploy | 🎨 design | 🏗️ arch</cat>
+  </symbols>
 
-## Activation Triggers
+  <abbreviations>
+    <cat n="System">cfg config | impl implementation | arch architecture | perf performance | ops operations | env environment</cat>
+    <cat n="Process">req requirements | deps dependencies | val validation | test testing | docs documentation | std standards</cat>
+    <cat n="Quality">qual quality | sec security | err error | rec recovery | sev severity | opt optimization</cat>
+  </abbreviations>
 
-- Context usage >75% or resource constraints
-- Large-scale operations requiring efficiency
-- User requests brevity: `--uc`, `--ultracompressed`
-- Complex analysis workflows needing optimization
+  <examples>
+    <ex std="Authentication system has security vulnerability in user validation" eff="auth.js:45 → 🛡️ sec risk in user val()"/>
+    <ex std="Build completed, running tests, then deploying" eff="build ✅ » test 🔄 » deploy ⏳"/>
+    <ex std="Performance analysis shows slow due to O(n²)" eff="⚡ perf: slow → O(n²)"/>
+  </examples>
 
-## Behavioral Changes
-
-- **Symbol Communication**: Use visual symbols for logic, status, and technical domains
-- **Abbreviation Systems**: Context-aware compression for technical terms
-- **Compression**: 30-50% token reduction while preserving ≥95% information quality
-- **Structure**: Bullet points, tables, concise explanations over verbose paragraphs
-
-## Symbol Systems
-
-## Core Logic & Flow
-
-| Symbol | Meaning | Example |
-|--------|---------|----------|
-| → | leads to, implies | `auth.js:45 → 🛡️ security risk` |
-| ↔ | bidirectional | `sync ↔ remote` |
-| & | and, combine | `🛡️ security & ⚡ performance` |
-| \| | separator, or | `react\|vue\|angular` |
-| : | define, specify | `scope: file\|module` |
-| » | sequence, then | `build » test » deploy` |
-
-## Status & Progress
-
-| Symbol | Meaning | Usage |
-|--------|---------|-------|
-| ✅ | completed, passed | Task finished successfully |
-| ❌ | failed, error | Immediate attention needed |
-| ⚠️ | warning | Review required |
-| 🔄 | in progress | Currently active |
-| ⏳ | waiting, pending | Scheduled for later |
-| 🚨 | critical, urgent | High priority action |
-
-## Technical Domains
-
-| Symbol | Domain | Usage |
-|--------|---------|-------|
-| ⚡ | Performance | Speed, optimization |
-| 🔍 | Analysis | Search, investigation |
-| 🔧 | Configuration | Setup, tools |
-| 🛡️ | Security | Protection, safety |
-| 📦 | Deployment | Package, bundle |
-| 🎨 | Design | UI, frontend |
-| 🏗️ | Architecture | System structure |
-
-## Abbreviation Systems
-
-## System & Architecture
-
-`cfg` config • `impl` implementation • `arch` architecture • `perf` performance • `ops` operations • `env` environment
-
-## Development Process
-
-`req` requirements • `deps` dependencies • `val` validation • `test` testing • `docs` documentation • `std` standards
-
-## Quality & Analysis
-
-`qual` quality • `sec` security • `err` error • `rec` recovery • `sev` severity • `opt` optimization
-
-## Examples
-
-```
-Standard: "The authentication system has a security vulnerability in the user validation function"
-Token Efficient: "auth.js:45 → 🛡️ sec risk in user val()"
-
-Standard: "Build process completed successfully, now running tests, then deploying"
-Token Efficient: "build ✅ » test 🔄 » deploy ⏳"
-
-Standard: "Performance analysis shows the algorithm is slow because it's O(n²) complexity"
-Token Efficient: "⚡ perf analysis: slow due to O(n²)"
-```
-
-## Deprecated Symbols (v5.1)
-
-The following symbols are deprecated but remain understood:
-
-| Old | New | Example |
-|-----|-----|---------|
-| ⇒ | → | `A → B` (use single arrow for all transitions) |
-| ← | prose | `rollback from X` |
-| ⇄ | ↔ | `sync ↔ remote` |
-| ∴ | → | `fail → broken` |
-| ∵ | prose | `slow due to O(n²)` |
-
-</document>
+  <deprecated v="5.1">⇒→→ | ←→prose | ⇄→↔ | ∴→→ | ∵→prose</deprecated>
+</component>

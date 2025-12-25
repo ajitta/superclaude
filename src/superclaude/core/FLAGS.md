@@ -1,156 +1,65 @@
----
-name: flags
-type: core
-triggers: [flag, --, mode, mcp, think, effort, delegate]
-description: Behavioral flags for Claude Code execution modes and tool selection
-priority: high
----
+<component name="flags" type="core" priority="high">
+  <config style="Telegraphic|Imperative|XML" eval="true"/>
+  <triggers>flag|--|mode|mcp|think|effort|delegate</triggers>
 
-<document type="core" name="flags"
-          triggers="flag, --, mode, mcp, think, effort, delegate">
+  <role>
+    <mission>Behavioral flags for Claude Code execution modes and tool selection</mission>
+  </role>
 
-# SuperClaude Framework Flags
+  <modes>
+    <f n="--brainstorm" trigger="vague requests, 'maybe', 'thinking about'">Collaborative discovery, probing questions</f>
+    <f n="--introspect" trigger="self-analysis, error recovery, meta-cognition">Expose thinking (🤔🎯⚡📊💡)</f>
+    <f n="--task-manage" trigger=">3 steps, >2 dirs, >3 files">Delegation, progressive enhancement</f>
+    <f n="--orchestrate" trigger="multi-tool, perf constraints, parallel ops">Tool matrix optimization, parallel thinking</f>
+    <f n="--token-efficient" trigger="context >75%, large ops, --uc">Symbol communication, 30-50% reduction</f>
+  </modes>
 
-Behavioral flags for Claude Code to enable specific execution modes and tool selection patterns.
+  <mcp>
+    <f n="--c7|--context7" trigger="imports, frameworks, official docs">Context7: curated docs, patterns</f>
+    <f n="--seq|--sequential" trigger="complex debug, system design">Sequential: multi-step reasoning</f>
+    <f n="--magic" trigger="/ui, /21, design systems">Magic: 21st.dev UI components</f>
+    <f n="--morph|--morphllm" trigger="bulk transforms, pattern edits">Morphllm: multi-file patterns</f>
+    <f n="--serena" trigger="symbol ops, project memory">Serena: semantic understanding</f>
+    <f n="--play|--playwright" trigger="browser testing, E2E, visual">Playwright: browser automation</f>
+    <f n="--chrome|--devtools" trigger="perf audit, debug, layout">Chrome DevTools: real-time inspection</f>
+    <f n="--tavily" trigger="web search, real-time info">Tavily: web search</f>
+    <f n="--frontend-verify" trigger="UI testing, frontend debug">Playwright + DevTools + Serena</f>
+    <f n="--all-mcp" trigger="max complexity">Enable all MCP servers</f>
+    <f n="--no-mcp" trigger="native-only, perf priority">Disable all MCP, use native + WebSearch</f>
+  </mcp>
 
-## Mode Activation Flags
+  <analysis>
+    <f n="--think" trigger="moderate complexity">~4K tokens, enables Sequential</f>
+    <f n="--think-hard" trigger="architecture, system-wide">~10K tokens, Sequential + Context7</f>
+    <f n="--ultrathink" trigger="critical redesign, legacy, complex debug">~32K tokens, all MCP</f>
+  </analysis>
 
-**--brainstorm**
-- Trigger: Vague project requests, exploration keywords ("maybe", "thinking about", "not sure")
-- Behavior: Activate collaborative discovery mindset, ask probing questions, guide requirement elicitation
+  <effort note="Opus 4.5 specific">
+    <f n="--effort low">Minimal reasoning (~76% fewer tokens), fastest</f>
+    <f n="--effort medium">Balanced (default)</f>
+    <f n="--effort high">Maximum reasoning depth</f>
+  </effort>
 
-**--introspect**
-- Trigger: Self-analysis requests, error recovery, complex problem solving requiring meta-cognition
-- Behavior: Expose thinking process with transparency markers (🤔, 🎯, ⚡, 📊, 💡)
+  <execution>
+    <f n="--delegate [auto|files|folders]" trigger=">7 dirs, >50 files, complexity >0.8">Sub-agent parallel processing</f>
+    <f n="--concurrency [n]" range="1-15">Max concurrent operations</f>
+    <f n="--loop" trigger="polish, refine, enhance">Iterative improvement cycles</f>
+    <f n="--iterations [n]" range="1-10">Improvement cycle count</f>
+    <f n="--validate" trigger="risk >0.7, usage >75%, production">Pre-execution risk assessment</f>
+    <f n="--safe-mode" trigger="usage >85%, production, critical">Max validation, conservative, auto --uc</f>
+  </execution>
 
-**--task-manage**
-- Trigger: Multi-step operations (>3 steps), complex scope (>2 directories OR >3 files)
-- Behavior: Orchestrate through delegation, progressive enhancement, systematic organization
+  <output>
+    <f n="--uc|--ultracompressed" trigger="context pressure, efficiency">Symbol system, 30-50% reduction</f>
+    <f n="--scope [file|module|project|system]">Analysis boundary</f>
+    <f n="--focus [perf|security|quality|arch|a11y|testing]">Target domain</f>
+  </output>
 
-**--orchestrate**
-- Trigger: Multi-tool operations, performance constraints, parallel execution opportunities
-- Behavior: Optimize tool selection matrix, enable parallel thinking, adapt to resource constraints
-
-**--token-efficient**
-- Trigger: Context usage >75%, large-scale operations, --uc flag
-- Behavior: Symbol-enhanced communication, 30-50% token reduction while preserving clarity
-
-## MCP Server Flags
-
-**--c7 / --context7**
-- Trigger: Library imports, framework questions, official documentation needs
-- Behavior: Enable Context7 for curated documentation lookup and pattern guidance
-
-**--seq / --sequential**
-- Trigger: Complex debugging, system design, multi-component analysis
-- Behavior: Enable Sequential for structured multi-step reasoning and hypothesis testing
-
-**--magic**
-- Trigger: UI component requests (/ui, /21), design system queries, frontend development
-- Behavior: Enable Magic for modern UI generation from 21st.dev patterns
-
-**--morph / --morphllm**
-- Trigger: Bulk code transformations, pattern-based edits, style enforcement
-- Behavior: Enable Morphllm for efficient multi-file pattern application
-
-**--serena**
-- Trigger: Symbol operations, project memory needs, large codebase navigation
-- Behavior: Enable Serena for semantic understanding and session persistence
-
-**--play / --playwright**
-- Trigger: Browser testing, E2E scenarios, visual validation, accessibility testing
-- Behavior: Enable Playwright for real browser automation and testing
-
-**--chrome / --devtools**
-- Trigger: Performance auditing, debugging, layout issues, network analysis, console errors
-- Behavior: Enable Chrome DevTools for real-time browser inspection and performance analysis
-
-**--tavily**
-- Trigger: Web search requests, real-time information needs, research queries, current events
-- Behavior: Enable Tavily for web search and real-time information gathering
-
-**--frontend-verify**
-- Trigger: UI testing requests, frontend debugging, layout validation, component verification
-- Behavior: Enable Playwright + Chrome DevTools + Serena for comprehensive frontend verification and debugging
-
-**--all-mcp**
-- Trigger: Maximum complexity scenarios, multi-domain problems
-- Behavior: Enable all MCP servers for comprehensive capability
-
-**--no-mcp**
-- Trigger: Native-only execution needs, performance priority
-- Behavior: Disable all MCP servers, use native tools with WebSearch fallback
-
-## Analysis Depth Flags
-
-**--think**
-- Trigger: Multi-component analysis needs, moderate complexity
-- Behavior: Standard structured analysis (~4K tokens), enables Sequential
-
-**--think-hard**
-- Trigger: Architectural analysis, system-wide dependencies
-- Behavior: Deep analysis (~10K tokens), enables Sequential + Context7
-
-**--ultrathink**
-- Trigger: Critical system redesign, legacy modernization, complex debugging
-- Behavior: Maximum depth analysis (~32K tokens), enables all MCP servers
-
-## Effort Control Flag
-
-**--effort [low|medium|high]**
-- Trigger: Reasoning depth control, token optimization needs
-- Behavior: Control extended thinking depth
-  - `low`: Minimal reasoning overhead, fastest responses (~76% fewer tokens)
-  - `medium`: Balanced analysis depth (default for most tasks)
-  - `high`: Maximum reasoning depth for complex problems
-- Note: Opus 4.5 specific - controls computational effort allocation
-
-## Execution Control Flags
-
-**--delegate [auto|files|folders]**
-- Trigger: >7 directories OR >50 files OR complexity >0.8
-- Behavior: Enable sub-agent parallel processing with intelligent routing
-
-**--concurrency [n]**
-- Trigger: Resource optimization needs, parallel operation control
-- Behavior: Control max concurrent operations (range: 1-15)
-
-**--loop**
-- Trigger: Improvement keywords (polish, refine, enhance, improve)
-- Behavior: Enable iterative improvement cycles with validation gates
-
-**--iterations [n]**
-- Trigger: Specific improvement cycle requirements
-- Behavior: Set improvement cycle count (range: 1-10)
-
-**--validate**
-- Trigger: Risk score >0.7, resource usage >75%, production environment
-- Behavior: Pre-execution risk assessment and validation gates
-
-**--safe-mode**
-- Trigger: Resource usage >85%, production environment, critical operations
-- Behavior: Maximum validation, conservative execution, auto-enable --uc
-
-## Output Optimization Flags
-
-**--uc / --ultracompressed**
-- Trigger: Context pressure, efficiency requirements, large operations
-- Behavior: Symbol communication system, 30-50% token reduction
-
-**--scope [file|module|project|system]**
-- Trigger: Analysis boundary needs
-- Behavior: Define operational scope and analysis depth
-
-**--focus [performance|security|quality|architecture|accessibility|testing]**
-- Trigger: Domain-specific optimization needs
-- Behavior: Target specific analysis domain and expertise application
-
-## Flag Priority Rules
-
-**Safety First**: --safe-mode > --validate > optimization flags
-**Explicit Override**: User flags > auto-detection
-**Depth Hierarchy**: --ultrathink > --think-hard > --think
-**MCP Control**: --no-mcp overrides all individual MCP flags
-**Scope Precedence**: system > project > module > file
-
-</document>
+  <priority_rules>
+    <r>Safety First: --safe-mode > --validate > optimization</r>
+    <r>Explicit Override: User flags > auto-detection</r>
+    <r>Depth: --ultrathink > --think-hard > --think</r>
+    <r>MCP: --no-mcp overrides individual flags</r>
+    <r>Scope: system > project > module > file</r>
+  </priority_rules>
+</component>

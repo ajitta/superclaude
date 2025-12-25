@@ -1,125 +1,52 @@
----
-name: research
-type: command
-triggers: [research, investigate, study, analyze, explore]
-description: Deep web research with adaptive planning and intelligent search
-category: command
-complexity: advanced
-mcp-servers: [tavily, sequential, playwright, serena]
-personas: [deep-research-agent]
----
+<component name="research" type="command">
+  <config style="Telegraphic|Imperative|XML" eval="true"/>
+  <runtime model="opus-4-5" effort="high"/>
 
-<document type="command" name="research"
-          triggers="research, investigate, study, analyze, explore">
+  <role>
+    /sc:research
+    <mission>Deep web research with adaptive planning and intelligent search</mission>
+  </role>
 
-# /sc:research - Deep Research Command
+  <syntax>/sc:research "[query]" [--depth quick|standard|deep|exhaustive] [--strategy planning|intent|unified]</syntax>
 
-> **Context Framework Note**: This command activates comprehensive research capabilities with adaptive planning, multi-hop reasoning, and evidence-based synthesis.
+  <triggers>
+    <t>Research beyond knowledge cutoff</t>
+    <t>Complex research questions</t>
+    <t>Current events + real-time info</t>
+    <t>Academic/technical research</t>
+    <t>Market analysis + competitive intel</t>
+  </triggers>
 
-## Triggers
+  <flow>
+    <s n="1">Understand (5-10%): Complexity + success criteria</s>
+    <s n="2">Plan (10-15%): Strategy + parallelization</s>
+    <s n="3">TodoWrite (5%): Adaptive hierarchy (3-15 tasks)</s>
+    <s n="4">Execute (50-60%): Parallel search + multi-hop + evidence</s>
+    <s n="5">Track: Progress + confidence + gaps</s>
+    <s n="6">Validate (10-15%): Evidence chains + credibility + contradictions</s>
+  </flow>
 
-- Research questions beyond knowledge cutoff
-- Complex research questions
-- Current events and real-time information
-- Academic or technical research requirements
-- Market analysis and competitive intelligence
+  <mcp servers="tavily:search|seq:reasoning|play:extraction|serena:persistence"/>
+  <personas p="deep-research-agent"/>
 
-## Context Trigger Pattern
+  <depth_levels>
+    <level n="quick">1 hop | summary output</level>
+    <level n="standard">2-3 hops | structured report</level>
+    <level n="deep">3-4 hops | detailed analysis</level>
+    <level n="exhaustive">5 hops | complete investigation</level>
+  </depth_levels>
 
-```
-/sc:research "[query]" [--depth quick|standard|deep|exhaustive] [--strategy planning|intent|unified]
-```
+  <patterns>
+    <p n="Parallel">Batch independent searches | concurrent extractions</p>
+    <p n="Evidence">Track results | citations | note uncertainties</p>
+    <p n="Output">claudedocs/research_[topic]_[timestamp].md</p>
+  </patterns>
 
-## Behavioral Flow
+  <examples>
+    <ex i="'quantum computing 2024'" o="Standard depth research"/>
+    <ex i="'AI coding assistants' --depth deep" o="Competitive analysis"/>
+    <ex i="'distributed systems' --strategy unified" o="Best practices research"/>
+  </examples>
 
-## Understand (5-10% effort)
-
-- Assess query complexity and ambiguity
-- Identify required information types
-- Determine resource requirements
-- Define success criteria
-
-## Plan (10-15% effort)
-
-- Select planning strategy based on complexity
-- Identify parallelization opportunities
-- Generate research question decomposition
-- Create investigation milestones
-
-## TodoWrite (5% effort)
-
-- Create adaptive task hierarchy
-- Scale tasks to query complexity (3-15 tasks)
-- Establish task dependencies
-- Set progress tracking
-
-## Execute (50-60% effort)
-
-- **Parallel-first searches**: Prefer batching similar queries
-- **Smart extraction**: Route by content complexity
-- **Multi-hop exploration**: Follow entity and concept chains
-- **Evidence collection**: Track sources and confidence
-
-## Track (Continuous)
-
-- Monitor TodoWrite progress
-- Update confidence scores
-- Log successful patterns
-- Identify information gaps
-
-## Validate (10-15% effort)
-
-- Verify evidence chains
-- Check source credibility
-- Resolve contradictions
-- Ensure completeness
-
-## Key Patterns
-
-## Parallel Execution
-
-- Batch independent searches when possible
-- Run concurrent extractions
-- Sequential only for dependencies
-
-## Evidence Management
-
-- Track search results
-- Provide clear citations when available
-- Note uncertainties explicitly
-
-## Adaptive Depth
-
-- **Quick**: Basic search, 1 hop, summary output
-- **Standard**: Extended search, 2-3 hops, structured report
-- **Deep**: Comprehensive search, 3-4 hops, detailed analysis
-- **Exhaustive**: Maximum depth, 5 hops, complete investigation
-
-## MCP Integration
-
-- **Tavily**: Primary search and extraction engine
-- **Sequential**: Complex reasoning and synthesis
-- **Playwright**: JavaScript-heavy content extraction
-- **Serena**: Research session persistence
-
-## Output Standards
-
-- Save reports to `claudedocs/research_[topic]_[timestamp].md`
-- Include executive summary
-- Provide confidence levels
-- List all sources with citations
-
-## Examples
-
-```
-/sc:research "latest developments in quantum computing 2024"
-/sc:research "competitive analysis of AI coding assistants" --depth deep
-/sc:research "best practices for distributed systems" --strategy unified
-```
-
-## Boundaries
-
-**Will**: Current information, intelligent search, evidence-based analysis
-**Won't**: Make claims without sources, skip validation, access restricted content
-
-</document>
+  <bounds will="current info|intelligent search|evidence-based" wont="claims without sources|skip validation|restricted content"/>
+</component>

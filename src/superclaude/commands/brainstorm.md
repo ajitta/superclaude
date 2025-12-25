@@ -1,107 +1,53 @@
----
-name: brainstorm
-type: command
-triggers: [/sc:brainstorm, requirements-discovery, socratic-dialogue, exploration]
-description: "Interactive requirements discovery through Socratic dialogue and systematic exploration"
-category: orchestration
-complexity: advanced
-mcp-servers: [sequential, context7, magic, playwright, morphllm, serena]
-personas: [architect, analyzer, frontend, backend, security, devops, project-manager]
----
+<component name="brainstorm" type="command">
+  <config style="Telegraphic|Imperative|XML" eval="true"/>
+  <runtime model="opus-4-5" effort="high"/>
 
-<document type="command" name="brainstorm"
-          triggers="/sc:brainstorm, requirements-discovery, socratic-dialogue, exploration">
+  <role>
+    /sc:brainstorm
+    <mission>Interactive requirements discovery through Socratic dialogue and systematic exploration</mission>
+  </role>
 
-# /sc:brainstorm - Interactive Requirements Discovery
+  <syntax>/sc:brainstorm [topic/idea] [--strategy systematic|agile|enterprise] [--depth shallow|normal|deep] [--parallel]</syntax>
 
-> **Context Framework Note**: This file provides behavioral instructions for Claude Code when users type `/sc:brainstorm` patterns. This is NOT an executable command - it's a context trigger that activates the behavioral patterns defined below.
+  <triggers>
+    <t>Ambiguous project ideas</t>
+    <t>Requirements discovery needs</t>
+    <t>Concept validation requests</t>
+    <t>Cross-session refinement</t>
+  </triggers>
 
-## Triggers
-- Ambiguous project ideas requiring structured exploration
-- Requirements discovery and specification development needs
-- Concept validation and feasibility assessment requests
-- Cross-session brainstorming and iterative refinement scenarios
+  <flow>
+    <s n="1">Explore: Socratic dialogue + systematic questioning</s>
+    <s n="2">Analyze: Multi-persona coordination + domain expertise</s>
+    <s n="3">Validate: Feasibility assessment + requirement validation</s>
+    <s n="4">Specify: Concrete specs + cross-session persistence</s>
+    <s n="5">Handoff: Actionable briefs for implementation</s>
+  </flow>
 
-## Context Trigger Pattern
-```
-/sc:brainstorm [topic/idea] [--strategy systematic|agile|enterprise] [--depth shallow|normal|deep] [--parallel]
-```
-**Usage**: Type this pattern in your Claude Code conversation to activate brainstorming behavioral mode with systematic exploration and multi-persona coordination.
+  <mcp servers="seq:reasoning|c7:patterns|magic:UI|play:UX|morph:analysis|serena:persistence"/>
+  <personas p="arch|anal|fe|be|sec|ops|pm"/>
 
-## Behavioral Flow
-1. **Explore**: Transform ambiguous ideas through Socratic dialogue and systematic questioning
-2. **Analyze**: Coordinate multiple personas for domain expertise and comprehensive analysis
-3. **Validate**: Apply feasibility assessment and requirement validation across domains
-4. **Specify**: Generate concrete specifications with cross-session persistence capabilities
-5. **Handoff**: Create actionable briefs ready for implementation or further development
+  <tools>
+    <t n="Read/Write/Edit">Requirements docs + spec generation</t>
+    <t n="TodoWrite">Multi-phase exploration tracking</t>
+    <t n="Task">Parallel exploration + multi-agent</t>
+    <t n="WebSearch">Market research + tech validation</t>
+    <t n="sequentialthinking">Requirements analysis</t>
+  </tools>
 
-Key behaviors:
-- Multi-persona orchestration across architecture, analysis, frontend, backend, security domains
-- Advanced MCP coordination with intelligent routing for specialized analysis
-- Systematic execution with progressive dialogue enhancement and parallel exploration
-- Cross-session persistence with comprehensive requirements discovery documentation
+  <patterns>
+    <p n="Socratic">Question-driven → systematic discovery</p>
+    <p n="Multi-Domain">Cross-functional → comprehensive feasibility</p>
+    <p n="Progressive">Systematic → iterative refinement</p>
+    <p n="Specification">Concrete requirements → actionable briefs</p>
+  </patterns>
 
-## MCP Integration
-- **Sequential MCP**: Complex multi-step reasoning for systematic exploration and validation
-- **Context7 MCP**: Framework-specific feasibility assessment and pattern analysis
-- **Magic MCP**: UI/UX feasibility and design system integration analysis
-- **Playwright MCP**: User experience validation and interaction pattern testing
-- **Morphllm MCP**: Large-scale content analysis and pattern-based transformation
-- **Serena MCP**: Cross-session persistence, memory management, and project context enhancement
+  <examples>
+    <ex i="'AI project management tool' --strategy systematic --depth deep" o="Multi-persona deep analysis"/>
+    <ex i="'real-time collaboration' --strategy agile --parallel" o="Parallel FE/BE/Sec exploration"/>
+    <ex i="'enterprise data analytics' --strategy enterprise --validate" o="Compliance + validation"/>
+    <ex i="'mobile monetization' --depth normal" o="Cross-session with Serena"/>
+  </examples>
 
-## Tool Coordination
-- **Read/Write/Edit**: Requirements documentation and specification generation
-- **TodoWrite**: Progress tracking for complex multi-phase exploration
-- **Task**: Advanced delegation for parallel exploration paths and multi-agent coordination
-- **WebSearch**: Market research, competitive analysis, and technology validation
-- **sequentialthinking**: Structured reasoning for complex requirements analysis
-
-## Key Patterns
-- **Socratic Dialogue**: Question-driven exploration → systematic requirements discovery
-- **Multi-Domain Analysis**: Cross-functional expertise → comprehensive feasibility assessment
-- **Progressive Coordination**: Systematic exploration → iterative refinement and validation
-- **Specification Generation**: Concrete requirements → actionable implementation briefs
-
-## Examples
-
-### Systematic Product Discovery
-```
-/sc:brainstorm "AI-powered project management tool" --strategy systematic --depth deep
-# Multi-persona analysis: architect (system design), analyzer (feasibility), project-manager (requirements)
-# Sequential MCP provides structured exploration framework
-```
-
-### Agile Feature Exploration
-```
-/sc:brainstorm "real-time collaboration features" --strategy agile --parallel
-# Parallel exploration paths with frontend, backend, and security personas
-# Context7 and Magic MCP for framework and UI pattern analysis
-```
-
-### Enterprise Solution Validation
-```
-/sc:brainstorm "enterprise data analytics platform" --strategy enterprise --validate
-# Comprehensive validation with security, devops, and architect personas
-# Serena MCP for cross-session persistence and enterprise requirements tracking
-```
-
-### Cross-Session Refinement
-```
-/sc:brainstorm "mobile app monetization strategy" --depth normal
-# Serena MCP manages cross-session context and iterative refinement
-# Progressive dialogue enhancement with memory-driven insights
-```
-
-## Boundaries
-
-**Will:**
-- Transform ambiguous ideas into concrete specifications through systematic exploration
-- Coordinate multiple personas and MCP servers for comprehensive analysis
-- Provide cross-session persistence and progressive dialogue enhancement
-
-**Will Not:**
-- Make implementation decisions without proper requirements discovery
-- Override user vision with prescriptive solutions during exploration phase
-- Bypass systematic exploration for complex multi-domain projects
-
-</document>
+  <bounds will="ambiguous→concrete|multi-persona+MCP|cross-session persistence" wont="impl without discovery|override user vision|bypass systematic exploration"/>
+</component>

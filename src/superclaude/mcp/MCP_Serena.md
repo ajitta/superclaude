@@ -1,49 +1,29 @@
----
-name: serena
-type: mcp
-triggers: [symbol, rename, extract, move, LSP, session, memory, /sc:load, /sc:save, serena]
-description: Semantic code understanding with project memory and session persistence
-category: semantic-code
----
+<component name="serena" type="mcp">
+  <config style="Telegraphic|Imperative|XML" eval="true"/>
+  <triggers>symbol|rename|extract|move|LSP|session|memory|/sc:load|/sc:save|serena</triggers>
 
-<document type="mcp" name="serena"
-          triggers="symbol, rename, extract, move, LSP, session, memory, /sc:load, /sc:save, serena">
+  <role>
+    <mission>Semantic code understanding with project memory and session persistence</mission>
+  </role>
 
-# Serena MCP Server
+  <choose>
+    <use context="symbol operations">For semantic ops, not pattern-based (use Morphllm)</use>
+    <use context="semantic understanding">Symbol refs, dependency tracking, LSP</use>
+    <use context="session persistence">Project context, memory, cross-session learning</use>
+    <use context="large projects">Multi-language, architectural understanding</use>
+    <avoid context="simple edits">Basic text replacements, style, bulk ops</avoid>
+  </choose>
 
-**Purpose**: Semantic code understanding with project memory and session persistence
+  <synergy>
+    <with n="Morphllm">Serena analyzes semantic → Morphllm executes edits</with>
+    <with n="Sequential">Serena provides context → Sequential does architectural analysis</with>
+  </synergy>
 
-## Triggers
-
-- Symbol operations: rename, extract, move functions/classes
-- Project-wide code navigation and exploration
-- Multi-language projects requiring LSP integration
-- Session lifecycle: `/sc:load`, `/sc:save`, project activation
-- Memory-driven development workflows
-- Large codebase analysis (>50 files, complex architecture)
-
-## Choose When
-
-- **Over Morphllm**: For symbol operations, not pattern-based edits
-- **For semantic understanding**: Symbol references, dependency tracking, LSP integration
-- **For session persistence**: Project context, memory management, cross-session learning
-- **For large projects**: Multi-language codebases requiring architectural understanding
-- **Not for simple edits**: Basic text replacements, style enforcement, bulk operations
-
-## Works Best With
-
-- **Morphllm**: Serena analyzes semantic context → Morphllm executes precise edits
-- **Sequential**: Serena provides project context → Sequential performs architectural analysis
-
-## Examples
-
-```
-"rename getUserData function everywhere" → Serena (symbol operation with dependency tracking)
-"find all references to this class" → Serena (semantic search and navigation)
-"load my project context" → Serena (/sc:load with project activation)
-"save my current work session" → Serena (/sc:save with memory persistence)
-"update all console.log to logger" → Morphllm (pattern-based replacement)
-"create a login form" → Magic (UI component generation)
-```
-
-</document>
+  <examples>
+    <ex i="rename getUserData everywhere" o="Serena" r="symbol op with dependency tracking"/>
+    <ex i="find all class references" o="Serena" r="semantic search"/>
+    <ex i="load project context" o="Serena" r="/sc:load with project activation"/>
+    <ex i="save work session" o="Serena" r="/sc:save with memory persistence"/>
+    <ex i="update console.log to logger" o="Morphllm" r="pattern-based replacement"/>
+  </examples>
+</component>

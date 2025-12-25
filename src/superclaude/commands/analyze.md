@@ -1,96 +1,49 @@
----
-name: analyze
-type: command
-triggers: [/sc:analyze, code-analysis, quality, security, performance, architecture]
-description: "Comprehensive code analysis across quality, security, performance, and architecture domains"
-category: utility
-complexity: basic
-mcp-servers: []
-personas: []
----
+<component name="analyze" type="command">
+  <config style="Telegraphic|Imperative|XML" eval="true"/>
+  <runtime model="opus-4-5" effort="low"/>
 
-<document type="command" name="analyze"
-          triggers="/sc:analyze, code-analysis, quality, security, performance, architecture">
+  <role>
+    /sc:analyze
+    <mission>Comprehensive code analysis across quality, security, performance, and architecture domains</mission>
+  </role>
 
-# /sc:analyze - Code Analysis and Quality Assessment
+  <syntax>/sc:analyze [target] [--focus quality|security|performance|architecture] [--depth quick|deep] [--format text|json|report]</syntax>
 
-## Triggers
-- Code quality assessment requests for projects or specific components
-- Security vulnerability scanning and compliance validation needs
-- Performance bottleneck identification and optimization planning
-- Architecture review and technical debt assessment requirements
+  <triggers>
+    <t>Code quality assessment</t>
+    <t>Security vulnerability scanning</t>
+    <t>Performance bottleneck identification</t>
+    <t>Architecture review + tech debt</t>
+  </triggers>
 
-## Usage
-```
-/sc:analyze [target] [--focus quality|security|performance|architecture] [--depth quick|deep] [--format text|json|report]
-```
+  <flow>
+    <s n="1">Discover: Categorize files by language</s>
+    <s n="2">Scan: Domain-specific analysis</s>
+    <s n="3">Evaluate: Prioritized findings + severity</s>
+    <s n="4">Recommend: Actionable guidance</s>
+    <s n="5">Report: Metrics + roadmap</s>
+  </flow>
 
-## Behavioral Flow
-1. **Discover**: Categorize source files using language detection and project analysis
-2. **Scan**: Apply domain-specific analysis techniques and pattern matching
-3. **Evaluate**: Generate prioritized findings with severity ratings and impact assessment
-4. **Recommend**: Create actionable recommendations with implementation guidance
-5. **Report**: Present comprehensive analysis with metrics and improvement roadmap
+  <tools>
+    <t n="Glob">File discovery</t>
+    <t n="Grep">Pattern analysis</t>
+    <t n="Read">Source inspection</t>
+    <t n="Bash">External tools</t>
+    <t n="Write">Report generation</t>
+  </tools>
 
-Key behaviors:
-- Multi-domain analysis combining static analysis and heuristic evaluation
-- Intelligent file discovery and language-specific pattern recognition
-- Severity-based prioritization of findings and recommendations
-- Comprehensive reporting with metrics, trends, and actionable insights
+  <patterns>
+    <p n="Domain">Quality|Security|Perf|Arch → specialized assessment</p>
+    <p n="Recognition">Language detect → appropriate techniques</p>
+    <p n="Severity">Issue classification → prioritized recs</p>
+  </patterns>
 
-## Tool Coordination
-- **Glob**: File discovery and project structure analysis
-- **Grep**: Pattern analysis and code search operations
-- **Read**: Source code inspection and configuration analysis
-- **Bash**: External analysis tool execution and validation
-- **Write**: Report generation and metrics documentation
+  <examples>
+    <ex i="/sc:analyze" o="Multi-domain project report"/>
+    <ex i="src/auth --focus security --deep" o="Vulnerability assessment"/>
+    <ex i="--focus performance --format report" o="Bottleneck analysis"/>
+    <ex i="src/components --focus quality --quick" o="Code smell detection"/>
+  </examples>
 
-## Key Patterns
-- **Domain Analysis**: Quality/Security/Performance/Architecture → specialized assessment
-- **Pattern Recognition**: Language detection → appropriate analysis techniques
-- **Severity Assessment**: Issue classification → prioritized recommendations
-- **Report Generation**: Analysis results → structured documentation
-
-## Examples
-
-## Comprehensive Project Analysis
-```
-/sc:analyze
-# Multi-domain analysis of entire project
-# Generates comprehensive report with key findings and roadmap
-```
-
-## Focused Security Assessment
-```
-/sc:analyze src/auth --focus security --depth deep
-# Deep security analysis of authentication components
-# Vulnerability assessment with detailed remediation guidance
-```
-
-## Performance Optimization Analysis
-```
-/sc:analyze --focus performance --format report
-# Performance bottleneck identification
-# Generates HTML report with optimization recommendations
-```
-
-## Quick Quality Check
-```
-/sc:analyze src/components --focus quality --depth quick
-# Rapid quality assessment of component directory
-# Identifies code smells and maintainability issues
-```
-
-## Boundaries
-
-**Will:**
-- Perform comprehensive static code analysis across multiple domains
-- Generate severity-rated findings with actionable recommendations
-- Provide detailed reports with metrics and improvement guidance
-
-**Will Not:**
-- Execute dynamic analysis requiring code compilation or runtime
-- Modify source code or apply fixes without explicit user consent
-- Analyze external dependencies beyond import and usage patterns
-
-</document>
+  <bounds will="static analysis|severity-rated findings|detailed reports" wont="dynamic/runtime analysis|modify code|analyze external deps"/>
+</component>

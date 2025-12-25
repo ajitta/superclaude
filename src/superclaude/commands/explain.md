@@ -1,99 +1,51 @@
----
-name: explain
-type: command
-triggers: [/sc:explain, explanation, code-explanation, concept-explanation, learning]
-description: "Provide clear explanations of code, concepts, and system behavior with educational clarity"
-category: workflow
-complexity: standard
-mcp-servers: [sequential, context7]
-personas: [educator, architect, security]
----
+<component name="explain" type="command">
+  <config style="Telegraphic|Imperative|XML" eval="true"/>
+  <runtime model="opus-4-5" effort="medium"/>
 
-<document type="command" name="explain"
-          triggers="/sc:explain, explanation, code-explanation, concept-explanation, learning">
+  <role>
+    /sc:explain
+    <mission>Provide clear explanations of code, concepts, and system behavior with educational clarity</mission>
+  </role>
 
-# /sc:explain - Code and Concept Explanation
+  <syntax>/sc:explain [target] [--level basic|intermediate|advanced] [--format text|examples|interactive] [--context domain]</syntax>
 
-## Triggers
-- Code understanding and documentation requests for complex functionality
-- System behavior explanation needs for architectural components
-- Educational content generation for knowledge transfer
-- Framework-specific concept clarification requirements
+  <triggers>
+    <t>Code understanding requests</t>
+    <t>System behavior explanation</t>
+    <t>Educational content generation</t>
+    <t>Framework concept clarification</t>
+  </triggers>
 
-## Usage
-```
-/sc:explain [target] [--level basic|intermediate|advanced] [--format text|examples|interactive] [--context domain]
-```
+  <flow>
+    <s n="1">Analyze: Target code/concept/system</s>
+    <s n="2">Assess: Audience level + depth</s>
+    <s n="3">Structure: Progressive complexity</s>
+    <s n="4">Generate: Explanations + examples</s>
+    <s n="5">Validate: Accuracy + effectiveness</s>
+  </flow>
 
-## Behavioral Flow
-1. **Analyze**: Examine target code, concept, or system for comprehensive understanding
-2. **Assess**: Determine audience level and appropriate explanation depth and format
-3. **Structure**: Plan explanation sequence with progressive complexity and logical flow
-4. **Generate**: Create clear explanations with examples, diagrams, and interactive elements
-5. **Validate**: Verify explanation accuracy and educational effectiveness
+  <mcp servers="seq:analysis|c7:patterns"/>
+  <personas p="educator|arch|sec"/>
 
-Key behaviors:
-- Multi-persona coordination for domain expertise (educator, architect, security)
-- Framework-specific explanations via Context7 integration
-- Systematic analysis via Sequential MCP for complex concept breakdown
-- Adaptive explanation depth based on audience and complexity
+  <tools>
+    <t n="Read/Grep/Glob">Code analysis + pattern ID</t>
+    <t n="TodoWrite">Multi-part explanation tracking</t>
+    <t n="Task">Complex explanation delegation</t>
+  </tools>
 
-## MCP Integration
-- **Sequential MCP**: Auto-activated for complex multi-component analysis and structured reasoning
-- **Context7 MCP**: Framework documentation and official pattern explanations
-- **Persona Coordination**: Educator (learning), Architect (systems), Security (practices)
+  <patterns>
+    <p n="Progressive">Basic → intermediate → advanced</p>
+    <p n="Framework">C7 docs → official patterns</p>
+    <p n="Multi-Domain">Technical + clarity + security</p>
+    <p n="Interactive">Static → examples → exploration</p>
+  </patterns>
 
-## Tool Coordination
-- **Read/Grep/Glob**: Code analysis and pattern identification for explanation content
-- **TodoWrite**: Progress tracking for complex multi-part explanations
-- **Task**: Delegation for comprehensive explanation workflows requiring systematic breakdown
+  <examples>
+    <ex i="authentication.js --level basic" o="Beginner explanation"/>
+    <ex i="react-hooks --intermediate --context react" o="C7 patterns"/>
+    <ex i="microservices-system --advanced --interactive" o="Arch deep-dive"/>
+    <ex i="jwt-authentication --context security --basic" o="Security concepts"/>
+  </examples>
 
-## Key Patterns
-- **Progressive Learning**: Basic concepts → intermediate details → advanced implementation
-- **Framework Integration**: Context7 documentation → accurate official patterns and practices
-- **Multi-Domain Analysis**: Technical accuracy + educational clarity + security awareness
-- **Interactive Explanation**: Static content → examples → interactive exploration
-
-## Examples
-
-### Basic Code Explanation
-```
-/sc:explain authentication.js --level basic
-# Clear explanation with practical examples for beginners
-# Educator persona provides learning-optimized structure
-```
-
-### Framework Concept Explanation
-```
-/sc:explain react-hooks --level intermediate --context react
-# Context7 integration for official React documentation patterns
-# Structured explanation with progressive complexity
-```
-
-### System Architecture Explanation
-```
-/sc:explain microservices-system --level advanced --format interactive
-# Architect persona explains system design and patterns
-# Interactive exploration with Sequential analysis breakdown
-```
-
-### Security Concept Explanation
-```
-/sc:explain jwt-authentication --context security --level basic
-# Security persona explains authentication concepts and best practices
-# Framework-agnostic security principles with practical examples
-```
-
-## Boundaries
-
-**Will:**
-- Provide clear, comprehensive explanations with educational clarity
-- Auto-activate relevant personas for domain expertise and accurate analysis
-- Generate framework-specific explanations with official documentation integration
-
-**Will Not:**
-- Generate explanations without thorough analysis and accuracy verification
-- Override project-specific documentation standards or reveal sensitive details
-- Bypass established explanation validation or educational quality requirements
-
-</document>
+  <bounds will="clear explanations|persona expertise|framework integration" wont="explain without analysis|override standards|reveal sensitive"/>
+</component>

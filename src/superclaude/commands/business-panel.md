@@ -1,85 +1,43 @@
----
-name: business-panel
-type: command
-triggers: [/sc:business-panel, business-analysis, strategic-planning, multi-expert]
-description: "Multi-expert business analysis with adaptive interaction modes"
-category: analysis
-complexity: complex
----
+<component name="business-panel" type="command">
+  <config style="Telegraphic|Imperative|XML" eval="true"/>
+  <runtime model="opus-4-5" effort="high"/>
 
-<document type="command" name="business-panel"
-          triggers="/sc:business-panel, business-analysis, strategic-planning, multi-expert">
+  <role>
+    /sc:business-panel
+    <mission>Multi-expert business analysis with adaptive interaction modes</mission>
+  </role>
 
-# /sc:business-panel - Business Panel Analysis System
+  <syntax>/sc:business-panel [doc|content] [--experts "names"] [--mode discussion|debate|socratic|adaptive] [--focus domain]</syntax>
 
-## Overview
+  <experts>
+    <e n="Christensen">Disruption Theory, Jobs-to-be-Done</e>
+    <e n="Porter">Competitive Strategy, Five Forces</e>
+    <e n="Drucker">Management Philosophy, MBO</e>
+    <e n="Godin">Marketing Innovation, Tribe Building</e>
+    <e n="Kim-Mauborgne">Blue Ocean Strategy</e>
+    <e n="Collins">Organizational Excellence, Good to Great</e>
+    <e n="Taleb">Risk Management, Antifragility</e>
+    <e n="Meadows">Systems Thinking, Leverage Points</e>
+    <e n="Doumont">Communication Systems, Structured Clarity</e>
+  </experts>
 
-AI facilitated panel discussion between renowned business thought leaders analyzing documents through their distinct frameworks and methodologies.
+  <modes>
+    <m n="discussion">Collaborative analysis, experts build on insights</m>
+    <m n="debate">Adversarial analysis for controversial topics</m>
+    <m n="socratic">Question-driven exploration for deep learning</m>
+    <m n="adaptive">System selects based on content</m>
+  </modes>
 
-## Expert Panel
+  <options>
+    <o n="--experts">Select specific: "porter,christensen,meadows"</o>
+    <o n="--focus">Auto-select for domain</o>
+    <o n="--all-experts">Include all 9</o>
+    <o n="--synthesis-only">Skip detailed, show synthesis</o>
+    <o n="--structured">Use symbol system</o>
+  </options>
 
-## Available Experts
-- **Clayton Christensen**: Disruption Theory, Jobs-to-be-Done
-- **Michael Porter**: Competitive Strategy, Five Forces
-- **Peter Drucker**: Management Philosophy, MBO
-- **Seth Godin**: Marketing Innovation, Tribe Building
-- **W. Chan Kim & Renée Mauborgne**: Blue Ocean Strategy
-- **Jim Collins**: Organizational Excellence, Good to Great
-- **Nassim Nicholas Taleb**: Risk Management, Antifragility
-- **Donella Meadows**: Systems Thinking, Leverage Points
-- **Jean-luc Doumont**: Communication Systems, Structured Clarity
+  <mcp servers="seq:primary|c7:business-patterns"/>
+  <personas p="anal|arch|mentor" auto="true"/>
 
-## Analysis Modes
-
-## Phase 1: DISCUSSION (Default)
-Collaborative analysis where experts build upon each other's insights through their frameworks.
-
-## Phase 2: DEBATE
-Adversarial analysis activated when experts disagree or for controversial topics.
-
-## Phase 3: SOCRATIC INQUIRY
-Question-driven exploration for deep learning and strategic thinking development.
-
-## Usage
-
-## Basic Usage
-```bash
-/sc:business-panel [document_path_or_content]
-```
-
-## Advanced Options
-```bash
-/sc:business-panel [content] --experts "porter,christensen,meadows"
-/sc:business-panel [content] --mode debate
-/sc:business-panel [content] --focus "competitive-analysis"
-/sc:business-panel [content] --synthesis-only
-```
-
-## Mode Commands
-- `--mode discussion` - Collaborative analysis (default)
-- `--mode debate` - Challenge and stress-test ideas
-- `--mode socratic` - Question-driven exploration
-- `--mode adaptive` - System selects based on content
-
-## Expert Selection
-- `--experts "name1,name2,name3"` - Select specific experts
-- `--focus domain` - Auto-select experts for domain
-- `--all-experts` - Include all 9 experts
-
-## Output Options
-- `--synthesis-only` - Skip detailed analysis, show synthesis
-- `--structured` - Use symbol system for efficiency
-- `--verbose` - Full detailed analysis
-- `--questions` - Focus on strategic questions
-
-## Auto-Persona Activation
-- **Auto-Activates**: Analyzer, Architect, Mentor personas
-- **MCP Integration**: Sequential (primary), Context7 (business patterns)
-- **Tool Orchestration**: Read, Grep, Write, MultiEdit, TodoWrite
-
-## Integration Notes
-- Compatible with all thinking flags (--think, --think-hard, --ultrathink)
-- Supports wave orchestration for comprehensive business analysis
-- Integrates with scribe persona for professional business communication
-
-</document>
+  <bounds will="multi-expert analysis|adaptive modes|comprehensive synthesis" wont="replace professional advice|make decisions for user"/>
+</component>

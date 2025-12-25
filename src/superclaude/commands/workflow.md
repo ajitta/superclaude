@@ -1,104 +1,53 @@
----
-name: workflow
-type: command
-triggers: [/sc:workflow, prd-analysis, implementation-planning, workflow-generation]
-description: "Generate structured implementation workflows from PRDs and feature requirements"
-category: orchestration
-complexity: advanced
-mcp-servers: [sequential, context7, magic, playwright, morphllm, serena]
-personas: [architect, analyzer, frontend, backend, security, devops, project-manager]
----
+<component name="workflow" type="command">
+  <config style="Telegraphic|Imperative|XML" eval="true"/>
+  <runtime model="opus-4-5" effort="high"/>
 
-<document type="command" name="workflow"
-          triggers="/sc:workflow, prd-analysis, implementation-planning, workflow-generation">
+  <role>
+    /sc:workflow
+    <mission>Generate structured implementation workflows from PRDs and feature requirements</mission>
+  </role>
 
-# /sc:workflow - Implementation Workflow Generator
+  <syntax>/sc:workflow [prd-file|feature] [--strategy systematic|agile|enterprise] [--depth shallow|normal|deep] [--parallel]</syntax>
 
-## Triggers
-- PRD and feature specification analysis for implementation planning
-- Structured workflow generation for development projects
-- Multi-persona coordination for complex implementation strategies
-- Cross-session workflow management and dependency mapping
+  <triggers>
+    <t>PRD + spec analysis</t>
+    <t>Implementation workflow generation</t>
+    <t>Multi-persona coordination</t>
+    <t>Cross-session workflow management</t>
+  </triggers>
 
-## Usage
-```
-/sc:workflow [prd-file|feature-description] [--strategy systematic|agile|enterprise] [--depth shallow|normal|deep] [--parallel]
-```
+  <flow>
+    <s n="1">Analyze: Parse PRD + understand requirements</s>
+    <s n="2">Plan: Workflow structure + dependency mapping</s>
+    <s n="3">Coordinate: Multi-persona + domain expertise</s>
+    <s n="4">Execute: Step-by-step workflows + task coordination</s>
+    <s n="5">Validate: Quality gates + workflow completeness</s>
+  </flow>
 
-## Behavioral Flow
-1. **Analyze**: Parse PRD and feature specifications to understand implementation requirements
-2. **Plan**: Generate comprehensive workflow structure with dependency mapping and task orchestration
-3. **Coordinate**: Activate multiple personas for domain expertise and implementation strategy
-4. **Execute**: Create structured step-by-step workflows with automated task coordination
-5. **Validate**: Apply quality gates and ensure workflow completeness across domains
+  <mcp servers="seq:analysis|c7:patterns|magic:UI|play:testing|morph:transform|serena:persistence"/>
+  <personas p="arch|anal|fe|be|sec|ops|pm"/>
 
-Key behaviors:
-- Multi-persona orchestration across architecture, frontend, backend, security, and devops domains
-- Advanced MCP coordination with intelligent routing for specialized workflow analysis
-- Systematic execution with progressive workflow enhancement and parallel processing
-- Cross-session workflow management with comprehensive dependency tracking
+  <tools>
+    <t n="Read/Write/Edit">PRD analysis + workflow docs</t>
+    <t n="TodoWrite">Multi-phase progress tracking</t>
+    <t n="Task">Parallel workflow + multi-agent</t>
+    <t n="WebSearch">Tech research + framework validation</t>
+    <t n="sequentialthinking">Dependency analysis</t>
+  </tools>
 
-## MCP Integration
-- **Sequential MCP**: Complex multi-step workflow analysis and systematic implementation planning
-- **Context7 MCP**: Framework-specific workflow patterns and implementation best practices
-- **Magic MCP**: UI/UX workflow generation and design system integration strategies
-- **Playwright MCP**: Testing workflow integration and quality assurance automation
-- **Morphllm MCP**: Large-scale workflow transformation and pattern-based optimization
-- **Serena MCP**: Cross-session workflow persistence, memory management, and project context
+  <patterns>
+    <p n="PRD">Document parsing → requirement extraction → strategy</p>
+    <p n="Generation">Task decomposition → dependency → planning</p>
+    <p n="Multi-Domain">Cross-functional → comprehensive strategies</p>
+    <p n="Quality">Validation → testing → deployment planning</p>
+  </patterns>
 
-## Tool Coordination
-- **Read/Write/Edit**: PRD analysis and workflow documentation generation
-- **TodoWrite**: Progress tracking for complex multi-phase workflow execution
-- **Task**: Advanced delegation for parallel workflow generation and multi-agent coordination
-- **WebSearch**: Technology research, framework validation, and implementation strategy analysis
-- **sequentialthinking**: Structured reasoning for complex workflow dependency analysis
+  <examples>
+    <ex i="Claudedocs/PRD/feature.md --strategy systematic --depth deep" o="Comprehensive PRD workflow"/>
+    <ex i="'user auth system' --strategy agile --parallel" o="Agile + parallel coordination"/>
+    <ex i="enterprise-prd.md --strategy enterprise --validate" o="Enterprise + compliance"/>
+    <ex i="project-brief.md --depth normal" o="Cross-session with Serena"/>
+  </examples>
 
-## Key Patterns
-- **PRD Analysis**: Document parsing → requirement extraction → implementation strategy development
-- **Workflow Generation**: Task decomposition → dependency mapping → structured implementation planning
-- **Multi-Domain Coordination**: Cross-functional expertise → comprehensive implementation strategies
-- **Quality Integration**: Workflow validation → testing strategies → deployment planning
-
-## Examples
-
-### Systematic PRD Workflow
-```
-/sc:workflow Claudedocs/PRD/feature-spec.md --strategy systematic --depth deep
-# Comprehensive PRD analysis with systematic workflow generation
-# Multi-persona coordination for complete implementation strategy
-```
-
-### Agile Feature Workflow
-```
-/sc:workflow "user authentication system" --strategy agile --parallel
-# Agile workflow generation with parallel task coordination
-# Context7 and Magic MCP for framework and UI workflow patterns
-```
-
-### Enterprise Implementation Planning
-```
-/sc:workflow enterprise-prd.md --strategy enterprise --validate
-# Enterprise-scale workflow with comprehensive validation
-# Security, devops, and architect personas for compliance and scalability
-```
-
-### Cross-Session Workflow Management
-```
-/sc:workflow project-brief.md --depth normal
-# Serena MCP manages cross-session workflow context and persistence
-# Progressive workflow enhancement with memory-driven insights
-```
-
-## Boundaries
-
-**Will:**
-- Generate comprehensive implementation workflows from PRD and feature specifications
-- Coordinate multiple personas and MCP servers for complete implementation strategies
-- Provide cross-session workflow management and progressive enhancement capabilities
-
-**Will Not:**
-- Execute actual implementation tasks beyond workflow planning and strategy
-- Override established development processes without proper analysis and validation
-- Generate workflows without comprehensive requirement analysis and dependency mapping
-
-</document> 
+  <bounds will="comprehensive workflows|multi-persona+MCP|cross-session management" wont="execute impl beyond planning|override dev process|generate without analysis"/>
+</component>

@@ -1,176 +1,51 @@
----
-name: index-repo
-type: command
-triggers: [/sc:index-repo, repository-index, project-index, token-reduction]
-description: "Repository indexing with 94% token reduction (58K → 3K)"
-category: utility
-complexity: standard
-mcp-servers: []
-personas: []
----
+<component name="index-repo" type="command">
+  <config style="Telegraphic|Imperative|XML" eval="true"/>
+  <runtime model="opus-4-5" effort="low"/>
 
-<document type="command" name="index-repo"
-          triggers="/sc:index-repo, repository-index, project-index, token-reduction">
+  <role>
+    /sc:index-repo
+    <mission>Repository indexing with 94% token reduction (58K → 3K)</mission>
+  </role>
 
-# Repository Index Creator
+  <syntax>/sc:index-repo [mode=create|update|quick]</syntax>
 
-📊 **Index Creator activated**
+  <triggers>
+    <t>Repository indexing requests</t>
+    <t>Token reduction needs</t>
+    <t>Project structure documentation</t>
+  </triggers>
 
-## Problem Statement
+  <flow>
+    <s n="1">Analyze: Repo structure (5 parallel Glob)</s>
+    <s n="2">Extract: Entry points + modules + APIs + deps</s>
+    <s n="3">Generate: PROJECT_INDEX.md + .json</s>
+    <s n="4">Validate: Completeness + size &lt;5KB</s>
+  </flow>
 
-**Before**: Reading all files → 58,000 tokens every session
-**After**: Read PROJECT_INDEX.md → 3,000 tokens (94% reduction)
+  <tools>
+    <t n="Glob">Parallel structure scan (code|docs|config|tests|scripts)</t>
+    <t n="Read">Metadata extraction</t>
+    <t n="Write">Index generation</t>
+  </tools>
 
-## Index Creation Flow
+  <patterns>
+    <p n="Structure">src/**/*.{ts,py,js} | docs/**/*.md | *.toml | tests/**/*</p>
+    <p n="Output">PROJECT_INDEX.md (3KB) + PROJECT_INDEX.json (10KB)</p>
+  </patterns>
 
-## Phase 1: Analyze Repository Structure
+  <roi>
+    <metric n="creation">2K tokens (one-time)</metric>
+    <metric n="reading">3K tokens (per session)</metric>
+    <metric n="full-read">58K tokens (per session)</metric>
+    <metric n="breakeven">1 session</metric>
+    <metric n="10-sessions">550K tokens saved</metric>
+  </roi>
 
-**Parallel analysis** (5 concurrent Glob searches):
+  <examples>
+    <ex i="/index-repo" o="Create full index"/>
+    <ex i="mode=update" o="Update existing"/>
+    <ex i="mode=quick" o="Skip tests"/>
+  </examples>
 
-1. **Code Structure**
-   ```
-   src/**/*.{ts,py,js,tsx,jsx}
-   lib/**/*.{ts,py,js}
-   superclaude/**/*.py
-   ```
-
-2. **Documentation**
-   ```
-   docs/**/*.md
-   *.md (root level)
-   README*.md
-   ```
-
-3. **Configuration**
-   ```
-   *.toml
-   *.yaml, *.yml
-   *.json (exclude package-lock, node_modules)
-   ```
-
-4. **Tests**
-   ```
-   tests/**/*.{py,ts,js}
-   **/*.test.{ts,py,js}
-   **/*.spec.{ts,py,js}
-   ```
-
-5. **Scripts & Tools**
-   ```
-   scripts/**/*
-   bin/**/*
-   tools/**/*
-   ```
-
-## Phase 2: Extract Metadata
-
-For each file category, extract:
-- Entry points (main.py, index.ts, cli.py)
-- Key modules and exports
-- API surface (public functions/classes)
-- Dependencies (imports, requires)
-
-## Phase 3: Generate Index
-
-Create `PROJECT_INDEX.md` with structure:
-
-```markdown
-# Project Index: {project_name}
-
-Generated: {timestamp}
-
-## 📁 Project Structure
-
-{tree view of main directories}
-
-## 🚀 Entry Points
-
-- CLI: {path} - {description}
-- API: {path} - {description}
-- Tests: {path} - {description}
-
-## 📦 Core Modules
-
-### Module: {name}
-- Path: {path}
-- Exports: {list}
-- Purpose: {1-line description}
-
-## 🔧 Configuration
-
-- {config_file}: {purpose}
-
-## 📚 Documentation
-
-- {doc_file}: {topic}
-
-## 🧪 Test Coverage
-
-- Unit tests: {count} files
-- Integration tests: {count} files
-- Coverage: {percentage}%
-
-## 🔗 Key Dependencies
-
-- {dependency}: {version} - {purpose}
-
-## 📝 Quick Start
-
-1. {setup step}
-2. {run step}
-3. {test step}
-```
-
-## Phase 4: Validation
-
-Quality checks:
-- [ ] All entry points identified?
-- [ ] Core modules documented?
-- [ ] Index size < 5KB?
-- [ ] Human-readable format?
-
----
-
-## Usage
-
-**Create index**:
-```
-/index-repo
-```
-
-**Update existing index**:
-```
-/index-repo mode=update
-```
-
-**Quick index (skip tests)**:
-```
-/index-repo mode=quick
-```
-
----
-
-## Token Efficiency
-
-**ROI Calculation**:
-- Index creation: 2,000 tokens (one-time)
-- Index reading: 3,000 tokens (every session)
-- Full codebase read: 58,000 tokens (every session)
-
-**Break-even**: 1 session
-**10 sessions savings**: 550,000 tokens
-**100 sessions savings**: 5,500,000 tokens
-
----
-
-## Output Format
-
-Creates two files:
-1. `PROJECT_INDEX.md` (3KB, human-readable)
-2. `PROJECT_INDEX.json` (10KB, machine-readable)
-
----
-
-**Index Creator is now active.** Run to analyze current repository.
-
-</document>
+  <bounds will="94% token reduction|parallel analysis|human-readable output" wont="modify source|exceed 5KB"/>
+</component>

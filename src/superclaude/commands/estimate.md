@@ -1,94 +1,51 @@
----
-name: estimate
-type: command
-triggers: [/sc:estimate, estimation, time-estimate, effort-estimate, complexity-assessment]
-description: "Provide development estimates for tasks, features, or projects with intelligent analysis"
-category: special
-complexity: standard
-mcp-servers: [sequential, context7]
-personas: [architect, performance, project-manager]
----
+<component name="estimate" type="command">
+  <config style="Telegraphic|Imperative|XML" eval="true"/>
+  <runtime model="opus-4-5" effort="medium"/>
 
-<document type="command" name="estimate"
-          triggers="/sc:estimate, estimation, time-estimate, effort-estimate, complexity-assessment">
+  <role>
+    /sc:estimate
+    <mission>Provide development estimates for tasks, features, or projects with intelligent analysis</mission>
+  </role>
 
-# /sc:estimate - Development Estimation
+  <syntax>/sc:estimate [target] [--type time|effort|complexity] [--unit hours|days|weeks] [--breakdown]</syntax>
 
-## Triggers
-- Development planning requiring time, effort, or complexity estimates
-- Project scoping and resource allocation decisions
-- Feature breakdown needing systematic estimation methodology
-- Risk assessment and confidence interval analysis requirements
+  <triggers>
+    <t>Development time/effort estimates</t>
+    <t>Project scoping + resource allocation</t>
+    <t>Feature breakdown estimation</t>
+    <t>Risk assessment + confidence intervals</t>
+  </triggers>
 
-## Usage
-```
-/sc:estimate [target] [--type time|effort|complexity] [--unit hours|days|weeks] [--breakdown]
-```
+  <flow>
+    <s n="1">Analyze: Scope, complexity, deps, patterns</s>
+    <s n="2">Calculate: Methodology + benchmarks</s>
+    <s n="3">Validate: Cross-reference + domain expertise</s>
+    <s n="4">Present: Breakdown + confidence + risk</s>
+    <s n="5">Track: Accuracy for improvement</s>
+  </flow>
 
-## Behavioral Flow
-1. **Analyze**: Examine scope, complexity factors, dependencies, and framework patterns
-2. **Calculate**: Apply estimation methodology with historical benchmarks and complexity scoring
-3. **Validate**: Cross-reference estimates with project patterns and domain expertise
-4. **Present**: Provide detailed breakdown with confidence intervals and risk assessment
-5. **Track**: Document estimation accuracy for continuous methodology improvement
+  <mcp servers="seq:analysis|c7:benchmarks"/>
+  <personas p="arch|perf|pm"/>
 
-Key behaviors:
-- Multi-persona coordination (architect, performance, project-manager) based on estimation scope
-- Sequential MCP integration for systematic analysis and complexity assessment
-- Context7 MCP integration for framework-specific patterns and historical benchmarks
-- Intelligent breakdown analysis with confidence intervals and risk factors
+  <tools>
+    <t n="Read/Grep/Glob">Codebase complexity analysis</t>
+    <t n="TodoWrite">Estimation breakdown tracking</t>
+    <t n="Task">Multi-domain estimation delegation</t>
+    <t n="Bash">Project + dependency analysis</t>
+  </tools>
 
-## MCP Integration
-- **Sequential MCP**: Complex multi-step estimation analysis and systematic complexity assessment
-- **Context7 MCP**: Framework-specific estimation patterns and historical benchmark data
-- **Persona Coordination**: Architect (design complexity), Performance (optimization effort), Project Manager (timeline)
+  <patterns>
+    <p n="Scope">Requirements → complexity → patterns → risk</p>
+    <p n="Method">Time|Effort|Complexity|Cost approaches</p>
+    <p n="Multi-Domain">Arch + Perf + Timeline assessment</p>
+    <p n="Validation">Benchmarks → cross-check → confidence</p>
+  </patterns>
 
-## Tool Coordination
-- **Read/Grep/Glob**: Codebase analysis for complexity assessment and scope evaluation
-- **TodoWrite**: Estimation breakdown and progress tracking for complex estimation workflows
-- **Task**: Advanced delegation for multi-domain estimation requiring systematic coordination
-- **Bash**: Project analysis and dependency evaluation for accurate complexity scoring
+  <examples>
+    <ex i="'auth system' --type time --unit days --breakdown" o="8 days, 85% confidence"/>
+    <ex i="'monolith to microservices' --type complexity --breakdown" o="Risk + dependency map"/>
+    <ex i="'optimize performance' --type effort --unit hours" o="Effort by category"/>
+  </examples>
 
-## Key Patterns
-- **Scope Analysis**: Project requirements → complexity factors → framework patterns → risk assessment
-- **Estimation Methodology**: Time-based → Effort-based → Complexity-based → Cost-based approaches
-- **Multi-Domain Assessment**: Architecture complexity → Performance requirements → Project timeline
-- **Validation Framework**: Historical benchmarks → cross-validation → confidence intervals → accuracy tracking
-
-## Examples
-
-### Feature Development Estimation
-```
-/sc:estimate "user authentication system" --type time --unit days --breakdown
-# Systematic analysis: Database design (2 days) + Backend API (3 days) + Frontend UI (2 days) + Testing (1 day)
-# Total: 8 days with 85% confidence interval
-```
-
-### Project Complexity Assessment
-```
-/sc:estimate "migrate monolith to microservices" --type complexity --breakdown
-# Architecture complexity analysis with risk factors and dependency mapping
-# Multi-persona coordination for comprehensive assessment
-```
-
-### Performance Optimization Effort
-```
-/sc:estimate "optimize application performance" --type effort --unit hours
-# Performance persona analysis with benchmark comparisons
-# Effort breakdown by optimization category and expected impact
-```
-
-## Boundaries
-
-**Will:**
-- Provide systematic development estimates with confidence intervals and risk assessment
-- Apply multi-persona coordination for comprehensive complexity analysis
-- Generate detailed breakdown analysis with historical benchmark comparisons
-
-**Will Not:**
-- Guarantee estimate accuracy without proper scope analysis and validation
-- Provide estimates without appropriate domain expertise and complexity assessment
-- Override historical benchmarks without clear justification and analysis
-
-</document>
-
+  <bounds will="systematic estimates|confidence intervals|multi-persona analysis" wont="guarantee accuracy|estimate without analysis|override benchmarks"/>
+</component>

@@ -1,94 +1,56 @@
----
-name: select-tool
-type: command
-triggers: [/sc:select-tool, tool-selection, mcp-routing, complexity-scoring]
-description: "Intelligent MCP tool selection based on complexity scoring and operation analysis"
-category: special
-complexity: high
-mcp-servers: [serena, morphllm]
-personas: []
----
+<component name="select-tool" type="command">
+  <config style="Telegraphic|Imperative|XML" eval="true"/>
+  <runtime model="opus-4-5" effort="low"/>
 
-<document type="command" name="select-tool"
-          triggers="/sc:select-tool, tool-selection, mcp-routing, complexity-scoring">
+  <role>
+    /sc:select-tool
+    <mission>Intelligent MCP tool selection based on complexity scoring and operation analysis</mission>
+  </role>
 
-# /sc:select-tool - Intelligent MCP Tool Selection
+  <syntax>/sc:select-tool [operation] [--analyze] [--explain]</syntax>
 
-## Triggers
-- Operations requiring optimal MCP tool selection between Serena and Morphllm
-- Meta-system decisions needing complexity analysis and capability matching
-- Tool routing decisions requiring performance vs accuracy trade-offs
-- Operations benefiting from intelligent tool capability assessment
+  <triggers>
+    <t>MCP tool selection (Serena vs Morphllm)</t>
+    <t>Complexity analysis needs</t>
+    <t>Tool routing decisions</t>
+    <t>Performance vs accuracy trade-offs</t>
+  </triggers>
 
-## Usage
-```
-/sc:select-tool [operation] [--analyze] [--explain]
-```
+  <flow>
+    <s n="1">Parse: Operation type + scope + file count</s>
+    <s n="2">Score: Multi-dimensional complexity</s>
+    <s n="3">Match: Requirements vs capabilities</s>
+    <s n="4">Select: Optimal tool via scoring matrix</s>
+    <s n="5">Validate: Selection accuracy + confidence</s>
+  </flow>
 
-## Behavioral Flow
-1. **Parse**: Analyze operation type, scope, file count, and complexity indicators
-2. **Score**: Apply multi-dimensional complexity scoring across various operation factors
-3. **Match**: Compare operation requirements against Serena and Morphllm capabilities
-4. **Select**: Choose optimal tool based on scoring matrix and performance requirements
-5. **Validate**: Verify selection accuracy and provide confidence metrics
+  <mcp servers="serena:semantic|morph:pattern"/>
 
-Key behaviors:
-- Complexity scoring based on file count, operation type, language, and framework requirements
-- Performance assessment evaluating speed vs accuracy trade-offs for optimal selection
-- Decision logic matrix with direct mappings and threshold-based routing rules
-- Tool capability matching for Serena (semantic operations) vs Morphllm (pattern operations)
+  <decision_matrix>
+    <direct n="Symbol ops">Serena (LSP, navigation)</direct>
+    <direct n="Pattern edits">Morphllm (bulk, speed)</direct>
+    <direct n="Memory ops">Serena (persistence)</direct>
+    <threshold n=">0.6">Serena (accuracy)</threshold>
+    <threshold n="<0.4">Morphllm (speed)</threshold>
+    <threshold n="0.4-0.6">Feature-based selection</threshold>
+  </decision_matrix>
 
-## MCP Integration
-- **Serena MCP**: Optimal for semantic operations, LSP functionality, symbol navigation, and project context
-- **Morphllm MCP**: Optimal for pattern-based edits, bulk transformations, and speed-critical operations
-- **Decision Matrix**: Intelligent routing based on complexity scoring and operation characteristics
+  <patterns>
+    <p n="Serena">Semantic ops | LSP | symbol nav | project context</p>
+    <p n="Morphllm">Pattern edits | bulk transforms | speed-critical</p>
+    <p n="Fallback">Serena → Morphllm → Native tools</p>
+  </patterns>
 
-## Tool Coordination
-- **get_current_config**: System configuration analysis for tool capability assessment
-- **execute_sketched_edit**: Operation testing and validation for selection accuracy
-- **Read/Grep**: Operation context analysis and complexity factor identification
-- **Integration**: Automatic selection logic used by refactor, edit, implement, and improve commands
+  <performance>
+    <metric n="decision-time">&lt;100ms</metric>
+    <metric n="accuracy">>95%</metric>
+  </performance>
 
-## Key Patterns
-- **Direct Mapping**: Symbol operations → Serena, Pattern edits → Morphllm, Memory operations → Serena
-- **Complexity Thresholds**: Score >0.6 → Serena, Score <0.4 → Morphllm, 0.4-0.6 → Feature-based
-- **Performance Trade-offs**: Speed requirements → Morphllm, Accuracy requirements → Serena
-- **Fallback Strategy**: Serena → Morphllm → Native tools degradation chain
+  <examples>
+    <ex i="'rename function across 10 files' --analyze" o="Serena (LSP, semantic)"/>
+    <ex i="'update console.log to logger.info' --explain" o="Morphllm (pattern, bulk)"/>
+    <ex i="'save project context'" o="Serena (memory direct)"/>
+  </examples>
 
-## Examples
-
-### Complex Refactoring Operation
-```
-/sc:select-tool "rename function across 10 files" --analyze
-# Analysis: High complexity (multi-file, symbol operations)
-# Selection: Serena MCP (LSP capabilities, semantic understanding)
-```
-
-### Pattern-Based Bulk Edit
-```
-/sc:select-tool "update console.log to logger.info across project" --explain
-# Analysis: Pattern-based transformation, speed priority
-# Selection: Morphllm MCP (pattern matching, bulk operations)
-```
-
-### Memory Management Operation
-```
-/sc:select-tool "save project context and discoveries"
-# Direct mapping: Memory operations → Serena MCP
-# Rationale: Project context and cross-session persistence
-```
-
-## Boundaries
-
-**Will:**
-- Analyze operations and provide optimal tool selection between Serena and Morphllm
-- Apply complexity scoring based on file count, operation type, and requirements
-- Provide sub-100ms decision time with >95% selection accuracy
-
-**Will Not:**
-- Override explicit tool specifications when user has clear preference
-- Select tools without proper complexity analysis and capability matching
-- Compromise performance requirements for convenience or speed
-
-</document>
-
+  <bounds will="optimal selection|complexity scoring|sub-100ms decision" wont="override explicit preference|skip analysis|compromise performance"/>
+</component>

@@ -1,108 +1,64 @@
----
-name: pm
-type: command
-triggers: [/sc:pm, project-manager, orchestration, workflow-management]
-description: "Project Manager Agent - Default orchestration agent that coordinates all sub-agents and manages workflows seamlessly"
-category: orchestration
-complexity: meta
-mcp-servers: [sequential, context7, magic, playwright, morphllm, serena, tavily, chrome-devtools]
-personas: [pm-agent]
----
+<component name="pm" type="command">
+  <config style="Telegraphic|Imperative|XML" eval="true"/>
+  <runtime model="opus-4-5" effort="high"/>
 
-<document type="command" name="pm"
-          triggers="/sc:pm, project-manager, orchestration, workflow-management">
+  <role>
+    /sc:pm
+    <mission>Project Manager Agent - Default orchestration that coordinates sub-agents and manages workflows</mission>
+    <note>Always-active foundation: runs at session start, orchestrates transparently</note>
+  </role>
 
-# /sc:pm - Project Manager Agent
+  <syntax>/sc:pm [request] [--strategy brainstorm|direct|wave] [--verbose]</syntax>
 
-> **Always-Active Foundation**: PM Agent runs automatically at session start. Users interact naturally; PM Agent orchestrates sub-agents transparently.
+  <triggers>
+    <t>Session start (always restores via Serena)</t>
+    <t>All requests (default entry point)</t>
+    <t>State questions: どこまで進んでた, 現状, 進捗</t>
+    <t>Vague requests: 作りたい, 実装したい</t>
+    <t>Multi-domain coordination</t>
+  </triggers>
 
-**Full implementation**: See `agents/pm-agent.md`
+  <flow>
+    <s n="1">Analyze: Parse intent + classify complexity</s>
+    <s n="2">Strategy: Brainstorm | Direct | Wave</s>
+    <s n="3">Delegate: Auto-select specialist sub-agents</s>
+    <s n="4">Orchestrate: Dynamic MCP loading</s>
+    <s n="5">Monitor: TodoWrite tracking</s>
+    <s n="6">Improve: Document patterns/mistakes</s>
+    <s n="7">Evaluate: PDCA continuous improvement</s>
+  </flow>
 
-## Command Syntax
+  <mcp servers="seq|c7|magic|play|morph|serena|tavily|chrome"/>
+  <personas p="pm-agent"/>
 
-```bash
-# Default (PM Agent handles all interactions)
-"Build authentication system for my app"
+  <mcp_phases>
+    <phase n="Discovery">seq|c7</phase>
+    <phase n="Design">seq|magic</phase>
+    <phase n="Implementation">c7|magic|morph</phase>
+    <phase n="Testing">play|seq</phase>
+  </mcp_phases>
 
-# Explicit invocation
-/sc:pm [request] [--strategy brainstorm|direct|wave] [--verbose]
+  <patterns>
+    <p n="Vague">Discovery → requirements-analyst → system-architect → specialists</p>
+    <p n="Clear">c7 → refactoring-expert → quality-engineer</p>
+    <p n="Complex">Wave1(BE‖) → Wave2(FE‖) → Wave3(integration) → Wave4(test/sec‖)</p>
+  </patterns>
 
-# Override to specific sub-agent
-/sc:implement "user profile" --agent backend
-```
+  <self_correction>
+    <rule>Never retry without understanding WHY it failed</rule>
+    <s n="1">STOP: Don't re-execute same command</s>
+    <s n="2">Investigate: c7, WebFetch, Grep</s>
+    <s n="3">Hypothesis: Document root cause</s>
+    <s n="4">New Approach: Different from failed</s>
+    <s n="5">Execute: Based on understanding</s>
+    <s n="6">Learn: write_memory for future</s>
+  </self_correction>
 
-## Auto-Activation Triggers
+  <examples>
+    <ex i="'Build auth system'" o="Brainstorm → specialists"/>
+    <ex i="'Fix LoginForm.tsx:45'" o="Direct → c7 → refactor"/>
+    <ex i="'Real-time chat with video'" o="Wave mode (4 waves)"/>
+  </examples>
 
-| Trigger | Example |
-|---------|---------|
-| Session Start | Always restores context via Serena |
-| All Requests | Default entry point |
-| State Questions | "どこまで進んでた", "現状", "進捗" |
-| Vague Requests | "作りたい", "実装したい" |
-| Multi-Domain | Cross-functional coordination |
-
-## Behavioral Flow
-
-1. **Request Analysis** → Parse intent, classify complexity
-2. **Strategy Selection** → Brainstorming, Direct, Wave
-3. **Sub-Agent Delegation** → Auto-select specialists
-4. **MCP Orchestration** → Dynamic tool loading
-5. **Progress Monitoring** → TodoWrite tracking
-6. **Self-Improvement** → Document patterns/mistakes
-7. **PDCA Evaluation** → Continuous improvement
-
-## MCP Phase-Based Loading
-
-```yaml
-Discovery: [sequential, context7]
-Design: [sequential, magic]
-Implementation: [context7, magic, morphllm]
-Testing: [playwright, sequential]
-```
-
-## Orchestration Patterns
-
-### Vague Request → Discovery Mode
-```
-User: "アプリに認証機能作りたい"
-→ Brainstorming Mode → requirements-analyst → system-architect
-→ security-engineer → backend-architect → quality-engineer
-```
-
-### Clear Request → Direct Delegation
-```
-User: "Fix LoginForm.tsx:45 validation bug"
-→ context7 → refactoring-expert → quality-engineer
-```
-
-### Complex Project → Wave Mode
-```
-User: "Build real-time chat with video"
-→ Wave 1: backend (parallel)
-→ Wave 2: frontend (parallel)
-→ Wave 3: integration (sequential)
-→ Wave 4: testing/security (parallel)
-```
-
-## Self-Correction Protocol
-
-**Rule**: Never retry without understanding WHY it failed.
-
-```yaml
-Error Detection:
-  1. STOP - Don't re-execute same command
-  2. Investigate - context7, WebFetch, Grep
-  3. Hypothesis - Document root cause
-  4. New Approach - Different from failed attempt
-  5. Execute - Based on understanding
-  6. Learn - write_memory for future
-```
-
-## Key Behaviors
-
-- **Seamless**: Users interact with PM Agent only
-- **Auto-Delegation**: Intelligent specialist routing
-- **Zero-Token**: Dynamic MCP loading/unloading
-- **Self-Documenting**: Automatic pattern capture
-
-</document>
+  <bounds will="seamless orchestration|auto-delegation|zero-token MCP|self-documenting" wont="expose complexity|manual agent selection required"/>
+</component>

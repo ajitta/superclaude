@@ -1,101 +1,52 @@
----
-name: build
-type: command
-triggers: [/sc:build, compile, package, artifact, deployment]
-description: "Build, compile, and package projects with intelligent error handling and optimization"
-category: utility
-complexity: enhanced
-mcp-servers: [playwright]
-personas: [devops-engineer]
----
+<component name="build" type="command">
+  <config style="Telegraphic|Imperative|XML" eval="true"/>
+  <runtime model="opus-4-5" effort="medium"/>
 
-<document type="command" name="build"
-          triggers="/sc:build, compile, package, artifact, deployment">
+  <role>
+    /sc:build
+    <mission>Build, compile, and package projects with intelligent error handling and optimization</mission>
+  </role>
 
-# /sc:build - Project Building and Packaging
+  <syntax>/sc:build [target] [--type dev|prod|test] [--clean] [--optimize] [--verbose]</syntax>
 
-## Triggers
-- Project compilation and packaging requests for different environments
-- Build optimization and artifact generation needs
-- Error debugging during build processes
-- Deployment preparation and artifact packaging requirements
+  <triggers>
+    <t>Project compilation + packaging</t>
+    <t>Build optimization needs</t>
+    <t>Build error debugging</t>
+    <t>Deployment artifact preparation</t>
+  </triggers>
 
-## Usage
-```
-/sc:build [target] [--type dev|prod|test] [--clean] [--optimize] [--verbose]
-```
+  <flow>
+    <s n="1">Analyze: Structure, configs, deps</s>
+    <s n="2">Validate: Environment + toolchain</s>
+    <s n="3">Execute: Build + real-time monitoring</s>
+    <s n="4">Optimize: Artifacts + bundle size</s>
+    <s n="5">Package: Artifacts + reports</s>
+  </flow>
 
-## Behavioral Flow
-1. **Analyze**: Project structure, build configurations, and dependency manifests
-2. **Validate**: Build environment, dependencies, and required toolchain components
-3. **Execute**: Build process with real-time monitoring and error detection
-4. **Optimize**: Build artifacts, apply optimizations, and minimize bundle sizes
-5. **Package**: Generate deployment artifacts and comprehensive build reports
+  <mcp servers="play:validation"/>
+  <personas p="devops"/>
 
-Key behaviors:
-- Configuration-driven build orchestration with dependency validation
-- Intelligent error analysis with actionable resolution guidance
-- Environment-specific optimization (dev/prod/test configurations)
-- Comprehensive build reporting with timing metrics and artifact analysis
+  <tools>
+    <t n="Bash">Build execution</t>
+    <t n="Read">Config analysis</t>
+    <t n="Grep">Error parsing</t>
+    <t n="Glob">Artifact discovery</t>
+    <t n="Write">Build reports</t>
+  </tools>
 
-## MCP Integration
-- **Playwright MCP**: Auto-activated for build validation and UI testing during builds
-- **DevOps Engineer Persona**: Activated for build optimization and deployment preparation
-- **Enhanced Capabilities**: Build pipeline integration, performance monitoring, artifact validation
+  <patterns>
+    <p n="Environment">dev|prod|test → appropriate config</p>
+    <p n="Error">Build failures → diagnostic + resolution</p>
+    <p n="Optimize">Artifact analysis → size reduction</p>
+  </patterns>
 
-## Tool Coordination
-- **Bash**: Build system execution and process management
-- **Read**: Configuration analysis and manifest inspection
-- **Grep**: Error parsing and build log analysis
-- **Glob**: Artifact discovery and validation
-- **Write**: Build reports and deployment documentation
+  <examples>
+    <ex i="/sc:build" o="Default build + report"/>
+    <ex i="--type prod --clean --optimize" o="Production artifacts"/>
+    <ex i="frontend --verbose" o="Detailed component build"/>
+    <ex i="--type dev --validate" o="Dev build + Playwright validation"/>
+  </examples>
 
-## Key Patterns
-- **Environment Builds**: dev/prod/test → appropriate configuration and optimization
-- **Error Analysis**: Build failures → diagnostic analysis and resolution guidance
-- **Optimization**: Artifact analysis → size reduction and performance improvements
-- **Validation**: Build verification → quality gates and deployment readiness
-
-## Examples
-
-### Standard Project Build
-```
-/sc:build
-# Builds entire project using default configuration
-# Generates artifacts and comprehensive build report
-```
-
-### Production Optimization Build
-```
-/sc:build --type prod --clean --optimize
-# Clean production build with advanced optimizations
-# Minification, tree-shaking, and deployment preparation
-```
-
-### Targeted Component Build
-```
-/sc:build frontend --verbose
-# Builds specific project component with detailed output
-# Real-time progress monitoring and diagnostic information
-```
-
-### Development Build with Validation
-```
-/sc:build --type dev --validate
-# Development build with Playwright validation
-# UI testing and build verification integration
-```
-
-## Boundaries
-
-**Will:**
-- Execute project build systems using existing configurations
-- Provide comprehensive error analysis and optimization recommendations
-- Generate deployment-ready artifacts with detailed reporting
-
-**Will Not:**
-- Modify build system configuration or create new build scripts
-- Install missing build dependencies or development tools
-- Execute deployment operations beyond artifact preparation
-
-</document>
+  <bounds will="execute build|error analysis|optimization recs" wont="modify build config|install deps|deploy"/>
+</component>

@@ -1,95 +1,49 @@
----
-name: document
-type: command
-triggers: [/sc:document, documentation, api-docs, inline-docs, user-guide]
-description: "Generate focused documentation for components, functions, APIs, and features"
-category: utility
-complexity: basic
-mcp-servers: []
-personas: []
----
+<component name="document" type="command">
+  <config style="Telegraphic|Imperative|XML" eval="true"/>
+  <runtime model="opus-4-5" effort="low"/>
 
-<document type="command" name="document"
-          triggers="/sc:document, documentation, api-docs, inline-docs, user-guide">
+  <role>
+    /sc:document
+    <mission>Generate focused documentation for components, functions, APIs, and features</mission>
+  </role>
 
-# /sc:document - Focused Documentation Generation
+  <syntax>/sc:document [target] [--type inline|external|api|guide] [--style brief|detailed]</syntax>
 
-## Triggers
-- Documentation requests for specific components, functions, or features
-- API documentation and reference material generation needs
-- Code comment and inline documentation requirements
-- User guide and technical documentation creation requests
+  <triggers>
+    <t>Component/function documentation</t>
+    <t>API reference generation</t>
+    <t>Code comments + inline docs</t>
+    <t>User guides + technical docs</t>
+  </triggers>
 
-## Usage
-```
-/sc:document [target] [--type inline|external|api|guide] [--style brief|detailed]
-```
+  <flow>
+    <s n="1">Analyze: Component structure + interfaces</s>
+    <s n="2">Identify: Audience + requirements</s>
+    <s n="3">Generate: Content by type + style</s>
+    <s n="4">Format: Consistent structure</s>
+    <s n="5">Integrate: Project doc ecosystem</s>
+  </flow>
 
-## Behavioral Flow
-1. **Analyze**: Examine target component structure, interfaces, and functionality
-2. **Identify**: Determine documentation requirements and target audience context
-3. **Generate**: Create appropriate documentation content based on type and style
-4. **Format**: Apply consistent structure and organizational patterns
-5. **Integrate**: Ensure compatibility with existing project documentation ecosystem
+  <tools>
+    <t n="Read">Component + existing docs</t>
+    <t n="Grep">Reference extraction</t>
+    <t n="Write">Doc file creation</t>
+    <t n="Glob">Multi-file organization</t>
+  </tools>
 
-Key behaviors:
-- Code structure analysis with API extraction and usage pattern identification
-- Multi-format documentation generation (inline, external, API reference, guides)
-- Consistent formatting and cross-reference integration
-- Language-specific documentation patterns and conventions
+  <patterns>
+    <p n="Inline">Code analysis → JSDoc/docstring</p>
+    <p n="API">Interface extraction → reference + examples</p>
+    <p n="Guide">Feature analysis → tutorial content</p>
+    <p n="External">Overview → specs → integration</p>
+  </patterns>
 
-## Tool Coordination
-- **Read**: Component analysis and existing documentation review
-- **Grep**: Reference extraction and pattern identification
-- **Write**: Documentation file creation with proper formatting
-- **Glob**: Multi-file documentation projects and organization
+  <examples>
+    <ex i="src/auth/login.js --type inline" o="JSDoc comments"/>
+    <ex i="src/api --type api --detailed" o="API reference"/>
+    <ex i="payment-module --type guide --brief" o="User docs"/>
+    <ex i="components/ --type external" o="Component library docs"/>
+  </examples>
 
-## Key Patterns
-- **Inline Documentation**: Code analysis → JSDoc/docstring generation → inline comments
-- **API Documentation**: Interface extraction → reference material → usage examples
-- **User Guides**: Feature analysis → tutorial content → implementation guidance
-- **External Docs**: Component overview → detailed specifications → integration instructions
-
-## Examples
-
-### Inline Code Documentation
-```
-/sc:document src/auth/login.js --type inline
-# Generates JSDoc comments with parameter and return descriptions
-# Adds comprehensive inline documentation for functions and classes
-```
-
-### API Reference Generation
-```
-/sc:document src/api --type api --style detailed
-# Creates comprehensive API documentation with endpoints and schemas
-# Generates usage examples and integration guidelines
-```
-
-### User Guide Creation
-```
-/sc:document payment-module --type guide --style brief
-# Creates user-focused documentation with practical examples
-# Focuses on implementation patterns and common use cases
-```
-
-### Component Documentation
-```
-/sc:document components/ --type external
-# Generates external documentation files for component library
-# Includes props, usage examples, and integration patterns
-```
-
-## Boundaries
-
-**Will:**
-- Generate focused documentation for specific components and features
-- Create multiple documentation formats based on target audience needs
-- Integrate with existing documentation ecosystems and maintain consistency
-
-**Will Not:**
-- Generate documentation without proper code analysis and context understanding
-- Override existing documentation standards or project-specific conventions
-- Create documentation that exposes sensitive implementation details
-
-</document>
+  <bounds will="focused docs|multi-format|ecosystem integration" wont="doc without analysis|override standards|expose sensitive details"/>
+</component>

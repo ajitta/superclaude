@@ -1,100 +1,51 @@
----
-name: save
-type: command
-triggers: [/sc:save, session-save, context-persist, checkpoint-create]
-description: "Session lifecycle management with Serena MCP integration for session context persistence"
-category: session
-complexity: standard
-mcp-servers: [serena]
-personas: []
----
+<component name="save" type="command">
+  <config style="Telegraphic|Imperative|XML" eval="true"/>
+  <runtime model="opus-4-5" effort="low"/>
 
-<document type="command" name="save"
-          triggers="/sc:save, session-save, context-persist, checkpoint-create">
+  <role>
+    /sc:save
+    <mission>Session lifecycle management with Serena MCP integration for context persistence</mission>
+  </role>
 
-# /sc:save - Session Context Persistence
+  <syntax>/sc:save [--type session|learnings|context|all] [--summarize] [--checkpoint]</syntax>
 
-## Triggers
-- Session completion and project context persistence needs
-- Cross-session memory management and checkpoint creation requests
-- Project understanding preservation and discovery archival scenarios
-- Session lifecycle management and progress tracking requirements
+  <triggers>
+    <t>Session completion</t>
+    <t>Cross-session memory management</t>
+    <t>Discovery preservation</t>
+    <t>Progress tracking</t>
+  </triggers>
 
-## Usage
-```
-/sc:save [--type session|learnings|context|all] [--summarize] [--checkpoint]
-```
+  <flow>
+    <s n="1">Analyze: Session progress + discoveries</s>
+    <s n="2">Persist: Context + learnings (Serena memory)</s>
+    <s n="3">Checkpoint: Recovery points + progress tracking</s>
+    <s n="4">Validate: Data integrity + compatibility</s>
+    <s n="5">Prepare: Ready for future session continuation</s>
+  </flow>
 
-## Behavioral Flow
-1. **Analyze**: Examine session progress and identify discoveries worth preserving
-2. **Persist**: Save session context and learnings using Serena MCP memory management
-3. **Checkpoint**: Create recovery points for complex sessions and progress tracking
-4. **Validate**: Ensure session data integrity and cross-session compatibility
-5. **Prepare**: Ready session context for seamless continuation in future sessions
+  <mcp servers="serena:memory|serena:persistence"/>
 
-Key behaviors:
-- Serena MCP integration for memory management and cross-session persistence
-- Automatic checkpoint creation based on session progress and critical tasks
-- Session context preservation with comprehensive discovery and pattern archival
-- Cross-session learning with accumulated project insights and technical decisions
+  <tools>
+    <t n="write_memory/read_memory">Session context persistence</t>
+    <t n="think_about_collected_information">Discovery identification</t>
+    <t n="summarize_changes">Progress documentation</t>
+    <t n="TodoRead">Auto checkpoint triggers</t>
+  </tools>
 
-## MCP Integration
-- **Serena MCP**: Mandatory integration for session management, memory operations, and cross-session persistence
-- **Memory Operations**: Session context storage, checkpoint creation, and discovery archival
-- **Performance Critical**: <200ms for memory operations, <1s for checkpoint creation
+  <patterns>
+    <p n="Preservation">Discovery → memory → checkpoint</p>
+    <p n="Learning">Accumulation → archival → understanding</p>
+    <p n="Progress">Completion → auto-checkpoint → continuity</p>
+    <p n="Recovery">State → validation → restoration ready</p>
+  </patterns>
 
-## Tool Coordination
-- **write_memory/read_memory**: Core session context persistence and retrieval
-- **think_about_collected_information**: Session analysis and discovery identification
-- **summarize_changes**: Session summary generation and progress documentation
-- **TodoRead**: Task completion tracking for automatic checkpoint triggers
+  <examples>
+    <ex i="/sc:save" o="Auto-checkpoint if >30min session"/>
+    <ex i="--type all --checkpoint" o="Complete preservation + recovery"/>
+    <ex i="--summarize" o="Summary + learning patterns"/>
+    <ex i="--type learnings" o="Patterns + insights only"/>
+  </examples>
 
-## Key Patterns
-- **Session Preservation**: Discovery analysis → memory persistence → checkpoint creation
-- **Cross-Session Learning**: Context accumulation → pattern archival → enhanced project understanding
-- **Progress Tracking**: Task completion → automatic checkpoints → session continuity
-- **Recovery Planning**: State preservation → checkpoint validation → restoration readiness
-
-## Examples
-
-### Basic Session Save
-```
-/sc:save
-# Saves current session discoveries and context to Serena MCP
-# Automatically creates checkpoint if session exceeds 30 minutes
-```
-
-### Comprehensive Session Checkpoint
-```
-/sc:save --type all --checkpoint
-# Complete session preservation with recovery checkpoint
-# Includes all learnings, context, and progress for session restoration
-```
-
-### Session Summary Generation
-```
-/sc:save --summarize
-# Creates session summary with discovery documentation
-# Updates cross-session learning patterns and project insights
-```
-
-### Discovery-Only Persistence
-```
-/sc:save --type learnings
-# Saves only new patterns and insights discovered during session
-# Updates project understanding without full session preservation
-```
-
-## Boundaries
-
-**Will:**
-- Save session context using Serena MCP integration for cross-session persistence
-- Create automatic checkpoints based on session progress and task completion
-- Preserve discoveries and patterns for enhanced project understanding
-
-**Will Not:**
-- Operate without proper Serena MCP integration and memory access
-- Save session data without validation and integrity verification
-- Override existing session context without proper checkpoint preservation
-
-</document>
+  <bounds will="Serena integration|auto-checkpoints|discovery preservation" wont="operate without Serena|save without validation|override without checkpoint"/>
+</component>

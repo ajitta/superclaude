@@ -1,49 +1,29 @@
----
-name: chrome-devtools
-type: mcp
-triggers: [performance, debug, layout, CLS, LCP, console, network, DOM, CSS, devtools]
-description: Performance analysis, debugging, and real-time browser inspection
-category: debugging
----
+<component name="chrome-devtools" type="mcp">
+  <config style="Telegraphic|Imperative|XML" eval="true"/>
+  <triggers>performance|debug|layout|CLS|LCP|console|network|DOM|CSS|devtools</triggers>
 
-<document type="mcp" name="chrome-devtools"
-          triggers="performance, debug, layout, CLS, LCP, console, network, DOM, CSS, devtools">
+  <role>
+    <mission>Performance analysis, debugging, and real-time browser inspection</mission>
+  </role>
 
-# Chrome DevTools MCP Server
+  <choose>
+    <use context="deep performance analysis">Understand performance bottlenecks</use>
+    <use context="live debugging">Inspect runtime page state, debug live issues</use>
+    <use context="network analysis">Inspect requests, CORS errors</use>
+    <avoid context="E2E testing">Use Playwright</avoid>
+    <avoid context="static analysis">Use native Claude</avoid>
+  </choose>
 
-**Purpose**: Performance analysis, debugging, and real-time browser inspection
+  <synergy>
+    <with n="Sequential">Sequential plans perf strategy → DevTools verifies</with>
+    <with n="Playwright">Playwright automates flow → DevTools analyzes</with>
+  </synergy>
 
-## Triggers
-
-- Performance auditing and analysis requests
-- Debugging of layout issues (e.g., CLS)
-- Investigation of slow loading times (e.g., LCP)
-- Analysis of console errors and network requests
-- Real-time inspection of the DOM and CSS
-
-## Choose When
-
-- **For deep performance analysis**: When you need to understand performance bottlenecks.
-- **For live debugging**: To inspect the runtime state of a web page and debug live issues.
-- **For network analysis**: To inspect network requests and identify issues like CORS errors.
-- **Not for E2E testing**: Use Playwright for end-to-end testing scenarios.
-- **Not for static analysis**: Use native Claude for code review and logic validation.
-
-## Works Best With
-
-- **Sequential**: Sequential plans a performance improvement strategy → Chrome DevTools analyzes and verifies the improvements.
-- **Playwright**: Playwright automates a user flow → Chrome DevTools analyzes the performance of that flow.
-
-## Examples
-
-```
-"analyze the performance of this page" → Chrome DevTools (performance analysis)
-"why is this page loading slowly?" → Chrome DevTools (performance analysis)
-"debug the layout shift on this element" → Chrome DevTools (live debugging)
-"check for console errors on the homepage" → Chrome DevTools (live debugging)
-"what network requests are failing?" → Chrome DevTools (network analysis)
-"test the login flow" → Playwright (browser automation)
-"review this function's logic" → Native Claude (static analysis)
-```
-
-</document>
+  <examples>
+    <ex i="analyze page performance" o="DevTools" r="performance analysis"/>
+    <ex i="debug layout shift" o="DevTools" r="live debugging"/>
+    <ex i="network requests failing" o="DevTools" r="network analysis"/>
+    <ex i="test login flow" o="Playwright" r="browser automation"/>
+    <ex i="review function logic" o="Native Claude" r="static analysis"/>
+  </examples>
+</component>

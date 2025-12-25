@@ -1,66 +1,58 @@
----
-name: rules
-type: core
-triggers: [rules, behavior, compliance, standards, guidelines]
-description: Claude Code behavioral rules for framework operation
-category: core
-priority: critical
----
+<component name="rules" type="core" priority="critical">
+  <config style="Telegraphic|Imperative|XML" eval="true"/>
+  <triggers>rules|behavior|compliance|standards|guidelines</triggers>
 
-<document type="core" name="rules"
-          triggers="rules, behavior, compliance, standards, guidelines"
-          priority="critical">
+  <role>
+    <mission>Claude Code behavioral rules for framework operation</mission>
+    <note>Full rules in ~/.claude/RULES.md. This file provides project-specific additions.</note>
+  </role>
 
-# Claude Code Behavioral Rules
+  <priority_system>
+    <p level="🔴">Security, data safety — Never compromise</p>
+    <p level="🟡">Quality, maintainability — Strong preference</p>
+    <p level="🟢">Optimization, style — Apply when practical</p>
+  </priority_system>
 
-> **Note**: Full rules are defined in `~/.claude/RULES.md`. This file provides project-specific additions.
+  <conflict_resolution>
+    <r>Safety First: Security/data rules take precedence</r>
+    <r>Scope > Features: Build only what's asked</r>
+    <r>Quality > Speed: Except genuine emergencies</r>
+  </conflict_resolution>
 
-## Priority System
+  <agent_orchestration>
+    <layer n="Task">Auto-selection by keywords, file types, complexity</layer>
+    <layer n="PM Agent">Post-implementation docs, mistake detection, monthly maintenance</layer>
+    <flow>User request → Specialist executes → PM Agent documents → Knowledge capture</flow>
+  </agent_orchestration>
 
-| Priority | Scope | Examples |
-|----------|-------|----------|
-| 🔴 | Security, data safety | Never compromise |
-| 🟡 | Quality, maintainability | Strong preference |
-| 🟢 | Optimization, style | Apply when practical |
+  <core_rules>
+    <r rule="Workflow" p="🟡">Understand → Plan → TodoWrite → Execute → Validate</r>
+    <r rule="Planning" p="🔴">Identify parallel operations explicitly</r>
+    <r rule="Implementation" p="🟡">No partial features, no TODOs, no mocks</r>
+    <r rule="Scope" p="🟡">Build only what's asked, YAGNI</r>
+    <r rule="Trust" p="🟢">Trust internal code; validate at boundaries only</r>
+    <r rule="Language" p="🟢">Normal language over CRITICAL/MUST intensity</r>
+    <r rule="Git" p="🔴">Feature branches, incremental commits</r>
+    <r rule="Failure" p="🔴">Root cause analysis, never skip tests</r>
+    <r rule="Honesty" p="🟡">No marketing language, evidence-based</r>
+  </core_rules>
 
-## Conflict Resolution
-1. Safety First: Security/data rules take precedence
-2. Scope > Features: Build only what's asked
-3. Quality > Speed: Except in genuine emergencies
+  <anti_over_engineering>
+    <r>Bug fix ≠ cleanup: Don't touch surrounding code</r>
+    <r>Simple feature ≠ configurable system: No extra flexibility</r>
+    <r>Unchanged code untouched: No comments/types/docs on unchanged code</r>
+    <r>Delete completely: No backwards-compat hacks, no _unused vars</r>
+  </anti_over_engineering>
 
-## Agent Orchestration
+  <decision_trees>
+    <t>File operation → Read first → Check patterns → Edit/Create</t>
+    <t>New feature → Scope clear? → TodoWrite(3+ steps) → Execute</t>
+    <t>Tool selection → MCP > Native > Basic → Parallel when possible</t>
+  </decision_trees>
 
-**Task Execution**: Auto-selection of specialist agents by keywords, file types, complexity
-**PM Agent Meta-Layer**: Post-implementation documentation, mistake detection, monthly maintenance
-
-```
-User request → Specialist executes → PM Agent documents → Knowledge capture
-```
-
-## Core Rules Summary
-
-| Rule | Priority | Key Behavior |
-|------|----------|--------------|
-| Workflow | 🟡 | Understand → Plan → TodoWrite → Execute → Validate |
-| Planning | 🔴 | Identify parallel operations explicitly |
-| Implementation | 🟡 | No partial features, no TODOs, no mocks |
-| Scope | 🟡 | Build only what's asked, YAGNI |
-| Git | 🔴 | Feature branches, incremental commits |
-| Failure | 🔴 | Root cause analysis, never skip tests |
-| Honesty | 🟡 | No marketing language, evidence-based |
-
-## Quick Decision Trees
-
-```
-File operation → Read first → Check patterns → Edit/Create
-New feature → Scope clear? → TodoWrite(3+ steps) → Execute
-Tool selection → MCP > Native > Basic → Parallel when possible
-```
-
-## Priority Actions
-
-**🔴 Safety**: git status, read before edit, feature branches, root cause analysis
-**🟡 Quality**: TodoWrite for complex tasks, complete implementations, MVP first
-**🟢 Efficiency**: Parallel operations, MCP tools, batch operations
-
-</document>
+  <priority_actions>
+    <a p="🔴">git status, read before edit, feature branches, root cause analysis</a>
+    <a p="🟡">TodoWrite for complex, complete implementations, MVP first</a>
+    <a p="🟢">Parallel operations, MCP tools, batch operations</a>
+  </priority_actions>
+</component>

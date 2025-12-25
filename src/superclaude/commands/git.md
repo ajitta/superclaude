@@ -1,87 +1,48 @@
----
-name: git
-type: command
-triggers: [/sc:git, git-operations, commit, push, pull, branch]
-description: "Git operations with intelligent commit messages and workflow optimization"
-category: utility
-complexity: basic
-mcp-servers: []
-personas: []
----
+<component name="git" type="command">
+  <config style="Telegraphic|Imperative|XML" eval="true"/>
+  <runtime model="opus-4-5" effort="low"/>
 
-<document type="command" name="git"
-          triggers="/sc:git, git-operations, commit, push, pull, branch">
+  <role>
+    /sc:git
+    <mission>Git operations with intelligent commit messages and workflow optimization</mission>
+  </role>
 
-# /sc:git - Git Operations
+  <syntax>/sc:git [operation] [args] [--smart-commit] [--interactive]</syntax>
 
-## Triggers
-- Git repository operations: status, add, commit, push, pull, branch
-- Need for intelligent commit message generation
-- Repository workflow optimization requests
-- Branch management and merge operations
+  <triggers>
+    <t>Git ops: status, add, commit, push, pull, branch</t>
+    <t>Intelligent commit message generation</t>
+    <t>Repository workflow optimization</t>
+    <t>Branch management + merges</t>
+  </triggers>
 
-## Usage
-```
-/sc:git [operation] [args] [--smart-commit] [--interactive]
-```
+  <flow>
+    <s n="1">Analyze: Repo state + changes</s>
+    <s n="2">Validate: Operation appropriateness</s>
+    <s n="3">Execute: Git command + automation</s>
+    <s n="4">Optimize: Smart commits + patterns</s>
+    <s n="5">Report: Status + next steps</s>
+  </flow>
 
-## Behavioral Flow
-1. **Analyze**: Check repository state and working directory changes
-2. **Validate**: Ensure operation is appropriate for current Git context
-3. **Execute**: Run Git command with intelligent automation
-4. **Optimize**: Apply smart commit messages and workflow patterns
-5. **Report**: Provide status and next steps guidance
+  <tools>
+    <t n="Bash">Git command execution</t>
+    <t n="Read">Repo state analysis</t>
+    <t n="Grep">Log parsing + status</t>
+    <t n="Write">Commit message generation</t>
+  </tools>
 
-Key behaviors:
-- Generate conventional commit messages based on change analysis
-- Apply consistent branch naming conventions
-- Handle merge conflicts with guided resolution
-- Provide clear status summaries and workflow recommendations
+  <patterns>
+    <p n="SmartCommit">Analyze changes → conventional message</p>
+    <p n="Status">Repo state → actionable recs</p>
+    <p n="Branch">Consistent naming + workflow</p>
+    <p n="Recovery">Conflict resolution + restoration</p>
+  </patterns>
 
-## Tool Coordination
-- **Bash**: Git command execution and repository operations
-- **Read**: Repository state analysis and configuration review
-- **Grep**: Log parsing and status analysis
-- **Write**: Commit message generation and documentation
+  <examples>
+    <ex i="status" o="State analysis + recommendations"/>
+    <ex i="commit --smart-commit" o="Conventional commit"/>
+    <ex i="merge feature-branch --interactive" o="Guided merge"/>
+  </examples>
 
-## Key Patterns
-- **Smart Commits**: Analyze changes → generate conventional commit message
-- **Status Analysis**: Repository state → actionable recommendations
-- **Branch Strategy**: Consistent naming and workflow enforcement
-- **Error Recovery**: Conflict resolution and state restoration guidance
-
-## Examples
-
-### Smart Status Analysis
-```
-/sc:git status
-# Analyzes repository state with change summary
-# Provides next steps and workflow recommendations
-```
-
-### Intelligent Commit
-```
-/sc:git commit --smart-commit
-# Generates conventional commit message from change analysis
-# Applies best practices and consistent formatting
-```
-
-### Interactive Operations
-```
-/sc:git merge feature-branch --interactive
-# Guided merge with conflict resolution assistance
-```
-
-## Boundaries
-
-**Will:**
-- Execute Git operations with intelligent automation
-- Generate conventional commit messages from change analysis
-- Provide workflow optimization and best practice guidance
-
-**Will Not:**
-- Modify repository configuration without explicit authorization
-- Execute destructive operations without confirmation
-- Handle complex merges requiring manual intervention
-
-</document>
+  <bounds will="intelligent git ops|conventional commits|workflow guidance" wont="modify config without auth|destructive without confirm|complex merges requiring manual"/>
+</component>
