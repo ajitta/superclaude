@@ -1,11 +1,16 @@
 ---
 name: git
+type: command
+triggers: [/sc:git, git-operations, commit, push, pull, branch]
 description: "Git operations with intelligent commit messages and workflow optimization"
 category: utility
 complexity: basic
 mcp-servers: []
 personas: []
 ---
+
+<document type="command" name="git"
+          triggers="/sc:git, git-operations, commit, push, pull, branch">
 
 # /sc:git - Git Operations
 
@@ -78,3 +83,5 @@ Key behaviors:
 - Modify repository configuration without explicit authorization
 - Execute destructive operations without confirmation
 - Handle complex merges requiring manual intervention
+
+</document>

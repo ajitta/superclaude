@@ -1,11 +1,16 @@
 ---
 name: reflect
+type: command
+triggers: [/sc:reflect, reflection, validation, task-analysis]
 description: "Task reflection and validation using Serena MCP analysis capabilities"
 category: special
 complexity: standard
 mcp-servers: [serena]
 personas: []
 ---
+
+<document type="command" name="reflect"
+          triggers="/sc:reflect, reflection, validation, task-analysis">
 
 # /sc:reflect - Task Reflection and Validation
 
@@ -85,4 +90,6 @@ Key behaviors:
 - Operate without proper Serena MCP integration and reflection tool access
 - Override task completion decisions without proper adherence and quality validation
 - Bypass session integrity checks and cross-session persistence requirements
+
+</document>
 

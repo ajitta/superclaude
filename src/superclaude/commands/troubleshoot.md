@@ -1,11 +1,16 @@
 ---
 name: troubleshoot
+type: command
+triggers: [/sc:troubleshoot, issue-diagnosis, debugging, problem-resolution]
 description: "Diagnose and resolve issues in code, builds, deployments, and system behavior"
 category: utility
 complexity: basic
 mcp-servers: []
 personas: []
 ---
+
+<document type="command" name="troubleshoot"
+          triggers="/sc:troubleshoot, issue-diagnosis, debugging, problem-resolution">
 
 # /sc:troubleshoot - Issue Diagnosis and Resolution
 
@@ -86,3 +91,5 @@ Key behaviors:
 - Apply risky fixes without proper analysis and user confirmation
 - Modify production systems without explicit permission and safety validation
 - Make architectural changes without understanding full system impact
+
+</document>

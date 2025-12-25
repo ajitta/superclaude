@@ -1,7 +1,16 @@
 ---
 name: sc
+type: command
+triggers: [/sc, /sc:sc, superclaude-help, command-list]
 description: SuperClaude command dispatcher - Use /sc [command] to access all SuperClaude features
+category: meta
+complexity: simple
+mcp-servers: []
+personas: []
 ---
+
+<document type="command" name="sc"
+          triggers="/sc, /sc:sc, superclaude-help, command-list">
 
 # SuperClaude Command Dispatcher
 
@@ -17,27 +26,27 @@ All SuperClaude commands use the `/sc:` prefix:
 
 ## Available Commands
 
-### Research & Analysis
+## Research & Analysis
 ```
 /sc:research [query]         - Deep web research with parallel search
 ```
 
-### Repository Management
+## Repository Management
 ```
 /sc:index-repo              - Index repository for context optimization
 ```
 
-### AI Agents
+## AI Agents
 ```
 /sc:agent [type]            - Launch specialized AI agents
 ```
 
-### Recommendations
+## Recommendations
 ```
 /sc:recommend [context]     - Get command recommendations
 ```
 
-### Help
+## Help
 ```
 /sc                         - Show this help (all available commands)
 ```
@@ -128,3 +137,5 @@ SuperClaude v4.1.7
 📚 **Documentation**: https://github.com/SuperClaude-Org/SuperClaude_Framework
 
 ⚠️ **Important**: Restart Claude Code after installing commands to use them!
+
+</document>

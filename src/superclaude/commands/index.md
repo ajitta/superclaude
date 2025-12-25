@@ -1,11 +1,16 @@
 ---
 name: index
+type: command
+triggers: [/sc:index, project-documentation, knowledge-base, api-docs]
 description: "Generate comprehensive project documentation and knowledge base with intelligent organization"
 category: special
 complexity: standard
 mcp-servers: [sequential, context7]
 personas: [architect, scribe, quality]
 ---
+
+<document type="command" name="index"
+          triggers="/sc:index, project-documentation, knowledge-base, api-docs">
 
 # /sc:index - Project Documentation
 
@@ -84,3 +89,5 @@ Key behaviors:
 - Override existing manual documentation without explicit update permission
 - Generate documentation without appropriate project structure analysis and validation
 - Bypass established documentation standards or quality requirements
+
+</document>

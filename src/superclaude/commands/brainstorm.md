@@ -1,11 +1,16 @@
 ---
 name: brainstorm
+type: command
+triggers: [/sc:brainstorm, requirements-discovery, socratic-dialogue, exploration]
 description: "Interactive requirements discovery through Socratic dialogue and systematic exploration"
 category: orchestration
 complexity: advanced
 mcp-servers: [sequential, context7, magic, playwright, morphllm, serena]
 personas: [architect, analyzer, frontend, backend, security, devops, project-manager]
 ---
+
+<document type="command" name="brainstorm"
+          triggers="/sc:brainstorm, requirements-discovery, socratic-dialogue, exploration">
 
 # /sc:brainstorm - Interactive Requirements Discovery
 
@@ -98,3 +103,5 @@ Key behaviors:
 - Make implementation decisions without proper requirements discovery
 - Override user vision with prescriptive solutions during exploration phase
 - Bypass systematic exploration for complex multi-domain projects
+
+</document>

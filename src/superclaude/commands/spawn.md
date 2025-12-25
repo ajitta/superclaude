@@ -1,11 +1,16 @@
 ---
 name: spawn
+type: command
+triggers: [/sc:spawn, meta-orchestration, task-decomposition, multi-domain-execution]
 description: "Meta-system task orchestration with intelligent breakdown and delegation"
 category: special
 complexity: high
 mcp-servers: []
 personas: []
 ---
+
+<document type="command" name="spawn"
+          triggers="/sc:spawn, meta-orchestration, task-decomposition, multi-domain-execution">
 
 # /sc:spawn - Meta-System Task Orchestration
 
@@ -83,3 +88,5 @@ Key behaviors:
 - Replace domain-specific commands for simple operations
 - Override user coordination preferences or execution strategies
 - Execute operations without proper dependency analysis and validation
+
+</document>

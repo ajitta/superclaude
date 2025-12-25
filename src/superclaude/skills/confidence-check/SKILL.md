@@ -1,7 +1,16 @@
 ---
-name: Confidence Check
+name: confidence-check
+type: skill
+triggers: [/confidence-check, pre-implementation, confidence-assessment, readiness-check]
 description: Pre-implementation confidence assessment (≥90% required). Use before starting any implementation to verify readiness with duplicate check, architecture compliance, official docs verification, OSS references, and root cause identification.
+category: validation
+complexity: standard
+mcp-servers: [context7, tavily]
+personas: []
 ---
+
+<document type="skill" name="confidence-check"
+          triggers="/confidence-check, pre-implementation, confidence-assessment, readiness-check">
 
 # Confidence Check Skill
 

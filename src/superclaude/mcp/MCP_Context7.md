@@ -1,3 +1,11 @@
+---
+name: context7
+type: mcp
+triggers: [library, docs, framework, documentation, import, require]
+description: Official library documentation lookup and framework pattern guidance
+category: mcp
+---
+
 <document type="mcp" name="context7"
           triggers="library, docs, framework, documentation, import, require">
 

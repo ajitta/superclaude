@@ -1,3 +1,14 @@
+---
+name: research-config
+type: core
+triggers: [research, deep-research, planning, hop, confidence, tavily]
+description: Deep research configuration and strategy settings
+priority: medium
+---
+
+<document type="core" name="research-config"
+          triggers="research, deep-research, planning, hop, confidence, tavily">
+
 # Deep Research Configuration
 
 ## Default Settings
@@ -9,12 +20,12 @@ research_defaults:
   confidence_threshold: 0.7
   memory_enabled: true
   parallelization: true
-  parallel_first: true  # MANDATORY DEFAULT
-  sequential_override_requires_justification: true  # NEW
-  
+  parallel_first: true  # Recommended default
+  sequential_override_requires_justification: true
+
 parallel_execution_rules:
-  DEFAULT_MODE: PARALLEL  # EMPHASIZED
-  
+  DEFAULT_MODE: PARALLEL
+
   mandatory_parallel:
     - "Multiple search queries"
     - "Batch URL extractions"
@@ -22,7 +33,7 @@ parallel_execution_rules:
     - "Non-dependent hops"
     - "Result processing"
     - "Information extraction"
-    
+
   sequential_only_with_justification:
     - reason: "Explicit dependency"
       example: "Hop N requires Hop N-1 results"
@@ -30,7 +41,7 @@ parallel_execution_rules:
       example: "API rate limit reached"
     - reason: "User requirement"
       example: "User requests sequential for debugging"
-    
+
   parallel_optimization:
     batch_sizes:
       searches: 5
@@ -40,18 +51,18 @@ parallel_execution_rules:
       by_domain: true
       by_complexity: true
       by_resource: true
-  
+
 planning_strategies:
   planning_only:
     clarification: false
     user_confirmation: false
     execution: immediate
-    
+
   intent_planning:
     clarification: true
     max_questions: 3
     execution: after_clarification
-    
+
   unified:
     clarification: optional
     plan_presentation: true
@@ -148,14 +159,14 @@ strategy_selection:
       - Technical documentation request
       - Well-defined scope
       - No ambiguity detected
-    
+
   intent_planning:
     indicators:
       - Ambiguous terms present
       - Broad topic area
       - Multiple possible interpretations
       - User expertise unknown
-    
+
   unified:
     indicators:
       - Complex multi-faceted query
@@ -175,7 +186,7 @@ source_credibility:
       - Government publications
       - Official documentation
       - Peer-reviewed papers
-    
+
   tier_2_sources:
     score: 0.7-0.9
     types:
@@ -183,7 +194,7 @@ source_credibility:
       - Industry reports
       - Expert blogs
       - Technical forums
-    
+
   tier_3_sources:
     score: 0.5-0.7
     types:
@@ -191,7 +202,7 @@ source_credibility:
       - User documentation
       - Social media (verified)
       - Wikipedia
-    
+
   tier_4_sources:
     score: 0.3-0.5
     types:
@@ -212,7 +223,7 @@ research_depth_profiles:
     time_limit: 2 minutes
     confidence_target: 0.6
     extraction: tavily_only
-    
+
   standard:
     max_sources: 20
     max_hops: 3
@@ -220,7 +231,7 @@ research_depth_profiles:
     time_limit: 5 minutes
     confidence_target: 0.7
     extraction: selective
-    
+
   deep:
     max_sources: 40
     max_hops: 4
@@ -228,7 +239,7 @@ research_depth_profiles:
     time_limit: 8 minutes
     confidence_target: 0.8
     extraction: comprehensive
-    
+
   exhaustive:
     max_sources: 50+
     max_hops: 5
@@ -246,17 +257,17 @@ hop_patterns:
     description: "Explore entities found in previous hop"
     example: "Paper → Authors → Other works → Collaborators"
     max_branches: 3
-    
+
   concept_deepening:
     description: "Drill down into concepts"
     example: "Topic → Subtopics → Details → Examples"
     max_depth: 4
-    
+
   temporal_progression:
     description: "Follow chronological development"
     example: "Current → Recent → Historical → Origins"
     direction: backward
-    
+
   causal_chain:
     description: "Trace cause and effect"
     example: "Effect → Immediate cause → Root cause → Prevention"
@@ -273,7 +284,7 @@ extraction_routing:
       - Simple article structure
       - No JavaScript requirement
       - Public access
-    
+
   use_playwright:
     conditions:
       - JavaScript rendering required
@@ -281,14 +292,14 @@ extraction_routing:
       - Authentication needed
       - Interactive elements
       - Screenshots required
-    
+
   use_context7:
     conditions:
       - Technical documentation
       - API references
       - Framework guides
       - Library documentation
-    
+
   use_native:
     conditions:
       - Local file access
@@ -303,7 +314,7 @@ extraction_routing:
 case_schema:
   case_id:
     format: "research_[timestamp]_[topic_hash]"
-    
+
   case_content:
     query: "original research question"
     strategy_used: "planning approach"
@@ -335,16 +346,16 @@ replanning_triggers:
     low: < 0.6
     acceptable: 0.6-0.7
     good: > 0.7
-    
+
   time_based:
     warning: 70% of limit
     critical: 90% of limit
-    
+
   quality_based:
     insufficient_sources: < 3
     contradictions: > 30%
     gaps_identified: > 50%
-    
+
   user_based:
     explicit_request: immediate
     implicit_dissatisfaction: assess
@@ -358,13 +369,13 @@ output_formats:
     max_length: 500 words
     sections: [key_finding, evidence, sources]
     confidence_display: simple
-    
+
   report:
     sections: [executive_summary, methodology, findings, synthesis, conclusions]
     citations: inline
     confidence_display: detailed
     visuals: included
-    
+
   academic:
     sections: [abstract, introduction, methodology, literature_review, findings, discussion, conclusions]
     citations: academic_format
@@ -380,12 +391,12 @@ error_handling:
     api_key_missing: "Check TAVILY_API_KEY environment variable"
     rate_limit: "Wait and retry with exponential backoff"
     no_results: "Expand search terms or try alternatives"
-    
+
   playwright_errors:
     timeout: "Skip source or increase timeout"
     navigation_failed: "Mark as inaccessible, continue"
     screenshot_failed: "Continue without visual"
-    
+
   quality_errors:
     low_confidence: "Trigger replanning"
     contradictions: "Seek additional sources"
@@ -399,19 +410,19 @@ mcp_integration:
   tavily:
     role: primary_search
     fallback: native_websearch
-    
+
   playwright:
     role: complex_extraction
     fallback: tavily_extraction
-    
+
   sequential:
     role: reasoning_engine
     fallback: native_reasoning
-    
+
   context7:
     role: technical_docs
     fallback: tavily_search
-    
+
   serena:
     role: memory_management
     fallback: session_only
@@ -426,21 +437,23 @@ metrics_tracking:
     - extraction_time
     - synthesis_duration
     - total_research_time
-    
+
   quality:
     - confidence_scores
     - source_diversity
     - coverage_completeness
     - contradiction_rate
-    
+
   efficiency:
     - cache_hit_rate
     - parallel_execution_rate
     - memory_usage
     - api_cost
-    
+
   learning:
     - pattern_reuse_rate
     - strategy_success_rate
     - improvement_trajectory
 ```
+
+</document>

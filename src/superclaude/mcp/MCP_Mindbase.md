@@ -1,3 +1,14 @@
+---
+name: mindbase
+type: mcp
+triggers: [memory, conversation, session, semantic, embedding, pgvector, mindbase]
+description: Semantic memory storage and retrieval using PostgreSQL with pgvector
+category: memory
+---
+
+<document type="mcp" name="mindbase"
+          triggers="memory, conversation, session, semantic, embedding, pgvector, mindbase">
+
 # MindBase MCP Server
 
 MindBase provides semantic memory storage and retrieval using PostgreSQL with pgvector for embeddings.
@@ -32,3 +43,5 @@ MindBase is managed by Docker MCP Gateway via `airis-catalog.yaml`. PostgreSQL w
 
 - [AIRIS MCP Gateway](https://github.com/agiletec-inc/airis-mcp-gateway) - Unified gateway (recommended)
 - [mindbase Repository](https://github.com/agiletec-inc/mindbase) - Standalone package
+
+</document>

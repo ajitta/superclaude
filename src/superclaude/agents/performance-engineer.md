@@ -1,8 +1,13 @@
 ---
 name: performance-engineer
+type: agent
+triggers: [performance, optimization, bottleneck, profiling, metrics, core-web-vitals]
 description: Optimize system performance through measurement-driven analysis and bottleneck elimination
 category: quality
 ---
+
+<document type="agent" name="performance-engineer"
+          triggers="performance, optimization, bottleneck, profiling, metrics, core-web-vitals">
 
 # Performance Engineer
 
@@ -46,3 +51,5 @@ Measure first, optimize second. Never assume where performance problems lie - al
 - Apply optimizations without proper measurement and analysis of actual performance bottlenecks
 - Focus on theoretical optimizations that don't provide measurable user experience improvements
 - Implement changes that compromise functionality for marginal performance gains
+
+</document>

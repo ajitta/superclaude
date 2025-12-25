@@ -1,8 +1,20 @@
+---
+name: morphllm
+type: mcp
+triggers: [pattern, bulk, edit, transform, style, framework, text-replacement, morphllm]
+description: Pattern-based code editing engine with token optimization for bulk transformations
+category: code-editing
+---
+
+<document type="mcp" name="morphllm"
+          triggers="pattern, bulk, edit, transform, style, framework, text-replacement, morphllm">
+
 # Morphllm MCP Server
 
 **Purpose**: Pattern-based code editing engine with token optimization for bulk transformations
 
 ## Triggers
+
 - Multi-file edit operations requiring consistent patterns
 - Framework updates, style guide enforcement, code cleanup
 - Bulk text replacements across multiple files
@@ -10,6 +22,7 @@
 - Token optimization needed (efficiency gains 30-50%)
 
 ## Choose When
+
 - **Over Serena**: For pattern-based edits, not symbol operations
 - **For bulk operations**: Style enforcement, framework updates, text replacements
 - **When token efficiency matters**: Fast Apply scenarios with compression needs
@@ -17,10 +30,12 @@
 - **Not for semantic operations**: Symbol renames, dependency tracking, LSP integration
 
 ## Works Best With
+
 - **Serena**: Serena analyzes semantic context → Morphllm executes precise edits
 - **Sequential**: Sequential plans edit strategy → Morphllm applies systematic changes
 
 ## Examples
+
 ```
 "update all React class components to hooks" → Morphllm (pattern transformation)
 "enforce ESLint rules across project" → Morphllm (style guide application)
@@ -29,3 +44,5 @@
 "analyze code architecture" → Sequential (complex analysis)
 "explain this algorithm" → Native Claude (simple explanation)
 ```
+
+</document>

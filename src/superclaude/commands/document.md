@@ -1,11 +1,16 @@
 ---
 name: document
+type: command
+triggers: [/sc:document, documentation, api-docs, inline-docs, user-guide]
 description: "Generate focused documentation for components, functions, APIs, and features"
 category: utility
 complexity: basic
 mcp-servers: []
 personas: []
 ---
+
+<document type="command" name="document"
+          triggers="/sc:document, documentation, api-docs, inline-docs, user-guide">
 
 # /sc:document - Focused Documentation Generation
 
@@ -86,3 +91,5 @@ Key behaviors:
 - Generate documentation without proper code analysis and context understanding
 - Override existing documentation standards or project-specific conventions
 - Create documentation that exposes sensitive implementation details
+
+</document>

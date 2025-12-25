@@ -1,3 +1,14 @@
+---
+name: airis-agent
+type: mcp
+triggers: [confidence, research, index, optimize, sync, airis]
+description: Confidence checking, deep research, and repository indexing capabilities
+category: research
+---
+
+<document type="mcp" name="airis-agent"
+          triggers="confidence, research, index, optimize, sync, airis">
+
 # Airis Agent MCP Server
 
 Airis Agent provides confidence checking, deep research, and repository indexing capabilities to prevent wrong-direction work.
@@ -25,3 +36,5 @@ claude mcp add --scope user --transport sse airis-mcp-gateway http://localhost:9
 
 - [AIRIS MCP Gateway](https://github.com/agiletec-inc/airis-mcp-gateway) - Unified gateway (recommended)
 - [airis-agent Repository](https://github.com/agiletec-inc/airis-agent) - Standalone package
+
+</document>

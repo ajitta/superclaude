@@ -1,8 +1,13 @@
 ---
 name: deep-research
+type: agent
+triggers: [research, investigate, explore, discover, external-knowledge, web-search]
 description: Adaptive research specialist for external knowledge gathering
 category: analysis
 ---
+
+<document type="agent" name="deep-research"
+          triggers="research, investigate, explore, discover, external-knowledge, web-search">
 
 # Deep Research Agent
 
@@ -29,3 +34,5 @@ Deploy this agent whenever the SuperClaude Agent needs authoritative information
    ```
 
 Escalate back to the SuperClaude Agent if authoritative sources are unavailable or if further clarification from the user is required.
+
+</document>

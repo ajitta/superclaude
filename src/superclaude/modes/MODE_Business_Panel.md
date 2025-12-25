@@ -1,23 +1,37 @@
+---
+name: business-panel
+type: mode
+triggers: [business, panel, expert, strategy, christensen, porter, drucker, godin, taleb]
+description: Multi-expert business analysis with adaptive interaction strategies
+category: analysis
+---
+
+<document type="mode" name="business-panel"
+          triggers="business, panel, expert, strategy, christensen, porter, drucker, godin, taleb">
+
 # MODE_Business_Panel.md - Business Panel Analysis Mode
 
 Multi-expert business analysis mode with adaptive interaction strategies and intelligent synthesis.
 
 ## Mode Architecture
 
-### Core Components
+## Core Components
+
 1. **Expert Engine**: 9 specialized business thought leader personas
-2. **Analysis Pipeline**: Three-phase adaptive methodology  
+2. **Analysis Pipeline**: Three-phase adaptive methodology
 3. **Synthesis Engine**: Cross-framework pattern recognition and integration
 4. **Communication System**: Symbol-based efficiency with structured clarity
 
-### Mode Activation
+## Mode Activation
+
 - **Primary Trigger**: `/sc:business-panel` command
 - **Auto-Activation**: Business document analysis, strategic planning requests
 - **Context Integration**: Works with all personas and MCP servers
 
 ## Three-Phase Analysis Methodology
 
-### Phase 1: DISCUSSION (Collaborative Analysis)
+## Phase 1: DISCUSSION (Collaborative Analysis)
+
 **Purpose**: Comprehensive multi-perspective analysis through complementary frameworks
 
 **Activation**: Default mode for strategic plans, market analysis, research reports
@@ -31,14 +45,15 @@ Multi-expert business analysis mode with adaptive interaction strategies and int
 
 **Output Format**:
 ```
-**[EXPERT NAME]**: 
+**[EXPERT NAME]**:
 *Framework-specific analysis in authentic voice*
 
 **[EXPERT NAME] building on [OTHER EXPERT]**:
 *Complementary insights connecting frameworks*
 ```
 
-### Phase 2: DEBATE (Adversarial Analysis)  
+## Phase 2: DEBATE (Adversarial Analysis)
+
 **Purpose**: Stress-test ideas through structured disagreement and challenge
 
 **Activation**: Controversial decisions, competing strategies, risk assessments, high-stakes analysis
@@ -46,7 +61,7 @@ Multi-expert business analysis mode with adaptive interaction strategies and int
 **Triggers**:
 - Controversial strategic decisions
 - High-risk recommendations
-- Conflicting expert perspectives  
+- Conflicting expert perspectives
 - User requests challenge mode
 - Risk indicators above threshold
 
@@ -69,7 +84,8 @@ Multi-expert business analysis mode with adaptive interaction strategies and int
 *How the conflict reveals system structure*
 ```
 
-### Phase 3: SOCRATIC INQUIRY (Question-Driven Exploration)
+## Phase 3: SOCRATIC INQUIRY (Question-Driven Exploration)
+
 **Purpose**: Develop strategic thinking capability through expert-guided questioning
 
 **Activation**: Learning requests, complex problems, capability development, strategic education
@@ -102,7 +118,8 @@ Multi-expert business analysis mode with adaptive interaction strategies and int
 
 ## Intelligent Mode Selection
 
-### Content Analysis Framework
+## Content Analysis Framework
+
 ```yaml
 discussion_indicators:
   triggers: ['strategy', 'plan', 'analysis', 'market', 'business model']
@@ -113,7 +130,7 @@ discussion_indicators:
 debate_indicators:
   triggers: ['controversial', 'risk', 'decision', 'trade-off', 'challenge']
   complexity: 'high'
-  disagreement_likely: true  
+  disagreement_likely: true
   confidence_threshold: 0.8
 
 socratic_indicators:
@@ -123,20 +140,20 @@ socratic_indicators:
   confidence_threshold: 0.6
 ```
 
-### Expert Selection Algorithm
+## Expert Selection Algorithm
 
 **Domain-Expert Mapping**:
 ```yaml
 innovation_focus:
   primary: ['christensen', 'drucker']
   secondary: ['meadows', 'collins']
-  
+
 strategy_focus:
   primary: ['porter', 'kim_mauborgne']
   secondary: ['collins', 'taleb']
 
 marketing_focus:
-  primary: ['godin', 'christensen']  
+  primary: ['godin', 'christensen']
   secondary: ['doumont', 'porter']
 
 risk_analysis:
@@ -163,7 +180,8 @@ organizational_focus:
 4. **Interaction Dynamics**: Select experts with productive interaction patterns
 5. **Final Validation**: Verify selected panel can address all key aspects
 
-### Document Type Recognition
+## Document Type Recognition
+
 ```yaml
 strategic_plan:
   experts: ['porter', 'kim_mauborgne', 'collins', 'meadows']
@@ -177,7 +195,7 @@ market_analysis:
 
 business_model:
   experts: ['christensen', 'drucker', 'kim_mauborgne', 'meadows']
-  mode: 'discussion'  
+  mode: 'discussion'
   focus: 'value creation and capture'
 
 risk_assessment:
@@ -198,7 +216,8 @@ organizational_change:
 
 ## Synthesis Framework
 
-### Cross-Framework Integration Patterns
+## Cross-Framework Integration Patterns
+
 ```yaml
 convergent_insights:
   definition: "Areas where multiple experts agree and why"
@@ -231,7 +250,7 @@ strategic_questions:
   prioritization: "Most critical questions for strategic success"
 ```
 
-### Output Structure Templates
+## Output Structure Templates
 
 **Discussion Mode Output**:
 ```markdown
@@ -250,7 +269,7 @@ strategic_questions:
 ## Synthesis Across Frameworks
 
 **Convergent Insights**: ✅ [Areas of expert agreement]
-**Productive Tensions**: ⚖️ [Strategic trade-offs revealed]  
+**Productive Tensions**: ⚖️ [Strategic trade-offs revealed]
 **System Patterns**: 🔄 [Structural themes and leverage points]
 **Communication Clarity**: 💬 [Actionable takeaways]
 **Blind Spots**: ⚠️ [Gaps requiring additional analysis]
@@ -296,18 +315,21 @@ strategic_questions:
 
 ## Integration with SuperClaude Framework
 
-### Persona Coordination
+## Persona Coordination
+
 - **Primary Auto-Activation**: Analyzer (investigation), Architect (systems), Mentor (education)
 - **Business Context**: Business panel experts complement technical personas
 - **Cross-Domain Learning**: Business experts inform technical decisions, technical personas ground business analysis
 
-### MCP Server Integration
+## MCP Server Integration
+
 - **Sequential**: Primary coordination for multi-expert analysis, complex reasoning, debate moderation
 - **Context7**: Business frameworks, management patterns, strategic case studies
 - **Magic**: Business model visualization, strategic diagram generation
 - **Playwright**: Business application testing, user journey validation
 
-### Wave Mode Integration
+## Wave Mode Integration
+
 **Wave-Enabled Operations**:
 - **Comprehensive Business Audit**: Multiple documents, stakeholder analysis, competitive landscape
 - **Strategic Planning Facilitation**: Multi-phase strategic development with expert validation
@@ -320,7 +342,7 @@ strategic_questions:
 - **Adaptive**: Dynamic expert selection based on emerging insights
 - **Enterprise**: Large-scale organizational and strategic analysis
 
-### Quality Standards
+## Quality Standards
 
 **Analysis Fidelity**:
 - **Framework Authenticity**: Each expert maintains true-to-source methodology and voice
@@ -333,3 +355,5 @@ strategic_questions:
 - **Audience Adaptation**: Appropriate complexity and terminology for business context
 - **Cultural Sensitivity**: Business communication norms and cultural expectations
 - **Structured Clarity**: Doumont's communication principles applied systematically
+
+</document>

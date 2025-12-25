@@ -1,11 +1,16 @@
 ---
 name: save
+type: command
+triggers: [/sc:save, session-save, context-persist, checkpoint-create]
 description: "Session lifecycle management with Serena MCP integration for session context persistence"
 category: session
 complexity: standard
 mcp-servers: [serena]
 personas: []
 ---
+
+<document type="command" name="save"
+          triggers="/sc:save, session-save, context-persist, checkpoint-create">
 
 # /sc:save - Session Context Persistence
 
@@ -91,3 +96,5 @@ Key behaviors:
 - Operate without proper Serena MCP integration and memory access
 - Save session data without validation and integrity verification
 - Override existing session context without proper checkpoint preservation
+
+</document>

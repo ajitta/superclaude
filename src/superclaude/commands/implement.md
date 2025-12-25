@@ -1,11 +1,16 @@
 ---
 name: implement
+type: command
+triggers: [/sc:implement, implementation, feature-development, code-generation]
 description: "Feature and code implementation with intelligent persona activation and MCP integration"
 category: workflow
 complexity: standard
 mcp-servers: [context7, sequential, magic, playwright]
 personas: [architect, frontend, backend, security, qa-specialist]
 ---
+
+<document type="command" name="implement"
+          triggers="/sc:implement, implementation, feature-development, code-generation">
 
 # /sc:implement - Feature Implementation
 
@@ -95,3 +100,5 @@ Key behaviors:
 - Make architectural decisions without appropriate persona consultation
 - Implement features conflicting with security policies or architectural constraints
 - Override user-specified safety constraints or bypass quality gates
+
+</document>

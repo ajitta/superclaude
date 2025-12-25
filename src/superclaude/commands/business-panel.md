@@ -1,14 +1,16 @@
-# /sc:business-panel - Business Panel Analysis System
+---
+name: business-panel
+type: command
+triggers: [/sc:business-panel, business-analysis, strategic-planning, multi-expert]
+description: "Multi-expert business analysis with adaptive interaction modes"
+category: analysis
+complexity: complex
+---
 
-```yaml
----
-command: "/sc:business-panel"
-category: "Analysis & Strategic Planning"  
-purpose: "Multi-expert business analysis with adaptive interaction modes"
-wave-enabled: true
-performance-profile: "complex"
----
-```
+<document type="command" name="business-panel"
+          triggers="/sc:business-panel, business-analysis, strategic-planning, multi-expert">
+
+# /sc:business-panel - Business Panel Analysis System
 
 ## Overview
 
@@ -16,7 +18,7 @@ AI facilitated panel discussion between renowned business thought leaders analyz
 
 ## Expert Panel
 
-### Available Experts
+## Available Experts
 - **Clayton Christensen**: Disruption Theory, Jobs-to-be-Done
 - **Michael Porter**: Competitive Strategy, Five Forces
 - **Peter Drucker**: Management Philosophy, MBO
@@ -29,23 +31,23 @@ AI facilitated panel discussion between renowned business thought leaders analyz
 
 ## Analysis Modes
 
-### Phase 1: DISCUSSION (Default)
+## Phase 1: DISCUSSION (Default)
 Collaborative analysis where experts build upon each other's insights through their frameworks.
 
-### Phase 2: DEBATE
+## Phase 2: DEBATE
 Adversarial analysis activated when experts disagree or for controversial topics.
 
-### Phase 3: SOCRATIC INQUIRY
+## Phase 3: SOCRATIC INQUIRY
 Question-driven exploration for deep learning and strategic thinking development.
 
 ## Usage
 
-### Basic Usage
+## Basic Usage
 ```bash
 /sc:business-panel [document_path_or_content]
 ```
 
-### Advanced Options
+## Advanced Options
 ```bash
 /sc:business-panel [content] --experts "porter,christensen,meadows"
 /sc:business-panel [content] --mode debate
@@ -53,18 +55,18 @@ Question-driven exploration for deep learning and strategic thinking development
 /sc:business-panel [content] --synthesis-only
 ```
 
-### Mode Commands
+## Mode Commands
 - `--mode discussion` - Collaborative analysis (default)
 - `--mode debate` - Challenge and stress-test ideas
 - `--mode socratic` - Question-driven exploration
 - `--mode adaptive` - System selects based on content
 
-### Expert Selection
+## Expert Selection
 - `--experts "name1,name2,name3"` - Select specific experts
 - `--focus domain` - Auto-select experts for domain
 - `--all-experts` - Include all 9 experts
 
-### Output Options
+## Output Options
 - `--synthesis-only` - Skip detailed analysis, show synthesis
 - `--structured` - Use symbol system for efficiency
 - `--verbose` - Full detailed analysis
@@ -79,3 +81,5 @@ Question-driven exploration for deep learning and strategic thinking development
 - Compatible with all thinking flags (--think, --think-hard, --ultrathink)
 - Supports wave orchestration for comprehensive business analysis
 - Integrates with scribe persona for professional business communication
+
+</document>

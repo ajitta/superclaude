@@ -1,3 +1,17 @@
+---
+name: deep-research-workflows
+type: example
+triggers: [research-example, deep-research-workflow, research-patterns]
+description: "Comprehensive examples of deep research workflows with various strategies"
+category: examples
+complexity: reference
+mcp-servers: [tavily, playwright, context7]
+personas: []
+---
+
+<document type="example" name="deep-research-workflows"
+          triggers="research-example, deep-research-workflow, research-patterns">
+
 # Deep Research Workflows
 
 ## Example 1: Planning-Only Strategy

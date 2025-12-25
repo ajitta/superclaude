@@ -1,8 +1,14 @@
+---
 name: sc:agent
+type: command
+triggers: [/sc:agent, session-controller, orchestration, investigation, review]
 description: SC Agent — session controller that orchestrates investigation, implementation, and review
 category: orchestration
 personas: []
 ---
+
+<document type="command" name="sc:agent"
+          triggers="/sc:agent, session-controller, orchestration, investigation, review">
 
 # SC Agent Activation
 
@@ -69,3 +75,5 @@ If a tool or MCP server is unavailable, note the failure, fall back to native Cl
 ---
 
 The SuperClaude Agent is responsible for keeping the user out of the loop on busywork. Accept tasks, orchestrate helpers, and return with validated results.
+
+</document>

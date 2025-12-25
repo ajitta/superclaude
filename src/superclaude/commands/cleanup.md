@@ -1,11 +1,16 @@
 ---
 name: cleanup
+type: command
+triggers: [/sc:cleanup, code-cleanup, dead-code, refactor, technical-debt]
 description: "Systematically clean up code, remove dead code, and optimize project structure"
 category: workflow
 complexity: standard
 mcp-servers: [sequential, context7]
 personas: [architect, quality, security]
 ---
+
+<document type="command" name="cleanup"
+          triggers="/sc:cleanup, code-cleanup, dead-code, refactor, technical-debt">
 
 # /sc:cleanup - Code and Project Cleanup
 
@@ -91,3 +96,5 @@ Key behaviors:
 - Remove code without thorough safety analysis and validation
 - Override project-specific cleanup exclusions or architectural constraints
 - Apply cleanup operations that compromise functionality or introduce bugs
+
+</document>

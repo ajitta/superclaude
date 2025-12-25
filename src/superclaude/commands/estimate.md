@@ -1,11 +1,16 @@
 ---
 name: estimate
+type: command
+triggers: [/sc:estimate, estimation, time-estimate, effort-estimate, complexity-assessment]
 description: "Provide development estimates for tasks, features, or projects with intelligent analysis"
 category: special
 complexity: standard
 mcp-servers: [sequential, context7]
 personas: [architect, performance, project-manager]
 ---
+
+<document type="command" name="estimate"
+          triggers="/sc:estimate, estimation, time-estimate, effort-estimate, complexity-assessment">
 
 # /sc:estimate - Development Estimation
 
@@ -84,4 +89,6 @@ Key behaviors:
 - Guarantee estimate accuracy without proper scope analysis and validation
 - Provide estimates without appropriate domain expertise and complexity assessment
 - Override historical benchmarks without clear justification and analysis
+
+</document>
 

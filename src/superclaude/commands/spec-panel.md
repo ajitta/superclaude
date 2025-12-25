@@ -1,11 +1,16 @@
 ---
 name: spec-panel
+type: command
+triggers: [/sc:spec-panel, specification-review, expert-panel, requirements-analysis]
 description: "Multi-expert specification review and improvement using renowned specification and software engineering experts"
 category: analysis
 complexity: enhanced
 mcp-servers: [sequential, context7]
 personas: [technical-writer, system-architect, quality-engineer]
 ---
+
+<document type="command" name="spec-panel"
+          triggers="/sc:spec-panel, specification-review, expert-panel, requirements-analysis">
 
 # /sc:spec-panel - Expert Specification Review Panel
 
@@ -36,7 +41,7 @@ Key behaviors:
 
 ## Expert Panel System
 
-### Core Specification Experts
+## Core Specification Experts
 
 **Karl Wiegers** - Requirements Engineering Pioneer
 - **Domain**: Functional/non-functional requirements, requirement quality frameworks
@@ -58,7 +63,7 @@ Key behaviors:
 - **Methodology**: Interface segregation, bounded contexts, refactoring patterns
 - **Critique Focus**: "This interface violates the single responsibility principle. Consider separating concerns."
 
-### Technical Architecture Experts
+## Technical Architecture Experts
 
 **Michael Nygard** - Release It! Author
 - **Domain**: Production systems, reliability patterns, operational requirements, failure modes
@@ -75,7 +80,7 @@ Key behaviors:
 - **Methodology**: Message-driven architecture, integration patterns, event-driven design
 - **Critique Focus**: "What's the message exchange pattern here? How do you handle ordering and delivery guarantees?"
 
-### Quality & Testing Experts
+## Quality & Testing Experts
 
 **Lisa Crispin** - Agile Testing Expert
 - **Domain**: Testing strategies, quality requirements, acceptance criteria, test automation
@@ -87,7 +92,7 @@ Key behaviors:
 - **Methodology**: Specification workshops, three amigos, quality conversation facilitation
 - **Critique Focus**: "Did the whole team participate in creating this specification? Are quality expectations clearly defined?"
 
-### Modern Software Experts
+## Modern Software Experts
 
 **Kelsey Hightower** - Cloud Native Expert
 - **Domain**: Kubernetes, cloud architecture, operational excellence, infrastructure as code
@@ -103,7 +108,7 @@ Key behaviors:
 
 ## Analysis Modes
 
-### Discussion Mode (`--mode discussion`)
+## Discussion Mode (`--mode discussion`)
 **Purpose**: Collaborative improvement through expert dialogue and knowledge sharing
 
 **Expert Interaction Pattern**:
@@ -129,7 +134,7 @@ MARTIN FOWLER: "The specification should also define the failure notification in
 How do upstream services know what type of failure occurred?"
 ```
 
-### Critique Mode (`--mode critique`)
+## Critique Mode (`--mode critique`)
 **Purpose**: Systematic review with specific improvement suggestions and priority rankings
 
 **Analysis Structure**:
@@ -163,7 +168,7 @@ MARTIN FOWLER - Interface Design:
 📊 QUALITY IMPACT: +20% maintainability, +15% testability
 ```
 
-### Socratic Mode (`--mode socratic`)
+## Socratic Mode (`--mode socratic`)
 **Purpose**: Learning-focused questioning to deepen understanding and improve thinking
 
 **Question Categories**:
@@ -191,7 +196,7 @@ KELSEY HIGHTOWER: "What operational and monitoring capabilities does this specif
 
 ## Focus Areas
 
-### Requirements Focus (`--focus requirements`)
+## Requirements Focus (`--focus requirements`)
 **Expert Panel**: Wiegers (lead), Adzic, Cockburn
 **Analysis Areas**:
 - Requirement clarity, completeness, and consistency
@@ -200,7 +205,7 @@ KELSEY HIGHTOWER: "What operational and monitoring capabilities does this specif
 - Acceptance criteria quality and coverage
 - Requirements traceability and verification
 
-### Architecture Focus (`--focus architecture`)
+## Architecture Focus (`--focus architecture`)
 **Expert Panel**: Fowler (lead), Newman, Hohpe, Nygard
 **Analysis Areas**:
 - Interface design quality and consistency
@@ -209,7 +214,7 @@ KELSEY HIGHTOWER: "What operational and monitoring capabilities does this specif
 - Design pattern appropriateness and implementation
 - Integration and communication specifications
 
-### Testing Focus (`--focus testing`)
+## Testing Focus (`--focus testing`)
 **Expert Panel**: Crispin (lead), Gregory, Adzic
 **Analysis Areas**:
 - Test strategy and coverage requirements
@@ -218,7 +223,7 @@ KELSEY HIGHTOWER: "What operational and monitoring capabilities does this specif
 - Acceptance criteria and definition of done
 - Test automation and continuous validation
 
-### Compliance Focus (`--focus compliance`)
+## Compliance Focus (`--focus compliance`)
 **Expert Panel**: Wiegers (lead), Nygard, Hightower
 **Analysis Areas**:
 - Regulatory requirement coverage and validation
@@ -237,13 +242,13 @@ KELSEY HIGHTOWER: "What operational and monitoring capabilities does this specif
 
 ## Iterative Improvement Process
 
-### Single Iteration (Default)
+## Single Iteration (Default)
 1. **Initial Analysis**: Expert panel reviews specification
 2. **Issue Identification**: Systematic problem and gap identification
 3. **Improvement Recommendations**: Specific, actionable enhancement suggestions
 4. **Priority Ranking**: Critical path and impact-based prioritization
 
-### Multi-Iteration (`--iterations N`)
+## Multi-Iteration (`--iterations N`)
 **Iteration 1**: Structural and fundamental issues
 - Requirements clarity and completeness
 - Architecture consistency and boundaries
@@ -261,7 +266,7 @@ KELSEY HIGHTOWER: "What operational and monitoring capabilities does this specif
 
 ## Output Formats
 
-### Standard Format (`--format standard`)
+## Standard Format (`--format standard`)
 ```yaml
 specification_review:
   original_spec: "authentication_service.spec.yml"
@@ -299,15 +304,15 @@ improvement_roadmap:
   long_term: ["Comprehensive security review", "Integration testing strategy"]
 ```
 
-### Structured Format (`--format structured`)
+## Structured Format (`--format structured`)
 Token-efficient format using SuperClaude symbol system for concise communication.
 
-### Detailed Format (`--format detailed`)
+## Detailed Format (`--format detailed`)
 Comprehensive analysis with full expert commentary, examples, and implementation guidance.
 
 ## Examples
 
-### API Specification Review
+## API Specification Review
 ```
 /sc:spec-panel @auth_api.spec.yml --mode critique --focus requirements,architecture
 # Comprehensive API specification review
@@ -315,7 +320,7 @@ Comprehensive analysis with full expert commentary, examples, and implementation
 # Generate detailed improvement recommendations
 ```
 
-### Requirements Workshop
+## Requirements Workshop
 ```
 /sc:spec-panel "user story content" --mode discussion --experts "wiegers,adzic,cockburn"
 # Collaborative requirements analysis and improvement
@@ -323,7 +328,7 @@ Comprehensive analysis with full expert commentary, examples, and implementation
 # Consensus building around acceptance criteria
 ```
 
-### Architecture Validation
+## Architecture Validation
 ```
 /sc:spec-panel @microservice.spec.yml --mode socratic --focus architecture
 # Learning-focused architectural review
@@ -331,7 +336,7 @@ Comprehensive analysis with full expert commentary, examples, and implementation
 # Alternative approach exploration
 ```
 
-### Iterative Improvement
+## Iterative Improvement
 ```
 /sc:spec-panel @complex_system.spec.yml --iterations 3 --format detailed
 # Multi-iteration improvement process
@@ -339,7 +344,7 @@ Comprehensive analysis with full expert commentary, examples, and implementation
 # Comprehensive quality enhancement
 ```
 
-### Compliance Review
+## Compliance Review
 ```
 /sc:spec-panel @security_requirements.yml --focus compliance --experts "wiegers,nygard"
 # Compliance and security specification review
@@ -349,7 +354,7 @@ Comprehensive analysis with full expert commentary, examples, and implementation
 
 ## Integration Patterns
 
-### Workflow Integration with /sc:code-to-spec
+## Workflow Integration with /sc:code-to-spec
 ```bash
 # Generate initial specification from code
 /sc:code-to-spec ./authentication_service --type api --format yaml
@@ -361,7 +366,7 @@ Comprehensive analysis with full expert commentary, examples, and implementation
 /sc:spec-panel @improved_auth_spec.yml --mode discussion --iterations 2
 ```
 
-### Learning and Development Workflow
+## Learning and Development Workflow
 ```bash
 # Start with socratic mode for learning
 /sc:spec-panel @my_first_spec.yml --mode socratic --iterations 2
@@ -375,19 +380,19 @@ Comprehensive analysis with full expert commentary, examples, and implementation
 
 ## Quality Assurance Features
 
-### Expert Validation
+## Expert Validation
 - Cross-expert consistency checking and validation
 - Methodology alignment and best practice verification
 - Quality metric calculation and progress tracking
 - Recommendation prioritization and impact assessment
 
-### Specification Quality Metrics
+## Specification Quality Metrics
 - **Clarity Score**: Language precision and understandability (0-10)
 - **Completeness Score**: Coverage of essential specification elements (0-10)
 - **Testability Score**: Measurability and validation capability (0-10)
 - **Consistency Score**: Internal coherence and contradiction detection (0-10)
 
-### Continuous Improvement
+## Continuous Improvement
 - Pattern recognition from successful improvements
 - Expert recommendation effectiveness tracking
 - Specification quality trend analysis
@@ -395,19 +400,19 @@ Comprehensive analysis with full expert commentary, examples, and implementation
 
 ## Advanced Features
 
-### Custom Expert Panels
+## Custom Expert Panels
 - Domain-specific expert selection and configuration
 - Industry-specific methodology application
 - Custom quality criteria and assessment frameworks
 - Specialized review processes for unique requirements
 
-### Integration with Development Workflow
+## Integration with Development Workflow
 - CI/CD pipeline integration for specification validation
 - Version control integration for specification evolution tracking
 - IDE integration for inline specification quality feedback
 - Automated quality gate enforcement and validation
 
-### Learning and Mentoring
+## Learning and Mentoring
 - Progressive skill development tracking and guidance
 - Specification writing pattern recognition and teaching
 - Best practice library development and sharing
@@ -426,3 +431,5 @@ Comprehensive analysis with full expert commentary, examples, and implementation
 - Modify specifications without explicit user consent and validation
 - Generate specifications from scratch without existing content or context
 - Provide legal or regulatory compliance guarantees beyond analysis guidance
+
+</document>

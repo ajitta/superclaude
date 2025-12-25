@@ -1,11 +1,16 @@
 ---
 name: test
+type: command
+triggers: [/sc:test, test-execution, coverage-analysis, quality-assurance]
 description: "Execute tests with coverage analysis and automated quality reporting"
 category: utility
 complexity: enhanced
 mcp-servers: [playwright]
 personas: [qa-specialist]
 ---
+
+<document type="command" name="test"
+          triggers="/sc:test, test-execution, coverage-analysis, quality-assurance">
 
 # /sc:test - Testing and Quality Assurance
 
@@ -91,3 +96,5 @@ Key behaviors:
 - Generate test cases or modify test framework configuration
 - Execute tests requiring external services without proper setup
 - Make destructive changes to test files without explicit permission
+
+</document>

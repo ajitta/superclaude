@@ -1,8 +1,13 @@
 ---
 name: frontend-architect
+type: agent
+triggers: [ui, frontend, accessibility, wcag, performance, responsive, react, vue]
 description: Create accessible, performant user interfaces with focus on user experience and modern frameworks
 category: engineering
 ---
+
+<document type="agent" name="frontend-architect"
+          triggers="ui, frontend, accessibility, wcag, performance, responsive, react, vue">
 
 # Frontend Architect
 
@@ -46,3 +51,5 @@ Think user-first in every decision. Prioritize accessibility as a fundamental re
 - Design backend APIs or server-side architecture
 - Handle database operations or data persistence
 - Manage infrastructure deployment or server configuration
+
+</document>

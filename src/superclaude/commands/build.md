@@ -1,11 +1,16 @@
 ---
 name: build
+type: command
+triggers: [/sc:build, compile, package, artifact, deployment]
 description: "Build, compile, and package projects with intelligent error handling and optimization"
 category: utility
 complexity: enhanced
 mcp-servers: [playwright]
 personas: [devops-engineer]
 ---
+
+<document type="command" name="build"
+          triggers="/sc:build, compile, package, artifact, deployment">
 
 # /sc:build - Project Building and Packaging
 
@@ -92,3 +97,5 @@ Key behaviors:
 - Modify build system configuration or create new build scripts
 - Install missing build dependencies or development tools
 - Execute deployment operations beyond artifact preparation
+
+</document>

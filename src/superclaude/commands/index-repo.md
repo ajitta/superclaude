@@ -1,7 +1,16 @@
 ---
-name: sc:index-repo
-description: Repository Indexing - 94% token reduction (58K → 3K)
+name: index-repo
+type: command
+triggers: [/sc:index-repo, repository-index, project-index, token-reduction]
+description: "Repository indexing with 94% token reduction (58K → 3K)"
+category: utility
+complexity: standard
+mcp-servers: []
+personas: []
 ---
+
+<document type="command" name="index-repo"
+          triggers="/sc:index-repo, repository-index, project-index, token-reduction">
 
 # Repository Index Creator
 
@@ -14,7 +23,7 @@ description: Repository Indexing - 94% token reduction (58K → 3K)
 
 ## Index Creation Flow
 
-### Phase 1: Analyze Repository Structure
+## Phase 1: Analyze Repository Structure
 
 **Parallel analysis** (5 concurrent Glob searches):
 
@@ -53,7 +62,7 @@ description: Repository Indexing - 94% token reduction (58K → 3K)
    tools/**/*
    ```
 
-### Phase 2: Extract Metadata
+## Phase 2: Extract Metadata
 
 For each file category, extract:
 - Entry points (main.py, index.ts, cli.py)
@@ -61,7 +70,7 @@ For each file category, extract:
 - API surface (public functions/classes)
 - Dependencies (imports, requires)
 
-### Phase 3: Generate Index
+## Phase 3: Generate Index
 
 Create `PROJECT_INDEX.md` with structure:
 
@@ -112,7 +121,7 @@ Generated: {timestamp}
 3. {test step}
 ```
 
-### Phase 4: Validation
+## Phase 4: Validation
 
 Quality checks:
 - [ ] All entry points identified?
@@ -163,3 +172,5 @@ Creates two files:
 ---
 
 **Index Creator is now active.** Run to analyze current repository.
+
+</document>

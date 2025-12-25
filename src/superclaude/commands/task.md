@@ -1,11 +1,16 @@
 ---
 name: task
+type: command
+triggers: [/sc:task, task-management, workflow-execution, multi-agent-coordination]
 description: "Execute complex tasks with intelligent workflow management and delegation"
 category: special
 complexity: advanced
 mcp-servers: [sequential, context7, magic, playwright, morphllm, serena]
 personas: [architect, analyzer, frontend, backend, security, devops, project-manager]
 ---
+
+<document type="command" name="task"
+          triggers="/sc:task, task-management, workflow-execution, multi-agent-coordination">
 
 # /sc:task - Enhanced Task Management
 
@@ -87,3 +92,5 @@ Key behaviors:
 - Execute simple tasks that don't require advanced orchestration
 - Compromise quality standards for speed or convenience
 - Operate without proper validation and quality gates
+
+</document>

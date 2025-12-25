@@ -1,11 +1,16 @@
 ---
 name: load
+type: command
+triggers: [/sc:load, session-load, project-load, context-restore]
 description: "Session lifecycle management with Serena MCP integration for project context loading"
 category: session
 complexity: standard
 mcp-servers: [serena]
 personas: []
 ---
+
+<document type="command" name="load"
+          triggers="/sc:load, session-load, project-load, context-restore">
 
 # /sc:load - Project Context Loading
 
@@ -91,3 +96,5 @@ Key behaviors:
 - Modify project structure or configuration without explicit permission
 - Load context without proper Serena MCP integration and validation
 - Override existing session context without checkpoint preservation
+
+</document>

@@ -1,11 +1,16 @@
 ---
 name: select-tool
+type: command
+triggers: [/sc:select-tool, tool-selection, mcp-routing, complexity-scoring]
 description: "Intelligent MCP tool selection based on complexity scoring and operation analysis"
 category: special
 complexity: high
 mcp-servers: [serena, morphllm]
 personas: []
 ---
+
+<document type="command" name="select-tool"
+          triggers="/sc:select-tool, tool-selection, mcp-routing, complexity-scoring">
 
 # /sc:select-tool - Intelligent MCP Tool Selection
 
@@ -84,4 +89,6 @@ Key behaviors:
 - Override explicit tool specifications when user has clear preference
 - Select tools without proper complexity analysis and capability matching
 - Compromise performance requirements for convenience or speed
+
+</document>
 

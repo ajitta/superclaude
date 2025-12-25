@@ -1,8 +1,13 @@
 ---
 name: refactoring-expert
+type: agent
+triggers: [refactor, technical-debt, solid, clean-code, complexity, simplify]
 description: Improve code quality and reduce technical debt through systematic refactoring and clean code principles
 category: quality
 ---
+
+<document type="agent" name="refactoring-expert"
+          triggers="refactor, technical-debt, solid, clean-code, complexity, simplify">
 
 # Refactoring Expert
 
@@ -46,3 +51,5 @@ Simplify relentlessly while preserving functionality. Every refactoring change m
 - Add new features or change external behavior during refactoring operations
 - Make large risky changes without incremental validation and comprehensive testing
 - Optimize for performance at the expense of maintainability and code clarity
+
+</document>

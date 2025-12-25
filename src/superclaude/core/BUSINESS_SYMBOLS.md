@@ -1,10 +1,22 @@
+---
+name: business-symbols
+type: core
+triggers: [business, panel, expert, strategy, framework, symbol]
+description: Business analysis symbol system for strategic focus and efficiency
+priority: medium
+---
+
+<document type="core" name="business-symbols"
+          triggers="business, panel, expert, strategy, framework, symbol">
+
 # BUSINESS_SYMBOLS.md - Business Analysis Symbol System
 
 Enhanced symbol system for business panel analysis with strategic focus and efficiency optimization.
 
 ## Business-Specific Symbols
 
-### Strategic Analysis
+## Strategic Analysis
+
 | Symbol | Meaning | Usage Context |
 |--------|---------|---------------|
 | 🎯 | strategic target, objective | Key goals and outcomes |
@@ -18,7 +30,8 @@ Enhanced symbol system for business panel analysis with strategic focus and effi
 | 🏭 | industry, market structure | Competitive landscape |
 | 🎪 | remarkable, purple cow | Standout products, viral potential |
 
-### Framework Integration  
+## Framework Integration
+
 | Symbol | Expert | Framework Element |
 |--------|--------|-------------------|
 | 🔨 | Christensen | Jobs-to-be-Done |
@@ -31,7 +44,8 @@ Enhanced symbol system for business panel analysis with strategic focus and effi
 | 💬 | Doumont | Clear Communication |
 | 🧭 | Drucker | Management Fundamentals |
 
-### Analysis Process
+## Analysis Process
+
 | Symbol | Process Stage | Description |
 |--------|---------------|-------------|
 | 🔍 | investigation | Initial analysis and discovery |
@@ -43,21 +57,19 @@ Enhanced symbol system for business panel analysis with strategic focus and effi
 | 🧩 | synthesis | Cross-framework integration |
 | 📋 | conclusion | Final recommendations |
 
-### Business Logic Flow
+## Business Logic Flow
+
 | Symbol | Meaning | Business Context |
 |--------|---------|------------------|
 | → | causes, leads to | Market trends → opportunities |
-| ⇒ | strategic transformation | Current state ⇒ desired future |
-| ← | constraint, limitation | Resource limits ← budget |
-| ⇄ | mutual influence | Customer needs ⇄ product development |
-| ∴ | strategic conclusion | Market analysis ∴ go-to-market strategy |
-| ∵ | business rationale | Expand ∵ market opportunity |
+| ↔ | mutual influence | Customer needs ↔ product development |
 | ≡ | strategic equivalence | Strategy A ≡ Strategy B outcomes |
 | ≠ | competitive differentiation | Our approach ≠ competitors |
 
 ## Expert Voice Symbols
 
-### Communication Styles
+## Communication Styles
+
 | Expert | Symbol | Voice Characteristic |
 |--------|--------|---------------------|
 | Christensen | 📚 | Academic, methodical |
@@ -72,7 +84,8 @@ Enhanced symbol system for business panel analysis with strategic focus and effi
 
 ## Synthesis Output Templates
 
-### Discussion Mode Synthesis
+## Discussion Mode Synthesis
+
 ```markdown
 ## 🧩 SYNTHESIS ACROSS FRAMEWORKS
 
@@ -98,7 +111,8 @@ Enhanced symbol system for business panel analysis with strategic focus and effi
 **🤔 Strategic Questions**: [Next exploration priorities]
 ```
 
-### Debate Mode Synthesis
+## Debate Mode Synthesis
+
 ```markdown
 ## ⚡ PRODUCTIVE TENSIONS RESOLVED
 
@@ -106,17 +120,18 @@ Enhanced symbol system for business panel analysis with strategic focus and effi
 - 📚 **CHRISTENSEN position**: [Innovation framework perspective]
 - 📊 **PORTER counter**: [Competitive strategy challenge]
 
-**🔄 Resolution Process**: 
+**🔄 Resolution Process**:
 [How experts found common ground or maintained productive tension]
 
-**🧩 Higher-Order Solution**: 
+**🧩 Higher-Order Solution**:
 [Strategy that honors multiple frameworks]
 
 **🕸️ Systems Insight** (Meadows):
 [How the debate reveals deeper system dynamics]
 ```
 
-### Socratic Mode Synthesis
+## Socratic Mode Synthesis
+
 ```markdown
 ## 🎓 STRATEGIC THINKING DEVELOPMENT
 
@@ -134,17 +149,19 @@ Enhanced symbol system for business panel analysis with strategic focus and effi
 
 ## Token Efficiency Integration
 
-### Compression Strategies
+## Compression Strategies
+
 - **Expert Voice Compression**: Maintain authenticity while reducing verbosity
 - **Framework Symbol Substitution**: Use symbols for common framework concepts
 - **Structured Output**: Organized templates reducing repetitive text
 - **Smart Abbreviation**: Business-specific abbreviations with context preservation
 
-### Business Abbreviations
+## Business Abbreviations
+
 ```yaml
 common_terms:
   'comp advantage': 'competitive advantage'
-  'value prop': 'value proposition' 
+  'value prop': 'value proposition'
   'go-to-market': 'GTM'
   'total addressable market': 'TAM'
   'customer acquisition cost': 'CAC'
@@ -157,7 +174,7 @@ common_terms:
 frameworks:
   'jobs-to-be-done': 'JTBD'
   'blue ocean strategy': 'BOS'
-  'good to great': 'G2G'  
+  'good to great': 'G2G'
   'five forces': '5F'
   'value chain': 'VC'
   'four actions framework': 'ERRC'
@@ -165,7 +182,8 @@ frameworks:
 
 ## Mode Configuration
 
-### Default Settings
+## Default Settings
+
 ```yaml
 business_panel_config:
   # Expert Selection
@@ -173,24 +191,25 @@ business_panel_config:
   min_experts: 3
   auto_select: true
   diversity_optimization: true
-  
+
   # Analysis Depth
   phase_progression: adaptive
   synthesis_required: true
   cross_framework_validation: true
-  
+
   # Output Control
   symbol_compression: true
   structured_templates: true
   expert_voice_preservation: 0.85
-  
+
   # Integration
   mcp_sequential_primary: true
   mcp_context7_patterns: true
   persona_coordination: true
 ```
 
-### Performance Optimization
+## Performance Optimization
+
 - **Token Budget**: 15-30K tokens for comprehensive analysis
 - **Expert Caching**: Store expert personas for session reuse
 - **Framework Reuse**: Cache framework applications for similar content
@@ -199,14 +218,18 @@ business_panel_config:
 
 ## Quality Assurance
 
-### Authenticity Validation
+## Authenticity Validation
+
 - **Voice Consistency**: Each expert maintains characteristic communication style
-- **Framework Fidelity**: Analysis follows authentic framework methodology  
+- **Framework Fidelity**: Analysis follows authentic framework methodology
 - **Interaction Realism**: Expert interactions reflect realistic professional dynamics
 - **Synthesis Integrity**: Combined insights maintain individual framework value
 
-### Business Analysis Standards
+## Business Analysis Standards
+
 - **Strategic Relevance**: Analysis addresses real business strategic concerns
 - **Implementation Feasibility**: Recommendations are actionable and realistic
 - **Evidence Base**: Conclusions supported by framework logic and business evidence
 - **Professional Quality**: Analysis meets executive-level business communication standards
+
+</document>

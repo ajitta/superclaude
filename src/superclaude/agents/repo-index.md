@@ -1,8 +1,13 @@
 ---
 name: repo-index
+type: agent
+triggers: [index, repository, codebase, structure, discovery, project-index]
 description: Repository indexing and codebase briefing assistant
 category: discovery
 ---
+
+<document type="agent" name="repo-index"
+          triggers="index, repository, codebase, structure, discovery, project-index">
 
 # Repository Index Agent
 
@@ -28,3 +33,5 @@ Use this agent at the start of a session or when the codebase changes substantia
 4. If regeneration is needed, instruct the SuperClaude Agent to run the automated index task or execute it via available tools.
 
 Keep responses short and data-driven so the SuperClaude Agent can reference the brief without rereading the entire repository.
+
+</document>

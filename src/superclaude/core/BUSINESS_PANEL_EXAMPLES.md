@@ -1,25 +1,39 @@
+---
+name: business-panel-examples
+type: core
+triggers: [business-panel, example, usage, workflow, integration]
+description: Usage examples and integration patterns for business panel
+priority: low
+---
+
+<document type="core" name="business-panel-examples"
+          triggers="business-panel, example, usage, workflow, integration">
+
 # BUSINESS_PANEL_EXAMPLES.md - Usage Examples and Integration Patterns
 
 ## Basic Usage Examples
 
-### Example 1: Strategic Plan Analysis
+## Example 1: Strategic Plan Analysis
+
 ```bash
 /sc:business-panel @strategy_doc.pdf
 
 # Output: Discussion mode with Porter, Collins, Meadows, Doumont
-# Analysis focuses on competitive positioning, organizational capability, 
+# Analysis focuses on competitive positioning, organizational capability,
 # system dynamics, and communication clarity
 ```
 
-### Example 2: Innovation Assessment  
+## Example 2: Innovation Assessment
+
 ```bash
 /sc:business-panel "We're developing AI-powered customer service" --experts "christensen,drucker,godin"
 
-# Output: Discussion mode focusing on jobs-to-be-done, customer value, 
+# Output: Discussion mode focusing on jobs-to-be-done, customer value,
 # and remarkability/tribe building
 ```
 
-### Example 3: Risk Analysis with Debate
+## Example 3: Risk Analysis with Debate
+
 ```bash
 /sc:business-panel @risk_assessment.md --mode debate
 
@@ -27,7 +41,8 @@
 # other experts defending their frameworks, systems perspective on conflicts
 ```
 
-### Example 4: Strategic Learning Session
+## Example 4: Strategic Learning Session
+
 ```bash
 /sc:business-panel "Help me understand competitive strategy" --mode socratic
 
@@ -37,21 +52,24 @@
 
 ## Advanced Usage Patterns
 
-### Multi-Document Analysis
+## Multi-Document Analysis
+
 ```bash
 /sc:business-panel @market_research.pdf @competitor_analysis.xlsx @financial_projections.csv --synthesis-only
 
 # Comprehensive analysis across multiple documents with focus on synthesis
 ```
 
-### Domain-Specific Analysis
+## Domain-Specific Analysis
+
 ```bash
 /sc:business-panel @product_strategy.md --focus "innovation" --experts "christensen,drucker,meadows"
 
 # Innovation-focused analysis with disruption theory, management principles, systems thinking
 ```
 
-### Structured Communication Focus
+## Structured Communication Focus
+
 ```bash
 /sc:business-panel @exec_presentation.pptx --focus "communication" --structured
 
@@ -60,21 +78,24 @@
 
 ## Integration with SuperClaude Commands
 
-### Combined with /analyze
+## Combined with /analyze
+
 ```bash
 /analyze @business_model.md --business-panel
 
 # Technical analysis followed by business expert panel review
 ```
 
-### Combined with /improve  
+## Combined with /improve
+
 ```bash
 /improve @strategy_doc.md --business-panel --iterative
 
 # Iterative improvement with business expert validation
 ```
 
-### Combined with /design
+## Combined with /design
+
 ```bash
 /design business-model --business-panel --experts "drucker,porter,kim_mauborgne"
 
@@ -83,14 +104,15 @@
 
 ## Expert Selection Strategies
 
-### By Business Domain
+## By Business Domain
+
 ```yaml
 strategy_planning:
   experts: ['porter', 'kim_mauborgne', 'collins', 'meadows']
   rationale: "Competitive analysis, blue ocean opportunities, execution excellence, systems thinking"
 
 innovation_management:
-  experts: ['christensen', 'drucker', 'godin', 'meadows']  
+  experts: ['christensen', 'drucker', 'godin', 'meadows']
   rationale: "Disruption theory, systematic innovation, remarkability, systems approach"
 
 organizational_development:
@@ -110,16 +132,17 @@ business_model_design:
   rationale: "Value creation, customer focus, value innovation, system dynamics"
 ```
 
-### By Analysis Type
+## By Analysis Type
+
 ```yaml
 comprehensive_audit:
   experts: "all"
   mode: "discussion → debate → synthesis"
-  
+
 strategic_validation:
   experts: ['porter', 'collins', 'taleb']
   mode: "debate"
-  
+
 learning_facilitation:
   experts: ['drucker', 'meadows', 'doumont']
   mode: "socratic"
@@ -132,20 +155,22 @@ quick_assessment:
 
 ## Output Format Variations
 
-### Executive Summary Format
+## Executive Summary Format
+
 ```bash
 /sc:business-panel @doc.pdf --structured --synthesis-only
 
 # Output:
 ## 🎯 Strategic Assessment
 **💰 Financial Impact**: [Key economic drivers]
-**🏆 Competitive Position**: [Advantage analysis]  
+**🏆 Competitive Position**: [Advantage analysis]
 **📈 Growth Opportunities**: [Expansion potential]
 **⚠️ Risk Factors**: [Critical threats]
 **🧩 Synthesis**: [Integrated recommendation]
 ```
 
-### Framework-by-Framework Format  
+## Framework-by-Framework Format
+
 ```bash
 /sc:business-panel @doc.pdf --verbose
 
@@ -153,14 +178,15 @@ quick_assessment:
 ## 📚 CHRISTENSEN - Disruption Analysis
 [Detailed jobs-to-be-done and disruption assessment]
 
-## 📊 PORTER - Competitive Strategy  
+## 📊 PORTER - Competitive Strategy
 [Five forces and value chain analysis]
 
 ## 🧩 Cross-Framework Synthesis
 [Integration and strategic implications]
 ```
 
-### Question-Driven Format
+## Question-Driven Format
+
 ```bash
 /sc:business-panel @doc.pdf --questions
 
@@ -169,7 +195,7 @@ quick_assessment:
 **🔨 Innovation Questions** (Christensen):
 - What job is this being hired to do?
 
-**⚔️ Competitive Questions** (Porter):  
+**⚔️ Competitive Questions** (Porter):
 - What are the sustainable advantages?
 
 **🧭 Management Questions** (Drucker):
@@ -178,16 +204,18 @@ quick_assessment:
 
 ## Integration Workflows
 
-### Business Strategy Development
+## Business Strategy Development
+
 ```yaml
 workflow_stages:
   stage_1: "/sc:business-panel @market_research.pdf --mode discussion"
-  stage_2: "/sc:business-panel @competitive_analysis.md --mode debate"  
+  stage_2: "/sc:business-panel @competitive_analysis.md --mode debate"
   stage_3: "/sc:business-panel 'synthesize findings' --mode socratic"
   stage_4: "/design strategy --business-panel --experts 'porter,kim_mauborgne'"
 ```
 
-### Innovation Pipeline Assessment
+## Innovation Pipeline Assessment
+
 ```yaml
 workflow_stages:
   stage_1: "/sc:business-panel @innovation_portfolio.xlsx --focus innovation"
@@ -195,8 +223,9 @@ workflow_stages:
   stage_3: "/analyze @market_opportunities.pdf --business-panel --think"
 ```
 
-### Risk Management Review
-```yaml  
+## Risk Management Review
+
+```yaml
 workflow_stages:
   stage_1: "/sc:business-panel @risk_register.pdf --experts 'taleb,meadows,porter'"
   stage_2: "/sc:business-panel 'challenge risk assumptions' --mode debate"
@@ -205,18 +234,20 @@ workflow_stages:
 
 ## Customization Options
 
-### Expert Behavior Modification
+## Expert Behavior Modification
+
 ```bash
 # Focus specific expert on particular aspect
 /sc:business-panel @doc.pdf --christensen-focus "disruption-potential"
 /sc:business-panel @doc.pdf --porter-focus "competitive-moats"
 
-# Adjust expert interaction style  
+# Adjust expert interaction style
 /sc:business-panel @doc.pdf --interaction "collaborative" # softer debate mode
 /sc:business-panel @doc.pdf --interaction "challenging" # stronger debate mode
 ```
 
-### Output Customization
+## Output Customization
+
 ```bash
 # Symbol density control
 /sc:business-panel @doc.pdf --symbols minimal  # reduce symbol usage
@@ -227,12 +258,13 @@ workflow_stages:
 /sc:business-panel @doc.pdf --depth detailed   # comprehensive analysis
 ```
 
-### Time and Resource Management
+## Time and Resource Management
+
 ```bash
 # Quick analysis for time constraints
 /sc:business-panel @doc.pdf --quick --experts-max 3
 
-# Comprehensive analysis for important decisions  
+# Comprehensive analysis for important decisions
 /sc:business-panel @doc.pdf --comprehensive --all-experts
 
 # Resource-aware analysis
@@ -241,7 +273,8 @@ workflow_stages:
 
 ## Quality Validation
 
-### Analysis Quality Checks
+## Analysis Quality Checks
+
 ```yaml
 authenticity_validation:
   voice_consistency: "Each expert maintains characteristic style"
@@ -249,7 +282,7 @@ authenticity_validation:
   interaction_realism: "Expert dynamics reflect professional patterns"
 
 business_relevance:
-  strategic_focus: "Analysis addresses real strategic concerns"  
+  strategic_focus: "Analysis addresses real strategic concerns"
   actionable_insights: "Recommendations are implementable"
   evidence_based: "Conclusions supported by framework logic"
 
@@ -259,7 +292,8 @@ integration_quality:
   practical_utility: "Results support strategic decision-making"
 ```
 
-### Performance Standards
+## Performance Standards
+
 ```yaml
 response_time:
   simple_analysis: "< 30 seconds"
@@ -268,7 +302,7 @@ response_time:
 
 token_efficiency:
   discussion_mode: "8-15K tokens"
-  debate_mode: "10-20K tokens"  
+  debate_mode: "10-20K tokens"
   socratic_mode: "12-25K tokens"
   synthesis_only: "3-8K tokens"
 
@@ -277,3 +311,5 @@ accuracy_targets:
   strategic_relevance: "> 85%"
   actionable_insights: "> 80%"
 ```
+
+</document>

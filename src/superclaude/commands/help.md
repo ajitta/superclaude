@@ -1,11 +1,16 @@
 ---
 name: help
+type: command
+triggers: [/sc:help, help, commands, reference, documentation]
 description: "List all available /sc commands and their functionality"
 category: utility
 complexity: low
 mcp-servers: []
 personas: []
 ---
+
+<document type="command" name="help"
+          triggers="/sc:help, help, commands, reference, documentation">
 
 # /sc:help - Command Reference Documentation
 
@@ -55,7 +60,7 @@ Here is a complete list of all available SuperClaude (`/sc`) commands.
 
 SuperClaude supports behavioral flags to enable specific execution modes and tool selection patterns. Use these flags with any `/sc` command to customize behavior.
 
-### Mode Activation Flags
+## Mode Activation Flags
 
 | Flag | Trigger | Behavior |
 |------|---------|----------|
@@ -65,7 +70,7 @@ SuperClaude supports behavioral flags to enable specific execution modes and too
 | `--orchestrate` | Multi-tool operations, parallel execution | Optimize tool selection matrix, enable parallel thinking |
 | `--token-efficient` | Context usage >75%, large-scale operations | Symbol-enhanced communication, 30-50% token reduction |
 
-### MCP Server Flags
+## MCP Server Flags
 
 | Flag | Trigger | Behavior |
 |------|---------|----------|
@@ -78,7 +83,7 @@ SuperClaude supports behavioral flags to enable specific execution modes and too
 | `--all-mcp` | Maximum complexity scenarios | Enable all MCP servers for comprehensive capability |
 | `--no-mcp` | Native-only execution needs | Disable all MCP servers, use native tools |
 
-### Analysis Depth Flags
+## Analysis Depth Flags
 
 | Flag | Trigger | Behavior |
 |------|---------|----------|
@@ -86,7 +91,7 @@ SuperClaude supports behavioral flags to enable specific execution modes and too
 | `--think-hard` | Architectural analysis, system-wide dependencies | Deep analysis (~10K tokens), enables Sequential + Context7 |
 | `--ultrathink` | Critical system redesign, legacy modernization | Maximum depth analysis (~32K tokens), enables all MCP servers |
 
-### Execution Control Flags
+## Execution Control Flags
 
 | Flag | Trigger | Behavior |
 |------|---------|----------|
@@ -97,7 +102,7 @@ SuperClaude supports behavioral flags to enable specific execution modes and too
 | `--validate` | Risk score >0.7, resource usage >75% | Pre-execution risk assessment and validation gates |
 | `--safe-mode` | Resource usage >85%, production environment | Maximum validation, conservative execution |
 
-### Output Optimization Flags
+## Output Optimization Flags
 
 | Flag | Trigger | Behavior |
 |------|---------|----------|
@@ -105,7 +110,7 @@ SuperClaude supports behavioral flags to enable specific execution modes and too
 | `--scope [file\|module\|project\|system]` | Analysis boundary needs | Define operational scope and analysis depth |
 | `--focus [performance\|security\|quality\|architecture\|accessibility\|testing]` | Domain-specific optimization | Target specific analysis domain and expertise application |
 
-### Flag Priority Rules
+## Flag Priority Rules
 
 - **Safety First**: `--safe-mode` > `--validate` > optimization flags
 - **Explicit Override**: User flags > auto-detection
@@ -113,7 +118,7 @@ SuperClaude supports behavioral flags to enable specific execution modes and too
 - **MCP Control**: `--no-mcp` overrides all individual MCP flags
 - **Scope Precedence**: system > project > module > file
 
-### Usage Examples
+## Usage Examples
 
 ```bash
 # Deep analysis with Context7 enabled
@@ -146,3 +151,5 @@ SuperClaude supports behavioral flags to enable specific execution modes and too
 ---
 
 **Note:** This list is manually generated and may become outdated. If you suspect it is inaccurate, please consider regenerating it or contacting a maintainer.
+
+</document>

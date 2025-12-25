@@ -1,3 +1,11 @@
+---
+name: superclaude
+type: manifest
+version: 4.1.9
+description: Bootstrap manifest for SuperClaude components
+category: core
+---
+
 <document type="manifest" name="superclaude" version="4.1.9">
 
 # SuperClaude Framework Configuration

@@ -1,4 +1,15 @@
-<document type="core" name="rules" priority="critical">
+---
+name: rules
+type: core
+triggers: [rules, behavior, compliance, standards, guidelines]
+description: Claude Code behavioral rules for framework operation
+category: core
+priority: critical
+---
+
+<document type="core" name="rules"
+          triggers="rules, behavior, compliance, standards, guidelines"
+          priority="critical">
 
 # Claude Code Behavioral Rules
 

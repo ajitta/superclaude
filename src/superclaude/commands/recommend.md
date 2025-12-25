@@ -1,8 +1,16 @@
 ---
-name: sc:recommend
-description: Ultra-intelligent command recommendation engine - recommends the most suitable SuperClaude commands for any user input
+name: recommend
+type: command
+triggers: [/sc:recommend, command-recommendation, suggest-command, help-choose]
+description: "Ultra-intelligent command recommendation engine - recommends the most suitable SuperClaude commands for any user input"
 category: utility
+complexity: standard
+mcp-servers: []
+personas: []
 ---
+
+<document type="command" name="recommend"
+          triggers="/sc:recommend, command-recommendation, suggest-command, help-choose">
 
 # SuperClaude Intelligent Command Recommender
 
@@ -16,7 +24,7 @@ category: utility
 
 ## Multi-language Support
 
-### Language Detection and Translation System
+## Language Detection and Translation System
 
 ```yaml
 language_mapping:
@@ -41,7 +49,7 @@ language_mapping:
     help_words: ["help", "suggest", "recommend", "learn"]
 ```
 
-### Language Detection Algorithm
+## Language Detection Algorithm
 
 ```python
 def detect_language_and_translate(input_text):
@@ -56,7 +64,7 @@ def detect_language_and_translate(input_text):
     return "en"  # Default to English
 ```
 
-### Multi-language Examples
+## Multi-language Examples
 
 ```bash
 # Turkish examples
@@ -77,7 +85,7 @@ def detect_language_and_translate(input_text):
 
 ## SuperClaude Integrated Recommendation Engine
 
-### 1. Keyword Extraction and Persona Matching
+## 1. Keyword Extraction and Persona Matching
 ```yaml
 keyword_extraction:
   pattern_matching:
@@ -112,7 +120,7 @@ keyword_extraction:
     - "next step|what now" → next_step_mode + --think
 ```
 
-### 2. SuperClaude Command Map
+## 2. SuperClaude Command Map
 ```yaml
 category_mapping:
   ml_category:
@@ -186,7 +194,7 @@ category_mapping:
     flags: ["--examples", "--visual", "--interactive"]
 ```
 
-### 3. Expertise Level Detection and Customization
+## 3. Expertise Level Detection and Customization
 ```yaml
 expertise_levels:
   beginner:
@@ -360,7 +368,7 @@ standard_response_format:
 
 ## Step 3: Project Context Detection System
 
-### Project Type Detection Algorithm
+## Project Type Detection Algorithm
 
 ```yaml
 project_detection:
@@ -417,7 +425,7 @@ project_detection:
       recommended_approach: "comprehensive analysis -> design -> implement"
 ```
 
-### Context-Aware Examples
+## Context-Aware Examples
 
 ```bash
 /sc:recommend "I need to add a new feature"
@@ -467,7 +475,7 @@ project_detection:
 
 ## Step 4: Real-Time Streaming Mode
 
-### Continuous Recommendation System
+## Continuous Recommendation System
 
 ```yaml
 streaming_mode:
@@ -493,7 +501,7 @@ streaming_mode:
       project_complete: true
 ```
 
-### Streaming Example
+## Streaming Example
 
 ```bash
 /sc:recommend --stream "I'm building a new e-commerce site"
@@ -515,7 +523,7 @@ streaming_mode:
 
 ## Step 5: Alternative Recommendation Engine
 
-### Multiple Option Presentation
+## Multiple Option Presentation
 
 ```yaml
 alternative_engine:
@@ -537,7 +545,7 @@ alternative_engine:
       testing: ["Unit", "Integration", "E2E", "Performance"]
 ```
 
-### Alternative Example
+## Alternative Example
 
 ```bash
 /sc:recommend --alternatives "new blog site"
@@ -577,7 +585,7 @@ alternative_engine:
 
 ## Step 6: Time and Budget Estimation System
 
-### Intelligent Estimation Algorithm
+## Intelligent Estimation Algorithm
 
 ```yaml
 estimation_engine:
@@ -617,7 +625,7 @@ estimation_engine:
       deployment: 5-15% of total time
 ```
 
-### Estimation Examples
+## Estimation Examples
 
 ```bash
 /sc:recommend "I'm developing a classification model" --estimate
@@ -690,7 +698,7 @@ estimation_engine:
 
 ## Step 7: Smart Flag Recommendation System
 
-### Context-Based Flag Recommendations
+## Context-Based Flag Recommendations
 
 ```yaml
 smart_flag_engine:
@@ -729,7 +737,7 @@ smart_flag_engine:
       mobile_project: "--offline --sync --battery-optimized"
 ```
 
-### Smart Flag Examples
+## Smart Flag Examples
 
 ```bash
 /sc:recommend "performance improvement"
@@ -781,7 +789,7 @@ smart_flag_engine:
 
 ## Step 8: Community Patterns and Final Integration
 
-### Community Data-Based Recommendations
+## Community Data-Based Recommendations
 
 ```yaml
 community_patterns:
@@ -830,7 +838,7 @@ community_patterns:
       security_first: "67% prioritize security early"
 ```
 
-### Final Command Integration
+## Final Command Integration
 
 ```yaml
 recommend_command_implementation:
@@ -865,7 +873,7 @@ recommend_command_implementation:
       - 🔄 Continuous flow (with --stream)
 ```
 
-### Comprehensive Final Example
+## Comprehensive Final Example
 
 ```bash
 /sc:recommend "I'm building an e-commerce site" --estimate --alternatives --community
@@ -1003,3 +1011,5 @@ You'll receive automatic recommendations at each stage! 🚀
 ```
 
 **Ultra-intelligent command recommender ready! 🎉**
+
+</document>

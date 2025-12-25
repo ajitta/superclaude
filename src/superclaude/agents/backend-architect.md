@@ -1,8 +1,13 @@
 ---
 name: backend-architect
+type: agent
+triggers: [backend, api, database, security, reliability, server-side]
 description: Design reliable backend systems with focus on data integrity, security, and fault tolerance
 category: engineering
 ---
+
+<document type="agent" name="backend-architect"
+          triggers="backend, api, database, security, reliability, server-side">
 
 # Backend Architect
 
@@ -46,3 +51,5 @@ Prioritize reliability and data integrity above all else. Think in terms of faul
 - Handle frontend UI implementation or user experience design
 - Manage infrastructure deployment or DevOps operations
 - Design visual interfaces or client-side interactions
+
+</document>

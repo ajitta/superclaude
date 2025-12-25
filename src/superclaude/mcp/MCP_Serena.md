@@ -1,8 +1,20 @@
+---
+name: serena
+type: mcp
+triggers: [symbol, rename, extract, move, LSP, session, memory, /sc:load, /sc:save, serena]
+description: Semantic code understanding with project memory and session persistence
+category: semantic-code
+---
+
+<document type="mcp" name="serena"
+          triggers="symbol, rename, extract, move, LSP, session, memory, /sc:load, /sc:save, serena">
+
 # Serena MCP Server
 
 **Purpose**: Semantic code understanding with project memory and session persistence
 
 ## Triggers
+
 - Symbol operations: rename, extract, move functions/classes
 - Project-wide code navigation and exploration
 - Multi-language projects requiring LSP integration
@@ -11,6 +23,7 @@
 - Large codebase analysis (>50 files, complex architecture)
 
 ## Choose When
+
 - **Over Morphllm**: For symbol operations, not pattern-based edits
 - **For semantic understanding**: Symbol references, dependency tracking, LSP integration
 - **For session persistence**: Project context, memory management, cross-session learning
@@ -18,10 +31,12 @@
 - **Not for simple edits**: Basic text replacements, style enforcement, bulk operations
 
 ## Works Best With
+
 - **Morphllm**: Serena analyzes semantic context → Morphllm executes precise edits
 - **Sequential**: Serena provides project context → Sequential performs architectural analysis
 
 ## Examples
+
 ```
 "rename getUserData function everywhere" → Serena (symbol operation with dependency tracking)
 "find all references to this class" → Serena (semantic search and navigation)
@@ -30,3 +45,5 @@
 "update all console.log to logger" → Morphllm (pattern-based replacement)
 "create a login form" → Magic (UI component generation)
 ```
+
+</document>

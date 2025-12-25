@@ -1,11 +1,16 @@
 ---
 name: improve
+type: command
+triggers: [/sc:improve, improvement, refactor, optimization, quality]
 description: "Apply systematic improvements to code quality, performance, and maintainability"
 category: workflow
 complexity: standard
 mcp-servers: [sequential, context7]
 personas: [architect, performance, quality, security]
 ---
+
+<document type="command" name="improve"
+          triggers="/sc:improve, improvement, refactor, optimization, quality">
 
 # /sc:improve - Code Improvement
 
@@ -91,4 +96,6 @@ Key behaviors:
 - Apply risky improvements without proper analysis and user confirmation
 - Make architectural changes without understanding full system impact
 - Override established coding standards or project-specific conventions
+
+</document>
 

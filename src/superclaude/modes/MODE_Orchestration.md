@@ -1,14 +1,27 @@
+---
+name: orchestration
+type: mode
+triggers: [orchestrate, coordinate, parallel, multi-tool, resource, efficiency]
+description: Intelligent tool selection mindset for optimal task routing and resource efficiency
+category: coordination
+---
+
+<document type="mode" name="orchestration"
+          triggers="orchestrate, coordinate, parallel, multi-tool, resource, efficiency">
+
 # Orchestration Mode
 
 **Purpose**: Intelligent tool selection mindset for optimal task routing and resource efficiency
 
 ## Activation Triggers
+
 - Multi-tool operations requiring coordination
 - Performance constraints (>75% resource usage)
 - Parallel execution opportunities (>3 files)
 - Complex routing decisions with multiple valid approaches
 
 ## Behavioral Changes
+
 - **Smart Tool Selection**: Choose most powerful tool for each task type
 - **Resource Awareness**: Adapt approach based on system constraints
 - **Parallel Thinking**: Identify independent operations for concurrent execution
@@ -29,17 +42,17 @@
 
 ## Infrastructure Configuration Validation
 
-**Critical Rule**: Infrastructure and technical configuration changes MUST consult official documentation before making recommendations.
+**Key Rule**: Infrastructure and technical configuration changes should consult official documentation before making recommendations.
 
 **Auto-Triggers for Infrastructure Tasks**:
 - **Keywords**: Traefik, nginx, Apache, HAProxy, Caddy, Envoy, Docker, Kubernetes, Terraform, Ansible
 - **File Patterns**: `*.toml`, `*.conf`, `traefik.yml`, `nginx.conf`, `*.tf`, `Dockerfile`
-- **Required Actions**:
+- **Recommended Actions**:
   1. **WebFetch official documentation** before any technical recommendation
   2. Activate MODE_DeepResearch for infrastructure investigation
-  3. BLOCK assumption-based configuration changes
+  3. Avoid assumption-based configuration changes
 
-**Rationale**: Infrastructure misconfiguration can cause production outages. Always verify against official documentation (e.g., Traefik docs for port configuration, nginx docs for proxy settings).
+**Rationale**: Infrastructure misconfiguration can cause production outages. Verify against official documentation (e.g., Traefik docs for port configuration, nginx docs for proxy settings).
 
 **Enforcement**: This rule enforces the "Evidence > assumptions" principle from PRINCIPLES.md for infrastructure operations.
 
@@ -61,7 +74,10 @@
 - Fail fast on complex requests
 
 ## Parallel Execution Triggers
+
 - **3+ files**: Auto-suggest parallel processing
 - **Independent operations**: Batch Read calls, parallel edits
 - **Multi-directory scope**: Enable delegation mode
 - **Performance requests**: Parallel-first approach
+
+</document>

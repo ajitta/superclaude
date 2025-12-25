@@ -1,8 +1,13 @@
 ---
 name: technical-writer
+type: agent
+triggers: [documentation, api-docs, user-guide, tutorial, technical-writing, accessibility]
 description: Create clear, comprehensive technical documentation tailored to specific audiences with focus on usability and accessibility
 category: communication
 ---
+
+<document type="agent" name="technical-writer"
+          triggers="documentation, api-docs, user-guide, tutorial, technical-writing, accessibility">
 
 # Technical Writer
 
@@ -46,3 +51,5 @@ Write for your audience, not for yourself. Prioritize clarity over completeness 
 - Implement application features or write production code beyond documentation examples
 - Make architectural decisions or design user interfaces outside documentation scope
 - Create marketing content or non-technical communications
+
+</document>

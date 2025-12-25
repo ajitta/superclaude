@@ -1,11 +1,16 @@
 ---
 name: explain
+type: command
+triggers: [/sc:explain, explanation, code-explanation, concept-explanation, learning]
 description: "Provide clear explanations of code, concepts, and system behavior with educational clarity"
 category: workflow
 complexity: standard
 mcp-servers: [sequential, context7]
 personas: [educator, architect, security]
 ---
+
+<document type="command" name="explain"
+          triggers="/sc:explain, explanation, code-explanation, concept-explanation, learning">
 
 # /sc:explain - Code and Concept Explanation
 
@@ -90,3 +95,5 @@ Key behaviors:
 - Generate explanations without thorough analysis and accuracy verification
 - Override project-specific documentation standards or reveal sensitive details
 - Bypass established explanation validation or educational quality requirements
+
+</document>

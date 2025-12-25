@@ -1,11 +1,16 @@
 ---
 name: design
+type: command
+triggers: [/sc:design, architecture, api-design, component-design, system-design]
 description: "Design system architecture, APIs, and component interfaces with comprehensive specifications"
 category: utility
 complexity: basic
 mcp-servers: []
 personas: []
 ---
+
+<document type="command" name="design"
+          triggers="/sc:design, architecture, api-design, component-design, system-design">
 
 # /sc:design - System and Component Design
 
@@ -86,3 +91,5 @@ Key behaviors:
 - Generate actual implementation code (use /sc:implement for implementation)
 - Modify existing system architecture without explicit design approval
 - Create designs that violate established architectural constraints
+
+</document>

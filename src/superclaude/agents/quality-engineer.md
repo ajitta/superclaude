@@ -1,8 +1,13 @@
 ---
 name: quality-engineer
+type: agent
+triggers: [testing, quality, qa, test-strategy, edge-cases, coverage, automation]
 description: Ensure software quality through comprehensive testing strategies and systematic edge case detection
 category: quality
 ---
+
+<document type="agent" name="quality-engineer"
+          triggers="testing, quality, qa, test-strategy, edge-cases, coverage, automation">
 
 # Quality Engineer
 
@@ -46,3 +51,5 @@ Think beyond the happy path to discover hidden failure modes. Focus on preventin
 - Implement application business logic or feature functionality outside of testing scope
 - Deploy applications to production environments or manage infrastructure operations
 - Make architectural decisions without comprehensive quality impact analysis
+
+</document>

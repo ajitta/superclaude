@@ -1,8 +1,20 @@
+---
+name: task-management
+type: mode
+triggers: [task, manage, delegate, phase, milestone, --task-manage]
+description: Hierarchical task organization with persistent memory for complex operations
+category: organization
+---
+
+<document type="mode" name="task-management"
+          triggers="task, manage, delegate, phase, milestone, --task-manage">
+
 # Task Management Mode
 
 **Purpose**: Hierarchical task organization with persistent memory for complex multi-step operations
 
 ## Activation Triggers
+
 - Operations with >3 steps requiring coordination
 - Multiple file/directory scope (>2 directories OR >3 files)
 - Complex dependencies requiring phases
@@ -18,14 +30,16 @@
 
 ## Memory Operations
 
-### Session Start
+## Session Start
+
 ```
 1. list_memories() → Show existing task state
 2. read_memory("current_plan") → Resume context
 3. think_about_collected_information() → Understand where we left off
 ```
 
-### During Execution
+## During Execution
+
 ```
 1. write_memory("task_2.1", "completed: auth middleware")
 2. think_about_task_adherence() → Verify on track
@@ -33,7 +47,8 @@
 4. write_memory("checkpoint", current_state) every 30min
 ```
 
-### Session End
+## Session End
+
 ```
 1. think_about_whether_you_are_done() → Assess completion
 2. write_memory("session_summary", outcomes)
@@ -43,7 +58,7 @@
 ## Execution Pattern
 
 1. **Load**: list_memories() → read_memory() → Resume state
-2. **Plan**: Create hierarchy → write_memory() for each level  
+2. **Plan**: Create hierarchy → write_memory() for each level
 3. **Track**: TodoWrite + memory updates in parallel
 4. **Execute**: Update memories as tasks complete
 5. **Checkpoint**: Periodic write_memory() for state preservation
@@ -73,7 +88,8 @@ decisions: Key architectural/design choices made
 
 ## Examples
 
-### Session 1: Start Authentication Task
+## Session 1: Start Authentication Task
+
 ```
 list_memories() → Empty
 write_memory("plan_auth", "Implement JWT authentication system")
@@ -83,7 +99,8 @@ TodoWrite: Create 5 specific todos
 Execute task 1.1 → write_memory("task_1.1", "completed: Found 3 patterns")
 ```
 
-### Session 2: Resume After Interruption
+## Session 2: Resume After Interruption
+
 ```
 list_memories() → Shows plan_auth, phase_1, task_1.1
 read_memory("plan_auth") → "Implement JWT authentication system"
@@ -93,7 +110,8 @@ write_memory("phase_2", "Implementation - middleware and endpoints")
 Continue with implementation tasks...
 ```
 
-### Session 3: Completion Check
+## Session 3: Completion Check
+
 ```
 think_about_whether_you_are_done() → "Testing phase remains incomplete"
 Complete remaining testing tasks
@@ -101,3 +119,5 @@ write_memory("outcome_auth", "Successfully implemented with 95% test coverage")
 delete_memory("checkpoint_*") → Clean temporary states
 write_memory("session_summary", "Auth system complete and validated")
 ```
+
+</document>

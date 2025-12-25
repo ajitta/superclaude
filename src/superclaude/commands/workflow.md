@@ -1,11 +1,16 @@
 ---
 name: workflow
+type: command
+triggers: [/sc:workflow, prd-analysis, implementation-planning, workflow-generation]
 description: "Generate structured implementation workflows from PRDs and feature requirements"
 category: orchestration
 complexity: advanced
 mcp-servers: [sequential, context7, magic, playwright, morphllm, serena]
 personas: [architect, analyzer, frontend, backend, security, devops, project-manager]
 ---
+
+<document type="command" name="workflow"
+          triggers="/sc:workflow, prd-analysis, implementation-planning, workflow-generation">
 
 # /sc:workflow - Implementation Workflow Generator
 
@@ -94,4 +99,6 @@ Key behaviors:
 **Will Not:**
 - Execute actual implementation tasks beyond workflow planning and strategy
 - Override established development processes without proper analysis and validation
-- Generate workflows without comprehensive requirement analysis and dependency mapping 
+- Generate workflows without comprehensive requirement analysis and dependency mapping
+
+</document> 
