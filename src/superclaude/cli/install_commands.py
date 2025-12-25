@@ -4,11 +4,16 @@ SuperClaude Installation
 Installs all SuperClaude components to ~/.claude/ directory:
 - commands/sc/     : Slash commands
 - superclaude/     : Framework files (agents, core, modes, mcp, skills)
+- CLAUDE.md        : Auto-configured to import CLAUDE_SC.md
 """
 
+import re
 import shutil
 from pathlib import Path
 from typing import Dict, List, Tuple
+
+# Import line to add to CLAUDE.md
+CLAUDE_SC_IMPORT = "@superclaude/CLAUDE_SC.md"
 
 # Component definitions: (source_subdir, target_subdir, description)
 COMPONENTS = {
@@ -172,6 +177,92 @@ def install_claude_sc_md(base_path: Path = None, force: bool = False) -> Tuple[b
         return False, f"Failed to install CLAUDE_SC.md: {e}"
 
 
+def check_claude_md_import(base_path: Path = None) -> Tuple[bool, str]:
+    """
+    Check if ~/.claude/CLAUDE.md has the CLAUDE_SC.md import.
+
+    Args:
+        base_path: Base installation path
+
+    Returns:
+        Tuple of (has_import: bool, status_message: str)
+    """
+    if base_path is None:
+        base_path = Path.home() / ".claude"
+
+    claude_md = base_path / "CLAUDE.md"
+
+    if not claude_md.exists():
+        return False, "CLAUDE.md not found"
+
+    content = claude_md.read_text(encoding="utf-8")
+
+    # Check for import pattern (with or without leading @)
+    patterns = [
+        r"@superclaude/CLAUDE_SC\.md",
+        r"@superclaude\\CLAUDE_SC\.md",  # Windows path
+    ]
+
+    for pattern in patterns:
+        if re.search(pattern, content):
+            return True, "CLAUDE.md already imports CLAUDE_SC.md"
+
+    return False, "CLAUDE.md does not import CLAUDE_SC.md"
+
+
+def update_claude_md_import(base_path: Path = None, force: bool = False) -> Tuple[bool, str]:
+    """
+    Add CLAUDE_SC.md import to ~/.claude/CLAUDE.md if not present.
+
+    Args:
+        base_path: Base installation path
+        force: Force update even if import exists
+
+    Returns:
+        Tuple of (success: bool, message: str)
+    """
+    if base_path is None:
+        base_path = Path.home() / ".claude"
+
+    claude_md = base_path / "CLAUDE.md"
+
+    # Check if already has import
+    has_import, status = check_claude_md_import(base_path)
+
+    if has_import and not force:
+        return True, status
+
+    # Create or update CLAUDE.md
+    if claude_md.exists():
+        content = claude_md.read_text(encoding="utf-8")
+
+        # If force, replace any existing superclaude imports
+        if force:
+            # Remove old superclaude imports
+            content = re.sub(r"@superclaude/[^\n]+\n?", "", content)
+            content = re.sub(r"@superclaude\\[^\n]+\n?", "", content)
+
+        # Add import if not present
+        if CLAUDE_SC_IMPORT not in content:
+            # Add at the end with proper spacing
+            if not content.endswith("\n"):
+                content += "\n"
+            content += f"\n# SuperClaude Framework\n{CLAUDE_SC_IMPORT}\n"
+
+        claude_md.write_text(content, encoding="utf-8")
+        return True, "CLAUDE.md updated with CLAUDE_SC.md import"
+    else:
+        # Create new CLAUDE.md
+        content = f"""# Claude Code Configuration
+
+# SuperClaude Framework
+{CLAUDE_SC_IMPORT}
+"""
+        base_path.mkdir(parents=True, exist_ok=True)
+        claude_md.write_text(content, encoding="utf-8")
+        return True, "CLAUDE.md created with CLAUDE_SC.md import"
+
+
 def install_all(base_path: Path = None, force: bool = False) -> Tuple[bool, str]:
     """
     Install all SuperClaude components.
@@ -213,6 +304,20 @@ def install_all(base_path: Path = None, force: bool = False) -> Tuple[bool, str]
     # Install CLAUDE_SC.md
     success, msg = install_claude_sc_md(base_path, force)
     messages.append(f"{'✅' if success else '❌'} {msg}")
+
+    # Check and update CLAUDE.md import
+    messages.append("")
+    has_import, check_msg = check_claude_md_import(base_path)
+    if has_import:
+        messages.append(f"✅ {check_msg}")
+    else:
+        # Try to add the import
+        update_success, update_msg = update_claude_md_import(base_path, force=False)
+        if update_success:
+            messages.append(f"✅ {update_msg}")
+        else:
+            messages.append(f"⚠️  {update_msg}")
+            messages.append(f"   Add manually: {CLAUDE_SC_IMPORT}")
 
     # Summary
     messages.append("")
