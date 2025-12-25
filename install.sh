@@ -7,7 +7,13 @@
 # It performs the following steps:
 #   1. Checks prerequisites (Python 3.10+, UV package manager)
 #   2. Installs SuperClaude package in editable mode
-#   3. Installs 30 slash commands to ~/.claude/commands/
+#   3. Installs all components to ~/.claude/:
+#      - commands/sc/        : 30+ slash commands
+#      - superclaude/agents/ : Agent definitions
+#      - superclaude/core/   : PRINCIPLES, FLAGS, RULES, etc.
+#      - superclaude/modes/  : Behavioral modes
+#      - superclaude/mcp/    : MCP server documentation
+#      - superclaude/skills/ : Skills
 #   4. Verifies installation
 #   5. Provides next steps guidance
 #
@@ -198,7 +204,7 @@ install_package() {
 }
 
 install_commands() {
-    print_step "Installing slash commands..."
+    print_step "Installing SuperClaude components..."
 
     # Check if superclaude command is available
     if ! command -v superclaude &> /dev/null; then
@@ -207,11 +213,18 @@ install_commands() {
         exit 1
     fi
 
-    print_info "Installing 30 slash commands to ~/.claude/commands/sc/"
+    print_info "Installing all components to ~/.claude/"
+    print_info "  - commands/sc/        : Slash commands"
+    print_info "  - superclaude/agents/ : Agent definitions"
+    print_info "  - superclaude/core/   : Core framework"
+    print_info "  - superclaude/modes/  : Behavioral modes"
+    print_info "  - superclaude/mcp/    : MCP documentation"
+    print_info "  - superclaude/skills/ : Skills"
+    echo ""
     if superclaude install; then
-        print_success "Slash commands installed successfully"
+        print_success "All components installed successfully"
     else
-        print_error "Failed to install slash commands"
+        print_error "Failed to install components"
         print_info "Try running manually: superclaude install"
         exit 1
     fi
@@ -233,10 +246,9 @@ verify_installation() {
         print_info "You can run 'superclaude doctor' anytime to check status"
     fi
 
-    # List installed commands
-    print_info "Installed commands:"
-    superclaude install --list | head -n 10
-    echo "   ... and more (30 commands total)"
+    # List all installed components
+    print_info "Installed components:"
+    superclaude install --list-all
 }
 
 ################################################################################
@@ -325,8 +337,8 @@ main() {
     install_package
     echo ""
 
-    # Phase 3: Install commands
-    print_header "⚙️  Phase 3: Installing Slash Commands"
+    # Phase 3: Install all components
+    print_header "⚙️  Phase 3: Installing All Components"
     install_commands
     echo ""
 
@@ -342,8 +354,13 @@ main() {
     echo ""
     print_info "Next Steps:"
     echo "  1. Run health check:        superclaude doctor"
-    echo "  2. View all commands:       superclaude install --list"
-    echo "  3. Try a command:           /sc:help"
+    echo "  2. View all components:     superclaude install --list-all"
+    echo "  3. View commands only:      superclaude install --list"
+    echo "  4. Try a command:           /sc:help"
+    echo ""
+    print_info "Installed locations:"
+    echo "  • Commands:   ~/.claude/commands/sc/"
+    echo "  • Framework:  ~/.claude/superclaude/"
     echo ""
     print_info "Optional - Install MCP Servers for enhanced features:"
     echo "  • List available servers:   superclaude mcp --list"

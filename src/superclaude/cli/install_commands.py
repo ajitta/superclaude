@@ -1,141 +1,263 @@
 """
-Command Installation
+SuperClaude Installation
 
-Installs SuperClaude slash commands to ~/.claude/commands/sc/ directory.
+Installs all SuperClaude components to ~/.claude/ directory:
+- commands/sc/     : Slash commands
+- superclaude/     : Framework files (agents, core, modes, mcp, skills)
 """
 
 import shutil
 from pathlib import Path
-from typing import List, Tuple
+from typing import Dict, List, Tuple
+
+# Component definitions: (source_subdir, target_subdir, description)
+COMPONENTS = {
+    "commands": ("commands", "commands/sc", "Slash commands"),
+    "agents": ("agents", "superclaude/agents", "Agent definitions"),
+    "core": ("core", "superclaude/core", "Core framework (PRINCIPLES, FLAGS, RULES)"),
+    "modes": ("modes", "superclaude/modes", "Behavioral modes"),
+    "mcp": ("mcp", "superclaude/mcp", "MCP server documentation"),
+    "skills": ("skills", "superclaude/skills", "Skills"),
+}
+
+
+def _get_package_root() -> Path:
+    """
+    Get the package root directory.
+
+    Returns:
+        Path to superclaude package root (src/superclaude/ in dev, site-packages/superclaude/ when installed)
+    """
+    return Path(__file__).resolve().parent.parent
+
+
+def _get_source_dir(component: str) -> Path:
+    """
+    Get source directory for a component.
+
+    Args:
+        component: Component name (commands, agents, core, modes, mcp, skills)
+
+    Returns:
+        Path to component source directory
+    """
+    package_root = _get_package_root()
+    source_subdir = COMPONENTS[component][0]
+
+    # Priority 1: Package directory (installed or editable)
+    package_dir = package_root / source_subdir
+    if package_dir.exists():
+        return package_dir
+
+    # Priority 2: plugins directory (legacy source checkout)
+    repo_root = package_root.parent.parent
+    plugins_dir = repo_root / "plugins" / "superclaude" / source_subdir
+    if plugins_dir.exists():
+        return plugins_dir
+
+    return package_dir
+
+
+def _get_target_dir(component: str, base_path: Path = None) -> Path:
+    """
+    Get target directory for a component.
+
+    Args:
+        component: Component name
+        base_path: Base installation path (default: ~/.claude)
+
+    Returns:
+        Path to target directory
+    """
+    if base_path is None:
+        base_path = Path.home() / ".claude"
+
+    target_subdir = COMPONENTS[component][1]
+    return base_path / target_subdir
+
+
+def install_component(
+    component: str,
+    base_path: Path = None,
+    force: bool = False
+) -> Tuple[int, int, int, List[str]]:
+    """
+    Install a single component.
+
+    Args:
+        component: Component name
+        base_path: Base installation path
+        force: Force reinstall
+
+    Returns:
+        Tuple of (installed_count, skipped_count, failed_count, failed_names)
+    """
+    source_dir = _get_source_dir(component)
+    target_dir = _get_target_dir(component, base_path)
+
+    if not source_dir.exists():
+        return 0, 0, 1, [f"Source not found: {source_dir}"]
+
+    target_dir.mkdir(parents=True, exist_ok=True)
+
+    installed = 0
+    skipped = 0
+    failed = 0
+    failed_names = []
+
+    # Handle skills directory specially (has subdirectories)
+    if component == "skills":
+        for skill_dir in source_dir.iterdir():
+            if skill_dir.is_dir():
+                target_skill_dir = target_dir / skill_dir.name
+                if target_skill_dir.exists() and not force:
+                    skipped += 1
+                    continue
+                try:
+                    if target_skill_dir.exists():
+                        shutil.rmtree(target_skill_dir)
+                    shutil.copytree(skill_dir, target_skill_dir)
+                    installed += 1
+                except Exception as e:
+                    failed += 1
+                    failed_names.append(f"{skill_dir.name}: {e}")
+    else:
+        # Copy .md files
+        for source_file in source_dir.glob("*.md"):
+            target_file = target_dir / source_file.name
+            if target_file.exists() and not force:
+                skipped += 1
+                continue
+            try:
+                shutil.copy2(source_file, target_file)
+                installed += 1
+            except Exception as e:
+                failed += 1
+                failed_names.append(f"{source_file.name}: {e}")
+
+    return installed, skipped, failed, failed_names
+
+
+def install_claude_sc_md(base_path: Path = None, force: bool = False) -> Tuple[bool, str]:
+    """
+    Install CLAUDE_SC.md to ~/.claude/superclaude/
+
+    Args:
+        base_path: Base installation path
+        force: Force reinstall
+
+    Returns:
+        Tuple of (success, message)
+    """
+    if base_path is None:
+        base_path = Path.home() / ".claude"
+
+    package_root = _get_package_root()
+    source_file = package_root / "CLAUDE_SC.md"
+    target_dir = base_path / "superclaude"
+    target_file = target_dir / "CLAUDE_SC.md"
+
+    if not source_file.exists():
+        return False, f"CLAUDE_SC.md not found at {source_file}"
+
+    target_dir.mkdir(parents=True, exist_ok=True)
+
+    if target_file.exists() and not force:
+        return True, "CLAUDE_SC.md already exists (use --force to reinstall)"
+
+    try:
+        shutil.copy2(source_file, target_file)
+        return True, "CLAUDE_SC.md installed"
+    except Exception as e:
+        return False, f"Failed to install CLAUDE_SC.md: {e}"
+
+
+def install_all(base_path: Path = None, force: bool = False) -> Tuple[bool, str]:
+    """
+    Install all SuperClaude components.
+
+    Args:
+        base_path: Base installation path (default: ~/.claude)
+        force: Force reinstall if components exist
+
+    Returns:
+        Tuple of (success: bool, message: str)
+    """
+    if base_path is None:
+        base_path = Path.home() / ".claude"
+
+    messages = []
+    total_installed = 0
+    total_skipped = 0
+    total_failed = 0
+
+    # Install each component
+    for component, (_, _, description) in COMPONENTS.items():
+        installed, skipped, failed, failed_names = install_component(
+            component, base_path, force
+        )
+
+        total_installed += installed
+        total_skipped += skipped
+        total_failed += failed
+
+        if installed > 0:
+            messages.append(f"✅ {description}: {installed} installed")
+        if skipped > 0:
+            messages.append(f"⏭️  {description}: {skipped} skipped")
+        if failed > 0:
+            messages.append(f"❌ {description}: {failed} failed")
+            for name in failed_names:
+                messages.append(f"   - {name}")
+
+    # Install CLAUDE_SC.md
+    success, msg = install_claude_sc_md(base_path, force)
+    messages.append(f"{'✅' if success else '❌'} {msg}")
+
+    # Summary
+    messages.append("")
+    messages.append(f"📊 Summary: {total_installed} installed, {total_skipped} skipped, {total_failed} failed")
+    messages.append(f"📁 Installation directory: {base_path}")
+
+    if total_skipped > 0:
+        messages.append("\n💡 Tip: Use --force to reinstall existing files")
+
+    messages.append("\n🔄 Restart Claude Code to use the new components")
+
+    overall_success = total_failed == 0
+    return overall_success, "\n".join(messages)
 
 
 def install_commands(target_path: Path = None, force: bool = False) -> Tuple[bool, str]:
     """
-    Install all SuperClaude commands to Claude Code
+    Install all SuperClaude commands to Claude Code (legacy function).
+
+    Now installs ALL components, not just commands.
 
     Args:
-        target_path: Target installation directory (default: ~/.claude/commands/sc)
+        target_path: Ignored (kept for backwards compatibility)
         force: Force reinstall if commands exist
 
     Returns:
         Tuple of (success: bool, message: str)
     """
-    # Default to ~/.claude/commands/sc to maintain /sc: namespace
-    if target_path is None:
-        target_path = Path.home() / ".claude" / "commands" / "sc"
-
-    # Get command source directory
-    command_source = _get_commands_source()
-
-    if not command_source or not command_source.exists():
-        return False, f"Command source directory not found: {command_source}"
-
-    # Create target directory
-    target_path.mkdir(parents=True, exist_ok=True)
-
-    # Get all command files
-    command_files = list(command_source.glob("*.md"))
-
-    if not command_files:
-        return False, f"No command files found in {command_source}"
-
-    installed_commands = []
-    skipped_commands = []
-    failed_commands = []
-
-    for command_file in command_files:
-        target_file = target_path / command_file.name
-        command_name = command_file.stem
-
-        # Check if already exists
-        if target_file.exists() and not force:
-            skipped_commands.append(command_name)
-            continue
-
-        # Copy command file
-        try:
-            shutil.copy2(command_file, target_file)
-            installed_commands.append(command_name)
-        except Exception as e:
-            failed_commands.append(f"{command_name}: {e}")
-
-    # Build result message
-    messages = []
-
-    if installed_commands:
-        messages.append(f"✅ Installed {len(installed_commands)} commands:")
-        for cmd in installed_commands:
-            messages.append(f"   - /{cmd}")
-
-    if skipped_commands:
-        messages.append(
-            f"\n⚠️  Skipped {len(skipped_commands)} existing commands (use --force to reinstall):"
-        )
-        for cmd in skipped_commands:
-            messages.append(f"   - /{cmd}")
-
-    if failed_commands:
-        messages.append(f"\n❌ Failed to install {len(failed_commands)} commands:")
-        for fail in failed_commands:
-            messages.append(f"   - {fail}")
-
-    if not installed_commands and not skipped_commands:
-        return False, "No commands were installed"
-
-    messages.append(f"\n📁 Installation directory: {target_path}")
-    messages.append("\n💡 Tip: Restart Claude Code to use the new commands")
-
-    success = len(failed_commands) == 0
-    return success, "\n".join(messages)
-
-
-def _get_commands_source() -> Path:
-    """
-    Get source directory for commands
-
-    Commands are stored in:
-        1. package_root/commands/ (installed package)
-        2. plugins/superclaude/commands/ (source checkout)
-
-    Returns:
-        Path to commands source directory
-    """
-    # Get package root (superclaude/ when installed, src/superclaude/ in dev)
-    package_root = Path(__file__).resolve().parent.parent
-
-    # Priority 1: Try commands/ in package (for installed package via pipx/pip)
-    # This will be site-packages/superclaude/commands/
-    package_commands_dir = package_root / "commands"
-    if package_commands_dir.exists():
-        return package_commands_dir
-
-    # Priority 2: Try plugins/superclaude/commands/ in project root (for source checkout)
-    # package_root = src/superclaude/
-    # repo_root = src/superclaude/../../ = project root
-    repo_root = package_root.parent.parent
-    plugins_commands_dir = repo_root / "plugins" / "superclaude" / "commands"
-
-    if plugins_commands_dir.exists():
-        return plugins_commands_dir
-
-    # If neither exists, return package location (will fail with clear error)
-    return package_commands_dir
+    return install_all(force=force)
 
 
 def list_available_commands() -> List[str]:
     """
-    List all available commands
+    List all available commands.
 
     Returns:
         List of command names
     """
-    command_source = _get_commands_source()
+    source_dir = _get_source_dir("commands")
 
-    if not command_source.exists():
+    if not source_dir.exists():
         return []
 
     commands = []
-    for file in command_source.glob("*.md"):
+    for file in source_dir.glob("*.md"):
         if file.stem != "README":
             commands.append(file.stem)
 
@@ -160,3 +282,35 @@ def list_installed_commands() -> List[str]:
             installed.append(file.stem)
 
     return sorted(installed)
+
+
+def list_all_components() -> Dict[str, Dict[str, any]]:
+    """
+    List all components with their installation status.
+
+    Returns:
+        Dict with component info and status
+    """
+    result = {}
+
+    for component, (_, _, description) in COMPONENTS.items():
+        source_dir = _get_source_dir(component)
+        target_dir = _get_target_dir(component)
+
+        # Count source files
+        if component == "skills":
+            source_count = sum(1 for d in source_dir.iterdir() if d.is_dir()) if source_dir.exists() else 0
+            installed_count = sum(1 for d in target_dir.iterdir() if d.is_dir()) if target_dir.exists() else 0
+        else:
+            source_count = len(list(source_dir.glob("*.md"))) if source_dir.exists() else 0
+            installed_count = len(list(target_dir.glob("*.md"))) if target_dir.exists() else 0
+
+        result[component] = {
+            "description": description,
+            "source_path": str(source_dir),
+            "target_path": str(target_dir),
+            "available": source_count,
+            "installed": installed_count,
+        }
+
+    return result

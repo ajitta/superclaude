@@ -28,14 +28,9 @@ def main():
 
 @main.command()
 @click.option(
-    "--target",
-    default="~/.claude/commands/sc",
-    help="Installation directory (default: ~/.claude/commands/sc)",
-)
-@click.option(
     "--force",
     is_flag=True,
-    help="Force reinstall if commands already exist",
+    help="Force reinstall if components already exist",
 )
 @click.option(
     "--list",
@@ -43,26 +38,45 @@ def main():
     is_flag=True,
     help="List available commands without installing",
 )
-def install(target: str, force: bool, list_only: bool):
+@click.option(
+    "--list-all",
+    "list_all",
+    is_flag=True,
+    help="List all components and their installation status",
+)
+def install(force: bool, list_only: bool, list_all: bool):
     """
-    Install SuperClaude commands to Claude Code
+    Install all SuperClaude components to Claude Code
 
-    Installs all slash commands (/sc:research, /sc:index-repo, etc.) to your
-    ~/.claude/commands/sc directory so you can use them in Claude Code.
+    Installs:
+    - Slash commands to ~/.claude/commands/sc/
+    - Framework files to ~/.claude/superclaude/ (agents, core, modes, mcp, skills)
 
     Examples:
         superclaude install
         superclaude install --force
         superclaude install --list
-        superclaude install --target /custom/path
+        superclaude install --list-all
     """
     from .install_commands import (
-        install_commands,
+        install_all,
         list_available_commands,
         list_installed_commands,
+        list_all_components,
     )
 
-    # List only mode
+    # List all components mode
+    if list_all:
+        components = list_all_components()
+        click.echo("📋 SuperClaude Components:\n")
+        for name, info in components.items():
+            status = f"{info['installed']}/{info['available']}"
+            icon = "✅" if info['installed'] == info['available'] and info['available'] > 0 else "⬜"
+            click.echo(f"   {icon} {info['description']:40} [{status}]")
+            click.echo(f"      └─ {info['target_path']}")
+        return
+
+    # List commands only mode
     if list_only:
         available = list_available_commands()
         installed = list_installed_commands()
@@ -75,13 +89,11 @@ def install(target: str, force: bool, list_only: bool):
         click.echo(f"\nTotal: {len(available)} available, {len(installed)} installed")
         return
 
-    # Install commands
-    target_path = Path(target).expanduser()
-
-    click.echo(f"📦 Installing SuperClaude commands to {target_path}...")
+    # Install all components
+    click.echo("📦 Installing SuperClaude components...")
     click.echo()
 
-    success, message = install_commands(target_path=target_path, force=force)
+    success, message = install_all(force=force)
 
     click.echo(message)
 
