@@ -16,9 +16,11 @@
 #   5. Provides next steps guidance
 #
 # Usage:
-#   ./install.sh            # Interactive installation
-#   ./install.sh --yes      # Non-interactive (auto-yes to prompts)
-#   ./install.sh --help     # Show help message
+#   ./install.sh                    # Interactive installation to ~/.claude/
+#   ./install.sh --yes              # Non-interactive (auto-yes to prompts)
+#   ./install.sh --scope project    # Install to ./.claude/ (current directory)
+#   ./install.sh --scope user --force  # Force reinstall to ~/.claude/
+#   ./install.sh --help             # Show help message
 #
 ################################################################################
 
@@ -38,6 +40,9 @@ PROJECT_ROOT="$SCRIPT_DIR"
 
 # Installation options
 AUTO_YES=false
+INSTALL_SCOPE="user"  # user or project
+INSTALL_FORCE=false
+INSTALL_EXTRA_ARGS=""
 
 ################################################################################
 # Helper Functions
@@ -204,17 +209,34 @@ install_package() {
 install_commands() {
     print_step "Installing SuperClaude components..."
 
-    print_info "Installing all components to ~/.claude/"
+    local target_path
+    if [ "$INSTALL_SCOPE" = "project" ]; then
+        target_path="./.claude/"
+    else
+        target_path="~/.claude/"
+    fi
+
+    print_info "Installing all components to $target_path"
     print_info "  - commands/sc/   : Slash commands"
     print_info "  - agents/        : Agent definitions"
     print_info "  - skills/        : Skills"
     print_info "  - superclaude/   : Core framework (core, modes, mcp)"
     echo ""
-    if uv run superclaude install; then
+
+    local install_cmd="uv run superclaude install --scope $INSTALL_SCOPE"
+    if [ "$INSTALL_FORCE" = true ]; then
+        install_cmd="$install_cmd --force"
+    fi
+    if [ -n "$INSTALL_EXTRA_ARGS" ]; then
+        install_cmd="$install_cmd $INSTALL_EXTRA_ARGS"
+    fi
+
+    print_info "Running: $install_cmd"
+    if eval "$install_cmd"; then
         print_success "All components installed successfully"
     else
         print_error "Failed to install components"
-        print_info "Try running manually: uv run superclaude install"
+        print_info "Try running manually: $install_cmd"
         exit 1
     fi
 }
@@ -236,8 +258,8 @@ verify_installation() {
     fi
 
     # List all installed components
-    print_info "Installed components:"
-    uv run superclaude install --list
+    print_info "Installed components (scope: $INSTALL_SCOPE):"
+    uv run superclaude install --list --scope "$INSTALL_SCOPE"
 }
 
 ################################################################################
@@ -252,8 +274,12 @@ Usage:
     ./install.sh [OPTIONS]
 
 Options:
-    --yes       Non-interactive mode (auto-yes to all prompts)
-    --help      Show this help message
+    --yes              Non-interactive mode (auto-yes to all prompts)
+    --scope SCOPE      Installation scope: user (default) or project
+                       - user: Install to ~/.claude/
+                       - project: Install to ./.claude/
+    --force            Force reinstall if components already exist
+    --help             Show this help message
 
 Description:
     Installs SuperClaude Framework directly from the Git repository.
@@ -264,8 +290,11 @@ Requirements:
     - UV package manager (will be installed if missing)
 
 Examples:
-    ./install.sh              # Interactive installation
-    ./install.sh --yes        # Non-interactive installation
+    ./install.sh                      # Interactive installation to ~/.claude/
+    ./install.sh --yes                # Non-interactive installation
+    ./install.sh --scope project      # Install to ./.claude/ (current directory)
+    ./install.sh --scope user --force # Force reinstall to ~/.claude/
+    ./install.sh --yes --scope project # Non-interactive project installation
 
 For more information:
     https://github.com/SuperClaude-Org/SuperClaude_Framework
@@ -280,13 +309,29 @@ parse_args() {
                 AUTO_YES=true
                 shift
                 ;;
+            --scope)
+                if [ -z "$2" ] || [[ "$2" =~ ^- ]]; then
+                    print_error "--scope requires a value (user or project)"
+                    exit 1
+                fi
+                if [ "$2" != "user" ] && [ "$2" != "project" ]; then
+                    print_error "Invalid scope: $2. Must be 'user' or 'project'"
+                    exit 1
+                fi
+                INSTALL_SCOPE="$2"
+                shift 2
+                ;;
+            --force)
+                INSTALL_FORCE=true
+                shift
+                ;;
             --help|-h)
                 show_help
                 ;;
             *)
-                print_error "Unknown option: $1"
-                echo "Run './install.sh --help' for usage information"
-                exit 1
+                # Pass unknown arguments to superclaude install command
+                INSTALL_EXTRA_ARGS="$INSTALL_EXTRA_ARGS $1"
+                shift
                 ;;
         esac
     done
@@ -302,6 +347,14 @@ main() {
     echo ""
     print_info "This script will install SuperClaude Framework in development mode"
     print_info "Installation location: $PROJECT_ROOT"
+    if [ "$INSTALL_SCOPE" = "project" ]; then
+        print_info "Target scope: project (./.claude/)"
+    else
+        print_info "Target scope: user (~/.claude/)"
+    fi
+    if [ "$INSTALL_FORCE" = true ]; then
+        print_info "Force mode: enabled (will reinstall existing components)"
+    fi
     echo ""
 
     if [ "$AUTO_YES" != true ]; then
@@ -346,11 +399,18 @@ main() {
     echo "  2. View all components:     uv run superclaude install --list"
     echo "  3. Try a command:           /sc:help"
     echo ""
+    local target_base
+    if [ "$INSTALL_SCOPE" = "project" ]; then
+        target_base="./.claude"
+    else
+        target_base="~/.claude"
+    fi
+
     print_info "Installed locations:"
-    echo "  • Commands:   ~/.claude/commands/sc/"
-    echo "  • Agents:     ~/.claude/agents/"
-    echo "  • Skills:     ~/.claude/skills/"
-    echo "  • Framework:  ~/.claude/superclaude/"
+    echo "  • Commands:   $target_base/commands/sc/"
+    echo "  • Agents:     $target_base/agents/"
+    echo "  • Skills:     $target_base/skills/"
+    echo "  • Framework:  $target_base/superclaude/"
     echo ""
     print_info "Optional - Install MCP Servers for enhanced features:"
     echo "  • List available servers:   uv run superclaude mcp --list"
