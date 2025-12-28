@@ -9,29 +9,39 @@
   <activation primary="/sc:business-panel" auto="business docs|strategic planning"/>
 
   <experts>
-    <e n="Christensen" domain="Disruptive innovation" fw="Jobs-to-be-done"/>
-    <e n="Porter" domain="Competitive strategy" fw="Five Forces, Value Chain"/>
-    <e n="Drucker" domain="Management" fw="Effectiveness, Knowledge work"/>
-    <e n="Godin" domain="Marketing" fw="Permission marketing, Purple Cow"/>
-    <e n="Kim+Mauborgne" domain="Strategy" fw="Blue Ocean, Value innovation"/>
-    <e n="Collins" domain="Organizational" fw="Good to Great, Level 5"/>
-    <e n="Taleb" domain="Risk" fw="Antifragility, Black Swan"/>
-    <e n="Meadows" domain="Systems" fw="Leverage points, Feedback loops"/>
-    <e n="Doumont" domain="Communication" fw="Message optimization"/>
+
+| Expert | Domain | Framework |
+|--------|--------|-----------|
+| Christensen | Disruptive innovation | Jobs-to-be-done |
+| Porter | Competitive strategy | Five Forces, Value Chain |
+| Drucker | Management | Effectiveness, Knowledge work |
+| Godin | Marketing | Permission marketing, Purple Cow |
+| Kim+Mauborgne | Strategy | Blue Ocean, Value innovation |
+| Collins | Organizational | Good to Great, Level 5 |
+| Taleb | Risk | Antifragility, Black Swan |
+| Meadows | Systems | Leverage points, Feedback loops |
+| Doumont | Communication | Message optimization |
+
   </experts>
 
   <modes>
-    <m n="Discussion" trigger="strategy|plan|market" out="Insights → Cross-pollination → Synthesis"/>
-    <m n="Debate" trigger="controversial|risk|trade-off" out="Position → Challenge → Rebuttal → Resolution"/>
-    <m n="Socratic" trigger="learn|understand|how|why" out="Questions → Response → Deeper inquiry"/>
+
+- **Discussion** (trigger: strategy|plan|market): Insights -> Cross-pollination -> Synthesis
+- **Debate** (trigger: controversial|risk|trade-off): Position -> Challenge -> Rebuttal -> Resolution
+- **Socratic** (trigger: learn|understand|how|why): Questions -> Response -> Deeper inquiry
+
   </modes>
 
   <selection>
-    <s focus="Innovation" primary="Christensen, Drucker" secondary="Meadows, Collins"/>
-    <s focus="Strategy" primary="Porter, Kim+Mauborgne" secondary="Collins, Taleb"/>
-    <s focus="Marketing" primary="Godin, Christensen" secondary="Doumont, Porter"/>
-    <s focus="Risk" primary="Taleb, Meadows" secondary="Porter, Collins"/>
-    <s focus="Systems" primary="Meadows, Drucker" secondary="Collins, Taleb"/>
+
+| Focus | Primary | Secondary |
+|-------|---------|-----------|
+| Innovation | Christensen, Drucker | Meadows, Collins |
+| Strategy | Porter, Kim+Mauborgne | Collins, Taleb |
+| Marketing | Godin, Christensen | Doumont, Porter |
+| Risk | Taleb, Meadows | Porter, Collins |
+| Systems | Meadows, Drucker | Collins, Taleb |
+
   </selection>
 
   <synthesis>Convergent insights | Productive tensions | System patterns | Blind spots | Strategic questions</synthesis>

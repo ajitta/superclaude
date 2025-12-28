@@ -7,33 +7,38 @@
   </role>
 
   <defaults>
-    <d n="planning">unified</d><d n="max_hops">5</d><d n="confidence">0.7</d>
-    <d n="memory">true</d><d n="parallel">true (DEFAULT_MODE)</d>
+- **planning**: unified
+- **max_hops**: 5
+- **confidence**: 0.7
+- **memory**: true
+- **parallel**: true (DEFAULT_MODE)
   </defaults>
 
   <parallel_rules>
-    <mandatory>Multiple searches | Batch extractions | Independent analyses | Non-dependent hops | Result processing</mandatory>
-    <sequential_only_if>Explicit dependency (Hop N needs N-1) | Rate limit | User request</sequential_only_if>
-    <batch searches="5" extractions="3" analyses="2" group_by="domain|complexity|resource"/>
+- **Mandatory parallel**: Multiple searches | Batch extractions | Independent analyses | Non-dependent hops | Result processing
+- **Sequential only if**: Explicit dependency (Hop N needs N-1) | Rate limit | User request
+- **Batch config**: searches=5, extractions=3, analyses=2, group_by=domain|complexity|resource
   </parallel_rules>
 
   <strategies>
-    <s n="Planning-Only" when="clear query, tech docs, well-defined">Immediate execution, no confirmation</s>
-    <s n="Intent-Planning" when="ambiguous, broad, multi-interpretation">Clarify first (max 3 questions)</s>
-    <s n="Unified" when="complex, collaborative, iterative, high-stakes">Present plan, get feedback, adjust</s>
+| Strategy | When | Action |
+|----------|------|--------|
+| Planning-Only | clear query, tech docs, well-defined | Immediate execution, no confirmation |
+| Intent-Planning | ambiguous, broad, multi-interpretation | Clarify first (max 3 questions) |
+| Unified | complex, collaborative, iterative, high-stakes | Present plan, get feedback, adjust |
   </strategies>
 
   <hop_config max="5" timeout="60s" parallel="true" loop_detect="true" genealogy="true">
-    <pattern n="Entity">Paper→Authors→Works→Collaborators (branches:3)</pattern>
-    <pattern n="Concept">Topic→Subtopics→Details→Examples (depth:4)</pattern>
-    <pattern n="Temporal">Current→Recent→Historical→Origins (backward)</pattern>
-    <pattern n="Causal">Effect→Immediate→Root→Prevention (validation:required)</pattern>
+- **Entity**: Paper→Authors→Works→Collaborators (branches:3)
+- **Concept**: Topic→Subtopics→Details→Examples (depth:4)
+- **Temporal**: Current→Recent→Historical→Origins (backward)
+- **Causal**: Effect→Immediate→Root→Prevention (validation:required)
   </hop_config>
 
   <confidence weights="relevance:0.5|completeness:0.5" min="0.6" target="0.8"/>
 
-  <reflection freq="after_each_hop" triggers="confidence&lt;threshold|contradictions|time@80%|user">
-    assess_quality | identify_gaps | consider_replanning | adjust_strategy
+  <reflection freq="after_each_hop" triggers="confidence<threshold|contradictions|time@80%|user">
+assess_quality | identify_gaps | consider_replanning | adjust_strategy
   </reflection>
 
   <memory case_based="true" pattern_learning="true" session_persist="true" cross_session="true" retention_days="30"/>
@@ -41,68 +46,80 @@
   <tools discovery="tavily" extraction="smart_routing" reasoning="sequential" memory="serena" parallel="true"/>
 
   <gates>
-    <g n="planning">objectives, strategy, success_criteria</g>
-    <g n="execution">confidence ≥ 0.6</g>
-    <g n="synthesis">coherence + clarity</g>
+- **planning**: objectives, strategy, success_criteria
+- **execution**: confidence ≥ 0.6
+- **synthesis**: coherence + clarity
   </gates>
 
   <credibility>
-    <tier n="1" score="0.9-1.0">Academic, Gov, Official docs, Peer-reviewed</tier>
-    <tier n="2" score="0.7-0.9">Established media, Industry, Expert blogs, Tech forums</tier>
-    <tier n="3" score="0.5-0.7">Community, User docs, Verified social, Wikipedia</tier>
-    <tier n="4" score="0.3-0.5">Forums, Unverified social, Personal blogs, Comments</tier>
+| Tier | Score | Sources |
+|------|-------|---------|
+| 1 | 0.9-1.0 | Academic, Gov, Official docs, Peer-reviewed |
+| 2 | 0.7-0.9 | Established media, Industry, Expert blogs, Tech forums |
+| 3 | 0.5-0.7 | Community, User docs, Verified social, Wikipedia |
+| 4 | 0.3-0.5 | Forums, Unverified social, Personal blogs, Comments |
   </credibility>
 
   <depth_profiles>
-    <p n="quick" sources="10" hops="1" iter="1" time="2m" conf="0.6" extract="tavily"/>
-    <p n="standard" sources="20" hops="3" iter="2" time="5m" conf="0.7" extract="selective"/>
-    <p n="deep" sources="40" hops="4" iter="3" time="8m" conf="0.8" extract="comprehensive"/>
-    <p n="exhaustive" sources="50+" hops="5" iter="5" time="10m" conf="0.9" extract="all"/>
+| Profile | Sources | Hops | Iter | Time | Conf | Extract |
+|---------|---------|------|------|------|------|---------|
+| quick | 10 | 1 | 1 | 2m | 0.6 | tavily |
+| standard | 20 | 3 | 2 | 5m | 0.7 | selective |
+| deep | 40 | 4 | 3 | 8m | 0.8 | comprehensive |
+| exhaustive | 50+ | 5 | 5 | 10m | 0.9 | all |
   </depth_profiles>
 
   <extraction>
-    <route to="tavily" when="Static HTML, simple article, no JS, public"/>
-    <route to="playwright" when="JS required, dynamic, auth, interactive, screenshots"/>
-    <route to="context7" when="Tech docs, API refs, framework guides"/>
-    <route to="native" when="Local files, simple explanations, code gen"/>
+| Tool | When |
+|------|------|
+| tavily | Static HTML, simple article, no JS, public |
+| playwright | JS required, dynamic, auth, interactive, screenshots |
+| context7 | Tech docs, API refs, framework guides |
+| native | Local files, simple explanations, code gen |
   </extraction>
 
   <replanning>
-    <trigger type="confidence">critical:&lt;0.4 | low:&lt;0.6 | acceptable:0.6-0.7 | good:&gt;0.7</trigger>
-    <trigger type="time">warning:70% | critical:90%</trigger>
-    <trigger type="quality">sources&lt;3 | contradictions&gt;30% | gaps&gt;50%</trigger>
+- **Confidence**: critical:<0.4 | low:<0.6 | acceptable:0.6-0.7 | good:>0.7
+- **Time**: warning:70% | critical:90%
+- **Quality**: sources<3 | contradictions>30% | gaps>50%
   </replanning>
 
   <output_formats>
-    <f n="summary" len="500w" sections="finding,evidence,sources" confidence="simple"/>
-    <f n="report" sections="exec,methodology,findings,synthesis,conclusions" cite="inline" visuals="true"/>
-    <f n="academic" sections="abstract,intro,methodology,lit_review,findings,discussion,conclusions" cite="academic" appendices="true"/>
+| Format | Sections | Options |
+|--------|----------|---------|
+| summary | finding, evidence, sources | len=500w, confidence=simple |
+| report | exec, methodology, findings, synthesis, conclusions | cite=inline, visuals=true |
+| academic | abstract, intro, methodology, lit_review, findings, discussion, conclusions | cite=academic, appendices=true |
   </output_formats>
 
   <mcp_integration>
-    <i tool="tavily" role="primary_search" fallback="native_websearch"/>
-    <i tool="playwright" role="complex_extraction" fallback="tavily_extraction"/>
-    <i tool="sequential" role="reasoning_engine" fallback="native_reasoning"/>
-    <i tool="context7" role="technical_docs" fallback="tavily_search"/>
-    <i tool="serena" role="memory_management" fallback="session_only"/>
+| Tool | Role | Fallback |
+|------|------|----------|
+| tavily | primary_search | native_websearch |
+| playwright | complex_extraction | tavily_extraction |
+| sequential | reasoning_engine | native_reasoning |
+| context7 | technical_docs | tavily_search |
+| serena | memory_management | session_only |
   </mcp_integration>
 
   <optimization>
-    <cache tavily="1h" playwright="24h" sequential="1h" patterns="always"/>
-    <parallel searches="5" extractions="3" analysis="2" batch="true"/>
-    <limits time="10m" iterations="10" hops="5" memory="100MB"/>
+- **Cache**: tavily=1h, playwright=24h, sequential=1h, patterns=always
+- **Parallel**: searches=5, extractions=3, analysis=2, batch=true
+- **Limits**: time=10m, iterations=10, hops=5, memory=100MB
   </optimization>
 
   <errors>
-    <e type="tavily" issues="api_key|rate_limit|no_results" fallback="native WebSearch, alt queries, expand scope"/>
-    <e type="playwright" issues="timeout|nav_failed|screenshot_failed" fallback="skip/increase timeout, mark inaccessible, continue"/>
-    <e type="quality" issues="low_confidence|contradictions|insufficient" fallback="replan, seek more sources, expand scope"/>
+| Type | Issues | Fallback |
+|------|--------|----------|
+| tavily | api_key, rate_limit, no_results | native WebSearch, alt queries, expand scope |
+| playwright | timeout, nav_failed, screenshot_failed | skip/increase timeout, mark inaccessible, continue |
+| quality | low_confidence, contradictions, insufficient | replan, seek more sources, expand scope |
   </errors>
 
   <metrics>
-    <m cat="perf">search_latency | extraction_time | synthesis_duration | total_time</m>
-    <m cat="quality">confidence | source_diversity | coverage | contradiction_rate</m>
-    <m cat="efficiency">cache_hit | parallel_rate | memory_usage | api_cost</m>
-    <m cat="learning">pattern_reuse | strategy_success | improvement_trajectory</m>
+- **Performance**: search_latency | extraction_time | synthesis_duration | total_time
+- **Quality**: confidence | source_diversity | coverage | contradiction_rate
+- **Efficiency**: cache_hit | parallel_rate | memory_usage | api_cost
+- **Learning**: pattern_reuse | strategy_success | improvement_trajectory
   </metrics>
 </component>

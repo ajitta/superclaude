@@ -13,46 +13,50 @@ description: SuperClaude command dispatcher - main entry point for all features
   <syntax>/sc:[command] [args...]</syntax>
 
   <triggers>
-    <t>/sc or /sc:sc</t>
-    <t>superclaude-help</t>
-    <t>command-list</t>
+    - /sc or /sc:sc
+    - superclaude-help
+    - command-list
   </triggers>
 
   <commands>
-    <c n="research">Deep web research with parallel search</c>
-    <c n="index-repo">Repository indexing for context optimization</c>
-    <c n="agent">Launch specialized AI agents</c>
-    <c n="recommend">Get command recommendations</c>
-    <c n="brainstorm">Requirements discovery via Socratic dialogue</c>
-    <c n="analyze">Code analysis across quality/security/perf/arch</c>
-    <c n="design">System architecture + API design</c>
-    <c n="implement">Feature implementation + MCP integration</c>
-    <c n="test">Test execution + coverage analysis</c>
-    <c n="troubleshoot">Issue diagnosis + resolution</c>
-    <c n="load">Session context loading (Serena)</c>
-    <c n="save">Session context persistence</c>
-    <c n="help">Complete command reference</c>
+    - **research**: Deep web research with parallel search
+    - **index-repo**: Repository indexing for context optimization
+    - **agent**: Launch specialized AI agents
+    - **recommend**: Get command recommendations
+    - **brainstorm**: Requirements discovery via Socratic dialogue
+    - **analyze**: Code analysis across quality/security/perf/arch
+    - **design**: System architecture + API design
+    - **implement**: Feature implementation + MCP integration
+    - **test**: Test execution + coverage analysis
+    - **troubleshoot**: Issue diagnosis + resolution
+    - **load**: Session context loading (Serena)
+    - **save**: Session context persistence
+    - **help**: Complete command reference
   </commands>
 
   <features>
-    <f>Parallel execution: multiple searches concurrent</f>
-    <f>Evidence-based: findings backed by sources</f>
-    <f>Context-aware: uses repo context when available</f>
-    <f>Token efficient: optimized minimal usage</f>
+    - Parallel execution: multiple searches concurrent
+    - Evidence-based: findings backed by sources
+    - Context-aware: uses repo context when available
+    - Token efficient: optimized minimal usage
   </features>
 
   <examples>
-    <ex i="/sc:research React 18 features" o="Deep research"/>
-    <ex i="/sc:index-repo" o="Create project index"/>
-    <ex i="/sc:agent deep-research" o="Launch agent"/>
-    <ex i="/sc:recommend" o="Get suggestions"/>
+
+| Input | Output |
+|-------|--------|
+| `/sc:research React 18 features` | Deep research |
+| `/sc:index-repo` | Create project index |
+| `/sc:agent deep-research` | Launch agent |
+| `/sc:recommend` | Get suggestions |
+
   </examples>
 
   <meta>
-    <version>SuperClaude v4.1.7</version>
-    <package>superclaude 0.4.0</package>
-    <install>superclaude install</install>
-    <docs>github.com/SuperClaude-Org/SuperClaude_Framework</docs>
+    - **version**: SuperClaude v4.1.7
+    - **package**: superclaude 0.4.0
+    - **install**: superclaude install
+    - **docs**: github.com/SuperClaude-Org/SuperClaude_Framework
   </meta>
 
   <bounds will="display commands|provide help|route to features" wont="execute without command|modify files"/>

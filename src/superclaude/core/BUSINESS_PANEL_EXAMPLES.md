@@ -7,59 +7,61 @@
   </role>
 
   <basic_examples>
-    <ex n="Strategic Plan">/sc:business-panel @strategy_doc.pdf → Discussion: Porter, Collins, Meadows, Doumont</ex>
-    <ex n="Innovation">/sc:business-panel "AI customer service" --experts "christensen,drucker,godin" → JTBD, value, tribes</ex>
-    <ex n="Risk Debate">/sc:business-panel @risk.md --mode debate → Taleb challenges, systems perspective</ex>
-    <ex n="Learning">/sc:business-panel "competitive strategy" --mode socratic → Progressive questioning</ex>
+- **Strategic Plan**: `/sc:business-panel @strategy_doc.pdf` → Discussion: Porter, Collins, Meadows, Doumont
+- **Innovation**: `/sc:business-panel "AI customer service" --experts "christensen,drucker,godin"` → JTBD, value, tribes
+- **Risk Debate**: `/sc:business-panel @risk.md --mode debate` → Taleb challenges, systems perspective
+- **Learning**: `/sc:business-panel "competitive strategy" --mode socratic` → Progressive questioning
   </basic_examples>
 
   <advanced_patterns>
-    <p n="Multi-Doc">/sc:business-panel @research.pdf @competitor.xlsx @financials.csv --synthesis-only</p>
-    <p n="Domain">/sc:business-panel @product.md --focus "innovation" --experts "christensen,drucker,meadows"</p>
-    <p n="Structured">/sc:business-panel @exec.pptx --focus "communication" --structured</p>
+- **Multi-Doc**: `/sc:business-panel @research.pdf @competitor.xlsx @financials.csv --synthesis-only`
+- **Domain**: `/sc:business-panel @product.md --focus "innovation" --experts "christensen,drucker,meadows"`
+- **Structured**: `/sc:business-panel @exec.pptx --focus "communication" --structured`
   </advanced_patterns>
 
   <integrations>
-    <i cmd="/analyze">/analyze @model.md --business-panel → Tech analysis + expert review</i>
-    <i cmd="/improve">/improve @strategy.md --business-panel --iterative → Expert validation</i>
-    <i cmd="/design">/design business-model --business-panel → Expert-guided design</i>
+- `/analyze @model.md --business-panel` → Tech analysis + expert review
+- `/improve @strategy.md --business-panel --iterative` → Expert validation
+- `/design business-model --business-panel` → Expert-guided design
   </integrations>
 
   <expert_selection>
-    <by domain="strategy" experts="porter,kim_mauborgne,collins,meadows"/>
-    <by domain="innovation" experts="christensen,drucker,godin,meadows"/>
-    <by domain="organization" experts="collins,drucker,meadows,doumont"/>
-    <by domain="risk" experts="taleb,meadows,porter,collins"/>
-    <by domain="market_entry" experts="porter,christensen,godin,kim_mauborgne"/>
-    <by type="comprehensive" experts="all" mode="discussion→debate→synthesis"/>
-    <by type="validation" experts="porter,collins,taleb" mode="debate"/>
-    <by type="learning" experts="drucker,meadows,doumont" mode="socratic"/>
+| Domain/Type | Experts | Mode |
+|-------------|---------|------|
+| strategy | porter, kim_mauborgne, collins, meadows | - |
+| innovation | christensen, drucker, godin, meadows | - |
+| organization | collins, drucker, meadows, doumont | - |
+| risk | taleb, meadows, porter, collins | - |
+| market_entry | porter, christensen, godin, kim_mauborgne | - |
+| comprehensive | all | discussion→debate→synthesis |
+| validation | porter, collins, taleb | debate |
+| learning | drucker, meadows, doumont | socratic |
   </expert_selection>
 
   <output_formats>
-    <f n="Executive">--structured --synthesis-only → 🎯Strategic|💰Financial|🏆Competitive|📈Growth|⚠️Risk|🧩Synthesis</f>
-    <f n="Detailed">--verbose → Per-expert framework analysis + cross-framework synthesis</f>
-    <f n="Questions">--questions → Strategic questions per expert framework</f>
+- **Executive**: `--structured --synthesis-only` → 🎯Strategic|💰Financial|🏆Competitive|📈Growth|⚠️Risk|🧩Synthesis
+- **Detailed**: `--verbose` → Per-expert framework analysis + cross-framework synthesis
+- **Questions**: `--questions` → Strategic questions per expert framework
   </output_formats>
 
   <workflows>
-    <w n="Strategy">discussion(research) → debate(competitive) → socratic(synthesis) → design(strategy)</w>
-    <w n="Innovation">panel(portfolio) → improve(roadmap) → analyze(opportunities)</w>
-    <w n="Risk">panel(register) → debate(assumptions) → implement(mitigation)</w>
+- **Strategy**: discussion(research) → debate(competitive) → socratic(synthesis) → design(strategy)
+- **Innovation**: panel(portfolio) → improve(roadmap) → analyze(opportunities)
+- **Risk**: panel(register) → debate(assumptions) → implement(mitigation)
   </workflows>
 
   <customization>
-    <opt n="Focus">--christensen-focus "disruption" | --porter-focus "moats"</opt>
-    <opt n="Style">--interaction collaborative|challenging</opt>
-    <opt n="Symbols">--symbols minimal|rich</opt>
-    <opt n="Depth">--depth surface|detailed</opt>
-    <opt n="Speed">--quick --experts-max 3 | --comprehensive --all-experts</opt>
+- **Focus**: `--christensen-focus "disruption"` | `--porter-focus "moats"`
+- **Style**: `--interaction collaborative|challenging`
+- **Symbols**: `--symbols minimal|rich`
+- **Depth**: `--depth surface|detailed`
+- **Speed**: `--quick --experts-max 3` | `--comprehensive --all-experts`
   </customization>
 
   <quality>
-    <v n="Authenticity">Voice consistency | Framework fidelity | Interaction realism</v>
-    <v n="Relevance">Strategic focus | Actionable insights | Evidence-based</v>
-    <v n="Integration">Synthesis value | Framework preservation | Practical utility</v>
-    <perf response="simple&lt;30s|comprehensive&lt;2m|multi-doc&lt;5m" tokens="discussion:8-15K|debate:10-20K|socratic:12-25K|synthesis:3-8K" accuracy="framework&gt;90%|relevance&gt;85%|actionable&gt;80%"/>
+- **Authenticity**: Voice consistency | Framework fidelity | Interaction realism
+- **Relevance**: Strategic focus | Actionable insights | Evidence-based
+- **Integration**: Synthesis value | Framework preservation | Practical utility
+- **Performance**: response=simple<30s|comprehensive<2m|multi-doc<5m, tokens=discussion:8-15K|debate:10-20K|socratic:12-25K|synthesis:3-8K, accuracy=framework>90%|relevance>85%|actionable>80%
   </quality>
 </component>

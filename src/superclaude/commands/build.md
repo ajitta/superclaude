@@ -13,42 +13,46 @@ description: Build, compile, and package projects with intelligent error handlin
   <syntax>/sc:build [target] [--type dev|prod|test] [--clean] [--optimize] [--verbose]</syntax>
 
   <triggers>
-    <t>Project compilation + packaging</t>
-    <t>Build optimization needs</t>
-    <t>Build error debugging</t>
-    <t>Deployment artifact preparation</t>
+    - Project compilation + packaging
+    - Build optimization needs
+    - Build error debugging
+    - Deployment artifact preparation
   </triggers>
 
   <flow>
-    <s n="1">Analyze: Structure, configs, deps</s>
-    <s n="2">Validate: Environment + toolchain</s>
-    <s n="3">Execute: Build + real-time monitoring</s>
-    <s n="4">Optimize: Artifacts + bundle size</s>
-    <s n="5">Package: Artifacts + reports</s>
+    1. **Analyze**: Structure, configs, deps
+    2. **Validate**: Environment + toolchain
+    3. **Execute**: Build + real-time monitoring
+    4. **Optimize**: Artifacts + bundle size
+    5. **Package**: Artifacts + reports
   </flow>
 
   <mcp servers="play:validation"/>
   <personas p="devops"/>
 
   <tools>
-    <t n="Bash">Build execution</t>
-    <t n="Read">Config analysis</t>
-    <t n="Grep">Error parsing</t>
-    <t n="Glob">Artifact discovery</t>
-    <t n="Write">Build reports</t>
+    - **Bash**: Build execution
+    - **Read**: Config analysis
+    - **Grep**: Error parsing
+    - **Glob**: Artifact discovery
+    - **Write**: Build reports
   </tools>
 
   <patterns>
-    <p n="Environment">dev|prod|test → appropriate config</p>
-    <p n="Error">Build failures → diagnostic + resolution</p>
-    <p n="Optimize">Artifact analysis → size reduction</p>
+    - **Environment**: dev|prod|test → appropriate config
+    - **Error**: Build failures → diagnostic + resolution
+    - **Optimize**: Artifact analysis → size reduction
   </patterns>
 
   <examples>
-    <ex i="/sc:build" o="Default build + report"/>
-    <ex i="--type prod --clean --optimize" o="Production artifacts"/>
-    <ex i="frontend --verbose" o="Detailed component build"/>
-    <ex i="--type dev --validate" o="Dev build + Playwright validation"/>
+
+| Input | Output |
+|-------|--------|
+| `/sc:build` | Default build + report |
+| `--type prod --clean --optimize` | Production artifacts |
+| `frontend --verbose` | Detailed component build |
+| `--type dev --validate` | Dev build + Playwright validation |
+
   </examples>
 
   <bounds will="execute build|error analysis|optimization recs" wont="modify build config|install deps|deploy"/>

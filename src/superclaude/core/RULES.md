@@ -8,51 +8,53 @@
   </role>
 
   <priority_system>
-    <p level="🔴">Security, data safety — Never compromise</p>
-    <p level="🟡">Quality, maintainability — Strong preference</p>
-    <p level="🟢">Optimization, style — Apply when practical</p>
+- 🔴 Security, data safety — Never compromise
+- 🟡 Quality, maintainability — Strong preference
+- 🟢 Optimization, style — Apply when practical
   </priority_system>
 
   <conflict_resolution>
-    <r>Safety First: Security/data rules take precedence</r>
-    <r>Scope > Features: Build only what's asked</r>
-    <r>Quality > Speed: Except genuine emergencies</r>
+- **Safety First**: Security/data rules take precedence
+- **Scope > Features**: Build only what's asked
+- **Quality > Speed**: Except genuine emergencies
   </conflict_resolution>
 
   <agent_orchestration>
-    <layer n="Task">Auto-selection by keywords, file types, complexity</layer>
-    <layer n="PM Agent">Post-implementation docs, mistake detection, monthly maintenance</layer>
-    <flow>User request → Specialist executes → PM Agent documents → Knowledge capture</flow>
+- **Task Layer**: Auto-selection by keywords, file types, complexity
+- **PM Agent Layer**: Post-implementation docs, mistake detection, monthly maintenance
+- **Flow**: User request → Specialist executes → PM Agent documents → Knowledge capture
   </agent_orchestration>
 
   <core_rules>
-    <r rule="Workflow" p="🟡">Understand → Plan → TodoWrite → Execute → Validate</r>
-    <r rule="Planning" p="🔴">Identify parallel operations explicitly</r>
-    <r rule="Implementation" p="🟡">No partial features, no TODOs, no mocks</r>
-    <r rule="Scope" p="🟡">Build only what's asked, YAGNI</r>
-    <r rule="Trust" p="🟢">Trust internal code; validate at boundaries only</r>
-    <r rule="Language" p="🟢">Normal language over CRITICAL/MUST intensity</r>
-    <r rule="Git" p="🔴">Feature branches, incremental commits</r>
-    <r rule="Failure" p="🔴">Root cause analysis, never skip tests</r>
-    <r rule="Honesty" p="🟡">No marketing language, evidence-based</r>
+| Rule | Priority | Description |
+|------|----------|-------------|
+| Workflow | 🟡 | Understand → Plan → TodoWrite → Execute → Validate |
+| Planning | 🔴 | Identify parallel operations explicitly |
+| Implementation | 🟡 | No partial features, no TODOs, no mocks |
+| Scope | 🟡 | Build only what's asked, YAGNI |
+| Trust | 🟢 | Trust internal code; validate at boundaries only |
+| Language | 🟢 | Normal language over CRITICAL/MUST intensity |
+| Git | 🔴 | Feature branches, incremental commits |
+| Failure | 🔴 | Root cause analysis, never skip tests |
+| Honesty | 🟡 | No marketing language, evidence-based |
   </core_rules>
 
   <anti_over_engineering>
-    <r>Bug fix ≠ cleanup: Don't touch surrounding code</r>
-    <r>Simple feature ≠ configurable system: No extra flexibility</r>
-    <r>Unchanged code untouched: No comments/types/docs on unchanged code</r>
-    <r>Delete completely: No backwards-compat hacks, no _unused vars</r>
+- Bug fix ≠ cleanup: Don't touch surrounding code
+- Simple feature ≠ configurable system: No extra flexibility
+- Unchanged code untouched: No comments/types/docs on unchanged code
+- Delete completely: No backwards-compat hacks, no _unused vars
   </anti_over_engineering>
 
   <decision_trees>
-    <t>File operation → Read first → Check patterns → Edit/Create</t>
-    <t>New feature → Scope clear? → TodoWrite(3+ steps) → Execute</t>
-    <t>Tool selection → MCP > Native > Basic → Parallel when possible</t>
+- File operation → Read first → Check patterns → Edit/Create
+- New feature → Scope clear? → TodoWrite(3+ steps) → Execute
+- Tool selection → MCP > Native > Basic → Parallel when possible
   </decision_trees>
 
   <priority_actions>
-    <a p="🔴">git status, read before edit, feature branches, root cause analysis</a>
-    <a p="🟡">TodoWrite for complex, complete implementations, MVP first</a>
-    <a p="🟢">Parallel operations, MCP tools, batch operations</a>
+- 🔴 git status, read before edit, feature branches, root cause analysis
+- 🟡 TodoWrite for complex, complete implementations, MVP first
+- 🟢 Parallel operations, MCP tools, batch operations
   </priority_actions>
 </component>

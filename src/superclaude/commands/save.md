@@ -13,41 +13,45 @@ description: Session lifecycle management with Serena MCP integration for contex
   <syntax>/sc:save [--type session|learnings|context|all] [--summarize] [--checkpoint]</syntax>
 
   <triggers>
-    <t>Session completion</t>
-    <t>Cross-session memory management</t>
-    <t>Discovery preservation</t>
-    <t>Progress tracking</t>
+    - Session completion
+    - Cross-session memory management
+    - Discovery preservation
+    - Progress tracking
   </triggers>
 
   <flow>
-    <s n="1">Analyze: Session progress + discoveries</s>
-    <s n="2">Persist: Context + learnings (Serena memory)</s>
-    <s n="3">Checkpoint: Recovery points + progress tracking</s>
-    <s n="4">Validate: Data integrity + compatibility</s>
-    <s n="5">Prepare: Ready for future session continuation</s>
+    1. **Analyze**: Session progress + discoveries
+    2. **Persist**: Context + learnings (Serena memory)
+    3. **Checkpoint**: Recovery points + progress tracking
+    4. **Validate**: Data integrity + compatibility
+    5. **Prepare**: Ready for future session continuation
   </flow>
 
   <mcp servers="serena:memory|serena:persistence"/>
 
   <tools>
-    <t n="write_memory/read_memory">Session context persistence</t>
-    <t n="think_about_collected_information">Discovery identification</t>
-    <t n="summarize_changes">Progress documentation</t>
-    <t n="TodoRead">Auto checkpoint triggers</t>
+    - **write_memory/read_memory**: Session context persistence
+    - **think_about_collected_information**: Discovery identification
+    - **summarize_changes**: Progress documentation
+    - **TodoRead**: Auto checkpoint triggers
   </tools>
 
   <patterns>
-    <p n="Preservation">Discovery → memory → checkpoint</p>
-    <p n="Learning">Accumulation → archival → understanding</p>
-    <p n="Progress">Completion → auto-checkpoint → continuity</p>
-    <p n="Recovery">State → validation → restoration ready</p>
+    - **Preservation**: Discovery → memory → checkpoint
+    - **Learning**: Accumulation → archival → understanding
+    - **Progress**: Completion → auto-checkpoint → continuity
+    - **Recovery**: State → validation → restoration ready
   </patterns>
 
   <examples>
-    <ex i="/sc:save" o="Auto-checkpoint if >30min session"/>
-    <ex i="--type all --checkpoint" o="Complete preservation + recovery"/>
-    <ex i="--summarize" o="Summary + learning patterns"/>
-    <ex i="--type learnings" o="Patterns + insights only"/>
+
+| Input | Output |
+|-------|--------|
+| `/sc:save` | Auto-checkpoint if >30min session |
+| `--type all --checkpoint` | Complete preservation + recovery |
+| `--summarize` | Summary + learning patterns |
+| `--type learnings` | Patterns + insights only |
+
   </examples>
 
   <bounds will="Serena integration|auto-checkpoints|discovery preservation" wont="operate without Serena|save without validation|override without checkpoint"/>

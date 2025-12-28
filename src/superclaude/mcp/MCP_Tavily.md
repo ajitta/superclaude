@@ -7,77 +7,85 @@
   </role>
 
   <choose>
-    <use context="structured search">Advanced filtering over WebSearch</use>
-    <use context="multi-source">Search, not single page extraction (use WebFetch)</use>
-    <use context="research">Comprehensive multi-source investigations</use>
-    <use context="current info">Post-knowledge-cutoff events</use>
-    <avoid context="training knowledge">Simple questions from training</avoid>
-    <avoid context="code generation">Writing code, local file ops</avoid>
+**Use for:**
+- Structured search: Advanced filtering over WebSearch
+- Multi-source: Search, not single page extraction (use WebFetch)
+- Research: Comprehensive multi-source investigations
+- Current info: Post-knowledge-cutoff events
+
+**Avoid for:**
+- Training knowledge: Simple questions from training
+- Code generation: Writing code, local file ops
   </choose>
 
   <config_req>TAVILY_API_KEY from https://app.tavily.com</config_req>
 
   <capabilities>
-    <c n="Web">General searches with ranking</c>
-    <c n="News">Time-filtered current events</c>
-    <c n="Academic">Scholarly articles, research papers</c>
-    <c n="Domains">Include/exclude specific domains</c>
-    <c n="Extract">Full-text from results</c>
-    <c n="Freshness">Prioritize recent content</c>
-    <c n="Multi-Round">Iterative refinement</c>
+- **Web**: General searches with ranking
+- **News**: Time-filtered current events
+- **Academic**: Scholarly articles, research papers
+- **Domains**: Include/exclude specific domains
+- **Extract**: Full-text from results
+- **Freshness**: Prioritize recent content
+- **Multi-Round**: Iterative refinement
   </capabilities>
 
   <synergy>
-    <with n="Sequential">Tavily provides info → Sequential analyzes/synthesizes</with>
-    <with n="Playwright">Tavily discovers URLs → Playwright extracts complex content</with>
-    <with n="Context7">Tavily searches updates → Context7 provides stable docs</with>
-    <with n="Serena">Tavily searches → Serena stores sessions</with>
+- **Sequential**: Tavily provides info → Sequential analyzes/synthesizes
+- **Playwright**: Tavily discovers URLs → Playwright extracts complex content
+- **Context7**: Tavily searches updates → Context7 provides stable docs
+- **Serena**: Tavily searches → Serena stores sessions
   </synergy>
 
   <search_patterns>
-    <p n="Basic">query → ranked results + snippets</p>
-    <p n="Domain">query + domains:[arxiv,github] → filtered results</p>
-    <p n="Time">query + recency:week|month|year → recent results</p>
-    <p n="Deep">query + extract:true → full content extraction</p>
+- **Basic**: query → ranked results + snippets
+- **Domain**: query + domains:[arxiv,github] → filtered results
+- **Time**: query + recency:week|month|year → recent results
+- **Deep**: query + extract:true → full content extraction
   </search_patterns>
 
   <quality>Refine queries | Source diversity | Credibility filter | Dedupe | Relevance scoring</quality>
 
   <flows>
-    <flow n="Research">Tavily:broad → Sequential:gaps → Tavily:targeted → Sequential:synthesize → Serena:store</flow>
-    <flow n="Fact-Check">Tavily:verify → Tavily:contradictions → Sequential:evidence → Report:balanced</flow>
-    <flow n="Competitive">Tavily:competitors → Tavily:trends → Sequential:compare → Context7:tech → Report:insights</flow>
-    <flow n="Deep-Research">Plan:decompose → Tavily:search → Analyze:URLs → Route:simple→Tavily|complex→Playwright → Synthesize → Iterate</flow>
+- **Research**: Tavily:broad → Sequential:gaps → Tavily:targeted → Sequential:synthesize → Serena:store
+- **Fact-Check**: Tavily:verify → Tavily:contradictions → Sequential:evidence → Report:balanced
+- **Competitive**: Tavily:competitors → Tavily:trends → Sequential:compare → Context7:tech → Report:insights
+- **Deep-Research**: Plan:decompose → Tavily:search → Analyze:URLs → Route:simple→Tavily|complex→Playwright → Synthesize → Iterate
   </flows>
 
   <strategies>
-    <s n="Multi-Hop">Initial:broad → Follow1:entities → Follow2:relationships → Synthesize:resolve contradictions</s>
-    <s n="Adaptive">Simple:direct terms | Complex:variations+boolean+domain+time | Iterative:broad→refine→gaps</s>
-    <s n="Credibility">High:academic,gov,established,official | Medium:industry,expert,community | Low:forums,social,unverified</s>
+- **Multi-Hop**: Initial:broad → Follow1:entities → Follow2:relationships → Synthesize:resolve contradictions
+- **Adaptive**: Simple:direct terms | Complex:variations+boolean+domain+time | Iterative:broad→refine→gaps
+- **Credibility**: High:academic,gov,established,official | Medium:industry,expert,community | Low:forums,social,unverified
   </strategies>
 
   <perf>Batch similar | Cache results | Prioritize high-value | Limit depth by confidence</perf>
 
   <dr_integration>
-    <planning>Planning-Only:direct | Intent:clarify→focus | Unified:present→adjust</planning>
-    <multi_hop>Track genealogy | Build on previous | Detect circular | Maintain context</multi_hop>
-    <reflection>Assess relevance | ID gaps | Trigger searches | Calc confidence</reflection>
-    <learning>Query formulations | Search strategies | Domain prefs | Time patterns</learning>
+- **Planning**: Planning-Only:direct | Intent:clarify→focus | Unified:present→adjust
+- **Multi-hop**: Track genealogy | Build on previous | Detect circular | Maintain context
+- **Reflection**: Assess relevance | ID gaps | Trigger searches | Calc confidence
+- **Learning**: Query formulations | Search strategies | Domain prefs | Time patterns
   </dr_integration>
 
   <errors>
-    <e issue="API key missing" fix="Check TAVILY_API_KEY env var"/>
-    <e issue="Rate limit" fix="Wait + exponential backoff"/>
-    <e issue="Timeout" fix="Increase timeout or skip"/>
-    <e issue="No results" fix="Expand/modify search terms"/>
-    <fallbacks>Native WebSearch | Alternative queries | Expand scope | Use cached | Simplify terms</fallbacks>
+| Issue | Fix |
+|-------|-----|
+| API key missing | Check TAVILY_API_KEY env var |
+| Rate limit | Wait + exponential backoff |
+| Timeout | Increase timeout or skip |
+| No results | Expand/modify search terms |
+
+**Fallbacks**: Native WebSearch | Alternative queries | Expand scope | Use cached | Simplify terms
   </errors>
 
   <examples>
-    <ex i="latest TypeScript 2024" o="Tavily" r="current tech info"/>
-    <ex i="OpenAI updates this week" o="Tavily" r="recent news"/>
-    <ex i="quantum computing 2024" o="Tavily" r="recent research"/>
-    <ex i="explain recursion" o="Native Claude" r="general concept"/>
-    <ex i="write Python function" o="Native Claude" r="code generation"/>
+| Input | Output | Reason |
+|-------|--------|--------|
+| latest TypeScript 2024 | Tavily | current tech info |
+| OpenAI updates this week | Tavily | recent news |
+| quantum computing 2024 | Tavily | recent research |
+| explain recursion | Native Claude | general concept |
+| write Python function | Native Claude | code generation |
   </examples>
 </component>

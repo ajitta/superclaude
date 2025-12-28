@@ -7,23 +7,28 @@
   </role>
 
   <choose>
-    <use context="deep performance analysis">Understand performance bottlenecks</use>
-    <use context="live debugging">Inspect runtime page state, debug live issues</use>
-    <use context="network analysis">Inspect requests, CORS errors</use>
-    <avoid context="E2E testing">Use Playwright</avoid>
-    <avoid context="static analysis">Use native Claude</avoid>
+**Use for:**
+- Deep performance analysis: Understand performance bottlenecks
+- Live debugging: Inspect runtime page state, debug live issues
+- Network analysis: Inspect requests, CORS errors
+
+**Avoid for:**
+- E2E testing: Use Playwright
+- Static analysis: Use native Claude
   </choose>
 
   <synergy>
-    <with n="Sequential">Sequential plans perf strategy → DevTools verifies</with>
-    <with n="Playwright">Playwright automates flow → DevTools analyzes</with>
+- **Sequential**: Sequential plans perf strategy → DevTools verifies
+- **Playwright**: Playwright automates flow → DevTools analyzes
   </synergy>
 
   <examples>
-    <ex i="analyze page performance" o="DevTools" r="performance analysis"/>
-    <ex i="debug layout shift" o="DevTools" r="live debugging"/>
-    <ex i="network requests failing" o="DevTools" r="network analysis"/>
-    <ex i="test login flow" o="Playwright" r="browser automation"/>
-    <ex i="review function logic" o="Native Claude" r="static analysis"/>
+| Input | Output | Reason |
+|-------|--------|--------|
+| analyze page performance | DevTools | performance analysis |
+| debug layout shift | DevTools | live debugging |
+| network requests failing | DevTools | network analysis |
+| test login flow | Playwright | browser automation |
+| review function logic | Native Claude | static analysis |
   </examples>
 </component>

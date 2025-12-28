@@ -7,22 +7,27 @@
   </role>
 
   <choose>
-    <use context="UI components">Use Magic, not native HTML/CSS</use>
-    <use context="production-ready">Accessible components needed</use>
-    <use context="design systems">Consistency with existing patterns</use>
-    <use context="modern frameworks">React, Vue, Angular best practices</use>
-    <avoid context="backend">API logic, database, server config</avoid>
+**Use for:**
+- UI components: Use Magic, not native HTML/CSS
+- Production-ready: Accessible components needed
+- Design systems: Consistency with existing patterns
+- Modern frameworks: React, Vue, Angular best practices
+
+**Avoid for:**
+- Backend: API logic, database, server config
   </choose>
 
   <synergy>
-    <with n="Context7">Magic uses 21st.dev → Context7 provides framework integration</with>
-    <with n="Sequential">Sequential analyzes UI reqs → Magic implements components</with>
+- **Context7**: Magic uses 21st.dev → Context7 provides framework integration
+- **Sequential**: Sequential analyzes UI reqs → Magic implements components
   </synergy>
 
   <examples>
-    <ex i="create login form" o="Magic" r="UI component generation"/>
-    <ex i="responsive navbar" o="Magic" r="UI pattern with accessibility"/>
-    <ex i="data table with sorting" o="Magic" r="complex UI component"/>
-    <ex i="write REST API" o="Native Claude" r="backend logic"/>
+| Input | Output | Reason |
+|-------|--------|--------|
+| create login form | Magic | UI component generation |
+| responsive navbar | Magic | UI pattern with accessibility |
+| data table with sorting | Magic | complex UI component |
+| write REST API | Native Claude | backend logic |
   </examples>
 </component>

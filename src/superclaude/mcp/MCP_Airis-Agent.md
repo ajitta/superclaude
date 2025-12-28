@@ -7,18 +7,23 @@
   </role>
 
   <tools>
-    <t n="airis_confidence_check">Validate decisions before implementation</t>
-    <t n="airis_deep_research">Comprehensive research with web search</t>
-    <t n="airis_repo_index">Index repository structure for better context</t>
-    <t n="airis_docs_optimize">Optimize documentation structure</t>
-    <t n="airis_sync_manifest">Sync manifest.toml with filesystem</t>
+- **airis_confidence_check**: Validate decisions before implementation
+- **airis_deep_research**: Comprehensive research with web search
+- **airis_repo_index**: Index repository structure for better context
+- **airis_docs_optimize**: Optimize documentation structure
+- **airis_sync_manifest**: Sync manifest.toml with filesystem
   </tools>
 
   <install recommended="AIRIS MCP Gateway">
-    <cmd>git clone https://github.com/agiletec-inc/airis-mcp-gateway.git</cmd>
-    <cmd>cd airis-mcp-gateway &amp;&amp; docker compose up -d</cmd>
-    <cmd>claude mcp add --scope user --transport sse airis-mcp-gateway http://localhost:9400/sse</cmd>
+```bash
+git clone https://github.com/agiletec-inc/airis-mcp-gateway.git
+cd airis-mcp-gateway && docker compose up -d
+claude mcp add --scope user --transport sse airis-mcp-gateway http://localhost:9400/sse
+```
   </install>
 
-  <links gateway="https://github.com/agiletec-inc/airis-mcp-gateway" standalone="https://github.com/agiletec-inc/airis-agent"/>
+  <links>
+- **Gateway**: https://github.com/agiletec-inc/airis-mcp-gateway
+- **Standalone**: https://github.com/agiletec-inc/airis-agent
+  </links>
 </component>

@@ -11,86 +11,86 @@ description: List all available /sc commands and their functionality
   </role>
 
   <triggers>
-    <t>Command discovery + reference</t>
-    <t>Framework capability overview</t>
-    <t>Documentation for commands</t>
+    - Command discovery + reference
+    - Framework capability overview
+    - Documentation for commands
   </triggers>
 
   <flow>
-    <s n="1">Display: Complete command list</s>
-    <s n="2">Complete: End after display</s>
+    1. **Display**: Complete command list
+    2. **Complete**: End after display
   </flow>
 
   <commands>
-    <c n="analyze">Code analysis: quality, security, performance, architecture</c>
-    <c n="brainstorm">Requirements discovery via Socratic dialogue</c>
-    <c n="build">Build, compile, package with error handling</c>
-    <c n="business-panel">Multi-expert business analysis</c>
-    <c n="cleanup">Dead code removal + structure optimization</c>
-    <c n="design">System architecture + API design</c>
-    <c n="document">Focused documentation generation</c>
-    <c n="estimate">Development time/effort estimates</c>
-    <c n="explain">Code + concept explanations</c>
-    <c n="git">Intelligent git operations</c>
-    <c n="help">This command reference</c>
-    <c n="implement">Feature implementation + MCP integration</c>
-    <c n="improve">Code quality + performance improvements</c>
-    <c n="index">Project documentation + knowledge base</c>
-    <c n="load">Session context loading (Serena)</c>
-    <c n="reflect">Task reflection + validation</c>
-    <c n="save">Session context persistence</c>
-    <c n="select-tool">Intelligent MCP tool selection</c>
-    <c n="spawn">Meta-system task orchestration</c>
-    <c n="spec-panel">Multi-expert specification review</c>
-    <c n="task">Complex task workflow management</c>
-    <c n="test">Test execution + coverage analysis</c>
-    <c n="troubleshoot">Issue diagnosis + resolution</c>
-    <c n="workflow">PRD → implementation workflow</c>
+    - **analyze**: Code analysis: quality, security, performance, architecture
+    - **brainstorm**: Requirements discovery via Socratic dialogue
+    - **build**: Build, compile, package with error handling
+    - **business-panel**: Multi-expert business analysis
+    - **cleanup**: Dead code removal + structure optimization
+    - **design**: System architecture + API design
+    - **document**: Focused documentation generation
+    - **estimate**: Development time/effort estimates
+    - **explain**: Code + concept explanations
+    - **git**: Intelligent git operations
+    - **help**: This command reference
+    - **implement**: Feature implementation + MCP integration
+    - **improve**: Code quality + performance improvements
+    - **index**: Project documentation + knowledge base
+    - **load**: Session context loading (Serena)
+    - **reflect**: Task reflection + validation
+    - **save**: Session context persistence
+    - **select-tool**: Intelligent MCP tool selection
+    - **spawn**: Meta-system task orchestration
+    - **spec-panel**: Multi-expert specification review
+    - **task**: Complex task workflow management
+    - **test**: Test execution + coverage analysis
+    - **troubleshoot**: Issue diagnosis + resolution
+    - **workflow**: PRD → implementation workflow
   </commands>
 
   <flags>
     <category name="Mode">
-      <f n="--brainstorm">Collaborative discovery</f>
-      <f n="--introspect">Expose thinking process</f>
-      <f n="--task-manage">Systematic organization</f>
-      <f n="--orchestrate">Parallel tool optimization</f>
-      <f n="--token-efficient">30-50% token reduction</f>
+      - **--brainstorm**: Collaborative discovery
+      - **--introspect**: Expose thinking process
+      - **--task-manage**: Systematic organization
+      - **--orchestrate**: Parallel tool optimization
+      - **--token-efficient**: 30-50% token reduction
     </category>
     <category name="MCP">
-      <f n="--c7|--context7">Curated documentation</f>
-      <f n="--seq|--sequential">Multi-step reasoning</f>
-      <f n="--magic">UI generation (21st.dev)</f>
-      <f n="--morph|--morphllm">Bulk transformations</f>
-      <f n="--serena">Semantic + memory</f>
-      <f n="--play|--playwright">Browser automation</f>
-      <f n="--all-mcp">Enable all servers</f>
-      <f n="--no-mcp">Native tools only</f>
+      - **--c7|--context7**: Curated documentation
+      - **--seq|--sequential**: Multi-step reasoning
+      - **--magic**: UI generation (21st.dev)
+      - **--morph|--morphllm**: Bulk transformations
+      - **--serena**: Semantic + memory
+      - **--play|--playwright**: Browser automation
+      - **--all-mcp**: Enable all servers
+      - **--no-mcp**: Native tools only
     </category>
     <category name="Depth">
-      <f n="--think">~4K tokens, Sequential</f>
-      <f n="--think-hard">~10K tokens, Seq+C7</f>
-      <f n="--ultrathink">~32K tokens, all MCP</f>
+      - **--think**: ~4K tokens, Sequential
+      - **--think-hard**: ~10K tokens, Seq+C7
+      - **--ultrathink**: ~32K tokens, all MCP
     </category>
     <category name="Control">
-      <f n="--delegate">Sub-agent parallel processing</f>
-      <f n="--concurrency [n]">Max concurrent ops (1-15)</f>
-      <f n="--loop">Iterative improvement cycles</f>
-      <f n="--validate">Pre-execution risk assessment</f>
-      <f n="--safe-mode">Maximum validation</f>
+      - **--delegate**: Sub-agent parallel processing
+      - **--concurrency [n]**: Max concurrent ops (1-15)
+      - **--loop**: Iterative improvement cycles
+      - **--validate**: Pre-execution risk assessment
+      - **--safe-mode**: Maximum validation
     </category>
     <category name="Output">
-      <f n="--uc|--ultracompressed">Symbol communication</f>
-      <f n="--scope">file|module|project|system</f>
-      <f n="--focus">perf|sec|qual|arch|a11y|test</f>
+      - **--uc|--ultracompressed**: Symbol communication
+      - **--scope**: file|module|project|system
+      - **--focus**: perf|sec|qual|arch|a11y|test
     </category>
   </flags>
 
   <priority_rules>
-    <r>Safety: --safe-mode > --validate > optimization</r>
-    <r>Override: User flags > auto-detection</r>
-    <r>Depth: --ultrathink > --think-hard > --think</r>
-    <r>MCP: --no-mcp overrides all MCP flags</r>
-    <r>Scope: system > project > module > file</r>
+    - **Safety**: --safe-mode > --validate > optimization
+    - **Override**: User flags > auto-detection
+    - **Depth**: --ultrathink > --think-hard > --think
+    - **MCP**: --no-mcp overrides all MCP flags
+    - **Scope**: system > project > module > file
   </priority_rules>
 
   <bounds will="display commands|flags|usage" wont="execute|create files|activate modes"/>

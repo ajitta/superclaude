@@ -13,50 +13,54 @@ description: Multi-expert specification review and improvement using renowned so
   <syntax>/sc:spec-panel [spec|@file] [--mode discussion|critique|socratic] [--experts "name1,name2"] [--focus requirements|architecture|testing|compliance] [--iterations N]</syntax>
 
   <triggers>
-    <t>Specification review requests</t>
-    <t>Expert panel analysis</t>
-    <t>Requirements quality assessment</t>
+    - Specification review requests
+    - Expert panel analysis
+    - Requirements quality assessment
   </triggers>
 
   <flow>
-    <s n="1">Analyze: Parse spec content</s>
-    <s n="2">Assemble: Select relevant experts</s>
-    <s n="3">Review: Multi-expert analysis</s>
-    <s n="4">Collaborate: Expert dialogue</s>
-    <s n="5">Synthesize: Improvement roadmap</s>
+    1. **Analyze**: Parse spec content
+    2. **Assemble**: Select relevant experts
+    3. **Review**: Multi-expert analysis
+    4. **Collaborate**: Expert dialogue
+    5. **Synthesize**: Improvement roadmap
   </flow>
 
   <mcp servers="seq:coordination|c7:patterns"/>
   <personas p="tech-writer|sys-arch|qual-eng"/>
 
   <experts>
-    <e n="Wiegers" domain="Requirements quality, SMART" q="How would you validate this?"/>
-    <e n="Adzic" domain="BDD, Given/When/Then" q="Concrete examples?"/>
-    <e n="Cockburn" domain="Use cases, goals" q="Primary stakeholder?"/>
-    <e n="Fowler" domain="API design, patterns" q="Separation of concerns?"/>
-    <e n="Nygard" domain="Production reliability" q="What happens when this fails?"/>
-    <e n="Newman" domain="Microservices" q="Service evolution?"/>
-    <e n="Crispin" domain="Testing strategies" q="How to validate?"/>
-    <e n="Hightower" domain="Cloud native, K8s" q="Cloud deployment?"/>
+    - **Wiegers** (Requirements quality, SMART): "How would you validate this?"
+    - **Adzic** (BDD, Given/When/Then): "Concrete examples?"
+    - **Cockburn** (Use cases, goals): "Primary stakeholder?"
+    - **Fowler** (API design, patterns): "Separation of concerns?"
+    - **Nygard** (Production reliability): "What happens when this fails?"
+    - **Newman** (Microservices): "Service evolution?"
+    - **Crispin** (Testing strategies): "How to validate?"
+    - **Hightower** (Cloud native, K8s): "Cloud deployment?"
   </experts>
 
   <modes>
-    <m n="discussion">Sequential expert dialogue building insights</m>
-    <m n="critique">Issue → Severity → Recommendation → Priority</m>
-    <m n="socratic">Deep questioning to surface assumptions</m>
+    - **discussion**: Sequential expert dialogue building insights
+    - **critique**: Issue → Severity → Recommendation → Priority
+    - **socratic**: Deep questioning to surface assumptions
   </modes>
 
   <focus_areas>
-    <f n="requirements" experts="Wiegers,Adzic,Cockburn">Clarity, testability, acceptance</f>
-    <f n="architecture" experts="Fowler,Newman,Nygard">Interfaces, boundaries, patterns</f>
-    <f n="testing" experts="Crispin,Adzic">Strategy, edge cases, validation</f>
-    <f n="compliance" experts="Wiegers,Nygard">Security, regulatory, audit</f>
+    - **requirements** (Wiegers,Adzic,Cockburn): Clarity, testability, acceptance
+    - **architecture** (Fowler,Newman,Nygard): Interfaces, boundaries, patterns
+    - **testing** (Crispin,Adzic): Strategy, edge cases, validation
+    - **compliance** (Wiegers,Nygard): Security, regulatory, audit
   </focus_areas>
 
   <examples>
-    <ex i="@auth_api.yml --mode critique --focus requirements,architecture" o="Multi-focus review"/>
-    <ex i="'user story' --mode discussion --experts 'wiegers,adzic'" o="Expert dialogue"/>
-    <ex i="@system.yml --mode socratic --iterations 3" o="Deep questioning"/>
+
+| Input | Output |
+|-------|--------|
+| `@auth_api.yml --mode critique --focus requirements,architecture` | Multi-focus review |
+| `'user story' --mode discussion --experts 'wiegers,adzic'` | Expert dialogue |
+| `@system.yml --mode socratic --iterations 3` | Deep questioning |
+
   </examples>
 
   <bounds will="expert-level review|actionable recs|multi-mode analysis" wont="replace human judgment|modify without consent|legal guarantees"/>

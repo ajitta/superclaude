@@ -7,23 +7,28 @@
   </role>
 
   <choose>
-    <use context="real browser">Actual rendering, not just code</use>
-    <use context="integration testing">User journeys, visual validation over unit tests</use>
-    <use context="E2E">Login flows, form submissions, multi-page workflows</use>
-    <use context="visual testing">Screenshots, responsive design validation</use>
-    <avoid context="code analysis">Static review, syntax, logic validation</avoid>
+**Use for:**
+- Real browser: Actual rendering, not just code
+- Integration testing: User journeys, visual validation over unit tests
+- E2E: Login flows, form submissions, multi-page workflows
+- Visual testing: Screenshots, responsive design validation
+
+**Avoid for:**
+- Code analysis: Static review, syntax, logic validation
   </choose>
 
   <synergy>
-    <with n="Sequential">Sequential plans test strategy → Playwright executes</with>
-    <with n="Magic">Magic creates UI → Playwright validates accessibility</with>
+- **Sequential**: Sequential plans test strategy → Playwright executes
+- **Magic**: Magic creates UI → Playwright validates accessibility
   </synergy>
 
   <examples>
-    <ex i="test login flow" o="Playwright" r="browser automation"/>
-    <ex i="form validation works" o="Playwright" r="real user interaction"/>
-    <ex i="screenshots responsive design" o="Playwright" r="visual testing"/>
-    <ex i="accessibility compliance" o="Playwright" r="automated WCAG"/>
-    <ex i="review function logic" o="Native Claude" r="static analysis"/>
+| Input | Output | Reason |
+|-------|--------|--------|
+| test login flow | Playwright | browser automation |
+| form validation works | Playwright | real user interaction |
+| screenshots responsive design | Playwright | visual testing |
+| accessibility compliance | Playwright | automated WCAG |
+| review function logic | Native Claude | static analysis |
   </examples>
 </component>

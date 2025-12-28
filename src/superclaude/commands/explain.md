@@ -13,41 +13,45 @@ description: Provide clear explanations of code, concepts, and system behavior w
   <syntax>/sc:explain [target] [--level basic|intermediate|advanced] [--format text|examples|interactive] [--context domain]</syntax>
 
   <triggers>
-    <t>Code understanding requests</t>
-    <t>System behavior explanation</t>
-    <t>Educational content generation</t>
-    <t>Framework concept clarification</t>
+    - Code understanding requests
+    - System behavior explanation
+    - Educational content generation
+    - Framework concept clarification
   </triggers>
 
   <flow>
-    <s n="1">Analyze: Target code/concept/system</s>
-    <s n="2">Assess: Audience level + depth</s>
-    <s n="3">Structure: Progressive complexity</s>
-    <s n="4">Generate: Explanations + examples</s>
-    <s n="5">Validate: Accuracy + effectiveness</s>
+    1. **Analyze**: Target code/concept/system
+    2. **Assess**: Audience level + depth
+    3. **Structure**: Progressive complexity
+    4. **Generate**: Explanations + examples
+    5. **Validate**: Accuracy + effectiveness
   </flow>
 
   <mcp servers="seq:analysis|c7:patterns"/>
   <personas p="educator|arch|sec"/>
 
   <tools>
-    <t n="Read/Grep/Glob">Code analysis + pattern ID</t>
-    <t n="TodoWrite">Multi-part explanation tracking</t>
-    <t n="Task">Complex explanation delegation</t>
+    - **Read/Grep/Glob**: Code analysis + pattern ID
+    - **TodoWrite**: Multi-part explanation tracking
+    - **Task**: Complex explanation delegation
   </tools>
 
   <patterns>
-    <p n="Progressive">Basic → intermediate → advanced</p>
-    <p n="Framework">C7 docs → official patterns</p>
-    <p n="Multi-Domain">Technical + clarity + security</p>
-    <p n="Interactive">Static → examples → exploration</p>
+    - **Progressive**: Basic → intermediate → advanced
+    - **Framework**: C7 docs → official patterns
+    - **Multi-Domain**: Technical + clarity + security
+    - **Interactive**: Static → examples → exploration
   </patterns>
 
   <examples>
-    <ex i="authentication.js --level basic" o="Beginner explanation"/>
-    <ex i="react-hooks --intermediate --context react" o="C7 patterns"/>
-    <ex i="microservices-system --advanced --interactive" o="Arch deep-dive"/>
-    <ex i="jwt-authentication --context security --basic" o="Security concepts"/>
+
+| Input | Output |
+|-------|--------|
+| `authentication.js --level basic` | Beginner explanation |
+| `react-hooks --intermediate --context react` | C7 patterns |
+| `microservices-system --advanced --interactive` | Arch deep-dive |
+| `jwt-authentication --context security --basic` | Security concepts |
+
   </examples>
 
   <bounds will="clear explanations|persona expertise|framework integration" wont="explain without analysis|override standards|reveal sensitive"/>

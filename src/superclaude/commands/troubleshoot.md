@@ -13,39 +13,43 @@ description: Diagnose and resolve issues in code, builds, deployments, and syste
   <syntax>/sc:troubleshoot [issue] [--type bug|build|performance|deployment] [--trace] [--fix]</syntax>
 
   <triggers>
-    <t>Code defects + runtime errors</t>
-    <t>Build failure analysis</t>
-    <t>Performance issue diagnosis</t>
-    <t>Deployment problem debugging</t>
+    - Code defects + runtime errors
+    - Build failure analysis
+    - Performance issue diagnosis
+    - Deployment problem debugging
   </triggers>
 
   <flow>
-    <s n="1">Analyze: Issue description + system state</s>
-    <s n="2">Investigate: Root causes via pattern analysis</s>
-    <s n="3">Debug: Structured procedures + log examination</s>
-    <s n="4">Propose: Solution + impact assessment</s>
-    <s n="5">Resolve: Apply fixes + verify effectiveness</s>
+    1. **Analyze**: Issue description + system state
+    2. **Investigate**: Root causes via pattern analysis
+    3. **Debug**: Structured procedures + log examination
+    4. **Propose**: Solution + impact assessment
+    5. **Resolve**: Apply fixes + verify effectiveness
   </flow>
 
   <tools>
-    <t n="Read">Log analysis + state examination</t>
-    <t n="Bash">Diagnostic command execution</t>
-    <t n="Grep">Error pattern detection</t>
-    <t n="Write">Diagnostic reports + documentation</t>
+    - **Read**: Log analysis + state examination
+    - **Bash**: Diagnostic command execution
+    - **Grep**: Error pattern detection
+    - **Write**: Diagnostic reports + documentation
   </tools>
 
   <patterns>
-    <p n="Bug">Error → stack trace → code inspection → fix validation</p>
-    <p n="Build">Log analysis → dependency check → config validation</p>
-    <p n="Performance">Metrics → bottleneck ID → optimization recs</p>
-    <p n="Deployment">Environment → config verification → service validation</p>
+    - **Bug**: Error → stack trace → code inspection → fix validation
+    - **Build**: Log analysis → dependency check → config validation
+    - **Performance**: Metrics → bottleneck ID → optimization recs
+    - **Deployment**: Environment → config verification → service validation
   </patterns>
 
   <examples>
-    <ex i="'Null pointer in user service' --type bug --trace" o="Root cause + targeted fix"/>
-    <ex i="'TypeScript compilation errors' --type build --fix" o="Auto-apply safe fixes"/>
-    <ex i="'API response times degraded' --type performance" o="Bottleneck + optimization"/>
-    <ex i="'Service not starting' --type deployment --trace" o="Environment analysis"/>
+
+| Input | Output |
+|-------|--------|
+| `'Null pointer in user service' --type bug --trace` | Root cause + targeted fix |
+| `'TypeScript compilation errors' --type build --fix` | Auto-apply safe fixes |
+| `'API response times degraded' --type performance` | Bottleneck + optimization |
+| `'Service not starting' --type deployment --trace` | Environment analysis |
+
   </examples>
 
   <bounds will="systematic diagnosis|validated solutions|safe fixes" wont="risky fixes without confirm|modify production without permission|arch changes without impact"/>

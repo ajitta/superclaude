@@ -13,41 +13,45 @@ description: Generate comprehensive project documentation and knowledge base wit
   <syntax>/sc:index [target] [--type docs|api|structure|readme] [--format md|json|yaml]</syntax>
 
   <triggers>
-    <t>Project documentation creation</t>
-    <t>Knowledge base generation</t>
-    <t>API documentation needs</t>
-    <t>Cross-referencing requirements</t>
+    - Project documentation creation
+    - Knowledge base generation
+    - API documentation needs
+    - Cross-referencing requirements
   </triggers>
 
   <flow>
-    <s n="1">Analyze: Project structure + key components</s>
-    <s n="2">Organize: Intelligent patterns + cross-refs</s>
-    <s n="3">Generate: Comprehensive docs + framework patterns</s>
-    <s n="4">Validate: Completeness + quality standards</s>
-    <s n="5">Maintain: Update while preserving manual additions</s>
+    1. **Analyze**: Project structure + key components
+    2. **Organize**: Intelligent patterns + cross-refs
+    3. **Generate**: Comprehensive docs + framework patterns
+    4. **Validate**: Completeness + quality standards
+    5. **Maintain**: Update while preserving manual additions
   </flow>
 
   <mcp servers="seq:analysis|c7:patterns"/>
   <personas p="arch|scribe|qual"/>
 
   <tools>
-    <t n="Read/Grep/Glob">Structure analysis + content extraction</t>
-    <t n="Write">Doc creation + cross-referencing</t>
-    <t n="TodoWrite">Multi-component progress</t>
-    <t n="Task">Large-scale doc delegation</t>
+    - **Read/Grep/Glob**: Structure analysis + content extraction
+    - **Write**: Doc creation + cross-referencing
+    - **TodoWrite**: Multi-component progress
+    - **Task**: Large-scale doc delegation
   </tools>
 
   <patterns>
-    <p n="Structure">Examination → component ID → organization → cross-refs</p>
-    <p n="Types">API docs | Structure docs | README | Knowledge base</p>
-    <p n="Quality">Completeness → accuracy → compliance → maintenance</p>
-    <p n="Framework">C7 patterns → official standards → best practices</p>
+    - **Structure**: Examination → component ID → organization → cross-refs
+    - **Types**: API docs | Structure docs | README | Knowledge base
+    - **Quality**: Completeness → accuracy → compliance → maintenance
+    - **Framework**: C7 patterns → official standards → best practices
   </patterns>
 
   <examples>
-    <ex i="project-root --type structure --format md" o="Navigable structure docs"/>
-    <ex i="src/api --type api --format json" o="API docs + validation"/>
-    <ex i=". --type docs" o="Knowledge base creation"/>
+
+| Input | Output |
+|-------|--------|
+| `project-root --type structure --format md` | Navigable structure docs |
+| `src/api --type api --format json` | API docs + validation |
+| `. --type docs` | Knowledge base creation |
+
   </examples>
 
   <bounds will="comprehensive docs|multi-persona|framework patterns" wont="override manual docs|generate without analysis|bypass standards"/>
