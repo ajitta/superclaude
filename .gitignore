@@ -99,6 +99,7 @@ Pipfile.lock
 poetry.lock
 
 # Claude Code - ignore project-local installation
+.claude/settings.local.json
 .claude/
 
 # SuperClaude specific
