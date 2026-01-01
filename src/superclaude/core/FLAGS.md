@@ -46,6 +46,21 @@
 - `--effort high`: Maximum reasoning depth
   </effort>
 
+  <extended_thinking note="API budget_tokens config">
+| Parameter | Value | Notes |
+|-----------|-------|-------|
+| budget_tokens | 1024-32768 | Start low, increase incrementally |
+| minimum | 1024 | Hard minimum enforced by API |
+| recommended_start | 2048 | Good balance for most tasks |
+| max_practical | 32768 | >32K requires batch processing |
+| temperature | INCOMPATIBLE | Do not set when thinking enabled |
+
+Mapping to flags:
+- `--think`: budget_tokens=4096
+- `--think-hard`: budget_tokens=10240
+- `--ultrathink`: budget_tokens=32768
+  </extended_thinking>
+
   <execution>
 | Flag | Trigger/Range | Effect |
 |------|---------------|--------|

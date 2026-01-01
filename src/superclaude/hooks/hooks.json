@@ -10,6 +10,29 @@
           }
         ]
       }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "./scripts/skill-activator.sh",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '.tool_input.file_path' | xargs -I {} sh -c 'echo \"{}\" | grep -qE \"\\.(ts|tsx|js|jsx)$\" && npx prettier --write \"{}\" 2>/dev/null || true'",
+            "timeout": 30
+          }
+        ]
+      }
     ]
   }
 }

@@ -13,6 +13,22 @@
 - Structure: Bullets, tables, concise over verbose
   </behaviors>
 
+  <context_limits note="Claude Code practical thresholds">
+| Threshold | Tokens | Action |
+|-----------|--------|--------|
+| Usable | ~176K | Full capabilities, normal operation |
+| Degradation | >200K | Model performance drops noticeably |
+| Warning | 75% | Trigger --token-efficient mode |
+| Critical | 85% | Trigger --safe-mode, auto --uc |
+| Maximum | 200K | Hard limit, context window full |
+
+Best practices:
+- Monitor usage before complex operations
+- Use /clear between unrelated tasks
+- Fresh sessions prevent context drift
+- One major task per session recommended
+  </context_limits>
+
   <symbols>
 | Category | Symbols |
 |----------|---------|
