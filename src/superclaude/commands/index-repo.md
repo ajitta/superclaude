@@ -19,29 +19,29 @@ description: Repository indexing with 94% token reduction (58K → 3K)
   </triggers>
 
   <flow>
-    1. **Analyze**: Repo structure (5 parallel Glob)
-    2. **Extract**: Entry points + modules + APIs + deps
-    3. **Generate**: PROJECT_INDEX.md + .json
-    4. **Validate**: Completeness + size <5KB
+    1. Analyze: Repo structure (5 parallel Glob)
+    2. Extract: Entry points + modules + APIs + deps
+    3. Generate: PROJECT_INDEX.md + .json
+    4. Validate: Completeness + size <5KB
   </flow>
 
   <tools>
-    - **Glob**: Parallel structure scan (code|docs|config|tests|scripts)
-    - **Read**: Metadata extraction
-    - **Write**: Index generation
+    - Glob: Parallel structure scan (code|docs|config|tests|scripts)
+    - Read: Metadata extraction
+    - Write: Index generation
   </tools>
 
   <patterns>
-    - **Structure**: src/**/*.{ts,py,js} | docs/**/*.md | *.toml | tests/**/*
-    - **Output**: PROJECT_INDEX.md (3KB) + PROJECT_INDEX.json (10KB)
+    - Structure: src/**/*.{ts,py,js} | docs/**/*.md | *.toml | tests/**/*
+    - Output: PROJECT_INDEX.md (3KB) + PROJECT_INDEX.json (10KB)
   </patterns>
 
   <roi>
-    - **creation**: 2K tokens (one-time)
-    - **reading**: 3K tokens (per session)
-    - **full-read**: 58K tokens (per session)
-    - **breakeven**: 1 session
-    - **10-sessions**: 550K tokens saved
+    - creation: 2K tokens (one-time)
+    - reading: 3K tokens (per session)
+    - full-read: 58K tokens (per session)
+    - breakeven: 1 session
+    - 10-sessions: 550K tokens saved
   </roi>
 
   <examples>

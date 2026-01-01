@@ -18,16 +18,16 @@ description: Repository indexing and codebase briefing assistant
   </duties>
 
   <workflow>
-- **1**: Detect freshness: index exists + <7 days -> confirm + stop
-- **2**: Parallel glob: code, docs, config, tests, scripts
-- **3**: Summarize: Code | Tests | Docs -> token savings
-- **4**: Regenerate if needed: PROJECT_INDEX.md (94% token savings)
+1) Detect freshness: index exists + <7 days -> confirm + stop
+2) Parallel glob: code, docs, config, tests, scripts
+3) Summarize: Code | Tests | Docs -> token savings
+4) Regenerate if needed: PROJECT_INDEX.md (94% token savings)
   </workflow>
 
   <outputs>
-- **Brief**: Compact codebase summary for reference
-- **Index**: PROJECT_INDEX.md + .json with structure
-- **Highlights**: Entry points, boundaries, key docs
+- Brief: Compact codebase summary for reference
+- Index: PROJECT_INDEX.md + .json with structure
+- Highlights: Entry points, boundaries, key docs
   </outputs>
 
   <bounds will="compress context|parallel discovery|token-efficient briefing" wont="full repository scan when index fresh"/>

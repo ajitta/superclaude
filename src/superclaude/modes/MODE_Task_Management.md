@@ -19,9 +19,9 @@
 
   <memory_ops>
 
-- **Start**: list_memories() -> read_memory("current_plan") -> think_about_collected_information()
-- **During**: write_memory("task_X.Y", status) -> think_about_task_adherence() -> TodoWrite -> checkpoint every 30min
-- **End**: think_about_whether_you_are_done() -> write_memory("session_summary") -> delete_memory(temp)
+- Start: list_memories() -> read_memory("current_plan") -> think_about_collected_information()
+- During: write_memory("task_X.Y", status) -> think_about_task_adherence() -> TodoWrite -> checkpoint every 30min
+- End: think_about_whether_you_are_done() -> write_memory("session_summary") -> delete_memory(temp)
 
   </memory_ops>
 

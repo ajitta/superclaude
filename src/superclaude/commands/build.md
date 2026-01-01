@@ -20,28 +20,28 @@ description: Build, compile, and package projects with intelligent error handlin
   </triggers>
 
   <flow>
-    1. **Analyze**: Structure, configs, deps
-    2. **Validate**: Environment + toolchain
-    3. **Execute**: Build + real-time monitoring
-    4. **Optimize**: Artifacts + bundle size
-    5. **Package**: Artifacts + reports
+    1. Analyze: Structure, configs, deps
+    2. Validate: Environment + toolchain
+    3. Execute: Build + real-time monitoring
+    4. Optimize: Artifacts + bundle size
+    5. Package: Artifacts + reports
   </flow>
 
   <mcp servers="play:validation"/>
   <personas p="devops"/>
 
   <tools>
-    - **Bash**: Build execution
-    - **Read**: Config analysis
-    - **Grep**: Error parsing
-    - **Glob**: Artifact discovery
-    - **Write**: Build reports
+    - Bash: Build execution
+    - Read: Config analysis
+    - Grep: Error parsing
+    - Glob: Artifact discovery
+    - Write: Build reports
   </tools>
 
   <patterns>
-    - **Environment**: dev|prod|test → appropriate config
-    - **Error**: Build failures → diagnostic + resolution
-    - **Optimize**: Artifact analysis → size reduction
+    - Environment: dev|prod|test → appropriate config
+    - Error: Build failures → diagnostic + resolution
+    - Optimize: Artifact analysis → size reduction
   </patterns>
 
   <examples>

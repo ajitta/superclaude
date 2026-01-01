@@ -20,27 +20,27 @@ description: Provide clear explanations of code, concepts, and system behavior w
   </triggers>
 
   <flow>
-    1. **Analyze**: Target code/concept/system
-    2. **Assess**: Audience level + depth
-    3. **Structure**: Progressive complexity
-    4. **Generate**: Explanations + examples
-    5. **Validate**: Accuracy + effectiveness
+    1. Analyze: Target code/concept/system
+    2. Assess: Audience level + depth
+    3. Structure: Progressive complexity
+    4. Generate: Explanations + examples
+    5. Validate: Accuracy + effectiveness
   </flow>
 
   <mcp servers="seq:analysis|c7:patterns"/>
   <personas p="educator|arch|sec"/>
 
   <tools>
-    - **Read/Grep/Glob**: Code analysis + pattern ID
-    - **TodoWrite**: Multi-part explanation tracking
-    - **Task**: Complex explanation delegation
+    - Read/Grep/Glob: Code analysis + pattern ID
+    - TodoWrite: Multi-part explanation tracking
+    - Task: Complex explanation delegation
   </tools>
 
   <patterns>
-    - **Progressive**: Basic → intermediate → advanced
-    - **Framework**: C7 docs → official patterns
-    - **Multi-Domain**: Technical + clarity + security
-    - **Interactive**: Static → examples → exploration
+    - Progressive: Basic → intermediate → advanced
+    - Framework: C7 docs → official patterns
+    - Multi-Domain: Technical + clarity + security
+    - Interactive: Static → examples → exploration
   </patterns>
 
   <examples>

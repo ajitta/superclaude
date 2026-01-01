@@ -8,10 +8,10 @@
 
   <behaviors>
 
-- **Symbol-Communication**: Visual symbols for logic, status, technical domains
-- **Abbreviation**: Context-aware compression for technical terms
-- **Compression**: 30-50% token reduction, >=95% info quality
-- **Structure**: Bullets, tables, concise over verbose
+- Symbol-Communication: Visual symbols for logic, status, technical domains
+- Abbreviation: Context-aware compression for technical terms
+- Compression: 30-50% token reduction, >=95% info quality
+- Structure: Bullets, tables, concise over verbose
 
   </behaviors>
 

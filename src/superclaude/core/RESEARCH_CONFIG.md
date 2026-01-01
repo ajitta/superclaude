@@ -7,17 +7,17 @@
   </role>
 
   <defaults>
-- **planning**: unified
-- **max_hops**: 5
-- **confidence**: 0.7
-- **memory**: true
-- **parallel**: true (DEFAULT_MODE)
+- planning: unified
+- max_hops: 5
+- confidence: 0.7
+- memory: true
+- parallel: true (DEFAULT_MODE)
   </defaults>
 
   <parallel_rules>
-- **Mandatory parallel**: Multiple searches | Batch extractions | Independent analyses | Non-dependent hops | Result processing
-- **Sequential only if**: Explicit dependency (Hop N needs N-1) | Rate limit | User request
-- **Batch config**: searches=5, extractions=3, analyses=2, group_by=domain|complexity|resource
+- Mandatory parallel: Multiple searches | Batch extractions | Independent analyses | Non-dependent hops | Result processing
+- Sequential only if: Explicit dependency (Hop N needs N-1) | Rate limit | User request
+- Batch config: searches=5, extractions=3, analyses=2, group_by=domain|complexity|resource
   </parallel_rules>
 
   <strategies>
@@ -29,10 +29,10 @@
   </strategies>
 
   <hop_config max="5" timeout="60s" parallel="true" loop_detect="true" genealogy="true">
-- **Entity**: Paper→Authors→Works→Collaborators (branches:3)
-- **Concept**: Topic→Subtopics→Details→Examples (depth:4)
-- **Temporal**: Current→Recent→Historical→Origins (backward)
-- **Causal**: Effect→Immediate→Root→Prevention (validation:required)
+- Entity: Paper→Authors→Works→Collaborators (branches:3)
+- Concept: Topic→Subtopics→Details→Examples (depth:4)
+- Temporal: Current→Recent→Historical→Origins (backward)
+- Causal: Effect→Immediate→Root→Prevention (validation:required)
   </hop_config>
 
   <confidence weights="relevance:0.5|completeness:0.5" min="0.6" target="0.8"/>
@@ -46,9 +46,9 @@ assess_quality | identify_gaps | consider_replanning | adjust_strategy
   <tools discovery="tavily" extraction="smart_routing" reasoning="sequential" memory="serena" parallel="true"/>
 
   <gates>
-- **planning**: objectives, strategy, success_criteria
-- **execution**: confidence ≥ 0.6
-- **synthesis**: coherence + clarity
+- planning: objectives, strategy, success_criteria
+- execution: confidence ≥ 0.6
+- synthesis: coherence + clarity
   </gates>
 
   <credibility>
@@ -79,9 +79,9 @@ assess_quality | identify_gaps | consider_replanning | adjust_strategy
   </extraction>
 
   <replanning>
-- **Confidence**: critical:<0.4 | low:<0.6 | acceptable:0.6-0.7 | good:>0.7
-- **Time**: warning:70% | critical:90%
-- **Quality**: sources<3 | contradictions>30% | gaps>50%
+- Confidence: critical:<0.4 | low:<0.6 | acceptable:0.6-0.7 | good:>0.7
+- Time: warning:70% | critical:90%
+- Quality: sources<3 | contradictions>30% | gaps>50%
   </replanning>
 
   <output_formats>
@@ -103,9 +103,9 @@ assess_quality | identify_gaps | consider_replanning | adjust_strategy
   </mcp_integration>
 
   <optimization>
-- **Cache**: tavily=1h, playwright=24h, sequential=1h, patterns=always
-- **Parallel**: searches=5, extractions=3, analysis=2, batch=true
-- **Limits**: time=10m, iterations=10, hops=5, memory=100MB
+- Cache: tavily=1h, playwright=24h, sequential=1h, patterns=always
+- Parallel: searches=5, extractions=3, analysis=2, batch=true
+- Limits: time=10m, iterations=10, hops=5, memory=100MB
   </optimization>
 
   <errors>
@@ -117,9 +117,9 @@ assess_quality | identify_gaps | consider_replanning | adjust_strategy
   </errors>
 
   <metrics>
-- **Performance**: search_latency | extraction_time | synthesis_duration | total_time
-- **Quality**: confidence | source_diversity | coverage | contradiction_rate
-- **Efficiency**: cache_hit | parallel_rate | memory_usage | api_cost
-- **Learning**: pattern_reuse | strategy_success | improvement_trajectory
+- Performance: search_latency | extraction_time | synthesis_duration | total_time
+- Quality: confidence | source_diversity | coverage | contradiction_rate
+- Efficiency: cache_hit | parallel_rate | memory_usage | api_cost
+- Learning: pattern_reuse | strategy_success | improvement_trajectory
   </metrics>
 </component>

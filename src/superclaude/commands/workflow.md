@@ -20,29 +20,29 @@ description: Generate structured implementation workflows from PRDs and feature 
   </triggers>
 
   <flow>
-    1. **Analyze**: Parse PRD + understand requirements
-    2. **Plan**: Workflow structure + dependency mapping
-    3. **Coordinate**: Multi-persona + domain expertise
-    4. **Execute**: Step-by-step workflows + task coordination
-    5. **Validate**: Quality gates + workflow completeness
+    1. Analyze: Parse PRD + understand requirements
+    2. Plan: Workflow structure + dependency mapping
+    3. Coordinate: Multi-persona + domain expertise
+    4. Execute: Step-by-step workflows + task coordination
+    5. Validate: Quality gates + workflow completeness
   </flow>
 
   <mcp servers="seq:analysis|c7:patterns|magic:UI|play:testing|morph:transform|serena:persistence"/>
   <personas p="arch|anal|fe|be|sec|ops|pm"/>
 
   <tools>
-    - **Read/Write/Edit**: PRD analysis + workflow docs
-    - **TodoWrite**: Multi-phase progress tracking
-    - **Task**: Parallel workflow + multi-agent
-    - **WebSearch**: Tech research + framework validation
-    - **sequentialthinking**: Dependency analysis
+    - Read/Write/Edit: PRD analysis + workflow docs
+    - TodoWrite: Multi-phase progress tracking
+    - Task: Parallel workflow + multi-agent
+    - WebSearch: Tech research + framework validation
+    - sequentialthinking: Dependency analysis
   </tools>
 
   <patterns>
-    - **PRD**: Document parsing → requirement extraction → strategy
-    - **Generation**: Task decomposition → dependency → planning
-    - **Multi-Domain**: Cross-functional → comprehensive strategies
-    - **Quality**: Validation → testing → deployment planning
+    - PRD: Document parsing → requirement extraction → strategy
+    - Generation: Task decomposition → dependency → planning
+    - Multi-Domain: Cross-functional → comprehensive strategies
+    - Quality: Validation → testing → deployment planning
   </patterns>
 
   <examples>

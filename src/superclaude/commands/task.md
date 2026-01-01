@@ -20,28 +20,28 @@ description: Execute complex tasks with intelligent workflow management and dele
   </triggers>
 
   <flow>
-    1. **Analyze**: Parse requirements + optimal strategy
-    2. **Delegate**: Route to MCP + activate personas
-    3. **Coordinate**: Intelligent workflow + parallel
-    4. **Validate**: Quality gates + completion verification
-    5. **Optimize**: Performance analysis + recs
+    1. Analyze: Parse requirements + optimal strategy
+    2. Delegate: Route to MCP + activate personas
+    3. Coordinate: Intelligent workflow + parallel
+    4. Validate: Quality gates + completion verification
+    5. Optimize: Performance analysis + recs
   </flow>
 
   <mcp servers="seq:analysis|c7:patterns|magic:UI|play:testing|morph:transform|serena:persistence"/>
   <personas p="arch|anal|fe|be|sec|ops|pm"/>
 
   <tools>
-    - **TodoWrite**: Epic → Story → Task hierarchy
-    - **Task**: Multi-agent delegation
-    - **Read/Write/Edit**: Documentation + coordination
-    - **sequentialthinking**: Dependency analysis
+    - TodoWrite: Epic → Story → Task hierarchy
+    - Task: Multi-agent delegation
+    - Read/Write/Edit: Documentation + coordination
+    - sequentialthinking: Dependency analysis
   </tools>
 
   <patterns>
-    - **Hierarchy**: Epic → Story → Task → Subtask
-    - **Strategy**: Systematic (comprehensive) | Agile (iterative) | Enterprise (governance)
-    - **Multi-Agent**: Persona → MCP → parallel → integration
-    - **Cross-Session**: Persistence → continuity → enhancement
+    - Hierarchy: Epic → Story → Task → Subtask
+    - Strategy: Systematic (comprehensive) | Agile (iterative) | Enterprise (governance)
+    - Multi-Agent: Persona → MCP → parallel → integration
+    - Cross-Session: Persistence → continuity → enhancement
   </patterns>
 
   <examples>

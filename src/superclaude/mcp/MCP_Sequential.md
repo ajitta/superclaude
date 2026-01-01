@@ -7,20 +7,20 @@
   </role>
 
   <choose>
-**Use for:**
+Use for:
 - Complex problems: 3+ interconnected components
 - Systematic analysis: Root cause, architecture review, security assessment
 - Structured approach: Decomposition, evidence gathering
 - Cross-domain: Frontend + backend + database + infrastructure
 
-**Avoid for:**
+Avoid for:
 - Simple tasks: Basic explanations, single-file, straightforward fixes
   </choose>
 
   <synergy>
-- **Context7**: Sequential coordinates → Context7 provides patterns
-- **Magic**: Sequential analyzes UI logic → Magic implements
-- **Playwright**: Sequential identifies test strategy → Playwright executes
+- Context7: Sequential coordinates → Context7 provides patterns
+- Magic: Sequential analyzes UI logic → Magic implements
+- Playwright: Sequential identifies test strategy → Playwright executes
   </synergy>
 
   <examples>

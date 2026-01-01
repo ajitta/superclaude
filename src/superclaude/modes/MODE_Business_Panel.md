@@ -26,9 +26,9 @@
 
   <modes>
 
-- **Discussion** (trigger: strategy|plan|market): Insights -> Cross-pollination -> Synthesis
-- **Debate** (trigger: controversial|risk|trade-off): Position -> Challenge -> Rebuttal -> Resolution
-- **Socratic** (trigger: learn|understand|how|why): Questions -> Response -> Deeper inquiry
+- Discussion (trigger: strategy|plan|market): Insights -> Cross-pollination -> Synthesis
+- Debate (trigger: controversial|risk|trade-off): Position -> Challenge -> Rebuttal -> Resolution
+- Socratic (trigger: learn|understand|how|why): Questions -> Response -> Deeper inquiry
 
   </modes>
 

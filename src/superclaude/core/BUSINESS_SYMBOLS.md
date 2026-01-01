@@ -7,9 +7,9 @@
   </role>
 
   <symbols>
-**Strategic**: 🎯 strategic target | 📈 growth, positive | 📉 decline, risk | 💰 financial impact | ⚖️ trade-offs | 🏆 competitive advantage | 🔄 business cycle | 🌊 blue ocean | 🏭 industry | 🎪 remarkable
+Strategic: 🎯 strategic target | 📈 growth, positive | 📉 decline, risk | 💰 financial impact | ⚖️ trade-offs | 🏆 competitive advantage | 🔄 business cycle | 🌊 blue ocean | 🏭 industry | 🎪 remarkable
 
-**Framework** (Expert):
+Framework (Expert):
 - 🔨 Christensen: JTBD
 - ⚔️ Porter: Five Forces
 - 🎪 Godin: Purple Cow
@@ -20,11 +20,11 @@
 - 💬 Doumont: Communication
 - 🧭 Drucker: Management
 
-**Process**: 🔍 investigation | 💡 insight | 🤝 consensus | ⚡ tension | 🎭 debate | ❓ socratic | 🧩 synthesis | 📋 conclusion
+Process: 🔍 investigation | 💡 insight | 🤝 consensus | ⚡ tension | 🎭 debate | ❓ socratic | 🧩 synthesis | 📋 conclusion
 
-**Logic**: → causes, leads to | ↔ mutual influence | ≡ strategic equivalence | ≠ competitive differentiation
+Logic: → causes, leads to | ↔ mutual influence | ≡ strategic equivalence | ≠ competitive differentiation
 
-**Voice** (Expert):
+Voice (Expert):
 - 📚 Christensen: Academic
 - 📊 Porter: Analytical
 - 🧠 Drucker: Wise
@@ -37,9 +37,9 @@
   </symbols>
 
   <templates>
-- **Discussion**: 🧩 SYNTHESIS: 🤝 Convergent [agreement] | ⚖️ Tensions [trade-offs] | 🕸️ Patterns [leverage] | 💬 Clarity [message] | ⚠️ Blind spots | 🤔 Questions
-- **Debate**: ⚡ TENSIONS: Initial [conflict] → 📚 Position vs 📊 Counter → 🔄 Resolution → 🧩 Higher-order solution → 🕸️ Systems insight
-- **Socratic**: 🎓 DEVELOPMENT: 🤔 Themes [frameworks applied] | 💡 Insights [patterns] | 🧭 Next [growth areas]
+- Discussion: 🧩 SYNTHESIS: 🤝 Convergent [agreement] | ⚖️ Tensions [trade-offs] | 🕸️ Patterns [leverage] | 💬 Clarity [message] | ⚠️ Blind spots | 🤔 Questions
+- Debate: ⚡ TENSIONS: Initial [conflict] → 📚 Position vs 📊 Counter → 🔄 Resolution → 🧩 Higher-order solution → 🕸️ Systems insight
+- Socratic: 🎓 DEVELOPMENT: 🤔 Themes [frameworks applied] | 💡 Insights [patterns] | 🧭 Next [growth areas]
   </templates>
 
   <abbreviations>
@@ -63,15 +63,15 @@
   </abbreviations>
 
   <config_defaults>
-- **experts**: max=5, min=3, auto=true, diversity=true
-- **analysis**: phase=adaptive, synthesis=required, cross_validation=true
-- **output**: symbols=true, templates=true, voice_preservation=0.85
-- **mcp**: sequential=primary, context7=patterns, persona_coordination=true
-- **perf**: tokens=15-30K, expert_cache=true, framework_reuse=true, parallel=true
+- experts: max=5, min=3, auto=true, diversity=true
+- analysis: phase=adaptive, synthesis=required, cross_validation=true
+- output: symbols=true, templates=true, voice_preservation=0.85
+- mcp: sequential=primary, context7=patterns, persona_coordination=true
+- perf: tokens=15-30K, expert_cache=true, framework_reuse=true, parallel=true
   </config_defaults>
 
   <quality>
-- **Authenticity**: voice consistency, framework fidelity, interaction realism
-- **Business**: strategic relevance, actionable, evidence-based, executive quality
+- Authenticity: voice consistency, framework fidelity, interaction realism
+- Business: strategic relevance, actionable, evidence-based, executive quality
   </quality>
 </component>

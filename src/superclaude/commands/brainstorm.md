@@ -20,29 +20,29 @@ description: Interactive requirements discovery through Socratic dialogue and sy
   </triggers>
 
   <flow>
-    1. **Explore**: Socratic dialogue + systematic questioning
-    2. **Analyze**: Multi-persona coordination + domain expertise
-    3. **Validate**: Feasibility assessment + requirement validation
-    4. **Specify**: Concrete specs + cross-session persistence
-    5. **Handoff**: Actionable briefs for implementation
+    1. Explore: Socratic dialogue + systematic questioning
+    2. Analyze: Multi-persona coordination + domain expertise
+    3. Validate: Feasibility assessment + requirement validation
+    4. Specify: Concrete specs + cross-session persistence
+    5. Handoff: Actionable briefs for implementation
   </flow>
 
   <mcp servers="seq:reasoning|c7:patterns|magic:UI|play:UX|morph:analysis|serena:persistence"/>
   <personas p="arch|anal|fe|be|sec|ops|pm"/>
 
   <tools>
-    - **Read/Write/Edit**: Requirements docs + spec generation
-    - **TodoWrite**: Multi-phase exploration tracking
-    - **Task**: Parallel exploration + multi-agent
-    - **WebSearch**: Market research + tech validation
-    - **sequentialthinking**: Requirements analysis
+    - Read/Write/Edit: Requirements docs + spec generation
+    - TodoWrite: Multi-phase exploration tracking
+    - Task: Parallel exploration + multi-agent
+    - WebSearch: Market research + tech validation
+    - sequentialthinking: Requirements analysis
   </tools>
 
   <patterns>
-    - **Socratic**: Question-driven → systematic discovery
-    - **Multi-Domain**: Cross-functional → comprehensive feasibility
-    - **Progressive**: Systematic → iterative refinement
-    - **Specification**: Concrete requirements → actionable briefs
+    - Socratic: Question-driven → systematic discovery
+    - Multi-Domain: Cross-functional → comprehensive feasibility
+    - Progressive: Systematic → iterative refinement
+    - Specification: Concrete requirements → actionable briefs
   </patterns>
 
   <examples>

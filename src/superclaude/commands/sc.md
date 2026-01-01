@@ -19,19 +19,19 @@ description: SuperClaude command dispatcher - main entry point for all features
   </triggers>
 
   <commands>
-    - **research**: Deep web research with parallel search
-    - **index-repo**: Repository indexing for context optimization
-    - **agent**: Launch specialized AI agents
-    - **recommend**: Get command recommendations
-    - **brainstorm**: Requirements discovery via Socratic dialogue
-    - **analyze**: Code analysis across quality/security/perf/arch
-    - **design**: System architecture + API design
-    - **implement**: Feature implementation + MCP integration
-    - **test**: Test execution + coverage analysis
-    - **troubleshoot**: Issue diagnosis + resolution
-    - **load**: Session context loading (Serena)
-    - **save**: Session context persistence
-    - **help**: Complete command reference
+    - research: Deep web research with parallel search
+    - index-repo: Repository indexing for context optimization
+    - agent: Launch specialized AI agents
+    - recommend: Get command recommendations
+    - brainstorm: Requirements discovery via Socratic dialogue
+    - analyze: Code analysis across quality/security/perf/arch
+    - design: System architecture + API design
+    - implement: Feature implementation + MCP integration
+    - test: Test execution + coverage analysis
+    - troubleshoot: Issue diagnosis + resolution
+    - load: Session context loading (Serena)
+    - save: Session context persistence
+    - help: Complete command reference
   </commands>
 
   <features>
@@ -53,10 +53,10 @@ description: SuperClaude command dispatcher - main entry point for all features
   </examples>
 
   <meta>
-    - **version**: SuperClaude v4.1.7
-    - **package**: superclaude 0.4.0
-    - **install**: superclaude install
-    - **docs**: github.com/SuperClaude-Org/SuperClaude_Framework
+    - version: SuperClaude v4.1.7
+    - package: superclaude 0.4.0
+    - install: superclaude install
+    - docs: github.com/SuperClaude-Org/SuperClaude_Framework
   </meta>
 
   <bounds will="display commands|provide help|route to features" wont="execute without command|modify files"/>

@@ -7,7 +7,7 @@
   </role>
 
   <choose>
-**Use for:**
+Use for:
 - Curated docs: Version-specific documentation over WebSearch
 - Official patterns: Implementation must follow official patterns
 - Frameworks: React hooks, Vue composition API, Angular services
@@ -16,8 +16,8 @@
   </choose>
 
   <synergy>
-- **Sequential**: Context7 provides docs → Sequential analyzes strategy
-- **Magic**: Context7 supplies patterns → Magic generates components
+- Sequential: Context7 provides docs → Sequential analyzes strategy
+- Magic: Context7 supplies patterns → Magic generates components
   </synergy>
 
   <examples>

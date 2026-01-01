@@ -20,25 +20,25 @@ description: Design system architecture, APIs, and component interfaces with com
   </triggers>
 
   <flow>
-    1. **Analyze**: Requirements + existing context
-    2. **Plan**: Design approach + structure
-    3. **Design**: Comprehensive specs + best practices
-    4. **Validate**: Requirements + maintainability
-    5. **Document**: Diagrams + specifications
+    1. Analyze: Requirements + existing context
+    2. Plan: Design approach + structure
+    3. Design: Comprehensive specs + best practices
+    4. Validate: Requirements + maintainability
+    5. Document: Diagrams + specifications
   </flow>
 
   <tools>
-    - **Read**: Requirements analysis
-    - **Grep/Glob**: System structure investigation
-    - **Write**: Design documentation
-    - **Bash**: External design tools
+    - Read: Requirements analysis
+    - Grep/Glob: System structure investigation
+    - Write: Design documentation
+    - Bash: External design tools
   </tools>
 
   <patterns>
-    - **Architecture**: Requirements → structure → scalability
-    - **API**: Interface spec → REST/GraphQL → docs
-    - **Component**: Functional reqs → interface → guidance
-    - **Database**: Data reqs → schema → relationships
+    - Architecture: Requirements → structure → scalability
+    - API: Interface spec → REST/GraphQL → docs
+    - Component: Functional reqs → interface → guidance
+    - Database: Data reqs → schema → relationships
   </patterns>
 
   <examples>

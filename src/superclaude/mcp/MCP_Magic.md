@@ -7,19 +7,19 @@
   </role>
 
   <choose>
-**Use for:**
+Use for:
 - UI components: Use Magic, not native HTML/CSS
 - Production-ready: Accessible components needed
 - Design systems: Consistency with existing patterns
 - Modern frameworks: React, Vue, Angular best practices
 
-**Avoid for:**
+Avoid for:
 - Backend: API logic, database, server config
   </choose>
 
   <synergy>
-- **Context7**: Magic uses 21st.dev → Context7 provides framework integration
-- **Sequential**: Sequential analyzes UI reqs → Magic implements components
+- Context7: Magic uses 21st.dev → Context7 provides framework integration
+- Sequential: Sequential analyzes UI reqs → Magic implements components
   </synergy>
 
   <examples>

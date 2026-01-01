@@ -7,19 +7,19 @@
   </role>
 
   <choose>
-**Use for:**
+Use for:
 - Real browser: Actual rendering, not just code
 - Integration testing: User journeys, visual validation over unit tests
 - E2E: Login flows, form submissions, multi-page workflows
 - Visual testing: Screenshots, responsive design validation
 
-**Avoid for:**
+Avoid for:
 - Code analysis: Static review, syntax, logic validation
   </choose>
 
   <synergy>
-- **Sequential**: Sequential plans test strategy → Playwright executes
-- **Magic**: Magic creates UI → Playwright validates accessibility
+- Sequential: Sequential plans test strategy → Playwright executes
+- Magic: Magic creates UI → Playwright validates accessibility
   </synergy>
 
   <examples>

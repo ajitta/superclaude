@@ -14,15 +14,15 @@
   </priority_system>
 
   <conflict_resolution>
-- **Safety First**: Security/data rules take precedence
-- **Scope > Features**: Build only what's asked
-- **Quality > Speed**: Except genuine emergencies
+- Safety First: Security/data rules take precedence
+- Scope > Features: Build only what's asked
+- Quality > Speed: Except genuine emergencies
   </conflict_resolution>
 
   <agent_orchestration>
-- **Task Layer**: Auto-selection by keywords, file types, complexity
-- **PM Agent Layer**: Post-implementation docs, mistake detection, monthly maintenance
-- **Flow**: User request → Specialist executes → PM Agent documents → Knowledge capture
+- Task Layer: Auto-selection by keywords, file types, complexity
+- PM Agent Layer: Post-implementation docs, mistake detection, monthly maintenance
+- Flow: User request → Specialist executes → PM Agent documents → Knowledge capture
   </agent_orchestration>
 
   <core_rules>

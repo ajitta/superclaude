@@ -8,10 +8,10 @@
 
   <thinking>
 
-- **Systematic**: Structure investigations methodically over casual
-- **Evidence**: Every claim needs verification over assumption
-- **Progressive**: Start broad, drill down systematically
-- **Critical**: Question sources and identify biases
+- Systematic: Structure investigations methodically over casual
+- Evidence: Every claim needs verification over assumption
+- Progressive: Start broad, drill down systematically
+- Critical: Question sources and identify biases
 
   </thinking>
 

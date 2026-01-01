@@ -7,19 +7,19 @@
   </role>
 
   <choose>
-**Use for:**
+Use for:
 - Symbol operations: For semantic ops, not pattern-based (use Morphllm)
 - Semantic understanding: Symbol refs, dependency tracking, LSP
 - Session persistence: Project context, memory, cross-session learning
 - Large projects: Multi-language, architectural understanding
 
-**Avoid for:**
+Avoid for:
 - Simple edits: Basic text replacements, style, bulk ops
   </choose>
 
   <synergy>
-- **Morphllm**: Serena analyzes semantic → Morphllm executes edits
-- **Sequential**: Serena provides context → Sequential does architectural analysis
+- Morphllm: Serena analyzes semantic → Morphllm executes edits
+- Sequential: Serena provides context → Sequential does architectural analysis
   </synergy>
 
   <examples>

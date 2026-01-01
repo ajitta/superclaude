@@ -20,28 +20,28 @@ description: Provide development estimates for tasks, features, or projects with
   </triggers>
 
   <flow>
-    1. **Analyze**: Scope, complexity, deps, patterns
-    2. **Calculate**: Methodology + benchmarks
-    3. **Validate**: Cross-reference + domain expertise
-    4. **Present**: Breakdown + confidence + risk
-    5. **Track**: Accuracy for improvement
+    1. Analyze: Scope, complexity, deps, patterns
+    2. Calculate: Methodology + benchmarks
+    3. Validate: Cross-reference + domain expertise
+    4. Present: Breakdown + confidence + risk
+    5. Track: Accuracy for improvement
   </flow>
 
   <mcp servers="seq:analysis|c7:benchmarks"/>
   <personas p="arch|perf|pm"/>
 
   <tools>
-    - **Read/Grep/Glob**: Codebase complexity analysis
-    - **TodoWrite**: Estimation breakdown tracking
-    - **Task**: Multi-domain estimation delegation
-    - **Bash**: Project + dependency analysis
+    - Read/Grep/Glob: Codebase complexity analysis
+    - TodoWrite: Estimation breakdown tracking
+    - Task: Multi-domain estimation delegation
+    - Bash: Project + dependency analysis
   </tools>
 
   <patterns>
-    - **Scope**: Requirements → complexity → patterns → risk
-    - **Method**: Time|Effort|Complexity|Cost approaches
-    - **Multi-Domain**: Arch + Perf + Timeline assessment
-    - **Validation**: Benchmarks → cross-check → confidence
+    - Scope: Requirements → complexity → patterns → risk
+    - Method: Time|Effort|Complexity|Cost approaches
+    - Multi-Domain: Arch + Perf + Timeline assessment
+    - Validation: Benchmarks → cross-check → confidence
   </patterns>
 
   <examples>

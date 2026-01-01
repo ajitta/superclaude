@@ -7,16 +7,16 @@
   </role>
 
   <basic_examples>
-- **Strategic Plan**: `/sc:business-panel @strategy_doc.pdf` → Discussion: Porter, Collins, Meadows, Doumont
-- **Innovation**: `/sc:business-panel "AI customer service" --experts "christensen,drucker,godin"` → JTBD, value, tribes
-- **Risk Debate**: `/sc:business-panel @risk.md --mode debate` → Taleb challenges, systems perspective
-- **Learning**: `/sc:business-panel "competitive strategy" --mode socratic` → Progressive questioning
+- Strategic Plan: `/sc:business-panel @strategy_doc.pdf` → Discussion: Porter, Collins, Meadows, Doumont
+- Innovation: `/sc:business-panel "AI customer service" --experts "christensen,drucker,godin"` → JTBD, value, tribes
+- Risk Debate: `/sc:business-panel @risk.md --mode debate` → Taleb challenges, systems perspective
+- Learning: `/sc:business-panel "competitive strategy" --mode socratic` → Progressive questioning
   </basic_examples>
 
   <advanced_patterns>
-- **Multi-Doc**: `/sc:business-panel @research.pdf @competitor.xlsx @financials.csv --synthesis-only`
-- **Domain**: `/sc:business-panel @product.md --focus "innovation" --experts "christensen,drucker,meadows"`
-- **Structured**: `/sc:business-panel @exec.pptx --focus "communication" --structured`
+- Multi-Doc: `/sc:business-panel @research.pdf @competitor.xlsx @financials.csv --synthesis-only`
+- Domain: `/sc:business-panel @product.md --focus "innovation" --experts "christensen,drucker,meadows"`
+- Structured: `/sc:business-panel @exec.pptx --focus "communication" --structured`
   </advanced_patterns>
 
   <integrations>
@@ -39,29 +39,29 @@
   </expert_selection>
 
   <output_formats>
-- **Executive**: `--structured --synthesis-only` → 🎯Strategic|💰Financial|🏆Competitive|📈Growth|⚠️Risk|🧩Synthesis
-- **Detailed**: `--verbose` → Per-expert framework analysis + cross-framework synthesis
-- **Questions**: `--questions` → Strategic questions per expert framework
+- Executive: `--structured --synthesis-only` → 🎯Strategic|💰Financial|🏆Competitive|📈Growth|⚠️Risk|🧩Synthesis
+- Detailed: `--verbose` → Per-expert framework analysis + cross-framework synthesis
+- Questions: `--questions` → Strategic questions per expert framework
   </output_formats>
 
   <workflows>
-- **Strategy**: discussion(research) → debate(competitive) → socratic(synthesis) → design(strategy)
-- **Innovation**: panel(portfolio) → improve(roadmap) → analyze(opportunities)
-- **Risk**: panel(register) → debate(assumptions) → implement(mitigation)
+- Strategy: discussion(research) → debate(competitive) → socratic(synthesis) → design(strategy)
+- Innovation: panel(portfolio) → improve(roadmap) → analyze(opportunities)
+- Risk: panel(register) → debate(assumptions) → implement(mitigation)
   </workflows>
 
   <customization>
-- **Focus**: `--christensen-focus "disruption"` | `--porter-focus "moats"`
-- **Style**: `--interaction collaborative|challenging`
-- **Symbols**: `--symbols minimal|rich`
-- **Depth**: `--depth surface|detailed`
-- **Speed**: `--quick --experts-max 3` | `--comprehensive --all-experts`
+- Focus: `--christensen-focus "disruption"` | `--porter-focus "moats"`
+- Style: `--interaction collaborative|challenging`
+- Symbols: `--symbols minimal|rich`
+- Depth: `--depth surface|detailed`
+- Speed: `--quick --experts-max 3` | `--comprehensive --all-experts`
   </customization>
 
   <quality>
-- **Authenticity**: Voice consistency | Framework fidelity | Interaction realism
-- **Relevance**: Strategic focus | Actionable insights | Evidence-based
-- **Integration**: Synthesis value | Framework preservation | Practical utility
-- **Performance**: response=simple<30s|comprehensive<2m|multi-doc<5m, tokens=discussion:8-15K|debate:10-20K|socratic:12-25K|synthesis:3-8K, accuracy=framework>90%|relevance>85%|actionable>80%
+- Authenticity: Voice consistency | Framework fidelity | Interaction realism
+- Relevance: Strategic focus | Actionable insights | Evidence-based
+- Integration: Synthesis value | Framework preservation | Practical utility
+- Performance: response=simple<30s|comprehensive<2m|multi-doc<5m, tokens=discussion:8-15K|debate:10-20K|socratic:12-25K|synthesis:3-8K, accuracy=framework>90%|relevance>85%|actionable>80%
   </quality>
 </component>

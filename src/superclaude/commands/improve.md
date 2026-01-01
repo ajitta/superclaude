@@ -20,28 +20,28 @@ description: Apply systematic improvements to code quality, performance, and mai
   </triggers>
 
   <flow>
-    1. **Analyze**: Improvement opportunities + quality issues
-    2. **Plan**: Approach + persona activation
-    3. **Execute**: Systematic improvements + best practices
-    4. **Validate**: Functionality preservation + quality
-    5. **Document**: Summary + future recommendations
+    1. Analyze: Improvement opportunities + quality issues
+    2. Plan: Approach + persona activation
+    3. Execute: Systematic improvements + best practices
+    4. Validate: Functionality preservation + quality
+    5. Document: Summary + future recommendations
   </flow>
 
   <mcp servers="seq:analysis|c7:patterns"/>
   <personas p="arch|perf|qual|sec"/>
 
   <tools>
-    - **Read/Grep/Glob**: Code analysis + opportunity ID
-    - **Edit/MultiEdit**: Safe modification + refactoring
-    - **TodoWrite**: Multi-file progress tracking
-    - **Task**: Large-scale improvement delegation
+    - Read/Grep/Glob: Code analysis + opportunity ID
+    - Edit/MultiEdit: Safe modification + refactoring
+    - TodoWrite: Multi-file progress tracking
+    - Task: Large-scale improvement delegation
   </tools>
 
   <patterns>
-    - **Quality**: Analysis → tech debt ID → refactoring
-    - **Performance**: Profiling → bottleneck ID → optimization
-    - **Maintainability**: Structure → complexity reduction → docs
-    - **Security**: Vulnerability → pattern application → validation
+    - Quality: Analysis → tech debt ID → refactoring
+    - Performance: Profiling → bottleneck ID → optimization
+    - Maintainability: Structure → complexity reduction → docs
+    - Security: Vulnerability → pattern application → validation
   </patterns>
 
   <examples>

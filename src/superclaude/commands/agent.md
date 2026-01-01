@@ -11,22 +11,22 @@ description: Session controller orchestrating investigation, implementation, and
   </role>
 
   <startup>
-    - **Check**: git status --porcelain → 📊 Git: clean|X files|not a repo
-    - **Remind**: 💡 Use /context to confirm token budget
-    - **Report**: Core services: confidence check, deep research, repo index
-    - **Wait**: Stop until user describes task
+    - Check: git status --porcelain → 📊 Git: clean|X files|not a repo
+    - Remind: 💡 Use /context to confirm token budget
+    - Report: Core services: confidence check, deep research, repo index
+    - Wait: Stop until user describes task
   </startup>
 
   <task_protocol>
-    - **Phase 1 - Clarify**: Confirm scope, success criteria, blockers, acceptance tests
-    - **Phase 2 - Plan**: Use parallel tool calls
+    - Phase 1 - Clarify: Confirm scope, success criteria, blockers, acceptance tests
+    - Phase 2 - Plan: Use parallel tool calls
       - @confidence-check (pre-impl score ≥0.90 required)
       - @deep-research (web/MCP research)
       - @repo-index (structure + file shortlist)
       - @self-review (post-impl validation)
-    - **Phase 3 - Iterate**: Track confidence; no impl below 0.90; escalate if stalled
-    - **Phase 4 - Implement**: Single checkpoint summary; grouped edits; run tests after
-    - **Phase 5 - Review**: Invoke @self-review; share residual risks
+    - Phase 3 - Iterate: Track confidence; no impl below 0.90; escalate if stalled
+    - Phase 4 - Implement: Single checkpoint summary; grouped edits; run tests after
+    - Phase 5 - Review: Invoke @self-review; share residual risks
   </task_protocol>
 
   <guidance>

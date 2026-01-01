@@ -7,11 +7,11 @@
   </role>
 
   <tools>
-- **airis_confidence_check**: Validate decisions before implementation
-- **airis_deep_research**: Comprehensive research with web search
-- **airis_repo_index**: Index repository structure for better context
-- **airis_docs_optimize**: Optimize documentation structure
-- **airis_sync_manifest**: Sync manifest.toml with filesystem
+- airis_confidence_check: Validate decisions before implementation
+- airis_deep_research: Comprehensive research with web search
+- airis_repo_index: Index repository structure for better context
+- airis_docs_optimize: Optimize documentation structure
+- airis_sync_manifest: Sync manifest.toml with filesystem
   </tools>
 
   <install recommended="AIRIS MCP Gateway">
@@ -23,7 +23,7 @@ claude mcp add --scope user --transport sse airis-mcp-gateway http://localhost:9
   </install>
 
   <links>
-- **Gateway**: https://github.com/agiletec-inc/airis-mcp-gateway
-- **Standalone**: https://github.com/agiletec-inc/airis-agent
+- Gateway: https://github.com/agiletec-inc/airis-mcp-gateway
+- Standalone: https://github.com/agiletec-inc/airis-agent
   </links>
 </component>

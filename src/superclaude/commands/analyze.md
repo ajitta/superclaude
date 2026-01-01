@@ -20,25 +20,25 @@ description: Comprehensive code analysis across quality, security, performance, 
   </triggers>
 
   <flow>
-    1. **Discover**: Categorize files by language
-    2. **Scan**: Domain-specific analysis
-    3. **Evaluate**: Prioritized findings + severity
-    4. **Recommend**: Actionable guidance
-    5. **Report**: Metrics + roadmap
+    1. Discover: Categorize files by language
+    2. Scan: Domain-specific analysis
+    3. Evaluate: Prioritized findings + severity
+    4. Recommend: Actionable guidance
+    5. Report: Metrics + roadmap
   </flow>
 
   <tools>
-    - **Glob**: File discovery
-    - **Grep**: Pattern analysis
-    - **Read**: Source inspection
-    - **Bash**: External tools
-    - **Write**: Report generation
+    - Glob: File discovery
+    - Grep: Pattern analysis
+    - Read: Source inspection
+    - Bash: External tools
+    - Write: Report generation
   </tools>
 
   <patterns>
-    - **Domain**: Quality|Security|Perf|Arch → specialized assessment
-    - **Recognition**: Language detect → appropriate techniques
-    - **Severity**: Issue classification → prioritized recs
+    - Domain: Quality|Security|Perf|Arch → specialized assessment
+    - Recognition: Language detect → appropriate techniques
+    - Severity: Issue classification → prioritized recs
   </patterns>
 
   <examples>

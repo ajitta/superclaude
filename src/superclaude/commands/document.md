@@ -20,25 +20,25 @@ description: Generate focused documentation for components, functions, APIs, and
   </triggers>
 
   <flow>
-    1. **Analyze**: Component structure + interfaces
-    2. **Identify**: Audience + requirements
-    3. **Generate**: Content by type + style
-    4. **Format**: Consistent structure
-    5. **Integrate**: Project doc ecosystem
+    1. Analyze: Component structure + interfaces
+    2. Identify: Audience + requirements
+    3. Generate: Content by type + style
+    4. Format: Consistent structure
+    5. Integrate: Project doc ecosystem
   </flow>
 
   <tools>
-    - **Read**: Component + existing docs
-    - **Grep**: Reference extraction
-    - **Write**: Doc file creation
-    - **Glob**: Multi-file organization
+    - Read: Component + existing docs
+    - Grep: Reference extraction
+    - Write: Doc file creation
+    - Glob: Multi-file organization
   </tools>
 
   <patterns>
-    - **Inline**: Code analysis → JSDoc/docstring
-    - **API**: Interface extraction → reference + examples
-    - **Guide**: Feature analysis → tutorial content
-    - **External**: Overview → specs → integration
+    - Inline: Code analysis → JSDoc/docstring
+    - API: Interface extraction → reference + examples
+    - Guide: Feature analysis → tutorial content
+    - External: Overview → specs → integration
   </patterns>
 
   <examples>

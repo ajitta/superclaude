@@ -64,10 +64,10 @@
   </output>
 
   <priority_rules>
-- **Safety First**: --safe-mode > --validate > optimization
-- **Explicit Override**: User flags > auto-detection
-- **Depth**: --ultrathink > --think-hard > --think
-- **MCP**: --no-mcp overrides individual flags
-- **Scope**: system > project > module > file
+- Safety First: --safe-mode > --validate > optimization
+- Explicit Override: User flags > auto-detection
+- Depth: --ultrathink > --think-hard > --think
+- MCP: --no-mcp overrides individual flags
+- Scope: system > project > module > file
   </priority_rules>
 </component>

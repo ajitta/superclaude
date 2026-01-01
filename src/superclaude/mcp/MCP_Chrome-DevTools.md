@@ -7,19 +7,19 @@
   </role>
 
   <choose>
-**Use for:**
+Use for:
 - Deep performance analysis: Understand performance bottlenecks
 - Live debugging: Inspect runtime page state, debug live issues
 - Network analysis: Inspect requests, CORS errors
 
-**Avoid for:**
+Avoid for:
 - E2E testing: Use Playwright
 - Static analysis: Use native Claude
   </choose>
 
   <synergy>
-- **Sequential**: Sequential plans perf strategy → DevTools verifies
-- **Playwright**: Playwright automates flow → DevTools analyzes
+- Sequential: Sequential plans perf strategy → DevTools verifies
+- Playwright: Playwright automates flow → DevTools analyzes
   </synergy>
 
   <examples>

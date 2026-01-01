@@ -20,25 +20,25 @@ description: Meta-system task orchestration with intelligent breakdown and deleg
   </triggers>
 
   <flow>
-    1. **Analyze**: Complex op requirements + scope
-    2. **Decompose**: Epic → Story → Task → Subtask
-    3. **Orchestrate**: Execute via optimal strategy
-    4. **Monitor**: Progress + dependency management
-    5. **Integrate**: Aggregate results + summary
+    1. Analyze: Complex op requirements + scope
+    2. Decompose: Epic → Story → Task → Subtask
+    3. Orchestrate: Execute via optimal strategy
+    4. Monitor: Progress + dependency management
+    5. Integrate: Aggregate results + summary
   </flow>
 
   <tools>
-    - **TodoWrite**: Hierarchical breakdown (Epic→Story→Task)
-    - **Read/Grep/Glob**: Dependency mapping
-    - **Edit/MultiEdit/Write**: Coordinated file ops
-    - **Bash**: System-level coordination
+    - TodoWrite: Hierarchical breakdown (Epic→Story→Task)
+    - Read/Grep/Glob: Dependency mapping
+    - Edit/MultiEdit/Write: Coordinated file ops
+    - Bash: System-level coordination
   </tools>
 
   <patterns>
-    - **Hierarchy**: Epic → Story → Task → Subtask granularity
-    - **Strategy**: Sequential (deps) | Parallel (independent) | Adaptive (dynamic)
-    - **Meta**: Cross-domain → resource opt → result integration
-    - **Enhancement**: Systematic → quality gates → validation
+    - Hierarchy: Epic → Story → Task → Subtask granularity
+    - Strategy: Sequential (deps) | Parallel (independent) | Adaptive (dynamic)
+    - Meta: Cross-domain → resource opt → result integration
+    - Enhancement: Systematic → quality gates → validation
   </patterns>
 
   <examples>

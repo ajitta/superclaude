@@ -20,25 +20,25 @@ description: Git operations with intelligent commit messages and workflow optimi
   </triggers>
 
   <flow>
-    1. **Analyze**: Repo state + changes
-    2. **Validate**: Operation appropriateness
-    3. **Execute**: Git command + automation
-    4. **Optimize**: Smart commits + patterns
-    5. **Report**: Status + next steps
+    1. Analyze: Repo state + changes
+    2. Validate: Operation appropriateness
+    3. Execute: Git command + automation
+    4. Optimize: Smart commits + patterns
+    5. Report: Status + next steps
   </flow>
 
   <tools>
-    - **Bash**: Git command execution
-    - **Read**: Repo state analysis
-    - **Grep**: Log parsing + status
-    - **Write**: Commit message generation
+    - Bash: Git command execution
+    - Read: Repo state analysis
+    - Grep: Log parsing + status
+    - Write: Commit message generation
   </tools>
 
   <patterns>
-    - **SmartCommit**: Analyze changes → conventional message
-    - **Status**: Repo state → actionable recs
-    - **Branch**: Consistent naming + workflow
-    - **Recovery**: Conflict resolution + restoration
+    - SmartCommit: Analyze changes → conventional message
+    - Status: Repo state → actionable recs
+    - Branch: Consistent naming + workflow
+    - Recovery: Conflict resolution + restoration
   </patterns>
 
   <examples>

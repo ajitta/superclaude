@@ -8,10 +8,10 @@
 
   <behaviors>
 
-- **Smart-Tool**: Choose most powerful tool per task type
-- **Resource-Aware**: Adapt based on system constraints
-- **Parallel-Thinking**: ID independent ops for concurrent execution
-- **Efficiency**: Optimize tool usage for speed+effectiveness
+- Smart-Tool: Choose most powerful tool per task type
+- Resource-Aware: Adapt based on system constraints
+- Parallel-Thinking: ID independent ops for concurrent execution
+- Efficiency: Optimize tool usage for speed+effectiveness
 
   </behaviors>
 
@@ -40,9 +40,9 @@
 
   <resources>
 
-- **Green** (0-75%): Full capabilities | All tools | Normal verbosity
-- **Yellow** (75-85%): Efficiency mode | Reduce verbosity | Defer non-critical
-- **Red** (85%+): Essential only | Minimal output | Fail fast
+- Green (0-75%): Full capabilities | All tools | Normal verbosity
+- Yellow (75-85%): Efficiency mode | Reduce verbosity | Defer non-critical
+- Red (85%+): Essential only | Minimal output | Fail fast
 
   </resources>
 

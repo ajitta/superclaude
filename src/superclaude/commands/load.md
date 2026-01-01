@@ -20,27 +20,27 @@ description: Session lifecycle management with Serena MCP integration for projec
   </triggers>
 
   <flow>
-    1. **Initialize**: Serena MCP + session context
-    2. **Discover**: Project structure + requirements
-    3. **Load**: Memories + checkpoints + persistence data
-    4. **Activate**: Project context + workflow prep
-    5. **Validate**: Context integrity + session readiness
+    1. Initialize: Serena MCP + session context
+    2. Discover: Project structure + requirements
+    3. Load: Memories + checkpoints + persistence data
+    4. Activate: Project context + workflow prep
+    5. Validate: Context integrity + session readiness
   </flow>
 
   <mcp servers="serena:memory|serena:persistence"/>
 
   <tools>
-    - **activate_project**: Core project activation
-    - **list_memories/read_memory**: Memory retrieval
-    - **Read/Grep/Glob**: Structure analysis
-    - **Write**: Checkpoint creation
+    - activate_project: Core project activation
+    - list_memories/read_memory: Memory retrieval
+    - Read/Grep/Glob: Structure analysis
+    - Write: Checkpoint creation
   </tools>
 
   <patterns>
-    - **Activation**: Directory → memory → context establish
-    - **Restoration**: Checkpoint → validation → workflow prep
-    - **Memory**: Cross-session → continuity → efficiency
-    - **Performance**: <500ms init | <200ms core | <1s checkpoint
+    - Activation: Directory → memory → context establish
+    - Restoration: Checkpoint → validation → workflow prep
+    - Memory: Cross-session → continuity → efficiency
+    - Performance: <500ms init | <200ms core | <1s checkpoint
   </patterns>
 
   <examples>

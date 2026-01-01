@@ -7,19 +7,19 @@
   </role>
 
   <choose>
-**Use for:**
+Use for:
 - Pattern-based edits: For bulk ops, not symbol ops (use Serena)
 - Bulk operations: Style enforcement, framework updates, text replacements
 - Token efficiency: Fast Apply with compression (30-50% gains)
 - Moderate complexity: <10 files, straightforward transformations
 
-**Avoid for:**
+Avoid for:
 - Semantic operations: Symbol renames, dependency tracking, LSP
   </choose>
 
   <synergy>
-- **Serena**: Serena analyzes semantic → Morphllm executes edits
-- **Sequential**: Sequential plans strategy → Morphllm applies changes
+- Serena: Serena analyzes semantic → Morphllm executes edits
+- Sequential: Sequential plans strategy → Morphllm applies changes
   </synergy>
 
   <examples>

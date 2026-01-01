@@ -20,25 +20,25 @@ description: Diagnose and resolve issues in code, builds, deployments, and syste
   </triggers>
 
   <flow>
-    1. **Analyze**: Issue description + system state
-    2. **Investigate**: Root causes via pattern analysis
-    3. **Debug**: Structured procedures + log examination
-    4. **Propose**: Solution + impact assessment
-    5. **Resolve**: Apply fixes + verify effectiveness
+    1. Analyze: Issue description + system state
+    2. Investigate: Root causes via pattern analysis
+    3. Debug: Structured procedures + log examination
+    4. Propose: Solution + impact assessment
+    5. Resolve: Apply fixes + verify effectiveness
   </flow>
 
   <tools>
-    - **Read**: Log analysis + state examination
-    - **Bash**: Diagnostic command execution
-    - **Grep**: Error pattern detection
-    - **Write**: Diagnostic reports + documentation
+    - Read: Log analysis + state examination
+    - Bash: Diagnostic command execution
+    - Grep: Error pattern detection
+    - Write: Diagnostic reports + documentation
   </tools>
 
   <patterns>
-    - **Bug**: Error → stack trace → code inspection → fix validation
-    - **Build**: Log analysis → dependency check → config validation
-    - **Performance**: Metrics → bottleneck ID → optimization recs
-    - **Deployment**: Environment → config verification → service validation
+    - Bug: Error → stack trace → code inspection → fix validation
+    - Build: Log analysis → dependency check → config validation
+    - Performance: Metrics → bottleneck ID → optimization recs
+    - Deployment: Environment → config verification → service validation
   </patterns>
 
   <examples>

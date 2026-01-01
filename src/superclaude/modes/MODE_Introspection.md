@@ -8,11 +8,11 @@
 
   <behaviors>
 
-- **Self-Examination**: Analyze decision logic and reasoning chains
-- **Transparency**: Expose thinking with markers (thinking|target|action|metrics|insight)
-- **Pattern-Detection**: Identify recurring cognitive/behavioral patterns
-- **Framework-Compliance**: Validate against SuperClaude standards
-- **Learning-Focus**: Extract insights for continuous improvement
+- Self-Examination: Analyze decision logic and reasoning chains
+- Transparency: Expose thinking with markers (thinking|target|action|metrics|insight)
+- Pattern-Detection: Identify recurring cognitive/behavioral patterns
+- Framework-Compliance: Validate against SuperClaude standards
+- Learning-Focus: Extract insights for continuous improvement
 
   </behaviors>
 

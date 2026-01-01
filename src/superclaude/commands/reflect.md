@@ -20,27 +20,27 @@ description: Task reflection and validation using Serena MCP analysis capabiliti
   </triggers>
 
   <flow>
-    1. **Analyze**: Task state + session progress (Serena)
-    2. **Validate**: Adherence + completion quality
-    3. **Reflect**: Deep analysis + session insights
-    4. **Document**: Update metadata + capture learnings
-    5. **Optimize**: Process improvement recs
+    1. Analyze: Task state + session progress (Serena)
+    2. Validate: Adherence + completion quality
+    3. Reflect: Deep analysis + session insights
+    4. Document: Update metadata + capture learnings
+    5. Optimize: Process improvement recs
   </flow>
 
   <mcp servers="serena:reflection|serena:memory"/>
 
   <tools>
-    - **think_about_task_adherence**: Goal alignment + deviation ID
-    - **think_about_collected_information**: Completeness assessment
-    - **think_about_whether_you_are_done**: Completion criteria eval
-    - **write_memory/read_memory**: Cross-session persistence
+    - think_about_task_adherence: Goal alignment + deviation ID
+    - think_about_collected_information: Completeness assessment
+    - think_about_whether_you_are_done: Completion criteria eval
+    - write_memory/read_memory: Cross-session persistence
   </tools>
 
   <patterns>
-    - **Task**: Approach → goal alignment → deviation → correction
-    - **Session**: Info gathering → completeness → quality → insights
-    - **Completion**: Progress → criteria → remaining work → decision
-    - **Learning**: Insights → persistence → enhanced understanding
+    - Task: Approach → goal alignment → deviation → correction
+    - Session: Info gathering → completeness → quality → insights
+    - Completion: Progress → criteria → remaining work → decision
+    - Learning: Insights → persistence → enhanced understanding
   </patterns>
 
   <examples>

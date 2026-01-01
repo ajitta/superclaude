@@ -20,28 +20,28 @@ description: Systematically clean up code, remove dead code, and optimize projec
   </triggers>
 
   <flow>
-    1. **Analyze**: Cleanup opportunities + safety
-    2. **Plan**: Choose approach + activate personas
-    3. **Execute**: Systematic dead code detection
-    4. **Validate**: Ensure no functionality loss
-    5. **Report**: Summary + maintenance recs
+    1. Analyze: Cleanup opportunities + safety
+    2. Plan: Choose approach + activate personas
+    3. Execute: Systematic dead code detection
+    4. Validate: Ensure no functionality loss
+    5. Report: Summary + maintenance recs
   </flow>
 
   <mcp servers="seq:analysis|c7:patterns"/>
   <personas p="arch|qual|sec"/>
 
   <tools>
-    - **Read/Grep/Glob**: Analysis + pattern detection
-    - **Edit/MultiEdit**: Safe modification
-    - **TodoWrite**: Progress tracking
-    - **Task**: Large-scale delegation
+    - Read/Grep/Glob: Analysis + pattern detection
+    - Edit/MultiEdit: Safe modification
+    - TodoWrite: Progress tracking
+    - Task: Large-scale delegation
   </tools>
 
   <patterns>
-    - **DeadCode**: Usage analysis → safe removal
-    - **Imports**: Dependency analysis → optimization
-    - **Structure**: Arch analysis → modular improvements
-    - **Safety**: Pre/during/post checks
+    - DeadCode: Usage analysis → safe removal
+    - Imports: Dependency analysis → optimization
+    - Structure: Arch analysis → modular improvements
+    - Safety: Pre/during/post checks
   </patterns>
 
   <examples>
