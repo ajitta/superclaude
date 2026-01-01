@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Python Environment
 
-**CRITICAL**: This project uses **UV** for all Python operations.
+This project uses **UV** for all Python operations to ensure consistent dependency management.
 
 ```bash
 uv run pytest                    # Run tests
@@ -122,6 +122,43 @@ superclaude install
 # or manually:
 uv pip install -e ".[dev]"
 uv run superclaude install
+```
+
+## Project-Specific Installation
+
+To install SuperClaude to a specific project directory (`./.claude/`):
+
+```bash
+# Clone and install to current project
+git clone https://github.com/SuperClaude-Org/SuperClaude_Framework.git
+cd SuperClaude_Framework
+
+# Install with project scope (installs to ./.claude/)
+./install.sh --scope project
+
+# Or non-interactive
+./install.sh --scope project --yes
+
+# Force reinstall if already exists
+./install.sh --scope project --force
+```
+
+**install.sh options:**
+| Option | Description |
+|--------|-------------|
+| `--scope user` | Install to `~/.claude/` (default) |
+| `--scope project` | Install to `./.claude/` (current directory) |
+| `--yes` | Non-interactive mode |
+| `--force` | Force reinstall existing components |
+
+**Alternative: Copy to existing project**
+```bash
+# From SuperClaude repo, copy .claude to your project
+cp -r .claude /path/to/your/project/
+
+# Or use superclaude CLI after global install
+cd /path/to/your/project
+superclaude install --scope project
 ```
 
 ## MCP Server Integration

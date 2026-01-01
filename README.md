@@ -150,6 +150,34 @@ cd SuperClaude_Framework
 ./install.sh
 ```
 
+**Option 3: Project-Specific Installation**
+```bash
+# Clone and install to project scope (./.claude/)
+git clone https://github.com/SuperClaude-Org/SuperClaude_Framework.git
+cd SuperClaude_Framework
+./install.sh --scope project
+
+# Or non-interactive with force reinstall
+./install.sh --scope project --yes --force
+```
+
+| install.sh Option | Description |
+|-------------------|-------------|
+| `--scope user` | Install to `~/.claude/` (default) |
+| `--scope project` | Install to `./.claude/` |
+| `--yes` | Non-interactive mode |
+| `--force` | Force reinstall |
+
+**Alternative: Copy to existing project**
+```bash
+# After cloning, copy .claude to your project
+cp -r .claude /path/to/your/project/
+
+# Or use CLI after global install
+cd /path/to/your/project
+superclaude install --scope project
+```
+
 ### **Coming in v5.0 (In Development)**
 
 We are actively working on a new TypeScript plugin system (see issue [#419](https://github.com/SuperClaude-Org/SuperClaude_Framework/issues/419) for details). When released, installation will be simplified to:
