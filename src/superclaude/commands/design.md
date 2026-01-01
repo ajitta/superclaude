@@ -42,14 +42,12 @@ description: Design system architecture, APIs, and component interfaces with com
   </patterns>
 
   <examples>
-
 | Input | Output |
 |-------|--------|
 | `user-mgmt --type architecture --format diagram` | System architecture |
 | `payment-api --type api --format spec` | API specification |
 | `notification-service --type component --format code` | Component interface |
 | `e-commerce-db --type database --format diagram` | Schema design |
-
   </examples>
 
   <bounds will="comprehensive specs|multi-format output|validation" wont="generate impl code|modify existing arch|violate constraints"/>

@@ -46,14 +46,12 @@ description: Interactive requirements discovery through Socratic dialogue and sy
   </patterns>
 
   <examples>
-
 | Input | Output |
 |-------|--------|
 | `'AI project management tool' --strategy systematic --depth deep` | Multi-persona deep analysis |
 | `'real-time collaboration' --strategy agile --parallel` | Parallel FE/BE/Sec exploration |
 | `'enterprise data analytics' --strategy enterprise --validate` | Compliance + validation |
 | `'mobile monetization' --depth normal` | Cross-session with Serena |
-
   </examples>
 
   <bounds will="ambiguous→concrete|multi-persona+MCP|cross-session persistence" wont="impl without discovery|override user vision|bypass systematic exploration"/>

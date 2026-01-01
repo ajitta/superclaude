@@ -45,14 +45,12 @@ description: Feature and code implementation with intelligent persona activation
   </patterns>
 
   <examples>
-
 | Input | Output |
 |-------|--------|
 | `user profile --type component --framework react` | Magic UI + FE best practices |
 | `auth API --type api --safe --with-tests` | BE + Sec personas |
 | `payment system --type feature --with-tests` | Multi-persona coordination |
 | `dashboard widget --framework vue` | C7 Vue patterns |
-
   </examples>
 
   <bounds will="intelligent impl|framework best practices|comprehensive testing" wont="arch decisions without consultation|conflict with security|override safety"/>

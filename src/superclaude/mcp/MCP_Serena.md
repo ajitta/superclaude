@@ -7,13 +7,13 @@
   </role>
 
   <choose>
-Use for:
+Use:
 - Symbol operations: For semantic ops, not pattern-based (use Morphllm)
 - Semantic understanding: Symbol refs, dependency tracking, LSP
 - Session persistence: Project context, memory, cross-session learning
 - Large projects: Multi-language, architectural understanding
 
-Avoid for:
+Avoid:
 - Simple edits: Basic text replacements, style, bulk ops
   </choose>
 

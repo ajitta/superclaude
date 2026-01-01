@@ -7,13 +7,13 @@
   </role>
 
   <choose>
-Use for:
+Use:
 - Pattern-based edits: For bulk ops, not symbol ops (use Serena)
 - Bulk operations: Style enforcement, framework updates, text replacements
 - Token efficiency: Fast Apply with compression (30-50% gains)
 - Moderate complexity: <10 files, straightforward transformations
 
-Avoid for:
+Avoid:
 - Semantic operations: Symbol renames, dependency tracking, LSP
   </choose>
 

@@ -7,12 +7,12 @@
   </role>
 
   <choose>
-Use for:
+Use:
 - Deep performance analysis: Understand performance bottlenecks
 - Live debugging: Inspect runtime page state, debug live issues
 - Network analysis: Inspect requests, CORS errors
 
-Avoid for:
+Avoid:
 - E2E testing: Use Playwright
 - Static analysis: Use native Claude
   </choose>

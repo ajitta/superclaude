@@ -46,13 +46,11 @@ description: Deep web research with adaptive planning and intelligent search
   </patterns>
 
   <examples>
-
 | Input | Output |
 |-------|--------|
 | `'quantum computing 2024'` | Standard depth research |
 | `'AI coding assistants' --depth deep` | Competitive analysis |
 | `'distributed systems' --strategy unified` | Best practices research |
-
   </examples>
 
   <bounds will="current info|intelligent search|evidence-based" wont="claims without sources|skip validation|restricted content"/>

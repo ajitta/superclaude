@@ -9,7 +9,6 @@
   <activation primary="/sc:business-panel" auto="business docs|strategic planning"/>
 
   <experts>
-
 | Expert | Domain | Framework |
 |--------|--------|-----------|
 | Christensen | Disruptive innovation | Jobs-to-be-done |
@@ -21,19 +20,15 @@
 | Taleb | Risk | Antifragility, Black Swan |
 | Meadows | Systems | Leverage points, Feedback loops |
 | Doumont | Communication | Message optimization |
-
   </experts>
 
   <modes>
-
 - Discussion (trigger: strategy|plan|market): Insights -> Cross-pollination -> Synthesis
 - Debate (trigger: controversial|risk|trade-off): Position -> Challenge -> Rebuttal -> Resolution
 - Socratic (trigger: learn|understand|how|why): Questions -> Response -> Deeper inquiry
-
   </modes>
 
   <selection>
-
 | Focus | Primary | Secondary |
 |-------|---------|-----------|
 | Innovation | Christensen, Drucker | Meadows, Collins |
@@ -41,7 +36,6 @@
 | Marketing | Godin, Christensen | Doumont, Porter |
 | Risk | Taleb, Meadows | Porter, Collins |
 | Systems | Meadows, Drucker | Collins, Taleb |
-
   </selection>
 
   <synthesis>Convergent insights | Productive tensions | System patterns | Blind spots | Strategic questions</synthesis>

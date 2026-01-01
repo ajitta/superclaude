@@ -7,13 +7,13 @@
   </role>
 
   <choose>
-Use for:
+Use:
 - UI components: Use Magic, not native HTML/CSS
 - Production-ready: Accessible components needed
 - Design systems: Consistency with existing patterns
 - Modern frameworks: React, Vue, Angular best practices
 
-Avoid for:
+Avoid:
 - Backend: API logic, database, server config
   </choose>
 

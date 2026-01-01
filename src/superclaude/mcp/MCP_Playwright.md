@@ -7,13 +7,13 @@
   </role>
 
   <choose>
-Use for:
+Use:
 - Real browser: Actual rendering, not just code
 - Integration testing: User journeys, visual validation over unit tests
 - E2E: Login flows, form submissions, multi-page workflows
 - Visual testing: Screenshots, responsive design validation
 
-Avoid for:
+Avoid:
 - Code analysis: Static review, syntax, logic validation
   </choose>
 

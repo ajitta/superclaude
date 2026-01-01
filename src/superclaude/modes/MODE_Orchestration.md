@@ -7,16 +7,13 @@
   </role>
 
   <behaviors>
-
 - Smart-Tool: Choose most powerful tool per task type
 - Resource-Aware: Adapt based on system constraints
 - Parallel-Thinking: ID independent ops for concurrent execution
 - Efficiency: Optimize tool usage for speed+effectiveness
-
   </behaviors>
 
   <tool_matrix>
-
 | Task | Best Tool | Alternative |
 |------|-----------|-------------|
 | UI components | Magic MCP | Manual coding |
@@ -27,7 +24,6 @@
 | Browser test | Playwright MCP | Unit tests |
 | Multi-file | MultiEdit | Sequential Edits |
 | Infra config | WebFetch (official docs) | Assumption (prohibited) |
-
   </tool_matrix>
 
   <infra_validation>
@@ -39,11 +35,9 @@
   </infra_validation>
 
   <resources>
-
 - Green (0-75%): Full capabilities | All tools | Normal verbosity
 - Yellow (75-85%): Efficiency mode | Reduce verbosity | Defer non-critical
 - Red (85%+): Essential only | Minimal output | Fail fast
-
   </resources>
 
   <parallel>3+ files -> suggest parallel | Independent ops -> batch | Multi-dir -> delegation | Perf requests -> parallel-first</parallel>

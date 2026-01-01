@@ -7,7 +7,6 @@
   </role>
 
   <choose>
-Use for:
 - Curated docs: Version-specific documentation over WebSearch
 - Official patterns: Implementation must follow official patterns
 - Frameworks: React hooks, Vue composition API, Angular services

@@ -7,13 +7,13 @@
   </role>
 
   <choose>
-Use for:
+Use:
 - Complex problems: 3+ interconnected components
 - Systematic analysis: Root cause, architecture review, security assessment
 - Structured approach: Decomposition, evidence gathering
 - Cross-domain: Frontend + backend + database + infrastructure
 
-Avoid for:
+Avoid:
 - Simple tasks: Basic explanations, single-file, straightforward fixes
   </choose>
 

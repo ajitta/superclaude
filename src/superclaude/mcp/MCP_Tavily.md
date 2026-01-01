@@ -7,13 +7,13 @@
   </role>
 
   <choose>
-Use for:
+Use:
 - Structured search: Advanced filtering over WebSearch
 - Multi-source: Search, not single page extraction (use WebFetch)
 - Research: Comprehensive multi-source investigations
 - Current info: Post-knowledge-cutoff events
 
-Avoid for:
+Avoid:
 - Training knowledge: Simple questions from training
 - Code generation: Writing code, local file ops
   </choose>
