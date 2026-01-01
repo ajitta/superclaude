@@ -126,21 +126,21 @@ uv run superclaude install
 
 ## Project-Specific Installation
 
-To install SuperClaude to a specific project directory (`./.claude/`):
+To install SuperClaude to a specific project directory:
 
 ```bash
-# Clone and install to current project
+# Clone the repository
 git clone https://github.com/SuperClaude-Org/SuperClaude_Framework.git
 cd SuperClaude_Framework
 
-# Install with project scope (installs to ./.claude/)
+# Install to a specific target directory
+./install.sh --target /path/to/your/project
+
+# Or non-interactive with force
+./install.sh --target /path/to/your/project --yes --force
+
+# Install to current directory (./.claude/)
 ./install.sh --scope project
-
-# Or non-interactive
-./install.sh --scope project --yes
-
-# Force reinstall if already exists
-./install.sh --scope project --force
 ```
 
 **install.sh options:**
@@ -148,18 +148,9 @@ cd SuperClaude_Framework
 |--------|-------------|
 | `--scope user` | Install to `~/.claude/` (default) |
 | `--scope project` | Install to `./.claude/` (current directory) |
+| `--target PATH` | Install to `PATH/.claude/` (specific directory) |
 | `--yes` | Non-interactive mode |
 | `--force` | Force reinstall existing components |
-
-**Alternative: Copy to existing project**
-```bash
-# From SuperClaude repo, copy .claude to your project
-cp -r .claude /path/to/your/project/
-
-# Or use superclaude CLI after global install
-cd /path/to/your/project
-superclaude install --scope project
-```
 
 ## MCP Server Integration
 

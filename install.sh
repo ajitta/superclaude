@@ -22,6 +22,7 @@
 #   ./install.sh --yes              # Non-interactive (auto-yes to prompts)
 #   ./install.sh --scope project    # Install to ./.claude/ (current directory)
 #   ./install.sh --scope user --force  # Force reinstall to ~/.claude/
+#   ./install.sh --target /path/to/project  # Install to specific project directory
 #   ./install.sh --help             # Show help message
 #
 ################################################################################
@@ -44,6 +45,7 @@ PROJECT_ROOT="$SCRIPT_DIR"
 AUTO_YES=false
 INSTALL_SCOPE="user"  # user or project
 INSTALL_FORCE=false
+INSTALL_TARGET=""     # Target directory for installation
 INSTALL_EXTRA_ARGS=""
 
 ################################################################################
@@ -212,7 +214,13 @@ install_commands() {
     print_step "Installing SuperClaude components..."
 
     local target_path
-    if [ "$INSTALL_SCOPE" = "project" ]; then
+    local effective_scope="$INSTALL_SCOPE"
+
+    # If --target is specified, use project scope in that directory
+    if [ -n "$INSTALL_TARGET" ]; then
+        target_path="$INSTALL_TARGET/.claude/"
+        effective_scope="project"
+    elif [ "$INSTALL_SCOPE" = "project" ]; then
         target_path="./.claude/"
     else
         target_path="~/.claude/"
@@ -227,7 +235,7 @@ install_commands() {
     print_info "  - superclaude/   : Core framework (core, modes, mcp)"
     echo ""
 
-    local install_cmd="uv run superclaude install --scope $INSTALL_SCOPE"
+    local install_cmd="uv run superclaude install --scope $effective_scope"
     if [ "$INSTALL_FORCE" = true ]; then
         install_cmd="$install_cmd --force"
     fi
@@ -235,13 +243,30 @@ install_commands() {
         install_cmd="$install_cmd $INSTALL_EXTRA_ARGS"
     fi
 
-    print_info "Running: $install_cmd"
-    if eval "$install_cmd"; then
-        print_success "All components installed successfully"
+    # If --target is specified, run in that directory
+    if [ -n "$INSTALL_TARGET" ]; then
+        if [ ! -d "$INSTALL_TARGET" ]; then
+            print_error "Target directory does not exist: $INSTALL_TARGET"
+            exit 1
+        fi
+        print_info "Running in target directory: $INSTALL_TARGET"
+        print_info "Running: (cd $INSTALL_TARGET && $install_cmd)"
+        if (cd "$INSTALL_TARGET" && eval "$install_cmd"); then
+            print_success "All components installed successfully"
+        else
+            print_error "Failed to install components"
+            print_info "Try running manually: cd $INSTALL_TARGET && $install_cmd"
+            exit 1
+        fi
     else
-        print_error "Failed to install components"
-        print_info "Try running manually: $install_cmd"
-        exit 1
+        print_info "Running: $install_cmd"
+        if eval "$install_cmd"; then
+            print_success "All components installed successfully"
+        else
+            print_error "Failed to install components"
+            print_info "Try running manually: $install_cmd"
+            exit 1
+        fi
     fi
 }
 
@@ -262,8 +287,15 @@ verify_installation() {
     fi
 
     # List all installed components
-    print_info "Installed components (scope: $INSTALL_SCOPE):"
-    uv run superclaude install --list --scope "$INSTALL_SCOPE"
+    local effective_scope="$INSTALL_SCOPE"
+    if [ -n "$INSTALL_TARGET" ]; then
+        effective_scope="project"
+        print_info "Installed components (target: $INSTALL_TARGET):"
+        (cd "$INSTALL_TARGET" && uv run superclaude install --list --scope project)
+    else
+        print_info "Installed components (scope: $INSTALL_SCOPE):"
+        uv run superclaude install --list --scope "$INSTALL_SCOPE"
+    fi
 }
 
 ################################################################################
@@ -282,6 +314,9 @@ Options:
     --scope SCOPE      Installation scope: user (default) or project
                        - user: Install to ~/.claude/
                        - project: Install to ./.claude/
+    --target PATH      Install to specific project directory
+                       - Installs to PATH/.claude/
+                       - Automatically uses project scope
     --force            Force reinstall if components already exist
     --help             Show this help message
 
@@ -299,6 +334,8 @@ Examples:
     ./install.sh --scope project      # Install to ./.claude/ (current directory)
     ./install.sh --scope user --force # Force reinstall to ~/.claude/
     ./install.sh --yes --scope project # Non-interactive project installation
+    ./install.sh --target /path/to/myproject  # Install to specific directory
+    ./install.sh --target ~/projects/myapp --force  # Force install to target
 
 For more information:
     https://github.com/SuperClaude-Org/SuperClaude_Framework
@@ -323,6 +360,14 @@ parse_args() {
                     exit 1
                 fi
                 INSTALL_SCOPE="$2"
+                shift 2
+                ;;
+            --target)
+                if [ -z "$2" ] || [[ "$2" =~ ^- ]]; then
+                    print_error "--target requires a directory path"
+                    exit 1
+                fi
+                INSTALL_TARGET="$2"
                 shift 2
                 ;;
             --force)
@@ -351,7 +396,9 @@ main() {
     echo ""
     print_info "This script will install SuperClaude Framework in development mode"
     print_info "Installation location: $PROJECT_ROOT"
-    if [ "$INSTALL_SCOPE" = "project" ]; then
+    if [ -n "$INSTALL_TARGET" ]; then
+        print_info "Target directory: $INSTALL_TARGET/.claude/"
+    elif [ "$INSTALL_SCOPE" = "project" ]; then
         print_info "Target scope: project (./.claude/)"
     else
         print_info "Target scope: user (~/.claude/)"
@@ -404,7 +451,9 @@ main() {
     echo "  3. Try a command:           /sc:help"
     echo ""
     local target_base
-    if [ "$INSTALL_SCOPE" = "project" ]; then
+    if [ -n "$INSTALL_TARGET" ]; then
+        target_base="$INSTALL_TARGET/.claude"
+    elif [ "$INSTALL_SCOPE" = "project" ]; then
         target_base="./.claude"
     else
         target_base="~/.claude"

@@ -152,31 +152,25 @@ cd SuperClaude_Framework
 
 **Option 3: Project-Specific Installation**
 ```bash
-# Clone and install to project scope (./.claude/)
+# Clone and install to a specific project directory
 git clone https://github.com/SuperClaude-Org/SuperClaude_Framework.git
 cd SuperClaude_Framework
-./install.sh --scope project
+./install.sh --target /path/to/your/project
 
 # Or non-interactive with force reinstall
-./install.sh --scope project --yes --force
+./install.sh --target /path/to/your/project --yes --force
+
+# Install to current directory (./.claude/)
+./install.sh --scope project
 ```
 
 | install.sh Option | Description |
 |-------------------|-------------|
 | `--scope user` | Install to `~/.claude/` (default) |
 | `--scope project` | Install to `./.claude/` |
+| `--target PATH` | Install to `PATH/.claude/` |
 | `--yes` | Non-interactive mode |
 | `--force` | Force reinstall |
-
-**Alternative: Copy to existing project**
-```bash
-# After cloning, copy .claude to your project
-cp -r .claude /path/to/your/project/
-
-# Or use CLI after global install
-cd /path/to/your/project
-superclaude install --scope project
-```
 
 ### **Coming in v5.0 (In Development)**
 
