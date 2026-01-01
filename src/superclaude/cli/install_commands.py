@@ -5,14 +5,17 @@ Installs all SuperClaude components to ~/.claude/ or ./.claude/ directory:
 - commands/sc/     : Slash commands
 - agents/          : Agent definitions
 - skills/          : Skills
+- hooks/           : Hook scripts (copied from scripts/, config merged into settings.json)
 - superclaude/     : Framework files (core, modes, mcp, CLAUDE_SC.md)
 - CLAUDE.md        : Auto-configured to import CLAUDE_SC.md
+- settings.json    : Hook configurations merged from hooks/hooks.json
 
 Supports two scopes:
 - user: ~/.claude/ (default)
 - project: ./.claude/ (current directory)
 """
 
+import json
 import re
 import shutil
 from pathlib import Path
@@ -38,6 +41,7 @@ def get_base_path(scope: str = "user") -> Path:
         return Path.home() / ".claude"
 
 # Component definitions: (source_subdir, target_subdir, description)
+# Note: hooks and scripts are handled specially by install_hooks_and_scripts()
 COMPONENTS = {
     "commands": ("commands", "commands/sc", "Slash commands"),
     "agents": ("agents", "agents", "Agent definitions"),
@@ -203,6 +207,131 @@ def install_claude_sc_md(base_path: Path = None, force: bool = False) -> Tuple[b
         return False, f"Failed to install CLAUDE_SC.md: {e}"
 
 
+def install_hooks_and_scripts(
+    base_path: Path = None,
+    force: bool = False
+) -> Tuple[int, int, int, List[str]]:
+    """
+    Install hooks configuration and scripts.
+
+    This function:
+    1. Copies scripts from src/superclaude/scripts/ to .claude/hooks/
+    2. Reads hooks/hooks.json and transforms paths
+    3. Merges hooks configuration into settings.json
+
+    Args:
+        base_path: Base installation path (default: ~/.claude)
+        force: Force reinstall
+
+    Returns:
+        Tuple of (installed_count, skipped_count, failed_count, messages)
+    """
+    if base_path is None:
+        base_path = Path.home() / ".claude"
+
+    package_root = _get_package_root()
+    scripts_source = package_root / "scripts"
+    hooks_source = package_root / "hooks"
+    hooks_target = base_path / "hooks"
+    settings_file = base_path / "settings.json"
+
+    installed = 0
+    skipped = 0
+    failed = 0
+    messages = []
+
+    # 1. Copy scripts to .claude/hooks/
+    if scripts_source.exists():
+        hooks_target.mkdir(parents=True, exist_ok=True)
+
+        patterns = ["*.sh", "*.py"]
+        for pattern in patterns:
+            for source_file in scripts_source.glob(pattern):
+                # Skip __init__.py and README files
+                if source_file.name == "__init__.py" or source_file.stem.upper() == "README":
+                    continue
+
+                target_file = hooks_target / source_file.name
+                if target_file.exists() and not force:
+                    skipped += 1
+                    continue
+
+                try:
+                    shutil.copy2(source_file, target_file)
+                    installed += 1
+                except Exception as e:
+                    failed += 1
+                    messages.append(f"Failed to copy {source_file.name}: {e}")
+
+    # 2. Read hooks.json and transform paths
+    hooks_json_file = hooks_source / "hooks.json"
+    if hooks_json_file.exists():
+        try:
+            with open(hooks_json_file, "r", encoding="utf-8") as f:
+                hooks_config = json.load(f)
+
+            # Transform paths: ./scripts/* → "$CLAUDE_PROJECT_DIR"/.claude/hooks/*
+            def transform_command(cmd: str) -> str:
+                # Replace ./scripts/ with "$CLAUDE_PROJECT_DIR"/.claude/hooks/
+                if "./scripts/" in cmd:
+                    return cmd.replace("./scripts/", '"$CLAUDE_PROJECT_DIR"/.claude/hooks/')
+                return cmd
+
+            def transform_hooks(obj):
+                """Recursively transform command paths in hooks configuration."""
+                if isinstance(obj, dict):
+                    result = {}
+                    for key, value in obj.items():
+                        if key == "command" and isinstance(value, str):
+                            result[key] = transform_command(value)
+                        else:
+                            result[key] = transform_hooks(value)
+                    return result
+                elif isinstance(obj, list):
+                    return [transform_hooks(item) for item in obj]
+                else:
+                    return obj
+
+            transformed_hooks = transform_hooks(hooks_config)
+
+            # 3. Merge into settings.json
+            settings = {}
+            if settings_file.exists():
+                try:
+                    with open(settings_file, "r", encoding="utf-8") as f:
+                        settings = json.load(f)
+                except json.JSONDecodeError:
+                    messages.append("Warning: Existing settings.json is invalid, creating new one")
+
+            # Check if hooks already exist
+            if "hooks" in settings and not force:
+                messages.append("Hooks already configured in settings.json (use --force to update)")
+                skipped += 1
+            else:
+                # Merge hooks configuration
+                if "hooks" in transformed_hooks:
+                    settings["hooks"] = transformed_hooks["hooks"]
+                else:
+                    settings["hooks"] = transformed_hooks
+
+                # Write updated settings.json
+                base_path.mkdir(parents=True, exist_ok=True)
+                with open(settings_file, "w", encoding="utf-8") as f:
+                    json.dump(settings, f, indent=2, ensure_ascii=False)
+                    f.write("\n")
+
+                installed += 1
+                messages.append("Hooks configuration merged into settings.json")
+
+        except Exception as e:
+            failed += 1
+            messages.append(f"Failed to process hooks.json: {e}")
+    else:
+        messages.append("hooks.json not found, skipping hooks configuration")
+
+    return installed, skipped, failed, messages
+
+
 def check_claude_md_import(base_path: Path = None) -> Tuple[bool, str]:
     """
     Check if ~/.claude/CLAUDE.md has the CLAUDE_SC.md import.
@@ -327,6 +456,23 @@ def install_all(base_path: Path = None, force: bool = False) -> Tuple[bool, str]
             for name in failed_names:
                 messages.append(f"   - {name}")
 
+    # Install hooks and scripts
+    hooks_installed, hooks_skipped, hooks_failed, hooks_messages = install_hooks_and_scripts(
+        base_path, force
+    )
+    total_installed += hooks_installed
+    total_skipped += hooks_skipped
+    total_failed += hooks_failed
+
+    if hooks_installed > 0:
+        messages.append(f"✅ Hooks and scripts: {hooks_installed} installed")
+    if hooks_skipped > 0:
+        messages.append(f"⏭️  Hooks and scripts: {hooks_skipped} skipped")
+    if hooks_failed > 0:
+        messages.append(f"❌ Hooks and scripts: {hooks_failed} failed")
+    for msg in hooks_messages:
+        messages.append(f"   {msg}")
+
     # Install CLAUDE_SC.md
     success, msg = install_claude_sc_md(base_path, force)
     messages.append(f"{'✅' if success else '❌'} {msg}")
@@ -442,12 +588,14 @@ def list_all_components(base_path: Path = None) -> Dict[str, Dict[str, any]]:
         base_path = Path.home() / ".claude"
 
     result = {}
+    package_root = _get_package_root()
 
+    # Regular components
     for component, (_, _, description) in COMPONENTS.items():
         source_dir = _get_source_dir(component)
         target_dir = _get_target_dir(component, base_path)
 
-        # Count source files (excluding README.md)
+        # Count source files (excluding README.md and __init__.py)
         if component == "skills":
             source_count = sum(1 for d in source_dir.iterdir() if d.is_dir()) if source_dir.exists() else 0
             installed_count = sum(1 for d in target_dir.iterdir() if d.is_dir()) if target_dir.exists() else 0
@@ -462,5 +610,40 @@ def list_all_components(base_path: Path = None) -> Dict[str, Dict[str, any]]:
             "available": source_count,
             "installed": installed_count,
         }
+
+    # Hooks and scripts (special handling)
+    scripts_source = package_root / "scripts"
+    hooks_target = base_path / "hooks"
+    settings_file = base_path / "settings.json"
+
+    # Count scripts
+    scripts_available = 0
+    if scripts_source.exists():
+        scripts_available = sum(1 for f in scripts_source.glob("*.sh"))
+        scripts_available += sum(1 for f in scripts_source.glob("*.py") if f.name != "__init__.py")
+
+    scripts_installed = 0
+    if hooks_target.exists():
+        scripts_installed = sum(1 for f in hooks_target.glob("*.sh"))
+        scripts_installed += sum(1 for f in hooks_target.glob("*.py") if f.name != "__init__.py")
+
+    # Check if hooks are configured in settings.json
+    hooks_configured = False
+    if settings_file.exists():
+        try:
+            with open(settings_file, "r", encoding="utf-8") as f:
+                settings = json.load(f)
+                hooks_configured = "hooks" in settings
+        except (json.JSONDecodeError, IOError):
+            pass
+
+    result["hooks"] = {
+        "description": "Hook scripts and configuration",
+        "source_path": str(scripts_source),
+        "target_path": str(hooks_target),
+        "available": scripts_available,
+        "installed": scripts_installed,
+        "hooks_configured": hooks_configured,
+    }
 
     return result

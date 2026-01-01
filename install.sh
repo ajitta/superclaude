@@ -11,6 +11,8 @@
 #      - commands/sc/   : 30+ slash commands
 #      - agents/        : Agent definitions
 #      - skills/        : Skills
+#      - hooks/         : Hook scripts (session-init.sh, skill-activator.sh)
+#      - settings.json  : Hook configurations merged from hooks/hooks.json
 #      - superclaude/   : Core framework (core, modes, mcp, CLAUDE_SC.md)
 #   4. Verifies installation
 #   5. Provides next steps guidance
@@ -220,6 +222,8 @@ install_commands() {
     print_info "  - commands/sc/   : Slash commands"
     print_info "  - agents/        : Agent definitions"
     print_info "  - skills/        : Skills"
+    print_info "  - hooks/         : Hook scripts"
+    print_info "  - settings.json  : Hook configurations"
     print_info "  - superclaude/   : Core framework (core, modes, mcp)"
     echo ""
 
@@ -407,10 +411,12 @@ main() {
     fi
 
     print_info "Installed locations:"
-    echo "  • Commands:   $target_base/commands/sc/"
-    echo "  • Agents:     $target_base/agents/"
-    echo "  • Skills:     $target_base/skills/"
-    echo "  • Framework:  $target_base/superclaude/"
+    echo "  • Commands:     $target_base/commands/sc/"
+    echo "  • Agents:       $target_base/agents/"
+    echo "  • Skills:       $target_base/skills/"
+    echo "  • Hook scripts: $target_base/hooks/"
+    echo "  • Hook config:  $target_base/settings.json"
+    echo "  • Framework:    $target_base/superclaude/"
     echo ""
     print_info "Optional - Install MCP Servers for enhanced features:"
     echo "  • List available servers:   uv run superclaude mcp --list"

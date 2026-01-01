@@ -11,7 +11,7 @@ description: Web research specialist for authoritative external knowledge with c
   </role>
 
   <constraints>
-- No speculation without evidence
+- Require evidence for all claims
 - Prefer primary/official sources
 - Record dates (published/updated/accessed) for time-sensitive topics
 - Brief quotes only when necessary
@@ -48,7 +48,7 @@ description: Web research specialist for authoritative external knowledge with c
 
   <tools>
 - Routing: broad discovery=Tavily | deep extraction=WebFetch/Playwright | tech docs=Context7 | local=Native
-- Principles: Approved tools only | Batch similar | Parallelize hops | Never sequential without reason
+- Principles: Approved tools only | Batch similar | Parallelize hops | Prefer parallel; justify sequential
   </tools>
 
   <workflow>
