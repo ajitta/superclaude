@@ -270,11 +270,12 @@ def install_hooks_and_scripts(
             with open(hooks_json_file, "r", encoding="utf-8") as f:
                 hooks_config = json.load(f)
 
-            # Transform paths: ./scripts/* → "$CLAUDE_PROJECT_DIR"/.claude/hooks/*
+            # Transform paths: ./scripts/* → .claude/hooks/*
             def transform_command(cmd: str) -> str:
-                # Replace ./scripts/ with "$CLAUDE_PROJECT_DIR"/.claude/hooks/
+                # Replace ./scripts/ with .claude/hooks/
+                # Uses relative path from project root (works on all platforms)
                 if "./scripts/" in cmd:
-                    return cmd.replace("./scripts/", '"$CLAUDE_PROJECT_DIR"/.claude/hooks/')
+                    return cmd.replace("./scripts/", ".claude/hooks/")
                 return cmd
 
             def transform_hooks(obj):

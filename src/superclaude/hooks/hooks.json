@@ -5,7 +5,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "./scripts/session-init.sh",
+            "command": "python ./scripts/session_init.py",
             "timeout": 10
           }
         ]
@@ -16,7 +16,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "./scripts/skill-activator.sh",
+            "command": "python ./scripts/skill_activator.py",
             "timeout": 5
           }
         ]
@@ -28,7 +28,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "jq -r '.tool_input.file_path' | xargs -I {} sh -c 'echo \"{}\" | grep -qE \"\\.(ts|tsx|js|jsx)$\" && npx prettier --write \"{}\" 2>/dev/null || true'",
+            "command": "python ./scripts/prettier_hook.py",
             "timeout": 30
           }
         ]
