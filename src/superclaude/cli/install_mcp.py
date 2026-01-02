@@ -66,7 +66,7 @@ MCP_SERVERS = {
         "name": "tavily",
         "description": "Web search and real-time information retrieval for deep research",
         "transport": "stdio",
-        "command": "npx -y tavily-mcp@0.1.2",
+        "command": "npx -y tavily-mcp@latest",
         "required": False,
         "api_key_env": "TAVILY_API_KEY",
         "api_key_description": "Tavily API key for web search (get from https://app.tavily.com)",
@@ -235,7 +235,8 @@ def install_mcp_server(
             env_args = ["--env", f"{api_key_env}={api_key}"]
 
     # Build installation command using modern Claude Code API
-    # Format: claude mcp add --transport <transport> [--scope <scope>] [--env KEY=VALUE] <name> -- <command>
+    # Format: claude mcp add --transport <transport> [--scope <scope>] <name> [--env KEY=VALUE] -- <command>
+    # Note: <name> must come BEFORE --env flags, otherwise CLI parses incorrectly
 
     cmd = ["claude", "mcp", "add", "--transport", transport]
 
@@ -243,12 +244,12 @@ def install_mcp_server(
     if scope != "local":
         cmd.extend(["--scope", scope])
 
-    # Add environment variables if any
+    # Add server name (must come before --env)
+    cmd.append(server_name)
+
+    # Add environment variables if any (must come after name)
     if env_args:
         cmd.extend(env_args)
-
-    # Add server name
-    cmd.append(server_name)
 
     # Add separator
     cmd.append("--")
