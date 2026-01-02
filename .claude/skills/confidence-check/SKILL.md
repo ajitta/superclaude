@@ -1,12 +1,12 @@
 ---
 name: confidence-check
-type: skill
-triggers: [/confidence-check, pre-implementation, confidence-assessment, readiness-check]
-description: Pre-implementation confidence assessment (≥90% required). Use before starting any implementation to verify readiness with duplicate check, architecture compliance, official docs verification, OSS references, and root cause identification.
-category: validation
-complexity: standard
-mcp-servers: [context7, tavily]
-personas: []
+description: >-
+  Pre-implementation confidence assessment (≥90% required to proceed).
+  USE THIS SKILL WHEN: user asks to implement a feature, add functionality,
+  create a new component, fix a bug, or refactor code. Also use when user says
+  "check confidence", "am I ready", "verify before implementing", "readiness check",
+  "pre-implementation check", "before starting", or "확인해줘/검증해줘".
+  Validates: no duplicates, architecture compliance, official docs, OSS references, root cause.
 ---
 
 <document type="skill" name="confidence-check"
