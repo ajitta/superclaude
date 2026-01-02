@@ -153,19 +153,17 @@ cat test_output.txt
 
 ### **Pitfall 4: Version Inconsistency**
 
-**Problem**: VERSION file says 4.1.9, but package.json says 4.1.5, pyproject.toml says 0.4.0.
+**Problem**: VERSION file says 4.1.9, but pyproject.toml says 0.4.0.
 
 **Solution**: Understand versioning strategy:
 - **Framework version** (VERSION file): User-facing version (4.1.9)
 - **Python package** (pyproject.toml): Library semantic version (0.4.0)
-- **NPM package** (package.json): Should match framework version (4.1.9)
 
 **When updating versions**:
 1. Update VERSION file first
-2. Update package.json to match
-3. Update README badges
-4. Consider if pyproject.toml needs bump (breaking changes?)
-5. Update CHANGELOG.md
+2. Update README badges
+3. Consider if pyproject.toml needs bump (breaking changes?)
+4. Update CHANGELOG.md
 
 **Prevention**: Create release checklist
 

@@ -239,7 +239,6 @@ Use SelfCheckProtocol to prevent hallucinations:
 1. **Version sources of truth**:
    - Framework version: `VERSION` file (e.g., 4.1.9)
    - Python package version: `pyproject.toml` (e.g., 0.4.0)
-   - NPM package version: `package.json` (should match VERSION)
 
 2. **When to bump versions**:
    - Major: Breaking API changes

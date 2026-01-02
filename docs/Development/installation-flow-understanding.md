@@ -10,8 +10,6 @@
 ```bash
 # Step 1: パッケージインストール
 pipx install SuperClaude
-# または
-npm install -g @bifrost_inc/superclaude
 
 # Step 2: セットアップ実行
 SuperClaude install

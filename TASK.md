@@ -15,7 +15,7 @@
 
 1. **[DONE]** Version inconsistency across files
    - ✅ Fixed VERSION file, README files (commit bec0b0c)
-   - ✅ Updated package.json to 4.1.7
+   - ✅ Removed npm wrapper (package.json) to avoid stale install paths
    - ⚠️ Note: pyproject.toml intentionally uses 0.4.0 (Python package versioning)
 
 2. **[DONE]** Plugin system documentation misleading
@@ -260,11 +260,6 @@ CLAUDE.md          # This file is tracked but listed here
    - Line 12: `sys.path.insert(0, ...)` shouldn't be necessary
    - Should rely on proper package installation
    - Priority: LOW
-
-3. **package.json references deleted bin/ files**
-   - Lines 6-7: postinstall/update scripts reference non-existent files
-   - Need to update or remove these scripts
-   - Priority: MEDIUM
 
 ---
 

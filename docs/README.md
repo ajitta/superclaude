@@ -75,7 +75,6 @@ pip install SuperClaude && SuperClaude install
 # Install framework (choose one)
 pipx install SuperClaude       # Recommended for Linux/macOS
 pip install SuperClaude        # Traditional method
-npm install -g @bifrost_inc/superclaude  # Cross-platform
 
 # Configure and maintain
 SuperClaude install            # Configure Claude Code

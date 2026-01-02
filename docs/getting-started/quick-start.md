@@ -84,9 +84,6 @@ pipx install SuperClaude && SuperClaude install
 
 # Or traditional pip
 pip install SuperClaude && SuperClaude install
-
-# Or via npm
-npm install -g @bifrost_inc/superclaude && superclaude install
 ```
 
 </td>

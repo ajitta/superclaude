@@ -122,12 +122,6 @@ Core patterns for AI-enhanced development:
 - **Python**: ≥3.10
 - **Dependencies**: pytest ≥7.0.0, click ≥8.0.0, rich ≥13.0.0
 
-### NPM Wrapper
-- **File**: `package.json`
-- **Package**: `@bifrost_inc/superclaude`
-- **Version**: 4.1.5
-- **Purpose**: Cross-platform installation wrapper
-
 ### Claude Code
 - **File**: `.claude/settings.json`
 - **Purpose**: Plugin and marketplace settings

@@ -17,9 +17,6 @@
   <a href="https://pypi.org/project/superclaude/">
     <img src="https://img.shields.io/pypi/v/SuperClaude.svg?" alt="PyPI">
   </a>
-  <a href="https://www.npmjs.com/package/@bifrost_inc/superclaude">
-    <img src="https://img.shields.io/npm/v/@bifrost_inc/superclaude.svg" alt="npm">
-  </a>
 </p>
 
 <!-- Language Selector -->

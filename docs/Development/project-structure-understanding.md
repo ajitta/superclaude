@@ -30,8 +30,7 @@ SuperClaude_Framework/
 │
 ├── tests/                # テストコード
 ├── docs/                 # 開発者向けドキュメント
-├── pyproject.toml        # Python設定
-└── package.json          # npm設定
+└── pyproject.toml        # Python設定
 ```
 
 **Operations**:
@@ -81,8 +80,6 @@ SuperClaude_Framework/
 ```bash
 # 1. インストール
 pipx install SuperClaude
-# または
-npm install -g @bifrost_inc/superclaude
 
 # 2. セットアップ実行
 SuperClaude install

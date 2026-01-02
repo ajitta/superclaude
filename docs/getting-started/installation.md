@@ -32,7 +32,6 @@
 |:------:|---------|:--------:|----------|
 | **🐍 pipx** | `pipx install SuperClaude && SuperClaude install` | Linux/macOS | **✅ Recommended** - Isolated environment |
 | **📦 pip** | `pip install SuperClaude && SuperClaude install` | All | Traditional Python setups |
-| **🌐 npm** | `npm install -g @bifrost_inc/superclaude && superclaude install` | All | Node.js developers |
 | **🔧 Dev** | `git clone ... && uv pip install -e ".[dev]"` | All | Contributors & developers |
 
 </div>
@@ -167,38 +166,7 @@ SuperClaude install
 </tr>
 </table>
 
-### **Method 3: npm (Cross-platform)**
-
-<table>
-<tr>
-<td width="60%">
-
-```bash
-# Global installation
-npm install -g @bifrost_inc/superclaude
-
-# Run the installer
-superclaude install
-```
-
-</td>
-<td width="40%">
-
-**✅ Advantages:**
-- Cross-platform
-- NPM ecosystem
-- JavaScript familiar
-
-**📍 Best for:**
-- Node.js developers
-- NPM users
-- Cross-platform needs
-
-</td>
-</tr>
-</table>
-
-### **Method 4: Development Installation**
+### **Method 3: Development Installation**
 
 <table>
 <tr>
