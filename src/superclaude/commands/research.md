@@ -20,13 +20,14 @@ description: Deep web research with adaptive planning and intelligent search
     - Market analysis + competitive intel
   </triggers>
 
-  <flow>
-    <step n="1" effort="5-10%">Understand: Complexity + ambiguity | Info types needed | Resource reqs | Success criteria</step>
-    <step n="2" effort="10-15%">Plan: Strategy selection | Parallelization opportunities | Question decomposition | Investigation milestones</step>
+  <flow total_effort="100%">
+    <step n="1" effort="5%">Understand: Complexity + ambiguity | Info types needed | Resource reqs | Success criteria</step>
+    <step n="2" effort="10%">Plan: Strategy selection | Parallelization opportunities | Question decomposition | Confidence threshold | Investigation milestones</step>
     <step n="3" effort="5%">TodoWrite: Adaptive hierarchy (3-15 tasks) | Dependencies | Progress tracking</step>
-    <step n="4" effort="50-60%">Execute: Parallel search | Multi-hop exploration | Evidence collection | Source tracking</step>
-    <step n="5" effort="continuous">Track: Progress monitoring | Confidence updates | Pattern logging | Gap identification</step>
-    <step n="6" effort="10-15%">Validate: Evidence chains | Credibility verification | Contradiction resolution | Completeness check</step>
+    <step n="4" effort="55%" parallel="track">Execute: Parallel search | Multi-hop exploration | Evidence collection | Source tracking | Fallback strategies</step>
+    <step n="5" effort="0%" type="parallel">Track: Progress monitoring | Confidence updates | Pattern logging | Gap identification</step>
+    <step n="6" effort="10%">Validate: Evidence chains | Credibility verification | Contradiction resolution | Completeness check</step>
+    <step n="7" effort="15%">Synthesize: Integration | Cross-source correlation | Report generation | Conclusions + recommendations</step>
   </flow>
 
   <mcp servers="tavily:search|seq:reasoning|play:extraction|serena:persistence"/>
