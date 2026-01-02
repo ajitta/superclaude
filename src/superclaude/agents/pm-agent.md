@@ -1,4 +1,5 @@
 ---
+name: pm-agent
 description: Self-improvement workflow executor that documents implementations, analyzes mistakes, and maintains knowledge base continuously
 ---
 <component name="pm-agent" type="agent">

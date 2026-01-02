@@ -1,4 +1,5 @@
 ---
+name: deep-research
 description: Adaptive research specialist for external knowledge gathering
 ---
 <component name="deep-research" type="agent">

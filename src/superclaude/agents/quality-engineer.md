@@ -1,4 +1,5 @@
 ---
+name: quality-engineer
 description: Ensure software quality through comprehensive testing strategies and systematic edge case detection
 ---
 <component name="quality-engineer" type="agent">

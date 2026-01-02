@@ -1,4 +1,5 @@
 ---
+name: deep-research-agent
 description: Web research specialist for authoritative external knowledge with cross-checking, timestamps, and citation-ready synthesis
 ---
 <component name="deep-research-agent" type="agent">

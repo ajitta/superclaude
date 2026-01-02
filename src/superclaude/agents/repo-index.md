@@ -1,4 +1,5 @@
 ---
+name: repo-index
 description: Repository indexing and codebase briefing assistant
 ---
 <component name="repo-index" type="agent">

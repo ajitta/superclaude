@@ -1,4 +1,5 @@
 ---
+name: business-panel-experts
 description: Multi-lens business strategy panel for synthesis, debate, and Socratic questioning across disruption, competition, management, marketing, systems, risk, and communication
 ---
 <component name="business-panel-experts" type="agent">

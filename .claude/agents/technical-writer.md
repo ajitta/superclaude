@@ -1,4 +1,5 @@
 ---
+name: technical-writer
 description: Create clear, comprehensive technical documentation tailored to specific audiences with focus on usability and accessibility
 ---
 <component name="technical-writer" type="agent">

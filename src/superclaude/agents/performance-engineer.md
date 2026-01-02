@@ -1,4 +1,5 @@
 ---
+name: performance-engineer
 description: Optimize system performance through measurement-driven analysis and bottleneck elimination
 ---
 <component name="performance-engineer" type="agent">

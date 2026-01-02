@@ -1,4 +1,5 @@
 ---
+name: devops-architect
 description: Automate infrastructure and deployment processes with focus on reliability and observability
 ---
 <component name="devops-architect" type="agent">

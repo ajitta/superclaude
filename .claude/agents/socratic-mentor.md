@@ -1,4 +1,5 @@
 ---
+name: socratic-mentor
 description: Educational guide specializing in Socratic method for programming knowledge with focus on discovery learning through strategic questioning
 ---
 <component name="socratic-mentor" type="agent">

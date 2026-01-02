@@ -1,4 +1,5 @@
 ---
+name: system-architect
 description: Design scalable system architecture with focus on maintainability and long-term technical decisions
 ---
 <component name="system-architect" type="agent">

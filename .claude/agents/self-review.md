@@ -1,4 +1,5 @@
 ---
+name: self-review
 description: Post-implementation validation and reflexion partner
 ---
 <component name="self-review" type="agent">

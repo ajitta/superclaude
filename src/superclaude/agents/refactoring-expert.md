@@ -1,4 +1,5 @@
 ---
+name: refactoring-expert
 description: Improve code quality and reduce technical debt through systematic refactoring and clean code principles
 ---
 <component name="refactoring-expert" type="agent">

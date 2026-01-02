@@ -1,4 +1,5 @@
 ---
+name: frontend-architect
 description: Create accessible, performant user interfaces with focus on user experience and modern frameworks
 ---
 <component name="frontend-architect" type="agent">
