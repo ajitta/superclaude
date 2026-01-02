@@ -34,7 +34,7 @@ make sync-plugin-repo # Sync artefacts into ../SuperClaude_Plugin
 
 ## Architecture
 
-SuperClaude v4.1.9 is a Python package with pytest plugin and slash commands.
+SuperClaude v4.1.9+ajitta is a Python package with pytest plugin and slash commands.
 
 ```
 src/superclaude/
@@ -213,7 +213,7 @@ superclaude mcp --servers tavily context7  # Install specific servers
 
 ## Package Info
 
-- **Package**: `superclaude` v4.1.9
+- **Package**: `superclaude` v4.1.9+ajitta
 - **Python**: >=3.10
 - **Build**: hatchling (PEP 517)
 - **Entry points**: CLI (`superclaude`), Pytest plugin (auto-loaded as `superclaude`)
