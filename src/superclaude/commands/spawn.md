@@ -3,7 +3,7 @@ description: Meta-system task orchestration with intelligent breakdown and deleg
 ---
 <component name="spawn" type="command">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
-  <runtime model="opus-4-5" effort="high"/>
+  <runtime model="opus-4-5"/>
 
   <role>
     /sc:spawn

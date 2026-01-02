@@ -1,3 +1,10 @@
+---
+name: mindbase
+type: mcp
+server: mindbase
+cache: gated
+triggers: [memory, conversation, session, semantic, embedding, pgvector, mindbase]
+---
 <component name="mindbase" type="mcp">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
   <triggers>memory|conversation|session|semantic|embedding|pgvector|mindbase</triggers>

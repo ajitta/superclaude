@@ -3,7 +3,7 @@ description: Multi-expert specification review and improvement using renowned so
 ---
 <component name="spec-panel" type="command">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
-  <runtime model="opus-4-5" effort="high"/>
+  <runtime model="opus-4-5"/>
 
   <role>
     /sc:spec-panel

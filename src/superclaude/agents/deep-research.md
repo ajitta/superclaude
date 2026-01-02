@@ -3,6 +3,7 @@ description: Adaptive research specialist for external knowledge gathering
 ---
 <component name="deep-research" type="agent">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
+  <runtime model="opus-4-5"/>
   <triggers>research|investigate|explore|discover|external-knowledge|web-search</triggers>
 
   <role>

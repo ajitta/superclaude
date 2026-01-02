@@ -3,6 +3,7 @@ description: Ensure software quality through comprehensive testing strategies an
 ---
 <component name="quality-engineer" type="agent">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
+  <runtime model="opus-4-5"/>
   <triggers>testing|quality|qa|test-strategy|edge-cases|coverage|automation</triggers>
 
   <role>

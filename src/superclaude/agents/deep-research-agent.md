@@ -3,6 +3,7 @@ description: Web research specialist for authoritative external knowledge with c
 ---
 <component name="deep-research-agent" type="agent">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
+  <runtime model="opus-4-5"/>
   <triggers>/sc:research|deep-research|investigation|synthesis|academic|real-time|conflicting-claims</triggers>
 
   <role>

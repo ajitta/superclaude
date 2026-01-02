@@ -1,3 +1,10 @@
+---
+name: airis-agent
+type: mcp
+server: airis-mcp-gateway
+cache: gated
+triggers: [confidence, research, index, optimize, sync, airis]
+---
 <component name="airis-agent" type="mcp">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
   <triggers>confidence|research|index|optimize|sync|airis</triggers>

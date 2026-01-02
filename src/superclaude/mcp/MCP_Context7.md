@@ -1,3 +1,10 @@
+---
+name: context7
+type: mcp
+server: context7
+cache: gated
+triggers: [library, docs, framework, documentation, import, require, --c7, --context7]
+---
 <component name="context7" type="mcp">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
   <triggers>library|docs|framework|documentation|import|require</triggers>

@@ -1,3 +1,10 @@
+---
+name: principles
+type: core
+priority: high
+cache: pinned
+triggers: [principle, philosophy, mindset, engineering, quality, decision]
+---
 <component name="principles" type="core" priority="high">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
   <triggers>principle|philosophy|mindset|engineering|quality|decision</triggers>

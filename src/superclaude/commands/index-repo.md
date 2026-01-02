@@ -3,7 +3,7 @@ description: Repository indexing with 94% token reduction (58K → 3K)
 ---
 <component name="index-repo" type="command">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
-  <runtime model="opus-4-5" effort="low"/>
+  <runtime model="opus-4-5"/>
 
   <role>
     /sc:index-repo

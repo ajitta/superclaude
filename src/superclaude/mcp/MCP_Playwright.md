@@ -1,3 +1,10 @@
+---
+name: playwright
+type: mcp
+server: playwright
+cache: gated
+triggers: [browser, E2E, test, screenshot, validation, accessibility, WCAG, --play, --playwright]
+---
 <component name="playwright" type="mcp">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
   <triggers>browser|E2E|test|screenshot|validation|accessibility|WCAG|playwright</triggers>

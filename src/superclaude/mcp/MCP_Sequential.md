@@ -1,3 +1,10 @@
+---
+name: sequential
+type: mcp
+server: sequential-thinking
+cache: gated
+triggers: [think, think-hard, ultrathink, debug, architecture, analysis, reasoning, --seq, --sequential]
+---
 <component name="sequential" type="mcp">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
   <triggers>think|think-hard|ultrathink|debug|architecture|analysis|reasoning|sequential</triggers>
