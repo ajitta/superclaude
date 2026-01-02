@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """PostToolUse hook for running prettier on JS/TS files (Python)
 Runs prettier on edited files with supported extensions
+Cross-platform compatible (Windows/macOS/Linux)
 """
 import json
 import subprocess

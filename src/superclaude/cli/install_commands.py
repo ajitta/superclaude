@@ -2,13 +2,13 @@
 SuperClaude Installation
 
 Installs all SuperClaude components to ~/.claude/ or ./.claude/ directory:
-- commands/sc/     : Slash commands
-- agents/          : Agent definitions
-- skills/          : Skills
-- hooks/           : Hook scripts (copied from scripts/, config merged into settings.json)
-- superclaude/     : Framework files (core, modes, mcp, CLAUDE_SC.md)
-- CLAUDE.md        : Auto-configured to import CLAUDE_SC.md
-- settings.json    : Hook configurations merged from hooks/hooks.json
+- commands/sc/          : Slash commands
+- agents/               : Agent definitions
+- skills/               : Skills
+- hooks/hooks.json      : Hook configuration (auto-loaded by Claude Code)
+- superclaude/scripts/  : Hook scripts
+- superclaude/          : Framework files (core, modes, mcp, CLAUDE_SC.md)
+- CLAUDE.md             : Auto-configured to import CLAUDE_SC.md
 
 Supports two scopes:
 - user: ~/.claude/ (default)
@@ -215,9 +215,8 @@ def install_hooks_and_scripts(
     Install hooks configuration and scripts.
 
     This function:
-    1. Copies scripts from src/superclaude/scripts/ to .claude/hooks/
-    2. Reads hooks/hooks.json and transforms paths
-    3. Merges hooks configuration into settings.json
+    1. Copies scripts from src/superclaude/scripts/ to .claude/superclaude/scripts/
+    2. Copies hooks/hooks.json to .claude/hooks/hooks.json (auto-loaded by Claude Code)
 
     Args:
         base_path: Base installation path (default: ~/.claude)
@@ -232,17 +231,17 @@ def install_hooks_and_scripts(
     package_root = _get_package_root()
     scripts_source = package_root / "scripts"
     hooks_source = package_root / "hooks"
+    scripts_target = base_path / "superclaude" / "scripts"
     hooks_target = base_path / "hooks"
-    settings_file = base_path / "settings.json"
 
     installed = 0
     skipped = 0
     failed = 0
     messages = []
 
-    # 1. Copy scripts to .claude/hooks/
+    # 1. Copy scripts to .claude/superclaude/scripts/
     if scripts_source.exists():
-        hooks_target.mkdir(parents=True, exist_ok=True)
+        scripts_target.mkdir(parents=True, exist_ok=True)
 
         patterns = ["*.sh", "*.py"]
         for pattern in patterns:
@@ -251,7 +250,7 @@ def install_hooks_and_scripts(
                 if source_file.name == "__init__.py" or source_file.stem.upper() == "README":
                     continue
 
-                target_file = hooks_target / source_file.name
+                target_file = scripts_target / source_file.name
                 if target_file.exists() and not force:
                     skipped += 1
                     continue
@@ -263,70 +262,23 @@ def install_hooks_and_scripts(
                     failed += 1
                     messages.append(f"Failed to copy {source_file.name}: {e}")
 
-    # 2. Read hooks.json and transform paths
+    # 2. Copy hooks.json to .claude/hooks/hooks.json (Claude Code auto-loads this)
     hooks_json_file = hooks_source / "hooks.json"
     if hooks_json_file.exists():
-        try:
-            with open(hooks_json_file, "r", encoding="utf-8") as f:
-                hooks_config = json.load(f)
+        hooks_target.mkdir(parents=True, exist_ok=True)
+        target_hooks_json = hooks_target / "hooks.json"
 
-            # Transform paths: ./scripts/* → .claude/hooks/*
-            def transform_command(cmd: str) -> str:
-                # Replace ./scripts/ with .claude/hooks/
-                # Uses relative path from project root (works on all platforms)
-                if "./scripts/" in cmd:
-                    return cmd.replace("./scripts/", ".claude/hooks/")
-                return cmd
-
-            def transform_hooks(obj):
-                """Recursively transform command paths in hooks configuration."""
-                if isinstance(obj, dict):
-                    result = {}
-                    for key, value in obj.items():
-                        if key == "command" and isinstance(value, str):
-                            result[key] = transform_command(value)
-                        else:
-                            result[key] = transform_hooks(value)
-                    return result
-                elif isinstance(obj, list):
-                    return [transform_hooks(item) for item in obj]
-                else:
-                    return obj
-
-            transformed_hooks = transform_hooks(hooks_config)
-
-            # 3. Merge into settings.json
-            settings = {}
-            if settings_file.exists():
-                try:
-                    with open(settings_file, "r", encoding="utf-8") as f:
-                        settings = json.load(f)
-                except json.JSONDecodeError:
-                    messages.append("Warning: Existing settings.json is invalid, creating new one")
-
-            # Check if hooks already exist
-            if "hooks" in settings and not force:
-                messages.append("Hooks already configured in settings.json (use --force to update)")
-                skipped += 1
-            else:
-                # Merge hooks configuration
-                if "hooks" in transformed_hooks:
-                    settings["hooks"] = transformed_hooks["hooks"]
-                else:
-                    settings["hooks"] = transformed_hooks
-
-                # Write updated settings.json
-                base_path.mkdir(parents=True, exist_ok=True)
-                with open(settings_file, "w", encoding="utf-8") as f:
-                    json.dump(settings, f, indent=2, ensure_ascii=False)
-                    f.write("\n")
-
+        if target_hooks_json.exists() and not force:
+            messages.append("hooks.json already exists (use --force to update)")
+            skipped += 1
+        else:
+            try:
+                shutil.copy2(hooks_json_file, target_hooks_json)
                 installed += 1
-                messages.append("Hooks configuration merged into settings.json")
-
-        except Exception as e:
-            failed += 1
-            messages.append(f"Failed to process hooks.json: {e}")
+                messages.append("hooks.json installed to .claude/hooks/")
+            except Exception as e:
+                failed += 1
+                messages.append(f"Failed to copy hooks.json: {e}")
     else:
         messages.append("hooks.json not found, skipping hooks configuration")
 
@@ -612,10 +564,9 @@ def list_all_components(base_path: Path = None) -> Dict[str, Dict[str, any]]:
             "installed": installed_count,
         }
 
-    # Hooks and scripts (special handling)
+    # Scripts (special handling - now in superclaude/scripts/)
     scripts_source = package_root / "scripts"
-    hooks_target = base_path / "hooks"
-    settings_file = base_path / "settings.json"
+    scripts_target = base_path / "superclaude" / "scripts"
 
     # Count scripts
     scripts_available = 0
@@ -624,27 +575,29 @@ def list_all_components(base_path: Path = None) -> Dict[str, Dict[str, any]]:
         scripts_available += sum(1 for f in scripts_source.glob("*.py") if f.name != "__init__.py")
 
     scripts_installed = 0
-    if hooks_target.exists():
-        scripts_installed = sum(1 for f in hooks_target.glob("*.sh"))
-        scripts_installed += sum(1 for f in hooks_target.glob("*.py") if f.name != "__init__.py")
+    if scripts_target.exists():
+        scripts_installed = sum(1 for f in scripts_target.glob("*.sh"))
+        scripts_installed += sum(1 for f in scripts_target.glob("*.py") if f.name != "__init__.py")
 
-    # Check if hooks are configured in settings.json
-    hooks_configured = False
-    if settings_file.exists():
-        try:
-            with open(settings_file, "r", encoding="utf-8") as f:
-                settings = json.load(f)
-                hooks_configured = "hooks" in settings
-        except (json.JSONDecodeError, IOError):
-            pass
-
-    result["hooks"] = {
-        "description": "Hook scripts and configuration",
+    result["scripts"] = {
+        "description": "Hook scripts",
         "source_path": str(scripts_source),
-        "target_path": str(hooks_target),
+        "target_path": str(scripts_target),
         "available": scripts_available,
         "installed": scripts_installed,
-        "hooks_configured": hooks_configured,
+    }
+
+    # Hooks configuration (now in .claude/hooks/hooks.json)
+    hooks_source = package_root / "hooks"
+    hooks_target = base_path / "hooks"
+    hooks_json_installed = (hooks_target / "hooks.json").exists()
+
+    result["hooks"] = {
+        "description": "Hook configuration",
+        "source_path": str(hooks_source),
+        "target_path": str(hooks_target),
+        "available": 1 if (hooks_source / "hooks.json").exists() else 0,
+        "installed": 1 if hooks_json_installed else 0,
     }
 
     return result

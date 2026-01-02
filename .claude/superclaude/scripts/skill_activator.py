@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Skill Activator Hook (Python)
 Evaluates user prompt against skill triggers for reliable activation
+Cross-platform compatible (Windows/macOS/Linux)
 """
-import os
 import re
 import sys
 

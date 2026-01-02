@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """SuperClaude SessionStart initialization script (Python)
 Auto-executed when Claude Code session starts
+Cross-platform compatible (Windows/macOS/Linux)
 """
 import subprocess
 import sys
