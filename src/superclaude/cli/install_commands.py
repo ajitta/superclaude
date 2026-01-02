@@ -209,18 +209,20 @@ def install_claude_sc_md(base_path: Path = None, force: bool = False) -> Tuple[b
 
 def install_hooks_and_scripts(
     base_path: Path = None,
-    force: bool = False
+    force: bool = False,
+    scope: str = "user"
 ) -> Tuple[int, int, int, List[str]]:
     """
     Install hooks configuration and scripts.
 
     This function:
     1. Copies scripts from src/superclaude/scripts/ to .claude/superclaude/scripts/
-    2. Copies hooks/hooks.json to .claude/hooks/hooks.json (auto-loaded by Claude Code)
+    2. Transforms hooks/hooks.json with correct paths and copies to .claude/hooks/hooks.json
 
     Args:
         base_path: Base installation path (default: ~/.claude)
         force: Force reinstall
+        scope: Installation scope ("user", "project", or "target")
 
     Returns:
         Tuple of (installed_count, skipped_count, failed_count, messages)
@@ -238,6 +240,14 @@ def install_hooks_and_scripts(
     skipped = 0
     failed = 0
     messages = []
+
+    # Determine scripts path based on scope
+    # - project scope: relative path (works from project root)
+    # - user/target scope: absolute path (works from anywhere)
+    if scope == "project":
+        scripts_path_for_hooks = ".claude/superclaude/scripts"
+    else:
+        scripts_path_for_hooks = str(scripts_target.resolve())
 
     # 1. Copy scripts to .claude/superclaude/scripts/
     if scripts_source.exists():
@@ -262,7 +272,7 @@ def install_hooks_and_scripts(
                     failed += 1
                     messages.append(f"Failed to copy {source_file.name}: {e}")
 
-    # 2. Copy hooks.json to .claude/hooks/hooks.json (Claude Code auto-loads this)
+    # 2. Transform and copy hooks.json to .claude/hooks/hooks.json
     hooks_json_file = hooks_source / "hooks.json"
     if hooks_json_file.exists():
         hooks_target.mkdir(parents=True, exist_ok=True)
@@ -273,12 +283,22 @@ def install_hooks_and_scripts(
             skipped += 1
         else:
             try:
-                shutil.copy2(hooks_json_file, target_hooks_json)
+                # Read template and replace placeholder
+                with open(hooks_json_file, "r", encoding="utf-8") as f:
+                    content = f.read()
+
+                # Replace {{SCRIPTS_PATH}} placeholder with actual path
+                content = content.replace("{{SCRIPTS_PATH}}", scripts_path_for_hooks)
+
+                # Write transformed content
+                with open(target_hooks_json, "w", encoding="utf-8") as f:
+                    f.write(content)
+
                 installed += 1
-                messages.append("hooks.json installed to .claude/hooks/")
+                messages.append(f"hooks.json installed (scripts path: {scripts_path_for_hooks})")
             except Exception as e:
                 failed += 1
-                messages.append(f"Failed to copy hooks.json: {e}")
+                messages.append(f"Failed to install hooks.json: {e}")
     else:
         messages.append("hooks.json not found, skipping hooks configuration")
 
@@ -371,13 +391,18 @@ def update_claude_md_import(base_path: Path = None, force: bool = False) -> Tupl
         return True, "CLAUDE.md created with CLAUDE_SC.md import"
 
 
-def install_all(base_path: Path = None, force: bool = False) -> Tuple[bool, str]:
+def install_all(
+    base_path: Path = None,
+    force: bool = False,
+    scope: str = "user"
+) -> Tuple[bool, str]:
     """
     Install all SuperClaude components.
 
     Args:
         base_path: Base installation path (default: ~/.claude)
         force: Force reinstall if components exist
+        scope: Installation scope ("user", "project", or "target")
 
     Returns:
         Tuple of (success: bool, message: str)
@@ -411,7 +436,7 @@ def install_all(base_path: Path = None, force: bool = False) -> Tuple[bool, str]
 
     # Install hooks and scripts
     hooks_installed, hooks_skipped, hooks_failed, hooks_messages = install_hooks_and_scripts(
-        base_path, force
+        base_path, force, scope
     )
     total_installed += hooks_installed
     total_skipped += hooks_skipped

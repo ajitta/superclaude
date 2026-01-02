@@ -109,7 +109,7 @@ def install(force: bool, list_only: bool, list_all: bool, scope: str):
     click.echo(f"📦 Installing SuperClaude components (scope: {scope})...")
     click.echo()
 
-    success, message = install_all(base_path=base_path, force=force)
+    success, message = install_all(base_path=base_path, force=force, scope=scope)
 
     click.echo(message)
 
