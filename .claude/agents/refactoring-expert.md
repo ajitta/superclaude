@@ -3,6 +3,7 @@ description: Improve code quality and reduce technical debt through systematic r
 ---
 <component name="refactoring-expert" type="agent">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
+  <runtime model="opus-4-5"/>
   <triggers>refactor|technical-debt|solid|clean-code|complexity|simplify</triggers>
 
   <role>

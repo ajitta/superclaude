@@ -3,6 +3,7 @@ description: Identify security vulnerabilities and ensure compliance with securi
 ---
 <component name="security-engineer" type="agent">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
+  <runtime model="opus-4-5"/>
   <triggers>security|vulnerability|owasp|compliance|threat-model|authentication</triggers>
 
   <role>

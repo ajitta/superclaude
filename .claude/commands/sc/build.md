@@ -3,7 +3,7 @@ description: Build, compile, and package projects with intelligent error handlin
 ---
 <component name="build" type="command">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
-  <runtime model="opus-4-5" effort="medium"/>
+  <runtime model="opus-4-5"/>
 
   <role>
     /sc:build

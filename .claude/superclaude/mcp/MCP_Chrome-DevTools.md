@@ -1,3 +1,10 @@
+---
+name: chrome-devtools
+type: mcp
+server: chrome-devtools
+cache: gated
+triggers: [performance, debug, layout, CLS, LCP, console, network, DOM, CSS, --chrome, --devtools]
+---
 <component name="chrome-devtools" type="mcp">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
   <triggers>performance|debug|layout|CLS|LCP|console|network|DOM|CSS|devtools</triggers>

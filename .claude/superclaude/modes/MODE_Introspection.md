@@ -1,3 +1,9 @@
+---
+name: introspection
+type: mode
+cache: pinned
+triggers: [introspect, reflect, analyze reasoning, meta, self-analysis, --introspect]
+---
 <component name="introspection" type="mode">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
   <triggers>introspect|reflect|analyze reasoning|meta|self-analysis|--introspect</triggers>

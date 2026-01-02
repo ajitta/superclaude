@@ -3,6 +3,7 @@ description: Deliver production-ready, secure, high-performance Python code foll
 ---
 <component name="python-expert" type="agent">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
+  <runtime model="opus-4-5"/>
   <triggers>python|pytest|django|fastapi|flask|poetry|uv</triggers>
 
   <role>

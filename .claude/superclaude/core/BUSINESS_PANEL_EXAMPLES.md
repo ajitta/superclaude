@@ -1,3 +1,10 @@
+---
+name: business-panel-examples
+type: core
+priority: low
+cache: deferred
+triggers: [business-panel, example, usage, workflow, integration]
+---
 <component name="business-panel-examples" type="core" priority="low">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
   <triggers>business-panel|example|usage|workflow|integration</triggers>

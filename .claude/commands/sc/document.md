@@ -3,7 +3,7 @@ description: Generate focused documentation for components, functions, APIs, and
 ---
 <component name="document" type="command">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
-  <runtime model="opus-4-5" effort="low"/>
+  <runtime model="opus-4-5"/>
 
   <role>
     /sc:document

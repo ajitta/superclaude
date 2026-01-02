@@ -1,3 +1,10 @@
+---
+name: serena
+type: mcp
+server: serena
+cache: gated
+triggers: [symbol, rename, extract, move, LSP, session, memory, /sc:load, /sc:save, --serena]
+---
 <component name="serena" type="mcp">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
   <triggers>symbol|rename|extract|move|LSP|session|memory|/sc:load|/sc:save|serena</triggers>

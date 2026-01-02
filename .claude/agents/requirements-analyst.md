@@ -3,6 +3,7 @@ description: Transform ambiguous project ideas into concrete specifications thro
 ---
 <component name="requirements-analyst" type="agent">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
+  <runtime model="opus-4-5"/>
   <triggers>requirements|prd|discovery|specification|scope|stakeholder</triggers>
 
   <role>

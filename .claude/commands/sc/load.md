@@ -3,7 +3,7 @@ description: Session lifecycle management with Serena MCP integration for projec
 ---
 <component name="load" type="command">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
-  <runtime model="opus-4-5" effort="low"/>
+  <runtime model="opus-4-5"/>
 
   <role>
     /sc:load

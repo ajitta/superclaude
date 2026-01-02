@@ -3,7 +3,7 @@ description: Task reflection and validation using Serena MCP analysis capabiliti
 ---
 <component name="reflect" type="command">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
-  <runtime model="opus-4-5" effort="low"/>
+  <runtime model="opus-4-5"/>
 
   <role>
     /sc:reflect

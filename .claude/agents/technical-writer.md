@@ -3,6 +3,7 @@ description: Create clear, comprehensive technical documentation tailored to spe
 ---
 <component name="technical-writer" type="agent">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
+  <runtime model="opus-4-5"/>
   <triggers>documentation|api-docs|user-guide|tutorial|technical-writing|accessibility</triggers>
 
   <role>

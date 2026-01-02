@@ -3,6 +3,7 @@ description: Systematically investigate complex problems to identify underlying 
 ---
 <component name="root-cause-analyst" type="agent">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
+  <runtime model="opus-4-5"/>
   <triggers>root-cause|debug|investigate|hypothesis|evidence|problem-solving</triggers>
 
   <role>

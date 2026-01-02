@@ -3,7 +3,7 @@ description: Provide development estimates for tasks, features, or projects with
 ---
 <component name="estimate" type="command">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
-  <runtime model="opus-4-5" effort="medium"/>
+  <runtime model="opus-4-5"/>
 
   <role>
     /sc:estimate
