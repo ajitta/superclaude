@@ -178,16 +178,16 @@ def prompt_for_api_key(
     server_name: str, env_var: str, description: str
 ) -> Optional[str]:
     """Prompt user for API key if needed."""
+    # Check if already set in environment - use silently
+    if os.getenv(env_var):
+        click.echo(f"   ✅ Using {env_var} from environment")
+        return os.getenv(env_var)
+
+    # Not set - prompt user
     click.echo(f"\n🔑 MCP server '{server_name}' requires an API key")
     click.echo(f"   Environment variable: {env_var}")
     click.echo(f"   Description: {description}")
 
-    # Check if already set in environment
-    if os.getenv(env_var):
-        click.echo(f"   ✅ {env_var} already set in environment")
-        return os.getenv(env_var)
-
-    # Prompt user
     if click.confirm(f"   Would you like to set {env_var} now?", default=True):
         api_key = click.prompt(f"   Enter {env_var}", hide_input=True)
         return api_key
