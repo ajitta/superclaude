@@ -66,10 +66,12 @@ MCP_SERVERS = {
         "name": "tavily",
         "description": "Web search and real-time information retrieval for deep research",
         "transport": "stdio",
-        "command": "npx -y tavily-mcp@latest",
+        "command": "npx -y mcp-remote https://mcp.tavily.com/mcp",
         "required": False,
         "api_key_env": "TAVILY_API_KEY",
         "api_key_description": "Tavily API key for web search (get from https://app.tavily.com)",
+        "api_key_in_url": True,
+        "api_key_url_param": "tavilyApiKey",  # URL param name (camelCase)
     },
     "chrome-devtools": {
         "name": "chrome-devtools",
@@ -223,6 +225,7 @@ def install_mcp_server(
 
     # Handle API key requirements
     env_args = []
+    api_key = None
     if "api_key_env" in server_info:
         api_key_env = server_info["api_key_env"]
         api_key = prompt_for_api_key(
@@ -231,7 +234,16 @@ def install_mcp_server(
             server_info.get("api_key_description", f"API key for {server_name}"),
         )
 
-        if api_key:
+        # Check if API key should be in URL or as env var
+        if api_key and server_info.get("api_key_in_url"):
+            # Append API key to URL in command (for mcp-remote style)
+            url_param = server_info.get("api_key_url_param", api_key_env)
+            if "?" in command:
+                command = f"{command}&{url_param}={api_key}"
+            else:
+                command = f"{command}?{url_param}={api_key}"
+        elif api_key:
+            # Standard env var approach
             env_args = ["--env", f"{api_key_env}={api_key}"]
 
     # Build installation command using modern Claude Code API
