@@ -1,239 +1,191 @@
 {
-  "metadata": {
-    "generated_at": "2025-10-29T00:00:00Z",
-    "version": "0.4.0",
-    "total_files": 196,
-    "python_loc": 3002,
-    "test_files": 7,
-    "documentation_files": 90
+  "meta": {
+    "generated": "2026-01-03",
+    "version": "4.1.9+ajitta",
+    "description": "AI-enhanced development framework for Claude Code"
+  },
+  "statistics": {
+    "commands": 30,
+    "agents": 20,
+    "modes": 8,
+    "mcp_servers": 11,
+    "core_configs": 6,
+    "python_files": 30,
+    "test_files": 6
   },
   "entry_points": {
     "cli": {
       "command": "superclaude",
-      "source": "src/superclaude/cli/main.py",
-      "purpose": "CLI interface for SuperClaude operations"
+      "source": "src/superclaude/cli/main.py:main",
+      "subcommands": ["install", "mcp", "update", "install-skill", "doctor", "version"]
     },
     "pytest_plugin": {
       "auto_loaded": true,
       "source": "src/superclaude/pytest_plugin.py",
-      "purpose": "PM Agent fixtures and test automation"
-    },
-    "skills": {
-      "confidence_check": {
-        "source": ".claude/skills/confidence-check/confidence.ts",
-        "purpose": "Pre-implementation confidence assessment"
-      }
+      "fixtures": ["confidence_checker", "self_check_protocol", "reflexion_pattern", "token_budget", "pm_context"]
     }
   },
-  "core_modules": {
-    "pm_agent": {
-      "path": "src/superclaude/pm_agent/",
-      "modules": {
-        "confidence": {
-          "file": "confidence.py",
-          "purpose": "Pre-execution confidence assessment",
-          "threshold": "≥90% required, 70-89% present alternatives, <70% ask questions",
-          "roi": "25-250x token savings"
-        },
-        "self_check": {
-          "file": "self_check.py",
-          "purpose": "Post-implementation evidence-based validation",
-          "pattern": "Assert → Verify → Report"
-        },
-        "reflexion": {
-          "file": "reflexion.py",
-          "purpose": "Error learning and prevention",
-          "features": ["Cross-session pattern matching", "Failure analysis"]
-        },
-        "token_budget": {
-          "file": "token_budget.py",
-          "purpose": "Token allocation and tracking",
-          "levels": {
-            "simple": 200,
-            "medium": 1000,
-            "complex": 2500
-          }
-        }
-      }
+  "pm_agent": {
+    "confidence": {
+      "file": "src/superclaude/pm_agent/confidence.py",
+      "class": "ConfidenceChecker",
+      "methods": ["assess", "get_recommendation", "_has_official_docs", "_no_duplicates", "_architecture_compliant", "_has_oss_reference", "_root_cause_identified", "_has_existing_patterns", "_has_clear_path"],
+      "thresholds": {"proceed": 90, "alternatives": 70, "clarify": 0}
     },
-    "execution": {
-      "path": "src/superclaude/execution/",
-      "modules": {
-        "parallel": {
-          "file": "parallel.py",
-          "pattern": "Wave → Checkpoint → Wave",
-          "performance": "3.5x faster than sequential"
-        },
-        "reflection": {
-          "file": "reflection.py",
-          "purpose": "Post-execution analysis and improvement"
-        },
-        "self_correction": {
-          "file": "self_correction.py",
-          "purpose": "Automated error detection and correction"
-        }
-      }
+    "self_check": {
+      "file": "src/superclaude/pm_agent/self_check.py",
+      "class": "SelfCheckProtocol",
+      "methods": ["validate", "format_report", "_check_tests_passing", "_check_requirements_met", "_check_assumptions_verified", "_check_evidence_exists", "_detect_hallucinations"]
     },
-    "cli": {
-      "path": "src/superclaude/cli/",
-      "modules": {
-        "main": {
-          "file": "main.py",
-          "exports": ["main()"],
-          "framework": "Click-based CLI"
-        },
-        "doctor": {
-          "file": "doctor.py",
-          "purpose": "Health check diagnostics"
-        },
-        "install_skill": {
-          "file": "install_skill.py",
-          "purpose": "Install SuperClaude skills to Claude Code",
-          "target": "~/.claude/skills/"
-        }
-      }
+    "reflexion": {
+      "file": "src/superclaude/pm_agent/reflexion.py",
+      "class": "ReflexionPattern",
+      "methods": ["get_solution", "record_error", "get_statistics", "_create_error_signature", "_search_mindbase", "_search_local_files", "_signatures_match", "_create_mistake_doc"]
+    },
+    "token_budget": {
+      "file": "src/superclaude/pm_agent/token_budget.py",
+      "class": "TokenBudgetManager",
+      "methods": ["allocate", "use", "remaining", "remaining_tokens", "reset"],
+      "levels": {"simple": 200, "medium": 1000, "complex": 2500}
     }
   },
-  "configuration": {
-    "python_package": {
-      "file": "pyproject.toml",
-      "build_system": "hatchling (PEP 517)",
-      "python_version": ">=3.10",
-      "dependencies": {
-        "pytest": ">=7.0.0",
-        "click": ">=8.0.0",
-        "rich": ">=13.0.0"
-      }
-    },
-    "claude_code": {
-      "file": ".claude/settings.json",
-      "purpose": "Plugin and marketplace settings"
+  "execution": {
+    "parallel": {
+      "file": "src/superclaude/execution/parallel.py",
+      "classes": ["TaskStatus", "Task", "ParallelGroup", "ExecutionPlan", "ParallelExecutor"],
+      "functions": ["parallel_file_operations", "should_parallelize", "example_parallel_read", "example_dependent_tasks"],
+      "pattern": "Wave→Checkpoint→Wave",
+      "speedup": "3.5x"
     }
   },
-  "documentation": {
-    "key_files": [
-      "CLAUDE.md",
-      "README.md",
-      "CONTRIBUTING.md",
-      "CHANGELOG.md",
-      "AGENTS.md"
-    ],
-    "user_guides": [
-      "docs/user-guide/commands.md",
-      "docs/user-guide/agents.md",
-      "docs/user-guide/flags.md",
-      "docs/user-guide/modes.md",
-      "docs/user-guide/session-management.md",
-      "docs/user-guide/mcp-servers.md"
-    ],
-    "developer_guides": [
-      "docs/developer-guide/contributing-code.md",
-      "docs/developer-guide/technical-architecture.md",
-      "docs/developer-guide/testing-debugging.md"
-    ],
-    "architecture": [
-      "docs/architecture/MIGRATION_TO_CLEAN_ARCHITECTURE.md",
-      "docs/architecture/PM_AGENT_COMPARISON.md",
-      "docs/architecture/CONTEXT_WINDOW_ANALYSIS.md"
-    ],
-    "research": [
-      "docs/research/llm-agent-token-efficiency-2025.md",
-      "docs/research/reflexion-integration-2025.md",
-      "docs/research/parallel-execution-complete-findings.md",
-      "docs/research/pm_agent_roi_analysis_2025-10-21.md"
+  "commands": {
+    "count": 30,
+    "location": "src/superclaude/commands/",
+    "installed_to": "~/.claude/commands/sc/",
+    "files": ["agent.md", "analyze.md", "brainstorm.md", "build.md", "business-panel.md", "cleanup.md", "design.md", "document.md", "estimate.md", "explain.md", "git.md", "help.md", "implement.md", "improve.md", "index-repo.md", "index.md", "load.md", "pm.md", "recommend.md", "reflect.md", "research.md", "save.md", "sc.md", "select-tool.md", "spawn.md", "spec-panel.md", "task.md", "test.md", "troubleshoot.md", "workflow.md"],
+    "categories": {
+      "core": ["sc", "help", "recommend"],
+      "analysis": ["analyze", "explain", "troubleshoot"],
+      "implementation": ["implement", "improve", "cleanup"],
+      "planning": ["brainstorm", "design", "estimate", "workflow", "spawn"],
+      "documentation": ["document", "index", "index-repo"],
+      "quality": ["test", "build", "reflect"],
+      "research": ["research", "spec-panel", "business-panel"],
+      "session": ["load", "save", "agent", "task"],
+      "git": ["git"],
+      "tools": ["select-tool", "pm"]
+    }
+  },
+  "agents": {
+    "count": 20,
+    "location": "src/superclaude/agents/",
+    "installed_to": "~/.claude/agents/",
+    "files": ["backend-architect.md", "business-panel-experts.md", "deep-research-agent.md", "deep-research.md", "devops-architect.md", "frontend-architect.md", "learning-guide.md", "performance-engineer.md", "pm-agent.md", "python-expert.md", "quality-engineer.md", "refactoring-expert.md", "repo-index.md", "requirements-analyst.md", "root-cause-analyst.md", "security-engineer.md", "self-review.md", "socratic-mentor.md", "system-architect.md", "technical-writer.md"],
+    "categories": {
+      "architecture": ["backend-architect", "devops-architect", "frontend-architect", "system-architect"],
+      "quality": ["quality-engineer", "security-engineer", "performance-engineer"],
+      "development": ["python-expert", "refactoring-expert", "requirements-analyst"],
+      "analysis": ["root-cause-analyst", "deep-research-agent", "deep-research"],
+      "education": ["learning-guide", "socratic-mentor", "technical-writer"],
+      "workflow": ["pm-agent", "repo-index", "self-review", "business-panel-experts"]
+    }
+  },
+  "modes": {
+    "count": 8,
+    "location": "src/superclaude/modes/",
+    "files": ["MODE_Brainstorming.md", "MODE_Business_Panel.md", "MODE_DeepResearch.md", "MODE_Introspection.md", "MODE_Orchestration.md", "MODE_Task_Management.md", "MODE_Token_Efficiency.md", "MODE_UNIFIED.md"],
+    "list": [
+      {"name": "Brainstorming", "trigger": "--brainstorm", "file": "MODE_Brainstorming.md"},
+      {"name": "DeepResearch", "trigger": "--research", "file": "MODE_DeepResearch.md"},
+      {"name": "Orchestration", "trigger": "--orchestrate", "file": "MODE_Orchestration.md"},
+      {"name": "TaskManagement", "trigger": "--task-manage", "file": "MODE_Task_Management.md"},
+      {"name": "TokenEfficiency", "trigger": "--uc", "file": "MODE_Token_Efficiency.md"},
+      {"name": "Introspection", "trigger": "--introspect", "file": "MODE_Introspection.md"},
+      {"name": "BusinessPanel", "trigger": "business", "file": "MODE_Business_Panel.md"},
+      {"name": "Unified", "trigger": "default", "file": "MODE_UNIFIED.md"}
+    ]
+  },
+  "mcp_servers": {
+    "count": 11,
+    "config_location": "src/superclaude/mcp/configs/",
+    "doc_location": "src/superclaude/mcp/",
+    "configs": ["airis-agent.json", "context7.json", "magic.json", "mindbase.json", "morphllm.json", "playwright.json", "sequential.json", "serena-docker.json", "serena.json", "tavily.json"],
+    "docs": ["MCP_Airis-Agent.md", "MCP_Chrome-DevTools.md", "MCP_Context7.md", "MCP_Magic.md", "MCP_Mindbase.md", "MCP_Morphllm.md", "MCP_Playwright.md", "MCP_Sequential.md", "MCP_Serena.md", "MCP_Tavily.md", "MCP_UNIFIED.md"],
+    "servers": [
+      {"name": "context7", "flag": "--c7", "purpose": "Official docs lookup"},
+      {"name": "tavily", "flag": "--tavily", "purpose": "Web search"},
+      {"name": "sequential", "flag": "--seq", "purpose": "Extended thinking"},
+      {"name": "serena", "flag": "--serena", "purpose": "Symbol ops, memory"},
+      {"name": "morphllm", "flag": "--morph", "purpose": "Bulk pattern edits"},
+      {"name": "magic", "flag": "--magic", "purpose": "UI components"},
+      {"name": "playwright", "flag": "--play", "purpose": "Browser automation"},
+      {"name": "airis-agent", "flag": null, "purpose": "Confidence, indexing"},
+      {"name": "mindbase", "flag": null, "purpose": "Semantic memory"},
+      {"name": "chrome-devtools", "flag": "--chrome", "purpose": "Performance debug"},
+      {"name": "serena-docker", "flag": null, "purpose": "Containerized serena"}
+    ]
+  },
+  "core_configs": {
+    "location": "src/superclaude/core/",
+    "files": [
+      {"name": "FLAGS.md", "purpose": "Behavioral flags, MCP triggers, effort levels"},
+      {"name": "PRINCIPLES.md", "purpose": "Engineering philosophy, SOLID, decisions"},
+      {"name": "RULES.md", "purpose": "Behavioral rules, priorities, conflict resolution"},
+      {"name": "RESEARCH_CONFIG.md", "purpose": "Deep research settings, hop config, credibility"},
+      {"name": "BUSINESS_PANEL_EXAMPLES.md", "purpose": "Business panel usage examples"},
+      {"name": "BUSINESS_SYMBOLS.md", "purpose": "Business domain symbols"}
     ]
   },
   "tests": {
-    "framework": "pytest >=7.0.0",
-    "coverage_tool": "pytest-cov >=4.0.0",
-    "markers": [
-      "confidence_check",
-      "self_check",
-      "reflexion",
-      "unit",
-      "integration"
-    ],
-    "test_files": [
-      "tests/pm_agent/test_confidence_check.py",
-      "tests/pm_agent/test_self_check_protocol.py",
-      "tests/pm_agent/test_reflexion_pattern.py",
-      "tests/pm_agent/test_token_budget.py",
-      "tests/test_pytest_plugin.py",
-      "tests/conftest.py"
-    ],
-    "commands": {
-      "all_tests": "uv run pytest",
-      "specific_directory": "uv run pytest tests/pm_agent/ -v",
-      "by_marker": "uv run pytest -m confidence_check",
-      "with_coverage": "uv run pytest --cov=superclaude"
-    }
-  },
-  "dependencies": {
-    "core": {
-      "pytest": ">=7.0.0",
-      "click": ">=8.0.0",
-      "rich": ">=13.0.0"
+    "framework": "pytest>=7.0.0",
+    "location": "tests/",
+    "structure": {
+      "unit": ["test_cli_install.py", "test_confidence.py", "test_reflexion.py", "test_self_check.py", "test_token_budget.py"],
+      "integration": ["test_pytest_plugin.py"]
     },
-    "dev": {
-      "pytest-cov": ">=4.0.0",
-      "pytest-benchmark": ">=4.0.0",
-      "scipy": ">=1.10.0",
-      "ruff": ">=0.1.0",
-      "mypy": ">=1.0"
+    "markers": ["unit", "integration", "confidence_check", "self_check", "reflexion", "complexity"],
+    "commands": {
+      "all": "uv run pytest",
+      "unit": "uv run pytest tests/unit/ -v",
+      "integration": "uv run pytest tests/integration/ -v",
+      "by_marker": "uv run pytest -m <marker>",
+      "coverage": "uv run pytest --cov=superclaude"
     }
   },
-  "quick_start": {
-    "installation": [
-      "uv pip install superclaude",
-      "pip install superclaude",
-      "make install"
-    ],
-    "usage": [
-      "superclaude --version",
-      "superclaude install-skill confidence-check",
-      "make doctor",
-      "make test"
-    ]
-  },
-  "git_workflow": {
-    "branch_structure": "master (production) ← integration (testing) ← feature/*, fix/*, docs/*",
-    "current_branch": "next"
+  "cross_reference": {
+    "by_functionality": {
+      "cli_entry": "cli/main.py",
+      "pytest_fixtures": "pytest_plugin.py",
+      "confidence": ["pm_agent/confidence.py", "skills/confidence-check/"],
+      "validation": "pm_agent/self_check.py",
+      "learning": "pm_agent/reflexion.py",
+      "tokens": "pm_agent/token_budget.py",
+      "parallel": "execution/parallel.py",
+      "commands": "commands/*.md",
+      "agents": "agents/*.md",
+      "modes": "modes/*.md",
+      "mcp": "mcp/configs/*.json",
+      "rules": "core/RULES.md",
+      "flags": "core/FLAGS.md"
+    },
+    "by_extension": {
+      ".py": {"count": 30, "purpose": "Python source"},
+      ".md": {"count": 80, "purpose": "Documentation, commands, agents"},
+      ".json": {"count": 15, "purpose": "Config files"},
+      ".ts": {"count": 1, "purpose": "TypeScript skill"},
+      ".sh": {"count": 3, "purpose": "Shell scripts"}
+    }
   },
   "token_efficiency": {
     "index_performance": {
-      "before": "58,000 tokens (reading all files every session)",
-      "after": "3,000 tokens (reading this index)",
-      "reduction": "94% (55,000 tokens saved per session)"
+      "before_tokens": 58000,
+      "after_tokens": 3000,
+      "reduction_percent": 94
     },
     "pm_agent_roi": {
-      "confidence_check_cost": "100-200 tokens",
-      "savings": "5,000-50,000 tokens",
-      "roi": "25-250x token savings",
-      "break_even": "1 failed implementation prevented"
+      "cost_tokens": "100-200",
+      "savings_tokens": "5000-50000",
+      "roi_multiplier": "25-250x"
     }
-  },
-  "project_stats": {
-    "python_source_lines": 3002,
-    "test_files_count": 7,
-    "documentation_files_count": 90,
-    "supported_python": ["3.10", "3.11", "3.12"],
-    "license": "MIT",
-    "contributors": 3
-  },
-  "mcp_integration": {
-    "servers": {
-      "tavily": "Web search (Deep Research)",
-      "context7": "Official documentation (prevent hallucination)",
-      "sequential": "Token-efficient reasoning (30-50% reduction)",
-      "serena": "Session persistence",
-      "mindbase": "Cross-session learning"
-    }
-  },
-  "project_principles": [
-    "Evidence-Based Development - Never guess, verify with official docs",
-    "Confidence-First Implementation - Check confidence BEFORE starting",
-    "Parallel-First Execution - Use Wave → Checkpoint → Wave (3.5x faster)",
-    "Token Efficiency - Optimize for minimal token usage",
-    "Test-Driven Development - Tests first, implementation second"
-  ]
+  }
 }
