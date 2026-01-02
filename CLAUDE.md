@@ -124,6 +124,36 @@ uv pip install -e ".[dev]"
 uv run superclaude install
 ```
 
+## Development Workflow
+
+**For developers working on this codebase:**
+
+```bash
+# 1. Initial setup (once)
+make install   # or: uv pip install -e ".[dev]"
+
+# 2. Development cycle
+# Edit code...
+uv run superclaude install --list-all  # Test changes immediately (editable mode)
+uv run pytest tests/ -v                 # Run tests
+
+# 3. Deploy to global tool (use from any directory)
+uv tool install --force .
+
+# 4. Use from anywhere
+cd /any/project
+superclaude install
+superclaude mcp --servers tavily
+```
+
+| Stage | Command | Location |
+|-------|---------|----------|
+| Dev/Test | `uv run superclaude ...` | This repo |
+| Deploy | `uv tool install --force .` | This repo |
+| Use | `superclaude ...` | Anywhere |
+
+**Note**: Editable mode (`-e`) means code changes are reflected immediately in `uv run` without reinstalling. Global tool requires `uv tool install --force .` to update.
+
 ## Project-Specific Installation
 
 To install SuperClaude to a specific project directory:

@@ -172,6 +172,40 @@ cd SuperClaude_Framework
 | `--yes` | Non-interactive mode |
 | `--force` | Force reinstall |
 
+**Option 4: Development with Global Access (uv)**
+```bash
+# Clone and setup
+git clone https://github.com/SuperClaude-Org/SuperClaude_Framework.git
+cd SuperClaude_Framework
+
+# Install as global tool (use from any directory)
+uv tool install .
+
+# Now use from anywhere
+cd /any/project
+superclaude install
+superclaude mcp --servers tavily
+```
+
+**For contributors/developers:**
+```bash
+# Initial setup (editable mode for development)
+uv pip install -e ".[dev]"
+
+# Development cycle
+uv run superclaude install --list-all  # Test changes immediately
+uv run pytest tests/ -v                 # Run tests
+
+# Deploy changes to global tool
+uv tool install --force .
+```
+
+| Stage | Command | Description |
+|-------|---------|-------------|
+| Dev/Test | `uv run superclaude ...` | Test in repo (editable) |
+| Deploy | `uv tool install --force .` | Update global tool |
+| Use | `superclaude ...` | Run from anywhere |
+
 ### **Coming in v5.0 (In Development)**
 
 We are actively working on a new TypeScript plugin system (see issue [#419](https://github.com/SuperClaude-Org/SuperClaude_Framework/issues/419) for details). When released, installation will be simplified to:
