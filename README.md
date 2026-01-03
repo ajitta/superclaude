@@ -184,6 +184,30 @@ superclaude install
 superclaude mcp --servers tavily
 ```
 
+**How `uv tool install .` works:**
+
+The command reads `pyproject.toml` and performs the following:
+
+```
+Read pyproject.toml → hatchling build → Create wheel → Global install
+```
+
+| Step | What Happens |
+|------|--------------|
+| **1. Metadata** | Reads `[project]` for name, version, dependencies |
+| **2. Entry Point** | Uses `[project.scripts]` to create `superclaude` CLI command |
+| **3. Build** | hatchling creates wheel from `src/superclaude/` |
+| **4. Install** | Places binary in `~/.local/bin/` (Linux/Mac) or `%USERPROFILE%\.local\bin\` (Windows) |
+
+**Key pyproject.toml sections:**
+```toml
+[project.scripts]
+superclaude = "superclaude.cli.main:main"  # CLI entry point
+
+[project.entry-points.pytest11]
+superclaude = "superclaude.pytest_plugin"   # pytest plugin auto-load
+```
+
 **For contributors/developers:**
 ```bash
 # Initial setup (editable mode for development)
@@ -195,6 +219,11 @@ uv run pytest tests/ -v                 # Run tests
 
 # Deploy changes to global tool
 uv tool install --force .
+
+# Verify installation
+uv tool list              # List installed tools
+which superclaude         # Check install path (Linux/Mac)
+where superclaude         # Check install path (Windows)
 ```
 
 | Stage | Command | Description |

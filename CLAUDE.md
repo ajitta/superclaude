@@ -154,6 +154,58 @@ superclaude mcp --servers tavily
 
 **Note**: Editable mode (`-e`) means code changes are reflected immediately in `uv run` without reinstalling. Global tool requires `uv tool install --force .` to update.
 
+## pyproject.toml and uv tool install
+
+`pyproject.toml` is Python's **standard project configuration file** that manages package build, dependencies, CLI commands, and plugins in a single file.
+
+### How `uv tool install .` Works
+
+```
+Read pyproject.toml → hatchling build → Create wheel → Global install
+```
+
+**1. Metadata Extraction**
+```toml
+[project]
+name = "superclaude"           # Package name
+version = "4.1.9+ajitta"       # Version
+
+[project.scripts]
+superclaude = "superclaude.cli.main:main"  # CLI entry point
+```
+
+**2. Build Execution**
+```toml
+[build-system]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/superclaude"]  # Source to include
+```
+
+**3. Global Installation Path**
+- Linux/Mac: `~/.local/bin/superclaude`
+- Windows: `%USERPROFILE%\.local\bin\superclaude`
+
+### pyproject.toml Key Sections
+
+| Section | Purpose |
+|---------|---------|
+| `[build-system]` | Build backend (hatchling) |
+| `[project]` | Package metadata, dependencies |
+| `[project.scripts]` | CLI command registration |
+| `[project.entry-points.pytest11]` | pytest plugin auto-load |
+| `[tool.pytest]` | Test configuration |
+| `[tool.ruff]` / `[tool.black]` | Linter/formatter settings |
+
+### Verification Commands
+
+```bash
+uv tool list              # List installed tools
+where superclaude         # Check install path (Windows)
+which superclaude         # Check install path (Linux/Mac)
+```
+
 ## Project-Specific Installation
 
 To install SuperClaude to a specific project directory:
