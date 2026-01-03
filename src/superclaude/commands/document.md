@@ -22,10 +22,26 @@ description: Generate focused documentation for components, functions, APIs, and
   <flow>
     1. Analyze: Component structure + interfaces
     2. Identify: Audience + requirements
-    3. Generate: Content by type + style
+    3. Generate: Content by type + style (see outputs)
     4. Format: Consistent structure
     5. Integrate: Project doc ecosystem
   </flow>
+
+  <outputs note="Per --type flag">
+| Type | Output | Metrics |
+|------|--------|---------|
+| inline | JSDoc/docstring in source | coverage ≥80% |
+| external | {component}_DOCS.md | all public APIs |
+| api | API.md or api.json | endpoints 100% |
+| guide | GUIDE.md | install+usage+examples |
+  </outputs>
+
+  <checklist note="MUST complete all">
+    - [ ] Target documentation generated
+    - [ ] Format matches --style (brief/detailed)
+    - [ ] Cross-references validated
+    - [ ] Integrated with existing docs
+  </checklist>
 
   <tools>
     - Read: Component + existing docs

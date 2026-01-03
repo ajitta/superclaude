@@ -21,11 +21,26 @@ description: Build, compile, and package projects with intelligent error handlin
 
   <flow>
     1. Analyze: Structure, configs, deps
-    2. Validate: Environment + toolchain
+    2. Validate: Environment + toolchain ready
     3. Execute: Build + real-time monitoring
-    4. Optimize: Artifacts + bundle size
-    5. Package: Artifacts + reports
+    4. Optimize: Artifacts + bundle size (if --optimize)
+    5. Package: Artifacts + generate report
   </flow>
+
+  <outputs note="Per --type flag">
+| Type | Artifacts | Report |
+|------|-----------|--------|
+| dev | dist-dev/ | BUILD_DEV.log |
+| prod | dist/ | BUILD_REPORT.md |
+| test | dist-test/ | BUILD_TEST.log |
+  </outputs>
+
+  <checklist note="MUST complete all">
+    - [ ] Build completed without errors
+    - [ ] Artifacts generated in correct location
+    - [ ] Bundle size within limits (if --optimize)
+    - [ ] Build report generated
+  </checklist>
 
   <mcp servers="play:validation"/>
   <personas p="devops"/>

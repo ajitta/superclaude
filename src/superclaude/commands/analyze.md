@@ -21,11 +21,26 @@ description: Comprehensive code analysis across quality, security, performance, 
 
   <flow>
     1. Discover: Categorize files by language
-    2. Scan: Domain-specific analysis
-    3. Evaluate: Prioritized findings + severity
+    2. Scan: Domain-specific analysis per --focus
+    3. Evaluate: Prioritized findings + severity (🔴🟡🟢)
     4. Recommend: Actionable guidance
-    5. Report: Metrics + roadmap
+    5. Report: Generate output per --format
   </flow>
+
+  <outputs note="Per --format flag">
+| Format | Output | Content |
+|--------|--------|---------|
+| text | console | Inline findings + recs |
+| json | analysis.json | Structured findings |
+| report | ANALYSIS_REPORT.md | Full report + roadmap |
+  </outputs>
+
+  <checklist note="MUST complete all">
+    - [ ] All files in target scanned
+    - [ ] Findings prioritized by severity
+    - [ ] Actionable recommendations provided
+    - [ ] Output format matches --format
+  </checklist>
 
   <tools>
     - Glob: File discovery

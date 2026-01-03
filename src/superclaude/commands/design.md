@@ -22,10 +22,26 @@ description: Design system architecture, APIs, and component interfaces with com
   <flow>
     1. Analyze: Requirements + existing context
     2. Plan: Design approach + structure
-    3. Design: Comprehensive specs + best practices
-    4. Validate: Requirements + maintainability
+    3. Design: Comprehensive specs + best practices (see outputs)
+    4. Validate: Requirements coverage ≥90%, maintainability check
     5. Document: Diagrams + specifications
   </flow>
+
+  <outputs note="Per --type and --format">
+| Type | diagram | spec | code |
+|------|---------|------|------|
+| architecture | ARCH_DIAGRAM.md | ARCHITECTURE.md | interfaces/*.ts |
+| api | API_DIAGRAM.md | API_SPEC.md | openapi.yaml |
+| component | COMPONENT_DIAGRAM.md | COMPONENT_SPEC.md | types/*.ts |
+| database | ERD.md | SCHEMA.md | migrations/*.sql |
+  </outputs>
+
+  <checklist note="MUST complete all">
+    - [ ] Design document generated per --type
+    - [ ] Format matches --format flag
+    - [ ] Requirements coverage validated
+    - [ ] Maintainability considerations documented
+  </checklist>
 
   <tools>
     - Read: Requirements analysis

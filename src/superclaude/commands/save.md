@@ -27,6 +27,22 @@ description: Session lifecycle management with Serena MCP integration for contex
     5. Prepare: Ready for future session continuation
   </flow>
 
+  <outputs note="Per --type flag">
+| Type | Serena Memory | Content |
+|------|---------------|---------|
+| session | session_[date] | Full context |
+| learnings | learnings_[topic] | Patterns + insights |
+| context | context_[project] | Project state |
+| all | All above | Complete preservation |
+  </outputs>
+
+  <checklist note="MUST complete all">
+    - [ ] Session data collected
+    - [ ] Serena memory write successful
+    - [ ] Checkpoint validated for recovery
+    - [ ] Ready for /sc:load continuation
+  </checklist>
+
   <mcp servers="serena:memory|serena:persistence"/>
 
   <tools>

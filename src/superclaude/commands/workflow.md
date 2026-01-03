@@ -27,6 +27,21 @@ description: Generate structured implementation workflows from PRDs and feature 
     5. Validate: Quality gates + workflow completeness
   </flow>
 
+  <outputs note="Per execution">
+| Artifact | Purpose |
+|----------|---------|
+| WORKFLOW.md | Implementation workflow document |
+| TodoWrite items | Task tracking hierarchy |
+| WORKFLOW_STATUS.md | Progress + quality gates |
+  </outputs>
+
+  <checklist note="MUST complete all">
+    - [ ] PRD/requirements fully parsed
+    - [ ] Workflow document generated
+    - [ ] Dependencies mapped in TodoWrite
+    - [ ] Quality gates defined and tracked
+  </checklist>
+
   <mcp servers="seq:analysis|c7:patterns|magic:UI|play:testing|morph:transform|serena:persistence"/>
   <personas p="arch|anal|fe|be|sec|ops|pm"/>
 

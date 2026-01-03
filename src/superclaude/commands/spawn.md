@@ -22,10 +22,25 @@ description: Meta-system task orchestration with intelligent breakdown and deleg
   <flow>
     1. Analyze: Complex op requirements + scope
     2. Decompose: Epic → Story → Task → Subtask
-    3. Orchestrate: Execute via optimal strategy
+    3. Orchestrate: Execute via --strategy
     4. Monitor: Progress + dependency management
     5. Integrate: Aggregate results + summary
   </flow>
+
+  <outputs note="Per execution">
+| Artifact | Purpose |
+|----------|---------|
+| TodoWrite hierarchy | Task breakdown tracking |
+| SPAWN_PLAN.md | Execution strategy doc |
+| SPAWN_RESULT.md | Aggregated results |
+  </outputs>
+
+  <checklist note="MUST complete all">
+    - [ ] Task decomposition complete (Epic→Subtask)
+    - [ ] Dependencies mapped correctly
+    - [ ] All subtasks executed or delegated
+    - [ ] Results aggregated and summarized
+  </checklist>
 
   <tools>
     - TodoWrite: Hierarchical breakdown (Epic→Story→Task)

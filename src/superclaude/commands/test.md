@@ -24,8 +24,24 @@ description: Execute tests with coverage analysis and automated quality reportin
     2. Configure: Environment + execution params
     3. Execute: Run + real-time progress
     4. Analyze: Coverage reports + failure diagnostics
-    5. Report: Actionable recs + quality metrics
+    5. Report: Generate outputs per flags
   </flow>
+
+  <outputs note="Per flags">
+| Flag | Output | Metrics |
+|------|--------|---------|
+| --coverage | coverage/ | line ≥80%, branch ≥70% |
+| --type unit | TEST_UNIT.log | pass rate |
+| --type e2e | TEST_E2E.log | screenshots if fail |
+| default | TEST_REPORT.md | summary + failures |
+  </outputs>
+
+  <checklist note="MUST complete all">
+    - [ ] All targeted tests executed
+    - [ ] Coverage meets thresholds (if --coverage)
+    - [ ] Failure diagnostics provided
+    - [ ] Test report generated
+  </checklist>
 
   <mcp servers="play:e2e"/>
   <personas p="qa-specialist"/>

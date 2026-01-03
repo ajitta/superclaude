@@ -20,12 +20,28 @@ description: Systematically clean up code, remove dead code, and optimize projec
   </triggers>
 
   <flow>
-    1. Analyze: Cleanup opportunities + safety
+    1. Analyze: Cleanup opportunities + safety assessment
     2. Plan: Choose approach + activate personas
-    3. Execute: Systematic dead code detection
-    4. Validate: Ensure no functionality loss
+    3. Execute: Systematic cleanup per --type
+    4. Validate: Ensure no functionality loss (tests pass)
     5. Report: Summary + maintenance recs
   </flow>
+
+  <outputs note="Per --type flag">
+| Type | Actions | Report |
+|------|---------|--------|
+| code | Remove dead code | CLEANUP_CODE.md |
+| imports | Remove unused imports | CLEANUP_IMPORTS.md |
+| files | Remove orphan files | CLEANUP_FILES.md |
+| all | All above | CLEANUP_REPORT.md |
+  </outputs>
+
+  <checklist note="MUST complete all">
+    - [ ] Pre-cleanup snapshot/backup noted
+    - [ ] Cleanup actions executed per --type
+    - [ ] Tests still passing (no functionality loss)
+    - [ ] Cleanup report generated
+  </checklist>
 
   <mcp servers="seq:analysis|c7:patterns"/>
   <personas p="arch|qual|sec"/>
