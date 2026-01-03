@@ -201,3 +201,4 @@ uv.lock
 .mcp.json
 .claude/
 docs/mistakes/
+docs/memory/solutions_learned.jsonl
