@@ -12,11 +12,19 @@ def check_skill_triggers(prompt: str) -> list[str]:
     hints = []
     prompt_lower = prompt.lower()
 
-    # Confidence check triggers
-    confidence_pattern = r"(implement|build|create|add feature|before starting)"
-    if re.search(confidence_pattern, prompt_lower):
+    # Confidence check triggers (aligned with SKILL.md)
+    confidence_patterns = [
+        r"(implement|build|create|add feature|fix bug|refactor)",  # Action triggers
+        r"(check confidence|confidence check)",  # Direct triggers
+        r"(am i ready|ready to start)",  # Readiness triggers
+        r"(verify before|before implementing|pre-implementation)",  # Pre-check triggers
+        r"(readiness check|readiness-check)",  # Explicit check triggers
+        r"(확인해줘|검증해줘|준비됐|시작하기 전)",  # Korean triggers
+    ]
+    if any(re.search(p, prompt_lower) for p in confidence_patterns):
         hints.append(
-            "INSTRUCTION: Consider using /confidence-check skill before implementation"
+            "INSTRUCTION: Use /confidence-check skill before implementation. "
+            "Assess: duplicates, architecture, docs, OSS refs, root cause."
         )
 
     # Research triggers
