@@ -199,3 +199,4 @@ TODO.txt
 package-lock.json
 uv.lock
 .mcp.json
+.claude/
