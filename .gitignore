@@ -200,3 +200,4 @@ package-lock.json
 uv.lock
 .mcp.json
 .claude/
+docs/mistakes/
