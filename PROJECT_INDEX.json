@@ -1,16 +1,16 @@
 {
   "meta": {
-    "generated": "2026-01-03",
+    "generated": "2026-01-04",
     "version": "4.1.9+ajitta",
     "description": "AI-enhanced development framework for Claude Code"
   },
   "statistics": {
-    "commands": 30,
+    "commands": 31,
     "agents": 20,
     "modes": 8,
     "mcp_servers": 11,
     "core_configs": 6,
-    "python_files": 30,
+    "python_files": 34,
     "test_files": 6
   },
   "entry_points": {
@@ -59,14 +59,14 @@
     }
   },
   "commands": {
-    "count": 30,
+    "count": 31,
     "location": "src/superclaude/commands/",
     "installed_to": "~/.claude/commands/sc/",
-    "files": ["agent.md", "analyze.md", "brainstorm.md", "build.md", "business-panel.md", "cleanup.md", "design.md", "document.md", "estimate.md", "explain.md", "git.md", "help.md", "implement.md", "improve.md", "index-repo.md", "index.md", "load.md", "pm.md", "recommend.md", "reflect.md", "research.md", "save.md", "sc.md", "select-tool.md", "spawn.md", "spec-panel.md", "task.md", "test.md", "troubleshoot.md", "workflow.md"],
+    "files": ["agent.md", "analyze.md", "brainstorm.md", "build.md", "business-panel.md", "cleanup.md", "design.md", "document.md", "estimate.md", "explain.md", "git.md", "help.md", "implement.md", "improve.md", "index-repo.md", "index.md", "load.md", "pm.md", "recommend.md", "reflect.md", "refactoring.md", "research.md", "save.md", "sc.md", "select-tool.md", "spawn.md", "spec-panel.md", "task.md", "test.md", "troubleshoot.md", "workflow.md"],
     "categories": {
       "core": ["sc", "help", "recommend"],
       "analysis": ["analyze", "explain", "troubleshoot"],
-      "implementation": ["implement", "improve", "cleanup"],
+      "implementation": ["implement", "improve", "cleanup", "refactoring"],
       "planning": ["brainstorm", "design", "estimate", "workflow", "spawn"],
       "documentation": ["document", "index", "index-repo"],
       "quality": ["test", "build", "reflect"],
@@ -169,7 +169,7 @@
       "flags": "core/FLAGS.md"
     },
     "by_extension": {
-      ".py": {"count": 30, "purpose": "Python source"},
+      ".py": {"count": 34, "purpose": "Python source"},
       ".md": {"count": 80, "purpose": "Documentation, commands, agents"},
       ".json": {"count": 15, "purpose": "Config files"},
       ".ts": {"count": 1, "purpose": "TypeScript skill"},

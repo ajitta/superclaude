@@ -1,6 +1,6 @@
 # Project Index: SuperClaude Framework
 
-**Generated**: 2026-01-03
+**Generated**: 2026-01-04
 **Version**: 4.1.9+ajitta
 **Description**: AI-enhanced development framework for Claude Code - pytest plugin with specialized commands, agents, and modes
 
@@ -100,7 +100,7 @@ SuperClaude_Framework/
 
 ---
 
-## Slash Commands (30)
+## Slash Commands (31)
 
 Commands installed to `~/.claude/commands/sc/`:
 
