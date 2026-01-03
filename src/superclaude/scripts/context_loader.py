@@ -50,16 +50,7 @@ TRIGGER_MAP = [
     (r"(tavily|web search|news search|--tavily)", "mcp/MCP_Tavily.md", 1),
     (r"(devtools|chrome|performance audit|layout debug|--chrome)", "mcp/MCP_Chrome-DevTools.md", 2),
 
-    # Agents - Priority 3 (loaded via Task tool typically)
-    (r"(frontend|react|vue|css|accessibility|a11y)", "agents/frontend-architect.md", 3),
-    (r"(backend|api|database|security|auth)", "agents/backend-architect.md", 3),
-    (r"(architect|system design|scalability|boundary)", "agents/system-architect.md", 3),
-    (r"(security|owasp|vulnerability|pentest)", "agents/security-engineer.md", 3),
-    (r"(test|quality|coverage|edge case)", "agents/quality-engineer.md", 3),
-    (r"(devops|ci.?cd|kubernetes|terraform|docker)", "agents/devops-architect.md", 3),
-    (r"(refactor|tech.?debt|solid|clean code)", "agents/refactoring-expert.md", 3),
-    (r"(debug|root cause|hypothesis|bisect)", "agents/root-cause-analyst.md", 3),
-    (r"(performance|optimize|profil|bottleneck)", "agents/performance-engineer.md", 3),
+    # NOTE: Agents (.claude/agents/) are auto-triggered by Claude - no injection needed
 
     # Business - Priority 2
     (r"(business|strategy|market|competitive)", "core/BUSINESS_PANEL.md", 2),
