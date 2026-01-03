@@ -118,6 +118,92 @@ def install(force: bool, list_only: bool, list_all: bool, scope: str):
 
 
 @main.command()
+@click.option(
+    "--scope",
+    default="user",
+    type=click.Choice(["user", "project"]),
+    help="Uninstall scope: user (~/.claude/) or project (./.claude/)",
+)
+@click.option(
+    "--dry-run",
+    is_flag=True,
+    help="Show what would be removed without actually removing",
+)
+@click.option(
+    "--yes",
+    "-y",
+    is_flag=True,
+    help="Skip confirmation prompt",
+)
+@click.option(
+    "--keep-settings",
+    is_flag=True,
+    help="Keep settings.json hooks (only remove files/directories)",
+)
+def uninstall(scope: str, dry_run: bool, yes: bool, keep_settings: bool):
+    """
+    Uninstall all SuperClaude components from Claude Code
+
+    Removes:
+    - superclaude/ directory (core, modes, mcp, scripts)
+    - commands/sc/ directory (slash commands)
+    - agents/ directory
+    - skills/ directory
+    - hooks/hooks.json file
+    - SuperClaude hooks from settings.json (preserves user hooks)
+    - @superclaude import from CLAUDE.md
+
+    Scopes:
+    - user (default): Uninstall from ~/.claude/
+    - project: Uninstall from ./.claude/ (current directory)
+
+    Examples:
+        superclaude uninstall --dry-run        # Preview what will be removed
+        superclaude uninstall --yes            # Skip confirmation
+        superclaude uninstall --scope project  # Uninstall from current project
+        superclaude uninstall --keep-settings  # Keep settings.json hooks
+    """
+    from .install_commands import uninstall_all, get_base_path
+
+    base_path = get_base_path(scope)
+
+    # Dry-run mode: show what would be removed
+    if dry_run:
+        click.echo(f"🔍 Dry-run mode: Showing what would be removed (scope: {scope})\n")
+        success, message = uninstall_all(
+            base_path=base_path,
+            scope=scope,
+            dry_run=True,
+            keep_settings=keep_settings
+        )
+        click.echo(message)
+        return
+
+    # Confirmation prompt (unless --yes)
+    if not yes:
+        click.echo(f"⚠️  This will remove SuperClaude from {base_path}")
+        click.echo("   User hooks in settings.json will be preserved.\n")
+        if not click.confirm("Do you want to continue?"):
+            click.echo("❌ Uninstall cancelled")
+            return
+
+    click.echo(f"🗑️  Uninstalling SuperClaude components (scope: {scope})...")
+    click.echo()
+
+    success, message = uninstall_all(
+        base_path=base_path,
+        scope=scope,
+        dry_run=False,
+        keep_settings=keep_settings
+    )
+
+    click.echo(message)
+
+    if not success:
+        sys.exit(1)
+
+
+@main.command()
 @click.option("--servers", "-s", multiple=True, help="Specific MCP servers to install")
 @click.option("--list", "list_only", is_flag=True, help="List available MCP servers")
 @click.option(

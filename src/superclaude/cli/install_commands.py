@@ -751,6 +751,303 @@ def list_installed_commands(base_path: Path = None) -> List[str]:
     return sorted(installed)
 
 
+def uninstall_hooks_from_settings(base_path: Path) -> Tuple[bool, str]:
+    """
+    Remove SuperClaude hooks from settings.json, preserving user hooks.
+
+    Args:
+        base_path: Installation base path (.claude directory)
+
+    Returns:
+        Tuple of (success, message)
+    """
+    settings_file = base_path / "settings.json"
+
+    if not settings_file.exists():
+        return True, "No settings.json found (nothing to clean)"
+
+    settings = _load_settings(settings_file)
+
+    if "hooks" not in settings or not settings["hooks"]:
+        return True, "No hooks in settings.json"
+
+    existing_hooks = settings["hooks"]
+    cleaned_any = False
+
+    # Remove SuperClaude hooks from each hook type
+    for hook_type, hook_array in list(existing_hooks.items()):
+        # Keep only user hooks
+        user_hooks = [h for h in hook_array if not _is_superclaude_hook(h)]
+
+        if len(user_hooks) < len(hook_array):
+            cleaned_any = True
+
+        if user_hooks:
+            existing_hooks[hook_type] = user_hooks
+        else:
+            # Remove empty hook type
+            del existing_hooks[hook_type]
+
+    # If no hooks remain, remove hooks section entirely
+    if not existing_hooks:
+        del settings["hooks"]
+
+    # Save updated settings
+    success, save_msg = _save_settings(settings_file, settings)
+
+    if not success:
+        return False, save_msg
+
+    if cleaned_any:
+        return True, f"SuperClaude hooks removed from {settings_file}"
+    else:
+        return True, "No SuperClaude hooks found in settings.json"
+
+
+def remove_claude_md_import(base_path: Path) -> Tuple[bool, str]:
+    """
+    Remove @superclaude/CLAUDE_SC.md import from CLAUDE.md.
+
+    Args:
+        base_path: Installation base path (.claude directory)
+
+    Returns:
+        Tuple of (success, message)
+    """
+    claude_md = base_path / "CLAUDE.md"
+
+    if not claude_md.exists():
+        return True, "No CLAUDE.md found (nothing to clean)"
+
+    try:
+        content = claude_md.read_text(encoding="utf-8")
+        original_content = content
+
+        # Remove SuperClaude import lines and related comments
+        # Pattern: # SuperClaude Framework\n@superclaude/CLAUDE_SC.md\n
+        content = re.sub(r"# SuperClaude Framework\n@superclaude/[^\n]+\n?", "", content)
+        content = re.sub(r"@superclaude/[^\n]+\n?", "", content)
+        content = re.sub(r"@superclaude\\[^\n]+\n?", "", content)
+
+        # Clean up multiple blank lines
+        content = re.sub(r"\n{3,}", "\n\n", content)
+        content = content.strip() + "\n"
+
+        if content != original_content:
+            claude_md.write_text(content, encoding="utf-8")
+            return True, "SuperClaude import removed from CLAUDE.md"
+        else:
+            return True, "No SuperClaude import found in CLAUDE.md"
+
+    except Exception as e:
+        return False, f"Failed to update CLAUDE.md: {e}"
+
+
+def uninstall_all(
+    base_path: Path = None,
+    scope: str = "user",
+    dry_run: bool = False,
+    keep_settings: bool = False
+) -> Tuple[bool, str]:
+    """
+    Uninstall all SuperClaude components.
+
+    This function removes:
+    1. .claude/superclaude/ directory (entire directory)
+    2. .claude/hooks/hooks.json file
+    3. SuperClaude hooks from settings.json (preserves user hooks)
+    4. @superclaude import from CLAUDE.md
+
+    Args:
+        base_path: Installation base path (default: ~/.claude or ./.claude based on scope)
+        scope: Installation scope ("user" or "project")
+        dry_run: If True, only show what would be removed
+        keep_settings: If True, don't modify settings.json hooks
+
+    Returns:
+        Tuple of (success: bool, message: str)
+    """
+    if base_path is None:
+        base_path = get_base_path(scope)
+
+    messages = []
+    removed = 0
+    skipped = 0
+    failed = 0
+
+    # 1. Remove .claude/superclaude/ directory
+    superclaude_dir = base_path / "superclaude"
+    if superclaude_dir.exists():
+        if dry_run:
+            # Count items for dry-run display
+            item_count = sum(1 for _ in superclaude_dir.rglob("*") if _.is_file())
+            messages.append(f"[DRY-RUN] Would remove: {superclaude_dir}/ ({item_count} files)")
+            removed += 1
+        else:
+            try:
+                shutil.rmtree(superclaude_dir)
+                messages.append(f"✅ Removed: {superclaude_dir}/")
+                removed += 1
+            except Exception as e:
+                messages.append(f"❌ Failed to remove {superclaude_dir}/: {e}")
+                failed += 1
+    else:
+        messages.append(f"⏭️  Not found: {superclaude_dir}/")
+        skipped += 1
+
+    # 2. Remove .claude/commands/sc/ directory (slash commands)
+    commands_sc_dir = base_path / "commands" / "sc"
+    if commands_sc_dir.exists():
+        if dry_run:
+            item_count = sum(1 for _ in commands_sc_dir.glob("*.md"))
+            messages.append(f"[DRY-RUN] Would remove: {commands_sc_dir}/ ({item_count} files)")
+            removed += 1
+        else:
+            try:
+                shutil.rmtree(commands_sc_dir)
+                messages.append(f"✅ Removed: {commands_sc_dir}/")
+                removed += 1
+            except Exception as e:
+                messages.append(f"❌ Failed to remove {commands_sc_dir}/: {e}")
+                failed += 1
+    else:
+        messages.append(f"⏭️  Not found: {commands_sc_dir}/")
+        skipped += 1
+
+    # 3. Remove .claude/agents/ directory
+    agents_dir = base_path / "agents"
+    if agents_dir.exists():
+        if dry_run:
+            item_count = sum(1 for _ in agents_dir.glob("*.md"))
+            messages.append(f"[DRY-RUN] Would remove: {agents_dir}/ ({item_count} files)")
+            removed += 1
+        else:
+            try:
+                shutil.rmtree(agents_dir)
+                messages.append(f"✅ Removed: {agents_dir}/")
+                removed += 1
+            except Exception as e:
+                messages.append(f"❌ Failed to remove {agents_dir}/: {e}")
+                failed += 1
+    else:
+        messages.append(f"⏭️  Not found: {agents_dir}/")
+        skipped += 1
+
+    # 4. Remove .claude/skills/ directory
+    skills_dir = base_path / "skills"
+    if skills_dir.exists():
+        if dry_run:
+            item_count = sum(1 for _ in skills_dir.iterdir() if _.is_dir())
+            messages.append(f"[DRY-RUN] Would remove: {skills_dir}/ ({item_count} skills)")
+            removed += 1
+        else:
+            try:
+                shutil.rmtree(skills_dir)
+                messages.append(f"✅ Removed: {skills_dir}/")
+                removed += 1
+            except Exception as e:
+                messages.append(f"❌ Failed to remove {skills_dir}/: {e}")
+                failed += 1
+    else:
+        messages.append(f"⏭️  Not found: {skills_dir}/")
+        skipped += 1
+
+    # 5. Remove .claude/hooks/hooks.json file
+    hooks_json = base_path / "hooks" / "hooks.json"
+    if hooks_json.exists():
+        if dry_run:
+            messages.append(f"[DRY-RUN] Would remove: {hooks_json}")
+            removed += 1
+        else:
+            try:
+                hooks_json.unlink()
+                messages.append(f"✅ Removed: {hooks_json}")
+                removed += 1
+                # Remove hooks directory if empty
+                hooks_dir = base_path / "hooks"
+                if hooks_dir.exists() and not any(hooks_dir.iterdir()):
+                    hooks_dir.rmdir()
+            except Exception as e:
+                messages.append(f"❌ Failed to remove {hooks_json}: {e}")
+                failed += 1
+    else:
+        messages.append(f"⏭️  Not found: {hooks_json}")
+        skipped += 1
+
+    # 6. Remove SuperClaude hooks from settings.json (preserve user hooks)
+    if keep_settings:
+        messages.append("⏭️  Skipped: settings.json hooks (--keep-settings)")
+        skipped += 1
+    else:
+        if dry_run:
+            settings_file = base_path / "settings.json"
+            if settings_file.exists():
+                settings = _load_settings(settings_file)
+                if "hooks" in settings:
+                    sc_hook_count = sum(
+                        1 for hook_array in settings["hooks"].values()
+                        for h in hook_array if _is_superclaude_hook(h)
+                    )
+                    if sc_hook_count > 0:
+                        messages.append(f"[DRY-RUN] Would remove {sc_hook_count} SuperClaude hooks from settings.json")
+                        removed += 1
+                    else:
+                        messages.append("⏭️  No SuperClaude hooks in settings.json")
+                        skipped += 1
+                else:
+                    messages.append("⏭️  No hooks section in settings.json")
+                    skipped += 1
+            else:
+                messages.append("⏭️  No settings.json found")
+                skipped += 1
+        else:
+            success, msg = uninstall_hooks_from_settings(base_path)
+            if success:
+                messages.append(f"✅ {msg}")
+                removed += 1
+            else:
+                messages.append(f"❌ {msg}")
+                failed += 1
+
+    # 7. Remove @superclaude import from CLAUDE.md
+    if dry_run:
+        claude_md = base_path / "CLAUDE.md"
+        if claude_md.exists():
+            content = claude_md.read_text(encoding="utf-8")
+            if "@superclaude" in content:
+                messages.append("[DRY-RUN] Would remove SuperClaude import from CLAUDE.md")
+                removed += 1
+            else:
+                messages.append("⏭️  No SuperClaude import in CLAUDE.md")
+                skipped += 1
+        else:
+            messages.append("⏭️  No CLAUDE.md found")
+            skipped += 1
+    else:
+        success, msg = remove_claude_md_import(base_path)
+        if success:
+            messages.append(f"✅ {msg}")
+            removed += 1
+        else:
+            messages.append(f"❌ {msg}")
+            failed += 1
+
+    # Summary
+    messages.append("")
+    if dry_run:
+        messages.append(f"📊 Summary (DRY-RUN): {removed} would be removed, {skipped} not found/skipped")
+        messages.append("\n💡 Run without --dry-run to actually remove components")
+    else:
+        messages.append(f"📊 Summary: {removed} removed, {skipped} skipped, {failed} failed")
+        messages.append(f"📁 Uninstall directory: {base_path}")
+
+        if failed == 0 and removed > 0:
+            messages.append("\n🔄 Restart Claude Code to complete the uninstall")
+
+    overall_success = failed == 0
+    return overall_success, "\n".join(messages)
+
+
 def list_all_components(base_path: Path = None) -> Dict[str, Dict[str, any]]:
     """
     List all components with their installation status.
