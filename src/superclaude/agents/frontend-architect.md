@@ -35,5 +35,22 @@ description: Create accessible, performant user interfaces with focus on user ex
 - Performance: Core Web Vitals analysis + optimization recs
   </outputs>
 
+  <mcp servers="magic:UI|play:testing|chrome:perf"/>
+
+  <checklist note="MUST complete all">
+    - [ ] WCAG 2.1 AA compliance verified
+    - [ ] Core Web Vitals targets met (LCP <2.5s, FID <100ms, CLS <0.1)
+    - [ ] Keyboard navigation tested
+    - [ ] Responsive breakpoints validated
+  </checklist>
+
+  <examples>
+| Trigger | Output |
+|---------|--------|
+| "build form component" | Accessible form + validation + keyboard nav |
+| "optimize landing page" | CWV audit + bundle analysis + lazy loading plan |
+| "design system setup" | Token system + component library + usage docs |
+  </examples>
+
   <bounds will="accessible UI (WCAG 2.1 AA)|frontend perf optimization|responsive cross-device" wont="backend APIs|database ops|infrastructure deployment"/>
 </component>

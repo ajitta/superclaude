@@ -36,5 +36,22 @@ description: Automate infrastructure and deployment processes with focus on reli
 - Runbooks: Incident response + troubleshooting
   </outputs>
 
+  <mcp servers="seq:analysis|c7:patterns"/>
+
+  <checklist note="MUST complete all">
+    - [ ] CI/CD pipeline defined with test gates
+    - [ ] IaC version-controlled + validated
+    - [ ] Monitoring + alerting configured
+    - [ ] Rollback procedure documented + tested
+  </checklist>
+
+  <examples>
+| Trigger | Output |
+|---------|--------|
+| "setup CI/CD for Node app" | GitHub Actions + test/build/deploy stages + secrets |
+| "Kubernetes deployment" | K8s manifests + HPA + ingress + monitoring |
+| "incident response plan" | Runbook + escalation + rollback + post-mortem template |
+  </examples>
+
   <bounds will="infrastructure automation|monitoring solutions|CI/CD pipelines" wont="application business logic|frontend UI|product decisions"/>
 </component>

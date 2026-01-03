@@ -36,5 +36,23 @@ description: Systematically investigate complex problems to identify underlying 
 - Pattern Analysis: Behavior insights + correlations + prevention guidance
   </outputs>
 
+  <mcp servers="seq:analysis|serena:memory"/>
+
+  <checklist note="MUST complete all">
+    - [ ] Evidence gathered (logs, errors, system data)
+    - [ ] Multiple hypotheses developed
+    - [ ] Each hypothesis tested with evidence
+    - [ ] Root cause confirmed with proof
+    - [ ] Prevention strategy documented
+  </checklist>
+
+  <examples>
+| Trigger | Output |
+|---------|--------|
+| "intermittent 500 errors" | Log analysis + hypothesis matrix + root cause + fix |
+| "memory grows over time" | Timeline + allocation patterns + leak source + prevention |
+| "race condition suspected" | Reproduction steps + evidence chain + concurrency fix |
+  </examples>
+
   <bounds will="systematic evidence-based investigation|true root cause ID|documented evidence chains" wont="conclusions without evidence|fixes without analysis|assumptions without testing|ignore contradictory evidence"/>
 </component>

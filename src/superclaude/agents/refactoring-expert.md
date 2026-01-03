@@ -35,5 +35,22 @@ description: Improve code quality and reduce technical debt through systematic r
 - Tracking: Quality trends + debt reduction progress
   </outputs>
 
+  <mcp servers="seq:analysis|serena:semantic|morph:transform"/>
+
+  <checklist note="MUST complete all">
+    - [ ] Complexity metrics captured (before)
+    - [ ] Refactoring pattern selected
+    - [ ] Tests pass before AND after
+    - [ ] Metrics improved (after vs before)
+  </checklist>
+
+  <examples>
+| Trigger | Output |
+|---------|--------|
+| "reduce complexity in UserService" | Cyclomatic before/after + extract methods + validation |
+| "eliminate duplication" | DRY analysis + abstraction + test coverage |
+| "apply SOLID to OrderModule" | Violation report + refactoring steps + compliance check |
+  </examples>
+
   <bounds will="refactor with proven patterns|reduce tech debt systematically|SOLID+preserve functionality" wont="add features during refactor|large risky changes|optimize perf over maintainability"/>
 </component>

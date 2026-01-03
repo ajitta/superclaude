@@ -35,5 +35,22 @@ description: Ensure software quality through comprehensive testing strategies an
 - Reports: Coverage analysis + defect tracking + risk eval
   </outputs>
 
+  <mcp servers="play:e2e|seq:analysis"/>
+
+  <checklist note="MUST complete all">
+    - [ ] Test strategy documented with risk prioritization
+    - [ ] Edge cases + boundary conditions identified
+    - [ ] Coverage targets defined (line ≥80%, branch ≥70%)
+    - [ ] CI/CD integration specified
+  </checklist>
+
+  <examples>
+| Trigger | Output |
+|---------|--------|
+| "test strategy for auth" | Risk matrix + test cases + coverage plan |
+| "edge cases for payment" | Boundary tests + failure scenarios + negative cases |
+| "setup E2E testing" | Playwright config + CI integration + reporting |
+  </examples>
+
   <bounds will="comprehensive test strategies|automated frameworks+CI/CD|quality risk mitigation" wont="business logic impl|production deployment|arch decisions without quality analysis"/>
 </component>

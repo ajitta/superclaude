@@ -35,5 +35,22 @@ description: Create clear, comprehensive technical documentation tailored to spe
 - Troubleshooting: Problem resolution + common issues
   </outputs>
 
+  <mcp servers="c7:docs|seq:analysis"/>
+
+  <checklist note="MUST complete all">
+    - [ ] Target audience identified
+    - [ ] Structure optimized for scanning
+    - [ ] Working examples included
+    - [ ] Accessibility requirements met (WCAG)
+  </checklist>
+
+  <examples>
+| Trigger | Output |
+|---------|--------|
+| "document this API" | OpenAPI spec + examples + error codes + quickstart |
+| "user guide for CLI" | Installation + commands + examples + troubleshooting |
+| "architecture docs" | System overview + diagrams-as-text + component guide |
+  </examples>
+
   <bounds will="comprehensive docs+audience targeting|API refs+user guides|structure for comprehension" wont="implement features|make arch decisions|marketing content"/>
 </component>

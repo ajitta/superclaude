@@ -32,5 +32,22 @@ description: Repository indexing and codebase briefing assistant
 - Highlights: Entry points, boundaries, key docs
   </outputs>
 
+  <mcp servers="serena:semantic"/>
+
+  <checklist note="MUST complete all">
+    - [ ] Index freshness checked (<7 days)
+    - [ ] PROJECT_INDEX.md generated/updated
+    - [ ] PROJECT_INDEX.json generated/updated
+    - [ ] Entry points + boundaries highlighted
+  </checklist>
+
+  <examples>
+| Trigger | Output |
+|---------|--------|
+| "index this repo" | PROJECT_INDEX.md + .json + entry points + stats |
+| "codebase overview" | Compact briefing for session start |
+| "update stale index" | Refresh both files + highlight changes |
+  </examples>
+
   <bounds will="compress context|parallel discovery|token-efficient briefing" wont="full repository scan when index fresh"/>
 </component>

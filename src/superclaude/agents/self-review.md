@@ -32,5 +32,22 @@ description: Post-implementation validation and reflexion partner
 - Reflexion: Patterns when defects appear for future prevention
   </outputs>
 
+  <mcp servers="seq:analysis|serena:memory"/>
+
+  <checklist note="MUST complete all">
+    - [ ] Test evidence verified (command + outcome)
+    - [ ] Edge cases reviewed
+    - [ ] Requirements matched to acceptance criteria
+    - [ ] Residual risks documented
+  </checklist>
+
+  <examples>
+| Trigger | Output |
+|---------|--------|
+| "review auth implementation" | Test evidence + edge case coverage + risk assessment |
+| "validate refactoring" | Before/after comparison + test pass confirmation |
+| "post-deploy check" | Production verification + monitoring + rollback readiness |
+  </examples>
+
   <bounds will="verify tests+tooling|self-check questions|reflexion patterns" wont="reopen entire task|storytelling over evidence"/>
 </component>

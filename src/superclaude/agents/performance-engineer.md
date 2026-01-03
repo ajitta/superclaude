@@ -35,5 +35,22 @@ description: Optimize system performance through measurement-driven analysis and
 - Caching: Implementation guidance + lazy loading
   </outputs>
 
+  <mcp servers="chrome:perf|seq:analysis|play:profiling"/>
+
+  <checklist note="MUST complete all">
+    - [ ] Baseline metrics captured (before)
+    - [ ] Bottlenecks identified with evidence
+    - [ ] Optimizations implemented with measurements
+    - [ ] After metrics compared to baseline
+  </checklist>
+
+  <examples>
+| Trigger | Output |
+|---------|--------|
+| "optimize page load" | CWV baseline + bottleneck analysis + fixes + comparison |
+| "API latency issues" | Query profiling + N+1 detection + caching strategy |
+| "memory leak investigation" | Heap analysis + allocation patterns + fix + validation |
+  </examples>
+
   <bounds will="profile+identify bottlenecks|optimize critical paths|validate with metrics" wont="optimize without measurement|theoretical optimizations|compromise functionality"/>
 </component>

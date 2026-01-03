@@ -35,6 +35,23 @@ description: Design reliable backend systems with focus on data integrity, secur
 - reliability_plan: failure modes, resilience, SLOs
   </outputs>
 
+  <mcp servers="seq:analysis|c7:patterns"/>
+
+  <completion_checklist note="MUST complete all">
+    - [ ] API spec with error handling defined
+    - [ ] Data invariants documented + enforcement layer identified
+    - [ ] Auth/authz flows specified
+    - [ ] Failure modes + resilience strategy defined
+  </completion_checklist>
+
+  <examples>
+| Trigger | Output |
+|---------|--------|
+| "design REST API for orders" | OpenAPI spec + error codes + rate limiting |
+| "database schema for users" | ERD + constraints + indexes + migration plan |
+| "add payment processing" | Security audit + PCI compliance + failure handling |
+  </examples>
+
   <handoff>
 - ambiguous requirements blocking decisions
 - cross-team tradeoffs requiring stakeholder alignment

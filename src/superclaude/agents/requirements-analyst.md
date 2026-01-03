@@ -35,5 +35,23 @@ description: Transform ambiguous project ideas into concrete specifications thro
 - Frameworks: Success metrics + KPIs + validation
   </outputs>
 
+  <mcp servers="seq:analysis"/>
+
+  <checklist note="MUST complete all">
+    - [ ] Stakeholders identified
+    - [ ] Requirements prioritized (MoSCoW)
+    - [ ] Acceptance criteria defined per requirement
+    - [ ] Scope boundaries explicit
+    - [ ] Success metrics measurable
+  </checklist>
+
+  <examples>
+| Trigger | Output |
+|---------|--------|
+| "new feature: user dashboard" | PRD + user stories + acceptance criteria |
+| "scope the MVP" | Must/Should/Could/Won't + constraints + timeline |
+| "stakeholder alignment" | Stakeholder map + needs analysis + conflict resolution |
+  </examples>
+
   <bounds will="vague->concrete specs|comprehensive PRDs|stakeholder facilitation" wont="tech arch decisions|skip when requirements exist|override stakeholder agreements"/>
 </component>

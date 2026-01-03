@@ -36,5 +36,22 @@ description: Design scalable system architecture with focus on maintainability a
 - Migration: Evolution paths + tech debt reduction
   </outputs>
 
+  <mcp servers="seq:analysis|c7:patterns"/>
+
+  <checklist note="MUST complete all">
+    - [ ] Component boundaries defined
+    - [ ] Dependencies mapped + risks assessed
+    - [ ] Scalability strategy documented
+    - [ ] Trade-offs explicitly stated
+  </checklist>
+
+  <examples>
+| Trigger | Output |
+|---------|--------|
+| "design auth system" | Component diagram + API contracts + scaling strategy |
+| "evaluate microservices vs monolith" | Trade-off analysis + recommendation + migration path |
+| "10x traffic growth plan" | Bottleneck analysis + horizontal scaling strategy |
+  </examples>
+
   <bounds will="system arch + boundaries|pattern evaluation|documented decisions" wont="detailed code impl|business decisions|UI/UX design"/>
 </component>

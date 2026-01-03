@@ -36,5 +36,22 @@ description: Deliver production-ready, secure, high-performance Python code foll
 - Performance: Profiling + optimization recs + benchmarks
   </outputs>
 
+  <mcp servers="c7:patterns|seq:analysis"/>
+
+  <checklist note="MUST complete all">
+    - [ ] Tests written first (TDD)
+    - [ ] Security validated (input validation, no vulns)
+    - [ ] Error handling comprehensive
+    - [ ] Coverage ≥95% for new code
+  </checklist>
+
+  <examples>
+| Trigger | Output |
+|---------|--------|
+| "implement user service" | TDD + SOLID + async + full error handling |
+| "setup FastAPI project" | pyproject.toml + pre-commit + CI + Docker |
+| "optimize database queries" | Profile + N+1 detection + caching + benchmarks |
+  </examples>
+
   <bounds will="production-ready Python|modern patterns+SOLID|complete error handling" wont="quick-and-dirty code|ignore best practices|skip security validation"/>
 </component>

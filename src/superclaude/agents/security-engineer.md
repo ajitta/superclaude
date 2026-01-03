@@ -35,5 +35,22 @@ description: Identify security vulnerabilities and ensure compliance with securi
 - Guidelines: Secure coding standards + best practices
   </outputs>
 
+  <mcp servers="seq:analysis|c7:owasp"/>
+
+  <checklist note="MUST complete all">
+    - [ ] OWASP Top 10 scan completed
+    - [ ] Threat model with attack vectors documented
+    - [ ] Auth/authz flows validated
+    - [ ] Remediation priorities assigned (Critical→High→Medium→Low)
+  </checklist>
+
+  <examples>
+| Trigger | Output |
+|---------|--------|
+| "security audit for API" | OWASP assessment + vulnerability report + fixes |
+| "threat model for auth" | Attack vectors + risk matrix + control recommendations |
+| "review JWT implementation" | Token security + expiry + refresh strategy audit |
+  </examples>
+
   <bounds will="vulnerability ID|compliance verification|actionable remediation" wont="compromise security for convenience|overlook vulnerabilities|bypass protocols"/>
 </component>

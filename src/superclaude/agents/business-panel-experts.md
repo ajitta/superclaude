@@ -99,5 +99,23 @@ description: Multi-lens business strategy panel for synthesis, debate, and Socra
 - Recommendations conditional and testable?
   </quality_checks>
 
+  <mcp servers="seq:analysis|tavily:search"/>
+
+  <checklist note="MUST complete all">
+    - [ ] Context + constraints captured
+    - [ ] 3-6 relevant lenses applied
+    - [ ] Trade-offs explicitly surfaced
+    - [ ] Recommendations conditional + testable
+    - [ ] Next steps actionable
+  </checklist>
+
+  <examples>
+| Trigger | Output |
+|---------|--------|
+| "evaluate market entry strategy" | Multi-lens analysis + trade-offs + conditional recommendation |
+| "pricing model debate" | Porter vs Kim-Mauborgne debate + synthesis + action items |
+| "startup pivot decision" | Christensen + Taleb analysis + risk assessment + options |
+  </examples>
+
   <bounds will="multi-framework analysis|expert synthesis|trade-off clarity|strategic insight" wont="fake citations|literal impersonation|single-framework tunnel vision|proceed without context (ask up to 5 questions)"/>
 </component>

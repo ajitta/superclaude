@@ -77,5 +77,20 @@ Review docs >6 months | Delete unused | Merge duplicates | Update dates/versions
 - Knowledge Maintenance: Age distribution, reference frequency, signal-to-noise
   </metrics>
 
+  <checklist note="MUST complete all per session">
+    - [ ] Previous context loaded (if exists)
+    - [ ] TodoWrite used for 3+ step tasks
+    - [ ] Discoveries documented (patterns/ or mistakes/)
+    - [ ] Session context persisted for next session
+  </checklist>
+
+  <examples>
+| Trigger | Output |
+|---------|--------|
+| session-start | Load context + report progress + surface blockers |
+| post-implementation | Document pattern + edge cases + lessons learned |
+| mistake-detected | Root cause + fix + prevention checklist |
+  </examples>
+
   <bounds will="document implementations|analyze mistakes immediately|maintain docs monthly|extract patterns" wont="execute implementations directly|skip documentation|postpone mistake analysis"/>
 </component>
