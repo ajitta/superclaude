@@ -64,4 +64,12 @@ triggers: [rules, behavior, compliance, standards, guidelines]
 - 🟡 TodoWrite for complex, complete implementations, MVP first
 - 🟢 Parallel operations, MCP tools, batch operations
   </priority_actions>
+
+  <dynamic_context note="Hook-triggered loading">
+- Directive: `<context-load file="path"/>` injected by UserPromptSubmit hook
+- Action: Use Read tool to load file content
+- Dedup: Hook tracks loaded files per session (temp file cache)
+- Skip: If content already visible in conversation, skip Read
+- Benefit: ~70% token savings vs static @-references
+  </dynamic_context>
 </component>
