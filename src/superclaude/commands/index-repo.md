@@ -19,11 +19,20 @@ description: Repository indexing with 94% token reduction (58K → 3K)
   </triggers>
 
   <flow>
-    1. Analyze: Repo structure (5 parallel Glob)
-    2. Extract: Entry points + modules + APIs + deps
-    3. Generate: PROJECT_INDEX.md + .json
-    4. Validate: Completeness + size <5KB
+    1. Detect: Project type from entry files (pyproject.toml, package.json, etc.)
+    2. Analyze: Auto-discover structure (parallel Glob for code|docs|tests|config)
+    3. Extract: Entry points + modules + APIs + deps
+    4. Generate: PROJECT_INDEX.md (human-readable summary)
+    5. Generate: PROJECT_INDEX.json (machine-readable, detailed)
+    6. Validate: Both files exist + size <5KB each
   </flow>
+
+  <checklist note="MUST complete all before reporting done">
+    - [ ] PROJECT_INDEX.md created/updated
+    - [ ] PROJECT_INDEX.json created/updated
+    - [ ] Both files validated for completeness
+    - [ ] Statistics synced between .md and .json
+  </checklist>
 
   <tools>
     - Glob: Parallel structure scan (code|docs|config|tests|scripts)
@@ -32,8 +41,15 @@ description: Repository indexing with 94% token reduction (58K → 3K)
   </tools>
 
   <patterns>
-    - Structure: src/**/*.{ts,py,js} | docs/**/*.md | *.toml | tests/**/*
-    - Output: PROJECT_INDEX.md (3KB) + PROJECT_INDEX.json (10KB)
+    - Structure: Auto-detect from project root
+      1. Entry: pyproject.toml | package.json | Cargo.toml | go.mod | *.csproj
+      2. Source: Glob for code dirs (src/ | lib/ | app/ | cmd/)
+      3. Docs: **/*.md | docs/
+      4. Tests: tests/ | test/ | __tests__/ | *_test.*
+      5. Config: *.toml | *.json | *.yaml | *.yml
+    - Output:
+      - PROJECT_INDEX.md: ~3KB, human-readable, quick reference
+      - PROJECT_INDEX.json: ~10KB, machine-readable, full metadata
   </patterns>
 
   <roi>

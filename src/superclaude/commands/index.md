@@ -22,10 +22,31 @@ description: Generate comprehensive project documentation and knowledge base wit
   <flow>
     1. Analyze: Project structure + key components
     2. Organize: Intelligent patterns + cross-refs
-    3. Generate: Comprehensive docs + framework patterns
-    4. Validate: Completeness + quality standards
-    5. Maintain: Update while preserving manual additions
+    3. Generate: Type-specific documentation (see outputs)
+    4. Validate: Completeness + metrics per type
+    5. Maintain: Preserve <!-- MANUAL --> marked sections
   </flow>
+
+  <outputs note="Per --type flag">
+| Type | Output File | Metrics |
+|------|-------------|---------|
+| docs | KNOWLEDGE.md | coverage ≥80% |
+| api | API.md | endpoints 100% |
+| structure | STRUCTURE.md | depth ≤4 levels |
+| readme | README.md | sections: install, usage, api |
+  </outputs>
+
+  <checklist note="MUST complete all before reporting done">
+    - [ ] Target type documentation generated
+    - [ ] Cross-references validated
+    - [ ] Manual sections (<!-- MANUAL -->) preserved
+    - [ ] Format output (md|json|yaml) correct
+  </checklist>
+
+  <distinction note="vs /sc:index-repo">
+    - index-repo: Minimal index (~3KB), token-efficient, PROJECT_INDEX.*
+    - index: Comprehensive docs, full coverage, type-specific files
+  </distinction>
 
   <mcp servers="seq:analysis|c7:patterns"/>
   <personas p="arch|scribe|qual"/>
