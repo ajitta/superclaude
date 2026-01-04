@@ -250,29 +250,34 @@ def mcp(servers, list_only, scope, dry_run):
 
 @main.command()
 @click.option(
-    "--target",
-    default="~/.claude/commands/sc",
-    help="Installation directory (default: ~/.claude/commands/sc)",
+    "--scope",
+    default="user",
+    type=click.Choice(["user", "project"]),
+    help="Installation scope: user (~/.claude/) or project (./.claude/)",
 )
-def update(target: str):
+def update(scope: str):
     """
     Update SuperClaude commands to latest version
 
-    Re-installs all slash commands to match the current package version.
+    Re-installs all components to match the current package version.
     This is a convenience command equivalent to 'install --force'.
+
+    Scopes:
+    - user (default): Update ~/.claude/
+    - project: Update ./.claude/
 
     Example:
         superclaude update
-        superclaude update --target /custom/path
+        superclaude update --scope project
     """
-    from .install_commands import install_commands
+    from .install_commands import install_all, get_base_path
 
-    target_path = Path(target).expanduser()
+    base_path = get_base_path(scope)
 
-    click.echo(f"🔄 Updating SuperClaude commands to version {__version__}...")
+    click.echo(f"🔄 Updating SuperClaude to version {__version__} (scope: {scope})...")
     click.echo()
 
-    success, message = install_commands(target_path=target_path, force=True)
+    success, message = install_all(base_path=base_path, force=True, scope=scope)
 
     click.echo(message)
 
@@ -283,30 +288,37 @@ def update(target: str):
 @main.command()
 @click.argument("skill_name")
 @click.option(
-    "--target",
-    default="~/.claude/skills",
-    help="Installation directory (default: ~/.claude/skills)",
+    "--scope",
+    default="user",
+    type=click.Choice(["user", "project"]),
+    help="Installation scope: user (~/.claude/) or project (./.claude/)",
 )
 @click.option(
     "--force",
     is_flag=True,
     help="Force reinstall if skill already exists",
 )
-def install_skill(skill_name: str, target: str, force: bool):
+def install_skill(skill_name: str, scope: str, force: bool):
     """
     Install a SuperClaude skill to Claude Code
 
     SKILL_NAME: Name of the skill to install (e.g., pm-agent)
 
+    Scopes:
+    - user (default): Install to ~/.claude/skills/
+    - project: Install to ./.claude/skills/
+
     Example:
         superclaude install-skill pm-agent
-        superclaude install-skill pm-agent --target ~/.claude/skills --force
+        superclaude install-skill pm-agent --scope project --force
     """
     from .install_skill import install_skill_command
+    from .install_commands import get_base_path
 
-    target_path = Path(target).expanduser()
+    base_path = get_base_path(scope)
+    target_path = base_path / "skills"
 
-    click.echo(f"📦 Installing skill '{skill_name}' to {target_path}...")
+    click.echo(f"📦 Installing skill '{skill_name}' (scope: {scope})...")
 
     success, message = install_skill_command(
         skill_name=skill_name, target_path=target_path, force=force
