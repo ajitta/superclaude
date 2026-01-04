@@ -34,7 +34,7 @@ make sync-plugin-repo # Sync artefacts into ../SuperClaude_Plugin
 
 ## Architecture
 
-SuperClaude v4.1.9+ajitta is a Python package with pytest plugin and slash commands.
+SuperClaude v4.2.1+ajitta is a Python package with pytest plugin and slash commands.
 
 ```
 src/superclaude/
@@ -168,7 +168,7 @@ Read pyproject.toml → hatchling build → Create wheel → Global install
 ```toml
 [project]
 name = "superclaude"           # Package name
-version = "4.1.9+ajitta"       # Version
+version = "4.2.1+ajitta"       # Version
 
 [project.scripts]
 superclaude = "superclaude.cli.main:main"  # CLI entry point
@@ -268,7 +268,7 @@ superclaude mcp --servers tavily context7  # Install specific servers
 
 ## Package Info
 
-- **Package**: `superclaude` v4.1.9+ajitta
+- **Package**: `superclaude` v4.2.1+ajitta
 - **Python**: >=3.10
 - **Build**: hatchling (PEP 517)
 - **Entry points**: CLI (`superclaude`), Pytest plugin (auto-loaded as `superclaude`)

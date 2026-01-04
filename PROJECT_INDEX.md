@@ -1,7 +1,7 @@
 # Project Index: SuperClaude Framework
 
 **Generated**: 2026-01-04
-**Version**: 4.1.9+ajitta
+**Version**: 4.2.1+ajitta
 **Description**: AI-enhanced development framework for Claude Code - pytest plugin with specialized commands, agents, and modes
 
 ---
