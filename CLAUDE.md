@@ -215,24 +215,27 @@ To install SuperClaude to a specific project directory:
 git clone https://github.com/SuperClaude-Org/SuperClaude_Framework.git
 cd SuperClaude_Framework
 
-# Install to a specific target directory
-./install.sh --target /path/to/your/project
-
-# Or non-interactive with force
-./install.sh --target /path/to/your/project --yes --force
-
 # Install to current directory (./.claude/)
 ./install.sh --scope project
+
+# Or non-interactive with force
+./install.sh --scope project --yes --force
 ```
 
-**install.sh options:**
-| Option | Description |
-|--------|-------------|
-| `--scope user` | Install to `~/.claude/` (default) |
-| `--scope project` | Install to `./.claude/` (current directory) |
-| `--target PATH` | Install to `PATH/.claude/` (specific directory) |
-| `--yes` | Non-interactive mode |
-| `--force` | Force reinstall existing components |
+**CLI scope options (all commands use consistent --scope):**
+| Command | Scopes | Default |
+|---------|--------|---------|
+| `superclaude install` | `user`, `project` | `user` |
+| `superclaude uninstall` | `user`, `project` | `user` |
+| `superclaude update` | `user`, `project` | `user` |
+| `superclaude install-skill` | `user`, `project` | `user` |
+| `superclaude mcp` | `local`, `project`, `user` | `user` |
+
+| Scope | Path | Description |
+|-------|------|-------------|
+| `user` | `~/.claude/` | Global installation (default) |
+| `project` | `./.claude/` | Current project only |
+| `local` | `.mcp.json` | MCP servers only (Claude Code standard) |
 
 ## MCP Server Integration
 
