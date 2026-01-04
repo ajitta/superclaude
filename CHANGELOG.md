@@ -8,6 +8,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **ConfidenceChecker Async Support** (Phase 3) - MCP integration capability
+  - `AsyncConfidenceCheck` Protocol for async checks with `evaluate_async()`
+  - `assess_async()` method supporting mixed sync/async checks
+  - `has_async_checks()` helper for async detection
+  - Enables async MCP tool calls during confidence assessment
+
+- **ConfidenceChecker Registry Pattern** (Phase 2) - Pluggable check architecture
+  - `ConfidenceCheck` Protocol with `@runtime_checkable` for duck typing
+  - 5 concrete check classes: `NoDuplicatesCheck`, `ArchitectureCheck`, `OfficialDocsCheck`, `OssReferenceCheck`, `RootCauseCheck`
+  - `register_check()`, `unregister_check()`, `clear_checks()`, `get_checks()` methods
+  - Automatic weight normalization for custom checks
+  - `register_defaults` parameter for fresh checker instances
+
+- **ConfidenceChecker Result Dataclass** (Phase 1) - Improved API design
+  - `ConfidenceResult` dataclass with score, checks, recommendation
+  - `CheckResult` dataclass for individual check results
+  - Numeric comparison operators (`>=`, `==`, `float()`) for backward compatibility
+  - `@lru_cache` for tech stack detection performance
+  - Deleted duplicate TypeScript implementation (DRY)
+
 - **ConfidenceChecker Active Verification** - Complete implementation of 4 core validation methods
   - `_root_cause_identified()` - Heuristic validation requiring 5+ words, no vague terms, evidence
   - `_no_duplicates()` - Filesystem search using rglob with configurable threshold
@@ -18,7 +38,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Full backward compatibility via explicit flags
 
 ### Added (Tests)
-- 25 new tests for ConfidenceChecker active verification
+- 63 total tests for ConfidenceChecker (was 12)
+  - `TestConfidenceResult` (6 tests) - Dataclass, comparison operators, backward compatibility
+  - `TestCachingBehavior` (2 tests) - LRU cache verification
+  - `TestRegistryPattern` (10 tests) - Pluggable checks, weight normalization, protocol compliance
+  - `TestAsyncSupport` (8 tests) - Async checks, mixed sync/async, MCP integration
   - `TestRootCauseActiveVerification` (5 tests) - Heuristic validation, vague terms, evidence
   - `TestNoDuplicatesActiveVerification` (6 tests) - Filesystem search, threshold, exclusions
   - `TestArchitectureCompliantActiveVerification` (7 tests) - Tech stack detection, conflicts
@@ -29,10 +53,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - ROI of 25-250x token savings now achievable through real validation
 
 ### Technical
+- Phase 3: `AsyncConfidenceCheck` Protocol, `assess_async()`, `has_async_checks()`, `_is_async_check()`, `_has_sync_evaluate()`
+- Phase 2: `ConfidenceCheck` Protocol, 5 concrete check classes, registry methods
+- Phase 1: `ConfidenceResult`/`CheckResult` dataclasses, `@lru_cache`, deleted `confidence.ts`
 - Added helper methods: `_detect_tech_stack()`, `_find_architecture_conflicts()`
 - Added helper methods: `_validate_oss_references()`, `_find_cached_pattern()`, `_match_known_oss_pattern()`
 - Conflict rules for Supabase, Next.js, React, FastAPI, Turborepo, pytest
 - Reputable source validation for GitHub, StackOverflow, official docs
+- Added `pytest-asyncio` dev dependency for async test support
 
 ## [4.2.0] - 2025-09-18
 ### Added
