@@ -20,10 +20,10 @@ Prevents wrong-direction execution by assessing confidence **BEFORE** starting i
 
 **Requirement**: ≥90% confidence to proceed with implementation.
 
-**Test Results** (2025-10-21):
+**Test Results** (2026-01-05):
 - Precision: 1.000 (no false positives)
 - Recall: 1.000 (no false negatives)
-- 8/8 test cases passed
+- 63/63 test cases passed
 
 ## When to Use
 
@@ -122,10 +122,53 @@ If Total < 0.70:   ❌ STOP - Request more context
 
 The Python implementation is in `src/superclaude/pm_agent/confidence.py`:
 
-- `ConfidenceChecker.assess(context)` - Returns `ConfidenceResult` with score, checks, recommendation
+### Core API
+
+- `ConfidenceChecker.assess(context)` - Sync assessment, returns `ConfidenceResult`
+- `ConfidenceChecker.assess_async(context)` - Async assessment for MCP integration
 - `ConfidenceResult` - Dataclass supporting numeric comparison (e.g., `result >= 0.9`)
 - `CheckResult` - Individual check result with name, passed, message, weight
-- LRU-cached tech stack detection for performance
+
+### Registry Pattern (Pluggable Checks)
+
+```python
+from superclaude.pm_agent import ConfidenceChecker, ConfidenceCheck
+
+class CustomCheck:
+    name = "custom_check"
+    weight = 1.0
+
+    def evaluate(self, context):
+        return True, "Custom check passed"
+
+checker = ConfidenceChecker()
+checker.register_check(CustomCheck())
+result = checker.assess(context)
+```
+
+### Async Support (MCP Integration)
+
+```python
+from superclaude.pm_agent import ConfidenceChecker, AsyncConfidenceCheck
+
+class McpCheck:
+    name = "mcp_verify"
+    weight = 1.0
+
+    async def evaluate_async(self, context):
+        result = await some_mcp_tool(context)
+        return result.success, result.message
+
+checker = ConfidenceChecker()
+checker.register_check(McpCheck())
+result = await checker.assess_async(context)
+```
+
+### Performance
+
+- LRU-cached tech stack detection
+- Weight normalization for custom checks
+- Mixed sync/async check execution
 
 ## ROI
 
