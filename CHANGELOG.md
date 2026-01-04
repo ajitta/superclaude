@@ -7,6 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **ConfidenceChecker Active Verification** - Complete implementation of 4 core validation methods
+  - `_root_cause_identified()` - Heuristic validation requiring 5+ words, no vague terms, evidence
+  - `_no_duplicates()` - Filesystem search using rglob with configurable threshold
+  - `_architecture_compliant()` - Tech stack detection from CLAUDE.md, pyproject.toml, package.json
+  - `_has_oss_reference()` - 3-tier verification (external refs, local cache, built-in pattern DB)
+  - Built-in OSS pattern database with 15 common patterns (auth, jwt, api, crud, test, etc.)
+  - Context enrichment with diagnostic info (potential_duplicates, detected_tech_stack, etc.)
+  - Full backward compatibility via explicit flags
+
+### Added (Tests)
+- 25 new tests for ConfidenceChecker active verification
+  - `TestRootCauseActiveVerification` (5 tests) - Heuristic validation, vague terms, evidence
+  - `TestNoDuplicatesActiveVerification` (6 tests) - Filesystem search, threshold, exclusions
+  - `TestArchitectureCompliantActiveVerification` (7 tests) - Tech stack detection, conflicts
+  - `TestOssReferenceActiveVerification` (7 tests) - 3-tier verification, pattern matching
+
+### Changed
+- ConfidenceChecker now performs active verification instead of placeholder flag checks
+- ROI of 25-250x token savings now achievable through real validation
+
+### Technical
+- Added helper methods: `_detect_tech_stack()`, `_find_architecture_conflicts()`
+- Added helper methods: `_validate_oss_references()`, `_find_cached_pattern()`, `_match_known_oss_pattern()`
+- Conflict rules for Supabase, Next.js, React, FastAPI, Turborepo, pytest
+- Reputable source validation for GitHub, StackOverflow, official docs
+
 ## [4.2.0] - 2025-09-18
 ### Added
 - **Deep Research System** - Complete implementation of autonomous web research capabilities
