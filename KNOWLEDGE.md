@@ -5,7 +5,7 @@
 > This document captures lessons learned, common pitfalls, and solutions discovered during development.
 > Consult this when encountering issues or learning project patterns.
 
-**Last Updated**: 2025-11-12
+**Last Updated**: 2025-01-05
 
 ---
 
@@ -29,6 +29,169 @@
 - Trivial changes (typo fixes)
 - Well-understood tasks with clear path
 - Emergency hotfixes (but document learnings after)
+
+---
+
+### **ConfidenceChecker: Active Verification Implementation**
+
+**Status**: Fully implemented (2025-01-05)
+
+The ConfidenceChecker now performs **active verification** instead of relying on placeholder flags. All 4 core methods have been upgraded:
+
+#### **1. `_root_cause_identified()` - Heuristic Validation**
+
+```python
+# Validates root cause quality
+context = {
+    "root_cause": "Null pointer in UserService.getUser() due to missing null check",
+    "evidence": ["stack trace line 42", "reproduction steps"]
+}
+# Returns True: 5+ words, no vague terms, evidence exists
+```
+
+**Validation rules**:
+- Root cause must have ≥5 words
+- No vague terms: `maybe`, `probably`, `might`, `unknown`, `possibly`, `perhaps`
+- Evidence list must have ≥1 item
+
+**Common failures**:
+```python
+# Too short
+{"root_cause": "Bug in code", "evidence": ["trace"]}  # → False
+
+# Vague language
+{"root_cause": "Maybe the auth service is failing somewhere", "evidence": ["log"]}  # → False
+
+# No evidence
+{"root_cause": "Database timeout due to pool exhaustion", "evidence": []}  # → False
+```
+
+---
+
+#### **2. `_no_duplicates()` - Filesystem Search**
+
+```python
+# Searches codebase for potential duplicates
+context = {
+    "task_name": "implement_user_authentication",
+    "project_root": "/path/to/project",
+    "duplicate_threshold": 5  # Optional, default 5
+}
+# Searches for *user*.py, *authentication*.py
+# Returns False if >5 matches found per keyword
+```
+
+**Features**:
+- Extracts keywords from task_name (>3 chars, skips common words)
+- Uses `rglob()` for recursive search
+- Excludes test files (`test_*.py`) and `__pycache__`
+- Configurable threshold via `duplicate_threshold`
+- Stores matches in `context["potential_duplicates"]`
+
+---
+
+#### **3. `_architecture_compliant()` - Tech Stack Detection**
+
+```python
+# Detects tech stack and checks for conflicts
+context = {
+    "project_root": "/path/to/project",
+    "proposed_technology": ["custom_api", "jquery"]
+}
+# Detects React/Supabase from CLAUDE.md
+# Returns False: conflicts with existing stack
+```
+
+**Detection sources** (in order):
+1. `CLAUDE.md` - Framework, database, tool keywords
+2. `pyproject.toml` - Python dependencies
+3. `package.json` - JavaScript dependencies
+
+**Detected technologies**:
+| Category | Technologies |
+|----------|-------------|
+| Frameworks | Next.js, React, Vue, FastAPI, Django, Flask |
+| Databases | Supabase, PostgreSQL, MongoDB, SQLAlchemy |
+| Tools | Turborepo, pytest |
+
+**Conflict rules**:
+| Existing | Conflicts With |
+|----------|----------------|
+| `supabase` | custom_api, custom_auth, raw_postgresql |
+| `nextjs` | custom_routing, express_routing |
+| `react` | jquery, vanilla_dom |
+| `fastapi` | flask_in_same_project, django_in_same_project |
+| `turborepo` | manual_workspace_scripts |
+| `pytest` | unittest_exclusively |
+
+---
+
+#### **4. `_has_oss_reference()` - 3-Tier Verification**
+
+```python
+# Three-tier OSS reference verification
+context = {
+    "oss_references": [{"url": "https://github.com/tiangolo/fastapi"}],
+    # OR
+    "task_type": "authentication",  # Checks cached patterns
+    # OR
+    "task_name": "implement_jwt_auth"  # Matches built-in database
+}
+```
+
+**Tier 1: External References**
+- Validates URLs from reputable sources
+- Reputable domains: github.com, stackoverflow.com, docs.python.org, reactjs.org, etc.
+
+**Tier 2: Local Pattern Cache**
+- Searches: `docs/patterns/`, `.claude/patterns/`, `~/.claude/patterns/`
+- Matches `{task_type}.md` files
+
+**Tier 3: Built-in Pattern Database**
+```python
+# Keywords → OSS References
+"auth" → NextAuth.js, Passport.js, python-jose
+"jwt" → python-jose, PyJWT, jsonwebtoken
+"api" → FastAPI, Express.js, Django REST
+"crud" → SQLAlchemy, Prisma, TypeORM
+"test" → pytest, Jest, Vitest
+"form" → React Hook Form, Formik, VeeValidate
+"cache" → Redis, Memcached, lru_cache
+"queue" → Celery, Bull, RabbitMQ
+```
+
+---
+
+#### **Backward Compatibility**
+
+All methods maintain backward compatibility via explicit flags:
+
+```python
+# Flag always takes precedence
+context = {"root_cause_identified": True}  # → True (skips heuristic)
+context = {"duplicate_check_complete": True}  # → True (skips search)
+context = {"architecture_check_complete": True}  # → True (skips detection)
+context = {"oss_reference_complete": True}  # → True (skips verification)
+```
+
+---
+
+#### **Context Enrichment**
+
+Active verification enriches context with diagnostic info:
+
+```python
+checker.assess(context)
+
+# After assessment, context contains:
+context["confidence_checks"]  # List of ✅/❌ status messages
+context["potential_duplicates"]  # Files matching keywords (if found)
+context["detected_tech_stack"]  # {"frameworks": [], "databases": [], "tools": []}
+context["architecture_conflicts"]  # Conflict descriptions (if any)
+context["validated_oss_references"]  # Validated OSS refs
+context["matched_oss_pattern"]  # Pattern from built-in database
+context["cached_pattern_source"]  # Path to cached pattern file
+```
 
 ---
 
