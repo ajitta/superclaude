@@ -6,7 +6,11 @@ Tests pre-execution confidence assessment functionality.
 
 import pytest
 
-from superclaude.pm_agent.confidence import ConfidenceChecker
+from superclaude.pm_agent.confidence import (
+    CheckResult,
+    ConfidenceChecker,
+    ConfidenceResult,
+)
 
 
 class TestConfidenceChecker:
@@ -517,3 +521,114 @@ class TestOssReferenceActiveVerification:
             "task_type": "custom_pattern",
         }
         assert checker._has_oss_reference(context) is True
+
+
+class TestConfidenceResult:
+    """Test suite for ConfidenceResult dataclass"""
+
+    def test_returns_confidence_result(self, sample_context):
+        """Test that assess returns ConfidenceResult"""
+        checker = ConfidenceChecker()
+        result = checker.assess(sample_context)
+
+        assert isinstance(result, ConfidenceResult)
+        assert result.score == 1.0
+        assert len(result.checks) == 5
+        assert "High confidence" in result.recommendation
+
+    def test_check_results_structure(self, sample_context):
+        """Test CheckResult structure in ConfidenceResult"""
+        checker = ConfidenceChecker()
+        result = checker.assess(sample_context)
+
+        for check in result.checks:
+            assert isinstance(check, CheckResult)
+            assert isinstance(check.name, str)
+            assert isinstance(check.passed, bool)
+            assert isinstance(check.message, str)
+            assert isinstance(check.weight, float)
+
+    def test_comparison_operators(self):
+        """Test numeric comparison operators"""
+        result = ConfidenceResult(score=0.85, checks=[], recommendation="")
+
+        assert result >= 0.8
+        assert result > 0.8
+        assert result <= 0.9
+        assert result < 0.9
+        assert result == 0.85
+        assert not result == 0.9
+
+    def test_float_conversion(self):
+        """Test __float__ method"""
+        result = ConfidenceResult(score=0.75, checks=[], recommendation="")
+
+        assert float(result) == 0.75
+
+    def test_backward_compatibility(self, sample_context):
+        """Test backward compatibility with numeric comparisons"""
+        checker = ConfidenceChecker()
+        result = checker.assess(sample_context)
+
+        # Old-style comparisons should work
+        if result >= 0.9:
+            passed = True
+        else:
+            passed = False
+
+        assert passed is True
+        assert result.score >= 0.9
+
+    def test_context_still_populated(self, sample_context):
+        """Test context is still populated for legacy callers"""
+        checker = ConfidenceChecker()
+        checker.assess(sample_context)
+
+        # Legacy context should still have confidence_checks
+        assert "confidence_checks" in sample_context
+        assert isinstance(sample_context["confidence_checks"], list)
+        assert len(sample_context["confidence_checks"]) == 5
+
+
+class TestCachingBehavior:
+    """Test LRU caching for tech stack detection"""
+
+    def test_cache_hit(self, tmp_path):
+        """Test that repeated calls use cached result"""
+        from superclaude.pm_agent.confidence import _cached_detect_tech_stack
+
+        # Create a project with CLAUDE.md
+        (tmp_path / "CLAUDE.md").write_text("Using React and Next.js")
+
+        # Clear cache first
+        _cached_detect_tech_stack.cache_clear()
+
+        # First call - cache miss
+        result1 = _cached_detect_tech_stack(str(tmp_path))
+
+        # Second call - cache hit
+        result2 = _cached_detect_tech_stack(str(tmp_path))
+
+        # Results should be identical
+        assert result1 == result2
+
+        # Check cache info
+        cache_info = _cached_detect_tech_stack.cache_info()
+        assert cache_info.hits >= 1
+
+    def test_cache_returns_tuple(self, tmp_path):
+        """Test cached function returns hashable tuple"""
+        from superclaude.pm_agent.confidence import _cached_detect_tech_stack
+
+        (tmp_path / "CLAUDE.md").write_text("Using pytest")
+        _cached_detect_tech_stack.cache_clear()
+
+        result = _cached_detect_tech_stack(str(tmp_path))
+
+        # Result should be tuple of tuples
+        assert isinstance(result, tuple)
+        assert len(result) == 3
+        frameworks, databases, tools = result
+        assert isinstance(frameworks, tuple)
+        assert isinstance(databases, tuple)
+        assert isinstance(tools, tuple)

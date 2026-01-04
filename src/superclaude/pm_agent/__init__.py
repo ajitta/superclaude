@@ -8,12 +8,14 @@ Provides core functionality for PM Agent:
 - Token budget management
 """
 
-from .confidence import ConfidenceChecker
+from .confidence import CheckResult, ConfidenceChecker, ConfidenceResult
 from .reflexion import ReflexionPattern
 from .self_check import SelfCheckProtocol
 
 __all__ = [
+    "CheckResult",
     "ConfidenceChecker",
-    "SelfCheckProtocol",
+    "ConfidenceResult",
     "ReflexionPattern",
+    "SelfCheckProtocol",
 ]

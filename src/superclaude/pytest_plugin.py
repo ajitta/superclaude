@@ -151,10 +151,10 @@ def pytest_runtest_setup(item):
             "markers": [m.name for m in item.iter_markers()],
         }
 
-        confidence = checker.assess(context)
+        result = checker.assess(context)
 
-        if confidence < 0.7:
-            pytest.skip(f"Confidence too low: {confidence:.0%} (minimum: 70%)")
+        if result < 0.7:
+            pytest.skip(f"Confidence too low: {result.score:.0%} (minimum: 70%)")
 
 
 def pytest_runtest_makereport(item, call):

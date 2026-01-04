@@ -120,11 +120,12 @@ If Total < 0.70:   ❌ STOP - Request more context
 
 ## Implementation Details
 
-The TypeScript implementation is available in `confidence.ts` for reference, containing:
+The Python implementation is in `src/superclaude/pm_agent/confidence.py`:
 
-- `confidenceCheck(context)` - Main assessment function
-- Detailed check implementations
-- Context interface definitions
+- `ConfidenceChecker.assess(context)` - Returns `ConfidenceResult` with score, checks, recommendation
+- `ConfidenceResult` - Dataclass supporting numeric comparison (e.g., `result >= 0.9`)
+- `CheckResult` - Individual check result with name, passed, message, weight
+- LRU-cached tech stack detection for performance
 
 ## ROI
 
