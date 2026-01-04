@@ -19,6 +19,8 @@ Required Checks:
     5. Root cause identified with high certainty
 """
 
+import inspect
+import warnings
 from dataclasses import dataclass, field
 from functools import lru_cache
 from pathlib import Path
@@ -28,7 +30,7 @@ from typing import Any, Dict, List, Protocol, Tuple, runtime_checkable
 @runtime_checkable
 class ConfidenceCheck(Protocol):
     """
-    Protocol for confidence checks.
+    Protocol for synchronous confidence checks.
 
     Implement this protocol to create custom confidence checks
     that can be registered with ConfidenceChecker.
@@ -61,6 +63,65 @@ class ConfidenceCheck(Protocol):
             Tuple of (passed: bool, message: str)
         """
         ...
+
+
+@runtime_checkable
+class AsyncConfidenceCheck(Protocol):
+    """
+    Protocol for asynchronous confidence checks.
+
+    Implement this protocol for checks that need to perform async operations
+    like fetching documentation from MCP servers (Context7, Tavily).
+
+    Example:
+        class AsyncDocsCheck:
+            name = "async_docs"
+            weight = 0.2
+
+            async def evaluate_async(self, context: Dict[str, Any]) -> Tuple[bool, str]:
+                # Async operation (e.g., fetch from Context7)
+                docs = await fetch_docs_from_mcp(context.get("library"))
+                if docs:
+                    return True, "Documentation verified via MCP"
+                return False, "No documentation found"
+
+        checker = ConfidenceChecker()
+        checker.register_check(AsyncDocsCheck())
+        result = await checker.assess_async(context)
+    """
+
+    name: str
+    weight: float
+
+    async def evaluate_async(self, context: Dict[str, Any]) -> Tuple[bool, str]:
+        """
+        Asynchronously evaluate the check against the given context.
+
+        Args:
+            context: Task context dictionary
+
+        Returns:
+            Tuple of (passed: bool, message: str)
+        """
+        ...
+
+
+def _is_async_check(check: Any) -> bool:
+    """Check if a check object has async evaluation capability."""
+    return (
+        hasattr(check, "evaluate_async")
+        and callable(getattr(check, "evaluate_async", None))
+        and inspect.iscoroutinefunction(check.evaluate_async)
+    )
+
+
+def _has_sync_evaluate(check: Any) -> bool:
+    """Check if a check object has sync evaluation capability."""
+    return (
+        hasattr(check, "evaluate")
+        and callable(getattr(check, "evaluate", None))
+        and not inspect.iscoroutinefunction(check.evaluate)
+    )
 
 
 @dataclass
@@ -569,10 +630,10 @@ class ConfidenceChecker:
         Register a new confidence check.
 
         Args:
-            check: Check implementing ConfidenceCheck protocol
+            check: Check implementing ConfidenceCheck or AsyncConfidenceCheck protocol
         """
-        if not isinstance(check, ConfidenceCheck):
-            raise TypeError(f"Check must implement ConfidenceCheck protocol, got {type(check)}")
+        if not isinstance(check, (ConfidenceCheck, AsyncConfidenceCheck)):
+            raise TypeError(f"Check must implement ConfidenceCheck or AsyncConfidenceCheck protocol, got {type(check)}")
         self._checks.append(check)
 
     def unregister_check(self, name: str) -> bool:
@@ -649,6 +710,86 @@ class ConfidenceChecker:
         ]
 
         return ConfidenceResult(score=score, checks=check_results, recommendation=recommendation)
+
+    async def assess_async(self, context: Dict[str, Any]) -> ConfidenceResult:
+        """
+        Asynchronously assess confidence level using registered checks.
+
+        This method supports both sync and async checks:
+        - Sync checks (with evaluate()) are called normally
+        - Async checks (with evaluate_async()) are awaited
+
+        Use this method when you have async checks that need to fetch
+        data from MCP servers (Context7, Tavily) or other async sources.
+
+        Args:
+            context: Context dict with task details
+
+        Returns:
+            ConfidenceResult: Result with score, checks, and recommendation.
+
+        Example:
+            result = await checker.assess_async(context)
+            if result >= 0.9:
+                # Proceed with implementation
+        """
+        if not self._checks:
+            return ConfidenceResult(
+                score=0.0,
+                checks=[],
+                recommendation=self.get_recommendation(0.0),
+            )
+
+        # Calculate total weight for normalization
+        total_weight = sum(c.weight for c in self._checks)
+        if total_weight == 0:
+            total_weight = 1.0
+
+        score = 0.0
+        check_results: List[CheckResult] = []
+
+        for check in self._checks:
+            # Determine how to evaluate this check
+            if _is_async_check(check):
+                # Async check - await it
+                passed, message = await check.evaluate_async(context)
+            elif _has_sync_evaluate(check):
+                # Sync check - call normally
+                passed, message = check.evaluate(context)
+            else:
+                # No valid evaluate method
+                warnings.warn(
+                    f"Check '{getattr(check, 'name', 'unknown')}' has no valid "
+                    "evaluate() or evaluate_async() method, skipping",
+                    RuntimeWarning,
+                )
+                continue
+
+            normalized_weight = check.weight / total_weight
+
+            if passed:
+                score += normalized_weight
+
+            check_results.append(CheckResult(
+                name=check.name,
+                passed=passed,
+                message=message,
+                weight=check.weight,
+            ))
+
+        # Build recommendation
+        recommendation = self.get_recommendation(score)
+
+        # Backward compatibility: also store in context for legacy callers
+        context["confidence_checks"] = [
+            f"{'✅' if c.passed else '❌'} {c.message}" for c in check_results
+        ]
+
+        return ConfidenceResult(score=score, checks=check_results, recommendation=recommendation)
+
+    def has_async_checks(self) -> bool:
+        """Check if any registered checks require async evaluation."""
+        return any(_is_async_check(check) for check in self._checks)
 
     def _has_official_docs(self, context: Dict[str, Any]) -> bool:
         """

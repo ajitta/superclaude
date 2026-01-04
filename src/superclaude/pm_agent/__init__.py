@@ -9,7 +9,8 @@ Provides core functionality for PM Agent:
 """
 
 from .confidence import (
-    # Protocol
+    # Protocols
+    AsyncConfidenceCheck,
     ConfidenceCheck,
     # Result types
     CheckResult,
@@ -26,7 +27,8 @@ from .reflexion import ReflexionPattern
 from .self_check import SelfCheckProtocol
 
 __all__ = [
-    # Protocol
+    # Protocols
+    "AsyncConfidenceCheck",
     "ConfidenceCheck",
     # Core
     "CheckResult",

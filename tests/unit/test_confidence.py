@@ -4,6 +4,8 @@ Unit tests for ConfidenceChecker
 Tests pre-execution confidence assessment functionality.
 """
 
+import asyncio
+
 import pytest
 
 from superclaude.pm_agent.confidence import (
@@ -785,3 +787,145 @@ class TestRegistryPattern:
 
         assert result.score == 1.0
         assert result.checks[0].passed is True
+
+
+class TestAsyncSupport:
+    """Tests for async confidence checking (Phase 3)"""
+
+    @pytest.mark.asyncio
+    async def test_assess_async_with_sync_checks(self):
+        """Test assess_async with synchronous checks"""
+        checker = ConfidenceChecker()
+        context = {
+            "task_name": "implement async",
+            "has_official_docs": True,
+            "root_cause": "Need async support for MCP integration",
+            "evidence": "MCP tools return coroutines",
+        }
+        result = await checker.assess_async(context)
+
+        assert isinstance(result, ConfidenceResult)
+        assert 0.0 <= result.score <= 1.0
+        assert len(result.checks) == 5  # default checks
+
+    @pytest.mark.asyncio
+    async def test_assess_async_with_async_check(self):
+        """Test assess_async with a custom async check"""
+        from superclaude.pm_agent.confidence import AsyncConfidenceCheck
+
+        class AsyncMcpCheck:
+            """Custom async check simulating MCP call"""
+
+            name = "async_mcp"
+            weight = 1.0
+
+            async def evaluate_async(self, context):
+                # Simulate async MCP tool call
+                await asyncio.sleep(0.01)
+                return True, "MCP check passed"
+
+        checker = ConfidenceChecker(register_defaults=False)
+        async_check = AsyncMcpCheck()
+
+        # Should satisfy async protocol
+        assert isinstance(async_check, AsyncConfidenceCheck)
+
+        checker.register_check(async_check)
+        result = await checker.assess_async({})
+
+        assert result.score == 1.0
+        assert result.checks[0].passed is True
+        assert result.checks[0].name == "async_mcp"
+
+    @pytest.mark.asyncio
+    async def test_assess_async_mixed_checks(self):
+        """Test assess_async with mixed sync and async checks"""
+
+        class SyncCheck:
+            name = "sync_check"
+            weight = 1.0
+
+            def evaluate(self, context):
+                return True, "Sync passed"
+
+        class AsyncCheck:
+            name = "async_check"
+            weight = 1.0
+
+            async def evaluate_async(self, context):
+                await asyncio.sleep(0.01)
+                return True, "Async passed"
+
+        checker = ConfidenceChecker(register_defaults=False)
+        checker.register_check(SyncCheck())
+        checker.register_check(AsyncCheck())
+
+        result = await checker.assess_async({})
+
+        assert result.score == 1.0
+        assert len(result.checks) == 2
+        assert result.checks[0].name == "sync_check"
+        assert result.checks[1].name == "async_check"
+
+    def test_has_async_checks_false(self):
+        """Test has_async_checks returns False for sync-only"""
+        checker = ConfidenceChecker()
+        assert checker.has_async_checks() is False
+
+    def test_has_async_checks_true(self):
+        """Test has_async_checks returns True when async check registered"""
+
+        class AsyncCheck:
+            name = "async_check"
+            weight = 1.0
+
+            async def evaluate_async(self, context):
+                return True, "Async"
+
+        checker = ConfidenceChecker(register_defaults=False)
+        checker.register_check(AsyncCheck())
+
+        assert checker.has_async_checks() is True
+
+    @pytest.mark.asyncio
+    async def test_assess_async_empty_registry(self):
+        """Test assess_async with no registered checks"""
+        checker = ConfidenceChecker(register_defaults=False)
+        result = await checker.assess_async({})
+
+        assert result.score == 0.0
+        assert result.checks == []
+        assert "stop" in result.recommendation.lower()  # Low confidence recommendation
+
+    @pytest.mark.asyncio
+    async def test_assess_async_result_comparison(self):
+        """Test ConfidenceResult from assess_async supports comparison"""
+
+        class HighConfidenceCheck:
+            name = "high_conf"
+            weight = 1.0
+
+            async def evaluate_async(self, context):
+                return True, "High confidence"
+
+        checker = ConfidenceChecker(register_defaults=False)
+        checker.register_check(HighConfidenceCheck())
+
+        result = await checker.assess_async({})
+
+        assert result >= 0.9
+        assert result >= 0.7
+        assert float(result) == 1.0
+
+    def test_invalid_check_registration_rejected(self):
+        """Test that checks without evaluate methods cannot be registered"""
+
+        class InvalidCheck:
+            name = "invalid"
+            weight = 1.0
+            # No evaluate or evaluate_async method
+
+        checker = ConfidenceChecker(register_defaults=False)
+
+        with pytest.raises(TypeError, match="must implement ConfidenceCheck or AsyncConfidenceCheck"):
+            checker.register_check(InvalidCheck())
