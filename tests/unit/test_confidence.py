@@ -632,3 +632,156 @@ class TestCachingBehavior:
         assert isinstance(frameworks, tuple)
         assert isinstance(databases, tuple)
         assert isinstance(tools, tuple)
+
+
+class TestRegistryPattern:
+    """Test suite for registry pattern"""
+
+    def test_default_checks_registered(self):
+        """Test that default checks are registered on init"""
+        checker = ConfidenceChecker()
+        checks = checker.get_checks()
+
+        assert len(checks) == 5
+        names = [c.name for c in checks]
+        assert "no_duplicates" in names
+        assert "architecture_compliant" in names
+        assert "official_docs" in names
+        assert "oss_reference" in names
+        assert "root_cause" in names
+
+    def test_no_defaults_registration(self):
+        """Test init without default checks"""
+        checker = ConfidenceChecker(register_defaults=False)
+        checks = checker.get_checks()
+
+        assert len(checks) == 0
+
+    def test_custom_check_registration(self):
+        """Test registering a custom check"""
+        from superclaude.pm_agent.confidence import NoDuplicatesCheck
+
+        checker = ConfidenceChecker(register_defaults=False)
+        custom_check = NoDuplicatesCheck(weight=1.0)
+        checker.register_check(custom_check)
+
+        checks = checker.get_checks()
+        assert len(checks) == 1
+        assert checks[0].name == "no_duplicates"
+        assert checks[0].weight == 1.0
+
+    def test_unregister_check(self):
+        """Test unregistering a check by name"""
+        checker = ConfidenceChecker()
+
+        # Unregister one check
+        result = checker.unregister_check("root_cause")
+        assert result is True
+        assert len(checker.get_checks()) == 4
+
+        # Try to unregister non-existent
+        result = checker.unregister_check("nonexistent")
+        assert result is False
+        assert len(checker.get_checks()) == 4
+
+    def test_clear_checks(self):
+        """Test clearing all checks"""
+        checker = ConfidenceChecker()
+        assert len(checker.get_checks()) == 5
+
+        checker.clear_checks()
+        assert len(checker.get_checks()) == 0
+
+    def test_weight_normalization(self):
+        """Test that weights are normalized"""
+        from superclaude.pm_agent.confidence import NoDuplicatesCheck, RootCauseCheck
+
+        checker = ConfidenceChecker(register_defaults=False)
+        # Add two checks with weight 0.5 each (total = 1.0)
+        checker.register_check(NoDuplicatesCheck(weight=0.5))
+        checker.register_check(RootCauseCheck(weight=0.5))
+
+        context = {
+            "duplicate_check_complete": True,
+            "root_cause_identified": True,
+        }
+        result = checker.assess(context)
+
+        # Both pass, normalized score should be 1.0
+        assert result.score == 1.0
+
+    def test_weight_normalization_unequal(self):
+        """Test weight normalization with unequal weights"""
+        from superclaude.pm_agent.confidence import NoDuplicatesCheck, RootCauseCheck
+
+        checker = ConfidenceChecker(register_defaults=False)
+        # Add two checks: one with weight 3, one with weight 1 (total = 4)
+        checker.register_check(NoDuplicatesCheck(weight=3.0))
+        checker.register_check(RootCauseCheck(weight=1.0))
+
+        # Only first check passes
+        context = {
+            "duplicate_check_complete": True,
+            "root_cause_identified": False,
+        }
+        result = checker.assess(context)
+
+        # First check contributes 3/4 = 0.75
+        assert result.score == 0.75
+
+    def test_empty_registry_returns_zero(self):
+        """Test assess with empty registry"""
+        checker = ConfidenceChecker(register_defaults=False)
+        context = {}
+        result = checker.assess(context)
+
+        assert result.score == 0.0
+        assert len(result.checks) == 0
+
+    def test_protocol_compliance(self):
+        """Test that concrete checks implement protocol"""
+        from superclaude.pm_agent.confidence import (
+            ArchitectureCheck,
+            ConfidenceCheck,
+            NoDuplicatesCheck,
+            OfficialDocsCheck,
+            OssReferenceCheck,
+            RootCauseCheck,
+        )
+
+        checks = [
+            NoDuplicatesCheck(),
+            ArchitectureCheck(),
+            OfficialDocsCheck(),
+            OssReferenceCheck(),
+            RootCauseCheck(),
+        ]
+
+        for check in checks:
+            assert isinstance(check, ConfidenceCheck)
+            assert hasattr(check, "name")
+            assert hasattr(check, "weight")
+            assert hasattr(check, "evaluate")
+
+    def test_custom_check_class(self):
+        """Test creating a fully custom check class"""
+        from superclaude.pm_agent.confidence import ConfidenceCheck
+
+        class AlwaysPassCheck:
+            name = "always_pass"
+            weight = 1.0
+
+            def evaluate(self, context):
+                return True, "Always passes"
+
+        checker = ConfidenceChecker(register_defaults=False)
+        custom = AlwaysPassCheck()
+
+        # Should satisfy protocol
+        assert isinstance(custom, ConfidenceCheck)
+
+        checker.register_check(custom)
+        result = checker.assess({})
+
+        assert result.score == 1.0
+        assert result.checks[0].passed is True
