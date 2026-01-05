@@ -1,4 +1,4 @@
-/** 
+/**
  * Confidence Check - Pre-implementation confidence assessment
  *
  * Prevents wrong-direction execution by assessing confidence BEFORE starting.
@@ -7,10 +7,10 @@
  * Token Budget: 100-200 tokens
  * ROI: 25-250x token savings when stopping wrong direction
  *
- * Test Results (2025-10-21):
+ * Test Results (2026-01-05):
  * - Precision: 1.000 (no false positives)
  * - Recall: 1.000 (no false negatives)
- * - 8/8 test cases passed
+ * - 63/63 test cases passed
  *
  * Confidence Levels:
  *    - High (≥90%): Root cause identified, solution verified, no duplication, architecture-compliant
@@ -18,8 +18,28 @@
  *    - Low (<70%): Investigation incomplete, unclear root cause, missing official docs
  */
 
-import { existsSync, readdirSync } from 'fs';
-import { join, dirname } from 'path';
+import { existsSync } from "fs";
+import { join, dirname } from "path";
+
+/** Configuration options for ConfidenceChecker */
+export interface CheckerOptions {
+  silent?: boolean; // Suppress console output
+}
+
+/** Individual check result */
+export interface CheckResult {
+  name: string;
+  passed: boolean;
+  message: string;
+  weight: number;
+}
+
+/** Assessment result with score and details */
+export interface ConfidenceResult {
+  score: number;
+  checks: CheckResult[];
+  recommendation: string;
+}
 
 export interface Context {
   task?: string;
@@ -50,7 +70,22 @@ export interface Context {
  *     // Low confidence - STOP and request clarification
  *   }
  */
+/** Weight constants for each check */
+const WEIGHTS = {
+  NO_DUPLICATES: 0.25,
+  ARCHITECTURE: 0.25,
+  OFFICIAL_DOCS: 0.2,
+  OSS_REFERENCE: 0.15,
+  ROOT_CAUSE: 0.15,
+} as const;
+
 export class ConfidenceChecker {
+  private options: CheckerOptions;
+
+  constructor(options: CheckerOptions = {}) {
+    this.options = options;
+  }
+
   /**
    * Assess confidence level (0.0 - 1.0)
    *
@@ -62,61 +97,92 @@ export class ConfidenceChecker {
    * 5. Root cause identified? (15%)
    *
    * @param context - Task context with investigation flags
-   * @returns Confidence score (0.0 = no confidence, 1.0 = absolute certainty)
+   * @returns ConfidenceResult with score, checks, and recommendation
    */
-  async assess(context: Context): Promise<number> {
-    let score = 0.0;
-    const checks: string[] = [];
+  async assess(context: Context): Promise<ConfidenceResult> {
+    const checkResults: CheckResult[] = [];
 
     // Check 1: No duplicate implementations (25%)
-    if (this.noDuplicates(context)) {
-      score += 0.25;
-      checks.push("✅ No duplicate implementations found");
-    } else {
-      checks.push("❌ Check for existing implementations first");
-    }
+    const noDups = this.noDuplicates(context);
+    checkResults.push({
+      name: "no_duplicates",
+      passed: noDups,
+      message: noDups
+        ? "No duplicate implementations found"
+        : "Check for existing implementations first",
+      weight: WEIGHTS.NO_DUPLICATES,
+    });
 
     // Check 2: Architecture compliance (25%)
-    if (this.architectureCompliant(context)) {
-      score += 0.25;
-      checks.push("✅ Uses existing tech stack (e.g., Supabase)");
-    } else {
-      checks.push("❌ Verify architecture compliance (avoid reinventing)");
-    }
+    const archOk = this.architectureCompliant(context);
+    checkResults.push({
+      name: "architecture_compliant",
+      passed: archOk,
+      message: archOk
+        ? "Uses existing tech stack"
+        : "Verify architecture compliance",
+      weight: WEIGHTS.ARCHITECTURE,
+    });
 
     // Check 3: Official documentation verified (20%)
-    if (this.hasOfficialDocs(context)) {
-      score += 0.2;
-      checks.push("✅ Official documentation verified");
-    } else {
-      checks.push("❌ Read official docs first");
-    }
+    const docsOk = this.hasOfficialDocs(context);
+    checkResults.push({
+      name: "official_docs",
+      passed: docsOk,
+      message: docsOk
+        ? "Official documentation verified"
+        : "Read official docs first",
+      weight: WEIGHTS.OFFICIAL_DOCS,
+    });
 
     // Check 4: Working OSS implementations referenced (15%)
-    if (this.hasOssReference(context)) {
-      score += 0.15;
-      checks.push("✅ Working OSS implementation found");
-    } else {
-      checks.push("❌ Search for OSS implementations");
-    }
+    const ossOk = this.hasOssReference(context);
+    checkResults.push({
+      name: "oss_reference",
+      passed: ossOk,
+      message: ossOk
+        ? "Working OSS implementation found"
+        : "Search for OSS implementations",
+      weight: WEIGHTS.OSS_REFERENCE,
+    });
 
     // Check 5: Root cause identified (15%)
-    if (this.rootCauseIdentified(context)) {
-      score += 0.15;
-      checks.push("✅ Root cause identified");
-    } else {
-      checks.push("❌ Continue investigation to identify root cause");
+    const rootOk = this.rootCauseIdentified(context);
+    checkResults.push({
+      name: "root_cause",
+      passed: rootOk,
+      message: rootOk
+        ? "Root cause identified"
+        : "Continue investigation to identify root cause",
+      weight: WEIGHTS.ROOT_CAUSE,
+    });
+
+    // Calculate score
+    const score = checkResults.reduce(
+      (sum, c) => sum + (c.passed ? c.weight : 0),
+      0,
+    );
+
+    // Store legacy format for backward compatibility
+    context.confidence_checks = checkResults.map(
+      (c) => `${c.passed ? "✅" : "❌"} ${c.message}`,
+    );
+
+    // Display checks (unless silent)
+    if (!this.options.silent) {
+      console.log("📋 Confidence Checks:");
+      checkResults.forEach((c) => {
+        const icon = c.passed ? "✅" : "❌";
+        console.log(`   ${icon} ${c.message}`);
+      });
+      console.log("");
     }
 
-    // Store check results for reporting
-    context.confidence_checks = checks;
-
-    // Display checks
-    console.log("📋 Confidence Checks:");
-    checks.forEach(check => console.log(`   ${check}`));
-    console.log("");
-
-    return score;
+    return {
+      score,
+      checks: checkResults,
+      recommendation: this.getRecommendation(score),
+    };
   }
 
   /**
@@ -140,13 +206,13 @@ export class ConfidenceChecker {
     let dir = dirname(testFile);
 
     while (dir !== dirname(dir)) {
-      if (existsSync(join(dir, 'README.md'))) {
+      if (existsSync(join(dir, "README.md"))) {
         return true;
       }
-      if (existsSync(join(dir, 'CLAUDE.md'))) {
+      if (existsSync(join(dir, "CLAUDE.md"))) {
         return true;
       }
-      if (existsSync(join(dir, 'docs'))) {
+      if (existsSync(join(dir, "docs"))) {
         return true;
       }
       dir = dirname(dir);
@@ -212,62 +278,6 @@ export class ConfidenceChecker {
   }
 
   /**
-   * Check if existing patterns can be followed
-   *
-   * Looks for:
-   * - Similar test files
-   * - Common naming conventions
-   * - Established directory structure
-   */
-  private hasExistingPatterns(context: Context): boolean {
-    const testFile = context.test_file;
-    if (!testFile) {
-      return false;
-    }
-
-    const testDir = dirname(testFile);
-
-    if (existsSync(testDir)) {
-      try {
-        const files = readdirSync(testDir);
-        const testFiles = files.filter(f =>
-          f.startsWith('test_') && f.endsWith('.py')
-        );
-        return testFiles.length > 1;
-      } catch {
-        return false;
-      }
-    }
-
-    return false;
-  }
-
-  /**
-   * Check if implementation path is clear
-   *
-   * Considers:
-   * - Test name suggests clear purpose
-   * - Markers indicate test type
-   * - Context has sufficient information
-   */
-  private hasClearPath(context: Context): boolean {
-    const testName = context.test_name ?? '';
-    if (!testName || testName === 'test_example') {
-      return false;
-    }
-
-    const markers = context.markers ?? [];
-    const knownMarkers = new Set([
-      'unit', 'integration', 'hallucination',
-      'performance', 'confidence_check', 'self_check'
-    ]);
-
-    const hasMarkers = markers.some(m => knownMarkers.has(m));
-
-    return hasMarkers || testName.length > 10;
-  }
-
-  /**
    * Get recommended action based on confidence level
    *
    * @param confidence - Confidence score (0.0 - 1.0)
@@ -291,7 +301,8 @@ export class ConfidenceChecker {
  */
 export async function confidenceCheck(context: Context): Promise<number> {
   const checker = new ConfidenceChecker();
-  return checker.assess(context);
+  const result = await checker.assess(context);
+  return result.score;
 }
 
 /**
