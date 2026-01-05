@@ -25,6 +25,7 @@ from .confidence import (
 )
 from .reflexion import ReflexionPattern
 from .self_check import SelfCheckProtocol
+from .token_budget import TokenBudgetManager
 
 __all__ = [
     # Protocols
@@ -43,4 +44,5 @@ __all__ = [
     # Other patterns
     "ReflexionPattern",
     "SelfCheckProtocol",
+    "TokenBudgetManager",
 ]
