@@ -1,12 +1,3 @@
----
-name: superclaude
-type: manifest
-version: 4.3.1
-loading: hybrid
-cache_strategy: prefix-stable
-total_static_tokens: ~5.5K
----
-
 # Static Context (~5.5K tokens)
 # All @ referenced files load at session start (Claude Code limitation)
 # Ordered for prefix-stable caching - do not reorder
