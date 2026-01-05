@@ -373,232 +373,36 @@ def doctor(verbose: bool):
         sys.exit(1)
 
 
-@main.command()
-@click.option(
-    "--task", "-t",
-    help="Task name or description to check",
-)
-@click.option(
-    "--json", "output_json",
-    is_flag=True,
-    help="Output as JSON",
-)
-@click.option(
-    "--verbose", "-v",
-    is_flag=True,
-    help="Show detailed check results",
-)
-@click.option(
-    "--project-root", "-p",
-    type=click.Path(exists=True),
-    help="Project root directory (default: current directory)",
-)
-def confidence(task: str, output_json: bool, verbose: bool, project_root: str):
-    """
-    Run pre-implementation confidence check
+# =============================================================================
+# PM Agent CLI Commands - DISABLED
+# These commands use pm_agent Python implementation.
+# Skill-based approach (confidence.ts) is preferred.
+# To re-enable: uncomment the blocks below
+# =============================================================================
 
-    Assesses readiness before starting implementation.
-    Returns confidence score (0-100%) based on 5 checks:
+# @main.command()
+# @click.option("--task", "-t", help="Task name or description to check")
+# @click.option("--json", "output_json", is_flag=True, help="Output as JSON")
+# @click.option("--verbose", "-v", is_flag=True, help="Show detailed check results")
+# @click.option("--project-root", "-p", type=click.Path(exists=True), help="Project root directory")
+# def confidence(task: str, output_json: bool, verbose: bool, project_root: str):
+#     """Run pre-implementation confidence check (DISABLED - use /confidence-check skill)"""
+#     pass
 
-    \b
-    - No duplicate implementations (25%)
-    - Architecture compliance (25%)
-    - Official docs verified (20%)
-    - OSS reference found (15%)
-    - Root cause identified (15%)
+# @main.command("self-check")
+# @click.option("--tests-passed", "-t", is_flag=True, help="Mark tests as passed")
+# @click.option("--json", "output_json", is_flag=True, help="Output as JSON")
+# @click.option("--evidence", "-e", multiple=True, help="Evidence items")
+# def self_check(tests_passed: bool, output_json: bool, evidence: tuple):
+#     """Run post-implementation self-check protocol (DISABLED - use skill)"""
+#     pass
 
-    \b
-    Thresholds:
-    - ≥90%: Proceed with implementation
-    - 70-89%: Continue investigation
-    - <70%: STOP - gather more context
-
-    \b
-    Examples:
-        superclaude confidence
-        superclaude confidence --task "implement user auth"
-        superclaude confidence --json
-        superclaude confidence -v --project-root ./myproject
-    """
-    import json as json_module
-    from pathlib import Path
-    from superclaude.pm_agent import ConfidenceChecker
-
-    checker = ConfidenceChecker()
-    context = {
-        "task_name": task or "",
-        "project_root": project_root or str(Path.cwd()),
-    }
-
-    result = checker.assess(context)
-
-    if output_json:
-        output = {
-            "score": result.score,
-            "percentage": f"{result.score:.0%}",
-            "recommendation": result.recommendation,
-            "checks": [
-                {
-                    "name": c.name,
-                    "passed": c.passed,
-                    "message": c.message,
-                    "weight": c.weight,
-                }
-                for c in result.checks
-            ],
-        }
-        click.echo(json_module.dumps(output, indent=2, ensure_ascii=False))
-    else:
-        # Header
-        click.echo("📋 Confidence Check Results\n")
-
-        # Show each check result
-        if verbose:
-            for check in result.checks:
-                icon = "✅" if check.passed else "❌"
-                weight_pct = f"{check.weight * 100:.0f}%"
-                click.echo(f"   {icon} {check.name} ({weight_pct})")
-                if check.message:
-                    click.echo(f"      └─ {check.message}")
-            click.echo()
-
-        # Score and recommendation
-        score_pct = result.score * 100
-        if score_pct >= 90:
-            icon = "✅"
-            color = "green"
-        elif score_pct >= 70:
-            icon = "⚠️"
-            color = "yellow"
-        else:
-            icon = "❌"
-            color = "red"
-
-        click.echo(f"📊 Confidence: {click.style(f'{score_pct:.0f}%', fg=color, bold=True)}")
-        click.echo(f"{icon} {result.recommendation}")
-
-        # Exit with non-zero if confidence too low
-        if score_pct < 70:
-            sys.exit(1)
-
-
-@main.command("self-check")
-@click.option(
-    "--tests-passed", "-t",
-    is_flag=True,
-    help="Mark tests as passed",
-)
-@click.option(
-    "--json", "output_json",
-    is_flag=True,
-    help="Output as JSON",
-)
-@click.option(
-    "--evidence", "-e",
-    multiple=True,
-    help="Evidence items (can be repeated)",
-)
-def self_check(tests_passed: bool, output_json: bool, evidence: tuple):
-    """
-    Run post-implementation self-check protocol
-
-    Validates implementation with evidence-based verification.
-    Prevents hallucination by requiring concrete proof.
-
-    \b
-    Checks:
-    - Tests executed and passed
-    - Requirements met with evidence
-    - Assumptions verified
-    - No speculation
-
-    \b
-    Examples:
-        superclaude self-check --tests-passed
-        superclaude self-check --tests-passed --evidence "pytest output" --evidence "linting passed"
-        superclaude self-check --json
-    """
-    import json as json_module
-    from superclaude.pm_agent import SelfCheckProtocol
-
-    protocol = SelfCheckProtocol()
-
-    implementation = {
-        "tests_passed": tests_passed,
-        "evidence": {item: "provided" for item in evidence} if evidence else {},
-        "requirements": [],
-        "requirements_met": [],
-        "assumptions": [],
-        "assumptions_verified": [],
-    }
-
-    passed, issues = protocol.validate(implementation)
-
-    if output_json:
-        output = {
-            "passed": passed,
-            "issues": issues,
-            "evidence_count": len(evidence),
-        }
-        click.echo(json_module.dumps(output, indent=2, ensure_ascii=False))
-    else:
-        if passed:
-            click.echo("✅ Self-check passed")
-            if evidence:
-                click.echo(f"   Evidence items: {len(evidence)}")
-        else:
-            click.echo("❌ Self-check failed")
-            for issue in issues:
-                click.echo(f"   - {issue}")
-            sys.exit(1)
-
-
-@main.command("token-budget")
-@click.option(
-    "--complexity", "-c",
-    type=click.Choice(["simple", "medium", "complex"]),
-    default="medium",
-    help="Task complexity level",
-)
-@click.option(
-    "--json", "output_json",
-    is_flag=True,
-    help="Output as JSON",
-)
-def token_budget(complexity: str, output_json: bool):
-    """
-    Show token budget for task complexity
-
-    \b
-    Complexity levels:
-    - simple: 200 tokens (typo fix, trivial change)
-    - medium: 1,000 tokens (bug fix, small feature)
-    - complex: 2,500 tokens (large feature, refactoring)
-
-    \b
-    Examples:
-        superclaude token-budget
-        superclaude token-budget --complexity complex
-        superclaude token-budget -c simple --json
-    """
-    import json as json_module
-    from superclaude.pm_agent import TokenBudgetManager
-
-    manager = TokenBudgetManager(complexity=complexity)
-
-    if output_json:
-        output = {
-            "complexity": complexity,
-            "limit": manager.limit,
-            "used": manager.used,
-            "remaining": manager.remaining,
-        }
-        click.echo(json_module.dumps(output, indent=2, ensure_ascii=False))
-    else:
-        click.echo(f"📊 Token Budget: {complexity.upper()}")
-        click.echo(f"   Limit: {manager.limit:,} tokens")
-        click.echo(f"   Used: {manager.used:,} tokens")
-        click.echo(f"   Remaining: {manager.remaining:,} tokens")
+# @main.command("token-budget")
+# @click.option("--complexity", "-c", type=click.Choice(["simple", "medium", "complex"]), default="medium")
+# @click.option("--json", "output_json", is_flag=True, help="Output as JSON")
+# def token_budget(complexity: str, output_json: bool):
+#     """Show token budget for task complexity (DISABLED - use skill)"""
+#     pass
 
 
 @main.command()

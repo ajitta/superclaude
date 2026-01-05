@@ -120,55 +120,54 @@ If Total < 0.70:   ❌ STOP - Request more context
 
 ## Implementation Details
 
-The Python implementation is in `src/superclaude/pm_agent/confidence.py`:
+The TypeScript implementation is in `confidence.ts` (same directory):
 
 ### Core API
 
-- `ConfidenceChecker.assess(context)` - Sync assessment, returns `ConfidenceResult`
-- `ConfidenceChecker.assess_async(context)` - Async assessment for MCP integration
-- `ConfidenceResult` - Dataclass supporting numeric comparison (e.g., `result >= 0.9`)
-- `CheckResult` - Individual check result with name, passed, message, weight
+```typescript
+import { ConfidenceChecker, Context } from './confidence';
 
-### Registry Pattern (Pluggable Checks)
+const checker = new ConfidenceChecker();
+const confidence = await checker.assess(context);
 
-```python
-from superclaude.pm_agent import ConfidenceChecker, ConfidenceCheck
-
-class CustomCheck:
-    name = "custom_check"
-    weight = 1.0
-
-    def evaluate(self, context):
-        return True, "Custom check passed"
-
-checker = ConfidenceChecker()
-checker.register_check(CustomCheck())
-result = checker.assess(context)
+if (confidence >= 0.9) {
+  // High confidence - proceed immediately
+} else if (confidence >= 0.7) {
+  // Medium confidence - present options to user
+} else {
+  // Low confidence - STOP and request clarification
+}
 ```
 
-### Async Support (MCP Integration)
+### Context Interface
 
-```python
-from superclaude.pm_agent import ConfidenceChecker, AsyncConfidenceCheck
-
-class McpCheck:
-    name = "mcp_verify"
-    weight = 1.0
-
-    async def evaluate_async(self, context):
-        result = await some_mcp_tool(context)
-        return result.success, result.message
-
-checker = ConfidenceChecker()
-checker.register_check(McpCheck())
-result = await checker.assess_async(context)
+```typescript
+interface Context {
+  task?: string;
+  test_file?: string;
+  test_name?: string;
+  markers?: string[];
+  duplicate_check_complete?: boolean;
+  architecture_check_complete?: boolean;
+  official_docs_verified?: boolean;
+  oss_reference_complete?: boolean;
+  root_cause_identified?: boolean;
+  confidence_checks?: string[];
+}
 ```
 
-### Performance
+### Recommendation Helper
 
-- LRU-cached tech stack detection
-- Weight normalization for custom checks
-- Mixed sync/async check execution
+```typescript
+const recommendation = checker.getRecommendation(confidence);
+// ✅ High confidence (≥90%) - Proceed with implementation
+// ⚠️ Medium confidence (70-89%) - Continue investigation
+// ❌ Low confidence (<70%) - STOP and continue investigation loop
+```
+
+### Note
+
+Python implementation (`pm_agent/confidence.py`) also available for pytest integration, but CLI commands disabled in favor of skill-based approach.
 
 ## ROI
 
