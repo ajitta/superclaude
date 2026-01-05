@@ -1,11 +1,10 @@
 # Repository Guidelines for AI Agents
 
-SuperClaude is a Python-based framework and pytest plugin, plus configuration
-assets (agents, commands, modes, MCP configs) for Claude Code. This guide
-provides essential context for AI coding agents working in this repository.
+SuperClaude is a Python-based pytest plugin and framework for Claude Code, providing
+PM Agent capabilities (confidence checks, reflexion, self-check, token budgeting)
+plus configuration assets (agents, commands, modes, MCP configs).
 
 ## Project Structure
-
 ```
 src/superclaude/           # Core package
   cli/                     # CLI commands (Click-based)
@@ -23,19 +22,14 @@ tests/
   unit/                    # Unit tests
   integration/             # Integration tests
   conftest.py              # Shared fixtures
-plugins/                   # Plugin packaging assets
-scripts/                   # Build and automation scripts
 ```
 
 ## Build, Test, and Lint Commands
-
-### Installation
 ```bash
+# Installation
 make install              # Dev install: uv pip install -e ".[dev]"
-```
 
-### Running Tests
-```bash
+# Running Tests
 make test                 # Run all tests: uv run pytest
 uv run pytest tests/unit  # Run only unit tests
 uv run pytest -m unit     # Run tests marked 'unit'
@@ -52,27 +46,17 @@ uv run pytest -v tests/unit/test_confidence.py
 
 # Run with coverage
 uv run pytest --cov=src/superclaude tests/
-```
 
-### Linting and Formatting
-```bash
+# Linting and Formatting
 make lint                 # uv run ruff check .
 make format               # uv run ruff format .
 uv run ruff check --fix . # Auto-fix lint issues
 uv run mypy src/          # Type checking (gradual typing)
-```
 
-### Verification
-```bash
+# Verification
 make verify               # Full installation verification
 make doctor               # Health check: uv run superclaude doctor
 make test-plugin          # Verify pytest plugin auto-discovery
-```
-
-### Plugin Building
-```bash
-make build-plugin         # Build plugin artifacts to dist/plugins/
-make sync-plugin-repo     # Sync to external plugin repository
 ```
 
 ## Code Style Guidelines
@@ -91,7 +75,6 @@ Imports are sorted by Ruff (isort-compatible). Order:
 3. Local imports
 
 ```python
-# Example from cli/main.py
 import sys
 from pathlib import Path
 
@@ -124,7 +107,6 @@ def assess(self, context: Dict[str, Any]) -> ConfidenceResult:
 
 ### Docstrings
 Use triple-quoted docstrings for modules, classes, and public functions:
-
 ```python
 def get_recommendation(self, confidence: float) -> str:
     """
@@ -152,7 +134,6 @@ except (OSError, UnicodeDecodeError):
 
 ### Dataclasses
 Use `@dataclass` for data containers with type hints:
-
 ```python
 @dataclass
 class CheckResult:
@@ -178,26 +159,7 @@ class CheckResult:
 @pytest.mark.confidence_check  # Confidence-related tests
 ```
 
-### Fixture Usage
-```python
-def test_high_confidence_scenario(self, sample_context):
-    """Test with fixture from conftest.py"""
-    checker = ConfidenceChecker()
-    confidence = checker.assess(sample_context)
-    assert confidence >= 0.9
-```
-
-### Async Tests
-```python
-@pytest.mark.asyncio
-async def test_assess_async_with_sync_checks(self):
-    checker = ConfidenceChecker()
-    result = await checker.assess_async(context)
-    assert isinstance(result, ConfidenceResult)
-```
-
 ## Commit Message Format
-
 Follow Conventional Commits:
 ```
 feat(scope): add new feature
@@ -208,16 +170,9 @@ refactor(scope): code restructuring
 test(scope): add or update tests
 ```
 
-Examples:
-- `feat(cli): add uninstall command with dry-run option`
-- `fix(confidence): handle empty project root gracefully`
-- `test(pm_agent): add async check integration tests`
-
 ## Key Architectural Patterns
 
 ### Protocol-based Design
-The codebase uses Python Protocols for extensibility:
-
 ```python
 @runtime_checkable
 class ConfidenceCheck(Protocol):
@@ -227,8 +182,6 @@ class ConfidenceCheck(Protocol):
 ```
 
 ### Registry Pattern
-ConfidenceChecker uses a registry pattern for pluggable checks:
-
 ```python
 checker = ConfidenceChecker(register_defaults=False)
 checker.register_check(CustomCheck())
@@ -242,11 +195,3 @@ Use `@lru_cache` for expensive operations:
 def _cached_detect_tech_stack(project_root_str: str) -> tuple:
     ...
 ```
-
-## Reference Files
-
-For architecture and planning context:
-- `PLANNING.md` - Project roadmap and priorities
-- `TASK.md` - Current task tracking
-- `KNOWLEDGE.md` - Domain knowledge and patterns
-- `CONTRIBUTING.md` - Contribution guidelines
