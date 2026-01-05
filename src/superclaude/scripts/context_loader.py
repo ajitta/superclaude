@@ -9,6 +9,7 @@ Supports two modes:
 Tracks loaded contexts per session to prevent duplicates.
 Cross-platform compatible (Windows/macOS/Linux)
 """
+
 import hashlib
 import os
 import re
@@ -18,7 +19,9 @@ from pathlib import Path
 
 # Configuration
 INJECT_MODE = os.environ.get("CLAUDE_CONTEXT_INJECT", "1") == "1"  # Default: inject
-MAX_TOKENS_ESTIMATE = int(os.environ.get("CLAUDE_CONTEXT_MAX_TOKENS", "8000"))  # ~8K tokens
+MAX_TOKENS_ESTIMATE = int(
+    os.environ.get("CLAUDE_CONTEXT_MAX_TOKENS", "8000")
+)  # ~8K tokens
 CHARS_PER_TOKEN = 4  # Rough estimate
 
 # Session tracking file (unique per working directory)
@@ -26,34 +29,86 @@ SESSION_ID = hashlib.md5(os.getcwd().encode()).hexdigest()[:8]
 CACHE_FILE = Path(tempfile.gettempdir()) / f"claude_context_{SESSION_ID}.txt"
 
 # Base path for context files
-BASE_PATH = Path(".claude/superclaude")
+# Install adjusts this to: .claude/superclaude
+BASE_PATH = Path(os.environ.get("SUPERCLAUDE_PATH", ".claude/superclaude"))
 
 # Trigger → File mapping with priority (lower = higher priority)
 # Format: (regex_pattern, relative_path, priority)
 TRIGGER_MAP = [
     # Modes (detailed) - Priority 1-2
-    (r"(brainstorm|ideate|explore ideas|maybe|thinking about)", "modes/MODE_Brainstorming.md", 1),
-    (r"(deep.?research|investigate thoroughly|comprehensive search)", "modes/MODE_DeepResearch.md", 1),
-    (r"(introspect|reflect|self.?analysis|meta)", "modes/MODE_Introspection.md", 2),
-    (r"(orchestrat|parallel|multi.?tool|batch)", "modes/MODE_Orchestration.md", 2),
-    (r"(task.?manage|delegate|milestone|phase)", "modes/MODE_TaskManagement.md", 2),
-    (r"(--uc|ultracompressed|token.?efficient|compress)", "modes/MODE_TokenEfficiency.md", 1),
-    (r"(business.?panel|expert.?panel|strategy.?panel)", "modes/MODE_BusinessPanel.md", 1),
-
+    (
+        r"(brainstorm|ideate|explore ideas|maybe|thinking about|--brainstorm|--bs)",
+        "modes/MODE_Brainstorming.md",
+        1,
+    ),
+    (
+        r"(deep.?research|investigate thoroughly|comprehensive search|/sc:research|--research)",
+        "modes/MODE_DeepResearch.md",
+        1,
+    ),
+    (
+        r"(introspect|reflect|self.?analysis|meta|--introspect)",
+        "modes/MODE_Introspection.md",
+        2,
+    ),
+    (
+        r"(orchestrat|coordinate|parallel|multi.?tool|batch|--orchestrate)",
+        "modes/MODE_Orchestration.md",
+        2,
+    ),
+    (
+        r"(task.?manage|delegate|milestone|phase|--task-manage)",
+        "modes/MODE_Task_Management.md",
+        2,
+    ),
+    (
+        r"(--uc|--ultracompressed|token.?efficient|compress|brevity)",
+        "modes/MODE_Token_Efficiency.md",
+        1,
+    ),
+    (
+        r"(business.?panel|expert.?panel|strategy.?panel)",
+        "modes/MODE_Business_Panel.md",
+        1,
+    ),
     # MCP servers (detailed) - Priority 1-2
-    (r"(context7|c7|library docs|framework docs|--c7)", "mcp/MCP_Context7.md", 2),
-    (r"(sequential|seq|multi.?step|reasoning chain|--seq)", "mcp/MCP_Sequential.md", 2),
-    (r"(playwright|browser test|e2e|screenshot|--play)", "mcp/MCP_Playwright.md", 2),
-    (r"(serena|symbol|rename across|lsp|--serena)", "mcp/MCP_Serena.md", 2),
-    (r"(morphllm|morph|bulk edit|pattern replace|--morph)", "mcp/MCP_Morphllm.md", 2),
-    (r"(magic|21st|ui component|--magic)", "mcp/MCP_Magic.md", 2),
+    (
+        r"(context7|c7|library docs|framework docs|--c7|--context7)",
+        "mcp/MCP_Context7.md",
+        2,
+    ),
+    (
+        r"(sequential|seq|multi.?step|reasoning chain|--seq|--sequential)",
+        "mcp/MCP_Sequential.md",
+        2,
+    ),
+    (
+        r"(playwright|browser test|e2e|screenshot|--play|--playwright)",
+        "mcp/MCP_Playwright.md",
+        2,
+    ),
+    (
+        r"(serena|symbol|rename across|lsp|--serena|/sc:load|/sc:save)",
+        "mcp/MCP_Serena.md",
+        2,
+    ),
+    (
+        r"(morphllm|morph|bulk edit|pattern replace|--morph|--morphllm)",
+        "mcp/MCP_Morphllm.md",
+        2,
+    ),
+    (r"(magic|21st|ui component|--magic|/ui|/21)", "mcp/MCP_Magic.md", 2),
     (r"(tavily|web search|news search|--tavily)", "mcp/MCP_Tavily.md", 1),
-    (r"(devtools|chrome|performance audit|layout debug|--chrome)", "mcp/MCP_Chrome-DevTools.md", 2),
-
-    # NOTE: Agents (.claude/agents/) are auto-triggered by Claude - no injection needed
-
-    # Business - Priority 2
-    (r"(business|strategy|market|competitive)", "core/BUSINESS_PANEL.md", 2),
+    (
+        r"(devtools|chrome|performance audit|layout debug|--chrome|--devtools)",
+        "mcp/MCP_Chrome-DevTools.md",
+        2,
+    ),
+    (r"(mindbase|pgvector|conversation.?memory|--mindbase)", "mcp/MCP_Mindbase.md", 2),
+    (r"(airis|confidence.?check|repo.?index|--airis)", "mcp/MCP_Airis-Agent.md", 2),
+    # Business symbols/examples - Priority 3 (lower priority, supplementary)
+    (r"(business.?symbol|strategic.?symbol)", "core/BUSINESS_SYMBOLS.md", 3),
+    (r"(business.?example|panel.?example)", "core/BUSINESS_PANEL_EXAMPLES.md", 3),
 ]
 
 
@@ -132,7 +187,9 @@ def output_inject_mode(contexts: list[tuple[str, int]]) -> None:
 
     # Summary
     if loaded_files or skipped_files:
-        print(f"<!-- Context loaded: {len(loaded_files)} files (~{total_tokens} tokens) -->")
+        print(
+            f"<!-- Context loaded: {len(loaded_files)} files (~{total_tokens} tokens) -->"
+        )
         if skipped_files:
             skipped_info = ", ".join(f"{f}(p{p})" for f, _, p in skipped_files)
             print(f"<!-- Skipped (budget): {skipped_info} -->")
