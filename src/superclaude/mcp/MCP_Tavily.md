@@ -1,10 +1,3 @@
----
-name: tavily
-type: mcp
-server: tavily
-cache: gated
-triggers: [search, research, news, current, web, fact-check, /sc:research, --tavily]
----
 <component name="tavily" type="mcp">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
   <triggers>search|research|news|current|web|fact-check|/sc:research|tavily</triggers>

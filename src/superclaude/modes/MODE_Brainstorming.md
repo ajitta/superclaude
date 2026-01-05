@@ -1,9 +1,3 @@
----
-name: brainstorming
-type: mode
-cache: pinned
-triggers: [brainstorm, explore, maybe, thinking about, discuss, not sure, --brainstorm, --bs]
----
 <component name="brainstorming" type="mode">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
   <triggers>brainstorm|explore|maybe|thinking about|discuss|not sure|--brainstorm|--bs</triggers>

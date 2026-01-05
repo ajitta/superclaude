@@ -1,9 +1,3 @@
----
-name: abbreviations
-type: reference
-cache: pinned
-triggers: [abbr, abbreviation, shorthand, alias, mapping]
----
 <component name="abbreviations" type="core" priority="medium">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
   <triggers>abbr|abbreviation|shorthand|alias|mapping|c7|seq|play|arch|fe|be</triggers>

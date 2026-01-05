@@ -19,8 +19,8 @@ total_static_tokens: ~5.5K
 @core/ABBREVIATIONS.md
 
 # Routing Indexes (~0.5K tokens) - lightweight trigger-to-file mappings
-@modes/MODE_UNIFIED.md
-@mcp/MCP_UNIFIED.md
+@modes/MODE_INDEX.md
+@mcp/MCP_INDEX.md
 
 # Dynamic Context (loaded via context_loader.py hook on trigger detection)
 # modes/MODE_*.md (7 files): Detailed mode behaviors - loaded when triggered

@@ -1,10 +1,3 @@
----
-name: morphllm
-type: mcp
-server: morphllm
-cache: gated
-triggers: [pattern, bulk, edit, transform, style, framework, text-replacement, --morph, --morphllm]
----
 <component name="morphllm" type="mcp">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
   <triggers>pattern|bulk|edit|transform|style|framework|text-replacement|morphllm</triggers>
