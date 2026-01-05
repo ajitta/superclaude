@@ -37,75 +37,91 @@ BASE_PATH = Path(os.environ.get("SUPERCLAUDE_PATH", ".claude/superclaude"))
 TRIGGER_MAP = [
     # Modes (detailed) - Priority 1-2
     (
-        r"(brainstorm|ideate|explore ideas|maybe|thinking about|--brainstorm|--bs)",
+        r"(brainstorm|ideate|explore(?: ideas)?|maybe|thinking about|discuss|not sure|--brainstorm|--bs)",
         "modes/MODE_Brainstorming.md",
         1,
     ),
     (
-        r"(deep.?research|investigate thoroughly|comprehensive search|/sc:research|--research)",
+        r"(deep.?research|investigate(?: thoroughly)?|comprehensive search|/sc:research|--research|explore|discover|analyz)",
         "modes/MODE_DeepResearch.md",
         1,
     ),
     (
-        r"(introspect|reflect|self.?analysis|meta|--introspect)",
+        r"(introspect|reflect|self.?analysis|meta|analyze reasoning|--introspect)",
         "modes/MODE_Introspection.md",
         2,
     ),
     (
-        r"(orchestrat|coordinate|parallel|multi.?tool|batch|--orchestrate)",
+        r"(orchestrat|coordinate|parallel|multi.?tool|batch|resource|efficiency|--orchestrate)",
         "modes/MODE_Orchestration.md",
         2,
     ),
     (
-        r"(task.?manage|delegate|milestone|phase|--task-manage)",
+        r"(task|manage|task.?manage|delegate|milestone|phase|--task-manage)",
         "modes/MODE_Task_Management.md",
         2,
     ),
     (
-        r"(--uc|--ultracompressed|token.?efficient|compress|brevity)",
+        r"(--uc|--ultracompressed|token.?efficient|compress|brevity|efficient|token)",
         "modes/MODE_Token_Efficiency.md",
         1,
     ),
     (
-        r"(business.?panel|expert.?panel|strategy.?panel)",
+        r"(business|panel|expert|strategy|business.?panel|expert.?panel|strategy.?panel|christensen|porter|drucker|godin|taleb)",
         "modes/MODE_Business_Panel.md",
         1,
     ),
     # MCP servers (detailed) - Priority 1-2
     (
-        r"(context7|c7|library docs|framework docs|--c7|--context7)",
+        r"(context7|c7|library|docs|framework|documentation|import|require|library docs|framework docs|--c7|--context7)",
         "mcp/MCP_Context7.md",
         2,
     ),
     (
-        r"(sequential|seq|multi.?step|reasoning chain|--seq|--sequential)",
+        r"(sequential|seq|think|think-hard|ultrathink|debug|architecture|analysis|reasoning|multi.?step|reasoning chain|--seq|--sequential)",
         "mcp/MCP_Sequential.md",
         2,
     ),
     (
-        r"(playwright|browser test|e2e|screenshot|--play|--playwright)",
+        r"(playwright|browser|browser test|e2e|test|screenshot|validation|accessibility|wcag|--play|--playwright)",
         "mcp/MCP_Playwright.md",
         2,
     ),
     (
-        r"(serena|symbol|rename across|lsp|--serena|/sc:load|/sc:save)",
+        r"(serena|symbol|rename|rename across|extract|move|lsp|session|memory|--serena|/sc:load|/sc:save)",
         "mcp/MCP_Serena.md",
         2,
     ),
     (
-        r"(morphllm|morph|bulk edit|pattern replace|--morph|--morphllm)",
+        r"(morphllm|morph|pattern|pattern replace|bulk|bulk edit|edit|transform|style|framework|text-replacement|--morph|--morphllm)",
         "mcp/MCP_Morphllm.md",
         2,
     ),
-    (r"(magic|21st|ui component|--magic|/ui|/21)", "mcp/MCP_Magic.md", 2),
-    (r"(tavily|web search|news search|--tavily)", "mcp/MCP_Tavily.md", 1),
     (
-        r"(devtools|chrome|performance audit|layout debug|--chrome|--devtools)",
+        r"(magic|21st|ui component|ui|component|button|form|modal|card|table|nav|responsive|accessible|--magic|/ui|/21)",
+        "mcp/MCP_Magic.md",
+        2,
+    ),
+    (
+        r"(tavily|search|research|news|current|web|fact-check|/sc:research|web search|news search|--tavily)",
+        "mcp/MCP_Tavily.md",
+        1,
+    ),
+    (
+        r"(devtools|chrome|performance|performance audit|layout|layout debug|debug|cls|lcp|console|network|dom|css|--chrome|--devtools)",
         "mcp/MCP_Chrome-DevTools.md",
         2,
     ),
-    (r"(mindbase|pgvector|conversation.?memory|--mindbase)", "mcp/MCP_Mindbase.md", 2),
-    (r"(airis|confidence.?check|repo.?index|--airis)", "mcp/MCP_Airis-Agent.md", 2),
+    (
+        r"(mindbase|memory|conversation|conversation.?memory|session|semantic|embedding|pgvector|--mindbase)",
+        "mcp/MCP_Mindbase.md",
+        2,
+    ),
+    (
+        r"(airis|confidence|confidence.?check|research|index|repo.?index|optimize|sync|--airis)",
+        "mcp/MCP_Airis-Agent.md",
+        2,
+    ),
     # Business symbols/examples - Priority 3 (lower priority, supplementary)
     (r"(business.?symbol|strategic.?symbol)", "core/BUSINESS_SYMBOLS.md", 3),
     (r"(business.?example|panel.?example)", "core/BUSINESS_PANEL_EXAMPLES.md", 3),

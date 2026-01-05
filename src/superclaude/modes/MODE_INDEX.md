@@ -10,13 +10,13 @@
   <mode_index>
 | Mode | Triggers | File |
 |------|----------|------|
-| Brainstorming | brainstorm, explore, maybe, thinking about, discuss, not sure, --brainstorm, --bs | MODE_Brainstorming.md |
-| DeepResearch | /sc:research, investigate, explore, discover, analyze, --research | MODE_DeepResearch.md |
-| Orchestration | orchestrate, coordinate, parallel, multi-tool, resource, efficiency, --orchestrate | MODE_Orchestration.md |
-| TaskManagement | task, manage, delegate, phase, milestone, --task-manage | MODE_Task_Management.md |
-| TokenEfficiency | compress, efficient, --uc, --ultracompressed, token, brevity | MODE_Token_Efficiency.md |
+| Brainstorming | brainstorm, ideate, explore, explore ideas, maybe, thinking about, discuss, not sure, --brainstorm, --bs | MODE_Brainstorming.md |
+| DeepResearch | deep research, /sc:research, investigate, investigate thoroughly, explore, discover, analyze, comprehensive search, --research | MODE_DeepResearch.md |
+| Orchestration | orchestrate, coordinate, parallel, multi-tool, resource, efficiency, batch, --orchestrate | MODE_Orchestration.md |
+| TaskManagement | task, manage, task manage, delegate, phase, milestone, --task-manage | MODE_Task_Management.md |
+| TokenEfficiency | compress, efficient, token, token efficient, brevity, --uc, --ultracompressed | MODE_Token_Efficiency.md |
 | Introspection | introspect, reflect, analyze reasoning, meta, self-analysis, --introspect | MODE_Introspection.md |
-| BusinessPanel | business, panel, expert, strategy, christensen, porter, drucker, godin, taleb | MODE_Business_Panel.md |
+| BusinessPanel | business, panel, expert, strategy, business panel, expert panel, strategy panel, christensen, porter, drucker, godin, taleb | MODE_Business_Panel.md |
   </mode_index>
 
   <tool_index note="Quick MCP selection">

@@ -10,16 +10,16 @@
   <mcp_index>
 | MCP | Triggers | File |
 |-----|----------|------|
-| Context7 | library, docs, framework, documentation, import, require, --c7, --context7 | MCP_Context7.md |
-| Tavily | search, research, news, current, web, fact-check, /sc:research, --tavily | MCP_Tavily.md |
-| Sequential | think, think-hard, ultrathink, debug, architecture, analysis, reasoning, --seq, --sequential | MCP_Sequential.md |
-| Serena | symbol, rename, extract, move, LSP, session, memory, /sc:load, /sc:save, --serena | MCP_Serena.md |
-| Morphllm | pattern, bulk, edit, transform, style, framework, text-replacement, --morph, --morphllm | MCP_Morphllm.md |
-| Magic | UI, component, button, form, modal, card, table, nav, /ui, /21, responsive, accessible, --magic | MCP_Magic.md |
-| Playwright | browser, E2E, test, screenshot, validation, accessibility, WCAG, --play, --playwright | MCP_Playwright.md |
-| DevTools | performance, debug, layout, CLS, LCP, console, network, DOM, CSS, --chrome, --devtools | MCP_Chrome-DevTools.md |
-| Mindbase | memory, conversation, session, semantic, embedding, pgvector, --mindbase | MCP_Mindbase.md |
-| Airis-Agent | confidence, research, index, optimize, sync, --airis | MCP_Airis-Agent.md |
+| Context7 | context7, c7, library, docs, framework, documentation, import, require, library docs, framework docs, --c7, --context7 | MCP_Context7.md |
+| Tavily | tavily, search, research, news, current, web, fact-check, /sc:research, web search, news search, --tavily | MCP_Tavily.md |
+| Sequential | sequential, seq, think, think-hard, ultrathink, debug, architecture, analysis, reasoning, multi-step, reasoning chain, --seq, --sequential | MCP_Sequential.md |
+| Serena | serena, symbol, rename, rename across, extract, move, LSP, session, memory, /sc:load, /sc:save, --serena | MCP_Serena.md |
+| Morphllm | morphllm, morph, pattern, pattern replace, bulk, bulk edit, edit, transform, style, framework, text-replacement, --morph, --morphllm | MCP_Morphllm.md |
+| Magic | magic, 21st, ui, component, button, form, modal, card, table, nav, /ui, /21, responsive, accessible, ui component, --magic | MCP_Magic.md |
+| Playwright | playwright, browser, browser test, E2E, test, screenshot, validation, accessibility, WCAG, --play, --playwright | MCP_Playwright.md |
+| DevTools | devtools, chrome, performance, performance audit, debug, layout, layout debug, CLS, LCP, console, network, DOM, CSS, --chrome, --devtools | MCP_Chrome-DevTools.md |
+| Mindbase | mindbase, memory, conversation, conversation memory, session, semantic, embedding, pgvector, --mindbase | MCP_Mindbase.md |
+| Airis-Agent | airis, confidence, confidence check, research, index, repo index, optimize, sync, --airis | MCP_Airis-Agent.md |
   </mcp_index>
 
   <decision_flow>
