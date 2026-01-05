@@ -1,10 +1,3 @@
----
-name: flags
-type: core
-priority: high
-cache: pinned
-triggers: [flag, --, mode, mcp, think, effort, delegate]
----
 <component name="flags" type="core" priority="high">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
   <triggers>flag|--|mode|mcp|think|effort|delegate</triggers>

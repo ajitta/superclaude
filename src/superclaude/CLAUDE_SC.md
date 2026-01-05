@@ -1,12 +1,3 @@
----
-name: superclaude
-type: manifest
-version: 4.3.1
-loading: hybrid
-cache_strategy: prefix-stable
-total_static_tokens: ~5.5K
----
-
 # Static Context (~5.5K tokens)
 # All @ referenced files load at session start (Claude Code limitation)
 # Ordered for prefix-stable caching - do not reorder
@@ -19,8 +10,8 @@ total_static_tokens: ~5.5K
 @core/ABBREVIATIONS.md
 
 # Routing Indexes (~0.5K tokens) - lightweight trigger-to-file mappings
-@modes/MODE_UNIFIED.md
-@mcp/MCP_UNIFIED.md
+@modes/MODE_INDEX.md
+@mcp/MCP_INDEX.md
 
 # Dynamic Context (loaded via context_loader.py hook on trigger detection)
 # modes/MODE_*.md (7 files): Detailed mode behaviors - loaded when triggered

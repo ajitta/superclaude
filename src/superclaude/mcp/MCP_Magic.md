@@ -1,10 +1,3 @@
----
-name: magic
-type: mcp
-server: 21st-dev
-cache: gated
-triggers: [UI, component, button, form, modal, card, table, nav, /ui, /21, responsive, accessible, --magic]
----
 <component name="magic" type="mcp">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
   <triggers>UI|component|button|form|modal|card|table|nav|/ui|/21|responsive|accessible</triggers>

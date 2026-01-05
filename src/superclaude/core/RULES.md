@@ -1,10 +1,3 @@
----
-name: rules
-type: core
-priority: critical
-cache: pinned
-triggers: [rules, behavior, compliance, standards, guidelines]
----
 <component name="rules" type="core" priority="critical">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
   <triggers>rules|behavior|compliance|standards|guidelines</triggers>

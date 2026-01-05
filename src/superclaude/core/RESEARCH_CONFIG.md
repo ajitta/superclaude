@@ -1,10 +1,3 @@
----
-name: research-config
-type: core
-priority: medium
-cache: pinned
-triggers: [research, deep-research, planning, hop, confidence, tavily]
----
 <component name="research-config" type="core" priority="medium">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
   <triggers>research|deep-research|planning|hop|confidence|tavily</triggers>

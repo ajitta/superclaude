@@ -1,9 +1,3 @@
----
-name: deep-research
-type: mode
-cache: pinned
-triggers: [/sc:research, investigate, explore, discover, analyze, --research]
----
 <component name="deep-research" type="mode">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
   <triggers>/sc:research|investigate|explore|discover|analyze|--research</triggers>

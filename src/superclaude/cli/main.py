@@ -373,6 +373,38 @@ def doctor(verbose: bool):
         sys.exit(1)
 
 
+# =============================================================================
+# PM Agent CLI Commands - DISABLED
+# These commands use pm_agent Python implementation.
+# Skill-based approach (confidence.ts) is preferred.
+# To re-enable: uncomment the blocks below
+# =============================================================================
+
+# @main.command()
+# @click.option("--task", "-t", help="Task name or description to check")
+# @click.option("--json", "output_json", is_flag=True, help="Output as JSON")
+# @click.option("--verbose", "-v", is_flag=True, help="Show detailed check results")
+# @click.option("--project-root", "-p", type=click.Path(exists=True), help="Project root directory")
+# def confidence(task: str, output_json: bool, verbose: bool, project_root: str):
+#     """Run pre-implementation confidence check (DISABLED - use /confidence-check skill)"""
+#     pass
+
+# @main.command("self-check")
+# @click.option("--tests-passed", "-t", is_flag=True, help="Mark tests as passed")
+# @click.option("--json", "output_json", is_flag=True, help="Output as JSON")
+# @click.option("--evidence", "-e", multiple=True, help="Evidence items")
+# def self_check(tests_passed: bool, output_json: bool, evidence: tuple):
+#     """Run post-implementation self-check protocol (DISABLED - use skill)"""
+#     pass
+
+# @main.command("token-budget")
+# @click.option("--complexity", "-c", type=click.Choice(["simple", "medium", "complex"]), default="medium")
+# @click.option("--json", "output_json", is_flag=True, help="Output as JSON")
+# def token_budget(complexity: str, output_json: bool):
+#     """Show token budget for task complexity (DISABLED - use skill)"""
+#     pass
+
+
 @main.command()
 def version():
     """Show SuperClaude version"""

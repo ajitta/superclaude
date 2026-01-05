@@ -67,7 +67,7 @@
 
 | **Commands** | **Agents** | **Modes** | **MCP Servers** |
 |:------------:|:----------:|:---------:|:---------------:|
-| **30** | **16** | **7** | **8** |
+| **30** | **20** | **8** | **10** |
 | Slash Commands | Specialized AI | Behavioral | Integrations |
 
 30 slash commands covering the complete development lifecycle from brainstorming to deployment.
@@ -346,7 +346,7 @@ For **2-3x faster** execution and **30-50% fewer tokens**, optionally install MC
 <td width="50%">
 
 ### 🤖 **Smarter Agent System**
-**16 specialized agents** with domain expertise:
+**20 specialized agents** with domain expertise:
 - PM Agent ensures continuous learning through systematic documentation
 - Deep Research agent for autonomous web research
 - Security engineer catches real vulnerabilities
@@ -370,7 +370,7 @@ For **2-3x faster** execution and **30-50% fewer tokens**, optionally install MC
 <td width="50%">
 
 ### 🔧 **MCP Server Integration**
-**8 powerful servers** with easy CLI installation:
+**10 powerful servers** with easy CLI installation:
 
 ```bash
 # List available MCP servers
@@ -392,12 +392,14 @@ superclaude mcp
 - **Magic** → UI component generation
 - **Morphllm-Fast-Apply** → Context-aware code modifications
 - **Chrome DevTools** → Performance analysis
+- **Mindbase** → Semantic memory & embeddings
+- **Airis-Agent** → Confidence & indexing
 
 </td>
 <td width="50%">
 
 ### 🎯 **Behavioral Modes**
-**7 adaptive modes** for different contexts:
+**8 adaptive modes** for different contexts:
 - **Brainstorming** → Asks right questions
 - **Business Panel** → Multi-expert strategic analysis
 - **Deep Research** → Autonomous web research
@@ -405,6 +407,7 @@ superclaude mcp
 - **Token-Efficiency** → 30-50% context savings
 - **Task Management** → Systematic organization
 - **Introspection** → Meta-cognitive analysis
+- **Unified** → Combined reference (default)
 
 </td>
 </tr>
@@ -557,10 +560,10 @@ The Deep Research system intelligently coordinates multiple tools:
   *All 30 commands organized by category*
 
 - 🤖 [**Agents Guide**](docs/user-guide/agents.md)  
-  *16 specialized agents*
+  *20 specialized agents*
 
 - 🎨 [**Behavioral Modes**](docs/user-guide/modes.md)  
-  *7 adaptive modes*
+  *8 adaptive modes*
 
 - 🚩 [**Flags Guide**](docs/user-guide/flags.md)  
   *Control behaviors*

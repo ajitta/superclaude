@@ -34,11 +34,11 @@
 
 ## ✅ Completed Features
 
-### Core Framework (v4.1.5)
-- ✅ **26 Commands**: `/sc:*` namespace
-- ✅ **16 Agents**: Specialized domain experts
-- ✅ **7 Modes**: Behavioral modifiers
-- ✅ **8 MCP Servers**: External tool integrations
+### Core Framework (v4.2.1+ajitta)
+- ✅ **30 Commands**: `/sc:*` namespace
+- ✅ **20 Agents**: Specialized domain experts
+- ✅ **8 Modes**: Behavioral modifiers
+- ✅ **10 MCP Servers**: External tool integrations
 
 ### PM Agent Mode (Design Phase)
 - ✅ Session Lifecycle design

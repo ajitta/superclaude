@@ -1,7 +1,7 @@
 # SuperClaude Architecture
 
-**Last Updated**: 2025-10-14
-**Version**: 4.1.5
+**Last Updated**: 2026-01-05
+**Version**: 4.2.1+ajitta
 
 ## 📋 Table of Contents
 
@@ -26,20 +26,20 @@ SuperClaude is a **Context-Oriented Configuration Framework** that transforms Cl
 
 ```
 SuperClaude Framework
-├── Commands (26)      → Workflow patterns
-├── Agents (16)        → Domain expertise
-├── Modes (7)          → Behavioral modifiers
-├── MCP Servers (8)    → External tool integrations
+├── Commands (30)      → Workflow patterns
+├── Agents (20)        → Domain expertise
+├── Modes (8)          → Behavioral modifiers
+├── MCP Servers (10)   → External tool integrations
 └── PM Agent Mode      → Meta-layer orchestration (Always-Active)
 ```
 
 ### Version Information
 
-- **Current Version**: 4.1.5
-- **Commands**: 26 slash commands (`/sc:*`)
-- **Agents**: 16 specialized domain experts
-- **Modes**: 7 behavioral modes
-- **MCP Servers**: 8 integrations (Context7, Sequential, Magic, Playwright, Morphllm, Serena, Tavily, Chrome DevTools)
+- **Current Version**: 4.2.1+ajitta
+- **Commands**: 30 slash commands (`/sc:*`)
+- **Agents**: 20 specialized domain experts
+- **Modes**: 8 behavioral modes
+- **MCP Servers**: 10 integrations (Context7, Sequential, Magic, Playwright, Morphllm, Serena, Tavily, Chrome DevTools, Mindbase, Airis-Agent)
 
 ---
 
@@ -73,15 +73,15 @@ Output Generation
 ├── FLAGS.md                    # Flag definitions
 ├── RULES.md                    # Core behavioral rules
 ├── PRINCIPLES.md               # Guiding principles
-├── MODE_*.md                   # 7 behavioral modes
-├── MCP_*.md                    # 8 MCP server integrations
-├── agents/                     # 16 specialized agents
+├── MODE_*.md                   # 8 behavioral modes
+├── MCP_*.md                    # 10+ MCP server integrations
+├── agents/                     # 20 specialized agents
 │   ├── pm-agent.md            # 🆕 Meta-layer orchestrator
 │   ├── backend-architect.md
 │   ├── frontend-architect.md
 │   ├── security-engineer.md
-│   └── ... (13 more)
-└── commands/sc/               # 26 workflow commands
+│   └── ... (17 more)
+└── commands/sc/               # 30 workflow commands
     ├── pm.md                  # 🆕 PM Agent command
     ├── implement.md
     ├── analyze.md

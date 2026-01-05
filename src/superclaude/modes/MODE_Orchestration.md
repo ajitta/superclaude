@@ -1,9 +1,3 @@
----
-name: orchestration
-type: mode
-cache: pinned
-triggers: [orchestrate, coordinate, parallel, multi-tool, resource, efficiency]
----
 <component name="orchestration" type="mode">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
   <triggers>orchestrate|coordinate|parallel|multi-tool|resource|efficiency</triggers>

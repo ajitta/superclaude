@@ -54,9 +54,9 @@ src/superclaude/
 │   ├── install_skill.py # Skill installation
 │   ├── install_commands.py
 │   └── install_mcp.py   # MCP server installation
-├── agents/              # Agent definitions (16 specialized agents)
+├── agents/              # Agent definitions (20 specialized agents)
 ├── commands/            # Slash command definitions (30 commands)
-├── modes/               # Behavioral modes (7 modes)
+├── modes/               # Behavioral modes (8 modes)
 └── mcp/                 # MCP server configurations
 ```
 

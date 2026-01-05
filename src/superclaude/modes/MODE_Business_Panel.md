@@ -1,9 +1,3 @@
----
-name: business-panel
-type: mode
-cache: deferred
-triggers: [business, panel, expert, strategy, christensen, porter, drucker, godin, taleb]
----
 <component name="business-panel" type="mode">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
   <triggers>business|panel|expert|strategy|christensen|porter|drucker|godin|taleb</triggers>

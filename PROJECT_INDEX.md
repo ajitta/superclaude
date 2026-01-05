@@ -1,6 +1,6 @@
 # Project Index: SuperClaude Framework
 
-**Generated**: 2026-01-04
+**Generated**: 2026-01-05
 **Version**: 4.2.1+ajitta
 **Description**: AI-enhanced development framework for Claude Code - pytest plugin with specialized commands, agents, and modes
 
@@ -46,8 +46,10 @@ SuperClaude_Framework/
 | Slash Commands | 30 | src/superclaude/commands/ |
 | Agents | 20 | src/superclaude/agents/ |
 | Modes | 8 | src/superclaude/modes/ |
-| MCP Servers | 11 | src/superclaude/mcp/ |
-| Core Configs | 6 | src/superclaude/core/ |
+| MCP Servers | 10 | src/superclaude/mcp/configs/ |
+| Core Configs | 7 | src/superclaude/core/ |
+| Python Files | 34 | src/superclaude/ |
+| Test Files | 10 | tests/ |
 
 ---
 
@@ -100,7 +102,7 @@ SuperClaude_Framework/
 
 ---
 
-## Slash Commands (31)
+## Slash Commands (30)
 
 Commands installed to `~/.claude/commands/sc/`:
 
@@ -151,7 +153,7 @@ Behavioral modes in `src/superclaude/modes/`:
 
 ---
 
-## MCP Servers (11)
+## MCP Servers (10)
 
 Configurations in `src/superclaude/mcp/configs/`:
 
@@ -169,7 +171,7 @@ Configurations in `src/superclaude/mcp/configs/`:
 
 ---
 
-## Core Configs (6)
+## Core Configs (7)
 
 Located in `src/superclaude/core/`:
 
@@ -179,6 +181,7 @@ Located in `src/superclaude/core/`:
 | PRINCIPLES.md | Engineering philosophy, SOLID, decisions |
 | RULES.md | Behavioral rules, priorities, conflict resolution |
 | RESEARCH_CONFIG.md | Deep research settings, hop config, credibility |
+| ABBREVIATIONS.md | MCP and persona abbreviation mappings |
 | BUSINESS_PANEL_EXAMPLES.md | Business panel usage examples |
 | BUSINESS_SYMBOLS.md | Business domain symbols |
 

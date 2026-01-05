@@ -1,10 +1,3 @@
----
-name: business-symbols
-type: core
-priority: medium
-cache: deferred
-triggers: [business, panel, expert, strategy, framework, symbol]
----
 <component name="business-symbols" type="core" priority="medium">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
   <triggers>business|panel|expert|strategy|framework|symbol</triggers>
