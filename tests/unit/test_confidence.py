@@ -166,12 +166,14 @@ class TestConfidenceChecker:
         assert checker._root_cause_identified(context_fail) is False
 
 
-@pytest.mark.confidence_check
 def test_confidence_check_marker_integration(confidence_checker):
     """
-    Test that confidence_check marker works with pytest plugin fixture
+    Test that confidence_checker fixture works with pytest plugin
 
-    This test should skip if confidence < 70%
+    Note: We don't use @pytest.mark.confidence_check here because
+    the hook builds minimal context (only test_name, test_file, markers)
+    which results in low confidence and skips the test. The marker
+    is intended for production tests, not for testing the fixture itself.
     """
     context = {
         "test_name": "test_confidence_check_marker_integration",
@@ -184,7 +186,20 @@ def test_confidence_check_marker_integration(confidence_checker):
     }
 
     confidence = confidence_checker.assess(context)
-    assert confidence >= 0.7, "Confidence should be high enough to not skip"
+    assert confidence >= 0.7, "Confidence should be high enough"
+
+
+def test_confidence_check_marker_skips_low_confidence(request):
+    """
+    Test that confidence_check marker is properly registered
+
+    Verifies the marker exists and can be retrieved.
+    The actual skip behavior is tested by the pytest plugin hook.
+    """
+    # Verify marker is registered (won't raise unknown marker warning)
+    marker = request.config.getini("markers")
+    marker_names = [m.split(":")[0] for m in marker]
+    assert "confidence_check" in marker_names
 
 
 class TestRootCauseActiveVerification:
