@@ -1,17 +1,18 @@
 {
   "meta": {
-    "generated": "2026-01-04",
+    "generated": "2026-01-05",
     "version": "4.2.1+ajitta",
     "description": "AI-enhanced development framework for Claude Code"
   },
   "statistics": {
-    "commands": 31,
+    "commands": 30,
     "agents": 20,
     "modes": 8,
-    "mcp_servers": 11,
-    "core_configs": 6,
+    "mcp_servers": 10,
+    "mcp_docs": 11,
+    "core_configs": 7,
     "python_files": 34,
-    "test_files": 6
+    "test_files": 10
   },
   "entry_points": {
     "cli": {
@@ -59,7 +60,7 @@
     }
   },
   "commands": {
-    "count": 31,
+    "count": 30,
     "location": "src/superclaude/commands/",
     "installed_to": "~/.claude/commands/sc/",
     "files": ["agent.md", "analyze.md", "brainstorm.md", "build.md", "business-panel.md", "cleanup.md", "design.md", "document.md", "estimate.md", "explain.md", "git.md", "help.md", "implement.md", "improve.md", "index-repo.md", "index.md", "load.md", "pm.md", "recommend.md", "reflect.md", "refactoring.md", "research.md", "save.md", "sc.md", "select-tool.md", "spawn.md", "spec-panel.md", "task.md", "test.md", "troubleshoot.md", "workflow.md"],
@@ -106,7 +107,7 @@
     ]
   },
   "mcp_servers": {
-    "count": 11,
+    "count": 10,
     "config_location": "src/superclaude/mcp/configs/",
     "doc_location": "src/superclaude/mcp/",
     "configs": ["airis-agent.json", "context7.json", "magic.json", "mindbase.json", "morphllm.json", "playwright.json", "sequential.json", "serena-docker.json", "serena.json", "tavily.json"],
@@ -132,6 +133,7 @@
       {"name": "PRINCIPLES.md", "purpose": "Engineering philosophy, SOLID, decisions"},
       {"name": "RULES.md", "purpose": "Behavioral rules, priorities, conflict resolution"},
       {"name": "RESEARCH_CONFIG.md", "purpose": "Deep research settings, hop config, credibility"},
+      {"name": "ABBREVIATIONS.md", "purpose": "MCP and persona abbreviation mappings"},
       {"name": "BUSINESS_PANEL_EXAMPLES.md", "purpose": "Business panel usage examples"},
       {"name": "BUSINESS_SYMBOLS.md", "purpose": "Business domain symbols"}
     ]
@@ -141,7 +143,8 @@
     "location": "tests/",
     "structure": {
       "unit": ["test_cli_install.py", "test_confidence.py", "test_reflexion.py", "test_self_check.py", "test_token_budget.py"],
-      "integration": ["test_pytest_plugin.py"]
+      "integration": ["test_pytest_plugin.py"],
+      "total_files": 10
     },
     "markers": ["unit", "integration", "confidence_check", "self_check", "reflexion", "complexity"],
     "commands": {

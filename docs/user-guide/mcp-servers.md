@@ -2,7 +2,7 @@
 
 ## Overview
 
-MCP (Model Context Protocol) servers extend Claude Code's capabilities through specialized tools. SuperClaude integrates 8 MCP servers and provides Claude with instructions on when to activate them based on your tasks.
+MCP (Model Context Protocol) servers extend Claude Code's capabilities through specialized tools. SuperClaude integrates 10 MCP servers and provides Claude with instructions on when to activate them based on your tasks.
 
 ### 🔍 Reality Check
 - **What MCP servers are**: External Node.js processes that provide additional tools

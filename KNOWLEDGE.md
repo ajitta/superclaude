@@ -5,7 +5,7 @@
 > This document captures lessons learned, common pitfalls, and solutions discovered during development.
 > Consult this when encountering issues or learning project patterns.
 
-**Last Updated**: 2025-01-05
+**Last Updated**: 2026-01-05
 
 ---
 
@@ -724,6 +724,25 @@ Based on real usage data:
 - Add CI/CD to run tests automatically
 
 **Prevention**: Make tests a requirement in PR template
+
+---
+
+## 📊 **Current Framework Statistics (2026-01-05)**
+
+| Category | Count | Location |
+|----------|-------|----------|
+| Slash Commands | 30 | src/superclaude/commands/ |
+| Agents | 20 | src/superclaude/agents/ |
+| Modes | 8 | src/superclaude/modes/ |
+| MCP Servers | 10 | src/superclaude/mcp/configs/ |
+| Core Configs | 7 | src/superclaude/core/ |
+| Python Files | 34 | src/superclaude/ |
+| Test Files | 10 | tests/ |
+
+**Key files updated**:
+- PROJECT_INDEX.md / PROJECT_INDEX.json - Token-efficient repository index (94% reduction)
+- README.md - Framework overview with accurate statistics
+- KNOWLEDGE.md - Accumulated insights and best practices
 
 ---
 

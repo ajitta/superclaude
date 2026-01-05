@@ -30,7 +30,7 @@ All slash commands are documented in [commands-list.md](commands-list.md)
 19. **repo-index** (in src) - Repository indexing
 20. **self-review** (in src) - Code review
 
-## 🎨 Behavioral Modes (7)
+## 🎨 Behavioral Modes (8)
 
 1. **Brainstorming** - Multi-perspective ideation
 2. **Business Panel** - Executive-level strategic analysis
@@ -39,8 +39,9 @@ All slash commands are documented in [commands-list.md](commands-list.md)
 5. **Orchestration** - Efficient tool coordination
 6. **Task Management** - Systematic organization
 7. **Token Efficiency** - 30-50% context savings
+8. **Unified** - Combined reference mode (default)
 
-## 🔌 MCP Server Integration (8)
+## 🔌 MCP Server Integration (10)
 
 ### CLI Installation
 
@@ -141,9 +142,9 @@ All resources are included in both:
 src/superclaude/
 ├── agents/          # 20 agent definitions
 ├── commands/        # 30 slash commands  
-├── modes/           # 7 behavioral modes
-├── mcp/            # 8 MCP integrations + configs
-├── core/           # 6 core documentation files
+├── modes/           # 8 behavioral modes
+├── mcp/            # 10 MCP integrations + configs
+├── core/           # 7 core documentation files
 ├── examples/       # Workflow examples
 ├── hooks/          # Hook configurations
 ├── scripts/        # Utility scripts
@@ -172,9 +173,9 @@ superclaude install --list
 |---------|-------|----------|
 | **Commands** | 30 | commands/ |
 | **Agents** | 20 | agents/ |
-| **Modes** | 7 | modes/ |
-| **MCP Servers** | 8 | mcp/ |
-| **Core Docs** | 6 | core/ |
+| **Modes** | 8 | modes/ |
+| **MCP Servers** | 10 | mcp/ |
+| **Core Docs** | 7 | core/ |
 | **User Docs** | 152 | docs/ |
 
 **Total Resource Files**: 200+
