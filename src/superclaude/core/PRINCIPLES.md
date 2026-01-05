@@ -73,5 +73,12 @@
   | ` ```Code``` ` | HIGH | HIGH | Use for code |
   | `**Bold**` | LOW | HIGH | Keep for maintainability |
 - Rationale: XML-embedded Markdown: machine-parseable + human-readable. Bold aids scanning despite weak LLM emphasis (~3-5% token overhead acceptable for DX).
+- Official Support:
+  | Feature | Anthropic Status | Source |
+  |---------|------------------|--------|
+  | XML Tags | Recommended | docs.anthropic.com/use-xml-tags |
+  | YAML Frontmatter | Supported | Claude Code built-in feature |
+  | Hybrid Format | Allowed | No prohibition in official docs |
+- Design Choice: XML+YAML hybrid is intentional LLM optimization, not format inconsistency. Claude parses XML for structure, YAML for metadata.
   </format_design>
 </component>
