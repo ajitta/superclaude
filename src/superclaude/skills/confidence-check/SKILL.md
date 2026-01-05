@@ -7,10 +7,11 @@ description: >-
   "check confidence", "am I ready", "verify before implementing", "readiness check",
   "pre-implementation check", "before starting", or "확인해줘/검증해줘".
   Validates: no duplicates, architecture compliance, official docs, OSS references, root cause.
+mcp: c7:docs|tavily:oss-search
 ---
 
 <document type="skill" name="confidence-check"
-          triggers="/confidence-check, pre-implementation, confidence-assessment, readiness-check">
+          triggers="/confidence-check, pre-implementation, confidence-assessment, readiness-check, verify-before-implementing">
 
 # Confidence Check Skill
 
@@ -18,91 +19,78 @@ description: >-
 
 Prevents wrong-direction execution by assessing confidence **BEFORE** starting implementation.
 
-**Requirement**: ≥90% confidence to proceed with implementation.
+| Threshold | Action |
+|-----------|--------|
+| ≥90% | Proceed with implementation |
+| 70-89% | Present alternatives, ask questions |
+| <70% | STOP - Request more context |
 
-**Test Results** (2026-01-05):
-- Precision: 1.000 (no false positives)
-- Recall: 1.000 (no false negatives)
-- 63/63 test cases passed
+**Test Results** (2026-01-05): 63/63 passed, Precision: 1.000, Recall: 1.000
 
 ## When to Use
 
-Use this skill BEFORE implementing any task to ensure:
-- No duplicate implementations exist
-- Architecture compliance verified
-- Official documentation reviewed
-- Working OSS implementations found
-- Root cause properly identified
+Use this skill BEFORE implementing any task. The 5 checks verify:
 
-## Confidence Assessment Criteria
+| Check | Weight | What It Validates |
+|-------|--------|-------------------|
+| No Duplicates | 25% | No existing similar functionality in codebase |
+| Architecture | 25% | Uses existing tech stack (not reinventing) |
+| Official Docs | 20% | Documentation reviewed (Context7 MCP) |
+| OSS Reference | 15% | Working implementations found (Tavily MCP) |
+| Root Cause | 15% | Problem source identified with evidence |
 
-Calculate confidence score (0.0 - 1.0) based on 5 checks:
+## Confidence Assessment
 
-### 1. No Duplicate Implementations? (25%)
+### Check 1: No Duplicate Implementations (25%)
 
-**Check**: Search codebase for existing functionality
-
-```bash
-# Use Grep to search for similar functions
-# Use Glob to find related modules
-```
-
-✅ Pass if no duplicates found
-❌ Fail if similar implementation exists
-
-### 2. Architecture Compliance? (25%)
-
-**Check**: Verify tech stack alignment
-
-- Read `CLAUDE.md`, `PLANNING.md`
-- Confirm existing patterns used
-- Avoid reinventing existing solutions
-
-✅ Pass if uses existing tech stack (e.g., Supabase, UV, pytest)
-❌ Fail if introduces new dependencies unnecessarily
-
-### 3. Official Documentation Verified? (20%)
-
-**Check**: Review official docs before implementation
-
-- Use Context7 MCP for official docs
-- Use WebFetch for documentation URLs
-- Verify API compatibility
-
-✅ Pass if official docs reviewed
-❌ Fail if relying on assumptions
-
-### 4. Working OSS Implementations Referenced? (15%)
-
-**Check**: Find proven implementations
-
-- Use Tavily MCP or WebSearch
-- Search GitHub for examples
-- Verify working code samples
-
-✅ Pass if OSS reference found
-❌ Fail if no working examples
-
-### 5. Root Cause Identified? (15%)
-
-**Check**: Understand the actual problem
-
-- Analyze error messages
-- Check logs and stack traces
-- Identify underlying issue
-
-✅ Pass if root cause clear
-❌ Fail if symptoms unclear
-
-## Confidence Score Calculation
+**Tools**: Grep, Glob, Serena find_symbol
 
 ```
-Total = Check1 (25%) + Check2 (25%) + Check3 (20%) + Check4 (15%) + Check5 (15%)
-
-If Total >= 0.90:  ✅ Proceed with implementation
-If Total >= 0.70:  ⚠️  Present alternatives, ask questions
-If Total < 0.70:   ❌ STOP - Request more context
+Search codebase for:
+- Existing similar functions/modules
+- Helper functions solving same problem
+- Libraries providing functionality
 ```
+
+### Check 2: Architecture Compliance (25%)
+
+**Reference**: CLAUDE.md, PLANNING.md, pyproject.toml, package.json
+
+```
+Verify solution uses existing stack:
+- Supabase project → Use Supabase APIs (not custom)
+- Next.js project → Use Next.js patterns
+- pytest project → Use pytest fixtures
+```
+
+### Check 3: Official Documentation (20%)
+
+**Tools**: Context7 MCP, WebFetch
+
+```
+Query Context7 for:
+- Framework documentation
+- API references
+- Best practices
+```
+
+### Check 4: OSS Reference (15%)
+
+**Tools**: Tavily MCP, WebSearch
+
+```
+Search for:
+- Similar open-source solutions
+- Reference implementations
+- Community best practices
+```
+
+### Check 5: Root Cause Identified (15%)
+
+**Verification**:
+- Problem source pinpointed (not guessing)
+- Solution addresses root cause (not symptoms)
+- Evidence supports conclusion
 
 ## Output Format
 
@@ -118,30 +106,30 @@ If Total < 0.70:   ❌ STOP - Request more context
 ✅ High confidence - Proceeding to implementation
 ```
 
-## Implementation Details
+## TypeScript Implementation
 
-The TypeScript implementation is in `confidence.ts` (same directory):
+Located in `confidence.ts` (same directory).
 
-### Core API
+### Interfaces
 
 ```typescript
-import { ConfidenceChecker, Context } from './confidence';
-
-const checker = new ConfidenceChecker();
-const confidence = await checker.assess(context);
-
-if (confidence >= 0.9) {
-  // High confidence - proceed immediately
-} else if (confidence >= 0.7) {
-  // Medium confidence - present options to user
-} else {
-  // Low confidence - STOP and request clarification
+interface CheckerOptions {
+  silent?: boolean;  // Suppress console output
 }
-```
 
-### Context Interface
+interface CheckResult {
+  name: string;
+  passed: boolean;
+  message: string;
+  weight: number;
+}
 
-```typescript
+interface ConfidenceResult {
+  score: number;
+  checks: CheckResult[];
+  recommendation: string;
+}
+
 interface Context {
   task?: string;
   test_file?: string;
@@ -153,26 +141,88 @@ interface Context {
   oss_reference_complete?: boolean;
   root_cause_identified?: boolean;
   confidence_checks?: string[];
+  [key: string]: any;  // Extensible
 }
 ```
 
-### Recommendation Helper
+### Usage
 
 ```typescript
-const recommendation = checker.getRecommendation(confidence);
-// ✅ High confidence (≥90%) - Proceed with implementation
-// ⚠️ Medium confidence (70-89%) - Continue investigation
-// ❌ Low confidence (<70%) - STOP and continue investigation loop
+import { ConfidenceChecker } from './confidence';
+
+const checker = new ConfidenceChecker();
+const result = await checker.assess(context);
+
+if (result.score >= 0.9) {
+  // High confidence - proceed
+} else if (result.score >= 0.7) {
+  // Medium - present options
+} else {
+  // Low - STOP and investigate
+}
+
+// Get recommendation text
+const recommendation = checker.getRecommendation(result.score);
 ```
 
-### Note
+## Python Implementation
 
-Python implementation (`pm_agent/confidence.py`) also available for pytest integration, but CLI commands disabled in favor of skill-based approach.
+Located in `src/superclaude/pm_agent/confidence.py`. More feature-rich with:
+
+- **Protocol-based extensibility**: Custom checks via `ConfidenceCheck` protocol
+- **Async support**: `assess_async()` for MCP integration
+- **Pluggable registry**: `register_check()`, `unregister_check()`
+- **Comparison operators**: `result >= 0.9` works directly
+
+### Pytest Integration
+
+```python
+import pytest
+
+@pytest.mark.confidence_check
+def test_feature(confidence_checker):
+    """confidence_checker fixture auto-injected"""
+    context = {
+        "test_name": "test_feature",
+        "duplicate_check_complete": True,
+        "architecture_check_complete": True,
+        "official_docs_verified": True,
+        "oss_reference_complete": True,
+        "root_cause_identified": True,
+    }
+    result = confidence_checker.assess(context)
+    assert result >= 0.9
+```
+
+### Custom Check Registration
+
+```python
+from superclaude.pm_agent.confidence import ConfidenceChecker
+
+class CustomCheck:
+    name = "custom_check"
+    weight = 0.1
+
+    def evaluate(self, context):
+        passed = context.get("custom_flag", False)
+        return passed, "Custom check" if passed else "Custom check failed"
+
+checker = ConfidenceChecker(register_defaults=True)
+checker.register_check(CustomCheck())
+```
+
+## MCP Integration
+
+| MCP | Role | Fallback |
+|-----|------|----------|
+| Context7 | Official docs lookup (Check 3) | WebFetch |
+| Tavily | OSS implementation search (Check 4) | WebSearch |
+| Serena | Symbol-level duplicate detection (Check 1) | Grep/Glob |
 
 ## ROI
 
-**Token Savings**: Spend 100-200 tokens on confidence check to save 5,000-50,000 tokens on wrong-direction work.
+**Token Savings**: 100-200 tokens on check → saves 5,000-50,000 tokens on wrong-direction work (25-250x ROI)
 
-**Success Rate**: 100% precision and recall in production testing.
+**Success Rate**: 100% precision and recall in production testing
 
 </document>
