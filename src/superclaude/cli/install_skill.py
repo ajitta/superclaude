@@ -47,9 +47,13 @@ def install_skill_command(
     if skill_target.exists() and force:
         shutil.rmtree(skill_target)
 
-    # Copy skill files
+    # Copy skill files (exclude Python package artifacts)
     try:
-        shutil.copytree(skill_source, skill_target)
+        shutil.copytree(
+            skill_source,
+            skill_target,
+            ignore=shutil.ignore_patterns("__init__.py", "__pycache__", "*.pyc"),
+        )
         return True, f"Skill '{skill_name}' installed successfully to {skill_target}"
     except Exception as e:
         return False, f"Failed to install skill: {e}"
