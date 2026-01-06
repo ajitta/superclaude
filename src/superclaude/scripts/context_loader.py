@@ -29,8 +29,27 @@ SESSION_ID = hashlib.md5(os.getcwd().encode()).hexdigest()[:8]
 CACHE_FILE = Path(tempfile.gettempdir()) / f"claude_context_{SESSION_ID}.txt"
 
 # Base path for context files
-# Install adjusts this to: .claude/superclaude
-BASE_PATH = Path(os.environ.get("SUPERCLAUDE_PATH", ".claude/superclaude"))
+def _get_base_path() -> Path:
+    """
+    Get base path for context files.
+
+    Priority:
+    1. SUPERCLAUDE_PATH environment variable (explicit override)
+    2. Project-local: ./.claude/superclaude (if exists)
+    3. User scope: ~/.claude/superclaude (default)
+    """
+    if os.environ.get("SUPERCLAUDE_PATH"):
+        return Path(os.environ["SUPERCLAUDE_PATH"])
+
+    # Check project-local first
+    project_path = Path.cwd() / ".claude" / "superclaude"
+    if project_path.exists():
+        return project_path
+
+    # Fall back to user scope
+    return Path.home() / ".claude" / "superclaude"
+
+BASE_PATH = _get_base_path()
 
 # Trigger → File mapping with priority (lower = higher priority)
 # Format: (regex_pattern, relative_path, priority)
