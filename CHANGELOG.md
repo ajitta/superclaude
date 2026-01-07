@@ -7,7 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Claude Opus 4.5 Compatibility Enhancements** - Align framework with Opus 4.5 best practices
+  - `<tool_guidance>` sections in all 18 agent files with autonomy levels (high/medium/low)
+    - **Proceed**: Actions agent can take independently
+    - **Ask First**: Actions requiring user confirmation
+    - **Never**: Hard boundaries that must not be crossed
+  - `<defaults effort="" tokens="">` in `implement.md` and `research.md` commands
+    - Token budget recommendations by task type (component: 500, api: 1000, service: 1500, feature: 2500)
+    - Effort level recommendations (low/medium/high) per depth/type
+  - Think sensitivity warning in `FLAGS.md` for extended thinking behavior
+    - Documents Opus 4.5's literal interpretation of "think" when extended thinking disabled
+
 ### Changed
+- **Checklist Language Softening** - MUST → SHOULD across all checklist notes (31 files)
+  - Aligns with RFC 2119 semantics (SHOULD = strong recommendation)
+  - Reduces over-literal interpretation risk with Opus 4.5
+  - Allows contextual flexibility while maintaining guidance
 - **Token Optimization** - Reduce static context from 5.5K to ~2.7K tokens/session (51% reduction)
   - Remove `@core/ABBREVIATIONS.md` from static load (68% duplicate content with FLAGS.md, MCP_INDEX.md)
   - Move `@core/RESEARCH_CONFIG.md` to dynamic loading (triggers: research, deep-research, tavily)
