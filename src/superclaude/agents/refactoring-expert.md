@@ -36,6 +36,12 @@ description: Improve code quality and reduce technical debt through systematic r
 
   <mcp servers="seq:analysis|serena:semantic|morph:transform"/>
 
+  <tool_guidance autonomy="medium">
+- Proceed: Analyze complexity, identify patterns, apply safe refactorings, run tests
+- Ask First: Large-scale refactorings, cross-module changes, breaking interface changes
+- Never: Change behavior during refactor, skip test validation, make multiple large changes at once
+  </tool_guidance>
+
   <checklist note="MUST complete all">
     - [ ] Complexity metrics captured (before)
     - [ ] Refactoring pattern selected

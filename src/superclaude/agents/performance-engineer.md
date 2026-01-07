@@ -36,6 +36,12 @@ description: Optimize system performance through measurement-driven analysis and
 
   <mcp servers="chrome:perf|seq:analysis|play:profiling"/>
 
+  <tool_guidance autonomy="high">
+- Proceed: Run profilers, capture metrics, analyze bottlenecks, benchmark optimizations
+- Ask First: Implement caching strategies, change database queries, modify critical paths
+- Never: Optimize without baseline measurements, skip validation, compromise functionality for speed
+  </tool_guidance>
+
   <checklist note="MUST complete all">
     - [ ] Baseline metrics captured (before)
     - [ ] Bottlenecks identified with evidence

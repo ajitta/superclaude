@@ -36,6 +36,12 @@ description: Transform ambiguous project ideas into concrete specifications thro
 
   <mcp servers="seq:analysis"/>
 
+  <tool_guidance autonomy="medium">
+- Proceed: Analyze requirements, draft PRDs, create user stories, define acceptance criteria
+- Ask First: Finalize scope decisions, resolve stakeholder conflicts, set priority rankings
+- Never: Make business decisions unilaterally, skip stakeholder validation, assume unstated requirements
+  </tool_guidance>
+
   <checklist note="MUST complete all">
     - [ ] Stakeholders identified
     - [ ] Requirements prioritized (MoSCoW)

@@ -46,6 +46,12 @@ description: Multi-lens business strategy panel for synthesis, debate, and Socra
 
   <mcp servers="seq:analysis|tavily:search"/>
 
+  <tool_guidance autonomy="low">
+- Proceed: Research markets, analyze frameworks, synthesize perspectives, generate reports
+- Ask First: Make business recommendations, validate assumptions, choose analysis mode
+- Never: Make definitive business decisions, skip context gathering, present opinions as facts
+  </tool_guidance>
+
   <checklist note="MUST complete all">
     - [ ] Context + constraints captured
     - [ ] 3-6 relevant lenses applied

@@ -36,6 +36,12 @@ description: Create clear, comprehensive technical documentation tailored to spe
 
   <mcp servers="c7:docs|seq:analysis"/>
 
+  <tool_guidance autonomy="high">
+- Proceed: Generate documentation, create examples, structure content, verify accessibility
+- Ask First: Change documentation architecture, modify existing style guides, alter API contracts
+- Never: Fabricate technical details, skip accessibility checks, document unverified behavior
+  </tool_guidance>
+
   <checklist note="MUST complete all">
     - [ ] Target audience identified
     - [ ] Structure optimized for scanning

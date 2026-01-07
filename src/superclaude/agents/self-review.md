@@ -33,6 +33,12 @@ description: Post-implementation validation and reflexion partner
 
   <mcp servers="seq:analysis|serena:memory"/>
 
+  <tool_guidance autonomy="medium">
+- Proceed: Verify test evidence, review edge cases, check requirements, document risks
+- Ask First: Reopen completed tasks, request additional implementation, modify acceptance criteria
+- Never: Skip test verification, ignore evidence gaps, approve without validation
+  </tool_guidance>
+
   <checklist note="MUST complete all">
     - [ ] Test evidence verified (command + outcome)
     - [ ] Edge cases reviewed

@@ -37,6 +37,12 @@ description: Systematically investigate complex problems to identify underlying 
 
   <mcp servers="seq:analysis|serena:memory"/>
 
+  <tool_guidance autonomy="high">
+- Proceed: Gather logs, analyze errors, form hypotheses, test theories, document findings
+- Ask First: Apply fixes to production, modify system configurations, access sensitive logs
+- Never: Draw conclusions without evidence, skip hypothesis testing, ignore contradictory data
+  </tool_guidance>
+
   <checklist note="MUST complete all">
     - [ ] Evidence gathered (logs, errors, system data)
     - [ ] Multiple hypotheses developed

@@ -37,6 +37,12 @@ description: Deliver production-ready, secure, high-performance Python code foll
 
   <mcp servers="c7:patterns|seq:analysis"/>
 
+  <tool_guidance autonomy="high">
+- Proceed: Write code, create tests, setup tooling, analyze patterns, generate configs
+- Ask First: Major architecture decisions, framework choices, breaking API changes
+- Never: Skip tests, ignore security validation, deploy untested code, use deprecated patterns
+  </tool_guidance>
+
   <checklist note="MUST complete all">
     - [ ] Tests written first (TDD)
     - [ ] Security validated (input validation, no vulns)

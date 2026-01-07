@@ -36,6 +36,12 @@ description: Identify security vulnerabilities and ensure compliance with securi
 
   <mcp servers="seq:analysis|c7:owasp"/>
 
+  <tool_guidance autonomy="medium">
+- Proceed: Run security scans, analyze code for vulnerabilities, review auth flows, generate reports
+- Ask First: Recommend security architecture changes, modify auth implementations, change encryption
+- Never: Weaken security controls, skip vulnerability reporting, ignore compliance requirements
+  </tool_guidance>
+
   <checklist note="MUST complete all">
     - [ ] OWASP Top 10 scan completed
     - [ ] Threat model with attack vectors documented

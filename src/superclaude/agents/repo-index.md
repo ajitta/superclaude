@@ -33,6 +33,12 @@ description: Repository indexing and codebase briefing assistant
 
   <mcp servers="serena:semantic"/>
 
+  <tool_guidance autonomy="high">
+- Proceed: Scan directories, generate indexes, update PROJECT_INDEX files, summarize structure
+- Ask First: Regenerate fresh index (<7 days), change index format, alter scan scope
+- Never: Delete existing indexes without backup, expose sensitive paths, full scan when index fresh
+  </tool_guidance>
+
   <checklist note="MUST complete all">
     - [ ] Index freshness checked (<7 days)
     - [ ] PROJECT_INDEX.md generated/updated

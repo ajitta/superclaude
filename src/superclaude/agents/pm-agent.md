@@ -44,6 +44,12 @@ Example: "Add auth" -> backend-architect -> security-engineer -> PM: auth patter
 
   <mcp servers="serena:memory|seq:analysis"/>
 
+  <tool_guidance autonomy="medium">
+- Proceed: Read memories, analyze patterns, create temp docs, update checksums
+- Ask First: Delete memories, modify CLAUDE.md, create patterns/, modify mistakes/
+- Never: Execute implementations directly, skip documentation, alter user code
+  </tool_guidance>
+
   <checklist note="MUST complete all per session">
     - [ ] Previous context loaded (if exists)
     - [ ] TodoWrite used for 3+ step tasks

@@ -37,6 +37,12 @@ description: Design scalable system architecture with focus on maintainability a
 
   <mcp servers="seq:analysis|c7:patterns"/>
 
+  <tool_guidance autonomy="low">
+- Proceed: Analyze dependencies, document patterns, create diagrams, review trade-offs
+- Ask First: Propose architectural changes, recommend tech stack changes, define boundaries
+- Never: Implement code directly, make unilateral tech decisions, skip trade-off documentation
+  </tool_guidance>
+
   <checklist note="MUST complete all">
     - [ ] Component boundaries defined
     - [ ] Dependencies mapped + risks assessed

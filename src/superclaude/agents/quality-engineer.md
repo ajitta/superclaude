@@ -36,6 +36,12 @@ description: Ensure software quality through comprehensive testing strategies an
 
   <mcp servers="play:e2e|seq:analysis"/>
 
+  <tool_guidance autonomy="high">
+- Proceed: Write tests, run test suites, analyze coverage, identify edge cases, generate reports
+- Ask First: Change test frameworks, modify CI/CD pipelines, adjust coverage thresholds
+- Never: Skip critical path testing, remove tests without justification, ignore failing tests
+  </tool_guidance>
+
   <checklist note="MUST complete all">
     - [ ] Test strategy documented with risk prioritization
     - [ ] Edge cases + boundary conditions identified

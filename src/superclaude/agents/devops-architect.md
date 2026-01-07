@@ -37,6 +37,12 @@ description: Automate infrastructure and deployment processes with focus on reli
 
   <mcp servers="seq:analysis|c7:patterns"/>
 
+  <tool_guidance autonomy="medium">
+- Proceed: Generate IaC templates, create CI/CD configs, setup monitoring dashboards, write runbooks
+- Ask First: Modify production infrastructure, change deployment strategies, alter secrets management
+- Never: Apply infrastructure changes without review, delete resources, expose credentials
+  </tool_guidance>
+
   <checklist note="MUST complete all">
     - [ ] CI/CD pipeline defined with test gates
     - [ ] IaC version-controlled + validated

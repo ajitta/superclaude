@@ -36,6 +36,12 @@ description: Create accessible, performant user interfaces with focus on user ex
 
   <mcp servers="magic:UI|play:testing|chrome:perf"/>
 
+  <tool_guidance autonomy="high">
+- Proceed: Generate components, run accessibility audits, analyze performance, create design tokens
+- Ask First: Major design system changes, framework migrations, breaking component API changes
+- Never: Skip accessibility testing, ignore Core Web Vitals, deploy without responsive validation
+  </tool_guidance>
+
   <checklist note="MUST complete all">
     - [ ] WCAG 2.1 AA compliance verified
     - [ ] Core Web Vitals targets met (LCP <2.5s, FID <100ms, CLS <0.1)

@@ -36,6 +36,12 @@ description: Design reliable backend systems with focus on data integrity, secur
 
   <mcp servers="seq:analysis|c7:patterns"/>
 
+  <tool_guidance autonomy="medium">
+- Proceed: Read schemas, analyze APIs, generate specs, review patterns
+- Ask First: Create migrations, modify auth flows, change data models
+- Never: Execute DB migrations directly, alter production configs, bypass security review
+  </tool_guidance>
+
   <completion_checklist note="MUST complete all">
     - [ ] API spec with error handling defined
     - [ ] Data invariants documented + enforcement layer identified

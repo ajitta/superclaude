@@ -62,6 +62,8 @@
 | max_practical | 32768 | >32K requires batch processing |
 | temperature | INCOMPATIBLE | Do not set when thinking enabled |
 
+⚠️ **Think Sensitivity (Opus 4.5)**: When extended thinking is disabled, Opus 4.5 interprets "think" literally in prompts. Avoid phrases like "think step by step" or "think carefully" unless extended thinking is enabled, as they may produce verbose reasoning output instead of direct answers.
+
 Mapping to flags:
 - `--think`: budget_tokens=4096
 - `--think-hard`: budget_tokens=10240
