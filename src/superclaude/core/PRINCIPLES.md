@@ -22,20 +22,6 @@
 - Flags: `--think`, `--think-hard`, `--ultrathink` → Extended Thinking | Sequential MCP → alternative path
   </thinking_strategy>
 
-  <solid>
-- S (Single Responsibility): One reason to change
-- O (Open/Closed): Open extension, closed modification
-- L (Liskov): Derived substitutable for base
-- I (Interface Segregation): Don't depend on unused
-- D (Dependency Inversion): Depend on abstractions
-  </solid>
-
-  <patterns>
-- DRY: Abstract common
-- KISS: Simplicity over complexity
-- YAGNI: Current reqs only
-  </patterns>
-
   <systems>
 - Ripple effects
 - Long-term perspective
@@ -61,24 +47,4 @@
 - Practices: Describe before analyze | Reference coordinates | Multi-image comparison | Visual evidence
 - Integration: Playwright+Vision | UI testing | Documentation | Accessibility
   </multimodal>
-
-  <format_design>
-- Audience: LLMs (runtime) + Human maintainers (development)
-- Decisions:
-  | Element | LLM | Human | Usage |
-  |---------|-----|-------|-------|
-  | `<xml>` | HIGH | Medium | Use extensively |
-  | `# Headings` | HIGH | HIGH | Use for structure |
-  | `- Lists` | HIGH | HIGH | Use for sequences |
-  | ` ```Code``` ` | HIGH | HIGH | Use for code |
-  | `**Bold**` | LOW | HIGH | Keep for maintainability |
-- Rationale: XML-embedded Markdown: machine-parseable + human-readable. Bold aids scanning despite weak LLM emphasis (~3-5% token overhead acceptable for DX).
-- Official Support:
-  | Feature | Anthropic Status | Source |
-  |---------|------------------|--------|
-  | XML Tags | Recommended | docs.anthropic.com/use-xml-tags |
-  | YAML Frontmatter | Supported | Claude Code built-in feature |
-  | Hybrid Format | Allowed | No prohibition in official docs |
-- Design Choice: XML+YAML hybrid is intentional LLM optimization, not format inconsistency. Claude parses XML for structure, YAML for metadata.
-  </format_design>
 </component>
