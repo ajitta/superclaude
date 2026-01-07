@@ -39,11 +39,10 @@
   <fallbacks>
 | Primary | Fallback |
 |---------|----------|
-| Tavily | WebSearch |
+| Tavily | WebSearch (native) |
 | Context7 | Tavily |
 | Sequential | Native |
-| Playwright | Claude in Chrome (native) |
-| Claude in Chrome | Playwright |
+| Playwright | Chrome (native --chrome) |
 | Serena | Native search |
 | Morphllm | Native edit |
 | Magic | Native coding |
@@ -51,4 +50,11 @@
 | Mindbase | Serena |
 | Airis-Agent | Native |
   </fallbacks>
+
+  <native_features note="Built-in Claude Code capabilities, not MCP">
+| Feature | Flag | Use Case |
+|---------|------|----------|
+| Chrome Automation | --chrome | Live browser, auth sessions, GIF recording |
+| Web Search | (none) | Fact-check, current info |
+  </native_features>
 </component>

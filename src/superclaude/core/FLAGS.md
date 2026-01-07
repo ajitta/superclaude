@@ -1,6 +1,6 @@
 <component name="flags" type="core" priority="high">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
-  <triggers>flag|--|mode|mcp|think|effort|delegate</triggers>
+  <triggers>flag|--|mode|mcp|think|effort|delegate|--chrome|native</triggers>
 
   <role>
     <mission>Behavioral flags for Claude Code execution modes and tool selection</mission>
@@ -29,8 +29,15 @@
 | `--tavily` | web search, real-time info | Tavily: web search |
 | `--frontend-verify` | UI testing, frontend debug | Playwright + DevTools + Serena |
 | `--all-mcp` | max complexity | Enable all MCP servers |
-| `--no-mcp` | native-only, perf priority | Disable all MCP, use native + WebSearch |
+| `--no-mcp` | native-only, perf priority | Disable all MCP, use native + WebSearch + Chrome |
   </mcp>
+
+  <native note="Built-in Claude Code features">
+| Flag | Trigger | Effect |
+|------|---------|--------|
+| `--chrome` | live browser, auth sessions, interactive | Native Chrome automation |
+| WebSearch | fact-check, current info | Native web search (no flag needed) |
+  </native>
 
   <analysis>
 | Flag | Trigger | Effect |

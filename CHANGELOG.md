@@ -15,18 +15,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - **3-Tier Browser Automation Hierarchy** - Clear role separation for browser tools
-  1. **Native**: Claude in Chrome (`/chrome`) - authenticated apps, live debugging, GIF recording
+  1. **Native**: Claude in Chrome (`--chrome`) - authenticated apps, live debugging, GIF recording
   2. **E2E Testing**: Playwright (`--play`) - CI/CD, headless, cross-browser testing
   3. **Performance**: DevTools (`--perf`) - Core Web Vitals, memory profiling, metrics
-- **MCP_Claude-Chrome.md** - Documentation for native Claude in Chrome capabilities
-  - Tool reference for `mcp__claude-in-chrome__*` functions
-  - Use case examples and decision matrix
+- **`--chrome` flag** - Trigger native Chrome automation
+- **`<native>` section in FLAGS.md** - Document built-in Claude Code features (Chrome, WebSearch)
 - Updated `MCP_INDEX.md` decision flow with native Chrome step
-- Updated fallback chain: Playwright ↔ Claude in Chrome bidirectional
+- Updated fallback chain: Playwright → Chrome (native)
 
 ### Removed
 - `--chrome` trigger from DevTools MCP (freed for native Claude Code usage)
 - Generic "debug", "console", "network" triggers from DevTools (now handled by native Chrome)
+- **MCP_Claude-Chrome.md** - Removed redundant MCP doc (Chrome is native, not MCP)
 
 ## [4.2.1] - 2026-01-05
 
