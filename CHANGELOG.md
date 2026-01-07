@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
+- **Token Optimization** - Reduce static context from 5.5K to 4.2K tokens/session (73% reduction)
+  - Remove `@core/ABBREVIATIONS.md` from static load (68% duplicate content with FLAGS.md, MCP_INDEX.md)
+  - Strip `CLAUDE_SC.md` to @-references only (24 lines → 6 lines)
+  - Remove hardcoded `<runtime model="opus-4-5"/>` from 50 command/agent files
+  - Add `<persona_index>` to `MODE_INDEX.md` (preserve unique agent abbreviations)
 - **Browser Tools Refactor** - Resolve `--chrome` flag conflict with Claude Code native
   - Renamed `--chrome` flag to `--perf` for Chrome DevTools MCP (avoids collision with native `/chrome`)
   - `--devtools` flag remains as alternative
