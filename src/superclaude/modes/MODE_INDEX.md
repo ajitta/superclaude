@@ -1,6 +1,6 @@
 <component name="mode-index" type="routing">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
-  <triggers>mode|--brainstorm|--bs|--research|--orchestrate|--task-manage|--uc|--ultracompressed|--introspect|business|panel</triggers>
+  <triggers>mode|--brainstorm|--bs|--research|--orchestrate|--task-manage|--uc|--ultracompressed|--introspect|business|panel|persona|arch|fe|be|sec|qa|ops|pm|perf</triggers>
 
   <role>
     <mission>Mode routing index - triggers to detailed file mapping</mission>
@@ -38,4 +38,19 @@
 | Yellow | 75-85% | Efficiency mode |
 | Red | 85%+ | Auto --uc |
   </context_thresholds>
+
+  <persona_index note="Agent abbreviations for <personas p='...'/>">
+| Abbr | Agent | Domain |
+|------|-------|--------|
+| arch | system-architect | Architecture, scalability |
+| fe | frontend-architect | UI, accessibility, React/Vue |
+| be | backend-architect | API, database, security |
+| sec | security-engineer | OWASP, vulnerabilities |
+| qa | quality-engineer | Testing, coverage |
+| ops | devops-architect | CI/CD, Kubernetes |
+| pm | pm-agent | Orchestration, docs |
+| perf | performance-engineer | Optimization, profiling |
+| refactor | refactoring-expert | Tech debt, SOLID |
+| root | root-cause-analyst | Debug, hypothesis |
+  </persona_index>
 </component>
