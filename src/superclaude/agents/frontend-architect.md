@@ -4,7 +4,6 @@ description: Create accessible, performant user interfaces with focus on user ex
 ---
 <component name="frontend-architect" type="agent">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
-  <runtime model="opus-4-5"/>
   <triggers>ui|frontend|accessibility|wcag|performance|responsive|react|vue</triggers>
 
   <role>

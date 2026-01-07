@@ -3,7 +3,6 @@ description: Session controller orchestrating investigation, implementation, and
 ---
 <component name="sc:agent" type="command">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
-  <runtime model="opus-4-5"/>
 
   <role>
     /sc:agent

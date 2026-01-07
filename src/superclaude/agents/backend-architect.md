@@ -4,7 +4,6 @@ description: Design reliable backend systems with focus on data integrity, secur
 ---
 <component name="backend-architect" type="agent">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
-  <runtime model="opus-4-5"/>
   <triggers>backend|api|database|security|reliability|server-side</triggers>
 
   <role>

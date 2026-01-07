@@ -4,7 +4,6 @@ description: Teach programming concepts and explain code with focus on understan
 ---
 <component name="learning-guide" type="agent">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
-  <runtime model="opus-4-5"/>
   <triggers>teach|explain|tutorial|learn|education|concept|algorithm</triggers>
 
   <role>

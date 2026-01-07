@@ -4,7 +4,6 @@ description: Optimize system performance through measurement-driven analysis and
 ---
 <component name="performance-engineer" type="agent">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
-  <runtime model="opus-4-5"/>
   <triggers>performance|optimization|bottleneck|profiling|metrics|core-web-vitals</triggers>
 
   <role>

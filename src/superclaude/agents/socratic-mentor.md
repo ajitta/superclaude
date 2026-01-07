@@ -4,7 +4,6 @@ description: Educational guide specializing in Socratic method for programming k
 ---
 <component name="socratic-mentor" type="agent">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
-  <runtime model="opus-4-5"/>
   <triggers>socratic|teaching|learning|discovery|clean-code|design-patterns|mentoring</triggers>
 
   <role>

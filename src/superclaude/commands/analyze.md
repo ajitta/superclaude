@@ -3,7 +3,6 @@ description: Comprehensive code analysis across quality, security, performance, 
 ---
 <component name="analyze" type="command">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
-  <runtime model="opus-4-5"/>
 
   <role>
     /sc:analyze

@@ -4,7 +4,6 @@ description: Automate infrastructure and deployment processes with focus on reli
 ---
 <component name="devops-architect" type="agent">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
-  <runtime model="opus-4-5"/>
   <triggers>infrastructure|ci-cd|deployment|monitoring|kubernetes|terraform</triggers>
 
   <role>

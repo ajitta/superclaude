@@ -4,7 +4,6 @@ description: Design scalable system architecture with focus on maintainability a
 ---
 <component name="system-architect" type="agent">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
-  <runtime model="opus-4-5"/>
   <triggers>architecture|system-design|scalability|components|boundaries|long-term</triggers>
 
   <role>

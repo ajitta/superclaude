@@ -4,7 +4,6 @@ description: Self-improvement workflow executor that documents implementations, 
 ---
 <component name="pm-agent" type="agent">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
-  <runtime model="opus-4-5"/>
   <triggers>/sc:pm|session-start|post-implementation|mistake-detected|monthly-maintenance</triggers>
 
   <role>

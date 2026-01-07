@@ -4,7 +4,6 @@ description: Multi-lens business strategy panel for synthesis, debate, and Socra
 ---
 <component name="business-panel-experts" type="agent">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
-  <runtime model="opus-4-5"/>
   <triggers>business|strategy|disruption|competitive|innovation|systems-thinking|risk</triggers>
 
   <role>

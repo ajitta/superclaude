@@ -3,7 +3,6 @@ description: Ultra-intelligent command recommendation engine for optimal SuperCl
 ---
 <component name="recommend" type="command">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
-  <runtime model="opus-4-5"/>
 
   <role>
     /sc:recommend

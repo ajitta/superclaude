@@ -4,7 +4,6 @@ description: Repository indexing and codebase briefing assistant
 ---
 <component name="repo-index" type="agent">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
-  <runtime model="opus-4-5"/>
   <triggers>index|repository|codebase|structure|discovery|project-index</triggers>
 
   <role>

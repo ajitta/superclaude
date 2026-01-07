@@ -3,7 +3,6 @@ description: Feature and code implementation with intelligent persona activation
 ---
 <component name="implement" type="command">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
-  <runtime model="opus-4-5"/>
 
   <role>
     /sc:implement
