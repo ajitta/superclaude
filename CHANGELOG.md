@@ -5,6 +5,29 @@ All notable changes to SuperClaude will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+- **Browser Tools Refactor** - Resolve `--chrome` flag conflict with Claude Code native
+  - Renamed `--chrome` flag to `--perf` for Chrome DevTools MCP (avoids collision with native `/chrome`)
+  - `--devtools` flag remains as alternative
+  - DevTools MCP refocused on performance metrics (CLS, LCP, Core Web Vitals)
+
+### Added
+- **3-Tier Browser Automation Hierarchy** - Clear role separation for browser tools
+  1. **Native**: Claude in Chrome (`/chrome`) - authenticated apps, live debugging, GIF recording
+  2. **E2E Testing**: Playwright (`--play`) - CI/CD, headless, cross-browser testing
+  3. **Performance**: DevTools (`--perf`) - Core Web Vitals, memory profiling, metrics
+- **MCP_Claude-Chrome.md** - Documentation for native Claude in Chrome capabilities
+  - Tool reference for `mcp__claude-in-chrome__*` functions
+  - Use case examples and decision matrix
+- Updated `MCP_INDEX.md` decision flow with native Chrome step
+- Updated fallback chain: Playwright ↔ Claude in Chrome bidirectional
+
+### Removed
+- `--chrome` trigger from DevTools MCP (freed for native Claude Code usage)
+- Generic "debug", "console", "network" triggers from DevTools (now handled by native Chrome)
+
 ## [4.2.1] - 2026-01-05
 
 ### Added
