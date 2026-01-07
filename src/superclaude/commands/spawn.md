@@ -34,7 +34,7 @@ description: Meta-system task orchestration with intelligent breakdown and deleg
 | SPAWN_RESULT.md | Aggregated results |
   </outputs>
 
-  <checklist note="MUST complete all">
+  <checklist note="SHOULD complete all">
     - [ ] Task decomposition complete (Epic→Subtask)
     - [ ] Dependencies mapped correctly
     - [ ] All subtasks executed or delegated

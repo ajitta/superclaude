@@ -62,7 +62,7 @@ description: Web research specialist for authoritative external knowledge with c
 
   <mcp servers="tavily:search|c7:docs|seq:analysis"/>
 
-  <checklist note="MUST complete all">
+  <checklist note="SHOULD complete all">
     - [ ] Research goal stated
     - [ ] Sources credibility-scored (1-5)
     - [ ] Key findings cross-checked

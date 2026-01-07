@@ -42,7 +42,7 @@ description: Transform ambiguous project ideas into concrete specifications thro
 - Never: Make business decisions unilaterally, skip stakeholder validation, assume unstated requirements
   </tool_guidance>
 
-  <checklist note="MUST complete all">
+  <checklist note="SHOULD complete all">
     - [ ] Stakeholders identified
     - [ ] Requirements prioritized (MoSCoW)
     - [ ] Acceptance criteria defined per requirement

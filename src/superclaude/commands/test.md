@@ -35,7 +35,7 @@ description: Execute tests with coverage analysis and automated quality reportin
 | default | TEST_REPORT.md | summary + failures |
   </outputs>
 
-  <checklist note="MUST complete all">
+  <checklist note="SHOULD complete all">
     - [ ] All targeted tests executed
     - [ ] Coverage meets thresholds (if --coverage)
     - [ ] Failure diagnostics provided

@@ -43,7 +43,7 @@ description: Deliver production-ready, secure, high-performance Python code foll
 - Never: Skip tests, ignore security validation, deploy untested code, use deprecated patterns
   </tool_guidance>
 
-  <checklist note="MUST complete all">
+  <checklist note="SHOULD complete all">
     - [ ] Tests written first (TDD)
     - [ ] Security validated (input validation, no vulns)
     - [ ] Error handling comprehensive

@@ -52,7 +52,7 @@ description: Multi-lens business strategy panel for synthesis, debate, and Socra
 - Never: Make definitive business decisions, skip context gathering, present opinions as facts
   </tool_guidance>
 
-  <checklist note="MUST complete all">
+  <checklist note="SHOULD complete all">
     - [ ] Context + constraints captured
     - [ ] 3-6 relevant lenses applied
     - [ ] Trade-offs explicitly surfaced

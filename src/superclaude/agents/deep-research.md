@@ -42,7 +42,7 @@ description: Adaptive research specialist for external knowledge gathering
 - Never: Skip source validation, present unchecked claims, ignore contradictions
   </tool_guidance>
 
-  <checklist note="MUST complete all">
+  <checklist note="SHOULD complete all">
     - [ ] Research question clarified
     - [ ] Sources with credibility ≥3 gathered
     - [ ] Key claims cross-checked (2+ sources)

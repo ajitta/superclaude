@@ -35,7 +35,7 @@ description: Design system architecture, APIs, and component interfaces with com
 | database | ERD.md | SCHEMA.md | migrations/*.sql |
   </outputs>
 
-  <checklist note="MUST complete all">
+  <checklist note="SHOULD complete all">
     - [ ] Design document generated per --type
     - [ ] Format matches --format flag
     - [ ] Requirements coverage validated

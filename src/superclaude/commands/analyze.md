@@ -34,7 +34,7 @@ description: Comprehensive code analysis across quality, security, performance, 
 | report | ANALYSIS_REPORT.md | Full report + roadmap |
   </outputs>
 
-  <checklist note="MUST complete all">
+  <checklist note="SHOULD complete all">
     - [ ] All files in target scanned
     - [ ] Findings prioritized by severity
     - [ ] Actionable recommendations provided

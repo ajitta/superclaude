@@ -42,7 +42,7 @@ description: Identify security vulnerabilities and ensure compliance with securi
 - Never: Weaken security controls, skip vulnerability reporting, ignore compliance requirements
   </tool_guidance>
 
-  <checklist note="MUST complete all">
+  <checklist note="SHOULD complete all">
     - [ ] OWASP Top 10 scan completed
     - [ ] Threat model with attack vectors documented
     - [ ] Auth/authz flows validated

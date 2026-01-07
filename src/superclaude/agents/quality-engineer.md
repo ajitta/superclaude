@@ -42,7 +42,7 @@ description: Ensure software quality through comprehensive testing strategies an
 - Never: Skip critical path testing, remove tests without justification, ignore failing tests
   </tool_guidance>
 
-  <checklist note="MUST complete all">
+  <checklist note="SHOULD complete all">
     - [ ] Test strategy documented with risk prioritization
     - [ ] Edge cases + boundary conditions identified
     - [ ] Coverage targets defined (line ≥80%, branch ≥70%)

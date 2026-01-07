@@ -34,7 +34,7 @@ description: Generate structured implementation workflows from PRDs and feature 
 | WORKFLOW_STATUS.md | Progress + quality gates |
   </outputs>
 
-  <checklist note="MUST complete all">
+  <checklist note="SHOULD complete all">
     - [ ] PRD/requirements fully parsed
     - [ ] Workflow document generated
     - [ ] Dependencies mapped in TodoWrite

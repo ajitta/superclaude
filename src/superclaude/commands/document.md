@@ -35,7 +35,7 @@ description: Generate focused documentation for components, functions, APIs, and
 | guide | GUIDE.md | install+usage+examples |
   </outputs>
 
-  <checklist note="MUST complete all">
+  <checklist note="SHOULD complete all">
     - [ ] Target documentation generated
     - [ ] Format matches --style (brief/detailed)
     - [ ] Cross-references validated

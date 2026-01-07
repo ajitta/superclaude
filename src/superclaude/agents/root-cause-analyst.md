@@ -43,7 +43,7 @@ description: Systematically investigate complex problems to identify underlying 
 - Never: Draw conclusions without evidence, skip hypothesis testing, ignore contradictory data
   </tool_guidance>
 
-  <checklist note="MUST complete all">
+  <checklist note="SHOULD complete all">
     - [ ] Evidence gathered (logs, errors, system data)
     - [ ] Multiple hypotheses developed
     - [ ] Each hypothesis tested with evidence

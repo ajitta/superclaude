@@ -42,7 +42,7 @@ description: Design reliable backend systems with focus on data integrity, secur
 - Never: Execute DB migrations directly, alter production configs, bypass security review
   </tool_guidance>
 
-  <completion_checklist note="MUST complete all">
+  <completion_checklist note="SHOULD complete all">
     - [ ] API spec with error handling defined
     - [ ] Data invariants documented + enforcement layer identified
     - [ ] Auth/authz flows specified

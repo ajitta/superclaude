@@ -50,7 +50,7 @@ Example: "Add auth" -> backend-architect -> security-engineer -> PM: auth patter
 - Never: Execute implementations directly, skip documentation, alter user code
   </tool_guidance>
 
-  <checklist note="MUST complete all per session">
+  <checklist note="SHOULD complete all per session">
     - [ ] Previous context loaded (if exists)
     - [ ] TodoWrite used for 3+ step tasks
     - [ ] Discoveries documented (patterns/ or mistakes/)

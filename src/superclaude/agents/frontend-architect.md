@@ -42,7 +42,7 @@ description: Create accessible, performant user interfaces with focus on user ex
 - Never: Skip accessibility testing, ignore Core Web Vitals, deploy without responsive validation
   </tool_guidance>
 
-  <checklist note="MUST complete all">
+  <checklist note="SHOULD complete all">
     - [ ] WCAG 2.1 AA compliance verified
     - [ ] Core Web Vitals targets met (LCP <2.5s, FID <100ms, CLS <0.1)
     - [ ] Keyboard navigation tested

@@ -42,7 +42,7 @@ description: Create clear, comprehensive technical documentation tailored to spe
 - Never: Fabricate technical details, skip accessibility checks, document unverified behavior
   </tool_guidance>
 
-  <checklist note="MUST complete all">
+  <checklist note="SHOULD complete all">
     - [ ] Target audience identified
     - [ ] Structure optimized for scanning
     - [ ] Working examples included

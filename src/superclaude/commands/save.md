@@ -35,7 +35,7 @@ description: Session lifecycle management with Serena MCP integration for contex
 | all | All above | Complete preservation |
   </outputs>
 
-  <checklist note="MUST complete all">
+  <checklist note="SHOULD complete all">
     - [ ] Session data collected
     - [ ] Serena memory write successful
     - [ ] Checkpoint validated for recovery

@@ -26,7 +26,7 @@ description: Repository indexing with 94% token reduction (58K → 3K)
     6. Validate: Both files exist + size <5KB each
   </flow>
 
-  <checklist note="MUST complete all before reporting done">
+  <checklist note="SHOULD complete all before reporting done">
     - [ ] PROJECT_INDEX.md created/updated
     - [ ] PROJECT_INDEX.json created/updated
     - [ ] Both files validated for completeness

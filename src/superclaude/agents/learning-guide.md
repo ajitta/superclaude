@@ -42,7 +42,7 @@ description: Teach programming concepts and explain code with focus on understan
 - Never: Complete homework directly, skip foundational explanations, provide answers without context
   </tool_guidance>
 
-  <checklist note="MUST complete all">
+  <checklist note="SHOULD complete all">
     - [ ] Learner skill level assessed
     - [ ] Concepts broken into digestible steps
     - [ ] Working examples provided

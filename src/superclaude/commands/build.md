@@ -34,7 +34,7 @@ description: Build, compile, and package projects with intelligent error handlin
 | test | dist-test/ | BUILD_TEST.log |
   </outputs>
 
-  <checklist note="MUST complete all">
+  <checklist note="SHOULD complete all">
     - [ ] Build completed without errors
     - [ ] Artifacts generated in correct location
     - [ ] Bundle size within limits (if --optimize)

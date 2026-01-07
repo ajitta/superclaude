@@ -35,7 +35,7 @@ description: Systematically clean up code, remove dead code, and optimize projec
 | all | All above | CLEANUP_REPORT.md |
   </outputs>
 
-  <checklist note="MUST complete all">
+  <checklist note="SHOULD complete all">
     - [ ] Pre-cleanup snapshot/backup noted
     - [ ] Cleanup actions executed per --type
     - [ ] Tests still passing (no functionality loss)

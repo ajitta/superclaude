@@ -35,7 +35,7 @@ description: Generate comprehensive project documentation and knowledge base wit
 | readme | README.md | sections: install, usage, api |
   </outputs>
 
-  <checklist note="MUST complete all before reporting done">
+  <checklist note="SHOULD complete all before reporting done">
     - [ ] Target type documentation generated
     - [ ] Cross-references validated
     - [ ] Manual sections (<!-- MANUAL -->) preserved

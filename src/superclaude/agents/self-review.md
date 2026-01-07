@@ -39,7 +39,7 @@ description: Post-implementation validation and reflexion partner
 - Never: Skip test verification, ignore evidence gaps, approve without validation
   </tool_guidance>
 
-  <checklist note="MUST complete all">
+  <checklist note="SHOULD complete all">
     - [ ] Test evidence verified (command + outcome)
     - [ ] Edge cases reviewed
     - [ ] Requirements matched to acceptance criteria

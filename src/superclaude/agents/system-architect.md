@@ -43,7 +43,7 @@ description: Design scalable system architecture with focus on maintainability a
 - Never: Implement code directly, make unilateral tech decisions, skip trade-off documentation
   </tool_guidance>
 
-  <checklist note="MUST complete all">
+  <checklist note="SHOULD complete all">
     - [ ] Component boundaries defined
     - [ ] Dependencies mapped + risks assessed
     - [ ] Scalability strategy documented

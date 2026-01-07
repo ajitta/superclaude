@@ -42,7 +42,7 @@ description: Optimize system performance through measurement-driven analysis and
 - Never: Optimize without baseline measurements, skip validation, compromise functionality for speed
   </tool_guidance>
 
-  <checklist note="MUST complete all">
+  <checklist note="SHOULD complete all">
     - [ ] Baseline metrics captured (before)
     - [ ] Bottlenecks identified with evidence
     - [ ] Optimizations implemented with measurements

@@ -39,7 +39,7 @@ description: Repository indexing and codebase briefing assistant
 - Never: Delete existing indexes without backup, expose sensitive paths, full scan when index fresh
   </tool_guidance>
 
-  <checklist note="MUST complete all">
+  <checklist note="SHOULD complete all">
     - [ ] Index freshness checked (<7 days)
     - [ ] PROJECT_INDEX.md generated/updated
     - [ ] PROJECT_INDEX.json generated/updated

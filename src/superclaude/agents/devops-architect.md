@@ -43,7 +43,7 @@ description: Automate infrastructure and deployment processes with focus on reli
 - Never: Apply infrastructure changes without review, delete resources, expose credentials
   </tool_guidance>
 
-  <checklist note="MUST complete all">
+  <checklist note="SHOULD complete all">
     - [ ] CI/CD pipeline defined with test gates
     - [ ] IaC version-controlled + validated
     - [ ] Monitoring + alerting configured
