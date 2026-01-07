@@ -75,7 +75,7 @@ MCP_SERVERS = {
     },
     "chrome-devtools": {
         "name": "chrome-devtools",
-        "description": "Chrome DevTools debugging and performance analysis",
+        "description": "Performance analysis and Core Web Vitals (CLS, LCP, memory profiling). Use --perf or --devtools flag.",
         "transport": "stdio",
         "command": "npx -y chrome-devtools-mcp@latest",
         "required": False,

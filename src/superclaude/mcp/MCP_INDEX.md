@@ -1,6 +1,6 @@
 <component name="mcp-index" type="routing">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
-  <triggers>mcp|tool|--tavily|--c7|--context7|--seq|--sequential|--serena|--magic|--morph|--morphllm|--play|--playwright|--chrome|--devtools|--mindbase|--airis</triggers>
+  <triggers>mcp|tool|--tavily|--c7|--context7|--seq|--sequential|--serena|--magic|--morph|--morphllm|--play|--playwright|--perf|--devtools|--mindbase|--airis</triggers>
 
   <role>
     <mission>MCP routing index - triggers to detailed file mapping</mission>
@@ -17,7 +17,7 @@
 | Morphllm | morphllm, morph, pattern, pattern replace, bulk, bulk edit, edit, transform, style, framework, text-replacement, --morph, --morphllm | MCP_Morphllm.md |
 | Magic | magic, 21st, ui, component, button, form, modal, card, table, nav, /ui, /21, responsive, accessible, ui component, --magic | MCP_Magic.md |
 | Playwright | playwright, browser, browser test, E2E, test, screenshot, validation, accessibility, WCAG, --play, --playwright | MCP_Playwright.md |
-| DevTools | devtools, chrome, performance, performance audit, debug, layout, layout debug, CLS, LCP, console, network, DOM, CSS, --chrome, --devtools | MCP_Chrome-DevTools.md |
+| DevTools | devtools, performance, performance audit, layout, layout debug, CLS, LCP, metrics, core web vitals, --perf, --devtools | MCP_Chrome-DevTools.md |
 | Mindbase | mindbase, memory, conversation, conversation memory, session, semantic, embedding, pgvector, --mindbase | MCP_Mindbase.md |
 | Airis-Agent | airis, confidence, confidence check, research, index, repo index, optimize, sync, --airis | MCP_Airis-Agent.md |
   </mcp_index>
@@ -29,10 +29,11 @@
 4. Symbol ops? → Serena
 5. Bulk edits? → Morphllm
 6. UI components? → Magic
-7. Browser test? → Playwright
-8. Perf debug? → DevTools
-9. Memory/session? → Mindbase
-10. Confidence/index? → Airis-Agent
+7. E2E test? → Playwright
+8. Live browser (authenticated)? → Claude in Chrome (native /chrome)
+9. Performance metrics? → DevTools
+10. Memory/session? → Mindbase
+11. Confidence/index? → Airis-Agent
   </decision_flow>
 
   <fallbacks>
@@ -41,7 +42,8 @@
 | Tavily | WebSearch |
 | Context7 | Tavily |
 | Sequential | Native |
-| Playwright | Tavily |
+| Playwright | Claude in Chrome (native) |
+| Claude in Chrome | Playwright |
 | Serena | Native search |
 | Morphllm | Native edit |
 | Magic | Native coding |

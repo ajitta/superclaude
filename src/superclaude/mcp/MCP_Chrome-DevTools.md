@@ -1,34 +1,39 @@
 <component name="chrome-devtools" type="mcp">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
-  <triggers>performance|debug|layout|CLS|LCP|console|network|DOM|CSS|devtools</triggers>
+  <triggers>performance|layout|CLS|LCP|metrics|core web vitals|devtools|perf</triggers>
 
   <role>
-    <mission>Performance analysis, debugging, and real-time browser inspection</mission>
+    <mission>Performance analysis and Core Web Vitals measurement</mission>
+    <flags>--perf, --devtools</flags>
+    <note>For live debugging with logged-in browser, use Claude in Chrome (native /chrome)</note>
   </role>
 
   <choose>
 Use:
-- Deep performance analysis: Understand performance bottlenecks
-- Live debugging: Inspect runtime page state, debug live issues
-- Network analysis: Inspect requests, CORS errors
+- Core Web Vitals: CLS, LCP, FID, TTFB metrics
+- Performance profiling: CPU, memory, rendering analysis
+- Layout debugging: Layout shift detection, render blocking
+- Performance audit: Lighthouse-style metrics
 
 Avoid:
-- E2E testing: Use Playwright
+- Live browser interaction: Use Claude in Chrome (native /chrome)
+- E2E testing: Use Playwright (--play)
 - Static analysis: Use native Claude
   </choose>
 
   <synergy>
+- Claude in Chrome: Native handles live debugging → DevTools for metrics
+- Playwright: Playwright automates flow → DevTools analyzes performance
 - Sequential: Sequential plans perf strategy → DevTools verifies
-- Playwright: Playwright automates flow → DevTools analyzes
   </synergy>
 
   <examples>
 | Input | Output | Reason |
 |-------|--------|--------|
-| analyze page performance | DevTools | performance analysis |
-| debug layout shift | DevTools | live debugging |
-| network requests failing | DevTools | network analysis |
+| analyze CLS score | DevTools | Core Web Vitals |
+| measure LCP | DevTools | performance metrics |
+| profile memory usage | DevTools | performance profiling |
+| debug live console errors | Claude in Chrome | live browser state |
 | test login flow | Playwright | browser automation |
-| review function logic | Native Claude | static analysis |
   </examples>
 </component>

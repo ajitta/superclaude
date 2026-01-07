@@ -25,7 +25,7 @@
 | `--morph\|--morphllm` | bulk transforms, pattern edits | Morphllm: multi-file patterns |
 | `--serena` | symbol ops, project memory | Serena: semantic understanding |
 | `--play\|--playwright` | browser testing, E2E, visual | Playwright: browser automation |
-| `--chrome\|--devtools` | perf audit, debug, layout | Chrome DevTools: real-time inspection |
+| `--perf\|--devtools` | perf audit, CLS, LCP, metrics | Chrome DevTools: performance analysis |
 | `--tavily` | web search, real-time info | Tavily: web search |
 | `--frontend-verify` | UI testing, frontend debug | Playwright + DevTools + Serena |
 | `--all-mcp` | max complexity | Enable all MCP servers |

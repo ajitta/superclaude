@@ -127,7 +127,7 @@ TRIGGER_MAP = [
         1,
     ),
     (
-        r"(devtools|chrome|performance|performance audit|layout|layout debug|debug|cls|lcp|console|network|dom|css|--chrome|--devtools)",
+        r"(devtools|perf|performance|performance audit|layout|layout debug|cls|lcp|metrics|core web vitals|--perf|--devtools)",
         "mcp/MCP_Chrome-DevTools.md",
         2,
     ),

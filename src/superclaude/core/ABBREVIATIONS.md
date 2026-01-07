@@ -17,7 +17,7 @@
 | morph | Morphllm | MCP_Morphllm.md | pattern, bulk, transform, style |
 | serena | Serena | MCP_Serena.md | symbol, rename, memory, LSP |
 | tavily | Tavily | MCP_Tavily.md | search, research, news, web |
-| chrome | Chrome DevTools | MCP_Chrome-DevTools.md | performance, debug, layout, CLS |
+| devtools | Chrome DevTools | MCP_Chrome-DevTools.md | performance, CLS, LCP, metrics |
 | airis | Airis Agent | MCP_Airis-Agent.md | confidence, index, optimize |
 | mindbase | Mindbase | MCP_Mindbase.md | memory, conversation, embedding |
   </mcp_abbreviations>
