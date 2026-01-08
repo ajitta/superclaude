@@ -1,6 +1,6 @@
 # Project Index: SuperClaude Framework
 
-**Generated**: 2026-01-05
+**Generated**: 2026-01-08
 **Version**: 4.2.1+ajitta
 **Description**: AI-enhanced development framework for Claude Code - pytest plugin with specialized commands, agents, and modes
 
@@ -65,9 +65,11 @@ SuperClaude_Framework/
 - **Source**: `src/superclaude/pytest_plugin.py`
 - **Fixtures**: confidence_checker, self_check_protocol, reflexion_pattern, token_budget, pm_context
 
-### Skills
-- **Confidence Check**: `.claude/skills/confidence-check/`
-- **Purpose**: Pre-implementation confidence assessment
+### Skills (2)
+- **Confidence Check**: `src/superclaude/skills/confidence-check/`
+  - Purpose: Pre-implementation confidence assessment (≥90% to proceed)
+- **Tavily Response Filter**: `src/superclaude/skills/tavily-response-filter/`
+  - Purpose: Web search response filtering
 
 ---
 
