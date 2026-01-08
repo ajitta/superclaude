@@ -3,12 +3,9 @@ name: confidence-check
 description: Pre-implementation confidence assessment (≥90% to proceed)
 triggers: /confidence-check, pre-implementation, verify-before-implementing, 확인해줘
 mcp: c7:docs|tavily:oss-search
-
-# v2.1.0 Compatibility Fields
-context: inline                    # inline (default) | fork (sub-agent)
-agent: quality-engineer            # Optional: agent type for execution
-user-invocable: true               # true (default) | false (hide from slash menu)
-
+context: inline
+agent: quality-engineer
+user-invocable: true
 allowed-tools:
   - Read
   - Grep
