@@ -1,5 +1,6 @@
 {
   "description": "SuperClaude hooks for session management and code formatting",
+  "schema_version": "2.1.0",
   "hooks": {
     "SessionStart": [
       {
@@ -7,7 +8,8 @@
           {
             "type": "command",
             "command": "python {{SCRIPTS_PATH}}/session_init.py",
-            "timeout": 10
+            "timeout": 10,
+            "once": true
           }
         ]
       }

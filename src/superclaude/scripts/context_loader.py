@@ -8,6 +8,10 @@ Supports two modes:
 
 Tracks loaded contexts per session to prevent duplicates.
 Cross-platform compatible (Windows/macOS/Linux)
+
+v2.1.0 Features:
+- Skills discovery and token estimation
+- Skill frontmatter loading for context visualization
 """
 
 import hashlib
@@ -16,6 +20,10 @@ import re
 import sys
 import tempfile
 from pathlib import Path
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from superclaude.scripts.token_estimator import TokenEstimate
 
 # Configuration
 INJECT_MODE = os.environ.get("CLAUDE_CONTEXT_INJECT", "1") == "1"  # Default: inject
@@ -146,6 +154,54 @@ TRIGGER_MAP = [
     (r"(business.?example|panel.?example)", "core/BUSINESS_PANEL_EXAMPLES.md", 3),
 ]
 
+# v2.1.0: Skills configuration
+SHOW_SKILLS_SUMMARY = os.environ.get("CLAUDE_SHOW_SKILLS", "1") == "1"
+
+
+def get_skill_estimates() -> list["TokenEstimate"]:
+    """Get token estimates for all installed skills.
+
+    Returns:
+        List of TokenEstimate objects for all skills
+    """
+    try:
+        from superclaude.scripts.token_estimator import get_all_skill_estimates
+
+        return get_all_skill_estimates()
+    except ImportError:
+        return []
+
+
+def format_skills_summary(skills: list["TokenEstimate"]) -> str:
+    """Format skills summary for context output.
+
+    Args:
+        skills: List of TokenEstimate objects
+
+    Returns:
+        Formatted skills summary string
+    """
+    if not skills:
+        return ""
+
+    lines = ["<!-- Skills Available -->"]
+    total_frontmatter = 0
+    total_full = 0
+
+    for skill in skills:
+        total_frontmatter += skill.frontmatter_tokens
+        total_full += skill.full_tokens
+        lines.append(
+            f"<!--   {skill.name}: ~{skill.frontmatter_tokens} tokens "
+            f"(full: ~{skill.full_tokens}) -->"
+        )
+
+    lines.append(
+        f"<!-- Skills Total: ~{total_frontmatter} frontmatter, "
+        f"~{total_full} full load -->"
+    )
+    return "\n".join(lines)
+
 
 def get_loaded_contexts() -> set:
     """Read already-loaded contexts from session cache."""
@@ -236,6 +292,15 @@ def main():
 
     if not prompt.strip():
         return
+
+    # v2.1.0: Output skills summary if enabled
+    if SHOW_SKILLS_SUMMARY:
+        skills = get_skill_estimates()
+        if skills:
+            summary = format_skills_summary(skills)
+            if summary:
+                print(summary)
+                print()
 
     # Check triggers and get contexts to load
     contexts = check_triggers(prompt)

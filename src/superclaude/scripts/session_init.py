@@ -1,10 +1,42 @@
 #!/usr/bin/env python3
 """SuperClaude SessionStart initialization script (Python)
-Auto-executed when Claude Code session starts
-Cross-platform compatible (Windows/macOS/Linux)
+
+Auto-executed when Claude Code session starts.
+Cross-platform compatible (Windows/macOS/Linux).
+
+v2.1.0 Features:
+- Hook session tracking initialization
+- Old session cleanup (>24h)
 """
+
+from __future__ import annotations
+
 import subprocess
 import sys
+
+
+def init_hook_tracker() -> str | None:
+    """Initialize hook tracker and cleanup old sessions.
+
+    Returns:
+        Session ID or None if tracker unavailable
+    """
+    try:
+        from superclaude.hooks.hook_tracker import (
+            cleanup_old_sessions,
+            get_session_id,
+        )
+
+        # Cleanup old sessions (>24h)
+        cleaned = cleanup_old_sessions()
+        if cleaned > 0:
+            print(f"🧹 Cleaned {cleaned} old hook session(s)")
+
+        # Get/create current session
+        session_id = get_session_id()
+        return session_id
+    except ImportError:
+        return None
 
 
 def get_git_status():
@@ -28,6 +60,9 @@ def get_git_status():
 
 
 def main():
+    # 0. Initialize hook tracker (cleanup old sessions)
+    init_hook_tracker()
+
     # 1. Check git status
     print(get_git_status())
 
