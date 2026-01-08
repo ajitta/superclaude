@@ -8,6 +8,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Claude Code v2.1.0 Compatibility** - Full support for v2.1.0 skill/hook features
+  - **Phase 1: Frontmatter Schema** - New v2.1.0 fields for skills
+    - `context: inline|fork` - Execution context (inline default, fork for sub-agent)
+    - `agent: <agent-name>` - Optional agent type for skill execution
+    - `user-invocable: true|false` - Control visibility in slash command menu
+    - `allowed-tools: [...]` - Restrict tools available during skill execution
+    - `hooks: {PreToolUse: [...]}` - Inline hook definitions in frontmatter
+  - **Phase 2: Hook Session Tracker** - `once: true` support
+    - `hook_tracker.py` - Session-based hook execution tracking
+    - Prevents duplicate execution of `once: true` hooks within session
+    - Auto-cleanup of old sessions (>24h TTL)
+    - State persistence in `~/.claude/.superclaude_hooks/`
+  - **Phase 3: CLI Improvements** - New management commands
+    - `superclaude agents --list|--info|--tokens` - Agent management
+    - `superclaude skills --list|--info|--tokens` - Skill management with v2.1.0 fields
+    - `token_estimator.py` - Token estimation for context budget
+    - `skill_watcher.py` - Hot-reload detection with polling
+    - `context_loader.py` - Skills summary in context output
+
+- **New Files Created**
+  - `src/superclaude/hooks/hook_tracker.py` (390 LOC) - Session tracking
+  - `src/superclaude/hooks/inline_hooks.py` (254 LOC) - Frontmatter parsing
+  - `src/superclaude/scripts/token_estimator.py` (269 LOC) - Token estimation
+  - `src/superclaude/scripts/skill_watcher.py` (398 LOC) - Change detection
+  - `docs/research/claude-code-v2.1.0-compatibility-improvements.md` - Documentation
+
 - **Claude Opus 4.5 Compatibility Enhancements** - Align framework with Opus 4.5 best practices
   - `<tool_guidance>` sections in all 18 agent files with autonomy levels (high/medium/low)
     - **Proceed**: Actions agent can take independently
@@ -20,6 +46,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - Documents Opus 4.5's literal interpretation of "think" when extended thinking disabled
 
 ### Changed
+- **v2.1.0 Hook System Updates**
+  - `hooks.json` - Added `schema_version: "2.1.0"` and `once: true` to SessionStart
+  - `session_init.py` - Integrated hook tracker initialization with old session cleanup
+  - `skill_activator.py` - Added v2.1.0 frontmatter parsing and agent routing
+  - `hooks/__init__.py` - Exported all hook module functions
+
+### Dependencies
+- Added `pyyaml>=6.0.0` for YAML frontmatter parsing
+
 - **Checklist Language Softening** - MUST → SHOULD across all checklist notes (31 files)
   - Aligns with RFC 2119 semantics (SHOULD = strong recommendation)
   - Reduces over-literal interpretation risk with Opus 4.5
