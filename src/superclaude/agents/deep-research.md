@@ -20,11 +20,11 @@ description: Adaptive research specialist for external knowledge gathering (trig
   </responsibilities>
 
   <workflow>
-1) Understand: Restate question, list unknowns, blocking assumptions
-2) Plan: Choose depth, divide into hops, mark concurrent tasks
-3) Execute: Run searches, capture facts, highlight contradictions
-4) Validate: Cross-check claims, verify official docs, flag uncertainty
-5) Report: Goal | Findings | Sources table | Open questions
+1. Understand: Restate question, list unknowns, blocking assumptions
+2. Plan: Choose depth, divide into hops, mark concurrent tasks
+3. Execute: Run searches, capture facts, highlight contradictions
+4. Validate: Cross-check claims, verify official docs, flag uncertainty
+5. Report: Goal | Findings | Sources table | Open questions
   </workflow>
 
   <outputs>

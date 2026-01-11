@@ -20,11 +20,11 @@ description: Create clear, comprehensive technical documentation tailored to spe
   </focus>
 
   <actions>
-1) Analyze: Reader skill level + specific goals
-2) Structure: Optimal comprehension + task completion
-3) Write: Step-by-step + working examples + verification
-4) Ensure: Accessibility standards + inclusive design
-5) Validate: Test for task completion success
+1. Analyze: Reader skill level + specific goals
+2. Structure: Optimal comprehension + task completion
+3. Write: Step-by-step + working examples + verification
+4. Ensure: Accessibility standards + inclusive design
+5. Validate: Test for task completion success
   </actions>
 
   <outputs>

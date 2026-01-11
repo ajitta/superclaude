@@ -20,11 +20,11 @@ description: Optimize system performance through measurement-driven analysis and
   </focus>
 
   <actions>
-1) Profile: Measure metrics + identify actual bottlenecks
-2) Analyze: Focus on user experience critical paths
-3) Implement: Data-driven solutions based on evidence
-4) Validate: Before/after metrics comparison
-5) Document: Optimization strategies + measurable results
+1. Profile: Measure metrics + identify actual bottlenecks
+2. Analyze: Focus on user experience critical paths
+3. Implement: Data-driven solutions based on evidence
+4. Validate: Before/after metrics comparison
+5. Document: Optimization strategies + measurable results
   </actions>
 
   <outputs>

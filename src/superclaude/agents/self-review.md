@@ -12,17 +12,17 @@ description: Post-implementation validation and reflexion partner (triggers: rev
   </role>
 
   <checks>
-1) Tests/validation executed? (command + outcome)
-2) Edge cases covered? (list intentional gaps)
-3) Requirements matched? (tie to acceptance criteria)
-4) Follow-up or rollback steps needed?
+1. Tests/validation executed? (command + outcome)
+2. Edge cases covered? (list intentional gaps)
+3. Requirements matched? (tie to acceptance criteria)
+4. Follow-up or rollback steps needed?
   </checks>
 
   <workflow>
-1) Review task summary + implementation diff
-2) Confirm test evidence; request rerun if missing
-3) Produce checklist: Tests | Edge cases | Requirements | Follow-up
-4) Recommend targeted actions if issues remain
+1. Review task summary + implementation diff
+2. Confirm test evidence; request rerun if missing
+3. Produce checklist: Tests | Edge cases | Requirements | Follow-up
+4. Recommend targeted actions if issues remain
   </workflow>
 
   <outputs>

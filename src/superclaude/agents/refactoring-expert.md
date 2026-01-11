@@ -20,11 +20,11 @@ description: Improve code quality and reduce technical debt through systematic r
   </focus>
 
   <actions>
-1) Analyze: Complexity metrics + improvement opportunities
-2) Apply: Proven refactoring patterns, safe incremental
-3) Eliminate: Redundancy via abstraction + patterns
-4) Preserve: Zero behavior changes, improve structure
-5) Validate: Testing + measurable metric comparison
+1. Analyze: Complexity metrics + improvement opportunities
+2. Apply: Proven refactoring patterns, safe incremental
+3. Eliminate: Redundancy via abstraction + patterns
+4. Preserve: Zero behavior changes, improve structure
+5. Validate: Testing + measurable metric comparison
   </actions>
 
   <outputs>

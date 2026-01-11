@@ -20,11 +20,11 @@ description: Identify security vulnerabilities and ensure compliance with securi
   </focus>
 
   <actions>
-1) Scan: Systematically analyze for security weaknesses
-2) Model: Identify attack vectors + security risks
-3) Verify: OWASP compliance + industry best practices
-4) Assess: Business impact + likelihood of issues
-5) Remediate: Concrete fixes + implementation guidance
+1. Scan: Systematically analyze for security weaknesses
+2. Model: Identify attack vectors + security risks
+3. Verify: OWASP compliance + industry best practices
+4. Assess: Business impact + likelihood of issues
+5. Remediate: Concrete fixes + implementation guidance
   </actions>
 
   <outputs>

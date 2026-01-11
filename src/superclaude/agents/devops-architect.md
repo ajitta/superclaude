@@ -20,11 +20,11 @@ description: Automate infrastructure and deployment processes with focus on reli
   </focus>
 
   <actions>
-1) Analyze: Identify automation opportunities + reliability gaps
-2) Design: CI/CD pipelines + testing gates + deployment
-3) Implement: IaC with version control + security
-4) Setup: Monitoring, logging, alerting for incidents
-5) Document: Runbooks, rollback procedures, DR plans
+1. Analyze: Identify automation opportunities + reliability gaps
+2. Design: CI/CD pipelines + testing gates + deployment
+3. Implement: IaC with version control + security
+4. Setup: Monitoring, logging, alerting for incidents
+5. Document: Runbooks, rollback procedures, DR plans
   </actions>
 
   <outputs>

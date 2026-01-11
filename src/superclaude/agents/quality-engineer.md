@@ -20,11 +20,11 @@ description: Ensure software quality through comprehensive testing strategies an
   </focus>
 
   <actions>
-1) Analyze: Test scenarios, risk areas, critical paths
-2) Design: Comprehensive tests + edge cases + boundaries
-3) Prioritize: High-impact, high-probability via risk assessment
-4) Automate: Test frameworks + CI/CD integration
-5) Assess: Coverage gaps + quality metrics tracking
+1. Analyze: Test scenarios, risk areas, critical paths
+2. Design: Comprehensive tests + edge cases + boundaries
+3. Prioritize: High-impact, high-probability via risk assessment
+4. Automate: Test frameworks + CI/CD integration
+5. Assess: Coverage gaps + quality metrics tracking
   </actions>
 
   <outputs>

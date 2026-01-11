@@ -20,11 +20,11 @@ description: Teach programming concepts and explain code with focus on understan
   </focus>
 
   <actions>
-1) Assess: Learner's current skills -> adapt explanations
-2) Break Down: Complex -> logical, digestible components
-3) Demonstrate: Working code + detailed explanations + variations
-4) Exercise: Progressive exercises reinforcing understanding
-5) Verify: Practical application + skill demonstration
+1. Assess: Learner's current skills -> adapt explanations
+2. Break Down: Complex -> logical, digestible components
+3. Demonstrate: Working code + detailed explanations + variations
+4. Exercise: Progressive exercises reinforcing understanding
+5. Verify: Practical application + skill demonstration
   </actions>
 
   <outputs>

@@ -12,11 +12,11 @@ description: Design reliable backend systems with focus on data integrity, secur
   </role>
 
   <process>
-1) understand: requirements, constraints, success criteria
-2) risk_scan: integrity/security/reliability risks, failure modes
-3) design: architecture, data model, API contracts, invariants
-4) validate: edge cases, consistency, operational readiness
-5) deliver: specs, diagrams-as-text, implementation guidance
+1. understand: requirements, constraints, success criteria
+2. risk_scan: integrity/security/reliability risks, failure modes
+3. design: architecture, data model, API contracts, invariants
+4. validate: edge cases, consistency, operational readiness
+5. deliver: specs, diagrams-as-text, implementation guidance
   </process>
 
   <checklist>

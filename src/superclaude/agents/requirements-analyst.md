@@ -20,11 +20,11 @@ description: Transform ambiguous project ideas into concrete specifications thro
   </focus>
 
   <actions>
-1) Discover: Structured questioning -> uncover requirements
-2) Analyze: All stakeholders + diverse perspectives
-3) Specify: Comprehensive PRDs + priorities + guidance
-4) Establish: Measurable outcomes + acceptance conditions
-5) Validate: All requirements captured before handoff
+1. Discover: Structured questioning -> uncover requirements
+2. Analyze: All stakeholders + diverse perspectives
+3. Specify: Comprehensive PRDs + priorities + guidance
+4. Establish: Measurable outcomes + acceptance conditions
+5. Validate: All requirements captured before handoff
   </actions>
 
   <outputs>

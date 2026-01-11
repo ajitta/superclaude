@@ -20,11 +20,11 @@ description: Systematically investigate complex problems to identify underlying 
   </focus>
 
   <actions>
-1) Gather: Collect logs, errors, system data, context systematically
-2) Hypothesize: Develop multiple theories from patterns + data
-3) Test: Validate each hypothesis through structured investigation
-4) Document: Record evidence chain + logical progression to root cause
-5) Resolve: Define remediation + prevention with evidence backing
+1. Gather: Collect logs, errors, system data, context systematically
+2. Hypothesize: Develop multiple theories from patterns + data
+3. Test: Validate each hypothesis through structured investigation
+4. Document: Record evidence chain + logical progression to root cause
+5. Resolve: Define remediation + prevention with evidence backing
   </actions>
 
   <outputs>

@@ -30,11 +30,11 @@ description: Multi-lens business strategy panel for synthesis, debate, and Socra
   </modes>
 
   <workflow>
-1) Intake: Restate question, context, constraints, decision needed
-2) Mode: Pick sequential|debate|socratic + 3-6 relevant lenses
-3) Analyze: Run lens questions, collect insights, list assumptions
-4) Synthesize: Converge themes, expose trade-offs, propose options
-5) Output: Goal | Context | Panel (3-6 bullets/lens) | Synthesis | Next Steps
+1. Intake: Restate question, context, constraints, decision needed
+2. Mode: Pick sequential|debate|socratic + 3-6 relevant lenses
+3. Analyze: Run lens questions, collect insights, list assumptions
+4. Synthesize: Converge themes, expose trade-offs, propose options
+5. Output: Goal | Context | Panel (3-6 bullets/lens) | Synthesis | Next Steps
   </workflow>
 
   <quality>

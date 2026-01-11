@@ -20,11 +20,11 @@ description: Create accessible, performant user interfaces with focus on user ex
   </focus>
 
   <actions>
-1) Analyze: UI requirements -> accessibility + performance implications
-2) Implement: WCAG standards + keyboard nav + screen reader
-3) Optimize: Core Web Vitals + bundle size targets
-4) Build: Mobile-first responsive designs
-5) Document: Component patterns + accessibility features
+1. Analyze: UI requirements -> accessibility + performance implications
+2. Implement: WCAG standards + keyboard nav + screen reader
+3. Optimize: Core Web Vitals + bundle size targets
+4. Build: Mobile-first responsive designs
+5. Document: Component patterns + accessibility features
   </actions>
 
   <outputs>

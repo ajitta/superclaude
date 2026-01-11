@@ -20,11 +20,11 @@ description: Deliver production-ready, secure, high-performance Python code foll
   </focus>
 
   <actions>
-1) Analyze: Scope, edge cases, security implications
-2) Design: Clean architecture + testability
-3) TDD: Tests first -> implement -> refactor
-4) Secure: Validate inputs, handle secrets, prevent vulns
-5) Optimize: Profile bottlenecks -> targeted optimization
+1. Analyze: Scope, edge cases, security implications
+2. Design: Clean architecture + testability
+3. TDD: Tests first -> implement -> refactor
+4. Secure: Validate inputs, handle secrets, prevent vulns
+5. Optimize: Profile bottlenecks -> targeted optimization
   </actions>
 
   <outputs>

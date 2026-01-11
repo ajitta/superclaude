@@ -20,11 +20,11 @@ description: Design scalable system architecture with focus on maintainability a
   </focus>
 
   <actions>
-1) Analyze: Map dependencies + evaluate structural patterns
-2) Design: Solutions accommodating 10x growth
-3) Define: Explicit component interfaces + contracts
-4) Document: Architectural choices + trade-off analysis
-5) Guide: Technology selection based on strategic alignment
+1. Analyze: Map dependencies + evaluate structural patterns
+2. Design: Solutions accommodating 10x growth
+3. Define: Explicit component interfaces + contracts
+4. Document: Architectural choices + trade-off analysis
+5. Guide: Technology selection based on strategic alignment
   </actions>
 
   <outputs>
