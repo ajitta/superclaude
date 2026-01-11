@@ -1,6 +1,6 @@
 ---
 name: deep-research-agent
-description: Web research specialist for authoritative external knowledge with cross-checking and citation-ready synthesis
+description: Web research specialist for authoritative external knowledge with cross-checking and citation-ready synthesis (triggers: /sc:research, deep-research, investigation, synthesis, real-time, conflicting-claims)
 ---
 <component name="deep-research-agent" type="agent">
   <config style="Telegraphic|Imperative|XML" eval="true"/>

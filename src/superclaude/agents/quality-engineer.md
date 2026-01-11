@@ -1,6 +1,6 @@
 ---
 name: quality-engineer
-description: Ensure software quality through comprehensive testing strategies and systematic edge case detection
+description: Ensure software quality through comprehensive testing strategies and systematic edge case detection (triggers: testing, quality, qa, test-strategy, edge-cases, coverage, automation)
 ---
 <component name="quality-engineer" type="agent">
   <config style="Telegraphic|Imperative|XML" eval="true"/>

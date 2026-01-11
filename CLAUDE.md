@@ -54,20 +54,10 @@ src/superclaude/
 │   ├── install_skill.py # Skill installation
 │   ├── install_commands.py
 │   └── install_mcp.py   # MCP server installation
-├── hooks/               # v2.1.0 hook system
-│   ├── hook_tracker.py  # Session-based hook execution tracking (once: true)
-│   └── inline_hooks.py  # Frontmatter hook parsing
-├── scripts/             # Utility scripts
-│   ├── token_estimator.py   # Token estimation for context budget
-│   ├── skill_watcher.py     # Hot-reload detection with polling
-│   ├── context_loader.py    # Skills summary in context output
-│   ├── skill_activator.py   # v2.1.0 frontmatter parsing and agent routing
-│   └── session_init.py      # Hook tracker initialization
-├── agents/              # Agent definitions (18 specialized agents)
-├── commands/            # Slash command definitions (25 commands)
-├── modes/               # Behavioral modes (7 modes)
-├── skills/              # Skill definitions
-└── mcp/                 # MCP server configurations (7 servers)
+├── agents/              # Agent definitions (20 specialized agents)
+├── commands/            # Slash command definitions (30 commands)
+├── modes/               # Behavioral modes (8 modes)
+└── mcp/                 # MCP server configurations
 ```
 
 ## Pytest Plugin
@@ -164,57 +154,19 @@ superclaude mcp --servers tavily
 
 **Note**: Editable mode (`-e`) means code changes are reflected immediately in `uv run` without reinstalling. Global tool requires `uv tool install --force .` to update.
 
-## pyproject.toml and uv tool install
+## Entry Points
 
-`pyproject.toml` is Python's **standard project configuration file** that manages package build, dependencies, CLI commands, and plugins in a single file.
+Key entry points defined in `pyproject.toml`:
 
-### How `uv tool install .` Works
-
-```
-Read pyproject.toml → hatchling build → Create wheel → Global install
-```
-
-**1. Metadata Extraction**
 ```toml
-[project]
-name = "superclaude"           # Package name
-version = "4.2.1+ajitta"       # Version
-
 [project.scripts]
-superclaude = "superclaude.cli.main:main"  # CLI entry point
+superclaude = "superclaude.cli.main:main"  # CLI command
+
+[project.entry-points.pytest11]
+superclaude = "superclaude.pytest_plugin"   # pytest auto-load
 ```
 
-**2. Build Execution**
-```toml
-[build-system]
-build-backend = "hatchling.build"
-
-[tool.hatch.build.targets.wheel]
-packages = ["src/superclaude"]  # Source to include
-```
-
-**3. Global Installation Path**
-- Linux/Mac: `~/.local/bin/superclaude`
-- Windows: `%USERPROFILE%\.local\bin\superclaude`
-
-### pyproject.toml Key Sections
-
-| Section | Purpose |
-|---------|---------|
-| `[build-system]` | Build backend (hatchling) |
-| `[project]` | Package metadata, dependencies |
-| `[project.scripts]` | CLI command registration |
-| `[project.entry-points.pytest11]` | pytest plugin auto-load |
-| `[tool.pytest]` | Test configuration |
-| `[tool.ruff]` / `[tool.black]` | Linter/formatter settings |
-
-### Verification Commands
-
-```bash
-uv tool list              # List installed tools
-where superclaude         # Check install path (Windows)
-which superclaude         # Check install path (Linux/Mac)
-```
+Verify installation: `uv tool list` or `which superclaude`
 
 ## Project-Specific Installation
 
@@ -284,9 +236,11 @@ Optional servers (7 available) for enhanced performance:
 - **Context7**: Official documentation lookup
 - **Sequential-Thinking**: Token-efficient reasoning (30-50% reduction)
 - **Serena**: Session persistence
-- **Playwright**: Browser automation and E2E testing
-- **Morphllm**: Fast file editing
-- **DevTools**: Chrome DevTools performance metrics
+
+```bash
+superclaude mcp --list           # List available servers
+superclaude mcp --servers tavily context7  # Install specific servers
+```
 
 ## Key Documentation Files
 
