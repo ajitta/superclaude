@@ -34,7 +34,7 @@ make sync-plugin-repo # Sync artefacts into ../SuperClaude_Plugin
 
 ## Architecture
 
-SuperClaude v4.2.1+ajitta is a Python package with pytest plugin and slash commands.
+SuperClaude v4.2.1+ajitta is a Python package with pytest plugin, slash commands, and Claude Code v2.1.0 compatibility.
 
 ```
 src/superclaude/
@@ -54,10 +54,20 @@ src/superclaude/
 │   ├── install_skill.py # Skill installation
 │   ├── install_commands.py
 │   └── install_mcp.py   # MCP server installation
-├── agents/              # Agent definitions (20 specialized agents)
-├── commands/            # Slash command definitions (30 commands)
-├── modes/               # Behavioral modes (8 modes)
-└── mcp/                 # MCP server configurations
+├── hooks/               # v2.1.0 hook system
+│   ├── hook_tracker.py  # Session-based hook execution tracking (once: true)
+│   └── inline_hooks.py  # Frontmatter hook parsing
+├── scripts/             # Utility scripts
+│   ├── token_estimator.py   # Token estimation for context budget
+│   ├── skill_watcher.py     # Hot-reload detection with polling
+│   ├── context_loader.py    # Skills summary in context output
+│   ├── skill_activator.py   # v2.1.0 frontmatter parsing and agent routing
+│   └── session_init.py      # Hook tracker initialization
+├── agents/              # Agent definitions (18 specialized agents)
+├── commands/            # Slash command definitions (25 commands)
+├── modes/               # Behavioral modes (7 modes)
+├── skills/              # Skill definitions
+└── mcp/                 # MCP server configurations (7 servers)
 ```
 
 ## Pytest Plugin
@@ -237,27 +247,71 @@ cd SuperClaude_Framework
 | `project` | `./.claude/` | Current project only |
 | `local` | `.mcp.json` | MCP servers only (Claude Code standard) |
 
+## CLI Commands
+
+The `superclaude` CLI provides management commands:
+
+```bash
+# Installation
+superclaude install              # Install all components to ~/.claude/
+superclaude install --scope project  # Install to ./.claude/
+superclaude install --list-all   # Show installation status
+superclaude uninstall            # Remove SuperClaude components
+superclaude update               # Update to current version (--force install)
+
+# Component Management (v2.1.0)
+superclaude agents --list        # List all agents
+superclaude agents --info <name> # Agent details
+superclaude agents --tokens      # Token estimates for agents
+superclaude skills --list        # List all skills
+superclaude skills --info <name> # Skill details (v2.1.0 fields)
+superclaude skills --tokens      # Token estimates for context budget
+
+# MCP Servers
+superclaude mcp --list           # List available MCP servers
+superclaude mcp --servers tavily context7  # Install specific servers
+superclaude mcp --scope local    # Install to .mcp.json
+
+# Utilities
+superclaude doctor               # Health check diagnostics
+superclaude install-skill <name> # Install specific skill
+```
+
 ## MCP Server Integration
 
-Optional servers via airis-mcp-gateway for enhanced performance:
+Optional servers (7 available) for enhanced performance:
 - **Tavily**: Web search (Deep Research)
 - **Context7**: Official documentation lookup
 - **Sequential-Thinking**: Token-efficient reasoning (30-50% reduction)
 - **Serena**: Session persistence
-
-```bash
-superclaude mcp --list           # List available servers
-superclaude mcp --servers tavily context7  # Install specific servers
-```
+- **Playwright**: Browser automation and E2E testing
+- **Morphllm**: Fast file editing
+- **DevTools**: Chrome DevTools performance metrics
 
 ## Key Documentation Files
 
 | File | Purpose |
 |------|---------|
+| CHANGELOG.md | Version history and feature changes |
 | PLANNING.md | Architecture, design principles, absolute rules |
 | TASK.md | Current tasks and priorities |
 | KNOWLEDGE.md | Accumulated insights and troubleshooting |
-| docs/reference/commands-list.md | All 30 slash commands |
+
+## Claude Code v2.1.0 Compatibility
+
+SuperClaude supports Claude Code v2.1.0 skill/hook features:
+
+**Frontmatter Schema Fields:**
+- `context: inline|fork` - Execution context (inline default, fork for sub-agent)
+- `agent: <agent-name>` - Optional agent type for skill execution
+- `user-invocable: true|false` - Control visibility in slash command menu
+- `allowed-tools: [...]` - Restrict tools available during skill execution
+- `hooks: {PreToolUse: [...]}` - Inline hook definitions in frontmatter
+
+**Hook Session Tracker:**
+- `once: true` support for single-execution hooks per session
+- State persistence in `~/.claude/.superclaude_hooks/`
+- Auto-cleanup of old sessions (>24h TTL)
 
 ## Development Principles
 
@@ -272,4 +326,4 @@ superclaude mcp --servers tavily context7  # Install specific servers
 - **Python**: >=3.10
 - **Build**: hatchling (PEP 517)
 - **Entry points**: CLI (`superclaude`), Pytest plugin (auto-loaded as `superclaude`)
-- **Dependencies**: pytest>=7.0.0, click>=8.0.0, rich>=13.0.0
+- **Dependencies**: pytest>=7.0.0, click>=8.0.0, rich>=13.0.0, pyyaml>=6.0.0
