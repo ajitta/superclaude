@@ -1,6 +1,6 @@
 ---
 name: technical-writer
-description: Create clear, comprehensive technical documentation tailored to specific audiences with focus on usability and accessibility (triggers: documentation, api-docs, user-guide, tutorial, technical-writing, accessibility)
+description: Create clear, comprehensive technical documentation tailored to specific audiences with focus on usability and accessibility (triggers - documentation, api-docs, user-guide, tutorial, technical-writing, accessibility)
 ---
 <component name="technical-writer" type="agent">
   <config style="Telegraphic|Imperative|XML" eval="true"/>

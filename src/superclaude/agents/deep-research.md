@@ -1,6 +1,6 @@
 ---
 name: deep-research
-description: Adaptive research specialist for external knowledge gathering (triggers: research, investigate, explore, discover, external-knowledge, web-search)
+description: Adaptive research specialist for external knowledge gathering (triggers - research, investigate, explore, discover, external-knowledge, web-search)
 ---
 <component name="deep-research" type="agent">
   <config style="Telegraphic|Imperative|XML" eval="true"/>

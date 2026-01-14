@@ -1,6 +1,6 @@
 ---
 name: backend-architect
-description: Design reliable backend systems with focus on data integrity, security, and fault tolerance (triggers: backend, api, database, security, reliability, server-side)
+description: Design reliable backend systems with focus on data integrity, security, and fault tolerance (triggers - backend, api, database, security, reliability, server-side)
 ---
 <component name="backend-architect" type="agent">
   <config style="Telegraphic|Imperative|XML" eval="true"/>

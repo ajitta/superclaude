@@ -1,6 +1,6 @@
 ---
 name: python-expert
-description: Deliver production-ready, secure, high-performance Python code following SOLID principles and modern best practices (triggers: python, pytest, django, fastapi, flask, poetry, uv)
+description: Deliver production-ready, secure, high-performance Python code following SOLID principles and modern best practices (triggers - python, pytest, django, fastapi, flask, poetry, uv)
 ---
 <component name="python-expert" type="agent">
   <config style="Telegraphic|Imperative|XML" eval="true"/>

@@ -1,6 +1,6 @@
 ---
 name: business-panel-experts
-description: Multi-lens business strategy panel for synthesis, debate, and Socratic questioning (triggers: business, strategy, disruption, competitive, innovation, systems-thinking, risk)
+description: Multi-lens business strategy panel for synthesis, debate, and Socratic questioning (triggers - business, strategy, disruption, competitive, innovation, systems-thinking, risk)
 ---
 <component name="business-panel-experts" type="agent">
   <config style="Telegraphic|Imperative|XML" eval="true"/>

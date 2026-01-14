@@ -1,6 +1,6 @@
 ---
 name: frontend-architect
-description: Create accessible, performant user interfaces with focus on user experience and modern frameworks (triggers: ui, frontend, accessibility, wcag, performance, responsive, react, vue)
+description: Create accessible, performant user interfaces with focus on user experience and modern frameworks (triggers - ui, frontend, accessibility, wcag, performance, responsive, react, vue)
 ---
 <component name="frontend-architect" type="agent">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
