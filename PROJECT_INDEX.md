@@ -1,6 +1,6 @@
 # Project Index: SuperClaude Framework
 
-**Generated**: 2026-01-08
+**Generated**: 2026-01-14
 **Version**: 4.2.1+ajitta
 **Description**: AI-enhanced development framework for Claude Code - pytest plugin with specialized commands, agents, and modes
 
@@ -15,20 +15,20 @@ SuperClaude_Framework/
 │   ├── pm_agent/             # PM Agent core (confidence, self_check, reflexion, token_budget)
 │   ├── execution/            # Execution patterns (parallel, reflection, self_correction)
 │   ├── agents/               # 20 specialized agent definitions
-│   ├── commands/             # 30 slash command definitions
+│   ├── commands/             # 31 slash command definitions
 │   ├── modes/                # 8 behavioral mode definitions
 │   ├── mcp/                  # 11 MCP server configs and docs
 │   ├── core/                 # Core configs (FLAGS, PRINCIPLES, RULES, RESEARCH_CONFIG)
 │   ├── hooks/                # Git/session hooks
-│   ├── skills/               # TypeScript skills (confidence-check)
+│   ├── skills/               # Skills (confidence-check)
 │   ├── scripts/              # Utility scripts
 │   └── pytest_plugin.py      # Auto-loaded pytest integration
 ├── tests/                    # Test suite
-│   ├── unit/                 # Unit tests (5 files)
+│   ├── unit/                 # Unit tests (6 files)
 │   └── integration/          # Integration tests (1 file)
 ├── .claude/                  # Claude Code runtime configuration
 │   ├── agents/               # Installed agents (20 files)
-│   ├── commands/sc/          # Installed slash commands (30 files)
+│   ├── commands/sc/          # Installed slash commands (31 files)
 │   ├── skills/               # Installed skills
 │   ├── superclaude/          # Core configs (FLAGS, PRINCIPLES, RULES, etc.)
 │   └── settings.json         # Claude Code settings
@@ -43,13 +43,13 @@ SuperClaude_Framework/
 
 | Category | Count | Location |
 |----------|-------|----------|
-| Slash Commands | 30 | src/superclaude/commands/ |
+| Slash Commands | 31 | src/superclaude/commands/ |
 | Agents | 20 | src/superclaude/agents/ |
 | Modes | 8 | src/superclaude/modes/ |
 | MCP Servers | 10 | src/superclaude/mcp/configs/ |
 | Core Configs | 7 | src/superclaude/core/ |
-| Python Files | 34 | src/superclaude/ |
-| Test Files | 10 | tests/ |
+| Python Files | 37 | src/superclaude/ |
+| Test Files | 11 | tests/ |
 
 ---
 
@@ -65,11 +65,9 @@ SuperClaude_Framework/
 - **Source**: `src/superclaude/pytest_plugin.py`
 - **Fixtures**: confidence_checker, self_check_protocol, reflexion_pattern, token_budget, pm_context
 
-### Skills (2)
+### Skills (1)
 - **Confidence Check**: `src/superclaude/skills/confidence-check/`
   - Purpose: Pre-implementation confidence assessment (≥90% to proceed)
-- **Tavily Response Filter**: `src/superclaude/skills/tavily-response-filter/`
-  - Purpose: Web search response filtering
 
 ---
 
@@ -104,7 +102,7 @@ SuperClaude_Framework/
 
 ---
 
-## Slash Commands (30)
+## Slash Commands (31)
 
 Commands installed to `~/.claude/commands/sc/`:
 
@@ -112,7 +110,7 @@ Commands installed to `~/.claude/commands/sc/`:
 |----------|----------|
 | Core | sc, help, recommend |
 | Analysis | analyze, explain, troubleshoot |
-| Implementation | implement, improve, cleanup, refactoring |
+| Implementation | implement, improve, cleanup |
 | Planning | brainstorm, design, estimate, workflow, spawn |
 | Documentation | document, index, index-repo |
 | Quality | test, build, reflect |
@@ -151,7 +149,6 @@ Behavioral modes in `src/superclaude/modes/`:
 | TokenEfficiency | --uc | Symbol communication, 30-50% reduction |
 | Introspection | --introspect | Meta-cognition, pattern detection |
 | BusinessPanel | business, panel | Multi-expert analysis |
-| Unified | (default) | Combined reference |
 
 ---
 
@@ -198,6 +195,7 @@ tests/
 ├── unit/
 │   ├── test_cli_install.py  # CLI installation tests
 │   ├── test_confidence.py   # ConfidenceChecker tests
+│   ├── test_hooks.py        # Hook system tests
 │   ├── test_reflexion.py    # ReflexionPattern tests
 │   ├── test_self_check.py   # SelfCheckProtocol tests
 │   └── test_token_budget.py # TokenBudgetManager tests
@@ -228,7 +226,7 @@ uv run pytest --cov=superclaude       # With coverage
 ### Python Package (pyproject.toml)
 - **Build**: hatchling (PEP 517)
 - **Python**: ≥3.10
-- **Dependencies**: pytest≥7.0.0, click≥8.0.0, rich≥13.0.0
+- **Dependencies**: pytest≥7.0.0, click≥8.0.0, rich≥13.0.0, pyyaml≥6.0.0
 
 ### Entry Points
 ```toml
@@ -310,11 +308,9 @@ superclaude install --list
 
 | Extension | Count | Purpose |
 |-----------|-------|---------|
-| .py | 30+ | Python source |
-| .md | 80+ | Documentation, commands, agents |
+| .py | 37 | Python source |
+| .md | 90+ | Documentation, commands, agents |
 | .json | 15+ | Config files |
-| .ts | 1 | TypeScript skill |
-| .sh | 3 | Shell scripts |
 
 ---
 

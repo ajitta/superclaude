@@ -1,19 +1,19 @@
 {
   "meta": {
-    "generated": "2026-01-08",
+    "generated": "2026-01-14",
     "version": "4.2.1+ajitta",
     "description": "AI-enhanced development framework for Claude Code"
   },
   "statistics": {
-    "commands": 30,
+    "commands": 31,
     "agents": 20,
     "modes": 8,
     "mcp_servers": 10,
     "mcp_docs": 11,
     "core_configs": 7,
-    "python_files": 34,
-    "test_files": 10,
-    "skills": 2
+    "python_files": 37,
+    "test_files": 11,
+    "skills": 1
   },
   "entry_points": {
     "cli": {
@@ -61,14 +61,14 @@
     }
   },
   "commands": {
-    "count": 30,
+    "count": 31,
     "location": "src/superclaude/commands/",
     "installed_to": "~/.claude/commands/sc/",
-    "files": ["agent.md", "analyze.md", "brainstorm.md", "build.md", "business-panel.md", "cleanup.md", "design.md", "document.md", "estimate.md", "explain.md", "git.md", "help.md", "implement.md", "improve.md", "index-repo.md", "index.md", "load.md", "pm.md", "recommend.md", "reflect.md", "refactoring.md", "research.md", "save.md", "sc.md", "select-tool.md", "spawn.md", "spec-panel.md", "task.md", "test.md", "troubleshoot.md", "workflow.md"],
+    "files": ["agent.md", "analyze.md", "brainstorm.md", "build.md", "business-panel.md", "cleanup.md", "design.md", "document.md", "estimate.md", "explain.md", "git.md", "help.md", "implement.md", "improve.md", "index-repo.md", "index.md", "load.md", "pm.md", "recommend.md", "reflect.md", "research.md", "save.md", "sc.md", "select-tool.md", "spawn.md", "spec-panel.md", "task.md", "test.md", "troubleshoot.md", "workflow.md"],
     "categories": {
       "core": ["sc", "help", "recommend"],
       "analysis": ["analyze", "explain", "troubleshoot"],
-      "implementation": ["implement", "improve", "cleanup", "refactoring"],
+      "implementation": ["implement", "improve", "cleanup"],
       "planning": ["brainstorm", "design", "estimate", "workflow", "spawn"],
       "documentation": ["document", "index", "index-repo"],
       "quality": ["test", "build", "reflect"],
@@ -95,7 +95,7 @@
   "modes": {
     "count": 8,
     "location": "src/superclaude/modes/",
-    "files": ["MODE_Brainstorming.md", "MODE_Business_Panel.md", "MODE_DeepResearch.md", "MODE_Introspection.md", "MODE_Orchestration.md", "MODE_Task_Management.md", "MODE_Token_Efficiency.md", "MODE_UNIFIED.md"],
+    "files": ["MODE_Brainstorming.md", "MODE_Business_Panel.md", "MODE_DeepResearch.md", "MODE_Introspection.md", "MODE_Orchestration.md", "MODE_Task_Management.md", "MODE_Token_Efficiency.md", "MODE_INDEX.md"],
     "list": [
       {"name": "Brainstorming", "trigger": "--brainstorm", "file": "MODE_Brainstorming.md"},
       {"name": "DeepResearch", "trigger": "--research", "file": "MODE_DeepResearch.md"},
@@ -103,8 +103,7 @@
       {"name": "TaskManagement", "trigger": "--task-manage", "file": "MODE_Task_Management.md"},
       {"name": "TokenEfficiency", "trigger": "--uc", "file": "MODE_Token_Efficiency.md"},
       {"name": "Introspection", "trigger": "--introspect", "file": "MODE_Introspection.md"},
-      {"name": "BusinessPanel", "trigger": "business", "file": "MODE_Business_Panel.md"},
-      {"name": "Unified", "trigger": "default", "file": "MODE_UNIFIED.md"}
+      {"name": "BusinessPanel", "trigger": "business", "file": "MODE_Business_Panel.md"}
     ]
   },
   "mcp_servers": {
@@ -112,7 +111,7 @@
     "config_location": "src/superclaude/mcp/configs/",
     "doc_location": "src/superclaude/mcp/",
     "configs": ["airis-agent.json", "context7.json", "magic.json", "mindbase.json", "morphllm.json", "playwright.json", "sequential.json", "serena-docker.json", "serena.json", "tavily.json"],
-    "docs": ["MCP_Airis-Agent.md", "MCP_Chrome-DevTools.md", "MCP_Context7.md", "MCP_Magic.md", "MCP_Mindbase.md", "MCP_Morphllm.md", "MCP_Playwright.md", "MCP_Sequential.md", "MCP_Serena.md", "MCP_Tavily.md", "MCP_UNIFIED.md"],
+    "docs": ["MCP_Airis-Agent.md", "MCP_Chrome-DevTools.md", "MCP_Context7.md", "MCP_Magic.md", "MCP_Mindbase.md", "MCP_Morphllm.md", "MCP_Playwright.md", "MCP_Sequential.md", "MCP_Serena.md", "MCP_Tavily.md", "MCP_INDEX.md"],
     "servers": [
       {"name": "context7", "flag": "--c7", "purpose": "Official docs lookup"},
       {"name": "tavily", "flag": "--tavily", "purpose": "Web search"},
@@ -123,8 +122,7 @@
       {"name": "playwright", "flag": "--play", "purpose": "Browser automation"},
       {"name": "airis-agent", "flag": null, "purpose": "Confidence, indexing"},
       {"name": "mindbase", "flag": null, "purpose": "Semantic memory"},
-      {"name": "chrome-devtools", "flag": "--chrome", "purpose": "Performance debug"},
-      {"name": "serena-docker", "flag": null, "purpose": "Containerized serena"}
+      {"name": "chrome-devtools", "flag": "--chrome", "purpose": "Performance debug"}
     ]
   },
   "core_configs": {
@@ -143,11 +141,11 @@
     "framework": "pytest>=7.0.0",
     "location": "tests/",
     "structure": {
-      "unit": ["test_cli_install.py", "test_confidence.py", "test_reflexion.py", "test_self_check.py", "test_token_budget.py"],
+      "unit": ["test_cli_install.py", "test_confidence.py", "test_hooks.py", "test_reflexion.py", "test_self_check.py", "test_token_budget.py"],
       "integration": ["test_pytest_plugin.py"],
-      "total_files": 10
+      "total_files": 11
     },
-    "markers": ["unit", "integration", "confidence_check", "self_check", "reflexion", "complexity"],
+    "markers": ["unit", "integration", "confidence_check", "self_check", "reflexion", "complexity", "hallucination", "performance"],
     "commands": {
       "all": "uv run pytest",
       "unit": "uv run pytest tests/unit/ -v",
@@ -173,11 +171,9 @@
       "flags": "core/FLAGS.md"
     },
     "by_extension": {
-      ".py": {"count": 34, "purpose": "Python source"},
-      ".md": {"count": 80, "purpose": "Documentation, commands, agents"},
-      ".json": {"count": 15, "purpose": "Config files"},
-      ".ts": {"count": 1, "purpose": "TypeScript skill"},
-      ".sh": {"count": 3, "purpose": "Shell scripts"}
+      ".py": {"count": 37, "purpose": "Python source"},
+      ".md": {"count": 90, "purpose": "Documentation, commands, agents"},
+      ".json": {"count": 15, "purpose": "Config files"}
     }
   },
   "token_efficiency": {
