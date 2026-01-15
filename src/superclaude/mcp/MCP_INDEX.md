@@ -7,19 +7,19 @@
     <note>Detailed usage loaded dynamically via context_loader.py hook</note>
   </role>
 
-  <mcp_index>
-| MCP | Triggers | File |
-|-----|----------|------|
-| Context7 | context7, c7, library, docs, framework, documentation, import, require, library docs, framework docs, --c7, --context7 | MCP_Context7.md |
-| Tavily | tavily, search, research, news, current, web, fact-check, /sc:research, web search, news search, --tavily | MCP_Tavily.md |
-| Sequential | sequential, seq, think, think-hard, ultrathink, debug, architecture, analysis, reasoning, multi-step, reasoning chain, --seq, --sequential | MCP_Sequential.md |
-| Serena | serena, symbol, rename, rename across, extract, move, LSP, session, memory, /sc:load, /sc:save, --serena | MCP_Serena.md |
-| Morphllm | morphllm, morph, pattern, pattern replace, bulk, bulk edit, edit, transform, style, framework, text-replacement, --morph, --morphllm | MCP_Morphllm.md |
-| Magic | magic, 21st, ui, component, button, form, modal, card, table, nav, /ui, /21, responsive, accessible, ui component, --magic | MCP_Magic.md |
-| Playwright | playwright, browser, browser test, E2E, test, screenshot, validation, accessibility, WCAG, --play, --playwright | MCP_Playwright.md |
-| DevTools | devtools, performance, performance audit, layout, layout debug, CLS, LCP, metrics, core web vitals, --perf, --devtools | MCP_Chrome-DevTools.md |
-| Mindbase | mindbase, memory, conversation, conversation memory, session, semantic, embedding, pgvector, --mindbase | MCP_Mindbase.md |
-| Airis-Agent | airis, confidence, confidence check, research, index, repo index, optimize, sync, --airis | MCP_Airis-Agent.md |
+  <mcp_index note="All MCPs optional - load via claude_desktop_config.json">
+| MCP | Status | Triggers | Fallback | File |
+|-----|--------|----------|----------|------|
+| Context7 | Optional | context7, c7, library, docs, framework, documentation, --c7, --context7 | Tavily/WebSearch | MCP_Context7.md |
+| Tavily | Optional | tavily, search, research, news, current, web, fact-check, --tavily | WebSearch (native) | MCP_Tavily.md |
+| Sequential | Optional | sequential, seq, debug, architecture, analysis, reasoning, --seq, --sequential | Native reasoning | MCP_Sequential.md |
+| Serena | Optional | serena, symbol, rename, extract, move, LSP, memory, --serena | Native search | MCP_Serena.md |
+| Morphllm | Optional | morphllm, morph, pattern, bulk edit, transform, --morph, --morphllm | Edit (native) | MCP_Morphllm.md |
+| Magic | Optional | magic, 21st, ui, component, /ui, /21, --magic | Write (native) | MCP_Magic.md |
+| Playwright | Optional | playwright, browser, E2E, test, screenshot, WCAG, --play, --playwright | --chrome (native) | MCP_Playwright.md |
+| DevTools | Optional | devtools, performance, CLS, LCP, metrics, --perf, --devtools | Playwright | MCP_Chrome-DevTools.md |
+| Mindbase | Experimental | mindbase, memory, conversation, semantic, --mindbase | Serena memory | MCP_Mindbase.md |
+| Airis-Agent | Experimental | airis, confidence, repo index, --airis | Native | MCP_Airis-Agent.md |
   </mcp_index>
 
   <decision_flow>
@@ -36,20 +36,21 @@
 11. Confidence/index? → Airis-Agent
   </decision_flow>
 
-  <fallbacks>
-| Primary | Fallback |
-|---------|----------|
-| Tavily | WebSearch (native) |
-| Context7 | Tavily |
-| Sequential | Native |
-| Playwright | Chrome (native --chrome) |
-| Serena | Native search |
-| Morphllm | Native edit |
-| Magic | Native coding |
-| DevTools | Playwright |
-| Mindbase | Serena |
-| Airis-Agent | Native |
-  </fallbacks>
+  <fallback_behavior note="First notification only per session">
+    <rule>MCP 미로드 시 첫 사용에만 알림, 이후 자동 fallback</rule>
+    <format>⚠️ [MCP명] unavailable → using [Fallback]</format>
+    <tracking>hook_tracker.py session state 활용</tracking>
+  </fallback_behavior>
+
+  <cross_reference note="FLAGS.md와 MCP 연동">
+| FLAGS.md Flag | Triggers MCP | Triggers Mode |
+|---------------|--------------|---------------|
+| --think | Sequential | - |
+| --think-hard | Sequential + Context7 | - |
+| --ultrathink | All loaded MCP | - |
+| --brainstorm | - | Brainstorming |
+| --uc | - | TokenEfficiency |
+  </cross_reference>
 
   <native_features note="Built-in Claude Code capabilities, not MCP">
 | Feature | Flag | Use Case |

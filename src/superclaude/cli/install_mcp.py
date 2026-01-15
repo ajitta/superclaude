@@ -299,7 +299,7 @@ def list_available_servers():
     """List all available MCP servers."""
     click.echo("📋 Available MCP Servers:\n")
 
-    for server_key, server_info in MCP_SERVERS.items():
+    for server_info in MCP_SERVERS.values():
         name = server_info["name"]
         description = server_info["description"]
         api_key_note = ""
@@ -316,6 +316,52 @@ def list_available_servers():
         click.echo()
 
     click.echo(f"Total: {len(MCP_SERVERS)} servers available")
+
+
+def show_mcp_status():
+    """Show MCP server status with fallback info."""
+    # Import fallback mappings
+    try:
+        from superclaude.hooks.mcp_fallback import MCP_FALLBACKS
+    except ImportError:
+        MCP_FALLBACKS = {}
+
+    click.echo("📊 MCP Server Status\n")
+    click.echo("┌─────────────────────┬──────────┬─────────────────────┐")
+    click.echo("│ Server              │ Status   │ Fallback            │")
+    click.echo("├─────────────────────┼──────────┼─────────────────────┤")
+
+    installed_count = 0
+    for server_info in MCP_SERVERS.values():
+        name = server_info["name"]
+        is_installed = check_mcp_server_installed(name)
+
+        if is_installed:
+            status = "✅ Active"
+            installed_count += 1
+        else:
+            status = "⬜ —"
+
+        # Get fallback from mapping
+        fallback_key = name.lower().replace("-", "")
+        # Handle special mappings
+        fallback_map = {
+            "sequentialthinking": "sequential",
+            "morphllmfastapply": "morphllm",
+            "chromedevtools": "devtools",
+            "airisagent": "airis-agent",
+        }
+        fallback_key = fallback_map.get(fallback_key, fallback_key)
+        fallback = MCP_FALLBACKS.get(fallback_key, "Native")
+
+        click.echo(f"│ {name:19} │ {status:8} │ {fallback:19} │")
+
+    click.echo("└─────────────────────┴──────────┴─────────────────────┘")
+    click.echo(f"\n📈 {installed_count}/{len(MCP_SERVERS)} servers active")
+
+    if installed_count < len(MCP_SERVERS):
+        click.echo("\n💡 Install with: superclaude mcp --servers <name>")
+        click.echo("   Or install all: superclaude mcp --servers all")
 
 
 def install_mcp_servers(
@@ -357,7 +403,7 @@ def install_mcp_servers(
         click.echo("📋 Available MCP servers:\n")
 
         server_options = []
-        for key, info in MCP_SERVERS.items():
+        for info in MCP_SERVERS.values():
             api_note = (
                 f" (requires {info['api_key_env']})" if "api_key_env" in info else ""
             )

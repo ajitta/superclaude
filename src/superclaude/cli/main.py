@@ -206,6 +206,7 @@ def uninstall(scope: str, dry_run: bool, yes: bool, keep_settings: bool):
 @main.command()
 @click.option("--servers", "-s", multiple=True, help="Specific MCP servers to install")
 @click.option("--list", "list_only", is_flag=True, help="List available MCP servers")
+@click.option("--status", "show_status", is_flag=True, help="Show MCP server status with fallbacks")
 @click.option(
     "--scope",
     default="user",
@@ -217,20 +218,25 @@ def uninstall(scope: str, dry_run: bool, yes: bool, keep_settings: bool):
     is_flag=True,
     help="Show what would be installed without actually installing",
 )
-def mcp(servers, list_only, scope, dry_run):
+def mcp(servers, list_only, show_status, scope, dry_run):
     """
     Install and manage MCP servers for Claude Code
 
     Examples:
         superclaude mcp --list
+        superclaude mcp --status
         superclaude mcp --servers tavily --servers context7
         superclaude mcp --scope project
         superclaude mcp --dry-run
     """
-    from .install_mcp import install_mcp_servers, list_available_servers
+    from .install_mcp import install_mcp_servers, list_available_servers, show_mcp_status
 
     if list_only:
         list_available_servers()
+        return
+
+    if show_status:
+        show_mcp_status()
         return
 
     click.echo(f"🔌 Installing MCP servers (scope: {scope})...")

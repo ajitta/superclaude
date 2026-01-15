@@ -19,16 +19,17 @@
 | BusinessPanel | business, panel, expert, strategy, business panel, expert panel, strategy panel, christensen, porter, drucker, godin, taleb | MODE_Business_Panel.md |
   </mode_index>
 
-  <tool_index note="Quick MCP selection">
-| Task | Tool |
-|------|------|
-| UI components | Magic MCP |
-| Deep analysis | Sequential MCP |
-| Symbol ops | Serena MCP |
-| Pattern edits | Morphllm MCP |
-| Docs lookup | Context7 MCP |
-| Browser test | Playwright MCP |
-| Web search | Tavily MCP |
+  <tool_index note="Quick MCP selection with fallbacks">
+| Task | Tool | Fallback |
+|------|------|----------|
+| UI components | Magic MCP | Write (native) |
+| Deep analysis | Sequential MCP | Native reasoning |
+| Symbol ops | Serena MCP | Native search |
+| Pattern edits | Morphllm MCP | Edit (native) |
+| Docs lookup | Context7 MCP | Tavily/WebSearch |
+| Browser test | Playwright MCP | --chrome (native) |
+| Web search | Tavily MCP | WebSearch (native) |
+| Perf metrics | DevTools MCP | Playwright |
   </tool_index>
 
   <context_thresholds>

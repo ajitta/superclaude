@@ -39,12 +39,12 @@
 | WebSearch | fact-check, current info | Native web search (no flag needed) |
   </native>
 
-  <analysis>
-| Flag | Trigger | Effect |
-|------|---------|--------|
-| `--think` | moderate complexity | ~4K tokens, enables Sequential |
-| `--think-hard` | architecture, system-wide | ~10K tokens, Sequential + Context7 |
-| `--ultrathink` | critical redesign, legacy, complex debug | ~32K tokens, all MCP |
+  <analysis note="Primary source for think flags - also triggers MCP_INDEX">
+| Flag | Trigger | Effect | MCP Integration |
+|------|---------|--------|-----------------|
+| `--think` | moderate complexity | ~4K tokens | Sequential |
+| `--think-hard` | architecture, system-wide | ~10K tokens | Sequential + Context7 |
+| `--ultrathink` | critical redesign, legacy, complex debug | ~32K tokens | All loaded MCP |
   </analysis>
 
   <effort note="Opus 4.5 specific">

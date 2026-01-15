@@ -25,6 +25,14 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from superclaude.scripts.token_estimator import TokenEstimate
 
+# v2.2.0: MCP fallback notification support
+try:
+    from superclaude.hooks.mcp_fallback import check_mcp_and_notify, MCP_FALLBACKS
+    MCP_FALLBACK_AVAILABLE = True
+except ImportError:
+    MCP_FALLBACK_AVAILABLE = False
+    MCP_FALLBACKS = {}
+
 # Configuration
 INJECT_MODE = os.environ.get("CLAUDE_CONTEXT_INJECT", "1") == "1"  # Default: inject
 MAX_TOKENS_ESTIMATE = int(
@@ -250,11 +258,47 @@ def output_directive_mode(contexts: list[tuple[str, int]]) -> None:
         print("These provide detailed guidance for the detected domain.")
 
 
+def check_mcp_fallbacks(contexts: list[tuple[str, int]]) -> list[str]:
+    """Check for MCP fallback notifications (first time only per session).
+
+    Args:
+        contexts: List of (context_file, priority) tuples
+
+    Returns:
+        List of notification strings to display
+    """
+    if not MCP_FALLBACK_AVAILABLE:
+        return []
+
+    notifications = []
+    for context_file, _ in contexts:
+        # Extract MCP name from path like "mcp/MCP_Morphllm.md"
+        if context_file.startswith("mcp/MCP_"):
+            mcp_name = context_file.replace("mcp/MCP_", "").replace(".md", "").lower()
+            # Map special names
+            name_map = {"chrome-devtools": "devtools"}
+            mcp_name = name_map.get(mcp_name, mcp_name)
+
+            if mcp_name in MCP_FALLBACKS:
+                notification = check_mcp_and_notify(mcp_name)
+                if notification:
+                    notifications.append(notification)
+
+    return notifications
+
+
 def output_inject_mode(contexts: list[tuple[str, int]]) -> None:
     """Directly output file contents (deterministic, no Read dependency)."""
     total_tokens = 0
     loaded_files = []
     skipped_files = []
+
+    # v2.2.0: Check MCP fallbacks first
+    fallback_notifications = check_mcp_fallbacks(contexts)
+    for notification in fallback_notifications:
+        print(f"<!-- {notification} -->")
+    if fallback_notifications:
+        print()
 
     for context_file, priority in contexts:
         file_path = BASE_PATH / context_file
