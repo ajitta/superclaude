@@ -37,12 +37,12 @@
   </decision_flow>
 
   <fallback_behavior note="First notification only per session">
-    <rule>MCP 미로드 시 첫 사용에만 알림, 이후 자동 fallback</rule>
-    <format>⚠️ [MCP명] unavailable → using [Fallback]</format>
-    <tracking>hook_tracker.py session state 활용</tracking>
+    <rule>Notify only on first use when MCP not loaded, then auto fallback</rule>
+    <format>⚠️ [MCP_NAME] unavailable → using [Fallback]</format>
+    <tracking>Uses hook_tracker.py session state</tracking>
   </fallback_behavior>
 
-  <cross_reference note="FLAGS.md와 MCP 연동">
+  <cross_reference note="FLAGS.md and MCP integration">
 | FLAGS.md Flag | Triggers MCP | Triggers Mode |
 |---------------|--------------|---------------|
 | --think | Sequential | - |

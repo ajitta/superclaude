@@ -1,7 +1,7 @@
 ---
 name: confidence-check
 description: Pre-implementation confidence assessment (≥90% to proceed)
-triggers: /confidence-check, pre-implementation, verify-before-implementing, 확인해줘
+triggers: /confidence-check, pre-implementation, verify-before-implementing, sanity-check
 mcp: c7:docs|tavily:oss-search
 context: inline
 agent: quality-engineer
