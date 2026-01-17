@@ -4,34 +4,35 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Python Environment
 
-This project uses **UV** for all Python operations.
+This project uses **UV** for all Python operations. Never use `pip` or `python -m pytest` directly.
 
 ```bash
 # Tests
-uv run pytest                         # Full suite
-uv run pytest tests/unit/ -v          # Unit tests only
-uv run pytest tests/integration/ -v   # Integration tests only
+uv run pytest                              # Full suite
+uv run pytest tests/unit/ -v               # Unit tests only (6 files)
+uv run pytest tests/integration/ -v        # Integration tests (1 file)
 uv run pytest tests/unit/test_confidence.py -v  # Single file
-uv run pytest -m confidence_check     # By marker
-uv run pytest -k "test_assess"        # By name pattern
+uv run pytest -m confidence_check          # By marker
+uv run pytest -k "test_assess"             # By name pattern
 
-# Development
-uv pip install -e ".[dev]"            # Install editable (RECOMMENDED)
-uv run superclaude install --list-all # Test CLI changes
-uv tool install --force .             # Deploy to global tool
+# Development workflow
+uv pip install -e ".[dev]"                 # Install editable (RECOMMENDED)
+uv run superclaude install --list-all      # Test CLI changes
+uv tool install --force .                  # Deploy to global tool
 ```
 
 ## Make Commands
 
 ```bash
-make install      # uv pip install -e ".[dev]"
-make test         # uv run pytest
-make test-plugin  # Verify pytest plugin loads
-make verify       # Full installation check
-make lint         # ruff check
-make format       # ruff format
-make doctor       # Health check
-make clean        # Remove artifacts
+make install       # uv pip install -e ".[dev]"
+make test          # uv run pytest
+make test-plugin   # Verify pytest plugin loads
+make verify        # Full installation check
+make lint          # ruff check
+make format        # ruff format
+make doctor        # Health check
+make clean         # Remove artifacts
+make build-plugin  # Build plugin artefacts to dist/
 ```
 
 ## Architecture
@@ -40,12 +41,12 @@ make clean        # Remove artifacts
 src/superclaude/
 ├── pytest_plugin.py     # Entry point (auto-loaded via pyproject.toml)
 ├── pm_agent/            # Pre/post implementation patterns
-│   ├── confidence.py    # Pre-execution check (≥90% to proceed)
-│   ├── self_check.py    # Post-implementation validation
+│   ├── confidence.py    # Pre-execution check (≥90% proceed, 70-89% alternatives, <70% stop)
+│   ├── self_check.py    # Post-implementation validation (evidence required)
 │   ├── reflexion.py     # Cross-session error learning
 │   └── token_budget.py  # simple: 200, medium: 1000, complex: 2500
 ├── execution/
-│   ├── parallel.py      # Wave→Checkpoint→Wave (3.5x faster)
+│   ├── parallel.py      # Wave→Checkpoint→Wave pattern (3.5x speedup)
 │   └── self_correction.py
 ├── cli/
 │   ├── main.py          # superclaude command entry
@@ -53,13 +54,25 @@ src/superclaude/
 │   ├── install_skill.py # Skill installation
 │   └── install_mcp.py   # MCP server configs
 ├── hooks/
-│   ├── hook_tracker.py  # once: true session tracking
+│   ├── hook_tracker.py  # once: true session tracking (24h TTL)
 │   └── inline_hooks.py  # Frontmatter hook parser
 ├── agents/              # 20 agent definitions (.md)
 ├── commands/            # 30 slash commands (.md)
 ├── modes/               # 8 behavioral modes (.md)
 ├── mcp/                 # MCP server docs + configs/
-└── skills/              # Skill implementations
+├── core/                # FLAGS, PRINCIPLES, RULES
+├── skills/              # Skill implementations
+└── scripts/             # Shell/Python utilities
+
+tests/
+├── conftest.py          # Shared fixtures
+├── unit/                # 6 test files
+└── integration/         # 1 test file
+
+scripts/                 # Build and maintenance utilities
+├── build_superclaude_plugin.py
+├── compare_token_usage.py
+└── uninstall_legacy.sh
 ```
 
 ## Entry Points (pyproject.toml)
@@ -76,7 +89,12 @@ superclaude = "superclaude.pytest_plugin"
 
 Auto-loaded after `uv pip install -e .`. Provides fixtures and markers.
 
-**Fixtures**: `confidence_checker`, `self_check_protocol`, `reflexion_pattern`, `token_budget`, `pm_context`
+**Fixtures** (defined in `tests/conftest.py` and `pytest_plugin.py`):
+- `confidence_checker` - Pre-execution assessment
+- `self_check_protocol` - Post-implementation validation
+- `reflexion_pattern` - Error learning
+- `token_budget` - Token allocation by complexity
+- `pm_context` - Combined PM Agent context
 
 **Auto-markers** (path-based):
 - Tests in `tests/unit/` → `@pytest.mark.unit`
@@ -109,6 +127,8 @@ def test_with_budget(token_budget):
 | SelfCheckProtocol | Post-validation | Evidence required, no speculation |
 | ReflexionPattern | Error learning | Cross-session pattern matching |
 | Parallel Execution | Wave→Checkpoint→Wave | 3.5x speedup |
+
+**Confidence Check ROI**: 25-250x token savings by preventing wrong-direction work
 
 ## CLI Commands
 
@@ -151,6 +171,20 @@ Located in `src/superclaude/hooks/`. Claude Code v2.1.0 compatible.
 - State in `~/.claude/.superclaude_hooks/`
 - Auto-cleanup after 24h TTL
 
+## Installation Paths
+
+When installed via `superclaude install`:
+- **User scope** (default): `~/.claude/` - Global installation
+- **Project scope**: `./.claude/` - Project-specific
+
+Contents installed:
+- `commands/` → 30 slash commands
+- `agents/` → 20 agent definitions
+- `modes/` → 8 behavioral modes
+- `mcp/` → MCP server configurations
+- `core/` → FLAGS, PRINCIPLES, RULES
+- `skills/` → Skill implementations
+
 ## Git Workflow
 
 Branch: `master` ← `integration` ← `feature/*`, `fix/*`, `docs/*`
@@ -167,6 +201,7 @@ Parallel sessions: `git worktree add ../SuperClaude-feature feature/name`
 | TASK.md | Current tasks and priorities |
 | KNOWLEDGE.md | Accumulated insights, troubleshooting |
 | CHANGELOG.md | Version history |
+| PROJECT_INDEX.md | Full documentation index |
 
 ## Package Info
 
