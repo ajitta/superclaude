@@ -94,4 +94,33 @@ Mapping to flags:
 - MCP: --no-mcp overrides individual flags
 - Scope: system > project > module > file
   </priority_rules>
+
+  <environment_variables note="Claude Code 2.1.x additions">
+| Variable | Purpose | Version |
+|----------|---------|---------|
+| `IS_DEMO` | Hide email/org from UI (streaming) | 2.1.0 |
+| `CLAUDE_CODE_FILE_READ_MAX_OUTPUT_TOKENS` | Override file read token limit | 2.1.0 |
+| `FORCE_AUTOUPDATE_PLUGINS` | Force plugin autoupdate | 2.1.2 |
+| `CLAUDE_CODE_DISABLE_BACKGROUND_TASKS` | Disable Ctrl+B backgrounding | 2.1.4 |
+| `CLAUDE_CODE_TMPDIR` | Override temp directory | 2.1.5 |
+  </environment_variables>
+
+  <settings note="Claude Code 2.1.x additions">
+| Setting | Purpose | Version |
+|---------|---------|---------|
+| `language` | Response language (e.g., "japanese") | 2.1.0 |
+| `respectGitignore` | Per-project @-mention file picker control | 2.1.0 |
+| `showTurnDuration` | Hide "Cooked for Xm Xs" messages | 2.1.7 |
+| `plansDirectory` | Custom plan file storage location | 2.1.9 |
+  </settings>
+
+  <permission_patterns note="v2.1.0+ wildcard syntax">
+| Pattern | Example | Matches |
+|---------|---------|---------|
+| Prefix wildcard | `Bash(* install)` | Any command ending with "install" |
+| Suffix wildcard | `Bash(npm *)` | npm followed by anything |
+| Middle wildcard | `Bash(git * main)` | git commands targeting main |
+| Agent disable | `Task(AgentName)` | Disable specific agent in disallowedTools |
+| MCP wildcard | `mcp__server__*` | All tools from an MCP server |
+  </permission_patterns>
 </component>

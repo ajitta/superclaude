@@ -42,6 +42,20 @@
     <tracking>Uses hook_tracker.py session state</tracking>
   </fallback_behavior>
 
+  <auto_mode note="v2.1.7+ - MCP tool search auto mode">
+    <rule>When MCP tool descriptions exceed threshold, defer to MCPSearch tool</rule>
+    <default>10% of context window</default>
+    <config>`auto:N` syntax where N is percentage (0-100)</config>
+    <disable>Add `MCPSearch` to `disallowedTools` in settings</disable>
+    <benefit>Reduces context usage for users with many MCP tools</benefit>
+  </auto_mode>
+
+  <list_changed note="v2.1.0+ - Dynamic tool updates">
+    <rule>MCP servers can emit list_changed notifications</rule>
+    <effect>Tools, prompts, resources update without reconnection</effect>
+    <use_case>Dynamic tool registration, capability changes</use_case>
+  </list_changed>
+
   <cross_reference note="FLAGS.md and MCP integration">
 | FLAGS.md Flag | Triggers MCP | Triggers Mode |
 |---------------|--------------|---------------|
