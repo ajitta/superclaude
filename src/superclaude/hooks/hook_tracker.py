@@ -366,9 +366,9 @@ def check_and_mark(
     once: bool = False,
     matcher: str | None = None,
 ) -> bool:
-    """Check if hook should execute and mark it if so.
+    """Check if hook should execute and mark it if so - optimized single I/O.
 
-    Atomic operation that checks and marks in one call.
+    Atomic operation that checks and marks in one call with single load/save.
 
     Args:
         hook_type: Type of hook
@@ -383,8 +383,31 @@ def check_and_mark(
     if not once:
         return True
 
-    if has_executed_once(hook_type, command, source, matcher):
+    session_id = get_session_id()
+    hook_id = _generate_hook_id(hook_type, command, source, matcher)
+
+    # Single load
+    data = _load_tracker_data()
+
+    # Check if already executed
+    session_data = data.get(session_id)
+    if session_data and hook_id in session_data.executions:
         return False
 
-    mark_executed(hook_type, command, source, matcher)
+    # Mark as executed
+    if session_id not in data:
+        data[session_id] = SessionData(
+            session_id=session_id,
+            started_at=datetime.now().isoformat(),
+        )
+
+    data[session_id].executions[hook_id] = HookExecution(
+        hook_id=hook_id,
+        hook_type=hook_type,
+        executed_at=datetime.now().isoformat(),
+        source=source,
+    )
+
+    # Single save
+    _save_tracker_data(data)
     return True

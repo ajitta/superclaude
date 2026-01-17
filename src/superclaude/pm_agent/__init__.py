@@ -9,15 +9,15 @@ Provides core functionality for PM Agent:
 """
 
 from .confidence import (
-    # Protocols
-    AsyncConfidenceCheck,
-    ConfidenceCheck,
-    # Result types
-    CheckResult,
-    ConfidenceChecker,
-    ConfidenceResult,
     # Concrete checks (for custom registration)
     ArchitectureCheck,
+    # Protocols
+    AsyncConfidenceCheck,
+    # Result types
+    CheckResult,
+    ConfidenceCheck,
+    ConfidenceChecker,
+    ConfidenceResult,
     NoDuplicatesCheck,
     OfficialDocsCheck,
     OssReferenceCheck,

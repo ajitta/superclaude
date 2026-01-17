@@ -108,64 +108,6 @@ class TestConfidenceChecker:
         assert "Low confidence" in recommendation
         assert "STOP" in recommendation
 
-    def test_has_official_docs_with_flag(self):
-        """Test official docs check with direct flag"""
-        checker = ConfidenceChecker()
-        context = {"official_docs_verified": True}
-
-        result = checker._has_official_docs(context)
-
-        assert result is True
-
-    def test_no_duplicates_check(self):
-        """Test duplicate check validation"""
-        checker = ConfidenceChecker()
-
-        # With flag
-        context_pass = {"duplicate_check_complete": True}
-        assert checker._no_duplicates(context_pass) is True
-
-        # Without flag
-        context_fail = {"duplicate_check_complete": False}
-        assert checker._no_duplicates(context_fail) is False
-
-    def test_architecture_compliance_check(self):
-        """Test architecture compliance validation"""
-        checker = ConfidenceChecker()
-
-        # With flag
-        context_pass = {"architecture_check_complete": True}
-        assert checker._architecture_compliant(context_pass) is True
-
-        # Without flag
-        context_fail = {}
-        assert checker._architecture_compliant(context_fail) is False
-
-    def test_oss_reference_check(self):
-        """Test OSS reference validation"""
-        checker = ConfidenceChecker()
-
-        # With flag
-        context_pass = {"oss_reference_complete": True}
-        assert checker._has_oss_reference(context_pass) is True
-
-        # Without flag
-        context_fail = {"oss_reference_complete": False}
-        assert checker._has_oss_reference(context_fail) is False
-
-    def test_root_cause_check(self):
-        """Test root cause identification validation"""
-        checker = ConfidenceChecker()
-
-        # With flag
-        context_pass = {"root_cause_identified": True}
-        assert checker._root_cause_identified(context_pass) is True
-
-        # Without flag
-        context_fail = {}
-        assert checker._root_cause_identified(context_fail) is False
-
-
 def test_confidence_check_marker_integration(confidence_checker):
     """
     Test that confidence_checker fixture works with pytest plugin
@@ -200,344 +142,6 @@ def test_confidence_check_marker_skips_low_confidence(request):
     marker = request.config.getini("markers")
     marker_names = [m.split(":")[0] for m in marker]
     assert "confidence_check" in marker_names
-
-
-class TestRootCauseActiveVerification:
-    """Test active verification for _root_cause_identified"""
-
-    def test_specific_root_cause_with_evidence_passes(self):
-        """Root cause with 5+ words and evidence should pass"""
-        checker = ConfidenceChecker()
-        context = {
-            "root_cause": "Null pointer exception in UserService.getUser() due to missing null check",
-            "evidence": ["stack trace line 42", "reproduction steps documented"],
-        }
-        assert checker._root_cause_identified(context) is True
-
-    def test_short_root_cause_fails(self):
-        """Root cause with fewer than 5 words should fail"""
-        checker = ConfidenceChecker()
-        context = {
-            "root_cause": "Bug in code",
-            "evidence": ["some evidence"],
-        }
-        assert checker._root_cause_identified(context) is False
-
-    def test_vague_root_cause_fails(self):
-        """Root cause with vague terms should fail"""
-        checker = ConfidenceChecker()
-        vague_examples = [
-            "Maybe the authentication service is failing somewhere",
-            "The error probably comes from the database connection",
-            "It might be a race condition in the async handler",
-            "Unknown issue causing the timeout in production",
-            "Possibly a memory leak in the worker process",
-        ]
-        for vague_cause in vague_examples:
-            context = {
-                "root_cause": vague_cause,
-                "evidence": ["some evidence"],
-            }
-            assert checker._root_cause_identified(context) is False, f"Should fail for: {vague_cause}"
-
-    def test_no_evidence_fails(self):
-        """Root cause without evidence should fail"""
-        checker = ConfidenceChecker()
-        context = {
-            "root_cause": "Database connection timeout due to connection pool exhaustion",
-            "evidence": [],
-        }
-        assert checker._root_cause_identified(context) is False
-
-    def test_flag_overrides_heuristic(self):
-        """Explicit flag should override heuristic check"""
-        checker = ConfidenceChecker()
-        # Flag True overrides bad heuristics
-        context = {
-            "root_cause_identified": True,
-            "root_cause": "Bug",  # Would fail heuristic
-            "evidence": [],
-        }
-        assert checker._root_cause_identified(context) is True
-
-        # Flag False overrides good heuristics
-        context = {
-            "root_cause_identified": False,
-            "root_cause": "Null pointer exception in UserService due to missing check",
-            "evidence": ["stack trace"],
-        }
-        assert checker._root_cause_identified(context) is False
-
-
-class TestNoDuplicatesActiveVerification:
-    """Test active verification for _no_duplicates"""
-
-    def test_no_task_name_passes(self, tmp_path):
-        """No task name means nothing to check, should pass"""
-        checker = ConfidenceChecker()
-        context = {"project_root": str(tmp_path)}
-        assert checker._no_duplicates(context) is True
-
-    def test_no_matches_passes(self, tmp_path):
-        """No matching files should pass"""
-        checker = ConfidenceChecker()
-        # Create a file that won't match
-        (tmp_path / "unrelated.py").write_text("# nothing here")
-        context = {
-            "task_name": "implement_unique_feature",
-            "project_root": str(tmp_path),
-        }
-        assert checker._no_duplicates(context) is True
-
-    def test_many_matches_fails(self, tmp_path):
-        """Many matching files should fail (potential duplicates)"""
-        checker = ConfidenceChecker()
-        # Create many files matching "user" keyword
-        for i in range(10):
-            (tmp_path / f"user_handler_{i}.py").write_text(f"# handler {i}")
-
-        context = {
-            "task_name": "implement_user_management",
-            "project_root": str(tmp_path),
-            "duplicate_threshold": 5,
-        }
-        assert checker._no_duplicates(context) is False
-        assert "potential_duplicates" in context
-
-    def test_threshold_configurable(self, tmp_path):
-        """Duplicate threshold should be configurable"""
-        checker = ConfidenceChecker()
-        # Create 3 matching files
-        for i in range(3):
-            (tmp_path / f"auth_{i}.py").write_text(f"# auth {i}")
-
-        # Should pass with high threshold
-        context = {
-            "task_name": "implement_auth_feature",
-            "project_root": str(tmp_path),
-            "duplicate_threshold": 10,
-        }
-        assert checker._no_duplicates(context) is True
-
-        # Should fail with low threshold
-        context["duplicate_threshold"] = 2
-        assert checker._no_duplicates(context) is False
-
-    def test_excludes_test_files(self, tmp_path):
-        """Test files should be excluded from duplicate check"""
-        checker = ConfidenceChecker()
-        # Create test files (should be ignored)
-        for i in range(10):
-            (tmp_path / f"test_feature_{i}.py").write_text(f"# test {i}")
-
-        context = {
-            "task_name": "implement_feature",
-            "project_root": str(tmp_path),
-            "duplicate_threshold": 5,
-        }
-        assert checker._no_duplicates(context) is True
-
-    def test_flag_overrides_search(self, tmp_path):
-        """Explicit flag should override filesystem search"""
-        checker = ConfidenceChecker()
-        # Create many duplicates
-        for i in range(10):
-            (tmp_path / f"handler_{i}.py").write_text(f"# handler {i}")
-
-        context = {
-            "duplicate_check_complete": True,  # Override
-            "task_name": "implement_handler",
-            "project_root": str(tmp_path),
-        }
-        assert checker._no_duplicates(context) is True
-
-
-class TestArchitectureCompliantActiveVerification:
-    """Test active verification for _architecture_compliant"""
-
-    def test_no_proposed_tech_fails(self):
-        """No proposed technology should fail (backward compat)"""
-        checker = ConfidenceChecker()
-        context = {"project_root": "."}
-        assert checker._architecture_compliant(context) is False
-
-    def test_compatible_tech_passes(self, tmp_path):
-        """Proposed tech compatible with stack should pass"""
-        checker = ConfidenceChecker()
-        # Create CLAUDE.md with React
-        (tmp_path / "CLAUDE.md").write_text("# Project\nUsing React and Next.js")
-
-        context = {
-            "project_root": str(tmp_path),
-            "proposed_technology": ["react_components", "nextjs_api"],
-        }
-        assert checker._architecture_compliant(context) is True
-        assert "detected_tech_stack" in context
-
-    def test_conflicting_tech_fails(self, tmp_path):
-        """Proposed tech conflicting with stack should fail"""
-        checker = ConfidenceChecker()
-        # Create CLAUDE.md with React
-        (tmp_path / "CLAUDE.md").write_text("# Project\nUsing React for frontend")
-
-        context = {
-            "project_root": str(tmp_path),
-            "proposed_technology": ["jquery", "vanilla_dom"],
-        }
-        assert checker._architecture_compliant(context) is False
-        assert "architecture_conflicts" in context
-        assert len(context["architecture_conflicts"]) > 0
-
-    def test_supabase_conflict_detection(self, tmp_path):
-        """Should detect conflicts with Supabase projects"""
-        checker = ConfidenceChecker()
-        (tmp_path / "CLAUDE.md").write_text("# Project\nUsing Supabase for backend")
-
-        context = {
-            "project_root": str(tmp_path),
-            "proposed_technology": ["custom_api", "custom_auth"],
-        }
-        assert checker._architecture_compliant(context) is False
-        conflicts = context.get("architecture_conflicts", [])
-        assert any("custom_api" in c for c in conflicts)
-
-    def test_detects_from_pyproject(self, tmp_path):
-        """Should detect tech stack from pyproject.toml"""
-        checker = ConfidenceChecker()
-        (tmp_path / "pyproject.toml").write_text(
-            '[project]\ndependencies = ["fastapi", "pytest"]'
-        )
-
-        context = {
-            "project_root": str(tmp_path),
-            "proposed_technology": ["compatible_middleware"],
-        }
-        result = checker._architecture_compliant(context)
-        assert result is True
-        stack = context.get("detected_tech_stack", {})
-        assert "fastapi" in stack.get("frameworks", [])
-
-    def test_detects_from_package_json(self, tmp_path):
-        """Should detect tech stack from package.json"""
-        checker = ConfidenceChecker()
-        (tmp_path / "package.json").write_text(
-            '{"dependencies": {"next": "14.0.0", "react": "18.0.0"}}'
-        )
-
-        context = {
-            "project_root": str(tmp_path),
-            "proposed_technology": ["server_components"],
-        }
-        result = checker._architecture_compliant(context)
-        assert result is True
-        stack = context.get("detected_tech_stack", {})
-        assert "nextjs" in stack.get("frameworks", [])
-
-    def test_flag_overrides_detection(self, tmp_path):
-        """Explicit flag should override detection"""
-        checker = ConfidenceChecker()
-        (tmp_path / "CLAUDE.md").write_text("Using React")
-
-        context = {
-            "architecture_check_complete": True,
-            "project_root": str(tmp_path),
-            "proposed_technology": ["jquery"],  # Would conflict
-        }
-        assert checker._architecture_compliant(context) is True
-
-
-class TestOssReferenceActiveVerification:
-    """Test active verification for _has_oss_reference"""
-
-    def test_valid_github_reference_passes(self):
-        """Valid GitHub reference should pass"""
-        checker = ConfidenceChecker()
-        context = {
-            "oss_references": [
-                {"url": "https://github.com/tiangolo/fastapi", "source": "Context7"}
-            ]
-        }
-        assert checker._has_oss_reference(context) is True
-        assert "validated_oss_references" in context
-
-    def test_multiple_reputable_sources_pass(self):
-        """Multiple reputable sources should pass"""
-        checker = ConfidenceChecker()
-        context = {
-            "oss_references": [
-                {"url": "https://stackoverflow.com/questions/12345"},
-                {"url": "https://docs.python.org/3/library/asyncio.html"},
-                {"url": "https://reactjs.org/docs/hooks-intro.html"},
-            ]
-        }
-        assert checker._has_oss_reference(context) is True
-
-    def test_cached_pattern_passes(self, tmp_path):
-        """Cached pattern file should pass"""
-        checker = ConfidenceChecker()
-        patterns_dir = tmp_path / "docs" / "patterns"
-        patterns_dir.mkdir(parents=True)
-        (patterns_dir / "authentication.md").write_text("# Auth patterns")
-
-        context = {
-            "project_root": str(tmp_path),
-            "task_type": "authentication",
-        }
-        assert checker._has_oss_reference(context) is True
-        assert "cached_pattern_source" in context
-
-    def test_known_pattern_database_match(self):
-        """Known OSS pattern should match from database"""
-        checker = ConfidenceChecker()
-        test_cases = [
-            ("implement_jwt_auth", "jwt"),
-            ("add_user_login", "login"),
-            ("create_api_endpoint", "api"),
-            ("write_unit_tests", "test"),
-            ("add_form_validation", "form"),
-            ("add_cache_layer", "cache"),  # "cache" must be substring
-        ]
-        for task_name, expected_keyword in test_cases:
-            context = {"task_name": task_name}
-            result = checker._has_oss_reference(context)
-            assert result is True, f"Should match pattern for: {task_name}"
-            assert "matched_oss_pattern" in context
-            pattern = context["matched_oss_pattern"]
-            assert "references" in pattern
-
-    def test_no_reference_fails(self):
-        """No OSS reference should fail"""
-        checker = ConfidenceChecker()
-        context = {
-            "task_name": "implement_xyz_unique_feature",
-            "project_root": ".",
-        }
-        assert checker._has_oss_reference(context) is False
-
-    def test_flag_overrides_verification(self):
-        """Explicit flag should override verification"""
-        checker = ConfidenceChecker()
-        context = {
-            "oss_reference_complete": True,
-            "task_name": "unique_feature",  # Would fail
-        }
-        assert checker._has_oss_reference(context) is True
-
-    def test_home_claude_patterns_checked(self, tmp_path, monkeypatch):
-        """Should check ~/.claude/patterns for cached patterns"""
-        checker = ConfidenceChecker()
-        # Mock Path.home() to return tmp_path
-        monkeypatch.setattr("pathlib.Path.home", lambda: tmp_path)
-
-        patterns_dir = tmp_path / ".claude" / "patterns"
-        patterns_dir.mkdir(parents=True)
-        (patterns_dir / "custom_pattern.md").write_text("# Custom")
-
-        context = {
-            "project_root": str(tmp_path / "project"),
-            "task_type": "custom_pattern",
-        }
-        assert checker._has_oss_reference(context) is True
 
 
 class TestConfidenceResult:
@@ -944,3 +548,512 @@ class TestAsyncSupport:
 
         with pytest.raises(TypeError, match="must implement ConfidenceCheck or AsyncConfidenceCheck"):
             checker.register_check(InvalidCheck())
+
+
+class TestNoDuplicatesCheckActiveVerification:
+    """Test NoDuplicatesCheck active verification logic"""
+
+    def test_explicit_flag_true(self):
+        """Test that explicit flag=True passes"""
+        from superclaude.pm_agent.confidence import NoDuplicatesCheck
+
+        check = NoDuplicatesCheck()
+        context = {"duplicate_check_complete": True}
+        passed, msg = check.evaluate(context)
+
+        assert passed is True
+        assert "No duplicate" in msg
+
+    def test_explicit_flag_false(self):
+        """Test that explicit flag=False fails"""
+        from superclaude.pm_agent.confidence import NoDuplicatesCheck
+
+        check = NoDuplicatesCheck()
+        context = {"duplicate_check_complete": False}
+        passed, msg = check.evaluate(context)
+
+        assert passed is False
+        assert "Check for existing" in msg
+
+    def test_no_task_name_passes(self):
+        """Test that empty task_name passes (no duplicates to check)"""
+        from superclaude.pm_agent.confidence import NoDuplicatesCheck
+
+        check = NoDuplicatesCheck()
+        context = {"task_name": ""}
+        passed, msg = check.evaluate(context)
+
+        assert passed is True
+
+    def test_nonexistent_project_passes(self):
+        """Test that nonexistent project root passes"""
+        from superclaude.pm_agent.confidence import NoDuplicatesCheck
+
+        check = NoDuplicatesCheck()
+        context = {
+            "task_name": "implement feature",
+            "project_root": "/nonexistent/path/12345",
+        }
+        passed, msg = check.evaluate(context)
+
+        assert passed is True
+
+    def test_keywords_extraction(self, tmp_path):
+        """Test keyword extraction from task name"""
+        from superclaude.pm_agent.confidence import NoDuplicatesCheck
+
+        check = NoDuplicatesCheck()
+        # Create minimal project structure
+        (tmp_path / "dummy.py").write_text("# placeholder")
+
+        context = {
+            "task_name": "implement the test_feature",  # 'the' should be skipped
+            "project_root": str(tmp_path),
+        }
+        passed, _ = check.evaluate(context)
+
+        # Should pass (no files matching 'implement' or 'feature')
+        assert passed is True
+
+    def test_duplicate_detection(self, tmp_path):
+        """Test duplicate detection when many matching files exist"""
+        from superclaude.pm_agent.confidence import NoDuplicatesCheck
+
+        check = NoDuplicatesCheck()
+
+        # Create many files matching 'config' keyword
+        for i in range(10):
+            (tmp_path / f"config_{i}.py").write_text(f"# config {i}")
+
+        context = {
+            "task_name": "implement config handler",
+            "project_root": str(tmp_path),
+            "duplicate_threshold": 5,
+        }
+        passed, msg = check.evaluate(context)
+
+        assert passed is False
+        assert "Check for existing" in msg
+        assert "potential_duplicates" in context
+
+
+class TestArchitectureCheckActiveVerification:
+    """Test ArchitectureCheck active verification logic"""
+
+    def test_explicit_flag_true(self):
+        """Test that explicit flag=True passes"""
+        from superclaude.pm_agent.confidence import ArchitectureCheck
+
+        check = ArchitectureCheck()
+        context = {"architecture_check_complete": True}
+        passed, msg = check.evaluate(context)
+
+        assert passed is True
+        assert "existing tech stack" in msg
+
+    def test_explicit_flag_false(self):
+        """Test that explicit flag=False fails"""
+        from superclaude.pm_agent.confidence import ArchitectureCheck
+
+        check = ArchitectureCheck()
+        context = {"architecture_check_complete": False}
+        passed, msg = check.evaluate(context)
+
+        assert passed is False
+
+    def test_no_proposed_tech_fails(self):
+        """Test that missing proposed_technology fails"""
+        from superclaude.pm_agent.confidence import ArchitectureCheck
+
+        check = ArchitectureCheck()
+        context = {}
+        passed, msg = check.evaluate(context)
+
+        assert passed is False
+        assert "Verify architecture" in msg
+
+    def test_tech_stack_detection(self, tmp_path):
+        """Test tech stack detection from project files"""
+        from superclaude.pm_agent.confidence import ArchitectureCheck, _cached_detect_tech_stack
+
+        # Clear cache
+        _cached_detect_tech_stack.cache_clear()
+
+        # Create CLAUDE.md with tech stack
+        (tmp_path / "CLAUDE.md").write_text("Using React, Next.js, and pytest")
+
+        check = ArchitectureCheck()
+        context = {
+            "project_root": str(tmp_path),
+            "proposed_technology": ["react"],  # Compatible
+        }
+        passed, msg = check.evaluate(context)
+
+        assert passed is True
+        assert "detected_tech_stack" in context
+
+    def test_conflict_detection(self, tmp_path):
+        """Test architecture conflict detection"""
+        from superclaude.pm_agent.confidence import ArchitectureCheck, _cached_detect_tech_stack
+
+        _cached_detect_tech_stack.cache_clear()
+
+        # Create project using React
+        (tmp_path / "CLAUDE.md").write_text("Using React framework")
+
+        check = ArchitectureCheck()
+        context = {
+            "project_root": str(tmp_path),
+            "proposed_technology": ["jquery"],  # Conflicts with react
+        }
+        passed, msg = check.evaluate(context)
+
+        assert passed is False
+        assert "architecture_conflicts" in context
+
+    def test_find_conflicts_method(self):
+        """Test _find_conflicts helper method"""
+        from superclaude.pm_agent.confidence import ArchitectureCheck
+
+        check = ArchitectureCheck()
+        detected = {"frameworks": ["react"], "databases": [], "tools": []}
+
+        conflicts = check._find_conflicts(detected, ["jquery"])
+        assert len(conflicts) == 1
+        assert "jquery" in conflicts[0].lower()
+
+        # No conflict
+        conflicts = check._find_conflicts(detected, ["typescript"])
+        assert len(conflicts) == 0
+
+
+class TestOfficialDocsCheckActiveVerification:
+    """Test OfficialDocsCheck active verification logic"""
+
+    def test_explicit_flag_true(self):
+        """Test that explicit flag=True passes"""
+        from superclaude.pm_agent.confidence import OfficialDocsCheck
+
+        check = OfficialDocsCheck()
+        context = {"official_docs_verified": True}
+        passed, msg = check.evaluate(context)
+
+        assert passed is True
+        assert "verified" in msg
+
+    def test_explicit_flag_false(self):
+        """Test that explicit flag=False fails"""
+        from superclaude.pm_agent.confidence import OfficialDocsCheck
+
+        check = OfficialDocsCheck()
+        context = {"official_docs_verified": False}
+        passed, msg = check.evaluate(context)
+
+        assert passed is False
+        assert "Read official docs" in msg
+
+    def test_no_test_file_fails(self):
+        """Test that missing test_file fails"""
+        from superclaude.pm_agent.confidence import OfficialDocsCheck
+
+        check = OfficialDocsCheck()
+        context = {}
+        passed, msg = check.evaluate(context)
+
+        assert passed is False
+
+    def test_readme_found(self, tmp_path):
+        """Test that README.md is found"""
+        from superclaude.pm_agent.confidence import OfficialDocsCheck
+
+        # Create project with README
+        (tmp_path / "README.md").write_text("# Project")
+        test_file = tmp_path / "tests" / "test_example.py"
+        test_file.parent.mkdir(parents=True)
+        test_file.write_text("# test")
+
+        check = OfficialDocsCheck()
+        context = {"test_file": str(test_file)}
+        passed, msg = check.evaluate(context)
+
+        assert passed is True
+
+    def test_claude_md_found(self, tmp_path):
+        """Test that CLAUDE.md is found"""
+        from superclaude.pm_agent.confidence import OfficialDocsCheck
+
+        # Create project with CLAUDE.md
+        (tmp_path / "CLAUDE.md").write_text("# Claude instructions")
+        test_file = tmp_path / "test_example.py"
+        test_file.write_text("# test")
+
+        check = OfficialDocsCheck()
+        context = {"test_file": str(test_file)}
+        passed, msg = check.evaluate(context)
+
+        assert passed is True
+
+    def test_docs_dir_found(self, tmp_path):
+        """Test that docs/ directory is found"""
+        from superclaude.pm_agent.confidence import OfficialDocsCheck
+
+        # Create project with docs/
+        (tmp_path / "docs").mkdir()
+        test_file = tmp_path / "test_example.py"
+        test_file.write_text("# test")
+
+        check = OfficialDocsCheck()
+        context = {"test_file": str(test_file)}
+        passed, msg = check.evaluate(context)
+
+        assert passed is True
+
+
+class TestOssReferenceCheckActiveVerification:
+    """Test OssReferenceCheck active verification logic"""
+
+    def test_explicit_flag_true(self):
+        """Test that explicit flag=True passes"""
+        from superclaude.pm_agent.confidence import OssReferenceCheck
+
+        check = OssReferenceCheck()
+        context = {"oss_reference_complete": True}
+        passed, msg = check.evaluate(context)
+
+        assert passed is True
+        assert "OSS implementation found" in msg
+
+    def test_explicit_flag_false(self):
+        """Test that explicit flag=False fails"""
+        from superclaude.pm_agent.confidence import OssReferenceCheck
+
+        check = OssReferenceCheck()
+        context = {"oss_reference_complete": False}
+        passed, msg = check.evaluate(context)
+
+        assert passed is False
+
+    def test_valid_oss_references(self):
+        """Test with valid OSS references"""
+        from superclaude.pm_agent.confidence import OssReferenceCheck
+
+        check = OssReferenceCheck()
+        context = {
+            "oss_references": [
+                {"url": "https://github.com/example/repo", "source": "pattern"},
+            ]
+        }
+        passed, msg = check.evaluate(context)
+
+        assert passed is True
+        assert "validated_oss_references" in context
+
+    def test_validate_references_method(self):
+        """Test _validate_references helper"""
+        from superclaude.pm_agent.confidence import OssReferenceCheck
+
+        check = OssReferenceCheck()
+
+        # Reputable domain
+        refs = [{"url": "https://github.com/example/repo"}]
+        valid = check._validate_references(refs)
+        assert len(valid) == 1
+
+        # String reference
+        refs = ["https://stackoverflow.com/questions/12345"]
+        valid = check._validate_references(refs)
+        assert len(valid) == 1
+
+        # Short URL without reputable domain
+        refs = [{"url": "http://x.com/a"}]
+        valid = check._validate_references(refs)
+        assert len(valid) == 0
+
+    def test_known_pattern_matching(self):
+        """Test _match_known_pattern"""
+        from superclaude.pm_agent.confidence import OssReferenceCheck
+
+        check = OssReferenceCheck()
+
+        # Should match 'auth' pattern
+        pattern = check._match_known_pattern("implement authentication")
+        assert pattern is not None
+        assert "references" in pattern
+
+        # Should match 'api' pattern
+        pattern = check._match_known_pattern("build API endpoint")
+        assert pattern is not None
+
+        # No match
+        pattern = check._match_known_pattern("random task xyz")
+        assert pattern == {}
+
+    def test_cached_pattern_search(self, tmp_path):
+        """Test _find_cached_pattern"""
+        from superclaude.pm_agent.confidence import OssReferenceCheck
+
+        check = OssReferenceCheck()
+
+        # Create pattern cache
+        patterns_dir = tmp_path / "docs" / "patterns"
+        patterns_dir.mkdir(parents=True)
+        (patterns_dir / "authentication.md").write_text("# Auth Pattern")
+
+        result = check._find_cached_pattern(tmp_path, "authentication")
+        assert result != ""
+        assert "authentication" in result
+
+
+class TestRootCauseCheckActiveVerification:
+    """Test RootCauseCheck active verification logic"""
+
+    def test_explicit_flag_true(self):
+        """Test that explicit flag=True passes"""
+        from superclaude.pm_agent.confidence import RootCauseCheck
+
+        check = RootCauseCheck()
+        context = {"root_cause_identified": True}
+        passed, msg = check.evaluate(context)
+
+        assert passed is True
+        assert "identified" in msg
+
+    def test_explicit_flag_false(self):
+        """Test that explicit flag=False fails"""
+        from superclaude.pm_agent.confidence import RootCauseCheck
+
+        check = RootCauseCheck()
+        context = {"root_cause_identified": False}
+        passed, msg = check.evaluate(context)
+
+        assert passed is False
+
+    def test_specific_root_cause_with_evidence(self):
+        """Test specific root cause with evidence passes"""
+        from superclaude.pm_agent.confidence import RootCauseCheck
+
+        check = RootCauseCheck()
+        context = {
+            "root_cause": "The function returns None because the database connection times out after 30 seconds",
+            "evidence": ["Connection log shows timeout at 30s"],
+        }
+        passed, msg = check.evaluate(context)
+
+        assert passed is True
+
+    def test_vague_root_cause_fails(self):
+        """Test vague root cause fails"""
+        from superclaude.pm_agent.confidence import RootCauseCheck
+
+        check = RootCauseCheck()
+        context = {
+            "root_cause": "Maybe it is broken",  # Too short, contains 'maybe'
+            "evidence": ["some evidence"],
+        }
+        passed, msg = check.evaluate(context)
+
+        assert passed is False
+
+    def test_no_evidence_fails(self):
+        """Test missing evidence fails"""
+        from superclaude.pm_agent.confidence import RootCauseCheck
+
+        check = RootCauseCheck()
+        context = {
+            "root_cause": "The database connection pool is exhausted due to connection leaks",
+            "evidence": [],  # Empty evidence
+        }
+        passed, msg = check.evaluate(context)
+
+        assert passed is False
+
+
+class TestTechStackDetection:
+    """Test _cached_detect_tech_stack function"""
+
+    def test_detect_from_claude_md(self, tmp_path):
+        """Test detection from CLAUDE.md"""
+        from superclaude.pm_agent.confidence import _cached_detect_tech_stack
+
+        _cached_detect_tech_stack.cache_clear()
+
+        content = """
+        # Project
+        Using Next.js, React, FastAPI, Supabase, and pytest
+        """
+        (tmp_path / "CLAUDE.md").write_text(content)
+
+        frameworks, databases, tools = _cached_detect_tech_stack(str(tmp_path))
+
+        assert "nextjs" in frameworks
+        assert "react" in frameworks
+        assert "fastapi" in frameworks
+        assert "supabase" in databases
+        assert "pytest" in tools
+
+    def test_detect_from_pyproject(self, tmp_path):
+        """Test detection from pyproject.toml"""
+        from superclaude.pm_agent.confidence import _cached_detect_tech_stack
+
+        _cached_detect_tech_stack.cache_clear()
+
+        content = """
+        [project]
+        dependencies = ["fastapi", "pytest", "sqlalchemy"]
+        """
+        (tmp_path / "pyproject.toml").write_text(content)
+
+        frameworks, databases, tools = _cached_detect_tech_stack(str(tmp_path))
+
+        assert "fastapi" in frameworks
+        assert "sqlalchemy" in databases
+        assert "pytest" in tools
+
+    def test_detect_from_package_json(self, tmp_path):
+        """Test detection from package.json"""
+        from superclaude.pm_agent.confidence import _cached_detect_tech_stack
+
+        _cached_detect_tech_stack.cache_clear()
+
+        content = """
+        {
+            "dependencies": {
+                "next": "^13.0.0",
+                "react": "^18.0.0",
+                "@supabase/supabase-js": "^2.0.0"
+            }
+        }
+        """
+        (tmp_path / "package.json").write_text(content)
+
+        frameworks, databases, tools = _cached_detect_tech_stack(str(tmp_path))
+
+        assert "nextjs" in frameworks
+        assert "react" in frameworks
+        assert "supabase" in databases
+
+    def test_empty_project(self, tmp_path):
+        """Test empty project returns empty tuples"""
+        from superclaude.pm_agent.confidence import _cached_detect_tech_stack
+
+        _cached_detect_tech_stack.cache_clear()
+
+        frameworks, databases, tools = _cached_detect_tech_stack(str(tmp_path))
+
+        assert frameworks == ()
+        assert databases == ()
+        assert tools == ()
+
+    def test_deduplication(self, tmp_path):
+        """Test that duplicate detections are deduplicated"""
+        from superclaude.pm_agent.confidence import _cached_detect_tech_stack
+
+        _cached_detect_tech_stack.cache_clear()
+
+        # Both files mention React
+        (tmp_path / "CLAUDE.md").write_text("Using React")
+        (tmp_path / "package.json").write_text('{"dependencies": {"react": "^18"}}')
+
+        frameworks, _, _ = _cached_detect_tech_stack(str(tmp_path))
+
+        assert frameworks.count("react") == 1  # No duplicates

@@ -181,3 +181,275 @@ def test_reflexion_with_real_exception():
 
     # Test should complete successfully
     assert True
+
+
+class TestReflexionSignatureMatching:
+    """Test error signature creation and matching"""
+
+    def test_create_error_signature_full(self, tmp_path):
+        """Test signature creation with full error info"""
+        reflexion = ReflexionPattern(memory_dir=tmp_path / "memory")
+
+        error_info = {
+            "error_type": "ValueError",
+            "error_message": "Invalid value: 42",
+            "test_name": "test_validation",
+        }
+
+        sig = reflexion._create_error_signature(error_info)
+
+        assert "ValueError" in sig
+        assert "Invalid value" in sig
+        assert "test_validation" in sig
+
+    def test_create_error_signature_numbers_normalized(self, tmp_path):
+        """Test that numbers are normalized in signatures"""
+        reflexion = ReflexionPattern(memory_dir=tmp_path / "memory")
+
+        error_info = {
+            "error_type": "IndexError",
+            "error_message": "list index 42 out of range",
+        }
+
+        sig = reflexion._create_error_signature(error_info)
+
+        # Numbers should be replaced with 'N'
+        assert "42" not in sig
+        assert "N" in sig
+
+    def test_signatures_match_identical(self, tmp_path):
+        """Test matching identical signatures"""
+        reflexion = ReflexionPattern(memory_dir=tmp_path / "memory")
+
+        sig = "ValueError | Invalid input | test_func"
+        assert reflexion._signatures_match(sig, sig) is True
+
+    def test_signatures_match_similar(self, tmp_path):
+        """Test matching similar signatures"""
+        reflexion = ReflexionPattern(memory_dir=tmp_path / "memory")
+
+        sig1 = "ValueError | Invalid input value | test_validation"
+        sig2 = "ValueError | Invalid input string | test_validation"
+
+        # Should match (high word overlap)
+        assert reflexion._signatures_match(sig1, sig2) is True
+
+    def test_signatures_match_different(self, tmp_path):
+        """Test non-matching signatures"""
+        reflexion = ReflexionPattern(memory_dir=tmp_path / "memory")
+
+        sig1 = "ValueError | completely different error"
+        sig2 = "TypeError | unrelated message here"
+
+        assert reflexion._signatures_match(sig1, sig2) is False
+
+    def test_signatures_match_empty(self, tmp_path):
+        """Test matching with empty signatures"""
+        reflexion = ReflexionPattern(memory_dir=tmp_path / "memory")
+
+        assert reflexion._signatures_match("", "") is False
+        assert reflexion._signatures_match("some text", "") is False
+
+
+class TestReflexionLocalFileSearch:
+    """Test local file search functionality"""
+
+    def test_search_local_files_no_file(self, tmp_path):
+        """Test search when solutions file doesn't exist"""
+        memory_dir = tmp_path / "memory"
+        memory_dir.mkdir(parents=True)
+
+        reflexion = ReflexionPattern(memory_dir=memory_dir)
+        result = reflexion._search_local_files("any error")
+
+        assert result is None
+
+    def test_search_local_files_with_match(self, tmp_path):
+        """Test search finds matching error"""
+        memory_dir = tmp_path / "memory"
+        memory_dir.mkdir(parents=True)
+
+        reflexion = ReflexionPattern(memory_dir=memory_dir)
+
+        # Record an error with solution
+        error_info = {
+            "error_type": "ImportError",
+            "error_message": "No module named requests",
+            "test_name": "test_api",
+            "solution": "pip install requests",
+            "root_cause": "Missing dependency",
+        }
+        reflexion.record_error(error_info)
+
+        # Search for similar error
+        search_info = {
+            "error_type": "ImportError",
+            "error_message": "No module named requests",
+            "test_name": "test_api",
+        }
+        result = reflexion._search_local_files(
+            reflexion._create_error_signature(search_info)
+        )
+
+        assert result is not None
+        assert result.get("solution") == "pip install requests"
+
+    def test_search_local_files_invalid_json(self, tmp_path):
+        """Test search handles invalid JSON lines gracefully"""
+        memory_dir = tmp_path / "memory"
+        memory_dir.mkdir(parents=True)
+
+        reflexion = ReflexionPattern(memory_dir=memory_dir)
+
+        # Write invalid JSON
+        reflexion.solutions_file.write_text("invalid json\n{}\n")
+
+        # Should not crash, just return None
+        result = reflexion._search_local_files("any error")
+        assert result is None
+
+
+class TestReflexionMistakeDoc:
+    """Test mistake documentation creation"""
+
+    def test_create_mistake_doc(self, tmp_path):
+        """Test creating a mistake document"""
+        memory_dir = tmp_path / "memory"
+        memory_dir.mkdir(parents=True)
+
+        reflexion = ReflexionPattern(memory_dir=memory_dir)
+
+        error_info = {
+            "test_name": "test_feature",
+            "error_type": "AssertionError",
+            "error_message": "Expected True, got False",
+            "traceback": "File test.py, line 42",
+            "root_cause": "Logic error in conditional",
+            "solution": "Fix the condition to check != instead of ==",
+            "why_missed": "Rushed implementation",
+            "prevention": "Add edge case tests",
+            "lesson": "Always test edge cases",
+        }
+
+        reflexion._create_mistake_doc(error_info)
+
+        # Check file was created
+        files = list(reflexion.mistakes_dir.glob("*.md"))
+        assert len(files) == 1
+
+        # Check content
+        content = files[0].read_text()
+        assert "test_feature" in content
+        assert "AssertionError" in content
+        assert "Logic error" in content
+        assert "Fix the condition" in content
+
+    def test_record_error_creates_mistake_doc_when_has_solution(self, tmp_path):
+        """Test that record_error creates mistake doc when solution provided"""
+        memory_dir = tmp_path / "memory"
+        memory_dir.mkdir(parents=True)
+
+        reflexion = ReflexionPattern(memory_dir=memory_dir)
+
+        error_info = {
+            "test_name": "test_with_solution",
+            "error_type": "ValueError",
+            "error_message": "Invalid input",
+            "solution": "Validate input first",
+        }
+
+        reflexion.record_error(error_info)
+
+        # Should create mistake doc
+        files = list(reflexion.mistakes_dir.glob("*.md"))
+        assert len(files) == 1
+
+
+class TestReflexionStatistics:
+    """Test statistics functionality"""
+
+    def test_get_statistics_empty(self, tmp_path):
+        """Test statistics with no errors recorded"""
+        memory_dir = tmp_path / "memory"
+        memory_dir.mkdir(parents=True)
+
+        reflexion = ReflexionPattern(memory_dir=memory_dir)
+        stats = reflexion.get_statistics()
+
+        assert stats["total_errors"] == 0
+        assert stats["errors_with_solutions"] == 0
+        assert stats["solution_reuse_rate"] == 0.0
+
+    def test_get_statistics_with_errors(self, tmp_path):
+        """Test statistics with errors recorded"""
+        memory_dir = tmp_path / "memory"
+        memory_dir.mkdir(parents=True)
+
+        reflexion = ReflexionPattern(memory_dir=memory_dir)
+
+        # Record errors
+        reflexion.record_error({
+            "error_type": "Error1",
+            "error_message": "msg1",
+            "solution": "fix1",
+        })
+        reflexion.record_error({
+            "error_type": "Error2",
+            "error_message": "msg2",
+            # No solution
+        })
+        reflexion.record_error({
+            "error_type": "Error3",
+            "error_message": "msg3",
+            "solution": "fix3",
+        })
+
+        stats = reflexion.get_statistics()
+
+        assert stats["total_errors"] == 3
+        assert stats["errors_with_solutions"] == 2
+        assert stats["solution_reuse_rate"] == pytest.approx(66.67, rel=0.1)
+
+
+class TestReflexionGetSolution:
+    """Test get_solution functionality"""
+
+    def test_get_solution_dict_input(self, tmp_path):
+        """Test get_solution with dict input"""
+        memory_dir = tmp_path / "memory"
+        memory_dir.mkdir(parents=True)
+
+        reflexion = ReflexionPattern(memory_dir=memory_dir)
+
+        # Record an error
+        reflexion.record_error({
+            "error_type": "KeyError",
+            "error_message": "key 'name' not found",
+            "test_name": "test_dict_access",
+            "solution": "Use .get() with default",
+            "root_cause": "Missing key handling",
+        })
+
+        # Search with dict
+        result = reflexion.get_solution({
+            "error_type": "KeyError",
+            "error_message": "key 'name' not found",
+            "test_name": "test_dict_access",
+        })
+
+        assert result is not None
+        assert result.get("solution") == "Use .get() with default"
+
+    def test_get_solution_no_match(self, tmp_path):
+        """Test get_solution returns None when no match"""
+        memory_dir = tmp_path / "memory"
+        memory_dir.mkdir(parents=True)
+
+        reflexion = ReflexionPattern(memory_dir=memory_dir)
+
+        result = reflexion.get_solution({
+            "error_type": "UnknownError",
+            "error_message": "something completely different",
+        })
+
+        assert result is None

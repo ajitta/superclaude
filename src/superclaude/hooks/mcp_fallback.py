@@ -14,7 +14,7 @@ import json
 from datetime import datetime
 from pathlib import Path
 
-from superclaude.hooks.hook_tracker import get_session_id, _ensure_tracker_dir
+from superclaude.hooks.hook_tracker import _ensure_tracker_dir, get_session_id
 
 # Storage for MCP fallback notifications
 MCP_FALLBACK_FILE = Path.home() / ".claude" / ".superclaude_hooks" / "mcp_fallbacks.json"

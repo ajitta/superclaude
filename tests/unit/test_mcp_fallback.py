@@ -150,7 +150,6 @@ class TestMcpFallbackCleanup:
         from datetime import datetime, timedelta
 
         from superclaude.hooks.mcp_fallback import (
-            MCP_FALLBACK_FILE,
             cleanup_old_fallback_sessions,
         )
 

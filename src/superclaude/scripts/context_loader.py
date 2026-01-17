@@ -27,7 +27,7 @@ if TYPE_CHECKING:
 
 # v2.2.0: MCP fallback notification support
 try:
-    from superclaude.hooks.mcp_fallback import check_mcp_and_notify, MCP_FALLBACKS
+    from superclaude.hooks.mcp_fallback import MCP_FALLBACKS, check_mcp_and_notify
     MCP_FALLBACK_AVAILABLE = True
 except ImportError:
     MCP_FALLBACK_AVAILABLE = False

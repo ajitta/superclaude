@@ -11,11 +11,24 @@ Key features:
 - Result aggregation and error handling
 """
 
+import logging
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass
 from enum import Enum
 from typing import Any, Callable, Dict, List, Optional, Set
+
+logger = logging.getLogger(__name__)
+
+__all__ = [
+    "TaskStatus",
+    "Task",
+    "ParallelGroup",
+    "ExecutionPlan",
+    "ParallelExecutor",
+    "parallel_file_operations",
+    "should_parallelize",
+]
 
 
 class TaskStatus(Enum):
@@ -107,8 +120,8 @@ class ParallelExecutor:
         Builds dependency graph and identifies parallel groups.
         """
 
-        print(f"⚡ Parallel Executor: Planning {len(tasks)} tasks")
-        print("=" * 60)
+        logger.info("Parallel Executor: Planning %d tasks", len(tasks))
+        logger.debug("=" * 60)
 
         # Find parallel groups using topological sort
         groups = []
@@ -161,8 +174,8 @@ class ParallelExecutor:
             speedup=speedup,
         )
 
-        print(plan)
-        print("=" * 60)
+        logger.info("%s", plan)
+        logger.debug("=" * 60)
 
         return plan
 
@@ -173,14 +186,14 @@ class ParallelExecutor:
         Returns dict of task_id -> result
         """
 
-        print(f"\n🚀 Executing {plan.total_tasks} tasks in {len(plan.groups)} groups")
-        print("=" * 60)
+        logger.info("Executing %d tasks in %d groups", plan.total_tasks, len(plan.groups))
+        logger.debug("=" * 60)
 
         results = {}
         start_time = time.time()
 
         for group in plan.groups:
-            print(f"\n📦 {group}")
+            logger.debug("Processing %s", group)
             group_start = time.time()
 
             # Execute group in parallel
@@ -188,16 +201,16 @@ class ParallelExecutor:
             results.update(group_results)
 
             group_time = time.time() - group_start
-            print(f"   Completed in {group_time:.2f}s")
+            logger.debug("Group completed in %.2fs", group_time)
 
         total_time = time.time() - start_time
         actual_speedup = plan.sequential_time_estimate / total_time
 
-        print("\n" + "=" * 60)
-        print(f"✅ All tasks completed in {total_time:.2f}s")
-        print(f"   Estimated: {plan.parallel_time_estimate:.2f}s")
-        print(f"   Actual speedup: {actual_speedup:.1f}x")
-        print("=" * 60)
+        logger.debug("=" * 60)
+        logger.info("All tasks completed in %.2fs", total_time)
+        logger.debug("Estimated: %.2fs", plan.parallel_time_estimate)
+        logger.debug("Actual speedup: %.1fx", actual_speedup)
+        logger.debug("=" * 60)
 
         return results
 
@@ -222,14 +235,14 @@ class ParallelExecutor:
                     task.result = result
                     results[task.id] = result
 
-                    print(f"   ✅ {task.description}")
+                    logger.debug("Completed: %s", task.description)
 
                 except Exception as e:
                     task.status = TaskStatus.FAILED
                     task.error = e
                     results[task.id] = None
 
-                    print(f"   ❌ {task.description}: {e}")
+                    logger.error("Failed: %s: %s", task.description, e)
 
         return results
 

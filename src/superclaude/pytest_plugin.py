@@ -203,10 +203,11 @@ def pytest_collection_modifyitems(config, items):
     for item in items:
         test_path = str(item.fspath)
 
-        # Auto-mark by directory
-        if "/unit/" in test_path:
+        # Auto-mark by directory (normalize Windows paths)
+        normalized_path = test_path.replace("\\", "/")
+        if "/unit/" in normalized_path:
             item.add_marker(pytest.mark.unit)
-        elif "/integration/" in test_path:
+        elif "/integration/" in normalized_path:
             item.add_marker(pytest.mark.integration)
 
         # Auto-mark by filename

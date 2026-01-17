@@ -4,10 +4,12 @@ SuperClaude CLI Main Entry Point
 Provides command-line interface for SuperClaude operations.
 """
 
+import re
 import sys
 from pathlib import Path
 
 import click
+import yaml
 
 # Add parent directory to path to import superclaude
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
@@ -229,7 +231,11 @@ def mcp(servers, list_only, show_status, scope, dry_run):
         superclaude mcp --scope project
         superclaude mcp --dry-run
     """
-    from .install_mcp import install_mcp_servers, list_available_servers, show_mcp_status
+    from .install_mcp import (
+        install_mcp_servers,
+        list_available_servers,
+        show_mcp_status,
+    )
 
     if list_only:
         list_available_servers()
@@ -478,7 +484,6 @@ def agents(list_only: bool, agent_name: str, tokens: bool, scope: str):
             full_tokens = len(content) // 4  # CHARS_PER_TOKEN
 
             # Extract frontmatter
-            import re
             match = re.match(r"^---\n(.*?)\n---", content, re.DOTALL)
             frontmatter_tokens = len(match.group(1)) // 4 if match else 0
 
@@ -509,9 +514,6 @@ def agents(list_only: bool, agent_name: str, tokens: bool, scope: str):
         content = agent_file.read_text(encoding="utf-8")
 
         # Parse frontmatter
-        import re
-
-        import yaml
         match = re.match(r"^---\n(.*?)\n---", content, re.DOTALL)
         if match:
             try:
@@ -537,10 +539,6 @@ def agents(list_only: bool, agent_name: str, tokens: bool, scope: str):
 
     # Default: list agents
     click.echo(f"📋 Available Agents (scope: {scope}):\n")
-
-    import re
-
-    import yaml
 
     for agent_file in agent_files:
         content = agent_file.read_text(encoding="utf-8")
@@ -659,9 +657,6 @@ def skills(list_only: bool, skill_name: str, tokens: bool, scope: str):
         content = manifest.read_text(encoding="utf-8")
 
         # Parse frontmatter
-        import re
-
-        import yaml
         match = re.match(r"^---\n(.*?)\n---", content, re.DOTALL)
         if match:
             try:
@@ -696,10 +691,6 @@ def skills(list_only: bool, skill_name: str, tokens: bool, scope: str):
 
     # Default: list skills
     click.echo(f"📋 Available Skills (scope: {scope}):\n")
-
-    import re
-
-    import yaml
 
     for skill_dir, manifest in skill_dirs:
         content = manifest.read_text(encoding="utf-8")
