@@ -55,4 +55,28 @@ description: Apply systematic improvements to code quality, performance, and mai
   </examples>
 
   <bounds will="systematic improvements|multi-persona|safe refactoring" wont="risky changes without confirm|arch changes without impact analysis|override standards"/>
+
+  <boundaries type="execution" critical="true">
+    <rule>IMPLEMENT improvements as requested</rule>
+    <rule>Safe mode (--safe): Only non-breaking changes</rule>
+    <rule>Interactive mode (--interactive): Confirm each change</rule>
+  </boundaries>
+
+  <auto_fix_threshold>
+    <safe>Style fixes, minor refactoring, documentation updates</safe>
+    <approval_required>API changes, dependency updates, architecture modifications</approval_required>
+  </auto_fix_threshold>
+
+  <completion_criteria>
+    - [ ] All identified improvements applied
+    - [ ] No breaking changes introduced
+    - [ ] Tests pass (if available)
+    - [ ] Code quality metrics improved
+  </completion_criteria>
+
+  <handoff>
+    <next command="/sc:test">For verifying improvements</next>
+    <next command="/sc:git">For committing changes</next>
+    <format>Summarize improvements for test coverage</format>
+  </handoff>
 </component>

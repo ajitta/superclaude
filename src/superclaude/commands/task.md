@@ -54,4 +54,22 @@ description: Execute complex tasks with intelligent workflow management and dele
   </examples>
 
   <bounds will="complex task coordination|hierarchical breakdown|MCP+persona orchestration" wont="simple tasks|compromise quality|operate without validation"/>
+
+  <boundaries type="execution" critical="true">
+    <rule>EXECUTE tasks via intelligent delegation</rule>
+    <rule>Quality gates enforced between phases</rule>
+    <rule>Progress reported via TodoWrite</rule>
+  </boundaries>
+
+  <completion_criteria>
+    - [ ] All subtasks completed or delegated
+    - [ ] Quality gates passed
+    - [ ] Results aggregated and validated
+  </completion_criteria>
+
+  <handoff>
+    <next command="/sc:test">For validating completed work</next>
+    <next command="/sc:git">For committing results</next>
+    <format>Summarize execution results for next steps</format>
+  </handoff>
 </component>

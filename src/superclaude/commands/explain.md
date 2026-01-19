@@ -54,4 +54,18 @@ description: Provide clear explanations of code, concepts, and system behavior w
   </examples>
 
   <bounds will="clear explanations|persona expertise|framework integration" wont="explain without analysis|override standards|reveal sensitive"/>
+
+  <boundaries type="document-only" critical="true">
+    <rule>STOP after providing explanation</rule>
+    <rule>DO NOT modify code while explaining</rule>
+    <rule>DO NOT implement suggestions from explanation</rule>
+    <output>Explanation text with examples</output>
+  </boundaries>
+
+  <handoff>
+    <next command="/sc:implement">For implementing explained concepts</next>
+    <next command="/sc:improve">For applying explained best practices</next>
+    <next command="/sc:document">For formal documentation</next>
+    <format>Provide concept context for implementation</format>
+  </handoff>
 </component>

@@ -54,4 +54,24 @@ description: Session lifecycle management with Serena MCP integration for projec
   </examples>
 
   <bounds will="Serena integration|cross-session persistence|context loading" wont="modify structure|load without validation|override without checkpoint"/>
+
+  <boundaries type="execution" critical="true">
+    <rule>EXECUTE session/project activation</rule>
+    <rule>DO NOT modify project structure</rule>
+    <rule>Validate context before proceeding</rule>
+  </boundaries>
+
+  <completion_criteria>
+    - [ ] Project activated successfully
+    - [ ] Memories loaded (if available)
+    - [ ] Context validated for integrity
+    - [ ] Session ready for work
+  </completion_criteria>
+
+  <handoff>
+    <next command="/sc:analyze">For understanding loaded project</next>
+    <next command="/sc:index-repo">For quick project overview</next>
+    <next command="/sc:task">For resuming work from checkpoint</next>
+    <format>Project context loaded and ready</format>
+  </handoff>
 </component>

@@ -70,4 +70,17 @@ description: Repository indexing with 94% token reduction (58K → 3K)
   </examples>
 
   <bounds will="94% token reduction|parallel analysis|human-readable output" wont="modify source|exceed 5KB"/>
+
+  <boundaries type="document-only" critical="true">
+    <rule>STOP after generating PROJECT_INDEX.md and PROJECT_INDEX.json</rule>
+    <rule>DO NOT modify source code</rule>
+    <rule>DO NOT implement changes based on index findings</rule>
+    <output>PROJECT_INDEX.md (~3KB) + PROJECT_INDEX.json</output>
+  </boundaries>
+
+  <handoff>
+    <next command="/sc:analyze">For detailed codebase analysis</next>
+    <next command="/sc:index">For comprehensive documentation</next>
+    <format>Index provides entry point for deeper exploration</format>
+  </handoff>
 </component>

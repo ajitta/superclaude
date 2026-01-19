@@ -70,4 +70,23 @@ description: Session lifecycle management with Serena MCP integration for contex
   </examples>
 
   <bounds will="Serena integration|auto-checkpoints|discovery preservation" wont="operate without Serena|save without validation|override without checkpoint"/>
+
+  <boundaries type="execution" critical="true">
+    <rule>EXECUTE session persistence</rule>
+    <rule>DO NOT modify project code</rule>
+    <rule>Validate data integrity before save</rule>
+  </boundaries>
+
+  <completion_criteria>
+    - [ ] Session data collected
+    - [ ] Serena memory write successful
+    - [ ] Checkpoint validated
+    - [ ] Ready for /sc:load continuation
+  </completion_criteria>
+
+  <handoff>
+    <next command="/sc:load">For restoring saved session</next>
+    <next command="/sc:reflect">For session analysis before save</next>
+    <format>Session saved, checkpoint ID provided</format>
+  </handoff>
 </component>

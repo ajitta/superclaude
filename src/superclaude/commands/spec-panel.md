@@ -63,4 +63,17 @@ description: Multi-expert specification review and improvement using renowned so
   </examples>
 
   <bounds will="expert-level review|actionable recs|multi-mode analysis" wont="replace human judgment|modify without consent|legal guarantees"/>
+
+  <boundaries type="document-only" critical="true">
+    <rule>STOP after producing expert review document</rule>
+    <rule>DO NOT modify specifications</rule>
+    <rule>DO NOT implement based on review</rule>
+    <output>Expert review document with recommendations</output>
+  </boundaries>
+
+  <handoff>
+    <next command="/sc:design">For implementing architectural recommendations</next>
+    <next command="/sc:implement">For implementing feature recommendations</next>
+    <format>Provide prioritized recommendations for action</format>
+  </handoff>
 </component>

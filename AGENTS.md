@@ -56,7 +56,6 @@ uv run mypy src/          # Type checking (gradual typing)
 # Verification
 make verify               # Full installation verification
 make doctor               # Health check: uv run superclaude doctor
-make test-plugin          # Verify pytest plugin auto-discovery
 ```
 
 ## Code Style Guidelines
@@ -69,11 +68,7 @@ make test-plugin          # Verify pytest plugin auto-discovery
 - **Linter**: Ruff with rules `E/F/I/N/W` (ignore E501)
 
 ### Import Organization
-Imports are sorted by Ruff (isort-compatible). Order:
-1. Standard library
-2. Third-party packages
-3. Local imports
-
+Imports sorted by Ruff (isort-compatible): stdlib, third-party, local.
 ```python
 import sys
 from pathlib import Path
@@ -96,35 +91,30 @@ from superclaude import __version__
 - Use type hints for function signatures
 - Use `Dict`, `List`, `Tuple`, `Any` from `typing` module
 - Protocol classes for duck typing (`ConfidenceCheck`, `AsyncConfidenceCheck`)
-- Gradual typing allowed (`disallow_untyped_defs = false` in mypy)
-
+- Gradual typing allowed (`disallow_untyped_defs = false`)
 ```python
 from typing import Any, Dict, List, Protocol, Tuple
 
-def assess(self, context: Dict[str, Any]) -> ConfidenceResult:
-    ...
+def assess(self, context: Dict[str, Any]) -> ConfidenceResult: ...
 ```
 
 ### Docstrings
-Use triple-quoted docstrings for modules, classes, and public functions:
+Use Google-style docstrings for modules, classes, and public functions:
 ```python
 def get_recommendation(self, confidence: float) -> str:
-    """
-    Get recommended action based on confidence level.
+    """Get recommended action based on confidence level.
 
     Args:
         confidence: Confidence score (0.0 - 1.0)
 
     Returns:
-        str: Recommended action
+        Recommended action string
     """
 ```
 
 ### Error Handling
-- Use specific exception types when possible
-- Catch `OSError`, `PermissionError` for file operations
-- Use `try/except` with specific handling, not bare `except`
-
+- Use specific exception types (`OSError`, `PermissionError`, `UnicodeDecodeError`)
+- Never use bare `except:` - always specify exception type
 ```python
 try:
     content = file_path.read_text(encoding="utf-8")
@@ -159,17 +149,6 @@ class CheckResult:
 @pytest.mark.confidence_check  # Confidence-related tests
 ```
 
-## Commit Message Format
-Follow Conventional Commits:
-```
-feat(scope): add new feature
-fix(scope): fix bug description
-docs: update documentation
-chore: maintenance task
-refactor(scope): code restructuring
-test(scope): add or update tests
-```
-
 ## Key Architectural Patterns
 
 ### Protocol-based Design
@@ -189,35 +168,33 @@ checker.register_check(CustomCheck())
 
 ### LRU Caching
 Use `@lru_cache` for expensive operations:
-
 ```python
 @lru_cache(maxsize=32)
-def _cached_detect_tech_stack(project_root_str: str) -> tuple:
-    ...
+def _cached_detect_tech_stack(project_root_str: str) -> tuple: ...
+```
+
+## Commit Message Format
+Follow Conventional Commits:
+```
+feat(scope): add new feature
+fix(scope): fix bug description
+docs: update documentation
+chore: maintenance task
+refactor(scope): code restructuring
+test(scope): add or update tests
 ```
 
 ## Landing the Plane (Session Completion)
 
-**When ending a work session**, you MUST complete ALL steps below. Work is NOT complete until `git push` succeeds.
+**When ending a work session**, complete ALL steps. Work is NOT complete until `git push` succeeds.
 
-**MANDATORY WORKFLOW:**
-
-1. **File issues for remaining work** - Create issues for anything that needs follow-up
-2. **Run quality gates** (if code changed) - Tests, linters, builds
-3. **Update issue status** - Close finished work, update in-progress items
-4. **PUSH TO REMOTE** - This is MANDATORY:
+1. **File issues** for remaining work
+2. **Run quality gates** (if code changed): `make test && make lint`
+3. **PUSH TO REMOTE** (MANDATORY):
    ```bash
-   git pull --rebase
-   bd sync
-   git push
+   git pull --rebase && git push
    git status  # MUST show "up to date with origin"
    ```
-5. **Clean up** - Clear stashes, prune remote branches
-6. **Verify** - All changes committed AND pushed
-7. **Hand off** - Provide context for next session
+4. **Verify** all changes committed AND pushed
 
-**CRITICAL RULES:**
-- Work is NOT complete until `git push` succeeds
-- NEVER stop before pushing - that leaves work stranded locally
-- NEVER say "ready to push when you are" - YOU must push
-- If push fails, resolve and retry until it succeeds
+**CRITICAL**: Never stop before pushing - that leaves work stranded locally.

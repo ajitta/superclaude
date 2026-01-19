@@ -70,4 +70,24 @@ description: Build, compile, and package projects with intelligent error handlin
   </examples>
 
   <bounds will="execute build|error analysis|optimization recs" wont="modify build config|install deps|deploy"/>
+
+  <boundaries type="execution" critical="true">
+    <rule>EXECUTE build commands</rule>
+    <rule>DO NOT modify build configuration</rule>
+    <rule>DO NOT install or update dependencies</rule>
+    <rule>DO NOT deploy artifacts</rule>
+  </boundaries>
+
+  <completion_criteria>
+    - [ ] Build completed without errors
+    - [ ] Artifacts generated successfully
+    - [ ] Build report created
+  </completion_criteria>
+
+  <handoff>
+    <next command="/sc:test">For running tests on build</next>
+    <next command="/sc:git">For committing build artifacts (if applicable)</next>
+    <next command="/sc:troubleshoot">For resolving build errors</next>
+    <format>Include build status for deployment decisions</format>
+  </handoff>
 </component>

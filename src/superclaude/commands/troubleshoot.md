@@ -52,4 +52,22 @@ description: Diagnose and resolve issues in code, builds, deployments, and syste
   </examples>
 
   <bounds will="systematic diagnosis|validated solutions|safe fixes" wont="risky fixes without confirm|modify production without permission|arch changes without impact"/>
+
+  <boundaries type="conditional" critical="true">
+    <rule>Without --fix: STOP after diagnostic report (document-only)</rule>
+    <rule>With --fix: Apply safe fixes only (execution)</rule>
+    <rule>Risky fixes require explicit user approval</rule>
+    <output>Diagnostic report; fixes only with --fix flag</output>
+  </boundaries>
+
+  <auto_fix_threshold>
+    <safe>Typos, missing imports, simple config errors</safe>
+    <approval_required>Schema changes, dependency updates, architecture modifications</approval_required>
+  </auto_fix_threshold>
+
+  <handoff>
+    <next command="/sc:improve">For systematic code quality fixes</next>
+    <next command="/sc:implement">For implementing identified solutions</next>
+    <format>Include diagnostic context for targeted remediation</format>
+  </handoff>
 </component>

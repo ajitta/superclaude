@@ -54,4 +54,17 @@ description: Provide development estimates for tasks, features, or projects with
   </examples>
 
   <bounds will="systematic estimates|confidence intervals|multi-persona analysis" wont="guarantee accuracy|estimate without analysis|override benchmarks"/>
+
+  <boundaries type="document-only" critical="true">
+    <rule>STOP after producing estimation report</rule>
+    <rule>DO NOT begin implementation</rule>
+    <rule>DO NOT create task tracking beyond estimation</rule>
+    <output>Estimation report with breakdown and confidence intervals</output>
+  </boundaries>
+
+  <handoff>
+    <next command="/sc:workflow">For implementation planning based on estimates</next>
+    <next command="/sc:implement">For direct implementation of estimated work</next>
+    <format>Provide estimates context for resource allocation</format>
+  </handoff>
 </component>

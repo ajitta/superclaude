@@ -62,4 +62,23 @@ description: Feature and code implementation with intelligent persona activation
   </examples>
 
   <bounds will="intelligent impl|framework best practices|comprehensive testing" wont="arch decisions without consultation|conflict with security|override safety"/>
+
+  <boundaries type="execution" critical="true">
+    <rule>IMPLEMENT code changes as requested</rule>
+    <rule>Follow framework-specific best practices</rule>
+    <rule>Validate security constraints before commit</rule>
+  </boundaries>
+
+  <completion_criteria>
+    - [ ] All requested features implemented
+    - [ ] Code compiles/runs without errors
+    - [ ] Security validation passed (if --safe)
+    - [ ] Tests written (if --with-tests)
+  </completion_criteria>
+
+  <handoff>
+    <next command="/sc:test">For comprehensive testing</next>
+    <next command="/sc:git">For committing changes</next>
+    <format>Summarize implemented changes for test coverage</format>
+  </handoff>
 </component>

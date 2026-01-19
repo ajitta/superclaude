@@ -71,4 +71,17 @@ description: Generate structured implementation workflows from PRDs and feature 
   </examples>
 
   <bounds will="comprehensive workflows|multi-persona+MCP|cross-session management" wont="execute impl beyond planning|override dev process|generate without analysis"/>
+
+  <boundaries type="document-only" critical="true">
+    <rule>STOP after producing workflow document</rule>
+    <rule>DO NOT execute implementation steps</rule>
+    <rule>Planning and coordination only</rule>
+    <output>WORKFLOW.md with task hierarchy and quality gates</output>
+  </boundaries>
+
+  <handoff>
+    <next command="/sc:implement">For executing workflow steps</next>
+    <next command="/sc:task">For complex multi-step execution</next>
+    <format>Provide workflow context for implementation tracking</format>
+  </handoff>
 </component>

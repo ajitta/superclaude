@@ -75,4 +75,17 @@ description: Generate comprehensive project documentation and knowledge base wit
   </examples>
 
   <bounds will="comprehensive docs|multi-persona|framework patterns" wont="override manual docs|generate without analysis|bypass standards"/>
+
+  <boundaries type="document-only" critical="true">
+    <rule>STOP after generating documentation files</rule>
+    <rule>DO NOT modify source code</rule>
+    <rule>Preserve <!-- MANUAL --> marked sections</rule>
+    <output>Documentation files per --type (KNOWLEDGE.md, API.md, etc.)</output>
+  </boundaries>
+
+  <handoff>
+    <next command="/sc:implement">For implementing from documentation</next>
+    <next command="/sc:improve">For addressing documented issues</next>
+    <format>Provide documentation context for action</format>
+  </handoff>
 </component>

@@ -67,4 +67,18 @@ description: Comprehensive code analysis across quality, security, performance, 
   </examples>
 
   <bounds will="static analysis|severity-rated findings|detailed reports" wont="dynamic/runtime analysis|modify code|analyze external deps"/>
+
+  <boundaries type="document-only" critical="true">
+    <rule>STOP after producing analysis report</rule>
+    <rule>DO NOT modify source code</rule>
+    <rule>DO NOT auto-fix issues (use /sc:improve or /sc:cleanup)</rule>
+    <output>Analysis report with severity-rated findings</output>
+  </boundaries>
+
+  <handoff>
+    <next command="/sc:improve">For quality improvements and refactoring</next>
+    <next command="/sc:cleanup">For dead code removal and optimization</next>
+    <next command="/sc:implement">For implementing missing features</next>
+    <format>Include finding references for targeted fixes</format>
+  </handoff>
 </component>

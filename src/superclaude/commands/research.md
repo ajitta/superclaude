@@ -63,4 +63,19 @@ description: Deep web research with adaptive planning and intelligent search
   </examples>
 
   <bounds will="current info|intelligent search|evidence-based" wont="claims without sources|skip validation|restricted content"/>
+
+  <boundaries type="document-only" critical="true">
+    <rule>STOP after producing research report</rule>
+    <rule>DO NOT implement based on research findings</rule>
+    <rule>DO NOT modify codebase</rule>
+    <rule>Research and documentation only</rule>
+    <output>Research report with citations and findings</output>
+  </boundaries>
+
+  <handoff>
+    <next command="/sc:design">For architecture based on research</next>
+    <next command="/sc:implement">For implementation of researched solutions</next>
+    <next command="/sc:brainstorm">For requirements refinement</next>
+    <format>Provide research context for implementation decisions</format>
+  </handoff>
 </component>

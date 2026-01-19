@@ -71,4 +71,27 @@ description: Systematically clean up code, remove dead code, and optimize projec
   </examples>
 
   <bounds will="systematic cleanup|safety validation|intelligent algorithms" wont="remove without analysis|override exclusions|compromise functionality"/>
+
+  <boundaries type="execution" critical="true">
+    <rule>IMPLEMENT cleanup actions as requested</rule>
+    <rule>Safe mode (--safe): Only low-risk removals</rule>
+    <rule>Interactive mode (--interactive): Confirm each removal</rule>
+  </boundaries>
+
+  <auto_fix_threshold>
+    <safe>Unused imports, dead variables, empty files</safe>
+    <approval_required>Exported functions, config files, shared modules</approval_required>
+  </auto_fix_threshold>
+
+  <completion_criteria>
+    - [ ] All identified cleanup actions applied
+    - [ ] No functionality loss verified (tests pass)
+    - [ ] Cleanup report generated
+  </completion_criteria>
+
+  <handoff>
+    <next command="/sc:test">For verifying no regressions</next>
+    <next command="/sc:git">For committing cleanup changes</next>
+    <format>Summarize removals for review</format>
+  </handoff>
 </component>

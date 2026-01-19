@@ -42,4 +42,17 @@ description: Multi-expert business analysis with adaptive interaction modes
   <personas p="anal|arch|mentor" auto="true"/>
 
   <bounds will="multi-expert analysis|adaptive modes|comprehensive synthesis" wont="replace professional advice|make decisions for user"/>
+
+  <boundaries type="document-only" critical="true">
+    <rule>STOP after producing business analysis document</rule>
+    <rule>DO NOT implement business decisions</rule>
+    <rule>DO NOT modify code or configurations</rule>
+    <output>Business analysis synthesis document</output>
+  </boundaries>
+
+  <handoff>
+    <next command="/sc:brainstorm">For requirements discovery based on analysis</next>
+    <next command="/sc:design">For technical architecture from business needs</next>
+    <format>Provide strategic context for technical decisions</format>
+  </handoff>
 </component>

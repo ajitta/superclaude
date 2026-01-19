@@ -66,4 +66,18 @@ description: Design system architecture, APIs, and component interfaces with com
   </examples>
 
   <bounds will="comprehensive specs|multi-format output|validation" wont="generate impl code|modify existing arch|violate constraints"/>
+
+  <boundaries type="document-only" critical="true">
+    <rule>STOP after producing design documentation</rule>
+    <rule>DO NOT write implementation code</rule>
+    <rule>DO NOT create actual source files</rule>
+    <rule>Design specs and interfaces only</rule>
+    <output>Architecture/API/Component/Database design documents</output>
+  </boundaries>
+
+  <handoff>
+    <next command="/sc:implement">For code implementation from design</next>
+    <next command="/sc:workflow">For phased implementation planning</next>
+    <format>Provide design context for seamless handoff</format>
+  </handoff>
 </component>

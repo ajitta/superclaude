@@ -53,4 +53,18 @@ description: Task reflection and validation using Serena MCP analysis capabiliti
   </examples>
 
   <bounds will="comprehensive reflection|TodoWrite bridge|cross-session learning" wont="operate without Serena|override completion|bypass integrity"/>
+
+  <boundaries type="document-only" critical="true">
+    <rule>STOP after producing reflection report</rule>
+    <rule>DO NOT modify code based on reflection</rule>
+    <rule>DO NOT auto-fix identified issues</rule>
+    <output>Reflection analysis with recommendations</output>
+  </boundaries>
+
+  <handoff>
+    <next command="/sc:improve">For implementing reflection insights</next>
+    <next command="/sc:troubleshoot">For addressing identified issues</next>
+    <next command="/sc:save">For persisting reflection learnings</next>
+    <format>Provide actionable recommendations for follow-up</format>
+  </handoff>
 </component>
