@@ -8,12 +8,11 @@ install:
 	@echo "✅ Installation complete!"
 	@echo "   Run 'make verify' to check installation"
 
-# Deploy to global uv tool (fixes cache invalidation)
+# Deploy to global uv tool (editable mode for instant changes)
 deploy:
-	@echo "🚀 Deploying SuperClaude as global tool..."
-	@touch src/
-	uv tool install --force .
-	@echo "✅ Deployed! Run 'superclaude --version' to verify"
+	@echo "🚀 Deploying SuperClaude as global tool (editable)..."
+	uv tool install --force --editable .
+	@echo "✅ Deployed! Changes in src/ are reflected immediately."
 
 # Run tests
 test:
