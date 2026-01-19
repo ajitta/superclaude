@@ -224,8 +224,11 @@ uv pip install -e ".[dev]"
 uv run superclaude install --list-all  # Test changes immediately
 uv run pytest tests/ -v                 # Run tests
 
-# Deploy changes to global tool
-uv tool install --force .
+# Deploy changes to global tool (recommended)
+make deploy               # Handles cache invalidation automatically
+
+# Or manual deploy (may miss file changes due to uv caching)
+# uv tool install --force .
 
 # Verify installation
 uv tool list              # List installed tools
@@ -236,7 +239,7 @@ where superclaude         # Check install path (Windows)
 | Stage | Command | Description |
 |-------|---------|-------------|
 | Dev/Test | `uv run superclaude ...` | Test in repo (editable) |
-| Deploy | `uv tool install --force .` | Update global tool |
+| Deploy | `make deploy` | Update global tool (cache-safe) |
 | Use | `superclaude ...` | Run from anywhere |
 
 ### **Coming in v5.0 (In Development)**

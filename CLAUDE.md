@@ -18,13 +18,14 @@ uv run pytest -k "test_assess"             # By name pattern
 # Development workflow
 uv pip install -e ".[dev]"                 # Install editable (RECOMMENDED)
 uv run superclaude install --list-all      # Test CLI changes
-uv tool install --force .                  # Deploy to global tool
+make deploy                                # Deploy to global tool (recommended)
 ```
 
 ## Make Commands
 
 ```bash
 make install       # uv pip install -e ".[dev]"
+make deploy        # Deploy to global uv tool (touch src/ + uv tool install)
 make test          # uv run pytest
 make test-plugin   # Verify pytest plugin loads
 make verify        # Full installation check

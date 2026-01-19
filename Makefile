@@ -1,4 +1,4 @@
-.PHONY: install test test-plugin doctor verify clean lint format build-plugin sync-plugin-repo uninstall-legacy help
+.PHONY: install deploy test test-plugin doctor verify clean lint format build-plugin sync-plugin-repo uninstall-legacy help
 
 # Installation (local source, editable) - RECOMMENDED
 install:
@@ -7,6 +7,13 @@ install:
 	@echo ""
 	@echo "✅ Installation complete!"
 	@echo "   Run 'make verify' to check installation"
+
+# Deploy to global uv tool (fixes cache invalidation)
+deploy:
+	@echo "🚀 Deploying SuperClaude as global tool..."
+	@touch src/
+	uv tool install --force .
+	@echo "✅ Deployed! Run 'superclaude --version' to verify"
 
 # Run tests
 test:
@@ -110,6 +117,7 @@ help:
 	@echo ""
 	@echo "🚀 Quick Start:"
 	@echo "  make install         - Install in development mode (RECOMMENDED)"
+	@echo "  make deploy          - Deploy as global uv tool"
 	@echo "  make verify          - Verify installation is working"
 	@echo ""
 	@echo "🔧 Development:"
