@@ -1,6 +1,6 @@
 # Project Index: SuperClaude Framework
 
-**Generated**: 2026-01-14
+**Generated**: 2026-01-20
 **Version**: 4.2.1+ajitta
 **Description**: AI-enhanced development framework for Claude Code - pytest plugin with specialized commands, agents, and modes
 
@@ -24,7 +24,7 @@ SuperClaude_Framework/
 │   ├── scripts/              # Utility scripts
 │   └── pytest_plugin.py      # Auto-loaded pytest integration
 ├── tests/                    # Test suite
-│   ├── unit/                 # Unit tests (6 files)
+│   ├── unit/                 # Unit tests (9 files)
 │   └── integration/          # Integration tests (1 file)
 ├── .claude/                  # Claude Code runtime configuration
 │   ├── agents/               # Installed agents (20 files)
@@ -43,13 +43,13 @@ SuperClaude_Framework/
 
 | Category | Count | Location |
 |----------|-------|----------|
-| Slash Commands | 31 | src/superclaude/commands/ |
+| Slash Commands | 30 | src/superclaude/commands/ |
 | Agents | 20 | src/superclaude/agents/ |
-| Modes | 8 | src/superclaude/modes/ |
+| Modes | 7 | src/superclaude/modes/ |
 | MCP Servers | 10 | src/superclaude/mcp/configs/ |
 | Core Configs | 7 | src/superclaude/core/ |
-| Python Files | 37 | src/superclaude/ |
-| Test Files | 11 | tests/ |
+| Python Files | 38 | src/superclaude/ |
+| Test Files | 14 | tests/ |
 
 ---
 

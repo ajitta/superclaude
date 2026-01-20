@@ -1,18 +1,18 @@
 {
   "meta": {
-    "generated": "2026-01-14",
+    "generated": "2026-01-20",
     "version": "4.2.1+ajitta",
     "description": "AI-enhanced development framework for Claude Code"
   },
   "statistics": {
-    "commands": 31,
+    "commands": 30,
     "agents": 20,
-    "modes": 8,
+    "modes": 7,
     "mcp_servers": 10,
     "mcp_docs": 11,
     "core_configs": 7,
-    "python_files": 37,
-    "test_files": 11,
+    "python_files": 38,
+    "test_files": 14,
     "skills": 1
   },
   "entry_points": {
@@ -141,9 +141,9 @@
     "framework": "pytest>=7.0.0",
     "location": "tests/",
     "structure": {
-      "unit": ["test_cli_install.py", "test_confidence.py", "test_hooks.py", "test_reflexion.py", "test_self_check.py", "test_token_budget.py"],
+      "unit": ["test_cli_install.py", "test_confidence.py", "test_hook_tracker.py", "test_hooks.py", "test_mcp_fallback.py", "test_parallel.py", "test_reflexion.py", "test_self_check.py", "test_token_budget.py"],
       "integration": ["test_pytest_plugin.py"],
-      "total_files": 11
+      "total_files": 14
     },
     "markers": ["unit", "integration", "confidence_check", "self_check", "reflexion", "complexity", "hallucination", "performance"],
     "commands": {
