@@ -12,7 +12,7 @@
 |-----|--------|----------|----------|------|
 | Context7 | Optional | context7, c7, library, docs, framework, documentation, --c7, --context7 | Tavily/WebSearch | MCP_Context7.md |
 | Tavily | Optional | tavily, search, research, news, current, web, fact-check, --tavily | WebSearch (native) | MCP_Tavily.md |
-| Sequential | Optional | sequential, seq, debug, architecture, analysis, reasoning, --seq, --sequential | Native reasoning | MCP_Sequential.md |
+| Sequential | Optional | sequential, seq, --effort medium/high, debug, architecture, analysis, reasoning, --seq, --sequential | Native reasoning | MCP_Sequential.md |
 | Serena | Optional | serena, symbol, rename, extract, move, LSP, memory, --serena | Native search | MCP_Serena.md |
 | Morphllm | Optional | morphllm, morph, pattern, bulk edit, transform, --morph, --morphllm | Edit (native) | MCP_Morphllm.md |
 | Magic | Optional | magic, 21st, ui, component, /ui, /21, --magic | Write (native) | MCP_Magic.md |
@@ -59,11 +59,15 @@
   <cross_reference note="FLAGS.md and MCP integration">
 | FLAGS.md Flag | Triggers MCP | Triggers Mode |
 |---------------|--------------|---------------|
-| --think | Sequential | - |
-| --think-hard | Sequential + Context7 | - |
-| --ultrathink | All loaded MCP | - |
+| --effort medium | Sequential | - |
+| --effort high | Sequential + Context7 | - |
+| --think (legacy) | Sequential | - |
+| --think-hard (legacy) | Sequential + Context7 | - |
+| --ultrathink (legacy) | All loaded MCP | - |
 | --brainstorm | - | Brainstorming |
 | --uc | - | TokenEfficiency |
+
+Note: When `alwaysThinkingEnabled: true`, legacy --think flags map to --effort levels.
   </cross_reference>
 
   <native_features note="Built-in Claude Code capabilities, not MCP">

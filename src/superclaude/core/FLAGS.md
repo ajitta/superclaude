@@ -39,35 +39,40 @@
 | WebSearch | fact-check, current info | Native web search (no flag needed) |
   </native>
 
-  <analysis note="Primary source for think flags - also triggers MCP_INDEX">
-| Flag | Trigger | Effect | MCP Integration |
-|------|---------|--------|-----------------|
-| `--think` | moderate complexity | ~4K tokens | Sequential |
-| `--think-hard` | architecture, system-wide | ~10K tokens | Sequential + Context7 |
-| `--ultrathink` | critical redesign, legacy, complex debug | ~32K tokens | All loaded MCP |
-  </analysis>
-
-  <effort note="Opus 4.5 specific">
-- `--effort low`: Minimal reasoning (~76% fewer tokens), fastest
-- `--effort medium`: Balanced (default)
-- `--effort high`: Maximum reasoning depth
+  <effort note="Opus 4.5 - Primary reasoning depth control">
+| Flag | Effect | MCP Integration |
+|------|--------|-----------------|
+| `--effort low` | Minimal reasoning (~76% fewer tokens), fastest | None |
+| `--effort medium` | Balanced analysis (default) | Sequential on demand |
+| `--effort high` | Maximum reasoning depth, comprehensive analysis | Sequential + Context7 |
   </effort>
 
-  <extended_thinking note="API budget_tokens config">
+  <think_flags note="Legacy compatibility - maps to --effort when alwaysThinkingEnabled=true">
+| Legacy Flag | Maps To | Behavior |
+|-------------|---------|----------|
+| `--think` | `--effort medium` | Standard analysis depth |
+| `--think-hard` | `--effort high` | Deep analysis with MCP |
+| `--ultrathink` | `--effort high` + all MCP | Maximum complexity handling |
+
+When `alwaysThinkingEnabled: true` (default for Opus 4.5):
+- Extended thinking is always active
+- Think flags serve as **complexity hints** rather than thinking toggles
+- Use `--effort` directly for explicit control
+  </think_flags>
+
+  <extended_thinking note="API budget_tokens - auto-managed when alwaysThinkingEnabled=true">
 | Parameter | Value | Notes |
 |-----------|-------|-------|
-| budget_tokens | 1024-32768 | Start low, increase incrementally |
+| budget_tokens | 1024-32768 | Auto-scaled based on complexity |
 | minimum | 1024 | Hard minimum enforced by API |
-| recommended_start | 2048 | Good balance for most tasks |
-| max_practical | 32768 | >32K requires batch processing |
+| default | 4096 | Standard tasks |
+| max_practical | 32768 | Complex multi-domain analysis |
 | temperature | INCOMPATIBLE | Do not set when thinking enabled |
 
-⚠️ **Think Sensitivity (Opus 4.5)**: When extended thinking is disabled, Opus 4.5 interprets "think" literally in prompts. Avoid phrases like "think step by step" or "think carefully" unless extended thinking is enabled, as they may produce verbose reasoning output instead of direct answers.
-
-Mapping to flags:
-- `--think`: budget_tokens=4096
-- `--think-hard`: budget_tokens=10240
-- `--ultrathink`: budget_tokens=32768
+Legacy mapping (deprecated when alwaysThinkingEnabled=true):
+- `--think`: budget_tokens=4096 → now use `--effort medium`
+- `--think-hard`: budget_tokens=10240 → now use `--effort high`
+- `--ultrathink`: budget_tokens=32768 → now use `--effort high` + `--all-mcp`
   </extended_thinking>
 
   <execution>
@@ -90,7 +95,8 @@ Mapping to flags:
   <priority_rules>
 - Safety First: --safe-mode > --validate > optimization
 - Explicit Override: User flags > auto-detection
-- Depth: --ultrathink > --think-hard > --think
+- Effort: --effort high > --effort medium > --effort low
+- Legacy Think: --ultrathink → --effort high + --all-mcp
 - MCP: --no-mcp overrides individual flags
 - Scope: system > project > module > file
   </priority_rules>
