@@ -4,6 +4,11 @@ SuperClaude is a Python-based pytest plugin and framework for Claude Code. It sh
 PM Agent capabilities (confidence checks, reflexion, self-check, token budgeting)
 plus configuration assets (agents, commands, modes, MCP configs).
 
+## Serena Usage
+- Use Serena tools for codebase navigation and edits whenever possible.
+- Prefer symbol-level reads/edits over full-file reads; only read whole files when necessary.
+- Use Serena search tools (`find_symbol`, `search_for_pattern`, `find_referencing_symbols`) before manual file scans.
+
 ## Project Structure
 ```
 docs/                      # Documentation
