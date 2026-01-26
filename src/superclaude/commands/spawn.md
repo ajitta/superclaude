@@ -29,7 +29,7 @@ description: Meta-system task orchestration with intelligent breakdown and deleg
   <outputs note="Per execution">
 | Artifact | Purpose |
 |----------|---------|
-| TodoWrite hierarchy | Task breakdown tracking |
+| TaskCreate/TaskUpdate hierarchy | Task breakdown tracking |
 | SPAWN_PLAN.md | Execution strategy doc |
 | SPAWN_RESULT.md | Aggregated results |
   </outputs>
@@ -42,7 +42,7 @@ description: Meta-system task orchestration with intelligent breakdown and deleg
   </checklist>
 
   <tools>
-    - TodoWrite: Hierarchical breakdown (Epic→Story→Task)
+    - TaskCreate/TaskUpdate: Hierarchical breakdown (Epic→Story→Task)
     - Read/Grep/Glob: Dependency mapping
     - Edit/MultiEdit/Write: Coordinated file ops
     - Bash: System-level coordination

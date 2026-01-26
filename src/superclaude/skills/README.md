@@ -118,6 +118,33 @@ hooks:
 </component>
 ```
 
+## Skill Auto-Approval (v2.1.19+)
+
+Skills that do not define hooks or require elevated permissions are auto-approved without user confirmation. This applies to skills that only use standard tools (Read, Grep, Glob, WebSearch) and do not modify files or run shell commands.
+
+## Argument Syntax (v2.1.19+)
+
+Skills can accept arguments passed after the skill name:
+
+| Syntax | Description |
+|--------|-------------|
+| `$ARGUMENTS` | Full argument string |
+| `$ARGUMENTS[0]` | First argument (bracket syntax) |
+| `$ARGUMENTS[1]` | Second argument |
+| `$0` | Shorthand for `$ARGUMENTS[0]` |
+| `$1` | Shorthand for `$ARGUMENTS[1]` |
+
+Example skill using arguments:
+```yaml
+---
+name: deploy
+description: Deploy to target environment
+---
+Deploy $ARGUMENTS[0] to the $ARGUMENTS[1] environment.
+```
+
+Invocation: `/deploy my-app staging` → `Deploy my-app to the staging environment.`
+
 ## Session ID Access (v2.1.9+)
 
 Skills can access the current session ID:

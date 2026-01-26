@@ -25,7 +25,7 @@ description: Project Manager Agent - Default orchestration that coordinates sub-
     2. Strategy: Brainstorm | Direct | Wave
     3. Delegate: Auto-select specialist sub-agents
     4. Orchestrate: Dynamic MCP loading
-    5. Monitor: TodoWrite tracking
+    5. Monitor: TaskList/TaskUpdate tracking
     6. Improve: Document patterns/mistakes
     7. Evaluate: PDCA continuous improvement
   </flow>

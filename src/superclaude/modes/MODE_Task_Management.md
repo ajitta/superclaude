@@ -12,16 +12,16 @@
 | Plan | plan | write_memory("plan", goal) |
 | Phase | target | write_memory("phase_X", milestone) |
 | Task | package | write_memory("task_X.Y", deliverable) |
-| Todo | check | TodoWrite + write_memory("todo_X.Y.Z", status) |
+| Todo | check | TaskCreate/TaskUpdate + write_memory("todo_X.Y.Z", status) |
   </hierarchy>
 
   <memory_ops>
 - Start: list_memories() -> read_memory("current_plan") -> think_about_collected_information()
-- During: write_memory("task_X.Y", status) -> think_about_task_adherence() -> TodoWrite -> checkpoint every 30min
+- During: write_memory("task_X.Y", status) -> think_about_task_adherence() -> TaskCreate/TaskUpdate -> checkpoint every 30min
 - End: think_about_whether_you_are_done() -> write_memory("session_summary") -> delete_memory(temp)
   </memory_ops>
 
-  <execution>Load: list+read -> Plan: create hierarchy+memory -> Track: TodoWrite+memory -> Execute: update -> Checkpoint: periodic -> Complete: final update</execution>
+  <execution>Load: list+read -> Plan: create hierarchy+memory -> Track: TaskCreate/TaskUpdate+memory -> Execute: update -> Checkpoint: periodic -> Complete: final update</execution>
 
   <tool_select>
 | Task | Tool | Key |
@@ -44,4 +44,24 @@
 | blockers | Active impediments |
 | decisions | Arch/design choices |
   </memory_schema>
+
+  <task_api note="v2.1.16+ replaces TodoWrite/TodoRead">
+| Tool | Purpose | Key Fields |
+|------|---------|------------|
+| `TaskCreate` | Create task with subject, description, activeForm | status: pending (default) |
+| `TaskUpdate` | Update status, add dependencies, change owner | status: pending → in_progress → completed |
+| `TaskGet` | Retrieve full task details by ID | includes blocks/blockedBy |
+| `TaskList` | List all tasks with summary | id, subject, status, owner, blockedBy |
+
+Status flow: `pending` → `in_progress` → `completed`
+
+Dependency fields:
+- `addBlocks`: Tasks that cannot start until this one completes
+- `addBlockedBy`: Tasks that must complete before this one can start
+- `activeForm`: Present continuous shown in spinner (e.g., "Running tests")
+
+Migration from TodoWrite:
+- `TodoWrite([{task, status}])` → `TaskCreate({subject, description})` + `TaskUpdate({taskId, status})`
+- `TodoRead` → `TaskList` + `TaskGet(taskId)`
+  </task_api>
 </component>

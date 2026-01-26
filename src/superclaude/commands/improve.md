@@ -32,7 +32,7 @@ description: Apply systematic improvements to code quality, performance, and mai
   <tools>
     - Read/Grep/Glob: Code analysis + opportunity ID
     - Edit/MultiEdit: Safe modification + refactoring
-    - TodoWrite: Multi-file progress tracking
+    - TaskCreate/TaskUpdate: Multi-file progress tracking
     - Task: Large-scale improvement delegation
   </tools>
 

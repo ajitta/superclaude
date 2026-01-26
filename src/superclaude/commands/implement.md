@@ -41,7 +41,7 @@ description: Feature and code implementation with intelligent persona activation
   <tools>
     - Write/Edit/MultiEdit: Code generation
     - Read/Grep/Glob: Project analysis
-    - TodoWrite: Multi-file progress
+    - TaskCreate/TaskUpdate: Multi-file progress
     - Task: Large-scale delegation
   </tools>
 

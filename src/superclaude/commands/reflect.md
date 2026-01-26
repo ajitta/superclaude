@@ -52,7 +52,7 @@ description: Task reflection and validation using Serena MCP analysis capabiliti
 
   </examples>
 
-  <bounds will="comprehensive reflection|TodoWrite bridge|cross-session learning" wont="operate without Serena|override completion|bypass integrity"/>
+  <bounds will="comprehensive reflection|TaskList bridge|cross-session learning" wont="operate without Serena|override completion|bypass integrity"/>
 
   <boundaries type="document-only" critical="true">
     <rule>STOP after producing reflection report</rule>

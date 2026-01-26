@@ -22,6 +22,10 @@
 | Critical | 85% | Trigger --safe-mode, auto --uc |
 | Maximum | 200K | Hard limit, context window full |
 
+Status line fields (v2.1.6+):
+- `context_window.used_percentage`: Current context usage
+- `context_window.remaining_percentage`: Available context budget
+
 Best practices:
 - Monitor usage before complex operations
 - Use /clear between unrelated tasks

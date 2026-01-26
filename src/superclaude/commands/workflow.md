@@ -30,14 +30,14 @@ description: Generate structured implementation workflows from PRDs and feature 
 | Artifact | Purpose |
 |----------|---------|
 | WORKFLOW.md | Implementation workflow document |
-| TodoWrite items | Task tracking hierarchy |
+| TaskCreate/TaskUpdate items | Task tracking hierarchy |
 | WORKFLOW_STATUS.md | Progress + quality gates |
   </outputs>
 
   <checklist note="SHOULD complete all">
     - [ ] PRD/requirements fully parsed
     - [ ] Workflow document generated
-    - [ ] Dependencies mapped in TodoWrite
+    - [ ] Dependencies mapped in TaskCreate/TaskUpdate
     - [ ] Quality gates defined and tracked
   </checklist>
 
@@ -46,7 +46,7 @@ description: Generate structured implementation workflows from PRDs and feature 
 
   <tools>
     - Read/Write/Edit: PRD analysis + workflow docs
-    - TodoWrite: Multi-phase progress tracking
+    - TaskCreate/TaskUpdate: Multi-phase progress tracking
     - Task: Parallel workflow + multi-agent
     - WebSearch: Tech research + framework validation
     - sequentialthinking: Dependency analysis

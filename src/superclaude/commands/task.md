@@ -30,7 +30,7 @@ description: Execute complex tasks with intelligent workflow management and dele
   <personas p="arch|anal|fe|be|sec|ops|pm"/>
 
   <tools>
-    - TodoWrite: Epic → Story → Task hierarchy
+    - TaskCreate/TaskUpdate: Epic → Story → Task hierarchy
     - Task: Multi-agent delegation
     - Read/Write/Edit: Documentation + coordination
     - sequentialthinking: Dependency analysis
@@ -58,7 +58,7 @@ description: Execute complex tasks with intelligent workflow management and dele
   <boundaries type="execution" critical="true">
     <rule>EXECUTE tasks via intelligent delegation</rule>
     <rule>Quality gates enforced between phases</rule>
-    <rule>Progress reported via TodoWrite</rule>
+    <rule>Progress reported via TaskCreate/TaskUpdate</rule>
   </boundaries>
 
   <completion_criteria>

@@ -31,7 +31,7 @@ description: Interactive requirements discovery through Socratic dialogue and sy
 
   <tools>
     - Read/Write/Edit: Requirements docs + spec generation
-    - TodoWrite: Multi-phase exploration tracking
+    - TaskCreate/TaskUpdate: Multi-phase exploration tracking
     - Task: Parallel exploration + multi-agent
     - WebSearch: Market research + tech validation
     - sequentialthinking: Requirements analysis

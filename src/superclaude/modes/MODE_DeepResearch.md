@@ -23,7 +23,7 @@
 - Activates deep-research-agent automatically
 - Enables Tavily search capabilities
 - Triggers Sequential for complex reasoning
-- Emphasizes TodoWrite for task tracking
+- Emphasizes TaskCreate/TaskUpdate for task tracking
   </integration>
 
   <quality>Source credibility paramount | Contradiction resolution required | Confidence scoring mandatory | Citation completeness essential</quality>

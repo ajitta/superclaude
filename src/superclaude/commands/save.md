@@ -48,7 +48,7 @@ description: Session lifecycle management with Serena MCP integration for contex
     - write_memory/read_memory: Session context persistence
     - think_about_collected_information: Discovery identification
     - summarize_changes: Progress documentation
-    - TodoRead: Auto checkpoint triggers
+    - TaskList/TaskGet: Auto checkpoint triggers
   </tools>
 
   <patterns>

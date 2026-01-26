@@ -31,7 +31,7 @@ description: Provide clear explanations of code, concepts, and system behavior w
 
   <tools>
     - Read/Grep/Glob: Code analysis + pattern ID
-    - TodoWrite: Multi-part explanation tracking
+    - TaskCreate/TaskUpdate: Multi-part explanation tracking
     - Task: Complex explanation delegation
   </tools>
 

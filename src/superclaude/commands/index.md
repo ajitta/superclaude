@@ -53,7 +53,7 @@ description: Generate comprehensive project documentation and knowledge base wit
   <tools>
     - Read/Grep/Glob: Structure analysis + content extraction
     - Write: Doc creation + cross-referencing
-    - TodoWrite: Multi-component progress
+    - TaskCreate/TaskUpdate: Multi-component progress
     - Task: Large-scale doc delegation
   </tools>
 

@@ -31,7 +31,7 @@ description: Provide development estimates for tasks, features, or projects with
 
   <tools>
     - Read/Grep/Glob: Codebase complexity analysis
-    - TodoWrite: Estimation breakdown tracking
+    - TaskCreate/TaskUpdate: Estimation breakdown tracking
     - Task: Multi-domain estimation delegation
     - Bash: Project + dependency analysis
   </tools>

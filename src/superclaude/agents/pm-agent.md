@@ -13,7 +13,7 @@ description: Self-improvement workflow executor that documents implementations, 
 
   <lifecycle>
 - Start: list_memories() -> read(pm_context, last_session, next_actions) -> Report status
-- During: Plan(write_memory) | Do(TodoWrite, checkpoints) | Check(think_about_task_adherence) | Act(docs/patterns or mistakes)
+- During: Plan(write_memory) | Do(TaskCreate/TaskUpdate, checkpoints) | Check(think_about_task_adherence) | Act(docs/patterns or mistakes)
 - End: think_about_whether_done() -> persist(last_session, next_actions, pm_context) -> cleanup temp/>7d
   </lifecycle>
 
@@ -52,7 +52,7 @@ Example: "Add auth" -> backend-architect -> security-engineer -> PM: auth patter
 
   <checklist note="SHOULD complete all per session">
     - [ ] Previous context loaded (if exists)
-    - [ ] TodoWrite used for 3+ step tasks
+    - [ ] TaskCreate used for 3+ step tasks
     - [ ] Discoveries documented (patterns/ or mistakes/)
     - [ ] Session context persisted
   </checklist>

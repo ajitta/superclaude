@@ -109,6 +109,7 @@ Legacy mapping (deprecated when alwaysThinkingEnabled=true):
 | `FORCE_AUTOUPDATE_PLUGINS` | Force plugin autoupdate | 2.1.2 |
 | `CLAUDE_CODE_DISABLE_BACKGROUND_TASKS` | Disable Ctrl+B backgrounding | 2.1.4 |
 | `CLAUDE_CODE_TMPDIR` | Override temp directory | 2.1.5 |
+| `CLAUDE_CODE_ENABLE_TASKS` | Enable TaskCreate/TaskUpdate/TaskList/TaskGet (replaces TodoWrite) | 2.1.19 |
   </environment_variables>
 
   <settings note="Claude Code 2.1.x additions">
@@ -118,6 +119,9 @@ Legacy mapping (deprecated when alwaysThinkingEnabled=true):
 | `respectGitignore` | Per-project @-mention file picker control | 2.1.0 |
 | `showTurnDuration` | Hide "Cooked for Xm Xs" messages | 2.1.7 |
 | `plansDirectory` | Custom plan file storage location | 2.1.9 |
+| `keybindings` | Custom keyboard shortcut mappings | 2.1.18 |
+| `context_window.used_percentage` | Status line: context usage % | 2.1.6 |
+| `context_window.remaining_percentage` | Status line: context remaining % | 2.1.6 |
   </settings>
 
   <permission_patterns note="v2.1.0+ wildcard syntax">
@@ -129,4 +133,23 @@ Legacy mapping (deprecated when alwaysThinkingEnabled=true):
 | Agent disable | `Task(AgentName)` | Disable specific agent in disallowedTools |
 | MCP wildcard | `mcp__server__*` | All tools from an MCP server |
   </permission_patterns>
+
+  <argument_syntax note="v2.1.19+ skill argument passing">
+| Syntax | Description | Example |
+|--------|-------------|---------|
+| `$ARGUMENTS` | Full argument string | `/skill hello world` → `"hello world"` |
+| `$ARGUMENTS[0]` | First argument (bracket syntax) | `/skill hello world` → `"hello"` |
+| `$ARGUMENTS[1]` | Second argument | `/skill hello world` → `"world"` |
+| `$0` | Shorthand for `$ARGUMENTS[0]` | Same as bracket syntax |
+| `$1` | Shorthand for `$ARGUMENTS[1]` | Same as bracket syntax |
+
+Usage in skill frontmatter:
+```yaml
+---
+name: deploy
+description: Deploy to environment
+---
+Deploy $ARGUMENTS[0] to $ARGUMENTS[1] environment.
+```
+  </argument_syntax>
 </component>

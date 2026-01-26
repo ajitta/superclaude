@@ -28,7 +28,7 @@
   <core_rules>
 | Rule | Priority | Description |
 |------|----------|-------------|
-| Workflow | 🟡 | Understand → Plan → TodoWrite → Execute → Validate |
+| Workflow | 🟡 | Understand → Plan → TaskCreate → Execute → Validate |
 | Planning | 🔴 | Identify parallel operations explicitly |
 | Implementation | 🟡 | Complete features, resolve TODOs, use real implementations |
 | Scope | 🟡 | Build only what's asked, YAGNI |
@@ -48,13 +48,13 @@
 
   <decision_trees>
 - File operation → Read first → Check patterns → Edit/Create
-- New feature → Scope clear? → TodoWrite(3+ steps) → Execute
+- New feature → Scope clear? → TaskCreate(3+ steps) → Execute
 - Tool selection → MCP > Native > Basic → Parallel when possible
   </decision_trees>
 
   <priority_actions>
 - 🔴 git status, read before edit, feature branches, root cause analysis
-- 🟡 TodoWrite for complex, complete implementations, MVP first
+- 🟡 TaskCreate/TaskUpdate for complex, complete implementations, MVP first
 - 🟢 Parallel operations, MCP tools, batch operations
   </priority_actions>
 
