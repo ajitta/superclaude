@@ -5,7 +5,7 @@
 > This document captures lessons learned, common pitfalls, and solutions discovered during development.
 > Consult this when encountering issues or learning project patterns.
 
-**Last Updated**: 2026-01-05
+**Last Updated**: 2026-01-26
 
 ---
 
@@ -727,17 +727,17 @@ Based on real usage data:
 
 ---
 
-## 📊 **Current Framework Statistics (2026-01-05)**
+## 📊 **Current Framework Statistics (2026-01-26)**
 
 | Category | Count | Location |
 |----------|-------|----------|
-| Slash Commands | 30 | src/superclaude/commands/ |
-| Agents | 20 | src/superclaude/agents/ |
-| Modes | 8 | src/superclaude/modes/ |
-| MCP Servers | 10 | src/superclaude/mcp/configs/ |
-| Core Configs | 7 | src/superclaude/core/ |
-| Python Files | 34 | src/superclaude/ |
-| Test Files | 10 | tests/ |
+| Slash Commands | 32 | src/superclaude/commands/ |
+| Agents | 22 | src/superclaude/agents/ |
+| Modes | 9 | src/superclaude/modes/ |
+| MCP Servers | 11 | src/superclaude/mcp/configs/ |
+| Core Configs | 8 | src/superclaude/core/ |
+| Python Files | 44 | src/superclaude/ |
+| Test Files | 9 | tests/ |
 
 **Key files updated**:
 - PROJECT_INDEX.md / PROJECT_INDEX.json - Token-efficient repository index (94% reduction)
