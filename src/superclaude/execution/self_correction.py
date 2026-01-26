@@ -14,10 +14,13 @@ Key features:
 
 import hashlib
 import json
+import threading
 from dataclasses import asdict, dataclass
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional
+
+from superclaude.utils import atomic_write_json, word_overlap_count
 
 
 @dataclass
@@ -100,8 +103,7 @@ class SelfCorrectionEngine:
             "prevention_rules": [],
         }
 
-        with open(self.reflexion_file, "w") as f:
-            json.dump(initial_data, f, indent=2)
+        atomic_write_json(self.reflexion_file, initial_data)
 
     def detect_failure(self, execution_result: Dict[str, Any]) -> bool:
         """
@@ -196,17 +198,10 @@ class SelfCorrectionEngine:
                 FailureEntry.from_dict(entry) for entry in data.get("mistakes", [])
             ]
 
-            # Simple similarity: keyword overlap
-            task_keywords = set(task.lower().split())
-            error_keywords = set(error_msg.lower().split())
-
             similar = []
             for failure in past_failures:
-                failure_keywords = set(failure.task.lower().split())
-                error_keywords_past = set(failure.error_message.lower().split())
-
-                task_overlap = len(task_keywords & failure_keywords)
-                error_overlap = len(error_keywords & error_keywords_past)
+                task_overlap = word_overlap_count(task, failure.task)
+                error_overlap = word_overlap_count(error_msg, failure.error_message)
 
                 if task_overlap >= 2 or error_overlap >= 2:
                     similar.append(failure)
@@ -334,9 +329,13 @@ class SelfCorrectionEngine:
             data["prevention_rules"].append(root_cause.prevention_rule)
             print("📝 Prevention rule added")
 
-        # Save updated memory
-        with open(self.reflexion_file, "w") as f:
-            json.dump(data, f, indent=2)
+        # Cap stored mistakes to prevent unbounded growth (P1)
+        max_mistakes = 200
+        if len(data["mistakes"]) > max_mistakes:
+            data["mistakes"] = data["mistakes"][-max_mistakes:]
+
+        # Save updated memory (atomic write for crash safety)
+        atomic_write_json(self.reflexion_file, data)
 
         print("💾 Reflexion memory updated")
 
@@ -367,15 +366,9 @@ class SelfCorrectionEngine:
                 FailureEntry.from_dict(entry) for entry in data.get("mistakes", [])
             ]
 
-            # Find similar tasks
-            task_keywords = set(task.lower().split())
-
             relevant = []
             for failure in past_failures:
-                failure_keywords = set(failure.task.lower().split())
-                overlap = len(task_keywords & failure_keywords)
-
-                if overlap >= 2:
+                if word_overlap_count(task, failure.task) >= 2:
                     relevant.append(failure)
 
             return relevant
@@ -384,8 +377,9 @@ class SelfCorrectionEngine:
             return []
 
 
-# Singleton instance
+# Singleton instance (thread-safe via double-checked locking)
 _self_correction_engine: Optional[SelfCorrectionEngine] = None
+_self_correction_lock = threading.Lock()
 
 
 def get_self_correction_engine(
@@ -395,9 +389,11 @@ def get_self_correction_engine(
     global _self_correction_engine
 
     if _self_correction_engine is None:
-        if repo_path is None:
-            repo_path = Path.cwd()
-        _self_correction_engine = SelfCorrectionEngine(repo_path)
+        with _self_correction_lock:
+            if _self_correction_engine is None:
+                if repo_path is None:
+                    repo_path = Path.cwd()
+                _self_correction_engine = SelfCorrectionEngine(repo_path)
 
     return _self_correction_engine
 

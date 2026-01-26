@@ -330,10 +330,13 @@ def list_available_servers():
 def show_mcp_status():
     """Show MCP server status with fallback info."""
     # Import fallback mappings
+    fallbacks = {}
     try:
         from superclaude.hooks.mcp_fallback import MCP_FALLBACKS
+
+        fallbacks = MCP_FALLBACKS
     except ImportError:
-        MCP_FALLBACKS = {}
+        pass
 
     click.echo("📊 MCP Server Status\n")
     click.echo("┌─────────────────────┬──────────┬─────────────────────┐")
@@ -361,7 +364,7 @@ def show_mcp_status():
             "airisagent": "airis-agent",
         }
         fallback_key = fallback_map.get(fallback_key, fallback_key)
-        fallback = MCP_FALLBACKS.get(fallback_key, "Native")
+        fallback = fallbacks.get(fallback_key, "Native")
 
         click.echo(f"│ {name:19} │ {status:8} │ {fallback:19} │")
 

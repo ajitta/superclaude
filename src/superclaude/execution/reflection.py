@@ -10,10 +10,13 @@ Only proceeds with execution if confidence >70%.
 """
 
 import json
+import threading
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional
+
+from superclaude.utils import atomic_write_json, word_overlap_count
 
 
 @dataclass
@@ -247,15 +250,9 @@ class ReflectionEngine:
 
             past_mistakes = reflexion_data.get("mistakes", [])
 
-            # Search for similar mistakes
             similar_mistakes = []
-            task_keywords = set(task.lower().split())
-
             for mistake in past_mistakes:
-                mistake_keywords = set(mistake.get("task", "").lower().split())
-                overlap = task_keywords & mistake_keywords
-
-                if len(overlap) >= 2:  # At least 2 common words
+                if word_overlap_count(task, mistake.get("task", "")) >= 2:
                     similar_mistakes.append(mistake)
 
             if similar_mistakes:
@@ -364,15 +361,16 @@ class ReflectionEngine:
 
             log_data["reflections"].append(entry)
 
-            with open(reflection_log, "w") as f:
-                json.dump(log_data, f, indent=2)
+            # Atomic write for crash safety (S2)
+            atomic_write_json(reflection_log, log_data)
 
         except Exception as e:
             print(f"⚠️ Could not record reflection: {e}")
 
 
-# Singleton instance
+# Singleton instance (thread-safe via double-checked locking)
 _reflection_engine: Optional[ReflectionEngine] = None
+_reflection_lock = threading.Lock()
 
 
 def get_reflection_engine(repo_path: Optional[Path] = None) -> ReflectionEngine:
@@ -380,9 +378,11 @@ def get_reflection_engine(repo_path: Optional[Path] = None) -> ReflectionEngine:
     global _reflection_engine
 
     if _reflection_engine is None:
-        if repo_path is None:
-            repo_path = Path.cwd()
-        _reflection_engine = ReflectionEngine(repo_path)
+        with _reflection_lock:
+            if _reflection_engine is None:
+                if repo_path is None:
+                    repo_path = Path.cwd()
+                _reflection_engine = ReflectionEngine(repo_path)
 
     return _reflection_engine
 

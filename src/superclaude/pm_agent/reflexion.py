@@ -24,9 +24,12 @@ Process:
 """
 
 import json
+import re
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, Optional
+
+from superclaude.utils import word_overlap_ratio
 
 
 class ReflexionPattern:
@@ -78,9 +81,8 @@ class ReflexionPattern:
         Get known solution for similar error
 
         Lookup strategy:
-            1. Try mindbase semantic search (if available)
-            2. Fallback to grep-based text search
-            3. Return None if no match found
+            1. Search local JSONL file for similar errors
+            2. Return None if no match found
 
         Args:
             error_info: Error information dict
@@ -89,15 +91,7 @@ class ReflexionPattern:
             Solution dict if found, None otherwise
         """
         error_signature = self._create_error_signature(error_info)
-
-        # Try mindbase first (semantic search, 500 tokens)
-        solution = self._search_mindbase(error_signature)
-        if solution:
-            return solution
-
-        # Fallback to file-based search (0 tokens, local grep)
-        solution = self._search_local_files(error_signature)
-        return solution
+        return self._search_local_files(error_signature)
 
     def record_error(self, error_info: Dict[str, Any]) -> None:
         """
@@ -151,8 +145,6 @@ class ReflexionPattern:
             # Extract key words from error message
             message = error_info["error_message"]
             # Remove numbers (often varies between errors)
-            import re
-
             message = re.sub(r"\d+", "N", message)
             parts.append(message[:100])  # First 100 chars
 
@@ -160,20 +152,6 @@ class ReflexionPattern:
             parts.append(error_info["test_name"])
 
         return " | ".join(parts)
-
-    def _search_mindbase(self, error_signature: str) -> Optional[Dict[str, Any]]:
-        """
-        Search for similar error in mindbase (semantic search)
-
-        Args:
-            error_signature: Error signature to search
-
-        Returns:
-            Solution dict if found, None if mindbase unavailable or no match
-        """
-        # TODO: Implement mindbase integration
-        # For now, return None (fallback to file search)
-        return None
 
     def _search_local_files(self, error_signature: str) -> Optional[Dict[str, Any]]:
         """
@@ -212,9 +190,7 @@ class ReflexionPattern:
 
     def _signatures_match(self, sig1: str, sig2: str, threshold: float = 0.7) -> bool:
         """
-        Check if two error signatures match
-
-        Simple word overlap check (good enough for most cases).
+        Check if two error signatures match using Jaccard word overlap.
 
         Args:
             sig1: First signature
@@ -224,16 +200,7 @@ class ReflexionPattern:
         Returns:
             bool: Whether signatures are similar enough
         """
-        words1 = set(sig1.lower().split())
-        words2 = set(sig2.lower().split())
-
-        if not words1 or not words2:
-            return False
-
-        overlap = len(words1 & words2)
-        total = len(words1 | words2)
-
-        return (overlap / total) >= threshold
+        return word_overlap_ratio(sig1, sig2) >= threshold
 
     def _create_mistake_doc(self, error_info: Dict[str, Any]) -> None:
         """

@@ -162,6 +162,12 @@ TRIGGER_MAP = [
     (r"(business.?example|panel.?example)", "core/BUSINESS_PANEL_EXAMPLES.md", 3),
 ]
 
+# Pre-compile regex patterns for performance (P2)
+TRIGGER_MAP = [
+    (re.compile(pattern, re.IGNORECASE), path, priority)
+    for pattern, path, priority in TRIGGER_MAP
+]
+
 # v2.1.0: Skills configuration
 SHOW_SKILLS_SUMMARY = os.environ.get("CLAUDE_SHOW_SKILLS", "1") == "1"
 
@@ -237,7 +243,7 @@ def check_triggers(prompt: str) -> list[tuple[str, int]]:
     prompt_lower = prompt.lower()
 
     for pattern, context_file, priority in TRIGGER_MAP:
-        if re.search(pattern, prompt_lower, re.IGNORECASE):
+        if pattern.search(prompt_lower):
             if context_file not in loaded:
                 contexts_to_load.append((context_file, priority))
                 mark_as_loaded(context_file)

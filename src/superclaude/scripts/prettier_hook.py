@@ -31,8 +31,8 @@ def main():
                 capture_output=True,
                 timeout=30,
             )
-    except (json.JSONDecodeError, subprocess.TimeoutExpired, Exception):
-        # Silently ignore errors
+    except Exception:
+        # Silently ignore errors (covers JSONDecodeError, TimeoutExpired, etc.)
         pass
 
 
