@@ -5,618 +5,544 @@
 > This document captures lessons learned, common pitfalls, and solutions discovered during development.
 > Consult this when encountering issues or learning project patterns.
 
-**Last Updated**: 2026-01-26
+**Last Updated**: 2026-01-27
+**Version**: 4.2.1+ajitta
 
 ---
 
-## 🧠 **Core Insights**
+## Architecture Deep Dive
 
-### **PM Agent ROI: 25-250x Token Savings**
+### Package Layout
+
+SuperClaude uses a `src/` layout with hatchling (PEP 517) build system:
+
+```
+src/superclaude/
+├── __init__.py              # Exports: ConfidenceChecker, ConfidenceResult, CheckResult, ReflexionPattern, SelfCheckProtocol
+├── pytest_plugin.py         # Auto-loaded via pyproject.toml entry point (pytest11)
+├── pm_agent/                # Pre/post implementation patterns
+│   ├── confidence.py        # Protocol-based confidence checking (5 checks, weighted scoring)
+│   ├── self_check.py        # Post-implementation validation ("The Four Questions")
+│   ├── reflexion.py         # Cross-session error learning (JSONL storage, Jaccard matching)
+│   └── token_budget.py      # Token allocation by complexity (simple:200, medium:1000, complex:2500)
+├── execution/
+│   ├── parallel.py          # ThreadPoolExecutor + topological sort (Wave→Checkpoint→Wave)
+│   ├── reflection.py        # Post-execution analysis
+│   └── self_correction.py   # Automated error correction
+├── cli/                     # Click-based CLI (9 modules)
+│   ├── main.py              # Entry: superclaude command group
+│   ├── doctor.py            # Health check diagnostics
+│   ├── install_skill.py     # Individual skill installation
+│   ├── install_mcp.py       # MCP server config installation
+│   ├── install_paths.py     # Installation path resolution
+│   ├── install_settings.py  # Settings management
+│   ├── install_commands.py  # Command file installation
+│   ├── install_components.py # Component installation orchestration
+│   └── install_inventory.py # Component inventory and listing
+├── hooks/                   # Claude Code v2.1.0 hook system
+│   ├── hook_tracker.py      # Session tracking (once:true, 24h TTL, SHA-256 session IDs)
+│   ├── inline_hooks.py      # YAML frontmatter parser (wildcard tool filtering)
+│   └── mcp_fallback.py      # First-notification-only MCP fallback handling
+├── utils/
+│   └── __init__.py          # Shared: word_overlap_ratio (Jaccard), atomic_write_json
+├── agents/                  # 20 specialized agent definitions (.md)
+├── commands/                # 30 slash command definitions (.md)
+├── modes/                   # 7 behavioral modes + INDEX (.md)
+├── mcp/                     # 10 MCP server configs + 11 docs
+├── core/                    # 7 core configs (FLAGS, PRINCIPLES, RULES, etc.)
+├── skills/                  # Skills (confidence-check)
+└── scripts/                 # Shell/Python utilities
+```
+
+### Entry Points
+
+```toml
+# pyproject.toml
+[project.scripts]
+superclaude = "superclaude.cli.main:main"    # CLI entry
+
+[project.entry-points.pytest11]
+superclaude = "superclaude.pytest_plugin"     # Auto-loaded pytest plugin
+```
+
+### Key Dependencies
+
+- `pytest>=7.0.0` — Test framework (core dependency)
+- `click>=8.0.0` — CLI framework
+- `rich>=13.0.0` — Terminal formatting
+- `pyyaml>=6.0.0` — YAML frontmatter parsing
+- `Python>=3.10` — Minimum Python version
+
+---
+
+## PM Agent Patterns (Core Module)
+
+### ConfidenceChecker — Pre-Execution Gate
+
+**File**: `src/superclaude/pm_agent/confidence.py`
+
+The confidence system uses a Protocol-based architecture for extensibility:
+
+```python
+# Two protocols for sync and async checks
+class ConfidenceCheck(Protocol):
+    name: str
+    weight: float
+    def check(self, context: Dict[str, Any]) -> CheckResult: ...
+
+class AsyncConfidenceCheck(Protocol):
+    name: str
+    weight: float
+    async def check(self, context: Dict[str, Any]) -> CheckResult: ...
+```
+
+**5 Default Checks** (weights sum to 1.0):
+
+| Check | Weight | What It Verifies |
+|-------|--------|------------------|
+| NoDuplicatesCheck | 0.25 | No existing implementations match task keywords |
+| ArchitectureCheck | 0.25 | Proposed tech doesn't conflict with project stack |
+| OfficialDocsCheck | 0.20 | Official documentation has been referenced |
+| OssReferenceCheck | 0.15 | Working OSS implementations exist (3-tier lookup) |
+| RootCauseCheck | 0.15 | Root cause is specific, evidenced, non-vague |
+
+**Thresholds**:
+- `>=90%`: Proceed with implementation
+- `70-89%`: Present alternatives to user
+- `<70%`: Ask clarifying questions
+
+**Tech Stack Detection** (cached via `@lru_cache`):
+- Scans `CLAUDE.md`, `pyproject.toml`, `package.json`
+- Detects: Next.js, React, Vue, FastAPI, Django, Flask, Supabase, PostgreSQL, MongoDB, Turborepo, pytest
+- Conflict matrix prevents incompatible technologies (e.g., React + jQuery, Supabase + custom_api)
+
+**OSS Reference 3-Tier Verification**:
+1. External URLs from reputable domains (github.com, stackoverflow.com, docs.python.org, etc.)
+2. Local pattern cache (`docs/patterns/`, `.claude/patterns/`, `~/.claude/patterns/`)
+3. Built-in pattern database (15 keyword→reference mappings: auth, jwt, api, crud, test, form, cache, queue, etc.)
+
+**Data Classes**:
+- `CheckResult(passed: bool, message: str, details: Dict)` — Individual check outcome
+- `ConfidenceResult(score: float, checks: List[CheckResult], recommendation: str)` — Aggregate result
+  - Implements `__float__()` and comparison operators for backward compatibility with raw float scores
+
+**Context Enrichment** — After `assess()`, the context dict gains:
+```python
+context["confidence_checks"]        # List of status messages
+context["potential_duplicates"]      # Matching files (if found)
+context["detected_tech_stack"]       # {"frameworks": [], "databases": [], "tools": []}
+context["architecture_conflicts"]    # Conflict descriptions
+context["validated_oss_references"]  # Validated external refs
+context["matched_oss_pattern"]       # Built-in database match
+```
+
+**Backward Compatibility** — Explicit flags bypass active verification:
+```python
+context = {"root_cause_identified": True}         # Skips heuristic
+context = {"duplicate_check_complete": True}       # Skips search
+context = {"architecture_check_complete": True}    # Skips detection
+context = {"oss_reference_complete": True}         # Skips verification
+```
+
+---
+
+### SelfCheckProtocol — Post-Implementation Validation
+
+**File**: `src/superclaude/pm_agent/self_check.py`
+
+Implements "The Four Questions" validation framework:
+
+1. **Are all tests passing?** — Requires actual test output
+2. **Are all requirements met?** — Lists each requirement
+3. **No assumptions without verification?** — Shows documentation
+4. **Is there evidence?** — Provides test results, code changes, validation
+
+**7 Hallucination Red Flags** (detected automatically):
+- "Tests pass" without showing output
+- "Everything works" without evidence
+- "Implementation complete" with failing tests
+- Skipping error messages
+- Ignoring warnings
+- "Probably works" language
+- Unverified claims about external services
+
+**API**:
+```python
+protocol = SelfCheckProtocol()
+passed, issues = protocol.validate(context)  # -> Tuple[bool, List[str]]
+report = protocol.format_report(context)     # -> str (human-readable)
+```
+
+---
+
+### ReflexionPattern — Cross-Session Error Learning
+
+**File**: `src/superclaude/pm_agent/reflexion.py`
+
+**Storage**:
+- Solutions: `docs/memory/solutions_learned.jsonl` (append-only JSONL)
+- Mistake docs: `docs/mistakes/` directory
+
+**Matching Algorithm**:
+- Uses Jaccard word overlap via `word_overlap_ratio()` from utils
+- Match threshold: `0.7` (70% word overlap between error signatures)
+- Signature creation: Combines error type + key context words
+
+**API**:
+```python
+reflexion = ReflexionPattern()
+
+# Look up past solutions
+solution = reflexion.get_solution(error_info)  # Returns solution or None
+
+# Record new error for future reference
+reflexion.record_error(error_info)
+
+# Aggregate statistics
+stats = reflexion.get_statistics()
+```
+
+---
+
+### TokenBudgetManager — Complexity-Based Allocation
+
+**File**: `src/superclaude/pm_agent/token_budget.py`
+
+**Complexity Levels**:
+
+| Level | Token Budget | Use For |
+|-------|-------------|---------|
+| simple | 200 | Typo fixes, small tweaks |
+| medium | 1,000 | Standard features, bug fixes |
+| complex | 2,500 | Multi-file refactors, architecture changes |
+
+**API**:
+```python
+budget = TokenBudgetManager(complexity="medium")
+budget.allocate()               # Reset to level's limit
+budget.use(150)                 # Deduct tokens
+remaining = budget.remaining    # Property: tokens left
+budget.reset()                  # Back to full allocation
+```
+
+---
+
+## Execution Patterns
+
+### ParallelExecutor — Wave→Checkpoint→Wave
+
+**File**: `src/superclaude/execution/parallel.py`
+
+**Core Classes**:
+- `TaskStatus` — Enum: PENDING, RUNNING, COMPLETED, FAILED
+- `Task` — Dataclass with dependency checking (`can_run()` checks all deps completed)
+- `ParallelGroup` — Tasks that can run concurrently (no inter-dependencies)
+- `ExecutionPlan` — Ordered list of groups with checkpoints
+- `ParallelExecutor` — ThreadPoolExecutor-based execution engine
+
+**Planning Algorithm**:
+1. Topological sort of task dependency graph
+2. Circular dependency detection (raises error)
+3. Group independent tasks into parallel waves
+4. Insert checkpoints between waves
+
+**Convenience Functions**:
+```python
+# Quick parallel file operations
+results = parallel_file_operations(operations)
+
+# Check if parallelization is worthwhile (threshold=3)
+if should_parallelize(operations):
+    results = parallel_file_operations(operations)
+```
+
+**Performance**: 3.5x average speedup, up to 10x for large batches.
+
+---
+
+## Hooks System
+
+### HookTracker — Session State Management
+
+**File**: `src/superclaude/hooks/hook_tracker.py`
+
+**Session ID Resolution** (in order):
+1. `CLAUDE_SESSION_ID` environment variable
+2. Cached session file
+3. Generated SHA-256 hash
+
+**Storage**: `~/.claude/.superclaude_hooks/hook_executions.json`
+
+**Features**:
+- `once: true` support — hooks execute only once per session
+- 24-hour TTL — sessions auto-expire
+- Thread-safe via `atomic_write_json()` from utils
+
+**Key Functions**:
+```python
+should_execute_hook(hook_name)        # Check if hook should run
+check_and_mark(hook_name)             # Atomic check-and-mark
+cleanup_old_sessions()                # Remove expired sessions
+get_session_stats()                   # Session diagnostics
+```
+
+### InlineHooks — Frontmatter Parser
+
+**File**: `src/superclaude/hooks/inline_hooks.py`
+
+Parses YAML frontmatter from skill/agent/command markdown files:
+
+**Supported Fields**:
+- `context: inline|fork` — Execution context
+- `agent: <name>` — Agent type for skill
+- `user-invocable: true|false` — Visibility in menu
+- `allowed-tools: [...]` — Tool restrictions (supports wildcards)
+- `hooks: {PreToolUse: [...]}` — Inline hook definitions
+
+**Tool Filtering**: Supports exact match, wildcard patterns (`Bash(*)`), and agent patterns (`Task(AgentName)`).
+
+### MCP Fallback — Graceful Degradation
+
+**File**: `src/superclaude/hooks/mcp_fallback.py`
+
+**10 MCP→Fallback Mappings**:
+
+| MCP Server | Fallback |
+|-----------|----------|
+| context7 | Tavily / WebSearch |
+| tavily | WebSearch (native) |
+| sequential | Native reasoning |
+| serena | Native search |
+| morphllm | Edit (native) |
+| magic | Write (native) |
+| playwright | --chrome (native) |
+| devtools | Playwright |
+| mindbase | Serena memory |
+| airis-agent | Native |
+
+**Behavior**: First-notification-only per session — notifies once then silently falls back.
+
+**Storage**: `~/.claude/.superclaude_hooks/mcp_fallbacks.json`
+
+---
+
+## Shared Utilities
+
+**File**: `src/superclaude/utils/__init__.py`
+
+### word_overlap_ratio(a, b) → float
+Jaccard similarity coefficient for two strings. Used by ReflexionPattern for error signature matching.
+
+### word_overlap_count(a, b) → int
+Raw count of overlapping words between two strings.
+
+### atomic_write_json(path, data)
+Crash-safe JSON writes via temp file + `os.replace()`. Used by hook_tracker and mcp_fallback for thread-safe state persistence.
+
+---
+
+## CLI Commands Reference
+
+**Entry**: `superclaude` (click-based)
+
+| Command | Options | Purpose |
+|---------|---------|---------|
+| `install` | `--force`, `--list`, `--list-all`, `--scope user\|project` | Install components to ~/.claude/ or ./.claude/ |
+| `uninstall` | `--scope`, `--dry-run`, `--yes`, `--keep-settings` | Remove installed components |
+| `mcp` | `--servers`, `--list`, `--status`, `--scope`, `--dry-run` | MCP server configuration |
+| `update` | `--scope` | Force reinstall (alias for install --force) |
+| `install-skill` | `<name>` | Install individual skill |
+| `doctor` | `--verbose` | Health check diagnostics |
+| `agents` | `--list`, `--info <name>`, `--tokens`, `--scope` | Agent management |
+| `skills` | `--list`, `--info <name>`, `--tokens`, `--scope` | Skill management |
+| `version` | — | Show version |
+
+**Installation Scopes**:
+- `user` (default): `~/.claude/` — Global installation
+- `project`: `./.claude/` — Project-specific
+
+---
+
+## Pytest Plugin
+
+**Auto-loaded** after `uv pip install -e .` via pyproject.toml entry point.
+
+### Fixtures
+
+| Fixture | Type | Source |
+|---------|------|--------|
+| `confidence_checker` | `ConfidenceChecker` | pytest_plugin.py |
+| `self_check_protocol` | `SelfCheckProtocol` | pytest_plugin.py |
+| `reflexion_pattern` | `ReflexionPattern` | pytest_plugin.py |
+| `token_budget` | `TokenBudgetManager` | pytest_plugin.py (reads `@pytest.mark.complexity`) |
+| `pm_context` | Dict (all above) | pytest_plugin.py |
+
+### Hooks
+
+| Hook | Purpose |
+|------|---------|
+| `pytest_configure` | Register custom markers |
+| `pytest_runtest_setup` | Confidence gating (skip if <70%) |
+| `pytest_runtest_makereport` | Record failures to reflexion |
+| `pytest_collection_modifyitems` | Auto-mark by directory (unit/integration) |
+| `pytest_report_header` | Display SuperClaude version |
+
+### Markers
+
+| Marker | Purpose |
+|--------|---------|
+| `@pytest.mark.unit` | Auto-applied in tests/unit/ |
+| `@pytest.mark.integration` | Auto-applied in tests/integration/ |
+| `@pytest.mark.confidence_check` | Pre-execution assessment |
+| `@pytest.mark.self_check` | Post-implementation validation |
+| `@pytest.mark.reflexion` | Error learning |
+| `@pytest.mark.complexity(level)` | Token budget (simple/medium/complex) |
+| `@pytest.mark.hallucination` | Hallucination detection |
+| `@pytest.mark.performance` | Benchmarks |
+
+---
+
+## Core Insights
+
+### PM Agent ROI: 25-250x Token Savings
 
 **Finding**: Pre-execution confidence checking has exceptional ROI.
 
-**Evidence**:
 - Spending 100-200 tokens on confidence check saves 5,000-50,000 tokens on wrong-direction work
-- Real example: Checking for duplicate implementations before coding (2min research) vs implementing duplicate feature (2hr work)
+- Real example: Checking for duplicate implementations before coding vs implementing duplicate feature
 
-**When it works best**:
-- Unclear requirements → Ask questions first
-- New codebase → Search for existing patterns
-- Complex features → Verify architecture compliance
-- Bug fixes → Identify root cause before coding
-
-**When to skip**:
-- Trivial changes (typo fixes)
-- Well-understood tasks with clear path
-- Emergency hotfixes (but document learnings after)
+**When to use**: Unclear requirements, new codebase, complex features, bug fixes.
+**When to skip**: Trivial changes, well-understood tasks, emergency hotfixes.
 
 ---
 
-### **ConfidenceChecker: Active Verification Implementation**
+### Hallucination Detection: The Four Questions
 
-**Status**: Fully implemented (2025-01-05)
+The SelfCheckProtocol catches most AI hallucinations:
 
-The ConfidenceChecker now performs **active verification** instead of relying on placeholder flags. All 4 core methods have been upgraded:
-
-#### **1. `_root_cause_identified()` - Heuristic Validation**
-
-```python
-# Validates root cause quality
-context = {
-    "root_cause": "Null pointer in UserService.getUser() due to missing null check",
-    "evidence": ["stack trace line 42", "reproduction steps"]
-}
-# Returns True: 5+ words, no vague terms, evidence exists
-```
-
-**Validation rules**:
-- Root cause must have ≥5 words
-- No vague terms: `maybe`, `probably`, `might`, `unknown`, `possibly`, `perhaps`
-- Evidence list must have ≥1 item
-
-**Common failures**:
-```python
-# Too short
-{"root_cause": "Bug in code", "evidence": ["trace"]}  # → False
-
-# Vague language
-{"root_cause": "Maybe the auth service is failing somewhere", "evidence": ["log"]}  # → False
-
-# No evidence
-{"root_cause": "Database timeout due to pool exhaustion", "evidence": []}  # → False
-```
-
----
-
-#### **2. `_no_duplicates()` - Filesystem Search**
-
-```python
-# Searches codebase for potential duplicates
-context = {
-    "task_name": "implement_user_authentication",
-    "project_root": "/path/to/project",
-    "duplicate_threshold": 5  # Optional, default 5
-}
-# Searches for *user*.py, *authentication*.py
-# Returns False if >5 matches found per keyword
-```
-
-**Features**:
-- Extracts keywords from task_name (>3 chars, skips common words)
-- Uses `rglob()` for recursive search
-- Excludes test files (`test_*.py`) and `__pycache__`
-- Configurable threshold via `duplicate_threshold`
-- Stores matches in `context["potential_duplicates"]`
-
----
-
-#### **3. `_architecture_compliant()` - Tech Stack Detection**
-
-```python
-# Detects tech stack and checks for conflicts
-context = {
-    "project_root": "/path/to/project",
-    "proposed_technology": ["custom_api", "jquery"]
-}
-# Detects React/Supabase from CLAUDE.md
-# Returns False: conflicts with existing stack
-```
-
-**Detection sources** (in order):
-1. `CLAUDE.md` - Framework, database, tool keywords
-2. `pyproject.toml` - Python dependencies
-3. `package.json` - JavaScript dependencies
-
-**Detected technologies**:
-| Category | Technologies |
-|----------|-------------|
-| Frameworks | Next.js, React, Vue, FastAPI, Django, Flask |
-| Databases | Supabase, PostgreSQL, MongoDB, SQLAlchemy |
-| Tools | Turborepo, pytest |
-
-**Conflict rules**:
-| Existing | Conflicts With |
-|----------|----------------|
-| `supabase` | custom_api, custom_auth, raw_postgresql |
-| `nextjs` | custom_routing, express_routing |
-| `react` | jquery, vanilla_dom |
-| `fastapi` | flask_in_same_project, django_in_same_project |
-| `turborepo` | manual_workspace_scripts |
-| `pytest` | unittest_exclusively |
-
----
-
-#### **4. `_has_oss_reference()` - 3-Tier Verification**
-
-```python
-# Three-tier OSS reference verification
-context = {
-    "oss_references": [{"url": "https://github.com/tiangolo/fastapi"}],
-    # OR
-    "task_type": "authentication",  # Checks cached patterns
-    # OR
-    "task_name": "implement_jwt_auth"  # Matches built-in database
-}
-```
-
-**Tier 1: External References**
-- Validates URLs from reputable sources
-- Reputable domains: github.com, stackoverflow.com, docs.python.org, reactjs.org, etc.
-
-**Tier 2: Local Pattern Cache**
-- Searches: `docs/patterns/`, `.claude/patterns/`, `~/.claude/patterns/`
-- Matches `{task_type}.md` files
-
-**Tier 3: Built-in Pattern Database**
-```python
-# Keywords → OSS References
-"auth" → NextAuth.js, Passport.js, python-jose
-"jwt" → python-jose, PyJWT, jsonwebtoken
-"api" → FastAPI, Express.js, Django REST
-"crud" → SQLAlchemy, Prisma, TypeORM
-"test" → pytest, Jest, Vitest
-"form" → React Hook Form, Formik, VeeValidate
-"cache" → Redis, Memcached, lru_cache
-"queue" → Celery, Bull, RabbitMQ
-```
-
----
-
-#### **Backward Compatibility**
-
-All methods maintain backward compatibility via explicit flags:
-
-```python
-# Flag always takes precedence
-context = {"root_cause_identified": True}  # → True (skips heuristic)
-context = {"duplicate_check_complete": True}  # → True (skips search)
-context = {"architecture_check_complete": True}  # → True (skips detection)
-context = {"oss_reference_complete": True}  # → True (skips verification)
-```
-
----
-
-#### **Context Enrichment**
-
-Active verification enriches context with diagnostic info:
-
-```python
-checker.assess(context)
-
-# After assessment, context contains:
-context["confidence_checks"]  # List of ✅/❌ status messages
-context["potential_duplicates"]  # Files matching keywords (if found)
-context["detected_tech_stack"]  # {"frameworks": [], "databases": [], "tools": []}
-context["architecture_conflicts"]  # Conflict descriptions (if any)
-context["validated_oss_references"]  # Validated OSS refs
-context["matched_oss_pattern"]  # Pattern from built-in database
-context["cached_pattern_source"]  # Path to cached pattern file
-```
-
----
-
-### **Hallucination Detection: 94% Accuracy**
-
-**Finding**: The Four Questions catch most AI hallucinations.
-
-**The Four Questions**:
 1. Are all tests passing? → REQUIRE actual output
 2. Are all requirements met? → LIST each requirement
 3. No assumptions without verification? → SHOW documentation
-4. Is there evidence? → PROVIDE test results, code changes, validation
+4. Is there evidence? → PROVIDE test results, code changes
 
-**Red flags that indicate hallucination**:
-- "Tests pass" (without showing output) 🚩
-- "Everything works" (without evidence) 🚩
-- "Implementation complete" (with failing tests) 🚩
-- Skipping error messages 🚩
-- Ignoring warnings 🚩
-- "Probably works" language 🚩
-
-**Real example**:
-```
-❌ BAD: "The API integration is complete and working correctly."
-✅ GOOD: "The API integration is complete. Test output:
-         ✅ test_api_connection: PASSED
-         ✅ test_api_authentication: PASSED
-         ✅ test_api_data_fetch: PASSED
-         All 3 tests passed in 1.2s"
-```
+**Bad**: "The API integration is complete and working correctly."
+**Good**: "The API integration is complete. Test output: 3/3 tests passed in 1.2s."
 
 ---
 
-### **Parallel Execution: 3.5x Speedup**
+### Parallel Execution: 3.5x Speedup
 
-**Finding**: Wave → Checkpoint → Wave pattern dramatically improves performance.
+Wave → Checkpoint → Wave pattern:
 
-**Pattern**:
-```python
-# Wave 1: Independent reads (parallel)
-files = [Read(f1), Read(f2), Read(f3)]
-
-# Checkpoint: Analyze together (sequential)
-analysis = analyze_files(files)
-
-# Wave 2: Independent edits (parallel)
-edits = [Edit(f1), Edit(f2), Edit(f3)]
+```
+Wave 1: Independent reads (parallel)   → ThreadPoolExecutor
+Checkpoint: Analyze together            → Sequential
+Wave 2: Independent edits (parallel)    → ThreadPoolExecutor
 ```
 
-**When to use**:
-- ✅ Reading multiple independent files
-- ✅ Editing multiple unrelated files
-- ✅ Running multiple independent searches
-- ✅ Parallel test execution
+**Use for**: Multiple independent file reads, unrelated edits, parallel searches.
+**Avoid for**: Operations with dependencies, sequential analysis, shared state mutations.
 
-**When NOT to use**:
-- ❌ Operations with dependencies (file2 needs data from file1)
-- ❌ Sequential analysis (building context step-by-step)
-- ❌ Operations that modify shared state
-
-**Performance data**:
-- Sequential: 10 file reads = 10 API calls = ~30 seconds
-- Parallel: 10 file reads = 1 API call = ~3 seconds
-- Speedup: 3.5x average, up to 10x for large batches
+Performance diminishes after ~10 operations per wave.
 
 ---
 
-## 🛠️ **Common Pitfalls and Solutions**
+## Common Pitfalls and Solutions
 
-### **Pitfall 1: Implementing Before Checking for Duplicates**
+### Pitfall 1: Implementing Before Checking for Duplicates
 
-**Problem**: Spent hours implementing feature that already exists in codebase.
+**Problem**: Spent effort implementing feature that already exists.
+**Solution**: Run `NoDuplicatesCheck` or search codebase first.
+**Prevention**: `confidence_checker.assess()` before starting.
 
-**Solution**: ALWAYS use Glob/Grep before implementing:
-```bash
-# Search for similar functions
-uv run python -c "from pathlib import Path; print([f for f in Path('src').rglob('*.py') if 'feature_name' in f.read_text()])"
-
-# Or use grep
-grep -r "def feature_name" src/
-```
-
-**Prevention**: Run confidence check, ensure duplicate_check_complete=True
-
----
-
-### **Pitfall 2: Assuming Architecture Without Verification**
+### Pitfall 2: Architecture Conflicts
 
 **Problem**: Implemented custom API when project uses Supabase.
+**Solution**: Read CLAUDE.md and check tech stack detection.
+**Prevention**: `ArchitectureCheck` catches conflicts automatically.
 
-**Solution**: READ CLAUDE.md and PLANNING.md before implementing:
-```python
-# Check project tech stack
-with open('CLAUDE.md') as f:
-    claude_md = f.read()
-
-if 'Supabase' in claude_md:
-    # Use Supabase APIs, not custom implementation
-```
-
-**Prevention**: Run confidence check, ensure architecture_check_complete=True
-
----
-
-### **Pitfall 3: Skipping Test Output**
+### Pitfall 3: Skipping Test Output
 
 **Problem**: Claimed tests passed but they were actually failing.
+**Solution**: Always show actual `uv run pytest -v` output.
+**Prevention**: `SelfCheckProtocol.validate()` requires evidence.
 
-**Solution**: ALWAYS show actual test output:
-```bash
-# Run tests and capture output
-uv run pytest -v > test_output.txt
-
-# Show in validation
-echo "Test Results:"
-cat test_output.txt
-```
-
-**Prevention**: Use SelfCheckProtocol, require evidence
-
----
-
-### **Pitfall 4: Version Inconsistency**
-
-**Problem**: VERSION file says 4.1.9, but pyproject.toml says 0.4.0.
-
-**Solution**: Understand versioning strategy:
-- **Framework version** (VERSION file): User-facing version (4.1.9)
-- **Python package** (pyproject.toml): Library semantic version (0.4.0)
-
-**When updating versions**:
-1. Update VERSION file first
-2. Update README badges
-3. Consider if pyproject.toml needs bump (breaking changes?)
-4. Update CHANGELOG.md
-
-**Prevention**: Create release checklist
-
----
-
-### **Pitfall 5: UV Not Installed**
+### Pitfall 4: UV Not Installed
 
 **Problem**: Makefile requires `uv` but users don't have it.
-
-**Solution**: Install UV:
-```bash
-# macOS/Linux
-curl -LsSf https://astral.sh/uv/install.sh | sh
-
-# Windows
-powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
-
-# With pip
-pip install uv
-```
-
-**Alternative**: Provide fallback commands:
-```bash
-# With UV (preferred)
-uv run pytest
-
-# Without UV (fallback)
-python -m pytest
-```
-
-**Prevention**: Document UV requirement in README
-
----
-
-## 📚 **Best Practices**
-
-### **Testing Best Practices**
-
-**1. Use pytest markers for organization**:
-```python
-@pytest.mark.unit
-def test_individual_function():
-    pass
-
-@pytest.mark.integration
-def test_component_interaction():
-    pass
-
-@pytest.mark.confidence_check
-def test_with_pre_check(confidence_checker):
-    pass
-```
-
-**2. Use fixtures for shared setup**:
-```python
-# conftest.py
-@pytest.fixture
-def sample_context():
-    return {...}
-
-# test_file.py
-def test_feature(sample_context):
-    # Use sample_context
-```
-
-**3. Test both happy path and edge cases**:
-```python
-def test_feature_success():
-    # Normal operation
-
-def test_feature_with_empty_input():
-    # Edge case
-
-def test_feature_with_invalid_data():
-    # Error handling
-```
-
----
-
-### **Git Workflow Best Practices**
-
-**1. Conventional commits**:
-```bash
-git commit -m "feat: add confidence checking to PM Agent"
-git commit -m "fix: resolve version inconsistency"
-git commit -m "docs: update CLAUDE.md with plugin warnings"
-git commit -m "test: add unit tests for reflexion pattern"
-```
-
-**2. Small, focused commits**:
-- Each commit should do ONE thing
-- Commit message should explain WHY, not WHAT
-- Code changes should be reviewable in <500 lines
-
-**3. Branch naming**:
-```bash
-feature/add-confidence-check
-fix/version-inconsistency
-docs/update-readme
-refactor/simplify-cli
-test/add-unit-tests
-```
-
----
-
-### **Documentation Best Practices**
-
-**1. Code documentation**:
-```python
-def assess(self, context: Dict[str, Any]) -> float:
-    """
-    Assess confidence level (0.0 - 1.0)
-
-    Investigation Phase Checks:
-    1. No duplicate implementations? (25%)
-    2. Architecture compliance? (25%)
-    3. Official documentation verified? (20%)
-    4. Working OSS implementations referenced? (15%)
-    5. Root cause identified? (15%)
-
-    Args:
-        context: Context dict with task details
-
-    Returns:
-        float: Confidence score (0.0 = no confidence, 1.0 = absolute certainty)
-
-    Example:
-        >>> checker = ConfidenceChecker()
-        >>> confidence = checker.assess(context)
-        >>> if confidence >= 0.9:
-        ...     proceed_with_implementation()
-    """
-```
-
-**2. README structure**:
-- Start with clear value proposition
-- Quick installation instructions
-- Usage examples
-- Link to detailed docs
-- Contribution guidelines
-- License
-
-**3. Keep docs synchronized with code**:
-- Update docs in same PR as code changes
-- Review docs during code review
-- Use automated doc generation where possible
-
----
-
-## 🔧 **Troubleshooting Guide**
-
-### **Issue: Tests Not Found**
-
-**Symptoms**:
-```
-$ uv run pytest
-ERROR: file or directory not found: tests/
-```
-
-**Cause**: tests/ directory doesn't exist
-
 **Solution**:
 ```bash
-# Create tests structure
-mkdir -p tests/unit tests/integration
-
-# Add __init__.py files
-touch tests/__init__.py
-touch tests/unit/__init__.py
-touch tests/integration/__init__.py
-
-# Add conftest.py
-touch tests/conftest.py
+curl -LsSf https://astral.sh/uv/install.sh | sh   # macOS/Linux
+pip install uv                                       # via pip
 ```
 
----
+### Pitfall 5: Plugin Not Loaded
 
-### **Issue: Plugin Not Loaded**
-
-**Symptoms**:
-```
-$ uv run pytest --trace-config
-# superclaude not listed in plugins
-```
-
-**Cause**: Package not installed or entry point not configured
-
+**Symptoms**: `fixture 'confidence_checker' not found`
 **Solution**:
 ```bash
-# Reinstall in editable mode
 uv pip install -e ".[dev]"
-
-# Verify entry point in pyproject.toml
-# Should have:
-# [project.entry-points.pytest11]
-# superclaude = "superclaude.pytest_plugin"
-
-# Test plugin loaded
 uv run pytest --trace-config 2>&1 | grep superclaude
 ```
 
----
+### Pitfall 6: ImportError in Tests
 
-### **Issue: ImportError in Tests**
-
-**Symptoms**:
-```python
-ImportError: No module named 'superclaude'
-```
-
-**Cause**: Package not installed in test environment
-
-**Solution**:
-```bash
-# Install package in editable mode
-uv pip install -e .
-
-# Or use uv run (creates venv automatically)
-uv run pytest
-```
+**Symptoms**: `ImportError: No module named 'superclaude'`
+**Solution**: `uv pip install -e .` or use `uv run pytest` (creates venv automatically).
 
 ---
 
-### **Issue: Fixtures Not Available**
+## Troubleshooting Guide
 
-**Symptoms**:
-```python
+### Tests Not Found
+
+```
+ERROR: file or directory not found: tests/
+```
+**Fix**: `mkdir -p tests/unit tests/integration && touch tests/conftest.py`
+
+### Fixtures Not Available
+
+```
 fixture 'confidence_checker' not found
 ```
+**Fix**: Reinstall package: `uv pip install -e ".[dev]"`
 
-**Cause**: pytest plugin not loaded or fixture not defined
+### Hook Session Issues
 
-**Solution**:
-```bash
-# Check plugin loaded
-uv run pytest --fixtures | grep confidence_checker
+**Symptoms**: `once: true` hooks re-executing every time
+**Fix**: Check session ID resolution — ensure `CLAUDE_SESSION_ID` is set or cached file exists at `~/.claude/.superclaude_hooks/`.
 
-# Verify pytest_plugin.py has fixture
-# Should have:
-# @pytest.fixture
-# def confidence_checker():
-#     return ConfidenceChecker()
+### MCP Fallback Not Triggering
 
-# Reinstall package
-uv pip install -e .
-```
+**Symptoms**: No fallback notification when MCP is unavailable
+**Fix**: Check `~/.claude/.superclaude_hooks/mcp_fallbacks.json` — may have already notified (first-notification-only behavior). Delete the file to reset.
 
----
+### Atomic Write Failures
 
-### **Issue: .gitignore Not Working**
-
-**Symptoms**: Files listed in .gitignore still tracked by git
-
-**Cause**: Files were tracked before adding to .gitignore
-
-**Solution**:
-```bash
-# Remove from git but keep in filesystem
-git rm --cached <file>
-
-# OR remove entire directory
-git rm -r --cached <directory>
-
-# Commit the change
-git commit -m "fix: remove tracked files from gitignore"
-```
+**Symptoms**: `PermissionError` on hook state files
+**Fix**: Check permissions on `~/.claude/.superclaude_hooks/` directory. The `atomic_write_json` function uses temp files + `os.replace()`, which requires write permissions in the target directory.
 
 ---
 
-## 💡 **Advanced Techniques**
+## Advanced Techniques
 
-### **Technique 1: Dynamic Fixture Configuration**
+### Dynamic Fixture Configuration
 
 ```python
 @pytest.fixture
 def token_budget(request):
-    """Fixture that adapts based on test markers"""
+    """Adapts based on @pytest.mark.complexity marker"""
     marker = request.node.get_closest_marker("complexity")
     complexity = marker.args[0] if marker else "medium"
     return TokenBudgetManager(complexity=complexity)
 
-# Usage
 @pytest.mark.complexity("simple")
 def test_simple_feature(token_budget):
     assert token_budget.limit == 200
 ```
 
----
-
-### **Technique 2: Confidence-Driven Test Execution**
+### Confidence-Driven Test Execution
 
 ```python
 def pytest_runtest_setup(item):
@@ -626,35 +552,43 @@ def pytest_runtest_setup(item):
         checker = ConfidenceChecker()
         context = build_context(item)
         confidence = checker.assess(context)
-
         if confidence < 0.7:
             pytest.skip(f"Confidence too low: {confidence:.0%}")
 ```
 
----
-
-### **Technique 3: Reflexion-Powered Error Learning**
+### Reflexion-Powered Error Learning
 
 ```python
 def pytest_runtest_makereport(item, call):
     """Record failed tests for future learning"""
     if call.when == "call" and call.excinfo is not None:
         reflexion = ReflexionPattern()
-        error_info = {
+        reflexion.record_error({
             "test_name": item.name,
             "error_type": type(call.excinfo.value).__name__,
             "error_message": str(call.excinfo.value),
-        }
-        reflexion.record_error(error_info)
+        })
+```
+
+### Custom Confidence Checks
+
+```python
+class SecurityCheck:
+    name = "security_audit"
+    weight = 0.20
+
+    def check(self, context):
+        # Implements ConfidenceCheck protocol
+        has_auth = "auth" in context.get("features", [])
+        return CheckResult(passed=has_auth, message="Security reviewed")
+
+checker = ConfidenceChecker()
+checker.register(SecurityCheck())
 ```
 
 ---
 
-## 📊 **Performance Insights**
-
-### **Token Usage Patterns**
-
-Based on real usage data:
+## Token Usage Patterns
 
 | Task Type | Typical Tokens | With PM Agent | Savings |
 |-----------|---------------|---------------|---------|
@@ -663,120 +597,84 @@ Based on real usage data:
 | Feature | 10,000-50,000 | 5,000-15,000 | 60% |
 | Wrong direction | 50,000+ | 100-200 (prevented) | 99%+ |
 
-**Key insight**: Prevention (confidence check) saves more tokens than optimization
+**Key insight**: Prevention (confidence check) saves more tokens than optimization.
+
+### Index Performance
+
+- **Before**: ~58,000 tokens (reading all files)
+- **After**: ~3,000 tokens (reading PROJECT_INDEX)
+- **Reduction**: 94%
 
 ---
 
-### **Execution Time Patterns**
-
-| Operation | Sequential | Parallel | Speedup |
-|-----------|-----------|----------|---------|
-| 5 file reads | 15s | 3s | 5x |
-| 10 file reads | 30s | 3s | 10x |
-| 20 file edits | 60s | 15s | 4x |
-| Mixed ops | 45s | 12s | 3.75x |
-
-**Key insight**: Parallel execution has diminishing returns after ~10 operations per wave
-
----
-
-## 🎓 **Lessons Learned**
-
-### **Lesson 1: Documentation Drift is Real**
-
-**What happened**: README described v2.0 plugin system that didn't exist in v4.1.9
-
-**Impact**: Users spent hours trying to install non-existent features
-
-**Solution**:
-- Add warnings about planned vs implemented features
-- Review docs during every release
-- Link to tracking issues for planned features
-
-**Prevention**: Documentation review checklist in release process
-
----
-
-### **Lesson 2: Version Management is Hard**
-
-**What happened**: Three different version numbers across files
-
-**Impact**: Confusion about which version is installed
-
-**Solution**:
-- Define version sources of truth
-- Document versioning strategy
-- Automate version updates in release script
-
-**Prevention**: Single-source-of-truth for versions (maybe use bumpversion)
-
----
-
-### **Lesson 3: Tests Are Non-Negotiable**
-
-**What happened**: Framework provided testing tools but had no tests itself
-
-**Impact**: No confidence in code quality, regression bugs
-
-**Solution**:
-- Create comprehensive test suite
-- Require tests for all new code
-- Add CI/CD to run tests automatically
-
-**Prevention**: Make tests a requirement in PR template
-
----
-
-## 📊 **Current Framework Statistics (2026-01-26)**
+## Framework Statistics (2026-01-27)
 
 | Category | Count | Location |
 |----------|-------|----------|
-| Slash Commands | 32 | src/superclaude/commands/ |
-| Agents | 22 | src/superclaude/agents/ |
-| Modes | 9 | src/superclaude/modes/ |
-| MCP Servers | 11 | src/superclaude/mcp/configs/ |
-| Core Configs | 8 | src/superclaude/core/ |
+| Slash Commands | 30 | src/superclaude/commands/ |
+| Agents | 20 | src/superclaude/agents/ |
+| Modes | 7 (+INDEX) | src/superclaude/modes/ |
+| MCP Servers | 10 | src/superclaude/mcp/configs/ |
+| MCP Docs | 11 | src/superclaude/mcp/ |
+| Core Configs | 7 | src/superclaude/core/ |
 | Python Files | 44 | src/superclaude/ |
-| Test Files | 9 | tests/ |
-
-**Key files updated**:
-- PROJECT_INDEX.md / PROJECT_INDEX.json - Token-efficient repository index (94% reduction)
-- README.md - Framework overview with accurate statistics
-- KNOWLEDGE.md - Accumulated insights and best practices
+| Test Files | 14 | tests/ |
+| Skills | 1 | src/superclaude/skills/ |
+| CI Workflows | 4 | .github/workflows/ |
 
 ---
 
-## 🔮 **Future Explorations**
+## Cross-Reference Index
 
-Ideas worth investigating:
-
-1. **Automated confidence checking** - AI analyzes context and suggests improvements
-2. **Visual reflexion patterns** - Graph view of error patterns over time
-3. **Predictive token budgeting** - ML model predicts token usage based on task
-4. **Collaborative learning** - Share reflexion patterns across projects (opt-in)
-5. **Real-time hallucination detection** - Streaming analysis during generation
-
----
-
-## 📞 **Getting Help**
-
-**When stuck**:
-1. Check this KNOWLEDGE.md for similar issues
-2. Read PLANNING.md for architecture context
-3. Check TASK.md for known issues
-4. Search GitHub issues for solutions
-5. Ask in GitHub discussions
-
-**When sharing knowledge**:
-1. Document solution in this file
-2. Update relevant section
-3. Add to troubleshooting guide if applicable
-4. Consider adding to FAQ
+| Need | File(s) |
+|------|---------|
+| CLI entry | cli/main.py |
+| Pytest fixtures | pytest_plugin.py |
+| Confidence assessment | pm_agent/confidence.py, skills/confidence-check/ |
+| Post-validation | pm_agent/self_check.py |
+| Error learning | pm_agent/reflexion.py |
+| Token management | pm_agent/token_budget.py |
+| Parallel execution | execution/parallel.py |
+| Session tracking | hooks/hook_tracker.py |
+| Frontmatter parsing | hooks/inline_hooks.py |
+| MCP fallback | hooks/mcp_fallback.py |
+| Shared utils | utils/__init__.py |
+| Slash commands | commands/*.md |
+| Agent definitions | agents/*.md |
+| Mode behaviors | modes/*.md |
+| MCP configs | mcp/configs/*.json |
+| Core rules | core/RULES.md |
+| Flag reference | core/FLAGS.md |
 
 ---
 
-*This document grows with the project. Everyone who encounters a problem and finds a solution should document it here.*
+## Git Workflow
 
-**Contributors**: SuperClaude development team and community
-**Maintained by**: Project maintainers
-**Review frequency**: Quarterly or after major insights
+- **Branch**: `master` <- `integration` <- `feature/*`, `fix/*`, `docs/*`
+- **Commits**: Conventional (`feat:`, `fix:`, `docs:`, `refactor:`, `test:`, `chore:`)
+- **Worktrees**: `git worktree add ../SuperClaude-feature feature/name`
+
+---
+
+## Lessons Learned
+
+### Documentation Drift
+README described features that didn't exist. **Fix**: Add warnings about planned vs implemented features; review docs during every release.
+
+### Version Management
+Multiple version numbers across files. **Fix**: Single source of truth in `pyproject.toml` (`__version__` in `__init__.py` mirrors it).
+
+### Tests Are Non-Negotiable
+Framework provided testing tools but initially had no tests itself. **Fix**: Comprehensive test suite (14 files) with CI/CD.
+
+### Install Module Complexity
+`install_commands.py` grew too large. **Fix**: Split into 4 focused modules (`install_mcp.py`, `install_paths.py`, `install_settings.py`, `install_components.py`).
+
+### Thread Safety Matters
+Hook state files corrupted under concurrent access. **Fix**: `atomic_write_json()` utility using temp files + `os.replace()`.
+
+---
+
+*This document grows with the project. Document solutions here when encountering and resolving problems.*
+
+**Review frequency**: After major changes or quarterly

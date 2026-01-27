@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generated": "2026-01-20",
+    "generated": "2026-01-27",
     "version": "4.2.1+ajitta",
     "description": "AI-enhanced development framework for Claude Code"
   },
@@ -11,9 +11,10 @@
     "mcp_servers": 10,
     "mcp_docs": 11,
     "core_configs": 7,
-    "python_files": 38,
+    "python_files": 44,
     "test_files": 14,
-    "skills": 1
+    "skills": 1,
+    "ci_workflows": 4
   },
   "entry_points": {
     "cli": {
@@ -56,12 +57,46 @@
       "file": "src/superclaude/execution/parallel.py",
       "classes": ["TaskStatus", "Task", "ParallelGroup", "ExecutionPlan", "ParallelExecutor"],
       "functions": ["parallel_file_operations", "should_parallelize", "example_parallel_read", "example_dependent_tasks"],
-      "pattern": "Wave→Checkpoint→Wave",
+      "pattern": "Wave->Checkpoint->Wave",
       "speedup": "3.5x"
+    },
+    "reflection": {
+      "file": "src/superclaude/execution/reflection.py",
+      "purpose": "Post-execution analysis"
+    },
+    "self_correction": {
+      "file": "src/superclaude/execution/self_correction.py",
+      "purpose": "Automated error correction"
     }
   },
+  "cli": {
+    "location": "src/superclaude/cli/",
+    "modules": [
+      {"name": "main.py", "purpose": "CLI entry point (click-based)"},
+      {"name": "doctor.py", "purpose": "Health check diagnostics"},
+      {"name": "install_skill.py", "purpose": "Individual skill installation"},
+      {"name": "install_mcp.py", "purpose": "MCP server config installation"},
+      {"name": "install_paths.py", "purpose": "Installation path resolution"},
+      {"name": "install_settings.py", "purpose": "Settings management"},
+      {"name": "install_commands.py", "purpose": "Command file installation"},
+      {"name": "install_components.py", "purpose": "Component installation orchestration"},
+      {"name": "install_inventory.py", "purpose": "Component inventory and listing"}
+    ]
+  },
+  "hooks": {
+    "location": "src/superclaude/hooks/",
+    "modules": [
+      {"name": "hook_tracker.py", "purpose": "Session tracking (once:true, 24h TTL)"},
+      {"name": "inline_hooks.py", "purpose": "Frontmatter hook parser"},
+      {"name": "mcp_fallback.py", "purpose": "MCP unavailability fallback handling"}
+    ]
+  },
+  "utils": {
+    "location": "src/superclaude/utils/",
+    "purpose": "Shared utilities (thread safety, atomic writes)"
+  },
   "commands": {
-    "count": 31,
+    "count": 30,
     "location": "src/superclaude/commands/",
     "installed_to": "~/.claude/commands/sc/",
     "files": ["agent.md", "analyze.md", "brainstorm.md", "build.md", "business-panel.md", "cleanup.md", "design.md", "document.md", "estimate.md", "explain.md", "git.md", "help.md", "implement.md", "improve.md", "index-repo.md", "index.md", "load.md", "pm.md", "recommend.md", "reflect.md", "research.md", "save.md", "sc.md", "select-tool.md", "spawn.md", "spec-panel.md", "task.md", "test.md", "troubleshoot.md", "workflow.md"],
@@ -122,7 +157,7 @@
       {"name": "playwright", "flag": "--play", "purpose": "Browser automation"},
       {"name": "airis-agent", "flag": null, "purpose": "Confidence, indexing"},
       {"name": "mindbase", "flag": null, "purpose": "Semantic memory"},
-      {"name": "chrome-devtools", "flag": "--chrome", "purpose": "Performance debug"}
+      {"name": "chrome-devtools", "flag": "--perf", "purpose": "Performance debug"}
     ]
   },
   "core_configs": {
@@ -154,6 +189,27 @@
       "coverage": "uv run pytest --cov=superclaude"
     }
   },
+  "ci_cd": {
+    "location": ".github/workflows/",
+    "workflows": [
+      {"name": "test.yml", "purpose": "Test suite execution"},
+      {"name": "quick-check.yml", "purpose": "Fast validation checks"},
+      {"name": "publish-pypi.yml", "purpose": "PyPI publishing"},
+      {"name": "readme-quality-check.yml", "purpose": "README quality gate"}
+    ]
+  },
+  "scripts": {
+    "location": "scripts/",
+    "files": [
+      {"name": "build_superclaude_plugin.py", "purpose": "Plugin build script"},
+      {"name": "compare_token_usage.py", "purpose": "Token usage comparison"},
+      {"name": "ab_test_workflows.py", "purpose": "A/B test workflow runner"},
+      {"name": "analyze_workflow_metrics.py", "purpose": "Workflow metrics analysis"},
+      {"name": "cleanup.sh", "purpose": "Artifact cleanup"},
+      {"name": "publish.sh", "purpose": "Publish to PyPI"},
+      {"name": "uninstall_legacy.sh", "purpose": "Legacy file removal"}
+    ]
+  },
   "cross_reference": {
     "by_functionality": {
       "cli_entry": "cli/main.py",
@@ -163,6 +219,8 @@
       "learning": "pm_agent/reflexion.py",
       "tokens": "pm_agent/token_budget.py",
       "parallel": "execution/parallel.py",
+      "mcp_fallback": "hooks/mcp_fallback.py",
+      "shared_utils": "utils/__init__.py",
       "commands": "commands/*.md",
       "agents": "agents/*.md",
       "modes": "modes/*.md",
@@ -171,8 +229,8 @@
       "flags": "core/FLAGS.md"
     },
     "by_extension": {
-      ".py": {"count": 37, "purpose": "Python source"},
-      ".md": {"count": 90, "purpose": "Documentation, commands, agents"},
+      ".py": {"count": 44, "purpose": "Python source"},
+      ".md": {"count": 84, "purpose": "Documentation, commands, agents"},
       ".json": {"count": 15, "purpose": "Config files"}
     }
   },

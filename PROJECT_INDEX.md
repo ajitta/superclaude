@@ -1,6 +1,6 @@
 # Project Index: SuperClaude Framework
 
-**Generated**: 2026-01-20
+**Generated**: 2026-01-27
 **Version**: 4.2.1+ajitta
 **Description**: AI-enhanced development framework for Claude Code - pytest plugin with specialized commands, agents, and modes
 
@@ -11,30 +11,25 @@
 ```
 SuperClaude_Framework/
 ├── src/superclaude/          # Python package
-│   ├── cli/                  # CLI commands (main.py, doctor.py, install_*.py)
+│   ├── cli/                  # CLI commands (main.py, doctor.py, install_*.py x6)
 │   ├── pm_agent/             # PM Agent core (confidence, self_check, reflexion, token_budget)
 │   ├── execution/            # Execution patterns (parallel, reflection, self_correction)
+│   ├── hooks/                # Hook system (hook_tracker, inline_hooks, mcp_fallback)
+│   ├── utils/                # Shared utilities (thread safety, atomic writes)
 │   ├── agents/               # 20 specialized agent definitions
-│   ├── commands/             # 31 slash command definitions
-│   ├── modes/                # 8 behavioral mode definitions
-│   ├── mcp/                  # 11 MCP server configs and docs
-│   ├── core/                 # Core configs (FLAGS, PRINCIPLES, RULES, RESEARCH_CONFIG)
-│   ├── hooks/                # Git/session hooks
+│   ├── commands/             # 30 slash command definitions
+│   ├── modes/                # 8 behavioral mode definitions (7 + INDEX)
+│   ├── mcp/                  # 10 MCP server configs + 11 docs
+│   ├── core/                 # Core configs (FLAGS, PRINCIPLES, RULES, RESEARCH_CONFIG, etc.)
 │   ├── skills/               # Skills (confidence-check)
 │   ├── scripts/              # Utility scripts
 │   └── pytest_plugin.py      # Auto-loaded pytest integration
 ├── tests/                    # Test suite
 │   ├── unit/                 # Unit tests (9 files)
 │   └── integration/          # Integration tests (1 file)
-├── .claude/                  # Claude Code runtime configuration
-│   ├── agents/               # Installed agents (20 files)
-│   ├── commands/sc/          # Installed slash commands (31 files)
-│   ├── skills/               # Installed skills
-│   ├── superclaude/          # Core configs (FLAGS, PRINCIPLES, RULES, etc.)
-│   └── settings.json         # Claude Code settings
+├── scripts/                  # Build and analysis tools
 ├── docs/                     # Extended documentation
-├── plugins/                  # Plugin staging (for v5.0)
-└── scripts/                  # Build and analysis tools
+└── .github/                  # CI/CD workflows (4 workflows)
 ```
 
 ---
@@ -45,11 +40,12 @@ SuperClaude_Framework/
 |----------|-------|----------|
 | Slash Commands | 30 | src/superclaude/commands/ |
 | Agents | 20 | src/superclaude/agents/ |
-| Modes | 7 | src/superclaude/modes/ |
+| Modes | 7 (+INDEX) | src/superclaude/modes/ |
 | MCP Servers | 10 | src/superclaude/mcp/configs/ |
 | Core Configs | 7 | src/superclaude/core/ |
-| Python Files | 38 | src/superclaude/ |
+| Python Files | 44 | src/superclaude/ |
 | Test Files | 14 | tests/ |
+| Skills | 1 | src/superclaude/skills/ |
 
 ---
 
@@ -67,7 +63,7 @@ SuperClaude_Framework/
 
 ### Skills (1)
 - **Confidence Check**: `src/superclaude/skills/confidence-check/`
-  - Purpose: Pre-implementation confidence assessment (≥90% to proceed)
+  - Purpose: Pre-implementation confidence assessment (>=90% to proceed)
 
 ---
 
@@ -83,7 +79,7 @@ SuperClaude_Framework/
 | token_budget.py | TokenBudgetManager | Token allocation | allocate(), use(), remaining() |
 
 **Confidence Thresholds**:
-- ≥90%: Proceed with implementation
+- >=90%: Proceed with implementation
 - 70-89%: Present alternatives to user
 - <70%: Ask clarifying questions
 
@@ -96,13 +92,41 @@ SuperClaude_Framework/
 
 | Module | Classes | Purpose |
 |--------|---------|---------|
-| parallel.py | TaskStatus, Task, ParallelGroup, ExecutionPlan, ParallelExecutor | Wave→Checkpoint→Wave (3.5x faster) |
+| parallel.py | TaskStatus, Task, ParallelGroup, ExecutionPlan, ParallelExecutor | Wave->Checkpoint->Wave (3.5x faster) |
 | reflection.py | - | Post-execution analysis |
 | self_correction.py | - | Automated error correction |
 
+### CLI (src/superclaude/cli/)
+
+| Module | Purpose |
+|--------|---------|
+| main.py | CLI entry point (click-based) |
+| doctor.py | Health check diagnostics |
+| install_skill.py | Individual skill installation |
+| install_mcp.py | MCP server config installation |
+| install_paths.py | Installation path resolution |
+| install_settings.py | Settings management |
+| install_commands.py | Command file installation |
+| install_components.py | Component installation orchestration |
+| install_inventory.py | Component inventory and listing |
+
+### Hooks (src/superclaude/hooks/)
+
+| Module | Purpose |
+|--------|---------|
+| hook_tracker.py | Session tracking (once:true, 24h TTL) |
+| inline_hooks.py | Frontmatter hook parser |
+| mcp_fallback.py | MCP unavailability fallback handling |
+
+### Utils (src/superclaude/utils/)
+
+| Module | Purpose |
+|--------|---------|
+| __init__.py | Shared utilities (thread safety, atomic writes) |
+
 ---
 
-## Slash Commands (31)
+## Slash Commands (30)
 
 Commands installed to `~/.claude/commands/sc/`:
 
@@ -136,7 +160,7 @@ Specialized agents installed to `~/.claude/agents/`:
 
 ---
 
-## Modes (8)
+## Modes (7 + INDEX)
 
 Behavioral modes in `src/superclaude/modes/`:
 
@@ -167,6 +191,7 @@ Configurations in `src/superclaude/mcp/configs/`:
 | playwright | Browser automation | --play |
 | airis-agent | Confidence, indexing | - |
 | mindbase | Semantic memory | - |
+| chrome-devtools | Performance debug | --perf |
 
 ---
 
@@ -191,16 +216,19 @@ Located in `src/superclaude/core/`:
 ### Structure
 ```
 tests/
-├── conftest.py              # Shared fixtures
+├── conftest.py                # Shared fixtures
 ├── unit/
-│   ├── test_cli_install.py  # CLI installation tests
-│   ├── test_confidence.py   # ConfidenceChecker tests
-│   ├── test_hooks.py        # Hook system tests
-│   ├── test_reflexion.py    # ReflexionPattern tests
-│   ├── test_self_check.py   # SelfCheckProtocol tests
-│   └── test_token_budget.py # TokenBudgetManager tests
+│   ├── test_cli_install.py    # CLI installation tests
+│   ├── test_confidence.py     # ConfidenceChecker tests
+│   ├── test_hook_tracker.py   # Hook tracker tests
+│   ├── test_hooks.py          # Hook system tests
+│   ├── test_mcp_fallback.py   # MCP fallback tests
+│   ├── test_parallel.py       # Parallel execution tests
+│   ├── test_reflexion.py      # ReflexionPattern tests
+│   ├── test_self_check.py     # SelfCheckProtocol tests
+│   └── test_token_budget.py   # TokenBudgetManager tests
 └── integration/
-    └── test_pytest_plugin.py # Plugin integration tests
+    └── test_pytest_plugin.py  # Plugin integration tests
 ```
 
 ### Markers
@@ -225,8 +253,8 @@ uv run pytest --cov=superclaude       # With coverage
 
 ### Python Package (pyproject.toml)
 - **Build**: hatchling (PEP 517)
-- **Python**: ≥3.10
-- **Dependencies**: pytest≥7.0.0, click≥8.0.0, rich≥13.0.0, pyyaml≥6.0.0
+- **Python**: >=3.10
+- **Dependencies**: pytest>=7.0.0, click>=8.0.0, rich>=13.0.0, pyyaml>=6.0.0
 
 ### Entry Points
 ```toml
@@ -239,16 +267,26 @@ superclaude = "superclaude.pytest_plugin"
 
 ---
 
+## CI/CD (.github/workflows/)
+
+| Workflow | Purpose |
+|----------|---------|
+| test.yml | Test suite execution |
+| quick-check.yml | Fast validation checks |
+| publish-pypi.yml | PyPI publishing |
+| readme-quality-check.yml | README quality gate |
+
+---
+
 ## Installation
 
 ```bash
-# Option 1: pipx (recommended)
-pipx install superclaude
-superclaude install
-
-# Option 2: Development
+# Option 1: Development (recommended)
 uv pip install -e ".[dev]"
 uv run superclaude install
+
+# Option 2: Global tool
+make deploy
 
 # Verify
 superclaude doctor
@@ -263,11 +301,11 @@ superclaude install --list
 |------|---------|
 | CLAUDE.md | Claude Code integration instructions |
 | README.md | Project overview, quick start |
-| PLANNING.md | Architecture, design principles |
-| TASK.md | Current tasks, priorities |
-| KNOWLEDGE.md | Accumulated insights |
 | CONTRIBUTING.md | Contribution guidelines |
-| CHANGELOG.md | Version history |
+| SECURITY.md | Security policy |
+| docs/developer-guide/ | Technical docs (architecture, testing, contributing) |
+| docs/reference/ | User reference (commands, examples, troubleshooting) |
+| docs/research/ | Research findings and analysis |
 
 ---
 
@@ -279,7 +317,7 @@ superclaude install --list
 - **Reduction**: 94%
 
 ### PM Agent ROI
-- **Confidence check**: 100-200 tokens → saves 5,000-50,000 tokens
+- **Confidence check**: 100-200 tokens -> saves 5,000-50,000 tokens
 - **ROI**: 25-250x token savings
 
 ---
@@ -297,6 +335,8 @@ superclaude install --list
 | Error learning | pm_agent/reflexion.py |
 | Token management | pm_agent/token_budget.py |
 | Parallel execution | execution/parallel.py |
+| MCP fallback | hooks/mcp_fallback.py |
+| Shared utils | utils/__init__.py |
 | Slash commands | commands/*.md |
 | Agent definitions | agents/*.md |
 | Mode behaviors | modes/*.md |
@@ -308,15 +348,15 @@ superclaude install --list
 
 | Extension | Count | Purpose |
 |-----------|-------|---------|
-| .py | 37 | Python source |
-| .md | 90+ | Documentation, commands, agents |
+| .py | 44 | Python source |
+| .md | 84+ | Documentation, commands, agents |
 | .json | 15+ | Config files |
 
 ---
 
 ## Git Workflow
 
-- **Branch**: master ← integration ← feature/*, fix/*, docs/*
+- **Branch**: master <- integration <- feature/*, fix/*, docs/*
 - **Commits**: Conventional (feat:, fix:, docs:, refactor:, test:, chore:)
 - **Current**: master (clean)
 
