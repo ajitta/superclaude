@@ -56,6 +56,39 @@ class InlineHooks:
         """Check if any hooks are defined."""
         return bool(self.pre_tool_use or self.post_tool_use or self.stop)
 
+    def to_claude_code_format(self) -> dict:
+        """Convert hooks to Claude Code's native nested format.
+
+        Groups hooks by matcher and outputs the structure Claude Code expects:
+            PreToolUse:
+              - matcher: "pattern"
+                hooks:
+                  - type: command
+                    command: ...
+        """
+        result: dict = {}
+        for key, hooks in [
+            ("PreToolUse", self.pre_tool_use),
+            ("PostToolUse", self.post_tool_use),
+            ("Stop", self.stop),
+        ]:
+            if not hooks:
+                continue
+            groups: dict[str | None, list[dict]] = {}
+            for hook in hooks:
+                groups.setdefault(hook.matcher, []).append(hook.to_dict())
+            entries = []
+            for matcher, hook_dicts in groups.items():
+                # Strip matcher from inner hook dicts (it belongs at the outer level)
+                cleaned = [{k: v for k, v in d.items() if k != "matcher"} for d in hook_dicts]
+                entry: dict = {}
+                if matcher:
+                    entry["matcher"] = matcher
+                entry["hooks"] = cleaned
+                entries.append(entry)
+            result[key] = entries
+        return result
+
 
 def parse_frontmatter(content: str) -> dict:
     """Extract and parse YAML frontmatter from markdown content.
@@ -121,6 +154,10 @@ def parse_inline_hooks(frontmatter: dict) -> InlineHooks:
 def _parse_hook_list(hooks_list: list) -> list[InlineHook]:
     """Parse a list of hook definitions.
 
+    Supports two formats:
+    - Nested (Claude Code native): entry has 'matcher' + 'hooks' array
+    - Flat (legacy): entry has 'command' directly
+
     Args:
         hooks_list: List of hook dictionaries
 
@@ -131,25 +168,42 @@ def _parse_hook_list(hooks_list: list) -> list[InlineHook]:
         return []
 
     result = []
-    for hook_dict in hooks_list:
-        if not isinstance(hook_dict, dict):
+    for entry in hooks_list:
+        if not isinstance(entry, dict):
             continue
 
-        hook_type = hook_dict.get("type", "command")
-        command = hook_dict.get("command", "")
-
-        if not command:
-            continue
-
-        result.append(
-            InlineHook(
-                type=hook_type,
-                command=command,
-                matcher=hook_dict.get("matcher"),
-                timeout=hook_dict.get("timeout", 30),
-                once=hook_dict.get("once", False),
+        # Nested format: entry has 'hooks' key with a list value
+        if "hooks" in entry and isinstance(entry["hooks"], list):
+            outer_matcher = entry.get("matcher")
+            for hook_dict in entry["hooks"]:
+                if not isinstance(hook_dict, dict):
+                    continue
+                command = hook_dict.get("command", "")
+                if not command:
+                    continue
+                result.append(
+                    InlineHook(
+                        type=hook_dict.get("type", "command"),
+                        command=command,
+                        matcher=outer_matcher,
+                        timeout=hook_dict.get("timeout", 30),
+                        once=hook_dict.get("once", False),
+                    )
+                )
+        else:
+            # Flat format (legacy): command is at the same level
+            command = entry.get("command", "")
+            if not command:
+                continue
+            result.append(
+                InlineHook(
+                    type=entry.get("type", "command"),
+                    command=command,
+                    matcher=entry.get("matcher"),
+                    timeout=entry.get("timeout", 30),
+                    once=entry.get("once", False),
+                )
             )
-        )
 
     return result
 

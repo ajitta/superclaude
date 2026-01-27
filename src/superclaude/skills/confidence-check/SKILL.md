@@ -19,10 +19,12 @@ allowed-tools:
 
 hooks:
   PreToolUse:
-    - type: command
-      command: python {{SCRIPTS_PATH}}/validate_confidence_context.py
-      matcher: WebFetch|WebSearch
-      once: true
+    - matcher: "WebFetch|WebSearch"
+      hooks:
+        - type: command
+          command: python {{SCRIPTS_PATH}}/validate_confidence_context.py
+          timeout: 30
+          once: true
 ---
 <component name="confidence-check" type="skill">
   <config style="Telegraphic|Imperative|XML" eval="true"/>

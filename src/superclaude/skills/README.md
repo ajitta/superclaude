@@ -26,14 +26,20 @@ disallowed-tools:                 # Explicit tool blocking (v2.0.30+)
 
 hooks:                            # Inline hooks (v2.1.0+)
   PreToolUse:
-    - matcher: "Bash|Edit"
-      command: "python validate.py"
-      once: true                  # Execute only once per session
+    - matcher: "Bash|Edit"        # Outer level: matcher + hooks array
+      hooks:
+        - type: command
+          command: "python validate.py"
+          once: true              # Execute only once per session
   PostToolUse:
     - matcher: "Write"
-      command: "python format.py"
+      hooks:
+        - type: command
+          command: "python format.py"
   Stop:
-    - command: "python cleanup.py"
+    - hooks:
+        - type: command
+          command: "python cleanup.py"
 ---
 ```
 
@@ -111,7 +117,9 @@ allowed-tools:
   - mcp__serena__*
 hooks:
   Stop:
-    - command: "python summarize.py"
+    - hooks:
+        - type: command
+          command: "python summarize.py"
 ---
 <component name="deep-analysis">
   <!-- Skill implementation -->
