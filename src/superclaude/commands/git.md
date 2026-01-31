@@ -9,13 +9,14 @@ description: Git operations with intelligent commit messages and workflow optimi
     <mission>Git operations with intelligent commit messages and workflow optimization</mission>
   </role>
 
-  <syntax>/sc:git [operation] [args] [--smart-commit] [--interactive]</syntax>
+  <syntax>/sc:git [operation] [args] [--smart-commit] [--interactive] [--pr-status]</syntax>
 
   <triggers>
     - Git ops: status, add, commit, push, pull, branch
     - Intelligent commit message generation
     - Repository workflow optimization
     - Branch management + merges
+    - PR review status check (Claude Code 2.1.20+)
   </triggers>
 
   <flow>
@@ -38,7 +39,23 @@ description: Git operations with intelligent commit messages and workflow optimi
     - Status: Repo state → actionable recs
     - Branch: Consistent naming + workflow
     - Recovery: Conflict resolution + restoration
+    - PRStatus: gh pr view → review state → confidence check
   </patterns>
+
+  <pr_status_integration note="Claude Code 2.1.20+">
+    <description>PR review status indicator integration</description>
+    <command>gh pr view --json state,reviewDecision,isDraft</command>
+    <states>
+      - APPROVED: Ready to merge (green dot)
+      - CHANGES_REQUESTED: Address feedback first (red dot)
+      - PENDING: Awaiting review (yellow dot)
+      - DRAFT: Not ready for review (gray dot)
+    </states>
+    <usage>
+      - /sc:git --pr-status: Show current branch PR state
+      - Auto-integrated with PRStatusCheck confidence check
+    </usage>
+  </pr_status_integration>
 
   <examples>
 
@@ -47,10 +64,11 @@ description: Git operations with intelligent commit messages and workflow optimi
 | `status` | State analysis + recommendations |
 | `commit --smart-commit` | Conventional commit |
 | `merge feature-branch --interactive` | Guided merge |
+| `--pr-status` | Current branch PR review state |
 
   </examples>
 
-  <bounds will="intelligent git ops|conventional commits|workflow guidance" wont="modify config without auth|destructive without confirm|complex merges requiring manual"/>
+  <bounds will="intelligent git ops|conventional commits|workflow guidance|PR status checks" wont="modify config without auth|destructive without confirm|complex merges requiring manual"/>
 
   <boundaries type="execution" critical="true">
     <rule>EXECUTE git operations as requested</rule>
@@ -60,7 +78,7 @@ description: Git operations with intelligent commit messages and workflow optimi
   </boundaries>
 
   <safety_rules>
-    <safe>status, log, diff, add, commit, pull, fetch, branch</safe>
+    <safe>status, log, diff, add, commit, pull, fetch, branch, pr-status</safe>
     <approval_required>push --force, reset --hard, rebase, merge with conflicts</approval_required>
   </safety_rules>
 
@@ -68,6 +86,7 @@ description: Git operations with intelligent commit messages and workflow optimi
     - [ ] Operation executed successfully
     - [ ] Repository state verified
     - [ ] Appropriate next steps suggested
+    - [ ] PR status checked (if --pr-status)
   </completion_criteria>
 
   <handoff>

@@ -37,7 +37,9 @@ __all__ = [
     "OfficialDocsCheck",
     "OssReferenceCheck",
     "RootCauseCheck",
+    "PRStatusCheck",
     "DEFAULT_CHECKS",
+    "detect_tech_stack_multi_dir",
 ]
 
 
@@ -273,6 +275,63 @@ def _cached_detect_tech_stack(project_root_str: str) -> tuple:
     )
 
 
+def detect_tech_stack_multi_dir(
+    project_root: Path, additional_dirs: List[Path] | None = None
+) -> Dict[str, List[str]]:
+    """
+    Detect tech stack from multiple directories.
+
+    Supports Claude Code 2.1.20's --add-dir flag for multi-directory CLAUDE.md.
+
+    Args:
+        project_root: Main project root directory
+        additional_dirs: Optional list of additional directories to scan
+
+    Returns:
+        Dict with 'frameworks', 'databases', 'tools' keys
+    """
+    import os
+
+    # Get main project stack
+    frameworks, databases, tools = _cached_detect_tech_stack(str(project_root))
+    all_frameworks = list(frameworks)
+    all_databases = list(databases)
+    all_tools = list(tools)
+
+    # Check if multi-directory mode is enabled
+    additional_dirs_enabled = (
+        os.environ.get("CLAUDE_CODE_ADDITIONAL_DIRECTORIES_CLAUDE_MD", "0") == "1"
+    )
+
+    if additional_dirs_enabled and additional_dirs:
+        for add_dir in additional_dirs:
+            if add_dir.exists():
+                add_frameworks, add_databases, add_tools = _cached_detect_tech_stack(
+                    str(add_dir)
+                )
+                all_frameworks.extend(add_frameworks)
+                all_databases.extend(add_databases)
+                all_tools.extend(add_tools)
+
+    # Also check common monorepo patterns if enabled
+    if additional_dirs_enabled and not additional_dirs:
+        for pattern in ["packages/*", "apps/*", "libs/*", "services/*"]:
+            for subdir in project_root.glob(pattern):
+                if subdir.is_dir() and (subdir / "CLAUDE.md").exists():
+                    sub_frameworks, sub_databases, sub_tools = (
+                        _cached_detect_tech_stack(str(subdir))
+                    )
+                    all_frameworks.extend(sub_frameworks)
+                    all_databases.extend(sub_databases)
+                    all_tools.extend(sub_tools)
+
+    return {
+        "frameworks": sorted(set(all_frameworks)),
+        "databases": sorted(set(all_databases)),
+        "tools": sorted(set(all_tools)),
+    }
+
+
 # =============================================================================
 # Concrete Check Implementations
 # =============================================================================
@@ -291,7 +350,11 @@ class NoDuplicatesCheck:
         # Honor explicit flag
         if "duplicate_check_complete" in context:
             passed = context["duplicate_check_complete"]
-            msg = "No duplicate implementations found" if passed else "Check for existing implementations first"
+            msg = (
+                "No duplicate implementations found"
+                if passed
+                else "Check for existing implementations first"
+            )
             return passed, msg
 
         # Active verification
@@ -306,7 +369,8 @@ class NoDuplicatesCheck:
         # Extract keywords
         skip_words = {"test", "the", "and", "for", "with", "from", "that", "this"}
         keywords = [
-            w.lower() for w in task_name.replace("_", " ").replace("-", " ").split()
+            w.lower()
+            for w in task_name.replace("_", " ").replace("-", " ").split()
             if len(w) > 3 and w.lower() not in skip_words
         ]
 
@@ -319,7 +383,8 @@ class NoDuplicatesCheck:
             try:
                 matches = list(project_root.rglob(f"*{keyword}*.py"))
                 matches = [
-                    m for m in matches
+                    m
+                    for m in matches
                     if "__pycache__" not in str(m) and not m.name.startswith("test_")
                 ]
                 if len(matches) > duplicate_threshold:
@@ -344,7 +409,11 @@ class ArchitectureCheck:
         # Honor explicit flag
         if "architecture_check_complete" in context:
             passed = context["architecture_check_complete"]
-            msg = "Uses existing tech stack" if passed else "Verify architecture compliance"
+            msg = (
+                "Uses existing tech stack"
+                if passed
+                else "Verify architecture compliance"
+            )
             return passed, msg
 
         # Active verification
@@ -388,13 +457,17 @@ class ArchitectureCheck:
             + detected_stack.get("tools", [])
         )
 
-        proposed_lower = [p.lower().replace("-", "_").replace(" ", "_") for p in proposed_tech]
+        proposed_lower = [
+            p.lower().replace("-", "_").replace(" ", "_") for p in proposed_tech
+        ]
 
         for tech in all_detected:
             if tech in conflict_rules:
                 for proposed in proposed_lower:
                     if proposed in conflict_rules[tech]:
-                        conflicts.append(f"Conflict: '{proposed}' conflicts with existing '{tech}'")
+                        conflicts.append(
+                            f"Conflict: '{proposed}' conflicts with existing '{tech}'"
+                        )
 
         return conflicts
 
@@ -412,7 +485,11 @@ class OfficialDocsCheck:
         # Honor explicit flag
         if "official_docs_verified" in context:
             passed = context.get("official_docs_verified", False)
-            msg = "Official documentation verified" if passed else "Read official docs first"
+            msg = (
+                "Official documentation verified"
+                if passed
+                else "Read official docs first"
+            )
             return passed, msg
 
         # Active verification
@@ -443,27 +520,73 @@ class OssReferenceCheck:
 
     # Known OSS patterns database
     KNOWN_PATTERNS = {
-        "auth": {"pattern": "authentication", "references": ["NextAuth.js", "Passport.js", "python-jose"]},
-        "login": {"pattern": "user_login", "references": ["NextAuth.js", "Flask-Login", "Django-allauth"]},
-        "jwt": {"pattern": "jwt_authentication", "references": ["python-jose", "PyJWT", "jsonwebtoken"]},
-        "api": {"pattern": "rest_api", "references": ["FastAPI", "Express.js", "Django REST"]},
-        "graphql": {"pattern": "graphql_api", "references": ["Strawberry", "Apollo", "Graphene"]},
-        "crud": {"pattern": "crud_operations", "references": ["SQLAlchemy", "Prisma", "TypeORM"]},
-        "migration": {"pattern": "database_migration", "references": ["Alembic", "Prisma Migrate"]},
+        "auth": {
+            "pattern": "authentication",
+            "references": ["NextAuth.js", "Passport.js", "python-jose"],
+        },
+        "login": {
+            "pattern": "user_login",
+            "references": ["NextAuth.js", "Flask-Login", "Django-allauth"],
+        },
+        "jwt": {
+            "pattern": "jwt_authentication",
+            "references": ["python-jose", "PyJWT", "jsonwebtoken"],
+        },
+        "api": {
+            "pattern": "rest_api",
+            "references": ["FastAPI", "Express.js", "Django REST"],
+        },
+        "graphql": {
+            "pattern": "graphql_api",
+            "references": ["Strawberry", "Apollo", "Graphene"],
+        },
+        "crud": {
+            "pattern": "crud_operations",
+            "references": ["SQLAlchemy", "Prisma", "TypeORM"],
+        },
+        "migration": {
+            "pattern": "database_migration",
+            "references": ["Alembic", "Prisma Migrate"],
+        },
         "test": {"pattern": "testing", "references": ["pytest", "Jest", "Vitest"]},
-        "mock": {"pattern": "mocking", "references": ["unittest.mock", "pytest-mock", "Jest mocks"]},
-        "component": {"pattern": "ui_component", "references": ["React", "Vue", "Svelte"]},
-        "form": {"pattern": "form_handling", "references": ["React Hook Form", "Formik", "VeeValidate"]},
-        "state": {"pattern": "state_management", "references": ["Redux", "Zustand", "Pinia"]},
-        "cache": {"pattern": "caching", "references": ["Redis", "Memcached", "lru_cache"]},
-        "queue": {"pattern": "message_queue", "references": ["Celery", "Bull", "RabbitMQ"]},
+        "mock": {
+            "pattern": "mocking",
+            "references": ["unittest.mock", "pytest-mock", "Jest mocks"],
+        },
+        "component": {
+            "pattern": "ui_component",
+            "references": ["React", "Vue", "Svelte"],
+        },
+        "form": {
+            "pattern": "form_handling",
+            "references": ["React Hook Form", "Formik", "VeeValidate"],
+        },
+        "state": {
+            "pattern": "state_management",
+            "references": ["Redux", "Zustand", "Pinia"],
+        },
+        "cache": {
+            "pattern": "caching",
+            "references": ["Redis", "Memcached", "lru_cache"],
+        },
+        "queue": {
+            "pattern": "message_queue",
+            "references": ["Celery", "Bull", "RabbitMQ"],
+        },
         "log": {"pattern": "logging", "references": ["structlog", "Winston", "Pino"]},
     }
 
     REPUTABLE_DOMAINS = [
-        "github.com", "gitlab.com", "bitbucket.org", "stackoverflow.com",
-        "docs.python.org", "developer.mozilla.org", "reactjs.org", "nextjs.org",
-        "fastapi.tiangolo.com", "django-project.com",
+        "github.com",
+        "gitlab.com",
+        "bitbucket.org",
+        "stackoverflow.com",
+        "docs.python.org",
+        "developer.mozilla.org",
+        "reactjs.org",
+        "nextjs.org",
+        "fastapi.tiangolo.com",
+        "django-project.com",
     ]
 
     def evaluate(self, context: Dict[str, Any]) -> Tuple[bool, str]:
@@ -471,7 +594,11 @@ class OssReferenceCheck:
         # Honor explicit flag
         if "oss_reference_complete" in context:
             passed = context["oss_reference_complete"]
-            msg = "Working OSS implementation found" if passed else "Search for OSS implementations"
+            msg = (
+                "Working OSS implementation found"
+                if passed
+                else "Search for OSS implementations"
+            )
             return passed, msg
 
         # Check provided references
@@ -512,7 +639,9 @@ class OssReferenceCheck:
                 url = str(ref)
                 source = ""
 
-            is_reputable = any(domain in url.lower() for domain in self.REPUTABLE_DOMAINS)
+            is_reputable = any(
+                domain in url.lower() for domain in self.REPUTABLE_DOMAINS
+            )
             has_content = len(url) > 20 or len(source) > 10
 
             if is_reputable or has_content:
@@ -567,7 +696,11 @@ class RootCauseCheck:
         # Honor explicit flag
         if "root_cause_identified" in context:
             passed = context["root_cause_identified"]
-            msg = "Root cause identified" if passed else "Continue investigation to identify root cause"
+            msg = (
+                "Root cause identified"
+                if passed
+                else "Continue investigation to identify root cause"
+            )
             return passed, msg
 
         # Active verification
@@ -576,9 +709,8 @@ class RootCauseCheck:
 
         # Heuristic: root cause must be specific
         words = root_cause.split()
-        is_specific = (
-            len(words) >= 5
-            and not any(term in root_cause.lower() for term in self.VAGUE_TERMS)
+        is_specific = len(words) >= 5 and not any(
+            term in root_cause.lower() for term in self.VAGUE_TERMS
         )
 
         has_evidence = len(evidence) >= 1
@@ -586,6 +718,136 @@ class RootCauseCheck:
         if is_specific and has_evidence:
             return True, "Root cause identified"
         return False, "Continue investigation to identify root cause"
+
+
+class PRStatusCheck:
+    """Check PR review status for current branch.
+
+    Integrates with Claude Code 2.1.20's PR status indicator feature.
+    Uses gh CLI to fetch PR state (approved/changes_requested/pending/draft).
+
+    Confidence adjustments:
+        - approved: Full weight (pass)
+        - pending/draft: Neutral (conditional pass)
+        - changes_requested: Fail (needs attention)
+    """
+
+    name: str = "pr_status"
+
+    def __init__(self, weight: float = 0.10):
+        self.weight = weight
+
+    # PR states and their confidence implications
+    PR_STATES = {
+        "APPROVED": {"pass": True, "message": "PR approved - ready to merge"},
+        "CHANGES_REQUESTED": {
+            "pass": False,
+            "message": "PR has requested changes - address feedback first",
+        },
+        "PENDING": {
+            "pass": True,
+            "message": "PR pending review - proceed with caution",
+        },
+        "DRAFT": {"pass": True, "message": "PR is draft - not ready for review"},
+        "NO_PR": {"pass": True, "message": "No PR for current branch"},
+    }
+
+    def evaluate(self, context: Dict[str, Any]) -> Tuple[bool, str]:
+        """Check PR status for current branch."""
+        import subprocess
+
+        # Honor explicit flag
+        if "pr_status" in context:
+            status = context["pr_status"]
+            if status in self.PR_STATES:
+                state_info = self.PR_STATES[status]
+                return bool(state_info["pass"]), str(state_info["message"])
+
+        # Skip if not in git repo or gh not available
+        if not context.get("check_pr_status", True):
+            return True, "PR status check skipped"
+
+        try:
+            # Get current branch
+            branch_result = subprocess.run(
+                ["git", "branch", "--show-current"],
+                capture_output=True,
+                text=True,
+                timeout=5,
+            )
+            if branch_result.returncode != 0:
+                return True, "Not in git repository"
+
+            current_branch = branch_result.stdout.strip()
+            if not current_branch:
+                return True, "No current branch (detached HEAD)"
+
+            # Skip main/master branches
+            if current_branch in ("main", "master"):
+                return True, "On main branch - no PR check needed"
+
+            # Check PR status via gh CLI
+            pr_result = subprocess.run(
+                ["gh", "pr", "view", "--json", "state,reviewDecision,isDraft"],
+                capture_output=True,
+                text=True,
+                timeout=10,
+            )
+
+            if pr_result.returncode != 0:
+                # No PR exists for this branch
+                context["pr_status"] = "NO_PR"
+                return True, "No PR for current branch"
+
+            import json
+
+            pr_data = json.loads(pr_result.stdout)
+
+            # Determine PR status
+            if pr_data.get("isDraft"):
+                context["pr_status"] = "DRAFT"
+                return True, "PR is draft - not ready for review"
+
+            review_decision = pr_data.get("reviewDecision", "")
+            if review_decision == "APPROVED":
+                context["pr_status"] = "APPROVED"
+                context["pr_url"] = self._get_pr_url()
+                return True, "PR approved - ready to merge"
+            elif review_decision == "CHANGES_REQUESTED":
+                context["pr_status"] = "CHANGES_REQUESTED"
+                context["pr_url"] = self._get_pr_url()
+                return False, "PR has requested changes - address feedback first"
+            else:
+                context["pr_status"] = "PENDING"
+                return True, "PR pending review - proceed with caution"
+
+        except FileNotFoundError:
+            # gh CLI not installed
+            return True, "gh CLI not available - PR status check skipped"
+        except subprocess.TimeoutExpired:
+            return True, "PR status check timed out"
+        except (subprocess.SubprocessError, OSError):
+            return True, "PR status check failed - skipped"
+        except Exception:
+            # Catch json.JSONDecodeError and other unexpected errors
+            return True, "PR status check failed - skipped"
+
+    def _get_pr_url(self) -> str:
+        """Get PR URL for current branch."""
+        import subprocess
+
+        try:
+            result = subprocess.run(
+                ["gh", "pr", "view", "--json", "url", "-q", ".url"],
+                capture_output=True,
+                text=True,
+                timeout=5,
+            )
+            if result.returncode == 0:
+                return result.stdout.strip()
+        except (subprocess.SubprocessError, OSError):
+            pass
+        return ""
 
 
 # Default check instances (for backward compatibility)
@@ -633,11 +895,17 @@ class ConfidenceChecker:
             self._register_default_checks()
 
     def _register_default_checks(self) -> None:
-        """Register the 5 default confidence checks."""
+        """Register the 6 default confidence checks (including PRStatusCheck)."""
         for check in DEFAULT_CHECKS:
             # Create fresh instances to avoid shared state
             check_class = type(check)
-            self._checks.append(check_class(weight=check.weight))
+            # Use getattr to handle classes with optional weight parameter
+            weight = getattr(check, "weight", 0.15)
+            try:
+                self._checks.append(check_class(weight=weight))
+            except TypeError:
+                # Fallback for checks without weight parameter
+                self._checks.append(check_class())
 
     def register_check(self, check: ConfidenceCheck) -> None:
         """
@@ -647,7 +915,9 @@ class ConfidenceChecker:
             check: Check implementing ConfidenceCheck or AsyncConfidenceCheck protocol
         """
         if not isinstance(check, (ConfidenceCheck, AsyncConfidenceCheck)):
-            raise TypeError(f"Check must implement ConfidenceCheck or AsyncConfidenceCheck protocol, got {type(check)}")
+            raise TypeError(
+                f"Check must implement ConfidenceCheck or AsyncConfidenceCheck protocol, got {type(check)}"
+            )
         self._checks.append(check)
 
     def unregister_check(self, name: str) -> bool:
@@ -708,12 +978,14 @@ class ConfidenceChecker:
             if passed:
                 score += normalized_weight
 
-            check_results.append(CheckResult(
-                name=check.name,
-                passed=passed,
-                message=message,
-                weight=check.weight,
-            ))
+            check_results.append(
+                CheckResult(
+                    name=check.name,
+                    passed=passed,
+                    message=message,
+                    weight=check.weight,
+                )
+            )
 
         # Build recommendation
         recommendation = self.get_recommendation(score)
@@ -723,7 +995,9 @@ class ConfidenceChecker:
             f"{'✅' if c.passed else '❌'} {c.message}" for c in check_results
         ]
 
-        return ConfidenceResult(score=score, checks=check_results, recommendation=recommendation)
+        return ConfidenceResult(
+            score=score, checks=check_results, recommendation=recommendation
+        )
 
     async def assess_async(self, context: Dict[str, Any]) -> ConfidenceResult:
         """
@@ -784,12 +1058,14 @@ class ConfidenceChecker:
             if passed:
                 score += normalized_weight
 
-            check_results.append(CheckResult(
-                name=check.name,
-                passed=passed,
-                message=message,
-                weight=check.weight,
-            ))
+            check_results.append(
+                CheckResult(
+                    name=check.name,
+                    passed=passed,
+                    message=message,
+                    weight=check.weight,
+                )
+            )
 
         # Build recommendation
         recommendation = self.get_recommendation(score)
@@ -799,7 +1075,9 @@ class ConfidenceChecker:
             f"{'✅' if c.passed else '❌'} {c.message}" for c in check_results
         ]
 
-        return ConfidenceResult(score=score, checks=check_results, recommendation=recommendation)
+        return ConfidenceResult(
+            score=score, checks=check_results, recommendation=recommendation
+        )
 
     def has_async_checks(self) -> bool:
         """Check if any registered checks require async evaluation."""

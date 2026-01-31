@@ -12,6 +12,11 @@ Cross-platform compatible (Windows/macOS/Linux)
 v2.1.0 Features:
 - Skills discovery and token estimation
 - Skill frontmatter loading for context visualization
+
+v2.2.0 Features (Claude Code 2.1.20 Integration):
+- Multi-directory CLAUDE.md support via --add-dir flag
+- CLAUDE_CODE_ADDITIONAL_DIRECTORIES_CLAUDE_MD environment variable
+- Tech stack detection from multiple project directories
 """
 
 import hashlib
@@ -20,7 +25,7 @@ import re
 import sys
 import tempfile
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, List
 
 if TYPE_CHECKING:
     from superclaude.scripts.token_estimator import TokenEstimate
@@ -28,6 +33,7 @@ if TYPE_CHECKING:
 # v2.2.0: MCP fallback notification support
 try:
     from superclaude.hooks.mcp_fallback import MCP_FALLBACKS, check_mcp_and_notify
+
     MCP_FALLBACK_AVAILABLE = True
 except ImportError:
     MCP_FALLBACK_AVAILABLE = False
@@ -40,9 +46,15 @@ MAX_TOKENS_ESTIMATE = int(
 )  # ~8K tokens
 CHARS_PER_TOKEN = 4  # Rough estimate
 
+# v2.2.0: Multi-directory CLAUDE.md support
+ADDITIONAL_DIRS_ENABLED = (
+    os.environ.get("CLAUDE_CODE_ADDITIONAL_DIRECTORIES_CLAUDE_MD", "0") == "1"
+)
+
 # Session tracking file (unique per working directory)
 SESSION_ID = hashlib.md5(os.getcwd().encode()).hexdigest()[:8]
 CACHE_FILE = Path(tempfile.gettempdir()) / f"claude_context_{SESSION_ID}.txt"
+
 
 # Base path for context files
 def _get_base_path() -> Path:
@@ -64,6 +76,7 @@ def _get_base_path() -> Path:
 
     # Fall back to user scope
     return Path.home() / ".claude" / "superclaude"
+
 
 BASE_PATH = _get_base_path()
 
@@ -170,6 +183,78 @@ TRIGGER_MAP = [
 
 # v2.1.0: Skills configuration
 SHOW_SKILLS_SUMMARY = os.environ.get("CLAUDE_SHOW_SKILLS", "1") == "1"
+
+
+def get_additional_claude_dirs() -> List[Path]:
+    """
+    Get additional directories containing CLAUDE.md files.
+
+    Supports Claude Code 2.1.20's --add-dir flag feature.
+    Requires CLAUDE_CODE_ADDITIONAL_DIRECTORIES_CLAUDE_MD=1 to be set.
+
+    Returns:
+        List of Path objects to additional directories with CLAUDE.md
+    """
+    if not ADDITIONAL_DIRS_ENABLED:
+        return []
+
+    additional_dirs: List[Path] = []
+
+    # Check for CLAUDE_ADD_DIRS environment variable (comma-separated paths)
+    add_dirs_env = os.environ.get("CLAUDE_ADD_DIRS", "")
+    if add_dirs_env:
+        for dir_path in add_dirs_env.split(","):
+            dir_path = dir_path.strip()
+            if dir_path:
+                path = Path(dir_path).expanduser().resolve()
+                if path.exists() and (path / "CLAUDE.md").exists():
+                    additional_dirs.append(path)
+
+    # Check for common monorepo patterns
+    cwd = Path.cwd()
+
+    # Look for workspace packages (monorepo pattern)
+    for pattern in ["packages/*", "apps/*", "libs/*", "services/*"]:
+        for subdir in cwd.glob(pattern):
+            if subdir.is_dir() and (subdir / "CLAUDE.md").exists():
+                additional_dirs.append(subdir)
+
+    # Deduplicate while preserving order
+    seen = set()
+    unique_dirs = []
+    for d in additional_dirs:
+        if d not in seen:
+            seen.add(d)
+            unique_dirs.append(d)
+
+    return unique_dirs
+
+
+def load_additional_claude_md_content() -> str:
+    """
+    Load and combine CLAUDE.md content from additional directories.
+
+    Returns:
+        Combined content from all additional CLAUDE.md files
+    """
+    additional_dirs = get_additional_claude_dirs()
+    if not additional_dirs:
+        return ""
+
+    contents = []
+    for dir_path in additional_dirs:
+        claude_md = dir_path / "CLAUDE.md"
+        if claude_md.exists():
+            try:
+                content = claude_md.read_text(encoding="utf-8")
+                contents.append(f"<!-- From {dir_path.name}/CLAUDE.md -->\n{content}")
+            except (OSError, UnicodeDecodeError):
+                continue
+
+    if contents:
+        header = f"<!-- Additional CLAUDE.md files loaded ({len(contents)} dirs) -->\n"
+        return header + "\n\n".join(contents)
+    return ""
 
 
 def get_skill_estimates() -> list["TokenEstimate"]:
