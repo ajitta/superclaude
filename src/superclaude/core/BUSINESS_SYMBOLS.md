@@ -7,71 +7,52 @@
   </role>
 
   <symbols>
-Strategic: 🎯 strategic target | 📈 growth, positive | 📉 decline, risk | 💰 financial impact | ⚖️ trade-offs | 🏆 competitive advantage | 🔄 business cycle | 🌊 blue ocean | 🏭 industry | 🎪 remarkable
+Strategic: 🎯 target | 📈 growth | 📉 decline/risk | 💰 financial | ⚖️ trade-offs | 🏆 competitive | 🔄 cycle | 🌊 blue ocean | 🏭 industry | 🎪 remarkable
 
-Framework (Expert):
-- 🔨 Christensen: JTBD
-- ⚔️ Porter: Five Forces
-- 🎪 Godin: Purple Cow
-- 🌊 Kim/Mauborgne: Blue Ocean
-- 🚀 Collins: Flywheel
-- 🛡️ Taleb: Antifragile
-- 🕸️ Meadows: Systems
-- 💬 Doumont: Communication
-- 🧭 Drucker: Management
+Expert (Framework + Voice):
+- 🔨 Christensen: JTBD (📚 Academic)
+- ⚔️ Porter: Five Forces (📊 Analytical)
+- 🎪 Godin: Purple Cow (💬 Provocative)
+- 🌊 Kim/Mauborgne: Blue Ocean (🎨 Strategic)
+- 🚀 Collins: Flywheel (📖 Research-driven)
+- 🛡️ Taleb: Antifragile (🎲 Contrarian)
+- 🕸️ Meadows: Systems (🌐 Holistic)
+- 💬 Doumont: Communication (✏️ Precise)
+- 🧭 Drucker: Management (🧠 Wise)
 
 Process: 🔍 investigation | 💡 insight | 🤝 consensus | ⚡ tension | 🎭 debate | ❓ socratic | 🧩 synthesis | 📋 conclusion
 
-Logic: → causes, leads to | ↔ mutual influence | ≡ strategic equivalence | ≠ competitive differentiation
-
-Voice (Expert):
-- 📚 Christensen: Academic
-- 📊 Porter: Analytical
-- 🧠 Drucker: Wise
-- 💬 Godin: Provocative
-- 🎨 Kim/Mauborgne: Strategic
-- 📖 Collins: Research-driven
-- 🎲 Taleb: Contrarian
-- 🌐 Meadows: Holistic
-- ✏️ Doumont: Precise
+Logic: → leads to | ↔ mutual | ≡ equivalence | ≠ differentiation
   </symbols>
 
   <templates>
-- Discussion: 🧩 SYNTHESIS: 🤝 Convergent [agreement] | ⚖️ Tensions [trade-offs] | 🕸️ Patterns [leverage] | 💬 Clarity [message] | ⚠️ Blind spots | 🤔 Questions
-- Debate: ⚡ TENSIONS: Initial [conflict] → 📚 Position vs 📊 Counter → 🔄 Resolution → 🧩 Higher-order solution → 🕸️ Systems insight
-- Socratic: 🎓 DEVELOPMENT: 🤔 Themes [frameworks applied] | 💡 Insights [patterns] | 🧭 Next [growth areas]
+- Discussion: 🧩 SYNTHESIS: 🤝 Convergent | ⚖️ Tensions | 🕸️ Patterns | 💬 Clarity | ⚠️ Blind spots | 🤔 Questions
+- Debate: ⚡ TENSIONS: Initial → Position vs Counter → Resolution → 🧩 Solution → 🕸️ Systems insight
+- Socratic: 🎓 DEVELOPMENT: 🤔 Themes | 💡 Insights | 🧭 Next growth areas
   </templates>
 
   <abbreviations>
-| Term | Abbrev |
-|------|--------|
-| competitive advantage | comp advantage |
-| value proposition | value prop |
-| go-to-market | GTM |
-| total addressable market | TAM |
-| customer acquisition cost | CAC |
-| lifetime value | LTV |
-| key performance indicator | KPI |
-| return on investment | ROI |
-| minimum viable product | MVP |
-| product-market fit | PMF |
-| jobs-to-be-done | JTBD |
-| blue ocean strategy | BOS |
-| good to great | G2G |
-| five forces | 5F |
-| value chain | VC |
+| Term | Abbrev | Term | Abbrev |
+|------|--------|------|--------|
+| competitive advantage | comp advantage | value proposition | value prop |
+| go-to-market | GTM | total addressable market | TAM |
+| customer acquisition cost | CAC | lifetime value | LTV |
+| key performance indicator | KPI | return on investment | ROI |
+| minimum viable product | MVP | product-market fit | PMF |
+| jobs-to-be-done | JTBD | blue ocean strategy | BOS |
+| good to great | G2G | five forces | 5F |
   </abbreviations>
 
   <config_defaults>
-- experts: max=5, min=3, auto=true, diversity=true
-- analysis: phase=adaptive, synthesis=required, cross_validation=true
-- output: symbols=true, templates=true, voice_preservation=0.85
-- mcp: sequential=primary, context7=patterns, persona_coordination=true
-- perf: tokens=15-30K, expert_cache=true, framework_reuse=true, parallel=true
+experts: max=5, min=3, auto=true, diversity=true
+analysis: phase=adaptive, synthesis=required, cross_validation=true
+output: symbols=true, templates=true, voice_preservation=0.85
+mcp: sequential=primary, context7=patterns, parallel=true
+perf: tokens=15-30K, expert_cache=true, framework_reuse=true
   </config_defaults>
 
   <quality>
-- Authenticity: voice consistency, framework fidelity, interaction realism
-- Business: strategic relevance, actionable, evidence-based, executive quality
+authenticity: voice consistency | framework fidelity | interaction realism
+business: strategic relevance | actionable | evidence-based | executive quality
   </quality>
 </component>

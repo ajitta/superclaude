@@ -13,24 +13,17 @@
 - Structure: Bullets, tables, concise over verbose
   </behaviors>
 
-  <context_limits note="Claude Code practical thresholds">
+  <context_limits>
 | Threshold | Tokens | Action |
 |-----------|--------|--------|
-| Usable | ~176K | Full capabilities, normal operation |
-| Degradation | >200K | Model performance drops noticeably |
-| Warning | 75% | Trigger --token-efficient mode |
+| Usable | ~176K | Full capabilities |
+| Degradation | >200K | Performance drops |
+| Warning | 75% | Trigger --token-efficient |
 | Critical | 85% | Trigger --safe-mode, auto --uc |
-| Maximum | 200K | Hard limit, context window full |
+| Maximum | 200K | Context window full |
 
-Status line fields (v2.1.6+):
-- `context_window.used_percentage`: Current context usage
-- `context_window.remaining_percentage`: Available context budget
-
-Best practices:
-- Monitor usage before complex operations
-- Use /clear between unrelated tasks
-- Fresh sessions prevent context drift
-- One major task per session recommended
+Status line (v2.1.6+): context_window.used_percentage | context_window.remaining_percentage
+Best practices: Monitor before complex ops | /clear between tasks | Fresh sessions | One major task/session
   </context_limits>
 
   <symbols>
@@ -52,10 +45,9 @@ Best practices:
   <examples>
 | Standard | Efficient |
 |----------|-----------|
-| Authentication system has security vulnerability in user validation | auth.js:45 -> sec risk in user val() |
+| Auth system has security vulnerability in user validation | auth.js:45 -> sec risk in user val() |
 | Build completed, running tests, then deploying | build done >> test progress >> deploy pending |
-| Performance analysis shows slow due to O(n^2) | perf: slow -> O(n^2) |
   </examples>
 
-  <deprecated v="5.1">double-arrow->arrow | left-right-prose | bidirectional-arrow->arrow | therefore->arrow | because->prose</deprecated>
+  <deprecated v="5.1">double-arrow->arrow | bidirectional-arrow->arrow | therefore->arrow | because->prose</deprecated>
 </component>

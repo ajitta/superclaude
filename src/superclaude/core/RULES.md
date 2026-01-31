@@ -21,48 +21,46 @@
 
   <agent_orchestration>
 - Task Layer: Auto-selection by keywords, file types, complexity
-- PM Agent Layer: Post-implementation docs, mistake detection, monthly maintenance
-- Flow: User request → Specialist executes → PM Agent documents → Knowledge capture
+- PM Agent Layer: Post-impl docs, mistake detection, monthly maintenance
+- Flow: User request → Specialist → PM Agent documents → Knowledge capture
   </agent_orchestration>
 
   <core_rules>
-| Rule | Priority | Description |
-|------|----------|-------------|
+| Rule | Pri | Description |
+|------|-----|-------------|
 | Workflow | 🟡 | Understand → Plan → TaskCreate → Execute → Validate |
-| Planning | 🔴 | Identify parallel operations explicitly |
-| Implementation | 🟡 | Complete features, resolve TODOs, use real implementations |
+| Planning | 🔴 | Identify parallel ops explicitly |
+| Implementation | 🟡 | Complete features, resolve TODOs, real impls |
 | Scope | 🟡 | Build only what's asked, YAGNI |
-| Trust | 🟢 | Trust internal code; validate at boundaries only |
-| Language | 🟢 | Normal language over CRITICAL/MUST intensity |
+| Trust | 🟢 | Trust internal code; validate at boundaries |
+| Language | 🟢 | Normal language over CRITICAL/MUST |
 | Git | 🔴 | Feature branches, incremental commits |
-| Failure | 🔴 | Root cause analysis, always run tests |
-| Honesty | 🟡 | Use factual language, evidence-based claims |
+| Failure | 🔴 | Root cause analysis, always test |
+| Honesty | 🟡 | Factual language, evidence-based |
   </core_rules>
 
   <anti_over_engineering>
-- Bug fix ≠ cleanup: Focus on the fix only
-- Simple feature ≠ configurable system: Build exactly what's requested
-- Unchanged code untouched: Preserve existing code as-is
+- Bug fix ≠ cleanup: Focus on fix only
+- Simple feature ≠ configurable system: Build exactly requested
+- Unchanged code untouched: Preserve existing as-is
 - Delete completely: Remove unused code entirely
   </anti_over_engineering>
 
   <decision_trees>
-- File operation → Read first → Check patterns → Edit/Create
+- File op → Read first → Check patterns → Edit/Create
 - New feature → Scope clear? → TaskCreate(3+ steps) → Execute
 - Tool selection → MCP > Native > Basic → Parallel when possible
   </decision_trees>
 
   <priority_actions>
-- 🔴 git status, read before edit, feature branches, root cause analysis
-- 🟡 TaskCreate/TaskUpdate for complex, complete implementations, MVP first
-- 🟢 Parallel operations, MCP tools, batch operations
+- 🔴 git status, read before edit, feature branches, root cause
+- 🟡 TaskCreate for complex, complete impls, MVP first
+- 🟢 Parallel ops, MCP tools, batch operations
   </priority_actions>
 
-  <dynamic_context note="Hook-triggered loading">
-- Directive: `<context-load file="path"/>` injected by UserPromptSubmit hook
-- Action: Use Read tool to load file content
-- Dedup: Hook tracks loaded files per session (temp file cache)
-- Skip: If content already visible in conversation, skip Read
+  <dynamic_context>
+- Hook injects `<context-load file="path"/>` on UserPromptSubmit
+- Dedup via temp file cache; skip if content visible
 - Benefit: ~70% token savings vs static @-references
   </dynamic_context>
 </component>

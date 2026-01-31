@@ -32,48 +32,23 @@
 | `--no-mcp` | native-only, perf priority | Disable all MCP, use native + WebSearch + Chrome |
   </mcp>
 
-  <native note="Built-in Claude Code features">
+  <native>
 | Flag | Trigger | Effect |
 |------|---------|--------|
 | `--chrome` | live browser, auth sessions, interactive | Native Chrome automation |
 | WebSearch | fact-check, current info | Native web search (no flag needed) |
   </native>
 
-  <effort note="Opus 4.5 - Primary reasoning depth control">
-| Flag | Effect | MCP Integration |
-|------|--------|-----------------|
-| `--effort low` | Minimal reasoning (~76% fewer tokens), fastest | None |
-| `--effort medium` | Balanced analysis (default) | Sequential on demand |
-| `--effort high` | Maximum reasoning depth, comprehensive analysis | Sequential + Context7 |
+  <effort note="Reasoning depth control (Opus 4.5)">
+| Flag | Effect | MCP | budget_tokens |
+|------|--------|-----|---------------|
+| `--effort low` | Minimal (~76% fewer tokens) | None | 1024 |
+| `--effort medium` | Balanced (default) | Sequential on demand | 4096 |
+| `--effort high` | Maximum depth, comprehensive | Sequential + Context7 | 10240-32768 |
+
+Legacy: `--think`→medium, `--think-hard`→high, `--ultrathink`→high+all-mcp
+Note: temperature incompatible with thinking; budget auto-scaled when alwaysThinkingEnabled=true
   </effort>
-
-  <think_flags note="Legacy compatibility - maps to --effort when alwaysThinkingEnabled=true">
-| Legacy Flag | Maps To | Behavior |
-|-------------|---------|----------|
-| `--think` | `--effort medium` | Standard analysis depth |
-| `--think-hard` | `--effort high` | Deep analysis with MCP |
-| `--ultrathink` | `--effort high` + all MCP | Maximum complexity handling |
-
-When `alwaysThinkingEnabled: true` (default for Opus 4.5):
-- Extended thinking is always active
-- Think flags serve as **complexity hints** rather than thinking toggles
-- Use `--effort` directly for explicit control
-  </think_flags>
-
-  <extended_thinking note="API budget_tokens - auto-managed when alwaysThinkingEnabled=true">
-| Parameter | Value | Notes |
-|-----------|-------|-------|
-| budget_tokens | 1024-32768 | Auto-scaled based on complexity |
-| minimum | 1024 | Hard minimum enforced by API |
-| default | 4096 | Standard tasks |
-| max_practical | 32768 | Complex multi-domain analysis |
-| temperature | INCOMPATIBLE | Do not set when thinking enabled |
-
-Legacy mapping (deprecated when alwaysThinkingEnabled=true):
-- `--think`: budget_tokens=4096 → now use `--effort medium`
-- `--think-hard`: budget_tokens=10240 → now use `--effort high`
-- `--ultrathink`: budget_tokens=32768 → now use `--effort high` + `--all-mcp`
-  </extended_thinking>
 
   <execution>
 | Flag | Trigger/Range | Effect |
@@ -101,28 +76,23 @@ Legacy mapping (deprecated when alwaysThinkingEnabled=true):
 - Scope: system > project > module > file
   </priority_rules>
 
-  <environment_variables note="Claude Code 2.1.x additions">
-| Variable | Purpose | Version |
-|----------|---------|---------|
-| `IS_DEMO` | Hide email/org from UI (streaming) | 2.1.0 |
-| `CLAUDE_CODE_FILE_READ_MAX_OUTPUT_TOKENS` | Override file read token limit | 2.1.0 |
-| `FORCE_AUTOUPDATE_PLUGINS` | Force plugin autoupdate | 2.1.2 |
-| `CLAUDE_CODE_DISABLE_BACKGROUND_TASKS` | Disable Ctrl+B backgrounding | 2.1.4 |
-| `CLAUDE_CODE_TMPDIR` | Override temp directory | 2.1.5 |
-| `CLAUDE_CODE_ENABLE_TASKS` | Enable TaskCreate/TaskUpdate/TaskList/TaskGet (replaces TodoWrite) | 2.1.19 |
-  </environment_variables>
-
-  <settings note="Claude Code 2.1.x additions">
-| Setting | Purpose | Version |
-|---------|---------|---------|
-| `language` | Response language (e.g., "japanese") | 2.1.0 |
-| `respectGitignore` | Per-project @-mention file picker control | 2.1.0 |
-| `showTurnDuration` | Hide "Cooked for Xm Xs" messages | 2.1.7 |
-| `plansDirectory` | Custom plan file storage location | 2.1.9 |
-| `keybindings` | Custom keyboard shortcut mappings | 2.1.18 |
-| `context_window.used_percentage` | Status line: context usage % | 2.1.6 |
-| `context_window.remaining_percentage` | Status line: context remaining % | 2.1.6 |
-  </settings>
+  <cc_features note="Claude Code 2.1.x">
+| Name | Type | Purpose | Ver |
+|------|------|---------|-----|
+| `IS_DEMO` | env | Hide email/org from UI | 2.1.0 |
+| `CLAUDE_CODE_FILE_READ_MAX_OUTPUT_TOKENS` | env | Override file read token limit | 2.1.0 |
+| `FORCE_AUTOUPDATE_PLUGINS` | env | Force plugin autoupdate | 2.1.2 |
+| `CLAUDE_CODE_DISABLE_BACKGROUND_TASKS` | env | Disable Ctrl+B backgrounding | 2.1.4 |
+| `CLAUDE_CODE_TMPDIR` | env | Override temp directory | 2.1.5 |
+| `CLAUDE_CODE_ENABLE_TASKS` | env | Enable Task tools (replaces TodoWrite) | 2.1.19 |
+| `language` | set | Response language (e.g., "japanese") | 2.1.0 |
+| `respectGitignore` | set | Per-project @-mention file picker | 2.1.0 |
+| `showTurnDuration` | set | Hide "Cooked for Xm Xs" messages | 2.1.7 |
+| `plansDirectory` | set | Custom plan file storage location | 2.1.9 |
+| `keybindings` | set | Custom keyboard shortcut mappings | 2.1.18 |
+| `context_window.used_percentage` | set | Status line: context usage % | 2.1.6 |
+| `context_window.remaining_percentage` | set | Status line: context remaining % | 2.1.6 |
+  </cc_features>
 
   <permission_patterns note="v2.1.0+ wildcard syntax">
 | Pattern | Example | Matches |
@@ -134,22 +104,13 @@ Legacy mapping (deprecated when alwaysThinkingEnabled=true):
 | MCP wildcard | `mcp__server__*` | All tools from an MCP server |
   </permission_patterns>
 
-  <argument_syntax note="v2.1.19+ skill argument passing">
-| Syntax | Description | Example |
-|--------|-------------|---------|
-| `$ARGUMENTS` | Full argument string | `/skill hello world` → `"hello world"` |
-| `$ARGUMENTS[0]` | First argument (bracket syntax) | `/skill hello world` → `"hello"` |
-| `$ARGUMENTS[1]` | Second argument | `/skill hello world` → `"world"` |
-| `$0` | Shorthand for `$ARGUMENTS[0]` | Same as bracket syntax |
-| `$1` | Shorthand for `$ARGUMENTS[1]` | Same as bracket syntax |
+  <argument_syntax note="v2.1.19+ skill args">
+| Syntax | Description | Example: `/skill hello world` |
+|--------|-------------|-------------------------------|
+| `$ARGUMENTS` | Full string | "hello world" |
+| `$ARGUMENTS[0]`, `$0` | First arg | "hello" |
+| `$ARGUMENTS[1]`, `$1` | Second arg | "world" |
 
-Usage in skill frontmatter:
-```yaml
----
-name: deploy
-description: Deploy to environment
----
-Deploy $ARGUMENTS[0] to $ARGUMENTS[1] environment.
-```
+Frontmatter usage: `Deploy $0 to $1 environment.`
   </argument_syntax>
 </component>
