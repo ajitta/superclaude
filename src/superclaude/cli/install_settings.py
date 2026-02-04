@@ -10,6 +10,8 @@ import re
 from pathlib import Path
 from typing import List, Tuple
 
+from superclaude.utils import atomic_write_json
+
 # Import line to add to CLAUDE.md
 CLAUDE_SC_IMPORT = "@superclaude/CLAUDE_SC.md"
 
@@ -55,8 +57,7 @@ def _save_settings(settings_file: Path, settings: dict) -> Tuple[bool, str]:
     """
     try:
         settings_file.parent.mkdir(parents=True, exist_ok=True)
-        with open(settings_file, "w", encoding="utf-8") as f:
-            json.dump(settings, f, indent=2, ensure_ascii=False)
+        atomic_write_json(settings_file, settings)
         return True, f"Settings saved to {settings_file}"
     except IOError as e:
         return False, f"Failed to save settings: {e}"

@@ -942,6 +942,51 @@ class ConfidenceChecker:
         """Get list of registered checks."""
         return list(self._checks)
 
+    def _build_result(
+        self,
+        evaluations: List[Tuple[ConfidenceCheck, bool, str]],
+        context: Dict[str, Any],
+    ) -> ConfidenceResult:
+        """Build ConfidenceResult from evaluated checks.
+
+        Args:
+            evaluations: List of (check, passed, message) tuples
+            context: Context dict (updated with backward-compat keys)
+
+        Returns:
+            ConfidenceResult with score, checks, and recommendation
+        """
+        total_weight = sum(c.weight for c, _, _ in evaluations)
+        if total_weight == 0:
+            total_weight = 1.0
+
+        score = 0.0
+        check_results: List[CheckResult] = []
+
+        for check, passed, message in evaluations:
+            if passed:
+                score += check.weight / total_weight
+
+            check_results.append(
+                CheckResult(
+                    name=check.name,
+                    passed=passed,
+                    message=message,
+                    weight=check.weight,
+                )
+            )
+
+        recommendation = self.get_recommendation(score)
+
+        # Backward compatibility: also store in context for legacy callers
+        context["confidence_checks"] = [
+            f"{'✅' if c.passed else '❌'} {c.message}" for c in check_results
+        ]
+
+        return ConfidenceResult(
+            score=score, checks=check_results, recommendation=recommendation
+        )
+
     def assess(self, context: Dict[str, Any]) -> ConfidenceResult:
         """
         Assess confidence level using registered checks.
@@ -963,41 +1008,12 @@ class ConfidenceChecker:
                 recommendation=self.get_recommendation(0.0),
             )
 
-        # Calculate total weight for normalization
-        total_weight = sum(c.weight for c in self._checks)
-        if total_weight == 0:
-            total_weight = 1.0  # Avoid division by zero
-
-        score = 0.0
-        check_results: List[CheckResult] = []
-
+        evaluations = []
         for check in self._checks:
             passed, message = check.evaluate(context)
-            normalized_weight = check.weight / total_weight
+            evaluations.append((check, passed, message))
 
-            if passed:
-                score += normalized_weight
-
-            check_results.append(
-                CheckResult(
-                    name=check.name,
-                    passed=passed,
-                    message=message,
-                    weight=check.weight,
-                )
-            )
-
-        # Build recommendation
-        recommendation = self.get_recommendation(score)
-
-        # Backward compatibility: also store in context for legacy callers
-        context["confidence_checks"] = [
-            f"{'✅' if c.passed else '❌'} {c.message}" for c in check_results
-        ]
-
-        return ConfidenceResult(
-            score=score, checks=check_results, recommendation=recommendation
-        )
+        return self._build_result(evaluations, context)
 
     async def assess_async(self, context: Dict[str, Any]) -> ConfidenceResult:
         """
@@ -1028,56 +1044,22 @@ class ConfidenceChecker:
                 recommendation=self.get_recommendation(0.0),
             )
 
-        # Calculate total weight for normalization
-        total_weight = sum(c.weight for c in self._checks)
-        if total_weight == 0:
-            total_weight = 1.0
-
-        score = 0.0
-        check_results: List[CheckResult] = []
-
+        evaluations = []
         for check in self._checks:
-            # Determine how to evaluate this check
             if _is_async_check(check):
-                # Async check - await it
                 passed, message = await check.evaluate_async(context)
             elif _has_sync_evaluate(check):
-                # Sync check - call normally
                 passed, message = check.evaluate(context)
             else:
-                # No valid evaluate method
                 warnings.warn(
                     f"Check '{getattr(check, 'name', 'unknown')}' has no valid "
                     "evaluate() or evaluate_async() method, skipping",
                     RuntimeWarning,
                 )
                 continue
+            evaluations.append((check, passed, message))
 
-            normalized_weight = check.weight / total_weight
-
-            if passed:
-                score += normalized_weight
-
-            check_results.append(
-                CheckResult(
-                    name=check.name,
-                    passed=passed,
-                    message=message,
-                    weight=check.weight,
-                )
-            )
-
-        # Build recommendation
-        recommendation = self.get_recommendation(score)
-
-        # Backward compatibility: also store in context for legacy callers
-        context["confidence_checks"] = [
-            f"{'✅' if c.passed else '❌'} {c.message}" for c in check_results
-        ]
-
-        return ConfidenceResult(
-            score=score, checks=check_results, recommendation=recommendation
-        )
+        return self._build_result(evaluations, context)
 
     def has_async_checks(self) -> bool:
         """Check if any registered checks require async evaluation."""

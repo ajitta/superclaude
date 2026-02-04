@@ -9,12 +9,9 @@ import sys
 from pathlib import Path
 
 import click
-import yaml
-
-# Add parent directory to path to import superclaude
-sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from superclaude import __version__
+from superclaude.hooks.inline_hooks import parse_frontmatter
 
 
 @click.group()
@@ -385,38 +382,6 @@ def doctor(verbose: bool):
         sys.exit(1)
 
 
-# =============================================================================
-# PM Agent CLI Commands - DISABLED
-# These commands use pm_agent Python implementation.
-# Skill-based approach (confidence.py) is preferred.
-# To re-enable: uncomment the blocks below
-# =============================================================================
-
-# @main.command()
-# @click.option("--task", "-t", help="Task name or description to check")
-# @click.option("--json", "output_json", is_flag=True, help="Output as JSON")
-# @click.option("--verbose", "-v", is_flag=True, help="Show detailed check results")
-# @click.option("--project-root", "-p", type=click.Path(exists=True), help="Project root directory")
-# def confidence(task: str, output_json: bool, verbose: bool, project_root: str):
-#     """Run pre-implementation confidence check (DISABLED - use /confidence-check skill)"""
-#     pass
-
-# @main.command("self-check")
-# @click.option("--tests-passed", "-t", is_flag=True, help="Mark tests as passed")
-# @click.option("--json", "output_json", is_flag=True, help="Output as JSON")
-# @click.option("--evidence", "-e", multiple=True, help="Evidence items")
-# def self_check(tests_passed: bool, output_json: bool, evidence: tuple):
-#     """Run post-implementation self-check protocol (DISABLED - use skill)"""
-#     pass
-
-# @main.command("token-budget")
-# @click.option("--complexity", "-c", type=click.Choice(["simple", "medium", "complex"]), default="medium")
-# @click.option("--json", "output_json", is_flag=True, help="Output as JSON")
-# def token_budget(complexity: str, output_json: bool):
-#     """Show token budget for task complexity (DISABLED - use skill)"""
-#     pass
-
-
 @main.command()
 @click.option(
     "--list",
@@ -514,14 +479,7 @@ def agents(list_only: bool, agent_name: str, tokens: bool, scope: str):
         content = agent_file.read_text(encoding="utf-8")
 
         # Parse frontmatter
-        match = re.match(r"^---\n(.*?)\n---", content, re.DOTALL)
-        if match:
-            try:
-                fm = yaml.safe_load(match.group(1))
-            except Exception:
-                fm = {}
-        else:
-            fm = {}
+        fm = parse_frontmatter(content)
 
         click.echo(f"📋 Agent: {agent_file.stem}\n")
         click.echo(f"   Name: {fm.get('name', agent_file.stem)}")
@@ -544,16 +502,10 @@ def agents(list_only: bool, agent_name: str, tokens: bool, scope: str):
         content = agent_file.read_text(encoding="utf-8")
 
         # Parse frontmatter for description
-        match = re.match(r"^---\n(.*?)\n---", content, re.DOTALL)
-        description = "N/A"
-        if match:
-            try:
-                fm = yaml.safe_load(match.group(1))
-                description = fm.get("description", "N/A")
-                if len(description) > 50:
-                    description = description[:47] + "..."
-            except Exception:
-                pass
+        fm = parse_frontmatter(content)
+        description = fm.get("description", "N/A")
+        if len(description) > 50:
+            description = description[:47] + "..."
 
         click.echo(f"   {agent_file.stem:25} {description}")
 
@@ -657,14 +609,7 @@ def skills(list_only: bool, skill_name: str, tokens: bool, scope: str):
         content = manifest.read_text(encoding="utf-8")
 
         # Parse frontmatter
-        match = re.match(r"^---\n(.*?)\n---", content, re.DOTALL)
-        if match:
-            try:
-                fm = yaml.safe_load(match.group(1))
-            except Exception:
-                fm = {}
-        else:
-            fm = {}
+        fm = parse_frontmatter(content)
 
         click.echo(f"📋 Skill: {skill_dir.name}\n")
         click.echo(f"   Name: {fm.get('name', skill_dir.name)}")
@@ -696,19 +641,11 @@ def skills(list_only: bool, skill_name: str, tokens: bool, scope: str):
         content = manifest.read_text(encoding="utf-8")
 
         # Parse frontmatter
-        match = re.match(r"^---\n(.*?)\n---", content, re.DOTALL)
-        description = "N/A"
-        context = ""
-        if match:
-            try:
-                fm = yaml.safe_load(match.group(1))
-                description = fm.get("description", "N/A")
-                if len(description) > 40:
-                    description = description[:37] + "..."
-                if fm.get("context") == "fork":
-                    context = " [fork]"
-            except Exception:
-                pass
+        fm = parse_frontmatter(content)
+        description = fm.get("description", "N/A")
+        if len(description) > 40:
+            description = description[:37] + "..."
+        context = " [fork]" if fm.get("context") == "fork" else ""
 
         click.echo(f"   {skill_dir.name:25} {description}{context}")
 

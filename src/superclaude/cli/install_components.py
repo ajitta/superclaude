@@ -24,6 +24,23 @@ from .install_settings import (
 )
 
 
+def _safe_target_path(target: Path, base_path: Path) -> bool:
+    """Check that a target path is safe (not a symlink to outside base_path).
+
+    Args:
+        target: Target path to validate
+        base_path: Expected base directory
+
+    Returns:
+        True if the path is safe, False if it's a symlink to an unexpected location
+    """
+    if not target.exists():
+        return True
+    resolved = target.resolve()
+    base_resolved = base_path.resolve()
+    return str(resolved).startswith(str(base_resolved))
+
+
 def install_component(
     component: str,
     base_path: Path = None,
@@ -63,6 +80,10 @@ def install_component(
                     continue
                 try:
                     if target_skill_dir.exists():
+                        if not _safe_target_path(target_skill_dir, target_dir):
+                            failed += 1
+                            failed_names.append(f"{skill_dir.name}: symlink outside target")
+                            continue
                         shutil.rmtree(target_skill_dir)
                     shutil.copytree(skill_dir, target_skill_dir)
                     installed += 1

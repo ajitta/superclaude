@@ -6,7 +6,7 @@ Handles listing available/installed components and full uninstallation.
 
 import shutil
 from pathlib import Path
-from typing import Dict, List, Tuple
+from typing import Any, Dict, List, Tuple
 
 from .install_paths import (
     COMPONENTS,
@@ -69,7 +69,7 @@ def list_installed_commands(base_path: Path = None) -> List[str]:
     return sorted(installed)
 
 
-def list_all_components(base_path: Path = None) -> Dict[str, Dict[str, any]]:
+def list_all_components(base_path: Path = None) -> Dict[str, Dict[str, Any]]:
     """
     List all components with their installation status.
 

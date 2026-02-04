@@ -15,6 +15,7 @@ from datetime import datetime
 from pathlib import Path
 
 from superclaude.hooks.hook_tracker import _ensure_tracker_dir, get_session_id
+from superclaude.utils import atomic_write_json
 
 # Storage for MCP fallback notifications
 MCP_FALLBACK_FILE = Path.home() / ".claude" / ".superclaude_hooks" / "mcp_fallbacks.json"
@@ -53,7 +54,7 @@ def _save_fallback_data(data: dict[str, dict[str, str]]) -> None:
     """Save fallback notification data."""
     _ensure_tracker_dir()
     try:
-        MCP_FALLBACK_FILE.write_text(json.dumps(data, indent=2))
+        atomic_write_json(MCP_FALLBACK_FILE, data)
     except OSError:
         pass
 

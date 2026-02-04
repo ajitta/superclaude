@@ -20,6 +20,8 @@ from datetime import datetime
 from pathlib import Path
 from typing import Literal
 
+from superclaude.utils import atomic_write_json
+
 # Default session TTL: 24 hours
 SESSION_TTL_SECONDS = 24 * 60 * 60
 
@@ -165,7 +167,7 @@ def _save_tracker_data(data: dict[str, SessionData]) -> None:
         }
 
     try:
-        HOOK_TRACKER_FILE.write_text(json.dumps(json_data, indent=2))
+        atomic_write_json(HOOK_TRACKER_FILE, json_data)
     except OSError:
         pass  # Silently fail if we can't write
 

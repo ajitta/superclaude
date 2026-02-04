@@ -83,6 +83,37 @@ MCP_SERVERS = {
 }
 
 
+def _mask_secret(text: str, secret: Optional[str]) -> str:
+    """Replace a secret value with a masked version in text.
+
+    Args:
+        text: Text that may contain the secret
+        secret: The secret to mask (if None, returns text unchanged)
+
+    Returns:
+        Text with secret replaced by masked version (last 4 chars visible)
+    """
+    if not secret or secret not in text:
+        return text
+    masked = f"***{secret[-4:]}" if len(secret) > 4 else "****"
+    return text.replace(secret, masked)
+
+
+def _mask_secrets_in_args(args: List[str], secret: Optional[str]) -> List[str]:
+    """Mask secrets in a list of command arguments.
+
+    Args:
+        args: Command argument list
+        secret: The secret to mask
+
+    Returns:
+        New list with secrets masked
+    """
+    if not secret:
+        return args
+    return [_mask_secret(arg, secret) for arg in args]
+
+
 def _run_command(cmd: List[str], **kwargs) -> subprocess.CompletedProcess:
     """
     Run a command with proper cross-platform shell handling.
@@ -103,16 +134,7 @@ def _run_command(cmd: List[str], **kwargs) -> subprocess.CompletedProcess:
     if platform.system() == "Windows":
         # On Windows, wrap command in 'cmd /c' to properly handle commands like npx
         cmd = ["cmd", "/c"] + cmd
-        return subprocess.run(cmd, **kwargs)
-    else:
-        # macOS/Linux: Use string format with proper shell to support aliases
-        cmd_str = " ".join(shlex.quote(str(arg)) for arg in cmd)
-
-        # Use the user's shell to execute the command, supporting aliases
-        user_shell = os.environ.get("SHELL", "/bin/bash")
-        return subprocess.run(
-            cmd_str, shell=True, env=os.environ, executable=user_shell, **kwargs
-        )
+    return subprocess.run(cmd, **kwargs)
 
 
 def check_prerequisites() -> Tuple[bool, List[str]]:
@@ -279,12 +301,16 @@ def install_mcp_server(
     cmd.extend(shlex.split(command))
 
     if dry_run:
-        click.echo(f"   [DRY RUN] Would run: {' '.join(cmd)}")
+        # Mask API keys in dry-run output
+        safe_cmd = _mask_secrets_in_args(cmd, api_key)
+        click.echo(f"   [DRY RUN] Would run: {' '.join(safe_cmd)}")
         return True
 
     try:
+        # Mask API keys in log output
+        safe_command = _mask_secret(command, api_key) if api_key else command
         click.echo(
-            f"   Running: claude mcp add --transport {transport} {server_name} -- {command}"
+            f"   Running: claude mcp add --transport {transport} {server_name} -- {safe_command}"
         )
         result = _run_command(cmd, capture_output=True, text=True, timeout=120)
 

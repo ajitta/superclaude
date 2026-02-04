@@ -51,9 +51,11 @@ ADDITIONAL_DIRS_ENABLED = (
     os.environ.get("CLAUDE_CODE_ADDITIONAL_DIRECTORIES_CLAUDE_MD", "0") == "1"
 )
 
-# Session tracking file (unique per working directory)
+# Session tracking file (unique per working directory, stored in user-private dir)
 SESSION_ID = hashlib.md5(os.getcwd().encode()).hexdigest()[:8]
-CACHE_FILE = Path(tempfile.gettempdir()) / f"claude_context_{SESSION_ID}.txt"
+_CACHE_DIR = Path.home() / ".claude" / ".superclaude_hooks"
+_CACHE_DIR.mkdir(parents=True, exist_ok=True)
+CACHE_FILE = _CACHE_DIR / f"claude_context_{SESSION_ID}.txt"
 
 
 # Base path for context files
