@@ -19,7 +19,8 @@
 - Task planning: Manual `<thinking>`
 - Simple tasks: Neither
 - Anti-pattern: Extended + Manual = redundant overhead. Choose one by complexity.
-- Flags: `--think`, `--think-hard`, `--ultrathink` → Extended Thinking | Sequential MCP → alternative path
+- Effort: `--effort low` (1K) | `--effort medium` (4K, Sequential) | `--effort high` (10-32K, Seq+C7)
+- Legacy: `--think`→medium, `--think-hard`→high, `--ultrathink`→high+all-mcp
   </thinking_strategy>
 
   <systems>

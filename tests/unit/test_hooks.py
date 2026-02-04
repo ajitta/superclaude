@@ -449,6 +449,15 @@ allowed-tools:
         assert is_tool_allowed("mcp__serena__search", allowed) is True
         assert is_tool_allowed("mcp__context7__query", allowed) is False
 
+    def test_is_tool_allowed_agent_pattern(self):
+        """Test Task(agent-name) pattern matching."""
+        from superclaude.hooks.inline_hooks import is_tool_allowed
+
+        allowed = ["Task(backend-architect)"]
+        assert is_tool_allowed("Task", allowed) is True
+        assert is_tool_allowed("Read", allowed) is False
+        assert is_tool_allowed("Bash", allowed) is False
+
     def test_is_tool_allowed_empty_list(self):
         """Test that empty allowed list means all tools allowed."""
         from superclaude.hooks.inline_hooks import is_tool_allowed

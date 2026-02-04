@@ -26,7 +26,7 @@ description: Feature and code implementation with intelligent persona activation
     5. Integrate: Docs + testing recs
   </flow>
 
-  <mcp servers="c7:patterns|seq:analysis|magic:UI|play:testing"/>
+  <mcp servers="c7|seq|magic|play"/>
   <personas p="arch|fe|be|sec|qa"/>
 
   <defaults effort="medium" tokens="1000">

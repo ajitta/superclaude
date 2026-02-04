@@ -29,7 +29,7 @@ description: Deep web research with adaptive planning and intelligent search
     <step n="7" effort="15%">Synthesize: Integration | Cross-source correlation | Report generation | Conclusions + recommendations</step>
   </flow>
 
-  <mcp servers="tavily:search|seq:reasoning|play:extraction|serena:persistence"/>
+  <mcp servers="tavily|seq|play|serena"/>
   <personas p="deep-research-agent"/>
 
   <depth_levels>

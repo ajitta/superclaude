@@ -26,7 +26,7 @@ description: Provide clear explanations of code, concepts, and system behavior w
     5. Validate: Accuracy + effectiveness
   </flow>
 
-  <mcp servers="seq:analysis|c7:patterns"/>
+  <mcp servers="seq|c7"/>
   <personas p="educator|arch|sec"/>
 
   <tools>

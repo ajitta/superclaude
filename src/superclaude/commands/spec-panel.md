@@ -25,7 +25,7 @@ description: Multi-expert specification review and improvement using renowned so
     5. Synthesize: Improvement roadmap
   </flow>
 
-  <mcp servers="seq:coordination|c7:patterns"/>
+  <mcp servers="seq|c7"/>
   <personas p="arch|qa|pm"/>
 
   <experts>

@@ -26,7 +26,7 @@ description: Provide development estimates for tasks, features, or projects with
     5. Track: Accuracy for improvement
   </flow>
 
-  <mcp servers="seq:analysis|c7:benchmarks"/>
+  <mcp servers="seq|c7"/>
   <personas p="arch|perf|pm"/>
 
   <tools>

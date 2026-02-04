@@ -41,7 +41,7 @@ description: Generate structured implementation workflows from PRDs and feature 
     - [ ] Quality gates defined and tracked
   </checklist>
 
-  <mcp servers="seq:analysis|c7:patterns|magic:UI|play:testing|morph:transform|serena:persistence"/>
+  <mcp servers="seq|c7|magic|play|morph|serena"/>
   <personas p="arch|anal|fe|be|sec|ops|pm"/>
 
   <tools>

@@ -26,7 +26,7 @@ description: Interactive requirements discovery through Socratic dialogue and sy
     5. Handoff: Actionable briefs for implementation
   </flow>
 
-  <mcp servers="seq:reasoning|c7:patterns|magic:UI|play:UX|morph:analysis|serena:persistence"/>
+  <mcp servers="seq|c7|magic|play|morph|serena"/>
   <personas p="arch|anal|fe|be|sec|ops|pm"/>
 
   <tools>

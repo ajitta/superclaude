@@ -41,7 +41,7 @@ description: Build, compile, and package projects with intelligent error handlin
     - [ ] Build report generated
   </checklist>
 
-  <mcp servers="play:validation"/>
+  <mcp servers="play"/>
   <personas p="devops"/>
 
   <tools>

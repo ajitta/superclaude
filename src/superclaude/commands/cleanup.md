@@ -42,7 +42,7 @@ description: Systematically clean up code, remove dead code, and optimize projec
     - [ ] Cleanup report generated
   </checklist>
 
-  <mcp servers="seq:analysis|c7:patterns"/>
+  <mcp servers="seq|c7"/>
   <personas p="arch|qual|sec"/>
 
   <tools>

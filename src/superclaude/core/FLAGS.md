@@ -1,6 +1,6 @@
 <component name="flags" type="core" priority="high">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
-  <triggers>flag|--|mode|mcp|think|effort|delegate|--chrome|native</triggers>
+  <triggers>flag|--|mode|mcp|think|effort|delegate|native</triggers>
 
   <role>
     <mission>Behavioral flags for Claude Code execution modes and tool selection</mission>
@@ -25,17 +25,16 @@
 | `--morph\|--morphllm` | bulk transforms, pattern edits | Morphllm: multi-file patterns |
 | `--serena` | symbol ops, project memory | Serena: semantic understanding |
 | `--play\|--playwright` | browser testing, E2E, visual | Playwright: browser automation |
-| `--perf\|--devtools` | perf audit, CLS, LCP, metrics | Chrome DevTools: performance analysis |
+| `--perf\|--devtools` | perf audit, CLS, LCP, metrics | DevTools: performance analysis |
 | `--tavily` | web search, real-time info | Tavily: web search |
 | `--frontend-verify` | UI testing, frontend debug | Playwright + DevTools + Serena |
 | `--all-mcp` | max complexity | Enable all MCP servers |
-| `--no-mcp` | native-only, perf priority | Disable all MCP, use native + WebSearch + Chrome |
+| `--no-mcp` | native-only, perf priority | Disable all MCP, use native + WebSearch |
   </mcp>
 
   <native>
-| Flag | Trigger | Effect |
+| Tool | Trigger | Effect |
 |------|---------|--------|
-| `--chrome` | live browser, auth sessions, interactive | Native Chrome automation |
 | WebSearch | fact-check, current info | Native web search (no flag needed) |
   </native>
 
@@ -73,6 +72,7 @@ Note: temperature incompatible with thinking; budget auto-scaled when alwaysThin
 - Effort: --effort high > --effort medium > --effort low
 - Legacy Think: --ultrathink → --effort high + --all-mcp
 - MCP: --no-mcp overrides individual flags
+- MCP Fallback: Notify on first use → auto fallback to native equivalent
 - Scope: system > project > module > file
   </priority_rules>
 

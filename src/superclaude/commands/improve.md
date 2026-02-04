@@ -26,7 +26,7 @@ description: Apply systematic improvements to code quality, performance, and mai
     5. Document: Summary + future recommendations
   </flow>
 
-  <mcp servers="seq:analysis|c7:patterns"/>
+  <mcp servers="seq|c7"/>
   <personas p="arch|perf|qual|sec"/>
 
   <tools>

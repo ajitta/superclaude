@@ -42,7 +42,7 @@ description: Execute tests with coverage analysis and automated quality reportin
     - [ ] Test report generated
   </checklist>
 
-  <mcp servers="play:e2e"/>
+  <mcp servers="play"/>
   <personas p="qa-specialist"/>
 
   <tools>

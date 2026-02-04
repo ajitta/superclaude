@@ -298,8 +298,9 @@ def is_tool_allowed(tool_name: str, allowed_tools: list[str]) -> bool:
                 return True
         elif pattern.startswith("Task(") and pattern.endswith(")"):
             # Agent pattern (e.g., Task(backend-architect))
-            agent_name = pattern[5:-1]
-            if tool_name == "Task" and agent_name in str(tool_name):
+            # At tool-name level, verify Task tool is allowed;
+            # agent-specific filtering requires argument-level inspection
+            if tool_name == "Task":
                 return True
         elif tool_name == pattern:
             # Exact match
