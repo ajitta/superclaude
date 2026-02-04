@@ -69,9 +69,9 @@ description: Comprehensive code analysis across quality, security, performance, 
   <bounds will="static analysis|severity-rated findings|detailed reports" wont="dynamic/runtime analysis|modify code|analyze external deps"/>
 
   <boundaries type="document-only" critical="true">
-    <rule>STOP after producing analysis report</rule>
-    <rule>DO NOT modify source code</rule>
-    <rule>DO NOT auto-fix issues (use /sc:improve or /sc:cleanup)</rule>
+    <rule>Produce analysis report, then complete</rule>
+    <rule>Preserve source code unchanged</rule>
+    <rule>Report issues; defer fixes to /sc:improve or /sc:cleanup</rule>
     <output>Analysis report with severity-rated findings</output>
   </boundaries>
 

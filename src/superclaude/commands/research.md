@@ -65,9 +65,9 @@ description: Deep web research with adaptive planning and intelligent search
   <bounds will="current info|intelligent search|evidence-based" wont="claims without sources|skip validation|restricted content"/>
 
   <boundaries type="document-only" critical="true">
-    <rule>STOP after producing research report</rule>
-    <rule>DO NOT implement based on research findings</rule>
-    <rule>DO NOT modify codebase</rule>
+    <rule>Produce research report, then complete</rule>
+    <rule>Defer implementation to /sc:implement</rule>
+    <rule>Preserve codebase unchanged</rule>
     <rule>Research and documentation only</rule>
     <output>Research report with citations and findings</output>
   </boundaries>

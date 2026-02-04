@@ -9,6 +9,8 @@ description: Session controller orchestrating investigation, implementation, and
     <mission>Session controller orchestrating investigation, implementation, and review workflows</mission>
   </role>
 
+  <syntax>/sc:agent [task-description]</syntax>
+
   <startup>
     - Check: git status --porcelain → 📊 Git: clean|X files|not a repo
     - Remind: 💡 Use /context to confirm token budget

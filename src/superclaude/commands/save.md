@@ -42,7 +42,7 @@ description: Session lifecycle management with Serena MCP integration for contex
     - [ ] Ready for /sc:load continuation
   </checklist>
 
-  <mcp servers="serena:memory|serena:persistence"/>
+  <mcp servers="serena"/>
 
   <tools>
     - write_memory/read_memory: Session context persistence
@@ -72,8 +72,8 @@ description: Session lifecycle management with Serena MCP integration for contex
   <bounds will="Serena integration|auto-checkpoints|discovery preservation" wont="operate without Serena|save without validation|override without checkpoint"/>
 
   <boundaries type="execution" critical="true">
-    <rule>EXECUTE session persistence</rule>
-    <rule>DO NOT modify project code</rule>
+    <rule>Execute session persistence</rule>
+    <rule>Preserve project code unchanged</rule>
     <rule>Validate data integrity before save</rule>
   </boundaries>
 

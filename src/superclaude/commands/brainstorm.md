@@ -56,10 +56,10 @@ description: Interactive requirements discovery through Socratic dialogue and sy
   <bounds will="ambiguous→concrete|multi-persona+MCP|cross-session persistence" wont="impl without discovery|override user vision|bypass systematic exploration"/>
 
   <boundaries type="document-only" critical="true">
-    <rule>STOP after producing requirements specification</rule>
-    <rule>DO NOT generate architecture diagrams or system designs</rule>
-    <rule>DO NOT write implementation code</rule>
-    <rule>DO NOT create file structures or scaffolding</rule>
+    <rule>Produce requirements specification, then complete</rule>
+    <rule>Focus on requirements; defer architecture to /sc:design</rule>
+    <rule>Defer implementation to /sc:implement</rule>
+    <rule>Defer scaffolding to /sc:implement</rule>
     <output>Requirements specification document only</output>
   </boundaries>
 

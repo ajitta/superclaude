@@ -68,8 +68,8 @@ description: Meta-system task orchestration with intelligent breakdown and deleg
   <bounds will="multi-domain decomposition|intelligent orchestration|meta-system ops" wont="replace domain commands|override user strategy|execute without analysis"/>
 
   <boundaries type="document-only" critical="true">
-    <rule>STOP after producing task hierarchy document</rule>
-    <rule>DO NOT execute implementation steps</rule>
+    <rule>Produce task hierarchy document, then complete</rule>
+    <rule>Defer implementation to /sc:task or /sc:implement</rule>
     <rule>Orchestration planning only</rule>
     <output>SPAWN_PLAN.md with task breakdown and dependencies</output>
   </boundaries>

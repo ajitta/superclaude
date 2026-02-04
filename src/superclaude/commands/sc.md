@@ -18,19 +18,35 @@ description: SuperClaude command dispatcher - main entry point for all features
   </triggers>
 
   <commands>
-    - research: Deep web research with parallel search
-    - index-repo: Repository indexing for context optimization
-    - agent: Launch specialized AI agents
-    - recommend: Get command recommendations
-    - brainstorm: Requirements discovery via Socratic dialogue
+    - agent: Session controller + workflow orchestration
     - analyze: Code analysis across quality/security/perf/arch
+    - brainstorm: Requirements discovery via Socratic dialogue
+    - build: Build, compile, package with error handling
+    - business-panel: Multi-expert business analysis
+    - cleanup: Dead code removal + structure optimization
     - design: System architecture + API design
+    - document: Focused documentation generation
+    - estimate: Development time/effort estimates
+    - explain: Code + concept explanations
+    - git: Intelligent git operations + PR integration
+    - help: Complete command reference
     - implement: Feature implementation + MCP integration
+    - improve: Code quality + performance improvements
+    - index: Project documentation + knowledge base
+    - index-repo: Repository indexing (94% token reduction)
+    - load: Session context loading (Serena)
+    - pm: Project Manager Agent (default orchestration)
+    - recommend: Get command recommendations
+    - reflect: Task reflection + validation
+    - research: Deep web research with parallel search
+    - save: Session context persistence
+    - select-tool: Intelligent MCP tool selection
+    - spawn: Meta-system task orchestration
+    - spec-panel: Multi-expert specification review
+    - task: Complex task workflow management
     - test: Test execution + coverage analysis
     - troubleshoot: Issue diagnosis + resolution
-    - load: Session context loading (Serena)
-    - save: Session context persistence
-    - help: Complete command reference
+    - workflow: PRD → implementation workflow
   </commands>
 
   <features>
@@ -52,10 +68,10 @@ description: SuperClaude command dispatcher - main entry point for all features
   </examples>
 
   <meta>
-    - version: SuperClaude v4.1.7
-    - package: superclaude 0.4.0
+    - version: SuperClaude v4.2.1+ajitta
+    - package: superclaude 4.2.1+ajitta
     - install: superclaude install
-    - docs: github.com/SuperClaude-Org/SuperClaude_Framework
+    - docs: github.com/ajitta/superclaude
   </meta>
 
   <bounds will="display commands|provide help|route to features" wont="execute without command|modify files"/>

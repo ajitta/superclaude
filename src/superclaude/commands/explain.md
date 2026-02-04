@@ -56,9 +56,9 @@ description: Provide clear explanations of code, concepts, and system behavior w
   <bounds will="clear explanations|persona expertise|framework integration" wont="explain without analysis|override standards|reveal sensitive"/>
 
   <boundaries type="document-only" critical="true">
-    <rule>STOP after providing explanation</rule>
-    <rule>DO NOT modify code while explaining</rule>
-    <rule>DO NOT implement suggestions from explanation</rule>
+    <rule>Provide explanation, then complete</rule>
+    <rule>Preserve code unchanged during explanation</rule>
+    <rule>Defer implementation to /sc:implement</rule>
     <output>Explanation text with examples</output>
   </boundaries>
 

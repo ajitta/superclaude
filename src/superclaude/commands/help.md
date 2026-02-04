@@ -21,6 +21,7 @@ description: List all available /sc commands and their functionality
   </flow>
 
   <commands>
+    - agent: Session controller + workflow orchestration
     - analyze: Code analysis: quality, security, performance, architecture
     - brainstorm: Requirements discovery via Socratic dialogue
     - build: Build, compile, package with error handling
@@ -30,13 +31,17 @@ description: List all available /sc commands and their functionality
     - document: Focused documentation generation
     - estimate: Development time/effort estimates
     - explain: Code + concept explanations
-    - git: Intelligent git operations
+    - git: Intelligent git operations + PR integration
     - help: This command reference
     - implement: Feature implementation + MCP integration
     - improve: Code quality + performance improvements
     - index: Project documentation + knowledge base
+    - index-repo: Repository indexing (94% token reduction)
     - load: Session context loading (Serena)
+    - pm: Project Manager Agent (default orchestration)
+    - recommend: Intelligent command recommendations
     - reflect: Task reflection + validation
+    - research: Deep web research with parallel search
     - save: Session context persistence
     - select-tool: Intelligent MCP tool selection
     - spawn: Meta-system task orchestration
@@ -65,10 +70,11 @@ description: List all available /sc commands and their functionality
       - --all-mcp: Enable all servers
       - --no-mcp: Native tools only
     </category>
-    <category name="Depth">
-      - --think: ~4K tokens, Sequential
-      - --think-hard: ~10K tokens, Seq+C7
-      - --ultrathink: ~32K tokens, all MCP
+    <category name="Effort">
+      - --effort low: ~1K tokens
+      - --effort medium: ~4K tokens, Sequential
+      - --effort high: ~10-32K tokens, Seq+C7
+      Legacy: --think→medium, --think-hard→high, --ultrathink→high+all-mcp
     </category>
     <category name="Control">
       - --delegate: Sub-agent parallel processing
@@ -87,7 +93,7 @@ description: List all available /sc commands and their functionality
   <priority_rules>
     - Safety: --safe-mode > --validate > optimization
     - Override: User flags > auto-detection
-    - Depth: --ultrathink > --think-hard > --think
+    - Effort: high > medium > low
     - MCP: --no-mcp overrides all MCP flags
     - Scope: system > project > module > file
   </priority_rules>

@@ -83,9 +83,9 @@ description: Git operations with intelligent commit messages and workflow optimi
   <bounds will="intelligent git ops|conventional commits|workflow guidance|PR status checks" wont="modify config without auth|destructive without confirm|complex merges requiring manual"/>
 
   <boundaries type="execution" critical="true">
-    <rule>EXECUTE git operations as requested</rule>
-    <rule>DO NOT force push without explicit confirmation</rule>
-    <rule>DO NOT modify git config without authorization</rule>
+    <rule>Execute git operations as requested</rule>
+    <rule>Require explicit user confirmation before force push</rule>
+    <rule>Require user authorization before modifying git config</rule>
     <rule>Destructive operations require explicit user approval</rule>
   </boundaries>
 

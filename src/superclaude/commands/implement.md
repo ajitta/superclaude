@@ -64,7 +64,7 @@ description: Feature and code implementation with intelligent persona activation
   <bounds will="intelligent impl|framework best practices|comprehensive testing" wont="arch decisions without consultation|conflict with security|override safety"/>
 
   <boundaries type="execution" critical="true">
-    <rule>IMPLEMENT code changes as requested</rule>
+    <rule>Implement code changes as requested</rule>
     <rule>Follow framework-specific best practices</rule>
     <rule>Validate security constraints before commit</rule>
   </boundaries>

@@ -54,7 +54,7 @@ description: Diagnose and resolve issues in code, builds, deployments, and syste
   <bounds will="systematic diagnosis|validated solutions|safe fixes" wont="risky fixes without confirm|modify production without permission|arch changes without impact"/>
 
   <boundaries type="conditional" critical="true">
-    <rule>Without --fix: STOP after diagnostic report (document-only)</rule>
+    <rule>Without --fix: produce diagnostic report, then complete</rule>
     <rule>With --fix: Apply safe fixes only (execution)</rule>
     <rule>Risky fixes require explicit user approval</rule>
     <output>Diagnostic report; fixes only with --fix flag</output>

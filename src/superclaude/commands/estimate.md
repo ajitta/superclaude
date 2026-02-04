@@ -56,9 +56,9 @@ description: Provide development estimates for tasks, features, or projects with
   <bounds will="systematic estimates|confidence intervals|multi-persona analysis" wont="guarantee accuracy|estimate without analysis|override benchmarks"/>
 
   <boundaries type="document-only" critical="true">
-    <rule>STOP after producing estimation report</rule>
-    <rule>DO NOT begin implementation</rule>
-    <rule>DO NOT create task tracking beyond estimation</rule>
+    <rule>Produce estimation report, then complete</rule>
+    <rule>Defer implementation to /sc:implement or /sc:workflow</rule>
+    <rule>Limit task tracking to estimation scope</rule>
     <output>Estimation report with breakdown and confidence intervals</output>
   </boundaries>
 

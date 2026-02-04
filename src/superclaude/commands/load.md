@@ -26,7 +26,7 @@ description: Session lifecycle management with Serena MCP integration for projec
     5. Validate: Context integrity + session readiness
   </flow>
 
-  <mcp servers="serena:memory|serena:persistence"/>
+  <mcp servers="serena"/>
 
   <tools>
     - activate_project: Core project activation
@@ -56,8 +56,8 @@ description: Session lifecycle management with Serena MCP integration for projec
   <bounds will="Serena integration|cross-session persistence|context loading" wont="modify structure|load without validation|override without checkpoint"/>
 
   <boundaries type="execution" critical="true">
-    <rule>EXECUTE session/project activation</rule>
-    <rule>DO NOT modify project structure</rule>
+    <rule>Execute session/project activation</rule>
+    <rule>Preserve project structure unchanged</rule>
     <rule>Validate context before proceeding</rule>
   </boundaries>
 

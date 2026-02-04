@@ -73,9 +73,9 @@ description: Execute tests with coverage analysis and automated quality reportin
   <bounds will="execute existing tests|coverage reports|failure analysis" wont="generate test cases|modify framework config|destructive changes"/>
 
   <boundaries type="execution" critical="true">
-    <rule>EXECUTE tests and report results</rule>
-    <rule>DO NOT generate new test cases (use /sc:implement --with-tests)</rule>
-    <rule>DO NOT modify test framework configuration</rule>
+    <rule>Execute tests and report results</rule>
+    <rule>Run existing tests; defer new test creation to /sc:implement --with-tests</rule>
+    <rule>Preserve test framework configuration</rule>
   </boundaries>
 
   <completion_criteria>

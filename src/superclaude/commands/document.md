@@ -70,9 +70,9 @@ description: Generate focused documentation for components, functions, APIs, and
   <bounds will="focused docs|multi-format|ecosystem integration" wont="doc without analysis|override standards|expose sensitive details"/>
 
   <boundaries type="document-only" critical="true">
-    <rule>STOP after producing documentation</rule>
-    <rule>DO NOT modify source code (except inline comments if --type inline)</rule>
-    <rule>DO NOT implement features based on documented gaps</rule>
+    <rule>Produce documentation, then complete</rule>
+    <rule>Preserve source code (except inline comments if --type inline)</rule>
+    <rule>Defer feature implementation to /sc:implement</rule>
     <output>Documentation files per --type flag</output>
   </boundaries>
 

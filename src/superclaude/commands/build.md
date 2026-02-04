@@ -72,10 +72,10 @@ description: Build, compile, and package projects with intelligent error handlin
   <bounds will="execute build|error analysis|optimization recs" wont="modify build config|install deps|deploy"/>
 
   <boundaries type="execution" critical="true">
-    <rule>EXECUTE build commands</rule>
-    <rule>DO NOT modify build configuration</rule>
-    <rule>DO NOT install or update dependencies</rule>
-    <rule>DO NOT deploy artifacts</rule>
+    <rule>Execute build commands</rule>
+    <rule>Preserve build configuration</rule>
+    <rule>Preserve current dependencies</rule>
+    <rule>Defer deployment to user or CI/CD</rule>
   </boundaries>
 
   <completion_criteria>

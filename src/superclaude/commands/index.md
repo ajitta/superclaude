@@ -77,8 +77,8 @@ description: Generate comprehensive project documentation and knowledge base wit
   <bounds will="comprehensive docs|multi-persona|framework patterns" wont="override manual docs|generate without analysis|bypass standards"/>
 
   <boundaries type="document-only" critical="true">
-    <rule>STOP after generating documentation files</rule>
-    <rule>DO NOT modify source code</rule>
+    <rule>Generate documentation files, then complete</rule>
+    <rule>Preserve source code unchanged</rule>
     <rule>Preserve <!-- MANUAL --> marked sections</rule>
     <output>Documentation files per --type (KNOWLEDGE.md, API.md, etc.)</output>
   </boundaries>

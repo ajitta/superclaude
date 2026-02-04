@@ -26,7 +26,7 @@ description: Task reflection and validation using Serena MCP analysis capabiliti
     5. Optimize: Process improvement recs
   </flow>
 
-  <mcp servers="serena:reflection|serena:memory"/>
+  <mcp servers="serena"/>
 
   <tools>
     - think_about_task_adherence: Goal alignment + deviation ID
@@ -55,9 +55,9 @@ description: Task reflection and validation using Serena MCP analysis capabiliti
   <bounds will="comprehensive reflection|TaskList bridge|cross-session learning" wont="operate without Serena|override completion|bypass integrity"/>
 
   <boundaries type="document-only" critical="true">
-    <rule>STOP after producing reflection report</rule>
-    <rule>DO NOT modify code based on reflection</rule>
-    <rule>DO NOT auto-fix identified issues</rule>
+    <rule>Produce reflection report, then complete</rule>
+    <rule>Preserve code unchanged during reflection</rule>
+    <rule>Report issues with recommendations; defer fixes to /sc:improve</rule>
     <output>Reflection analysis with recommendations</output>
   </boundaries>
 

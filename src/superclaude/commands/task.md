@@ -76,7 +76,7 @@ description: Execute complex tasks with intelligent workflow management and dele
   <bounds will="complex task coordination|hierarchical breakdown|MCP+persona orchestration|auto cleanup" wont="simple tasks|compromise quality|operate without validation"/>
 
   <boundaries type="execution" critical="true">
-    <rule>EXECUTE tasks via intelligent delegation</rule>
+    <rule>Execute tasks via intelligent delegation</rule>
     <rule>Quality gates enforced between phases</rule>
     <rule>Progress reported via TaskCreate/TaskUpdate</rule>
     <rule>Cleanup removes only completed/cancelled/stale tasks</rule>

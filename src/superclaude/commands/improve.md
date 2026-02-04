@@ -57,7 +57,7 @@ description: Apply systematic improvements to code quality, performance, and mai
   <bounds will="systematic improvements|multi-persona|safe refactoring" wont="risky changes without confirm|arch changes without impact analysis|override standards"/>
 
   <boundaries type="execution" critical="true">
-    <rule>IMPLEMENT improvements as requested</rule>
+    <rule>Implement improvements as requested</rule>
     <rule>Safe mode (--safe): Only non-breaking changes</rule>
     <rule>Interactive mode (--interactive): Confirm each change</rule>
   </boundaries>

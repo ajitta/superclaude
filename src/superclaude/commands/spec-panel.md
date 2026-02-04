@@ -26,7 +26,7 @@ description: Multi-expert specification review and improvement using renowned so
   </flow>
 
   <mcp servers="seq:coordination|c7:patterns"/>
-  <personas p="tech-writer|sys-arch|qual-eng"/>
+  <personas p="arch|qa|pm"/>
 
   <experts>
     - Wiegers (Requirements quality, SMART): "How would you validate this?"
@@ -65,9 +65,9 @@ description: Multi-expert specification review and improvement using renowned so
   <bounds will="expert-level review|actionable recs|multi-mode analysis" wont="replace human judgment|modify without consent|legal guarantees"/>
 
   <boundaries type="document-only" critical="true">
-    <rule>STOP after producing expert review document</rule>
-    <rule>DO NOT modify specifications</rule>
-    <rule>DO NOT implement based on review</rule>
+    <rule>Produce expert review document, then complete</rule>
+    <rule>Preserve specifications unchanged</rule>
+    <rule>Provide recommendations; defer implementation to /sc:implement</rule>
     <output>Expert review document with recommendations</output>
   </boundaries>
 

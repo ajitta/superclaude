@@ -44,9 +44,9 @@ description: Multi-expert business analysis with adaptive interaction modes
   <bounds will="multi-expert analysis|adaptive modes|comprehensive synthesis" wont="replace professional advice|make decisions for user"/>
 
   <boundaries type="document-only" critical="true">
-    <rule>STOP after producing business analysis document</rule>
-    <rule>DO NOT implement business decisions</rule>
-    <rule>DO NOT modify code or configurations</rule>
+    <rule>Produce business analysis document, then complete</rule>
+    <rule>Defer business decisions to stakeholders</rule>
+    <rule>Preserve code and configurations unchanged</rule>
     <output>Business analysis synthesis document</output>
   </boundaries>
 

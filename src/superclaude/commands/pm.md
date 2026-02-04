@@ -30,8 +30,8 @@ description: Project Manager Agent - Default orchestration that coordinates sub-
     7. Evaluate: PDCA continuous improvement
   </flow>
 
-  <mcp servers="seq|c7|magic|play|morph|serena|tavily|chrome"/>
-  <personas p="pm-agent"/>
+  <mcp servers="seq|c7|magic|play|morph|serena|tavily"/>
+  <personas p="pm"/>
 
   <mcp_phases>
     - Discovery: seq|c7
