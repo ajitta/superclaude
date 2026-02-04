@@ -8,7 +8,7 @@
       "--workdir", "/workspace",
       "python:3.11-slim",
       "bash", "-c",
-      "pip install uv && uv tool install serena-ai && uv tool run serena-ai start-mcp-server --context ide-assistant --project /workspace"
+      "pip install uv && uv tool install serena-ai && uv tool run serena-ai start-mcp-server --context claude-code --project /workspace"
     ]
   }
 }

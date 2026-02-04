@@ -50,7 +50,7 @@ MCP_SERVERS = {
         "name": "serena",
         "description": "Semantic code analysis and intelligent editing",
         "transport": "stdio",
-        "command": "uvx --from git+https://github.com/oraios/serena serena start-mcp-server --context ide-assistant --enable-web-dashboard false --enable-gui-log-window false",
+        "command": "uvx --from git+https://github.com/oraios/serena serena start-mcp-server --context claude-code --enable-web-dashboard false --enable-gui-log-window false",
         "required": False,
     },
     "morphllm-fast-apply": {
