@@ -1,6 +1,6 @@
 <component name="introspection" type="mode">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
-  <triggers>introspect|reflect|analyze reasoning|meta|self-analysis|--introspect</triggers>
+  <triggers>introspect|reflect|analyze reasoning|meta-cognitive|self-analysis|--introspect</triggers>
 
   <role>
     <mission>Meta-cognitive analysis mindset for self-reflection and reasoning optimization</mission>

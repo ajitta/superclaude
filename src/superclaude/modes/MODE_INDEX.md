@@ -11,11 +11,11 @@
 | Mode | Triggers | File |
 |------|----------|------|
 | Brainstorming | brainstorm, ideate, explore, explore ideas, maybe, thinking about, discuss, not sure, --brainstorm, --bs | MODE_Brainstorming.md |
-| DeepResearch | deep research, /sc:research, investigate, investigate thoroughly, explore, discover, analyze, comprehensive search, --research | MODE_DeepResearch.md |
+| DeepResearch | deep research, /sc:research, investigate, investigate thoroughly, discover, deep-research, --research | MODE_DeepResearch.md |
 | Orchestration | orchestrate, coordinate, parallel, multi-tool, resource, efficiency, batch, --orchestrate | MODE_Orchestration.md |
 | TaskManagement | task, manage, task manage, delegate, phase, milestone, --task-manage | MODE_Task_Management.md |
 | TokenEfficiency | compress, efficient, token, token efficient, brevity, --uc, --ultracompressed | MODE_Token_Efficiency.md |
-| Introspection | introspect, reflect, analyze reasoning, meta, self-analysis, --introspect | MODE_Introspection.md |
+| Introspection | introspect, reflect, analyze reasoning, meta-cognitive, self-analysis, --introspect | MODE_Introspection.md |
 | BusinessPanel | business, panel, expert, strategy, business panel, expert panel, strategy panel, christensen, porter, drucker, godin, taleb | MODE_Business_Panel.md |
   </mode_index>
 
@@ -27,10 +27,14 @@
 | Symbol ops | Serena MCP | Native search |
 | Pattern edits | Morphllm MCP | Edit (native) |
 | Docs lookup | Context7 MCP | Tavily/WebSearch |
-| Browser test | Playwright MCP | --chrome (native) |
+| Browser test | Playwright MCP | Native browser |
 | Web search | Tavily MCP | WebSearch (native) |
 | Perf metrics | DevTools MCP | Playwright |
   </tool_index>
+
+  <sequential_priority note="When multiple modes trigger Sequential MCP">
+    DeepResearch > TaskManagement > Orchestration
+  </sequential_priority>
 
   <context_thresholds>
 | Level | Tokens | Action |

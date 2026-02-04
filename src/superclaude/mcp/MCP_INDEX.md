@@ -18,8 +18,8 @@
 | Magic | Optional | magic, 21st, ui, component, /ui, --magic | Write (native) | MCP_Magic.md |
 | Playwright | Optional | playwright, browser, E2E, test, --play | --chrome (native) | MCP_Playwright.md |
 | DevTools | Optional | devtools, performance, CLS, LCP, --perf | Playwright | MCP_Chrome-DevTools.md |
-| Mindbase | Experimental | mindbase, memory, conversation, --mindbase | Serena memory | MCP_Mindbase.md |
-| Airis-Agent | Experimental | airis, confidence, repo index, --airis | Native | MCP_Airis-Agent.md |
+| Mindbase | Deprecated | mindbase, memory, conversation, --mindbase | Serena memory | MCP_Mindbase.md |
+| Airis-Agent | Deprecated | airis, confidence, repo index, --airis | Native | MCP_Airis-Agent.md |
   </mcp_index>
 
   <decision_flow>
@@ -56,7 +56,7 @@ Disable: Add MCPSearch to disallowedTools
   <native_features>
 | Feature | Flag | Use Case |
 |---------|------|----------|
-| Chrome Automation | --chrome | Live browser, auth sessions, GIF |
+| Chrome Automation | /chrome | Live browser, auth sessions, GIF |
 | Web Search | (none) | Fact-check, current info |
   </native_features>
 </component>

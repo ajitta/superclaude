@@ -9,6 +9,8 @@
 | `--task-manage` | Delegation, progressive enhancement |
 | `--orchestrate` | Tool matrix optimization, parallel thinking |
 | `--token-efficient` | Symbol communication, 30-50% reduction |
+| `--research` | Systematic investigation, evidence-based reasoning |
+| `--business-panel` | Multi-expert business analysis |
   </modes>
 
   <mcp note="Auto-loaded by hooks on flag trigger">

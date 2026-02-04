@@ -22,8 +22,8 @@ from typing import Literal
 
 from superclaude.utils import atomic_write_json
 
-# Default session TTL: 24 hours
-SESSION_TTL_SECONDS = 24 * 60 * 60
+# Default session TTL: 24 hours (configurable via SUPERCLAUDE_SESSION_TTL env var)
+SESSION_TTL_SECONDS = int(os.environ.get("SUPERCLAUDE_SESSION_TTL", 24 * 60 * 60))
 
 # Storage location for hook execution tracking
 HOOK_TRACKER_DIR = Path.home() / ".claude" / ".superclaude_hooks"
@@ -73,7 +73,7 @@ def get_session_id() -> str:
             if cached:
                 return cached
         except OSError:
-            pass
+            pass  # Best-effort: proceed to generate new session
 
     # Generate new session ID
     timestamp = datetime.now().isoformat()
@@ -87,7 +87,7 @@ def get_session_id() -> str:
     try:
         SESSION_FILE.write_text(session_id)
     except OSError:
-        pass
+        pass  # Best-effort: session still usable without cache
 
     return session_id
 
@@ -318,7 +318,7 @@ def reset_session() -> str:
         try:
             SESSION_FILE.unlink()
         except OSError:
-            pass
+            pass  # Best-effort: new session will be generated regardless
 
     # Clear any environment variable cache
     if "CLAUDE_SESSION_ID" in os.environ:

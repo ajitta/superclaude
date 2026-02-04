@@ -56,7 +56,7 @@ def _save_fallback_data(data: dict[str, dict[str, str]]) -> None:
     try:
         atomic_write_json(MCP_FALLBACK_FILE, data)
     except OSError:
-        pass
+        pass  # Best-effort: fallback still works without persistence
 
 
 def should_notify_fallback(mcp_name: str) -> tuple[bool, str]:
@@ -151,18 +151,23 @@ def cleanup_old_fallback_sessions(ttl_seconds: int = 24 * 60 * 60) -> int:
 
     sessions_to_remove = []
     for session_id, mcp_data in data.items():
-        # Check any MCP timestamp to determine session age
+        # Use the latest MCP timestamp to determine session age
+        latest_ts = None
+        invalid = False
         for timestamp in mcp_data.values():
             try:
-                notified = datetime.fromisoformat(timestamp)
-                if notified.timestamp() < cutoff:
-                    sessions_to_remove.append(session_id)
-                    cleaned += 1
-                break
+                ts = datetime.fromisoformat(timestamp).timestamp()
+                if latest_ts is None or ts > latest_ts:
+                    latest_ts = ts
             except (ValueError, AttributeError):
-                sessions_to_remove.append(session_id)
-                cleaned += 1
-                break
+                invalid = True
+        if invalid and latest_ts is None:
+            # All timestamps invalid — remove session
+            sessions_to_remove.append(session_id)
+            cleaned += 1
+        elif latest_ts is not None and latest_ts < cutoff:
+            sessions_to_remove.append(session_id)
+            cleaned += 1
 
     for session_id in sessions_to_remove:
         del data[session_id]

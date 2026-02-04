@@ -1,6 +1,8 @@
-<component name="mindbase" type="mcp">
+<component name="mindbase" type="mcp" status="deprecated">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
   <triggers>memory|conversation|session|semantic|embedding|pgvector|mindbase</triggers>
+
+  <deprecated>Standalone mindbase is deprecated. Use airis-mcp-gateway instead: https://github.com/agiletec-inc/airis-mcp-gateway</deprecated>
 
   <role>
     <mission>Semantic memory storage and retrieval using PostgreSQL with pgvector</mission>

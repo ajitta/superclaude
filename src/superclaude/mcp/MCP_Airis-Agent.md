@@ -1,6 +1,8 @@
-<component name="airis-agent" type="mcp">
+<component name="airis-agent" type="mcp" status="deprecated">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
   <triggers>confidence|research|index|optimize|sync|airis</triggers>
+
+  <deprecated>Standalone airis-agent is deprecated. Use airis-mcp-gateway instead: https://github.com/agiletec-inc/airis-mcp-gateway</deprecated>
 
   <role>
     <mission>Confidence checking, deep research, and repository indexing capabilities</mission>

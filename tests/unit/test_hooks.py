@@ -225,6 +225,51 @@ class TestHookTracker:
         )
 
 
+class TestMcpFallback:
+    """Tests for mcp_fallback.py functionality."""
+
+    def test_cleanup_old_fallback_sessions_uses_latest_timestamp(self, tmp_path: Path):
+        """Test that cleanup uses the latest timestamp across all MCPs in a session."""
+        import json
+        from datetime import datetime, timedelta
+        from unittest.mock import patch
+
+        fallback_file = tmp_path / "mcp_fallbacks.json"
+        tracker_dir = tmp_path
+
+        old_time = (datetime.now() - timedelta(hours=48)).isoformat()
+        recent_time = datetime.now().isoformat()
+
+        # Session has one old and one recent MCP timestamp
+        data = {
+            "session-old": {
+                "context7": old_time,
+                "tavily": old_time,
+            },
+            "session-mixed": {
+                "context7": old_time,
+                "tavily": recent_time,  # This is recent — session should survive
+            },
+        }
+        fallback_file.write_text(json.dumps(data))
+
+        with patch(
+            "superclaude.hooks.mcp_fallback.MCP_FALLBACK_FILE", fallback_file
+        ), patch(
+            "superclaude.hooks.mcp_fallback._ensure_tracker_dir",
+            lambda: None,
+        ):
+            from superclaude.hooks.mcp_fallback import cleanup_old_fallback_sessions
+
+            cleaned = cleanup_old_fallback_sessions(ttl_seconds=24 * 60 * 60)
+
+        # Only session-old should be cleaned; session-mixed has a recent timestamp
+        assert cleaned == 1
+        remaining = json.loads(fallback_file.read_text())
+        assert "session-old" not in remaining
+        assert "session-mixed" in remaining
+
+
 class TestInlineHooks:
     """Tests for inline_hooks.py functionality."""
 
