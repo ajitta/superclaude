@@ -39,7 +39,7 @@ description: Feature and code implementation with intelligent persona activation
   </defaults>
 
   <tools>
-    - Write/Edit/MultiEdit: Code generation
+    - Write/Edit: Code generation
     - Read/Grep/Glob: Project analysis
     - TaskCreate/TaskUpdate: Multi-file progress
     - Task: Large-scale delegation

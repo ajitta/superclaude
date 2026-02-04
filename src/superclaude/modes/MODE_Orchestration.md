@@ -22,7 +22,7 @@
 | Pattern edits | Morphllm MCP | Individual edits |
 | Docs | Context7 MCP | Web search |
 | Browser test | Playwright MCP | Unit tests |
-| Multi-file | MultiEdit | Sequential Edits |
+| Multi-file | Edit | Sequential Edits |
 | Infra config | WebFetch (official docs) | Assumption (prohibited) |
   </tool_matrix>
 

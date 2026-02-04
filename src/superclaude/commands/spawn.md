@@ -44,7 +44,7 @@ description: Meta-system task orchestration with intelligent breakdown and deleg
   <tools>
     - TaskCreate/TaskUpdate: Hierarchical breakdown (Epic→Story→Task)
     - Read/Grep/Glob: Dependency mapping
-    - Edit/MultiEdit/Write: Coordinated file ops
+    - Edit/Write: Coordinated file ops
     - Bash: System-level coordination
   </tools>
 

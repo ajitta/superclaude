@@ -85,13 +85,23 @@ Note: temperature incompatible with thinking; budget auto-scaled when alwaysThin
 | `CLAUDE_CODE_DISABLE_BACKGROUND_TASKS` | env | Disable Ctrl+B backgrounding | 2.1.4 |
 | `CLAUDE_CODE_TMPDIR` | env | Override temp directory | 2.1.5 |
 | `CLAUDE_CODE_ENABLE_TASKS` | env | Enable Task tools (replaces TodoWrite) | 2.1.19 |
+| `CLAUDE_CODE_DISABLE_EXPERIMENTAL_BETAS` | env | Disable beta headers (Bedrock/Vertex) | 2.1.25 |
+| `CLAUDE_ENV_FILE` | env | Custom env file path (SessionStart hooks) | 2.1.25 |
+| `CLAUDE_CODE_REMOTE` | env | Remote session indicator | 2.1.26 |
 | `language` | set | Response language (e.g., "japanese") | 2.1.0 |
 | `respectGitignore` | set | Per-project @-mention file picker | 2.1.0 |
 | `showTurnDuration` | set | Hide "Cooked for Xm Xs" messages | 2.1.7 |
 | `plansDirectory` | set | Custom plan file storage location | 2.1.9 |
 | `keybindings` | set | Custom keyboard shortcut mappings | 2.1.18 |
+| `reducedMotion` | set | Reduced motion mode | 2.1.30 |
 | `context_window.used_percentage` | set | Status line: context usage % | 2.1.6 |
 | `context_window.remaining_percentage` | set | Status line: context remaining % | 2.1.6 |
+| `--from-pr` | flag | Resume session linked to PR number/URL | 2.1.27 |
+| `--client-id/--client-secret` | flag | Pre-configured OAuth for MCP servers | 2.1.30 |
+| `/debug` | cmd | Troubleshoot current session | 2.1.30 |
+| `pages` (Read tool) | param | PDF page range (e.g., "1-5") | 2.1.30 |
+| Task metrics | status | Token count, tool uses, duration in Task results | 2.1.30 |
+| Permission precedence | rule | `ask` overrides `allow` at content level | 2.1.27 |
   </cc_features>
 
   <permission_patterns note="v2.1.0+ wildcard syntax">

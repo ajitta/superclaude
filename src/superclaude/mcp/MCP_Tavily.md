@@ -20,7 +20,7 @@ Avoid:
   </choose>
 
   <capabilities>
-Web: General searches | News: Time-filtered | Academic: Scholarly articles | Domains: Include/exclude | Extract: Full-text | Freshness: Recent priority | Multi-Round: Iterative
+Web: General searches | News: Time-filtered | Academic: Scholarly articles | Domains: Include/exclude | Extract: Full-text | Freshness: Recent priority | Multi-Round: Iterative | Research: Multi-source synthesis | Crawl: Site-wide content extraction | Map: URL structure discovery
   </capabilities>
 
   <synergy>
@@ -30,8 +30,18 @@ Web: General searches | News: Time-filtered | Academic: Scholarly articles | Dom
 - Serena: Tavily searches → Serena stores sessions
   </synergy>
 
+  <tools>
+| Tool | Purpose | When |
+|------|---------|------|
+| `tavily_search` | Web search with filtering | General queries, news, domain-specific |
+| `tavily_extract` | Extract content from URLs | Full-text from known URLs |
+| `tavily_research` | Multi-source synthesis | Comprehensive research tasks |
+| `tavily_crawl` | Site-wide extraction | Crawl from root URL with depth/breadth |
+| `tavily_map` | URL structure discovery | Map site structure before targeted extraction |
+  </tools>
+
   <search_patterns>
-Basic: query → ranked results | Domain: query + domains:[arxiv,github] | Time: query + recency:week|month|year | Deep: query + extract:true
+Basic: query → ranked results | Domain: query + domains:[arxiv,github] | Time: query + recency:week|month|year | Deep: query + extract:true | Research: input → multi-source synthesis | Crawl: url + depth + instructions → pages
   </search_patterns>
 
   <quality>Refine queries | Source diversity | Credibility filter | Dedupe | Relevance scoring</quality>

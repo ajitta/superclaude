@@ -388,7 +388,7 @@ def doctor(verbose: bool):
 # =============================================================================
 # PM Agent CLI Commands - DISABLED
 # These commands use pm_agent Python implementation.
-# Skill-based approach (confidence.ts) is preferred.
+# Skill-based approach (confidence.py) is preferred.
 # To re-enable: uncomment the blocks below
 # =============================================================================
 

@@ -60,11 +60,12 @@ hooks:
 | Serena | Symbol detection (Check 1) | Grep/Glob |
   </mcp_integration>
 
-  <usage note="See confidence.ts for interfaces">
-```typescript
-const checker = new ConfidenceChecker();
-const result = await checker.assess(context);
-if (result.score >= 0.9) { /* proceed */ }
+  <usage note="See confidence.py for interfaces">
+```python
+checker = ConfidenceChecker()
+result = checker.assess(context)
+if result >= 0.9:  # proceed
+    pass
 ```
   </usage>
 

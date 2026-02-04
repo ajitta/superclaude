@@ -47,7 +47,7 @@ description: Systematically clean up code, remove dead code, and optimize projec
 
   <tools>
     - Read/Grep/Glob: Analysis + pattern detection
-    - Edit/MultiEdit: Safe modification
+    - Edit: Safe modification
     - TaskCreate/TaskUpdate: Progress tracking
     - Task: Large-scale delegation
   </tools>

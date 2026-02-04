@@ -12,7 +12,7 @@ triggers: /skill-name, keyword1, keyword2
 user-invocable: true              # Visible in slash command menu (default: true for /skills/)
 context: inline|fork              # inline = same context, fork = sub-agent (v2.1.0+)
 agent: agent-name                 # Agent type for execution (v2.1.0+)
-model: haiku|sonnet|opus          # Override model for this skill (v2.0.28+)
+model: haiku|sonnet|opus          # Override model for this skill (v2.1.0+)
 mcp: c7:docs|tavily:search        # MCP dependencies
 allowed-tools:                    # YAML list format (v2.1.0+)
   - Read
@@ -21,7 +21,7 @@ allowed-tools:                    # YAML list format (v2.1.0+)
   - WebSearch
   - mcp__server__tool             # Specific MCP tool
   - mcp__server__*                # All tools from server (wildcard)
-disallowed-tools:                 # Explicit tool blocking (v2.0.30+)
+disallowed-tools:                 # Explicit tool blocking (v2.1.0+)
   - Bash
 
 hooks:                            # Inline hooks (v2.1.0+)
@@ -53,7 +53,7 @@ hooks:                            # Inline hooks (v2.1.0+)
 | `user-invocable` | boolean | true | Show in slash command menu |
 | `context` | string | inline | `inline` or `fork` (sub-agent) |
 | `agent` | string | - | Agent type for specialized behavior |
-| `model` | string | inherited | Override parent model |
+| `model` | string | inherited | Override parent model (v2.1.0+) |
 | `mcp` | string | - | MCP server dependencies |
 | `allowed-tools` | list | all | Whitelist of permitted tools |
 | `disallowed-tools` | list | none | Blacklist of blocked tools |
@@ -71,6 +71,7 @@ hooks:                            # Inline hooks (v2.1.0+)
 - Isolated memory and state
 - Can use different model
 - Progress visible in parent thread
+- Note: `context: fork` + `agent:` via Skill tool may not be honored (GitHub #17283)
 
 ## Skill Discovery
 

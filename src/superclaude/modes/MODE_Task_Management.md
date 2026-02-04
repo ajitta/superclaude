@@ -27,7 +27,7 @@
 | Task | Tool |
 |------|------|
 | Analysis | Sequential MCP |
-| Implementation | MultiEdit/Morphllm |
+| Implementation | Edit/Morphllm |
 | UI | Magic MCP |
 | Testing | Playwright MCP |
 | Docs | Context7 MCP |
@@ -43,7 +43,7 @@
 | blockers | Active impediments |
   </memory_schema>
 
-  <task_api note="v2.1.16+">
+  <task_api note="v2.1.19+">
 | Tool | Purpose |
 |------|---------|
 | TaskCreate | Create task: subject, description, activeForm → status: pending |

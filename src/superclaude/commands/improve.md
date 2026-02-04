@@ -31,7 +31,7 @@ description: Apply systematic improvements to code quality, performance, and mai
 
   <tools>
     - Read/Grep/Glob: Code analysis + opportunity ID
-    - Edit/MultiEdit: Safe modification + refactoring
+    - Edit: Safe modification + refactoring
     - TaskCreate/TaskUpdate: Multi-file progress tracking
     - Task: Large-scale improvement delegation
   </tools>

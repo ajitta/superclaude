@@ -9,7 +9,7 @@ description: Git operations with intelligent commit messages and workflow optimi
     <mission>Git operations with intelligent commit messages and workflow optimization</mission>
   </role>
 
-  <syntax>/sc:git [operation] [args] [--smart-commit] [--interactive] [--pr-status]</syntax>
+  <syntax>/sc:git [operation] [args] [--smart-commit] [--interactive] [--pr-status] [--from-pr PR#|URL]</syntax>
 
   <triggers>
     - Git ops: status, add, commit, push, pull, branch
@@ -17,6 +17,7 @@ description: Git operations with intelligent commit messages and workflow optimi
     - Repository workflow optimization
     - Branch management + merges
     - PR review status check (Claude Code 2.1.20+)
+    - Resume session from PR (Claude Code 2.1.27+)
   </triggers>
 
   <flow>
@@ -40,6 +41,7 @@ description: Git operations with intelligent commit messages and workflow optimi
     - Branch: Consistent naming + workflow
     - Recovery: Conflict resolution + restoration
     - PRStatus: gh pr view → review state → confidence check
+    - FromPR: --from-pr → checkout branch → load PR context → resume work
   </patterns>
 
   <pr_status_integration note="Claude Code 2.1.20+">
@@ -57,6 +59,15 @@ description: Git operations with intelligent commit messages and workflow optimi
     </usage>
   </pr_status_integration>
 
+  <from_pr note="Claude Code 2.1.27+">
+    <description>Resume session linked to a PR number or URL</description>
+    <usage>
+      - `claude --from-pr 123`: Checkout PR branch and load context
+      - `claude --from-pr https://github.com/org/repo/pull/123`: From URL
+      - Auto-linking: Sessions auto-linked to PRs created via `gh pr create`
+    </usage>
+  </from_pr>
+
   <examples>
 
 | Input | Output |
@@ -65,6 +76,7 @@ description: Git operations with intelligent commit messages and workflow optimi
 | `commit --smart-commit` | Conventional commit |
 | `merge feature-branch --interactive` | Guided merge |
 | `--pr-status` | Current branch PR review state |
+| `--from-pr 123` | Resume session from PR #123 |
 
   </examples>
 
