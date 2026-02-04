@@ -181,6 +181,105 @@ TRIGGER_MAP = [
     for pattern, path, priority in TRIGGER_MAP
 ]
 
+# v3.0: Instruction Injection Map
+# Short instruction strings (~25-80 tokens) replace full .md file injection (~500-750 tokens each)
+# Claude already has MCP tool descriptions from servers; these provide behavioral guidance only.
+# Full .md files remain source of truth; instructions are derived summaries.
+INSTRUCTION_MAP = {
+    # Modes - behavioral directives
+    "modes/MODE_Brainstorming.md": (
+        "Brainstorm mode: Socratic dialogue, probe assumptions, divergent→convergent thinking. "
+        "Present alternatives before committing. No implementation until user confirms direction. "
+        "Ask probing questions, challenge premises, explore edge cases."
+    ),
+    "modes/MODE_DeepResearch.md": (
+        "Deep research mode: Plan→Search→Analyze→Synthesize. Multi-source triangulation. "
+        "Every claim needs verification. Progressive drilling. Confidence scoring per finding. "
+        "Citation-ready output. Question biases."
+    ),
+    "modes/MODE_Introspection.md": (
+        "Introspection mode: Expose reasoning with markers — "
+        "🤔thinking 🎯target ⚡action 📊metrics 💡insight. "
+        "Show confidence levels, alternatives considered, and tradeoffs at each decision point."
+    ),
+    "modes/MODE_Orchestration.md": (
+        "Orchestration mode: Choose most powerful tool per task. "
+        "Identify independent ops for parallel execution. Wave→Checkpoint→Wave pattern. "
+        "Resource-aware batching. Maximize concurrent operations."
+    ),
+    "modes/MODE_Task_Management.md": (
+        "Task management mode: Plan→Phase→Task→Todo hierarchy. "
+        "Use TaskCreate for 3+ steps. Persistent cross-session tracking via write_memory. "
+        "Progressive enhancement. Dependency-aware sequencing."
+    ),
+    "modes/MODE_Token_Efficiency.md": (
+        "Token efficiency mode: Symbol-enhanced communication. "
+        "Context-aware abbreviation. Target 30-50% token reduction at ≥95% information quality. "
+        "Compressed formatting, tables over prose, code over explanation."
+    ),
+    "modes/MODE_Business_Panel.md": (
+        "Business panel mode: Multi-expert analysis with frameworks — "
+        "Christensen(disruption) Porter(competition) Drucker(management) Godin(marketing) Taleb(risk). "
+        "Adaptive interaction: strategic, innovation, risk debate, socratic."
+    ),
+    # MCP servers - tool awareness (Claude already has tool descriptions from MCP servers)
+    "mcp/MCP_Context7.md": (
+        "Context7 MCP: resolve-library-id → query-docs for official library documentation. "
+        "Version-specific. Use for imports, framework patterns, API compliance."
+    ),
+    "mcp/MCP_Sequential.md": (
+        "Sequential Thinking MCP: sequentialthinking tool for multi-step reasoning. "
+        "Numbered thoughts, revision, branching. Use for debug, architecture, security, "
+        "complex analysis with 3+ interconnected components."
+    ),
+    "mcp/MCP_Tavily.md": (
+        "Tavily MCP: tavily_search (web queries), tavily_research (multi-source synthesis), "
+        "tavily_extract (URL content), tavily_crawl (site crawling), tavily_map (URL discovery). "
+        "Use for current info, news, fact-checking."
+    ),
+    "mcp/MCP_Playwright.md": (
+        "Playwright MCP: Browser automation and E2E testing. Real rendering, screenshots, "
+        "user journeys, WCAG accessibility. Use for login flows, forms, visual validation."
+    ),
+    "mcp/MCP_Serena.md": (
+        "Serena MCP: Semantic code understanding — symbol ops, LSP, rename across codebase, "
+        "dependency tracking, project memory. Use for large projects, architectural understanding."
+    ),
+    "mcp/MCP_Morphllm.md": (
+        "Morphllm MCP: Pattern-based bulk code transformations. Style enforcement, "
+        "framework updates. Fast Apply with 30-50% token savings. Best for <10 files, "
+        "straightforward transforms. Not for semantic ops."
+    ),
+    "mcp/MCP_Magic.md": (
+        "Magic MCP (21st.dev): Modern UI component generation. Accessible, design-system "
+        "consistent. React/Vue/Angular. Use for production-ready buttons, forms, modals, cards."
+    ),
+    "mcp/MCP_Chrome-DevTools.md": (
+        "Chrome DevTools MCP: Core Web Vitals — CLS, LCP, FID, TTFB. CPU/memory profiling, "
+        "layout shift detection, render blocking analysis."
+    ),
+    "mcp/MCP_Mindbase.md": (
+        "Mindbase MCP: Semantic memory with pgvector. Auto-embedding, conversation persistence, "
+        "cross-session memory, semantic search."
+    ),
+    "mcp/MCP_Airis-Agent.md": (
+        "Airis MCP: airis_confidence_check (pre-implementation validation), "
+        "airis_deep_research (comprehensive research), airis_repo_index (structure indexing)."
+    ),
+    # Core supplementary
+    "core/BUSINESS_SYMBOLS.md": (
+        "Business symbols: 🎯target 📈growth 💰financial ⚖️tradeoffs 🏆competitive 🌊blue-ocean. "
+        "Use in business panel discussions for visual strategic communication."
+    ),
+    "core/BUSINESS_PANEL_EXAMPLES.md": (
+        "Business panel examples: /sc:business-panel @file with modes — "
+        "strategic, innovation, risk debate, socratic. Multi-perspective analysis patterns."
+    ),
+}
+
+# Environment variable to control instruction mode (default: enabled)
+USE_INSTRUCTIONS = os.environ.get("CLAUDE_CONTEXT_USE_INSTRUCTIONS", "1") == "1"
+
 # v2.1.0: Skills configuration
 SHOW_SKILLS_SUMMARY = os.environ.get("CLAUDE_SHOW_SKILLS", "1") == "1"
 
@@ -379,7 +478,12 @@ def check_mcp_fallbacks(contexts: list[tuple[str, int]]) -> list[str]:
 
 
 def output_inject_mode(contexts: list[tuple[str, int]]) -> None:
-    """Directly output file contents (deterministic, no Read dependency)."""
+    """Output context for triggered files.
+
+    v3.0: Instruction injection mode (default) outputs short instruction strings
+    instead of full file contents. ~86% token reduction for heavy sessions.
+    Set CLAUDE_CONTEXT_USE_INSTRUCTIONS=0 to revert to full file injection.
+    """
     total_tokens = 0
     loaded_files = []
     skipped_files = []
@@ -392,6 +496,19 @@ def output_inject_mode(contexts: list[tuple[str, int]]) -> None:
         print()
 
     for context_file, priority in contexts:
+        # v3.0: Try instruction injection first
+        if USE_INSTRUCTIONS and context_file in INSTRUCTION_MAP:
+            instruction = INSTRUCTION_MAP[context_file]
+            tokens = estimate_tokens(instruction)
+            total_tokens += tokens
+            loaded_files.append((context_file, tokens))
+            print(f"<sc-context src=\"{context_file}\">")
+            print(instruction)
+            print("</sc-context>")
+            print()
+            continue
+
+        # Fallback: full file injection for unmapped files
         file_path = BASE_PATH / context_file
         if not file_path.exists():
             continue
