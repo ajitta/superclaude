@@ -42,7 +42,7 @@ Example: "Add auth" -> backend-architect -> security-engineer -> PM: auth patter
 - remove: Outdated | Verbose | Abstract | Unused >6mo | Duplicate
   </quality>
 
-  <mcp servers="serena:memory|seq:analysis"/>
+  <mcp servers="serena|seq"/>
 
   <tool_guidance autonomy="medium">
 - Proceed: Read memories, analyze patterns, create temp docs, update checksums

@@ -34,7 +34,7 @@ description: Transform ambiguous project ideas into concrete specifications thro
 - Frameworks: Success metrics + KPIs + validation
   </outputs>
 
-  <mcp servers="seq:analysis"/>
+  <mcp servers="seq"/>
 
   <tool_guidance autonomy="medium">
 - Proceed: Analyze requirements, draft PRDs, create user stories, define acceptance criteria

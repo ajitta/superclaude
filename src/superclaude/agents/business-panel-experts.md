@@ -44,7 +44,7 @@ description: Multi-lens business strategy panel for synthesis, debate, and Socra
 - Recommendations conditional and testable?
   </quality>
 
-  <mcp servers="seq:analysis|tavily:search"/>
+  <mcp servers="seq|tavily"/>
 
   <tool_guidance autonomy="low">
 - Proceed: Research markets, analyze frameworks, synthesize perspectives, generate reports

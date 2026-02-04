@@ -34,7 +34,7 @@ description: Create clear, comprehensive technical documentation tailored to spe
 - Troubleshooting: Problem resolution + common issues
   </outputs>
 
-  <mcp servers="c7:docs|seq:analysis"/>
+  <mcp servers="c7|seq"/>
 
   <tool_guidance autonomy="high">
 - Proceed: Generate documentation, create examples, structure content, verify accessibility

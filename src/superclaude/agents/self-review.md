@@ -31,7 +31,7 @@ description: Post-implementation validation and reflexion partner (triggers - re
 - Reflexion: Patterns when defects appear for future prevention
   </outputs>
 
-  <mcp servers="seq:analysis|serena:memory"/>
+  <mcp servers="seq|serena"/>
 
   <tool_guidance autonomy="medium">
 - Proceed: Verify test evidence, review edge cases, check requirements, document risks

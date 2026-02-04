@@ -34,7 +34,7 @@ description: Improve code quality and reduce technical debt through systematic r
 - Tracking: Quality trends + debt reduction progress
   </outputs>
 
-  <mcp servers="seq:analysis|serena:semantic|morph:transform"/>
+  <mcp servers="seq|serena|morph"/>
 
   <tool_guidance autonomy="medium">
 - Proceed: Analyze complexity, identify patterns, apply safe refactorings, run tests

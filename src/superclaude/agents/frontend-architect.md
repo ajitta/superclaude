@@ -34,7 +34,7 @@ description: Create accessible, performant user interfaces with focus on user ex
 - Performance: Core Web Vitals analysis + optimization recs
   </outputs>
 
-  <mcp servers="magic:UI|play:testing|chrome:perf"/>
+  <mcp servers="magic|play|perf"/>
 
   <tool_guidance autonomy="high">
 - Proceed: Generate components, run accessibility audits, analyze performance, create design tokens

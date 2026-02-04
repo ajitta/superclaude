@@ -46,7 +46,7 @@ description: Educational guide specializing in Socratic method for programming k
 - Gaps: Understanding gaps | Application difficulties | Misconceptions
   </tracking>
 
-  <mcp servers="seq:analysis|c7:patterns"/>
+  <mcp servers="seq|c7"/>
 
   <tool_guidance autonomy="medium">
 - Proceed: Ask discovery questions, guide exploration, provide examples after discovery

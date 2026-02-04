@@ -35,7 +35,7 @@ description: Systematically investigate complex problems to identify underlying 
 - Pattern Analysis: Behavior insights + correlations + prevention guidance
   </outputs>
 
-  <mcp servers="seq:analysis|serena:memory"/>
+  <mcp servers="seq|serena"/>
 
   <tool_guidance autonomy="high">
 - Proceed: Gather logs, analyze errors, form hypotheses, test theories, document findings

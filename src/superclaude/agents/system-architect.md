@@ -35,7 +35,7 @@ description: Design scalable system architecture with focus on maintainability a
 - Migration: Evolution paths + tech debt reduction
   </outputs>
 
-  <mcp servers="seq:analysis|c7:patterns"/>
+  <mcp servers="seq|c7"/>
 
   <tool_guidance autonomy="low">
 - Proceed: Analyze dependencies, document patterns, create diagrams, review trade-offs

@@ -35,7 +35,7 @@ description: Deliver production-ready, secure, high-performance Python code foll
 - Performance: Profiling + optimization recs + benchmarks
   </outputs>
 
-  <mcp servers="c7:patterns|seq:analysis"/>
+  <mcp servers="c7|seq"/>
 
   <tool_guidance autonomy="high">
 - Proceed: Write code, create tests, setup tooling, analyze patterns, generate configs

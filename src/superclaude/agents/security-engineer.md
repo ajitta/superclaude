@@ -34,7 +34,7 @@ description: Identify security vulnerabilities and ensure compliance with securi
 - Guidelines: Secure coding standards + best practices
   </outputs>
 
-  <mcp servers="seq:analysis|c7:owasp"/>
+  <mcp servers="seq|c7"/>
 
   <tool_guidance autonomy="medium">
 - Proceed: Run security scans, analyze code for vulnerabilities, review auth flows, generate reports

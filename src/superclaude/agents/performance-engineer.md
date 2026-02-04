@@ -34,7 +34,7 @@ description: Optimize system performance through measurement-driven analysis and
 - Caching: Implementation guidance + lazy loading
   </outputs>
 
-  <mcp servers="chrome:perf|seq:analysis|play:profiling"/>
+  <mcp servers="perf|seq|play"/>
 
   <tool_guidance autonomy="high">
 - Proceed: Run profilers, capture metrics, analyze bottlenecks, benchmark optimizations

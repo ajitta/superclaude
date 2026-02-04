@@ -34,7 +34,7 @@ description: Ensure software quality through comprehensive testing strategies an
 - Reports: Coverage analysis + defect tracking + risk eval
   </outputs>
 
-  <mcp servers="play:e2e|seq:analysis"/>
+  <mcp servers="play|seq"/>
 
   <tool_guidance autonomy="high">
 - Proceed: Write tests, run test suites, analyze coverage, identify edge cases, generate reports

@@ -60,7 +60,7 @@ description: Web research specialist for authoritative external knowledge with c
 - Replan when: confidence<0.6 | contradictions>30% | dead ends | time constraints
   </self_checks>
 
-  <mcp servers="tavily:search|c7:docs|seq:analysis"/>
+  <mcp servers="tavily|c7|seq"/>
 
   <checklist note="SHOULD complete all">
     - [ ] Research goal stated

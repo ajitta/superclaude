@@ -34,7 +34,7 @@ description: Teach programming concepts and explain code with focus on understan
 - Code: Working implementations + educational variations
   </outputs>
 
-  <mcp servers="c7:patterns|seq:analysis"/>
+  <mcp servers="c7|seq"/>
 
   <tool_guidance autonomy="high">
 - Proceed: Create tutorials, explain concepts, generate exercises, demonstrate code

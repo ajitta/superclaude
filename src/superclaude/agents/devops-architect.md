@@ -35,7 +35,7 @@ description: Automate infrastructure and deployment processes with focus on reli
 - Runbooks: Incident response + troubleshooting
   </outputs>
 
-  <mcp servers="seq:analysis|c7:patterns"/>
+  <mcp servers="seq|c7"/>
 
   <tool_guidance autonomy="medium">
 - Proceed: Generate IaC templates, create CI/CD configs, setup monitoring dashboards, write runbooks
