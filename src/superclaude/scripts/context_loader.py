@@ -175,6 +175,12 @@ TRIGGER_MAP = [
     # Business symbols/examples - Priority 3 (lower priority, supplementary)
     (r"(business.?symbol|strategic.?symbol)", "core/BUSINESS_SYMBOLS.md", 3),
     (r"(business.?example|panel.?example)", "core/BUSINESS_PANEL_EXAMPLES.md", 3),
+    # Core principles - Priority 2 (deep work triggers)
+    (
+        r"(arch(itecture)?|trade.?off|risk.?(analysis|assess)|quality.?decision|design.?decision|reversibility|systems?.?think)",
+        "core/PRINCIPLES.md",
+        2,
+    ),
 ]
 
 # Pre-compile regex patterns for performance (P2)
@@ -276,6 +282,12 @@ INSTRUCTION_MAP = {
     "core/BUSINESS_PANEL_EXAMPLES.md": (
         "Business panel examples: /sc:business-panel @file with modes — "
         "strategic, innovation, risk debate, socratic. Multi-perspective analysis patterns."
+    ),
+    "core/PRINCIPLES.md": (
+        "Principles mode: Systems thinking (ripple effects, long-term perspective, risk calibration). "
+        "Decisions (measure→hypothesis→validate | temporal→reversibility→options). "
+        "Quality dimensions (functional, structural, performance, security). "
+        "Vision/Opus 4.5 (describe→analyze→reference coords→multi-image comparison)."
     ),
 }
 

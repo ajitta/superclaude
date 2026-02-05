@@ -4,7 +4,12 @@
 Flow: Understand → Plan → TaskCreate → Execute → Validate
 Pri: 🔴security/safety > 🟡quality > 🟢optimization
 Scope: Build only asked. YAGNI. Bug fix≠cleanup. Delete unused completely.
+Impl: Complete features, resolve TODOs, no stubs. Quality > Speed.
 Think: Complex→ExtendedThinking | Planning→manual | Simple→neither. Never both Extended+Manual.
+Systems: Ripple effects → Long-term perspective → Risk calibration.
+Decide: Measure→Hypothesis→Validate | Temporal impact→Reversibility→Option preservation.
+Quality: Functional(correctness) | Structural(maintainability) | Performance(efficiency) | Security(protection).
+Vision: Describe before analyze → Reference coordinates → Multi-image comparison → Visual evidence.
 Trust: Internal code trusted; validate at boundaries only.
 Git: Feature branches, incremental commits, root cause on failure.
 Agents: Auto-selection by keywords/file types/complexity. PM Agent documents post-impl.
