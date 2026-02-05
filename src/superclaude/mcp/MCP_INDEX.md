@@ -40,6 +40,54 @@ Notify only on first use when MCP not loaded → auto fallback
 Format: ⚠️ [MCP_NAME] unavailable → using [Fallback]
   </fallback_behavior>
 
+  <error_handling note="MCP failure recovery">
+    <error_taxonomy>
+| Error Type | Cause | Detection | Recovery |
+|------------|-------|-----------|----------|
+| API Timeout | Network latency, server overload | >30s response | Retry 2x with backoff → fallback |
+| Auth Failure | Invalid/expired API key | 401/403 response | Notify user, use fallback |
+| Rate Limit | Quota exceeded | 429 response | Wait + exponential backoff (1s→2s→4s) |
+| Schema Error | Invalid request format | 400 response | Log error, skip MCP, use fallback |
+| Server Error | MCP server crash | 500/502/503 | Retry 1x → fallback |
+| Not Loaded | MCP not in config | Tool not found | Silent fallback, notify on first use |
+    </error_taxonomy>
+
+    <recovery_flow>
+      1. Detect: Check response status/timeout
+      2. Classify: Map to error type above
+      3. Retry: If retryable (timeout, 5xx), attempt with backoff
+      4. Fallback: Use native equivalent from mcp_index table
+      5. Notify: Inform user on first fallback occurrence
+      6. Continue: Proceed with degraded capability
+    </recovery_flow>
+
+    <mcp_error_matrix>
+| MCP | Common Errors | Fallback Strategy |
+|-----|---------------|-------------------|
+| Context7 | Rate limit, library not found | Tavily search → WebSearch |
+| Tavily | API key invalid, rate limit | WebSearch (native) |
+| Sequential | Token budget exceeded | Native reasoning (reduce depth) |
+| Serena | LSP timeout, symbol not found | Native Grep/Glob search |
+| Morphllm | Pattern match failure | Edit tool (file by file) |
+| Magic | Component not found | Write tool (manual component) |
+| Playwright | Browser launch failure | Notify user, skip E2E |
+| DevTools | Chrome not available | Playwright metrics |
+    </mcp_error_matrix>
+
+    <notification_format>
+      - First failure: `⚠️ [MCP] error: [message] → using [Fallback]`
+      - Subsequent: Silent fallback (avoid noise)
+      - Critical: `🔴 [MCP] unavailable for session. Check API key or config.`
+    </notification_format>
+
+    <debugging>
+      - Verify MCP loaded: Check claude_desktop_config.json
+      - Enable debug: Set MCP server log level to debug
+      - Test connectivity: `mcp__[server]__health_check` if available
+      - Manual fallback: Use `--no-mcp` flag to bypass all MCPs
+    </debugging>
+  </error_handling>
+
   <auto_mode note="v2.1.7+">
 When MCP tool descriptions exceed 10% of context → defer to MCPSearch tool
 Disable: Add MCPSearch to disallowedTools

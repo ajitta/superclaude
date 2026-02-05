@@ -84,6 +84,59 @@ Each agent includes:
 - **Behavioral Guidelines**: How the agent approaches problems
 - **Output Format**: Structured response patterns
 - **Tool Preferences**: Recommended tools for the domain
+- **Autonomy Level**: Permission boundaries for actions
+
+## Autonomy Framework
+
+Agents operate under three autonomy levels that define permission boundaries:
+
+### Level Definitions
+
+| Level | Permission | Actions | User Interaction |
+|-------|------------|---------|------------------|
+| **high** | Proceed without asking | Read-only analysis, code generation, reporting, documentation | Inform after completion |
+| **medium** | Ask first for significant changes | Config modifications, API changes, dependency updates | Confirm before execution |
+| **low** | Ask first for all decisions | Architecture changes, tech stack decisions, boundary changes | Confirm each major step |
+
+### Autonomy by Agent
+
+| Agent | Autonomy | Rationale |
+|-------|----------|-----------|
+| `deep-research` | high | Read-only web research, no code changes |
+| `python-expert` | high | Code generation/analysis, user reviews output |
+| `frontend-architect` | high | UI patterns/components, no infrastructure changes |
+| `quality-engineer` | high | Test strategy/analysis, non-destructive |
+| `backend-architect` | medium | API contracts affect multiple systems |
+| `security-engineer` | medium | Security changes require review |
+| `pm-agent` | medium | Orchestration decisions need oversight |
+| `devops-architect` | medium | Infrastructure changes are significant |
+| `system-architect` | low | Architecture decisions have broad impact |
+| `refactoring-expert` | low | Structural changes need careful review |
+
+### Tool Guidance Semantics
+
+Each agent's `<tool_guidance>` section follows these rules:
+
+```xml
+<tool_guidance autonomy="level">
+  <proceed conditions="read-only|analysis|non-binding|hypothesis">
+    Actions that don't change state or make commitments
+  </proceed>
+  <ask_first conditions="state-change|binding-decision|cross-boundary">
+    Actions that modify code, config, or affect other systems
+  </ask_first>
+  <never conditions="destructive|irreversible|unilateral">
+    Actions that could cause data loss or bypass review
+  </never>
+</tool_guidance>
+```
+
+### Escalation Rules
+
+1. **Uncertainty**: When unsure about scope → escalate to `ask_first`
+2. **Cross-boundary**: When action affects another agent's domain → escalate
+3. **Risk**: When action has >10% chance of breaking change → escalate
+4. **Context pressure**: When context >85% → compress output, don't skip steps
 
 ## For Developers
 

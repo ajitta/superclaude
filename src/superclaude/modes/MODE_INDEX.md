@@ -36,6 +36,30 @@
     DeepResearch > TaskManagement > Orchestration
   </sequential_priority>
 
+  <conflict_resolution note="Multi-mode trigger handling">
+| Scenario | Resolution | Example |
+|----------|------------|---------|
+| 2+ modes trigger | Higher priority wins | research + task → DeepResearch |
+| Same priority | User intent determines | Explicit flag takes precedence |
+| Context pressure (>85%) | TokenEfficiency overrides | Any mode + Red context → --uc first |
+| Explicit flag | Always wins | --brainstorm overrides auto-detection |
+
+    <rules>
+      1. Explicit user flag > auto-detected mode
+      2. Safety modes (--safe-mode, --validate) > all other modes
+      3. TokenEfficiency activates as overlay, not replacement
+      4. Sequential MCP: Only highest-priority mode gets budget
+      5. Tie-break: Ask user via AskUserQuestion
+    </rules>
+
+    <examples>
+      - `--research --task-manage` → DeepResearch (higher priority)
+      - `--brainstorm` at 90% context → Brainstorming + auto --uc overlay
+      - `--effort high --no-mcp` → --no-mcp wins (explicit override)
+      - Ambiguous intent → Prompt: "Multiple approaches possible. Prefer research or task management?"
+    </examples>
+  </conflict_resolution>
+
   <context_thresholds>
 | Level | Tokens | Action |
 |-------|--------|--------|

@@ -58,4 +58,17 @@ description: Ultra-intelligent command recommendation engine for optimal SuperCl
   </examples>
 
   <bounds will="intelligent mapping|project context|expertise adaptation" wont="execute commands|make assumptions without context"/>
+
+  <boundaries type="document-only" critical="true">
+    <rule>Provide recommendations only, then complete</rule>
+    <rule>Do not execute recommended commands automatically</rule>
+    <rule>Do not modify files or project state</rule>
+    <output>Prioritized command recommendations with justification</output>
+  </boundaries>
+
+  <handoff>
+    <next command="(recommended)">Execute the suggested command</next>
+    <next command="/sc:help">For detailed command documentation</next>
+    <format>Copy-paste ready command with flags</format>
+  </handoff>
 </component>

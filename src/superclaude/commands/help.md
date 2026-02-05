@@ -99,4 +99,17 @@ description: List all available /sc commands and their functionality
   </priority_rules>
 
   <bounds will="display commands|flags|usage" wont="execute|create files|activate modes"/>
+
+  <boundaries type="document-only" critical="true">
+    <rule>Display reference information only, then complete</rule>
+    <rule>Do not execute any commands automatically</rule>
+    <rule>Do not modify files or project state</rule>
+    <output>Command and flag reference documentation</output>
+  </boundaries>
+
+  <handoff>
+    <next command="/sc:recommend">For intelligent command suggestions</next>
+    <next command="/sc:[command]">Execute specific command</next>
+    <format>Reference documentation for user selection</format>
+  </handoff>
 </component>
