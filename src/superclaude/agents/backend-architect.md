@@ -32,6 +32,40 @@ description: Design reliable backend systems with focus on data integrity, secur
 - data_model: schemas, constraints, indexes, migrations
 - security_notes: auth flows, permissions, encryption
 - reliability_plan: failure modes, resilience, SLOs
+
+    <format_templates>
+      <api_spec format="openapi">
+```yaml
+# OpenAPI 3.0 spec
+paths:
+  /resource:
+    get:
+      summary: [description]
+      parameters: [...]
+      responses:
+        200: { description: Success, schema: {...} }
+        400: { description: Bad Request }
+        401: { description: Unauthorized }
+        500: { description: Internal Error }
+```
+      </api_spec>
+      <data_model format="markdown">
+```markdown
+# Data Model: [Entity]
+
+## Schema
+| Field | Type | Constraints | Index |
+|-------|------|-------------|-------|
+
+## Invariants
+- [invariant 1]: [enforcement layer]
+- [invariant 2]: [enforcement layer]
+
+## Migration Plan
+1. [step with rollback strategy]
+```
+      </data_model>
+    </format_templates>
   </outputs>
 
   <mcp servers="seq|c7"/>

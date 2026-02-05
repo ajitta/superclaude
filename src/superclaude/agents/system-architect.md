@@ -33,6 +33,41 @@ description: Design scalable system architecture with focus on maintainability a
 - Scalability: Growth strategies + bottleneck mitigation
 - Patterns: Architecture implementations + compliance
 - Migration: Evolution paths + tech debt reduction
+
+    <format_templates>
+      <architecture_diagram format="mermaid">
+```mermaid
+graph TB
+    subgraph [Component Group]
+        A[Service A] --> B[Service B]
+        B --> C[(Database)]
+    end
+    A --> D[External API]
+```
+      </architecture_diagram>
+      <decision_record format="markdown">
+```markdown
+# ADR-[number]: [Title]
+
+## Status: Proposed | Accepted | Deprecated
+
+## Context
+[Problem statement and constraints]
+
+## Decision
+[Chosen approach]
+
+## Consequences
+- ✅ [Benefit 1]
+- ✅ [Benefit 2]
+- ⚠️ [Trade-off 1]
+- ❌ [Risk 1]
+
+## Alternatives Considered
+| Option | Pros | Cons | Rejected Because |
+```
+      </decision_record>
+    </format_templates>
   </outputs>
 
   <mcp servers="seq|c7"/>

@@ -1,6 +1,6 @@
 <component name="brainstorming" type="mode">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
-  <triggers>brainstorm|explore|ideate|maybe|thinking about|discuss|not sure|--brainstorm|--bs</triggers>
+  <triggers>brainstorm|explore|explore ideas|ideate|maybe|thinking about|discuss|not sure|--brainstorm|--bs</triggers>
 
   <role>
     <mission>Collaborative discovery mindset for interactive requirements exploration and creative problem solving</mission>

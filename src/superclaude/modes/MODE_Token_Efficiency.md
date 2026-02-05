@@ -13,17 +13,25 @@
 - Structure: Bullets, tables, concise over verbose
   </behaviors>
 
-  <context_limits>
-| Threshold | Tokens | Action |
-|-----------|--------|--------|
-| Usable | ~176K | Full capabilities |
-| Degradation | >200K | Performance drops |
-| Warning | 75% | Trigger --token-efficient |
-| Critical | 85% | Trigger --safe-mode, auto --uc |
-| Maximum | 200K | Context window full |
+  <context_limits note="Percentage-based thresholds (aligned with MODE_INDEX.md)">
+| Level | Usage | Action |
+|-------|-------|--------|
+| Green | 0-75% | Full capabilities, all tools, normal verbosity |
+| Yellow | 75-85% | Efficiency mode, reduce verbosity, defer non-critical |
+| Red | 85%+ | Essential only, auto --uc, minimal output |
 
-Status line (v2.1.6+): context_window.used_percentage | context_window.remaining_percentage
-Best practices: Monitor before complex ops | /clear between tasks | Fresh sessions | One major task/session
+    <monitoring>
+      - Status line (v2.1.6+): context_window.used_percentage
+      - Check before complex ops: Glob large dirs, multi-file reads
+      - /clear between major tasks for fresh context
+    </monitoring>
+
+    <best_practices>
+      - One major task per session for optimal performance
+      - Use --uc proactively when approaching 75%
+      - Prefer symbol communication at Yellow threshold
+      - Fresh sessions for unrelated tasks
+    </best_practices>
   </context_limits>
 
   <symbols>

@@ -32,6 +32,40 @@ description: Ensure software quality through comprehensive testing strategies an
 - Test Cases: Scenarios + edge cases + negative testing
 - Automation: Framework + CI/CD + coverage reporting
 - Reports: Coverage analysis + defect tracking + risk eval
+
+    <format_templates>
+      <test_strategy>
+```markdown
+# Test Strategy: [Feature/Module]
+
+## Risk Assessment
+| Area | Risk Level | Priority | Rationale |
+|------|------------|----------|-----------|
+
+## Coverage Targets
+- Line: ≥80%
+- Branch: ≥70%
+- Critical Path: 100%
+
+## Test Types
+- Unit: [scope]
+- Integration: [scope]
+- E2E: [scope]
+```
+      </test_strategy>
+      <test_case format="markdown|yaml">
+```yaml
+# test_cases.yaml
+- id: TC001
+  name: [descriptive name]
+  type: unit|integration|e2e
+  priority: P0|P1|P2
+  steps: [...]
+  expected: [...]
+  edge_cases: [...]
+```
+      </test_case>
+    </format_templates>
   </outputs>
 
   <mcp servers="play|seq"/>

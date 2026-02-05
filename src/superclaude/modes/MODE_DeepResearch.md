@@ -26,6 +26,26 @@
 - Emphasizes TaskCreate/TaskUpdate for task tracking
   </integration>
 
+  <extended_thinking note="Opus 4.5 integration">
+    <activation>
+      - Auto: Complex reasoning (hypothesis testing, multi-source synthesis)
+      - Manual: --effort high flag
+      - Budget: 10K-32K tokens for extended analysis
+    </activation>
+    <when_to_use>
+      - Multi-step hypothesis testing
+      - Conflicting source resolution
+      - Cross-domain synthesis
+      - Evidence chain construction
+    </when_to_use>
+    <behavior>
+      - Do NOT add manual "think step-by-step" (redundant with Extended Thinking)
+      - Let model manage reasoning budget autonomously
+      - Focus prompts on WHAT not HOW to think
+    </behavior>
+    <reference>See PRINCIPLES.md thinking_strategy for effort mappings</reference>
+  </extended_thinking>
+
   <quality>Source credibility paramount | Contradiction resolution required | Confidence scoring mandatory | Citation completeness essential</quality>
 
   <output>Structured reports | Clear evidence | Transparent methodology | Actionable insights</output>

@@ -1,6 +1,6 @@
 <component name="orchestration" type="mode">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
-  <triggers>orchestrate|coordinate|parallel|multi-tool|resource|efficiency</triggers>
+  <triggers>orchestrate|coordinate|parallel|multi-tool|resource|efficiency|batch|--orchestrate</triggers>
 
   <role>
     <mission>Intelligent tool selection mindset for optimal task routing and resource efficiency</mission>
