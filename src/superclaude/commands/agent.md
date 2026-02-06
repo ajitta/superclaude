@@ -1,7 +1,7 @@
 ---
 description: Session controller orchestrating investigation, implementation, and review workflows
 ---
-<component name="sc:agent" type="command">
+<component name="agent" type="command">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
 
   <role>

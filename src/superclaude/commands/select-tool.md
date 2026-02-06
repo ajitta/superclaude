@@ -27,6 +27,7 @@ description: Intelligent MCP tool selection based on complexity scoring and oper
   </flow>
 
   <mcp servers="serena|morph"/>
+  <personas p="arch"/>
 
   <decision_matrix>
     - Symbol ops: Serena (LSP, navigation)
@@ -47,6 +48,13 @@ description: Intelligent MCP tool selection based on complexity scoring and oper
     - decision-time: <100ms
     - accuracy: >95%
   </performance>
+
+  <checklist note="SHOULD complete all">
+    - [ ] Operation complexity scored
+    - [ ] Optimal tool selected via matrix
+    - [ ] Selection rationale provided (if --explain)
+    - [ ] Fallback strategy identified
+  </checklist>
 
   <examples>
 

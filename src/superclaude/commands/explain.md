@@ -42,6 +42,13 @@ description: Provide clear explanations of code, concepts, and system behavior w
     - Interactive: Static → examples → exploration
   </patterns>
 
+  <checklist note="SHOULD complete all">
+    - [ ] Target code/concept fully analyzed
+    - [ ] Explanation matches requested --level
+    - [ ] Examples provided for clarity
+    - [ ] Output format matches --format
+  </checklist>
+
   <examples>
 
 | Input | Output |

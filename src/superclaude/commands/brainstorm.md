@@ -44,6 +44,13 @@ description: Interactive requirements discovery through Socratic dialogue and sy
     - Specification: Concrete requirements → actionable briefs
   </patterns>
 
+  <checklist note="SHOULD complete all">
+    - [ ] Requirements systematically explored
+    - [ ] Multi-persona validation completed
+    - [ ] Feasibility assessment included
+    - [ ] Actionable specification generated
+  </checklist>
+
   <examples>
 | Input | Output |
 |-------|--------|

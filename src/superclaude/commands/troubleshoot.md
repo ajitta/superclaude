@@ -40,6 +40,16 @@ description: Diagnose and resolve issues in code, builds, deployments, and syste
     - Deployment: Environment → config verification → service validation
   </patterns>
 
+  <mcp servers="seq"/>
+  <personas p="root|devops"/>
+
+  <checklist note="SHOULD complete all">
+    - [ ] Root cause identified
+    - [ ] Diagnostic evidence collected
+    - [ ] Solution proposed with impact assessment
+    - [ ] Fix validated (if --fix applied)
+  </checklist>
+
   <examples>
 
 | Input | Output |
