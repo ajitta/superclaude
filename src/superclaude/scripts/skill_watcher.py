@@ -336,7 +336,7 @@ class SkillWatcher:
         self._running = False
 
 
-def main():
+def main() -> None:
     """CLI entry point for skill watcher."""
     import argparse
 

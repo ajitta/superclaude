@@ -9,7 +9,7 @@ import sys
 from pathlib import Path
 
 
-def main():
+def main() -> None:
     # Read tool input from stdin (JSON from Claude Code)
     try:
         stdin_data = sys.stdin.read() if not sys.stdin.isatty() else ""
@@ -31,8 +31,7 @@ def main():
                 capture_output=True,
                 timeout=30,
             )
-    except Exception:
-        # Silently ignore errors (covers JSONDecodeError, TimeoutExpired, etc.)
+    except (json.JSONDecodeError, subprocess.TimeoutExpired, OSError):
         pass
 
 

@@ -1,6 +1,6 @@
 <component name="sequential" type="mcp">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
-  <triggers>--effort medium|--effort high|--think|--think-hard|--ultrathink|debug|architecture|analysis|reasoning|sequential</triggers>
+  <triggers>--effort medium|--effort high|--effort max|debug|architecture|analysis|reasoning|sequential</triggers>
 
   <role>
     <mission>Multi-step reasoning engine for complex analysis and systematic problem solving</mission>

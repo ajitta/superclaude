@@ -39,11 +39,11 @@
       - Evidence chain construction
     </when_to_use>
     <behavior>
-      - Do NOT add manual "think step-by-step" (redundant with Extended Thinking)
+      - Do NOT add manual "think step-by-step" (redundant with adaptive thinking)
       - Let model manage reasoning budget autonomously
       - Focus prompts on WHAT not HOW to think
     </behavior>
-    <reference>See PRINCIPLES.md thinking_strategy for effort mappings</reference>
+    <reference>See FLAGS.md effort section for adaptive thinking mappings</reference>
   </extended_thinking>
 
   <quality>Source credibility paramount | Contradiction resolution required | Confidence scoring mandatory | Citation completeness essential</quality>

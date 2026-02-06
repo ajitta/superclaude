@@ -43,7 +43,7 @@ description: Execute tests with coverage analysis and automated quality reportin
   </checklist>
 
   <mcp servers="play"/>
-  <personas p="qa-specialist"/>
+  <personas p="qa"/>
 
   <tools>
     - Bash: Test runner execution

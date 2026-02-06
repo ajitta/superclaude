@@ -15,6 +15,7 @@ v2.2.0 Features (Claude Code 2.1.20 Integration):
 
 from __future__ import annotations
 
+import json
 import subprocess
 import sys
 
@@ -43,7 +44,7 @@ def init_hook_tracker() -> str | None:
         return None
 
 
-def get_git_status():
+def get_git_status() -> str:
     """Check git status and return formatted string."""
     try:
         result = subprocess.run(
@@ -59,7 +60,7 @@ def get_git_status():
             count = len([line for line in status.split("\n") if line])
             return f"📊 Git: {count} files"
         return "📊 Git: not a repo"
-    except Exception:
+    except (subprocess.TimeoutExpired, subprocess.CalledProcessError, OSError):
         return "📊 Git: not a repo"
 
 
@@ -98,8 +99,6 @@ def get_pr_status() -> str:
         if pr_result.returncode != 0:
             return ""
 
-        import json
-
         pr_data = json.loads(pr_result.stdout)
 
         # Determine status and indicator
@@ -126,7 +125,8 @@ def get_pr_status() -> str:
     except FileNotFoundError:
         # gh CLI not installed
         return ""
-    except Exception:
+    except (subprocess.TimeoutExpired, subprocess.CalledProcessError, OSError,
+            json.JSONDecodeError, KeyError):
         return ""
 
 
@@ -156,7 +156,7 @@ def get_additional_dirs_status() -> str:
     return ""
 
 
-def main():
+def main() -> None:
     # 0. Initialize hook tracker (cleanup old sessions)
     init_hook_tracker()
 

@@ -198,7 +198,7 @@ def check_skill_triggers(prompt: str) -> list[str]:
     return hints
 
 
-def main():
+def main() -> None:
     # Read prompt from stdin (passed by Claude Code)
     prompt = sys.stdin.read() if not sys.stdin.isatty() else ""
 

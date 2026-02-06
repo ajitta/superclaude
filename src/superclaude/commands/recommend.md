@@ -25,7 +25,7 @@ description: Ultra-intelligent command recommendation engine for optimal SuperCl
   </flow>
 
   <keyword_map>
-    - ml (machine learning|ml|ai|model): /sc:analyze --seq --c7|/sc:design --seq --ultrathink
+    - ml (machine learning|ml|ai|model): /sc:analyze --seq --c7|/sc:design --seq --effort max
     - web (website|frontend|ui|react|vue): /sc:build --feature --magic|/sc:test --e2e --pup
     - api (api|backend|server|microservice): /sc:design --api --ddd --seq|/sc:build --feature --tdd
     - debug (error|bug|issue|not working): /sc:troubleshoot --investigate --seq|/sc:analyze --code

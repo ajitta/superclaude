@@ -73,7 +73,7 @@ Note: temperature incompatible with thinking; interleaved thinking automatic
 - Safety First: --safe-mode > --validate > optimization
 - Explicit Override: User flags > auto-detection
 - Effort: --effort high > --effort medium > --effort low
-- Legacy Think: --ultrathink → --effort high + --all-mcp
+- Legacy Think: --ultrathink → --effort max + --all-mcp
 - MCP: --no-mcp overrides individual flags
 - MCP Fallback: Notify on first use → auto fallback to native equivalent
 - Scope: system > project > module > file

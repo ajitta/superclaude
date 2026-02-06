@@ -71,10 +71,11 @@ description: List all available /sc commands and their functionality
       - --no-mcp: Native tools only
     </category>
     <category name="Effort">
-      - --effort low: ~1K tokens
-      - --effort medium: ~4K tokens, Sequential
-      - --effort high: ~10-32K tokens, Seq+C7
-      Legacy: --think→medium, --think-hard→high, --ultrathink→high+all-mcp
+      - --effort low: May skip thinking
+      - --effort medium: Selective thinking, Sequential
+      - --effort high: Default, almost always thinks, Seq+C7
+      - --effort max: Unconstrained depth (Opus 4.6), all MCP
+      Legacy: --think→medium, --think-hard→high, --ultrathink→max+all-mcp
     </category>
     <category name="Control">
       - --delegate: Sub-agent parallel processing
