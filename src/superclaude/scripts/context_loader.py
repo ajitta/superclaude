@@ -120,7 +120,7 @@ TRIGGER_MAP = [
         2,
     ),
     (
-        r"(sequential|seq|--effort\s*(medium|high)|--think|--think-hard|--ultrathink|debug|architecture|analysis|reasoning|multi.?step|reasoning chain|--seq|--sequential)",
+        r"(sequential|seq|--effort\s*(medium|high|max)|--think|--think-hard|--ultrathink|debug|architecture|analysis|reasoning|multi.?step|reasoning chain|--seq|--sequential)",
         "mcp/MCP_Sequential.md",
         2,
     ),

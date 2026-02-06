@@ -74,7 +74,7 @@ description: List all available /sc commands and their functionality
       - --effort low: May skip thinking
       - --effort medium: Selective thinking, Sequential
       - --effort high: Default, almost always thinks, Seq+C7
-      - --effort max: Unconstrained depth (Opus 4.6), all MCP
+      - --effort max: Unconstrained depth (Claude 4 models), all MCP
       Legacy: --think→medium, --think-hard→high, --ultrathink→max+all-mcp
     </category>
     <category name="Control">

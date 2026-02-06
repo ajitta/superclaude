@@ -44,10 +44,10 @@
 | `--effort low` | May skip thinking for simple tasks | None |
 | `--effort medium` | Selective thinking, balanced | Sequential on demand |
 | `--effort high` | Default — almost always thinks | Sequential + Context7 |
-| `--effort max` | Unconstrained depth (Opus 4.6 only) | All available |
+| `--effort max` | Unconstrained depth (Claude 4 models) | All available |
 
 Thinking: `{type: "adaptive"}` — Claude decides when/how much to think
-Deprecated: budget_tokens (still functional, will be removed)
+Deprecated: `budget_tokens` (removed for long-context >200K in Claude 4.6 migration)
 Legacy: `--think`→medium, `--think-hard`→high, `--ultrathink`→max+all-mcp
 Note: temperature incompatible with thinking; interleaved thinking automatic
   </effort>

@@ -12,7 +12,9 @@ triggers: /skill-name, keyword1, keyword2
 user-invocable: true              # Visible in slash command menu (default: true for /skills/)
 context: inline|fork              # inline = same context, fork = sub-agent (v2.1.0+)
 agent: agent-name                 # Agent type for execution (v2.1.0+)
-model: haiku|sonnet|opus          # Override model for this skill (v2.1.0+)
+model: haiku|sonnet|opus          # Override parent model alias (v2.1.0+)
+# For reproducibility, prefer a versioned model ID when needed
+# Example: claude-opus-4-6-*
 mcp: c7:docs|tavily:search        # MCP dependencies
 allowed-tools:                    # YAML list format (v2.1.0+)
   - Read
@@ -58,6 +60,8 @@ hooks:                            # Inline hooks (v2.1.0+)
 | `allowed-tools` | list | all | Whitelist of permitted tools |
 | `disallowed-tools` | list | none | Blacklist of blocked tools |
 | `hooks` | object | - | Inline hook definitions |
+
+Model guidance: use aliases (`haiku|sonnet|opus`) for flexible upgrades, and use versioned model IDs when deterministic behavior is required across runs.
 
 ## Context Modes
 
@@ -110,7 +114,7 @@ description: Comprehensive code analysis
 triggers: /analyze, deep-dive, thorough-check
 context: fork
 agent: quality-engineer
-model: opus
+model: opus  # or a versioned model ID for deterministic runs
 mcp: c7:patterns|serena:symbols
 allowed-tools:
   - Read

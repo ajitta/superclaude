@@ -12,6 +12,7 @@ Utility scripts for automation, session management, and hook integrations.
 | `context_loader.py` | Load and merge context files dynamically |
 | `skill_activator.py` | Activate skills based on task requirements |
 | `prettier_hook.py` | Code formatting hook using Prettier |
+| `validate_confidence_context.py` | PreToolUse confidence-check context validation hook |
 | `clean_command_names.py` | Utility for cleaning/normalizing command names |
 
 ### Shell Scripts
