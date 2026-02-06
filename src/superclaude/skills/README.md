@@ -83,6 +83,7 @@ Skills are discovered from:
 1. `~/.claude/skills/` (user-level)
 2. `.claude/skills/` (project-level)
 3. Nested `.claude/skills/` directories (v2.1.6+)
+4. Additional directories specified via `--add-dir` flag (v2.1.20+, v2.1.32+)
 
 ### Hot Reload (v2.1.0+)
 Skills created or modified are immediately available without restarting the session.
@@ -166,3 +167,11 @@ ${CLAUDE_SESSION_ID}
 ```
 
 This enables session-aware behavior and tracking.
+
+## Skill Token Budget (v2.1.32+)
+
+Skill character budgets scale dynamically with the context window at ~2% of the available context. This means:
+- Larger context windows allow more detailed skill descriptions
+- Only `name` + `description` are loaded at startup (~30-50 tokens each)
+- Full SKILL.md content is loaded on invocation
+- Keep SKILL.md under 1,500-2,000 words for optimal loading

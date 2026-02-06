@@ -1,6 +1,7 @@
 ---
 name: security-engineer
 description: Identify security vulnerabilities and ensure compliance with security standards and best practices (triggers - security, vulnerability, owasp, compliance, threat-model, authentication)
+memory: user
 ---
 <component name="security-engineer" type="agent">
   <config style="Telegraphic|Imperative|XML" eval="true"/>

@@ -79,18 +79,33 @@ Note: temperature incompatible with thinking; interleaved thinking automatic
 - Scope: system > project > module > file
   </priority_rules>
 
-  <cc_features note="Claude Code 2.1.32+">
+  <cc_features note="Claude Code 2.1.33+">
 | Name | Type | Purpose |
 |------|------|---------|
 | `CLAUDE_CODE_ENABLE_TASKS` | env | Enable Task tools (replaces TodoWrite) |
+| `CLAUDE_CODE_ADDITIONAL_DIRECTORIES_CLAUDE_MD` | env | Load CLAUDE.md from `--add-dir` paths (v2.1.20) |
+| `CLAUDE_CODE_TMPDIR` | env | Override temp directory location (v2.1.23) |
+| `CLAUDE_CODE_DISABLE_BACKGROUND_TASKS` | env | Disable background tasks and Ctrl+B (v2.1.4) |
+| `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS` | env | Experimental multi-agent team orchestration (v2.1.32) |
+| `CLAUDE_CODE_SHELL` | env | Override automatic shell detection (v2.0.65) |
 | `context_window.used_percentage` | set | Status line: context usage % |
 | `context_window.remaining_percentage` | set | Status line: context remaining % |
+| `current_usage` | set | Status line: accurate context window calculations (v2.0.70) |
 | `keybindings` | set | Custom keyboard shortcut mappings |
 | `plansDirectory` | set | Custom plan file storage location |
 | `respectGitignore` | set | Per-project @-mention file picker |
 | `language` | set | Response language (e.g., "korean") |
-| `--from-pr` | flag | Resume session linked to PR number/URL |
+| `showTurnDuration` | set | Show/hide turn duration messages (v2.1.7) |
+| `spinnerVerbs` | set | Customize spinner text during tool execution (v2.1.23) |
+| `companyAnnouncements` | set | Display announcements on startup (v2.0.32) |
+| `--from-pr` | flag | Resume session linked to PR number/URL; auto-links via `gh pr create` |
 | `/debug` | cmd | Troubleshoot current session |
+| Auto memory | feature | Claude auto-records/recalls memories as it works (v2.1.32) |
+| Agent memory | feature | `memory: user\|project\|local` frontmatter for persistent agent memory (v2.1.33) |
+| Task metrics | feature | Task tool returns token count, tool uses, duration in results (v2.1.30) |
+| `status: "deleted"` | feature | TaskUpdate supports permanent task deletion (v2.1.20) |
+| Read `pages` param | feature | PDF page-range reading, e.g. `pages: "1-5"` (v2.1.30) |
+| Skill 2% budget | feature | Skill character budget scales with context window (v2.1.32) |
 | Permission precedence | rule | `ask` overrides `allow` at content level |
   </cc_features>
 
@@ -101,6 +116,7 @@ Note: temperature incompatible with thinking; interleaved thinking automatic
 | Suffix wildcard | `Bash(npm *)` | npm followed by anything |
 | Middle wildcard | `Bash(git * main)` | git commands targeting main |
 | Agent disable | `Task(AgentName)` | Disable specific agent in disallowedTools |
+| Agent allowlist | `Task(agent-name)` in tools | Restrict which sub-agents an agent can spawn (v2.1.33) |
 | MCP wildcard | `mcp__server__*` | All tools from an MCP server |
   </permission_patterns>
 
@@ -112,6 +128,12 @@ Note: temperature incompatible with thinking; interleaved thinking automatic
 | `$ARGUMENTS[1]`, `$1` | Second arg | "world" |
 
 Frontmatter usage: `Deploy $0 to $1 environment.`
+
+Skill variables:
+| Variable | Description |
+|----------|-------------|
+| `${CLAUDE_SESSION_ID}` | Current session ID (v2.1.9+) |
+| `${CLAUDE_PLUGIN_ROOT}` | Plugin root directory (plugins only) |
   </argument_syntax>
 
   <persona_index note="Agent abbreviations for <personas p='...'/>">
@@ -137,6 +159,7 @@ Frontmatter usage: `Deploy $0 to $1 environment.`
 
   <mcp_auto_mode note="v2.1.7+">
 When MCP tool descriptions exceed 10% of context → defer to MCPSearch tool
+Custom threshold: `auto:N` syntax where N is context % (e.g., `auto:15`) (v2.1.9+)
 Disable: Add MCPSearch to disallowedTools
   </mcp_auto_mode>
 </component>

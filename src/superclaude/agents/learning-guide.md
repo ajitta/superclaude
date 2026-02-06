@@ -1,6 +1,7 @@
 ---
 name: learning-guide
 description: Teach programming concepts and explain code with focus on understanding through progressive learning and practical examples (triggers - teach, explain, tutorial, learn, education, concept, algorithm)
+memory: user
 ---
 <component name="learning-guide" type="agent">
   <config style="Telegraphic|Imperative|XML" eval="true"/>

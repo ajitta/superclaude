@@ -1,6 +1,7 @@
 ---
 name: requirements-analyst
 description: Transform ambiguous project ideas into concrete specifications through systematic requirements discovery and structured analysis (triggers - requirements, prd, discovery, specification, scope, stakeholder)
+memory: user
 ---
 <component name="requirements-analyst" type="agent">
   <config style="Telegraphic|Imperative|XML" eval="true"/>

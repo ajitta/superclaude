@@ -27,6 +27,10 @@ Hooks are defined in `hooks.json` and support the following events:
 | `PreCompact` | Before conversation compaction | No | Context preservation |
 | `SessionEnd` | When session terminates | No | Final cleanup, session summary |
 | `Setup` | Via `--init`, `--init-only`, `--maintenance` flags | N/A | Repository setup, maintenance |
+| `TeammateIdle` | Agent team member becomes idle | No | Assign new work to idle teammates [experimental] |
+| `TaskCompleted` | Agent team task finishes | No | Trigger next steps, aggregate results [experimental] |
+
+> **Note:** `TeammateIdle` and `TaskCompleted` require `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` (v2.1.33). Schemas are not yet published in official docs.
 
 ## Current Hooks
 
@@ -184,6 +188,9 @@ Hook scripts receive JSON via stdin with common and event-specific fields:
 | `Stop`/`SubagentStop` | `reason`, `stop_hook_active` |
 | `SubagentStop` | `agent_id`, `agent_transcript_path` |
 | `SessionStart` | `agent_type` (if `--agent` specified) |
+| `Setup` | `agent_type` (if `--agent` specified); triggered by `--init`, `--init-only`, `--maintenance` |
+| `TeammateIdle` | Agent/teammate identifier [experimental, v2.1.33] |
+| `TaskCompleted` | Agent/teammate identifier, task result summary [experimental, v2.1.33] |
 
 ### Hook Script Guidelines
 

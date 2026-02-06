@@ -1,6 +1,6 @@
 {
   "description": "SuperClaude hooks for session management and code formatting",
-  "schema_version": "2.1.0",
+  "schema_version": "2.1.33",
   "hooks": {
     "SessionStart": [
       {
@@ -59,6 +59,41 @@
             "type": "command",
             "command": "python {{SCRIPTS_PATH}}/prettier_hook.py",
             "timeout": 30
+          }
+        ]
+      }
+    ],
+    "Setup": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python {{SCRIPTS_PATH}}/session_init.py",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
+    "TeammateIdle": [
+      {
+        "_comment": "[experimental] Requires CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 (v2.1.33)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo 'Teammate idle — assign next task'",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "TaskCompleted": [
+      {
+        "_comment": "[experimental] Requires CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 (v2.1.33)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo 'Task completed — aggregate results'",
+            "timeout": 10
           }
         ]
       }

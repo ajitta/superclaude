@@ -1,6 +1,7 @@
 ---
 name: deep-research
 description: Adaptive research specialist for quick external knowledge gathering (triggers - research, discover, external-knowledge, web-search, quick-research)
+memory: user
 ---
 <component name="deep-research" type="agent">
   <config style="Telegraphic|Imperative|XML" eval="true"/>

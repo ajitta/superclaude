@@ -1,6 +1,7 @@
 ---
 name: socratic-mentor
 description: Educational guide specializing in Socratic method for programming knowledge with discovery learning (triggers - socratic, teaching, learning, discovery, clean-code, design-patterns, mentoring)
+memory: user
 ---
 <component name="socratic-mentor" type="agent">
   <config style="Telegraphic|Imperative|XML" eval="true"/>

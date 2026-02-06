@@ -85,6 +85,43 @@ Each agent includes:
 - **Output Format**: Structured response patterns
 - **Tool Preferences**: Recommended tools for the domain
 - **Autonomy Level**: Permission boundaries for actions
+- **Persistent Memory**: Cross-session learning via `memory` frontmatter (v2.1.33)
+
+## Agent Memory (v2.1.33)
+
+Agents can declare persistent memory that survives across conversations:
+
+```yaml
+---
+name: agent-name
+description: Agent description
+memory: user
+---
+```
+
+### Memory Scopes
+
+| Scope | Location | Use Case |
+|-------|----------|----------|
+| `user` | `~/.claude/agent-memory/<name>/` | Cross-project learnings (recommended default) |
+| `project` | `.claude/agent-memory/<name>/` | Project-specific knowledge (committable) |
+| `local` | `.claude/agent-memory-local/<name>/` | Project-specific, gitignored |
+
+When `memory` is set, the agent automatically gets Read/Write/Edit tools and the first 200 lines of its `MEMORY.md` are injected into the system prompt. All SuperClaude agents use `memory: user` for cross-project domain knowledge.
+
+## Sub-Agent Restrictions (v2.1.33)
+
+Agents can restrict which sub-agents they can spawn using `Task(agent_type)` syntax in the `tools` frontmatter field:
+
+```yaml
+---
+name: orchestrator
+description: Coordinates specialized agents
+tools: Read, Grep, Task(code-reviewer), Task(debugger)
+---
+```
+
+Without this restriction, an agent with Task access can spawn any available subagent. Use this for controlled multi-agent workflows. See also the `Task(AgentName)` deny pattern in FLAGS.md `permission_patterns`.
 
 ## Autonomy Framework
 
@@ -150,19 +187,22 @@ Each agent's `<tool_guidance>` section follows these rules:
 
 ### Agent File Structure
 
-```markdown
-# Agent Name
+```yaml
+---
+name: agent-name
+description: Brief description (triggers - keyword1, keyword2)
+memory: user                              # Persistent memory scope (v2.1.33)
+---
+```
 
-## Expertise
-- Domain knowledge areas
-
-## Behavior
-- How the agent approaches problems
-- Communication style
-
-## Guidelines
-- Specific rules and constraints
-
-## Output Format
-- Expected response structure
+```xml
+<component name="agent-name" type="agent">
+  <config style="Telegraphic|Imperative|XML" eval="true"/>
+  <triggers>keyword1|keyword2</triggers>
+  <mcp servers="seq|c7"/>
+  <tool_guidance autonomy="high|medium|low">
+    ...
+  </tool_guidance>
+  <!-- Domain-specific sections -->
+</component>
 ```

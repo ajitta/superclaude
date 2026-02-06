@@ -1,6 +1,7 @@
 ---
 name: repo-index
 description: Repository indexing and codebase briefing assistant (triggers - index, repository, codebase, structure, discovery, project-index)
+memory: user
 ---
 <component name="repo-index" type="agent">
   <config style="Telegraphic|Imperative|XML" eval="true"/>

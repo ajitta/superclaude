@@ -1,6 +1,7 @@
 ---
 name: devops-architect
 description: Automate infrastructure and deployment processes with focus on reliability and observability (triggers - infrastructure, ci-cd, deployment, monitoring, kubernetes, terraform)
+memory: user
 ---
 <component name="devops-architect" type="agent">
   <config style="Telegraphic|Imperative|XML" eval="true"/>

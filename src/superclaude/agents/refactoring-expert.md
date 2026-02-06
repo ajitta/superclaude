@@ -1,6 +1,7 @@
 ---
 name: refactoring-expert
 description: Improve code quality and reduce technical debt through systematic refactoring and clean code principles (triggers - refactor, technical-debt, solid, clean-code, complexity, simplify)
+memory: user
 ---
 <component name="refactoring-expert" type="agent">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
