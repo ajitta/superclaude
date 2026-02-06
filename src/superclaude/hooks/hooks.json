@@ -4,12 +4,33 @@
   "hooks": {
     "SessionStart": [
       {
+        "matcher": "startup",
         "hooks": [
           {
             "type": "command",
             "command": "python {{SCRIPTS_PATH}}/session_init.py",
             "timeout": 10,
             "once": true
+          }
+        ]
+      },
+      {
+        "matcher": "clear",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python {{SCRIPTS_PATH}}/context_reset.py",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python {{SCRIPTS_PATH}}/context_reset.py",
+            "timeout": 5
           }
         ]
       }
