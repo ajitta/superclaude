@@ -121,7 +121,7 @@ tools: Read, Grep, Task(code-reviewer), Task(debugger)
 ---
 ```
 
-Without this restriction, an agent with Task access can spawn any available subagent. Use this for controlled multi-agent workflows. See also the `Task(AgentName)` deny pattern in FLAGS.md `permission_patterns`.
+Without this restriction, an agent with Task access can spawn any available subagent. Use this for controlled multi-agent workflows. The `Task(AgentName)` deny pattern can disable specific agents in `disallowedTools`.
 
 ## Autonomy Framework
 

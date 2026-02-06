@@ -68,27 +68,6 @@ Note: temperature incompatible with thinking; interleaved thinking automatic
 - Scope: system > project > module > file
   </priority_rules>
 
-  <cc_features note="Claude Code v2.0.32+">
-env: CLAUDE_CODE_ENABLE_TASKS=Task tools | CLAUDE_CODE_ADDITIONAL_DIRECTORIES_CLAUDE_MD=--add-dir CLAUDE.md (v2.1.20) | CLAUDE_CODE_TMPDIR=temp dir override (v2.1.23) | CLAUDE_CODE_DISABLE_BACKGROUND_TASKS=disable Ctrl+B (v2.1.4) | CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=multi-agent teams (v2.1.32) | CLAUDE_CODE_SHELL=shell detection override (v2.0.65)
-set: context_window.used_percentage | context_window.remaining_percentage | current_usage (v2.0.70) | keybindings | plansDirectory | respectGitignore | language | showTurnDuration (v2.1.7) | spinnerVerbs (v2.1.23) | companyAnnouncements (v2.0.32)
-flag: --from-pr=resume session linked to PR; auto-links via gh pr create
-cmd: /debug=troubleshoot current session
-feature: Auto memory=auto-records/recalls (v2.1.32) | Agent memory=memory: user|project|local frontmatter (v2.1.33) | Task metrics=token count+tool uses+duration (v2.1.30) | status: "deleted" in TaskUpdate (v2.1.20) | Read pages param for PDF (v2.1.30) | Skill 2% budget scales with context (v2.1.32)
-rule: Permission precedence — ask overrides allow at content level
-  </cc_features>
-
-  <permission_patterns note="v2.1.0+ wildcard syntax">
-Bash(* install)=prefix wildcard | Bash(npm *)=suffix wildcard | Bash(git * main)=middle wildcard
-Task(AgentName)=disable agent in disallowedTools | Task(agent-name) in tools=agent allowlist (v2.1.33)
-mcp__server__*=all tools from MCP server
-  </permission_patterns>
-
-  <argument_syntax note="v2.1.19+ skill args">
-$ARGUMENTS=full string | $ARGUMENTS[0]/$0=first arg | $ARGUMENTS[1]/$1=second arg
-Frontmatter: Deploy $0 to $1 environment.
-Variables: ${CLAUDE_SESSION_ID}=session ID (v2.1.9+) | ${CLAUDE_PLUGIN_ROOT}=plugin root dir
-  </argument_syntax>
-
   <persona_index note="Agent abbreviations for p='...'">
 arch=system-architect(architecture) | fe=frontend-architect(UI,a11y) | be=backend-architect(API,db,security) | sec=security-engineer(OWASP) | qa=quality-engineer(testing) | qual=quality-engineer(alias) | ops=devops-architect(CI/CD,K8s) | devops=devops-architect(alias) | pm=pm-agent(orchestration) | perf=performance-engineer(profiling) | refactor=refactoring-expert(tech-debt) | root=root-cause-analyst(debug) | anal=requirements-analyst(strategy) | educator=learning-guide(education) | mentor=socratic-mentor(guidance) | scribe=technical-writer(docs) | py=python-expert(python) | panel=business-panel-experts(business) | research=deep-research(web) | review=self-review(validation) | index=repo-index(indexing)
   </persona_index>
