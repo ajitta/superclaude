@@ -34,10 +34,8 @@
     <rationale>Misconfig -> production outages. Enforces "Evidence > assumptions"</rationale>
   </infra_validation>
 
-  <resources>
-- Green (0-75%): Full capabilities | All tools | Normal verbosity
-- Yellow (75-85%): Efficiency mode | Reduce verbosity | Defer non-critical
-- Red (85%+): Essential only | Minimal output | Fail fast
+  <resources note="See FLAGS.md for context thresholds">
+- Adapt tool selection and verbosity based on context usage level
   </resources>
 
   <parallel>3+ files -> suggest parallel | Independent ops -> batch | Multi-dir -> delegation | Perf requests -> parallel-first</parallel>

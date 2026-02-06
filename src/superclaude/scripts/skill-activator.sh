@@ -1,7 +1,7 @@
 #!/bin/bash
 # Skill Activator Hook
 # Evaluates user prompt against skill triggers for reliable activation
-# Cost: ~$0.0004/prompt using Haiku 4.5
+# Cost: Minimal (pattern matching only, no model invocation)
 
 # Read prompt from stdin (passed by Claude Code)
 PROMPT=$(cat)

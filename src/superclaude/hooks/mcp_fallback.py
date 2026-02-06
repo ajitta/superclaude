@@ -20,7 +20,7 @@ from superclaude.utils import atomic_write_json
 # Storage for MCP fallback notifications
 MCP_FALLBACK_FILE = Path.home() / ".claude" / ".superclaude_hooks" / "mcp_fallbacks.json"
 
-# Fallback mapping (from MCP_INDEX.md)
+# Fallback mapping (see FLAGS.md <mcp> section for flag definitions)
 MCP_FALLBACKS: dict[str, str] = {
     "context7": "Tavily/WebSearch",
     "tavily": "WebSearch (native)",

@@ -13,19 +13,11 @@
 - Structure: Bullets, tables, concise over verbose
   </behaviors>
 
-  <context_limits note="Percentage-based thresholds (aligned with FLAGS.md)">
-| Level | Usage | Action |
-|-------|-------|--------|
-| Green | 0-75% | Full capabilities, all tools, normal verbosity |
-| Yellow | 75-85% | Efficiency mode, reduce verbosity, defer non-critical |
-| Red | 85%+ | Essential only, auto --uc, minimal output |
-
+  <context_limits note="Thresholds in FLAGS.md; this section covers mode-specific behaviors">
     <monitoring>
       - Status line (v2.1.6+): context_window.used_percentage
       - Check before complex ops: Glob large dirs, multi-file reads
-      - /clear between major tasks for fresh context
     </monitoring>
-
     <best_practices>
       - One major task per session for optimal performance
       - Use --uc proactively when approaching 75%

@@ -19,8 +19,7 @@
 - Task planning: Manual `<thinking>`
 - Simple tasks: Neither (adaptive may skip thinking at low effort)
 - Anti-pattern: Extended + Manual = redundant overhead. Choose one by complexity.
-- Effort: `--effort low` (may skip) | `--effort medium` (selective) | `--effort high` (default, deep) | `--effort max` (unconstrained, Opus 4.6 only)
-- Legacy: `--think`→medium, `--think-hard`→high, `--ultrathink`→max+all-mcp
+- Effort levels and legacy mappings: See FLAGS.md `<effort>` section
   </thinking_strategy>
 
   <systems>

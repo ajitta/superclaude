@@ -79,7 +79,7 @@ Note: temperature incompatible with thinking; interleaved thinking automatic
 - Scope: system > project > module > file
   </priority_rules>
 
-  <cc_features note="Claude Code 2.1.x essentials">
+  <cc_features note="Claude Code 2.1.32+">
 | Name | Type | Purpose |
 |------|------|---------|
 | `CLAUDE_CODE_ENABLE_TASKS` | env | Enable Task tools (replaces TodoWrite) |
@@ -122,11 +122,17 @@ Frontmatter usage: `Deploy $0 to $1 environment.`
 | be | backend-architect | API, database, security |
 | sec | security-engineer | OWASP, vulnerabilities |
 | qa | quality-engineer | Testing, coverage |
+| qual | quality-engineer | Code quality (alias) |
 | ops | devops-architect | CI/CD, Kubernetes |
+| devops | devops-architect | DevOps (alias) |
 | pm | pm-agent | Orchestration, docs |
 | perf | performance-engineer | Optimization, profiling |
 | refactor | refactoring-expert | Tech debt, SOLID |
 | root | root-cause-analyst | Debug, hypothesis |
+| anal | requirements-analyst | Analysis, strategy |
+| educator | learning-guide | Code/concept education |
+| mentor | socratic-mentor | Guidance, Socratic method |
+| scribe | technical-writer | Documentation |
   </persona_index>
 
   <mcp_auto_mode note="v2.1.7+">
