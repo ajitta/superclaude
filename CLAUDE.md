@@ -48,11 +48,11 @@ SuperClaude is a **dual-purpose** project:
 The CLI `superclaude install` copies content from the package to Claude Code's config directory:
 
 ```
-src/superclaude/commands/  →  ~/.claude/commands/sc/     (30 slash commands)
-src/superclaude/agents/    →  ~/.claude/agents/          (20 agent definitions)
+src/superclaude/commands/  →  ~/.claude/commands/sc/     (31 slash commands)
+src/superclaude/agents/    →  ~/.claude/agents/          (21 agent definitions)
 src/superclaude/skills/    →  ~/.claude/skills/          (skill implementations)
 src/superclaude/core/      →  ~/.claude/superclaude/core/  (FLAGS, PRINCIPLES, RULES)
-src/superclaude/modes/     →  ~/.claude/superclaude/modes/ (8 behavioral modes)
+src/superclaude/modes/     →  ~/.claude/superclaude/modes/ (7 behavioral modes)
 src/superclaude/mcp/       →  ~/.claude/superclaude/mcp/   (MCP server docs)
 ```
 
@@ -82,20 +82,22 @@ src/superclaude/
 │   ├── install_components.py
 │   ├── install_settings.py
 │   ├── install_inventory.py
+│   ├── install_commands.py
 │   ├── install_skill.py
 │   ├── install_mcp.py
 │   └── doctor.py
 ├── hooks/
-│   ├── hook_tracker.py  # once: true session tracking (24h TTL, state in ~/.claude/.superclaude_hooks/)
-│   ├── inline_hooks.py  # Frontmatter hook parser
-│   └── mcp_fallback.py  # MCP server availability fallback handling
+│   ├── hooks.json         # Hook definitions template (SessionStart, UserPromptSubmit, PostToolUse)
+│   ├── hook_tracker.py    # once: true session tracking (24h TTL, state in ~/.claude/.superclaude_hooks/)
+│   ├── inline_hooks.py    # Frontmatter hook parser
+│   └── mcp_fallback.py    # MCP server availability fallback handling
 ├── commands/            # 30 slash command markdown files (installed to ~/.claude/commands/sc/)
 ├── agents/              # 20 agent definition markdown files
 ├── modes/               # 8 behavioral mode markdown files
-├── mcp/                 # MCP server docs + configs/
+├── mcp/                 # MCP server docs + configs/ (MCP_INDEX.md removed, merged into core/FLAGS.md)
 ├── core/                # FLAGS.md, PRINCIPLES.md, RULES.md
 ├── skills/              # Skill implementations (directories with SKILL.md manifests)
-└── scripts/             # Shell/Python utilities
+└── scripts/             # Shell/Python utilities (includes context_reset.py for /clear and /compact)
 ```
 
 ### Entry Points (pyproject.toml)
