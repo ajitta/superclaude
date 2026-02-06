@@ -67,7 +67,7 @@ description: Ultra-intelligent command recommendation engine for optimal SuperCl
   </boundaries>
 
   <handoff>
-    <next command="(recommended)">Execute the suggested command</next>
+    <next command="/sc:implement">Execute the top recommended command</next>
     <next command="/sc:help">For detailed command documentation</next>
     <format>Copy-paste ready command with flags</format>
   </handoff>

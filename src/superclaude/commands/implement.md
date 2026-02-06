@@ -29,7 +29,7 @@ description: Feature and code implementation with intelligent persona activation
   <mcp servers="c7|seq|magic|play"/>
   <personas p="arch|fe|be|sec|qa"/>
 
-  <defaults effort="medium" tokens="1000">
+  <defaults effort="medium">
 | Type | Effort | Token Budget | Rationale |
 |------|--------|--------------|-----------|
 | component | low | 500 | Single-file, framework patterns |

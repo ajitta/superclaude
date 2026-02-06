@@ -1,4 +1,4 @@
-<component name="rules" type="core" priority="critical">
+<component name="rules" type="core" priority="critical" note="Version-agnostic — applies to all Claude Code versions">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
   <triggers>rules|behavior|compliance|standards|guidelines</triggers>
 

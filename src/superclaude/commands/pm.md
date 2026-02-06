@@ -67,4 +67,17 @@ description: Project Manager Agent - Default orchestration that coordinates sub-
   </examples>
 
   <bounds will="seamless orchestration|auto-delegation|zero-token MCP|self-documenting" wont="expose complexity|manual agent selection required"/>
+
+  <boundaries type="execution" critical="true">
+    <rule>Orchestrate sub-agents and manage workflows</rule>
+    <rule>Delegate to specialists based on complexity analysis</rule>
+    <rule>Document patterns and mistakes for continuous improvement</rule>
+    <output>Coordinated task execution with progress tracking</output>
+  </boundaries>
+
+  <handoff>
+    <next command="/sc:implement">For direct feature implementation</next>
+    <next command="/sc:task">For complex multi-step task management</next>
+    <format>Pass orchestration context and delegation decisions</format>
+  </handoff>
 </component>

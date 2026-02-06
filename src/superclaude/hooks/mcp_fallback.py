@@ -45,7 +45,8 @@ def _load_fallback_data() -> dict[str, dict[str, str]]:
         return {}
 
     try:
-        return json.loads(MCP_FALLBACK_FILE.read_text())
+        data: dict[str, dict[str, str]] = json.loads(MCP_FALLBACK_FILE.read_text())
+        return data
     except (json.JSONDecodeError, OSError):
         return {}
 

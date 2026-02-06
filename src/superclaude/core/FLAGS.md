@@ -79,7 +79,7 @@ Note: temperature incompatible with thinking; interleaved thinking automatic
 - Scope: system > project > module > file
   </priority_rules>
 
-  <cc_features note="Claude Code 2.1.33+">
+  <cc_features note="Claude Code v2.0.32+">
 | Name | Type | Purpose |
 |------|------|---------|
 | `CLAUDE_CODE_ENABLE_TASKS` | env | Enable Task tools (replaces TodoWrite) |
@@ -136,7 +136,7 @@ Skill variables:
 | `${CLAUDE_PLUGIN_ROOT}` | Plugin root directory (plugins only) |
   </argument_syntax>
 
-  <persona_index note="Agent abbreviations for <personas p='...'/>">
+  <persona_index note="Agent abbreviations for personas p='...'">
 | Abbr | Agent | Domain |
 |------|-------|--------|
 | arch | system-architect | Architecture, scalability |
@@ -155,6 +155,11 @@ Skill variables:
 | educator | learning-guide | Code/concept education |
 | mentor | socratic-mentor | Guidance, Socratic method |
 | scribe | technical-writer | Documentation |
+| py | python-expert | Python best practices |
+| panel | business-panel-experts | Business strategy |
+| research | deep-research | Web research |
+| review | self-review | Post-impl validation |
+| index | repo-index | Codebase indexing |
   </persona_index>
 
   <mcp_auto_mode note="v2.1.7+">

@@ -44,4 +44,17 @@ description: Session controller orchestrating investigation, implementation, and
   </token_discipline>
 
   <bounds will="orchestrate helpers|validate results|keep user out of busywork" wont="speculate without research|impl below 0.90 confidence"/>
+
+  <boundaries type="execution" critical="true">
+    <rule>Orchestrate investigation, implementation, and review workflows</rule>
+    <rule>Enforce confidence gate (0.90) before implementation</rule>
+    <rule>Fallback to native tools when MCP unavailable</rule>
+    <output>Coordinated session with confidence-gated execution</output>
+  </boundaries>
+
+  <handoff>
+    <next command="/sc:implement">For executing implementation after confidence gate</next>
+    <next command="/sc:research">For deep investigation before implementation</next>
+    <format>Pass task context, confidence score, and research findings</format>
+  </handoff>
 </component>

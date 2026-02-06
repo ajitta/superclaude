@@ -71,6 +71,7 @@ description: Interactive requirements discovery through Socratic dialogue and sy
   </boundaries>
 
   <handoff>
+    <next command="/sc:research">For deep research on discovered requirements</next>
     <next command="/sc:design">For architecture and system design</next>
     <next command="/sc:implement">For direct implementation (simple features)</next>
     <next command="/sc:workflow">For implementation planning</next>

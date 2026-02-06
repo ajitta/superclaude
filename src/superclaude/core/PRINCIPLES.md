@@ -1,4 +1,4 @@
-<component name="principles" type="core" priority="high">
+<component name="principles" type="core" priority="high" note="Version-agnostic — applies to all Claude Code versions">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
   <triggers>principle|philosophy|mindset|engineering|quality|decision</triggers>
 
@@ -16,16 +16,16 @@
 
   <thinking_strategy note="Opus 4.6 adaptive thinking">
 - Complex reasoning (debug, arch): Adaptive Thinking (auto)
-- Task planning: Manual `<thinking>`
+- Task planning: Manual thinking block
 - Simple tasks: Neither (adaptive may skip thinking at low effort)
 - Anti-pattern: Extended + Manual = redundant overhead. Choose one by complexity.
 - Effort levels and legacy mappings: See FLAGS.md `<effort>` section
   </thinking_strategy>
 
   <systems>
-- Ripple effects
-- Long-term perspective
-- Risk calibration
+- Ripple effects: Consider downstream impact of every change across the codebase
+- Long-term perspective: Favor decisions that reduce future maintenance burden
+- Risk calibration: Scale validation effort to match change impact and reversibility
   </systems>
 
   <decisions>

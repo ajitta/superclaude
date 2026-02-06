@@ -233,9 +233,9 @@ def get_skill_context(frontmatter: dict) -> Literal["inline", "fork"]:
     Returns:
         'inline' (default) or 'fork' for sub-agent execution
     """
-    context = frontmatter.get("context", "inline")
+    context: str = frontmatter.get("context", "inline")
     if context in ("inline", "fork"):
-        return context
+        return context  # type: ignore[return-value]
     return "inline"
 
 
@@ -260,7 +260,8 @@ def is_user_invocable(frontmatter: dict) -> bool:
     Returns:
         True (default) if visible in menu, False if hidden
     """
-    return frontmatter.get("user-invocable", True)
+    result: bool = frontmatter.get("user-invocable", True)
+    return result
 
 
 def get_allowed_tools(frontmatter: dict) -> list[str]:

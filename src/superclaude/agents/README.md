@@ -148,7 +148,7 @@ Agents operate under three autonomy levels that define permission boundaries:
 | `pm-agent` | medium | Orchestration decisions need oversight |
 | `devops-architect` | medium | Infrastructure changes are significant |
 | `system-architect` | low | Architecture decisions have broad impact |
-| `refactoring-expert` | low | Structural changes need careful review |
+| `refactoring-expert` | medium | Safe refactoring patterns with user review |
 
 ### Tool Guidance Semantics
 
