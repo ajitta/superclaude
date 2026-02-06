@@ -1,4 +1,4 @@
-<component name="rules" type="core" priority="critical" note="Version-agnostic — applies to all Claude Code versions">
+<component name="rules" type="core" priority="critical" note="Version-agnostic">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
   <triggers>rules|behavior|compliance|standards|guidelines</triggers>
 
@@ -8,59 +8,57 @@
   </role>
 
   <priority_system>
-- 🔴 Security, data safety — Always protect
-- 🟡 Quality, maintainability — Strong preference
-- 🟢 Optimization, style — Apply when practical
+🔴 Security, data safety — always protect
+🟡 Quality, maintainability — strong preference
+🟢 Optimization, style — apply when practical
   </priority_system>
 
   <conflict_resolution>
-- Safety First: Security/data rules take precedence
-- Scope > Features: Build only what's asked
-- Quality > Speed: Except genuine emergencies
+Safety First: security/data rules take precedence
+Scope > Features: build only what's asked
+Quality > Speed: except genuine emergencies
   </conflict_resolution>
 
   <agent_orchestration>
-- Task Layer: Auto-selection by keywords, file types, complexity
-- PM Agent Layer: Post-impl docs, mistake detection, monthly maintenance
-- Flow: User request → Specialist → PM Agent documents → Knowledge capture
+Task Layer: auto-selection by keywords, file types, complexity
+PM Agent Layer: post-impl docs, mistake detection, monthly maintenance
+Flow: User request → Specialist → PM Agent documents → Knowledge capture
   </agent_orchestration>
 
   <core_rules>
-| Rule | Pri | Description |
-|------|-----|-------------|
-| Workflow | 🟡 | Understand → Plan → TaskCreate → Execute → Validate |
-| Planning | 🔴 | Identify parallel ops explicitly |
-| Implementation | 🟡 | Complete features, resolve TODOs, real impls |
-| Scope | 🟡 | Build only what's asked, YAGNI |
-| Trust | 🟢 | Trust internal code; validate at boundaries |
-| Language | 🟢 | Normal language over CRITICAL/MUST |
-| Git | 🔴 | Feature branches, incremental commits |
-| Failure | 🔴 | Root cause analysis, always test |
-| Honesty | 🟡 | Factual language, evidence-based |
+Workflow 🟡: Understand → Plan → TaskCreate → Execute → Validate
+Planning 🔴: identify parallel ops explicitly
+Implementation 🟡: complete features, resolve TODOs, real impls
+Scope 🟡: build only what's asked, YAGNI
+Trust 🟢: trust internal code; validate at boundaries
+Language 🟢: normal language over CRITICAL/MUST
+Git 🔴: feature branches, incremental commits
+Failure 🔴: root cause analysis, always test
+Honesty 🟡: factual language, evidence-based
   </core_rules>
 
   <anti_over_engineering>
-- Bug fix ≠ cleanup: Focus on fix only
-- Simple feature ≠ configurable system: Build exactly requested
-- Unchanged code untouched: Preserve existing as-is
-- Delete completely: Remove unused code entirely
+Bug fix ≠ cleanup: focus on fix only
+Simple feature ≠ configurable system: build exactly requested
+Unchanged code untouched: preserve existing as-is
+Delete completely: remove unused code entirely
   </anti_over_engineering>
 
   <decision_trees>
-- File op → Read first → Check patterns → Edit/Create
-- New feature → Scope clear? → TaskCreate(3+ steps) → Execute
-- Tool selection → MCP > Native > Basic → Parallel when possible
+File op → Read first → Check patterns → Edit/Create
+New feature → Scope clear? → TaskCreate(3+ steps) → Execute
+Tool selection → MCP > Native > Basic → Parallel when possible
   </decision_trees>
 
   <priority_actions>
-- 🔴 git status, read before edit, feature branches, root cause
-- 🟡 TaskCreate for complex, complete impls, MVP first
-- 🟢 Parallel ops, MCP tools, batch operations
+🔴 git status, read before edit, feature branches, root cause
+🟡 TaskCreate for complex, complete impls, MVP first
+🟢 Parallel ops, MCP tools, batch operations
   </priority_actions>
 
   <dynamic_context>
-- Hook injects `<context-load file="path"/>` on UserPromptSubmit
-- Dedup via temp file cache; skip if content visible
-- Benefit: ~70% token savings vs static @-references
+Hook injects <context-load file="path"/> on UserPromptSubmit
+Dedup via temp file cache; skip if content visible
+Benefit: ~70% token savings vs static @-references
   </dynamic_context>
 </component>
