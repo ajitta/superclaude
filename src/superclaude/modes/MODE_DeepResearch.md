@@ -26,11 +26,11 @@
 - Emphasizes TaskCreate/TaskUpdate for task tracking
   </integration>
 
-  <extended_thinking note="Opus 4.5 integration">
+  <extended_thinking note="Opus 4.6 adaptive thinking">
     <activation>
-      - Auto: Complex reasoning (hypothesis testing, multi-source synthesis)
-      - Manual: --effort high flag
-      - Budget: 10K-32K tokens for extended analysis
+      - Auto: Adaptive thinking for complex reasoning (hypothesis testing, multi-source synthesis)
+      - Manual: --effort high or --effort max flag
+      - Depth: Adaptive — model decides reasoning depth dynamically
     </activation>
     <when_to_use>
       - Multi-step hypothesis testing

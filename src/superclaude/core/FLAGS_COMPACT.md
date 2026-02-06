@@ -29,13 +29,15 @@
 | `--no-mcp` | Native only, no MCP |
   </mcp>
 
-  <effort note="Reasoning depth (Opus 4.5)">
-| Flag | MCP | budget_tokens |
-|------|-----|---------------|
-| `--effort low` | None | 1024 |
-| `--effort medium` | Sequential on demand | 4096 |
-| `--effort high` | Sequential + Context7 | 10240-32768 |
-Legacy: --think→medium, --think-hard→high, --ultrathink→high+all-mcp
+  <effort note="Adaptive thinking (Opus 4.6)">
+| Flag | Behavior | MCP |
+|------|----------|-----|
+| `--effort low` | May skip thinking | None |
+| `--effort medium` | Selective thinking | Sequential on demand |
+| `--effort high` | Default, deep reasoning | Sequential + Context7 |
+| `--effort max` | Unconstrained (Opus 4.6 only) | All available |
+Thinking: `{type: "adaptive"}` — deprecated: budget_tokens
+Legacy: --think→medium, --think-hard→high, --ultrathink→max+all-mcp
   </effort>
 
   <execution>

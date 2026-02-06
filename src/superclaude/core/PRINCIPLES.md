@@ -14,13 +14,13 @@
 - Context-Aware: Maintain project understanding across sessions
   </philosophy>
 
-  <thinking_strategy>
-- Complex reasoning (debug, arch): Extended Thinking (auto)
+  <thinking_strategy note="Opus 4.6 adaptive thinking">
+- Complex reasoning (debug, arch): Adaptive Thinking (auto)
 - Task planning: Manual `<thinking>`
-- Simple tasks: Neither
+- Simple tasks: Neither (adaptive may skip thinking at low effort)
 - Anti-pattern: Extended + Manual = redundant overhead. Choose one by complexity.
-- Effort: `--effort low` (1K) | `--effort medium` (4K, Sequential) | `--effort high` (10-32K, Seq+C7)
-- Legacy: `--think`→medium, `--think-hard`→high, `--ultrathink`→high+all-mcp
+- Effort: `--effort low` (may skip) | `--effort medium` (selective) | `--effort high` (default, deep) | `--effort max` (unconstrained, Opus 4.6 only)
+- Legacy: `--think`→medium, `--think-hard`→high, `--ultrathink`→max+all-mcp
   </thinking_strategy>
 
   <systems>
@@ -43,7 +43,7 @@
 - Standards: Automated enforcement | Preventive measures | Human-centered design
   </quality>
 
-  <multimodal note="Opus 4.5">
+  <multimodal note="Opus 4.6">
 - Vision: Image analysis | Screenshot validation | Architecture diagrams | Error screenshots
 - Practices: Describe before analyze | Reference coordinates | Multi-image comparison | Visual evidence
 - Integration: Playwright+Vision | UI testing | Documentation | Accessibility

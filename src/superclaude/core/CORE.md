@@ -1,11 +1,12 @@
-<component name="core" type="unified" priority="critical" model="opus-4.5">
+<component name="core" type="unified" priority="critical" model="opus-4.6">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
   <triggers>core|flag|principle|rule|mode|mcp|think|effort|quality|decision</triggers>
 
   <identity>
-    <model>Claude Opus 4.5 (claude-opus-4-5-20251101)</model>
-    <context_window>200K tokens</context_window>
-    <capabilities>Extended Thinking | Multimodal Vision | Advanced Code Analysis</capabilities>
+    <model>Claude Opus 4.6 (claude-opus-4-6)</model>
+    <context_window>200K tokens (1M beta via context-1m-2025-08-07 header)</context_window>
+    <max_output>128K tokens</max_output>
+    <capabilities>Adaptive Thinking | Multimodal Vision | Advanced Code Analysis | Agent Teams</capabilities>
     <directive>Evidence > assumptions | Code > documentation | Efficiency > verbosity</directive>
   </identity>
 
@@ -75,15 +76,18 @@
 | `--no-mcp` | native-only, perf priority | Disable all MCP | WebSearch only |
     </mcp>
 
-    <effort note="Reasoning depth control">
-| Level | budget_tokens | MCP | Trigger |
-|-------|---------------|-----|---------|
-| `--effort low` | 1024 | None | Quick tasks, simple queries |
-| `--effort medium` | 4096 | Sequential on demand | Default, balanced |
-| `--effort high` | 10240-32768 | Sequential + Context7 | Complex debug, architecture |
+    <effort note="Adaptive thinking (Opus 4.6)">
+| Level | Behavior | MCP |
+|-------|----------|-----|
+| `--effort low` | May skip thinking for simple tasks | None |
+| `--effort medium` | Selective thinking, balanced | Sequential on demand |
+| `--effort high` | Default — almost always thinks | Sequential + Context7 |
+| `--effort max` | Maximum depth, unconstrained (Opus 4.6 only) | All available |
 
-Legacy mapping: `--think`→medium, `--think-hard`→high, `--ultrathink`→high+all-mcp
-Note: temperature incompatible with thinking; budget auto-scaled when alwaysThinkingEnabled=true
+Thinking mode: `thinking: {type: "adaptive"}` (recommended) — Claude dynamically decides when/how much to think
+Deprecated: `budget_tokens` (still functional, will be removed)
+Legacy mapping: `--think`→medium, `--think-hard`→high, `--ultrathink`→max+all-mcp
+Note: temperature incompatible with thinking; interleaved thinking automatic with adaptive mode
     </effort>
 
     <execution>
@@ -126,25 +130,28 @@ Note: temperature incompatible with thinking; budget auto-scaled when alwaysThin
 - Risk: Proactive ID | Impact assessment | Mitigation planning
   </decisions>
 
-  <extended_thinking note="Opus 4.5 auto-reasoning">
+  <extended_thinking note="Opus 4.6 adaptive reasoning">
+    <mode>Adaptive thinking: `thinking: {type: "adaptive"}` — model decides when and how deeply to reason</mode>
     <auto_triggers>
 - Complex debugging (multi-component, cross-file)
 - Architecture design (system boundaries, scalability)
 - Security analysis (threat modeling, vulnerability assessment)
 - Multi-step reasoning (3+ interconnected decisions)
     </auto_triggers>
-    <budget_scaling>
-- alwaysThinkingEnabled=true → auto-scale budget_tokens
-- --effort controls depth: low(1K) | medium(4K) | high(10-32K)
-    </budget_scaling>
+    <effort_scaling>
+- Effort controls depth: low (may skip) | medium (selective) | high (default, deep) | max (unconstrained, Opus 4.6 only)
+- Interleaved thinking automatic — no beta header needed
+- budget_tokens deprecated — use effort levels instead
+    </effort_scaling>
     <anti_patterns>
 - Extended Thinking + Manual `<thinking>` = redundant overhead
 - Choose ONE by complexity, not both
 - temperature parameter incompatible with thinking mode
+- Prefilling assistant messages not supported (returns 400)
     </anti_patterns>
   </extended_thinking>
 
-  <multimodal note="Opus 4.5 Vision">
+  <multimodal note="Opus 4.6 Vision">
     <capabilities>
 - Image analysis: Screenshots, architecture diagrams, charts, error screenshots
 - Multi-image comparison: Side-by-side analysis, diff visualization
@@ -167,7 +174,7 @@ Note: temperature incompatible with thinking; budget auto-scaled when alwaysThin
     </integrations>
   </multimodal>
 
-  <context_management window="200K">
+  <context_management window="200K" extended="1M beta">
     <thresholds>
 | Level | Usage | Action |
 |-------|-------|--------|
@@ -180,17 +187,23 @@ Note: temperature incompatible with thinking; budget auto-scaled when alwaysThin
 - Symbol communication: --uc mode for 30-50% token reduction
 - Selective retention: Priority-based context preservation
 - Deduplication: Skip if content already visible in context
+- Context compaction (beta): Server-side auto-summarization for long conversations
     </strategies>
     <dynamic_context>
 - Hook injects `<context-load file="path"/>` on UserPromptSubmit
 - Dedup via temp file cache; benefit: ~70% token savings vs static @-references
     </dynamic_context>
+    <output_capacity>
+- Max output: 128K tokens (doubled from 64K)
+- Streaming required for large max_tokens values to avoid HTTP timeouts
+    </output_capacity>
   </context_management>
 
-  <cc_features note="Claude Code 2.1.x">
+  <cc_features note="Claude Code 2.1.32+">
 | Name | Type | Purpose |
 |------|------|---------|
 | `CLAUDE_CODE_ENABLE_TASKS` | env | Enable Task tools |
+| `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS` | env | Enable agent teams (research preview) |
 | `context_window.used_percentage` | set | Status line: context usage % |
 | `keybindings` | set | Custom keyboard shortcuts |
 | `plansDirectory` | set | Plan file storage location |
@@ -198,6 +211,8 @@ Note: temperature incompatible with thinking; budget auto-scaled when alwaysThin
 | `language` | set | Response language |
 | `--from-pr` | flag | Resume session linked to PR |
 | `/debug` | cmd | Troubleshoot current session |
+| Auto-memory | feature | Claude automatically records and recalls memories |
+| Agent teams | feature | Multi-agent collaboration (research preview) |
   </cc_features>
 
   <permissions note="v2.1.0+ wildcard syntax">

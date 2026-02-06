@@ -38,15 +38,18 @@
 | WebSearch | fact-check, current info | Native web search (no flag needed) |
   </native>
 
-  <effort note="Reasoning depth control (Opus 4.5)">
-| Flag | Effect | MCP | budget_tokens |
-|------|--------|-----|---------------|
-| `--effort low` | Minimal (~76% fewer tokens) | None | 1024 |
-| `--effort medium` | Balanced (default) | Sequential on demand | 4096 |
-| `--effort high` | Maximum depth, comprehensive | Sequential + Context7 | 10240-32768 |
+  <effort note="Adaptive thinking (Opus 4.6)">
+| Flag | Behavior | MCP |
+|------|----------|-----|
+| `--effort low` | May skip thinking for simple tasks | None |
+| `--effort medium` | Selective thinking, balanced | Sequential on demand |
+| `--effort high` | Default — almost always thinks | Sequential + Context7 |
+| `--effort max` | Unconstrained depth (Opus 4.6 only) | All available |
 
-Legacy: `--think`→medium, `--think-hard`→high, `--ultrathink`→high+all-mcp
-Note: temperature incompatible with thinking; budget auto-scaled when alwaysThinkingEnabled=true
+Thinking: `{type: "adaptive"}` — Claude decides when/how much to think
+Deprecated: budget_tokens (still functional, will be removed)
+Legacy: `--think`→medium, `--think-hard`→high, `--ultrathink`→max+all-mcp
+Note: temperature incompatible with thinking; interleaved thinking automatic
   </effort>
 
   <execution>
