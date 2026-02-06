@@ -113,4 +113,24 @@ Note: temperature incompatible with thinking; interleaved thinking automatic
 
 Frontmatter usage: `Deploy $0 to $1 environment.`
   </argument_syntax>
+
+  <persona_index note="Agent abbreviations for <personas p='...'/>">
+| Abbr | Agent | Domain |
+|------|-------|--------|
+| arch | system-architect | Architecture, scalability |
+| fe | frontend-architect | UI, accessibility, React/Vue |
+| be | backend-architect | API, database, security |
+| sec | security-engineer | OWASP, vulnerabilities |
+| qa | quality-engineer | Testing, coverage |
+| ops | devops-architect | CI/CD, Kubernetes |
+| pm | pm-agent | Orchestration, docs |
+| perf | performance-engineer | Optimization, profiling |
+| refactor | refactoring-expert | Tech debt, SOLID |
+| root | root-cause-analyst | Debug, hypothesis |
+  </persona_index>
+
+  <mcp_auto_mode note="v2.1.7+">
+When MCP tool descriptions exceed 10% of context → defer to MCPSearch tool
+Disable: Add MCPSearch to disallowedTools
+  </mcp_auto_mode>
 </component>

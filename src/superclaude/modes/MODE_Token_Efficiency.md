@@ -13,7 +13,7 @@
 - Structure: Bullets, tables, concise over verbose
   </behaviors>
 
-  <context_limits note="Percentage-based thresholds (aligned with MODE_INDEX.md)">
+  <context_limits note="Percentage-based thresholds (aligned with FLAGS.md)">
 | Level | Usage | Action |
 |-------|-------|--------|
 | Green | 0-75% | Full capabilities, all tools, normal verbosity |
