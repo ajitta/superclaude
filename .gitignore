@@ -202,3 +202,4 @@ uv.lock
 .claude/
 docs/mistakes/
 docs/memory/solutions_learned.jsonl
+.envrc
