@@ -55,6 +55,8 @@ description: List all available /sc commands and their functionality
   <flags>
     <category name="Mode">
       - --brainstorm: Collaborative discovery
+      - --business-panel: Multi-expert business analysis
+      - --research: Systematic investigation mode
       - --introspect: Expose thinking process
       - --task-manage: Systematic organization
       - --orchestrate: Parallel tool optimization

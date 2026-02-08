@@ -26,17 +26,17 @@ description: Ultra-intelligent command recommendation engine for optimal SuperCl
 
   <keyword_map>
     - ml (machine learning|ml|ai|model): /sc:analyze --seq --c7|/sc:design --seq --effort max
-    - web (website|frontend|ui|react|vue): /sc:build --feature --magic|/sc:test --e2e --pup
+    - web (website|frontend|ui|react|vue): /sc:build --feature --magic|/sc:test --e2e --play
     - api (api|backend|server|microservice): /sc:design --api --ddd --seq|/sc:build --feature --tdd
     - debug (error|bug|issue|not working): /sc:troubleshoot --investigate --seq|/sc:analyze --code
-    - perf (slow|performance|optimization): /sc:analyze --performance --pup --profile|/sc:improve --performance
-    - sec (security|auth|vulnerability|owasp): /sc:scan --security --owasp --deps|/sc:analyze --security
-    - test (test|qa|coverage|e2e): /sc:test --coverage --e2e --pup|/sc:scan --validate
+    - perf (slow|performance|optimization): /sc:analyze --performance --play --profile|/sc:improve --performance
+    - sec (security|auth|vulnerability|owasp): /sc:analyze --focus security --seq|/sc:improve --focus security
+    - test (test|qa|coverage|e2e): /sc:test --coverage --e2e --play|/sc:analyze --focus quality
     - learn (how|learn|explain|tutorial): /sc:document --user --examples|/sc:brainstorm --interactive
   </keyword_map>
 
   <project_detect>
-    - react (package.json+react|src/App.jsx): --magic --c7 --pup
+    - react (package.json+react|src/App.jsx): --magic --c7 --play
     - node_api (express|server.js|routes/): --seq --c7
     - python (requirements.txt|setup.py|main.py): --seq
   </project_detect>

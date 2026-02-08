@@ -12,7 +12,7 @@ Behavioral modes that shift Claude's communication style and priorities for spec
 | Introspection | `--introspect` | Meta-cognitive analysis and reasoning optimization |
 | Orchestration | `--orchestrate` | Intelligent tool selection and resource efficiency |
 | Task Management | `--task-manage` | Hierarchical task organization for multi-step operations |
-| Token Efficiency | `--uc` | Symbol-enhanced communication for compressed clarity |
+| Token Efficiency | `--token-efficient` or `--uc` | Symbol-enhanced communication for compressed clarity |
 
 ## How Modes Work
 

@@ -18,7 +18,7 @@
   </examples>
 
   <integrations>
-`/analyze @model.md --business-panel` | `/improve @strategy.md --business-panel` | `/design business-model --business-panel`
+`/sc:analyze @model.md --business-panel` | `/sc:improve @strategy.md --business-panel` | `/sc:design business-model --business-panel`
   </integrations>
 
   <expert_selection>
@@ -36,7 +36,7 @@
 
   <output_formats>
 - Executive: `--structured --synthesis-only` → 🎯Strategic|💰Financial|🏆Competitive|📈Growth|⚠️Risk|🧩Synthesis
-- Detailed: `--verbose` → Per-expert analysis + cross-framework synthesis
+- Detailed: default output (omit `--synthesis-only`) → Per-expert analysis + cross-framework synthesis
 - Questions: `--questions` → Strategic questions per framework
   </output_formats>
 
@@ -47,9 +47,9 @@
   </workflows>
 
   <customization>
-focus: `--christensen-focus "disruption"` | `--porter-focus "moats"`
-style: `--interaction collaborative|challenging`
-depth: `--depth surface|detailed` | `--quick --experts-max 3` | `--comprehensive`
+focus: `--focus innovation|strategy|risk|systems`
+experts: `--experts "porter,christensen,meadows"` | `--all-experts`
+output: `--structured` | `--synthesis-only`
   </customization>
 
   <quality>
