@@ -17,12 +17,15 @@
     <monitoring>
       - Status line (v2.1.6+): context_window.used_percentage
       - Check before complex ops: Glob large dirs, multi-file reads
+      - Opus 4.6 uses 25-50% more tokens — trigger efficiency earlier
     </monitoring>
     <best_practices>
       - One major task per session for optimal performance
-      - Use --uc proactively when approaching 75%
+      - Use --uc proactively when approaching 60% (was 75%, lowered for Opus 4.6)
       - Prefer symbol communication at Yellow threshold
       - Fresh sessions for unrelated tasks
+      - Use effort=medium for routine tasks to reduce thinking overhead
+      - Minimize subagent spawning — solve in single session when possible
     </best_practices>
   </context_limits>
 

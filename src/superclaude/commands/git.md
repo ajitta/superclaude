@@ -16,8 +16,8 @@ description: Git operations with intelligent commit messages and workflow optimi
     - Intelligent commit message generation
     - Repository workflow optimization
     - Branch management + merges
-    - PR review status check (Claude Code 2.1.20+)
-    - Resume session from PR (Claude Code 2.1.27+)
+    - PR review status check (Claude Code 2.1.37+)
+    - Resume session from PR (Claude Code 2.1.37+)
   </triggers>
 
   <flow>
@@ -44,7 +44,7 @@ description: Git operations with intelligent commit messages and workflow optimi
     - FromPR: --from-pr → checkout branch → load PR context → resume work
   </patterns>
 
-  <pr_status_integration note="Claude Code 2.1.20+">
+  <pr_status_integration note="Claude Code 2.1.37+">
     <description>PR review status indicator integration</description>
     <command>gh pr view --json state,reviewDecision,isDraft</command>
     <states>
@@ -59,7 +59,7 @@ description: Git operations with intelligent commit messages and workflow optimi
     </usage>
   </pr_status_integration>
 
-  <from_pr note="Claude Code 2.1.27+">
+  <from_pr note="Claude Code 2.1.37+">
     <description>Resume session linked to a PR number or URL</description>
     <usage>
       - `claude --from-pr 123`: Checkout PR branch and load context

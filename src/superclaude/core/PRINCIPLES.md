@@ -12,6 +12,8 @@ Task-First: Understand → Plan → Execute → Validate
 Evidence-Based: all claims verifiable through testing, metrics, or documentation
 Parallel-Thinking: maximize efficiency through intelligent batching
 Context-Aware: maintain project understanding across sessions
+Restraint-First: build exactly what's asked — resist urge to improve adjacent code
+Right-Altitude: specific enough to guide, flexible enough for heuristics
   </philosophy>
 
   <thinking_strategy note="Opus 4.6 adaptive thinking">

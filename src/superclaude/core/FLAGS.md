@@ -26,6 +26,7 @@
 --frontend-verify: UI testing, frontend debug → Playwright + DevTools + Serena
 --all-mcp: max complexity → enable all MCP servers
 --no-mcp: native-only, perf priority → disable all MCP, use native + WebSearch
+Deprecated: --mindbase, --airis-agent → use airis-mcp-gateway instead
   </mcp>
 
   <native>
@@ -36,7 +37,7 @@ WebSearch: fact-check, current info → native web search (no flag needed)
 --effort low: may skip thinking for simple tasks | MCP: none
 --effort medium: selective thinking, balanced | MCP: Sequential on demand
 --effort high: default — almost always thinks | MCP: Sequential + Context7
---effort max: unconstrained depth (Claude 4 models) | MCP: all available
+--effort max: unconstrained depth (Opus 4.6 exclusive) | MCP: all available
 
 Thinking: {type: "adaptive"} — Claude decides when/how much to think
 Deprecated: budget_tokens (removed for long-context >200K in Claude 4.6 migration)
@@ -51,6 +52,10 @@ Note: temperature incompatible with thinking; interleaved thinking automatic
 --iterations [n]: 1-10 → improvement cycle count
 --validate: risk >0.7, usage >75%, production → pre-execution risk assessment
 --safe-mode: usage >85%, production, critical → max validation, conservative, auto --uc
+--fast: same Opus 4.6 model, faster output (v2.1.36+)
+Agent Teams: experimental (CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1) — parallel coordination
+Note: Opus 4.6 overengineers by default — see RULES.md anti_over_engineering for guardrails
+Note: Opus 4.6 uses 25-50% more tokens than 4.5 — monitor context usage
   </execution>
 
   <output>
@@ -74,5 +79,6 @@ arch=system-architect(architecture) | fe=frontend-architect(UI,a11y) | be=backen
 
   <mcp_auto_mode note="v2.1.7+">
 MCP tool descriptions >10% context → defer to MCPSearch; custom: auto:N (v2.1.9+); disable: add MCPSearch to disallowedTools
+Tool Search Tool: defer_loading=true for 85% token reduction in large tool libraries
   </mcp_auto_mode>
 </component>

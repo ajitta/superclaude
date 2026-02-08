@@ -67,4 +67,10 @@ description: Intelligent MCP tool selection based on complexity scoring and oper
   </examples>
 
   <bounds will="optimal selection|complexity scoring|sub-100ms decision" wont="override explicit preference|skip analysis|compromise performance"/>
+
+  <handoff>
+    <next command="/sc:implement">For executing with selected tool</next>
+    <next command="/sc:analyze">For deeper analysis before tool selection</next>
+    <format>Include selected tool + rationale for downstream use</format>
+  </handoff>
 </component>

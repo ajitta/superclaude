@@ -16,7 +16,7 @@ description: Execute complex tasks with intelligent workflow management and dele
     - Structured workflow management
     - Intelligent MCP routing needs
     - Systematic execution requirements
-    - Task cleanup and maintenance (Claude Code 2.1.20+)
+    - Task cleanup and maintenance (Claude Code 2.1.37+)
   </triggers>
 
   <flow>
@@ -28,7 +28,7 @@ description: Execute complex tasks with intelligent workflow management and dele
     6. Cleanup: Auto-remove stale/completed tasks (--cleanup)
   </flow>
 
-  <task_cleanup note="Claude Code 2.1.20+">
+  <task_cleanup note="Claude Code 2.1.37+">
     <description>Automatic task cleanup via TaskUpdate delete feature</description>
     <cleanable_states>
       - completed: Successfully finished tasks

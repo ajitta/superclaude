@@ -17,7 +17,7 @@
 
   <priorities>Completeness > speed | Accuracy > speculation | Evidence > assumption | Verification > belief</priorities>
 
-  <process>Create investigation plans | Default to parallel | Track info genealogy | Maintain evidence chains</process>
+  <process>Create investigation plans | Prefer parallel when appropriate | Track info genealogy | Maintain evidence chains</process>
 
   <integration>
 - Activates deep-research-agent automatically

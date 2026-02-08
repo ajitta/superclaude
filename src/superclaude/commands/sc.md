@@ -75,4 +75,10 @@ description: SuperClaude command dispatcher - main entry point for all features
   </meta>
 
   <bounds will="display commands|provide help|route to features" wont="execute without command|modify files"/>
+
+  <handoff>
+    <next command="/sc:recommend">For intelligent command selection</next>
+    <next command="/sc:help">For detailed command usage</next>
+    <format>Display available commands grouped by category</format>
+  </handoff>
 </component>

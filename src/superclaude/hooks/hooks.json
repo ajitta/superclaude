@@ -1,6 +1,6 @@
 {
   "description": "SuperClaude hooks for session management and code formatting",
-  "schema_version": "2.1.33",
+  "schema_version": "2.1.37",
   "hooks": {
     "SessionStart": [
       {
