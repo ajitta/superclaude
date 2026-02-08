@@ -86,21 +86,25 @@ Claude Codeは[Anthropic](https://www.anthropic.com/)によって構築および
 
 ## ⚡ **クイックインストール**
 
-> **重要**：古いドキュメントで説明されているTypeScriptプラグインシステムは
-> まだ利用できません（v5.0で予定）。v4.xの現在のインストール
-> 手順については、以下の手順に従ってください。
-
 ### **現在の安定バージョン (v4.2.1+ajitta)**
 
 SuperClaudeは現在スラッシュコマンドを使用しています。
 
-**オプション1：pipx（推奨）**
 ```bash
-# PyPIからインストール
-pipx install superclaude
+# リポジトリをクローン
+git clone https://github.com/ajitta/superclaude.git
+cd superclaude
 
-# コマンドをインストール（/research、/index-repo、/agent、/recommendをインストール）
-superclaude install
+# グローバルuvツールとしてデプロイ
+make deploy
+# makeがインストールされていない場合、uvを直接使用:
+# uv tool install --force .
+
+# コマンド、エージェント、モード、コア設定を~/.claude/にインストール
+superclaude install --force
+
+# MCPサーバーのインストール（オプション、機能強化用）
+superclaude mcp
 
 # インストールを確認
 superclaude install --list
@@ -109,32 +113,11 @@ superclaude doctor
 
 インストール後、Claude Codeを再起動してコマンドを使用します：
 - `/sc:research` - 並列検索による深いウェブ研究
-- `/sc:index-repo` - コンテキスト最適化のためのリポジトリインデックス作成
-- `/sc:agent` - 専門AIエージェント
-- `/sc:recommend` - コマンド推奨
-- `/sc` - 利用可能なすべてのSuperClaudeコマンドを表示
-
-**オプション2：Gitから直接インストール**
-```bash
-# リポジトリをクローン
-git clone https://github.com/SuperClaude-Org/SuperClaude_Framework.git
-cd SuperClaude_Framework
-
-# インストールスクリプトを実行
-./install.sh
-```
-
-### **v5.0で提供予定（開発中）**
-
-新しいTypeScriptプラグインシステムを積極的に開発中です（詳細は[#419](https://github.com/SuperClaude-Org/SuperClaude_Framework/issues/419)を参照）。リリース後、インストールは次のように簡略化されます：
-
-```bash
-# この機能はまだ利用できません
-/plugin marketplace add SuperClaude-Org/superclaude-plugin-marketplace
-/plugin install superclaude
-```
-
-**ステータス**：開発中。ETAは未定です。
+- `/sc:brainstorm` - 構造化ブレインストーミング
+- `/sc:implement` - コード実装
+- `/sc:test` - テストワークフロー
+- `/sc:pm` - プロジェクト管理
+- `/sc` - 利用可能なすべての30コマンドを表示
 
 ### **パフォーマンス向上（オプションのMCP）**
 

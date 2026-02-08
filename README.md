@@ -103,26 +103,25 @@ Claude Code is a product built and maintained by [Anthropic](https://www.anthrop
 
 ## ⚡ **Quick Installation**
 
-> **IMPORTANT**: The TypeScript plugin system described in older documentation is
-> not yet available (planned for v5.0). For current installation
-> instructions, please follow the steps below for v4.x.
-
 ### **Current Stable Version (v4.2.1+ajitta)**
 
 SuperClaude currently uses slash commands.
 
-**Option 1: pipx (Recommended)**
 ```bash
-# Install from PyPI
-pipx install superclaude
+# Clone the repository
+git clone https://github.com/ajitta/superclaude.git
+cd superclaude
 
-# Install commands (installs all 30 slash commands)
-superclaude install
+# Deploy as global uv tool
+make deploy
+# If make is not available, use uv directly:
+# uv tool install --force .
+
+# Install commands, agents, modes, and core configs into ~/.claude/
+superclaude install --force
 
 # Install MCP servers (optional, for enhanced capabilities)
-superclaude mcp --list         # List available MCP servers
-superclaude mcp                # Interactive installation
-superclaude mcp --servers tavily --servers context7  # Install specific servers
+superclaude mcp
 
 # Verify installation
 superclaude install --list
@@ -136,29 +135,6 @@ After installation, restart Claude Code to use 30 commands including:
 - `/sc:test` - Testing workflows
 - `/sc:pm` - Project management
 - `/sc` - Show all 30 available commands
-
-**Option 2: Direct Installation from Git**
-```bash
-# Clone the repository
-git clone https://github.com/SuperClaude-Org/SuperClaude_Framework.git
-cd SuperClaude_Framework
-
-# Run the installation script
-./install.sh
-```
-
-**Option 3: Project-Specific Installation**
-```bash
-# Clone and install to project directory
-git clone https://github.com/SuperClaude-Org/SuperClaude_Framework.git
-cd SuperClaude_Framework
-
-# Install to current directory (./.claude/)
-./install.sh --scope project
-
-# Or non-interactive with force reinstall
-./install.sh --scope project --yes --force
-```
 
 **CLI Scope Reference (all commands use consistent --scope):**
 
@@ -176,45 +152,6 @@ cd SuperClaude_Framework
 | `project` | `./.claude/` | Current project only |
 | `local` | `.mcp.json` | MCP servers only |
 
-**Option 4: Development with Global Access (uv)**
-```bash
-# Clone and setup
-git clone https://github.com/SuperClaude-Org/SuperClaude_Framework.git
-cd SuperClaude_Framework
-
-# Install as global tool (use from any directory)
-uv tool install .
-
-# Now use from anywhere
-cd /any/project
-superclaude install
-superclaude mcp --servers tavily
-```
-
-**How `uv tool install .` works:**
-
-The command reads `pyproject.toml` and performs the following:
-
-```
-Read pyproject.toml → hatchling build → Create wheel → Global install
-```
-
-| Step | What Happens |
-|------|--------------|
-| **1. Metadata** | Reads `[project]` for name, version, dependencies |
-| **2. Entry Point** | Uses `[project.scripts]` to create `superclaude` CLI command |
-| **3. Build** | hatchling creates wheel from `src/superclaude/` |
-| **4. Install** | Places binary in `~/.local/bin/` (Linux/Mac) or `%USERPROFILE%\.local\bin\` (Windows) |
-
-**Key pyproject.toml sections:**
-```toml
-[project.scripts]
-superclaude = "superclaude.cli.main:main"  # CLI entry point
-
-[project.entry-points.pytest11]
-superclaude = "superclaude.pytest_plugin"   # pytest plugin auto-load
-```
-
 **For contributors/developers:**
 ```bash
 # Initial setup (editable mode for development)
@@ -227,9 +164,6 @@ uv run pytest tests/ -v                 # Run tests
 # Deploy changes to global tool (recommended)
 make deploy               # Handles cache invalidation automatically
 
-# Or manual deploy (may miss file changes due to uv caching)
-# uv tool install --force .
-
 # Verify installation
 uv tool list              # List installed tools
 which superclaude         # Check install path (Linux/Mac)
@@ -241,18 +175,6 @@ where superclaude         # Check install path (Windows)
 | Dev/Test | `uv run superclaude ...` | Test in repo (editable) |
 | Deploy | `make deploy` | Update global tool (cache-safe) |
 | Use | `superclaude ...` | Run from anywhere |
-
-### **Coming in v5.0 (In Development)**
-
-We are actively working on a new TypeScript plugin system (see issue [#419](https://github.com/SuperClaude-Org/SuperClaude_Framework/issues/419) for details). When released, installation will be simplified to:
-
-```bash
-# This feature is not yet available
-/plugin marketplace add SuperClaude-Org/superclaude-plugin-marketplace
-/plugin install superclaude
-```
-
-**Status**: In development. No ETA has been set.
 
 ### **Enhanced Performance (Optional MCPs)**
 
