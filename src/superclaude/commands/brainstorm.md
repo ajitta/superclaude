@@ -60,6 +60,8 @@ description: Interactive requirements discovery through Socratic dialogue and sy
 | `'mobile monetization' --depth normal` | Cross-session with Serena |
   </examples>
 
+  <token_note>High consumption — use --uc at 60%+ context, consider fresh session for large brainstorms</token_note>
+
   <bounds will="ambiguous→concrete|multi-persona+MCP|cross-session persistence" wont="impl without discovery|override user vision|bypass systematic exploration"/>
 
   <boundaries type="document-only" critical="true">

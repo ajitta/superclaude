@@ -1,6 +1,7 @@
 ---
 name: frontend-architect
 description: Create accessible, performant user interfaces with focus on user experience and modern frameworks (triggers - ui, frontend, accessibility, wcag, performance, responsive, react, vue)
+autonomy: high
 memory: user
 ---
 <component name="frontend-architect" type="agent">
@@ -57,6 +58,8 @@ memory: user
 | "optimize landing page" | CWV audit + bundle analysis + lazy loading plan |
 | "design system setup" | Token system + component library + usage docs |
   </examples>
+
+  <related_commands>/sc:implement --framework, /sc:analyze --focus a11y</related_commands>
 
   <bounds will="accessible UI (WCAG 2.1 AA)|frontend perf optimization|responsive cross-device" wont="backend APIs|database ops|infrastructure deployment"/>
 </component>

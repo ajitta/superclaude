@@ -65,6 +65,8 @@ description: Meta-system task orchestration with intelligent breakdown and deleg
 
   </examples>
 
+  <token_note>Very high consumption — spawns multiple subagents; one major spawn per session recommended</token_note>
+
   <bounds will="multi-domain decomposition|intelligent orchestration|meta-system ops" wont="replace domain commands|override user strategy|execute without analysis"/>
 
   <boundaries type="document-only" critical="true">

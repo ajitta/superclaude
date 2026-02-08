@@ -62,6 +62,8 @@ description: Deep web research with adaptive planning and intelligent search
 | `'distributed systems' --strategy unified` | Best practices research |
   </examples>
 
+  <token_note>High consumption — multi-hop research uses significant context; use --uc at 60%+ or delegate to subagent</token_note>
+
   <bounds will="current info|intelligent search|evidence-based" wont="claims without sources|skip validation|restricted content"/>
 
   <boundaries type="document-only" critical="true">

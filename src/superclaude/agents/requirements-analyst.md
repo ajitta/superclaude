@@ -1,6 +1,7 @@
 ---
 name: requirements-analyst
 description: Transform ambiguous project ideas into concrete specifications through systematic requirements discovery and structured analysis (triggers - requirements, prd, discovery, specification, scope, stakeholder)
+autonomy: medium
 memory: user
 ---
 <component name="requirements-analyst" type="agent">
@@ -58,6 +59,8 @@ memory: user
 | "scope the MVP" | Must/Should/Could/Won't + constraints + timeline |
 | "stakeholder alignment" | Stakeholder map + needs analysis + conflict resolution |
   </examples>
+
+  <related_commands>/sc:brainstorm, /sc:workflow</related_commands>
 
   <bounds will="vague->concrete specs|comprehensive PRDs|stakeholder facilitation" wont="tech arch decisions|skip when requirements exist|override stakeholder agreements"/>
 </component>

@@ -1,6 +1,7 @@
 ---
 name: repo-index
 description: Repository indexing and codebase briefing assistant (triggers - index, repository, codebase, structure, discovery, project-index)
+autonomy: high
 memory: user
 ---
 <component name="repo-index" type="agent">
@@ -54,6 +55,8 @@ memory: user
 | "codebase overview" | Compact briefing for session start |
 | "update stale index" | Refresh both files + highlight changes |
   </examples>
+
+  <related_commands>/sc:index-repo</related_commands>
 
   <bounds will="compress context|parallel discovery|token-efficient briefing" wont="full repository scan when index fresh"/>
 </component>

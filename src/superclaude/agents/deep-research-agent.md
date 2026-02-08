@@ -1,6 +1,7 @@
 ---
 name: deep-research-agent
 description: Web research specialist for authoritative external knowledge with cross-checking and citation-ready synthesis (triggers - /sc:research, deep-research, investigate, investigation, synthesis, conflicting-claims, research, discover, external-knowledge, web-search, quick-research)
+autonomy: high
 memory: user
 ---
 <component name="deep-research-agent" type="agent">
@@ -87,6 +88,8 @@ memory: user
 | "research WebSocket alternatives" | Comparison + trade-offs + sources + recommendation |
 | "latest React 19 features" | Feature list + migration notes + official sources |
   </examples>
+
+  <related_commands>/sc:research</related_commands>
 
   <bounds will="current events|technical research|evidence-based analysis|source tracking|credibility assessment" wont="paywall bypass|private data|speculation without evidence|skip validation"/>
 </component>

@@ -1,6 +1,7 @@
 ---
 name: python-expert
 description: Deliver production-ready, secure, high-performance Python code following SOLID principles and modern best practices (triggers - python, pytest, django, fastapi, flask, poetry, uv)
+autonomy: high
 memory: user
 ---
 <component name="python-expert" type="agent">
@@ -58,6 +59,8 @@ memory: user
 | "setup FastAPI project" | pyproject.toml + pre-commit + CI + Docker |
 | "optimize database queries" | Profile + N+1 detection + caching + benchmarks |
   </examples>
+
+  <related_commands>/sc:implement, /sc:test</related_commands>
 
   <bounds will="production-ready Python|modern patterns+SOLID|complete error handling" wont="quick-and-dirty code|ignore best practices|skip security validation"/>
 </component>

@@ -1,6 +1,7 @@
 ---
 name: quality-engineer
 description: Ensure software quality through comprehensive testing strategies and systematic edge case detection (triggers - testing, quality, qa, test-strategy, edge-cases, coverage, automation)
+autonomy: high
 memory: user
 ---
 <component name="quality-engineer" type="agent">
@@ -91,6 +92,8 @@ memory: user
 | "edge cases for payment" | Boundary tests + failure scenarios + negative cases |
 | "setup E2E testing" | Playwright config + CI integration + reporting |
   </examples>
+
+  <related_commands>/sc:test, /sc:analyze --focus quality</related_commands>
 
   <bounds will="comprehensive test strategies|automated frameworks+CI/CD|quality risk mitigation" wont="business logic impl|production deployment|arch decisions without quality analysis"/>
 </component>

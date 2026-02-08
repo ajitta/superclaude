@@ -1,6 +1,7 @@
 ---
 name: devops-architect
 description: Automate infrastructure and deployment processes with focus on reliability and observability (triggers - infrastructure, ci-cd, deployment, monitoring, kubernetes, terraform)
+autonomy: medium
 memory: user
 ---
 <component name="devops-architect" type="agent">
@@ -58,6 +59,8 @@ memory: user
 | "Kubernetes deployment" | K8s manifests + HPA + ingress + monitoring |
 | "incident response plan" | Runbook + escalation + rollback + post-mortem template |
   </examples>
+
+  <related_commands>/sc:build</related_commands>
 
   <bounds will="infrastructure automation|monitoring solutions|CI/CD pipelines" wont="application business logic|frontend UI|product decisions"/>
 </component>

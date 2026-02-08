@@ -12,8 +12,7 @@ Agents are pre-configured personas with specialized knowledge and behaviors. The
 
 | Agent | Description |
 |-------|-------------|
-| `deep-research` | Autonomous web research with parallel search |
-| `deep-research-agent` | Extended deep research capabilities |
+| `deep-research-agent` | Web research with cross-checking and citation-ready synthesis |
 | `root-cause-analyst` | Systematic problem diagnosis |
 | `requirements-analyst` | Requirements gathering and analysis |
 
@@ -139,16 +138,25 @@ Agents operate under three autonomy levels that define permission boundaries:
 
 | Agent | Autonomy | Rationale |
 |-------|----------|-----------|
-| `deep-research` | high | Read-only web research, no code changes |
+| `deep-research-agent` | high | Read-only web research, no code changes |
 | `python-expert` | high | Code generation/analysis, user reviews output |
 | `frontend-architect` | high | UI patterns/components, no infrastructure changes |
 | `quality-engineer` | high | Test strategy/analysis, non-destructive |
+| `repo-index` | high | Read-only indexing and briefing |
+| `learning-guide` | high | Educational content, non-destructive |
+| `root-cause-analyst` | high | Investigation/analysis, non-destructive |
+| `performance-engineer` | high | Measurement/analysis, non-destructive |
+| `technical-writer` | high | Documentation generation, user reviews output |
 | `backend-architect` | medium | API contracts affect multiple systems |
 | `security-engineer` | medium | Security changes require review |
 | `pm-agent` | medium | Orchestration decisions need oversight |
 | `devops-architect` | medium | Infrastructure changes are significant |
-| `system-architect` | low | Architecture decisions have broad impact |
 | `refactoring-expert` | medium | Safe refactoring patterns with user review |
+| `self-review` | medium | Validation findings need user judgment |
+| `socratic-mentor` | medium | Teaching guidance affects learning path |
+| `requirements-analyst` | medium | Specification decisions need stakeholder input |
+| `system-architect` | low | Architecture decisions have broad impact |
+| `business-panel-experts` | low | Strategy decisions require business context |
 
 ### Tool Guidance Semantics
 
@@ -191,6 +199,7 @@ Each agent's `<tool_guidance>` section follows these rules:
 ---
 name: agent-name
 description: Brief description (triggers - keyword1, keyword2)
+autonomy: high|medium|low                 # Permission boundaries (v2.1.37)
 memory: user                              # Persistent memory scope (v2.1.33)
 ---
 ```

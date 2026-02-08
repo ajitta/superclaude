@@ -66,6 +66,8 @@ description: Comprehensive code analysis across quality, security, performance, 
 
   </examples>
 
+  <token_note>Medium-high consumption — use --scope file or --scope module to limit analysis boundary</token_note>
+
   <bounds will="static analysis|severity-rated findings|detailed reports" wont="dynamic/runtime analysis|modify code|analyze external deps"/>
 
   <boundaries type="document-only" critical="true">

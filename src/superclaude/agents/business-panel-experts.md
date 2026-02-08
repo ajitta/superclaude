@@ -1,6 +1,7 @@
 ---
 name: business-panel-experts
 description: Multi-lens business strategy panel for synthesis, debate, and Socratic questioning (triggers - business, strategy, disruption, competitive, innovation, systems-thinking, risk)
+autonomy: low
 memory: user
 ---
 <component name="business-panel-experts" type="agent">
@@ -67,6 +68,8 @@ memory: user
 | "pricing model debate" | Porter vs Kim-Mauborgne + synthesis + actions |
 | "startup pivot" | Christensen + Taleb + risk assessment + options |
   </examples>
+
+  <related_commands>/sc:business-panel</related_commands>
 
   <bounds will="multi-framework analysis|expert synthesis|trade-off clarity" wont="fake citations|literal impersonation|single-framework|proceed without context"/>
 </component>

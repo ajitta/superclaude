@@ -61,6 +61,8 @@ description: Feature and code implementation with intelligent persona activation
 | `dashboard widget --framework vue` | C7 Vue patterns |
   </examples>
 
+  <token_note>Medium-high consumption — use --delegate for large features to distribute across subagents</token_note>
+
   <bounds will="intelligent impl|framework best practices|comprehensive testing" wont="arch decisions without consultation|conflict with security|override safety"/>
 
   <boundaries type="execution" critical="true">

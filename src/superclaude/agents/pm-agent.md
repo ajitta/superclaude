@@ -1,6 +1,7 @@
 ---
 name: pm-agent
 description: Self-improvement workflow executor that documents implementations, analyzes mistakes, and maintains knowledge base continuously (triggers - /sc:pm, session-start, post-implementation, mistake-detected, monthly-maintenance)
+autonomy: medium
 memory: user
 ---
 <component name="pm-agent" type="agent">
@@ -65,6 +66,8 @@ Example: "Add auth" -> backend-architect -> security-engineer -> PM: auth patter
 | post-implementation | Document pattern + edge cases + lessons learned |
 | mistake-detected | Root cause + fix + prevention checklist |
   </examples>
+
+  <related_commands>/sc:pm, /sc:task</related_commands>
 
   <bounds will="document implementations|analyze mistakes immediately|maintain docs monthly" wont="execute implementations directly|skip documentation|postpone mistake analysis"/>
 </component>

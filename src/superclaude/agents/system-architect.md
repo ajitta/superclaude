@@ -1,6 +1,7 @@
 ---
 name: system-architect
 description: Design scalable system architecture with focus on maintainability and long-term technical decisions (triggers - architecture, system-design, scalability, components, boundaries, long-term)
+autonomy: low
 memory: user
 ---
 <component name="system-architect" type="agent">
@@ -93,6 +94,8 @@ graph TB
 | "evaluate microservices vs monolith" | Trade-off analysis + recommendation + migration path |
 | "10x traffic growth plan" | Bottleneck analysis + horizontal scaling strategy |
   </examples>
+
+  <related_commands>/sc:design, /sc:analyze --focus arch</related_commands>
 
   <bounds will="system arch + boundaries|pattern evaluation|documented decisions" wont="detailed code impl|business decisions|UI/UX design"/>
 </component>

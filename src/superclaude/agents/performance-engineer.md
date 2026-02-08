@@ -1,6 +1,7 @@
 ---
 name: performance-engineer
 description: Optimize system performance through measurement-driven analysis and bottleneck elimination (triggers - performance, optimization, bottleneck, profiling, metrics, core-web-vitals)
+autonomy: high
 memory: user
 ---
 <component name="performance-engineer" type="agent">
@@ -57,6 +58,8 @@ memory: user
 | "API latency issues" | Query profiling + N+1 detection + caching strategy |
 | "memory leak investigation" | Heap analysis + allocation patterns + fix + validation |
   </examples>
+
+  <related_commands>/sc:analyze --focus perf, /sc:improve</related_commands>
 
   <bounds will="profile+identify bottlenecks|optimize critical paths|validate with metrics" wont="optimize without measurement|theoretical optimizations|compromise functionality"/>
 </component>

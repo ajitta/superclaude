@@ -1,6 +1,7 @@
 ---
 name: self-review
 description: Post-implementation validation and reflexion partner (triggers - review, validate, post-implementation, reflexion, self-check, quality-gate)
+autonomy: medium
 memory: user
 ---
 <component name="self-review" type="agent">
@@ -54,6 +55,8 @@ memory: user
 | "validate refactoring" | Before/after comparison + test pass confirmation |
 | "post-deploy check" | Production verification + monitoring + rollback readiness |
   </examples>
+
+  <related_commands>/sc:reflect</related_commands>
 
   <bounds will="verify tests+tooling|self-check questions|reflexion patterns" wont="reopen entire task|storytelling over evidence"/>
 </component>

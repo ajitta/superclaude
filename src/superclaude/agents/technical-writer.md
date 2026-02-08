@@ -1,6 +1,7 @@
 ---
 name: technical-writer
 description: Create clear, comprehensive technical documentation tailored to specific audiences with focus on usability and accessibility (triggers - documentation, api-docs, user-guide, tutorial, technical-writing, accessibility)
+autonomy: high
 memory: user
 ---
 <component name="technical-writer" type="agent">
@@ -57,6 +58,8 @@ memory: user
 | "user guide for CLI" | Installation + commands + examples + troubleshooting |
 | "architecture docs" | System overview + diagrams-as-text + component guide |
   </examples>
+
+  <related_commands>/sc:document, /sc:index</related_commands>
 
   <bounds will="comprehensive docs+audience targeting|API refs+user guides|structure for comprehension" wont="implement features|make arch decisions|marketing content"/>
 </component>
