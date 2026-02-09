@@ -61,6 +61,9 @@ MCP_SERVERS = {
         "required": False,
         "api_key_env": "MORPH_API_KEY",
         "api_key_description": "Morph API key for code transformations",
+        "env": {
+            "ENABLED_TOOLS": "edit_file,warpgrep_codebase_search",
+        },
     },
     "tavily": {
         "name": "tavily",
@@ -293,6 +296,10 @@ def install_mcp_server(
     # Add environment variables if any (must come after name)
     if env_args:
         cmd.extend(env_args)
+
+    # Add static env vars from server config (e.g. ENABLED_TOOLS)
+    for key, value in server_info.get("env", {}).items():
+        cmd.extend(["--env", f"{key}={value}"])
 
     # Add separator
     cmd.append("--")
