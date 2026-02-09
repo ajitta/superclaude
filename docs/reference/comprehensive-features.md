@@ -70,7 +70,7 @@ superclaude mcp --dry-run
 3. **magic** - Modern UI component generation and design systems (requires API key)
 4. **playwright** - Cross-browser E2E testing and automation
 5. **serena** - Semantic code analysis and intelligent editing
-6. **morphllm-fast-apply** - Fast Apply capability for context-aware code modifications (requires API key)
+6. **filesystem-with-morph** - Pattern-based bulk code transformations with filesystem access (requires API key)
 7. **tavily** - Web search and real-time information retrieval (requires API key)
 8. **chrome-devtools** - Chrome DevTools debugging and performance analysis
 

@@ -23,7 +23,7 @@ MCP（モデルコンテキストプロトコル）サーバーは、専用ツ�
 - **段階的思考**：多段階の推論と分析
 - **マジック**：モダンなUIコンポーネント生成
 - **プレイライト**：ブラウザ自動化とE2Eテスト
-- **morphllm-fast-apply** : パターンベースのコード変換
+- **filesystem-with-morph** : パターンベースのコード変換
 - **serena** : セマンティックコード理解とプロジェクトメモリ
 
 ## クイックスタート
@@ -107,9 +107,9 @@ export TWENTYFIRST_API_KEY="your_key_here"
 /sc:validate "accessibility compliance" --play
 ```
 
-### morphllm-fast-apply 🔄
+### filesystem-with-morph 🔄
 
-[](https://github.com/khayashi4337/SuperClaude_Framework/blob/master/docs/user-guide/mcp-servers.md#morphllm-fast-apply-)
+[](https://github.com/khayashi4337/SuperClaude_Framework/blob/master/docs/user-guide/mcp-servers.md#filesystem-with-morph-)
 
 **目的**: 効率的なパターンベースのコード変換 **トリガー**: 複数ファイルの編集、リファクタリング、フレームワークの移行 **要件**: Node.js 16+、MORPH_API_KEY
 
@@ -163,9 +163,9 @@ export MORPH_API_KEY="your_key_here"
       "command": "npx",
       "args": ["@playwright/mcp@latest"]
     },
-    "morphllm-fast-apply": {
+    "filesystem-with-morph": {
       "command": "npx",
-      "args": ["@morph-llm/morph-fast-apply"],
+      "args": ["-y", "@morphllm/morphmcp"],
       "env": {"MORPH_API_KEY": "${MORPH_API_KEY}"}
     },
     "serena": {
@@ -267,7 +267,7 @@ echo 'export MORPH_API_KEY="your_key"' >> ~/.bashrc
 
 **2つのAPIキー**:
 
-- 大規模リファクタリングのために morphllm-fast-apply を追加
+- 大規模リファクタリングのために filesystem-with-morph を追加
 
 **一般的なワークフロー:**
 

@@ -15,7 +15,7 @@ superclaude mcp
 superclaude mcp --servers tavily --servers context7
 
 # Install all servers
-superclaude mcp --servers sequential-thinking context7 magic playwright serena morphllm-fast-apply tavily chrome-devtools
+superclaude mcp --servers sequential-thinking context7 magic playwright serena filesystem-with-morph tavily chrome-devtools
 ```
 
 ## Available MCP Servers
@@ -27,7 +27,7 @@ superclaude mcp --servers sequential-thinking context7 magic playwright serena m
 | **magic** | Modern UI component generation and design systems | Yes (`TWENTYFIRST_API_KEY`) |
 | **playwright** | Cross-browser E2E testing and automation | No |
 | **serena** | Semantic code analysis and intelligent editing | No |
-| **morphllm-fast-apply** | Fast Apply for context-aware code modifications | Yes (`MORPH_API_KEY`) |
+| **filesystem-with-morph** | Pattern-based bulk code transformations with filesystem access | Yes (`MORPH_API_KEY`) |
 | **tavily** | Web search and real-time information retrieval | Yes (`TAVILY_API_KEY`) |
 | **chrome-devtools** | Chrome DevTools debugging and performance analysis | No |
 

@@ -15,7 +15,7 @@ MCP (Model Context Protocol) 서버는 전문 도구를 통해 Claude Code의 �
 - **sequential-thinking**: 다단계 추론 및 분석
 - **magic**: 현대적인 UI 컴포넌트 생성
 - **playwright**: 브라우저 자동화 및 E2E 테스팅
-- **morphllm-fast-apply**: 패턴 기반 코드 변환
+- **filesystem-with-morph**: 패턴 기반 코드 변환
 - **serena**: 의미론적 코드 이해 및 프로젝트 메모리
 - **tavily**: 웹 검색 및 실시간 정보 검색
 - **chrome-devtools**: 성능 분석 및 디버깅
@@ -32,7 +32,7 @@ MCP (Model Context Protocol) 서버는 전문 도구를 통해 Claude Code의 �
 | `--think`, 디버깅 | **sequential-thinking** |
 | `component`, `UI`, frontend | **magic** |
 | `test`, `e2e`, `browser` | **playwright** |
-| 다중 파일 편집, 리팩토링 | **morphllm-fast-apply** |
+| 다중 파일 편집, 리팩토링 | **filesystem-with-morph** |
 | 대규모 프로젝트, 세션 | **serena** |
 | `/sc:research`, `latest`, `current` | **tavily** |
 | `performance`, `debug`, `LCP` | **chrome-devtools** |
@@ -95,7 +95,7 @@ export TWENTYFIRST_API_KEY="your_key_here"
 /sc:validate "접근성 규정 준수" --play
 ```
 
-### morphllm-fast-apply 🔄
+### filesystem-with-morph 🔄
 **목적**: 효율적인 패턴 기반 코드 변환
 **트리거**: 다중 파일 편집, 리팩토링, 프레임워크 마이그레이션
 **요구사항**: Node.js 16+, MORPH_API_KEY
@@ -190,9 +190,9 @@ export TAVILY_API_KEY="tvly-your_api_key_here"
       "command": "npx",
       "args": ["@playwright/mcp@latest"]
     },
-    "morphllm-fast-apply": {
+    "filesystem-with-morph": {
       "command": "npx",
-      "args": ["@morph-llm/morph-fast-apply"],
+      "args": ["-y", "@morphllm/morphmcp"],
       "env": {"MORPH_API_KEY": "${MORPH_API_KEY}"}
     },
     "serena": {
@@ -293,7 +293,7 @@ echo 'export TAVILY_API_KEY="your_key"' >> ~/.bashrc
 - 전문 UI 개발을 위해 magic 추가
 
 **API 키 2개**:
-- 대규모 리팩토링을 위해 morphllm-fast-apply 추가
+- 대규모 리팩토링을 위해 filesystem-with-morph 추가
 
 **일반적인 워크플로우:**
 - **학습**: context7 + sequential-thinking

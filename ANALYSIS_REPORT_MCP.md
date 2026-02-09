@@ -112,8 +112,8 @@ if api_key and server_info.get("api_key_in_url"):
 
 | Component | Name Used |
 |-----------|-----------|
-| JSON config | `morphllm-fast-apply` |
-| install_mcp.py | `morphllm-fast-apply` |
+| JSON config | `filesystem-with-morph` |
+| install_mcp.py | `filesystem-with-morph` |
 | FLAGS.md | `--morph\|--morphllm` |
 | mcp_fallback.py | `morphllm` |
 | context_loader.py | Special mapping needed |
@@ -189,7 +189,7 @@ Trailing newline and inconsistent indentation.
 **Severity:** 🟢 Medium | **File:** `mcp/configs/morphllm.json`
 
 ```json
-"args": ["@morph-llm/morph-fast-apply", "/home/"]
+"args": ["-y", "@morphllm/morphmcp"]
 ```
 
 Hardcoded Unix path; won't work on Windows.

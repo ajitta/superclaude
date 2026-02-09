@@ -1,13 +1,13 @@
 {
-  "morphllm-fast-apply": {
+  "filesystem-with-morph": {
     "command": "npx",
     "args": [
-      "@morph-llm/morph-fast-apply",
-      "/home/"
+      "-y",
+      "@morphllm/morphmcp"
     ],
     "env": {
       "MORPH_API_KEY": "",
-      "ALL_TOOLS": "true"
+      "ENABLED_TOOLS": "edit_file,warpgrep_codebase_search"
     }
   }
 }

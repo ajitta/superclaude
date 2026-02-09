@@ -15,7 +15,7 @@ MCP (Model Context Protocol) servers extend Claude Code's capabilities through s
 - **sequential-thinking**: Multi-step reasoning and analysis  
 - **magic**: Modern UI component generation
 - **playwright**: Browser automation and E2E testing
-- **morphllm-fast-apply**: Pattern-based code transformations
+- **filesystem-with-morph**: Pattern-based code transformations
 - **serena**: Semantic code understanding and project memory
 - **tavily**: Web search and real-time information retrieval
 - **chrome-devtools**: Performance analysis and debugging
@@ -32,7 +32,7 @@ MCP (Model Context Protocol) servers extend Claude Code's capabilities through s
 | `--think`, debugging | **sequential-thinking** |  
 | `component`, `UI`, frontend | **magic** |
 | `test`, `e2e`, `browser` | **playwright** |
-| Multi-file edits, refactoring | **morphllm-fast-apply** |
+| Multi-file edits, refactoring | **filesystem-with-morph** |
 | Large projects, sessions | **serena** |
 | `/sc:research`, `latest`, `current` | **tavily** |
 | `performance`, `debug`, `LCP` | **chrome-devtools** |
@@ -95,7 +95,7 @@ export TWENTYFIRST_API_KEY="your_key_here"
 /sc:validate "accessibility compliance" --play
 ```
 
-### morphllm-fast-apply 🔄
+### filesystem-with-morph 🔄
 **Purpose**: Efficient pattern-based code transformations
 **Triggers**: Multi-file edits, refactoring, framework migrations
 **Requirements**: Node.js 16+, MORPH_API_KEY
@@ -230,9 +230,9 @@ docker compose restart api
       "command": "npx",
       "args": ["@playwright/mcp@latest"]
     },
-    "morphllm-fast-apply": {
+    "filesystem-with-morph": {
       "command": "npx",
-      "args": ["@morph-llm/morph-fast-apply"],
+      "args": ["-y", "@morphllm/morphmcp"],
       "env": {"MORPH_API_KEY": "${MORPH_API_KEY}"}
     },
     "serena": {
@@ -333,7 +333,7 @@ echo 'export TAVILY_API_KEY="your_key"' >> ~/.bashrc
 - Add magic for professional UI development
 
 **2 API Keys**:
-- Add morphllm-fast-apply for large-scale refactoring
+- Add filesystem-with-morph for large-scale refactoring
 
 **Common Workflows:**
 - **Learning**: context7 + sequential-thinking

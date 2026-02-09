@@ -53,14 +53,14 @@ MCP_SERVERS = {
         "command": "uvx --from git+https://github.com/oraios/serena serena start-mcp-server --context claude-code --enable-web-dashboard false --enable-gui-log-window false",
         "required": False,
     },
-    "morphllm-fast-apply": {
-        "name": "morphllm-fast-apply",
-        "description": "Fast Apply capability for context-aware code modifications",
+    "filesystem-with-morph": {
+        "name": "filesystem-with-morph",
+        "description": "Pattern-based bulk code transformations with filesystem access",
         "transport": "stdio",
-        "command": "npx -y @morph-llm/morph-fast-apply",
+        "command": "npx -y @morphllm/morphmcp",
         "required": False,
         "api_key_env": "MORPH_API_KEY",
-        "api_key_description": "Morph API key for Fast Apply",
+        "api_key_description": "Morph API key for code transformations",
     },
     "tavily": {
         "name": "tavily",
@@ -385,7 +385,7 @@ def show_mcp_status():
         # Handle special mappings
         fallback_map = {
             "sequentialthinking": "sequential",
-            "morphllmfastapply": "morphllm",
+            "filesystemwithmorph": "morphllm",
             "chromedevtools": "devtools",
             "airisagent": "airis-agent",
         }

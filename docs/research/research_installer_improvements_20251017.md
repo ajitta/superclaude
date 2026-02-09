@@ -570,7 +570,7 @@ class InstallationConfig(BaseModel):
         """Validate MCP server names"""
         valid_servers = {
             'sequential-thinking', 'context7', 'magic', 'playwright',
-            'serena', 'morphllm', 'morphllm-fast-apply', 'tavily',
+            'serena', 'morphllm', 'filesystem-with-morph', 'tavily',
             'chrome-devtools', 'airis-mcp-gateway'
         }
         invalid = set(v) - valid_servers

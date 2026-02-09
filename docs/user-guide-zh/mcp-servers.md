@@ -15,7 +15,7 @@ MCP（模型上下文协议）服务器通过专业工具扩展 Claude Code 的�
 - **sequential-thinking**：多步推理和分析
 - **magic**：现代 UI 组件生成
 - **playwright**：浏览器自动化和 E2E 测试
-- **morphllm-fast-apply**：基于模式的代码转换
+- **filesystem-with-morph**：基于模式的代码转换
 - **serena**：语义代码理解和项目内存
 
 ## 快速开始
@@ -30,7 +30,7 @@ MCP（模型上下文协议）服务器通过专业工具扩展 Claude Code 的�
 | `--think`、调试 | **sequential-thinking** |
 | `component`、`UI`、前端 | **magic** |
 | `test`、`e2e`、`browser` | **playwright** |
-| 多文件编辑、重构 | **morphllm-fast-apply** |
+| 多文件编辑、重构 | **filesystem-with-morph** |
 | 大型项目、会话 | **serena** |
 
 ## 服务器详情
@@ -91,7 +91,7 @@ export TWENTYFIRST_API_KEY="your_key_here"
 /sc:validate "accessibility compliance" --play
 ```
 
-### morphllm-fast-apply 🔄
+### filesystem-with-morph 🔄
 **目的**：高效的基于模式的代码转换
 **触发器**：多文件编辑、重构、框架迁移
 **要求**：Node.js 16+，MORPH_API_KEY
@@ -142,9 +142,9 @@ export MORPH_API_KEY="your_key_here"
       "command": "npx",
       "args": ["@playwright/mcp@latest"]
     },
-    "morphllm-fast-apply": {
+    "filesystem-with-morph": {
       "command": "npx",
-      "args": ["@morph-llm/morph-fast-apply"],
+      "args": ["-y", "@morphllm/morphmcp"],
       "env": {"MORPH_API_KEY": "${MORPH_API_KEY}"}
     },
     "serena": {
@@ -231,7 +231,7 @@ echo 'export MORPH_API_KEY="your_key"' >> ~/.bashrc
 - 添加 magic 用于专业 UI 开发
 
 **2 个 API 密钥**：
-- 添加 morphllm-fast-apply 用于大规模重构
+- 添加 filesystem-with-morph 用于大规模重构
 
 **常见工作流：**
 - **学习**：context7 + sequential-thinking
