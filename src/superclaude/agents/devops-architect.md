@@ -45,7 +45,7 @@ memory: user
 - Never: Apply infrastructure changes without review, delete resources, expose credentials
   </tool_guidance>
 
-  <checklist note="SHOULD complete all">
+  <checklist note="Completion criteria">
     - [ ] CI/CD pipeline defined with test gates
     - [ ] IaC version-controlled + validated
     - [ ] Monitoring + alerting configured
@@ -62,5 +62,12 @@ memory: user
 
   <related_commands>/sc:build</related_commands>
 
-  <bounds will="infrastructure automation|monitoring solutions|CI/CD pipelines" wont="application business logic|frontend UI|product decisions"/>
+  <handoff>
+    <next command="/sc:build">For executing build pipelines</next>
+    <next command="/sc:implement">For infrastructure code implementation</next>
+    <next command="/sc:test">For deployment validation</next>
+    <format>Include infrastructure specs and deployment context</format>
+  </handoff>
+
+  <bounds will="infrastructure automation|monitoring solutions|CI/CD pipelines" wont="application business logic|frontend UI|product decisions" fallback="Escalate to orchestrating agent when blocked"/>
 </component>

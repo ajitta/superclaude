@@ -11,12 +11,7 @@ description: Generate comprehensive project documentation and knowledge base wit
 
   <syntax>/sc:index [target] [--type docs|api|structure|readme] [--format md|json|yaml]</syntax>
 
-  <triggers>
-    - Project documentation creation
-    - Knowledge base generation
-    - API documentation needs
-    - Cross-referencing requirements
-  </triggers>
+  <triggers>project documentation|knowledge base|API docs|cross-referencing</triggers>
 
   <flow>
     1. Analyze: Project structure + key components
@@ -35,9 +30,9 @@ description: Generate comprehensive project documentation and knowledge base wit
 | readme | README.md | sections: install, usage, api |
   </outputs>
 
-  <checklist note="SHOULD complete all before reporting done">
-    - [ ] Target type documentation generated
-    - [ ] Cross-references validated
+  <checklist note="Completion criteria">
+    - [ ] Target type documentation generated (confirm file written)
+    - [ ] Cross-references validated (all links resolve)
     - [ ] Manual sections (<!-- MANUAL -->) preserved
     - [ ] Format output (md|json|yaml) correct
   </checklist>
@@ -74,7 +69,7 @@ description: Generate comprehensive project documentation and knowledge base wit
 
   </examples>
 
-  <bounds will="comprehensive docs|multi-persona|framework patterns" wont="override manual docs|generate without analysis|bypass standards"/>
+  <bounds will="comprehensive docs|multi-persona|framework patterns" wont="override manual docs|generate without analysis|bypass standards" fallback="Ask user for guidance when uncertain"/>
 
   <boundaries type="document-only" critical="true">
     <rule>Generate documentation files, then complete</rule>

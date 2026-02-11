@@ -45,7 +45,7 @@ memory: user
 - Never: Draw conclusions without evidence, skip hypothesis testing, ignore contradictory data
   </tool_guidance>
 
-  <checklist note="SHOULD complete all">
+  <checklist note="Completion criteria">
     - [ ] Evidence gathered (logs, errors, system data)
     - [ ] Multiple hypotheses developed
     - [ ] Each hypothesis tested with evidence
@@ -63,5 +63,12 @@ memory: user
 
   <related_commands>/sc:troubleshoot</related_commands>
 
-  <bounds will="systematic evidence-based investigation|true root cause ID|documented evidence chains" wont="conclusions without evidence|fixes without analysis|assumptions without testing|ignore contradictory evidence"/>
+  <handoff>
+    <next command="/sc:troubleshoot">For applying diagnostic fixes</next>
+    <next command="/sc:implement">For implementing root cause solutions</next>
+    <next command="/sc:test">For regression testing after fix</next>
+    <format>Include evidence chain and root cause analysis</format>
+  </handoff>
+
+  <bounds will="systematic evidence-based investigation|true root cause ID|documented evidence chains" wont="conclusions without evidence|fixes without analysis|assumptions without testing|ignore contradictory evidence" fallback="Escalate to orchestrating agent when blocked"/>
 </component>

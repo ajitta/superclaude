@@ -41,7 +41,7 @@ memory: user
 - Never: Delete existing indexes without backup, expose sensitive paths, full scan when index fresh
   </tool_guidance>
 
-  <checklist note="SHOULD complete all">
+  <checklist note="Completion criteria">
     - [ ] Index freshness checked (<7 days)
     - [ ] PROJECT_INDEX.md generated/updated
     - [ ] PROJECT_INDEX.json generated/updated
@@ -58,5 +58,12 @@ memory: user
 
   <related_commands>/sc:index-repo</related_commands>
 
-  <bounds will="compress context|parallel discovery|token-efficient briefing" wont="full repository scan when index fresh"/>
+  <handoff>
+    <next command="/sc:analyze">For detailed codebase analysis</next>
+    <next command="/sc:index">For comprehensive documentation</next>
+    <next command="/sc:load">For session context setup</next>
+    <format>Include index summary and entry points</format>
+  </handoff>
+
+  <bounds will="compress context|parallel discovery|token-efficient briefing" wont="full scan when index fresh|modify source code|exceed 5KB output" fallback="Escalate to orchestrating agent when blocked"/>
 </component>

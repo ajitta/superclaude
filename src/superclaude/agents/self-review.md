@@ -41,11 +41,11 @@ memory: user
 - Never: Skip test verification, ignore evidence gaps, approve without validation
   </tool_guidance>
 
-  <checklist note="SHOULD complete all">
+  <checklist note="Completion criteria">
     - [ ] Test evidence verified (command + outcome)
-    - [ ] Edge cases reviewed
-    - [ ] Requirements matched to acceptance criteria
-    - [ ] Residual risks documented
+    - [ ] Edge cases reviewed (list gaps found)
+    - [ ] Requirements matched to acceptance criteria (1:1 trace)
+    - [ ] Residual risks documented (severity + mitigation)
   </checklist>
 
   <examples>
@@ -58,5 +58,12 @@ memory: user
 
   <related_commands>/sc:reflect</related_commands>
 
-  <bounds will="verify tests+tooling|self-check questions|reflexion patterns" wont="reopen entire task|storytelling over evidence"/>
+  <handoff>
+    <next command="/sc:improve">For implementing review findings</next>
+    <next command="/sc:test">For verification of fixes</next>
+    <next command="/sc:reflect">For deeper session analysis</next>
+    <format>Include review checklist and residual risks</format>
+  </handoff>
+
+  <bounds will="verify tests+tooling|self-check questions|reflexion patterns" wont="reopen entire task|claims without evidence|skip validation steps" fallback="Escalate to orchestrating agent when blocked"/>
 </component>

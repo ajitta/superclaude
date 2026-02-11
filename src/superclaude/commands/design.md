@@ -3,6 +3,7 @@ description: Design system architecture, APIs, and component interfaces with com
 ---
 <component name="design" type="command">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
+  <constraints note="Reinforced from RULES.md">Scope: build only what's asked | Read before edit | No adjacent improvements</constraints>
 
   <role>
     /sc:design
@@ -11,12 +12,7 @@ description: Design system architecture, APIs, and component interfaces with com
 
   <syntax>/sc:design [target] [--type architecture|api|component|database] [--format diagram|spec|code]</syntax>
 
-  <triggers>
-    - Architecture planning
-    - API specification
-    - Component design
-    - Database schema design
-  </triggers>
+  <triggers>architecture planning|API specification|component design|database schema</triggers>
 
   <flow>
     1. Analyze: Requirements + existing context
@@ -35,11 +31,11 @@ description: Design system architecture, APIs, and component interfaces with com
 | database | ERD.md | SCHEMA.md | migrations/*.sql |
   </outputs>
 
-  <checklist note="SHOULD complete all">
+  <checklist note="Completion criteria">
     - [ ] Design document generated per --type
     - [ ] Format matches --format flag
-    - [ ] Requirements coverage validated
-    - [ ] Maintainability considerations documented
+    - [ ] Requirements coverage validated (trace each req)
+    - [ ] Maintainability considerations documented (coupling + cohesion)
   </checklist>
 
   <tools>
@@ -65,7 +61,7 @@ description: Design system architecture, APIs, and component interfaces with com
 | `e-commerce-db --type database --format diagram` | Schema design |
   </examples>
 
-  <bounds will="comprehensive specs|multi-format output|validation" wont="generate impl code|modify existing arch|violate constraints"/>
+  <bounds will="comprehensive specs|multi-format output|validation" wont="generate impl code|modify existing arch|violate constraints" fallback="Ask user for guidance when uncertain"/>
 
   <boundaries type="document-only" critical="true">
     <rule>Produce design documentation, then complete</rule>

@@ -11,12 +11,7 @@ description: Generate focused documentation for components, functions, APIs, and
 
   <syntax>/sc:document [target] [--type inline|external|api|guide] [--style brief|detailed]</syntax>
 
-  <triggers>
-    - Component/function documentation
-    - API reference generation
-    - Code comments + inline docs
-    - User guides + technical docs
-  </triggers>
+  <triggers>component docs|API reference|code comments|user guides</triggers>
 
   <flow>
     1. Analyze: Component structure + interfaces
@@ -35,11 +30,11 @@ description: Generate focused documentation for components, functions, APIs, and
 | guide | GUIDE.md | install+usage+examples |
   </outputs>
 
-  <checklist note="SHOULD complete all">
-    - [ ] Target documentation generated
+  <checklist note="Completion criteria">
+    - [ ] Target documentation generated (confirm file written)
     - [ ] Format matches --style (brief/detailed)
-    - [ ] Cross-references validated
-    - [ ] Integrated with existing docs
+    - [ ] Cross-references validated (all links resolve)
+    - [ ] Integrated with existing docs (no conflicts)
   </checklist>
 
   <tools>
@@ -67,7 +62,7 @@ description: Generate focused documentation for components, functions, APIs, and
 
   </examples>
 
-  <bounds will="focused docs|multi-format|ecosystem integration" wont="doc without analysis|override standards|expose sensitive details"/>
+  <bounds will="focused docs|multi-format|ecosystem integration" wont="doc without analysis|override standards|expose sensitive details" fallback="Ask user for guidance when uncertain"/>
 
   <boundaries type="document-only" critical="true">
     <rule>Produce documentation, then complete</rule>

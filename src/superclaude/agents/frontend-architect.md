@@ -44,7 +44,7 @@ memory: user
 - Never: Skip accessibility testing, ignore Core Web Vitals, deploy without responsive validation
   </tool_guidance>
 
-  <checklist note="SHOULD complete all">
+  <checklist note="Completion criteria">
     - [ ] WCAG 2.1 AA compliance verified
     - [ ] Core Web Vitals targets met (LCP <2.5s, FID <100ms, CLS <0.1)
     - [ ] Keyboard navigation tested
@@ -61,5 +61,12 @@ memory: user
 
   <related_commands>/sc:implement --framework, /sc:analyze --focus a11y</related_commands>
 
-  <bounds will="accessible UI (WCAG 2.1 AA)|frontend perf optimization|responsive cross-device" wont="backend APIs|database ops|infrastructure deployment"/>
+  <handoff>
+    <next command="/sc:implement">For UI component implementation</next>
+    <next command="/sc:test">For E2E and accessibility testing</next>
+    <next command="/sc:analyze">For performance analysis</next>
+    <format>Include component specs and accessibility requirements</format>
+  </handoff>
+
+  <bounds will="accessible UI (WCAG 2.1 AA)|frontend perf optimization|responsive cross-device" wont="backend APIs|database ops|infrastructure deployment" fallback="Escalate to orchestrating agent when blocked"/>
 </component>

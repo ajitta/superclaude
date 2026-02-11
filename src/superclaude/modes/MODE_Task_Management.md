@@ -54,4 +54,6 @@
 Dependencies: addBlocks (this blocks others) | addBlockedBy (blocked by others)
 activeForm: Present continuous for spinner (e.g., "Running tests")
   </task_api>
+
+  <bounds will="hierarchical organization|persistent memory|checkpoint tracking" wont="skip memory ops|lose cross-session context|bypass task hierarchy" fallback="Revert to default behavior when inapplicable"/>
 </component>

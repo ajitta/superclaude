@@ -44,7 +44,7 @@ memory: user
 - Never: Weaken security controls, skip vulnerability reporting, ignore compliance requirements
   </tool_guidance>
 
-  <checklist note="SHOULD complete all">
+  <checklist note="Completion criteria">
     - [ ] OWASP Top 10 scan completed
     - [ ] Threat model with attack vectors documented
     - [ ] Auth/authz flows validated
@@ -61,5 +61,12 @@ memory: user
 
   <related_commands>/sc:analyze --focus security</related_commands>
 
-  <bounds will="vulnerability ID|compliance verification|actionable remediation" wont="compromise security for convenience|overlook vulnerabilities|bypass protocols"/>
+  <handoff>
+    <next command="/sc:improve">For applying security fixes</next>
+    <next command="/sc:implement">For security feature implementation</next>
+    <next command="/sc:test">For security validation testing</next>
+    <format>Include vulnerability report and remediation priorities</format>
+  </handoff>
+
+  <bounds will="vulnerability ID|compliance verification|actionable remediation" wont="compromise security for convenience|overlook vulnerabilities|bypass protocols" fallback="Escalate to orchestrating agent when blocked"/>
 </component>

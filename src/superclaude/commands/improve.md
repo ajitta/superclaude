@@ -3,6 +3,7 @@ description: Apply systematic improvements to code quality, performance, and mai
 ---
 <component name="improve" type="command">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
+  <constraints note="Reinforced from RULES.md">Scope: build only what's asked | Read before edit | No adjacent improvements</constraints>
 
   <role>
     /sc:improve
@@ -11,12 +12,7 @@ description: Apply systematic improvements to code quality, performance, and mai
 
   <syntax>/sc:improve [target] [--type quality|performance|maintainability|style] [--safe] [--interactive]</syntax>
 
-  <triggers>
-    - Code quality enhancement requests
-    - Performance optimization needs
-    - Maintainability + tech debt reduction
-    - Best practices enforcement
-  </triggers>
+  <triggers>code quality enhancement|performance optimization|maintainability|best practices</triggers>
 
   <flow>
     1. Analyze: Improvement opportunities + quality issues
@@ -54,7 +50,7 @@ description: Apply systematic improvements to code quality, performance, and mai
 
   </examples>
 
-  <bounds will="systematic improvements|multi-persona|safe refactoring" wont="risky changes without confirm|arch changes without impact analysis|override standards"/>
+  <bounds will="systematic improvements|multi-persona|safe refactoring" wont="risky changes without confirm|arch changes without impact analysis|override standards" fallback="Ask user for guidance when uncertain"/>
 
   <boundaries type="execution" critical="true">
     <rule>Implement improvements as requested</rule>
@@ -66,6 +62,13 @@ description: Apply systematic improvements to code quality, performance, and mai
     <safe>Style fixes, minor refactoring, documentation updates</safe>
     <approval_required>API changes, dependency updates, architecture modifications</approval_required>
   </auto_fix_threshold>
+
+  <checklist note="Completion criteria">
+    - [ ] Improvement opportunities identified (list with severity)
+    - [ ] Changes preserve functionality (run existing tests)
+    - [ ] Tests pass after improvements (show test output)
+    - [ ] Quality metrics improved (show before/after)
+  </checklist>
 
   <completion_criteria>
     - [ ] All identified improvements applied

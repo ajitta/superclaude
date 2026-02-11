@@ -3,6 +3,7 @@ description: Deep web research with adaptive planning and intelligent search
 ---
 <component name="research" type="command">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
+  <constraints note="Reinforced from RULES.md">Scope: build only what's asked | Read before edit | No adjacent improvements</constraints>
 
   <role>
     /sc:research
@@ -11,13 +12,7 @@ description: Deep web research with adaptive planning and intelligent search
 
   <syntax>/sc:research "[query]" [--depth quick|standard|deep|exhaustive] [--strategy planning|intent|unified]</syntax>
 
-  <triggers>
-    - Research beyond knowledge cutoff
-    - Complex research questions
-    - Current events + real-time info
-    - Academic/technical research
-    - Market analysis + competitive intel
-  </triggers>
+  <triggers>research beyond cutoff|complex questions|current events|academic research|market analysis</triggers>
 
   <flow total_effort="100%">
     <step n="1" effort="5%">Understand: Complexity + ambiguity | Info types needed | Resource reqs | Success criteria</step>
@@ -30,7 +25,7 @@ description: Deep web research with adaptive planning and intelligent search
   </flow>
 
   <mcp servers="tavily|seq|play|serena"/>
-  <personas p="deep-research-agent"/>
+  <personas p="research"/>
 
   <depth_levels>
     - quick: 1 hop | summary output
@@ -54,6 +49,13 @@ description: Deep web research with adaptive planning and intelligent search
     - Output: claudedocs/research_[topic]_[timestamp].md
   </patterns>
 
+  <checklist note="Completion criteria">
+    - [ ] Research strategy selected (depth level)
+    - [ ] Evidence collected with sources (cite URLs/docs)
+    - [ ] Findings validated and cross-checked (2+ sources each)
+    - [ ] Synthesis report generated (with confidence ratings)
+  </checklist>
+
   <examples>
 | Input | Output |
 |-------|--------|
@@ -64,7 +66,7 @@ description: Deep web research with adaptive planning and intelligent search
 
   <token_note>High consumption — multi-hop research uses significant context; use --uc at 60%+ or delegate to subagent</token_note>
 
-  <bounds will="current info|intelligent search|evidence-based" wont="claims without sources|skip validation|restricted content"/>
+  <bounds will="current info|intelligent search|evidence-based" wont="claims without sources|skip validation|restricted content" fallback="Ask user for guidance when uncertain"/>
 
   <boundaries type="document-only" critical="true">
     <rule>Produce research report, then complete</rule>

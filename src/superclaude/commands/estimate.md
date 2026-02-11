@@ -11,12 +11,7 @@ description: Provide development estimates for tasks, features, or projects with
 
   <syntax>/sc:estimate [target] [--type time|effort|complexity] [--unit hours|days|weeks] [--breakdown]</syntax>
 
-  <triggers>
-    - Development time/effort estimates
-    - Project scoping + resource allocation
-    - Feature breakdown estimation
-    - Risk assessment + confidence intervals
-  </triggers>
+  <triggers>development estimates|project scoping|feature breakdown|risk assessment</triggers>
 
   <flow>
     1. Analyze: Scope, complexity, deps, patterns
@@ -43,6 +38,13 @@ description: Provide development estimates for tasks, features, or projects with
     - Validation: Benchmarks → cross-check → confidence
   </patterns>
 
+  <checklist note="Completion criteria">
+    - [ ] Scope and complexity analyzed (list components)
+    - [ ] Estimation methodology applied (name method used)
+    - [ ] Confidence intervals provided (show range + %)
+    - [ ] Risk factors documented (probability + impact each)
+  </checklist>
+
   <examples>
 
 | Input | Output |
@@ -53,7 +55,7 @@ description: Provide development estimates for tasks, features, or projects with
 
   </examples>
 
-  <bounds will="systematic estimates|confidence intervals|multi-persona analysis" wont="guarantee accuracy|estimate without analysis|override benchmarks"/>
+  <bounds will="systematic estimates|confidence intervals|multi-persona analysis" wont="guarantee accuracy|estimate without analysis|override benchmarks" fallback="Ask user for guidance when uncertain"/>
 
   <boundaries type="document-only" critical="true">
     <rule>Produce estimation report, then complete</rule>

@@ -39,4 +39,6 @@
   </resources>
 
   <parallel>3+ files -> suggest parallel | Independent ops -> batch | Multi-dir -> delegation | Perf requests -> parallel-first</parallel>
+
+  <bounds will="intelligent tool selection|parallel optimization|resource efficiency" wont="use wrong tool for task|ignore system constraints|sequential when parallel possible" fallback="Revert to default behavior when inapplicable"/>
 </component>

@@ -44,7 +44,7 @@ memory: user
 - Never: Optimize without baseline measurements, skip validation, compromise functionality for speed
   </tool_guidance>
 
-  <checklist note="SHOULD complete all">
+  <checklist note="Completion criteria">
     - [ ] Baseline metrics captured (before)
     - [ ] Bottlenecks identified with evidence
     - [ ] Optimizations implemented with measurements
@@ -61,5 +61,12 @@ memory: user
 
   <related_commands>/sc:analyze --focus perf, /sc:improve</related_commands>
 
-  <bounds will="profile+identify bottlenecks|optimize critical paths|validate with metrics" wont="optimize without measurement|theoretical optimizations|compromise functionality"/>
+  <handoff>
+    <next command="/sc:improve">For applying optimizations</next>
+    <next command="/sc:implement">For performance fix implementation</next>
+    <next command="/sc:test">For benchmark validation</next>
+    <format>Include baseline metrics and bottleneck analysis</format>
+  </handoff>
+
+  <bounds will="profile+identify bottlenecks|optimize critical paths|validate with metrics" wont="optimize without measurement|theoretical optimizations|compromise functionality" fallback="Escalate to orchestrating agent when blocked"/>
 </component>

@@ -44,7 +44,7 @@ memory: user
 - Never: Change behavior during refactor, skip test validation, make multiple large changes at once
   </tool_guidance>
 
-  <checklist note="SHOULD complete all">
+  <checklist note="Completion criteria">
     - [ ] Complexity metrics captured (before)
     - [ ] Refactoring pattern selected
     - [ ] Tests pass before AND after
@@ -61,5 +61,12 @@ memory: user
 
   <related_commands>/sc:improve, /sc:cleanup</related_commands>
 
-  <bounds will="refactor with proven patterns|reduce tech debt systematically|SOLID+preserve functionality" wont="add features during refactor|large risky changes|optimize perf over maintainability"/>
+  <handoff>
+    <next command="/sc:improve">For applying refactoring improvements</next>
+    <next command="/sc:test">For regression validation</next>
+    <next command="/sc:cleanup">For dead code removal</next>
+    <format>Include before/after metrics and refactoring scope</format>
+  </handoff>
+
+  <bounds will="refactor with proven patterns|reduce tech debt systematically|SOLID+preserve functionality" wont="add features during refactor|large risky changes|optimize perf over maintainability" fallback="Escalate to orchestrating agent when blocked"/>
 </component>

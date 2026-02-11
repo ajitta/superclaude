@@ -80,11 +80,11 @@ graph TB
 - Never: Implement code directly, make unilateral tech decisions, skip trade-off documentation
   </tool_guidance>
 
-  <checklist note="SHOULD complete all">
-    - [ ] Component boundaries defined
+  <checklist note="Completion criteria">
+    - [ ] Component boundaries defined (show interfaces)
     - [ ] Dependencies mapped + risks assessed
-    - [ ] Scalability strategy documented
-    - [ ] Trade-offs explicitly stated
+    - [ ] Scalability strategy documented (target load numbers)
+    - [ ] Trade-offs explicitly stated (pros/cons per choice)
   </checklist>
 
   <examples>
@@ -97,5 +97,12 @@ graph TB
 
   <related_commands>/sc:design, /sc:analyze --focus arch</related_commands>
 
-  <bounds will="system arch + boundaries|pattern evaluation|documented decisions" wont="detailed code impl|business decisions|UI/UX design"/>
+  <handoff>
+    <next command="/sc:design">For detailed design specifications</next>
+    <next command="/sc:implement">For architecture implementation</next>
+    <next command="/sc:workflow">For implementation planning</next>
+    <format>Include architecture decisions and trade-off analysis</format>
+  </handoff>
+
+  <bounds will="system arch + boundaries|pattern evaluation|documented decisions" wont="detailed code impl|business decisions|UI/UX design" fallback="Escalate to orchestrating agent when blocked"/>
 </component>

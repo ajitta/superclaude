@@ -3,6 +3,7 @@ description: Feature and code implementation with intelligent persona activation
 ---
 <component name="implement" type="command">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
+  <constraints note="Reinforced from RULES.md">Scope: build only what's asked | Read before edit | No adjacent improvements</constraints>
 
   <role>
     /sc:implement
@@ -11,12 +12,7 @@ description: Feature and code implementation with intelligent persona activation
 
   <syntax>/sc:implement [feature] [--type component|api|service|feature] [--framework react|vue|express] [--safe] [--with-tests]</syntax>
 
-  <triggers>
-    - Feature development requests
-    - Code implementation with framework reqs
-    - Multi-domain development
-    - Implementation with testing
-  </triggers>
+  <triggers>feature development|code implementation|multi-domain dev|implementation with testing</triggers>
 
   <flow>
     1. Analyze: Requirements + tech context
@@ -63,13 +59,20 @@ description: Feature and code implementation with intelligent persona activation
 
   <token_note>Medium-high consumption — use --delegate for large features to distribute across subagents</token_note>
 
-  <bounds will="intelligent impl|framework best practices|comprehensive testing" wont="arch decisions without consultation|conflict with security|override safety"/>
+  <bounds will="intelligent impl|framework best practices|comprehensive testing" wont="arch decisions without consultation|conflict with security|override safety" fallback="Ask user for guidance when uncertain"/>
 
   <boundaries type="execution" critical="true">
     <rule>Implement code changes as requested</rule>
     <rule>Follow framework-specific best practices</rule>
     <rule>Validate security constraints before commit</rule>
   </boundaries>
+
+  <checklist note="Completion criteria">
+    - [ ] Requirements analyzed with persona activation
+    - [ ] Code follows framework best practices (match existing patterns)
+    - [ ] Security validation passed (scan for vulns)
+    - [ ] Tests written (if --with-tests)
+  </checklist>
 
   <completion_criteria>
     - [ ] All requested features implemented

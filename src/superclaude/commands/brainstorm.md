@@ -11,12 +11,7 @@ description: Interactive requirements discovery through Socratic dialogue and sy
 
   <syntax>/sc:brainstorm [topic/idea] [--strategy systematic|agile|enterprise] [--depth shallow|normal|deep] [--parallel]</syntax>
 
-  <triggers>
-    - Ambiguous project ideas
-    - Requirements discovery needs
-    - Concept validation requests
-    - Cross-session refinement
-  </triggers>
+  <triggers>ambiguous ideas|requirements discovery|concept validation|cross-session refinement</triggers>
 
   <flow>
     1. Explore: Socratic dialogue + systematic questioning
@@ -44,11 +39,11 @@ description: Interactive requirements discovery through Socratic dialogue and sy
     - Specification: Concrete requirements → actionable briefs
   </patterns>
 
-  <checklist note="SHOULD complete all">
-    - [ ] Requirements systematically explored
-    - [ ] Multi-persona validation completed
-    - [ ] Feasibility assessment included
-    - [ ] Actionable specification generated
+  <checklist note="Completion criteria">
+    - [ ] Requirements systematically explored (list questions asked)
+    - [ ] Multi-persona validation completed (name each persona)
+    - [ ] Feasibility assessment included (risks + constraints)
+    - [ ] Actionable specification generated (concrete next steps)
   </checklist>
 
   <examples>
@@ -62,7 +57,7 @@ description: Interactive requirements discovery through Socratic dialogue and sy
 
   <token_note>High consumption — use --uc at 60%+ context, consider fresh session for large brainstorms</token_note>
 
-  <bounds will="ambiguous→concrete|multi-persona+MCP|cross-session persistence" wont="impl without discovery|override user vision|bypass systematic exploration"/>
+  <bounds will="ambiguous→concrete|multi-persona+MCP|cross-session persistence" wont="impl without discovery|override user vision|bypass systematic exploration" fallback="Ask user for guidance when uncertain"/>
 
   <boundaries type="document-only" critical="true">
     <rule>Produce requirements specification, then complete</rule>

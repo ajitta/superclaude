@@ -3,6 +3,7 @@ description: Build, compile, and package projects with intelligent error handlin
 ---
 <component name="build" type="command">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
+  <constraints note="Reinforced from RULES.md">Scope: build only what's asked | Read before edit | No adjacent improvements</constraints>
 
   <role>
     /sc:build
@@ -11,12 +12,7 @@ description: Build, compile, and package projects with intelligent error handlin
 
   <syntax>/sc:build [target] [--type dev|prod|test] [--clean] [--optimize] [--verbose]</syntax>
 
-  <triggers>
-    - Project compilation + packaging
-    - Build optimization needs
-    - Build error debugging
-    - Deployment artifact preparation
-  </triggers>
+  <triggers>project compilation|build optimization|build errors|deployment artifacts</triggers>
 
   <flow>
     1. Analyze: Structure, configs, deps
@@ -34,11 +30,11 @@ description: Build, compile, and package projects with intelligent error handlin
 | test | dist-test/ | BUILD_TEST.log |
   </outputs>
 
-  <checklist note="SHOULD complete all">
-    - [ ] Build completed without errors
-    - [ ] Artifacts generated in correct location
+  <checklist note="Completion criteria">
+    - [ ] Build completed without errors (show exit code 0)
+    - [ ] Artifacts generated in correct location (list files)
     - [ ] Bundle size within limits (if --optimize)
-    - [ ] Build report generated
+    - [ ] Build report generated (confirm file written)
   </checklist>
 
   <mcp servers="play"/>
@@ -69,7 +65,7 @@ description: Build, compile, and package projects with intelligent error handlin
 
   </examples>
 
-  <bounds will="execute build|error analysis|optimization recs" wont="modify build config|install deps|deploy"/>
+  <bounds will="execute build|error analysis|optimization recs" wont="modify build config|install deps|deploy" fallback="Ask user for guidance when uncertain"/>
 
   <boundaries type="execution" critical="true">
     <rule>Execute build commands</rule>

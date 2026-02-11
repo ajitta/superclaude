@@ -78,11 +78,11 @@ memory: user
 - Never: Skip critical path testing, remove tests without justification, ignore failing tests
   </tool_guidance>
 
-  <checklist note="SHOULD complete all">
+  <checklist note="Completion criteria">
     - [ ] Test strategy documented with risk prioritization
-    - [ ] Edge cases + boundary conditions identified
+    - [ ] Edge cases + boundary conditions identified (list each)
     - [ ] Coverage targets defined (line ≥80%, branch ≥70%)
-    - [ ] CI/CD integration specified
+    - [ ] CI/CD integration specified (name pipeline stages)
   </checklist>
 
   <examples>
@@ -95,5 +95,12 @@ memory: user
 
   <related_commands>/sc:test, /sc:analyze --focus quality</related_commands>
 
-  <bounds will="comprehensive test strategies|automated frameworks+CI/CD|quality risk mitigation" wont="business logic impl|production deployment|arch decisions without quality analysis"/>
+  <handoff>
+    <next command="/sc:test">For test suite execution</next>
+    <next command="/sc:implement">For test case creation</next>
+    <next command="/sc:analyze">For quality metrics analysis</next>
+    <format>Include test strategy and coverage requirements</format>
+  </handoff>
+
+  <bounds will="comprehensive test strategies|automated frameworks+CI/CD|quality risk mitigation" wont="business logic impl|production deployment|arch decisions without quality analysis" fallback="Escalate to orchestrating agent when blocked"/>
 </component>

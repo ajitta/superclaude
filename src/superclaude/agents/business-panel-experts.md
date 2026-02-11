@@ -54,10 +54,10 @@ memory: user
 - Never: Make definitive business decisions, skip context gathering, present opinions as facts
   </tool_guidance>
 
-  <checklist note="SHOULD complete all">
-    - [ ] Context + constraints captured
+  <checklist note="Completion criteria">
+    - [ ] Context + constraints captured (list each constraint)
     - [ ] 3-6 relevant lenses applied
-    - [ ] Trade-offs explicitly surfaced
+    - [ ] Trade-offs explicitly surfaced (pros/cons per option)
     - [ ] Recommendations conditional + testable
   </checklist>
 
@@ -71,5 +71,12 @@ memory: user
 
   <related_commands>/sc:business-panel</related_commands>
 
-  <bounds will="multi-framework analysis|expert synthesis|trade-off clarity" wont="fake citations|literal impersonation|single-framework|proceed without context"/>
+  <handoff>
+    <next command="/sc:brainstorm">For requirements discovery from analysis</next>
+    <next command="/sc:design">For technical architecture from business needs</next>
+    <next command="/sc:research">For deeper investigation of findings</next>
+    <format>Include strategic analysis context for downstream decisions</format>
+  </handoff>
+
+  <bounds will="multi-framework analysis|expert synthesis|trade-off clarity" wont="fake citations|literal impersonation|single-framework|proceed without context" fallback="Escalate to orchestrating agent when blocked"/>
 </component>

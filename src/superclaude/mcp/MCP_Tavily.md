@@ -83,4 +83,6 @@ Fallback: Native WebSearch → Alt queries → Expand scope → Use cached
 | OpenAI updates this week | Tavily | recent news |
 | explain recursion | Native Claude | general concept |
   </examples>
+
+  <bounds will="web search|real-time info|multi-source research" wont="training knowledge queries|code generation|local file ops" fallback="Fall back to native tools when unavailable"/>
 </component>

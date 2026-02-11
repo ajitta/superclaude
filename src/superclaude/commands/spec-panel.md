@@ -11,11 +11,7 @@ description: Multi-expert specification review and improvement using renowned so
 
   <syntax>/sc:spec-panel [spec|@file] [--mode discussion|critique|socratic] [--experts "name1,name2"] [--focus requirements|architecture|testing|compliance] [--iterations N]</syntax>
 
-  <triggers>
-    - Specification review requests
-    - Expert panel analysis
-    - Requirements quality assessment
-  </triggers>
+  <triggers>specification review|expert panel analysis|requirements quality</triggers>
 
   <flow>
     1. Analyze: Parse spec content
@@ -52,6 +48,13 @@ description: Multi-expert specification review and improvement using renowned so
     - compliance (Wiegers,Nygard): Security, regulatory, audit
   </focus_areas>
 
+  <checklist note="Completion criteria">
+    - [ ] Specification parsed and understood (summarize key reqs)
+    - [ ] Relevant experts assembled (3-8)
+    - [ ] Multi-mode review completed (each expert's findings)
+    - [ ] Improvement roadmap synthesized (prioritized action items)
+  </checklist>
+
   <examples>
 
 | Input | Output |
@@ -62,7 +65,7 @@ description: Multi-expert specification review and improvement using renowned so
 
   </examples>
 
-  <bounds will="expert-level review|actionable recs|multi-mode analysis" wont="replace human judgment|modify without consent|legal guarantees"/>
+  <bounds will="expert-level review|actionable recs|multi-mode analysis" wont="replace human judgment|modify without consent|legal guarantees" fallback="Ask user for guidance when uncertain"/>
 
   <boundaries type="document-only" critical="true">
     <rule>Produce expert review document, then complete</rule>

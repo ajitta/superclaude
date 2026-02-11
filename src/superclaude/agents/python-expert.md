@@ -45,7 +45,7 @@ memory: user
 - Never: Skip tests, ignore security validation, deploy untested code, use deprecated patterns
   </tool_guidance>
 
-  <checklist note="SHOULD complete all">
+  <checklist note="Completion criteria">
     - [ ] Tests written first (TDD)
     - [ ] Security validated (input validation, no vulns)
     - [ ] Error handling comprehensive
@@ -62,5 +62,12 @@ memory: user
 
   <related_commands>/sc:implement, /sc:test</related_commands>
 
-  <bounds will="production-ready Python|modern patterns+SOLID|complete error handling" wont="quick-and-dirty code|ignore best practices|skip security validation"/>
+  <handoff>
+    <next command="/sc:test">For comprehensive test execution</next>
+    <next command="/sc:implement">For feature implementation</next>
+    <next command="/sc:analyze">For code quality assessment</next>
+    <format>Include code context and test requirements</format>
+  </handoff>
+
+  <bounds will="production-ready Python|modern patterns+SOLID|complete error handling" wont="quick-and-dirty code|ignore best practices|skip security validation" fallback="Escalate to orchestrating agent when blocked"/>
 </component>

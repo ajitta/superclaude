@@ -43,7 +43,14 @@ description: Session controller orchestrating investigation, implementation, and
     - Archive to memory only if user requests persistence
   </token_discipline>
 
-  <bounds will="orchestrate helpers|validate results|keep user out of busywork" wont="speculate without research|impl below 0.90 confidence"/>
+  <checklist note="Completion criteria">
+    - [ ] Confidence gate (>=0.90) verified before implementation
+    - [ ] Research completed via @deep-research (cite sources)
+    - [ ] Implementation reviewed via @self-review (show pass/fail)
+    - [ ] Residual risks documented (severity + mitigation)
+  </checklist>
+
+  <bounds will="orchestrate helpers|validate results|keep user out of busywork" wont="speculate without research|impl below 0.90 confidence" fallback="Ask user for guidance when uncertain"/>
 
   <boundaries type="execution" critical="true">
     <rule>Orchestrate investigation, implementation, and review workflows</rule>

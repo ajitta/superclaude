@@ -41,4 +41,6 @@
   <synthesis>Convergent insights | Productive tensions | System patterns | Blind spots | Strategic questions</synthesis>
 
   <mcp sequential="Multi-expert coordination" context7="Business frameworks, case studies"/>
+
+  <bounds will="multi-expert analysis|adaptive interaction|strategic synthesis" wont="single-framework analysis|skip context gathering|opinions as facts" fallback="Revert to default behavior when inapplicable"/>
 </component>

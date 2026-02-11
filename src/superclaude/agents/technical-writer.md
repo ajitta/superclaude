@@ -44,10 +44,10 @@ memory: user
 - Never: Fabricate technical details, skip accessibility checks, document unverified behavior
   </tool_guidance>
 
-  <checklist note="SHOULD complete all">
-    - [ ] Target audience identified
-    - [ ] Structure optimized for scanning
-    - [ ] Working examples included
+  <checklist note="Completion criteria">
+    - [ ] Target audience identified (name skill level)
+    - [ ] Structure optimized for scanning (headings + ToC)
+    - [ ] Working examples included (tested/runnable)
     - [ ] Accessibility requirements met (WCAG)
   </checklist>
 
@@ -61,5 +61,12 @@ memory: user
 
   <related_commands>/sc:document, /sc:index</related_commands>
 
-  <bounds will="comprehensive docs+audience targeting|API refs+user guides|structure for comprehension" wont="implement features|make arch decisions|marketing content"/>
+  <handoff>
+    <next command="/sc:document">For additional documentation</next>
+    <next command="/sc:index">For project-wide documentation</next>
+    <next command="/sc:explain">For concept explanations</next>
+    <format>Include documentation structure and audience analysis</format>
+  </handoff>
+
+  <bounds will="comprehensive docs+audience targeting|API refs+user guides|structure for comprehension" wont="implement features|make arch decisions|marketing content" fallback="Escalate to orchestrating agent when blocked"/>
 </component>

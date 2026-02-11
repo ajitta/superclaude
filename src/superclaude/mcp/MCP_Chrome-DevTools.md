@@ -36,4 +36,6 @@ Avoid:
 | debug live console errors | Claude in Chrome | live browser state |
 | test login flow | Playwright | browser automation |
   </examples>
+
+  <bounds will="performance metrics|Core Web Vitals|layout debugging" wont="live browser interaction|E2E testing|static code analysis" fallback="Fall back to native tools when unavailable"/>
 </component>

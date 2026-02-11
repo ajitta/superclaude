@@ -3,6 +3,7 @@ description: Diagnose and resolve issues in code, builds, deployments, and syste
 ---
 <component name="troubleshoot" type="command">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
+  <constraints note="Reinforced from RULES.md">Scope: build only what's asked | Read before edit | No adjacent improvements</constraints>
 
   <role>
     /sc:troubleshoot
@@ -11,12 +12,7 @@ description: Diagnose and resolve issues in code, builds, deployments, and syste
 
   <syntax>/sc:troubleshoot [issue] [--type bug|build|performance|deployment] [--trace] [--fix]</syntax>
 
-  <triggers>
-    - Code defects + runtime errors
-    - Build failure analysis
-    - Performance issue diagnosis
-    - Deployment problem debugging
-  </triggers>
+  <triggers>code defects|build failures|performance diagnosis|deployment debugging</triggers>
 
   <flow>
     1. Analyze: Issue description + system state
@@ -43,11 +39,11 @@ description: Diagnose and resolve issues in code, builds, deployments, and syste
   <mcp servers="seq"/>
   <personas p="root|devops"/>
 
-  <checklist note="SHOULD complete all">
-    - [ ] Root cause identified
-    - [ ] Diagnostic evidence collected
-    - [ ] Solution proposed with impact assessment
-    - [ ] Fix validated (if --fix applied)
+  <checklist note="Completion criteria">
+    - [ ] Root cause identified (cite evidence chain)
+    - [ ] Diagnostic evidence collected (logs/errors/repro)
+    - [ ] Solution proposed with impact assessment (scope of change)
+    - [ ] Fix validated (if --fix applied) (show test pass)
   </checklist>
 
   <examples>
@@ -61,7 +57,7 @@ description: Diagnose and resolve issues in code, builds, deployments, and syste
 
   </examples>
 
-  <bounds will="systematic diagnosis|validated solutions|safe fixes" wont="risky fixes without confirm|modify production without permission|arch changes without impact"/>
+  <bounds will="systematic diagnosis|validated solutions|safe fixes" wont="risky fixes without confirm|modify production without permission|arch changes without impact" fallback="Ask user for guidance when uncertain"/>
 
   <boundaries type="conditional" critical="true">
     <rule>Without --fix: produce diagnostic report, then complete</rule>

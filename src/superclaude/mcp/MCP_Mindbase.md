@@ -34,4 +34,6 @@ Note: MindBase managed via airis-catalog.yaml. PostgreSQL+pgvector included.
 - Gateway: https://github.com/agiletec-inc/airis-mcp-gateway
 - Standalone: https://github.com/agiletec-inc/mindbase
   </links>
+
+  <bounds will="semantic memory|conversation storage|session management" wont="code execution|file modification|non-memory tasks" fallback="Fall back to native tools when unavailable"/>
 </component>

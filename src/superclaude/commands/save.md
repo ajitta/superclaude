@@ -11,12 +11,7 @@ description: Session lifecycle management with Serena MCP integration for contex
 
   <syntax>/sc:save [--type session|learnings|context|all] [--summarize] [--checkpoint]</syntax>
 
-  <triggers>
-    - Session completion
-    - Cross-session memory management
-    - Discovery preservation
-    - Progress tracking
-  </triggers>
+  <triggers>session completion|cross-session memory|discovery preservation|progress tracking</triggers>
 
   <flow>
     1. Analyze: Session progress + discoveries
@@ -35,10 +30,10 @@ description: Session lifecycle management with Serena MCP integration for contex
 | all | All above | Complete preservation |
   </outputs>
 
-  <checklist note="SHOULD complete all">
-    - [ ] Session data collected
-    - [ ] Serena memory write successful
-    - [ ] Checkpoint validated for recovery
+  <checklist note="Completion criteria">
+    - [ ] Session data collected (list data categories)
+    - [ ] Serena memory write successful (show memory name)
+    - [ ] Checkpoint validated for recovery (read-back test)
     - [ ] Ready for /sc:load continuation
   </checklist>
 
@@ -69,7 +64,7 @@ description: Session lifecycle management with Serena MCP integration for contex
 
   </examples>
 
-  <bounds will="Serena integration|auto-checkpoints|discovery preservation" wont="operate without Serena|save without validation|override without checkpoint"/>
+  <bounds will="Serena integration|auto-checkpoints|discovery preservation" wont="operate without Serena|save without validation|override without checkpoint" fallback="Ask user for guidance when uncertain"/>
 
   <boundaries type="execution" critical="true">
     <rule>Execute session persistence</rule>

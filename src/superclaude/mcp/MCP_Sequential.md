@@ -32,4 +32,6 @@ Avoid:
 | security vulnerabilities | Sequential | comprehensive threat modeling |
 | explain this function | Native Claude | simple explanation |
   </examples>
+
+  <bounds will="multi-step reasoning|systematic analysis|complex problem decomposition" wont="simple tasks|single-file fixes|basic explanations" fallback="Fall back to native tools when unavailable"/>
 </component>

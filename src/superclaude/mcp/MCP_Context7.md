@@ -27,4 +27,6 @@
 | migrate to Vue 3 | Context7 | official migration guide |
 | just explain this function | Native Claude | no external docs needed |
   </examples>
+
+  <bounds will="official library docs|version-specific patterns|framework guidance" wont="general knowledge queries|code generation|non-library tasks" fallback="Fall back to native tools when unavailable"/>
 </component>

@@ -3,6 +3,7 @@ description: Git operations with intelligent commit messages and workflow optimi
 ---
 <component name="git" type="command">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
+  <constraints note="Reinforced from RULES.md">Scope: build only what's asked | Read before edit | No adjacent improvements</constraints>
 
   <role>
     /sc:git
@@ -11,14 +12,7 @@ description: Git operations with intelligent commit messages and workflow optimi
 
   <syntax>/sc:git [operation] [args] [--smart-commit] [--interactive] [--pr-status] [--from-pr PR#|URL]</syntax>
 
-  <triggers>
-    - Git ops: status, add, commit, push, pull, branch
-    - Intelligent commit message generation
-    - Repository workflow optimization
-    - Branch management + merges
-    - PR review status check (Claude Code 2.1.37+)
-    - Resume session from PR (Claude Code 2.1.37+)
-  </triggers>
+  <triggers>git ops|intelligent commits|repo workflow|branch management|PR review status|resume from PR</triggers>
 
   <flow>
     1. Analyze: Repo state + changes
@@ -80,7 +74,7 @@ description: Git operations with intelligent commit messages and workflow optimi
 
   </examples>
 
-  <bounds will="intelligent git ops|conventional commits|workflow guidance|PR status checks" wont="modify config without auth|destructive without confirm|complex merges requiring manual"/>
+  <bounds will="intelligent git ops|conventional commits|workflow guidance|PR status checks" wont="modify config without auth|destructive without confirm|complex merges requiring manual" fallback="Ask user for guidance when uncertain"/>
 
   <boundaries type="execution" critical="true">
     <rule>Execute git operations as requested</rule>
@@ -93,6 +87,13 @@ description: Git operations with intelligent commit messages and workflow optimi
     <safe>status, log, diff, add, commit, pull, fetch, branch, pr-status</safe>
     <approval_required>push --force, reset --hard, rebase, merge with conflicts</approval_required>
   </safety_rules>
+
+  <checklist note="Completion criteria">
+    - [ ] Repository state analyzed (show git status output)
+    - [ ] Operation validated before execution (dry-run or preview)
+    - [ ] Smart commit message generated (if commit)
+    - [ ] Next steps recommended (specific commands)
+  </checklist>
 
   <completion_criteria>
     - [ ] Operation executed successfully

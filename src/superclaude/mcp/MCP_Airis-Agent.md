@@ -28,4 +28,6 @@ claude mcp add --scope user --transport sse airis-mcp-gateway http://localhost:9
 - Gateway: https://github.com/agiletec-inc/airis-mcp-gateway
 - Standalone: https://github.com/agiletec-inc/airis-agent
   </links>
+
+  <bounds will="confidence checking|deep research|repo indexing" wont="direct implementation|file modification|non-analysis tasks" fallback="Fall back to native tools when unavailable"/>
 </component>

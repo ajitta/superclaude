@@ -11,12 +11,7 @@ description: Systematically clean up code, remove dead code, and optimize projec
 
   <syntax>/sc:cleanup [target] [--type code|imports|files|all] [--safe|--aggressive] [--interactive]</syntax>
 
-  <triggers>
-    - Code maintenance + tech debt
-    - Dead code removal
-    - Project structure improvement
-    - Codebase hygiene
-  </triggers>
+  <triggers>code maintenance|dead code removal|project structure|codebase hygiene</triggers>
 
   <flow>
     1. Analyze: Cleanup opportunities + safety assessment
@@ -35,11 +30,11 @@ description: Systematically clean up code, remove dead code, and optimize projec
 | all | All above | CLEANUP_REPORT.md |
   </outputs>
 
-  <checklist note="SHOULD complete all">
-    - [ ] Pre-cleanup snapshot/backup noted
+  <checklist note="Completion criteria">
+    - [ ] Pre-cleanup snapshot/backup noted (show git SHA)
     - [ ] Cleanup actions executed per --type
-    - [ ] Tests still passing (no functionality loss)
-    - [ ] Cleanup report generated
+    - [ ] Tests still passing (no functionality loss) (run test suite)
+    - [ ] Cleanup report generated (list items removed)
   </checklist>
 
   <mcp servers="seq|c7"/>
@@ -70,7 +65,7 @@ description: Systematically clean up code, remove dead code, and optimize projec
 
   </examples>
 
-  <bounds will="systematic cleanup|safety validation|intelligent algorithms" wont="remove without analysis|override exclusions|compromise functionality"/>
+  <bounds will="systematic cleanup|safety validation|intelligent algorithms" wont="remove without analysis|override exclusions|compromise functionality" fallback="Ask user for guidance when uncertain"/>
 
   <boundaries type="execution" critical="true">
     <rule>Implement cleanup actions as requested</rule>

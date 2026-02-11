@@ -3,6 +3,7 @@ description: Comprehensive code analysis across quality, security, performance, 
 ---
 <component name="analyze" type="command">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
+  <constraints note="Reinforced from RULES.md">Scope: build only what's asked | Read before edit | No adjacent improvements</constraints>
 
   <role>
     /sc:analyze
@@ -11,12 +12,7 @@ description: Comprehensive code analysis across quality, security, performance, 
 
   <syntax>/sc:analyze [target] [--focus quality|security|performance|architecture] [--depth quick|deep] [--format text|json|report]</syntax>
 
-  <triggers>
-    - Code quality assessment
-    - Security vulnerability scanning
-    - Performance bottleneck identification
-    - Architecture review + tech debt
-  </triggers>
+  <triggers>code quality|security scanning|performance bottlenecks|architecture review</triggers>
 
   <flow>
     1. Discover: Categorize files by language
@@ -34,10 +30,10 @@ description: Comprehensive code analysis across quality, security, performance, 
 | report | ANALYSIS_REPORT.md | Full report + roadmap |
   </outputs>
 
-  <checklist note="SHOULD complete all">
-    - [ ] All files in target scanned
-    - [ ] Findings prioritized by severity
-    - [ ] Actionable recommendations provided
+  <checklist note="Completion criteria">
+    - [ ] All files in target scanned (show file count)
+    - [ ] Findings prioritized by severity (critical/high/med/low)
+    - [ ] Actionable recommendations provided (specific fix per finding)
     - [ ] Output format matches --format
   </checklist>
 
@@ -68,7 +64,7 @@ description: Comprehensive code analysis across quality, security, performance, 
 
   <token_note>Medium-high consumption — use --scope file or --scope module to limit analysis boundary</token_note>
 
-  <bounds will="static analysis|severity-rated findings|detailed reports" wont="dynamic/runtime analysis|modify code|analyze external deps"/>
+  <bounds will="static analysis|severity-rated findings|detailed reports" wont="dynamic/runtime analysis|modify code|analyze external deps" fallback="Ask user for guidance when uncertain"/>
 
   <boundaries type="document-only" critical="true">
     <rule>Produce analysis report, then complete</rule>

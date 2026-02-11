@@ -11,12 +11,7 @@ description: Intelligent MCP tool selection based on complexity scoring and oper
 
   <syntax>/sc:select-tool [operation] [--analyze] [--explain]</syntax>
 
-  <triggers>
-    - MCP tool selection (Serena vs Morphllm)
-    - Complexity analysis needs
-    - Tool routing decisions
-    - Performance vs accuracy trade-offs
-  </triggers>
+  <triggers>MCP tool selection|complexity analysis|tool routing|performance trade-offs</triggers>
 
   <flow>
     1. Parse: Operation type + scope + file count
@@ -49,11 +44,11 @@ description: Intelligent MCP tool selection based on complexity scoring and oper
     - accuracy: >95%
   </performance>
 
-  <checklist note="SHOULD complete all">
-    - [ ] Operation complexity scored
-    - [ ] Optimal tool selected via matrix
+  <checklist note="Completion criteria">
+    - [ ] Operation complexity scored (show numeric score)
+    - [ ] Optimal tool selected via matrix (name tool + reason)
     - [ ] Selection rationale provided (if --explain)
-    - [ ] Fallback strategy identified
+    - [ ] Fallback strategy identified (name backup tool)
   </checklist>
 
   <examples>
@@ -66,7 +61,7 @@ description: Intelligent MCP tool selection based on complexity scoring and oper
 
   </examples>
 
-  <bounds will="optimal selection|complexity scoring|sub-100ms decision" wont="override explicit preference|skip analysis|compromise performance"/>
+  <bounds will="optimal selection|complexity scoring|sub-100ms decision" wont="override explicit preference|skip analysis|compromise performance" fallback="Ask user for guidance when uncertain"/>
 
   <handoff>
     <next command="/sc:implement">For executing with selected tool</next>

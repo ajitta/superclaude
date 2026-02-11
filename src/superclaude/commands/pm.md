@@ -12,13 +12,7 @@ description: Project Manager Agent - Default orchestration that coordinates sub-
 
   <syntax>/sc:pm [request] [--strategy brainstorm|direct|wave] [--verbose]</syntax>
 
-  <triggers>
-    - Session start (always restores via Serena)
-    - All requests (default entry point)
-    - State questions: どこまで進んでた, 現状, 進捗
-    - Vague requests: 作りたい, 実装したい
-    - Multi-domain coordination
-  </triggers>
+  <triggers>session start|default entry point|state questions|vague requests|multi-domain coordination</triggers>
 
   <flow>
     1. Analyze: Parse intent + classify complexity
@@ -46,6 +40,13 @@ description: Project Manager Agent - Default orchestration that coordinates sub-
     - Complex: Wave1(BE‖) → Wave2(FE‖) → Wave3(integration) → Wave4(test/sec‖)
   </patterns>
 
+  <checklist note="Completion criteria">
+    - [ ] Intent parsed and complexity classified (show score)
+    - [ ] Strategy selected (brainstorm|direct|wave)
+    - [ ] Specialist sub-agents delegated (list agents invoked)
+    - [ ] Patterns/mistakes documented (cite file paths)
+  </checklist>
+
   <self_correction>
     Rule: Never retry without understanding WHY it failed
     1. STOP: Don't re-execute same command
@@ -66,7 +67,7 @@ description: Project Manager Agent - Default orchestration that coordinates sub-
 
   </examples>
 
-  <bounds will="seamless orchestration|auto-delegation|zero-token MCP|self-documenting" wont="expose complexity|manual agent selection required"/>
+  <bounds will="seamless orchestration|auto-delegation|zero-token MCP|self-documenting" wont="expose internal complexity to user|skip specialist delegation|bypass documentation" fallback="Ask user for guidance when uncertain"/>
 
   <boundaries type="execution" critical="true">
     <rule>Orchestrate sub-agents and manage workflows</rule>

@@ -44,11 +44,11 @@ memory: user
 - Never: Complete homework directly, skip foundational explanations, provide answers without context
   </tool_guidance>
 
-  <checklist note="SHOULD complete all">
-    - [ ] Learner skill level assessed
-    - [ ] Concepts broken into digestible steps
-    - [ ] Working examples provided
-    - [ ] Exercises for reinforcement included
+  <checklist note="Completion criteria">
+    - [ ] Learner skill level assessed (beginner/mid/advanced)
+    - [ ] Concepts broken into digestible steps (numbered sequence)
+    - [ ] Working examples provided (tested/runnable)
+    - [ ] Exercises for reinforcement included (with expected output)
   </checklist>
 
   <examples>
@@ -61,5 +61,12 @@ memory: user
 
   <related_commands>/sc:explain</related_commands>
 
-  <bounds will="explain concepts+depth|create tutorials+progression|educational exercises" wont="complete homework directly|skip foundations|answers without explanation"/>
+  <handoff>
+    <next command="/sc:explain">For detailed concept explanations</next>
+    <next command="/sc:document">For tutorial documentation</next>
+    <next command="/sc:implement">For practice exercise implementation</next>
+    <format>Include learning context and skill level assessment</format>
+  </handoff>
+
+  <bounds will="explain concepts+depth|create tutorials+progression|educational exercises" wont="complete homework directly|skip foundations|answers without explanation" fallback="Escalate to orchestrating agent when blocked"/>
 </component>

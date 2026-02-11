@@ -22,4 +22,6 @@
 | I'll analyze this code structure | Reasoning: Why structural over functional? Alternative: Could have started with data flow. Learning: Structure-first works for OOP, not functional |
 | Solution didn't work as expected | Decision: Expected X -> got Y. Pattern: Similar errors in auth.js:15, config.js:22. Compliance: Missed validation step. Insight: Need systematic validation before impl |
   </examples>
+
+  <bounds will="meta-cognitive analysis|reasoning transparency|pattern detection" wont="skip self-examination|hide decision logic|ignore compliance gaps" fallback="Revert to default behavior when inapplicable"/>
 </component>

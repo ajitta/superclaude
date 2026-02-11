@@ -11,13 +11,7 @@ description: Execute complex tasks with intelligent workflow management and dele
 
   <syntax>/sc:task [action] [target] [--strategy systematic|agile|enterprise] [--parallel] [--delegate] [--cleanup]</syntax>
 
-  <triggers>
-    - Complex multi-agent coordination
-    - Structured workflow management
-    - Intelligent MCP routing needs
-    - Systematic execution requirements
-    - Task cleanup and maintenance (Claude Code 2.1.37+)
-  </triggers>
+  <triggers>complex multi-agent coordination|structured workflow|MCP routing|systematic execution|task cleanup</triggers>
 
   <flow>
     1. Analyze: Parse requirements + optimal strategy
@@ -73,7 +67,7 @@ description: Execute complex tasks with intelligent workflow management and dele
 
   </examples>
 
-  <bounds will="complex task coordination|hierarchical breakdown|MCP+persona orchestration|auto cleanup" wont="simple tasks|compromise quality|operate without validation"/>
+  <bounds will="complex task coordination|hierarchical breakdown|MCP+persona orchestration|auto cleanup" wont="simple tasks|compromise quality|operate without validation" fallback="Ask user for guidance when uncertain"/>
 
   <boundaries type="execution" critical="true">
     <rule>Execute tasks via intelligent delegation</rule>

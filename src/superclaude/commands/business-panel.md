@@ -41,7 +41,14 @@ description: Multi-expert business analysis with adaptive interaction modes
   <mcp servers="seq|c7"/>
   <personas p="anal|arch|mentor" auto="true"/>
 
-  <bounds will="multi-expert analysis|adaptive modes|comprehensive synthesis" wont="replace professional advice|make decisions for user"/>
+  <checklist note="Completion criteria">
+    - [ ] Context and constraints captured (list each constraint)
+    - [ ] Relevant experts selected (3-6)
+    - [ ] Multi-lens analysis completed (each expert quoted)
+    - [ ] Synthesis with trade-offs provided (pros/cons per option)
+  </checklist>
+
+  <bounds will="multi-expert analysis|adaptive modes|comprehensive synthesis" wont="replace professional advice|make decisions for user" fallback="Ask user for guidance when uncertain"/>
 
   <boundaries type="document-only" critical="true">
     <rule>Produce business analysis document, then complete</rule>

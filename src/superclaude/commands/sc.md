@@ -11,11 +11,7 @@ description: SuperClaude command dispatcher - main entry point for all features
 
   <syntax>/sc:[command] [args...]</syntax>
 
-  <triggers>
-    - /sc or /sc:sc
-    - superclaude-help
-    - command-list
-  </triggers>
+  <triggers>/sc|superclaude-help|command-list</triggers>
 
   <commands>
     - agent: Session controller + workflow orchestration
@@ -56,6 +52,12 @@ description: SuperClaude command dispatcher - main entry point for all features
     - Token efficient: optimized minimal usage
   </features>
 
+  <checklist note="Completion criteria">
+    - [ ] Command list displayed (show all available)
+    - [ ] Usage context provided (example per command)
+    - [ ] Routing to correct command (match user intent)
+  </checklist>
+
   <examples>
 
 | Input | Output |
@@ -74,7 +76,7 @@ description: SuperClaude command dispatcher - main entry point for all features
     - docs: github.com/ajitta/superclaude
   </meta>
 
-  <bounds will="display commands|provide help|route to features" wont="execute without command|modify files"/>
+  <bounds will="command dispatch|feature routing|context-aware help" wont="execute without explicit command|modify files|bypass command validation" fallback="Ask user for guidance when uncertain"/>
 
   <handoff>
     <next command="/sc:recommend">For intelligent command selection</next>

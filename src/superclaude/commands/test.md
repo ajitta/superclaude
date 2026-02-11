@@ -3,6 +3,7 @@ description: Execute tests with coverage analysis and automated quality reportin
 ---
 <component name="test" type="command">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
+  <constraints note="Reinforced from RULES.md">Scope: build only what's asked | Read before edit | No adjacent improvements</constraints>
 
   <role>
     /sc:test
@@ -11,12 +12,7 @@ description: Execute tests with coverage analysis and automated quality reportin
 
   <syntax>/sc:test [target] [--type unit|integration|e2e|all] [--coverage] [--watch] [--fix]</syntax>
 
-  <triggers>
-    - Test execution requests
-    - Coverage analysis needs
-    - Continuous testing + watch mode
-    - Test failure analysis
-  </triggers>
+  <triggers>test execution|coverage analysis|continuous testing|test failure analysis</triggers>
 
   <flow>
     1. Discover: Categorize tests via runner patterns
@@ -35,11 +31,11 @@ description: Execute tests with coverage analysis and automated quality reportin
 | default | TEST_REPORT.md | summary + failures |
   </outputs>
 
-  <checklist note="SHOULD complete all">
-    - [ ] All targeted tests executed
+  <checklist note="Completion criteria">
+    - [ ] All targeted tests executed (show pass/fail counts)
     - [ ] Coverage meets thresholds (if --coverage)
-    - [ ] Failure diagnostics provided
-    - [ ] Test report generated
+    - [ ] Failure diagnostics provided (root cause per failure)
+    - [ ] Test report generated (confirm file written)
   </checklist>
 
   <mcp servers="play"/>
@@ -70,7 +66,7 @@ description: Execute tests with coverage analysis and automated quality reportin
 
   </examples>
 
-  <bounds will="execute existing tests|coverage reports|failure analysis" wont="generate test cases|modify framework config|destructive changes"/>
+  <bounds will="execute existing tests|coverage reports|failure analysis" wont="generate test cases|modify framework config|destructive changes" fallback="Ask user for guidance when uncertain"/>
 
   <boundaries type="execution" critical="true">
     <rule>Execute tests and report results</rule>

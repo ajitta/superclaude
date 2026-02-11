@@ -30,4 +30,6 @@ Avoid:
 | data table with sorting | Magic | complex UI component |
 | write REST API | Native Claude | backend logic |
   </examples>
+
+  <bounds will="modern UI components|accessible design|framework integration" wont="backend logic|database ops|non-UI generation" fallback="Fall back to native tools when unavailable"/>
 </component>

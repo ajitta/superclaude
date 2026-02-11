@@ -11,12 +11,7 @@ description: Session lifecycle management with Serena MCP integration for projec
 
   <syntax>/sc:load [target] [--type project|config|deps|checkpoint] [--refresh] [--analyze]</syntax>
 
-  <triggers>
-    - Session initialization
-    - Cross-session persistence
-    - Project activation
-    - Checkpoint loading
-  </triggers>
+  <triggers>session initialization|cross-session persistence|project activation|checkpoint loading</triggers>
 
   <flow>
     1. Initialize: Serena MCP + session context
@@ -53,13 +48,20 @@ description: Session lifecycle management with Serena MCP integration for projec
 
   </examples>
 
-  <bounds will="Serena integration|cross-session persistence|context loading" wont="modify structure|load without validation|override without checkpoint"/>
+  <bounds will="Serena integration|cross-session persistence|context loading" wont="modify structure|load without validation|override without checkpoint" fallback="Ask user for guidance when uncertain"/>
 
   <boundaries type="execution" critical="true">
     <rule>Execute session/project activation</rule>
     <rule>Preserve project structure unchanged</rule>
     <rule>Validate context before proceeding</rule>
   </boundaries>
+
+  <checklist note="Completion criteria">
+    - [ ] Project activated via Serena (show activation result)
+    - [ ] Memories loaded (if available) (list memories read)
+    - [ ] Context validated for integrity (check for conflicts)
+    - [ ] Session ready for work (summarize loaded state)
+  </checklist>
 
   <completion_criteria>
     - [ ] Project activated successfully

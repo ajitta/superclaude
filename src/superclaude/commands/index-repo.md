@@ -11,11 +11,7 @@ description: Repository indexing with 94% token reduction (58K → 3K)
 
   <syntax>/sc:index-repo [mode=create|update|quick]</syntax>
 
-  <triggers>
-    - Repository indexing requests
-    - Token reduction needs
-    - Project structure documentation
-  </triggers>
+  <triggers>repository indexing|token reduction|project structure docs</triggers>
 
   <flow>
     1. Detect: Project type from entry files (pyproject.toml, package.json, etc.)
@@ -26,11 +22,11 @@ description: Repository indexing with 94% token reduction (58K → 3K)
     6. Validate: Both files exist + size <5KB each
   </flow>
 
-  <checklist note="SHOULD complete all before reporting done">
-    - [ ] PROJECT_INDEX.md created/updated
-    - [ ] PROJECT_INDEX.json created/updated
-    - [ ] Both files validated for completeness
-    - [ ] Statistics synced between .md and .json
+  <checklist note="Completion criteria">
+    - [ ] PROJECT_INDEX.md created/updated (confirm file exists)
+    - [ ] PROJECT_INDEX.json created/updated (confirm file exists)
+    - [ ] Both files validated for completeness (check size <5KB)
+    - [ ] Statistics synced between .md and .json (compare counts)
   </checklist>
 
   <tools>
@@ -69,7 +65,7 @@ description: Repository indexing with 94% token reduction (58K → 3K)
 
   </examples>
 
-  <bounds will="94% token reduction|parallel analysis|human-readable output" wont="modify source|exceed 5KB"/>
+  <bounds will="94% token reduction|parallel analysis|human-readable output" wont="modify source|exceed 5KB" fallback="Ask user for guidance when uncertain"/>
 
   <boundaries type="document-only" critical="true">
     <rule>Generate PROJECT_INDEX.md and PROJECT_INDEX.json, then complete</rule>

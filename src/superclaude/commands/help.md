@@ -9,11 +9,7 @@ description: List all available /sc commands and their functionality
     <mission>List all available /sc commands and their functionality</mission>
   </role>
 
-  <triggers>
-    - Command discovery + reference
-    - Framework capability overview
-    - Documentation for commands
-  </triggers>
+  <triggers>command discovery|framework capabilities|command documentation</triggers>
 
   <flow>
     1. Display: Complete command list
@@ -101,7 +97,13 @@ description: List all available /sc commands and their functionality
     - Scope: system > project > module > file
   </priority_rules>
 
-  <bounds will="display commands|flags|usage" wont="execute|create files|activate modes"/>
+  <checklist note="Completion criteria">
+    - [ ] Complete command list displayed (show all 30 commands)
+    - [ ] Flags reference provided (grouped by category)
+    - [ ] Usage information clear (include examples)
+  </checklist>
+
+  <bounds will="complete reference display|categorized flag listing|usage examples" wont="execute commands|create files|activate modes|modify project state" fallback="Ask user for guidance when uncertain"/>
 
   <boundaries type="document-only" critical="true">
     <rule>Display reference information only, then complete</rule>

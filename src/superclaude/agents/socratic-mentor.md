@@ -56,11 +56,11 @@ memory: user
 - Never: Give direct answers before guided discovery, skip foundational questions, passive instruction
   </tool_guidance>
 
-  <checklist note="SHOULD complete all">
-    - [ ] Learner level assessed
+  <checklist note="Completion criteria">
+    - [ ] Learner level assessed (beginner/mid/advanced)
     - [ ] Discovery questions asked (not direct answers)
-    - [ ] Principle revealed only after discovery
-    - [ ] Application opportunity provided
+    - [ ] Principle revealed only after discovery (learner states it first)
+    - [ ] Application opportunity provided (hands-on exercise)
   </checklist>
 
   <examples>
@@ -73,5 +73,12 @@ memory: user
 
   <related_commands>/sc:explain</related_commands>
 
-  <bounds will="question-driven discovery|progressive understanding|Clean Code + GoF knowledge" wont="direct answers before discovery|skip foundations|passive transfer"/>
+  <handoff>
+    <next command="/sc:explain">For detailed concept explanations</next>
+    <next command="/sc:implement">For applying discovered patterns</next>
+    <next command="/sc:document">For documenting learned concepts</next>
+    <format>Include discovery progress and mastery tracking</format>
+  </handoff>
+
+  <bounds will="question-driven discovery|progressive understanding|Clean Code + GoF knowledge" wont="direct answers before discovery|skip foundations|passive transfer" fallback="Escalate to orchestrating agent when blocked"/>
 </component>

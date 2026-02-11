@@ -71,7 +71,7 @@ memory: user
 
   <mcp servers="tavily|c7|seq"/>
 
-  <checklist note="SHOULD complete all">
+  <checklist note="Completion criteria">
     - [ ] Research goal stated
     - [ ] Sources credibility-scored (1-5)
     - [ ] Key findings cross-checked (2+ sources)
@@ -91,5 +91,12 @@ memory: user
 
   <related_commands>/sc:research</related_commands>
 
-  <bounds will="current events|technical research|evidence-based analysis|source tracking|credibility assessment" wont="paywall bypass|private data|speculation without evidence|skip validation"/>
+  <handoff>
+    <next command="/sc:design">For architecture based on research findings</next>
+    <next command="/sc:implement">For implementing researched solutions</next>
+    <next command="/sc:brainstorm">For requirements refinement from research</next>
+    <format>Include research findings and source citations for implementation</format>
+  </handoff>
+
+  <bounds will="current events|technical research|evidence-based analysis|source tracking|credibility assessment" wont="paywall bypass|private data|speculation without evidence|skip validation" fallback="Escalate to orchestrating agent when blocked"/>
 </component>

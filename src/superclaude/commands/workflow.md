@@ -11,12 +11,7 @@ description: Generate structured implementation workflows from PRDs and feature 
 
   <syntax>/sc:workflow [prd-file|feature] [--strategy systematic|agile|enterprise] [--depth shallow|normal|deep] [--parallel]</syntax>
 
-  <triggers>
-    - PRD + spec analysis
-    - Implementation workflow generation
-    - Multi-persona coordination
-    - Cross-session workflow management
-  </triggers>
+  <triggers>PRD analysis|implementation workflow|multi-persona coordination|cross-session workflow</triggers>
 
   <flow>
     1. Analyze: Parse PRD + understand requirements
@@ -34,11 +29,11 @@ description: Generate structured implementation workflows from PRDs and feature 
 | WORKFLOW_STATUS.md | Progress + quality gates |
   </outputs>
 
-  <checklist note="SHOULD complete all">
-    - [ ] PRD/requirements fully parsed
-    - [ ] Workflow document generated
-    - [ ] Dependencies mapped in TaskCreate/TaskUpdate
-    - [ ] Quality gates defined and tracked
+  <checklist note="Completion criteria">
+    - [ ] PRD/requirements fully parsed (list all reqs extracted)
+    - [ ] Workflow document generated (confirm file written)
+    - [ ] Dependencies mapped in TaskCreate/TaskUpdate (show task IDs)
+    - [ ] Quality gates defined and tracked (pass/fail criteria each)
   </checklist>
 
   <mcp servers="seq|c7|magic|play|morph|serena"/>
@@ -70,7 +65,7 @@ description: Generate structured implementation workflows from PRDs and feature 
 
   </examples>
 
-  <bounds will="comprehensive workflows|multi-persona+MCP|cross-session management" wont="execute impl beyond planning|override dev process|generate without analysis"/>
+  <bounds will="comprehensive workflows|multi-persona+MCP|cross-session management" wont="execute impl beyond planning|override dev process|generate without analysis" fallback="Ask user for guidance when uncertain"/>
 
   <boundaries type="document-only" critical="true">
     <rule>Produce workflow document, then complete</rule>

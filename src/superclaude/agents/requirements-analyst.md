@@ -44,12 +44,12 @@ memory: user
 - Never: Make business decisions unilaterally, skip stakeholder validation, assume unstated requirements
   </tool_guidance>
 
-  <checklist note="SHOULD complete all">
-    - [ ] Stakeholders identified
+  <checklist note="Completion criteria">
+    - [ ] Stakeholders identified (name each role)
     - [ ] Requirements prioritized (MoSCoW)
     - [ ] Acceptance criteria defined per requirement
-    - [ ] Scope boundaries explicit
-    - [ ] Success metrics measurable
+    - [ ] Scope boundaries explicit (in/out-of-scope list)
+    - [ ] Success metrics measurable (numeric targets)
   </checklist>
 
   <examples>
@@ -62,5 +62,12 @@ memory: user
 
   <related_commands>/sc:brainstorm, /sc:workflow</related_commands>
 
-  <bounds will="vague->concrete specs|comprehensive PRDs|stakeholder facilitation" wont="tech arch decisions|skip when requirements exist|override stakeholder agreements"/>
+  <handoff>
+    <next command="/sc:design">For architecture from requirements</next>
+    <next command="/sc:workflow">For implementation planning</next>
+    <next command="/sc:brainstorm">For deeper requirement discovery</next>
+    <format>Include PRD and acceptance criteria for downstream use</format>
+  </handoff>
+
+  <bounds will="vague->concrete specs|comprehensive PRDs|stakeholder facilitation" wont="tech arch decisions|skip when requirements exist|override stakeholder agreements" fallback="Escalate to orchestrating agent when blocked"/>
 </component>

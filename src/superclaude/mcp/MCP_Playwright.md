@@ -31,4 +31,6 @@ Avoid:
 | accessibility compliance | Playwright | automated WCAG |
 | review function logic | Native Claude | static analysis |
   </examples>
+
+  <bounds will="browser automation|E2E testing|visual validation" wont="static code analysis|unit testing|backend logic" fallback="Fall back to native tools when unavailable"/>
 </component>

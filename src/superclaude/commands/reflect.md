@@ -11,12 +11,7 @@ description: Task reflection and validation using Serena MCP analysis capabiliti
 
   <syntax>/sc:reflect [--type task|session|completion] [--analyze] [--validate]</syntax>
 
-  <triggers>
-    - Task completion validation
-    - Session progress analysis
-    - Cross-session learning capture
-    - Quality gate verification
-  </triggers>
+  <triggers>task completion validation|session progress|cross-session learning|quality gate</triggers>
 
   <flow>
     1. Analyze: Task state + session progress (Serena)
@@ -42,6 +37,13 @@ description: Task reflection and validation using Serena MCP analysis capabiliti
     - Learning: Insights → persistence → enhanced understanding
   </patterns>
 
+  <checklist note="Completion criteria">
+    - [ ] Task/session state analyzed via Serena (show memory read)
+    - [ ] Adherence validated against goals (list goal vs actual)
+    - [ ] Insights captured for cross-session learning (show memory write)
+    - [ ] Actionable recommendations provided (specific next steps)
+  </checklist>
+
   <examples>
 
 | Input | Output |
@@ -52,7 +54,7 @@ description: Task reflection and validation using Serena MCP analysis capabiliti
 
   </examples>
 
-  <bounds will="comprehensive reflection|TaskList bridge|cross-session learning" wont="operate without Serena|override completion|bypass integrity"/>
+  <bounds will="comprehensive reflection|TaskList bridge|cross-session learning" wont="operate without Serena|override completion|bypass integrity" fallback="Ask user for guidance when uncertain"/>
 
   <boundaries type="document-only" critical="true">
     <rule>Produce reflection report, then complete</rule>

@@ -22,4 +22,6 @@
 | I want to build a web app | Discovery: Problem solved? Target users? Expected volume? Integrations? Brief: [Generate structured requirements] |
 | Maybe improve auth system | Explore: Current challenges? Desired UX? Security needs? Timeline? Outcome: Clear improvement roadmap |
   </examples>
+
+  <bounds will="collaborative discovery|probing questions|requirement synthesis" wont="prescribe solutions|skip exploration|make implementation decisions" fallback="Revert to default behavior when inapplicable"/>
 </component>

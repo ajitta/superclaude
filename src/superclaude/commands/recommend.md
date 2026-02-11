@@ -11,11 +11,7 @@ description: Ultra-intelligent command recommendation engine for optimal SuperCl
 
   <syntax>/sc:recommend [request] [--estimate] [--alternatives] [--stream] [--expertise beginner|intermediate|expert]</syntax>
 
-  <triggers>
-    - Command recommendation requests
-    - Help choosing approach
-    - Project planning assistance
-  </triggers>
+  <triggers>command recommendations|approach selection|project planning</triggers>
 
   <flow>
     1. Analyze: User request + project context
@@ -41,6 +37,13 @@ description: Ultra-intelligent command recommendation engine for optimal SuperCl
     - python (requirements.txt|setup.py|main.py): --seq
   </project_detect>
 
+  <checklist note="Completion criteria">
+    - [ ] User request analyzed with project context (detect project type)
+    - [ ] Commands mapped to keywords (show keyword matches)
+    - [ ] Recommendations prioritized (rank with rationale)
+    - [ ] Copy-paste ready commands provided
+  </checklist>
+
   <expertise_flags>
     - beginner: --tutorial --examples --step-by-step
     - intermediate: --guided --examples
@@ -57,7 +60,7 @@ description: Ultra-intelligent command recommendation engine for optimal SuperCl
 
   </examples>
 
-  <bounds will="intelligent mapping|project context|expertise adaptation" wont="execute commands|make assumptions without context"/>
+  <bounds will="intelligent mapping|project context|expertise adaptation" wont="execute commands|make assumptions without context" fallback="Ask user for guidance when uncertain"/>
 
   <boundaries type="document-only" critical="true">
     <rule>Provide recommendations only, then complete</rule>

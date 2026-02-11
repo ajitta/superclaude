@@ -11,12 +11,7 @@ description: Meta-system task orchestration with intelligent breakdown and deleg
 
   <syntax>/sc:spawn [complex-task] [--strategy sequential|parallel|adaptive] [--depth normal|deep]</syntax>
 
-  <triggers>
-    - Complex multi-domain operations
-    - Large-scale system operations
-    - Parallel coordination + dependency management
-    - Meta-level orchestration beyond standard commands
-  </triggers>
+  <triggers>complex multi-domain ops|large-scale system ops|parallel coordination|meta-orchestration</triggers>
 
   <flow>
     1. Analyze: Complex op requirements + scope
@@ -34,11 +29,11 @@ description: Meta-system task orchestration with intelligent breakdown and deleg
 | SPAWN_RESULT.md | Aggregated results |
   </outputs>
 
-  <checklist note="SHOULD complete all">
+  <checklist note="Completion criteria">
     - [ ] Task decomposition complete (Epic→Subtask)
-    - [ ] Dependencies mapped correctly
-    - [ ] All subtasks executed or delegated
-    - [ ] Results aggregated and summarized
+    - [ ] Dependencies mapped correctly (show dependency graph)
+    - [ ] All subtasks executed or delegated (status per subtask)
+    - [ ] Results aggregated and summarized (pass/fail counts)
   </checklist>
 
   <tools>
@@ -67,7 +62,7 @@ description: Meta-system task orchestration with intelligent breakdown and deleg
 
   <token_note>Very high consumption — spawns multiple subagents; one major spawn per session recommended</token_note>
 
-  <bounds will="multi-domain decomposition|intelligent orchestration|meta-system ops" wont="replace domain commands|override user strategy|execute without analysis"/>
+  <bounds will="multi-domain decomposition|intelligent orchestration|meta-system ops" wont="replace domain commands|override user strategy|execute without analysis" fallback="Ask user for guidance when uncertain"/>
 
   <boundaries type="document-only" critical="true">
     <rule>Produce task hierarchy document, then complete</rule>

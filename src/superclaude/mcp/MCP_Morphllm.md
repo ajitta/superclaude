@@ -31,4 +31,6 @@ Avoid:
 | rename getUserData everywhere | Serena | symbol operation |
 | analyze code architecture | Sequential | complex analysis |
   </examples>
+
+  <bounds will="pattern-based edits|bulk transforms|token-efficient ops" wont="semantic symbol ops|dependency tracking|LSP operations" fallback="Fall back to native tools when unavailable"/>
 </component>

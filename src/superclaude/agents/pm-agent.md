@@ -52,11 +52,11 @@ Example: "Add auth" -> backend-architect -> security-engineer -> PM: auth patter
 - Never: Execute implementations directly, skip documentation, alter user code
   </tool_guidance>
 
-  <checklist note="SHOULD complete all per session">
-    - [ ] Previous context loaded (if exists)
+  <checklist note="Completion criteria">
+    - [ ] Previous context loaded (if exists) (show memory read)
     - [ ] TaskCreate used for 3+ step tasks
-    - [ ] Discoveries documented (patterns/ or mistakes/)
-    - [ ] Session context persisted
+    - [ ] Discoveries documented (patterns/ or mistakes/) (cite file paths)
+    - [ ] Session context persisted (show memory write)
   </checklist>
 
   <examples>
@@ -69,5 +69,12 @@ Example: "Add auth" -> backend-architect -> security-engineer -> PM: auth patter
 
   <related_commands>/sc:pm, /sc:task</related_commands>
 
-  <bounds will="document implementations|analyze mistakes immediately|maintain docs monthly" wont="execute implementations directly|skip documentation|postpone mistake analysis"/>
+  <handoff>
+    <next command="/sc:implement">For executing planned implementations</next>
+    <next command="/sc:task">For complex multi-step delegation</next>
+    <next command="/sc:research">For investigation before decisions</next>
+    <format>Include orchestration context and delegation decisions</format>
+  </handoff>
+
+  <bounds will="document implementations|analyze mistakes immediately|maintain docs monthly" wont="execute implementations directly|skip documentation|postpone mistake analysis" fallback="Escalate to orchestrating agent when blocked"/>
 </component>

@@ -3,6 +3,7 @@ description: Provide clear explanations of code, concepts, and system behavior w
 ---
 <component name="explain" type="command">
   <config style="Telegraphic|Imperative|XML" eval="true"/>
+  <constraints note="Reinforced from RULES.md">Scope: build only what's asked | Read before edit | No adjacent improvements</constraints>
 
   <role>
     /sc:explain
@@ -11,12 +12,7 @@ description: Provide clear explanations of code, concepts, and system behavior w
 
   <syntax>/sc:explain [target] [--level basic|intermediate|advanced] [--format text|examples|interactive] [--context domain]</syntax>
 
-  <triggers>
-    - Code understanding requests
-    - System behavior explanation
-    - Educational content generation
-    - Framework concept clarification
-  </triggers>
+  <triggers>code understanding|system behavior|educational content|framework concepts</triggers>
 
   <flow>
     1. Analyze: Target code/concept/system
@@ -42,10 +38,10 @@ description: Provide clear explanations of code, concepts, and system behavior w
     - Interactive: Static → examples → exploration
   </patterns>
 
-  <checklist note="SHOULD complete all">
-    - [ ] Target code/concept fully analyzed
+  <checklist note="Completion criteria">
+    - [ ] Target code/concept fully analyzed (read source first)
     - [ ] Explanation matches requested --level
-    - [ ] Examples provided for clarity
+    - [ ] Examples provided for clarity (runnable code shown)
     - [ ] Output format matches --format
   </checklist>
 
@@ -60,7 +56,7 @@ description: Provide clear explanations of code, concepts, and system behavior w
 
   </examples>
 
-  <bounds will="clear explanations|persona expertise|framework integration" wont="explain without analysis|override standards|reveal sensitive"/>
+  <bounds will="clear explanations|persona expertise|framework integration" wont="explain without analysis|override standards|reveal sensitive" fallback="Ask user for guidance when uncertain"/>
 
   <boundaries type="document-only" critical="true">
     <rule>Provide explanation, then complete</rule>

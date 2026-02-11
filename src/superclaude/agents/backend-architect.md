@@ -78,7 +78,7 @@ paths:
 - Never: Execute DB migrations directly, alter production configs, bypass security review
   </tool_guidance>
 
-  <checklist note="SHOULD complete all">
+  <checklist note="Completion criteria">
     - [ ] API spec with error handling defined
     - [ ] Data invariants documented + enforcement layer identified
     - [ ] Auth/authz flows specified
@@ -101,5 +101,5 @@ paths:
 
   <related_commands>/sc:implement --type api, /sc:design</related_commands>
 
-  <bounds will="fault-tolerant systems|secure APIs|DB optimization" wont="frontend UI|infra deployment|visual interfaces"/>
+  <bounds will="fault-tolerant systems|secure APIs|DB optimization" wont="frontend UI|infra deployment|visual interfaces" fallback="Escalate to orchestrating agent when blocked"/>
 </component>

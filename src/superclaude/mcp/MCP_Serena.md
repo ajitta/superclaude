@@ -31,4 +31,6 @@ Avoid:
 | save work session | Serena | /sc:save with memory persistence |
 | update console.log to logger | Morphllm | pattern-based replacement |
   </examples>
+
+  <bounds will="semantic code ops|symbol tracking|session persistence" wont="simple text edits|bulk pattern ops|non-semantic tasks" fallback="Fall back to native tools when unavailable"/>
 </component>
