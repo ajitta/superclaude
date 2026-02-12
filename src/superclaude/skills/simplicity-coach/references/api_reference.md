@@ -1,19 +1,19 @@
-# Orient-Step-Learn 적용 사례집
+# Orient-Step-Learn Applied Examples
 
-> 이 문서는 SKILL.md에서 `references/orient-step-learn-examples.md`로 참조됨.
-> Orient-Step-Learn 프레임워크의 구체적 적용 사례를 담고 있다.
+> This document is referenced from SKILL.md as `references/orient-step-learn-examples.md`.
+> It contains concrete examples of applying the Orient-Step-Learn framework.
 
 ---
 
-## 사례 1: 새 API 엔드포인트 개발
+## Example 1: Developing a New API Endpoint
 
 ### Orient
-- **현재**: 사용자 목록을 반환하는 `/users` API만 존재
-- **목표**: 사용자 프로필 상세 조회 `/users/{id}/profile` 추가
-- **완료 기준**: GET 요청으로 사용자 이름, 이메일, 가입일을 JSON으로 반환
+- **Current**: Only a `/users` API exists that returns a user list
+- **Goal**: Add `/users/{id}/profile` for detailed user profile retrieval
+- **Completion criteria**: GET request returns user name, email, and registration date as JSON
 
 ### Step 1
-가장 핵심적인 시나리오: id로 사용자 1명을 조회하여 이름만 반환하는 엔드포인트.
+Most essential scenario: an endpoint that retrieves one user by id and returns only their name.
 ```python
 @app.get("/users/{user_id}/profile")
 def get_profile(user_id: int):
@@ -22,119 +22,119 @@ def get_profile(user_id: int):
 ```
 
 ### Learn 1
-- 동작 확인됨. 존재하지 않는 user_id에 대해 500 에러 발생 → 404 처리 필요.
-- DB 쿼리가 불필요하게 전체 컬럼을 가져옴 → 다음 단계에서 최적화.
+- Verified it works. A non-existent user_id causes a 500 error → need 404 handling.
+- DB query unnecessarily fetches all columns → optimize in the next step.
 
 ### Step 2
-404 처리 추가 + 필요한 필드만 반환하도록 수정.
+Add 404 handling + modify to return only the required fields.
 
 ### Learn 2
-- 에러 처리 패턴이 다른 엔드포인트와 일관되지 않음 발견 → 공통 에러 핸들러 고려.
-- 이 발견은 프로세스 버그: 에러 처리에 대한 팀 컨벤션이 없었음.
+- Found that the error handling pattern is inconsistent with other endpoints → consider a common error handler.
+- This is a process bug: the team had no convention for error handling.
 
 ---
 
-## 사례 2: 레거시 코드 리팩토링
+## Example 2: Refactoring Legacy Code
 
 ### Orient
-- **현재**: 5000줄짜리 `utils.py`에 온갖 함수가 섞여 있음
-- **목표**: 관련 함수들을 모듈별로 분리하여 가독성 향상
-- **완료 기준**: 각 모듈이 하나의 관심사만 다루고, 기존 테스트가 모두 통과
+- **Current**: A 5,000-line `utils.py` with all sorts of functions mixed together
+- **Goal**: Separate related functions into modules for improved readability
+- **Completion criteria**: Each module handles a single concern, and all existing tests pass
 
 ### Step 1
-가장 큰 함수 그룹(날짜 관련 10개 함수)만 `date_utils.py`로 추출.
-import 수정, 테스트 실행.
+Extract only the largest function group (10 date-related functions) into `date_utils.py`.
+Fix imports, run tests.
 
 ### Learn 1
-- 테스트 통과. 그런데 날짜 함수 중 3개가 `string_utils`의 함수를 호출하고 있었음.
-- 순환 의존성 가능성 발견 → 다음 단계에서 의존 방향 확인 필요.
+- Tests pass. However, 3 of the date functions call functions from `string_utils`.
+- Potential circular dependency found → need to verify dependency direction in the next step.
 
 ### Step 2
-의존성 그래프를 그려봄. string_utils → date_utils 방향은 OK. 역방향 없음 확인.
-string_utils 관련 8개 함수를 분리.
+Drew a dependency graph. string_utils → date_utils direction is OK. No reverse dependency confirmed.
+Separated 8 string_utils-related functions.
 
 ### Learn 2
-- 분리 후 테스트 1개 실패: mock이 `utils.string_format`을 직접 참조하고 있었음.
-- 피드백 3층위 적용:
-  - 코드 버그: mock 경로 수정
-  - 기대 버그: 해당 없음
-  - 프로세스 버그: mock에서 구현 경로를 하드코딩하는 패턴이 리팩토링에 취약함
+- 1 test failed after separation: a mock was directly referencing `utils.string_format`.
+- Applied the 3-level feedback:
+  - Code bug: Fix the mock path
+  - Expectation bug: Not applicable
+  - Process bug: The pattern of hardcoding implementation paths in mocks is fragile during refactoring
 
 ---
 
-## 사례 3: 기술 선택 — 상태 관리
+## Example 3: Technology Selection — State Management
 
 ### Orient
-- **현재**: React 앱에서 prop drilling이 5단계 이상으로 깊어짐
-- **목표**: 적절한 상태 관리 도입
-- **완료 기준**: prop drilling 2단계 이하로 줄임, 번들 크기 증가 최소화
+- **Current**: In a React app, prop drilling has gone 5+ levels deep
+- **Goal**: Introduce appropriate state management
+- **Completion criteria**: Reduce prop drilling to 2 levels or fewer, minimize bundle size increase
 
-### 의존성 질문 적용
-| 선택지 | 사용할 기능 | 직접 구현 가능? | 가역성 |
-|--------|-----------|---------------|--------|
-| Redux | 전역 store + selector | 과한 보일러플레이트 | 낮음 (전체 구조 변경) |
-| Zustand | 전역 store | 3줄 hook으로 대체 가능한 수준 | 중간 |
-| React Context | Provider + useContext | 이미 내장 | 높음 (표준 API) |
-| Jotai | 원자적 상태 | 직접 구현 어려움 | 중간 |
+### Applying the Dependency Questions
+| Option | Features Used | Can Build Ourselves? | Reversibility |
+|--------|--------------|---------------------|---------------|
+| Redux | Global store + selector | Excessive boilerplate | Low (changes entire structure) |
+| Zustand | Global store | Replaceable with a 3-line hook | Medium |
+| React Context | Provider + useContext | Already built-in | High (standard API) |
+| Jotai | Atomic state | Hard to implement ourselves | Medium |
 
 ### Step 1
-가역성이 가장 높은 React Context로 먼저 시도.
-가장 깊은 prop drilling 체인 1개만 Context로 전환.
+Try React Context first, as it has the highest reversibility.
+Convert only the deepest prop drilling chain to Context.
 
 ### Learn 1
-- 5단계 → 1단계로 감소. 코드 명확해짐.
-- 그러나 Context를 읽는 컴포넌트가 20개 → 리렌더링 우려.
-- 현재 성능 문제는 없음. YAGNI 원칙: 성능 문제가 실제로 발생할 때 대응.
+- Reduced from 5 levels to 1. Code is much clearer.
+- However, 20 components read from the Context → re-rendering concern.
+- No actual performance issue currently. YAGNI principle: address performance when it actually becomes a problem.
 
 ---
 
-## 사례 4: 의존성 감사
+## Example 4: Dependency Audit
 
-### 프로젝트 상황
-`package.json`에 47개의 직접 의존성. `node_modules`는 1,200개 패키지.
+### Project Context
+47 direct dependencies in `package.json`. 1,200 packages in `node_modules`.
 
-### Step 1: 사용하지 않는 의존성 식별
+### Step 1: Identify Unused Dependencies
 ```bash
 npx depcheck
 ```
-결과: 8개의 사용되지 않는 의존성 발견.
+Result: 8 unused dependencies found.
 
 ### Learn 1
-8개 중 3개는 빌드 도구가 암묵적으로 사용 → 실제 미사용은 5개.
-5개 제거 후 빌드/테스트 통과 확인.
+3 of the 8 are implicitly used by build tools → actually unused: 5.
+Removed 5, confirmed build/tests pass.
 
-### Step 2: 대체 가능한 의존성 식별
-`moment.js` (300KB) → 프로젝트에서 사용하는 함수: `format()`, `diff()`, `isValid()` 3개.
-3개 함수를 네이티브 `Intl.DateTimeFormat`과 20줄의 유틸리티 함수로 대체.
+### Step 2: Identify Replaceable Dependencies
+`moment.js` (300KB) → Functions used in the project: `format()`, `diff()`, `isValid()` — only 3.
+Replaced the 3 functions with native `Intl.DateTimeFormat` and a 20-line utility function.
 
 ### Learn 2
-- 번들 크기 280KB 감소
-- 빌드 시간 2초 단축
-- 날짜 포맷 중 하나(`'Do'` — "1st", "2nd" 등)가 네이티브로 불가능 → 10줄 추가로 해결
-- 프로세스 버그: 프로젝트 시작 시 "다들 쓰니까"라는 이유로 moment.js를 추가했음
+- Bundle size reduced by 280KB
+- Build time reduced by 2 seconds
+- One date format (`'Do'` — "1st", "2nd", etc.) not possible natively → solved with 10 extra lines
+- Process bug: moment.js was added at project start with "everyone uses it" as the only reason
 
 ---
 
-## 사례 5: 디버깅 — 3층위 피드백
+## Example 5: Debugging — 3-Level Feedback
 
-### 버그
-사용자가 폼 제출 시 간헐적으로 데이터가 저장되지 않음.
+### Bug
+Form submission intermittently fails to save data.
 
-### 1층위: 코드의 버그
-race condition — 두 개의 비동기 요청이 동시에 발생할 때 하나가 무시됨.
-수정: debounce 적용.
+### Level 1: Bug in the Code
+Race condition — when two async requests fire simultaneously, one gets ignored.
+Fix: Apply debounce.
 
-### 2층위: 기대의 버그
-테스트에서 "폼 제출 시 데이터가 저장된다"만 검증.
-동시 제출 시나리오를 테스트하지 않았음.
-수정: concurrent submission 테스트 추가.
+### Level 2: Bug in Expectations
+Tests only verify "data is saved on form submission."
+No test for concurrent submission scenarios.
+Fix: Add concurrent submission tests.
 
-### 3층위: 프로세스의 버그
-왜 이런 race condition이 발생했는가?
-- 버튼에 disable 처리를 하지 않아 사용자가 여러 번 클릭 가능했음
-- UI 피드백(로딩 스피너)이 없어 사용자가 "안 눌렸나?"라고 생각하고 재클릭
+### Level 3: Bug in the Process
+Why did this race condition occur?
+- No disable on the button, allowing users to click multiple times
+- No UI feedback (loading spinner), making users think "it didn't register" and click again
 
-근본 원인: 비동기 작업에 대한 UI 피드백 패턴이 프로젝트에 없었음.
-수정: 비동기 작업 시 UI 피드백 가이드라인 수립.
+Root cause: The project had no UI feedback pattern for async operations.
+Fix: Establish UI feedback guidelines for async operations.
 
-이 3층위 분석을 DAYBOOK.md에 기록하면, 향후 비슷한 패턴을 직감적으로 감지할 수 있게 된다.
+Recording this 3-level analysis in DAYBOOK.md builds intuition to instinctively detect similar patterns in the future.

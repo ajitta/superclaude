@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """
-dependency-audit.py — 프로젝트 의존성 감사 보고서 생성
+dependency-audit.py — Generate a project dependency audit report
 
-사용법:
+Usage:
   python3 dependency-audit.py <project-root>
 
-package.json, requirements.txt, Gemfile, go.mod 등에서 의존성을 추출하고,
-각 의존성에 대해 Simplicity Coach의 3가지 질문을 제시한다.
+Extracts dependencies from package.json, requirements.txt, Gemfile, go.mod, etc.,
+and presents the Simplicity Coach's 3 questions for each dependency.
 """
 
 import json
@@ -16,7 +16,7 @@ from pathlib import Path
 
 
 def find_dependency_files(root: str) -> dict:
-    """프로젝트 루트에서 의존성 관리 파일을 찾는다."""
+    """Find dependency management files in the project root."""
     root_path = Path(root)
     found = {}
 
@@ -41,7 +41,7 @@ def find_dependency_files(root: str) -> dict:
 
 
 def parse_package_json(filepath: str) -> list:
-    """package.json에서 직접 의존성을 추출한다."""
+    """Extract direct dependencies from package.json."""
     with open(filepath) as f:
         data = json.load(f)
 
@@ -58,13 +58,13 @@ def parse_package_json(filepath: str) -> list:
 
 
 def parse_requirements_txt(filepath: str) -> list:
-    """requirements.txt에서 의존성을 추출한다."""
+    """Extract dependencies from requirements.txt."""
     deps = []
     with open(filepath) as f:
         for line in f:
             line = line.strip()
             if line and not line.startswith("#") and not line.startswith("-"):
-                # 버전 지정 분리
+                # Separate version specifier
                 for sep in ["==", ">=", "<=", "~=", "!="]:
                     if sep in line:
                         name, version = line.split(sep, 1)
@@ -76,16 +76,16 @@ def parse_requirements_txt(filepath: str) -> list:
 
 
 def generate_report(root: str):
-    """의존성 감사 보고서를 생성한다."""
+    """Generate a dependency audit report."""
     dep_files = find_dependency_files(root)
 
     if not dep_files:
-        print(f"의존성 관리 파일을 찾을 수 없습니다: {root}")
+        print(f"No dependency management files found in: {root}")
         return
 
-    print("# 의존성 감사 보고서")
-    print(f"\n프로젝트: {os.path.basename(os.path.abspath(root))}")
-    print(f"경로: {os.path.abspath(root)}")
+    print("# Dependency Audit Report")
+    print(f"\nProject: {os.path.basename(os.path.abspath(root))}")
+    print(f"Path: {os.path.abspath(root)}")
     print()
 
     total_deps = 0
@@ -100,7 +100,7 @@ def generate_report(root: str):
         elif "requirements.txt" in filepath:
             deps = parse_requirements_txt(filepath)
         else:
-            print(f"  (파서 미구현 — 수동 확인 필요)")
+            print(f"  (Parser not implemented — manual review required)")
             print()
             continue
 
@@ -109,21 +109,21 @@ def generate_report(root: str):
         for dep in deps:
             print(f"### {dep['name']} ({dep['version']}) [{dep['type']}]")
             print()
-            print("Simplicity 3가지 질문:")
-            print(f"  1. 이 라이브러리에서 실제로 사용하는 기능이 몇 줄인가?  → [ ]")
-            print(f"  2. 그 몇 줄을 직접 작성하면 얼마나 걸리는가?           → [ ]")
-            print(f"  3. 6개월 후에도 안전하고 호환될 것이라 확신하는가?      → [ ]")
+            print("Simplicity 3 Questions:")
+            print(f"  1. How many lines of this library do we actually use?        → [ ]")
+            print(f"  2. How long would it take to write those lines ourselves?     → [ ]")
+            print(f"  3. Are we confident it will remain safe and compatible in 6m? → [ ]")
             print()
 
     print("---")
-    print(f"\n총 직접 의존성: {total_deps}개")
-    print("\n각 의존성에 대해 3가지 질문에 답해보세요.")
-    print("3개 모두 불확실한 의존성은 제거를 고려하세요.")
+    print(f"\nTotal direct dependencies: {total_deps}")
+    print("\nAnswer the 3 questions for each dependency.")
+    print("Consider removing any dependency where all 3 answers are uncertain.")
 
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print("사용법: python3 dependency-audit.py <project-root>")
+        print("Usage: python3 dependency-audit.py <project-root>")
         sys.exit(1)
 
     generate_report(sys.argv[1])
