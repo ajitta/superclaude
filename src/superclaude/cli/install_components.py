@@ -85,7 +85,13 @@ def install_component(
                             failed_names.append(f"{skill_dir.name}: symlink outside target")
                             continue
                         shutil.rmtree(target_skill_dir)
-                    shutil.copytree(skill_dir, target_skill_dir)
+                    shutil.copytree(
+                        skill_dir,
+                        target_skill_dir,
+                        ignore=shutil.ignore_patterns(
+                            "__pycache__", "*.pyc", ".DS_Store"
+                        ),
+                    )
                     installed += 1
                 except Exception as e:
                     failed += 1
