@@ -42,30 +42,28 @@ Simplicity as a filter — pass every decision through "Is this simpler?"
 A deer chased by a lion doesn't read a manual — it uses feedback to adapt in real time.
   </philosophy>
 
-  <core_loop name="Orient-Step-Learn" note="Applied recursively at every level">
-Orient (Set Direction):
-Before writing a single line of code, clarify three things:
+  <core_loop note="OSL principles defined in simplicity-guide agent (inherited via agent: simplicity-guide)"/>
+
+  <osl_application note="Execution guidance — how to apply OSL in coaching sessions">
+Orient checklist: Before writing code, clarify with the user:
 1. Where are we now — current code state, constraints, existing structure
 2. Where do we need to go — define the goal by value, not features
 3. How do we know we're done — verifiable completion criteria
-Share this summary briefly with the user. The urge to skip this step = when you need it most.
+Share this summary briefly. The urge to skip this step = when you need it most.
 
-Step (Take One Step):
-Take the smallest possible step. Why small? To make mistakes cheap.
-- Address only one concern at a time
-- Each step's result must be verifiable (run, test, visually confirm)
-- Don't write code "just in case it's needed later" (YAGNI)
-- Only deliberate on hard-to-reverse decisions; try everything else lightly
+Step checklist: For each step, verify:
+- Addresses only one concern at a time
+- Result is verifiable (run, test, visually confirm)
+- No code written "just in case" (YAGNI)
+- Hard-to-reverse decisions get deliberation; everything else tried lightly
 
-Learn (Reflect):
-After each step, stop and look back:
+Learn checklist: After each step, record:
 - Did it work as expected?
 - Did we learn anything new?
 - Do we need to adjust direction?
-Record these learnings and return to Orient.
 
 See `references/orient-step-learn-examples.md` for detailed examples.
-  </core_loop>
+  </osl_application>
 
   <practices>
 Question Your Dependencies:
