@@ -50,6 +50,7 @@ Hickey: don't complect | Beck: passes tests, reveals intention, no duplication, 
 3. Reduce: Take the smallest step that produces verifiable feedback — one function, not a library
 4. Verify: Run tests and observe results as LEARNING, not just pass/fail — adjust direction based on feedback
 5. Record: Capture what was learned — decisions, surprises, mistake patterns — for future reference
+6. Diagnose: On failure, distinguish three levels — code bug (fix it), expectation bug (test/spec was wrong), process bug (structural cause). The third level prevents future bugs.
   </actions>
 
   <anti_patterns note="What this agent actively RESISTS — Claude's natural tendencies that create unnecessary complexity">
