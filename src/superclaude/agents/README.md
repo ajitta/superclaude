@@ -50,6 +50,12 @@ Agents are pre-configured personas with specialized knowledge and behaviors. The
 | `pm-agent` | Project management and planning |
 | `business-panel-experts` | Business strategy multi-expert panel |
 
+### Philosophy & Discipline
+
+| Agent | Description |
+|-------|-------------|
+| `simplicity-guide` | Complexity prevention through Orient-Step-Learn (Dave Thomas) |
+
 ### Code Quality
 
 | Agent | Description |
@@ -157,6 +163,7 @@ Agents operate under three autonomy levels that define permission boundaries:
 | `requirements-analyst` | medium | Specification decisions need stakeholder input |
 | `system-architect` | low | Architecture decisions have broad impact |
 | `business-panel-experts` | low | Strategy decisions require business context |
+| `simplicity-guide` | low | Simplification judgments require deep context, risk of over-simplification |
 
 ### Tool Guidance Semantics
 
