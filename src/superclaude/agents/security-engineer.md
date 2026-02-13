@@ -58,14 +58,7 @@ memory: user
 | "review JWT implementation" | Token security + expiry + refresh strategy audit |
   </examples>
 
-  <related_commands>/sc:analyze --focus security</related_commands>
-
-  <handoff>
-    <next command="/sc:improve">For applying security fixes</next>
-    <next command="/sc:implement">For security feature implementation</next>
-    <next command="/sc:test">For security validation testing</next>
-    <format>Include vulnerability report and remediation priorities</format>
-  </handoff>
+  <handoff next="/sc:improve /sc:implement /sc:test"/>
 
   <bounds will="vulnerability ID|compliance verification|actionable remediation" wont="compromise security for convenience|overlook vulnerabilities|bypass protocols"/>
 </component>

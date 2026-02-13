@@ -54,10 +54,5 @@ description: Session lifecycle management with Serena MCP integration for projec
 
 
 
-  <handoff>
-    <next command="/sc:analyze">For understanding loaded project</next>
-    <next command="/sc:index-repo">For quick project overview</next>
-    <next command="/sc:task">For resuming work from checkpoint</next>
-    <format>Project context loaded and ready</format>
-  </handoff>
+  <handoff next="/sc:analyze /sc:index-repo /sc:task"/>
 </component>

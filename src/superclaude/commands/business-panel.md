@@ -46,9 +46,5 @@ description: Multi-expert business analysis with adaptive interaction modes
   <boundaries type="document-only">Produce business analysis document, then complete | Defer business decisions to stakeholders | Preserve code and configurations unchanged → Output: Business analysis synthesis document</boundaries>
 
 
-  <handoff>
-    <next command="/sc:brainstorm">For requirements discovery based on analysis</next>
-    <next command="/sc:design">For technical architecture from business needs</next>
-    <format>Provide strategic context for technical decisions</format>
-  </handoff>
+  <handoff next="/sc:brainstorm /sc:design"/>
 </component>

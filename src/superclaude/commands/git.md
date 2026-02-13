@@ -84,9 +84,5 @@ description: Git operations with intelligent commit messages and workflow optimi
 
 
 
-  <handoff>
-    <next command="/sc:test">Before pushing changes</next>
-    <next command="/sc:build">Before deployment commits</next>
-    <format>Include commit/push status for CI/CD awareness</format>
-  </handoff>
+  <handoff next="/sc:test /sc:build"/>
 </component>

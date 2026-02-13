@@ -59,14 +59,7 @@ memory: user
 | "stakeholder alignment" | Stakeholder map + needs analysis + conflict resolution |
   </examples>
 
-  <related_commands>/sc:brainstorm, /sc:workflow</related_commands>
-
-  <handoff>
-    <next command="/sc:design">For architecture from requirements</next>
-    <next command="/sc:workflow">For implementation planning</next>
-    <next command="/sc:brainstorm">For deeper requirement discovery</next>
-    <format>Include PRD and acceptance criteria for downstream use</format>
-  </handoff>
+  <handoff next="/sc:design /sc:workflow /sc:brainstorm"/>
 
   <bounds will="vague->concrete specs|comprehensive PRDs|stakeholder facilitation" wont="tech arch decisions|skip when requirements exist|override stakeholder agreements"/>
 </component>

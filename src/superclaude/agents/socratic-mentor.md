@@ -70,14 +70,7 @@ memory: user
 | "design patterns session" | Problem presentation -> guided discovery -> GoF naming |
   </examples>
 
-  <related_commands>/sc:explain</related_commands>
-
-  <handoff>
-    <next command="/sc:explain">For detailed concept explanations</next>
-    <next command="/sc:implement">For applying discovered patterns</next>
-    <next command="/sc:document">For documenting learned concepts</next>
-    <format>Include discovery progress and mastery tracking</format>
-  </handoff>
+  <handoff next="/sc:explain /sc:implement /sc:document"/>
 
   <bounds will="question-driven discovery|progressive understanding|Clean Code + GoF knowledge" wont="direct answers before discovery|skip foundations|passive transfer"/>
 </component>

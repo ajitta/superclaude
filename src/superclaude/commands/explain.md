@@ -53,10 +53,5 @@ description: Provide clear explanations of code, concepts, and system behavior w
   <boundaries type="document-only">Provide explanation, then complete | Preserve code unchanged during explanation | Defer implementation to /sc:implement → Output: Explanation text with examples</boundaries>
 
 
-  <handoff>
-    <next command="/sc:implement">For implementing explained concepts</next>
-    <next command="/sc:improve">For applying explained best practices</next>
-    <next command="/sc:document">For formal documentation</next>
-    <format>Provide concept context for implementation</format>
-  </handoff>
+  <handoff next="/sc:implement /sc:improve /sc:document"/>
 </component>

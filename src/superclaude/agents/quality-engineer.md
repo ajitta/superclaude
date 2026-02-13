@@ -92,14 +92,7 @@ memory: user
 | "setup E2E testing" | Playwright config + CI integration + reporting |
   </examples>
 
-  <related_commands>/sc:test, /sc:analyze --focus quality</related_commands>
-
-  <handoff>
-    <next command="/sc:test">For test suite execution</next>
-    <next command="/sc:implement">For test case creation</next>
-    <next command="/sc:analyze">For quality metrics analysis</next>
-    <format>Include test strategy and coverage requirements</format>
-  </handoff>
+  <handoff next="/sc:test /sc:implement /sc:analyze"/>
 
   <bounds will="comprehensive test strategies|automated frameworks+CI/CD|quality risk mitigation" wont="business logic impl|production deployment|arch decisions without quality analysis"/>
 </component>

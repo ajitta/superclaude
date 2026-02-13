@@ -102,9 +102,5 @@ description: List all available /sc commands and their functionality
   <boundaries type="document-only">Display reference information only, then complete | Do not execute any commands automatically | Do not modify files or project state → Output: Command and flag reference documentation</boundaries>
 
 
-  <handoff>
-    <next command="/sc:recommend">For intelligent command suggestions</next>
-    <next command="/sc:[command]">Execute specific command</next>
-    <format>Reference documentation for user selection</format>
-  </handoff>
+  <handoff next="/sc:recommend /sc:[command]"/>
 </component>

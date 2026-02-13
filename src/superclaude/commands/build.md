@@ -63,10 +63,5 @@ description: Build, compile, and package projects with intelligent error handlin
 
 
 
-  <handoff>
-    <next command="/sc:test">For running tests on build</next>
-    <next command="/sc:git">For committing build artifacts (if applicable)</next>
-    <next command="/sc:troubleshoot">For resolving build errors</next>
-    <format>Include build status for deployment decisions</format>
-  </handoff>
+  <handoff next="/sc:test /sc:git /sc:troubleshoot"/>
 </component>

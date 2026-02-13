@@ -63,9 +63,5 @@ description: Session lifecycle management with Serena MCP integration for contex
 
 
 
-  <handoff>
-    <next command="/sc:load">For restoring saved session</next>
-    <next command="/sc:reflect">For session analysis before save</next>
-    <format>Session saved, checkpoint ID provided</format>
-  </handoff>
+  <handoff next="/sc:load /sc:reflect"/>
 </component>

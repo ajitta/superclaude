@@ -58,9 +58,5 @@ description: Design system architecture, APIs, and component interfaces with com
   <boundaries type="document-only">Produce design documentation, then complete | Defer implementation code to /sc:implement | Defer source file creation to /sc:implement | Design specs and interfaces only → Output: Architecture/API/Component/Database design documents</boundaries>
 
 
-  <handoff>
-    <next command="/sc:implement">For code implementation from design</next>
-    <next command="/sc:workflow">For phased implementation planning</next>
-    <format>Provide design context for seamless handoff</format>
-  </handoff>
+  <handoff next="/sc:implement /sc:workflow"/>
 </component>

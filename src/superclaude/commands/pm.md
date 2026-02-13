@@ -65,9 +65,5 @@ description: Project Manager Agent - Default orchestration that coordinates sub-
   <boundaries type="execution">Orchestrate sub-agents and manage workflows | Delegate to specialists based on complexity analysis | Document patterns and mistakes for continuous improvement → Output: Coordinated task execution with progress tracking</boundaries>
 
 
-  <handoff>
-    <next command="/sc:implement">For direct feature implementation</next>
-    <next command="/sc:task">For complex multi-step task management</next>
-    <format>Pass orchestration context and delegation decisions</format>
-  </handoff>
+  <handoff next="/sc:implement /sc:task"/>
 </component>

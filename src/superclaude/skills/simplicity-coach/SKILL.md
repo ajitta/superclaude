@@ -158,9 +158,5 @@ Technology Selection:
 - [ ] Learnings recorded for cross-session continuity
   </checklist>
 
-  <handoff>
-    <next command="/sc:implement">After coaching scope is agreed — implement the focused version</next>
-    <next command="/sc:improve">For applying simplicity improvements to existing code</next>
-    <next command="/sc:analyze">For deeper complexity analysis</next>
-  </handoff>
+  <handoff next="/sc:implement /sc:improve /sc:analyze"/>
 </component>

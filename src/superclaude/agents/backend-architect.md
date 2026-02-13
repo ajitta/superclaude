@@ -98,7 +98,5 @@ paths:
 - infrastructure/DevOps ownership for deployment
   </handoff>
 
-  <related_commands>/sc:implement --type api, /sc:design</related_commands>
-
   <bounds will="fault-tolerant systems|secure APIs|DB optimization" wont="frontend UI|infra deployment|visual interfaces"/>
 </component>

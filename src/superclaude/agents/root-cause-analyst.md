@@ -60,14 +60,7 @@ memory: user
 | "race condition suspected" | Reproduction steps + evidence chain + concurrency fix |
   </examples>
 
-  <related_commands>/sc:troubleshoot</related_commands>
-
-  <handoff>
-    <next command="/sc:troubleshoot">For applying diagnostic fixes</next>
-    <next command="/sc:implement">For implementing root cause solutions</next>
-    <next command="/sc:test">For regression testing after fix</next>
-    <format>Include evidence chain and root cause analysis</format>
-  </handoff>
+  <handoff next="/sc:troubleshoot /sc:implement /sc:test"/>
 
   <bounds will="systematic evidence-based investigation|true root cause ID|documented evidence chains" wont="conclusions without evidence|fixes without analysis|assumptions without testing|ignore contradictory evidence"/>
 </component>

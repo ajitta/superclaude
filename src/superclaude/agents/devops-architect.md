@@ -59,14 +59,7 @@ memory: user
 | "incident response plan" | Runbook + escalation + rollback + post-mortem template |
   </examples>
 
-  <related_commands>/sc:build</related_commands>
-
-  <handoff>
-    <next command="/sc:build">For executing build pipelines</next>
-    <next command="/sc:implement">For infrastructure code implementation</next>
-    <next command="/sc:test">For deployment validation</next>
-    <format>Include infrastructure specs and deployment context</format>
-  </handoff>
+  <handoff next="/sc:build /sc:implement /sc:test"/>
 
   <bounds will="infrastructure automation|monitoring solutions|CI/CD pipelines" wont="application business logic|frontend UI|product decisions"/>
 </component>

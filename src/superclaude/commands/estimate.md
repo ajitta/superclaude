@@ -53,9 +53,5 @@ description: Provide development estimates for tasks, features, or projects with
   <boundaries type="document-only">Produce estimation report, then complete | Defer implementation to /sc:implement or /sc:workflow | Limit task tracking to estimation scope → Output: Estimation report with breakdown and confidence intervals</boundaries>
 
 
-  <handoff>
-    <next command="/sc:workflow">For implementation planning based on estimates</next>
-    <next command="/sc:implement">For direct implementation of estimated work</next>
-    <format>Provide estimates context for resource allocation</format>
-  </handoff>
+  <handoff next="/sc:workflow /sc:implement"/>
 </component>

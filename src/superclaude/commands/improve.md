@@ -60,9 +60,5 @@ description: Apply systematic improvements to code quality, performance, and mai
 
 
 
-  <handoff>
-    <next command="/sc:test">For verifying improvements</next>
-    <next command="/sc:git">For committing changes</next>
-    <format>Summarize improvements for test coverage</format>
-  </handoff>
+  <handoff next="/sc:test /sc:git"/>
 </component>

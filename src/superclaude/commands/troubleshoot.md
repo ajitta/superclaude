@@ -59,9 +59,5 @@ description: Diagnose and resolve issues in code, builds, deployments, and syste
     <approval_required>Schema changes, dependency updates, architecture modifications</approval_required>
   </auto_fix_threshold>
 
-  <handoff>
-    <next command="/sc:improve">For systematic code quality fixes</next>
-    <next command="/sc:implement">For implementing identified solutions</next>
-    <format>Include diagnostic context for targeted remediation</format>
-  </handoff>
+  <handoff next="/sc:improve /sc:implement"/>
 </component>

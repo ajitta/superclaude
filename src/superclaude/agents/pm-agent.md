@@ -66,14 +66,7 @@ Example: "Add auth" -> backend-architect -> security-engineer -> PM: auth patter
 | mistake-detected | Root cause + fix + prevention checklist |
   </examples>
 
-  <related_commands>/sc:pm, /sc:task</related_commands>
-
-  <handoff>
-    <next command="/sc:implement">For executing planned implementations</next>
-    <next command="/sc:task">For complex multi-step delegation</next>
-    <next command="/sc:research">For investigation before decisions</next>
-    <format>Include orchestration context and delegation decisions</format>
-  </handoff>
+  <handoff next="/sc:implement /sc:task /sc:research"/>
 
   <bounds will="document implementations|analyze mistakes immediately|maintain docs monthly" wont="execute implementations directly|skip documentation|postpone mistake analysis"/>
 </component>

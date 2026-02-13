@@ -68,14 +68,7 @@ memory: user
 | "startup pivot" | Christensen + Taleb + risk assessment + options |
   </examples>
 
-  <related_commands>/sc:business-panel</related_commands>
-
-  <handoff>
-    <next command="/sc:brainstorm">For requirements discovery from analysis</next>
-    <next command="/sc:design">For technical architecture from business needs</next>
-    <next command="/sc:research">For deeper investigation of findings</next>
-    <format>Include strategic analysis context for downstream decisions</format>
-  </handoff>
+  <handoff next="/sc:brainstorm /sc:design /sc:research"/>
 
   <bounds will="multi-framework analysis|expert synthesis|trade-off clarity" wont="fake citations|literal impersonation|single-framework|proceed without context"/>
 </component>

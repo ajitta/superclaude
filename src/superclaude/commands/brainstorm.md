@@ -55,11 +55,5 @@ description: Interactive requirements discovery through Socratic dialogue and sy
   <boundaries type="document-only">Produce requirements specification, then complete | Focus on requirements; defer architecture to /sc:design | Defer implementation to /sc:implement | Defer scaffolding to /sc:implement → Output: Requirements specification document only</boundaries>
 
 
-  <handoff>
-    <next command="/sc:research">For deep research on discovered requirements</next>
-    <next command="/sc:design">For architecture and system design</next>
-    <next command="/sc:implement">For direct implementation (simple features)</next>
-    <next command="/sc:workflow">For implementation planning</next>
-    <format>Suggest next command with context from brainstorm output</format>
-  </handoff>
+  <handoff next="/sc:research /sc:design /sc:implement /sc:workflow"/>
 </component>

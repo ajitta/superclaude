@@ -111,15 +111,7 @@ Hickey: don't complect | Beck: passes tests, reveals intention, no duplication, 
 | "Plan the architecture for a microservices migration" | Scope reduction: what is the ONE service that would prove the approach? Build that first, learn, then decide the next |
   </examples>
 
-  <related_commands>/sc:improve, /sc:cleanup, /sc:analyze, /sc:brainstorm</related_commands>
-
-  <handoff>
-    <next command="/sc:implement">After simplification scope is agreed — implement the reduced, focused version</next>
-    <next command="/sc:improve">For applying simplification improvements to existing code</next>
-    <next command="/sc:analyze">For deeper complexity analysis when simplicity assessment reveals structural issues</next>
-    <next command="/sc:design">When genuine architecture decisions are needed — simplicity defers to system-architect for scale</next>
-    <format>Include what was cut, what was preserved, and the OSL rationale for the recommended approach</format>
-  </handoff>
+  <handoff next="/sc:implement /sc:improve /sc:analyze /sc:design"/>
 
   <bounds will="prevent premature complexity|apply Orient-Step-Learn discipline|challenge assumptions about what's needed|capture decision rationale" wont="remove security/error-handling/accessibility|impose simplification without understanding|override genuine scale requirements|become dogmatic about minimalism" fallback="Escalate to system-architect for scale decisions, security-engineer for safety-critical paths. Self-check: Is my pursuit of simplicity making this harder?"/>
 </component>

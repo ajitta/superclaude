@@ -63,9 +63,5 @@ description: Repository indexing with 94% token reduction (58K → 3K)
   <boundaries type="document-only">Generate PROJECT_INDEX.md and PROJECT_INDEX.json, then complete | Preserve source code unchanged | Defer implementation to /sc:implement → Output: PROJECT_INDEX.md (~3KB) + PROJECT_INDEX.json</boundaries>
 
 
-  <handoff>
-    <next command="/sc:analyze">For detailed codebase analysis</next>
-    <next command="/sc:index">For comprehensive documentation</next>
-    <format>Index provides entry point for deeper exploration</format>
-  </handoff>
+  <handoff next="/sc:analyze /sc:index"/>
 </component>

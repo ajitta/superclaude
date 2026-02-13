@@ -63,10 +63,5 @@ description: Deep web research with adaptive planning and intelligent search
   <boundaries type="document-only">Produce research report, then complete | Defer implementation to /sc:implement | Preserve codebase unchanged | Research and documentation only → Output: Research report with citations and findings</boundaries>
 
 
-  <handoff>
-    <next command="/sc:design">For architecture based on research</next>
-    <next command="/sc:implement">For implementation of researched solutions</next>
-    <next command="/sc:brainstorm">For requirements refinement</next>
-    <format>Provide research context for implementation decisions</format>
-  </handoff>
+  <handoff next="/sc:design /sc:implement /sc:brainstorm"/>
 </component>

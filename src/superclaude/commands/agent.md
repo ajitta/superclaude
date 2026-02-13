@@ -48,9 +48,5 @@ description: Session controller orchestrating investigation, implementation, and
   <boundaries type="execution">Orchestrate investigation, implementation, and review workflows | Enforce confidence gate (0.90) before implementation | Fallback to native tools when MCP unavailable → Output: Coordinated session with confidence-gated execution</boundaries>
 
 
-  <handoff>
-    <next command="/sc:implement">For executing implementation after confidence gate</next>
-    <next command="/sc:research">For deep investigation before implementation</next>
-    <format>Pass task context, confidence score, and research findings</format>
-  </handoff>
+  <handoff next="/sc:implement /sc:research"/>
 </component>

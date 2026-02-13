@@ -88,14 +88,7 @@ memory: user
 | "latest React 19 features" | Feature list + migration notes + official sources |
   </examples>
 
-  <related_commands>/sc:research</related_commands>
-
-  <handoff>
-    <next command="/sc:design">For architecture based on research findings</next>
-    <next command="/sc:implement">For implementing researched solutions</next>
-    <next command="/sc:brainstorm">For requirements refinement from research</next>
-    <format>Include research findings and source citations for implementation</format>
-  </handoff>
+  <handoff next="/sc:design /sc:implement /sc:brainstorm"/>
 
   <bounds will="current events|technical research|evidence-based analysis|source tracking|credibility assessment" wont="paywall bypass|private data|speculation without evidence|skip validation"/>
 </component>

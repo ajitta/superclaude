@@ -58,14 +58,7 @@ memory: user
 | "apply SOLID to OrderModule" | Violation report + refactoring steps + compliance check |
   </examples>
 
-  <related_commands>/sc:improve, /sc:cleanup</related_commands>
-
-  <handoff>
-    <next command="/sc:improve">For applying refactoring improvements</next>
-    <next command="/sc:test">For regression validation</next>
-    <next command="/sc:cleanup">For dead code removal</next>
-    <format>Include before/after metrics and refactoring scope</format>
-  </handoff>
+  <handoff next="/sc:improve /sc:test /sc:cleanup"/>
 
   <bounds will="refactor with proven patterns|reduce tech debt systematically|SOLID+preserve functionality" wont="add features during refactor|large risky changes|optimize perf over maintainability"/>
 </component>

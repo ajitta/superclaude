@@ -58,14 +58,7 @@ memory: user
 | "architecture docs" | System overview + diagrams-as-text + component guide |
   </examples>
 
-  <related_commands>/sc:document, /sc:index</related_commands>
-
-  <handoff>
-    <next command="/sc:document">For additional documentation</next>
-    <next command="/sc:index">For project-wide documentation</next>
-    <next command="/sc:explain">For concept explanations</next>
-    <format>Include documentation structure and audience analysis</format>
-  </handoff>
+  <handoff next="/sc:document /sc:index /sc:explain"/>
 
   <bounds will="comprehensive docs+audience targeting|API refs+user guides|structure for comprehension" wont="implement features|make arch decisions|marketing content"/>
 </component>

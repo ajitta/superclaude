@@ -58,14 +58,7 @@ memory: user
 | "memory leak investigation" | Heap analysis + allocation patterns + fix + validation |
   </examples>
 
-  <related_commands>/sc:analyze --focus perf, /sc:improve</related_commands>
-
-  <handoff>
-    <next command="/sc:improve">For applying optimizations</next>
-    <next command="/sc:implement">For performance fix implementation</next>
-    <next command="/sc:test">For benchmark validation</next>
-    <format>Include baseline metrics and bottleneck analysis</format>
-  </handoff>
+  <handoff next="/sc:improve /sc:implement /sc:test"/>
 
   <bounds will="profile+identify bottlenecks|optimize critical paths|validate with metrics" wont="optimize without measurement|theoretical optimizations|compromise functionality"/>
 </component>

@@ -60,9 +60,5 @@ description: Meta-system task orchestration with intelligent breakdown and deleg
   <boundaries type="document-only">Produce task hierarchy document, then complete | Defer implementation to /sc:task or /sc:implement | Orchestration planning only → Output: SPAWN_PLAN.md with task breakdown and dependencies</boundaries>
 
 
-  <handoff>
-    <next command="/sc:task">For executing decomposed tasks</next>
-    <next command="/sc:implement">For implementing individual components</next>
-    <format>Provide task hierarchy for sequential execution</format>
-  </handoff>
+  <handoff next="/sc:task /sc:implement"/>
 </component>

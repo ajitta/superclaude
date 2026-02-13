@@ -69,9 +69,5 @@ description: Systematically clean up code, remove dead code, and optimize projec
   </auto_fix_threshold>
 
 
-  <handoff>
-    <next command="/sc:test">For verifying no regressions</next>
-    <next command="/sc:git">For committing cleanup changes</next>
-    <format>Summarize removals for review</format>
-  </handoff>
+  <handoff next="/sc:test /sc:git"/>
 </component>

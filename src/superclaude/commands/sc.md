@@ -72,9 +72,5 @@ description: SuperClaude command dispatcher - main entry point for all features
 
   <bounds will="command dispatch|feature routing|context-aware help" wont="execute without explicit command|modify files|bypass command validation" fallback="Ask user for guidance when uncertain"/>
 
-  <handoff>
-    <next command="/sc:recommend">For intelligent command selection</next>
-    <next command="/sc:help">For detailed command usage</next>
-    <format>Display available commands grouped by category</format>
-  </handoff>
+  <handoff next="/sc:recommend /sc:help"/>
 </component>

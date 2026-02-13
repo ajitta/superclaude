@@ -64,9 +64,5 @@ description: Feature and code implementation with intelligent persona activation
 
 
 
-  <handoff>
-    <next command="/sc:test">For comprehensive testing</next>
-    <next command="/sc:git">For committing changes</next>
-    <format>Summarize implemented changes for test coverage</format>
-  </handoff>
+  <handoff next="/sc:test /sc:git"/>
 </component>

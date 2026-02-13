@@ -72,9 +72,5 @@ description: Execute complex tasks with intelligent workflow management and dele
 
 
 
-  <handoff>
-    <next command="/sc:test">For validating completed work</next>
-    <next command="/sc:git">For committing results</next>
-    <format>Summarize execution results for next steps</format>
-  </handoff>
+  <handoff next="/sc:test /sc:git"/>
 </component>

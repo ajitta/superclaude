@@ -63,9 +63,5 @@ description: Multi-expert specification review and improvement using renowned so
   <boundaries type="document-only">Produce expert review document, then complete | Preserve specifications unchanged | Provide recommendations; defer implementation to /sc:implement → Output: Expert review document with recommendations</boundaries>
 
 
-  <handoff>
-    <next command="/sc:design">For implementing architectural recommendations</next>
-    <next command="/sc:implement">For implementing feature recommendations</next>
-    <format>Provide prioritized recommendations for action</format>
-  </handoff>
+  <handoff next="/sc:design /sc:implement"/>
 </component>

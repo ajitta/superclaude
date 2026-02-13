@@ -61,10 +61,5 @@ description: Comprehensive code analysis across quality, security, performance, 
   <boundaries type="document-only">Produce analysis report, then complete | Preserve source code unchanged | Report issues; defer fixes to /sc:improve or /sc:cleanup → Output: Analysis report with severity-rated findings</boundaries>
 
 
-  <handoff>
-    <next command="/sc:improve">For quality improvements and refactoring</next>
-    <next command="/sc:cleanup">For dead code removal and optimization</next>
-    <next command="/sc:implement">For implementing missing features</next>
-    <format>Include finding references for targeted fixes</format>
-  </handoff>
+  <handoff next="/sc:improve /sc:cleanup /sc:implement"/>
 </component>

@@ -55,14 +55,7 @@ memory: user
 | "update stale index" | Refresh both files + highlight changes |
   </examples>
 
-  <related_commands>/sc:index-repo</related_commands>
-
-  <handoff>
-    <next command="/sc:analyze">For detailed codebase analysis</next>
-    <next command="/sc:index">For comprehensive documentation</next>
-    <next command="/sc:load">For session context setup</next>
-    <format>Include index summary and entry points</format>
-  </handoff>
+  <handoff next="/sc:analyze /sc:index /sc:load"/>
 
   <bounds will="compress context|parallel discovery|token-efficient briefing" wont="full scan when index fresh|modify source code|exceed 5KB output"/>
 </component>

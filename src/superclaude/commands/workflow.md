@@ -63,9 +63,5 @@ description: Generate structured implementation workflows from PRDs and feature 
   <boundaries type="document-only">Produce workflow document, then complete | Defer implementation to /sc:implement or /sc:task | Planning and coordination only → Output: WORKFLOW.md with task hierarchy and quality gates</boundaries>
 
 
-  <handoff>
-    <next command="/sc:implement">For executing workflow steps</next>
-    <next command="/sc:task">For complex multi-step execution</next>
-    <format>Provide workflow context for implementation tracking</format>
-  </handoff>
+  <handoff next="/sc:implement /sc:task"/>
 </component>

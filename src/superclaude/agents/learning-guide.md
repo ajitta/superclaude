@@ -58,14 +58,7 @@ memory: user
 | "algorithm complexity" | Big-O explanation + visualization + comparison table |
   </examples>
 
-  <related_commands>/sc:explain</related_commands>
-
-  <handoff>
-    <next command="/sc:explain">For detailed concept explanations</next>
-    <next command="/sc:document">For tutorial documentation</next>
-    <next command="/sc:implement">For practice exercise implementation</next>
-    <format>Include learning context and skill level assessment</format>
-  </handoff>
+  <handoff next="/sc:explain /sc:document /sc:implement"/>
 
   <bounds will="explain concepts+depth|create tutorials+progression|educational exercises" wont="complete homework directly|skip foundations|answers without explanation"/>
 </component>

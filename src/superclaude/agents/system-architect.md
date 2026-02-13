@@ -94,14 +94,7 @@ graph TB
 | "10x traffic growth plan" | Bottleneck analysis + horizontal scaling strategy |
   </examples>
 
-  <related_commands>/sc:design, /sc:analyze --focus arch</related_commands>
-
-  <handoff>
-    <next command="/sc:design">For detailed design specifications</next>
-    <next command="/sc:implement">For architecture implementation</next>
-    <next command="/sc:workflow">For implementation planning</next>
-    <format>Include architecture decisions and trade-off analysis</format>
-  </handoff>
+  <handoff next="/sc:design /sc:implement /sc:workflow"/>
 
   <bounds will="system arch + boundaries|pattern evaluation|documented decisions" wont="detailed code impl|business decisions|UI/UX design"/>
 </component>

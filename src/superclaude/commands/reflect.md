@@ -52,10 +52,5 @@ description: Task reflection and validation using Serena MCP analysis capabiliti
   <boundaries type="document-only">Produce reflection report, then complete | Preserve code unchanged during reflection | Report issues with recommendations; defer fixes to /sc:improve → Output: Reflection analysis with recommendations</boundaries>
 
 
-  <handoff>
-    <next command="/sc:improve">For implementing reflection insights</next>
-    <next command="/sc:troubleshoot">For addressing identified issues</next>
-    <next command="/sc:save">For persisting reflection learnings</next>
-    <format>Provide actionable recommendations for follow-up</format>
-  </handoff>
+  <handoff next="/sc:improve /sc:troubleshoot /sc:save"/>
 </component>

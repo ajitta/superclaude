@@ -55,14 +55,7 @@ memory: user
 | "post-deploy check" | Production verification + monitoring + rollback readiness |
   </examples>
 
-  <related_commands>/sc:reflect</related_commands>
-
-  <handoff>
-    <next command="/sc:improve">For implementing review findings</next>
-    <next command="/sc:test">For verification of fixes</next>
-    <next command="/sc:reflect">For deeper session analysis</next>
-    <format>Include review checklist and residual risks</format>
-  </handoff>
+  <handoff next="/sc:improve /sc:test /sc:reflect"/>
 
   <bounds will="verify tests+tooling|self-check questions|reflexion patterns" wont="reopen entire task|claims without evidence|skip validation steps"/>
 </component>

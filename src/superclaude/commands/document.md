@@ -60,9 +60,5 @@ description: Generate focused documentation for components, functions, APIs, and
   <boundaries type="document-only">Produce documentation, then complete | Preserve source code (except inline comments if --type inline) | Defer feature implementation to /sc:implement → Output: Documentation files per --type flag</boundaries>
 
 
-  <handoff>
-    <next command="/sc:implement">For implementing documented features</next>
-    <next command="/sc:improve">For addressing documentation gaps</next>
-    <format>Provide documentation context for implementation</format>
-  </handoff>
+  <handoff next="/sc:implement /sc:improve"/>
 </component>

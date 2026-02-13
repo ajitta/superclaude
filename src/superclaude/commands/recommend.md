@@ -58,9 +58,5 @@ description: Ultra-intelligent command recommendation engine for optimal SuperCl
   <boundaries type="document-only">Provide recommendations only, then complete | Do not execute recommended commands automatically | Do not modify files or project state → Output: Prioritized command recommendations with justification</boundaries>
 
 
-  <handoff>
-    <next command="/sc:implement">Execute the top recommended command</next>
-    <next command="/sc:help">For detailed command documentation</next>
-    <format>Copy-paste ready command with flags</format>
-  </handoff>
+  <handoff next="/sc:implement /sc:help"/>
 </component>

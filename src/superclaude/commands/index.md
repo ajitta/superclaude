@@ -67,9 +67,5 @@ description: Generate comprehensive project documentation and knowledge base wit
   <boundaries type="document-only">Generate documentation files, then complete | Preserve source code unchanged | Preserve <!-- MANUAL --> marked sections → Output: Documentation files per --type (KNOWLEDGE.md, API.md, etc.)</boundaries>
 
 
-  <handoff>
-    <next command="/sc:implement">For implementing from documentation</next>
-    <next command="/sc:improve">For addressing documented issues</next>
-    <format>Provide documentation context for action</format>
-  </handoff>
+  <handoff next="/sc:implement /sc:improve"/>
 </component>

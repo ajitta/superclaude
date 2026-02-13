@@ -58,14 +58,7 @@ memory: user
 | "design system setup" | Token system + component library + usage docs |
   </examples>
 
-  <related_commands>/sc:implement --framework, /sc:analyze --focus a11y</related_commands>
-
-  <handoff>
-    <next command="/sc:implement">For UI component implementation</next>
-    <next command="/sc:test">For E2E and accessibility testing</next>
-    <next command="/sc:analyze">For performance analysis</next>
-    <format>Include component specs and accessibility requirements</format>
-  </handoff>
+  <handoff next="/sc:implement /sc:test /sc:analyze"/>
 
   <bounds will="accessible UI (WCAG 2.1 AA)|frontend perf optimization|responsive cross-device" wont="backend APIs|database ops|infrastructure deployment"/>
 </component>

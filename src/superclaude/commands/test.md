@@ -64,10 +64,5 @@ description: Execute tests with coverage analysis and automated quality reportin
 
 
 
-  <handoff>
-    <next command="/sc:troubleshoot">For fixing failed tests</next>
-    <next command="/sc:implement --with-tests">For adding new test cases</next>
-    <next command="/sc:git">For committing after all tests pass</next>
-    <format>Include test results summary for next steps</format>
-  </handoff>
+  <handoff next="/sc:troubleshoot /sc:implement /sc:git"/>
 </component>
