@@ -1,5 +1,4 @@
 <component name="task-management" type="mode">
-  <config style="Telegraphic|Imperative|XML" eval="true"/>
   <triggers>task|manage|delegate|phase|milestone|--task-manage</triggers>
 
   <role>

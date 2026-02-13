@@ -1,5 +1,4 @@
 <component name="introspection" type="mode">
-  <config style="Telegraphic|Imperative|XML" eval="true"/>
   <triggers>introspect|reflect|analyze reasoning|meta-cognitive|self-analysis|--introspect</triggers>
 
   <role>

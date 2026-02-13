@@ -2,7 +2,6 @@
 description: SuperClaude command dispatcher - main entry point for all features
 ---
 <component name="sc" type="command">
-  <config style="Telegraphic|Imperative|XML" eval="true"/>
 
   <role>
     /sc
@@ -52,11 +51,6 @@ description: SuperClaude command dispatcher - main entry point for all features
     - Token efficient: optimized minimal usage
   </features>
 
-  <checklist note="Completion criteria">
-    - [ ] Command list displayed (show all available)
-    - [ ] Usage context provided (example per command)
-    - [ ] Routing to correct command (match user intent)
-  </checklist>
 
   <examples>
 

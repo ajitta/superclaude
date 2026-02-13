@@ -130,10 +130,6 @@ class TestAgentXMLStructure:
             f"{stem}: component type='{ctype}', expected 'agent'"
         )
 
-    def test_has_config_tag(self, agent):
-        stem, content, _ = agent
-        assert "<config " in content, f"{stem}: missing <config> tag"
-
     def test_has_triggers(self, agent):
         stem, content, _ = agent
         triggers = extract_xml_content(content, "triggers")

@@ -1,5 +1,4 @@
 <component name="dependency-audit-checklist" type="reference" parent="simplicity-coach">
-  <config style="Telegraphic|Imperative|XML" eval="true"/>
   <meta>Referenced from SKILL.md as `assets/dependency-audit-checklist.md`</meta>
 
   <pre_add title="Before Adding a New Dependency">

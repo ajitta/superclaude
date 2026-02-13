@@ -2,7 +2,6 @@
 description: Generate structured implementation workflows from PRDs and feature requirements
 ---
 <component name="workflow" type="command">
-  <config style="Telegraphic|Imperative|XML" eval="true"/>
 
   <role>
     /sc:workflow
@@ -29,12 +28,6 @@ description: Generate structured implementation workflows from PRDs and feature 
 | WORKFLOW_STATUS.md | Progress + quality gates |
   </outputs>
 
-  <checklist note="Completion criteria">
-    - [ ] PRD/requirements fully parsed (list all reqs extracted)
-    - [ ] Workflow document generated (confirm file written)
-    - [ ] Dependencies mapped in TaskCreate/TaskUpdate (show task IDs)
-    - [ ] Quality gates defined and tracked (pass/fail criteria each)
-  </checklist>
 
   <mcp servers="seq|c7|magic|play|morph|serena"/>
   <personas p="arch|anal|fe|be|sec|ops|pm"/>
@@ -67,12 +60,8 @@ description: Generate structured implementation workflows from PRDs and feature 
 
   <bounds will="comprehensive workflows|multi-persona+MCP|cross-session management" wont="execute impl beyond planning|override dev process|generate without analysis" fallback="Ask user for guidance when uncertain"/>
 
-  <boundaries type="document-only" critical="true">
-    <rule>Produce workflow document, then complete</rule>
-    <rule>Defer implementation to /sc:implement or /sc:task</rule>
-    <rule>Planning and coordination only</rule>
-    <output>WORKFLOW.md with task hierarchy and quality gates</output>
-  </boundaries>
+  <boundaries type="document-only">Produce workflow document, then complete | Defer implementation to /sc:implement or /sc:task | Planning and coordination only → Output: WORKFLOW.md with task hierarchy and quality gates</boundaries>
+
 
   <handoff>
     <next command="/sc:implement">For executing workflow steps</next>

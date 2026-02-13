@@ -1,5 +1,4 @@
 <component name="rules" type="core" priority="critical" note="Version-agnostic">
-  <config style="Telegraphic|Imperative|XML" eval="true"/>
   <triggers>rules|behavior|compliance|standards|guidelines</triggers>
 
   <role>

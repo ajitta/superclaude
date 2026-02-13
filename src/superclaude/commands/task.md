@@ -2,7 +2,6 @@
 description: Execute complex tasks with intelligent workflow management and delegation
 ---
 <component name="task" type="command">
-  <config style="Telegraphic|Imperative|XML" eval="true"/>
 
   <role>
     /sc:task
@@ -69,19 +68,9 @@ description: Execute complex tasks with intelligent workflow management and dele
 
   <bounds will="complex task coordination|hierarchical breakdown|MCP+persona orchestration|auto cleanup" wont="simple tasks|compromise quality|operate without validation" fallback="Ask user for guidance when uncertain"/>
 
-  <boundaries type="execution" critical="true">
-    <rule>Execute tasks via intelligent delegation</rule>
-    <rule>Quality gates enforced between phases</rule>
-    <rule>Progress reported via TaskCreate/TaskUpdate</rule>
-    <rule>Cleanup removes only completed/cancelled/stale tasks</rule>
-  </boundaries>
+  <boundaries type="execution">Execute tasks via intelligent delegation | Quality gates enforced between phases | Progress reported via TaskCreate/TaskUpdate | Cleanup removes only completed/cancelled/stale tasks</boundaries>
 
-  <completion_criteria>
-    - [ ] All subtasks completed or delegated
-    - [ ] Quality gates passed
-    - [ ] Results aggregated and validated
-    - [ ] Stale tasks cleaned up (if --cleanup)
-  </completion_criteria>
+
 
   <handoff>
     <next command="/sc:test">For validating completed work</next>

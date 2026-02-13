@@ -1,5 +1,4 @@
 <component name="serena" type="mcp">
-  <config style="Telegraphic|Imperative|XML" eval="true"/>
   <triggers>symbol|rename|extract|move|LSP|session|memory|/sc:load|/sc:save|serena</triggers>
 
   <role>
@@ -17,10 +16,6 @@ Avoid:
 - Simple edits: Basic text replacements, style, bulk ops
   </choose>
 
-  <synergy>
-- Morphllm: Serena analyzes semantic → Morphllm executes edits
-- Sequential: Serena provides context → Sequential does architectural analysis
-  </synergy>
 
   <examples>
 | Input | Output | Reason |
@@ -32,5 +27,4 @@ Avoid:
 | update console.log to logger | Morphllm | pattern-based replacement |
   </examples>
 
-  <bounds will="semantic code ops|symbol tracking|session persistence" wont="simple text edits|bulk pattern ops|non-semantic tasks" fallback="Fall back to native tools when unavailable"/>
 </component>

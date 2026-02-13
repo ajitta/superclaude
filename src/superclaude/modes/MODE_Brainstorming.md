@@ -1,5 +1,4 @@
 <component name="brainstorming" type="mode">
-  <config style="Telegraphic|Imperative|XML" eval="true"/>
   <triggers>brainstorm|explore|explore ideas|ideate|maybe|thinking about|discuss|not sure|--brainstorm|--bs</triggers>
 
   <role>

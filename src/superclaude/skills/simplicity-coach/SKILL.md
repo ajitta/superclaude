@@ -27,7 +27,6 @@ hooks:
           once: true
 ---
 <component name="simplicity-coach" type="skill">
-  <config style="Telegraphic|Imperative|XML" eval="true"/>
 
   <role>
     Development coaching through Dave Thomas's Simplicity philosophy — a specific toolbox.

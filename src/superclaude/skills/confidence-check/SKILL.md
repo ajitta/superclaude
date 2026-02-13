@@ -27,7 +27,6 @@ hooks:
           once: true
 ---
 <component name="confidence-check" type="skill">
-  <config style="Telegraphic|Imperative|XML" eval="true"/>
 
   <role>
     <mission>Prevent wrong-direction execution by assessing confidence BEFORE implementation</mission>

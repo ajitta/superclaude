@@ -1,5 +1,4 @@
 <component name="chrome-devtools" type="mcp">
-  <config style="Telegraphic|Imperative|XML" eval="true"/>
   <triggers>performance|layout|CLS|LCP|metrics|core web vitals|devtools|perf</triggers>
 
   <role>
@@ -21,11 +20,6 @@ Avoid:
 - Static analysis: Use native Claude
   </choose>
 
-  <synergy>
-- Claude in Chrome: Native handles live debugging → DevTools for metrics
-- Playwright: Playwright automates flow → DevTools analyzes performance
-- Sequential: Sequential plans perf strategy → DevTools verifies
-  </synergy>
 
   <examples>
 | Input | Output | Reason |
@@ -37,5 +31,4 @@ Avoid:
 | test login flow | Playwright | browser automation |
   </examples>
 
-  <bounds will="performance metrics|Core Web Vitals|layout debugging" wont="live browser interaction|E2E testing|static code analysis" fallback="Fall back to native tools when unavailable"/>
 </component>

@@ -2,7 +2,6 @@
 description: Session lifecycle management with Serena MCP integration for context persistence
 ---
 <component name="save" type="command">
-  <config style="Telegraphic|Imperative|XML" eval="true"/>
 
   <role>
     /sc:save
@@ -30,12 +29,6 @@ description: Session lifecycle management with Serena MCP integration for contex
 | all | All above | Complete preservation |
   </outputs>
 
-  <checklist note="Completion criteria">
-    - [ ] Session data collected (list data categories)
-    - [ ] Serena memory write successful (show memory name)
-    - [ ] Checkpoint validated for recovery (read-back test)
-    - [ ] Ready for /sc:load continuation
-  </checklist>
 
   <mcp servers="serena"/>
 
@@ -66,18 +59,9 @@ description: Session lifecycle management with Serena MCP integration for contex
 
   <bounds will="Serena integration|auto-checkpoints|discovery preservation" wont="operate without Serena|save without validation|override without checkpoint" fallback="Ask user for guidance when uncertain"/>
 
-  <boundaries type="execution" critical="true">
-    <rule>Execute session persistence</rule>
-    <rule>Preserve project code unchanged</rule>
-    <rule>Validate data integrity before save</rule>
-  </boundaries>
+  <boundaries type="execution">Execute session persistence | Preserve project code unchanged | Validate data integrity before save</boundaries>
 
-  <completion_criteria>
-    - [ ] Session data collected
-    - [ ] Serena memory write successful
-    - [ ] Checkpoint validated
-    - [ ] Ready for /sc:load continuation
-  </completion_criteria>
+
 
   <handoff>
     <next command="/sc:load">For restoring saved session</next>

@@ -2,7 +2,6 @@
 description: Interactive requirements discovery through Socratic dialogue and systematic exploration
 ---
 <component name="brainstorm" type="command">
-  <config style="Telegraphic|Imperative|XML" eval="true"/>
 
   <role>
     /sc:brainstorm
@@ -39,12 +38,6 @@ description: Interactive requirements discovery through Socratic dialogue and sy
     - Specification: Concrete requirements → actionable briefs
   </patterns>
 
-  <checklist note="Completion criteria">
-    - [ ] Requirements systematically explored (list questions asked)
-    - [ ] Multi-persona validation completed (name each persona)
-    - [ ] Feasibility assessment included (risks + constraints)
-    - [ ] Actionable specification generated (concrete next steps)
-  </checklist>
 
   <examples>
 | Input | Output |
@@ -59,13 +52,8 @@ description: Interactive requirements discovery through Socratic dialogue and sy
 
   <bounds will="ambiguous→concrete|multi-persona+MCP|cross-session persistence" wont="impl without discovery|override user vision|bypass systematic exploration" fallback="Ask user for guidance when uncertain"/>
 
-  <boundaries type="document-only" critical="true">
-    <rule>Produce requirements specification, then complete</rule>
-    <rule>Focus on requirements; defer architecture to /sc:design</rule>
-    <rule>Defer implementation to /sc:implement</rule>
-    <rule>Defer scaffolding to /sc:implement</rule>
-    <output>Requirements specification document only</output>
-  </boundaries>
+  <boundaries type="document-only">Produce requirements specification, then complete | Focus on requirements; defer architecture to /sc:design | Defer implementation to /sc:implement | Defer scaffolding to /sc:implement → Output: Requirements specification document only</boundaries>
+
 
   <handoff>
     <next command="/sc:research">For deep research on discovered requirements</next>

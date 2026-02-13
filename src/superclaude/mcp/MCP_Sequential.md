@@ -1,5 +1,4 @@
 <component name="sequential" type="mcp">
-  <config style="Telegraphic|Imperative|XML" eval="true"/>
   <triggers>--effort medium|--effort high|--effort max|debug|architecture|analysis|reasoning|sequential</triggers>
 
   <role>
@@ -17,11 +16,6 @@ Avoid:
 - Simple tasks: Basic explanations, single-file, straightforward fixes
   </choose>
 
-  <synergy>
-- Context7: Sequential coordinates → Context7 provides patterns
-- Magic: Sequential analyzes UI logic → Magic implements
-- Playwright: Sequential identifies test strategy → Playwright executes
-  </synergy>
 
   <examples>
 | Input | Output | Reason |
@@ -33,5 +27,4 @@ Avoid:
 | explain this function | Native Claude | simple explanation |
   </examples>
 
-  <bounds will="multi-step reasoning|systematic analysis|complex problem decomposition" wont="simple tasks|single-file fixes|basic explanations" fallback="Fall back to native tools when unavailable"/>
 </component>

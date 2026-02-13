@@ -2,8 +2,6 @@
 description: Design system architecture, APIs, and component interfaces with comprehensive specifications
 ---
 <component name="design" type="command">
-  <config style="Telegraphic|Imperative|XML" eval="true"/>
-  <constraints note="Reinforced from RULES.md">Scope: build only what's asked | Read before edit | No adjacent improvements</constraints>
 
   <role>
     /sc:design
@@ -31,12 +29,6 @@ description: Design system architecture, APIs, and component interfaces with com
 | database | ERD.md | SCHEMA.md | migrations/*.sql |
   </outputs>
 
-  <checklist note="Completion criteria">
-    - [ ] Design document generated per --type
-    - [ ] Format matches --format flag
-    - [ ] Requirements coverage validated (trace each req)
-    - [ ] Maintainability considerations documented (coupling + cohesion)
-  </checklist>
 
   <tools>
     - Read: Requirements analysis
@@ -63,13 +55,8 @@ description: Design system architecture, APIs, and component interfaces with com
 
   <bounds will="comprehensive specs|multi-format output|validation" wont="generate impl code|modify existing arch|violate constraints" fallback="Ask user for guidance when uncertain"/>
 
-  <boundaries type="document-only" critical="true">
-    <rule>Produce design documentation, then complete</rule>
-    <rule>Defer implementation code to /sc:implement</rule>
-    <rule>Defer source file creation to /sc:implement</rule>
-    <rule>Design specs and interfaces only</rule>
-    <output>Architecture/API/Component/Database design documents</output>
-  </boundaries>
+  <boundaries type="document-only">Produce design documentation, then complete | Defer implementation code to /sc:implement | Defer source file creation to /sc:implement | Design specs and interfaces only → Output: Architecture/API/Component/Database design documents</boundaries>
+
 
   <handoff>
     <next command="/sc:implement">For code implementation from design</next>

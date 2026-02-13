@@ -2,7 +2,6 @@
 description: Session lifecycle management with Serena MCP integration for project context loading
 ---
 <component name="load" type="command">
-  <config style="Telegraphic|Imperative|XML" eval="true"/>
 
   <role>
     /sc:load
@@ -50,25 +49,10 @@ description: Session lifecycle management with Serena MCP integration for projec
 
   <bounds will="Serena integration|cross-session persistence|context loading" wont="modify structure|load without validation|override without checkpoint" fallback="Ask user for guidance when uncertain"/>
 
-  <boundaries type="execution" critical="true">
-    <rule>Execute session/project activation</rule>
-    <rule>Preserve project structure unchanged</rule>
-    <rule>Validate context before proceeding</rule>
-  </boundaries>
+  <boundaries type="execution">Execute session/project activation | Preserve project structure unchanged | Validate context before proceeding</boundaries>
 
-  <checklist note="Completion criteria">
-    - [ ] Project activated via Serena (show activation result)
-    - [ ] Memories loaded (if available) (list memories read)
-    - [ ] Context validated for integrity (check for conflicts)
-    - [ ] Session ready for work (summarize loaded state)
-  </checklist>
 
-  <completion_criteria>
-    - [ ] Project activated successfully
-    - [ ] Memories loaded (if available)
-    - [ ] Context validated for integrity
-    - [ ] Session ready for work
-  </completion_criteria>
+
 
   <handoff>
     <next command="/sc:analyze">For understanding loaded project</next>

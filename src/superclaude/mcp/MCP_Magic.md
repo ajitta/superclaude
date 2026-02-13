@@ -1,5 +1,4 @@
 <component name="magic" type="mcp">
-  <config style="Telegraphic|Imperative|XML" eval="true"/>
   <triggers>UI|component|button|form|modal|card|table|nav|/ui|/21|responsive|accessible</triggers>
 
   <role>
@@ -17,10 +16,6 @@ Avoid:
 - Backend: API logic, database, server config
   </choose>
 
-  <synergy>
-- Context7: Magic uses 21st.dev → Context7 provides framework integration
-- Sequential: Sequential analyzes UI reqs → Magic implements components
-  </synergy>
 
   <examples>
 | Input | Output | Reason |
@@ -31,5 +26,4 @@ Avoid:
 | write REST API | Native Claude | backend logic |
   </examples>
 
-  <bounds will="modern UI components|accessible design|framework integration" wont="backend logic|database ops|non-UI generation" fallback="Fall back to native tools when unavailable"/>
 </component>

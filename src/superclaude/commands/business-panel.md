@@ -2,7 +2,6 @@
 description: Multi-expert business analysis with adaptive interaction modes
 ---
 <component name="business-panel" type="command">
-  <config style="Telegraphic|Imperative|XML" eval="true"/>
 
   <role>
     /sc:business-panel
@@ -41,21 +40,11 @@ description: Multi-expert business analysis with adaptive interaction modes
   <mcp servers="seq|c7"/>
   <personas p="anal|arch|mentor" auto="true"/>
 
-  <checklist note="Completion criteria">
-    - [ ] Context and constraints captured (list each constraint)
-    - [ ] Relevant experts selected (3-6)
-    - [ ] Multi-lens analysis completed (each expert quoted)
-    - [ ] Synthesis with trade-offs provided (pros/cons per option)
-  </checklist>
 
   <bounds will="multi-expert analysis|adaptive modes|comprehensive synthesis" wont="replace professional advice|make decisions for user" fallback="Ask user for guidance when uncertain"/>
 
-  <boundaries type="document-only" critical="true">
-    <rule>Produce business analysis document, then complete</rule>
-    <rule>Defer business decisions to stakeholders</rule>
-    <rule>Preserve code and configurations unchanged</rule>
-    <output>Business analysis synthesis document</output>
-  </boundaries>
+  <boundaries type="document-only">Produce business analysis document, then complete | Defer business decisions to stakeholders | Preserve code and configurations unchanged → Output: Business analysis synthesis document</boundaries>
+
 
   <handoff>
     <next command="/sc:brainstorm">For requirements discovery based on analysis</next>

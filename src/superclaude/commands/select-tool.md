@@ -2,7 +2,6 @@
 description: Intelligent MCP tool selection based on complexity scoring and operation analysis
 ---
 <component name="select-tool" type="command">
-  <config style="Telegraphic|Imperative|XML" eval="true"/>
 
   <role>
     /sc:select-tool
@@ -44,12 +43,6 @@ description: Intelligent MCP tool selection based on complexity scoring and oper
     - accuracy: >95%
   </performance>
 
-  <checklist note="Completion criteria">
-    - [ ] Operation complexity scored (show numeric score)
-    - [ ] Optimal tool selected via matrix (name tool + reason)
-    - [ ] Selection rationale provided (if --explain)
-    - [ ] Fallback strategy identified (name backup tool)
-  </checklist>
 
   <examples>
 

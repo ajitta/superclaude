@@ -2,7 +2,6 @@
 description: Multi-expert specification review and improvement using renowned software engineering experts
 ---
 <component name="spec-panel" type="command">
-  <config style="Telegraphic|Imperative|XML" eval="true"/>
 
   <role>
     /sc:spec-panel
@@ -48,12 +47,6 @@ description: Multi-expert specification review and improvement using renowned so
     - compliance (Wiegers,Nygard): Security, regulatory, audit
   </focus_areas>
 
-  <checklist note="Completion criteria">
-    - [ ] Specification parsed and understood (summarize key reqs)
-    - [ ] Relevant experts assembled (3-8)
-    - [ ] Multi-mode review completed (each expert's findings)
-    - [ ] Improvement roadmap synthesized (prioritized action items)
-  </checklist>
 
   <examples>
 
@@ -67,12 +60,8 @@ description: Multi-expert specification review and improvement using renowned so
 
   <bounds will="expert-level review|actionable recs|multi-mode analysis" wont="replace human judgment|modify without consent|legal guarantees" fallback="Ask user for guidance when uncertain"/>
 
-  <boundaries type="document-only" critical="true">
-    <rule>Produce expert review document, then complete</rule>
-    <rule>Preserve specifications unchanged</rule>
-    <rule>Provide recommendations; defer implementation to /sc:implement</rule>
-    <output>Expert review document with recommendations</output>
-  </boundaries>
+  <boundaries type="document-only">Produce expert review document, then complete | Preserve specifications unchanged | Provide recommendations; defer implementation to /sc:implement → Output: Expert review document with recommendations</boundaries>
+
 
   <handoff>
     <next command="/sc:design">For implementing architectural recommendations</next>

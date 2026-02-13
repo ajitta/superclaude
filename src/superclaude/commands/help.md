@@ -2,7 +2,6 @@
 description: List all available /sc commands and their functionality
 ---
 <component name="help" type="command">
-  <config style="Telegraphic|Imperative|XML" eval="true"/>
 
   <role>
     /sc:help
@@ -97,20 +96,11 @@ description: List all available /sc commands and their functionality
     - Scope: system > project > module > file
   </priority_rules>
 
-  <checklist note="Completion criteria">
-    - [ ] Complete command list displayed (show all 30 commands)
-    - [ ] Flags reference provided (grouped by category)
-    - [ ] Usage information clear (include examples)
-  </checklist>
 
   <bounds will="complete reference display|categorized flag listing|usage examples" wont="execute commands|create files|activate modes|modify project state" fallback="Ask user for guidance when uncertain"/>
 
-  <boundaries type="document-only" critical="true">
-    <rule>Display reference information only, then complete</rule>
-    <rule>Do not execute any commands automatically</rule>
-    <rule>Do not modify files or project state</rule>
-    <output>Command and flag reference documentation</output>
-  </boundaries>
+  <boundaries type="document-only">Display reference information only, then complete | Do not execute any commands automatically | Do not modify files or project state → Output: Command and flag reference documentation</boundaries>
+
 
   <handoff>
     <next command="/sc:recommend">For intelligent command suggestions</next>

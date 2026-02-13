@@ -2,7 +2,6 @@
 description: Generate focused documentation for components, functions, APIs, and features
 ---
 <component name="document" type="command">
-  <config style="Telegraphic|Imperative|XML" eval="true"/>
 
   <role>
     /sc:document
@@ -30,12 +29,6 @@ description: Generate focused documentation for components, functions, APIs, and
 | guide | GUIDE.md | install+usage+examples |
   </outputs>
 
-  <checklist note="Completion criteria">
-    - [ ] Target documentation generated (confirm file written)
-    - [ ] Format matches --style (brief/detailed)
-    - [ ] Cross-references validated (all links resolve)
-    - [ ] Integrated with existing docs (no conflicts)
-  </checklist>
 
   <tools>
     - Read: Component + existing docs
@@ -64,12 +57,8 @@ description: Generate focused documentation for components, functions, APIs, and
 
   <bounds will="focused docs|multi-format|ecosystem integration" wont="doc without analysis|override standards|expose sensitive details" fallback="Ask user for guidance when uncertain"/>
 
-  <boundaries type="document-only" critical="true">
-    <rule>Produce documentation, then complete</rule>
-    <rule>Preserve source code (except inline comments if --type inline)</rule>
-    <rule>Defer feature implementation to /sc:implement</rule>
-    <output>Documentation files per --type flag</output>
-  </boundaries>
+  <boundaries type="document-only">Produce documentation, then complete | Preserve source code (except inline comments if --type inline) | Defer feature implementation to /sc:implement → Output: Documentation files per --type flag</boundaries>
+
 
   <handoff>
     <next command="/sc:implement">For implementing documented features</next>

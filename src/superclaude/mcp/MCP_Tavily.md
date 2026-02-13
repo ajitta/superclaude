@@ -1,5 +1,4 @@
 <component name="tavily" type="mcp">
-  <config style="Telegraphic|Imperative|XML" eval="true"/>
   <triggers>search|research|news|current|web|fact-check|/sc:research|tavily</triggers>
 
   <role>
@@ -23,12 +22,6 @@ Avoid:
 Web: General searches | News: Time-filtered | Academic: Scholarly articles | Domains: Include/exclude | Extract: Full-text | Freshness: Recent priority | Multi-Round: Iterative | Research: Multi-source synthesis | Crawl: Site-wide content extraction | Map: URL structure discovery
   </capabilities>
 
-  <synergy>
-- Sequential: Tavily provides info → Sequential analyzes/synthesizes
-- Playwright: Tavily discovers URLs → Playwright extracts complex content
-- Context7: Tavily searches updates → Context7 provides stable docs
-- Serena: Tavily searches → Serena stores sessions
-  </synergy>
 
   <tools>
 | Tool | Purpose | When |
@@ -84,5 +77,4 @@ Fallback: Native WebSearch → Alt queries → Expand scope → Use cached
 | explain recursion | Native Claude | general concept |
   </examples>
 
-  <bounds will="web search|real-time info|multi-source research" wont="training knowledge queries|code generation|local file ops" fallback="Fall back to native tools when unavailable"/>
 </component>

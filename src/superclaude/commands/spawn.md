@@ -2,7 +2,6 @@
 description: Meta-system task orchestration with intelligent breakdown and delegation
 ---
 <component name="spawn" type="command">
-  <config style="Telegraphic|Imperative|XML" eval="true"/>
 
   <role>
     /sc:spawn
@@ -29,12 +28,6 @@ description: Meta-system task orchestration with intelligent breakdown and deleg
 | SPAWN_RESULT.md | Aggregated results |
   </outputs>
 
-  <checklist note="Completion criteria">
-    - [ ] Task decomposition complete (Epic→Subtask)
-    - [ ] Dependencies mapped correctly (show dependency graph)
-    - [ ] All subtasks executed or delegated (status per subtask)
-    - [ ] Results aggregated and summarized (pass/fail counts)
-  </checklist>
 
   <tools>
     - TaskCreate/TaskUpdate: Hierarchical breakdown (Epic→Story→Task)
@@ -64,12 +57,8 @@ description: Meta-system task orchestration with intelligent breakdown and deleg
 
   <bounds will="multi-domain decomposition|intelligent orchestration|meta-system ops" wont="replace domain commands|override user strategy|execute without analysis" fallback="Ask user for guidance when uncertain"/>
 
-  <boundaries type="document-only" critical="true">
-    <rule>Produce task hierarchy document, then complete</rule>
-    <rule>Defer implementation to /sc:task or /sc:implement</rule>
-    <rule>Orchestration planning only</rule>
-    <output>SPAWN_PLAN.md with task breakdown and dependencies</output>
-  </boundaries>
+  <boundaries type="document-only">Produce task hierarchy document, then complete | Defer implementation to /sc:task or /sc:implement | Orchestration planning only → Output: SPAWN_PLAN.md with task breakdown and dependencies</boundaries>
+
 
   <handoff>
     <next command="/sc:task">For executing decomposed tasks</next>

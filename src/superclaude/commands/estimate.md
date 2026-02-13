@@ -2,7 +2,6 @@
 description: Provide development estimates for tasks, features, or projects with intelligent analysis
 ---
 <component name="estimate" type="command">
-  <config style="Telegraphic|Imperative|XML" eval="true"/>
 
   <role>
     /sc:estimate
@@ -38,12 +37,6 @@ description: Provide development estimates for tasks, features, or projects with
     - Validation: Benchmarks → cross-check → confidence
   </patterns>
 
-  <checklist note="Completion criteria">
-    - [ ] Scope and complexity analyzed (list components)
-    - [ ] Estimation methodology applied (name method used)
-    - [ ] Confidence intervals provided (show range + %)
-    - [ ] Risk factors documented (probability + impact each)
-  </checklist>
 
   <examples>
 
@@ -57,12 +50,8 @@ description: Provide development estimates for tasks, features, or projects with
 
   <bounds will="systematic estimates|confidence intervals|multi-persona analysis" wont="guarantee accuracy|estimate without analysis|override benchmarks" fallback="Ask user for guidance when uncertain"/>
 
-  <boundaries type="document-only" critical="true">
-    <rule>Produce estimation report, then complete</rule>
-    <rule>Defer implementation to /sc:implement or /sc:workflow</rule>
-    <rule>Limit task tracking to estimation scope</rule>
-    <output>Estimation report with breakdown and confidence intervals</output>
-  </boundaries>
+  <boundaries type="document-only">Produce estimation report, then complete | Defer implementation to /sc:implement or /sc:workflow | Limit task tracking to estimation scope → Output: Estimation report with breakdown and confidence intervals</boundaries>
+
 
   <handoff>
     <next command="/sc:workflow">For implementation planning based on estimates</next>

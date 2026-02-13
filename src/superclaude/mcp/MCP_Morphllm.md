@@ -1,5 +1,4 @@
 <component name="morphllm" type="mcp">
-  <config style="Telegraphic|Imperative|XML" eval="true"/>
   <triggers>pattern|bulk|edit|transform|style|framework|text-replacement|morphllm</triggers>
 
   <role>
@@ -17,10 +16,6 @@ Avoid:
 - Semantic operations: Symbol renames, dependency tracking, LSP
   </choose>
 
-  <synergy>
-- Serena: Serena analyzes semantic → Morphllm executes edits
-- Sequential: Sequential plans strategy → Morphllm applies changes
-  </synergy>
 
   <examples>
 | Input | Output | Reason |
@@ -32,5 +27,4 @@ Avoid:
 | analyze code architecture | Sequential | complex analysis |
   </examples>
 
-  <bounds will="pattern-based edits|bulk transforms|token-efficient ops" wont="semantic symbol ops|dependency tracking|LSP operations" fallback="Fall back to native tools when unavailable"/>
 </component>

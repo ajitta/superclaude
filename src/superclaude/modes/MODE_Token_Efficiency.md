@@ -1,5 +1,4 @@
 <component name="token-efficiency" type="mode">
-  <config style="Telegraphic|Imperative|XML" eval="true"/>
   <triggers>compress|efficient|--uc|--ultracompressed|token|brevity</triggers>
 
   <role>

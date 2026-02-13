@@ -2,8 +2,6 @@
 description: Execute tests with coverage analysis and automated quality reporting
 ---
 <component name="test" type="command">
-  <config style="Telegraphic|Imperative|XML" eval="true"/>
-  <constraints note="Reinforced from RULES.md">Scope: build only what's asked | Read before edit | No adjacent improvements</constraints>
 
   <role>
     /sc:test
@@ -31,12 +29,6 @@ description: Execute tests with coverage analysis and automated quality reportin
 | default | TEST_REPORT.md | summary + failures |
   </outputs>
 
-  <checklist note="Completion criteria">
-    - [ ] All targeted tests executed (show pass/fail counts)
-    - [ ] Coverage meets thresholds (if --coverage)
-    - [ ] Failure diagnostics provided (root cause per failure)
-    - [ ] Test report generated (confirm file written)
-  </checklist>
 
   <mcp servers="play"/>
   <personas p="qa"/>
@@ -68,17 +60,9 @@ description: Execute tests with coverage analysis and automated quality reportin
 
   <bounds will="execute existing tests|coverage reports|failure analysis" wont="generate test cases|modify framework config|destructive changes" fallback="Ask user for guidance when uncertain"/>
 
-  <boundaries type="execution" critical="true">
-    <rule>Execute tests and report results</rule>
-    <rule>Run existing tests; defer new test creation to /sc:implement --with-tests</rule>
-    <rule>Preserve test framework configuration</rule>
-  </boundaries>
+  <boundaries type="execution">Execute tests and report results | Run existing tests; defer new test creation to /sc:implement --with-tests | Preserve test framework configuration</boundaries>
 
-  <completion_criteria>
-    - [ ] All targeted tests executed
-    - [ ] Coverage report generated (if --coverage)
-    - [ ] Failure analysis provided for failed tests
-  </completion_criteria>
+
 
   <handoff>
     <next command="/sc:troubleshoot">For fixing failed tests</next>

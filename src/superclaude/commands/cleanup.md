@@ -2,7 +2,6 @@
 description: Systematically clean up code, remove dead code, and optimize project structure
 ---
 <component name="cleanup" type="command">
-  <config style="Telegraphic|Imperative|XML" eval="true"/>
 
   <role>
     /sc:cleanup
@@ -30,12 +29,6 @@ description: Systematically clean up code, remove dead code, and optimize projec
 | all | All above | CLEANUP_REPORT.md |
   </outputs>
 
-  <checklist note="Completion criteria">
-    - [ ] Pre-cleanup snapshot/backup noted (show git SHA)
-    - [ ] Cleanup actions executed per --type
-    - [ ] Tests still passing (no functionality loss) (run test suite)
-    - [ ] Cleanup report generated (list items removed)
-  </checklist>
 
   <mcp servers="seq|c7"/>
   <personas p="arch|qual|sec"/>
@@ -67,22 +60,14 @@ description: Systematically clean up code, remove dead code, and optimize projec
 
   <bounds will="systematic cleanup|safety validation|intelligent algorithms" wont="remove without analysis|override exclusions|compromise functionality" fallback="Ask user for guidance when uncertain"/>
 
-  <boundaries type="execution" critical="true">
-    <rule>Implement cleanup actions as requested</rule>
-    <rule>Safe mode (--safe): Only low-risk removals</rule>
-    <rule>Interactive mode (--interactive): Confirm each removal</rule>
-  </boundaries>
+  <boundaries type="execution">Implement cleanup actions as requested | Safe mode (--safe): Only low-risk removals | Interactive mode (--interactive): Confirm each removal</boundaries>
+
 
   <auto_fix_threshold>
     <safe>Unused imports, dead variables, empty files</safe>
     <approval_required>Exported functions, config files, shared modules</approval_required>
   </auto_fix_threshold>
 
-  <completion_criteria>
-    - [ ] All identified cleanup actions applied
-    - [ ] No functionality loss verified (tests pass)
-    - [ ] Cleanup report generated
-  </completion_criteria>
 
   <handoff>
     <next command="/sc:test">For verifying no regressions</next>

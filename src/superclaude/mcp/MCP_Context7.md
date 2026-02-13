@@ -1,5 +1,4 @@
 <component name="context7" type="mcp">
-  <config style="Telegraphic|Imperative|XML" eval="true"/>
   <triggers>library|docs|framework|documentation|import|require</triggers>
 
   <role>
@@ -14,10 +13,6 @@
 - Compliance: Adherence to official standards
   </choose>
 
-  <synergy>
-- Sequential: Context7 provides docs → Sequential analyzes strategy
-- Magic: Context7 supplies patterns → Magic generates components
-  </synergy>
 
   <examples>
 | Input | Output | Reason |
@@ -28,5 +23,4 @@
 | just explain this function | Native Claude | no external docs needed |
   </examples>
 
-  <bounds will="official library docs|version-specific patterns|framework guidance" wont="general knowledge queries|code generation|non-library tasks" fallback="Fall back to native tools when unavailable"/>
 </component>

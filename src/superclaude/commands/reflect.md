@@ -2,7 +2,6 @@
 description: Task reflection and validation using Serena MCP analysis capabilities
 ---
 <component name="reflect" type="command">
-  <config style="Telegraphic|Imperative|XML" eval="true"/>
 
   <role>
     /sc:reflect
@@ -37,12 +36,6 @@ description: Task reflection and validation using Serena MCP analysis capabiliti
     - Learning: Insights → persistence → enhanced understanding
   </patterns>
 
-  <checklist note="Completion criteria">
-    - [ ] Task/session state analyzed via Serena (show memory read)
-    - [ ] Adherence validated against goals (list goal vs actual)
-    - [ ] Insights captured for cross-session learning (show memory write)
-    - [ ] Actionable recommendations provided (specific next steps)
-  </checklist>
 
   <examples>
 
@@ -56,12 +49,8 @@ description: Task reflection and validation using Serena MCP analysis capabiliti
 
   <bounds will="comprehensive reflection|TaskList bridge|cross-session learning" wont="operate without Serena|override completion|bypass integrity" fallback="Ask user for guidance when uncertain"/>
 
-  <boundaries type="document-only" critical="true">
-    <rule>Produce reflection report, then complete</rule>
-    <rule>Preserve code unchanged during reflection</rule>
-    <rule>Report issues with recommendations; defer fixes to /sc:improve</rule>
-    <output>Reflection analysis with recommendations</output>
-  </boundaries>
+  <boundaries type="document-only">Produce reflection report, then complete | Preserve code unchanged during reflection | Report issues with recommendations; defer fixes to /sc:improve → Output: Reflection analysis with recommendations</boundaries>
+
 
   <handoff>
     <next command="/sc:improve">For implementing reflection insights</next>

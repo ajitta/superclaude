@@ -2,8 +2,6 @@
 description: Git operations with intelligent commit messages and workflow optimization
 ---
 <component name="git" type="command">
-  <config style="Telegraphic|Imperative|XML" eval="true"/>
-  <constraints note="Reinforced from RULES.md">Scope: build only what's asked | Read before edit | No adjacent improvements</constraints>
 
   <role>
     /sc:git
@@ -76,31 +74,15 @@ description: Git operations with intelligent commit messages and workflow optimi
 
   <bounds will="intelligent git ops|conventional commits|workflow guidance|PR status checks" wont="modify config without auth|destructive without confirm|complex merges requiring manual" fallback="Ask user for guidance when uncertain"/>
 
-  <boundaries type="execution" critical="true">
-    <rule>Execute git operations as requested</rule>
-    <rule>Require explicit user confirmation before force push</rule>
-    <rule>Require user authorization before modifying git config</rule>
-    <rule>Destructive operations require explicit user approval</rule>
-  </boundaries>
+  <boundaries type="execution">Execute git operations as requested | Require explicit user confirmation before force push | Require user authorization before modifying git config | Destructive operations require explicit user approval</boundaries>
+
 
   <safety_rules>
     <safe>status, log, diff, add, commit, pull, fetch, branch, pr-status</safe>
     <approval_required>push --force, reset --hard, rebase, merge with conflicts</approval_required>
   </safety_rules>
 
-  <checklist note="Completion criteria">
-    - [ ] Repository state analyzed (show git status output)
-    - [ ] Operation validated before execution (dry-run or preview)
-    - [ ] Smart commit message generated (if commit)
-    - [ ] Next steps recommended (specific commands)
-  </checklist>
 
-  <completion_criteria>
-    - [ ] Operation executed successfully
-    - [ ] Repository state verified
-    - [ ] Appropriate next steps suggested
-    - [ ] PR status checked (if --pr-status)
-  </completion_criteria>
 
   <handoff>
     <next command="/sc:test">Before pushing changes</next>

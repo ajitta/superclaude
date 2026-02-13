@@ -1,5 +1,4 @@
 <component name="principles" type="core" priority="high" note="Version-agnostic">
-  <config style="Telegraphic|Imperative|XML" eval="true"/>
   <triggers>principle|philosophy|mindset|engineering|quality|decision</triggers>
 
   <role>

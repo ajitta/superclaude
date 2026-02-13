@@ -1,5 +1,4 @@
 <component name="orchestration" type="mode">
-  <config style="Telegraphic|Imperative|XML" eval="true"/>
   <triggers>orchestrate|coordinate|parallel|multi-tool|resource|efficiency|batch|--orchestrate</triggers>
 
   <role>

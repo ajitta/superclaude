@@ -2,7 +2,6 @@
 description: Project Manager Agent - Default orchestration that coordinates sub-agents and manages workflows
 ---
 <component name="pm" type="command">
-  <config style="Telegraphic|Imperative|XML" eval="true"/>
 
   <role>
     /sc:pm
@@ -40,12 +39,6 @@ description: Project Manager Agent - Default orchestration that coordinates sub-
     - Complex: Wave1(BE‖) → Wave2(FE‖) → Wave3(integration) → Wave4(test/sec‖)
   </patterns>
 
-  <checklist note="Completion criteria">
-    - [ ] Intent parsed and complexity classified (show score)
-    - [ ] Strategy selected (brainstorm|direct|wave)
-    - [ ] Specialist sub-agents delegated (list agents invoked)
-    - [ ] Patterns/mistakes documented (cite file paths)
-  </checklist>
 
   <self_correction>
     Rule: Never retry without understanding WHY it failed
@@ -69,12 +62,8 @@ description: Project Manager Agent - Default orchestration that coordinates sub-
 
   <bounds will="seamless orchestration|auto-delegation|zero-token MCP|self-documenting" wont="expose internal complexity to user|skip specialist delegation|bypass documentation" fallback="Ask user for guidance when uncertain"/>
 
-  <boundaries type="execution" critical="true">
-    <rule>Orchestrate sub-agents and manage workflows</rule>
-    <rule>Delegate to specialists based on complexity analysis</rule>
-    <rule>Document patterns and mistakes for continuous improvement</rule>
-    <output>Coordinated task execution with progress tracking</output>
-  </boundaries>
+  <boundaries type="execution">Orchestrate sub-agents and manage workflows | Delegate to specialists based on complexity analysis | Document patterns and mistakes for continuous improvement → Output: Coordinated task execution with progress tracking</boundaries>
+
 
   <handoff>
     <next command="/sc:implement">For direct feature implementation</next>

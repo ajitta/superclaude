@@ -165,8 +165,7 @@ TRIGGER_MAP = [
         2,
     ),
     # Business symbols/examples - Priority 3 (lower priority, supplementary)
-    (r"(business.?symbol|strategic.?symbol)", "core/BUSINESS_SYMBOLS.md", 3),
-    (r"(business.?example|panel.?example)", "core/BUSINESS_PANEL_EXAMPLES.md", 3),
+    (r"(business.?symbol|strategic.?symbol|business.?example|panel.?example)", "core/BUSINESS_SYMBOLS.md", 3),
     # Note: PRINCIPLES.md removed - now loaded via CLAUDE_SC.md @-reference
 ]
 
@@ -263,12 +262,8 @@ INSTRUCTION_MAP = {
     ),
     # Core supplementary
     "core/BUSINESS_SYMBOLS.md": (
-        "Business symbols: 🎯target 📈growth 💰financial ⚖️tradeoffs 🏆competitive 🌊blue-ocean. "
-        "Use in business panel discussions for visual strategic communication."
-    ),
-    "core/BUSINESS_PANEL_EXAMPLES.md": (
-        "Business panel examples: /sc:business-panel @file with modes — "
-        "strategic, innovation, risk debate, socratic. Multi-perspective analysis patterns."
+        "Business symbols + expert selection: 🎯target 📈growth 💰financial ⚖️tradeoffs 🏆competitive 🌊blue-ocean. "
+        "Includes expert domain mapping, discussion templates, and abbreviations."
     ),
     # Note: PRINCIPLES.md removed - now loaded via CLAUDE_SC.md @-reference
 }

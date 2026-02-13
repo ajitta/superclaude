@@ -2,8 +2,6 @@
 description: Build, compile, and package projects with intelligent error handling and optimization
 ---
 <component name="build" type="command">
-  <config style="Telegraphic|Imperative|XML" eval="true"/>
-  <constraints note="Reinforced from RULES.md">Scope: build only what's asked | Read before edit | No adjacent improvements</constraints>
 
   <role>
     /sc:build
@@ -30,12 +28,6 @@ description: Build, compile, and package projects with intelligent error handlin
 | test | dist-test/ | BUILD_TEST.log |
   </outputs>
 
-  <checklist note="Completion criteria">
-    - [ ] Build completed without errors (show exit code 0)
-    - [ ] Artifacts generated in correct location (list files)
-    - [ ] Bundle size within limits (if --optimize)
-    - [ ] Build report generated (confirm file written)
-  </checklist>
 
   <mcp servers="play"/>
   <personas p="devops"/>
@@ -67,18 +59,9 @@ description: Build, compile, and package projects with intelligent error handlin
 
   <bounds will="execute build|error analysis|optimization recs" wont="modify build config|install deps|deploy" fallback="Ask user for guidance when uncertain"/>
 
-  <boundaries type="execution" critical="true">
-    <rule>Execute build commands</rule>
-    <rule>Preserve build configuration</rule>
-    <rule>Preserve current dependencies</rule>
-    <rule>Defer deployment to user or CI/CD</rule>
-  </boundaries>
+  <boundaries type="execution">Execute build commands | Preserve build configuration | Preserve current dependencies | Defer deployment to user or CI/CD</boundaries>
 
-  <completion_criteria>
-    - [ ] Build completed without errors
-    - [ ] Artifacts generated successfully
-    - [ ] Build report created
-  </completion_criteria>
+
 
   <handoff>
     <next command="/sc:test">For running tests on build</next>

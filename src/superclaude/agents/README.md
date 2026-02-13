@@ -213,7 +213,6 @@ memory: user                              # Persistent memory scope (v2.1.33)
 
 ```xml
 <component name="agent-name" type="agent">
-  <config style="Telegraphic|Imperative|XML" eval="true"/>
   <triggers>keyword1|keyword2</triggers>
   <mcp servers="seq|c7"/>
   <tool_guidance autonomy="high|medium|low">

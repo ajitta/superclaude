@@ -2,8 +2,6 @@
 description: Feature and code implementation with intelligent persona activation and MCP integration
 ---
 <component name="implement" type="command">
-  <config style="Telegraphic|Imperative|XML" eval="true"/>
-  <constraints note="Reinforced from RULES.md">Scope: build only what's asked | Read before edit | No adjacent improvements</constraints>
 
   <role>
     /sc:implement
@@ -61,25 +59,10 @@ description: Feature and code implementation with intelligent persona activation
 
   <bounds will="intelligent impl|framework best practices|comprehensive testing" wont="arch decisions without consultation|conflict with security|override safety" fallback="Ask user for guidance when uncertain"/>
 
-  <boundaries type="execution" critical="true">
-    <rule>Implement code changes as requested</rule>
-    <rule>Follow framework-specific best practices</rule>
-    <rule>Validate security constraints before commit</rule>
-  </boundaries>
+  <boundaries type="execution">Implement code changes as requested | Follow framework-specific best practices | Validate security constraints before commit</boundaries>
 
-  <checklist note="Completion criteria">
-    - [ ] Requirements analyzed with persona activation
-    - [ ] Code follows framework best practices (match existing patterns)
-    - [ ] Security validation passed (scan for vulns)
-    - [ ] Tests written (if --with-tests)
-  </checklist>
 
-  <completion_criteria>
-    - [ ] All requested features implemented
-    - [ ] Code compiles/runs without errors
-    - [ ] Security validation passed (if --safe)
-    - [ ] Tests written (if --with-tests)
-  </completion_criteria>
+
 
   <handoff>
     <next command="/sc:test">For comprehensive testing</next>

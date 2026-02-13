@@ -2,8 +2,6 @@
 description: Deep web research with adaptive planning and intelligent search
 ---
 <component name="research" type="command">
-  <config style="Telegraphic|Imperative|XML" eval="true"/>
-  <constraints note="Reinforced from RULES.md">Scope: build only what's asked | Read before edit | No adjacent improvements</constraints>
 
   <role>
     /sc:research
@@ -49,12 +47,6 @@ description: Deep web research with adaptive planning and intelligent search
     - Output: claudedocs/research_[topic]_[timestamp].md
   </patterns>
 
-  <checklist note="Completion criteria">
-    - [ ] Research strategy selected (depth level)
-    - [ ] Evidence collected with sources (cite URLs/docs)
-    - [ ] Findings validated and cross-checked (2+ sources each)
-    - [ ] Synthesis report generated (with confidence ratings)
-  </checklist>
 
   <examples>
 | Input | Output |
@@ -68,13 +60,8 @@ description: Deep web research with adaptive planning and intelligent search
 
   <bounds will="current info|intelligent search|evidence-based" wont="claims without sources|skip validation|restricted content" fallback="Ask user for guidance when uncertain"/>
 
-  <boundaries type="document-only" critical="true">
-    <rule>Produce research report, then complete</rule>
-    <rule>Defer implementation to /sc:implement</rule>
-    <rule>Preserve codebase unchanged</rule>
-    <rule>Research and documentation only</rule>
-    <output>Research report with citations and findings</output>
-  </boundaries>
+  <boundaries type="document-only">Produce research report, then complete | Defer implementation to /sc:implement | Preserve codebase unchanged | Research and documentation only → Output: Research report with citations and findings</boundaries>
+
 
   <handoff>
     <next command="/sc:design">For architecture based on research</next>

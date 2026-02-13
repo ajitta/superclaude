@@ -1,5 +1,4 @@
 <component name="deep-research" type="mode">
-  <config style="Telegraphic|Imperative|XML" eval="true"/>
   <triggers>/sc:research|investigate|discover|deep-research|--research</triggers>
 
   <role>

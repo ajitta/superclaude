@@ -2,8 +2,6 @@
 description: Provide clear explanations of code, concepts, and system behavior with educational clarity
 ---
 <component name="explain" type="command">
-  <config style="Telegraphic|Imperative|XML" eval="true"/>
-  <constraints note="Reinforced from RULES.md">Scope: build only what's asked | Read before edit | No adjacent improvements</constraints>
 
   <role>
     /sc:explain
@@ -38,12 +36,6 @@ description: Provide clear explanations of code, concepts, and system behavior w
     - Interactive: Static → examples → exploration
   </patterns>
 
-  <checklist note="Completion criteria">
-    - [ ] Target code/concept fully analyzed (read source first)
-    - [ ] Explanation matches requested --level
-    - [ ] Examples provided for clarity (runnable code shown)
-    - [ ] Output format matches --format
-  </checklist>
 
   <examples>
 
@@ -58,12 +50,8 @@ description: Provide clear explanations of code, concepts, and system behavior w
 
   <bounds will="clear explanations|persona expertise|framework integration" wont="explain without analysis|override standards|reveal sensitive" fallback="Ask user for guidance when uncertain"/>
 
-  <boundaries type="document-only" critical="true">
-    <rule>Provide explanation, then complete</rule>
-    <rule>Preserve code unchanged during explanation</rule>
-    <rule>Defer implementation to /sc:implement</rule>
-    <output>Explanation text with examples</output>
-  </boundaries>
+  <boundaries type="document-only">Provide explanation, then complete | Preserve code unchanged during explanation | Defer implementation to /sc:implement → Output: Explanation text with examples</boundaries>
+
 
   <handoff>
     <next command="/sc:implement">For implementing explained concepts</next>

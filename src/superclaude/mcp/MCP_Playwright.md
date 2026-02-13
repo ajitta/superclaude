@@ -1,5 +1,4 @@
 <component name="playwright" type="mcp">
-  <config style="Telegraphic|Imperative|XML" eval="true"/>
   <triggers>browser|E2E|test|screenshot|validation|accessibility|WCAG|playwright</triggers>
 
   <role>
@@ -17,10 +16,6 @@ Avoid:
 - Code analysis: Static review, syntax, logic validation
   </choose>
 
-  <synergy>
-- Sequential: Sequential plans test strategy → Playwright executes
-- Magic: Magic creates UI → Playwright validates accessibility
-  </synergy>
 
   <examples>
 | Input | Output | Reason |
@@ -32,5 +27,4 @@ Avoid:
 | review function logic | Native Claude | static analysis |
   </examples>
 
-  <bounds will="browser automation|E2E testing|visual validation" wont="static code analysis|unit testing|backend logic" fallback="Fall back to native tools when unavailable"/>
 </component>

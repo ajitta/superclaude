@@ -2,8 +2,6 @@
 description: Diagnose and resolve issues in code, builds, deployments, and system behavior
 ---
 <component name="troubleshoot" type="command">
-  <config style="Telegraphic|Imperative|XML" eval="true"/>
-  <constraints note="Reinforced from RULES.md">Scope: build only what's asked | Read before edit | No adjacent improvements</constraints>
 
   <role>
     /sc:troubleshoot
@@ -39,12 +37,6 @@ description: Diagnose and resolve issues in code, builds, deployments, and syste
   <mcp servers="seq"/>
   <personas p="root|devops"/>
 
-  <checklist note="Completion criteria">
-    - [ ] Root cause identified (cite evidence chain)
-    - [ ] Diagnostic evidence collected (logs/errors/repro)
-    - [ ] Solution proposed with impact assessment (scope of change)
-    - [ ] Fix validated (if --fix applied) (show test pass)
-  </checklist>
 
   <examples>
 
@@ -59,12 +51,8 @@ description: Diagnose and resolve issues in code, builds, deployments, and syste
 
   <bounds will="systematic diagnosis|validated solutions|safe fixes" wont="risky fixes without confirm|modify production without permission|arch changes without impact" fallback="Ask user for guidance when uncertain"/>
 
-  <boundaries type="conditional" critical="true">
-    <rule>Without --fix: produce diagnostic report, then complete</rule>
-    <rule>With --fix: Apply safe fixes only (execution)</rule>
-    <rule>Risky fixes require explicit user approval</rule>
-    <output>Diagnostic report; fixes only with --fix flag</output>
-  </boundaries>
+  <boundaries type="conditional">Without --fix: produce diagnostic report, then complete | With --fix: Apply safe fixes only (execution) | Risky fixes require explicit user approval → Output: Diagnostic report; fixes only with --fix flag</boundaries>
+
 
   <auto_fix_threshold>
     <safe>Typos, missing imports, simple config errors</safe>

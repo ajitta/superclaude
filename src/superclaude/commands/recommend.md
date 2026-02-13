@@ -2,7 +2,6 @@
 description: Ultra-intelligent command recommendation engine for optimal SuperClaude command selection
 ---
 <component name="recommend" type="command">
-  <config style="Telegraphic|Imperative|XML" eval="true"/>
 
   <role>
     /sc:recommend
@@ -37,12 +36,6 @@ description: Ultra-intelligent command recommendation engine for optimal SuperCl
     - python (requirements.txt|setup.py|main.py): --seq
   </project_detect>
 
-  <checklist note="Completion criteria">
-    - [ ] User request analyzed with project context (detect project type)
-    - [ ] Commands mapped to keywords (show keyword matches)
-    - [ ] Recommendations prioritized (rank with rationale)
-    - [ ] Copy-paste ready commands provided
-  </checklist>
 
   <expertise_flags>
     - beginner: --tutorial --examples --step-by-step
@@ -62,12 +55,8 @@ description: Ultra-intelligent command recommendation engine for optimal SuperCl
 
   <bounds will="intelligent mapping|project context|expertise adaptation" wont="execute commands|make assumptions without context" fallback="Ask user for guidance when uncertain"/>
 
-  <boundaries type="document-only" critical="true">
-    <rule>Provide recommendations only, then complete</rule>
-    <rule>Do not execute recommended commands automatically</rule>
-    <rule>Do not modify files or project state</rule>
-    <output>Prioritized command recommendations with justification</output>
-  </boundaries>
+  <boundaries type="document-only">Provide recommendations only, then complete | Do not execute recommended commands automatically | Do not modify files or project state → Output: Prioritized command recommendations with justification</boundaries>
+
 
   <handoff>
     <next command="/sc:implement">Execute the top recommended command</next>

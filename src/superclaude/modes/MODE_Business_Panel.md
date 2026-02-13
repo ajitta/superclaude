@@ -1,5 +1,4 @@
 <component name="business-panel" type="mode">
-  <config style="Telegraphic|Imperative|XML" eval="true"/>
   <triggers>business|panel|expert|strategy|christensen|porter|drucker|godin|taleb|--business-panel</triggers>
 
   <role>

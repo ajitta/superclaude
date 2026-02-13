@@ -2,7 +2,6 @@
 description: Session controller orchestrating investigation, implementation, and review workflows
 ---
 <component name="agent" type="command">
-  <config style="Telegraphic|Imperative|XML" eval="true"/>
 
   <role>
     /sc:agent
@@ -43,21 +42,11 @@ description: Session controller orchestrating investigation, implementation, and
     - Archive to memory only if user requests persistence
   </token_discipline>
 
-  <checklist note="Completion criteria">
-    - [ ] Confidence gate (>=0.90) verified before implementation
-    - [ ] Research completed via @deep-research (cite sources)
-    - [ ] Implementation reviewed via @self-review (show pass/fail)
-    - [ ] Residual risks documented (severity + mitigation)
-  </checklist>
 
   <bounds will="orchestrate helpers|validate results|keep user out of busywork" wont="speculate without research|impl below 0.90 confidence" fallback="Ask user for guidance when uncertain"/>
 
-  <boundaries type="execution" critical="true">
-    <rule>Orchestrate investigation, implementation, and review workflows</rule>
-    <rule>Enforce confidence gate (0.90) before implementation</rule>
-    <rule>Fallback to native tools when MCP unavailable</rule>
-    <output>Coordinated session with confidence-gated execution</output>
-  </boundaries>
+  <boundaries type="execution">Orchestrate investigation, implementation, and review workflows | Enforce confidence gate (0.90) before implementation | Fallback to native tools when MCP unavailable → Output: Coordinated session with confidence-gated execution</boundaries>
+
 
   <handoff>
     <next command="/sc:implement">For executing implementation after confidence gate</next>

@@ -2,8 +2,6 @@
 description: Apply systematic improvements to code quality, performance, and maintainability
 ---
 <component name="improve" type="command">
-  <config style="Telegraphic|Imperative|XML" eval="true"/>
-  <constraints note="Reinforced from RULES.md">Scope: build only what's asked | Read before edit | No adjacent improvements</constraints>
 
   <role>
     /sc:improve
@@ -52,30 +50,15 @@ description: Apply systematic improvements to code quality, performance, and mai
 
   <bounds will="systematic improvements|multi-persona|safe refactoring" wont="risky changes without confirm|arch changes without impact analysis|override standards" fallback="Ask user for guidance when uncertain"/>
 
-  <boundaries type="execution" critical="true">
-    <rule>Implement improvements as requested</rule>
-    <rule>Safe mode (--safe): Only non-breaking changes</rule>
-    <rule>Interactive mode (--interactive): Confirm each change</rule>
-  </boundaries>
+  <boundaries type="execution">Implement improvements as requested | Safe mode (--safe): Only non-breaking changes | Interactive mode (--interactive): Confirm each change</boundaries>
+
 
   <auto_fix_threshold>
     <safe>Style fixes, minor refactoring, documentation updates</safe>
     <approval_required>API changes, dependency updates, architecture modifications</approval_required>
   </auto_fix_threshold>
 
-  <checklist note="Completion criteria">
-    - [ ] Improvement opportunities identified (list with severity)
-    - [ ] Changes preserve functionality (run existing tests)
-    - [ ] Tests pass after improvements (show test output)
-    - [ ] Quality metrics improved (show before/after)
-  </checklist>
 
-  <completion_criteria>
-    - [ ] All identified improvements applied
-    - [ ] No breaking changes introduced
-    - [ ] Tests pass (if available)
-    - [ ] Code quality metrics improved
-  </completion_criteria>
 
   <handoff>
     <next command="/sc:test">For verifying improvements</next>

@@ -2,7 +2,6 @@
 description: Generate comprehensive project documentation and knowledge base with intelligent organization
 ---
 <component name="index" type="command">
-  <config style="Telegraphic|Imperative|XML" eval="true"/>
 
   <role>
     /sc:index
@@ -30,12 +29,6 @@ description: Generate comprehensive project documentation and knowledge base wit
 | readme | README.md | sections: install, usage, api |
   </outputs>
 
-  <checklist note="Completion criteria">
-    - [ ] Target type documentation generated (confirm file written)
-    - [ ] Cross-references validated (all links resolve)
-    - [ ] Manual sections (<!-- MANUAL -->) preserved
-    - [ ] Format output (md|json|yaml) correct
-  </checklist>
 
   <distinction note="vs /sc:index-repo">
     - index-repo: Minimal index (~3KB), token-efficient, PROJECT_INDEX.*
@@ -71,12 +64,8 @@ description: Generate comprehensive project documentation and knowledge base wit
 
   <bounds will="comprehensive docs|multi-persona|framework patterns" wont="override manual docs|generate without analysis|bypass standards" fallback="Ask user for guidance when uncertain"/>
 
-  <boundaries type="document-only" critical="true">
-    <rule>Generate documentation files, then complete</rule>
-    <rule>Preserve source code unchanged</rule>
-    <rule>Preserve <!-- MANUAL --> marked sections</rule>
-    <output>Documentation files per --type (KNOWLEDGE.md, API.md, etc.)</output>
-  </boundaries>
+  <boundaries type="document-only">Generate documentation files, then complete | Preserve source code unchanged | Preserve <!-- MANUAL --> marked sections → Output: Documentation files per --type (KNOWLEDGE.md, API.md, etc.)</boundaries>
+
 
   <handoff>
     <next command="/sc:implement">For implementing from documentation</next>

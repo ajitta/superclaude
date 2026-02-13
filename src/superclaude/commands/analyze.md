@@ -2,8 +2,6 @@
 description: Comprehensive code analysis across quality, security, performance, and architecture domains
 ---
 <component name="analyze" type="command">
-  <config style="Telegraphic|Imperative|XML" eval="true"/>
-  <constraints note="Reinforced from RULES.md">Scope: build only what's asked | Read before edit | No adjacent improvements</constraints>
 
   <role>
     /sc:analyze
@@ -30,12 +28,6 @@ description: Comprehensive code analysis across quality, security, performance, 
 | report | ANALYSIS_REPORT.md | Full report + roadmap |
   </outputs>
 
-  <checklist note="Completion criteria">
-    - [ ] All files in target scanned (show file count)
-    - [ ] Findings prioritized by severity (critical/high/med/low)
-    - [ ] Actionable recommendations provided (specific fix per finding)
-    - [ ] Output format matches --format
-  </checklist>
 
   <tools>
     - Glob: File discovery
@@ -66,12 +58,8 @@ description: Comprehensive code analysis across quality, security, performance, 
 
   <bounds will="static analysis|severity-rated findings|detailed reports" wont="dynamic/runtime analysis|modify code|analyze external deps" fallback="Ask user for guidance when uncertain"/>
 
-  <boundaries type="document-only" critical="true">
-    <rule>Produce analysis report, then complete</rule>
-    <rule>Preserve source code unchanged</rule>
-    <rule>Report issues; defer fixes to /sc:improve or /sc:cleanup</rule>
-    <output>Analysis report with severity-rated findings</output>
-  </boundaries>
+  <boundaries type="document-only">Produce analysis report, then complete | Preserve source code unchanged | Report issues; defer fixes to /sc:improve or /sc:cleanup → Output: Analysis report with severity-rated findings</boundaries>
+
 
   <handoff>
     <next command="/sc:improve">For quality improvements and refactoring</next>
