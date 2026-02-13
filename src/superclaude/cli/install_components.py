@@ -24,6 +24,32 @@ from .install_settings import (
 )
 
 
+def _resolve_template_paths(base_path: Path, scope: str = "user") -> dict:
+    """Compute resolved template variable values for a given scope."""
+    if scope == "project":
+        scripts = ".claude/superclaude/scripts"
+        skills = ".claude/skills"
+    else:
+        scripts = str((base_path / "superclaude" / "scripts").resolve())
+        skills = str((base_path / "skills").resolve())
+    return {"{{SCRIPTS_PATH}}": scripts, "{{SKILLS_PATH}}": skills}
+
+
+def _resolve_skill_templates(skill_dir: Path, template_vars: dict) -> None:
+    """Replace template variables in SKILL.md files within a copied skill directory."""
+    for manifest in ("SKILL.md", "skill.md"):
+        skill_md = skill_dir / manifest
+        if skill_md.exists():
+            content = skill_md.read_text(encoding="utf-8")
+            changed = False
+            for placeholder, value in template_vars.items():
+                if placeholder in content:
+                    content = content.replace(placeholder, value)
+                    changed = True
+            if changed:
+                skill_md.write_text(content, encoding="utf-8")
+
+
 def _safe_target_path(target: Path, base_path: Path) -> bool:
     """Check that a target path is safe (not a symlink to outside base_path).
 
@@ -44,7 +70,8 @@ def _safe_target_path(target: Path, base_path: Path) -> bool:
 def install_component(
     component: str,
     base_path: Path = None,
-    force: bool = False
+    force: bool = False,
+    scope: str = "user"
 ) -> Tuple[int, int, int, List[str]]:
     """
     Install a single component.
@@ -92,6 +119,9 @@ def install_component(
                             "__pycache__", "*.pyc", ".DS_Store"
                         ),
                     )
+                    # Resolve template variables in SKILL.md
+                    template_vars = _resolve_template_paths(base_path, scope)
+                    _resolve_skill_templates(target_skill_dir, template_vars)
                     installed += 1
                 except Exception as e:
                     failed += 1
@@ -308,7 +338,7 @@ def install_all(
     # Install each component
     for component, (_, _, description) in COMPONENTS.items():
         installed, skipped, failed, failed_names = install_component(
-            component, base_path, force
+            component, base_path, force, scope
         )
 
         total_installed += installed

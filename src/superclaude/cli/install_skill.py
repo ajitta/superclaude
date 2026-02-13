@@ -10,7 +10,7 @@ from typing import List, Optional, Tuple
 
 
 def install_skill_command(
-    skill_name: str, target_path: Path, force: bool = False
+    skill_name: str, target_path: Path, force: bool = False, scope: str = "user"
 ) -> Tuple[bool, str]:
     """
     Install a skill to target directory
@@ -54,6 +54,11 @@ def install_skill_command(
             skill_target,
             ignore=shutil.ignore_patterns("__init__.py", "__pycache__", "*.pyc"),
         )
+        # Resolve template variables ({{SCRIPTS_PATH}}, {{SKILLS_PATH}}) in SKILL.md
+        from .install_components import _resolve_template_paths, _resolve_skill_templates
+        base_path = target_path.parent  # target_path is base_path/skills
+        template_vars = _resolve_template_paths(base_path, scope)
+        _resolve_skill_templates(skill_target, template_vars)
         return True, f"Skill '{skill_name}' installed successfully to {skill_target}"
     except Exception as e:
         return False, f"Failed to install skill: {e}"

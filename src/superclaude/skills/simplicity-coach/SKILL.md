@@ -22,7 +22,7 @@ hooks:
   Stop:
     - hooks:
         - type: command
-          command: "python {{SCRIPTS_PATH}}/../skills/simplicity-coach/scripts/dependency-audit.py ."
+          command: "python {{SKILLS_PATH}}/simplicity-coach/scripts/dependency-audit.py ."
           timeout: 15
           once: true
 ---

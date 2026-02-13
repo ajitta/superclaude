@@ -330,7 +330,7 @@ def install_skill(skill_name: str, scope: str, force: bool):
     click.echo(f"📦 Installing skill '{skill_name}' (scope: {scope})...")
 
     success, message = install_skill_command(
-        skill_name=skill_name, target_path=target_path, force=force
+        skill_name=skill_name, target_path=target_path, force=force, scope=scope
     )
 
     if success:
