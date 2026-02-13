@@ -9,8 +9,8 @@ This project uses **UV** for all Python operations. Never use `pip` or `python -
 ```bash
 # Tests
 uv run pytest                              # Full suite
-uv run pytest tests/unit/ -v               # Unit tests only (8 files)
-uv run pytest tests/integration/ -v        # Integration tests (1 file)
+uv run pytest tests/unit/ -v               # Unit tests only
+uv run pytest tests/integration/ -v        # Integration tests
 uv run pytest tests/unit/test_confidence.py -v  # Single file
 uv run pytest -m confidence_check          # By marker
 uv run pytest -k "test_assess"             # By name pattern
@@ -25,7 +25,7 @@ make deploy                                # Deploy to global tool (recommended)
 
 ```bash
 make install       # uv pip install -e ".[dev]"
-make deploy        # Deploy to global uv tool (touch src/ + uv tool install)
+make deploy        # Deploy to global uv tool (editable, changes reflect immediately)
 make test          # uv run pytest
 make test-plugin   # Verify pytest plugin loads
 make verify        # Full installation check
@@ -48,19 +48,29 @@ SuperClaude is a **dual-purpose** project:
 The CLI `superclaude install` copies content from the package to Claude Code's config directory:
 
 ```
-src/superclaude/commands/  →  ~/.claude/commands/sc/     (31 slash commands)
-src/superclaude/agents/    →  ~/.claude/agents/          (21 agent definitions)
-src/superclaude/skills/    →  ~/.claude/skills/          (skill implementations)
-src/superclaude/core/      →  ~/.claude/superclaude/core/  (FLAGS, PRINCIPLES, RULES)
-src/superclaude/modes/     →  ~/.claude/superclaude/modes/ (7 behavioral modes)
-src/superclaude/mcp/       →  ~/.claude/superclaude/mcp/   (MCP server docs)
+src/superclaude/commands/  →  ~/.claude/commands/sc/       (31 slash commands)
+src/superclaude/agents/    →  ~/.claude/agents/             (21 agent definitions)
+src/superclaude/skills/    →  ~/.claude/skills/             (skill implementations)
+src/superclaude/core/      →  ~/.claude/superclaude/core/   (FLAGS, PRINCIPLES, RULES)
+src/superclaude/modes/     →  ~/.claude/superclaude/modes/  (8 behavioral modes)
+src/superclaude/mcp/       →  ~/.claude/superclaude/mcp/    (MCP server documentation)
 ```
 
-This mapping is defined in `src/superclaude/cli/install_paths.py` (the `COMPONENTS` dict). The install logic is split across four submodules under `cli/`:
+This mapping is defined in `src/superclaude/cli/install_paths.py` (the `COMPONENTS` dict). The install logic is split across submodules under `cli/`:
 - `install_paths.py` — Path resolution (leaf dependency, no internal imports)
-- `install_settings.py` — Settings, hooks, CLAUDE.md management
-- `install_components.py` — Component installation orchestration
+- `install_settings.py` — Settings, hooks, CLAUDE.md management (leaf dependency)
+- `install_components.py` — Component installation orchestration (imports from paths + settings)
 - `install_inventory.py` — Listing and uninstallation
+- `install_commands.py` — Top-level command wiring (imports from all above)
+- `install_skill.py` — Individual skill installation with `{{SKILLS_PATH}}` template resolution
+- `install_mcp.py` — MCP server configuration into settings.json
+
+### Key Architectural Decisions
+
+- **Editable install via `make deploy`**: Uses `uv tool install --editable .` so changes in `src/` reflect immediately without reinstalling.
+- **CLAUDE_SC.md import**: Installation adds `@superclaude/CLAUDE_SC.md` to the user's `~/.claude/CLAUDE.md`, which chains to `core/FLAGS.md`, `core/PRINCIPLES.md`, and `core/RULES.md`.
+- **Hooks merge (not replace)**: `install_settings.py` merges SuperClaude hooks into existing `settings.json` using marker-based identification (`SUPERCLAUDE_HOOK_MARKERS`), preserving user hooks.
+- **Template variables**: Skill manifests (`SKILL.md`) support `{{SCRIPTS_PATH}}` and `{{SKILLS_PATH}}` placeholders resolved at install time based on scope.
 
 ### Package Structure
 
@@ -71,43 +81,28 @@ src/superclaude/
 ├── pm_agent/            # Core Python patterns
 │   ├── confidence.py    # Pre-execution check (Protocol-based, extensible checks)
 │   ├── self_check.py    # Post-implementation validation
-│   ├── reflexion.py     # Cross-session error learning
-│   └── token_budget.py  # simple: 200, medium: 1000, complex: 2500
+│   ├── reflexion.py     # Cross-session error learning (JSONL storage)
+│   ├── token_budget.py  # simple: 200, medium: 1000, complex: 2500
+│   └── task_cleanup.py  # Stale task removal (24h threshold)
 ├── execution/
 │   ├── parallel.py      # Wave→Checkpoint→Wave pattern
+│   ├── reflection.py    # Meta-reasoning
 │   └── self_correction.py
 ├── cli/                 # Click-based CLI (superclaude command)
-│   ├── main.py          # @click.group with subcommands: install, uninstall, mcp, update, etc.
-│   ├── install_paths.py
-│   ├── install_components.py
-│   ├── install_settings.py
-│   ├── install_inventory.py
-│   ├── install_commands.py
-│   ├── install_skill.py
-│   ├── install_mcp.py
-│   └── doctor.py
+│   └── main.py          # @click.group: install, uninstall, update, mcp, doctor, agents, skills, install-skill, version
 ├── hooks/
-│   ├── hooks.json         # Hook definitions template (SessionStart, UserPromptSubmit, PostToolUse)
-│   ├── hook_tracker.py    # once: true session tracking (24h TTL, state in ~/.claude/.superclaude_hooks/)
-│   ├── inline_hooks.py    # Frontmatter hook parser
-│   └── mcp_fallback.py    # MCP server availability fallback handling
-├── commands/            # 30 slash command markdown files (installed to ~/.claude/commands/sc/)
-├── agents/              # 20 agent definition markdown files
+│   ├── hooks.json       # Hook definitions template (SessionStart, UserPromptSubmit, PostToolUse)
+│   ├── hook_tracker.py  # once: true session tracking (24h TTL, state in ~/.claude/.superclaude_hooks/)
+│   ├── inline_hooks.py  # YAML frontmatter parser for skills/agents/commands
+│   └── mcp_fallback.py  # MCP server availability fallback handling
+├── utils/               # Shared utilities (atomic_write_json)
+├── commands/            # 31 slash command markdown files
+├── agents/              # 21 agent definition markdown files
+├── skills/              # Skill directories with SKILL.md manifests
 ├── modes/               # 8 behavioral mode markdown files
-├── mcp/                 # MCP server docs + configs/ (MCP_INDEX.md removed, merged into core/FLAGS.md)
+├── mcp/                 # MCP server docs + configs/
 ├── core/                # FLAGS.md, PRINCIPLES.md, RULES.md
-├── skills/              # Skill implementations (directories with SKILL.md manifests)
-└── scripts/             # Shell/Python utilities (includes context_reset.py for /clear and /compact)
-```
-
-### Entry Points (pyproject.toml)
-
-```toml
-[project.scripts]
-superclaude = "superclaude.cli.main:main"     # CLI command
-
-[project.entry-points.pytest11]
-superclaude = "superclaude.pytest_plugin"      # Auto-loaded by pytest
+└── scripts/             # Shell/Python utilities (context_reset.py, session_init.py, etc.)
 ```
 
 ## Pytest Plugin
@@ -135,16 +130,24 @@ Auto-loaded after `uv pip install -e .`. The plugin (`pytest_plugin.py`) provide
 |---------|-------|---------|-----------|
 | ConfidenceChecker | `pm_agent/confidence.py` | Pre-execution gate | ≥90% proceed, 70-89% alternatives, <70% stop |
 | SelfCheckProtocol | `pm_agent/self_check.py` | Post-validation | Evidence required, no speculation |
-| ReflexionPattern | `pm_agent/reflexion.py` | Error learning | Cross-session pattern matching |
+| ReflexionPattern | `pm_agent/reflexion.py` | Error learning | Cross-session pattern matching (JSONL) |
 | TokenBudgetManager | `pm_agent/token_budget.py` | Token allocation | simple/medium/complex |
+| TaskCleanupManager | `pm_agent/task_cleanup.py` | Stale task removal | 24h threshold |
 
-`confidence.py` uses a Protocol-based design (`ConfidenceCheck` protocol) with pluggable checks: `NoDuplicatesCheck`, `ArchitectureCheck`, `OfficialDocsCheck`, `OssReferenceCheck`, `RootCauseCheck`, `PRStatusCheck`.
+`confidence.py` uses a Protocol-based design (`ConfidenceCheck` protocol) with pluggable checks. Default checks (weights summing to 1.0):
+- `NoDuplicatesCheck` (0.25) — searches for duplicate implementations
+- `ArchitectureCheck` (0.25) — verifies tech stack compliance via CLAUDE.md/pyproject.toml/package.json
+- `OfficialDocsCheck` (0.20) — confirms documentation exists
+- `OssReferenceCheck` (0.15) — matches against known OSS patterns database
+- `RootCauseCheck` (0.15) — validates root cause specificity
+
+`PRStatusCheck` exists but is not in `DEFAULT_CHECKS` — must be registered manually. `ConfidenceResult` supports numeric comparison operators (`result >= 0.9`) via `__float__`.
 
 ## Hooks System
 
 Located in `src/superclaude/hooks/`. Claude Code v2.1.0+ compatible.
 
-**Frontmatter fields** (parsed by `inline_hooks.py`):
+**Frontmatter fields** (parsed by `inline_hooks.py` using `pyyaml`):
 - `context: inline|fork` — execution context
 - `agent: <name>` — agent type for skill
 - `user-invocable: true|false` — visibility in menu
