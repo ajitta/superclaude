@@ -154,16 +154,6 @@ TRIGGER_MAP = [
         "mcp/MCP_Chrome-DevTools.md",
         2,
     ),
-    (
-        r"(mindbase|memory|conversation|conversation.?memory|session|semantic|embedding|pgvector|--mindbase)",
-        "mcp/MCP_Mindbase.md",
-        2,
-    ),
-    (
-        r"(airis|confidence|confidence.?check|research|index|repo.?index|optimize|sync|--airis)",
-        "mcp/MCP_Airis-Agent.md",
-        2,
-    ),
     # Business symbols/examples - Priority 3 (lower priority, supplementary)
     (r"(business.?symbol|strategic.?symbol|business.?example|panel.?example)", "core/BUSINESS_SYMBOLS.md", 3),
     # Note: PRINCIPLES.md removed - now loaded via CLAUDE_SC.md @-reference
@@ -251,14 +241,6 @@ INSTRUCTION_MAP = {
     "mcp/MCP_Chrome-DevTools.md": (
         "Chrome DevTools MCP: Core Web Vitals — CLS, LCP, FID, TTFB. CPU/memory profiling, "
         "layout shift detection, render blocking analysis."
-    ),
-    "mcp/MCP_Mindbase.md": (
-        "Mindbase MCP: Semantic memory with pgvector. Auto-embedding, conversation persistence, "
-        "cross-session memory, semantic search."
-    ),
-    "mcp/MCP_Airis-Agent.md": (
-        "Airis MCP: airis_confidence_check (pre-implementation validation), "
-        "airis_deep_research (comprehensive research), airis_repo_index (structure indexing)."
     ),
     # Core supplementary
     "core/BUSINESS_SYMBOLS.md": (

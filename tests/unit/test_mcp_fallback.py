@@ -117,7 +117,6 @@ class TestMcpFallback:
         expected_mcps = [
             "context7", "tavily", "sequential", "serena",
             "morphllm", "magic", "playwright", "devtools",
-            "mindbase", "airis-agent"
         ]
 
         for mcp in expected_mcps:

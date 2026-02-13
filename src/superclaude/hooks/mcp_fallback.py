@@ -30,8 +30,6 @@ MCP_FALLBACKS: dict[str, str] = {
     "magic": "Write (native)",
     "playwright": "--chrome (native)",
     "devtools": "Playwright",
-    "mindbase": "Serena memory",
-    "airis-agent": "Native",
 }
 
 

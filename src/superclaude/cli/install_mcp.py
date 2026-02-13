@@ -394,7 +394,6 @@ def show_mcp_status():
             "sequentialthinking": "sequential",
             "filesystemwithmorph": "morphllm",
             "chromedevtools": "devtools",
-            "airisagent": "airis-agent",
         }
         fallback_key = fallback_map.get(fallback_key, fallback_key)
         fallback = fallbacks.get(fallback_key, "Native")

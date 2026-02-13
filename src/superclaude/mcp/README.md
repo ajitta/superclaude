@@ -15,13 +15,6 @@ Configuration and usage docs for MCP (Model Context Protocol) servers integrated
 | Magic | `--magic` | UI component generation from 21st.dev patterns |
 | Morphllm | `--morph` | Pattern-based bulk code transformations |
 
-## Deprecated
-
-| Server | Replacement |
-|--------|-------------|
-| Mindbase | `airis-mcp-gateway` |
-| Airis-Agent | `airis-mcp-gateway` |
-
 ## Composite Flags
 
 | Flag | Servers Activated |

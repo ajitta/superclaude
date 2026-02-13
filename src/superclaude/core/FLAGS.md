@@ -27,7 +27,6 @@
 --frontend-verify: UI testing, frontend debug → Playwright + DevTools + Serena
 --all-mcp: max complexity → enable all MCP servers
 --no-mcp: native-only, perf priority → disable all MCP, use native + WebSearch
-Deprecated: --mindbase, --airis-agent → use airis-mcp-gateway instead
   </mcp>
 
   <native>
@@ -41,7 +40,6 @@ WebSearch: fact-check, current info → native web search (no flag needed)
 --effort max: unconstrained depth (Opus 4.6 exclusive) | MCP: all available
 
 Thinking: {type: "adaptive"} — Claude decides when/how much to think
-Deprecated: budget_tokens (removed for long-context >200K in Claude 4.6 migration)
 Legacy: --think→medium, --think-hard→high, --ultrathink→max+all-mcp
 Note: temperature incompatible with thinking; interleaved thinking automatic
   </effort>

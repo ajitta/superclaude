@@ -123,9 +123,3 @@ export class ConfidenceChecker {
         : "❌ Low (<70%) - STOP, investigate";
   }
 }
-
-/** @deprecated Use ConfidenceChecker */
-export const confidenceCheck = async (ctx: Context) =>
-  (await new ConfidenceChecker().assess(ctx)).score;
-export const getRecommendation = (c: number) =>
-  new ConfidenceChecker().getRec(c);

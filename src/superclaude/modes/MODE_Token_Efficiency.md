@@ -51,7 +51,5 @@
 | Build completed, running tests, then deploying | build done >> test progress >> deploy pending |
   </examples>
 
-  <deprecated v="5.1">double-arrow->arrow | bidirectional-arrow->arrow | therefore->arrow | because->prose</deprecated>
-
   <bounds will="symbol communication|30-50% token reduction|compressed clarity" wont="sacrifice info quality|lose critical context|compress beyond readability" fallback="Revert to default behavior when inapplicable"/>
 </component>

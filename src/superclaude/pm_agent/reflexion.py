@@ -13,7 +13,6 @@ Performance:
 
 Storage Strategy:
     - Primary: docs/memory/solutions_learned.jsonl (local file)
-    - Secondary: mindbase (if available, semantic search)
     - Fallback: grep-based text search
 
 Process:
