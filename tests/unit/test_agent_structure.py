@@ -253,8 +253,10 @@ class TestSimplicityGuideSpecific:
     def test_has_anti_patterns(self):
         assert "<anti_patterns" in self.content
 
-    def test_has_checkpoints(self):
-        assert "<checkpoints" in self.content
+    def test_has_osl_gate_in_checklist(self):
+        """Checkpoints merged into checklist — OSL meta-check preserved."""
+        assert "<checklist" in self.content
+        assert "simplicity" in self.content.lower()
 
     def test_has_differentiation(self):
         """Should distinguish itself from adjacent agents."""
