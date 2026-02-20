@@ -22,7 +22,7 @@ hooks:
     - matcher: "WebFetch|WebSearch"
       hooks:
         - type: command
-          command: python {{SCRIPTS_PATH}}/validate_confidence_context.py
+          command: "python3 {{SKILLS_PATH}}/confidence-check/scripts/validate_confidence_context.py"
           timeout: 30
           once: true
 ---
@@ -79,5 +79,16 @@ def test_feature(confidence_checker):
 
   <roi>100-200 tokens check → saves 5,000-50,000 tokens (25-250x ROI)</roi>
 
+  <hooks note="validate_confidence_context.py runs on PreToolUse for WebFetch/WebSearch — injects evidence-focus guidance (once per session)"/>
+
   <bounds will="pre-implementation validation|evidence-based assessment" wont="runtime checks|modify code"/>
+
+  <checklist>
+- [ ] All 5 checks evaluated (duplicates, architecture, docs, OSS, root cause)
+- [ ] Score computed with correct weights (25/25/20/15/15)
+- [ ] Recommendation matches threshold (≥90% proceed, 70-89% investigate, <70% stop)
+- [ ] Evidence sources cited for each check
+  </checklist>
+
+  <handoff next="/sc:implement /sc:test /sc:analyze"/>
 </component>
