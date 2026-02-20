@@ -30,8 +30,9 @@ def _resolve_template_paths(base_path: Path, scope: str = "user") -> dict:
         scripts = ".claude/superclaude/scripts"
         skills = ".claude/skills"
     else:
-        scripts = str((base_path / "superclaude" / "scripts").resolve())
-        skills = str((base_path / "skills").resolve())
+        # Use as_posix() to avoid Windows backslashes breaking YAML parsing
+        scripts = (base_path / "superclaude" / "scripts").resolve().as_posix()
+        skills = (base_path / "skills").resolve().as_posix()
     return {"{{SCRIPTS_PATH}}": scripts, "{{SKILLS_PATH}}": skills}
 
 
