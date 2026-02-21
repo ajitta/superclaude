@@ -1,22 +1,9 @@
 ---
 name: confidence-check
 description: Pre-implementation confidence assessment (≥90% to proceed)
-user-invokable: true
 metadata:
-  triggers: /confidence-check, pre-implementation, verify-before-implementing, sanity-check
-  mcp: c7:docs|tavily:oss-search
   context: inline
   agent: quality-engineer
-  allowed-tools:
-    - Read
-    - Grep
-    - Glob
-    - WebFetch
-    - WebSearch
-    - mcp__context7__*
-    - mcp__tavily__*
-    - mcp__serena__find_symbol
-    - mcp__serena__search_for_pattern
   hooks:
     PreToolUse:
       - matcher: "WebFetch|WebSearch"

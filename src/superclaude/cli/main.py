@@ -484,12 +484,8 @@ def agents(list_only: bool, agent_name: str, tokens: bool, scope: str):
         click.echo(f"📋 Agent: {agent_file.stem}\n")
         click.echo(f"   Name: {fm.get('name', agent_file.stem)}")
         click.echo(f"   Description: {fm.get('description', 'N/A')}")
-        if fm.get('triggers'):
-            click.echo(f"   Triggers: {fm.get('triggers')}")
         if fm.get('context'):
             click.echo(f"   Context: {fm.get('context')}")
-        if fm.get('allowed-tools'):
-            click.echo(f"   Allowed Tools: {', '.join(fm.get('allowed-tools', []))}")
 
         click.echo(f"\n   File: {agent_file}")
         click.echo(f"   Tokens: ~{len(content) // 4}")
@@ -614,18 +610,12 @@ def skills(list_only: bool, skill_name: str, tokens: bool, scope: str):
         click.echo(f"📋 Skill: {skill_dir.name}\n")
         click.echo(f"   Name: {fm.get('name', skill_dir.name)}")
         click.echo(f"   Description: {fm.get('description', 'N/A')}")
-        if fm.get('triggers'):
-            click.echo(f"   Triggers: {fm.get('triggers')}")
         if fm.get('context'):
-            click.echo(f"   Context: {fm.get('context')} (v2.1.0)")
+            click.echo(f"   Context: {fm.get('context')}")
         if fm.get('agent'):
-            click.echo(f"   Agent: {fm.get('agent')} (v2.1.0)")
-        if fm.get('user-invocable') is False:
-            click.echo("   User-Invocable: false (v2.1.0)")
-        if fm.get('allowed-tools'):
-            click.echo(f"   Allowed Tools: {len(fm.get('allowed-tools', []))} tools (v2.1.0)")
+            click.echo(f"   Agent: {fm.get('agent')}")
         if fm.get('hooks'):
-            click.echo(f"   Hooks: {list(fm.get('hooks', {}).keys())} (v2.1.0)")
+            click.echo(f"   Hooks: {list(fm.get('hooks', {}).keys())}")
 
         click.echo(f"\n   Path: {skill_dir}")
 
