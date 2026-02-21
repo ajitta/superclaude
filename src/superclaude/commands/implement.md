@@ -15,9 +15,10 @@ description: Feature and code implementation with intelligent persona activation
   <flow>
     1. Analyze: Requirements + tech context
     2. Plan: Approach + activate personas
-    3. Generate: Code + framework best practices
-    4. Validate: Security + quality checks
-    5. Integrate: Docs + testing recs
+    3. Checkpoint: If changes affect >3 files → present numbered plan → wait for user approval before editing
+    4. Generate: Code + framework best practices
+    5. Validate: Security + quality checks
+    6. Integrate: Docs + testing recs
   </flow>
 
   <mcp servers="c7|seq|magic|play"/>

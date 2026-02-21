@@ -15,9 +15,10 @@ description: Diagnose and resolve issues in code, builds, deployments, and syste
   <flow>
     1. Analyze: Issue description + system state
     2. Investigate: Root causes via pattern analysis
-    3. Debug: Structured procedures + log examination
-    4. Propose: Solution + impact assessment
-    5. Resolve: Apply fixes + verify effectiveness
+    3. Debug: Structured procedures + log examination (max 3 hypothesis-test cycles)
+    4. Escalate: If no root cause after 3 rounds → summarize hypotheses + evidence → ask user for guidance
+    5. Propose: Solution + impact assessment
+    6. Resolve: Apply fixes + verify effectiveness
   </flow>
 
   <tools>

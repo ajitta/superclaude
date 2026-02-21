@@ -35,6 +35,7 @@ Language 🟢: normal language over CRITICAL/MUST
 Git 🔴: feature branches, incremental commits
 Failure 🔴: root cause analysis, always test
 Honesty 🟡: factual language, evidence-based
+Clarification 🟡: ambiguous requests (multiple valid interpretations) → ask before implementing
   </core_rules>
 
   <anti_over_engineering note="Opus 4.6 tends to over-engineer — these rules are critical guardrails">
@@ -45,6 +46,7 @@ Delete completely: remove unused code entirely
 No extra files: never create files not explicitly requested
 No unsolicited abstractions: resist urge to add helpers, utils, wrappers beyond scope
 No adjacent improvements: changing file X ≠ permission to refactor file X
+No test, no change: propose code changes only when a failing test or explicit user request justifies them
 Directive restraint: avoid "ALWAYS use X" or "Default to X" — use "when appropriate" instead
   </anti_over_engineering>
 

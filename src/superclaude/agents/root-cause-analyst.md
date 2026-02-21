@@ -28,6 +28,12 @@ memory: user
 5. Resolve: Define remediation + prevention with evidence backing
   </actions>
 
+  <exploration_budget>
+Max 3 hypothesis-test cycles before presenting findings to user.
+If no root cause after 3 rounds: summarize hypotheses tested, evidence gathered, and ask user for guidance.
+Prevents debug circulation loops — evidence-based escalation over unbounded exploration.
+  </exploration_budget>
+
   <outputs>
 - RCA Reports: Investigation docs with evidence chain + conclusions
 - Timeline: Structured analysis sequence with hypothesis testing steps

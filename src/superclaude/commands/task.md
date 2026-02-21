@@ -15,10 +15,11 @@ description: Execute complex tasks with intelligent workflow management and dele
   <flow>
     1. Analyze: Parse requirements + optimal strategy
     2. Delegate: Route to MCP + activate personas
-    3. Coordinate: Intelligent workflow + parallel
-    4. Validate: Quality gates + completion verification
-    5. Optimize: Performance analysis + recs
-    6. Cleanup: Auto-remove stale/completed tasks (--cleanup)
+    3. Checkpoint: If changes affect >3 files → present numbered plan → wait for user approval before editing
+    4. Coordinate: Intelligent workflow + parallel
+    5. Validate: Quality gates + completion verification
+    6. Optimize: Performance analysis + recs
+    7. Cleanup: Auto-remove stale/completed tasks (--cleanup)
   </flow>
 
   <task_cleanup note="Claude Code 2.1.37+">
