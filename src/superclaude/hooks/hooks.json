@@ -76,7 +76,7 @@
     ],
     "TeammateIdle": [
       {
-        "_comment": "[experimental] Requires CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 (v2.1.33)",
+        "_comment": "[superclaude] experimental — Requires CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 (v2.1.33)",
         "hooks": [
           {
             "type": "command",
@@ -88,7 +88,7 @@
     ],
     "TaskCompleted": [
       {
-        "_comment": "[experimental] Requires CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 (v2.1.33)",
+        "_comment": "[superclaude] experimental — Requires CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 (v2.1.33)",
         "hooks": [
           {
             "type": "command",

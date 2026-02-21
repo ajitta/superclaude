@@ -71,8 +71,14 @@ def _is_superclaude_hook(hook_entry: dict) -> bool:
         hook_entry: A hook entry dict with "hooks" array
 
     Returns:
-        True if any hook command contains SuperClaude markers
+        True if any hook command contains SuperClaude markers,
+        or the entry's _comment references experimental agent teams
     """
+    # Check _comment field on the hook entry itself
+    comment = hook_entry.get("_comment", "")
+    if any(marker in comment for marker in SUPERCLAUDE_HOOK_MARKERS):
+        return True
+
     for hook in hook_entry.get("hooks", []):
         cmd = hook.get("command", "")
         if any(marker in cmd for marker in SUPERCLAUDE_HOOK_MARKERS):
