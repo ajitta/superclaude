@@ -288,7 +288,24 @@ Content here
         assert fm["description"] == "A test skill"
 
     def test_parse_frontmatter_with_lists(self):
-        """Test frontmatter parsing with YAML lists."""
+        """Test frontmatter parsing with YAML lists in metadata."""
+        from superclaude.hooks.inline_hooks import parse_frontmatter
+
+        content = """---
+name: test-skill
+metadata:
+  allowed-tools:
+    - Read
+    - Grep
+    - WebFetch
+---
+"""
+        fm = parse_frontmatter(content)
+        assert fm["name"] == "test-skill"
+        assert fm["metadata"]["allowed-tools"] == ["Read", "Grep", "WebFetch"]
+
+    def test_parse_frontmatter_with_lists_root_compat(self):
+        """Test frontmatter parsing with YAML lists at root (backward compat)."""
         from superclaude.hooks.inline_hooks import parse_frontmatter
 
         content = """---
@@ -304,7 +321,43 @@ allowed-tools:
         assert fm["allowed-tools"] == ["Read", "Grep", "WebFetch"]
 
     def test_parse_inline_hooks(self):
-        """Test inline hooks parsing with nested (Claude Code native) format."""
+        """Test inline hooks parsing with nested format in metadata."""
+        from superclaude.hooks.inline_hooks import parse_inline_hooks
+
+        fm = {
+            "metadata": {
+                "hooks": {
+                    "PreToolUse": [
+                        {
+                            "matcher": "WebFetch|WebSearch",
+                            "hooks": [
+                                {"type": "command", "command": "echo pre", "once": True}
+                            ],
+                        }
+                    ],
+                    "PostToolUse": [
+                        {
+                            "matcher": "Write",
+                            "hooks": [
+                                {"type": "command", "command": "echo post"}
+                            ],
+                        }
+                    ],
+                }
+            }
+        }
+
+        hooks = parse_inline_hooks(fm)
+        assert hooks.has_hooks() is True
+        assert len(hooks.pre_tool_use) == 1
+        assert len(hooks.post_tool_use) == 1
+        assert hooks.pre_tool_use[0].once is True
+        assert hooks.pre_tool_use[0].matcher == "WebFetch|WebSearch"
+        assert hooks.post_tool_use[0].once is False
+        assert hooks.post_tool_use[0].matcher == "Write"
+
+    def test_parse_inline_hooks_root_compat(self):
+        """Test inline hooks parsing from root level (backward compat)."""
         from superclaude.hooks.inline_hooks import parse_inline_hooks
 
         fm = {
@@ -317,25 +370,13 @@ allowed-tools:
                         ],
                     }
                 ],
-                "PostToolUse": [
-                    {
-                        "matcher": "Write",
-                        "hooks": [
-                            {"type": "command", "command": "echo post"}
-                        ],
-                    }
-                ],
             }
         }
 
         hooks = parse_inline_hooks(fm)
         assert hooks.has_hooks() is True
         assert len(hooks.pre_tool_use) == 1
-        assert len(hooks.post_tool_use) == 1
         assert hooks.pre_tool_use[0].once is True
-        assert hooks.pre_tool_use[0].matcher == "WebFetch|WebSearch"
-        assert hooks.post_tool_use[0].once is False
-        assert hooks.post_tool_use[0].matcher == "Write"
 
     def test_parse_inline_hooks_flat_format_legacy(self):
         """Test inline hooks parsing with flat (legacy) format for backward compat."""
@@ -436,15 +477,29 @@ allowed-tools:
         fm = {"name": "test"}
         assert get_skill_context(fm) == "inline"
 
-    def test_get_skill_context_fork(self):
-        """Test fork context detection."""
+    def test_get_skill_context_fork_metadata(self):
+        """Test fork context detection from metadata."""
+        from superclaude.hooks.inline_hooks import get_skill_context
+
+        fm = {"name": "test", "metadata": {"context": "fork"}}
+        assert get_skill_context(fm) == "fork"
+
+    def test_get_skill_context_fork_root_compat(self):
+        """Test fork context detection from root (backward compat)."""
         from superclaude.hooks.inline_hooks import get_skill_context
 
         fm = {"name": "test", "context": "fork"}
         assert get_skill_context(fm) == "fork"
 
-    def test_get_skill_agent(self):
-        """Test agent field retrieval."""
+    def test_get_skill_agent_metadata(self):
+        """Test agent field retrieval from metadata."""
+        from superclaude.hooks.inline_hooks import get_skill_agent
+
+        fm = {"name": "test", "metadata": {"agent": "backend-architect"}}
+        assert get_skill_agent(fm) == "backend-architect"
+
+    def test_get_skill_agent_root_compat(self):
+        """Test agent field retrieval from root (backward compat)."""
         from superclaude.hooks.inline_hooks import get_skill_agent
 
         fm = {"name": "test", "agent": "backend-architect"}
@@ -460,15 +515,36 @@ allowed-tools:
         fm = {"name": "test"}
         assert is_user_invocable(fm) is True
 
-    def test_is_user_invocable_false(self):
-        """Test user-invocable can be set to False."""
+    def test_is_user_invocable_false_invokable(self):
+        """Test user-invokable (correct spelling) set to False."""
+        from superclaude.hooks.inline_hooks import is_user_invocable
+
+        fm = {"name": "test", "user-invokable": False}
+        assert is_user_invocable(fm) is False
+
+    def test_is_user_invocable_false_legacy(self):
+        """Test user-invocable (legacy spelling) set to False."""
         from superclaude.hooks.inline_hooks import is_user_invocable
 
         fm = {"name": "test", "user-invocable": False}
         assert is_user_invocable(fm) is False
 
-    def test_get_allowed_tools(self):
-        """Test allowed-tools retrieval."""
+    def test_is_user_invocable_metadata(self):
+        """Test user-invokable in metadata."""
+        from superclaude.hooks.inline_hooks import is_user_invocable
+
+        fm = {"name": "test", "metadata": {"user-invokable": False}}
+        assert is_user_invocable(fm) is False
+
+    def test_get_allowed_tools_metadata(self):
+        """Test allowed-tools retrieval from metadata."""
+        from superclaude.hooks.inline_hooks import get_allowed_tools
+
+        fm = {"metadata": {"allowed-tools": ["Read", "Grep", "mcp__serena__*"]}}
+        assert get_allowed_tools(fm) == ["Read", "Grep", "mcp__serena__*"]
+
+    def test_get_allowed_tools_root_compat(self):
+        """Test allowed-tools retrieval from root (backward compat)."""
         from superclaude.hooks.inline_hooks import get_allowed_tools
 
         fm = {"allowed-tools": ["Read", "Grep", "mcp__serena__*"]}

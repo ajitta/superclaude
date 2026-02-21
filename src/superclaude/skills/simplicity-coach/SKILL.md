@@ -1,29 +1,29 @@
 ---
 name: simplicity-coach
 description: Interactive OSL coaching, daybook journaling, dependency audits, and simplicity reviews
-triggers: /simplicity-coach, OSL coaching, daybook, engineering journal, dependency audit, simplicity review, 3 levels of feedback
-context: inline
-agent: simplicity-guide
-user-invocable: true
-mcp: c7:docs|serena:symbols|tavily:deps
-allowed-tools:
-  - Read
-  - Grep
-  - Glob
-  - WebSearch
-  - mcp__context7__*
-  - mcp__serena__find_symbol
-  - mcp__serena__get_symbols_overview
-  - mcp__serena__search_for_pattern
-  - mcp__tavily__tavily_search
-
-hooks:
-  Stop:
-    - hooks:
-        - type: command
-          command: "python3 {{SKILLS_PATH}}/simplicity-coach/scripts/dependency-audit.py ."
-          timeout: 15
-          once: true
+user-invokable: true
+metadata:
+  triggers: /simplicity-coach, OSL coaching, daybook, engineering journal, dependency audit, simplicity review, 3 levels of feedback
+  context: inline
+  agent: simplicity-guide
+  mcp: c7:docs|serena:symbols|tavily:deps
+  allowed-tools:
+    - Read
+    - Grep
+    - Glob
+    - WebSearch
+    - mcp__context7__*
+    - mcp__serena__find_symbol
+    - mcp__serena__get_symbols_overview
+    - mcp__serena__search_for_pattern
+    - mcp__tavily__tavily_search
+  hooks:
+    Stop:
+      - hooks:
+          - type: command
+            command: "python3 {{SKILLS_PATH}}/simplicity-coach/scripts/dependency-audit.py ."
+            timeout: 15
+            once: true
 ---
 <component name="simplicity-coach" type="skill">
 

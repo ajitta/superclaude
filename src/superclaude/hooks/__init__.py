@@ -18,6 +18,7 @@ from superclaude.hooks.hook_tracker import (
 from superclaude.hooks.inline_hooks import (
     InlineHook,
     InlineHooks,
+    _get_meta_value,
     get_allowed_tools,
     get_skill_agent,
     get_skill_context,
@@ -41,6 +42,7 @@ __all__ = [
     # inline_hooks
     "InlineHook",
     "InlineHooks",
+    "_get_meta_value",
     "parse_frontmatter",
     "parse_inline_hooks",
     "parse_skill_frontmatter",

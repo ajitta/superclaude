@@ -121,6 +121,28 @@ def parse_frontmatter(content: str) -> dict:
     return result
 
 
+def _get_meta_value(frontmatter: dict, key: str, default=None):
+    """Get a value from frontmatter, checking metadata first then root.
+
+    Claude Code skill schema only supports a fixed set of top-level attributes.
+    Custom attributes (context, agent, allowed-tools, hooks, etc.) are stored
+    under the ``metadata`` key. This helper checks ``metadata`` first, then
+    falls back to root-level for backward compatibility with older manifests.
+
+    Args:
+        frontmatter: Parsed frontmatter dictionary
+        key: The attribute key to look up
+        default: Default value if not found
+
+    Returns:
+        The value from metadata or root, or default
+    """
+    metadata = frontmatter.get("metadata")
+    if isinstance(metadata, dict) and key in metadata:
+        return metadata[key]
+    return frontmatter.get(key, default)
+
+
 def parse_inline_hooks(frontmatter: dict) -> InlineHooks:
     """Parse inline hooks from frontmatter dictionary.
 
@@ -130,7 +152,7 @@ def parse_inline_hooks(frontmatter: dict) -> InlineHooks:
     Returns:
         InlineHooks container with parsed hooks
     """
-    hooks_data = frontmatter.get("hooks", {})
+    hooks_data = _get_meta_value(frontmatter, "hooks", {})
     if not hooks_data or not isinstance(hooks_data, dict):
         return InlineHooks()
 
@@ -233,7 +255,7 @@ def get_skill_context(frontmatter: dict) -> Literal["inline", "fork"]:
     Returns:
         'inline' (default) or 'fork' for sub-agent execution
     """
-    context: str = frontmatter.get("context", "inline")
+    context: str = _get_meta_value(frontmatter, "context", "inline")
     if context in ("inline", "fork"):
         return context  # type: ignore[return-value]
     return "inline"
@@ -248,7 +270,7 @@ def get_skill_agent(frontmatter: dict) -> str | None:
     Returns:
         Agent name or None if not specified
     """
-    return frontmatter.get("agent")
+    return _get_meta_value(frontmatter, "agent")
 
 
 def is_user_invocable(frontmatter: dict) -> bool:
@@ -260,8 +282,14 @@ def is_user_invocable(frontmatter: dict) -> bool:
     Returns:
         True (default) if visible in menu, False if hidden
     """
-    result: bool = frontmatter.get("user-invocable", True)
-    return result
+    # Check official spelling (user-invokable) first, then legacy (user-invocable)
+    for key in ("user-invokable", "user-invocable"):
+        metadata = frontmatter.get("metadata")
+        if isinstance(metadata, dict) and key in metadata:
+            return metadata[key]
+        if key in frontmatter:
+            return frontmatter[key]
+    return True
 
 
 def get_allowed_tools(frontmatter: dict) -> list[str]:
@@ -273,7 +301,7 @@ def get_allowed_tools(frontmatter: dict) -> list[str]:
     Returns:
         List of allowed tool patterns, empty list means all allowed
     """
-    tools = frontmatter.get("allowed-tools", [])
+    tools = _get_meta_value(frontmatter, "allowed-tools", [])
     if isinstance(tools, list):
         return tools
     return []
