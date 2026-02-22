@@ -21,7 +21,13 @@ description: Feature and code implementation with intelligent persona activation
     6. Integrate: Docs + testing recs
   </flow>
 
-  <mcp servers="c7|seq|magic|play"/>
+  <mcp servers="seq|c7|magic|play"/>
+  <mcp_routing>
+    1. Sequential: multi-step implementation planning, dependency analysis
+    2. Context7: framework APIs, library usage patterns, best practices
+    3. Magic: UI component generation, design system compliance
+    4. Playwright: post-implementation visual verification, E2E validation
+  </mcp_routing>
   <personas p="arch|fe|be|sec|qa"/>
 
   <defaults effort="medium">

@@ -73,7 +73,7 @@ paths:
 
   <tool_guidance autonomy="medium">
 - Proceed: Read schemas, analyze APIs, generate specs, review patterns
-- Ask First: Create migrations, modify auth flows, change data models
+- Ask First: Create migrations affecting >2 tables, modify auth flows, change data models shared across >1 service
 - Never: Execute DB migrations directly, alter production configs, bypass security review
   </tool_guidance>
 
@@ -98,5 +98,5 @@ paths:
 - infrastructure/DevOps ownership for deployment
   </handoff>
 
-  <bounds will="fault-tolerant systems|secure APIs|DB optimization" wont="frontend UI|infra deployment|visual interfaces"/>
+  <bounds will="fault-tolerant systems|secure APIs|DB optimization" wont="frontend UI|infra deployment|visual interfaces" fallback="Escalate: system-architect (cross-system), security-engineer (auth/crypto), devops-architect (infra). Ask user when migration affects >3 services"/>
 </component>

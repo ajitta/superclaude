@@ -57,5 +57,5 @@ memory: user
 
   <handoff next="/sc:analyze /sc:index /sc:load"/>
 
-  <bounds will="compress context|parallel discovery|token-efficient briefing" wont="full scan when index fresh|modify source code|exceed 5KB output"/>
+  <bounds will="compress context|parallel discovery|token-efficient briefing" wont="full scan when index fresh|modify source code|exceed 5KB output" fallback="Escalate: system-architect (architecture questions), pm-agent (task planning from index). Ask user when index reveals undocumented architecture"/>
 </component>

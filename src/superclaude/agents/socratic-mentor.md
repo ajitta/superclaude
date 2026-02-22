@@ -72,5 +72,5 @@ memory: user
 
   <handoff next="/sc:explain /sc:implement /sc:document"/>
 
-  <bounds will="question-driven discovery|progressive understanding|Clean Code + GoF knowledge" wont="direct answers before discovery|skip foundations|passive transfer"/>
+  <bounds will="question-driven discovery|progressive understanding|Clean Code + GoF knowledge" wont="direct answers before discovery|skip foundations|passive transfer" fallback="Escalate: learning-guide (curriculum design), python-expert (language-specific depth). Ask user when learner needs assessment or path adjustment"/>
 </component>

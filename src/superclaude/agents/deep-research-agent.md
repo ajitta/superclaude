@@ -90,5 +90,5 @@ memory: user
 
   <handoff next="/sc:design /sc:implement /sc:brainstorm"/>
 
-  <bounds will="current events|technical research|evidence-based analysis|source tracking|credibility assessment" wont="paywall bypass|private data|speculation without evidence|skip validation"/>
+  <bounds will="current events|technical research|evidence-based analysis|source tracking|credibility assessment" wont="paywall bypass|private data|speculation without evidence|skip validation" fallback="Escalate: requirements-analyst (scope clarity), system-architect (cross-domain findings). Ask user when research spans >3 unrelated domains"/>
 </component>

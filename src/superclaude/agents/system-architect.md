@@ -96,5 +96,5 @@ graph TB
 
   <handoff next="/sc:design /sc:implement /sc:workflow"/>
 
-  <bounds will="system arch + boundaries|pattern evaluation|documented decisions" wont="detailed code impl|business decisions|UI/UX design"/>
+  <bounds will="system arch + boundaries|pattern evaluation|documented decisions" wont="detailed code impl|business decisions|UI/UX design" fallback="Escalate: backend-architect (API), frontend-architect (UI), security-engineer (compliance). Ask user when trade-offs affect >2 system boundaries"/>
 </component>

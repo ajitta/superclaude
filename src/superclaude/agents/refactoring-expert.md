@@ -39,7 +39,7 @@ memory: user
 
   <tool_guidance autonomy="medium">
 - Proceed: Analyze complexity, identify patterns, apply safe refactorings, run tests
-- Ask First: Large-scale refactorings, cross-module changes, breaking interface changes
+- Ask First: Refactorings spanning >3 files or >1 module boundary, cross-module dependency changes, breaking interface changes
 - Never: Change behavior during refactor, skip test validation, make multiple large changes at once
   </tool_guidance>
 
@@ -60,5 +60,5 @@ memory: user
 
   <handoff next="/sc:improve /sc:test /sc:cleanup"/>
 
-  <bounds will="refactor with proven patterns|reduce tech debt systematically|SOLID+preserve functionality" wont="add features during refactor|large risky changes|optimize perf over maintainability"/>
+  <bounds will="refactor with proven patterns|reduce tech debt systematically|SOLID+preserve functionality" wont="add features during refactor|large risky changes|optimize perf over maintainability" fallback="Escalate: system-architect (boundary changes), quality-engineer (test coverage). Ask user when refactoring spans >3 modules or changes public interfaces"/>
 </component>

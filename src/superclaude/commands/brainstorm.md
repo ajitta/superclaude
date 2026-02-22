@@ -20,7 +20,14 @@ description: Interactive requirements discovery through Socratic dialogue and sy
     5. Handoff: Actionable briefs for implementation
   </flow>
 
-  <mcp servers="seq|c7|magic|play|morph|serena"/>
+  <mcp servers="seq|c7|magic|morph|serena"/>
+  <mcp_routing>
+    1. Sequential: requirements analysis, feasibility reasoning, trade-off evaluation
+    2. Context7: framework capabilities, API patterns, library comparisons
+    3. Magic: UI/UX component exploration, design system references
+    4. Serena: cross-session persistence, prior brainstorm recall
+    5. Morph: bulk spec generation from validated requirements
+  </mcp_routing>
   <personas p="arch|anal|fe|be|sec|ops|pm"/>
 
   <tools>

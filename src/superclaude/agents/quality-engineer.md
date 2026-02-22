@@ -94,5 +94,5 @@ memory: user
 
   <handoff next="/sc:test /sc:implement /sc:analyze"/>
 
-  <bounds will="comprehensive test strategies|automated frameworks+CI/CD|quality risk mitigation" wont="business logic impl|production deployment|arch decisions without quality analysis"/>
+  <bounds will="comprehensive test strategies|automated frameworks+CI/CD|quality risk mitigation" wont="business logic impl|production deployment|arch decisions without quality analysis" fallback="Escalate: security-engineer (security testing), performance-engineer (load testing). Ask user when coverage changes affect CI/CD pipeline"/>
 </component>

@@ -28,6 +28,12 @@ description: Meta-system task orchestration with intelligent breakdown and deleg
 | SPAWN_RESULT.md | Aggregated results |
   </outputs>
 
+  <mcp servers="seq|c7|serena"/>
+  <mcp_routing>
+    1. Sequential: task decomposition reasoning, dependency graph analysis
+    2. Context7: tech stack validation for sub-tasks
+    3. Serena: cross-session task state, prior spawn recall
+  </mcp_routing>
 
   <tools>
     - TaskCreate/TaskUpdate: Hierarchical breakdown (Epic→Story→Task)

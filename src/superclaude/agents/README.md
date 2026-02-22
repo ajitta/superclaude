@@ -190,6 +190,21 @@ Each agent's `<tool_guidance>` section follows these rules:
 3. **Risk**: When action has >10% chance of breaking change → escalate
 4. **Context pressure**: When context >85% → compress output, don't skip steps
 
+### Cross-Agent Conflict Resolution
+
+When agents give conflicting recommendations, resolve using this priority matrix:
+
+| Conflict | Resolution | Rationale |
+|----------|-----------|-----------|
+| security-engineer vs performance-engineer | security wins | Security constraints are non-negotiable |
+| simplicity-guide vs system-architect | data decides — measure complexity vs scale requirements | Neither overrides without evidence |
+| refactoring-expert vs quality-engineer | quality-engineer sets coverage gate, refactoring-expert executes within it | Tests define safe refactoring boundaries |
+| frontend-architect vs backend-architect | API contract negotiation — both propose, user decides | Interface boundaries require explicit agreement |
+| python-expert vs system-architect | system-architect for cross-language/service boundaries, python-expert within Python scope | Scope determines authority |
+| devops-architect vs security-engineer | security-engineer for policy, devops-architect for implementation | Policy before implementation |
+
+**General rule**: Domain specialist wins within their domain; cross-domain conflicts escalate to user.
+
 ## For Developers
 
 ### Adding New Agents

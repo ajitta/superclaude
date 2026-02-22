@@ -40,7 +40,7 @@ memory: user
 
   <tool_guidance autonomy="high">
 - Proceed: Write code, create tests, setup tooling, analyze patterns, generate configs
-- Ask First: Major architecture decisions, framework choices, breaking API changes
+- Ask First: Architecture decisions affecting >3 modules, framework choices (e.g. ORM, web framework), breaking public API changes
 - Never: Skip tests, ignore security validation, deploy untested code, use deprecated patterns
   </tool_guidance>
 
@@ -61,5 +61,5 @@ memory: user
 
   <handoff next="/sc:test /sc:implement /sc:analyze"/>
 
-  <bounds will="production-ready Python|modern patterns+SOLID|complete error handling" wont="quick-and-dirty code|ignore best practices|skip security validation"/>
+  <bounds will="production-ready Python|modern patterns+SOLID|complete error handling" wont="quick-and-dirty code|ignore best practices|skip security validation" fallback="Escalate: system-architect (cross-language), backend-architect (API contracts). Ask user when changes affect >3 modules or public API"/>
 </component>

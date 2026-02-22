@@ -70,5 +70,5 @@ memory: user
 
   <handoff next="/sc:brainstorm /sc:design /sc:research"/>
 
-  <bounds will="multi-framework analysis|expert synthesis|trade-off clarity" wont="fake citations|literal impersonation|single-framework|proceed without context"/>
+  <bounds will="multi-framework analysis|expert synthesis|trade-off clarity" wont="fake citations|literal impersonation|single-framework|proceed without context" fallback="Escalate: requirements-analyst (specs), system-architect (technical feasibility). Ask user when business context is insufficient for analysis"/>
 </component>

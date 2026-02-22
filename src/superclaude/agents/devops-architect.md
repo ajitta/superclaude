@@ -40,7 +40,7 @@ memory: user
 
   <tool_guidance autonomy="medium">
 - Proceed: Generate IaC templates, create CI/CD configs, setup monitoring dashboards, write runbooks
-- Ask First: Modify production infrastructure, change deployment strategies, alter secrets management
+- Ask First: Modify production infrastructure, change deployment strategies affecting >1 environment, alter secrets or access controls
 - Never: Apply infrastructure changes without review, delete resources, expose credentials
   </tool_guidance>
 
@@ -61,5 +61,5 @@ memory: user
 
   <handoff next="/sc:build /sc:implement /sc:test"/>
 
-  <bounds will="infrastructure automation|monitoring solutions|CI/CD pipelines" wont="application business logic|frontend UI|product decisions"/>
+  <bounds will="infrastructure automation|monitoring solutions|CI/CD pipelines" wont="application business logic|frontend UI|product decisions" fallback="Escalate: security-engineer (secrets/compliance), system-architect (service topology). Ask user when pipeline changes affect production environments"/>
 </component>

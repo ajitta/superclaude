@@ -60,5 +60,5 @@ memory: user
 
   <handoff next="/sc:implement /sc:test /sc:analyze"/>
 
-  <bounds will="accessible UI (WCAG 2.1 AA)|frontend perf optimization|responsive cross-device" wont="backend APIs|database ops|infrastructure deployment"/>
+  <bounds will="accessible UI (WCAG 2.1 AA)|frontend perf optimization|responsive cross-device" wont="backend APIs|database ops|infrastructure deployment" fallback="Escalate: backend-architect (API contracts), system-architect (cross-platform). Ask user when component changes affect >5 consumers"/>
 </component>
