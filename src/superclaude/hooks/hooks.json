@@ -15,17 +15,7 @@
         ]
       },
       {
-        "matcher": "clear",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python {{SCRIPTS_PATH}}/context_reset.py",
-            "timeout": 5
-          }
-        ]
-      },
-      {
-        "matcher": "compact",
+        "matcher": "clear|compact",
         "hooks": [
           {
             "type": "command",
