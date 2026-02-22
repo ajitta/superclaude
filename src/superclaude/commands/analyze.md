@@ -52,6 +52,12 @@ description: Comprehensive code analysis across quality, security, performance, 
 | `--focus performance --format report` | Bottleneck analysis |
 | `src/components --focus quality --quick` | Code smell detection |
 
+  <example name="invalid-focus" type="error-path">
+    <input>/sc:analyze --focus everything --scope system</input>
+    <why_wrong>--focus accepts: perf|security|quality|arch|a11y|testing. 'everything' is not a valid domain.</why_wrong>
+    <correct>/sc:analyze --scope system (omit --focus for multi-domain analysis)</correct>
+  </example>
+
   </examples>
 
   <token_note>Medium-high consumption — use --scope file or --scope module to limit analysis boundary</token_note>

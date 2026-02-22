@@ -56,6 +56,12 @@ description: Systematically clean up code, remove dead code, and optimize projec
 | `--type all --interactive` | Multi-domain with guidance |
 | `components/ --aggressive` | Thorough cleanup |
 
+  <example name="aggressive-without-review" type="error-path">
+    <input>/sc:cleanup --type all --aggressive (on unfamiliar codebase)</input>
+    <why_wrong>Aggressive cleanup without understanding the codebase risks removing code that appears unused but is dynamically referenced.</why_wrong>
+    <correct>/sc:cleanup --type all --preview first, review results, then /sc:cleanup --type all --safe</correct>
+  </example>
+
   </examples>
 
   <bounds will="systematic cleanup|safety validation|intelligent algorithms" wont="remove without analysis|override exclusions|compromise functionality" fallback="Ask user for guidance when uncertain"/>

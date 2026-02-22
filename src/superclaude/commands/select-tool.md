@@ -52,6 +52,11 @@ description: Intelligent MCP tool selection based on complexity scoring and oper
 | `'update console.log to logger.info' --explain` | Morphllm (pattern, bulk) |
 | `'save project context'` | Serena (memory direct) |
 
+  <example name="wrong-tool-choice" type="error-path">
+    <input>/sc:select-tool 'rename a variable across the project' → suggests Morphllm</input>
+    <why_wrong>Variable renaming is a semantic operation. Morphllm does text patterns, not semantic renames.</why_wrong>
+    <correct>Serena (LSP-based rename) for semantic operations. Morphllm for text-pattern transformations only.</correct>
+  </example>
   </examples>
 
   <bounds will="optimal selection|complexity scoring|sub-100ms decision" wont="override explicit preference|skip analysis|compromise performance" fallback="Ask user for guidance when uncertain"/>

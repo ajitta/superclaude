@@ -53,6 +53,11 @@ description: Interactive requirements discovery through Socratic dialogue and sy
 | `'real-time collaboration' --strategy agile --parallel` | Parallel FE/BE/Sec exploration |
 | `'enterprise data analytics' --strategy enterprise --validate` | Compliance + validation |
 | `'mobile monetization' --depth normal` | Cross-session with Serena |
+  <example name="brainstorm-then-implement" type="error-path">
+    <input>/sc:brainstorm 'auth system' (then immediately starts coding without user confirmation)</input>
+    <why_wrong>Brainstorm is discovery-only. Implementation without user confirming direction violates the exploration contract.</why_wrong>
+    <correct>Complete brainstorm → present options → user confirms → handoff to /sc:design or /sc:implement</correct>
+  </example>
   </examples>
 
   <token_note>High consumption — use --uc at 60%+ context, consider fresh session for large brainstorms</token_note>

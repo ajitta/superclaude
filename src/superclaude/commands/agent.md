@@ -43,6 +43,16 @@ description: Session controller orchestrating investigation, implementation, and
   </token_discipline>
 
 
+  <examples>
+
+  <example name="agent-wrong-type" type="error-path">
+    <input>/sc:agent frontend-architect 'optimize database queries'</input>
+    <why_wrong>frontend-architect is a UI/accessibility specialist, not a database expert.</why_wrong>
+    <correct>/sc:agent backend-architect 'optimize database queries' or /sc:agent performance-engineer for profiling</correct>
+  </example>
+
+  </examples>
+
   <bounds will="orchestrate helpers|validate results|keep user out of busywork" wont="speculate without research|impl below 0.90 confidence" fallback="Ask user for guidance when uncertain"/>
 
   <boundaries type="execution">Orchestrate investigation, implementation, and review workflows | Enforce confidence gate (0.90) before implementation | Fallback to native tools when MCP unavailable → Output: Coordinated session with confidence-gated execution</boundaries>

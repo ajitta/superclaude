@@ -55,6 +55,12 @@ description: Build, compile, and package projects with intelligent error handlin
 | `frontend --verbose` | Detailed component build |
 | `--type dev --validate` | Dev build + Playwright validation |
 
+  <example name="build-failure-retry" type="error-path">
+    <input>/sc:build --type prod (after build fails with missing dependency)</input>
+    <why_wrong>Retrying the same build without fixing the root cause wastes tokens and time.</why_wrong>
+    <correct>Investigate error → fix dependency (npm install / uv add) → then /sc:build --type prod</correct>
+  </example>
+
   </examples>
 
   <bounds will="execute build|error analysis|optimization recs" wont="modify build config|install deps|deploy" fallback="Ask user for guidance when uncertain"/>

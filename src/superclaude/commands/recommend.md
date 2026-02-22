@@ -45,11 +45,57 @@ description: Ultra-intelligent command recommendation engine for optimal SuperCl
 
   <examples>
 
-| Input | Output |
-|-------|--------|
-| `'I want to do machine learning'` | ML-Beginner → analyze+design flow |
-| `'my site is very slow'` | Perf-Urgent → analyze+troubleshoot+improve |
-| `'building e-commerce' --estimate` | Multi-domain → design+build+scan + timeline |
+  <example name="keyword-detection" type="happy-path">
+    <input>/sc:recommend 'my login page is broken and sometimes shows a blank screen'</input>
+    <reasoning>Keywords: 'broken' → debug, 'login page' → web, 'blank screen' → debug+web overlap</reasoning>
+    <output>
+      Matched: debug + web domains
+      Primary: /sc:troubleshoot --investigate --seq (diagnose blank screen root cause)
+      Follow-up: /sc:analyze --focus quality --scope file (LoginPage component)
+      Flags: --play (visual verification), --c7 (React hydration patterns)
+      Project context: React detected → add --magic for component fix
+    </output>
+  </example>
+
+  <example name="project-context" type="happy-path">
+    <input>/sc:recommend 'make the dashboard load faster'</input>
+    <reasoning>Keywords: 'faster' → perf. Project: package.json has react + next.js</reasoning>
+    <output>
+      Matched: perf domain + react project
+      Primary: /sc:analyze --focus perf --play --devtools (Core Web Vitals audit)
+      Follow-up: /sc:improve --performance (apply optimizations)
+      Then: /sc:test --e2e --play (verify no regressions)
+      Flags: --c7 (Next.js optimization patterns), --magic (lazy-loaded components)
+    </output>
+  </example>
+
+  <example name="multi-domain" type="happy-path">
+    <input>/sc:recommend 'build e-commerce with Stripe payments' --estimate</input>
+    <reasoning>Multi-domain: web + api + sec. --estimate requested</reasoning>
+    <output>
+      Matched: web + api + sec domains
+      Workflow:
+        1. /sc:design --api --ddd --seq (payment architecture)
+        2. /sc:implement --type feature --safe --with-tests (Stripe integration)
+        3. /sc:analyze --focus security (PCI compliance check)
+        4. /sc:test --e2e --play (checkout flow validation)
+      Estimate: ~4-6 sessions, high complexity
+    </output>
+  </example>
+
+  <example name="ambiguous-request" type="error-path">
+    <input>/sc:recommend 'improve the code'</input>
+    <reasoning>No specific keywords matched, no domain signal, too vague</reasoning>
+    <output>
+      Matched: none (ambiguous)
+      Clarification: "What aspect would you like to improve?"
+        - Performance → /sc:analyze --focus perf
+        - Code quality → /sc:analyze --focus quality → /sc:improve
+        - Security → /sc:analyze --focus security
+        - Architecture → /sc:analyze --focus arch → /sc:design
+      Suggestion: Run /sc:analyze first for a broad assessment
+    </output>
+  </example>
 
   </examples>
 

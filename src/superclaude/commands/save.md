@@ -55,6 +55,12 @@ description: Session lifecycle management with Serena MCP integration for contex
 | `--summarize` | Summary + learning patterns |
 | `--type learnings` | Patterns + insights only |
 
+  <example name="save-incomplete-work" type="error-path">
+    <input>/sc:save --type all --checkpoint (mid-debugging, broken state)</input>
+    <why_wrong>Checkpointing a broken state preserves errors. Next session loads broken context.</why_wrong>
+    <correct>Reach a stable state first (tests pass or revert), then /sc:save --type all --checkpoint.</correct>
+  </example>
+
   </examples>
 
   <bounds will="Serena integration|auto-checkpoints|discovery preservation" wont="operate without Serena|save without validation|override without checkpoint" fallback="Ask user for guidance when uncertain"/>

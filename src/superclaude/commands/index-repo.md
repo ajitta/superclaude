@@ -56,6 +56,11 @@ description: Repository indexing with 94% token reduction (58K → 3K)
 | `mode=update` | Update existing |
 | `mode=quick` | Skip tests |
 
+  <example name="index-outside-repo" type="error-path">
+    <input>/sc:index-repo (run outside a git repository)</input>
+    <why_wrong>Repository indexing requires a git repo for structure analysis and change detection.</why_wrong>
+    <correct>Navigate to a git repo first, or use /sc:index for non-repo directories.</correct>
+  </example>
   </examples>
 
   <bounds will="94% token reduction|parallel analysis|human-readable output" wont="modify source|exceed 5KB" fallback="Ask user for guidance when uncertain"/>

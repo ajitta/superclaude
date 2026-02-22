@@ -45,6 +45,11 @@ description: Task reflection and validation using Serena MCP analysis capabiliti
 | `--type session --validate` | Session work quality |
 | `--type completion` | Completion readiness eval |
 
+  <example name="reflect-before-work" type="error-path">
+    <input>/sc:reflect --type session --validate (at session start, no work done yet)</input>
+    <why_wrong>Reflecting on an empty session produces no useful validation. Nothing to reflect on.</why_wrong>
+    <correct>Do meaningful work first, then /sc:reflect --type session to validate progress and quality.</correct>
+  </example>
   </examples>
 
   <bounds will="comprehensive reflection|TaskList bridge|cross-session learning" wont="operate without Serena|override completion|bypass integrity" fallback="Ask user for guidance when uncertain"/>

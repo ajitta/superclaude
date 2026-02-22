@@ -60,6 +60,12 @@ description: Generate comprehensive project documentation and knowledge base wit
 | `src/api --type api --format json` | API docs + validation |
 | `. --type docs` | Knowledge base creation |
 
+  <example name="index-huge-monorepo" type="error-path">
+    <input>/sc:index . --type structure (in a 10,000+ file monorepo)</input>
+    <why_wrong>Indexing an entire large monorepo in one pass exhausts context. Index specific packages instead.</why_wrong>
+    <correct>/sc:index packages/auth --type structure or /sc:index-repo for token-efficient full indexing</correct>
+  </example>
+
   </examples>
 
   <bounds will="comprehensive docs|multi-persona|framework patterns" wont="override manual docs|generate without analysis|bypass standards" fallback="Ask user for guidance when uncertain"/>

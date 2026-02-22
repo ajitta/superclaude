@@ -46,6 +46,12 @@ description: Apply systematic improvements to code quality, performance, and mai
 | `legacy-modules --type maintainability --preview` | Structure improvement |
 | `auth-service --type security --validate` | Security hardening |
 
+  <example name="improve-without-baseline" type="error-path">
+    <input>/sc:improve --type performance (without prior profiling or metrics)</input>
+    <why_wrong>Improving performance without a baseline means you can't measure if changes helped.</why_wrong>
+    <correct>/sc:analyze --focus perf first → establish baseline → then /sc:improve --type performance</correct>
+  </example>
+
   </examples>
 
   <bounds will="systematic improvements|multi-persona|safe refactoring" wont="risky changes without confirm|arch changes without impact analysis|override standards" fallback="Ask user for guidance when uncertain"/>

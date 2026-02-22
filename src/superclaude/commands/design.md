@@ -51,6 +51,12 @@ description: Design system architecture, APIs, and component interfaces with com
 | `payment-api --type api --format spec` | API specification |
 | `notification-service --type component --format code` | Component interface |
 | `e-commerce-db --type database --format diagram` | Schema design |
+  <example name="design-without-requirements" type="error-path">
+    <input>/sc:design payment-api --type api (with no context about payment provider or requirements)</input>
+    <why_wrong>Designing without requirements leads to assumptions that may not match business needs.</why_wrong>
+    <correct>/sc:brainstorm 'payment system requirements' first → then /sc:design with concrete requirements</correct>
+  </example>
+
   </examples>
 
   <bounds will="comprehensive specs|multi-format output|validation" wont="generate impl code|modify existing arch|violate constraints" fallback="Ask user for guidance when uncertain"/>

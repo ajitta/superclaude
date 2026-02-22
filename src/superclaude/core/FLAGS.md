@@ -46,6 +46,9 @@ Note: temperature incompatible with thinking; interleaved thinking automatic
 
   <execution>
 --delegate [auto|files|folders]: >7 dirs, >50 files, complexity >0.8 → sub-agent parallel
+  Direct work for: single-file edits, sequential ops, <3 steps, simple searches (grep/glob)
+  Sub-agents for: parallel-capable, isolated context, independent work streams, >5 files
+  Model routing: haiku for search/explore, sonnet for general coding, opus for architecture/complex reasoning
 --concurrency [n]: 1-15 → max concurrent operations
 --loop: polish, refine, enhance → iterative improvement cycles
 --iterations [n]: 1-10 → improvement cycle count

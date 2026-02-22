@@ -49,11 +49,57 @@ description: Deep web research with adaptive planning and intelligent search
 
 
   <examples>
-| Input | Output |
-|-------|--------|
-| `'quantum computing 2024'` | Standard depth research |
-| `'AI coding assistants' --depth deep` | Competitive analysis |
-| `'distributed systems' --strategy unified` | Best practices research |
+
+  <example name="standard-depth" type="happy-path">
+    <input>/sc:research 'quantum computing breakthroughs 2025'</input>
+    <reasoning>Factual query, current events → standard depth, 2-3 hops</reasoning>
+    <output>
+      Depth: standard (auto-detected)
+      Hop 1: tavily_search ('quantum computing 2025 breakthroughs') → 5 sources
+      Hop 2: tavily_extract (top 3 URLs) → detailed content
+      Hop 3: Cross-validate claims across sources
+      Output: claudedocs/research_quantum_computing_20250815.md (structured report, 8 citations)
+    </output>
+  </example>
+
+  <example name="exhaustive-depth" type="happy-path">
+    <input>/sc:research 'AI coding assistants market comparison' --depth exhaustive</input>
+    <reasoning>Comparative analysis, multiple entities → exhaustive, 5 hops, parallel search</reasoning>
+    <output>
+      Depth: exhaustive
+      Hop 1: tavily_search (3 parallel queries: market share, features, pricing) → 15 sources
+      Hop 2: tavily_extract (top 8 URLs) → feature matrices
+      Hop 3: tavily_research (competitive positioning synthesis)
+      Hop 4: Entity-specific deep dives (Cursor, Copilot, Claude Code, Windsurf)
+      Hop 5: Cross-source contradiction resolution
+      Output: Full report with comparison tables, citations, confidence scores per claim
+    </output>
+  </example>
+
+  <example name="no-sources-found" type="error-path">
+    <input>/sc:research 'internal company API migration patterns' --depth standard</input>
+    <reasoning>Niche/internal topic → standard search yields sparse results</reasoning>
+    <output>
+      Depth: standard → auto-escalate to deep
+      Hop 1: tavily_search → 1 weak source (confidence: 0.3)
+      Recovery: Broaden query to 'API migration best practices enterprise'
+      Hop 2: tavily_search (broadened) → 6 sources (confidence: 0.7)
+      Hop 3: Filter for enterprise-relevant patterns
+      Output: Report with confidence gap noted — "Limited data on internal patterns; general best practices provided. Consider /sc:analyze --scope project for codebase-specific insights."
+    </output>
+  </example>
+
+  <example name="depth-comparison" type="comparison">
+    <input>/sc:research 'React server components' --depth quick</input>
+    <reasoning>Same topic at quick depth → single hop, summary only</reasoning>
+    <output>
+      Depth: quick
+      Hop 1: tavily_search → top 3 results summarized
+      Output: 5-sentence summary with 3 links
+      Contrast: At --depth deep, would produce 3-hop investigation with code examples, migration guide, and performance benchmarks
+    </output>
+  </example>
+
   </examples>
 
   <token_note>High consumption — multi-hop research uses significant context; use --uc at 60%+ or delegate to subagent</token_note>

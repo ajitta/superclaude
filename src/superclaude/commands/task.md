@@ -65,6 +65,11 @@ description: Execute complex tasks with intelligent workflow management and dele
 | `cleanup` | Auto-remove stale/completed tasks |
 | `cleanup --dry-run` | Preview cleanup without deletion |
 
+  <example name="task-without-breakdown" type="error-path">
+    <input>/sc:task execute 'build entire platform' (single monolithic task, no breakdown)</input>
+    <why_wrong>Executing a massive task without decomposition leads to scope creep and lost progress on failure.</why_wrong>
+    <correct>/sc:task create 'build platform' --strategy systematic → decompose into stories → execute incrementally</correct>
+  </example>
   </examples>
 
   <bounds will="complex task coordination|hierarchical breakdown|MCP+persona orchestration|auto cleanup" wont="simple tasks|compromise quality|operate without validation" fallback="Ask user for guidance when uncertain"/>

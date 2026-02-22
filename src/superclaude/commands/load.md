@@ -45,6 +45,12 @@ description: Session lifecycle management with Serena MCP integration for projec
 | `--type checkpoint --checkpoint session_123` | Restore checkpoint |
 | `--type deps --refresh` | Fresh dependency analysis |
 
+  <example name="load-wrong-project" type="error-path">
+    <input>/sc:load /path/to/wrong/project --type project</input>
+    <why_wrong>Loading context for the wrong project pollutes the session with irrelevant information.</why_wrong>
+    <correct>Verify project path first (ls, git remote -v), then /sc:load with confirmed path.</correct>
+  </example>
+
   </examples>
 
   <bounds will="Serena integration|cross-session persistence|context loading" wont="modify structure|load without validation|override without checkpoint" fallback="Ask user for guidance when uncertain"/>

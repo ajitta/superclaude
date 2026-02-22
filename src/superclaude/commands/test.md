@@ -56,6 +56,12 @@ description: Execute tests with coverage analysis and automated quality reportin
 | `--type e2e` | Playwright browser testing |
 | `--watch --fix` | Continuous + auto-fix |
 
+  <example name="retry-without-diagnosis" type="error-path">
+    <input>/sc:test (after 3 test failures, re-running same tests hoping they pass)</input>
+    <why_wrong>Retrying failing tests without investigating root cause is not productive.</why_wrong>
+    <correct>Analyze failure output → /sc:troubleshoot --type bug → fix root cause → /sc:test</correct>
+  </example>
+
   </examples>
 
   <bounds will="execute existing tests|coverage reports|failure analysis" wont="generate test cases|modify framework config|destructive changes" fallback="Ask user for guidance when uncertain"/>

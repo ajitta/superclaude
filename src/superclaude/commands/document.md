@@ -53,6 +53,12 @@ description: Generate focused documentation for components, functions, APIs, and
 | `payment-module --type guide --brief` | User docs |
 | `components/ --type external` | Component library docs |
 
+  <example name="document-unstable-code" type="error-path">
+    <input>/sc:document src/api --type api --detailed (during active refactoring)</input>
+    <why_wrong>Documenting code that's actively being refactored produces docs that immediately go stale.</why_wrong>
+    <correct>Complete the refactoring first, then /sc:document for stable API surface.</correct>
+  </example>
+
   </examples>
 
   <bounds will="focused docs|multi-format|ecosystem integration" wont="doc without analysis|override standards|expose sensitive details" fallback="Ask user for guidance when uncertain"/>

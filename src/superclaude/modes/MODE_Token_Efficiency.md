@@ -51,5 +51,17 @@
 | Build completed, running tests, then deploying | build done >> test progress >> deploy pending |
   </examples>
 
+  <compaction note="Long-session context management">
+    <when>Context >60% used, answer quality degrading, or explicit --uc flag</when>
+    <preserve>Architecture decisions, unresolved issues, implementation details, active file paths</preserve>
+    <discard>Completed tool outputs, resolved intermediate results, stale error messages, duplicate information</discard>
+    <tuning_order>
+      1. Recall: capture all relevant information first
+      2. Precision: remove unnecessary content iteratively
+      3. Validate: test on complex agent traces, not simple conversations
+    </tuning_order>
+    <safest_action>Clear old tool call results — agent rarely needs raw results from earlier turns</safest_action>
+  </compaction>
+
   <bounds will="symbol communication|30-50% token reduction|compressed clarity" wont="sacrifice info quality|lose critical context|compress beyond readability" fallback="Revert to default behavior when inapplicable"/>
 </component>

@@ -46,6 +46,12 @@ description: Provide clear explanations of code, concepts, and system behavior w
 | `microservices-system --advanced --interactive` | Arch deep-dive |
 | `jwt-authentication --context security --basic` | Security concepts |
 
+  <example name="explain-without-context" type="error-path">
+    <input>/sc:explain 'the code' --level advanced</input>
+    <why_wrong>No file path or specific code reference. 'the code' is too vague to explain anything.</why_wrong>
+    <correct>/sc:explain src/auth/jwt.ts --level advanced or /sc:explain 'JWT refresh token rotation'</correct>
+  </example>
+
   </examples>
 
   <bounds will="clear explanations|persona expertise|framework integration" wont="explain without analysis|override standards|reveal sensitive" fallback="Ask user for guidance when uncertain"/>

@@ -46,6 +46,12 @@ description: Provide development estimates for tasks, features, or projects with
 | `'monolith to microservices' --type complexity --breakdown` | Risk + dependency map |
 | `'optimize performance' --type effort --unit hours` | Effort by category |
 
+  <example name="estimate-no-scope" type="error-path">
+    <input>/sc:estimate 'make it better' --type time</input>
+    <why_wrong>No measurable scope. 'make it better' could mean anything from a typo fix to a full rewrite.</why_wrong>
+    <correct>Define scope first: /sc:estimate 'refactor auth module to use JWT' --type time --breakdown</correct>
+  </example>
+
   </examples>
 
   <bounds will="systematic estimates|confidence intervals|multi-persona analysis" wont="guarantee accuracy|estimate without analysis|override benchmarks" fallback="Ask user for guidance when uncertain"/>

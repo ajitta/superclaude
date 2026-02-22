@@ -52,11 +52,60 @@ description: Project Manager Agent - Default orchestration that coordinates sub-
 
   <examples>
 
-| Input | Output |
-|-------|--------|
-| `'Build auth system'` | Brainstorm → specialists |
-| `'Fix LoginForm.tsx:45'` | Direct → c7 → refactor |
-| `'Real-time chat with video'` | Wave mode (4 waves) |
+  <example name="brainstorm-strategy" type="happy-path">
+    <input>/sc:pm 'Build auth system'</input>
+    <reasoning>Vague scope, multi-domain (DB + API + UI + security) → brainstorm strategy</reasoning>
+    <output>
+      Strategy: brainstorm
+      Flow: requirements-analyst → system-architect → [backend-architect ‖ security-engineer] → frontend-architect
+      MCP: seq (decomposition) → c7 (auth patterns) → magic (login UI)
+      Tasks: 4 stories, 12 subtasks across 3 waves
+    </output>
+  </example>
+
+  <example name="direct-strategy" type="happy-path">
+    <input>/sc:pm 'Fix LoginForm.tsx:45 — button disabled state not updating'</input>
+    <reasoning>Precise file:line, single-domain (FE), clear symptom → direct strategy</reasoning>
+    <output>
+      Strategy: direct
+      Flow: c7 (React state patterns) → refactoring-expert → quality-engineer
+      MCP: c7 (useEffect/useState docs)
+      Tasks: 1 story, 2 subtasks
+    </output>
+  </example>
+
+  <example name="wave-strategy" type="happy-path">
+    <input>/sc:pm 'Real-time chat with video calling'</input>
+    <reasoning>Multi-domain (WebSocket + WebRTC + UI + infra), parallelizable → wave strategy</reasoning>
+    <output>
+      Strategy: wave
+      Wave1: backend-architect (WebSocket server ‖ WebRTC signaling)
+      Wave2: frontend-architect (chat UI ‖ video UI) using Wave1 APIs
+      Wave3: integration testing (E2E flows)
+      Wave4: security-engineer (auth) ‖ quality-engineer (load testing)
+    </output>
+  </example>
+
+  <example name="missing-prerequisites" type="error-path">
+    <input>/sc:pm 'Deploy to production'</input>
+    <reasoning>No test results in context, no CI config detected → self-correction triggers</reasoning>
+    <output>
+      Strategy: direct (blocked)
+      Self-correction: STOP → Investigate (no test evidence) → Hypothesis (untested code)
+      Recovery: "No test results found. Run /sc:test --coverage first?"
+      Handoff: /sc:test → then retry /sc:pm 'Deploy to production'
+    </output>
+  </example>
+
+  <example name="cross-command-handoff" type="handoff">
+    <input>/sc:pm 'Optimize API response times'</input>
+    <reasoning>Performance domain → needs profiling before action</reasoning>
+    <output>
+      Strategy: direct
+      Handoff chain: /sc:analyze --focus perf → bottleneck report → /sc:improve --performance → /sc:test --e2e
+      MCP: devtools (profiling) → seq (bottleneck reasoning) → c7 (optimization patterns)
+    </output>
+  </example>
 
   </examples>
 

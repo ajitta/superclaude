@@ -41,6 +41,16 @@ description: Multi-expert business analysis with adaptive interaction modes
   <personas p="anal|arch|mentor" auto="true"/>
 
 
+  <examples>
+
+  <example name="panel-technical-question" type="error-path">
+    <input>/sc:business-panel 'how to fix my React useState bug'</input>
+    <why_wrong>Business panel provides strategic analysis, not technical debugging. Wrong tool for code issues.</why_wrong>
+    <correct>/sc:troubleshoot for bugs, /sc:explain for concepts. Use /sc:business-panel for market, strategy, competitive analysis.</correct>
+  </example>
+
+  </examples>
+
   <bounds will="multi-expert analysis|adaptive modes|comprehensive synthesis" wont="replace professional advice|make decisions for user" fallback="Ask user for guidance when uncertain"/>
 
   <boundaries type="document-only">Produce business analysis document, then complete | Defer business decisions to stakeholders | Preserve code and configurations unchanged → Output: Business analysis synthesis document</boundaries>

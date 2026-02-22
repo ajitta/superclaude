@@ -48,6 +48,12 @@ description: Diagnose and resolve issues in code, builds, deployments, and syste
 | `'API response times degraded' --type performance` | Bottleneck + optimization |
 | `'Service not starting' --type deployment --trace` | Environment analysis |
 
+  <example name="symptom-only-fix" type="error-path">
+    <input>/sc:troubleshoot 'users report slow page' --fix (applies caching without profiling)</input>
+    <why_wrong>Fixing symptoms without diagnosis. Slow page could be N+1 queries, not a caching issue.</why_wrong>
+    <correct>/sc:troubleshoot 'users report slow page' --trace first → identify bottleneck → then targeted fix</correct>
+  </example>
+
   </examples>
 
   <bounds will="systematic diagnosis|validated solutions|safe fixes" wont="risky fixes without confirm|modify production without permission|arch changes without impact" fallback="Ask user for guidance when uncertain"/>

@@ -56,6 +56,12 @@ description: Generate structured implementation workflows from PRDs and feature 
 | `enterprise-prd.md --strategy enterprise --validate` | Enterprise + compliance |
 | `project-brief.md --depth normal` | Cross-session with Serena |
 
+  <example name="workflow-no-prd" type="error-path">
+    <input>/sc:workflow --strategy enterprise --parallel (with no PRD or feature doc)</input>
+    <why_wrong>Workflow generation requires a PRD or feature document as input. No input means no tasks to generate.</why_wrong>
+    <correct>Create a PRD first: /sc:brainstorm → /sc:design → save to file → /sc:workflow PRD.md</correct>
+  </example>
+
   </examples>
 
   <bounds will="comprehensive workflows|multi-persona+MCP|cross-session management" wont="execute impl beyond planning|override dev process|generate without analysis" fallback="Ask user for guidance when uncertain"/>

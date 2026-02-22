@@ -56,6 +56,11 @@ description: Multi-expert specification review and improvement using renowned so
 | `'user story' --mode discussion --experts 'wiegers,adzic'` | Expert dialogue |
 | `@system.yml --mode socratic --iterations 3` | Deep questioning |
 
+  <example name="spec-no-document" type="error-path">
+    <input>/sc:spec-panel --mode critique (with no spec document provided)</input>
+    <why_wrong>Panel review requires a specification document to critique. No input means no structured review possible.</why_wrong>
+    <correct>Provide a spec: /sc:spec-panel @api-spec.yml --mode critique --focus requirements</correct>
+  </example>
   </examples>
 
   <bounds will="expert-level review|actionable recs|multi-mode analysis" wont="replace human judgment|modify without consent|legal guarantees" fallback="Ask user for guidance when uncertain"/>

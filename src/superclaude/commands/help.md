@@ -97,6 +97,49 @@ description: List all available /sc commands and their functionality
   </priority_rules>
 
 
+  <examples>
+
+  <example name="help-as-execution" type="error-path">
+    <input>/sc:help implement auth (expecting it to run /sc:implement)</input>
+    <why_wrong>help is reference-only. It displays information but does not execute commands.</why_wrong>
+    <correct>Use /sc:implement 'auth system' to execute. Use /sc:help to see what's available.</correct>
+  </example>
+
+  </examples>
+
+  <workflows note="Common multi-command pipelines">
+
+  <workflow name="feature-development">
+    /sc:brainstorm 'user auth' → requirements doc
+    /sc:design --api --ddd → architecture spec
+    /sc:implement --tdd --with-tests → code + tests
+    /sc:test --coverage --e2e → validation
+    /ship --pr → delivery
+  </workflow>
+
+  <workflow name="performance-fix">
+    /sc:analyze --focus perf --play → bottleneck report
+    /sc:troubleshoot --investigate → root cause
+    /sc:improve --performance → optimized code
+    /sc:test --e2e → regression check
+  </workflow>
+
+  <workflow name="research-to-implementation">
+    /sc:research 'topic' --depth deep → findings report
+    /sc:brainstorm 'approach' → refined requirements
+    /sc:design → architecture spec
+    /sc:implement → code
+  </workflow>
+
+  <workflow name="code-quality">
+    /sc:analyze --focus quality → issue report
+    /sc:cleanup --type code → dead code removal
+    /sc:improve --focus quality → refactored code
+    /sc:test --coverage → verify improvements
+  </workflow>
+
+  </workflows>
+
   <bounds will="complete reference display|categorized flag listing|usage examples" wont="execute commands|create files|activate modes|modify project state" fallback="Ask user for guidance when uncertain"/>
 
   <boundaries type="document-only">Display reference information only, then complete | Do not execute any commands automatically | Do not modify files or project state → Output: Command and flag reference documentation</boundaries>

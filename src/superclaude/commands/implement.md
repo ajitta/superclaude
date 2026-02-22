@@ -60,6 +60,12 @@ description: Feature and code implementation with intelligent persona activation
 | `auth API --type api --safe --with-tests` | BE + Sec personas |
 | `payment system --type feature --with-tests` | Multi-persona coordination |
 | `dashboard widget --framework vue` | C7 Vue patterns |
+  <example name="scope-creep" type="error-path">
+    <input>/sc:implement 'add logout button' (agent also refactors auth module and adds session management)</input>
+    <why_wrong>Implementation exceeded requested scope. "Add logout button" does not authorize refactoring adjacent code.</why_wrong>
+    <correct>Implement only the logout button. Suggest separate tasks for auth refactor and session management.</correct>
+  </example>
+
   </examples>
 
   <token_note>Medium-high consumption — use --delegate for large features to distribute across subagents</token_note>

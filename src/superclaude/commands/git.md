@@ -70,6 +70,12 @@ description: Git operations with intelligent commit messages and workflow optimi
 | `--pr-status` | Current branch PR review state |
 | `--from-pr 123` | Resume session from PR #123 |
 
+  <example name="force-push-main" type="error-path">
+    <input>/sc:git push --force origin main</input>
+    <why_wrong>Force-pushing to main/master can destroy team members' work and is irreversible.</why_wrong>
+    <correct>Create a feature branch, push there, then open a PR for main.</correct>
+  </example>
+
   </examples>
 
   <bounds will="intelligent git ops|conventional commits|workflow guidance|PR status checks" wont="modify config without auth|destructive without confirm|complex merges requiring manual" fallback="Ask user for guidance when uncertain"/>

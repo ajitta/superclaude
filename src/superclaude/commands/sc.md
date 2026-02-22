@@ -61,6 +61,11 @@ description: SuperClaude command dispatcher - main entry point for all features
 | `/sc:agent deep-research` | Launch agent |
 | `/sc:recommend` | Get suggestions |
 
+  <example name="unknown-command" type="error-path">
+    <input>/sc:deploy (command does not exist)</input>
+    <why_wrong>'deploy' is not a registered /sc command.</why_wrong>
+    <correct>Use /sc:help to see available commands. For deployment: /sc:build --type prod then /ship</correct>
+  </example>
   </examples>
 
   <meta>

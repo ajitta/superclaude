@@ -286,6 +286,9 @@ def get_skill_estimates() -> list["TokenEstimate"]:
 def format_skills_summary(skills: list["TokenEstimate"]) -> str:
     """Format skills summary for context output.
 
+    Compact single-line format to minimize attention budget dilution.
+    Full skill details available via /sc:help.
+
     Args:
         skills: List of TokenEstimate objects
 
@@ -295,23 +298,9 @@ def format_skills_summary(skills: list["TokenEstimate"]) -> str:
     if not skills:
         return ""
 
-    lines = ["<!-- Skills Available -->"]
-    total_frontmatter = 0
-    total_full = 0
-
-    for skill in skills:
-        total_frontmatter += skill.frontmatter_tokens
-        total_full += skill.full_tokens
-        lines.append(
-            f"<!--   {skill.name}: ~{skill.frontmatter_tokens} tokens "
-            f"(full: ~{skill.full_tokens}) -->"
-        )
-
-    lines.append(
-        f"<!-- Skills Total: ~{total_frontmatter} frontmatter, "
-        f"~{total_full} full load -->"
-    )
-    return "\n".join(lines)
+    skill_names = ", ".join(s.name for s in skills)
+    total_full = sum(s.full_tokens for s in skills)
+    return f"<!-- {len(skills)} skills installed ({skill_names}). ~{total_full} tokens full load. Use /sc:help for details. -->"
 
 
 def get_loaded_contexts() -> set:
