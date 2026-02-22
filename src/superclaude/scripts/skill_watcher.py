@@ -49,16 +49,9 @@ class WatcherState:
 
 
 def get_skill_directories() -> list[Path]:
-    """Get all skill directories to monitor.
-
-    Returns:
-        List of skill base directories
-    """
-    return [
-        Path.home() / ".claude" / "skills",
-        Path.home() / ".claude" / "superclaude" / "skills",
-        Path.cwd() / ".claude" / "skills",
-    ]
+    """Get all skill directories to monitor."""
+    from superclaude.utils import get_skill_directories as _get
+    return _get()
 
 
 def hash_file(file_path: Path) -> str:

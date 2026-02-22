@@ -45,11 +45,8 @@ VALID_AGENTS = {
 
 def get_skill_directories() -> list[Path]:
     """Get skill directories to search."""
-    return [
-        Path.home() / ".claude" / "skills",
-        Path.home() / ".claude" / "superclaude" / "skills",
-        Path.cwd() / ".claude" / "skills",
-    ]
+    from superclaude.utils import get_skill_directories as _get
+    return _get()
 
 
 def find_skill_manifest(skill_name: str) -> Path | None:

@@ -37,7 +37,7 @@ except ImportError:
     MCP_FALLBACKS = {}
 
 # Configuration
-INJECT_MODE = os.environ.get("CLAUDE_CONTEXT_INJECT", "1") == "1"  # Default: inject
+INJECT_MODE = os.environ.get("CLAUDE_CONTEXT_INJECT", "1").lower() in ("1", "true", "yes")  # Default: inject
 MAX_TOKENS_ESTIMATE = int(
     os.environ.get("CLAUDE_CONTEXT_MAX_TOKENS", "8000")
 )  # ~8K tokens

@@ -35,7 +35,7 @@ def init_hook_tracker() -> str | None:
         # Cleanup old sessions (>24h)
         cleaned = cleanup_old_sessions()
         if cleaned > 0:
-            print(f"🧹 Cleaned {cleaned} old hook session(s)")
+            print(f"🧹 Cleaned {cleaned} old hook session(s)", file=sys.stderr)
 
         # Get/create current session
         session_id = get_session_id()

@@ -31,8 +31,12 @@ def main() -> None:
                 capture_output=True,
                 timeout=30,
             )
-    except (json.JSONDecodeError, subprocess.TimeoutExpired, OSError):
+    except json.JSONDecodeError:
         pass
+    except subprocess.TimeoutExpired:
+        print("prettier hook: skipped (timeout after 30s)", file=sys.stderr)
+    except OSError as e:
+        print(f"prettier hook: skipped (OS error: {e})", file=sys.stderr)
 
 
 if __name__ == "__main__":

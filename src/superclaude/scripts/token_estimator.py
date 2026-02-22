@@ -158,16 +158,9 @@ def estimate_agent_tokens(agent_file: Path) -> TokenEstimate | None:
 
 
 def get_skill_directories() -> list[Path]:
-    """Get all skill directories to scan.
-
-    Returns:
-        List of skill base directories
-    """
-    return [
-        Path.home() / ".claude" / "skills",
-        Path.home() / ".claude" / "superclaude" / "skills",
-        Path.cwd() / ".claude" / "skills",
-    ]
+    """Get all skill directories to scan."""
+    from superclaude.utils import get_skill_directories as _get
+    return _get()
 
 
 def get_all_skill_estimates() -> list[TokenEstimate]:

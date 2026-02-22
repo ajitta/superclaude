@@ -63,3 +63,16 @@ def atomic_write_json(path: Path, data: Any, indent: int = 2) -> None:
         except OSError:
             pass
         raise
+
+
+def get_skill_directories() -> list[Path]:
+    """Get all skill directories to scan.
+
+    Returns:
+        List of skill base directories (global, superclaude, project-local)
+    """
+    return [
+        Path.home() / ".claude" / "skills",
+        Path.home() / ".claude" / "superclaude" / "skills",
+        Path.cwd() / ".claude" / "skills",
+    ]
