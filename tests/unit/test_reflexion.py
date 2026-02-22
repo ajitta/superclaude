@@ -20,9 +20,9 @@ class TestReflexionPattern:
         assert hasattr(reflexion, "record_error")
         assert hasattr(reflexion, "get_solution")
 
-    def test_record_error_basic(self):
+    def test_record_error_basic(self, tmp_path):
         """Test recording a basic error"""
-        reflexion = ReflexionPattern()
+        reflexion = ReflexionPattern(memory_dir=tmp_path / "memory")
 
         error_info = {
             "test_name": "test_feature",
@@ -34,9 +34,9 @@ class TestReflexionPattern:
         # Should not raise an exception
         reflexion.record_error(error_info)
 
-    def test_record_error_with_solution(self):
+    def test_record_error_with_solution(self, tmp_path):
         """Test recording an error with a solution"""
-        reflexion = ReflexionPattern()
+        reflexion = ReflexionPattern(memory_dir=tmp_path / "memory")
 
         error_info = {
             "test_name": "test_database_connection",
@@ -47,9 +47,9 @@ class TestReflexionPattern:
 
         reflexion.record_error(error_info)
 
-    def test_get_solution_for_known_error(self):
+    def test_get_solution_for_known_error(self, tmp_path):
         """Test retrieving solution for a known error pattern"""
-        reflexion = ReflexionPattern()
+        reflexion = ReflexionPattern(memory_dir=tmp_path / "memory")
 
         # Record an error with solution
         error_info = {
@@ -68,9 +68,9 @@ class TestReflexionPattern:
         # This test documents expected behavior
         assert solution is None or isinstance(solution, str)
 
-    def test_error_pattern_matching(self):
+    def test_error_pattern_matching(self, tmp_path):
         """Test error pattern matching functionality"""
-        reflexion = ReflexionPattern()
+        reflexion = ReflexionPattern(memory_dir=tmp_path / "memory")
 
         # Record multiple similar errors
         errors = [
@@ -108,14 +108,14 @@ class TestReflexionPattern:
         # Should not raise exception even with custom memory dir
         reflexion.record_error(error_info)
 
-    def test_error_learning_across_sessions(self):
+    def test_error_learning_across_sessions(self, tmp_path):
         """
         Test that errors can be learned across sessions
 
         Note: This tests the interface, actual persistence
         depends on implementation
         """
-        reflexion = ReflexionPattern()
+        reflexion = ReflexionPattern(memory_dir=tmp_path / "memory")
 
         # Session 1: Record error
         error_info = {
@@ -136,7 +136,7 @@ class TestReflexionPattern:
 
 
 @pytest.mark.reflexion
-def test_reflexion_marker_integration(reflexion_pattern):
+def test_reflexion_marker_integration(reflexion_pattern, tmp_path):
     """
     Test that reflexion marker works with pytest plugin fixture
 
@@ -145,7 +145,8 @@ def test_reflexion_marker_integration(reflexion_pattern):
     # Test that fixture is properly provided
     assert reflexion_pattern is not None
 
-    # Record a test error
+    # Use tmp_path-backed instance for the write to avoid polluting real JSONL
+    isolated = ReflexionPattern(memory_dir=tmp_path / "memory")
     error_info = {
         "test_name": "test_reflexion_marker_integration",
         "error_type": "IntegrationTestError",
@@ -153,16 +154,16 @@ def test_reflexion_marker_integration(reflexion_pattern):
     }
 
     # Should not raise exception
-    reflexion_pattern.record_error(error_info)
+    isolated.record_error(error_info)
 
 
-def test_reflexion_with_real_exception():
+def test_reflexion_with_real_exception(tmp_path):
     """
     Test reflexion pattern with a real exception scenario
 
     This simulates how reflexion would be used in practice
     """
-    reflexion = ReflexionPattern()
+    reflexion = ReflexionPattern(memory_dir=tmp_path / "memory")
 
     try:
         # Simulate an operation that fails
