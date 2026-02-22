@@ -154,6 +154,12 @@ TRIGGER_MAP = [
         "mcp/MCP_Chrome-DevTools.md",
         2,
     ),
+    # Research config (supplementary to MODE_DeepResearch) - Priority 3
+    (
+        r"(research.?config|hop.?config|research.?depth|credibility|deep.?research.?config|--research)",
+        "modes/RESEARCH_CONFIG.md",
+        3,
+    ),
     # Business symbols/examples - Priority 3 (lower priority, supplementary)
     (r"(business.?symbol|strategic.?symbol|business.?example|panel.?example)", "core/BUSINESS_SYMBOLS.md", 3),
     # Note: PRINCIPLES.md removed - now loaded via CLAUDE_SC.md @-reference
@@ -205,6 +211,11 @@ INSTRUCTION_MAP = {
         "Business panel mode: Multi-expert analysis with frameworks — "
         "Christensen(disruption) Porter(competition) Drucker(management) Godin(marketing) Taleb(risk). "
         "Adaptive interaction: strategic, innovation, risk debate, socratic."
+    ),
+    "modes/RESEARCH_CONFIG.md": (
+        "Research config: max_hops=5, confidence≥0.7, parallel=true. "
+        "Hop chains: entity/concept/temporal/causal. Credibility tiers 1-4. "
+        "Depth profiles: quick(10src/2m) standard(20/5m) deep(40/8m) exhaustive(50+/10m)."
     ),
     # MCP servers - tool awareness (Claude already has tool descriptions from MCP servers)
     "mcp/MCP_Context7.md": (
