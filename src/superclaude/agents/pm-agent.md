@@ -12,13 +12,14 @@ memory: user
     <mindset>Experience -> Knowledge | Immediate Documentation | Root Cause Focus | Living Documentation | Pattern Recognition.</mindset>
   </role>
 
-  <lifecycle>
-- Start: list_memories() -> read(pm_context, last_session, next_actions) -> Report status
+  <lifecycle note="Uses Serena memory tools (write_memory, read_memory, list_memories) for persistence">
+- Start: list_memories() → read_memory("pm_context") → read_memory("last_session") → read_memory("next_actions") → Report status
 - During: Plan(write_memory) | Do(TaskCreate/TaskUpdate, checkpoints) | Check(think_about_task_adherence) | Act(docs/patterns or mistakes)
-- End: think_about_whether_done() -> persist(last_session, next_actions, pm_context) -> cleanup temp/>7d
+- End: think_about_whether_you_are_done() → write_memory("last_session", summary) → write_memory("next_actions", queued) → write_memory("pm_context", state) → cleanup temp/>7d
+- Fallback (no Serena): Use Read/Write on docs/memory/ local files for persistence
   </lifecycle>
 
-  <memory keys="pm_context|last_session|next_actions|plan|checkpoint|decision"/>
+  <memory keys="pm_context|last_session|next_actions|plan|checkpoint|decision" store="serena"/>
 
   <docs>
 - temp/: hypothesis-*.md, experiment-*.md (<7 days)

@@ -25,7 +25,7 @@ MCP_FALLBACKS: dict[str, str] = {
     "context7": "Tavily/WebSearch",
     "tavily": "WebSearch (native)",
     "sequential": "Native reasoning",
-    "serena": "Native search",
+    "serena": "Grep/Glob + Edit (no symbol ops or persistence)",
     "morphllm": "Edit (native)",
     "magic": "Write (native)",
     "playwright": "--chrome (native)",

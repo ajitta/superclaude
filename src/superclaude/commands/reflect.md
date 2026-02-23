@@ -13,11 +13,12 @@ description: Task reflection and validation using Serena MCP analysis capabiliti
   <triggers>task completion validation|session progress|cross-session learning|quality gate</triggers>
 
   <flow>
-    1. Analyze: Task state + session progress (Serena)
-    2. Validate: Adherence + completion quality
-    3. Reflect: Deep analysis + session insights
-    4. Document: Update metadata + capture learnings
+    1. Analyze: think_about_collected_information() → assess completeness
+    2. Validate: think_about_task_adherence() → check goal alignment
+    3. Reflect: think_about_whether_you_are_done() → evaluate completion
+    4. Persist: write_memory("learnings_[topic]", insights) → cross-session capture
     5. Optimize: Process improvement recs
+    Fallback (no Serena): Use native reasoning for steps 1-3, Write for step 4
   </flow>
 
   <mcp servers="serena"/>
@@ -52,7 +53,7 @@ description: Task reflection and validation using Serena MCP analysis capabiliti
   </example>
   </examples>
 
-  <bounds will="comprehensive reflection|TaskList bridge|cross-session learning" wont="operate without Serena|override completion|bypass integrity" fallback="Ask user for guidance when uncertain"/>
+  <bounds will="comprehensive reflection|TaskList bridge|cross-session learning" wont="override completion|bypass integrity" fallback="Without Serena: use native reasoning for reflection, Grep/Read for code analysis. Ask user for guidance when uncertain"/>
 
   <boundaries type="document-only">Produce reflection report, then complete | Preserve code unchanged during reflection | Report issues with recommendations; defer fixes to /sc:improve → Output: Reflection analysis with recommendations</boundaries>
 

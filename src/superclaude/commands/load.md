@@ -13,11 +13,12 @@ description: Session lifecycle management with Serena MCP integration for projec
   <triggers>session initialization|cross-session persistence|project activation|checkpoint loading</triggers>
 
   <flow>
-    1. Initialize: Serena MCP + session context
-    2. Discover: Project structure + requirements
-    3. Load: Memories + checkpoints + persistence data
+    1. Initialize: activate_project() → check_onboarding_performed()
+    2. Load: list_memories() → read_memory("pm_context") → read_memory("last_session") → read_memory("next_actions")
+    3. Discover: Project structure + requirements (get_symbols_overview, list_dir)
     4. Activate: Project context + workflow prep
     5. Validate: Context integrity + session readiness
+    Fallback (no Serena): Read CLAUDE.md, PLANNING.md, TASK.md; Glob for structure discovery
   </flow>
 
   <mcp servers="serena"/>
@@ -53,7 +54,7 @@ description: Session lifecycle management with Serena MCP integration for projec
 
   </examples>
 
-  <bounds will="Serena integration|cross-session persistence|context loading" wont="modify structure|load without validation|override without checkpoint" fallback="Ask user for guidance when uncertain"/>
+  <bounds will="Serena integration|cross-session persistence|context loading" wont="modify structure|load without validation|override without checkpoint" fallback="Without Serena: use Read for CLAUDE.md/PLANNING.md/TASK.md, Glob for structure discovery. Ask user for guidance when uncertain"/>
 
   <boundaries type="execution">Execute session/project activation | Preserve project structure unchanged | Validate context before proceeding</boundaries>
 

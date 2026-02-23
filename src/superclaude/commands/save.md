@@ -14,10 +14,11 @@ description: Session lifecycle management with Serena MCP integration for contex
 
   <flow>
     1. Analyze: Session progress + discoveries
-    2. Persist: Context + learnings (Serena memory)
-    3. Checkpoint: Recovery points + progress tracking
-    4. Validate: Data integrity + compatibility
-    5. Prepare: Ready for future session continuation
+    2. Persist (Serena): write_memory("session_[date]", context) → write_memory("learnings_[topic]", insights)
+    3. Verify: list_memories() to confirm persistence
+    4. Checkpoint: Recovery points + progress tracking
+    5. Validate: Data integrity + compatibility
+    Fallback (no Serena): Write session context to docs/memory/ local files
   </flow>
 
   <outputs note="Per --type flag">
@@ -63,7 +64,7 @@ description: Session lifecycle management with Serena MCP integration for contex
 
   </examples>
 
-  <bounds will="Serena integration|auto-checkpoints|discovery preservation" wont="operate without Serena|save without validation|override without checkpoint" fallback="Ask user for guidance when uncertain"/>
+  <bounds will="Serena integration|auto-checkpoints|discovery preservation" wont="save without validation|override without checkpoint" fallback="Without Serena: use Write for local memory files in docs/memory/. Ask user for guidance when uncertain"/>
 
   <boundaries type="execution">Execute session persistence | Preserve project code unchanged | Validate data integrity before save</boundaries>
 

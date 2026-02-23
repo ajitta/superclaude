@@ -7,7 +7,11 @@
         "serena",
         "start-mcp-server",
         "--context",
-        "claude-code"
+        "claude-code",
+        "--enable-web-dashboard",
+        "false",
+        "--enable-gui-log-window",
+        "false"
       ]
     }
   }

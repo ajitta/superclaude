@@ -91,7 +91,7 @@ class TestMcpFallback:
         assert get_fallback_for("context7") == "Tavily/WebSearch"
         assert get_fallback_for("tavily") == "WebSearch (native)"
         assert get_fallback_for("sequential") == "Native reasoning"
-        assert get_fallback_for("serena") == "Native search"
+        assert get_fallback_for("serena") == "Grep/Glob + Edit (no symbol ops or persistence)"
 
     def test_get_fallback_for_unknown_mcp(self, temp_fallback_dir: Path):
         """Test fallback lookup for unknown MCP returns Native."""
