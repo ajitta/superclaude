@@ -103,7 +103,8 @@ poetry.lock
 
 
 # SuperClaude specific
-.serena/
+.serena/*
+!.serena/memories/
 .superclaude/
 *.backup
 *.bak
