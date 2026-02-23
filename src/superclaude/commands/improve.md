@@ -43,8 +43,8 @@ description: Apply systematic improvements to code quality, performance, and mai
 |-------|--------|
 | `src/ --type quality --safe` | Systematic quality + safe refactor |
 | `api-endpoints --type performance --interactive` | Bottleneck analysis |
-| `legacy-modules --type maintainability --preview` | Structure improvement |
-| `auth-service --type security --validate` | Security hardening |
+| `legacy-modules --type maintainability --interactive` | Structure improvement |
+| `auth-service --type quality --safe` | Security-focused hardening |
 
   <example name="improve-without-baseline" type="error-path">
     <input>/sc:improve --type performance (without prior profiling or metrics)</input>
@@ -53,6 +53,8 @@ description: Apply systematic improvements to code quality, performance, and mai
   </example>
 
   </examples>
+
+  <token_note>Medium-high consumption — scales with target scope; use --safe for conservative changes</token_note>
 
   <bounds will="systematic improvements|multi-persona|safe refactoring" wont="risky changes without confirm|arch changes without impact analysis|override standards" fallback="Ask user for guidance when uncertain"/>
 

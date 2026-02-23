@@ -30,6 +30,9 @@ description: Generate focused documentation for components, functions, APIs, and
   </outputs>
 
 
+  <mcp servers="seq|c7"/>
+  <personas p="scribe|arch"/>
+
   <tools>
     - Read: Component + existing docs
     - Grep: Reference extraction
@@ -49,8 +52,8 @@ description: Generate focused documentation for components, functions, APIs, and
 | Input | Output |
 |-------|--------|
 | `src/auth/login.js --type inline` | JSDoc comments |
-| `src/api --type api --detailed` | API reference |
-| `payment-module --type guide --brief` | User docs |
+| `src/api --type api --style detailed` | API reference |
+| `payment-module --type guide --style brief` | User docs |
 | `components/ --type external` | Component library docs |
 
   <example name="document-unstable-code" type="error-path">
@@ -60,6 +63,8 @@ description: Generate focused documentation for components, functions, APIs, and
   </example>
 
   </examples>
+
+  <token_note>Medium consumption — scales with target scope; use --style brief for lighter output</token_note>
 
   <bounds will="focused docs|multi-format|ecosystem integration" wont="doc without analysis|override standards|expose sensitive details" fallback="Ask user for guidance when uncertain"/>
 

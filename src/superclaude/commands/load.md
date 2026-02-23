@@ -42,7 +42,7 @@ description: Session lifecycle management with Serena MCP integration for projec
 |-------|--------|
 | `/sc:load` | Current dir + Serena memory |
 | `/path/to/project --type project --analyze` | Specific project + analysis |
-| `--type checkpoint --checkpoint session_123` | Restore checkpoint |
+| `session_123 --type checkpoint` | Restore checkpoint |
 | `--type deps --refresh` | Fresh dependency analysis |
 
   <example name="load-wrong-project" type="error-path">

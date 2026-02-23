@@ -102,12 +102,14 @@ description: Project Manager Agent - Default orchestration that coordinates sub-
     <reasoning>Performance domain → needs profiling before action</reasoning>
     <output>
       Strategy: direct
-      Handoff chain: /sc:analyze --focus perf → bottleneck report → /sc:improve --performance → /sc:test --e2e
+      Handoff chain: /sc:analyze --focus perf → bottleneck report → /sc:improve --type performance → /sc:test --type e2e
       MCP: devtools (profiling) → seq (bottleneck reasoning) → c7 (optimization patterns)
     </output>
   </example>
 
   </examples>
+
+  <token_note>High consumption — orchestrates multiple sub-agents; consider --strategy direct for simple tasks</token_note>
 
   <bounds will="seamless orchestration|auto-delegation|zero-token MCP|self-documenting" wont="expose internal complexity to user|skip specialist delegation|bypass documentation" fallback="Ask user for guidance when uncertain"/>
 

@@ -52,7 +52,7 @@ description: Systematically clean up code, remove dead code, and optimize projec
 | Input | Output |
 |-------|--------|
 | `src/ --type code --safe` | Conservative cleanup |
-| `--type imports --preview` | Unused import analysis |
+| `--type imports --safe` | Unused import analysis |
 | `--type all --interactive` | Multi-domain with guidance |
 | `components/ --aggressive` | Thorough cleanup |
 
@@ -63,6 +63,8 @@ description: Systematically clean up code, remove dead code, and optimize projec
   </example>
 
   </examples>
+
+  <token_note>Medium consumption — scales with target scope; use --safe for conservative cleanup</token_note>
 
   <bounds will="systematic cleanup|safety validation|intelligent algorithms" wont="remove without analysis|override exclusions|compromise functionality" fallback="Ask user for guidance when uncertain"/>
 

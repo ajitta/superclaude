@@ -53,7 +53,7 @@ description: Build, compile, and package projects with intelligent error handlin
 | `/sc:build` | Default build + report |
 | `--type prod --clean --optimize` | Production artifacts |
 | `frontend --verbose` | Detailed component build |
-| `--type dev --validate` | Dev build + Playwright validation |
+| `--type dev --verbose` | Dev build + detailed output |
 
   <example name="build-failure-retry" type="error-path">
     <input>/sc:build --type prod (after build fails with missing dependency)</input>
@@ -62,6 +62,8 @@ description: Build, compile, and package projects with intelligent error handlin
   </example>
 
   </examples>
+
+  <token_note>Medium consumption — build output can be verbose; use --type dev for lighter builds</token_note>
 
   <bounds will="execute build|error analysis|optimization recs" wont="modify build config|install deps|deploy" fallback="Ask user for guidance when uncertain"/>
 

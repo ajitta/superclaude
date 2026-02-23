@@ -72,7 +72,7 @@ description: List all available /sc commands and their functionality
       - --effort low: May skip thinking
       - --effort medium: Selective thinking, Sequential
       - --effort high: Default, almost always thinks, Seq+C7
-      - --effort max: Unconstrained depth (Claude 4 models), all MCP
+      - --effort max: Unconstrained depth (Opus 4.6 exclusive), all MCP
     </category>
     <category name="Control">
       - --delegate: Sub-agent parallel processing
@@ -84,7 +84,7 @@ description: List all available /sc commands and their functionality
     <category name="Output">
       - --uc|--ultracompressed: Symbol communication
       - --scope: file|module|project|system
-      - --focus: perf|sec|qual|arch|a11y|test
+      - --focus: perf|security|quality|arch|a11y|testing
     </category>
   </flags>
 
@@ -105,17 +105,17 @@ description: List all available /sc commands and their functionality
 
   <workflow name="feature-development">
     /sc:brainstorm 'user auth' → requirements doc
-    /sc:design --api --ddd → architecture spec
-    /sc:implement --tdd --with-tests → code + tests
-    /sc:test --coverage --e2e → validation
+    /sc:design --type api → architecture spec
+    /sc:implement --type feature --with-tests → code + tests
+    /sc:test --type e2e --coverage → validation
     /ship --pr → delivery
   </workflow>
 
   <workflow name="performance-fix">
-    /sc:analyze --focus perf --play → bottleneck report
-    /sc:troubleshoot --investigate → root cause
-    /sc:improve --performance → optimized code
-    /sc:test --e2e → regression check
+    /sc:analyze --focus perf --perf → bottleneck report
+    /sc:troubleshoot --type performance --trace → root cause
+    /sc:improve --type performance → optimized code
+    /sc:test --type e2e → regression check
   </workflow>
 
   <workflow name="research-to-implementation">
@@ -127,8 +127,8 @@ description: List all available /sc commands and their functionality
 
   <workflow name="code-quality">
     /sc:analyze --focus quality → issue report
-    /sc:cleanup --type code → dead code removal
-    /sc:improve --focus quality → refactored code
+    /sc:cleanup --type code --safe → dead code removal
+    /sc:improve --type quality → refactored code
     /sc:test --coverage → verify improvements
   </workflow>
 

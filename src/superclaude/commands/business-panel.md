@@ -8,7 +8,7 @@ description: Multi-expert business analysis with adaptive interaction modes
     <mission>Multi-expert business analysis with adaptive interaction modes</mission>
   </role>
 
-  <syntax>/sc:business-panel [doc|content] [--experts "names"] [--mode discussion|debate|socratic|adaptive] [--focus domain]</syntax>
+  <syntax>/sc:business-panel [doc|content] [--experts "names"] [--mode discussion|debate|socratic|adaptive] [--focus domain] [--all-experts] [--synthesis-only] [--structured]</syntax>
 
   <experts>
     - Christensen: Disruption Theory, Jobs-to-be-Done
@@ -43,6 +43,13 @@ description: Multi-expert business analysis with adaptive interaction modes
 
   <examples>
 
+| Input | Output |
+|-------|--------|
+| `market-analysis.md --mode discussion --focus strategy` | Collaborative expert analysis |
+| `'SaaS pricing strategy' --experts "porter,godin" --mode debate` | Adversarial pricing analysis |
+| `startup-pitch.md --mode socratic --all-experts` | Deep questioning with all 9 experts |
+| `competitive-landscape.md --synthesis-only` | Summary synthesis only |
+
   <example name="panel-technical-question" type="error-path">
     <input>/sc:business-panel 'how to fix my React useState bug'</input>
     <why_wrong>Business panel provides strategic analysis, not technical debugging. Wrong tool for code issues.</why_wrong>
@@ -50,6 +57,8 @@ description: Multi-expert business analysis with adaptive interaction modes
   </example>
 
   </examples>
+
+  <token_note>High consumption — multi-expert dialogue; use --synthesis-only for lighter output</token_note>
 
   <bounds will="multi-expert analysis|adaptive modes|comprehensive synthesis" wont="replace professional advice|make decisions for user" fallback="Ask user for guidance when uncertain"/>
 

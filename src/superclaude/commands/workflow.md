@@ -29,7 +29,7 @@ description: Generate structured implementation workflows from PRDs and feature 
   </outputs>
 
 
-  <mcp servers="seq|c7|magic|play|morph|serena"/>
+  <mcp servers="seq|c7|magic|play|serena"/>
   <personas p="arch|anal|fe|be|sec|ops|pm"/>
 
   <tools>
@@ -53,7 +53,7 @@ description: Generate structured implementation workflows from PRDs and feature 
 |-------|--------|
 | `Claudedocs/PRD/feature.md --strategy systematic --depth deep` | Comprehensive PRD workflow |
 | `'user auth system' --strategy agile --parallel` | Agile + parallel coordination |
-| `enterprise-prd.md --strategy enterprise --validate` | Enterprise + compliance |
+| `enterprise-prd.md --strategy enterprise --depth deep` | Enterprise + compliance |
 | `project-brief.md --depth normal` | Cross-session with Serena |
 
   <example name="workflow-no-prd" type="error-path">
@@ -63,6 +63,8 @@ description: Generate structured implementation workflows from PRDs and feature 
   </example>
 
   </examples>
+
+  <token_note>High consumption — multi-persona coordination; use --depth shallow for lighter analysis</token_note>
 
   <bounds will="comprehensive workflows|multi-persona+MCP|cross-session management" wont="execute impl beyond planning|override dev process|generate without analysis" fallback="Ask user for guidance when uncertain"/>
 

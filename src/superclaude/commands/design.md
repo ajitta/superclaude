@@ -30,6 +30,9 @@ description: Design system architecture, APIs, and component interfaces with com
   </outputs>
 
 
+  <mcp servers="seq|c7"/>
+  <personas p="arch|fe|be"/>
+
   <tools>
     - Read: Requirements analysis
     - Grep/Glob: System structure investigation
@@ -58,6 +61,8 @@ description: Design system architecture, APIs, and component interfaces with com
   </example>
 
   </examples>
+
+  <token_note>Medium-high consumption — scales with --type complexity; use --format spec for lighter output</token_note>
 
   <bounds will="comprehensive specs|multi-format output|validation" wont="generate impl code|modify existing arch|violate constraints" fallback="Ask user for guidance when uncertain"/>
 

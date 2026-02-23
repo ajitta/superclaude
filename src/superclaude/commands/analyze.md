@@ -29,6 +29,9 @@ description: Comprehensive code analysis across quality, security, performance, 
   </outputs>
 
 
+  <mcp servers="seq|c7"/>
+  <personas p="arch|perf|sec|qual"/>
+
   <tools>
     - Glob: File discovery
     - Grep: Pattern analysis
