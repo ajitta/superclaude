@@ -20,13 +20,19 @@ description: Interactive requirements discovery through Socratic dialogue and sy
     5. Handoff: Actionable briefs for implementation
   </flow>
 
-  <mcp servers="seq|c7|magic|morph|serena"/>
+  <outputs note="Per execution">
+| Artifact | Purpose |
+|----------|---------|
+| REQUIREMENTS.md | Requirements specification document |
+| Conversation output | Socratic dialogue + validated requirements |
+  </outputs>
+
+  <mcp servers="seq|c7|magic|serena"/>
   <mcp_routing>
     1. Sequential: requirements analysis, feasibility reasoning, trade-off evaluation
     2. Context7: framework capabilities, API patterns, library comparisons
     3. Magic: UI/UX component exploration, design system references
     4. Serena: cross-session persistence, prior brainstorm recall
-    5. Morph: bulk spec generation from validated requirements
   </mcp_routing>
   <personas p="arch|anal|fe|be|sec|ops|pm"/>
 
@@ -51,7 +57,7 @@ description: Interactive requirements discovery through Socratic dialogue and sy
 |-------|--------|
 | `'AI project management tool' --strategy systematic --depth deep` | Multi-persona deep analysis |
 | `'real-time collaboration' --strategy agile --parallel` | Parallel FE/BE/Sec exploration |
-| `'enterprise data analytics' --strategy enterprise --validate` | Compliance + validation |
+| `'enterprise data analytics' --strategy enterprise --depth deep` | Compliance + validation |
 | `'mobile monetization' --depth normal` | Cross-session with Serena |
   <example name="brainstorm-then-implement" type="error-path">
     <input>/sc:brainstorm 'auth system' (then immediately starts coding without user confirmation)</input>
