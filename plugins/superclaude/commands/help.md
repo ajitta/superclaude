@@ -78,13 +78,14 @@ SuperClaude supports behavioral flags to enable specific execution modes and too
 | `--all-mcp` | Maximum complexity scenarios | Enable all MCP servers for comprehensive capability |
 | `--no-mcp` | Native-only execution needs | Disable all MCP servers, use native tools |
 
-### Analysis Depth Flags
+### Effort Level Flags
 
 | Flag | Trigger | Behavior |
 |------|---------|----------|
-| `--think` | Multi-component analysis needs | Standard structured analysis (~4K tokens), enables Sequential |
-| `--think-hard` | Architectural analysis, system-wide dependencies | Deep analysis (~10K tokens), enables Sequential + Context7 |
-| `--ultrathink` | Critical system redesign, legacy modernization | Maximum depth analysis (~32K tokens), enables all MCP servers |
+| `--effort low` | Simple tasks, quick fixes | May skip thinking, no MCP |
+| `--effort medium` | Multi-component analysis needs | Selective thinking, Sequential on demand |
+| `--effort high` | Architectural analysis, system-wide dependencies (default) | Almost always thinks, Sequential + Context7 |
+| `--effort max` | Critical system redesign, legacy modernization | Unconstrained depth (Opus 4.6 exclusive), all MCP servers |
 
 ### Execution Control Flags
 
@@ -109,7 +110,7 @@ SuperClaude supports behavioral flags to enable specific execution modes and too
 
 - **Safety First**: `--safe-mode` > `--validate` > optimization flags
 - **Explicit Override**: User flags > auto-detection
-- **Depth Hierarchy**: `--ultrathink` > `--think-hard` > `--think`
+- **Effort Hierarchy**: `--effort max` > `--effort high` > `--effort medium` > `--effort low`
 - **MCP Control**: `--no-mcp` overrides all individual MCP flags
 - **Scope Precedence**: system > project > module > file
 
@@ -117,7 +118,7 @@ SuperClaude supports behavioral flags to enable specific execution modes and too
 
 ```bash
 # Deep analysis with Context7 enabled
-/sc:analyze --think-hard --context7 src/
+/sc:analyze --effort high --context7 src/
 
 # UI development with Magic and validation
 /sc:implement --magic --validate "Add user dashboard"

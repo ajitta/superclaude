@@ -1,6 +1,7 @@
 ---
 description: List all available /sc commands and their functionality
 ---
+
 <component name="help" type="command">
 
   <role>
@@ -8,7 +9,7 @@ description: List all available /sc commands and their functionality
     <mission>List all available /sc commands and their functionality</mission>
   </role>
 
-  <triggers>command discovery|framework capabilities|command documentation</triggers>
+<triggers>command discovery|framework capabilities|command documentation</triggers>
 
   <flow>
     1. Display: Complete command list
@@ -72,7 +73,6 @@ description: List all available /sc commands and their functionality
       - --effort medium: Selective thinking, Sequential
       - --effort high: Default, almost always thinks, Seq+C7
       - --effort max: Unconstrained depth (Claude 4 models), all MCP
-      Legacy: --think→medium, --think-hard→high, --ultrathink→max+all-mcp
     </category>
     <category name="Control">
       - --delegate: Sub-agent parallel processing
@@ -88,14 +88,8 @@ description: List all available /sc commands and their functionality
     </category>
   </flags>
 
-  <priority_rules>
-    - Safety: --safe-mode > --validate > optimization
-    - Override: User flags > auto-detection
-    - Effort: high > medium > low
-    - MCP: --no-mcp overrides all MCP flags
-    - Scope: system > project > module > file
-  </priority_rules>
-
+<priority_rules> - Safety: --safe-mode > --validate > optimization - Override: User flags > auto-detection - Effort: high > medium > low - MCP: --no-mcp overrides all MCP flags - Scope: system > project > module > file
+</priority_rules>
 
   <examples>
 
@@ -142,8 +136,7 @@ description: List all available /sc commands and their functionality
 
   <bounds will="complete reference display|categorized flag listing|usage examples" wont="execute commands|create files|activate modes|modify project state" fallback="Ask user for guidance when uncertain"/>
 
-  <boundaries type="document-only">Display reference information only, then complete | Do not execute any commands automatically | Do not modify files or project state → Output: Command and flag reference documentation</boundaries>
-
+<boundaries type="document-only">Display reference information only, then complete | Do not execute any commands automatically | Do not modify files or project state → Output: Command and flag reference documentation</boundaries>
 
   <handoff next="/sc:recommend /sc:[command]"/>
 </component>

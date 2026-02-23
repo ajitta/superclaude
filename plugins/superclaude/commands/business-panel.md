@@ -76,6 +76,6 @@ Question-driven exploration for deep learning and strategic thinking development
 - **Tool Orchestration**: Read, Grep, Write, MultiEdit, TodoWrite
 
 ## Integration Notes
-- Compatible with all thinking flags (--think, --think-hard, --ultrathink)
+- Compatible with all effort flags (--effort low, --effort medium, --effort high, --effort max)
 - Supports wave orchestration for comprehensive business analysis
 - Integrates with scribe persona for professional business communication

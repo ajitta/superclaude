@@ -40,9 +40,8 @@ WebSearch: fact-check, current info → native web search (no flag needed)
 --effort max: unconstrained depth (Opus 4.6 exclusive) | MCP: all available
 
 Thinking: {type: "adaptive"} — Claude decides when/how much to think
-Legacy: --think→medium, --think-hard→high, --ultrathink→max+all-mcp
 Note: temperature incompatible with thinking; interleaved thinking automatic
-  </effort>
+</effort>
 
   <execution>
 --delegate [auto|files|folders]: >7 dirs, >50 files, complexity >0.8 → sub-agent parallel
@@ -66,21 +65,21 @@ Note: Opus 4.6 uses 25-50% more tokens than 4.5 — monitor context usage
 --focus [perf|security|quality|arch|a11y|testing]: target domain
   </output>
 
-  <priority_rules>
+<priority_rules>
+
 - Safety First: --safe-mode > --validate > optimization
 - Explicit Override: user flags > auto-detection
 - Effort: high > medium > low
-- Legacy Think: --ultrathink → --effort max + --all-mcp
 - MCP: --no-mcp overrides individual flags; notify on first use → auto fallback
 - Scope: system > project > module > file
   </priority_rules>
 
   <persona_index note="Agent abbreviations for p='...'">
-arch=system-architect(architecture) | fe=frontend-architect(UI,a11y) | be=backend-architect(API,db,security) | sec=security-engineer(OWASP) | qa=quality-engineer(testing) | qual=quality-engineer(alias) | ops=devops-architect(CI/CD,K8s) | devops=devops-architect(alias) | pm=pm-agent(orchestration) | perf=performance-engineer(profiling) | refactor=refactoring-expert(tech-debt) | root=root-cause-analyst(debug) | anal=requirements-analyst(strategy) | educator=learning-guide(education) | mentor=socratic-mentor(guidance) | scribe=technical-writer(docs) | py=python-expert(python) | panel=business-panel-experts(business) | research=deep-research-agent(web) | review=self-review(validation) | index=repo-index(indexing) | simple=simplicity-guide(OSL,YAGNI)
+  arch=system-architect(architecture) | fe=frontend-architect(UI,a11y) | be=backend-architect(API,db,security) | sec=security-engineer(OWASP) | qa=quality-engineer(testing) | qual=quality-engineer(alias) | ops=devops-architect(CI/CD,K8s) | devops=devops-architect(alias) | pm=pm-agent(orchestration) | perf=performance-engineer(profiling) | refactor=refactoring-expert(tech-debt) | root=root-cause-analyst(debug) | anal=requirements-analyst(strategy) | educator=learning-guide(education) | mentor=socratic-mentor(guidance) | scribe=technical-writer(docs) | py=python-expert(python) | panel=business-panel-experts(business) | research=deep-research-agent(web) | review=self-review(validation) | index=repo-index(indexing) | simple=simplicity-guide(OSL,YAGNI)
   </persona_index>
 
   <mcp_auto_mode note="v2.1.7+">
-MCP tool descriptions >10% context → defer to MCPSearch; custom: auto:N (v2.1.9+); disable: add MCPSearch to disallowedTools
-Tool Search Tool: defer_loading=true for 85% token reduction in large tool libraries
+  MCP tool descriptions >10% context → defer to MCPSearch; custom: auto:N (v2.1.9+); disable: add MCPSearch to disallowedTools
+  Tool Search Tool: defer_loading=true for 85% token reduction in large tool libraries
   </mcp_auto_mode>
-</component>
+  </component>

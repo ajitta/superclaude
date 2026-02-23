@@ -192,7 +192,7 @@ workflow_stages:
 workflow_stages:
   stage_1: "/sc:business-panel @innovation_portfolio.xlsx --focus innovation"
   stage_2: "/improve @product_roadmap.md --business-panel"
-  stage_3: "/analyze @market_opportunities.pdf --business-panel --think"
+  stage_3: "/analyze @market_opportunities.pdf --business-panel --effort high"
 ```
 
 ### Risk Management Review

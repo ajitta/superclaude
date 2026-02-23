@@ -21,7 +21,8 @@ category: utility
 ```yaml
 language_mapping:
   turkish_keywords:
-    machine_learning: ["machine learning", "ml", "artificial intelligence", "ai"]
+    machine_learning:
+      ["machine learning", "ml", "artificial intelligence", "ai"]
     website: ["website", "web site", "site", "page"]
     application: ["app", "application", "program", "software"]
     error: ["error", "bug", "issue", "problem"]
@@ -30,7 +31,8 @@ language_mapping:
     analysis: ["analyze", "analysis", "examine", "research"]
 
   english_keywords:
-    machine learning: ["machine learning", "artificial intelligence", "ml", "ai"]
+    machine learning:
+      ["machine learning", "artificial intelligence", "ml", "ai"]
     website: ["website", "site", "page", "web application"]
     performance: ["performance", "speed", "optimization", "speed"]
     error: ["error", "issue", "bug", "problem"]
@@ -78,6 +80,7 @@ def detect_language_and_translate(input_text):
 ## SuperClaude Integrated Recommendation Engine
 
 ### 1. Keyword Extraction and Persona Matching
+
 ```yaml
 keyword_extraction:
   pattern_matching:
@@ -109,77 +112,91 @@ keyword_extraction:
     - "beginner|starter|just started" → beginner_level + --persona-mentor
     - "expert|senior|experienced" → expert_level + --persona-architect
     - "continue|resume" → continuity_mode + --seq
-    - "next step|what now" → next_step_mode + --think
+    - "next step|what now" → next_step_mode + --effort medium
 ```
 
 ### 2. SuperClaude Command Map
+
 ```yaml
 category_mapping:
   ml_category:
-    primary_commands: ["/sc:analyze --seq --c7", "/sc:design --seq --ultrathink"]
-    secondary_commands: ["/sc:build --feature --tdd", "/sc:improve --performance"]
+    primary_commands: ["/sc:analyze --seq --c7", "/sc:design --seq"]
+    secondary_commands:
+      ["/sc:build --feature --tdd", "/sc:improve --performance"]
     mcp_servers: ["--c7", "--seq"]
     personas: ["--persona-analyzer", "--persona-architect"]
-    flags: ["--think-hard", "--evidence", "--profile"]
+    flags: ["--effort high", "--evidence", "--profile"]
 
   web_category:
     primary_commands: ["/sc:build --feature --magic", "/sc:design --api --seq"]
-    secondary_commands: ["/sc:test --coverage --e2e --pup", "/sc:analyze --code"]
+    secondary_commands:
+      ["/sc:test --coverage --e2e --pup", "/sc:analyze --code"]
     mcp_servers: ["--magic", "--c7", "--pup"]
     personas: ["--persona-frontend", "--persona-qa"]
     flags: ["--react", "--tdd", "--validate"]
 
   api_category:
-    primary_commands: ["/sc:design --api --ddd --seq", "/sc:build --feature --tdd"]
-    secondary_commands: ["/sc:scan --security --owasp", "/sc:analyze --performance --pup"]
+    primary_commands:
+      ["/sc:design --api --ddd --seq", "/sc:build --feature --tdd"]
+    secondary_commands:
+      ["/sc:scan --security --owasp", "/sc:analyze --performance --pup"]
     mcp_servers: ["--seq", "--c7", "--pup"]
     personas: ["--persona-backend", "--persona-security"]
-    flags: ["--microservices", "--ultrathink", "--security"]
+    flags: ["--microservices", "--security"]
 
   debug_category:
-    primary_commands: ["/sc:troubleshoot --investigate --seq", "/sc:analyze --code --seq"]
+    primary_commands:
+      ["/sc:troubleshoot --investigate --seq", "/sc:analyze --code --seq"]
     secondary_commands: ["/sc:scan --security", "/sc:improve --quality"]
     mcp_servers: ["--seq", "--all-mcp"]
     personas: ["--persona-analyzer", "--persona-security"]
-    flags: ["--evidence", "--think-hard", "--profile"]
+    flags: ["--evidence", "--effort high", "--profile"]
 
   performance_category:
-    primary_commands: ["/sc:analyze --performance --pup --profile", "/sc:troubleshoot --seq"]
-    secondary_commands: ["/sc:improve --performance --iterate", "/sc:build --optimize"]
+    primary_commands:
+      ["/sc:analyze --performance --pup --profile", "/sc:troubleshoot --seq"]
+    secondary_commands:
+      ["/sc:improve --performance --iterate", "/sc:build --optimize"]
     mcp_servers: ["--pup", "--seq"]
     personas: ["--persona-performance", "--persona-analyzer"]
     flags: ["--profile", "--monitoring", "--benchmark"]
 
   security_category:
-    primary_commands: ["/sc:scan --security --owasp --deps", "/sc:analyze --security --seq"]
-    secondary_commands: ["/sc:improve --security --harden", "/sc:troubleshoot --investigate"]
+    primary_commands:
+      ["/sc:scan --security --owasp --deps", "/sc:analyze --security --seq"]
+    secondary_commands:
+      ["/sc:improve --security --harden", "/sc:troubleshoot --investigate"]
     mcp_servers: ["--seq"]
     personas: ["--persona-security", "--persona-analyzer"]
     flags: ["--strict", "--validate", "--owasp"]
 
   create_category:
-    primary_commands: ["/sc:build --feature --tdd", "/sc:design --seq --ultrathink"]
+    primary_commands:
+      ["/sc:build --feature --tdd", "/sc:design --seq --effort max"]
     secondary_commands: ["/sc:analyze --code --c7", "/sc:test --coverage --e2e"]
     mcp_servers: ["--magic", "--c7", "--pup"]
     personas: ["--persona-frontend", "--persona-backend", "--persona-architect"]
-    flags: ["--interactive", "--plan", "--think"]
+    flags: ["--interactive", "--plan", "--effort medium"]
 
   test_category:
     primary_commands: ["/sc:test --coverage --e2e --pup", "/sc:scan --validate"]
-    secondary_commands: ["/sc:improve --quality", "/sc:troubleshoot --investigate"]
+    secondary_commands:
+      ["/sc:improve --quality", "/sc:troubleshoot --investigate"]
     mcp_servers: ["--pup"]
     personas: ["--persona-qa", "--persona-performance"]
     flags: ["--validate", "--coverage", "--monitoring"]
 
   improve_category:
-    primary_commands: ["/sc:improve --quality --iterate", "/sc:cleanup --code --all"]
+    primary_commands:
+      ["/sc:improve --quality --iterate", "/sc:cleanup --code --all"]
     secondary_commands: ["/sc:analyze --code --seq", "/sc:refactor --quality"]
     mcp_servers: ["--seq"]
     personas: ["--persona-refactorer", "--persona-mentor"]
     flags: ["--threshold", "--iterate", "--profile"]
 
   learning_category:
-    primary_commands: ["/sc:document --user --examples", "/sc:analyze --code --c7"]
+    primary_commands:
+      ["/sc:document --user --examples", "/sc:analyze --code --c7"]
     secondary_commands: ["/sc:brainstorm --interactive", "/sc:help --specific"]
     mcp_servers: ["--c7"]
     personas: ["--persona-mentor", "--persona-analyzer"]
@@ -187,11 +204,13 @@ category_mapping:
 ```
 
 ### 3. Expertise Level Detection and Customization
+
 ```yaml
 expertise_levels:
   beginner:
     style: "detailed, step-by-step, explanatory"
-    recommended_commands: ["/sc:brainstorm --educational", "/sc:help --interactive"]
+    recommended_commands:
+      ["/sc:brainstorm --educational", "/sc:help --interactive"]
     extra_explanations: true
     step_by_step: true
 
@@ -209,6 +228,7 @@ expertise_levels:
 ## SuperClaude Integrated Real Examples
 
 ### Example 1: Beginner Level ML Project
+
 ```bash
 User: /sc:recommend "I'm new, I want to do machine learning"
 
@@ -221,7 +241,7 @@ User: /sc:recommend "I'm new, I want to do machine learning"
 1. /sc:analyze --seq --c7 --persona-mentor
    "Research ML goals, data types, and suitable libraries"
 
-2. /sc:design --seq --ultrathink --persona-architect
+2. /sc:design --seq --effort max --persona-architect
    "Design simple but scalable ML architecture"
 
 3. /sc:build --feature --tdd --persona-frontend
@@ -241,6 +261,7 @@ User: /sc:recommend "I'm new, I want to do machine learning"
 ```
 
 ### Example 2: Web Performance Optimization
+
 ```bash
 User: /sc:recommend "my site is very slow, what should I do?"
 
@@ -273,6 +294,7 @@ User: /sc:recommend "my site is very slow, what should I do?"
 ```
 
 ### Example 3: Advanced API Security (English)
+
 ```bash
 User: /sc:recommend "Need to secure API with authentication and authorization"
 
@@ -288,7 +310,7 @@ User: /sc:recommend "Need to secure API with authentication and authorization"
 2. /sc:scan --security --owasp --deps --strict --persona-security
    "OWASP Top 10 vulnerability scan and dependency check"
 
-3. /sc:design --api --ddd --seq --ultrathink --persona-architect
+3. /sc:design --api --ddd --seq --effort max --persona-architect
    "Secure API architecture with proper authentication patterns"
 
 4. /sc:build --feature --tdd --persona-backend
@@ -307,6 +329,7 @@ User: /sc:recommend "Need to secure API with authentication and authorization"
 ```
 
 ### Example 4: React Component Development
+
 ```bash
 User: /sc:recommend "I'm going to create a new user profile component"
 
@@ -366,9 +389,19 @@ standard_response_format:
 project_detection:
   file_system_analysis:
     react_project:
-      indicators: ["package.json with react", "src/App.jsx", "public/", "node_modules/react"]
+      indicators:
+        [
+          "package.json with react",
+          "src/App.jsx",
+          "public/",
+          "node_modules/react",
+        ]
       detection_commands:
-        primary: ["/sc:build --feature --magic --react", "/sc:test --coverage --e2e --pup"]
+        primary:
+          [
+            "/sc:build --feature --magic --react",
+            "/sc:test --coverage --e2e --pup",
+          ]
         personas: ["--persona-frontend", "--persona-qa"]
         mcp: ["--magic", "--c7", "--pup"]
 
@@ -380,23 +413,26 @@ project_detection:
         mcp: ["--magic", "--c7"]
 
     node_api_project:
-      indicators: ["package.json with express", "server.js", "routes/", "controllers/"]
+      indicators:
+        ["package.json with express", "server.js", "routes/", "controllers/"]
       detection_commands:
         primary: ["/sc:design --api --ddd --seq", "/sc:build --feature --tdd"]
         personas: ["--persona-backend", "--persona-security"]
         mcp: ["--seq", "--c7"]
 
     python_project:
-      indicators: ["requirements.txt", "setup.py", "src/", "main.py", "Dockerfile"]
+      indicators:
+        ["requirements.txt", "setup.py", "src/", "main.py", "Dockerfile"]
       detection_commands:
-        primary: ["/sc:analyze --code --seq", "/sc:design --seq --ultrathink"]
+        primary: ["/sc:analyze --code --seq", "/sc:design --seq --effort max"]
         personas: ["--persona-analyzer", "--persona-architect"]
         mcp: ["--seq"]
 
     database_project:
       indicators: ["schema.sql", "migrations/", "models/", "prisma.schema"]
       detection_commands:
-        primary: ["/sc:migrate --database --validate", "/sc:analyze --security --seq"]
+        primary:
+          ["/sc:migrate --database --validate", "/sc:analyze --security --seq"]
         personas: ["--persona-backend", "--persona-security"]
         mcp: ["--seq"]
 
@@ -507,7 +543,7 @@ streaming_mode:
    "E-commerce architecture and technology selection"
 
 🔄 Next Steps (when completed):
-1. /sc:design --api --ddd --seq --ultrathink --persona-architect
+1. /sc:design --api --ddd --seq --effort max --persona-architect
 2. /sc:build --feature --magic --react --persona-frontend
 
 --- STREAM CONTINUING ---
@@ -698,7 +734,7 @@ smart_flag_engine:
     project_size:
       small: "--quick --simple --no-validation"
       medium: "--plan --validate --profile"
-      large: "--plan --validate --seq --ultrathink"
+      large: "--plan --validate --seq --effort max"
 
     security_requirements:
       basic: "--basic-security"
@@ -743,7 +779,7 @@ smart_flag_engine:
 - Large refactoring history: --plan --dry-run
 
 🎯 PROJECT CONTEXT:
-- Large project (>200 files): --seq --ultrathink
+- Large project (>200 files): --seq --effort max
 - Production environment: --validate --monitoring
 - High traffic: --benchmark --profile
 
@@ -798,7 +834,7 @@ community_patterns:
     ml_development:
       most_successful_flow:
         - "/sc:analyze --seq --c7 --persona-mentor"
-        - "/sc:design --seq --ultrathink --persona-architect"
+        - "/sc:design --seq --effort max --persona-architect"
         - "/sc:build --feature --tdd --persona-frontend"
         - "/sc:improve --performance --iterate"
       success_rate: "82%"
@@ -883,7 +919,7 @@ recommend_command_implementation:
 =================
 
 1. 🏗️ PLANNING AND DESIGN
-   /sc:design --api --ddd --seq --ultrathink --persona-architect
+   /sc:design --api --ddd --seq --effort max --persona-architect
    "E-commerce domain architecture and system design"
 
 2. 🎨 FRONTEND DEVELOPMENT
