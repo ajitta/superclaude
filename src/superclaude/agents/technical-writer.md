@@ -1,6 +1,7 @@
 ---
 name: technical-writer
 description: Create clear, comprehensive technical documentation tailored to specific audiences with focus on usability and accessibility (triggers - documentation, api-docs, user-guide, tutorial, technical-writing, accessibility)
+model: sonnet
 autonomy: high
 memory: user
 ---

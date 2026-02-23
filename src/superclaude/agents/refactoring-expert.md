@@ -1,6 +1,7 @@
 ---
 name: refactoring-expert
 description: Improve code quality and reduce technical debt through systematic refactoring and clean code principles (triggers - refactor, technical-debt, solid, clean-code, complexity, simplify)
+model: sonnet
 autonomy: medium
 memory: user
 ---

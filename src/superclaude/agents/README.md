@@ -142,28 +142,28 @@ Agents operate under three autonomy levels that define permission boundaries:
 
 ### Autonomy by Agent
 
-| Agent | Autonomy | Rationale |
-|-------|----------|-----------|
-| `deep-research-agent` | high | Read-only web research, no code changes |
-| `python-expert` | high | Code generation/analysis, user reviews output |
-| `frontend-architect` | high | UI patterns/components, no infrastructure changes |
-| `quality-engineer` | high | Test strategy/analysis, non-destructive |
-| `repo-index` | high | Read-only indexing and briefing |
-| `learning-guide` | high | Educational content, non-destructive |
-| `root-cause-analyst` | high | Investigation/analysis, non-destructive |
-| `performance-engineer` | high | Measurement/analysis, non-destructive |
-| `technical-writer` | high | Documentation generation, user reviews output |
-| `backend-architect` | medium | API contracts affect multiple systems |
-| `security-engineer` | medium | Security changes require review |
-| `pm-agent` | medium | Orchestration decisions need oversight |
-| `devops-architect` | medium | Infrastructure changes are significant |
-| `refactoring-expert` | medium | Safe refactoring patterns with user review |
-| `self-review` | medium | Validation findings need user judgment |
-| `socratic-mentor` | medium | Teaching guidance affects learning path |
-| `requirements-analyst` | medium | Specification decisions need stakeholder input |
-| `system-architect` | low | Architecture decisions have broad impact |
-| `business-panel-experts` | low | Strategy decisions require business context |
-| `simplicity-guide` | low | Simplification judgments require deep context, risk of over-simplification |
+| Agent | Model | Autonomy | Rationale |
+|-------|-------|----------|-----------|
+| `deep-research-agent` | opus | high | Read-only web research, no code changes |
+| `python-expert` | sonnet | high | Code generation/analysis, user reviews output |
+| `frontend-architect` | sonnet | high | UI patterns/components, no infrastructure changes |
+| `quality-engineer` | sonnet | high | Test strategy/analysis, non-destructive |
+| `repo-index` | haiku | high | Read-only indexing and briefing |
+| `learning-guide` | sonnet | high | Educational content, non-destructive |
+| `root-cause-analyst` | sonnet | high | Investigation/analysis, non-destructive |
+| `performance-engineer` | sonnet | high | Measurement/analysis, non-destructive |
+| `technical-writer` | sonnet | high | Documentation generation, user reviews output |
+| `backend-architect` | sonnet | medium | API contracts affect multiple systems |
+| `security-engineer` | opus | medium | Security changes require review |
+| `pm-agent` | sonnet | medium | Orchestration decisions need oversight |
+| `devops-architect` | sonnet | medium | Infrastructure changes are significant |
+| `refactoring-expert` | sonnet | medium | Safe refactoring patterns with user review |
+| `self-review` | sonnet | medium | Validation findings need user judgment |
+| `socratic-mentor` | sonnet | medium | Teaching guidance affects learning path |
+| `requirements-analyst` | sonnet | medium | Specification decisions need stakeholder input |
+| `system-architect` | opus | low | Architecture decisions have broad impact |
+| `business-panel-experts` | opus | low | Strategy decisions require business context |
+| `simplicity-guide` | opus | low | Simplification judgments require deep context, risk of over-simplification |
 
 ### Tool Guidance Semantics
 
@@ -221,6 +221,7 @@ When agents give conflicting recommendations, resolve using this priority matrix
 ---
 name: agent-name
 description: Brief description (triggers - keyword1, keyword2)
+model: opus|sonnet|haiku                  # Sub-agent model routing (v4.2)
 autonomy: high|medium|low                 # Permission boundaries (v2.1.37)
 memory: user                              # Persistent memory scope (v2.1.33)
 ---

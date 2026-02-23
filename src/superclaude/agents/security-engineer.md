@@ -1,6 +1,7 @@
 ---
 name: security-engineer
 description: Identify security vulnerabilities and ensure compliance with security standards and best practices (triggers - security, vulnerability, owasp, compliance, threat-model, authentication)
+model: opus
 autonomy: medium
 memory: user
 ---

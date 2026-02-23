@@ -1,6 +1,7 @@
 ---
 name: self-review
 description: Post-implementation validation and reflexion partner (triggers - review, validate, post-implementation, reflexion, self-check, quality-gate)
+model: sonnet
 autonomy: medium
 memory: user
 ---

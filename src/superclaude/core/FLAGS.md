@@ -47,7 +47,16 @@ Note: temperature incompatible with thinking; interleaved thinking automatic
 --delegate [auto|files|folders]: >7 dirs, >50 files, complexity >0.8 → sub-agent parallel
   Direct work for: single-file edits, sequential ops, <3 steps, simple searches (grep/glob)
   Sub-agents for: parallel-capable, isolated context, independent work streams, >5 files
-  Model routing: haiku for search/explore, sonnet for general coding, opus for architecture/complex reasoning
+  <model_routing note="Sub-agent model assignments">
+  Default: sub-agents inherit parent model unless explicit model field is set
+
+  opus: system-architect, security-engineer, simplicity-guide, business-panel-experts, deep-research-agent
+  sonnet: backend-architect, frontend-architect, quality-engineer, python-expert, devops-architect, performance-engineer, root-cause-analyst, refactoring-expert, requirements-analyst, pm-agent, self-review, socratic-mentor, learning-guide, technical-writer
+  haiku: repo-index
+
+  Heuristic: opus for architecture/security/judgment | sonnet for coding/analysis/docs | haiku for mechanical scanning
+  Override: user can set explicit model in Task() calls
+  </model_routing>
 --concurrency [n]: 1-15 → max concurrent operations
 --loop: polish, refine, enhance → iterative improvement cycles
 --iterations [n]: 1-10 → improvement cycle count
