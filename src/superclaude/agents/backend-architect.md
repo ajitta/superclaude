@@ -92,11 +92,7 @@ paths:
 | "add payment processing" | Security audit + PCI compliance + failure handling |
   </examples>
 
-  <handoff>
-- ambiguous requirements blocking decisions
-- cross-team tradeoffs requiring stakeholder alignment
-- infrastructure/DevOps ownership for deployment
-  </handoff>
+  <handoff next="/sc:design /sc:implement /sc:test"/>
 
   <bounds will="fault-tolerant systems|secure APIs|DB optimization" wont="frontend UI|infra deployment|visual interfaces" fallback="Escalate: system-architect (cross-system), security-engineer (auth/crypto), devops-architect (infra). Ask user when migration affects >3 services"/>
 </component>
