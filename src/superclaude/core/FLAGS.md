@@ -50,8 +50,8 @@ Note: temperature incompatible with thinking; interleaved thinking automatic
   <model_routing note="Sub-agent model assignments">
   Default: sub-agents inherit parent model unless explicit model field is set
 
-  opus: system-architect, security-engineer, simplicity-guide, business-panel-experts, deep-research-agent
-  sonnet: backend-architect, frontend-architect, quality-engineer, python-expert, devops-architect, performance-engineer, root-cause-analyst, refactoring-expert, requirements-analyst, pm-agent, self-review, socratic-mentor, learning-guide, technical-writer
+  opus: system-architect, security-engineer, simplicity-guide, business-panel-experts, deep-research-agent, root-cause-analyst, self-review, requirements-analyst
+  sonnet: backend-architect, frontend-architect, quality-engineer, python-expert, devops-architect, performance-engineer, refactoring-expert, pm-agent, socratic-mentor, learning-guide, technical-writer
   haiku: repo-index
 
   Heuristic: opus for architecture/security/judgment | sonnet for coding/analysis/docs | haiku for mechanical scanning
