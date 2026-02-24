@@ -25,7 +25,7 @@ A **dual-purpose** project: (1) a pytest plugin + CLI tool providing PM Agent pa
 | `hooks/` | 4 | Hook tracker, inline hooks (YAML frontmatter), MCP fallback |
 | `scripts/` | 10 | Utilities: session_init, context_loader, token_estimator, etc. |
 | `utils/` | 1 | Shared utilities (atomic_write_json) |
-| `commands/` | 31 | Slash command markdown files (sc:analyze, sc:implement, etc.) |
+| `commands/` | 30 | Slash command markdown files (sc:analyze, sc:implement, etc.) |
 | `agents/` | 21 | Agent definitions (system-architect, python-expert, etc.) |
 | `skills/` | 3 | Skills: confidence-check, simplicity-coach, ship |
 | `modes/` | 9 | Behavioral modes: Brainstorming, Business Panel, DeepResearch, etc. |
@@ -49,7 +49,7 @@ A **dual-purpose** project: (1) a pytest plugin + CLI tool providing PM Agent pa
 ## Content Installation Map
 
 ```
-commands/  →  ~/.claude/commands/sc/       (31 slash commands)
+commands/  →  ~/.claude/commands/sc/       (30 slash commands)
 agents/    →  ~/.claude/agents/            (21 agent definitions)
 skills/    →  ~/.claude/skills/            (3 skill implementations)
 core/      →  ~/.claude/superclaude/core/  (FLAGS, PRINCIPLES, RULES)
@@ -57,7 +57,7 @@ modes/     →  ~/.claude/superclaude/modes/ (8 behavioral modes)
 mcp/       →  ~/.claude/superclaude/mcp/   (8 MCP server docs)
 ```
 
-## Slash Commands (31)
+## Slash Commands (30)
 
 | Category | Commands |
 |----------|----------|

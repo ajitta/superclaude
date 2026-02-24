@@ -5,12 +5,12 @@
     "description": "AI-enhanced development framework for Claude Code - pytest plugin with optional skills"
   },
   "statistics": {
-    "commands": 31,
+    "commands": 30,
     "agents": 20,
     "modes": 8,
     "mcp_servers": 8,
     "core_configs": 3,
-    "python_files": 47,
+    "python_files": 49,
     "test_files": 17,
     "skills": 3,
     "scripts": 10
@@ -88,7 +88,7 @@
   },
   "content": {
     "commands": {
-      "count": 31,
+      "count": 30,
       "location": "src/superclaude/commands/",
       "install_to": "~/.claude/commands/sc/",
       "items": ["agent", "analyze", "brainstorm", "build", "business-panel", "cleanup", "design", "document", "estimate", "explain", "git", "help", "implement", "improve", "index", "index-repo", "load", "pm", "recommend", "reflect", "research", "save", "sc", "select-tool", "spawn", "spec-panel", "task", "test", "troubleshoot", "workflow"]
