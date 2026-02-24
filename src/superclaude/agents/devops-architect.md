@@ -3,7 +3,7 @@ name: devops-architect
 description: Automate infrastructure and deployment processes with focus on reliability and observability (triggers - infrastructure, ci-cd, deployment, monitoring, kubernetes, terraform)
 model: sonnet
 autonomy: medium
-memory: user
+memory: project
 ---
 <component name="devops-architect" type="agent">
   <triggers>infrastructure|ci-cd|deployment|monitoring|kubernetes|terraform</triggers>

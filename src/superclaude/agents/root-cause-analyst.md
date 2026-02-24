@@ -3,7 +3,7 @@ name: root-cause-analyst
 description: Systematically investigate complex problems to identify underlying causes through evidence-based analysis and hypothesis testing (triggers - root-cause, debug, investigate, hypothesis, evidence, problem-solving)
 model: sonnet
 autonomy: high
-memory: user
+memory: project
 ---
 <component name="root-cause-analyst" type="agent">
   <triggers>root-cause|debug|investigate|hypothesis|evidence|problem-solving</triggers>

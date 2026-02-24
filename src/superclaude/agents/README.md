@@ -100,7 +100,7 @@ Agents can declare persistent memory that survives across conversations:
 ---
 name: agent-name
 description: Agent description
-memory: user
+memory: project
 ---
 ```
 
@@ -108,11 +108,11 @@ memory: user
 
 | Scope | Location | Use Case |
 |-------|----------|----------|
-| `user` | `~/.claude/agent-memory/<name>/` | Cross-project learnings (recommended default) |
-| `project` | `.claude/agent-memory/<name>/` | Project-specific knowledge (committable) |
+| `project` | `.claude/agent-memory/<name>/` | Project-specific knowledge, committable (SuperClaude default) |
+| `user` | `~/.claude/agent-memory/<name>/` | Cross-project learnings |
 | `local` | `.claude/agent-memory-local/<name>/` | Project-specific, gitignored |
 
-When `memory` is set, the agent automatically gets Read/Write/Edit tools and the first 200 lines of its `MEMORY.md` are injected into the system prompt. All SuperClaude agents use `memory: user` for cross-project domain knowledge.
+When `memory` is set, the agent automatically gets Read/Write/Edit tools and the first 200 lines of its `MEMORY.md` are injected into the system prompt. All SuperClaude agents use `memory: project` for project-scoped, committable knowledge.
 
 ## Sub-Agent Restrictions (v2.1.33)
 
@@ -223,7 +223,7 @@ name: agent-name
 description: Brief description (triggers - keyword1, keyword2)
 model: opus|sonnet|haiku                  # Sub-agent model routing (v4.2)
 autonomy: high|medium|low                 # Permission boundaries (v2.1.37)
-memory: user                              # Persistent memory scope (v2.1.33)
+memory: project                              # Persistent memory scope (v2.1.33)
 ---
 ```
 

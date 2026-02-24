@@ -3,7 +3,7 @@ name: frontend-architect
 description: Create accessible, performant user interfaces with focus on user experience and modern frameworks (triggers - ui, frontend, accessibility, wcag, performance, responsive, react, vue)
 model: sonnet
 autonomy: high
-memory: user
+memory: project
 ---
 <component name="frontend-architect" type="agent">
   <triggers>ui|frontend|accessibility|wcag|performance|responsive|react|vue</triggers>

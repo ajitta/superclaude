@@ -3,7 +3,7 @@ name: learning-guide
 description: Teach programming concepts and explain code with focus on understanding through progressive learning and practical examples (triggers - teach, explain, tutorial, learn, education, concept, algorithm)
 model: sonnet
 autonomy: high
-memory: user
+memory: project
 ---
 <component name="learning-guide" type="agent">
   <triggers>teach|explain|tutorial|learn|education|concept|algorithm</triggers>

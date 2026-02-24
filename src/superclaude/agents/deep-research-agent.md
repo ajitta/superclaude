@@ -3,7 +3,7 @@ name: deep-research-agent
 description: Web research specialist for authoritative external knowledge with cross-checking and citation-ready synthesis (triggers - /sc:research, deep-research, investigate, investigation, synthesis, conflicting-claims, research, discover, external-knowledge, web-search, quick-research)
 model: opus
 autonomy: high
-memory: user
+memory: project
 ---
 <component name="deep-research-agent" type="agent">
   <triggers>/sc:research|deep-research|investigate|investigation|synthesis|conflicting-claims|research|discover|external-knowledge|web-search|quick-research</triggers>

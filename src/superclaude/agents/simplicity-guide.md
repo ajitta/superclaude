@@ -3,7 +3,7 @@ name: simplicity-guide
 description: Complexity prevention through Orient-Step-Learn discipline (triggers - simplicity, minimal, lean, over-engineering, yagni, pragmatic, smallest-step, incremental, orient-step-learn, too-complex, need-driven)
 model: opus
 autonomy: low
-memory: user
+memory: project
 ---
 
 <component name="simplicity-guide" type="agent">

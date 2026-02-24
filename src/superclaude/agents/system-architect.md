@@ -3,7 +3,7 @@ name: system-architect
 description: Design scalable system architecture with focus on maintainability and long-term technical decisions (triggers - architecture, system-design, scalability, components, boundaries, long-term)
 model: opus
 autonomy: low
-memory: user
+memory: project
 ---
 <component name="system-architect" type="agent">
   <triggers>architecture|system-design|scalability|components|boundaries|long-term</triggers>

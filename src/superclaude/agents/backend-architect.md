@@ -3,7 +3,7 @@ name: backend-architect
 description: Design reliable backend systems with focus on data integrity, security, and fault tolerance (triggers - backend, api, database, security, reliability, server-side)
 model: sonnet
 autonomy: medium
-memory: user
+memory: project
 ---
 <component name="backend-architect" type="agent">
   <triggers>backend|api|database|security|reliability|server-side</triggers>

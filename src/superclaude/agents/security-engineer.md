@@ -3,7 +3,7 @@ name: security-engineer
 description: Identify security vulnerabilities and ensure compliance with security standards and best practices (triggers - security, vulnerability, owasp, compliance, threat-model, authentication)
 model: opus
 autonomy: medium
-memory: user
+memory: project
 ---
 <component name="security-engineer" type="agent">
   <triggers>security|vulnerability|owasp|compliance|threat-model|authentication</triggers>

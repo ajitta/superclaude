@@ -24,9 +24,9 @@ description: Session lifecycle management with Serena MCP + Claude auto memory f
 
   <storage note="Dual persistence">
     Serena (primary): .serena/memories/ — semantic project memories, symbol-aware context
-    Auto memory (supplementary): ~/.claude/projects/{project-hash}/memory/MEMORY.md (auto-loaded, max 200 lines)
-    Topic files: ~/.claude/projects/{project-hash}/memory/{topic}.md (linked from MEMORY.md)
-    Agent memory: ~/.claude/agent-memory/{name}/MEMORY.md (per-agent cross-project)
+    Auto memory (supplementary): .claude/memory/MEMORY.md (project-scoped, committable, max 200 lines)
+    Topic files: .claude/memory/{topic}.md (linked from MEMORY.md)
+    Agent memory: .claude/agent-memory/{name}/MEMORY.md (project-scoped, per-agent)
   </storage>
 
   <mcp servers="serena"/>
