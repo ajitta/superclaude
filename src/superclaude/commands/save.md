@@ -1,11 +1,11 @@
 ---
-description: Session lifecycle management with Serena MCP integration for context persistence
+description: Session lifecycle management with Serena MCP + Claude auto memory for context persistence
 ---
 <component name="save" type="command">
 
   <role>
     /sc:save
-    <mission>Session lifecycle management with Serena MCP integration for context persistence</mission>
+    <mission>Session lifecycle management with Serena MCP + Claude auto memory for context persistence</mission>
   </role>
 
   <syntax>/sc:save [--type session|learnings|context|all] [--summarize] [--checkpoint]</syntax>
@@ -15,33 +15,40 @@ description: Session lifecycle management with Serena MCP integration for contex
   <flow>
     1. Analyze: Session progress + discoveries
     2. Persist (Serena): write_memory("session_[date]", context) → write_memory("learnings_[topic]", insights)
-    3. Verify: list_memories() to confirm persistence
-    4. Checkpoint: Recovery points + progress tracking
-    5. Validate: Data integrity + compatibility
-    Fallback (no Serena): Write session context to docs/memory/ local files
+    3. Persist (auto memory): Write/Edit MEMORY.md + topic files for cross-session continuity
+    4. Verify: list_memories() + Read MEMORY.md to confirm both stores
+    5. Checkpoint: Recovery points + progress tracking
+    6. Validate: Data integrity + no duplicates across stores
+    Fallback (no Serena): Claude auto memory only (MEMORY.md + topic files)
   </flow>
 
-  <outputs note="Per --type flag">
-| Type | Serena Memory | Content |
-|------|---------------|---------|
-| session | session_[date] | Full context |
-| learnings | learnings_[topic] | Patterns + insights |
-| context | context_[project] | Project state |
-| all | All above | Complete preservation |
-  </outputs>
+  <storage note="Dual persistence">
+    Serena (primary): .serena/memories/ — semantic project memories, symbol-aware context
+    Auto memory (supplementary): ~/.claude/projects/{project-hash}/memory/MEMORY.md (auto-loaded, max 200 lines)
+    Topic files: ~/.claude/projects/{project-hash}/memory/{topic}.md (linked from MEMORY.md)
+    Agent memory: ~/.claude/agent-memory/{name}/MEMORY.md (per-agent cross-project)
+  </storage>
 
+  <outputs note="Per --type flag">
+| Type | Serena Memory | Auto Memory | Content |
+|------|---------------|-------------|---------|
+| session | session_[date] | MEMORY.md | Full context |
+| learnings | learnings_[topic] | topic files | Patterns + insights |
+| context | context_[project] | MEMORY.md | Project state |
+| all | All above | All above | Complete preservation |
+  </outputs>
 
   <mcp servers="serena"/>
 
   <tools>
-    - write_memory/read_memory: Session context persistence
-    - think_about_collected_information: Discovery identification
-    - summarize_changes: Progress documentation
-    - TaskList/TaskGet: Auto checkpoint triggers
+    - write_memory/read_memory: Serena semantic persistence (primary)
+    - list_memories: Verify Serena memories
+    - Write/Edit: Claude auto memory persistence (supplementary)
+    - Read: Verify auto memory content
   </tools>
 
   <patterns>
-    - Preservation: Discovery → memory → checkpoint
+    - Preservation: Discovery → Serena memory → auto memory → checkpoint
     - Learning: Accumulation → archival → understanding
     - Progress: Completion → auto-checkpoint → continuity
     - Recovery: State → validation → restoration ready
@@ -64,11 +71,9 @@ description: Session lifecycle management with Serena MCP integration for contex
 
   </examples>
 
-  <bounds will="Serena integration|auto-checkpoints|discovery preservation" wont="save without validation|override without checkpoint" fallback="Without Serena: use Write for local memory files in docs/memory/. Ask user for guidance when uncertain"/>
+  <bounds will="Serena integration|auto memory sync|auto-checkpoints|discovery preservation" wont="save without validation|override without checkpoint|duplicate across stores" fallback="Without Serena: use Claude auto memory only (Write/Edit MEMORY.md). Ask user for guidance when uncertain"/>
 
   <boundaries type="execution">Execute session persistence | Preserve project code unchanged | Validate data integrity before save</boundaries>
-
-
 
   <handoff next="/sc:load /sc:reflect"/>
 </component>

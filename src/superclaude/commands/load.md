@@ -1,11 +1,11 @@
 ---
-description: Session lifecycle management with Serena MCP integration for project context loading
+description: Session lifecycle management with Serena MCP + Claude auto memory for project context loading
 ---
 <component name="load" type="command">
 
   <role>
     /sc:load
-    <mission>Session lifecycle management with Serena MCP integration for project context loading</mission>
+    <mission>Session lifecycle management with Serena MCP + Claude auto memory for project context loading</mission>
   </role>
 
   <syntax>/sc:load [target] [--type project|config|deps|checkpoint] [--refresh] [--analyze]</syntax>
@@ -14,24 +14,33 @@ description: Session lifecycle management with Serena MCP integration for projec
 
   <flow>
     1. Initialize: activate_project() → check_onboarding_performed()
-    2. Load: list_memories() → read_memory("pm_context") → read_memory("last_session") → read_memory("next_actions")
-    3. Discover: Project structure + requirements (get_symbols_overview, list_dir)
-    4. Activate: Project context + workflow prep
-    5. Validate: Context integrity + session readiness
-    Fallback (no Serena): Read CLAUDE.md, PLANNING.md, TASK.md; Glob for structure discovery
+    2. Load (Serena): list_memories() → read_memory("pm_context") → read_memory("last_session") → read_memory("next_actions")
+    3. Load (auto memory): MEMORY.md (auto-loaded) + topic files linked from MEMORY.md
+    4. Discover: Project structure + requirements (get_symbols_overview, list_dir, Read/Grep/Glob)
+    5. Activate: Project context + workflow prep
+    6. Validate: Context integrity + session readiness
+    Fallback (no Serena): Claude auto memory + Read CLAUDE.md, PLANNING.md, TASK.md; Glob for structure discovery
   </flow>
+
+  <storage note="Dual persistence">
+    Serena (primary): .serena/memories/ — semantic project memories, symbol-aware context
+    Auto memory (supplementary): ~/.claude/projects/{project-hash}/memory/MEMORY.md (auto-loaded, max 200 lines)
+    Topic files: ~/.claude/projects/{project-hash}/memory/{topic}.md (linked from MEMORY.md)
+    Agent memory: ~/.claude/agent-memory/{name}/MEMORY.md (per-agent cross-project)
+  </storage>
 
   <mcp servers="serena"/>
 
   <tools>
-    - activate_project: Core project activation
-    - list_memories/read_memory: Memory retrieval
-    - Read/Grep/Glob: Structure analysis
+    - activate_project: Serena project activation (primary)
+    - list_memories/read_memory: Serena memory retrieval
+    - get_symbols_overview/list_dir: Serena structure analysis
+    - Read/Grep/Glob: Auto memory + project file analysis
     - Write: Checkpoint creation
   </tools>
 
   <patterns>
-    - Activation: Directory → memory → context establish
+    - Activation: Serena activate → Serena memories → auto memory → context establish
     - Restoration: Checkpoint → validation → workflow prep
     - Memory: Cross-session → continuity → efficiency
     - Performance: <500ms init | <200ms core | <1s checkpoint
@@ -41,7 +50,7 @@ description: Session lifecycle management with Serena MCP integration for projec
 
 | Input | Output |
 |-------|--------|
-| `/sc:load` | Current dir + Serena memory |
+| `/sc:load` | Current dir + Serena memory + auto memory |
 | `/path/to/project --type project --analyze` | Specific project + analysis |
 | `session_123 --type checkpoint` | Restore checkpoint |
 | `--type deps --refresh` | Fresh dependency analysis |
@@ -54,12 +63,9 @@ description: Session lifecycle management with Serena MCP integration for projec
 
   </examples>
 
-  <bounds will="Serena integration|cross-session persistence|context loading" wont="modify structure|load without validation|override without checkpoint" fallback="Without Serena: use Read for CLAUDE.md/PLANNING.md/TASK.md, Glob for structure discovery. Ask user for guidance when uncertain"/>
+  <bounds will="Serena integration|auto memory loading|cross-session persistence|context loading" wont="modify structure|load without validation|override without checkpoint" fallback="Without Serena: use Claude auto memory + Read CLAUDE.md/PLANNING.md/TASK.md, Glob for structure. Ask user for guidance when uncertain"/>
 
   <boundaries type="execution">Execute session/project activation | Preserve project structure unchanged | Validate context before proceeding</boundaries>
-
-
-
 
   <handoff next="/sc:analyze /sc:index-repo /sc:task"/>
 </component>
