@@ -103,6 +103,7 @@ poetry.lock
 
 
 # SuperClaude specific
+.beads/
 .serena/*
 !.serena/memories/
 .superclaude/
