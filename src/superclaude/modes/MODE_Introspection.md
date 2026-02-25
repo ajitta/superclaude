@@ -1,6 +1,4 @@
 <component name="introspection" type="mode">
-  <triggers>introspect|reflect|analyze reasoning|meta-cognitive|self-analysis|--introspect</triggers>
-
   <role>
     <mission>Meta-cognitive analysis mindset for self-reflection and reasoning optimization</mission>
   </role>

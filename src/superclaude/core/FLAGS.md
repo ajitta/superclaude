@@ -1,6 +1,4 @@
 <component name="flags" type="core" priority="high">
-  <triggers>flag|--|mode|mcp|think|effort|delegate|native</triggers>
-
   <role>
     <mission>Behavioral flags for Claude Code execution modes and tool selection</mission>
   </role>

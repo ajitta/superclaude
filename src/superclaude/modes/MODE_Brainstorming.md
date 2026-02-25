@@ -1,6 +1,4 @@
 <component name="brainstorming" type="mode">
-  <triggers>brainstorm|explore|explore ideas|ideate|maybe|thinking about|discuss|not sure|--brainstorm</triggers>
-
   <role>
     <mission>Collaborative discovery mindset for interactive requirements exploration and creative problem solving</mission>
   </role>

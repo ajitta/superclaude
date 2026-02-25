@@ -1,6 +1,4 @@
 <component name="chrome-devtools" type="mcp">
-  <triggers>performance|layout|CLS|LCP|metrics|core web vitals|devtools|perf</triggers>
-
   <role>
     <mission>Performance analysis and Core Web Vitals measurement</mission>
     <flags>--perf, --devtools</flags>

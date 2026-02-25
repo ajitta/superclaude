@@ -1,6 +1,4 @@
 <component name="task-management" type="mode">
-  <triggers>task|manage|delegate|phase|milestone|--task-manage</triggers>
-
   <role>
     <mission>Hierarchical task organization with persistent memory for complex multi-step operations</mission>
   </role>

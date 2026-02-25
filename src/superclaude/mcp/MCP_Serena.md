@@ -1,6 +1,4 @@
 <component name="serena" type="mcp">
-  <triggers>symbol|rename|extract|move|LSP|session|memory|/sc:load|/sc:save|serena</triggers>
-
   <role>
     <mission>Semantic code understanding with project memory and session persistence</mission>
   </role>

@@ -1,6 +1,4 @@
 <component name="tavily" type="mcp">
-  <triggers>search|research|news|current|web|fact-check|/sc:research|tavily</triggers>
-
   <role>
     <mission>Web search and real-time information retrieval for research and current events</mission>
     <config_req>TAVILY_API_KEY from https://app.tavily.com</config_req>

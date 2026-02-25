@@ -1,6 +1,4 @@
 <component name="playwright" type="mcp">
-  <triggers>browser|E2E|test|screenshot|validation|accessibility|WCAG|playwright</triggers>
-
   <role>
     <mission>Browser automation and E2E testing with real browser interaction</mission>
   </role>

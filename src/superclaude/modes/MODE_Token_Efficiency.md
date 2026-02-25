@@ -1,6 +1,4 @@
 <component name="token-efficiency" type="mode">
-  <triggers>compress|efficient|--token-efficient|--uc|--ultracompressed|token|brevity</triggers>
-
   <role>
     <mission>Symbol-enhanced communication mindset for compressed clarity and efficient token usage</mission>
   </role>

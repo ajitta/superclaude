@@ -1,6 +1,4 @@
 <component name="morphllm" type="mcp">
-  <triggers>pattern|bulk|edit|transform|style|framework|text-replacement|morphllm</triggers>
-
   <role>
     <mission>Pattern-based code editing engine with token optimization for bulk transformations</mission>
   </role>

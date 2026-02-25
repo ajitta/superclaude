@@ -1,6 +1,4 @@
 <component name="business-symbols" type="core" priority="medium">
-  <triggers>business|panel|expert|strategy|framework|symbol</triggers>
-
   <role>
     <mission>Business analysis symbol system and usage patterns for strategic panel</mission>
   </role>

@@ -1,6 +1,4 @@
 <component name="magic" type="mcp">
-  <triggers>UI|component|button|form|modal|card|table|nav|/ui|/21|responsive|accessible</triggers>
-
   <role>
     <mission>Modern UI component generation from 21st.dev patterns with design system integration</mission>
   </role>

@@ -1,6 +1,4 @@
 <component name="research-config" type="core" priority="medium">
-  <triggers>research|deep-research|planning|hop|confidence|tavily</triggers>
-
   <role>
     <mission>Deep research configuration and strategy settings</mission>
   </role>

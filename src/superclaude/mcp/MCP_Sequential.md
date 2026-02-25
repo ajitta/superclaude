@@ -1,6 +1,4 @@
 <component name="sequential" type="mcp">
-  <triggers>--effort medium|--effort high|--effort max|debug|architecture|analysis|reasoning|sequential</triggers>
-
   <role>
     <mission>Multi-step reasoning engine for complex analysis and systematic problem solving</mission>
   </role>

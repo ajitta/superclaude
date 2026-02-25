@@ -1,6 +1,4 @@
 <component name="context7" type="mcp">
-  <triggers>library|docs|framework|documentation|import|require</triggers>
-
   <role>
     <mission>Official library documentation lookup and framework pattern guidance</mission>
   </role>

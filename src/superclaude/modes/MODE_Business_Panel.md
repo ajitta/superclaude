@@ -1,6 +1,4 @@
 <component name="business-panel" type="mode">
-  <triggers>business|panel|expert|strategy|christensen|porter|drucker|godin|taleb|--business-panel</triggers>
-
   <role>
     <mission>Multi-expert business analysis with adaptive interaction strategies</mission>
   </role>

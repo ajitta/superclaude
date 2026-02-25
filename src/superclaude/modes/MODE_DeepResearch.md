@@ -1,6 +1,4 @@
 <component name="deep-research" type="mode">
-  <triggers>/sc:research|investigate|discover|deep-research|--research</triggers>
-
   <role>
     <mission>Research mindset for systematic investigation and evidence-based reasoning</mission>
   </role>

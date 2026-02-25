@@ -1,6 +1,4 @@
 <component name="principles" type="core" priority="high" note="Version-agnostic">
-  <triggers>principle|philosophy|mindset|engineering|quality|decision</triggers>
-
   <role>
     <mission>Software engineering principles and decision frameworks</mission>
     <directive>Evidence > assumptions | Code > documentation | Efficiency > verbosity</directive>

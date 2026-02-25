@@ -1,6 +1,4 @@
 <component name="rules" type="core" priority="critical" note="Version-agnostic">
-  <triggers>rules|behavior|compliance|standards|guidelines</triggers>
-
   <role>
     <mission>Claude Code behavioral rules for framework operation</mission>
     <note>Full rules in ~/.claude/RULES.md. This file provides project-specific additions.</note>
