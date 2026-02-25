@@ -6,7 +6,7 @@ SuperClaude is a **dual-purpose** project:
 2. **Content framework** — Markdown files (commands, agents, modes, MCP docs, core config) installed into `~/.claude/` to configure Claude Code's behavior
 
 ## Version & Meta
-- **Version**: 4.2.1+ajitta
+- **Version**: 4.3.0+ajitta
 - **Python**: >=3.10
 - **Build**: hatchling (PEP 517)
 - **License**: MIT
@@ -27,9 +27,9 @@ SuperClaude is a **dual-purpose** project:
 ## Content Installation Flow
 The CLI `superclaude install` copies content from the package to Claude Code's config directory:
 ```
-src/superclaude/commands/  →  ~/.claude/commands/sc/     (30+ slash commands)
-src/superclaude/agents/    →  ~/.claude/agents/          (20+ agent definitions)
-src/superclaude/skills/    →  ~/.claude/skills/          (skill implementations)
+src/superclaude/commands/  →  ~/.claude/commands/sc/     (31 slash commands)
+src/superclaude/agents/    →  ~/.claude/agents/          (20 agent definitions)
+src/superclaude/skills/    →  ~/.claude/skills/          (3 skills: confidence-check, ship, simplicity-coach)
 src/superclaude/core/      →  ~/.claude/superclaude/core/  (FLAGS, PRINCIPLES, RULES)
 src/superclaude/modes/     →  ~/.claude/superclaude/modes/ (7 behavioral modes)
 src/superclaude/mcp/       →  ~/.claude/superclaude/mcp/   (MCP server docs + configs)
@@ -46,44 +46,34 @@ src/superclaude/
 ├── execution/           # Parallel executor, self-correction, reflection
 ├── cli/                 # Click CLI (main, install_paths, install_components, install_settings, install_inventory, install_skill, install_mcp, install_commands, doctor)
 ├── hooks/               # Hook system (hook_tracker, inline_hooks, mcp_fallback, hooks.json)
-├── commands/            # 30+ slash command markdown files
-├── agents/              # 20+ agent definition markdown files
+├── commands/            # 31 slash command markdown files
+├── agents/              # 20 agent definition markdown files + README
 ├── modes/               # 7 behavioral mode markdown files
 ├── mcp/                 # MCP server docs + configs/ directory with JSON configs
 ├── core/                # FLAGS.md, PRINCIPLES.md, RULES.md
-├── skills/              # Skill implementations (confidence-check with SKILL.md)
-├── scripts/             # Shell/Python utilities
-├── utils/               # Utility modules
+├── skills/              # 3 skills (confidence-check, ship, simplicity-coach) each with SKILL.md manifest
+├── scripts/             # context_loader.py (v3.1 hybrid injection), session_init.py, token_estimator.py, skill_activator.py
+├── utils/               # Utility modules (atomic_write_json)
 └── examples/            # Example workflows
 ```
 
 ## Tests
-```
-tests/
-├── conftest.py                     # Shared fixtures
-├── unit/                           # 10 unit test files
-│   ├── test_confidence.py
-│   ├── test_self_check.py
-│   ├── test_reflexion.py
-│   ├── test_token_budget.py
-│   ├── test_parallel.py
-│   ├── test_hooks.py
-│   ├── test_hook_tracker.py
-│   ├── test_mcp_fallback.py
-│   └── test_cli_install.py
-└── integration/
-    └── test_pytest_plugin.py
-```
+- **734 tests passing** (as of v4.3.0)
+- Location: tests/unit/ (6 files), tests/integration/ (1 file)
+- Run: `uv run pytest` or `uv run python -m pytest`
+- Custom markers: confidence_check, self_check, reflexion, complexity(level), hallucination, performance
+- Auto-markers: unit/integration added by path in `pytest_collection_modifyitems`
 
 ## PM Agent Patterns
 | Pattern | Class | Purpose | Threshold |
 |---------|-------|---------|-----------|
 | ConfidenceChecker | `pm_agent/confidence.py` | Pre-execution gate | >=90% proceed, 70-89% alternatives, <70% stop |
 | SelfCheckProtocol | `pm_agent/self_check.py` | Post-validation | Evidence required |
-| ReflexionPattern | `pm_agent/reflexion.py` | Error learning | Cross-session |
+| ReflexionPattern | `pm_agent/reflexion.py` | Error learning | Cross-session (JSONL) |
 | TokenBudgetManager | `pm_agent/token_budget.py` | Token allocation | simple/medium/complex |
+| TaskCleanupManager | `pm_agent/task_cleanup.py` | Stale task removal | 24h threshold |
 
-`confidence.py` uses Protocol-based design with pluggable checks: NoDuplicatesCheck, ArchitectureCheck, OfficialDocsCheck, OssReferenceCheck, RootCauseCheck, PRStatusCheck.
+`confidence.py` uses Protocol-based design with pluggable checks: NoDuplicatesCheck, ArchitectureCheck, OfficialDocsCheck, OssReferenceCheck, RootCauseCheck. PRStatusCheck exists but must be registered manually.
 
 ## Hooks System
 - `hook_tracker.py`: `once: true` session tracking (24h TTL, state in `~/.claude/.superclaude_hooks/`)
@@ -93,3 +83,11 @@ tests/
 ## Git Workflow
 - Branch: `master` ← `integration` ← `feature/*`, `fix/*`, `docs/*`
 - Commits: `feat:`, `fix:`, `docs:`, `refactor:`, `test:`, `chore:`
+
+## Recent Changes (v4.3.0)
+- Version bump from 4.2.1 to 4.3.0
+- context_loader.py v3.1: hybrid injection, tightened TRIGGER_MAP, COMPOSITE_FLAGS, --no-mcp
+- permissionMode frontmatter added to all 20 agent files
+- Triggers XML cleanup across 69 files
+- Beads (bd) tracking removed from repository
+- Test count growth: 225 → 734

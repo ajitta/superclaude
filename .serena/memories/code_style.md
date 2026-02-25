@@ -22,17 +22,18 @@
 
 ## Markdown Content Files
 - Commands: YAML frontmatter with context, agent, user-invocable, allowed-tools fields
-- Agents: Markdown definitions with trigger keywords and tool descriptions
-- Modes: Behavioral mode definitions
+- Agents: YAML frontmatter with name, description, memory, permissionMode fields
+- Modes: Behavioral mode definitions (MODE_*.md)
 - MCP: Server documentation with JSON configs in `configs/` subdirectory
 
 ## Test Conventions
-- Test files: `test_*.py` in `tests/unit/` and `tests/integration/`
+- Test files: `test_*.py` in `tests/unit/` (6 files) and `tests/integration/` (1 file)
 - Test classes: `Test*`
 - Test functions: `test_*`
 - Markers: confidence_check, self_check, reflexion, complexity, hallucination, performance
 - Auto-markers: unit/integration added by path in `pytest_collection_modifyitems`
 - Fixtures in `conftest.py` and `pytest_plugin.py`
+- 734 tests as of v4.3.0
 
 ## Anti-Patterns to Avoid
 - Never use pip directly (always UV)
@@ -40,3 +41,7 @@
 - Bug fix ≠ cleanup opportunity
 - Delete unused code completely (no commented-out remnants)
 - Don't add docstrings/comments to unchanged code
+
+## Environment Notes
+- Development on Windows 11 with bash shell in Claude Code
+- `uv run pytest` may need `uv run python -m pytest` fallback on Windows

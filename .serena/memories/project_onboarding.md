@@ -1,7 +1,7 @@
 # SuperClaude Framework - Project Onboarding
 
 ## Overview
-SuperClaude v4.2.1+ajitta is an AI-enhanced development framework for Claude Code with pytest plugin, 31 slash commands, 21 agents, and 8 behavioral modes.
+SuperClaude v4.3.0+ajitta is an AI-enhanced development framework for Claude Code with pytest plugin, 31 slash commands, 20 agents, 3 skills, and 7 behavioral modes.
 
 ## Key Entry Points
 - **CLI**: `superclaude` → `src/superclaude/cli/main.py:main`
@@ -45,20 +45,21 @@ Key behaviors:
 - make deploy uses `uv tool install --editable .` for instant changes
 
 ## Directory Structure
-- agents/: 21 specialized agent definitions (.md)
-- commands/: 31 slash command definitions (.md)
-- modes/: 8 behavioral mode definitions (.md)
+- agents/: 20 specialized agent definitions (.md) + README
+- commands/: 31 slash command definitions (.md) + README
+- modes/: 7 behavioral mode definitions (MODE_*.md)
 - mcp/: MCP server docs + configs/
 - core/: FLAGS.md, PRINCIPLES.md, RULES.md
-- skills/: Skill directories with SKILL.md manifests (confidence-check, simplicity-coach)
+- skills/: 3 skill directories (confidence-check, ship, simplicity-coach) with SKILL.md manifests
 - hooks/: Hook definitions, session tracking, frontmatter parser, MCP fallback
 - utils/: Shared utilities (atomic_write_json)
-- scripts/: Shell/Python utilities (context_reset.py, session_init.py, etc.)
+- scripts/: context_loader.py (v3.1 hybrid injection), session_init.py, token_estimator.py, skill_activator.py
 
 ## Testing
 - Framework: pytest≥7.0.0
-- Location: tests/unit/ (10 files), tests/integration/ (1 file)
-- Run: `uv run pytest`
+- Location: tests/unit/ (6 files), tests/integration/ (1 file)
+- **734 tests passing** (v4.3.0)
+- Run: `uv run pytest` or `uv run python -m pytest`
 - Custom markers: confidence_check, self_check, reflexion, complexity(level), hallucination, performance
 
 ## Development Workflow
@@ -78,3 +79,9 @@ make format                 # ruff format
 - KNOWLEDGE.md: Accumulated insights, troubleshooting
 - CHANGELOG.md: Version history
 - pyproject.toml: Package configuration (hatchling, Python >=3.10)
+
+## Agent Frontmatter (v4.3.0)
+All 20 agents have:
+- `name`, `description`, `memory: user` (v2.1.33)
+- `permissionMode` field (added Feb 2025): high autonomy → acceptEdits, medium → default, low → plan
+- `<bounds will="..." wont="..."/>` sections with negative examples

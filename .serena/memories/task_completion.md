@@ -15,8 +15,9 @@ uv run ruff format .
 
 ## 3. Tests
 ```bash
-uv run pytest                    # Full suite
-uv run pytest tests/unit/ -v     # Unit tests if only Python changes
+uv run pytest                    # Full suite (734 tests, v4.3.0)
+uv run python -m pytest         # Windows fallback
+uv run pytest tests/unit/ -v    # Unit tests if only Python changes
 ```
 All tests must pass.
 

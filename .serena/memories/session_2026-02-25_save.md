@@ -12,12 +12,21 @@
    - Serena + Tavily excluded from INSTRUCTION_MAP → full .md injection (behavioral patterns)
 5. **Tests**: 734 passing, 3 new tests added (permissionMode), 3 removed (triggers)
 
-## Commits (5, unpushed)
+## Commits (all pushed to origin/master)
 - 66062c7: permissionMode + command-agent linkage + agent trigger removal
 - e36c4c9: command triggers removal (28 files)
 - 7fc7cc0: core/modes/mcp triggers removal (20 files)
 - 57fb5c7: context_loader v3.1 hybrid injection
 - d9f21df: Tavily → full .md injection
+
+## Post-session commits (v4.3.0 bump, also pushed)
+- 341845c: fix: --safe-mode triggers Token Efficiency mode (auto --uc)
+- 40a27af: fix: tighten Serena trigger regex
+- 3e0f426: docs: fix stale counts in CLAUDE.md
+- 8a46ad0: chore: bump version to 4.3.0+ajitta
+- c64e37e: fix: correct stale test count in confidence-check
+- 93f4229, f04886c, 077303e: docs updates (PROJECT_INDEX, KNOWLEDGE.md)
+- 9f6e48b: chore: remove beads (bd) tracking from repository
 
 ## Key Decisions
 - `<triggers>` XML was dead code — never read by any Python code or runtime
@@ -38,5 +47,6 @@ User prompt → stdin → context_loader.py
 ```
 
 ## Repository State
-- Branch: master (5 commits ahead of origin, unpushed)
-- 734 tests passing, version 4.2.1+ajitta
+- Branch: master (up to date with origin, all commits pushed)
+- 734 tests passing, version 4.3.0+ajitta
+- Clean working tree

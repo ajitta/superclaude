@@ -1,6 +1,6 @@
 # Suggested Commands for SuperClaude Development
 
-## System: macOS (Darwin)
+## System: Windows 11 (win32, bash shell in Claude Code)
 
 ## Package Management (UV only — never use pip)
 ```bash
@@ -16,7 +16,8 @@ uv run superclaude mcp               # MCP server management
 
 ## Testing
 ```bash
-uv run pytest                              # Full test suite
+uv run pytest                              # Full test suite (734 tests)
+uv run python -m pytest                    # Alternative invocation
 uv run pytest tests/unit/ -v               # Unit tests only
 uv run pytest tests/integration/ -v        # Integration tests
 uv run pytest tests/unit/test_confidence.py -v  # Single file
@@ -54,9 +55,7 @@ git checkout -b feature/name  # New feature branch
 # Commits: feat:, fix:, docs:, refactor:, test:, chore:
 ```
 
-## System Utils (macOS)
-```bash
-ls, cd, pwd          # Directory navigation
-find . -name "*.py"  # Find files
-grep -r "pattern" .  # Search content
-```
+## Windows-specific Notes
+- Claude Code uses bash shell on Windows (Unix syntax, forward slashes)
+- Use `/c/Users/...` paths in bash, `C:\Users\...` in tool paths
+- `uv run pytest` may show "Failed to canonicalize script path" — use `uv run python -m pytest` as fallback
