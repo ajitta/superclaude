@@ -76,91 +76,94 @@ BASE_PATH = _get_base_path()
 
 # Trigger → File mapping with priority (lower = higher priority)
 # Format: (regex_pattern, relative_path, priority)
+# NOTE: Avoid generic single words (edit, test, search, task, docs, debug, ui, etc.)
+#       that cause false positives on normal coding prompts.
+#       Use compound terms (e.g. "browser test" not "test") or explicit flags (--play).
 TRIGGER_MAP = [
-    # Modes (detailed) - Priority 1-2
+    # Modes - Priority 1-2
     (
-        r"(brainstorm|ideate|explore(?: ideas)?|maybe|thinking about|discuss|not sure|--brainstorm|--bs)",
+        r"(brainstorm|ideate|explore ideas|--brainstorm|--bs)",
         "modes/MODE_Brainstorming.md",
         1,
     ),
     (
-        r"(deep.?research|investigate(?: thoroughly)?|comprehensive search|/sc:research|--research|explore|discover|analyz)",
+        r"(deep.?research|investigate thoroughly|comprehensive search|/sc:research|--research)",
         "modes/MODE_DeepResearch.md",
         1,
     ),
     (
-        r"(introspect|reflect|self.?analysis|meta|analyze reasoning|--introspect)",
+        r"(introspect|self.?analysis|analyze reasoning|--introspect)",
         "modes/MODE_Introspection.md",
         2,
     ),
     (
-        r"(orchestrat|coordinate|parallel|multi.?tool|batch|resource|efficiency|--orchestrate)",
+        r"(orchestrat|coordinate|multi.?tool|--orchestrate)",
         "modes/MODE_Orchestration.md",
         2,
     ),
     (
-        r"(task|manage|task.?manage|delegate|milestone|phase|--task-manage)",
+        r"(task.?manage|--task-manage)",
         "modes/MODE_Task_Management.md",
         2,
     ),
     (
-        r"(--uc|--ultracompressed|token.?efficient|compress|brevity|efficient|token)",
+        r"(--uc|--ultracompressed|token.?efficient|--token-efficient)",
         "modes/MODE_Token_Efficiency.md",
         1,
     ),
     (
-        r"(business|panel|expert|strategy|business.?panel|expert.?panel|strategy.?panel|christensen|porter|drucker|godin|taleb)",
+        r"(business.?panel|expert.?panel|strategy.?panel|christensen|porter|drucker|godin|taleb|--business-panel)",
         "modes/MODE_Business_Panel.md",
         1,
     ),
-    # MCP servers (detailed) - Priority 1-2
+    # MCP servers - Priority 2
     (
-        r"(context7|c7|library|docs|framework|documentation|import|require|library docs|framework docs|--c7|--context7)",
+        r"(context7|c7|library docs|framework docs|--c7|--context7)",
         "mcp/MCP_Context7.md",
         2,
     ),
     (
-        r"(sequential|seq|--effort\s*(medium|high|max)|debug|architecture|analysis|reasoning|multi.?step|reasoning chain|--seq|--sequential)",
+        r"(sequential thinking|--effort\s*(medium|high|max)|multi.?step reasoning|reasoning chain|--seq|--sequential)",
         "mcp/MCP_Sequential.md",
         2,
     ),
     (
-        r"(playwright|browser|browser test|e2e|test|screenshot|validation|accessibility|wcag|--play|--playwright)",
+        r"(playwright|browser test|e2e|screenshot|wcag|--play|--playwright)",
         "mcp/MCP_Playwright.md",
         2,
     ),
     (
-        r"(serena|symbol|rename|rename across|extract|move|lsp|session|memory|--serena|/sc:load|/sc:save)",
+        r"(serena|symbol ops|rename|lsp|--serena|/sc:load|/sc:save)",
         "mcp/MCP_Serena.md",
         2,
     ),
     (
-        r"(morphllm|morph|pattern|pattern replace|bulk|bulk edit|edit|transform|style|framework|text-replacement|--morph|--morphllm)",
+        r"(morphllm|morph|pattern replace|bulk edit|bulk transform|--morph|--morphllm)",
         "mcp/MCP_Morphllm.md",
         2,
     ),
     (
-        r"(magic|21st|ui component|ui|component|button|form|modal|card|table|nav|responsive|accessible|--magic|/ui|/21)",
+        r"(magic|21st|ui component|design system|--magic|/ui|/21)",
         "mcp/MCP_Magic.md",
         2,
     ),
     (
-        r"(tavily|search|research|news|current|web|fact-check|/sc:research|web search|news search|--tavily)",
+        r"(tavily|web search|news|fact.?check|/sc:research|--tavily)",
         "mcp/MCP_Tavily.md",
         1,
     ),
     (
-        r"(devtools|perf|performance|performance audit|layout|layout debug|cls|lcp|metrics|core web vitals|--perf|--devtools)",
+        r"(devtools|performance audit|layout shift|core web vitals|\bcls\b|\blcp\b|\bfid\b|\bttfb\b|--perf|--devtools)",
         "mcp/MCP_Chrome-DevTools.md",
         2,
     ),
-    # Research config (supplementary to MODE_DeepResearch) - Priority 3
+    # Research config (supplementary) - Priority 3
     (
-        r"(research.?config|hop.?config|research.?depth|credibility|deep.?research.?config|--research)",
+        r"(research.?config|hop.?config|research.?depth|deep.?research.?config|--research)",
         "modes/RESEARCH_CONFIG.md",
         3,
     ),
-    # Business symbols/examples - Priority 3 (lower priority, supplementary)
+    # Business symbols - Priority 3
     (r"(business.?symbol|strategic.?symbol|business.?example|panel.?example)", "core/BUSINESS_SYMBOLS.md", 3),
     # Note: PRINCIPLES.md removed - now loaded via CLAUDE_SC.md @-reference
 ]
@@ -171,53 +174,31 @@ TRIGGER_MAP = [
     for pattern, path, priority in TRIGGER_MAP
 ]
 
-# v3.0: Instruction Injection Map
-# Short instruction strings (~25-80 tokens) replace full .md file injection (~500-750 tokens each)
-# Claude already has MCP tool descriptions from servers; these provide behavioral guidance only.
-# Full .md files remain source of truth; instructions are derived summaries.
+# Composite flags: one flag → multiple context files
+COMPOSITE_FLAGS = {
+    "--frontend-verify": [
+        ("mcp/MCP_Playwright.md", 1),
+        ("mcp/MCP_Chrome-DevTools.md", 1),
+        ("mcp/MCP_Serena.md", 1),
+    ],
+    "--all-mcp": [
+        ("mcp/MCP_Context7.md", 1),
+        ("mcp/MCP_Sequential.md", 1),
+        ("mcp/MCP_Playwright.md", 1),
+        ("mcp/MCP_Serena.md", 1),
+        ("mcp/MCP_Morphllm.md", 1),
+        ("mcp/MCP_Magic.md", 1),
+        ("mcp/MCP_Tavily.md", 1),
+        ("mcp/MCP_Chrome-DevTools.md", 1),
+    ],
+}
+
+# v3.1: Hybrid Injection Map
+# MCP files → short instructions (Claude already gets tool descriptions from MCP servers)
+# Mode files → full .md injection (behavioral rules, symbol tables, tool matrices need complete content)
+# Core files → short instructions (supplementary reference)
 INSTRUCTION_MAP = {
-    # Modes - behavioral directives
-    "modes/MODE_Brainstorming.md": (
-        "Brainstorm mode: Socratic dialogue, probe assumptions, divergent→convergent thinking. "
-        "Present alternatives before committing. No implementation until user confirms direction. "
-        "Ask probing questions, challenge premises, explore edge cases."
-    ),
-    "modes/MODE_DeepResearch.md": (
-        "Deep research mode: Plan→Search→Analyze→Synthesize. Multi-source triangulation. "
-        "Every claim needs verification. Progressive drilling. Confidence scoring per finding. "
-        "Citation-ready output. Question biases."
-    ),
-    "modes/MODE_Introspection.md": (
-        "Introspection mode: Expose reasoning with markers — "
-        "🤔thinking 🎯target ⚡action 📊metrics 💡insight. "
-        "Show confidence levels, alternatives considered, and tradeoffs at each decision point."
-    ),
-    "modes/MODE_Orchestration.md": (
-        "Orchestration mode: Choose most powerful tool per task. "
-        "Identify independent ops for parallel execution. Wave→Checkpoint→Wave pattern. "
-        "Resource-aware batching. Maximize concurrent operations."
-    ),
-    "modes/MODE_Task_Management.md": (
-        "Task management mode: Plan→Phase→Task→Todo hierarchy. "
-        "Use TaskCreate for 3+ steps. Persistent cross-session tracking via write_memory. "
-        "Progressive enhancement. Dependency-aware sequencing."
-    ),
-    "modes/MODE_Token_Efficiency.md": (
-        "Token efficiency mode: Symbol-enhanced communication. "
-        "Context-aware abbreviation. Target 30-50% token reduction at ≥95% information quality. "
-        "Compressed formatting, tables over prose, code over explanation."
-    ),
-    "modes/MODE_Business_Panel.md": (
-        "Business panel mode: Multi-expert analysis with frameworks — "
-        "Christensen(disruption) Porter(competition) Drucker(management) Godin(marketing) Taleb(risk). "
-        "Adaptive interaction: strategic, innovation, risk debate, socratic."
-    ),
-    "modes/RESEARCH_CONFIG.md": (
-        "Research config: max_hops=5, confidence≥0.7, parallel=true. "
-        "Hop chains: entity/concept/temporal/causal. Credibility tiers 1-4. "
-        "Depth profiles: quick(10src/2m) standard(20/5m) deep(40/8m) exhaustive(50+/10m)."
-    ),
-    # MCP servers - tool awareness (Claude already has tool descriptions from MCP servers)
+    # MCP servers - tool awareness only (Claude has full tool descriptions from MCP protocol)
     "mcp/MCP_Context7.md": (
         "Context7 MCP: resolve-library-id → query-docs for official library documentation. "
         "Version-specific. Use for imports, framework patterns, API compliance."
@@ -236,10 +217,8 @@ INSTRUCTION_MAP = {
         "Playwright MCP: Browser automation and E2E testing. Real rendering, screenshots, "
         "user journeys, WCAG accessibility. Use for login flows, forms, visual validation."
     ),
-    "mcp/MCP_Serena.md": (
-        "Serena MCP: Semantic code understanding — symbol ops, LSP, rename across codebase, "
-        "dependency tracking, project memory. Use for large projects, architectural understanding."
-    ),
+    # mcp/MCP_Serena.md — NOT in INSTRUCTION_MAP: full .md injection required
+    # (initialization sequence, decision matrix, memory patterns, thinking tools status)
     "mcp/MCP_Morphllm.md": (
         "Morphllm MCP: Pattern-based bulk code transformations. Style enforcement, "
         "framework updates. Fast Apply with 30-50% token savings. Best for <10 files, "
@@ -258,7 +237,7 @@ INSTRUCTION_MAP = {
         "Business symbols + expert selection: 🎯target 📈growth 💰financial ⚖️tradeoffs 🏆competitive 🌊blue-ocean. "
         "Includes expert domain mapping, discussion templates, and abbreviations."
     ),
-    # Note: PRINCIPLES.md removed - now loaded via CLAUDE_SC.md @-reference
+    # Mode files NOT listed here → full .md injection via fallback path
 }
 
 # Environment variable to control instruction mode (default: enabled)
@@ -328,11 +307,28 @@ def check_triggers(prompt: str) -> list[tuple[str, int]]:
     loaded = get_loaded_contexts()
     prompt_lower = prompt.lower()
 
+    # --no-mcp: suppress all MCP context loading
+    no_mcp = bool(re.search(r"--no-mcp", prompt_lower))
+
+    def _add_context(context_file: str, priority: int) -> None:
+        if context_file in loaded:
+            return
+        if no_mcp and context_file.startswith("mcp/"):
+            return
+        contexts_to_load.append((context_file, priority))
+        loaded.add(context_file)
+        mark_as_loaded(context_file)
+
+    # Composite flags (one flag → multiple files)
+    for flag, files in COMPOSITE_FLAGS.items():
+        if flag in prompt_lower:
+            for context_file, priority in files:
+                _add_context(context_file, priority)
+
+    # Standard trigger matching
     for pattern, context_file, priority in TRIGGER_MAP:
         if pattern.search(prompt_lower):
-            if context_file not in loaded:
-                contexts_to_load.append((context_file, priority))
-                mark_as_loaded(context_file)
+            _add_context(context_file, priority)
 
     # Sort by priority (lower number = higher priority)
     contexts_to_load.sort(key=lambda x: x[1])
@@ -382,9 +378,10 @@ def check_mcp_fallbacks(contexts: list[tuple[str, int]]) -> list[str]:
 def output_inject_mode(contexts: list[tuple[str, int]]) -> None:
     """Output context for triggered files.
 
-    v3.0: Instruction injection mode (default) outputs short instruction strings
-    instead of full file contents. ~86% token reduction for heavy sessions.
-    Set CLAUDE_CONTEXT_USE_INSTRUCTIONS=0 to revert to full file injection.
+    v3.1: Hybrid injection — MCP files use short instruction strings (Claude already
+    has tool descriptions from MCP servers), Mode files inject full .md content
+    (behavioral rules, symbol tables, tool matrices need complete content).
+    Set CLAUDE_CONTEXT_USE_INSTRUCTIONS=0 to inject full .md files for everything.
     """
     total_tokens = 0
     loaded_files = []
@@ -458,6 +455,11 @@ def main() -> None:
 
     # Check triggers and get contexts to load
     contexts = check_triggers(prompt)
+
+    # --no-mcp notification
+    if "--no-mcp" in prompt.lower():
+        print("<!-- --no-mcp: MCP contexts suppressed. Using native tools + WebSearch. -->")
+        print()
 
     if not contexts:
         return
