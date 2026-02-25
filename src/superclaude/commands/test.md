@@ -10,8 +10,6 @@ description: Execute tests with coverage analysis and automated quality reportin
 
   <syntax>/sc:test [target] [--type unit|integration|e2e|all] [--coverage] [--watch] [--fix]</syntax>
 
-  <triggers>test execution|coverage analysis|continuous testing|test failure analysis</triggers>
-
   <flow>
     1. Discover: Categorize tests via runner patterns
     2. Configure: Environment + execution params

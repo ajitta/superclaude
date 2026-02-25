@@ -10,8 +10,6 @@ description: Provide development estimates for tasks, features, or projects with
 
   <syntax>/sc:estimate [target] [--type time|effort|complexity] [--unit hours|days|weeks] [--breakdown]</syntax>
 
-  <triggers>development estimates|project scoping|feature breakdown|risk assessment</triggers>
-
   <flow>
     1. Analyze: Scope, complexity, deps, patterns
     2. Calculate: Methodology + benchmarks

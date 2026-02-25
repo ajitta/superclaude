@@ -10,8 +10,6 @@ description: Interactive requirements discovery through Socratic dialogue and sy
 
   <syntax>/sc:brainstorm [topic/idea] [--strategy systematic|agile|enterprise] [--depth shallow|normal|deep] [--parallel]</syntax>
 
-  <triggers>ambiguous ideas|requirements discovery|concept validation|cross-session refinement</triggers>
-
   <flow>
     1. Explore: Socratic dialogue + systematic questioning
     2. Analyze: Multi-persona coordination + domain expertise

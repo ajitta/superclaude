@@ -10,8 +10,6 @@ description: SuperClaude command dispatcher - main entry point for all features
 
   <syntax>/sc:[command] [args...]</syntax>
 
-  <triggers>/sc|superclaude-help|command-list</triggers>
-
   <commands>
     - agent: Session controller + workflow orchestration
     - analyze: Code analysis across quality/security/perf/arch

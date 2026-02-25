@@ -10,8 +10,6 @@ description: Repository indexing with 94% token reduction (58K → 3K)
 
   <syntax>/sc:index-repo [mode=create|update|quick]</syntax>
 
-  <triggers>repository indexing|token reduction|project structure docs</triggers>
-
   <flow>
     1. Detect: Project type from entry files (pyproject.toml, package.json, etc.)
     2. Analyze: Auto-discover structure (parallel Glob for code|docs|tests|config)

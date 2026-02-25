@@ -10,8 +10,6 @@ description: Comprehensive code analysis across quality, security, performance, 
 
   <syntax>/sc:analyze [target] [--focus quality|security|performance|architecture] [--depth quick|deep] [--format text|json|report]</syntax>
 
-  <triggers>code quality|security scanning|performance bottlenecks|architecture review</triggers>
-
   <flow>
     1. Discover: Categorize files by language
     2. Scan: Domain-specific analysis per --focus

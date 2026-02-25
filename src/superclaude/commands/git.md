@@ -10,8 +10,6 @@ description: Git operations with intelligent commit messages and workflow optimi
 
   <syntax>/sc:git [operation] [args] [--smart-commit] [--interactive] [--pr-status] [--from-pr PR#|URL]</syntax>
 
-  <triggers>git ops|intelligent commits|repo workflow|branch management|PR review status|resume from PR</triggers>
-
   <flow>
     1. Analyze: Repo state + changes
     2. Validate: Operation appropriateness

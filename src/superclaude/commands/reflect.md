@@ -10,8 +10,6 @@ description: Task reflection and validation using Serena MCP analysis capabiliti
 
   <syntax>/sc:reflect [--type task|session|completion] [--analyze] [--validate]</syntax>
 
-  <triggers>task completion validation|session progress|cross-session learning|quality gate</triggers>
-
   <flow>
     1. Analyze: think_about_collected_information() → assess completeness
     2. Validate: think_about_task_adherence() → check goal alignment

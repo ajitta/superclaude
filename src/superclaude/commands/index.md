@@ -10,8 +10,6 @@ description: Generate comprehensive project documentation and knowledge base wit
 
   <syntax>/sc:index [target] [--type docs|api|structure|readme] [--format md|json|yaml]</syntax>
 
-  <triggers>project documentation|knowledge base|API docs|cross-referencing</triggers>
-
   <flow>
     1. Analyze: Project structure + key components
     2. Organize: Intelligent patterns + cross-refs

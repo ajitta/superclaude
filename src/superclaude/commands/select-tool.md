@@ -10,8 +10,6 @@ description: Intelligent MCP tool selection based on complexity scoring and oper
 
   <syntax>/sc:select-tool [operation] [--analyze] [--explain]</syntax>
 
-  <triggers>MCP tool selection|complexity analysis|tool routing|performance trade-offs</triggers>
-
   <flow>
     1. Parse: Operation type + scope + file count
     2. Score: Multi-dimensional complexity

@@ -10,8 +10,6 @@ description: Execute complex tasks with intelligent workflow management and dele
 
   <syntax>/sc:task [action] [target] [--strategy systematic|agile|enterprise] [--parallel] [--delegate] [--cleanup]</syntax>
 
-  <triggers>complex multi-agent coordination|structured workflow|MCP routing|systematic execution|task cleanup</triggers>
-
   <flow>
     1. Analyze: Parse requirements + optimal strategy
     2. Delegate: Route to MCP + activate personas

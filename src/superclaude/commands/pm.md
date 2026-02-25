@@ -11,8 +11,6 @@ description: Project Manager Agent - Default orchestration that coordinates sub-
 
   <syntax>/sc:pm [request] [--strategy brainstorm|direct|wave] [--verbose]</syntax>
 
-  <triggers>session start|default entry point|state questions|vague requests|multi-domain coordination</triggers>
-
   <flow>
     1. Analyze: Parse intent + classify complexity
     2. Strategy: Brainstorm | Direct | Wave

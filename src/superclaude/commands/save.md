@@ -10,8 +10,6 @@ description: Session lifecycle management with Serena MCP + Claude auto memory f
 
   <syntax>/sc:save [--type session|learnings|context|all] [--summarize] [--checkpoint]</syntax>
 
-  <triggers>session completion|cross-session memory|discovery preservation|progress tracking</triggers>
-
   <flow>
     1. Analyze: Session progress + discoveries
     2. Persist (Serena): write_memory("session_[date]", context) → write_memory("learnings_[topic]", insights)

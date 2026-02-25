@@ -10,8 +10,6 @@ description: Systematically clean up code, remove dead code, and optimize projec
 
   <syntax>/sc:cleanup [target] [--type code|imports|files|all] [--safe|--aggressive] [--interactive]</syntax>
 
-  <triggers>code maintenance|dead code removal|project structure|codebase hygiene</triggers>
-
   <flow>
     1. Analyze: Cleanup opportunities + safety assessment
     2. Plan: Choose approach + activate personas

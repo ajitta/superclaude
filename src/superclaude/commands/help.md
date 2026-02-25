@@ -9,8 +9,6 @@ description: List all available /sc commands and their functionality
     <mission>List all available /sc commands and their functionality</mission>
   </role>
 
-<triggers>command discovery|framework capabilities|command documentation</triggers>
-
   <flow>
     1. Display: Complete command list
     2. Complete: End after display

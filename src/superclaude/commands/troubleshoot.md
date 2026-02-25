@@ -10,8 +10,6 @@ description: Diagnose and resolve issues in code, builds, deployments, and syste
 
   <syntax>/sc:troubleshoot [issue] [--type bug|build|performance|deployment] [--trace] [--fix]</syntax>
 
-  <triggers>code defects|build failures|performance diagnosis|deployment debugging</triggers>
-
   <flow>
     1. Analyze: Issue description + system state
     2. Investigate: Root causes via pattern analysis

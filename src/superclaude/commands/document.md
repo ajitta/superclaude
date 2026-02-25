@@ -10,8 +10,6 @@ description: Generate focused documentation for components, functions, APIs, and
 
   <syntax>/sc:document [target] [--type inline|external|api|guide] [--style brief|detailed]</syntax>
 
-  <triggers>component docs|API reference|code comments|user guides</triggers>
-
   <flow>
     1. Analyze: Component structure + interfaces
     2. Identify: Audience + requirements

@@ -10,8 +10,6 @@ description: Apply systematic improvements to code quality, performance, and mai
 
   <syntax>/sc:improve [target] [--type quality|performance|maintainability|style] [--safe] [--interactive]</syntax>
 
-  <triggers>code quality enhancement|performance optimization|maintainability|best practices</triggers>
-
   <flow>
     1. Analyze: Improvement opportunities + quality issues
     2. Plan: Approach + persona activation

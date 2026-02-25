@@ -10,8 +10,6 @@ description: Provide clear explanations of code, concepts, and system behavior w
 
   <syntax>/sc:explain [target] [--level basic|intermediate|advanced] [--format text|examples|interactive] [--context domain]</syntax>
 
-  <triggers>code understanding|system behavior|educational content|framework concepts</triggers>
-
   <flow>
     1. Analyze: Target code/concept/system
     2. Assess: Audience level + depth

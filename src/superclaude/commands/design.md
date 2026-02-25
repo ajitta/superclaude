@@ -10,8 +10,6 @@ description: Design system architecture, APIs, and component interfaces with com
 
   <syntax>/sc:design [target] [--type architecture|api|component|database] [--format diagram|spec|code]</syntax>
 
-  <triggers>architecture planning|API specification|component design|database schema</triggers>
-
   <flow>
     1. Analyze: Requirements + existing context
     2. Plan: Design approach + structure

@@ -10,8 +10,6 @@ description: Meta-system task orchestration with intelligent breakdown and deleg
 
   <syntax>/sc:spawn [complex-task] [--strategy sequential|parallel|adaptive] [--depth normal|deep]</syntax>
 
-  <triggers>complex multi-domain ops|large-scale system ops|parallel coordination|meta-orchestration</triggers>
-
   <flow>
     1. Analyze: Complex op requirements + scope
     2. Decompose: Epic → Story → Task → Subtask

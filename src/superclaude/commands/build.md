@@ -10,8 +10,6 @@ description: Build, compile, and package projects with intelligent error handlin
 
   <syntax>/sc:build [target] [--type dev|prod|test] [--clean] [--optimize] [--verbose]</syntax>
 
-  <triggers>project compilation|build optimization|build errors|deployment artifacts</triggers>
-
   <flow>
     1. Analyze: Structure, configs, deps
     2. Validate: Environment + toolchain ready

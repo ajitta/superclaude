@@ -10,8 +10,6 @@ description: Generate structured implementation workflows from PRDs and feature 
 
   <syntax>/sc:workflow [prd-file|feature] [--strategy systematic|agile|enterprise] [--depth shallow|normal|deep] [--parallel]</syntax>
 
-  <triggers>PRD analysis|implementation workflow|multi-persona coordination|cross-session workflow</triggers>
-
   <flow>
     1. Analyze: Parse PRD + understand requirements
     2. Plan: Workflow structure + dependency mapping

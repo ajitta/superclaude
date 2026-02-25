@@ -10,8 +10,6 @@ description: Feature and code implementation with intelligent persona activation
 
   <syntax>/sc:implement [feature] [--type component|api|service|feature] [--framework react|vue|express] [--safe] [--with-tests]</syntax>
 
-  <triggers>feature development|code implementation|multi-domain dev|implementation with testing</triggers>
-
   <flow>
     1. Analyze: Requirements + tech context
     2. Plan: Approach + activate personas

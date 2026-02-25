@@ -10,8 +10,6 @@ description: Deep web research with adaptive planning and intelligent search
 
   <syntax>/sc:research "[query]" [--depth quick|standard|deep|exhaustive] [--strategy planning|intent|unified]</syntax>
 
-  <triggers>research beyond cutoff|complex questions|current events|academic research|market analysis</triggers>
-
   <flow total_effort="100%">
     <step n="1" effort="5%">Understand: Complexity + ambiguity | Info types needed | Resource reqs | Success criteria</step>
     <step n="2" effort="10%">Plan: Strategy selection | Parallelization opportunities | Question decomposition | Confidence threshold | Investigation milestones</step>

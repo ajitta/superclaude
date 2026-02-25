@@ -10,8 +10,6 @@ description: Ultra-intelligent command recommendation engine for optimal SuperCl
 
   <syntax>/sc:recommend [request] [--estimate] [--alternatives] [--expertise beginner|intermediate|expert]</syntax>
 
-  <triggers>command recommendations|approach selection|project planning</triggers>
-
   <flow>
     1. Analyze: User request + project context
     2. Classify: Category + expertise level

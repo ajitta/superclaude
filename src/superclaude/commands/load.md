@@ -10,8 +10,6 @@ description: Session lifecycle management with Serena MCP + Claude auto memory f
 
   <syntax>/sc:load [target] [--type project|config|deps|checkpoint] [--refresh] [--analyze]</syntax>
 
-  <triggers>session initialization|cross-session persistence|project activation|checkpoint loading</triggers>
-
   <flow>
     1. Initialize: activate_project() → check_onboarding_performed()
     2. Load (Serena): list_memories() → read_memory("pm_context") → read_memory("last_session") → read_memory("next_actions")

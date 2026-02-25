@@ -10,8 +10,6 @@ description: Multi-expert specification review and improvement using renowned so
 
   <syntax>/sc:spec-panel [spec|@file] [--mode discussion|critique|socratic] [--experts "name1,name2"] [--focus requirements|architecture|testing|compliance] [--iterations N]</syntax>
 
-  <triggers>specification review|expert panel analysis|requirements quality</triggers>
-
   <flow>
     1. Analyze: Parse spec content
     2. Assemble: Select relevant experts
