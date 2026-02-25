@@ -31,7 +31,7 @@ description: Design system architecture, APIs, and component interfaces with com
 
 
   <mcp servers="seq|c7"/>
-  <personas p="arch|fe|be"/>
+  <personas p="arch|fe|be|anal"/>
 
   <tools>
     - Read: Requirements analysis

@@ -90,6 +90,7 @@ Each agent includes:
 - **Output Format**: Structured response patterns
 - **Tool Preferences**: Recommended tools for the domain
 - **Autonomy Level**: Permission boundaries for actions
+- **Permission Mode**: Claude Code `permissionMode` enforced via frontmatter (v4.2)
 - **Persistent Memory**: Cross-session learning via `memory` frontmatter (v2.1.33)
 
 ## Agent Memory (v2.1.33)
@@ -130,40 +131,40 @@ Without this restriction, an agent with Task access can spawn any available suba
 
 ## Autonomy Framework
 
-Agents operate under three autonomy levels that define permission boundaries:
+Agents operate under three autonomy levels that map to Claude Code's `permissionMode` for system-level enforcement:
 
 ### Level Definitions
 
-| Level | Permission | Actions | User Interaction |
-|-------|------------|---------|------------------|
-| **high** | Proceed without asking | Read-only analysis, code generation, reporting, documentation | Inform after completion |
-| **medium** | Ask first for significant changes | Config modifications, API changes, dependency updates | Confirm before execution |
-| **low** | Ask first for all decisions | Architecture changes, tech stack decisions, boundary changes | Confirm each major step |
+| Level | permissionMode | Effect | User Interaction |
+|-------|---------------|--------|------------------|
+| **high** | `acceptEdits` | File edits auto-approved; Bash/MCP still require approval | Inform after completion |
+| **medium** | `default` | Each tool prompted on first use | Confirm before execution |
+| **low** | `plan` | Read-only; all modifications blocked until user approves | Confirm each major step |
 
 ### Autonomy by Agent
 
-| Agent | Model | Autonomy | Rationale |
-|-------|-------|----------|-----------|
-| `deep-research-agent` | opus | high | Read-only web research, no code changes |
-| `python-expert` | sonnet | high | Code generation/analysis, user reviews output |
-| `frontend-architect` | sonnet | high | UI patterns/components, no infrastructure changes |
-| `quality-engineer` | sonnet | high | Test strategy/analysis, non-destructive |
-| `repo-index` | haiku | high | Read-only indexing and briefing |
-| `learning-guide` | sonnet | high | Educational content, non-destructive |
-| `root-cause-analyst` | sonnet | high | Investigation/analysis, non-destructive |
-| `performance-engineer` | sonnet | high | Measurement/analysis, non-destructive |
-| `technical-writer` | sonnet | high | Documentation generation, user reviews output |
-| `backend-architect` | sonnet | medium | API contracts affect multiple systems |
-| `security-engineer` | opus | medium | Security changes require review |
-| `pm-agent` | sonnet | medium | Orchestration decisions need oversight |
-| `devops-architect` | sonnet | medium | Infrastructure changes are significant |
-| `refactoring-expert` | sonnet | medium | Safe refactoring patterns with user review |
-| `self-review` | sonnet | medium | Validation findings need user judgment |
-| `socratic-mentor` | sonnet | medium | Teaching guidance affects learning path |
-| `requirements-analyst` | sonnet | medium | Specification decisions need stakeholder input |
-| `system-architect` | opus | low | Architecture decisions have broad impact |
-| `business-panel-experts` | opus | low | Strategy decisions require business context |
-| `simplicity-guide` | opus | low | Simplification judgments require deep context, risk of over-simplification |
+| Agent | Model | Autonomy | permissionMode | Rationale |
+|-------|-------|----------|---------------|-----------|
+| `deep-research-agent` | opus | high | acceptEdits | Read-only web research, no code changes |
+| `python-expert` | sonnet | high | acceptEdits | Code generation/analysis, user reviews output |
+| `frontend-architect` | sonnet | high | acceptEdits | UI patterns/components, no infrastructure changes |
+| `quality-engineer` | sonnet | high | acceptEdits | Test strategy/analysis, non-destructive |
+| `repo-index` | haiku | high | acceptEdits | Read-only indexing and briefing |
+| `learning-guide` | sonnet | high | acceptEdits | Educational content, non-destructive |
+| `performance-engineer` | sonnet | high | acceptEdits | Measurement/analysis, non-destructive |
+| `backend-architect` | sonnet | medium | default | API contracts affect multiple systems |
+| `pm-agent` | sonnet | medium | default | Orchestration decisions need oversight |
+| `devops-architect` | sonnet | medium | default | Infrastructure changes are significant |
+| `refactoring-expert` | sonnet | medium | default | Safe refactoring patterns with user review |
+| `self-review` | opus | medium | default | Validation findings need user judgment |
+| `socratic-mentor` | sonnet | medium | default | Teaching guidance affects learning path |
+| `requirements-analyst` | opus | medium | default | Specification decisions need stakeholder input |
+| `root-cause-analyst` | opus | medium | default | Investigation requiring careful judgment |
+| `technical-writer` | sonnet | medium | default | Documentation with user-facing impact |
+| `system-architect` | opus | low | plan | Architecture decisions have broad impact |
+| `security-engineer` | opus | low | plan | Security policies require explicit review |
+| `business-panel-experts` | opus | low | plan | Strategy decisions require business context |
+| `simplicity-guide` | opus | low | plan | Simplification judgments require deep context |
 
 ### Tool Guidance Semantics
 
@@ -223,13 +224,13 @@ name: agent-name
 description: Brief description (triggers - keyword1, keyword2)
 model: opus|sonnet|haiku                  # Sub-agent model routing (v4.2)
 autonomy: high|medium|low                 # Permission boundaries (v2.1.37)
-memory: project                              # Persistent memory scope (v2.1.33)
+permissionMode: acceptEdits|default|plan  # Claude Code enforcement (v4.2)
+memory: project                           # Persistent memory scope (v2.1.33)
 ---
 ```
 
 ```xml
 <component name="agent-name" type="agent">
-  <triggers>keyword1|keyword2</triggers>
   <mcp servers="seq|c7"/>
   <tool_guidance autonomy="high|medium|low">
     ...

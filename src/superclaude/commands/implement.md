@@ -28,7 +28,7 @@ description: Feature and code implementation with intelligent persona activation
     3. Magic: UI component generation, design system compliance
     4. Playwright: post-implementation visual verification, E2E validation
   </mcp_routing>
-  <personas p="arch|fe|be|sec|qa"/>
+  <personas p="arch|fe|be|sec|qa|py"/>
 
   <defaults effort="medium">
 | Type | Effort | Token Budget | Rationale |

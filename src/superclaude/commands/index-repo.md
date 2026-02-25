@@ -22,6 +22,8 @@ description: Repository indexing with 94% token reduction (58K → 3K)
   </flow>
 
 
+  <personas p="index"/>
+
   <tools>
     - Glob: Parallel structure scan (code|docs|config|tests|scripts)
     - Read: Metadata extraction

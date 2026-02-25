@@ -31,7 +31,7 @@ description: Systematically clean up code, remove dead code, and optimize projec
 
 
   <mcp servers="seq|c7"/>
-  <personas p="arch|qual|sec"/>
+  <personas p="arch|qual|sec|refactor"/>
 
   <tools>
     - Read/Grep/Glob: Analysis + pattern detection

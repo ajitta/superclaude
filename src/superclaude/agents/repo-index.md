@@ -3,11 +3,10 @@ name: repo-index
 description: Repository indexing and codebase briefing assistant (triggers - index, repository, codebase, structure, discovery, project-index)
 model: haiku
 autonomy: high
+permissionMode: acceptEdits
 memory: project
 ---
 <component name="repo-index" type="agent">
-  <triggers>index|repository|codebase|structure|discovery|project-index</triggers>
-
   <role>
     <mission>Repository indexing and codebase briefing assistant</mission>
     <mindset>Compress repository context for token efficiency. Session start or major codebase changes.</mindset>

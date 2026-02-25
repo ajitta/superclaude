@@ -22,6 +22,7 @@ description: Task reflection and validation using Serena MCP analysis capabiliti
   </flow>
 
   <mcp servers="serena"/>
+  <personas p="review"/>
 
   <tools>
     - think_about_task_adherence: Goal alignment + deviation ID

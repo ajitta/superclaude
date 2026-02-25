@@ -13,6 +13,12 @@ import pytest
 AGENTS_DIR = Path(__file__).parent.parent.parent / "src" / "superclaude" / "agents"
 
 VALID_AUTONOMY_LEVELS = {"high", "medium", "low"}
+VALID_PERMISSION_MODES = {"acceptEdits", "default", "plan", "dontAsk", "bypassPermissions"}
+AUTONOMY_TO_PERMISSION = {
+    "high": "acceptEdits",
+    "medium": "default",
+    "low": "plan",
+}
 VALID_MEMORY_SCOPES = {"user", "project", "local"}
 
 # All agent .md files (excluding README)
@@ -93,6 +99,17 @@ class TestAgentFrontmatter:
             f"{stem}: autonomy '{level}' not in {VALID_AUTONOMY_LEVELS}"
         )
 
+    def test_has_permission_mode(self, agent):
+        stem, content, fm = agent
+        assert "permissionMode" in fm, f"{stem}: frontmatter missing 'permissionMode'"
+
+    def test_permission_mode_valid(self, agent):
+        stem, content, fm = agent
+        mode = fm.get("permissionMode", "")
+        assert mode in VALID_PERMISSION_MODES, (
+            f"{stem}: permissionMode '{mode}' not in {VALID_PERMISSION_MODES}"
+        )
+
     def test_has_memory(self, agent):
         stem, content, fm = agent
         assert "memory" in fm, f"{stem}: frontmatter missing 'memory'"
@@ -130,14 +147,6 @@ class TestAgentXMLStructure:
             f"{stem}: component type='{ctype}', expected 'agent'"
         )
 
-    def test_has_triggers(self, agent):
-        stem, content, _ = agent
-        triggers = extract_xml_content(content, "triggers")
-        assert triggers, f"{stem}: missing or empty <triggers>"
-        assert "|" in triggers, (
-            f"{stem}: triggers should be pipe-delimited"
-        )
-
     def test_has_role(self, agent):
         stem, content, _ = agent
         assert "<role>" in content, f"{stem}: missing <role> section"
@@ -166,14 +175,6 @@ class TestAgentXMLStructure:
 class TestAgentCrossFieldConsistency:
     """Validate that frontmatter and XML body are consistent."""
 
-    def test_triggers_in_description(self, agent):
-        """Frontmatter description should mention triggers."""
-        stem, content, fm = agent
-        desc = fm.get("description", "")
-        assert "triggers" in desc.lower() or "trigger" in desc.lower(), (
-            f"{stem}: description should include trigger keywords"
-        )
-
     def test_autonomy_matches_tool_guidance(self, agent):
         """Frontmatter autonomy should match tool_guidance autonomy attr."""
         stem, content, fm = agent
@@ -183,6 +184,17 @@ class TestAgentCrossFieldConsistency:
         assert fm_level == xml_level, (
             f"{stem}: frontmatter autonomy '{fm_level}' != "
             f"tool_guidance autonomy '{xml_level}'"
+        )
+
+    def test_autonomy_permission_mode_consistency(self, agent):
+        """Autonomy level must map to the correct permissionMode."""
+        stem, content, fm = agent
+        autonomy = fm.get("autonomy", "")
+        mode = fm.get("permissionMode", "")
+        expected = AUTONOMY_TO_PERMISSION.get(autonomy)
+        assert mode == expected, (
+            f"{stem}: autonomy '{autonomy}' should map to "
+            f"permissionMode '{expected}', got '{mode}'"
         )
 
     def test_mission_appears_in_description(self, agent):
@@ -270,11 +282,6 @@ class TestSimplicityGuideSpecific:
 
     def test_dave_thomas_attribution(self):
         assert "Dave Thomas" in self.content
-
-    def test_triggers_include_key_terms(self):
-        triggers = extract_xml_content(self.content, "triggers") or ""
-        for term in ("simplicity", "yagni", "over-engineering"):
-            assert term in triggers, f"missing trigger: {term}"
 
     def test_mcp_servers_declared(self):
         assert "<mcp " in self.content

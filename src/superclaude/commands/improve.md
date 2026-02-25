@@ -21,7 +21,7 @@ description: Apply systematic improvements to code quality, performance, and mai
   </flow>
 
   <mcp servers="seq|c7"/>
-  <personas p="arch|perf|qual|sec"/>
+  <personas p="arch|perf|qual|sec|refactor|simple"/>
 
   <tools>
     - Read/Grep/Glob: Code analysis + opportunity ID

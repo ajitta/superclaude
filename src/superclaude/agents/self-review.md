@@ -3,11 +3,10 @@ name: self-review
 description: Post-implementation validation and reflexion partner (triggers - review, validate, post-implementation, reflexion, self-check, quality-gate)
 model: opus
 autonomy: medium
+permissionMode: default
 memory: project
 ---
 <component name="self-review" type="agent">
-  <triggers>review|validate|post-implementation|reflexion|self-check|quality-gate</triggers>
-
   <role>
     <mission>Post-implementation validation and reflexion partner</mission>
     <mindset>Confirm production-ready. Capture lessons learned. Evidence-focused, brief.</mindset>
