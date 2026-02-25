@@ -52,7 +52,7 @@ src/superclaude/commands/  →  ~/.claude/commands/sc/       (31 slash commands)
 src/superclaude/agents/    →  ~/.claude/agents/             (21 agent definitions)
 src/superclaude/skills/    →  ~/.claude/skills/             (skill implementations)
 src/superclaude/core/      →  ~/.claude/superclaude/core/   (FLAGS, PRINCIPLES, RULES)
-src/superclaude/modes/     →  ~/.claude/superclaude/modes/  (8 behavioral modes)
+src/superclaude/modes/     →  ~/.claude/superclaude/modes/  (7 behavioral modes)
 src/superclaude/mcp/       →  ~/.claude/superclaude/mcp/    (MCP server documentation)
 ```
 
@@ -64,6 +64,7 @@ This mapping is defined in `src/superclaude/cli/install_paths.py` (the `COMPONEN
 - `install_commands.py` — Top-level command wiring (imports from all above)
 - `install_skill.py` — Individual skill installation with `{{SKILLS_PATH}}` template resolution
 - `install_mcp.py` — MCP server configuration into settings.json
+- `doctor.py` — Health check diagnostics
 
 ### Key Architectural Decisions
 
@@ -98,11 +99,11 @@ src/superclaude/
 ├── utils/               # Shared utilities (atomic_write_json)
 ├── commands/            # 31 slash command markdown files
 ├── agents/              # 21 agent definition markdown files
-├── skills/              # Skill directories with SKILL.md manifests
-├── modes/               # 8 behavioral mode markdown files
+├── skills/              # 3 skills: confidence-check, ship, simplicity-coach (each has SKILL.md manifest)
+├── modes/               # 7 behavioral mode markdown files
 ├── mcp/                 # MCP server docs + configs/
 ├── core/                # FLAGS.md, PRINCIPLES.md, RULES.md
-└── scripts/             # Shell/Python utilities (context_reset.py, session_init.py, etc.)
+└── scripts/             # context_loader.py (trigger system, hybrid injection), session_init.py, token_estimator.py, skill_activator.py
 ```
 
 ## Pytest Plugin
