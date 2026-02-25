@@ -1,20 +1,23 @@
 #!/usr/bin/env python3
 """Dynamic Context Loader Hook (Python)
 
-Detects triggers and loads relevant MD files on-demand.
-Supports two modes:
-  - Directive mode (default): Outputs <context-load/> for Claude to Read
-  - Inject mode: Directly outputs file content (deterministic)
+Detects triggers in user prompts and injects relevant context on-demand.
+Runs as a UserPromptSubmit hook via stdin.
 
-Tracks loaded contexts per session to prevent duplicates.
-Cross-platform compatible (Windows/macOS/Linux)
+Modes:
+  - Inject mode (default): Outputs context directly to stdout
+  - Directive mode: Outputs <context-load/> for Claude to Read
 
-v2.1.0 Features:
-- Skills discovery and token estimation
-- Skill frontmatter loading for context visualization
+v3.1 Features:
+- Hybrid injection: Mode files → full .md, MCP files → short instructions
+  (Serena + Tavily get full .md due to behavioral patterns)
+- Composite flags: --frontend-verify (3 MCP), --all-mcp (8 MCP)
+- --no-mcp: suppresses all mcp/ context loading
+- Tightened TRIGGER_MAP regex (no generic single words)
+- Session dedup via cache file, cross-platform compatible
 
-v2.2.0 Features (Claude Code 2.1.20 Integration):
-- MCP fallback notification support
+v2.2.0: MCP fallback notification support
+v2.1.0: Skills discovery and token estimation
 """
 
 import hashlib
@@ -392,7 +395,7 @@ def output_inject_mode(contexts: list[tuple[str, int]]) -> None:
         print()
 
     for context_file, priority in contexts:
-        # v3.0: Try instruction injection first
+        # v3.1: Try instruction injection first (MCP + core only)
         if USE_INSTRUCTIONS and context_file in INSTRUCTION_MAP:
             instruction = INSTRUCTION_MAP[context_file]
             tokens = estimate_tokens(instruction)
