@@ -1,7 +1,7 @@
 # SuperClaude — Project Index
 
 > **Version**: 4.3.0+ajitta | **Python**: >=3.10 | **Build**: hatchling | **License**: MIT
-> **Generated**: 2026-02-26
+> **Generated**: 2026-02-26 | **Latest commit**: f04886c
 
 ## What It Is
 
@@ -20,16 +20,16 @@ A **dual-purpose** project: (1) a pytest plugin + CLI tool providing PM Agent pa
 | Directory | Files | Purpose |
 |-----------|-------|---------|
 | `cli/` | 8 | CLI commands: install, uninstall, update, mcp, doctor, agents, skills, version |
-| `pm_agent/` | 6 | Core patterns: confidence, self_check, reflexion, token_budget, task_cleanup |
-| `execution/` | 4 | Parallel exec, reflection, self-correction |
-| `hooks/` | 4 | Hook tracker, inline hooks (YAML frontmatter), MCP fallback |
+| `pm_agent/` | 5 | Core patterns: confidence, self_check, reflexion, token_budget, task_cleanup |
+| `execution/` | 3 | Parallel exec, reflection, self-correction |
+| `hooks/` | 3 | Hook tracker, inline hooks (YAML frontmatter), MCP fallback |
 | `scripts/` | 10 | Utilities: session_init, context_loader, token_estimator, etc. |
 | `utils/` | 1 | Shared utilities (atomic_write_json) |
-| `commands/` | 30 | Slash command markdown files (sc:analyze, sc:implement, etc.) |
+| `commands/` | 31 | Slash command markdown files (sc:analyze, sc:implement, etc.) |
 | `agents/` | 21 | Agent definitions (system-architect, python-expert, etc.) |
-| `skills/` | 3 | Skills: confidence-check, simplicity-coach, ship |
+| `skills/` | 7 | Skills + docs: confidence-check, simplicity-coach, ship |
 | `modes/` | 9 | Behavioral modes: Brainstorming, Business Panel, DeepResearch, etc. |
-| `mcp/` | 9 | MCP server docs: Context7, Sequential, Playwright, Tavily, Serena, etc. |
+| `mcp/` | 8+ | MCP server docs: Context7, Sequential, Playwright, Tavily, Serena, etc. |
 
 ## Key Modules
 
@@ -49,15 +49,15 @@ A **dual-purpose** project: (1) a pytest plugin + CLI tool providing PM Agent pa
 ## Content Installation Map
 
 ```
-commands/  →  ~/.claude/commands/sc/       (30 slash commands)
+commands/  →  ~/.claude/commands/sc/       (31 slash commands)
 agents/    →  ~/.claude/agents/            (21 agent definitions)
 skills/    →  ~/.claude/skills/            (3 skill implementations)
 core/      →  ~/.claude/superclaude/core/  (FLAGS, PRINCIPLES, RULES)
-modes/     →  ~/.claude/superclaude/modes/ (8 behavioral modes)
+modes/     →  ~/.claude/superclaude/modes/ (9 behavioral modes)
 mcp/       →  ~/.claude/superclaude/mcp/   (8 MCP server docs)
 ```
 
-## Slash Commands (30)
+## Slash Commands (31)
 
 | Category | Commands |
 |----------|----------|
@@ -72,7 +72,7 @@ mcp/       →  ~/.claude/superclaude/mcp/   (8 MCP server docs)
 | Git | git |
 | Tools | select-tool, pm |
 
-## Agents (20)
+## Agents (21)
 
 | Category | Agents |
 |----------|--------|
@@ -83,7 +83,7 @@ mcp/       →  ~/.claude/superclaude/mcp/   (8 MCP server docs)
 | Education | learning-guide, socratic-mentor, technical-writer |
 | Workflow | pm-agent, repo-index, self-review, business-panel-experts, simplicity-guide |
 
-## Modes (8)
+## Modes (9)
 
 | Mode | Trigger | Purpose |
 |------|---------|---------|
@@ -94,7 +94,7 @@ mcp/       →  ~/.claude/superclaude/mcp/   (8 MCP server docs)
 | TokenEfficiency | --uc | Symbol communication, 30-50% reduction |
 | Introspection | --introspect | Meta-cognition, pattern detection |
 | BusinessPanel | --business-panel | Multi-expert analysis |
-| RESEARCH_CONFIG | (internal) | Research hop/credibility settings |
+| ResearchConfig | (internal) | Research hop/credibility settings |
 
 ## MCP Servers (8)
 
@@ -121,7 +121,7 @@ mcp/       →  ~/.claude/superclaude/mcp/   (8 MCP server docs)
 | `tests/unit/` | 12 | confidence, self_check, token_budget, parallel, hooks, CLI, agents, reflexion, mcp_fallback, context_loader, install_settings |
 | `tests/integration/` | 1 | pytest_plugin |
 
-**Markers**: unit, integration, confidence_check, self_check, reflexion, complexity, hallucination, performance
+**Total test files**: 13 | **Markers**: unit, integration, confidence_check, self_check, reflexion, complexity, hallucination, performance
 
 ## Dev Commands
 

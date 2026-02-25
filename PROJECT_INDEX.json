@@ -2,16 +2,17 @@
   "meta": {
     "generated": "2026-02-26",
     "version": "4.3.0+ajitta",
+    "latest_commit": "f04886c",
     "description": "AI-enhanced development framework for Claude Code - pytest plugin with optional skills"
   },
   "statistics": {
-    "commands": 30,
-    "agents": 20,
-    "modes": 8,
+    "commands": 31,
+    "agents": 21,
+    "modes": 9,
     "mcp_servers": 8,
     "core_configs": 3,
     "python_files": 49,
-    "test_files": 17,
+    "test_files": 13,
     "skills": 3,
     "scripts": 10
   },
@@ -88,13 +89,13 @@
   },
   "content": {
     "commands": {
-      "count": 30,
+      "count": 31,
       "location": "src/superclaude/commands/",
       "install_to": "~/.claude/commands/sc/",
       "items": ["agent", "analyze", "brainstorm", "build", "business-panel", "cleanup", "design", "document", "estimate", "explain", "git", "help", "implement", "improve", "index", "index-repo", "load", "pm", "recommend", "reflect", "research", "save", "sc", "select-tool", "spawn", "spec-panel", "task", "test", "troubleshoot", "workflow"]
     },
     "agents": {
-      "count": 20,
+      "count": 21,
       "location": "src/superclaude/agents/",
       "install_to": "~/.claude/agents/",
       "items": ["backend-architect", "business-panel-experts", "deep-research-agent", "devops-architect", "frontend-architect", "learning-guide", "performance-engineer", "pm-agent", "python-expert", "quality-engineer", "refactoring-expert", "repo-index", "requirements-analyst", "root-cause-analyst", "security-engineer", "self-review", "simplicity-guide", "socratic-mentor", "system-architect", "technical-writer"]
@@ -106,7 +107,7 @@
       "items": ["confidence-check", "simplicity-coach", "ship"]
     },
     "modes": {
-      "count": 8,
+      "count": 9,
       "location": "src/superclaude/modes/",
       "items": [
         {"name": "Brainstorming", "trigger": "--brainstorm"},
@@ -116,7 +117,8 @@
         {"name": "Orchestration", "trigger": "--orchestrate"},
         {"name": "Task_Management", "trigger": "--task-manage"},
         {"name": "Token_Efficiency", "trigger": "--uc"},
-        {"name": "RESEARCH_CONFIG", "trigger": "(internal)"}
+        {"name": "RESEARCH_CONFIG", "trigger": "(internal)"},
+        {"name": "README", "trigger": "(docs)"}
       ]
     },
     "mcp": {
@@ -143,10 +145,12 @@
     "framework": "pytest>=7.0.0",
     "unit": {
       "path": "tests/unit/",
+      "count": 12,
       "files": ["test_agent_structure.py", "test_cli_install.py", "test_confidence.py", "test_context_loader.py", "test_hook_tracker.py", "test_hooks.py", "test_install_settings.py", "test_mcp_fallback.py", "test_parallel.py", "test_reflexion.py", "test_self_check.py", "test_token_budget.py"]
     },
     "integration": {
       "path": "tests/integration/",
+      "count": 1,
       "files": ["test_pytest_plugin.py"]
     },
     "markers": ["unit", "integration", "confidence_check", "self_check", "reflexion", "complexity", "hallucination", "performance"]
@@ -155,7 +159,7 @@
     "runtime": ["pytest>=7.0.0", "click>=8.0.0", "rich>=13.0.0", "pyyaml>=6.0.0"],
     "dev": ["pytest-cov>=4.0.0", "pytest-benchmark>=4.0.0", "pytest-asyncio>=0.23.0", "scipy>=1.10.0", "black>=22.0", "ruff>=0.1.0", "mypy>=1.0"]
   },
-  "make_commands": ["install", "deploy", "test", "test-plugin", "doctor", "verify", "lint", "format", "clean", "build-plugin", "sync-plugin-repo", "translate", "uninstall-legacy", "help"],
+  "make_commands": ["install", "deploy", "test", "test-plugin", "doctor", "verify", "lint", "format", "clean", "build-plugin"],
   "git": {
     "branch_model": "master <- integration <- feature/*, fix/*, docs/*",
     "commit_prefixes": ["feat:", "fix:", "docs:", "refactor:", "test:", "chore:"]
