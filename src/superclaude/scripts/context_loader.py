@@ -136,7 +136,7 @@ TRIGGER_MAP = [
         2,
     ),
     (
-        r"(serena|symbol ops|rename|lsp|--serena|/sc:load|/sc:save)",
+        r"(serena|symbol ops|rename.?symbol|lsp|--serena|/sc:load|/sc:save)",
         "mcp/MCP_Serena.md",
         2,
     ),
