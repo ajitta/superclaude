@@ -895,7 +895,7 @@ class ConfidenceChecker:
             self._register_default_checks()
 
     def _register_default_checks(self) -> None:
-        """Register the 6 default confidence checks (including PRStatusCheck)."""
+        """Register the 5 default confidence checks."""
         for check in DEFAULT_CHECKS:
             # Create fresh instances to avoid shared state
             check_class = type(check)

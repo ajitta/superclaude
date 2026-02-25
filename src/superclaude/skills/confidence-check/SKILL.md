@@ -17,7 +17,7 @@ metadata:
 
   <role>
     <mission>Prevent wrong-direction execution by assessing confidence BEFORE implementation</mission>
-    <stats>Precision: 1.000 | Recall: 1.000 | 63/63 tests passed</stats>
+    <stats>Precision: 1.000 | Recall: 1.000 | 69/69 tests passed</stats>
   </role>
 
   <thresholds>
