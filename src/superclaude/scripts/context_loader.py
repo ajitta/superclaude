@@ -110,7 +110,7 @@ TRIGGER_MAP = [
         2,
     ),
     (
-        r"(--uc|--ultracompressed|token.?efficient|--token-efficient)",
+        r"(--uc|--ultracompressed|token.?efficient|--token-efficient|--safe-mode)",
         "modes/MODE_Token_Efficiency.md",
         1,
     ),
