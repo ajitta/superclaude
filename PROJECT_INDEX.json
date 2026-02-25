@@ -1,7 +1,7 @@
 {
   "meta": {
-    "generated": "2026-02-24",
-    "version": "4.2.1+ajitta",
+    "generated": "2026-02-26",
+    "version": "4.3.0+ajitta",
     "description": "AI-enhanced development framework for Claude Code - pytest plugin with optional skills"
   },
   "statistics": {

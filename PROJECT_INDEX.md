@@ -1,7 +1,7 @@
 # SuperClaude — Project Index
 
-> **Version**: 4.2.1+ajitta | **Python**: >=3.10 | **Build**: hatchling | **License**: MIT
-> **Generated**: 2026-02-24
+> **Version**: 4.3.0+ajitta | **Python**: >=3.10 | **Build**: hatchling | **License**: MIT
+> **Generated**: 2026-02-26
 
 ## What It Is
 
