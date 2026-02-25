@@ -5,8 +5,8 @@
 > This document captures lessons learned, common pitfalls, and solutions discovered during development.
 > Consult this when encountering issues or learning project patterns.
 
-**Last Updated**: 2026-01-27
-**Version**: 4.2.1+ajitta
+**Last Updated**: 2026-02-26
+**Version**: 4.3.0+ajitta
 
 ---
 
@@ -45,12 +45,12 @@ src/superclaude/
 │   └── mcp_fallback.py      # First-notification-only MCP fallback handling
 ├── utils/
 │   └── __init__.py          # Shared: word_overlap_ratio (Jaccard), atomic_write_json
-├── agents/                  # 20 specialized agent definitions (.md)
-├── commands/                # 30 slash command definitions (.md)
+├── agents/                  # 21 specialized agent definitions (.md)
+├── commands/                # 31 slash command definitions (.md)
 ├── modes/                   # 7 behavioral modes + INDEX (.md)
 ├── mcp/                     # 10 MCP server configs + 11 docs
 ├── core/                    # 7 core configs (FLAGS, PRINCIPLES, RULES, etc.)
-├── skills/                  # Skills (confidence-check)
+├── skills/                  # 3 skills (confidence-check, ship, simplicity-coach)
 └── scripts/                 # Shell/Python utilities
 ```
 
@@ -607,19 +607,19 @@ checker.register(SecurityCheck())
 
 ---
 
-## Framework Statistics (2026-01-27)
+## Framework Statistics (2026-02-26)
 
 | Category | Count | Location |
 |----------|-------|----------|
-| Slash Commands | 30 | src/superclaude/commands/ |
-| Agents | 20 | src/superclaude/agents/ |
+| Slash Commands | 31 | src/superclaude/commands/ |
+| Agents | 21 | src/superclaude/agents/ |
 | Modes | 7 (+INDEX) | src/superclaude/modes/ |
 | MCP Servers | 10 | src/superclaude/mcp/configs/ |
 | MCP Docs | 11 | src/superclaude/mcp/ |
 | Core Configs | 7 | src/superclaude/core/ |
-| Python Files | 44 | src/superclaude/ |
-| Test Files | 14 | tests/ |
-| Skills | 1 | src/superclaude/skills/ |
+| Python Files | 49 | src/superclaude/ |
+| Test Files | 17 | tests/ |
+| Skills | 3 | src/superclaude/skills/ |
 | CI Workflows | 4 | .github/workflows/ |
 
 ---
