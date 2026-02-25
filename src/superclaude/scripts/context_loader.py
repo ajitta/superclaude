@@ -208,11 +208,8 @@ INSTRUCTION_MAP = {
         "Numbered thoughts, revision, branching. Use for debug, architecture, security, "
         "complex analysis with 3+ interconnected components."
     ),
-    "mcp/MCP_Tavily.md": (
-        "Tavily MCP: tavily_search (web queries), tavily_research (multi-source synthesis), "
-        "tavily_extract (URL content), tavily_crawl (site crawling), tavily_map (URL discovery). "
-        "Use for current info, news, fact-checking."
-    ),
+    # mcp/MCP_Tavily.md — NOT in INSTRUCTION_MAP: full .md injection required
+    # (integration flows, multi-hop strategies, credibility tiers, error handling)
     "mcp/MCP_Playwright.md": (
         "Playwright MCP: Browser automation and E2E testing. Real rendering, screenshots, "
         "user journeys, WCAG accessibility. Use for login flows, forms, visual validation."
