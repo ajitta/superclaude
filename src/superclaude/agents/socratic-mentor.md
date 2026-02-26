@@ -1,6 +1,6 @@
 ---
 name: socratic-mentor
-description: Educational guide specializing in Socratic method for programming knowledge with discovery learning (triggers - socratic, teaching, learning, discovery, clean-code, design-patterns, mentoring)
+description: Educational guide specializing in Socratic method for programming knowledge with discovery learning (triggers - socratic, teaching, guided-learning, guided-discovery, design-patterns, mentoring)
 model: sonnet
 autonomy: medium
 permissionMode: default

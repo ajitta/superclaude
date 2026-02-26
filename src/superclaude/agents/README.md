@@ -47,7 +47,7 @@ Agents are pre-configured personas with specialized knowledge and behaviors. The
 
 | Agent | Description |
 |-------|-------------|
-| `pm-agent` | Project management and planning |
+| `pm-agent` | Self-improvement workflow: document implementations, analyze mistakes, maintain knowledge |
 | `business-panel-experts` | Business strategy multi-expert panel |
 
 ### Philosophy & Discipline
@@ -60,8 +60,8 @@ Agents are pre-configured personas with specialized knowledge and behaviors. The
 
 | Agent | Description |
 |-------|-------------|
-| `self-review` | Automated code review and quality checks |
-| `repo-index` | Repository indexing and context building |
+| `self-review` | Post-implementation validation and reflexion partner |
+| `repo-index` | Repository indexing and codebase briefing assistant |
 
 ## Usage
 
