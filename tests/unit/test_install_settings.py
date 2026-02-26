@@ -230,3 +230,94 @@ class TestMergeHooksToSettings:
         assert "python prettier_hook.py" not in post_cmds
         # SessionStart should be gone entirely (was only SC hooks)
         assert "SessionStart" not in settings["hooks"]
+
+    def _sc_hooks_config_with_echo(self):
+        """SC hooks config including echo-only hooks (TeammateIdle, TaskCompleted)."""
+        config = self._sc_hooks_config()
+        config["hooks"]["TeammateIdle"] = [
+            {
+                "_comment": "[superclaude] experimental",
+                "hooks": [{"command": "echo '[superclaude] Teammate idle — assign next task'"}],
+            }
+        ]
+        config["hooks"]["TaskCompleted"] = [
+            {
+                "_comment": "[superclaude] experimental",
+                "hooks": [{"command": "echo '[superclaude] Task completed — aggregate results'"}],
+            }
+        ]
+        return config
+
+    def test_idempotent_reinstall_no_duplicates(self, base_path: Path):
+        """Running merge twice should NOT create duplicate hook entries."""
+        from superclaude.cli.install_settings import merge_hooks_to_settings
+
+        config = self._sc_hooks_config_with_echo()
+
+        # First install
+        merge_hooks_to_settings(base_path, config, scope="user")
+        # Second install (re-install)
+        merge_hooks_to_settings(base_path, config, scope="user")
+
+        settings = json.loads((base_path / "settings.json").read_text())
+        for hook_type in ["SessionStart", "PostToolUse", "TeammateIdle", "TaskCompleted"]:
+            entries = settings["hooks"].get(hook_type, [])
+            assert len(entries) == len(config["hooks"][hook_type]), (
+                f"{hook_type}: expected {len(config['hooks'][hook_type])} entries, got {len(entries)}"
+            )
+
+    def test_detection_after_comment_stripping(self, base_path: Path):
+        """Hooks remain detectable after _comment fields are stripped (as Claude Code does)."""
+        from superclaude.cli.install_settings import merge_hooks_to_settings
+
+        config = self._sc_hooks_config_with_echo()
+
+        # First install
+        merge_hooks_to_settings(base_path, config, scope="user")
+
+        # Simulate Claude Code stripping _comment fields
+        settings = json.loads((base_path / "settings.json").read_text())
+        for hook_type, hook_array in settings["hooks"].items():
+            for entry in hook_array:
+                entry.pop("_comment", None)
+        (base_path / "settings.json").write_text(json.dumps(settings, indent=2))
+
+        # Re-install should NOT duplicate
+        merge_hooks_to_settings(base_path, config, scope="user")
+
+        settings = json.loads((base_path / "settings.json").read_text())
+        for hook_type in ["TeammateIdle", "TaskCompleted"]:
+            entries = settings["hooks"].get(hook_type, [])
+            assert len(entries) == 1, (
+                f"{hook_type}: expected 1 entry after re-install, got {len(entries)}"
+            )
+
+    def test_uninstall_echo_only_hooks_after_comment_stripping(self, base_path: Path):
+        """Uninstall removes echo-only hooks even after _comment is stripped."""
+        from superclaude.cli.install_settings import (
+            merge_hooks_to_settings,
+            uninstall_hooks_from_settings,
+        )
+
+        config = self._sc_hooks_config_with_echo()
+        merge_hooks_to_settings(base_path, config, scope="user")
+
+        # Strip _comment fields (simulating Claude Code behavior)
+        settings = json.loads((base_path / "settings.json").read_text())
+        for hook_type, hook_array in settings["hooks"].items():
+            for entry in hook_array:
+                entry.pop("_comment", None)
+        (base_path / "settings.json").write_text(json.dumps(settings, indent=2))
+
+        # Uninstall should still remove all SC hooks
+        success, _ = uninstall_hooks_from_settings(base_path)
+        assert success is True
+
+        settings = json.loads((base_path / "settings.json").read_text())
+        # All hook types should be removed (no user hooks mixed in)
+        assert "TeammateIdle" not in settings.get("hooks", {}), (
+            "TeammateIdle should be removed after uninstall"
+        )
+        assert "TaskCompleted" not in settings.get("hooks", {}), (
+            "TaskCompleted should be removed after uninstall"
+        )
