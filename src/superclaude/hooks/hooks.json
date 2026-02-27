@@ -65,31 +65,8 @@
           {
             "type": "command",
             "command": "python {{SCRIPTS_PATH}}/session_init.py",
-            "timeout": 30
-          }
-        ]
-      }
-    ],
-    "TeammateIdle": [
-      {
-        "_comment": "[superclaude] experimental — Requires CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 (v2.1.33)",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "echo '[superclaude] Teammate idle — assign next task'",
-            "timeout": 10
-          }
-        ]
-      }
-    ],
-    "TaskCompleted": [
-      {
-        "_comment": "[superclaude] experimental — Requires CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 (v2.1.33)",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "echo '[superclaude] Task completed — aggregate results'",
-            "timeout": 10
+            "timeout": 30,
+            "once": true
           }
         ]
       }

@@ -40,13 +40,13 @@ class TestIsSuperclaudeHook:
         hook = {"_comment": "[superclaude] session init hook", "hooks": []}
         assert self.is_sc_hook(hook) is True
 
-    def test_detects_experimental_comment(self):
-        """Legacy [experimental] comment detected after marker addition."""
+    def test_plain_experimental_comment_not_detected(self):
+        """Plain [experimental] comment without superclaude marker is NOT detected."""
         hook = {
             "_comment": "[experimental] Requires CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1",
             "hooks": [{"command": "echo team-hook"}],
         }
-        assert self.is_sc_hook(hook) is True
+        assert self.is_sc_hook(hook) is False
 
     def test_user_hook_not_detected(self):
         """User hooks with npm/echo commands are NOT falsely detected."""

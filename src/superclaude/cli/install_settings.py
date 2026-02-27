@@ -22,7 +22,6 @@ SUPERCLAUDE_HOOK_MARKERS = [
     "skill_activator",
     "prettier_hook",
     "test_runner_hook",
-    "[experimental]",
 ]
 
 
