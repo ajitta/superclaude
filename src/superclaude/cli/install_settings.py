@@ -84,6 +84,10 @@ def _is_superclaude_hook(hook_entry: dict) -> bool:
         cmd = hook.get("command", "")
         if any(marker in cmd for marker in SUPERCLAUDE_HOOK_MARKERS):
             return True
+        # Also check _comment on inner hook objects (e.g. test_runner_hook)
+        inner_comment = hook.get("_comment", "")
+        if any(marker in inner_comment for marker in SUPERCLAUDE_HOOK_MARKERS):
+            return True
     return False
 
 

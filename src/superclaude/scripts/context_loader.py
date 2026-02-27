@@ -21,6 +21,7 @@ v2.1.0: Skills discovery and token estimation
 """
 
 import hashlib
+import json
 import os
 import re
 import sys
@@ -247,7 +248,6 @@ USE_INSTRUCTIONS = os.environ.get("CLAUDE_CONTEXT_USE_INSTRUCTIONS", "1") == "1"
 SHOW_SKILLS_SUMMARY = os.environ.get("CLAUDE_SHOW_SKILLS", "1") == "1"
 
 
-
 def get_skill_estimates() -> list["TokenEstimate"]:
     """Get token estimates for all installed skills.
 
@@ -289,10 +289,13 @@ def get_loaded_contexts() -> set:
     return set()
 
 
-def mark_as_loaded(context: str) -> None:
-    """Mark a context as loaded in session cache."""
+def mark_as_loaded(contexts: str | list[str]) -> None:
+    """Mark context(s) as loaded in session cache. Accepts single or batch."""
     loaded = get_loaded_contexts()
-    loaded.add(context)
+    if isinstance(contexts, str):
+        loaded.add(contexts)
+    else:
+        loaded.update(contexts)
     CACHE_FILE.write_text("\n".join(loaded))
 
 
@@ -317,7 +320,6 @@ def check_triggers(prompt: str) -> list[tuple[str, int]]:
             return
         contexts_to_load.append((context_file, priority))
         loaded.add(context_file)
-        mark_as_loaded(context_file)
 
     # Composite flags (one flag → multiple files)
     for flag, files in COMPOSITE_FLAGS.items():
@@ -329,6 +331,10 @@ def check_triggers(prompt: str) -> list[tuple[str, int]]:
     for pattern, context_file, priority in TRIGGER_MAP:
         if pattern.search(prompt_lower):
             _add_context(context_file, priority)
+
+    # Batch write to cache (single I/O instead of per-context)
+    if contexts_to_load:
+        mark_as_loaded([ctx for ctx, _ in contexts_to_load])
 
     # Sort by priority (lower number = higher priority)
     contexts_to_load.sort(key=lambda x: x[1])
@@ -412,7 +418,10 @@ def output_inject_mode(contexts: list[tuple[str, int]]) -> None:
         if not file_path.exists():
             continue
 
-        content = file_path.read_text(encoding="utf-8")
+        try:
+            content = file_path.read_text(encoding="utf-8")
+        except (OSError, UnicodeDecodeError):
+            continue
         tokens = estimate_tokens(content)
 
         # Check token budget
@@ -437,9 +446,19 @@ def output_inject_mode(contexts: list[tuple[str, int]]) -> None:
             print(f"<!-- Skipped (budget): {skipped_info} -->")
 
 
+def _extract_prompt(stdin_data: str) -> str:
+    """Extract prompt from UserPromptSubmit JSON input, with raw text fallback."""
+    try:
+        data = json.loads(stdin_data)
+        return data.get("prompt", stdin_data)
+    except (json.JSONDecodeError, TypeError):
+        return stdin_data
+
+
 def main() -> None:
-    # Read prompt from stdin
-    prompt = sys.stdin.read() if not sys.stdin.isatty() else ""
+    # Read and parse JSON input from Claude Code
+    stdin_data = sys.stdin.read() if not sys.stdin.isatty() else ""
+    prompt = _extract_prompt(stdin_data)
 
     if not prompt.strip():
         return

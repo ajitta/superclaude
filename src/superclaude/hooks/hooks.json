@@ -54,6 +54,7 @@
             "_comment": "[superclaude] optional — set SUPERCLAUDE_AUTO_TEST=0 to disable",
             "type": "command",
             "command": "python {{SCRIPTS_PATH}}/test_runner_hook.py",
+            "async": true,
             "timeout": 120
           }
         ]

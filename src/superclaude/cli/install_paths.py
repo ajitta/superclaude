@@ -58,17 +58,7 @@ def _get_source_dir(component: str) -> Path:
     package_root = _get_package_root()
     source_subdir = COMPONENTS[component][0]
 
-    # Priority 1: Package directory (installed or editable)
     package_dir = package_root / source_subdir
-    if package_dir.exists():
-        return package_dir
-
-    # Priority 2: plugins directory (legacy source checkout)
-    repo_root = package_root.parent.parent
-    plugins_dir = repo_root / "plugins" / "superclaude" / source_subdir
-    if plugins_dir.exists():
-        return plugins_dir
-
     return package_dir
 
 

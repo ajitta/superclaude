@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
-"""PostToolUse hook for running tests after code edits.
+"""PostToolUse hook for running tests after code edits (async).
+
 Detects project test runner (npm test / pytest / make test) and runs it.
 Cross-platform compatible (Windows/macOS/Linux).
 
 Only runs when a source code file is edited (not configs, docs, etc.).
 Respects SUPERCLAUDE_AUTO_TEST=0 env var to disable.
+Checks stop_hook_active to prevent infinite loops (Claude Code best practice).
+Outputs structured JSON systemMessage so Claude can react to results.
 """
 import json
 import os
@@ -55,11 +58,9 @@ def should_run(file_path: str) -> bool:
 
     path = Path(file_path)
 
-    # Check extension
     if path.suffix.lower() not in SOURCE_EXTENSIONS:
         return False
 
-    # Check if in a skip directory
     parts = path.parts
     if any(part in SKIP_DIRS for part in parts):
         return False
@@ -78,6 +79,11 @@ def main() -> None:
             return
 
         data = json.loads(stdin_data)
+
+        # Prevent infinite loops when Claude is stopping
+        if data.get("stop_hook_active"):
+            return
+
         file_path = data.get("tool_input", {}).get("file_path", "")
 
         if not should_run(file_path):
@@ -95,22 +101,28 @@ def main() -> None:
             timeout=120,
         )
 
+        file_name = Path(file_path).name
+
         if result.returncode != 0:
-            # Output failure info so Claude Code can see it
-            print(f"test hook: FAIL ({test_cmd})", file=sys.stderr)
-            # Show last 20 lines of output for context
+            # Last 15 lines of failure output for context
             lines = (result.stdout + result.stderr).strip().splitlines()
-            for line in lines[-20:]:
-                print(f"  {line}", file=sys.stderr)
+            tail = "\n".join(lines[-15:])
+            msg = json.dumps({
+                "systemMessage": f"Tests FAILED after editing {file_name} ({test_cmd}):\n{tail}"
+            })
+            print(msg)
         else:
-            print("test hook: PASS", file=sys.stderr)
+            msg = json.dumps({
+                "systemMessage": f"Tests passed after editing {file_name}"
+            })
+            print(msg)
 
     except json.JSONDecodeError:
-        print("test hook: skipped (invalid JSON input)", file=sys.stderr)
+        print("test hook: invalid JSON input", file=sys.stderr)
     except subprocess.TimeoutExpired:
-        print("test hook: skipped (timeout after 120s)", file=sys.stderr)
+        print("test hook: timeout after 120s", file=sys.stderr)
     except OSError as e:
-        print(f"test hook: skipped (OS error: {e})", file=sys.stderr)
+        print(f"test hook: OS error: {e}", file=sys.stderr)
 
 
 if __name__ == "__main__":

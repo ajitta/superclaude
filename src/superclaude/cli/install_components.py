@@ -65,7 +65,7 @@ def _safe_target_path(target: Path, base_path: Path) -> bool:
         return True
     resolved = target.resolve()
     base_resolved = base_path.resolve()
-    return str(resolved).startswith(str(base_resolved))
+    return resolved == base_resolved or base_resolved in resolved.parents
 
 
 def install_component(
@@ -247,9 +247,26 @@ def install_hooks_and_scripts(
                     failed += 1
                     messages.append(f"Failed to copy {source_file.name}: {e}")
 
-    # 2. Transform and copy hooks.json to .claude/hooks/hooks.json
+    # 2. Read and transform hooks.json once (reused for copy + merge)
     hooks_json_file = hooks_source / "hooks.json"
+    hooks_content_transformed = None
+
     if hooks_json_file.exists():
+        try:
+            raw_content = hooks_json_file.read_text(encoding="utf-8")
+            # Use forward slashes for JSON compatibility (works on all platforms)
+            scripts_path_json_safe = scripts_path_for_hooks.replace("\\", "/")
+            hooks_content_transformed = raw_content.replace(
+                "{{SCRIPTS_PATH}}", scripts_path_json_safe
+            )
+        except OSError as e:
+            failed += 1
+            messages.append(f"Failed to read hooks.json: {e}")
+    else:
+        messages.append("hooks.json not found, skipping hooks configuration")
+
+    # 2a. Copy transformed hooks.json to .claude/hooks/hooks.json
+    if hooks_content_transformed is not None:
         hooks_target.mkdir(parents=True, exist_ok=True)
         target_hooks_json = hooks_target / "hooks.json"
 
@@ -258,37 +275,17 @@ def install_hooks_and_scripts(
             skipped += 1
         else:
             try:
-                # Read template and replace placeholder
-                with open(hooks_json_file, "r", encoding="utf-8") as f:
-                    content = f.read()
-
-                # Replace {{SCRIPTS_PATH}} placeholder with actual path
-                content = content.replace("{{SCRIPTS_PATH}}", scripts_path_for_hooks)
-
-                # Write transformed content
-                with open(target_hooks_json, "w", encoding="utf-8") as f:
-                    f.write(content)
-
+                target_hooks_json.write_text(hooks_content_transformed, encoding="utf-8")
                 installed += 1
                 messages.append(f"hooks.json installed (scripts path: {scripts_path_for_hooks})")
-            except Exception as e:
+            except OSError as e:
                 failed += 1
                 messages.append(f"Failed to install hooks.json: {e}")
-    else:
-        messages.append("hooks.json not found, skipping hooks configuration")
 
-    # 3. Merge hooks to settings.json (ensures Claude Code recognizes hooks)
-    if hooks_json_file.exists():
+    # 2b. Merge hooks to settings.json (ensures Claude Code recognizes hooks)
+    if hooks_content_transformed is not None:
         try:
-            # Read and transform hooks config
-            with open(hooks_json_file, "r", encoding="utf-8") as f:
-                hooks_content = f.read()
-            # Use forward slashes for JSON compatibility (works on all platforms)
-            scripts_path_json_safe = scripts_path_for_hooks.replace("\\", "/")
-            hooks_content = hooks_content.replace("{{SCRIPTS_PATH}}", scripts_path_json_safe)
-            hooks_config = json.loads(hooks_content)
-
-            # Merge to settings.json
+            hooks_config = json.loads(hooks_content_transformed)
             merge_success, merge_msg = merge_hooks_to_settings(
                 base_path=base_path,
                 hooks_config=hooks_config,
@@ -305,7 +302,7 @@ def install_hooks_and_scripts(
         except json.JSONDecodeError as e:
             failed += 1
             messages.append(f"Failed to parse hooks.json for merge: {e}")
-        except Exception as e:
+        except OSError as e:
             failed += 1
             messages.append(f"Failed to merge hooks to settings.json: {e}")
 

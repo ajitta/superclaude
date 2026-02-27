@@ -4,6 +4,7 @@ SuperClaude Doctor Command
 Health check for SuperClaude installation.
 """
 
+import json
 from pathlib import Path
 from typing import Any, Dict
 
@@ -21,16 +22,22 @@ def run_doctor(verbose: bool = False) -> Dict[str, Any]:
     checks = []
 
     # Check 1: pytest plugin loaded
-    plugin_check = _check_pytest_plugin()
-    checks.append(plugin_check)
+    checks.append(_check_pytest_plugin())
 
     # Check 2: Skills installed
-    skills_check = _check_skills_installed()
-    checks.append(skills_check)
+    checks.append(_check_skills_installed())
 
     # Check 3: Configuration
-    config_check = _check_configuration()
-    checks.append(config_check)
+    checks.append(_check_configuration())
+
+    # Check 4: Hooks in settings.json
+    checks.append(_check_hooks_installed())
+
+    # Check 5: CLAUDE_SC.md exists
+    checks.append(_check_claude_sc_md())
+
+    # Check 6: CLAUDE.md import
+    checks.append(_check_claude_md_import())
 
     return {
         "checks": checks,
@@ -101,10 +108,17 @@ def _check_skills_installed() -> Dict[str, Any]:
             "details": ["No skills installed (optional)"],
         }
 
-    # Find skills (directories with implementation.md)
+    # Find skills (directories with SKILL.md or implementation.md)
     skills = []
     for item in skills_dir.iterdir():
-        if item.is_dir() and (item / "implementation.md").exists():
+        if not item.is_dir():
+            continue
+        has_manifest = (
+            (item / "SKILL.md").exists()
+            or (item / "skill.md").exists()
+            or (item / "implementation.md").exists()
+        )
+        if has_manifest:
             skills.append(item.name)
 
     if skills:
@@ -145,3 +159,90 @@ def _check_configuration() -> Dict[str, Any]:
             "passed": False,
             "details": [f"Could not import superclaude: {e}"],
         }
+
+
+def _check_hooks_installed() -> Dict[str, Any]:
+    """Check if SuperClaude hooks are present in settings.json."""
+    settings_file = Path.home() / ".claude" / "settings.json"
+
+    if not settings_file.exists():
+        return {
+            "name": "Hooks in settings.json",
+            "passed": False,
+            "details": ["settings.json not found"],
+        }
+
+    try:
+        settings = json.loads(settings_file.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return {
+            "name": "Hooks in settings.json",
+            "passed": False,
+            "details": ["settings.json is invalid or unreadable"],
+        }
+
+    hooks = settings.get("hooks", {})
+    expected = ["SessionStart", "UserPromptSubmit", "PostToolUse", "Setup"]
+    found = [h for h in expected if hooks.get(h)]
+    missing = [h for h in expected if not hooks.get(h)]
+
+    if not missing:
+        return {
+            "name": "Hooks in settings.json",
+            "passed": True,
+            "details": [f"All {len(found)} hook types present"],
+        }
+    return {
+        "name": "Hooks in settings.json",
+        "passed": False,
+        "details": [f"Missing hook types: {', '.join(missing)}"],
+    }
+
+
+def _check_claude_sc_md() -> Dict[str, Any]:
+    """Check if CLAUDE_SC.md exists in ~/.claude/superclaude/."""
+    sc_md = Path.home() / ".claude" / "superclaude" / "CLAUDE_SC.md"
+    if sc_md.exists():
+        return {
+            "name": "CLAUDE_SC.md",
+            "passed": True,
+            "details": [f"Found at {sc_md}"],
+        }
+    return {
+        "name": "CLAUDE_SC.md",
+        "passed": False,
+        "details": ["CLAUDE_SC.md not found — run 'superclaude install'"],
+    }
+
+
+def _check_claude_md_import() -> Dict[str, Any]:
+    """Check if CLAUDE.md imports CLAUDE_SC.md."""
+    claude_md = Path.home() / ".claude" / "CLAUDE.md"
+
+    if not claude_md.exists():
+        return {
+            "name": "CLAUDE.md import",
+            "passed": False,
+            "details": ["CLAUDE.md not found"],
+        }
+
+    try:
+        content = claude_md.read_text(encoding="utf-8")
+    except OSError:
+        return {
+            "name": "CLAUDE.md import",
+            "passed": False,
+            "details": ["CLAUDE.md is unreadable"],
+        }
+
+    if "@superclaude/CLAUDE_SC.md" in content:
+        return {
+            "name": "CLAUDE.md import",
+            "passed": True,
+            "details": ["@superclaude/CLAUDE_SC.md import present"],
+        }
+    return {
+        "name": "CLAUDE.md import",
+        "passed": False,
+        "details": ["Missing @superclaude/CLAUDE_SC.md import — run 'superclaude install'"],
+    }

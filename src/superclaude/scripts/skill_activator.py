@@ -12,6 +12,7 @@ v2.1.0 Features:
 
 from __future__ import annotations
 
+import json
 import re
 import sys
 from pathlib import Path
@@ -159,18 +160,21 @@ def get_skill_inline_hooks(skill_name: str) -> "InlineHooks | None":
 
 
 def check_skill_triggers(prompt: str) -> list[str]:
-    """Check prompt against skill triggers and return activation hints."""
+    """Check prompt against skill triggers and return activation hints.
+
+    Only fires on explicit triggers to avoid noise on normal coding prompts.
+    Research/business context injection is handled by context_loader.py.
+    """
     hints = []
     prompt_lower = prompt.lower()
 
-    # Confidence check triggers (aligned with SKILL.md)
+    # Confidence check — explicit triggers only (no generic "implement"/"build")
     confidence_patterns = [
-        r"(implement|build|create|add feature|fix bug|refactor)",  # Action triggers
-        r"(check confidence|confidence check)",  # Direct triggers
-        r"(am i ready|ready to start)",  # Readiness triggers
-        r"(verify before|before implementing|pre-implementation)",  # Pre-check triggers
-        r"(readiness check|readiness-check)",  # Explicit check triggers
-        r"(확인해줘|검증해줘|준비됐|시작하기 전)",  # Korean triggers
+        r"(check confidence|confidence check|/confidence-check|--confidence)",
+        r"(am i ready|ready to start)",
+        r"(verify before|before implementing|pre-implementation)",
+        r"(readiness check|readiness-check)",
+        r"(확인해줘|검증해줘|준비됐|시작하기 전)",
     ]
     if any(re.search(p, prompt_lower) for p in confidence_patterns):
         hints.append(
@@ -178,26 +182,22 @@ def check_skill_triggers(prompt: str) -> list[str]:
             "Assess: duplicates, architecture, docs, OSS refs, root cause."
         )
 
-    # Research triggers
-    research_pattern = (
-        r"(research|investigate|find out|what is|how does|latest|current)"
-    )
-    if re.search(research_pattern, prompt_lower):
-        hints.append("INSTRUCTION: Consider using /sc:research skill for web research")
-
-    # Business panel triggers
-    business_pattern = r"(business|strategy|market|competitive|porter|christensen)"
-    if re.search(business_pattern, prompt_lower):
-        hints.append(
-            "INSTRUCTION: Consider using /sc:business-panel skill for expert analysis"
-        )
-
     return hints
 
 
+def _extract_prompt(stdin_data: str) -> str:
+    """Extract prompt from UserPromptSubmit JSON input, with raw text fallback."""
+    try:
+        data = json.loads(stdin_data)
+        return data.get("prompt", stdin_data)
+    except (json.JSONDecodeError, TypeError):
+        return stdin_data
+
+
 def main() -> None:
-    # Read prompt from stdin (passed by Claude Code)
-    prompt = sys.stdin.read() if not sys.stdin.isatty() else ""
+    # Read and parse JSON input from Claude Code
+    stdin_data = sys.stdin.read() if not sys.stdin.isatty() else ""
+    prompt = _extract_prompt(stdin_data)
 
     # Execute check and print hints
     hints = check_skill_triggers(prompt)
