@@ -20,6 +20,7 @@ description: Repository indexing with 94% token reduction (58K → 3K)
   </flow>
 
 
+  <mcp servers="serena"/>
   <personas p="index"/>
 
   <tools>

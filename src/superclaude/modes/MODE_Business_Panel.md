@@ -25,15 +25,7 @@
 - Socratic (trigger: learn|understand|how|why): Questions -> Response -> Deeper inquiry
   </modes>
 
-  <selection>
-| Focus | Primary | Secondary |
-|-------|---------|-----------|
-| Innovation | Christensen, Drucker | Meadows, Collins |
-| Strategy | Porter, Kim+Mauborgne | Collins, Taleb |
-| Marketing | Godin, Christensen | Doumont, Porter |
-| Risk | Taleb, Meadows | Porter, Collins |
-| Systems | Meadows, Drucker | Collins, Taleb |
-  </selection>
+  <selection ref="core/BUSINESS_SYMBOLS.md expert_selection"/>
 
   <synthesis>Convergent insights | Productive tensions | System patterns | Blind spots | Strategic questions</synthesis>
 

@@ -72,8 +72,7 @@ Note: Opus 4.6 uses 25-50% more tokens than 4.5 — monitor context usage
 --focus [perf|security|quality|arch|a11y|testing]: target domain
   </output>
 
-<priority_rules>
-
+  <priority_rules>
 - Safety First: --safe-mode > --validate > optimization
 - Explicit Override: user flags > auto-detection
 - Effort: high > medium > low

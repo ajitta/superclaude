@@ -10,8 +10,8 @@ Slash commands for Claude Code. Installed to `~/.claude/commands/sc/` when users
 |---------|-------------|
 | `/sc` | Show all available SuperClaude commands |
 | `/sc:help` | Get help on SuperClaude usage |
-| `/sc:load` | Load context files or configurations |
-| `/sc:save` | Save session state or outputs |
+| `/sc:load` | Session lifecycle: load project context via Serena MCP + auto memory |
+| `/sc:save` | Session lifecycle: persist context via Serena MCP + auto memory |
 
 ### Development Commands
 
@@ -21,7 +21,7 @@ Slash commands for Claude Code. Installed to `~/.claude/commands/sc/` when users
 | `/sc:build` | Build and compile projects |
 | `/sc:test` | Run tests with coverage analysis |
 | `/sc:analyze` | Analyze code quality and patterns |
-| `/sc:improve` | Suggest and apply code improvements |
+| `/sc:improve` | Apply systematic improvements to quality, performance, and maintainability |
 | `/sc:explain` | Explain code behavior and architecture |
 | `/sc:cleanup` | Clean up code, remove dead code |
 | `/sc:troubleshoot` | Debug and fix issues |
@@ -31,7 +31,7 @@ Slash commands for Claude Code. Installed to `~/.claude/commands/sc/` when users
 | Command | Description |
 |---------|-------------|
 | `/sc:design` | Design systems and architectures |
-| `/sc:brainstorm` | Generate ideas and solutions |
+| `/sc:brainstorm` | Interactive requirements discovery through Socratic dialogue |
 | `/sc:estimate` | Estimate effort and complexity |
 | `/sc:workflow` | Define and execute workflows |
 | `/sc:task` | Manage development tasks |
@@ -43,15 +43,15 @@ Slash commands for Claude Code. Installed to `~/.claude/commands/sc/` when users
 | `/sc:research` | Deep web research with parallel search |
 | `/sc:document` | Generate documentation |
 | `/sc:index-repo` | Repository indexing for context optimization |
-| `/sc:reflect` | Reflect on decisions and approaches |
+| `/sc:reflect` | Task reflection and validation using Serena MCP analysis |
 
 ### Git & Project Management
 
 | Command | Description |
 |---------|-------------|
 | `/sc:git` | Git operations and workflows |
-| `/sc:pm` | Project management operations |
-| `/sc:spawn` | Spawn sub-agents for parallel work |
+| `/sc:pm` | Project Manager Agent: orchestrate sub-agents and manage workflows |
+| `/sc:spawn` | Meta-system task orchestration with intelligent breakdown and delegation |
 
 ### Advisory Panels
 
@@ -64,10 +64,10 @@ Slash commands for Claude Code. Installed to `~/.claude/commands/sc/` when users
 
 | Command | Description |
 |---------|-------------|
-| `/sc:agent` | Invoke specialized AI agents |
-| `/sc:recommend` | Get command recommendations |
-| `/sc:select-tool` | Select appropriate tools for tasks |
-| `/sc:index` | Index and organize resources |
+| `/sc:agent` | Session controller orchestrating investigation, implementation, and review |
+| `/sc:recommend` | Intelligent command recommendation engine for optimal command selection |
+| `/sc:select-tool` | Intelligent MCP tool selection based on complexity scoring |
+| `/sc:index` | Generate comprehensive project documentation and knowledge base |
 
 ## Usage
 

@@ -1,4 +1,4 @@
-<component name="research-config" type="core" priority="medium">
+<component name="research-config" type="config" priority="medium">
   <role>
     <mission>Deep research configuration and strategy settings</mission>
   </role>

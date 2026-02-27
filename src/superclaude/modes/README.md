@@ -8,11 +8,17 @@ Behavioral modes that shift Claude's communication style and priorities for spec
 |------|------|---------|
 | Brainstorming | `--brainstorm` | Collaborative discovery for requirements exploration |
 | Business Panel | `--business-panel` | Multi-expert business analysis with adaptive strategies |
-| Deep Research | `--research` | Systematic investigation and evidence-based reasoning |
+| Deep Research | `--research` | Research mindset for systematic investigation and evidence-based reasoning |
 | Introspection | `--introspect` | Meta-cognitive analysis and reasoning optimization |
 | Orchestration | `--orchestrate` | Intelligent tool selection and resource efficiency |
-| Task Management | `--task-manage` | Hierarchical task organization for multi-step operations |
-| Token Efficiency | `--token-efficient` or `--uc` | Symbol-enhanced communication for compressed clarity |
+| Task Management | `--task-manage` | Hierarchical task organization with persistent memory for complex multi-step operations |
+| Token Efficiency | `--token-efficient` or `--uc` | Symbol-enhanced communication mindset for compressed clarity and efficient token usage |
+
+### Supporting Configuration
+
+| File | Purpose |
+|------|---------|
+| RESEARCH_CONFIG | Deep research strategy settings, depth profiles, and tool routing |
 
 ## How Modes Work
 

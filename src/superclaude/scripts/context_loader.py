@@ -167,7 +167,7 @@ TRIGGER_MAP = [
         3,
     ),
     # Business symbols - Priority 3
-    (r"(business.?symbol|strategic.?symbol|business.?example|panel.?example)", "core/BUSINESS_SYMBOLS.md", 3),
+    (r"(business.?symbol|strategic.?symbol|business.?example|panel.?example|--structured)", "core/BUSINESS_SYMBOLS.md", 3),
     # Note: PRINCIPLES.md removed - now loaded via CLAUDE_SC.md @-reference
 ]
 

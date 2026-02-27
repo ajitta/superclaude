@@ -67,8 +67,8 @@ description: SuperClaude command dispatcher - main entry point for all features
   </examples>
 
   <meta>
-    - version: SuperClaude v4.2.1+ajitta
-    - package: superclaude 4.2.1+ajitta
+    - version: SuperClaude v4.3.0+ajitta
+    - package: superclaude 4.3.0+ajitta
     - install: superclaude install
     - docs: github.com/ajitta/superclaude
   </meta>
