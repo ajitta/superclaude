@@ -182,7 +182,7 @@ def _check_hooks_installed() -> Dict[str, Any]:
         }
 
     hooks = settings.get("hooks", {})
-    expected = ["SessionStart", "UserPromptSubmit", "PostToolUse", "Setup"]
+    expected = ["SessionStart", "UserPromptSubmit", "PostToolUse", "PreToolUse"]
     found = [h for h in expected if hooks.get(h)]
     missing = [h for h in expected if not hooks.get(h)]
 
