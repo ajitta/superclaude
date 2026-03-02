@@ -1,5 +1,5 @@
 ---
-name: simplicity-coach
+name: sc-simplicity-coach
 description: Interactive OSL coaching, daybook journaling, dependency audits, and simplicity reviews
 metadata:
   context: inline
@@ -8,11 +8,11 @@ metadata:
     Stop:
       - hooks:
           - type: command
-            command: "python3 {{SKILLS_PATH}}/simplicity-coach/scripts/dependency-audit.py ."
+            command: "python3 {{SKILLS_PATH}}/sc-simplicity-coach/scripts/dependency-audit.py ."
             timeout: 15
             once: true
 ---
-<component name="simplicity-coach" type="skill">
+<component name="sc-simplicity-coach" type="skill">
 
   <role>
     Development coaching through Dave Thomas's Simplicity philosophy — a specific toolbox.

@@ -127,3 +127,69 @@ def test_token_budget_no_marker(token_budget):
     """
     assert token_budget.limit == 1000
     assert token_budget.complexity == "medium"
+
+
+class TestTokenBudgetLevels:
+    """Test suite for token budget levels and marker extraction"""
+
+    def test_budget_simple_level(self):
+        """
+        Test simple complexity returns 200 tokens
+
+        Simple tasks (typo fixes, trivial changes) should
+        have the smallest token budget of 200.
+        """
+        manager = TokenBudgetManager(complexity="simple")
+
+        assert manager.limit == 200, f"Expected 200 tokens for simple, got {manager.limit}"
+        assert manager.complexity == "simple"
+        assert manager.used == 0
+        assert manager.remaining == 200
+
+    def test_budget_medium_level(self):
+        """
+        Test medium complexity returns 1000 tokens
+
+        Medium tasks (bug fixes, small features) should
+        have a moderate token budget of 1000.
+        """
+        manager = TokenBudgetManager(complexity="medium")
+
+        assert manager.limit == 1000, f"Expected 1000 tokens for medium, got {manager.limit}"
+        assert manager.complexity == "medium"
+        assert manager.used == 0
+        assert manager.remaining == 1000
+
+    def test_budget_complex_level(self):
+        """
+        Test complex complexity returns 2500 tokens
+
+        Complex tasks (large features, refactoring) should
+        have the largest token budget of 2500.
+        """
+        manager = TokenBudgetManager(complexity="complex")
+
+        assert manager.limit == 2500, f"Expected 2500 tokens for complex, got {manager.limit}"
+        assert manager.complexity == "complex"
+        assert manager.used == 0
+        assert manager.remaining == 2500
+
+    def test_marker_extraction(self, request):
+        """
+        Test pytest marker extraction for complexity level
+
+        Verifies the complexity marker is registered and can
+        be retrieved from pytest configuration, which is how
+        the token_budget fixture determines complexity level.
+        """
+        markers = request.config.getini("markers")
+        marker_names = [m.split(":")[0] for m in markers]
+
+        assert "complexity" in marker_names, (
+            "complexity marker should be registered in pyproject.toml"
+        )
+
+        # Verify the marker accepts a level argument by checking
+        # the LIMITS dict covers all documented levels
+        expected_levels = {"simple", "medium", "complex"}
+        assert set(TokenBudgetManager.LIMITS.keys()) == expected_levels

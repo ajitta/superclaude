@@ -30,11 +30,6 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 {{SCRIPTS_PATH}}/skill_activator.py",
-            "timeout": 5
-          },
-          {
-            "type": "command",
             "command": "python3 {{SCRIPTS_PATH}}/context_loader.py",
             "timeout": 5
           }

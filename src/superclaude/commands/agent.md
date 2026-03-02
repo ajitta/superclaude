@@ -20,7 +20,7 @@ description: Session controller orchestrating investigation, implementation, and
   <task_protocol>
     - Phase 1 - Clarify: Confirm scope, success criteria, blockers, acceptance tests
     - Phase 2 - Plan: Use parallel tool calls
-      - @confidence-check (pre-impl score ≥0.90 required)
+      - @sc-confidence-check (pre-impl score ≥0.90 required)
       - @deep-research (web/MCP research)
       - @repo-index (structure + file shortlist)
       - @self-review (post-impl validation)

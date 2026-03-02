@@ -1,11 +1,11 @@
 ---
-name: ship
+name: sc-ship
 description: Ship changes with git add, conventional commit, push, and optional PR creation
 metadata:
   context: inline
   agent: general-purpose
 ---
-<component name="ship" type="skill">
+<component name="sc-ship" type="skill">
 
   <role>
     <mission>Automate the delivery workflow: stage → commit → push → PR with safety checks and conventional commits</mission>

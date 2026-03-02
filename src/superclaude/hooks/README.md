@@ -40,8 +40,7 @@ Hooks are defined in `hooks.json` and support the following events:
 
 ### UserPromptSubmit
 
-- **skill_activator.py**: Activates relevant skills based on prompt content
-- **context_loader.py**: Loads appropriate context files dynamically
+- **context_loader.py**: Unified trigger matching and context injection (v4.0: consolidated from skill_activator + context_loader)
 
 ### PostToolUse (Edit|Write)
 

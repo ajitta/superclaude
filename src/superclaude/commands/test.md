@@ -1,74 +1,12 @@
 ---
-description: Execute tests with coverage analysis and automated quality reporting
+description: "Test execution — redirected to sc:test skill"
+allowed-tools: []
 ---
-<component name="test" type="command">
-
-  <role>
-    /sc:test
-    <mission>Execute tests with coverage analysis and automated quality reporting</mission>
-  </role>
-
-  <syntax>/sc:test [target] [--type unit|integration|e2e|all] [--coverage] [--watch] [--fix]</syntax>
-
-  <flow>
-    1. Discover: Categorize tests via runner patterns
-    2. Configure: Environment + execution params
-    3. Execute: Run + real-time progress
-    4. Analyze: Coverage reports + failure diagnostics
-    5. Report: Generate outputs per flags
-  </flow>
-
-  <outputs note="Per flags">
-| Flag | Output | Metrics |
-|------|--------|---------|
-| --coverage | coverage/ | line ≥80%, branch ≥70% |
-| --type unit | TEST_UNIT.log | pass rate |
-| --type e2e | TEST_E2E.log | screenshots if fail |
-| default | TEST_REPORT.md | summary + failures |
-  </outputs>
-
-
-  <mcp servers="play"/>
-  <personas p="qa"/>
-
-  <tools>
-    - Bash: Test runner execution
-    - Glob: Test discovery + patterns
-    - Grep: Result parsing + failure analysis
-    - Write: Coverage reports + summaries
-  </tools>
-
-  <patterns>
-    - Discovery: Pattern categorization → runner selection
-    - Coverage: Metrics → comprehensive reporting
-    - E2E: Browser automation → cross-platform validation
-    - Watch: File monitoring → continuous execution
-  </patterns>
-
-  <examples>
-
-| Input | Output |
-|-------|--------|
-| `/sc:test` | All tests + basic coverage |
-| `src/components --type unit --coverage` | Targeted coverage |
-| `--type e2e` | Playwright browser testing |
-| `--watch --fix` | Continuous + auto-fix |
-
-  <example name="retry-without-diagnosis" type="error-path">
-    <input>/sc:test (after 3 test failures, re-running same tests hoping they pass)</input>
-    <why_wrong>Retrying failing tests without investigating root cause is not productive.</why_wrong>
-    <correct>Analyze failure output → /sc:troubleshoot --type bug → fix root cause → /sc:test</correct>
-  </example>
-
-  </examples>
-
-  <token_note>Medium consumption — E2E tests with --play use more context than unit tests</token_note>
-
-  <bounds will="execute existing tests|coverage reports|failure analysis" wont="generate test cases|modify framework config|destructive changes" fallback="Ask user for guidance when uncertain"/>
-
-  <boundaries type="execution">Execute tests and report results | Run existing tests; defer new test creation to /sc:implement --with-tests | Preserve test framework configuration</boundaries>
-
-
-
-  <handoff next="/sc:troubleshoot /sc:implement /sc:git"/>
-</component>
+> This command has been migrated to the `sc:test` skill.
+> Use `/sc:test` directly or let it auto-trigger from your prompt.
+>
+> Auto-triggers: "run tests", "execute test suite", "check test coverage",
+> "run unit tests", "run integration tests", "run e2e tests"
+>
+> The skill adds: auto-triggering, test runner detection, tool restrictions,
+> and all original command capabilities.

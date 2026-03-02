@@ -4,21 +4,21 @@ Behavioral modes that shift Claude's communication style and priorities for spec
 
 ## Available Modes
 
-| Mode | Flag | Mission |
-|------|------|---------|
-| Brainstorming | `--brainstorm` | Collaborative discovery for requirements exploration |
-| Business Panel | `--business-panel` | Multi-expert business analysis with adaptive strategies |
-| Deep Research | `--research` | Research mindset for systematic investigation and evidence-based reasoning |
-| Introspection | `--introspect` | Meta-cognitive analysis and reasoning optimization |
-| Orchestration | `--orchestrate` | Intelligent tool selection and resource efficiency |
-| Task Management | `--task-manage` | Hierarchical task organization with persistent memory for complex multi-step operations |
-| Token Efficiency | `--token-efficient` or `--uc` | Symbol-enhanced communication mindset for compressed clarity and efficient token usage |
+| Mode | Flag | File |
+|------|------|------|
+| Brainstorming | `--brainstorm` | `brainstorming.md` |
+| Business Panel | `--business-panel` | `business-panel.md` |
+| Deep Research | `--research` | `deep-research.md` |
+| Introspection | `--introspect` | `introspection.md` |
+| Orchestration | `--orchestrate` | `orchestration.md` |
+| Task Management | `--task-manage` | `task-management.md` |
+| Token Efficiency | `--token-efficient` or `--uc` | `token-efficiency.md` |
 
 ### Supporting Configuration
 
 | File | Purpose |
 |------|---------|
-| RESEARCH_CONFIG | Deep research strategy settings, depth profiles, and tool routing |
+| `research-config.md` | Deep research strategy settings, depth profiles, and tool routing |
 
 ## How Modes Work
 
@@ -30,6 +30,12 @@ Modes are activated via flags (see `core/FLAGS.md`) or auto-detected from contex
 - **Thinking depth** — how much reasoning to apply
 
 Modes can be combined (e.g., `--research --uc` for compressed research output).
+
+## Injection Behavior
+
+- **Explicit flag** (e.g., `--brainstorm`): Full `.md` file injection
+- **Natural language** (e.g., "brainstorm ideas"): Compact instruction injection (saves ~30-50% tokens)
+- **Exception**: `token-efficiency.md` always gets full injection (symbol table required)
 
 ## Related
 

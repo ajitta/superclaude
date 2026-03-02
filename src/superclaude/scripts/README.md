@@ -9,8 +9,11 @@ Utility scripts for automation, session management, and hook integrations.
 | Script | Description |
 |--------|-------------|
 | `session_init.py` | Initialize Claude Code session with SuperClaude context |
-| `context_loader.py` | Load and merge context files dynamically |
-| `skill_activator.py` | Activate skills based on task requirements |
+| `context_loader.py` | Entrypoint: trigger matching + context injection |
+| `context_session.py` | Session state, paths, config constants |
+| `context_trigger_map.py` | Unified trigger map (SKILL > MODE > MCP > CORE) |
+| `context_injection.py` | Hybrid injection engine (full/compact/instruction/hint) |
+| `skill_metadata.py` | Skill discovery, agent routing, inline hooks (renamed from skill_activator) |
 | `prettier_hook.py` | Code formatting hook using Prettier |
 | `clean_command_names.py` | Utility for cleaning/normalizing command names |
 

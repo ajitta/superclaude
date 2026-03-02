@@ -1,4 +1,4 @@
-<component name="osl-examples" type="reference" parent="simplicity-coach">
+<component name="osl-examples" type="reference" parent="sc-simplicity-coach">
   <meta>Referenced from SKILL.md as `references/orient-step-learn-examples.md`</meta>
 
   <example name="New API Endpoint">

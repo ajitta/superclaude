@@ -15,7 +15,7 @@ check_skill_triggers() {
 
     # Confidence check triggers
     if echo "$prompt" | grep -qiE "(implement|build|create|add feature|before starting)"; then
-        echo "INSTRUCTION: Consider using /confidence-check skill before implementation"
+        echo "INSTRUCTION: Consider using /sc-confidence-check skill before implementation"
     fi
 
     # Research triggers

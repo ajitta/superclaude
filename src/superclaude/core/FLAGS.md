@@ -66,11 +66,9 @@ Note: Opus 4.6 overengineers by default — see RULES.md anti_over_engineering f
 Note: Opus 4.6 uses 25-50% more tokens than 4.5 — monitor context usage
   </execution>
 
-  <output>
 --uc|--ultracompressed: symbol system, 30-50% reduction (trigger: context pressure)
 --scope [file|module|project|system]: analysis boundary
 --focus [perf|security|quality|arch|a11y|testing]: target domain
-  </output>
 
   <priority_rules>
 - Safety First: --safe-mode > --validate > optimization

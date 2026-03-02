@@ -528,12 +528,49 @@ def agents(list_only: bool, agent_name: str, tokens: bool, scope: str):
     help="Show token estimates for all skills",
 )
 @click.option(
+    "--lint",
+    is_flag=True,
+    help="Lint all skills for structural issues",
+)
+@click.option(
+    "--version-list",
+    "version_list",
+    is_flag=True,
+    help="Show version info for all installed skills",
+)
+@click.option(
+    "--outdated",
+    is_flag=True,
+    help="Check for outdated skills (requires registry)",
+)
+@click.option(
+    "--deps",
+    is_flag=True,
+    help="Show skill dependency graph",
+)
+@click.option(
+    "--deps-check",
+    "deps_check",
+    is_flag=True,
+    help="Check for missing or circular dependencies",
+)
+@click.option(
     "--scope",
     default="user",
     type=click.Choice(["user", "project"]),
     help="Scope to check: user (~/.claude/) or project (./.claude/)",
 )
-def skills(list_only: bool, skill_name: str, tokens: bool, scope: str):
+def skills(
+    list_only: bool,
+    skill_name: str,
+    tokens: bool,
+    lint: bool,
+    version_list: bool,
+    outdated: bool,
+    deps: bool,
+    deps_check: bool,
+    scope: str,
+):
     """
     Manage and inspect SuperClaude skills
 
@@ -544,10 +581,175 @@ def skills(list_only: bool, skill_name: str, tokens: bool, scope: str):
 
     Examples:
         superclaude skills --list
-        superclaude skills --info confidence-check
+        superclaude skills --info sc-confidence-check
         superclaude skills --tokens
+        superclaude skills --lint
     """
     from .install_commands import get_base_path
+
+    # Lint mode: use source skills directory
+    if lint:
+        try:
+            from superclaude.skills._testing.skill_linter import lint_all_skills
+
+            package_root = Path(__file__).resolve().parent.parent
+            skills_dir = package_root / "skills"
+
+            if not skills_dir.exists():
+                click.echo("⚠️  No source skills directory found")
+                sys.exit(1)
+
+            results = lint_all_skills(skills_dir)
+            if not results:
+                click.echo("⚠️  No skills found to lint")
+                sys.exit(1)
+
+            click.echo(f"🔍 Linting {len(results)} skill(s):\n")
+            all_passed = True
+            for r in results:
+                icon = "✅" if r.passed else "❌"
+                click.echo(f"   {icon} {r.skill_name:25} {r.error_count} errors, {r.warning_count} warnings")
+                for issue in r.issues:
+                    severity = "E" if issue.severity == "error" else "W"
+                    click.echo(f"      [{severity}] {issue.rule}: {issue.message}")
+                if not r.passed:
+                    all_passed = False
+
+            click.echo()
+            passed_count = sum(1 for r in results if r.passed)
+            click.echo(f"   {passed_count}/{len(results)} skills passed")
+
+            if not all_passed:
+                sys.exit(1)
+        except ImportError:
+            click.echo("❌ Skill linter not available — install superclaude[dev]")
+            sys.exit(1)
+        return
+
+    # Outdated mode: placeholder for future registry
+    if outdated:
+        click.echo(
+            "Registry not configured. Version comparison requires a skill registry "
+            "(planned for v5.2.0+ajitta)."
+        )
+        return
+
+    # Version list mode: show skill versions from source
+    if version_list:
+        try:
+            from superclaude.skills._testing.skill_linter import extract_dependencies
+
+            package_root = Path(__file__).resolve().parent.parent
+            skills_dir = package_root / "skills"
+
+            if not skills_dir.exists():
+                click.echo("⚠️  No source skills directory found")
+                sys.exit(1)
+
+            click.echo(f"📋 Skills Versions (scope: {scope}):\n")
+            versioned = 0
+            total = 0
+
+            for entry in sorted(skills_dir.iterdir()):
+                if not entry.is_dir() or entry.name.startswith("_"):
+                    continue
+                if not (entry / "SKILL.md").exists() and not (entry / "skill.md").exists():
+                    continue
+
+                deps = extract_dependencies(entry)
+                ver = deps.get("version") or "unversioned"
+                if ver != "unversioned":
+                    versioned += 1
+                total += 1
+                click.echo(f"   {entry.name:25} {ver}")
+
+            click.echo(
+                f"\n   Total: {total} skills ({versioned} versioned, {total - versioned} unversioned)"
+            )
+        except ImportError:
+            click.echo("❌ Dependency tools not available — install superclaude[dev]")
+            sys.exit(1)
+        return
+
+    # Deps mode: show dependency graph
+    if deps:
+        try:
+            from superclaude.skills._testing.dependency_resolver import build_graph
+
+            package_root = Path(__file__).resolve().parent.parent
+            skills_dir = package_root / "skills"
+
+            if not skills_dir.exists():
+                click.echo("⚠️  No source skills directory found")
+                sys.exit(1)
+
+            graph = build_graph(skills_dir)
+            nodes = graph.nodes
+            enhancements = graph.enhancement_map()
+
+            click.echo(f"📊 Skill Dependencies ({len(nodes)} skills):\n")
+            for name in sorted(nodes):
+                node = nodes[name]
+                parts = [f"   {name:25}"]
+                if node.requires_skills:
+                    parts.append(f"requires: {', '.join(node.requires_skills)}")
+                if node.requires_mcp:
+                    parts.append(f"mcp: {', '.join(node.requires_mcp)}")
+                if name in enhancements:
+                    parts.append(f"enhanced by: {', '.join(enhancements[name])}")
+                if len(parts) == 1:
+                    parts.append("(no dependencies)")
+                click.echo("  ".join(parts))
+
+            order = graph.resolve_all()
+            click.echo(f"\n   Install order: {' → '.join(order)}")
+        except ImportError:
+            click.echo("❌ Dependency resolver not available — install superclaude[dev]")
+            sys.exit(1)
+        return
+
+    # Deps check mode: validate dependencies
+    if deps_check:
+        try:
+            from superclaude.skills._testing.dependency_resolver import build_graph
+
+            package_root = Path(__file__).resolve().parent.parent
+            skills_dir = package_root / "skills"
+
+            if not skills_dir.exists():
+                click.echo("⚠️  No source skills directory found")
+                sys.exit(1)
+
+            graph = build_graph(skills_dir)
+            cycles = graph.check_circular()
+            missing = graph.missing_dependencies()
+
+            click.echo("🔍 Dependency Check:\n")
+
+            if not cycles and not missing:
+                click.echo("   ✅ No circular dependencies")
+                click.echo("   ✅ No missing dependencies")
+            else:
+                if cycles:
+                    click.echo(f"   ❌ Circular dependencies found:")
+                    for a, b in cycles:
+                        click.echo(f"      {a} ↔ {b}")
+                else:
+                    click.echo("   ✅ No circular dependencies")
+
+                if missing:
+                    click.echo(f"   ⚠️  Missing dependencies:")
+                    for issue in missing:
+                        click.echo(f"      [{issue.kind}] {issue.message}")
+                else:
+                    click.echo("   ✅ No missing dependencies")
+
+            if cycles:
+                sys.exit(1)
+        except ImportError:
+            click.echo("❌ Dependency resolver not available — install superclaude[dev]")
+            sys.exit(1)
+        return
 
     base_path = get_base_path(scope)
     skills_path = base_path / "skills"
@@ -627,6 +829,9 @@ def skills(list_only: bool, skill_name: str, tokens: bool, scope: str):
     # Default: list skills
     click.echo(f"📋 Available Skills (scope: {scope}):\n")
 
+    migrated_count = 0
+    original_count = 0
+
     for skill_dir, manifest in skill_dirs:
         content = manifest.read_text(encoding="utf-8")
 
@@ -637,9 +842,21 @@ def skills(list_only: bool, skill_name: str, tokens: bool, scope: str):
             description = description[:37] + "..."
         context = " [fork]" if fm.get("context") == "fork" else ""
 
-        click.echo(f"   {skill_dir.name:25} {description}{context}")
+        # Determine skill type
+        is_migrated = skill_dir.name.startswith("sc-")
+        if is_migrated:
+            migrated_count += 1
+        else:
+            original_count += 1
 
-    click.echo(f"\n   Total: {len(skill_dirs)} skills")
+        if list_only and not tokens:
+            # Simple list mode
+            tag = "[migrated]" if is_migrated else "[original]"
+            click.echo(f"   {skill_dir.name:25} {tag:12} {description}{context}")
+        else:
+            click.echo(f"   {skill_dir.name:25} {description}{context}")
+
+    click.echo(f"\n   Total: {len(skill_dirs)} skills ({migrated_count} migrated, {original_count} original)")
     click.echo("   Use --info <skill> for details, --tokens for estimates")
 
 

@@ -1,13 +1,12 @@
 """
-Unit tests for context_loader.format_skills_summary
+Unit tests for context_injection.format_skills_summary
 
 Tests the compact single-line skill summary format.
 """
 
 from dataclasses import dataclass
-from pathlib import Path
 
-from superclaude.scripts.context_loader import format_skills_summary
+from superclaude.scripts.context_injection import format_skills_summary
 
 
 @dataclass

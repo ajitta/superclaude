@@ -1,5 +1,5 @@
 ---
-name: confidence-check
+name: sc-confidence-check
 description: Pre-implementation confidence assessment (≥90% to proceed)
 metadata:
   context: inline
@@ -9,11 +9,11 @@ metadata:
       - matcher: "WebFetch|WebSearch"
         hooks:
           - type: command
-            command: "python3 {{SKILLS_PATH}}/confidence-check/scripts/validate_confidence_context.py"
+            command: "python3 {{SKILLS_PATH}}/sc-confidence-check/scripts/validate_confidence_context.py"
             timeout: 30
             once: true
 ---
-<component name="confidence-check" type="skill">
+<component name="sc-confidence-check" type="skill">
 
   <role>
     <mission>Prevent wrong-direction execution by assessing confidence BEFORE implementation</mission>

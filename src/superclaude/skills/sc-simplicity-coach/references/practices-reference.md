@@ -1,4 +1,4 @@
-<component name="practices-reference" type="reference" parent="simplicity-coach">
+<component name="practices-reference" type="reference" parent="sc-simplicity-coach">
   <meta>Referenced from SKILL.md — detailed templates for practices and task types</meta>
 
   <dependency_gate title="Question Your Dependencies">

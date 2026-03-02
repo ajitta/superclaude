@@ -23,14 +23,23 @@ def install_skill_command(
     Returns:
         Tuple of (success: bool, message: str)
     """
-    # Get skill source directory
-    skill_source = _get_skill_source(skill_name)
+    # Check if skill_name is an absolute or expandable path
+    skill_path = Path(skill_name).expanduser()
+    if skill_path.is_absolute() and skill_path.is_dir():
+        if not _is_valid_skill_dir(skill_path):
+            return False, f"Directory '{skill_path}' is not a valid skill (no SKILL.md found)"
+        skill_source = skill_path
+        # Use directory name as the installed skill name
+        skill_name = skill_path.name
+    else:
+        # Get skill source directory from package
+        skill_source = _get_skill_source(skill_name)
 
-    if not skill_source:
-        return False, f"Skill '{skill_name}' not found"
+        if not skill_source:
+            return False, f"Skill '{skill_name}' not found"
 
-    if not skill_source.exists():
-        return False, f"Skill source directory not found: {skill_source}"
+        if not skill_source.exists():
+            return False, f"Skill source directory not found: {skill_source}"
 
     # Create target directory
     skill_target = target_path / skill_name
