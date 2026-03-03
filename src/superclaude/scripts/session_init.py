@@ -20,6 +20,16 @@ import subprocess
 import sys
 
 
+def reset_context_cache() -> None:
+    """Reset context_loader dedup cache so new session gets fresh injections."""
+    try:
+        from superclaude.scripts.context_reset import reset_context_cache as _reset
+
+        _reset()
+    except ImportError:
+        pass
+
+
 def init_hook_tracker() -> str | None:
     """Initialize hook tracker and cleanup old sessions.
 
@@ -157,26 +167,29 @@ def get_additional_dirs_status() -> str:
 
 
 def main() -> None:
-    # 0. Initialize hook tracker (cleanup old sessions)
+    # 0. Reset context cache from prior session (CWD-based cache persists across sessions)
+    reset_context_cache()
+
+    # 1. Initialize hook tracker (cleanup old sessions)
     init_hook_tracker()
 
-    # 1. Check git status
+    # 2. Check git status
     print(get_git_status())
 
-    # 2. Check PR status (Claude Code 2.1.20+)
+    # 3. Check PR status (Claude Code 2.1.20+)
     pr_status = get_pr_status()
     if pr_status:
         print(pr_status)
 
-    # 3. Check for additional directories (monorepo)
+    # 4. Check for additional directories (monorepo)
     additional_dirs = get_additional_dirs_status()
     if additional_dirs:
         print(additional_dirs)
 
-    # 4. Remind token budget
+    # 5. Remind token budget
     print("💡 Use /context to confirm token budget.")
 
-    # 5. Report core services
+    # 6. Core services
     print()
     print("🛠️ Core Services Available:")
     print("  ✅ Confidence Check (pre-implementation validation)")
