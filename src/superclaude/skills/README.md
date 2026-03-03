@@ -4,55 +4,67 @@ Skills are reusable, specialized capabilities with defined behaviors, tool acces
 
 ## Skill Frontmatter Reference (v2.1.0+)
 
+Claude Code only supports a fixed set of top-level frontmatter attributes (`name`, `description`, `triggers`, `user-invocable`). Custom attributes must be nested under `metadata:`. SuperClaude's `_get_meta_value()` helper checks `metadata` first, then falls back to root-level for backward compatibility.
+
 ```yaml
 ---
 name: skill-name
 description: Brief description shown in slash command menu
+version: 1.0.0                     # Skill version (SuperClaude convention)
 triggers: /skill-name, keyword1, keyword2
-user-invocable: true              # Visible in slash command menu (default: true for /skills/)
-context: inline|fork              # inline = same context, fork = sub-agent (v2.1.0+)
-agent: agent-name                 # Agent type for execution (v2.1.0+)
-model: haiku|sonnet|opus          # Override parent model alias (v2.1.0+)
-# For reproducibility, prefer a versioned model ID when needed
-# Example: claude-opus-4-6-*
-mcp: c7:docs|tavily:search        # MCP dependencies
-allowed-tools:                    # YAML list format (v2.1.0+)
-  - Read
-  - Grep
-  - Glob
-  - WebSearch
-  - mcp__server__tool             # Specific MCP tool
-  - mcp__server__*                # All tools from server (wildcard)
-disallowed-tools:                 # Explicit tool blocking (v2.1.0+)
-  - Bash
+user-invocable: true                # Visible in slash command menu (default: true for /skills/)
+metadata:                           # Custom attributes nested under metadata
+  context: inline|fork              # inline = same context, fork = sub-agent (v2.1.0+)
+  agent: agent-name                 # Agent type for execution (v2.1.0+)
+  model: haiku|sonnet|opus          # Override parent model alias (v2.1.0+)
+  # For reproducibility, prefer a versioned model ID when needed
+  # Example: claude-opus-4-6-*
+  mcp: c7:docs|tavily:search        # MCP dependencies
+  allowed-tools:                    # YAML list format (v2.1.0+)
+    - Read
+    - Grep
+    - Glob
+    - WebSearch
+    - mcp__server__tool             # Specific MCP tool
+    - mcp__server__*                # All tools from server (wildcard)
+  disallowed-tools:                 # Explicit tool blocking (v2.1.0+)
+    - Bash
 
-hooks:                            # Inline hooks (v2.1.0+)
-  PreToolUse:
-    - matcher: "Bash|Edit"        # Outer level: matcher + hooks array
-      hooks:
-        - type: command
-          command: "python validate.py"
-          once: true              # Execute only once per session
-  PostToolUse:
-    - matcher: "Write"
-      hooks:
-        - type: command
-          command: "python format.py"
-  Stop:
-    - hooks:
-        - type: command
-          command: "python cleanup.py"
+  hooks:                            # Inline hooks (v2.1.0+)
+    PreToolUse:
+      - matcher: "Bash|Edit"        # Outer level: matcher + hooks array
+        hooks:
+          - type: command
+            command: "python validate.py"
+            once: true              # Execute only once per session
+    PostToolUse:
+      - matcher: "Write"
+        hooks:
+          - type: command
+            command: "python format.py"
+    Stop:
+      - hooks:
+          - type: command
+            command: "python cleanup.py"
 ---
 ```
 
 ## Frontmatter Fields
 
+### Top-level (Claude Code native)
+
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `name` | string | required | Unique skill identifier |
 | `description` | string | required | Shown in command menu |
+| `version` | string | - | Skill version (SuperClaude convention) |
 | `triggers` | string | - | Comma-separated activation keywords |
 | `user-invocable` | boolean | true | Show in slash command menu |
+
+### Under `metadata:` (SuperClaude custom)
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
 | `context` | string | inline | `inline` or `fork` (sub-agent) |
 | `agent` | string | - | Agent type for specialized behavior |
 | `model` | string | inherited | Override parent model (v2.1.0+) |
@@ -112,20 +124,22 @@ Perform a quick validation of the current context.
 ---
 name: deep-analysis
 description: Comprehensive code analysis
+version: 1.0.0
 triggers: /analyze, deep-dive, thorough-check
-context: fork
-agent: quality-engineer
-model: opus  # or a versioned model ID for deterministic runs
-mcp: c7:patterns|serena:symbols
-allowed-tools:
-  - Read
-  - Grep
-  - mcp__serena__*
-hooks:
-  Stop:
-    - hooks:
-        - type: command
-          command: "python summarize.py"
+metadata:
+  context: fork
+  agent: quality-engineer
+  model: opus  # or a versioned model ID for deterministic runs
+  mcp: c7:patterns|serena:symbols
+  allowed-tools:
+    - Read
+    - Grep
+    - mcp__serena__*
+  hooks:
+    Stop:
+      - hooks:
+          - type: command
+            command: "python summarize.py"
 ---
 <component name="deep-analysis">
   <!-- Skill implementation -->

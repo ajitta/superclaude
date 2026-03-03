@@ -387,7 +387,7 @@ def _check_conversion_completeness() -> Dict[str, Any]:
         return {
             "name": "Conversion completeness",
             "passed": True,
-            "details": [f"8/8 command→skill pairs complete"],
+            "details": ["8/8 command→skill pairs complete"],
         }
 
     details = []

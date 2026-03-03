@@ -10,9 +10,9 @@ and presents the Simplicity Coach's 3 questions for each dependency.
 """
 
 import json
+import os
 import re
 import sys
-import os
 from pathlib import Path
 
 
@@ -180,7 +180,7 @@ def generate_report(root: str):
         if parser:
             deps = parser(filepath)
         else:
-            print(f"  (No parser available — manual review required)")
+            print("  (No parser available — manual review required)")
             print()
             continue
 
@@ -195,9 +195,9 @@ def generate_report(root: str):
             print(f"### {dep['name']} ({dep['version']}) [{dep['type']}]")
             print()
             print("Simplicity 3 Questions:")
-            print(f"  1. How many lines of this library do we actually use?        -> [ ]")
-            print(f"  2. How long would it take to write those lines ourselves?     -> [ ]")
-            print(f"  3. Are we confident it will remain safe and compatible in 6m? -> [ ]")
+            print("  1. How many lines of this library do we actually use?        -> [ ]")
+            print("  2. How long would it take to write those lines ourselves?     -> [ ]")
+            print("  3. Are we confident it will remain safe and compatible in 6m? -> [ ]")
             print()
 
     print("---")

@@ -64,7 +64,10 @@ def install_skill_command(
             ignore=shutil.ignore_patterns("__init__.py", "__pycache__", "*.pyc"),
         )
         # Resolve template variables ({{SCRIPTS_PATH}}) in SKILL.md
-        from .install_components import _resolve_template_paths, _resolve_skill_templates
+        from .install_components import (
+            _resolve_skill_templates,
+            _resolve_template_paths,
+        )
         base_path = target_path.parent  # target_path is base_path/skills
         template_vars = _resolve_template_paths(base_path, scope)
         _resolve_skill_templates(skill_target, template_vars)

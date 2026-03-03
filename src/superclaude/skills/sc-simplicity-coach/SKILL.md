@@ -1,6 +1,7 @@
 ---
 name: sc-simplicity-coach
 description: Interactive OSL coaching, daybook journaling, dependency audits, and simplicity reviews
+version: 1.0.0
 metadata:
   context: inline
   agent: simplicity-guide
@@ -8,7 +9,7 @@ metadata:
     Stop:
       - hooks:
           - type: command
-            command: "python3 {{SKILLS_PATH}}/sc-simplicity-coach/scripts/dependency-audit.py ."
+            command: "{{PYTHON_PATH}} {{SKILLS_PATH}}/sc-simplicity-coach/scripts/dependency-audit.py ."
             timeout: 15
             once: true
 ---

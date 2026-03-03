@@ -1,6 +1,7 @@
 ---
 name: sc-confidence-check
 description: Pre-implementation confidence assessment (≥90% to proceed)
+version: 1.0.0
 metadata:
   context: inline
   agent: quality-engineer
@@ -9,7 +10,7 @@ metadata:
       - matcher: "WebFetch|WebSearch"
         hooks:
           - type: command
-            command: "python3 {{SKILLS_PATH}}/sc-confidence-check/scripts/validate_confidence_context.py"
+            command: "{{PYTHON_PATH}} {{SKILLS_PATH}}/sc-confidence-check/scripts/validate_confidence_context.py"
             timeout: 30
             once: true
 ---

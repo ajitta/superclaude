@@ -9,7 +9,7 @@ User approval is always required — no auto-generation.
 from __future__ import annotations
 
 from collections import Counter
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 
 @dataclass

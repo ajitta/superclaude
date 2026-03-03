@@ -26,7 +26,7 @@ metadata:
       - matcher: "Bash"
         hooks:
           - type: command
-            command: "python3 {{SKILLS_PATH}}/sc-git/scripts/validate_git_safety.py"
+            command: "{{PYTHON_PATH}} {{SKILLS_PATH}}/sc-git/scripts/validate_git_safety.py"
             timeout: 5
 ---
 <component name="sc-git" type="skill">

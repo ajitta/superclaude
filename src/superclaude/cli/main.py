@@ -731,14 +731,14 @@ def skills(
                 click.echo("   ✅ No missing dependencies")
             else:
                 if cycles:
-                    click.echo(f"   ❌ Circular dependencies found:")
+                    click.echo("   ❌ Circular dependencies found:")
                     for a, b in cycles:
                         click.echo(f"      {a} ↔ {b}")
                 else:
                     click.echo("   ✅ No circular dependencies")
 
                 if missing:
-                    click.echo(f"   ⚠️  Missing dependencies:")
+                    click.echo("   ⚠️  Missing dependencies:")
                     for issue in missing:
                         click.echo(f"      [{issue.kind}] {issue.message}")
                 else:

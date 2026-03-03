@@ -7,7 +7,7 @@ This is an experimental/prototype module (Phase 4 / Sprint 7).
 """
 from __future__ import annotations
 
-from collections import defaultdict, deque
+from collections import defaultdict
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -95,22 +95,22 @@ class DependencyGraph:
     def check_circular(self) -> list[tuple[str, str]]:
         """Detect circular dependencies. Returns list of (from, to) edge pairs forming cycles."""
         cycles: list[tuple[str, str]] = []
-        WHITE, GRAY, BLACK = 0, 1, 2
-        color: dict[str, int] = {n: WHITE for n in self._nodes}
+        white, gray, black = 0, 1, 2
+        color: dict[str, int] = {n: white for n in self._nodes}
 
         def _dfs(name: str) -> None:
-            color[name] = GRAY
+            color[name] = gray
             for dep in self._edges.get(name, []):
                 if dep not in color:
                     continue
-                if color[dep] == GRAY:
+                if color[dep] == gray:
                     cycles.append((name, dep))
-                elif color[dep] == WHITE:
+                elif color[dep] == white:
                     _dfs(dep)
-            color[name] = BLACK
+            color[name] = black
 
         for name in self._nodes:
-            if color[name] == WHITE:
+            if color[name] == white:
                 _dfs(name)
 
         return cycles

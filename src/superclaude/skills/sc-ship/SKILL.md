@@ -1,9 +1,17 @@
 ---
 name: sc-ship
 description: Ship changes with git add, conventional commit, push, and optional PR creation
+version: 1.0.0
 metadata:
   context: inline
   agent: general-purpose
+  hooks:
+    PreToolUse:
+      - matcher: "Bash"
+        hooks:
+          - type: command
+            command: "{{PYTHON_PATH}} {{SKILLS_PATH}}/sc-git/scripts/validate_git_safety.py"
+            timeout: 5
 ---
 <component name="sc-ship" type="skill">
 

@@ -21,14 +21,20 @@ def main():
         sys.exit(0)
 
     # BLOCK: force push to main/master
-    if re.search(r"git\s+push\s+.*--force.*\b(main|master)\b", command) or \
-       re.search(r"git\s+push\s+.*\b(main|master)\b.*--force", command):
+    # Covers: --force, -f, --force-with-lease, and +ref refspec syntax
+    is_push = re.search(r"git\s+push\b", command)
+    targets_protected = re.search(r"\b(main|master)\b", command) if is_push else None
+    has_force = re.search(r"git\s+push\s+.*?(--force\b|\s-f\b)", command) if is_push else None
+    has_refspec_force = re.search(r"\+\s*(main|master)\b", command) if is_push else None
+
+    if is_push and targets_protected and (has_force or has_refspec_force):
         print("BLOCKED: Force push to main/master is not allowed. "
               "Create a feature branch and open a PR instead.", file=sys.stderr)
         sys.exit(2)
 
     # WARN: destructive operations (allow but inform)
     warn_patterns = [
+        (r"git\s+push\s+.*--force-with-lease", "git push --force-with-lease can overwrite remote commits"),
         (r"git\s+reset\s+--hard", "git reset --hard will discard uncommitted changes"),
         (r"git\s+clean\s+-f", "git clean -f will permanently delete untracked files"),
         (r"git\s+checkout\s+--\s+\.", "git checkout -- . will discard all unstaged changes"),

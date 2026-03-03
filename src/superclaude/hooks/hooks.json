@@ -8,7 +8,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 {{SCRIPTS_PATH}}/session_init.py",
+            "command": "{{PYTHON_PATH}} {{SCRIPTS_PATH}}/session_init.py",
             "timeout": 10,
             "once": true
           }
@@ -19,7 +19,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 {{SCRIPTS_PATH}}/context_reset.py",
+            "command": "{{PYTHON_PATH}} {{SCRIPTS_PATH}}/context_reset.py",
             "timeout": 5
           }
         ]
@@ -30,7 +30,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 {{SCRIPTS_PATH}}/context_loader.py",
+            "command": "{{PYTHON_PATH}} {{SCRIPTS_PATH}}/context_loader.py",
             "timeout": 5
           }
         ]
@@ -55,13 +55,13 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 {{SCRIPTS_PATH}}/prettier_hook.py",
+            "command": "{{PYTHON_PATH}} {{SCRIPTS_PATH}}/prettier_hook.py",
             "timeout": 30
           },
           {
             "_comment": "[superclaude] optional — set SUPERCLAUDE_AUTO_TEST=0 to disable",
             "type": "command",
-            "command": "python3 {{SCRIPTS_PATH}}/test_runner_hook.py",
+            "command": "{{PYTHON_PATH}} {{SCRIPTS_PATH}}/test_runner_hook.py",
             "async": true,
             "timeout": 120
           }

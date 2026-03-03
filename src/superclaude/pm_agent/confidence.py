@@ -828,8 +828,7 @@ class PRStatusCheck:
             return True, "PR status check timed out"
         except (subprocess.SubprocessError, OSError):
             return True, "PR status check failed - skipped"
-        except Exception:
-            # Catch json.JSONDecodeError and other unexpected errors
+        except (json.JSONDecodeError, KeyError, ValueError):
             return True, "PR status check failed - skipped"
 
     def _get_pr_url(self) -> str:

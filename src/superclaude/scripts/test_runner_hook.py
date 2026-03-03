@@ -27,22 +27,26 @@ SOURCE_EXTENSIONS = {
 SKIP_DIRS = {"node_modules", "__pycache__", ".venv", "dist", "build", ".git"}
 
 
-def detect_test_command(file_path: str) -> str | None:
-    """Detect the appropriate test command based on project files."""
+def detect_test_command(file_path: str) -> list[str] | None:
+    """Detect the appropriate test command based on project files.
+
+    Returns:
+        Command as a list of arguments (for shell=False), or None if no test runner found.
+    """
     path = Path(file_path).resolve()
 
     # Walk up to find project root indicators
     for parent in [path.parent, *path.parents]:
         if (parent / "pyproject.toml").exists() or (parent / "setup.py").exists():
             if (parent / "Makefile").exists():
-                return f"make -C {shlex.quote(str(parent))} test"
-            return "uv run pytest --tb=short -q"
+                return ["make", "-C", str(parent), "test"]
+            return ["uv", "run", "pytest", "--tb=short", "-q"]
 
         if (parent / "package.json").exists():
-            return "npm test --silent"
+            return ["npm", "test", "--silent"]
 
         if (parent / "Makefile").exists():
-            return f"make -C {shlex.quote(str(parent))} test"
+            return ["make", "-C", str(parent), "test"]
 
         # Stop at git root
         if (parent / ".git").exists():
@@ -95,20 +99,20 @@ def main() -> None:
 
         result = subprocess.run(
             test_cmd,
-            shell=True,
             capture_output=True,
             text=True,
             timeout=120,
         )
 
         file_name = Path(file_path).name
+        cmd_str = shlex.join(test_cmd)
 
         if result.returncode != 0:
             # Last 15 lines of failure output for context
             lines = (result.stdout + result.stderr).strip().splitlines()
             tail = "\n".join(lines[-15:])
             msg = json.dumps({
-                "systemMessage": f"Tests FAILED after editing {file_name} ({test_cmd}):\n{tail}"
+                "systemMessage": f"Tests FAILED after editing {file_name} ({cmd_str}):\n{tail}"
             })
             print(msg)
         else:

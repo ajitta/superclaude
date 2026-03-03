@@ -7,6 +7,7 @@ and the top-level install_all orchestration.
 
 import json
 import shutil
+import sys
 from pathlib import Path
 from typing import List, Tuple
 
@@ -24,8 +25,35 @@ from .install_settings import (
 )
 
 
+def _resolve_python_path() -> str:
+    """Find the best Python interpreter that can import superclaude.
+
+    Prefers the uv tool venv (durable across venv recreations) over
+    the currently running sys.executable (which may be a transient project venv).
+    """
+    import subprocess
+
+    # Try uv tool's Python first — it's the most stable install location
+    try:
+        result = subprocess.run(
+            ["uv", "tool", "run", "--from", "superclaude", "python", "-c",
+             "import sys; print(sys.executable)"],
+            capture_output=True, text=True, timeout=10
+        )
+        if result.returncode == 0:
+            candidate = result.stdout.strip()
+            if candidate and Path(candidate).exists():
+                return Path(candidate).resolve().as_posix()
+    except (FileNotFoundError, subprocess.TimeoutExpired):
+        pass
+
+    # Fallback: the Python running this install (always has superclaude)
+    return Path(sys.executable).resolve().as_posix()
+
+
 def _resolve_template_paths(base_path: Path, scope: str = "user") -> dict:
     """Compute resolved template variable values for a given scope."""
+    python = _resolve_python_path()
     if scope == "project":
         scripts = ".claude/superclaude/scripts"
         skills = ".claude/skills"
@@ -33,7 +61,11 @@ def _resolve_template_paths(base_path: Path, scope: str = "user") -> dict:
         # Use as_posix() to avoid Windows backslashes breaking YAML parsing
         scripts = (base_path / "superclaude" / "scripts").resolve().as_posix()
         skills = (base_path / "skills").resolve().as_posix()
-    return {"{{SCRIPTS_PATH}}": scripts, "{{SKILLS_PATH}}": skills}
+    return {
+        "{{SCRIPTS_PATH}}": scripts,
+        "{{SKILLS_PATH}}": skills,
+        "{{PYTHON_PATH}}": python,
+    }
 
 
 def _resolve_skill_templates(skill_dir: Path, template_vars: dict) -> None:
@@ -256,8 +288,11 @@ def install_hooks_and_scripts(
             raw_content = hooks_json_file.read_text(encoding="utf-8")
             # Use forward slashes for JSON compatibility (works on all platforms)
             scripts_path_json_safe = scripts_path_for_hooks.replace("\\", "/")
+            python_path = _resolve_python_path()
             hooks_content_transformed = raw_content.replace(
                 "{{SCRIPTS_PATH}}", scripts_path_json_safe
+            ).replace(
+                "{{PYTHON_PATH}}", python_path
             )
         except OSError as e:
             failed += 1
