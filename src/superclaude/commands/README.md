@@ -18,21 +18,15 @@ Slash commands for Claude Code. Installed to `~/.claude/commands/sc/` when users
 | Command | Description |
 |---------|-------------|
 | `/sc:implement` | Implement features with structured workflow |
-| `/sc:build` | Build and compile projects |
-| `/sc:test` | Run tests with coverage analysis |
 | `/sc:analyze` | Analyze code quality and patterns |
 | `/sc:improve` | Apply systematic improvements to quality, performance, and maintainability |
 | `/sc:explain` | Explain code behavior and architecture |
-| `/sc:cleanup` | Clean up code, remove dead code |
-| `/sc:troubleshoot` | Debug and fix issues |
 
 ### Planning & Design Commands
 
 | Command | Description |
 |---------|-------------|
-| `/sc:design` | Design systems and architectures |
 | `/sc:brainstorm` | Interactive requirements discovery through Socratic dialogue |
-| `/sc:estimate` | Estimate effort and complexity |
 | `/sc:workflow` | Define and execute workflows |
 | `/sc:task` | Manage development tasks |
 
@@ -41,7 +35,6 @@ Slash commands for Claude Code. Installed to `~/.claude/commands/sc/` when users
 | Command | Description |
 |---------|-------------|
 | `/sc:research` | Deep web research with parallel search |
-| `/sc:document` | Generate documentation |
 | `/sc:index-repo` | Repository indexing for context optimization |
 | `/sc:reflect` | Task reflection and validation using Serena MCP analysis |
 
@@ -49,9 +42,23 @@ Slash commands for Claude Code. Installed to `~/.claude/commands/sc/` when users
 
 | Command | Description |
 |---------|-------------|
-| `/sc:git` | Git operations and workflows |
 | `/sc:pm` | Project Manager Agent: orchestrate sub-agents and manage workflows |
 | `/sc:spawn` | Meta-system task orchestration with intelligent breakdown and delegation |
+
+### Migrated to Skills
+
+The following were migrated from commands to skills (auto-triggering, hooks, tool restrictions):
+
+| Skill | Description |
+|-------|-------------|
+| `sc-build` | Build, compile, package with error handling |
+| `sc-cleanup` | Dead code removal + structure optimization |
+| `sc-design` | System architecture + API design |
+| `sc-document` | Focused documentation generation |
+| `sc-estimate` | Development time/effort estimates |
+| `sc-git` | Intelligent git operations + PR integration |
+| `sc-test` | Test execution + coverage analysis |
+| `sc-troubleshoot` | Issue diagnosis + resolution |
 
 ### Advisory Panels
 

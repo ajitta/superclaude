@@ -14,18 +14,12 @@ description: List all available /sc commands and their functionality
     2. Complete: End after display
   </flow>
 
-  <commands>
+  <commands note="Slash commands (22)">
     - agent: Session controller + workflow orchestration
     - analyze: Code analysis: quality, security, performance, architecture
     - brainstorm: Requirements discovery via Socratic dialogue
-    - build: Build, compile, package with error handling
     - business-panel: Multi-expert business analysis
-    - cleanup: Dead code removal + structure optimization
-    - design: System architecture + API design
-    - document: Focused documentation generation
-    - estimate: Development time/effort estimates
     - explain: Code + concept explanations
-    - git: Intelligent git operations + PR integration
     - help: This command reference
     - implement: Feature implementation + MCP integration
     - improve: Code quality + performance improvements
@@ -41,10 +35,22 @@ description: List all available /sc commands and their functionality
     - spawn: Meta-system task orchestration
     - spec-panel: Multi-expert specification review
     - task: Complex task workflow management
-    - test: Test execution + coverage analysis
-    - troubleshoot: Issue diagnosis + resolution
     - workflow: PRD → implementation workflow
   </commands>
+
+  <skills note="Auto-triggering skills (11) — invoke via skill name or natural language">
+    - sc-build: Build, compile, package with error handling
+    - sc-cleanup: Dead code removal + structure optimization
+    - sc-confidence-check: Pre-implementation confidence assessment
+    - sc-design: System architecture + API design
+    - sc-document: Focused documentation generation
+    - sc-estimate: Development time/effort estimates
+    - sc-git: Intelligent git operations + PR integration (hooks: git safety)
+    - sc-ship: Ship changes with commit + push + PR (hooks: git safety)
+    - sc-simplicity-coach: OSL coaching + dependency audits (hooks: session audit)
+    - sc-test: Test execution + coverage analysis
+    - sc-troubleshoot: Issue diagnosis + resolution
+  </skills>
 
   <flags>
     <category name="Mode">

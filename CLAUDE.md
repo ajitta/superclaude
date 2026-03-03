@@ -48,7 +48,7 @@ SuperClaude is a **dual-purpose** project:
 The CLI `superclaude install` copies content from the package to Claude Code's config directory:
 
 ```
-src/superclaude/commands/  →  ~/.claude/commands/sc/       (31 slash commands)
+src/superclaude/commands/  →  ~/.claude/commands/sc/       (22 slash commands)
 src/superclaude/agents/    →  ~/.claude/agents/             (21 agent definitions)
 src/superclaude/skills/    →  ~/.claude/skills/             (skill implementations)
 src/superclaude/core/      →  ~/.claude/superclaude/core/   (FLAGS, PRINCIPLES, RULES)
