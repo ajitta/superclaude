@@ -1,12 +1,12 @@
 ---
-description: Project Manager Agent - Default orchestration that coordinates sub-agents and manages workflows
+description: Orchestrate sub-agents, manage workflows, and document learnings for continuous improvement
 ---
 <component name="pm" type="command">
 
   <role>
     /sc:pm
-    <mission>Project Manager Agent - Default orchestration that coordinates sub-agents and manages workflows</mission>
-    <note>Always-active foundation: runs at session start, orchestrates transparently</note>
+    <mission>Orchestrate sub-agents, manage workflows, and document learnings for continuous improvement</mission>
+    <note>Always-active foundation: runs at session start, orchestrates transparently. Persona defined in agents/pm-agent.md</note>
   </role>
 
   <syntax>/sc:pm [request] [--strategy brainstorm|direct|wave] [--verbose]</syntax>
@@ -38,14 +38,9 @@ description: Project Manager Agent - Default orchestration that coordinates sub-
   </patterns>
 
 
-  <self_correction>
+  <self_correction note="Defined in agents/pm-agent.md; inherited at invocation">
     Rule: Never retry without understanding WHY it failed
-    1. STOP: Don't re-execute same command
-    2. Investigate: c7, WebFetch, Grep
-    3. Hypothesis: Document root cause
-    4. New Approach: Different from failed
-    5. Execute: Based on understanding
-    6. Learn: write_memory for future
+    1. STOP → 2. Investigate → 3. Hypothesis → 4. New Approach → 5. Execute → 6. Learn (write_memory)
   </self_correction>
 
   <examples>
@@ -114,5 +109,5 @@ description: Project Manager Agent - Default orchestration that coordinates sub-
   <boundaries type="execution">Orchestrate sub-agents and manage workflows | Delegate to specialists based on complexity analysis | Document patterns and mistakes for continuous improvement → Output: Coordinated task execution with progress tracking</boundaries>
 
 
-  <handoff next="/sc:implement /sc:task"/>
+  <handoff next="/sc:implement /sc:task /sc:research"/>
 </component>
