@@ -1,7 +1,7 @@
 # SuperClaude — Project Index
 
 > **Version**: 4.3.0+ajitta | **Python**: >=3.10 | **Build**: hatchling | **License**: MIT
-> **Generated**: 2026-02-26 | **Latest commit**: f04886c
+> **Generated**: 2026-03-05 | **Latest commit**: 20adbfb
 
 ## What It Is
 
@@ -19,17 +19,18 @@ A **dual-purpose** project: (1) a pytest plugin + CLI tool providing PM Agent pa
 
 | Directory | Files | Purpose |
 |-----------|-------|---------|
-| `cli/` | 8 | CLI commands: install, uninstall, update, mcp, doctor, agents, skills, version |
+| `cli/` | 9 | CLI commands: install, uninstall, update, mcp, doctor, agents, skills, version |
 | `pm_agent/` | 5 | Core patterns: confidence, self_check, reflexion, token_budget, task_cleanup |
 | `execution/` | 3 | Parallel exec, reflection, self-correction |
-| `hooks/` | 3 | Hook tracker, inline hooks (YAML frontmatter), MCP fallback |
-| `scripts/` | 10 | Utilities: session_init, context_loader, token_estimator, etc. |
+| `hooks/` | 3+json | Hook tracker, inline hooks (YAML frontmatter), MCP fallback |
+| `scripts/` | 7 | Utilities: session_init, context_loader, token_estimator, skill_activator, etc. |
 | `utils/` | 1 | Shared utilities (atomic_write_json) |
 | `commands/` | 31 | Slash command markdown files (sc:analyze, sc:implement, etc.) |
-| `agents/` | 21 | Agent definitions (system-architect, python-expert, etc.) |
-| `skills/` | 7 | Skills + docs: confidence-check, simplicity-coach, ship |
-| `modes/` | 9 | Behavioral modes: Brainstorming, Business Panel, DeepResearch, etc. |
-| `mcp/` | 8+ | MCP server docs: Context7, Sequential, Playwright, Tavily, Serena, etc. |
+| `agents/` | 20+README | Agent definitions (system-architect, python-expert, etc.) |
+| `skills/` | 3 | Skills: confidence-check, simplicity-coach, ship (each has SKILL.md) |
+| `modes/` | 7+README+cfg | Behavioral modes: Brainstorming, Business Panel, DeepResearch, etc. |
+| `mcp/` | 7+README | MCP server docs: Context7, Sequential, Playwright, Tavily, Serena, etc. |
+| `core/` | 4 | FLAGS.md, PRINCIPLES.md, RULES.md, BUSINESS_SYMBOLS.md |
 
 ## Key Modules
 
@@ -45,16 +46,17 @@ A **dual-purpose** project: (1) a pytest plugin + CLI tool providing PM Agent pa
 | `hooks/hook_tracker.py` | — | once:true session tracking (24h TTL) |
 | `cli/install_paths.py` | `COMPONENTS` | Content installation path mapping |
 | `cli/install_settings.py` | — | Settings/hooks merge into settings.json |
+| `scripts/context_loader.py` | `TRIGGER_MAP` | Context loading with flag detection, hybrid injection |
 
 ## Content Installation Map
 
 ```
 commands/  →  ~/.claude/commands/sc/       (31 slash commands)
-agents/    →  ~/.claude/agents/            (21 agent definitions)
+agents/    →  ~/.claude/agents/            (20 agent definitions)
 skills/    →  ~/.claude/skills/            (3 skill implementations)
 core/      →  ~/.claude/superclaude/core/  (FLAGS, PRINCIPLES, RULES)
-modes/     →  ~/.claude/superclaude/modes/ (9 behavioral modes)
-mcp/       →  ~/.claude/superclaude/mcp/   (8 MCP server docs)
+modes/     →  ~/.claude/superclaude/modes/ (7 behavioral modes)
+mcp/       →  ~/.claude/superclaude/mcp/   (7 MCP server docs)
 ```
 
 ## Slash Commands (31)
@@ -72,7 +74,7 @@ mcp/       →  ~/.claude/superclaude/mcp/   (8 MCP server docs)
 | Git | git |
 | Tools | select-tool, pm |
 
-## Agents (21)
+## Agents (20)
 
 | Category | Agents |
 |----------|--------|
@@ -83,7 +85,7 @@ mcp/       →  ~/.claude/superclaude/mcp/   (8 MCP server docs)
 | Education | learning-guide, socratic-mentor, technical-writer |
 | Workflow | pm-agent, repo-index, self-review, business-panel-experts, simplicity-guide |
 
-## Modes (9)
+## Modes (7+2)
 
 | Mode | Trigger | Purpose |
 |------|---------|---------|
@@ -96,7 +98,7 @@ mcp/       →  ~/.claude/superclaude/mcp/   (8 MCP server docs)
 | BusinessPanel | --business-panel | Multi-expert analysis |
 | ResearchConfig | (internal) | Research hop/credibility settings |
 
-## MCP Servers (8)
+## MCP Servers (7)
 
 | Server | Flag | Purpose |
 |--------|------|---------|
@@ -118,10 +120,10 @@ mcp/       →  ~/.claude/superclaude/mcp/   (8 MCP server docs)
 
 | Directory | Files | Focus |
 |-----------|-------|-------|
-| `tests/unit/` | 12 | confidence, self_check, token_budget, parallel, hooks, CLI, agents, reflexion, mcp_fallback, context_loader, install_settings |
-| `tests/integration/` | 1 | pytest_plugin |
+| `tests/unit/` | 16 | confidence, self_check, token_budget, parallel, hooks, CLI, agents, reflexion, mcp_fallback, context_loader, install_settings, skills, triggers |
+| `tests/integration/` | 2 | pytest_plugin, cross_directory_refs |
 
-**Total test files**: 13 | **Markers**: unit, integration, confidence_check, self_check, reflexion, complexity, hallucination, performance
+**908 tests passing, 28 skipped** | **Markers**: unit, integration, confidence_check, self_check, reflexion, complexity, hallucination, performance
 
 ## Dev Commands
 

@@ -1,6 +1,6 @@
 ---
 name: pm-agent
-description: Self-improvement workflow executor that documents implementations, analyzes mistakes, and maintains knowledge base continuously (triggers - /sc:pm, session-start, post-implementation, mistake-detected, monthly-maintenance)
+description: Self-improvement workflow executor that documents implementations, analyzes mistakes, and maintains knowledge base continuously (triggers - /sc:pm; lifecycle - session-start, post-implementation, mistake-detected, monthly-maintenance)
 model: sonnet
 autonomy: medium
 permissionMode: default
@@ -19,13 +19,13 @@ memory: project
 - Fallback (no Serena): Use Read/Write on docs/memory/ local files for persistence
   </lifecycle>
 
-  <memory keys="pm_context|last_session|next_actions|plan|checkpoint|decision" store="serena"/>
+  <memory keys="pm_context|last_session|next_actions|plan|checkpoint|decision" store="serena" note="Primary: Serena write_memory/read_memory. Fallback: frontmatter memory:project → .claude/agent-memory/pm-agent/"/>
 
-  <docs>
-- temp/: hypothesis-*.md, experiment-*.md (<7 days)
+  <docs note="Paths relative to project docs/memory/; created on-demand">
+- temp/: hypothesis-*.md, experiment-*.md (<7 days, auto-cleanup)
 - patterns/: Verified success patterns (Last Verified date)
 - mistakes/: Root cause + fix + prevention checklist
-- Flow: temp -> Success -> patterns/ | Failure -> mistakes/ -> CLAUDE.md
+- Flow: temp/ -> Success -> patterns/ | Failure -> mistakes/ -> CLAUDE.md
   </docs>
 
   <actions>

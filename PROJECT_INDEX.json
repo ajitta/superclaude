@@ -1,20 +1,20 @@
 {
   "meta": {
-    "generated": "2026-02-26",
+    "generated": "2026-03-05",
     "version": "4.3.0+ajitta",
-    "latest_commit": "f04886c",
+    "latest_commit": "20adbfb",
     "description": "AI-enhanced development framework for Claude Code - pytest plugin with optional skills"
   },
   "statistics": {
     "commands": 31,
-    "agents": 21,
-    "modes": 9,
-    "mcp_servers": 8,
-    "core_configs": 3,
+    "agents": 20,
+    "modes": 7,
+    "mcp_servers": 7,
+    "core_configs": 4,
     "python_files": 49,
-    "test_files": 13,
+    "test_files": 18,
     "skills": 3,
-    "scripts": 10
+    "scripts": 7
   },
   "entry_points": {
     "cli": {
@@ -95,7 +95,7 @@
       "items": ["agent", "analyze", "brainstorm", "build", "business-panel", "cleanup", "design", "document", "estimate", "explain", "git", "help", "implement", "improve", "index", "index-repo", "load", "pm", "recommend", "reflect", "research", "save", "sc", "select-tool", "spawn", "spec-panel", "task", "test", "troubleshoot", "workflow"]
     },
     "agents": {
-      "count": 21,
+      "count": 20,
       "location": "src/superclaude/agents/",
       "install_to": "~/.claude/agents/",
       "items": ["backend-architect", "business-panel-experts", "deep-research-agent", "devops-architect", "frontend-architect", "learning-guide", "performance-engineer", "pm-agent", "python-expert", "quality-engineer", "refactoring-expert", "repo-index", "requirements-analyst", "root-cause-analyst", "security-engineer", "self-review", "simplicity-guide", "socratic-mentor", "system-architect", "technical-writer"]
@@ -104,10 +104,10 @@
       "count": 3,
       "location": "src/superclaude/skills/",
       "install_to": "~/.claude/skills/",
-      "items": ["confidence-check", "simplicity-coach", "ship"]
+      "items": ["confidence-check", "ship", "simplicity-coach"]
     },
     "modes": {
-      "count": 9,
+      "count": 7,
       "location": "src/superclaude/modes/",
       "items": [
         {"name": "Brainstorming", "trigger": "--brainstorm"},
@@ -116,13 +116,11 @@
         {"name": "Introspection", "trigger": "--introspect"},
         {"name": "Orchestration", "trigger": "--orchestrate"},
         {"name": "Task_Management", "trigger": "--task-manage"},
-        {"name": "Token_Efficiency", "trigger": "--uc"},
-        {"name": "RESEARCH_CONFIG", "trigger": "(internal)"},
-        {"name": "README", "trigger": "(docs)"}
+        {"name": "Token_Efficiency", "trigger": "--uc"}
       ]
     },
     "mcp": {
-      "count": 8,
+      "count": 7,
       "location": "src/superclaude/mcp/",
       "items": [
         {"name": "Context7", "flag": "--c7"},
@@ -136,22 +134,23 @@
       ]
     },
     "core": {
-      "count": 3,
+      "count": 4,
       "location": "src/superclaude/core/",
-      "items": ["FLAGS.md", "PRINCIPLES.md", "RULES.md"]
+      "items": ["FLAGS.md", "PRINCIPLES.md", "RULES.md", "BUSINESS_SYMBOLS.md"]
     }
   },
   "tests": {
     "framework": "pytest>=7.0.0",
+    "total": "908 passing, 28 skipped",
     "unit": {
       "path": "tests/unit/",
-      "count": 12,
-      "files": ["test_agent_structure.py", "test_cli_install.py", "test_confidence.py", "test_context_loader.py", "test_hook_tracker.py", "test_hooks.py", "test_install_settings.py", "test_mcp_fallback.py", "test_parallel.py", "test_reflexion.py", "test_self_check.py", "test_token_budget.py"]
+      "count": 16,
+      "files": ["test_agent_structure.py", "test_cli_install.py", "test_confidence.py", "test_context_injection.py", "test_context_loader.py", "test_context_trigger_map.py", "test_hook_tracker.py", "test_hooks.py", "test_install_settings.py", "test_mcp_fallback.py", "test_parallel.py", "test_reflexion.py", "test_self_check.py", "test_session_init.py", "test_skill_linter.py", "test_skill_metadata.py", "test_task_cleanup.py", "test_token_budget.py", "test_trigger_validator.py"]
     },
     "integration": {
       "path": "tests/integration/",
-      "count": 1,
-      "files": ["test_pytest_plugin.py"]
+      "count": 2,
+      "files": ["test_pytest_plugin.py", "test_cross_directory_refs.py"]
     },
     "markers": ["unit", "integration", "confidence_check", "self_check", "reflexion", "complexity", "hallucination", "performance"]
   },
