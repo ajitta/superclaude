@@ -67,10 +67,8 @@ description: List all available /sc commands and their functionality
       - --no-mcp: Native tools only
     </category>
     <category name="Effort">
-      - --effort low: May skip thinking
-      - --effort medium: Default, selective thinking, Sequential
-      - --effort high|ultrathink: Almost always thinks, Seq+C7
-      - --effort max: Unconstrained depth (Opus 4.6 exclusive), all MCP
+      - Default: medium (Claude Code native)
+      - ultrathink: keyword in prompt → effort high for that turn + Sequential + Context7
     </category>
     <category name="Control">
       - --delegate: Sub-agent parallel processing

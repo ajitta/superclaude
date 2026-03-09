@@ -26,7 +26,7 @@ mcp-servers: [context7, sequential, serena, tavily, playwright, magic]
 |---|---|---|
 | 일반 구현/분석 | `--think --c7` | 기본 사고 + 공식 문서 확인 |
 | 복잡한 구조 변경 | `--think-hard --seq --c7` | 다단계 추론 + 문서 기반 설계 |
-| 대규모 작업 | `--ultrathink --all-mcp --delegate auto` | 최대 깊이 + 병렬 위임 |
+| 대규모 작업 | `ultrathink --all-mcp --delegate auto` | 최대 깊이 + 병렬 위임 |
 | UI 검증 | `--frontend-verify --play --magic` | UI 생성 + 브라우저/E2E 검증 |
 | 버그 추적 | `--seq --validate` | 원인 분석 + 변경 전 검증 |
 | 토큰 압박 | `--uc` (`--token-efficient`) | 컨텍스트 절약 |

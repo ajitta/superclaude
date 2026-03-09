@@ -28,7 +28,7 @@ description: Feature and code implementation with intelligent persona activation
   </mcp_routing>
   <personas p="arch|fe|be|sec|qa|py"/>
 
-  <defaults effort="medium">
+  <defaults>
 | Type | Effort | Token Budget | Rationale |
 |------|--------|--------------|-----------|
 | component | low | 500 | Single-file, framework patterns |

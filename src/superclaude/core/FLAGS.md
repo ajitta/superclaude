@@ -31,14 +31,11 @@
 WebSearch: fact-check, current info → native web search (no flag needed)
   </native>
 
-  <effort note="Adaptive thinking (Opus 4.6)">
---effort low: may skip thinking for simple tasks | MCP: none
---effort medium: default — selective thinking, balanced | MCP: Sequential on demand
---effort high|ultrathink: almost always thinks | MCP: Sequential + Context7
---effort max: unconstrained depth (Opus 4.6 exclusive) | MCP: all available
-
-Thinking: {type: "adaptive"} — Claude decides when/how much to think
-Note: temperature incompatible with thinking; interleaved thinking automatic
+  <effort note="Claude Code native reasoning effort">
+Default: medium (Claude Code built-in)
+ultrathink: keyword in prompt → Claude Code auto-elevates to effort high for that turn
+Note: effort level is controlled by Claude Code natively, not by SuperClaude
+Note: ultrathink triggers Sequential Thinking + Context7 MCP loading
 </effort>
 
   <execution>
@@ -75,7 +72,7 @@ Note: Opus 4.6 uses 25-50% more tokens than 4.5 — monitor context usage
   <priority_rules>
 - Safety First: --safe-mode > --validate > optimization
 - Explicit Override: user flags > auto-detection
-- Effort: high > medium > low
+- Effort: Claude Code native (ultrathink → high)
 - MCP: --no-mcp overrides individual flags; notify on first use → auto fallback
 - Scope: system > project > module > file
   </priority_rules>

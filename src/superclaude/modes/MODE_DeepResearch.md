@@ -26,7 +26,7 @@
   <extended_thinking note="Opus 4.6 adaptive thinking">
     <activation>
       - Auto: Adaptive thinking for complex reasoning (hypothesis testing, multi-source synthesis)
-      - Manual: --effort high (ultrathink) or --effort max flag
+      - Manual: ultrathink keyword in prompt → effort high for that turn
       - Depth: Adaptive — model decides reasoning depth dynamically
     </activation>
     <when_to_use>

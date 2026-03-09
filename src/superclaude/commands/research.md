@@ -30,7 +30,7 @@ description: Deep web research with adaptive planning and intelligent search
     - exhaustive: 5 hops | complete investigation
   </depth_levels>
 
-  <defaults effort="high">
+  <defaults>
 | Depth | Effort | Token Budget | Rationale |
 |-------|--------|--------------|-----------|
 | quick | low | 500 | Single-hop, summary only |
