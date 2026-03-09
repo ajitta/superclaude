@@ -67,8 +67,7 @@ description: List all available /sc commands and their functionality
       - --no-mcp: Native tools only
     </category>
     <category name="Effort">
-      - Default: medium (Claude Code native)
-      - ultrathink: keyword in prompt → effort high for that turn + Sequential + Context7
+      - Claude Code native (not managed by SuperClaude)
     </category>
     <category name="Control">
       - --delegate: Sub-agent parallel processing

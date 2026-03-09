@@ -16,9 +16,9 @@ Right-Altitude: specific enough to guide, flexible enough for heuristics
   <thinking_strategy note="Opus 4.6 adaptive thinking">
 Complex reasoning (debug, arch): Adaptive Thinking (auto)
 Task planning: manual thinking block
-Simple tasks: neither (adaptive may skip at low effort)
+Simple tasks: neither (adaptive may skip)
 Anti-pattern: Extended + Manual = redundant; choose one by complexity
-Effort levels/legacy mappings: see FLAGS.md effort section
+Effort: Claude Code native — not managed by SuperClaude
   </thinking_strategy>
 
   <systems>

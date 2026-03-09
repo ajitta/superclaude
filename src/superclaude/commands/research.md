@@ -30,15 +30,6 @@ description: Deep web research with adaptive planning and intelligent search
     - exhaustive: 5 hops | complete investigation
   </depth_levels>
 
-  <defaults>
-| Depth | Effort | Token Budget | Rationale |
-|-------|--------|--------------|-----------|
-| quick | low | 500 | Single-hop, summary only |
-| standard | medium | 1000 | Multi-source validation |
-| deep | high | 2000 | Cross-checking, synthesis |
-| exhaustive | high | 2500 | Full investigation, citations |
-  </defaults>
-
   <patterns>
     - Parallel: Batch independent searches | concurrent extractions
     - Evidence: Track results | citations | note uncertainties

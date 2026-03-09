@@ -28,15 +28,6 @@ description: Feature and code implementation with intelligent persona activation
   </mcp_routing>
   <personas p="arch|fe|be|sec|qa|py"/>
 
-  <defaults>
-| Type | Effort | Token Budget | Rationale |
-|------|--------|--------------|-----------|
-| component | low | 500 | Single-file, framework patterns |
-| api | medium | 1000 | Multi-file, security considerations |
-| service | medium | 1500 | Integration, error handling |
-| feature | high | 2500 | Cross-cutting, multiple personas |
-  </defaults>
-
   <tools>
     - Write/Edit: Code generation
     - Read/Grep/Glob: Project analysis

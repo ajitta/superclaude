@@ -21,7 +21,7 @@
       - Use --uc proactively when approaching 60% (was 75%, lowered for Opus 4.6)
       - Prefer symbol communication at Yellow threshold
       - Fresh sessions for unrelated tasks
-      - Routine tasks use default effort; use ultrathink only when deep reasoning needed
+      - Effort is Claude Code native — avoid overriding
       - Minimize subagent spawning — solve in single session when possible
     </best_practices>
   </context_limits>

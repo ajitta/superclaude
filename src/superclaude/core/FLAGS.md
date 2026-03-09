@@ -31,13 +31,6 @@
 WebSearch: fact-check, current info → native web search (no flag needed)
   </native>
 
-  <effort note="Claude Code native reasoning effort">
-Default: medium (Claude Code built-in)
-ultrathink: keyword in prompt → Claude Code auto-elevates to effort high for that turn
-Note: effort level is controlled by Claude Code natively, not by SuperClaude
-Note: ultrathink triggers Sequential Thinking + Context7 MCP loading
-</effort>
-
   <execution>
 --delegate [auto|files|folders]: >7 dirs, >50 files, complexity >0.8 → sub-agent parallel
   Direct work for: single-file edits, sequential ops, <3 steps, simple searches (grep/glob)
@@ -72,7 +65,7 @@ Note: Opus 4.6 uses 25-50% more tokens than 4.5 — monitor context usage
   <priority_rules>
 - Safety First: --safe-mode > --validate > optimization
 - Explicit Override: user flags > auto-detection
-- Effort: Claude Code native (ultrathink → high)
+- Effort: Claude Code native (not managed by SuperClaude)
 - MCP: --no-mcp overrides individual flags; notify on first use → auto fallback
 - Scope: system > project > module > file
   </priority_rules>

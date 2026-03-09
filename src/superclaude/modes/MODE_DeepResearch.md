@@ -26,7 +26,7 @@
   <extended_thinking note="Opus 4.6 adaptive thinking">
     <activation>
       - Auto: Adaptive thinking for complex reasoning (hypothesis testing, multi-source synthesis)
-      - Manual: ultrathink keyword in prompt → effort high for that turn
+      - Manual: ultrathink keyword in prompt (Claude Code native)
       - Depth: Adaptive — model decides reasoning depth dynamically
     </activation>
     <when_to_use>
@@ -40,7 +40,7 @@
       - Let model manage reasoning budget autonomously
       - Focus prompts on WHAT not HOW to think
     </behavior>
-    <reference>See FLAGS.md effort section for adaptive thinking mappings</reference>
+    <reference>Effort is Claude Code native — not managed by SuperClaude</reference>
   </extended_thinking>
 
   <quality>Source credibility paramount | Contradiction resolution required | Confidence scoring mandatory | Citation completeness essential</quality>
