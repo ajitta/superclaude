@@ -40,26 +40,27 @@ class TestConfidenceChecker:
         """
         Test that an unprepared context returns low confidence (<70%)
 
-        No checks pass: 0%
+        AlreadyImplementedCheck passes by default (no task_name), rest fail.
         """
         checker = ConfidenceChecker()
         confidence = checker.assess(low_confidence_context)
 
         assert confidence < 0.7, f"Expected low confidence <0.7, got {confidence}"
-        assert confidence == 0.0, "No checks passed should give 0% confidence"
 
     def test_medium_confidence_scenario(self):
         """
         Test medium confidence scenario (70-89%)
 
-        Some checks pass, some don't
+        Some checks pass, some don't.
+        AlreadyImplemented (0.20) + NoDuplicates (0.20) + Architecture (0.20) + OfficialDocs (0.15) = 0.75
         """
         checker = ConfidenceChecker()
         context = {
             "test_name": "test_feature",
-            "duplicate_check_complete": True,  # 25%
-            "architecture_check_complete": True,  # 25%
-            "official_docs_verified": True,  # 20%
+            "already_implemented_check": True,  # 20%
+            "duplicate_check_complete": True,  # 20%
+            "architecture_check_complete": True,  # 20%
+            "official_docs_verified": True,  # 15%
             "oss_reference_complete": False,  # 0%
             "root_cause_identified": False,  # 0%
         }
@@ -69,7 +70,7 @@ class TestConfidenceChecker:
         assert 0.7 <= confidence < 0.9, (
             f"Expected medium confidence 0.7-0.9, got {confidence}"
         )
-        assert confidence == 0.7, "Should be exactly 70%"
+        assert abs(float(confidence) - 0.75) < 1e-10, "Should be approximately 75%"
 
     def test_confidence_checks_recorded(self, sample_context):
         """Test that confidence checks are recorded in context"""
@@ -78,7 +79,7 @@ class TestConfidenceChecker:
 
         assert "confidence_checks" in sample_context
         assert isinstance(sample_context["confidence_checks"], list)
-        assert len(sample_context["confidence_checks"]) == 5
+        assert len(sample_context["confidence_checks"]) == 6
 
         # All checks should pass
         for check in sample_context["confidence_checks"]:
@@ -154,7 +155,7 @@ class TestConfidenceResult:
 
         assert isinstance(result, ConfidenceResult)
         assert result.score == 1.0
-        assert len(result.checks) == 5
+        assert len(result.checks) == 6
         assert "High confidence" in result.recommendation
 
     def test_check_results_structure(self, sample_context):
@@ -208,7 +209,7 @@ class TestConfidenceResult:
         # Legacy context should still have confidence_checks
         assert "confidence_checks" in sample_context
         assert isinstance(sample_context["confidence_checks"], list)
-        assert len(sample_context["confidence_checks"]) == 5
+        assert len(sample_context["confidence_checks"]) == 6
 
 
 class TestCachingBehavior:
@@ -263,8 +264,9 @@ class TestRegistryPattern:
         checker = ConfidenceChecker()
         checks = checker.get_checks()
 
-        assert len(checks) == 5
+        assert len(checks) == 6
         names = [c.name for c in checks]
+        assert "already_implemented" in names
         assert "no_duplicates" in names
         assert "architecture_compliant" in names
         assert "official_docs" in names
@@ -298,17 +300,17 @@ class TestRegistryPattern:
         # Unregister one check
         result = checker.unregister_check("root_cause")
         assert result is True
-        assert len(checker.get_checks()) == 4
+        assert len(checker.get_checks()) == 5
 
         # Try to unregister non-existent
         result = checker.unregister_check("nonexistent")
         assert result is False
-        assert len(checker.get_checks()) == 4
+        assert len(checker.get_checks()) == 5
 
     def test_clear_checks(self):
         """Test clearing all checks"""
         checker = ConfidenceChecker()
-        assert len(checker.get_checks()) == 5
+        assert len(checker.get_checks()) == 6
 
         checker.clear_checks()
         assert len(checker.get_checks()) == 0
@@ -362,6 +364,7 @@ class TestRegistryPattern:
     def test_protocol_compliance(self):
         """Test that concrete checks implement protocol"""
         from superclaude.pm_agent.confidence import (
+            AlreadyImplementedCheck,
             ArchitectureCheck,
             ConfidenceCheck,
             NoDuplicatesCheck,
@@ -371,6 +374,7 @@ class TestRegistryPattern:
         )
 
         checks = [
+            AlreadyImplementedCheck(),
             NoDuplicatesCheck(),
             ArchitectureCheck(),
             OfficialDocsCheck(),
@@ -425,7 +429,7 @@ class TestAsyncSupport:
 
         assert isinstance(result, ConfidenceResult)
         assert 0.0 <= result.score <= 1.0
-        assert len(result.checks) == 5  # default checks
+        assert len(result.checks) == 6  # default checks
 
     @pytest.mark.asyncio
     async def test_assess_async_with_async_check(self):

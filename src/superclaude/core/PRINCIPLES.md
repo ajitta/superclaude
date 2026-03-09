@@ -29,6 +29,7 @@ Risk calibration: scale validation to match change impact and reversibility
 
   <decisions>
 Data-Driven: measure first | hypothesis test | source validation | bias recognition
+Diagnosis: 3+ hypotheses (simplest first) | environment before code | falsify before confirming | known-pitfalls check
 Trade-offs: temporal impact | reversibility classification | option preservation
 Risk: proactive ID | impact assessment | mitigation planning
   </decisions>

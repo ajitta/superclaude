@@ -1,11 +1,16 @@
 """
-PM Agent Core Module
+PM Agent Pytest Patterns
 
-Provides core functionality for PM Agent:
-- Pre-execution confidence checking
-- Post-implementation self-check protocol
-- Reflexion error learning pattern
-- Token budget management
+Reusable testing patterns exposed as pytest fixtures via superclaude's pytest plugin.
+These run during `uv run pytest`, NOT during Claude Code sessions.
+
+The Claude Code agent definition is in agents/pm-agent.md (separate system).
+
+Patterns:
+- ConfidenceChecker: Pre-execution gate with pluggable checks
+- SelfCheckProtocol: Post-implementation validation
+- ReflexionPattern: Cross-session error learning (JSONL)
+- TokenBudgetManager: Token allocation by complexity
 """
 
 from .confidence import (

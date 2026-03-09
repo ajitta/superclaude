@@ -37,6 +37,7 @@ __all__ = [
     "OfficialDocsCheck",
     "OssReferenceCheck",
     "RootCauseCheck",
+    "AlreadyImplementedCheck",
     "PRStatusCheck",
     "DEFAULT_CHECKS",
     "detect_tech_stack_multi_dir",
@@ -196,8 +197,14 @@ def _cached_detect_tech_stack(project_root_str: str) -> tuple:
     Cached tech stack detection.
 
     Returns tuple for hashability: (frameworks, databases, tools)
+    Note: Path is resolved internally for consistent cache keys.
     """
-    project_root = Path(project_root_str)
+    # Normalize to resolved path for consistent cache hits
+    project_root = Path(project_root_str).resolve()
+    resolved_str = str(project_root)
+    if resolved_str != project_root_str:
+        # Re-call with normalized key to share cache entry
+        return _cached_detect_tech_stack(resolved_str)
     stack_frameworks: List[str] = []
     stack_databases: List[str] = []
     stack_tools: List[str] = []
@@ -377,16 +384,23 @@ class NoDuplicatesCheck:
         if not keywords:
             return True, "No duplicate implementations found"
 
-        # Search for duplicates
+        # Search for duplicates (bounded scan with early termination)
         duplicate_threshold = context.get("duplicate_threshold", 5)
+        _exclude_dirs = {
+            "__pycache__", ".git", "node_modules", ".venv", "venv",
+            ".tox", ".mypy_cache", ".ruff_cache", "dist", "build",
+        }
         for keyword in keywords[:3]:
             try:
-                matches = list(project_root.rglob(f"*{keyword}*.py"))
-                matches = [
-                    m
-                    for m in matches
-                    if "__pycache__" not in str(m) and not m.name.startswith("test_")
-                ]
+                matches = []
+                for m in project_root.rglob(f"*{keyword}*.py"):
+                    if any(part in _exclude_dirs for part in m.parts):
+                        continue
+                    if m.name.startswith("test_"):
+                        continue
+                    matches.append(m)
+                    if len(matches) > duplicate_threshold:
+                        break  # Early termination
                 if len(matches) > duplicate_threshold:
                     context["potential_duplicates"] = [str(m) for m in matches[:10]]
                     return False, "Check for existing implementations first"
@@ -720,6 +734,83 @@ class RootCauseCheck:
         return False, "Continue investigation to identify root cause"
 
 
+class AlreadyImplementedCheck:
+    """Check if the requested work has already been implemented.
+
+    Searches git log and file patterns to detect existing implementations
+    matching the task description, preventing redundant exploration.
+    """
+
+    name: str = "already_implemented"
+
+    def __init__(self, weight: float = 0.20):
+        self.weight = weight
+
+    def evaluate(self, context: Dict[str, Any]) -> Tuple[bool, str]:
+        """Check if work is already done via git log and file search."""
+        # Honor explicit flag
+        if "already_implemented_check" in context:
+            passed = context["already_implemented_check"]
+            msg = (
+                "Status check complete — no prior implementation found"
+                if passed
+                else "Similar implementation may already exist"
+            )
+            return passed, msg
+
+        task_name = context.get("task_name", "")
+        if not task_name:
+            return True, "Status check complete — no prior implementation found"
+
+        project_root = Path(context.get("project_root", "."))
+        if not project_root.exists():
+            return True, "Status check complete — no prior implementation found"
+
+        # Extract meaningful keywords from task name
+        skip_words = {
+            "test", "the", "and", "for", "with", "from", "that", "this",
+            "add", "create", "implement", "make", "build", "fix", "update",
+        }
+        keywords = [
+            w.lower()
+            for w in task_name.replace("_", " ").replace("-", " ").split()
+            if len(w) > 3 and w.lower() not in skip_words
+        ]
+
+        if not keywords:
+            return True, "Status check complete — no prior implementation found"
+
+        # Check git log for recent commits mentioning these keywords
+        matches = self._check_git_log(project_root, keywords)
+        if matches:
+            context["existing_implementations"] = matches
+            return False, "Similar implementation may already exist"
+
+        return True, "Status check complete — no prior implementation found"
+
+    def _check_git_log(self, project_root: Path, keywords: List[str]) -> List[str]:
+        """Search recent git log for commits matching keywords."""
+        import subprocess
+
+        matches = []
+        for keyword in keywords[:3]:
+            try:
+                result = subprocess.run(
+                    ["git", "log", "--oneline", "-20", f"--grep={keyword}", "-i"],
+                    capture_output=True,
+                    text=True,
+                    timeout=5,
+                    cwd=str(project_root),
+                )
+                if result.returncode == 0 and result.stdout.strip():
+                    for line in result.stdout.strip().split("\n")[:3]:
+                        if line and line not in matches:
+                            matches.append(line)
+            except (subprocess.SubprocessError, OSError):
+                continue
+        return matches
+
+
 class PRStatusCheck:
     """Check PR review status for current branch.
 
@@ -801,7 +892,10 @@ class PRStatusCheck:
 
             import json
 
-            pr_data = json.loads(pr_result.stdout)
+            try:
+                pr_data = json.loads(pr_result.stdout)
+            except (json.JSONDecodeError, ValueError):
+                return True, "PR status check failed - invalid response"
 
             # Determine PR status
             if pr_data.get("isDraft"):
@@ -852,10 +946,11 @@ class PRStatusCheck:
 
 # Default check instances (for backward compatibility)
 DEFAULT_CHECKS: List[ConfidenceCheck] = [
-    NoDuplicatesCheck(weight=0.25),
-    ArchitectureCheck(weight=0.25),
-    OfficialDocsCheck(weight=0.20),
-    OssReferenceCheck(weight=0.15),
+    AlreadyImplementedCheck(weight=0.20),
+    NoDuplicatesCheck(weight=0.20),
+    ArchitectureCheck(weight=0.20),
+    OfficialDocsCheck(weight=0.15),
+    OssReferenceCheck(weight=0.10),
     RootCauseCheck(weight=0.15),
 ]
 

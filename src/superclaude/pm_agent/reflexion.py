@@ -218,10 +218,11 @@ class ReflexionPattern:
         Args:
             error_info: Error information with analysis
         """
-        # Generate filename
+        # Generate filename (sanitize to prevent path traversal)
         test_name = error_info.get("test_name", "unknown")
+        safe_name = test_name.replace("/", "_").replace("\\", "_").replace("..", "__")
         date = datetime.now().strftime("%Y-%m-%d")
-        filename = f"{test_name}-{date}.md"
+        filename = f"{safe_name}-{date}.md"
         filepath = self.mistakes_dir / filename
 
         # Create mistake document

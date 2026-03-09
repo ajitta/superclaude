@@ -19,6 +19,7 @@ def sample_context():
     return {
         "test_name": "test_sample_feature",
         "test_file": __file__,
+        "already_implemented_check": True,
         "duplicate_check_complete": True,
         "architecture_check_complete": True,
         "official_docs_verified": True,
@@ -39,6 +40,7 @@ def low_confidence_context():
     return {
         "test_name": "test_unclear_feature",
         "test_file": __file__,
+        "already_implemented_check": False,
         "duplicate_check_complete": False,
         "architecture_check_complete": False,
         "official_docs_verified": False,

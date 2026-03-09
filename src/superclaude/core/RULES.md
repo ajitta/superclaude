@@ -24,7 +24,9 @@ Flow: User request → Specialist → PM Agent documents → Knowledge capture
   </agent_orchestration>
 
   <core_rules>
-Workflow 🟡: Understand → Plan → TaskCreate → Execute → Validate
+Workflow 🟡: Status Check → Understand → Plan → Execute → Validate (verify assumptions at each gate)
+Status Check 🔴: before implementation, run 2-3 targeted searches (git log, grep key identifiers) to verify work isn't already complete
+Diagnosis 🔴: generate 3+ hypotheses ranked by simplicity; check environment (ports, processes, branches) before code; falsify before confirming
 Planning 🔴: identify parallel ops explicitly
 Implementation 🟡: complete features, resolve TODOs, real impls
 Scope 🟡: build only what's asked, YAGNI

@@ -83,7 +83,7 @@ class TaskCleanupManager:
             Tuple of (deleted_task_ids, remaining_tasks)
         """
         stale = self.identify_stale_tasks(tasks)
-        stale_ids = {t.get("id") for t in stale if t.get("id")}
+        stale_ids = {t["id"] for t in stale if "id" in t and t["id"] is not None}
 
         deleted_ids = []
         remaining = []
