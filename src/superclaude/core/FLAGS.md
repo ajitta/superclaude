@@ -38,13 +38,13 @@ WebSearch: fact-check, current info → native web search (no flag needed)
   <model_routing note="Sub-agent model assignments">
   Default: sub-agents inherit parent model unless explicit model field is set
 
-  opus: system-architect, security-engineer, simplicity-guide, business-panel-experts, deep-research-agent, root-cause-analyst, self-review, requirements-analyst
-  sonnet: backend-architect, frontend-architect, quality-engineer, python-expert, devops-architect, performance-engineer, refactoring-expert, pm-agent, socratic-mentor, learning-guide, technical-writer
-  haiku: repo-index
+opus: system-architect, security-engineer, simplicity-guide, business-panel-experts, deep-research-agent, root-cause-analyst, self-review, requirements-analyst
+sonnet: backend-architect, frontend-architect, quality-engineer, python-expert, devops-architect, performance-engineer, refactoring-expert, pm-agent, socratic-mentor, learning-guide, technical-writer
+haiku: repo-index
 
-  Heuristic: opus for architecture/security/judgment | sonnet for coding/analysis/docs | haiku for mechanical scanning
-  Override: user can set explicit model in Task() calls
-  </model_routing>
+Heuristic: opus for architecture/security/judgment | sonnet for coding/analysis/docs | haiku for mechanical scanning
+Override: user can set explicit model in Task() calls
+</model_routing>
 --concurrency [n]: 1-15 → max concurrent operations
 --loop: polish, refine, enhance → iterative improvement cycles
 --iterations [n]: 1-10 → improvement cycle count
@@ -54,7 +54,7 @@ WebSearch: fact-check, current info → native web search (no flag needed)
 Agent Teams: experimental (CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1) — parallel coordination
 Note: Opus 4.6 overengineers by default — see RULES.md anti_over_engineering for guardrails
 Note: Opus 4.6 uses 25-50% more tokens than 4.5 — monitor context usage
-  </execution>
+</execution>
 
   <output>
 --uc|--ultracompressed: symbol system, 30-50% reduction (trigger: context pressure)
@@ -62,10 +62,10 @@ Note: Opus 4.6 uses 25-50% more tokens than 4.5 — monitor context usage
 --focus [perf|security|quality|arch|a11y|testing]: target domain
   </output>
 
-  <priority_rules>
+<priority_rules>
+
 - Safety First: --safe-mode > --validate > optimization
 - Explicit Override: user flags > auto-detection
-- Effort: Claude Code native (not managed by SuperClaude)
 - MCP: --no-mcp overrides individual flags; notify on first use → auto fallback
 - Scope: system > project > module > file
   </priority_rules>
