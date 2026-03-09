@@ -33,8 +33,8 @@ WebSearch: fact-check, current info → native web search (no flag needed)
 
   <effort note="Adaptive thinking (Opus 4.6)">
 --effort low: may skip thinking for simple tasks | MCP: none
---effort medium: selective thinking, balanced | MCP: Sequential on demand
---effort high: default — almost always thinks | MCP: Sequential + Context7
+--effort medium: default — selective thinking, balanced | MCP: Sequential on demand
+--effort high|ultrathink: almost always thinks | MCP: Sequential + Context7
 --effort max: unconstrained depth (Opus 4.6 exclusive) | MCP: all available
 
 Thinking: {type: "adaptive"} — Claude decides when/how much to think

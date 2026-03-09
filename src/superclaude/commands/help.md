@@ -68,8 +68,8 @@ description: List all available /sc commands and their functionality
     </category>
     <category name="Effort">
       - --effort low: May skip thinking
-      - --effort medium: Selective thinking, Sequential
-      - --effort high: Default, almost always thinks, Seq+C7
+      - --effort medium: Default, selective thinking, Sequential
+      - --effort high|ultrathink: Almost always thinks, Seq+C7
       - --effort max: Unconstrained depth (Opus 4.6 exclusive), all MCP
     </category>
     <category name="Control">
