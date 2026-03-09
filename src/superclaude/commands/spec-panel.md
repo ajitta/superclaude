@@ -45,7 +45,6 @@ description: Multi-expert specification review and improvement using renowned so
     - compliance (Wiegers,Nygard): Security, regulatory, audit
   </focus_areas>
 
-
   <examples>
 
 | Input | Output |
@@ -61,10 +60,11 @@ description: Multi-expert specification review and improvement using renowned so
   </example>
   </examples>
 
-  <bounds will="expert-level review|actionable recs|multi-mode analysis" wont="replace human judgment|modify without consent|legal guarantees" fallback="Ask user for guidance when uncertain"/>
+  <bounds will="expert-level review|actionable recs|multi-mode analysis" wont="replace human judgment|modify without consent|legal guarantees" fallback="Ask user for guidance when uncertain" type="document-only">
 
-  <boundaries type="document-only">Produce expert review document, then complete | Preserve specifications unchanged | Provide recommendations; defer implementation to /sc:implement → Output: Expert review document with recommendations</boundaries>
+    Produce expert review document, then complete | Preserve specifications unchanged | Provide recommendations; defer implementation to /sc:implement → Output: Expert review document with recommendations
 
+  </bounds>
 
   <handoff next="/sc:design /sc:implement"/>
 </component>

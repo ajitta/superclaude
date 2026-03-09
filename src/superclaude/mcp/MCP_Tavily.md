@@ -31,41 +31,26 @@ Web: General searches | News: Time-filtered | Academic: Scholarly articles | Dom
 | `tavily_map` | URL structure discovery | Map site structure before targeted extraction |
   </tools>
 
-  <search_patterns>
-Basic: query → ranked results | Domain: query + domains:[arxiv,github] | Time: query + recency:week|month|year | Deep: query + extract:true | Research: input → multi-source synthesis | Crawl: url + depth + instructions → pages
-  </search_patterns>
+  ## Search Patterns
+  Basic: query → ranked results | Domain: query + domains:[arxiv,github] | Time: query + recency:week|month|year | Deep: query + extract:true | Research: input → multi-source synthesis | Crawl: url + depth + instructions → pages
 
-  <quality>Refine queries | Source diversity | Credibility filter | Dedupe | Relevance scoring</quality>
+  ## Workflows
+  - Research: Tavily:broad → Sequential:gaps → Tavily:targeted → Sequential:synthesize → Serena:store
+  - Fact-Check: Tavily:verify → Tavily:contradictions → Sequential:evidence → Report
+  - Deep-Research: Plan:decompose → Tavily:search → Route:simple→Tavily|complex→Playwright → Synthesize
 
-  <flows>
-- Research: Tavily:broad → Sequential:gaps → Tavily:targeted → Sequential:synthesize → Serena:store
-- Fact-Check: Tavily:verify → Tavily:contradictions → Sequential:evidence → Report
-- Deep-Research: Plan:decompose → Tavily:search → Route:simple→Tavily|complex→Playwright → Synthesize
-  </flows>
+  ## Strategies
+  Multi-Hop: broad → entities → relationships → synthesize | Adaptive: Simple:direct|Complex:variations+boolean+domain|Iterative:refine→gaps
+  Credibility: High=academic,gov,official | Medium=industry,expert | Low=forums,social
 
-  <strategies>
-Multi-Hop: broad → entities → relationships → synthesize | Adaptive: Simple:direct|Complex:variations+boolean+domain|Iterative:refine→gaps
-Credibility: High=academic,gov,official | Medium=industry,expert | Low=forums,social
-  </strategies>
-
-  <perf>Batch similar | Cache results | Prioritize high-value | Limit depth by confidence</perf>
-
-  <dr_integration>
-Planning: Planning-Only:direct | Intent:clarify→focus | Unified:present→adjust
-Multi-hop: Track genealogy | Detect circular | Maintain context
-Reflection: Assess relevance | ID gaps | Calc confidence
-  </dr_integration>
-
-  <errors>
+  ## Error Handling
 | Issue | Fix |
 |-------|-----|
 | API key missing | Check TAVILY_API_KEY env var |
 | Rate limit | Wait + exponential backoff |
 | Timeout | Increase timeout or skip |
 | No results | Expand/modify search terms |
-
-Fallback: Native WebSearch → Alt queries → Expand scope → Use cached
-  </errors>
+  Fallback: Native WebSearch → Alt queries → Expand scope → Use cached
 
   <examples>
 | Input | Output | Reason |
@@ -75,4 +60,7 @@ Fallback: Native WebSearch → Alt queries → Expand scope → Use cached
 | explain recursion | Native Claude | general concept |
   </examples>
 
+  <bounds will="web search|multi-source synthesis|current information retrieval" wont="code generation|local file operations|training knowledge questions" fallback="Use native WebSearch for simple queries, WebFetch for single pages"/>
+
+  <handoff next="/sc:research /sc:analyze"/>
 </component>

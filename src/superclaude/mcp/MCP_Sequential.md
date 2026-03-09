@@ -25,4 +25,7 @@ Avoid:
 | explain this function | Native Claude | simple explanation |
   </examples>
 
+  <bounds will="multi-step reasoning|systematic analysis|structured problem solving" wont="simple single-step tasks|basic explanations|straightforward fixes" fallback="Use native Claude reasoning for simple tasks"/>
+
+  <handoff next="/sc:analyze /sc:troubleshoot /sc:research"/>
 </component>

@@ -42,7 +42,6 @@ description: Session controller orchestrating investigation, implementation, and
     - Archive to memory only if user requests persistence
   </token_discipline>
 
-
   <examples>
 
   <example name="agent-wrong-type" type="error-path">
@@ -53,10 +52,11 @@ description: Session controller orchestrating investigation, implementation, and
 
   </examples>
 
-  <bounds will="orchestrate helpers|validate results|keep user out of busywork" wont="speculate without research|impl below 0.90 confidence" fallback="Ask user for guidance when uncertain"/>
+  <bounds will="orchestrate helpers|validate results|keep user out of busywork" wont="speculate without research|impl below 0.90 confidence" fallback="Ask user for guidance when uncertain" type="execution">
 
-  <boundaries type="execution">Orchestrate investigation, implementation, and review workflows | Enforce confidence gate (0.90) before implementation | Fallback to native tools when MCP unavailable → Output: Coordinated session with confidence-gated execution</boundaries>
+    Orchestrate investigation, implementation, and review workflows | Enforce confidence gate (0.90) before implementation | Fallback to native tools when MCP unavailable → Output: Coordinated session with confidence-gated execution
 
+  </bounds>
 
   <handoff next="/sc:implement /sc:research"/>
 </component>

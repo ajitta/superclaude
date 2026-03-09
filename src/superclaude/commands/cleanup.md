@@ -27,7 +27,6 @@ description: Systematically clean up code, remove dead code, and optimize projec
 | all | All above | CLEANUP_REPORT.md |
   </outputs>
 
-
   <mcp servers="seq|c7"/>
   <personas p="arch|qual|sec|refactor"/>
 
@@ -64,16 +63,16 @@ description: Systematically clean up code, remove dead code, and optimize projec
 
   <token_note>Medium consumption — scales with target scope; use --safe for conservative cleanup</token_note>
 
-  <bounds will="systematic cleanup|safety validation|intelligent algorithms" wont="remove without analysis|override exclusions|compromise functionality" fallback="Ask user for guidance when uncertain"/>
+  <bounds will="systematic cleanup|safety validation|intelligent algorithms" wont="remove without analysis|override exclusions|compromise functionality" fallback="Ask user for guidance when uncertain" type="execution">
 
-  <boundaries type="execution">Implement cleanup actions as requested | Safe mode (--safe): Only low-risk removals | Interactive mode (--interactive): Confirm each removal</boundaries>
+    Implement cleanup actions as requested | Safe mode (--safe): Only low-risk removals | Interactive mode (--interactive): Confirm each removal
 
+  </bounds>
 
   <auto_fix_threshold>
     <safe>Unused imports, dead variables, empty files</safe>
     <approval_required>Exported functions, config files, shared modules</approval_required>
   </auto_fix_threshold>
-
 
   <handoff next="/sc:test /sc:git"/>
 </component>

@@ -35,7 +35,6 @@ description: Provide development estimates for tasks, features, or projects with
     - Validation: Benchmarks → cross-check → confidence
   </patterns>
 
-
   <examples>
 
 | Input | Output |
@@ -52,10 +51,11 @@ description: Provide development estimates for tasks, features, or projects with
 
   </examples>
 
-  <bounds will="systematic estimates|confidence intervals|multi-persona analysis" wont="guarantee accuracy|estimate without analysis|override benchmarks" fallback="Ask user for guidance when uncertain"/>
+  <bounds will="systematic estimates|confidence intervals|multi-persona analysis" wont="guarantee accuracy|estimate without analysis|override benchmarks" fallback="Ask user for guidance when uncertain" type="document-only">
 
-  <boundaries type="document-only">Produce estimation report, then complete | Defer implementation to /sc:implement or /sc:workflow | Limit task tracking to estimation scope → Output: Estimation report with breakdown and confidence intervals</boundaries>
+    Produce estimation report, then complete | Defer implementation to /sc:implement or /sc:workflow | Limit task tracking to estimation scope → Output: Estimation report with breakdown and confidence intervals
 
+  </bounds>
 
   <handoff next="/sc:workflow /sc:implement"/>
 </component>

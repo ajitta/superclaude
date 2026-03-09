@@ -27,7 +27,6 @@ description: Generate focused documentation for components, functions, APIs, and
 | guide | GUIDE.md | install+usage+examples |
   </outputs>
 
-
   <mcp servers="seq|c7"/>
   <personas p="scribe|arch"/>
 
@@ -64,10 +63,11 @@ description: Generate focused documentation for components, functions, APIs, and
 
   <token_note>Medium consumption — scales with target scope; use --style brief for lighter output</token_note>
 
-  <bounds will="focused docs|multi-format|ecosystem integration" wont="doc without analysis|override standards|expose sensitive details" fallback="Ask user for guidance when uncertain"/>
+  <bounds will="focused docs|multi-format|ecosystem integration" wont="doc without analysis|override standards|expose sensitive details" fallback="Ask user for guidance when uncertain" type="document-only">
 
-  <boundaries type="document-only">Produce documentation, then complete | Preserve source code (except inline comments if --type inline) | Defer feature implementation to /sc:implement → Output: Documentation files per --type flag</boundaries>
+    Produce documentation, then complete | Preserve source code (except inline comments if --type inline) | Defer feature implementation to /sc:implement → Output: Documentation files per --type flag
 
+  </bounds>
 
   <handoff next="/sc:implement /sc:improve"/>
 </component>

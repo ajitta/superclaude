@@ -130,9 +130,11 @@ description: Deep web research with adaptive planning and intelligent search
 
   <token_note>High consumption — multi-hop research uses significant context; use --uc at 60%+ or delegate to subagent for deep/exhaustive</token_note>
 
-  <bounds will="current info|intelligent search|evidence-based|adaptive replan" wont="claims without sources|skip validation|restricted content|carry raw payloads between hops" fallback="Ask user for guidance when uncertain"/>
+  <bounds will="current info|intelligent search|evidence-based|adaptive replan" wont="claims without sources|skip validation|restricted content|carry raw payloads between hops" fallback="Ask user for guidance when uncertain" type="document-only">
 
-  <boundaries type="document-only">Produce research report, then complete | Defer implementation to /sc:implement | Preserve codebase unchanged | Research and documentation only → Output: Research report with citations and findings</boundaries>
+    Produce research report, then complete | Defer implementation to /sc:implement | Preserve codebase unchanged | Research and documentation only → Output: Research report with citations and findings
+
+  </bounds>
 
   <handoff next="/sc:design /sc:implement /sc:brainstorm"/>
 </component>

@@ -1,6 +1,7 @@
 ---
 description: Task reflection and validation using Serena MCP analysis capabilities
 ---
+
 <component name="reflect" type="command">
 
   <role>
@@ -8,7 +9,7 @@ description: Task reflection and validation using Serena MCP analysis capabiliti
     <mission>Task reflection and validation using Serena MCP analysis capabilities</mission>
   </role>
 
-  <syntax>/sc:reflect [--type task|session|completion] [--analyze] [--validate]</syntax>
+<syntax>/sc:reflect [--type task|session|completion] [--analyze] [--validate]</syntax>
 
   <flow>
     1. Analyze: think_about_collected_information() → assess completeness
@@ -36,14 +37,13 @@ description: Task reflection and validation using Serena MCP analysis capabiliti
     - Learning: Insights → persistence → enhanced understanding
   </patterns>
 
-
   <examples>
 
-| Input | Output |
-|-------|--------|
-| `--type task --analyze` | Goal alignment validation |
-| `--type session --validate` | Session work quality |
-| `--type completion` | Completion readiness eval |
+| Input                       | Output                    |
+| --------------------------- | ------------------------- |
+| `--type task --analyze`     | Goal alignment validation |
+| `--type session --validate` | Session work quality      |
+| `--type completion`         | Completion readiness eval |
 
   <example name="reflect-before-work" type="error-path">
     <input>/sc:reflect --type session --validate (at session start, no work done yet)</input>
@@ -52,10 +52,9 @@ description: Task reflection and validation using Serena MCP analysis capabiliti
   </example>
   </examples>
 
-  <bounds will="comprehensive reflection|TaskList bridge|cross-session learning" wont="override completion|bypass integrity" fallback="Without Serena: use native reasoning for reflection, Grep/Read for code analysis. Ask user for guidance when uncertain"/>
-
-  <boundaries type="document-only">Produce reflection report, then complete | Preserve code unchanged during reflection | Report issues with recommendations; defer fixes to /sc:improve → Output: Reflection analysis with recommendations</boundaries>
-
+  <bounds will="comprehensive reflection|TaskList bridge|cross-session learning" wont="override completion|bypass integrity" fallback="Without Serena: use native reasoning for reflection, Grep/Read for code analysis. Ask user for guidance when uncertain" type="document-only">
+    Produce reflection report, then complete | Preserve code unchanged during reflection | Report issues with recommendations; defer fixes to /sc:improve
+  </bounds>
 
   <handoff next="/sc:improve /sc:troubleshoot /sc:save"/>
 </component>

@@ -19,7 +19,6 @@ description: Repository indexing with 94% token reduction (58K → 3K)
     6. Validate: Both files exist + size <5KB each
   </flow>
 
-
   <mcp servers="serena"/>
   <personas p="index"/>
 
@@ -64,10 +63,11 @@ description: Repository indexing with 94% token reduction (58K → 3K)
   </example>
   </examples>
 
-  <bounds will="94% token reduction|parallel analysis|human-readable output" wont="modify source|exceed 5KB" fallback="Ask user for guidance when uncertain"/>
+  <bounds will="94% token reduction|parallel analysis|human-readable output" wont="modify source|exceed 5KB" fallback="Ask user for guidance when uncertain" type="document-only">
 
-  <boundaries type="document-only">Generate PROJECT_INDEX.md and PROJECT_INDEX.json, then complete | Preserve source code unchanged | Defer implementation to /sc:implement → Output: PROJECT_INDEX.md (~3KB) + PROJECT_INDEX.json</boundaries>
+    Generate PROJECT_INDEX.md and PROJECT_INDEX.json, then complete | Preserve source code unchanged | Defer implementation to /sc:implement → Output: PROJECT_INDEX.md (~3KB) + PROJECT_INDEX.json
 
+  </bounds>
 
   <handoff next="/sc:analyze /sc:index"/>
 </component>

@@ -21,4 +21,7 @@
 | just explain this function | Native Claude | no external docs needed |
   </examples>
 
+  <bounds will="official library docs|version-specific patterns|framework compliance" wont="general knowledge questions|code generation|local file operations" fallback="Use WebSearch or WebFetch for non-library documentation"/>
+
+  <handoff next="/sc:implement /sc:analyze"/>
 </component>

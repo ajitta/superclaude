@@ -37,7 +37,6 @@ description: Orchestrate sub-agents, manage workflows, and document learnings fo
     - Complex: Wave1(BE‖) → Wave2(FE‖) → Wave3(integration) → Wave4(test/sec‖)
   </patterns>
 
-
   <self_correction note="Defined in agents/pm-agent.md; inherited at invocation">
     Rule: Never retry without understanding WHY it failed
     1. STOP → 2. Investigate → 3. Hypothesis → 4. New Approach → 5. Execute → 6. Learn (write_memory)
@@ -104,10 +103,11 @@ description: Orchestrate sub-agents, manage workflows, and document learnings fo
 
   <token_note>High consumption — orchestrates multiple sub-agents; consider --strategy direct for simple tasks</token_note>
 
-  <bounds will="seamless orchestration|auto-delegation|zero-token MCP|self-documenting" wont="expose internal complexity to user|skip specialist delegation|bypass documentation" fallback="Ask user for guidance when uncertain"/>
+  <bounds will="seamless orchestration|auto-delegation|zero-token MCP|self-documenting" wont="expose internal complexity to user|skip specialist delegation|bypass documentation" fallback="Ask user for guidance when uncertain" type="execution">
 
-  <boundaries type="execution">Orchestrate sub-agents and manage workflows | Delegate to specialists based on complexity analysis | Document patterns and mistakes for continuous improvement → Output: Coordinated task execution with progress tracking</boundaries>
+    Orchestrate sub-agents and manage workflows | Delegate to specialists based on complexity analysis | Document patterns and mistakes for continuous improvement → Output: Coordinated task execution with progress tracking
 
+  </bounds>
 
   <handoff next="/sc:implement /sc:task /sc:research"/>
 </component>

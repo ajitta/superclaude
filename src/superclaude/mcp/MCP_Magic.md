@@ -24,4 +24,7 @@ Avoid:
 | write REST API | Native Claude | backend logic |
   </examples>
 
+  <bounds will="UI component generation|design system integration|accessible components" wont="backend logic|API design|database operations" fallback="Use native Claude for non-UI code generation"/>
+
+  <handoff next="/sc:implement /sc:design --type component"/>
 </component>

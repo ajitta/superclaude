@@ -21,4 +21,6 @@
   </examples>
 
   <bounds will="meta-cognitive analysis|reasoning transparency|pattern detection" wont="skip self-examination|hide decision logic|ignore compliance gaps" fallback="Revert to default behavior when inapplicable"/>
+
+  <handoff next="/sc:reflect /sc:improve /sc:analyze"/>
 </component>

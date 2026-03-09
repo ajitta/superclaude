@@ -54,17 +54,16 @@ description: Apply systematic improvements to code quality, performance, and mai
 
   <token_note>Medium-high consumption — scales with target scope; use --safe for conservative changes</token_note>
 
-  <bounds will="systematic improvements|multi-persona|safe refactoring" wont="risky changes without confirm|arch changes without impact analysis|override standards" fallback="Ask user for guidance when uncertain"/>
+  <bounds will="systematic improvements|multi-persona|safe refactoring" wont="risky changes without confirm|arch changes without impact analysis|override standards" fallback="Ask user for guidance when uncertain" type="execution">
 
-  <boundaries type="execution">Implement improvements as requested | Safe mode (--safe): Only non-breaking changes | Interactive mode (--interactive): Confirm each change</boundaries>
+    Implement improvements as requested | Safe mode (--safe): Only non-breaking changes | Interactive mode (--interactive): Confirm each change
 
+  </bounds>
 
   <auto_fix_threshold>
     <safe>Style fixes, minor refactoring, documentation updates</safe>
     <approval_required>API changes, dependency updates, architecture modifications</approval_required>
   </auto_fix_threshold>
-
-
 
   <handoff next="/sc:test /sc:git"/>
 </component>

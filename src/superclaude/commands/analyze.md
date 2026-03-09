@@ -63,9 +63,9 @@ description: Comprehensive code analysis across quality, security, performance, 
 
   <token_note>Medium-high consumption — use --scope file or --scope module to limit analysis boundary</token_note>
 
-  <bounds will="static analysis|severity-rated findings|detailed reports" wont="dynamic/runtime analysis|modify code|analyze external deps" fallback="Ask user for guidance when uncertain"/>
-
-  <boundaries type="document-only">Produce analysis report, then complete | Preserve source code unchanged | Report issues; defer fixes to /sc:improve or /sc:cleanup → Output: Analysis report with severity-rated findings</boundaries>
+  <bounds will="static analysis|severity-rated findings|detailed reports" wont="dynamic/runtime analysis|modify code|analyze external deps" fallback="Ask user for guidance when uncertain" type="document-only">
+    Produce analysis report, then complete | Preserve source code unchanged | Report issues; defer fixes to /sc:improve or /sc:cleanup
+  </bounds>
 
 
   <handoff next="/sc:improve /sc:cleanup /sc:implement"/>

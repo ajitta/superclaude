@@ -26,7 +26,6 @@ description: Generate structured implementation workflows from PRDs and feature 
 | WORKFLOW_STATUS.md | Progress + quality gates |
   </outputs>
 
-
   <mcp servers="seq|c7|magic|play|serena"/>
   <personas p="arch|anal|fe|be|sec|ops|pm"/>
 
@@ -64,10 +63,11 @@ description: Generate structured implementation workflows from PRDs and feature 
 
   <token_note>High consumption — multi-persona coordination; use --depth shallow for lighter analysis</token_note>
 
-  <bounds will="comprehensive workflows|multi-persona+MCP|cross-session management" wont="execute impl beyond planning|override dev process|generate without analysis" fallback="Ask user for guidance when uncertain"/>
+  <bounds will="comprehensive workflows|multi-persona+MCP|cross-session management" wont="execute impl beyond planning|override dev process|generate without analysis" fallback="Ask user for guidance when uncertain" type="document-only">
 
-  <boundaries type="document-only">Produce workflow document, then complete | Defer implementation to /sc:implement or /sc:task | Planning and coordination only → Output: WORKFLOW.md with task hierarchy and quality gates</boundaries>
+    Produce workflow document, then complete | Defer implementation to /sc:implement or /sc:task | Planning and coordination only → Output: WORKFLOW.md with task hierarchy and quality gates
 
+  </bounds>
 
   <handoff next="/sc:implement /sc:task"/>
 </component>

@@ -27,7 +27,6 @@ description: Design system architecture, APIs, and component interfaces with com
 | database | ERD.md | SCHEMA.md | migrations/*.sql |
   </outputs>
 
-
   <mcp servers="seq|c7"/>
   <personas p="arch|fe|be|anal"/>
 
@@ -62,10 +61,11 @@ description: Design system architecture, APIs, and component interfaces with com
 
   <token_note>Medium-high consumption — scales with --type complexity; use --format spec for lighter output</token_note>
 
-  <bounds will="comprehensive specs|multi-format output|validation" wont="generate impl code|modify existing arch|violate constraints" fallback="Ask user for guidance when uncertain"/>
+  <bounds will="comprehensive specs|multi-format output|validation" wont="generate impl code|modify existing arch|violate constraints" fallback="Ask user for guidance when uncertain" type="document-only">
 
-  <boundaries type="document-only">Produce design documentation, then complete | Defer implementation code to /sc:implement | Defer source file creation to /sc:implement | Design specs and interfaces only → Output: Architecture/API/Component/Database design documents</boundaries>
+    Produce design documentation, then complete | Defer implementation code to /sc:implement | Defer source file creation to /sc:implement | Design specs and interfaces only → Output: Architecture/API/Component/Database design documents
 
+  </bounds>
 
   <handoff next="/sc:implement /sc:workflow"/>
 </component>

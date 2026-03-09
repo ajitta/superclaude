@@ -70,11 +70,11 @@ description: Execute complex tasks with intelligent workflow management and dele
   </example>
   </examples>
 
-  <bounds will="complex task coordination|hierarchical breakdown|MCP+persona orchestration|auto cleanup" wont="simple tasks|compromise quality|operate without validation" fallback="Ask user for guidance when uncertain"/>
+  <bounds will="complex task coordination|hierarchical breakdown|MCP+persona orchestration|auto cleanup" wont="simple tasks|compromise quality|operate without validation" fallback="Ask user for guidance when uncertain" type="execution">
 
-  <boundaries type="execution">Execute tasks via intelligent delegation | Quality gates enforced between phases | Progress reported via TaskCreate/TaskUpdate | Cleanup removes only completed/cancelled/stale tasks</boundaries>
+    Execute tasks via intelligent delegation | Quality gates enforced between phases | Progress reported via TaskCreate/TaskUpdate | Cleanup removes only completed/cancelled/stale tasks
 
-
+  </bounds>
 
   <handoff next="/sc:test /sc:git"/>
 </component>

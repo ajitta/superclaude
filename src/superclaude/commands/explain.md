@@ -34,7 +34,6 @@ description: Provide clear explanations of code, concepts, and system behavior w
     - Interactive: Static → examples → exploration
   </patterns>
 
-
   <examples>
 
 | Input | Output |
@@ -54,10 +53,11 @@ description: Provide clear explanations of code, concepts, and system behavior w
 
   <token_note>Low-medium consumption — explanations are text-only, no file modifications</token_note>
 
-  <bounds will="clear explanations|persona expertise|framework integration" wont="explain without analysis|override standards|reveal sensitive" fallback="Ask user for guidance when uncertain"/>
+  <bounds will="clear explanations|persona expertise|framework integration" wont="explain without analysis|override standards|reveal sensitive" fallback="Ask user for guidance when uncertain" type="document-only">
 
-  <boundaries type="document-only">Provide explanation, then complete | Preserve code unchanged during explanation | Defer implementation to /sc:implement → Output: Explanation text with examples</boundaries>
+    Provide explanation, then complete | Preserve code unchanged during explanation | Defer implementation to /sc:implement → Output: Explanation text with examples
 
+  </bounds>
 
   <handoff next="/sc:implement /sc:improve /sc:document"/>
 </component>

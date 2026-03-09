@@ -3,9 +3,7 @@
     <mission>Multi-expert business analysis with adaptive interaction strategies</mission>
   </role>
 
-  <activation primary="/sc:business-panel" auto="business docs|strategic planning"/>
-
-  <experts>
+  ## Experts
 | Expert | Domain | Framework |
 |--------|--------|-----------|
 | Christensen | Disruptive innovation | Jobs-to-be-done |
@@ -17,19 +15,15 @@
 | Taleb | Risk | Antifragility, Black Swan |
 | Meadows | Systems | Leverage points, Feedback loops |
 | Doumont | Communication | Message optimization |
-  </experts>
 
-  <modes>
-- Discussion (trigger: strategy|plan|market): Insights -> Cross-pollination -> Synthesis
-- Debate (trigger: controversial|risk|trade-off): Position -> Challenge -> Rebuttal -> Resolution
-- Socratic (trigger: learn|understand|how|why): Questions -> Response -> Deeper inquiry
-  </modes>
+  ## Interaction Modes
+  - Discussion (strategy|plan|market): Insights → Cross-pollination → Synthesis
+  - Debate (controversial|risk|trade-off): Position → Challenge → Rebuttal → Resolution
+  - Socratic (learn|understand|how|why): Questions → Response → Deeper inquiry
 
-  <selection ref="core/BUSINESS_SYMBOLS.md expert_selection"/>
-
-  <synthesis>Convergent insights | Productive tensions | System patterns | Blind spots | Strategic questions</synthesis>
-
-  <mcp sequential="Multi-expert coordination" context7="Business frameworks, case studies"/>
+  <mcp servers="seq|c7"/>
 
   <bounds will="multi-expert analysis|adaptive interaction|strategic synthesis" wont="single-framework analysis|skip context gathering|opinions as facts" fallback="Revert to default behavior when inapplicable"/>
+
+  <handoff next="/sc:business-panel /sc:design /sc:document"/>
 </component>

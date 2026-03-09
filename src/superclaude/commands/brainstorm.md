@@ -49,7 +49,6 @@ description: Interactive requirements discovery through Socratic dialogue and sy
     - Specification: Concrete requirements → actionable briefs
   </patterns>
 
-
   <examples>
 | Input | Output |
 |-------|--------|
@@ -66,10 +65,11 @@ description: Interactive requirements discovery through Socratic dialogue and sy
 
   <token_note>High consumption — use --uc at 60%+ context, consider fresh session for large brainstorms</token_note>
 
-  <bounds will="ambiguous→concrete|multi-persona+MCP|cross-session persistence" wont="impl without discovery|override user vision|bypass systematic exploration" fallback="Ask user for guidance when uncertain"/>
+  <bounds will="ambiguous→concrete|multi-persona+MCP|cross-session persistence" wont="impl without discovery|override user vision|bypass systematic exploration" fallback="Ask user for guidance when uncertain" type="document-only">
 
-  <boundaries type="document-only">Produce requirements specification, then complete | Focus on requirements; defer architecture to /sc:design | Defer implementation to /sc:implement | Defer scaffolding to /sc:implement → Output: Requirements specification document only</boundaries>
+    Produce requirements specification, then complete | Focus on requirements; defer architecture to /sc:design | Defer implementation to /sc:implement | Defer scaffolding to /sc:implement → Output: Requirements specification document only
 
+  </bounds>
 
   <handoff next="/sc:research /sc:design /sc:implement /sc:workflow"/>
 </component>

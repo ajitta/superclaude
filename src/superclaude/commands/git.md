@@ -78,17 +78,16 @@ description: Git operations with intelligent commit messages and workflow optimi
 
   </examples>
 
-  <bounds will="intelligent git ops|conventional commits|workflow guidance|PR status checks" wont="modify config without auth|destructive without confirm|complex merges requiring manual" fallback="Ask user for guidance when uncertain"/>
+  <bounds will="intelligent git ops|conventional commits|workflow guidance|PR status checks" wont="modify config without auth|destructive without confirm|complex merges requiring manual" fallback="Ask user for guidance when uncertain" type="execution">
 
-  <boundaries type="execution">Execute git operations as requested | Require explicit user confirmation before force push | Require user authorization before modifying git config | Destructive operations require explicit user approval</boundaries>
+    Execute git operations as requested | Require explicit user confirmation before force push | Require user authorization before modifying git config | Destructive operations require explicit user approval
 
+  </bounds>
 
   <safety_rules>
     <safe>status, log, diff, add, commit, pull, fetch, branch, pr-status</safe>
     <approval_required>push --force, reset --hard, rebase, merge with conflicts</approval_required>
   </safety_rules>
-
-
 
   <handoff next="/sc:test /sc:build"/>
 </component>

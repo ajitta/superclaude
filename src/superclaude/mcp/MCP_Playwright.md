@@ -25,4 +25,7 @@ Avoid:
 | review function logic | Native Claude | static analysis |
   </examples>
 
+  <bounds will="browser automation|E2E testing|visual validation|accessibility testing" wont="static code analysis|unit testing|backend logic" fallback="Use native Claude for code review, DevTools for performance profiling"/>
+
+  <handoff next="/sc:test --type e2e /sc:analyze"/>
 </component>

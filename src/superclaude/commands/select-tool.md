@@ -41,7 +41,6 @@ description: Intelligent MCP tool selection based on complexity scoring and oper
     - accuracy: >95%
   </performance>
 
-
   <examples>
 
 | Input | Output |
@@ -57,9 +56,11 @@ description: Intelligent MCP tool selection based on complexity scoring and oper
   </example>
   </examples>
 
-  <bounds will="optimal selection|complexity scoring|sub-100ms decision" wont="override explicit preference|skip analysis|compromise performance" fallback="Ask user for guidance when uncertain"/>
+  <bounds will="optimal selection|complexity scoring|sub-100ms decision" wont="override explicit preference|skip analysis|compromise performance" fallback="Ask user for guidance when uncertain" type="document-only">
 
-  <boundaries type="document-only">Provide tool selection recommendation, then complete | Do not execute the selected tool automatically | Defer execution to the user or calling command → Output: Tool recommendation with scoring rationale</boundaries>
+    Provide tool selection recommendation, then complete | Do not execute the selected tool automatically | Defer execution to the user or calling command → Output: Tool recommendation with scoring rationale
+
+  </bounds>
 
   <handoff next="/sc:implement /sc:analyze"/>
 </component>

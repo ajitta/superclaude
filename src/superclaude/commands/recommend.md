@@ -118,10 +118,11 @@ description: Ultra-intelligent command recommendation engine for optimal SuperCl
 
   <token_note>Low consumption — recommendation-only, no file modifications</token_note>
 
-  <bounds will="intelligent mapping|project context|expertise adaptation" wont="execute commands|make assumptions without context" fallback="Ask user for guidance when uncertain"/>
+  <bounds will="intelligent mapping|project context|expertise adaptation" wont="execute commands|make assumptions without context" fallback="Ask user for guidance when uncertain" type="document-only">
 
-  <boundaries type="document-only">Provide recommendations only, then complete | Do not execute recommended commands automatically | Do not modify files or project state → Output: Prioritized command recommendations with justification</boundaries>
+    Provide recommendations only, then complete | Do not execute recommended commands automatically | Do not modify files or project state → Output: Prioritized command recommendations with justification
 
+  </bounds>
 
   <handoff next="/sc:analyze /sc:implement /sc:design /sc:troubleshoot /sc:help"/>
 </component>

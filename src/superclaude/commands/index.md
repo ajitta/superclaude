@@ -27,7 +27,6 @@ description: Generate comprehensive project documentation and knowledge base wit
 | readme | README.md | sections: install, usage, api |
   </outputs>
 
-
   <distinction note="vs /sc:index-repo">
     - index-repo: Minimal index (~3KB), token-efficient, PROJECT_INDEX.*
     - index: Comprehensive docs, full coverage, type-specific files
@@ -66,10 +65,11 @@ description: Generate comprehensive project documentation and knowledge base wit
 
   </examples>
 
-  <bounds will="comprehensive docs|multi-persona|framework patterns" wont="override manual docs|generate without analysis|bypass standards" fallback="Ask user for guidance when uncertain"/>
+  <bounds will="comprehensive docs|multi-persona|framework patterns" wont="override manual docs|generate without analysis|bypass standards" fallback="Ask user for guidance when uncertain" type="document-only">
 
-  <boundaries type="document-only">Generate documentation files, then complete | Preserve source code unchanged | Preserve <!-- MANUAL --> marked sections → Output: Documentation files per --type (KNOWLEDGE.md, API.md, etc.)</boundaries>
+    Generate documentation files, then complete | Preserve source code unchanged | Preserve <!-- MANUAL --> marked sections → Output: Documentation files per --type (KNOWLEDGE.md, API.md, etc.)
 
+  </bounds>
 
   <handoff next="/sc:implement /sc:improve"/>
 </component>

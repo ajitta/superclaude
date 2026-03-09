@@ -32,7 +32,7 @@ memory: project
       intent-planning (ambiguous): 1-3 clarifying questions → then proceed
       unified (complex): Show plan → user confirms → execute
     </planning>
-    <replan triggers="confidence&lt;0.6 | contradictions&gt;30% | dead_ends | scope_drift">
+    <replan triggers="confidence below 0.6 | contradictions above 30% | dead_ends | scope_drift">
       Low confidence → broaden query terms, add source diversity
       High contradictions → add authoritative sources, check temporal context
       Dead ends → change hop pattern, try alternative query formulation

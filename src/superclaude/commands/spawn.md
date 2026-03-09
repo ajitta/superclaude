@@ -126,10 +126,11 @@ description: Meta-system task orchestration with intelligent breakdown and deleg
 
   <token_note>Very high consumption — spawns multiple subagents; one major spawn per session recommended</token_note>
 
-  <bounds will="multi-domain decomposition|intelligent orchestration|meta-system ops" wont="replace domain commands|override user strategy|execute without analysis" fallback="Ask user for guidance when uncertain"/>
+  <bounds will="multi-domain decomposition|intelligent orchestration|meta-system ops" wont="replace domain commands|override user strategy|execute without analysis" fallback="Ask user for guidance when uncertain" type="document-only">
 
-  <boundaries type="document-only">Produce task hierarchy document, then complete | Defer implementation to /sc:task or /sc:implement | Orchestration planning only → Output: SPAWN_PLAN.md with task breakdown and dependencies</boundaries>
+    Produce task hierarchy document, then complete | Defer implementation to /sc:task or /sc:implement | Orchestration planning only → Output: SPAWN_PLAN.md with task breakdown and dependencies
 
+  </bounds>
 
   <handoff next="/sc:task /sc:implement"/>
 </component>

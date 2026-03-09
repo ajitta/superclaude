@@ -40,7 +40,6 @@ description: Multi-expert business analysis with adaptive interaction modes
   <mcp servers="seq|c7"/>
   <personas p="anal|arch|mentor" auto="true"/>
 
-
   <examples>
 
 | Input | Output |
@@ -60,10 +59,11 @@ description: Multi-expert business analysis with adaptive interaction modes
 
   <token_note>High consumption — multi-expert dialogue; use --synthesis-only for lighter output</token_note>
 
-  <bounds will="multi-expert analysis|adaptive modes|comprehensive synthesis" wont="replace professional advice|make decisions for user" fallback="Ask user for guidance when uncertain"/>
+  <bounds will="multi-expert analysis|adaptive modes|comprehensive synthesis" wont="replace professional advice|make decisions for user" fallback="Ask user for guidance when uncertain" type="document-only">
 
-  <boundaries type="document-only">Produce business analysis document, then complete | Defer business decisions to stakeholders | Preserve code and configurations unchanged → Output: Business analysis synthesis document</boundaries>
+    Produce business analysis document, then complete | Defer business decisions to stakeholders | Preserve code and configurations unchanged → Output: Business analysis synthesis document
 
+  </bounds>
 
   <handoff next="/sc:brainstorm /sc:design"/>
 </component>

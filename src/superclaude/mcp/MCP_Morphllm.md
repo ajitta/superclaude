@@ -25,4 +25,7 @@ Avoid:
 | analyze code architecture | Sequential | complex analysis |
   </examples>
 
+  <bounds will="pattern-based bulk edits|style enforcement|token-efficient transformations" wont="semantic symbol operations|dependency tracking|LSP-powered refactoring" fallback="Use Serena for symbol-level operations, Edit for single-file changes"/>
+
+  <handoff next="/sc:improve /sc:cleanup"/>
 </component>

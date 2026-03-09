@@ -36,7 +36,6 @@ description: Diagnose and resolve issues in code, builds, deployments, and syste
   <mcp servers="seq"/>
   <personas p="root|devops"/>
 
-
   <examples>
 
 | Input | Output |
@@ -56,10 +55,11 @@ description: Diagnose and resolve issues in code, builds, deployments, and syste
 
   <token_note>Medium-high consumption — diagnostic cycles use significant context; limit with --type for focused diagnosis</token_note>
 
-  <bounds will="systematic diagnosis|validated solutions|safe fixes" wont="risky fixes without confirm|modify production without permission|arch changes without impact" fallback="Ask user for guidance when uncertain"/>
+  <bounds will="systematic diagnosis|validated solutions|safe fixes" wont="risky fixes without confirm|modify production without permission|arch changes without impact" fallback="Ask user for guidance when uncertain" type="conditional">
 
-  <boundaries type="conditional">Without --fix: produce diagnostic report, then complete | With --fix: Apply safe fixes only (execution) | Risky fixes require explicit user approval → Output: Diagnostic report; fixes only with --fix flag</boundaries>
+    Without --fix: produce diagnostic report, then complete | With --fix: Apply safe fixes only (execution) | Risky fixes require explicit user approval → Output: Diagnostic report; fixes only with --fix flag
 
+  </bounds>
 
   <auto_fix_threshold>
     <safe>Typos, missing imports, simple config errors</safe>

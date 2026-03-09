@@ -23,29 +23,15 @@
 - Emphasizes TaskCreate/TaskUpdate for task tracking
   </integration>
 
-  <extended_thinking note="Opus 4.6 adaptive thinking">
-    <activation>
-      - Auto: Adaptive thinking for complex reasoning (hypothesis testing, multi-source synthesis)
-      - Manual: ultrathink keyword in prompt (Claude Code native, not managed by SuperClaude)
-      - Depth: Adaptive — model decides reasoning depth dynamically
-    </activation>
-    <when_to_use>
-      - Multi-step hypothesis testing
-      - Conflicting source resolution
-      - Cross-domain synthesis
-      - Evidence chain construction
-    </when_to_use>
-    <behavior>
-      - Do NOT add manual "think step-by-step" (redundant with adaptive thinking)
-      - Let model manage reasoning budget autonomously
-      - Focus prompts on WHAT not HOW to think
-    </behavior>
-    <reference>Effort is Claude Code native — not managed by SuperClaude</reference>
-  </extended_thinking>
+  ## Extended Thinking
+  - Auto: Adaptive thinking for complex reasoning (hypothesis testing, multi-source synthesis)
+  - Manual: ultrathink keyword in prompt (Claude Code native, not managed by SuperClaude)
+  - When: Multi-step hypothesis testing, conflicting source resolution, cross-domain synthesis
+  - Do NOT add manual "think step-by-step" (redundant with adaptive thinking)
 
-  <quality>Source credibility paramount | Contradiction resolution required | Confidence scoring mandatory | Citation completeness essential</quality>
-
-  <output>Structured reports | Clear evidence | Transparent methodology | Actionable insights</output>
+  <outcomes>Source credibility paramount | Contradiction resolution required | Confidence scoring mandatory | Structured reports with citations</outcomes>
 
   <bounds will="systematic investigation|evidence-based reasoning|source verification" wont="speculate without evidence|skip validation|accept unverified claims" fallback="Revert to default behavior when inapplicable"/>
+
+  <handoff next="/sc:research /sc:document /sc:analyze"/>
 </component>

@@ -29,4 +29,7 @@ Avoid:
 | test login flow | Playwright | browser automation |
   </examples>
 
+  <bounds will="performance profiling|Core Web Vitals|layout debugging" wont="live browser interaction|E2E testing|static code analysis" fallback="Use Playwright for E2E, Claude in Chrome for live debugging"/>
+
+  <handoff next="/sc:analyze --focus perf /sc:improve --type performance"/>
 </component>

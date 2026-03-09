@@ -3,14 +3,13 @@
     <mission>Semantic code understanding with project memory and session persistence</mission>
   </role>
 
-  <initialization note="Required sequence on first use">
-    1. `initial_instructions` — loads Serena operating manual (only needed in non-system-prompt contexts)
-    2. `check_onboarding_performed` — verifies project is set up
-    3. `activate_project` — activates the project by name or path
-    If onboarding not performed: call `onboarding` before `activate_project`
-  </initialization>
+  ## Initialization (required on first use)
+  1. `initial_instructions` — loads Serena operating manual (only needed in non-system-prompt contexts)
+  2. `check_onboarding_performed` — verifies project is set up
+  3. `activate_project` — activates the project by name or path
+  If onboarding not performed: call `onboarding` before `activate_project`
 
-  <tools_active note="20 tools active in claude-code context">
+  <tools note="20 tools active in claude-code context">
     **Symbol Operations (7):**
     - `find_symbol` — search by name path pattern (supports substring, depth, kind filtering)
     - `find_referencing_symbols` — find all references to a symbol
@@ -38,9 +37,9 @@
     - `onboarding` — run initial project setup
     - `initial_instructions` — load operating manual
     - `get_current_config` — show active config, tools, modes
-  </tools_active>
+  </tools>
 
-  <tools_thinking note="5 tools — available in Serena but restricted by claude-code context">
+  ## Thinking Tools (restricted in claude-code context)
     - `think_about_collected_information` — assess completeness of gathered info
     - `think_about_task_adherence` — check goal alignment and detect deviation
     - `think_about_whether_you_are_done` — evaluate completion criteria
@@ -53,9 +52,8 @@
     use native reasoning as a fallback.
 
     Future: May become available if Serena adds context-override support or a dedicated mode.
-  </tools_thinking>
 
-  <choose note="Decision matrix: Serena vs native tools">
+  <choose>
     **Use Serena for:**
     - Symbol operations: rename, find references, extract, move (semantic precision)
     - Cross-file refactoring: rename propagates through all references
@@ -74,7 +72,7 @@
     **Decision rule:** If the operation is about _what the code means_ (symbols, references, types), use Serena. If it's about _what the text says_ (patterns, strings), use native tools.
   </choose>
 
-  <memory_patterns note="Cross-session persistence via Serena memory">
+  ## Memory Patterns
     **Session start (/sc:load):**
     `activate_project` → `list_memories` → `read_memory("pm_context")` → report context
 
@@ -91,9 +89,8 @@
     - `next_actions` — queued work items
     - `session_[YYYY-MM-DD]` — dated session snapshots
     - `learnings_[topic]` — accumulated insights by topic
-  </memory_patterns>
 
-  <configuration>
+  ## Configuration
     **Project config:** `.serena/project.yml`
     - `languages:` — LSP language servers to start
     - `included_optional_tools:` — enable thinking/context tools
@@ -102,7 +99,6 @@
     - `ignore_all_files_in_gitignore:` — respect .gitignore
 
     **Install:** `uvx --from git+https://github.com/oraios/serena serena start-mcp-server --context claude-code --enable-web-dashboard false --enable-gui-log-window false`
-  </configuration>
 
   <examples>
 | Input | Tool | Reason |
@@ -116,4 +112,7 @@
 | update console.log to logger | Morphllm (not Serena) | Pattern-based bulk replacement |
   </examples>
 
+  <bounds will="semantic code understanding|symbol operations|cross-session memory" wont="simple text edits|bulk pattern replacement|file-level operations" fallback="Use native Grep/Glob/Edit for text-level operations"/>
+
+  <handoff next="/sc:reflect /sc:save /sc:load"/>
 </component>

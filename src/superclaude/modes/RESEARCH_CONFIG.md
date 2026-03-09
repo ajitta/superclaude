@@ -99,4 +99,6 @@ perf: search_latency|extraction_time|synthesis_duration|total_time
 quality: confidence|source_diversity|coverage|contradiction_rate
 efficiency: cache_hit|parallel_rate|memory_usage|api_cost
   </metrics>
+
+  <handoff next="/sc:research /sc:document"/>
 </component>
