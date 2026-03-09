@@ -127,7 +127,7 @@ TRIGGER_MAP = [
         2,
     ),
     (
-        r"(sequential thinking|ultrathink|multi.?step reasoning|reasoning chain|--seq|--sequential)",
+        r"(sequential thinking|multi.?step reasoning|reasoning chain|--seq|--sequential)",
         "mcp/MCP_Sequential.md",
         2,
     ),
