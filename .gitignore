@@ -99,6 +99,7 @@ Pipfile.lock
 poetry.lock
 
 # Claude Code - share project config, exclude personal/runtime data
+.claude/settings.json
 .claude/settings.local.json
 .claude/agent-memory*/
 .claude/.superclaude_hooks/
