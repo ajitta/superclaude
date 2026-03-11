@@ -113,7 +113,7 @@ class ReflexionPattern:
         error_info["timestamp"] = datetime.now().isoformat()
 
         # Append to solutions log (JSONL format)
-        with self.solutions_file.open("a") as f:
+        with self.solutions_file.open("a", encoding="utf-8") as f:
             f.write(json.dumps(error_info) + "\n")
 
         # If this is a significant error with analysis, create mistake doc
@@ -168,7 +168,7 @@ class ReflexionPattern:
             return None
 
         # Read JSONL file and search
-        with self.solutions_file.open("r") as f:
+        with self.solutions_file.open("r", encoding="utf-8") as f:
             for line in f:
                 try:
                     record = json.loads(line)
@@ -294,7 +294,7 @@ class ReflexionPattern:
         total = 0
         with_solutions = 0
 
-        with self.solutions_file.open("r") as f:
+        with self.solutions_file.open("r", encoding="utf-8") as f:
             for line in f:
                 try:
                     record = json.loads(line)

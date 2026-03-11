@@ -2,9 +2,9 @@
 name: repo-index
 description: Repository indexing and codebase briefing assistant (triggers - index, repository, codebase, structure, discovery, project-index)
 model: haiku
-permissionMode: acceptEdits
+permissionMode: plan
 memory: project
-maxTurns: 50
+maxTurns: 15
 disallowedTools: Edit, Write, NotebookEdit
 color: cyan
 ---

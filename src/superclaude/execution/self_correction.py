@@ -191,7 +191,7 @@ class SelfCorrectionEngine:
         """Find similar past failures"""
 
         try:
-            with open(self.reflexion_file) as f:
+            with open(self.reflexion_file, encoding="utf-8") as f:
                 data = json.load(f)
 
             past_failures = [
@@ -302,7 +302,7 @@ class SelfCorrectionEngine:
         )
 
         # Load current reflexion memory
-        with open(self.reflexion_file) as f:
+        with open(self.reflexion_file, encoding="utf-8") as f:
             data = json.load(f)
 
         # Check if similar failure exists (increment recurrence)
@@ -343,7 +343,7 @@ class SelfCorrectionEngine:
         """Get all active prevention rules"""
 
         try:
-            with open(self.reflexion_file) as f:
+            with open(self.reflexion_file, encoding="utf-8") as f:
                 data = json.load(f)
 
             return data.get("prevention_rules", [])
@@ -359,7 +359,7 @@ class SelfCorrectionEngine:
         """
 
         try:
-            with open(self.reflexion_file) as f:
+            with open(self.reflexion_file, encoding="utf-8") as f:
                 data = json.load(f)
 
             past_failures = [

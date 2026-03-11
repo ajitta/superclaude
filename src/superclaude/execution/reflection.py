@@ -245,7 +245,7 @@ class ReflectionEngine:
             )
 
         try:
-            with open(reflexion_file) as f:
+            with open(reflexion_file, encoding="utf-8") as f:
                 reflexion_data = json.load(f)
 
             past_mistakes = reflexion_data.get("mistakes", [])
@@ -354,7 +354,7 @@ class ReflectionEngine:
         # Append to log
         try:
             if reflection_log.exists():
-                with open(reflection_log) as f:
+                with open(reflection_log, encoding="utf-8") as f:
                     log_data = json.load(f)
             else:
                 log_data = {"reflections": []}

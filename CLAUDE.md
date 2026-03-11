@@ -48,11 +48,11 @@ SuperClaude is a **dual-purpose** project:
 The CLI `superclaude install` copies content from the package to Claude Code's config directory:
 
 ```
-src/superclaude/commands/  →  ~/.claude/commands/sc/       (31 slash commands)
-src/superclaude/agents/    →  ~/.claude/agents/             (21 agent definitions)
+src/superclaude/commands/  →  ~/.claude/commands/sc/       (30 slash commands)
+src/superclaude/agents/    →  ~/.claude/agents/             (20 agent definitions)
 src/superclaude/skills/    →  ~/.claude/skills/             (skill implementations)
-src/superclaude/core/      →  ~/.claude/superclaude/core/   (FLAGS, PRINCIPLES, RULES)
-src/superclaude/modes/     →  ~/.claude/superclaude/modes/  (7 behavioral modes)
+src/superclaude/core/      →  ~/.claude/superclaude/core/   (FLAGS, PRINCIPLES, RULES, BUSINESS_SYMBOLS)
+src/superclaude/modes/     →  ~/.claude/superclaude/modes/  (8 mode/config files)
 src/superclaude/mcp/       →  ~/.claude/superclaude/mcp/    (MCP server documentation)
 ```
 
@@ -97,10 +97,10 @@ src/superclaude/
 │   ├── inline_hooks.py  # YAML frontmatter parser for skills/agents/commands
 │   └── mcp_fallback.py  # MCP server availability fallback handling
 ├── utils/               # Shared utilities (atomic_write_json)
-├── commands/            # 31 slash command markdown files
-├── agents/              # 21 agent definition markdown files
+├── commands/            # 30 slash command markdown files
+├── agents/              # 20 agent definition markdown files
 ├── skills/              # 3 skills: confidence-check, ship, simplicity-coach (each has SKILL.md manifest)
-├── modes/               # 7 behavioral mode markdown files
+├── modes/               # 8 mode/config markdown files
 ├── mcp/                 # MCP server docs + configs/
 ├── core/                # FLAGS.md, PRINCIPLES.md, RULES.md
 └── scripts/             # context_loader.py (trigger system, hybrid injection), session_init.py, token_estimator.py, skill_activator.py

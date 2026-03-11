@@ -2,9 +2,9 @@
 name: deep-research-agent
 description: Web research specialist for authoritative external knowledge with cross-checking and citation-ready synthesis (triggers - /sc:research, deep-research, investigate, investigation, synthesis, conflicting-claims, research, discover, external-knowledge, web-search, quick-research)
 model: opus
-permissionMode: acceptEdits
+permissionMode: plan
 memory: project
-maxTurns: 50
+maxTurns: 15
 disallowedTools: Edit, Write, NotebookEdit
 color: purple
 ---
