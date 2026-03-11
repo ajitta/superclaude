@@ -321,43 +321,7 @@ allowed-tools:
         assert fm["allowed-tools"] == ["Read", "Grep", "WebFetch"]
 
     def test_parse_inline_hooks(self):
-        """Test inline hooks parsing with nested format in metadata."""
-        from superclaude.hooks.inline_hooks import parse_inline_hooks
-
-        fm = {
-            "metadata": {
-                "hooks": {
-                    "PreToolUse": [
-                        {
-                            "matcher": "WebFetch|WebSearch",
-                            "hooks": [
-                                {"type": "command", "command": "echo pre", "once": True}
-                            ],
-                        }
-                    ],
-                    "PostToolUse": [
-                        {
-                            "matcher": "Write",
-                            "hooks": [
-                                {"type": "command", "command": "echo post"}
-                            ],
-                        }
-                    ],
-                }
-            }
-        }
-
-        hooks = parse_inline_hooks(fm)
-        assert hooks.has_hooks() is True
-        assert len(hooks.pre_tool_use) == 1
-        assert len(hooks.post_tool_use) == 1
-        assert hooks.pre_tool_use[0].once is True
-        assert hooks.pre_tool_use[0].matcher == "WebFetch|WebSearch"
-        assert hooks.post_tool_use[0].once is False
-        assert hooks.post_tool_use[0].matcher == "Write"
-
-    def test_parse_inline_hooks_root_compat(self):
-        """Test inline hooks parsing from root level (backward compat)."""
+        """Test inline hooks parsing with nested format at top-level."""
         from superclaude.hooks.inline_hooks import parse_inline_hooks
 
         fm = {
@@ -370,13 +334,25 @@ allowed-tools:
                         ],
                     }
                 ],
+                "PostToolUse": [
+                    {
+                        "matcher": "Write",
+                        "hooks": [
+                            {"type": "command", "command": "echo post"}
+                        ],
+                    }
+                ],
             }
         }
 
         hooks = parse_inline_hooks(fm)
         assert hooks.has_hooks() is True
         assert len(hooks.pre_tool_use) == 1
+        assert len(hooks.post_tool_use) == 1
         assert hooks.pre_tool_use[0].once is True
+        assert hooks.pre_tool_use[0].matcher == "WebFetch|WebSearch"
+        assert hooks.post_tool_use[0].once is False
+        assert hooks.post_tool_use[0].matcher == "Write"
 
     def test_parse_inline_hooks_flat_format_legacy(self):
         """Test inline hooks parsing with flat (legacy) format for backward compat."""
@@ -477,36 +453,33 @@ allowed-tools:
         fm = {"name": "test"}
         assert get_skill_context(fm) == "inline"
 
-    def test_get_skill_context_fork_metadata(self):
-        """Test fork context detection from metadata."""
-        from superclaude.hooks.inline_hooks import get_skill_context
-
-        fm = {"name": "test", "metadata": {"context": "fork"}}
-        assert get_skill_context(fm) == "fork"
-
-    def test_get_skill_context_fork_root_compat(self):
-        """Test fork context detection from root (backward compat)."""
+    def test_get_skill_context_fork(self):
+        """Test fork context detection from top-level field."""
         from superclaude.hooks.inline_hooks import get_skill_context
 
         fm = {"name": "test", "context": "fork"}
         assert get_skill_context(fm) == "fork"
 
-    def test_get_skill_agent_metadata(self):
-        """Test agent field retrieval from metadata."""
-        from superclaude.hooks.inline_hooks import get_skill_agent
+    def test_get_skill_context_invalid_falls_back(self):
+        """Test invalid context value falls back to inline."""
+        from superclaude.hooks.inline_hooks import get_skill_context
 
-        fm = {"name": "test", "metadata": {"agent": "backend-architect"}}
-        assert get_skill_agent(fm) == "backend-architect"
+        fm = {"name": "test", "context": "unknown"}
+        assert get_skill_context(fm) == "inline"
 
-    def test_get_skill_agent_root_compat(self):
-        """Test agent field retrieval from root (backward compat)."""
+    def test_get_skill_agent(self):
+        """Test agent field retrieval from top-level."""
         from superclaude.hooks.inline_hooks import get_skill_agent
 
         fm = {"name": "test", "agent": "backend-architect"}
         assert get_skill_agent(fm) == "backend-architect"
 
-        fm_no_agent = {"name": "test"}
-        assert get_skill_agent(fm_no_agent) is None
+    def test_get_skill_agent_none(self):
+        """Test agent returns None when not specified."""
+        from superclaude.hooks.inline_hooks import get_skill_agent
+
+        fm = {"name": "test"}
+        assert get_skill_agent(fm) is None
 
     def test_inline_hook_to_dict(self):
         """Test InlineHook serialization."""

@@ -121,30 +121,11 @@ def parse_frontmatter(content: str) -> dict:
     return result
 
 
-def _get_meta_value(frontmatter: dict, key: str, default=None):
-    """Get a value from frontmatter, checking metadata first then root.
-
-    Claude Code skill schema only supports a fixed set of top-level attributes.
-    Custom attributes (context, agent, allowed-tools, hooks, etc.) are stored
-    under the ``metadata`` key. This helper checks ``metadata`` first, then
-    falls back to root-level for backward compatibility with older manifests.
-
-    Args:
-        frontmatter: Parsed frontmatter dictionary
-        key: The attribute key to look up
-        default: Default value if not found
-
-    Returns:
-        The value from metadata or root, or default
-    """
-    metadata = frontmatter.get("metadata")
-    if isinstance(metadata, dict) and key in metadata:
-        return metadata[key]
-    return frontmatter.get(key, default)
-
-
 def parse_inline_hooks(frontmatter: dict) -> InlineHooks:
     """Parse inline hooks from frontmatter dictionary.
+
+    All CC extension fields (hooks, context, agent) are top-level in
+    frontmatter per the official Claude Code skill spec.
 
     Args:
         frontmatter: Parsed frontmatter dictionary
@@ -152,7 +133,7 @@ def parse_inline_hooks(frontmatter: dict) -> InlineHooks:
     Returns:
         InlineHooks container with parsed hooks
     """
-    hooks_data = _get_meta_value(frontmatter, "hooks", {})
+    hooks_data = frontmatter.get("hooks", {})
     if not hooks_data or not isinstance(hooks_data, dict):
         return InlineHooks()
 
@@ -255,7 +236,7 @@ def get_skill_context(frontmatter: dict) -> Literal["inline", "fork"]:
     Returns:
         'inline' (default) or 'fork' for sub-agent execution
     """
-    context: str = _get_meta_value(frontmatter, "context", "inline")
+    context: str = frontmatter.get("context", "inline")
     if context in ("inline", "fork"):
         return context  # type: ignore[return-value]
     return "inline"
@@ -270,6 +251,6 @@ def get_skill_agent(frontmatter: dict) -> str | None:
     Returns:
         Agent name or None if not specified
     """
-    return _get_meta_value(frontmatter, "agent")
+    return frontmatter.get("agent")
 
 
