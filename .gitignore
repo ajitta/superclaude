@@ -98,8 +98,11 @@ Pipfile.lock
 # Poetry
 poetry.lock
 
-# Claude Code - ignore project-local installation
+# Claude Code - share project config, exclude personal/runtime data
 .claude/settings.local.json
+.claude/agent-memory*/
+.claude/.superclaude_hooks/
+.claude/projects/
 
 
 # SuperClaude specific
@@ -201,7 +204,6 @@ TODO.txt
 package-lock.json
 uv.lock
 .mcp.json
-.claude/
 docs/mistakes/
 docs/memory/solutions_learned.jsonl
 .envrc

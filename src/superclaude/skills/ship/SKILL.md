@@ -1,9 +1,7 @@
 ---
 name: ship
 description: Ship changes with git add, conventional commit, push, and optional PR creation
-metadata:
-  context: inline
-  agent: general-purpose
+disable-model-invocation: true
 ---
 <component name="ship" type="skill">
 

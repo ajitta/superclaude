@@ -1,16 +1,13 @@
 ---
 name: simplicity-coach
 description: Interactive OSL coaching, daybook journaling, dependency audits, and simplicity reviews
-metadata:
-  context: inline
-  agent: simplicity-guide
-  hooks:
-    Stop:
-      - hooks:
-          - type: command
-            command: "python3 {{SKILLS_PATH}}/simplicity-coach/scripts/dependency-audit.py ."
-            timeout: 15
-            once: true
+hooks:
+  Stop:
+    - hooks:
+        - type: command
+          command: "python3 {{SKILLS_PATH}}/simplicity-coach/scripts/dependency-audit.py ."
+          timeout: 15
+          once: true
 ---
 <component name="simplicity-coach" type="skill">
 

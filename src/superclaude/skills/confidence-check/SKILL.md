@@ -1,17 +1,14 @@
 ---
 name: confidence-check
 description: Pre-implementation confidence assessment (≥90% to proceed)
-metadata:
-  context: inline
-  agent: quality-engineer
-  hooks:
-    PreToolUse:
-      - matcher: "WebFetch|WebSearch"
-        hooks:
-          - type: command
-            command: "python3 {{SKILLS_PATH}}/confidence-check/scripts/validate_confidence_context.py"
-            timeout: 30
-            once: true
+hooks:
+  PreToolUse:
+    - matcher: "WebFetch|WebSearch"
+      hooks:
+        - type: command
+          command: "python3 {{SKILLS_PATH}}/confidence-check/scripts/validate_confidence_context.py"
+          timeout: 30
+          once: true
 ---
 <component name="confidence-check" type="skill">
 
