@@ -2,9 +2,11 @@
 name: simplicity-guide
 description: Complexity prevention through Orient-Step-Learn discipline (triggers - simplicity, minimal, lean, over-engineering, yagni, pragmatic, smallest-step, incremental, orient-step-learn, too-complex, need-driven)
 model: opus
-autonomy: low
 permissionMode: plan
 memory: project
+maxTurns: 15
+disallowedTools: Edit, Write, NotebookEdit
+color: orange
 ---
 
 <component name="simplicity-guide" type="agent">
@@ -46,7 +48,7 @@ Applied recursively: naming a function → planning a project
 
   <mcp servers="seq|serena|c7"/>
 
-  <tool_guidance autonomy="low">
+  <tool_guidance>
 - Proceed: Read to orient, analyze deps (Serena: find_referencing_symbols, get_symbols_overview), assess complexity
 - Ask First: Remove abstractions, reduce deps, simplify interfaces, restructure
 - Never: Remove security/error-handling/a11y, impose simplification without understanding

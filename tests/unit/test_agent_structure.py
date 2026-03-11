@@ -12,14 +12,14 @@ import pytest
 
 AGENTS_DIR = Path(__file__).parent.parent.parent / "src" / "superclaude" / "agents"
 
-VALID_AUTONOMY_LEVELS = {"high", "medium", "low"}
 VALID_PERMISSION_MODES = {"acceptEdits", "default", "plan", "dontAsk", "bypassPermissions"}
-AUTONOMY_TO_PERMISSION = {
-    "high": "acceptEdits",
-    "medium": "default",
-    "low": "plan",
-}
 VALID_MEMORY_SCOPES = {"user", "project", "local"}
+VALID_COLORS = {"blue", "green", "orange", "purple", "yellow", "cyan", "red"}
+PERMISSION_TO_MAX_TURNS = {
+    "plan": 15,
+    "default": 25,
+    "acceptEdits": 50,
+}
 
 # All agent .md files (excluding README)
 AGENT_FILES = sorted(
@@ -88,17 +88,6 @@ class TestAgentFrontmatter:
             f"{stem}: description too short"
         )
 
-    def test_has_autonomy(self, agent):
-        stem, content, fm = agent
-        assert "autonomy" in fm, f"{stem}: frontmatter missing 'autonomy'"
-
-    def test_autonomy_valid(self, agent):
-        stem, content, fm = agent
-        level = fm.get("autonomy", "")
-        assert level in VALID_AUTONOMY_LEVELS, (
-            f"{stem}: autonomy '{level}' not in {VALID_AUTONOMY_LEVELS}"
-        )
-
     def test_has_permission_mode(self, agent):
         stem, content, fm = agent
         assert "permissionMode" in fm, f"{stem}: frontmatter missing 'permissionMode'"
@@ -119,6 +108,45 @@ class TestAgentFrontmatter:
         scope = fm.get("memory", "")
         assert scope in VALID_MEMORY_SCOPES, (
             f"{stem}: memory '{scope}' not in {VALID_MEMORY_SCOPES}"
+        )
+
+    def test_has_maxTurns(self, agent):
+        stem, content, fm = agent
+        assert "maxTurns" in fm, f"{stem}: frontmatter missing 'maxTurns'"
+
+    def test_maxTurns_is_positive_integer(self, agent):
+        stem, content, fm = agent
+        val = fm.get("maxTurns", "")
+        assert val.isdigit() and int(val) > 0, (
+            f"{stem}: maxTurns '{val}' must be a positive integer"
+        )
+
+    def test_maxTurns_matches_permission_mode(self, agent):
+        stem, content, fm = agent
+        mode = fm.get("permissionMode", "")
+        expected = PERMISSION_TO_MAX_TURNS.get(mode)
+        if expected:
+            assert fm.get("maxTurns") == str(expected), (
+                f"{stem}: permissionMode '{mode}' should have "
+                f"maxTurns={expected}, got {fm.get('maxTurns')}"
+            )
+
+    def test_has_color(self, agent):
+        stem, content, fm = agent
+        assert "color" in fm, f"{stem}: frontmatter missing 'color'"
+
+    def test_color_valid(self, agent):
+        stem, content, fm = agent
+        color = fm.get("color", "")
+        assert color in VALID_COLORS, (
+            f"{stem}: color '{color}' not in {VALID_COLORS}"
+        )
+
+    def test_no_autonomy_field(self, agent):
+        """autonomy is not an official Claude Code field — should not be in frontmatter."""
+        stem, content, fm = agent
+        assert "autonomy" not in fm, (
+            f"{stem}: frontmatter contains non-official 'autonomy' field"
         )
 
 
@@ -175,26 +203,13 @@ class TestAgentXMLStructure:
 class TestAgentCrossFieldConsistency:
     """Validate that frontmatter and XML body are consistent."""
 
-    def test_autonomy_matches_tool_guidance(self, agent):
-        """Frontmatter autonomy should match tool_guidance autonomy attr."""
-        stem, content, fm = agent
-        fm_level = fm.get("autonomy", "")
-        xml_level = extract_xml_attr(content, "tool_guidance", "autonomy")
-        assert xml_level, f"{stem}: tool_guidance missing autonomy attribute"
-        assert fm_level == xml_level, (
-            f"{stem}: frontmatter autonomy '{fm_level}' != "
-            f"tool_guidance autonomy '{xml_level}'"
-        )
-
-    def test_autonomy_permission_mode_consistency(self, agent):
-        """Autonomy level must map to the correct permissionMode."""
-        stem, content, fm = agent
-        autonomy = fm.get("autonomy", "")
-        mode = fm.get("permissionMode", "")
-        expected = AUTONOMY_TO_PERMISSION.get(autonomy)
-        assert mode == expected, (
-            f"{stem}: autonomy '{autonomy}' should map to "
-            f"permissionMode '{expected}', got '{mode}'"
+    def test_tool_guidance_has_content(self, agent):
+        """tool_guidance should contain Proceed/Ask First/Never behavioral rules."""
+        stem, content, _ = agent
+        tg = extract_xml_content(content, "tool_guidance")
+        assert tg, f"{stem}: tool_guidance is empty"
+        assert "Proceed" in tg or "Ask First" in tg or "Never" in tg, (
+            f"{stem}: tool_guidance missing behavioral rules (Proceed/Ask First/Never)"
         )
 
     def test_mission_appears_in_description(self, agent):
@@ -251,8 +266,8 @@ class TestSimplicityGuideSpecific:
         self.content = path.read_text()
         self.fm = parse_frontmatter(self.content)
 
-    def test_autonomy_is_low(self):
-        assert self.fm["autonomy"] == "low"
+    def test_permission_mode_is_plan(self):
+        assert self.fm["permissionMode"] == "plan"
 
     def test_has_osl_core_loop(self):
         """Orient-Step-Learn is the defining methodology."""

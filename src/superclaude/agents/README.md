@@ -129,49 +129,49 @@ tools: Read, Grep, Task(code-reviewer), Task(debugger)
 
 Without this restriction, an agent with Task access can spawn any available subagent. Use this for controlled multi-agent workflows. The `Task(AgentName)` deny pattern can disable specific agents in `disallowedTools`.
 
-## Autonomy Framework
+## Permission Framework
 
-Agents operate under three autonomy levels that map to Claude Code's `permissionMode` for system-level enforcement:
+Agents operate under Claude Code's `permissionMode` for system-level enforcement, with `maxTurns` and `disallowedTools` providing additional guardrails:
 
-### Level Definitions
+### Permission Levels
 
-| Level | permissionMode | Effect | User Interaction |
-|-------|---------------|--------|------------------|
-| **high** | `acceptEdits` | File edits auto-approved; Bash/MCP still require approval | Inform after completion |
-| **medium** | `default` | Each tool prompted on first use | Confirm before execution |
-| **low** | `plan` | Read-only; all modifications blocked until user approves | Confirm each major step |
+| permissionMode | maxTurns | Effect | User Interaction |
+|---------------|----------|--------|------------------|
+| `acceptEdits` | 50 | File edits auto-approved; Bash/MCP still require approval | Inform after completion |
+| `default` | 25 | Each tool prompted on first use | Confirm before execution |
+| `plan` | 15 | Read-only; all modifications blocked until user approves | Confirm each major step |
 
-### Autonomy by Agent
+### Agent Configuration
 
-| Agent | Model | Autonomy | permissionMode | Rationale |
-|-------|-------|----------|---------------|-----------|
-| `deep-research-agent` | opus | high | acceptEdits | Read-only web research, no code changes |
-| `python-expert` | sonnet | high | acceptEdits | Code generation/analysis, user reviews output |
-| `frontend-architect` | sonnet | high | acceptEdits | UI patterns/components, no infrastructure changes |
-| `quality-engineer` | sonnet | high | acceptEdits | Test strategy/analysis, non-destructive |
-| `repo-index` | haiku | high | acceptEdits | Read-only indexing and briefing |
-| `learning-guide` | sonnet | high | acceptEdits | Educational content, non-destructive |
-| `performance-engineer` | sonnet | high | acceptEdits | Measurement/analysis, non-destructive |
-| `backend-architect` | sonnet | medium | default | API contracts affect multiple systems |
-| `pm-agent` | sonnet | medium | default | Orchestration decisions need oversight |
-| `devops-architect` | sonnet | medium | default | Infrastructure changes are significant |
-| `refactoring-expert` | sonnet | medium | default | Safe refactoring patterns with user review |
-| `self-review` | opus | medium | default | Validation findings need user judgment |
-| `socratic-mentor` | sonnet | medium | default | Teaching guidance affects learning path |
-| `requirements-analyst` | opus | medium | default | Specification decisions need stakeholder input |
-| `root-cause-analyst` | opus | medium | default | Investigation requiring careful judgment |
-| `technical-writer` | sonnet | medium | default | Documentation with user-facing impact |
-| `system-architect` | opus | low | plan | Architecture decisions have broad impact |
-| `security-engineer` | opus | low | plan | Security policies require explicit review |
-| `business-panel-experts` | opus | low | plan | Strategy decisions require business context |
-| `simplicity-guide` | opus | low | plan | Simplification judgments require deep context |
+| Agent | Model | permissionMode | maxTurns | disallowedTools | Rationale |
+|-------|-------|---------------|----------|-----------------|-----------|
+| `deep-research-agent` | opus | acceptEdits | 50 | Edit, Write, NotebookEdit | Read-only web research, no code changes |
+| `python-expert` | sonnet | acceptEdits | 50 | — | Code generation/analysis, user reviews output |
+| `frontend-architect` | sonnet | acceptEdits | 50 | — | UI patterns/components, no infrastructure changes |
+| `quality-engineer` | sonnet | acceptEdits | 50 | — | Test strategy/analysis, non-destructive |
+| `repo-index` | haiku | acceptEdits | 50 | Edit, Write, NotebookEdit | Read-only indexing and briefing |
+| `learning-guide` | sonnet | acceptEdits | 50 | — | Educational content, non-destructive |
+| `performance-engineer` | sonnet | acceptEdits | 50 | — | Measurement/analysis, non-destructive |
+| `backend-architect` | sonnet | default | 25 | NotebookEdit | API contracts affect multiple systems |
+| `pm-agent` | sonnet | default | 25 | NotebookEdit | Orchestration decisions need oversight |
+| `devops-architect` | sonnet | default | 25 | NotebookEdit | Infrastructure changes are significant |
+| `refactoring-expert` | sonnet | default | 25 | NotebookEdit | Safe refactoring patterns with user review |
+| `self-review` | opus | default | 25 | Edit, Write, NotebookEdit | Validation findings need user judgment |
+| `socratic-mentor` | sonnet | default | 25 | NotebookEdit | Teaching guidance affects learning path |
+| `requirements-analyst` | opus | default | 25 | NotebookEdit | Specification decisions need stakeholder input |
+| `root-cause-analyst` | opus | default | 25 | NotebookEdit | Investigation requiring careful judgment |
+| `technical-writer` | sonnet | default | 25 | NotebookEdit | Documentation with user-facing impact |
+| `system-architect` | opus | plan | 15 | Edit, Write, NotebookEdit | Architecture decisions have broad impact |
+| `security-engineer` | opus | plan | 15 | Edit, Write, NotebookEdit | Security policies require explicit review |
+| `business-panel-experts` | opus | plan | 15 | Edit, Write, NotebookEdit | Strategy decisions require business context |
+| `simplicity-guide` | opus | plan | 15 | Edit, Write, NotebookEdit | Simplification judgments require deep context |
 
 ### Tool Guidance Semantics
 
-Each agent's `<tool_guidance>` section follows these rules:
+Each agent's `<tool_guidance>` XML section provides behavioral guidelines (Proceed/Ask First/Never rules):
 
 ```xml
-<tool_guidance autonomy="level">
+<tool_guidance>
   <proceed conditions="read-only|analysis|non-binding|hypothesis">
     Actions that don't change state or make commitments
   </proceed>
@@ -223,16 +223,18 @@ When agents give conflicting recommendations, resolve using this priority matrix
 name: agent-name
 description: Brief description (triggers - keyword1, keyword2)
 model: opus|sonnet|haiku                  # Sub-agent model routing (v4.2)
-autonomy: high|medium|low                 # Permission boundaries (v2.1.37)
 permissionMode: acceptEdits|default|plan  # Claude Code enforcement (v4.2)
 memory: project                           # Persistent memory scope (v2.1.33)
+maxTurns: 15|25|50                        # Infinite loop prevention
+disallowedTools: Edit, Write, NotebookEdit # Tool restriction (optional)
+color: blue|green|purple|...              # UI color indicator (optional)
 ---
 ```
 
 ```xml
 <component name="agent-name" type="agent">
   <mcp servers="seq|c7"/>
-  <tool_guidance autonomy="high|medium|low">
+  <tool_guidance>
     ...
   </tool_guidance>
   <!-- Domain-specific sections -->

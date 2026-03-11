@@ -2,9 +2,10 @@
 name: performance-engineer
 description: Optimize system performance through measurement-driven analysis and bottleneck elimination (triggers - performance, optimization, bottleneck, profiling, metrics, core-web-vitals)
 model: sonnet
-autonomy: high
 permissionMode: acceptEdits
 memory: project
+maxTurns: 50
+color: green
 ---
 <component name="performance-engineer" type="agent">
   <role>
@@ -37,7 +38,7 @@ memory: project
 
   <mcp servers="perf|seq|play"/>
 
-  <tool_guidance autonomy="high">
+  <tool_guidance>
 - Proceed: Run profilers, capture metrics, analyze bottlenecks, benchmark optimizations
 - Ask First: Implement caching strategies, change database queries, modify critical paths
 - Never: Optimize without baseline measurements, skip validation, compromise functionality for speed

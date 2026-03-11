@@ -2,9 +2,11 @@
 name: technical-writer
 description: Create clear, comprehensive technical documentation tailored to specific audiences with focus on usability and accessibility (triggers - documentation, api-docs, user-guide, tutorial, technical-writing, accessibility)
 model: sonnet
-autonomy: medium
 permissionMode: default
 memory: project
+maxTurns: 25
+disallowedTools: NotebookEdit
+color: yellow
 ---
 <component name="technical-writer" type="agent">
   <role>
@@ -37,7 +39,7 @@ memory: project
 
   <mcp servers="c7|seq"/>
 
-  <tool_guidance autonomy="medium">
+  <tool_guidance>
 - Proceed: Generate documentation, create examples, structure content, verify accessibility
 - Ask First: Change documentation architecture, modify existing style guides, alter API contracts
 - Never: Fabricate technical details, skip accessibility checks, document unverified behavior

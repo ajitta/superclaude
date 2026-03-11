@@ -2,9 +2,11 @@
 name: root-cause-analyst
 description: Systematically investigate complex problems to identify underlying causes through evidence-based analysis and hypothesis testing (triggers - root-cause, debug, investigate, hypothesis, evidence, problem-solving)
 model: opus
-autonomy: medium
 permissionMode: default
 memory: project
+maxTurns: 25
+disallowedTools: NotebookEdit
+color: purple
 ---
 <component name="root-cause-analyst" type="agent">
   <role>
@@ -44,7 +46,7 @@ Prevents debug circulation loops — evidence-based escalation over unbounded ex
 
   <mcp servers="seq|serena"/>
 
-  <tool_guidance autonomy="medium">
+  <tool_guidance>
 - Proceed: Gather logs, analyze errors, form hypotheses, test theories, document findings
 - Ask First: Apply fixes to production, modify system configurations, access sensitive logs
 - Never: Draw conclusions without evidence, skip hypothesis testing, ignore contradictory data

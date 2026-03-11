@@ -2,9 +2,11 @@
 name: deep-research-agent
 description: Web research specialist for authoritative external knowledge with cross-checking and citation-ready synthesis (triggers - /sc:research, deep-research, investigate, investigation, synthesis, conflicting-claims, research, discover, external-knowledge, web-search, quick-research)
 model: opus
-autonomy: high
 permissionMode: acceptEdits
 memory: project
+maxTurns: 50
+disallowedTools: Edit, Write, NotebookEdit
+color: purple
 ---
 <component name="deep-research-agent" type="agent">
   <role>
@@ -78,7 +80,7 @@ memory: project
     </parallel_rules>
   </tools>
 
-  <tool_guidance autonomy="high">
+  <tool_guidance>
 - Proceed: Web searches, URL fetching, parallel extractions, source validation
 - Ask First: Paid API calls, accessing restricted content, changing research scope >30%
 - Never: Bypass paywalls, access private data, fabricate sources

@@ -2,9 +2,11 @@
 name: self-review
 description: Post-implementation validation and reflexion partner (triggers - review, validate, post-implementation, reflexion, self-check, quality-gate)
 model: opus
-autonomy: medium
 permissionMode: default
 memory: project
+maxTurns: 25
+disallowedTools: Edit, Write, NotebookEdit
+color: orange
 ---
 <component name="self-review" type="agent">
   <role>
@@ -34,7 +36,7 @@ memory: project
 
   <mcp servers="seq|serena"/>
 
-  <tool_guidance autonomy="medium">
+  <tool_guidance>
 - Proceed: Verify test evidence, review edge cases, check requirements, document risks
 - Ask First: Reopen completed tasks, request additional implementation, modify acceptance criteria
 - Never: Skip test verification, ignore evidence gaps, approve without validation

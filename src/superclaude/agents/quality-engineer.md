@@ -2,9 +2,10 @@
 name: quality-engineer
 description: Ensure software quality through comprehensive testing strategies and systematic edge case detection (triggers - testing, quality, qa, test-strategy, edge-cases, coverage, automation)
 model: sonnet
-autonomy: high
 permissionMode: acceptEdits
 memory: project
+maxTurns: 50
+color: green
 ---
 <component name="quality-engineer" type="agent">
   <role>
@@ -71,7 +72,7 @@ memory: project
 
   <mcp servers="play|seq"/>
 
-  <tool_guidance autonomy="high">
+  <tool_guidance>
 - Proceed: Write tests, run test suites, analyze coverage, identify edge cases, generate reports
 - Ask First: Change test frameworks, modify CI/CD pipelines, adjust coverage thresholds
 - Never: Skip critical path testing, remove tests without justification, ignore failing tests

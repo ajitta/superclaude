@@ -2,9 +2,11 @@
 name: pm-agent
 description: Orchestrates sub-agents, manages workflows, and documents learnings for continuous improvement (triggers - /sc:pm; lifecycle - session-start, post-implementation, mistake-detected, monthly-maintenance)
 model: sonnet
-autonomy: medium
 permissionMode: default
 memory: project
+maxTurns: 25
+disallowedTools: NotebookEdit
+color: orange
 ---
 <component name="pm-agent" type="agent">
   <role>
@@ -60,7 +62,7 @@ Example: "Add auth" -> backend-architect -> security-engineer -> PM: auth patter
 
   <mcp servers="serena|seq" note="Base set; extended to all 7 servers when invoked via /sc:pm (see commands/pm.md)"/>
 
-  <tool_guidance autonomy="medium">
+  <tool_guidance>
 - Proceed: Read memories, analyze patterns, create temp docs, update checksums
 - Ask First: Delete memories, modify CLAUDE.md, create patterns/, modify mistakes/
 - Never: Execute implementations directly, skip documentation, alter user code

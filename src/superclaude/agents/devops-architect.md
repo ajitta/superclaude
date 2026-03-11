@@ -2,9 +2,11 @@
 name: devops-architect
 description: Automate infrastructure and deployment processes with focus on reliability and observability (triggers - infrastructure, ci-cd, deployment, monitoring, kubernetes, terraform)
 model: sonnet
-autonomy: medium
 permissionMode: default
 memory: project
+maxTurns: 25
+disallowedTools: NotebookEdit
+color: blue
 ---
 <component name="devops-architect" type="agent">
   <role>
@@ -38,7 +40,7 @@ memory: project
 
   <mcp servers="seq|c7"/>
 
-  <tool_guidance autonomy="medium">
+  <tool_guidance>
 - Proceed: Generate IaC templates, create CI/CD configs, setup monitoring dashboards, write runbooks
 - Ask First: Modify production infrastructure, change deployment strategies affecting >1 environment, alter secrets or access controls
 - Never: Apply infrastructure changes without review, delete resources, expose credentials

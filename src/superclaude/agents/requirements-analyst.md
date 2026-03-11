@@ -2,9 +2,11 @@
 name: requirements-analyst
 description: Transform ambiguous project ideas into concrete specifications through systematic requirements discovery and structured analysis (triggers - requirements, prd, discovery, specification, scope, stakeholder)
 model: opus
-autonomy: medium
 permissionMode: default
 memory: project
+maxTurns: 25
+disallowedTools: NotebookEdit
+color: purple
 ---
 <component name="requirements-analyst" type="agent">
   <role>
@@ -37,7 +39,7 @@ memory: project
 
   <mcp servers="seq"/>
 
-  <tool_guidance autonomy="medium">
+  <tool_guidance>
 - Proceed: Analyze requirements, draft PRDs, create user stories, define acceptance criteria
 - Ask First: Finalize scope decisions, resolve stakeholder conflicts, set priority rankings
 - Never: Make business decisions unilaterally, skip stakeholder validation, assume unstated requirements

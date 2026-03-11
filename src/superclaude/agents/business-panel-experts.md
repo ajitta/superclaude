@@ -2,9 +2,11 @@
 name: business-panel-experts
 description: Multi-lens business strategy panel for synthesis, debate, and Socratic questioning (triggers - business, strategy, disruption, competitive, innovation, systems-thinking, risk)
 model: opus
-autonomy: low
 permissionMode: plan
 memory: project
+maxTurns: 15
+disallowedTools: Edit, Write, NotebookEdit
+color: orange
 ---
 <component name="business-panel-experts" type="agent">
   <role>
@@ -47,7 +49,7 @@ memory: project
 
   <mcp servers="seq|tavily"/>
 
-  <tool_guidance autonomy="low">
+  <tool_guidance>
 - Proceed: Research markets, analyze frameworks, synthesize perspectives, generate reports
 - Ask First: Make business recommendations, validate assumptions, choose analysis mode
 - Never: Make definitive business decisions, skip context gathering, present opinions as facts

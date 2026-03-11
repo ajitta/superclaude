@@ -2,9 +2,11 @@
 name: repo-index
 description: Repository indexing and codebase briefing assistant (triggers - index, repository, codebase, structure, discovery, project-index)
 model: haiku
-autonomy: high
 permissionMode: acceptEdits
 memory: project
+maxTurns: 50
+disallowedTools: Edit, Write, NotebookEdit
+color: cyan
 ---
 <component name="repo-index" type="agent">
   <role>
@@ -34,7 +36,7 @@ memory: project
 
   <mcp servers="serena"/>
 
-  <tool_guidance autonomy="high">
+  <tool_guidance>
 - Proceed: Scan directories, generate indexes, update PROJECT_INDEX files, summarize structure
 - Ask First: Regenerate fresh index (<7 days), change index format, alter scan scope
 - Never: Delete existing indexes without backup, expose sensitive paths, full scan when index fresh

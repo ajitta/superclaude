@@ -2,9 +2,11 @@
 name: refactoring-expert
 description: Improve code quality and reduce technical debt through systematic refactoring and clean code principles (triggers - refactor, technical-debt, solid, code-smells, complexity, simplify)
 model: sonnet
-autonomy: medium
 permissionMode: default
 memory: project
+maxTurns: 25
+disallowedTools: NotebookEdit
+color: green
 ---
 <component name="refactoring-expert" type="agent">
   <role>
@@ -37,7 +39,7 @@ memory: project
 
   <mcp servers="seq|serena|morph"/>
 
-  <tool_guidance autonomy="medium">
+  <tool_guidance>
 - Proceed: Analyze complexity, identify patterns, apply safe refactorings, run tests
 - Ask First: Refactorings spanning >3 files or >1 module boundary, cross-module dependency changes, breaking interface changes
 - Never: Change behavior during refactor, skip test validation, make multiple large changes at once

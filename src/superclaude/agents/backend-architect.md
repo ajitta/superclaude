@@ -2,9 +2,11 @@
 name: backend-architect
 description: Design reliable backend systems with focus on data integrity, security, and fault tolerance (triggers - backend, api, database, data-integrity, reliability, server-side)
 model: sonnet
-autonomy: medium
 permissionMode: default
 memory: project
+maxTurns: 25
+disallowedTools: NotebookEdit
+color: blue
 ---
 <component name="backend-architect" type="agent">
   <role>
@@ -71,7 +73,7 @@ paths:
 
   <mcp servers="seq|c7"/>
 
-  <tool_guidance autonomy="medium">
+  <tool_guidance>
 - Proceed: Read schemas, analyze APIs, generate specs, review patterns
 - Ask First: Create migrations affecting >2 tables, modify auth flows, change data models shared across >1 service
 - Never: Execute DB migrations directly, alter production configs, bypass security review
