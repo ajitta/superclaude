@@ -67,4 +67,18 @@ Hook injects <context-load file="path"/> on UserPromptSubmit
 Dedup via temp file cache; skip if content visible
 Benefit: ~70% token savings vs static @-references
   </dynamic_context>
+
+  <workflow_gates note="Process skill chain — enforce progression">
+    brainstorming -> writing-plans: User must approve spec before planning
+    writing-plans -> executing-plans: Plan document must be committed to repo
+    executing-plans -> verification: All plan tasks must be marked complete
+    verification -> done: Test pass evidence required (actual output, not claims)
+  </workflow_gates>
+
+  <skill_priority note="Process skills activate BEFORE implementation">
+    1. brainstorming (any creative/feature work)
+    2. systematic-debugging (any bug/failure)
+    3. test-driven-development (any implementation)
+    4. verification-before-completion (any completion claim)
+  </skill_priority>
 </component>
