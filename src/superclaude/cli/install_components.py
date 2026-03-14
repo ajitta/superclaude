@@ -23,6 +23,43 @@ from .install_settings import (
     update_claude_md_import,
 )
 
+# Skills that overlap with superpowers plugin — skip when superpowers is installed
+SUPERPOWERS_OVERLAPPING_SKILLS = {
+    "brainstorming",
+    "dispatching-parallel-agents",
+    "executing-plans",
+    "finishing-a-development-branch",
+    "receiving-code-review",
+    "requesting-code-review",
+    "systematic-debugging",
+    "test-driven-development",
+    "using-git-worktrees",
+    "verification-before-completion",
+    "writing-plans",
+}
+
+
+def _detect_superpowers(base_path: Path) -> bool:
+    """Detect if the superpowers plugin is installed.
+
+    Checks the Claude Code plugin cache for any superpowers version.
+
+    Args:
+        base_path: Base Claude config path (e.g., ~/.claude)
+
+    Returns:
+        True if superpowers plugin is found
+    """
+    plugin_cache = base_path / "plugins" / "cache" / "claude-plugins-official" / "superpowers"
+    if plugin_cache.exists() and any(plugin_cache.iterdir()):
+        return True
+    # Also check if superpowers skills dir has content (manual install)
+    plugin_skills = base_path / "plugins"
+    if plugin_skills.exists():
+        for p in plugin_skills.rglob("using-superpowers/SKILL.md"):
+            return True
+    return False
+
 
 def _resolve_template_paths(base_path: Path, scope: str = "user") -> dict:
     """Compute resolved template variable values for a given scope."""
@@ -100,8 +137,22 @@ def install_component(
 
     # Handle skills directory specially (has subdirectories)
     if component == "skills":
+        # Detect superpowers to avoid installing overlapping skills
+        superpowers_present = _detect_superpowers(base_path) if base_path else False
+        skipped_overlap = []
+
         for skill_dir in source_dir.iterdir():
             if skill_dir.is_dir() and not skill_dir.name.startswith(("_", ".")):
+                # Skip overlapping skills when superpowers plugin is installed
+                if superpowers_present and skill_dir.name in SUPERPOWERS_OVERLAPPING_SKILLS:
+                    # Also remove if previously installed (clean up stale copies)
+                    target_skill_dir = target_dir / skill_dir.name
+                    if target_skill_dir.exists():
+                        shutil.rmtree(target_skill_dir)
+                    skipped_overlap.append(skill_dir.name)
+                    skipped += 1
+                    continue
+
                 target_skill_dir = target_dir / skill_dir.name
                 if target_skill_dir.exists() and not force:
                     skipped += 1
@@ -127,6 +178,12 @@ def install_component(
                 except Exception as e:
                     failed += 1
                     failed_names.append(f"{skill_dir.name}: {e}")
+
+        if skipped_overlap:
+            failed_names.append(
+                f"Skipped {len(skipped_overlap)} skills (superpowers plugin provides them): "
+                + ", ".join(sorted(skipped_overlap))
+            )
     else:
         # Copy .md files (excluding README.md)
         for source_file in source_dir.glob("*.md"):
