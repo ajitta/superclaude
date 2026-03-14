@@ -460,7 +460,7 @@ def main() -> None:
     stdin_data = sys.stdin.read() if not sys.stdin.isatty() else ""
     prompt = _extract_prompt(stdin_data)
 
-    if not prompt.strip():
+    if not prompt or not prompt.strip():
         return
 
     # v2.1.0: Output skills summary if enabled

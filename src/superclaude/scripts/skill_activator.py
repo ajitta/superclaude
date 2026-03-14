@@ -198,6 +198,8 @@ def main() -> None:
     # Read and parse JSON input from Claude Code
     stdin_data = sys.stdin.read() if not sys.stdin.isatty() else ""
     prompt = _extract_prompt(stdin_data)
+    if not prompt:
+        return
 
     # Execute check and print hints
     hints = check_skill_triggers(prompt)
