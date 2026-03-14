@@ -99,7 +99,7 @@ src/superclaude/
 ├── utils/               # Shared utilities (atomic_write_json)
 ├── commands/            # 30 slash command markdown files
 ├── agents/              # 20 agent definition markdown files
-├── skills/              # 3 skills: confidence-check, ship, simplicity-coach (each has SKILL.md manifest)
+├── skills/              # 15 skills: 12 process skills (ported from superpowers) + confidence-check, ship, simplicity-coach
 ├── modes/               # 8 mode/config markdown files
 ├── mcp/                 # MCP server docs + configs/
 ├── core/                # FLAGS.md, PRINCIPLES.md, RULES.md

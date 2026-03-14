@@ -11,59 +11,31 @@ description: Apply systematic improvements to code quality, performance, and mai
   <syntax>/sc:improve [target] [--type quality|performance|maintainability|style] [--safe] [--interactive]</syntax>
 
   <flow>
-    1. Analyze: Improvement opportunities + quality issues
-    2. Plan: Approach + persona activation
-    3. Execute: Systematic improvements + best practices
-    4. Validate: Functionality preservation + quality
+    1. Analyze: Identify improvement opportunities
+    2. Plan: Select approach + activate relevant persona
+    3. Execute: Apply improvements following best practices
+    4. Validate: Ensure functionality preserved
     5. Document: Summary + future recommendations
   </flow>
 
-  <mcp servers="seq|c7"/>
   <personas p="arch|perf|qual|sec|refactor|simple"/>
 
-  <tools>
-    - Read/Grep/Glob: Code analysis + opportunity ID
-    - Edit: Safe modification + refactoring
-    - TaskCreate/TaskUpdate: Multi-file progress tracking
-    - Task: Large-scale improvement delegation
-  </tools>
-
   <patterns>
-    - Quality: Analysis → tech debt ID → refactoring
-    - Performance: Profiling → bottleneck ID → optimization
-    - Maintainability: Structure → complexity reduction → docs
-    - Security: Vulnerability → pattern application → validation
+    - Quality: tech debt ID → refactoring → validation
+    - Performance: profiling → bottleneck ID → optimization
+    - Maintainability: complexity reduction → structure → docs
+    - Security: vulnerability scan → pattern application → validation
   </patterns>
 
   <examples>
-
-| Input | Output |
-|-------|--------|
-| `src/ --type quality --safe` | Systematic quality + safe refactor |
-| `api-endpoints --type performance --interactive` | Bottleneck analysis |
-| `legacy-modules --type maintainability --interactive` | Structure improvement |
-| `auth-service --type quality --safe` | Security-focused hardening |
-
-  <example name="improve-without-baseline" type="error-path">
-    <input>/sc:improve --type performance (without prior profiling or metrics)</input>
-    <why_wrong>Improving performance without a baseline means you can't measure if changes helped.</why_wrong>
-    <correct>/sc:analyze --focus perf first → establish baseline → then /sc:improve --type performance</correct>
-  </example>
-
+  | Input | Output |
+  |-------|--------|
+  | `src/ --type quality --safe` | Safe quality refactoring |
+  | `api/ --type performance` | Bottleneck analysis + optimization |
+  | `--type performance` (no baseline) | Error: run /sc:analyze --focus perf first |
   </examples>
 
-  <token_note>Medium-high consumption — scales with target scope; use --safe for conservative changes</token_note>
+  <bounds will="systematic improvements|safe refactoring" wont="risky changes without confirm|arch changes without analysis"/>
 
-  <bounds will="systematic improvements|multi-persona|safe refactoring" wont="risky changes without confirm|arch changes without impact analysis|override standards" fallback="Ask user for guidance when uncertain" type="execution">
-
-    Implement improvements as requested | Safe mode (--safe): Only non-breaking changes | Interactive mode (--interactive): Confirm each change
-
-  </bounds>
-
-  <auto_fix_threshold>
-    <safe>Style fixes, minor refactoring, documentation updates</safe>
-    <approval_required>API changes, dependency updates, architecture modifications</approval_required>
-  </auto_fix_threshold>
-
-  <handoff next="/sc:test /sc:git"/>
+  <handoff next="/sc:test /sc:analyze"/>
 </component>
