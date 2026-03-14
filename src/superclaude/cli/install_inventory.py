@@ -92,8 +92,8 @@ def list_all_components(base_path: Path = None) -> Dict[str, Dict[str, Any]]:
 
         # Count source files (excluding README.md and __init__.py)
         if component == "skills":
-            source_count = sum(1 for d in source_dir.iterdir() if d.is_dir()) if source_dir.exists() else 0
-            installed_count = sum(1 for d in target_dir.iterdir() if d.is_dir()) if target_dir.exists() else 0
+            source_count = sum(1 for d in source_dir.iterdir() if d.is_dir() and not d.name.startswith(("_", "."))) if source_dir.exists() else 0
+            installed_count = sum(1 for d in target_dir.iterdir() if d.is_dir() and not d.name.startswith(("_", "."))) if target_dir.exists() else 0
         else:
             source_count = sum(1 for f in source_dir.glob("*.md") if f.stem.upper() != "README") if source_dir.exists() else 0
             installed_count = sum(1 for f in target_dir.glob("*.md") if f.stem.upper() != "README") if target_dir.exists() else 0
