@@ -1,4 +1,8 @@
 """
+DEPRECATED: This module is superseded by the superclaude process skills
+(systematic-debugging, test-driven-development).
+Kept for backward compatibility with existing pytest fixtures and tests.
+
 Self-Correction Engine - Learn from Mistakes
 
 Detects failures, analyzes root causes, and prevents recurrence
