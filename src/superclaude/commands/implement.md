@@ -65,5 +65,5 @@ description: Feature and code implementation with intelligent persona activation
 
   </bounds>
 
-  <handoff next="/sc:test /sc:git"/>
+  <handoff next="/sc:test /sc:build"/>
 </component>

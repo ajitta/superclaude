@@ -49,7 +49,7 @@ Slash commands for Claude Code. Installed to `~/.claude/commands/sc/` when users
 
 | Command | Description |
 |---------|-------------|
-| `/sc:git` | Git operations and workflows |
+| `/sc:review` | Code review with structured feedback |
 | `/sc:pm` | Project Manager Agent: orchestrate sub-agents and manage workflows |
 | `/sc:spawn` | Meta-system task orchestration with intelligent breakdown and delegation |
 

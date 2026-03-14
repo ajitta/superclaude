@@ -68,5 +68,5 @@ description: Build, compile, and package projects with intelligent error handlin
 
   </bounds>
 
-  <handoff next="/sc:test /sc:git /sc:troubleshoot"/>
+  <handoff next="/sc:test /sc:troubleshoot"/>
 </component>

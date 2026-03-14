@@ -76,5 +76,5 @@ description: Execute complex tasks with intelligent workflow management and dele
 
   </bounds>
 
-  <handoff next="/sc:test /sc:git"/>
+  <handoff next="/sc:test /sc:implement"/>
 </component>

@@ -74,5 +74,5 @@ description: Systematically clean up code, remove dead code, and optimize projec
     <approval_required>Exported functions, config files, shared modules</approval_required>
   </auto_fix_threshold>
 
-  <handoff next="/sc:test /sc:git"/>
+  <handoff next="/sc:test /sc:build"/>
 </component>
