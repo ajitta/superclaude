@@ -15,6 +15,7 @@ from .install_paths import (
     _get_target_dir,
     get_base_path,
 )
+from .install_components import SUPERPOWERS_OVERLAPPING_SKILLS, _detect_superpowers
 from .install_settings import (
     _is_superclaude_hook,
     _load_settings,
