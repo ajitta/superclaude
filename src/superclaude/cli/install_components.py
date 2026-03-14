@@ -101,7 +101,7 @@ def install_component(
     # Handle skills directory specially (has subdirectories)
     if component == "skills":
         for skill_dir in source_dir.iterdir():
-            if skill_dir.is_dir():
+            if skill_dir.is_dir() and not skill_dir.name.startswith(("_", ".")):
                 target_skill_dir = target_dir / skill_dir.name
                 if target_skill_dir.exists() and not force:
                     skipped += 1
