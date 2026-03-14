@@ -69,5 +69,5 @@ description: Execute tests with coverage analysis and automated quality reportin
 
   </bounds>
 
-  <handoff next="/sc:troubleshoot /sc:implement /sc:git"/>
+  <handoff next="/sc:troubleshoot /sc:implement"/>
 </component>

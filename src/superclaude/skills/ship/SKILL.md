@@ -82,5 +82,5 @@ disable-model-invocation: true
 
   <bounds will="safe delivery automation|conventional commits|PR creation" wont="force push|commit secrets|push to main without confirmation|skip user approval"/>
 
-  <handoff next="/sc:test /sc:git"/>
+  <handoff next="/sc:test /sc:build"/>
 </component>

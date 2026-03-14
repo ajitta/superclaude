@@ -5,7 +5,7 @@ model: opus
 permissionMode: default
 memory: project
 maxTurns: 25
-disallowedTools: Edit, Write, NotebookEdit
+disallowedTools: NotebookEdit
 color: orange
 ---
 <component name="self-review" type="agent">
