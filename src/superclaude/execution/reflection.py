@@ -1,4 +1,8 @@
 """
+DEPRECATED: This module is superseded by the superclaude process skills
+(systematic-debugging, verification-before-completion).
+Kept for backward compatibility with existing pytest fixtures and tests.
+
 Reflection Engine - 3-Stage Pre-Execution Confidence Check
 
 Implements the "Triple Reflection" pattern:
