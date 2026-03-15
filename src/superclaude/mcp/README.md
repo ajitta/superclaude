@@ -1,6 +1,10 @@
 # SuperClaude MCP Server Documentation
 
-Configuration and usage docs for MCP (Model Context Protocol) servers integrated with SuperClaude.
+Tool reference — documentation and configuration for integrated MCP servers.
+
+## Content Delivery
+
+MCP server docs are loaded on-demand by `context_loader.py` via flag/keyword triggers. Server configs in `configs/` are installed by `install_mcp.py` into Claude Code's `settings.json`.
 
 ## Available MCP Servers
 
@@ -29,21 +33,17 @@ Configuration and usage docs for MCP (Model Context Protocol) servers integrated
 |-----------|---------|
 | Context7 → Sequential | Docs provided → strategy analyzed |
 | Context7 → Magic | Patterns supplied → components generated |
-| Sequential → Magic | UI logic analyzed → components implemented |
 | Sequential → Playwright | Test strategy planned → tests executed |
 | Sequential → DevTools | Perf strategy planned → metrics verified |
-| Serena → Morphllm | Symbol analysis → pattern edits executed |
 | Serena → Sequential | Symbol context + memory → architectural analysis |
-| Tavily → Sequential | Info gathered → synthesized/analyzed |
-| Tavily → Playwright | URLs discovered → complex content extracted |
+| Serena → Morphllm | Symbol analysis → pattern edits executed |
 | Tavily → Context7 | Updates searched → stable docs provided |
-| Tavily → Serena | Research done → persisted to Serena memory |
+| Tavily → Playwright | URLs discovered → complex content extracted |
 | Magic → Playwright | UI created → accessibility validated |
 | Playwright → DevTools | Flow automated → performance analyzed |
-
-**Key distinctions:** Serena (semantic/symbol ops + project memory) vs Morphllm (pattern/bulk ops) | Tavily (web search) vs WebFetch (single URL) | DevTools (metrics) vs Playwright (automation) vs Claude-in-Chrome (live debug)
 
 ## Related
 
 - `core/FLAGS.md` — MCP flag definitions and auto-detection
-- `configs/` — Server configuration files
+- `configs/` — Server configuration files for `settings.json`
+- `scripts/context_loader.py` — On-demand delivery mechanism

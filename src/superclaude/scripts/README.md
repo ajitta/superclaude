@@ -1,69 +1,45 @@
 # SuperClaude Scripts
 
-Utility scripts for automation, session management, and hook integrations.
+Hook infrastructure — Python and shell scripts for context loading, session management, and automation.
+
+## Content Delivery
+
+Scripts are referenced by `hooks.json` and executed by Claude Code's hook runtime. They are not user-facing — they power the framework's dynamic behavior behind the scenes.
 
 ## Available Scripts
 
 ### Python Scripts
 
-| Script | Description |
-|--------|-------------|
-| `session_init.py` | Initialize Claude Code session with SuperClaude context |
-| `context_loader.py` | Load and merge context files dynamically |
-| `skill_activator.py` | Activate skills based on task requirements |
+| Script | Purpose |
+|--------|---------|
+| `context_loader.py` | Dynamic context file loading — TRIGGER_MAP matching, session dedup, 8K token budget, hybrid injection |
+| `session_init.py` | Session initialization — load SuperClaude context at startup |
+| `skill_activator.py` | Task-aware skill activation based on context |
+| `skill_watcher.py` | Watch for skill file changes (hot reload) |
+| `token_estimator.py` | Context window usage estimation |
 | `prettier_hook.py` | Code formatting hook using Prettier |
+| `test_runner_hook.py` | Test execution hook |
 | `clean_command_names.py` | Utility for cleaning/normalizing command names |
+| `context_reset.py` | Reset context loader state for fresh sessions |
 
 ### Shell Scripts
 
-| Script | Description |
-|--------|-------------|
+| Script | Purpose |
+|--------|---------|
 | `session-init.sh` | Shell wrapper for session initialization |
 | `skill-activator.sh` | Shell wrapper for skill activation |
 
-## Usage
+## Key Architecture: context_loader.py
 
-### Session Initialization
+The context loader is the primary on-demand delivery mechanism:
+- **TRIGGER_MAP** — maps flags/keywords to content files (modes/, mcp/, core/BUSINESS_SYMBOLS)
+- **Session dedup** — prevents loading the same content twice per session
+- **8K token budget** — limits total on-demand context injection
+- **Hybrid injection** — combines flag-based and keyword-based triggers
 
-Session scripts are automatically invoked when Claude Code starts with SuperClaude:
+## Related
 
-```bash
-# Manually trigger session init (if needed)
-python -m superclaude.scripts.session_init
-```
-
-### Context Loading
-
-```python
-from superclaude.scripts.context_loader import load_context
-
-context = load_context(["agents/deep-research.md", "modes/precision.md"])
-```
-
-### Hook Integration
-
-Scripts in this directory can be referenced in `hooks/hooks.json` for event-driven automation:
-
-```json
-{
-  "PreToolUse": {
-    "Bash": "python -m superclaude.scripts.prettier_hook"
-  }
-}
-```
-
-## For Developers
-
-### Adding New Scripts
-
-1. Create the script in this directory
-2. Add Python entry point in `__init__.py` if needed
-3. Update this README
-4. If it's a hook script, register it in `hooks/hooks.json`
-
-### Script Guidelines
-
-- Python scripts should be importable as modules
-- Shell scripts should be POSIX-compliant
-- Include docstrings and usage examples
-- Handle errors gracefully with clear messages
+- `hooks/hooks.json` — Hook definitions that reference these scripts
+- `hooks/hook_tracker.py` — Session tracking for `once: true` hooks
+- `modes/` — Content loaded by context_loader.py
+- `mcp/` — Content loaded by context_loader.py

@@ -1,19 +1,23 @@
 # SuperClaude Commands
 
-Slash commands for Claude Code. Installed to `~/.claude/commands/sc/` when users run `superclaude install`.
+Workflow entry points — user-facing slash commands for Claude Code.
+
+## Content Delivery
+
+Commands are managed by Claude Code's native command system. Installed to `~/.claude/commands/sc/` on `superclaude install`, accessible as `/sc:*` slash commands.
 
 ## Available Commands
 
-### Core Commands
+### Core
 
 | Command | Description |
 |---------|-------------|
 | `/sc` | Show all available SuperClaude commands |
 | `/sc:help` | Get help on SuperClaude usage |
-| `/sc:load` | Session lifecycle: load project context via Serena MCP + auto memory |
-| `/sc:save` | Session lifecycle: persist context via Serena MCP + auto memory |
+| `/sc:load` | Load project context via Serena MCP + auto memory |
+| `/sc:save` | Persist context via Serena MCP + auto memory |
 
-### Development Commands
+### Development
 
 | Command | Description |
 |---------|-------------|
@@ -21,17 +25,17 @@ Slash commands for Claude Code. Installed to `~/.claude/commands/sc/` when users
 | `/sc:build` | Build and compile projects |
 | `/sc:test` | Run tests with coverage analysis |
 | `/sc:analyze` | Analyze code quality and patterns |
-| `/sc:improve` | Apply systematic improvements to quality, performance, and maintainability |
+| `/sc:improve` | Apply systematic improvements |
 | `/sc:explain` | Explain code behavior and architecture |
 | `/sc:cleanup` | Clean up code, remove dead code |
 | `/sc:troubleshoot` | Debug and fix issues |
 
-### Planning & Design Commands
+### Planning & Design
 
 | Command | Description |
 |---------|-------------|
 | `/sc:design` | Design systems and architectures |
-| `/sc:brainstorm` | Interactive requirements discovery through Socratic dialogue |
+| `/sc:brainstorm` | Interactive requirements discovery |
 | `/sc:estimate` | Estimate effort and complexity |
 | `/sc:workflow` | Define and execute workflows |
 | `/sc:task` | Manage development tasks |
@@ -43,15 +47,15 @@ Slash commands for Claude Code. Installed to `~/.claude/commands/sc/` when users
 | `/sc:research` | Deep web research with parallel search |
 | `/sc:document` | Generate documentation |
 | `/sc:index-repo` | Repository indexing for context optimization |
-| `/sc:reflect` | Task reflection and validation using Serena MCP analysis |
+| `/sc:reflect` | Task reflection and validation |
 
 ### Git & Project Management
 
 | Command | Description |
 |---------|-------------|
 | `/sc:review` | Code review with structured feedback |
-| `/sc:pm` | Project Manager Agent: orchestrate sub-agents and manage workflows |
-| `/sc:spawn` | Meta-system task orchestration with intelligent breakdown and delegation |
+| `/sc:pm` | Project Manager Agent orchestration |
+| `/sc:spawn` | Meta-system task orchestration with delegation |
 
 ### Advisory Panels
 
@@ -60,43 +64,23 @@ Slash commands for Claude Code. Installed to `~/.claude/commands/sc/` when users
 | `/sc:business-panel` | Business strategy advisory panel |
 | `/sc:spec-panel` | Technical specification panel |
 
-### Utility Commands
+### Utility
 
 | Command | Description |
 |---------|-------------|
-| `/sc:agent` | Session controller orchestrating investigation, implementation, and review |
-| `/sc:recommend` | Intelligent command recommendation engine for optimal command selection |
-| `/sc:select-tool` | Intelligent MCP tool selection based on complexity scoring |
-| `/sc:index` | Generate comprehensive project documentation and knowledge base |
+| `/sc:agent` | Session controller for investigation, implementation, review |
+| `/sc:recommend` | Intelligent command recommendation engine |
+| `/sc:select-tool` | MCP tool selection based on complexity scoring |
+| `/sc:index` | Generate project documentation and knowledge base |
 
-## Usage
+## Authoring Rules
 
-Commands are invoked in Claude Code with the `/sc:` prefix:
+See `.claude/rules/command-authoring.md` for the complete authoring specification.
 
-```
-/sc:implement Add user authentication
-/sc:test --coverage
-/sc:research "best practices for API design"
-```
+Validation: `uv run python -m pytest tests/unit/test_command_structure.py -v`
 
-## For Developers
+## Related
 
-### File Location
-
-- **Source**: `src/superclaude/commands/`
-- **Installed to**: `~/.claude/commands/sc/`
-
-### Adding New Commands
-
-1. Create a new `.md` file in this directory
-2. Follow the existing command structure
-3. Update this README with the new command
-4. Test with `superclaude install` and verify in Claude Code
-
-### Command File Structure
-
-Each command file should include:
-- Clear description of the command's purpose
-- Parameter definitions (if any)
-- Execution workflow
-- Output format expectations
+- `agents/` — Domain personas that commands route to
+- `modes/` — Cognitive overlays activated by commands
+- `skills/` — Execution containers with hooks and tool restrictions

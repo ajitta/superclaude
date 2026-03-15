@@ -3,7 +3,7 @@
     <mission>Behavioral flags for Claude Code execution modes and tool selection</mission>
   </role>
 
-  <modes>
+  <modes note="Behavioral hints — model reads these directly, no extended docs injected">
 --brainstorm: vague requests, 'maybe' → collaborative discovery, probing questions
 --business-panel: multi-expert business analysis, strategy synthesis
 --research: systematic investigation, evidence-based reasoning

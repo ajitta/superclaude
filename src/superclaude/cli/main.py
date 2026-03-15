@@ -57,7 +57,8 @@ def install(force: bool, list_only: bool, list_all: bool, scope: str):
     - Slash commands to commands/sc/
     - Agent definitions to agents/
     - Skills to skills/
-    - Framework files to superclaude/ (core, modes, mcp)
+    - Behavioral modes to superclaude/modes/
+    - Framework files to superclaude/ (core, mcp)
 
     Scopes:
     - user (default): Install to ~/.claude/

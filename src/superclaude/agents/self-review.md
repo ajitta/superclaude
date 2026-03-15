@@ -2,10 +2,10 @@
 name: self-review
 description: Post-implementation validation and reflexion partner (triggers - review, validate, post-implementation, reflexion, self-check, quality-gate)
 model: opus
-permissionMode: default
+permissionMode: plan
 memory: project
-maxTurns: 25
-disallowedTools: NotebookEdit
+maxTurns: 15
+disallowedTools: Edit, Write, NotebookEdit
 color: orange
 ---
 <component name="self-review" type="agent">
