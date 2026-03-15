@@ -40,24 +40,38 @@ SUPERPOWERS_OVERLAPPING_SKILLS = {
 
 
 def _detect_superpowers(base_path: Path) -> bool:
-    """Detect if the superpowers plugin is installed.
+    """Detect if the superpowers plugin is actively enabled.
 
-    Checks the Claude Code plugin cache for any superpowers version.
+    Checks settings.json enabledPlugins for any superpowers entry set to true.
+    Falls back to cache check only if settings.json is unreadable.
 
     Args:
         base_path: Base Claude config path (e.g., ~/.claude)
 
     Returns:
-        True if superpowers plugin is found
+        True if superpowers plugin is enabled
     """
+    import json
+
+    # Primary: check enabledPlugins in settings.json
+    settings_path = base_path / "settings.json"
+    if settings_path.exists():
+        try:
+            with open(settings_path) as f:
+                settings = json.load(f)
+            enabled_plugins = settings.get("enabledPlugins", {})
+            for plugin_key, is_enabled in enabled_plugins.items():
+                if "superpowers" in plugin_key and is_enabled:
+                    return True
+            # settings.json readable and no superpowers enabled → not present
+            return False
+        except (json.JSONDecodeError, OSError):
+            pass  # Fall through to cache check
+
+    # Fallback: check plugin cache (for environments without settings.json)
     plugin_cache = base_path / "plugins" / "cache" / "claude-plugins-official" / "superpowers"
     if plugin_cache.exists() and any(plugin_cache.iterdir()):
         return True
-    # Also check if superpowers skills dir has content (manual install)
-    plugin_skills = base_path / "plugins"
-    if plugin_skills.exists():
-        for p in plugin_skills.rglob("using-superpowers/SKILL.md"):
-            return True
     return False
 
 
