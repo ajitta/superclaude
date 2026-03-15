@@ -1,149 +1,61 @@
 ---
 name: writing-plans
 description: |
-  Create detailed implementation plans with zero-context assumption. Use when you have
-  a spec or requirements for a multi-step task, before touching code. Produces bite-sized
-  TDD tasks with exact file paths, code, and verification commands.
+  Create detailed implementation plans with bite-sized TDD tasks, exact file paths,
+  complete code, and verification commands. Use when you have a spec or requirements
+  for a multi-step task, before touching code.
 ---
 
-# Writing Plans
+## Purpose
 
-## Overview
+Write comprehensive implementation plans with bite-sized tasks that include exact file paths, complete code, and verification commands. DRY. YAGNI. TDD. Frequent commits.
 
-Write comprehensive implementation plans assuming zero codebase context. Every plan must be self-contained: a developer with no prior knowledge should be able to execute it start to finish.
+## Workflow
 
-Principles:
-- **Zero-context assumption** -- document every file path, every import, every command
-- **Bite-sized tasks** -- each step is one discrete action (2-5 minutes)
-- **TDD always** -- write the test first, watch it fail, implement, watch it pass
-- **DRY / YAGNI** -- no speculative abstractions, no duplicated logic
-- **Frequent commits** -- commit after each passing test or logical unit
+1. **Announce** — "I'm using the writing-plans skill to create the implementation plan."
+2. **Map file structure** — before defining tasks, list which files will be created or modified and what each is responsible for. In existing codebases, follow established patterns
+3. **Write tasks** — each step should be a single action (2-5 minutes). Use checkbox (`- [ ]`) syntax. Include exact file paths, complete code (not "add validation"), and exact commands with expected output
+4. **Add plan header** — every plan starts with:
+   ```markdown
+   # [Feature Name] Implementation Plan
+   > **For agentic workers:** REQUIRED: Use subagent-driven-development (if subagents available) or executing-plans to implement this plan. Steps use checkbox (`- [ ]`) syntax for tracking.
+   **Goal:** [One sentence]
+   **Architecture:** [2-3 sentences]
+   **Tech Stack:** [Key technologies]
+   ---
+   ```
+5. **Plan review loop** — dispatch `plan-document-reviewer` subagent with crafted review context (not session history), providing chunk content and spec path. Fix issues and re-dispatch until approved, max 5 iterations before surfacing to human. Use `## Chunk N: <name>` headings, each chunk <=1000 lines
+6. **Save** — to `docs/superpowers/plans/YYYY-MM-DD-<feature-name>.md` (user preferences override)
+7. **Execution handoff** — if subagents are available, use subagent-driven-development. Otherwise, hand off to executing-plans
 
-## Announcement
+## Task Template
 
-> I'm using the writing-plans skill to create the implementation plan.
+````markdown
+### Task N: [Component Name]
 
-## Output Location
+**Files:**
+- Create: `exact/path/to/file.py`
+- Modify: `exact/path/to/existing.py:123-145`
+- Test: `tests/exact/path/to/test.py`
 
-Save plans to: `docs/superpowers/plans/YYYY-MM-DD-<feature-name>.md`
+- [ ] **Step 1: Write the failing test**
+- [ ] **Step 2: Run test to verify it fails**
+- [ ] **Step 3: Write minimal implementation**
+- [ ] **Step 4: Run test to verify it passes**
+- [ ] **Step 5: Commit**
+````
 
-Create the directory if it does not exist.
+## Constraints
 
-## Scope Check
+- Every step should include exact file paths and complete code
+- Reference relevant docs and skills with @ syntax
+- Reviewers are advisory — explain disagreements if you believe feedback is incorrect
+- If a spec covers multiple independent subsystems, suggest separate plans — one per subsystem
 
-Before writing, assess the spec:
-- If the spec covers **multiple independent subsystems**, suggest breaking into separate plans
-- Each plan should target one cohesive feature or subsystem
-- Ask the user before splitting: "This spec spans X and Y. Separate plans recommended. Proceed?"
+## Completion
 
-## Step 1: Map the File Structure
+Plan is saved, reviewed, and approved. Execution handoff message is delivered.
 
-Before writing any tasks, map every file that will be created or modified.
+## Next
 
-- List each file with its purpose and responsibility
-- One responsibility per file -- no god-files
-- Follow existing project patterns (naming, directory structure, imports)
-- Mark files as `[new]` or `[modify]`
-
-Example:
-```
-src/auth/token.py       [new]    -- JWT token generation and validation
-src/auth/middleware.py   [modify] -- Add token verification to request pipeline
-tests/unit/test_token.py [new]   -- Token generation/validation unit tests
-```
-
-## Step 2: Write Bite-Sized Tasks
-
-Each task is one action a developer can complete in 2-5 minutes.
-
-Granularity pattern:
-1. Write test for behavior X
-2. Run test -- confirm it fails
-3. Implement behavior X
-4. Run test -- confirm it passes
-5. Commit: `test: add X` / `feat: implement X`
-
-Never combine "implement + test" into a single step. Never say "add appropriate tests." Be explicit.
-
-## Plan Document Template
-
-Every plan starts with this header:
-
-```markdown
-# Plan: <Feature Name>
-
-**Date**: YYYY-MM-DD
-**Status**: Draft | In Progress | Complete
-
-## Goal
-One sentence describing what this plan delivers.
-
-## Architecture Decisions
-- Key decision 1 and rationale
-- Key decision 2 and rationale
-
-## Tech Stack
-- Language/framework versions
-- Dependencies to add (with exact versions)
-
-## File Map
-| File | Action | Responsibility |
-|------|--------|----------------|
-| path/to/file.py | new | What it does |
-```
-
-## Task Structure Template
-
-Each task follows this format:
-
-```markdown
-### Task N: <Short Description>
-
-**Files**: `path/to/file.py`
-
-**Steps**:
-- [ ] Step 1: Write/modify specific code
-- [ ] Step 2: Run verification command
-- [ ] Step 3: Commit with message
-
-**Run**:
-\`\`\`bash
-uv run pytest tests/unit/test_feature.py::test_name -v
-\`\`\`
-
-**Expected**: Test passes (green) / Output matches X
-```
-
-## Key Rules
-
-- **Exact file paths** -- always absolute or project-relative, never "the auth file"
-- **Complete code** -- show the full function/class, not "add validation here"
-- **Exact commands** -- `uv run pytest tests/unit/test_token.py -v`, not "run the tests"
-- **DRY** -- if two tasks share logic, extract it first in a prior task
-- **YAGNI** -- only plan what the spec requires, nothing speculative
-- **TDD** -- every implementation step has a preceding test step
-- **Commit points** -- mark explicit commit boundaries with conventional messages
-
-## Plan Review Loop
-
-After drafting the full plan:
-
-1. Re-read each task for completeness (paths, code, commands all present?)
-2. Check ordering -- does each task only depend on previously completed tasks?
-3. Verify no missing steps between "write test" and "implement"
-4. Confirm commit messages follow conventional format
-5. If issues found, fix and re-review (max 5 iterations)
-
-## Execution Handoff
-
-When the plan is complete and saved:
-
-> Plan complete and saved to `docs/superpowers/plans/YYYY-MM-DD-<feature>.md`. Ready to execute?
-
-If the user confirms, invoke the **executing-plans** skill to begin implementation.
-
-## SuperClaude Integration
-
-- Use `/sc:workflow` to coordinate multi-phase execution
-- Use `/sc:task` for individual task tracking
-- Handoff: **executing-plans** skill for implementation phase
+Handoff to **executing-plans** or **subagent-driven-development** for implementation.
