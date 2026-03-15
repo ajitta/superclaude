@@ -43,6 +43,20 @@ SuperClaude is a **dual-purpose** project:
 1. **Python package** — A pytest plugin + CLI tool (`superclaude`) providing PM Agent patterns (confidence checking, self-check, reflexion, parallel execution)
 2. **Content framework** — Markdown files (commands, agents, modes, MCP docs, core config) that get installed into `~/.claude/` to configure Claude Code's behavior via CLAUDE.md injection
 
+**Full framework taxonomy:** See `src/superclaude/ARCHITECTURE.md` for the single source of truth on directory roles, delivery pipelines, and content type definitions.
+
+### Content Framework Taxonomy
+
+| Directory | Role | Delivery |
+|-----------|------|----------|
+| `core/` | Framework DNA — always-applied principles and rules | Always loaded (CLAUDE_SC.md @import) |
+| `modes/` | Mindset overlay — situational cognitive frameworks | On-demand (context_loader) |
+| `agents/` | Domain persona — specialized expert definitions | CC-native auto-delegation |
+| `commands/` | Workflow entry — user-facing /sc:* slash commands | CC-native slash commands |
+| `skills/` | Execution logic — hooks, tool restrictions, isolation | CC-native auto-detection |
+| `mcp/` | Tool reference — MCP server docs + configuration | context_loader + install_mcp |
+| `scripts/` | Hook infrastructure — Python/shell automation | hooks.json → settings.json |
+
 ### Content Installation Flow
 
 The CLI `superclaude install` copies content from the package to Claude Code's config directory:
@@ -52,7 +66,6 @@ src/superclaude/commands/  →  ~/.claude/commands/sc/       (30 slash commands)
 src/superclaude/agents/    →  ~/.claude/agents/             (20 agent definitions)
 src/superclaude/skills/    →  ~/.claude/skills/             (skill implementations)
 src/superclaude/core/      →  ~/.claude/superclaude/core/   (FLAGS, PRINCIPLES, RULES, BUSINESS_SYMBOLS)
-src/superclaude/modes/     →  ~/.claude/superclaude/modes/  (8 mode/config files)
 src/superclaude/mcp/       →  ~/.claude/superclaude/mcp/    (MCP server documentation)
 ```
 
@@ -97,12 +110,13 @@ src/superclaude/
 │   ├── inline_hooks.py  # YAML frontmatter parser for skills/agents/commands
 │   └── mcp_fallback.py  # MCP server availability fallback handling
 ├── utils/               # Shared utilities (atomic_write_json)
-├── commands/            # 30 slash command markdown files
-├── agents/              # 20 agent definition markdown files
-├── skills/              # 15 skills: 12 process skills (ported from superpowers) + confidence-check, ship, simplicity-coach
-├── modes/               # 8 mode/config markdown files
-├── mcp/                 # MCP server docs + configs/
-├── core/                # FLAGS.md, PRINCIPLES.md, RULES.md
+├── ARCHITECTURE.md      # Framework taxonomy — single source of truth for directory roles and delivery pipelines
+├── commands/            # 30 slash commands — workflow entry points (authoring: .claude/rules/command-authoring.md)
+├── agents/              # 20 agent definitions — domain expert personas (authoring: .claude/rules/agent-authoring.md)
+├── skills/              # 15 skills — execution containers with hooks (authoring: .claude/rules/skill-authoring.md)
+├── modes/               # 7 modes + config — cognitive overlays (authoring: .claude/rules/mode-authoring.md)
+├── mcp/                 # 8 MCP server docs + configs/
+├── core/                # FLAGS.md, PRINCIPLES.md, RULES.md, BUSINESS_SYMBOLS.md
 └── scripts/             # context_loader.py (trigger system, hybrid injection), session_init.py, token_estimator.py, skill_activator.py
 ```
 

@@ -1,38 +1,53 @@
 # SuperClaude Modes
 
-Behavioral modes that shift Claude's communication style and priorities for specific contexts.
+Mindset overlays — situational cognitive frameworks that modify Claude's thinking, communication, and priorities.
+
+## Content Delivery
+
+Modes are activated on-demand by `context_loader.py` via flag/keyword detection (TRIGGER_MAP). They are **not** managed by Claude Code's native content system — no frontmatter required.
 
 ## Available Modes
 
 | Mode | Flag | Mission |
 |------|------|---------|
 | Brainstorming | `--brainstorm` | Collaborative discovery for requirements exploration |
-| Business Panel | `--business-panel` | Multi-expert business analysis with adaptive strategies |
-| Deep Research | `--research` | Research mindset for systematic investigation and evidence-based reasoning |
+| Business Panel | `--business-panel` | Multi-expert business analysis with adaptive interaction |
+| Deep Research | `--research` | Research mindset for systematic investigation |
 | Introspection | `--introspect` | Meta-cognitive analysis and reasoning optimization |
 | Orchestration | `--orchestrate` | Intelligent tool selection and resource efficiency |
-| Task Management | `--task-manage` | Hierarchical task organization with persistent memory for complex multi-step operations |
-| Token Efficiency | `--token-efficient` or `--uc` | Symbol-enhanced communication mindset for compressed clarity and efficient token usage |
+| Task Management | `--task-manage` | Hierarchical task organization with persistent memory |
+| Token Efficiency | `--token-efficient` / `--uc` | Symbol-enhanced communication for compressed clarity |
 
 ### Supporting Configuration
 
-| File | Purpose |
-|------|---------|
-| RESEARCH_CONFIG | Deep research strategy settings, depth profiles, and tool routing |
+| File | Type | Purpose |
+|------|------|---------|
+| RESEARCH_CONFIG.md | `config` | Deep research operational parameters — depth profiles, confidence thresholds, tool routing |
 
-## How Modes Work
+**Note:** RESEARCH_CONFIG.md is **not** a mode. It provides operational settings for the research mode and is excluded from mode structure validation. It uses `type="config"`, not `type="mode"`.
 
-Modes are activated via flags (see `core/FLAGS.md`) or auto-detected from context. They modify:
+## 4-Axis Structure
 
-- **Communication style** — how information is presented
-- **Priorities** — what to optimize for
-- **Tool selection** — which MCPs and tools to prefer
-- **Thinking depth** — how much reasoning to apply
+Every mode defines four axes:
+
+| Axis | Tag | What It Controls |
+|------|-----|------------------|
+| Thinking | `<thinking>` | Cognitive principles — how to reason |
+| Communication | `<communication>` | Expression style — how to present |
+| Priorities | `<priorities>` | Trade-off guidance — what to optimize |
+| Behaviors | `<behaviors>` | Action patterns — what to do differently |
 
 Modes can be combined (e.g., `--research --uc` for compressed research output).
+
+## Authoring Rules
+
+See `.claude/rules/mode-authoring.md` for the complete authoring specification.
+
+Validation: `uv run python -m pytest tests/unit/test_mode_structure.py -v`
 
 ## Related
 
 - `core/FLAGS.md` — Flag definitions and auto-detection triggers
-- `agents/` — Specialized personas (modes shape behavior, agents shape expertise)
-- `commands/` — Slash commands that activate modes automatically
+- `agents/` — Domain personas (modes shape mindset, agents shape expertise)
+- `commands/` — Slash commands that may activate modes
+- `scripts/context_loader.py` — On-demand delivery mechanism

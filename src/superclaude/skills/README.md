@@ -1,67 +1,57 @@
-# superclaude Skills
+# SuperClaude Skills
 
-Skills are reusable, specialized capabilities with defined behaviors, tool access, and optional hooks.
+Execution containers — reusable capabilities with hooks, tool restrictions, and optional subagent isolation.
 
-## Skill Frontmatter Reference (v2.1.0+)
+## Content Delivery
 
-```yaml
----
-name: skill-name
-description: Brief description shown in slash command menu
-triggers: /skill-name, keyword1, keyword2
-user-invocable: true              # Visible in slash command menu (default: true for /skills/)
-context: inline|fork              # inline = same context, fork = sub-agent (v2.1.0+)
-agent: agent-name                 # Agent type for execution (v2.1.0+)
-model: haiku|sonnet|opus          # Override parent model alias (v2.1.0+)
-# For reproducibility, prefer a versioned model ID when needed
-# Example: claude-opus-4-6-*
-mcp: c7:docs|tavily:search        # MCP dependencies
-allowed-tools:                    # YAML list format (v2.1.0+)
-  - Read
-  - Grep
-  - Glob
-  - WebSearch
-  - mcp__server__tool             # Specific MCP tool
-  - mcp__server__*                # All tools from server (wildcard)
-disallowed-tools:                 # Explicit tool blocking (v2.1.0+)
-  - Bash
+Skills are managed by Claude Code's native skill system. Auto-detected via `description` keyword matching at startup (only `name` + `description` loaded initially, ~30-50 tokens each). Full `SKILL.md` loaded on invocation. Installed to `~/.claude/skills/` on `superclaude install`.
 
-hooks:                            # Inline hooks (v2.1.0+)
-  PreToolUse:
-    - matcher: "Bash|Edit"        # Outer level: matcher + hooks array
-      hooks:
-        - type: command
-          command: "python validate.py"
-          once: true              # Execute only once per session
-  PostToolUse:
-    - matcher: "Write"
-      hooks:
-        - type: command
-          command: "python format.py"
-  Stop:
-    - hooks:
-        - type: command
-          command: "python cleanup.py"
----
+## Available Skills
+
+### Process Skills (ported from superpowers)
+
+| Skill | Description |
+|-------|-------------|
+| `executing-plans` | Execute implementation plans with structured tracking |
+| `receiving-code-review` | Process and apply code review feedback |
+| `requesting-code-review` | Generate structured code review requests |
+| `finishing-a-development-branch` | Branch completion with quality gates |
+| `using-git-worktrees` | Git worktree workflow for parallel development |
+| `using-superclaude` | Meta-skill for SuperClaude framework usage |
+| `dispatching-parallel-agents` | Parallel agent orchestration patterns |
+
+### Development Skills
+
+| Skill | Description |
+|-------|-------------|
+| `brainstorming` | Structured brainstorming with diverge/converge |
+| `confidence-check` | Pre-execution confidence assessment |
+| `ship` | Production deployment workflow |
+| `simplicity-coach` | Complexity prevention guidance |
+| `systematic-debugging` | Structured debugging methodology |
+| `test-driven-development` | TDD workflow with red/green/refactor |
+| `verification-before-completion` | Final verification gates |
+| `writing-plans` | Implementation plan authoring |
+
+## Skill Directory Structure
+
+```
+<skill-name>/
+├── SKILL.md          ← Entry point (frontmatter + XML body)
+├── scripts/          ← Execution scripts (Python, Bash)
+├── references/       ← Documentation, reference materials
+└── assets/           ← Templates, binaries
 ```
 
-## Frontmatter Fields
+## Key Frontmatter Fields
 
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `name` | string | required | Unique skill identifier |
-| `description` | string | required | Shown in command menu |
-| `triggers` | string | - | Comma-separated activation keywords |
-| `user-invocable` | boolean | true | Show in slash command menu |
-| `context` | string | inline | `inline` or `fork` (sub-agent) |
-| `agent` | string | - | Agent type for specialized behavior |
-| `model` | string | inherited | Override parent model (v2.1.0+) |
-| `mcp` | string | - | MCP server dependencies |
-| `allowed-tools` | list | all | Whitelist of permitted tools |
-| `disallowed-tools` | list | none | Blacklist of blocked tools |
-| `hooks` | object | - | Inline hook definitions |
-
-Model guidance: use aliases (`haiku|sonnet|opus`) for flexible upgrades, and use versioned model IDs when deterministic behavior is required across runs.
+| Field | Purpose | Example |
+|-------|---------|---------|
+| `description` | Auto-invocation trigger (critical) | Task keywords for detection |
+| `context` | `inline` (default) or `fork` (subagent) | `context: fork` |
+| `agent` | Subagent type (requires `context: fork`) | `agent: Explore` |
+| `allowed-tools` | Tool whitelist | `Read, Grep, Glob` |
+| `disable-model-invocation` | Block Claude auto-execution | `true` for destructive workflows |
 
 ## Context Modes
 
@@ -72,106 +62,46 @@ Model guidance: use aliases (`haiku|sonnet|opus`) for flexible upgrades, and use
 
 ### `context: fork` (v2.1.0+)
 - Executes in a forked sub-agent context
-- Isolated memory and state
-- Can use different model
+- Isolated memory and state, can use different model
 - Progress visible in parent thread
 - Note: `context: fork` + `agent:` via Skill tool may not be honored (GitHub #17283)
 
 ## Skill Discovery
 
-Skills are discovered from:
-1. `~/.claude/skills/` (user-level)
-2. `.claude/skills/` (project-level)
+Skills are discovered from (in order):
+1. `~/.claude/skills/` — user-level
+2. `.claude/skills/` — project-level
 3. Nested `.claude/skills/` directories (v2.1.6+)
-4. Additional directories specified via `--add-dir` flag (v2.1.20+, v2.1.32+)
+4. Additional directories via `--add-dir` flag (v2.1.20+)
 
-### Hot Reload (v2.1.0+)
-Skills created or modified are immediately available without restarting the session.
-
-## Skill vs Slash Command (v2.1.3+)
-
-As of v2.1.3, slash commands and skills are merged:
-- Skills in `/skills/` directories are visible in slash command menu by default
-- Opt-out with `user-invocable: false` in frontmatter
-- Skill suggestions prioritize recently/frequently used skills
-
-## Examples
-
-### Minimal Skill
-```yaml
----
-name: quick-check
-description: Fast validation
-user-invocable: true
----
-Perform a quick validation of the current context.
-```
-
-### Full-Featured Skill
-```yaml
----
-name: deep-analysis
-description: Comprehensive code analysis
-triggers: /analyze, deep-dive, thorough-check
-context: fork
-agent: quality-engineer
-model: opus  # or a versioned model ID for deterministic runs
-mcp: c7:patterns|serena:symbols
-allowed-tools:
-  - Read
-  - Grep
-  - mcp__serena__*
-hooks:
-  Stop:
-    - hooks:
-        - type: command
-          command: "python summarize.py"
----
-<component name="deep-analysis">
-  <!-- Skill implementation -->
-</component>
-```
-
-## Skill Auto-Approval (v2.1.19+)
-
-Skills that do not define hooks or require elevated permissions are auto-approved without user confirmation. This applies to skills that only use standard tools (Read, Grep, Glob, WebSearch) and do not modify files or run shell commands.
+Skills created or modified are immediately available without restarting (hot reload, v2.1.0+).
 
 ## Argument Syntax (v2.1.19+)
 
-Skills can accept arguments passed after the skill name:
+Skills accept arguments passed after the skill name:
 
 | Syntax | Description |
 |--------|-------------|
 | `$ARGUMENTS` | Full argument string |
-| `$ARGUMENTS[0]` | First argument (bracket syntax) |
-| `$ARGUMENTS[1]` | Second argument |
-| `$0` | Shorthand for `$ARGUMENTS[0]` |
-| `$1` | Shorthand for `$ARGUMENTS[1]` |
+| `$ARGUMENTS[0]` / `$0` | First argument |
+| `$ARGUMENTS[1]` / `$1` | Second argument |
 
-Example skill using arguments:
-```yaml
----
-name: deploy
-description: Deploy to target environment
----
-Deploy $ARGUMENTS[0] to the $ARGUMENTS[1] environment.
-```
+Example: `/deploy my-app staging` → `Deploy my-app to the staging environment.`
 
-Invocation: `/deploy my-app staging` → `Deploy my-app to the staging environment.`
+## Token Budget (v2.1.32+)
 
-## Session ID Access (v2.1.9+)
-
-Skills can access the current session ID:
-```
-${CLAUDE_SESSION_ID}
-```
-
-This enables session-aware behavior and tracking.
-
-## Skill Token Budget (v2.1.32+)
-
-Skill character budgets scale dynamically with the context window at ~2% of the available context. This means:
-- Larger context windows allow more detailed skill descriptions
-- Only `name` + `description` are loaded at startup (~30-50 tokens each)
-- Full SKILL.md content is loaded on invocation
+Skill character budgets scale dynamically at ~2% of the context window:
+- Only `name` + `description` loaded at startup (~30-50 tokens each)
+- Full `SKILL.md` content loaded on invocation
 - Keep SKILL.md under 1,500-2,000 words for optimal loading
+
+## Authoring Rules
+
+See `.claude/rules/skill-authoring.md` for the complete authoring specification (frontmatter reference, three archetypes, validation checklist).
+
+## Related
+
+- `commands/` — Workflow entry points that may invoke skills
+- `agents/` — Domain personas that skills can fork to
+- `scripts/skill_activator.py` — Skill activation logic
+- `hooks/` — Hook system that skills integrate with

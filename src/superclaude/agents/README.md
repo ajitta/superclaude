@@ -1,204 +1,111 @@
 # SuperClaude Agents
 
-Specialized AI agent definitions for domain-specific tasks.
+Domain expert personas — specialized AI agent definitions for task-based auto-delegation.
 
-## Overview
+## Content Delivery
 
-Agents are pre-configured personas with specialized knowledge and behaviors. They can be invoked via the `/sc:agent` command to get expert-level assistance in specific domains.
+Agents are managed by Claude Code's native agent delegation system. Auto-selected based on task keywords in the `description` frontmatter field. Installed to `~/.claude/agents/` on `superclaude install`.
 
 ## Available Agents
 
 ### Research & Analysis
 
-| Agent | Description |
-|-------|-------------|
-| `deep-research-agent` | Web research with cross-checking and citation-ready synthesis |
-| `root-cause-analyst` | Systematic problem diagnosis |
-| `requirements-analyst` | Requirements gathering and analysis |
+| Agent | Model | Permission | Description |
+|-------|-------|------------|-------------|
+| `deep-research-agent` | opus | acceptEdits | Web research with cross-checking and citation-ready synthesis |
+| `root-cause-analyst` | opus | default | Systematic problem diagnosis through hypothesis testing |
+| `requirements-analyst` | opus | default | Requirements gathering through systematic discovery |
 
 ### Architecture & Design
 
-| Agent | Description |
-|-------|-------------|
-| `system-architect` | System design and architecture decisions |
-| `backend-architect` | Backend systems and API design |
-| `frontend-architect` | Frontend architecture and UI patterns |
-| `devops-architect` | Infrastructure and deployment architecture |
+| Agent | Model | Permission | Description |
+|-------|-------|------------|-------------|
+| `system-architect` | opus | plan | System design and long-term architecture decisions |
+| `backend-architect` | sonnet | default | Backend systems, API design, data integrity |
+| `frontend-architect` | sonnet | acceptEdits | Frontend architecture, accessibility, UI patterns |
+| `devops-architect` | sonnet | default | Infrastructure, CI/CD, deployment automation |
 
 ### Engineering Specialists
 
-| Agent | Description |
-|-------|-------------|
-| `python-expert` | Python best practices and optimization |
-| `security-engineer` | Security analysis and hardening |
-| `performance-engineer` | Performance optimization and profiling |
-| `quality-engineer` | Quality assurance and testing strategies |
-| `refactoring-expert` | Code refactoring and modernization |
+| Agent | Model | Permission | Description |
+|-------|-------|------------|-------------|
+| `python-expert` | sonnet | acceptEdits | Python best practices, SOLID principles |
+| `security-engineer` | opus | plan | Security analysis, OWASP, threat modeling |
+| `performance-engineer` | sonnet | acceptEdits | Performance optimization and profiling |
+| `quality-engineer` | sonnet | acceptEdits | Testing strategies and edge case detection |
+| `refactoring-expert` | sonnet | default | Code quality improvement and tech debt reduction |
 
-### Documentation & Communication
+### Documentation & Education
 
-| Agent | Description |
-|-------|-------------|
-| `technical-writer` | Technical documentation and guides |
-| `learning-guide` | Educational content and tutorials |
-| `socratic-mentor` | Teaching through guided questioning |
+| Agent | Model | Permission | Description |
+|-------|-------|------------|-------------|
+| `technical-writer` | sonnet | default | Technical documentation tailored to audiences |
+| `learning-guide` | sonnet | acceptEdits | Progressive learning and practical examples |
+| `socratic-mentor` | sonnet | default | Teaching through guided questioning |
 
 ### Project & Business
 
-| Agent | Description |
-|-------|-------------|
-| `pm-agent` | Self-improvement workflow: document implementations, analyze mistakes, maintain knowledge |
-| `business-panel-experts` | Business strategy multi-expert panel |
+| Agent | Model | Permission | Description |
+|-------|-------|------------|-------------|
+| `pm-agent` | sonnet | default | Orchestration, workflow management, continuous improvement |
+| `business-panel-experts` | opus | plan | Multi-lens business strategy synthesis and debate |
 
 ### Philosophy & Discipline
 
-| Agent | Description |
-|-------|-------------|
-| `simplicity-guide` | Complexity prevention through Orient-Step-Learn (Dave Thomas) |
+| Agent | Model | Permission | Description |
+|-------|-------|------------|-------------|
+| `simplicity-guide` | opus | plan | Complexity prevention through Orient-Step-Learn |
 
 ### Code Quality
 
-| Agent | Description |
-|-------|-------------|
-| `self-review` | Post-implementation validation and reflexion partner |
-| `repo-index` | Repository indexing and codebase briefing assistant |
-
-## Usage
-
-### Via Command
-
-```
-/sc:agent python-expert "How should I structure this async code?"
-/sc:agent security-engineer "Review this authentication flow"
-/sc:agent system-architect "Design a scalable message queue"
-```
-
-### Direct Invocation
-
-Agents can also be loaded directly for extended conversations:
-
-```
-/sc:load agents/backend-architect
-```
-
-## Agent Capabilities
-
-Each agent includes:
-
-- **Expertise Domain**: Specific knowledge area
-- **Behavioral Guidelines**: How the agent approaches problems
-- **Output Format**: Structured response patterns
-- **Tool Preferences**: Recommended tools for the domain
-- **Autonomy Level**: Permission boundaries for actions
-- **Permission Mode**: Claude Code `permissionMode` enforced via frontmatter (v4.2)
-- **Persistent Memory**: Cross-session learning via `memory` frontmatter (v2.1.33)
-
-## Agent Memory (v2.1.33)
-
-Agents can declare persistent memory that survives across conversations:
-
-```yaml
----
-name: agent-name
-description: Agent description
-memory: project
----
-```
-
-### Memory Scopes
-
-| Scope | Location | Use Case |
-|-------|----------|----------|
-| `project` | `.claude/agent-memory/<name>/` | Project-specific knowledge, committable (SuperClaude default) |
-| `user` | `~/.claude/agent-memory/<name>/` | Cross-project learnings |
-| `local` | `.claude/agent-memory-local/<name>/` | Project-specific, gitignored |
-
-When `memory` is set, the agent automatically gets Read/Write/Edit tools and the first 200 lines of its `MEMORY.md` are injected into the system prompt. All SuperClaude agents use `memory: project` for project-scoped, committable knowledge.
-
-## Sub-Agent Restrictions (v2.1.33)
-
-Agents can restrict which sub-agents they can spawn using `Task(agent_type)` syntax in the `tools` frontmatter field:
-
-```yaml
----
-name: orchestrator
-description: Coordinates specialized agents
-tools: Read, Grep, Task(code-reviewer), Task(debugger)
----
-```
-
-Without this restriction, an agent with Task access can spawn any available subagent. Use this for controlled multi-agent workflows. The `Task(AgentName)` deny pattern can disable specific agents in `disallowedTools`.
+| Agent | Model | Permission | Description |
+|-------|-------|------------|-------------|
+| `self-review` | opus | default | Post-implementation validation and reflexion |
+| `repo-index` | haiku | acceptEdits | Repository indexing and codebase briefing |
 
 ## Permission Framework
 
-Agents operate under Claude Code's `permissionMode` for system-level enforcement, with `maxTurns` and `disallowedTools` providing additional guardrails:
+| permissionMode | maxTurns | Effect |
+|---------------|----------|--------|
+| `acceptEdits` | 50 | File edits auto-approved; Bash/MCP prompted |
+| `default` | 25 | Each tool prompted on first use |
+| `plan` | 15 | Read-only; modifications blocked until approved |
 
-### Permission Levels
+Model routing: `opus` for architecture/security/judgment | `sonnet` for coding/analysis/docs | `haiku` for mechanical scanning
 
-| permissionMode | maxTurns | Effect | User Interaction |
-|---------------|----------|--------|------------------|
-| `acceptEdits` | 50 | File edits auto-approved; Bash/MCP still require approval | Inform after completion |
-| `default` | 25 | Each tool prompted on first use | Confirm before execution |
-| `plan` | 15 | Read-only; all modifications blocked until user approves | Confirm each major step |
+## Authoring Rules
 
-### Agent Configuration
+See `.claude/rules/agent-authoring.md` for the complete authoring specification.
 
-| Agent | Model | permissionMode | maxTurns | disallowedTools | Rationale |
-|-------|-------|---------------|----------|-----------------|-----------|
-| `deep-research-agent` | opus | acceptEdits | 50 | Edit, Write, NotebookEdit | Read-only web research, no code changes |
-| `python-expert` | sonnet | acceptEdits | 50 | — | Code generation/analysis, user reviews output |
-| `frontend-architect` | sonnet | acceptEdits | 50 | — | UI patterns/components, no infrastructure changes |
-| `quality-engineer` | sonnet | acceptEdits | 50 | — | Test strategy/analysis, non-destructive |
-| `repo-index` | haiku | acceptEdits | 50 | Edit, Write, NotebookEdit | Read-only indexing and briefing |
-| `learning-guide` | sonnet | acceptEdits | 50 | — | Educational content, non-destructive |
-| `performance-engineer` | sonnet | acceptEdits | 50 | — | Measurement/analysis, non-destructive |
-| `backend-architect` | sonnet | default | 25 | NotebookEdit | API contracts affect multiple systems |
-| `pm-agent` | sonnet | default | 25 | NotebookEdit | Orchestration decisions need oversight |
-| `devops-architect` | sonnet | default | 25 | NotebookEdit | Infrastructure changes are significant |
-| `refactoring-expert` | sonnet | default | 25 | NotebookEdit | Safe refactoring patterns with user review |
-| `self-review` | opus | default | 25 | Edit, Write, NotebookEdit | Validation findings need user judgment |
-| `socratic-mentor` | sonnet | default | 25 | NotebookEdit | Teaching guidance affects learning path |
-| `requirements-analyst` | opus | default | 25 | NotebookEdit | Specification decisions need stakeholder input |
-| `root-cause-analyst` | opus | default | 25 | NotebookEdit | Investigation requiring careful judgment |
-| `technical-writer` | sonnet | default | 25 | NotebookEdit | Documentation with user-facing impact |
-| `system-architect` | opus | plan | 15 | Edit, Write, NotebookEdit | Architecture decisions have broad impact |
-| `security-engineer` | opus | plan | 15 | Edit, Write, NotebookEdit | Security policies require explicit review |
-| `business-panel-experts` | opus | plan | 15 | Edit, Write, NotebookEdit | Strategy decisions require business context |
-| `simplicity-guide` | opus | plan | 15 | Edit, Write, NotebookEdit | Simplification judgments require deep context |
+Validation: `uv run python -m pytest tests/unit/test_agent_structure.py -v`
 
-### Tool Guidance Semantics
+## Agent Memory (v2.1.33)
 
-Each agent's `<tool_guidance>` XML section provides behavioral guidelines (Proceed/Ask First/Never rules):
+Agents declare persistent memory that survives across conversations via the `memory` frontmatter field. All SuperClaude agents use `memory: project`.
 
-```xml
-<tool_guidance>
-  <proceed conditions="read-only|analysis|non-binding|hypothesis">
-    Actions that don't change state or make commitments
-  </proceed>
-  <ask_first conditions="state-change|binding-decision|cross-boundary">
-    Actions that modify code, config, or affect other systems
-  </ask_first>
-  <never conditions="destructive|irreversible|unilateral">
-    Actions that could cause data loss or bypass review
-  </never>
-</tool_guidance>
-```
+| Scope | Location | Use Case |
+|-------|----------|----------|
+| `project` | `.claude/agent-memory/<name>/` | Project-specific knowledge, committable |
+| `user` | `~/.claude/agent-memory/<name>/` | Cross-project learnings |
+| `local` | `.claude/agent-memory-local/<name>/` | Project-specific, gitignored |
 
-### Escalation Rules
+When `memory` is set, the agent automatically gets Read/Write/Edit tools and the first 200 lines of its `MEMORY.md` are injected into the system prompt.
+
+## Escalation Rules
 
 1. **Uncertainty**: When unsure about scope → escalate to `ask_first`
 2. **Cross-boundary**: When action affects another agent's domain → escalate
 3. **Risk**: When action has >10% chance of breaking change → escalate
 4. **Context pressure**: When context >85% → compress output, don't skip steps
 
-### Cross-Agent Conflict Resolution
+## Cross-Agent Conflict Resolution
 
-When agents give conflicting recommendations, resolve using this priority matrix:
+When agents give conflicting recommendations:
 
 | Conflict | Resolution | Rationale |
 |----------|-----------|-----------|
 | security-engineer vs performance-engineer | security wins | Security constraints are non-negotiable |
-| simplicity-guide vs system-architect | data decides — measure complexity vs scale requirements | Neither overrides without evidence |
+| simplicity-guide vs system-architect | data decides — measure complexity vs scale | Neither overrides without evidence |
 | refactoring-expert vs quality-engineer | quality-engineer sets coverage gate, refactoring-expert executes within it | Tests define safe refactoring boundaries |
 | frontend-architect vs backend-architect | API contract negotiation — both propose, user decides | Interface boundaries require explicit agreement |
 | python-expert vs system-architect | system-architect for cross-language/service boundaries, python-expert within Python scope | Scope determines authority |
@@ -206,37 +113,8 @@ When agents give conflicting recommendations, resolve using this priority matrix
 
 **General rule**: Domain specialist wins within their domain; cross-domain conflicts escalate to user.
 
-## For Developers
+## Related
 
-### Adding New Agents
-
-1. Create a new `.md` file in this directory
-2. Define the agent's persona, expertise, and behavior
-3. Include example interactions
-4. Update this README with the new agent
-5. Test with `/sc:agent <name>`
-
-### Agent File Structure
-
-```yaml
----
-name: agent-name
-description: Brief description (triggers - keyword1, keyword2)
-model: opus|sonnet|haiku                  # Sub-agent model routing (v4.2)
-permissionMode: acceptEdits|default|plan  # Claude Code enforcement (v4.2)
-memory: project                           # Persistent memory scope (v2.1.33)
-maxTurns: 15|25|50                        # Infinite loop prevention
-disallowedTools: Edit, Write, NotebookEdit # Tool restriction (optional)
-color: blue|green|purple|...              # UI color indicator (optional)
----
-```
-
-```xml
-<component name="agent-name" type="agent">
-  <mcp servers="seq|c7"/>
-  <tool_guidance>
-    ...
-  </tool_guidance>
-  <!-- Domain-specific sections -->
-</component>
-```
+- `commands/` — Workflow entry points that route to agents
+- `modes/` — Cognitive overlays that shape agent behavior
+- `core/FLAGS.md` — Model routing and persona index

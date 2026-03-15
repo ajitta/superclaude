@@ -97,7 +97,14 @@ TRIGGER_MAP = [
     ),
     # Business symbols - Priority 3
     (r"(business.?symbol|strategic.?symbol|business.?example|panel.?example|--structured)", "core/BUSINESS_SYMBOLS.md", 3),
-    # Note: Modes removed from auto-loading — FLAGS.md provides mode definitions via @-reference chain
+    # Modes — retained where content provides unique behavioral/reference value
+    (r"(--brainstorm|--bs)", "modes/MODE_Brainstorming.md", 1),
+    (r"(--introspect|self.?analysis|analyze reasoning)", "modes/MODE_Introspection.md", 2),
+    (r"(--task-manage)", "modes/MODE_Task_Management.md", 2),
+    (r"(--uc|--ultracompressed|token.?efficient|--token-efficient|--safe-mode)", "modes/MODE_Token_Efficiency.md", 1),
+    (r"(--orchestrate|multi.?tool|tool.?select|/sc:select-tool)", "modes/MODE_Orchestration.md", 2),
+    (r"(--research|deep.?research|systematic.?investigation|/sc:research)", "modes/MODE_DeepResearch.md", 1),
+    (r"(--business-panel|business.?panel|multi.?expert|strategic.?analysis|/sc:business-panel)", "modes/MODE_Business_Panel.md", 1),
     # Note: MCP docs for Context7, Sequential, Playwright, Morphllm, Magic, Chrome-DevTools removed — MCP auto-mode provides tool descriptions
 ]
 
