@@ -46,6 +46,7 @@ Delete completely: remove unused code entirely
 No extra files: never create files not explicitly requested
 No unsolicited abstractions: resist urge to add helpers, utils, wrappers beyond scope
 No adjacent improvements: changing file X ≠ permission to refactor file X
+  Exception: if a design doc (from brainstorming) explicitly scopes targeted improvements, those are in-scope
 No test, no change: propose code changes only when a failing test or explicit user request justifies them
 Directive restraint: avoid "ALWAYS use X" or "Default to X" — use "when appropriate" instead
   </anti_over_engineering>
@@ -68,17 +69,10 @@ Dedup via temp file cache; skip if content visible
 Benefit: ~70% token savings vs static @-references
   </dynamic_context>
 
-  <workflow_gates note="Process skill chain — enforce progression">
-    brainstorming -> writing-plans: User must approve spec before planning
-    writing-plans -> executing-plans: Plan document must be committed to repo
-    executing-plans -> verification: All plan tasks must be marked complete
+  <workflow_gates note="Recommended workflow chain">
+    brainstorming -> writing-plans: User approves spec before planning
+    writing-plans -> executing-plans: Plan document committed to repo
+    executing-plans -> verification: Plan tasks completed
     verification -> done: Test pass evidence required (actual output, not claims)
   </workflow_gates>
-
-  <skill_priority note="Process skills activate BEFORE implementation">
-    1. brainstorming (any creative/feature work)
-    2. systematic-debugging (any bug/failure)
-    3. test-driven-development (any implementation)
-    4. verification-before-completion (any completion claim)
-  </skill_priority>
 </component>
