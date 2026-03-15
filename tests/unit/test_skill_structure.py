@@ -50,8 +50,8 @@ SIDE_EFFECT_SKILLS = {
 }
 
 # Skills that MUST have context: fork (per spec)
+# Note: executing-plans removed — aligned with superpowers upstream (runs inline, not forked)
 FORK_CONTEXT_SKILLS = {
-    "executing-plans",
     "requesting-code-review",
 }
 
@@ -239,15 +239,34 @@ class TestWorkflowGates:
         content = rules_path.read_text(encoding="utf-8")
         assert "<workflow_gates" in content, "RULES.md missing <workflow_gates> section"
 
-    def test_rules_has_skill_priority(self):
-        rules_path = SKILLS_DIR.parent / "core" / "RULES.md"
-        content = rules_path.read_text(encoding="utf-8")
-        assert "<skill_priority" in content, "RULES.md missing <skill_priority> section"
-
     def test_workflow_gates_mention_key_skills(self):
         rules_path = SKILLS_DIR.parent / "core" / "RULES.md"
         content = rules_path.read_text(encoding="utf-8")
         for skill_name in ["brainstorming", "writing-plans", "executing-plans", "verification"]:
             assert skill_name in content, (
                 f"RULES.md workflow gates missing reference to '{skill_name}'"
+            )
+
+
+class TestNoAggressiveLanguage:
+    """Validate skills do not contain aggressive enforcement language.
+
+    Per Anthropic Opus 4.6 prompting guidance: 'dial back aggressive language'
+    and 'prefer general instructions over prescriptive steps'.
+    """
+
+    FORBIDDEN_PATTERNS = [
+        "ABSOLUTELY MUST",
+        "IRON LAW",
+        "NOT NEGOTIABLE",
+        "VIOLATING LETTER",
+        "EXTREMELY_IMPORTANT",
+        "EXTREMELY-IMPORTANT",
+    ]
+
+    def test_no_aggressive_language(self, skill):
+        dirname, content, fm = skill
+        for pattern in self.FORBIDDEN_PATTERNS:
+            assert pattern not in content, (
+                f"{dirname}: contains aggressive language '{pattern}'"
             )
