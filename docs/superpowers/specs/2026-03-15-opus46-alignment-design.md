@@ -20,16 +20,15 @@ already contains thinking prescriptions in core files (diagnosis rule, thinking_
 
 ## Research Evidence
 
-| Source | Finding |
-|--------|---------|
-| Anthropic docs (prompting tips) | "Prefer general instructions over prescriptive steps" |
-| Anthropic docs (adaptive thinking) | "large or complex system prompts" cause excessive thinking |
-| Anthropic docs (migration) | "dial back aggressive language" — models may overtrigger |
-| Anthropic docs (context engineering) | "hardcoding complex, brittle logic creates fragility" |
-| Anthropic docs (right altitude) | "specific enough to guide, flexible enough for heuristics" |
-| Wharton study (2025) | CoT benefits minimal (+2.9-3.1%) with reasoning models, adds 20-80% time |
-| YouTube review (Feb 2026) | "opus 4.6 has closed that gap... frameworks getting less relevant" |
-| SP skills analysis (Agent 2) | 63+ HOW prescriptions, 7 HARD GATES, 25+ behavioral mandates |
+| Source | Finding | Reference |
+|--------|---------|-----------|
+| Anthropic docs (prompting tips) | "Prefer general instructions over prescriptive steps" | platform.claude.com/docs/en/.../claude-prompting-best-practices |
+| Anthropic docs (adaptive thinking) | "large or complex system prompts" cause excessive thinking | platform.claude.com/docs/en/.../adaptive-thinking |
+| Anthropic docs (migration) | "dial back aggressive language" — models may overtrigger | platform.claude.com/docs/en/.../claude-prompting-best-practices |
+| Anthropic docs (context engineering) | "hardcoding complex, brittle logic creates fragility" | anthropic.com/engineering/effective-context-engineering |
+| Anthropic docs (right altitude) | "specific enough to guide, flexible enough for heuristics" | anthropic.com/engineering/effective-context-engineering |
+| Wharton study (2025) | CoT benefits minimal (+2.9-3.1%) with reasoning models | Meincke et al., "Prompting Science Report 1" (March 2025) |
+| SP skills analysis (local) | 63+ HOW prescriptions, 7 HARD GATES, 25+ behavioral mandates | Analysis of ~/.claude/plugins/.../superpowers/5.0.2/skills/ |
 
 ## Classification Framework: 3-Bucket Test
 
@@ -79,11 +78,20 @@ content conflicts possible. SC core files own their behavior, no SP deference.
 - Remove `Invoke-Eagerly` line (conflicts with Right-Altitude and Restraint-First)
 
 **FLAGS.md:**
-- Remove SP deference block in model_routing (SC owns its routing)
+- Remove the entire SP conditional block in model_routing (lines 41-45: "When superpowers
+  workflow active..." through "SC model_routing applies only to /sc: commands"). Leave only
+  the SC-native routing table (opus/sonnet/haiku assignments). SC owns all routing.
 
 #### 12 Skill Rewrites
 
-Each skill is rewritten from scratch following the Opus 4.6-native template:
+Each skill is rewritten from scratch following the Opus 4.6-native template.
+
+**Format decision:** The 12 SP-ported skills use plain markdown (not the XML `<component>`
+convention from `.claude/rules/skill-authoring.md`). This is intentional — these skills are
+Claude Code skills loaded via the skills system, not SC agent/command definitions. The
+skill-authoring.md XML convention applies to SC-native skills that use `<component type="skill">`;
+the SP-ported skills follow the simpler agentskills.io markdown format which Claude Code
+natively supports. Both formats are valid per Claude Code's skill loading mechanism.
 
 ```markdown
 ---
@@ -170,9 +178,14 @@ Handoff to next skill.
 **12. using-superclaude (~50 lines)**
 - REWRITE as SC-native meta-skill (not SP complementary mode)
 - KEEP: SC features overview, skill invocation method, /sc: command usage
-- REMOVE: 11 forbidden thought patterns, "1% threshold", "NOT NEGOTIABLE", "ABSOLUTELY MUST"
-- REMOVE: SP deference logic (handled at install-time only)
+- KEEP: Instruction priority list (User > Superpowers > SuperClaude > Default) — this is a
+  WHAT instruction about authority, not a HOW thinking prescription
+- REMOVE: 11 forbidden thought patterns table, "1% threshold", "NOT NEGOTIABLE", "ABSOLUTELY MUST"
+- REMOVE: SP deference logic in body (coexistence handled at install-time only)
+- REMOVE: Red flags rationalization table
 - ADD: Brief note that when SP is also installed, SP skills take precedence for overlapping names
+- NOTE: The extensive shared skill tables and coexistence documentation (current lines 41-137)
+  are replaced by a single line about install-time precedence
 
 ### Language Policy
 
@@ -187,14 +200,28 @@ Handoff to next skill.
 | `You MUST create a task for each` | `Track progress with tasks` |
 | `EXTREMELY_IMPORTANT` | remove |
 
+**Note:** The underlying WHAT-NOT rule may still be valid even when aggressive language is
+removed. E.g., "Do not implement before design is approved" is a valid WHAT-NOT constraint;
+only the "HARD-GATE" wrapper and "MUST" enforcement are softened.
+
+### Path Conventions
+
+Skills that reference `docs/superpowers/` paths (brainstorming saves specs to
+`docs/superpowers/specs/`, writing-plans saves to `docs/superpowers/plans/`) retain these
+paths. Changing them would break SP compatibility for users who switch between SP and SC.
+This is a documentation path, not a behavioral dependency.
+
 ### Test Impact
 
 | Category | Impact | Action |
 |----------|--------|--------|
 | Frontmatter validation | No change | Keep |
 | SP name compatibility | No change (names identical) | Keep |
-| Body content length | Minimum threshold may need lowering | Adjust |
-| FORK_CONTEXT_SKILLS | Review per skill | Check |
+| Body content length (>200 chars) | Skills will be shorter but still >200 chars at 30-80 lines | Verify, adjust if needed |
+| FORK_CONTEXT_SKILLS | `requesting-code-review` stays in set (still uses context: fork) | No change |
+| `test_rules_has_skill_priority` | Will FAIL — `skill_priority` section is being removed | **Update test: remove this assertion** |
+| `test_rules_has_workflow_gates` | May need updating — workflow_gates is simplified | **Update test: check for simplified gates** |
+| `test_workflow_gates_mention_key_skills` | May need updating — fewer skills referenced in gates | **Update test** |
 | **New: no aggressive language** | — | **Add test** |
 
 New test: validate that no skill contains `ABSOLUTELY MUST`, `IRON LAW`, `NOT NEGOTIABLE`,
@@ -204,7 +231,7 @@ New test: validate that no skill contains `ABSOLUTELY MUST`, `IRON LAW`, `NOT NE
 
 | Metric | Before | After | Savings |
 |--------|--------|-------|---------|
-| 12 skills total lines | ~1,848 | ~575 | 69% reduction |
+| 12 skills total lines | 2,089 | ~575 | 72% reduction |
 | Core files (branch additions) | +700B | ~+200B | 71% reduction |
 | On-demand context per skill invocation | 100-253 lines | 30-80 lines | ~60% reduction |
 
