@@ -23,57 +23,16 @@ from .install_settings import (
     update_claude_md_import,
 )
 
-# Skills that overlap with superpowers plugin — skip when superpowers is installed
-SUPERPOWERS_OVERLAPPING_SKILLS = {
-    "brainstorming",
-    "dispatching-parallel-agents",
-    "executing-plans",
-    "finishing-a-development-branch",
-    "receiving-code-review",
-    "requesting-code-review",
-    "systematic-debugging",
-    "test-driven-development",
-    "using-git-worktrees",
-    "verification-before-completion",
-    "writing-plans",
+# MCP docs to skip — redundant with MCP auto-mode (tool descriptions loaded natively)
+# Only Serena and Tavily retained (behavioral pattern docs with value beyond tool descriptions)
+MCP_DOCS_SKIP = {
+    "MCP_Context7.md",
+    "MCP_Sequential.md",
+    "MCP_Playwright.md",
+    "MCP_Morphllm.md",
+    "MCP_Magic.md",
+    "MCP_Chrome-DevTools.md",
 }
-
-
-def _detect_superpowers(base_path: Path) -> bool:
-    """Detect if the superpowers plugin is actively enabled.
-
-    Checks settings.json enabledPlugins for any superpowers entry set to true.
-    Falls back to cache check only if settings.json is unreadable.
-
-    Args:
-        base_path: Base Claude config path (e.g., ~/.claude)
-
-    Returns:
-        True if superpowers plugin is enabled
-    """
-    import json
-
-    # Primary: check enabledPlugins in settings.json
-    settings_path = base_path / "settings.json"
-    if settings_path.exists():
-        try:
-            with open(settings_path) as f:
-                settings = json.load(f)
-            enabled_plugins = settings.get("enabledPlugins", {})
-            for plugin_key, is_enabled in enabled_plugins.items():
-                if "superpowers" in plugin_key and is_enabled:
-                    return True
-            # settings.json readable and no superpowers enabled → not present
-            return False
-        except (json.JSONDecodeError, OSError):
-            pass  # Fall through to cache check
-
-    # Fallback: check plugin cache (for environments without settings.json)
-    plugin_cache = base_path / "plugins" / "cache" / "claude-plugins-official" / "superpowers"
-    if plugin_cache.exists() and any(plugin_cache.iterdir()):
-        return True
-    return False
-
 
 def _resolve_template_paths(base_path: Path, scope: str = "user") -> dict:
     """Compute resolved template variable values for a given scope."""
@@ -151,22 +110,8 @@ def install_component(
 
     # Handle skills directory specially (has subdirectories)
     if component == "skills":
-        # Detect superpowers to avoid installing overlapping skills
-        superpowers_present = _detect_superpowers(base_path) if base_path else False
-        skipped_overlap = []
-
         for skill_dir in source_dir.iterdir():
             if skill_dir.is_dir() and not skill_dir.name.startswith(("_", ".")):
-                # Skip overlapping skills when superpowers plugin is installed
-                if superpowers_present and skill_dir.name in SUPERPOWERS_OVERLAPPING_SKILLS:
-                    # Also remove if previously installed (clean up stale copies)
-                    target_skill_dir = target_dir / skill_dir.name
-                    if target_skill_dir.exists():
-                        shutil.rmtree(target_skill_dir)
-                    skipped_overlap.append(skill_dir.name)
-                    skipped += 1
-                    continue
-
                 target_skill_dir = target_dir / skill_dir.name
                 if target_skill_dir.exists() and not force:
                     skipped += 1
@@ -193,16 +138,16 @@ def install_component(
                     failed += 1
                     failed_names.append(f"{skill_dir.name}: {e}")
 
-        if skipped_overlap:
-            failed_names.append(
-                f"Skipped {len(skipped_overlap)} skills (superpowers plugin provides them): "
-                + ", ".join(sorted(skipped_overlap))
-            )
     else:
-        # Copy .md files (excluding README.md)
+        # Copy .md files (excluding README.md and filtered MCP docs)
         for source_file in source_dir.glob("*.md"):
             # Skip README files
             if source_file.stem.upper() == "README":
+                continue
+
+            # Skip redundant MCP docs (MCP auto-mode provides tool descriptions)
+            if component == "mcp" and source_file.name in MCP_DOCS_SKIP:
+                skipped += 1
                 continue
 
             target_file = target_dir / source_file.name

@@ -5,45 +5,57 @@ description: |
   creating PRs, or claiming work is done.
 ---
 
-## Purpose
+<component name="verification-before-completion" type="skill">
 
-Run the verification command, read the output, confirm the result — then make the claim. Evidence before claims.
+  <role>
+    <mission>Evidence-first verification before any completion claims</mission>
+  </role>
 
-## When to Use
+  <when>
+  - Before claiming work is complete
+  - Before running git commit or git push
+  - Before creating or updating a pull request
+  - Before moving to the next task in a sequence
+  </when>
 
-- Before claiming work is complete
-- Before running `git commit` or `git push`
-- Before creating or updating a pull request
-- Before moving to the next task in a sequence
+  <flow>
+    1. Baseline: If a test suite exists and hasn't been captured this session, run it NOW and record pass/fail counts as pre-change baseline
+    2. Identify: Determine the specific command that proves the claim (test suite, build, linter)
+    3. Run: Execute the full command — no partial runs or cached results
+    4. Read: Examine complete output — check exit code, count failures, warnings, errors
+    5. Compare: Verify pass count >= baseline — any new failures = regression, fix before claiming done
+    6. Confirm: Does the output actually support the claim? Match evidence to assertion
+    7. Report: State the claim citing evidence (e.g., "42/42 tests pass, baseline was 40 — 2 new tests added, 0 regressions")
+  </flow>
 
-## Workflow
+  <baseline_capture note="Test baseline pattern — advisory, not gate">
+  Run the project's test suite BEFORE making any changes. Record:
+  - Total tests, passed, failed, skipped
+  - Timestamp of baseline run
 
-1. **Identify**: Determine the specific command that proves the claim (test suite, build, linter).
-2. **Run**: Execute the full command. No partial runs or cached results.
-3. **Read**: Examine the complete output. Check exit code. Count failures, warnings, errors.
-4. **Confirm**: Does the output actually support the claim? Match evidence to assertion.
-5. **Report**: State the claim, citing the evidence (e.g., "All 42 tests pass — verified").
+  After implementation, compare:
+  - Pass count must be >= baseline (no regressions)
+  - New failures require investigation before completion
+  - New tests should increase total count
 
-## Revert-Verify for Regression
+  If no test suite exists, note "no baseline available" and skip comparison.
+  </baseline_capture>
 
-When fixing a bug with a new test:
+  <revert_verify note="For bug fixes with new tests">
+  1. Write the test, confirm it passes with the fix applied
+  2. Revert the fix, run the test — it should FAIL (proves test catches the bug)
+  3. Restore the fix, run the test — it should PASS
+  4. Run full suite — confirm no regressions against baseline
+  </revert_verify>
 
-1. Write the test and confirm it passes with the fix applied.
-2. Revert the fix, run the test again — it should fail (proves the test catches the bug).
-3. Restore the fix, run the test again — it should pass.
-4. Run the full suite to confirm no regressions.
+  <constraints>
+  - Never use "should pass" or "probably works" — cite actual output
+  - Prior test runs do not count — run verification fresh after changes
+  - If a subagent reports completion, verify independently before reporting upstream
+  - Do not conflate tools (linter passing does not mean build succeeds)
+  </constraints>
 
-## Constraints
+  <bounds will="evidence-based verification with baseline comparison" wont="skip verification or accept cached results"/>
 
-- Do not use "should pass" or "probably works" in completion statements. Cite actual output.
-- Prior test runs do not count — run verification fresh after your changes.
-- If a subagent reports completion, verify independently before reporting upstream.
-- Do not conflate different tools (linter passing does not mean build succeeds).
-
-## Completion
-
-Every claim is backed by fresh command output from the current turn.
-
-## Next
-
-Use `/sc:build` and `/sc:test` to run verification. Use the `self-review` agent for structured post-implementation validation.
+  <handoff next="/sc:build /sc:test"/>
+</component>

@@ -1,14 +1,14 @@
 ---
 name: using-superclaude
 description: |
-  Meta-skill for discovering and using SuperClaude features. Loaded at session
+  Meta-skill for discovering and using superclaude features. Loaded at session
   start. Covers SC commands (/sc:*), agents, skills, and core configuration
   (FLAGS, PRINCIPLES, RULES).
 ---
 <component name="using-superclaude" type="skill">
 
   <role>
-    <mission>Orient the user and model to SuperClaude's available features and how to invoke them</mission>
+    <mission>Orient the user and model to superclaude's available features and how to invoke them</mission>
   </role>
 
   <features>
@@ -27,27 +27,10 @@ description: |
 
   <instruction_priority>
     1. User's explicit instructions (highest — always wins)
-    2. Superpowers skills (if loaded — process workflow authority)
-    3. SuperClaude skills (domain knowledge, /sc: commands)
+    2. superclaude skills (process workflows, domain knowledge)
+    3. superclaude commands (/sc:* quick actions)
     4. Default system prompt (lowest — yields to the above)
   </instruction_priority>
-
-  <coexistence note="Superpowers plugin">
-When the Superpowers plugin is also installed, SP skills take precedence for overlapping skill names. This is handled automatically at install time.
-  </coexistence>
-
-  <sc_exclusive_skills>
-| Skill | Purpose |
-|-------|---------|
-| using-superclaude | Feature discovery and skill invocation |
-| confidence-check | Pre-execution confidence assessment before risky actions |
-| ship | Packaging and shipping deliverables |
-| simplicity-coach | Reducing complexity, removing unnecessary abstractions |
-  </sc_exclusive_skills>
-
-  <platform_adaptation>
-In non-Claude Code environments, skills cannot be invoked via the Skill tool. Treat skill content as reference documentation and follow the workflows manually.
-  </platform_adaptation>
 
   <bounds will="feature discovery|skill invocation guidance|instruction priority resolution" wont="modify code|execute workflows directly|override user instructions"/>
 

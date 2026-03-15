@@ -84,71 +84,10 @@ BASE_PATH = _get_base_path()
 #       that cause false positives on normal coding prompts.
 #       Use compound terms (e.g. "browser test" not "test") or explicit flags (--play).
 TRIGGER_MAP = [
-    # Modes - Priority 1-2
-    (
-        r"(brainstorm|ideate|explore ideas|--brainstorm|--bs)",
-        "modes/MODE_Brainstorming.md",
-        1,
-    ),
-    (
-        r"(deep.?research|investigate thoroughly|comprehensive search|/sc:research|--research)",
-        "modes/MODE_DeepResearch.md",
-        1,
-    ),
-    (
-        r"(introspect|self.?analysis|analyze reasoning|--introspect)",
-        "modes/MODE_Introspection.md",
-        2,
-    ),
-    (
-        r"(orchestrat|coordinate|multi.?tool|--orchestrate)",
-        "modes/MODE_Orchestration.md",
-        2,
-    ),
-    (
-        r"(task.?manage|--task-manage)",
-        "modes/MODE_Task_Management.md",
-        2,
-    ),
-    (
-        r"(--uc|--ultracompressed|token.?efficient|--token-efficient|--safe-mode)",
-        "modes/MODE_Token_Efficiency.md",
-        1,
-    ),
-    (
-        r"(business.?panel|expert.?panel|strategy.?panel|christensen|porter|drucker|godin|taleb|--business-panel)",
-        "modes/MODE_Business_Panel.md",
-        1,
-    ),
-    # MCP servers - Priority 2
-    (
-        r"(context7|c7|library docs|framework docs|--c7|--context7)",
-        "mcp/MCP_Context7.md",
-        2,
-    ),
-    (
-        r"(sequential thinking|multi.?step reasoning|reasoning chain|--seq|--sequential)",
-        "mcp/MCP_Sequential.md",
-        2,
-    ),
-    (
-        r"(playwright|browser test|e2e|screenshot|wcag|--play|--playwright)",
-        "mcp/MCP_Playwright.md",
-        2,
-    ),
+    # MCP servers - Priority 2 (only Serena + Tavily retained — others redundant with MCP auto-mode)
     (
         r"(serena|symbol ops|rename.?symbol|lsp|--serena|/sc:load|/sc:save)",
         "mcp/MCP_Serena.md",
-        2,
-    ),
-    (
-        r"(morphllm|morph|pattern replace|bulk edit|bulk transform|--morph|--morphllm)",
-        "mcp/MCP_Morphllm.md",
-        2,
-    ),
-    (
-        r"(magic|21st|ui component|design system|--magic|/ui|/21)",
-        "mcp/MCP_Magic.md",
         2,
     ),
     (
@@ -156,20 +95,10 @@ TRIGGER_MAP = [
         "mcp/MCP_Tavily.md",
         1,
     ),
-    (
-        r"(devtools|performance audit|layout shift|core web vitals|\bcls\b|\blcp\b|\bfid\b|\bttfb\b|--perf|--devtools)",
-        "mcp/MCP_Chrome-DevTools.md",
-        2,
-    ),
-    # Research config (supplementary) - Priority 3
-    (
-        r"(research.?config|hop.?config|research.?depth|deep.?research.?config|--research)",
-        "modes/RESEARCH_CONFIG.md",
-        3,
-    ),
     # Business symbols - Priority 3
     (r"(business.?symbol|strategic.?symbol|business.?example|panel.?example|--structured)", "core/BUSINESS_SYMBOLS.md", 3),
-    # Note: PRINCIPLES.md removed - now loaded via CLAUDE_SC.md @-reference
+    # Note: Modes removed from auto-loading — FLAGS.md provides mode definitions via @-reference chain
+    # Note: MCP docs for Context7, Sequential, Playwright, Morphllm, Magic, Chrome-DevTools removed — MCP auto-mode provides tool descriptions
 ]
 
 # Pre-compile regex patterns for performance (P2)
@@ -179,21 +108,14 @@ TRIGGER_MAP = [
 ]
 
 # Composite flags: one flag → multiple context files
+# Reduced to retained MCP docs only (Serena + Tavily)
 COMPOSITE_FLAGS = {
     "--frontend-verify": [
-        ("mcp/MCP_Playwright.md", 1),
-        ("mcp/MCP_Chrome-DevTools.md", 1),
         ("mcp/MCP_Serena.md", 1),
     ],
     "--all-mcp": [
-        ("mcp/MCP_Context7.md", 1),
-        ("mcp/MCP_Sequential.md", 1),
-        ("mcp/MCP_Playwright.md", 1),
         ("mcp/MCP_Serena.md", 1),
-        ("mcp/MCP_Morphllm.md", 1),
-        ("mcp/MCP_Magic.md", 1),
         ("mcp/MCP_Tavily.md", 1),
-        ("mcp/MCP_Chrome-DevTools.md", 1),
     ],
 }
 
@@ -202,43 +124,19 @@ COMPOSITE_FLAGS = {
 # Mode files → full .md injection (behavioral rules, symbol tables, tool matrices need complete content)
 # Core files → short instructions (supplementary reference)
 INSTRUCTION_MAP = {
-    # MCP servers - tool awareness only (Claude has full tool descriptions from MCP protocol)
-    "mcp/MCP_Context7.md": (
-        "Context7 MCP: resolve-library-id → query-docs for official library documentation. "
-        "Version-specific. Use for imports, framework patterns, API compliance."
-    ),
-    "mcp/MCP_Sequential.md": (
-        "Sequential Thinking MCP: sequentialthinking tool for multi-step reasoning. "
-        "Numbered thoughts, revision, branching. Use for debug, architecture, security, "
-        "complex analysis with 3+ interconnected components."
-    ),
     # mcp/MCP_Tavily.md — NOT in INSTRUCTION_MAP: full .md injection required
     # (integration flows, multi-hop strategies, credibility tiers, error handling)
-    "mcp/MCP_Playwright.md": (
-        "Playwright MCP: Browser automation and E2E testing. Real rendering, screenshots, "
-        "user journeys, WCAG accessibility. Use for login flows, forms, visual validation."
-    ),
     # mcp/MCP_Serena.md — NOT in INSTRUCTION_MAP: full .md injection required
     # (initialization sequence, decision matrix, memory patterns, thinking tools status)
-    "mcp/MCP_Morphllm.md": (
-        "Morphllm MCP: Pattern-based bulk code transformations. Style enforcement, "
-        "framework updates. Fast Apply with 30-50% token savings. Best for <10 files, "
-        "straightforward transforms. Not for semantic ops."
-    ),
-    "mcp/MCP_Magic.md": (
-        "Magic MCP (21st.dev): Modern UI component generation. Accessible, design-system "
-        "consistent. React/Vue/Angular. Use for production-ready buttons, forms, modals, cards."
-    ),
-    "mcp/MCP_Chrome-DevTools.md": (
-        "Chrome DevTools MCP: Core Web Vitals — CLS, LCP, FID, TTFB. CPU/memory profiling, "
-        "layout shift detection, render blocking analysis."
-    ),
+    #
+    # Note: 6 MCP docs removed (Context7, Sequential, Playwright, Morphllm, Magic, Chrome-DevTools)
+    # — MCP auto-mode provides tool descriptions natively; supplementary docs were redundant
+    #
     # Core supplementary
     "core/BUSINESS_SYMBOLS.md": (
         "Business symbols + expert selection: 🎯target 📈growth 💰financial ⚖️tradeoffs 🏆competitive 🌊blue-ocean. "
         "Includes expert domain mapping, discussion templates, and abbreviations."
     ),
-    # Mode files NOT listed here → full .md injection via fallback path
 }
 
 # Environment variable to control instruction mode (default: enabled)
