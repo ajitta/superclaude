@@ -69,7 +69,7 @@ Dedup via temp file cache; skip if content visible
 Benefit: ~70% token savings vs static @-references
   </dynamic_context>
 
-  <workflow_gates note="Recommended workflow chain — skills provided by SP when installed, or by SC /sc: commands">
+  <workflow_gates note="Recommended workflow chain — all skills provided by superclaude">
     brainstorming -> writing-plans: User approves spec before planning
     writing-plans -> executing-plans: Plan document committed to repo
     executing-plans -> verification: Plan tasks completed

@@ -8,7 +8,7 @@ Tests cover:
 - Frontmatter: name, description required; name matches directory
 - Frontmatter policy: disable-model-invocation, context, allowed-tools per spec
 - Body: minimum content length, not empty
-- Superpowers compatibility: skill names match upstream exactly
+- Skill coverage: all expected skill names present
 """
 
 import re
@@ -18,8 +18,8 @@ import pytest
 
 SKILLS_DIR = Path(__file__).parent.parent.parent / "src" / "superclaude" / "skills"
 
-# Expected superpowers-compatible skill names (12 ported + 3 existing)
-SUPERPOWERS_SKILL_NAMES = {
+# All superclaude skill names (12 process + 3 utility)
+PROCESS_SKILL_NAMES = {
     "brainstorming",
     "writing-plans",
     "verification-before-completion",
@@ -34,13 +34,13 @@ SUPERPOWERS_SKILL_NAMES = {
     "using-superclaude",
 }
 
-EXISTING_SKILL_NAMES = {
+UTILITY_SKILL_NAMES = {
     "confidence-check",
     "ship",
     "simplicity-coach",
 }
 
-ALL_SKILL_NAMES = SUPERPOWERS_SKILL_NAMES | EXISTING_SKILL_NAMES
+ALL_SKILL_NAMES = PROCESS_SKILL_NAMES | UTILITY_SKILL_NAMES
 
 # Skills that MUST have disable-model-invocation: true (per spec)
 SIDE_EFFECT_SKILLS = {
@@ -50,7 +50,6 @@ SIDE_EFFECT_SKILLS = {
 }
 
 # Skills that MUST have context: fork (per spec)
-# Note: executing-plans removed — aligned with superpowers upstream (runs inline, not forked)
 FORK_CONTEXT_SKILLS = {
     "requesting-code-review",
 }
@@ -96,22 +95,22 @@ class TestSkillCoverage:
     """Validate all expected skills exist."""
 
     def test_total_skill_count(self):
-        """Must have exactly 15 skills (12 ported + 3 existing)."""
+        """Must have exactly 15 skills (12 process + 3 utility)."""
         assert len(SKILL_DIRS) == 15, (
             f"Expected 15 skills, found {len(SKILL_DIRS)}: {SKILL_IDS}"
         )
 
-    def test_all_superpowers_skills_present(self):
-        """All 12 superpowers-compatible skill names must exist."""
+    def test_all_process_skills_present(self):
+        """All 12 process skill names must exist."""
         actual = set(SKILL_IDS)
-        missing = SUPERPOWERS_SKILL_NAMES - actual
-        assert not missing, f"Missing superpowers skills: {missing}"
+        missing = PROCESS_SKILL_NAMES - actual
+        assert not missing, f"Missing process skills: {missing}"
 
-    def test_all_existing_skills_preserved(self):
-        """Original 3 skills must still exist."""
+    def test_all_utility_skills_preserved(self):
+        """All 3 utility skills must exist."""
         actual = set(SKILL_IDS)
-        missing = EXISTING_SKILL_NAMES - actual
-        assert not missing, f"Missing existing skills: {missing}"
+        missing = UTILITY_SKILL_NAMES - actual
+        assert not missing, f"Missing utility skills: {missing}"
 
     def test_no_unexpected_skills(self):
         """No unexpected skill directories."""
@@ -190,7 +189,7 @@ class TestSkillFrontmatterPolicy:
     def test_non_side_effect_skills_no_disable_model(self, skill):
         """Non-side-effect skills should not block auto-invocation."""
         dirname, content, fm = skill
-        if dirname not in SIDE_EFFECT_SKILLS and dirname in SUPERPOWERS_SKILL_NAMES:
+        if dirname not in SIDE_EFFECT_SKILLS and dirname in PROCESS_SKILL_NAMES:
             assert fm.get("disable-model-invocation") != "true", (
                 f"{dirname}: process skill should not have disable-model-invocation"
             )

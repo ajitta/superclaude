@@ -1,4 +1,4 @@
-# SuperClaude Skills
+# superclaude Skills
 
 Skills are reusable, specialized capabilities with defined behaviors, tool access, and optional hooks.
 
