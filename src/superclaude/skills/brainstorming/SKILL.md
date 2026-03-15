@@ -6,114 +6,34 @@ description: |
   requirements and design through collaborative dialogue before writing code.
 ---
 
-# Brainstorming Ideas Into Designs
+## Purpose
 
-Turn ideas into actionable designs through structured collaborative dialogue. Start by understanding the project context — files, docs, conventions — then guide the user through clarifying questions, approach trade-offs, and design presentation before any code is written.
+Turn ideas into fully formed designs and specs through collaborative dialogue before any code is written.
 
-## HARD GATE
+## Workflow
 
-**Do NOT invoke any implementation skill, write code, or take implementation action until the design is explicitly approved by the user.**
+1. **Explore project context** — check files, docs, recent commits to understand current state
+2. **Offer visual companion** (optional) — if the topic involves visual questions, offer the browser-based companion in a standalone message. If accepted, read `skills/brainstorming/visual-companion.md` before proceeding
+3. **Ask clarifying questions** — one question per message, multiple choice preferred when possible. Focus on purpose, constraints, and success criteria. If the request spans multiple independent subsystems, flag decomposition before diving into details
+4. **Propose 2-3 approaches** — with trade-offs, rough effort estimates (small/medium/large), and your recommendation. If options feel equivalent, say so
+5. **Present design section by section** — scale each section to its complexity. Ask after each section whether it looks right. Cover architecture, components, data flow, error handling, testing. YAGNI ruthlessly
+6. **Write spec** — save to `docs/superpowers/specs/YYYY-MM-DD-<topic>-design.md` (user preferences override this path). Include problem statement, chosen approach, key decisions, interfaces, open questions. Commit to git
+7. **Spec review loop** — dispatch `spec-document-reviewer` subagent with crafted review context (not your session history). Fix issues and re-dispatch until approved, max 5 iterations before surfacing to human
+8. **User review** — ask user to review the written spec before proceeding. If they request changes, make them and re-run the review loop
+9. **Handoff** — invoke writing-plans skill to create the implementation plan
 
-This gate applies to EVERY project, regardless of perceived simplicity or urgency.
+## Constraints
 
-### Anti-Pattern: "This Is Too Simple To Need A Design"
+- Do not write code or invoke implementation skills until the user approves the design
+- Only one question per message — break multi-part topics into sequential questions
+- writing-plans is the only valid next skill after brainstorming
+- In existing codebases, follow established patterns. Include targeted improvements only where they serve the current goal
+- Do not propose unrelated refactoring
 
-Every project goes through this gate. "Simple" is exactly where unexamined assumptions waste the most work. A two-minute design conversation can prevent a two-hour rewrite.
+## Completion
 
-## Checklist
+The spec is written, committed, reviewed by both the subagent and the user, and approved. You are ready to invoke writing-plans.
 
-1. **Explore project context** — read key files, docs, recent commits, understand current state
-2. **Offer visual companion** — if visual questions lie ahead, suggest diagramming or sketching
-3. **Ask clarifying questions** — one at a time, prefer multiple choice when possible
-4. **Propose 2-3 approaches** — include trade-offs and a clear recommendation
-5. **Present design** — scale sections to complexity, get approval before proceeding
-6. **Write design doc** — save to `docs/superpowers/specs/YYYY-MM-DD-<topic>-design.md`
-7. **Spec review loop** — dispatch reviewer subagent, fix issues, max 5 iterations
-8. **User reviews written spec** — explicit approval required
-9. **Transition to implementation** — invoke writing-plans skill
+## Next
 
-## The Process
-
-### Understanding the Idea
-
-- Check project state: read README, recent commits, open issues, existing architecture
-- Assess scope: is this a new feature, a modification, or a refactor?
-- Ask one question at a time — never dump a list of five questions
-- Prefer multiple choice over open-ended ("Would you prefer A, B, or C?" over "What do you want?")
-- Summarize understanding back to the user before moving on
-
-### Exploring Approaches
-
-- Always present 2-3 distinct options
-- Lead with your recommendation and explain why
-- For each option, state:
-  - What it solves well
-  - What it trades away
-  - Rough effort estimate (small / medium / large)
-- If all options feel equivalent, say so — don't manufacture false distinctions
-
-### Presenting the Design
-
-- Scale detail to complexity:
-  - Small change: a few bullet points
-  - Medium feature: sections for scope, approach, data flow, edge cases
-  - Large system: full design doc with diagrams, interfaces, migration plan
-- Present one section at a time, ask if the direction is right before continuing
-- Never present a monolithic design and ask "does this look good?"
-
-### Design for Isolation and Clarity
-
-- Break work into the smallest independent units possible
-- Define clear boundaries between components
-- Specify interfaces explicitly — inputs, outputs, error cases
-- Prefer composition over inheritance, loose coupling over tight integration
-- Ask: "Can this be tested in isolation?"
-
-### Working in Existing Codebases
-
-- Explore before proposing — understand existing patterns and conventions
-- Follow established patterns unless there is a strong reason to diverge
-- Document any intentional deviations and the reasoning behind them
-- Consider migration paths: can old and new coexist during transition?
-
-## After the Design
-
-### Write the Spec
-
-- Save to `docs/superpowers/specs/YYYY-MM-DD-<topic>-design.md`
-- Include: problem statement, chosen approach, key decisions, interfaces, open questions
-
-### Spec Review Loop
-
-- Dispatch a reviewer subagent (requirements-analyst) to check for:
-  - Missing edge cases
-  - Unclear interfaces
-  - Unstated assumptions
-  - Scope creep
-- Address findings, re-review — max 5 iterations
-- If issues persist after 5 rounds, flag to user for judgment
-
-### User Review Gate
-
-- Present the final spec to the user
-- Require explicit approval ("approved", "looks good", "go ahead")
-- Silence or ambiguity is NOT approval — ask again
-
-### Terminal State
-
-- Once approved, invoke the writing-plans skill to break the design into implementation steps
-- Do not begin coding directly from the design — always create a plan first
-
-## Key Principles
-
-- **One question at a time** — respect cognitive load, never stack questions
-- **YAGNI** — design only what is needed now, note future possibilities without building them
-- **Explore alternatives** — the first idea is rarely the best; always generate at least two more
-- **Incremental validation** — check understanding at each step, don't wait until the end
-- **Reversibility** — prefer designs that are easy to change over designs that are "complete"
-
-## SuperClaude Integration
-
-- Use `/sc:brainstorm` command for structured exploration sessions
-- Delegate to `requirements-analyst` agent for spec validation during review loop
-- Handoff: writing-plans skill for implementation planning after design approval
+Handoff to **writing-plans** skill for implementation planning.
