@@ -206,10 +206,7 @@ only the "HARD-GATE" wrapper and "MUST" enforcement are softened.
 
 ### Path Conventions
 
-Skills that reference `docs/superpowers/` paths (brainstorming saves specs to
-`docs/superpowers/specs/`, writing-plans saves to `docs/superpowers/plans/`) retain these
-paths. Changing them would break SP compatibility for users who switch between SP and SC.
-This is a documentation path, not a behavioral dependency.
+Skills save specs to `docs/specs/` and plans to `docs/plans/`.
 
 ### Test Impact
 

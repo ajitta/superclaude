@@ -8,7 +8,7 @@
 
 **Tech Stack:** Markdown (skill files), Python (tests), Git
 
-**Spec:** `docs/superpowers/specs/2026-03-15-opus46-alignment-design.md`
+**Spec:** `docs/specs/2026-03-15-opus46-alignment-design.md`
 
 ---
 
@@ -121,7 +121,7 @@ Keep:
 - Frontmatter (name, description — tighten description if needed)
 - Checklist: explore context → ask questions one at a time → propose 2-3 approaches → present design → write spec → spec review loop → user review → handoff to writing-plans
 - Visual companion offer (as optional step)
-- Spec save path: `docs/superpowers/specs/YYYY-MM-DD-<topic>-design.md`
+- Spec save path: `docs/specs/YYYY-MM-DD-<topic>-design.md`
 - "One question at a time" and "multiple choice preferred" principles (these are WHAT)
 
 Remove:
@@ -160,7 +160,7 @@ Keep:
 - Plan document header template
 - Task structure with checkbox syntax
 - Plan review loop (dispatch reviewer)
-- Save path: `docs/superpowers/plans/YYYY-MM-DD-<feature>.md`
+- Save path: `docs/plans/YYYY-MM-DD-<feature>.md`
 - DRY, YAGNI, TDD, frequent commits
 - Execution handoff (subagent-driven or executing-plans)
 

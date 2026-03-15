@@ -8,7 +8,7 @@
 
 **Tech Stack:** Markdown (YAML frontmatter), Python (pytest, click CLI), UV package manager
 
-**Spec:** `docs/superpowers/specs/2026-03-15-superclaude-content-framework-upgrade-design.md`
+**Spec:** `docs/specs/2026-03-15-superclaude-content-framework-upgrade-design.md`
 
 ---
 
@@ -107,7 +107,7 @@ description: |
 - One question at a time rule
 - YAGNI ruthlessly
 - Design for isolation and clarity
-- After design: write spec to `docs/superpowers/specs/YYYY-MM-DD-<topic>-design.md`
+- After design: write spec to `docs/specs/YYYY-MM-DD-<topic>-design.md`
 - Terminal state: invoke writing-plans skill
 
 **Superclaude additions** (clearly marked):
@@ -163,7 +163,7 @@ description: |
 - Plan document header template
 - Task structure template (Files, Steps with checkboxes, Run commands, Expected output)
 - DRY, YAGNI, TDD, frequent commits
-- Save plans to `docs/superpowers/plans/YYYY-MM-DD-<feature-name>.md`
+- Save plans to `docs/plans/YYYY-MM-DD-<feature-name>.md`
 - Execution handoff: invoke executing-plans skill
 
 **Superclaude additions**:
