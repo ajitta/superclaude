@@ -1,96 +1,45 @@
 ---
 name: requesting-code-review
 description: |
-  Dispatch a subagent reviewer with precisely crafted context to review completed work.
-  Use when completing tasks, implementing features, or before merging. Provides the
-  reviewer exactly the context needed without session history leakage.
+  Dispatch a subagent reviewer with the context needed to review completed work.
+  Use when completing tasks, implementing features, or before merging.
 context: fork
 ---
 
-# Requesting Code Review
+## Purpose
 
-## Overview
+Request a structured code review by dispatching a reviewer subagent with the right context about what changed and why.
 
-When work is complete, dispatch a reviewer subagent with a purpose-built context payload. The reviewer should receive only the information it needs to evaluate the changes — not your entire session history. Craft the review request so the reviewer can operate independently, with clear boundaries around what changed and why.
+## When to Use
 
-## When to Request Review
-
-### Mandatory
-
-- After completing each discrete task or user story
-- After implementing a major feature or architectural change
+- After completing a discrete task or feature
 - Before merging any branch into `integration` or `master`
-- After resolving a complex bug where the fix touches multiple files
+- After resolving a complex bug touching multiple files
+- Optionally: when stuck on a design decision or working in unfamiliar code
 
-### Optional
+## Workflow
 
-- When stuck on a design decision and want a second perspective
-- Before starting a large refactor, to validate the approach
-- When making changes in unfamiliar areas of the codebase
-- After performance-sensitive changes
+1. **Get the diff range**: Identify BASE_SHA and HEAD_SHA covering your work. Use `git log --oneline BASE_SHA..HEAD_SHA` to confirm the range is correct.
+2. **Gather context**: Collect changed files, their purpose, the original requirements or plan, and current test results.
+3. **Dispatch reviewer**: Send a `self-review` subagent (or use `/sc:review`) with: what was implemented, the plan/requirements, the commit range, and a brief description.
+4. **Keep context clean**: The reviewer should receive the final result and requirements — not your false starts or abandoned approaches.
+5. **Triage feedback by severity**:
+   - **Critical**: Fix immediately before any other work.
+   - **Important**: Address before moving to the next task.
+   - **Minor**: Note for later, batch with related work.
+   - **Style**: Apply if you agree, skip if subjective.
+6. **Fix and re-request if needed**: After addressing Critical or Important items, request another review pass if the changes were substantial.
 
-## How to Request
+## Constraints
 
-### Step 1: Gather Change Boundaries
+- Do not skip review because "it's a small change" — small changes in critical paths cause outages.
+- Do not request review before the work compiles and tests pass.
+- Do not ignore Critical feedback — if you disagree, respond with evidence.
 
-Identify the exact commit range that covers your work:
+## Completion
 
-```
-BASE_SHA = commit before your first change
-HEAD_SHA = your latest commit (usually HEAD)
-```
+Reviewer feedback is received, triaged, and addressed. Critical and Important items are resolved.
 
-Use `git log --oneline BASE_SHA..HEAD_SHA` to confirm the range captures all relevant commits and nothing extraneous.
+## Next
 
-### Step 2: Dispatch the Reviewer Subagent
-
-Provide these four pieces of context — no more, no less:
-
-| Field | Content |
-|-------|---------|
-| **WHAT_WAS_IMPLEMENTED** | Concrete summary of changes made. List files touched and the purpose of each change. |
-| **PLAN_OR_REQUIREMENTS** | The original task description, acceptance criteria, or plan that drove the work. |
-| **BASE_SHA** | The commit SHA before your first change. |
-| **HEAD_SHA** | The commit SHA of your final change. |
-
-The reviewer uses `git diff BASE_SHA..HEAD_SHA` to inspect the actual changes. Your summary in WHAT_WAS_IMPLEMENTED helps the reviewer orient quickly, but the diff is the source of truth.
-
-### Step 3: Do Not Leak Session Context
-
-The reviewer should not inherit your reasoning, false starts, or abandoned approaches. If you tried three implementations before settling on one, the reviewer only needs to see the final result plus the requirements it should satisfy.
-
-## Acting on Feedback
-
-### Severity-Based Response
-
-| Severity | Action | Timing |
-|----------|--------|--------|
-| **Critical** | Fix immediately, do not proceed with other work | Before any other changes |
-| **Important** | Address before moving to next task | Before proceeding |
-| **Minor** | Note for later, batch with related work | Next convenient opportunity |
-| **Style** | Apply if you agree, skip if subjective | At your discretion |
-
-### Disagreeing with Feedback
-
-If feedback is incorrect or missing context, push back with evidence. Show the reviewer what they missed — a test that covers the case, a constraint they were not aware of, or a deliberate tradeoff documented in the plan. Do not silently ignore feedback.
-
-## Integration with Workflows
-
-**Subagent-driven development**: After each implementation subagent completes its work, the orchestrator dispatches a review subagent before accepting the result.
-
-**Executing plans**: Review at each milestone boundary, not only at the end. Catching issues early in a multi-step plan prevents cascading rework.
-
-**Ad-hoc work**: Even single-file fixes benefit from review when they touch critical paths (auth, payments, data migration).
-
-## Red Flags
-
-- Never skip review because "it's a small change" — small changes in critical paths cause outages
-- Never ignore Critical severity feedback — if you disagree, respond with evidence, but do not proceed without resolution
-- Never request review before the work compiles and tests pass — the reviewer's job is correctness and design, not catching syntax errors
-- Never dump your entire session as context — curate what the reviewer needs
-
-## SuperClaude Integration
-
-Use `/sc:review` to initiate a structured review workflow. The `self-review` agent can serve as the reviewer subagent for automated review passes.
-
-Handoff: after receiving reviewer feedback, follow the `receiving-code-review` skill for how to process and act on comments.
+After receiving feedback, follow the `receiving-code-review` skill to process and act on comments.
