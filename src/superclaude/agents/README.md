@@ -56,6 +56,12 @@ Agents are managed by Claude Code's native agent delegation system. Auto-selecte
 |-------|-------|------------|-------------|
 | `simplicity-guide` | opus | plan | Complexity prevention through Orient-Step-Learn |
 
+### Git & Workflow
+
+| Agent | Model | Permission | Description |
+|-------|-------|------------|-------------|
+| `git-workflow` | sonnet | default | Git operations with intelligent commits, PR workflow, and safety enforcement |
+
 ### Code Quality
 
 | Agent | Model | Permission | Description |
