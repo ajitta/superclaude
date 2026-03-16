@@ -356,6 +356,38 @@ def output_inject_mode(contexts: list[tuple[str, int]]) -> None:
             print(f"<!-- Skipped (budget): {skipped_info} -->")
 
 
+# Execution flag patterns and their behavioral directives
+_EXECUTION_DIRECTIVES = {
+    re.compile(r"--iterations\s+(\d+)", re.IGNORECASE): (
+        lambda m: f"<sc-directive flag=\"--iterations {m.group(1)}\">"
+        f"Execute exactly {m.group(1)} improvement iterations. "
+        f"After each iteration: state what changed. Do not stop early."
+        f"</sc-directive>"
+    ),
+    re.compile(r"--loop\b", re.IGNORECASE): (
+        lambda m: "<sc-directive flag=\"--loop\">"
+        "Iterative improvement mode: execute → self-evaluate → identify gaps → re-execute. "
+        "Repeat until no meaningful improvement. Report total iteration count when done."
+        "</sc-directive>"
+    ),
+    re.compile(r"--concurrency\s+(\d+)", re.IGNORECASE): (
+        lambda m: f"<sc-directive flag=\"--concurrency {m.group(1)}\">"
+        f"Batch up to {m.group(1)} independent tool calls per message. "
+        f"Group reads, searches, and other non-dependent operations together."
+        f"</sc-directive>"
+    ),
+}
+
+
+def _emit_execution_directives(prompt: str) -> None:
+    """Emit inline behavioral directives for execution flags."""
+    for pattern, directive_fn in _EXECUTION_DIRECTIVES.items():
+        match = pattern.search(prompt)
+        if match:
+            print(directive_fn(match))
+            print()
+
+
 def _extract_prompt(stdin_data: str) -> str:
     """Extract prompt from UserPromptSubmit JSON input, with raw text fallback."""
     try:
@@ -381,6 +413,9 @@ def main() -> None:
             if summary:
                 print(summary)
                 print()
+
+    # Execution flag directives (inline behavioral hints — no file injection)
+    _emit_execution_directives(prompt)
 
     # Check triggers and get contexts to load
     contexts = check_triggers(prompt)

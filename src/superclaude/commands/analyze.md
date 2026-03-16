@@ -19,11 +19,11 @@ description: Comprehensive code analysis across quality, security, performance, 
   </flow>
 
   <outputs note="Per --format flag">
-| Format | Output | Content |
-|--------|--------|---------|
-| text | console | Inline findings + recs |
-| json | analysis.json | Structured findings |
-| report | ANALYSIS_REPORT.md | Full report + roadmap |
+  | Format | Output | Content |
+  |--------|--------|---------|
+  | `text` (default) | Console inline | Findings + recommendations inline |
+  | `json` | `docs/analysis/YYYY-MM-DD-<target>-analysis.json` | Structured findings as JSON |
+  | `report` | `docs/analysis/YYYY-MM-DD-<target>-analysis.md` | Full report with roadmap |
   </outputs>
 
 
@@ -35,7 +35,7 @@ description: Comprehensive code analysis across quality, security, performance, 
     - Grep: Pattern analysis
     - Read: Source inspection
     - Bash: External tools
-    - Write: Report generation
+    - Write: Report generation (--format json|report)
   </tools>
 
   <patterns>
@@ -48,14 +48,14 @@ description: Comprehensive code analysis across quality, security, performance, 
 
 | Input | Output |
 |-------|--------|
-| `/sc:analyze` | Multi-domain project report |
-| `src/auth --focus security --deep` | Vulnerability assessment |
-| `--focus performance --format report` | Bottleneck analysis |
-| `src/components --focus quality --quick` | Code smell detection |
+| `/sc:analyze` | Multi-domain findings inline |
+| `src/auth --focus security --deep` | Security vulnerability assessment |
+| `--focus performance --format report` | ANALYSIS_REPORT.md with bottleneck roadmap |
+| `src/components --focus quality --format json` | analysis.json with code smell findings |
 
   <example name="invalid-focus" type="error-path">
     <input>/sc:analyze --focus everything --scope system</input>
-    <why_wrong>--focus accepts: perf|security|quality|arch|a11y|testing. 'everything' is not a valid domain.</why_wrong>
+    <why_wrong>--focus accepts: quality|security|performance|architecture. 'everything' is not valid.</why_wrong>
     <correct>/sc:analyze --scope system (omit --focus for multi-domain analysis)</correct>
   </example>
 
