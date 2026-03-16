@@ -6,7 +6,7 @@ description: Task reflection and validation using Serena MCP analysis capabiliti
   <role>
     /sc:reflect
     <mission>Task reflection and validation using analysis capabilities</mission>
-    <note>For evidence-based completion verification, use the verification-before-completion skill instead</note>
+    <note>For evidence-based completion verification, use /sc:test with the verification workflow</note>
   </role>
 
   <syntax>/sc:reflect [--type task|session|completion] [--analyze] [--validate]</syntax>

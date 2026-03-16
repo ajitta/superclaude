@@ -1,6 +1,5 @@
 """
-DEPRECATED: This module is superseded by the superclaude process skills
-(systematic-debugging, test-driven-development).
+DEPRECATED: This module is superseded by /sc:troubleshoot and /sc:test --tdd commands.
 Kept for backward compatibility with existing pytest fixtures and tests.
 
 Self-Correction Engine - Learn from Mistakes

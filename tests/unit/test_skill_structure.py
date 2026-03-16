@@ -4,11 +4,8 @@ Structural validation tests for skill SKILL.md files.
 Validates frontmatter fields, body content, and cross-field consistency
 for all skill definitions in src/superclaude/skills/.
 
-Tests cover:
-- Frontmatter: name, description required; name matches directory
-- Frontmatter policy: disable-model-invocation, context, allowed-tools per spec
-- Body: minimum content length, not empty
-- Skill coverage: all expected skill names present
+Skills are CC-native execution containers limited to hooks, safety,
+and script execution. Workflow procedures belong in commands/.
 """
 
 import re
@@ -18,41 +15,28 @@ import pytest
 
 SKILLS_DIR = Path(__file__).parent.parent.parent / "src" / "superclaude" / "skills"
 
-# All superclaude skill names (12 process + 3 utility)
-PROCESS_SKILL_NAMES = {
-    "brainstorming",
-    "writing-plans",
-    "verification-before-completion",
-    "executing-plans",
-    "test-driven-development",
-    "systematic-debugging",
-    "requesting-code-review",
-    "receiving-code-review",
-    "finishing-a-development-branch",
-    "dispatching-parallel-agents",
-    "using-git-worktrees",
-    "using-superclaude",
+# All superclaude skill names — only CC-native capability skills remain
+# (hooks, disable-model-invocation, allowed-tools, scripts)
+HOOK_SKILL_NAMES = {
+    "confidence-check",       # PreToolUse hook + validation script
+    "simplicity-coach",       # Stop hook + dependency-audit script
 }
 
-UTILITY_SKILL_NAMES = {
-    "confidence-check",
-    "ship",
-    "simplicity-coach",
+SAFETY_SKILL_NAMES = {
+    "ship",                          # disable-model-invocation
+    "finishing-a-development-branch", # disable-model-invocation + allowed-tools
 }
 
-ALL_SKILL_NAMES = PROCESS_SKILL_NAMES | UTILITY_SKILL_NAMES
+ALL_SKILL_NAMES = HOOK_SKILL_NAMES | SAFETY_SKILL_NAMES
 
-# Skills that MUST have disable-model-invocation: true (per spec)
+# Skills that MUST have disable-model-invocation: true
 SIDE_EFFECT_SKILLS = {
+    "ship",
     "finishing-a-development-branch",
-    "dispatching-parallel-agents",
-    "using-git-worktrees",
 }
 
-# Skills that MUST have context: fork (per spec)
-FORK_CONTEXT_SKILLS = {
-    "requesting-code-review",
-}
+# No fork-context skills remain (requesting-code-review migrated to /sc:review)
+FORK_CONTEXT_SKILLS: set[str] = set()
 
 # All skill directories with SKILL.md
 SKILL_DIRS = sorted(
@@ -95,22 +79,22 @@ class TestSkillCoverage:
     """Validate all expected skills exist."""
 
     def test_total_skill_count(self):
-        """Must have exactly 15 skills (12 process + 3 utility)."""
-        assert len(SKILL_DIRS) == 15, (
-            f"Expected 15 skills, found {len(SKILL_DIRS)}: {SKILL_IDS}"
+        """Must have exactly 4 skills (2 hook + 2 safety)."""
+        assert len(SKILL_DIRS) == 4, (
+            f"Expected 4 skills, found {len(SKILL_DIRS)}: {SKILL_IDS}"
         )
 
-    def test_all_process_skills_present(self):
-        """All 12 process skill names must exist."""
+    def test_all_hook_skills_present(self):
+        """Both hook skills must exist."""
         actual = set(SKILL_IDS)
-        missing = PROCESS_SKILL_NAMES - actual
-        assert not missing, f"Missing process skills: {missing}"
+        missing = HOOK_SKILL_NAMES - actual
+        assert not missing, f"Missing hook skills: {missing}"
 
-    def test_all_utility_skills_preserved(self):
-        """All 3 utility skills must exist."""
+    def test_all_safety_skills_present(self):
+        """Both safety skills must exist."""
         actual = set(SKILL_IDS)
-        missing = UTILITY_SKILL_NAMES - actual
-        assert not missing, f"Missing utility skills: {missing}"
+        missing = SAFETY_SKILL_NAMES - actual
+        assert not missing, f"Missing safety skills: {missing}"
 
     def test_no_unexpected_skills(self):
         """No unexpected skill directories."""
@@ -158,11 +142,11 @@ class TestSkillFrontmatter:
         assert not found, f"{dirname}: has agent-only fields: {found}"
 
 
-# --- Frontmatter Policy Tests (from spec) ---
+# --- Frontmatter Policy Tests ---
 
 
 class TestSkillFrontmatterPolicy:
-    """Validate frontmatter matches the spec's policy table."""
+    """Validate frontmatter matches policy."""
 
     def test_side_effect_skills_have_disable_model_invocation(self, skill):
         dirname, content, fm = skill
@@ -171,28 +155,19 @@ class TestSkillFrontmatterPolicy:
                 f"{dirname}: side-effect skill must have disable-model-invocation: true"
             )
 
-    def test_fork_skills_have_context(self, skill):
+    def test_no_orphaned_fork_context(self, skill):
+        """No remaining skills should have context: fork."""
         dirname, content, fm = skill
-        if dirname in FORK_CONTEXT_SKILLS:
-            assert fm.get("context") == "fork", (
-                f"{dirname}: must have context: fork per spec"
-            )
+        assert fm.get("context") != "fork", (
+            f"{dirname}: context: fork skills have been migrated to commands"
+        )
 
-    def test_non_fork_skills_no_agent_field(self, skill):
-        """Skills without context: fork must not have agent: field."""
+    def test_no_orphaned_agent_field(self, skill):
+        """No remaining skills should have agent: field."""
         dirname, content, fm = skill
-        if fm.get("context") != "fork":
-            assert "agent" not in fm, (
-                f"{dirname}: has agent: without context: fork (agent is ignored inline)"
-            )
-
-    def test_non_side_effect_skills_no_disable_model(self, skill):
-        """Non-side-effect skills should not block auto-invocation."""
-        dirname, content, fm = skill
-        if dirname not in SIDE_EFFECT_SKILLS and dirname in PROCESS_SKILL_NAMES:
-            assert fm.get("disable-model-invocation") != "true", (
-                f"{dirname}: process skill should not have disable-model-invocation"
-            )
+        assert "agent" not in fm, (
+            f"{dirname}: agent: field skills have been migrated to commands"
+        )
 
 
 # --- Body Content Tests ---
@@ -231,19 +206,19 @@ class TestSkillBody:
 
 
 class TestWorkflowGates:
-    """Validate workflow gates are defined in RULES.md."""
+    """Validate workflow gates reference commands in RULES.md."""
 
     def test_rules_has_workflow_gates(self):
         rules_path = SKILLS_DIR.parent / "core" / "RULES.md"
         content = rules_path.read_text(encoding="utf-8")
         assert "<workflow_gates" in content, "RULES.md missing <workflow_gates> section"
 
-    def test_workflow_gates_mention_key_skills(self):
+    def test_workflow_gates_reference_commands(self):
         rules_path = SKILLS_DIR.parent / "core" / "RULES.md"
         content = rules_path.read_text(encoding="utf-8")
-        for skill_name in ["brainstorming", "writing-plans", "executing-plans", "verification"]:
-            assert skill_name in content, (
-                f"RULES.md workflow gates missing reference to '{skill_name}'"
+        for cmd in ["/sc:brainstorm", "/sc:plan", "/sc:implement", "/sc:test"]:
+            assert cmd in content, (
+                f"RULES.md workflow gates missing reference to '{cmd}'"
             )
 
 
