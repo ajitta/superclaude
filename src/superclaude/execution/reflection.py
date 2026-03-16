@@ -1,6 +1,5 @@
 """
-DEPRECATED: This module is superseded by the superclaude process skills
-(systematic-debugging, verification-before-completion).
+DEPRECATED: This module is superseded by /sc:troubleshoot and /sc:test commands.
 Kept for backward compatibility with existing pytest fixtures and tests.
 
 Reflection Engine - 3-Stage Pre-Execution Confidence Check

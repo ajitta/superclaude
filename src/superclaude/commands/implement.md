@@ -8,15 +8,15 @@ description: Feature and code implementation with intelligent persona activation
     <mission>Feature and code implementation with intelligent persona activation and MCP integration</mission>
   </role>
 
-  <syntax>/sc:implement [feature] [--type component|api|service|feature] [--framework react|vue|express] [--safe] [--with-tests]</syntax>
+  <syntax>/sc:implement [feature] [--plan docs/plans/...] [--type component|api|service|feature] [--framework react|vue|express] [--safe] [--with-tests]</syntax>
 
   <flow>
-    1. Analyze: Requirements + tech context
-    2. Plan: Approach + activate personas
+    1. Load: If --plan provided, read plan document and extract tasks; otherwise analyze requirements + tech context
+    2. Plan: Approach + activate personas; for plan mode, follow task order exactly
     3. Checkpoint: If changes affect >3 files → present numbered plan → wait for user approval before editing
-    4. Generate: Code + framework best practices
-    5. Validate: Security + quality checks
-    6. Integrate: Docs + testing recs
+    4. Execute: Code + framework best practices; for plan mode, mark tasks complete as you go
+    5. Validate: Security + quality checks; run verification command per task
+    6. Integrate: Docs + testing recs; report any blockers encountered
   </flow>
 
   <mcp servers="seq|c7|magic|play"/>

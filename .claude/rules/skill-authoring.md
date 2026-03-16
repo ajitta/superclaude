@@ -1,5 +1,9 @@
 # Skill Authoring Rules
 
+> **Decision gate:** Only create a skill when you need a CC-native capability:
+> hooks, `disable-model-invocation`, `allowed-tools`, or script execution.
+> Workflow procedures → `commands/`. Domain expertise → `agents/`.
+
 When creating or modifying skill files in `src/superclaude/skills/`, follow these rules exactly.
 
 ## Directory Structure

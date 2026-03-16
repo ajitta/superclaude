@@ -8,7 +8,7 @@ description: Execute tests with coverage analysis and automated quality reportin
     <mission>Execute tests with coverage analysis and automated quality reporting</mission>
   </role>
 
-  <syntax>/sc:test [target] [--type unit|integration|e2e|all] [--coverage] [--watch] [--fix]</syntax>
+  <syntax>/sc:test [target] [--type unit|integration|e2e|all] [--tdd] [--coverage] [--watch] [--fix]</syntax>
 
   <flow>
     1. Discover: Categorize tests via runner patterns
@@ -42,6 +42,7 @@ description: Execute tests with coverage analysis and automated quality reportin
     - Coverage: Metrics → comprehensive reporting
     - E2E: Browser automation → cross-platform validation
     - Watch: File monitoring → continuous execution
+    - TDD (--tdd): RED (write one failing test) → GREEN (simplest code to pass) → REFACTOR (clean up under green) → repeat per behavior
   </patterns>
 
   <examples>
@@ -52,6 +53,7 @@ description: Execute tests with coverage analysis and automated quality reportin
 | `src/components --type unit --coverage` | Targeted coverage |
 | `--type e2e` | Playwright browser testing |
 | `--watch --fix` | Continuous + auto-fix |
+| `--tdd src/auth/` | RED-GREEN-REFACTOR cycle for auth module |
 
   <example name="retry-without-diagnosis" type="error-path">
     <input>/sc:test (after 3 test failures, re-running same tests hoping they pass)</input>

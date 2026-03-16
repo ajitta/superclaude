@@ -1,6 +1,6 @@
 """
 DEPRECATED: This module is superseded by Claude Code's native Agent tool
-and the superclaude process skills (executing-plans, dispatching-parallel-agents).
+and the /sc:implement command (--plan mode, --delegate flag).
 Kept for backward compatibility with existing pytest fixtures and tests.
 
 Parallel Execution Engine - Automatic Parallelization

@@ -53,7 +53,7 @@ SuperClaude is a **dual-purpose** project:
 | `modes/` | Mindset overlay — situational cognitive frameworks | On-demand (context_loader) |
 | `agents/` | Domain persona — specialized expert definitions | CC-native auto-delegation |
 | `commands/` | Workflow entry — user-facing /sc:* slash commands | CC-native slash commands |
-| `skills/` | Execution logic — hooks, tool restrictions, isolation | CC-native auto-detection |
+| `skills/` | Runtime hooks + safety — CC-native only | CC-native (hooks, disable-model-invocation) |
 | `mcp/` | Tool reference — MCP server docs + configuration | context_loader + install_mcp |
 | `scripts/` | Hook infrastructure — Python/shell automation | hooks.json → settings.json |
 
@@ -64,7 +64,7 @@ The CLI `superclaude install` copies content from the package to Claude Code's c
 ```
 src/superclaude/commands/  →  ~/.claude/commands/sc/       (30 slash commands)
 src/superclaude/agents/    →  ~/.claude/agents/             (20 agent definitions)
-src/superclaude/skills/    →  ~/.claude/skills/             (skill implementations)
+src/superclaude/skills/    →  ~/.claude/skills/             (4 hook/safety skills)
 src/superclaude/core/      →  ~/.claude/superclaude/core/   (FLAGS, PRINCIPLES, RULES, BUSINESS_SYMBOLS)
 src/superclaude/mcp/       →  ~/.claude/superclaude/mcp/    (MCP server documentation)
 ```
@@ -113,7 +113,7 @@ src/superclaude/
 ├── ARCHITECTURE.md      # Framework taxonomy — single source of truth for directory roles and delivery pipelines
 ├── commands/            # 30 slash commands — workflow entry points (authoring: .claude/rules/command-authoring.md)
 ├── agents/              # 20 agent definitions — domain expert personas (authoring: .claude/rules/agent-authoring.md)
-├── skills/              # 15 skills — execution containers with hooks (authoring: .claude/rules/skill-authoring.md)
+├── skills/              # 4 skills — CC-native hooks + safety only (authoring: .claude/rules/skill-authoring.md)
 ├── modes/               # 7 modes + config — cognitive overlays (authoring: .claude/rules/mode-authoring.md)
 ├── mcp/                 # 8 MCP server docs + configs/
 ├── core/                # FLAGS.md, PRINCIPLES.md, RULES.md, BUSINESS_SYMBOLS.md

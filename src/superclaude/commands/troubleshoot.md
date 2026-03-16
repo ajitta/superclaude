@@ -11,12 +11,13 @@ description: Diagnose and resolve issues in code, builds, deployments, and syste
   <syntax>/sc:troubleshoot [issue] [--type bug|build|performance|deployment] [--trace] [--fix]</syntax>
 
   <flow>
-    1. Analyze: Issue description + system state
-    2. Investigate: Root causes via pattern analysis
-    3. Debug: Structured procedures + log examination (max 3 hypothesis-test cycles)
-    4. Escalate: If no root cause after 3 rounds → summarize hypotheses + evidence → ask user for guidance
-    5. Propose: Solution + impact assessment
-    6. Resolve: Apply fixes + verify effectiveness
+    1. Reproduce: Confirm failure — read full error, identify exact trigger, verify it's consistent
+    2. Investigate: Check git log/diff, trace data flow, find working examples
+    3. Hypothesize: Form specific hypothesis ("X causes Y because Z") — max 3 cycles before escalating to user
+    4. Confirm: Test hypothesis by changing one variable at a time; check environment before code
+    5. Test: Write failing test that reproduces the exact bug (required before any fix)
+    6. Fix: Apply single change addressing root cause — no "while I'm here" fixes
+    7. Verify: Failing test passes, all existing tests pass, no regressions
   </flow>
 
   <tools>

@@ -11,7 +11,7 @@ core/           Framework DNA       Constitution    Always loaded (CLAUDE_SC.md)
 modes/          Mindset overlay     Mood/Posture    On-demand (context_loader)
 agents/         Domain persona      Specialist      CC-native delegation
 commands/       Workflow entry      Menu item       CC-native /sc:*
-skills/         Execution logic     Procedure       CC-native auto-detection
+skills/         Runtime hooks       Safety gate     CC-native (hooks + safety only)
 mcp/            Tool docs+config    Tool manual     context_loader + install_mcp
 scripts/        Hook infra          Plumbing        hooks.json → settings.json
 ```
@@ -54,11 +54,17 @@ User-facing workflow entry points accessible as `/sc:*` slash commands. Managed 
 
 **Contract:** Commands define what to do, not how to think. They route to agents, activate modes, and orchestrate tool usage. Each command has syntax, flow steps, and handoff chains.
 
-### skills/ — HOW TO EXECUTE
+### skills/ — RUNTIME HOOKS & SAFETY
 
-Execution containers with hooks, tool restrictions, and optional subagent isolation. Managed by Claude Code's native skill system — auto-detected via `description` keyword matching.
+CC-native execution containers limited to capabilities that commands and agents cannot provide: lifecycle hooks, tool restrictions, auto-invocation blocking, and script execution.
 
-**Contract:** Skills define execution procedures with safety boundaries. They can restrict tools (`allowed-tools`), run in isolation (`context: fork`), and attach lifecycle hooks. Skills are the only content type that can modify Claude Code's permission model at runtime.
+**Contract:** Skills exist only when CC-native features are required. Workflow procedures belong in commands/. Domain expertise belongs in agents/. Skills provide:
+- `hooks` (PreToolUse, PostToolUse, Stop) — runtime behavior modification
+- `disable-model-invocation` — prevent auto-execution of destructive workflows
+- `allowed-tools` — restrict tool access for safety
+- Script execution via `{{SKILLS_PATH}}` template variables
+
+**Current skills (4):** confidence-check (PreToolUse hook), simplicity-coach (Stop hook + scripts), ship (disable-model-invocation), finishing-a-development-branch (disable-model-invocation + allowed-tools)
 
 ### mcp/ — TOOL REFERENCE
 
@@ -110,7 +116,7 @@ Session Start
 |-----------|--------------|---------|--------|
 | **Always loaded** | core/ (FLAGS, PRINCIPLES, RULES) | Session start | ~500 lines via @import |
 | **On-demand** | modes/, mcp/, core/BUSINESS_SYMBOLS | Flag/keyword in prompt | 8K token budget (context_loader) |
-| **CC-native** | agents/, commands/, skills/ | Auto-delegation, /sc:*, description match | Managed by Claude Code runtime |
+| **CC-native** | agents/, commands/, skills/ | Auto-delegation, /sc:*, hooks/safety | Managed by Claude Code runtime |
 
 ## Naming Trinity
 
@@ -132,6 +138,8 @@ These are not redundant — each serves a distinct purpose in the framework:
 - **Mode** activates the right cognitive posture
 - **Agent** provides domain expertise and tool guidance
 - **Command** orchestrates the workflow and defines the entry point
+
+**Note:** Skills are deliberately absent from the naming trinity. They serve a cross-cutting infrastructure role (hooks, safety), not a domain-specific one. Workflow procedures that were formerly in skills now live in commands.
 
 ## Authoring Rules
 

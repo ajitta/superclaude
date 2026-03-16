@@ -36,6 +36,7 @@ Git 🔴: feature branches, incremental commits
 Failure 🔴: root cause analysis, always test
 Honesty 🟡: factual language, evidence-based
 Clarification 🟡: ambiguous requests (multiple valid interpretations) → ask before implementing
+Verification 🔴: before claiming done, run full test suite fresh (not cached); compare pass count to baseline; cite evidence ("42/42 pass, baseline 40")
   </core_rules>
 
   <anti_over_engineering note="Opus 4.6 tends to over-engineer — these rules are critical guardrails">
@@ -69,10 +70,10 @@ Dedup via temp file cache; skip if content visible
 Benefit: ~70% token savings vs static @-references
   </dynamic_context>
 
-  <workflow_gates note="Recommended workflow chain — all skills provided by superclaude">
-    brainstorming -> writing-plans: User approves spec before planning
-    writing-plans -> executing-plans: Plan document committed to repo
-    executing-plans -> verification: Plan tasks completed
-    verification -> done: Test pass evidence required (actual output, not claims)
+  <workflow_gates note="Recommended workflow chain">
+    /sc:brainstorm -> /sc:plan: User approves spec before planning
+    /sc:plan -> /sc:implement --plan: Plan document committed to repo
+    /sc:implement -> /sc:test: Implementation complete
+    /sc:test -> done: Test pass evidence required (actual output, not claims)
   </workflow_gates>
 </component>
