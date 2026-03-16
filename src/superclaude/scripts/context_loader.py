@@ -84,7 +84,7 @@ BASE_PATH = _get_base_path()
 #       that cause false positives on normal coding prompts.
 #       Use compound terms (e.g. "browser test" not "test") or explicit flags (--play).
 TRIGGER_MAP = [
-    # MCP servers - Priority 2 (only Serena + Tavily retained — others redundant with MCP auto-mode)
+    # MCP servers - Priority 2 (operational guides: workflows, decision rules, integration patterns)
     (
         r"(serena|symbol ops|rename.?symbol|lsp|--serena|/sc:load|/sc:save)",
         "mcp/MCP_Serena.md",
@@ -95,6 +95,12 @@ TRIGGER_MAP = [
         "mcp/MCP_Tavily.md",
         1,
     ),
+    (r"(--c7|--context7)", "mcp/MCP_Context7.md", 2),
+    (r"(--seq|--sequential)", "mcp/MCP_Sequential.md", 2),
+    (r"(--play|--playwright)", "mcp/MCP_Playwright.md", 2),
+    (r"(--perf|--devtools)", "mcp/MCP_Chrome-DevTools.md", 2),
+    (r"(--magic)", "mcp/MCP_Magic.md", 2),
+    (r"(--morph|--morphllm)", "mcp/MCP_Morphllm.md", 2),
     # Business symbols - Priority 3
     (r"(business.?symbol|strategic.?symbol|business.?example|panel.?example|--structured)", "core/BUSINESS_SYMBOLS.md", 3),
     # Modes — retained where content provides unique behavioral/reference value
@@ -105,7 +111,6 @@ TRIGGER_MAP = [
     (r"(--orchestrate|multi.?tool|tool.?select|/sc:select-tool)", "modes/MODE_Orchestration.md", 2),
     (r"(--research|deep.?research|systematic.?investigation|/sc:research)", "modes/MODE_DeepResearch.md", 1),
     (r"(--business-panel|business.?panel|multi.?expert|strategic.?analysis|/sc:business-panel)", "modes/MODE_Business_Panel.md", 1),
-    # Note: MCP docs for Context7, Sequential, Playwright, Morphllm, Magic, Chrome-DevTools removed — MCP auto-mode provides tool descriptions
 ]
 
 # Pre-compile regex patterns for performance (P2)
@@ -115,14 +120,21 @@ TRIGGER_MAP = [
 ]
 
 # Composite flags: one flag → multiple context files
-# Reduced to retained MCP docs only (Serena + Tavily)
 COMPOSITE_FLAGS = {
     "--frontend-verify": [
-        ("mcp/MCP_Serena.md", 1),
+        ("mcp/MCP_Playwright.md", 1),
+        ("mcp/MCP_Chrome-DevTools.md", 1),
+        ("mcp/MCP_Serena.md", 2),
     ],
     "--all-mcp": [
         ("mcp/MCP_Serena.md", 1),
         ("mcp/MCP_Tavily.md", 1),
+        ("mcp/MCP_Context7.md", 2),
+        ("mcp/MCP_Sequential.md", 2),
+        ("mcp/MCP_Playwright.md", 2),
+        ("mcp/MCP_Chrome-DevTools.md", 2),
+        ("mcp/MCP_Magic.md", 2),
+        ("mcp/MCP_Morphllm.md", 2),
     ],
 }
 
@@ -131,14 +143,7 @@ COMPOSITE_FLAGS = {
 # Mode files → full .md injection (behavioral rules, symbol tables, tool matrices need complete content)
 # Core files → short instructions (supplementary reference)
 INSTRUCTION_MAP = {
-    # mcp/MCP_Tavily.md — NOT in INSTRUCTION_MAP: full .md injection required
-    # (integration flows, multi-hop strategies, credibility tiers, error handling)
-    # mcp/MCP_Serena.md — NOT in INSTRUCTION_MAP: full .md injection required
-    # (initialization sequence, decision matrix, memory patterns, thinking tools status)
-    #
-    # Note: 6 MCP docs removed (Context7, Sequential, Playwright, Morphllm, Magic, Chrome-DevTools)
-    # — MCP auto-mode provides tool descriptions natively; supplementary docs were redundant
-    #
+    # All MCP docs use full .md injection (operational guides with workflows, decision rules, integration patterns)
     # Core supplementary
     "core/BUSINESS_SYMBOLS.md": (
         "Business symbols + expert selection: 🎯target 📈growth 💰financial ⚖️tradeoffs 🏆competitive 🌊blue-ocean. "

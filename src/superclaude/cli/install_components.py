@@ -23,16 +23,9 @@ from .install_settings import (
     update_claude_md_import,
 )
 
-# MCP docs to skip — redundant with MCP auto-mode (tool descriptions loaded natively)
-# Only Serena and Tavily retained (behavioral pattern docs with value beyond tool descriptions)
-MCP_DOCS_SKIP = {
-    "MCP_Context7.md",
-    "MCP_Sequential.md",
-    "MCP_Playwright.md",
-    "MCP_Morphllm.md",
-    "MCP_Magic.md",
-    "MCP_Chrome-DevTools.md",
-}
+# All MCP docs are now operational guides (workflow patterns, decision rules, integration strategies)
+# complementing CC's native tool search which handles tool discovery.
+MCP_DOCS_SKIP: set = set()
 
 def _resolve_template_paths(base_path: Path, scope: str = "user") -> dict:
     """Compute resolved template variable values for a given scope."""
