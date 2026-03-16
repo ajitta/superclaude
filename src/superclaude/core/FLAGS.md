@@ -45,9 +45,9 @@ haiku: repo-index
 Heuristic: opus for architecture/security/judgment | sonnet for coding/analysis/docs | haiku for mechanical scanning
 Override: user can set explicit model in Task() calls
 </model_routing>
---concurrency [n]: 1-15 → max concurrent operations
---loop: polish, refine, enhance → iterative improvement cycles
---iterations [n]: 1-10 → improvement cycle count
+--concurrency [n]: 1-15 → batch independent tool calls into single message (e.g. 5 parallel Grep calls)
+--loop: iterative improvement — execute task → self-evaluate output → identify gaps → re-execute → repeat until no meaningful improvement found. Report iteration count when done.
+--iterations [n]: fixed iteration count — execute the improvement cycle exactly N times. After each iteration, briefly state what changed. Do not stop early even if output seems good.
 --validate: risk >0.7, usage >75%, production → pre-execution risk assessment
 --safe-mode: usage >85%, production, critical → max validation, conservative, auto --uc
 --fast: same Opus 4.6 model, faster output (v2.1.36+)
