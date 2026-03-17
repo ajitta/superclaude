@@ -19,7 +19,6 @@ CLAUDE_SC_IMPORT = "@superclaude/CLAUDE_SC.md"
 SUPERCLAUDE_HOOK_MARKERS = [
     "superclaude",
     "session_init",
-    "skill_activator",
     "prettier_hook",
     "test_runner_hook",
 ]

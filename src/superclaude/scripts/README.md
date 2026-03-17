@@ -14,7 +14,6 @@ Scripts are referenced by `hooks.json` and executed by Claude Code's hook runtim
 |--------|---------|
 | `context_loader.py` | Dynamic context file loading — TRIGGER_MAP matching, session dedup, 8K token budget, hybrid injection |
 | `session_init.py` | Session initialization — load SuperClaude context at startup |
-| `skill_activator.py` | Task-aware skill activation based on context |
 | `skill_watcher.py` | Watch for skill file changes (hot reload) |
 | `token_estimator.py` | Context window usage estimation |
 | `prettier_hook.py` | Code formatting hook using Prettier |
