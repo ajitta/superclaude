@@ -4,7 +4,6 @@ description: Automate infrastructure and deployment processes with focus on reli
 model: sonnet
 permissionMode: default
 memory: project
-maxTurns: 25
 disallowedTools: NotebookEdit
 color: blue
 ---

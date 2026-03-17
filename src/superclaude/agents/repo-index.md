@@ -4,7 +4,6 @@ description: Repository indexing and codebase briefing assistant (triggers - ind
 model: haiku
 permissionMode: plan
 memory: project
-maxTurns: 15
 disallowedTools: Edit, Write, NotebookEdit
 color: cyan
 ---

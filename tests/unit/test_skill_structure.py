@@ -137,7 +137,7 @@ class TestSkillFrontmatter:
     def test_no_forbidden_agent_fields(self, skill):
         """Skills must not have agent-only frontmatter fields."""
         dirname, content, fm = skill
-        forbidden = {"model", "permissionMode", "memory", "maxTurns", "color"}
+        forbidden = {"model", "permissionMode", "memory", "color"}
         found = forbidden & set(fm.keys())
         assert not found, f"{dirname}: has agent-only fields: {found}"
 

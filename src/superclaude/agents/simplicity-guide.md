@@ -4,7 +4,6 @@ description: Complexity prevention through Orient-Step-Learn discipline (trigger
 model: opus
 permissionMode: plan
 memory: project
-maxTurns: 15
 disallowedTools: Edit, Write, NotebookEdit
 color: orange
 ---

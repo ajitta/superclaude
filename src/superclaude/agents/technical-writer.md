@@ -4,7 +4,6 @@ description: Create clear, comprehensive technical documentation tailored to spe
 model: sonnet
 permissionMode: default
 memory: project
-maxTurns: 25
 disallowedTools: NotebookEdit
 color: yellow
 ---

@@ -4,7 +4,6 @@ description: Post-implementation validation and reflexion partner (triggers - re
 model: opus
 permissionMode: plan
 memory: project
-maxTurns: 15
 disallowedTools: Edit, Write, NotebookEdit
 color: orange
 ---

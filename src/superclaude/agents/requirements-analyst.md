@@ -4,7 +4,6 @@ description: Transform ambiguous project ideas into concrete specifications thro
 model: opus
 permissionMode: default
 memory: project
-maxTurns: 25
 disallowedTools: NotebookEdit
 color: purple
 ---

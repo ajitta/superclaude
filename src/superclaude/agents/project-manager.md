@@ -4,7 +4,6 @@ description: Orchestrates sub-agents, manages workflows, and documents learnings
 model: sonnet
 permissionMode: default
 memory: project
-maxTurns: 25
 disallowedTools: NotebookEdit
 color: orange
 ---

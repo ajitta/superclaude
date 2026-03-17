@@ -4,7 +4,6 @@ description: Deliver production-ready, secure, high-performance Python code foll
 model: sonnet
 permissionMode: acceptEdits
 memory: project
-maxTurns: 50
 color: green
 ---
 <component name="python-expert" type="agent">

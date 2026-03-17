@@ -4,7 +4,6 @@ description: Git operations with intelligent commits, PR workflow, and safety en
 model: sonnet
 permissionMode: default
 memory: project
-maxTurns: 25
 disallowedTools: Edit, Write, NotebookEdit
 color: green
 ---

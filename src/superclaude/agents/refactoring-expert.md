@@ -4,7 +4,6 @@ description: Improve code quality and reduce technical debt through systematic r
 model: opus
 permissionMode: default
 memory: project
-maxTurns: 25
 disallowedTools: NotebookEdit
 color: green
 ---

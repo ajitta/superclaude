@@ -4,7 +4,6 @@ description: Create accessible, performant user interfaces with focus on user ex
 model: sonnet
 permissionMode: acceptEdits
 memory: project
-maxTurns: 50
 color: blue
 ---
 <component name="frontend-architect" type="agent">

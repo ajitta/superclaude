@@ -4,7 +4,6 @@ description: Design scalable system architecture with focus on maintainability a
 model: opus
 permissionMode: plan
 memory: project
-maxTurns: 15
 disallowedTools: Edit, Write, NotebookEdit
 color: blue
 ---

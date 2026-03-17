@@ -4,7 +4,6 @@ description: Educational guide specializing in Socratic method for programming k
 model: opus
 permissionMode: default
 memory: project
-maxTurns: 25
 disallowedTools: NotebookEdit
 color: yellow
 ---

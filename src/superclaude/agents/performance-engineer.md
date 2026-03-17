@@ -4,7 +4,6 @@ description: Optimize system performance through measurement-driven analysis and
 model: sonnet
 permissionMode: acceptEdits
 memory: project
-maxTurns: 50
 color: green
 ---
 <component name="performance-engineer" type="agent">

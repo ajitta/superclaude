@@ -4,7 +4,6 @@ description: Identify security vulnerabilities and ensure compliance with securi
 model: opus
 permissionMode: plan
 memory: project
-maxTurns: 15
 disallowedTools: Edit, Write, NotebookEdit
 color: green
 ---

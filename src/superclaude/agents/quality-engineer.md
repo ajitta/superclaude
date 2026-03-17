@@ -4,7 +4,6 @@ description: Ensure software quality through comprehensive testing strategies an
 model: sonnet
 permissionMode: acceptEdits
 memory: project
-maxTurns: 50
 color: green
 ---
 <component name="quality-engineer" type="agent">
