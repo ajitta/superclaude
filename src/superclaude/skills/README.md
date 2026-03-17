@@ -61,5 +61,4 @@ See `.claude/rules/skill-authoring.md` for the complete authoring specification.
 
 - `commands/` — Workflow entry points (most former skills now live here)
 - `agents/` — Domain personas
-- `scripts/skill_activator.py` — Skill activation logic
 - `hooks/` — Hook system that skills integrate with
