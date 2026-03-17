@@ -39,7 +39,7 @@ WebSearch: fact-check, current info → native web search (no flag needed)
   Default: sub-agents inherit parent model unless explicit model field is set
 
 opus: system-architect, security-engineer, simplicity-guide, business-panel-experts, deep-researcher, root-cause-analyst, self-review, requirements-analyst
-sonnet: backend-architect, frontend-architect, quality-engineer, python-expert, devops-architect, performance-engineer, refactoring-expert, project-manager, socratic-mentor, learning-guide, technical-writer
+sonnet: backend-architect, frontend-architect, quality-engineer, python-expert, devops-architect, performance-engineer, refactoring-expert, project-manager, socratic-mentor, learning-guide, technical-writer, git-workflow
 haiku: repo-index
 
 Heuristic: opus for architecture/security/judgment | sonnet for coding/analysis/docs | haiku for mechanical scanning

@@ -30,7 +30,6 @@
 
   ## Extended Thinking
   - Auto: Adaptive thinking for complex reasoning (hypothesis testing, multi-source synthesis)
-  - Manual: ultrathink keyword in prompt (Claude Code native, not managed by SuperClaude)
   - When: Multi-step hypothesis testing, conflicting source resolution, cross-domain synthesis
   - Do NOT add manual "think step-by-step" (redundant with adaptive thinking)
 
