@@ -14,11 +14,9 @@ Scripts are referenced by `hooks.json` and executed by Claude Code's hook runtim
 |--------|---------|
 | `context_loader.py` | Dynamic context file loading — TRIGGER_MAP matching, session dedup, 8K token budget, hybrid injection |
 | `session_init.py` | Session initialization — load SuperClaude context at startup |
-| `skill_watcher.py` | Watch for skill file changes (hot reload) |
 | `token_estimator.py` | Context window usage estimation |
 | `prettier_hook.py` | Code formatting hook using Prettier |
 | `test_runner_hook.py` | Test execution hook |
-| `clean_command_names.py` | Utility for cleaning/normalizing command names |
 | `context_reset.py` | Reset context loader state for fresh sessions |
 
 ### Shell Scripts
@@ -26,7 +24,6 @@ Scripts are referenced by `hooks.json` and executed by Claude Code's hook runtim
 | Script | Purpose |
 |--------|---------|
 | `session-init.sh` | Shell wrapper for session initialization |
-| `skill-activator.sh` | Shell wrapper for skill activation |
 
 ## Key Architecture: context_loader.py
 
