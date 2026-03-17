@@ -35,6 +35,7 @@ Commands are managed by Claude Code's native command system. Installed to `~/.cl
 | Command | Description |
 |---------|-------------|
 | `/sc:design` | Design systems and architectures |
+| `/sc:plan` | Create detailed implementation plans with TDD tasks |
 | `/sc:brainstorm` | Interactive requirements discovery |
 | `/sc:estimate` | Estimate effort and complexity |
 | `/sc:workflow` | Define and execute workflows |
@@ -53,6 +54,7 @@ Commands are managed by Claude Code's native command system. Installed to `~/.cl
 
 | Command | Description |
 |---------|-------------|
+| `/sc:git` | Git operations with intelligent commits and workflow |
 | `/sc:review` | Code review with structured feedback |
 | `/sc:pm` | Project Manager Agent orchestration |
 | `/sc:spawn` | Meta-system task orchestration with delegation |

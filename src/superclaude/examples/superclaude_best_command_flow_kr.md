@@ -24,9 +24,9 @@ mcp-servers: [context7, sequential, serena, tavily, playwright, magic]
 
 | 상황 | 추천 플래그 | 목적 |
 |---|---|---|
-| 일반 구현/분석 | `--think --c7` | 기본 사고 + 공식 문서 확인 |
-| 복잡한 구조 변경 | `--think-hard --seq --c7` | 다단계 추론 + 문서 기반 설계 |
-| 대규모 작업 | `ultrathink --all-mcp --delegate auto` | 최대 깊이 + 병렬 위임 |
+| 일반 구현/분석 | `--c7` | 공식 문서 확인 |
+| 복잡한 구조 변경 | `--seq --c7` | 다단계 추론 + 문서 기반 설계 |
+| 대규모 작업 | `--all-mcp --delegate auto` | 전체 MCP + 병렬 위임 |
 | UI 검증 | `--frontend-verify --play --magic` | UI 생성 + 브라우저/E2E 검증 |
 | 버그 추적 | `--seq --validate` | 원인 분석 + 변경 전 검증 |
 | 토큰 압박 | `--uc` (`--token-efficient`) | 컨텍스트 절약 |
@@ -38,7 +38,7 @@ mcp-servers: [context7, sequential, serena, tavily, playwright, magic]
 
 ```text
 /sc:brainstorm "문제/아이디어" --brainstorm
-/sc:design "확정한 방향" --think-hard --c7
+/sc:design "확정한 방향" --seq --c7
 /sc:workflow "실행 계획" --strategy systematic --depth deep
 /sc:implement "기능명" --with-tests --c7 --seq
 /sc:test --type unit --coverage
@@ -50,7 +50,7 @@ mcp-servers: [context7, sequential, serena, tavily, playwright, magic]
 
 ```text
 /sc:troubleshoot "증상" --type bug --trace --seq --validate
-/sc:analyze "영향 범위" --focus quality --think
+/sc:analyze "영향 범위" --focus quality --seq
 /sc:implement "수정안" --with-tests --safe-mode
 /sc:test --type integration
 /sc:git
