@@ -66,7 +66,7 @@ description: Deep web research with adaptive planning and intelligent search
 
   <token_efficiency>
     - quick/standard: inline execution (single context)
-    - deep/exhaustive: delegate to deep-research-agent subagent (context isolation)
+    - deep/exhaustive: delegate to deep-researcher subagent (context isolation)
     - Between hops: summarize intermediate results, discard raw payloads
     - Source deduplication before synthesis
     - Use --uc at 60%+ context
@@ -90,7 +90,7 @@ description: Deep web research with adaptive planning and intelligent search
     <input>/sc:research 'AI coding assistants market comparison' --depth exhaustive</input>
     <reasoning>Comparative analysis, multiple entities → exhaustive, 5 hops, parallel search, subagent delegation</reasoning>
     <output>
-      Depth: exhaustive → delegate to deep-research-agent subagent
+      Depth: exhaustive → delegate to deep-researcher subagent
       Hop 1: tavily_search (3 parallel queries: market share, features, pricing) → 15 sources
       Hop 2: tavily_extract (top 8 URLs) → feature matrices
       Hop 3: Validate checkpoint — confidence 0.7, proceed

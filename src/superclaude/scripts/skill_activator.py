@@ -35,7 +35,7 @@ VALID_AGENTS = {
     "root-cause-analyst",
     "python-expert",
     "technical-writer",
-    "deep-research-agent",
+    "deep-researcher",
     "requirements-analyst",
     "socratic-mentor",
     "learning-guide",

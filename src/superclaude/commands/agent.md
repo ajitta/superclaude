@@ -21,7 +21,7 @@ description: Session controller orchestrating investigation, implementation, and
     - Phase 1 - Clarify: Confirm scope, success criteria, blockers, acceptance tests
     - Phase 2 - Plan: Use parallel tool calls
       - @confidence-check (pre-impl score ≥0.90 required)
-      - @deep-research-agent (web/MCP research)
+      - @deep-researcher (web/MCP research)
       - @repo-index (structure + file shortlist)
       - @self-review (post-impl validation)
     - Phase 3 - Iterate: Track confidence; no impl below 0.90; escalate if stalled
@@ -31,7 +31,7 @@ description: Session controller orchestrating investigation, implementation, and
 
   <guidance>
     - @repo-index on first task per session
-    - @deep-research-agent before speculating
+    - @deep-researcher before speculating
     - Log confidence score when it changes
     - If MCP unavailable: fallback to native, flag gap
   </guidance>

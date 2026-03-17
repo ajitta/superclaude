@@ -125,7 +125,7 @@ The same domain often has content in three directories serving different roles:
 ```
 Domain: "Research"
   ├── modes/MODE_DeepResearch.md      → HOW TO THINK about research (mindset)
-  ├── agents/deep-research-agent.md   → WHO TO BE when researching (persona)
+  ├── agents/deep-researcher.md        → WHO TO BE when researching (persona)
   └── commands/research.md            → WHAT TO DO for a research task (workflow)
 
 Domain: "Business"

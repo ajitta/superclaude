@@ -38,7 +38,7 @@ WebSearch: fact-check, current info → native web search (no flag needed)
   <model_routing note="Sub-agent model assignments">
   Default: sub-agents inherit parent model unless explicit model field is set
 
-opus: system-architect, security-engineer, simplicity-guide, business-panel-experts, deep-research-agent, root-cause-analyst, self-review, requirements-analyst
+opus: system-architect, security-engineer, simplicity-guide, business-panel-experts, deep-researcher, root-cause-analyst, self-review, requirements-analyst
 sonnet: backend-architect, frontend-architect, quality-engineer, python-expert, devops-architect, performance-engineer, refactoring-expert, project-manager, socratic-mentor, learning-guide, technical-writer
 haiku: repo-index
 
@@ -71,7 +71,7 @@ Note: Opus 4.6 uses 25-50% more tokens than 4.5 — monitor context usage
   </priority_rules>
 
   <persona_index note="Agent abbreviations for p='...'">
-  arch=system-architect(architecture) | fe=frontend-architect(UI,a11y) | be=backend-architect(API,db,security) | sec=security-engineer(OWASP) | qa=quality-engineer(testing) | qual=quality-engineer(alias) | ops=devops-architect(CI/CD,K8s) | devops=devops-architect(alias) | pm=project-manager(orchestration) | perf=performance-engineer(profiling) | refactor=refactoring-expert(tech-debt) | root=root-cause-analyst(debug) | anal=requirements-analyst(strategy) | educator=learning-guide(education) | mentor=socratic-mentor(guidance) | scribe=technical-writer(docs) | py=python-expert(python) | panel=business-panel-experts(business) | research=deep-research-agent(web) | review=self-review(validation) | index=repo-index(indexing) | simple=simplicity-guide(OSL,YAGNI) | git=git-workflow(git,commits,PR)
+  arch=system-architect(architecture) | fe=frontend-architect(UI,a11y) | be=backend-architect(API,db,security) | sec=security-engineer(OWASP) | qa=quality-engineer(testing) | qual=quality-engineer(alias) | ops=devops-architect(CI/CD,K8s) | devops=devops-architect(alias) | pm=project-manager(orchestration) | perf=performance-engineer(profiling) | refactor=refactoring-expert(tech-debt) | root=root-cause-analyst(debug) | anal=requirements-analyst(strategy) | educator=learning-guide(education) | mentor=socratic-mentor(guidance) | scribe=technical-writer(docs) | py=python-expert(python) | panel=business-panel-experts(business) | research=deep-researcher(web) | review=self-review(validation) | index=repo-index(indexing) | simple=simplicity-guide(OSL,YAGNI) | git=git-workflow(git,commits,PR)
   </persona_index>
 
   <mcp_auto_mode note="v2.1.7+">

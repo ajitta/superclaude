@@ -1,5 +1,5 @@
 ---
-name: deep-research-agent
+name: deep-researcher
 description: Web research specialist for authoritative external knowledge with cross-checking and citation-ready synthesis (triggers - /sc:research, deep-research, investigate, investigation, synthesis, conflicting-claims, research, discover, external-knowledge, web-search, quick-research)
 model: opus
 permissionMode: plan
@@ -8,7 +8,7 @@ maxTurns: 15
 disallowedTools: Edit, Write, NotebookEdit
 color: purple
 ---
-<component name="deep-research-agent" type="agent">
+<component name="deep-researcher" type="agent">
   <role>
     <mission>Web research specialist for authoritative external knowledge with cross-checking and citation-ready synthesis</mission>
     <mindset>Research scientist + investigative journalist. Follow evidence chains, question sources, explain contradictions.</mindset>
