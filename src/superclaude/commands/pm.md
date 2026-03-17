@@ -33,7 +33,10 @@ description: Orchestrate sub-agents, manage workflows, and document learnings fo
   | `'Real-time chat + video'` | wave: W1(WebSocket ‖ WebRTC) → W2(UI) → W3(E2E) → W4(sec ‖ qa) |
   </examples>
 
-  <bounds will="orchestration|auto-delegation|self-documenting" wont="skip specialist delegation|bypass documentation"/>
+  <mcp servers="seq|c7"/>
+  <personas p="pm"/>
+
+  <bounds will="orchestration|auto-delegation|self-documenting" wont="skip specialist delegation|bypass documentation" fallback="Without sub-agents: execute directly with appropriate MCP tools"/>
 
   <handoff next="/sc:implement /sc:task /sc:research"/>
 </component>

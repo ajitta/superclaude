@@ -62,8 +62,8 @@ SuperClaude is a **dual-purpose** project:
 The CLI `superclaude install` copies content from the package to Claude Code's config directory:
 
 ```
-src/superclaude/commands/  →  ~/.claude/commands/sc/       (30 slash commands)
-src/superclaude/agents/    →  ~/.claude/agents/             (20 agent definitions)
+src/superclaude/commands/  →  ~/.claude/commands/sc/       (32 slash commands)
+src/superclaude/agents/    →  ~/.claude/agents/             (21 agent definitions)
 src/superclaude/skills/    →  ~/.claude/skills/             (4 hook/safety skills)
 src/superclaude/core/      →  ~/.claude/superclaude/core/   (FLAGS, PRINCIPLES, RULES, BUSINESS_SYMBOLS)
 src/superclaude/mcp/       →  ~/.claude/superclaude/mcp/    (MCP server documentation)
@@ -98,10 +98,6 @@ src/superclaude/
 │   ├── reflexion.py     # Cross-session error learning (JSONL storage)
 │   ├── token_budget.py  # simple: 200, medium: 1000, complex: 2500
 │   └── task_cleanup.py  # Stale task removal (24h threshold)
-├── execution/
-│   ├── parallel.py      # Wave→Checkpoint→Wave pattern
-│   ├── reflection.py    # Meta-reasoning
-│   └── self_correction.py
 ├── cli/                 # Click-based CLI (superclaude command)
 │   └── main.py          # @click.group: install, uninstall, update, mcp, doctor, agents, skills, install-skill, version
 ├── hooks/
@@ -111,13 +107,13 @@ src/superclaude/
 │   └── mcp_fallback.py  # MCP server availability fallback handling
 ├── utils/               # Shared utilities (atomic_write_json)
 ├── ARCHITECTURE.md      # Framework taxonomy — single source of truth for directory roles and delivery pipelines
-├── commands/            # 30 slash commands — workflow entry points (authoring: .claude/rules/command-authoring.md)
-├── agents/              # 20 agent definitions — domain expert personas (authoring: .claude/rules/agent-authoring.md)
+├── commands/            # 32 slash commands — workflow entry points (authoring: .claude/rules/command-authoring.md)
+├── agents/              # 21 agent definitions — domain expert personas (authoring: .claude/rules/agent-authoring.md)
 ├── skills/              # 4 skills — CC-native hooks + safety only (authoring: .claude/rules/skill-authoring.md)
 ├── modes/               # 7 modes + config — cognitive overlays (authoring: .claude/rules/mode-authoring.md)
 ├── mcp/                 # 8 MCP server docs + configs/
 ├── core/                # FLAGS.md, PRINCIPLES.md, RULES.md, BUSINESS_SYMBOLS.md
-└── scripts/             # context_loader.py (trigger system, hybrid injection), session_init.py, token_estimator.py, skill_activator.py
+└── scripts/             # context_loader.py (trigger system, hybrid injection), session_init.py, token_estimator.py
 ```
 
 ## Pytest Plugin

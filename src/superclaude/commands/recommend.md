@@ -53,7 +53,7 @@ description: Ultra-intelligent command recommendation engine for optimal SuperCl
 
   <token_note>Low consumption — recommendation-only, no file modifications</token_note>
 
-  <bounds will="intelligent mapping|project context|expertise adaptation" wont="execute commands|modify files"/>
+  <bounds will="intelligent mapping|project context|expertise adaptation" wont="execute commands|modify files" fallback="Ask user to clarify when request is too ambiguous to map"/>
 
   <handoff next="/sc:analyze /sc:implement /sc:design /sc:troubleshoot"/>
 </component>
