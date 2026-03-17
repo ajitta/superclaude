@@ -35,16 +35,9 @@ WebSearch: fact-check, current info → native web search (no flag needed)
 --delegate [auto|files|folders]: >7 dirs, >50 files, complexity >0.8 → sub-agent parallel
   Direct work for: single-file edits, sequential ops, <3 steps, simple searches (grep/glob)
   Sub-agents for: parallel-capable, isolated context, independent work streams, >5 files
-  <model_routing note="Sub-agent model assignments">
-  Default: sub-agents inherit parent model unless explicit model field is set
-
-opus: system-architect, security-engineer, simplicity-guide, business-panel-experts, deep-researcher, root-cause-analyst, self-review, requirements-analyst
-sonnet: backend-architect, frontend-architect, quality-engineer, python-expert, devops-architect, performance-engineer, refactoring-expert, project-manager, socratic-mentor, learning-guide, technical-writer, git-workflow
-haiku: repo-index
-
-Heuristic: opus for architecture/security/judgment | sonnet for coding/analysis/docs | haiku for mechanical scanning
-Override: user can set explicit model in Task() calls
-</model_routing>
+  Default: sub-agents inherit parent model unless explicit model field in agent frontmatter
+  Heuristic: opus for architecture/security/judgment | sonnet for coding/analysis/docs | haiku for mechanical scanning
+  Override: user can set explicit model in Task() calls
 --concurrency [n]: 1-15 → batch independent tool calls into single message (e.g. 5 parallel Grep calls)
 --loop: iterative improvement — execute task → self-evaluate output → identify gaps → re-execute → repeat until no meaningful improvement found. Report iteration count when done.
 --iterations [n]: fixed iteration count — execute the improvement cycle exactly N times. After each iteration, briefly state what changed. Do not stop early even if output seems good.
