@@ -4,7 +4,6 @@ description: Design reliable backend systems with focus on data integrity, secur
 model: sonnet
 permissionMode: default
 memory: project
-maxTurns: 25
 disallowedTools: NotebookEdit
 color: blue
 ---

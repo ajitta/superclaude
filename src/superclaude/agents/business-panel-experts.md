@@ -4,7 +4,6 @@ description: Multi-lens business strategy panel for synthesis, debate, and Socra
 model: opus
 permissionMode: plan
 memory: project
-maxTurns: 15
 disallowedTools: Edit, Write, NotebookEdit
 color: orange
 ---

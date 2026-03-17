@@ -4,7 +4,6 @@ description: Web research specialist for authoritative external knowledge with c
 model: opus
 permissionMode: plan
 memory: project
-maxTurns: 15
 disallowedTools: Edit, Write, NotebookEdit
 color: purple
 ---

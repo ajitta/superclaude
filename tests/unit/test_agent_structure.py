@@ -15,12 +15,6 @@ AGENTS_DIR = Path(__file__).parent.parent.parent / "src" / "superclaude" / "agen
 VALID_PERMISSION_MODES = {"acceptEdits", "default", "plan", "dontAsk", "bypassPermissions"}
 VALID_MEMORY_SCOPES = {"user", "project", "local"}
 VALID_COLORS = {"blue", "green", "orange", "purple", "yellow", "cyan", "red"}
-PERMISSION_TO_MAX_TURNS = {
-    "plan": 15,
-    "default": 25,
-    "acceptEdits": 50,
-}
-
 # All agent .md files (excluding README)
 AGENT_FILES = sorted(
     [f for f in AGENTS_DIR.glob("*.md") if f.name != "README.md"]
@@ -109,27 +103,6 @@ class TestAgentFrontmatter:
         assert scope in VALID_MEMORY_SCOPES, (
             f"{stem}: memory '{scope}' not in {VALID_MEMORY_SCOPES}"
         )
-
-    def test_has_maxTurns(self, agent):
-        stem, content, fm = agent
-        assert "maxTurns" in fm, f"{stem}: frontmatter missing 'maxTurns'"
-
-    def test_maxTurns_is_positive_integer(self, agent):
-        stem, content, fm = agent
-        val = fm.get("maxTurns", "")
-        assert val.isdigit() and int(val) > 0, (
-            f"{stem}: maxTurns '{val}' must be a positive integer"
-        )
-
-    def test_maxTurns_matches_permission_mode(self, agent):
-        stem, content, fm = agent
-        mode = fm.get("permissionMode", "")
-        expected = PERMISSION_TO_MAX_TURNS.get(mode)
-        if expected:
-            assert fm.get("maxTurns") == str(expected), (
-                f"{stem}: permissionMode '{mode}' should have "
-                f"maxTurns={expected}, got {fm.get('maxTurns')}"
-            )
 
     def test_has_color(self, agent):
         stem, content, fm = agent

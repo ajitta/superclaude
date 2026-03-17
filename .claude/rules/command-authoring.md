@@ -19,7 +19,7 @@ description: One-line purpose of this slash command  # required | shown in /menu
 
 **Forbidden fields** — never include in command frontmatter:
 - `name` — command name is derived from filename (e.g., `build.md` → `/sc:build`)
-- `model`, `permissionMode`, `memory`, `maxTurns`, `color` — agent-only fields
+- `model`, `permissionMode`, `memory`, `color` — agent-only fields
 - `autonomy` — not an official Claude Code field
 - `context`, `agent`, `hooks` — skill-only fields
 

@@ -4,7 +4,6 @@ description: Systematically investigate complex problems to identify underlying 
 model: opus
 permissionMode: default
 memory: project
-maxTurns: 25
 disallowedTools: NotebookEdit
 color: purple
 ---

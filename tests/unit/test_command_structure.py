@@ -14,7 +14,7 @@ COMMANDS_DIR = Path(__file__).parent.parent.parent / "src" / "superclaude" / "co
 
 # Agent/skill-only fields that should never appear in command frontmatter
 FORBIDDEN_FIELDS = {
-    "name", "model", "permissionMode", "memory", "maxTurns",
+    "name", "model", "permissionMode", "memory",
     "color", "autonomy", "context", "agent", "hooks",
 }
 

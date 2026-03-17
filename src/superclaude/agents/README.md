@@ -71,11 +71,11 @@ Agents are managed by Claude Code's native agent delegation system. Auto-selecte
 
 ## Permission Framework
 
-| permissionMode | maxTurns | Effect |
-|---------------|----------|--------|
-| `acceptEdits` | 50 | File edits auto-approved; Bash/MCP prompted |
-| `default` | 25 | Each tool prompted on first use |
-| `plan` | 15 | Read-only; modifications blocked until approved |
+| permissionMode | Effect |
+|---------------|--------|
+| `acceptEdits` | File edits auto-approved; Bash/MCP prompted |
+| `default` | Each tool prompted on first use |
+| `plan` | Read-only; modifications blocked until approved |
 
 Model routing: `opus` for architecture/security/judgment | `sonnet` for coding/analysis/docs | `haiku` for mechanical scanning
 

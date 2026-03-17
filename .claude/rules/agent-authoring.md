@@ -11,7 +11,6 @@ description: One-line purpose (triggers - keyword1, keyword2)  # required | used
 model: opus|sonnet|haiku                   # required | see model routing below
 permissionMode: plan|default|acceptEdits   # required | system-enforced permission level
 memory: project                            # required | always "project" for SuperClaude agents
-maxTurns: 15|25|50                         # required | must match permissionMode
 disallowedTools: Edit, Write, NotebookEdit # optional | comma-separated, least privilege
 color: blue|green|purple|yellow|orange|cyan # required | by role group
 ---
@@ -22,13 +21,6 @@ color: blue|green|purple|yellow|orange|cyan # required | by role group
 **Forbidden fields** — never include in frontmatter:
 - `autonomy` — not an official Claude Code field, silently ignored
 - Any field not documented in Claude Code's agent specification
-
-**permissionMode → maxTurns mapping** (strict):
-| permissionMode | maxTurns | Use Case |
-|---------------|----------|----------|
-| `plan` | 15 | Analysis/planning only, no code modification |
-| `default` | 25 | Moderate work, user confirms tool use |
-| `acceptEdits` | 50 | Large implementation, file edits auto-approved |
 
 **disallowedTools by role pattern**:
 | Pattern | disallowedTools | When to use |
@@ -117,7 +109,6 @@ uv run pytest tests/unit/test_agent_structure.py -v
 
 This validates:
 - All required frontmatter fields present and valid
-- permissionMode → maxTurns consistency
 - color in valid set
 - No `autonomy` field
 - XML structure (component, role, mission, mindset, tool_guidance, bounds)
@@ -129,7 +120,7 @@ This validates:
 
 1. Create `src/superclaude/agents/<name>.md` with frontmatter + XML body
 2. Verify `name` matches filename (without `.md`)
-3. Set `permissionMode` → `maxTurns` → `disallowedTools` following least privilege
+3. Set `permissionMode` → `disallowedTools` following least privilege
 4. Run `uv run pytest tests/unit/test_agent_structure.py -v`
 5. Update `src/superclaude/agents/README.md` agent table
 6. Run `make deploy`
