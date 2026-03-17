@@ -4,7 +4,7 @@ PM Agent Pytest Patterns
 Reusable testing patterns exposed as pytest fixtures via superclaude's pytest plugin.
 These run during `uv run pytest`, NOT during Claude Code sessions.
 
-The Claude Code agent definition is in agents/pm-agent.md (separate system).
+The Claude Code agent definition is in agents/project-manager.md (separate system).
 
 Patterns:
 - ConfidenceChecker: Pre-execution gate with pluggable checks

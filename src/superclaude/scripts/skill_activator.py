@@ -29,7 +29,7 @@ VALID_AGENTS = {
     "security-engineer",
     "quality-engineer",
     "devops-architect",
-    "pm-agent",
+    "project-manager",
     "performance-engineer",
     "refactoring-expert",
     "root-cause-analyst",

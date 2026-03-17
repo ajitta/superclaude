@@ -47,7 +47,7 @@ Agents are managed by Claude Code's native agent delegation system. Auto-selecte
 
 | Agent | Model | Permission | Description |
 |-------|-------|------------|-------------|
-| `pm-agent` | sonnet | default | Orchestration, workflow management, continuous improvement |
+| `project-manager` | sonnet | default | Orchestration, workflow management, continuous improvement |
 | `business-panel-experts` | opus | plan | Multi-lens business strategy synthesis and debate |
 
 ### Philosophy & Discipline
