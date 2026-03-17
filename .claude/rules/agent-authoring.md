@@ -34,6 +34,7 @@ color: blue|green|purple|yellow|orange|cyan # required | by role group
 | Pattern | disallowedTools | When to use |
 |---------|-----------------|-------------|
 | Read-only (plan, review, research, indexing) | `Edit, Write, NotebookEdit` | Agent should never modify files |
+| Execute-only (Bash but no file edits) | `Edit, Write, NotebookEdit` | Agent runs commands but never modifies files (e.g., git-workflow) |
 | General work (default mode) | `NotebookEdit` | Agent can edit code but not notebooks |
 | Full access (implementation) | *(omit field)* | Agent needs all tools |
 
