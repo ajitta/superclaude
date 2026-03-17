@@ -312,15 +312,15 @@ def install_skill(skill_name: str, scope: str, force: bool):
     """
     Install a SuperClaude skill to Claude Code
 
-    SKILL_NAME: Name of the skill to install (e.g., pm-agent)
+    SKILL_NAME: Name of the skill to install (e.g., project-manager)
 
     Scopes:
     - user (default): Install to ~/.claude/skills/
     - project: Install to ./.claude/skills/
 
     Example:
-        superclaude install-skill pm-agent
-        superclaude install-skill pm-agent --scope project --force
+        superclaude install-skill project-manager
+        superclaude install-skill project-manager --scope project --force
     """
     from .install_commands import get_base_path
     from .install_skill import install_skill_command

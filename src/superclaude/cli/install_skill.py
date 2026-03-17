@@ -16,7 +16,7 @@ def install_skill_command(
     Install a skill to target directory
 
     Args:
-        skill_name: Name of skill to install (e.g., 'pm-agent')
+        skill_name: Name of skill to install (e.g., 'project-manager')
         target_path: Target installation directory
         force: Force reinstall if skill exists
 

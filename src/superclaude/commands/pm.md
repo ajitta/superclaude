@@ -6,7 +6,7 @@ description: Orchestrate sub-agents, manage workflows, and document learnings fo
   <role>
     /sc:pm
     <mission>Orchestrate sub-agents, manage workflows, and document learnings</mission>
-    <note>Full PM Agent persona defined in agents/pm-agent.md</note>
+    <note>Full PM Agent persona defined in agents/project-manager.md</note>
   </role>
 
   <syntax>/sc:pm [request] [--strategy brainstorm|direct|wave] [--verbose]</syntax>
