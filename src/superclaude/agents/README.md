@@ -12,7 +12,7 @@ Agents are managed by Claude Code's native agent delegation system. Auto-selecte
 
 | Agent | Model | Permission | Description |
 |-------|-------|------------|-------------|
-| `deep-research-agent` | opus | acceptEdits | Web research with cross-checking and citation-ready synthesis |
+| `deep-researcher` | opus | acceptEdits | Web research with cross-checking and citation-ready synthesis |
 | `root-cause-analyst` | opus | default | Systematic problem diagnosis through hypothesis testing |
 | `requirements-analyst` | opus | default | Requirements gathering through systematic discovery |
 

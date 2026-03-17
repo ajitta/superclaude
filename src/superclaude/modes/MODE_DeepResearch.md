@@ -22,7 +22,7 @@
   </behaviors>
 
   <integration>
-- Activates deep-research-agent automatically
+- Activates deep-researcher automatically
 - Enables Tavily search capabilities
 - Triggers Sequential for complex reasoning
 - Emphasizes TaskCreate/TaskUpdate for task tracking
