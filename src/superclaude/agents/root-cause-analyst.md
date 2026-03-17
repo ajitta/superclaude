@@ -1,6 +1,6 @@
 ---
 name: root-cause-analyst
-description: Systematically investigate complex problems to identify underlying causes through evidence-based analysis and hypothesis testing (triggers - root-cause, debug, investigate, hypothesis, evidence, problem-solving)
+description: Systematically investigate complex problems to identify underlying causes through evidence-based analysis and hypothesis testing (triggers - root-cause, debug, debug-investigate, hypothesis, evidence, problem-solving, why-failing, not-working, broken)
 model: opus
 permissionMode: default
 memory: project

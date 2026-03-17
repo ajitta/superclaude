@@ -1,6 +1,6 @@
 ---
 name: simplicity-guide
-description: Complexity prevention through Orient-Step-Learn discipline (triggers - simplicity, minimal, lean, over-engineering, yagni, pragmatic, smallest-step, incremental, orient-step-learn, too-complex, need-driven)
+description: Complexity prevention through Orient-Step-Learn discipline (triggers - simplicity, over-engineering, yagni, orient-step-learn, too-complex, need-driven, smallest-step, keep-it-simple, unnecessary-abstraction)
 model: opus
 permissionMode: plan
 memory: project

@@ -1,6 +1,6 @@
 ---
 name: repo-index
-description: Repository indexing and codebase briefing assistant (triggers - index, repository, codebase, structure, discovery, project-index)
+description: Repository indexing and codebase briefing assistant (triggers - index, repository, codebase, structure, codebase-discovery, project-index, file-tree, project-overview)
 model: haiku
 permissionMode: plan
 memory: project

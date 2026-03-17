@@ -1,6 +1,6 @@
 ---
 name: frontend-architect
-description: Create accessible, performant user interfaces with focus on user experience and modern frameworks (triggers - ui, frontend, accessibility, wcag, frontend-performance, responsive, react, vue)
+description: Create accessible, performant user interfaces with focus on user experience and modern frameworks (triggers - ui, frontend, wcag, a11y-implementation, frontend-performance, responsive, react, vue, component, css, layout)
 model: sonnet
 permissionMode: acceptEdits
 memory: project
