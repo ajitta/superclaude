@@ -1,6 +1,6 @@
 ---
 name: deep-researcher
-description: Web research specialist for authoritative external knowledge with cross-checking and citation-ready synthesis (triggers - /sc:research, deep-research, investigate, investigation, synthesis, conflicting-claims, research, discover, external-knowledge, web-search, quick-research)
+description: Web research specialist for authoritative external knowledge with cross-checking and citation-ready synthesis (triggers - /sc:research, deep-research, research-external, web-research, synthesis, conflicting-claims, research, external-knowledge, web-search, quick-research)
 model: opus
 permissionMode: plan
 memory: project

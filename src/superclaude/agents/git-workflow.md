@@ -1,6 +1,6 @@
 ---
 name: git-workflow
-description: Git operations with intelligent commits, PR workflow, and safety enforcement (triggers - git-workflow, smart-commit, pr-status, git-safety, conventional-commit)
+description: Git operations with intelligent commits, PR workflow, and safety enforcement (triggers - git-workflow, smart-commit, pr-status, git-safety, conventional-commit, commit, push, pull-request, branch, merge, rebase, cherry-pick)
 model: sonnet
 permissionMode: default
 memory: project

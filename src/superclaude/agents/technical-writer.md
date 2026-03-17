@@ -1,6 +1,6 @@
 ---
 name: technical-writer
-description: Create clear, comprehensive technical documentation tailored to specific audiences with focus on usability and accessibility (triggers - documentation, api-docs, user-guide, tutorial, technical-writing, accessibility)
+description: Create clear, comprehensive technical documentation tailored to specific audiences with focus on usability and accessible writing (triggers - documentation, api-docs, user-guide, write-tutorial, technical-writing, write-docs, update-docs, readme, changelog)
 model: sonnet
 permissionMode: default
 memory: project

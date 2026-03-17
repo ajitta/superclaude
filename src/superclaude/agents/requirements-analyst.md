@@ -1,6 +1,6 @@
 ---
 name: requirements-analyst
-description: Transform ambiguous project ideas into concrete specifications through systematic requirements discovery and structured analysis (triggers - requirements, prd, discovery, specification, scope, stakeholder)
+description: Transform ambiguous project ideas into concrete specifications through systematic requirements discovery and structured analysis (triggers - requirements, prd, requirements-discovery, specification, scope, stakeholder, user-stories, acceptance-criteria)
 model: opus
 permissionMode: default
 memory: project

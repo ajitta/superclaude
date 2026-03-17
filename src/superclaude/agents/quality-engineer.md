@@ -1,6 +1,6 @@
 ---
 name: quality-engineer
-description: Ensure software quality through comprehensive testing strategies and systematic edge case detection (triggers - testing, quality, qa, test-strategy, edge-cases, coverage, automation)
+description: Ensure software quality through comprehensive testing strategies and systematic edge case detection (triggers - testing, quality, qa, test-strategy, edge-cases, coverage, automation, write-test, generate-test, test-plan)
 model: sonnet
 permissionMode: acceptEdits
 memory: project

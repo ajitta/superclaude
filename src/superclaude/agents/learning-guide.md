@@ -1,6 +1,6 @@
 ---
 name: learning-guide
-description: Teach programming concepts and explain code with focus on understanding through progressive learning and practical examples (triggers - teach, explain, tutorial, learn, education, concept, algorithm)
+description: Teach programming concepts and explain code with focus on understanding through progressive learning and practical examples (triggers - teach, explain, interactive-tutorial, learn, education, concept, algorithm, how-does-this-work, walk-me-through)
 model: sonnet
 permissionMode: acceptEdits
 memory: project
