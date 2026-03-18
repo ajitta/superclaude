@@ -71,19 +71,10 @@ superclaude = "superclaude.pytest_plugin"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/superclaude"]
-include = [
-    "src/**",
-    "plugins/**",
-]
-
-[tool.hatch.build.targets.wheel.force-include]
-"src" = "superclaude/_src"
-"plugins" = "superclaude/_plugins"
 
 [tool.hatch.build.targets.sdist]
 include = [
     "src/",
-    "plugins/",
     "tests/",
     "README.md",
     "LICENSE",
@@ -113,10 +104,6 @@ markers = [
     "integration: Integration tests",
     "hallucination: Hallucination detection tests",
     "performance: Performance benchmark tests",
-    "confidence_check: Pre-execution confidence assessment",
-    "self_check: Post-implementation validation",
-    "reflexion: Error learning and prevention",
-    "complexity: Task complexity level (simple, medium, complex)",
 ]
 
 [tool.coverage.run]

@@ -43,24 +43,6 @@ hooks:
 | Serena | Symbol detection (Check 1) | Grep/Glob |
   </mcp_integration>
 
-  <usage note="See confidence.py for interfaces">
-```python
-checker = ConfidenceChecker()
-result = checker.assess(context)
-if result >= 0.9:  # proceed
-    pass
-```
-  </usage>
-
-  <pytest note="See confidence.py for full API">
-```python
-@pytest.mark.confidence_check
-def test_feature(confidence_checker):
-    result = confidence_checker.assess(context)
-    assert result >= 0.9
-```
-  </pytest>
-
   <roi>100-200 tokens check → saves 5,000-50,000 tokens (25-250x ROI)</roi>
 
   <hooks note="validate_confidence_context.py runs on PreToolUse for WebFetch/WebSearch — injects evidence-focus guidance (once per session)"/>

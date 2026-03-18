@@ -80,7 +80,7 @@ Python and shell scripts that power SuperClaude's hook system, context loading, 
 
 ### Python Infrastructure (not content types)
 
-The following directories support the content framework but are not content types themselves: `cli/` (Click-based CLI and installation logic), `hooks/` (hook system integration), `pm_agent/` (PM Agent patterns — confidence, self-check, reflexion), and `utils/` (shared utilities). These are documented in the project `CLAUDE.md` under "Package Structure."
+The following directories support the content framework but are not content types themselves: `cli/` (Click-based CLI and installation logic), `hooks/` (hook system integration), and `utils/` (shared utilities). These are documented in the project `CLAUDE.md`.
 
 ## Content Delivery Pipeline
 

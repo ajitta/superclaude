@@ -24,20 +24,6 @@ def word_overlap_ratio(text1: str, text2: str) -> float:
     return len(words1 & words2) / len(words1 | words2)
 
 
-def word_overlap_count(text1: str, text2: str) -> int:
-    """Count of overlapping words between two texts.
-
-    Args:
-        text1: First text
-        text2: Second text
-
-    Returns:
-        Number of shared words
-    """
-    words1 = set(text1.lower().split())
-    words2 = set(text2.lower().split())
-    return len(words1 & words2)
-
 
 def atomic_write_json(path: Path, data: Any, indent: int = 2) -> None:
     """Write JSON data atomically using temp file + os.replace.

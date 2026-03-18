@@ -31,7 +31,7 @@ description: Execute complex tasks with intelligent workflow management and dele
     <usage>
       - /sc:task cleanup: Run automatic task cleanup
       - /sc:task cleanup --dry-run: Preview without deletion
-      - Auto-integrated with SelfCheckProtocol
+      - Auto-integrated with task lifecycle
     </usage>
   </task_cleanup>
 

@@ -35,5 +35,5 @@ allowed-tools: Bash, Read, Grep, Glob
 
   <bounds will="execute chosen completion option, handle worktree cleanup, inform user of result" wont="proceed with failing tests, force-push without request, auto-merge PRs"/>
 
-  <handoff next="using-git-worktrees /sc:ship"/>
+  <handoff next="/sc:git /sc:ship"/>
 </component>
