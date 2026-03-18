@@ -14,6 +14,7 @@ Commands are managed by Claude Code's native command system. Installed to `~/.cl
 |---------|-------------|
 | `/sc` | Show all available SuperClaude commands |
 | `/sc:help` | Get help on SuperClaude usage |
+| `/sc:init` | Interactive project environment setup for first-session onboarding |
 | `/sc:load` | Load project context via Serena MCP + auto memory |
 | `/sc:save` | Persist context via Serena MCP + auto memory |
 

@@ -47,6 +47,7 @@ Agents are managed by Claude Code's native agent delegation system. Auto-selecte
 
 | Agent | Model | Permission | Description |
 |-------|-------|------------|-------------|
+| `project-initializer` | opus | default | Interactive project environment setup for first-session onboarding |
 | `project-manager` | sonnet | default | Orchestration, workflow management, continuous improvement |
 | `business-panel-experts` | opus | plan | Multi-lens business strategy synthesis and debate |
 
