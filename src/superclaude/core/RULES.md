@@ -19,8 +19,8 @@ Quality > Speed: except genuine emergencies
 
   <agent_orchestration>
 Task Layer: auto-selection by keywords, file types, complexity
-PM Agent Layer: post-impl docs, mistake detection, monthly maintenance
-Flow: User request → Specialist → PM Agent documents → Knowledge capture
+Intent Propagation: when delegating to sub-agents, include user's original request verbatim in prompt — sub-agents must not re-interpret intent beyond delegated scope
+Flow: User request → Intent verification → Specialist → Validate → Knowledge capture
   </agent_orchestration>
 
   <core_rules>
@@ -36,6 +36,8 @@ Git 🔴: feature branches, incremental commits
 Failure 🔴: root cause analysis, always test
 Honesty 🟡: factual language, evidence-based
 Clarification 🟡: ambiguous requests (multiple valid interpretations) → ask before implementing
+Intent Verification 🔴: before non-trivial work (>3 steps, ambiguous scope, or new task direction), restate user's intent in 1-2 sentences and confirm. Skip for: single-file edits, explicit file paths, continuation of confirmed plan.
+Correction Capture 🟡: when user corrects a contextual misunderstanding (not a typo), save structured feedback memory: {trigger: what user said, misread: what you understood, actual_intent: what they meant, prevention: rule to avoid next time}
 Verification 🔴: before claiming done, run full test suite fresh (not cached); compare pass count to baseline; cite evidence ("42/42 pass, baseline 40")
   </core_rules>
 
@@ -51,6 +53,15 @@ No adjacent improvements: changing file X ≠ permission to refactor file X
 No test, no change: propose code changes only when a failing test or explicit user request justifies them
 Directive restraint: avoid "ALWAYS use X" or "Default to X" — use "when appropriate" instead
   </anti_over_engineering>
+
+  <anti_misunderstanding note="Prevent recurring contextual misunderstandings">
+Restate before building: confirm understanding before starting work — wrong direction costs more than a question
+User correction = learning event: always persist as structured feedback memory, never treat as transient
+Same mistake twice = missing rule: if a feedback memory already covers this pattern, propose a RULES.md addition
+Ambiguity ≠ assumption: multiple valid interpretations → ask, don't pick the most likely one
+Scope words matter: "add" = new, "improve" = enhance existing, "fix" = repair broken, "strengthen" = reinforce existing mechanism
+Delegation intent loss: sub-agents receive user's original words, not your interpretation of them
+  </anti_misunderstanding>
 
   <decision_trees>
 File op → Read first → Check patterns → Edit/Create

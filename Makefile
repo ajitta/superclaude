@@ -1,4 +1,4 @@
-.PHONY: install deploy test test-plugin doctor verify clean lint format build-plugin sync-plugin-repo uninstall-legacy help
+.PHONY: install deploy test test-plugin doctor verify verify-drift audit clean lint format build-plugin sync-plugin-repo uninstall-legacy help
 
 # Installation (local source, editable) - RECOMMENDED
 install:
@@ -48,6 +48,16 @@ verify:
 	@echo ""
 	@echo "======================================"
 	@echo "✅ Phase 1 verification complete"
+
+# Check for installation drift
+verify-drift:
+	@echo "Checking for installation drift..."
+	@uv run superclaude verify-drift --verbose
+
+# Run content integrity audit
+audit:
+	@echo "Running content integrity audit..."
+	@uv run superclaude audit --verbose
 
 # Linting
 lint:
@@ -123,6 +133,8 @@ help:
 	@echo "  make test            - Run test suite"
 	@echo "  make test-plugin     - Test pytest plugin auto-discovery"
 	@echo "  make doctor          - Run health check"
+	@echo "  make verify-drift    - Check for installation drift"
+	@echo "  make audit           - Run content integrity audit"
 	@echo "  make lint            - Run linter (ruff check)"
 	@echo "  make format          - Format code (ruff format)"
 	@echo "  make clean           - Clean build artifacts"

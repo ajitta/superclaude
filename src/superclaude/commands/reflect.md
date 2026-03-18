@@ -14,6 +14,7 @@ description: Task reflection and validation using Serena MCP analysis capabiliti
   <flow>
     1. Analyze: Assess completeness of collected information
     2. Validate: Check goal alignment and deviation
+    2.5. Misunderstanding-Audit: Identify moments where user intent was misread during this session. For each: what triggered the misread, what was the actual intent, what rule would prevent it. Save as feedback memory if not already stored.
     3. Reflect: Evaluate completion criteria
     4. Persist: Write learnings for cross-session capture
   </flow>

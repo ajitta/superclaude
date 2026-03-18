@@ -644,6 +644,155 @@ def skills(list_only: bool, skill_name: str, tokens: bool, scope: str):
     click.echo("   Use --info <skill> for details, --tokens for estimates")
 
 
+@main.command(name="verify-drift")
+@click.option(
+    "--scope",
+    default="user",
+    type=click.Choice(["user", "project"]),
+    help="Installation scope: user (~/.claude/) or project (./.claude/)",
+)
+@click.option("--verbose", is_flag=True, help="Show per-file details")
+def verify_drift_cmd(scope: str, verbose: bool):
+    """
+    Check for installation drift between source and installed files.
+
+    Compares each installed file against the package source to detect:
+    - MISSING: source file not installed
+    - DRIFTED: installed file differs from source
+    - EXTRA: installed file has no source counterpart
+
+    Examples:
+        superclaude verify-drift
+        superclaude verify-drift --verbose
+        superclaude verify-drift --scope project
+    """
+    from .install_commands import get_base_path
+    from .verify_drift import DRIFTED, EXTRA, MISSING, OK, verify_drift
+
+    base_path = get_base_path(scope)
+    click.echo(f"🔍 Checking installation drift (scope: {scope})...\n")
+
+    result = verify_drift(base_path, verbose=verbose)
+
+    # Display per-component results
+    for comp, data in result["components"].items():
+        ok = data["ok"]
+        total = ok + data["drifted"] + data["missing"] + data["extra"]
+        if total == 0:
+            continue
+
+        issues = data["drifted"] + data["missing"] + data["extra"]
+        icon = "✅" if issues == 0 else "⚠️"
+        click.echo(f"   {icon} {comp:15} {ok}/{total} OK", nl=False)
+        parts = []
+        if data["drifted"]:
+            parts.append(f"{data['drifted']} drifted")
+        if data["missing"]:
+            parts.append(f"{data['missing']} missing")
+        if data["extra"]:
+            parts.append(f"{data['extra']} extra")
+        if parts:
+            click.echo(f"  ({', '.join(parts)})")
+        else:
+            click.echo()
+
+        # Verbose: show individual files
+        if verbose and data.get("files"):
+            for fname, status in data["files"].items():
+                s_icon = {"OK": "✅", "DRIFTED": "🔶", "MISSING": "❌", "EXTRA": "➕"}
+                click.echo(f"      {s_icon.get(status, '?')} {fname}: {status}")
+
+    # CLAUDE_SC.md
+    sc = result["claude_sc_md"]
+    sc_icon = "✅" if sc == OK else "⚠️"
+    click.echo(f"   {sc_icon} CLAUDE_SC.md: {sc}")
+
+    # Summary
+    click.echo()
+    if result["clean"]:
+        click.echo("✅ No drift detected — installation matches source")
+    else:
+        click.echo(
+            f"⚠️  Drift detected: {result['total_drifted']} drifted, "
+            f"{result['total_missing']} missing, {result['total_extra']} extra"
+        )
+        click.echo("   Run 'superclaude install --force' to re-sync")
+        sys.exit(1)
+
+
+@main.command()
+@click.option(
+    "--scope",
+    default="user",
+    type=click.Choice(["user", "project"]),
+    help="Installation scope: user (~/.claude/) or project (./.claude/)",
+)
+@click.option("--verbose", is_flag=True, help="Show detailed results")
+@click.option(
+    "--check",
+    type=click.Choice(["drift", "cross-refs", "usage", "all"]),
+    default="all",
+    help="Which check to run (default: all)",
+)
+def audit(scope: str, verbose: bool, check: str):
+    """
+    Run content integrity audit.
+
+    Combines drift detection, cross-reference validation, and content usage
+    checks into a single report.
+
+    Examples:
+        superclaude audit
+        superclaude audit --check drift
+        superclaude audit --verbose
+    """
+    from .audit import run_audit
+    from .install_commands import get_base_path
+
+    base_path = get_base_path(scope)
+    click.echo(f"🔍 SuperClaude Audit (scope: {scope}, check: {check})\n")
+
+    result = run_audit(base_path, verbose=verbose, check=check)
+
+    # Drift results
+    if "drift" in result:
+        drift = result["drift"]
+        icon = "✅" if drift["clean"] else "⚠️"
+        click.echo(f"{icon} Drift: {drift['total_ok']} OK, "
+                    f"{drift['total_drifted']} drifted, "
+                    f"{drift['total_missing']} missing, "
+                    f"{drift['total_extra']} extra")
+
+    # Cross-reference results
+    if "cross_refs" in result:
+        xref = result["cross_refs"]
+        icon = "✅" if xref["clean"] else "⚠️"
+        click.echo(f"{icon} Cross-refs: {xref['total_issues']} issues")
+        if verbose and not xref["clean"]:
+            for category, items in xref["issues"].items():
+                if items:
+                    click.echo(f"   {category}:")
+                    for item in items:
+                        click.echo(f"      - {item}")
+
+    # Usage results
+    if "usage" in result:
+        usage = result["usage"]
+        icon = "✅" if usage["clean"] else "⚠️"
+        click.echo(f"{icon} Usage: {usage['total_issues']} issues")
+        if verbose and not usage["clean"]:
+            for issue in usage["issues"]:
+                click.echo(f"      - {issue}")
+
+    # Overall
+    click.echo()
+    if result["clean"]:
+        click.echo("✅ All checks passed")
+    else:
+        click.echo("⚠️  Issues found — see above for details")
+        sys.exit(1)
+
+
 @main.command()
 def version():
     """Show SuperClaude version"""
