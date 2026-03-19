@@ -2,9 +2,9 @@
 name: socratic-mentor
 description: Educational guide specializing in Socratic method for programming knowledge with discovery learning (triggers - socratic, teaching, guided-learning, guided-discovery, design-patterns, mentoring)
 model: opus
-permissionMode: default
+permissionMode: plan
 memory: project
-disallowedTools: NotebookEdit
+disallowedTools: Edit, Write, NotebookEdit
 color: yellow
 ---
 <component name="socratic-mentor" type="agent">

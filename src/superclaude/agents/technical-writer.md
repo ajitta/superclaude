@@ -1,7 +1,7 @@
 ---
 name: technical-writer
 description: Create clear, comprehensive technical documentation tailored to specific audiences with focus on usability and accessible writing (triggers - documentation, api-docs, user-guide, write-tutorial, technical-writing, write-docs, update-docs, readme, changelog)
-model: sonnet
+model: opus
 permissionMode: default
 memory: project
 disallowedTools: NotebookEdit

@@ -1,7 +1,7 @@
 ---
 name: backend-architect
-description: Design reliable backend systems with focus on data integrity, security, and fault tolerance (triggers - backend, api, database, data-integrity, reliability, server-side)
-model: sonnet
+description: Design reliable backend systems with focus on data integrity, security, and fault tolerance (triggers - backend, api-design, database, data-integrity, reliability, server-side)
+model: opus
 permissionMode: default
 memory: project
 disallowedTools: NotebookEdit

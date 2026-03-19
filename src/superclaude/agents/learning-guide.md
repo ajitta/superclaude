@@ -1,9 +1,10 @@
 ---
 name: learning-guide
 description: Teach programming concepts and explain code with focus on understanding through progressive learning and practical examples (triggers - teach, explain, interactive-tutorial, learn, education, concept, algorithm, how-does-this-work, walk-me-through)
-model: sonnet
-permissionMode: acceptEdits
+model: opus
+permissionMode: default
 memory: project
+disallowedTools: NotebookEdit
 color: yellow
 ---
 <component name="learning-guide" type="agent">

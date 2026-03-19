@@ -1,10 +1,10 @@
 ---
 name: repo-index
-description: Repository indexing and codebase briefing assistant (triggers - index, repository, codebase, structure, codebase-discovery, project-index, file-tree, project-overview)
-model: haiku
-permissionMode: plan
+description: Repository indexing and codebase briefing assistant (triggers - repo-index, repository, codebase, codebase-structure, codebase-discovery, project-index, file-tree, project-overview)
+model: sonnet
+permissionMode: default
 memory: project
-disallowedTools: Edit, Write, NotebookEdit
+disallowedTools: NotebookEdit
 color: cyan
 ---
 <component name="repo-index" type="agent">

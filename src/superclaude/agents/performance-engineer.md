@@ -1,7 +1,7 @@
 ---
 name: performance-engineer
 description: Optimize system performance through measurement-driven analysis and bottleneck elimination (triggers - performance, optimization, bottleneck, profiling, metrics, core-web-vitals)
-model: sonnet
+model: opus
 permissionMode: acceptEdits
 memory: project
 color: green
