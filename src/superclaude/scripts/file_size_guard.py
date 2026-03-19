@@ -34,13 +34,13 @@ BINARY_EXTENSIONS = {
 def main() -> None:
     # Respect opt-out env var
     if os.environ.get("SUPERCLAUDE_SIZE_GUARD", "1") == "0":
-        print(json.dumps({"decision": "allow"}))
+        print(json.dumps({"decision": "approve"}))
         return
 
     try:
         stdin_data = sys.stdin.read() if not sys.stdin.isatty() else ""
         if not stdin_data:
-            print(json.dumps({"decision": "allow"}))
+            print(json.dumps({"decision": "approve"}))
             return
 
         data = json.loads(stdin_data)
@@ -51,14 +51,14 @@ def main() -> None:
 
         # If limit is already set, caller is paginating — allow
         if has_limit:
-            print(json.dumps({"decision": "allow"}))
+            print(json.dumps({"decision": "approve"}))
             return
 
         # Skip binary files
         if file_path:
             ext = Path(file_path).suffix.lower()
             if ext in BINARY_EXTENSIONS:
-                print(json.dumps({"decision": "allow"}))
+                print(json.dumps({"decision": "approve"}))
                 return
 
         # Check file size
@@ -79,13 +79,13 @@ def main() -> None:
                 }))
                 return
 
-        print(json.dumps({"decision": "allow"}))
+        print(json.dumps({"decision": "approve"}))
 
     except json.JSONDecodeError:
         # Don't block on hook errors — fail open
-        print(json.dumps({"decision": "allow"}))
+        print(json.dumps({"decision": "approve"}))
     except OSError:
-        print(json.dumps({"decision": "allow"}))
+        print(json.dumps({"decision": "approve"}))
 
 
 if __name__ == "__main__":

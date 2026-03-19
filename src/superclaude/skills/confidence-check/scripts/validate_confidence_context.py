@@ -60,7 +60,7 @@ def main() -> None:
 
         print(
             json.dumps(
-                {"decision": "allow", "additionalContext": additional_context},
+                {"decision": "approve", "additionalContext": additional_context},
                 ensure_ascii=True,
             )
         )
