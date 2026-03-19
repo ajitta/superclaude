@@ -198,6 +198,31 @@ For **2-3x faster** execution and **30-50% fewer tokens**, optionally install MC
 - **Without MCPs**: Fully functional, standard performance ✅
 - **With MCPs**: 2-3x faster, 30-50% fewer tokens ⚡
 
+### **Tavily Agent Skills (Optional CLI Enhancement)**
+
+SuperClaude includes **Tavily MCP** for in-conversation web search. For advanced use cases (saving to local files, domain/time filtering, pipeline composition), optionally install the [Tavily Agent Skills](https://github.com/tavily-ai/skills):
+
+```bash
+# Install Tavily Agent Skills (requires Tavily CLI)
+curl -fsSL https://cli.tavily.com/install.sh | bash
+tvly login --api-key tvly-YOUR_KEY
+
+# Install skills into Claude Code
+npx skills add https://github.com/tavily-ai/skills
+```
+
+**When to use which:**
+
+| Scenario | Tool | Why |
+|----------|------|-----|
+| In-conversation search | Tavily **MCP** (default) | Low latency, structured output, parallel queries |
+| Agent-driven research (`/sc:research`) | Tavily **MCP** | Integrated with deep-researcher agent |
+| Save docs to local files | Tavily **CLI** (`tvly crawl --output-dir`) | File output not available via MCP |
+| Domain/time filtering | Tavily **CLI** (`tvly search --include-domains --time-range`) | Advanced filters CLI-only |
+| Pipeline composition | Tavily **CLI** (`tvly search --json \| jq`) | Composable with shell tools |
+
+> **Recommended setup:** Keep both — Tavily MCP handles 90% of searches automatically. The CLI activates only when its unique capabilities are needed.
+
 </div>
 
 ---
