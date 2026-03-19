@@ -38,6 +38,17 @@
     ],
     "PreToolUse": [
       {
+        "matcher": "Read",
+        "hooks": [
+          {
+            "_comment": "[superclaude] safety — blocks Read on files >80KB to prevent MaxFileReadTokenExceededError",
+            "type": "command",
+            "command": "python3 {{SCRIPTS_PATH}}/file_size_guard.py",
+            "timeout": 5
+          }
+        ]
+      },
+      {
         "matcher": "Bash",
         "hooks": [
           {

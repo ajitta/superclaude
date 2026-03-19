@@ -21,6 +21,7 @@ SUPERCLAUDE_HOOK_MARKERS = [
     "session_init",
     "prettier_hook",
     "test_runner_hook",
+    "file_size_guard",
 ]
 
 

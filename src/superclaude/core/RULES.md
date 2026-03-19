@@ -39,6 +39,7 @@ Clarification 🟡: ambiguous requests (multiple valid interpretations) → ask 
 Intent Verification 🔴: before non-trivial work (>3 steps, ambiguous scope, or new task direction), restate user's intent in 1-2 sentences and confirm. Skip for: single-file edits, explicit file paths, continuation of confirmed plan.
 Correction Capture 🟡: when user corrects a contextual misunderstanding (not a typo), save structured feedback memory: {trigger: what user said, misread: what you understood, actual_intent: what they meant, prevention: rule to avoid next time}
 Verification 🔴: before claiming done, run full test suite fresh (not cached); compare pass count to baseline; cite evidence ("42/42 pass, baseline 40")
+Safe Read 🟡: files of unknown size → use limit parameter or check wc -c first; logs, transcripts, changelogs (>80KB) → prefer Grep or Bash over Read; plan files → keep under 15KB, split into phases for large implementations
   </core_rules>
 
   <anti_over_engineering note="Opus 4.6 tends to over-engineer — these rules are critical guardrails">
