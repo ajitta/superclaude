@@ -45,7 +45,7 @@ description: Deep web research with adaptive planning and intelligent search
     - Tavily: tavily_search, tavily_extract, tavily_research, tavily_crawl, tavily_map
     - Native: WebSearch/WebFetch (fallback when Tavily unavailable)
     - Sequential: Multi-step reasoning + replan decisions
-    - Read/Write: Report generation to claudedocs/
+    - Read/Write: Report generation to docs/research/
     - Serena: Cross-session research memory
   </tools>
 
@@ -61,7 +61,7 @@ description: Deep web research with adaptive planning and intelligent search
     - Credibility: 5=Official/standards | 4=Peer-reviewed | 3=Industry reports | 2=Expert blogs | 1=Community posts
     - Parallel: Batch independent | concurrent extractions | post-collection cross-validate
     - Evidence: Source-linked claims | dated access | uncertainty flagged
-    - Output: claudedocs/research_[topic]_[timestamp].md
+    - Output: docs/research/YYYY-MM-DD-<topic>-research-<username>.md
   </patterns>
 
   <token_efficiency>
@@ -82,7 +82,7 @@ description: Deep web research with adaptive planning and intelligent search
       Hop 1: tavily_search ('quantum computing 2025 breakthroughs') → 5 sources
       Hop 2: tavily_extract (top 3 URLs) → detailed content
       Hop 3: Cross-validate claims across sources
-      Output: claudedocs/research_quantum_computing_20250815.md (structured report, 8 citations)
+      Output: docs/research/2025-08-15-quantum-computing-research-ajitta.md (structured report, 8 citations)
     </output>
   </example>
 

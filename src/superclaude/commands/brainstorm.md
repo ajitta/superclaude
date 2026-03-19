@@ -14,7 +14,7 @@ description: Interactive requirements discovery through Socratic dialogue and sy
     1. Explore: Socratic dialogue + systematic questioning
     2. Analyze: Multi-persona coordination + domain expertise
     3. Validate: Feasibility assessment + requirement validation
-    4. Specify: Write spec to docs/specs/YYYY-MM-DD-<topic>-design.md
+    4. Specify: Write spec to docs/specs/YYYY-MM-DD-<topic>-design-<username>.md
     5. Approve: Present spec for user review — do not proceed without confirmation
     6. Handoff: Route to /sc:plan for implementation planning
   </flow>
@@ -22,7 +22,7 @@ description: Interactive requirements discovery through Socratic dialogue and sy
   <outputs note="Per execution">
 | Artifact | Purpose |
 |----------|---------|
-| `docs/specs/YYYY-MM-DD-<topic>-design.md` | Design specification document |
+| `docs/specs/YYYY-MM-DD-<topic>-design-<username>.md` | Design specification document |
 | Conversation output | Socratic dialogue + validated requirements |
   </outputs>
 

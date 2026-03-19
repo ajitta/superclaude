@@ -64,6 +64,32 @@ Scope words matter: "add" = new, "improve" = enhance existing, "fix" = repair br
 Delegation intent loss: sub-agents receive user's original words, not your interpretation of them
   </anti_misunderstanding>
 
+  <selection_protocol note="Structured choice presentation — all commands">
+Identify: assign unique selectors — [N] flat, [Na] hierarchical, [y/n] binary
+Format: "#### [N] Label" with details as sub-list; keep each option scannable
+Recommend: mark suggested option with ★ when one is clearly superior for context
+Guide: end with input method — "select: N", "select: N,N", "[y/n]"
+Accept: bare numbers (1), comma lists (1,3), y/n, and free text — all valid
+Escape: always append free-input path — "or type your own" at end of guide
+Depth: sub-choices → present parent first, drill down next turn (Progressive)
+  Exception: ≤3 sub-options per parent → show inline as [Na] [Nb] [Nc]
+Limit: max 7 options per selection; split into categories if more
+Compare: add trade-off row when options have clear differentiators
+  </selection_protocol>
+
+  <doc_output_convention note="Unified naming for all file-producing commands">
+Pattern: docs/<type>/YYYY-MM-DD-<topic-slug>-<suffix>-<username>.md
+Username: resolve via `git config user.name` (lowercase, no spaces) — fallback to system username
+Directory map: brainstorm → docs/specs/ | plan → docs/plans/ | analyze → docs/analysis/ | research → docs/research/
+Suffix map: brainstorm → design | plan → (none, use topic only) | analyze → analysis | research → research
+Living docs (overwritten, no date/username): PROJECT_INDEX.md, WORKFLOW.md, BUILD_REPORT.md, CLEANUP_REPORT.md, KNOWLEDGE.md
+Examples:
+  docs/specs/2026-03-20-selection-protocol-design-ajitta.md
+  docs/plans/2026-03-20-auth-migration-ajitta.md
+  docs/analysis/2026-03-20-api-security-analysis-ajitta.md
+  docs/research/2026-03-20-quantum-computing-research-ajitta.md
+  </doc_output_convention>
+
   <decision_trees>
 File op → Read first → Check patterns → Edit/Create
 New feature → Scope clear? → TaskCreate(3+ steps) → Execute

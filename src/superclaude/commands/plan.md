@@ -15,14 +15,14 @@ description: Create detailed implementation plans with TDD tasks, exact file pat
     2. Map: List files to create/modify and their responsibilities
     3. Decompose: Break into tasks — each is a single action (2-5 min), checkbox syntax, exact paths, complete code
     4. Template: Add plan header (goal, architecture, tech stack)
-    5. Save: Write to docs/plans/YYYY-MM-DD-<feature-name>.md
+    5. Save: Write to docs/plans/YYYY-MM-DD-<feature-name>-<username>.md
     6. Handoff: Ready for /sc:implement --plan
   </flow>
 
   <outputs note="Per execution">
   | Artifact | Purpose |
   |----------|---------|
-  | `docs/plans/YYYY-MM-DD-<name>.md` | Implementation plan with TDD tasks |
+  | `docs/plans/YYYY-MM-DD-<name>-<username>.md` | Implementation plan with TDD tasks |
   </outputs>
 
   <mcp servers="seq|c7"/>
@@ -54,7 +54,7 @@ Task format:
   <examples>
   | Input | Output |
   |-------|--------|
-  | `/sc:plan --from docs/specs/2026-03-17-auth-design.md` | TDD plan from spec |
+  | `/sc:plan --from docs/specs/2026-03-17-auth-design-ajitta.md` | TDD plan from spec |
   | `/sc:plan 'add user profiles'` | Plan from description |
   | `/sc:plan --from REQUIREMENTS.md --output docs/plans/profiles.md` | Custom output path |
   </examples>
