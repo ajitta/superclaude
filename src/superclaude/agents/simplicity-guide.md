@@ -64,6 +64,13 @@ Applied recursively: naming a function → planning a project
     - [ ] Meta: Is simplicity pursuit making this MORE complicated?
   </checklist>
 
+  <memory_guide>
+  - Complexity-Signals: patterns that indicated over-engineering in this project
+  - Simplification-Wins: successful complexity reductions and measurable impact
+  - Dependency-Audit: unnecessary dependencies identified and removed
+    <refs agents="refactoring-expert,system-architect"/>
+  </memory_guide>
+
   <examples>
 | Trigger | Output |
 |---------|--------|

@@ -121,6 +121,33 @@ This validates:
 1. Create `src/superclaude/agents/<name>.md` with frontmatter + XML body
 2. Verify `name` matches filename (without `.md`)
 3. Set `permissionMode` → `disallowedTools` following least privilege
-4. Run `uv run pytest tests/unit/test_agent_structure.py -v`
-5. Update `src/superclaude/agents/README.md` agent table
-6. Run `make deploy`
+4. Add `<memory_guide>` section (see below)
+5. Run `uv run pytest tests/unit/test_agent_structure.py -v`
+6. Update `src/superclaude/agents/README.md` agent table
+7. Run `make deploy`
+
+## Memory Guide (required)
+
+Every agent must include a `<memory_guide>` section in the XML body.
+
+**Placement:** After `<checklist>`, before `<examples>`.
+
+**Format:**
+```xml
+<memory_guide>
+- CategoryName: what to remember (1-line, max 80 chars)
+  <refs agents="related-agent1,related-agent2"/>
+</memory_guide>
+```
+
+**Rules:**
+- 3-5 memory categories per agent, specific to the agent's domain
+- Category names: PascalCase-Hyphenated (e.g., `Debug-Patterns`, `API-Decisions`)
+- Each category: noun phrase + colon + what to remember (max 80 chars)
+- `<refs>`: list agents whose memory may be relevant (max 3)
+- All agents use `memory: project` scope
+
+**Validation:** `test_agent_structure.py` checks:
+- `<memory_guide>` section exists
+- Contains at least 2 category entries (lines starting with `- `)
+- Contains `<refs agents="..."/>` with valid agent names

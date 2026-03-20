@@ -230,6 +230,44 @@ class TestAgentMinimumContent:
             )
 
 
+class TestAgentMemoryGuide:
+    """Validate <memory_guide> section in every agent file."""
+
+    def test_has_memory_guide(self, agent):
+        stem, content, _ = agent
+        assert "<memory_guide>" in content, (
+            f"{stem}: missing <memory_guide> section"
+        )
+
+    def test_memory_guide_has_categories(self, agent):
+        stem, content, _ = agent
+        mg = extract_xml_content(content, "memory_guide")
+        assert mg, f"{stem}: <memory_guide> is empty"
+        categories = [line.strip() for line in mg.splitlines()
+                      if line.strip().startswith("- ")]
+        assert len(categories) >= 2, (
+            f"{stem}: memory_guide has {len(categories)} categories, need >= 2"
+        )
+
+    def test_memory_guide_has_refs(self, agent):
+        stem, content, _ = agent
+        mg = extract_xml_content(content, "memory_guide") or ""
+        assert '<refs agents="' in mg, (
+            f"{stem}: memory_guide missing <refs agents=\"...\"/>"
+        )
+
+    def test_memory_guide_refs_valid(self, agent):
+        stem, content, _ = agent
+        mg = extract_xml_content(content, "memory_guide") or ""
+        match = re.search(r'<refs agents="([^"]+)"', mg)
+        if match:
+            refs = [r.strip() for r in match.group(1).split(",")]
+            for ref in refs:
+                assert ref in AGENT_IDS, (
+                    f"{stem}: memory_guide refs unknown agent '{ref}'"
+                )
+
+
 class TestSimplicityGuideSpecific:
     """Targeted tests for the simplicity-guide agent."""
 

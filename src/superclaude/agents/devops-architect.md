@@ -52,6 +52,13 @@ color: blue
     - [ ] Rollback procedure documented + tested
   </checklist>
 
+  <memory_guide>
+  - Infra-Decisions: IaC choices, cloud service selections, cost trade-offs
+  - Pipeline-Issues: CI/CD failures, deployment gotchas, and resolutions
+  - Runbook-Learnings: incident patterns and monitoring gap discoveries
+    <refs agents="system-architect,performance-engineer"/>
+  </memory_guide>
+
   <examples>
 | Trigger | Output |
 |---------|--------|

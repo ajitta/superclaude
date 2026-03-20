@@ -51,6 +51,13 @@ color: yellow
     - [ ] Accessibility requirements met (WCAG)
   </checklist>
 
+  <memory_guide>
+  - Style-Decisions: documentation style choices and terminology conventions
+  - Audience-Profiles: target reader characteristics and knowledge levels
+  - Structure-Patterns: effective information architecture for this project
+    <refs agents="learning-guide"/>
+  </memory_guide>
+
   <examples>
 | Trigger | Output |
 |---------|--------|

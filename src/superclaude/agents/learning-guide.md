@@ -51,6 +51,13 @@ color: yellow
     - [ ] Exercises for reinforcement included (with expected output)
   </checklist>
 
+  <memory_guide>
+  - Effective-Explanations: explanation patterns that resonated with users
+  - Prerequisite-Maps: concept dependency chains by domain area
+  - Difficulty-Calibration: concepts users found unexpectedly easy or hard
+    <refs agents="socratic-mentor,technical-writer"/>
+  </memory_guide>
+
   <examples>
 | Trigger | Output |
 |---------|--------|

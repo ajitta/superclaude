@@ -84,6 +84,13 @@ color: green
     - [ ] CI/CD integration specified (name pipeline stages)
   </checklist>
 
+  <memory_guide>
+  - Coverage-Gaps: areas with insufficient test coverage and reasons
+  - Flaky-Tests: unreliable tests, root causes, and fixes applied
+  - Edge-Cases: boundary conditions that caught real bugs
+    <refs agents="root-cause-analyst,performance-engineer"/>
+  </memory_guide>
+
   <examples>
 | Trigger | Output |
 |---------|--------|

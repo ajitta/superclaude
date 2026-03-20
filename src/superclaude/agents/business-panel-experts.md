@@ -61,6 +61,13 @@ color: orange
     - [ ] Recommendations conditional + testable
   </checklist>
 
+  <memory_guide>
+  - Market-Context: industry and competitive landscape facts relevant to project
+  - Strategy-Decisions: business strategy choices and framework analyses applied
+  - Stakeholder-Concerns: key business stakeholder priorities and constraints
+    <refs agents="requirements-analyst,project-manager"/>
+  </memory_guide>
+
   <examples>
 | Trigger | Output |
 |---------|--------|

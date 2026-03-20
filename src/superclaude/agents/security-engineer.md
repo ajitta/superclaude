@@ -51,6 +51,13 @@ color: green
     - [ ] Remediation priorities assigned (Critical→High→Medium→Low)
   </checklist>
 
+  <memory_guide>
+  - Vulnerabilities: discovered vulnerability patterns with CWE references
+  - Auth-Patterns: authentication and authorization decisions, threat models
+  - Compliance: regulatory requirements and how they were satisfied
+    <refs agents="backend-architect,quality-engineer"/>
+  </memory_guide>
+
   <examples>
 | Trigger | Output |
 |---------|--------|

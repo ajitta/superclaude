@@ -50,6 +50,13 @@ color: green
     - [ ] After metrics compared to baseline
   </checklist>
 
+  <memory_guide>
+  - Baselines: benchmark measurements (before/after) for critical paths
+  - Bottlenecks: identified performance bottleneck locations and resolutions
+  - Regressions: performance regressions caught and their root causes
+    <refs agents="frontend-architect,backend-architect"/>
+  </memory_guide>
+
   <examples>
 | Trigger | Output |
 |---------|--------|

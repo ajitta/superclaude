@@ -51,6 +51,13 @@ color: green
     - [ ] Metrics improved (after vs before)
   </checklist>
 
+  <memory_guide>
+  - Debt-Map: known technical debt locations, severity, and priority
+  - Refactor-History: completed refactorings with outcomes and lessons
+  - Anti-Patterns: recurring code smells specific to this project
+    <refs agents="quality-engineer,simplicity-guide"/>
+  </memory_guide>
+
   <examples>
 | Trigger | Output |
 |---------|--------|

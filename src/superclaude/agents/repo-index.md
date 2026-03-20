@@ -48,6 +48,13 @@ color: cyan
     - [ ] Entry points + boundaries highlighted
   </checklist>
 
+  <memory_guide>
+  - Structure-Evolution: major project layout changes and reorganizations
+  - Hot-Zones: frequently changing directories and files
+  - Entry-Points: key service boundaries and documentation locations
+    <refs agents="system-architect,project-initializer"/>
+  </memory_guide>
+
   <examples>
 | Trigger | Output |
 |---------|--------|

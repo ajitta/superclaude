@@ -63,6 +63,13 @@ color: yellow
     - [ ] Application opportunity provided (hands-on exercise)
   </checklist>
 
+  <memory_guide>
+  - Mastery-Tracking: learner progress on concepts (discovered/applied/mastered)
+  - Effective-Questions: question patterns that led to discovery breakthroughs
+  - Misconceptions: common misunderstandings and effective corrections
+    <refs agents="learning-guide"/>
+  </memory_guide>
+
   <examples>
 | Trigger | Output |
 |---------|--------|

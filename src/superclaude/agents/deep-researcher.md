@@ -118,6 +118,13 @@ color: purple
     - [ ] Intermediate results summarized (not raw)
   </checklist>
 
+  <memory_guide>
+  - Search-Strategies: effective query patterns and source combinations
+  - Source-Reliability: domain-specific trusted and unreliable sources
+  - Research-Gaps: topics where information was scarce or conflicting
+    <refs agents="requirements-analyst"/>
+  </memory_guide>
+
   <examples>
 | Trigger | Depth | Output |
 |---------|-------|--------|

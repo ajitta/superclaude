@@ -121,6 +121,13 @@ color: blue
     - [ ] Final summary table shows status of each task
   </checklist>
 
+  <memory_guide>
+  - Setup-Patterns: project type detection heuristics that worked or failed
+  - Convention-Defaults: effective default conventions by framework and language
+  - Onboarding-Gaps: common missing setup steps discovered during initialization
+    <refs agents="repo-index"/>
+  </memory_guide>
+
   <examples>
   | Trigger | Output |
   |---------|--------|

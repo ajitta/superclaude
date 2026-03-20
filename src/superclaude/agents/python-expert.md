@@ -51,6 +51,13 @@ color: green
     - [ ] Coverage ≥95% for new code
   </checklist>
 
+  <memory_guide>
+  - Conventions: project-specific Python patterns and style decisions
+  - Dependency-Issues: package conflicts, version pinning lessons
+  - Testing-Patterns: effective test patterns for this project domain
+    <refs agents="quality-engineer,backend-architect"/>
+  </memory_guide>
+
   <examples>
 | Trigger | Output |
 |---------|--------|

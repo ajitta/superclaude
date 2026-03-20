@@ -85,6 +85,13 @@ paths:
     - [ ] Failure modes + resilience strategy defined
   </checklist>
 
+  <memory_guide>
+  - API-Decisions: endpoint design choices, versioning strategy, auth patterns
+  - Data-Models: schema evolution rationale and migration lessons
+  - Reliability: failure modes encountered, retry and circuit-breaker configurations
+    <refs agents="system-architect,security-engineer"/>
+  </memory_guide>
+
   <examples>
 | Trigger | Output |
 |---------|--------|

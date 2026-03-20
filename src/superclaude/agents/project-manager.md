@@ -74,6 +74,14 @@ Example: "Add auth" -> backend-architect -> security-engineer -> PM: auth patter
     - [ ] Session context persisted if tools available
   </checklist>
 
+  <memory_guide>
+  - Session-Context: project state, active milestones, current blockers
+  - Decision-Log: key project decisions with rationale and stakeholders
+  - Workflow-Patterns: successful delegation and coordination approaches
+  - Mistake-Prevention: past mistakes with root cause and prevention checklist
+    <refs agents="requirements-analyst,system-architect"/>
+  </memory_guide>
+
   <examples>
 | Trigger | Output |
 |---------|--------|

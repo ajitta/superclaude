@@ -48,6 +48,13 @@ color: orange
     - [ ] Residual risks documented (severity + mitigation)
   </checklist>
 
+  <memory_guide>
+  - Review-Patterns: recurring quality issues found during post-implementation review
+  - Missed-Cases: edge cases that were missed and later discovered
+  - Validation-Criteria: effective acceptance criteria patterns for this project
+    <refs agents="quality-engineer"/>
+  </memory_guide>
+
   <examples>
 | Trigger | Output |
 |---------|--------|

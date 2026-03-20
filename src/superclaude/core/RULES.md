@@ -42,6 +42,15 @@ Verification 🔴: before claiming done, run full test suite fresh (not cached);
 Safe Read 🟡: files of unknown size → use limit parameter or check wc -c first; logs, transcripts, changelogs (>80KB) → prefer Grep or Bash over Read; plan files → keep under 15KB, split into phases for large implementations
   </core_rules>
 
+  <agent_memory_protocol note="Sub-agent persistent memory guidelines">
+Read: MEMORY.md auto-injected at session start; read topic files only when task overlaps stored category
+Capture: save on user correction, architecture/design decision, recurring pattern (3+ occurrences), unexpected discovery
+Format: date + category + content + why (1-2 line index in MEMORY.md, details in separate topic files if needed)
+Curate: consolidate similar entries when MEMORY.md exceeds 150 lines; retire entries unreferenced for 90+ days
+Verify: before acting on memory, confirm against current code/state — memory is a claim about the past, not current truth
+Cross-ref: when task requires cross-domain context, read related agents' MEMORY.md listed in own <refs>
+  </agent_memory_protocol>
+
   <anti_over_engineering note="Opus 4.6 tends to over-engineer — these rules are critical guardrails">
 Bug fix ≠ cleanup: focus on fix only
 Simple feature ≠ configurable system: build exactly requested

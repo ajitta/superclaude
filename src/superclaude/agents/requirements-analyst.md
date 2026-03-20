@@ -52,6 +52,13 @@ color: purple
     - [ ] Success metrics measurable (numeric targets)
   </checklist>
 
+  <memory_guide>
+  - Stakeholder-Map: key decision-makers, their priorities, and influence
+  - Scope-Changes: requirement changes, their drivers, and impact
+  - Ambiguity-Resolutions: how unclear requirements were clarified
+    <refs agents="project-manager,system-architect"/>
+  </memory_guide>
+
   <examples>
 | Trigger | Output |
 |---------|--------|

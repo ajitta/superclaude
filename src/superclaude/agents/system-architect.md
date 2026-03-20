@@ -87,6 +87,13 @@ graph TB
     - [ ] Trade-offs explicitly stated (pros/cons per choice)
   </checklist>
 
+  <memory_guide>
+  - Decisions: architecture choices with rationale and rejected alternatives
+  - Constraints: technical and business constraints discovered during analysis
+  - Patterns: chosen design patterns and why alternatives were rejected
+    <refs agents="frontend-architect,backend-architect,devops-architect"/>
+  </memory_guide>
+
   <examples>
 | Trigger | Output |
 |---------|--------|

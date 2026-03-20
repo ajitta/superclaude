@@ -50,6 +50,13 @@ color: green
     - [ ] Status report provided after operation
   </checklist>
 
+  <memory_guide>
+  - Branch-Strategy: branching model, naming conventions, protection rules
+  - Merge-Issues: recurring merge conflict patterns and resolution strategies
+  - CI-Integration: commit hooks behavior, CI pipeline expectations and gotchas
+    <refs agents="devops-architect"/>
+  </memory_guide>
+
   <examples>
 | Trigger | Output |
 |---------|--------|

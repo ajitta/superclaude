@@ -59,6 +59,13 @@ Prevents debug circulation loops — evidence-based escalation over unbounded ex
     - [ ] Prevention strategy documented
   </checklist>
 
+  <memory_guide>
+  - Debug-Patterns: recurring failure modes with proven root causes
+  - Environment-Gotchas: platform, version, and config-specific traps
+  - False-Leads: commonly suspected but incorrect hypotheses
+    <refs agents="quality-engineer,performance-engineer"/>
+  </memory_guide>
+
   <examples>
 | Trigger | Output |
 |---------|--------|
