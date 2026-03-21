@@ -20,6 +20,7 @@ v2.2.0: MCP fallback notification support
 v2.1.0: Skills discovery and token estimation
 """
 
+import difflib
 import hashlib
 import json
 import os
@@ -153,6 +154,75 @@ INSTRUCTION_MAP = {
 
 # Environment variable to control instruction mode (default: enabled)
 USE_INSTRUCTIONS = os.environ.get("CLAUDE_CONTEXT_USE_INSTRUCTIONS", "1") == "1"
+
+# Flag alias/fuzzy matching system
+# Maps common typos, conceptual aliases, and truncations to valid flags
+FLAG_ALIASES: dict[str, list[str]] = {
+    # Conceptual aliases
+    "ultrathink": ["seq"],
+    "think": ["seq"],
+    "think-hard": ["seq"],
+    "parallel": ["delegate"],
+    "agent": ["delegate"],
+    # Typo corrections
+    "parellel": ["delegate"],
+    "conccurrency": ["concurrency"],
+    "confidenc-check": ["validate"],
+    "confidence-check": ["validate"],
+    "iteration": ["iterations"],
+    "loo": ["loop"],
+    "sea": ["serena"],
+}
+
+# All valid flags for fuzzy matching fallback
+VALID_FLAGS = {
+    "brainstorm", "business-panel", "research", "introspect", "task-manage",
+    "orchestrate", "token-efficient", "c7", "context7", "seq", "sequential",
+    "magic", "morph", "morphllm", "serena", "play", "playwright", "perf",
+    "devtools", "tavily", "tvly", "frontend-verify", "all-mcp", "no-mcp",
+    "delegate", "concurrency", "loop", "iterations", "validate", "safe-mode",
+    "fast", "uc", "ultracompressed", "scope", "focus", "effort",
+    "bs", "fix",
+}
+
+
+def resolve_flags(prompt: str) -> tuple[str, list[str]]:
+    """Resolve flag aliases and typos in a prompt.
+
+    Returns:
+        Tuple of (corrected_prompt, list of notification messages)
+    """
+    notifications: list[str] = []
+    corrected = prompt
+
+    # Find all --flag patterns (flags may have values after them)
+    flag_pattern = re.compile(r"--([a-zA-Z][\w-]*)")
+    for match in flag_pattern.finditer(prompt):
+        flag = match.group(1).lower()
+
+        # Skip already-valid flags
+        if flag in VALID_FLAGS:
+            continue
+
+        # Check alias table
+        if flag in FLAG_ALIASES:
+            replacements = FLAG_ALIASES[flag]
+            replacement_str = " ".join(f"--{r}" for r in replacements)
+            corrected = corrected.replace(f"--{match.group(1)}", replacement_str, 1)
+            notifications.append(
+                f"--{flag} → auto-corrected to {replacement_str} (alias)"
+            )
+            continue
+
+        # Fuzzy match fallback (Levenshtein distance ≤ 2)
+        close = difflib.get_close_matches(flag, VALID_FLAGS, n=3, cutoff=0.6)
+        if close:
+            suggestions = ", ".join(f"--{c}" for c in close)
+            notifications.append(
+                f"--{flag} is not a recognized flag. Did you mean: {suggestions}?"
+            )
+
+    return corrected, notifications
 
 # v2.1.0: Skills configuration
 SHOW_SKILLS_SUMMARY = os.environ.get("CLAUDE_SHOW_SKILLS", "1") == "1"
@@ -383,6 +453,14 @@ _EXECUTION_DIRECTIVES = {
         "Use --json for structured output, -o for file output."
         "</sc-directive>"
     ),
+    re.compile(r"--serena\b", re.IGNORECASE): (
+        lambda _: "<sc-directive flag=\"--serena\">"
+        "Serena-first code exploration: prefer symbolic tools over Read/Grep for code files. "
+        "1) get_symbols_overview before Read, 2) find_symbol(include_body=True) for specific functions, "
+        "3) search_for_pattern instead of Grep, 4) find_referencing_symbols instead of Grep for usage tracing. "
+        "Reserve Read for non-code files or when full file context is needed."
+        "</sc-directive>"
+    ),
 }
 
 
@@ -411,6 +489,13 @@ def main() -> None:
 
     if not prompt or not prompt.strip():
         return
+
+    # v3.2: Resolve flag aliases and typos before processing
+    prompt, flag_notifications = resolve_flags(prompt)
+    if flag_notifications:
+        for note in flag_notifications:
+            print(f"<!-- SuperClaude flag: {note} -->")
+        print()
 
     # v2.1.0: Output skills summary if enabled
     if SHOW_SKILLS_SUMMARY:

@@ -68,5 +68,5 @@ description: Comprehensive code analysis across quality, security, performance, 
   </bounds>
 
 
-  <handoff next="/sc:improve /sc:cleanup /sc:implement"/>
+  <handoff next="/sc:plan /sc:improve /sc:cleanup /sc:implement"/>
 </component>
