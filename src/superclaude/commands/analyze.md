@@ -16,6 +16,7 @@ description: Comprehensive code analysis across quality, security, performance, 
     3. Evaluate: Prioritized findings + severity (🔴🟡🟢)
     4. Recommend: Actionable guidance
     5. Report: Generate output per --format
+    6. Bridge: If findings are actionable (fixable issues, not just informational), suggest: "Would you like to create an implementation plan? → /sc:plan"
   </flow>
 
   <outputs note="Per --format flag">

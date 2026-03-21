@@ -12,10 +12,10 @@
 
 | Improvement | Spec # | Status | Sprint |
 |-------------|--------|--------|--------|
-| Flag alias/fuzzy matching | #2 (P1) | **DONE** | 1 |
-| Workflow reconnection (analyze→plan) | #3 (P1) | **DONE** | 1 |
-| Serena-first directive | #5 (P2) | **DONE** | 1 |
-| FLAGS.md alias documentation | — | TODO | 2 |
+| Flag alias/fuzzy matching | #2 (P1) | **DONE** | 1 (`74d24ba`) |
+| Workflow reconnection (analyze→plan) | #3 (P1) | **DONE** | 1 (`74d24ba`) |
+| Serena-first directive | #5 (P2) | **DONE** | 1 (`74d24ba`) |
+| FLAGS.md alias documentation | — | **DONE** | 2 (`f37ddaf`) |
 | Observer session phase-out | #1 (P0) | USER ACTION | — |
 | oasis_editor test conventions | #4 (P2) | OUT OF SCOPE | — |
 | Unused command audit | #6 (P3) | INFORMATIONAL | — |
@@ -33,13 +33,13 @@
 - Create: `docs/specs/2026-03-21-usage-insights-improvement-design-chosh1179.md`
 - Create: `docs/plans/2026-03-21-usage-insights-improvements-chosh1179.md`
 
-- [ ] Stage all files
-- [ ] Commit: `feat: add flag alias/fuzzy matching, Serena-first directive, and analyze→plan handoff`
-- [ ] Verify: `git log --oneline -1`
+- [x] Stage all files
+- [x] Commit: `feat: add flag alias/fuzzy matching, Serena-first directive, and usage insights analysis` → `74d24ba`
+- [x] Verify: `git log --oneline -1`
 
 ### Task 2: Deploy
-- [ ] Run `make deploy`
-- [ ] Verify: `echo '{"prompt":"--ultrathink"}' | python -m superclaude.scripts.context_loader` shows alias correction
+- [x] Run `make deploy` → `superclaude v4.3.0+ajitta` deployed as global editable tool
+- [x] Verify: alias + fuzzy match E2E confirmed
 
 ---
 
@@ -48,18 +48,14 @@
 ### Task 3: Document alias system in FLAGS.md
 **Files:** Modify: `src/superclaude/core/FLAGS.md`
 
-- [ ] Add `<aliases>` section after `<execution>` documenting:
-  - `--ultrathink` → `--seq`
-  - `--think` / `--think-hard` → `--seq`
-  - `--parallel` / `--parellel` → `--delegate`
-  - Fuzzy matching behavior (auto-suggest for typos)
-- [ ] Add `--serena` directive note in `<mcp>` section
-- [ ] Verify: `uv run pytest tests/unit/test_content_structure.py -v -k flags`
+- [x] Add `<aliases>` section after `<execution>` documenting all 12 aliases + fuzzy-match rules
+- [x] Add `--serena` directive note in `<mcp>` section
+- [x] Verify: tests pass
 
 ### Task 4: Final commit + deploy
-- [ ] Commit: `docs: add flag alias system documentation to FLAGS.md`
-- [ ] Run `make deploy`
-- [ ] Verify: installed FLAGS.md matches source
+- [x] Commit: `docs: add flag alias system and Serena directive documentation to FLAGS.md` → `f37ddaf`
+- [x] Run `make deploy`
+- [x] Verify: installed FLAGS.md matches source
 
 ---
 

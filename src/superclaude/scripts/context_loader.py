@@ -181,7 +181,7 @@ VALID_FLAGS = {
     "magic", "morph", "morphllm", "serena", "play", "playwright", "perf",
     "devtools", "tavily", "tvly", "frontend-verify", "all-mcp", "no-mcp",
     "delegate", "concurrency", "loop", "iterations", "validate", "safe-mode",
-    "fast", "uc", "ultracompressed", "scope", "focus", "effort",
+    "fast", "plan", "uc", "ultracompressed", "scope", "focus", "effort",
     "bs", "fix",
 }
 
@@ -459,6 +459,13 @@ _EXECUTION_DIRECTIVES = {
         "1) get_symbols_overview before Read, 2) find_symbol(include_body=True) for specific functions, "
         "3) search_for_pattern instead of Grep, 4) find_referencing_symbols instead of Grep for usage tracing. "
         "Reserve Read for non-code files or when full file context is needed."
+        "</sc-directive>"
+    ),
+    re.compile(r"--plan\b", re.IGNORECASE): (
+        lambda _: "<sc-directive flag=\"--plan\">"
+        "Lightweight planning mode: before implementing, generate a concise 5-line plan "
+        "(goal, approach, files to change, risks, verification). "
+        "Present the plan and wait for user approval before proceeding with implementation."
         "</sc-directive>"
     ),
 }

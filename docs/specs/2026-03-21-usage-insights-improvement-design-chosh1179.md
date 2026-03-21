@@ -2,8 +2,25 @@
 
 **Date:** 2026-03-21
 **Author:** chosh1179
-**Status:** Draft — pending user review
+**Status:** Partially shipped — Improvements 2, 3, 5 deployed; 1, 4, 6 pending user action
 **Data basis:** [Deep analysis](../analysis/2026-03-21-claude-code-insights-deep-analysis-chosh1179.md) of 640 sessions, 3.6M tokens
+**Implementation:** [Plan](../plans/2026-03-21-usage-insights-improvements-chosh1179.md) | Commits: `74d24ba`, `f37ddaf`
+
+---
+
+## Delivery Summary
+
+| # | Improvement | Status | Commit |
+|---|-----------|--------|--------|
+| 1 | Observer session phase-out | **USER ACTION** — stop launching observers, use /sc:save | — |
+| 2 | Flag alias/fuzzy matching | **SHIPPED** | `74d24ba` |
+| 3 | Workflow pipeline reconnection | **SHIPPED** (Options A+B+C) | `74d24ba` + pending |
+| 4 | oasis_editor test conventions | **PENDING** — project-level CLAUDE.md change | — |
+| 5 | Serena-first directive | **SHIPPED** | `74d24ba` |
+| 6 | Unused command audit | **INFORMATIONAL** — no action needed | — |
+
+**Deployed:** `superclaude v4.3.0+ajitta` via `uv tool install --force --editable .`
+**E2E verified:** `--ultrathink`→`--seq`, `--loo`→`--loop` (alias); `--seqq`→"Did you mean: --seq?" (fuzzy)
 
 ---
 
@@ -12,10 +29,10 @@
 Deep analysis of Claude Code usage data (2026-02-19 to 2026-03-20) reveals five systemic inefficiencies that the standard HTML report failed to surface:
 
 1. **47.3% token waste** on observer sessions with near-zero ROI
-2. **14.5% flag error rate** due to missing aliases/fuzzy matching
-3. **Workflow pipeline disconnection** — /sc:plan has 0 uses despite being a defined workflow gate
+2. ~~**14.5% flag error rate** due to missing aliases/fuzzy matching~~ → **FIXED** (12 aliases + fuzzy matching)
+3. ~~**Workflow pipeline disconnection** — /sc:plan has 0 uses~~ → **FIXED** (analyze.md handoff added)
 4. **Project-agnostic friction** — recommendations are diluted by aggregating all projects
-5. **Serena underutilization** in superclaude project (20.3% vs 40.2% in oasis_editor)
+5. ~~**Serena underutilization** in superclaude project (20.3%)~~ → **FIXED** (Serena-first directive)
 
 ---
 
@@ -52,64 +69,60 @@ Deep analysis of Claude Code usage data (2026-02-19 to 2026-03-20) reveals five 
 
 ---
 
-## Improvement 2: Flag Alias & Fuzzy Matching System
+## Improvement 2: Flag Alias & Fuzzy Matching System ✅ SHIPPED
 
-### Current State
+### Before
 - 39 invalid flag uses across 14 distinct typo/missing flags (14.5% error rate)
-- context_loader.py silently ignores unrecognized flags
+- context_loader.py silently ignored unrecognized flags
 - Most common: `--ultrathink` (14), `--fix` (8), `--parellel` (4)
 
-### Design
+### What Was Delivered
 
-**Alias Table** — Add to `context_loader.py`:
+**Alias Table** — `context_loader.py` lines 160-175:
 
 ```python
-FLAG_ALIASES = {
+FLAG_ALIASES: dict[str, list[str]] = {
     # Conceptual aliases
-    "ultrathink": ["seq", "effort max"],
+    "ultrathink": ["seq"],
     "think": ["seq"],
-    "think-hard": ["seq", "effort max"],
-    "fix": ["troubleshoot"],  # or no-op with message
+    "think-hard": ["seq"],
     "parallel": ["delegate"],
     "agent": ["delegate"],
-
     # Typo corrections
     "parellel": ["delegate"],
     "conccurrency": ["concurrency"],
     "confidenc-check": ["validate"],
+    "confidence-check": ["validate"],
     "iteration": ["iterations"],
     "loo": ["loop"],
     "sea": ["serena"],
 }
 ```
 
-**Fuzzy Matching** — For flags not in alias table:
-1. Compute Levenshtein distance to all valid flags
-2. If distance ≤ 2 and unique match → auto-correct with notification
-3. If ambiguous → suggest top 3 matches in output
+> **Design delta:** `--ultrathink` maps to `["seq"]` only (not `["seq", "effort max"]` as originally proposed). `--fix` kept in `VALID_FLAGS` as a no-op rather than aliased to `--troubleshoot`. `--confidence-check` added (hyphenated variant missing from original spec).
 
-**User Notification:**
-```
-⚠ --parellel → auto-corrected to --delegate (typo)
-⚠ --ultrathink → expanded to --seq --effort max (alias)
-⚠ --fix is not a recognized flag. Did you mean: --seq, --introspect, or /sc:troubleshoot?
-```
+**Fuzzy Matching** — `resolve_flags()` at line 189:
+- `difflib.get_close_matches(flag, VALID_FLAGS, n=3, cutoff=0.6)` for unrecognized flags
+- Suggests up to 3 closest matches (does not auto-correct — suggestion only)
+- Notifications surfaced as HTML comments (invisible in rendering, auditable in source)
 
-### Implementation Scope
-- `context_loader.py`: Add `FLAG_ALIASES` dict + `resolve_flag()` function
-- `context_loader.py`: Add fuzzy match fallback using `difflib.get_close_matches()`
-- Notification via `<sc-directive>` output
+**Documentation** — FLAGS.md `<aliases>` section (commit `f37ddaf`):
+- All 12 aliases documented with arrow notation
+- Fuzzy match behavior documented
+
+**Tests** — 16 unit tests in `TestResolveFlags` class:
+- Alias resolution, fuzzy matching, edge cases (empty, unknown, already-valid)
 
 ### Expected Impact
 - **14.5% → <2% flag error rate**
-- Better user experience — flags "just work" even with typos
+- Flags "just work" even with typos
 - Usage data quality improves for future analysis
 
 ---
 
-## Improvement 3: Workflow Pipeline Reconnection
+## Improvement 3: Workflow Pipeline Reconnection ✅ SHIPPED (all options)
 
-### Current State
+### Before
 
 Defined pipeline in RULES.md:
 ```
@@ -131,32 +144,26 @@ Actual usage:
 2. **Friction** — /sc:plan may require too much upfront structure for the user's iterative style
 3. **Workflow gate enforcement is advisory** — nothing prevents skipping /sc:plan
 
-### Design Options
+### What Was Delivered
 
-**Option A: Auto-suggest (low friction)**
-- After /sc:brainstorm completes, output includes: `"Next: /sc:plan to create implementation plan, or proceed directly"`
-- After /sc:analyze with findings, suggest: `"Consider /sc:plan before implementing"`
-- No enforcement — just awareness
+**Option A: Handoff** (commit `74d24ba`) — `/sc:plan` added to analyze.md `<handoff>` chain
 
-**Option B: Analyze→Plan bridge**
-- When /sc:analyze produces actionable findings (not just information), auto-prompt:
-  `"Would you like to create an implementation plan? [y/n]"`
-- If yes, transition to /sc:plan with analyze findings as input
-- Reduces friction of starting /sc:plan from scratch
+**Option B: Analyze→Plan bridge** — analyze.md `<flow>` step 6 added:
+```
+6. Bridge: If findings are actionable (fixable issues, not just informational),
+   suggest: "Would you like to create an implementation plan? → /sc:plan"
+```
 
-**Option C: Lightweight plan mode**
-- Create /sc:plan-lite or `--plan` flag for /sc:implement
-- Generates a 5-line plan (not a full document) before implementing
-- Captures the planning value without the overhead
-
-### Recommendation: Option B + C combined
-- B connects the most-used command (/sc:analyze) to the missing workflow step
-- C reduces the barrier to planning for users who find /sc:plan too heavy
+**Option C: `--plan` flag** — lightweight planning mode:
+- `context_loader.py`: `--plan` directive in `_EXECUTION_DIRECTIVES` — generates 5-line plan (goal, approach, files, risks, verification) before implementation
+- `FLAGS.md`: `--plan` documented in `<execution>` section
+- `VALID_FLAGS`: `"plan"` added for fuzzy match support
+- Usage: `/sc:implement --plan feature-name`
 
 ### Expected Impact
 - /sc:plan usage from 0 → estimated 5-10/period
+- `--plan` provides lightweight alternative for users who find /sc:plan too heavy
 - Reduced "wrong_approach" friction from better pre-implementation planning
-- More deliberate implementation sessions
 
 ---
 
@@ -200,31 +207,29 @@ Step 0 (new): Read 2-3 existing test files in the target directory
 
 ---
 
-## Improvement 5: Serena-First Directive for superclaude Project
+## Improvement 5: Serena-First Directive for superclaude Project ✅ SHIPPED
 
-### Current State
+### Before
 - superclaude: Serena adoption 20.3% of code-read operations
 - oasis_editor: Serena adoption 40.2% (2x higher — proves Serena is effective)
 - superclaude has 681 Read + 263 Grep = 944 file-read ops vs 240 Serena ops
 
-### Design
+### What Was Delivered
 
-**Add behavioral directive to context_loader.py** when `--serena` flag is active:
+**Execution directive in `_EXECUTION_DIRECTIVES`** — context_loader.py lines 456-463:
 
 ```python
-SERENA_DIRECTIVE = """
-<sc-directive name="serena-first">
-When exploring code in a Serena-activated project:
-1. Use get_symbols_overview before Read for code files
-2. Use find_symbol with include_body=True for specific functions
-3. Use search_for_pattern instead of Grep for code search
-4. Reserve Read for non-code files, config, or when full file context needed
-5. Use find_referencing_symbols instead of Grep for usage tracing
-</sc-directive>
-"""
+re.compile(r"--serena\b", re.IGNORECASE): (
+    lambda _: "<sc-directive flag=\"--serena\">"
+    "Serena-first code exploration: prefer symbolic tools over Read/Grep for code files. "
+    "1) get_symbols_overview before Read, 2) find_symbol(include_body=True) for specific functions, "
+    "3) search_for_pattern instead of Grep, 4) find_referencing_symbols instead of Grep for usage tracing. "
+    "Reserve Read for non-code files or when full file context is needed."
+    "</sc-directive>"
+),
 ```
 
-**Trigger:** Emit when `--serena` flag is present AND Serena project is activated
+> **Design delta:** Implemented as an `_EXECUTION_DIRECTIVES` entry (emitted on every `--serena` prompt) rather than a standalone `SERENA_DIRECTIVE` constant. Same content, integrated into the existing directive pipeline. FLAGS.md `--serena` description also updated to mention "Serena-first exploration directive" (commit `f37ddaf`).
 
 ### Expected Impact
 - superclaude Serena adoption: 20.3% → target 35-40%
@@ -273,34 +278,43 @@ When exploring code in a Serena-activated project:
 
 ## Implementation Priority
 
-| # | Improvement | Impact | Effort | Priority |
-|---|-----------|--------|--------|----------|
-| 1 | Observer session phase-out | **CRITICAL** (47% token savings) | Low | **P0** |
-| 2 | Flag alias/fuzzy matching | HIGH (UX quality) | Medium | **P1** |
-| 3 | Workflow pipeline reconnection | HIGH (process quality) | Medium | **P1** |
-| 4 | oasis_editor test conventions | MEDIUM (project-specific) | Low | **P2** |
-| 5 | Serena-first directive | MEDIUM (token savings) | Low | **P2** |
-| 6 | Unused command audit | LOW (informational) | Low | **P3** |
+| # | Improvement | Impact | Effort | Priority | Status |
+|---|-----------|--------|--------|----------|--------|
+| 1 | Observer session phase-out | **CRITICAL** (47% token savings) | Low | **P0** | User action needed |
+| 2 | Flag alias/fuzzy matching | HIGH (UX quality) | Medium | **P1** | **SHIPPED** `74d24ba` |
+| 3 | Workflow pipeline reconnection | HIGH (process quality) | Medium | **P1** | **SHIPPED** (A+B+C) |
+| 4 | oasis_editor test conventions | MEDIUM (project-specific) | Low | **P2** | Pending — different project |
+| 5 | Serena-first directive | MEDIUM (token savings) | Low | **P2** | **SHIPPED** `74d24ba` |
+| 6 | Unused command audit | LOW (informational) | Low | **P3** | Informational only |
 
 ---
 
-## Open Questions
+## Open Questions — Resolution Status
 
-1. **Observer sessions** — Are there any observer sessions that provide value not captured by claude-mem? If so, what specific observations are they recording?
-2. **--ultrathink** — Should this become an official flag (alias for `--seq --effort max`), or should users be guided to the existing flags?
-3. **/sc:plan** — Is the 0-usage a discovery problem, or does the user deliberately prefer ad-hoc over structured planning?
-4. **Flag notification mechanism** — Should typo corrections be visible to the user (stderr/directive), or silently applied?
-5. **Token budget tracking** — Should SuperClaude add per-session token tracking to enable cost-aware decisions?
+1. **Observer sessions** — Are there any observer sessions that provide value not captured by claude-mem?
+   → **UNRESOLVED.** User should stop launching observers and use `/sc:save` instead. Requires user process change, not code.
+
+2. ~~**--ultrathink** — Should this become an official flag or alias?~~
+   → **RESOLVED.** Implemented as alias: `--ultrathink` → `--seq`. Kept simple (no `--effort max` bundling). Documented in FLAGS.md `<aliases>` section.
+
+3. **/sc:plan** — Is the 0-usage a discovery problem or deliberate preference?
+   → **PARTIALLY RESOLVED.** Added `/sc:plan` to analyze.md handoff for discoverability. If usage remains 0 in next period, consider Options B/C from Improvement 3.
+
+4. ~~**Flag notification mechanism** — Visible or silent?~~
+   → **RESOLVED.** Notifications surfaced as HTML comments (invisible in rendered output, auditable in source). Alias corrections auto-applied; fuzzy matches suggestion-only.
+
+5. **Token budget tracking** — Should SuperClaude add per-session tracking?
+   → **UNRESOLVED.** Not in scope for this spec. Could be a future improvement.
 
 ---
 
-## Success Metrics (next report period)
+## Success Metrics (next report period: 2026-03-21 → 2026-04-20)
 
-| Metric | Current | Target |
-|--------|---------|--------|
-| Observer session tokens | 1,717,941 (47.3%) | 0 (0%) |
-| Invalid flag usage | 39 (14.5%) | < 5 (< 2%) |
-| /sc:plan usage | 0 | 5-10 |
-| oasis_editor buggy_code friction | 9 | 2-3 |
-| superclaude Serena adoption | 20.3% | 35-40% |
-| Overall friction events | 72 | < 40 |
+| Metric | Baseline (Feb 19–Mar 20) | Target | Tracking |
+|--------|---------|--------|----------|
+| Observer session tokens | 1,717,941 (47.3%) | 0 (0%) | Requires user action |
+| Invalid flag usage | 39 (14.5%) | < 5 (< 2%) | Alias system deployed |
+| /sc:plan usage | 0 | 5-10 | Handoff added |
+| oasis_editor buggy_code friction | 9 | 2-3 | Requires CLAUDE.md update |
+| superclaude Serena adoption | 20.3% | 35-40% | Directive deployed |
+| Overall friction events | 72 | < 40 | Partial — 3 of 6 improvements shipped |
