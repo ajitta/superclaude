@@ -376,6 +376,13 @@ _EXECUTION_DIRECTIVES = {
         f"Group reads, searches, and other non-dependent operations together."
         f"</sc-directive>"
     ),
+    re.compile(r"--tvly\b", re.IGNORECASE): (
+        lambda m: "<sc-directive flag=\"--tvly\">"
+        "Use Tavily CLI (`tvly` command) via Bash instead of Tavily MCP tools. "
+        "Prefer: tvly search, tvly extract, tvly crawl, tvly map, tvly research run. "
+        "Use --json for structured output, -o for file output."
+        "</sc-directive>"
+    ),
 }
 
 
