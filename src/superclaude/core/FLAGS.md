@@ -18,7 +18,7 @@
 --seq|--sequential: complex debug, system design → Sequential multi-step reasoning
 --magic: /ui, /21, design systems → Magic 21st.dev UI components
 --morph|--morphllm: bulk transforms, pattern edits → Morphllm multi-file patterns
---serena: symbol ops, project memory → Serena semantic understanding
+--serena: symbol ops, project memory → Serena semantic understanding + Serena-first exploration directive
 --play|--playwright: browser testing, E2E, visual → Playwright browser automation
 --perf|--devtools: perf audit, CLS, LCP, metrics → DevTools performance analysis
 --tavily: web search, real-time info → Tavily MCP (in-conversation search, parallel queries, agent workflows)
@@ -55,6 +55,14 @@ Note: Opus 4.6 uses 25-50% more tokens than 4.5 — monitor context usage
 --scope [file|module|project|system]: analysis boundary
 --focus [perf|security|quality|arch|a11y|testing]: target domain
   </output>
+
+  <aliases note="v3.2: auto-corrected by context_loader.py">
+--ultrathink → --seq | --think → --seq | --think-hard → --seq
+--parallel|--parellel → --delegate | --agent → --delegate
+--conccurrency → --concurrency | --iteration → --iterations | --loo → --loop
+--sea → --serena | --confidenc-check|--confidence-check → --validate
+Typos: fuzzy-matched (Levenshtein ≤ 2) → suggestion in HTML comment
+  </aliases>
 
 <priority_rules>
 
