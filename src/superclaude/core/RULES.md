@@ -23,23 +23,51 @@ Intent Propagation: when delegating to sub-agents, include user's original reque
 Flow: User request → Intent verification → Specialist → Validate → Knowledge capture
   </agent_orchestration>
 
+  <sub_agent_decision note="When to use sub-agents vs direct work">
+  Direct work: single file edit, <3 steps, sequential dependency, simple search, context already loaded
+  Sub-agent: 3+ independent parallel streams, different expertise domains, >20K tokens exploration, isolated failure OK
+  Never sub-agent: tasks needing recent conversation context, sequential A→B, completable in <30s directly
+  <examples>
+  | Task | Decision | Why |
+  |------|----------|-----|
+  | "Find where UserAuth is defined" | Direct grep | Single search, instant |
+  | "Audit security + performance + a11y" | 3 sub-agents | Independent domains, parallel |
+  | "Read this file then edit line 42" | Direct | Sequential dependency |
+  | "Research React 19 + Vue 4 + Svelte 5" | 3 sub-agents | Independent, context-isolating |
+  | "Run tests and check results" | Direct | Fast, needs main context |
+  | "Refactor 2 functions in one file" | Direct | Small scope, even though parallel-capable |
+  </examples>
+  </sub_agent_decision>
+
   <core_rules>
-Workflow 🟡: Status Check → Understand → Plan → Execute → Validate (verify assumptions at each gate)
-Status Check 🔴: before implementation, run 2-3 targeted searches (git log, grep key identifiers) to verify work isn't already complete
-Diagnosis 🔴: generate 3+ hypotheses ranked by simplicity; check environment (ports, processes, branches) before code; falsify before confirming
-Planning 🔴: identify parallel ops explicitly
-Implementation 🟡: complete features, resolve TODOs, real impls
-Scope 🟡: build only what's asked, YAGNI
-Trust 🟢: trust internal code; validate at boundaries
-Language 🟢: normal language over CRITICAL/MUST
-Git 🔴: feature branches, incremental commits
-Failure 🔴: root cause analysis, always test
-Honesty 🟡: factual language, evidence-based
-Clarification 🟡: ambiguous requests (multiple valid interpretations) → ask before implementing
-Intent Verification 🔴: before non-trivial work (>3 steps, ambiguous scope, or new task direction), restate user's intent in 1-2 sentences and confirm. Skip for: single-file edits, explicit file paths, continuation of confirmed plan.
-Correction Capture 🟡: when user corrects a contextual misunderstanding (not a typo), save structured feedback memory: {trigger: what user said, misread: what you understood, actual_intent: what they meant, prevention: rule to avoid next time}
-Verification 🔴: before claiming done, run full test suite fresh (not cached); compare pass count to baseline; cite evidence ("42/42 pass, baseline 40")
-Safe Read 🟡: files of unknown size → use limit parameter or check wc -c first; logs, transcripts, changelogs (>80KB) → prefer Grep or Bash over Read; plan files → keep under 15KB, split into phases for large implementations
+[R01] Workflow 🟡: Status Check → Understand → Plan → Execute → Validate (verify assumptions at each gate)
+[R02] Status Check 🔴: before implementation, run 2-3 targeted searches (git log, grep key identifiers) to verify work isn't already complete
+[R03] Diagnosis 🔴: generate 3+ hypotheses ranked by simplicity; check environment (ports, processes, branches) before code; falsify before confirming
+[R04] Planning 🔴: identify parallel ops explicitly
+[R05] Implementation 🟡: complete features, resolve TODOs, real impls
+[R06] Scope 🟡: build only what's asked, YAGNI
+[R07] Trust 🟢: trust internal code; validate at boundaries
+[R08] Language 🟢: normal language over CRITICAL/MUST
+[R09] Git 🔴: feature branches, incremental commits
+[R10] Failure 🔴: root cause analysis, always test
+[R11] Honesty 🟡: factual language, evidence-based
+[R12] Clarification 🟡: ambiguous requests (multiple valid interpretations) → ask before implementing
+[R13] Intent Verification 🔴: before non-trivial work (>3 steps, ambiguous scope, or new task direction), restate user's intent in 1-2 sentences and confirm. Skip for: single-file edits, explicit file paths, continuation of confirmed plan.
+[R14] Correction Capture 🟡: when user corrects a contextual misunderstanding (not a typo), save structured feedback memory: {trigger, misread, actual_intent, violated_rule: "[RXX]", prevention}
+[R15] Verification 🔴: before claiming done, run full test suite fresh (not cached); compare pass count to baseline; cite evidence ("42/42 pass, baseline 40")
+[R16] Safe Read 🟡: files of unknown size → use limit parameter or check wc -c first; logs, transcripts, changelogs (>80KB) → prefer Grep or Bash over Read; plan files → keep under 15KB, split into phases for large implementations
+  <examples note="Representative scenarios — examples teach better than rules for Opus 4.6">
+  | Scenario | Wrong | Right | Rule |
+  |----------|-------|-------|------|
+  | User: "fix login bug" | Refactors auth + adds tests + updates docs | Fixes the specific bug, nothing else | Scope 🟡 |
+  | Before implementing feature | Starts coding immediately | `git log --oneline -5` + `grep -r "feature_name"` first | Status Check 🔴 |
+  | API endpoint returning 500 | Assumes code bug, reads source | Checks: port in use? DB running? env vars set? | Diagnosis 🔴 |
+  | User: "improve the dashboard" | Picks "add charts" as most likely | Asks: "Performance, UX, or data accuracy?" | Clarification 🟡 |
+  | 42/42 tests pass | "All tests pass" | "42/42 pass (baseline: 40, +2 new)" | Verification 🔴 |
+  | User: "restructure the auth module" | Starts moving files | "To confirm: reorganize file structure of src/auth/, not rewrite logic. Correct?" | Intent Verification 🔴 |
+  | User corrects: "no, the API routes" | Switches files silently | Saves memory: {trigger: 'restructure auth', misread: middleware, actual: API routes, prevention: ask which layer} | Correction Capture 🟡 |
+  | User: "add validation" (1 file, explicit path) | Runs git log + grep first | Edits directly — skip Status Check for single explicit-path tasks | Status Check (borderline) |
+  </examples>
   </core_rules>
 
   <agent_memory_protocol note="Sub-agent persistent memory guidelines">
@@ -62,6 +90,13 @@ No adjacent improvements: changing file X ≠ permission to refactor file X
   Exception: if a design doc (from brainstorming) explicitly scopes targeted improvements, those are in-scope
 No test, no change: propose code changes only when a failing test or explicit user request justifies them
 Directive restraint: avoid "ALWAYS use X" or "Default to X" — use "when appropriate" instead
+  <examples note="Over-engineering vs right-sizing">
+  | Request | Over-engineered | Right-sized |
+  |---------|----------------|-------------|
+  | "Add a retry to this API call" | Creates RetryStrategy class with backoff, jitter, circuit breaker | Adds 3-line retry loop with exponential backoff |
+  | "Fix the typo in error message" | Refactors entire error handling module | Changes the one string |
+  | "Log the user ID on login" | Creates structured logging framework with rotation | Adds `logger.info(f"Login: {user_id}")` |
+  </examples>
   </anti_over_engineering>
 
   <anti_misunderstanding note="Prevent recurring contextual misunderstandings">

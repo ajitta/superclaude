@@ -144,13 +144,72 @@ COMPOSITE_FLAGS = {
 # Mode files → full .md injection (behavioral rules, symbol tables, tool matrices need complete content)
 # Core files → short instructions (supplementary reference)
 INSTRUCTION_MAP = {
-    # All MCP docs use full .md injection (operational guides with workflows, decision rules, integration patterns)
     # Core supplementary
     "core/BUSINESS_SYMBOLS.md": (
         "Business symbols + expert selection: 🎯target 📈growth 💰financial ⚖️tradeoffs 🏆competitive 🌊blue-ocean. "
         "Includes expert domain mapping, discussion templates, and abbreviations."
     ),
+    # Behavioral MCPs — longer instructions (these need workflow + decision rules)
+    "mcp/MCP_Serena.md": (
+        "Serena: symbol-level code operations (find_symbol, replace_symbol_body, get_symbols_overview, "
+        "insert_before/after_symbol, find_referencing_symbols, rename_symbol). "
+        "Workflow: get_symbols_overview → find_symbol(name_path, include_body=True) → edit. "
+        "Use search_for_pattern when symbol name is unknown. "
+        "Decision: symbol meaning (references, types, rename) → Serena; text patterns (strings, regex) → native Grep/Edit. "
+        "Memory: activate_project → list_memories → read_memory for cross-session context. "
+        "Prioritize symbolic tools over full file reads."
+    ),
+    "mcp/MCP_Tavily.md": (
+        "Tavily MCP: tavily_search (web search with domain/time filtering), tavily_extract (full-text from URLs), "
+        "tavily_research (multi-source synthesis), tavily_crawl (site-wide extraction), tavily_map (URL discovery). "
+        "Use for current info post-knowledge-cutoff, multi-source research, fact-checking. "
+        "Fallback: native WebSearch for simple queries, WebFetch for single pages."
+    ),
+    # Tool MCPs — shorter instructions (Claude already has tool descriptions from MCP servers)
+    "mcp/MCP_Context7.md": (
+        "Context7: 2-step library docs lookup. "
+        "Step 1: resolve-library-id (name → ID). Step 2: query-docs (ID + query → docs). "
+        "Never skip step 1. Default 10K tokens/query. Pin version: /org/project/version."
+    ),
+    "mcp/MCP_Sequential.md": (
+        "Sequential: multi-step reasoning chain (thought, thoughtNumber, totalThoughts, nextThoughtNeeded). "
+        "Branch with branchFromThought+branchId. Revise with isRevision+revisesThought. "
+        "Use for: 3+ component problems, root cause analysis, trade-off evaluation."
+    ),
+    "mcp/MCP_Playwright.md": (
+        "Playwright: browser E2E automation. Pattern: navigate → interact → assert. "
+        "Prefer CSS selectors, waitForSelector for async. Screenshot on failure. "
+        "Combine with DevTools for performance + visual testing."
+    ),
+    "mcp/MCP_Chrome-DevTools.md": (
+        "Chrome DevTools: performance profiling and Core Web Vitals (CLS, LCP, INP). "
+        "Workflow: start trace → reproduce → stop trace → analyze insights. "
+        "Use lighthouse_audit for scores, take_screenshot for visual validation."
+    ),
+    "mcp/MCP_Magic.md": (
+        "Magic 21st.dev: UI component library. Search → preview → customize → integrate. "
+        "Focus on React components, design system tokens, responsive patterns."
+    ),
+    "mcp/MCP_Morphllm.md": (
+        "Morphllm: bulk code transforms via pattern matching. Multi-file edits for: "
+        "rename across codebase, pattern migration, API signature updates."
+    ),
 }
+
+# v3.2: Tier 0 — 1-line summaries for tool MCPs (Claude already has tool descriptions)
+# Behavioral MCPs (Serena, Tavily) are NOT here — they use INSTRUCTION_MAP (Tier 1)
+TIER_0_MAP = {
+    "mcp/MCP_Context7.md": "Context7: resolve-library-id first, then query-docs. Never skip step 1.",
+    "mcp/MCP_Sequential.md": "Sequential: multi-step reasoning chain. Use for 3+ component problems.",
+    "mcp/MCP_Playwright.md": "Playwright: browser E2E automation. navigate → interact → assert.",
+    "mcp/MCP_Chrome-DevTools.md": "DevTools: performance profiling. trace → reproduce → analyze Core Web Vitals.",
+    "mcp/MCP_Magic.md": "Magic 21st.dev: UI component search → customize → integrate.",
+    "mcp/MCP_Morphllm.md": "Morphllm: bulk pattern-based multi-file code transforms.",
+    "core/BUSINESS_SYMBOLS.md": "Business symbols + expert selection. 🎯📈💰⚖️🏆🌊 domain mapping.",
+}
+
+# Behavioral MCPs that need Tier 1 (INSTRUCTION_MAP), not Tier 0
+_BEHAVIORAL_MCPS = {"mcp/MCP_Serena.md", "mcp/MCP_Tavily.md"}
 
 # Environment variable to control instruction mode (default: enabled)
 USE_INSTRUCTIONS = os.environ.get("CLAUDE_CONTEXT_USE_INSTRUCTIONS", "1") == "1"
@@ -182,7 +241,7 @@ VALID_FLAGS = {
     "devtools", "tavily", "tvly", "frontend-verify", "all-mcp", "no-mcp",
     "delegate", "concurrency", "loop", "iterations", "validate", "safe-mode",
     "fast", "plan", "uc", "ultracompressed", "scope", "focus", "effort",
-    "bs", "fix",
+    "bs", "fix", "verbose-context",
 }
 
 
@@ -361,17 +420,42 @@ def check_mcp_fallbacks(contexts: list[tuple[str, int]]) -> list[str]:
     return notifications
 
 
-def output_inject_mode(contexts: list[tuple[str, int]]) -> None:
+def _get_injection_tier(context_file: str, verbose: bool) -> int:
+    """Determine injection tier for a context file.
+
+    Returns:
+        0 = 1-line hint (tool MCPs, core)
+        1 = compact instruction (behavioral MCPs via INSTRUCTION_MAP)
+        2 = full .md (modes, --verbose-context, unmapped)
+    """
+    if verbose or not USE_INSTRUCTIONS:
+        return 2
+    if context_file.startswith("modes/"):
+        return 2  # Modes always need full behavioral content
+    if context_file in _BEHAVIORAL_MCPS:
+        return 1  # Serena, Tavily need operational instructions
+    if context_file in TIER_0_MAP:
+        return 0  # Tool MCPs get 1-line hints
+    if context_file in INSTRUCTION_MAP:
+        return 1  # Anything else in INSTRUCTION_MAP gets Tier 1
+    return 2  # Unmapped files get full injection
+
+
+def output_inject_mode(contexts: list[tuple[str, int]], prompt: str = "") -> None:
     """Output context for triggered files.
 
     v3.1: Hybrid injection — MCP files use short instruction strings (Claude already
     has tool descriptions from MCP servers), Mode files inject full .md content
     (behavioral rules, symbol tables, tool matrices need complete content).
+    v3.2: --verbose-context forces full .md injection for all contexts.
     Set CLAUDE_CONTEXT_USE_INSTRUCTIONS=0 to inject full .md files for everything.
     """
     total_tokens = 0
     loaded_files = []
     skipped_files = []
+
+    # v3.2: --verbose-context overrides INSTRUCTION_MAP (force full .md)
+    verbose = bool(re.search(r"--verbose-context", prompt, re.IGNORECASE))
 
     # v2.2.0: Check MCP fallbacks first
     fallback_notifications = check_mcp_fallbacks(contexts)
@@ -381,19 +465,31 @@ def output_inject_mode(contexts: list[tuple[str, int]]) -> None:
         print()
 
     for context_file, priority in contexts:
-        # v3.1: Try instruction injection first (MCP + core only)
-        if USE_INSTRUCTIONS and context_file in INSTRUCTION_MAP:
+        tier = _get_injection_tier(context_file, verbose)
+
+        # Tier 0: 1-line hint (tool MCPs, core)
+        if tier == 0 and context_file in TIER_0_MAP:
+            hint = TIER_0_MAP[context_file]
+            tokens = estimate_tokens(hint)
+            total_tokens += tokens
+            loaded_files.append((context_file, tokens))
+            print(f'<sc-context-hint src="{context_file}">{hint}</sc-context-hint>')
+            print()
+            continue
+
+        # Tier 1: compact instruction (behavioral MCPs, core with INSTRUCTION_MAP)
+        if tier <= 1 and context_file in INSTRUCTION_MAP:
             instruction = INSTRUCTION_MAP[context_file]
             tokens = estimate_tokens(instruction)
             total_tokens += tokens
             loaded_files.append((context_file, tokens))
-            print(f"<sc-context src=\"{context_file}\">")
+            print(f'<sc-context src="{context_file}">')
             print(instruction)
             print("</sc-context>")
             print()
             continue
 
-        # Fallback: full file injection for unmapped files
+        # Tier 2: full .md injection (modes, --verbose-context, unmapped files)
         file_path = BASE_PATH / context_file
         if not file_path.exists():
             continue
@@ -422,8 +518,8 @@ def output_inject_mode(contexts: list[tuple[str, int]]) -> None:
             f"<!-- Context loaded: {len(loaded_files)} files (~{total_tokens} tokens) -->"
         )
         if skipped_files:
-            skipped_info = ", ".join(f"{f}(p{p})" for f, _, p in skipped_files)
-            print(f"<!-- Skipped (budget): {skipped_info} -->")
+            skipped_names = ", ".join(f for f, _, _ in skipped_files)
+            print(f"<!-- ⚠️ Budget exceeded: skipped {skipped_names} -->")
 
 
 # Execution flag patterns and their behavioral directives
@@ -529,7 +625,7 @@ def main() -> None:
 
     # Output based on mode
     if INJECT_MODE:
-        output_inject_mode(contexts)
+        output_inject_mode(contexts, prompt=prompt)
     else:
         output_directive_mode(contexts)
 

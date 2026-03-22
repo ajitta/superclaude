@@ -1,14 +1,19 @@
 """
 Unit tests for context_loader
 
-Tests: format_skills_summary, resolve_flags (alias/fuzzy matching)
+Tests: format_skills_summary, resolve_flags (alias/fuzzy matching),
+       tiered injection (TIER_0_MAP, INSTRUCTION_MAP, _get_injection_tier)
 """
 
 from dataclasses import dataclass
 
 from superclaude.scripts.context_loader import (
     FLAG_ALIASES,
+    INSTRUCTION_MAP,
+    TIER_0_MAP,
     VALID_FLAGS,
+    _BEHAVIORAL_MCPS,
+    _get_injection_tier,
     format_skills_summary,
     resolve_flags,
 )
@@ -162,3 +167,49 @@ class TestResolveFlags:
             assert alias not in VALID_FLAGS, (
                 f"--{alias} is in both FLAG_ALIASES and VALID_FLAGS"
             )
+
+
+class TestTieredInjection:
+    """Test 3-tier context injection system."""
+
+    def test_tool_mcp_gets_tier_0(self):
+        """Tool MCPs (Context7, Playwright, etc.) should get Tier 0."""
+        assert _get_injection_tier("mcp/MCP_Context7.md", verbose=False) == 0
+        assert _get_injection_tier("mcp/MCP_Playwright.md", verbose=False) == 0
+        assert _get_injection_tier("mcp/MCP_Magic.md", verbose=False) == 0
+
+    def test_behavioral_mcp_gets_tier_1(self):
+        """Behavioral MCPs (Serena, Tavily) should get Tier 1."""
+        assert _get_injection_tier("mcp/MCP_Serena.md", verbose=False) == 1
+        assert _get_injection_tier("mcp/MCP_Tavily.md", verbose=False) == 1
+
+    def test_mode_always_gets_tier_2(self):
+        """Modes should always get Tier 2 (full .md)."""
+        assert _get_injection_tier("modes/MODE_Brainstorming.md", verbose=False) == 2
+        assert _get_injection_tier("modes/MODE_DeepResearch.md", verbose=False) == 2
+        assert _get_injection_tier("modes/MODE_Token_Efficiency.md", verbose=False) == 2
+
+    def test_verbose_context_forces_tier_2(self):
+        """--verbose-context should force Tier 2 for everything."""
+        assert _get_injection_tier("mcp/MCP_Context7.md", verbose=True) == 2
+        assert _get_injection_tier("mcp/MCP_Serena.md", verbose=True) == 2
+        assert _get_injection_tier("modes/MODE_Brainstorming.md", verbose=True) == 2
+
+    def test_tier_0_and_instruction_map_no_conflicting_keys(self):
+        """TIER_0_MAP and INSTRUCTION_MAP may share keys but should not
+        both be applied — tier logic selects one or the other."""
+        # Behavioral MCPs should be in INSTRUCTION_MAP but NOT in TIER_0_MAP
+        for mcp in _BEHAVIORAL_MCPS:
+            assert mcp in INSTRUCTION_MAP, f"{mcp} missing from INSTRUCTION_MAP"
+            assert mcp not in TIER_0_MAP, f"{mcp} should NOT be in TIER_0_MAP"
+
+    def test_all_tier_0_entries_are_concise(self):
+        """Tier 0 entries should be 1-line summaries (< 100 chars)."""
+        for key, value in TIER_0_MAP.items():
+            assert len(value) < 100, (
+                f"TIER_0_MAP[{key}] is {len(value)} chars — should be < 100"
+            )
+
+    def test_verbose_context_in_valid_flags(self):
+        """--verbose-context should be a valid flag."""
+        assert "verbose-context" in VALID_FLAGS

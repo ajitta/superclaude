@@ -17,6 +17,7 @@ description: Session lifecycle management with Serena MCP + Claude auto memory f
     4. Discover: Project structure + requirements (get_symbols_overview, list_dir, Read/Grep/Glob)
     5. Activate: Project context + workflow prep
     6. Validate: Context integrity + session readiness
+    7. Session Goal (optional): If user provides a goal, record as 1-line objective. Display as reminder when context exceeds 60%.
     Fallback (no Serena): Claude auto memory + Read CLAUDE.md, PLANNING.md, TASK.md; Glob for structure discovery
   </flow>
 

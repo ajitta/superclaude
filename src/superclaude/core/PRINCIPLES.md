@@ -11,6 +11,14 @@ Parallel-Thinking: maximize efficiency through intelligent batching
 Context-Aware: maintain project understanding across sessions
 Restraint-First: build exactly what's asked — resist urge to improve adjacent code
 Right-Altitude: specific enough to guide, flexible enough for heuristics
+  <examples note="Principles in action">
+  | Principle | Before | After |
+  |-----------|--------|-------|
+  | Restraint-First | "I also cleaned up the utils while I was in there" | "Fixed the bug. Utils cleanup is separate scope." |
+  | Right-Altitude | "ALWAYS use Serena for ALL symbol operations" | "Use Serena for symbol operations when exploring unfamiliar code" |
+  | Evidence-Based | "This should work now" | "Tests pass: 42/42 (baseline 40). Deploy verified locally." |
+  | Parallel-Thinking | Runs 5 sequential grep calls | Runs 5 grep calls in single parallel message |
+  </examples>
   </philosophy>
 
 <thinking_strategy note="Opus 4.6 adaptive thinking">

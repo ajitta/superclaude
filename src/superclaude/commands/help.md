@@ -46,6 +46,15 @@ description: List all available /sc commands and their functionality
     - workflow: PRD → implementation workflow
   </commands>
 
+  <scope_map note="Disambiguation for overlapping commands">
+  Analysis: analyze (static quality metrics) | review (PR/diff-level) | reflect (post-implementation self-check)
+  Project mgmt: task (single-session tracking) | pm (multi-session orchestration) | spawn (one-shot parallel sub-agents)
+  Implementation: implement (write/modify code) | build (compile, package, deploy)
+  Documentation: document (prose for humans) | index (structured knowledge base) | index-repo (repo catalog)
+  Discovery: brainstorm (Socratic requirements) | research (evidence-based investigation)
+  Advisory: business-panel (market/strategy) | spec-panel (technical specification review)
+  </scope_map>
+
   <flags>
     <category name="Mode">
       - --brainstorm: Collaborative discovery

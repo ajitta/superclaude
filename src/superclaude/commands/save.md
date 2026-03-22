@@ -18,8 +18,15 @@ description: Session lifecycle management with Serena MCP + Claude auto memory f
     4. Verify: list_memories() + Read MEMORY.md to confirm both stores
     5. Checkpoint: Recovery points + progress tracking
     6. Validate: Data integrity + no duplicates across stores
+    7. Session Goal: If a session goal was set via /sc:load, evaluate completion status (done/partial/deferred)
     Fallback (no Serena): Claude auto memory only (MEMORY.md + topic files)
   </flow>
+
+  <compaction_strategy note="What to preserve vs discard across sessions">
+  Preserve (high signal): architecture decisions + rationale, unresolved issues, key patterns discovered, session goal status
+  Discard (low signal): verbatim tool output, intermediate search results, already-committed diffs, duplicate context
+  Format: structured summary (decisions, todo, context pointers) — not narrative prose
+  </compaction_strategy>
 
   <storage note="Dual persistence">
     Serena (primary): .serena/memories/ — semantic project memories, symbol-aware context

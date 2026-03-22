@@ -46,6 +46,7 @@ WebSearch: fact-check, current info → native web search (no flag needed)
 --validate: risk >0.7, usage >75%, production → pre-execution risk assessment
 --safe-mode: usage >85%, production, critical → max validation, conservative, auto --uc
 --fast: same Opus 4.6 model, faster output (v2.1.36+)
+--verbose-context: force full .md injection for all triggered contexts, bypassing INSTRUCTION_MAP short instructions. Use when short instructions cause incorrect MCP behavior.
 Agent Teams: experimental (CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1) — parallel coordination
 Note: Opus 4.6 overengineers by default — see RULES.md anti_over_engineering for guardrails
 Note: Opus 4.6 uses 25-50% more tokens than 4.5 — monitor context usage
