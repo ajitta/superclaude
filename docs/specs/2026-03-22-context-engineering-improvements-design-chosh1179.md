@@ -146,71 +146,55 @@ INSTRUCTION_MAP currently has only 1 entry (BUSINESS_SYMBOLS.md). All 8 MCP docs
 
 | Tier | Content Level | When Used | Token Cost |
 |------|---------------|-----------|------------|
-| **Tier 0** | 1-line summary | Default for MCPs (Claude already has tool descriptions) | ~15 tokens |
-| **Tier 1** | Compact reference (operational essentials) | Default for modes; on-demand for MCPs | ~100 tokens |
-| **Tier 2** | Full .md file | Explicit `--verbose-context` flag or auto-escalation | ~400-800 tokens |
+| **Tier 0** | 1-line summary (TIER_0_MAP) | Default for tool MCPs (Claude already has tool descriptions) | ~15 tokens |
+| **Tier 1** | Compact instruction (INSTRUCTION_MAP) | Behavioral MCPs (Serena, Tavily), core files | ~100 tokens |
+| **Tier 2** | Full .md file | Modes, `--verbose-context` flag, unmapped files | ~400-800 tokens |
 
-**Auto-escalation rule:** If the same mode/MCP triggers in 2+ consecutive prompts within a session, escalate from Tier 0/1 → Tier 2.
+**Deferred:** Auto-escalation (Tier 0→2 on repeated same-session use) planned for Sprint 5.
 
 #### Implementation
 
 ```python
-# context_loader.py additions
+# context_loader.py — actual implementation (v3.2)
 
+# Tier 0: 1-line hints for tool MCPs (7 entries)
 TIER_0_MAP = {
-    # MCP — 1-line summaries (Claude has tool descriptions already)
-    "mcp/MCP_Serena.md": "Serena: symbol-level code ops. Use get_symbols_overview before reading files.",
-    "mcp/MCP_Tavily.md": "Tavily: web search (tavily_search), extraction (tavily_extract), research (tavily_research).",
     "mcp/MCP_Context7.md": "Context7: resolve-library-id first, then query-docs. Never skip step 1.",
     "mcp/MCP_Sequential.md": "Sequential: multi-step reasoning chain. Use for 3+ component problems.",
-    "mcp/MCP_Playwright.md": "Playwright: browser E2E automation. navigate→interact→assert.",
-    "mcp/MCP_Chrome-DevTools.md": "DevTools: performance profiling. trace→reproduce→analyze Core Web Vitals.",
-    "mcp/MCP_Magic.md": "Magic 21st.dev: UI component search→customize→integrate.",
-    "mcp/MCP_Morphllm.md": "Morphllm: bulk pattern-based multi-file transforms.",
-    # Core
+    "mcp/MCP_Playwright.md": "Playwright: browser E2E automation. navigate → interact → assert.",
+    "mcp/MCP_Chrome-DevTools.md": "DevTools: performance profiling. trace → reproduce → analyze Core Web Vitals.",
+    "mcp/MCP_Magic.md": "Magic 21st.dev: UI component search → customize → integrate.",
+    "mcp/MCP_Morphllm.md": "Morphllm: bulk pattern-based multi-file code transforms.",
     "core/BUSINESS_SYMBOLS.md": "Business symbols + expert selection. 🎯📈💰⚖️🏆🌊 domain mapping.",
 }
 
-TIER_1_MAP = {
-    # Modes — compact 4-axis reference
-    "modes/MODE_Brainstorming.md": (
-        "<sc-mode name='brainstorm'>"
-        "Think: diverge→converge, quantity→quality | "
-        "Communicate: questions over answers, 'what if' framing | "
-        "Prioritize: exploration>efficiency, understanding>solution | "
-        "Behave: Socratic probing, non-presumptive, brief-generation"
-        "</sc-mode>"
-    ),
-    # ... (one per mode, ~100 tokens each)
+# Behavioral MCPs skip Tier 0, use INSTRUCTION_MAP (Tier 1) instead
+_BEHAVIORAL_MCPS = {"mcp/MCP_Serena.md", "mcp/MCP_Tavily.md"}
 
-    # MCP — operational essentials
-    "mcp/MCP_Serena.md": (
-        "<sc-mcp name='serena'>"
-        "Symbol ops: find_symbol(name_path, include_body), get_symbols_overview, replace_symbol_body. "
-        "Workflow: overview→find→read body→edit. Use search_for_pattern for unknown locations. "
-        "Priority: symbolic tools > file reads. Memory: list_memories for cross-session context."
-        "</sc-mcp>"
-    ),
-    # ... (one per MCP, ~80 tokens each)
-}
+# Tier 1: INSTRUCTION_MAP serves as Tier 1 content (9 entries: 1 core + 2 behavioral + 6 tool)
+# No separate TIER_1_MAP — panel finding F2 merged the representations
 
-# Injection logic update
-def get_injection_tier(context_file: str, session_count: int) -> int:
-    """Determine injection tier based on file type and session usage count."""
-    if session_count >= 2:
-        return 2  # Auto-escalate after repeated use
-    if context_file.startswith("mcp/"):
-        return 0  # MCPs default to minimal
+# Tier selection logic
+def _get_injection_tier(context_file: str, verbose: bool) -> int:
+    """Determine injection tier based on file type and flags."""
+    if verbose or not USE_INSTRUCTIONS:
+        return 2  # --verbose-context forces full .md
     if context_file.startswith("modes/"):
-        return 1  # Modes need behavioral context
-    return 1  # Core files default to compact
+        return 2  # Modes always need full behavioral content
+    if context_file in _BEHAVIORAL_MCPS:
+        return 1  # Serena, Tavily need operational instructions
+    if context_file in TIER_0_MAP:
+        return 0  # Tool MCPs get 1-line hints
+    if context_file in INSTRUCTION_MAP:
+        return 1  # Anything else in INSTRUCTION_MAP gets Tier 1
+    return 2  # Unmapped files get full injection
 ```
 
 #### Files Changed
 
 | File | Change |
 |------|--------|
-| `src/superclaude/scripts/context_loader.py` | Add TIER_0_MAP, TIER_1_MAP, tier selection logic |
+| `src/superclaude/scripts/context_loader.py` | Add TIER_0_MAP (7 entries), _BEHAVIORAL_MCPS, _get_injection_tier(); INSTRUCTION_MAP serves as Tier 1 (no TIER_1_MAP) |
 | `src/superclaude/core/FLAGS.md` | Add `--verbose-context` flag documentation |
 
 ---
@@ -508,9 +492,9 @@ Implementation: Store goal in session cache file (already exists at `~/.claude/.
 
 | File | Change |
 |------|--------|
-| `src/superclaude/commands/load.md` | Add session goal step to flow |
-| `src/superclaude/commands/save.md` | Add goal completion evaluation |
-| `src/superclaude/scripts/context_loader.py` | Read/emit goal from session cache |
+| `src/superclaude/commands/load.md` | ✅ Add session goal step to flow |
+| `src/superclaude/commands/save.md` | ✅ Add goal completion evaluation |
+| `src/superclaude/scripts/context_loader.py` | ⏳ Deferred: Read/emit goal from session cache (command-level only for now) |
 
 ---
 
@@ -552,8 +536,8 @@ No way to know if rules improve behavior. Guide (§2.3): "최소 프롬프트로
 
 | File | Change |
 |------|--------|
-| `src/superclaude/core/RULES.md` | Add rule_id prefixes, update correction format |
-| `src/superclaude/commands/analyze.md` | Add `--focus rules` option |
+| `src/superclaude/core/RULES.md` | ✅ Add rule_id prefixes [R01]-[R16], update correction format |
+| `src/superclaude/commands/analyze.md` | ✅ `--focus rules` with dual-mode (quality + compliance), maturity label, [R14] bootstrapping |
 
 ---
 
@@ -614,21 +598,24 @@ Add `<compaction_strategy>` to save.md:
 
 ### Recommended Sprint Plan
 
-**Sprint 1 (Quick wins — P1 low-effort):**
-- [ ] #3 Expand INSTRUCTION_MAP (9 entries)
-- [ ] #4 Add sub-agent decision section to RULES.md
+**Sprint 1 (Content-first — zero code risk):**
+- [x] #2 Add examples to RULES.md and PRINCIPLES.md
+- [x] #3 Expand INSTRUCTION_MAP (1→9 entries)
+- [x] Budget overflow warning [N1], --verbose-context [N3]
 
-**Sprint 2 (High-impact — P0):**
-- [ ] #2 Add examples to RULES.md and PRINCIPLES.md
-- [ ] #1 Implement tiered context disclosure in context_loader.py
+**Sprint 2 (Tiered disclosure — P0):**
+- [x] #1 Implement tiered context disclosure (TIER_0_MAP, _get_injection_tier)
+- [x] #4 Add sub-agent decision framework to RULES.md
+- [x] 7 integration tests in TestTieredInjection [C2]
 
 **Sprint 3 (Documentation — P2):**
-- [ ] #5 Command scope map in help.md
-- [ ] #6 Session goal framing in load/save
-- [ ] #8 Compaction strategy in save.md
+- [x] #5 Command scope map in help.md
+- [x] #6 Session goal framing in load.md/save.md
+- [x] #7 Rule IDs [R01]-[R16] in RULES.md + `--focus rules` in analyze.md (dual-mode: quality + compliance)
+- [x] #8 Compaction strategy in save.md
 
-**Sprint 4 (Feedback loop — P2 medium-effort):**
-- [ ] #7 Rule effectiveness tracking (IDs + analyze mode)
+**Sprint 4 (Validation):**
+- [x] Token output re-measurement and spec status update
 
 ---
 
@@ -651,7 +638,7 @@ Add `<compaction_strategy>` to save.md:
 | Tier 0/1 too terse → Claude misuses MCP | Medium | Auto-escalation to Tier 2 on repeated use; --verbose-context escape hatch |
 | Examples become stale | Low | Examples reference behavioral patterns, not specific code |
 | INSTRUCTION_MAP instructions diverge from full .md | Medium | Generate from .md programmatically (future enhancement) |
-| Rule IDs create maintenance burden | Low | Only 17 core_rules + 9 anti_over_engineering = 26 IDs |
+| Rule IDs create maintenance burden | Low | Only 16 core_rules [R01]-[R16]; anti_over_engineering uses prose, not IDs |
 | Session goal feels intrusive | Low | Made optional in /sc:load; never auto-prompted |
 
 ---
@@ -668,6 +655,30 @@ Add `<compaction_strategy>` to save.md:
 | #6 Session goal | Manual test: `/sc:load` → set goal → work → `/sc:save` → check goal captured |
 | #7 Rule tracking | Qualitative: after 10 sessions, check feedback memories for rule_id patterns |
 | #8 Compaction | Qualitative: compare /sc:save output before/after |
+
+---
+
+## Future Work (deferred extensions)
+
+| ID | Extension | Origin | Prerequisite | Effort | Notes |
+|----|-----------|--------|-------------|--------|-------|
+| F1 | **Auto-escalation: Tier 0→2 on repeated same-session use** | Spec Improvement #1 | Session-level usage counter in context_loader.py | Medium | Original design included `session_count` param; deferred to Sprint 5. Risk: over-injection if threshold too low |
+| F2 | **Session goal injection via context_loader.py** | Spec Improvement #6 | Session cache file format stable | Low | Currently command-level (load.md/save.md). Code-level would auto-emit `<sc-directive>` at 60%+ context |
+| F3 | **Rule compliance data bootstrapping (Stage 3)** | Spec Improvement #7 | Users actively following [R14] Correction Capture | None | `--focus rules` is ready; needs real feedback memories with `violated_rule: "[RXX]"` to produce compliance heatmap |
+| F4 | **Rules + Iteration (Stage 4)** | Brainstorm research (PromptWizard, Stanford ACE) | Stage 3 active | High | Auto-suggest rule refinements based on violation patterns. Inspired by PromptWizard's generate→critique→refine loop |
+| F5 | **INSTRUCTION_MAP auto-generation from .md files** | Spec Risks table | Stable .md format + extraction heuristic | Medium | Currently hand-written. Risk of INSTRUCTION_MAP diverging from full .md over time |
+| F6 | **Tier 0 hint accuracy monitoring** | Session 2026-03-22 post-deploy | Production usage data | Low | Context7 Tier 0 hint may cause step-1 skipping. If observed → enrich TIER_0_MAP or promote to Tier 1 |
+| F7 | **Quarterly rule audit workflow** | Spec Improvement #7 | 10+ sessions with `--focus rules` data | Low | Scan for: cold rules (never triggered), conflicting feedback memories, severity rebalancing |
+
+### Dependency Graph
+
+```
+F3 (bootstrap) → F4 (iteration) → F7 (quarterly audit)
+F1 (auto-escalation) — independent
+F2 (session goal code) — independent
+F5 (INSTRUCTION_MAP gen) — independent
+F6 (Tier 0 monitoring) → F1 (auto-escalation may solve)
+```
 
 ---
 

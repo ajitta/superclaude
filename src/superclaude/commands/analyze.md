@@ -8,7 +8,7 @@ description: Comprehensive code analysis across quality, security, performance, 
     <mission>Comprehensive code analysis across quality, security, performance, and architecture domains</mission>
   </role>
 
-  <syntax>/sc:analyze [target] [--focus quality|security|performance|architecture] [--depth quick|deep] [--format text|json|report]</syntax>
+  <syntax>/sc:analyze [target] [--focus quality|security|performance|architecture|rules] [--depth quick|deep] [--format text|json|report]</syntax>
 
   <flow>
     1. Discover: Categorize files by language
@@ -28,7 +28,7 @@ description: Comprehensive code analysis across quality, security, performance, 
   </outputs>
 
 
-  <mcp servers="seq|c7"/>
+  <mcp servers="seq|c7|serena"/>
   <personas p="arch|perf|sec|qual"/>
 
   <tools>
@@ -39,8 +39,18 @@ description: Comprehensive code analysis across quality, security, performance, 
     - Write: Report generation (--format json|report)
   </tools>
 
+  <rules_analysis note="--focus rules: rule effectiveness audit">
+    Quality (always): Read RULES.md → summary: rule count, example coverage, severity distribution
+    Compliance (when data exists): Glob auto memory + list Serena memories → grep `violated_rule: "[RXX]"` → heatmap
+      Hot (≥2 violations) 🔴: needs examples or clarification → /sc:improve
+      Warm (1 violation) 🟡: monitor
+      Untagged: corrections without violated_rule field → suggest [R14] format
+    Maturity label: Stage 1 (rules defined) | Stage 2 (rules + examples) | Stage 3 (rules + tracking) | Stage 4 (rules + iteration)
+    Empty data: report "Stage N" + guide: "To bootstrap tracking, follow [R14] Correction Capture format when correcting Claude's behavior"
+  </rules_analysis>
+
   <patterns>
-    - Domain: Quality|Security|Perf|Arch → specialized assessment
+    - Domain: Quality|Security|Perf|Arch|Rules → specialized assessment
     - Recognition: Language detect → appropriate techniques
     - Severity: Issue classification → prioritized recs
   </patterns>
@@ -53,10 +63,11 @@ description: Comprehensive code analysis across quality, security, performance, 
 | `src/auth --focus security --deep` | Security vulnerability assessment |
 | `--focus performance --format report` | ANALYSIS_REPORT.md with bottleneck roadmap |
 | `src/components --focus quality --format json` | analysis.json with code smell findings |
+| `--focus rules` | Rule heatmap + maturity label + recommendations |
 
   <example name="invalid-focus" type="error-path">
     <input>/sc:analyze --focus everything --scope system</input>
-    <why_wrong>--focus accepts: quality|security|performance|architecture. 'everything' is not valid.</why_wrong>
+    <why_wrong>--focus accepts: quality|security|performance|architecture|rules. 'everything' is not valid.</why_wrong>
     <correct>/sc:analyze --scope system (omit --focus for multi-domain analysis)</correct>
   </example>
 

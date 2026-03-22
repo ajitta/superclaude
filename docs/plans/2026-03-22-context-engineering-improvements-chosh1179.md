@@ -103,7 +103,7 @@
 
 ### Task 2.1: Implement TIER_0_MAP for 1-line MCP summaries
 **Files:** Modify: `src/superclaude/scripts/context_loader.py` (add after INSTRUCTION_MAP)
-- [x] Add `TIER_0_MAP` dict with 9 entries (8 MCPs + 1 core): one-line summaries (~15 tokens each)
+- [x] Add `TIER_0_MAP` dict with 7 entries (6 tool MCPs + 1 core): one-line summaries (~15 tokens each)
 - [x] Behavioral MCPs (Serena, Tavily): NOT in TIER_0 — they skip to INSTRUCTION_MAP (Tier 1) [N2]
 - [x] Tool MCPs (Context7, Sequential, Playwright, DevTools, Magic, Morphllm): in TIER_0
 - [x] Core (BUSINESS_SYMBOLS): in TIER_0
@@ -208,7 +208,7 @@
 | `src/superclaude/commands/help.md` | 3 | +scope_map section |
 | `src/superclaude/commands/load.md` | 3 | +session goal step |
 | `src/superclaude/commands/save.md` | 3 | +goal evaluation, +compaction_strategy |
-| `tests/unit/test_context_loader.py` | 2 | +TestTieredInjection class (6 tests) |
+| `tests/unit/test_context_loader.py` | 2 | +TestTieredInjection class (7 tests) |
 | `docs/specs/2026-03-22-*` | 4 | Status update + measurements |
 
 **Total: 9 files across 4 sprints. No new files created.**
@@ -223,4 +223,4 @@
 | Budget overflow warning | N1 | `⚠️ Budget exceeded: skipped [files]` visible comment | 1 | 1.5 |
 | Serena/Tavily default Tier 1 | N2 | Behavioral MCPs skip TIER_0, go to INSTRUCTION_MAP | 2 | 2.1-2.2 |
 | Missing Intent Verification + Correction Capture examples | A1 | Added as rows 6-7 in Task 1.1 | 1 | 1.1 |
-| Regression tests for context_loader.py | C2 | 6 integration tests in TestTieredInjection | 2 | 2.4 |
+| Regression tests for context_loader.py | C2 | 7 integration tests in TestTieredInjection | 2 | 2.4 |
