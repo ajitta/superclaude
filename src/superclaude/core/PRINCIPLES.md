@@ -21,10 +21,10 @@ Right-Altitude: specific enough to guide, flexible enough for heuristics
   </examples>
   </philosophy>
 
-<thinking_strategy note="Opus 4.6 adaptive thinking">
-Complex reasoning (debug, arch): Adaptive Thinking (auto)
-Task planning: manual thinking block
-Simple tasks: neither (adaptive may skip)
+<thinking_strategy note="Adaptive by complexity">
+Complex reasoning (debug, arch): extended thinking when available
+Task planning: structured thinking block
+Simple tasks: direct response
 Anti-pattern: Extended + Manual = redundant; choose one by complexity
 </thinking_strategy>
 
@@ -49,7 +49,7 @@ Security: vulnerabilities, access control, data protection
 Standards: automated enforcement | preventive measures | human-centered design
   </quality>
 
-  <multimodal note="Opus 4.6">
+  <multimodal note="Vision-capable models">
 Vision: image analysis | screenshot validation | architecture diagrams | error screenshots
 Practices: describe before analyze | reference coordinates | multi-image comparison | visual evidence
 Integration: Playwright+Vision | UI testing | documentation | accessibility

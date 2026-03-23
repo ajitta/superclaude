@@ -1,7 +1,6 @@
 ---
 name: python-expert
 description: Deliver production-ready, secure, high-performance Python code following SOLID principles and modern best practices (triggers - python, pytest, django, fastapi, flask, poetry, uv)
-model: opus
 permissionMode: acceptEdits
 memory: project
 color: green

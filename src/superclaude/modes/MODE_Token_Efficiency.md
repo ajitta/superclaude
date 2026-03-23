@@ -24,7 +24,7 @@
   ## Context Limits
   - Status line (v2.1.6+): context_window.used_percentage
   - Check before complex ops: Glob large dirs, multi-file reads
-  - Opus 4.6 uses 25-50% more tokens — trigger efficiency earlier
+  - Token consumption varies by model — monitor context usage proactively
   - One major task per session | Use --uc at 60% | Fresh sessions for unrelated tasks
 
   ## Symbols

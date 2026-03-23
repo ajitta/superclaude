@@ -36,20 +36,19 @@ WebSearch: fact-check, current info → native web search (no flag needed)
 --delegate [auto|files|folders]: >7 dirs, >50 files, complexity >0.8 → sub-agent parallel
   Direct work for: single-file edits, sequential ops, <3 steps, simple searches (grep/glob)
   Sub-agents for: parallel-capable, isolated context, independent work streams, >5 files
-  Default: sub-agents inherit parent model unless explicit model field in agent frontmatter
-  Heuristic: opus for all specialist agents | sonnet for repo-index (scanning) | haiku for future lightweight tasks
-  Override: user can set explicit model in Task() calls
+  Default: sub-agents inherit parent model (no agent declares model: by default)
+  Override: add model: to agent frontmatter to pin a specific model (overrides user's session choice)
 --concurrency [n]: 1-15 → batch independent tool calls into single message (e.g. 5 parallel Grep calls)
 --loop: iterative improvement — execute task → self-evaluate output → identify gaps → re-execute → repeat until no meaningful improvement found. Report iteration count when done.
 --iterations [n]: fixed iteration count — execute the improvement cycle exactly N times. After each iteration, briefly state what changed. Do not stop early even if output seems good.
 --plan: lightweight pre-implementation planning → 5-line plan (goal, approach, files, risks, verification) before execution
 --validate: risk >0.7, usage >75%, production → pre-execution risk assessment
 --safe-mode: usage >85%, production, critical → max validation, conservative, auto --uc
---fast: same Opus 4.6 model, faster output (v2.1.36+)
+--fast: same model, faster output (v2.1.36+)
 --verbose-context: force full .md injection for all triggered contexts, bypassing INSTRUCTION_MAP short instructions. Use when short instructions cause incorrect MCP behavior.
 Agent Teams: experimental (CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1) — parallel coordination
-Note: Opus 4.6 overengineers by default — see RULES.md anti_over_engineering for guardrails
-Note: Opus 4.6 uses 25-50% more tokens than 4.5 — monitor context usage
+Note: see RULES.md anti_over_engineering for scope discipline guardrails
+Note: token consumption varies by model — monitor context usage, use --uc at 60%+
 </execution>
 
   <output>

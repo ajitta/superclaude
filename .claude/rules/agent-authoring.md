@@ -8,7 +8,7 @@ When creating or modifying agent `.md` files in `src/superclaude/agents/`, follo
 ---
 name: agent-name                           # required | lowercase + hyphens, must match filename
 description: One-line purpose (triggers - keyword1, keyword2)  # required | used for auto-delegation
-model: opus|sonnet|haiku                   # required | see model routing below
+model: opus|sonnet|haiku                   # optional | omit to inherit parent model (recommended)
 permissionMode: plan|default|acceptEdits   # required | system-enforced permission level
 memory: project                            # required | always "project" for SuperClaude agents
 disallowedTools: Edit, Write, NotebookEdit # optional | comma-separated, least privilege
@@ -30,10 +30,10 @@ color: blue|green|purple|yellow|orange|cyan # required | by role group
 | General work (default mode) | `NotebookEdit` | Agent can edit code but not notebooks |
 | Full access (implementation) | *(omit field)* | Agent needs all tools |
 
-**model routing heuristic**:
-- `opus` — architecture, security, judgment, deep analysis, strategy
-- `sonnet` — coding, documentation, analysis, testing, teaching
-- `haiku` — mechanical scanning, indexing, low-complexity reads
+**model routing**:
+- Default: omit `model:` field — agent inherits parent session's model (recommended)
+- Override: set `model:` explicitly only when a specific model is required regardless of user's session choice
+- Use sparingly — explicit `model:` overrides the user's cost/speed preference
 
 **color by role group**:
 | Group | color | Roles |

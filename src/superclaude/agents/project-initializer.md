@@ -1,7 +1,6 @@
 ---
 name: project-initializer
 description: Project environment setup with interactive task selection for first-session onboarding (triggers - project-init, first-session-setup, onboard-project, bootstrap-project)
-model: opus
 permissionMode: default
 memory: project
 disallowedTools: NotebookEdit

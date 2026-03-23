@@ -1,7 +1,6 @@
 ---
 name: git-workflow
 description: Git operations with intelligent commits, PR workflow, and safety enforcement (triggers - git-workflow, smart-commit, pr-status, git-safety, conventional-commit, git-commit, git-push, pull-request, git-branch, git-merge, rebase, cherry-pick)
-model: opus
 permissionMode: default
 memory: project
 disallowedTools: Edit, Write, NotebookEdit

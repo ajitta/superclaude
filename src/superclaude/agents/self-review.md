@@ -1,7 +1,6 @@
 ---
 name: self-review
 description: Post-implementation validation and reflexion partner (triggers - review, validate, post-implementation, reflexion, self-check, quality-gate, verify-work, double-check, did-i-miss, sanity-check)
-model: opus
 permissionMode: plan
 memory: project
 disallowedTools: Edit, Write, NotebookEdit

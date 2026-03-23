@@ -10,65 +10,65 @@ Agents are managed by Claude Code's native agent delegation system. Auto-selecte
 
 ### Research & Analysis
 
-| Agent | Model | Permission | Description |
-|-------|-------|------------|-------------|
-| `deep-researcher` | opus | acceptEdits | Web research with cross-checking and citation-ready synthesis |
-| `root-cause-analyst` | opus | default | Systematic problem diagnosis through hypothesis testing |
-| `requirements-analyst` | opus | default | Requirements gathering through systematic discovery |
+| Agent | Permission | Description |
+|-------|------------|-------------|
+| `deep-researcher` | acceptEdits | Web research with cross-checking and citation-ready synthesis |
+| `root-cause-analyst` | default | Systematic problem diagnosis through hypothesis testing |
+| `requirements-analyst` | default | Requirements gathering through systematic discovery |
 
 ### Architecture & Design
 
-| Agent | Model | Permission | Description |
-|-------|-------|------------|-------------|
-| `system-architect` | opus | plan | System design and long-term architecture decisions |
-| `backend-architect` | sonnet | default | Backend systems, API design, data integrity |
-| `frontend-architect` | sonnet | acceptEdits | Frontend architecture, accessibility, UI patterns |
-| `devops-architect` | sonnet | default | Infrastructure, CI/CD, deployment automation |
+| Agent | Permission | Description |
+|-------|------------|-------------|
+| `system-architect` | plan | System design and long-term architecture decisions |
+| `backend-architect` | default | Backend systems, API design, data integrity |
+| `frontend-architect` | acceptEdits | Frontend architecture, accessibility, UI patterns |
+| `devops-architect` | default | Infrastructure, CI/CD, deployment automation |
 
 ### Engineering Specialists
 
-| Agent | Model | Permission | Description |
-|-------|-------|------------|-------------|
-| `python-expert` | sonnet | acceptEdits | Python best practices, SOLID principles |
-| `security-engineer` | opus | plan | Security analysis, OWASP, threat modeling |
-| `performance-engineer` | sonnet | acceptEdits | Performance optimization and profiling |
-| `quality-engineer` | sonnet | acceptEdits | Testing strategies and edge case detection |
-| `refactoring-expert` | sonnet | default | Code quality improvement and tech debt reduction |
+| Agent | Permission | Description |
+|-------|------------|-------------|
+| `python-expert` | acceptEdits | Python best practices, SOLID principles |
+| `security-engineer` | plan | Security analysis, OWASP, threat modeling |
+| `performance-engineer` | acceptEdits | Performance optimization and profiling |
+| `quality-engineer` | acceptEdits | Testing strategies and edge case detection |
+| `refactoring-expert` | default | Code quality improvement and tech debt reduction |
 
 ### Documentation & Education
 
-| Agent | Model | Permission | Description |
-|-------|-------|------------|-------------|
-| `technical-writer` | sonnet | default | Technical documentation tailored to audiences |
-| `learning-guide` | sonnet | acceptEdits | Progressive learning and practical examples |
-| `socratic-mentor` | sonnet | default | Teaching through guided questioning |
+| Agent | Permission | Description |
+|-------|------------|-------------|
+| `technical-writer` | default | Technical documentation tailored to audiences |
+| `learning-guide` | acceptEdits | Progressive learning and practical examples |
+| `socratic-mentor` | default | Teaching through guided questioning |
 
 ### Project & Business
 
-| Agent | Model | Permission | Description |
-|-------|-------|------------|-------------|
-| `project-initializer` | opus | default | Interactive project environment setup for first-session onboarding |
-| `project-manager` | sonnet | default | Orchestration, workflow management, continuous improvement |
-| `business-panel-experts` | opus | plan | Multi-lens business strategy synthesis and debate |
+| Agent | Permission | Description |
+|-------|------------|-------------|
+| `project-initializer` | default | Interactive project environment setup for first-session onboarding |
+| `project-manager` | default | Orchestration, workflow management, continuous improvement |
+| `business-panel-experts` | plan | Multi-lens business strategy synthesis and debate |
 
 ### Philosophy & Discipline
 
-| Agent | Model | Permission | Description |
-|-------|-------|------------|-------------|
-| `simplicity-guide` | opus | plan | Complexity prevention through Orient-Step-Learn |
+| Agent | Permission | Description |
+|-------|------------|-------------|
+| `simplicity-guide` | plan | Complexity prevention through Orient-Step-Learn |
 
 ### Git & Workflow
 
-| Agent | Model | Permission | Description |
-|-------|-------|------------|-------------|
-| `git-workflow` | sonnet | default | Git operations with intelligent commits, PR workflow, and safety enforcement |
+| Agent | Permission | Description |
+|-------|------------|-------------|
+| `git-workflow` | default | Git operations with intelligent commits, PR workflow, and safety enforcement |
 
 ### Code Quality
 
-| Agent | Model | Permission | Description |
-|-------|-------|------------|-------------|
-| `self-review` | opus | default | Post-implementation validation and reflexion |
-| `repo-index` | haiku | acceptEdits | Repository indexing and codebase briefing |
+| Agent | Permission | Description |
+|-------|------------|-------------|
+| `self-review` | default | Post-implementation validation and reflexion |
+| `repo-index` | acceptEdits | Repository indexing and codebase briefing |
 
 ## Permission Framework
 
@@ -78,7 +78,10 @@ Agents are managed by Claude Code's native agent delegation system. Auto-selecte
 | `default` | Each tool prompted on first use |
 | `plan` | Read-only; modifications blocked until approved |
 
-Model routing: `opus` for architecture/security/judgment | `sonnet` for coding/analysis/docs | `haiku` for mechanical scanning
+## Model Routing
+
+All agents inherit the parent session's model by default — no `model:` field in frontmatter.
+To pin a specific model, add `model: opus|sonnet|haiku` to frontmatter (not recommended — overrides user's choice).
 
 ## Authoring Rules
 

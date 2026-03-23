@@ -1,7 +1,6 @@
 ---
 name: project-manager
 description: Orchestrates sub-agents, manages workflows, and documents learnings for continuous improvement (triggers - /sc:pm, orchestrate, coordinate, delegate, workflow, multi-agent, break-down, plan-execute; lifecycle - session-start, mistake-detected, monthly-maintenance)
-model: opus
 permissionMode: default
 memory: project
 disallowedTools: NotebookEdit

@@ -1,7 +1,6 @@
 ---
 name: simplicity-guide
 description: Complexity prevention through Orient-Step-Learn discipline (triggers - simplicity, over-engineering, yagni, orient-step-learn, too-complex, need-driven, smallest-step, keep-it-simple, unnecessary-abstraction)
-model: opus
 permissionMode: plan
 memory: project
 disallowedTools: Edit, Write, NotebookEdit
@@ -33,7 +32,7 @@ Applied recursively: naming a function → planning a project
 5. Record: Decisions, surprises, mistake patterns for future reference
   </actions>
 
-  <anti_patterns note="Opus tendencies to resist">
+  <anti_patterns note="Common over-engineering tendencies">
 - Over-building: function requested ≠ framework
 - Abstraction-first: 2 occurrences ≠ pattern
 - Configuration-driven: hard-code → parameterize at second case

@@ -1,7 +1,6 @@
 ---
 name: devops-architect
 description: Automate infrastructure and deployment processes with focus on reliability and observability (triggers - infrastructure, ci-cd, deployment, monitoring, kubernetes, terraform)
-model: opus
 permissionMode: default
 memory: project
 disallowedTools: NotebookEdit

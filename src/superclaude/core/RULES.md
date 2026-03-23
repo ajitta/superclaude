@@ -56,7 +56,7 @@ Flow: User request → Intent verification → Specialist → Validate → Knowl
 [R14] Correction Capture 🟡: when user corrects a contextual misunderstanding (not a typo), save structured feedback memory: {trigger, misread, actual_intent, violated_rule: "[RXX]", prevention}
 [R15] Verification 🔴: before claiming done, run full test suite fresh (not cached); compare pass count to baseline; cite evidence ("42/42 pass, baseline 40")
 [R16] Safe Read 🟡: files of unknown size → use limit parameter or check wc -c first; logs, transcripts, changelogs (>80KB) → prefer Grep or Bash over Read; plan files → keep under 15KB, split into phases for large implementations
-  <examples note="Representative scenarios — examples teach better than rules for Opus 4.6">
+  <examples note="Representative scenarios — examples teach better than rules">
   | Scenario | Wrong | Right | Rule |
   |----------|-------|-------|------|
   | User: "fix login bug" | Refactors auth + adds tests + updates docs | Fixes the specific bug, nothing else | Scope 🟡 |
@@ -79,7 +79,7 @@ Verify: before acting on memory, confirm against current code/state — memory i
 Cross-ref: when task requires cross-domain context, read related agents' MEMORY.md listed in own <refs>
   </agent_memory_protocol>
 
-  <anti_over_engineering note="Opus 4.6 tends to over-engineer — these rules are critical guardrails">
+  <anti_over_engineering note="Scope discipline — prevent gold-plating">
 Bug fix ≠ cleanup: focus on fix only
 Simple feature ≠ configurable system: build exactly requested
 Unchanged code untouched: preserve existing as-is
@@ -97,6 +97,10 @@ Directive restraint: avoid "ALWAYS use X" or "Default to X" — use "when approp
   | "Fix the typo in error message" | Refactors entire error handling module | Changes the one string |
   | "Log the user ID on login" | Creates structured logging framework with rotation | Adds `logger.info(f"Login: {user_id}")` |
   </examples>
+  <model_tendencies note="Self-calibrate based on your known behavioral patterns">
+    Over-engineering signals: creating classes for one-time operations, adding config for fixed values, building frameworks for single features
+    Under-engineering signals: skipping error handling at system boundaries, omitting types in public interfaces, happy-path-only testing
+  </model_tendencies>
   </anti_over_engineering>
 
   <anti_misunderstanding note="Prevent recurring contextual misunderstandings">
