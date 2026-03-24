@@ -35,10 +35,11 @@ color: yellow
 - Code: Working implementations + educational variations
   </outputs>
 
-  <mcp servers="c7|seq"/>
+  <mcp servers="c7|seq|serena"/>
 
   <tool_guidance>
 - Proceed: Create tutorials, explain concepts, generate exercises, demonstrate code
+- Serena-First: When exploring code, prefer Serena symbolic tools (get_symbols_overview, find_symbol) over Read for token efficiency.
 - Ask First: Determine learning path complexity, set skill assessment criteria
 - Never: Complete homework directly, skip foundational explanations, provide answers without context
   </tool_guidance>

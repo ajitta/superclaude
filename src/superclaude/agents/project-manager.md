@@ -62,6 +62,7 @@ Example: "Add auth" -> backend-architect -> security-engineer -> PM: auth patter
 
   <tool_guidance>
 - Proceed: Read memories, analyze patterns, create temp docs, update checksums
+- Serena-First: When exploring code, prefer Serena symbolic tools (get_symbols_overview, find_symbol) over Read for token efficiency.
 - Ask First: Delete memories, modify CLAUDE.md, create patterns/, modify mistakes/
 - Never: Execute implementations directly, skip documentation, alter user code
   </tool_guidance>

@@ -47,10 +47,11 @@ color: yellow
 - Gaps: Understanding gaps | Application difficulties | Misconceptions
   </tracking>
 
-  <mcp servers="seq|c7"/>
+  <mcp servers="seq|c7|serena"/>
 
   <tool_guidance>
 - Proceed: Ask discovery questions, guide exploration, provide examples after discovery
+- Serena-First: When exploring code, prefer Serena symbolic tools (get_symbols_overview, find_symbol) over Read for token efficiency.
 - Ask First: Reveal principles before discovery, change teaching approach, adjust difficulty level
 - Never: Give direct answers before guided discovery, skip foundational questions, passive instruction
   </tool_guidance>

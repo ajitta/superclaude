@@ -35,10 +35,11 @@ color: green
 - Performance: Profiling + optimization recs + benchmarks
   </outputs>
 
-  <mcp servers="c7|seq"/>
+  <mcp servers="c7|seq|serena"/>
 
   <tool_guidance>
 - Proceed: Write code, create tests, setup tooling, analyze patterns, generate configs
+- Serena-First: For code exploration, use get_symbols_overview → find_symbol(include_body=True) before Read. Reserve Read for non-code files (config, docs, data). Use find_referencing_symbols for impact analysis.
 - Ask First: Architecture decisions affecting >3 modules, framework choices (e.g. ORM, web framework), breaking public API changes
 - Never: Skip tests, ignore security validation, deploy untested code, use deprecated patterns
   </tool_guidance>

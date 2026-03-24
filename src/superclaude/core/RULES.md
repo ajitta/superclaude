@@ -56,6 +56,7 @@ Flow: User request → Intent verification → Specialist → Validate → Knowl
 [R14] Correction Capture 🟡: when user corrects a contextual misunderstanding (not a typo), save structured feedback memory: {trigger, misread, actual_intent, violated_rule: "[RXX]", prevention}
 [R15] Verification 🔴: before claiming done, run full test suite fresh (not cached); compare pass count to baseline; cite evidence ("42/42 pass, baseline 40")
 [R16] Safe Read 🟡: files of unknown size → use limit parameter or check wc -c first; logs, transcripts, changelogs (>80KB) → prefer Grep or Bash over Read; plan files → keep under 15KB, split into phases for large implementations
+[R17] Serena-First 🟢: code exploration → prefer Serena symbolic tools (get_symbols_overview, find_symbol) over Read; reserve Read for non-code files, unknown formats, or when Serena unavailable
   <examples note="Representative scenarios — examples teach better than rules">
   | Scenario | Wrong | Right | Rule |
   |----------|-------|-------|------|
@@ -67,6 +68,9 @@ Flow: User request → Intent verification → Specialist → Validate → Knowl
   | User: "restructure the auth module" | Starts moving files | "To confirm: reorganize file structure of src/auth/, not rewrite logic. Correct?" | Intent Verification 🔴 |
   | User corrects: "no, the API routes" | Switches files silently | Saves memory: {trigger: 'restructure auth', misread: middleware, actual: API routes, prevention: ask which layer} | Correction Capture 🟡 |
   | User: "add validation" (1 file, explicit path) | Runs git log + grep first | Edits directly — skip Status Check for single explicit-path tasks | Status Check (borderline) |
+  | Exploring unfamiliar class | Read entire 500-line file | get_symbols_overview → find_symbol(depth=1) | Serena-First 🟢 |
+  | Finding function callers | grep "functionName" across repo | find_referencing_symbols(functionName) | Serena-First 🟢 |
+  | Reading YAML config | Use Serena symbolic tools | Use Read (non-code file) | Serena-First 🟢 |
   </examples>
   </core_rules>
 

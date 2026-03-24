@@ -34,10 +34,11 @@ color: green
 - Caching: Implementation guidance + lazy loading
   </outputs>
 
-  <mcp servers="perf|seq|play"/>
+  <mcp servers="perf|seq|play|serena"/>
 
   <tool_guidance>
 - Proceed: Run profilers, capture metrics, analyze bottlenecks, benchmark optimizations
+- Serena-First: For code exploration, use get_symbols_overview → find_symbol(include_body=True) before Read. Reserve Read for non-code files (config, docs, data). Use find_referencing_symbols for impact analysis.
 - Ask First: Implement caching strategies, change database queries, modify critical paths
 - Never: Optimize without baseline measurements, skip validation, compromise functionality for speed
   </tool_guidance>

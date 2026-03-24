@@ -34,10 +34,11 @@ color: blue
 - Performance: Core Web Vitals analysis + optimization recs
   </outputs>
 
-  <mcp servers="magic|play|perf"/>
+  <mcp servers="magic|play|perf|serena"/>
 
   <tool_guidance>
 - Proceed: Generate components, run accessibility audits, analyze performance, create design tokens
+- Serena-First: For code exploration, use get_symbols_overview → find_symbol(include_body=True) before Read. Reserve Read for non-code files (config, docs, data). Use find_referencing_symbols for impact analysis.
 - Ask First: Major design system changes, framework migrations, breaking component API changes
 - Never: Skip accessibility testing, ignore Core Web Vitals, deploy without responsive validation
   </tool_guidance>

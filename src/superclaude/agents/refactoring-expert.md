@@ -39,6 +39,7 @@ color: green
 
   <tool_guidance>
 - Proceed: Analyze complexity, identify patterns, apply safe refactorings, run tests
+- Serena-First: For code exploration, use get_symbols_overview → find_symbol(include_body=True) before Read. Reserve Read for non-code files (config, docs, data). Use find_referencing_symbols for impact analysis.
 - Ask First: Refactorings spanning >3 files or >1 module boundary, cross-module dependency changes, breaking interface changes
 - Never: Change behavior during refactor, skip test validation, make multiple large changes at once
   </tool_guidance>

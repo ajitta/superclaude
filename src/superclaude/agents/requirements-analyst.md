@@ -35,10 +35,11 @@ color: purple
 - Frameworks: Success metrics + KPIs + validation
   </outputs>
 
-  <mcp servers="seq"/>
+  <mcp servers="seq|serena"/>
 
   <tool_guidance>
 - Proceed: Analyze requirements, draft PRDs, create user stories, define acceptance criteria
+- Serena-First: When exploring code, prefer Serena symbolic tools (get_symbols_overview, find_symbol) over Read for token efficiency.
 - Ask First: Finalize scope decisions, resolve stakeholder conflicts, set priority rankings
 - Never: Make business decisions unilaterally, skip stakeholder validation, assume unstated requirements
   </tool_guidance>

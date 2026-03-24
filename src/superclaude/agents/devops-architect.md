@@ -36,10 +36,11 @@ color: blue
 - Runbooks: Incident response + troubleshooting
   </outputs>
 
-  <mcp servers="seq|c7"/>
+  <mcp servers="seq|c7|serena"/>
 
   <tool_guidance>
 - Proceed: Generate IaC templates, create CI/CD configs, setup monitoring dashboards, write runbooks
+- Serena-First: When exploring code, prefer Serena symbolic tools (get_symbols_overview, find_symbol) over Read for token efficiency.
 - Ask First: Modify production infrastructure, change deployment strategies affecting >1 environment, alter secrets or access controls
 - Never: Apply infrastructure changes without review, delete resources, expose credentials
   </tool_guidance>

@@ -13,6 +13,7 @@ permissionMode: plan|default|acceptEdits   # required | system-enforced permissi
 memory: project                            # required | always "project" for SuperClaude agents
 disallowedTools: Edit, Write, NotebookEdit # optional | comma-separated, least privilege
 color: blue|green|purple|yellow|orange|cyan # required | by role group
+mcpServers:                                # optional | MCP servers scoped to this subagent
 ---
 ```
 
@@ -71,7 +72,7 @@ Every agent body follows this template order:
   <mcp servers="seq|c7|..."/>
 
   <tool_guidance>
-  - Proceed: actions the agent should do freely
+  - Proceed: actions the agent should do freely | Serena-First: prefer symbolic tools for code exploration
   - Ask First: actions requiring user confirmation (with specific thresholds)
   - Never: actions the agent must never take
   </tool_guidance>
@@ -99,6 +100,35 @@ Every agent body follows this template order:
 - `<mcp>` — only list servers the agent actually uses
 - `<mission>` text must share 30%+ significant words with `description`
 - `<handoff>` — list 2-3 natural next commands
+
+## mcpServers Field
+
+`mcpServers` is an official Claude Code frontmatter field for scoping MCP servers to a subagent:
+
+```yaml
+mcpServers:
+  - serena                                 # string reference: uses parent's existing connection
+  - custom-server:                         # inline definition: starts new server for subagent
+      type: stdio
+      command: npx
+      args: ["-y", "@custom/mcp-server"]
+```
+
+**Note**: Sub-agents inherit all parent MCP tools by default. Use `mcpServers` only to add servers not in the parent session or for explicit scoping. Most agents should omit this field.
+
+## Code Exploration Pattern
+
+Agents that explore source code should include a Serena-first directive in `<tool_guidance>`:
+
+| Agent Tier | Directive | When |
+|-----------|-----------|------|
+| Code-centric (architect, engineer, analyst) | Full: `get_symbols_overview → find_symbol → find_referencing_symbols` | Always |
+| Code-adjacent (manager, writer, mentor) | Light: `prefer symbolic tools for code exploration` | When code may be read |
+| Non-code (researcher, business) | None | Skip |
+
+**Rationale**: Serena symbolic tools provide significant token reduction vs Read for code exploration (symbol overview vs full file read), plus structural understanding (references, types, inheritance).
+
+**Note**: `<mcp servers="...">` is a documentation-only convention (no runtime effect). The official CC field `mcpServers` (frontmatter) provides actual MCP server scoping.
 
 ## Validation
 

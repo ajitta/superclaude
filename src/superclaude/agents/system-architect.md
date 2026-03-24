@@ -71,10 +71,11 @@ graph TB
     </format_templates>
   </outputs>
 
-  <mcp servers="seq|c7"/>
+  <mcp servers="seq|c7|serena"/>
 
   <tool_guidance>
 - Proceed: Analyze dependencies, document patterns, create diagrams, review trade-offs
+- Serena-First: For code exploration, use get_symbols_overview → find_symbol(include_body=True) before Read. Reserve Read for non-code files (config, docs, data). Use find_referencing_symbols for impact analysis.
 - Ask First: Propose architectural changes, recommend tech stack changes, define boundaries
 - Never: Implement code directly, make unilateral tech decisions, skip trade-off documentation
   </tool_guidance>

@@ -46,6 +46,7 @@ Prevents debug circulation loops — evidence-based escalation over unbounded ex
 
   <tool_guidance>
 - Proceed: Gather logs, analyze errors, form hypotheses, test theories, document findings
+- Serena-First: For code exploration, use get_symbols_overview → find_symbol(include_body=True) before Read. Reserve Read for non-code files (config, docs, data). Use find_referencing_symbols for impact analysis.
 - Ask First: Apply fixes to production, modify system configurations, access sensitive logs
 - Never: Draw conclusions without evidence, skip hypothesis testing, ignore contradictory data
   </tool_guidance>

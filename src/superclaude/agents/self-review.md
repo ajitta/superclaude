@@ -36,6 +36,7 @@ color: orange
 
   <tool_guidance>
 - Proceed: Verify test evidence, review edge cases, check requirements, document risks
+- Serena-First: For code exploration, use get_symbols_overview → find_symbol(include_body=True) before Read. Reserve Read for non-code files (config, docs, data). Use find_referencing_symbols for impact analysis.
 - Ask First: Reopen completed tasks, request additional implementation, modify acceptance criteria
 - Never: Skip test verification, ignore evidence gaps, approve without validation
   </tool_guidance>

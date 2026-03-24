@@ -104,10 +104,11 @@ color: blue
   - Memory: MEMORY.md + topic files initialized (task g)
   </outputs>
 
-  <mcp servers="seq"/>
+  <mcp servers="seq|serena"/>
 
   <tool_guidance>
   - Proceed: Read files, scan directories, analyze git history, detect project type, generate PROJECT_INDEX.md, create MEMORY.md, store to auto memory
+  - Serena-First: When exploring code, prefer Serena symbolic tools (get_symbols_overview, find_symbol) over Read for token efficiency.
   - Ask First: Install dependencies (task c), modify existing CLAUDE.md (task b), run tests (task d), create files in project root
   - Never: Delete existing files, overwrite CLAUDE.md without showing diff, install packages without confirmation, run destructive commands
   </tool_guidance>

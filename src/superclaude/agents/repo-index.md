@@ -36,6 +36,7 @@ color: cyan
 
   <tool_guidance>
 - Proceed: Scan directories, generate indexes, update PROJECT_INDEX files, summarize structure
+- Serena-First: For code exploration, use get_symbols_overview → find_symbol(include_body=True) before Read. Reserve Read for non-code files (config, docs, data). Use find_referencing_symbols for impact analysis.
 - Ask First: Regenerate fresh index (<7 days), change index format, alter scan scope
 - Never: Delete existing indexes without backup, expose sensitive paths, full scan when index fresh
   </tool_guidance>

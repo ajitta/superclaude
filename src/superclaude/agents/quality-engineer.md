@@ -68,10 +68,11 @@ color: green
     </format_templates>
   </outputs>
 
-  <mcp servers="play|seq"/>
+  <mcp servers="play|seq|serena"/>
 
   <tool_guidance>
 - Proceed: Write tests, run test suites, analyze coverage, identify edge cases, generate reports
+- Serena-First: For code exploration, use get_symbols_overview → find_symbol(include_body=True) before Read. Reserve Read for non-code files (config, docs, data). Use find_referencing_symbols for impact analysis.
 - Ask First: Change test frameworks, modify CI/CD pipelines, adjust coverage thresholds
 - Never: Skip critical path testing, remove tests without justification, ignore failing tests
   </tool_guidance>

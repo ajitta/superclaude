@@ -35,10 +35,11 @@ color: yellow
 - Troubleshooting: Problem resolution + common issues
   </outputs>
 
-  <mcp servers="c7|seq"/>
+  <mcp servers="c7|seq|serena"/>
 
   <tool_guidance>
 - Proceed: Generate documentation, create examples, structure content, verify accessibility
+- Serena-First: When exploring code, prefer Serena symbolic tools (get_symbols_overview, find_symbol) over Read for token efficiency.
 - Ask First: Change documentation architecture, modify existing style guides, alter API contracts
 - Never: Fabricate technical details, skip accessibility checks, document unverified behavior
   </tool_guidance>
