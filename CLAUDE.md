@@ -13,6 +13,10 @@ uv run pytest tests/unit/ -v               # Unit tests only
 uv run pytest tests/integration/ -v        # Integration tests
 uv run pytest -k "test_agent"              # By name pattern
 
+# Test baseline
+# 1,787 collected, ~1,694 passing (12 pre-existing failures, 6 collection errors)
+# Tests are docs-change-safe: markdown-only changes carry no test risk
+
 # Development workflow
 uv pip install -e ".[dev]"                 # Install editable (RECOMMENDED)
 uv run superclaude install --list-all      # Test CLI changes
@@ -52,8 +56,8 @@ SuperClaude is a **content framework** — markdown files (commands, agents, mod
 ### Content Installation Flow
 
 ```
-src/superclaude/commands/  →  ~/.claude/commands/sc/       (32 slash commands)
-src/superclaude/agents/    →  ~/.claude/agents/             (21 agent definitions)
+src/superclaude/commands/  →  ~/.claude/commands/sc/       (33 slash commands)
+src/superclaude/agents/    →  ~/.claude/agents/             (24 agent definitions)
 src/superclaude/skills/    →  ~/.claude/skills/             (4 hook/safety skills)
 src/superclaude/core/      →  ~/.claude/superclaude/core/   (FLAGS, PRINCIPLES, RULES, BUSINESS_SYMBOLS)
 src/superclaude/mcp/       →  ~/.claude/superclaude/mcp/    (MCP server documentation)
@@ -67,6 +71,18 @@ Install logic in `cli/`: `install_paths.py` (paths) → `install_settings.py` (h
 - **CLAUDE_SC.md import chain**: `@superclaude/CLAUDE_SC.md` → `core/FLAGS.md`, `PRINCIPLES.md`, `RULES.md`.
 - **Hooks merge (not replace)**: `install_settings.py` preserves user hooks via marker-based identification.
 - **Template variables**: `{{SCRIPTS_PATH}}` and `{{SKILLS_PATH}}` resolved at install time.
+
+### Authoring Rules
+
+`.claude/rules/` contains 4 authoring guides enforced by tests:
+- `agent-authoring.md` — frontmatter, XML structure, memory_guide
+- `command-authoring.md` — frontmatter, component type, bounds
+- `skill-authoring.md` — YAML fields, archetypes, hooks
+- `mode-authoring.md` — 4-axis requirement, no frontmatter
+
+### Serena Integration
+
+`.serena/` contains project configuration and session memories for the Serena MCP server. These are committed to the repo for cross-session context.
 
 ## Git Workflow
 
