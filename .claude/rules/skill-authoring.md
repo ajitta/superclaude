@@ -1,8 +1,10 @@
 # Skill Authoring Rules
 
-> **Decision gate:** Only create a skill when you need a CC-native capability:
-> hooks, `disable-model-invocation`, `allowed-tools`, or script execution.
-> Workflow procedures → `commands/`. Domain expertise → `agents/`.
+> **Decision gate:** Create a skill when you need either:
+> 1. **CC-native capability**: hooks, `disable-model-invocation`, `allowed-tools`, or script execution.
+> 2. **Auto-invocation reference**: domain knowledge that should auto-trigger via CC description matching (Reference Skill archetype — no hooks needed).
+>
+> Workflow procedures → `commands/`. Domain expertise → `agents/`. Cognitive overlays → `modes/`.
 
 When creating or modifying skill files in `src/superclaude/skills/`, follow these rules exactly.
 

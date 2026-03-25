@@ -4,8 +4,9 @@ Structural validation tests for skill SKILL.md files.
 Validates frontmatter fields, body content, and cross-field consistency
 for all skill definitions in src/superclaude/skills/.
 
-Skills are CC-native execution containers limited to hooks, safety,
-and script execution. Workflow procedures belong in commands/.
+Skills are CC-native containers for hooks, safety, script execution,
+and reference knowledge (auto-invocation). Workflow procedures belong
+in commands/.
 """
 
 import re
@@ -15,8 +16,7 @@ import pytest
 
 SKILLS_DIR = Path(__file__).parent.parent.parent / "src" / "superclaude" / "skills"
 
-# All superclaude skill names — only CC-native capability skills remain
-# (hooks, disable-model-invocation, allowed-tools, scripts)
+# All superclaude skill names by category
 HOOK_SKILL_NAMES = {
     "confidence-check",       # PreToolUse hook + validation script
     "simplicity-coach",       # Stop hook + dependency-audit script
@@ -27,7 +27,10 @@ SAFETY_SKILL_NAMES = {
     "finishing-a-development-branch", # disable-model-invocation + allowed-tools
 }
 
-ALL_SKILL_NAMES = HOOK_SKILL_NAMES | SAFETY_SKILL_NAMES
+# Reference skills: auto-invocation via description matching, no hooks/safety
+REFERENCE_SKILL_NAMES: set[str] = set()
+
+ALL_SKILL_NAMES = HOOK_SKILL_NAMES | SAFETY_SKILL_NAMES | REFERENCE_SKILL_NAMES
 
 # Skills that MUST have disable-model-invocation: true
 SIDE_EFFECT_SKILLS = {
@@ -79,9 +82,11 @@ class TestSkillCoverage:
     """Validate all expected skills exist."""
 
     def test_total_skill_count(self):
-        """Must have exactly 4 skills (2 hook + 2 safety)."""
-        assert len(SKILL_DIRS) == 4, (
-            f"Expected 4 skills, found {len(SKILL_DIRS)}: {SKILL_IDS}"
+        """Skill count must match registered sets."""
+        expected = len(ALL_SKILL_NAMES)
+        assert len(SKILL_DIRS) == expected, (
+            f"Expected {expected} skills, found {len(SKILL_DIRS)}: {SKILL_IDS}. "
+            f"Add new skills to HOOK_SKILL_NAMES, SAFETY_SKILL_NAMES, or REFERENCE_SKILL_NAMES."
         )
 
     def test_all_hook_skills_present(self):
@@ -95,6 +100,14 @@ class TestSkillCoverage:
         actual = set(SKILL_IDS)
         missing = SAFETY_SKILL_NAMES - actual
         assert not missing, f"Missing safety skills: {missing}"
+
+    def test_all_reference_skills_present(self):
+        """All reference skills must exist."""
+        if not REFERENCE_SKILL_NAMES:
+            pytest.skip("No reference skills registered yet")
+        actual = set(SKILL_IDS)
+        missing = REFERENCE_SKILL_NAMES - actual
+        assert not missing, f"Missing reference skills: {missing}"
 
     def test_no_unexpected_skills(self):
         """No unexpected skill directories."""

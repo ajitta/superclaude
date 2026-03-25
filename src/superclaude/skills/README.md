@@ -1,6 +1,6 @@
 # SuperClaude Skills
 
-CC-native execution containers limited to capabilities that commands and agents cannot provide.
+CC-native containers for hooks, safety, script execution, and auto-invocation reference knowledge.
 
 ## When to Use Skills (vs Commands/Agents)
 
@@ -10,18 +10,27 @@ CC-native execution containers limited to capabilities that commands and agents 
 | Block auto-invocation | **Skill** | Only skills have `disable-model-invocation` |
 | Tool restriction (allowed-tools) | **Skill** | Only skills whitelist tools at runtime |
 | Script execution | **Skill** | Only skills have `{{SKILLS_PATH}}` resolution |
+| Auto-trigger reference knowledge | **Skill** | CC matches skill descriptions to auto-load domain protocols |
 | Workflow procedures | **Command** | Commands define WHAT TO DO |
 | Domain expertise | **Agent** | Agents define WHO TO BE |
 | Cognitive overlay | **Mode** | Modes define HOW TO THINK |
 
 ## Current Skills (4)
 
+### Hook Skills
 | Skill | CC-Native Feature | Purpose |
 |-------|-------------------|---------|
 | `confidence-check` | PreToolUse hook | Injects evidence-focus guidance on WebFetch/WebSearch |
 | `simplicity-coach` | Stop hook + scripts | Runs dependency audit at session end |
+
+### Safety Skills
+| Skill | CC-Native Feature | Purpose |
+|-------|-------------------|---------|
 | `ship` | disable-model-invocation | Protects destructive delivery workflow from auto-execution |
 | `finishing-a-development-branch` | disable-model-invocation + allowed-tools | Protects branch completion; restricts to Bash, Read, Grep, Glob |
+
+### Reference Skills
+*None yet — add here when creating auto-invocation reference skills.*
 
 ## Skill Directory Structure
 
@@ -55,7 +64,7 @@ Skills created or modified are immediately available without restarting (hot rel
 
 See `.claude/rules/skill-authoring.md` for the complete authoring specification.
 
-**Key rule:** Only create a skill when you need a CC-native capability (hooks, safety, scripts). Workflow procedures belong in `commands/`. Domain expertise belongs in `agents/`.
+**Key rule:** Create a skill when you need a CC-native capability (hooks, safety, scripts) or auto-invocation reference knowledge (CC description matching). Workflow procedures belong in `commands/`. Domain expertise belongs in `agents/`.
 
 ## Related
 
