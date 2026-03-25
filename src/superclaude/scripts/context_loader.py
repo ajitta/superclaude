@@ -231,6 +231,8 @@ FLAG_ALIASES: dict[str, list[str]] = {
     "iteration": ["iterations"],
     "loo": ["loop"],
     "sea": ["serena"],
+    "sampling": ["vs"],
+    "verbalized": ["vs"],
 }
 
 # All valid flags for fuzzy matching fallback
@@ -241,7 +243,7 @@ VALID_FLAGS = {
     "devtools", "tavily", "tvly", "frontend-verify", "all-mcp", "no-mcp",
     "delegate", "concurrency", "loop", "iterations", "validate", "safe-mode",
     "fast", "plan", "uc", "ultracompressed", "scope", "focus", "effort",
-    "bs", "fix", "verbose-context",
+    "bs", "fix", "verbose-context", "vs",
 }
 
 

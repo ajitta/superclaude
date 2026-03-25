@@ -45,6 +45,7 @@ WebSearch: fact-check, current info → native web search (no flag needed)
 --validate: risk >0.7, usage >75%, production → pre-execution risk assessment
 --safe-mode: usage >85%, production, critical → max validation, conservative, auto --uc
 --fast: same model, faster output (v2.1.36+)
+--vs [standard|cot|multi]: "multiple perspectives", diverse responses → verbalized sampling (distribution-level diversity, probability-weighted candidates). Bracket sub-params: [k:3-7], [tau:0.01-0.20], [turns:2-5], [no-synthesis]
 --verbose-context: force full .md injection for all triggered contexts, bypassing INSTRUCTION_MAP short instructions. Use when short instructions cause incorrect MCP behavior.
 Agent Teams: experimental (CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1) — parallel coordination
 Note: see RULES.md anti_over_engineering for scope discipline guardrails
@@ -62,6 +63,7 @@ Note: token consumption varies by model — monitor context usage, use --uc at 6
 --parallel|--parellel → --delegate | --agent → --delegate
 --conccurrency → --concurrency | --iteration → --iterations | --loo → --loop
 --sea → --serena | --confidenc-check|--confidence-check → --validate
+--sampling → --vs | --verbalized → --vs
 Typos: fuzzy-matched (Levenshtein ≤ 2) → suggestion in HTML comment
   </aliases>
 

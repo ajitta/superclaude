@@ -49,7 +49,7 @@ SuperClaude is a **content framework** — markdown files (commands, agents, mod
 | `modes/` | Mindset overlay — situational cognitive frameworks | On-demand (context_loader) |
 | `agents/` | Domain persona — specialized expert definitions | CC-native auto-delegation |
 | `commands/` | Workflow entry — user-facing /sc:* slash commands | CC-native slash commands |
-| `skills/` | Runtime hooks + safety — CC-native only | CC-native (hooks, disable-model-invocation) |
+| `skills/` | Runtime hooks, safety, and reference knowledge — CC-native | CC-native (hooks, disable-model-invocation, auto-invocation) |
 | `mcp/` | Tool reference — MCP server docs + configuration | context_loader + install_mcp |
 | `scripts/` | Hook infrastructure — Python/shell automation | hooks.json → settings.json |
 
@@ -58,7 +58,7 @@ SuperClaude is a **content framework** — markdown files (commands, agents, mod
 ```
 src/superclaude/commands/  →  ~/.claude/commands/sc/       (33 slash commands)
 src/superclaude/agents/    →  ~/.claude/agents/             (24 agent definitions)
-src/superclaude/skills/    →  ~/.claude/skills/             (4 hook/safety skills)
+src/superclaude/skills/    →  ~/.claude/skills/             (5 skills: 2 hook, 2 safety, 1 reference)
 src/superclaude/core/      →  ~/.claude/superclaude/core/   (FLAGS, PRINCIPLES, RULES, BUSINESS_SYMBOLS)
 src/superclaude/mcp/       →  ~/.claude/superclaude/mcp/    (MCP server documentation)
 ```

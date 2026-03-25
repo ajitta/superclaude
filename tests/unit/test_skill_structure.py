@@ -28,7 +28,9 @@ SAFETY_SKILL_NAMES = {
 }
 
 # Reference skills: auto-invocation via description matching, no hooks/safety
-REFERENCE_SKILL_NAMES: set[str] = set()
+REFERENCE_SKILL_NAMES: set[str] = {
+    "verbalized-sampling",    # Auto-invocation reference skill (no hooks/safety)
+}
 
 ALL_SKILL_NAMES = HOOK_SKILL_NAMES | SAFETY_SKILL_NAMES | REFERENCE_SKILL_NAMES
 

@@ -15,7 +15,7 @@ CC-native containers for hooks, safety, script execution, and auto-invocation re
 | Domain expertise | **Agent** | Agents define WHO TO BE |
 | Cognitive overlay | **Mode** | Modes define HOW TO THINK |
 
-## Current Skills (4)
+## Current Skills (5)
 
 ### Hook Skills
 | Skill | CC-Native Feature | Purpose |
@@ -30,7 +30,9 @@ CC-native containers for hooks, safety, script execution, and auto-invocation re
 | `finishing-a-development-branch` | disable-model-invocation + allowed-tools | Protects branch completion; restricts to Bash, Read, Grep, Glob |
 
 ### Reference Skills
-*None yet — add here when creating auto-invocation reference skills.*
+| Skill | CC-Native Feature | Purpose |
+|-------|-------------------|---------|
+| `verbalized-sampling` | Reference skill (auto-invocation) | Research-backed diverse response generation via distribution-level prompting |
 
 ## Skill Directory Structure
 
