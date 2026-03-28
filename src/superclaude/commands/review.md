@@ -15,9 +15,10 @@ description: Review code changes for quality, security, and correctness with str
     1. Scope: Determine review range — PR number, git diff, specific files, or branch comparison
     2. Gather: Read all changed files; locate spec/plan if exists (docs/specs/ or docs/plans/)
     3. Review-2D: Dimension 1 (spec fidelity) — does code match what was planned? Dimension 2 (code quality) — correctness, security, edge cases, test coverage. When no spec exists, weight shifts to Dimension 2
-    4. Categorize: Group findings as Critical (must fix) | Important (should fix) | Suggestion (nice to have)
-    5. Verify: Run tests and linting on changed code to confirm findings
-    6. Process: For each finding — classify (change request vs concern vs question) → verify against codebase → implement fix or push back with evidence
+    4. Challenge: Before categorizing, answer these explicitly — What conditions could make this approach fail? What edge cases are easiest to miss here? What will be hardest to modify 6 months from now?
+    5. Categorize: Group findings as Critical (must fix) | Important (should fix) | Suggestion (nice to have)
+    6. Verify: Run tests and linting on changed code to confirm findings
+    7. Process: For each finding — classify (change request vs concern vs question) → verify against codebase → implement fix or push back with evidence
   </flow>
 
   <outputs note="Per execution">
