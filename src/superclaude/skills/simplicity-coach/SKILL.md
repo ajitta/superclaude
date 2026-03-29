@@ -55,6 +55,11 @@ Storytelling (metaphors, not jargon) | Empathy (who maintains this?) | Transpare
 
   <hooks note="dependency-audit.py runs on Stop — audit report with Simplicity 3 Questions (once per session)"/>
 
+  <gotchas>
+  - timeout: If dependency-audit.py times out (15s), ignore and proceed. Stop hook does not block session
+  - osl-skip: Do not skip Orient phase and jump to Step. Step without Orient is directionless work
+  </gotchas>
+
   <bounds will="OSL coaching|daybook journaling|dependency audits|simplicity reviews|3-level feedback" wont="change entire organization|impose methodology|dogmatic rules|pursue perfection"/>
 
   <checklist>

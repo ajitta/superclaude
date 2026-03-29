@@ -162,6 +162,10 @@ Skill 본문은 agent와 동일한 XML `<component>` 패턴을 사용합니다.
     <mission>Single sentence purpose</mission>
   </role>
 
+  <references note="Load on demand — progressive disclosure">
+  - `references/file.md` — Description. When to read this file
+  </references>
+
   <syntax>/skill-name [args] [--flags]</syntax>
 
   <flow>
@@ -173,6 +177,13 @@ Skill 본문은 agent와 동일한 XML `<component>` 패턴을 사용합니다.
   <tools>
     - ToolName: purpose
   </tools>
+
+  <gotchas note="Recommended — project-specific failure patterns, not general advice">
+  - pattern-name: Concrete failure + action instruction (2-5 items)
+  Good gotcha: "score-rounding: Do not round 89% up to almost 90%" (project-specific)
+  Bad gotcha: "Do not force-push" (general advice — use hooks instead)
+  Lifecycle: Review quarterly. Remove entries not triggered in 90 days. Promote recurring patterns to tool_guidance.
+  </gotchas>
 
   <examples>
   | Input | Output |
@@ -241,15 +252,16 @@ user-invocable: false
 After creating/modifying a skill:
 
 1. `name` matches directory name
-2. `description` is specific (task + keywords), max 1024자
+2. `description` is specific (task + keywords), max 1024 chars
 3. All CC extension fields (`context`, `agent`, `hooks`) are top-level (NOT under `metadata:`)
 4. `metadata:` contains only user-defined info (author, version)
 5. Side-effect skills have `disable-model-invocation: true`
 6. Scripts use `{{SKILLS_PATH}}` template variable (not hardcoded paths)
-7. Body under 500 lines
+7. Body under 500 lines — use `<references>` + `references/` files for detailed content
 8. `<bounds>` has `will`/`wont` attributes
-9. Run `make deploy` to install
-10. Test with `/skill-name` to verify invocation
+9. `<gotchas>` present with project-specific failure patterns (recommended)
+10. Run `make deploy` to install
+11. Test with `/skill-name` to verify invocation
 
 ## Anti-Patterns
 
@@ -265,3 +277,6 @@ After creating/modifying a skill:
 | Body > 500 lines | Context bloat | Split to `references/` |
 | Missing `disable-model-invocation` on deploy/push skills | Claude may auto-execute destructive actions | Add `disable-model-invocation: true` |
 | Using `user-invocable: false` to block Claude | Only hides from `/menu`, Claude still auto-calls | Use `disable-model-invocation: true` instead |
+| All content inline in SKILL.md | Context bloat at Level 2 loading | Move detailed content to `references/`, add `<references>` tag |
+| Generic gotchas ("don't force-push") | Wastes gotcha signal on common sense | Use hooks for safety rules; gotchas for project-specific failures only |
+| No gotchas on failure-prone skill | Misses highest-value content per Anthropic guide | Add `<gotchas>` with observed failure patterns |

@@ -58,6 +58,10 @@ Every command body follows this template:
     - ToolName: purpose
   </tools>
 
+  <gotchas note="Recommended — project-specific failure patterns">
+  - pattern-name: Concrete failure + action instruction (2-5 items)
+  </gotchas>
+
   <examples>
   | Input | Output |
   |-------|--------|
@@ -83,7 +87,7 @@ Every command body follows this template:
 - `<flow>` — numbered execution steps (minimum 2)
 - `<bounds>` — must include `will` and `wont` attributes
 - `<handoff>` — list 2-3 natural next commands
-- Optional sections: `<outputs>`, `<mcp>`, `<personas>`, `<tools>`, `<examples>`, `<token_note>`
+- Optional sections: `<outputs>`, `<mcp>`, `<personas>`, `<tools>`, `<gotchas>`, `<examples>`, `<token_note>`
 
 ## Validation
 
@@ -108,9 +112,10 @@ This validates:
 1. Create `src/superclaude/commands/<name>.md` with frontmatter + XML body
 2. Verify `<component name="...">` matches filename (without `.md`)
 3. Write specific `description` for `/menu` display
-4. Run `uv run pytest tests/unit/test_command_structure.py -v`
-5. Update `src/superclaude/commands/README.md` command table
-6. Run `make deploy`
+4. Add `<gotchas>` section (recommended — project-specific failure patterns)
+5. Run `uv run pytest tests/unit/test_command_structure.py -v`
+6. Update `src/superclaude/commands/README.md` command table
+7. Run `make deploy`
 
 ## Anti-Patterns
 

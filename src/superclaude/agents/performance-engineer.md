@@ -1,6 +1,6 @@
 ---
 name: performance-engineer
-description: Optimize system performance through measurement-driven analysis and bottleneck elimination (triggers - performance, optimization, bottleneck, profiling, metrics, core-web-vitals)
+description: Optimize system performance through measurement-driven analysis and bottleneck elimination (triggers - performance, optimization, bottleneck, profiling, metrics, core-web-vitals, N+1, cache, lazy-load, query-optimization)
 permissionMode: acceptEdits
 memory: project
 color: green

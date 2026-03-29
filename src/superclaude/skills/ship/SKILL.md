@@ -1,7 +1,16 @@
 ---
 name: ship
-description: Ship changes with git add, conventional commit, push, and optional PR creation
+description: >
+  Ship changes with git add, conventional commit, push, and optional PR creation.
+  Use when user mentions 'ship', 'deploy', 'push', 'commit and push', 'create PR',
+  or wants to deliver code changes to remote.
 disable-model-invocation: true
+hooks:
+  PreToolUse:
+    - matcher: "Bash"
+      hooks:
+        - type: command
+          command: "echo \"$CLAUDE_TOOL_INPUT\" | grep -qE 'git push --force|git push -f' && echo 'BLOCKED: Force push detected. Use regular push.' >&2 && exit 2 || exit 0"
 ---
 <component name="ship" type="skill">
 
@@ -9,66 +18,34 @@ disable-model-invocation: true
     <mission>Automate the delivery workflow: stage → commit → push → PR with safety checks and conventional commits</mission>
   </role>
 
+  When $ARGUMENTS is provided, ship changes related to that issue or context.
+
   <syntax>/ship [--pr] [--title "..."] [--base branch] [--exclude pattern] [--dry-run]</syntax>
 
   <flow>
     1. Status: Run `git status` + `git diff --stat` to assess changes
-    2. Validate: Check branch naming (feature/*|fix/*|docs/*|refactor/*|chore/*), warn on master/main
+    2. Validate: Check branch naming conventions (see references/conventions.md), warn on master/main
     3. Stage: `git add` relevant files, respecting --exclude patterns and default exclusions
     4. Commit: Generate conventional commit message from diff analysis, present for approval
     5. Push: `git push -u origin <branch>` (confirm if first push to remote)
     6. PR (if --pr): Create PR via `gh pr create` with summary from commits
   </flow>
 
-  <exclusions note="Files never staged by default">
-    - .env, .env.* (secrets)
-    - credentials.json, *secret*, *token* (credentials)
-    - *.log, *.tmp (transient)
-    - node_modules/, __pycache__/, .venv/ (generated)
-    - User-specified --exclude patterns (glob syntax)
-  </exclusions>
-
-  <branch_validation>
-    - master/main: WARN — suggest creating feature branch first
-    - feature/*|fix/*|docs/*|refactor/*|chore/*: OK
-    - Other: WARN — suggest conventional branch name
-  </branch_validation>
-
-  <commit_format note="Conventional Commits">
-    - feat: new feature
-    - fix: bug fix
-    - docs: documentation only
-    - refactor: code restructuring
-    - test: adding/updating tests
-    - chore: maintenance, deps, config
-    Auto-detected from diff content; user approves final message.
-  </commit_format>
-
-  <pr_template>
-## Summary
-{1-3 bullet points from commit messages}
-
-## Changes
-{file list with change type indicators}
-
-## Test plan
-- [ ] {auto-generated from change types}
-  </pr_template>
+  <references note="Load on demand">
+  - `references/conventions.md` — branch naming, commit format, PR template, default exclusions. Read when detailed rules needed
+  </references>
 
   <tools>
-    - Bash: git commands, gh CLI
-    - Read: .gitignore, branch state
-    - Grep: Scan for secrets in staged files
+  - Bash: git commands, gh CLI
+  - Grep: Scan for secrets in staged files
   </tools>
 
-  <safety>
-    - Never force push
-    - Never commit files matching exclusion patterns
-    - Scan staged files for potential secrets (API keys, tokens, passwords)
-    - Require user confirmation for commit message
-    - Require user confirmation before push to remote
-    - --dry-run shows what would happen without executing
-  </safety>
+  <gotchas>
+  - force-push: --force detected by hook and physically blocked. Only regular push allowed
+  - secrets: .env, credentials.json are default exclusions but --include can bypass — warn required
+  - staged-scan: Scan staged files for API keys, tokens, passwords patterns before commit
+  - main-direct: When pushing directly to master/main, suggest creating feature branch first
+  </gotchas>
 
   <examples>
 | Input | Output |

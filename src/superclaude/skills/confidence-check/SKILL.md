@@ -1,6 +1,9 @@
 ---
 name: confidence-check
-description: Pre-implementation confidence assessment (≥90% to proceed)
+description: >
+  Pre-implementation confidence assessment (≥90% to proceed).
+  Use when user mentions 'confidence', 'before implementing', 'validate first',
+  'check before building', or wants validation before starting implementation work.
 hooks:
   PreToolUse:
     - matcher: "WebFetch|WebSearch"
@@ -25,27 +28,15 @@ hooks:
 | Low | <70% | STOP - Request clarification |
   </thresholds>
 
-  <checks>
-| Check | Weight | Tools | Validates |
-|-------|--------|-------|-----------|
-| No Duplicates | 25% | Grep, Glob, Serena | No existing similar functionality |
-| Architecture | 25% | CLAUDE.md, pyproject.toml | Uses existing tech stack |
-| Official Docs | 20% | Context7, WebFetch | Documentation reviewed |
-| OSS Reference | 15% | Tavily, WebSearch | Working implementations found |
-| Root Cause | 15% | Investigation | Problem source identified |
-  </checks>
+  <references note="Load on demand">
+  - `references/checks-detail.md` — Detailed weights for all 5 checks, MCP integration, ROI figures
+  </references>
 
-  <mcp_integration>
-| MCP | Role | Fallback |
-|-----|------|----------|
-| Context7 | Official docs (Check 3) | WebFetch |
-| Tavily | OSS search (Check 4) | WebSearch |
-| Serena | Symbol detection (Check 1) | Grep/Glob |
-  </mcp_integration>
-
-  <roi>100-200 tokens check → saves 5,000-50,000 tokens (25-250x ROI)</roi>
-
-  <hooks note="validate_confidence_context.py runs on PreToolUse for WebFetch/WebSearch — injects evidence-focus guidance (once per session)"/>
+  <gotchas>
+  - websearch-dup: Do not duplicate Context7 results with WebSearch. Use WebSearch only when Context7 fails
+  - score-rounding: Do not round 89% up to "almost 90%". 70-89% = Medium — must present alternatives
+  - evidence-gap: When presenting scores, always cite the evidence source for each check
+  </gotchas>
 
   <bounds will="pre-implementation validation|evidence-based assessment" wont="runtime checks|modify code"/>
 

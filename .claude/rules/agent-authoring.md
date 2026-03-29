@@ -89,6 +89,10 @@ Every agent body follows this template order:
 
   <handoff next="/sc:command1 /sc:command2"/>
 
+  <gotchas note="Recommended — project-specific failure patterns, placement: after handoff, before bounds">
+  - pattern-name: Concrete failure + action instruction (2-5 items)
+  </gotchas>
+
   <bounds will="core capabilities" wont="out-of-scope actions" fallback="Escalation path"/>
 </component>
 ```
@@ -145,6 +149,7 @@ This validates:
 - Mission ↔ description word overlap (≥30%)
 - tool_guidance has content (Proceed/Ask First/Never)
 - Non-empty sections
+- `<gotchas>` presence (recommended, not required — no test failure if missing)
 
 ## Checklist for New Agents
 
@@ -152,9 +157,10 @@ This validates:
 2. Verify `name` matches filename (without `.md`)
 3. Set `permissionMode` → `disallowedTools` following least privilege
 4. Add `<memory_guide>` section (see below)
-5. Run `uv run pytest tests/unit/test_agent_structure.py -v`
-6. Update `src/superclaude/agents/README.md` agent table
-7. Run `make deploy`
+5. Add `<gotchas>` section (recommended — project-specific failure patterns, 2-5 items)
+6. Run `uv run pytest tests/unit/test_agent_structure.py -v`
+7. Update `src/superclaude/agents/README.md` agent table
+8. Run `make deploy`
 
 ## Memory Guide (required)
 

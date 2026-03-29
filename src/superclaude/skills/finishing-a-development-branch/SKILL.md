@@ -3,9 +3,16 @@ name: finishing-a-development-branch
 description: |
   Complete development work with structured options for merge, PR, or cleanup.
   Use when implementation is complete and all tests pass. Presents options and
-  guides branch completion. Involves git operations.
+  guides branch completion. Involves git operations. Use when user mentions
+  'branch done', 'done with branch', 'merge back', 'finish branch', 'work complete'.
 disable-model-invocation: true
 allowed-tools: Bash, Read, Grep, Glob
+hooks:
+  PreToolUse:
+    - matcher: "Bash"
+      hooks:
+        - type: command
+          command: "echo \"$CLAUDE_TOOL_INPUT\" | grep -qE 'git branch -D|git push --force|git push -f' && echo 'BLOCKED: Destructive git operation. Confirm with user first.' >&2 && exit 2 || exit 0"
 ---
 
 <component name="finishing-a-development-branch" type="skill">
@@ -32,6 +39,11 @@ allowed-tools: Bash, Read, Grep, Glob
   - Do not force-push without an explicit user request
   - Do not auto-merge a PR — the review process is separate
   </constraints>
+
+  <gotchas>
+  - stash-check: Must check git stash state before deleting worktree. Notify user if stash entries exist
+  - base-branch: After auto-detecting main vs master, always confirm with user. Prevents merge into wrong base
+  </gotchas>
 
   <bounds will="execute chosen completion option, handle worktree cleanup, inform user of result" wont="proceed with failing tests, force-push without request, auto-merge PRs"/>
 
