@@ -15,7 +15,7 @@ description: Design system architecture, APIs, and component interfaces with com
     2. Plan: Design approach + structure
     3. Design: Comprehensive specs + best practices (see outputs)
     4. Validate: Requirements coverage ≥90%, maintainability check
-    5. Document: Diagrams + specifications
+    5. Document: Save design spec to docs/specs/<topic>-design-<username>-YYYY-MM-DD.md (with frontmatter: status: draft, revised: <today>) + diagrams
   </flow>
 
   <outputs note="Per --type and --format">

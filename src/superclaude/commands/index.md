@@ -21,9 +21,9 @@ description: Generate comprehensive project documentation and knowledge base wit
   <outputs note="Per --type flag">
 | Type | Output File | Metrics |
 |------|-------------|---------|
-| docs | KNOWLEDGE.md | coverage ≥80% |
-| api | API.md | endpoints 100% |
-| structure | STRUCTURE.md | depth ≤4 levels |
+| docs | docs/reports/KNOWLEDGE.md | coverage ≥80% |
+| api | docs/reports/API.md | endpoints 100% |
+| structure | docs/reports/STRUCTURE.md | depth ≤4 levels |
 | readme | README.md | sections: install, usage, api |
   </outputs>
 
@@ -67,7 +67,7 @@ description: Generate comprehensive project documentation and knowledge base wit
 
   <bounds will="comprehensive docs|multi-persona|framework patterns" wont="override manual docs|generate without analysis|bypass standards" fallback="Ask user for guidance when uncertain" type="document-only">
 
-    Generate documentation files, then complete | Preserve source code unchanged | Preserve <!-- MANUAL --> marked sections → Output: Documentation files per --type (KNOWLEDGE.md, API.md, etc.)
+    Generate documentation files, then complete | Preserve source code unchanged | Preserve <!-- MANUAL --> marked sections → Output: Documentation files per --type (docs/reports/KNOWLEDGE.md, docs/reports/API.md, etc.)
 
   </bounds>
 

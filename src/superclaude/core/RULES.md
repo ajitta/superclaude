@@ -100,12 +100,14 @@ Depth: parent first → drill down next turn; ≤3 sub-options → inline [Na] [
   </selection_protocol>
 
   <doc_output_convention note="Unified naming for all file-producing commands">
-Pattern: docs/<type>/YYYY-MM-DD-<topic-slug>-<suffix>-<username>.md
+Pattern: docs/<type>/<topic-slug>-<suffix?>-<username>-YYYY-MM-DD.md
 Username: `git config user.name` (lowercase, no spaces) — fallback to system username
 Directory: brainstorm→docs/specs/ | design→docs/specs/ | plan→docs/plans/ | workflow→docs/plans/ | analyze→docs/analysis/ | research→docs/research/
-Suffix: brainstorm→discovery | design→design | plan→(topic only) | workflow→workflow | analyze→analysis | research→research
-Living docs (no date/username): PROJECT_INDEX.md, WORKFLOW.md, BUILD_REPORT.md, CLEANUP_REPORT.md, KNOWLEDGE.md
-Example: docs/specs/2026-03-20-selection-protocol-design-ajitta.md
+Suffix (shared dirs only): brainstorm→-discovery | design→-design | workflow→-workflow
+Living docs (UPPER_SNAKE, no date/username): all in docs/reports/
+Frontmatter: specs/+plans/ require {status, revised}. research/+analysis/ optional. reports/ none
+Formatter: /sc:cleanup --type docs (validate + transform + migrate)
+Example: docs/specs/selection-protocol-design-ajitta-2026-03-20.md
   </doc_output_convention>
 
   <dynamic_context>

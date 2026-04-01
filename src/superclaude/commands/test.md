@@ -22,9 +22,9 @@ description: Execute tests with coverage analysis and automated quality reportin
 | Flag | Output | Metrics |
 |------|--------|---------|
 | --coverage | coverage/ | line ≥80%, branch ≥70% |
-| --type unit | TEST_UNIT.log | pass rate |
-| --type e2e | TEST_E2E.log | screenshots if fail |
-| default | TEST_REPORT.md | summary + failures |
+| --type unit | docs/reports/TEST_UNIT.log | pass rate |
+| --type e2e | docs/reports/TEST_E2E.log | screenshots if fail |
+| default | docs/reports/TEST_REPORT.md | summary + failures |
   </outputs>
 
   <mcp servers="play"/>

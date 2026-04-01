@@ -23,8 +23,8 @@ description: Comprehensive code analysis across quality, security, performance, 
   | Format | Output | Content |
   |--------|--------|---------|
   | `text` (default) | Console inline | Findings + recommendations inline |
-  | `json` | `docs/analysis/YYYY-MM-DD-<target>-analysis-<username>.json` | Structured findings as JSON |
-  | `report` | `docs/analysis/YYYY-MM-DD-<target>-analysis-<username>.md` | Full report with roadmap |
+  | `json` | `docs/analysis/<target>-<username>-YYYY-MM-DD.json` | Structured findings as JSON |
+  | `report` | `docs/analysis/<target>-<username>-YYYY-MM-DD.md` | Full report with roadmap |
   </outputs>
 
 

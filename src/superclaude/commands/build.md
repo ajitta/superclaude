@@ -21,9 +21,9 @@ description: Build, compile, and package projects with intelligent error handlin
   <outputs note="Per --type flag">
 | Type | Artifacts | Report |
 |------|-----------|--------|
-| dev | dist-dev/ | BUILD_DEV.log |
-| prod | dist/ | BUILD_REPORT.md |
-| test | dist-test/ | BUILD_TEST.log |
+| dev | dist-dev/ | docs/reports/BUILD_DEV.log |
+| prod | dist/ | docs/reports/BUILD_REPORT.md |
+| test | dist-test/ | docs/reports/BUILD_TEST.log |
   </outputs>
 
   <mcp servers="play"/>

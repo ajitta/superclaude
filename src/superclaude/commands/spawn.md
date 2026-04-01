@@ -22,8 +22,8 @@ description: Meta-system task orchestration with intelligent breakdown and deleg
 | Artifact | Purpose |
 |----------|---------|
 | TaskCreate/TaskUpdate hierarchy | Task breakdown tracking |
-| SPAWN_PLAN.md | Execution strategy doc |
-| SPAWN_RESULT.md | Aggregated results |
+| docs/reports/SPAWN_PLAN.md | Execution strategy doc |
+| docs/reports/SPAWN_RESULT.md | Aggregated results |
   </outputs>
 
   <mcp servers="seq|c7|serena"/>
@@ -128,7 +128,7 @@ description: Meta-system task orchestration with intelligent breakdown and deleg
 
   <bounds will="multi-domain decomposition|intelligent orchestration|meta-system ops" wont="replace domain commands|override user strategy|execute without analysis" fallback="Ask user for guidance when uncertain" type="document-only">
 
-    Produce task hierarchy document, then complete | Defer implementation to /sc:task or /sc:implement | Orchestration planning only → Output: SPAWN_PLAN.md with task breakdown and dependencies
+    Produce task hierarchy document, then complete | Defer implementation to /sc:task or /sc:implement | Orchestration planning only → Output: docs/reports/SPAWN_PLAN.md with task breakdown and dependencies
 
   </bounds>
 

@@ -15,7 +15,7 @@ description: Deep web research with adaptive planning and intelligent search
     2. Plan: Strategy + depth + hop pattern + query decomposition + parallelization map
     3. Execute: Multi-hop search with parallel batching | Evidence collection | Adaptive replan on confidence&lt;0.6 or contradictions&gt;30%
     4. Validate: Cross-source verification | Credibility scoring | Contradiction resolution | Gap check
-    5. Synthesize: Credibility-weighted integration | Structured report → docs/research/YYYY-MM-DD-&lt;topic&gt;-research-&lt;username&gt;.md
+    5. Synthesize: Credibility-weighted integration | Structured report → docs/research/&lt;topic&gt;-&lt;username&gt;-YYYY-MM-DD.md
   </flow>
 
   <depth note="See modes/RESEARCH_CONFIG.md for full profiles, hop config, and thresholds">
@@ -40,7 +40,7 @@ description: Deep web research with adaptive planning and intelligent search
     <input>/sc:research 'quantum computing breakthroughs 2025'</input>
     <output>
       Depth: standard (auto) | Hop 1: tavily_search → 5 sources | Hop 2: tavily_extract top 3 | Hop 3: cross-validate
-      Output: docs/research/2025-08-15-quantum-computing-research-ajitta.md (8 citations)
+      Output: docs/research/quantum-computing-ajitta-2025-08-15.md (8 citations)
     </output>
   </example>
 

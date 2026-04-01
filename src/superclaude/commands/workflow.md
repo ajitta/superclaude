@@ -21,9 +21,9 @@ description: Generate structured implementation workflows from PRDs and feature 
   <outputs note="Per execution">
 | Artifact | Purpose |
 |----------|---------|
-| WORKFLOW.md | Implementation workflow document |
+| docs/reports/WORKFLOW.md | Implementation workflow document |
 | TaskCreate/TaskUpdate items | Task tracking hierarchy |
-| WORKFLOW_STATUS.md | Progress + quality gates |
+| docs/reports/WORKFLOW_STATUS.md | Progress + quality gates |
   </outputs>
 
   <mcp servers="seq|c7|magic|play|serena"/>
@@ -65,7 +65,7 @@ description: Generate structured implementation workflows from PRDs and feature 
 
   <bounds will="comprehensive workflows|multi-persona+MCP|cross-session management" wont="execute impl beyond planning|override dev process|generate without analysis" fallback="Ask user for guidance when uncertain" type="document-only">
 
-    Produce workflow document, then complete | Defer implementation to /sc:implement or /sc:task | Planning and coordination only → Output: WORKFLOW.md with task hierarchy and quality gates
+    Produce workflow document, then complete | Defer implementation to /sc:implement or /sc:task | Planning and coordination only → Output: docs/reports/WORKFLOW.md with task hierarchy and quality gates
 
   </bounds>
 

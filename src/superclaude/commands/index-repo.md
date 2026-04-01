@@ -14,8 +14,8 @@ description: Repository indexing with 94% token reduction (58K → 3K)
     1. Detect: Project type from entry files (pyproject.toml, package.json, etc.)
     2. Analyze: Auto-discover structure (parallel Glob for code|docs|tests|config)
     3. Extract: Entry points + modules + APIs + deps
-    4. Generate: PROJECT_INDEX.md (human-readable summary)
-    5. Generate: PROJECT_INDEX.json (machine-readable, detailed)
+    4. Generate: docs/reports/PROJECT_INDEX.md (human-readable summary)
+    5. Generate: docs/reports/PROJECT_INDEX.json (machine-readable, detailed)
     6. Validate: Both files exist + size <5KB each
   </flow>
 
@@ -36,8 +36,8 @@ description: Repository indexing with 94% token reduction (58K → 3K)
       4. Tests: tests/ | test/ | __tests__/ | *_test.*
       5. Config: *.toml | *.json | *.yaml | *.yml
     - Output:
-      - PROJECT_INDEX.md: ~3KB, human-readable, quick reference
-      - PROJECT_INDEX.json: ~10KB, machine-readable, full metadata
+      - docs/reports/PROJECT_INDEX.md: ~3KB, human-readable, quick reference
+      - docs/reports/PROJECT_INDEX.json: ~10KB, machine-readable, full metadata
   </patterns>
 
   <roi>
@@ -65,7 +65,7 @@ description: Repository indexing with 94% token reduction (58K → 3K)
 
   <bounds will="94% token reduction|parallel analysis|human-readable output" wont="modify source|exceed 5KB" fallback="Ask user for guidance when uncertain" type="document-only">
 
-    Generate PROJECT_INDEX.md and PROJECT_INDEX.json, then complete | Preserve source code unchanged | Defer implementation to /sc:implement → Output: PROJECT_INDEX.md (~3KB) + PROJECT_INDEX.json
+    Generate docs/reports/PROJECT_INDEX.md and docs/reports/PROJECT_INDEX.json, then complete | Preserve source code unchanged | Defer implementation to /sc:implement → Output: docs/reports/PROJECT_INDEX.md (~3KB) + docs/reports/PROJECT_INDEX.json
 
   </bounds>
 

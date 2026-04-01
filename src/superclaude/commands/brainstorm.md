@@ -16,7 +16,7 @@ description: Interactive requirements discovery through Socratic dialogue and sy
        (--vs): VS distribution generation — k perspectives with probabilities + landscape synthesis.
                Multi-persona insights inform post-hoc labeling. --depth maps: shallow→brief, normal→balanced, deep→detailed.
     3. Validate: Feasibility assessment + requirement validation
-    4. Specify: Write spec to docs/specs/YYYY-MM-DD-<topic>-design-<username>.md
+    4. Specify: Write spec to docs/specs/<topic>-discovery-<username>-YYYY-MM-DD.md (with frontmatter: status: draft, revised: <today>)
     5. Approve: Present spec for user review — do not proceed without confirmation
     6. Handoff: Route to /sc:plan for implementation planning
   </flow>
@@ -24,7 +24,7 @@ description: Interactive requirements discovery through Socratic dialogue and sy
   <outputs note="Per execution">
 | Artifact | Purpose |
 |----------|---------|
-| `docs/specs/YYYY-MM-DD-<topic>-design-<username>.md` | Design specification document |
+| `docs/specs/<topic>-discovery-<username>-YYYY-MM-DD.md` | Discovery specification document |
 | Conversation output | Socratic dialogue + validated requirements |
   </outputs>
 

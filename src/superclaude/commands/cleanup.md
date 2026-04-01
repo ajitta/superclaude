@@ -8,7 +8,7 @@ description: Systematically clean up code, remove dead code, and optimize projec
     <mission>Systematically clean up code, remove dead code, and optimize project structure</mission>
   </role>
 
-  <syntax>/sc:cleanup [target] [--type code|imports|files|all] [--safe|--aggressive] [--interactive]</syntax>
+  <syntax>/sc:cleanup [target] [--type code|imports|files|docs|all] [--safe|--aggressive] [--interactive] [--dry-run]</syntax>
 
   <flow>
     1. Analyze: Cleanup opportunities + safety assessment
@@ -21,10 +21,11 @@ description: Systematically clean up code, remove dead code, and optimize projec
   <outputs note="Per --type flag">
 | Type | Actions | Report |
 |------|---------|--------|
-| code | Remove dead code | CLEANUP_CODE.md |
-| imports | Remove unused imports | CLEANUP_IMPORTS.md |
-| files | Remove orphan files | CLEANUP_FILES.md |
-| all | All above | CLEANUP_REPORT.md |
+| code | Remove dead code | docs/reports/CLEANUP_CODE.md |
+| imports | Remove unused imports | docs/reports/CLEANUP_IMPORTS.md |
+| files | Remove orphan files | docs/reports/CLEANUP_FILES.md |
+| docs | Validate + transform doc naming convention | docs/reports/CLEANUP_DOCS.md |
+| all | All above | docs/reports/CLEANUP_REPORT.md |
   </outputs>
 
   <mcp servers="seq|c7"/>
@@ -41,6 +42,7 @@ description: Systematically clean up code, remove dead code, and optimize projec
     - DeadCode: Usage analysis → safe removal
     - Imports: Dependency analysis → optimization
     - Structure: Arch analysis → modular improvements
+    - Docs: Convention validation → rename + move (--dry-run supported)
     - Safety: Pre/during/post checks
   </patterns>
 
@@ -52,6 +54,8 @@ description: Systematically clean up code, remove dead code, and optimize projec
 | `--type imports --safe` | Unused import analysis |
 | `--type all --interactive` | Multi-domain with guidance |
 | `components/ --aggressive` | Thorough cleanup |
+| `--type docs --dry-run` | Preview doc naming fixes |
+| `--type docs` | Auto-fix doc naming convention |
 
   <example name="aggressive-without-review" type="error-path">
     <input>/sc:cleanup --type all --aggressive (on unfamiliar codebase)</input>
