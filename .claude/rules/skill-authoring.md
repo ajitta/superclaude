@@ -35,9 +35,10 @@ IDE warnings for `context`, `agent`, `hooks` are from the agentskills.io standar
 ---
 # Standard fields (agentskills.io cross-platform)
 name: my-skill                    # 권장 | lowercase+hyphens, max 64자, 디렉토리명과 일치
-description: |                    # 권장 | Claude 자동 invocation 판단 핵심, max 1024자
-  What this skill does and when to trigger it.
-  Include task keywords for better auto-detection.
+description: One-line purpose.    # 권장 | 깔끔한 한 줄 요약, max 1024자
+when-to-use: >                    # 권장 | 트리거 키워드/시나리오 (description과 분리)
+  When user mentions X, Y, Z or wants to do W.
+effort: high                      # 선택 | low|medium|high|max — 추론 깊이 제어
 license: MIT                      # 선택 | 라이선스 명시
 compatibility:                    # 선택 | 환경 요구사항 (실험적)
   tools: [claude-code]
@@ -69,6 +70,8 @@ hooks:                            # 선택 | 생애주기 훅
 |-------|-----------|----------|--------|
 | `name` | top-level | 표준 | agentskills.io |
 | `description` | top-level | 표준 | agentskills.io |
+| `when-to-use` | top-level | 표준 | CC source (CommandBase) |
+| `effort` | top-level | 표준 | CC source (BaseAgentDefinition) |
 | `license` | top-level | 표준 | agentskills.io |
 | `compatibility` | top-level | 표준 (실험적) | agentskills.io |
 | `allowed-tools` | top-level | 표준 (실험적) | agentskills.io |
@@ -83,20 +86,24 @@ hooks:                            # 선택 | 생애주기 훅
 
 ### Field Rules
 
-**`description` 작성 원칙** — 가장 중요한 필드:
-- 시작 시 모든 skill의 name+description만 시스템 프롬프트에 주입됨
-- Claude는 이것만 보고 skill 활성화 여부를 결정
+**`description` + `when-to-use` 분리** — 가장 중요한 필드 쌍:
+- 시작 시 모든 skill의 name+description+when-to-use가 시스템 프롬프트에 주입됨
+- `description`: 깔끔한 한 줄 요약 (skill이 무엇인지)
+- `when-to-use`: 트리거 키워드와 시나리오 (언제 활성화할지)
 - SKILL.md 본문은 skill이 선택된 후에야 읽힘
-- 구체적 태스크 + 트리거 키워드 명시, 모호한 설명 금지
+- description은 간결하게, when-to-use에 트리거 키워드 집중
 
 ```yaml
-# Bad — too vague
-description: 코드 관련 도움을 줍니다.
-
-# Good — task + keywords + triggers
+# Bad — description에 모든 것을 채움
 description: |
   PR 및 커밋된 코드의 품질, 보안, 유지보수성을 검토.
   코드 리뷰, PR 피드백, 버그 탐지 요청 시 사용.
+
+# Good — description과 when-to-use 분리
+description: PR 및 커밋된 코드의 품질, 보안, 유지보수성을 검토.
+when-to-use: >
+  코드 리뷰, PR 피드백, 버그 탐지 요청 시 사용.
+  'review', 'security check', 'code quality' 키워드에 자동 트리거.
 ```
 
 **`disable-model-invocation` vs `user-invocable`** — 혼동 금지:

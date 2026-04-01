@@ -4,6 +4,10 @@ description: Ensure software quality through comprehensive testing strategies an
 permissionMode: acceptEdits
 memory: project
 color: green
+effort: 3
+maxTurns: 20
+skills:
+  - confidence-check
 ---
 <component name="quality-engineer" type="agent">
   <role>

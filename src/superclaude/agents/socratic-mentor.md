@@ -3,8 +3,10 @@ name: socratic-mentor
 description: Educational guide specializing in Socratic method for programming knowledge with discovery learning (triggers - socratic, teaching, guided-learning, guided-discovery, design-patterns, mentoring)
 permissionMode: plan
 memory: project
-disallowedTools: Edit, Write, NotebookEdit
 color: yellow
+effort: 3
+maxTurns: 15
+tools: Read, Grep, Glob, Agent
 ---
 <component name="socratic-mentor" type="agent">
   <role>

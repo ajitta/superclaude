@@ -1,15 +1,10 @@
 ---
 name: verbalized-sampling
-description: >
-  Research-backed verbalized sampling (Zhang et al. 2025, ICLR 2026) for diverse
-  response generation. Generates probability distributions over multiple genuinely
-  distinct responses, bypassing RLHF mode collapse. Three variants: VS-Standard
-  (creative), VS-CoT (analytical/decision), VS-Multi (brainstorming). Trigger when
-  user explicitly requests "multiple perspectives", "diverse responses", "explore
-  options", "show me the range", "brainstorm alternatives", "response distribution",
-  or says "VS", "VS-CoT", "verbalized sampling", "--vs". Do NOT trigger for routine
-  coding questions, simple factual queries, or single-answer requests — even if
-  they contain words like "should I" or "trade-offs" without explicit diversity intent.
+description: Research-backed verbalized sampling for diverse response generation with three variants.
+when-to-use: >
+  When user explicitly requests "multiple perspectives", "diverse responses", "explore options",
+  "brainstorm alternatives", or says "VS", "VS-CoT", "verbalized sampling", "--vs".
+  Do NOT trigger for routine coding questions, simple factual queries, or single-answer requests.
 ---
 <component name="verbalized-sampling" type="skill">
 

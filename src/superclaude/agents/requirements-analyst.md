@@ -5,6 +5,8 @@ permissionMode: default
 memory: project
 disallowedTools: NotebookEdit
 color: purple
+effort: 4
+maxTurns: 20
 ---
 <component name="requirements-analyst" type="agent">
   <role>

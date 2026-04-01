@@ -1,9 +1,8 @@
 ---
 name: ship
-description: >
-  Ship changes with git add, conventional commit, push, and optional PR creation.
-  Use when user mentions 'ship', 'deploy', 'push', 'commit and push', 'create PR',
-  or wants to deliver code changes to remote.
+description: Ship changes with git add, conventional commit, push, and optional PR creation.
+when-to-use: >
+  When user wants to ship, commit and push, create PR, or deploy changes to remote.
 disable-model-invocation: true
 hooks:
   PreToolUse:

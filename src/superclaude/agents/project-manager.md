@@ -5,6 +5,7 @@ permissionMode: default
 memory: project
 disallowedTools: NotebookEdit
 color: orange
+effort: 3
 ---
 <component name="project-manager" type="agent">
   <role>

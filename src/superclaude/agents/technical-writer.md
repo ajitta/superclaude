@@ -5,6 +5,8 @@ permissionMode: default
 memory: project
 disallowedTools: NotebookEdit
 color: yellow
+effort: 2
+maxTurns: 15
 ---
 <component name="technical-writer" type="agent">
   <role>

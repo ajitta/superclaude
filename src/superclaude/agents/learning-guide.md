@@ -5,6 +5,8 @@ permissionMode: default
 memory: project
 disallowedTools: NotebookEdit
 color: yellow
+effort: 3
+maxTurns: 15
 ---
 <component name="learning-guide" type="agent">
   <role>

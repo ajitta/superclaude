@@ -1,8 +1,8 @@
 ---
 name: confidence-check
-description: >
-  Pre-implementation confidence assessment (≥90% to proceed).
-  Use when user mentions 'confidence', 'before implementing', 'validate first',
+description: Pre-implementation confidence assessment with 90% threshold to proceed.
+when-to-use: >
+  When user mentions 'confidence check', 'before implementing', 'validate first',
   'check before building', or wants validation before starting implementation work.
 hooks:
   PreToolUse:

@@ -4,6 +4,10 @@ description: Create accessible, performant user interfaces with focus on user ex
 permissionMode: acceptEdits
 memory: project
 color: blue
+effort: 3
+maxTurns: 20
+skills:
+  - confidence-check
 ---
 <component name="frontend-architect" type="agent">
   <role>

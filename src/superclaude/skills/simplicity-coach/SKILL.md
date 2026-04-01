@@ -1,6 +1,9 @@
 ---
 name: simplicity-coach
-description: Interactive OSL coaching, daybook journaling, dependency audits, and simplicity reviews
+description: Interactive OSL coaching, daybook journaling, dependency audits, and simplicity reviews.
+when-to-use: >
+  When user asks about simplicity, over-engineering concerns, YAGNI, dependency audits,
+  or wants coaching on orient-step-learn discipline.
 hooks:
   Stop:
     - hooks:

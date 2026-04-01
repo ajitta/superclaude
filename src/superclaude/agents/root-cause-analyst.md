@@ -5,6 +5,10 @@ permissionMode: default
 memory: project
 disallowedTools: NotebookEdit
 color: purple
+effort: 4
+maxTurns: 25
+skills:
+  - confidence-check
 ---
 <component name="root-cause-analyst" type="agent">
   <role>

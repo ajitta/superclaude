@@ -4,6 +4,8 @@ description: Deliver production-ready, secure, high-performance Python code foll
 permissionMode: acceptEdits
 memory: project
 color: green
+effort: 3
+maxTurns: 20
 ---
 <component name="python-expert" type="agent">
   <role>

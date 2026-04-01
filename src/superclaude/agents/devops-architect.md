@@ -5,6 +5,8 @@ permissionMode: default
 memory: project
 disallowedTools: NotebookEdit
 color: blue
+effort: 3
+maxTurns: 20
 ---
 <component name="devops-architect" type="agent">
   <role>

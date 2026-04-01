@@ -15,9 +15,12 @@ AGENTS_DIR = Path(__file__).parent.parent.parent / "src" / "superclaude" / "agen
 VALID_PERMISSION_MODES = {"acceptEdits", "default", "plan", "dontAsk", "bypassPermissions"}
 VALID_MEMORY_SCOPES = {"user", "project", "local"}
 VALID_COLORS = {"blue", "green", "orange", "purple", "yellow", "cyan", "red"}
-# All agent .md files (excluding README)
+VALID_EFFORT_VALUES = {"1", "2", "3", "4", "5"}
+SKILLS_DIR = Path(__file__).parent.parent.parent / "src" / "superclaude" / "skills"
+# All agent .md files (excluding README and _ prefixed test agents)
 AGENT_FILES = sorted(
-    [f for f in AGENTS_DIR.glob("*.md") if f.name != "README.md"]
+    [f for f in AGENTS_DIR.glob("*.md")
+     if f.name != "README.md" and not f.name.startswith("_")]
 )
 AGENT_IDS = [f.stem for f in AGENT_FILES]
 
@@ -313,3 +316,61 @@ class TestSimplicityGuideSpecific:
         assert "<mcp " in self.content
         servers = extract_xml_attr(self.content, "mcp", "servers") or ""
         assert "serena" in servers
+
+
+class TestAgentOptionalFields:
+    """Validate optional CC-native fields when present (effort, maxTurns, tools, skills)."""
+
+    def test_effort_valid_if_present(self, agent):
+        """If effort is set, it must be 1-5."""
+        stem, content, fm = agent
+        if "effort" in fm:
+            assert fm["effort"] in VALID_EFFORT_VALUES, (
+                f"{stem}: effort '{fm['effort']}' not in {VALID_EFFORT_VALUES}"
+            )
+
+    def test_max_turns_valid_if_present(self, agent):
+        """If maxTurns is set, it must be a positive integer."""
+        stem, content, fm = agent
+        if "maxTurns" in fm:
+            val = fm["maxTurns"]
+            assert val.isdigit() and int(val) > 0, (
+                f"{stem}: maxTurns '{val}' must be a positive integer"
+            )
+
+    def test_tools_and_disallowed_mutually_exclusive(self, agent):
+        """tools (allow-list) and disallowedTools (deny-list) must not coexist."""
+        stem, content, fm = agent
+        has_tools = "tools" in fm
+        has_disallowed = "disallowedTools" in fm
+        assert not (has_tools and has_disallowed), (
+            f"{stem}: has both 'tools' and 'disallowedTools' — pick one"
+        )
+
+    def test_skills_reference_existing_dirs(self, agent):
+        """If skills are declared, each must exist as a skill directory."""
+        stem, content, fm = agent
+        if "skills" not in fm:
+            return
+        # Parse skill names from raw frontmatter (YAML list items)
+        fm_match = re.match(r"^---\n(.*?)\n---", content, re.DOTALL)
+        if not fm_match:
+            return
+        fm_text = fm_match.group(1)
+        in_skills = False
+        skill_names = []
+        for line in fm_text.splitlines():
+            if line.startswith("skills:"):
+                in_skills = True
+                continue
+            if in_skills:
+                stripped = line.strip()
+                if stripped.startswith("- "):
+                    skill_names.append(stripped[2:].strip())
+                else:
+                    break
+        existing_skills = {d.name for d in SKILLS_DIR.iterdir() if d.is_dir()}
+        for skill in skill_names:
+            assert skill in existing_skills, (
+                f"{stem}: skills references '{skill}' but no such skill dir exists"
+            )

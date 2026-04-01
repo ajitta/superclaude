@@ -5,6 +5,8 @@ permissionMode: default
 memory: project
 disallowedTools: NotebookEdit
 color: cyan
+effort: 2
+maxTurns: 10
 ---
 <component name="repo-index" type="agent">
   <role>

@@ -5,6 +5,8 @@ permissionMode: default
 memory: project
 disallowedTools: Edit, Write, NotebookEdit
 color: green
+effort: 2
+maxTurns: 10
 ---
 <component name="git-workflow" type="agent">
   <role>

@@ -3,8 +3,12 @@ name: system-architect
 description: Design scalable system architecture with focus on maintainability and long-term technical decisions (triggers - architecture, system-design, scalability, components, boundaries, long-term)
 permissionMode: plan
 memory: project
-disallowedTools: Edit, Write, NotebookEdit
 color: blue
+effort: 4
+maxTurns: 20
+tools: Read, Grep, Glob, Agent, WebSearch, WebFetch
+skills:
+  - confidence-check
 ---
 <component name="system-architect" type="agent">
   <role>

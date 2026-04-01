@@ -5,6 +5,8 @@ permissionMode: default
 memory: project
 disallowedTools: NotebookEdit
 color: blue
+effort: 3
+maxTurns: 15
 ---
 <component name="project-initializer" type="agent">
   <role>

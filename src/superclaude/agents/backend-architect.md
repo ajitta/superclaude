@@ -5,6 +5,10 @@ permissionMode: default
 memory: project
 disallowedTools: NotebookEdit
 color: blue
+effort: 3
+maxTurns: 20
+skills:
+  - confidence-check
 ---
 <component name="backend-architect" type="agent">
   <role>

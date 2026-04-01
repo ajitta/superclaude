@@ -1,10 +1,8 @@
 ---
 name: finishing-a-development-branch
-description: |
-  Complete development work with structured options for merge, PR, or cleanup.
-  Use when implementation is complete and all tests pass. Presents options and
-  guides branch completion. Involves git operations. Use when user mentions
-  'branch done', 'done with branch', 'merge back', 'finish branch', 'work complete'.
+description: Complete development work with structured options for merge, PR, or cleanup.
+when-to-use: >
+  When user is done with a feature branch and wants to merge, create PR, or clean up.
 disable-model-invocation: true
 allowed-tools: Bash, Read, Grep, Glob
 hooks:

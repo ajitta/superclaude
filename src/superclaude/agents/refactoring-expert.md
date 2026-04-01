@@ -5,6 +5,10 @@ permissionMode: default
 memory: project
 disallowedTools: NotebookEdit
 color: green
+effort: 3
+maxTurns: 20
+skills:
+  - confidence-check
 ---
 <component name="refactoring-expert" type="agent">
   <role>

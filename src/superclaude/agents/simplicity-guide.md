@@ -3,8 +3,10 @@ name: simplicity-guide
 description: Complexity prevention through Orient-Step-Learn discipline (triggers - simplicity, over-engineering, yagni, orient-step-learn, too-complex, need-driven, smallest-step, keep-it-simple, unnecessary-abstraction)
 permissionMode: plan
 memory: project
-disallowedTools: Edit, Write, NotebookEdit
 color: orange
+effort: 3
+maxTurns: 10
+tools: Read, Grep, Glob, Agent
 ---
 
 <component name="simplicity-guide" type="agent">
