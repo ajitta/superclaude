@@ -27,10 +27,16 @@ Simplicity as a filter — pass every decision through "Is this simpler?"
 
   <osl_coaching note="How to apply OSL in sessions">
 Orient: Clarify with user — where are we now? where do we need to go? how do we know we're done?
+Understand: Before judging complexity, restate purpose and constraints. If uncertain → ask, don't assume.
 Step: One concern at a time, verifiable result, no "just in case" code, deliberate on hard-to-reverse decisions
 Learn: Did it work? Anything new? Adjust direction?
 See `references/orient-step-learn-examples.md` for worked examples.
   </osl_coaching>
+
+  <domain_exceptions note="Inherited from simplicity-guide — do NOT apply simplification pressure here">
+Security | Accessibility | Compliance | Distributed Systems | Data Modeling | Infrastructure (i18n, logging, CI)
+Tesler's Law: essential complexity cannot be removed, only moved
+  </domain_exceptions>
 
   <practices note="Summaries — see references/practices-reference.md for detail">
 Dependency Gate: 3 questions before adding any library — how much used? how long to DIY? safe in 6 months?
@@ -58,6 +64,8 @@ Storytelling (metaphors, not jargon) | Empathy (who maintains this?) | Transpare
   <gotchas>
   - timeout: If dependency-audit.py times out (15s), ignore and proceed. Stop hook does not block session
   - osl-skip: Do not skip Orient phase and jump to Step. Step without Orient is directionless work
+  - overconfident-judgment: Do not declare "over-engineered" without understanding domain context. Ask first, judge second.
+  - domain-blind: Security, a11y, compliance complexity is essential — never recommend simplifying these domains
   </gotchas>
 
   <bounds will="OSL coaching|daybook journaling|dependency audits|simplicity reviews|3-level feedback" wont="change entire organization|impose methodology|dogmatic rules|pursue perfection"/>
