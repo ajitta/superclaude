@@ -1,51 +1,38 @@
 ---
 name: confidence-check
-description: Pre-implementation confidence assessment with 90% threshold to proceed.
+description: Pre-implementation validation checklist.
 when-to-use: >
-  When user mentions 'confidence check', 'before implementing', 'validate first',
-  'check before building', or wants validation before starting implementation work.
-hooks:
-  PreToolUse:
-    - matcher: "WebFetch|WebSearch"
-      hooks:
-        - type: command
-          command: "python3 {{SKILLS_PATH}}/confidence-check/scripts/validate_confidence_context.py"
-          timeout: 30
-          once: true
+  When user says 'confidence check', 'validate first', 'before implementing',
+  or wants validation before starting implementation work.
 ---
 <component name="confidence-check" type="skill">
 
   <role>
-    <mission>Prevent wrong-direction execution by assessing confidence BEFORE implementation</mission>
-    <stats>Precision: 1.000 | Recall: 1.000 | 69/69 tests passed</stats>
+    <mission>Prevent wrong-direction execution by validating assumptions BEFORE implementation</mission>
   </role>
 
-  <thresholds>
-| Level | Score | Action |
-|-------|-------|--------|
-| High | ≥90% | Proceed with implementation |
-| Medium | 70-89% | Present alternatives, investigate more |
-| Low | <70% | STOP - Request clarification |
-  </thresholds>
+  <syntax>/confidence-check [task description]</syntax>
 
-  <references note="Load on demand">
-  - `references/checks-detail.md` — Detailed weights for all 5 checks, MCP integration, ROI figures
-  </references>
+  <flow>
+    1. Run 3 checks below with evidence (Grep, Glob, Read)
+    2. For each: cite concrete evidence (file paths, search results, docs)
+    3. All Yes → proceed. Any No → investigate that item before implementing
+  </flow>
 
-  <gotchas>
-  - websearch-dup: Do not duplicate Context7 results with WebSearch. Use WebSearch only when Context7 fails
-  - score-rounding: Do not round 89% up to "almost 90%". 70-89% = Medium — must present alternatives
-  - evidence-gap: When presenting scores, always cite the evidence source for each check
-  </gotchas>
+  <checks>
+  1. **Already exists?** — Grep/Glob for similar functionality in codebase. If found, reuse or extend instead of building new
+  2. **Fits existing stack?** — Check CLAUDE.md, pyproject.toml, package.json for tech stack alignment. Don't introduce new deps/patterns when existing ones work
+  3. **Root cause understood?** — Bug: can you reproduce it? Feature: do you have clear requirements? If neither, clarify first
+  </checks>
 
-  <bounds will="pre-implementation validation|evidence-based assessment" wont="runtime checks|modify code"/>
+  <examples>
+  | Input | Output |
+  |-------|--------|
+  | `/confidence-check add retry logic to API client` | 1. grep "retry" → found in utils/http.py:42. Reuse. 2. requests already in deps. Fits. 3. Error logs show timeout pattern. Root cause clear. → Proceed |
+  | `/confidence-check add caching layer` | 1. grep "cache" → none found. New. 2. No cache deps in pyproject.toml. New pattern. 3. "Why cache?" — no perf data yet. → Stop, measure first |
+  </examples>
 
-  <checklist>
-- [ ] All 5 checks evaluated (duplicates, architecture, docs, OSS, root cause)
-- [ ] Score computed with correct weights (25/25/20/15/15)
-- [ ] Recommendation matches threshold (≥90% proceed, 70-89% investigate, <70% stop)
-- [ ] Evidence sources cited for each check
-  </checklist>
+  <bounds will="pre-implementation validation|evidence-based checklist" wont="score/percentage computation|runtime checks|modify code"/>
 
-  <handoff next="/sc:implement /sc:test /sc:analyze"/>
+  <handoff next="/sc:implement /sc:plan /sc:analyze"/>
 </component>
