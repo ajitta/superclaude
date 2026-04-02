@@ -36,7 +36,7 @@ WebSearch: fact-check, current info → native web search (no flag needed)
 --delegate [auto|files|folders]: >7 dirs, >50 files, complexity >0.8 → sub-agent parallel
   Direct work for: single-file edits, sequential ops, <3 steps, simple searches (grep/glob)
   Sub-agents for: parallel-capable, isolated context, independent work streams, >5 files
-  Model routing: 11 agents pinned to sonnet (execution tasks), 11 inherit parent (judgment tasks)
+  Model routing: 10 agents pinned to sonnet (execution tasks), 12 inherit parent (judgment tasks)
   Override: user can override any agent's model: field in frontmatter
 --concurrency [n]: 1-15 → batch independent tool calls into single message (e.g. 5 parallel Grep calls)
 --loop: iterative improvement — execute task → self-evaluate output → identify gaps → re-execute → repeat until no meaningful improvement found. Report iteration count when done.
@@ -79,9 +79,9 @@ Typos: fuzzy-matched (Levenshtein ≤ 2) → suggestion in HTML comment
   arch=system-architect(architecture) | fe=frontend-architect(UI,a11y) | be=backend-architect(API,db,security) | sec=security-engineer(OWASP) | qa=quality-engineer(testing) | qual=quality-engineer(alias) | ops=devops-architect(CI/CD,K8s) | devops=devops-architect(alias) | pm=project-manager(orchestration) | perf=performance-engineer(profiling) | refactor=refactoring-expert(tech-debt) | root=root-cause-analyst(debug) | anal=requirements-analyst(strategy) | educator=learning-guide(education) | mentor=socratic-mentor(guidance) | scribe=technical-writer(docs) | py=python-expert(python) | panel=business-panel-experts(business) | research=deep-researcher(web) | review=self-review(validation) | index=repo-index(indexing) | simple=simplicity-guide(OSL,YAGNI) | git=git-workflow(git,commits,PR)
   </persona_index>
 
-  <model_routing note="Cost optimization — 50% of agents pinned to sonnet">
-  Sonnet (execution, templates, code): repo-index, git-workflow, project-initializer, technical-writer, learning-guide, socratic-mentor, quality-engineer, self-review, python-expert, performance-engineer, frontend-architect
-  Opus (synthesis, judgment, architecture, security): system-architect, deep-researcher, business-panel-experts, simplicity-guide, root-cause-analyst, requirements-analyst, backend-architect, security-engineer, project-manager, devops-architect, refactoring-expert
+  <model_routing note="Cost optimization — ~50% of agents pinned to sonnet">
+  Sonnet (execution, templates, code): repo-index, git-workflow, project-initializer, technical-writer, learning-guide, socratic-mentor, quality-engineer, python-expert, performance-engineer, frontend-architect
+  Opus (synthesis, judgment, architecture, security): system-architect, deep-researcher, business-panel-experts, simplicity-guide, root-cause-analyst, requirements-analyst, backend-architect, security-engineer, project-manager, devops-architect, refactoring-expert, self-review
   Criteria: procedural/template-driven → sonnet | design judgment/high reversal cost/multi-framework synthesis → opus (inherit parent)
   </model_routing>
 
