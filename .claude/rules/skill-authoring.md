@@ -70,8 +70,8 @@ hooks:                            # 선택 | 생애주기 훅
 |-------|-----------|----------|--------|
 | `name` | top-level | 표준 | agentskills.io |
 | `description` | top-level | 표준 | agentskills.io |
-| `when-to-use` | top-level | 표준 | CC source (CommandBase) |
-| `effort` | top-level | 표준 | CC source (BaseAgentDefinition) |
+| `when-to-use` | top-level | CC 전용 | CC source (CommandBase) |
+| `effort` | top-level | CC 전용 | CC source (BaseAgentDefinition) |
 | `license` | top-level | 표준 | agentskills.io |
 | `compatibility` | top-level | 표준 (실험적) | agentskills.io |
 | `allowed-tools` | top-level | 표준 (실험적) | agentskills.io |

@@ -41,6 +41,7 @@ Intent Propagation: when delegating to sub-agents, include user's original reque
 [R15] Verification 🔴: before claiming done, run full test suite fresh (not cached); compare pass count to baseline; cite evidence ("42/42 pass, baseline 40")
 [R16] Safe Read 🟡: files of unknown size → use limit parameter or check wc -c first; logs, transcripts, changelogs (>80KB) → prefer Grep or Bash over Read; plan files → keep under 15KB, split into phases for large implementations
 [R17] Serena-First 🟢: code exploration → prefer Serena symbolic tools (get_symbols_overview, find_symbol) over Read; reserve Read for non-code files, unknown formats, or when Serena unavailable
+[R18] Necessity Test 🟡: before designing a component, answer "Is the system broken without this?" — "safer/better" alone is insufficient. Require: specific failure scenario, quantitative evidence, or user-facing impact. "Deferred to post-MVP review" is a valid design decision
   <examples note="Representative scenarios — examples teach better than rules">
   | Scenario | Wrong | Right | Rule |
   |----------|-------|-------|------|
@@ -55,6 +56,7 @@ Intent Propagation: when delegating to sub-agents, include user's original reque
   | Exploring unfamiliar class | Read entire 500-line file | get_symbols_overview → find_symbol(depth=1) | Serena-First 🟢 |
   | Finding function callers | grep "functionName" across repo | find_referencing_symbols(functionName) | Serena-First 🟢 |
   | Reading YAML config | Use Serena symbolic tools | Use Read (non-code file) | Serena-First 🟢 |
+  | Designing component "just in case" | "Good practice for resilience" | "Queue+retry self-regulates. No failure scenario without it. Defer." | Necessity Test 🟡 |
   </examples>
   </core_rules>
 
@@ -117,7 +119,8 @@ Benefit: ~70% token savings vs static @-references
   </dynamic_context>
 
   <workflow_gates note="Recommended workflow chain">
-    /sc:brainstorm -> /sc:plan: User approves spec before planning
+    /sc:brainstorm -> /sc:design: User approves discovery spec before designing
+    /sc:design -> /sc:plan: Design spec committed (components pass [R18] necessity test, deferred items marked)
     /sc:plan -> /sc:implement --plan: Plan document committed to repo
     /sc:implement -> /sc:test: Implementation complete
     /sc:test -> done: Test pass evidence required (actual output, not claims)

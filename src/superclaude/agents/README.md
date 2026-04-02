@@ -80,8 +80,14 @@ Agents are managed by Claude Code's native agent delegation system. Auto-selecte
 
 ## Model Routing
 
-All agents inherit the parent session's model by default — no `model:` field in frontmatter.
-To pin a specific model, add `model: opus|sonnet|haiku` to frontmatter (not recommended — overrides user's choice).
+10 agents pinned to `model: sonnet` (execution/template tasks), 12 inherit parent (judgment/synthesis tasks).
+
+| Tier | model: | Agents | Criteria |
+|------|--------|--------|----------|
+| Sonnet | `sonnet` | repo-index, git-workflow, project-initializer, technical-writer, learning-guide, socratic-mentor, quality-engineer, python-expert, performance-engineer, frontend-architect | Procedural, template-driven, code generation |
+| Opus | *(inherit)* | system-architect, deep-researcher, business-panel-experts, simplicity-guide, root-cause-analyst, requirements-analyst, backend-architect, security-engineer, project-manager, devops-architect, refactoring-expert, self-review | Design judgment, high reversal cost, multi-framework synthesis |
+
+Override: set `model:` in any agent's frontmatter to change its routing.
 
 ## Authoring Rules
 

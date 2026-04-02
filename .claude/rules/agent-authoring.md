@@ -14,8 +14,8 @@ memory: project                            # required | always "project" for Sup
 disallowedTools: Edit, Write, NotebookEdit # optional | comma-separated, deny-list (see tool access below)
 tools: Read, Grep, Glob, Agent             # optional | comma-separated, allow-list (see tool access below)
 color: blue|green|purple|yellow|orange|cyan # required | by role group
-effort: 1-5                                # optional | reasoning depth (2=light, 3=standard, 4=deep, 5=max)
-maxTurns: 10-30                            # optional | turn limit safety net (generous defaults)
+effort: low|medium|high|max               # optional | reasoning depth (v2.1.69+, max is Opus 4.6 only)
+maxTurns: 10-30                            # optional | turn limit safety net (positive integer)
 skills:                                    # optional | preload skills into agent session
   - confidence-check
 mcpServers:                                # optional | MCP servers scoped to this subagent
@@ -38,17 +38,21 @@ mcpServers:                                # optional | MCP servers scoped to th
 | General work (default mode) | `disallowedTools` | `NotebookEdit` | Agent can edit code but not notebooks |
 | Full access (implementation) | *(omit both)* | — | Agent needs all tools |
 
-**Rule:** `tools` and `disallowedTools` are mutually exclusive. Use `tools` (allow-list) for restrictive agents — it's more secure because it fails closed when CC adds new tools. Use `disallowedTools` (deny-list) for permissive agents where listing allowed tools would be impractical.
+**Rule:** `tools` and `disallowedTools` are mutually exclusive. Use `tools` (allow-list) for restrictive agents — it fails closed when CC adds new tools. Use `disallowedTools` (deny-list) for permissive agents where listing allowed tools would be impractical.
 
-**effort tiering**:
-| Tier | effort | Agents | Rationale |
-|------|--------|--------|-----------|
-| Light | 2 | repo-index, git-workflow, technical-writer | Mechanical/structured tasks |
-| Standard | 3 (or omit) | architects, engineers, mentors, managers | Standard design + analysis |
-| Deep | 4 | system-architect, security-engineer, performance-engineer, root-cause-analyst | Complex reasoning |
-| Maximum | 5 | deep-researcher, business-panel-experts | Multi-perspective synthesis |
+**effort** (v2.1.69+) — adaptive reasoning depth:
+| Value | Use for | Examples |
+|-------|---------|----------|
+| `low` | Mechanical/structured tasks | repo-index, git-workflow, technical-writer |
+| `medium` | Standard design + analysis (default if omitted) | architects, engineers, mentors |
+| `high` | Complex reasoning, deep debugging | system-architect, security-engineer, root-cause-analyst |
+| `max` | Multi-perspective synthesis (**Opus 4.6 only**) | deep-researcher, business-panel-experts |
 
-**maxTurns guidance**:
+Precedence: `CLAUDE_CODE_EFFORT_LEVEL` env > frontmatter `effort` > session setting > model default (medium).
+
+**⚠ Values must be strings** (`low`/`medium`/`high`/`max`), not numbers. CC does not accept numeric effort values (1-5).
+
+**maxTurns** — turn limit safety net:
 | Category | maxTurns | When |
 |----------|----------|------|
 | Quick | 10 | Scanning, mechanical ops (repo-index, git-workflow) |
@@ -56,15 +60,16 @@ mcpServers:                                # optional | MCP servers scoped to th
 | Extended | 25-30 | Deep research, complex debugging |
 | Unlimited | *(omit)* | Orchestrators (project-manager) |
 
-**skills preload**:
-- Use `skills:` to preload safety/validation skills into agent sessions
-- Currently: `confidence-check` for analytical agents (architects, engineers, analysts)
+**skills** — preload skills into agent session:
+- Use `skills:` to preload safety/validation skills (e.g., `confidence-check` for analytical agents)
 - Token cost: ~500 tokens per preloaded skill — acceptable for safety improvement
+- Each skill name must match an existing directory in `src/superclaude/skills/`
 
 **model routing**:
-- Default: omit `model:` field — agent inherits parent session's model (recommended)
-- Override: set `model:` explicitly only when a specific model is required regardless of user's session choice
-- Use sparingly — explicit `model:` overrides the user's cost/speed preference
+- Sonnet-tier (11 agents): execution/template/code tasks → `model: sonnet` pinned in frontmatter
+- Opus-tier (11 agents): design judgment/synthesis/security tasks → omit `model:` (inherit parent, typically Opus)
+- New agents: assess cognitive complexity — procedural → sonnet, nuanced judgment → omit
+- See `agents/README.md` Model Routing table and `core/FLAGS.md` `<model_routing>` for full list
 
 **color by role group**:
 | Group | color | Roles |
@@ -180,7 +185,7 @@ This validates:
 - tool_guidance has content (Proceed/Ask First/Never)
 - Non-empty sections
 - `<gotchas>` presence (recommended, not required — no test failure if missing)
-- Optional fields (if present): effort in 1-5, maxTurns is positive integer
+- Optional fields (if present): effort in `low|medium|high|max`, maxTurns is positive integer
 - `tools` and `disallowedTools` are mutually exclusive
 - `skills` references existing skill directories
 
@@ -189,7 +194,7 @@ This validates:
 1. Create `src/superclaude/agents/<name>.md` with frontmatter + XML body
 2. Verify `name` matches filename (without `.md`)
 3. Set `permissionMode` → tool access (`tools` or `disallowedTools`) following least privilege
-4. Set `effort` tier (2=light, 3=standard, 4=deep, 5=max) and `maxTurns` safety net
+4. Set `effort` (low/medium/high/max) and `maxTurns` safety net
 5. Consider `skills` preload (e.g., `confidence-check` for analytical agents)
 6. Add `<memory_guide>` section (see below)
 7. Add `<gotchas>` section (recommended — project-specific failure patterns, 2-5 items)

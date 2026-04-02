@@ -15,8 +15,9 @@ description: Feature and code implementation with intelligent persona activation
     2. Plan: Approach + activate personas; for plan mode, follow task order exactly
     3. Checkpoint: If changes affect >3 files → present numbered plan → wait for user approval before editing
     4. Execute: Code + framework best practices; for plan mode, mark tasks complete as you go
-    5. Validate: Security + quality checks; run verification command per task
-    6. Integrate: Docs + testing recs; report any blockers encountered
+    5. Phase Gate: After each phase/task group — build + run, then: "Does this already solve the next phase's problem?" If yes, skip with reason
+    6. Validate: Security + quality checks; run verification command per task
+    7. Integrate: Docs + testing recs; report any blockers encountered
   </flow>
 
   <mcp servers="seq|c7|magic|play"/>
