@@ -8,15 +8,15 @@ description: Execute complex tasks with intelligent workflow management and dele
     <mission>Execute complex tasks with intelligent workflow management and delegation</mission>
   </role>
 
-  <syntax>/sc:task [action] [target] [--strategy systematic|agile|enterprise] [--parallel] [--delegate] [--cleanup]</syntax>
+  <syntax>/sc:task [action] [target] [--strategy sequential|parallel|adaptive] [--delegate] [--cleanup]</syntax>
 
   <flow>
-    1. Analyze: Parse requirements + optimal strategy
-    2. Delegate: Route to MCP + activate personas
-    3. Checkpoint: If changes affect >3 files → present numbered plan → wait for user approval before editing
-    4. Coordinate: Intelligent workflow + parallel
-    5. Validate: Quality gates + completion verification
-    6. Optimize: Performance analysis + recs
+    1. Analyze: Parse requirements + dependency mapping
+    2. Decompose: Break into Epic → Story → Task hierarchy
+    3. Strategy: Select execution order (sequential for deps, parallel for independent, adaptive for mixed)
+    4. Checkpoint: If changes affect >3 files → present numbered plan → wait for user approval
+    5. Execute: Intelligent delegation + parallel where possible
+    6. Validate: Quality gates + completion verification
     7. Cleanup: Auto-remove stale/completed tasks (--cleanup)
   </flow>
 
@@ -31,48 +31,76 @@ description: Execute complex tasks with intelligent workflow management and dele
     <usage>
       - /sc:task cleanup: Run automatic task cleanup
       - /sc:task cleanup --dry-run: Preview without deletion
-      - Auto-integrated with task lifecycle
     </usage>
   </task_cleanup>
 
-  <mcp servers="seq|c7|magic|play|morph|serena"/>
-  <personas p="arch|anal|fe|be|sec|ops|pm"/>
-
   <tools>
     - TaskCreate/TaskUpdate: Epic → Story → Task hierarchy
-    - Task: Multi-agent delegation
-    - Read/Write/Edit: Documentation + coordination
-    - sequentialthinking: Dependency analysis
+    - Agent: Sub-agent delegation for parallel work
+    - Read/Write/Edit: Implementation + coordination
+    - Grep/Glob: Dependency mapping
   </tools>
 
   <patterns>
     - Hierarchy: Epic → Story → Task → Subtask
-    - Strategy: Systematic (comprehensive) | Agile (iterative) | Enterprise (governance)
-    - Multi-Agent: Persona → MCP → parallel → integration
-    - Cross-Session: Persistence → continuity → enhancement
+    - Strategy: Sequential (strict deps) | Parallel (independent streams) | Adaptive (discover then parallelize)
+    - Dependency: Analyze dependencies before execution — detect circular deps, present resolution options
     - Cleanup: Stale detection → auto-delete → report
   </patterns>
 
   <examples>
 
+  <example name="sequential-strategy" type="happy-path">
+    <input>/sc:task 'database migration from MySQL to PostgreSQL' --strategy sequential</input>
+    <output>
+      Epic: MySQL → PostgreSQL migration
+        Story 1: Schema migration (blocked: none)
+        Story 2: Data migration (blocked by: Story 1)
+        Story 3: Application layer (blocked by: Story 2)
+      Dependencies: S1 → S2 → S3 (strict chain)
+    </output>
+  </example>
+
+  <example name="parallel-strategy" type="happy-path">
+    <input>/sc:task 'implement user auth system' --strategy parallel</input>
+    <output>
+      Epic: User authentication system
+        Story 1: Database layer (parallel)
+        Story 2: API layer (parallel)
+        Story 3: UI layer (parallel)
+        Story 4: Integration (blocked by: S1 + S2 + S3)
+      Concurrency: S1 ‖ S2 ‖ S3 → S4
+    </output>
+  </example>
+
+  <example name="adaptive-strategy" type="happy-path">
+    <input>/sc:task 'refactor monolith into services' --strategy adaptive</input>
+    <output>
+      Phase 1 (sequential — discovery): Analyze dependencies, identify bounded contexts
+      Phase 2 (parallel — independent services): Extract UserService ‖ OrderService ‖ PaymentService
+      Phase 3 (sequential — integration): API gateway + integration testing
+      Strategy shift: Sequential → Parallel → Sequential
+    </output>
+  </example>
+
+  <example name="circular-dependency" type="error-path">
+    <input>/sc:task 'refactor auth and permissions modules'</input>
+    <why_wrong>Circular dependency detected: auth → permissions → auth</why_wrong>
+    <correct>Present options: A) Extract shared interface to break cycle, B) Merge into single module. User chooses before proceeding.</correct>
+  </example>
+
 | Input | Output |
 |-------|--------|
-| `create 'enterprise auth' --strategy systematic --parallel` | Multi-domain coordination |
-| `execute 'feature backlog' --strategy agile --delegate` | Iterative + delegation |
-| `execute 'microservices platform' --strategy enterprise --parallel` | Enterprise scale |
 | `cleanup` | Auto-remove stale/completed tasks |
 | `cleanup --dry-run` | Preview cleanup without deletion |
 
-  <example name="task-without-breakdown" type="error-path">
-    <input>/sc:task execute 'build entire platform' (single monolithic task, no breakdown)</input>
-    <why_wrong>Executing a massive task without decomposition leads to scope creep and lost progress on failure.</why_wrong>
-    <correct>/sc:task create 'build platform' --strategy systematic → decompose into stories → execute incrementally</correct>
-  </example>
   </examples>
 
-  <bounds will="complex task coordination|hierarchical breakdown|MCP+persona orchestration|auto cleanup" wont="simple tasks|compromise quality|operate without validation" fallback="Ask user for guidance when uncertain" type="execution">
+  <token_note>High consumption with --delegate — spawns sub-agents; consider fresh session for large tasks</token_note>
 
-    Execute tasks via intelligent delegation | Quality gates enforced between phases | Progress reported via TaskCreate/TaskUpdate | Cleanup removes only completed/cancelled/stale tasks
+  <bounds will="complex task coordination|hierarchical breakdown|dependency analysis|auto cleanup" wont="simple single-file tasks|compromise quality|operate without validation" fallback="Ask user for guidance when uncertain" type="execution">
+
+    Execute tasks via intelligent delegation | Quality gates enforced between phases | Progress reported via TaskCreate/TaskUpdate | Detect circular dependencies before execution
 
   </bounds>
 
