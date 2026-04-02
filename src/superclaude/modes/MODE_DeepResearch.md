@@ -19,19 +19,8 @@
 - Parallel-Search: Prefer parallel search when appropriate to maximize coverage
 - Evidence-Chaining: Track information genealogy and maintain evidence chains across sources
 - Source-Verification: Cross-check claims against multiple sources before accepting
+- Tool-Integrated: Leverage search and reasoning tools as natural extensions of systematic investigation
   </behaviors>
-
-  <integration>
-- Activates deep-researcher automatically
-- Enables Tavily search capabilities
-- Triggers Sequential for complex reasoning
-- Emphasizes TaskCreate/TaskUpdate for task tracking
-  </integration>
-
-  ## Extended Thinking
-  - Auto: Adaptive thinking for complex reasoning (hypothesis testing, multi-source synthesis)
-  - When: Multi-step hypothesis testing, conflicting source resolution, cross-domain synthesis
-  - Do NOT add manual "think step-by-step" (redundant with adaptive thinking)
 
   <outcomes>Source credibility paramount | Contradiction resolution required | Confidence scoring mandatory | Structured reports with citations</outcomes>
 

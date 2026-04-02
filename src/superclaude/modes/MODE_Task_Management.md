@@ -16,18 +16,10 @@
 
   <behaviors>
 - Hierarchical Decomposition: Plan -> Phase -> Task -> Todo
-- Memory-Backed: Start by loading context, checkpoint during work, summarize at end
+- State-Aware: Orient to current position (load context, identify phase, resume) before acting
 - Progress Awareness: Track status across tasks and phases
-- Natural Boundaries: Checkpoint at phase transitions and milestone completions
+- Checkpoint-Disciplined: Persist state at natural phase transitions, not arbitrary intervals
   </behaviors>
-
-  ## Memory Operations
-  - Start: list_memories() -> read_memory("current_plan") -> orient to current state
-  - During: write_memory + checkpoint at phase transitions + TaskCreate/TaskUpdate
-  - End: assess completion -> write_memory("session_summary") -> cleanup temp state
-
-  ## Execution Flow
-  Load: list+read -> Plan: hierarchy+memory -> Track: TaskCreate/TaskUpdate -> Execute -> Checkpoint -> Complete
 
   <examples>
 | Input | Response |

@@ -85,14 +85,19 @@ BASE_PATH = _get_base_path()
 #       that cause false positives on normal coding prompts.
 #       Use compound terms (e.g. "browser test" not "test") or explicit flags (--play).
 TRIGGER_MAP = [
-    # MCP servers - Priority 2 (operational guides: workflows, decision rules, integration patterns)
+    # Priority scheme:
+    #   1 = behavioral (complex decision rules, workflow patterns) — survives token budget cuts
+    #   2 = operational (tool hints, standard modes) — standard injection
+    #   3 = supplementary (reference data) — dropped first on budget pressure
+    #
+    # MCP servers — behavioral MCPs at P1, tool MCPs at P2
     (
         r"(serena|symbol ops|rename.?symbol|lsp|--serena|/sc:load|/sc:save)",
         "mcp/MCP_Serena.md",
-        2,
+        1,
     ),
     (
-        r"(tavily|web search|news|fact.?check|/sc:research|--tavily)",
+        r"(tavily|fact.?check|/sc:research|--tavily)",
         "mcp/MCP_Tavily.md",
         1,
     ),
@@ -102,14 +107,14 @@ TRIGGER_MAP = [
     (r"(--perf|--devtools)", "mcp/MCP_Chrome-DevTools.md", 2),
     (r"(--magic)", "mcp/MCP_Magic.md", 2),
     (r"(--morph|--morphllm)", "mcp/MCP_Morphllm.md", 2),
-    # Business symbols - Priority 3
+    # Business symbols - supplementary reference
     (r"(business.?symbol|strategic.?symbol|business.?example|panel.?example|--structured)", "core/BUSINESS_SYMBOLS.md", 3),
-    # Modes — retained where content provides unique behavioral/reference value
+    # Modes — behavioral at P1, operational at P2
     (r"(--brainstorm|--bs)", "modes/MODE_Brainstorming.md", 1),
     (r"(--introspect|self.?analysis|analyze reasoning)", "modes/MODE_Introspection.md", 2),
     (r"(--task-manage)", "modes/MODE_Task_Management.md", 2),
     (r"(--uc|--ultracompressed|token.?efficient|--token-efficient|--safe-mode)", "modes/MODE_Token_Efficiency.md", 1),
-    (r"(--orchestrate|multi.?tool|tool.?select|/sc:select-tool)", "modes/MODE_Orchestration.md", 2),
+    (r"(--orchestrate|tool.?select|/sc:select-tool)", "modes/MODE_Orchestration.md", 2),
     (r"(--research|deep.?research|systematic.?investigation|/sc:research)", "modes/MODE_DeepResearch.md", 1),
     (r"(--business-panel|business.?panel|multi.?expert|strategic.?analysis|/sc:business-panel)", "modes/MODE_Business_Panel.md", 1),
 ]
@@ -140,16 +145,12 @@ COMPOSITE_FLAGS = {
 }
 
 # v3.1: Hybrid Injection Map
-# MCP files → short instructions (Claude already gets tool descriptions from MCP servers)
-# Mode files → full .md injection (behavioral rules, symbol tables, tool matrices need complete content)
-# Core files → short instructions (supplementary reference)
+# Only entries reachable by _get_injection_tier() belong here:
+#   - Behavioral MCPs (Serena, Tavily) → Tier 1 via _BEHAVIORAL_MCPS check
+#   - Tool MCPs and core files use TIER_0_MAP (Tier 0) instead — do NOT duplicate here
+# Mode files → always Tier 2 (full .md injection)
 INSTRUCTION_MAP = {
-    # Core supplementary
-    "core/BUSINESS_SYMBOLS.md": (
-        "Business symbols + expert selection: 🎯target 📈growth 💰financial ⚖️tradeoffs 🏆competitive 🌊blue-ocean. "
-        "Includes expert domain mapping, discussion templates, and abbreviations."
-    ),
-    # Behavioral MCPs — longer instructions (these need workflow + decision rules)
+    # Behavioral MCPs — complex decision rules and workflow patterns
     "mcp/MCP_Serena.md": (
         "Serena: symbol-level code operations (find_symbol, replace_symbol_body, get_symbols_overview, "
         "insert_before/after_symbol, find_referencing_symbols, rename_symbol). "
@@ -157,6 +158,7 @@ INSTRUCTION_MAP = {
         "Use search_for_pattern when symbol name is unknown. "
         "Decision: symbol meaning (references, types, rename) → Serena; text patterns (strings, regex) → native Grep/Edit. "
         "Memory: activate_project → list_memories → read_memory for cross-session context. "
+        "Note: thinking tools (think_about_*, summarize_changes) are NOT active in claude-code context. "
         "Prioritize symbolic tools over full file reads."
     ),
     "mcp/MCP_Tavily.md": (
@@ -164,35 +166,6 @@ INSTRUCTION_MAP = {
         "tavily_research (multi-source synthesis), tavily_crawl (site-wide extraction), tavily_map (URL discovery). "
         "Use for current info post-knowledge-cutoff, multi-source research, fact-checking. "
         "Fallback: native WebSearch for simple queries, WebFetch for single pages."
-    ),
-    # Tool MCPs — shorter instructions (Claude already has tool descriptions from MCP servers)
-    "mcp/MCP_Context7.md": (
-        "Context7: 2-step library docs lookup. "
-        "Step 1: resolve-library-id (name → ID). Step 2: query-docs (ID + query → docs). "
-        "Never skip step 1. Default 10K tokens/query. Pin version: /org/project/version."
-    ),
-    "mcp/MCP_Sequential.md": (
-        "Sequential: multi-step reasoning chain (thought, thoughtNumber, totalThoughts, nextThoughtNeeded). "
-        "Branch with branchFromThought+branchId. Revise with isRevision+revisesThought. "
-        "Use for: 3+ component problems, root cause analysis, trade-off evaluation."
-    ),
-    "mcp/MCP_Playwright.md": (
-        "Playwright: browser E2E automation. Pattern: navigate → interact → assert. "
-        "Prefer CSS selectors, waitForSelector for async. Screenshot on failure. "
-        "Combine with DevTools for performance + visual testing."
-    ),
-    "mcp/MCP_Chrome-DevTools.md": (
-        "Chrome DevTools: performance profiling and Core Web Vitals (CLS, LCP, INP). "
-        "Workflow: start trace → reproduce → stop trace → analyze insights. "
-        "Use lighthouse_audit for scores, take_screenshot for visual validation."
-    ),
-    "mcp/MCP_Magic.md": (
-        "Magic 21st.dev: UI component library. Search → preview → customize → integrate. "
-        "Focus on React components, design system tokens, responsive patterns."
-    ),
-    "mcp/MCP_Morphllm.md": (
-        "Morphllm: bulk code transforms via pattern matching. Multi-file edits for: "
-        "rename across codebase, pattern migration, API signature updates."
     ),
 }
 

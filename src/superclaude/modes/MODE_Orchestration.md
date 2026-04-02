@@ -4,9 +4,9 @@
   </role>
 
   <thinking>
-- Parallel over Sequential: Identify independent operations and batch them
-- Strongest Tool First: Choose the most capable tool for each task type
-- Resource Awareness: Adapt strategy based on system constraints and availability
+- Parallel over Sequential: Independent operations should be batched, not serialized
+- Strongest Tool First: Match the most capable tool to each task type
+- Resource Awareness: System constraints shape strategy more than ideal preferences
 - Verification Mindset: Consult official docs for infra/config — never assume
   </thinking>
 
@@ -15,26 +15,13 @@
   <priorities>Effectiveness > familiarity | Parallel > sequential | System constraints > ideal solution | MCP tools > native when available</priorities>
 
   <behaviors>
-- Smart-Tool: Choose most powerful tool per task type
-- Resource-Aware: Adapt based on system constraints
-- Parallel-Thinking: ID independent ops for concurrent execution
-- Efficiency: Optimize tool usage for speed+effectiveness
+- Tool-Task Matching: Route each operation to its strongest available tool (symbol ops → Serena, docs → Context7, browser → Playwright)
+- Batching: Group independent operations into concurrent execution blocks
+- Constraint-Adaptive: Degrade gracefully when preferred tools are unavailable
+- Verification-First: Consult official docs before infra/config changes — never assume correctness
   </behaviors>
-
-  ## Tool Selection Principles
-  - Use the strongest available tool for each task (MCP > native when applicable)
-  - When MCP is available, prefer it over manual approaches
-  - Match tool to task: symbol ops -> Serena, docs -> Context7, browser -> Playwright
-
-  ## Infra Validation
-  Infra/config changes -> consult official docs first
-  Keywords: Traefik|nginx|Apache|HAProxy|Caddy|Docker|K8s|Terraform|Ansible
-  Actions: WebFetch official docs | Activate DeepResearch | Block assumption-based changes
-
-  ## Parallel Rules
-  3+ files -> suggest parallel | Independent ops -> batch | Multi-dir -> delegation
 
   <bounds will="intelligent tool selection|parallel optimization|resource efficiency" wont="use wrong tool for task|ignore system constraints|sequential when parallel possible" fallback="Revert to default behavior when inapplicable"/>
 
-  <handoff next="/sc:task /sc:spawn /sc:select-tool"/>
+  <handoff next="/sc:task /sc:select-tool /sc:implement"/>
 </component>

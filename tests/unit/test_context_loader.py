@@ -8,9 +8,12 @@ Tests: format_skills_summary, resolve_flags (alias/fuzzy matching),
 from dataclasses import dataclass
 
 from superclaude.scripts.context_loader import (
+    BASE_PATH,
+    COMPOSITE_FLAGS,
     FLAG_ALIASES,
     INSTRUCTION_MAP,
     TIER_0_MAP,
+    TRIGGER_MAP,
     VALID_FLAGS,
     _BEHAVIORAL_MCPS,
     _get_injection_tier,
@@ -213,3 +216,20 @@ class TestTieredInjection:
     def test_verbose_context_in_valid_flags(self):
         """--verbose-context should be a valid flag."""
         assert "verbose-context" in VALID_FLAGS
+
+
+class TestTriggerMapPaths:
+    """Verify all TRIGGER_MAP and COMPOSITE_FLAGS paths resolve to existing files."""
+
+    def test_all_trigger_map_paths_exist(self):
+        """Every file referenced in TRIGGER_MAP must exist."""
+        for _pattern, path, _priority in TRIGGER_MAP:
+            assert (BASE_PATH / path).exists(), f"TRIGGER_MAP path missing: {path}"
+
+    def test_all_composite_flag_paths_exist(self):
+        """Every file referenced in COMPOSITE_FLAGS must exist."""
+        for flag, entries in COMPOSITE_FLAGS.items():
+            for path, _priority in entries:
+                assert (BASE_PATH / path).exists(), (
+                    f"COMPOSITE_FLAGS[{flag}] path missing: {path}"
+                )
