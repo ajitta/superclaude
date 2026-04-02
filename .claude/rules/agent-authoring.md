@@ -11,8 +11,13 @@ description: One-line purpose (triggers - keyword1, keyword2)  # required | used
 model: opus|sonnet|haiku                   # optional | omit to inherit parent model (recommended)
 permissionMode: plan|default|acceptEdits   # required | system-enforced permission level
 memory: project                            # required | always "project" for SuperClaude agents
-disallowedTools: Edit, Write, NotebookEdit # optional | comma-separated, least privilege
+disallowedTools: Edit, Write, NotebookEdit # optional | comma-separated, deny-list (see tool access below)
+tools: Read, Grep, Glob, Agent             # optional | comma-separated, allow-list (see tool access below)
 color: blue|green|purple|yellow|orange|cyan # required | by role group
+effort: low|medium|high|max               # optional | reasoning depth (v2.1.69+, max is Opus 4.6 only)
+maxTurns: 10-30                            # optional | turn limit safety net (positive integer)
+skills:                                    # optional | preload skills into agent session
+  - confidence-check
 mcpServers:                                # optional | MCP servers scoped to this subagent
 ---
 ```
@@ -23,13 +28,42 @@ mcpServers:                                # optional | MCP servers scoped to th
 - `autonomy` — not an official Claude Code field, silently ignored
 - Any field not documented in Claude Code's agent specification
 
-**disallowedTools by role pattern**:
-| Pattern | disallowedTools | When to use |
-|---------|-----------------|-------------|
-| Read-only (plan, review, research, indexing) | `Edit, Write, NotebookEdit` | Agent should never modify files |
-| Execute-only (Bash but no file edits) | `Edit, Write, NotebookEdit` | Agent runs commands but never modifies files (e.g., git-workflow) |
-| General work (default mode) | `NotebookEdit` | Agent can edit code but not notebooks |
-| Full access (implementation) | *(omit field)* | Agent needs all tools |
+**Tool access** — use `tools` (allow-list) OR `disallowedTools` (deny-list), never both:
+
+| Pattern | Field | Value | When to use |
+|---------|-------|-------|-------------|
+| Read-only (plan, review, research) | `tools` | `Read, Grep, Glob, Agent, WebSearch, WebFetch` | Agent should only read/search — **preferred** for restrictive agents |
+| Read-only minimal | `tools` | `Read, Grep, Glob, Agent` | Agent should only read/search, no web access |
+| Execute-only (Bash but no file edits) | `disallowedTools` | `Edit, Write, NotebookEdit` | Agent runs commands but never modifies files (e.g., git-workflow) |
+| General work (default mode) | `disallowedTools` | `NotebookEdit` | Agent can edit code but not notebooks |
+| Full access (implementation) | *(omit both)* | — | Agent needs all tools |
+
+**Rule:** `tools` and `disallowedTools` are mutually exclusive. Use `tools` (allow-list) for restrictive agents — it fails closed when CC adds new tools. Use `disallowedTools` (deny-list) for permissive agents where listing allowed tools would be impractical.
+
+**effort** (v2.1.69+) — adaptive reasoning depth:
+| Value | Use for | Examples |
+|-------|---------|----------|
+| `low` | Mechanical/structured tasks | repo-index, git-workflow, technical-writer |
+| `medium` | Standard design + analysis (default if omitted) | architects, engineers, mentors |
+| `high` | Complex reasoning, deep debugging | system-architect, security-engineer, root-cause-analyst |
+| `max` | Multi-perspective synthesis (**Opus 4.6 only**) | deep-researcher, business-panel-experts |
+
+Precedence: `CLAUDE_CODE_EFFORT_LEVEL` env > frontmatter `effort` > session setting > model default (medium).
+
+**⚠ Values must be strings** (`low`/`medium`/`high`/`max`), not numbers. CC does not accept numeric effort values (1-5).
+
+**maxTurns** — turn limit safety net:
+| Category | maxTurns | When |
+|----------|----------|------|
+| Quick | 10 | Scanning, mechanical ops (repo-index, git-workflow) |
+| Standard | 15-20 | Most agents — analysis + output |
+| Extended | 25-30 | Deep research, complex debugging |
+| Unlimited | *(omit)* | Orchestrators (project-manager) |
+
+**skills** — preload skills into agent session:
+- Use `skills:` to preload safety/validation skills (e.g., `confidence-check` for analytical agents)
+- Token cost: ~500 tokens per preloaded skill — acceptable for safety improvement
+- Each skill name must match an existing directory in `src/superclaude/skills/`
 
 **model routing**:
 - Sonnet-tier (11 agents): execution/template/code tasks → `model: sonnet` pinned in frontmatter
@@ -151,17 +185,22 @@ This validates:
 - tool_guidance has content (Proceed/Ask First/Never)
 - Non-empty sections
 - `<gotchas>` presence (recommended, not required — no test failure if missing)
+- Optional fields (if present): effort in `low|medium|high|max`, maxTurns is positive integer
+- `tools` and `disallowedTools` are mutually exclusive
+- `skills` references existing skill directories
 
 ## Checklist for New Agents
 
 1. Create `src/superclaude/agents/<name>.md` with frontmatter + XML body
 2. Verify `name` matches filename (without `.md`)
-3. Set `permissionMode` → `disallowedTools` following least privilege
-4. Add `<memory_guide>` section (see below)
-5. Add `<gotchas>` section (recommended — project-specific failure patterns, 2-5 items)
-6. Run `uv run pytest tests/unit/test_agent_structure.py -v`
-7. Update `src/superclaude/agents/README.md` agent table
-8. Run `make deploy`
+3. Set `permissionMode` → tool access (`tools` or `disallowedTools`) following least privilege
+4. Set `effort` (low/medium/high/max) and `maxTurns` safety net
+5. Consider `skills` preload (e.g., `confidence-check` for analytical agents)
+6. Add `<memory_guide>` section (see below)
+7. Add `<gotchas>` section (recommended — project-specific failure patterns, 2-5 items)
+8. Run `uv run pytest tests/unit/test_agent_structure.py -v`
+9. Update `src/superclaude/agents/README.md` agent table
+10. Run `make deploy`
 
 ## Memory Guide (required)
 
