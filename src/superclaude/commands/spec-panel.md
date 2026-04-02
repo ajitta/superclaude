@@ -8,7 +8,7 @@ description: Multi-expert specification review and improvement using renowned so
     <mission>Multi-expert specification review and improvement using renowned software engineering experts</mission>
   </role>
 
-  <syntax>/sc:spec-panel [spec|@file] [--mode discussion|critique|socratic] [--experts "name1,name2"] [--focus requirements|architecture|testing|compliance] [--iterations N]</syntax>
+  <syntax>/sc:spec-panel [spec|@file] [--mode discussion|critique|socratic] [--experts "name1,name2"] [--focus implementability|simplicity|reliability|testing|observability] [--iterations N]</syntax>
 
   <flow>
     1. Analyze: Parse spec content
@@ -18,18 +18,15 @@ description: Multi-expert specification review and improvement using renowned so
     5. Synthesize: Improvement roadmap
   </flow>
 
-  <mcp servers="seq|c7"/>
   <personas p="arch|qa|pm"/>
 
   <experts>
-    - Wiegers (Requirements quality, SMART): "How would you validate this?"
-    - Adzic (BDD, Given/When/Then): "Concrete examples?"
-    - Cockburn (Use cases, goals): "Primary stakeholder?"
-    - Fowler (API design, patterns): "Separation of concerns?"
-    - Nygard (Production reliability): "What happens when this fails?"
-    - Newman (Microservices): "Service evolution?"
-    - Crispin (Testing strategies): "How to validate?"
-    - Hightower (Cloud native, K8s): "Cloud deployment?"
+    - Osmani (AI implementability, modular specs): "Can an AI agent execute this section by section?"
+    - Hickey (Essential complexity, data-driven design): "What's left after removing accidental complexity?"
+    - Beck (Testability, incremental design): "What's the first failing test?"
+    - Fowler (Interface design, patterns): "Are concerns properly separated?"
+    - Nygard (Failure modes, resilience): "What happens when this fails at 3AM?"
+    - Majors (Observability, production debugging): "How do you debug this in production?"
   </experts>
 
   <modes>
@@ -39,24 +36,25 @@ description: Multi-expert specification review and improvement using renowned so
   </modes>
 
   <focus_areas>
-    - requirements (Wiegers,Adzic,Cockburn): Clarity, testability, acceptance
-    - architecture (Fowler,Newman,Nygard): Interfaces, boundaries, patterns
-    - testing (Crispin,Adzic): Strategy, edge cases, validation
-    - compliance (Wiegers,Nygard): Security, regulatory, audit
+    - implementability (Osmani,Beck): AI executability, modularity, testability
+    - simplicity (Hickey,Fowler): Essential vs accidental complexity, patterns
+    - reliability (Nygard,Majors): Failure modes, resilience, observability
+    - testing (Beck,Majors): Test strategy, verification, production validation
+    - observability (Majors,Nygard): Debugging, monitoring, incident response
   </focus_areas>
 
   <examples>
 
 | Input | Output |
 |-------|--------|
-| `@auth_api.yml --mode critique --focus requirements,architecture` | Multi-focus review |
-| `'user story' --mode discussion --experts 'wiegers,adzic'` | Expert dialogue |
+| `@auth_api.yml --mode critique --focus implementability,reliability` | Multi-focus review |
+| `'user story' --mode discussion --experts 'osmani,hickey'` | Expert dialogue |
 | `@system.yml --mode socratic --iterations 3` | Deep questioning |
 
   <example name="spec-no-document" type="error-path">
     <input>/sc:spec-panel --mode critique (with no spec document provided)</input>
     <why_wrong>Panel review requires a specification document to critique. No input means no structured review possible.</why_wrong>
-    <correct>Provide a spec: /sc:spec-panel @api-spec.yml --mode critique --focus requirements</correct>
+    <correct>Provide a spec: /sc:spec-panel @api-spec.yml --mode critique --focus implementability</correct>
   </example>
   </examples>
 
