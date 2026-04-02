@@ -1,12 +1,23 @@
 ---
-status: draft
-revised: 2026-04-02
+status: superseded
+revised: 2026-04-03
 subject: Claude Code Source-Level Alignment — SuperClaude Improvement Discovery
 source: docs/analysis/claude-code-prompt-format-ajitta-2026-04-02.md (CC source analysis)
 method: sequential-thinking + verbalized-sampling (k=5, tau=0.10)
+superseded-by: Runtime verification (2026-04-03 session)
 ---
 
 # CC Source-Level Alignment: SuperClaude Improvement Discovery
+
+> **SUPERSEDED (2026-04-03):** Runtime verification revealed critical errors in this spec.
+> - `effort` values are strings (`low/medium/high/max`), not numbers (1-5) — Tier 1.1 table wrong
+> - `tools` allow-list strips ALL MCP tools (#13898) — Tier 2.1 recommendation is harmful
+> - `permissionMode` plan mode has active bugs (#40115, #10906) — implicit safety assumption invalid
+> - `mcpServers` frontmatter is broken for custom agents (#13898, open 5 months)
+>
+> **What survived:** `when-to-use` split (applied), `skills` preload (applied), Tier 4 deferrals (valid).
+> All other Tier 1-2 recommendations were either applied then reverted or skipped.
+> See `reference_cc-native-fields.md` in memory for verified field reference.
 
 CC 소스 코드 분석에서 도출된 SuperClaude 개선안. 문서화 기반이 아닌 **실제 TypeScript 인터페이스** 기반 gap 분석.
 

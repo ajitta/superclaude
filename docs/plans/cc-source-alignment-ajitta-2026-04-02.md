@@ -1,12 +1,15 @@
 ---
-status: draft
-revised: 2026-04-02
+status: superseded
+revised: 2026-04-03
 source: docs/specs/cc-source-alignment-discovery-ajitta-2026-04-02.md
 ---
 
 # CC Source-Level Alignment — Implementation Plan
 
-**Goal:** Adopt 5 unused CC-native fields (`effort`, `maxTurns`, `when-to-use`, `tools`, `skills`) across 22 agents and 5 skills to improve token economy, security, and agent quality.
+> **SUPERSEDED (2026-04-03):** Source spec had incorrect field values and harmful recommendations.
+> Applied: `when-to-use` split, `skills` preload. Reverted: `effort`, `maxTurns`, `tools`, `permissionMode`.
+
+**Original Goal:** Adopt 5 unused CC-native fields (`effort`, `maxTurns`, `when-to-use`, `tools`, `skills`) across 22 agents and 5 skills to improve token economy, security, and agent quality.
 
 **Architecture:** Frontmatter-only changes (no Python code). Test updates for optional field validation. Authoring rule updates for new field documentation.
 
