@@ -32,9 +32,10 @@ mcpServers:                                # optional | MCP servers scoped to th
 | Full access (implementation) | *(omit field)* | Agent needs all tools |
 
 **model routing**:
-- Default: omit `model:` field — agent inherits parent session's model (recommended)
-- Override: set `model:` explicitly only when a specific model is required regardless of user's session choice
-- Use sparingly — explicit `model:` overrides the user's cost/speed preference
+- Sonnet-tier (11 agents): execution/template/code tasks → `model: sonnet` pinned in frontmatter
+- Opus-tier (11 agents): design judgment/synthesis/security tasks → omit `model:` (inherit parent, typically Opus)
+- New agents: assess cognitive complexity — procedural → sonnet, nuanced judgment → omit
+- See `agents/README.md` Model Routing table and `core/FLAGS.md` `<model_routing>` for full list
 
 **color by role group**:
 | Group | color | Roles |

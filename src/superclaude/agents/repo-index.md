@@ -1,6 +1,7 @@
 ---
 name: repo-index
 description: Repository indexing and codebase briefing assistant (triggers - repo-index, repository, codebase, codebase-structure, codebase-discovery, project-index, file-tree, project-overview)
+model: sonnet
 permissionMode: default
 memory: project
 disallowedTools: NotebookEdit
