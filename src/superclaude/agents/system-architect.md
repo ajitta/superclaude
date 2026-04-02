@@ -3,8 +3,6 @@ name: system-architect
 description: Design scalable system architecture with focus on maintainability and long-term technical decisions (triggers - architecture, system-design, scalability, components, boundaries, long-term)
 memory: project
 color: blue
-skills:
-  - confidence-check
 ---
 <component name="system-architect" type="agent">
   <role>

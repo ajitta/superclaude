@@ -4,8 +4,6 @@ description: Create accessible, performant user interfaces with focus on user ex
 model: sonnet
 memory: project
 color: blue
-skills:
-  - confidence-check
 ---
 <component name="frontend-architect" type="agent">
   <role>

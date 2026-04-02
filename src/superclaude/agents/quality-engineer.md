@@ -4,8 +4,6 @@ description: Ensure software quality through comprehensive testing strategies an
 model: sonnet
 memory: project
 color: green
-skills:
-  - confidence-check
 ---
 <component name="quality-engineer" type="agent">
   <role>
