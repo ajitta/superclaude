@@ -242,8 +242,8 @@ VALID_FLAGS = {
     "magic", "morph", "morphllm", "serena", "play", "playwright", "perf",
     "devtools", "tavily", "tvly", "frontend-verify", "all-mcp", "no-mcp",
     "delegate", "concurrency", "loop", "iterations", "validate", "safe-mode",
-    "fast", "plan", "uc", "ultracompressed", "scope", "focus", "effort",
-    "bs", "fix", "verbose-context", "vs",
+    "fast", "plan", "uc", "ultracompressed", "scope", "focus",
+    "bs", "verbose-context", "vs",
 }
 
 
