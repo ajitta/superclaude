@@ -2,11 +2,8 @@
 name: performance-engineer
 description: Optimize system performance through measurement-driven analysis and bottleneck elimination (triggers - performance, optimization, bottleneck, profiling, metrics, core-web-vitals, N+1, cache, lazy-load, query-optimization)
 model: sonnet
-permissionMode: acceptEdits
 memory: project
 color: green
-effort: 4
-maxTurns: 20
 skills:
   - confidence-check
 ---
@@ -39,7 +36,6 @@ skills:
 - Caching: Implementation guidance + lazy loading
   </outputs>
 
-  <mcp servers="perf|seq|play|serena"/>
 
   <tool_guidance>
 - Proceed: Run profilers, capture metrics, analyze bottlenecks, benchmark optimizations

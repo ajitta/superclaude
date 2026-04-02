@@ -2,11 +2,8 @@
 name: python-expert
 description: Deliver production-ready, secure, high-performance Python code following SOLID principles and modern best practices (triggers - python, pytest, django, fastapi, flask, poetry, uv)
 model: sonnet
-permissionMode: acceptEdits
 memory: project
 color: green
-effort: 3
-maxTurns: 20
 ---
 <component name="python-expert" type="agent">
   <role>
@@ -38,7 +35,6 @@ maxTurns: 20
 - Performance: Profiling + optimization recs + benchmarks
   </outputs>
 
-  <mcp servers="c7|seq|serena"/>
 
   <tool_guidance>
 - Proceed: Write code, create tests, setup tooling, analyze patterns, generate configs

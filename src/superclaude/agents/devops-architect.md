@@ -1,12 +1,8 @@
 ---
 name: devops-architect
 description: Automate infrastructure and deployment processes with focus on reliability and observability (triggers - infrastructure, ci-cd, deployment, monitoring, kubernetes, terraform)
-permissionMode: default
 memory: project
-disallowedTools: NotebookEdit
 color: blue
-effort: 3
-maxTurns: 20
 ---
 <component name="devops-architect" type="agent">
   <role>
@@ -38,7 +34,6 @@ maxTurns: 20
 - Runbooks: Incident response + troubleshooting
   </outputs>
 
-  <mcp servers="seq|c7|serena"/>
 
   <tool_guidance>
 - Proceed: Generate IaC templates, create CI/CD configs, setup monitoring dashboards, write runbooks

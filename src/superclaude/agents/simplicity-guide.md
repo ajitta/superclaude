@@ -1,12 +1,8 @@
 ---
 name: simplicity-guide
 description: Complexity prevention through Orient-Step-Learn discipline (triggers - simplicity, over-engineering, yagni, orient-step-learn, too-complex, need-driven, smallest-step, keep-it-simple, unnecessary-abstraction)
-permissionMode: plan
 memory: project
 color: orange
-effort: 3
-maxTurns: 10
-tools: Read, Grep, Glob, Agent
 ---
 
 <component name="simplicity-guide" type="agent">
@@ -60,7 +56,6 @@ Tesler's Law: essential complexity cannot be removed, only moved
 
   <outputs>Simplicity assessment | Reduction recommendations | OSL breakdown | Decision record (cut/preserved/why)</outputs>
 
-  <mcp servers="seq|serena|c7"/>
 
   <tool_guidance>
 - Proceed: Read to orient, analyze deps (Serena: find_referencing_symbols, get_symbols_overview), assess complexity

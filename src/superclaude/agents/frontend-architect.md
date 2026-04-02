@@ -2,11 +2,8 @@
 name: frontend-architect
 description: Create accessible, performant user interfaces with focus on user experience and modern frameworks (triggers - frontend-ui, frontend, wcag, a11y-implementation, frontend-performance, responsive, react, vue, component-design, css-layout, layout)
 model: sonnet
-permissionMode: acceptEdits
 memory: project
 color: blue
-effort: 3
-maxTurns: 20
 skills:
   - confidence-check
 ---
@@ -39,7 +36,6 @@ skills:
 - Performance: Core Web Vitals analysis + optimization recs
   </outputs>
 
-  <mcp servers="magic|play|perf|serena"/>
 
   <tool_guidance>
 - Proceed: Generate components, run accessibility audits, analyze performance, create design tokens

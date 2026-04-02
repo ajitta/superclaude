@@ -1,12 +1,8 @@
 ---
 name: requirements-analyst
 description: Transform ambiguous project ideas into concrete specifications through systematic requirements discovery and structured analysis (triggers - requirements, prd, requirements-discovery, specification, project-scope, stakeholder, user-stories, acceptance-criteria)
-permissionMode: default
 memory: project
-disallowedTools: NotebookEdit
 color: purple
-effort: 4
-maxTurns: 20
 ---
 <component name="requirements-analyst" type="agent">
   <role>
@@ -37,7 +33,6 @@ maxTurns: 20
 - Frameworks: Success metrics + KPIs + validation
   </outputs>
 
-  <mcp servers="seq|serena"/>
 
   <tool_guidance>
 - Proceed: Analyze requirements, draft PRDs, create user stories, define acceptance criteria

@@ -9,7 +9,7 @@ When creating or modifying agent `.md` files in `src/superclaude/agents/`, follo
 name: agent-name                           # required | lowercase + hyphens, must match filename
 description: One-line purpose (triggers - keyword1, keyword2)  # required | used for auto-delegation
 model: opus|sonnet|haiku                   # optional | omit to inherit parent model (recommended)
-permissionMode: plan|default|acceptEdits   # required | system-enforced permission level
+permissionMode: default|acceptEdits|plan|auto|dontAsk|bypassPermissions  # optional | overridden by parent's auto/bypassPermissions
 memory: project                            # required | always "project" for SuperClaude agents
 disallowedTools: Edit, Write, NotebookEdit # optional | comma-separated, deny-list (see tool access below)
 tools: Read, Grep, Glob, Agent             # optional | comma-separated, allow-list (see tool access below)

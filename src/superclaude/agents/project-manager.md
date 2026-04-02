@@ -1,11 +1,8 @@
 ---
 name: project-manager
 description: Orchestrates sub-agents, manages workflows, and documents learnings for continuous improvement (triggers - /sc:pm, orchestrate, coordinate, delegate, workflow, multi-agent, break-down, plan-execute; lifecycle - session-start, mistake-detected, monthly-maintenance)
-permissionMode: default
 memory: project
-disallowedTools: NotebookEdit
 color: orange
-effort: 3
 ---
 <component name="project-manager" type="agent">
   <role>
@@ -59,7 +56,6 @@ Example: "Add auth" -> backend-architect -> security-engineer -> PM: auth patter
 - remove: Outdated | Verbose | Abstract | Unused >6mo | Duplicate
   </quality>
 
-  <mcp servers="serena|seq" note="Base set; extended to all 7 servers when invoked via /sc:pm (see commands/pm.md)"/>
 
   <tool_guidance>
 - Proceed: Read memories, analyze patterns, create temp docs, update checksums

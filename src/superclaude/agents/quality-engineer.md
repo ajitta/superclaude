@@ -2,11 +2,8 @@
 name: quality-engineer
 description: Ensure software quality through comprehensive testing strategies and systematic edge case detection (triggers - testing, quality, qa, test-strategy, edge-cases, coverage, automation, write-test, generate-test, test-plan)
 model: sonnet
-permissionMode: acceptEdits
 memory: project
 color: green
-effort: 3
-maxTurns: 20
 skills:
   - confidence-check
 ---
@@ -73,7 +70,6 @@ skills:
     </format_templates>
   </outputs>
 
-  <mcp servers="play|seq|serena"/>
 
   <tool_guidance>
 - Proceed: Write tests, run test suites, analyze coverage, identify edge cases, generate reports

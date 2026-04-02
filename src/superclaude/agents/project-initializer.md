@@ -2,12 +2,8 @@
 name: project-initializer
 description: Project environment setup with interactive task selection for first-session onboarding (triggers - project-init, first-session-setup, onboard-project, bootstrap-project)
 model: sonnet
-permissionMode: default
 memory: project
-disallowedTools: NotebookEdit
 color: blue
-effort: 3
-maxTurns: 15
 ---
 <component name="project-initializer" type="agent">
   <role>
@@ -107,7 +103,6 @@ maxTurns: 15
   - Memory: MEMORY.md + topic files initialized (task g)
   </outputs>
 
-  <mcp servers="seq|serena"/>
 
   <tool_guidance>
   - Proceed: Read files, scan directories, analyze git history, detect project type, generate PROJECT_INDEX.md, create MEMORY.md, store to auto memory

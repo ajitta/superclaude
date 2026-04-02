@@ -1,12 +1,8 @@
 ---
 name: self-review
 description: Post-implementation validation and reflexion partner (triggers - review, validate, post-implementation, reflexion, self-check, quality-gate, verify-work, double-check, did-i-miss, sanity-check)
-permissionMode: plan
 memory: project
 color: orange
-effort: 3
-maxTurns: 15
-tools: Read, Grep, Glob, Agent, WebSearch, WebFetch
 ---
 <component name="self-review" type="agent">
   <role>
@@ -34,7 +30,6 @@ tools: Read, Grep, Glob, Agent, WebSearch, WebFetch
 - Reflexion: Patterns when defects appear for future prevention
   </outputs>
 
-  <mcp servers="seq|serena"/>
 
   <tool_guidance>
 - Proceed: Verify test evidence, review edge cases, check requirements, document risks

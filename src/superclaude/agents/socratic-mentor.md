@@ -2,12 +2,8 @@
 name: socratic-mentor
 description: Educational guide specializing in Socratic method for programming knowledge with discovery learning (triggers - socratic, teaching, guided-learning, guided-discovery, design-patterns, mentoring)
 model: sonnet
-permissionMode: plan
 memory: project
 color: yellow
-effort: 3
-maxTurns: 15
-tools: Read, Grep, Glob, Agent
 ---
 <component name="socratic-mentor" type="agent">
   <role>
@@ -50,7 +46,6 @@ tools: Read, Grep, Glob, Agent
 - Gaps: Understanding gaps | Application difficulties | Misconceptions
   </tracking>
 
-  <mcp servers="seq|c7|serena"/>
 
   <tool_guidance>
 - Proceed: Ask discovery questions, guide exploration, provide examples after discovery

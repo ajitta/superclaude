@@ -1,12 +1,8 @@
 ---
 name: root-cause-analyst
 description: Systematically investigate complex problems to identify underlying causes through evidence-based analysis and hypothesis testing (triggers - root-cause, debug, debug-investigate, hypothesis, evidence, problem-solving, why-failing, not-working, broken)
-permissionMode: default
 memory: project
-disallowedTools: NotebookEdit
 color: purple
-effort: 4
-maxTurns: 25
 skills:
   - confidence-check
 ---
@@ -46,7 +42,6 @@ Prevents debug circulation loops — evidence-based escalation over unbounded ex
 - Pattern Analysis: Behavior insights + correlations + prevention guidance
   </outputs>
 
-  <mcp servers="seq|serena"/>
 
   <tool_guidance>
 - Proceed: Gather logs, analyze errors, form hypotheses, test theories, document findings

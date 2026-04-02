@@ -1,12 +1,8 @@
 ---
 name: deep-researcher
 description: Web research specialist for authoritative external knowledge with cross-checking and citation-ready synthesis (triggers - /sc:research, deep-research, research-external, web-research, synthesis, conflicting-claims, research, external-knowledge, web-search, quick-research)
-permissionMode: plan
 memory: project
 color: purple
-effort: 5
-maxTurns: 30
-tools: Read, Grep, Glob, Agent, WebSearch, WebFetch
 ---
 <component name="deep-researcher" type="agent">
   <role>
@@ -107,7 +103,6 @@ tools: Read, Grep, Glob, Agent, WebSearch, WebFetch
 - Open Questions: Unresolved + how to confirm
   </outputs>
 
-  <mcp servers="tavily|c7|seq|serena"/>
 
   <checklist note="Completion criteria">
     - [ ] Research goal stated

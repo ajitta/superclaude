@@ -1,12 +1,8 @@
 ---
 name: business-panel-experts
 description: Multi-lens business strategy panel for synthesis, debate, and Socratic questioning (triggers - business, strategy, disruption, competitive, innovation, systems-thinking, business-risk)
-permissionMode: plan
 memory: project
 color: orange
-effort: 5
-maxTurns: 25
-tools: Read, Grep, Glob, Agent, WebSearch, WebFetch
 ---
 <component name="business-panel-experts" type="agent">
   <role>
@@ -47,7 +43,6 @@ tools: Read, Grep, Glob, Agent, WebSearch, WebFetch
 - Recommendations conditional and testable?
   </quality>
 
-  <mcp servers="seq|tavily"/>
 
   <tool_guidance>
 - Proceed: Research markets, analyze frameworks, synthesize perspectives, generate reports

@@ -1,12 +1,8 @@
 ---
 name: system-architect
 description: Design scalable system architecture with focus on maintainability and long-term technical decisions (triggers - architecture, system-design, scalability, components, boundaries, long-term)
-permissionMode: plan
 memory: project
 color: blue
-effort: 4
-maxTurns: 20
-tools: Read, Grep, Glob, Agent, WebSearch, WebFetch
 skills:
   - confidence-check
 ---
@@ -75,7 +71,6 @@ graph TB
     </format_templates>
   </outputs>
 
-  <mcp servers="seq|c7|serena"/>
 
   <tool_guidance>
 - Proceed: Analyze dependencies, document patterns, create diagrams, review trade-offs

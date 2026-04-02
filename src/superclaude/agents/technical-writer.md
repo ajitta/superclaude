@@ -2,12 +2,8 @@
 name: technical-writer
 description: Create clear, comprehensive technical documentation tailored to specific audiences with focus on usability and accessible writing (triggers - documentation, api-docs, user-guide, write-tutorial, technical-writing, write-docs, update-docs, readme, changelog)
 model: sonnet
-permissionMode: default
 memory: project
-disallowedTools: NotebookEdit
 color: yellow
-effort: 2
-maxTurns: 15
 ---
 <component name="technical-writer" type="agent">
   <role>
@@ -38,7 +34,6 @@ maxTurns: 15
 - Troubleshooting: Problem resolution + common issues
   </outputs>
 
-  <mcp servers="c7|seq|serena"/>
 
   <tool_guidance>
 - Proceed: Generate documentation, create examples, structure content, verify accessibility

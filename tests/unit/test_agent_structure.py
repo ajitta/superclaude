@@ -12,10 +12,10 @@ import pytest
 
 AGENTS_DIR = Path(__file__).parent.parent.parent / "src" / "superclaude" / "agents"
 
-VALID_PERMISSION_MODES = {"acceptEdits", "default", "plan", "dontAsk", "bypassPermissions"}
+VALID_PERMISSION_MODES = {"acceptEdits", "default", "plan", "auto", "dontAsk", "bypassPermissions"}
 VALID_MEMORY_SCOPES = {"user", "project", "local"}
 VALID_COLORS = {"blue", "green", "orange", "purple", "yellow", "cyan", "red"}
-VALID_EFFORT_VALUES = {"1", "2", "3", "4", "5"}
+VALID_EFFORT_VALUES = {"low", "medium", "high", "max"}
 SKILLS_DIR = Path(__file__).parent.parent.parent / "src" / "superclaude" / "skills"
 # All agent .md files (excluding README and _ prefixed test agents)
 AGENT_FILES = sorted(
@@ -85,12 +85,11 @@ class TestAgentFrontmatter:
             f"{stem}: description too short"
         )
 
-    def test_has_permission_mode(self, agent):
+    def test_permission_mode_valid_if_present(self, agent):
+        """If permissionMode is set, it must be a valid value."""
         stem, content, fm = agent
-        assert "permissionMode" in fm, f"{stem}: frontmatter missing 'permissionMode'"
-
-    def test_permission_mode_valid(self, agent):
-        stem, content, fm = agent
+        if "permissionMode" not in fm:
+            return
         mode = fm.get("permissionMode", "")
         assert mode in VALID_PERMISSION_MODES, (
             f"{stem}: permissionMode '{mode}' not in {VALID_PERMISSION_MODES}"
@@ -280,9 +279,6 @@ class TestSimplicityGuideSpecific:
         self.content = path.read_text()
         self.fm = parse_frontmatter(self.content)
 
-    def test_permission_mode_is_plan(self):
-        assert self.fm["permissionMode"] == "plan"
-
     def test_has_osl_core_loop(self):
         """Orient-Step-Learn is the defining methodology."""
         assert "Orient-Step-Learn" in self.content
@@ -312,10 +308,6 @@ class TestSimplicityGuideSpecific:
     def test_dave_thomas_attribution(self):
         assert "Dave Thomas" in self.content
 
-    def test_mcp_servers_declared(self):
-        assert "<mcp " in self.content
-        servers = extract_xml_attr(self.content, "mcp", "servers") or ""
-        assert "serena" in servers
 
 
 class TestAgentOptionalFields:

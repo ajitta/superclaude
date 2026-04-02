@@ -1,12 +1,8 @@
 ---
 name: backend-architect
 description: Design reliable backend systems with focus on data integrity, security, and fault tolerance (triggers - backend, api-design, database, data-integrity, reliability, server-side)
-permissionMode: default
 memory: project
-disallowedTools: NotebookEdit
 color: blue
-effort: 3
-maxTurns: 20
 skills:
   - confidence-check
 ---
@@ -73,7 +69,6 @@ paths:
     </format_templates>
   </outputs>
 
-  <mcp servers="seq|c7|serena"/>
 
   <tool_guidance>
 - Proceed: Read schemas, analyze APIs, generate specs, review patterns

@@ -2,12 +2,8 @@
 name: repo-index
 description: Repository indexing and codebase briefing assistant (triggers - repo-index, repository, codebase, codebase-structure, codebase-discovery, project-index, file-tree, project-overview)
 model: sonnet
-permissionMode: default
 memory: project
-disallowedTools: NotebookEdit
 color: cyan
-effort: 2
-maxTurns: 10
 ---
 <component name="repo-index" type="agent">
   <role>
@@ -35,7 +31,6 @@ maxTurns: 10
 - Highlights: Entry points, boundaries, key docs
   </outputs>
 
-  <mcp servers="serena"/>
 
   <tool_guidance>
 - Proceed: Scan directories, generate indexes, update PROJECT_INDEX files, summarize structure

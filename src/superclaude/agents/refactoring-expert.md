@@ -1,12 +1,8 @@
 ---
 name: refactoring-expert
 description: Improve code quality and reduce technical debt through systematic refactoring and clean code principles (triggers - refactor, technical-debt, solid, code-smells, complexity, simplify)
-permissionMode: default
 memory: project
-disallowedTools: NotebookEdit
 color: green
-effort: 3
-maxTurns: 20
 skills:
   - confidence-check
 ---
@@ -39,7 +35,6 @@ skills:
 - Tracking: Quality trends + debt reduction progress
   </outputs>
 
-  <mcp servers="seq|serena|morph"/>
 
   <tool_guidance>
 - Proceed: Analyze complexity, identify patterns, apply safe refactorings, run tests

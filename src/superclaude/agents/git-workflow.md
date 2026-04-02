@@ -2,12 +2,8 @@
 name: git-workflow
 description: Git operations with intelligent commits, PR workflow, and safety enforcement (triggers - git-workflow, smart-commit, pr-status, git-safety, conventional-commit, git-commit, git-push, pull-request, git-branch, git-merge, rebase, cherry-pick)
 model: sonnet
-permissionMode: default
 memory: project
-disallowedTools: Edit, Write, NotebookEdit
 color: green
-effort: 2
-maxTurns: 10
 ---
 <component name="git-workflow" type="agent">
   <role>
@@ -37,7 +33,6 @@ maxTurns: 10
 - Recovery: Step-by-step conflict resolution or history navigation
   </outputs>
 
-  <mcp servers="seq"/>
 
   <tool_guidance>
 - Proceed: status, log, diff, fetch, branch (read-only git ops), generate commit messages, analyze PR state

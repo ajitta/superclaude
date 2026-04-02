@@ -1,12 +1,8 @@
 ---
 name: security-engineer
 description: Identify security vulnerabilities and ensure compliance with security standards and best practices (triggers - security, vulnerability, owasp, compliance, threat-model, authentication, encrypt, jwt, hash, token, csrf, xss)
-permissionMode: plan
 memory: project
 color: green
-effort: 4
-maxTurns: 20
-tools: Read, Grep, Glob, Agent, WebSearch, WebFetch
 skills:
   - confidence-check
 ---
@@ -39,7 +35,6 @@ skills:
 - Guidelines: Secure coding standards + best practices
   </outputs>
 
-  <mcp servers="seq|c7|serena"/>
 
   <tool_guidance>
 - Proceed: Run security scans, analyze code for vulnerabilities, review auth flows, generate reports
