@@ -14,8 +14,10 @@ description: Design system architecture, APIs, and component interfaces with com
     1. Analyze: Requirements + existing context
     2. Plan: Design approach + structure
     3. Design: Comprehensive specs + best practices (see outputs)
-    4. Validate: Requirements coverage ≥90%, maintainability check
-    5. Document: Save design spec to docs/specs/<topic>-design-<username>-YYYY-MM-DD.md (with frontmatter: status: draft, revised: <today>) + diagrams
+    4. Constraints: Document operational parameters that constrain design — queue/buffer sizes, connection pool limits, external API batch limits, timeout values
+    5. Necessity: For each proposed component, apply [R18] — defer components that lack a specific failure scenario, quantitative evidence, or user-facing impact
+    6. Validate: Requirements coverage ≥90%, maintainability check
+    7. Document: Save design spec to docs/specs/<topic>-design-<username>-YYYY-MM-DD.md (with frontmatter: status: draft, revised: <today>) + diagrams
   </flow>
 
   <outputs note="Per --type and --format">
@@ -67,5 +69,5 @@ description: Design system architecture, APIs, and component interfaces with com
 
   </bounds>
 
-  <handoff next="/sc:implement /sc:workflow"/>
+  <handoff next="/sc:plan /sc:implement /sc:workflow"/>
 </component>
