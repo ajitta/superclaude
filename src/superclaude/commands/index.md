@@ -32,8 +32,6 @@ description: Generate comprehensive project documentation and knowledge base wit
     - index: Comprehensive docs, full coverage, type-specific files
   </distinction>
 
-  <mcp servers="seq|c7"/>
-  <personas p="arch|scribe|qual"/>
 
   <tools>
     - Read/Grep/Glob: Structure analysis + content extraction

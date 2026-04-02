@@ -20,20 +20,11 @@ description: Feature and code implementation with intelligent persona activation
     7. Integrate: Docs + testing recs; report any blockers encountered
   </flow>
 
-  <mcp servers="seq|c7|magic|play"/>
-  <mcp_routing>
-    1. Sequential: multi-step implementation planning, dependency analysis
-    2. Context7: framework APIs, library usage patterns, best practices
-    3. Magic: UI component generation, design system compliance
-    4. Playwright: post-implementation visual verification, E2E validation
-  </mcp_routing>
-  <personas p="arch|fe|be|sec|qa|py"/>
-
   <tools>
     - Write/Edit: Code generation
     - Read/Grep/Glob: Project analysis
     - TaskCreate/TaskUpdate: Multi-file progress
-    - Task: Large-scale delegation
+    - Agent: Large-scale delegation
   </tools>
 
   <patterns>

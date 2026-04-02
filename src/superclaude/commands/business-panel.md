@@ -37,8 +37,6 @@ description: Multi-expert business analysis with adaptive interaction modes
     - --structured: Use symbol system
   </options>
 
-  <mcp servers="seq|c7"/>
-  <personas p="anal|arch|mentor" auto="true"/>
 
   <examples>
 

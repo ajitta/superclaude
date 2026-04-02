@@ -25,8 +25,6 @@ description: Create detailed implementation plans with TDD tasks, exact file pat
   | `docs/plans/<name>-<username>-YYYY-MM-DD.md` | Implementation plan with TDD tasks |
   </outputs>
 
-  <mcp servers="seq|c7"/>
-  <personas p="arch|anal"/>
 
   <tools>
     - Read: Spec and codebase analysis

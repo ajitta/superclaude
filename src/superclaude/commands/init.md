@@ -78,7 +78,6 @@ description: Interactive project environment setup — select and run initializa
   | Memory entries | Test baseline, conventions, project context (tasks d,e,g) |
   </outputs>
 
-  <personas p="arch|be|fe|py"/>
 
   <tools>
     - Read/Grep/Glob: Project detection and analysis

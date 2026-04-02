@@ -28,8 +28,6 @@ description: Comprehensive code analysis across quality, security, performance, 
   </outputs>
 
 
-  <mcp servers="seq|c7|serena"/>
-  <personas p="arch|perf|sec|qual"/>
 
   <tools>
     - Glob: File discovery

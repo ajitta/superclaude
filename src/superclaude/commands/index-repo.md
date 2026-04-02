@@ -19,8 +19,6 @@ description: Repository indexing with 94% token reduction (58K → 3K)
     6. Validate: Both files exist + size <5KB each
   </flow>
 
-  <mcp servers="serena"/>
-  <personas p="index"/>
 
   <tools>
     - Glob: Parallel structure scan (code|docs|config|tests|scripts)

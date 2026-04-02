@@ -26,8 +26,6 @@ description: Build, compile, and package projects with intelligent error handlin
 | test | dist-test/ | docs/reports/BUILD_TEST.log |
   </outputs>
 
-  <mcp servers="play"/>
-  <personas p="devops"/>
 
   <tools>
     - Bash: Build execution

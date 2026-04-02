@@ -18,8 +18,6 @@ description: Provide development estimates for tasks, features, or projects with
     5. Track: Accuracy for improvement
   </flow>
 
-  <mcp servers="seq|c7"/>
-  <personas p="arch|perf|pm"/>
 
   <tools>
     - Read/Grep/Glob: Codebase complexity analysis

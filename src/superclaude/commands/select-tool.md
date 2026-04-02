@@ -18,8 +18,6 @@ description: Intelligent MCP tool selection based on complexity scoring and oper
     5. Validate: Selection accuracy + confidence
   </flow>
 
-  <mcp servers="serena|morph"/>
-  <personas p="arch"/>
 
   <decision_matrix>
     - Symbol ops: Serena (LSP, navigation)

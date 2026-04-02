@@ -18,8 +18,6 @@ description: Apply systematic improvements to code quality, performance, and mai
     5. Document: Summary + future recommendations
   </flow>
 
-  <mcp servers="seq|c7"/>
-  <personas p="arch|perf|qual|sec|refactor|simple"/>
 
   <patterns>
     - Quality: tech debt ID → refactoring → validation

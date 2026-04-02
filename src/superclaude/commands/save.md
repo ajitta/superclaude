@@ -44,7 +44,6 @@ description: Session lifecycle management with Serena MCP + Claude auto memory f
 | all | All above | All above | Complete preservation |
   </outputs>
 
-  <mcp servers="serena"/>
 
   <tools>
     - write_memory/read_memory: Serena semantic persistence (primary)

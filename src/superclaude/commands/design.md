@@ -29,8 +29,6 @@ description: Design system architecture, APIs, and component interfaces with com
 | database | ERD.md | SCHEMA.md | migrations/*.sql |
   </outputs>
 
-  <mcp servers="seq|c7"/>
-  <personas p="arch|fe|be|anal"/>
 
   <tools>
     - Read: Requirements analysis

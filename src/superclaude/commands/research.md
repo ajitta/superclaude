@@ -23,8 +23,6 @@ description: Deep web research with adaptive planning and intelligent search
     deep: 3-4 hops, mid-checkpoints | exhaustive: 5+ hops, subagent delegation
   </depth>
 
-  <mcp servers="tavily|seq|c7|serena"/>
-  <personas p="research"/>
 
   <tools note="Routing details in modes/RESEARCH_CONFIG.md tool_routing">
     - Tavily: tavily_search, tavily_extract, tavily_research, tavily_crawl, tavily_map

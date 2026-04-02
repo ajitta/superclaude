@@ -19,7 +19,6 @@ description: Task reflection and validation using Serena MCP analysis capabiliti
     4. Persist: Write learnings for cross-session capture
   </flow>
 
-  <mcp servers="serena"/>
 
   <patterns>
     - Task: approach → goal alignment → deviation → correction

@@ -27,8 +27,6 @@ description: Generate focused documentation for components, functions, APIs, and
 | guide | GUIDE.md | install+usage+examples |
   </outputs>
 
-  <mcp servers="seq|c7"/>
-  <personas p="scribe|arch"/>
 
   <tools>
     - Read: Component + existing docs

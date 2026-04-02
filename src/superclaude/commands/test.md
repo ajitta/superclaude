@@ -27,8 +27,6 @@ description: Execute tests with coverage analysis and automated quality reportin
 | default | docs/reports/TEST_REPORT.md | summary + failures |
   </outputs>
 
-  <mcp servers="play"/>
-  <personas p="qa"/>
 
   <tools>
     - Bash: Test runner execution

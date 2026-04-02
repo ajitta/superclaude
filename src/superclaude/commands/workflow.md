@@ -26,8 +26,6 @@ description: Generate structured implementation workflows from PRDs and feature 
 | docs/reports/WORKFLOW_STATUS.md | Progress + quality gates |
   </outputs>
 
-  <mcp servers="seq|c7|magic|play|serena"/>
-  <personas p="arch|anal|fe|be|sec|ops|pm"/>
 
   <tools>
     - Read/Write/Edit: PRD analysis + workflow docs

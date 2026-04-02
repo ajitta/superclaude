@@ -28,20 +28,12 @@ description: Interactive requirements discovery through Socratic dialogue and sy
 | Conversation output | Socratic dialogue + validated requirements |
   </outputs>
 
-  <mcp servers="seq|c7|magic|serena"/>
-  <mcp_routing>
-    1. Sequential: requirements analysis, feasibility reasoning, trade-off evaluation
-    2. Context7: framework capabilities, API patterns, library comparisons
-    3. Magic: UI/UX component exploration, design system references
-    4. Serena: cross-session persistence, prior brainstorm recall
-  </mcp_routing>
-  <personas p="arch|anal|fe|be|sec|ops|pm"/>
-
   <tools>
     - Read/Write/Edit: Requirements docs + spec generation
     - TaskCreate/TaskUpdate: Multi-phase exploration tracking
-    - Task: Parallel exploration + multi-agent
-    - WebSearch: Market research + tech validation
+    - Agent: Parallel exploration + multi-agent
+    - WebSearch/Tavily: Market research + tech validation
+    - sequentialthinking: Requirements analysis, trade-off evaluation
     - sequentialthinking: Requirements analysis
   </tools>
 

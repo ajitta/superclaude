@@ -28,8 +28,6 @@ description: Systematically clean up code, remove dead code, and optimize projec
 | all | All above | docs/reports/CLEANUP_REPORT.md |
   </outputs>
 
-  <mcp servers="seq|c7"/>
-  <personas p="arch|qual|sec|refactor"/>
 
   <tools>
     - Read/Grep/Glob: Analysis + pattern detection

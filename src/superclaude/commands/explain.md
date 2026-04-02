@@ -18,8 +18,6 @@ description: Provide clear explanations of code, concepts, and system behavior w
     5. Validate: Accuracy + effectiveness
   </flow>
 
-  <mcp servers="seq|c7"/>
-  <personas p="educator|arch|sec|mentor"/>
 
   <tools>
     - Read/Grep/Glob: Code analysis + pattern ID

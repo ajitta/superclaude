@@ -28,7 +28,6 @@ description: Session lifecycle management with Serena MCP + Claude auto memory f
     Agent memory: .claude/agent-memory/{name}/MEMORY.md (project-scoped, per-agent)
   </storage>
 
-  <mcp servers="serena"/>
 
   <tools>
     - activate_project: Serena project activation (primary)

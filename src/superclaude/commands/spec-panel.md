@@ -18,7 +18,6 @@ description: Multi-expert specification review and improvement using renowned so
     5. Synthesize: Improvement roadmap
   </flow>
 
-  <personas p="arch|qa|pm"/>
 
   <experts>
     - Osmani (AI implementability, modular specs): "Can an AI agent execute this section by section?"

@@ -29,8 +29,6 @@ description: Review code changes for quality, security, and correctness with str
   | Test results | Verification evidence |
   </outputs>
 
-  <mcp servers="seq|serena"/>
-  <personas p="qa|sec"/>
 
   <tools>
     - Grep: Search for patterns across changed files

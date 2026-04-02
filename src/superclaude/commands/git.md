@@ -18,7 +18,6 @@ description: Git operations with intelligent commit messages and workflow optimi
     5. Report: Status + next steps
   </flow>
 
-  <mcp servers="seq"/>
 
   <tools>
     - Bash: Git command execution
