@@ -14,9 +14,10 @@ superseded-by: Runtime verification (2026-04-03 session)
 > - `tools` allow-list strips ALL MCP tools (#13898) — Tier 2.1 recommendation is harmful
 > - `permissionMode` plan mode has active bugs (#40115, #10906) — implicit safety assumption invalid
 > - `mcpServers` frontmatter is broken for custom agents (#13898, open 5 months)
+> - `omitClaudeMd` strips ALL CLAUDE.md including CLAUDE_SC.md (FLAGS/PRINCIPLES/RULES) — Tier 2.3 is destructive for SuperClaude
 >
 > **What survived:** `when-to-use` split (applied), `skills` preload (applied), Tier 4 deferrals (valid).
-> All other Tier 1-2 recommendations were either applied then reverted or skipped.
+> All other Tier 1-3 recommendations were either applied then reverted or skipped.
 > See `reference_cc-native-fields.md` in memory for verified field reference.
 
 CC 소스 코드 분석에서 도출된 SuperClaude 개선안. 문서화 기반이 아닌 **실제 TypeScript 인터페이스** 기반 gap 분석.
@@ -177,16 +178,18 @@ skills:
   - simplicity-coach
 ```
 
-#### 2.3 omitClaudeMd for Pure-Research Agents
+#### 2.3 ~~omitClaudeMd for Pure-Research Agents~~ REJECTED
+
+> **REJECTED (2026-04-03):** `omitClaudeMd` is undocumented (not in official sub-agents docs), and strips ALL CLAUDE.md — including `CLAUDE_SC.md` (FLAGS, PRINCIPLES, RULES). SuperClaude agents without the core framework are non-functional. Additionally: field is internal (v2.1.84+, used only by built-in Explore agent), could be renamed/removed without notice, and GitHub #40459 reports regressions (language prefs ignored, DEV/PROD confusion).
 
 | Agent | omitClaudeMd | Rationale |
 |-------|-------------|-----------|
-| deep-researcher | `true` | Web-only research, doesn't read project code |
-| business-panel-experts | `true` | Business analysis, not code-dependent |
+| ~~deep-researcher~~ | ~~`true`~~ | ~~Web-only research, doesn't read project code~~ |
+| ~~business-panel-experts~~ | ~~`true`~~ | ~~Business analysis, not code-dependent~~ |
 
-**Token savings:** ~2-5K tokens per agent session (project CLAUDE.md not loaded).
+~~**Token savings:** ~2-5K tokens per agent session (project CLAUDE.md not loaded).~~
 
-**Risk:** Agent loses project-specific rules. Only viable for agents that never touch project files.
+~~**Risk:** Agent loses project-specific rules. Only viable for agents that never touch project files.~~
 
 ---
 
