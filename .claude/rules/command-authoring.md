@@ -127,4 +127,4 @@ This validates:
 | Vague description | Poor `/menu` display | Be specific: "Build X with Y" |
 | Missing `<bounds>` | No scope/safety boundary | Add will/wont attributes |
 | Mission doesn't match description | Confusing inconsistency | Align 30%+ word overlap |
-| Decorative XML attributes (`note=` restating tag name, `type=` on bounds, `priority=` on component) | Unparsed attributes accumulate as boilerplate — token waste | Remove. Only add attributes that are parsed by code, validated by tests, or add info not derivable from tag name/content |
+| Decorative XML attributes | Unparsed attributes accumulate as boilerplate — token waste | `note=` allowed ONLY for: scope ("all commands"), safety ("do NOT"), version gates ("2.1.37+"), reference locations ("see X.md"), quantified constraints ("3-6"). Remove if tag name/content already says it |

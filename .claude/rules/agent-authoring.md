@@ -139,7 +139,7 @@ Every agent body follows this template order:
 - `<mcp>` — only list servers the agent actually uses
 - `<mission>` text must share 30%+ significant words with `description`
 - `<handoff>` — list 2-3 natural next commands
-- No decorative attributes — only add XML attributes that are parsed by code, validated by tests, or add info not derivable from tag name/content. Avoid `note=` that restates the tag name, `type=` on bounds, `priority=` on component.
+- No decorative attributes — `note=` is allowed ONLY when it adds: scope/applicability ("all commands"), safety directives ("do NOT"), version gates ("2.1.37+"), reference locations ("see X.md"), or quantified constraints ("3-6", "strict call order"). Remove if tag name or content already conveys the same meaning.
 
 ## mcpServers Field
 
