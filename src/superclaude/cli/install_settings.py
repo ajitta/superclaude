@@ -22,6 +22,7 @@ SUPERCLAUDE_HOOK_MARKERS = [
     "prettier_hook",
     "test_runner_hook",
     "file_size_guard",
+    "BLOCKED: destructive",
 ]
 
 
