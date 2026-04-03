@@ -21,14 +21,12 @@ def _get_src_root() -> Path:
 def _check_cross_refs(src: Path) -> Dict[str, Any]:
     """Run cross-reference integrity checks.
 
-    Returns dict with handoff, persona, and mcp results.
+    Returns dict with handoff and mcp results.
     """
     commands_dir = src / "commands"
     agents_dir = src / "agents"
     modes_dir = src / "modes"
     mcp_dir = src / "mcp"
-    flags_file = src / "core" / "FLAGS.md"
-
     MCP_ABBREV_MAP = {
         "seq": "MCP_Sequential.md",
         "c7": "MCP_Context7.md",
@@ -50,19 +48,8 @@ def _check_cross_refs(src: Path) -> Dict[str, Any]:
             if f.stem.upper() != "README"
         }
 
-    # Persona index
-    persona_abbrevs = set()
-    if flags_file.exists():
-        content = flags_file.read_text(encoding="utf-8")
-        match = re.search(r"<persona_index[^>]*>(.*?)</persona_index>", content, re.DOTALL)
-        if match:
-            for entry in match.group(1).strip().split("|"):
-                entry = entry.strip()
-                if "=" in entry:
-                    persona_abbrevs.add(entry.split("=")[0].strip())
-
     # Scan all content files
-    issues = {"handoff": [], "persona": [], "mcp": [], "triggers": []}
+    issues = {"handoff": [], "mcp": [], "triggers": []}
 
     content_files = []
     for d in (commands_dir, agents_dir, modes_dir):
@@ -82,14 +69,6 @@ def _check_cross_refs(src: Path) -> Dict[str, Any]:
             for t in targets:
                 if f"/sc:{t}" not in HANDOFF_SKIP and t not in available_commands:
                     issues["handoff"].append(f"{file_id}: /sc:{t}")
-
-        # Persona checks
-        persona_match = re.search(r'<personas\s+p="([^"]*)"', content)
-        if persona_match:
-            for ref in persona_match.group(1).split("|"):
-                ref = ref.strip()
-                if ref and ref not in persona_abbrevs:
-                    issues["persona"].append(f"{file_id}: {ref}")
 
         # MCP checks
         mcp_match = re.search(r'<mcp\s+servers="([^"]*)"', content)

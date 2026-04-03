@@ -76,9 +76,6 @@ Typos: fuzzy-matched (Levenshtein ≤ 2) → suggestion in HTML comment
 - Scope: system > project > module > file
   </priority_rules>
 
-  <persona_index note="Agent abbreviations for p='...'">
-  arch=system-architect(architecture) | fe=frontend-architect(UI,a11y) | be=backend-architect(API,db,security) | sec=security-engineer(OWASP) | qa=quality-engineer(testing) | qual=quality-engineer(alias) | ops=devops-architect(CI/CD,K8s) | devops=devops-architect(alias) | pm=project-manager(orchestration) | perf=performance-engineer(profiling) | refactor=refactoring-expert(tech-debt) | root=root-cause-analyst(debug) | anal=requirements-analyst(strategy) | educator=learning-guide(education) | mentor=socratic-mentor(guidance) | scribe=technical-writer(docs) | py=python-expert(python) | panel=business-panel-experts(business) | research=deep-researcher(web) | review=self-review(validation) | index=repo-index(indexing) | simple=simplicity-guide(OSL,YAGNI) | git=git-workflow(git,commits,PR)
-  </persona_index>
 
   <model_routing note="Cost optimization — ~50% of agents pinned to sonnet">
   Sonnet (execution, templates, code): repo-index, git-workflow, project-initializer, technical-writer, learning-guide, socratic-mentor, quality-engineer, python-expert, performance-engineer, frontend-architect
