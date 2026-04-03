@@ -41,7 +41,7 @@
         "matcher": "Read",
         "hooks": [
           {
-            "_comment": "[superclaude] safety — blocks Read on files >80KB to prevent MaxFileReadTokenExceededError",
+            "_comment": "[superclaude] safety — blocks Read on files >30KB for token conservation",
             "type": "command",
             "command": "python3 {{SCRIPTS_PATH}}/file_size_guard.py",
             "timeout": 5

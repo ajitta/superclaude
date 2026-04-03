@@ -39,8 +39,8 @@ Intent Propagation: when delegating to sub-agents, include user's original reque
 [R13] Intent Verification 🔴: before non-trivial work (>3 steps, ambiguous scope, or new task direction), restate user's intent in 1-2 sentences and confirm. Skip for: single-file edits, explicit file paths, continuation of confirmed plan.
 [R14] Correction Capture 🟡: when user corrects a contextual misunderstanding (not a typo), save structured feedback memory: {trigger, misread, actual_intent, violated_rule: "[RXX]", prevention}
 [R15] Verification 🔴: before claiming done, run full test suite fresh (not cached); compare pass count to baseline; cite evidence ("42/42 pass, baseline 40")
-[R16] Safe Read 🟡: files of unknown size → use limit parameter or check wc -c first; logs, transcripts, changelogs (>80KB) → prefer Grep or Bash over Read; plan files → keep under 15KB, split into phases for large implementations
-[R17] Serena-First 🟢: code exploration → prefer Serena symbolic tools (get_symbols_overview, find_symbol) over Read; reserve Read for non-code files, unknown formats, or when Serena unavailable
+[R16] Safe Read 🟡: always use limit parameter for files of unknown size (hook blocks >30KB without limit); small files (<5KB) auto-exempt; config formats (.json, .yaml, .yml, .toml, .cfg, .ini, .env) exempt <30KB; large JSON/data files → use jq for field queries instead of Read; logs, transcripts, changelogs → prefer Grep over Read; plan files → keep under 15KB, split into phases for large implementations
+[R17] Serena-First 🟡: code exploration fallback chain: 1. Serena symbolic tools (get_symbols_overview, find_symbol) — primary; 2. ast-grep MCP (if configured) — structural AST search fallback; 3. Grep with targeted patterns — last resort; reserve Read for non-code files, unknown formats, or when all above insufficient
 [R18] Necessity Test 🔴: before proposing any unsolicited code change, answer "Is the system broken without this?" — "safer/better" alone is insufficient. Require: specific failure scenario, quantitative evidence, or user-facing impact. "Deferred to post-MVP review" is a valid design decision
   <examples>
   | Scenario | Wrong | Right | Rule |
