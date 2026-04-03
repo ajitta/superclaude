@@ -15,6 +15,7 @@ Agents are managed by Claude Code's native agent delegation system. Auto-selecte
 | `deep-researcher` | acceptEdits | Web research with cross-checking and citation-ready synthesis |
 | `root-cause-analyst` | default | Systematic problem diagnosis through hypothesis testing |
 | `requirements-analyst` | default | Requirements gathering through systematic discovery |
+| `insight-analyst` | default | Find and present relevant project insights with contextual analysis |
 
 ### Architecture & Design
 
@@ -80,11 +81,11 @@ Agents are managed by Claude Code's native agent delegation system. Auto-selecte
 
 ## Model Routing
 
-10 agents pinned to `model: sonnet` (execution/template tasks), 12 inherit parent (judgment/synthesis tasks).
+11 agents pinned to `model: sonnet` (execution/template tasks), 12 inherit parent (judgment/synthesis tasks).
 
 | Tier | model: | Agents | Criteria |
 |------|--------|--------|----------|
-| Sonnet | `sonnet` | repo-index, git-workflow, project-initializer, technical-writer, learning-guide, socratic-mentor, quality-engineer, python-expert, performance-engineer, frontend-architect | Procedural, template-driven, code generation |
+| Sonnet | `sonnet` | repo-index, git-workflow, project-initializer, technical-writer, learning-guide, socratic-mentor, quality-engineer, python-expert, performance-engineer, frontend-architect, insight-analyst | Procedural, template-driven, code generation |
 | Opus | *(inherit)* | system-architect, deep-researcher, business-panel-experts, simplicity-guide, root-cause-analyst, requirements-analyst, backend-architect, security-engineer, project-manager, devops-architect, refactoring-expert, self-review | Design judgment, high reversal cost, multi-framework synthesis |
 
 Override: set `model:` in any agent's frontmatter to change its routing.

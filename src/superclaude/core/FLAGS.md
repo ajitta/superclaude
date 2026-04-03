@@ -36,7 +36,7 @@ WebSearch: fact-check, current info → native web search (no flag needed)
 --delegate [auto|files|folders]: >7 dirs, >50 files, complexity >0.8 → sub-agent parallel
   Direct work for: single-file edits, sequential ops, <3 steps, simple searches (grep/glob)
   Sub-agents for: parallel-capable, isolated context, independent work streams, >5 files
-  Model routing: 10 agents pinned to sonnet (execution tasks), 12 inherit parent (judgment tasks)
+  Model routing: 11 agents pinned to sonnet (execution tasks), 12 inherit parent (judgment tasks)
   Override: user can override any agent's model: field in frontmatter
 --concurrency [n]: 1-15 → batch independent tool calls into single message (e.g. 5 parallel Grep calls)
 --loop: iterative improvement — execute task → self-evaluate output → identify gaps → re-execute → repeat until no meaningful improvement found. Report iteration count when done.
@@ -46,7 +46,7 @@ WebSearch: fact-check, current info → native web search (no flag needed)
 --safe-mode: usage >85%, production, critical → max validation, conservative, auto --uc
 --fast: same model, faster output (v2.1.36+)
 --p [abbr,...]: agent preference — bias sub-agent delegation toward specific agents. Multi-select: --p=sec,perf,qa
-  Abbrevs: arch(system-architect) fe(frontend) be(backend) sec(security) qa(quality) ops(devops) pm(project-manager) perf(performance) refactor(refactoring) root(root-cause) req(requirements) py(python) panel(business) research(deep-researcher) review(self-review) simple(simplicity) git(git-workflow) scribe(technical-writer) educator(learning) mentor(socratic) index(repo-index) init(project-initializer)
+  Abbrevs: arch(system-architect) fe(frontend) be(backend) sec(security) qa(quality) ops(devops) pm(project-manager) perf(performance) refactor(refactoring) root(root-cause) req(requirements) py(python) panel(business) research(deep-researcher) review(self-review) simple(simplicity) git(git-workflow) scribe(technical-writer) educator(learning) mentor(socratic) index(repo-index) init(project-initializer) insight(insight-analyst)
 --vs [standard|cot|multi]: "multiple perspectives", diverse responses → verbalized sampling (distribution-level diversity, probability-weighted candidates). Bracket sub-params: [k:3-7], [tau:0.01-0.20], [turns:2-5], [no-synthesis]
 --verbose-context: force full .md injection for all triggered contexts, bypassing INSTRUCTION_MAP short instructions. Use when short instructions cause incorrect MCP behavior.
 Agent Teams: experimental (CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1) — parallel coordination
@@ -80,7 +80,7 @@ Typos: fuzzy-matched (Levenshtein ≤ 2) → suggestion in HTML comment
 
 
   <model_routing note="Cost optimization — ~50% of agents pinned to sonnet">
-  Sonnet (execution, templates, code): repo-index, git-workflow, project-initializer, technical-writer, learning-guide, socratic-mentor, quality-engineer, python-expert, performance-engineer, frontend-architect
+  Sonnet (execution, templates, code): repo-index, git-workflow, project-initializer, technical-writer, learning-guide, socratic-mentor, quality-engineer, python-expert, performance-engineer, frontend-architect, insight-analyst
   Opus (synthesis, judgment, architecture, security): system-architect, deep-researcher, business-panel-experts, simplicity-guide, root-cause-analyst, requirements-analyst, backend-architect, security-engineer, project-manager, devops-architect, refactoring-expert, self-review
   Criteria: procedural/template-driven → sonnet | design judgment/high reversal cost/multi-framework synthesis → opus (inherit parent)
   </model_routing>

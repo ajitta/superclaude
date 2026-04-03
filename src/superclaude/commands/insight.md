@@ -14,7 +14,7 @@ description: Capture structured session insights to per-project JSONL for human 
     1. Mode: Determine mode — capture (default/text), list, query, or stats
     2. Capture (default): Analyze session → propose 3-7 insights → present for user approval → append approved
     3. Capture (text): Take user text → infer type + tags → structure as JSON → present → append
-    4. Dedup: Before proposing, Read last 20 lines of .claude/insights.jsonl → skip already-captured topics
+    4. Dedup: Before proposing, Read last 20 lines of .claude/insights.jsonl → skip already-captured topics. For annotations, also check existing ref_ts to avoid duplicates.
     5. Append: Use Bash `echo '...' >> .claude/insights.jsonl` (NOT Write tool — Write overwrites)
     6. Query: For --list/--query/--stats, run jq via Bash (fallback: python3 -c "import json; ...")
   </flow>
@@ -34,8 +34,11 @@ description: Capture structured session insights to per-project JSONL for human 
   </storage>
 
   <schema>
-  Required: ts (ISO 8601), type (feedback|decision|discovery|pattern|metric), insight (one-line string)
-  Optional: session (topic slug), rule (R13, R18...), context (why it matters), action (what was done), files (string[]), tags (string[])
+  Required: ts (ISO 8601), type (feedback|decision|discovery|pattern|metric|annotation), insight (one-line string)
+  Optional: author (git username, always emitted), session (topic slug), rule (R13, R18...), context (why it matters), action (what was done), files (string[]), tags (string[]), ref_ts (ISO 8601, annotation target)
+
+  Author: `git config user.name` (lowercase, no spaces) — always populated, not enforced for backward compat.
+  Timestamp format: second precision, colon offset (YYYY-MM-DDTHH:MM:SS+HH:MM).
 
   Type taxonomy:
   - feedback: user correction or validated approach
@@ -43,6 +46,13 @@ description: Capture structured session insights to per-project JSONL for human 
   - discovery: unexpected finding during work
   - pattern: recurring problem/solution
   - metric: quantitative result
+  - annotation: relevance link to existing insight (requires ref_ts targeting a non-annotation entry)
+
+  Annotation rules:
+  - ref_ts must target an existing non-annotation entry's ts (no annotation chains)
+  - author on annotations = git user who invoked the agent, not the agent itself
+  - Agent must verify ref_ts target exists before appending
+  - Agent must check for existing annotations with same ref_ts to avoid duplicates
   </schema>
 
   <tools>
@@ -62,11 +72,23 @@ description: Capture structured session insights to per-project JSONL for human 
   --query tags=rules:
     jq 'select(.tags // [] | index("rules"))' .claude/insights.jsonl
 
-  --stats:
+  --stats (excludes annotations):
+    jq -r 'select(.type != "annotation") | .type' .claude/insights.jsonl | sort | uniq -c | sort -rn
+
+  --stats --all (includes annotations):
     jq -r '.type' .claude/insights.jsonl | sort | uniq -c | sort -rn
 
+  --query author=chosh1179:
+    jq 'select(.author=="chosh1179")' .claude/insights.jsonl
+
+  --query type=annotation:
+    jq 'select(.type=="annotation")' .claude/insights.jsonl
+
+  Annotations for a specific insight:
+    jq 'select(.ref_ts=="2026-04-03T18:00:00+09:00")' .claude/insights.jsonl
+
   Python fallback (--list):
-    python3 -c "import json;[print(f'{r[\"ts\"]} [{r[\"type\"]}] {r[\"insight\"]}') for r in (json.loads(l) for l in open('.claude/insights.jsonl'))]" | tail -20
+    python3 -c "import json;[print(f'{r[\"ts\"]} [{r.get(\"author\",\"unknown\")}] [{r[\"type\"]}] {r[\"insight\"]}') for r in (json.loads(l) for l in open('.claude/insights.jsonl'))]" | tail -20
   </query_reference>
 
   <examples>
@@ -78,6 +100,7 @@ description: Capture structured session insights to per-project JSONL for human 
   | `/sc:insight --query type=feedback` | All feedback-type insights |
   | `/sc:insight --query tags=rules` | All insights tagged "rules" |
   | `/sc:insight --stats` | Type counts + top tags |
+  | `/sc:insight --query type=annotation` | All annotation entries |
   </examples>
 
   <gotchas>
