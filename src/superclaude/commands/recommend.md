@@ -14,7 +14,7 @@ description: Ultra-intelligent command recommendation engine for optimal SuperCl
     1. Analyze: User request + project context
     2. Classify: Category + expertise level
     3. Map: Keywords → commands + flags
-    4. Recommend: Workflow + MCP flags + personas
+    4. Recommend: Workflow + MCP flags + agents
   </flow>
 
   <keyword_map>
@@ -50,8 +50,6 @@ description: Ultra-intelligent command recommendation engine for optimal SuperCl
   | `'make dashboard load faster'` | perf: /sc:analyze --focus perf → /sc:improve --type performance |
   | `'improve the code'` | ambiguous: ask what aspect (perf/quality/security/arch) → /sc:analyze |
   </examples>
-
-  <token_note>Low consumption — recommendation-only, no file modifications</token_note>
 
   <bounds will="intelligent mapping|project context|expertise adaptation" wont="execute commands|modify files" fallback="Ask user to clarify when request is too ambiguous to map"/>
 

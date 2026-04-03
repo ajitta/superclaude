@@ -52,7 +52,6 @@ Every command body follows this template:
   </outputs>
 
   <mcp servers="seq|c7|..."/>
-  <personas p="arch|be|fe|..."/>
 
   <tools>
     - ToolName: purpose
@@ -67,8 +66,6 @@ Every command body follows this template:
   |-------|--------|
   | `/sc:command-name arg` | Expected result |
   </examples>
-
-  <token_note>Consumption level — guidance for context management</token_note>
 
   <bounds will="core capabilities" wont="out-of-scope actions" fallback="Escalation path">
     Completion criteria and handoff behavior
@@ -87,7 +84,7 @@ Every command body follows this template:
 - `<flow>` — numbered execution steps (minimum 2)
 - `<bounds>` — must include `will` and `wont` attributes
 - `<handoff>` — list 2-3 natural next commands
-- Optional sections: `<outputs>`, `<mcp>`, `<personas>`, `<tools>`, `<gotchas>`, `<examples>`, `<token_note>`
+- Optional sections: `<outputs>`, `<mcp>`, `<tools>`, `<gotchas>`, `<examples>`
 
 ## Validation
 

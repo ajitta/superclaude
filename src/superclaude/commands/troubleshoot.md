@@ -52,8 +52,6 @@ description: Diagnose and resolve issues in code, builds, deployments, and syste
 
   </examples>
 
-  <token_note>Medium-high consumption — diagnostic cycles use significant context; limit with --type for focused diagnosis</token_note>
-
   <gotchas>
   - evidence-fabrication: Do not construct hypothetical failure scenarios to justify a pre-existing recommendation. Evidence (code, config, measurements) must precede proposals.
   - seq-loop: If sequential thinking reaches the same conclusion twice on the same question, terminate that analysis branch and move to next topic.

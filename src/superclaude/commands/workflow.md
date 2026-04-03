@@ -13,7 +13,7 @@ description: Generate structured implementation workflows from PRDs and feature 
   <flow>
     1. Analyze: Parse PRD + understand requirements
     2. Plan: Workflow structure + dependency mapping
-    3. Coordinate: Multi-persona + domain expertise
+    3. Coordinate: Multi-agent + domain expertise
     4. Execute: Step-by-step workflows + task coordination
     5. Validate: Quality gates + workflow completeness
   </flow>
@@ -21,9 +21,8 @@ description: Generate structured implementation workflows from PRDs and feature 
   <outputs>
 | Artifact | Purpose |
 |----------|---------|
-| docs/reports/WORKFLOW.md | Implementation workflow document |
+| `docs/plans/<topic>-workflow-<username>-YYYY-MM-DD.md` | Implementation workflow document (with Status section) |
 | TaskCreate/TaskUpdate items | Task tracking hierarchy |
-| docs/reports/WORKFLOW_STATUS.md | Progress + quality gates |
   </outputs>
 
 
@@ -59,11 +58,9 @@ description: Generate structured implementation workflows from PRDs and feature 
 
   </examples>
 
-  <token_note>High consumption — multi-persona coordination; use --depth shallow for lighter analysis</token_note>
+  <bounds will="comprehensive workflows|multi-agent+MCP|cross-session management" wont="execute impl beyond planning|override dev process|generate without analysis" fallback="Ask user for guidance when uncertain">
 
-  <bounds will="comprehensive workflows|multi-persona+MCP|cross-session management" wont="execute impl beyond planning|override dev process|generate without analysis" fallback="Ask user for guidance when uncertain">
-
-    Produce workflow document, then complete | Defer implementation to /sc:implement or /sc:task | Planning and coordination only → Output: docs/reports/WORKFLOW.md with task hierarchy and quality gates
+    Produce workflow document, then complete | Defer implementation to /sc:implement or /sc:task | Planning and coordination only → Output: docs/plans/<topic>-workflow-<username>-YYYY-MM-DD.md with task hierarchy and quality gates
 
   </bounds>
 

@@ -9,7 +9,7 @@ Content Type    Role                Analogy         Delivery
 ─────────────   ──────────────────  ─────────────   ──────────────────────────
 core/           Framework DNA       Constitution    Always loaded (CLAUDE_SC.md)
 modes/          Mindset overlay     Mood/Posture    On-demand (context_loader)
-agents/         Domain persona      Specialist      CC-native delegation
+agents/         Domain expert       Specialist      CC-native delegation
 commands/       Workflow entry      Menu item       CC-native /sc:*
 skills/         Runtime hooks       Safety gate     CC-native (hooks + safety only)
 mcp/            Tool docs+config    Tool manual     context_loader + install_mcp
@@ -44,9 +44,9 @@ Situational cognitive overlays that modify Claude's thinking, communication, pri
 
 ### agents/ — WHO TO BE
 
-Domain expert personas with specialized knowledge, behaviors, and tool preferences. Managed by Claude Code's native agent delegation system — auto-selected based on task keywords in the `description` frontmatter field.
+Domain expert agents with specialized knowledge, behaviors, and tool preferences. Managed by Claude Code's native agent delegation system — auto-selected based on task keywords in the `description` frontmatter field.
 
-**Contract:** Each agent is a self-contained persona with frontmatter (identity + permissions) and XML body (expertise + behavior). Agents receive tasks from commands and produce structured outputs.
+**Contract:** Each agent is a self-contained definition with frontmatter (identity + permissions) and XML body (expertise + behavior). Agents receive tasks from commands and produce structured outputs.
 
 ### commands/ — WHAT TO INVOKE
 
@@ -105,7 +105,7 @@ Session Start
 5. User invokes → commands/                                   ← /sc:* slash commands
   │
   ▼
-6. CC delegation → agents/                                    ← task-based persona selection
+6. CC delegation → agents/                                    ← task-based agent selection
                    (description triggers, model routing,
                     permissionMode enforcement)
 ```
@@ -125,12 +125,12 @@ The same domain often has content in three directories serving different roles:
 ```
 Domain: "Research"
   ├── modes/MODE_DeepResearch.md      → HOW TO THINK about research (mindset)
-  ├── agents/deep-researcher.md        → WHO TO BE when researching (persona)
+  ├── agents/deep-researcher.md        → WHO TO BE when researching (agent)
   └── commands/research.md            → WHAT TO DO for a research task (workflow)
 
 Domain: "Business"
   ├── modes/MODE_Business_Panel.md    → HOW TO THINK about business analysis (mindset)
-  ├── agents/business-panel-experts.md → WHO TO BE in a business panel (persona)
+  ├── agents/business-panel-experts.md → WHO TO BE in a business panel (agent)
   └── commands/business-panel.md      → WHAT TO DO for business analysis (workflow)
 ```
 

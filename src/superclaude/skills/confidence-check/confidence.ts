@@ -59,7 +59,7 @@ export class ConfidenceChecker {
         name: "architecture",
         passed: ctx.architecture_check_complete ?? false,
         message: ctx.architecture_check_complete
-          ? "Arch compliant"
+          ? "Architecture compliant"
           : "Verify architecture",
         weight: W.ARCH,
       },

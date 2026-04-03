@@ -21,9 +21,9 @@ description: Build, compile, and package projects with intelligent error handlin
   <outputs note="Per --type flag">
 | Type | Artifacts | Report |
 |------|-----------|--------|
-| dev | dist-dev/ | docs/reports/BUILD_DEV.log |
-| prod | dist/ | docs/reports/BUILD_REPORT.md |
-| test | dist-test/ | docs/reports/BUILD_TEST.log |
+| dev | `dist-dev/` (tool-generated) | Console: build output + warnings |
+| prod | `dist/` (tool-generated) | Console: bundle size + optimization summary |
+| test | `dist-test/` (tool-generated) | Console: build output + test config |
   </outputs>
 
 
@@ -57,8 +57,6 @@ description: Build, compile, and package projects with intelligent error handlin
   </example>
 
   </examples>
-
-  <token_note>Medium consumption — build output can be verbose; use --type dev for lighter builds</token_note>
 
   <bounds will="execute build|error analysis|optimization recs" wont="modify build config|install deps|deploy" fallback="Ask user for guidance when uncertain">
 

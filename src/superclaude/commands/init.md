@@ -102,8 +102,6 @@ description: Interactive project environment setup — select and run initializa
   </example>
   </examples>
 
-  <token_note>Medium-high consumption — task (a) delegates to repo-index for efficiency. Use --quick for minimal context usage.</token_note>
-
   <bounds will="interactive task menu|dependency-aware execution|parallel batching|idempotent setup|safe environment init" wont="auto-execute without selection|overwrite existing files|install without confirmation|skip dependency validation" fallback="Ask user when project type undetectable or when existing config conflicts with proposed setup">
     Present menu and execute selected tasks | Validate dependencies before execution | Report results with artifact locations
   </bounds>

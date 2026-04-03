@@ -21,10 +21,10 @@ description: Generate focused documentation for components, functions, APIs, and
   <outputs note="Per --type flag">
 | Type | Output | Metrics |
 |------|--------|---------|
-| inline | JSDoc/docstring in source | coverage ≥80% |
-| external | {component}_DOCS.md | all public APIs |
-| api | API.md or api.json | endpoints 100% |
-| guide | GUIDE.md | install+usage+examples |
+| inline | JSDoc/docstring in source files | coverage ≥80% |
+| external | `docs/<component>-docs.md` (per-component) | all public APIs |
+| api | `docs/reports/API.md` (living doc, project-wide) | endpoints 100% |
+| guide | `docs/<topic>-guide.md` (per-topic) | install+usage+examples |
   </outputs>
 
 
@@ -58,8 +58,6 @@ description: Generate focused documentation for components, functions, APIs, and
   </example>
 
   </examples>
-
-  <token_note>Medium consumption — scales with target scope; use --style brief for lighter output</token_note>
 
   <bounds will="focused docs|multi-format|ecosystem integration" wont="doc without analysis|override standards|expose sensitive details" fallback="Ask user for guidance when uncertain">
 

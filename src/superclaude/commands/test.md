@@ -21,10 +21,10 @@ description: Execute tests with coverage analysis and automated quality reportin
   <outputs>
 | Flag | Output | Metrics |
 |------|--------|---------|
-| --coverage | coverage/ | line ≥80%, branch ≥70% |
-| --type unit | docs/reports/TEST_UNIT.log | pass rate |
-| --type e2e | docs/reports/TEST_E2E.log | screenshots if fail |
-| default | docs/reports/TEST_REPORT.md | summary + failures |
+| --coverage | `coverage/` (tool-generated) | line ≥80%, branch ≥70% |
+| --type unit | Console: pass/fail summary | pass rate + failure details |
+| --type e2e | Console: flow results | screenshots if fail (Playwright) |
+| default | Console: test summary | pass count, failures, duration |
   </outputs>
 
 
@@ -60,8 +60,6 @@ description: Execute tests with coverage analysis and automated quality reportin
   </example>
 
   </examples>
-
-  <token_note>Medium consumption — E2E tests with --play use more context than unit tests</token_note>
 
   <bounds will="execute existing tests|coverage reports|failure analysis" wont="generate test cases|modify framework config|destructive changes" fallback="Ask user for guidance when uncertain">
 

@@ -53,7 +53,7 @@ description: Comprehensive code analysis across quality, security, performance, 
   </rules_analysis>
 
   <patterns>
-    - Domain: Quality|Security|Perf|Arch|Rules → specialized assessment
+    - Domain: Quality|Security|Performance|Architecture|Rules → specialized assessment
     - Recognition: Language detect → appropriate techniques
     - Severity: Issue classification → prioritized recs
   </patterns>
@@ -64,8 +64,8 @@ description: Comprehensive code analysis across quality, security, performance, 
 |-------|--------|
 | `/sc:analyze` | Multi-domain findings inline |
 | `src/auth --focus security --deep` | Security vulnerability assessment |
-| `--focus performance --format report` | ANALYSIS_REPORT.md with bottleneck roadmap |
-| `src/components --focus quality --format json` | analysis.json with code smell findings |
+| `--focus performance --format report` | `docs/analysis/<target>-<user>-YYYY-MM-DD.md` with bottleneck roadmap |
+| `src/components --focus quality --format json` | `docs/analysis/<target>-<user>-YYYY-MM-DD.json` with code smell findings |
 | `--focus rules` | Rule heatmap + maturity label + recommendations |
 
   <example name="invalid-focus" type="error-path">
@@ -75,8 +75,6 @@ description: Comprehensive code analysis across quality, security, performance, 
   </example>
 
   </examples>
-
-  <token_note>Medium-high consumption — use --scope file or --scope module to limit analysis boundary</token_note>
 
   <gotchas>
   - evidence-fabrication: Do not construct hypothetical failure scenarios to justify a pre-existing recommendation. Evidence (code, config, measurements) must precede proposals.

@@ -52,7 +52,7 @@ color: blue
   <memory_guide>
   - Components: design system decisions, component API patterns, token conventions
   - A11y-Issues: recurring accessibility failures and proven resolutions
-  - Perf-Baselines: Core Web Vitals baselines and optimization history
+  - Performance-Baselines: Core Web Vitals baselines and optimization history
     <refs agents="system-architect,performance-engineer"/>
   </memory_guide>
 

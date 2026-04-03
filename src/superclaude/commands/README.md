@@ -85,6 +85,6 @@ Validation: `uv run python -m pytest tests/unit/test_command_structure.py -v`
 
 ## Related
 
-- `agents/` — Domain personas that commands route to
+- `agents/` — Domain expert agents that commands route to
 - `modes/` — Cognitive overlays activated by commands
 - `skills/` — Execution containers with hooks and tool restrictions

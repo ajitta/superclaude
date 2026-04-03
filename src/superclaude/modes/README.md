@@ -48,6 +48,6 @@ Validation: `uv run python -m pytest tests/unit/test_mode_structure.py -v`
 ## Related
 
 - `core/FLAGS.md` — Flag definitions and auto-detection triggers
-- `agents/` — Domain personas (modes shape mindset, agents shape expertise)
+- `agents/` — Domain expert agents (modes shape mindset, agents shape expertise)
 - `commands/` — Slash commands that may activate modes
 - `scripts/context_loader.py` — On-demand delivery mechanism

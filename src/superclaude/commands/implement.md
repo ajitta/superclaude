@@ -1,18 +1,18 @@
 ---
-description: Feature and code implementation with intelligent persona activation and MCP integration
+description: Feature and code implementation with intelligent agent delegation and MCP integration
 ---
 <component name="implement" type="command">
 
   <role>
     /sc:implement
-    <mission>Feature and code implementation with intelligent persona activation and MCP integration</mission>
+    <mission>Feature and code implementation with intelligent agent delegation and MCP integration</mission>
   </role>
 
   <syntax>/sc:implement [feature] [--plan docs/plans/...] [--type component|api|service|feature] [--framework react|vue|express] [--safe] [--with-tests]</syntax>
 
   <flow>
     1. Load: If --plan provided, read plan document and extract tasks; otherwise analyze requirements + tech context
-    2. Plan: Approach + activate personas; for plan mode, follow task order exactly
+    2. Plan: Approach + delegate to agents; for plan mode, follow task order exactly
     3. Checkpoint: If changes affect >3 files → present numbered plan → wait for user approval before editing
     4. Execute: Code + framework best practices; for plan mode, mark tasks complete as you go
     5. Phase Gate: After each phase/task group — build + run, then: "Does this already solve the next phase's problem?" If yes, skip with reason
@@ -28,18 +28,18 @@ description: Feature and code implementation with intelligent persona activation
   </tools>
 
   <patterns>
-    - Context: Framework detect → persona + MCP activation
+    - Context: Framework detect → agent + MCP activation
     - Flow: Requirements → code → validation → integration
-    - Multi-Persona: FE + BE + Sec → comprehensive solutions
+    - Multi-Agent: frontend + backend + security → comprehensive solutions
     - Quality: Impl → testing → docs → validation
   </patterns>
 
   <examples>
 | Input | Output |
 |-------|--------|
-| `user profile --type component --framework react` | Magic UI + FE best practices |
-| `auth API --type api --safe --with-tests` | BE + Sec personas |
-| `payment system --type feature --with-tests` | Multi-persona coordination |
+| `user profile --type component --framework react` | Magic UI + frontend best practices |
+| `auth API --type api --safe --with-tests` | backend + security agents |
+| `payment system --type feature --with-tests` | Multi-agent coordination |
 | `dashboard widget --framework vue` | C7 Vue patterns |
   <example name="scope-creep" type="error-path">
     <input>/sc:implement 'add logout button' (agent also refactors auth module and adds session management)</input>
@@ -48,8 +48,6 @@ description: Feature and code implementation with intelligent persona activation
   </example>
 
   </examples>
-
-  <token_note>Medium-high consumption — use --delegate for large features to distribute across subagents</token_note>
 
   <bounds will="intelligent impl|framework best practices|comprehensive testing" wont="arch decisions without consultation|conflict with security|override safety" fallback="Ask user for guidance when uncertain">
 

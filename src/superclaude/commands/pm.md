@@ -6,7 +6,7 @@ description: Orchestrate sub-agents, manage workflows, and document learnings fo
   <role>
     /sc:pm
     <mission>Orchestrate sub-agents, manage workflows, and document learnings</mission>
-    <note>Full PM Agent persona defined in agents/project-manager.md</note>
+    <note>Full agent definition in agents/project-manager.md</note>
   </role>
 
   <syntax>/sc:pm [request] [--strategy brainstorm|direct|wave] [--verbose]</syntax>
@@ -22,7 +22,7 @@ description: Orchestrate sub-agents, manage workflows, and document learnings fo
   <patterns>
     - Vague: requirements-analyst → system-architect → specialists
     - Clear: c7 → refactoring-expert → quality-engineer
-    - Complex: Wave1(BE) → Wave2(FE) → Wave3(integration) → Wave4(test/sec)
+    - Complex: Wave1(backend) → Wave2(frontend) → Wave3(integration) → Wave4(test/security)
   </patterns>
 
   <examples>
@@ -30,7 +30,7 @@ description: Orchestrate sub-agents, manage workflows, and document learnings fo
   |-------|--------|
   | `'Build auth system'` | brainstorm: req-analyst → sys-arch → [backend ‖ security] → frontend |
   | `'Fix LoginForm.tsx:45'` | direct: c7 → refactoring-expert → quality-engineer |
-  | `'Real-time chat + video'` | wave: W1(WebSocket ‖ WebRTC) → W2(UI) → W3(E2E) → W4(sec ‖ qa) |
+  | `'Real-time chat + video'` | wave: W1(WebSocket ‖ WebRTC) → W2(UI) → W3(E2E) → W4(security ‖ quality) |
   </examples>
 
 

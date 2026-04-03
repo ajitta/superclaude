@@ -12,7 +12,7 @@ description: Systematically clean up code, remove dead code, and optimize projec
 
   <flow>
     1. Analyze: Cleanup opportunities + safety assessment
-    2. Plan: Choose approach + activate personas
+    2. Plan: Choose approach + delegate to agents
     3. Execute: Systematic cleanup per --type
     4. Validate: Ensure no functionality loss (tests pass)
     5. Report: Summary + maintenance recs
@@ -21,11 +21,11 @@ description: Systematically clean up code, remove dead code, and optimize projec
   <outputs note="Per --type flag">
 | Type | Actions | Report |
 |------|---------|--------|
-| code | Remove dead code | docs/reports/CLEANUP_CODE.md |
-| imports | Remove unused imports | docs/reports/CLEANUP_IMPORTS.md |
-| files | Remove orphan files | docs/reports/CLEANUP_FILES.md |
-| docs | Validate + transform doc naming convention | docs/reports/CLEANUP_DOCS.md |
-| all | All above | docs/reports/CLEANUP_REPORT.md |
+| code | Remove dead code | Console: removed items + line count |
+| imports | Remove unused imports | Console: removed imports per file |
+| files | Remove orphan files | Console: deleted file list |
+| docs | Validate + transform doc naming convention | Console: renamed/moved files |
+| all | All above | Console: combined summary |
   </outputs>
 
 
@@ -39,7 +39,7 @@ description: Systematically clean up code, remove dead code, and optimize projec
   <patterns>
     - DeadCode: Usage analysis → safe removal
     - Imports: Dependency analysis → optimization
-    - Structure: Arch analysis → modular improvements
+    - Structure: Architecture analysis → modular improvements
     - Docs: Convention validation → rename + move (--dry-run supported)
     - Safety: Pre/during/post checks
   </patterns>
@@ -62,8 +62,6 @@ description: Systematically clean up code, remove dead code, and optimize projec
   </example>
 
   </examples>
-
-  <token_note>Medium consumption — scales with target scope; use --safe for conservative cleanup</token_note>
 
   <bounds will="systematic cleanup|safety validation|intelligent algorithms" wont="remove without analysis|override exclusions|compromise functionality" fallback="Ask user for guidance when uncertain">
 

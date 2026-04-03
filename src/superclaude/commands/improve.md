@@ -12,7 +12,7 @@ description: Apply systematic improvements to code quality, performance, and mai
 
   <flow>
     1. Analyze: Identify improvement opportunities
-    2. Plan: Select approach + activate relevant persona
+    2. Plan: Select approach + delegate to relevant agent
     3. Execute: Apply improvements following best practices
     4. Validate: Ensure functionality preserved
     5. Document: Summary + future recommendations

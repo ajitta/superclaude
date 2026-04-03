@@ -38,7 +38,7 @@ description: Provide clear explanations of code, concepts, and system behavior w
 |-------|--------|
 | `authentication.js --level basic` | Beginner explanation |
 | `react-hooks --level intermediate --context react` | C7 patterns |
-| `microservices-system --level advanced --format interactive` | Arch deep-dive |
+| `microservices-system --level advanced --format interactive` | Architecture deep-dive |
 | `jwt-authentication --context security --level basic` | Security concepts |
 
   <example name="explain-without-context" type="error-path">
@@ -49,9 +49,7 @@ description: Provide clear explanations of code, concepts, and system behavior w
 
   </examples>
 
-  <token_note>Low-medium consumption — explanations are text-only, no file modifications</token_note>
-
-  <bounds will="clear explanations|persona expertise|framework integration" wont="explain without analysis|override standards|reveal sensitive" fallback="Ask user for guidance when uncertain">
+  <bounds will="clear explanations|agent expertise|framework integration" wont="explain without analysis|override standards|reveal sensitive" fallback="Ask user for guidance when uncertain">
 
     Provide explanation, then complete | Preserve code unchanged during explanation | Defer implementation to /sc:implement → Output: Explanation text with examples
 

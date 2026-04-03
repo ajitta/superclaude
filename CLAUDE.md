@@ -47,7 +47,7 @@ SuperClaude is a **content framework** — markdown files (commands, agents, mod
 |-----------|------|----------|
 | `core/` | Framework DNA — always-applied principles and rules | Always loaded (CLAUDE_SC.md @import) |
 | `modes/` | Mindset overlay — situational cognitive frameworks | On-demand (context_loader) |
-| `agents/` | Domain persona — specialized expert definitions | CC-native auto-delegation |
+| `agents/` | Domain expert — specialized agent definitions | CC-native auto-delegation |
 | `commands/` | Workflow entry — user-facing /sc:* slash commands | CC-native slash commands |
 | `skills/` | Runtime hooks, safety, and reference knowledge — CC-native | CC-native (hooks, disable-model-invocation, auto-invocation) |
 | `mcp/` | Tool reference — MCP server docs + configuration | context_loader + install_mcp |

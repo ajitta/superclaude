@@ -8,7 +8,7 @@ Modes are **cognitive overlays** — they change how Claude thinks, communicates
 
 - Mode = **HOW TO THINK** (mindset, posture)
 - Command = **WHAT TO DO** (workflow, steps)
-- Agent = **WHO TO BE** (persona, expertise)
+- Agent = **WHO TO BE** (domain, expertise)
 
 ## No Frontmatter
 

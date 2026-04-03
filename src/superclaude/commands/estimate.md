@@ -29,7 +29,7 @@ description: Provide development estimates for tasks, features, or projects with
   <patterns>
     - Scope: Requirements → complexity → patterns → risk
     - Method: Time|Effort|Complexity|Cost approaches
-    - Multi-Domain: Arch + Perf + Timeline assessment
+    - Multi-Domain: Architecture + Performance + Timeline assessment
     - Validation: Benchmarks → cross-check → confidence
   </patterns>
 
@@ -48,8 +48,7 @@ description: Provide development estimates for tasks, features, or projects with
   </example>
 
   </examples>
-
-  <bounds will="systematic estimates|confidence intervals|multi-persona analysis" wont="guarantee accuracy|estimate without analysis|override benchmarks" fallback="Ask user for guidance when uncertain">
+  <bounds will="systematic estimates|confidence intervals|multi-agent analysis" wont="guarantee accuracy|estimate without analysis|override benchmarks" fallback="Ask user for guidance when uncertain">
 
     Produce estimation report, then complete | Defer implementation to /sc:implement or /sc:workflow | Limit task tracking to estimation scope → Output: Estimation report with breakdown and confidence intervals
 

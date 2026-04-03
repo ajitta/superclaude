@@ -103,11 +103,12 @@ Depth: parent first → drill down next turn; ≤3 sub-options → inline [Na] [
   </selection_protocol>
 
   <doc_output_convention note="Unified naming for all file-producing commands">
-Pattern: docs/<type>/<topic-slug>-<suffix?>-<username>-YYYY-MM-DD.md
+Topic-based: docs/<type>/<topic-slug>-<suffix?>-<username>-YYYY-MM-DD.md
 Username: `git config user.name` (lowercase, no spaces) — fallback to system username
 Directory: brainstorm→docs/specs/ | design→docs/specs/ | plan→docs/plans/ | workflow→docs/plans/ | analyze→docs/analysis/ | research→docs/research/
 Suffix (shared dirs only): brainstorm→-discovery | design→-design | workflow→-workflow
-Living docs (UPPER_SNAKE, no date/username): all in docs/reports/
+Living docs (UPPER_SNAKE, no date/username): index→docs/reports/ | index-repo→docs/reports/ | document --type api→docs/reports/
+Inline only (no file output): test, build, cleanup — results go to console, tool artifacts (coverage/, dist/) preserved
 Frontmatter: specs/+plans/ require {status, revised}. research/+analysis/ optional. reports/ none
 Formatter: /sc:cleanup --type docs (validate + transform + migrate)
 Example: docs/specs/selection-protocol-design-ajitta-2026-03-20.md

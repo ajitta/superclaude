@@ -58,8 +58,6 @@ description: Review code changes for quality, security, and correctness with str
   </example>
   </examples>
 
-  <token_note>Medium-high consumption — --structured dispatches subagent for isolated context</token_note>
-
   <bounds will="code review|quality analysis|security scanning|2D spec+quality review" wont="auto-merge|auto-approve|modify code without explicit permission" fallback="Without spec: weight review toward code quality dimension"/>
 
   <handoff next="/sc:implement /sc:test /sc:troubleshoot"/>

@@ -1,6 +1,6 @@
 # SuperClaude Agents
 
-Domain expert personas — specialized AI agent definitions for task-based auto-delegation.
+Domain expert agents — specialized AI agent definitions for task-based auto-delegation.
 
 ## Content Delivery
 
@@ -134,4 +134,4 @@ When agents give conflicting recommendations:
 
 - `commands/` — Workflow entry points that route to agents
 - `modes/` — Cognitive overlays that shape agent behavior
-- `core/FLAGS.md` — Model routing and persona index
+- `core/FLAGS.md` — Model routing and --p flag agent mapping

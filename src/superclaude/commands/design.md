@@ -20,13 +20,15 @@ description: Design system architecture, APIs, and component interfaces with com
     7. Document: Save design spec to docs/specs/<topic>-design-<username>-YYYY-MM-DD.md (with frontmatter: status: draft, revised: <today>) + diagrams
   </flow>
 
-  <outputs note="Per --type and --format">
-| Type | diagram | spec | code |
-|------|---------|------|------|
-| architecture | ARCH_DIAGRAM.md | ARCHITECTURE.md | interfaces/*.ts |
-| api | API_DIAGRAM.md | API_SPEC.md | openapi.yaml |
-| component | COMPONENT_DIAGRAM.md | COMPONENT_SPEC.md | types/*.ts |
-| database | ERD.md | SCHEMA.md | migrations/*.sql |
+  <outputs note="All content in single spec file per invocation">
+| Artifact | Content |
+|----------|---------|
+| `docs/specs/<topic>-design-<username>-YYYY-MM-DD.md` | Diagram + spec + interface definitions |
+  Sections per --type:
+  - architecture: system diagram, component boundaries, interface contracts
+  - api: endpoint diagram, request/response specs, OpenAPI schema
+  - component: component diagram, prop/state specs, type definitions
+  - database: ERD, schema definitions, migration plan
   </outputs>
 
 
@@ -58,8 +60,6 @@ description: Design system architecture, APIs, and component interfaces with com
   </example>
 
   </examples>
-
-  <token_note>Medium-high consumption — scales with --type complexity; use --format spec for lighter output</token_note>
 
   <bounds will="comprehensive specs|multi-format output|validation" wont="generate impl code|modify existing arch|violate constraints" fallback="Ask user for guidance when uncertain">
 

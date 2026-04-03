@@ -53,8 +53,6 @@ description: Deep web research with adaptive planning and intelligent search
 
   </examples>
 
-  <token_note>High consumption — use --uc at 60%+; deep/exhaustive auto-delegate to subagent for context isolation</token_note>
-
   <gotchas>
   - single-source: Do not conclude from a single source. Cross-verify with at least 2 sources
   - source-quality: Do not use Wikipedia/Reddit as primary source. Cross-check with primary sources

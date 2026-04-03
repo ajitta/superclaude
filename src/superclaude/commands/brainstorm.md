@@ -12,9 +12,9 @@ description: Interactive requirements discovery through Socratic dialogue and sy
 
   <flow>
     1. Explore: Socratic dialogue + systematic questioning
-    2. Analyze: Multi-persona coordination + domain expertise
+    2. Analyze: Multi-agent coordination + domain expertise
        (--vs): VS distribution generation — k perspectives with probabilities + landscape synthesis.
-               Multi-persona insights inform post-hoc labeling. --depth maps: shallow→brief, normal→balanced, deep→detailed.
+               Multi-agent insights inform post-hoc labeling. --depth maps: shallow→brief, normal→balanced, deep→detailed.
     3. Validate: Feasibility assessment + requirement validation
     4. Specify: Write spec to docs/specs/<topic>-discovery-<username>-YYYY-MM-DD.md (with frontmatter: status: draft, revised: <today>)
     5. Approve: Present spec for user review — do not proceed without confirmation
@@ -48,8 +48,8 @@ description: Interactive requirements discovery through Socratic dialogue and sy
   <examples>
 | Input | Output |
 |-------|--------|
-| `'AI project management tool' --strategy systematic --depth deep` | Multi-persona deep analysis |
-| `'real-time collaboration' --strategy agile --parallel` | Parallel FE/BE/Sec exploration |
+| `'AI project management tool' --strategy systematic --depth deep` | Multi-agent deep analysis |
+| `'real-time collaboration' --strategy agile --parallel` | Parallel frontend/backend/security exploration |
 | `'enterprise data analytics' --strategy enterprise --depth deep` | Compliance + validation |
 | `'mobile monetization' --depth normal` | Cross-session with Serena |
 | `'API design' --vs cot [k:3, tau:0.20]` | 3 focused API design perspectives via VS-CoT |
@@ -62,14 +62,12 @@ description: Interactive requirements discovery through Socratic dialogue and sy
   </example>
   </examples>
 
-  <token_note>High consumption — use --uc at 60%+ context, consider fresh session for large brainstorms</token_note>
-
   <gotchas>
   - evidence-fabrication: Do not construct hypothetical failure scenarios to justify a pre-existing recommendation. Evidence (code, config, measurements) must precede proposals.
   - seq-loop: If sequential thinking reaches the same conclusion twice on the same question, terminate that analysis branch and move to next topic.
   </gotchas>
 
-  <bounds will="ambiguous→concrete|multi-persona+MCP|cross-session persistence" wont="impl without discovery|override user vision|bypass systematic exploration" fallback="Ask user for guidance when uncertain">
+  <bounds will="ambiguous→concrete|multi-agent+MCP|cross-session persistence" wont="impl without discovery|override user vision|bypass systematic exploration" fallback="Ask user for guidance when uncertain">
 
     Produce requirements specification, then complete | Focus on requirements; defer architecture to /sc:design | Defer implementation to /sc:implement | Defer scaffolding to /sc:implement → Output: Requirements specification document only
 

@@ -71,5 +71,5 @@ See `.claude/rules/skill-authoring.md` for the complete authoring specification.
 ## Related
 
 - `commands/` — Workflow entry points (most former skills now live here)
-- `agents/` — Domain personas
+- `agents/` — Domain expert agents
 - `hooks/` — Hook system that skills integrate with

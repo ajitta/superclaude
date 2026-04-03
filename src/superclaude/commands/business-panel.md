@@ -55,8 +55,6 @@ description: Multi-expert business analysis with adaptive interaction modes
 
   </examples>
 
-  <token_note>High consumption — multi-expert dialogue; use --synthesis-only for lighter output</token_note>
-
   <bounds will="multi-expert analysis|adaptive modes|comprehensive synthesis" wont="replace professional advice|make decisions for user" fallback="Ask user for guidance when uncertain">
 
     Produce business analysis document, then complete | Defer business decisions to stakeholders | Preserve code and configurations unchanged → Output: Business analysis synthesis document

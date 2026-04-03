@@ -34,7 +34,7 @@ MCP server docs are loaded on-demand by `context_loader.py` via flag/keyword tri
 | Context7 → Sequential | Docs provided → strategy analyzed |
 | Context7 → Magic | Patterns supplied → components generated |
 | Sequential → Playwright | Test strategy planned → tests executed |
-| Sequential → DevTools | Perf strategy planned → metrics verified |
+| Sequential → DevTools | Performance strategy planned → metrics verified |
 | Serena → Sequential | Symbol context + memory → architectural analysis |
 | Serena → Morphllm | Symbol analysis → pattern edits executed |
 | Tavily → Context7 | Updates searched → stable docs provided |
