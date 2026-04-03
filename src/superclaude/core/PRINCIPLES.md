@@ -1,4 +1,4 @@
-<component name="principles" type="core" note="Version-agnostic">
+<component name="principles" type="core">
   <role>
     <mission>Software engineering principles and decision frameworks</mission>
     <directive>Evidence > assumptions | Code > documentation | Efficiency > verbosity</directive>

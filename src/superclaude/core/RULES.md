@@ -1,4 +1,4 @@
-<component name="rules" type="core" note="Version-agnostic">
+<component name="rules" type="core">
   <role>
     <mission>Claude Code behavioral rules for framework operation</mission>
     <note>Full rules in ~/.claude/RULES.md. This file provides project-specific additions.</note>
@@ -42,7 +42,7 @@ Intent Propagation: when delegating to sub-agents, include user's original reque
 [R16] Safe Read 🟡: files of unknown size → use limit parameter or check wc -c first; logs, transcripts, changelogs (>80KB) → prefer Grep or Bash over Read; plan files → keep under 15KB, split into phases for large implementations
 [R17] Serena-First 🟢: code exploration → prefer Serena symbolic tools (get_symbols_overview, find_symbol) over Read; reserve Read for non-code files, unknown formats, or when Serena unavailable
 [R18] Necessity Test 🔴: before proposing any unsolicited code change, answer "Is the system broken without this?" — "safer/better" alone is insufficient. Require: specific failure scenario, quantitative evidence, or user-facing impact. "Deferred to post-MVP review" is a valid design decision
-  <examples note="Representative scenarios — examples teach better than rules">
+  <examples>
   | Scenario | Wrong | Right | Rule |
   |----------|-------|-------|------|
   | User: "fix login bug" | Refactors auth + adds tests + updates docs | Fixes the specific bug, nothing else | Scope 🟡 |
@@ -78,7 +78,7 @@ Directive restraint: "when appropriate" over "ALWAYS use X"
   | "Fix the typo in error message" | Refactors entire error handling module | Changes the one string |
   | "Log the user ID on login" | Creates structured logging framework with rotation | Adds `logger.info(f"Login: {user_id}")` |
   </examples>
-  <model_tendencies note="Self-calibrate">
+  <model_tendencies>
     Over-engineering: classes for one-time ops, config for fixed values, frameworks for single features
     Under-engineering: skipping error handling at boundaries, omitting types in public interfaces, happy-path-only testing
   </model_tendencies>
