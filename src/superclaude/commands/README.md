@@ -50,6 +50,7 @@ Commands are managed by Claude Code's native command system. Installed to `~/.cl
 | `/sc:document` | Generate documentation |
 | `/sc:index-repo` | Repository indexing for context optimization |
 | `/sc:reflect` | Task reflection and validation |
+| `/sc:insight` | Capture session insights to JSONL for analysis |
 
 ### Git & Project Management
 

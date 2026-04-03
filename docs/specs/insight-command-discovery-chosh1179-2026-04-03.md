@@ -1,5 +1,5 @@
 ---
-status: draft
+status: implemented
 revised: 2026-04-03
 ---
 
