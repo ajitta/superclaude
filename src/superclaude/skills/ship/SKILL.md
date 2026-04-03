@@ -30,7 +30,7 @@ hooks:
     6. PR (if --pr): Create PR via `gh pr create` with summary from commits
   </flow>
 
-  <references note="Load on demand">
+  <references>
   - `references/conventions.md` — branch naming, commit format, PR template, default exclusions. Read when detailed rules needed
   </references>
 

@@ -22,7 +22,7 @@ description: Session lifecycle management with Serena MCP + Claude auto memory f
     Fallback (no Serena): Claude auto memory only (MEMORY.md + topic files)
   </flow>
 
-  <compaction_strategy note="What to preserve vs discard across sessions">
+  <compaction_strategy>
   Preserve (high signal): architecture decisions + rationale, unresolved issues, key patterns discovered, session goal status
   Discard (low signal): verbatim tool output, intermediate search results, already-committed diffs, duplicate context
   Format: structured summary (decisions, todo, context pointers) — not narrative prose

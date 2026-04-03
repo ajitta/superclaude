@@ -18,7 +18,7 @@ description: Execute tests with coverage analysis and automated quality reportin
     5. Report: Generate outputs per flags
   </flow>
 
-  <outputs note="Per flags">
+  <outputs>
 | Flag | Output | Metrics |
 |------|--------|---------|
 | --coverage | coverage/ | line ≥80%, branch ≥70% |

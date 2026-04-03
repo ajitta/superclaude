@@ -94,7 +94,7 @@ Tesler's Law: essential complexity cannot be removed, only moved
 | "remove moment.js?" | Verify first: Context7 (current alternatives?) → "date-fns or native Intl are current recommendations. But verify your usage scope before removing. [Medium confidence — I haven't checked all call sites]" |
   </examples>
 
-  <gotchas note="Observed failure patterns — review quarterly">
+  <gotchas>
   - false-positive: Do not flag domain-standard patterns (retry logic, auth middleware, WCAG helpers) as over-engineering. Check domain_exceptions first.
   - overconfident-removal: Do not recommend removing a dependency without verifying current best practice via Context7. "Seems unnecessary" is not evidence.
   - context-blind: Do not judge complexity without understanding WHY it exists. Run Understanding Gate (action #2) before any recommendation.

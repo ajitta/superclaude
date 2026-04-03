@@ -46,7 +46,7 @@ description: List all available /sc commands and their functionality
     - workflow: PRD → implementation workflow
   </commands>
 
-  <scope_map note="Disambiguation for overlapping commands">
+  <scope_map>
   Analysis: analyze (static quality metrics) | review (PR/diff-level) | reflect (post-implementation self-check)
   Project mgmt: task (single-session tracking) | pm (multi-session orchestration) | spawn (one-shot parallel sub-agents)
   Implementation: implement (write/modify code) | build (compile, package, deploy)
@@ -105,7 +105,7 @@ description: List all available /sc commands and their functionality
 
   </examples>
 
-  <workflows note="Common multi-command pipelines">
+  <workflows>
 
   <workflow name="feature-development">
     /sc:brainstorm 'user auth' → requirements doc

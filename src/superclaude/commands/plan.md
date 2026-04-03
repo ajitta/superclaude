@@ -32,7 +32,7 @@ description: Create detailed implementation plans with TDD tasks, exact file pat
     - Write: Plan document creation
   </tools>
 
-  <templates note="Included in plan output">
+  <templates>
 Plan header:
   # [Feature] Implementation Plan
   **Goal:** [One sentence]
