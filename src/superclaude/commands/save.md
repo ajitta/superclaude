@@ -76,7 +76,7 @@ description: Session lifecycle management with Serena MCP + Claude auto memory f
 
   </examples>
 
-  <bounds will="Serena integration|auto memory sync|auto-checkpoints|discovery preservation" wont="save without validation|override without checkpoint|duplicate across stores" fallback="Without Serena: use Claude auto memory only (Write/Edit MEMORY.md). Ask user for guidance when uncertain" type="execution">
+  <bounds will="Serena integration|auto memory sync|auto-checkpoints|discovery preservation" wont="save without validation|override without checkpoint|duplicate across stores" fallback="Without Serena: use Claude auto memory only (Write/Edit MEMORY.md). Ask user for guidance when uncertain">
     Execute session persistence | Preserve project code unchanged | Validate data integrity before save
   </bounds>
 

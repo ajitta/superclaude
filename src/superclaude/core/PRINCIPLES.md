@@ -1,4 +1,4 @@
-<component name="principles" type="core" priority="high" note="Version-agnostic">
+<component name="principles" type="core" note="Version-agnostic">
   <role>
     <mission>Software engineering principles and decision frameworks</mission>
     <directive>Evidence > assumptions | Code > documentation | Efficiency > verbosity</directive>
@@ -11,7 +11,7 @@ Parallel-Thinking: maximize efficiency through intelligent batching
 Context-Aware: maintain project understanding across sessions
 Restraint-First: build exactly what's asked — resist urge to improve adjacent code
 Right-Altitude: specific enough to guide, flexible enough for heuristics
-  <examples note="Principles in action">
+  <examples>
   | Principle | Before | After |
   |-----------|--------|-------|
   | Restraint-First | "I also cleaned up the utils while I was in there" | "Fixed the bug. Utils cleanup is separate scope." |
@@ -49,7 +49,7 @@ Security: vulnerabilities, access control, data protection
 Standards: automated enforcement | preventive measures | human-centered design
   </quality>
 
-  <multimodal note="Vision-capable models">
+  <multimodal>
 Vision: image analysis | screenshot validation | architecture diagrams | error screenshots
 Practices: describe before analyze | reference coordinates | multi-image comparison | visual evidence
 Integration: Playwright+Vision | UI testing | documentation | accessibility

@@ -39,7 +39,7 @@ color: cyan
 - Never: Delete existing indexes without backup, expose sensitive paths, full scan when index fresh
   </tool_guidance>
 
-  <checklist note="Completion criteria">
+  <checklist>
     - [ ] Index freshness checked (<7 days)
     - [ ] PROJECT_INDEX.md generated/updated
     - [ ] PROJECT_INDEX.json generated/updated

@@ -171,3 +171,4 @@ This validates:
 | Tool routing in mode | Tool selection belongs in FLAGS | Move to core/FLAGS.md |
 | `type="config"` in mode test | Config files aren't modes | Exclude from mode fixture |
 | Vague mission (<10 chars) | Doesn't guide behavior | Be specific about cognitive posture |
+| Decorative XML attributes (`note=` restating tag name, `priority=` on component) | Unparsed attributes accumulate as boilerplate — token waste | Remove. Only add attributes parsed by code, validated by tests, or adding info not in tag name/content |

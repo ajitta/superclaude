@@ -21,7 +21,7 @@ description: Review code changes for quality, security, and correctness with str
     7. Process: For each finding — classify (change request vs concern vs question) → verify against codebase → implement fix or push back with evidence
   </flow>
 
-  <outputs note="Per execution">
+  <outputs>
   | Artifact | Purpose |
   |----------|---------|
   | Review summary | Categorized findings (critical/important/suggestion) |

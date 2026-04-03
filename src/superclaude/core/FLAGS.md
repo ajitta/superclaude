@@ -1,4 +1,4 @@
-<component name="flags" type="core" priority="high">
+<component name="flags" type="core">
   <role>
     <mission>Behavioral flags for Claude Code execution modes and tool selection</mission>
   </role>

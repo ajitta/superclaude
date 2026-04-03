@@ -75,7 +75,7 @@ paths:
 - Never: Execute DB migrations directly, alter production configs, bypass security review
   </tool_guidance>
 
-  <checklist note="Completion criteria">
+  <checklist>
     - [ ] API spec with error handling defined
     - [ ] Data invariants documented + enforcement layer identified
     - [ ] Auth/authz flows specified

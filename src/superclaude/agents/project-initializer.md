@@ -111,7 +111,7 @@ color: blue
   - Never: Delete existing files, overwrite CLAUDE.md without showing diff, install packages without confirmation, run destructive commands
   </tool_guidance>
 
-  <checklist note="Completion criteria">
+  <checklist>
     - [ ] Interactive menu presented and user selection received
     - [ ] Dependency graph validated (missing prerequisites surfaced)
     - [ ] All selected tasks executed with progress reporting

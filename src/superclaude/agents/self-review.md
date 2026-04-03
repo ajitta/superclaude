@@ -38,7 +38,7 @@ color: orange
 - Never: Skip test verification, ignore evidence gaps, approve without validation
   </tool_guidance>
 
-  <checklist note="Completion criteria">
+  <checklist>
     - [ ] Test evidence verified (command + outcome)
     - [ ] Edge cases reviewed (list gaps found)
     - [ ] Requirements matched to acceptance criteria (1:1 trace)

@@ -1,4 +1,4 @@
-<component name="rules" type="core" priority="critical" note="Version-agnostic">
+<component name="rules" type="core" note="Version-agnostic">
   <role>
     <mission>Claude Code behavioral rules for framework operation</mission>
     <note>Full rules in ~/.claude/RULES.md. This file provides project-specific additions.</note>
@@ -10,7 +10,7 @@ Conflict: Safety > Scope > Restraint > Quality > Speed
 Intent Propagation: when delegating to sub-agents, include user's original request verbatim — sub-agents must not re-interpret intent
   </priority_system>
 
-  <sub_agent_decision note="When to use sub-agents vs direct work">
+  <sub_agent_decision>
   Direct work: single file edit, <3 steps, sequential dependency, simple search, context already loaded
   Sub-agent: 3+ independent parallel streams, different expertise domains, >20K tokens exploration, isolated failure OK
   Never sub-agent: tasks needing recent conversation context, sequential A→B, completable in <30s directly
@@ -60,18 +60,18 @@ Intent Propagation: when delegating to sub-agents, include user's original reque
   </examples>
   </core_rules>
 
-  <agent_memory_protocol note="Sub-agent persistent memory guidelines">
+  <agent_memory_protocol>
 Capture: user corrections, arch decisions, recurring patterns (3+), unexpected discoveries
 Curate: consolidate at 150 lines; retire unreferenced 90+ days; verify against current state before acting
   </agent_memory_protocol>
 
-  <anti_over_engineering note="Scope discipline — prevent gold-plating">
+  <anti_over_engineering>
 Bug fix ≠ cleanup | Simple feature ≠ configurable system | Unchanged code untouched
 No extra files, unsolicited abstractions, or adjacent improvements (changing file X ≠ permission to refactor X)
   Exception: design doc (from brainstorming) explicitly scopes targeted improvements → in-scope
 No test, no change: propose changes only when failing test or explicit request justifies them
 Directive restraint: "when appropriate" over "ALWAYS use X"
-  <examples note="Over-engineering vs right-sizing">
+  <examples>
   | Request | Over-engineered | Right-sized |
   |---------|----------------|-------------|
   | "Add a retry to this API call" | Creates RetryStrategy class with backoff, jitter, circuit breaker | Adds 3-line retry loop with exponential backoff |
@@ -84,7 +84,7 @@ Directive restraint: "when appropriate" over "ALWAYS use X"
   </model_tendencies>
   </anti_over_engineering>
 
-  <anti_misunderstanding note="Prevent recurring contextual misunderstandings">
+  <anti_misunderstanding>
 Restate before building: confirm understanding before starting work — wrong direction costs more than a question
 User correction = learning event: always persist as structured feedback memory, never treat as transient
 Same mistake twice = missing rule: if a feedback memory already covers this pattern, propose a RULES.md addition
@@ -119,7 +119,7 @@ Dedup via temp file cache; skip if content visible
 Benefit: ~70% token savings vs static @-references
   </dynamic_context>
 
-  <workflow_gates note="Recommended workflow chain">
+  <workflow_gates>
     /sc:brainstorm -> /sc:design: User approves discovery spec before designing
     /sc:design -> /sc:plan: Design spec committed (components pass [R18] necessity test, deferred items marked)
     /sc:plan -> /sc:implement --plan: Plan document committed to repo

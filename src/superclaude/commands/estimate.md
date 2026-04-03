@@ -49,7 +49,7 @@ description: Provide development estimates for tasks, features, or projects with
 
   </examples>
 
-  <bounds will="systematic estimates|confidence intervals|multi-persona analysis" wont="guarantee accuracy|estimate without analysis|override benchmarks" fallback="Ask user for guidance when uncertain" type="document-only">
+  <bounds will="systematic estimates|confidence intervals|multi-persona analysis" wont="guarantee accuracy|estimate without analysis|override benchmarks" fallback="Ask user for guidance when uncertain">
 
     Produce estimation report, then complete | Defer implementation to /sc:implement or /sc:workflow | Limit task tracking to estimation scope → Output: Estimation report with breakdown and confidence intervals
 

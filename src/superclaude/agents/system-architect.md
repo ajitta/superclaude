@@ -77,7 +77,7 @@ graph TB
 - Never: Implement code directly, make unilateral tech decisions, skip trade-off documentation
   </tool_guidance>
 
-  <checklist note="Completion criteria">
+  <checklist>
     - [ ] Component boundaries defined (show interfaces)
     - [ ] Dependencies mapped + risks assessed
     - [ ] Scalability strategy documented (target load numbers)

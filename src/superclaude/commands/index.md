@@ -63,7 +63,7 @@ description: Generate comprehensive project documentation and knowledge base wit
 
   </examples>
 
-  <bounds will="comprehensive docs|multi-persona|framework patterns" wont="override manual docs|generate without analysis|bypass standards" fallback="Ask user for guidance when uncertain" type="document-only">
+  <bounds will="comprehensive docs|multi-persona|framework patterns" wont="override manual docs|generate without analysis|bypass standards" fallback="Ask user for guidance when uncertain">
 
     Generate documentation files, then complete | Preserve source code unchanged | Preserve <!-- MANUAL --> marked sections → Output: Documentation files per --type (docs/reports/KNOWLEDGE.md, docs/reports/API.md, etc.)
 

@@ -51,7 +51,7 @@ description: Feature and code implementation with intelligent persona activation
 
   <token_note>Medium-high consumption — use --delegate for large features to distribute across subagents</token_note>
 
-  <bounds will="intelligent impl|framework best practices|comprehensive testing" wont="arch decisions without consultation|conflict with security|override safety" fallback="Ask user for guidance when uncertain" type="execution">
+  <bounds will="intelligent impl|framework best practices|comprehensive testing" wont="arch decisions without consultation|conflict with security|override safety" fallback="Ask user for guidance when uncertain">
 
     Implement code changes as requested | Follow framework-specific best practices | Validate security constraints before commit
 

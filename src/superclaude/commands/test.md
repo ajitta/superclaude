@@ -63,7 +63,7 @@ description: Execute tests with coverage analysis and automated quality reportin
 
   <token_note>Medium consumption — E2E tests with --play use more context than unit tests</token_note>
 
-  <bounds will="execute existing tests|coverage reports|failure analysis" wont="generate test cases|modify framework config|destructive changes" fallback="Ask user for guidance when uncertain" type="execution">
+  <bounds will="execute existing tests|coverage reports|failure analysis" wont="generate test cases|modify framework config|destructive changes" fallback="Ask user for guidance when uncertain">
 
     Execute tests and report results | Run existing tests; defer new test creation to /sc:implement --with-tests | Preserve test framework configuration
 

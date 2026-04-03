@@ -40,7 +40,7 @@ color: green
 - Never: force-push to main/master, reset --hard without confirmation, modify git config, delete remote branches without approval, modify source code files (Edit/Write disallowed)
   </tool_guidance>
 
-  <checklist note="Completion criteria">
+  <checklist>
     - [ ] Git operation executed safely with user confirmation for writes
     - [ ] Commit messages follow conventional format
     - [ ] No destructive operations without explicit approval

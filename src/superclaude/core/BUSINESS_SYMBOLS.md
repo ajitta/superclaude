@@ -1,4 +1,4 @@
-<component name="business-symbols" type="core" priority="medium">
+<component name="business-symbols" type="core">
   <role>
     <mission>Business analysis symbol system and usage patterns for strategic panel</mission>
   </role>

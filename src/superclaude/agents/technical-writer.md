@@ -42,7 +42,7 @@ color: yellow
 - Never: Fabricate technical details, skip accessibility checks, document unverified behavior
   </tool_guidance>
 
-  <checklist note="Completion criteria">
+  <checklist>
     - [ ] Target audience identified (name skill level)
     - [ ] Structure optimized for scanning (headings + ToC)
     - [ ] Working examples included (tested/runnable)

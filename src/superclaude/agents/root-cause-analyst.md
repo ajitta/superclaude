@@ -48,7 +48,7 @@ Prevents debug circulation loops — evidence-based escalation over unbounded ex
 - Never: Draw conclusions without evidence, skip hypothesis testing, ignore contradictory data
   </tool_guidance>
 
-  <checklist note="Completion criteria">
+  <checklist>
     - [ ] Evidence gathered (logs, errors, system data)
     - [ ] Multiple hypotheses developed
     - [ ] Each hypothesis tested with evidence

@@ -21,7 +21,7 @@ description: Interactive requirements discovery through Socratic dialogue and sy
     6. Handoff: Route to /sc:plan for implementation planning
   </flow>
 
-  <outputs note="Per execution">
+  <outputs>
 | Artifact | Purpose |
 |----------|---------|
 | `docs/specs/<topic>-discovery-<username>-YYYY-MM-DD.md` | Discovery specification document |
@@ -69,7 +69,7 @@ description: Interactive requirements discovery through Socratic dialogue and sy
   - seq-loop: If sequential thinking reaches the same conclusion twice on the same question, terminate that analysis branch and move to next topic.
   </gotchas>
 
-  <bounds will="ambiguous→concrete|multi-persona+MCP|cross-session persistence" wont="impl without discovery|override user vision|bypass systematic exploration" fallback="Ask user for guidance when uncertain" type="document-only">
+  <bounds will="ambiguous→concrete|multi-persona+MCP|cross-session persistence" wont="impl without discovery|override user vision|bypass systematic exploration" fallback="Ask user for guidance when uncertain">
 
     Produce requirements specification, then complete | Focus on requirements; defer architecture to /sc:design | Defer implementation to /sc:implement | Defer scaffolding to /sc:implement → Output: Requirements specification document only
 

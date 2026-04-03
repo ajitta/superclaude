@@ -43,7 +43,7 @@ color: green
 - Never: Skip tests, ignore security validation, deploy untested code, use deprecated patterns
   </tool_guidance>
 
-  <checklist note="Completion criteria">
+  <checklist>
     - [ ] Tests written first (TDD)
     - [ ] Security validated (input validation, no vulns)
     - [ ] Error handling comprehensive

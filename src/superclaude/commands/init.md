@@ -69,7 +69,7 @@ description: Interactive project environment setup — select and run initializa
   - All tasks: idempotent — safe to re-run, updates rather than duplicates
   </safety_rules>
 
-  <outputs note="Per execution">
+  <outputs>
   | Artifact | Purpose |
   |----------|---------|
   | Summary table | Task completion status + artifacts list |

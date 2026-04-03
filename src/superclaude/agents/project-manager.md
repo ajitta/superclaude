@@ -64,7 +64,7 @@ Example: "Add auth" -> backend-architect -> security-engineer -> PM: auth patter
 - Never: Execute implementations directly, skip documentation, alter user code
   </tool_guidance>
 
-  <checklist note="Completion criteria">
+  <checklist>
     - [ ] Previous context loaded if available
     - [ ] TaskCreate used for 3+ step tasks
     - [ ] Discoveries documented (patterns/ or mistakes/)

@@ -60,7 +60,7 @@ description: Build, compile, and package projects with intelligent error handlin
 
   <token_note>Medium consumption — build output can be verbose; use --type dev for lighter builds</token_note>
 
-  <bounds will="execute build|error analysis|optimization recs" wont="modify build config|install deps|deploy" fallback="Ask user for guidance when uncertain" type="execution">
+  <bounds will="execute build|error analysis|optimization recs" wont="modify build config|install deps|deploy" fallback="Ask user for guidance when uncertain">
 
     Execute build commands | Preserve build configuration | Preserve current dependencies | Defer deployment to user or CI/CD
 

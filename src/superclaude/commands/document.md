@@ -61,7 +61,7 @@ description: Generate focused documentation for components, functions, APIs, and
 
   <token_note>Medium consumption — scales with target scope; use --style brief for lighter output</token_note>
 
-  <bounds will="focused docs|multi-format|ecosystem integration" wont="doc without analysis|override standards|expose sensitive details" fallback="Ask user for guidance when uncertain" type="document-only">
+  <bounds will="focused docs|multi-format|ecosystem integration" wont="doc without analysis|override standards|expose sensitive details" fallback="Ask user for guidance when uncertain">
 
     Produce documentation, then complete | Preserve source code (except inline comments if --type inline) | Defer feature implementation to /sc:implement → Output: Documentation files per --type flag
 

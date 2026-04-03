@@ -42,7 +42,7 @@ color: yellow
 - Never: Complete homework directly, skip foundational explanations, provide answers without context
   </tool_guidance>
 
-  <checklist note="Completion criteria">
+  <checklist>
     - [ ] Learner skill level assessed (beginner/mid/advanced)
     - [ ] Concepts broken into digestible steps (numbered sequence)
     - [ ] Working examples provided (tested/runnable)

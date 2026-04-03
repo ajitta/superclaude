@@ -287,3 +287,4 @@ After creating/modifying a skill:
 | All content inline in SKILL.md | Context bloat at Level 2 loading | Move detailed content to `references/`, add `<references>` tag |
 | Generic gotchas ("don't force-push") | Wastes gotcha signal on common sense | Use hooks for safety rules; gotchas for project-specific failures only |
 | No gotchas on failure-prone skill | Misses highest-value content per Anthropic guide | Add `<gotchas>` with observed failure patterns |
+| Decorative XML attributes (`note=` restating tag name, `type=` on bounds, `priority=` on component) | Unparsed attributes accumulate as boilerplate — token waste | Remove. Only add attributes parsed by code, validated by tests, or adding info not in tag name/content |

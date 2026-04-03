@@ -65,7 +65,7 @@ description: Systematically clean up code, remove dead code, and optimize projec
 
   <token_note>Medium consumption — scales with target scope; use --safe for conservative cleanup</token_note>
 
-  <bounds will="systematic cleanup|safety validation|intelligent algorithms" wont="remove without analysis|override exclusions|compromise functionality" fallback="Ask user for guidance when uncertain" type="execution">
+  <bounds will="systematic cleanup|safety validation|intelligent algorithms" wont="remove without analysis|override exclusions|compromise functionality" fallback="Ask user for guidance when uncertain">
 
     Implement cleanup actions as requested | Safe mode (--safe): Only low-risk removals | Interactive mode (--interactive): Confirm each removal
 

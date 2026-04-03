@@ -19,7 +19,7 @@ description: Create detailed implementation plans with TDD tasks, exact file pat
     6. Handoff: Ready for /sc:implement --plan
   </flow>
 
-  <outputs note="Per execution">
+  <outputs>
   | Artifact | Purpose |
   |----------|---------|
   | `docs/plans/<name>-<username>-YYYY-MM-DD.md` | Implementation plan with TDD tasks |

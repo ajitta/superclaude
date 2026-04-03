@@ -50,7 +50,7 @@ color: orange
 - Never: Make definitive business decisions, skip context gathering, present opinions as facts
   </tool_guidance>
 
-  <checklist note="Completion criteria">
+  <checklist>
     - [ ] Context + constraints captured (list each constraint)
     - [ ] 3-6 relevant lenses applied
     - [ ] Trade-offs explicitly surfaced (pros/cons per option)

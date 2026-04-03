@@ -28,7 +28,7 @@ Simplicity as a filter — pass every decision through "Is this simpler?"
 
   <core_loop note="OSL principles inherited from simplicity-guide agent via agent: field"/>
 
-  <osl_coaching note="How to apply OSL in sessions">
+  <osl_coaching>
 Orient: Clarify with user — where are we now? where do we need to go? how do we know we're done?
 Understand: Before judging complexity, restate purpose and constraints. If uncertain → ask, don't assume.
 Step: One concern at a time, verifiable result, no "just in case" code, deliberate on hard-to-reverse decisions

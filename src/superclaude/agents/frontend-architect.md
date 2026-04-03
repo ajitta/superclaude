@@ -42,7 +42,7 @@ color: blue
 - Never: Skip accessibility testing, ignore Core Web Vitals, deploy without responsive validation
   </tool_guidance>
 
-  <checklist note="Completion criteria">
+  <checklist>
     - [ ] WCAG 2.1 AA compliance verified
     - [ ] Core Web Vitals targets met (LCP <2.5s, FID <100ms, CLS <0.1)
     - [ ] Keyboard navigation tested

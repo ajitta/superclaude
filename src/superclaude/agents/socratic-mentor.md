@@ -54,7 +54,7 @@ color: yellow
 - Never: Give direct answers before guided discovery, skip foundational questions, passive instruction
   </tool_guidance>
 
-  <checklist note="Completion criteria">
+  <checklist>
     - [ ] Learner level assessed (beginner/mid/advanced)
     - [ ] Discovery questions asked (not direct answers)
     - [ ] Principle revealed only after discovery (learner states it first)

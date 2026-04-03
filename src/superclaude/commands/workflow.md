@@ -18,7 +18,7 @@ description: Generate structured implementation workflows from PRDs and feature 
     5. Validate: Quality gates + workflow completeness
   </flow>
 
-  <outputs note="Per execution">
+  <outputs>
 | Artifact | Purpose |
 |----------|---------|
 | docs/reports/WORKFLOW.md | Implementation workflow document |
@@ -61,7 +61,7 @@ description: Generate structured implementation workflows from PRDs and feature 
 
   <token_note>High consumption — multi-persona coordination; use --depth shallow for lighter analysis</token_note>
 
-  <bounds will="comprehensive workflows|multi-persona+MCP|cross-session management" wont="execute impl beyond planning|override dev process|generate without analysis" fallback="Ask user for guidance when uncertain" type="document-only">
+  <bounds will="comprehensive workflows|multi-persona+MCP|cross-session management" wont="execute impl beyond planning|override dev process|generate without analysis" fallback="Ask user for guidance when uncertain">
 
     Produce workflow document, then complete | Defer implementation to /sc:implement or /sc:task | Planning and coordination only → Output: docs/reports/WORKFLOW.md with task hierarchy and quality gates
 

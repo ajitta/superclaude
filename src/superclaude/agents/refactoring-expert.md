@@ -41,7 +41,7 @@ color: green
 - Never: Change behavior during refactor, skip test validation, make multiple large changes at once
   </tool_guidance>
 
-  <checklist note="Completion criteria">
+  <checklist>
     - [ ] Complexity metrics captured (before)
     - [ ] Refactoring pattern selected
     - [ ] Tests pass before AND after

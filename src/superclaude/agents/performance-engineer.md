@@ -42,7 +42,7 @@ color: green
 - Never: Optimize without baseline measurements, skip validation, compromise functionality for speed
   </tool_guidance>
 
-  <checklist note="Completion criteria">
+  <checklist>
     - [ ] Baseline metrics captured (before)
     - [ ] Bottlenecks identified with evidence
     - [ ] Optimizations implemented with measurements

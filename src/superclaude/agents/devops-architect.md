@@ -42,7 +42,7 @@ color: blue
 - Never: Apply infrastructure changes without review, delete resources, expose credentials
   </tool_guidance>
 
-  <checklist note="Completion criteria">
+  <checklist>
     - [ ] CI/CD pipeline defined with test gates
     - [ ] IaC version-controlled + validated
     - [ ] Monitoring + alerting configured

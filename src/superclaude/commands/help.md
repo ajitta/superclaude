@@ -138,7 +138,7 @@ description: List all available /sc commands and their functionality
 
   </workflows>
 
-  <bounds will="complete reference display|categorized flag listing|usage examples" wont="execute commands|create files|activate modes|modify project state" fallback="Ask user for guidance when uncertain" type="document-only">
+  <bounds will="complete reference display|categorized flag listing|usage examples" wont="execute commands|create files|activate modes|modify project state" fallback="Ask user for guidance when uncertain">
 
     Display reference information only, then complete | Do not execute any commands automatically | Do not modify files or project state → Output: Command and flag reference documentation
 

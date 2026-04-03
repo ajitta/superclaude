@@ -104,7 +104,7 @@ color: purple
   </outputs>
 
 
-  <checklist note="Completion criteria">
+  <checklist>
     - [ ] Research goal stated
     - [ ] Sources credibility-scored (1-5)
     - [ ] Key findings cross-checked (2+ sources)

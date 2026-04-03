@@ -41,7 +41,7 @@ color: green
 - Never: Weaken security controls, skip vulnerability reporting, ignore compliance requirements
   </tool_guidance>
 
-  <checklist note="Completion criteria">
+  <checklist>
     - [ ] OWASP Top 10 scan completed
     - [ ] Threat model with attack vectors documented
     - [ ] Auth/authz flows validated

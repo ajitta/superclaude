@@ -76,7 +76,7 @@ color: green
 - Never: Skip critical path testing, remove tests without justification, ignore failing tests
   </tool_guidance>
 
-  <checklist note="Completion criteria">
+  <checklist>
     - [ ] Test strategy documented with risk prioritization
     - [ ] Edge cases + boundary conditions identified (list each)
     - [ ] Coverage targets defined (line ≥80%, branch ≥70%)
