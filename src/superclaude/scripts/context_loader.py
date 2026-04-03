@@ -208,6 +208,32 @@ FLAG_ALIASES: dict[str, list[str]] = {
     "verbalized": ["vs"],
 }
 
+# Agent abbreviation map for --p flag (multi-select: --p=sec,perf,qa)
+AGENT_MAP = {
+    "arch": "system-architect",
+    "fe": "frontend-architect",
+    "be": "backend-architect",
+    "sec": "security-engineer",
+    "qa": "quality-engineer",
+    "ops": "devops-architect",
+    "pm": "project-manager",
+    "perf": "performance-engineer",
+    "refactor": "refactoring-expert",
+    "root": "root-cause-analyst",
+    "req": "requirements-analyst",
+    "educator": "learning-guide",
+    "mentor": "socratic-mentor",
+    "scribe": "technical-writer",
+    "py": "python-expert",
+    "panel": "business-panel-experts",
+    "research": "deep-researcher",
+    "review": "self-review",
+    "index": "repo-index",
+    "simple": "simplicity-guide",
+    "git": "git-workflow",
+    "init": "project-initializer",
+}
+
 # All valid flags for fuzzy matching fallback
 VALID_FLAGS = {
     "brainstorm", "business-panel", "research", "introspect", "task-manage",
@@ -216,7 +242,7 @@ VALID_FLAGS = {
     "devtools", "tavily", "tvly", "frontend-verify", "all-mcp", "no-mcp",
     "delegate", "concurrency", "loop", "iterations", "validate", "safe-mode",
     "fast", "plan", "uc", "ultracompressed", "scope", "focus",
-    "bs", "verbose-context", "vs",
+    "bs", "verbose-context", "vs", "p",
 }
 
 
@@ -542,6 +568,35 @@ _EXECUTION_DIRECTIVES = {
 }
 
 
+def _emit_agent_preference(prompt: str) -> None:
+    """Emit agent preference directives for --p flag. Supports multi-select: --p=sec,perf,qa"""
+    match = re.search(r"--p[=\s]+([a-zA-Z][a-zA-Z0-9,]*)", prompt)
+    if not match:
+        return
+    raw = match.group(1).lower()
+    abbrevs = [a.strip() for a in raw.split(",") if a.strip()]
+    agents = []
+    unknown = []
+    for abbr in abbrevs:
+        if abbr in AGENT_MAP:
+            agents.append(AGENT_MAP[abbr])
+        else:
+            unknown.append(abbr)
+    if agents:
+        agent_list = ", ".join(f"@{a}" for a in agents)
+        print(
+            f'<sc-directive flag="--p={raw}">'
+            f"Agent preference: delegate to {agent_list} when spawning sub-agents. "
+            f"Use these agents' expertise as the primary lens for this task."
+            f"</sc-directive>"
+        )
+        print()
+    if unknown:
+        valid = ", ".join(sorted(AGENT_MAP.keys()))
+        print(f"<!-- --p: unknown abbreviation(s): {', '.join(unknown)}. Valid: {valid} -->")
+        print()
+
+
 def _emit_execution_directives(prompt: str) -> None:
     """Emit inline behavioral directives for execution flags."""
     for pattern, directive_fn in _EXECUTION_DIRECTIVES.items():
@@ -586,6 +641,9 @@ def main() -> None:
 
     # Execution flag directives (inline behavioral hints — no file injection)
     _emit_execution_directives(prompt)
+
+    # Agent preference directives (--p=sec,perf,qa)
+    _emit_agent_preference(prompt)
 
     # Check triggers and get contexts to load
     contexts = check_triggers(prompt)

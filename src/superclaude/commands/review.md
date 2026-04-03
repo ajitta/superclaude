@@ -37,6 +37,11 @@ description: Review code changes for quality, security, and correctness with str
     - Agent: Dispatch isolated reviewer subagent for large reviews (--structured)
   </tools>
 
+  <focus_agent_mapping>
+  When --p flag or domain context suggests specialist review, delegate to:
+  security → @security-engineer | performance → @performance-engineer | quality → @quality-engineer | architecture → @system-architect
+  </focus_agent_mapping>
+
   <examples>
   | Input | Output |
   |-------|--------|

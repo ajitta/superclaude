@@ -45,6 +45,8 @@ WebSearch: fact-check, current info → native web search (no flag needed)
 --validate: risk >0.7, usage >75%, production → pre-execution risk assessment
 --safe-mode: usage >85%, production, critical → max validation, conservative, auto --uc
 --fast: same model, faster output (v2.1.36+)
+--p [abbr,...]: agent preference — bias sub-agent delegation toward specific agents. Multi-select: --p=sec,perf,qa
+  Abbrevs: arch(system-architect) fe(frontend) be(backend) sec(security) qa(quality) ops(devops) pm(project-manager) perf(performance) refactor(refactoring) root(root-cause) req(requirements) py(python) panel(business) research(deep-researcher) review(self-review) simple(simplicity) git(git-workflow) scribe(technical-writer) educator(learning) mentor(socratic) index(repo-index) init(project-initializer)
 --vs [standard|cot|multi]: "multiple perspectives", diverse responses → verbalized sampling (distribution-level diversity, probability-weighted candidates). Bracket sub-params: [k:3-7], [tau:0.01-0.20], [turns:2-5], [no-synthesis]
 --verbose-context: force full .md injection for all triggered contexts, bypassing INSTRUCTION_MAP short instructions. Use when short instructions cause incorrect MCP behavior.
 Agent Teams: experimental (CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1) — parallel coordination

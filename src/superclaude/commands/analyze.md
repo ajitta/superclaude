@@ -37,6 +37,11 @@ description: Comprehensive code analysis across quality, security, performance, 
     - Write: Report generation (--format json|report)
   </tools>
 
+  <focus_agent_mapping>
+  When --focus is specified and task benefits from specialist depth, delegate to the corresponding agent:
+  security → @security-engineer | performance → @performance-engineer | quality → @quality-engineer | architecture → @system-architect | a11y → @frontend-architect
+  </focus_agent_mapping>
+
   <rules_analysis note="--focus rules: rule effectiveness audit">
     Quality (always): Read RULES.md → summary: rule count, example coverage, severity distribution
     Compliance (when data exists): Glob auto memory + list Serena memories → grep `violated_rule: "[RXX]"` → heatmap
