@@ -54,6 +54,11 @@ description: Diagnose and resolve issues in code, builds, deployments, and syste
 
   <token_note>Medium-high consumption — diagnostic cycles use significant context; limit with --type for focused diagnosis</token_note>
 
+  <gotchas>
+  - evidence-fabrication: Do not construct hypothetical failure scenarios to justify a pre-existing recommendation. Evidence (code, config, measurements) must precede proposals.
+  - seq-loop: If sequential thinking reaches the same conclusion twice on the same question, terminate that analysis branch and move to next topic.
+  </gotchas>
+
   <bounds will="systematic diagnosis|validated solutions|safe fixes" wont="risky fixes without confirm|modify production without permission|arch changes without impact" fallback="Ask user for guidance when uncertain" type="conditional">
 
     Without --fix: produce diagnostic report, then complete | With --fix: Apply safe fixes only (execution) | Risky fixes require explicit user approval → Output: Diagnostic report; fixes only with --fix flag

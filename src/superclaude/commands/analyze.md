@@ -73,6 +73,11 @@ description: Comprehensive code analysis across quality, security, performance, 
 
   <token_note>Medium-high consumption — use --scope file or --scope module to limit analysis boundary</token_note>
 
+  <gotchas>
+  - evidence-fabrication: Do not construct hypothetical failure scenarios to justify a pre-existing recommendation. Evidence (code, config, measurements) must precede proposals.
+  - seq-loop: If sequential thinking reaches the same conclusion twice on the same question, terminate that analysis branch and move to next topic.
+  </gotchas>
+
   <bounds will="static analysis|severity-rated findings|detailed reports" wont="dynamic/runtime analysis|modify code|analyze external deps" fallback="Ask user for guidance when uncertain" type="document-only">
     Produce analysis report, then complete | Preserve source code unchanged | Report issues; defer fixes to /sc:improve or /sc:cleanup
   </bounds>

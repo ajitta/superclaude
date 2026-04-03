@@ -41,7 +41,7 @@ Intent Propagation: when delegating to sub-agents, include user's original reque
 [R15] Verification 🔴: before claiming done, run full test suite fresh (not cached); compare pass count to baseline; cite evidence ("42/42 pass, baseline 40")
 [R16] Safe Read 🟡: files of unknown size → use limit parameter or check wc -c first; logs, transcripts, changelogs (>80KB) → prefer Grep or Bash over Read; plan files → keep under 15KB, split into phases for large implementations
 [R17] Serena-First 🟢: code exploration → prefer Serena symbolic tools (get_symbols_overview, find_symbol) over Read; reserve Read for non-code files, unknown formats, or when Serena unavailable
-[R18] Necessity Test 🟡: before designing a component, answer "Is the system broken without this?" — "safer/better" alone is insufficient. Require: specific failure scenario, quantitative evidence, or user-facing impact. "Deferred to post-MVP review" is a valid design decision
+[R18] Necessity Test 🔴: before proposing any unsolicited code change, answer "Is the system broken without this?" — "safer/better" alone is insufficient. Require: specific failure scenario, quantitative evidence, or user-facing impact. "Deferred to post-MVP review" is a valid design decision
   <examples note="Representative scenarios — examples teach better than rules">
   | Scenario | Wrong | Right | Rule |
   |----------|-------|-------|------|
@@ -56,7 +56,7 @@ Intent Propagation: when delegating to sub-agents, include user's original reque
   | Exploring unfamiliar class | Read entire 500-line file | get_symbols_overview → find_symbol(depth=1) | Serena-First 🟢 |
   | Finding function callers | grep "functionName" across repo | find_referencing_symbols(functionName) | Serena-First 🟢 |
   | Reading YAML config | Use Serena symbolic tools | Use Read (non-code file) | Serena-First 🟢 |
-  | Designing component "just in case" | "Good practice for resilience" | "Queue+retry self-regulates. No failure scenario without it. Defer." | Necessity Test 🟡 |
+  | Model proposes adding retry logic | "This would be more resilient" | "System works without this. No failure scenario → SKIP." | Necessity Test 🔴 |
   </examples>
   </core_rules>
 
@@ -89,7 +89,8 @@ Restate before building: confirm understanding before starting work — wrong di
 User correction = learning event: always persist as structured feedback memory, never treat as transient
 Same mistake twice = missing rule: if a feedback memory already covers this pattern, propose a RULES.md addition
 Ambiguity ≠ assumption: multiple valid interpretations → ask, don't pick the most likely one
-Scope words matter: "add" = new, "improve" = enhance existing, "fix" = repair broken, "strengthen" = reinforce existing mechanism
+Scope words matter: "add" = new, "improve" = enhance existing, "fix" = repair broken, "strengthen" = reinforce existing mechanism, "adjust/readjust" = review applicability, not necessarily change
+Unverified numbers: prefix estimates with ~, distinguish from measured/coded values — never state estimates as facts
 Delegation intent loss: sub-agents receive user's original words, not your interpretation of them
   </anti_misunderstanding>
 

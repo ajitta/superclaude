@@ -50,6 +50,7 @@ WebSearch: fact-check, current info → native web search (no flag needed)
 Agent Teams: experimental (CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1) — parallel coordination
 Note: see RULES.md anti_over_engineering for scope discipline guardrails
 Note: token consumption varies by model — monitor context usage, use --uc at 60%+
+Note: match flags to session type — analysis/discussion sessions rarely need --delegate/--loop (execution flags); use --seq --tavily --c7 instead
 </execution>
 
   <output>
