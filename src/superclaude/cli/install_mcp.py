@@ -83,6 +83,13 @@ MCP_SERVERS = {
         "command": "npx -y chrome-devtools-mcp@latest",
         "required": False,
     },
+    "ast-grep": {
+        "name": "ast-grep",
+        "description": "Structural AST pattern search and code analysis using tree-sitter",
+        "transport": "stdio",
+        "command": "uvx --from git+https://github.com/ast-grep/ast-grep-mcp ast-grep-server",
+        "required": False,
+    },
 }
 
 
@@ -183,6 +190,27 @@ def check_prerequisites() -> Tuple[bool, List[str]]:
             click.echo("⚠️  uv not found - required for Serena MCP server", err=True)
     except (subprocess.TimeoutExpired, FileNotFoundError):
         click.echo("⚠️  uv not found - required for Serena MCP server", err=True)
+
+    # Check ast-grep binary for AST-based MCP server (optional)
+    _ast_grep_found = False
+    for binary in ["sg", "ast-grep"]:
+        try:
+            result = _run_command(
+                [binary, "--version"], capture_output=True, text=True, timeout=10
+            )
+            if result.returncode == 0:
+                _ast_grep_found = True
+                break
+        except (subprocess.TimeoutExpired, FileNotFoundError):
+            continue
+    if not _ast_grep_found:
+        click.echo(
+            "⚠️  ast-grep not found - required for ast-grep MCP server", err=True
+        )
+        click.echo(
+            "   Install: brew install ast-grep (macOS) | cargo install ast-grep --locked | npm i -g @ast-grep/cli",
+            err=True,
+        )
 
     return len(errors) == 0, errors
 

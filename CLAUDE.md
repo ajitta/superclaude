@@ -14,7 +14,7 @@ uv run pytest tests/integration/ -v        # Integration tests
 uv run pytest -k "test_agent"              # By name pattern
 
 # Test baseline
-# 1,787 collected, ~1,694 passing (12 pre-existing failures, 6 collection errors)
+# 1,787 collected, ~1,628 passing (12 pre-existing failures, 6 collection errors)
 # Tests are docs-change-safe: markdown-only changes carry no test risk
 
 # Development workflow
@@ -50,14 +50,14 @@ SuperClaude is a **content framework** — markdown files (commands, agents, mod
 | `agents/` | Domain expert — specialized agent definitions | CC-native auto-delegation |
 | `commands/` | Workflow entry — user-facing /sc:* slash commands | CC-native slash commands |
 | `skills/` | Runtime hooks, safety, and reference knowledge — CC-native | CC-native (hooks, disable-model-invocation, auto-invocation) |
-| `mcp/` | Tool reference — MCP server docs + configuration | context_loader + install_mcp |
+| `mcp/` | Tool reference — 9 MCP server docs + configuration | context_loader + install_mcp |
 | `scripts/` | Hook infrastructure — Python/shell automation | hooks.json → settings.json |
 
 ### Content Installation Flow
 
 ```
 src/superclaude/commands/  →  ~/.claude/commands/sc/       (33 slash commands)
-src/superclaude/agents/    →  ~/.claude/agents/             (24 agent definitions)
+src/superclaude/agents/    →  ~/.claude/agents/             (23 agent definitions)
 src/superclaude/skills/    →  ~/.claude/skills/             (5 skills: 2 hook, 2 safety, 1 reference)
 src/superclaude/core/      →  ~/.claude/superclaude/core/   (FLAGS, PRINCIPLES, RULES, BUSINESS_SYMBOLS)
 src/superclaude/mcp/       →  ~/.claude/superclaude/mcp/    (MCP server documentation)
@@ -92,7 +92,7 @@ Commits: `feat:`, `fix:`, `docs:`, `refactor:`, `test:`, `chore:`
 
 ## Package Info
 
-- **Version**: 4.3.0+ajitta
+- **Version**: 4.4.0+ajitta
 - **Python**: >=3.10
 - **Build**: hatchling (PEP 517)
 - **Deps**: pytest>=7.0.0, click>=8.0.0, rich>=13.0.0, pyyaml>=6.0.0

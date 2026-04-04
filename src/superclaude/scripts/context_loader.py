@@ -107,6 +107,7 @@ TRIGGER_MAP = [
     (r"(--perf|--devtools)", "mcp/MCP_Chrome-DevTools.md", 2),
     (r"(--magic)", "mcp/MCP_Magic.md", 2),
     (r"(--morph|--morphllm)", "mcp/MCP_Morphllm.md", 2),
+    (r"(--sg|--ast-grep|ast.?grep|syntax.?tree|structural.?pattern|structural.?search)", "mcp/MCP_AstGrep.md", 2),
     # Business symbols - supplementary reference
     (r"(business.?symbol|strategic.?symbol|business.?example|panel.?example|--structured)", "core/BUSINESS_SYMBOLS.md", 3),
     # Modes — behavioral at P1, operational at P2
@@ -141,6 +142,7 @@ COMPOSITE_FLAGS = {
         ("mcp/MCP_Chrome-DevTools.md", 2),
         ("mcp/MCP_Magic.md", 2),
         ("mcp/MCP_Morphllm.md", 2),
+        ("mcp/MCP_AstGrep.md", 2),
     ],
 }
 
@@ -178,6 +180,7 @@ TIER_0_MAP = {
     "mcp/MCP_Chrome-DevTools.md": "DevTools: performance profiling. trace → reproduce → analyze Core Web Vitals.",
     "mcp/MCP_Magic.md": "Magic 21st.dev: UI component search → customize → integrate.",
     "mcp/MCP_Morphllm.md": "Morphllm: bulk pattern-based multi-file code transforms.",
+    "mcp/MCP_AstGrep.md": "ast-grep: structural AST search. dump_tree → test_rule → find_code. For patterns beyond grep.",
     "core/BUSINESS_SYMBOLS.md": "Business symbols + expert selection. 🎯📈💰⚖️🏆🌊 domain mapping.",
 }
 
@@ -204,6 +207,7 @@ FLAG_ALIASES: dict[str, list[str]] = {
     "iteration": ["iterations"],
     "loo": ["loop"],
     "sea": ["serena"],
+    "astgrep": ["ast-grep"],
     "sampling": ["vs"],
     "verbalized": ["vs"],
 }
@@ -238,7 +242,7 @@ AGENT_MAP = {
 VALID_FLAGS = {
     "brainstorm", "business-panel", "research", "introspect", "task-manage",
     "orchestrate", "token-efficient", "c7", "context7", "seq", "sequential",
-    "magic", "morph", "morphllm", "serena", "play", "playwright", "perf",
+    "magic", "morph", "morphllm", "serena", "sg", "ast-grep", "play", "playwright", "perf",
     "devtools", "tavily", "tvly", "frontend-verify", "all-mcp", "no-mcp",
     "delegate", "concurrency", "loop", "iterations", "validate", "safe-mode",
     "fast", "plan", "uc", "ultracompressed", "scope", "focus",

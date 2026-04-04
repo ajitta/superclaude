@@ -18,6 +18,7 @@ MCP server docs are loaded on-demand by `context_loader.py` via flag/keyword tri
 | Chrome DevTools | `--perf` | Performance analysis and Core Web Vitals |
 | Magic | `--magic` | UI component generation from 21st.dev patterns |
 | Morphllm | `--morph` | Pattern-based bulk code transformations |
+| ast-grep | `--sg` | Structural AST pattern search via tree-sitter |
 
 ## Composite Flags
 
@@ -40,6 +41,8 @@ MCP server docs are loaded on-demand by `context_loader.py` via flag/keyword tri
 | Tavily → Context7 | Updates searched → stable docs provided |
 | Tavily → Playwright | URLs discovered → complex content extracted |
 | Magic → Playwright | UI created → accessibility validated |
+| Serena → ast-grep | Symbol context → structural pattern validation |
+| ast-grep → Morphllm | Patterns found → bulk transformations executed |
 | Playwright → DevTools | Flow automated → performance analyzed |
 
 ## Related
