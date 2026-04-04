@@ -27,7 +27,6 @@ MCP_ABBREV_MAP = {
     "c7": "MCP_Context7.md",
     "play": "MCP_Playwright.md",
     "perf": "MCP_Chrome-DevTools.md",
-    "morph": "MCP_Morphllm.md",
     "magic": "MCP_Magic.md",
     "serena": "MCP_Serena.md",
     "tavily": "MCP_Tavily.md",

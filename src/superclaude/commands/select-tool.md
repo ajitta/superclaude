@@ -21,17 +21,17 @@ description: Intelligent MCP tool selection based on complexity scoring and oper
 
   <decision_matrix>
     - Symbol ops: Serena (LSP, navigation)
-    - Pattern edits: Morphllm (bulk, speed)
+    - Pattern edits: ast-grep (structural) or Edit (native)
     - Memory ops: Serena (persistence)
     - Threshold >0.6: Serena (accuracy)
-    - Threshold <0.4: Morphllm (speed)
+    - Threshold <0.4: Native tools (speed)
     - Threshold 0.4-0.6: Feature-based selection
   </decision_matrix>
 
   <patterns>
     - Serena: Semantic ops | LSP | symbol nav | project context
-    - Morphllm: Pattern edits | bulk transforms | speed-critical
-    - Fallback: Serena → Morphllm → Native tools
+    - ast-grep: Structural pattern search | anti-pattern detection
+    - Fallback: Serena → ast-grep → Native tools
   </patterns>
 
   <performance>
@@ -44,13 +44,13 @@ description: Intelligent MCP tool selection based on complexity scoring and oper
 | Input | Output |
 |-------|--------|
 | `'rename function across 10 files' --analyze` | Serena (LSP, semantic) |
-| `'update console.log to logger.info' --explain` | Morphllm (pattern, bulk) |
+| `'update console.log to logger.info' --explain` | ast-grep + Edit (structural pattern) |
 | `'save project context'` | Serena (memory direct) |
 
   <example name="wrong-tool-choice" type="error-path">
-    <input>/sc:select-tool 'rename a variable across the project' → suggests Morphllm</input>
-    <why_wrong>Variable renaming is a semantic operation. Morphllm does text patterns, not semantic renames.</why_wrong>
-    <correct>Serena (LSP-based rename) for semantic operations. Morphllm for text-pattern transformations only.</correct>
+    <input>/sc:select-tool 'rename a variable across the project' → suggests ast-grep</input>
+    <why_wrong>Variable renaming is a semantic operation. ast-grep does structural patterns, not semantic renames.</why_wrong>
+    <correct>Serena (LSP-based rename) for semantic operations. ast-grep for structural pattern search only.</correct>
   </example>
   </examples>
 

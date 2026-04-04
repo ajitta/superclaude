@@ -69,7 +69,6 @@ description: List all available /sc commands and their functionality
       - --c7|--context7: Curated documentation
       - --seq|--sequential: Multi-step reasoning
       - --magic: UI generation (21st.dev)
-      - --morph|--morphllm: Bulk transformations
       - --serena: Semantic + memory
       - --play|--playwright: Browser automation
       - --all-mcp: Enable all servers

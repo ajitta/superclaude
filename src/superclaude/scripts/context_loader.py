@@ -92,7 +92,7 @@ TRIGGER_MAP = [
     #
     # MCP servers — behavioral MCPs at P1, tool MCPs at P2
     (
-        r"(serena|symbol ops|rename.?symbol|lsp|--serena|/sc:load|/sc:save)",
+        r"(serena|symbol ops|rename.?symbol|safe.?delete|lsp|--serena|/sc:load|/sc:save)",
         "mcp/MCP_Serena.md",
         1,
     ),
@@ -101,12 +101,11 @@ TRIGGER_MAP = [
         "mcp/MCP_Tavily.md",
         1,
     ),
-    (r"(--c7|--context7)", "mcp/MCP_Context7.md", 2),
+    (r"(--c7|--context7|library.?docs|framework.?docs|resolve.?library)", "mcp/MCP_Context7.md", 2),
     (r"(--seq|--sequential)", "mcp/MCP_Sequential.md", 2),
-    (r"(--play|--playwright)", "mcp/MCP_Playwright.md", 2),
-    (r"(--perf|--devtools)", "mcp/MCP_Chrome-DevTools.md", 2),
-    (r"(--magic)", "mcp/MCP_Magic.md", 2),
-    (r"(--morph|--morphllm)", "mcp/MCP_Morphllm.md", 2),
+    (r"(--play|--playwright|browser.?test|e2e.?test|network.?mock|mock.?api|browser.?automat)", "mcp/MCP_Playwright.md", 2),
+    (r"(--perf|--devtools|lighthouse|memory.?leak|core.?web.?vital|cwv|a11y.?audit|accessibility.?audit)", "mcp/MCP_Chrome-DevTools.md", 2),
+    (r"(--magic|/ui\b|21st\.dev|ui.?component.?generat)", "mcp/MCP_Magic.md", 2),
     (r"(--sg|--ast-grep|ast.?grep|syntax.?tree|structural.?pattern|structural.?search)", "mcp/MCP_AstGrep.md", 2),
     # Business symbols - supplementary reference
     (r"(business.?symbol|strategic.?symbol|business.?example|panel.?example|--structured)", "core/BUSINESS_SYMBOLS.md", 3),
@@ -141,9 +140,8 @@ COMPOSITE_FLAGS = {
         ("mcp/MCP_Playwright.md", 2),
         ("mcp/MCP_Chrome-DevTools.md", 2),
         ("mcp/MCP_Magic.md", 2),
-        ("mcp/MCP_Morphllm.md", 2),
         ("mcp/MCP_AstGrep.md", 2),
-    ],
+    ],  # Note: Morphllm removed; Playwright/DevTools/Magic are plugin-install-only (docs still loaded)
 }
 
 # v3.1: Hybrid Injection Map
@@ -154,18 +152,20 @@ COMPOSITE_FLAGS = {
 INSTRUCTION_MAP = {
     # Behavioral MCPs — complex decision rules and workflow patterns
     "mcp/MCP_Serena.md": (
-        "Serena: symbol-level code operations (find_symbol, replace_symbol_body, get_symbols_overview, "
-        "insert_before/after_symbol, find_referencing_symbols, rename_symbol). "
+        "Serena (22 tools): symbol ops (find_symbol, replace_symbol_body, get_symbols_overview, "
+        "insert_before/after_symbol, find_referencing_symbols, rename_symbol, safe_delete_symbol). "
         "Workflow: get_symbols_overview → find_symbol(name_path, include_body=True) → edit. "
         "Use search_for_pattern when symbol name is unknown. "
-        "Decision: symbol meaning (references, types, rename) → Serena; text patterns (strings, regex) → native Grep/Edit. "
-        "Memory: activate_project → list_memories → read_memory for cross-session context. "
-        "Note: thinking tools (think_about_*, summarize_changes) are NOT active in claude-code context. "
+        "Decision: symbol meaning (references, types, rename, delete) → Serena; text patterns → native Grep/Edit. "
+        "Memory (6): activate_project → list_memories → read/write/edit/rename/delete_memory. "
+        "Note: thinking tools (think_about_*, summarize_changes) NOT active in claude-code context. "
         "Prioritize symbolic tools over full file reads."
     ),
     "mcp/MCP_Tavily.md": (
-        "Tavily MCP: tavily_search (web search with domain/time filtering), tavily_extract (full-text from URLs), "
-        "tavily_research (multi-source synthesis), tavily_crawl (site-wide extraction), tavily_map (URL discovery). "
+        "Tavily MCP: tavily_search (web search — search_depth: basic/advanced/fast/ultra-fast, "
+        "time_range: day/week/month/year, start_date/end_date, include_domains/exclude_domains, country), "
+        "tavily_extract (full-text from URLs), tavily_research (multi-source synthesis), "
+        "tavily_crawl (site-wide extraction), tavily_map (URL discovery). "
         "Use for current info post-knowledge-cutoff, multi-source research, fact-checking. "
         "Fallback: native WebSearch for simple queries, WebFetch for single pages."
     ),
@@ -174,12 +174,11 @@ INSTRUCTION_MAP = {
 # v3.2: Tier 0 — 1-line summaries for tool MCPs (Claude already has tool descriptions)
 # Behavioral MCPs (Serena, Tavily) are NOT here — they use INSTRUCTION_MAP (Tier 1)
 TIER_0_MAP = {
-    "mcp/MCP_Context7.md": "Context7: resolve-library-id first, then query-docs. Never skip step 1.",
+    "mcp/MCP_Context7.md": "Context7: resolve-library-id first, then get-library-docs. Never skip step 1.",
     "mcp/MCP_Sequential.md": "Sequential: multi-step reasoning chain. Use for 3+ component problems.",
-    "mcp/MCP_Playwright.md": "Playwright: browser E2E automation. navigate → interact → assert.",
-    "mcp/MCP_Chrome-DevTools.md": "DevTools: performance profiling. trace → reproduce → analyze Core Web Vitals.",
+    "mcp/MCP_Playwright.md": "Playwright: browser E2E + network mocking (--caps=network,storage). navigate → assert.",
+    "mcp/MCP_Chrome-DevTools.md": "DevTools: 26 tools. Lighthouse audits, CWV, a11y, memory, --slim mode. trace → analyze → optimize.",
     "mcp/MCP_Magic.md": "Magic 21st.dev: UI component search → customize → integrate.",
-    "mcp/MCP_Morphllm.md": "Morphllm: bulk pattern-based multi-file code transforms.",
     "mcp/MCP_AstGrep.md": "ast-grep: structural AST search. dump_tree → test_rule → find_code. For patterns beyond grep.",
     "core/BUSINESS_SYMBOLS.md": "Business symbols + expert selection. 🎯📈💰⚖️🏆🌊 domain mapping.",
 }
@@ -242,7 +241,7 @@ AGENT_MAP = {
 VALID_FLAGS = {
     "brainstorm", "business-panel", "research", "introspect", "task-manage",
     "orchestrate", "token-efficient", "c7", "context7", "seq", "sequential",
-    "magic", "morph", "morphllm", "serena", "sg", "ast-grep", "play", "playwright", "perf",
+    "magic", "serena", "sg", "ast-grep", "play", "playwright", "perf",
     "devtools", "tavily", "tvly", "frontend-verify", "all-mcp", "no-mcp",
     "delegate", "concurrency", "loop", "iterations", "validate", "safe-mode",
     "fast", "plan", "uc", "ultracompressed", "scope", "focus",
@@ -410,7 +409,7 @@ def check_mcp_fallbacks(contexts: list[tuple[str, int]]) -> list[str]:
 
     notifications = []
     for context_file, _ in contexts:
-        # Extract MCP name from path like "mcp/MCP_Morphllm.md"
+        # Extract MCP name from path like "mcp/MCP_Serena.md"
         if context_file.startswith("mcp/MCP_"):
             mcp_name = context_file.replace("mcp/MCP_", "").replace(".md", "").lower()
             # Map special names

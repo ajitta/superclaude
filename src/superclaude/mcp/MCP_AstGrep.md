@@ -15,7 +15,7 @@
   - Anti-pattern detection: unused imports, missing error handling, eval() usage
   - Refactoring target identification: deprecated API patterns, duplicated structures
   - Code quality audits: structural checks beyond text grep capabilities
-  - Pre-transformation analysis: find patterns before bulk edits with Morphllm
+  - Pre-transformation analysis: find patterns before bulk edits
 
   Avoid:
   - Symbol navigation: find definitions, references, types → Serena (--serena)
@@ -42,14 +42,14 @@
   ```
   - **dump_syntax_tree**: Visualize AST node names before writing patterns
   - **test_match_code_rule**: Test YAML rules on code snippets before codebase-wide search
-  - **find_code**: Simple structural pattern search (supports `$METAVAR` and `$$$` wildcards)
-  - **find_code_by_rule**: Advanced search with YAML rules (constraints, meta-variables, regex)
+  - **find_code**: Simple structural pattern search (supports `$METAVAR` and `$$$` wildcards). Params: `max_results`, `output_format` ("text"|"json")
+  - **find_code_by_rule**: Advanced search with YAML rules (constraints, meta-variables, regex). Params: `max_results`, `output_format` ("text"|"json")
 
   ## Integration Patterns
   - **Refactoring prep**: ast-grep:find-patterns → Serena:rename-symbols → /sc:test
   - **Security audit**: ast-grep:vulnerability-patterns → /sc:review → /sc:implement fixes
-  - **Code quality**: /sc:analyze → ast-grep:anti-patterns → Morphllm:bulk-fix → /sc:test
-  - **Migration**: Context7:new-api-docs → ast-grep:find-old-patterns → Morphllm:transform
+  - **Code quality**: /sc:analyze → ast-grep:anti-patterns → Edit:bulk-fix → /sc:test
+  - **Migration**: Context7:new-api-docs → ast-grep:find-old-patterns → Edit:transform
 
   <examples>
 | Input | Action | Reason |

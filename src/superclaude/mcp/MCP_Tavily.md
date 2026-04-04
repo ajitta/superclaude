@@ -31,8 +31,18 @@ Web: General searches | News: Time-filtered | Academic: Scholarly articles | Dom
 | `tavily_map` | URL structure discovery | Map site structure before targeted extraction |
   </tools>
 
+  ## Search Parameters (tavily_search)
+  - `search_depth`: "basic" | "advanced" | "fast" | "ultra-fast"
+  - `time_range`: "day" | "week" | "month" | "year"
+  - `start_date` / `end_date`: YYYY-MM-DD format for precise date ranges
+  - `include_domains` / `exclude_domains`: domain filtering arrays
+  - `country`: boost results from specific country (full name, e.g., "Japan")
+  - `max_results`: 5-20 (default: 5)
+  - `include_raw_content`: get cleaned HTML of each result
+  - `DEFAULT_PARAMETERS` env var: set default search behavior
+
   ## Search Patterns
-  Basic: query → ranked results | Domain: query + domains:[arxiv,github] | Time: query + recency:week|month|year | Deep: query + extract:true | Research: input → multi-source synthesis | Crawl: url + depth + instructions → pages
+  Basic: query → ranked results | Domain: query + include_domains:[arxiv,github] | Time: query + time_range:week | Date: query + start_date/end_date | Deep: query + include_raw_content:true | Research: input → multi-source synthesis | Crawl: url + depth + instructions → pages
 
   ## Workflows
   - Research: Tavily:broad → Sequential:gaps → Tavily:targeted → Sequential:synthesize → Serena:store

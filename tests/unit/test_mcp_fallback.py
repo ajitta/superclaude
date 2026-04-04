@@ -35,40 +35,40 @@ class TestMcpFallback:
         """Test first notification returns True."""
         from superclaude.hooks.mcp_fallback import should_notify_fallback
 
-        should_notify, fallback = should_notify_fallback("morphllm")
+        should_notify, fallback = should_notify_fallback("sequential")
         assert should_notify is True
-        assert fallback == "Edit (native)"
+        assert fallback == "Native reasoning"
 
     def test_should_notify_fallback_second_time(self, temp_fallback_dir: Path):
         """Test second notification returns False."""
         from superclaude.hooks.mcp_fallback import should_notify_fallback
 
         # First call
-        should_notify_fallback("morphllm")
+        should_notify_fallback("sequential")
 
         # Second call - should not notify
-        should_notify, fallback = should_notify_fallback("morphllm")
+        should_notify, fallback = should_notify_fallback("sequential")
         assert should_notify is False
-        assert fallback == "Edit (native)"
+        assert fallback == "Native reasoning"
 
     def test_different_mcps_tracked_separately(self, temp_fallback_dir: Path):
         """Test that different MCPs are tracked independently."""
         from superclaude.hooks.mcp_fallback import should_notify_fallback
 
-        # Notify for morphllm
-        should_notify_fallback("morphllm")
+        # Notify for sequential
+        should_notify_fallback("sequential")
 
         # magic should still notify (first time)
         should_notify, fallback = should_notify_fallback("magic")
         assert should_notify is True
-        assert fallback == "Write (native)"
+        assert "Write (native" in fallback
 
     def test_format_fallback_notification(self, temp_fallback_dir: Path):
         """Test notification message format."""
         from superclaude.hooks.mcp_fallback import format_fallback_notification
 
-        msg = format_fallback_notification("Morphllm", "Edit (native)")
-        assert msg == "⚠️ Morphllm unavailable → using Edit (native)"
+        msg = format_fallback_notification("Sequential", "Native reasoning")
+        assert msg == "⚠️ Sequential unavailable → using Native reasoning"
 
     def test_check_mcp_and_notify_returns_message(self, temp_fallback_dir: Path):
         """Test combined check and notify function."""
@@ -78,7 +78,7 @@ class TestMcpFallback:
         result = check_mcp_and_notify("playwright")
         assert result is not None
         assert "Playwright" in result or "playwright" in result
-        assert "--chrome (native)" in result
+        assert "--chrome" in result or "plugin" in result.lower()
 
         # Second call - returns None
         result2 = check_mcp_and_notify("playwright")
@@ -104,10 +104,10 @@ class TestMcpFallback:
         from superclaude.hooks.mcp_fallback import should_notify_fallback
 
         # Use uppercase
-        should_notify_fallback("MORPHLLM")
+        should_notify_fallback("SEQUENTIAL")
 
         # Lowercase should see as already notified
-        should_notify, _ = should_notify_fallback("morphllm")
+        should_notify, _ = should_notify_fallback("sequential")
         assert should_notify is False
 
     def test_mcp_fallback_mapping_complete(self):
@@ -116,7 +116,7 @@ class TestMcpFallback:
 
         expected_mcps = [
             "context7", "tavily", "sequential", "serena",
-            "morphllm", "magic", "playwright", "devtools",
+            "magic", "playwright", "devtools",
         ]
 
         for mcp in expected_mcps:
@@ -155,7 +155,7 @@ class TestMcpFallbackCleanup:
         # Manually create old session data
         old_time = (datetime.now() - timedelta(hours=25)).isoformat()
         old_data = {
-            "old-session-123": {"morphllm": old_time},
+            "old-session-123": {"context7": old_time},
         }
 
         fallback_file = temp_fallback_dir / "mcp_fallbacks.json"

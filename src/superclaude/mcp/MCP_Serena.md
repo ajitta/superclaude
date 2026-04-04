@@ -9,8 +9,8 @@
   3. `activate_project` — activates the project by name or path
   If onboarding not performed: call `onboarding` before `activate_project`
 
-  <tools note="20 tools active in claude-code context">
-    **Symbol Operations (7):**
+  <tools note="22 tools active in claude-code context">
+    **Symbol Operations (8):**
     - `find_symbol` — search by name path pattern (supports substring, depth, kind filtering)
     - `find_referencing_symbols` — find all references to a symbol
     - `get_symbols_overview` — high-level file symbol map (call first for new files)
@@ -18,13 +18,15 @@
     - `insert_after_symbol` — insert code after a symbol
     - `insert_before_symbol` — insert code before a symbol
     - `rename_symbol` — rename across entire codebase
+    - `safe_delete_symbol` — remove symbol with unused code propagation
 
-    **Memory (5):**
+    **Memory (6):**
     - `write_memory` — persist named memory (md format, project-scoped)
     - `read_memory` — retrieve a named memory
     - `list_memories` — list all available memories
     - `delete_memory` — remove a memory
     - `edit_memory` — regex/literal replace within a memory
+    - `rename_memory` — rename existing memory
 
     **Search and Navigation (3):**
     - `search_for_pattern` — regex search with context lines, glob filtering
@@ -48,10 +50,12 @@
 
     **Status:** These tools exist in Serena but are NOT active in the `claude-code` context.
     The `included_optional_tools` setting in `.serena/project.yml` does not override context-level
-    restrictions in Serena 0.1.4. When commands reference these tools (reflect.md, save.md),
+    restrictions. When commands reference these tools (reflect.md, save.md),
     use native reasoning as a fallback.
 
-    Future: May become available if Serena adds context-override support or a dedicated mode.
+    **Note:** Serena also has JetBrains Plugin support with additional refactoring capabilities
+    (move, inline, propagate deletions, type hierarchy, find implementations).
+    These are available in the `ide-assistant` context, not `claude-code`.
 
   <choose>
     **Use Serena for:**
@@ -66,7 +70,7 @@
     - Simple text edits: Edit tool (pattern-based, no LSP needed)
     - File search by name: Glob (faster for simple patterns)
     - Content search: Grep (faster for text patterns)
-    - Bulk pattern replacements: Morphllm (--morph flag)
+    - Bulk pattern replacements: ast-grep + Edit (native)
     - File reading: Read tool (when you need full file, not symbols)
 
     **Decision rule:** If the operation is about _what the code means_ (symbols, references, types), use Serena. If it's about _what the text says_ (patterns, strings), use native tools.
@@ -109,7 +113,7 @@
 | load project context | `activate_project` → `list_memories` | Session initialization |
 | save work session | `write_memory` | Cross-session persistence |
 | check if task is complete | `think_about_whether_you_are_done` | Structured completion assessment |
-| update console.log to logger | Morphllm (not Serena) | Pattern-based bulk replacement |
+| update console.log to logger | ast-grep + Edit (not Serena) | Pattern-based bulk replacement |
   </examples>
 
   <bounds will="semantic code understanding|symbol operations|cross-session memory" wont="simple text edits|bulk pattern replacement|file-level operations" fallback="Use native Grep/Glob/Edit for text-level operations"/>

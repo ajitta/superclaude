@@ -3,11 +3,12 @@
     <mission>Modern UI component generation from 21st.dev patterns with design system integration</mission>
   </role>
 
-  ## Activation
-  Not always active. When UI component generation is needed:
-  1. `mcp-find("magic")` or `mcp-find("21st")` — locate in MCP Docker catalog
-  2. `mcp-add("magic")` — activate for current session
-  3. Components generated follow 21st.dev design patterns
+  ## Plugin Install (manual)
+  ```
+  npx @21st-dev/cli@latest install <client> --api-key <key>
+  ```
+  Or: `claude mcp add magic -s user -e TWENTYFIRST_API_KEY=<key> -- npx -y @21st-dev/magic`
+  Or via MCP Docker: `mcp-find("magic")` → `mcp-add("magic")`
 
   <choose>
   Use:

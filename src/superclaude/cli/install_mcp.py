@@ -30,40 +30,12 @@ MCP_SERVERS = {
         "command": "npx -y @upstash/context7-mcp",
         "required": False,
     },
-    "magic": {
-        "name": "magic",
-        "description": "Modern UI component generation and design systems",
-        "transport": "stdio",
-        "command": "npx -y @21st-dev/magic",
-        "required": False,
-        "api_key_env": "TWENTYFIRST_API_KEY",
-        "api_key_description": "21st.dev API key for UI component generation",
-    },
-    "playwright": {
-        "name": "playwright",
-        "description": "Cross-browser E2E testing and automation",
-        "transport": "stdio",
-        "command": "npx -y @playwright/mcp@latest",
-        "required": False,
-    },
     "serena": {
         "name": "serena",
         "description": "Semantic code analysis and intelligent editing",
         "transport": "stdio",
         "command": "uvx --from git+https://github.com/oraios/serena serena start-mcp-server --context claude-code --enable-web-dashboard false --enable-gui-log-window false",
         "required": False,
-    },
-    "filesystem-with-morph": {
-        "name": "filesystem-with-morph",
-        "description": "Pattern-based bulk code transformations with filesystem access",
-        "transport": "stdio",
-        "command": "npx -y @morphllm/morphmcp",
-        "required": False,
-        "api_key_env": "MORPH_API_KEY",
-        "api_key_description": "Morph API key for code transformations",
-        "env": {
-            "ENABLED_TOOLS": "edit_file,warpgrep_codebase_search",
-        },
     },
     "tavily": {
         "name": "tavily",
@@ -75,13 +47,6 @@ MCP_SERVERS = {
         "api_key_description": "Tavily API key for web search (get from https://app.tavily.com)",
         "api_key_in_url": True,
         "api_key_url_param": "tavilyApiKey",  # URL param name (camelCase)
-    },
-    "chrome-devtools": {
-        "name": "chrome-devtools",
-        "description": "Performance analysis and Core Web Vitals (CLS, LCP, memory profiling). Use --perf or --devtools flag.",
-        "transport": "stdio",
-        "command": "npx -y chrome-devtools-mcp@latest",
-        "required": False,
     },
     "ast-grep": {
         "name": "ast-grep",
@@ -420,8 +385,6 @@ def show_mcp_status():
         # Handle special mappings
         fallback_map = {
             "sequentialthinking": "sequential",
-            "filesystemwithmorph": "morphllm",
-            "chromedevtools": "devtools",
         }
         fallback_key = fallback_map.get(fallback_key, fallback_key)
         fallback = fallbacks.get(fallback_key, "Native")

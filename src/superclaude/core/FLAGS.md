@@ -17,7 +17,6 @@
 --c7|--context7: imports, frameworks, official docs → Context7 curated docs
 --seq|--sequential: complex debug, system design → Sequential multi-step reasoning
 --magic: /ui, /21, design systems → Magic 21st.dev UI components
---morph|--morphllm: bulk transforms, pattern edits → Morphllm multi-file patterns
 --serena: symbol ops, project memory → Serena semantic understanding + Serena-first exploration directive
 --play|--playwright: browser testing, E2E, visual → Playwright browser automation
 --perf|--devtools: perf audit, CLS, LCP, metrics → DevTools performance analysis

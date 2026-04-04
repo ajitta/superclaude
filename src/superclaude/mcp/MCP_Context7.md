@@ -5,16 +5,18 @@
 
   ## 2-Step Workflow (required)
   1. `resolve-library-id` — search library name → get Context7-compatible ID (format: `/org/project`)
-  2. `query-docs` — query documentation with the resolved ID
+  2. `get-library-docs` — query documentation with the resolved ID
 
-  Never call `query-docs` without first resolving the library ID, unless the user provides one explicitly.
+  Never call `get-library-docs` without first resolving the library ID, unless the user provides one explicitly.
 
-  <tools note="2 tools, strict call order">
+  <tools note="2 tools, strict call order — @upstash/context7-mcp v2.1.6+">
   | Tool | Purpose | Required Input |
   |------|---------|---------------|
-  | `resolve-library-id` | Name → library ID | `libraryName`, `query` |
-  | `query-docs` | ID → documentation | `libraryId`, `query` |
+  | `resolve-library-id` | Name → library ID | `libraryName` |
+  | `get-library-docs` | ID → documentation | `context7CompatibleLibraryID`, `topic` |
   </tools>
+
+  **Also available as:** Remote MCP server at `https://context7.com/mcp` (no local install needed)
 
   <choose>
   Use:

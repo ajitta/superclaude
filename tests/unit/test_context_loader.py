@@ -175,16 +175,29 @@ class TestResolveFlags:
 class TestTieredInjection:
     """Test 3-tier context injection system."""
 
+    # Expected MCP docs (8 total: 5 core + 3 plugin, Morphllm removed)
+    EXPECTED_TOOL_MCPS = {
+        "mcp/MCP_Context7.md",
+        "mcp/MCP_Sequential.md",
+        "mcp/MCP_Playwright.md",
+        "mcp/MCP_Chrome-DevTools.md",
+        "mcp/MCP_Magic.md",
+        "mcp/MCP_AstGrep.md",
+    }
+    EXPECTED_BEHAVIORAL_MCPS = {
+        "mcp/MCP_Serena.md",
+        "mcp/MCP_Tavily.md",
+    }
+
     def test_tool_mcp_gets_tier_0(self):
         """Tool MCPs (Context7, Playwright, etc.) should get Tier 0."""
-        assert _get_injection_tier("mcp/MCP_Context7.md", verbose=False) == 0
-        assert _get_injection_tier("mcp/MCP_Playwright.md", verbose=False) == 0
-        assert _get_injection_tier("mcp/MCP_Magic.md", verbose=False) == 0
+        for mcp in self.EXPECTED_TOOL_MCPS:
+            assert _get_injection_tier(mcp, verbose=False) == 0, f"{mcp} should be Tier 0"
 
     def test_behavioral_mcp_gets_tier_1(self):
         """Behavioral MCPs (Serena, Tavily) should get Tier 1."""
-        assert _get_injection_tier("mcp/MCP_Serena.md", verbose=False) == 1
-        assert _get_injection_tier("mcp/MCP_Tavily.md", verbose=False) == 1
+        for mcp in self.EXPECTED_BEHAVIORAL_MCPS:
+            assert _get_injection_tier(mcp, verbose=False) == 1, f"{mcp} should be Tier 1"
 
     def test_mode_always_gets_tier_2(self):
         """Modes should always get Tier 2 (full .md)."""
@@ -213,9 +226,48 @@ class TestTieredInjection:
                 f"TIER_0_MAP[{key}] is {len(value)} chars — should be < 100"
             )
 
+    def test_all_tool_mcps_in_tier_0_map(self):
+        """Every tool MCP should have a Tier 0 summary."""
+        for mcp in self.EXPECTED_TOOL_MCPS:
+            assert mcp in TIER_0_MAP, f"{mcp} missing from TIER_0_MAP"
+
+    def test_all_behavioral_mcps_in_instruction_map(self):
+        """Every behavioral MCP should have an INSTRUCTION_MAP entry."""
+        for mcp in self.EXPECTED_BEHAVIORAL_MCPS:
+            assert mcp in INSTRUCTION_MAP, f"{mcp} missing from INSTRUCTION_MAP"
+
+    def test_tier_0_context7_mentions_get_library_docs(self):
+        """Context7 Tier 0 hint should reference the correct tool name."""
+        hint = TIER_0_MAP["mcp/MCP_Context7.md"]
+        assert "get-library-docs" in hint, "Context7 hint should reference get-library-docs (not query-docs)"
+
+    def test_tier_0_devtools_mentions_lighthouse(self):
+        """DevTools Tier 0 hint should reference Lighthouse capability."""
+        hint = TIER_0_MAP["mcp/MCP_Chrome-DevTools.md"]
+        assert "Lighthouse" in hint, "DevTools hint should mention Lighthouse audits"
+
+    def test_tier_0_playwright_mentions_caps(self):
+        """Playwright Tier 0 hint should reference capability system."""
+        hint = TIER_0_MAP["mcp/MCP_Playwright.md"]
+        assert "--caps" in hint or "caps" in hint, "Playwright hint should mention capability system"
+
+    def test_instruction_map_serena_mentions_safe_delete(self):
+        """Serena INSTRUCTION_MAP should mention key symbol operations."""
+        hint = INSTRUCTION_MAP["mcp/MCP_Serena.md"]
+        assert "find_symbol" in hint
+        assert "replace_symbol_body" in hint
+
     def test_verbose_context_in_valid_flags(self):
         """--verbose-context should be a valid flag."""
         assert "verbose-context" in VALID_FLAGS
+
+    def test_no_morphllm_in_any_map(self):
+        """Morphllm should not appear in any injection map (removed)."""
+        morphllm_key = "mcp/MCP_Morphllm.md"
+        assert morphllm_key not in TIER_0_MAP, "Morphllm should be removed from TIER_0_MAP"
+        assert morphllm_key not in INSTRUCTION_MAP, "Morphllm should be removed from INSTRUCTION_MAP"
+        assert "morph" not in VALID_FLAGS, "morph should be removed from VALID_FLAGS"
+        assert "morphllm" not in VALID_FLAGS, "morphllm should be removed from VALID_FLAGS"
 
 
 class TestTriggerMapPaths:
@@ -233,3 +285,33 @@ class TestTriggerMapPaths:
                 assert (BASE_PATH / path).exists(), (
                     f"COMPOSITE_FLAGS[{flag}] path missing: {path}"
                 )
+
+    def test_no_morphllm_in_trigger_map(self):
+        """Morphllm should not appear in any TRIGGER_MAP entry."""
+        for _pattern, path, _priority in TRIGGER_MAP:
+            assert "Morphllm" not in path, f"Morphllm found in TRIGGER_MAP: {path}"
+
+    def test_no_morphllm_in_composite_flags(self):
+        """Morphllm should not appear in any COMPOSITE_FLAGS entry."""
+        for flag, entries in COMPOSITE_FLAGS.items():
+            for path, _priority in entries:
+                assert "Morphllm" not in path, f"Morphllm found in COMPOSITE_FLAGS[{flag}]: {path}"
+
+    def test_all_mcp_includes_8_servers(self):
+        """--all-mcp should activate exactly 8 MCP docs (5 core + 3 plugin)."""
+        all_mcp_paths = {p for p, _ in COMPOSITE_FLAGS["--all-mcp"]}
+        assert len(all_mcp_paths) == 8, f"Expected 8 MCP docs in --all-mcp, got {len(all_mcp_paths)}"
+
+    def test_frontend_verify_includes_3_servers(self):
+        """--frontend-verify should activate Playwright + DevTools + Serena."""
+        fv_paths = {p for p, _ in COMPOSITE_FLAGS["--frontend-verify"]}
+        assert fv_paths == {
+            "mcp/MCP_Playwright.md",
+            "mcp/MCP_Chrome-DevTools.md",
+            "mcp/MCP_Serena.md",
+        }
+
+    def test_trigger_map_mcp_count(self):
+        """TRIGGER_MAP should have entries for exactly 8 MCP docs."""
+        mcp_paths = {path for _, path, _ in TRIGGER_MAP if path.startswith("mcp/")}
+        assert len(mcp_paths) == 8, f"Expected 8 MCP trigger paths, got {len(mcp_paths)}: {mcp_paths}"
