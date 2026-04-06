@@ -12,7 +12,7 @@ description: Feature and code implementation with intelligent agent delegation a
 
   <flow>
     1. Load: If --plan provided, read plan document and extract tasks; otherwise analyze requirements + tech context
-    2. Plan: Approach + delegate to agents; for plan mode, follow task order exactly
+    2. Plan: Approach + delegate to agents; verify simplest viable approach before building; for plan mode, follow task order exactly
     3. Checkpoint: If changes affect >3 files → present numbered plan → wait for user approval before editing
     4. Execute: Code + framework best practices; for plan mode, mark tasks complete as you go
     5. Phase Gate: After each phase/task group — build + run, then: "Does this already solve the next phase's problem?" If yes, skip with reason
