@@ -84,6 +84,21 @@ Install logic in `cli/`: `install_paths.py` (paths) → `install_settings.py` (h
 
 `.serena/` contains project configuration and session memories for the Serena MCP server. These are committed to the repo for cross-session context.
 
+### Project Gotchas
+
+Project-specific failure patterns live in `.claude/rules/gotchas/`. CC loads these natively.
+
+    .claude/rules/gotchas/
+    ├── general.md              # No paths: → always loaded
+    └── <domain>.md             # paths: frontmatter → conditional loading
+
+- **Format**: `- name: description` (one gotcha per line, same as framework `<gotchas>`)
+- **Creation**: `/sc:init` task [h] creates `general.md`. Domain files are proposed by R19 on first correction.
+- **paths: example**: `paths: ["**/models/**"]` → loads only when working on model files
+- **Limits**: 50 lines per file, 100 lines total recommended
+- **Gardening**: `# Last reviewed: YYYY-MM-DD` at top. `/sc:reflect` warns on 90-day+ staleness.
+- **Layer priority**: Project gotcha (Layer 2) > Personal preference (Layer 3)
+
 ## Git Workflow
 
 Branch: `master` ← `integration` ← `feature/*`, `fix/*`, `docs/*`

@@ -34,8 +34,9 @@ description: Interactive project environment setup — select and run initializa
     [e] Code conventions learning      — lint config, commit style, naming
     [f] MCP server recommendation      — project-appropriate MCP suggestions
     [g] Project memory initialization  — key decisions, architecture notes      (requires a)
+    [h] Project gotchas setup          — .claude/rules/gotchas/general.md       (no deps)
 
-  Presets: --quick (a,b) | --full (a,b,c,d,e,f,g)
+  Presets: --quick (a,b) | --full (a,b,c,d,e,f,g,h)
 
   Enter selection (e.g., a,b,e or --full):
   ```
@@ -43,7 +44,7 @@ description: Interactive project environment setup — select and run initializa
 
   <dependency_graph note="Execution order constraints">
   ```
-  Batch 1 (parallel):  [a] [c] [e] [f]     — no dependencies
+  Batch 1 (parallel):  [a] [c] [e] [f] [h]     — no dependencies
   Batch 2 (parallel):  [b←a] [d←c] [g←a]   — wait for prerequisites
   ```
   Dynamic batching: only schedule selected tasks. If prerequisite missing, prompt user to add it.
@@ -59,6 +60,7 @@ description: Interactive project environment setup — select and run initializa
   | e | Convention summary | auto memory |
   | f | MCP recommendations | console |
   | g | MEMORY.md + topic files | .claude/memory/ |
+  | h | general.md | .claude/rules/gotchas/ |
   </task_outputs>
 
   <safety_rules>
@@ -66,6 +68,7 @@ description: Interactive project environment setup — select and run initializa
   - CLAUDE.md edit (b): if file exists, show proposed additions as diff before applying
   - Test execution (d): warn if test suite is large (>500 tests), offer --quick test flag
   - Memory init (g): merge with existing MEMORY.md, never replace
+  - Gotchas init (h): create .claude/rules/gotchas/ directory + general.md only if not exists. Idempotent — skip if gotchas/ already present. Template: 4-line comment header, no frontmatter.
   - All tasks: idempotent — safe to re-run, updates rather than duplicates
   </safety_rules>
 
