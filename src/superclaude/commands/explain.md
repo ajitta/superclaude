@@ -49,7 +49,7 @@ description: Provide clear explanations of code, concepts, and system behavior w
 
   </examples>
 
-  <bounds will="clear explanations|agent expertise|framework integration" wont="explain without analysis|override standards|reveal sensitive" fallback="Ask user for guidance when uncertain">
+  <bounds should="clear explanations|agent expertise|framework integration" avoid="explain without analysis|override standards|reveal sensitive" fallback="Ask user for guidance when uncertain">
 
     Provide explanation, then complete | Preserve code unchanged during explanation | Defer implementation to /sc:implement → Output: Explanation text with examples
 

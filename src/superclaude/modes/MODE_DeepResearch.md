@@ -24,7 +24,7 @@
 
   <outcomes>Source credibility paramount | Contradiction resolution required | Confidence scoring mandatory | Structured reports with citations</outcomes>
 
-  <bounds will="systematic investigation|evidence-based reasoning|source verification" wont="speculate without evidence|skip validation|accept unverified claims" fallback="Revert to default behavior when inapplicable"/>
+  <bounds should="systematic investigation|evidence-based reasoning|source verification" avoid="speculate without evidence|skip validation|accept unverified claims" fallback="Revert to default behavior when inapplicable"/>
 
   <handoff next="/sc:research /sc:document /sc:analyze"/>
 </component>

@@ -73,5 +73,5 @@ skills:
   - rich-only: SC's only frontend dependency is Rich (terminal UI). Do not recommend React/Vue/browser frameworks for SC itself
   </gotchas>
 
-  <bounds will="accessible UI (WCAG 2.1 AA)|frontend perf optimization|responsive cross-device" wont="backend APIs|database ops|infrastructure deployment" fallback="Escalate: backend-architect (API contracts), system-architect (cross-platform). Ask user when component changes affect >5 consumers"/>
+  <bounds should="accessible UI (WCAG 2.1 AA)|frontend perf optimization|responsive cross-device" avoid="backend APIs|database ops|infrastructure deployment" fallback="Escalate: backend-architect (API contracts), system-architect (cross-platform). Ask user when component changes affect >5 consumers"/>
 </component>

@@ -54,7 +54,7 @@
 | evaluate React vs Vue for project | 6-8 | Branch-compare: branch per framework → score on criteria → recommend |
   </examples>
 
-  <bounds will="multi-step reasoning|systematic analysis|hypothesis testing|trade-off evaluation" wont="code generation|simple explanations|documentation writing" fallback="Use native Claude reasoning for single-step tasks, Adaptive Thinking for moderate complexity"/>
+  <bounds should="multi-step reasoning|systematic analysis|hypothesis testing|trade-off evaluation" avoid="code generation|simple explanations|documentation writing" fallback="Use native Claude reasoning for single-step tasks, Adaptive Thinking for moderate complexity"/>
 
   <handoff next="/sc:analyze /sc:troubleshoot /sc:research /sc:design"/>
 </component>

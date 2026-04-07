@@ -61,7 +61,7 @@ description: Design system architecture, APIs, and component interfaces with com
 
   </examples>
 
-  <bounds will="comprehensive specs|multi-format output|validation" wont="generate impl code|modify existing arch|violate constraints" fallback="Ask user for guidance when uncertain">
+  <bounds should="comprehensive specs|multi-format output|validation" avoid="generate impl code|modify existing arch|violate constraints" fallback="Ask user for guidance when uncertain">
 
     Produce design documentation, then complete | Defer implementation code to /sc:implement | Defer source file creation to /sc:implement | Design specs and interfaces only → Output: Architecture/API/Component/Database design documents
 

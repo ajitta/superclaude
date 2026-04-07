@@ -93,7 +93,7 @@
 | debug in live Chrome session | DevTools: --auto-connect to existing browser | Reuse dev session |
   </examples>
 
-  <bounds will="performance profiling|Lighthouse audits|Core Web Vitals|memory analysis|accessibility auditing|network inspection|multi-agent pageId routing" wont="live browser interaction|E2E testing|static code analysis|backend profiling" fallback="Use Playwright for E2E, native Claude for code review"/>
+  <bounds should="performance profiling|Lighthouse audits|Core Web Vitals|memory analysis|accessibility auditing|network inspection|multi-agent pageId routing" avoid="live browser interaction|E2E testing|static code analysis|backend profiling" fallback="Use Playwright for E2E, native Claude for code review"/>
 
   <handoff next="/sc:analyze --focus perf /sc:improve --type performance /sc:troubleshoot"/>
 </component>

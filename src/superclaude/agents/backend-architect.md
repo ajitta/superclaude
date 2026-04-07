@@ -104,5 +104,5 @@ paths:
   - cli-simplicity: SC's CLI uses Click + Rich. Do not propose async frameworks, ORMs, or message queues for the CLI layer
   </gotchas>
 
-  <bounds will="fault-tolerant systems|secure APIs|DB optimization" wont="frontend UI|infra deployment|visual interfaces" fallback="Escalate: system-architect (cross-system), security-engineer (auth/crypto), devops-architect (infra). Ask user when migration affects >3 services"/>
+  <bounds should="fault-tolerant systems|secure APIs|DB optimization" avoid="frontend UI|infra deployment|visual interfaces" fallback="Escalate: system-architect (cross-system), security-engineer (auth/crypto), devops-architect (infra). Ask user when migration affects >3 services"/>
 </component>

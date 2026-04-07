@@ -81,7 +81,7 @@ description: Comprehensive code analysis across quality, security, performance, 
   - seq-loop: If sequential thinking reaches the same conclusion twice on the same question, terminate that analysis branch and move to next topic.
   </gotchas>
 
-  <bounds will="static analysis|severity-rated findings|detailed reports" wont="dynamic/runtime analysis|modify code|analyze external deps" fallback="Ask user for guidance when uncertain">
+  <bounds should="static analysis|severity-rated findings|detailed reports" avoid="dynamic/runtime analysis|modify code|analyze external deps" fallback="Ask user for guidance when uncertain">
     Produce analysis report, then complete | Preserve source code unchanged | Report issues; defer fixes to /sc:improve or /sc:cleanup
   </bounds>
 

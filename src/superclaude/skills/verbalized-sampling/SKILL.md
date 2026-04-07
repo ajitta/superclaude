@@ -67,8 +67,8 @@ when-to-use: >
     paper-proven — do not modify the distribution-level prompt structure.
   </attribution>
 
-  <bounds will="distribution-level diversity|multi-variant generation|landscape synthesis"
-         wont="single-answer collapse|pre-assigned perspective roles|calibrated probability claims"/>
+  <bounds should="distribution-level diversity|multi-variant generation|landscape synthesis"
+         avoid="single-answer collapse|pre-assigned perspective roles|calibrated probability claims"/>
 
   <handoff next="/sc:brainstorm /sc:analyze /sc:design"/>
 </component>

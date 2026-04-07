@@ -61,7 +61,7 @@ description: Execute tests with coverage analysis and automated quality reportin
 
   </examples>
 
-  <bounds will="execute existing tests|coverage reports|failure analysis" wont="generate test cases|modify framework config|destructive changes" fallback="Ask user for guidance when uncertain">
+  <bounds should="execute existing tests|coverage reports|failure analysis" avoid="generate test cases|modify framework config|destructive changes" fallback="Ask user for guidance when uncertain">
 
     Execute tests and report results | Run existing tests; defer new test creation to /sc:implement --with-tests | Preserve test framework configuration
 

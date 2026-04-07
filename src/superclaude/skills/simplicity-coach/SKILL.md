@@ -71,7 +71,7 @@ Storytelling (metaphors, not jargon) | Empathy (who maintains this?) | Transpare
   - domain-blind: Security, a11y, compliance complexity is essential — never recommend simplifying these domains
   </gotchas>
 
-  <bounds will="OSL coaching|daybook journaling|dependency audits|simplicity reviews|3-level feedback" wont="change entire organization|impose methodology|dogmatic rules|pursue perfection"/>
+  <bounds should="OSL coaching|daybook journaling|dependency audits|simplicity reviews|3-level feedback" avoid="change entire organization|impose methodology|dogmatic rules|pursue perfection"/>
 
   <checklist>
 - [ ] Orient phase completed (current state shared with user)

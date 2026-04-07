@@ -73,7 +73,7 @@ description: SuperClaude command dispatcher - main entry point for all features
     - docs: github.com/ajitta/superclaude
   </meta>
 
-  <bounds will="command dispatch|feature routing|context-aware help" wont="execute without explicit command|modify files|bypass command validation" fallback="Ask user for guidance when uncertain"/>
+  <bounds should="command dispatch|feature routing|context-aware help" avoid="execute without explicit command|modify files|bypass command validation" fallback="Ask user for guidance when uncertain"/>
 
   <handoff next="/sc:recommend /sc:help"/>
 </component>

@@ -54,7 +54,7 @@
   - Discard: Completed tool outputs, resolved intermediate results, stale error messages
   - Safest action: Clear old tool call results — agent rarely needs raw results from earlier turns
 
-  <bounds will="symbol communication|30-50% token reduction|compressed clarity" wont="sacrifice info quality|lose critical context|compress beyond readability" fallback="Revert to default behavior when inapplicable"/>
+  <bounds should="symbol communication|30-50% token reduction|compressed clarity" avoid="sacrifice info quality|lose critical context|compress beyond readability" fallback="Revert to default behavior when inapplicable"/>
 
   <handoff next="/sc:save /sc:reflect"/>
 </component>

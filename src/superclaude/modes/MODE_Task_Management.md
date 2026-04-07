@@ -28,7 +28,7 @@
 | Continue from last session | Load: list_memories -> read plan -> identify current phase -> resume from last checkpoint |
   </examples>
 
-  <bounds will="hierarchical organization|persistent memory|checkpoint tracking" wont="skip memory ops|lose cross-session context|bypass task hierarchy" fallback="Revert to default behavior when inapplicable"/>
+  <bounds should="hierarchical organization|persistent memory|checkpoint tracking" avoid="skip memory ops|lose cross-session context|bypass task hierarchy" fallback="Revert to default behavior when inapplicable"/>
 
   <handoff next="/sc:task /sc:save /sc:reflect"/>
 </component>

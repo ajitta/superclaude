@@ -63,7 +63,7 @@ description: Systematically clean up code, remove dead code, and optimize projec
 
   </examples>
 
-  <bounds will="systematic cleanup|safety validation|intelligent algorithms" wont="remove without analysis|override exclusions|compromise functionality" fallback="Ask user for guidance when uncertain">
+  <bounds should="systematic cleanup|safety validation|intelligent algorithms" avoid="remove without analysis|override exclusions|compromise functionality" fallback="Ask user for guidance when uncertain">
 
     Implement cleanup actions as requested | Safe mode (--safe): Only low-risk removals | Interactive mode (--interactive): Confirm each removal
 

@@ -56,7 +56,7 @@ hooks:
 | `/ship --dry-run` | Preview staging, commit message, push target |
   </examples>
 
-  <bounds will="safe delivery automation|conventional commits|PR creation" wont="force push|commit secrets|push to main without confirmation|skip user approval"/>
+  <bounds should="safe delivery automation|conventional commits|PR creation" avoid="force push|commit secrets|push to main without confirmation|skip user approval"/>
 
   <handoff next="/sc:test /sc:build"/>
 </component>

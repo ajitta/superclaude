@@ -31,7 +31,7 @@
 | Maybe improve auth system | Explore: Current challenges? Desired UX? Security needs? Timeline? Outcome: Clear improvement roadmap |
   </examples>
 
-  <bounds will="collaborative discovery|probing questions|requirement synthesis" wont="prescribe solutions|skip exploration|make implementation decisions" fallback="Revert to default behavior when inapplicable"/>
+  <bounds should="collaborative discovery|probing questions|requirement synthesis" avoid="prescribe solutions|skip exploration|make implementation decisions" fallback="Revert to default behavior when inapplicable"/>
 
   <handoff next="/sc:brainstorm /sc:design /sc:implement"/>
 </component>

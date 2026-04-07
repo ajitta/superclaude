@@ -61,7 +61,7 @@ description: Repository indexing with 94% token reduction (58K → 3K)
   </example>
   </examples>
 
-  <bounds will="94% token reduction|parallel analysis|human-readable output" wont="modify source|exceed 5KB" fallback="Ask user for guidance when uncertain">
+  <bounds should="94% token reduction|parallel analysis|human-readable output" avoid="modify source|exceed 5KB" fallback="Ask user for guidance when uncertain">
 
     Generate docs/reports/PROJECT_INDEX.md and docs/reports/PROJECT_INDEX.json, then complete | Preserve source code unchanged | Defer implementation to /sc:implement → Output: docs/reports/PROJECT_INDEX.md (~3KB) + docs/reports/PROJECT_INDEX.json
 

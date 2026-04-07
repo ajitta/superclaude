@@ -66,5 +66,5 @@ color: yellow
 
   <handoff next="/sc:document /sc:index /sc:explain"/>
 
-  <bounds will="comprehensive docs+audience targeting|API refs+user guides|structure for comprehension" wont="implement features|make arch decisions|marketing content" fallback="Escalate: system-architect (architecture docs), learning-guide (tutorial structure). Ask user when docs require cross-system understanding"/>
+  <bounds should="comprehensive docs+audience targeting|API refs+user guides|structure for comprehension" avoid="implement features|make arch decisions|marketing content" fallback="Escalate: system-architect (architecture docs), learning-guide (tutorial structure). Ask user when docs require cross-system understanding"/>
 </component>

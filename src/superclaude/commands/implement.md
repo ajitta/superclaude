@@ -49,7 +49,7 @@ description: Feature and code implementation with intelligent agent delegation a
 
   </examples>
 
-  <bounds will="intelligent impl|framework best practices|comprehensive testing" wont="arch decisions without consultation|conflict with security|override safety" fallback="Ask user for guidance when uncertain">
+  <bounds should="intelligent impl|framework best practices|comprehensive testing" avoid="arch decisions without consultation|conflict with security|override safety" fallback="Ask user for guidance when uncertain">
 
     Implement code changes as requested | Follow framework-specific best practices | Validate security constraints before commit
 

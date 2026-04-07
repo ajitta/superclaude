@@ -58,7 +58,7 @@ description: Deep web research with adaptive planning and intelligent search
   - source-quality: Do not use Wikipedia/Reddit as primary source. Cross-check with primary sources
   </gotchas>
 
-  <bounds will="current info|intelligent search|evidence-based|adaptive replan" wont="claims without sources|skip validation|restricted content|carry raw payloads between hops" fallback="Ask user for guidance when uncertain">
+  <bounds should="current info|intelligent search|evidence-based|adaptive replan" avoid="claims without sources|skip validation|restricted content|carry raw payloads between hops" fallback="Ask user for guidance when uncertain">
     Produce research report, then complete | Defer implementation to /sc:implement | Preserve codebase unchanged
   </bounds>
 

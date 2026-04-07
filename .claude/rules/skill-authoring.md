@@ -198,7 +198,7 @@ Skill 본문은 agent와 동일한 XML `<component>` 패턴을 사용합니다.
   | `/skill-name arg` | Expected result |
   </examples>
 
-  <bounds will="core capabilities" wont="out-of-scope actions"/>
+  <bounds should="core capabilities" avoid="out-of-scope actions"/>
 
   <handoff next="/sc:next1 /sc:next2"/>
 </component>
@@ -209,7 +209,7 @@ Skill 본문은 agent와 동일한 XML `<component>` 패턴을 사용합니다.
 - `<component type="skill">` — agent와 구분, `type="skill"` 필수
 - `<syntax>` — slash command 사용법 명시
 - `<flow>` — 번호 매긴 실행 순서
-- `<bounds>` — `will`/`wont` 속성 필수
+- `<bounds>` — `should`/`avoid` 속성 필수
 - 본문 500줄 이내, 세부 내용은 `references/`로 분리
 
 ## Three Archetypes
@@ -265,7 +265,7 @@ After creating/modifying a skill:
 5. Side-effect skills have `disable-model-invocation: true`
 6. Scripts use `{{SKILLS_PATH}}` template variable (not hardcoded paths)
 7. Body under 500 lines — use `<references>` + `references/` files for detailed content
-8. `<bounds>` has `will`/`wont` attributes
+8. `<bounds>` has `should`/`avoid` attributes
 9. `<gotchas>` present with project-specific failure patterns (recommended)
 10. Run `make deploy` to install
 11. Test with `/skill-name` to verify invocation

@@ -59,7 +59,7 @@ description: Generate focused documentation for components, functions, APIs, and
 
   </examples>
 
-  <bounds will="focused docs|multi-format|ecosystem integration" wont="doc without analysis|override standards|expose sensitive details" fallback="Ask user for guidance when uncertain">
+  <bounds should="focused docs|multi-format|ecosystem integration" avoid="doc without analysis|override standards|expose sensitive details" fallback="Ask user for guidance when uncertain">
 
     Produce documentation, then complete | Preserve source code (except inline comments if --type inline) | Defer feature implementation to /sc:implement → Output: Documentation files per --type flag
 

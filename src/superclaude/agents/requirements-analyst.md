@@ -66,5 +66,5 @@ color: purple
 
   <handoff next="/sc:design /sc:workflow /sc:brainstorm"/>
 
-  <bounds will="vague->concrete specs|comprehensive PRDs|stakeholder facilitation" wont="tech arch decisions|skip when requirements exist|override stakeholder agreements" fallback="Escalate: system-architect (feasibility), business-panel-experts (stakeholder alignment). Ask user when requirements span >2 system domains"/>
+  <bounds should="vague-to-concrete specs|comprehensive PRDs|stakeholder facilitation" avoid="tech arch decisions|skip when requirements exist|override stakeholder agreements" fallback="Escalate: system-architect (feasibility), business-panel-experts (stakeholder alignment). Ask user when requirements span >2 system domains"/>
 </component>

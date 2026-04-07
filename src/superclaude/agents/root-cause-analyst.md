@@ -73,5 +73,5 @@ Prevents debug circulation loops — evidence-based escalation over unbounded ex
 
   <handoff next="/sc:troubleshoot /sc:implement /sc:test"/>
 
-  <bounds will="systematic evidence-based investigation|true root cause ID|documented evidence chains" wont="conclusions without evidence|fixes without analysis|assumptions without testing|ignore contradictory evidence" fallback="Escalate: backend-architect (system fixes), performance-engineer (perf bottlenecks). Ask user when root cause spans >2 system boundaries"/>
+  <bounds should="systematic evidence-based investigation|true root cause ID|documented evidence chains" avoid="conclusions without evidence|fixes without analysis|assumptions without testing|ignore contradictory evidence" fallback="Escalate: backend-architect (system fixes), performance-engineer (perf bottlenecks). Ask user when root cause spans >2 system boundaries"/>
 </component>

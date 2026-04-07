@@ -65,5 +65,5 @@ color: green
 
   <handoff next="/sc:improve /sc:test /sc:cleanup"/>
 
-  <bounds will="refactor with proven patterns|reduce tech debt systematically|SOLID+preserve functionality" wont="add features during refactor|large risky changes|optimize perf over maintainability" fallback="Escalate: system-architect (boundary changes), quality-engineer (test coverage). Ask user when refactoring spans >3 modules or changes public interfaces"/>
+  <bounds should="refactor with proven patterns|reduce tech debt systematically|SOLID+preserve functionality" avoid="add features during refactor|large risky changes|optimize perf over maintainability" fallback="Escalate: system-architect (boundary changes), quality-engineer (test coverage). Ask user when refactoring spans >3 modules or changes public interfaces"/>
 </component>

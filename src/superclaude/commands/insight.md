@@ -108,7 +108,7 @@ description: Capture structured session insights to per-project JSONL for human 
   - dedup-before-propose: In auto-capture mode, always Read last 20 lines before proposing to avoid duplicating insights from earlier calls in same session.
   </gotchas>
 
-  <bounds will="structured capture|jq queries|append-only storage" wont="modify existing insights|load into LLM context|replace auto memory" fallback="If .claude/insights.jsonl doesn't exist, create it with first append"/>
+  <bounds should="structured capture|jq queries|append-only storage" avoid="modify existing insights|load into LLM context|replace auto memory" fallback="If .claude/insights.jsonl doesn't exist, create it with first append"/>
 
   <handoff next="/sc:save /sc:analyze"/>
 </component>

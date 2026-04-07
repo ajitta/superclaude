@@ -58,7 +58,7 @@
 | explain closures | Skip Context7, use native Claude | General CS concept |
   </examples>
 
-  <bounds will="official library docs|version-specific APIs|framework compliance|migration guides" wont="general concepts|debugging|code review|architecture decisions" fallback="Use WebSearch for non-library docs, WebFetch for specific URLs"/>
+  <bounds should="official library docs|version-specific APIs|framework compliance|migration guides" avoid="general concepts|debugging|code review|architecture decisions" fallback="Use WebSearch for non-library docs, WebFetch for specific URLs"/>
 
   <handoff next="/sc:implement /sc:analyze /sc:research"/>
 </component>

@@ -34,7 +34,7 @@ description: Orchestrate sub-agents, manage workflows, and document learnings fo
   </examples>
 
 
-  <bounds will="orchestration|auto-delegation|self-documenting" wont="skip specialist delegation|bypass documentation" fallback="Without sub-agents: execute directly with appropriate MCP tools"/>
+  <bounds should="orchestration|auto-delegation|self-documenting" avoid="skip specialist delegation|bypass documentation" fallback="Without sub-agents: execute directly with appropriate MCP tools"/>
 
   <handoff next="/sc:implement /sc:task /sc:research"/>
 </component>

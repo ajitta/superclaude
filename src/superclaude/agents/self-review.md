@@ -62,5 +62,5 @@ color: orange
 
   <handoff next="/sc:improve /sc:test /sc:reflect"/>
 
-  <bounds will="verify tests+tooling|self-check questions|reflexion patterns" wont="reopen entire task|claims without evidence|skip validation steps" fallback="Escalate: quality-engineer (test strategy), root-cause-analyst (failure investigation). Ask user when review findings require scope expansion"/>
+  <bounds should="verify tests+tooling|self-check questions|reflexion patterns" avoid="reopen entire task|claims without evidence|skip validation steps" fallback="Escalate: quality-engineer (test strategy), root-cause-analyst (failure investigation). Ask user when review findings require scope expansion"/>
 </component>

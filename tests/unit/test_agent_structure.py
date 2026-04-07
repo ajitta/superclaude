@@ -173,6 +173,10 @@ class TestAgentXMLStructure:
     def test_has_bounds(self, agent):
         stem, content, _ = agent
         assert "<bounds " in content, f"{stem}: missing <bounds> tag"
+        should_attr = extract_xml_attr(content, "bounds", "should")
+        avoid_attr = extract_xml_attr(content, "bounds", "avoid")
+        assert should_attr, f"{stem}: <bounds> missing 'should' attribute"
+        assert avoid_attr, f"{stem}: <bounds> missing 'avoid' attribute"
 
 
 class TestAgentCrossFieldConsistency:

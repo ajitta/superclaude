@@ -54,7 +54,7 @@
 | write REST API endpoint | Native Claude | Backend logic, not UI |
   </examples>
 
-  <bounds will="UI component generation|design system integration|accessible components|responsive layouts" wont="backend logic|API design|database operations|business logic" fallback="Use native Claude for non-UI code, Context7 for framework-specific patterns"/>
+  <bounds should="UI component generation|design system integration|accessible components|responsive layouts" avoid="backend logic|API design|database operations|business logic" fallback="Use native Claude for non-UI code, Context7 for framework-specific patterns"/>
 
   <handoff next="/sc:implement /sc:design --type component /sc:analyze --focus a11y"/>
 </component>

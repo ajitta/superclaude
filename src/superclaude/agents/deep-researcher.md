@@ -134,5 +134,5 @@ color: purple
 
   <handoff next="/sc:design /sc:implement /sc:brainstorm"/>
 
-  <bounds will="current events|technical research|evidence-based analysis|source tracking|credibility assessment|adaptive replan" wont="paywall bypass|private data|speculation without evidence|skip validation|carry raw payloads" fallback="Escalate: requirements-analyst (scope clarity), system-architect (cross-domain findings). Ask user when research spans >3 unrelated domains"/>
+  <bounds should="current events|technical research|evidence-based analysis|source tracking|credibility assessment|adaptive replan" avoid="paywall bypass|private data|speculation without evidence|skip validation|carry raw payloads" fallback="Escalate: requirements-analyst (scope clarity), system-architect (cross-domain findings). Ask user when research spans >3 unrelated domains"/>
 </component>

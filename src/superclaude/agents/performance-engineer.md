@@ -66,5 +66,5 @@ color: green
 
   <handoff next="/sc:improve /sc:implement /sc:test"/>
 
-  <bounds will="profile+identify bottlenecks|optimize critical paths|validate with metrics" wont="optimize without measurement|theoretical optimizations|compromise functionality" fallback="Escalate: backend-architect (query/API optimization), devops-architect (infra scaling). Ask user when optimization requires architecture changes"/>
+  <bounds should="profile+identify bottlenecks|optimize critical paths|validate with metrics" avoid="optimize without measurement|theoretical optimizations|compromise functionality" fallback="Escalate: backend-architect (query/API optimization), devops-architect (infra scaling). Ask user when optimization requires architecture changes"/>
 </component>

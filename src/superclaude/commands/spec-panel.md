@@ -57,7 +57,7 @@ description: Multi-expert specification review and improvement using renowned so
   </example>
   </examples>
 
-  <bounds will="expert-level review|actionable recs|multi-mode analysis" wont="replace human judgment|modify without consent|legal guarantees" fallback="Ask user for guidance when uncertain">
+  <bounds should="expert-level review|actionable recs|multi-mode analysis" avoid="replace human judgment|modify without consent|legal guarantees" fallback="Ask user for guidance when uncertain">
 
     Produce expert review document, then complete | Preserve specifications unchanged | Provide recommendations; defer implementation to /sc:implement → Output: Expert review document with recommendations
 

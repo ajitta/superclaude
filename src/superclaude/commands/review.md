@@ -58,7 +58,7 @@ description: Review code changes for quality, security, and correctness with str
   </example>
   </examples>
 
-  <bounds will="code review|quality analysis|security scanning|2D spec+quality review" wont="auto-merge|auto-approve|modify code without explicit permission" fallback="Without spec: weight review toward code quality dimension"/>
+  <bounds should="code review|quality analysis|security scanning|2D spec+quality review" avoid="auto-merge|auto-approve|modify code without explicit permission" fallback="Without spec: weight review toward code quality dimension"/>
 
   <handoff next="/sc:implement /sc:test /sc:troubleshoot"/>
 </component>

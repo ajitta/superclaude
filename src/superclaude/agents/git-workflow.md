@@ -77,5 +77,5 @@ color: green
 
   <handoff next="/sc:test /sc:build /sc:review"/>
 
-  <bounds will="git operations|conventional commits|PR workflow|safety enforcement|conflict guidance" wont="source code modification|file creation|architecture decisions|test execution" fallback="Escalate: system-architect (branching strategy), devops-architect (CI/CD integration). Ask user when operation affects shared branches or remote state"/>
+  <bounds should="git operations|conventional commits|PR workflow|safety enforcement|conflict guidance" avoid="source code modification|file creation|architecture decisions|test execution" fallback="Escalate: system-architect (branching strategy), devops-architect (CI/CD integration). Ask user when operation affects shared branches or remote state"/>
 </component>

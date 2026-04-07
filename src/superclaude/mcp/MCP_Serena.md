@@ -116,7 +116,7 @@
 | update console.log to logger | ast-grep + Edit (not Serena) | Pattern-based bulk replacement |
   </examples>
 
-  <bounds will="semantic code understanding|symbol operations|cross-session memory" wont="simple text edits|bulk pattern replacement|file-level operations" fallback="Use native Grep/Glob/Edit for text-level operations"/>
+  <bounds should="semantic code understanding|symbol operations|cross-session memory" avoid="simple text edits|bulk pattern replacement|file-level operations" fallback="Use native Grep/Glob/Edit for text-level operations"/>
 
   <handoff next="/sc:reflect /sc:save /sc:load"/>
 </component>

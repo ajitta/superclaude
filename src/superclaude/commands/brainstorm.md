@@ -67,7 +67,7 @@ description: Interactive requirements discovery through Socratic dialogue and sy
   - seq-loop: If sequential thinking reaches the same conclusion twice on the same question, terminate that analysis branch and move to next topic.
   </gotchas>
 
-  <bounds will="ambiguous→concrete|multi-agent+MCP|cross-session persistence" wont="impl without discovery|override user vision|bypass systematic exploration" fallback="Ask user for guidance when uncertain">
+  <bounds should="ambiguous→concrete|multi-agent+MCP|cross-session persistence" avoid="impl without discovery|override user vision|bypass systematic exploration" fallback="Ask user for guidance when uncertain">
 
     Produce requirements specification, then complete | Focus on requirements; defer architecture to /sc:design | Defer implementation to /sc:implement | Defer scaffolding to /sc:implement → Output: Requirements specification document only
 

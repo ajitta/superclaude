@@ -67,7 +67,7 @@ Every command body follows this template:
   | `/sc:command-name arg` | Expected result |
   </examples>
 
-  <bounds will="core capabilities" wont="out-of-scope actions" fallback="Escalation path">
+  <bounds should="core capabilities" avoid="out-of-scope actions" fallback="Escalation path">
     Completion criteria and handoff behavior
   </bounds>
 
@@ -82,7 +82,7 @@ Every command body follows this template:
 - `<mission>` — must share 30%+ significant words with frontmatter `description`
 - `<syntax>` — show full invocation with args and flags
 - `<flow>` — numbered execution steps (minimum 2)
-- `<bounds>` — must include `will` and `wont` attributes
+- `<bounds>` — must include `should` and `avoid` attributes
 - `<handoff>` — list 2-3 natural next commands
 - Optional sections: `<outputs>`, `<mcp>`, `<tools>`, `<gotchas>`, `<examples>`
 
@@ -122,6 +122,6 @@ This validates:
 | Adding `model:` or `permissionMode:` | Agent-only fields, ignored by CC for commands | Remove field |
 | Adding `hooks:` or `context:` | Skill-only fields — use skill if hooks needed | Migrate to skill |
 | Vague description | Poor `/menu` display | Be specific: "Build X with Y" |
-| Missing `<bounds>` | No scope/safety boundary | Add will/wont attributes |
+| Missing `<bounds>` | No scope/safety boundary | Add should/avoid attributes |
 | Mission doesn't match description | Confusing inconsistency | Align 30%+ word overlap |
 | Decorative XML attributes | Unparsed attributes accumulate as boilerplate — token waste | `note=` allowed ONLY for: scope ("all commands"), safety ("do NOT"), version gates ("2.1.37+"), reference locations ("see X.md"), quantified constraints ("3-6"). Remove if tag name/content already says it |

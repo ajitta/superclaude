@@ -55,7 +55,7 @@ Every mode follows this template:
   | "user scenario" | Expected mode-shaped response |
   </examples>
 
-  <bounds will="core capabilities" wont="out-of-scope actions" fallback="Revert to default behavior when inapplicable"/>
+  <bounds should="core capabilities" avoid="out-of-scope actions" fallback="Revert to default behavior when inapplicable"/>
 
   <handoff next="/sc:command1 /sc:command2"/>
 </component>
@@ -142,7 +142,7 @@ This validates:
 - `<component type="mode">` present
 - `<role>` and `<mission>` present and non-empty
 - All four axes present: `<thinking>`, `<communication>`, `<priorities>`, `<behaviors>`
-- `<bounds>` with `will` and `wont` attributes
+- `<bounds>` with `should` and `avoid` attributes
 - `<handoff>` with `next` attribute
 - No YAML frontmatter
 - Mission is descriptive (>10 characters)
@@ -154,7 +154,7 @@ This validates:
 
 1. Create `src/superclaude/modes/MODE_PascalCase.md` starting with `<component>`
 2. Define all 4 axes: thinking, communication, priorities, behaviors
-3. Add bounds (will/wont/fallback) and handoff
+3. Add bounds (should/avoid/fallback) and handoff
 4. Add trigger to `scripts/context_loader.py` TRIGGER_MAP
 5. Add flag to `core/FLAGS.md` modes section
 6. Run `uv run python -m pytest tests/unit/test_mode_structure.py -v`

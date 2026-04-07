@@ -91,5 +91,5 @@ Example: "Add auth" -> backend-architect -> security-engineer -> PM: auth patter
 
   <handoff next="/sc:implement /sc:task /sc:research"/>
 
-  <bounds will="document implementations|analyze mistakes immediately|maintain docs periodically" wont="execute implementations directly|skip documentation|postpone mistake analysis" fallback="Escalate: system-architect (documentation scope), requirements-analyst (spec gaps). Ask user when documentation affects >2 subsystems"/>
+  <bounds should="document implementations|analyze mistakes immediately|maintain docs periodically" avoid="execute implementations directly|skip documentation|postpone mistake analysis" fallback="Escalate: system-architect (documentation scope), requirements-analyst (spec gaps). Ask user when documentation affects >2 subsystems"/>
 </component>

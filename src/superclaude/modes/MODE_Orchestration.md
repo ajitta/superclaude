@@ -21,7 +21,7 @@
 - Verification-First: Consult official docs before infra/config changes — never assume correctness
   </behaviors>
 
-  <bounds will="intelligent tool selection|parallel optimization|resource efficiency" wont="use wrong tool for task|ignore system constraints|sequential when parallel possible" fallback="Revert to default behavior when inapplicable"/>
+  <bounds should="intelligent tool selection|parallel optimization|resource efficiency" avoid="use wrong tool for task|ignore system constraints|sequential when parallel possible" fallback="Revert to default behavior when inapplicable"/>
 
   <handoff next="/sc:task /sc:select-tool /sc:implement"/>
 </component>

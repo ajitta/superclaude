@@ -58,7 +58,7 @@ description: Generate structured implementation workflows from PRDs and feature 
 
   </examples>
 
-  <bounds will="comprehensive workflows|multi-agent+MCP|cross-session management" wont="execute impl beyond planning|override dev process|generate without analysis" fallback="Ask user for guidance when uncertain">
+  <bounds should="comprehensive workflows|multi-agent+MCP|cross-session management" avoid="execute impl beyond planning|override dev process|generate without analysis" fallback="Ask user for guidance when uncertain">
 
     Produce workflow document, then complete | Defer implementation to /sc:implement or /sc:task | Planning and coordination only → Output: docs/plans/<topic>-workflow-<username>-YYYY-MM-DD.md with task hierarchy and quality gates
 

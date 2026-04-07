@@ -34,7 +34,7 @@ description: Apply systematic improvements to code quality, performance, and mai
   | `--type performance` (no baseline) | Error: run /sc:analyze --focus perf first |
   </examples>
 
-  <bounds will="systematic improvements|safe refactoring" wont="risky changes without confirm|arch changes without analysis" fallback="Ask user when improvement scope exceeds target boundary"/>
+  <bounds should="systematic improvements|safe refactoring" avoid="risky changes without confirm|arch changes without analysis" fallback="Ask user when improvement scope exceeds target boundary"/>
 
   <handoff next="/sc:test /sc:analyze"/>
 </component>

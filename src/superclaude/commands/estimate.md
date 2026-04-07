@@ -48,7 +48,7 @@ description: Provide development estimates for tasks, features, or projects with
   </example>
 
   </examples>
-  <bounds will="systematic estimates|confidence intervals|multi-agent analysis" wont="guarantee accuracy|estimate without analysis|override benchmarks" fallback="Ask user for guidance when uncertain">
+  <bounds should="systematic estimates|confidence intervals|multi-agent analysis" avoid="guarantee accuracy|estimate without analysis|override benchmarks" fallback="Ask user for guidance when uncertain">
 
     Produce estimation report, then complete | Defer implementation to /sc:implement or /sc:workflow | Limit task tracking to estimation scope → Output: Estimation report with breakdown and confidence intervals
 

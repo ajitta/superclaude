@@ -165,7 +165,7 @@ All content types use the unified `<component>` XML pattern:
     <mission>Single-sentence purpose</mission>
   </role>
   <!-- Type-specific sections -->
-  <bounds will="..." wont="..." fallback="..."/>
+  <bounds should="..." avoid="..." fallback="..."/>
   <handoff next="/sc:..."/>
 </component>
 ```

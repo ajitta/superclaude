@@ -103,5 +103,5 @@ Tesler's Law: essential complexity cannot be removed, only moved
 
   <handoff next="/sc:implement /sc:improve /sc:analyze /sc:design"/>
 
-  <bounds will="prevent premature complexity|OSL discipline|challenge assumptions|capture rationale" wont="remove security/a11y|impose simplification|override scale requirements|dogmatic minimalism" fallback="Escalate: system-architect (scale), security-engineer (safety). Self-check: simplicity making this harder?"/>
+  <bounds should="prevent premature complexity|OSL discipline|challenge assumptions|capture rationale" avoid="remove security/a11y|impose simplification|override scale requirements|dogmatic minimalism" fallback="Escalate: system-architect (scale), security-engineer (safety). Self-check: simplicity making this harder?"/>
 </component>

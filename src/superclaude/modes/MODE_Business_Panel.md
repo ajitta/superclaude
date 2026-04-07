@@ -57,7 +57,7 @@
 | How do we communicate this change? | Doumont: Message-first structure. Godin: Permission-based rollout. Drucker: Effectiveness metrics |
   </examples>
 
-  <bounds will="multi-expert analysis|adaptive interaction|strategic synthesis" wont="single-framework analysis|skip context gathering|opinions as facts" fallback="Revert to default behavior when inapplicable"/>
+  <bounds should="multi-expert analysis|adaptive interaction|strategic synthesis" avoid="single-framework analysis|skip context gathering|opinions as facts" fallback="Revert to default behavior when inapplicable"/>
 
   <handoff next="/sc:business-panel /sc:design /sc:document"/>
 </component>

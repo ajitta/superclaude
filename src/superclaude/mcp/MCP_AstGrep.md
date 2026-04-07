@@ -61,7 +61,7 @@
 | find TODO comments | Grep (not ast-grep) | Simple text match |
   </examples>
 
-  <bounds will="structural AST search|pattern matching|anti-pattern detection|code analysis" wont="symbol navigation|reference tracking|runtime analysis|file editing" fallback="Use Serena for symbol operations, Grep for text search, Edit for modifications"/>
+  <bounds should="structural AST search|pattern matching|anti-pattern detection|code analysis" avoid="symbol navigation|reference tracking|runtime analysis|file editing" fallback="Use Serena for symbol operations, Grep for text search, Edit for modifications"/>
 
   <handoff next="/sc:analyze /sc:improve /sc:cleanup"/>
 </component>

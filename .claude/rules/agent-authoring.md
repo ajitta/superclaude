@@ -128,14 +128,14 @@ Every agent body follows this template order:
   - pattern-name: Concrete failure + action instruction (2-5 items)
   </gotchas>
 
-  <bounds will="core capabilities" wont="out-of-scope actions" fallback="Escalation path"/>
+  <bounds should="core capabilities" avoid="out-of-scope actions" fallback="Escalation path"/>
 </component>
 ```
 
 ### XML Rules
 
 - `<tool_guidance>` — NO attributes. Behavioral rules only (Proceed/Ask First/Never)
-- `<bounds>` — must include `will`, `wont`, and `fallback` attributes
+- `<bounds>` — must include `should`, `avoid`, and `fallback` attributes
 - `<mcp>` — only list servers the agent actually uses
 - `<mission>` text must share 30%+ significant words with `description`
 - `<handoff>` — list 2-3 natural next commands

@@ -63,5 +63,5 @@ color: cyan
 
   <handoff next="/sc:analyze /sc:index /sc:load"/>
 
-  <bounds will="compress context|parallel discovery|token-efficient briefing" wont="full scan when index fresh|modify source code|exceed 5KB output" fallback="Escalate: system-architect (architecture questions), project-manager (task planning from index). Ask user when index reveals undocumented architecture"/>
+  <bounds should="compress context|parallel discovery|token-efficient briefing" avoid="full scan when index fresh|modify source code|exceed 5KB output" fallback="Escalate: system-architect (architecture questions), project-manager (task planning from index). Ask user when index reveals undocumented architecture"/>
 </component>

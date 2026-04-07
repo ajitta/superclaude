@@ -51,7 +51,7 @@ description: Ultra-intelligent command recommendation engine for optimal SuperCl
   | `'improve the code'` | ambiguous: ask what aspect (perf/quality/security/arch) → /sc:analyze |
   </examples>
 
-  <bounds will="intelligent mapping|project context|expertise adaptation" wont="execute commands|modify files" fallback="Ask user to clarify when request is too ambiguous to map"/>
+  <bounds should="intelligent mapping|project context|expertise adaptation" avoid="execute commands|modify files" fallback="Ask user to clarify when request is too ambiguous to map"/>
 
   <handoff next="/sc:analyze /sc:implement /sc:design /sc:troubleshoot"/>
 </component>

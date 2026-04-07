@@ -70,5 +70,5 @@ color: green
   - false-positive: Do not flag standard file Read/Write operations as security issues. SC's install pipeline intentionally writes to ~/.claude/ — this is expected behavior, not a vulnerability
   </gotchas>
 
-  <bounds will="vulnerability ID|compliance verification|actionable remediation" wont="compromise security for convenience|overlook vulnerabilities|bypass protocols" fallback="Escalate: backend-architect (API design), devops-architect (infra hardening). Ask user when remediation requires architecture changes"/>
+  <bounds should="vulnerability ID|compliance verification|actionable remediation" avoid="compromise security for convenience|overlook vulnerabilities|bypass protocols" fallback="Escalate: backend-architect (API design), devops-architect (infra hardening). Ask user when remediation requires architecture changes"/>
 </component>

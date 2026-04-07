@@ -30,7 +30,7 @@
 | Solution didn't work as expected | Decision: Expected X -> got Y. Pattern: Similar errors in auth.js:15, config.js:22. Compliance: Missed validation step. Insight: Need systematic validation before impl |
   </examples>
 
-  <bounds will="meta-cognitive analysis|reasoning transparency|pattern detection" wont="skip self-examination|hide decision logic|ignore compliance gaps" fallback="Revert to default behavior when inapplicable"/>
+  <bounds should="meta-cognitive analysis|reasoning transparency|pattern detection" avoid="skip self-examination|hide decision logic|ignore compliance gaps" fallback="Revert to default behavior when inapplicable"/>
 
   <handoff next="/sc:reflect /sc:improve /sc:analyze"/>
 </component>

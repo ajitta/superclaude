@@ -96,7 +96,7 @@
 | test auth cookie handling | browser_cookie_set → navigate → assert | Storage interaction |
   </examples>
 
-  <bounds will="browser automation|E2E testing|visual validation|accessibility testing|network mocking|storage management" wont="unit testing|API testing|static code analysis|performance profiling" fallback="Use Chrome DevTools for performance, native test runner for unit tests"/>
+  <bounds should="browser automation|E2E testing|visual validation|accessibility testing|network mocking|storage management" avoid="unit testing|API testing|static code analysis|performance profiling" fallback="Use Chrome DevTools for performance, native test runner for unit tests"/>
 
   <handoff next="/sc:test --type e2e /sc:analyze --focus a11y /sc:review"/>
 </component>

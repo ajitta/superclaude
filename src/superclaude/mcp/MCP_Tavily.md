@@ -70,7 +70,7 @@ Web: General searches | News: Time-filtered | Academic: Scholarly articles | Dom
 | explain recursion | Native Claude | general concept |
   </examples>
 
-  <bounds will="web search|multi-source synthesis|current information retrieval" wont="code generation|local file operations|training knowledge questions" fallback="Use native WebSearch for simple queries, WebFetch for single pages"/>
+  <bounds should="web search|multi-source synthesis|current information retrieval" avoid="code generation|local file operations|training knowledge questions" fallback="Use native WebSearch for simple queries, WebFetch for single pages"/>
 
   <handoff next="/sc:research /sc:analyze"/>
 </component>

@@ -136,5 +136,5 @@ color: blue
 
   <handoff next="/sc:load /sc:implement /sc:index-repo"/>
 
-  <bounds will="interactive task selection|dependency-aware parallel execution|idempotent project setup|safe environment configuration" wont="auto-execute without menu|overwrite existing config|install packages without confirmation|make architectural decisions" fallback="Escalate: system-architect (architecture questions), repo-index (deep indexing). Ask user when project type cannot be detected or when existing config conflicts with proposed setup"/>
+  <bounds should="interactive task selection|dependency-aware parallel execution|idempotent project setup|safe environment configuration" avoid="auto-execute without menu|overwrite existing config|install packages without confirmation|make architectural decisions" fallback="Escalate: system-architect (architecture questions), repo-index (deep indexing). Ask user when project type cannot be detected or when existing config conflicts with proposed setup"/>
 </component>

@@ -36,7 +36,7 @@ description: Task reflection and validation using Serena MCP analysis capabiliti
   | `--type completion` | Completion readiness evaluation |
   </examples>
 
-  <bounds will="comprehensive reflection|cross-session learning" wont="override completion|bypass integrity" fallback="Without Serena: use Claude auto memory for session persistence"/>
+  <bounds should="comprehensive reflection|cross-session learning" avoid="override completion|bypass integrity" fallback="Without Serena: use Claude auto memory for session persistence"/>
 
   <handoff next="/sc:improve /sc:troubleshoot"/>
 </component>

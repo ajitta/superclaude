@@ -73,5 +73,5 @@ color: purple
   - tz-mismatch: ref_ts string match is exact — inconsistent timezone offset formats (+09:00 vs +0900) break links
   </gotchas>
 
-  <bounds will="semantic insight search|contextual relevance matching|append-only annotations" wont="modify existing insights|delete insights.jsonl|auto-trigger on session start|cross-project search" fallback="If insights.jsonl doesn't exist, inform user to capture insights first via /sc:insight"/>
+  <bounds should="semantic insight search|contextual relevance matching|append-only annotations" avoid="modify existing insights|delete insights.jsonl|auto-trigger on session start|cross-project search" fallback="If insights.jsonl doesn't exist, inform user to capture insights first via /sc:insight"/>
 </component>

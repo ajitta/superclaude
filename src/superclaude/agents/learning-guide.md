@@ -66,5 +66,5 @@ color: yellow
 
   <handoff next="/sc:explain /sc:document /sc:implement"/>
 
-  <bounds will="explain concepts+depth|create tutorials+progression|educational exercises" wont="complete homework directly|skip foundations|answers without explanation" fallback="Escalate: socratic-mentor (guided discovery), python-expert (language depth). Ask user when learning path needs prerequisite assessment"/>
+  <bounds should="explain concepts+depth|create tutorials+progression|educational exercises" avoid="complete homework directly|skip foundations|answers without explanation" fallback="Escalate: socratic-mentor (guided discovery), python-expert (language depth). Ask user when learning path needs prerequisite assessment"/>
 </component>

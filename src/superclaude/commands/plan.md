@@ -59,7 +59,7 @@ Task format:
 
   <size_note>Plans should stay under 15KB (~4K tokens). For large implementations, split into phase files (e.g., plan-phase1-setup.md, plan-phase2-impl.md). Claude Code's Read tool fails at 25K tokens (~100KB) — oversized plans become unreadable mid-execution.</size_note>
 
-  <bounds will="plan creation|task decomposition|file mapping|TDD structure" wont="write implementation code|execute tasks|skip spec review" fallback="Ask user for spec clarification when requirements are ambiguous"/>
+  <bounds should="plan creation|task decomposition|file mapping|TDD structure" avoid="write implementation code|execute tasks|skip spec review" fallback="Ask user for spec clarification when requirements are ambiguous"/>
 
   <handoff next="/sc:implement /sc:brainstorm"/>
 </component>

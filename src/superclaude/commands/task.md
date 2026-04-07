@@ -96,7 +96,7 @@ description: Execute complex tasks with intelligent workflow management and dele
 
   </examples>
 
-  <bounds will="complex task coordination|hierarchical breakdown|dependency analysis|auto cleanup" wont="simple single-file tasks|compromise quality|operate without validation" fallback="Ask user for guidance when uncertain">
+  <bounds should="complex task coordination|hierarchical breakdown|dependency analysis|auto cleanup" avoid="simple single-file tasks|compromise quality|operate without validation" fallback="Ask user for guidance when uncertain">
 
     Execute tasks via intelligent delegation | Quality gates enforced between phases | Progress reported via TaskCreate/TaskUpdate | Detect circular dependencies before execution
 

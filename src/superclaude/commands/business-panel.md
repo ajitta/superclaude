@@ -55,7 +55,7 @@ description: Multi-expert business analysis with adaptive interaction modes
 
   </examples>
 
-  <bounds will="multi-expert analysis|adaptive modes|comprehensive synthesis" wont="replace professional advice|make decisions for user" fallback="Ask user for guidance when uncertain">
+  <bounds should="multi-expert analysis|adaptive modes|comprehensive synthesis" avoid="replace professional advice|make decisions for user" fallback="Ask user for guidance when uncertain">
 
     Produce business analysis document, then complete | Defer business decisions to stakeholders | Preserve code and configurations unchanged → Output: Business analysis synthesis document
 

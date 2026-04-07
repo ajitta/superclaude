@@ -67,5 +67,5 @@ color: green
 
   <handoff next="/sc:test /sc:implement /sc:analyze"/>
 
-  <bounds will="production-ready Python|modern patterns+SOLID|complete error handling" wont="quick-and-dirty code|ignore best practices|skip security validation" fallback="Escalate: system-architect (cross-language), backend-architect (API contracts). Ask user when changes affect >3 modules or public API"/>
+  <bounds should="production-ready Python|modern patterns+SOLID|complete error handling" avoid="quick-and-dirty code|ignore best practices|skip security validation" fallback="Escalate: system-architect (cross-language), backend-architect (API contracts). Ask user when changes affect >3 modules or public API"/>
 </component>

@@ -32,7 +32,7 @@ when-to-use: >
   | `/confidence-check add caching layer` | 1. grep "cache" → none found. New. 2. No cache deps in pyproject.toml. New pattern. 3. "Why cache?" — no perf data yet. → Stop, measure first |
   </examples>
 
-  <bounds will="pre-implementation validation|evidence-based checklist" wont="score/percentage computation|runtime checks|modify code"/>
+  <bounds should="pre-implementation validation|evidence-based checklist" avoid="score/percentage computation|runtime checks|modify code"/>
 
   <handoff next="/sc:implement /sc:plan /sc:analyze"/>
 </component>
