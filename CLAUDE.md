@@ -14,7 +14,7 @@ uv run pytest tests/integration/ -v        # Integration tests
 uv run pytest -k "test_agent"              # By name pattern
 
 # Test baseline
-# 1,787 collected, ~1,628 passing (12 pre-existing failures, 6 collection errors)
+# 1,807 collected, ~1,628 passing (12 pre-existing failures, 6 collection errors)
 # Tests are docs-change-safe: markdown-only changes carry no test risk
 
 # Development workflow
@@ -50,7 +50,7 @@ SuperClaude is a **content framework** — markdown files (commands, agents, mod
 | `agents/` | Domain expert — specialized agent definitions | CC-native auto-delegation |
 | `commands/` | Workflow entry — user-facing /sc:* slash commands | CC-native slash commands |
 | `skills/` | Runtime hooks, safety, and reference knowledge — CC-native | CC-native (hooks, disable-model-invocation, auto-invocation) |
-| `mcp/` | Tool reference — 9 MCP server docs + configuration | context_loader + install_mcp |
+| `mcp/` | Tool reference — 8 MCP server docs + configuration | context_loader + install_mcp |
 | `scripts/` | Hook infrastructure — Python/shell automation | hooks.json → settings.json |
 
 ### Content Installation Flow
@@ -63,7 +63,7 @@ src/superclaude/core/      →  ~/.claude/superclaude/core/   (FLAGS, PRINCIPLES
 src/superclaude/mcp/       →  ~/.claude/superclaude/mcp/    (MCP server documentation)
 ```
 
-Install logic in `cli/`: `install_paths.py` (paths) → `install_settings.py` (hooks/CLAUDE.md) → `install_components.py` (orchestration) → `install_inventory.py` (listing) → `install_commands.py` (wiring).
+Install logic in `cli/`: `install_paths.py` (paths) → `install_settings.py` (hooks/CLAUDE.md) → `install_components.py` (orchestration) → `install_inventory.py` (listing) → `install_commands.py` (wiring) → `install_mcp.py` (MCP configs) → `install_skill.py` (skills).
 
 ### Key Decisions
 
