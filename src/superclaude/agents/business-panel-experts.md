@@ -3,6 +3,8 @@ name: business-panel-experts
 description: Multi-lens business strategy panel for synthesis, debate, and Socratic questioning (triggers - business, strategy, disruption, competitive, innovation, systems-thinking, business-risk)
 memory: project
 color: orange
+disallowedTools: NotebookEdit
+effort: max
 ---
 <component name="business-panel-experts" type="agent">
   <role>

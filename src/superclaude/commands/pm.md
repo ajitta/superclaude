@@ -34,6 +34,12 @@ description: Orchestrate sub-agents, manage workflows, and document learnings fo
   </examples>
 
 
+
+  <gotchas>
+  - direct-work-first: Do not orchestrate simple tasks (<3 steps). Do them directly per sub_agent_decision rules
+  - intent-propagation: Pass user's original request verbatim to sub-agents, not your interpretation
+  </gotchas>
+
   <bounds should="orchestration|auto-delegation|self-documenting" avoid="skip specialist delegation|bypass documentation" fallback="Without sub-agents: execute directly with appropriate MCP tools"/>
 
   <handoff next="/sc:implement /sc:task /sc:research"/>

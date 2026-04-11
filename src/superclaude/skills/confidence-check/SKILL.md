@@ -32,6 +32,12 @@ when-to-use: >
   | `/confidence-check add caching layer` | 1. grep "cache" → none found. New. 2. No cache deps in pyproject.toml. New pattern. 3. "Why cache?" — no perf data yet. → Stop, measure first |
   </examples>
 
+  <gotchas>
+  - false-positive: Do not flag "already exists" when grep finds unrelated matches (same word in comments or strings). Verify semantic match
+  - skip-evidence: Never claim "fits stack" without actually reading pyproject.toml or package.json. Cite file and line
+  - scope-expansion: Confidence check is 3 questions only — do not expand into full architecture review or implementation planning
+  </gotchas>
+
   <bounds should="pre-implementation validation|evidence-based checklist" avoid="score/percentage computation|runtime checks|modify code"/>
 
   <handoff next="/sc:implement /sc:plan /sc:analyze"/>

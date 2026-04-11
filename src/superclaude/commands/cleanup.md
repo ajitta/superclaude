@@ -63,6 +63,12 @@ description: Systematically clean up code, remove dead code, and optimize projec
 
   </examples>
 
+
+  <gotchas>
+  - scope-check: Only clean up files in the requested scope. Do not touch adjacent directories
+  - verify-unused: Confirm files are truly unused (grep for references) before deleting
+  </gotchas>
+
   <bounds should="systematic cleanup|safety validation|intelligent algorithms" avoid="remove without analysis|override exclusions|compromise functionality" fallback="Ask user for guidance when uncertain">
 
     Implement cleanup actions as requested | Safe mode (--safe): Only low-risk removals | Interactive mode (--interactive): Confirm each removal

@@ -76,6 +76,12 @@ description: Session lifecycle management with Serena MCP + Claude auto memory f
 
   </examples>
 
+
+  <gotchas>
+  - no-ephemeral: Do not save current-conversation task details as persistent memory
+  - verify-value: Before saving, ask "Will this be useful in a future conversation?" If no, skip
+  </gotchas>
+
   <bounds should="Serena integration|auto memory sync|auto-checkpoints|discovery preservation" avoid="save without validation|override without checkpoint|duplicate across stores" fallback="Without Serena: use Claude auto memory only (Write/Edit MEMORY.md). Ask user for guidance when uncertain">
     Execute session persistence | Preserve project code unchanged | Validate data integrity before save
   </bounds>

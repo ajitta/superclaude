@@ -5,6 +5,7 @@ model: sonnet
 permissionMode: default
 memory: project
 disallowedTools: NotebookEdit
+effort: low
 color: purple
 ---
 <component name="insight-analyst" type="agent">

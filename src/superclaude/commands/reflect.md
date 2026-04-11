@@ -36,6 +36,12 @@ description: Task reflection and validation using Serena MCP analysis capabiliti
   | `--type completion` | Completion readiness evaluation |
   </examples>
 
+
+  <gotchas>
+  - evidence-required: Cite actual test output and file state, not predicted results
+  - baseline-compare: Compare current state against baseline metrics (test counts, pass rates)
+  </gotchas>
+
   <bounds should="comprehensive reflection|cross-session learning" avoid="override completion|bypass integrity" fallback="Without Serena: use Claude auto memory for session persistence"/>
 
   <handoff next="/sc:improve /sc:troubleshoot"/>

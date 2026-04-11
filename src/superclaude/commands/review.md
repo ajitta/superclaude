@@ -58,6 +58,12 @@ description: Review code changes for quality, security, and correctness with str
   </example>
   </examples>
 
+
+  <gotchas>
+  - scope-focus: Review only the changed code, not the entire file or module
+  - no-unsolicited-fixes: Flag issues but do not fix them unless asked
+  </gotchas>
+
   <bounds should="code review|quality analysis|security scanning|2D spec+quality review" avoid="auto-merge|auto-approve|modify code without explicit permission" fallback="Without spec: weight review toward code quality dimension"/>
 
   <handoff next="/sc:implement /sc:test /sc:troubleshoot"/>

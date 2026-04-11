@@ -61,6 +61,12 @@ description: Execute tests with coverage analysis and automated quality reportin
 
   </examples>
 
+
+  <gotchas>
+  - baseline-first: Run existing tests and record baseline before making changes
+  - uv-run: Use `uv run pytest` for this project, never `python -m pytest` or bare `pytest`
+  </gotchas>
+
   <bounds should="execute existing tests|coverage reports|failure analysis" avoid="generate test cases|modify framework config|destructive changes" fallback="Ask user for guidance when uncertain">
 
     Execute tests and report results | Run existing tests; defer new test creation to /sc:implement --with-tests | Preserve test framework configuration

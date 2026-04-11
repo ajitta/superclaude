@@ -61,6 +61,12 @@ description: Design system architecture, APIs, and component interfaces with com
 
   </examples>
 
+
+  <gotchas>
+  - over-architect: Apply R18 necessity test to each proposed component. Only design what's needed now
+  - existing-check: Check if a design doc already exists for this topic before creating a new one
+  </gotchas>
+
   <bounds should="comprehensive specs|multi-format output|validation" avoid="generate impl code|modify existing arch|violate constraints" fallback="Ask user for guidance when uncertain">
 
     Produce design documentation, then complete | Defer implementation code to /sc:implement | Defer source file creation to /sc:implement | Design specs and interfaces only → Output: Architecture/API/Component/Database design documents

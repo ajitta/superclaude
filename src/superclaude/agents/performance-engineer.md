@@ -4,6 +4,7 @@ description: Optimize system performance through measurement-driven analysis and
 model: sonnet
 memory: project
 color: green
+effort: medium
 ---
 <component name="performance-engineer" type="agent">
   <role>

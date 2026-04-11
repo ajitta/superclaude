@@ -3,6 +3,7 @@ name: security-engineer
 description: Identify security vulnerabilities and ensure compliance with security standards and best practices (triggers - security, vulnerability, owasp, compliance, threat-model, authentication, encrypt, jwt, hash, token, csrf, xss)
 memory: project
 color: green
+effort: high
 ---
 <component name="security-engineer" type="agent">
   <role>

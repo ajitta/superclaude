@@ -48,8 +48,6 @@
 | Risk | Taleb + Meadows | Debate |
 | Communication | Doumont + Godin | Socratic |
 
-  <mcp servers="seq|c7"/>
-
   <examples>
 | Input | Response |
 |-------|----------|

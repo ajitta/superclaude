@@ -318,7 +318,7 @@ class TestAgentOptionalFields:
     """Validate optional CC-native fields when present (effort, maxTurns, tools, skills)."""
 
     def test_effort_valid_if_present(self, agent):
-        """If effort is set, it must be 1-5."""
+        """If effort is set, it must be low/medium/high/max."""
         stem, content, fm = agent
         if "effort" in fm:
             assert fm["effort"] in VALID_EFFORT_VALUES, (

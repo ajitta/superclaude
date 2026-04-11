@@ -3,6 +3,7 @@ name: devops-architect
 description: Automate infrastructure and deployment processes with focus on reliability and observability (triggers - infrastructure, ci-cd, deployment, monitoring, kubernetes, terraform)
 memory: project
 color: blue
+effort: high
 ---
 <component name="devops-architect" type="agent">
   <role>

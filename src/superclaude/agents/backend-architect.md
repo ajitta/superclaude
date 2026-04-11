@@ -3,6 +3,7 @@ name: backend-architect
 description: Design reliable backend systems with focus on data integrity, security, and fault tolerance (triggers - backend, api-design, database, data-integrity, reliability, server-side)
 memory: project
 color: blue
+effort: high
 ---
 <component name="backend-architect" type="agent">
   <role>

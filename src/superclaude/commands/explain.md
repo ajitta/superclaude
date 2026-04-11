@@ -49,6 +49,12 @@ description: Provide clear explanations of code, concepts, and system behavior w
 
   </examples>
 
+
+  <gotchas>
+  - serena-first: Use Serena symbolic tools for code exploration, not full file reads
+  - audience: Check user context/memory for expertise level before choosing explanation depth
+  </gotchas>
+
   <bounds should="clear explanations|agent expertise|framework integration" avoid="explain without analysis|override standards|reveal sensitive" fallback="Ask user for guidance when uncertain">
 
     Provide explanation, then complete | Preserve code unchanged during explanation | Defer implementation to /sc:implement → Output: Explanation text with examples

@@ -63,6 +63,12 @@ description: Generate comprehensive project documentation and knowledge base wit
 
   </examples>
 
+
+  <gotchas>
+  - living-doc: Index output uses UPPER_SNAKE naming in docs/reports/ (no date/username)
+  - token-budget: Use structural reading, not full file reads. Keep index compact
+  </gotchas>
+
   <bounds should="comprehensive docs|multi-agent|framework patterns" avoid="override manual docs|generate without analysis|bypass standards" fallback="Ask user for guidance when uncertain">
 
     Generate documentation files, then complete | Preserve source code unchanged | Preserve <!-- MANUAL --> marked sections → Output: Documentation files per --type (docs/reports/KNOWLEDGE.md, docs/reports/API.md, etc.)

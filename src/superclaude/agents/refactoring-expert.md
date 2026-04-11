@@ -3,6 +3,7 @@ name: refactoring-expert
 description: Improve code quality and reduce technical debt through systematic refactoring and clean code principles (triggers - refactor, technical-debt, solid, code-smells, complexity, simplify)
 memory: project
 color: green
+effort: high
 ---
 <component name="refactoring-expert" type="agent">
   <role>

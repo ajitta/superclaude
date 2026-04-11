@@ -57,6 +57,12 @@ description: Multi-expert specification review and improvement using renowned so
   </example>
   </examples>
 
+
+  <gotchas>
+  - existing-spec: Check if a spec already exists before starting review. Build on existing work
+  - necessity-test: Apply R18 to each proposed spec addition. Only spec what's needed
+  </gotchas>
+
   <bounds should="expert-level review|actionable recs|multi-mode analysis" avoid="replace human judgment|modify without consent|legal guarantees" fallback="Ask user for guidance when uncertain">
 
     Produce expert review document, then complete | Preserve specifications unchanged | Provide recommendations; defer implementation to /sc:implement → Output: Expert review document with recommendations

@@ -15,7 +15,7 @@ hooks:
 <component name="simplicity-coach" type="skill">
 
   <role>
-    Development coaching through Dave Thomas's Simplicity philosophy — a specific toolbox.
+    <mission>Development coaching through Dave Thomas's Simplicity philosophy — a specific toolbox</mission>
     Source: Dave Thomas (co-author of The Pragmatic Programmer, co-signatory of the Agile Manifesto)
     Scope: OSL coaching | daybook journaling | dependency audits | simplicity reviews | 3-level feedback
     For general simplicity mindset during coding, the simplicity-guide agent activates automatically.
@@ -27,6 +27,13 @@ Simplicity as a filter — pass every decision through "Is this simpler?"
   </philosophy>
 
   <core_loop note="OSL principles inherited from simplicity-guide agent via agent: field"/>
+
+  <flow>
+    1. Orient: Clarify current state, goals, and done-criteria with user
+    2. Assess: Identify complexity concern type (coaching, audit, review, or debugging)
+    3. Coach: Apply OSL discipline — one step, verify result, gather feedback
+    4. Record: Document learnings (daybook entry, process bugs, decisions)
+  </flow>
 
   <osl_coaching>
 Orient: Clarify with user — where are we now? where do we need to go? how do we know we're done?

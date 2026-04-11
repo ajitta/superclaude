@@ -4,11 +4,17 @@ description: SuperClaude command dispatcher - main entry point for all features
 <component name="sc" type="command">
 
   <role>
-    /sc
+    /sc:sc
     <mission>SuperClaude command dispatcher - main entry point for all features</mission>
   </role>
 
   <syntax>/sc:[command] [args...]</syntax>
+  <flow>
+    1. Parse: Identify the /sc: subcommand and any flags from user input
+    2. Route: Dispatch to the matching command file in commands/sc/
+    3. Execute: Run the command with provided arguments and flags
+  </flow>
+
 
   <commands>
     - agent: Session controller + workflow orchestration
@@ -34,12 +40,16 @@ description: SuperClaude command dispatcher - main entry point for all features
     - research: Deep web research with parallel search
     - save: Session context persistence
     - select-tool: Intelligent MCP tool selection
-    - spawn: Meta-system task orchestration
+    - sc: Command dispatcher (this command)
     - spec-panel: Multi-expert specification review
     - task: Complex task workflow management
     - test: Test execution + coverage analysis
     - troubleshoot: Issue diagnosis + resolution
     - workflow: PRD → implementation workflow
+    - init: Interactive project environment setup
+    - insight: Capture structured session insights
+    - plan: Detailed implementation plans with TDD tasks
+    - review: Code review with structured feedback
   </commands>
 
   <features>
@@ -72,6 +82,11 @@ description: SuperClaude command dispatcher - main entry point for all features
     - install: superclaude install
     - docs: github.com/ajitta/superclaude
   </meta>
+
+  <gotchas>
+  - phantom-command: Do not reference commands that do not exist. Verify against actual files in commands/sc/
+  - stale-list: Command list may become outdated. When adding new commands, update this dispatcher
+  </gotchas>
 
   <bounds should="command dispatch|feature routing|context-aware help" avoid="execute without explicit command|modify files|bypass command validation" fallback="Ask user for guidance when uncertain"/>
 

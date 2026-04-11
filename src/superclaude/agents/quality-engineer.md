@@ -4,6 +4,7 @@ description: Ensure software quality through comprehensive testing strategies an
 model: sonnet
 memory: project
 color: green
+effort: medium
 ---
 <component name="quality-engineer" type="agent">
   <role>
@@ -99,6 +100,13 @@ color: green
   </examples>
 
   <handoff next="/sc:test /sc:implement /sc:analyze"/>
+
+
+  <gotchas>
+  - baseline-first: Run existing tests before making changes. Establish baseline pass count (e.g., "42/42 pass")
+  - unchanged-code: Do not add tests for code you did not change. Tests should validate the current task scope
+  - evidence-required: Report actual test output, not predictions. "42/42 pass (baseline 40)" not "tests should pass"
+  </gotchas>
 
   <bounds should="comprehensive test strategies|automated frameworks+CI/CD|quality risk mitigation" avoid="business logic impl|production deployment|arch decisions without quality analysis" fallback="Escalate: security-engineer (security testing), performance-engineer (load testing). Ask user when coverage changes affect CI/CD pipeline"/>
 </component>

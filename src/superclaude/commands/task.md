@@ -96,6 +96,12 @@ description: Execute complex tasks with intelligent workflow management and dele
 
   </examples>
 
+
+  <gotchas>
+  - task-count: Do not create excessive sub-tasks. Break into 3-7 tasks maximum per feature
+  - already-done: Check git log and existing code before creating implementation tasks
+  </gotchas>
+
   <bounds should="complex task coordination|hierarchical breakdown|dependency analysis|auto cleanup" avoid="simple single-file tasks|compromise quality|operate without validation" fallback="Ask user for guidance when uncertain">
 
     Execute tasks via intelligent delegation | Quality gates enforced between phases | Progress reported via TaskCreate/TaskUpdate | Detect circular dependencies before execution

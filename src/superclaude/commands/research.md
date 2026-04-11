@@ -10,7 +10,7 @@ description: Deep web research with adaptive planning and intelligent search
 
   <syntax>/sc:research "[query]" [--depth quick|standard|deep|exhaustive] [--strategy planning|intent|unified]</syntax>
 
-  <flow effort="5|10|55|15|15">
+  <flow>
     1. Understand: Complexity + ambiguity assessment | Success criteria | Prior research check
     2. Plan: Strategy + depth + hop pattern + query decomposition + parallelization map
     3. Execute: Multi-hop search with parallel batching | Evidence collection | Adaptive replan on confidence&lt;0.6 or contradictions&gt;30%

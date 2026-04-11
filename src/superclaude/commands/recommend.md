@@ -51,6 +51,12 @@ description: Ultra-intelligent command recommendation engine for optimal SuperCl
   | `'improve the code'` | ambiguous: ask what aspect (perf/quality/security/arch) → /sc:analyze |
   </examples>
 
+
+  <gotchas>
+  - simplicity-bias: Recommend the simplest approach first. Complex multi-agent workflows only when justified
+  - flag-match: Match recommended flags to actual task needs, not maximum capability
+  </gotchas>
+
   <bounds should="intelligent mapping|project context|expertise adaptation" avoid="execute commands|modify files" fallback="Ask user to clarify when request is too ambiguous to map"/>
 
   <handoff next="/sc:analyze /sc:implement /sc:design /sc:troubleshoot"/>

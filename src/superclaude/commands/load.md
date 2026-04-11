@@ -61,6 +61,12 @@ description: Session lifecycle management with Serena MCP + Claude auto memory f
 
   </examples>
 
+
+  <gotchas>
+  - stale-memory: Verify loaded memory against current file state before acting on it
+  - dual-persistence: Check both Serena memory and auto memory for complete context
+  </gotchas>
+
   <bounds should="Serena integration|auto memory loading|cross-session persistence|context loading" avoid="modify structure|load without validation|override without checkpoint" fallback="Without Serena: use Claude auto memory + Read CLAUDE.md/PLANNING.md/TASK.md, Glob for structure. Ask user for guidance when uncertain">
     Execute session/project activation | Preserve project structure unchanged | Validate context before proceeding
   </bounds>

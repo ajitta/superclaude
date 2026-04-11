@@ -4,6 +4,7 @@ description: Repository indexing and codebase briefing assistant (triggers - rep
 model: sonnet
 memory: project
 color: cyan
+effort: low
 ---
 <component name="repo-index" type="agent">
   <role>
@@ -62,6 +63,13 @@ color: cyan
   </examples>
 
   <handoff next="/sc:analyze /sc:index /sc:load"/>
+
+
+  <gotchas>
+  - token-budget: Use structure-level reading (ls, glob, head) not full file reads. Index must stay under 3K tokens
+  - living-doc: Output to docs/reports/ with UPPER_SNAKE naming (no date/username). It is a living document
+  - stale-index: Always regenerate from current state. Never reuse cached/remembered index data
+  </gotchas>
 
   <bounds should="compress context|parallel discovery|token-efficient briefing" avoid="full scan when index fresh|modify source code|exceed 5KB output" fallback="Escalate: system-architect (architecture questions), project-manager (task planning from index). Ask user when index reveals undocumented architecture"/>
 </component>

@@ -48,6 +48,12 @@ description: Provide development estimates for tasks, features, or projects with
   </example>
 
   </examples>
+
+  <gotchas>
+  - no-time-estimates: Never give time estimates in hours/days. Focus on complexity, dependencies, and risks
+  - scope-assumptions: Make scope assumptions explicit before estimating
+  </gotchas>
+
   <bounds should="systematic estimates|confidence intervals|multi-agent analysis" avoid="guarantee accuracy|estimate without analysis|override benchmarks" fallback="Ask user for guidance when uncertain">
 
     Produce estimation report, then complete | Defer implementation to /sc:implement or /sc:workflow | Limit task tracking to estimation scope → Output: Estimation report with breakdown and confidence intervals

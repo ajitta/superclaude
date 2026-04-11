@@ -8,6 +8,8 @@ description: List all available /sc commands and their functionality
     /sc:help
     <mission>List all available /sc commands and their functionality</mission>
   </role>
+  <syntax>/sc:help [command-name] [--flags]</syntax>
+
 
   <flow>
     1. Display: Complete command list
@@ -38,17 +40,21 @@ description: List all available /sc commands and their functionality
     - research: Deep web research with parallel search
     - save: Session context persistence
     - select-tool: Intelligent MCP tool selection
-    - spawn: Meta-system task orchestration
+    - sc: Command dispatcher (main entry point)
     - spec-panel: Multi-expert specification review
     - task: Complex task workflow management
     - test: Test execution + coverage analysis
     - troubleshoot: Issue diagnosis + resolution
     - workflow: PRD → implementation workflow
+    - init: Interactive project environment setup
+    - insight: Capture structured session insights
+    - plan: Detailed implementation plans with TDD tasks
+    - review: Code review with structured feedback
   </commands>
 
   <scope_map>
   Analysis: analyze (static quality metrics) | review (PR/diff-level) | reflect (post-implementation self-check)
-  Project mgmt: task (single-session tracking) | pm (multi-session orchestration) | spawn (one-shot parallel sub-agents)
+  Project mgmt: task (single-session tracking) | pm (multi-session orchestration)
   Implementation: implement (write/modify code) | build (compile, package, deploy)
   Documentation: document (prose for humans) | index (structured knowledge base) | index-repo (repo catalog)
   Discovery: brainstorm (Socratic requirements) | research (evidence-based investigation)
@@ -136,6 +142,12 @@ description: List all available /sc commands and their functionality
   </workflow>
 
   </workflows>
+
+
+  <gotchas>
+  - stale-list: Command list may become stale. Verify against actual files in commands/sc/ if uncertain
+  - flag-docs: Direct users to core/FLAGS.md for flag documentation, not inline explanations
+  </gotchas>
 
   <bounds should="complete reference display|categorized flag listing|usage examples" avoid="execute commands|create files|activate modes|modify project state" fallback="Ask user for guidance when uncertain">
 

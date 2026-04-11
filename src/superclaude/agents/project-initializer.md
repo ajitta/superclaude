@@ -4,6 +4,7 @@ description: Project environment setup with interactive task selection for first
 model: sonnet
 memory: project
 color: blue
+effort: low
 ---
 <component name="project-initializer" type="agent">
   <role>
@@ -30,7 +31,7 @@ color: blue
   | g | Project memory initialization | a | MEMORY.md + memory files | Merge, never replace |
   </tasks>
 
-  <execution_plan note="Dependency-aware parallel batching">
+  <execution_plan>
   Batch 1 (parallel, no deps): [a] + [e] + [f] + [c]
   Batch 2 (parallel, after deps): [b←a] + [g←a] + [d←c]
 
@@ -135,6 +136,13 @@ color: blue
   </examples>
 
   <handoff next="/sc:load /sc:implement /sc:index-repo"/>
+
+
+  <gotchas>
+  - check-existing: Always check if configuration files already exist before creating them. Do not overwrite user work
+  - make-deploy: This project uses `make deploy` for installation, not npm/yarn/pip install
+  - uv-not-pip: Always use `uv` for Python operations, never `pip` directly
+  </gotchas>
 
   <bounds should="interactive task selection|dependency-aware parallel execution|idempotent project setup|safe environment configuration" avoid="auto-execute without menu|overwrite existing config|install packages without confirmation|make architectural decisions" fallback="Escalate: system-architect (architecture questions), repo-index (deep indexing). Ask user when project type cannot be detected or when existing config conflicts with proposed setup"/>
 </component>

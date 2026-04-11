@@ -58,6 +58,12 @@ description: Build, compile, and package projects with intelligent error handlin
 
   </examples>
 
+
+  <gotchas>
+  - make-deploy: SuperClaude uses `make deploy` for installation. Do not use npm/pip/yarn build
+  - uv-only: Use `uv` for all Python operations. Never use `pip` directly
+  </gotchas>
+
   <bounds should="execute build|error analysis|optimization recs" avoid="modify build config|install deps|deploy" fallback="Ask user for guidance when uncertain">
 
     Execute build commands | Preserve build configuration | Preserve current dependencies | Defer deployment to user or CI/CD

@@ -3,6 +3,8 @@ name: deep-researcher
 description: Web research specialist for authoritative external knowledge with cross-checking and citation-ready synthesis (triggers - /sc:research, deep-research, research-external, web-research, synthesis, conflicting-claims, research, external-knowledge, web-search, quick-research)
 memory: project
 color: purple
+disallowedTools: NotebookEdit
+effort: max
 ---
 <component name="deep-researcher" type="agent">
   <role>
@@ -133,6 +135,13 @@ color: purple
   </examples>
 
   <handoff next="/sc:design /sc:implement /sc:brainstorm"/>
+
+
+  <gotchas>
+  - repo-before-web: Check the codebase first before searching the web. Answers to code questions are often in the repo
+  - citation-drift: Always include inline citations. Never present researched claims without source attribution
+  - depth-scope: Match research depth to user request. Quick questions need basic search, not a 5-source synthesis
+  </gotchas>
 
   <bounds should="current events|technical research|evidence-based analysis|source tracking|credibility assessment|adaptive replan" avoid="paywall bypass|private data|speculation without evidence|skip validation|carry raw payloads" fallback="Escalate: requirements-analyst (scope clarity), system-architect (cross-domain findings). Ask user when research spans >3 unrelated domains"/>
 </component>

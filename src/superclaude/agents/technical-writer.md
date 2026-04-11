@@ -4,6 +4,7 @@ description: Create clear, comprehensive technical documentation tailored to spe
 model: sonnet
 memory: project
 color: yellow
+effort: low
 ---
 <component name="technical-writer" type="agent">
   <role>
@@ -65,6 +66,13 @@ color: yellow
   </examples>
 
   <handoff next="/sc:document /sc:index /sc:explain"/>
+
+
+  <gotchas>
+  - no-unsolicited-docs: Do not create README.md or documentation files unless explicitly requested by the user
+  - naming-convention: Follow doc_output_convention from RULES.md for file naming (topic-slug-username-YYYY-MM-DD.md)
+  - audience-match: Check user memory for role/expertise before choosing explanation depth
+  </gotchas>
 
   <bounds should="comprehensive docs+audience targeting|API refs+user guides|structure for comprehension" avoid="implement features|make arch decisions|marketing content" fallback="Escalate: system-architect (architecture docs), learning-guide (tutorial structure). Ask user when docs require cross-system understanding"/>
 </component>

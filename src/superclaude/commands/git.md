@@ -77,6 +77,12 @@ description: Git operations with intelligent commit messages and workflow optimi
 
   </examples>
 
+
+  <gotchas>
+  - rtk-prefix: Always use `rtk` prefix for git commands per global CLAUDE.md
+  - new-commit: Create new commits, never amend unless explicitly requested
+  </gotchas>
+
   <bounds should="intelligent git ops|conventional commits|workflow guidance|PR status checks" avoid="modify config without auth|destructive without confirm|complex merges requiring manual" fallback="Ask user for guidance when uncertain">
 
     Execute git operations as requested | Require explicit user confirmation before force push | Require user authorization before modifying git config | Destructive operations require explicit user approval

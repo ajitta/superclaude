@@ -59,6 +59,12 @@ description: Generate focused documentation for components, functions, APIs, and
 
   </examples>
 
+
+  <gotchas>
+  - no-unsolicited: Do not create documentation files unless explicitly requested
+  - naming: Follow doc_output_convention from RULES.md for file naming (topic-slug-username-date.md)
+  </gotchas>
+
   <bounds should="focused docs|multi-format|ecosystem integration" avoid="doc without analysis|override standards|expose sensitive details" fallback="Ask user for guidance when uncertain">
 
     Produce documentation, then complete | Preserve source code (except inline comments if --type inline) | Defer feature implementation to /sc:implement → Output: Documentation files per --type flag

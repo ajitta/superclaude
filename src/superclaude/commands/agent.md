@@ -9,6 +9,13 @@ description: Session controller orchestrating investigation, implementation, and
   </role>
 
   <syntax>/sc:agent [task-description]</syntax>
+  <flow>
+    1. Parse: Identify task type, complexity, and required expertise from user request
+    2. Delegate: Select appropriate agent(s) based on domain triggers and complexity
+    3. Monitor: Track agent progress, handle failures, consolidate outputs
+    4. Deliver: Present synthesized results to user with evidence citations
+  </flow>
+
 
   <startup>
     - Check: git status --porcelain → 📊 Git: clean|X files|not a repo
@@ -51,6 +58,12 @@ description: Session controller orchestrating investigation, implementation, and
   </example>
 
   </examples>
+
+
+  <gotchas>
+  - scope-leak: Do not let sub-agents expand scope beyond the original user request. Pass user's words verbatim
+  - context-pollution: Do not read sub-agent output files. Wait for returned summary only
+  </gotchas>
 
   <bounds should="orchestrate helpers|validate results|keep user out of busywork" avoid="speculate without research|impl below 0.90 confidence" fallback="Ask user for guidance when uncertain">
 

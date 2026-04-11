@@ -19,7 +19,7 @@ description: Interactive project environment setup — select and run initializa
     6. Report: Final summary table — task status, artifacts created, memory entries stored
   </flow>
 
-  <menu note="Interactive task selection">
+  <menu>
   ```
   Project Initializer
 
@@ -104,6 +104,12 @@ description: Interactive project environment setup — select and run initializa
     <correct>Detect missing prerequisite → prompt: "Task (d) requires (c). Add dependency check?" → user confirms → run c then d.</correct>
   </example>
   </examples>
+
+
+  <gotchas>
+  - check-existing: Verify files do not already exist before creating. Do not overwrite user configuration
+  - uv-not-pip: Use `uv` for Python operations in this project
+  </gotchas>
 
   <bounds should="interactive task menu|dependency-aware execution|parallel batching|idempotent setup|safe environment init" avoid="auto-execute without selection|overwrite existing files|install without confirmation|skip dependency validation" fallback="Ask user when project type undetectable or when existing config conflicts with proposed setup">
     Present menu and execute selected tasks | Validate dependencies before execution | Report results with artifact locations
