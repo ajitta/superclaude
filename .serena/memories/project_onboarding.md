@@ -1,7 +1,7 @@
 # SuperClaude Framework - Project Onboarding
 
 ## Overview
-SuperClaude v4.4.0+ajitta is a content framework for Claude Code with 33 slash commands, 23 agents, 5 skills, and 7 behavioral modes.
+SuperClaude v4.4.1+ajitta is a content framework for Claude Code with 33 slash commands, 23 agents, 5 skills, and 7 behavioral modes.
 
 ## Key Entry Points
 - **CLI**: `superclaude` → `src/superclaude/cli/main.py:main`

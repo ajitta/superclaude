@@ -4,7 +4,7 @@
 SuperClaude is a **content framework** — markdown files (commands, agents, modes, skills, MCP docs, core config) installed into `~/.claude/` to configure Claude Code's behavior. It also ships a CLI (`superclaude`) and a minimal pytest plugin for auto-markers.
 
 ## Version & Meta
-- **Version**: 4.4.0+ajitta
+- **Version**: 4.4.1+ajitta
 - **Python**: >=3.10
 - **Build**: hatchling (PEP 517)
 - **License**: MIT

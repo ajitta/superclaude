@@ -107,7 +107,7 @@ Commits: `feat:`, `fix:`, `docs:`, `refactor:`, `test:`, `chore:`
 
 ## Package Info
 
-- **Version**: 4.4.0+ajitta
+- **Version**: 4.4.1+ajitta
 - **Python**: >=3.10
 - **Build**: hatchling (PEP 517)
 - **Deps**: pytest>=7.0.0, click>=8.0.0, rich>=13.0.0, pyyaml>=6.0.0
