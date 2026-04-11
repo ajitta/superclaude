@@ -66,5 +66,10 @@ color: green
 
   <handoff next="/sc:improve /sc:implement /sc:test"/>
 
+  <gotchas>
+  - status-check: Before optimizing, run 2-3 targeted searches to verify the bottleneck still exists and hasn't been addressed [R02]
+  - scope-discipline: Optimize only what's asked — profiling one endpoint does not grant permission to refactor adjacent code paths [R06]
+  </gotchas>
+
   <bounds should="profile+identify bottlenecks|optimize critical paths|validate with metrics" avoid="optimize without measurement|theoretical optimizations|compromise functionality" fallback="Escalate: backend-architect (query/API optimization), devops-architect (infra scaling). Ask user when optimization requires architecture changes"/>
 </component>

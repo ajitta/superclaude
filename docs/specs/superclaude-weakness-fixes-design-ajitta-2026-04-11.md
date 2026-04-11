@@ -9,7 +9,7 @@ methodology: sequential-thinking (4 steps with self-evaluation loop)
 
 ## Scope
 
-5 weaknesses from the discovery spec. 3 implemented now (W3, W4, W5), 1 partially (W2 gotchas only), 1 designed but deferred to plan phase (W1 agent gotchas).
+5 weaknesses from the discovery spec. 3 implemented now (W3, W4, W5), 1 partially (W2 gotchas only), 1 substantially implemented (W1 agent gotchas — 15/23 agents, 8 low-risk deferred).
 
 | Weakness | Action | Phase |
 |----------|--------|-------|
@@ -17,7 +17,7 @@ methodology: sequential-thinking (4 steps with self-evaluation loop)
 | W4: Skills Budget Mechanics | Add budget section to skill-authoring.md | **Now** |
 | W5: Numeric Criteria | Add numbers to R06, R12 | **Now** |
 | W2: Context Isolation (partial) | Populate gotchas/general.md | **Now** |
-| W1: Agent Rule Reinforcement | Phase 1 implemented (5 agents), Phase 2 deferred | **Partial** |
+| W1: Agent Rule Reinforcement | Phase 1 (5 agents) + Phase 2 selective (5 agents) implemented, 8 low-risk deferred | **Substantial** |
 
 ## Design: W3 — R15 False Reporting Enumeration
 
@@ -121,7 +121,7 @@ gotchas/general.md exists (created by /sc:init) but is empty. CC loads these nat
 
 ---
 
-## Design: W1 — Agent Rule Reinforcement (Phase 1 IMPLEMENTED, Phase 2 DEFERRED)
+## Design: W1 — Agent Rule Reinforcement (Phase 1+2 IMPLEMENTED, 8 low-risk DEFERRED)
 
 ### Problem
 18/23 agents lack `<gotchas>` sections. Critical rules (R02, R13, R15, R18) have zero cross-file reinforcement.
@@ -147,7 +147,10 @@ Insert gotcha lines BEFORE `<bounds>` tag, after `<handoff>` (matching existing 
 ~3 lines x 18 agents = 54 lines, ~1.5-2K tokens total. Per-session cost: ~3 lines for whichever agent is delegated to.
 
 ### Phase 1 — IMPLEMENTED (2026-04-11)
-5 highest-judgment agents: self-review (R15+R06), system-architect (R18+R06), refactoring-expert (R02+R06), project-manager (R13+R04), root-cause-analyst (R13+R03). 2 gotchas per agent, placed after `<handoff>` before `<bounds>`. Total agent gotchas count: 10 (up from 5). Measure before expanding to all 18.
+5 highest-judgment agents: self-review (R15+R06), system-architect (R18+R06), refactoring-expert (R02+R06), project-manager (R13+R04), root-cause-analyst (R13+R03). 2 gotchas per agent, placed after `<handoff>` before `<bounds>`.
+
+### Phase 2 Selective — IMPLEMENTED (2026-04-11)
+5 high-value agents from remaining pool: python-expert (R02+R06), devops-architect (R02+R06), performance-engineer (R02+R06), business-panel-experts (R13+R06), requirements-analyst (R18+R06). R06 (scope) as universal secondary. R02 wording differentiated per domain (implementing/configuring/optimizing). Total agent gotchas count: 15 (up from 10). Remaining 8 agents (educators: learning-guide, socratic-mentor, technical-writer; executors: git-workflow, repo-index, project-initializer; low-risk: insight-analyst already has gotchas, simplicity-guide already has gotchas) deferred — procedural/low-judgment agents with minimal drift risk.
 
 ### Why Deferred
 1. The reviewer noted "content framework improvements, not measured problems" — no evidence of actual rule drift in production
@@ -172,5 +175,5 @@ Insert gotcha lines BEFORE `<bounds>` tag, after `<handoff>` (matching existing 
 
 - **No new rules**: Don't add R20 (context isolation rule). The gotchas/general.md entry covers this lighter-weight.
 - **No skill frontmatter changes**: Don't add `context: fork` yet — reviewer showed current skills don't benefit.
-- **No agent edits in this phase**: W1 deferred to plan. Template designed but not applied.
+- **W1 agent edits**: Phase 1 (5 high-judgment) + Phase 2 selective (5 high-value) implemented. 8 low-risk agents (educators + executors) deferred.
 - **Numbers must be sourced**: 15K and 250 from web research, not from the video's unverified 1% claim.

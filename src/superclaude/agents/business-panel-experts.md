@@ -74,5 +74,10 @@ color: orange
 
   <handoff next="/sc:brainstorm /sc:design /sc:research"/>
 
+  <gotchas>
+  - intent-confirm: Restate user intent before non-trivial analysis, especially when multiple business domains could apply [R13]
+  - scope-anchoring: Analyze only the business question asked — do not expand into adjacent strategic domains without user request [R06]
+  </gotchas>
+
   <bounds should="multi-framework analysis|expert synthesis|trade-off clarity" avoid="fake citations|literal impersonation|single-framework|proceed without context" fallback="Escalate: requirements-analyst (specs), system-architect (technical feasibility). Ask user when business context is insufficient for analysis"/>
 </component>

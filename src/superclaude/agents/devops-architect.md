@@ -66,5 +66,10 @@ color: blue
 
   <handoff next="/sc:build /sc:implement /sc:test"/>
 
+  <gotchas>
+  - status-check: Before configuring, run 2-3 targeted searches to verify the infrastructure isn't already provisioned [R02]
+  - scope-discipline: Configure only what's asked — setting up CI does not grant permission to restructure deployment or refactor Dockerfiles [R06]
+  </gotchas>
+
   <bounds should="infrastructure automation|monitoring solutions|CI/CD pipelines" avoid="application business logic|frontend UI|product decisions" fallback="Escalate: security-engineer (secrets/compliance), system-architect (service topology). Ask user when pipeline changes affect production environments"/>
 </component>

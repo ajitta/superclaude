@@ -12,14 +12,14 @@ source: docs/specs/superclaude-weakness-fixes-design-ajitta-2026-04-11.md
 
 **Token Cost:** ~3 lines x 5 agents = 15 lines, ~400-500 tokens total. Per-session impact: ~3 lines for whichever agent is delegated to.
 
-**Source Decision:** W1 in design spec was deferred with template ready. Phase 1 targets the 5 highest-judgment agents per spec recommendation. Phase 2 (remaining 13 agents) deferred pending measurement.
+**Source Decision:** W1 in design spec was deferred with template ready. Phase 1 targets the 5 highest-judgment agents per spec recommendation. Phase 2 selective (5 high-value agents) implemented same session. Remaining 8 low-risk agents deferred.
 
 ---
 
 ## Pre-flight
 
-- [ ] Verify all 5 agents currently lack `<gotchas>`: `grep -l "<gotchas" src/superclaude/agents/{self-review,system-architect,refactoring-expert,project-manager,root-cause-analyst}.md` (expect: no output)
-- [ ] Confirm current gotchas count: `grep -rl "<gotchas" src/superclaude/agents/ | wc -l` (expect: 5)
+- [x] Verify all 5 agents currently lack `<gotchas>`: `grep -l "<gotchas" src/superclaude/agents/{self-review,system-architect,refactoring-expert,project-manager,root-cause-analyst}.md` (expect: no output)
+- [x] Confirm current gotchas count: `grep -rl "<gotchas" src/superclaude/agents/ | wc -l` (expect: 5)
 
 ---
 
@@ -28,7 +28,7 @@ source: docs/specs/superclaude-weakness-fixes-design-ajitta-2026-04-11.md
 **File:** Modify: `src/superclaude/agents/self-review.md`
 **Location:** After L63 (`<handoff>`), before L65 (`<bounds>`)
 
-- [ ] Insert gotchas block:
+- [x] Insert gotchas block:
 
 ```xml
   <gotchas>
@@ -37,7 +37,7 @@ source: docs/specs/superclaude-weakness-fixes-design-ajitta-2026-04-11.md
   </gotchas>
 ```
 
-- [ ] Verify: `grep -c "gotchas" src/superclaude/agents/self-review.md` (expect: 2 — open + close tags)
+- [x] Verify: `grep -c "gotchas" src/superclaude/agents/self-review.md` (expect: 2 — open + close tags)
 
 ---
 
@@ -46,7 +46,7 @@ source: docs/specs/superclaude-weakness-fixes-design-ajitta-2026-04-11.md
 **File:** Modify: `src/superclaude/agents/system-architect.md`
 **Location:** After L102 (`<handoff>`), before L104 (`<bounds>`)
 
-- [ ] Insert gotchas block:
+- [x] Insert gotchas block:
 
 ```xml
   <gotchas>
@@ -55,7 +55,7 @@ source: docs/specs/superclaude-weakness-fixes-design-ajitta-2026-04-11.md
   </gotchas>
 ```
 
-- [ ] Verify: `grep -c "gotchas" src/superclaude/agents/system-architect.md` (expect: 2)
+- [x] Verify: `grep -c "gotchas" src/superclaude/agents/system-architect.md` (expect: 2)
 
 ---
 
@@ -64,7 +64,7 @@ source: docs/specs/superclaude-weakness-fixes-design-ajitta-2026-04-11.md
 **File:** Modify: `src/superclaude/agents/refactoring-expert.md`
 **Location:** After L66 (`<handoff>`), before L68 (`<bounds>`)
 
-- [ ] Insert gotchas block:
+- [x] Insert gotchas block:
 
 ```xml
   <gotchas>
@@ -73,7 +73,7 @@ source: docs/specs/superclaude-weakness-fixes-design-ajitta-2026-04-11.md
   </gotchas>
 ```
 
-- [ ] Verify: `grep -c "gotchas" src/superclaude/agents/refactoring-expert.md` (expect: 2)
+- [x] Verify: `grep -c "gotchas" src/superclaude/agents/refactoring-expert.md` (expect: 2)
 
 ---
 
@@ -82,7 +82,7 @@ source: docs/specs/superclaude-weakness-fixes-design-ajitta-2026-04-11.md
 **File:** Modify: `src/superclaude/agents/project-manager.md`
 **Location:** After L92 (`<handoff>`), before L94 (`<bounds>`)
 
-- [ ] Insert gotchas block:
+- [x] Insert gotchas block:
 
 ```xml
   <gotchas>
@@ -91,7 +91,7 @@ source: docs/specs/superclaude-weakness-fixes-design-ajitta-2026-04-11.md
   </gotchas>
 ```
 
-- [ ] Verify: `grep -c "gotchas" src/superclaude/agents/project-manager.md` (expect: 2)
+- [x] Verify: `grep -c "gotchas" src/superclaude/agents/project-manager.md` (expect: 2)
 
 ---
 
@@ -100,7 +100,7 @@ source: docs/specs/superclaude-weakness-fixes-design-ajitta-2026-04-11.md
 **File:** Modify: `src/superclaude/agents/root-cause-analyst.md`
 **Location:** After L74 (`<handoff>`), before L76 (`<bounds>`)
 
-- [ ] Insert gotchas block:
+- [x] Insert gotchas block:
 
 ```xml
   <gotchas>
@@ -109,28 +109,28 @@ source: docs/specs/superclaude-weakness-fixes-design-ajitta-2026-04-11.md
   </gotchas>
 ```
 
-- [ ] Verify: `grep -c "gotchas" src/superclaude/agents/root-cause-analyst.md` (expect: 2)
+- [x] Verify: `grep -c "gotchas" src/superclaude/agents/root-cause-analyst.md` (expect: 2)
 
 ---
 
 ### Task 6: Verification
 
-- [ ] All agent tests pass: `uv run pytest tests/unit/test_agent_structure.py -v`
-- [ ] Gotchas count increased: `grep -rl "<gotchas" src/superclaude/agents/ | wc -l` (expect: 10)
-- [ ] No new files: `git status` shows only 5 modified files + 1 new plan file
-- [ ] Rule tag cross-check: `grep -r "\[R15\]" src/superclaude/agents/` includes self-review
-- [ ] Rule tag cross-check: `grep -r "\[R18\]" src/superclaude/agents/` includes system-architect
-- [ ] Rule tag cross-check: `grep -r "\[R02\]" src/superclaude/agents/` includes refactoring-expert
-- [ ] Rule tag cross-check: `grep -r "\[R13\]" src/superclaude/agents/` includes project-manager + root-cause-analyst
+- [x] All agent tests pass: `uv run pytest tests/unit/test_agent_structure.py -v` — 720 pass, 1 pre-existing failure (frontend-architect skill ref)
+- [x] Gotchas count increased: `grep -rl "<gotchas" src/superclaude/agents/ | wc -l` — 10 (up from 5)
+- [x] No new files: `git status` shows only 5 modified files + 1 new plan file
+- [x] Rule tag cross-check: `grep -r "\[R15\]" src/superclaude/agents/` includes self-review
+- [x] Rule tag cross-check: `grep -r "\[R18\]" src/superclaude/agents/` includes system-architect
+- [x] Rule tag cross-check: `grep -r "\[R02\]" src/superclaude/agents/` includes refactoring-expert
+- [x] Rule tag cross-check: `grep -r "\[R13\]" src/superclaude/agents/` includes project-manager + root-cause-analyst
 
 ---
 
 ### Task 7: Commit
 
-- [ ] Stage 5 agent files: `git add src/superclaude/agents/{self-review,system-architect,refactoring-expert,project-manager,root-cause-analyst}.md`
-- [ ] Commit: `feat: add gotchas sections to 5 high-judgment agents (W1 Phase 1)`
-- [ ] Deploy: `make deploy` (propagates to ~/.claude/agents/)
-- [ ] Update design spec status if needed
+- [x] Stage 5 agent files: `git add src/superclaude/agents/{self-review,system-architect,refactoring-expert,project-manager,root-cause-analyst}.md`
+- [x] Commit: `feat: add gotchas to 5 high-judgment agents for critical rule reinforcement (W1 Phase 1)` — d437f0d
+- [x] Deploy: `make deploy` (propagates to ~/.claude/agents/)
+- [x] Update design spec status: W1 updated from "Plan" to "Partial" — Phase 1 complete, Phase 2 deferred
 
 ---
 
@@ -144,17 +144,17 @@ source: docs/specs/superclaude-weakness-fixes-design-ajitta-2026-04-11.md
 | project-manager | R13 Intent Verification | R04 Planning | Planner |
 | root-cause-analyst | R13 Intent Verification | R03 Diagnosis | Planner |
 
-## Phase 2 Scope (Deferred — Measure First)
+## Phase 2 Selective — IMPLEMENTED (2026-04-11)
 
-Remaining 13 agents without gotchas. Proceed only if Phase 1 shows measurable improvement in rule adherence during long sessions.
+5 high-value agents from remaining pool. Educators (3) and executors (3) deferred as low-risk/procedural.
 
-| Category | Agents | Gotcha Rule |
-|----------|--------|-------------|
-| Implementers | python-expert, devops-architect, performance-engineer | R02 Status Check |
-| Proposers | requirements-analyst | R18 Necessity Test |
-| Executors | git-workflow, repo-index, project-initializer | R02 Status Check |
-| Analysts | business-panel-experts | R13 Intent |
-| Educators | learning-guide, socratic-mentor, technical-writer | (low risk — defer) |
+| Category | Agents | Gotcha Rule | Status |
+|----------|--------|-------------|--------|
+| Implementers | python-expert, devops-architect, performance-engineer | R02 Status Check + R06 Scope | **Done** |
+| Proposers | requirements-analyst | R18 Necessity Test + R06 Scope | **Done** |
+| Analysts | business-panel-experts | R13 Intent + R06 Scope | **Done** |
+| Executors | git-workflow, repo-index, project-initializer | R02 Status Check | Deferred (procedural) |
+| Educators | learning-guide, socratic-mentor, technical-writer | (low risk) | Deferred (low-judgment) |
 
 ## Acceptance Criteria
 

@@ -66,5 +66,10 @@ color: purple
 
   <handoff next="/sc:design /sc:workflow /sc:brainstorm"/>
 
+  <gotchas>
+  - necessity-gate: Before proposing new requirements, answer "Is the system broken without this?" — "more complete" alone is insufficient [R18]
+  - scope-anchoring: Capture only the requirements asked about — do not expand scope into adjacent features or stakeholder groups [R06]
+  </gotchas>
+
   <bounds should="vague-to-concrete specs|comprehensive PRDs|stakeholder facilitation" avoid="tech arch decisions|skip when requirements exist|override stakeholder agreements" fallback="Escalate: system-architect (feasibility), business-panel-experts (stakeholder alignment). Ask user when requirements span >2 system domains"/>
 </component>

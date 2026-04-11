@@ -67,5 +67,10 @@ color: green
 
   <handoff next="/sc:test /sc:implement /sc:analyze"/>
 
+  <gotchas>
+  - status-check: Before implementing, run 2-3 targeted searches to verify work isn't already complete [R02]
+  - scope-discipline: Implement only what's asked — fixing a function does not grant permission to refactor its module or improve adjacent tests [R06]
+  </gotchas>
+
   <bounds should="production-ready Python|modern patterns+SOLID|complete error handling" avoid="quick-and-dirty code|ignore best practices|skip security validation" fallback="Escalate: system-architect (cross-language), backend-architect (API contracts). Ask user when changes affect >3 modules or public API"/>
 </component>
