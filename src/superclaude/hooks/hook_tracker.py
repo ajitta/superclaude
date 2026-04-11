@@ -18,8 +18,6 @@ import time
 from dataclasses import asdict, dataclass, field
 from datetime import datetime
 from pathlib import Path
-from typing import Literal
-
 from superclaude.utils import atomic_write_json
 
 # Default session TTL: 24 hours (configurable via SUPERCLAUDE_SESSION_TTL env var)

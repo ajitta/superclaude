@@ -121,39 +121,3 @@ def _is_valid_skill_dir(path: Path) -> bool:
     return False
 
 
-def list_available_skills() -> list[str]:
-    """
-    List all available skills
-
-    Returns:
-        List of skill names
-    """
-    package_root = Path(__file__).resolve().parent.parent
-    candidate_dirs = [
-        package_root / "skills",
-    ]
-
-    repo_root = package_root.parent
-    if repo_root.name == "src":
-        candidate_dirs.append(repo_root.parent / "skills")
-
-    skills: List[str] = []
-    seen: set[str] = set()
-
-    for base in candidate_dirs:
-        if not base.exists():
-            continue
-        for item in base.iterdir():
-            if not item.is_dir() or item.name.startswith("_"):
-                continue
-            if not _is_valid_skill_dir(item):
-                continue
-
-            # Prefer kebab-case names as canonical
-            canonical = item.name.replace("_", "-")
-            if canonical not in seen:
-                seen.add(canonical)
-                skills.append(canonical)
-
-    skills.sort()
-    return skills

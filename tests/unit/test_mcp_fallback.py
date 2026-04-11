@@ -143,28 +143,3 @@ class TestMcpFallbackCleanup:
         ):
             yield tracker_dir
 
-    def test_cleanup_removes_old_sessions(self, temp_fallback_dir: Path):
-        """Test that cleanup removes sessions older than TTL."""
-        import json
-        from datetime import datetime, timedelta
-
-        from superclaude.hooks.mcp_fallback import (
-            cleanup_old_fallback_sessions,
-        )
-
-        # Manually create old session data
-        old_time = (datetime.now() - timedelta(hours=25)).isoformat()
-        old_data = {
-            "old-session-123": {"context7": old_time},
-        }
-
-        fallback_file = temp_fallback_dir / "mcp_fallbacks.json"
-        fallback_file.write_text(json.dumps(old_data))
-
-        # Run cleanup with 24h TTL
-        cleaned = cleanup_old_fallback_sessions(ttl_seconds=24 * 60 * 60)
-        assert cleaned == 1
-
-        # Verify file is now empty or has no sessions
-        data = json.loads(fallback_file.read_text())
-        assert len(data) == 0

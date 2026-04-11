@@ -7,24 +7,6 @@ from pathlib import Path
 from typing import Any
 
 
-def word_overlap_ratio(text1: str, text2: str) -> float:
-    """Jaccard similarity coefficient between word sets.
-
-    Args:
-        text1: First text
-        text2: Second text
-
-    Returns:
-        Ratio of shared words to total unique words (0.0-1.0)
-    """
-    words1 = set(text1.lower().split())
-    words2 = set(text2.lower().split())
-    if not words1 or not words2:
-        return 0.0
-    return len(words1 & words2) / len(words1 | words2)
-
-
-
 def atomic_write_json(path: Path, data: Any, indent: int = 2) -> None:
     """Write JSON data atomically using temp file + os.replace.
 
