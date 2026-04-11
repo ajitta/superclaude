@@ -17,7 +17,7 @@ methodology: sequential-thinking (4 steps with self-evaluation loop)
 | W4: Skills Budget Mechanics | Add budget section to skill-authoring.md | **Now** |
 | W5: Numeric Criteria | Add numbers to R06, R12 | **Now** |
 | W2: Context Isolation (partial) | Populate gotchas/general.md | **Now** |
-| W1: Agent Rule Reinforcement | Template designed, defer implementation | **Plan** |
+| W1: Agent Rule Reinforcement | Phase 1 implemented (5 agents), Phase 2 deferred | **Partial** |
 
 ## Design: W3 — R15 False Reporting Enumeration
 
@@ -121,7 +121,7 @@ gotchas/general.md exists (created by /sc:init) but is empty. CC loads these nat
 
 ---
 
-## Design: W1 — Agent Rule Reinforcement (DEFERRED — Template Only)
+## Design: W1 — Agent Rule Reinforcement (Phase 1 IMPLEMENTED, Phase 2 DEFERRED)
 
 ### Problem
 18/23 agents lack `<gotchas>` sections. Critical rules (R02, R13, R15, R18) have zero cross-file reinforcement.
@@ -146,8 +146,8 @@ Insert gotcha lines BEFORE `<bounds>` tag, after `<handoff>` (matching existing 
 ### Token Cost
 ~3 lines x 18 agents = 54 lines, ~1.5-2K tokens total. Per-session cost: ~3 lines for whichever agent is delegated to.
 
-### Phase 1 Recommendation
-Start with 5 highest-judgment agents: self-review, system-architect, refactoring-expert, project-manager, root-cause-analyst. Measure before expanding to all 18.
+### Phase 1 — IMPLEMENTED (2026-04-11)
+5 highest-judgment agents: self-review (R15+R06), system-architect (R18+R06), refactoring-expert (R02+R06), project-manager (R13+R04), root-cause-analyst (R13+R03). 2 gotchas per agent, placed after `<handoff>` before `<bounds>`. Total agent gotchas count: 10 (up from 5). Measure before expanding to all 18.
 
 ### Why Deferred
 1. The reviewer noted "content framework improvements, not measured problems" — no evidence of actual rule drift in production

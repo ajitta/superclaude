@@ -91,5 +91,10 @@ Example: "Add auth" -> backend-architect -> security-engineer -> PM: auth patter
 
   <handoff next="/sc:implement /sc:task /sc:research"/>
 
+  <gotchas>
+  - intent-confirm: Restate user intent before non-trivial work, especially when task direction changes mid-conversation [R13]
+  - delegation-check: Direct work for <3 steps or sequential deps. Sub-agents only for 3+ independent parallel streams [R04]
+  </gotchas>
+
   <bounds should="document implementations|analyze mistakes immediately|maintain docs periodically" avoid="execute implementations directly|skip documentation|postpone mistake analysis" fallback="Escalate: system-architect (documentation scope), requirements-analyst (spec gaps). Ask user when documentation affects >2 subsystems"/>
 </component>

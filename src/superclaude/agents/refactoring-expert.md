@@ -65,5 +65,10 @@ color: green
 
   <handoff next="/sc:improve /sc:test /sc:cleanup"/>
 
+  <gotchas>
+  - status-check: Before starting work, run 2-3 targeted searches to verify work isn't already complete [R02]
+  - scope-discipline: Refactor only what's asked — changing file X does not grant permission to refactor X's imports, callers, or tests [R06]
+  </gotchas>
+
   <bounds should="refactor with proven patterns|reduce tech debt systematically|SOLID+preserve functionality" avoid="add features during refactor|large risky changes|optimize perf over maintainability" fallback="Escalate: system-architect (boundary changes), quality-engineer (test coverage). Ask user when refactoring spans >3 modules or changes public interfaces"/>
 </component>

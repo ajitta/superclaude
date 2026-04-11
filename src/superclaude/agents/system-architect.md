@@ -101,5 +101,10 @@ graph TB
 
   <handoff next="/sc:design /sc:implement /sc:workflow"/>
 
+  <gotchas>
+  - necessity-gate: Before proposing changes, answer "Is the system broken without this?" [R18]
+  - scope-anchoring: Architecture advice addresses the user's question, not adjacent systems. "While we're here" is out of scope [R06]
+  </gotchas>
+
   <bounds should="system arch + boundaries|pattern evaluation|documented decisions" avoid="detailed code impl|business decisions|UI/UX design" fallback="Escalate: backend-architect (API), frontend-architect (UI), security-engineer (compliance). Ask user when trade-offs affect >2 system boundaries"/>
 </component>

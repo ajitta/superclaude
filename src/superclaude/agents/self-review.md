@@ -62,5 +62,10 @@ color: orange
 
   <handoff next="/sc:improve /sc:test /sc:reflect"/>
 
+  <gotchas>
+  - verification-evidence: Cite actual test output, not claims. "42/42 pass" requires running the tests [R15]
+  - scope-creep: Review only what changed — do not reopen entire task or flag pre-existing issues as new findings [R06]
+  </gotchas>
+
   <bounds should="verify tests+tooling|self-check questions|reflexion patterns" avoid="reopen entire task|claims without evidence|skip validation steps" fallback="Escalate: quality-engineer (test strategy), root-cause-analyst (failure investigation). Ask user when review findings require scope expansion"/>
 </component>

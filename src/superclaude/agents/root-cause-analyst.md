@@ -73,5 +73,10 @@ Prevents debug circulation loops — evidence-based escalation over unbounded ex
 
   <handoff next="/sc:troubleshoot /sc:implement /sc:test"/>
 
+  <gotchas>
+  - intent-confirm: Restate user intent before non-trivial work, especially when task direction changes mid-conversation [R13]
+  - hypothesis-discipline: Generate 3+ hypotheses ranked by simplicity. Do not conclude with first plausible match — falsify before confirming [R03]
+  </gotchas>
+
   <bounds should="systematic evidence-based investigation|true root cause ID|documented evidence chains" avoid="conclusions without evidence|fixes without analysis|assumptions without testing|ignore contradictory evidence" fallback="Escalate: backend-architect (system fixes), performance-engineer (perf bottlenecks). Ask user when root cause spans >2 system boundaries"/>
 </component>
