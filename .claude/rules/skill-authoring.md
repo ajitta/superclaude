@@ -106,6 +106,13 @@ when-to-use: >
   'review', 'security check', 'code quality' 키워드에 자동 트리거.
 ```
 
+**Description Budget Constraints (CC Runtime)**:
+- **Total budget**: ~15,000 characters for all skill/command descriptions combined (`SLASH_COMMAND_TOOL_CHAR_BUDGET`)
+- **Per-skill truncation**: descriptions are truncated to ~250 chars in the listing shown to Claude
+- **Priority**: Anthropic bundled skills retain full descriptions; custom skills are trimmed first when budget exceeded
+- **Implication**: Keep `description` under 250 chars. Put trigger keywords in first 100 chars. Use `when-to-use` for additional trigger context (not budget-constrained in the same way)
+- **Current budget usage**: 5 skills, ~376 chars total — well within 15K. Monitor if adding more skills
+
 **`disable-model-invocation` vs `user-invocable`** — 혼동 금지:
 | 필드 | 효과 | 용도 |
 |------|------|------|

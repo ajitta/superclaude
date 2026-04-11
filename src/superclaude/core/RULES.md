@@ -32,13 +32,13 @@ Intent Propagation: when delegating to sub-agents, include user's original reque
 [R03] Diagnosis 🔴: generate 3+ hypotheses ranked by simplicity; check environment (ports, processes, branches) before code; falsify before confirming
 [R04] Planning 🔴: identify parallel ops explicitly
 [R05] Implementation 🟡: complete features, resolve TODOs, real impls
-[R06] Scope 🟡: build only what's asked, YAGNI
+[R06] Scope 🟡: build only what's asked — 0 unsolicited files, 0 adjacent refactors, YAGNI
 [R09] Git 🔴: feature branches, incremental commits
 [R10] Failure 🔴: root cause analysis, always test
-[R12] Clarification 🟡: ambiguous requests (multiple valid interpretations) → ask before implementing
+[R12] Clarification 🟡: ambiguous requests (2+ valid interpretations) → ask before implementing
 [R13] Intent Verification 🔴: before non-trivial work (>3 steps, ambiguous scope, or new task direction), restate user's intent in 1-2 sentences and confirm. Skip for: single-file edits, explicit file paths, continuation of confirmed plan.
 [R14] Correction Capture 🟡: when user corrects a contextual misunderstanding (not a typo), save structured feedback memory: {trigger, misread, actual_intent, violated_rule: "[RXX]", prevention}
-[R15] Verification 🔴: before claiming done, run full test suite fresh (not cached); compare pass count to baseline; cite evidence ("42/42 pass, baseline 40")
+[R15] Verification 🔴: before claiming done, run full test suite fresh (not cached); compare pass count to baseline; cite evidence ("42/42 pass, baseline 40"); prohibited: claiming passage without running tests, summarizing failures as 'minor issues', reporting completion without command output, predicting results instead of observing. If unable to verify, state "verification not possible: [reason]"
 [R16] Safe Read 🟡: always use limit parameter for files of unknown size (hook blocks >30KB without limit); small files (<5KB) auto-exempt; config formats (.json, .yaml, .yml, .toml, .cfg, .ini, .env) exempt <30KB; large JSON/data files → use jq for field queries instead of Read; logs, transcripts, changelogs → prefer Grep over Read; plan files → keep under 15KB, split into phases for large implementations
 [R17] Serena-First 🟡: code exploration fallback chain: 1. Serena symbolic tools (get_symbols_overview, find_symbol) — primary; 2. ast-grep MCP — structural AST search fallback; primary for pattern matching; 3. Grep with targeted patterns — last resort; reserve Read for non-code files, unknown formats, or when all above insufficient
 [R18] Necessity Test 🔴: before proposing any unsolicited code change, answer "Is the system broken without this?" — "safer/better" alone is insufficient. Require: specific failure scenario, quantitative evidence, or user-facing impact. "Deferred to post-MVP review" is a valid design decision
@@ -51,6 +51,7 @@ Intent Propagation: when delegating to sub-agents, include user's original reque
   | API endpoint returning 500 | Assumes code bug, reads source | Checks: port in use? DB running? env vars set? | Diagnosis 🔴 |
   | User: "improve the dashboard" | Picks "add charts" as most likely | Asks: "Performance, UX, or data accuracy?" | Clarification 🟡 |
   | 42/42 tests pass | "All tests pass" | "42/42 pass (baseline: 40, +2 new)" | Verification 🔴 |
+  | Agent says "all tests pass" without output | Reports "verification not possible" or runs tests first | Verification 🔴 |
   | User: "restructure the auth module" | Starts moving files | "To confirm: reorganize file structure of src/auth/, not rewrite logic. Correct?" | Intent Verification 🔴 |
   | User corrects: "no, the API routes" | Switches files silently | Saves memory: {trigger: 'restructure auth', misread: middleware, actual: API routes, prevention: ask which layer} | Correction Capture 🟡 |
   | User: "add validation" (1 file, explicit path) | Runs git log + grep first | Edits directly — skip Status Check for single explicit-path tasks | Status Check (borderline) |
@@ -91,7 +92,7 @@ Directive restraint: "when appropriate" over "ALWAYS use X"
 Restate before building: confirm understanding before starting work — wrong direction costs more than a question
 User correction = learning event: always persist as structured feedback memory, never treat as transient
 Same mistake twice = missing rule: if a feedback memory already covers this pattern, propose a RULES.md addition
-Ambiguity ≠ assumption: multiple valid interpretations → ask, don't pick the most likely one
+Ambiguity ≠ assumption: 2+ valid interpretations → ask, don't pick the most likely one
 Scope words matter: "add" = new, "improve" = enhance existing, "fix" = repair broken, "strengthen" = reinforce existing mechanism, "adjust/readjust" = review applicability, not necessarily change
 Unverified numbers: prefix estimates with ~, distinguish from measured/coded values — never state estimates as facts
 Delegation intent loss: sub-agents receive user's original words, not your interpretation of them
