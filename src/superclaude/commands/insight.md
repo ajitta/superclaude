@@ -15,7 +15,7 @@ description: Capture structured session insights to per-project JSONL for human 
     2. Capture (default): Analyze session → propose 3-7 insights → present for user approval → append approved
     3. Capture (text): Take user text → infer type + tags → structure as JSON → present → append
     4. Dedup: Before proposing, Read last 20 lines of .claude/insights.jsonl → skip already-captured topics. For annotations, also check existing ref_ts to avoid duplicates.
-    5. Append: Use Bash `echo '...' >> .claude/insights.jsonl` (NOT Write tool — Write overwrites)
+    5. Append: Batch via Python — `python3 -c "import json; entries=[...]; f=open('.claude/insights.jsonl','a'); [f.write(json.dumps(e)+'\n') for e in entries]; f.close()"` (NOT Write tool — Write overwrites, NOT echo — escaping risk)
     6. Query: For --list/--query/--stats, run jq via Bash (fallback: python3 -c "import json; ...")
   </flow>
 
@@ -104,7 +104,7 @@ description: Capture structured session insights to per-project JSONL for human 
   </examples>
 
   <gotchas>
-  - append-not-write: NEVER use Write tool for insights.jsonl — it overwrites. Always use Bash echo >> append.
+  - append-not-write: NEVER use Write tool for insights.jsonl — it overwrites. Use Python `json.dumps()` batch append (handles escaping safely). Avoid bare `echo >>` — quotes/special chars in insight text cause silent corruption.
   - dedup-before-propose: In auto-capture mode, always Read last 20 lines before proposing to avoid duplicating insights from earlier calls in same session.
   </gotchas>
 
