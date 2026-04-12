@@ -734,7 +734,20 @@ def verify_drift_cmd(scope: str, verbose: bool):
     default="all",
     help="Which check to run (default: all)",
 )
-def audit(scope: str, verbose: bool, check: str):
+@click.option(
+    "--format",
+    "output_format",
+    type=click.Choice(["text", "markdown"]),
+    default="text",
+    help="Output format (default: text). markdown writes a committed report.",
+)
+@click.option(
+    "--out",
+    type=click.Path(dir_okay=False, path_type=Path),
+    default=None,
+    help="Output path for --format markdown (default: docs/reports/AUDIT.md)",
+)
+def audit(scope: str, verbose: bool, check: str, output_format: str, out: Path | None):
     """
     Run content integrity audit.
 
@@ -743,16 +756,28 @@ def audit(scope: str, verbose: bool, check: str):
 
     Examples:
         superclaude audit
-        superclaude audit --check drift
-        superclaude audit --verbose
+        superclaude audit --check drift --verbose
+        superclaude audit --format markdown --out docs/reports/AUDIT.md
     """
     from .audit import run_audit
     from .install_commands import get_base_path
 
     base_path = get_base_path(scope)
-    click.echo(f"🔍 SuperClaude Audit (scope: {scope}, check: {check})\n")
 
-    result = run_audit(base_path, verbose=verbose, check=check)
+    # Markdown format always needs per-file detail
+    effective_verbose = verbose or output_format == "markdown"
+    result = run_audit(base_path, verbose=effective_verbose, check=check)
+
+    if output_format == "markdown":
+        report_path = out or Path("docs/reports/AUDIT.md")
+        report_path.parent.mkdir(parents=True, exist_ok=True)
+        report_path.write_text(_format_audit_markdown(result, scope, check), encoding="utf-8")
+        click.echo(f"📝 Audit report written to {report_path}")
+        if not result["clean"]:
+            sys.exit(1)
+        return
+
+    click.echo(f"🔍 SuperClaude Audit (scope: {scope}, check: {check})\n")
 
     # Drift results
     if "drift" in result:
@@ -762,6 +787,14 @@ def audit(scope: str, verbose: bool, check: str):
                     f"{drift['total_drifted']} drifted, "
                     f"{drift['total_missing']} missing, "
                     f"{drift['total_extra']} extra")
+        if verbose and not drift["clean"]:
+            for component, stats in drift["components"].items():
+                if stats["drifted"] + stats["missing"] + stats["extra"] == 0:
+                    continue
+                click.echo(f"   {component}:")
+                for filename, status in stats.get("files", {}).items():
+                    if status != "OK":
+                        click.echo(f"      - [{status}] {filename}")
 
     # Cross-reference results
     if "cross_refs" in result:
@@ -791,6 +824,65 @@ def audit(scope: str, verbose: bool, check: str):
     else:
         click.echo("⚠️  Issues found — see above for details")
         sys.exit(1)
+
+
+def _format_audit_markdown(result: dict, scope: str, check: str) -> str:
+    """Render audit result as a committable markdown health report."""
+    from datetime import datetime, timezone
+
+    lines = [
+        "# SuperClaude Audit Report",
+        "",
+        f"- **Generated:** {datetime.now(timezone.utc).isoformat(timespec='seconds')}",
+        f"- **Scope:** `{scope}`",
+        f"- **Checks:** `{check}`",
+        f"- **Status:** {'✅ Clean' if result['clean'] else '⚠️ Issues found'}",
+        "",
+    ]
+
+    if "drift" in result:
+        drift = result["drift"]
+        lines += [
+            "## Drift",
+            "",
+            f"- OK: {drift['total_ok']}",
+            f"- Drifted: {drift['total_drifted']}",
+            f"- Missing: {drift['total_missing']}",
+            f"- Extra: {drift['total_extra']}",
+            "",
+        ]
+        if not drift["clean"]:
+            for component, stats in drift["components"].items():
+                non_ok = [(f, s) for f, s in stats.get("files", {}).items() if s != "OK"]
+                if not non_ok:
+                    continue
+                lines.append(f"### {component}")
+                lines.append("")
+                for filename, status in non_ok:
+                    lines.append(f"- `{status}` — `{filename}`")
+                lines.append("")
+
+    if "cross_refs" in result:
+        xref = result["cross_refs"]
+        lines += [f"## Cross-references ({xref['total_issues']} issues)", ""]
+        if not xref["clean"]:
+            for category, items in xref["issues"].items():
+                if items:
+                    lines.append(f"### {category}")
+                    lines.append("")
+                    for item in items:
+                        lines.append(f"- {item}")
+                    lines.append("")
+
+    if "usage" in result:
+        usage = result["usage"]
+        lines += [f"## Usage ({usage['total_issues']} issues)", ""]
+        if not usage["clean"]:
+            for issue in usage["issues"]:
+                lines.append(f"- {issue}")
+            lines.append("")
+
+    return "\n".join(lines) + "\n"
 
 
 @main.command()

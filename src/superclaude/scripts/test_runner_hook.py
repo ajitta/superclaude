@@ -26,6 +26,31 @@ SOURCE_EXTENSIONS = {
 # Directories to skip (edits in these don't trigger tests)
 SKIP_DIRS = {"node_modules", "__pycache__", ".venv", "dist", "build", ".git"}
 
+# Authoring-rule dispatch: .md edits under these dirs run targeted structure tests
+AUTHORING_TEST_MAP = {
+    "agents": "tests/unit/test_agent_structure.py",
+    "commands": "tests/unit/test_command_structure.py",
+    "skills": "tests/unit/test_skill_structure.py",
+    "modes": "tests/unit/test_mode_structure.py",
+}
+
+
+def detect_authoring_test(file_path: str) -> str | None:
+    """If a SuperClaude .md authoring file was edited, return targeted pytest cmd."""
+    path = Path(file_path)
+    if path.suffix.lower() != ".md":
+        return None
+    parts = path.parts
+    if "superclaude" not in parts:
+        return None
+    for segment, test_file in AUTHORING_TEST_MAP.items():
+        if segment in parts:
+            for parent in path.resolve().parents:
+                if (parent / "pyproject.toml").exists():
+                    return f"uv run pytest {shlex.quote(str(parent / test_file))} --tb=short -q"
+            return None
+    return None
+
 
 def detect_test_command(file_path: str) -> str | None:
     """Detect the appropriate test command based on project files."""
@@ -86,10 +111,11 @@ def main() -> None:
 
         file_path = data.get("tool_input", {}).get("file_path", "")
 
-        if not should_run(file_path):
-            return
-
-        test_cmd = detect_test_command(file_path)
+        test_cmd = detect_authoring_test(file_path)
+        if test_cmd is None:
+            if not should_run(file_path):
+                return
+            test_cmd = detect_test_command(file_path)
         if not test_cmd:
             return
 
