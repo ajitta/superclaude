@@ -1,0 +1,35 @@
+# Single source of truth for mechanically-enforced enum rules from .claude/rules/*-authoring.md.
+# Prose authoring guides remain authoritative for *how* to author; this file is authoritative for *what values are valid*.
+# Loaded by tests/conftest.py via fixture `rules_schemas`.
+# Last reviewed: 2026-04-14
+
+# Agent color palette — maps role group to required color.
+# Source: .claude/rules/agent-authoring.md "color by role group" table.
+agent_colors:
+  architecture: blue       # system design, frontend, backend, devops
+  engineering: green       # coding, security, performance, quality, refactoring
+  research: purple         # investigation, research, requirements
+  documentation: yellow    # writing, teaching, mentoring
+  management: orange       # orchestration, business, review, simplicity
+  indexing: cyan           # repository scanning
+
+# Effort enum — adaptive reasoning depth (CC v2.1.69+).
+# Source: .claude/rules/agent-authoring.md "effort" table.
+effort_values:
+  - low       # mechanical/structured (repo-index, git-workflow)
+  - medium    # standard design + analysis (default)
+  - high      # complex reasoning, deep debugging
+  - max       # multi-perspective synthesis (Opus 4.6 only)
+
+# Command frontmatter forbidden fields — these belong on agents/skills, not commands.
+# Source: .claude/rules/command-authoring.md "Forbidden fields" list.
+forbidden_command_fields:
+  - name           # derived from filename
+  - model          # agent-only
+  - permissionMode # agent-only
+  - memory         # agent-only
+  - color          # agent-only
+  - autonomy       # not an official CC field
+  - context        # skill-only
+  - agent          # skill-only
+  - hooks          # skill-only
