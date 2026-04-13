@@ -9,13 +9,17 @@ import re
 from pathlib import Path
 
 import pytest
+import yaml
 
 AGENTS_DIR = Path(__file__).parent.parent.parent / "src" / "superclaude" / "agents"
 
 VALID_PERMISSION_MODES = {"acceptEdits", "default", "plan", "auto", "dontAsk", "bypassPermissions"}
 VALID_MEMORY_SCOPES = {"user", "project", "local"}
-VALID_COLORS = {"blue", "green", "orange", "purple", "yellow", "cyan", "red"}
-VALID_EFFORT_VALUES = {"low", "medium", "high", "max"}
+
+_SCHEMAS_PATH = Path(__file__).parent.parent.parent / ".claude" / "rules" / "schemas.yaml"
+_SCHEMAS = yaml.safe_load(_SCHEMAS_PATH.read_text(encoding="utf-8"))
+VALID_COLORS = set(_SCHEMAS["agent_colors"].values())
+VALID_EFFORT_VALUES = set(_SCHEMAS["effort_values"])
 SKILLS_DIR = Path(__file__).parent.parent.parent / "src" / "superclaude" / "skills"
 # All agent .md files (excluding README and _ prefixed test agents)
 AGENT_FILES = sorted(
