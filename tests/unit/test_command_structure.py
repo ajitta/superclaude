@@ -9,14 +9,14 @@ import re
 from pathlib import Path
 
 import pytest
+import yaml
 
 COMMANDS_DIR = Path(__file__).parent.parent.parent / "src" / "superclaude" / "commands"
 
 # Agent/skill-only fields that should never appear in command frontmatter
-FORBIDDEN_FIELDS = {
-    "name", "model", "permissionMode", "memory",
-    "color", "autonomy", "context", "agent", "hooks",
-}
+_SCHEMAS_PATH = Path(__file__).parent.parent.parent / ".claude" / "rules" / "schemas.yaml"
+_SCHEMAS = yaml.safe_load(_SCHEMAS_PATH.read_text(encoding="utf-8"))
+FORBIDDEN_FIELDS = set(_SCHEMAS["forbidden_command_fields"])
 
 # All command .md files (excluding README and __init__.py)
 COMMAND_FILES = sorted(
