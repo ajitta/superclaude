@@ -23,6 +23,8 @@ description: One-line purpose of this slash command  # required | shown in /menu
 - `autonomy` — not an official Claude Code field
 - `context`, `agent`, `hooks` — skill-only fields
 
+*Mechanical source of truth: `.claude/rules/schemas.yaml` (`forbidden_command_fields`). Prose here remains authoritative for rationale.*
+
 Commands inherit all tools and the parent model. Use skills (not commands) when you need tool restrictions, hooks, or subagent execution.
 
 ## XML Body Structure

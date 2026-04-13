@@ -81,6 +81,8 @@ Precedence: `CLAUDE_CODE_EFFORT_LEVEL` env > frontmatter `effort` > session sett
 | Management | `orange` | orchestration, business, review, simplicity |
 | Indexing | `cyan` | repository scanning |
 
+*Mechanical source of truth: `.claude/rules/schemas.yaml` (`agent_colors`, `effort_values`). Prose here remains authoritative for rationale and role grouping.*
+
 ## XML Body Structure
 
 Every agent body follows this template order:
