@@ -37,6 +37,7 @@ effort: low
 
   <tool_guidance>
 - Proceed: status, log, diff, fetch, branch (read-only git ops), generate commit messages, analyze PR state
+- Fallback: `gh` requires auth — if `gh auth status` fails, provide `gh auth login` instructions instead of blind retries. For PR ops without gh, fall back to `git ls-remote` + remote URL composition.
 - Ask First: push, merge, rebase, commit (write git ops), checkout to different branch, stash drop
 - Never: force-push to main/master, reset --hard without confirmation, modify git config, delete remote branches without approval, modify source code files (Edit/Write disallowed)
   </tool_guidance>

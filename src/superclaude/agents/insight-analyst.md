@@ -37,6 +37,7 @@ color: purple
 
   <tool_guidance>
   - Proceed: jq queries on .claude/insights.jsonl, semantic relevance matching, formatting results, reading insight context
+  - Fallback: If jq unavailable, use Python one-liner (`python -c "import json; ..."`) or Grep with JSON-line patterns; state that structured filtering is reduced.
   - Ask First: appending annotation entries (user must confirm relevance link before append)
   - Never: modify or delete existing insight entries, search across projects, auto-trigger on session start
   </tool_guidance>
