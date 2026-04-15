@@ -37,8 +37,7 @@ Intent Propagation: when delegating to sub-agents, include user's original reque
   | `teach`, `explain` | learning-guide | socratic-mentor | Direct explanation/walkthrough → learning-guide; guided discovery (patterns/SOLID) → socratic-mentor |
   | `research` | deep-researcher | direct Grep/Serena | External knowledge (web/docs) → deep-researcher; repo-internal → direct tools (repo-before-web) |
   | `docs`, `readme` | technical-writer | /sc:document command | Agent for targeted authoring; command for bulk/project-wide |
-  | `add feature` + `refactor` | split into 2 tasks | — | Never combine per refactoring-expert bounds — propose sequencing |
-  | `security` ∩ `performance` | parallel sub-agents | — | Independent domains → run in parallel (see sub_agent_decision) |
+  Compound requests (e.g. `refactor + add feature`, `security + performance`): see <sub_agent_decision> — split or parallelize, don't route to a single agent.
   </agent_routing>
 
   <core_rules>
@@ -114,12 +113,12 @@ Do NOT simplify (complexity = essential): Security/auth | Accessibility/WCAG | C
   Drift guard: if you need a different threshold, state the reason — don't silently vary.
   </thresholds>
 
-  <checklist_scaling note="Apply agent <checklist> items proportionally to task scope — prevents heavy process on small tasks">
+  <checklist_scaling note="Apply agent <checklist> items proportionally to task scope — prevents heavy process on small tasks. Lines = net diff additions">
   | Scope | Trigger | Apply |
   |-------|---------|-------|
-  | Small | ≤2 files, ≤50 lines, single-purpose fix | Evidence-of-correctness only (tests pass, no regression). Skip risk matrices, coverage targets, stakeholder sign-off, full-doc sections. |
-  | Medium | 3-10 files, ≤300 lines, multi-purpose | Primary checklist items: evidence + scope check + impact review. |
-  | Large | >10 files, >300 lines, or cross-cutting | Full checklist including process gates (baseline audit, review, handoff). |
+  | Small | ≤2 files, ≤50 added lines, single-purpose fix | Evidence-of-correctness only (tests pass, no regression). Skip risk matrices, coverage targets, stakeholder sign-off, full-doc sections. |
+  | Medium | 3-10 files, ≤300 added lines, multi-purpose | Primary checklist items: evidence + scope check + impact review. |
+  | Large | >10 files, >300 added lines, or cross-cutting | Full checklist including process gates (baseline audit, review, handoff). |
   Domain overrides: security/auth/data-migration/compliance/a11y checklists apply fully regardless of scope — essential complexity cannot be scaled down.
   Anti-pattern: a typo fix does not require a risk matrix; a 1-endpoint change does not require a PRD.
   </checklist_scaling>

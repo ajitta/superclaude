@@ -374,3 +374,20 @@ class TestAgentOptionalFields:
             assert skill in existing_skills, (
                 f"{stem}: skills references '{skill}' but no such skill dir exists"
             )
+
+
+def test_agent_rule_citations_exist_in_rules_md():
+    """Every [Rxx] citation in agent files must have a matching definition in core/RULES.md."""
+    rules_path = AGENTS_DIR.parent / "core" / "RULES.md"
+    rules_content = rules_path.read_text(encoding="utf-8")
+    defined_rules = set(re.findall(r"^\[R\d+\]", rules_content, re.MULTILINE))
+
+    for agent_file in AGENTS_DIR.glob("*.md"):
+        if agent_file.name == "README.md":
+            continue
+        content = agent_file.read_text(encoding="utf-8")
+        cited_rules = set(re.findall(r"\[R\d+\]", content))
+        missing = cited_rules - defined_rules
+        assert not missing, (
+            f"{agent_file.stem}: cites rules not defined in RULES.md: {sorted(missing)}"
+        )
