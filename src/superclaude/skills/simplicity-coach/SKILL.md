@@ -1,16 +1,12 @@
 ---
 name: simplicity-coach
-description: Interactive OSL coaching, daybook journaling, dependency audits, and simplicity reviews.
+description: Explicit OSL coaching, daybook journaling, and dependency audits (invoke with /simplicity-coach).
+disable-model-invocation: true
 when-to-use: >
-  When user asks about simplicity, over-engineering concerns, YAGNI, dependency audits,
-  or wants coaching on orient-step-learn discipline.
-hooks:
-  Stop:
-    - hooks:
-        - type: command
-          command: "python3 {{SKILLS_PATH}}/simplicity-coach/scripts/dependency-audit.py ."
-          timeout: 15
-          once: true
+  Explicit invocation only via /simplicity-coach. Use for: daybook journaling,
+  dependency-gate audits, 3-level feedback reviews, structured OSL coaching sessions.
+  For passive simplicity mindset during coding, the simplicity-guide agent
+  activates automatically — do not invoke this skill for that.
 ---
 <component name="simplicity-coach" type="skill">
 
@@ -26,7 +22,12 @@ hooks:
 Simplicity as a filter — pass every decision through "Is this simpler?"
   </philosophy>
 
-  <core_loop note="OSL principles inherited from simplicity-guide agent via agent: field"/>
+  <references note="Load on demand — progressive disclosure">
+  - `references/orient-step-learn-examples.md` — Worked OSL examples (API endpoint, refactoring, tech selection, dependency audit, debugging). Read when user needs concrete OSL walkthrough.
+  - `references/practices-reference.md` — Templates for dependency gate, 3-level feedback, daybook, simplicity review, task-type OSL. Read when preparing a specific practice.
+  - `assets/dependency-audit-checklist.md` — Printable checklist for Dependency Gate 3 questions. Share with user during audits.
+  - `scripts/dependency-audit.py` — Executable audit report. Run via Bash when user requests dependency audit.
+  </references>
 
   <flow>
     1. Orient: Clarify current state, goals, and done-criteria with user
@@ -69,13 +70,11 @@ Tech Selection: evaluate reversibility → list trade-offs → seek synthesis
 Storytelling (metaphors, not jargon) | Empathy (who maintains this?) | Transparency (state uncertainty)
   </communication>
 
-  <hooks note="dependency-audit.py runs on Stop — audit report with Simplicity 3 Questions (once per session)"/>
-
   <gotchas>
-  - timeout: If dependency-audit.py times out (15s), ignore and proceed. Stop hook does not block session
   - osl-skip: Do not skip Orient phase and jump to Step. Step without Orient is directionless work
   - overconfident-judgment: Do not declare "over-engineered" without understanding domain context. Ask first, judge second.
   - domain-blind: Security, a11y, compliance complexity is essential — never recommend simplifying these domains
+  - script-invocation: dependency-audit.py runs via explicit Bash invocation inside this skill session, not via Stop hook
   </gotchas>
 
   <bounds should="OSL coaching|daybook journaling|dependency audits|simplicity reviews|3-level feedback" avoid="change entire organization|impose methodology|dogmatic rules|pursue perfection"/>
