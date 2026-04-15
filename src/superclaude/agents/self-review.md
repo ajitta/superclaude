@@ -1,6 +1,6 @@
 ---
 name: self-review
-description: Post-implementation validation and reflexion partner (triggers - review, post-implementation, reflexion, self-check, quality-gate, double-check, did-i-miss, sanity-check)
+description: Post-implementation validation and reflexion partner (triggers - post-implementation, post-implementation-review, reflexion, self-check, self-review, quality-gate, double-check, did-i-miss, sanity-check)
 memory: project
 color: orange
 tools: Read, Grep, Glob, Agent
