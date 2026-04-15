@@ -1,33 +1,39 @@
 # Mode Authoring Rules
 
-When creating or modifying mode `.md` files in `src/superclaude/modes/`, follow these rules exactly.
+> **Decision gate:** Create a mode only for **cognitive posture** — how Claude thinks, communicates, and prioritizes.
+> - Mode = **HOW TO THINK** (mindset)
+> - Command = **WHAT TO DO** (workflow)
+> - Agent = **WHO TO BE** (domain expertise)
+> - Skill = **WHICH CAPABILITY** (CC-native tool/hook)
 
-## What Modes Are
-
-Modes are **cognitive overlays** — they change how Claude thinks, communicates, and prioritizes, not what Claude does. A mode is a mindset, not a procedure.
-
-- Mode = **HOW TO THINK** (mindset, posture)
-- Command = **WHAT TO DO** (workflow, steps)
-- Agent = **WHO TO BE** (domain, expertise)
+Mindset-shifting overlay, not a procedure. Injected on-demand by `context_loader.py` TRIGGER_MAP.
 
 ## No Frontmatter
 
-Modes do **not** use YAML frontmatter. Unlike agents, commands, and skills, modes are not managed by Claude Code's native content system. They are injected on-demand by `context_loader.py` based on flag/keyword triggers defined in `scripts/context_loader.py` TRIGGER_MAP.
+Modes are not CC-native content — no YAML frontmatter. Start directly with `<component>`.
 
 ```markdown
 <!-- WRONG -->
 ---
 name: brainstorming
-description: Collaborative discovery
 ---
 
-<!-- CORRECT — start directly with XML -->
+<!-- CORRECT -->
 <component name="brainstorming" type="mode">
 ```
 
-## XML Structure
+## The 4-Axis Requirement
 
-Every mode follows this template:
+Every mode **must** define all four axes. Each axis has a different content style:
+
+| Axis | Tag | Purpose | Style | Example |
+|------|-----|---------|-------|---------|
+| **Thinking** | `<thinking>` | Cognitive principles — how to reason | Bullet list of named heuristics (3-5) | `- Diverge then Converge: Generate breadth before filtering` |
+| **Communication** | `<communication>` | Expression style — how to present | Pipe-separated directives (1 line) | `Ask questions over giving answers \| Frame as possibilities` |
+| **Priorities** | `<priorities>` | Trade-offs — what to optimize | `A > B` comparison pairs | `Exploration > efficiency \| Understanding > solution` |
+| **Behaviors** | `<behaviors>` | Action patterns — what to do | Bullet list of named patterns (3-5) | `- Socratic: Ask probing questions to uncover requirements` |
+
+## XML Template
 
 ```xml
 <component name="mode-name" type="mode">
@@ -56,108 +62,42 @@ Every mode follows this template:
   </examples>
 
   <bounds should="core capabilities" avoid="out-of-scope actions" fallback="Revert to default behavior when inapplicable"/>
-
   <handoff next="/sc:command1 /sc:command2"/>
 </component>
 ```
 
-## The 4-Axis Requirement
+## Naming
 
-Every mode **must** define all four axes:
-
-| Axis | Tag | Purpose | Content Style |
-|------|-----|---------|---------------|
-| **Thinking** | `<thinking>` | Cognitive principles — how to reason | Bullet list of named principles |
-| **Communication** | `<communication>` | Expression style — how to present | Pipe-separated directives |
-| **Priorities** | `<priorities>` | Trade-off guidance — what to optimize | `A > B` comparison format |
-| **Behaviors** | `<behaviors>` | Action patterns — what to do differently | Bullet list of named patterns |
-
-### Axis Content Guidelines
-
-**`<thinking>`** — Define 3-5 cognitive principles. Each should be a named heuristic:
-```xml
-<thinking>
-- Diverge then Converge: Generate breadth before filtering for depth
-- Quantity then Quality: More ideas first, evaluate later
-</thinking>
-```
-
-**`<communication>`** — Pipe-separated style directives (not a list):
-```xml
-<communication>Ask questions over giving answers | Frame as possibilities | Summarize patterns without concluding</communication>
-```
-
-**`<priorities>`** — Trade-off pairs using `>` operator:
-```xml
-<priorities>Exploration > efficiency | Understanding > solution | User's vision > best practice</priorities>
-```
-
-**`<behaviors>`** — Named behavioral patterns with descriptions:
-```xml
-<behaviors>
-- Socratic: Ask probing questions to uncover hidden requirements
-- Non-Presumptive: Seek explicit guidance, let user guide direction
-</behaviors>
-```
-
-## Naming Convention
-
-- Filename: `MODE_PascalCase.md` (e.g., `MODE_Brainstorming.md`, `MODE_Token_Efficiency.md`)
-- Component name: lowercase-hyphenated (e.g., `name="brainstorming"`, `name="token-efficiency"`)
+- Filename: `MODE_PascalCase.md` (e.g., `MODE_Brainstorming.md`)
+- Component name: lowercase-hyphenated (e.g., `name="brainstorming"`)
 - Component type: always `type="mode"`
 
-## Allowed Content
+## Content Boundaries
 
-Modes may include **reference data** that is essential to the mindset:
+**Allowed** (if essential to the mindset):
 - Symbol tables (Token Efficiency mode)
 - Expert framework mappings (Business Panel mode)
 - Abbreviation maps
 
-## Forbidden Content
+**Forbidden** (belongs elsewhere):
+- Step-by-step process → `commands/`
+- API reference → `mcp/`
+- Tool routing matrix → `core/FLAGS.md`
+- YAML frontmatter (not CC-native)
+- `type="config"` blocks → separate file like `RESEARCH_CONFIG.md`
 
-Modes must **not** contain:
-- Step-by-step process instructions → use commands/
-- API reference tables → use mcp/
-- Tool routing matrices → use core/FLAGS.md
-- YAML frontmatter → modes are not CC-native content
-- `type="config"` components → use a separate config file (like RESEARCH_CONFIG.md)
+## Supporting Config Files
 
-## Supporting Configuration Files
+Operational parameters too detailed for the mode itself go in sibling `type="config"` files (e.g., `RESEARCH_CONFIG.md` — depth profiles, confidence thresholds). Not subject to mode validation (no 4-axis requirement), validated by `test_content_structure.py`.
 
-Some modes require operational parameters that are too detailed for the mode itself. These are stored as separate files with `type="config"`:
-
-- `RESEARCH_CONFIG.md` — depth profiles, confidence thresholds, tool routing for research mode
-
-Config files live in `modes/` alongside their associated mode but are **not** subject to mode validation (no 4-axis requirement).
-
-## Validation
-
-After creating or modifying a mode, run:
-
-```bash
-uv run python -m pytest tests/unit/test_mode_structure.py -v
-```
-
-This validates:
-- `<component type="mode">` present
-- `<role>` and `<mission>` present and non-empty
-- All four axes present: `<thinking>`, `<communication>`, `<priorities>`, `<behaviors>`
-- `<bounds>` with `should` and `avoid` attributes
-- `<handoff>` with `next` attribute
-- No YAML frontmatter
-- Mission is descriptive (>10 characters)
-- Minimum content length (>300 characters)
-
-**Note:** `RESEARCH_CONFIG.md` is excluded from mode tests (it has `type="config"`, not `type="mode"`). It is validated by `test_content_structure.py`.
-
-## Checklist for New Modes
+## Checklist
 
 1. Create `src/superclaude/modes/MODE_PascalCase.md` starting with `<component>`
 2. Define all 4 axes: thinking, communication, priorities, behaviors
-3. Add bounds (should/avoid/fallback) and handoff
+3. Add `<bounds>` (should/avoid/fallback) and `<handoff>`
 4. Add trigger to `scripts/context_loader.py` TRIGGER_MAP
 5. Add flag to `core/FLAGS.md` modes section
-6. Run `uv run python -m pytest tests/unit/test_mode_structure.py -v`
+6. Run `uv run pytest tests/unit/test_mode_structure.py -v`
 7. Update `modes/README.md` table
 8. Run `make deploy`
 
@@ -165,10 +105,10 @@ This validates:
 
 | Anti-Pattern | Why Wrong | Fix |
 |-------------|-----------|-----|
-| Adding frontmatter | Modes aren't CC-native content | Remove `---` block |
-| Missing an axis | Incomplete cognitive overlay | Add all 4 axes |
-| Process steps in mode | Mode = mindset, not procedure | Move steps to command |
-| Tool routing in mode | Tool selection belongs in FLAGS | Move to core/FLAGS.md |
+| Adding frontmatter | Modes aren't CC-native | Remove `---` block |
+| Missing an axis | Incomplete cognitive overlay | Add all 4 |
+| Process steps in mode | Mode = mindset, not procedure | Move to command |
+| Tool routing in mode | Tool selection belongs in FLAGS | Move to `core/FLAGS.md` |
+| Vague mission (<10 chars) | Doesn't guide behavior | Be specific about posture |
 | `type="config"` in mode test | Config files aren't modes | Exclude from mode fixture |
-| Vague mission (<10 chars) | Doesn't guide behavior | Be specific about cognitive posture |
-| Decorative XML attributes | Unparsed attributes accumulate as boilerplate — token waste | `note=` allowed ONLY for: scope, safety ("do NOT"), version gates, reference locations, quantified constraints. Remove if tag name/content already says it |
+| Decorative `note=` XML attrs | Unparsed boilerplate, token waste | `note=` only for scope/safety/version/reference/quantified constraint |
