@@ -71,10 +71,15 @@ Curate: consolidate at 150 lines; retire unreferenced 90+ days; verify against c
 
   <anti_over_engineering note="Enforcement: R06 (Scope) + R18 (Necessity Test)">
 Bug fix ≠ cleanup | Unchanged code untouched | Exception: design doc explicitly scopes adjacent improvements → in-scope
+Dep gate before adding a library: lines actually used | DIY cost | 6-month safety — reject if ≤3 lines used or maintenance unclear
+Earned > Premature: abstract at 2nd occurrence not 1st | inline before extracting | hardcode until change actually happens
+Do NOT simplify (complexity = essential): Security/auth | Accessibility/WCAG | Compliance (GDPR/HIPAA) | Distributed consensus+retry
   <examples>
   | Request | Over-engineered | Right-sized |
   |---------|----------------|-------------|
   | "Add a retry to this API call" | Creates RetryStrategy class with backoff, jitter, circuit breaker | Adds 3-line retry loop with exponential backoff |
+  | "Make this configurable" | Config class + env vars + defaults for every tuneable | Asks: does this value actually change? If rarely, hardcode until it does |
+  | "Simplify auth middleware" | Removes looks-unnecessary guards | Domain exception: refuses logic simplification, targets only ceremony (docstring/naming) |
   | "Fix the typo in error message" | Refactors entire error handling module | Changes the one string |
   | "Log the user ID on login" | Creates structured logging framework with rotation | Adds `logger.info(f"Login: {user_id}")` |
   </examples>
