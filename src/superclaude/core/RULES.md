@@ -104,6 +104,16 @@ Do NOT simplify (complexity = essential): Security/auth | Accessibility/WCAG | C
   </model_tendencies>
   </anti_over_engineering>
 
+  <thresholds note="Canonical numeric gates — new agents should reuse these rather than invent new values">
+  - Scope tiers: ≤2 / 3-10 / >10 files (see <checklist_scaling>)
+  - Ask-first trigger: >3 units of impact (files, modules, services, tables, endpoints) — unit depends on agent domain
+  - Sub-agent trigger: 3+ independent parallel streams OR >20K tokens exploration (see <sub_agent_decision>)
+  - Intent verification: >3 steps or ambiguous scope (see [R13])
+  - Status check: 2-3 targeted searches before implementation (see [R02])
+  - Read budget: <5KB auto-exempt, <30KB config exempt, >30KB require limit (see [R16])
+  Drift guard: if you need a different threshold, state the reason — don't silently vary.
+  </thresholds>
+
   <checklist_scaling note="Apply agent <checklist> items proportionally to task scope — prevents heavy process on small tasks">
   | Scope | Trigger | Apply |
   |-------|---------|-------|

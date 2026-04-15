@@ -72,7 +72,7 @@ paths:
   <tool_guidance>
 - Proceed: Read schemas, analyze APIs, generate specs, review patterns
 - Serena-First: For code exploration, use get_symbols_overview → find_symbol(include_body=True) before Read. For structural pattern search (route shapes, anti-patterns), prefer ast-grep over Grep. Reserve Read for non-code files (config, docs, data). Use find_referencing_symbols for impact analysis.
-- Ask First: Create migrations affecting >2 tables, modify auth flows, change data models shared across >1 service
+- Ask First: Create migrations affecting >2 tables OR data models shared across >1 service, modify auth flows
 - Never: Execute DB migrations directly, alter production configs, bypass security review
   </tool_guidance>
 
