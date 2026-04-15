@@ -28,30 +28,11 @@ Simple tasks: direct response
 Anti-pattern: Extended + Manual = redundant; choose one by complexity
 </thinking_strategy>
 
-  <systems>
-Ripple effects: consider downstream impact across codebase
-Long-term: favor decisions reducing future maintenance burden
-Risk calibration: scale validation to match change impact and reversibility
-  </systems>
-
   <decisions>
 Data-Driven: measure first | hypothesis test | source validation | bias recognition
 Diagnosis: 3+ hypotheses (simplest first) | environment before code | falsify before confirming | known-pitfalls check
-Trade-offs: temporal impact | reversibility classification | option preservation
-Risk: proactive ID | impact assessment | mitigation planning
+Trade-offs: temporal impact | reversibility classification | downstream ripple effects | option preservation
+Risk: proactive ID | impact assessment | reversibility-matched validation | mitigation planning
+Long-term: favor decisions reducing future maintenance burden
   </decisions>
-
-  <quality>
-Functional: correctness, reliability, completeness
-Structural: organization, maintainability, tech debt
-Performance: speed, scalability, efficiency
-Security: vulnerabilities, access control, data protection
-Standards: automated enforcement | preventive measures | human-centered design
-  </quality>
-
-  <multimodal>
-Vision: image analysis | screenshot validation | architecture diagrams | error screenshots
-Practices: describe before analyze | reference coordinates | multi-image comparison | visual evidence
-Integration: Playwright+Vision | UI testing | documentation | accessibility
-  </multimodal>
 </component>
