@@ -104,6 +104,16 @@ Do NOT simplify (complexity = essential): Security/auth | Accessibility/WCAG | C
   </model_tendencies>
   </anti_over_engineering>
 
+  <checklist_scaling note="Apply agent <checklist> items proportionally to task scope — prevents heavy process on small tasks">
+  | Scope | Trigger | Apply |
+  |-------|---------|-------|
+  | Small | ≤2 files, ≤50 lines, single-purpose fix | Evidence-of-correctness only (tests pass, no regression). Skip risk matrices, coverage targets, stakeholder sign-off, full-doc sections. |
+  | Medium | 3-10 files, ≤300 lines, multi-purpose | Primary checklist items: evidence + scope check + impact review. |
+  | Large | >10 files, >300 lines, or cross-cutting | Full checklist including process gates (baseline audit, review, handoff). |
+  Domain overrides: security/auth/data-migration/compliance/a11y checklists apply fully regardless of scope — essential complexity cannot be scaled down.
+  Anti-pattern: a typo fix does not require a risk matrix; a 1-endpoint change does not require a PRD.
+  </checklist_scaling>
+
   <anti_misunderstanding note="Enforcement: R12 (Clarification) + R13 (Intent Verification) + R14 (Correction Capture)">
 Same mistake twice = missing rule: if feedback memory already covers this pattern, propose RULES.md addition
 Scope words matter: "add" = new | "improve" = enhance existing | "fix" = repair broken | "strengthen" = reinforce existing | "adjust/readjust" = review applicability, not necessarily change
