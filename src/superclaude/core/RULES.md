@@ -69,12 +69,8 @@ Capture: user corrections, arch decisions, recurring patterns (3+), unexpected d
 Curate: consolidate at 150 lines; retire unreferenced 90+ days; verify against current state before acting
   </agent_memory_protocol>
 
-  <anti_over_engineering>
-Bug fix ≠ cleanup | Simple feature ≠ configurable system | Unchanged code untouched
-No extra files, unsolicited abstractions, or adjacent improvements (changing file X ≠ permission to refactor X)
-  Exception: design doc (from brainstorming) explicitly scopes targeted improvements → in-scope
-No test, no change: propose changes only when failing test or explicit request justifies them
-Directive restraint: "when appropriate" over "ALWAYS use X"
+  <anti_over_engineering note="Enforcement: R06 (Scope) + R18 (Necessity Test)">
+Bug fix ≠ cleanup | Unchanged code untouched | Exception: design doc explicitly scopes adjacent improvements → in-scope
   <examples>
   | Request | Over-engineered | Right-sized |
   |---------|----------------|-------------|
@@ -88,12 +84,9 @@ Directive restraint: "when appropriate" over "ALWAYS use X"
   </model_tendencies>
   </anti_over_engineering>
 
-  <anti_misunderstanding>
-Restate before building: confirm understanding before starting work — wrong direction costs more than a question
-User correction = learning event: always persist as structured feedback memory, never treat as transient
-Same mistake twice = missing rule: if a feedback memory already covers this pattern, propose a RULES.md addition
-Ambiguity ≠ assumption: 2+ valid interpretations → ask, don't pick the most likely one
-Scope words matter: "add" = new, "improve" = enhance existing, "fix" = repair broken, "strengthen" = reinforce existing mechanism, "adjust/readjust" = review applicability, not necessarily change
+  <anti_misunderstanding note="Enforcement: R12 (Clarification) + R13 (Intent Verification) + R14 (Correction Capture)">
+Same mistake twice = missing rule: if feedback memory already covers this pattern, propose RULES.md addition
+Scope words matter: "add" = new | "improve" = enhance existing | "fix" = repair broken | "strengthen" = reinforce existing | "adjust/readjust" = review applicability, not necessarily change
 Unverified numbers: prefix estimates with ~, distinguish from measured/coded values — never state estimates as facts
 Delegation intent loss: sub-agents receive user's original words, not your interpretation of them
   </anti_misunderstanding>
@@ -131,5 +124,4 @@ Benefit: ~70% token savings vs static @-references
     /sc:implement -> /sc:test: Implementation complete
     /sc:test -> done: Test pass evidence required (actual output, not claims)
   </workflow_gates>
-<!-- archived 2026-03-29: Rules removed — [R07] Trust, [R08] Language, [R11] Honesty (duplicate Claude defaults). Sections removed/merged — <conflict_resolution> (merged into priority_system), <agent_orchestration> (Intent Propagation kept, Task Layer/Flow dropped), <decision_trees> (redundant with core_rules), <priority_actions> (redundant with core_rules). Restore if behavioral regression observed within 30 days -->
 </component>

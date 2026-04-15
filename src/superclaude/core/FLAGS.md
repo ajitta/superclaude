@@ -10,7 +10,8 @@
 --introspect: self-analysis, error recovery → expose thinking (🤔🎯⚡📊💡)
 --task-manage: >3 steps, >2 dirs, >3 files → delegation, progressive enhancement
 --orchestrate: multi-tool, perf constraints, parallel → tool matrix optimization
---token-efficient: context >75%, large ops, --uc → symbol communication, 30-50% reduction
+--token-efficient: context >75%, large ops → symbol communication (see <output> --uc)
+--vs [standard|cot|multi]: "multiple perspectives", diverse responses → verbalized sampling (probability-weighted candidates). Bracket sub-params: [k:3-7], [tau:0.01-0.20], [turns:2-5], [no-synthesis]
   </modes>
 
   <mcp>
@@ -28,16 +29,8 @@
 --no-mcp: native-only, perf priority → disable all MCP, use native + WebSearch
   </mcp>
 
-  <native>
-WebSearch: fact-check, current info → native web search (no flag needed)
-  </native>
-
   <execution>
---delegate [auto|files|folders]: >7 dirs, >50 files, complexity >0.8 → sub-agent parallel
-  Direct work for: single-file edits, sequential ops, <3 steps, simple searches (grep/glob)
-  Sub-agents for: parallel-capable, isolated context, independent work streams, >5 files
-  Model routing: 11 agents pinned to sonnet (execution tasks), 12 inherit parent (judgment tasks)
-  Override: user can override any agent's model: field in frontmatter
+--delegate [auto|files|folders]: sub-agent parallel delegation. Auto-trigger: >7 dirs, >50 files, complexity >0.8. Decision matrix (when to sub-agent vs direct): RULES.md `<sub_agent_decision>` (SSOT)
 --concurrency [n]: 1-15 → batch independent tool calls into single message (e.g. 5 parallel Grep calls)
 --loop: iterative improvement — execute task → self-evaluate output → identify gaps → re-execute → repeat until no meaningful improvement found. Report iteration count when done.
 --iterations [n]: fixed iteration count — execute the improvement cycle exactly N times. After each iteration, briefly state what changed. Do not stop early even if output seems good.
@@ -47,13 +40,12 @@ WebSearch: fact-check, current info → native web search (no flag needed)
 --fast: same model, faster output (v2.1.36+)
 --p [abbr,...]: agent preference — bias sub-agent delegation toward specific agents. Multi-select: --p=sec,perf,qa
   Abbrevs: arch(system-architect) fe(frontend) be(backend) sec(security) qa(quality) ops(devops) pm(project-manager) perf(performance) refactor(refactoring) root(root-cause) req(requirements) py(python) panel(business) research(deep-researcher) review(self-review) simple(simplicity) git(git-workflow) scribe(technical-writer) educator(learning) mentor(socratic) index(repo-index) init(project-initializer) insight(insight-analyst)
---vs [standard|cot|multi]: "multiple perspectives", diverse responses → verbalized sampling (distribution-level diversity, probability-weighted candidates). Bracket sub-params: [k:3-7], [tau:0.01-0.20], [turns:2-5], [no-synthesis]
 --verbose-context: force full .md injection for all triggered contexts, bypassing INSTRUCTION_MAP short instructions. Use when short instructions cause incorrect MCP behavior.
-Agent Teams: experimental (CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1) — parallel coordination
+Note: Agent Teams experimental (CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1) — parallel coordination
 Note: see RULES.md anti_over_engineering for scope discipline guardrails
 Note: token consumption varies by model — monitor context usage, use --uc at 60%+
 Note: match flags to session type — analysis/discussion sessions rarely need --delegate/--loop (execution flags); use --seq --tavily --c7 instead
-</execution>
+  </execution>
 
   <output>
 --uc|--ultracompressed: symbol system, 30-50% reduction (trigger: context pressure)
@@ -61,32 +53,19 @@ Note: match flags to session type — analysis/discussion sessions rarely need -
 --focus [perf|security|quality|arch|a11y|testing]: target domain
   </output>
 
-  <aliases note="v3.2: auto-corrected by context_loader.py">
---ultrathink → --seq | --think → --seq | --think-hard → --seq
---parallel|--parellel → --delegate | --agent → --delegate
---conccurrency → --concurrency | --iteration → --iterations | --loo → --loop
---sea → --serena | --confidenc-check|--confidence-check → --validate
---sampling → --vs | --verbalized → --vs
-Typos: fuzzy-matched (Levenshtein ≤ 2) → suggestion in HTML comment
+  <aliases note="Auto-corrected by context_loader.py — listed for user reference">
+Remaps: --ultrathink/--think* → --seq | --parallel/--agent → --delegate | --sampling/--verbalized → --vs | --sea → --serena | --confidence-check → --validate
+Typo fuzzy-match: Levenshtein ≤ 2 → suggestion in HTML comment
   </aliases>
 
-<priority_rules>
-
-- Safety First: --safe-mode > --validate > optimization
-- Explicit Override: user flags > auto-detection
-- MCP: --no-mcp overrides individual flags; notify on first use → auto fallback
-- Scope: system > project > module > file
+  <priority_rules>
+  - Safety First: --safe-mode > --validate > optimization
+  - Explicit Override: user flags > auto-detection
+  - MCP: --no-mcp overrides individual flags; notify on first use → auto fallback
+  - Scope: system > project > module > file
   </priority_rules>
 
-
-  <model_routing note="Cost optimization — ~50% of agents pinned to sonnet">
-  Sonnet (execution, templates, code): repo-index, git-workflow, project-initializer, technical-writer, learning-guide, socratic-mentor, quality-engineer, python-expert, performance-engineer, frontend-architect, insight-analyst
-  Opus (synthesis, judgment, architecture, security): system-architect, deep-researcher, business-panel-experts, simplicity-guide, root-cause-analyst, requirements-analyst, backend-architect, security-engineer, project-manager, devops-architect, refactoring-expert, self-review
-  Criteria: procedural/template-driven → sonnet | design judgment/high reversal cost/multi-framework synthesis → opus (inherit parent)
-  </model_routing>
-
-  <mcp_auto_mode note="v2.1.7+">
-  MCP tool descriptions >10% context → defer to MCPSearch; custom: auto:N (v2.1.9+); disable: add MCPSearch to disallowedTools
-  Tool Search Tool: defer_loading=true for 85% token reduction in large tool libraries
+  <mcp_auto_mode>
+  When MCP tool descriptions exceed 10% of context, CC defers loading via MCPSearch. Override threshold with `auto:N` | disable by adding `MCPSearch` to `disallowedTools` in agent frontmatter.
   </mcp_auto_mode>
-  </component>
+</component>
