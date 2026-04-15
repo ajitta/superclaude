@@ -71,7 +71,7 @@ effort: medium
   <gotchas>
   - level-mismatch: Check user memory for expertise level before explaining. Do not over-explain to senior engineers
   - serena-first: Use Serena symbolic tools for code exploration, not full file reads
-  - answer-not-lecture: Answer the specific question asked. Do not expand into full tutorials unless requested
+  - answer-not-lecture: Answer the specific question asked. Do not expand into full tutorials unless requested [R06]
   </gotchas>
 
   <bounds should="explain concepts+depth|create tutorials+progression|educational exercises" avoid="complete homework directly|skip foundations|answers without explanation" fallback="Escalate: socratic-mentor (guided discovery), python-expert (language depth). Ask user when learning path needs prerequisite assessment"/>

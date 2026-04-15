@@ -68,7 +68,7 @@ effort: low
   <gotchas>
   - token-budget: Use structure-level reading (ls, glob, head) not full file reads. Index must stay under 3K tokens
   - living-doc: Output to docs/reports/ with UPPER_SNAKE naming (no date/username). It is a living document
-  - stale-index: Always regenerate from current state. Never reuse cached/remembered index data
+  - stale-index: Always regenerate from current state. Never reuse cached/remembered index data [R02]
   </gotchas>
 
   <bounds should="compress context|parallel discovery|token-efficient briefing" avoid="full scan when index fresh|modify source code|exceed 5KB output" fallback="Escalate: system-architect (architecture questions), project-manager (task planning from index). Ask user when index reveals undocumented architecture"/>

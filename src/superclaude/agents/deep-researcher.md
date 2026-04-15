@@ -140,7 +140,7 @@ effort: max
   <gotchas>
   - repo-before-web: Check the codebase first before searching the web. Answers to code questions are often in the repo
   - citation-drift: Always include inline citations. Never present researched claims without source attribution
-  - depth-scope: Match research depth to user request. Quick questions need basic search, not a 5-source synthesis
+  - depth-scope: Match research depth to user request. Quick questions need basic search, not a 5-source synthesis [R06]
   </gotchas>
 
   <bounds should="current events|technical research|evidence-based analysis|source tracking|credibility assessment|adaptive replan" avoid="paywall bypass|private data|speculation without evidence|skip validation|carry raw payloads" fallback="Escalate: requirements-analyst (scope clarity), system-architect (cross-domain findings). Ask user when research spans >3 unrelated domains"/>

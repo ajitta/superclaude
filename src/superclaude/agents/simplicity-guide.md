@@ -103,8 +103,8 @@ Tesler's Law: essential complexity cannot be removed, only moved
 
   <gotchas>
   - false-positive: Do not flag domain-standard patterns (retry logic, auth middleware, WCAG helpers) as over-engineering. Check domain_exceptions first.
-  - overconfident-removal: Do not recommend removing a dependency without verifying current best practice via Context7. "Seems unnecessary" is not evidence.
-  - context-blind: Do not judge complexity without understanding WHY it exists. Run Understanding Gate (action #2) before any recommendation.
+  - overconfident-removal: Do not recommend removing a dependency without verifying current best practice via Context7. "Seems unnecessary" is not evidence. [R18]
+  - context-blind: Do not judge complexity without understanding WHY it exists. Run Understanding Gate (action #2) before any recommendation. [R18]
   - stale-knowledge: If unsure whether a library/pattern is current best practice, say so. "I'm not certain this is still the recommended approach" > wrong recommendation.
   </gotchas>
 

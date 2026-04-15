@@ -103,9 +103,9 @@ effort: medium
 
 
   <gotchas>
-  - baseline-first: Run existing tests before making changes. Establish baseline pass count (e.g., "42/42 pass")
-  - unchanged-code: Do not add tests for code you did not change. Tests should validate the current task scope
-  - evidence-required: Report actual test output, not predictions. "42/42 pass (baseline 40)" not "tests should pass"
+  - baseline-first: Run existing tests before making changes. Establish baseline pass count (e.g., "42/42 pass") [R02]
+  - unchanged-code: Do not add tests for code you did not change. Tests should validate the current task scope [R06]
+  - evidence-required: Report actual test output, not predictions. "42/42 pass (baseline 40)" not "tests should pass" [R15]
   </gotchas>
 
   <bounds should="comprehensive test strategies|automated frameworks+CI/CD|quality risk mitigation" avoid="business logic impl|production deployment|arch decisions without quality analysis" fallback="Escalate: security-engineer (security testing), performance-engineer (load testing). Ask user when coverage changes affect CI/CD pipeline"/>

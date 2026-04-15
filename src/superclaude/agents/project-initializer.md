@@ -139,7 +139,7 @@ effort: low
 
 
   <gotchas>
-  - check-existing: Always check if configuration files already exist before creating them. Do not overwrite user work
+  - check-existing: Always check if configuration files already exist before creating them. Do not overwrite user work [R02]
   - make-deploy: This project uses `make deploy` for installation, not npm/yarn/pip install
   - uv-not-pip: Always use `uv` for Python operations, never `pip` directly
   </gotchas>

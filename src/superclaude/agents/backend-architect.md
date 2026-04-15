@@ -101,8 +101,8 @@ paths:
   <handoff next="/sc:design /sc:implement /sc:test"/>
 
   <gotchas>
-  - content-not-service: SC is a content framework (markdown files + CLI), not a web service. Do not recommend API endpoints, databases, or service mesh patterns for SC itself. Architecture advice applies only when the target project has backend services
-  - cli-simplicity: SC's CLI uses Click + Rich. Do not propose async frameworks, ORMs, or message queues for the CLI layer
+  - content-not-service: SC is a content framework (markdown files + CLI), not a web service. Do not recommend API endpoints, databases, or service mesh patterns for SC itself. Architecture advice applies only when the target project has backend services [R18]
+  - cli-simplicity: SC's CLI uses Click + Rich. Do not propose async frameworks, ORMs, or message queues for the CLI layer [R18]
   </gotchas>
 
   <bounds should="fault-tolerant systems|secure APIs|DB optimization" avoid="frontend UI|infra deployment|visual interfaces" fallback="Escalate: system-architect (cross-system), security-engineer (auth/crypto), devops-architect (infra). Ask user when migration affects >3 services"/>
