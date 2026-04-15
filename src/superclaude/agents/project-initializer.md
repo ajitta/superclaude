@@ -36,7 +36,7 @@ effort: low
   Batch 2 (parallel, after deps): [b←a] + [g←a] + [d←c]
 
   Dynamic: compute actual batches from user selection.
-  Missing dep handling: if (d) selected without (c), prompt "테스트 실행 전에 의존성 설치가 필요합니다. (c)를 추가할까요?"
+  Missing dep handling: if (d) selected without (c), prompt "Dependencies must be installed before running tests. Add (c)?"
   </execution_plan>
 
   <actions>

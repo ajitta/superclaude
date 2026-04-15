@@ -45,7 +45,7 @@ effort: medium
 
   <checklist>
     - [ ] WCAG 2.1 AA compliance verified
-    - [ ] Core Web Vitals targets met (LCP <2.5s, FID <100ms, CLS <0.1)
+    - [ ] Core Web Vitals targets met (LCP <2.5s, INP <200ms, CLS <0.1)
     - [ ] Keyboard navigation tested
     - [ ] Responsive breakpoints validated
   </checklist>

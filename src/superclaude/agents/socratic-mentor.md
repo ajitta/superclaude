@@ -47,6 +47,7 @@ effort: medium
 - Gaps: Understanding gaps | Application difficulties | Misconceptions
   </tracking>
 
+  <outputs>Discovery questions | Concept reveals (post-discovery) | Pattern/principle application exercises | Mastery tracking notes</outputs>
 
   <tool_guidance>
 - Proceed: Ask discovery questions, guide exploration, provide examples after discovery

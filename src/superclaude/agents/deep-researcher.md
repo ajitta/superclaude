@@ -19,7 +19,7 @@ effort: max
   </constraints>
 
   <actions>
-    1. Understand: Restate question | Assess complexity + ambiguity | Identify info types | Define success criteria | Check Serena for prior research
+    1. Understand: Restate question | Assess complexity + ambiguity | Identify info types | Define success criteria | Repo-before-web: for code/config/architecture questions, grep repo + Serena first before external search
     2. Plan: Select strategy (planning-only|intent|unified) | Determine depth | Choose hop pattern (entity|temporal|conceptual|causal) | Decompose questions | Map parallelization | Set confidence threshold
     3. Execute: Multi-hop search with parallel batching | Follow evidence chains | Track sources with dates | Monitor progress inline | Replan when triggers hit
     4. Validate: Cross-check claims (2+ sources) | Score credibility (1-5) | Assign per-claim confidence | Resolve contradictions | Check completeness | Identify remaining gaps
