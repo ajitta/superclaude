@@ -1,35 +1,33 @@
 # Command Authoring Rules
 
-When creating or modifying command `.md` files in `src/superclaude/commands/`, follow these rules exactly.
+> **Decision gate:** Create a command for **user-facing workflow entry** (`/sc:*` slash commands).
+> - Command = **WHAT TO DO** (ordered workflow)
+> - Agent = **WHO TO BE** (domain expertise, auto-delegated)
+> - Skill = **WHICH CAPABILITY** (CC-native tool/hook)
+> - Mode = **HOW TO THINK** (cognitive overlay)
+>
+> Need tool restrictions, hooks, or subagent execution? → use a skill, not a command.
 
 ## YAML Frontmatter
 
-Commands use minimal frontmatter — only `description` is required.
+Minimal — only `description` is required. Commands inherit all tools and the parent model.
 
 ```yaml
 ---
-description: One-line purpose of this slash command  # required | shown in /menu
+description: One-line purpose of this slash command  # required, >10 chars, action-oriented
 ---
 ```
 
-### Field Rules
+### Forbidden fields
 
-**Required field**:
-- `description` — shown in Claude Code's `/menu` listing. Must be >10 characters, specific, and action-oriented.
+Never add these — SSOT: `.claude/rules/schemas.yaml` (`forbidden_command_fields`):
 
-**Forbidden fields** — never include in command frontmatter:
-- `name` — command name is derived from filename (e.g., `build.md` → `/sc:build`)
-- `model`, `permissionMode`, `memory`, `color` — agent-only fields
-- `autonomy` — not an official Claude Code field
-- `context`, `agent`, `hooks` — skill-only fields
+- `name` — derived from filename (e.g., `build.md` → `/sc:build`)
+- `model`, `permissionMode`, `memory`, `color` — agent-only
+- `autonomy` — not an official CC field
+- `context`, `agent`, `hooks` — skill-only (migrate to skill if needed)
 
-*Mechanical source of truth: `.claude/rules/schemas.yaml` (`forbidden_command_fields`). Prose here remains authoritative for rationale.*
-
-Commands inherit all tools and the parent model. Use skills (not commands) when you need tool restrictions, hooks, or subagent execution.
-
-## XML Body Structure
-
-Every command body follows this template:
+## XML Template
 
 ```xml
 <component name="command-name" type="command">
@@ -44,7 +42,6 @@ Every command body follows this template:
   <flow>
     1. Step: Description
     2. Step: Description
-    3. Step: Description
   </flow>
 
   <outputs note="Per execution">
@@ -54,12 +51,9 @@ Every command body follows this template:
   </outputs>
 
   <mcp servers="seq|c7|..."/>
+  <tools>- ToolName: purpose</tools>
 
-  <tools>
-    - ToolName: purpose
-  </tools>
-
-  <gotchas note="Recommended — project-specific failure patterns">
+  <gotchas>
   - pattern-name: Concrete failure + action instruction (2-5 items)
   </gotchas>
 
@@ -79,51 +73,32 @@ Every command body follows this template:
 
 ### XML Rules
 
-- `<component>` — `name` must match filename stem, `type` must be `"command"`
-- `<role>` — first line is `/sc:command-name` (the invocation), then `<mission>`
-- `<mission>` — must share 30%+ significant words with frontmatter `description`
-- `<syntax>` — show full invocation with args and flags
-- `<flow>` — numbered execution steps (minimum 2)
-- `<bounds>` — must include `should` and `avoid` attributes
-- `<handoff>` — list 2-3 natural next commands
-- Optional sections: `<outputs>`, `<mcp>`, `<tools>`, `<gotchas>`, `<examples>`
+- `<component name="...">` matches filename stem, `type="command"`
+- `<role>` — first line is `/sc:command-name`, then `<mission>`
+- `<mission>` — shares ≥30% significant words with frontmatter `description`
+- `<flow>` — numbered execution steps (≥2)
+- `<bounds>` — `should` + `avoid` attributes required
+- `<handoff next="...">` — 2-3 natural next commands
+- Optional: `<outputs>`, `<mcp>`, `<tools>`, `<gotchas>`, `<examples>`
 
-## Validation
+## Checklist
 
-After creating/modifying a command, run:
-```bash
-uv run pytest tests/unit/test_command_structure.py -v
-```
-
-This validates:
-- Frontmatter has `description` field (>10 chars)
-- No forbidden fields (agent/skill-only)
-- XML component name matches filename
-- component type is "command"
-- `<role>` and `<mission>` exist
-- mission ↔ description word overlap (≥30%)
-- `<bounds>` exists
-- `<handoff>` exists
-- Minimum content length (>300 chars)
-
-## Checklist for New Commands
-
-1. Create `src/superclaude/commands/<name>.md` with frontmatter + XML body
-2. Verify `<component name="...">` matches filename (without `.md`)
-3. Write specific `description` for `/menu` display
-4. Add `<gotchas>` section (recommended — project-specific failure patterns)
+1. Create `src/superclaude/commands/<name>.md` with frontmatter + XML
+2. Verify `<component name="...">` matches filename
+3. Write specific `description` (shown in `/menu`)
+4. Add `<gotchas>` for project-specific failure patterns
 5. Run `uv run pytest tests/unit/test_command_structure.py -v`
-6. Update `src/superclaude/commands/README.md` command table
+6. Update `src/superclaude/commands/README.md` table
 7. Run `make deploy`
 
 ## Anti-Patterns
 
 | Anti-Pattern | Why Wrong | Fix |
 |-------------|-----------|-----|
-| Adding `name:` to frontmatter | Redundant — filename is command name | Remove field |
-| Adding `model:` or `permissionMode:` | Agent-only fields, ignored by CC for commands | Remove field |
-| Adding `hooks:` or `context:` | Skill-only fields — use skill if hooks needed | Migrate to skill |
+| `name:` in frontmatter | Filename is the command name | Remove |
+| `model:` or `permissionMode:` | Agent-only, ignored for commands | Remove |
+| `hooks:` or `context:` | Skill-only — migrate to skill if needed | Remove or migrate |
 | Vague description | Poor `/menu` display | Be specific: "Build X with Y" |
-| Missing `<bounds>` | No scope/safety boundary | Add should/avoid attributes |
-| Mission doesn't match description | Confusing inconsistency | Align 30%+ word overlap |
-| Decorative XML attributes | Unparsed attributes accumulate as boilerplate — token waste | `note=` allowed ONLY for: scope ("all commands"), safety ("do NOT"), version gates ("2.1.37+"), reference locations ("see X.md"), quantified constraints ("3-6"). Remove if tag name/content already says it |
+| Missing `<bounds>` | No scope/safety boundary | Add `should`/`avoid` |
+| Mission doesn't match description | Confusing inconsistency | Align ≥30% word overlap |
+| Decorative `note=` XML attrs | Unparsed boilerplate, token waste | `note=` only for scope/safety/version/reference/quantified constraint |

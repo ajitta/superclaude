@@ -2,172 +2,133 @@
 
 > **Decision gate:** Create a skill when you need either:
 > 1. **CC-native capability**: hooks, `disable-model-invocation`, `allowed-tools`, or script execution.
-> 2. **Auto-invocation reference**: domain knowledge that should auto-trigger via CC description matching (Reference Skill archetype — no hooks needed).
+> 2. **Auto-invocation reference**: domain knowledge that should auto-trigger via CC description matching.
 >
 > Workflow procedures → `commands/`. Domain expertise → `agents/`. Cognitive overlays → `modes/`.
 
-When creating or modifying skill files in `src/superclaude/skills/`, follow these rules exactly.
+## Pick an Archetype First
+
+| # | Archetype | Key fields | Use when |
+|---|-----------|-----------|----------|
+| ① | **Reference Skill** — auto-invoked | `description` + `when-to-use` | Domain knowledge should load when Claude sees matching keywords |
+| ② | **Workflow Skill** — user-invoked | `disable-model-invocation: true`, optional `context: fork` + `agent:` | Side-effect operations (deploy, release). Protect from auto-trigger |
+| ③ | **Background Context** — Claude-only | `user-invocable: false` | Silent context injection, never shown in `/menu` |
+
+```yaml
+# ① Reference — minimal
+---
+name: api-conventions
+description: API 설계 패턴과 컨벤션 가이드.
+when-to-use: >
+  REST 엔드포인트 작성, 에러 포맷, API 버전 관리 시 자동 적용.
+---
+
+# ② Workflow — side-effect protection
+---
+name: deploy
+description: 프로덕션 배포 자동화.
+disable-model-invocation: true
+allowed-tools: Bash, Read
+argument-hint: "[environment]"
+---
+
+# ③ Background — silent
+---
+name: legacy-auth-context
+description: 레거시 인증 시스템 배경 지식.
+user-invocable: false
+---
+```
 
 ## Directory Structure
 
 ```
-src/superclaude/skills/
-└── my-skill/
-    ├── SKILL.md          ← 필수 (entrypoint)
-    ├── scripts/          ← 실행 스크립트 (Python, Bash 등)
-    ├── references/       ← 문서, 참조자료
-    └── assets/           ← 템플릿, 바이너리
+src/superclaude/skills/my-skill/
+├── SKILL.md          ← 필수 (entrypoint)
+├── scripts/          ← 실행 스크립트 (use {{SKILLS_PATH}} in refs)
+├── references/       ← 세부 내용 (progressive disclosure)
+└── assets/           ← 템플릿, 바이너리
 ```
 
-Install path: `src/superclaude/skills/ → ~/.claude/skills/`
+Install path: `src/superclaude/skills/ → ~/.claude/skills/`.
 
-## YAML Frontmatter
+## YAML Frontmatter — Full Field Reference
 
-All fields are **top-level**. Source: `code.claude.com/docs/en/skills` (official Claude Code documentation).
-
-The `metadata:` key is only for arbitrary user-defined key-value pairs (author, version, etc.) — NOT for nesting CC extension fields.
-
-IDE warnings for `context`, `agent`, `hooks` are from the agentskills.io standard validator which doesn't recognize CC extension fields. These warnings are safe to ignore.
-
-### Field Reference (all top-level)
+All fields are **top-level**. `metadata:` is only for user-defined info (author, version) — never nest CC fields under it.
 
 ```yaml
 ---
-# Standard fields (agentskills.io cross-platform)
-name: my-skill                    # 권장 | lowercase+hyphens, max 64자, 디렉토리명과 일치
-description: One-line purpose.    # 권장 | 깔끔한 한 줄 요약, max 1024자
-when-to-use: >                    # 권장 | 트리거 키워드/시나리오 (description과 분리)
-  When user mentions X, Y, Z or wants to do W.
-effort: high                      # 선택 | low|medium|high|max — 추론 깊이 제어
-license: MIT                      # 선택 | 라이선스 명시
-compatibility:                    # 선택 | 환경 요구사항 (실험적)
-  tools: [claude-code]
-  requires: [python3]
-allowed-tools: Read, Grep, Glob   # 선택 | 허용 툴 화이트리스트 (실험적)
-disable-model-invocation: true    # 선택 | Claude 자동 호출 차단
-metadata:                         # 선택 | author, version 등 부가 정보만
-  author: team-name
-  version: "1.0.0"
+# Identity
+name: my-skill                    # 권장 | lowercase+hyphens, ≤64자, 디렉토리명과 일치
+description: One-line purpose.    # 권장 | ≤250 chars 실용 상한 (아래 예산 참조)
+when-to-use: >                    # 권장 | 트리거 키워드/시나리오
+  When user mentions X, Y, Z.
 
-# Claude Code extension fields (CC에서만 동작, 다른 툴은 무시)
-user-invocable: false             # 선택 | /menu 노출 여부 (UI only)
-argument-hint: "[issue-number]"   # 선택 | slash command 자동완성 힌트
-model: opus                       # 선택 | skill 활성 시 사용 모델
-context: fork                     # 선택 | fork = subagent 격리 실행
-agent: Explore                    # 선택 | subagent 타입 (context와 함께)
-hooks:                            # 선택 | 생애주기 훅
+# Invocation control
+disable-model-invocation: true    # 자동 호출 완전 차단 (부작용 skill)
+user-invocable: false             # /menu 미표시 (Claude 자동 실행은 가능)
+argument-hint: "[arg]"            # slash command 자동완성
+
+# Execution
+model: opus                       # skill 활성 시 모델 override
+effort: high                      # low|medium|high|max 추론 깊이
+allowed-tools: Read, Grep, Glob   # 최소 권한 화이트리스트
+context: fork                     # subagent 격리 실행
+agent: Explore                    # fork 시 subagent 타입
+
+# Lifecycle hooks
+hooks:
   PreToolUse:
     - matcher: "Bash"
       hooks:
         - type: command
           command: "./scripts/validate.sh"
+
+# Misc
+metadata:                         # author/version 등 부가 정보 전용
+  author: team-name
+  version: "1.0.0"
 ---
 ```
 
-### Field Placement Summary
+> IDE가 `context`/`agent`/`hooks`에 경고를 표시해도 무시 — agentskills.io 표준 validator가 CC 확장 필드를 인식하지 못할 뿐 CC에서는 정상 동작.
 
-| Field | Placement | Category | Source |
-|-------|-----------|----------|--------|
-| `name` | top-level | 표준 | agentskills.io |
-| `description` | top-level | 표준 | agentskills.io |
-| `when-to-use` | top-level | CC 전용 | CC source (CommandBase) |
-| `effort` | top-level | CC 전용 | CC source (BaseAgentDefinition) |
-| `license` | top-level | 표준 | agentskills.io |
-| `compatibility` | top-level | 표준 (실험적) | agentskills.io |
-| `allowed-tools` | top-level | 표준 (실험적) | agentskills.io |
-| `disable-model-invocation` | top-level | 표준 | agentskills.io |
-| `metadata` | top-level (container) | 표준 | agentskills.io |
-| `user-invocable` | top-level | CC 전용 | code.claude.com |
-| `argument-hint` | top-level | CC 전용 | code.claude.com |
-| `model` | top-level | CC 전용 | code.claude.com |
-| `context` | top-level | CC 전용 | code.claude.com |
-| `agent` | top-level | CC 전용 | code.claude.com |
-| `hooks` | top-level | CC 전용 | code.claude.com |
+## Field Rules (저작 시 가장 자주 틀리는 지점)
 
-### Field Rules
+**1. `description` vs `when-to-use` 분리** — 가장 중요:
+시작 시 모든 skill의 name+description+when-to-use가 시스템 프롬프트에 주입됨. 본문은 선택 후에야 읽힘.
+- `description`: "무엇" (한 줄 요약)
+- `when-to-use`: "언제" (트리거 키워드 집중)
 
-**`description` + `when-to-use` 분리** — 가장 중요한 필드 쌍:
-- 시작 시 모든 skill의 name+description+when-to-use가 시스템 프롬프트에 주입됨
-- `description`: 깔끔한 한 줄 요약 (skill이 무엇인지)
-- `when-to-use`: 트리거 키워드와 시나리오 (언제 활성화할지)
-- SKILL.md 본문은 skill이 선택된 후에야 읽힘
-- description은 간결하게, when-to-use에 트리거 키워드 집중
+**2. Description budget** (CC runtime):
+- 전체 skill/command description 합산 ~15,000 chars (`SLASH_COMMAND_TOOL_CHAR_BUDGET`)
+- 개별 description은 listing에서 ~250 chars로 잘림 — 트리거 키워드는 첫 100 chars 안에
+- Anthropic 번들 skill 우선, custom skill이 먼저 잘림
 
-```yaml
-# Bad — description에 모든 것을 채움
-description: |
-  PR 및 커밋된 코드의 품질, 보안, 유지보수성을 검토.
-  코드 리뷰, PR 피드백, 버그 탐지 요청 시 사용.
+**3. `disable-model-invocation` vs `user-invocable`** — 혼동 금지:
 
-# Good — description과 when-to-use 분리
-description: PR 및 커밋된 코드의 품질, 보안, 유지보수성을 검토.
-when-to-use: >
-  코드 리뷰, PR 피드백, 버그 탐지 요청 시 사용.
-  'review', 'security check', 'code quality' 키워드에 자동 트리거.
-```
-
-**Description Budget Constraints (CC Runtime)**:
-- **Total budget**: ~15,000 characters for all skill/command descriptions combined (`SLASH_COMMAND_TOOL_CHAR_BUDGET`)
-- **Per-skill truncation**: descriptions are truncated to ~250 chars in the listing shown to Claude
-- **Priority**: Anthropic bundled skills retain full descriptions; custom skills are trimmed first when budget exceeded
-- **Implication**: Keep `description` under 250 chars. Put trigger keywords in first 100 chars. Use `when-to-use` for additional trigger context (not budget-constrained in the same way)
-- **Current budget usage**: 5 skills, ~376 chars total — well within 15K. Monitor if adding more skills
-
-**`disable-model-invocation` vs `user-invocable`** — 혼동 금지:
 | 필드 | 효과 | 용도 |
 |------|------|------|
-| `disable-model-invocation: true` | Claude 자동 호출 완전 차단 + 시스템 프롬프트에서 description 제거 | 배포, 커밋 등 부작용 워크플로우 |
-| `user-invocable: false` | `/menu` 미표시 (Claude 자동 실행은 가능, description은 context에 유지) | 배경 지식 skill |
+| `disable-model-invocation: true` | Claude 자동 호출 차단 + 시스템 프롬프트에서 description 제거 | 배포/커밋 등 부작용 |
+| `user-invocable: false` | `/menu` 미표시 (Claude 자동 실행은 가능) | 배경 지식 skill |
 
-**`context` + `agent`** — 의존 관계:
-- `agent:` 필드는 `context: fork`일 때만 동작 — subagent 타입 지정
-- `context: inline`이면 `agent:` 무시됨 — 불필요한 필드 포함 금지
-- `context:` 미지정 시 기본값은 inline — 대부분의 skill은 `context`/`agent` 불필요
-- `context: fork` 사용 시에만 `agent:` 추가 (예: `agent: Explore`)
+**4. `context: fork` + `agent:` 의존 관계**:
+- `agent:`는 `context: fork`일 때만 동작 — `inline`이면 무시됨
+- `context:` 기본값은 `inline` → 명시 불필요. `fork` 필요할 때만 둘 다 지정
 
-```yaml
-# WRONG — agent without context: fork is meaningless
-context: inline
-agent: general-purpose   # ← 무시됨, 제거해야 함
-
-# CORRECT — agent with context: fork
-context: fork
-agent: Explore           # ← fork subagent 타입 지정
-
-# CORRECT — inline skill needs neither
-# (context/agent 필드 자체를 생략)
-```
-
-**`allowed-tools`** — 최소 권한:
+**5. `allowed-tools` 최소 권한 템플릿**:
 - 읽기 전용: `Read, Grep, Glob`
-- 분석 + 검색: `Read, Grep, Glob, WebSearch, WebFetch`
+- 분석+검색: `Read, Grep, Glob, WebSearch, WebFetch`
 - 구현: `Read, Grep, Glob, Edit, Write, Bash`
-- 미지정 시 전체 도구 상속
+- 생략 시 부모 전체 도구 상속
 
-**`metadata`** — author, version 등 부가 정보 전용:
-```yaml
-# Correct — metadata for user-defined info only
-metadata:
-  author: backend-team
-  version: "2.0.0"
+**6. Template variables** — 스크립트 경로는 반드시 사용:
+- `{{SKILLS_PATH}}` → 설치된 skills 루트 (`~/.claude/skills/`)
+- `{{SCRIPTS_PATH}}` → 설치된 scripts 경로
 
-# WRONG — do NOT nest CC fields under metadata
-metadata:
-  context: fork    # ← WRONG, must be top-level
-  agent: Explore   # ← WRONG, must be top-level
-```
+## Body Structure (XML `<component>`)
 
-**Template variables** — 스크립트 경로에 사용:
-| 변수 | 해석 |
-|------|------|
-| `{{SKILLS_PATH}}` | 설치된 skills 루트 경로 (`~/.claude/skills/`) |
-| `{{SCRIPTS_PATH}}` | 설치된 scripts 경로 |
-
-**IDE warnings** — agentskills.io validator가 CC 전용 필드(`context`, `agent`, `hooks`)를 인식 못해 경고 표시. Claude Code에서 정상 동작하므로 무시.
-
-## Body Structure (SuperClaude Convention)
-
-Skill 본문은 agent와 동일한 XML `<component>` 패턴을 사용합니다.
+본문은 agent와 동일한 XML 패턴. 500줄 초과 시 `references/`로 분리.
 
 ```xml
 <component name="skill-name" type="skill">
@@ -177,7 +138,7 @@ Skill 본문은 agent와 동일한 XML `<component>` 패턴을 사용합니다.
   </role>
 
   <references note="Load on demand — progressive disclosure">
-  - `references/file.md` — Description. When to read this file
+  - `references/file.md` — What + when to read
   </references>
 
   <syntax>/skill-name [args] [--flags]</syntax>
@@ -185,18 +146,14 @@ Skill 본문은 agent와 동일한 XML `<component>` 패턴을 사용합니다.
   <flow>
     1. Step one
     2. Step two
-    3. Step three
   </flow>
 
   <tools>
     - ToolName: purpose
   </tools>
 
-  <gotchas note="Recommended — project-specific failure patterns, not general advice">
-  - pattern-name: Concrete failure + action instruction (2-5 items)
-  Good gotcha: "score-rounding: Do not round 89% up to almost 90%" (project-specific)
-  Bad gotcha: "Do not force-push" (general advice — use hooks instead)
-  Lifecycle: Review quarterly. Remove entries not triggered in 90 days. Promote recurring patterns to tool_guidance.
+  <gotchas>
+  - pattern-name: 구체적 실패 + 행동 지침 (2-5 items)
   </gotchas>
 
   <examples>
@@ -206,92 +163,39 @@ Skill 본문은 agent와 동일한 XML `<component>` 패턴을 사용합니다.
   </examples>
 
   <bounds should="core capabilities" avoid="out-of-scope actions"/>
-
   <handoff next="/sc:next1 /sc:next2"/>
 </component>
 ```
 
-### Body Rules
-
-- `<component type="skill">` — agent와 구분, `type="skill"` 필수
-- `<syntax>` — slash command 사용법 명시
-- `<flow>` — 번호 매긴 실행 순서
+### Body rules
+- `type="skill"` 필수 (agent와 구분)
 - `<bounds>` — `should`/`avoid` 속성 필수
-- 본문 500줄 이내, 세부 내용은 `references/`로 분리
-
-## Three Archetypes
-
-### ① Reference Skill (자동 invocation)
-```yaml
----
-name: api-conventions
-description: |
-  API 설계 패턴과 컨벤션 가이드.
-  API 엔드포인트 작성, REST 설계, 에러 포맷 작업 시 자동 적용.
----
-```
-- `disable-model-invocation` 미설정 (Claude가 자동 호출)
-- `user-invocable` 미설정 (기본 true)
-
-### ② Workflow Skill (사용자 전용 호출)
-```yaml
----
-name: deploy
-description: 프로덕션 배포 자동화.
-disable-model-invocation: true
-allowed-tools: Bash, Read
-argument-hint: "[environment]"
-context: fork
-agent: general-purpose
----
-```
-- `disable-model-invocation: true` — 부작용 보호
-- `context: fork` — top-level
-
-### ③ Background Context Skill (Claude만 사용)
-```yaml
----
-name: legacy-auth-context
-description: |
-  레거시 인증 시스템 배경 지식.
-  인증 관련 코드 수정 시 자동 로드.
-user-invocable: false
----
-```
-- `user-invocable: false` — `/menu` 미표시
-- Claude가 필요시 자동 활성화
+- `<gotchas>` — **프로젝트 특유** 실패 패턴만 (force-push 금지 같은 일반론은 hooks로). 분기별 리뷰, 90일 미트리거 항목 제거
+- 본문 ≤500 lines. 상세 내용은 `references/`로 분리
 
 ## Validation Checklist
 
-After creating/modifying a skill:
-
-1. `name` matches directory name
-2. `description` is specific (task + keywords), max 1024 chars
-3. All CC extension fields (`context`, `agent`, `hooks`) are top-level (NOT under `metadata:`)
-4. `metadata:` contains only user-defined info (author, version)
-5. Side-effect skills have `disable-model-invocation: true`
-6. Scripts use `{{SKILLS_PATH}}` template variable (not hardcoded paths)
-7. Body under 500 lines — use `<references>` + `references/` files for detailed content
-8. `<bounds>` has `should`/`avoid` attributes
-9. `<gotchas>` present with project-specific failure patterns (recommended)
-10. Run `make deploy` to install
-11. Test with `/skill-name` to verify invocation
+1. `name` == 디렉토리명
+2. `description` + `when-to-use` 분리, 합쳐서 ≤250 chars 지향
+3. CC 확장 필드(`context`/`agent`/`hooks`)는 top-level, metadata 아래 금지
+4. 부작용 skill은 `disable-model-invocation: true`
+5. 스크립트 경로는 `{{SKILLS_PATH}}` 사용 (하드코딩 금지)
+6. `<bounds>` has `should` + `avoid`
+7. 본문 ≤500 lines
+8. `make deploy` 후 `/skill-name`으로 실제 호출 테스트
 
 ## Anti-Patterns
 
 | Anti-Pattern | Why Wrong | Fix |
 |-------------|-----------|-----|
-| Nesting `context:` under `metadata:` | CC reads top-level only | Move to top level |
-| Nesting `agent:` under `metadata:` | CC reads top-level only | Move to top level |
-| Nesting `hooks:` under `metadata:` | CC reads top-level only | Move to top level |
-| `agent:` without `context: fork` | `agent` is ignored when context is inline | Remove `agent:` or change to `context: fork` |
-| `context: inline` explicitly set | inline is the default, redundant | Remove `context:` field entirely |
-| Vague description | Claude won't auto-trigger | Add task + trigger keywords |
-| Hardcoded script paths | Breaks on install | Use `{{SKILLS_PATH}}` |
-| Body > 500 lines | Context bloat | Split to `references/` |
-| Missing `disable-model-invocation` on deploy/push skills | Claude may auto-execute destructive actions | Add `disable-model-invocation: true` |
-| Using `user-invocable: false` to block Claude | Only hides from `/menu`, Claude still auto-calls | Use `disable-model-invocation: true` instead |
-| All content inline in SKILL.md | Context bloat at Level 2 loading | Move detailed content to `references/`, add `<references>` tag |
-| Generic gotchas ("don't force-push") | Wastes gotcha signal on common sense | Use hooks for safety rules; gotchas for project-specific failures only |
-| No gotchas on failure-prone skill | Misses highest-value content per Anthropic guide | Add `<gotchas>` with observed failure patterns |
-| Decorative XML attributes | Unparsed attributes accumulate as boilerplate — token waste | `note=` allowed ONLY for: scope ("all commands"), safety ("do NOT"), version gates ("2.1.37+"), reference locations ("see X.md"), quantified constraints ("3-6"). Remove if tag name/content already says it |
+| `context`/`agent`/`hooks`를 `metadata:` 아래 중첩 | CC는 top-level만 읽음 | top-level로 이동 |
+| `agent:` without `context: fork` | inline에서는 무시됨 | `agent:` 제거 또는 `context: fork` 추가 |
+| `context: inline` 명시 | 기본값이라 redundant | 필드 제거 |
+| Vague description | Claude 자동 트리거 실패 | 핵심 작업 + 트리거 키워드 first 100 chars |
+| Hardcoded script paths | 설치 후 깨짐 | `{{SKILLS_PATH}}` |
+| Body > 500 lines | Context bloat | `references/`로 분리 |
+| Deploy/push skill에 `disable-model-invocation` 누락 | Claude 자동 실행 위험 | `disable-model-invocation: true` |
+| `user-invocable: false`로 Claude 차단 시도 | /menu만 가림, 자동 호출은 여전히 가능 | `disable-model-invocation: true`로 교체 |
+| 모든 내용 SKILL.md 인라인 | Level 2 로딩 시 bloat | `<references>` + `references/` |
+| 일반론 gotcha ("force-push 금지") | gotcha 신호 낭비 | 일반 안전규칙은 hooks, gotcha는 프로젝트 특유만 |
+| 장식용 XML `note=` 속성 | 미파싱 boilerplate, 토큰 낭비 | `note=`는 scope/safety/version/reference/quantified constraint일 때만 허용 |
