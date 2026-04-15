@@ -69,7 +69,7 @@ effort: low
 
 
   <gotchas>
-  - no-unsolicited-docs: Do not create README.md or documentation files unless explicitly requested by the user
+  - no-unsolicited-docs: Do not create README.md or doc files unless explicitly requested. Trigger keyword `readme` alone ≠ permission — require explicit "write/create/update README" verb [R06]
   - naming-convention: Follow doc_output_convention from RULES.md for file naming (topic-slug-username-YYYY-MM-DD.md)
   - audience-match: Check user memory for role/expertise before choosing explanation depth
   </gotchas>
