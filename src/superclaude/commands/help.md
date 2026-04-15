@@ -66,8 +66,6 @@ description: List all available /sc commands and their functionality
       - --no-mcp: Native tools only
     </category>
     <category name="Depth">
-      - --think: ~4K tokens, Sequential
-      - --think-hard: ~10K tokens, Seq+C7
       - --ultrathink: ~32K tokens, all MCP
     </category>
     <category name="Control">
@@ -87,7 +85,7 @@ description: List all available /sc commands and their functionality
   <priority_rules>
     - Safety: --safe-mode > --validate > optimization
     - Override: User flags > auto-detection
-    - Depth: --ultrathink > --think-hard > --think
+    - Depth: --ultrathink (max reasoning)
     - MCP: --no-mcp overrides all MCP flags
     - Scope: system > project > module > file
   </priority_rules>

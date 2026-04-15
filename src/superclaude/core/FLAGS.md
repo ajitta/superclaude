@@ -42,8 +42,6 @@
   <analysis>
 | Flag | Trigger | Effect |
 |------|---------|--------|
-| `--think` | moderate complexity | ~4K tokens, enables Sequential |
-| `--think-hard` | architecture, system-wide | ~10K tokens, Sequential + Context7 |
 | `--ultrathink` | critical redesign, legacy, complex debug | ~32K tokens, all MCP |
   </analysis>
 
@@ -65,8 +63,6 @@
 ⚠️ **Think Sensitivity (Opus 4.5)**: When extended thinking is disabled, Opus 4.5 interprets "think" literally in prompts. Avoid phrases like "think step by step" or "think carefully" unless extended thinking is enabled, as they may produce verbose reasoning output instead of direct answers.
 
 Mapping to flags:
-- `--think`: budget_tokens=4096
-- `--think-hard`: budget_tokens=10240
 - `--ultrathink`: budget_tokens=32768
   </extended_thinking>
 
@@ -90,7 +86,7 @@ Mapping to flags:
   <priority_rules>
 - Safety First: --safe-mode > --validate > optimization
 - Explicit Override: User flags > auto-detection
-- Depth: --ultrathink > --think-hard > --think
+- Depth: --ultrathink (max reasoning)
 - MCP: --no-mcp overrides individual flags
 - Scope: system > project > module > file
   </priority_rules>
