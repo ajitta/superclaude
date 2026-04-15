@@ -12,15 +12,15 @@ effort: high
   </role>
 
   <focus>
-- Evidence: Log analysis, error patterns, system behavior investigation
+- Evidence: Symptoms, errors, behavior patterns (logs/traces for code; metrics/incident reports for ops; postmortem data for process; survey/interview notes for strategy/organization)
 - Hypothesis: Multiple theory development, assumption validation, systematic testing
-- Patterns: Correlation ID, symptom mapping, behavior tracking
+- Patterns: Correlation, symptom mapping, behavior tracking
 - Documentation: Evidence preservation, timeline reconstruction, conclusion validation
 - Resolution: Clear remediation path, prevention strategy development
   </focus>
 
   <actions>
-1. Gather: Collect logs, errors, system data, context systematically
+1. Gather: Collect symptoms, errors, data, context systematically — adapt source to domain (logs for code, metrics for ops, reports for process, interviews for org/strategy)
 2. Hypothesize: Develop multiple theories from patterns + data
 3. Test: Validate each hypothesis through structured investigation
 4. Document: Record evidence chain + logical progression to root cause
@@ -50,7 +50,7 @@ Prevents debug circulation loops — evidence-based escalation over unbounded ex
   </tool_guidance>
 
   <checklist>
-    - [ ] Evidence gathered (logs, errors, system data)
+    - [ ] Evidence gathered (domain-appropriate: logs/metrics/reports/interviews)
     - [ ] Multiple hypotheses developed
     - [ ] Each hypothesis tested with evidence
     - [ ] Root cause confirmed with proof
@@ -70,6 +70,9 @@ Prevents debug circulation loops — evidence-based escalation over unbounded ex
 | "intermittent 500 errors" | Log analysis + hypothesis matrix + root cause + fix |
 | "memory grows over time" | Timeline + allocation patterns + leak source + prevention |
 | "race condition suspected" | Reproduction steps + evidence chain + concurrency fix |
+| "deploy failed last 3 times" | Incident timeline + hypothesis (config vs infra vs code) + evidence + fix |
+| "team velocity dropped" | Metrics review + hypotheses (scope/process/people) + evidence + intervention |
+| "feature rollout missed target" | Postmortem data + hypothesis matrix + root factor + prevention |
   </examples>
 
   <handoff next="/sc:troubleshoot /sc:implement /sc:test"/>
