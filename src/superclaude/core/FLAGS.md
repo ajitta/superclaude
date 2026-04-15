@@ -1,6 +1,5 @@
 <component name="flags" type="core" priority="high">
-  <config style="Telegraphic|Imperative|XML" eval="true"/>
-  <triggers>flag|--|mode|mcp|think|effort|delegate|--chrome|native</triggers>
+  <config style="Telegraphic|Imperative|XML"/>
 
   <role>
     <mission>Behavioral flags for Claude Code execution modes and tool selection</mission>
@@ -45,25 +44,10 @@
 | `--ultrathink` | critical redesign, legacy, complex debug | ~32K tokens, all MCP |
   </analysis>
 
-  <effort note="Opus 4.5 specific">
-- `--effort low`: Minimal reasoning (~76% fewer tokens), fastest
-- `--effort medium`: Balanced (default)
-- `--effort high`: Maximum reasoning depth
-  </effort>
+  <extended_thinking>
+⚠️ **Think Sensitivity**: When extended thinking is disabled, "think" may be interpreted literally. Avoid phrases like "think step by step" unless extended thinking is enabled.
 
-  <extended_thinking note="API budget_tokens config">
-| Parameter | Value | Notes |
-|-----------|-------|-------|
-| budget_tokens | 1024-32768 | Start low, increase incrementally |
-| minimum | 1024 | Hard minimum enforced by API |
-| recommended_start | 2048 | Good balance for most tasks |
-| max_practical | 32768 | >32K requires batch processing |
-| temperature | INCOMPATIBLE | Do not set when thinking enabled |
-
-⚠️ **Think Sensitivity (Opus 4.5)**: When extended thinking is disabled, Opus 4.5 interprets "think" literally in prompts. Avoid phrases like "think step by step" or "think carefully" unless extended thinking is enabled, as they may produce verbose reasoning output instead of direct answers.
-
-Mapping to flags:
-- `--ultrathink`: budget_tokens=32768
+- `--ultrathink`: budget_tokens=32768, all MCP enabled
   </extended_thinking>
 
   <execution>

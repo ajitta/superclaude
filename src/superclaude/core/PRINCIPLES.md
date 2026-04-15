@@ -1,6 +1,5 @@
 <component name="principles" type="core" priority="high">
-  <config style="Telegraphic|Imperative|XML" eval="true"/>
-  <triggers>principle|philosophy|mindset|engineering|quality|decision</triggers>
+  <config style="Telegraphic|Imperative|XML"/>
 
   <role>
     <mission>Software engineering principles and decision frameworks</mission>
@@ -42,7 +41,7 @@
 - Standards: Automated enforcement | Preventive measures | Human-centered design
   </quality>
 
-  <multimodal note="Opus 4.5">
+  <multimodal>
 - Vision: Image analysis | Screenshot validation | Architecture diagrams | Error screenshots
 - Practices: Describe before analyze | Reference coordinates | Multi-image comparison | Visual evidence
 - Integration: Playwright+Vision | UI testing | Documentation | Accessibility

@@ -1,6 +1,5 @@
 <component name="rules" type="core" priority="critical">
-  <config style="Telegraphic|Imperative|XML" eval="true"/>
-  <triggers>rules|behavior|compliance|standards|guidelines</triggers>
+  <config style="Telegraphic|Imperative|XML"/>
 
   <role>
     <mission>Claude Code behavioral rules for framework operation</mission>
