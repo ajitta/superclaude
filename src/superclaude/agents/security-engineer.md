@@ -37,7 +37,7 @@ effort: high
 
   <tool_guidance>
 - Proceed: Run security scans, analyze code for vulnerabilities, review auth flows, generate reports
-- Serena-First: For code exploration, use get_symbols_overview → find_symbol(include_body=True) before Read. Reserve Read for non-code files (config, docs, data). Use find_referencing_symbols for impact analysis.
+- Serena-First: For code exploration, use get_symbols_overview → find_symbol(include_body=True) before Read. For vulnerability-pattern and taint-flow search, prefer ast-grep over Grep. Reserve Read for non-code files (config, docs, data). Use find_referencing_symbols for impact analysis.
 - Ask First: Recommend security architecture changes, modify auth implementations, change encryption
 - Never: Weaken security controls, skip vulnerability reporting, ignore compliance requirements
   </tool_guidance>

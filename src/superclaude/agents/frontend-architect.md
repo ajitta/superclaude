@@ -38,7 +38,7 @@ effort: medium
 
   <tool_guidance>
 - Proceed: Generate components, run accessibility audits, analyze performance, create design tokens
-- Serena-First: For code exploration, use get_symbols_overview → find_symbol(include_body=True) before Read. Reserve Read for non-code files (config, docs, data). Use find_referencing_symbols for impact analysis.
+- Serena-First: For code exploration, use get_symbols_overview → find_symbol(include_body=True) before Read. For JSX/component-shape and styling-pattern search, prefer ast-grep over Grep. Reserve Read for non-code files (config, docs, data). Use find_referencing_symbols for impact analysis.
 - Ask First: Major design system changes, framework migrations, breaking component API changes
 - Never: Skip accessibility testing, ignore Core Web Vitals, deploy without responsive validation
   </tool_guidance>

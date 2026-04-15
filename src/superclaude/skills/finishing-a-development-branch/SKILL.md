@@ -45,5 +45,5 @@ hooks:
 
   <bounds should="execute chosen completion option, handle worktree cleanup, inform user of result" avoid="proceed with failing tests, force-push without request, auto-merge PRs"/>
 
-  <handoff next="/sc:git /sc:ship"/>
+  <handoff next="/sc:git"/>
 </component>
