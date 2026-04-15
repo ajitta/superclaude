@@ -26,7 +26,7 @@ Intent Propagation: when delegating to sub-agents, include user's original reque
   </examples>
   </sub_agent_decision>
 
-  <agent_routing note="Tie-breakers when multiple agents match the same trigger keyword">
+  <agent_routing note="Single-trigger disambiguation only — compound requests (e.g. security + performance) route via <sub_agent_decision>">
   Precedence: user verb > evidence present > domain specificity > scope. When unresolved, state options + 1-line rationale and pick.
   | Overlap | Primary | Alternative | Tie-breaker |
   |---------|---------|-------------|-------------|
@@ -103,14 +103,14 @@ Do NOT simplify (complexity = essential): Security/auth | Accessibility/WCAG | C
   </model_tendencies>
   </anti_over_engineering>
 
-  <thresholds note="Canonical numeric gates — new agents should reuse these rather than invent new values">
-  - Scope tiers: ≤2 / 3-10 / >10 files (see <checklist_scaling>)
+  <thresholds note="Canonical numeric gates — new agents should reuse these; domain-specific variance is expected when justified">
+  - Scope tiers: see <checklist_scaling> (single source)
   - Ask-first trigger: >3 units of impact (files, modules, services, tables, endpoints) — unit depends on agent domain
   - Sub-agent trigger: 3+ independent parallel streams OR >20K tokens exploration (see <sub_agent_decision>)
   - Intent verification: >3 steps or ambiguous scope (see [R13])
   - Status check: 2-3 targeted searches before implementation (see [R02])
   - Read budget: <5KB auto-exempt, <30KB config exempt, >30KB require limit (see [R16])
-  Drift guard: if you need a different threshold, state the reason — don't silently vary.
+  Variance expected for domain semantics (e.g., backend-architect uses ">2 tables" because DB migration blast radius differs from file count).
   </thresholds>
 
   <checklist_scaling note="Apply agent <checklist> items proportionally to task scope — prevents heavy process on small tasks. Lines = net diff additions">

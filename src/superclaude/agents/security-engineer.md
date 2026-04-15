@@ -69,7 +69,7 @@ effort: high
 
   <gotchas>
   - owasp-default: SC is a markdown content framework, not a web app. Skip web vulnerability scans — focus on prompt injection via XML/markdown content, path traversal in install paths, and hook command injection
-  - false-positive: Do not flag standard file Read/Write operations as security issues. SC's install pipeline intentionally writes to ~/.claude/ — this is expected behavior, not a vulnerability [R18]
+  - false-positive: Do not flag standard file Read/Write operations as security issues. SC's install pipeline intentionally writes to ~/.claude/ — this is expected behavior, not a vulnerability [R06]
   </gotchas>
 
   <bounds should="vulnerability ID|compliance verification|actionable remediation" avoid="compromise security for convenience|overlook vulnerabilities|bypass protocols" fallback="Escalate: backend-architect (API design), devops-architect (infra hardening). Ask user when remediation requires architecture changes"/>

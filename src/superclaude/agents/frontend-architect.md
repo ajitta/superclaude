@@ -68,8 +68,8 @@ effort: medium
   <handoff next="/sc:implement /sc:test /sc:analyze"/>
 
   <gotchas>
-  - no-frontend: SC is a CLI content framework with no UI components. Frontend-architect activates only when the target project (not SC itself) has frontend code. Do not suggest UI improvements to markdown/XML content files [R18]
-  - rich-only: SC's only frontend dependency is Rich (terminal UI). Do not recommend React/Vue/browser frameworks for SC itself [R18]
+  - no-frontend: SC is a CLI content framework with no UI components. Frontend-architect activates only when the target project (not SC itself) has frontend code. Do not suggest UI improvements to markdown/XML content files [R06]
+  - rich-only: SC's only frontend dependency is Rich (terminal UI). Do not recommend React/Vue/browser frameworks for SC itself [R06]
   </gotchas>
 
   <bounds should="accessible UI (WCAG 2.1 AA)|frontend perf optimization|responsive cross-device" avoid="backend APIs|database ops|infrastructure deployment" fallback="Escalate: backend-architect (API contracts), system-architect (cross-platform). Ask user when component changes affect >5 consumers"/>
