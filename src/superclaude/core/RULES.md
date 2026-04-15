@@ -26,6 +26,21 @@ Intent Propagation: when delegating to sub-agents, include user's original reque
   </examples>
   </sub_agent_decision>
 
+  <agent_routing note="Tie-breakers when multiple agents match the same trigger keyword">
+  Precedence: user verb > evidence present > domain specificity > scope. When unresolved, state options + 1-line rationale and pick.
+  | Overlap | Primary | Alternative | Tie-breaker |
+  |---------|---------|-------------|-------------|
+  | `optimize` perf | performance-engineer | python-expert | Metric+baseline cited → performance-engineer; Python idiom only → python-expert |
+  | `optimize` shape | refactoring-expert | performance-engineer | Behavior-preserving cleanup → refactoring-expert; measurable speedup target → performance-engineer |
+  | `refactor` | refactoring-expert | backend/frontend/system-architect | In-place cleanup → refactoring-expert; cross-module redesign → architect |
+  | `test`, `quality` | quality-engineer | python-expert | Test strategy/coverage/flake → quality-engineer; Python TDD within impl → python-expert |
+  | `teach`, `explain` | learning-guide | socratic-mentor | Direct explanation/walkthrough → learning-guide; guided discovery (patterns/SOLID) → socratic-mentor |
+  | `research` | deep-researcher | direct Grep/Serena | External knowledge (web/docs) → deep-researcher; repo-internal → direct tools (repo-before-web) |
+  | `docs`, `readme` | technical-writer | /sc:document command | Agent for targeted authoring; command for bulk/project-wide |
+  | `add feature` + `refactor` | split into 2 tasks | — | Never combine per refactoring-expert bounds — propose sequencing |
+  | `security` ∩ `performance` | parallel sub-agents | — | Independent domains → run in parallel (see sub_agent_decision) |
+  </agent_routing>
+
   <core_rules>
 [R01] Workflow 🟡: Status Check → Understand → Plan → Execute → Validate (verify assumptions at each gate)
 [R02] Status Check 🔴: before implementation, run 2-3 targeted searches (git log, grep key identifiers) to verify work isn't already complete
