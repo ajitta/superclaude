@@ -50,29 +50,6 @@ description: Execute complex tasks with intelligent workflow management and dele
 
   <examples>
 
-  <example name="sequential-strategy" type="happy-path">
-    <input>/sc:task 'database migration from MySQL to PostgreSQL' --strategy sequential</input>
-    <output>
-      Epic: MySQL → PostgreSQL migration
-        Story 1: Schema migration (blocked: none)
-        Story 2: Data migration (blocked by: Story 1)
-        Story 3: Application layer (blocked by: Story 2)
-      Dependencies: S1 → S2 → S3 (strict chain)
-    </output>
-  </example>
-
-  <example name="parallel-strategy" type="happy-path">
-    <input>/sc:task 'implement user auth system' --strategy parallel</input>
-    <output>
-      Epic: User authentication system
-        Story 1: Database layer (parallel)
-        Story 2: API layer (parallel)
-        Story 3: UI layer (parallel)
-        Story 4: Integration (blocked by: S1 + S2 + S3)
-      Concurrency: S1 ‖ S2 ‖ S3 → S4
-    </output>
-  </example>
-
   <example name="adaptive-strategy" type="happy-path">
     <input>/sc:task 'refactor monolith into services' --strategy adaptive</input>
     <output>
