@@ -59,7 +59,6 @@ Commands are managed by Claude Code's native command system. Installed to `~/.cl
 | `/sc:git` | Git operations with intelligent commits and workflow |
 | `/sc:review` | Code review with structured feedback |
 | `/sc:pm` | Project Manager Agent orchestration |
-| `/sc:spawn` | Meta-system task orchestration with delegation |
 
 ### Advisory Panels
 
