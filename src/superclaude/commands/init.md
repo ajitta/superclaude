@@ -42,12 +42,10 @@ description: Interactive project environment setup — select and run initializa
   ```
   </menu>
 
-  <dependency_graph note="Execution order constraints">
-  ```
-  Batch 1 (parallel):  [a] [c] [e] [f] [h]     — no dependencies
-  Batch 2 (parallel):  [b←a] [d←c] [g←a]   — wait for prerequisites
-  ```
-  Dynamic batching: only schedule selected tasks. If prerequisite missing, prompt user to add it.
+  <dependency_graph note="Execution order">
+  - Batch 1 (no deps, parallel): a, c, e, f, h
+  - Batch 2 (wait for prereq): b←a, d←c, g←a
+  - Schedule only selected tasks; prompt to add missing prerequisites.
   </dependency_graph>
 
   <task_outputs>

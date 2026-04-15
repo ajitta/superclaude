@@ -110,40 +110,6 @@ description: List all available /sc commands and their functionality
 
   </examples>
 
-  <workflows>
-
-  <workflow name="feature-development">
-    /sc:brainstorm 'user auth' → requirements doc
-    /sc:design --type api → architecture spec
-    /sc:implement --type feature --with-tests → code + tests
-    /sc:test --type e2e --coverage → validation
-    /ship --pr → delivery
-  </workflow>
-
-  <workflow name="performance-fix">
-    /sc:analyze --focus perf --perf → bottleneck report
-    /sc:troubleshoot --type performance --trace → root cause
-    /sc:improve --type performance → optimized code
-    /sc:test --type e2e → regression check
-  </workflow>
-
-  <workflow name="research-to-implementation">
-    /sc:research 'topic' --depth deep → findings report
-    /sc:brainstorm 'approach' → refined requirements
-    /sc:design → architecture spec
-    /sc:implement → code
-  </workflow>
-
-  <workflow name="code-quality">
-    /sc:analyze --focus quality → issue report
-    /sc:cleanup --type code --safe → dead code removal
-    /sc:improve --type quality → refactored code
-    /sc:test --coverage → verify improvements
-  </workflow>
-
-  </workflows>
-
-
   <gotchas>
   - stale-list: Command list may become stale. Verify against actual files in commands/sc/ if uncertain
   - flag-docs: Direct users to core/FLAGS.md for flag documentation, not inline explanations
