@@ -3,7 +3,6 @@ Cross-reference integrity linter for SuperClaude content files.
 
 Validates:
 - Handoff targets: <handoff next="/sc:X"> → commands/X.md exists
-- MCP server references: <mcp servers="seq|c7"> → MCP_*.md exists
 - Agent trigger uniqueness: no duplicate trigger keywords across agents
 """
 
@@ -18,19 +17,7 @@ _SRC = Path(__file__).parent.parent.parent / "src" / "superclaude"
 COMMANDS_DIR = _SRC / "commands"
 AGENTS_DIR = _SRC / "agents"
 MODES_DIR = _SRC / "modes"
-MCP_DIR = _SRC / "mcp"
 FLAGS_FILE = _SRC / "core" / "FLAGS.md"
-
-# Static MCP abbreviation → filename mapping
-MCP_ABBREV_MAP = {
-    "seq": "MCP_Sequential.md",
-    "c7": "MCP_Context7.md",
-    "play": "MCP_Playwright.md",
-    "perf": "MCP_Chrome-DevTools.md",
-    "magic": "MCP_Magic.md",
-    "serena": "MCP_Serena.md",
-    "tavily": "MCP_Tavily.md",
-}
 
 # Template patterns that are NOT real handoff targets
 HANDOFF_SKIP_PATTERNS = {
@@ -57,15 +44,6 @@ def _extract_handoff_targets(content: str) -> list[str]:
         return []
     raw = match.group(1)
     return re.findall(r"/sc:([\w-]+)", raw)
-
-
-
-def _extract_mcp_refs(content: str) -> list[str]:
-    """Extract MCP server abbreviations from <mcp servers="...">."""
-    match = re.search(r'<mcp\s+servers="([^"]*)"', content)
-    if not match:
-        return []
-    return [s.strip() for s in match.group(1).split("|") if s.strip()]
 
 
 
@@ -116,35 +94,6 @@ class TestHandoffIntegrity:
                 f"(available: {sorted(AVAILABLE_COMMANDS)[:10]}...)"
             )
 
-
-
-class TestMcpServerIntegrity:
-    """<mcp servers="seq|c7"> → abbreviation valid and mapped file exists."""
-
-    def test_mcp_abbreviations_valid(self, content_file):
-        file_id, content = content_file
-        refs = _extract_mcp_refs(content)
-        if not refs:
-            pytest.skip("No MCP server references")
-        for ref in refs:
-            assert ref in MCP_ABBREV_MAP, (
-                f"{file_id}: MCP abbreviation '{ref}' not in MCP_ABBREV_MAP "
-                f"(valid: {sorted(MCP_ABBREV_MAP.keys())})"
-            )
-
-    def test_mcp_mapped_files_exist(self, content_file):
-        file_id, content = content_file
-        refs = _extract_mcp_refs(content)
-        if not refs:
-            pytest.skip("No MCP server references")
-        for ref in refs:
-            if ref not in MCP_ABBREV_MAP:
-                continue  # Caught by abbreviation test
-            expected_file = MCP_DIR / MCP_ABBREV_MAP[ref]
-            assert expected_file.exists(), (
-                f"{file_id}: MCP '{ref}' maps to {MCP_ABBREV_MAP[ref]} "
-                f"but file not found at {expected_file}"
-            )
 
 
 class TestAgentTriggerUniqueness:

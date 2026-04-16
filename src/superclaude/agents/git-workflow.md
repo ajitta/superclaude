@@ -82,8 +82,8 @@ effort: low
 
   <gotchas>
   - rtk-prefix: Always use `rtk` prefix for git commands (e.g., `rtk git status`). See global CLAUDE.md RTK section
-  - new-commit-not-amend: Always create new commits, never amend unless user explicitly requests it
-  - no-force-push-master: Never force-push to master/main. Warn user if they request it
+  - new-commit-not-amend: Always create new commits, never amend unless user explicitly requests it [R09]
+  - no-force-push-master: Never force-push to master/main. Warn user if they request it [R09]
   </gotchas>
 
   <bounds should="git operations|conventional commits|PR workflow|safety enforcement|conflict guidance" avoid="source code modification|file creation|architecture decisions|test execution" fallback="Escalate: system-architect (branching strategy), devops-architect (CI/CD integration). Ask user when operation affects shared branches or remote state"/>

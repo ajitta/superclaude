@@ -94,8 +94,6 @@ Precedence: `CLAUDE_CODE_EFFORT_LEVEL` env > frontmatter > session > model defau
   - Type: deliverables (3-4 items)
   </outputs>
 
-  <mcp servers="seq|c7|..."/>
-
   <tool_guidance>
   - Proceed: actions to do freely | Serena-First: prefer symbolic tools for code exploration
   - Ask First: actions requiring confirmation (with specific thresholds)
@@ -132,7 +130,6 @@ Precedence: `CLAUDE_CODE_EFFORT_LEVEL` env > frontmatter > session > model defau
 - `<mission>` — shares ≥30% significant words with `description`
 - `<tool_guidance>` — no attributes, content only (Proceed/Ask First/Never)
 - `<bounds>` — `should` + `avoid` + `fallback` required
-- `<mcp>` — only servers the agent uses. Documentation-only; runtime scoping is the `mcpServers` frontmatter field
 - `<handoff>` — 2-3 natural next commands
 - `note=` attrs allowed only for: scope, safety ("do NOT"), version gate, reference location, quantified constraint. Remove if tag/content already conveys it
 

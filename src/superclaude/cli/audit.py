@@ -21,21 +21,11 @@ def _get_src_root() -> Path:
 def _check_cross_refs(src: Path) -> Dict[str, Any]:
     """Run cross-reference integrity checks.
 
-    Returns dict with handoff and mcp results.
+    Returns dict with handoff and trigger results.
     """
     commands_dir = src / "commands"
     agents_dir = src / "agents"
     modes_dir = src / "modes"
-    mcp_dir = src / "mcp"
-    MCP_ABBREV_MAP = {
-        "seq": "MCP_Sequential.md",
-        "c7": "MCP_Context7.md",
-        "play": "MCP_Playwright.md",
-        "perf": "MCP_Chrome-DevTools.md",
-        "magic": "MCP_Magic.md",
-        "serena": "MCP_Serena.md",
-        "tavily": "MCP_Tavily.md",
-    }
 
     HANDOFF_SKIP = {"/sc:[command]"}
 
@@ -48,7 +38,7 @@ def _check_cross_refs(src: Path) -> Dict[str, Any]:
         }
 
     # Scan all content files
-    issues = {"handoff": [], "mcp": [], "triggers": []}
+    issues = {"handoff": [], "triggers": []}
 
     content_files = []
     for d in (commands_dir, agents_dir, modes_dir):
@@ -68,18 +58,6 @@ def _check_cross_refs(src: Path) -> Dict[str, Any]:
             for t in targets:
                 if f"/sc:{t}" not in HANDOFF_SKIP and t not in available_commands:
                     issues["handoff"].append(f"{file_id}: /sc:{t}")
-
-        # MCP checks
-        mcp_match = re.search(r'<mcp\s+servers="([^"]*)"', content)
-        if mcp_match:
-            for ref in mcp_match.group(1).split("|"):
-                ref = ref.strip()
-                if not ref:
-                    continue
-                if ref not in MCP_ABBREV_MAP:
-                    issues["mcp"].append(f"{file_id}: unknown '{ref}'")
-                elif not (mcp_dir / MCP_ABBREV_MAP[ref]).exists():
-                    issues["mcp"].append(f"{file_id}: {ref} → {MCP_ABBREV_MAP[ref]} missing")
 
     # Trigger uniqueness
     trigger_owners = defaultdict(list)
