@@ -47,7 +47,8 @@ mcpServers: [serena]                       # optional | scope MCP servers to thi
 | `low` | Mechanical/structured | repo-index, git-workflow |
 | `medium` | Standard design + analysis (default) | architects, engineers |
 | `high` | Complex reasoning, deep debugging | system-architect, security-engineer |
-| `max` | Multi-perspective synthesis (**Opus 4.6 only**) | deep-researcher, business-panel-experts |
+| `xhigh` | Between high and max (**Opus 4.7 only**, CC 2.1.111+; other models fall back to high) | — |
+| `max` | Multi-perspective synthesis (**Opus 4.6/4.7 only**) | deep-researcher, business-panel-experts |
 
 Precedence: `CLAUDE_CODE_EFFORT_LEVEL` env > frontmatter > session > model default.
 

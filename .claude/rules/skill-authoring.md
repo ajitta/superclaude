@@ -60,7 +60,7 @@ All fields are **top-level**. `metadata:` is only for user-defined info (author,
 ---
 # Identity
 name: my-skill                    # 권장 | lowercase+hyphens, ≤64자, 디렉토리명과 일치
-description: One-line purpose.    # 권장 | ≤250 chars 실용 상한 (아래 예산 참조)
+description: One-line purpose.    # 권장 | ≤1,536 chars (CC 2.1.105+ listing cap, 초과 시 기동 경고)
 when-to-use: >                    # 권장 | 트리거 키워드/시나리오
   When user mentions X, Y, Z.
 
@@ -102,7 +102,7 @@ metadata:                         # author/version 등 부가 정보 전용
 
 **2. Description budget** (CC runtime):
 - 전체 skill/command description 합산 ~15,000 chars (`SLASH_COMMAND_TOOL_CHAR_BUDGET`)
-- 개별 description은 listing에서 ~250 chars로 잘림 — 트리거 키워드는 첫 100 chars 안에
+- 개별 description은 listing에서 ~1,536 chars로 잘림 (CC 2.1.105+, 이전 cap 250) — 트리거 키워드는 여전히 첫 100 chars 안에 두는 것이 권장
 - Anthropic 번들 skill 우선, custom skill이 먼저 잘림
 
 **3. `disable-model-invocation` vs `user-invocable`** — 혼동 금지:
@@ -176,7 +176,7 @@ metadata:                         # author/version 등 부가 정보 전용
 ## Validation Checklist
 
 1. `name` == 디렉토리명
-2. `description` + `when-to-use` 분리, 합쳐서 ≤250 chars 지향
+2. `description` + `when-to-use` 분리, 합쳐서 ≤1,536 chars (CC 2.1.105+ listing cap)
 3. CC 확장 필드(`context`/`agent`/`hooks`)는 top-level, metadata 아래 금지
 4. 부작용 skill은 `disable-model-invocation: true`
 5. 스크립트 경로는 `{{SKILLS_PATH}}` 사용 (하드코딩 금지)

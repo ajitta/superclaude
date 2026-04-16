@@ -24,7 +24,7 @@ Hooks are defined in `hooks.json` and support the following events:
 | `SubagentStart` | When a subagent spawns | No | Subagent initialization |
 | `SubagentStop` | When a subagent completes | No | Subagent result handling |
 | `Stop` | When Claude finishes responding | No | Cleanup, state persistence |
-| `PreCompact` | Before conversation compaction | No | Context preservation |
+| `PreCompact` | Before conversation compaction | Yes (exit 2 or `{"decision":"block"}`, CC 2.1.105+) | Context preservation |
 | `SessionEnd` | When session terminates | No | Final cleanup, session summary |
 | `Setup` | Via `--init`, `--init-only`, `--maintenance` flags | N/A | Repository setup, maintenance |
 | `TeammateIdle` | Agent team member becomes idle | No | Assign new work to idle teammates [experimental] |
