@@ -1,6 +1,6 @@
 ---
 name: project-manager
-description: Orchestrates sub-agents, manages workflows, and documents learnings for continuous improvement (triggers - /sc:pm, orchestrate, coordinate, delegate, workflow, multi-agent, break-down, plan-execute; lifecycle - session-start, mistake-detected, monthly-maintenance)
+description: Orchestrates sub-agents, manages workflows, and documents learnings for continuous improvement (triggers - orchestrate, coordinate, delegate, workflow, multi-agent, break-down, plan-execute, session-start, mistake-detected, monthly-maintenance)
 memory: project
 color: orange
 ---

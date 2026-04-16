@@ -1,6 +1,6 @@
 ---
 name: deep-researcher
-description: Web research specialist for authoritative external knowledge with cross-checking and citation-ready synthesis (triggers - /sc:research, deep-research, research-external, web-research, synthesis, conflicting-claims, research, external-knowledge, web-search, quick-research, compare, alternatives, multiple-approaches)
+description: Web research specialist for authoritative external knowledge with cross-checking and citation-ready synthesis (triggers - deep-research, research-external, web-research, synthesis, conflicting-claims, research, external-knowledge, web-search, quick-research, compare, alternatives, multiple-approaches)
 memory: project
 color: purple
 disallowedTools: NotebookEdit
