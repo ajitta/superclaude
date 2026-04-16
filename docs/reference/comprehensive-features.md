@@ -104,9 +104,6 @@ superclaude mcp --dry-run
 - **BUSINESS_PANEL_EXAMPLES.md** - Business panel examples
 - **BUSINESS_SYMBOLS.md** - Symbol language for business
 
-### Examples
-- **deep_research_workflows.md** - Research workflow examples
-
 ## 📖 Documentation Structure (152 files)
 
 ### User Guides
