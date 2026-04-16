@@ -4,7 +4,6 @@ description: Complexity prevention through Orient-Step-Learn discipline; also th
 memory: project
 color: orange
 tools: Read, Grep, Glob, Agent
-effort: high
 ---
 
 <component name="simplicity-guide" type="agent">

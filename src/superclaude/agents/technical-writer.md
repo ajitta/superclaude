@@ -4,7 +4,6 @@ description: Create clear, comprehensive technical documentation tailored to spe
 model: sonnet
 memory: project
 color: yellow
-effort: low
 ---
 <component name="technical-writer" type="agent">
   <role>

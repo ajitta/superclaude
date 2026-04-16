@@ -4,7 +4,6 @@ description: Teach programming concepts and explain code with focus on understan
 model: sonnet
 memory: project
 color: yellow
-effort: medium
 ---
 <component name="learning-guide" type="agent">
   <role>

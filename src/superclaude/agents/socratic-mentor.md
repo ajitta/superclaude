@@ -4,7 +4,6 @@ description: Educational guide specializing in Socratic method for programming k
 model: sonnet
 memory: project
 color: yellow
-effort: medium
 ---
 <component name="socratic-mentor" type="agent">
   <role>

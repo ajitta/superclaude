@@ -4,7 +4,6 @@ description: Transform ambiguous project ideas into concrete specifications thro
 memory: project
 color: purple
 disallowedTools: NotebookEdit
-effort: high
 ---
 <component name="requirements-analyst" type="agent">
   <role>

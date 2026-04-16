@@ -40,15 +40,18 @@ mcpServers: [serena]                       # optional | scope MCP servers to thi
 | General | `disallowedTools` | `NotebookEdit` | Can edit code but not notebooks |
 | Full access | *(omit both)* | — | Implementation agents |
 
-**`effort`** (v2.1.69+) — must be string (not number 1-5):
+**`effort`** (v2.1.69+) — must be string (not number 1-5). **Prefer omitting** unless the domain forces a deviation from parent session default:
 
-| Value | Use for | Examples |
-|-------|---------|----------|
-| `low` | Mechanical/structured | repo-index, git-workflow |
-| `medium` | Standard design + analysis (default) | architects, engineers |
-| `high` | Complex reasoning, deep debugging | system-architect, security-engineer |
-| `xhigh` | Between high and max (**Opus 4.7 only**, CC 2.1.111+; other models fall back to high) | — |
-| `max` | Multi-perspective synthesis (**Opus 4.6/4.7 only**) | deep-researcher, business-panel-experts |
+| Value | Set explicitly when | Examples |
+|-------|---------------------|----------|
+| *(omit)* | **Preferred default** — inherit from parent session; agent has no domain-forced depth requirement | python-expert, quality-engineer, refactoring-expert |
+| `low` | Task is clearly mechanical/structured; higher effort is wasted | repo-index, git-workflow, project-initializer |
+| `medium` | Rarely explicit (already the default) — only to cap a parent session that sets higher | — |
+| `high` | Domain unambiguously requires deep reasoning regardless of parent (data integrity, threat modeling, debugging) | system-architect, security-engineer, root-cause-analyst |
+| `xhigh` | Between high and max (**Opus 4.7 only**, CC 2.1.111+; other models fall back to high). Add only with concrete usage evidence | — |
+| `max` | Multi-perspective synthesis is essential (**Opus 4.6/4.7 only**) | deep-researcher, business-panel-experts |
+
+Decision rule: if lowering `effort` causes no measurable quality drop, lower it. If the need for the field is doubtful, remove it and inherit.
 
 Precedence: `CLAUDE_CODE_EFFORT_LEVEL` env > frontmatter > session > model default.
 
