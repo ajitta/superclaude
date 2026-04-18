@@ -216,40 +216,90 @@ def uninstall_all(
         messages.append(f"⏭️  Not found: {commands_sc_dir}/")
         skipped += 1
 
-    # 3. Remove .claude/agents/ directory
+    # 3. Remove SuperClaude-installed agents (preserves user-added agents)
     agents_dir = base_path / "agents"
+    agents_source = _get_source_dir("agents")
     if agents_dir.exists():
-        if dry_run:
-            item_count = sum(1 for _ in agents_dir.glob("*.md"))
-            messages.append(f"[DRY-RUN] Would remove: {agents_dir}/ ({item_count} files)")
-            removed += 1
-        else:
-            try:
-                shutil.rmtree(agents_dir)
-                messages.append(f"✅ Removed: {agents_dir}/")
+        sc_agent_names = (
+            {f.name for f in agents_source.glob("*.md")}
+            if agents_source.exists()
+            else set()
+        )
+        sc_agents_present = [
+            agents_dir / name
+            for name in sc_agent_names
+            if (agents_dir / name).is_file()
+        ]
+        if sc_agents_present:
+            if dry_run:
+                messages.append(
+                    f"[DRY-RUN] Would remove: {len(sc_agents_present)} SC agent file(s) from {agents_dir}/"
+                )
                 removed += 1
-            except Exception as e:
-                messages.append(f"❌ Failed to remove {agents_dir}/: {e}")
-                failed += 1
+            else:
+                try:
+                    for f in sc_agents_present:
+                        f.unlink()
+                    if not any(agents_dir.iterdir()):
+                        agents_dir.rmdir()
+                        messages.append(f"✅ Removed: {agents_dir}/ (empty after SC cleanup)")
+                    else:
+                        messages.append(
+                            f"✅ Removed: {len(sc_agents_present)} SC agent file(s) from {agents_dir}/ (preserved non-SC files)"
+                        )
+                    removed += 1
+                except Exception as e:
+                    messages.append(f"❌ Failed to remove SC agents from {agents_dir}/: {e}")
+                    failed += 1
+        else:
+            messages.append(f"⏭️  No SC agents found in: {agents_dir}/")
+            skipped += 1
     else:
         messages.append(f"⏭️  Not found: {agents_dir}/")
         skipped += 1
 
-    # 4. Remove .claude/skills/ directory
+    # 4. Remove SuperClaude-installed skills (preserves user-added skills)
     skills_dir = base_path / "skills"
+    skills_source = _get_source_dir("skills")
     if skills_dir.exists():
-        if dry_run:
-            item_count = sum(1 for _ in skills_dir.iterdir() if _.is_dir())
-            messages.append(f"[DRY-RUN] Would remove: {skills_dir}/ ({item_count} skills)")
-            removed += 1
-        else:
-            try:
-                shutil.rmtree(skills_dir)
-                messages.append(f"✅ Removed: {skills_dir}/")
+        sc_skill_names = (
+            {
+                d.name
+                for d in skills_source.iterdir()
+                if d.is_dir() and not d.name.startswith(("_", "."))
+            }
+            if skills_source.exists()
+            else set()
+        )
+        sc_skills_present = [
+            skills_dir / name
+            for name in sc_skill_names
+            if (skills_dir / name).is_dir()
+        ]
+        if sc_skills_present:
+            if dry_run:
+                messages.append(
+                    f"[DRY-RUN] Would remove: {len(sc_skills_present)} SC skill(s) from {skills_dir}/"
+                )
                 removed += 1
-            except Exception as e:
-                messages.append(f"❌ Failed to remove {skills_dir}/: {e}")
-                failed += 1
+            else:
+                try:
+                    for d in sc_skills_present:
+                        shutil.rmtree(d)
+                    if not any(skills_dir.iterdir()):
+                        skills_dir.rmdir()
+                        messages.append(f"✅ Removed: {skills_dir}/ (empty after SC cleanup)")
+                    else:
+                        messages.append(
+                            f"✅ Removed: {len(sc_skills_present)} SC skill(s) from {skills_dir}/ (preserved non-SC skills)"
+                        )
+                    removed += 1
+                except Exception as e:
+                    messages.append(f"❌ Failed to remove SC skills from {skills_dir}/: {e}")
+                    failed += 1
+        else:
+            messages.append(f"⏭️  No SC skills found in: {skills_dir}/")
+            skipped += 1
     else:
         messages.append(f"⏭️  Not found: {skills_dir}/")
         skipped += 1
