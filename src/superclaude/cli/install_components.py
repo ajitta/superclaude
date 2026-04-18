@@ -7,6 +7,7 @@ and the top-level install_all orchestration.
 
 import json
 import shutil
+import sys
 from pathlib import Path
 from typing import List, Tuple
 
@@ -226,10 +227,12 @@ def install_hooks_and_scripts(
     messages = []
 
     # Determine scripts path based on scope
-    # - project scope: relative path (works from project root)
+    # - project scope: $CLAUDE_PROJECT_DIR-based path (portable across machines, CWD-independent)
+    #   Docs: https://code.claude.com/docs/en/hooks — hook CWD is NOT guaranteed project root;
+    #   $CLAUDE_PROJECT_DIR is the official env var for project-root-relative paths.
     # - user/target scope: absolute path (works from anywhere)
     if scope == "project":
-        scripts_path_for_hooks = ".claude/superclaude/scripts"
+        scripts_path_for_hooks = "$CLAUDE_PROJECT_DIR/.claude/superclaude/scripts"
     else:
         scripts_path_for_hooks = str(scripts_target.resolve())
 
@@ -265,8 +268,18 @@ def install_hooks_and_scripts(
             raw_content = hooks_json_file.read_text(encoding="utf-8")
             # Use forward slashes for JSON compatibility (works on all platforms)
             scripts_path_json_safe = scripts_path_for_hooks.replace("\\", "/")
-            hooks_content_transformed = raw_content.replace(
-                "{{SCRIPTS_PATH}}", scripts_path_json_safe
+            # Python binary: bake absolute path to the Python running the installer.
+            # Avoids Windows `python3` absence (legacy installer), Store Python edge cases,
+            # and cross-shell $PATH differences. Matches pipx/uv/pre-commit pattern.
+            # Forward slashes for JSON compatibility; escape inner quotes if path has spaces
+            # (e.g., "C:/Program Files/Python/python.exe" → \"C:/Program Files/...\" for JSON).
+            python_bin_json_safe = sys.executable.replace("\\", "/")
+            if " " in python_bin_json_safe:
+                python_bin_json_safe = f'\\"{python_bin_json_safe}\\"'
+            hooks_content_transformed = (
+                raw_content
+                .replace("{{SCRIPTS_PATH}}", scripts_path_json_safe)
+                .replace("{{PYTHON_BIN}}", python_bin_json_safe)
             )
         except OSError as e:
             failed += 1
