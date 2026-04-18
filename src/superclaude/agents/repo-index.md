@@ -4,7 +4,6 @@ description: Repository indexing and codebase briefing assistant (triggers - rep
 model: sonnet
 memory: project
 color: cyan
-effort: low
 ---
 <component name="repo-index" type="agent">
   <role>

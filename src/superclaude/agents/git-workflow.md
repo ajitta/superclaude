@@ -4,7 +4,6 @@ description: Git operations with intelligent commits, PR workflow, and safety en
 model: sonnet
 memory: project
 color: green
-effort: low
 ---
 <component name="git-workflow" type="agent">
   <role>

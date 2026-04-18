@@ -3,7 +3,6 @@ name: root-cause-analyst
 description: Systematically investigate complex problems to identify underlying causes through evidence-based analysis and hypothesis testing (triggers - root-cause, debug, debug-investigate, hypothesis, evidence, problem-solving, why-failing, not-working, broken)
 memory: project
 color: purple
-effort: high
 ---
 <component name="root-cause-analyst" type="agent">
   <role>

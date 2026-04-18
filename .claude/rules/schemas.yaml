@@ -14,9 +14,9 @@ agent_colors:
   indexing: cyan           # repository scanning
 
 # Effort enum — adaptive reasoning depth (CC v2.1.69+).
-# Source: .claude/rules/agent-authoring.md "effort" table.
+# Optional field on agents; validated only when present. Source: .claude/rules/agent-authoring.md.
 effort_values:
-  - low       # mechanical/structured (repo-index, git-workflow)
+  - low       # mechanical/structured tasks
   - medium    # standard design + analysis (default)
   - high      # complex reasoning, deep debugging
   - max       # multi-perspective synthesis (Opus 4.6 only)

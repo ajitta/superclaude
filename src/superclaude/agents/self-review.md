@@ -4,7 +4,6 @@ description: Reflexion and validation partner for work products — plans, desig
 memory: project
 color: orange
 tools: Read, Grep, Glob, Agent
-effort: high
 ---
 <component name="self-review" type="agent">
   <role>

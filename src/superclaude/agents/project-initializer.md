@@ -4,7 +4,6 @@ description: Project environment setup with interactive task selection for first
 model: sonnet
 memory: project
 color: blue
-effort: low
 ---
 <component name="project-initializer" type="agent">
   <role>

@@ -4,7 +4,6 @@ description: Web research specialist for authoritative external knowledge with c
 memory: project
 color: purple
 disallowedTools: NotebookEdit
-effort: max
 ---
 <component name="deep-researcher" type="agent">
   <role>

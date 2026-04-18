@@ -19,7 +19,7 @@ model: opus|sonnet|haiku                   # optional | omit to inherit parent (
 permissionMode: default|acceptEdits|plan|auto|dontAsk|bypassPermissions  # optional
 tools: Read, Grep, Glob, Agent             # optional | allow-list (mutually exclusive with disallowedTools)
 disallowedTools: Edit, Write, NotebookEdit # optional | deny-list
-effort: low|medium|high|max                # optional | reasoning depth (v2.1.69+)
+effort: low|medium|high|max                # optional | omit by default; inherit from parent (v2.1.69+)
 maxTurns: 10-30                            # optional | positive integer turn limit
 skills: [confidence-check]                 # optional | preload skills into agent session
 mcpServers: [serena]                       # optional | scope MCP servers to this subagent
@@ -40,18 +40,9 @@ mcpServers: [serena]                       # optional | scope MCP servers to thi
 | General | `disallowedTools` | `NotebookEdit` | Can edit code but not notebooks |
 | Full access | *(omit both)* | — | Implementation agents |
 
-**`effort`** (v2.1.69+) — must be string (not number 1-5). **Prefer omitting** unless the domain forces a deviation from parent session default:
+**`effort`** (v2.1.69+) — **optional, omit by default.** Inherit from parent session unless you have measured evidence that a specific value materially changes output quality for this agent's domain. Must be a string (not number 1-5). Valid values: `low`, `medium`, `high`, `xhigh` (Opus 4.7 only, CC 2.1.111+), `max` (Opus 4.6/4.7 only).
 
-| Value | Set explicitly when | Examples |
-|-------|---------------------|----------|
-| *(omit)* | **Preferred default** — inherit from parent session; agent has no domain-forced depth requirement | python-expert, quality-engineer, refactoring-expert |
-| `low` | Task is clearly mechanical/structured; higher effort is wasted | repo-index, git-workflow, project-initializer |
-| `medium` | Rarely explicit (already the default) — only to cap a parent session that sets higher | — |
-| `high` | Domain unambiguously requires deep reasoning regardless of parent (data integrity, threat modeling, debugging) | system-architect, security-engineer, root-cause-analyst |
-| `xhigh` | Between high and max (**Opus 4.7 only**, CC 2.1.111+; other models fall back to high). Add only with concrete usage evidence | — |
-| `max` | Multi-perspective synthesis is essential (**Opus 4.6/4.7 only**) | deep-researcher, business-panel-experts |
-
-Decision rule: if lowering `effort` causes no measurable quality drop, lower it. If the need for the field is doubtful, remove it and inherit.
+Decision rule: start with no `effort` field. Add one only when omission demonstrably harms the agent's output on representative tasks.
 
 Precedence: `CLAUDE_CODE_EFFORT_LEVEL` env > frontmatter > session > model default.
 
@@ -168,7 +159,7 @@ Rationale: symbol overview vs full-file Read = significant token savings + struc
 1. Create `src/superclaude/agents/<name>.md`
 2. `name` matches filename
 3. Choose tool access pattern (`tools` vs `disallowedTools`, least privilege)
-4. Set `effort` + `maxTurns`
+4. Set `maxTurns` (omit `effort` unless measured evidence justifies it)
 5. Pick `color` by role group, `model` by cognitive complexity
 6. Consider `skills: [confidence-check]` for analytical agents
 7. Add `<memory_guide>` (required) and `<gotchas>` (recommended)

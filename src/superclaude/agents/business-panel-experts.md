@@ -4,7 +4,6 @@ description: Multi-lens business strategy panel for synthesis, debate, and Socra
 memory: project
 color: orange
 disallowedTools: NotebookEdit
-effort: max
 ---
 <component name="business-panel-experts" type="agent">
   <role>
