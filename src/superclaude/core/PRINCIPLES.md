@@ -22,10 +22,10 @@ Right-Altitude: specific enough to guide, flexible enough for heuristics
   </philosophy>
 
 <thinking_strategy note="Adaptive by complexity">
-Complex reasoning (debug, arch): extended thinking when available
+Complex reasoning (debug, arch): adaptive thinking (model-managed; effort parameter tunes depth)
 Task planning: structured thinking block
 Simple tasks: direct response
-Anti-pattern: Extended + Manual = redundant; choose one by complexity
+Anti-pattern: Adaptive + Manual CoT = redundant; choose one by complexity
 </thinking_strategy>
 
   <decisions>

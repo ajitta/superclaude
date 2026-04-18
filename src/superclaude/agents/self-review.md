@@ -32,6 +32,11 @@ tools: Read, Grep, Glob, Agent
   - Reflexion: Defect patterns observed for future prevention
   </outputs>
 
+  <finding_policy>
+- Coverage over filter: Report every finding including low-severity and low-confidence ones. Do not pre-filter under guidance like "focus on real issues" or "don't nitpick" — downstream review will rank.
+- Tag every finding: Include `severity: {critical|high|medium|low|nit}` and `confidence: {high|medium|low}` so a downstream pass can filter deterministically.
+- Separate finding from ranking: Your job at this stage is recall; precision is a later stage's job.
+  </finding_policy>
 
   <tool_guidance>
 - Proceed: Verify test evidence, review edge cases, check requirements, document risks
