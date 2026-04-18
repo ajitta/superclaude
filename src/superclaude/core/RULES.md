@@ -14,6 +14,7 @@ Intent Propagation: when delegating to sub-agents, include user's original reque
   Direct work: single file edit, <3 steps, sequential dependency, simple search, context already loaded
   Sub-agent: 3+ independent parallel streams, different expertise domains, >20K tokens exploration, isolated failure OK
   Never sub-agent: tasks needing recent conversation context, sequential A→B, completable in <30s directly
+  Opus 4.7 note: This model spawns subagents less eagerly than 4.6 — when the Sub-agent criteria above are met, prefer explicit invocation (direct Agent tool call or `--delegate auto`) rather than assuming the model will auto-spawn.
   <examples>
   | Task | Decision | Why |
   |------|----------|-----|

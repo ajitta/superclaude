@@ -19,7 +19,7 @@ model: opus|sonnet|haiku                   # optional | omit to inherit parent (
 permissionMode: default|acceptEdits|plan|auto|dontAsk|bypassPermissions  # optional
 tools: Read, Grep, Glob, Agent             # optional | allow-list (mutually exclusive with disallowedTools)
 disallowedTools: Edit, Write, NotebookEdit # optional | deny-list
-effort: low|medium|high|max                # optional | omit by default; inherit from parent (v2.1.69+)
+effort: low|medium|high|xhigh|max          # optional | omit by default; inherit from parent (v2.1.69+); xhigh requires CC 2.1.111+
 maxTurns: 10-30                            # optional | positive integer turn limit
 skills: [confidence-check]                 # optional | preload skills into agent session
 mcpServers: [serena]                       # optional | scope MCP servers to this subagent
@@ -45,6 +45,13 @@ mcpServers: [serena]                       # optional | scope MCP servers to thi
 Decision rule: start with no `effort` field. Add one only when omission demonstrably harms the agent's output on representative tasks.
 
 Precedence: `CLAUDE_CODE_EFFORT_LEVEL` env > frontmatter > session > model default.
+
+**When `xhigh` is worth setting (Opus 4.7+):** Anthropic's prompting guidance recommends `xhigh` as the baseline for coding and agentic work — at `low`/`medium`, Opus 4.7 tends to under-think edge cases. Two safe paths:
+
+1. **Session-level (preferred):** set `CLAUDE_CODE_EFFORT_LEVEL=xhigh` or choose `xhigh` at session start — applies uniformly to all agents and honors the user's cost-vs-quality choice.
+2. **Agent-level override:** add `effort: xhigh` to a specific agent's frontmatter **only** when you have measured a quality regression for that agent at the session default.
+
+Do not add `effort: xhigh` to an agent just because the domain "feels" coding-heavy — the session default covers that case. The framework's inherit-by-default policy (commit `8edd05d`) is intentional: it keeps cost control with the user, not the agent author.
 
 **`maxTurns`** — turn-limit safety net:
 

@@ -20,9 +20,9 @@ Method: manual review of `src/superclaude/core/RULES.md` <core_rules>
 Expected: each rule containing "all"/"every"/"always" has a scope qualifier
 
 ## V4 (D6) Subagent guidance reflects 4.7's lower-spawn default
-Search: `src/superclaude/core/RULES.md` <sub_agent_decision>
-Expected: note about explicit invocation for 3+ independent streams under Opus 4.7
-Known state: **deferred to Tier 2 (T2-b)** — current rules are written for 4.6 over-spawning. Track as open gap until eval data supports the fix.
+Command: `grep -n "Opus 4.7" src/superclaude/core/RULES.md`
+Expected: ≥1 match inside `<sub_agent_decision>` referencing explicit invocation for 3+ independent streams
+Known state: Doc-level note added in Tier 2 (2026-04-18). Behavioral-threshold rewrite (changing Sub-agent criteria numbers) remains deferred pending eval data on `--delegate auto` trigger rate under Opus 4.7.
 
 ## V5 (D7) Frontend agent has AI-slop guard
 Command: `grep -n "aesthetics\|frontend_aesthetics\|generic\|AI-slop" src/superclaude/agents/frontend-architect.md`
@@ -67,3 +67,23 @@ Expected: both present
 
 **Summary:** 8 ✅ pass · 1 ⏭ pending manual (V3) · 1 ⚠️ deferred (V4, T2-b). Tier 1 complete.
 **Regression:** `uv run -- python -m pytest tests/unit/` → 1684 passed, 0 failed.
+
+---
+
+## Run results 2026-04-18 (after Tier 2 implementation)
+
+| V# | Status | Evidence |
+|----|--------|----------|
+| V1 | ⚠️ 1 match (pre-existing, missed in Tier 1) | `src/superclaude/commands/insight.md:107` has `NEVER use Write tool for insights.jsonl` — line introduced 2026-04-11 (commit `b5c974f3`), predates Tier 1 run. Context is a technical tool-safety gotcha, not aggressive enforcement prompting. Scope-gate (R06) prevents inline fix within Tier 2; flagged as follow-up — user decision: (a) reword `NEVER` → `Do not` at insight.md:107, (b) refine V1 grep to exclude gotcha-style warnings, or (c) accept as documented exception |
+| V2 | ✅ pass | `grep -rnE "(If in doubt\|by default) use" src/superclaude/agents/` → 0 matches |
+| V3 | ⏭ manual review pending | unchanged — scheduled for next framework audit |
+| V4 | ✅ pass (doc-level) | `grep "Opus 4.7" src/superclaude/core/RULES.md` matches at line 17 inside `<sub_agent_decision>`; threshold rewrite still deferred pending eval |
+| V5 | ✅ pass | `grep -cE "aesthetics\|..." src/superclaude/agents/frontend-architect.md` → 3 |
+| V6 | ✅ pass | `grep -l "finding_policy" <3 review agents>` → 3 files match |
+| V7 | ✅ pass | `grep -rnE "extended thinking\|budget_tokens" src/superclaude/core/` → 0 matches |
+| V8 | ✅ (pre-existing) | RULES.md `<anti_over_engineering>` + R06 + R18 all present |
+| V9 | ✅ (pre-existing) | RULES.md R02, R17 present |
+| V10 | ✅ (pre-existing) | FLAGS.md `--concurrency` present at line 34 |
+
+**Summary:** 8 ✅ pass · 1 ⚠️ pre-existing V1 match surfaced (not caused by Tier 2 — missed in Tier 1 run) · 1 ⏭ pending manual (V3). Tier 2 content changes themselves complete; V1 follow-up awaiting user decision.
+**Regression:** `uv run -- python -m pytest tests/unit/ -q` → **1684 passed, 0 failed** (identical to Tier 1 baseline).
