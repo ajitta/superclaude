@@ -46,8 +46,8 @@ def main():
 @click.option(
     "--scope",
     default="user",
-    type=click.Choice(["user", "project"]),
-    help="Installation scope: user (~/.claude/) or project (./.claude/)",
+    type=click.Choice(["user", "project", "local"]),
+    help="Installation scope: user (~/.claude/), project (./.claude/ team-shared), or local (./.claude/ personal, gitignored)",
 )
 def install(force: bool, list_only: bool, list_all: bool, scope: str):
     """
@@ -61,13 +61,15 @@ def install(force: bool, list_only: bool, list_all: bool, scope: str):
     - Framework files to superclaude/ (core, mcp)
 
     Scopes:
-    - user (default): Install to ~/.claude/
-    - project: Install to ./.claude/ (current directory)
+    - user (default): Install to ~/.claude/ (global, personal)
+    - project: Install to ./.claude/ (team-shared, committed to repo)
+    - local: Install to ./.claude/ (personal in team repo; auto-gitignored, hooks to settings.local.json, CLAUDE.local.md at project root)
 
     Examples:
         superclaude install
         superclaude install --force
         superclaude install --scope project
+        superclaude install --scope local
         superclaude install --list
     """
     from .install_commands import (
@@ -121,8 +123,8 @@ def install(force: bool, list_only: bool, list_all: bool, scope: str):
 @click.option(
     "--scope",
     default="user",
-    type=click.Choice(["user", "project"]),
-    help="Uninstall scope: user (~/.claude/) or project (./.claude/)",
+    type=click.Choice(["user", "project", "local"]),
+    help="Uninstall scope: user (~/.claude/), project (./.claude/), or local (./.claude/ personal)",
 )
 @click.option(
     "--dry-run",
@@ -155,12 +157,14 @@ def uninstall(scope: str, dry_run: bool, yes: bool, keep_settings: bool):
 
     Scopes:
     - user (default): Uninstall from ~/.claude/
-    - project: Uninstall from ./.claude/ (current directory)
+    - project: Uninstall from ./.claude/ (team-shared)
+    - local: Uninstall from ./.claude/ + remove CLAUDE.local.md + clean .gitignore block
 
     Examples:
         superclaude uninstall --dry-run        # Preview what will be removed
         superclaude uninstall --yes            # Skip confirmation
         superclaude uninstall --scope project  # Uninstall from current project
+        superclaude uninstall --scope local    # Uninstall personal install (cleans .gitignore)
         superclaude uninstall --keep-settings  # Keep settings.json hooks
     """
     from .install_commands import get_base_path, uninstall_all
@@ -262,7 +266,7 @@ def mcp(servers, list_only, show_status, scope, dry_run):
 @click.option(
     "--scope",
     default="user",
-    type=click.Choice(["user", "project"]),
+    type=click.Choice(["user", "project", "local"]),
     help="Installation scope: user (~/.claude/) or project (./.claude/)",
 )
 def update(scope: str):
@@ -300,7 +304,7 @@ def update(scope: str):
 @click.option(
     "--scope",
     default="user",
-    type=click.Choice(["user", "project"]),
+    type=click.Choice(["user", "project", "local"]),
     help="Installation scope: user (~/.claude/) or project (./.claude/)",
 )
 @click.option(
@@ -404,7 +408,7 @@ def doctor(verbose: bool):
 @click.option(
     "--scope",
     default="user",
-    type=click.Choice(["user", "project"]),
+    type=click.Choice(["user", "project", "local"]),
     help="Scope to check: user (~/.claude/) or project (./.claude/)",
 )
 def agents(list_only: bool, agent_name: str, tokens: bool, scope: str):
@@ -531,7 +535,7 @@ def agents(list_only: bool, agent_name: str, tokens: bool, scope: str):
 @click.option(
     "--scope",
     default="user",
-    type=click.Choice(["user", "project"]),
+    type=click.Choice(["user", "project", "local"]),
     help="Scope to check: user (~/.claude/) or project (./.claude/)",
 )
 def skills(list_only: bool, skill_name: str, tokens: bool, scope: str):
@@ -648,7 +652,7 @@ def skills(list_only: bool, skill_name: str, tokens: bool, scope: str):
 @click.option(
     "--scope",
     default="user",
-    type=click.Choice(["user", "project"]),
+    type=click.Choice(["user", "project", "local"]),
     help="Installation scope: user (~/.claude/) or project (./.claude/)",
 )
 @click.option("--verbose", is_flag=True, help="Show per-file details")
@@ -724,7 +728,7 @@ def verify_drift_cmd(scope: str, verbose: bool):
 @click.option(
     "--scope",
     default="user",
-    type=click.Choice(["user", "project"]),
+    type=click.Choice(["user", "project", "local"]),
     help="Installation scope: user (~/.claude/) or project (./.claude/)",
 )
 @click.option("--verbose", is_flag=True, help="Show detailed results")

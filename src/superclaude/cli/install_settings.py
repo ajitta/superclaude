@@ -143,10 +143,12 @@ def merge_hooks_to_settings(
 
     Scope behavior:
         - user: Merges to ~/.claude/settings.json (absolute paths)
-        - project: Merges to ./.claude/settings.json (relative paths)
+        - project: Merges to ./.claude/settings.json (team-shared)
+        - local: Merges to ./.claude/settings.local.json (CC auto-gitignores)
         - target: Merges to {target}/.claude/settings.json (absolute paths)
     """
-    settings_file = base_path / "settings.json"
+    settings_filename = "settings.local.json" if scope == "local" else "settings.json"
+    settings_file = base_path / settings_filename
     new_hooks = hooks_config.get("hooks", {})
 
     if not new_hooks:
@@ -194,25 +196,28 @@ def merge_hooks_to_settings(
         return True, f"Hooks merged to {settings_file}"
 
 
-def uninstall_hooks_from_settings(base_path: Path) -> Tuple[bool, str]:
+def uninstall_hooks_from_settings(base_path: Path, scope: str = "user") -> Tuple[bool, str]:
     """
-    Remove SuperClaude hooks from settings.json, preserving user hooks.
+    Remove SuperClaude hooks from settings.json (or settings.local.json for local scope),
+    preserving user hooks.
 
     Args:
         base_path: Installation base path (.claude directory)
+        scope: Installation scope
 
     Returns:
         Tuple of (success, message)
     """
-    settings_file = base_path / "settings.json"
+    settings_filename = "settings.local.json" if scope == "local" else "settings.json"
+    settings_file = base_path / settings_filename
 
     if not settings_file.exists():
-        return True, "No settings.json found (nothing to clean)"
+        return True, f"No {settings_filename} found (nothing to clean)"
 
     settings = _load_settings(settings_file)
 
     if "hooks" not in settings or not settings["hooks"]:
-        return True, "No hooks in settings.json"
+        return True, f"No hooks in {settings_filename}"
 
     existing_hooks = settings["hooks"]
     cleaned_any = False
@@ -235,6 +240,14 @@ def uninstall_hooks_from_settings(base_path: Path) -> Tuple[bool, str]:
     if not existing_hooks:
         del settings["hooks"]
 
+    # For local scope: if the settings file is now empty (only SC content), delete it
+    if scope == "local" and not settings:
+        try:
+            settings_file.unlink()
+            return True, f"SuperClaude hooks removed and empty {settings_filename} deleted"
+        except OSError as e:
+            return False, f"Failed to delete empty {settings_file}: {e}"
+
     # Save updated settings
     success, save_msg = _save_settings(settings_file, settings)
 
@@ -244,15 +257,31 @@ def uninstall_hooks_from_settings(base_path: Path) -> Tuple[bool, str]:
     if cleaned_any:
         return True, f"SuperClaude hooks removed from {settings_file}"
     else:
-        return True, "No SuperClaude hooks found in settings.json"
+        return True, f"No SuperClaude hooks found in {settings_filename}"
 
 
-def check_claude_md_import(base_path: Path = None) -> Tuple[bool, str]:
+def _claude_md_target(base_path: Path, scope: str) -> Tuple[Path, str]:
     """
-    Check if ~/.claude/CLAUDE.md has the CLAUDE_SC.md import.
+    Resolve the CLAUDE.md target file and the import line for a scope.
+
+    - user/project: base_path/CLAUDE.md with `@superclaude/CLAUDE_SC.md` (import
+      resolves relative to CLAUDE.md's directory)
+    - local: project_root/CLAUDE.local.md with `@.claude/superclaude/CLAUDE_SC.md`
+      (CLAUDE.local.md lives at project root per CC docs; must walk into .claude/)
+    """
+    if scope == "local":
+        project_root = base_path.parent
+        return project_root / "CLAUDE.local.md", "@.claude/superclaude/CLAUDE_SC.md"
+    return base_path / "CLAUDE.md", CLAUDE_SC_IMPORT
+
+
+def check_claude_md_import(base_path: Path = None, scope: str = "user") -> Tuple[bool, str]:
+    """
+    Check if CLAUDE.md (or CLAUDE.local.md for local scope) has the CLAUDE_SC.md import.
 
     Args:
         base_path: Base installation path
+        scope: Installation scope
 
     Returns:
         Tuple of (has_import: bool, status_message: str)
@@ -260,33 +289,38 @@ def check_claude_md_import(base_path: Path = None) -> Tuple[bool, str]:
     if base_path is None:
         base_path = Path.home() / ".claude"
 
-    claude_md = base_path / "CLAUDE.md"
+    claude_md, import_line = _claude_md_target(base_path, scope)
+    target_label = claude_md.name
 
     if not claude_md.exists():
-        return False, "CLAUDE.md not found"
+        return False, f"{target_label} not found"
 
     content = claude_md.read_text(encoding="utf-8")
 
-    # Check for import pattern (with or without leading @)
+    # Check for import pattern (with or without leading @, cross-platform paths)
+    escaped = re.escape(import_line)
     patterns = [
-        r"@superclaude/CLAUDE_SC\.md",
-        r"@superclaude\\CLAUDE_SC\.md",  # Windows path
+        escaped,
+        escaped.replace("/", r"\\"),  # Windows backslash variant
     ]
 
     for pattern in patterns:
         if re.search(pattern, content):
-            return True, "CLAUDE.md already imports CLAUDE_SC.md"
+            return True, f"{target_label} already imports CLAUDE_SC.md"
 
-    return False, "CLAUDE.md does not import CLAUDE_SC.md"
+    return False, f"{target_label} does not import CLAUDE_SC.md"
 
 
-def update_claude_md_import(base_path: Path = None, force: bool = False) -> Tuple[bool, str]:
+def update_claude_md_import(
+    base_path: Path = None, force: bool = False, scope: str = "user"
+) -> Tuple[bool, str]:
     """
-    Add CLAUDE_SC.md import to ~/.claude/CLAUDE.md if not present.
+    Add CLAUDE_SC.md import to CLAUDE.md (or CLAUDE.local.md for local scope) if not present.
 
     Args:
         base_path: Base installation path
         force: Force update even if import exists
+        scope: Installation scope
 
     Returns:
         Tuple of (success: bool, message: str)
@@ -294,79 +328,95 @@ def update_claude_md_import(base_path: Path = None, force: bool = False) -> Tupl
     if base_path is None:
         base_path = Path.home() / ".claude"
 
-    claude_md = base_path / "CLAUDE.md"
+    claude_md, import_line = _claude_md_target(base_path, scope)
+    target_label = claude_md.name
 
     # Check if already has import
-    has_import, status = check_claude_md_import(base_path)
+    has_import, status = check_claude_md_import(base_path, scope)
 
     if has_import and not force:
         return True, status
 
-    # Create or update CLAUDE.md
+    # Create or update CLAUDE.md / CLAUDE.local.md
     if claude_md.exists():
         content = claude_md.read_text(encoding="utf-8")
 
         # If force, replace any existing superclaude imports
         if force:
-            # Remove old superclaude imports
+            content = re.sub(r"@\.claude/superclaude/[^\n]+\n?", "", content)
             content = re.sub(r"@superclaude/[^\n]+\n?", "", content)
             content = re.sub(r"@superclaude\\[^\n]+\n?", "", content)
 
-        # Add import if not present
-        if CLAUDE_SC_IMPORT not in content:
-            # Add at the end with proper spacing
+        if import_line not in content:
             if not content.endswith("\n"):
                 content += "\n"
-            content += f"\n# SuperClaude Framework\n{CLAUDE_SC_IMPORT}\n"
+            content += f"\n# SuperClaude Framework\n{import_line}\n"
 
         claude_md.write_text(content, encoding="utf-8")
-        return True, "CLAUDE.md updated with CLAUDE_SC.md import"
+        return True, f"{target_label} updated with CLAUDE_SC.md import"
     else:
-        # Create new CLAUDE.md
-        content = f"""# Claude Code Configuration
+        header = (
+            "# Claude Code Configuration (personal, gitignored)"
+            if scope == "local"
+            else "# Claude Code Configuration"
+        )
+        content = f"""{header}
 
 # SuperClaude Framework
-{CLAUDE_SC_IMPORT}
+{import_line}
 """
-        base_path.mkdir(parents=True, exist_ok=True)
+        claude_md.parent.mkdir(parents=True, exist_ok=True)
         claude_md.write_text(content, encoding="utf-8")
-        return True, "CLAUDE.md created with CLAUDE_SC.md import"
+        return True, f"{target_label} created with CLAUDE_SC.md import"
 
 
-def remove_claude_md_import(base_path: Path) -> Tuple[bool, str]:
+def remove_claude_md_import(base_path: Path, scope: str = "user") -> Tuple[bool, str]:
     """
-    Remove @superclaude/CLAUDE_SC.md import from CLAUDE.md.
+    Remove @superclaude/CLAUDE_SC.md import from CLAUDE.md (or CLAUDE.local.md for local scope).
 
     Args:
         base_path: Installation base path (.claude directory)
+        scope: Installation scope
 
     Returns:
         Tuple of (success, message)
     """
-    claude_md = base_path / "CLAUDE.md"
+    claude_md, _ = _claude_md_target(base_path, scope)
+    target_label = claude_md.name
 
     if not claude_md.exists():
-        return True, "No CLAUDE.md found (nothing to clean)"
+        return True, f"No {target_label} found (nothing to clean)"
 
     try:
         content = claude_md.read_text(encoding="utf-8")
         original_content = content
 
-        # Remove SuperClaude import lines and related comments
-        # Pattern: # SuperClaude Framework\n@superclaude/CLAUDE_SC.md\n
+        # Remove SuperClaude import lines and related comments (all variants)
+        content = re.sub(r"# SuperClaude Framework\n@\.claude/superclaude/[^\n]+\n?", "", content)
         content = re.sub(r"# SuperClaude Framework\n@superclaude/[^\n]+\n?", "", content)
+        content = re.sub(r"@\.claude/superclaude/[^\n]+\n?", "", content)
         content = re.sub(r"@superclaude/[^\n]+\n?", "", content)
         content = re.sub(r"@superclaude\\[^\n]+\n?", "", content)
 
         # Clean up multiple blank lines
         content = re.sub(r"\n{3,}", "\n\n", content)
-        content = content.strip() + "\n"
+        stripped = content.strip()
 
-        if content != original_content:
-            claude_md.write_text(content, encoding="utf-8")
-            return True, "SuperClaude import removed from CLAUDE.md"
-        else:
-            return True, "No SuperClaude import found in CLAUDE.md"
+        if content == original_content:
+            return True, f"No SuperClaude import found in {target_label}"
+
+        # For local scope: if CLAUDE.local.md has no user content (empty or only
+        # the SC-created header), remove it entirely.
+        SC_HEADERS = {
+            "# Claude Code Configuration (personal, gitignored)",
+            "# Claude Code Configuration",
+        }
+        if scope == "local" and (not stripped or stripped in SC_HEADERS):
+            claude_md.unlink()
+            return True, f"{target_label} removed (no user content after SC cleanup)"
+
+        claude_md.write_text(stripped + "\n", encoding="utf-8")
+        return True, f"SuperClaude import removed from {target_label}"
 
     except Exception as e:
-        return False, f"Failed to update CLAUDE.md: {e}"
+        return False, f"Failed to update {target_label}: {e}"

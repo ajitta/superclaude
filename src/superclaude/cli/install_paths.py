@@ -24,12 +24,13 @@ def get_base_path(scope: str = "user") -> Path:
     Get base installation path based on scope.
 
     Args:
-        scope: "user" for ~/.claude/ or "project" for ./.claude/
+        scope: "user" for ~/.claude/, "project" for ./.claude/ (team-shared),
+               or "local" for ./.claude/ (personal, gitignored)
 
     Returns:
         Path to base installation directory
     """
-    if scope == "project":
+    if scope in ("project", "local"):
         return Path.cwd() / ".claude"
     else:  # user (default)
         return Path.home() / ".claude"

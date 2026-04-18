@@ -17,6 +17,7 @@ from .install_paths import (
     _get_source_dir,
     _get_target_dir,
 )
+from .install_gitignore import add_local_gitignore
 from .install_settings import (
     CLAUDE_SC_IMPORT,
     check_claude_md_import,
@@ -30,7 +31,7 @@ MCP_DOCS_SKIP: set = set()
 
 def _resolve_template_paths(base_path: Path, scope: str = "user") -> dict:
     """Compute resolved template variable values for a given scope."""
-    if scope == "project":
+    if scope in ("project", "local"):
         scripts = ".claude/superclaude/scripts"
         skills = ".claude/skills"
     else:
@@ -227,11 +228,11 @@ def install_hooks_and_scripts(
     messages = []
 
     # Determine scripts path based on scope
-    # - project scope: $CLAUDE_PROJECT_DIR-based path (portable across machines, CWD-independent)
+    # - project/local scope: $CLAUDE_PROJECT_DIR-based path (portable, CWD-independent)
     #   Docs: https://code.claude.com/docs/en/hooks — hook CWD is NOT guaranteed project root;
     #   $CLAUDE_PROJECT_DIR is the official env var for project-root-relative paths.
     # - user/target scope: absolute path (works from anywhere)
-    if scope == "project":
+    if scope in ("project", "local"):
         scripts_path_for_hooks = "$CLAUDE_PROJECT_DIR/.claude/superclaude/scripts"
     else:
         scripts_path_for_hooks = str(scripts_target.resolve())
@@ -395,19 +396,26 @@ def install_all(
     success, msg = install_claude_sc_md(base_path, force)
     messages.append(f"{'✅' if success else '❌'} {msg}")
 
-    # Check and update CLAUDE.md import
+    # Check and update CLAUDE.md import (CLAUDE.local.md for local scope)
     messages.append("")
-    has_import, check_msg = check_claude_md_import(base_path)
+    has_import, check_msg = check_claude_md_import(base_path, scope=scope)
     if has_import:
         messages.append(f"✅ {check_msg}")
     else:
-        # Try to add the import
-        update_success, update_msg = update_claude_md_import(base_path, force=False)
+        update_success, update_msg = update_claude_md_import(
+            base_path, force=False, scope=scope
+        )
         if update_success:
             messages.append(f"✅ {update_msg}")
         else:
             messages.append(f"⚠️  {update_msg}")
             messages.append(f"   Add manually: {CLAUDE_SC_IMPORT}")
+
+    # For local scope: add .gitignore block (CC doesn't auto-ignore agents/skills/etc.)
+    if scope == "local":
+        project_root = base_path.parent
+        gi_ok, gi_msg = add_local_gitignore(project_root)
+        messages.append(f"{'✅' if gi_ok else '⚠️ '} {gi_msg}")
 
     # Summary
     messages.append("")

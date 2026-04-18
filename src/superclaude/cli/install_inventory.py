@@ -207,7 +207,13 @@ def uninstall_all(
         else:
             try:
                 shutil.rmtree(commands_sc_dir)
-                messages.append(f"✅ Removed: {commands_sc_dir}/")
+                # Remove empty parent commands/ directory
+                commands_parent = commands_sc_dir.parent
+                if commands_parent.exists() and not any(commands_parent.iterdir()):
+                    commands_parent.rmdir()
+                    messages.append(f"✅ Removed: {commands_sc_dir}/ (and empty {commands_parent.name}/)")
+                else:
+                    messages.append(f"✅ Removed: {commands_sc_dir}/")
                 removed += 1
             except Exception as e:
                 messages.append(f"❌ Failed to remove {commands_sc_dir}/: {e}")
@@ -326,13 +332,14 @@ def uninstall_all(
         messages.append(f"⏭️  Not found: {hooks_json}")
         skipped += 1
 
-    # 6. Remove SuperClaude hooks from settings.json (preserve user hooks)
+    # 6. Remove SuperClaude hooks from settings file (preserve user hooks)
+    settings_filename = "settings.local.json" if scope == "local" else "settings.json"
     if keep_settings:
-        messages.append("⏭️  Skipped: settings.json hooks (--keep-settings)")
+        messages.append(f"⏭️  Skipped: {settings_filename} hooks (--keep-settings)")
         skipped += 1
     else:
         if dry_run:
-            settings_file = base_path / "settings.json"
+            settings_file = base_path / settings_filename
             if settings_file.exists():
                 settings = _load_settings(settings_file)
                 if "hooks" in settings:
@@ -341,19 +348,19 @@ def uninstall_all(
                         for h in hook_array if _is_superclaude_hook(h)
                     )
                     if sc_hook_count > 0:
-                        messages.append(f"[DRY-RUN] Would remove {sc_hook_count} SuperClaude hooks from settings.json")
+                        messages.append(f"[DRY-RUN] Would remove {sc_hook_count} SuperClaude hooks from {settings_filename}")
                         removed += 1
                     else:
-                        messages.append("⏭️  No SuperClaude hooks in settings.json")
+                        messages.append(f"⏭️  No SuperClaude hooks in {settings_filename}")
                         skipped += 1
                 else:
-                    messages.append("⏭️  No hooks section in settings.json")
+                    messages.append(f"⏭️  No hooks section in {settings_filename}")
                     skipped += 1
             else:
-                messages.append("⏭️  No settings.json found")
+                messages.append(f"⏭️  No {settings_filename} found")
                 skipped += 1
         else:
-            success, msg = uninstall_hooks_from_settings(base_path)
+            success, msg = uninstall_hooks_from_settings(base_path, scope=scope)
             if success:
                 messages.append(f"✅ {msg}")
                 removed += 1
@@ -361,28 +368,62 @@ def uninstall_all(
                 messages.append(f"❌ {msg}")
                 failed += 1
 
-    # 7. Remove @superclaude import from CLAUDE.md
+    # 7. Remove @superclaude import from CLAUDE.md (or CLAUDE.local.md for local scope)
+    if scope == "local":
+        claude_md_target = base_path.parent / "CLAUDE.local.md"
+    else:
+        claude_md_target = base_path / "CLAUDE.md"
+    claude_md_label = claude_md_target.name
+
     if dry_run:
-        claude_md = base_path / "CLAUDE.md"
-        if claude_md.exists():
-            content = claude_md.read_text(encoding="utf-8")
-            if "@superclaude" in content:
-                messages.append("[DRY-RUN] Would remove SuperClaude import from CLAUDE.md")
+        if claude_md_target.exists():
+            content = claude_md_target.read_text(encoding="utf-8")
+            if "@superclaude" in content or "@.claude/superclaude" in content:
+                messages.append(f"[DRY-RUN] Would remove SuperClaude import from {claude_md_label}")
                 removed += 1
             else:
-                messages.append("⏭️  No SuperClaude import in CLAUDE.md")
+                messages.append(f"⏭️  No SuperClaude import in {claude_md_label}")
                 skipped += 1
         else:
-            messages.append("⏭️  No CLAUDE.md found")
+            messages.append(f"⏭️  No {claude_md_label} found")
             skipped += 1
     else:
-        success, msg = remove_claude_md_import(base_path)
+        success, msg = remove_claude_md_import(base_path, scope=scope)
         if success:
             messages.append(f"✅ {msg}")
             removed += 1
         else:
             messages.append(f"❌ {msg}")
             failed += 1
+
+    # 8. Remove .gitignore block for local scope
+    if scope == "local":
+        project_root = base_path.parent
+        if dry_run:
+            gitignore = project_root / ".gitignore"
+            if gitignore.exists() and "superclaude (local scope)" in gitignore.read_text(encoding="utf-8"):
+                messages.append(f"[DRY-RUN] Would remove SC local block from {gitignore}")
+                removed += 1
+            else:
+                messages.append(f"⏭️  No SC local block in {project_root / '.gitignore'}")
+                skipped += 1
+        else:
+            from .install_gitignore import remove_local_gitignore
+            gi_ok, gi_msg = remove_local_gitignore(project_root)
+            messages.append(f"{'✅' if gi_ok else '❌'} {gi_msg}")
+            if gi_ok:
+                removed += 1
+            else:
+                failed += 1
+
+    # 9. For project/local scope: rmdir empty .claude/ if nothing else remains
+    if not dry_run and scope in ("project", "local"):
+        if base_path.exists() and not any(base_path.iterdir()):
+            try:
+                base_path.rmdir()
+                messages.append(f"✅ Removed empty: {base_path}/")
+            except OSError:
+                pass
 
     # Summary
     messages.append("")
