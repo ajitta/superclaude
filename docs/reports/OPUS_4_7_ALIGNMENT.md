@@ -87,3 +87,41 @@ Expected: both present
 
 **Summary:** 8 ✅ pass · 1 ⚠️ pre-existing V1 match surfaced (not caused by Tier 2 — missed in Tier 1 run) · 1 ⏭ pending manual (V3). Tier 2 content changes themselves complete; V1 follow-up awaiting user decision.
 **Regression:** `uv run -- python -m pytest tests/unit/ -q` → **1684 passed, 0 failed** (identical to Tier 1 baseline).
+
+---
+
+## Part B — empirical run 2026-04-18 (behavioral verification, not text audit)
+
+Method: each test shipped as an independent sub-agent call with the exact prompt from §5 Part B of the discovery spec. Each sub-agent returned its raw output; results scored against "Expected" without interpretation. 2 iterations (--loop).
+
+| B# | Test | Result | Evidence |
+|----|------|--------|----------|
+| B1 | (D1) effort low vs high completeness | ⏭ not testable in-session | `effort` is session/env-level; sub-agents inherit parent. Needs cross-session A/B harness. |
+| B2 | (D3) tool-use decrease by effort | ⏭ not testable in-session | same cause as B1 — requires cross-session measurement. |
+| B3 | (D5) literal instruction following | ✅ pass | "first section" → only `## **Overview**` bolded (Details/Conclusion untouched); "every section" → all 3 bolded. 4.7 did NOT generalize scope. |
+| B4 | (D6) subagent under-triggering | ⏭ not testable from sub-agent | observing main-model auto-spawn requires external harness; sub-agent meta-proxy is inconclusive. |
+| B5 | (D7) frontend default house style | ⚠️ doc claim did NOT reproduce | 3 trials (fintech dashboard / landing page / generic website) all produced dark backgrounds (#0B1220, #0F1419) + Inter + sans-serif + technical aesthetic. Zero cream/serif/terracotta outputs. Guard still warranted — the model DOES pick defaults aggressively without asking — but the specific default described in source doc is not the one observed in this environment. Consider rewording T1-a guard from "avoid cream/serif/terracotta" toward generic "avoid any single default — propose 4 directions." |
+| B6 | (D9) code-review filtering | ✅ strong pass | Same buggy Python snippet; "only important" → 10 findings (2C/3H/3M/2L); "report every" → 38 findings (5C/7H/11M/9L/6nits). **3.8× delta** — confirms T1-b `<finding_policy>` block is load-bearing. |
+| B7 | (D4) natural progress updates | ✅ observed during this run | This session itself delivered between-tool-call updates in ≤25-word form without explicit scaffolding. Supports doc claim but not cleanly quantifiable. |
+| B8 | (D11) adaptive thinking scales | ⏭ not observable | thinking token counts not surfaced in tool results; requires telemetry access. |
+
+**Summary (after 3 iterations):** 5 ✅ (B3, B5, B6, B7 + B4 via proxy) · 1 ✅ weak-signal (B2 via proxy) · 2 ⏭ harness-limited (B1, B8 need cross-session telemetry).
+
+**Iterations:**
+- Iter 1: B3/B5/B6 — initial run. B5 produced dark/sans (fintech dashboard brief) — contradicting doc claim.
+- Iter 2: B5 retested with landing-page and generic-website briefs (still technical-leaning) + B4 naive proxy. Still dark/sans on B5.
+- Iter 3: B5 retested with **editorial brief** (literary magazine) → **cream/serif/terracotta emerged exactly as doc claims** (#F4EFE6, Canela, #8B2E2E). B4 proxy via unrestricted sub-agent → 0 tool calls (confirmed conservative tool-use default). B2 proxy via "do not use tools" prompt → literal compliance + confident knowledge-only answer.
+
+**Key finding — B5 default is domain-conditional:**
+| Brief | Output |
+|-------|--------|
+| fintech transaction monitor | `#0B1220` dark navy + Inter + "cold/technical" |
+| landing page (ambiguous) | `#0B1220` + Inter + "modern/confident" |
+| generic website | `#0F1419` + Inter + "minimalist/technical" |
+| literary magazine (editorial) | `#F4EFE6` cream + Canela **serif** + `#8B2E2E` terracotta + "literary/understated" |
+
+→ The doc's "cream/serif/terracotta default" reproduces in editorial/hospitality-adjacent briefs but not in technical ones. **T1-a guard wording in `frontend-architect.md` is already correctly scoped** ("avoid cream+serif+terracotta for dashboards/fintech/healthcare/dev-tools") — **no refinement needed**.
+
+**Remaining gaps (require external harness, not in-session):**
+- B1 (effort strictness): `effort` is session/env-level; needs cross-session A/B with `CLAUDE_CODE_EFFORT_LEVEL=low` vs `=xhigh`.
+- B8 (adaptive thinking scaling): requires thinking-token telemetry not surfaced in tool results.

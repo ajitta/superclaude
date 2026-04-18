@@ -56,7 +56,7 @@ revised: 2026-04-18
 |------|--------|----------------|---------|
 | `.claude/rules/agent-authoring.md` | Modify | `22`, insert after `45` | Fix effort enum example (missing `xhigh`) + add xhigh-guidance block |
 | `src/superclaude/core/RULES.md` | Modify | insert after `16` (inside `<sub_agent_decision>`, before `<examples>` on line 17) | One-line 4.7 under-spawn note |
-| `.claude/rules/checklists/opus-4-7-alignment.md` | Modify | V4 section + Run results table | Flip V4 from ⚠️ deferred to ✅ doc-only |
+| `docs/reports/OPUS_4_7_ALIGNMENT.md` | Modify | V4 section + Run results table | Flip V4 from ⚠️ deferred to ✅ doc-only |
 | `docs/specs/opus-4-7-alignment-discovery-ajitta-2026-04-18.md` | Modify | frontmatter `revised:` | Bump `revised:` only (status already `approved`) |
 
 ---
@@ -141,7 +141,7 @@ Verdict: ✅ doc-only note passes R18. A rule rewrite (changing thresholds) stil
 
 ### Task 3: Update Part A checklist V4 + add Tier 2 run results
 
-**Files:** Modify: `.claude/rules/checklists/opus-4-7-alignment.md` (V4 section; Run results table)
+**Files:** Modify: `docs/reports/OPUS_4_7_ALIGNMENT.md` (V4 section; Run results table)
 **Test:** None (checklist is a reference artifact; not installed to `~/.claude/`)
 
 **Sub-step 3a — Replace V4 section.** Current V4 reads:
@@ -189,7 +189,7 @@ Known state: Doc-level note added in Tier 2 (commit `<HASH>`). Behavioral-thresh
 **Checklist:**
 - [ ] Step 1: Replace V4 section per 3a
 - [ ] Step 2: Append Tier 2 run-results table per 3b
-- [ ] Step 3: Verify — `grep -n "Tier 2 implementation" .claude/rules/checklists/opus-4-7-alignment.md` returns 1 match
+- [ ] Step 3: Verify — `grep -n "Tier 2 implementation" docs/reports/OPUS_4_7_ALIGNMENT.md` returns 1 match
 - [ ] Step 4: The `<HASH>` placeholder in the V4 known-state note will be filled after Task 7 (commit); tolerate `<HASH>` in checklist until then
 
 ---
@@ -220,7 +220,7 @@ Known state: Doc-level note added in Tier 2 (commit `<HASH>`). Behavioral-thresh
 ### Task 6: Run Part A verification checklist (post-change)
 
 **Files:** none (verification)
-**Test:** walk through `.claude/rules/checklists/opus-4-7-alignment.md`
+**Test:** walk through `docs/reports/OPUS_4_7_ALIGNMENT.md`
 
 - [ ] Step 1: V1 — `grep -rnE "CRITICAL:|MUST use|You MUST|NEVER " src/superclaude/{agents,commands,modes,core}/` → expect 0 (unchanged from Tier 1)
 - [ ] Step 2: V2 — `grep -rnE "(If in doubt|by default) use" src/superclaude/agents/` → expect soft-language-only (unchanged)
@@ -239,7 +239,7 @@ Known state: Doc-level note added in Tier 2 (commit `<HASH>`). Behavioral-thresh
 - [ ] Step 1: `rtk git status` — expected change set: 3 modifications + 1 plan creation
   - modified: `.claude/rules/agent-authoring.md`
   - modified: `src/superclaude/core/RULES.md`
-  - modified: `.claude/rules/checklists/opus-4-7-alignment.md`
+  - modified: `docs/reports/OPUS_4_7_ALIGNMENT.md`
   - modified: `docs/specs/opus-4-7-alignment-discovery-ajitta-2026-04-18.md` (frontmatter)
   - new:      `docs/plans/opus-4-7-alignment-tier-2-ajitta-2026-04-18.md`
 - [ ] Step 2: Stage by specific file name (no `git add -A`)
@@ -271,7 +271,7 @@ Expected end-state evidence:
 | xhigh guidance block present | `grep -c "When \`xhigh\` is worth setting" .claude/rules/agent-authoring.md` | 1 |
 | Effort enum includes xhigh | `grep -n "low|medium|high|xhigh|max" .claude/rules/agent-authoring.md` | line 22 match |
 | 4.7 under-spawn note in RULES | `grep -n "Opus 4.7" src/superclaude/core/RULES.md` | ≥1 inside `<sub_agent_decision>` |
-| Checklist V4 flipped | `grep -n "Doc-level note added in Tier 2" .claude/rules/checklists/opus-4-7-alignment.md` | 1 |
+| Checklist V4 flipped | `grep -n "Doc-level note added in Tier 2" docs/reports/OPUS_4_7_ALIGNMENT.md` | 1 |
 | Unit tests pass | `uv run pytest tests/unit/ -q` | 1684 pass, 0 fail (Tier 1 baseline) |
 | Part A V1-V10 | walk checklist | 9 ✅ · 1 ⏭ (V3 manual) · 0 ⚠️ |
 

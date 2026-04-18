@@ -233,7 +233,7 @@ Assuming Tier 1 is approved:
 1. `/sc:plan` to break Tier 1 (T1-a, T1-b, T1-c) into concrete file edits with line-level changes
 2. Implement as `docs/`-branch (no code changes — pure content)
 3. Run Part A verification checklist after implementation
-4. Capture Part A results to `.claude/rules/checklists/opus-4-7-alignment.md` (new file) as a living audit artifact
+4. Capture Part A results to `docs/reports/OPUS_4_7_ALIGNMENT.md` (living audit artifact; renamed from `.claude/rules/checklists/opus-4-7-alignment.md` on 2026-04-18 to match `<doc_output_convention>`)
 5. Update `src/superclaude/agents/README.md` and `docs/reference/` with a pointer to the new checklist
 
 **Tier 2/3 decisions deferred until user provides answers to §6.**

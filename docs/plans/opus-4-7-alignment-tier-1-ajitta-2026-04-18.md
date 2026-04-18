@@ -22,7 +22,7 @@ revised: 2026-04-18
 | 3. quality-engineer `<finding_policy>` | ✅ done | V6 pass (file in match list) |
 | 4. self-review `<finding_policy>` | ✅ done | V6 pass (file in match list) |
 | 5. security-engineer `<finding_policy>` | ✅ done | V6 pass (file in match list) |
-| 6. Checklist artifact | ✅ done | `.claude/rules/checklists/opus-4-7-alignment.md` created; run results filled in |
+| 6. Checklist artifact | ✅ done | `docs/reports/OPUS_4_7_ALIGNMENT.md` created; run results filled in |
 | 7. Regression suite | ✅ pass | `uv run -- python -m pytest tests/unit/` → **1684 passed, 0 failed** (CLAUDE.md baseline "~1628" is stale — out of scope to fix here) |
 | 8. Part A verification | ✅ done | V1/V2/V5/V6/V7 pass · V3 pending manual review · V4 deferred to T2-b |
 | 9. Spec + plan status flip | ✅ done | spec `draft→approved`, plan `draft→implemented` |
@@ -35,7 +35,7 @@ revised: 2026-04-18
 - Q1 Tier 2 scope → deferred (this plan covers Tier 1 only)
 - Q2 xhigh on coding agents → N/A (Q1 deferred)
 - Q3 Part B ownership → manual user sessions + `/sc:insight` capture, not automated
-- Q4 Part A cadence → manual checklist in `.claude/rules/checklists/` (CI lift can come later)
+- Q4 Part A cadence → manual checklist at `docs/reports/OPUS_4_7_ALIGNMENT.md` (CI lift can come later)
 - Q5 Naming → "opus-4-7-alignment" (follows 2026-03-15 precedent; can rename in a future model-agnostic refactor)
 
 ---
@@ -49,7 +49,7 @@ revised: 2026-04-18
 | `src/superclaude/agents/quality-engineer.md` | Modify | insert after `69` | Add `<finding_policy>` block |
 | `src/superclaude/agents/self-review.md` | Modify | insert after `33` | Add `<finding_policy>` block |
 | `src/superclaude/agents/security-engineer.md` | Modify | insert after `34` | Add `<finding_policy>` block |
-| `.claude/rules/checklists/opus-4-7-alignment.md` | Create | — | Part A verification checklist (re-runnable) |
+| `docs/reports/OPUS_4_7_ALIGNMENT.md` | Create | — | Part A verification checklist (re-runnable) |
 | `docs/specs/opus-4-7-alignment-discovery-ajitta-2026-04-18.md` | Modify | frontmatter `status:` | Flip `draft` → `approved` after implementation |
 
 ---
@@ -141,10 +141,10 @@ Insert this block exactly:
 
 ### Task 6: Create Part A verification checklist artifact
 
-**Files:** Create: `.claude/rules/checklists/opus-4-7-alignment.md`
+**Files:** Create: `docs/reports/OPUS_4_7_ALIGNMENT.md`
 **Test:** None (pure documentation artifact; not installed to `~/.claude/`)
 
-- [ ] Step 1: Create parent dir — `mkdir -p .claude/rules/checklists/`
+- [ ] Step 1: Create parent dir — `mkdir -p docs/reports/`
 - [ ] Step 2: Write the checklist with exactly the Part A commands from the spec §5, plus a header identifying it as a living audit doc
 
 Content template:
@@ -202,7 +202,7 @@ Expected: both present
 ```
 
 - [ ] Step 3: Write the file with the above content
-- [ ] Step 4: Verify existence — `ls -la .claude/rules/checklists/opus-4-7-alignment.md`
+- [ ] Step 4: Verify existence — `ls -la docs/reports/OPUS_4_7_ALIGNMENT.md`
 
 ---
 
@@ -221,7 +221,7 @@ Expected: both present
 ### Task 8: Run Part A verification checklist
 
 **Files:** none (verification)
-**Test:** walk through `.claude/rules/checklists/opus-4-7-alignment.md`
+**Test:** walk through `docs/reports/OPUS_4_7_ALIGNMENT.md`
 
 - [ ] Step 1: Run V1 grep — expect 0 matches
 - [ ] Step 2: Run V2 grep — expect soft language only
@@ -264,7 +264,7 @@ Expected end-state evidence:
 | PRINCIPLES.md thinking updated | `grep -n "adaptive thinking" src/superclaude/core/PRINCIPLES.md` | line 25 match |
 | Aesthetics block present | `grep -c "aesthetics" src/superclaude/agents/frontend-architect.md` | ≥2 |
 | Finding policy in 3 review agents | `grep -l "finding_policy" src/superclaude/agents/{quality-engineer,self-review,security-engineer}.md` | 3 files |
-| Checklist artifact exists | `ls .claude/rules/checklists/opus-4-7-alignment.md` | file exists |
+| Checklist artifact exists | `ls docs/reports/OPUS_4_7_ALIGNMENT.md` | file exists |
 | Unit tests pass | `uv run pytest tests/unit/ -q` | baseline count unchanged |
 | Part A V1-V10 run | walk checklist | V4 = known deferred (T2-b); others pass |
 
