@@ -5,10 +5,12 @@ Installs and manages MCP servers using the latest Claude Code API.
 Based on the installer logic from commit d4a17fc but adapted for modern Claude Code.
 """
 
+import json
 import os
 import platform
 import shlex
 import subprocess
+from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
 import click
@@ -180,8 +182,60 @@ def check_prerequisites() -> Tuple[bool, List[str]]:
     return len(errors) == 0, errors
 
 
-def check_mcp_server_installed(server_name: str) -> bool:
-    """Check if an MCP server is already installed."""
+def _read_json_safe(path: Path) -> dict:
+    """Read a JSON file, returning {} on any error (missing/invalid/unreadable)."""
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError, OSError):
+        return {}
+
+
+def _scope_config_path(scope: str, project_root: Optional[Path] = None) -> Tuple[Path, List[str]]:
+    """
+    Return (config_file, keypath) for a given MCP scope.
+
+    The keypath is the sequence of dict keys leading to the mcpServers dict.
+    Project root defaults to CWD when omitted.
+    """
+    if scope == "user":
+        return Path.home() / ".claude.json", ["mcpServers"]
+    if scope == "project":
+        root = project_root or Path.cwd()
+        return root.resolve() / ".mcp.json", ["mcpServers"]
+    if scope == "local":
+        root = project_root or Path.cwd()
+        project_key = str(root.resolve())
+        return Path.home() / ".claude.json", ["projects", project_key, "mcpServers"]
+    raise ValueError(f"Unknown MCP scope: {scope!r}")
+
+
+def _mcp_servers_in_scope(scope: str, project_root: Optional[Path] = None) -> Dict[str, dict]:
+    """Return the mcpServers dict at the given scope (empty dict if none)."""
+    path, keypath = _scope_config_path(scope, project_root)
+    data = _read_json_safe(path)
+    for key in keypath:
+        if not isinstance(data, dict):
+            return {}
+        data = data.get(key, {})
+    return data if isinstance(data, dict) else {}
+
+
+def check_mcp_server_installed(
+    server_name: str,
+    scope: Optional[str] = None,
+    project_root: Optional[Path] = None,
+) -> bool:
+    """
+    Check if an MCP server is installed.
+
+    When scope is given, checks that scope only by reading the backing config
+    file directly (~/.claude.json or <project>/.mcp.json). When scope is None,
+    falls back to scope-agnostic detection via `claude mcp list`.
+    """
+    if scope is not None:
+        return server_name in _mcp_servers_in_scope(scope, project_root)
+
     try:
         result = _run_command(
             ["claude", "mcp", "list"], capture_output=True, text=True, timeout=60
@@ -245,9 +299,9 @@ def install_mcp_server(
 
     click.echo(f"📦 Installing MCP server: {server_name}")
 
-    # Check if already installed
-    if check_mcp_server_installed(server_name):
-        click.echo(f"   ✅ Already installed: {server_name}")
+    # Check if already installed at this specific scope
+    if check_mcp_server_installed(server_name, scope=scope):
+        click.echo(f"   ✅ Already installed at {scope} scope: {server_name}")
         return True
 
     # Handle API key requirements
@@ -274,14 +328,11 @@ def install_mcp_server(
             env_args = ["--env", f"{api_key_env}={api_key}"]
 
     # Build installation command using modern Claude Code API
-    # Format: claude mcp add --transport <transport> [--scope <scope>] <name> [--env KEY=VALUE] -- <command>
+    # Format: claude mcp add --transport <transport> --scope <scope> <name> [--env KEY=VALUE] -- <command>
     # Note: <name> must come BEFORE --env flags, otherwise CLI parses incorrectly
+    # Note: --scope always passed explicitly — do not rely on Claude CLI's default
 
-    cmd = ["claude", "mcp", "add", "--transport", transport]
-
-    # Add scope if not default
-    if scope != "local":
-        cmd.extend(["--scope", scope])
+    cmd = ["claude", "mcp", "add", "--transport", transport, "--scope", scope]
 
     # Add server name (must come before --env)
     cmd.append(server_name)
@@ -495,3 +546,50 @@ def install_mcp_servers(
         message += "\nℹ️  Use 'claude mcp list' to see all installed servers"
         message += "\nℹ️  Use '/mcp' in Claude Code to check server status"
         return True, message
+
+
+def uninstall_mcp_servers(
+    scope: str = "user",
+    project_root: Optional[Path] = None,
+    dry_run: bool = False,
+) -> Tuple[int, int, int, List[str]]:
+    """
+    Remove SuperClaude-registered MCP servers from the given scope.
+
+    Only servers in the MCP_SERVERS registry are considered — user-added
+    servers at the same scope are left untouched.
+
+    Returns (removed, skipped, failed, messages).
+    """
+    removed = 0
+    skipped = 0
+    failed = 0
+    messages: List[str] = []
+
+    sc_server_names = list(MCP_SERVERS.keys())
+
+    for server_name in sc_server_names:
+        if not check_mcp_server_installed(server_name, scope=scope, project_root=project_root):
+            skipped += 1
+            continue
+
+        if dry_run:
+            messages.append(f"[DRY-RUN] Would remove MCP server: {server_name} (scope: {scope})")
+            removed += 1
+            continue
+
+        cmd = ["claude", "mcp", "remove", "--scope", scope, server_name]
+        try:
+            result = _run_command(cmd, capture_output=True, text=True, timeout=60)
+            if result.returncode == 0:
+                messages.append(f"✅ Removed MCP server: {server_name} (scope: {scope})")
+                removed += 1
+            else:
+                err = (result.stderr or "").strip() or "unknown error"
+                messages.append(f"❌ Failed to remove MCP server {server_name}: {err}")
+                failed += 1
+        except (subprocess.TimeoutExpired, subprocess.SubprocessError, FileNotFoundError) as e:
+            messages.append(f"❌ Failed to remove MCP server {server_name}: {e}")
+            failed += 1
+
+    return removed, skipped, failed, messages

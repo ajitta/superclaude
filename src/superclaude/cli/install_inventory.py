@@ -149,7 +149,8 @@ def uninstall_all(
     base_path: Path = None,
     scope: str = "user",
     dry_run: bool = False,
-    keep_settings: bool = False
+    keep_settings: bool = False,
+    keep_mcp: bool = False,
 ) -> Tuple[bool, str]:
     """
     Uninstall all SuperClaude components.
@@ -159,12 +160,15 @@ def uninstall_all(
     2. .claude/hooks/hooks.json file
     3. SuperClaude hooks from settings.json (preserves user hooks)
     4. @superclaude import from CLAUDE.md
+    5. MCP servers registered by SuperClaude at the given scope
+       (scope-aware; user-added servers are preserved)
 
     Args:
         base_path: Installation base path (default: ~/.claude or ./.claude based on scope)
-        scope: Installation scope ("user" or "project")
+        scope: Installation scope ("user", "project", or "local")
         dry_run: If True, only show what would be removed
         keep_settings: If True, don't modify settings.json hooks
+        keep_mcp: If True, don't remove MCP server registrations
 
     Returns:
         Tuple of (success: bool, message: str)
@@ -416,7 +420,25 @@ def uninstall_all(
             else:
                 failed += 1
 
-    # 9. For project/local scope: rmdir empty .claude/ if nothing else remains
+    # 9. Remove SuperClaude-registered MCP servers (scope-aware, preserves user servers)
+    if keep_mcp:
+        messages.append("⏭️  Skipped: MCP server cleanup (--keep-mcp)")
+        skipped += 1
+    else:
+        from .install_mcp import uninstall_mcp_servers
+        project_root = base_path.parent if scope in ("project", "local") else None
+        mcp_removed, mcp_skipped, mcp_failed, mcp_messages = uninstall_mcp_servers(
+            scope=scope, project_root=project_root, dry_run=dry_run,
+        )
+        messages.extend(mcp_messages)
+        if mcp_removed == 0 and mcp_failed == 0:
+            messages.append(f"⏭️  No SuperClaude MCP servers at {scope} scope")
+            skipped += 1
+        else:
+            removed += mcp_removed
+            failed += mcp_failed
+
+    # 10. For project/local scope: rmdir empty .claude/ if nothing else remains
     if not dry_run and scope in ("project", "local"):
         if base_path.exists() and not any(base_path.iterdir()):
             try:

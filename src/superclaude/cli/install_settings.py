@@ -240,8 +240,9 @@ def uninstall_hooks_from_settings(base_path: Path, scope: str = "user") -> Tuple
     if not existing_hooks:
         del settings["hooks"]
 
-    # For local scope: if the settings file is now empty (only SC content), delete it
-    if scope == "local" and not settings:
+    # For local/project scope: if the settings file is now empty (only SC content), delete it.
+    # User scope is excluded — global settings.json is likely to hold user config independent of SC.
+    if scope in ("local", "project") and not settings:
         try:
             settings_file.unlink()
             return True, f"SuperClaude hooks removed and empty {settings_filename} deleted"
@@ -405,13 +406,14 @@ def remove_claude_md_import(base_path: Path, scope: str = "user") -> Tuple[bool,
         if content == original_content:
             return True, f"No SuperClaude import found in {target_label}"
 
-        # For local scope: if CLAUDE.local.md has no user content (empty or only
-        # the SC-created header), remove it entirely.
+        # For local/project scope: if CLAUDE.md/CLAUDE.local.md has no user content
+        # (empty or only the SC-created header), remove it entirely.
+        # User scope is excluded — global CLAUDE.md is likely to hold user config independent of SC.
         SC_HEADERS = {
             "# Claude Code Configuration (personal, gitignored)",
             "# Claude Code Configuration",
         }
-        if scope == "local" and (not stripped or stripped in SC_HEADERS):
+        if scope in ("local", "project") and (not stripped or stripped in SC_HEADERS):
             claude_md.unlink()
             return True, f"{target_label} removed (no user content after SC cleanup)"
 

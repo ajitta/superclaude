@@ -48,7 +48,9 @@ def _strip_block(content: str) -> Tuple[str, bool]:
     after = content[end_of_line:]
     if trimmed_before and after:
         return trimmed_before + "\n" + after, True
-    return (trimmed_before or after), True
+    if trimmed_before:
+        return trimmed_before + "\n", True
+    return after, True
 
 
 def add_local_gitignore(project_root: Path) -> Tuple[bool, str]:

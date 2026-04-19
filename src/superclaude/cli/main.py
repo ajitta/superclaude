@@ -25,6 +25,14 @@ def main():
     pass
 
 
+def _in_git_repo(start: Path) -> bool:
+    """Return True if start (or any parent) contains a .git directory/file."""
+    for p in [start, *start.parents]:
+        if (p / ".git").exists():
+            return True
+    return False
+
+
 @main.command()
 @click.option(
     "--force",
@@ -107,6 +115,20 @@ def install(force: bool, list_only: bool, list_all: bool, scope: str):
         click.echo(f"\nTotal: {len(available)} available, {len(installed)} installed")
         return
 
+    # Hint: suggest --scope local when defaulting to user inside a git repo
+    scope_source = click.get_current_context().get_parameter_source("scope")
+    scope_was_default = (
+        scope_source is not None
+        and scope_source.name == "DEFAULT"
+    )
+    if scope_was_default and scope == "user" and _in_git_repo(Path.cwd()):
+        click.echo(
+            "💡 Detected git repo at CWD. If this is a team repo and you want a "
+            "personal install (auto-gitignored, separate settings), rerun with "
+            "--scope local. Continuing with default (user) scope."
+        )
+        click.echo()
+
     # Install all components
     click.echo(f"📦 Installing SuperClaude components (scope: {scope})...")
     click.echo()
@@ -142,7 +164,12 @@ def install(force: bool, list_only: bool, list_all: bool, scope: str):
     is_flag=True,
     help="Keep settings.json hooks (only remove files/directories)",
 )
-def uninstall(scope: str, dry_run: bool, yes: bool, keep_settings: bool):
+@click.option(
+    "--keep-mcp",
+    is_flag=True,
+    help="Keep MCP server registrations (only remove files/hooks)",
+)
+def uninstall(scope: str, dry_run: bool, yes: bool, keep_settings: bool, keep_mcp: bool):
     """
     Uninstall all SuperClaude components from Claude Code
 
@@ -154,6 +181,7 @@ def uninstall(scope: str, dry_run: bool, yes: bool, keep_settings: bool):
     - hooks/hooks.json file
     - SuperClaude hooks from settings.json (preserves user hooks)
     - @superclaude import from CLAUDE.md
+    - MCP servers registered by SuperClaude at the given scope (preserves user-added servers)
 
     Scopes:
     - user (default): Uninstall from ~/.claude/
@@ -166,6 +194,7 @@ def uninstall(scope: str, dry_run: bool, yes: bool, keep_settings: bool):
         superclaude uninstall --scope project  # Uninstall from current project
         superclaude uninstall --scope local    # Uninstall personal install (cleans .gitignore)
         superclaude uninstall --keep-settings  # Keep settings.json hooks
+        superclaude uninstall --keep-mcp       # Keep MCP server registrations
     """
     from .install_commands import get_base_path, uninstall_all
 
@@ -178,7 +207,8 @@ def uninstall(scope: str, dry_run: bool, yes: bool, keep_settings: bool):
             base_path=base_path,
             scope=scope,
             dry_run=True,
-            keep_settings=keep_settings
+            keep_settings=keep_settings,
+            keep_mcp=keep_mcp,
         )
         click.echo(message)
         return
@@ -198,7 +228,8 @@ def uninstall(scope: str, dry_run: bool, yes: bool, keep_settings: bool):
         base_path=base_path,
         scope=scope,
         dry_run=False,
-        keep_settings=keep_settings
+        keep_settings=keep_settings,
+        keep_mcp=keep_mcp,
     )
 
     click.echo(message)
