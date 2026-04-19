@@ -57,7 +57,14 @@ def _in_git_repo(start: Path) -> bool:
     type=click.Choice(["user", "project", "local"]),
     help="Installation scope: user (~/.claude/), project (./.claude/ team-shared), or local (./.claude/ personal, gitignored)",
 )
-def install(force: bool, list_only: bool, list_all: bool, scope: str):
+@click.option(
+    "--interactive",
+    "-i",
+    "interactive",
+    is_flag=True,
+    help="Step-by-step wizard: scope, optional git init, force, preview, confirm",
+)
+def install(force: bool, list_only: bool, list_all: bool, scope: str, interactive: bool):
     """
     Install all SuperClaude components to Claude Code
 
@@ -87,6 +94,23 @@ def install(force: bool, list_only: bool, list_all: bool, scope: str):
         list_available_commands,
         list_installed_commands,
     )
+
+    # Decide whether to run the interactive wizard.
+    # Trigger paths:
+    #  - Explicit -i/--interactive
+    #  - No flags at all (every option still at its DEFAULT source)
+    ctx = click.get_current_context()
+
+    def _all_defaults() -> bool:
+        for opt in ("force", "list_only", "list_all", "scope", "interactive"):
+            src = ctx.get_parameter_source(opt)
+            if src is None or src.name != "DEFAULT":
+                return False
+        return True
+
+    if interactive or _all_defaults():
+        from .install_interactive import run_interactive_install
+        sys.exit(run_interactive_install())
 
     # Get base path based on scope
     base_path = get_base_path(scope)
