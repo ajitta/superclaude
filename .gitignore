@@ -115,7 +115,6 @@ poetry.lock
 *.bak
 
 # Project specific
-Tests/
 temp/
 tmp/
 .cache/
