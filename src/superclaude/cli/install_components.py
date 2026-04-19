@@ -29,6 +29,19 @@ from .install_settings import (
 # complementing CC's native tool search which handles tool discovery.
 MCP_DOCS_SKIP: set = set()
 
+def _rewrite_agent_memory_scope(content: str, scope: str) -> str:
+    """Rewrite agent frontmatter `memory:` to match install scope.
+
+    Source agents ship `memory: project`. Installing globally (`user`) or as
+    personal-scope (`local`) requires a matching memory location so agent
+    memory is not written into foreign cwds (user scope) or accidentally
+    committed to the team repo (local scope).
+    """
+    if scope not in {"user", "project", "local"}:
+        return content
+    return content.replace("memory: project\n", f"memory: {scope}\n", 1)
+
+
 def _resolve_template_paths(base_path: Path, scope: str = "user") -> dict:
     """Compute resolved template variable values for a given scope."""
     if scope in ("project", "local"):
@@ -150,7 +163,14 @@ def install_component(
                 skipped += 1
                 continue
             try:
-                shutil.copy2(source_file, target_file)
+                if component == "agents":
+                    content = source_file.read_text(encoding="utf-8")
+                    target_file.write_text(
+                        _rewrite_agent_memory_scope(content, scope),
+                        encoding="utf-8",
+                    )
+                else:
+                    shutil.copy2(source_file, target_file)
                 installed += 1
             except Exception as e:
                 failed += 1

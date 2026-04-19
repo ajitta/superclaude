@@ -12,7 +12,7 @@
 ---
 name: agent-name                           # required | lowercase-hyphens, matches filename
 description: One-line purpose (triggers - kw1, kw2)  # required | used for auto-delegation
-memory: project                            # required | always "project" for SuperClaude agents
+memory: project                            # required | source value always "project"; installer rewrites per scope (user/local)
 color: blue|green|purple|yellow|orange|cyan # required | see role-group mapping below
 
 model: opus|sonnet|haiku                   # optional | omit to inherit parent (recommended)
@@ -147,7 +147,7 @@ Do not add `effort: xhigh` to an agent just because the domain "feels" coding-he
 - 3-5 categories, specific to the agent's domain
 - PascalCase-Hyphenated names (e.g., `Debug-Patterns`, `API-Decisions`)
 - `<refs agents="...">` — up to 3 related agents
-- All agents use `memory: project` scope
+- Source files always use `memory: project`. The installer rewrites this to match install scope: `user` → `memory: user`, `project` → unchanged, `local` → `memory: local`. This keeps agent memory storage aligned with where the agent is installed (see `cli/install_components.py::_rewrite_agent_memory_scope`).
 
 ## Code Exploration (Serena-First)
 

@@ -98,13 +98,15 @@ Validation: `uv run python -m pytest tests/unit/test_agent_structure.py -v`
 
 ## Agent Memory (v2.1.33)
 
-Agents declare persistent memory that survives across conversations via the `memory` frontmatter field. All SuperClaude agents use `memory: project`.
+Agents declare persistent memory that survives across conversations via the `memory` frontmatter field. Source files ship with `memory: project`; the installer rewrites this to match install scope so memory storage follows install intent.
 
-| Scope | Location | Use Case |
-|-------|----------|----------|
-| `project` | `.claude/agent-memory/<name>/` | Project-specific knowledge, committable |
-| `user` | `~/.claude/agent-memory/<name>/` | Cross-project learnings |
-| `local` | `.claude/agent-memory-local/<name>/` | Project-specific, gitignored |
+| Install scope | Installed `memory:` | Location | Rationale |
+|---|---|---|---|
+| `user` | `user` | `~/.claude/agent-memory/<name>/` | Global agent — avoid polluting foreign project cwds |
+| `project` | `project` | `.claude/agent-memory/<name>/` | Team-shared, committed with repo |
+| `local` | `local` | `.claude/agent-memory-local/<name>/` | Personal, gitignored by CC |
+
+Rewriting happens during `install_component("agents", ..., scope=...)` via `_rewrite_agent_memory_scope`. Source files are never modified.
 
 When `memory` is set, the agent automatically gets Read/Write/Edit tools and the first 200 lines of its `MEMORY.md` are injected into the system prompt.
 
