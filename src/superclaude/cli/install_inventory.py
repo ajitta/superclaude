@@ -150,7 +150,7 @@ def uninstall_all(
     scope: str = "user",
     dry_run: bool = False,
     keep_settings: bool = False,
-    keep_mcp: bool = False,
+    keep_mcp: bool = True,
 ) -> Tuple[bool, str]:
     """
     Uninstall all SuperClaude components.
@@ -168,7 +168,11 @@ def uninstall_all(
         scope: Installation scope ("user", "project", or "local")
         dry_run: If True, only show what would be removed
         keep_settings: If True, don't modify settings.json hooks
-        keep_mcp: If True, don't remove MCP server registrations
+        keep_mcp: If True (default), don't remove MCP server registrations.
+            MCP servers are a shared CC resource — other tools/agents may
+            rely on them, so we preserve them by default. Pass False (via
+            `uninstall --remove-mcp`) to also clean SuperClaude-registered
+            servers at this scope.
 
     Returns:
         Tuple of (success: bool, message: str)
@@ -422,7 +426,7 @@ def uninstall_all(
 
     # 9. Remove SuperClaude-registered MCP servers (scope-aware, preserves user servers)
     if keep_mcp:
-        messages.append("⏭️  Skipped: MCP server cleanup (--keep-mcp)")
+        messages.append("⏭️  Skipped: MCP server cleanup (default; pass --remove-mcp to clean)")
         skipped += 1
     else:
         from .install_mcp import uninstall_mcp_servers

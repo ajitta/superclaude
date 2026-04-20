@@ -189,11 +189,11 @@ def install(force: bool, list_only: bool, list_all: bool, scope: str, interactiv
     help="Keep settings.json hooks (only remove files/directories)",
 )
 @click.option(
-    "--keep-mcp",
+    "--remove-mcp",
     is_flag=True,
-    help="Keep MCP server registrations (only remove files/hooks)",
+    help="Also remove SuperClaude-registered MCP servers (default: keep, since MCP is shared across tools)",
 )
-def uninstall(scope: str, dry_run: bool, yes: bool, keep_settings: bool, keep_mcp: bool):
+def uninstall(scope: str, dry_run: bool, yes: bool, keep_settings: bool, remove_mcp: bool):
     """
     Uninstall all SuperClaude components from Claude Code
 
@@ -205,7 +205,10 @@ def uninstall(scope: str, dry_run: bool, yes: bool, keep_settings: bool, keep_mc
     - hooks/hooks.json file
     - SuperClaude hooks from settings.json (preserves user hooks)
     - @superclaude import from CLAUDE.md
-    - MCP servers registered by SuperClaude at the given scope (preserves user-added servers)
+
+    Preserved by default (opt-in removal):
+    - MCP servers registered by SuperClaude — shared with other CC tools/agents.
+      Use --remove-mcp to clean them at the given scope (preserves user-added servers).
 
     Scopes:
     - user (default): Uninstall from ~/.claude/
@@ -218,8 +221,9 @@ def uninstall(scope: str, dry_run: bool, yes: bool, keep_settings: bool, keep_mc
         superclaude uninstall --scope project  # Uninstall from current project
         superclaude uninstall --scope local    # Uninstall personal install (cleans .gitignore)
         superclaude uninstall --keep-settings  # Keep settings.json hooks
-        superclaude uninstall --keep-mcp       # Keep MCP server registrations
+        superclaude uninstall --remove-mcp     # Also remove SuperClaude-registered MCP servers
     """
+    keep_mcp = not remove_mcp
     from .install_commands import get_base_path, uninstall_all
 
     base_path = get_base_path(scope)
