@@ -58,6 +58,17 @@
             "timeout": 5
           }
         ]
+      },
+      {
+        "matcher": "Edit|Write|Bash",
+        "hooks": [
+          {
+            "_comment": "[superclaude] safety — circuit breaker (SUPERCLAUDE_LOOP_GUARD=0 to disable)",
+            "type": "command",
+            "command": "{{PYTHON_BIN}} {{SCRIPTS_PATH}}/loop_guard.py",
+            "timeout": 5
+          }
+        ]
       }
     ],
     "PostToolUse": [
@@ -75,6 +86,17 @@
             "command": "{{PYTHON_BIN}} {{SCRIPTS_PATH}}/test_runner_hook.py",
             "async": true,
             "timeout": 120
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write|Bash",
+        "hooks": [
+          {
+            "_comment": "[superclaude] safety — circuit breaker records error/success signatures",
+            "type": "command",
+            "command": "{{PYTHON_BIN}} {{SCRIPTS_PATH}}/loop_guard.py",
+            "timeout": 5
           }
         ]
       }

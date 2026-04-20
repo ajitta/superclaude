@@ -340,6 +340,22 @@ def uninstall_all(
         messages.append(f"⏭️  Not found: {hooks_json}")
         skipped += 1
 
+    # 5a. Remove hook runtime state files (written during normal operation).
+    # Safe to remove — they will be regenerated if SuperClaude is reinstalled.
+    for state_file in (base_path / "loop_guard_state.json",):
+        if state_file.exists():
+            if dry_run:
+                messages.append(f"[DRY-RUN] Would remove: {state_file}")
+                removed += 1
+            else:
+                try:
+                    state_file.unlink()
+                    messages.append(f"✅ Removed: {state_file}")
+                    removed += 1
+                except Exception as e:
+                    messages.append(f"❌ Failed to remove {state_file}: {e}")
+                    failed += 1
+
     # 6. Remove SuperClaude hooks from settings file (preserve user hooks)
     settings_filename = "settings.local.json" if scope == "local" else "settings.json"
     if keep_settings:

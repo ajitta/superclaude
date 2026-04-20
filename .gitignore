@@ -104,6 +104,7 @@ poetry.lock
 .claude/agent-memory*/
 .claude/.superclaude_hooks/
 .claude/projects/
+.claude/loop_guard_state.json
 
 
 # SuperClaude specific

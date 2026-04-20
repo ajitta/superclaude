@@ -18,6 +18,8 @@ Scripts are referenced by `hooks.json` and executed by Claude Code's hook runtim
 | `prettier_hook.py` | Code formatting hook using Prettier |
 | `test_runner_hook.py` | Test execution hook |
 | `context_reset.py` | Reset context loader state for fresh sessions |
+| `file_size_guard.py` | Blocks Read on files >30KB to conserve tokens (`SUPERCLAUDE_SIZE_GUARD=0` to disable) |
+| `loop_guard.py` | Circuit breaker — blocks Edit/Write/Bash after 5 identical errors in 15 min (`SUPERCLAUDE_LOOP_GUARD=0` to disable) |
 
 ### Shell Scripts
 
