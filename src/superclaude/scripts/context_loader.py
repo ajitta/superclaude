@@ -167,7 +167,9 @@ INSTRUCTION_MAP = {
         "tavily_extract (full-text from URLs), tavily_research (multi-source synthesis), "
         "tavily_crawl (site-wide extraction), tavily_map (URL discovery). "
         "Use for current info post-knowledge-cutoff, multi-source research, fact-checking. "
-        "Fallback: native WebSearch for simple queries, WebFetch for single pages."
+        "Channel: prefer MCP tools (no load cost, parallel calls). Switch to tavily-cli skill only for "
+        "multi-query chained research where skill aggregates across calls. "
+        "Fallback: if MCP absent use tavily-cli skill; if both absent use native WebSearch (simple) / WebFetch (single page)."
     ),
 }
 
@@ -242,7 +244,7 @@ VALID_FLAGS = {
     "brainstorm", "business-panel", "research", "introspect", "task-manage",
     "orchestrate", "token-efficient", "c7", "context7", "seq", "sequential",
     "magic", "serena", "sg", "ast-grep", "play", "playwright", "perf",
-    "devtools", "tavily", "tvly", "frontend-verify", "all-mcp", "no-mcp",
+    "devtools", "tavily", "frontend-verify", "all-mcp", "no-mcp",
     "delegate", "concurrency", "loop", "iterations", "validate", "safe-mode",
     "fast", "plan", "uc", "ultracompressed", "scope", "focus",
     "bs", "verbose-context", "vs", "p",
@@ -545,13 +547,6 @@ _EXECUTION_DIRECTIVES = {
         f"Batch up to {m.group(1)} independent tool calls per message. "
         f"Group reads, searches, and other non-dependent operations together."
         f"</sc-directive>"
-    ),
-    re.compile(r"--tvly\b", re.IGNORECASE): (
-        lambda m: "<sc-directive flag=\"--tvly\">"
-        "Use Tavily CLI (`tvly` command) via Bash instead of Tavily MCP tools. "
-        "Prefer: tvly search, tvly extract, tvly crawl, tvly map, tvly research run. "
-        "Use --json for structured output, -o for file output."
-        "</sc-directive>"
     ),
     re.compile(r"--serena\b", re.IGNORECASE): (
         lambda _: "<sc-directive flag=\"--serena\">"

@@ -22,7 +22,6 @@
 --play|--playwright: browser testing, E2E, visual → Playwright browser automation
 --perf|--devtools: perf audit, CLS, LCP, metrics → DevTools performance analysis
 --tavily: web search, real-time info → Tavily MCP (in-conversation search, parallel queries, agent workflows)
---tvly: web search, file output → Tavily CLI via Bash (domain/time filtering, pipeline composition, --json structured output)
 --sg|--ast-grep: structural patterns, AST search, anti-patterns → ast-grep tree-sitter code analysis
 --frontend-verify: UI testing, frontend debug → Playwright + DevTools + Serena
 --all-mcp: max complexity → enable all MCP servers

@@ -14,6 +14,8 @@ Use:
 Avoid:
 - Training knowledge: Simple questions from training
 - Code generation: Writing code, local file ops
+
+Channel: MCP (`tavily_*` tools) is default. Switch to `tavily-cli` skill only for multi-query chained research where the skill aggregates across calls. If neither is available, fall back to native WebSearch.
   </choose>
 
   <capabilities>
