@@ -253,7 +253,7 @@ class TestInstallPathsMapping:
 
     def test_all_component_keys_match_expected(self):
         from superclaude.cli.install_paths import COMPONENTS
-        expected = {"commands", "agents", "core", "modes", "mcp", "skills"}
+        expected = {"commands", "agents", "core", "modes", "mcp", "skills", "templates"}
         assert set(COMPONENTS.keys()) == expected
 
 

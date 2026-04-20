@@ -176,6 +176,39 @@ def install_component(
                 failed += 1
                 failed_names.append(f"{source_file.name}: {e}")
 
+        # templates/ holds nested doc-scaffold directories consumed by
+        # /sc:init (not slash commands). Copy each subdirectory verbatim.
+        if component == "templates":
+            for sub_dir in source_dir.iterdir():
+                if not sub_dir.is_dir():
+                    continue
+                if sub_dir.name.startswith(("_", ".")):
+                    continue
+                target_sub = target_dir / sub_dir.name
+                if target_sub.exists() and not force:
+                    skipped += 1
+                    continue
+                try:
+                    if target_sub.exists():
+                        if not _safe_target_path(target_sub, target_dir):
+                            failed += 1
+                            failed_names.append(
+                                f"{sub_dir.name}: symlink outside target"
+                            )
+                            continue
+                        shutil.rmtree(target_sub)
+                    shutil.copytree(
+                        sub_dir,
+                        target_sub,
+                        ignore=shutil.ignore_patterns(
+                            "__pycache__", "*.pyc", ".DS_Store"
+                        ),
+                    )
+                    installed += 1
+                except Exception as e:
+                    failed += 1
+                    failed_names.append(f"{sub_dir.name}: {e}")
+
     return installed, skipped, failed, failed_names
 
 

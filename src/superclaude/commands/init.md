@@ -35,15 +35,16 @@ description: Interactive project environment setup — select and run initializa
     [f] MCP server recommendation      — project-appropriate MCP suggestions
     [g] Project memory initialization  — key decisions, architecture notes      (requires a)
     [h] Project gotchas setup          — .claude/rules/gotchas/general.md       (no deps)
+    [i] docs/ project brain scaffold   — PRD + ARCHITECTURE + ADR + UI-GUIDE    (no deps)
 
-  Presets: --quick (a,b) | --full (a,b,c,d,e,f,g,h)
+  Presets: --quick (a,b) | --full (a,b,c,d,e,f,g,h,i)
 
   Enter selection (e.g., a,b,e or --full):
   ```
   </menu>
 
   <dependency_graph note="Execution order">
-  - Batch 1 (no deps, parallel): a, c, e, f, h
+  - Batch 1 (no deps, parallel): a, c, e, f, h, i
   - Batch 2 (wait for prereq): b←a, d←c, g←a
   - Schedule only selected tasks; prompt to add missing prerequisites.
   </dependency_graph>
@@ -59,6 +60,7 @@ description: Interactive project environment setup — select and run initializa
   | f | MCP recommendations | console |
   | g | MEMORY.md + topic files | .claude/memory/ |
   | h | general.md | .claude/rules/gotchas/ |
+  | i | PRD.md, ARCHITECTURE.md, ADR/0001-*.md, UI-GUIDE.md | docs/ (project root) |
   </task_outputs>
 
   <safety_rules>
@@ -67,6 +69,7 @@ description: Interactive project environment setup — select and run initializa
   - Test execution (d): warn if test suite is large (>500 tests), offer --quick test flag
   - Memory init (g): merge with existing MEMORY.md, never replace
   - Gotchas init (h): create .claude/rules/gotchas/ directory + general.md only if not exists. Idempotent — skip if gotchas/ already present. Template: 4-line comment header, no frontmatter.
+  - Docs scaffold (i): create docs/ directory and copy PRD.md, ARCHITECTURE.md, UI-GUIDE.md, plus docs/ADR/0001-example.md from ~/.claude/superclaude/templates/docs-scaffold/ (project-scope installs: .claude/superclaude/templates/docs-scaffold/). Idempotent — skip per-file if it already exists; never overwrite user content. UI-GUIDE.md is optional (note this and let user delete for headless projects).
   - All tasks: idempotent — safe to re-run, updates rather than duplicates
   </safety_rules>
 
@@ -92,9 +95,10 @@ description: Interactive project environment setup — select and run initializa
   |-------|--------|
   | `/sc:init` | Show interactive menu → await selection |
   | `/sc:init --quick` | Run tasks a,b (structure + CLAUDE.md) |
-  | `/sc:init --full` | Run all tasks a-g in parallel batches |
+  | `/sc:init --full` | Run all tasks a-i in parallel batches |
   | `/sc:init a,c,d,e` | Run selected tasks with dependency validation |
   | `/sc:init b` | Detect that (a) is required → "Add structure analysis first?" |
+  | `/sc:init i` | Scaffold docs/ with PRD, ARCHITECTURE, ADR, UI-GUIDE templates (idempotent) |
 
   <example name="missing-prerequisite" type="error-path">
     <input>/sc:init d (without selecting c)</input>
