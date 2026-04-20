@@ -1,3 +1,7 @@
+---
+paths: ["src/superclaude/agents/**", ".claude/rules/agent-authoring.md"]
+---
+
 # Agent Authoring Rules
 
 > **Decision gate:** Create an agent for **domain expertise** that CC auto-delegates on keyword match.

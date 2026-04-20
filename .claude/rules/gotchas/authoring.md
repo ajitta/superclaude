@@ -1,6 +1,9 @@
+---
+paths: ["src/superclaude/**", ".claude/rules/**", "scripts/**"]
+---
+
 # Project Gotchas — Authoring
 # Last reviewed: 2026-04-16
-# paths: ["src/superclaude/**", ".claude/rules/**", "scripts/**"]
 # Content-framework authoring traps (agents/commands/skills/modes/core).
 
 - install-tree-boundary: Files outside `src/superclaude/` (e.g., `.claude/rules/schemas.yaml`, `tests/`, repo-root docs) are NOT shipped to `~/.claude/` at install. If installed content links to them, it breaks on user machines. Keep installed content self-contained or copy needed refs into `src/superclaude/`.

@@ -1,3 +1,7 @@
+---
+paths: ["src/superclaude/skills/**", ".claude/rules/skill-authoring.md"]
+---
+
 # Skill Authoring Rules
 
 > **Decision gate:** Create a skill when you need either:

@@ -1,3 +1,7 @@
+---
+paths: ["src/superclaude/commands/**", ".claude/rules/command-authoring.md"]
+---
+
 # Command Authoring Rules
 
 > **Decision gate:** Create a command for **user-facing workflow entry** (`/sc:*` slash commands).

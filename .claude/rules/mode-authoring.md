@@ -1,3 +1,7 @@
+---
+paths: ["src/superclaude/modes/**", ".claude/rules/mode-authoring.md"]
+---
+
 # Mode Authoring Rules
 
 > **Decision gate:** Create a mode only for **cognitive posture** — how Claude thinks, communicates, and prioritizes.
