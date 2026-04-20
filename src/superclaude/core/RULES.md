@@ -15,6 +15,7 @@ Intent Propagation: when delegating to sub-agents, include user's original reque
   Sub-agent: 3+ independent parallel streams, different expertise domains, >20K tokens exploration, isolated failure OK
   Never sub-agent: tasks needing recent conversation context, sequential A→B, completable in <30s directly
   Opus 4.7 note: This model spawns subagents less eagerly than 4.6 — when the Sub-agent criteria above are met, prefer explicit invocation (direct Agent tool call or `--delegate auto`) rather than assuming the model will auto-spawn.
+  Worktree-parallel: when the user is waiting on a long in-progress iteration (spec authoring, deep research, multi-phase plan), propose a worktree-isolated agent (EnterWorktree) for independent side-work — e.g., reviewing the project's own framework/config, drafting follow-up tickets. Separates file-edit surfaces so the two streams never conflict on merge. Decline the split when the side-work needs current conversation state or when the main iteration finishes in <5 minutes.
   <examples>
   | Task | Decision | Why |
   |------|----------|-----|
@@ -24,6 +25,7 @@ Intent Propagation: when delegating to sub-agents, include user's original reque
   | "Research React 19 + Vue 4 + Svelte 5" | 3 sub-agents | Independent, context-isolating |
   | "Run tests and check results" | Direct | Fast, needs main context |
   | "Refactor 2 functions in one file" | Direct | Small scope, even though parallel-capable |
+  | Waiting 10min on doc generation, want own harness reviewed | Worktree-isolated agent | Two file surfaces, no merge conflict |
   </examples>
   </sub_agent_decision>
 
