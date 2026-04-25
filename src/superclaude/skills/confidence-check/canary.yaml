@@ -1,0 +1,8 @@
+# Trigger regression canary for the confidence-check skill.
+# Fixture: tests/integration/test_skill_canary.py reads each entry,
+# invokes `claude -p '<trigger>' --output-format json`, and asserts the
+# response matches `expected_pattern` (case-insensitive regex).
+- trigger: "confidence check before implementing the auth refactor"
+  expected_pattern: "confidence|pre-start|validation|checklist"
+- trigger: "validate first before I write the migration"
+  expected_pattern: "confidence|validation|checklist|assumption"

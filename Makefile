@@ -16,10 +16,10 @@ deploy:
 	uv run superclaude install --force
 	@echo "✅ Deployed! Changes in src/ AND ~/.claude/ content updated."
 
-# Run tests
+# Run tests (canary excluded by default — invoke explicitly: pytest -m canary)
 test:
 	@echo "Running tests..."
-	uv run python -m pytest
+	uv run python -m pytest -m "not canary"
 
 # Test pytest plugin loading
 test-plugin:

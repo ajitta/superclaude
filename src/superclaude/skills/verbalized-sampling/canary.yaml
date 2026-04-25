@@ -1,0 +1,5 @@
+# Trigger regression canary for the verbalized-sampling skill.
+- trigger: "give me multiple perspectives on this caching strategy"
+  expected_pattern: "verbalized.sampling|VS|distribution|k.candidates|multiple.perspectives"
+- trigger: "use --vs to brainstorm options for the rate limiter"
+  expected_pattern: "verbalized.sampling|VS|distribution|brainstorm"

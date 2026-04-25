@@ -66,6 +66,8 @@ CC-native execution containers limited to capabilities that commands and agents 
 
 **Current skills (4):** confidence-check (PreToolUse hook), simplicity-coach (Stop hook + scripts), ship (disable-model-invocation), finishing-a-development-branch (disable-model-invocation + allowed-tools)
 
+**Optional canary manifest:** Skills MAY ship a `canary.yaml` next to `SKILL.md`. Each entry is `{trigger: <user phrase>, expected_pattern: <regex>}`. The canary fixture (`tests/integration/test_skill_canary.py`) iterates manifests and runs `claude -p '<trigger>'` to assert the trigger still routes to the skill. Excluded from default `make test`; run explicitly via `pytest -m canary`. Reference manifests: `confidence-check`, `verbalized-sampling`. Source: 2026-04-25 retrospective §1.1 (silent trigger regression class).
+
 ### mcp/ — TOOL REFERENCE
 
 Documentation and configuration for MCP (Model Context Protocol) servers. Server docs are loaded on-demand by context_loader.py; server configs are installed by `install_mcp.py`.
