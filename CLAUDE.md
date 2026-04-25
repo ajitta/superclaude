@@ -22,7 +22,10 @@ uv run superclaude install --list-all      # Test CLI changes
 
 ```bash
 make install       # uv pip install -e ".[dev]"
-make deploy        # Deploy CLI (editable) + sync content (skills/agents/commands/hooks) to ~/.claude/
+make deploy        # Deploy CLI (editable, uv tool install). Content sync is separate.
+make sync-user     # Force-sync src/ content to ~/.claude/ (user scope) — for headless `claude -p` testing
+make sync-project  # Force-sync to ./.claude/ (project scope, team-shared)
+make sync-local    # Force-sync to ./.claude/ (local scope, gitignored)
 make test          # uv run pytest
 make test-plugin   # Verify pytest plugin loads
 make verify        # Full installation check
@@ -39,7 +42,7 @@ make clean         # Remove artifacts
 
 ## Developer Environment
 
-- `make deploy` does two steps: `uv tool install --force --editable .` (CLI editable) + `uv run superclaude install --force` (syncs `src/` content to `~/.claude/`). Single command, single mental model: `src/` change → `make deploy` → both CLI and `~/.claude/` reflect.
+- `make deploy` runs `uv tool install --force --editable .` (CLI editable) only. Content sync is a separate scope-explicit step: `make sync-user` / `sync-project` / `sync-local`. The `--force` in sync targets is intentional — needed for non-interactive headless `claude -p` test scenarios. For interactive dev sync use `superclaude install -i`.
 - Template variables `{{SCRIPTS_PATH}}` and `{{SKILLS_PATH}}` resolved at install time
 - Experimental Agent Teams: `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`
 

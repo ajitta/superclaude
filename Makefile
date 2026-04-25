@@ -1,4 +1,4 @@
-.PHONY: install deploy test test-plugin doctor verify verify-drift audit clean lint format build-plugin sync-plugin-repo uninstall-legacy help
+.PHONY: install deploy sync-user sync-project sync-local test test-plugin doctor verify verify-drift audit clean lint format build-plugin sync-plugin-repo uninstall-legacy help
 
 # Installation (local source, editable) - RECOMMENDED
 install:
@@ -8,13 +8,25 @@ install:
 	@echo "✅ Installation complete!"
 	@echo "   Run 'make verify' to check installation"
 
-# Deploy to global uv tool (editable mode) + sync content to ~/.claude/
+# Deploy CLI only (editable). Content sync is a separate step (see sync-* targets).
 deploy:
-	@echo "🚀 Deploying SuperClaude as global tool (editable)..."
+	@echo "🚀 Deploying SuperClaude CLI (editable)..."
 	uv tool install --force --editable .
-	@echo "📦 Syncing content (skills, agents, commands, hooks) to ~/.claude/..."
-	uv run superclaude install --force
-	@echo "✅ Deployed! Changes in src/ AND ~/.claude/ content updated."
+	@echo "✅ CLI deployed. Run 'make sync-user' (or sync-project / sync-local) to sync content."
+
+# Force-sync content to a specific scope. --force is required for non-interactive
+# `claude -p` headless test scenarios; for interactive dev use `superclaude install -i`.
+sync-user:
+	@echo "📦 Syncing content to user scope (~/.claude/)..."
+	uv run superclaude install --force --scope user
+
+sync-project:
+	@echo "📦 Syncing content to project scope (./.claude/)..."
+	uv run superclaude install --force --scope project
+
+sync-local:
+	@echo "📦 Syncing content to local scope (./.claude/, gitignored)..."
+	uv run superclaude install --force --scope local
 
 # Run tests (canary excluded by default — invoke explicitly: pytest -m canary)
 test:
