@@ -1,9 +1,27 @@
 ---
-status: draft
+status: complete
 revised: 2026-04-25
 spec: docs/specs/retrospective-followups-discovery-ajitta-2026-04-25.md
 phases: 8
 branch: fix/retrospective-followups-2026-04-25
+implementation_log:
+  - phase: 1 (B1 make test python -m)
+    commit: 18e0921
+  - phase: 2 (E1 make deploy chains install)
+    commit: 0dbd62c
+  - phase: 3 (E2 status enum)
+    commit: a9a28b0
+  - phase: 8 (Q5 plan phase-default)
+    commit: b8dc312
+  - phase: 4 (C1 brainstorm hard-block)
+    commit: c438fa3
+  - phase: 5 (A1 canary manifests)
+    commit: 1959698
+  - phase: 6 (A2 memory verified hook)
+    commit: 01a520b
+  - phase: 7 (C2 delegated audit)
+    commit: d7e1fb8
+test_baseline: "1,777 passed / 24 skipped / 4 canary deselected (was 1,628)"
 ---
 
 # Retrospective Followups Implementation Plan
