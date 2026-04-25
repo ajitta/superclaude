@@ -8,15 +8,16 @@ description: Capture structured session insights to per-project JSONL for human 
     <mission>Capture structured session insights to per-project JSONL for human and tool analysis</mission>
   </role>
 
-  <syntax>/sc:insight [text] [--list] [--query key=value] [--stats]</syntax>
+  <syntax>/sc:insight [text] [--list] [--query key=value] [--stats] [--review]</syntax>
 
   <flow>
-    1. Mode: Determine mode — capture (default/text), list, query, or stats
+    1. Mode: Determine mode — capture (default/text), list, query, stats, or review (process pending harvested markers)
     2. Capture (default): Analyze session → propose 3-7 insights → present for user approval → append approved
     3. Capture (text): Take user text → infer type + tags → structure as JSON → present → append
-    4. Dedup: Before proposing, Read last 20 lines of .claude/insights.jsonl → skip already-captured topics. For annotations, also check existing ref_ts to avoid duplicates.
-    5. Append: Batch via Python — `python3 -c "import json; entries=[...]; f=open('.claude/insights.jsonl','a'); [f.write(json.dumps(e)+'\n') for e in entries]; f.close()"` (NOT Write tool — Write overwrites, NOT echo — escaping risk)
-    6. Query: For --list/--query/--stats, run jq via Bash (fallback: python3 -c "import json; ...")
+    4. Dedup: Before proposing, run `insight_writer.py list --limit 20` to check recent entries → skip already-captured topics. For annotations, also check existing ref_ts.
+    5. Append: ALWAYS via `python3 {{SCRIPTS_PATH}}/insight_writer.py append --json '<json>'` — NEVER hand-write to insights.jsonl. The script enforces schema, escaping, and annotation ref validation.
+    6. Read modes: `--list`, `--query`, `--stats` shell out to jq via the same script. If jq is missing the script prints an install hint and exits 1 — relay the message to the user.
+    7. Review mode: `--review` calls `insight_writer.py review` to list pending markers harvested by the SessionEnd/PreCompact hooks. For each desired entry, propose a structured promote (type + tags) and call `insight_writer.py promote --index N --type TYPE [--tags a,b]`.
   </flow>
 
   <outputs>
@@ -26,10 +27,16 @@ description: Capture structured session insights to per-project JSONL for human 
   | `--list` | Formatted recent insights (last 20) |
   | `--query key=value` | Filtered insights matching key=value |
   | `--stats` | Type distribution, top tags, count |
+  | `--review` | Pending harvested markers + promote flow |
   </outputs>
 
   <storage>
-  File: `.claude/insights.jsonl` (per-project, append-only, not loaded into LLM context)
+  Files (per-project, append-only, not loaded into LLM context):
+  - `.claude/insights.jsonl` — promoted, structured insights
+  - `.claude/insights.pending.jsonl` — raw `INSIGHT:` markers harvested from transcripts (created on demand, removed when empty)
+
+  Auto-harvest: `SessionEnd` and `PreCompact` hooks scan the active transcript for user messages containing `INSIGHT:` and append unique entries to pending. `SessionStart` (clear|compact|startup) prints a one-line notice if pending is non-empty.
+
   Relationship to auto memory: complement, not replace. Memory = LLM reads. Insight = human/tool queries.
   </storage>
 
@@ -37,8 +44,8 @@ description: Capture structured session insights to per-project JSONL for human 
   Required: ts (ISO 8601), type (feedback|decision|discovery|pattern|metric|annotation), insight (one-line string)
   Optional: author (git username, always emitted), session (topic slug), rule (R13, R18...), context (why it matters), action (what was done), files (string[]), tags (string[]), ref_ts (ISO 8601, annotation target)
 
-  Author: `git config user.name` (lowercase, no spaces) — always populated, not enforced for backward compat.
-  Timestamp format: second precision, colon offset (YYYY-MM-DDTHH:MM:SS+HH:MM).
+  Author: `git config user.name` (lowercase, no spaces) — script auto-fills if missing.
+  Timestamp format: second precision, colon offset (YYYY-MM-DDTHH:MM:SS+HH:MM) — script auto-fills if missing.
 
   Type taxonomy:
   - feedback: user correction or validated approach
@@ -46,69 +53,56 @@ description: Capture structured session insights to per-project JSONL for human 
   - discovery: unexpected finding during work
   - pattern: recurring problem/solution
   - metric: quantitative result
-  - annotation: relevance link to existing insight (requires ref_ts targeting a non-annotation entry)
-
-  Annotation rules:
-  - ref_ts must target an existing non-annotation entry's ts (no annotation chains)
-  - author on annotations = git user who invoked the agent, not the agent itself
-  - Agent must verify ref_ts target exists before appending
-  - Agent must check for existing annotations with same ref_ts to avoid duplicates
+  - annotation: relevance link to existing insight (requires ref_ts targeting a non-annotation entry; script enforces)
   </schema>
 
   <tools>
-    - Read: Session analysis, dedup check (last 20 lines of insights.jsonl)
-    - Bash: jq/python queries, echo >> append
+    - Bash: invoke `insight_writer.py` (append/list/query/stats/review/promote). All file I/O on insights.jsonl goes through this script.
   </tools>
 
-  <query_reference>
-  Prefer jq if available, fallback to python3:
+  <script_reference>
+  Append a single entry:
+    python3 {{SCRIPTS_PATH}}/insight_writer.py append --json '{"type":"feedback","insight":"...","tags":["..."]}'
 
-  --list:
-    jq -r '"\(.ts) [\(.type)] \(.insight)"' .claude/insights.jsonl | tail -20
+  Append multiple (batch):
+    python3 {{SCRIPTS_PATH}}/insight_writer.py append --json '[{...},{...}]'
 
-  --query type=feedback:
-    jq 'select(.type=="feedback")' .claude/insights.jsonl
+  Read paths (require jq):
+    python3 {{SCRIPTS_PATH}}/insight_writer.py list [--limit 20]
+    python3 {{SCRIPTS_PATH}}/insight_writer.py query type=feedback
+    python3 {{SCRIPTS_PATH}}/insight_writer.py query tags=rules
+    python3 {{SCRIPTS_PATH}}/insight_writer.py stats [--all]
 
-  --query tags=rules:
-    jq 'select(.tags // [] | index("rules"))' .claude/insights.jsonl
-
-  --stats (excludes annotations):
-    jq -r 'select(.type != "annotation") | .type' .claude/insights.jsonl | sort | uniq -c | sort -rn
-
-  --stats --all (includes annotations):
-    jq -r '.type' .claude/insights.jsonl | sort | uniq -c | sort -rn
-
-  --query author=chosh1179:
-    jq 'select(.author=="chosh1179")' .claude/insights.jsonl
-
-  --query type=annotation:
-    jq 'select(.type=="annotation")' .claude/insights.jsonl
-
-  Annotations for a specific insight:
-    jq 'select(.ref_ts=="2026-04-03T18:00:00+09:00")' .claude/insights.jsonl
-
-  Python fallback (--list):
-    python3 -c "import json;[print(f'{r[\"ts\"]} [{r.get(\"author\",\"unknown\")}] [{r[\"type\"]}] {r[\"insight\"]}') for r in (json.loads(l) for l in open('.claude/insights.jsonl'))]" | tail -20
-  </query_reference>
+  Pending review/promote:
+    python3 {{SCRIPTS_PATH}}/insight_writer.py review
+    python3 {{SCRIPTS_PATH}}/insight_writer.py promote --index 0 --type discovery --tags harvest,a,b
+    python3 {{SCRIPTS_PATH}}/insight_writer.py promote --index 0 --type pattern --insight "rewritten one-liner"
+  </script_reference>
 
   <examples>
   | Input | Output |
   |-------|--------|
-  | `/sc:insight` | Model proposes 3-7 insights from session → user approves → append |
-  | `/sc:insight "abbreviation false positive risk"` | Structures as discovery → append |
+  | `/sc:insight` | Model proposes 3-7 insights from session → user approves → script appends |
+  | `/sc:insight "abbreviation false positive risk"` | Structures as discovery → script appends |
   | `/sc:insight --list` | Recent 20 insights formatted |
   | `/sc:insight --query type=feedback` | All feedback-type insights |
   | `/sc:insight --query tags=rules` | All insights tagged "rules" |
-  | `/sc:insight --stats` | Type counts + top tags |
-  | `/sc:insight --query type=annotation` | All annotation entries |
+  | `/sc:insight --stats` | Type counts |
+  | `/sc:insight --review` | Lists pending markers; proposes structured promote for each |
   </examples>
 
+  <auto_harvest_behavior>
+  When a user message contains the literal `INSIGHT:` marker (line-start or inline), the SessionEnd / PreCompact hooks scan the active transcript and append unique entries to `.claude/insights.pending.jsonl`. On the next SessionStart (clear|compact|startup), a one-line notice ("🟡 N pending insight(s) — run /sc:insight --review") is injected. The user invokes `/sc:insight --review` to classify and promote each pending entry.
+  </auto_harvest_behavior>
+
   <gotchas>
-  - append-not-write: NEVER use Write tool for insights.jsonl — it overwrites. Use Python `json.dumps()` batch append (handles escaping safely). Avoid bare `echo >>` — quotes/special chars in insight text cause silent corruption.
-  - dedup-before-propose: In auto-capture mode, always Read last 20 lines before proposing to avoid duplicating insights from earlier calls in same session.
+  - script-only-writes: NEVER use Write/echo on insights.jsonl. ALWAYS go through `insight_writer.py append`. The script handles JSON escaping, schema validation, and annotation ref existence checks that hand-written code routinely misses.
+  - jq-required: `--list`, `--query`, `--stats` need jq on PATH. If absent, the script exits 1 with an install URL — surface that to the user, do not implement an inline Python fallback.
+  - dedup-before-propose: In auto-capture mode, run `insight_writer.py list --limit 20` first to avoid duplicating earlier entries from the same session.
+  - review-requires-classification: Pending entries are raw text; you must propose a `--type` (feedback|decision|discovery|...) and optional tags before calling promote. Never promote without showing the user what classification you intend.
   </gotchas>
 
-  <bounds should="structured capture|jq queries|append-only storage" avoid="modify existing insights|load into LLM context|replace auto memory" fallback="If .claude/insights.jsonl doesn't exist, create it with first append"/>
+  <bounds should="structured capture via script|jq queries|pending review/promote|append-only storage" avoid="modify existing insights|load into LLM context|replace auto memory|hand-edit insights.jsonl" fallback="If insights.jsonl doesn't exist, the script creates it on first append"/>
 
   <handoff next="/sc:save /sc:analyze"/>
 </component>

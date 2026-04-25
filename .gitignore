@@ -105,6 +105,7 @@ poetry.lock
 .claude/.superclaude_hooks/
 .claude/projects/
 .claude/loop_guard_state.json
+.claude/insights.pending.jsonl
 
 
 # SuperClaude specific

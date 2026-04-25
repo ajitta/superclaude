@@ -27,6 +27,36 @@
             "type": "command",
             "command": "{{PYTHON_BIN}} {{SCRIPTS_PATH}}/context_reset.py",
             "timeout": 5
+          },
+          {
+            "_comment": "[superclaude] notify if pending insights from prior session",
+            "type": "command",
+            "command": "{{PYTHON_BIN}} {{SCRIPTS_PATH}}/insight_writer.py pending-count",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "_comment": "[superclaude] harvest INSIGHT: markers from transcript before compaction",
+            "type": "command",
+            "command": "{{PYTHON_BIN}} {{SCRIPTS_PATH}}/insight_writer.py harvest-from-hook",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "_comment": "[superclaude] harvest INSIGHT: markers on /clear, /exit, logout",
+            "type": "command",
+            "command": "{{PYTHON_BIN}} {{SCRIPTS_PATH}}/insight_writer.py harvest-from-hook",
+            "timeout": 10
           }
         ]
       }
