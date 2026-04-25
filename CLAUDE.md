@@ -26,6 +26,9 @@ make deploy        # Deploy CLI (editable, uv tool install). Content sync is sep
 make sync-user     # Force-sync src/ content to ~/.claude/ (user scope) — for headless `claude -p` testing
 make sync-project  # Force-sync to ./.claude/ (project scope, team-shared)
 make sync-local    # Force-sync to ./.claude/ (local scope, gitignored)
+make uninstall-user    # Uninstall from ~/.claude/ (interactive confirm)
+make uninstall-project # Uninstall from ./.claude/ (project scope)
+make uninstall-local   # Uninstall from ./.claude/ (local scope, gitignored)
 make test          # uv run pytest
 make test-plugin   # Verify pytest plugin loads
 make verify        # Full installation check

@@ -1,4 +1,4 @@
-.PHONY: install deploy sync-user sync-project sync-local test test-plugin doctor verify verify-drift audit clean lint format build-plugin sync-plugin-repo uninstall-legacy help
+.PHONY: install deploy sync-user sync-project sync-local uninstall-user uninstall-project uninstall-local test test-plugin doctor verify verify-drift audit clean lint format build-plugin sync-plugin-repo uninstall-legacy help
 
 # Installation (local source, editable) - RECOMMENDED
 install:
@@ -27,6 +27,21 @@ sync-project:
 sync-local:
 	@echo "📦 Syncing content to local scope (./.claude/, gitignored)..."
 	uv run superclaude install --force --scope local
+
+# Uninstall content from a specific scope. Mirrors sync-* targets. Interactive
+# confirmation is preserved (pass `--yes` directly via `uv run superclaude
+# uninstall --yes` if you need non-interactive teardown).
+uninstall-user:
+	@echo "🗑️  Uninstalling SuperClaude from user scope (~/.claude/)..."
+	uv run superclaude uninstall --scope user
+
+uninstall-project:
+	@echo "🗑️  Uninstalling SuperClaude from project scope (./.claude/)..."
+	uv run superclaude uninstall --scope project
+
+uninstall-local:
+	@echo "🗑️  Uninstalling SuperClaude from local scope (./.claude/, gitignored)..."
+	uv run superclaude uninstall --scope local
 
 # Run tests (canary excluded by default — invoke explicitly: pytest -m canary)
 test:
@@ -161,8 +176,11 @@ help:
 	@echo "  make translate       - Translate README to Chinese and Japanese"
 	@echo ""
 	@echo "🧹 Cleanup:"
-	@echo "  make uninstall-legacy - Remove old SuperClaude files from ~/.claude"
-	@echo "  make help            - Show this help message"
+	@echo "  make uninstall-user    - Uninstall from user scope (~/.claude/)"
+	@echo "  make uninstall-project - Uninstall from project scope (./.claude/)"
+	@echo "  make uninstall-local   - Uninstall from local scope (./.claude/, gitignored)"
+	@echo "  make uninstall-legacy  - Remove old SuperClaude files from ~/.claude"
+	@echo "  make help              - Show this help message"
 
 # Remove legacy SuperClaude files from ~/.claude directory
 uninstall-legacy:
