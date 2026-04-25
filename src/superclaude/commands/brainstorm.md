@@ -17,8 +17,9 @@ description: Interactive requirements discovery through Socratic dialogue and sy
                Multi-agent insights inform post-hoc labeling. --depth maps: shallow→brief, normal→balanced, deep→detailed.
     3. Validate: Feasibility assessment + requirement validation
     4. Specify: Write spec to docs/specs/<topic>-discovery-<username>-YYYY-MM-DD.md (with frontmatter: status: draft, revised: <today>)
-    5. Approve: Present spec for user review — do not proceed without confirmation
-    6. Handoff: Route to /sc:plan for implementation planning
+    5a. Approve: Present spec for user review — do not proceed without confirmation
+    5b. Self-review (REQUIRED hard gate): emit explicit handoff "Run /sc:review on this spec before /sc:plan. Plan handoff is gated on review." — do NOT route directly to /sc:plan. Self-review caught 3 critical reversals on a user-approved spec in source session 2026-04-25 §3.5; soft recommendation is insufficient. Append a §"Self-Review Iteration Log" section to the spec with v1→vN delta after each review round.
+    6. Handoff: Route to /sc:review (mandatory) → then /sc:plan after spec status reaches approved-for-plan
   </flow>
 
   <outputs>
@@ -65,13 +66,14 @@ description: Interactive requirements discovery through Socratic dialogue and sy
   <gotchas>
   - evidence-fabrication: Do not construct hypothetical failure scenarios to justify a pre-existing recommendation. Evidence (code, config, measurements) must precede proposals.
   - seq-loop: If sequential thinking reaches the same conclusion twice on the same question, terminate that analysis branch and move to next topic.
+  - skip-review: do NOT route to /sc:plan when status: draft AND no /sc:review iteration logged. Hard gate, not advisory. Brainstorm output without a self-review round has historically shipped silent reversals (source 2026-04-25 §3.5).
   </gotchas>
 
-  <bounds should="ambiguous→concrete|multi-agent+MCP|cross-session persistence" avoid="impl without discovery|override user vision|bypass systematic exploration" fallback="Ask user for guidance when uncertain">
+  <bounds should="ambiguous→concrete|multi-agent+MCP|cross-session persistence|self-review precedes implementation handoff" avoid="impl without discovery|override user vision|bypass systematic exploration|route directly to /sc:plan without /sc:review" fallback="Ask user for guidance when uncertain">
 
     Produce requirements specification, then complete | Focus on requirements; defer architecture to /sc:design | Defer implementation to /sc:implement | Defer scaffolding to /sc:implement → Output: Requirements specification document only
 
   </bounds>
 
-  <handoff next="/sc:plan /sc:design /sc:research"/>
+  <handoff next="/sc:review /sc:plan /sc:design /sc:research"/>
 </component>
