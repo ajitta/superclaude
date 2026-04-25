@@ -1,8 +1,6 @@
 ---
 name: finishing-a-development-branch
-description: Complete development work with structured options for merge, PR, or cleanup.
-when-to-use: >
-  When user is done with a feature branch and wants to merge, create PR, or clean up.
+description: Complete development work with structured options for merge, PR, or cleanup. This skill should be used when the user is done with a feature branch and wants to merge it, create a PR, or clean up branches.
 disable-model-invocation: true
 allowed-tools: Bash, Read, Grep, Glob
 hooks:
@@ -10,7 +8,7 @@ hooks:
     - matcher: "Bash"
       hooks:
         - type: command
-          command: "echo \"$CLAUDE_TOOL_INPUT\" | grep -qE 'git branch -D|git push --force|git push -f' && echo 'BLOCKED: Destructive git operation. Confirm with user first.' >&2 && exit 2 || exit 0"
+          command: "echo \"$CLAUDE_TOOL_INPUT\" | grep -qE 'git branch -D([^a-zA-Z]|$)|git push (--force([^-]|$)|-f([^a-zA-Z]|$))' && echo 'BLOCKED: Destructive git operation. Confirm with user first (--force-with-lease is allowed).' >&2 && exit 2 || exit 0"
 ---
 
 <component name="finishing-a-development-branch" type="skill">

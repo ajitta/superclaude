@@ -54,7 +54,7 @@
           {
             "_comment": "[superclaude] safety — blocks destructive shell commands",
             "type": "command",
-            "command": "jq -r '.tool_input.command // empty' | head -1 | grep -qE 'rm\\s+-rf\\s+/\\s*$|rm\\s+-rf\\s+/\\*|git\\s+push\\s+.*--force.*(main|master)' && echo 'BLOCKED: destructive command detected' >&2 && exit 2 || exit 0",
+            "command": "jq -r '.tool_input.command // empty' | head -1 | grep -qE 'rm\\s+-rf\\s+/\\s*$|rm\\s+-rf\\s+/\\*|git\\s+push\\s+.*--force([^-]|$).*(main|master)' && echo 'BLOCKED: destructive command detected (--force-with-lease is allowed)' >&2 && exit 2 || exit 0",
             "timeout": 5
           }
         ]

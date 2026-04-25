@@ -4,6 +4,15 @@ paths: ["src/superclaude/skills/**", ".claude/rules/skill-authoring.md"]
 
 # Skill Authoring Rules
 
+> **House style note.** SuperClaude uses XML body for all authoring; this diverges from Anthropic's "no XML anywhere" guidance for skills. Decision rationale: `docs/research/rules-xml-conversion-ajitta-2026-04-14.md`. CC runtime accepts both forms; if redistributing a skill outside SuperClaude, prefer Markdown headings.
+
+| Component | Role |
+|-----------|------|
+| Agent     | WHO TO BE |
+| Command   | WHAT TO DO |
+| Skill     | WHICH CAPABILITY |
+| Mode      | HOW TO THINK |
+
 > **Decision gate:** Create a skill when you need either:
 > 1. **CC-native capability**: hooks, `disable-model-invocation`, `allowed-tools`, or script execution.
 > 2. **Auto-invocation reference**: domain knowledge that should auto-trigger via CC description matching.
@@ -14,32 +23,32 @@ paths: ["src/superclaude/skills/**", ".claude/rules/skill-authoring.md"]
 
 | # | Archetype | Key fields | Use when |
 |---|-----------|-----------|----------|
-| ① | **Reference Skill** — auto-invoked | `description` + `when-to-use` | Domain knowledge should load when Claude sees matching keywords |
-| ② | **Workflow Skill** — user-invoked | `disable-model-invocation: true`, optional `context: fork` + `agent:` | Side-effect operations (deploy, release). Protect from auto-trigger |
+| ① | **Reference Skill** — auto-invoked | `description` (with trigger phrases folded in) | Domain knowledge should load when Claude sees matching keywords |
+| ② | **Workflow Skill** — user-invoked | `disable-model-invocation: true`, optional `context: fork` + `agent:` | Workflow / explicit-invocation. Side-effect protection (deploy, release) OR delegation discipline (e.g., `simplicity-coach` reliably delegates to peer agent) |
 | ③ | **Background Context** — Claude-only | `user-invocable: false` | Silent context injection, never shown in `/menu` |
 
 ```yaml
 # ① Reference — minimal
 ---
 name: api-conventions
-description: API 설계 패턴과 컨벤션 가이드.
-when-to-use: >
-  REST 엔드포인트 작성, 에러 포맷, API 버전 관리 시 자동 적용.
+description: >
+  API 설계 패턴과 컨벤션 가이드. This skill should be used when working on
+  REST endpoints, error formats, or API versioning.
 ---
 
 # ② Workflow — side-effect protection
 ---
 name: deploy
-description: 프로덕션 배포 자동화.
+description: Production deployment automation.
 disable-model-invocation: true
-allowed-tools: Bash, Read
+allowed-tools: Bash Read
 argument-hint: "[environment]"
 ---
 
 # ③ Background — silent
 ---
 name: legacy-auth-context
-description: 레거시 인증 시스템 배경 지식.
+description: Legacy auth system background knowledge.
 user-invocable: false
 ---
 ```
@@ -48,40 +57,45 @@ user-invocable: false
 
 ```
 src/superclaude/skills/my-skill/
-├── SKILL.md          ← 필수 (entrypoint)
-├── scripts/          ← 실행 스크립트 (use {{SKILLS_PATH}} in refs)
-├── references/       ← 세부 내용 (progressive disclosure)
-└── assets/           ← 템플릿, 바이너리
+├── SKILL.md          ← required (entrypoint)
+├── scripts/          ← executable scripts (use {{SKILLS_PATH}} in command: strings)
+├── references/       ← detailed content (progressive disclosure)
+└── assets/           ← templates, binaries
 ```
 
-Install path: `src/superclaude/skills/ → ~/.claude/skills/`.
+Install paths (per `src/superclaude/cli/install_components.py:46-55`):
+- `--scope user` (default): `src/superclaude/skills/ → ~/.claude/skills/` (absolute, posix-resolved).
+- `--scope project` or `--scope local`: `src/superclaude/skills/ → ./.claude/skills/` (relative).
 
 ## YAML Frontmatter — Full Field Reference
 
 All fields are **top-level**. `metadata:` is only for user-defined info (author, version) — never nest CC fields under it.
 
+> *Annotations reflect actual usage as of 2026-04-25 across 5 shipped skills. Aspirational fields are kept for reference but marked.*
+
 ```yaml
 ---
 # Identity
-name: my-skill                    # 권장 | lowercase+hyphens, ≤64자, 디렉토리명과 일치
-description: One-line purpose.    # 권장 | ≤1,536 chars (CC 2.1.105+ listing cap, 초과 시 기동 경고)
-when-to-use: >                    # 권장 | 트리거 키워드/시나리오
-  When user mentions X, Y, Z.
+name: my-skill                    # recommended | lowercase+hyphens, ≤64 chars, matches directory name
+description: >                    # recommended | ≤1024 chars (validator-friendly), ≤1,536 chars (CC listing cap, soft truncation)
+  One-line purpose. This skill should be used when user mentions X, Y, Z.
+  Front-load trigger phrases in the first ~200 chars.
 
 # Invocation control
-disable-model-invocation: true    # 자동 호출 완전 차단 (부작용 skill)
-user-invocable: false             # /menu 미표시 (Claude 자동 실행은 가능)
-argument-hint: "[arg]"            # slash command 자동완성
+disable-model-invocation: true    # 3/5 shipped use this — block auto-invocation (side-effect skill)
+user-invocable: false             # 0/5 shipped use this — hidden from /menu (Claude auto-invoke still possible)
+argument-hint: "[arg]"            # 0/5 shipped use this — slash command autocomplete
 
 # Execution
-model: opus                       # skill 활성 시 모델 override
-effort: high                      # low|medium|high|max 추론 깊이
-allowed-tools: Read, Grep, Glob   # 최소 권한 화이트리스트
-context: fork                     # subagent 격리 실행
-agent: Explore                    # fork 시 subagent 타입
+model: opus                       # 0/5 shipped use this — model override when skill active
+effort: high                      # 0/5 shipped use this — low|medium|high|max; omit by default
+allowed-tools: Read Grep Glob     # 1/5 shipped use this — space-separated permission-grant
+paths: ["**/api/**"]              # 0/5 shipped use this — auto-load only on matching files
+context: fork                     # 0/5 shipped use this — isolated subagent execution
+agent: Explore                    # 0/5 shipped use this — only with context: fork
 
 # Lifecycle hooks
-hooks:
+hooks:                            # 2/5 shipped use this
   PreToolUse:
     - matcher: "Bash"
       hooks:
@@ -89,7 +103,7 @@ hooks:
           command: "./scripts/validate.sh"
 
 # Misc
-metadata:                         # author/version 등 부가 정보 전용
+metadata:                         # 0/5 shipped use this — user-defined info only (author, version, etc.)
   author: team-name
   version: "1.0.0"
 ---
@@ -99,15 +113,24 @@ metadata:                         # author/version 등 부가 정보 전용
 
 ## Field Rules (저작 시 가장 자주 틀리는 지점)
 
-**1. `description` vs `when-to-use` 분리** — 가장 중요:
-시작 시 모든 skill의 name+description+when-to-use가 시스템 프롬프트에 주입됨. 본문은 선택 후에야 읽힘.
-- `description`: "무엇" (한 줄 요약)
-- `when-to-use`: "언제" (트리거 키워드 집중)
+**1. `description` authoring pattern** — 가장 중요:
+시작 시 모든 skill의 `name`+`description`이 시스템 프롬프트에 주입됨. 본문은 선택 후에야 읽힘.
+- **Single field, third-person voice**: `description: <one-line purpose>. This skill should be used when <trigger contexts>.`
+- **Trigger phrases first ~200 chars**: 자주 잘리므로 키워드는 앞쪽에.
+- **Why one field, not two?** Anthropic의 canonical `skill-reviewer` 가 `when_to_use`를 deprecated 로 표시 (snake_case form). 프로젝트가 사용하던 hyphenated `when-to-use`는 CC parser 가 무시 (silent drop). 따라서 모든 트리거 키워드는 `description` 안으로 통합.
 
 **2. Description budget** (CC runtime):
-- 전체 skill/command description 합산 ~15,000 chars (`SLASH_COMMAND_TOOL_CHAR_BUDGET`)
-- 개별 description은 listing에서 ~1,536 chars로 잘림 (CC 2.1.105+, 이전 cap 250) — 트리거 키워드는 여전히 첫 100 chars 안에 두는 것이 권장
-- Anthropic 번들 skill 우선, custom skill이 먼저 잘림
+- 전체 skill/command description 합산: **1% of context window, fallback ~8,000 chars** (override via `SLASH_COMMAND_TOOL_CHAR_BUDGET` env var)
+- 개별 description: ≤1024 chars (agentskills.io validator-friendly), ≤1,536 chars (CC 2.1.105+ listing cap, soft truncation)
+- 트리거 키워드는 첫 ~200 chars 안에 둘 것
+- Anthropic 번들 skill 우선; custom skill이 먼저 잘림
+
+**Naming taxonomy (parser literals — exact match required):**
+- `kebab-case`: `disable-model-invocation`, `allowed-tools`, `user-invocable`, `argument-hint`
+- `single-word`: `name`, `description`, `model`, `effort`, `version`, `paths`
+- `snake_case`: only `when_to_use` — **deprecated by Anthropic, do not use**
+
+CC parser uses literal key matching with mixed conventions; do not reflexively kebab-case everything.
 
 **3. `disable-model-invocation` vs `user-invocable`** — 혼동 금지:
 
@@ -120,73 +143,100 @@ metadata:                         # author/version 등 부가 정보 전용
 - `agent:`는 `context: fork`일 때만 동작 — `inline`이면 무시됨
 - `context:` 기본값은 `inline` → 명시 불필요. `fork` 필요할 때만 둘 다 지정
 
-**5. `allowed-tools` 최소 권한 템플릿**:
-- 읽기 전용: `Read, Grep, Glob`
-- 분석+검색: `Read, Grep, Glob, WebSearch, WebFetch`
-- 구현: `Read, Grep, Glob, Edit, Write, Bash`
+**5. `allowed-tools` 최소 권한 템플릿** (space-separated; permission-grant, not access-restriction — non-listed tools remain callable but require user approval):
+- 읽기 전용: `Read Grep Glob`
+- 분석+검색: `Read Grep Glob WebSearch WebFetch`
+- 구현: `Read Grep Glob Edit Write Bash`
 - 생략 시 부모 전체 도구 상속
 
-**6. Template variables** — 스크립트 경로는 반드시 사용:
-- `{{SKILLS_PATH}}` → 설치된 skills 루트 (`~/.claude/skills/`)
+**6. Template variables** — 스크립트 경로는 반드시 사용 (in `command:` strings; `<references>` paths are project-relative and need no substitution):
+- `{{SKILLS_PATH}}` → 설치된 skills 루트 (`~/.claude/skills/` user scope, `.claude/skills/` project/local scope)
 - `{{SCRIPTS_PATH}}` → 설치된 scripts 경로
+- `${CLAUDE_SKILL_DIR}` → Anthropic-portable runtime template var; expands to the skill's install dir regardless of how it was installed. Prefer this over `{{SKILLS_PATH}}` for skills redistributed via plugin marketplace, where install-time substitution may not fire.
+
+**7. `name:` reserved words** — runtime fail:
+- `name:` cannot contain `anthropic` or `claude`. Skills with reserved words silently fail to install. Per Anthropic's authoring guide.
 
 ## Body Structure (XML `<component>`)
+
+> See top-of-file house-style note: this XML body convention diverges from Anthropic's guidance and is intentional.
 
 본문은 agent와 동일한 XML 패턴. 500줄 초과 시 `references/`로 분리.
 
 ```xml
 <component name="skill-name" type="skill">
 
-  <role>
+  <!-- Required tags: <role>, <gotchas>, <bounds>, <handoff> — appear in 5/5 shipped skills -->
+  <!-- Optional tags: <references>, <syntax>, <flow>, <tools>, <examples> — skill-shape-dependent -->
+
+  <role>                                                     <!-- required -->
     <mission>Single sentence purpose</mission>
   </role>
 
-  <references note="Load on demand — progressive disclosure">
+  <references note="Load on demand — progressive disclosure"> <!-- optional -->
   - `references/file.md` — What + when to read
   </references>
 
-  <syntax>/skill-name [args] [--flags]</syntax>
+  <syntax>/skill-name [args] [--flags]</syntax>              <!-- optional -->
 
-  <flow>
+  <flow>                                                     <!-- optional -->
     1. Step one
     2. Step two
   </flow>
 
-  <tools>
+  <tools>                                                    <!-- optional -->
     - ToolName: purpose
   </tools>
 
-  <gotchas>
+  <gotchas>                                                  <!-- required -->
   - pattern-name: 구체적 실패 + 행동 지침 (2-5 items)
   </gotchas>
 
-  <examples>
+  <examples>                                                 <!-- optional -->
   | Input | Output |
   |-------|--------|
   | `/skill-name arg` | Expected result |
   </examples>
 
-  <bounds should="core capabilities" avoid="out-of-scope actions"/>
-  <handoff next="/sc:next1 /sc:next2"/>
+  <bounds should="core capabilities" avoid="out-of-scope actions"/>  <!-- required -->
+  <handoff next="/sc:next1 /sc:next2"/>                      <!-- required -->
 </component>
 ```
 
+Required tags appear in 5/5 shipped skills. Optional tags are skill-shape-dependent.
+
 ### Body rules
 - `type="skill"` 필수 (agent와 구분)
-- `<bounds>` — `should`/`avoid` 속성 필수
+- `<bounds>` — `should` + `avoid` required; `fallback` optional. Skills are short-lived — implicit fallback is "skill ends, control returns to caller". Use explicit `fallback=` only if the recovery posture is non-obvious.
 - `<gotchas>` — **프로젝트 특유** 실패 패턴만 (force-push 금지 같은 일반론은 hooks로). 분기별 리뷰, 90일 미트리거 항목 제거
 - 본문 ≤500 lines. 상세 내용은 `references/`로 분리
 
 ## Validation Checklist
 
 1. `name` == 디렉토리명
-2. `description` + `when-to-use` 분리, 합쳐서 ≤1,536 chars (CC 2.1.105+ listing cap)
+2. `description` ≤1024 chars (validator-friendly) / ≤1,536 chars (CC listing cap), trigger phrases in first ~200 chars, third-person voice
 3. CC 확장 필드(`context`/`agent`/`hooks`)는 top-level, metadata 아래 금지
 4. 부작용 skill은 `disable-model-invocation: true`
 5. 스크립트 경로는 `{{SKILLS_PATH}}` 사용 (하드코딩 금지)
 6. `<bounds>` has `should` + `avoid`
 7. 본문 ≤500 lines
 8. `make deploy` 후 `/skill-name`으로 실제 호출 테스트
+
+## Style Recommendations (optional / advisory)
+
+- **Gerund naming.** Prefer `processing-pdfs` over `pdf-processor`. Anthropic's authoring guide leans gerund.
+- **Reference-file ToC.** If a `references/*.md` file exceeds 100 lines, add a table-of-contents at the top.
+- **Time-sensitive content.** Wrap "old patterns" in `<details>` collapsible blocks so they don't dominate context.
+
+## Runtime Quirks (CC version-pinned)
+
+<!-- last reviewed: 2026-04-25; verify quarterly, remove fixed issues -->
+
+These are CC runtime bugs verified open as of 2026-04-25. They affect skill behavior at runtime, not authoring correctness. Re-verify quarterly.
+
+- **#17688** — Skill-scoped hooks defined in SKILL.md frontmatter are not triggered within plugins. https://github.com/anthropics/claude-code/issues/17688
+- **#40630** — Skill-scoped hooks not propagated to forked subagent when `context: fork` is set. https://github.com/anthropics/claude-code/issues/40630
+- **#30874** — Skill-scoped PreToolUse hooks persist after the skill completes. https://github.com/anthropics/claude-code/issues/30874
 
 ## Anti-Patterns
 

@@ -1,10 +1,6 @@
 ---
 name: confidence-check
-description: Pre-start validation checklist for any work (plan, design, spec, implementation).
-when-to-use: >
-  When user says 'confidence check', 'validate first', 'before starting',
-  'before implementing', or wants validation before starting any work
-  (plan, design, spec, or implementation).
+description: Pre-start validation checklist for any work (plan, design, spec, implementation). This skill should be used when the user says 'confidence check', 'validate first', 'before starting work', 'before implementing', or asks to validate assumptions before any plan/design/spec/implementation. Do NOT trigger on the bare phrase 'before starting' in non-development contexts (meetings, conversations).
 ---
 <component name="confidence-check" type="skill">
 

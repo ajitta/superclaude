@@ -1,15 +1,13 @@
 ---
 name: ship
-description: Ship changes with git add, conventional commit, push, and optional PR creation.
-when-to-use: >
-  When user wants to ship, commit and push, create PR, or deploy changes to remote.
+description: Ship changes with git add, conventional commit, push, and optional PR creation. This skill should be used when the user says 'ship', 'commit and push', 'create PR', or wants to deploy changes to remote.
 disable-model-invocation: true
 hooks:
   PreToolUse:
     - matcher: "Bash"
       hooks:
         - type: command
-          command: "echo \"$CLAUDE_TOOL_INPUT\" | grep -qE 'git push --force|git push -f' && echo 'BLOCKED: Force push detected. Use regular push.' >&2 && exit 2 || exit 0"
+          command: "echo \"$CLAUDE_TOOL_INPUT\" | grep -qE 'git push (--force([^-]|$)|-f([^a-zA-Z]|$))' && echo 'BLOCKED: Force push detected. Use regular push (--force-with-lease is allowed).' >&2 && exit 2 || exit 0"
 ---
 <component name="ship" type="skill">
 
