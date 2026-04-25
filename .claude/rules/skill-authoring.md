@@ -4,6 +4,8 @@ paths: ["src/superclaude/skills/**", ".claude/rules/skill-authoring.md"]
 
 # Skill Authoring Rules
 
+> **House style note.** SuperClaude uses XML body for all authoring; this diverges from Anthropic's "no XML anywhere" guidance for skills. Decision rationale: `docs/research/rules-xml-conversion-ajitta-2026-04-14.md`. CC runtime accepts both forms; if redistributing a skill outside SuperClaude, prefer Markdown headings.
+
 > **Decision gate:** Create a skill when you need either:
 > 1. **CC-native capability**: hooks, `disable-model-invocation`, `allowed-tools`, or script execution.
 > 2. **Auto-invocation reference**: domain knowledge that should auto-trigger via CC description matching.
@@ -32,7 +34,7 @@ description: >
 name: deploy
 description: 프로덕션 배포 자동화.
 disable-model-invocation: true
-allowed-tools: Bash, Read
+allowed-tools: Bash Read
 argument-hint: "[environment]"
 ---
 
@@ -54,7 +56,9 @@ src/superclaude/skills/my-skill/
 └── assets/           ← 템플릿, 바이너리
 ```
 
-Install path: `src/superclaude/skills/ → ~/.claude/skills/`.
+Install paths (per `src/superclaude/cli/install_components.py:46-55`):
+- `--scope user` (default): `src/superclaude/skills/ → ~/.claude/skills/` (absolute, posix-resolved).
+- `--scope project` or `--scope local`: `src/superclaude/skills/ → ./.claude/skills/` (relative).
 
 ## YAML Frontmatter — Full Field Reference
 
@@ -74,11 +78,12 @@ user-invocable: false             # /menu 미표시 (Claude 자동 실행은 가
 argument-hint: "[arg]"            # slash command 자동완성
 
 # Execution
-model: opus                       # skill 활성 시 모델 override
-effort: high                      # low|medium|high|max 추론 깊이
-allowed-tools: Read, Grep, Glob   # 최소 권한 화이트리스트
+model: opus                       # skill 활성 시 모델 override (rarely set)
+effort: high                      # low|medium|high|max — omit by default; inherit from parent
+allowed-tools: Read Grep Glob     # space-separated; permission-grant (no-prompt list), not access-restriction
+paths: ["**/api/**"]              # rarely needed; auto-load only on matching files
 context: fork                     # subagent 격리 실행
-agent: Explore                    # fork 시 subagent 타입
+agent: Explore                    # fork 시 subagent 타입 (only with context: fork)
 
 # Lifecycle hooks
 hooks:
@@ -129,56 +134,67 @@ CC parser uses literal key matching with mixed conventions; do not reflexively k
 - `agent:`는 `context: fork`일 때만 동작 — `inline`이면 무시됨
 - `context:` 기본값은 `inline` → 명시 불필요. `fork` 필요할 때만 둘 다 지정
 
-**5. `allowed-tools` 최소 권한 템플릿**:
-- 읽기 전용: `Read, Grep, Glob`
-- 분석+검색: `Read, Grep, Glob, WebSearch, WebFetch`
-- 구현: `Read, Grep, Glob, Edit, Write, Bash`
+**5. `allowed-tools` 최소 권한 템플릿** (space-separated; permission-grant, not access-restriction — non-listed tools remain callable but require user approval):
+- 읽기 전용: `Read Grep Glob`
+- 분석+검색: `Read Grep Glob WebSearch WebFetch`
+- 구현: `Read Grep Glob Edit Write Bash`
 - 생략 시 부모 전체 도구 상속
 
-**6. Template variables** — 스크립트 경로는 반드시 사용:
-- `{{SKILLS_PATH}}` → 설치된 skills 루트 (`~/.claude/skills/`)
+**6. Template variables** — 스크립트 경로는 반드시 사용 (in `command:` strings; `<references>` paths are project-relative and need no substitution):
+- `{{SKILLS_PATH}}` → 설치된 skills 루트 (`~/.claude/skills/` user scope, `.claude/skills/` project/local scope)
 - `{{SCRIPTS_PATH}}` → 설치된 scripts 경로
+- `${CLAUDE_SKILL_DIR}` → Anthropic-portable runtime template var; expands to the skill's install dir regardless of how it was installed. Prefer this over `{{SKILLS_PATH}}` for skills redistributed via plugin marketplace, where install-time substitution may not fire.
+
+**7. `name:` reserved words** — runtime fail:
+- `name:` cannot contain `anthropic` or `claude`. Skills with reserved words silently fail to install. Per Anthropic's authoring guide.
 
 ## Body Structure (XML `<component>`)
+
+> See top-of-file house-style note: this XML body convention diverges from Anthropic's guidance and is intentional.
 
 본문은 agent와 동일한 XML 패턴. 500줄 초과 시 `references/`로 분리.
 
 ```xml
 <component name="skill-name" type="skill">
 
-  <role>
+  <!-- Required tags: <role>, <gotchas>, <bounds>, <handoff> — appear in 5/5 shipped skills -->
+  <!-- Optional tags: <references>, <syntax>, <flow>, <tools>, <examples> — skill-shape-dependent -->
+
+  <role>                                                     <!-- required -->
     <mission>Single sentence purpose</mission>
   </role>
 
-  <references note="Load on demand — progressive disclosure">
+  <references note="Load on demand — progressive disclosure"> <!-- optional -->
   - `references/file.md` — What + when to read
   </references>
 
-  <syntax>/skill-name [args] [--flags]</syntax>
+  <syntax>/skill-name [args] [--flags]</syntax>              <!-- optional -->
 
-  <flow>
+  <flow>                                                     <!-- optional -->
     1. Step one
     2. Step two
   </flow>
 
-  <tools>
+  <tools>                                                    <!-- optional -->
     - ToolName: purpose
   </tools>
 
-  <gotchas>
+  <gotchas>                                                  <!-- required -->
   - pattern-name: 구체적 실패 + 행동 지침 (2-5 items)
   </gotchas>
 
-  <examples>
+  <examples>                                                 <!-- optional -->
   | Input | Output |
   |-------|--------|
   | `/skill-name arg` | Expected result |
   </examples>
 
-  <bounds should="core capabilities" avoid="out-of-scope actions"/>
-  <handoff next="/sc:next1 /sc:next2"/>
+  <bounds should="core capabilities" avoid="out-of-scope actions"/>  <!-- required -->
+  <handoff next="/sc:next1 /sc:next2"/>                      <!-- required -->
 </component>
 ```
+
+Required tags appear in 5/5 shipped skills. Optional tags are skill-shape-dependent.
 
 ### Body rules
 - `type="skill"` 필수 (agent와 구분)
