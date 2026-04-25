@@ -47,7 +47,7 @@ def detect_authoring_test(file_path: str) -> str | None:
         if segment in parts:
             for parent in path.resolve().parents:
                 if (parent / "pyproject.toml").exists():
-                    return f"uv run pytest {shlex.quote(str(parent / test_file))} --tb=short -q"
+                    return f"uv run python -m pytest {shlex.quote(str(parent / test_file))} --tb=short -q"
             return None
     return None
 
@@ -61,7 +61,7 @@ def detect_test_command(file_path: str) -> str | None:
         if (parent / "pyproject.toml").exists() or (parent / "setup.py").exists():
             if (parent / "Makefile").exists():
                 return f"make -C {shlex.quote(str(parent))} test"
-            return "uv run pytest --tb=short -q"
+            return "uv run python -m pytest --tb=short -q"
 
         if (parent / "package.json").exists():
             return "npm test --silent"
