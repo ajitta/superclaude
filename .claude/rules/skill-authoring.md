@@ -6,6 +6,13 @@ paths: ["src/superclaude/skills/**", ".claude/rules/skill-authoring.md"]
 
 > **House style note.** SuperClaude uses XML body for all authoring; this diverges from Anthropic's "no XML anywhere" guidance for skills. Decision rationale: `docs/research/rules-xml-conversion-ajitta-2026-04-14.md`. CC runtime accepts both forms; if redistributing a skill outside SuperClaude, prefer Markdown headings.
 
+| Component | Role |
+|-----------|------|
+| Agent     | WHO TO BE |
+| Command   | WHAT TO DO |
+| Skill     | WHICH CAPABILITY |
+| Mode      | HOW TO THINK |
+
 > **Decision gate:** Create a skill when you need either:
 > 1. **CC-native capability**: hooks, `disable-model-invocation`, `allowed-tools`, or script execution.
 > 2. **Auto-invocation reference**: domain knowledge that should auto-trigger via CC description matching.
@@ -17,7 +24,7 @@ paths: ["src/superclaude/skills/**", ".claude/rules/skill-authoring.md"]
 | # | Archetype | Key fields | Use when |
 |---|-----------|-----------|----------|
 | ① | **Reference Skill** — auto-invoked | `description` (with trigger phrases folded in) | Domain knowledge should load when Claude sees matching keywords |
-| ② | **Workflow Skill** — user-invoked | `disable-model-invocation: true`, optional `context: fork` + `agent:` | Side-effect operations (deploy, release). Protect from auto-trigger |
+| ② | **Workflow Skill** — user-invoked | `disable-model-invocation: true`, optional `context: fork` + `agent:` | Workflow / explicit-invocation. Side-effect protection (deploy, release) OR delegation discipline (e.g., `simplicity-coach` reliably delegates to peer agent) |
 | ③ | **Background Context** — Claude-only | `user-invocable: false` | Silent context injection, never shown in `/menu` |
 
 ```yaml
@@ -64,6 +71,8 @@ Install paths (per `src/superclaude/cli/install_components.py:46-55`):
 
 All fields are **top-level**. `metadata:` is only for user-defined info (author, version) — never nest CC fields under it.
 
+> *Annotations reflect actual usage as of 2026-04-25 across 5 shipped skills. Aspirational fields are kept for reference but marked.*
+
 ```yaml
 ---
 # Identity
@@ -73,20 +82,20 @@ description: >                    # 권장 | ≤1024 chars (validator-friendly),
   Front-load trigger phrases in the first ~200 chars.
 
 # Invocation control
-disable-model-invocation: true    # 자동 호출 완전 차단 (부작용 skill)
-user-invocable: false             # /menu 미표시 (Claude 자동 실행은 가능)
-argument-hint: "[arg]"            # slash command 자동완성
+disable-model-invocation: true    # 3/5 shipped use this — 자동 호출 완전 차단 (부작용 skill)
+user-invocable: false             # 0/5 shipped use this — /menu 미표시 (Claude 자동 실행은 가능)
+argument-hint: "[arg]"            # 0/5 shipped use this — slash command 자동완성
 
 # Execution
-model: opus                       # skill 활성 시 모델 override (rarely set)
-effort: high                      # low|medium|high|max — omit by default; inherit from parent
-allowed-tools: Read Grep Glob     # space-separated; permission-grant (no-prompt list), not access-restriction
-paths: ["**/api/**"]              # rarely needed; auto-load only on matching files
-context: fork                     # subagent 격리 실행
-agent: Explore                    # fork 시 subagent 타입 (only with context: fork)
+model: opus                       # 0/5 shipped use this — skill 활성 시 모델 override
+effort: high                      # 0/5 shipped use this — low|medium|high|max; omit by default
+allowed-tools: Read Grep Glob     # 1/5 shipped use this — space-separated permission-grant
+paths: ["**/api/**"]              # 0/5 shipped use this — auto-load only on matching files
+context: fork                     # 0/5 shipped use this — subagent 격리 실행
+agent: Explore                    # 0/5 shipped use this — only with context: fork
 
 # Lifecycle hooks
-hooks:
+hooks:                            # 2/5 shipped use this
   PreToolUse:
     - matcher: "Bash"
       hooks:
@@ -94,7 +103,7 @@ hooks:
           command: "./scripts/validate.sh"
 
 # Misc
-metadata:                         # author/version 등 부가 정보 전용
+metadata:                         # 0/5 shipped use this — author/version 등 부가 정보 전용
   author: team-name
   version: "1.0.0"
 ---
@@ -198,7 +207,7 @@ Required tags appear in 5/5 shipped skills. Optional tags are skill-shape-depend
 
 ### Body rules
 - `type="skill"` 필수 (agent와 구분)
-- `<bounds>` — `should`/`avoid` 속성 필수
+- `<bounds>` — `should` + `avoid` required; `fallback` optional. Skills are short-lived — implicit fallback is "skill ends, control returns to caller". Use explicit `fallback=` only if the recovery posture is non-obvious.
 - `<gotchas>` — **프로젝트 특유** 실패 패턴만 (force-push 금지 같은 일반론은 hooks로). 분기별 리뷰, 90일 미트리거 항목 제거
 - 본문 ≤500 lines. 상세 내용은 `references/`로 분리
 

@@ -98,7 +98,7 @@ Operational parameters too detailed for the mode itself go in sibling `type="con
 
 1. Create `src/superclaude/modes/MODE_PascalCase.md` starting with `<component>`
 2. Define all 4 axes: thinking, communication, priorities, behaviors
-3. Add `<bounds>` (should/avoid/fallback) and `<handoff>`
+3. Add `<bounds>` (`should` + `avoid` required; `fallback` recommended for modes — explicit recovery when overlay doesn't apply) and `<handoff>`
 4. Add trigger to `scripts/context_loader.py` TRIGGER_MAP
 5. Add flag to `core/FLAGS.md` modes section
 6. Run `uv run pytest tests/unit/test_mode_structure.py -v`

@@ -131,7 +131,7 @@ Do not add `effort: xhigh` to an agent just because the domain "feels" coding-he
 
 - `<mission>` — shares ≥30% significant words with `description`
 - `<tool_guidance>` — no attributes, content only (Proceed/Ask First/Never)
-- `<bounds>` — `should` + `avoid` + `fallback` required
+- `<bounds>` — `should` + `avoid` required; `fallback` recommended (agents are long-lived; explicit recovery posture is high-leverage)
 - `<handoff>` — 2-3 natural next commands
 - `note=` attrs allowed only for: scope, safety ("do NOT"), version gate, reference location, quantified constraint. Remove if tag/content already conveys it
 

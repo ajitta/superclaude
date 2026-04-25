@@ -81,7 +81,7 @@ Never add these — SSOT: `.claude/rules/schemas.yaml` (`forbidden_command_field
 - `<role>` — first line is `/sc:command-name`, then `<mission>`
 - `<mission>` — shares ≥30% significant words with frontmatter `description`
 - `<flow>` — numbered execution steps (≥2)
-- `<bounds>` — `should` + `avoid` attributes required
+- `<bounds>` — `should` + `avoid` required; `fallback` optional (use when out-of-scope handling is non-obvious; example at line 70 demonstrates)
 - `<handoff next="...">` — 2-3 natural next commands
 - Optional: `<outputs>`, `<mcp>`, `<tools>`, `<gotchas>`, `<examples>`
 
