@@ -17,7 +17,7 @@ deploy:
 # Run tests
 test:
 	@echo "Running tests..."
-	uv run pytest
+	uv run python -m pytest
 
 # Test pytest plugin loading
 test-plugin:
