@@ -1,8 +1,6 @@
 ---
 name: finishing-a-development-branch
-description: Complete development work with structured options for merge, PR, or cleanup.
-when-to-use: >
-  When user is done with a feature branch and wants to merge, create PR, or clean up.
+description: Complete development work with structured options for merge, PR, or cleanup. This skill should be used when the user is done with a feature branch and wants to merge it, create a PR, or clean up branches.
 disable-model-invocation: true
 allowed-tools: Bash, Read, Grep, Glob
 hooks:

@@ -1,10 +1,6 @@
 ---
 name: verbalized-sampling
-description: Research-backed verbalized sampling for diverse response generation with three variants.
-when-to-use: >
-  When user explicitly requests "multiple perspectives", "diverse responses", "explore options",
-  "brainstorm alternatives", or says "VS", "VS-CoT", "verbalized sampling", "--vs".
-  Do NOT trigger for routine coding questions, simple factual queries, or single-answer requests.
+description: Research-backed verbalized sampling for diverse response generation with three variants. This skill should be used when the user explicitly requests "multiple perspectives", "diverse responses", "explore options", "brainstorm alternatives", or says "VS", "VS-CoT", "verbalized sampling", or "--vs". Do NOT trigger for routine coding questions, simple factual queries, or single-answer requests.
 ---
 <component name="verbalized-sampling" type="skill">
 

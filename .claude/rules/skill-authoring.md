@@ -14,7 +14,7 @@ paths: ["src/superclaude/skills/**", ".claude/rules/skill-authoring.md"]
 
 | # | Archetype | Key fields | Use when |
 |---|-----------|-----------|----------|
-| ① | **Reference Skill** — auto-invoked | `description` + `when-to-use` | Domain knowledge should load when Claude sees matching keywords |
+| ① | **Reference Skill** — auto-invoked | `description` (with trigger phrases folded in) | Domain knowledge should load when Claude sees matching keywords |
 | ② | **Workflow Skill** — user-invoked | `disable-model-invocation: true`, optional `context: fork` + `agent:` | Side-effect operations (deploy, release). Protect from auto-trigger |
 | ③ | **Background Context** — Claude-only | `user-invocable: false` | Silent context injection, never shown in `/menu` |
 
@@ -22,9 +22,9 @@ paths: ["src/superclaude/skills/**", ".claude/rules/skill-authoring.md"]
 # ① Reference — minimal
 ---
 name: api-conventions
-description: API 설계 패턴과 컨벤션 가이드.
-when-to-use: >
-  REST 엔드포인트 작성, 에러 포맷, API 버전 관리 시 자동 적용.
+description: >
+  API 설계 패턴과 컨벤션 가이드. This skill should be used when working on
+  REST endpoints, error formats, or API versioning.
 ---
 
 # ② Workflow — side-effect protection
@@ -64,9 +64,9 @@ All fields are **top-level**. `metadata:` is only for user-defined info (author,
 ---
 # Identity
 name: my-skill                    # 권장 | lowercase+hyphens, ≤64자, 디렉토리명과 일치
-description: One-line purpose.    # 권장 | ≤1,536 chars (CC 2.1.105+ listing cap, 초과 시 기동 경고)
-when-to-use: >                    # 권장 | 트리거 키워드/시나리오
-  When user mentions X, Y, Z.
+description: >                    # 권장 | ≤1024 chars (validator-friendly), ≤1,536 chars (CC listing cap, soft truncation)
+  One-line purpose. This skill should be used when user mentions X, Y, Z.
+  Front-load trigger phrases in the first ~200 chars.
 
 # Invocation control
 disable-model-invocation: true    # 자동 호출 완전 차단 (부작용 skill)
@@ -99,15 +99,24 @@ metadata:                         # author/version 등 부가 정보 전용
 
 ## Field Rules (저작 시 가장 자주 틀리는 지점)
 
-**1. `description` vs `when-to-use` 분리** — 가장 중요:
-시작 시 모든 skill의 name+description+when-to-use가 시스템 프롬프트에 주입됨. 본문은 선택 후에야 읽힘.
-- `description`: "무엇" (한 줄 요약)
-- `when-to-use`: "언제" (트리거 키워드 집중)
+**1. `description` authoring pattern** — 가장 중요:
+시작 시 모든 skill의 `name`+`description`이 시스템 프롬프트에 주입됨. 본문은 선택 후에야 읽힘.
+- **Single field, third-person voice**: `description: <one-line purpose>. This skill should be used when <trigger contexts>.`
+- **Trigger phrases first ~200 chars**: 자주 잘리므로 키워드는 앞쪽에.
+- **Why one field, not two?** Anthropic의 canonical `skill-reviewer` 가 `when_to_use`를 deprecated 로 표시 (snake_case form). 프로젝트가 사용하던 hyphenated `when-to-use`는 CC parser 가 무시 (silent drop). 따라서 모든 트리거 키워드는 `description` 안으로 통합.
 
 **2. Description budget** (CC runtime):
-- 전체 skill/command description 합산 ~15,000 chars (`SLASH_COMMAND_TOOL_CHAR_BUDGET`)
-- 개별 description은 listing에서 ~1,536 chars로 잘림 (CC 2.1.105+, 이전 cap 250) — 트리거 키워드는 여전히 첫 100 chars 안에 두는 것이 권장
-- Anthropic 번들 skill 우선, custom skill이 먼저 잘림
+- 전체 skill/command description 합산: **1% of context window, fallback ~8,000 chars** (override via `SLASH_COMMAND_TOOL_CHAR_BUDGET` env var)
+- 개별 description: ≤1024 chars (agentskills.io validator-friendly), ≤1,536 chars (CC 2.1.105+ listing cap, soft truncation)
+- 트리거 키워드는 첫 ~200 chars 안에 둘 것
+- Anthropic 번들 skill 우선; custom skill이 먼저 잘림
+
+**Naming taxonomy (parser literals — exact match required):**
+- `kebab-case`: `disable-model-invocation`, `allowed-tools`, `user-invocable`, `argument-hint`
+- `single-word`: `name`, `description`, `model`, `effort`, `version`, `paths`
+- `snake_case`: only `when_to_use` — **deprecated by Anthropic, do not use**
+
+CC parser uses literal key matching with mixed conventions; do not reflexively kebab-case everything.
 
 **3. `disable-model-invocation` vs `user-invocable`** — 혼동 금지:
 
@@ -180,7 +189,7 @@ metadata:                         # author/version 등 부가 정보 전용
 ## Validation Checklist
 
 1. `name` == 디렉토리명
-2. `description` + `when-to-use` 분리, 합쳐서 ≤1,536 chars (CC 2.1.105+ listing cap)
+2. `description` ≤1024 chars (validator-friendly) / ≤1,536 chars (CC listing cap), trigger phrases in first ~200 chars, third-person voice
 3. CC 확장 필드(`context`/`agent`/`hooks`)는 top-level, metadata 아래 금지
 4. 부작용 skill은 `disable-model-invocation: true`
 5. 스크립트 경로는 `{{SKILLS_PATH}}` 사용 (하드코딩 금지)

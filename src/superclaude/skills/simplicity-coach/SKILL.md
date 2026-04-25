@@ -1,12 +1,7 @@
 ---
 name: simplicity-coach
-description: Explicit OSL coaching, daybook journaling, and dependency audits (invoke with /simplicity-coach).
+description: Explicit OSL coaching, daybook journaling, and dependency audits (invoke with /simplicity-coach). This skill should be used for daybook journaling, dependency-gate audits, 3-level feedback reviews, or structured OSL coaching sessions. For passive simplicity mindset during coding, the simplicity-guide agent activates automatically — do not invoke this skill for that.
 disable-model-invocation: true
-when-to-use: >
-  Explicit invocation only via /simplicity-coach. Use for: daybook journaling,
-  dependency-gate audits, 3-level feedback reviews, structured OSL coaching sessions.
-  For passive simplicity mindset during coding, the simplicity-guide agent
-  activates automatically — do not invoke this skill for that.
 ---
 <component name="simplicity-coach" type="skill">
 
