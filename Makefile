@@ -8,16 +8,18 @@ install:
 	@echo "✅ Installation complete!"
 	@echo "   Run 'make verify' to check installation"
 
-# Deploy to global uv tool (editable mode for instant changes)
+# Deploy to global uv tool (editable mode) + sync content to ~/.claude/
 deploy:
 	@echo "🚀 Deploying SuperClaude as global tool (editable)..."
 	uv tool install --force --editable .
-	@echo "✅ Deployed! Changes in src/ are reflected immediately."
+	@echo "📦 Syncing content (skills, agents, commands, hooks) to ~/.claude/..."
+	uv run superclaude install --force
+	@echo "✅ Deployed! Changes in src/ AND ~/.claude/ content updated."
 
-# Run tests
+# Run tests (canary excluded by default — invoke explicitly: pytest -m canary)
 test:
 	@echo "Running tests..."
-	uv run pytest
+	uv run python -m pytest -m "not canary"
 
 # Test pytest plugin loading
 test-plugin:

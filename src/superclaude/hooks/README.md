@@ -37,6 +37,7 @@ Hooks are defined in `hooks.json` and support the following events:
 ### SessionStart
 
 - **session_init.py**: Initializes SuperClaude context and settings
+- **memory_staleness.py**: Scans the current project's CC memory directory and prints a stderr summary for any entry whose `verified: <YYYY-MM-DD>` frontmatter is older than `SUPERCLAUDE_MEMORY_STALE_DAYS` (default 90). Non-blocking. See "Memory `verified:` convention" below.
 
 ### UserPromptSubmit
 
@@ -197,3 +198,27 @@ Hook scripts receive JSON via stdin with common and event-specific fields:
 - Use stderr for error/block messages
 - Keep execution time under the timeout limit
 - Scripts receive context via environment variables and stdin (JSON)
+
+## Memory `verified:` convention (memory_staleness.py)
+
+CC auto-memory entries under `~/.claude/projects/<encoded-cwd>/memory/*.md` MAY include a `verified:` frontmatter field with an ISO date (`YYYY-MM-DD`). The SessionStart `memory_staleness.py` hook scans these and warns when any entry's `verified:` is older than the configured threshold.
+
+```markdown
+---
+name: my-memory-entry
+description: Something I want future sessions to know
+type: reference
+verified: 2026-04-25
+---
+
+Body content.
+```
+
+**Why:** A memory entry that says "X is true" only stays true for as long as upstream X stays the same. Without a freshness signal, contradictions ship invisibly (the 2026-04-25 retrospective documents a 14-day window where a memory contradicted upstream and shipped a silent bug).
+
+**Configuration:**
+- `SUPERCLAUDE_MEMORY_STALE_DAYS` env var — threshold in days (default 90; non-numeric or ≤0 falls back to default).
+
+**Output:** stderr line `⚠️ N memory entries verified > <T> days ago: [filenames]`. Non-blocking; the hook never returns nonzero.
+
+**Path encoding:** CC stores project-scoped memories under directories named by collapsing the project's absolute path: `:\` and `:/` collapse to `--`, remaining path separators become `-`. Example: `C:\Users\ajitta\Repos\ajitta\superclaude` → `C--Users-ajitta-Repos-ajitta-superclaude`.

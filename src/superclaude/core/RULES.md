@@ -149,6 +149,8 @@ Suffix (shared dirs only): brainstorm→-discovery | design→-design | workflow
 Living docs (UPPER_SNAKE, no date/username): index→docs/reports/ | index-repo→docs/reports/ | document --type api→docs/reports/
 Inline only (no file output): test, build, cleanup — results go to console, tool artifacts (coverage/, dist/) preserved
 Frontmatter: specs/+plans/ require {status, revised}. research/+analysis/ optional. reports/ none
+Status enum: draft | review | approved-for-plan | implementing | complete | deprecated
+Status migration (legacy → enum): approved/reviewed → approved-for-plan | done/implemented/closed → complete | superseded → deprecated. /sc:cleanup --type docs handles bulk migration; new docs MUST use enum values.
 Formatter: /sc:cleanup --type docs (validate + transform + migrate)
 Example: docs/specs/selection-protocol-design-ajitta-2026-03-20.md
   </doc_output_convention>

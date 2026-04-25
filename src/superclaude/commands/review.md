@@ -9,7 +9,7 @@ description: Review work products (code, plans, designs, specs) for quality, cor
     <mission>Review work products — code, plans, designs, specs — for quality, correctness, and alignment with structured feedback</mission>
   </role>
 
-  <syntax>/sc:review [target] [--scope pr|diff|file|branch|plan|design|spec] [--structured]</syntax>
+  <syntax>/sc:review [target] [--scope pr|diff|file|branch|plan|design|spec] [--structured] [--audit-delegated]</syntax>
 
   <flow>
     1. Scope: Determine review range — PR/diff/file/branch for code, or plan/design/spec doc path
@@ -19,6 +19,7 @@ description: Review work products (code, plans, designs, specs) for quality, cor
     5. Categorize: Group findings as Critical (must fix) | Important (should fix) | Suggestion (nice to have)
     6. Verify: Evidence appropriate to artifact type — tests+lint for code, executability+completeness for plans, trade-off rationale for designs, acceptance criteria for specs
     7. Process: For each finding — classify (change request vs concern vs question) → verify against source of truth → propose fix or push back with evidence
+    8. Delegated-decision audit (--audit-delegated): when invoked on a spec with a "Resolved Decisions" table, scope review to ONLY the rows whose `mode` is `delegated` (per /sc:brainstorm step 5c heuristic). Surface for each: original Q, model recommendation, and an independent re-evaluation of the choice. Other rows are skipped. Source: 2026-04-25 §5.3 — delegated decisions historically need explicit audit; user-confirmed choices already passed direct user judgment.
   </flow>
 
   <outputs>
