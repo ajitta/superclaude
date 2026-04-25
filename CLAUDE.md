@@ -22,7 +22,7 @@ uv run superclaude install --list-all      # Test CLI changes
 
 ```bash
 make install       # uv pip install -e ".[dev]"
-make deploy        # Deploy to global uv tool (editable — src/ changes reflect immediately)
+make deploy        # Deploy CLI (editable) + sync content (skills/agents/commands/hooks) to ~/.claude/
 make test          # uv run pytest
 make test-plugin   # Verify pytest plugin loads
 make verify        # Full installation check
@@ -39,7 +39,7 @@ make clean         # Remove artifacts
 
 ## Developer Environment
 
-- Editable install via `make deploy` (`uv tool install --editable .`) — `src/` changes reflect immediately
+- `make deploy` does two steps: `uv tool install --force --editable .` (CLI editable) + `uv run superclaude install --force` (syncs `src/` content to `~/.claude/`). Single command, single mental model: `src/` change → `make deploy` → both CLI and `~/.claude/` reflect.
 - Template variables `{{SCRIPTS_PATH}}` and `{{SKILLS_PATH}}` resolved at install time
 - Experimental Agent Teams: `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`
 
