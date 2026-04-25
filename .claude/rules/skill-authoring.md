@@ -39,7 +39,7 @@ description: >
 # ② Workflow — side-effect protection
 ---
 name: deploy
-description: 프로덕션 배포 자동화.
+description: Production deployment automation.
 disable-model-invocation: true
 allowed-tools: Bash Read
 argument-hint: "[environment]"
@@ -48,7 +48,7 @@ argument-hint: "[environment]"
 # ③ Background — silent
 ---
 name: legacy-auth-context
-description: 레거시 인증 시스템 배경 지식.
+description: Legacy auth system background knowledge.
 user-invocable: false
 ---
 ```
@@ -57,10 +57,10 @@ user-invocable: false
 
 ```
 src/superclaude/skills/my-skill/
-├── SKILL.md          ← 필수 (entrypoint)
-├── scripts/          ← 실행 스크립트 (use {{SKILLS_PATH}} in refs)
-├── references/       ← 세부 내용 (progressive disclosure)
-└── assets/           ← 템플릿, 바이너리
+├── SKILL.md          ← required (entrypoint)
+├── scripts/          ← executable scripts (use {{SKILLS_PATH}} in command: strings)
+├── references/       ← detailed content (progressive disclosure)
+└── assets/           ← templates, binaries
 ```
 
 Install paths (per `src/superclaude/cli/install_components.py:46-55`):
@@ -76,22 +76,22 @@ All fields are **top-level**. `metadata:` is only for user-defined info (author,
 ```yaml
 ---
 # Identity
-name: my-skill                    # 권장 | lowercase+hyphens, ≤64자, 디렉토리명과 일치
-description: >                    # 권장 | ≤1024 chars (validator-friendly), ≤1,536 chars (CC listing cap, soft truncation)
+name: my-skill                    # recommended | lowercase+hyphens, ≤64 chars, matches directory name
+description: >                    # recommended | ≤1024 chars (validator-friendly), ≤1,536 chars (CC listing cap, soft truncation)
   One-line purpose. This skill should be used when user mentions X, Y, Z.
   Front-load trigger phrases in the first ~200 chars.
 
 # Invocation control
-disable-model-invocation: true    # 3/5 shipped use this — 자동 호출 완전 차단 (부작용 skill)
-user-invocable: false             # 0/5 shipped use this — /menu 미표시 (Claude 자동 실행은 가능)
-argument-hint: "[arg]"            # 0/5 shipped use this — slash command 자동완성
+disable-model-invocation: true    # 3/5 shipped use this — block auto-invocation (side-effect skill)
+user-invocable: false             # 0/5 shipped use this — hidden from /menu (Claude auto-invoke still possible)
+argument-hint: "[arg]"            # 0/5 shipped use this — slash command autocomplete
 
 # Execution
-model: opus                       # 0/5 shipped use this — skill 활성 시 모델 override
+model: opus                       # 0/5 shipped use this — model override when skill active
 effort: high                      # 0/5 shipped use this — low|medium|high|max; omit by default
 allowed-tools: Read Grep Glob     # 1/5 shipped use this — space-separated permission-grant
 paths: ["**/api/**"]              # 0/5 shipped use this — auto-load only on matching files
-context: fork                     # 0/5 shipped use this — subagent 격리 실행
+context: fork                     # 0/5 shipped use this — isolated subagent execution
 agent: Explore                    # 0/5 shipped use this — only with context: fork
 
 # Lifecycle hooks
@@ -103,7 +103,7 @@ hooks:                            # 2/5 shipped use this
           command: "./scripts/validate.sh"
 
 # Misc
-metadata:                         # 0/5 shipped use this — author/version 등 부가 정보 전용
+metadata:                         # 0/5 shipped use this — user-defined info only (author, version, etc.)
   author: team-name
   version: "1.0.0"
 ---
@@ -221,6 +221,22 @@ Required tags appear in 5/5 shipped skills. Optional tags are skill-shape-depend
 6. `<bounds>` has `should` + `avoid`
 7. 본문 ≤500 lines
 8. `make deploy` 후 `/skill-name`으로 실제 호출 테스트
+
+## Style Recommendations (optional / advisory)
+
+- **Gerund naming.** Prefer `processing-pdfs` over `pdf-processor`. Anthropic's authoring guide leans gerund.
+- **Reference-file ToC.** If a `references/*.md` file exceeds 100 lines, add a table-of-contents at the top.
+- **Time-sensitive content.** Wrap "old patterns" in `<details>` collapsible blocks so they don't dominate context.
+
+## Runtime Quirks (CC version-pinned)
+
+<!-- last reviewed: 2026-04-25; verify quarterly, remove fixed issues -->
+
+These are CC runtime bugs verified open as of 2026-04-25. They affect skill behavior at runtime, not authoring correctness. Re-verify quarterly.
+
+- **#17688** — Skill-scoped hooks defined in SKILL.md frontmatter are not triggered within plugins. https://github.com/anthropics/claude-code/issues/17688
+- **#40630** — Skill-scoped hooks not propagated to forked subagent when `context: fork` is set. https://github.com/anthropics/claude-code/issues/40630
+- **#30874** — Skill-scoped PreToolUse hooks persist after the skill completes. https://github.com/anthropics/claude-code/issues/30874
 
 ## Anti-Patterns
 
