@@ -1,156 +1,172 @@
 <div align="center">
 
-# 🚀 SuperClaude Framework
+# 🚀 superclaude
 
-[![Run in Smithery](https://smithery.ai/badge/skills/SuperClaude-Org)](https://smithery.ai/skills?ns=SuperClaude-Org&utm_source=github&utm_medium=badge)
+#### *A Claude Code content framework — fork-origin, now its own project*
 
-
-### **Transform Claude Code into a Structured Development Platform**
-
-<p align="center">
-  <a href="https://github.com/hesreallyhim/awesome-claude-code/">
-  <img src="https://awesome.re/mentioned-badge-flat.svg" alt="Mentioned in Awesome Claude Code">
+<p>
+  <img src="https://img.shields.io/badge/version-4.5.1+ajitta-blue" alt="Version">
+  <a href="https://github.com/ajitta/superclaude/actions/workflows/test.yml">
+    <img src="https://github.com/ajitta/superclaude/actions/workflows/test.yml/badge.svg" alt="Tests">
   </a>
-<a href="https://github.com/SuperClaude-Org/SuperGemini_Framework" target="_blank">
-  <img src="https://img.shields.io/badge/Try-SuperGemini_Framework-blue" alt="Try SuperGemini Framework"/>
-</a>
-<a href="https://github.com/SuperClaude-Org/SuperQwen_Framework" target="_blank">
-  <img src="https://img.shields.io/badge/Try-SuperQwen_Framework-orange" alt="Try SuperQwen Framework"/>
-</a>
-  <img src="https://img.shields.io/badge/version-4.2.1+ajitta-blue" alt="Version">
-  <a href="https://github.com/SuperClaude-Org/SuperClaude_Framework/actions/workflows/test.yml">
-    <img src="https://github.com/SuperClaude-Org/SuperClaude_Framework/actions/workflows/test.yml/badge.svg" alt="Tests">
-  </a>
-  <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License">
+  <img src="https://img.shields.io/badge/license-MIT-yellow.svg" alt="License">
   <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs Welcome">
 </p>
 
-<p align="center">
-  <a href="https://superclaude.netlify.app/">
-    <img src="https://img.shields.io/badge/🌐_Visit_Website-blue" alt="Website">
-  </a>
-  <a href="https://pypi.org/project/superclaude/">
-    <img src="https://img.shields.io/pypi/v/SuperClaude.svg?" alt="PyPI">
-  </a>
-  <a href="https://pepy.tech/projects/superclaude">
-    <img src="https://static.pepy.tech/personalized-badge/superclaude?period=total&units=INTERNATIONAL_SYSTEM&left_color=BLACK&right_color=GREEN&left_text=downloads" alt="PyPI sats">
-  </a>
-</p>
-
-<p align="center">
-  <a href="README.md">
-    <img src="https://img.shields.io/badge/🇺🇸_English-blue" alt="English">
-  </a>
-  <a href="README-zh.md">
-    <img src="https://img.shields.io/badge/🇨🇳_中文-red" alt="中文">
-  </a>
-  <a href="README-ja.md">
-    <img src="https://img.shields.io/badge/🇯🇵_日本語-green" alt="日本語">
-  </a>
-</p>
-
-<p align="center">
-  <a href="#-quick-installation">Quick Start</a> •
-  <a href="#-support-the-project">Support</a> •
-  <a href="#-whats-new-in-v4">Features</a> •
-  <a href="#-documentation">Docs</a> •
-  <a href="#-contributing">Contributing</a>
-</p>
-
 </div>
+
+> **Origin & relationship to upstream.** `superclaude` started as a fork of [SuperClaude_Framework](https://github.com/SuperClaude-Org/SuperClaude_Framework) (Kazuki Nakai, NomenAK, Mithun Gowda B). It has since diverged — different MCP set, procedural skills system, insight pipeline, scope-explicit install, tightened workflow gates — and is **no longer a downstream of upstream**. The two projects share neither roadmap nor maintainers.
 
 ---
 
 <div align="center">
 
-## 📊 **Framework Statistics**
+## 📊 **At a glance**
 
-| **Commands** | **Agents** | **Modes** | **MCP Servers** |
-|:------------:|:----------:|:---------:|:---------------:|
-| **30** | **20** | **8** | **10** |
-| Slash Commands | Specialized AI | Behavioral | Integrations |
-
-30 slash commands covering the complete development lifecycle from brainstorming to deployment.
+| Commands | Agents | Modes | MCP Servers | Skills |
+|:--------:|:------:|:-----:|:-----------:|:------:|
+| **33**   | **23** | **7** | **8**       | **5**  |
+| Slash    | Domain-expert | Behavioral | Integrations | Procedural |
 
 </div>
 
----
+33 slash commands cover the development lifecycle from brainstorming to deployment. 5 procedural skills (`confidence-check`, `ship`, `simplicity-coach`, `verbalized-sampling`, `finishing-a-development-branch`) auto-load on matching prompts.
 
-<div align="center">
+---
 
 ## 🎯 **Overview**
 
-SuperClaude is a **meta-programming configuration framework** that transforms Claude Code into a structured development platform through behavioral instruction injection and component orchestration. It provides systematic workflow automation with powerful tools and intelligent agents.
+`superclaude` is a **content framework** for Claude Code: a directory of markdown (commands, agents, modes, MCP docs, core rules) plus a small CLI / pytest plugin that installs that content into Claude Code's content directories — `~/.claude/` (user), `./.claude/` (project), or `./.claude/` (local, gitignored).
 
+Claude Code reads those files at session start, which is how the framework changes its behavior. There is no runtime engine, no daemon, no proxy.
 
-## Disclaimer
+> **Disclaimer.** This project is not affiliated with or endorsed by Anthropic, nor by the upstream SuperClaude Framework. Claude Code is built and maintained by [Anthropic](https://www.anthropic.com/).
 
-This project is not affiliated with or endorsed by Anthropic.
-Claude Code is a product built and maintained by [Anthropic](https://www.anthropic.com/).
+---
 
-## 📖 **For Developers & Contributors**
+## 📖 **For developers & contributors**
 
-**Essential documentation for working with SuperClaude Framework:**
+**Essential reading when working in this repo:**
 
-| Document | Purpose | When to Read |
-|----------|---------|--------------|
-| **[PLANNING.md](PLANNING.md)** | Architecture, design principles, absolute rules | Session start, before implementation |
-| **[TASK.md](TASK.md)** | Current tasks, priorities, backlog | Daily, before starting work |
-| **[KNOWLEDGE.md](KNOWLEDGE.md)** | Accumulated insights, best practices, troubleshooting | When encountering issues, learning patterns |
-| **[CONTRIBUTING.md](CONTRIBUTING.md)** | Contribution guidelines, workflow | Before submitting PRs |
+| File | Purpose |
+|------|---------|
+| [`CLAUDE.md`](CLAUDE.md) | Project-specific rules: env (UV), make targets, test baseline (1,628 passing), git workflow |
+| [`src/superclaude/ARCHITECTURE.md`](src/superclaude/ARCHITECTURE.md) | Content-framework taxonomy — directory roles, delivery pipelines, content types |
+| [`src/superclaude/CLAUDE_SC.md`](src/superclaude/CLAUDE_SC.md) | The always-loaded import chain → `core/FLAGS.md`, `PRINCIPLES.md`, `RULES.md` |
+| [`.claude/rules/`](.claude/rules) | Authoring specs for agents/commands/skills/modes |
+| [`.claude/rules/gotchas/`](.claude/rules/gotchas) | Project-specific traps (e.g. *do not Read sub-agent `*.output` files*) |
+| [`SECURITY.md`](SECURITY.md) | Security disclosure policy |
 
-> **💡 Pro Tip**: Claude Code reads these files at session start to ensure consistent, high-quality development aligned with project standards.
+> Claude Code auto-loads `CLAUDE.md` and the `core/` import chain at session start, so the rules apply to every interaction inside this repo.
 
 ## ⚡ **Quick Installation**
 
-### **Current Stable Version (v4.2.1+ajitta)**
+### **Current Stable Version (v4.5.1+ajitta)**
 
-SuperClaude currently uses slash commands.
+`superclaude` ships markdown content (commands, agents, modes, MCP docs, core rules, hooks, skills) plus a small CLI that copies it into Claude Code's content directories.
+
+#### **1. Install the CLI**
 
 ```bash
-# Clone the repository
 git clone https://github.com/ajitta/superclaude.git
 cd superclaude
 
-# Deploy as global uv tool
+# Editable uv tool install — `superclaude` becomes available globally.
 make deploy
-# If make is not available, use uv directly:
-# uv tool install --force .
-
-# Install commands, agents, modes, and core configs into ~/.claude/
-superclaude install --force
-
-# Install MCP servers (optional, for enhanced capabilities)
-superclaude mcp
-
-# Verify installation
-superclaude install --list
-superclaude doctor
+# Equivalent without make:
+# uv tool install --force --editable .
 ```
 
-After installation, restart Claude Code to use 30 commands including:
-- `/sc:research` - Deep web research (enhanced with Tavily MCP)
-- `/sc:brainstorm` - Structured brainstorming
-- `/sc:implement` - Code implementation
-- `/sc:test` - Testing workflows
-- `/sc:pm` - Project management
-- `/sc` - Show all 30 available commands
+#### **2. Install framework content with `superclaude install`**
 
-**CLI Scope Reference (all commands use consistent --scope):**
+```bash
+superclaude install                    # default: --scope user (~/.claude/, global)
+superclaude install --scope project    # team-shared, committed to ./.claude/
+superclaude install --scope local      # personal-in-team-repo (./.claude/, gitignored,
+                                       #   uses settings.local.json + CLAUDE.local.md)
+superclaude install --force            # overwrite an existing install
+superclaude install -i                 # interactive wizard (scope → preview → confirm)
+superclaude install --list             # show available components, install nothing
+superclaude install --list-all         # show every component + its install status
+```
+
+What gets installed (per scope):
+
+```
+<scope>/
+├── commands/sc/        # 33 slash commands (/sc:plan, /sc:implement, …)
+├── agents/             # 23 agent definitions
+├── skills/             # 5 procedural skills
+├── superclaude/        # core rules, modes, mcp docs, scripts
+├── hooks/hooks.json    # SessionStart / PreCompact / SessionEnd / etc.
+└── settings(.local).json  # framework hooks merged in (your existing hooks preserved)
+```
+
+#### **3. Install MCP servers (optional)**
+
+```bash
+superclaude mcp                        # interactive picker (default scope: user)
+superclaude mcp --list                 # list available servers
+superclaude mcp --servers tavily context7
+superclaude mcp --scope project        # write to ./.mcp.json (team-shared)
+superclaude mcp --scope local          # write to ~/.claude.json local block
+```
+
+#### **4. Verify**
+
+```bash
+superclaude install --list-all          # component-by-component status
+superclaude doctor                      # health check
+superclaude verify-drift                # detect drift between source and installed copy
+superclaude version
+```
+
+Restart Claude Code, then try a few:
+
+- `/sc:brainstorm` — Socratic discovery for vague requests
+- `/sc:plan` — Detailed TDD implementation plans
+- `/sc:implement` — Code implementation
+- `/sc:review` — Multi-dimensional review (code/plan/design)
+- `/sc:research` — Deep web research (Tavily-enhanced)
+- `/sc:insight` — Capture structured session insights to JSONL
+- `/sc` — List all 33 commands
+
+#### **Update**
+
+```bash
+superclaude update                     # default: --scope user
+superclaude update --scope project
+superclaude update --force             # re-copy even unchanged files
+```
+
+#### **Uninstall**
+
+```bash
+superclaude uninstall --dry-run        # preview, no changes
+superclaude uninstall                  # default: --scope user, asks to confirm
+superclaude uninstall -y               # skip confirmation
+superclaude uninstall --scope project  # remove from ./.claude/
+superclaude uninstall --scope local    # also removes CLAUDE.local.md + cleans .gitignore
+superclaude uninstall --keep-settings  # leave settings.json hooks alone
+superclaude uninstall --remove-mcp     # also unregister framework-installed MCP servers
+                                       #   (default keeps them — they're shared with other tools)
+```
+
+The uninstall is marker-based: it removes only the hooks and the `@superclaude` import that the installer wrote. User-added hooks, MCP servers, and CLAUDE.md content are preserved unless you explicitly opt out.
+
+#### **CLI scope summary**
 
 | Command | Scopes | Default |
 |---------|--------|---------|
-| `superclaude install` | `user`, `project` | `user` |
-| `superclaude uninstall` | `user`, `project` | `user` |
-| `superclaude update` | `user`, `project` | `user` |
+| `superclaude install` / `update` / `uninstall` | `user`, `project`, `local` | `user` |
 | `superclaude install-skill` | `user`, `project` | `user` |
-| `superclaude mcp` | `local`, `project`, `user` | `user` |
+| `superclaude mcp` | `user`, `project`, `local` | `user` |
 
-| Scope | Path | Description |
+| Scope | Path | When to use |
 |-------|------|-------------|
-| `user` | `~/.claude/` | Global installation (default) |
-| `project` | `./.claude/` | Current project only |
-| `local` | `.mcp.json` | MCP servers only |
+| `user` | `~/.claude/` | Personal global install (default — daily use) |
+| `project` | `./.claude/` (committed) | Team-shared, checked into git |
+| `local` | `./.claude/` (gitignored) | Personal install inside a team repo (uses `settings.local.json`, `CLAUDE.local.md`) |
 
 **For contributors/developers:**
 ```bash
@@ -161,8 +177,13 @@ uv pip install -e ".[dev]"
 uv run superclaude install --list-all  # Test changes immediately
 uv run pytest tests/ -v                 # Run tests
 
-# Deploy changes to global tool (recommended)
-make deploy               # Handles cache invalidation automatically
+# Deploy CLI as a global uv tool (editable). Content sync is a separate step.
+make deploy
+
+# Sync framework content to a scope (force-sync — for headless `claude -p`)
+make sync-user      # → ~/.claude/        (global, recommended for daily use)
+make sync-project   # → ./.claude/        (team-shared, committed)
+make sync-local     # → ./.claude/        (local-only, gitignored)
 
 # Verify installation
 uv tool list              # List installed tools
@@ -173,25 +194,25 @@ where superclaude         # Check install path (Windows)
 | Stage | Command | Description |
 |-------|---------|-------------|
 | Dev/Test | `uv run superclaude ...` | Test in repo (editable) |
-| Deploy | `make deploy` | Update global tool (cache-safe) |
+| Deploy CLI | `make deploy` | `uv tool install --force --editable .` |
+| Sync content | `make sync-user` / `sync-project` / `sync-local` | Force-sync markdown/scripts to chosen scope |
 | Use | `superclaude ...` | Run from anywhere |
+| Uninstall | `make uninstall-user` / `uninstall-project` / `uninstall-local` | Scope-explicit removal |
 
 ### **Enhanced Performance (Optional MCPs)**
 
 For **2-3x faster** execution and **30-50% fewer tokens**, optionally install MCP servers:
 
 ```bash
-# Optional MCP servers for enhanced performance (via airis-mcp-gateway):
-# - Serena: Code understanding (2-3x faster)
-# - Sequential: Token-efficient reasoning (30-50% fewer tokens)
+# Optional MCP servers for enhanced performance:
+# - Serena: Semantic code understanding (2-3x faster symbol ops)
+# - Sequential: Token-efficient multi-step reasoning (30-50% fewer tokens)
 # - Tavily: Web search for Deep Research
 # - Context7: Official documentation lookup
-# - Mindbase: Semantic search across all conversations (optional enhancement)
+# - AST-Grep: Tree-sitter structural code search
 
 # Note: Error learning available via built-in ReflexionMemory (no installation required)
-# Mindbase provides semantic search enhancement (requires "recommended" profile)
-# Install MCP servers: https://github.com/agiletec-inc/airis-mcp-gateway
-# See docs/mcp/mcp-integration-policy.md for details
+# Source-of-truth for MCP docs: src/superclaude/MCP/MCP_*.md
 ```
 
 **Performance Comparison:**
@@ -200,7 +221,7 @@ For **2-3x faster** execution and **30-50% fewer tokens**, optionally install MC
 
 ### **Tavily Agent Skills (Optional CLI Enhancement)**
 
-SuperClaude includes **Tavily MCP** for in-conversation web search. For advanced use cases (saving to local files, domain/time filtering, pipeline composition), optionally install the [Tavily Agent Skills](https://github.com/tavily-ai/skills):
+`superclaude` includes **Tavily MCP** for in-conversation web search. For advanced use cases (saving to local files, domain/time filtering, pipeline composition), optionally install the [Tavily Agent Skills](https://github.com/tavily-ai/skills):
 
 ```bash
 # Install Tavily Agent Skills (requires Tavily CLI)
@@ -223,96 +244,97 @@ npx skills add https://github.com/tavily-ai/skills
 
 > **Recommended setup:** Keep both — Tavily MCP handles 90% of searches automatically. The CLI activates only when its unique capabilities are needed.
 
-</div>
+---
+
+## 🧭 **Workflows**
+
+The framework's value comes from chaining commands. Each chain has gates: a step's output must be committed (or explicitly approved) before the next step runs. Pick the chain that matches the task's blast radius — don't pay `brainstorm`-level overhead for a typo, and don't skip `design` for a system rewrite.
+
+#### By task size
+
+| Tier | Trigger | Recommended chain |
+|------|---------|-------------------|
+| **Trivial** | Typo · 1-line fix · rename · obvious bug with known fix | Direct edit. No `/sc:*` needed. |
+| **Small** | Single file · ≤ 50 added lines · clear scope | `/sc:implement` (or `/sc:improve`) **`--plan`** → `/sc:test` |
+| **Medium** | 3–10 files · multi-purpose · clear requirements | `/sc:plan` → `/sc:implement --plan` → `/sc:test` → `/sc:reflect` |
+| **Large** | > 10 files · cross-cutting · ambiguous scope · new system | `/sc:brainstorm` → `/sc:design` → `/sc:review` → `/sc:plan` → `/sc:implement --plan` → `/sc:test` → `/sc:reflect` |
+
+#### The full chain (large tasks)
+
+```text
+/sc:brainstorm   →   /sc:design   →   /sc:review   →   /sc:plan   →   /sc:implement --plan   →   /sc:test   →   /sc:reflect
+   discover           specify          gate              decompose       build (TDD)                 verify        learn
+   (Socratic)         (architecture)   (multi-lens)      (phases)        (per task)                  (baseline)    (capture)
+```
+
+| Step | Output | Hard gate before next step |
+|------|--------|----------------------------|
+| `/sc:brainstorm` | `docs/specs/<topic>-discovery-…md` | User approves discovery spec |
+| `/sc:design` | `docs/specs/<topic>-design-…md` | Design committed (components pass [R18] necessity test) |
+| `/sc:review` | Multi-dimensional review of design/plan | Required — `/sc:brainstorm` hard-blocks `/sc:plan` until this runs |
+| `/sc:plan` | `docs/plans/<topic>-…md` (phased TDD tasks, file paths, verify cmds) | Plan committed |
+| `/sc:implement --plan` | Code + per-phase commits | Implementation complete |
+| `/sc:test` | Test pass evidence (`42/42 pass, baseline 40`) | Real output, not predictions |
+| `/sc:reflect` | Retrospective + insights captured to `.claude/insights.jsonl` | — |
+
+#### Other common chains
+
+| Goal | Chain |
+|------|-------|
+| **Investigate a bug** | `/sc:troubleshoot` → `/sc:analyze --focus <domain>` → `/sc:implement --plan` → `/sc:test` |
+| **Performance work** | `/sc:analyze --focus perf --scope module` → `/sc:improve --loop --p=perf` → `/sc:test` |
+| **Security audit** | `/sc:analyze --focus security` → `/sc:review` → `/sc:improve --p=sec` |
+| **Refactor** | `/sc:analyze --focus quality` → `/sc:plan` → `/sc:improve --loop` → `/sc:test` |
+| **External research** | `/sc:research --depth deep --tavily --c7` → `/sc:reflect` |
+| **Codebase onboarding** | `/sc:load` → `/sc:index-repo` → `/sc:explain` |
+| **Strategy / market** | `/sc:business-panel` → `/sc:reflect` |
+| **End of branch** | `/sc:review` → `/sc:test` → `/sc:git` (commit) → `ship` skill (PR) |
+
+#### Tips
+
+- **Skip steps when the input already exists.** If you already have a written spec, jump straight to `/sc:plan`. The gates exist to prevent skipping *unfinished* work, not to force ceremony.
+- **`--plan` flag** on `/sc:implement` makes it consume a committed plan document. Without `--plan`, it works from the latest message.
+- **`/sc:review` runs many lenses in parallel** (correctness, scope, risk, alignment). Treat its output as a checklist, not a verdict.
+- **`/sc:reflect` writes insights to `.claude/insights.jsonl`** which `/sc:load` later reads — over time the framework remembers what worked.
 
 ---
 
-<div align="center">
+## 🙏 **Acknowledgements**
 
-## 💖 **Support the Project**
+`superclaude` builds on the original [SuperClaude_Framework](https://github.com/SuperClaude-Org/SuperClaude_Framework) by Kazuki Nakai, NomenAK, and Mithun Gowda B. To support that upstream project's authors directly, see their channels on the upstream repo — sponsorship goes to them, not to this fork.
 
-> Hey, let's be real - maintaining SuperClaude takes time and resources.
-> 
-> *The Claude Max subscription alone runs $100/month for testing, and that's before counting the hours spent on documentation, bug fixes, and feature development.*
-> *If you're finding value in SuperClaude for your daily work, consider supporting the project.*
-> *Even a few dollars helps cover the basics and keeps development active.*
-> 
-> Every contributor matters, whether through code, feedback, or support. Thanks for being part of this community! 🙏
-
-<table>
-<tr>
-<td align="center" width="33%">
-  
-### ☕ **Ko-fi**
-[![Ko-fi](https://img.shields.io/badge/Support_on-Ko--fi-ff5e5b?logo=ko-fi)](https://ko-fi.com/superclaude)
-
-*One-time contributions*
-
-</td>
-<td align="center" width="33%">
-
-### 🎯 **Patreon**
-[![Patreon](https://img.shields.io/badge/Become_a-Patron-f96854?logo=patreon)](https://patreon.com/superclaude)
-
-*Monthly support*
-
-</td>
-<td align="center" width="33%">
-
-### 💜 **GitHub**
-[![GitHub Sponsors](https://img.shields.io/badge/GitHub-Sponsor-30363D?logo=github-sponsors)](https://github.com/sponsors/SuperClaude-Org)
-
-*Flexible tiers*
-
-</td>
-</tr>
-</table>
-
-### **Your Support Enables:**
-
-| Item | Cost/Impact |
-|------|-------------|
-| 🔬 **Claude Max Testing** | $100/month for validation & testing |
-| ⚡ **Feature Development** | New capabilities & improvements |
-| 📚 **Documentation** | Comprehensive guides & examples |
-| 🤝 **Community Support** | Quick issue responses & help |
-| 🔧 **MCP Integration** | Testing new server connections |
-| 🌐 **Infrastructure** | Hosting & deployment costs |
-
-> **Note:** No pressure though - the framework stays open source regardless. Just knowing people use and appreciate it is motivating. Contributing code, documentation, or spreading the word helps too! 🙏
-
-</div>
+This fork is a personal, opinionated reshape of the framework: different MCP set, skills system, insight pipeline, scope-explicit deploy, tightened workflow gates. It is **not** maintained by the upstream authors.
 
 ---
 
+## 🎉 **What's new in v4.5+ajitta**
+
+*Procedural skills, an insight pipeline, scope-explicit deployment, and tightened brainstorm → plan → implement → review workflow gates.*
+
 <div align="center">
-
-## 🎉 **What's New in v4.1**
-
-> *Version 4.1 focuses on stabilizing the slash command architecture, enhancing agent capabilities, and improving documentation.*
-
 <table>
 <tr>
+<td width="50%">
+
+### 🧩 **Procedural Skills System**
+**5 auto-loaded skills** that fire on matching prompts:
+- **confidence-check** → Pre-implementation validation gate
+- **simplicity-coach** → Orient-Step-Learn discipline, anti over-engineering
+- **verbalized-sampling** → Probability-weighted candidate generation (`--vs`)
+- **ship** / **finishing-a-development-branch** → End-of-branch workflow
+
+Skills live under `Skills/<name>/SKILL.md` and load via Claude Code's native skill loader — no boilerplate.
+
+</td>
 <td width="50%">
 
 ### 🤖 **Smarter Agent System**
-**20 specialized agents** with domain expertise:
-- PM Agent ensures continuous learning through systematic documentation
+**23 specialized agents** with domain expertise:
+- New: **insight-analyst**, **repo-index**, **self-review**, **simplicity-guide**, **technical-writer**, **project-initializer**
 - Deep Research agent for autonomous web research
-- Security engineer catches real vulnerabilities
-- Frontend architect understands UI patterns
-- Automatic coordination based on context
-- Domain-specific expertise on demand
-
-</td>
-<td width="50%">
-
-### ⚡ **Optimized Performance**
-**Smaller framework, bigger projects:**
-- Reduced framework footprint
-- More context for your code
-- Longer conversations possible
-- Complex operations enabled
+- Security/performance/quality engineers catch real issues
+- Frontend / backend / system architect for design work
+- Single-trigger disambiguation matrix in RULES.md
 
 </td>
 </tr>
@@ -320,7 +342,7 @@ npx skills add https://github.com/tavily-ai/skills
 <td width="50%">
 
 ### 🔧 **MCP Server Integration**
-**10 powerful servers** with easy CLI installation:
+**8 curated servers** (lean default — no token bloat):
 
 ```bash
 # List available MCP servers
@@ -337,49 +359,73 @@ superclaude mcp
 - **Tavily** → Primary web search (Deep Research)
 - **Context7** → Official documentation lookup
 - **Sequential-Thinking** → Multi-step reasoning
-- **Serena** → Session persistence & memory
-- **Playwright** → Cross-browser automation
-- **Magic** → UI component generation
-- **Morphllm-Fast-Apply** → Context-aware code modifications
-- **Chrome DevTools** → Performance analysis
-- **Mindbase** → Semantic memory & embeddings
-- **Airis-Agent** → Confidence & indexing
+- **Serena** → Session persistence & semantic code understanding
+- **Playwright** → Cross-browser automation & E2E testing
+- **Magic** → UI component generation (21st.dev)
+- **Chrome DevTools** → Performance analysis (CLS, LCP)
+- **AST-Grep** → Tree-sitter structural code search
+
+> Removed in this fork: Morphllm, Mindbase, Airis-Agent (replaced by AstGrep + native ReflexionMemory).
 
 </td>
 <td width="50%">
 
 ### 🎯 **Behavioral Modes**
-**8 adaptive modes** for different contexts:
-- **Brainstorming** → Asks right questions
+**7 adaptive modes** for different contexts:
+- **Brainstorming** → Socratic discovery for vague requests
 - **Business Panel** → Multi-expert strategic analysis
 - **Deep Research** → Autonomous web research
 - **Orchestration** → Efficient tool coordination
-- **Token-Efficiency** → 30-50% context savings
+- **Token-Efficiency** → 30-50% context savings via symbol system
 - **Task Management** → Systematic organization
-- **Introspection** → Meta-cognitive analysis
-- **Unified** → Combined reference (default)
+- **Introspection** → Meta-cognitive analysis & error recovery
 
 </td>
 </tr>
 <tr>
 <td width="50%">
 
-### 📚 **Documentation Overhaul**
-**Complete rewrite** for developers:
-- Real examples & use cases
-- Common pitfalls documented
-- Practical workflows included
-- Better navigation structure
+### 📓 **Insight Pipeline**
+**`/sc:insight` + hook-driven harvest:**
+- Per-project JSONL store at `.claude/insights.jsonl`
+- Script-based writer (`scripts/insight_writer.py`) with append/promote
+- PreCompact / SessionEnd hooks auto-harvest pending insights
+- Empty/non-string entries rejected at the writer boundary
+- Searchable for human and tool analysis across sessions
 
 </td>
 <td width="50%">
 
-### 🧪 **Enhanced Stability**
-**Focus on reliability:**
-- Bug fixes for core commands
-- Improved test coverage
-- More robust error handling
-- CI/CD pipeline improvements
+### 🚦 **Tightened Workflow Gates**
+**Brainstorm → Plan → Implement → Review:**
+- `/sc:brainstorm` hard-blocks `/sc:plan` until `/sc:review` runs
+- Auto-trigger `/sc:review` on delegated decisions
+- Plan default: phase framing; opt-in `--pr-bundle` for multi-PR
+- `verified:` convention + SessionStart memory-staleness warning
+- Per-skill canary manifests guard against trigger regressions
+
+</td>
+</tr>
+<tr>
+<td width="50%">
+
+### 📦 **Scope-Explicit Deployment**
+**Separate CLI deploy from content sync:**
+- `make deploy` — installs the CLI only (`uv tool install --force --editable .`)
+- `make sync-user` / `sync-project` / `sync-local` — force-sync markdown content to chosen scope
+- `make uninstall-user` / `uninstall-project` / `uninstall-local` — mirror targets
+- `superclaude install/uninstall/update --scope user|project` — consistent flag across CLI
+
+</td>
+<td width="50%">
+
+### 🪝 **Hook Subsystem**
+**Settings-merge install + targeted hooks:**
+- `install_settings.py` preserves user hooks via marker-based identification
+- `test_runner_hook` uses `python -m pytest` (avoids Windows uv canonicalize bug)
+- SessionStart: git status + memory staleness warning
+- PreCompact / SessionEnd: insight harvest
+- Hooks are additive — your existing config survives reinstall
 
 </td>
 </tr>
@@ -389,14 +435,11 @@ superclaude mcp
 
 ---
 
+## 🔬 **Deep Research**
+
+*Autonomous web research aligned with the DR agent architecture — adaptive planning, multi-hop reasoning, confidence-scored synthesis.*
+
 <div align="center">
-
-## 🔬 **Deep Research Capabilities**
-
-### **Autonomous Web Research Aligned with DR Agent Architecture**
-
-SuperClaude v4.2 introduces comprehensive Deep Research capabilities, enabling autonomous, adaptive, and intelligent web research.
-
 <table>
 <tr>
 <td width="50%">
@@ -447,16 +490,16 @@ SuperClaude v4.2 introduces comprehensive Deep Research capabilities, enabling a
 
 ```bash
 # Basic research with automatic depth
-/research "latest AI developments 2024"
+/sc:research "latest AI developments 2026"
 
-# Controlled research depth (via options in TypeScript)
-/research "quantum computing breakthroughs"  # depth: exhaustive
+# Controlled depth — pass flags after the query
+/sc:research "quantum computing breakthroughs" --depth exhaustive
 
-# Specific strategy selection
-/research "market analysis"  # strategy: planning-only
+# Strategy selection
+/sc:research "market analysis" --strategy planning-only
 
-# Domain-filtered research (Tavily MCP integration)
-/research "React patterns"  # domains: reactjs.org,github.com
+# Domain-filtered research (uses Tavily MCP)
+/sc:research "React patterns" --domains reactjs.org,github.com
 ```
 
 ### **Research Depth Levels**
@@ -476,209 +519,163 @@ The Deep Research system intelligently coordinates multiple tools:
 - **Sequential MCP**: Multi-step reasoning and synthesis
 - **Serena MCP**: Memory and learning persistence
 - **Context7 MCP**: Technical documentation lookup
+- **AST-Grep MCP**: Structural pattern search across discovered code samples
 
 </div>
 
 ---
 
-<div align="center">
+## 📚 **References**
 
-## 📚 **Documentation**
+> The legacy `docs/` tree is upstream-derived and **not maintained** in this fork. Treat the table below as the source of truth.
 
-### **Complete Guide to SuperClaude**
-
-<table>
-<tr>
-<th align="center">🚀 Getting Started</th>
-<th align="center">📖 User Guides</th>
-<th align="center">🛠️ Developer Resources</th>
-<th align="center">📋 Reference</th>
-</tr>
-<tr>
-<td valign="top">
-
-- 📝 [**Quick Start Guide**](docs/getting-started/quick-start.md)  
-  *Get up and running fast*
-
-- 💾 [**Installation Guide**](docs/getting-started/installation.md)  
-  *Detailed setup instructions*
-
-</td>
-<td valign="top">
-
-- 🎯 [**Slash Commands**](docs/reference/commands-list.md)
-  *All 30 commands organized by category*
-
-- 🤖 [**Agents Guide**](docs/user-guide/agents.md)  
-  *20 specialized agents*
-
-- 🎨 [**Behavioral Modes**](docs/user-guide/modes.md)  
-  *8 adaptive modes*
-
-- 🚩 [**Flags Guide**](docs/user-guide/flags.md)  
-  *Control behaviors*
-
-- 🔧 [**MCP Servers**](docs/user-guide/mcp-servers.md)  
-  *8 server integrations*
-
-- 💼 [**Session Management**](docs/user-guide/session-management.md)  
-  *Save & restore state*
-
-</td>
-<td valign="top">
-
-- 🏗️ [**Technical Architecture**](docs/developer-guide/technical-architecture.md)  
-  *System design details*
-
-- 💻 [**Contributing Code**](docs/developer-guide/contributing-code.md)  
-  *Development workflow*
-
-- 🧪 [**Testing & Debugging**](docs/developer-guide/testing-debugging.md)  
-  *Quality assurance*
-
-</td>
-<td valign="top">
-- 📓 [**Examples Cookbook**](docs/reference/examples-cookbook.md)  
-  *Real-world recipes*
-
-- 🔍 [**Troubleshooting**](docs/reference/troubleshooting.md)  
-  *Common issues & fixes*
-
-</td>
-</tr>
-</table>
-
-</div>
+| Topic | Source of truth |
+|-------|-----------------|
+| Architecture & directory roles | [`src/superclaude/ARCHITECTURE.md`](src/superclaude/ARCHITECTURE.md) |
+| Project rules, build & test loop | [`CLAUDE.md`](CLAUDE.md) |
+| Project-specific gotchas | [`.claude/rules/gotchas/`](.claude/rules/gotchas) |
+| Slash commands (33) | [`src/superclaude/Commands/`](src/superclaude/Commands) · `superclaude install --list-all` |
+| Agents (23) | [`src/superclaude/Agents/`](src/superclaude/Agents) |
+| Modes (7) | [`src/superclaude/Modes/`](src/superclaude/Modes) |
+| MCP servers (8) | [`src/superclaude/MCP/`](src/superclaude/MCP) |
+| Skills (5) | [`src/superclaude/Skills/`](src/superclaude/Skills) |
+| Core rules (always-loaded) | [`FLAGS.md`](src/superclaude/core/FLAGS.md) · [`PRINCIPLES.md`](src/superclaude/core/PRINCIPLES.md) · [`RULES.md`](src/superclaude/core/RULES.md) |
+| Authoring specs for new content | [`.claude/rules/`](.claude/rules) |
+| Health & drift checks | `superclaude doctor` · `superclaude verify-drift` |
 
 ---
 
-<div align="center">
+## 🚩 **Flags**
 
-## 🤝 **Contributing**
+Flags are behavioral hints that any `/sc:*` prompt accepts. The model reads them inline — no setup, no separate config — and aliases (e.g. `--ultrathink` → `--seq`) are auto-corrected. SSOT: [`src/superclaude/core/FLAGS.md`](src/superclaude/core/FLAGS.md).
 
-### **Join the SuperClaude Community**
+#### Modes — switch the conversational stance
 
-We welcome contributions of all kinds! Here's how you can help:
+| Flag | When to use | Effect |
+|------|-------------|--------|
+| `--brainstorm` | Vague request, "maybe", unclear scope | Collaborative discovery, probing questions before code |
+| `--research` | Need evidence, citations, external knowledge | Systematic investigation, evidence-based reasoning |
+| `--business-panel` | Strategy/market/competitive analysis | Multi-expert business analysis & synthesis |
+| `--introspect` | Stuck, error recovery, "why is it doing X?" | Exposes thinking with 🤔🎯⚡📊💡 markers |
+| `--task-manage` | >3 steps · >2 dirs · >3 files | Delegation + progressive enhancement |
+| `--orchestrate` | Multi-tool, parallel, perf-sensitive | Tool-matrix optimization |
+| `--token-efficient` / `--uc` | Context > 75 % or large ops | Symbol system, 30–50 % reduction |
+| `--vs [standard\|cot\|multi]` | "Multiple perspectives", brainstorm options | Verbalized sampling — probability-weighted candidates. Sub-params: `[k:3-7] [tau:0.01-0.20] [turns:2-5] [no-synthesis]` |
 
-| Priority | Area | Description |
-|:--------:|------|-------------|
-| 📝 **High** | Documentation | Improve guides, add examples, fix typos |
-| 🔧 **High** | MCP Integration | Add server configs, test integrations |
-| 🎯 **Medium** | Workflows | Create command patterns & recipes |
-| 🧪 **Medium** | Testing | Add tests, validate features |
-| 🌐 **Low** | i18n | Translate docs to other languages |
+#### MCP servers — opt in or out per turn
 
-<p align="center">
-  <a href="CONTRIBUTING.md">
-    <img src="https://img.shields.io/badge/📖_Read-Contributing_Guide-blue" alt="Contributing Guide">
-  </a>
-  <a href="https://github.com/SuperClaude-Org/SuperClaude_Framework/graphs/contributors">
-    <img src="https://img.shields.io/badge/👥_View-All_Contributors-green" alt="Contributors">
-  </a>
-</p>
+| Flag | Server | Use for |
+|------|--------|---------|
+| `--c7` / `--context7` | Context7 | Imports, frameworks, official docs |
+| `--seq` / `--sequential` | Sequential | Complex debug, system design, multi-step reasoning |
+| `--serena` | Serena | Symbol ops, project memory, semantic exploration |
+| `--magic` | Magic (21st.dev) | UI components, design systems |
+| `--play` / `--playwright` | Playwright | Browser testing, E2E, visual diffs |
+| `--perf` / `--devtools` | Chrome DevTools | Perf audit, CLS, LCP, metrics |
+| `--tavily` | Tavily | Web search, real-time info, parallel queries |
+| `--sg` / `--ast-grep` | AST-Grep | Structural patterns, AST search, anti-patterns |
+| `--frontend-verify` | Combined | Playwright + DevTools + Serena (UI debug) |
+| `--all-mcp` / `--no-mcp` | — | Enable all / disable all (perf priority) |
 
-</div>
+#### Execution — control how work is done
+
+| Flag | Effect |
+|------|--------|
+| `--delegate [auto\|files\|folders]` | Sub-agent parallel delegation. Auto-trigger: > 7 dirs, > 50 files, complexity > 0.8 |
+| `--concurrency [n]` | Batch independent tool calls (1–15) into a single message |
+| `--loop` | Iterative improvement — repeat until no meaningful improvement found |
+| `--iterations [n]` | Fixed iteration count — exactly N cycles, with per-iteration delta report |
+| `--plan` | 5-line plan (goal · approach · files · risks · verification) before execution |
+| `--validate` | Pre-execution risk assessment (risk > 0.7, prod) |
+| `--safe-mode` | Max validation, conservative behavior, auto `--uc` |
+| `--fast` | Faster output, same model |
+| `--p [abbr,…]` | Bias agent delegation: `sec`, `perf`, `qa`, `arch`, `fe`, `be`, `ops`, `refactor`, `root`, `py`, `research`, `review`, `simple`, `git`, `scribe`, `educator`, `mentor`, `index`, `insight` (multi-select with comma) |
+| `--verbose-context` | Force full `.md` injection (bypass short-instruction map) |
+
+#### Scope & focus
+
+| Flag | Values |
+|------|--------|
+| `--scope` | `file` · `module` · `project` · `system` |
+| `--focus` | `perf` · `security` · `quality` · `arch` · `a11y` · `testing` |
+
+> **Priority when flags conflict:** `--safe-mode` > `--validate` > optimization · explicit user flags > auto-detection · `--no-mcp` overrides individual MCP flags.
+
+> **Aliases auto-corrected at load time:** `--ultrathink` / `--think*` → `--seq` · `--parallel` / `--agent` → `--delegate` · `--sampling` / `--verbalized` → `--vs` · `--sea` → `--serena` · `--confidence-check` → `--validate`. Typos within Levenshtein ≤ 2 trigger a suggestion comment.
+
+#### Examples
+
+```bash
+/sc:research "Rust async runtime tradeoffs" --depth deep --tavily --c7
+/sc:implement "user export endpoint" --plan --p=be,sec --validate
+/sc:analyze src/auth/ --focus security --scope module --seq
+/sc:improve src/api/handlers.py --loop --iterations 3 --serena
+/sc:brainstorm "should we migrate to gRPC?" --vs multi
+```
 
 ---
-
-<div align="center">
 
 ## ⚖️ **License**
 
-This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
-
-<p align="center">
-  <img src="https://img.shields.io/badge/License-MIT-yellow.svg?" alt="MIT License">
-</p>
-
-</div>
+MIT — see [`LICENSE`](LICENSE).
 
 ---
 
-<div align="center">
-
-## ⭐ **Star History**
-
-<a href="https://www.star-history.com/#SuperClaude-Org/SuperClaude_Framework&Timeline">
- <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=SuperClaude-Org/SuperClaude_Framework&type=Timeline&theme=dark" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=SuperClaude-Org/SuperClaude_Framework&type=Timeline" />
-   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=SuperClaude-Org/SuperClaude_Framework&type=Timeline" />
- </picture>
-</a>
-
-
-</div>
-
----
-
-<div align="center">
-
-### **🚀 Built with passion by the SuperClaude community**
-
-<p align="center">
-  <sub>Made with ❤️ for developers who push boundaries</sub>
-</p>
-
-<p align="center">
-  <a href="#-superclaude-framework">Back to Top ↑</a>
-</p>
-
-</div>
-
----
-
-## 📋 **All 30 Commands**
+## 📋 **All 33 Commands**
 
 <details>
 <summary><b>Click to expand full command list</b></summary>
 
-### 🧠 Planning & Design (4)
-- `/brainstorm` - Structured brainstorming
-- `/design` - System architecture
-- `/estimate` - Time/effort estimation
-- `/spec-panel` - Specification analysis
+### 🧠 Planning & Design (5)
+- `/sc:brainstorm` — Structured brainstorming through Socratic dialogue
+- `/sc:design` — System architecture, APIs, component interfaces
+- `/sc:plan` — Detailed implementation plans with TDD tasks
+- `/sc:estimate` — Time/effort estimation
+- `/sc:spec-panel` — Multi-expert specification review
 
 ### 💻 Development (5)
-- `/implement` - Code implementation
-- `/build` - Build workflows
-- `/improve` - Code improvements
-- `/cleanup` - Refactoring
-- `/explain` - Code explanation
+- `/sc:implement` — Code implementation
+- `/sc:build` — Build workflows
+- `/sc:improve` — Code improvements
+- `/sc:cleanup` — Refactoring & dead-code removal
+- `/sc:explain` — Code explanation
 
-### 🧪 Testing & Quality (4)
-- `/test` - Test generation
-- `/analyze` - Code analysis
-- `/troubleshoot` - Debugging
-- `/reflect` - Retrospectives
+### 🧪 Testing & Quality (5)
+- `/sc:test` — Test generation
+- `/sc:analyze` — Code analysis (quality, security, perf, arch)
+- `/sc:troubleshoot` — Diagnose & resolve issues
+- `/sc:reflect` — Task retrospectives
+- `/sc:review` — Multi-dimensional review of work products
 
 ### 📚 Documentation (2)
-- `/document` - Doc generation
-- `/help` - Command help
+- `/sc:document` — Doc generation
+- `/sc:help` — Command help
 
 ### 🔧 Version Control (1)
-- `/git` - Git operations
+- `/sc:git` — Git operations with intelligent commits
 
 ### 📊 Project Management (3)
-- `/pm` - Project management
-- `/task` - Task tracking
-- `/workflow` - Workflow automation
+- `/sc:pm` — Project management & sub-agent orchestration
+- `/sc:task` — Task tracking
+- `/sc:workflow` — Workflow automation
 
 ### 🔍 Research & Analysis (2)
-- `/research` - Deep web research
-- `/business-panel` - Business analysis
+- `/sc:research` — Deep web research
+- `/sc:business-panel` — Multi-expert business analysis
 
-### 🎯 Utilities (9)
-- `/agent` - AI agents
-- `/index-repo` - Repository indexing
-- `/index` - Indexing alias
-- `/recommend` - Command recommendations
-- `/select-tool` - Tool selection
-- `/spawn` - Parallel tasks
-- `/load` - Load sessions
-- `/save` - Save sessions
-- `/sc` - Show all commands
+### 🗂️ Session & Memory (3)
+- `/sc:load` — Load session context (Serena + auto memory)
+- `/sc:save` — Save session context
+- `/sc:insight` — Capture structured insights to JSONL
 
-[**📖 View Detailed Command Reference →**](docs/reference/commands-list.md)
+### 🎯 Utilities (7)
+- `/sc:agent` — AI agent dispatcher
+- `/sc:init` — Interactive project environment setup
+- `/sc:index` / `/sc:index-repo` — Repository indexing (94% token reduction)
+- `/sc:recommend` — Command recommendation engine
+- `/sc:select-tool` — Intelligent MCP tool selection
+- `/sc:sc` — Show all commands
+
+**Source files:** [`src/superclaude/Commands/`](src/superclaude/Commands) — each command is a single markdown file with frontmatter. After install, run `superclaude install --list-all` for a full inventory.
 
 </details>
