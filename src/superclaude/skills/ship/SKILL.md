@@ -7,7 +7,7 @@ hooks:
     - matcher: "Bash"
       hooks:
         - type: command
-          command: "echo \"$CLAUDE_TOOL_INPUT\" | grep -qE 'git push --force|git push -f' && echo 'BLOCKED: Force push detected. Use regular push.' >&2 && exit 2 || exit 0"
+          command: "echo \"$CLAUDE_TOOL_INPUT\" | grep -qE 'git push (--force([^-]|$)|-f([^a-zA-Z]|$))' && echo 'BLOCKED: Force push detected. Use regular push (--force-with-lease is allowed).' >&2 && exit 2 || exit 0"
 ---
 <component name="ship" type="skill">
 
