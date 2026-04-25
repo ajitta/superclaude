@@ -54,7 +54,11 @@ def main() -> None:
         # If we can't read input, reset cache defensively
         source = "unknown"
 
-    if source in ("clear", "compact"):
+    # 'startup' = fresh session (no conversation history) → LLM hasn't seen prior emits
+    # 'clear'   = /clear erased history → same situation
+    # 'compact' = summary may drop emit details → safer to re-inject
+    # 'resume'  = NOT included: history is restored, prior emits still visible to LLM
+    if source in ("clear", "compact", "startup"):
         was_reset = reset_context_cache()
         if was_reset:
             print(f"🔄 Context cache reset ({source}) — dynamic contexts will re-inject")

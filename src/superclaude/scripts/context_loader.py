@@ -462,6 +462,12 @@ def output_inject_mode(contexts: list[tuple[str, int]], prompt: str = "") -> Non
 
     # v3.2: --verbose-context overrides INSTRUCTION_MAP (force full .md)
     verbose = bool(re.search(r"--verbose-context", prompt, re.IGNORECASE))
+    if verbose:
+        print(
+            "<!-- SuperClaude --verbose-context: forcing full .md injection for "
+            f"{len(contexts)} file(s). Expect 5-10x token inflation vs default tiers. -->"
+        )
+        print()
 
     # v2.2.0: Check MCP fallbacks first
     fallback_notifications = check_mcp_fallbacks(contexts)
@@ -475,6 +481,11 @@ def output_inject_mode(contexts: list[tuple[str, int]], prompt: str = "") -> Non
 
         # Tier 0: 1-line hint (tool MCPs, core)
         if tier == 0 and context_file in TIER_0_MAP:
+            # Defensive: skip hint if backing file is missing (avoids advertising deleted MCPs)
+            if not (BASE_PATH / context_file).exists():
+                print(f'<!-- skip {context_file}: backing file not installed -->')
+                print()
+                continue
             hint = TIER_0_MAP[context_file]
             tokens = estimate_tokens(hint)
             total_tokens += tokens
@@ -548,14 +559,8 @@ _EXECUTION_DIRECTIVES = {
         f"Group reads, searches, and other non-dependent operations together."
         f"</sc-directive>"
     ),
-    re.compile(r"--serena\b", re.IGNORECASE): (
-        lambda _: "<sc-directive flag=\"--serena\">"
-        "Serena-first code exploration: prefer symbolic tools over Read/Grep for code files. "
-        "1) get_symbols_overview before Read, 2) find_symbol(include_body=True) for specific functions, "
-        "3) search_for_pattern instead of Grep, 4) find_referencing_symbols instead of Grep for usage tracing. "
-        "Reserve Read for non-code files or when full file context is needed."
-        "</sc-directive>"
-    ),
+    # --serena directive removed: INSTRUCTION_MAP[mcp/MCP_Serena.md] (Tier 1)
+    # already provides workflow + decision rules. Avoids ~85 token duplicate.
     re.compile(r"--plan\b", re.IGNORECASE): (
         lambda _: "<sc-directive flag=\"--plan\">"
         "Lightweight planning mode: before implementing, generate a concise 5-line plan "
@@ -567,11 +572,15 @@ _EXECUTION_DIRECTIVES = {
 
 
 def _emit_agent_preference(prompt: str) -> None:
-    """Emit agent preference directives for --p flag. Supports multi-select: --p=sec,perf,qa"""
+    """Emit agent preference directives for --p flag. Supports multi-select: --p=sec,perf,qa.
+    Session-deduped: a given --p combo is announced only once per session."""
     match = re.search(r"--p[=\s]+([a-zA-Z][a-zA-Z0-9,]*)", prompt)
     if not match:
         return
     raw = match.group(1).lower()
+    marker = f"_directive:--p={raw}"
+    if marker in get_loaded_contexts():
+        return
     abbrevs = [a.strip() for a in raw.split(",") if a.strip()]
     agents = []
     unknown = []
@@ -589,6 +598,7 @@ def _emit_agent_preference(prompt: str) -> None:
             f"</sc-directive>"
         )
         print()
+        mark_as_loaded(marker)
     if unknown:
         valid = ", ".join(sorted(AGENT_MAP.keys()))
         print(f"<!-- --p: unknown abbreviation(s): {', '.join(unknown)}. Valid: {valid} -->")
@@ -596,12 +606,22 @@ def _emit_agent_preference(prompt: str) -> None:
 
 
 def _emit_execution_directives(prompt: str) -> None:
-    """Emit inline behavioral directives for execution flags."""
+    """Emit inline behavioral directives for execution flags.
+    Session-deduped: each (pattern, matched-flag) combo emits once per session."""
+    loaded = get_loaded_contexts()
+    new_marks = []
     for pattern, directive_fn in _EXECUTION_DIRECTIVES.items():
         match = pattern.search(prompt)
-        if match:
-            print(directive_fn(match))
-            print()
+        if not match:
+            continue
+        marker = f"_directive:{pattern.pattern}:{match.group(0).lower()}"
+        if marker in loaded:
+            continue
+        print(directive_fn(match))
+        print()
+        new_marks.append(marker)
+    if new_marks:
+        mark_as_loaded(new_marks)
 
 
 def _extract_prompt(stdin_data: str) -> str:
@@ -628,14 +648,15 @@ def main() -> None:
             print(f"<!-- SuperClaude flag: {note} -->")
         print()
 
-    # v2.1.0: Output skills summary if enabled
-    if SHOW_SKILLS_SUMMARY:
+    # v2.1.0: Output skills summary if enabled — once per session (cache-marked)
+    if SHOW_SKILLS_SUMMARY and "_skills_summary" not in get_loaded_contexts():
         skills = get_skill_estimates()
         if skills:
             summary = format_skills_summary(skills)
             if summary:
                 print(summary)
                 print()
+                mark_as_loaded("_skills_summary")
 
     # Execution flag directives (inline behavioral hints — no file injection)
     _emit_execution_directives(prompt)
@@ -646,10 +667,11 @@ def main() -> None:
     # Check triggers and get contexts to load
     contexts = check_triggers(prompt)
 
-    # --no-mcp notification
-    if "--no-mcp" in prompt.lower():
+    # --no-mcp notification — once per session
+    if "--no-mcp" in prompt.lower() and "_notice:--no-mcp" not in get_loaded_contexts():
         print("<!-- --no-mcp: MCP contexts suppressed. Using native tools + WebSearch. -->")
         print()
+        mark_as_loaded("_notice:--no-mcp")
 
     if not contexts:
         return
