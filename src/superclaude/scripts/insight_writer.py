@@ -142,6 +142,9 @@ def cmd_append(args: argparse.Namespace) -> int:
             if required not in entry:
                 print(f"append: missing required field '{required}'", file=sys.stderr)
                 return 2
+        if not isinstance(entry["insight"], str) or not entry["insight"].strip():
+            print("append: 'insight' must be a non-empty string", file=sys.stderr)
+            return 2
         if entry["type"] not in VALID_TYPES:
             print(
                 f"append: invalid type '{entry['type']}' — must be one of {sorted(VALID_TYPES)}",
@@ -388,7 +391,13 @@ def cmd_promote(args: argparse.Namespace) -> int:
         print(f"promote: index {args.index} out of range (have {len(pending)})", file=sys.stderr)
         return 2
     p = pending[args.index]
-    insight_text = args.insight or p.get("raw_text", "")
+    insight_text = (args.insight or p.get("raw_text", "")).strip()
+    if not insight_text:
+        print(
+            f"promote: pending entry {args.index} has empty raw_text; pass --insight \"...\"",
+            file=sys.stderr,
+        )
+        return 2
     entry = {
         "ts": _now_iso(),
         "type": args.type,
