@@ -8,12 +8,12 @@ description: Create detailed implementation plans with TDD tasks, exact file pat
     <mission>Create detailed implementation plans with TDD tasks, exact file paths, and verification commands</mission>
   </role>
 
-  <syntax>/sc:plan [spec-or-topic] [--from docs/specs/...] [--output docs/plans/...]</syntax>
+  <syntax>/sc:plan [spec-or-topic] [--from docs/specs/...] [--output docs/plans/...] [--phases N] [--pr-bundle]</syntax>
 
   <flow>
     1. Load: Read spec or requirements (from --from path or user description)
     2. Map: List files to create/modify and their responsibilities
-    3. Decompose: Break into tasks — each is a single action (2-5 min), checkbox syntax, exact paths, complete code
+    3. Decompose: Break into phases (default) — each phase is a single-commit unit on a feature branch, ordered by dependency. Use "Phase N" terminology, NOT "PR N", since plans typically execute as N commits on one branch (single review cycle). For genuine multi-PR work (separate review cycles per change-set), opt-in with --pr-bundle.
     4. Template: Add plan header (goal, architecture, tech stack)
     5. Save: Write to docs/plans/<feature-name>-<username>-YYYY-MM-DD.md (with frontmatter: status: draft, revised: <today>)
     6. Handoff: Ready for /sc:implement --plan
@@ -52,9 +52,11 @@ Task format:
   <examples>
   | Input | Output |
   |-------|--------|
-  | `/sc:plan --from docs/specs/auth-design-ajitta-2026-03-17.md` | TDD plan from spec |
-  | `/sc:plan 'add user profiles'` | Plan from description |
+  | `/sc:plan --from docs/specs/auth-design-ajitta-2026-03-17.md` | TDD plan with Phase 1..N (single-branch default) |
+  | `/sc:plan 'add user profiles'` | Plan from description, Phase framing |
   | `/sc:plan --from REQUIREMENTS.md --output docs/plans/profiles.md` | Custom output path |
+  | `/sc:plan --from docs/specs/big-refactor.md --pr-bundle` | Multi-PR plan (separate review cycles per change-set; opt-in) |
+  | `/sc:plan --from docs/specs/foo.md --phases 4` | Hint preferred phase count when natural |
   </examples>
 
   <size_note>Plans should stay under 15KB (~4K tokens). For large implementations, split into phase files (e.g., plan-phase1-setup.md, plan-phase2-impl.md). Claude Code's Read tool fails at 25K tokens (~100KB) — oversized plans become unreadable mid-execution.</size_note>
@@ -63,6 +65,7 @@ Task format:
   <gotchas>
   - existing-plan: Check if a plan already exists for this feature before creating a new one
   - scope-match: Plan scope must match user request. Do not expand into adjacent features
+  - phase-vs-pr: Default to "Phase N" framing — single-branch, single-review-cycle execution. Reserve "PR N" for genuine multi-PR work (--pr-bundle), where each change-set gets its own review cycle. Source: 2026-04-25 retrospective §5.1 (4-PR plan was actually executed as 4 phase commits on 1 branch — naming should match reality).
   </gotchas>
 
   <bounds should="plan creation|task decomposition|file mapping|TDD structure" avoid="write implementation code|execute tasks|skip spec review" fallback="Ask user for spec clarification when requirements are ambiguous"/>
