@@ -60,3 +60,19 @@ All minimum-required gates green. Plus full B/D/E coverage.
 ## Conclusion
 
 **PR1 is verified and merge-ready.** The branch can be pushed and a PR opened with this results doc cited in the description. No rollback needed.
+
+## Follow-up: trigger-token tightening (commit `bac8203`, 2026-04-25)
+
+Audit found false-positive risks beyond what the canary covered:
+- `verbalized-sampling`: bare "VS" trigger would match `"X vs Y"` comparisons.
+- `confidence-check`: bare "before starting" too generic.
+- 3 hook regexes used substring matching that incorrectly blocked `--force-with-lease`.
+
+Fixed in commit `bac8203`. Re-canary verified:
+
+| Test | Before fix (predicted) | After fix (observed) |
+|------|------------------------|----------------------|
+| `"should I use Postgres vs DynamoDB for this app?"` | Would trigger verbalized-sampling on "vs" | ✅ Plain comparison response, no skill invoked |
+| `"give me multiple perspectives on this decision"` | Triggers correctly | ✅ Still triggers verbalized-sampling |
+
+False-positive eliminated; true-positive preserved.
