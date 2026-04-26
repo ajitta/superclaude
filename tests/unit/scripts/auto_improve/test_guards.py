@@ -2,8 +2,6 @@
 
 import time
 
-import pytest
-
 from superclaude.scripts.auto_improve.guards import (
     BudgetGuard,
     GuardVerdict,
@@ -11,7 +9,6 @@ from superclaude.scripts.auto_improve.guards import (
     RegressionBlock,
     SmokeGate,
 )
-
 
 # --- BudgetGuard ---
 

@@ -25,14 +25,14 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
 
-from .eval_runner import EvalResult, run_eval
+from .eval_runner import run_eval
 from .guards import (
     BudgetGuard,
     PlateauDetector,
     RegressionBlock,
     SmokeGate,
 )
-from .mutator import Mutator, MutationResult
+from .mutator import MutationResult, Mutator
 from .reporter import morning_summary
 from .results_tsv import ResultRow, ResultsTsv
 from .worktree import Worktree, WorktreeManager

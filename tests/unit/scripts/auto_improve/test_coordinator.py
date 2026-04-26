@@ -4,13 +4,13 @@ from __future__ import annotations
 
 import subprocess
 from pathlib import Path
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 import pytest
 
 from superclaude.scripts.auto_improve.coordinator import (
-    CoordinatorConfig,
     Coordinator,
+    CoordinatorConfig,
     status_mode,
 )
 from superclaude.scripts.auto_improve.eval_runner import EvalResult

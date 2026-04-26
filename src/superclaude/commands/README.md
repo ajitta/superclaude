@@ -26,7 +26,8 @@ Commands are managed by Claude Code's native command system. Installed to `~/.cl
 | `/sc:build` | Build and compile projects |
 | `/sc:test` | Run tests with coverage analysis |
 | `/sc:analyze` | Analyze code quality and patterns |
-| `/sc:improve` | Apply systematic improvements |
+| `/sc:improve` | Apply systematic improvements (interactive) |
+| `/sc:auto-improve` | Autonomous overnight code improvement loop driven by an objective metric (Karpathy AutoResearch pattern) |
 | `/sc:explain` | Explain code behavior and architecture |
 | `/sc:cleanup` | Clean up code, remove dead code |
 | `/sc:troubleshoot` | Debug and fix issues |
