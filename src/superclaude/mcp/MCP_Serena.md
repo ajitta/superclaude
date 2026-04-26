@@ -6,10 +6,9 @@
   ## Initialization (required on first use)
   1. `initial_instructions` — loads Serena operating manual (only needed in non-system-prompt contexts)
   2. `check_onboarding_performed` — verifies project is set up
-  3. `activate_project` — activates the project by name or path
-  If onboarding not performed: call `onboarding` before `activate_project`
+  Project auto-activates from CWD via `--project-from-cwd` flag. If onboarding not performed: call `onboarding`.
 
-  <tools note="22 tools active in claude-code context">
+  <tools note="17 tools active in claude-code context">
     **Symbol Operations (8):**
     - `find_symbol` — search by name path pattern (supports substring, depth, kind filtering)
     - `find_referencing_symbols` — find all references to a symbol
@@ -28,18 +27,22 @@
     - `edit_memory` — regex/literal replace within a memory
     - `rename_memory` — rename existing memory
 
-    **Search and Navigation (3):**
-    - `search_for_pattern` — regex search with context lines, glob filtering
-    - `list_dir` — directory listing (recursive optional)
-    - `find_file` — find files by mask
-
-    **Project Management (5):**
-    - `activate_project` — activate project by name/path
+    **Project Management (3):**
     - `check_onboarding_performed` — check setup status
     - `onboarding` — run initial project setup
     - `initial_instructions` — load operating manual
-    - `get_current_config` — show active config, tools, modes
   </tools>
+
+  ## Fallback for context-disabled tools
+  These tools exist in upstream Serena but are not exposed in the claude-code context (per upstream README §How Serena Works). Use the native fallback when you would have reached for one.
+
+  | Removed Serena tool | Native fallback | When to use |
+  |---|---|---|
+  | `activate_project` | (automatic via `--project-from-cwd`) | No action needed; verify with `check_onboarding_performed` if uncertain |
+  | `get_current_config` | (none — MCP itself reports tools at startup) | Use `claude mcp list` from shell when you need to verify |
+  | `search_for_pattern` | native `Grep` | Regex/text search; same capability, no LSP overhead |
+  | `list_dir` | native `Glob` (e.g., `**/*.py`) | Directory listing and file discovery |
+  | `find_file` | native `Glob` | Filename pattern matching |
 
   ## Thinking Tools (restricted in claude-code context)
     - `think_about_collected_information` — assess completeness of gathered info
@@ -78,7 +81,7 @@
 
   ## Memory Patterns
     **Session start (/sc:load):**
-    `activate_project` → `list_memories` → `read_memory("pm_context")` → report context
+    `list_memories` → `read_memory("pm_context")` → report context (project auto-active via `--project-from-cwd`)
 
     **During work:**
     `think_about_task_adherence` for goal alignment checks
@@ -102,7 +105,8 @@
     - `encoding:` — text file encoding (default: utf-8)
     - `ignore_all_files_in_gitignore:` — respect .gitignore
 
-    **Install:** `uvx --from git+https://github.com/oraios/serena serena start-mcp-server --context claude-code --enable-web-dashboard false --enable-gui-log-window false`
+    **Install:** `claude mcp add --scope user serena -- serena start-mcp-server --context=claude-code --project-from-cwd`
+    (Equivalent shorthand: `serena setup claude-code`. Already installed via old command? `claude mcp remove serena` first, then re-run.)
 
   <examples>
 | Input | Tool | Reason |
@@ -110,7 +114,7 @@
 | rename getUserData everywhere | `rename_symbol` | Semantic rename with reference tracking |
 | find all class references | `find_referencing_symbols` | LSP-powered reference discovery |
 | understand UserService class | `get_symbols_overview` → `find_symbol` (depth=1) | Token-efficient exploration |
-| load project context | `activate_project` → `list_memories` | Session initialization |
+| load project context | `list_memories` → `read_memory` | Project auto-active; just read memory |
 | save work session | `write_memory` | Cross-session persistence |
 | check if task is complete | `think_about_whether_you_are_done` | Structured completion assessment |
 | update console.log to logger | ast-grep + Edit (not Serena) | Pattern-based bulk replacement |
