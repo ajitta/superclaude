@@ -104,13 +104,18 @@ What gets installed (per scope):
 
 #### **3. Install MCP servers (optional)**
 
+> **Serena prerequisite.** Serena's CLI is **not** installed by `superclaude` — install it yourself first per [upstream's installation guide](https://oraios.github.io/serena/) (`uvx`/`pipx`). `superclaude mcp` only handles MCP registration + recommended hooks.
+
 ```bash
 superclaude mcp                        # interactive picker (default scope: user)
 superclaude mcp --list                 # list available servers
 superclaude mcp --servers tavily context7
+superclaude mcp --servers serena       # register Serena (CLI must already be installed)
 superclaude mcp --scope project        # write to ./.mcp.json (team-shared)
 superclaude mcp --scope local          # write to ~/.claude.json local block
 ```
+
+> **Serena init/stale-entry issues?** See [`docs/troubleshooting/serena-installation.md`](docs/troubleshooting/serena-installation.md).
 
 #### **4. Verify**
 
@@ -219,30 +224,48 @@ For **2-3x faster** execution and **30-50% fewer tokens**, optionally install MC
 - **Without MCPs**: Fully functional, standard performance ✅
 - **With MCPs**: 2-3x faster, 30-50% fewer tokens ⚡
 
-### **Tavily Agent Skills (Optional CLI Enhancement)**
+### **Tavily CLI + Agent Skills (Optional)**
 
-`superclaude` includes **Tavily MCP** for in-conversation web search. For advanced use cases (saving to local files, domain/time filtering, pipeline composition), optionally install the [Tavily Agent Skills](https://github.com/tavily-ai/skills):
+`superclaude` includes **Tavily MCP** for in-conversation web search. For deeper research (≥5 chained queries, file output, domain/time filters), install the [Tavily CLI](https://docs.tavily.com/sdk/cli) and [Tavily Agent Skills](https://github.com/tavily-ai/skills) — the `deep-researcher` agent will automatically route `--depth deep|exhaustive` runs through them.
+
+#### **1. Install the Tavily CLI**
 
 ```bash
-# Install Tavily Agent Skills (requires Tavily CLI)
+# macOS / Linux
 curl -fsSL https://cli.tavily.com/install.sh | bash
-tvly login --api-key tvly-YOUR_KEY
 
-# Install skills into Claude Code
-npx skills add https://github.com/tavily-ai/skills
+# Windows (PowerShell)
+iwr https://cli.tavily.com/install.ps1 -UseBasicParsing | iex
+
+tvly --version                          # verify install
 ```
 
-**When to use which:**
+#### **2. Authenticate**
 
-| Scenario | Tool | Why |
-|----------|------|-----|
-| In-conversation search | Tavily **MCP** (default) | Low latency, structured output, parallel queries |
-| Agent-driven research (`/sc:research`) | Tavily **MCP** | Integrated with deep-researcher agent |
-| Save docs to local files | Tavily **CLI** (`tvly crawl --output-dir`) | File output not available via MCP |
-| Domain/time filtering | Tavily **CLI** (`tvly search --include-domains --time-range`) | Advanced filters CLI-only |
-| Pipeline composition | Tavily **CLI** (`tvly search --json \| jq`) | Composable with shell tools |
+```bash
+tvly login --api-key tvly-YOUR_KEY      # get key at https://app.tavily.com
+tvly whoami                             # confirm auth
+```
 
-> **Recommended setup:** Keep both — Tavily MCP handles 90% of searches automatically. The CLI activates only when its unique capabilities are needed.
+#### **3. Install Tavily Agent Skills into Claude Code**
+
+```bash
+npx skills add https://github.com/tavily-ai/skills
+# Restart Claude Code — the `tavily-cli` skill auto-loads on /sc:research --depth deep|exhaustive
+```
+
+#### **Channel routing (post-install)**
+
+| Scenario | Channel | Why |
+|----------|---------|-----|
+| `<5` queries · in-conversation answer · `--depth quick\|standard` | Tavily **MCP** (default) | Low latency, structured parallel calls |
+| `≥5` chained queries · `--depth deep\|exhaustive` (≥20 sources) | `tavily-cli` **skill** | Aggregates across calls, sustained throughput |
+| Save docs to local files (`tvly crawl --output-dir`) | Tavily **CLI** | File output unavailable via MCP |
+| Advanced filters (`--include-domains`, `--time-range`, `--country`) | Tavily **CLI** | CLI-only flags |
+| Pipeline composition (`tvly search --json \| jq`) | Tavily **CLI** | Composable with shell tools |
+| MCP + CLI both unavailable | Native `WebSearch` / `WebFetch` | Fallback only |
+
+> **Recommended setup:** Install all three (MCP + CLI + Skills). The 3-way routing (SSOT: [`MCP_Tavily.md`](src/superclaude/MCP/MCP_Tavily.md)) picks the right channel automatically — MCP for ~90% of calls, CLI skill for heavy research.
 
 ---
 
@@ -534,6 +557,7 @@ The Deep Research system intelligently coordinates multiple tools:
 | Architecture & directory roles | [`src/superclaude/ARCHITECTURE.md`](src/superclaude/ARCHITECTURE.md) |
 | Project rules, build & test loop | [`CLAUDE.md`](CLAUDE.md) |
 | Project-specific gotchas | [`.claude/rules/gotchas/`](.claude/rules/gotchas) |
+| Serena MCP troubleshooting | [`docs/troubleshooting/serena-installation.md`](docs/troubleshooting/serena-installation.md) |
 | Slash commands (33) | [`src/superclaude/Commands/`](src/superclaude/Commands) · `superclaude install --list-all` |
 | Agents (23) | [`src/superclaude/Agents/`](src/superclaude/Agents) |
 | Modes (7) | [`src/superclaude/Modes/`](src/superclaude/Modes) |
