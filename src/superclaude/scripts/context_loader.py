@@ -152,12 +152,11 @@ COMPOSITE_FLAGS = {
 INSTRUCTION_MAP = {
     # Behavioral MCPs — complex decision rules and workflow patterns
     "mcp/MCP_Serena.md": (
-        "Serena (22 tools): symbol ops (find_symbol, replace_symbol_body, get_symbols_overview, "
+        "Serena (17 tools): symbol ops (find_symbol, replace_symbol_body, get_symbols_overview, "
         "insert_before/after_symbol, find_referencing_symbols, rename_symbol, safe_delete_symbol). "
         "Workflow: get_symbols_overview → find_symbol(name_path, include_body=True) → edit. "
-        "Use search_for_pattern when symbol name is unknown. "
         "Decision: symbol meaning (references, types, rename, delete) → Serena; text patterns → native Grep/Edit. "
-        "Memory (6): activate_project → list_memories → read/write/edit/rename/delete_memory. "
+        "Memory (6): list_memories → read/write/edit/rename/delete_memory. Project auto-active via --project-from-cwd; verify with check_onboarding_performed if uncertain. "
         "Note: thinking tools (think_about_*, summarize_changes) NOT active in claude-code context. "
         "Prioritize symbolic tools over full file reads."
     ),

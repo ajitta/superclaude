@@ -3,13 +3,15 @@
     <mission>Semantic code understanding with project memory and session persistence</mission>
   </role>
 
-  ## Initialization (required on first use)
-  1. `initial_instructions` — loads Serena operating manual (only needed in non-system-prompt contexts)
-  2. `check_onboarding_performed` — verifies project is set up
-  3. `activate_project` — activates the project by name or path
-  If onboarding not performed: call `onboarding` before `activate_project`
+  ## Initialization
+  Project auto-activates from CWD via `--project-from-cwd`. Onboarding runs automatically on first project use.
 
-  <tools note="22 tools active in claude-code context">
+  Recovery actions (only when needed):
+  - If the agent ignores Serena tools or appears to have forgotten the manual: call `initial_instructions` once. (Permanent fix: install Serena's SessionStart hook — see "Optional: Serena hooks" below.)
+  - To verify project setup: `check_onboarding_performed`.
+  - If onboarding hasn't run: `onboarding`.
+
+  <tools note="17 tools active in claude-code context">
     **Symbol Operations (8):**
     - `find_symbol` — search by name path pattern (supports substring, depth, kind filtering)
     - `find_referencing_symbols` — find all references to a symbol
@@ -28,18 +30,22 @@
     - `edit_memory` — regex/literal replace within a memory
     - `rename_memory` — rename existing memory
 
-    **Search and Navigation (3):**
-    - `search_for_pattern` — regex search with context lines, glob filtering
-    - `list_dir` — directory listing (recursive optional)
-    - `find_file` — find files by mask
-
-    **Project Management (5):**
-    - `activate_project` — activate project by name/path
+    **Project Management (3):**
     - `check_onboarding_performed` — check setup status
     - `onboarding` — run initial project setup
     - `initial_instructions` — load operating manual
-    - `get_current_config` — show active config, tools, modes
   </tools>
+
+  ## Fallback for context-disabled tools
+  These tools exist in upstream Serena but are not exposed in the claude-code context (per upstream README §How Serena Works). Use the native fallback when you would have reached for one.
+
+  | Removed Serena tool | Native fallback | When to use |
+  |---|---|---|
+  | `activate_project` | (automatic via `--project-from-cwd`) | No action needed; verify with `check_onboarding_performed` if uncertain |
+  | `get_current_config` | (none — MCP itself reports tools at startup) | Use `claude mcp list` from shell when you need to verify |
+  | `search_for_pattern` | native `Grep` | Regex/text search; same capability, no LSP overhead |
+  | `list_dir` | native `Glob` (e.g., `**/*.py`) | Directory listing and file discovery |
+  | `find_file` | native `Glob` | Filename pattern matching |
 
   ## Thinking Tools (restricted in claude-code context)
     - `think_about_collected_information` — assess completeness of gathered info
@@ -78,7 +84,7 @@
 
   ## Memory Patterns
     **Session start (/sc:load):**
-    `activate_project` → `list_memories` → `read_memory("pm_context")` → report context
+    `list_memories` → `read_memory("pm_context")` → report context (project auto-active via `--project-from-cwd`)
 
     **During work:**
     `think_about_task_adherence` for goal alignment checks
@@ -102,7 +108,37 @@
     - `encoding:` — text file encoding (default: utf-8)
     - `ignore_all_files_in_gitignore:` — respect .gitignore
 
-    **Install:** `uvx --from git+https://github.com/oraios/serena serena start-mcp-server --context claude-code --enable-web-dashboard false --enable-gui-log-window false`
+    **Install:** `claude mcp add --scope user serena -- serena start-mcp-server --context=claude-code --project-from-cwd`
+    (Equivalent shorthand: `serena setup claude-code`. Already installed via old command? `claude mcp remove serena` first, then re-run.)
+
+    **Scope choice** — `superclaude install` accepts `--scope user|project|local`. Upstream `serena setup claude-code` hardcodes `--scope user`; SC defaults to the same. Trade-offs:
+
+    | Scope | Stored in | Effect with `--project-from-cwd` |
+    |---|---|---|
+    | `user` (recommended) | `~/.claude.json` | One registration; auto-detects project per CWD at launch. |
+    | `project` | `.mcp.json` (committed) | Team-shared registration; each clone needs Serena binary locally; `--project-from-cwd` is redundant per-repo but harmless. |
+    | `local` | `~/.claude.json` (per-project) | Per-machine + per-repo; defeats the "register once" benefit of `--project-from-cwd`. |
+
+    **Optional: Serena hooks (recommended by upstream)** — Counteracts agent drift (forgetting Serena's manual mid-session) and missing tool-load on session start. Add to `.claude/settings.json` (user or project scope):
+
+    ```json
+    {
+      "hooks": {
+        "PreToolUse": [
+          { "matcher": "", "hooks": [{ "type": "command", "command": "serena-hooks remind --client=claude-code" }] },
+          { "matcher": "mcp__serena__*", "hooks": [{ "type": "command", "command": "serena-hooks auto-approve --client=claude-code" }] }
+        ],
+        "SessionStart": [
+          { "matcher": "", "hooks": [{ "type": "command", "command": "serena-hooks activate --client=claude-code" }] }
+        ],
+        "Stop": [
+          { "matcher": "", "hooks": [{ "type": "command", "command": "serena-hooks cleanup --client=claude-code" }] }
+        ]
+      }
+    }
+    ```
+
+    Prerequisite: `serena-hooks` binary on PATH (e.g., `uv tool install --from git+https://github.com/oraios/serena serena`). Caveat: the `mcp__serena__*` PreToolUse hook auto-approves all Serena tool calls — if you rely on permission prompts as a guardrail, drop that one entry. Source: `oraios.github.io/serena/02-usage/030_clients.html`.
 
   <examples>
 | Input | Tool | Reason |
@@ -110,7 +146,7 @@
 | rename getUserData everywhere | `rename_symbol` | Semantic rename with reference tracking |
 | find all class references | `find_referencing_symbols` | LSP-powered reference discovery |
 | understand UserService class | `get_symbols_overview` → `find_symbol` (depth=1) | Token-efficient exploration |
-| load project context | `activate_project` → `list_memories` | Session initialization |
+| load project context | `list_memories` → `read_memory` | Project auto-active; just read memory |
 | save work session | `write_memory` | Cross-session persistence |
 | check if task is complete | `think_about_whether_you_are_done` | Structured completion assessment |
 | update console.log to logger | ast-grep + Edit (not Serena) | Pattern-based bulk replacement |

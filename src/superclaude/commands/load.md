@@ -11,10 +11,10 @@ description: Session lifecycle management with Serena MCP + Claude auto memory f
   <syntax>/sc:load [target] [--type project|config|deps|checkpoint] [--refresh] [--analyze]</syntax>
 
   <flow>
-    1. Initialize: activate_project() → check_onboarding_performed()
+    1. Initialize: MCP auto-activates from CWD; verify with check_onboarding_performed()
     2. Load (Serena): list_memories() → read_memory("pm_context") → read_memory("last_session") → read_memory("next_actions")
     3. Load (auto memory): MEMORY.md (auto-loaded) + topic files linked from MEMORY.md
-    4. Discover: Project structure + requirements (get_symbols_overview, list_dir, Read/Grep/Glob)
+    4. Discover: Project structure + requirements (get_symbols_overview, Read/Grep/Glob)
     5. Activate: Project context + workflow prep
     6. Validate: Context integrity + session readiness
     7. Session Goal (optional): If user provides a goal, record as 1-line objective. Display as reminder when context exceeds 60%.
@@ -30,15 +30,14 @@ description: Session lifecycle management with Serena MCP + Claude auto memory f
 
 
   <tools>
-    - activate_project: Serena project activation (primary)
     - list_memories/read_memory: Serena memory retrieval
-    - get_symbols_overview/list_dir: Serena structure analysis
+    - get_symbols_overview: Serena structure analysis (use native Glob for directory listing)
     - Read/Grep/Glob: Auto memory + project file analysis
     - Write: Checkpoint creation
   </tools>
 
   <patterns>
-    - Activation: Serena activate → Serena memories → auto memory → context establish
+    - Activation: Serena memories (auto-active) → auto memory → context establish
     - Restoration: Checkpoint → validation → workflow prep
     - Memory: Cross-session → continuity → efficiency
     - Performance: <500ms init | <200ms core | <1s checkpoint
