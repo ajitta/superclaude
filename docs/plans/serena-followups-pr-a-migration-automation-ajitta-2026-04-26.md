@@ -1,29 +1,7 @@
 ---
-status: complete
+status: draft
 revised: 2026-04-26
 ---
-
-## Implementation result (2026-04-26)
-
-- 6 helpers added to `src/superclaude/cli/install_mcp.py`:
-  `_is_serena_stale_entry()`, `_migrate_stale_serena()`, `_handle_stale_serena()`,
-  plus the `SERENA_EXPECTED_FLAG` / `SERENA_STALE_FLAGS` constants and a `sys` import.
-- `install_mcp_server()` early-return branch now special-cases `server_name == "serena"`:
-  inspects the structured entry via `_mcp_servers_in_scope()`, runs the staleness check,
-  and only proceeds to re-install when migration succeeded. Other servers are unaffected.
-- New unit-test file `tests/unit/test_install_mcp.py`: **19 tests, all passing**.
-  Covers fresh/stale detection, dry-run / non-TTY / interactive-yes / interactive-no /
-  remove-failure decision branches, and the `install_mcp_server()` wiring.
-- Full pytest suite: **1,835 passed, 24 skipped, 3 pre-existing canary failures unrelated to this PR** (all in `tests/integration/test_skill_canary.py`, all `claude -p` subprocess timeouts that exist on master).
-- Lint clean (`ruff check`); formatted with `ruff format`.
-
-## Phase 0 findings (2026-04-26)
-
-- `install_mcp.py` already has `_mcp_servers_in_scope(scope)` at line ~205 that reads `~/.claude.json` directly and returns the **structured** entry (command, args, env). This eliminates the need to parse `claude mcp list` text output — Phase 1 detection inspects the dict directly. Risk #1 (JSON-format-changes) is **resolved** — we don't depend on CLI output format.
-- `install_mcp_server()` line ~304 currently returns early on "already installed at scope" without staleness check — that early-return is the insertion point.
-- `uninstall_mcp_servers()` line ~575 already has the `claude mcp remove --scope user serena` subprocess pattern — reuse the call shape.
-- `superclaude mcp` command has no `--yes` flag (`uninstall` does). Approach: use `sys.stdin.isatty()` for non-interactive detection — no new CLI flag needed, matches click conventions, falls back to safe default in CI.
-- Tests dir has `test_cli_install.py`/`test_install_settings.py` patterns; no existing `test_install_mcp.py`. Create new file.
 
 # Serena Follow-ups — PR-A: Existing-User Migration Automation
 
