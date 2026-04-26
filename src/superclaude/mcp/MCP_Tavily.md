@@ -15,7 +15,12 @@ Avoid:
 - Training knowledge: Simple questions from training
 - Code generation: Writing code, local file ops
 
-Channel: MCP (`tavily_*` tools) is default. Switch to `tavily-cli` skill only for multi-query chained research where the skill aggregates across calls. If neither is available, fall back to native WebSearch.
+Channel selection (3-way):
+| Channel | Trigger |
+|---------|---------|
+| **MCP** (default, `tavily_*`) | <5 queries · in-conversation answers · structured parallel calls · fact-check · `/sc:research --depth quick\|standard` |
+| **`tavily-cli` skill** | ≥5 chained queries · `/sc:research --depth deep\|exhaustive` (≥20 sources) · file output (`--output-dir`) · advanced filters (`--include-domains`, `--time-range`) · shell pipeline composition |
+| **Native WebSearch / WebFetch** | MCP+CLI both unavailable (fallback only) |
   </choose>
 
   <capabilities>
