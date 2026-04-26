@@ -1,7 +1,16 @@
 ---
-status: draft
-revised: 2026-04-26
+status: deprecated
+revised: 2026-04-27
 ---
+
+> **2026-04-27 — Reverted.** PR #3 was merged then reverted in a follow-up
+> simplification PR. Rationale: stale-entry migration is not in upstream
+> Serena's documented flow (`010_installation.html` / `030_clients.html`),
+> and `docs/troubleshooting/serena-installation.md` already covers the
+> manual `claude mcp remove serena` step. The 157-line surgical-edit
+> surface + 19 tests was disproportionate to the one-line manual hint it
+> automated. Item #3 of the follow-ups queue is now closed as
+> "documented manually, no automation."
 
 # Serena Follow-ups — PR-A: Existing-User Migration Automation
 

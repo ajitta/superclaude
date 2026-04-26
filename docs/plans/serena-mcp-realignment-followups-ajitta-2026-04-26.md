@@ -1,6 +1,6 @@
 ---
-status: draft
-revised: 2026-04-26
+status: review
+revised: 2026-04-27
 ---
 
 # Serena MCP Realignment — Deferred Follow-ups
@@ -21,19 +21,14 @@ PR #2 scope was tightly bounded to docs realignment (17 tools, upstream-authorit
 - **Risk profile:** Low-Medium — adds a runtime assumption that the `serena` CLI is on PATH; needs a pre-flight check or graceful fallback to the manual command path.
 - **Done when:** New install flow passes without hard-coding the verbose `claude mcp add ...` line, and missing-CLI case fails loud with a clear next step.
 
-### 2. Serena hooks integration
-- **What:** Add Serena-recommended hooks (per upstream `setup claude-code` post-install message → `oraios.github.io/serena/02-usage/030_clients.html#claude-code`) to SuperClaude's default `.claude/settings.json` template; rely on `install_settings.py` marker-based merger to preserve user customizations. Serena does **not** ship hook payloads — we author them based on upstream guidance.
-- **Status:** Out of scope per discovery spec §"Hooks recommendation (out of scope, noted for future)".
-- **Risk profile:** Medium — modifies settings template + exercises the marker-based merger; needs regression test on preserve-user-hooks invariant.
-- **Assumption:** Serena MCP is already registered (per PR #2 install command). The recommended hooks invoke Serena tools — they fail silently in environments where Serena MCP is not registered. If automating, gate hook installation on a successful `claude mcp list | grep serena` check.
-- **Snapshot:** Recommendation captured 2026-04-26 from upstream URL above; **re-verify at implementation time** — upstream's recommended hook set may have changed.
-- **Done when:** Fresh install lands hooks matching the upstream recommendation as of the implementation-time re-verification; an existing install with custom hooks survives an upgrade unchanged.
+### 2. Serena hooks integration — MERGED 2026-04-27 (PR #4)
+- **What:** Add Serena-recommended hooks (per upstream `setup claude-code` post-install message → `oraios.github.io/serena/02-usage/030_clients.html#claude-code`) to SuperClaude's default `.claude/settings.json` template; rely on `install_settings.py` marker-based merger to preserve user customizations.
+- **Resolution:** Shipped as `src/superclaude/hooks/serena-hooks.json` + gate in `install_components.py` (Serena MCP presence required). Marked via `[superclaude] _comment` convention so existing merger logic preserves user-authored hooks. No merger algorithm change.
 
-### 3. Existing-user migration automation
-- **What:** Replace the 1-line manual hint (`claude mcp remove serena && <re-run>`) with detection + prompted execution. Concretely: `install_mcp.py` detects a pre-realignment Serena MCP entry (no `--project-from-cwd`, or stale `--enable-*` flags) and prompts the user before running `claude mcp remove serena` and re-installing.
-- **Status:** Deferred (not in PR #2 scope; Q3 shipped only the docs hint).
-- **Risk profile:** Low-Medium — destructive command on user's MCP config; needs explicit confirmation prompt and a `--no-interactive` opt-out path.
-- **Done when:** A user with the old install command can run `superclaude install` (or equivalent) once and end up on the new flag set, without hand-running `claude mcp remove`.
+### 3. Existing-user migration automation — CLOSED 2026-04-27 (won't fix)
+- **What:** Replace the 1-line manual hint (`claude mcp remove serena && <re-run>`) with detection + prompted execution.
+- **Resolution:** Implemented as PR #3, then reverted in simplification PR. Upstream Serena's documented flow (`010_installation.html` / `030_clients.html`) does not include stale-entry migration; SC scope is mcp registration + hooks + install/uninstall scope. Manual `claude mcp remove serena` remains documented in `docs/troubleshooting/serena-installation.md`.
+- **Reopen if:** Multiple existing-user reports cite the manual step as friction. Until then, do not re-implement.
 
 ## Suggested priority order
 

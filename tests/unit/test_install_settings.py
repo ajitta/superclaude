@@ -67,18 +67,10 @@ class TestIsSuperclaudeHook:
         assert self.is_sc_hook({"hooks": []}) is False
 
     def test_detects_serena_recommended_via_comment(self):
-        """SC-managed Serena hook detected via [superclaude] serena-recommended _comment."""
+        """SC-managed Serena hook detected via [superclaude] _comment prefix."""
         hook = {
             "_comment": "[superclaude] serena-recommended (snapshot 2026-04-27)",
             "hooks": [{"command": "serena-hooks remind --client=claude-code"}],
-        }
-        assert self.is_sc_hook(hook) is True
-
-    def test_detects_serena_recommended_marker_directly(self):
-        """`serena-recommended` marker matches even without [superclaude] prefix."""
-        hook = {
-            "_comment": "serena-recommended snapshot",
-            "hooks": [{"command": "serena-hooks activate"}],
         }
         assert self.is_sc_hook(hook) is True
 

@@ -17,8 +17,7 @@ CLAUDE_SC_IMPORT = "@superclaude/CLAUDE_SC.md"
 
 # Markers to identify SuperClaude hooks (for merge/replace logic).
 # Match is substring-based against `_comment` and `command` fields.
-# `superclaude` already catches `[superclaude] ...` _comment prefixes;
-# `serena-recommended` is added for explicit attribution of upstream-mirrored hooks.
+# `superclaude` catches `[superclaude] ...` _comment prefixes (incl. serena-recommended hooks).
 SUPERCLAUDE_HOOK_MARKERS = [
     "superclaude",
     "session_init",
@@ -26,7 +25,6 @@ SUPERCLAUDE_HOOK_MARKERS = [
     "test_runner_hook",
     "file_size_guard",
     "BLOCKED: destructive",
-    "serena-recommended",
 ]
 
 
