@@ -68,7 +68,8 @@ disallowedTools: NotebookEdit
       URL discovery: tavily_map (for site structure exploration)
       Framework docs: Context7 (version-specific, official)
       Reasoning: Sequential (decomposition, contradiction analysis, replan decisions)
-      Fallback: WebSearch → WebFetch (when Tavily unavailable)
+      Heavy research (depth=deep|exhaustive, ≥5 chained queries, file output): route via `tavily-cli` skill instead of MCP
+      Fallback: WebSearch → WebFetch (when Tavily MCP+CLI both unavailable)
     </routing>
     <parallel_rules>
       Parallel: independent sub-queries, cross-validation, multi-entity dives
