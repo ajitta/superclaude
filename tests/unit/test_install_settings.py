@@ -66,6 +66,30 @@ class TestIsSuperclaudeHook:
         """Hook with empty hooks array and no markers returns False."""
         assert self.is_sc_hook({"hooks": []}) is False
 
+    def test_detects_serena_recommended_via_comment(self):
+        """SC-managed Serena hook detected via [superclaude] serena-recommended _comment."""
+        hook = {
+            "_comment": "[superclaude] serena-recommended (snapshot 2026-04-27)",
+            "hooks": [{"command": "serena-hooks remind --client=claude-code"}],
+        }
+        assert self.is_sc_hook(hook) is True
+
+    def test_detects_serena_recommended_marker_directly(self):
+        """`serena-recommended` marker matches even without [superclaude] prefix."""
+        hook = {
+            "_comment": "serena-recommended snapshot",
+            "hooks": [{"command": "serena-hooks activate"}],
+        }
+        assert self.is_sc_hook(hook) is True
+
+    def test_user_authored_serena_hook_not_detected(self):
+        """User-authored Serena hook (no marker) treated as user hook, not SC."""
+        hook = {
+            "matcher": "",
+            "hooks": [{"command": "serena-hooks remind --client=claude-code"}],
+        }
+        assert self.is_sc_hook(hook) is False
+
 
 class TestMergeHookArrays:
     """Tests for _merge_hook_arrays merge logic."""
