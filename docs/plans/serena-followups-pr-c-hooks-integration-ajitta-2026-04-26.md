@@ -1,7 +1,14 @@
 ---
-status: draft
-revised: 2026-04-26
+status: complete
+revised: 2026-04-27
 ---
+
+> **2026-04-27 — Merged as PR #4.** A simplification follow-up removed the
+> redundant `serena-recommended` marker from `SUPERCLAUDE_HOOK_MARKERS`
+> (the existing `superclaude` substring already catches `[superclaude]`
+> prefixes) and dropped the unused `tests/fixtures/serena-hooks-upstream-snapshot-2026-04-27.json`
+> (Phase 0 verification ran once — snapshot date preserved in PR #4
+> description).
 
 # Serena Follow-ups — PR-C: Hooks Integration
 

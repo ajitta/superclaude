@@ -10,7 +10,6 @@ import os
 import platform
 import shlex
 import subprocess
-import sys
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
@@ -172,7 +171,9 @@ def check_prerequisites() -> Tuple[bool, List[str]]:
         except (subprocess.TimeoutExpired, FileNotFoundError):
             continue
     if not _ast_grep_found:
-        click.echo("⚠️  ast-grep not found - required for ast-grep MCP server", err=True)
+        click.echo(
+            "⚠️  ast-grep not found - required for ast-grep MCP server", err=True
+        )
         click.echo(
             "   Install: brew install ast-grep (macOS) | cargo install ast-grep --locked | npm i -g @ast-grep/cli",
             err=True,
@@ -190,9 +191,7 @@ def _read_json_safe(path: Path) -> dict:
         return {}
 
 
-def _scope_config_path(
-    scope: str, project_root: Optional[Path] = None
-) -> Tuple[Path, List[str]]:
+def _scope_config_path(scope: str, project_root: Optional[Path] = None) -> Tuple[Path, List[str]]:
     """
     Return (config_file, keypath) for a given MCP scope.
 
@@ -211,9 +210,7 @@ def _scope_config_path(
     raise ValueError(f"Unknown MCP scope: {scope!r}")
 
 
-def _mcp_servers_in_scope(
-    scope: str, project_root: Optional[Path] = None
-) -> Dict[str, dict]:
+def _mcp_servers_in_scope(scope: str, project_root: Optional[Path] = None) -> Dict[str, dict]:
     """Return the mcpServers dict at the given scope (empty dict if none)."""
     path, keypath = _scope_config_path(scope, project_root)
     data = _read_json_safe(path)
@@ -222,112 +219,6 @@ def _mcp_servers_in_scope(
             return {}
         data = data.get(key, {})
     return data if isinstance(data, dict) else {}
-
-
-SERENA_EXPECTED_FLAG = "--project-from-cwd"
-SERENA_STALE_FLAGS = ("--enable-web-dashboard", "--enable-gui-log-window")
-
-
-def _is_serena_stale_entry(entry: Dict) -> bool:
-    """
-    Return True if a Serena MCP entry is from the pre-realignment install command.
-
-    Stale signals (any one is sufficient):
-      - Missing the `--project-from-cwd` flag in command/args
-      - Presence of `--enable-web-dashboard` or `--enable-gui-log-window` (PR #2 dropped these)
-
-    The entry shape is whatever `_mcp_servers_in_scope()` returns — typically a dict
-    with keys like `command`, `args`. Both string-form `command` and list-form `args`
-    are inspected so we work across both `claude mcp add` styles.
-    """
-    if not isinstance(entry, dict):
-        return False
-
-    parts: List[str] = []
-    cmd = entry.get("command")
-    if isinstance(cmd, str):
-        parts.extend(shlex.split(cmd))
-    args = entry.get("args")
-    if isinstance(args, list):
-        parts.extend(str(a) for a in args)
-
-    if not parts:
-        # No usable command info — treat as not-stale (avoid false-positive migration)
-        return False
-
-    joined = " ".join(parts)
-    if any(flag in joined for flag in SERENA_STALE_FLAGS):
-        return True
-    if SERENA_EXPECTED_FLAG not in joined:
-        return True
-    return False
-
-
-def _migrate_stale_serena(scope: str) -> Tuple[bool, str]:
-    """
-    Run `claude mcp remove --scope <scope> serena` so the caller can re-install with new flags.
-
-    Returns (success, message). Mirrors the pattern in `uninstall_mcp_servers()`.
-    """
-    cmd = ["claude", "mcp", "remove", "--scope", scope, "serena"]
-    try:
-        result = _run_command(cmd, capture_output=True, text=True, timeout=60)
-        if result.returncode == 0:
-            return True, "Removed stale Serena MCP entry"
-        err = (result.stderr or "").strip() or "unknown error"
-        return False, f"Failed to remove stale Serena: {err}"
-    except (
-        subprocess.TimeoutExpired,
-        subprocess.SubprocessError,
-        FileNotFoundError,
-    ) as e:
-        return False, f"Failed to remove stale Serena: {e}"
-
-
-def _handle_stale_serena(scope: str, dry_run: bool) -> Tuple[str, bool]:
-    """
-    Decide what to do when a stale Serena MCP entry is detected at install-time.
-
-    Returns (action, should_continue):
-      - action ∈ {"migrate", "skip", "dry-run"}
-      - should_continue: True if the caller should proceed to install the fresh entry
-    """
-    click.echo("   ⚠️  Stale Serena MCP install detected (pre-realignment flags)")
-
-    if dry_run:
-        click.echo(f"   [DRY RUN] Would run: claude mcp remove --scope {scope} serena")
-        click.echo("   [DRY RUN] Then re-install Serena with the new flag set")
-        return "dry-run", False
-
-    if not sys.stdin.isatty():
-        click.echo(
-            "   ❌ Cannot prompt for migration in non-interactive context.",
-            err=True,
-        )
-        click.echo(
-            f"   To migrate manually, run:\n"
-            f"     claude mcp remove --scope {scope} serena\n"
-            f"   then re-run this install.",
-            err=True,
-        )
-        return "skip", False
-
-    if not click.confirm(
-        "   Migrate now? (runs 'claude mcp remove serena' then re-installs)",
-        default=True,
-    ):
-        click.echo(
-            f"   Skipped migration. Run manually when ready:\n"
-            f"     claude mcp remove --scope {scope} serena"
-        )
-        return "skip", False
-
-    success, message = _migrate_stale_serena(scope)
-    if success:
-        click.echo(f"   ✅ {message}")
-        return "migrate", True
-    click.echo(f"   ❌ {message}", err=True)
-    return "skip", False
 
 
 def check_mcp_server_installed(
@@ -410,24 +301,8 @@ def install_mcp_server(
 
     # Check if already installed at this specific scope
     if check_mcp_server_installed(server_name, scope=scope):
-        # Serena-specific staleness check: PR #2 changed the install command;
-        # detect pre-realignment entries (missing --project-from-cwd or stale --enable-* flags)
-        # and offer migration. Other servers fall through to the unchanged "already installed" path.
-        if server_name == "serena":
-            entry = _mcp_servers_in_scope(scope).get(server_name, {})
-            if _is_serena_stale_entry(entry):
-                _, should_continue = _handle_stale_serena(scope=scope, dry_run=dry_run)
-                if not should_continue:
-                    return (
-                        True  # Skip / declined / dry-run: leave existing install alone
-                    )
-                # Migration succeeded — fall through to re-install with new flags
-            else:
-                click.echo(f"   ✅ Already installed at {scope} scope: {server_name}")
-                return True
-        else:
-            click.echo(f"   ✅ Already installed at {scope} scope: {server_name}")
-            return True
+        click.echo(f"   ✅ Already installed at {scope} scope: {server_name}")
+        return True
 
     # Handle API key requirements
     env_args = []
@@ -694,16 +569,12 @@ def uninstall_mcp_servers(
     sc_server_names = list(MCP_SERVERS.keys())
 
     for server_name in sc_server_names:
-        if not check_mcp_server_installed(
-            server_name, scope=scope, project_root=project_root
-        ):
+        if not check_mcp_server_installed(server_name, scope=scope, project_root=project_root):
             skipped += 1
             continue
 
         if dry_run:
-            messages.append(
-                f"[DRY-RUN] Would remove MCP server: {server_name} (scope: {scope})"
-            )
+            messages.append(f"[DRY-RUN] Would remove MCP server: {server_name} (scope: {scope})")
             removed += 1
             continue
 
@@ -711,19 +582,13 @@ def uninstall_mcp_servers(
         try:
             result = _run_command(cmd, capture_output=True, text=True, timeout=60)
             if result.returncode == 0:
-                messages.append(
-                    f"✅ Removed MCP server: {server_name} (scope: {scope})"
-                )
+                messages.append(f"✅ Removed MCP server: {server_name} (scope: {scope})")
                 removed += 1
             else:
                 err = (result.stderr or "").strip() or "unknown error"
                 messages.append(f"❌ Failed to remove MCP server {server_name}: {err}")
                 failed += 1
-        except (
-            subprocess.TimeoutExpired,
-            subprocess.SubprocessError,
-            FileNotFoundError,
-        ) as e:
+        except (subprocess.TimeoutExpired, subprocess.SubprocessError, FileNotFoundError) as e:
             messages.append(f"❌ Failed to remove MCP server {server_name}: {e}")
             failed += 1
 
