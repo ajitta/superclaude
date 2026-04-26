@@ -114,3 +114,19 @@ def test_mutator_handles_malformed_json(tmp_path):
         run.return_value = _completed("not json", returncode=0)
         result = Mutator().mutate(worktree_path=tmp_path)
     assert result.error is not None
+
+
+def test_mutator_passes_timeout_to_subprocess(tmp_path):
+    with patch("subprocess.run") as run:
+        run.return_value = _completed(_fake_claude_response("x"))
+        Mutator(timeout=120).mutate(worktree_path=tmp_path)
+    assert run.call_args.kwargs.get("timeout") == 120
+
+
+def test_mutator_returns_error_on_timeout(tmp_path):
+    import subprocess as _sp
+
+    with patch("subprocess.run", side_effect=_sp.TimeoutExpired("claude", 5)):
+        result = Mutator(timeout=5).mutate(worktree_path=tmp_path)
+    assert result.error is not None
+    assert "timeout" in result.error.lower()

@@ -16,6 +16,7 @@ from typing import Optional
 
 DEFAULT_MODEL = "sonnet"
 ALLOWED_TOOLS = "Edit Write Read"
+DEFAULT_TIMEOUT_S = 600  # matches CoordinatorConfig.cycle_timeout_seconds default
 
 DEFAULT_PROMPT = """\
 You are the mutator agent in a Karpathy-style autoresearch loop. The current
@@ -44,9 +45,15 @@ class MutationResult:
 class Mutator:
     """Subprocess wrapper around the `claude` CLI in headless print mode."""
 
-    def __init__(self, model: str = DEFAULT_MODEL, prompt: str = DEFAULT_PROMPT):
+    def __init__(
+        self,
+        model: str = DEFAULT_MODEL,
+        prompt: str = DEFAULT_PROMPT,
+        timeout: int = DEFAULT_TIMEOUT_S,
+    ):
         self.model = model
         self.prompt = prompt
+        self.timeout = timeout
 
     def _claude_path(self) -> str:
         which = shutil.which("claude")
@@ -69,10 +76,17 @@ class Mutator:
                 cwd=str(worktree_path),
                 capture_output=True,
                 text=True,
+                timeout=self.timeout,
             )
         except FileNotFoundError as exc:
             return MutationResult(
                 rationale="", tokens_used=0, error=f"claude CLI not found: {exc}"
+            )
+        except subprocess.TimeoutExpired:
+            return MutationResult(
+                rationale="",
+                tokens_used=0,
+                error=f"claude CLI exceeded timeout ({self.timeout}s) — killed",
             )
 
         if proc.returncode != 0:

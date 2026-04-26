@@ -48,6 +48,10 @@ class CoordinatorConfig:
     smoke_cmd: Optional[str] = None
     mutator_model: str = "sonnet"
     plateau_window: int = 5
+    # Glob restricting which files the mutator may edit. Forwarded to the
+    # mutator system prompt; not enforced at fs level (R2 v0.1: mutator's
+    # tool surface is already Edit/Write/Read, no shell — scope is advisory).
+    scope_glob: str = "**"
 
 
 class Coordinator:
@@ -221,7 +225,7 @@ class Coordinator:
             plateau.record(eval_result.metric_value)
             if eval_result.metric_value > (self._baseline_metric or 0.0):
                 self._baseline_metric = eval_result.metric_value
-                regression.baseline = eval_result.metric_value  # type: ignore[misc]
+                regression.baseline = eval_result.metric_value
         if not plateau.check().pass_:
             return "stop"
         return "continue"
@@ -236,9 +240,18 @@ class Coordinator:
 
     def _invoke_mutator(self) -> MutationResult:
         assert self._worktree is not None
-        return Mutator(model=self.config.mutator_model).mutate(
-            worktree_path=self._worktree.path
+        scoped_prompt = (
+            f"Edit only files matching glob: {self.config.scope_glob}\n\n"
+            if self.config.scope_glob and self.config.scope_glob != "**"
+            else ""
         )
+        from .mutator import DEFAULT_PROMPT
+
+        return Mutator(
+            model=self.config.mutator_model,
+            prompt=scoped_prompt + DEFAULT_PROMPT,
+            timeout=self.config.cycle_timeout_seconds,
+        ).mutate(worktree_path=self._worktree.path)
 
     def _git_commit(self, rationale: str) -> str:
         assert self._worktree is not None

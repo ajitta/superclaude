@@ -40,6 +40,11 @@ def _build_parser() -> argparse.ArgumentParser:
     p.add_argument("--cycle-timeout", default="600", help="per-cycle timeout (seconds)")
     p.add_argument("--smoke-cmd", default=None)
     p.add_argument("--mutator-model", default="sonnet")
+    p.add_argument(
+        "--scope",
+        default="**",
+        help="glob restricting mutator edits (advisory, default: **)",
+    )
     p.add_argument("--dry-run", action="store_true", help="record baseline only")
     p.add_argument("--status", action="store_true", help="print summary and exit")
     return p
@@ -71,6 +76,7 @@ def main(argv: list[str] | None = None) -> int:
         cycle_timeout_seconds=_parse_duration(args.cycle_timeout),
         smoke_cmd=args.smoke_cmd,
         mutator_model=args.mutator_model,
+        scope_glob=args.scope,
     )
     coord = Coordinator(cfg)
     if args.dry_run:

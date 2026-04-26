@@ -9,7 +9,7 @@ description: Autonomous overnight code improvement loop driven by an objective m
     <mission>Run an autonomous overnight code improvement loop driven by an objective metric (Karpathy AutoResearch pattern) — mutator proposes changes, eval-cmd measures, single git lineage in an isolated worktree</mission>
   </role>
 
-  <syntax>/sc:auto-improve &lt;project&gt; --eval-cmd &lt;sh&gt; --metric &lt;jmespath&gt; [--budget 8h] [--smoke-cmd &lt;sh&gt;] [--cycle-timeout 600] [--mutator-model sonnet|opus|haiku] [--status] [--dry-run]</syntax>
+  <syntax>/sc:auto-improve &lt;project&gt; --eval-cmd &lt;sh&gt; --metric &lt;jmespath&gt; [--budget 8h] [--smoke-cmd &lt;sh&gt;] [--cycle-timeout 600] [--mutator-model sonnet|opus|haiku] [--scope &lt;glob&gt;] [--status] [--dry-run]</syntax>
 
   <flow>
     1. Parse args + validate `--eval-cmd` and `--metric` are present (unless `--status`)
@@ -42,7 +42,7 @@ description: Autonomous overnight code improvement loop driven by an objective m
   <examples>
   | Input | Output |
   |-------|--------|
-  | `/sc:auto-improve . --eval-cmd 'pytest --json-report --json-report-file=/tmp/r.json && cat /tmp/r.json' --metric 'summary.passed' --budget 4h` | runs 4h loop optimising pytest pass count |
+  | `/sc:auto-improve . --eval-cmd 'python eval.py' --metric 'pass_rate' --budget 4h --scope 'src/**'` | 4h loop optimising pass_rate inside src/ |
   | `/sc:auto-improve . --eval-cmd 'python bench.py' --metric 'latency_p99' --budget 1h --mutator-model opus` | 1h Opus-driven latency optimisation |
   | `/sc:auto-improve . --status` | print most-recent run's summary |
   | `/sc:auto-improve . --eval-cmd 'echo {\"x\":1}' --metric 'x' --dry-run` | record baseline only, no mutations |
