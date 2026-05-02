@@ -32,7 +32,7 @@ from .guards import (
     RegressionBlock,
     SmokeGate,
 )
-from .mutator import MutationResult, Mutator
+from .mutator import DEFAULT_PROMPT, MutationResult, Mutator
 from .reporter import morning_summary
 from .results_tsv import ResultRow, ResultsTsv
 from .worktree import Worktree, WorktreeManager
@@ -245,8 +245,6 @@ class Coordinator:
             if self.config.scope_glob and self.config.scope_glob != "**"
             else ""
         )
-        from .mutator import DEFAULT_PROMPT
-
         return Mutator(
             model=self.config.mutator_model,
             prompt=scoped_prompt + DEFAULT_PROMPT,

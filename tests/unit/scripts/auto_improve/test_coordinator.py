@@ -192,13 +192,33 @@ def test_status_mode_skips_loop(repo):
     assert "auto-improve" in out.lower()
 
 
-def test_pid_file_written_on_loop_start_and_removed_on_exit(repo):
+def test_pid_file_written_during_setup(repo):
+    cfg = _make_config(repo, budget_seconds=0)
+    captured: dict = {}
+
+    def _capture_pid(self):
+        captured["existed"] = self.pid_path.exists()
+        captured["pid_value"] = self.pid_path.read_text(encoding="utf-8").strip()
+        # Now act as the original method would (record baseline + raise on failure)
+        raise SystemExit(0)  # short-circuit teardown
+
+    with patch.object(Coordinator, "_record_baseline_or_die", _capture_pid), patch(
+        "superclaude.scripts.auto_improve.coordinator.run_eval",
+        return_value=_eval_result(1.0),
+    ):
+        c = Coordinator(cfg)
+        with pytest.raises(SystemExit):
+            c.run()
+    assert captured["existed"] is True
+    assert captured["pid_value"]  # non-empty PID string
+
+
+def test_pid_file_removed_on_exit(repo):
     cfg = _make_config(repo, budget_seconds=0)
     with patch(
         "superclaude.scripts.auto_improve.coordinator.run_eval",
         return_value=_eval_result(1.0),
     ):
         c = Coordinator(cfg)
-        # pid path is determined after worktree creation
         c.run()
     assert not c.pid_path.exists()

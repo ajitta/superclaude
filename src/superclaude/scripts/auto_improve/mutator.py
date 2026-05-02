@@ -10,7 +10,7 @@ from __future__ import annotations
 import json
 import shutil
 import subprocess
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
 
@@ -38,7 +38,6 @@ about why it should improve the metric. Keep it under 200 words.
 class MutationResult:
     rationale: str
     tokens_used: int
-    files_changed: list[str] = field(default_factory=list)
     error: Optional[str] = None
 
 

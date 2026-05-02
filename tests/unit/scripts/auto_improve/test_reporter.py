@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 import os
+import time
+from unittest.mock import patch
 
 import pytest
 
-from superclaude.scripts.auto_improve.reporter import morning_summary
+from superclaude.scripts.auto_improve.reporter import _is_pid_alive, morning_summary
 from superclaude.scripts.auto_improve.results_tsv import ResultRow, ResultsTsv
 
 
@@ -80,3 +82,31 @@ def test_summary_includes_total_tokens(populated_tsv, tmp_path):
     pid = tmp_path / "auto_improve.pid"
     out = morning_summary(populated_tsv, pid)
     assert "300" in out  # 100 + 200 (baseline tokens=0)
+
+
+def test_is_pid_alive_returns_false_when_process_is_gone(tmp_path):
+    pid_file = tmp_path / "auto_improve.pid"
+    pid_file.write_text("99999", encoding="utf-8")
+    with patch("os.kill", side_effect=ProcessLookupError):
+        assert _is_pid_alive(99999, pid_file=pid_file) is False
+
+
+def test_is_pid_alive_windows_treats_fresh_pid_file_as_alive(tmp_path, monkeypatch):
+    """On Windows, kill(0) errors are ambiguous — a freshly-touched PID file
+    is the disambiguator. Regression guard for the Windows always-True stub.
+    """
+    pid_file = tmp_path / "auto_improve.pid"
+    pid_file.write_text("99999", encoding="utf-8")
+    monkeypatch.setattr(os, "name", "nt")
+    with patch("os.kill", side_effect=OSError("ambiguous on win")):
+        assert _is_pid_alive(99999, pid_file=pid_file) is True
+
+
+def test_is_pid_alive_windows_treats_stale_pid_file_as_dead(tmp_path, monkeypatch):
+    pid_file = tmp_path / "auto_improve.pid"
+    pid_file.write_text("99999", encoding="utf-8")
+    stale = time.time() - 25 * 3600  # > 24h threshold
+    os.utime(pid_file, (stale, stale))
+    monkeypatch.setattr(os, "name", "nt")
+    with patch("os.kill", side_effect=OSError("ambiguous on win")):
+        assert _is_pid_alive(99999, pid_file=pid_file) is False
