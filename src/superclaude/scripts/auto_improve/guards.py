@@ -77,10 +77,17 @@ class SmokeGate:
 
     FALLBACK_TIMEOUT_S = 30
 
-    def __init__(self, smoke_cmd: Optional[str], eval_cmd: str, timeout: int = 30):
+    def __init__(
+        self,
+        smoke_cmd: Optional[str],
+        eval_cmd: str,
+        timeout: int = 30,
+        cwd: Optional[str] = None,
+    ):
         self.smoke_cmd = smoke_cmd
         self.eval_cmd = eval_cmd
         self.timeout = timeout
+        self.cwd = cwd
 
     def check(self) -> GuardVerdict:
         cmd = self.smoke_cmd if self.smoke_cmd else self.eval_cmd
@@ -92,6 +99,7 @@ class SmokeGate:
                 capture_output=True,
                 text=True,
                 timeout=timeout,
+                cwd=self.cwd,
             )
         except subprocess.TimeoutExpired:
             return GuardVerdict(pass_=False, reason="smoke timed out")

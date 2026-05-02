@@ -92,6 +92,32 @@ def test_status_enum_validation(tsv_path):
         )
 
 
+def test_desc_with_embedded_newlines_stays_single_row(tsv_path):
+    """Mutator stderr can contain CRLF; desc must be sanitized so the row
+    stays on one physical line and read_all() can parse it back.
+    """
+    tsv = ResultsTsv(tsv_path)
+    tsv.init()
+    multiline_desc = "claude exited 1: line1\r\nline2\nline3\twith tab"
+    tsv.append(
+        ResultRow(
+            cycle_id=1,
+            timestamp="2026-04-27T02:50:00Z",
+            commit_hash="-",
+            metric_value=0.0,
+            status="mutation_error",
+            desc=multiline_desc,
+            tokens_used=0,
+            wall_seconds=0,
+        )
+    )
+    physical_lines = tsv_path.read_text(encoding="utf-8").splitlines()
+    assert len(physical_lines) == 2
+    rows = tsv.read_all()
+    assert len(rows) == 1
+    assert "\n" not in rows[0].desc and "\t" not in rows[0].desc and "\r" not in rows[0].desc
+
+
 def test_read_all_returns_inserted_rows(tsv_path):
     tsv = ResultsTsv(tsv_path)
     tsv.init()

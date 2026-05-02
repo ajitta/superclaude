@@ -59,6 +59,10 @@ class Mutator:
         return which if which else "claude"
 
     def mutate(self, worktree_path: Path) -> MutationResult:
+        # Prompt goes via stdin: --allowed-tools and --add-dir are variadic
+        # (commander.js style), and a trailing positional prompt gets greedily
+        # absorbed into one of them. claude CLI accepts prompt via stdin under
+        # --print and that path bypasses the parsing ambiguity.
         cmd = [
             self._claude_path(),
             "-p",
@@ -67,7 +71,6 @@ class Mutator:
             "--model", self.model,
             "--permission-mode", "bypassPermissions",
             "--add-dir", str(worktree_path),
-            self.prompt,
         ]
         try:
             proc = subprocess.run(
@@ -76,6 +79,7 @@ class Mutator:
                 capture_output=True,
                 text=True,
                 timeout=self.timeout,
+                input=self.prompt,
             )
         except FileNotFoundError as exc:
             return MutationResult(

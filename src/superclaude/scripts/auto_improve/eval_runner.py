@@ -25,8 +25,18 @@ class EvalResult:
     timed_out: bool
 
 
-def run_eval(cmd: str, metric_path: str, timeout: int) -> EvalResult:
-    """Execute `cmd` via shell, extract metric_path from JSON stdout."""
+def run_eval(
+    cmd: str,
+    metric_path: str,
+    timeout: int,
+    cwd: Optional[str] = None,
+) -> EvalResult:
+    """Execute `cmd` via shell, extract metric_path from JSON stdout.
+
+    `cwd` matters: the mutator edits files in the worktree, so eval-cmd MUST
+    run there too. Without it, eval measures the parent repo's unchanged
+    files and the metric stays pinned to baseline forever.
+    """
     start = time.monotonic()
     try:
         proc = subprocess.run(
@@ -35,6 +45,7 @@ def run_eval(cmd: str, metric_path: str, timeout: int) -> EvalResult:
             capture_output=True,
             text=True,
             timeout=timeout,
+            cwd=cwd,
         )
     except subprocess.TimeoutExpired as exc:
         return EvalResult(

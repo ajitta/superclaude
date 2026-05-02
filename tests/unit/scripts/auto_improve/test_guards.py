@@ -106,6 +106,19 @@ def test_smoke_gate_falls_back_to_eval_cmd(tmp_path):
     assert g.check().pass_ is True
 
 
+def test_smoke_gate_runs_in_specified_cwd(tmp_path):
+    """SmokeGate must run in the worktree, not the worker's launch dir.
+    Regression guard: a misconfigured cwd previously produced thousands
+    of fast smoke_fail cycles per minute (eval.py not found in worker dir).
+    """
+    import sys
+
+    (tmp_path / "marker.py").write_text("import sys; sys.exit(0)", encoding="utf-8")
+    cmd = f'"{sys.executable}" marker.py'
+    g = SmokeGate(smoke_cmd=None, eval_cmd=cmd, timeout=5, cwd=str(tmp_path))
+    assert g.check().pass_ is True
+
+
 def test_smoke_gate_fails_on_nonzero_exit(tmp_path):
     import sys
 

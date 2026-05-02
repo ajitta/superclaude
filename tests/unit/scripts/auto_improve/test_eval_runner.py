@@ -78,3 +78,18 @@ def test_extraction_handles_nested_path(script_factory):
     )
     result = run_eval(cmd, "a.b.c", timeout=10)
     assert result.metric_value == 9
+
+
+def test_runs_in_specified_cwd(tmp_path):
+    """Mutator edits the worktree; eval-cmd MUST run there too. Without
+    cwd= passed through, the metric measures the wrong files (regression
+    guard for the baseline-pinning bug).
+    """
+    (tmp_path / "marker.py").write_text(
+        'import sys, json; sys.stdout.write(json.dumps({"score": 0.99}))',
+        encoding="utf-8",
+    )
+    cmd = f'"{sys.executable}" marker.py'
+    result = run_eval(cmd, "score", timeout=10, cwd=str(tmp_path))
+    assert result.exit_code == 0
+    assert result.metric_value == pytest.approx(0.99)

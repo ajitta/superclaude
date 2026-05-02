@@ -129,6 +129,7 @@ class Coordinator:
             self.config.eval_cmd,
             self.config.metric_path,
             timeout=self.config.cycle_timeout_seconds,
+            cwd=str(self._worktree.path),
         )
         if result.metric_value is None or result.exit_code != 0:
             sys.stderr.write(
@@ -153,6 +154,7 @@ class Coordinator:
             smoke_cmd=self.config.smoke_cmd,
             eval_cmd=self.config.eval_cmd,
             timeout=self.config.cycle_timeout_seconds,
+            cwd=str(self._worktree.path),
         )
         return gate.check().pass_
 
@@ -178,6 +180,7 @@ class Coordinator:
             self.config.eval_cmd,
             self.config.metric_path,
             timeout=self.config.cycle_timeout_seconds,
+            cwd=str(self._worktree.path),
         )
         if eval_result.timed_out:
             self._git_rollback()

@@ -130,3 +130,17 @@ def test_mutator_returns_error_on_timeout(tmp_path):
         result = Mutator(timeout=5).mutate(worktree_path=tmp_path)
     assert result.error is not None
     assert "timeout" in result.error.lower()
+
+
+def test_mutator_pipes_prompt_via_stdin(tmp_path):
+    """claude CLI flags --allowed-tools and --add-dir are variadic and absorb
+    a trailing positional prompt. Mutator must pass prompt via stdin instead.
+    Regression guard for the "Input must be provided" failure observed in
+    actual mutation runs.
+    """
+    with patch("subprocess.run") as run:
+        run.return_value = _completed(_fake_claude_response("x"))
+        Mutator(prompt="optimize the metric").mutate(worktree_path=tmp_path)
+    cmd = run.call_args.args[0]
+    assert "optimize the metric" not in cmd  # prompt NOT in argv
+    assert run.call_args.kwargs.get("input") == "optimize the metric"

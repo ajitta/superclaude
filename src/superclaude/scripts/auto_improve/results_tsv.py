@@ -58,7 +58,7 @@ class ResultRow:
             raise ValueError("desc must not be empty (R3 normative)")
 
     def to_tsv_line(self) -> str:
-        return "\t".join(str(getattr(self, c)) for c in _COLUMNS)
+        return "\t".join(_sanitize_field(str(getattr(self, c))) for c in _COLUMNS)
 
     @classmethod
     def from_tsv_line(cls, line: str) -> ResultRow:
@@ -72,6 +72,15 @@ class ResultRow:
             field_type = next(f.type for f in fields(cls) if f.name == col)
             kwargs[col] = _coerce(raw, field_type)
         return cls(**kwargs)  # type: ignore[arg-type]
+
+
+def _sanitize_field(raw: str) -> str:
+    """Collapse tabs/newlines to single spaces — TSV row integrity (8 fields, 1 line).
+
+    Mutator stderr can contain CRLF/LF; without this, multi-line errors split
+    a row across physical lines and break read_all() parsing.
+    """
+    return raw.replace("\t", " ").replace("\r", " ").replace("\n", " ")
 
 
 def _coerce(raw: str, type_hint: object) -> object:
