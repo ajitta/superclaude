@@ -335,12 +335,12 @@ superclaude mcp
 ```
 
 **Available servers:**
-- **Tavily** → Primary web search (Deep Research)
+- **Tavily** → Primary web search, extract, crawl, and research (Deep Research). Installed as Claude plugin from [`tavily-ai/skills`](https://github.com/tavily-ai/skills); CLI docs: ['https://docs.tavily.com/documentation/tavily-cli'](https://docs.tavily.com/documentation/tavily-cli)
 - **Context7** → Official documentation lookup
 - **Sequential-Thinking** → Multi-step reasoning
 - **Serena** → Session persistence & semantic code understanding
-- **Playwright** → Cross-browser automation & E2E testing
-- **Chrome DevTools** → Performance analysis (CLS, LCP)
+- **Playwright** → Cross-browser automation & E2E testing (Microsoft official). Repo: ['https://github.com/microsoft/playwright-cli'](https://github.com/microsoft/playwright-cli)
+- **Chrome DevTools** → Performance, Lighthouse, accessibility, and memory profiling (CLS, LCP). Installed as Claude plugin from [`ChromeDevTools/chrome-devtools-mcp`](https://github.com/ChromeDevTools/chrome-devtools-mcp)
 
 > Removed in this fork: Morphllm, Mindbase, Airis-Agent, Magic, AST-Grep (replaced by native Grep/Edit + ReflexionMemory).
 

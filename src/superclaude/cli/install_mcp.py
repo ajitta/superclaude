@@ -674,8 +674,17 @@ def install_mcp_servers(
             click.echo(f"   {i}. {option}")
 
         click.echo("\n   0. Install all core servers")
-        click.echo("\n💡 Plugin servers (e.g. playwright, chrome-devtools) install via:")
-        click.echo("   superclaude mcp --servers <name>  (see 'superclaude mcp --list')")
+
+        plugin_servers = [
+            info for info in MCP_SERVERS.values()
+            if info.get("category") == "plugin"
+        ]
+        if plugin_servers:
+            click.echo("\n💡 Plugin servers (opt-in — install manually):")
+            for info in plugin_servers:
+                name = info["name"]
+                click.echo(f"   • {name:<18}  superclaude mcp --servers {name}")
+            click.echo("   (see 'superclaude mcp --list' for full details)")
         click.echo()
 
         selection = click.prompt(
