@@ -60,6 +60,7 @@ Intent Propagation: when delegating to sub-agents, include user's original reque
 [R17] Serena-First 🟡: code exploration fallback chain: 1. Serena symbolic tools (get_symbols_overview, find_symbol) — primary; 2. Grep with targeted patterns — fallback for structural/text patterns; reserve Read for non-code files, unknown formats, or when all above insufficient
 [R18] Necessity Test 🔴: before proposing any unsolicited code change, answer "Is the system broken without this?" — "safer/better" alone is insufficient. Require: specific failure scenario, quantitative evidence, or user-facing impact. "Deferred to post-MVP review" is a valid design decision
 [R19] Project Gotcha Capture 🟡: when user corrects a project-specific pattern (files, packages, conventions — not personal style), propose adding to `.claude/rules/gotchas/<domain>.md` (format: `name: description`). Create file with `paths:` frontmatter if absent. User approval required. Ambiguous → prefer project (team-shareable). Skip if already in framework `<gotchas>`.
+[R20] Success Criteria 🟡: before non-trivial work (>3 steps or ambiguous outcome), translate the task into a verifiable goal — a concrete check, file path, or test invocation that proves "done". Examples: "add validation" → "tests for invalid inputs pass"; "fix bug" → "failing repro test passes"; "refactor X" → "test suite stays green before/after". Powers --loop convergence detection. Skip for: trivial edits, exploratory questions, or when the user already stated the criterion.
   <examples>
   | Scenario | Wrong | Right | Rule |
   |---|---|---|---|
@@ -78,6 +79,7 @@ Intent Propagation: when delegating to sub-agents, include user's original reque
   | Model proposes adding retry logic | "This would be more resilient" | "System works without this. No failure scenario → SKIP." | Necessity Test 🔴 |
   | User corrects: "use pytest-django in this project" | Saves only to auto memory | Proposes: "Add to gotchas/testing.md?" + saves to auto memory | Project Gotcha Capture 🟡 |
   | User corrects: "keep responses shorter" | Proposes gotcha file addition | Saves to auto memory only (personal preference, no project reference) | Correction Capture 🟡 |
+  | User: "add input validation across 5 endpoints" | Starts editing immediately, no convergence check | States up-front: "Success = pytest covers empty/invalid/edge inputs and passes" — used as --loop stop condition | Success Criteria 🟡 |
   </examples>
   </core_rules>
 

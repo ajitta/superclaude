@@ -29,7 +29,7 @@
   <execution>
 --delegate [auto|files|folders]: sub-agent parallel delegation. Auto-trigger: >7 dirs, >50 files, complexity >0.8. Decision matrix (when to sub-agent vs direct): RULES.md `<sub_agent_decision>` (SSOT)
 --concurrency [n]: 1-15 → batch independent tool calls into single message (e.g. 5 parallel Grep calls)
---loop: iterative improvement — execute task → self-evaluate output → identify gaps → re-execute → repeat until no meaningful improvement found. Report iteration count when done.
+--loop: iterative improvement — (1) state verifiable success criteria up-front (R20); (2) execute → self-evaluate against criteria → identify gaps → re-execute; (3) brief 1-line delta per iteration ("iter N: <what changed>"); (4) stop when criteria met OR no meaningful improvement detected OR 5-iteration safety cap reached. Report total iteration count and final criteria-met status when done.
 --iterations [n]: fixed iteration count — execute the improvement cycle exactly N times. After each iteration, briefly state what changed. Do not stop early even if output seems good.
 --plan: lightweight pre-implementation planning → 5-line plan (goal, approach, files, risks, verification) before execution
 --validate: risk >0.7, usage >75%, production → pre-execution risk assessment

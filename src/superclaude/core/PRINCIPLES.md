@@ -35,4 +35,13 @@ Trade-offs: temporal impact | reversibility classification | downstream ripple e
 Risk: proactive ID | impact assessment | reversibility-matched validation | mitigation planning
 Long-term: favor decisions reducing future maintenance burden
   </decisions>
+
+  <karpathy_lens>
+  Cross-reference for self-check before/after work — distills existing RXX rules into 4 axes (Andrej Karpathy).
+
+  - Think-Before-Coding: surface assumptions, present interpretations, ask when unclear (R03/R12/R13 + confidence-check skill).
+  - Simplicity-First: minimum code, no speculation, no premature abstraction (R06/R18 + simplicity-guide agent).
+  - Surgical-Changes: every changed line traces to user request, no adjacent cleanup (R06 + Restraint-First).
+  - Goal-Driven-Execution: convert task to verifiable success criteria up-front, loop until met (R01/R10/R15/R20).
+  </karpathy_lens>
 </component>
