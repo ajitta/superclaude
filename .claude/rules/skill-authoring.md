@@ -193,16 +193,16 @@ CC parser uses literal key matching with mixed conventions; do not reflexively k
   </gotchas>
 
   <examples>                                                 <!-- optional -->
-    <example>
-    user: `/skill-name arg`
-    assistant: prose describing the expected result.
-    </example>
+  | Trigger | Expected behavior |
+  |---|---|
+  | `/skill-name arg` | one-line response shape |
+  | `/skill-name arg2` | another one-line shape |
   </examples>
 
   <bounds>                                                   <!-- required -->
-  - Should: core capabilities (in-scope description)
-  - Avoid: out-of-scope actions
-  - Fallback: (optional — skills are short-lived; implicit fallback is "skill ends, control returns to caller")
+    <should>core capabilities described in prose (in-scope).</should>
+    <avoid>out-of-scope actions described in prose.</avoid>
+    <fallback>optional — skills are short-lived; implicit fallback is "skill ends, control returns to caller". Use only if the recovery posture is non-obvious.</fallback>
   </bounds>
   <handoff next="/sc:next1 /sc:next2"/>                      <!-- required -->
 </component>
@@ -213,8 +213,9 @@ Required tags appear in 5/5 shipped skills. Optional tags are skill-shape-depend
 ### Body rules
 - `type="skill"` 필수 (agent와 구분)
 - All multi-word tag names use `snake_case`
-- Short enums: **Numbered** (`1.` for ordered procedures: `<flow>`), **Labeled** (`- Label:` fixed-set labels: `<bounds>` Should/Avoid/Fallback), **Named** (`- identifier-name:` per-item identifiers: `<references>`, `<tools>`, `<gotchas>`); `<examples>` uses `<example>` sub-tags for multi-line user/assistant exchanges
-- `<bounds>` — body-based labeled lines: `- Should: …` / `- Avoid: …` / `- Fallback: …` (no attributes). `Should` + `Avoid` required; `Fallback` optional. Skills are short-lived — implicit fallback is "skill ends, control returns to caller". Use explicit `Fallback:` line only if the recovery posture is non-obvious.
+- Short enums: **Numbered** (`1.` for ordered procedures: `<flow>`), **Labeled** (`- Label:` fixed-set labels: `<tool_guidance>` Proceed/Ask First/Never), **Named** (`- identifier-name:` per-item identifiers: `<references>`, `<tools>`, `<gotchas>`)
+- `<examples>` — compact markdown table with minimal separators `|---|---|` for short uniform rows. For richer illustrations (code blocks, narrative, multi-turn prose), use a standalone `<example>` tag — its body is free-form prose, not locked to a `user:` / `assistant:` shape. `<examples>` and `<example>` are two distinct constructs (see xml-prose-format.md).
+- `<bounds>` — sub-tag form: `<should>` / `<avoid>` / `<fallback>` (each tag's body is a prose sentence). `<should>` + `<avoid>` required; `<fallback>` optional. Skills are short-lived — implicit fallback is "skill ends, control returns to caller". Use explicit `<fallback>` only if the recovery posture is non-obvious. Sub-tag form keeps `<bounds>` structurally distinct from `<tool_guidance>` (commit `S390` measured Claude conflating the two when both used `- Label:` lines).
 - `<gotchas>` — **프로젝트 특유** 실패 패턴만 (force-push 금지 같은 일반론은 hooks로). 분기별 리뷰, 90일 미트리거 항목 제거
 - 본문 ≤500 lines. 상세 내용은 `references/`로 분리
 

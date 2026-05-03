@@ -175,12 +175,33 @@ class TestAgentXMLStructure:
         )
 
     def test_has_bounds(self, agent):
+        """<bounds> must use sub-tag form: <should>, <avoid>, optional <fallback>.
+
+        Per .claude/rules/agent-authoring.md and xml-prose-format.md:
+        sub-tag form (commit S390 measured Claude conflating <bounds> with
+        <tool_guidance> when both used '- Label:' lines). Legacy attribute
+        and body-labeled forms are rejected.
+        """
         stem, content, _ = agent
-        assert "<bounds " in content, f"{stem}: missing <bounds> tag"
-        should_attr = extract_xml_attr(content, "bounds", "should")
-        avoid_attr = extract_xml_attr(content, "bounds", "avoid")
-        assert should_attr, f"{stem}: <bounds> missing 'should' attribute"
-        assert avoid_attr, f"{stem}: <bounds> missing 'avoid' attribute"
+        assert "<bounds>" in content, (
+            f"{stem}: missing <bounds> opening tag (sub-tag form)"
+        )
+        body = extract_xml_content(content, "bounds")
+        assert body, f"{stem}: <bounds> body is empty"
+        assert re.search(r"<should>.+?</should>", body, re.DOTALL), (
+            f"{stem}: <bounds> missing <should> sub-tag"
+        )
+        assert re.search(r"<avoid>.+?</avoid>", body, re.DOTALL), (
+            f"{stem}: <bounds> missing <avoid> sub-tag"
+        )
+        # Forbid the legacy attribute form.
+        assert not re.search(r"<bounds\s+\w+\s*=", content), (
+            f"{stem}: <bounds> uses legacy attribute form — convert to sub-tag form"
+        )
+        # Forbid the legacy body-labeled form.
+        assert not re.search(r"^\s*-\s+(Should|Avoid|Fallback):\s+", body, re.MULTILINE), (
+            f"{stem}: <bounds> uses legacy body-labeled form — convert to sub-tag form"
+        )
 
 
 class TestAgentCrossFieldConsistency:
@@ -260,21 +281,35 @@ class TestAgentMemoryGuide:
         )
 
     def test_memory_guide_has_refs(self, agent):
+        """memory_guide must reference at least one related agent inline as 'Related: agent-1, ...'
+
+        Per .claude/rules/agent-authoring.md: nested <refs> tags are forbidden
+        (depth-rule violation). Use inline 'Related: agent-1, agent-2' on one
+        of the category lines.
+        """
         stem, content, _ = agent
         mg = extract_xml_content(content, "memory_guide") or ""
-        assert '<refs agents="' in mg, (
-            f"{stem}: memory_guide missing <refs agents=\"...\"/>"
+        # Forbid the legacy nested form.
+        assert "<refs " not in mg, (
+            f"{stem}: memory_guide uses legacy <refs> tag — replace with inline 'Related: ...'"
+        )
+        assert re.search(r"\bRelated:\s+\S", mg), (
+            f"{stem}: memory_guide missing inline 'Related: agent-1, agent-2' pointer"
         )
 
     def test_memory_guide_refs_valid(self, agent):
+        """Every agent listed after 'Related:' must exist in AGENT_IDS."""
         stem, content, _ = agent
         mg = extract_xml_content(content, "memory_guide") or ""
-        match = re.search(r'<refs agents="([^"]+)"', mg)
-        if match:
-            refs = [r.strip() for r in match.group(1).split(",")]
+        for match in re.finditer(r"Related:\s+([^\n]+)", mg):
+            refs = [r.strip() for r in match.group(1).split(",") if r.strip()]
+            assert refs, f"{stem}: memory_guide 'Related:' is empty"
+            assert len(refs) <= 3, (
+                f"{stem}: memory_guide 'Related:' lists {len(refs)} agents (max 3)"
+            )
             for ref in refs:
                 assert ref in AGENT_IDS, (
-                    f"{stem}: memory_guide refs unknown agent '{ref}'"
+                    f"{stem}: memory_guide Related: refs unknown agent '{ref}'"
                 )
 
 

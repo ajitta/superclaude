@@ -64,16 +64,16 @@ Never add these — SSOT: `.claude/rules/schemas.yaml` (`forbidden_command_field
   </gotchas>
 
   <examples>
-    <example>
-    user: `/sc:command-name arg`
-    assistant: prose describing the expected result.
-    </example>
+  | Trigger | Expected behavior |
+  |---|---|
+  | `/sc:command-name arg` | one-line response shape |
+  | `/sc:command-name arg2` | another one-line shape |
   </examples>
 
   <bounds>
-  - Should: core capabilities (in-scope description)
-  - Avoid: out-of-scope actions
-  - Fallback: escalation path (optional for commands — use when out-of-scope handling is non-obvious)
+    <should>core capabilities described in prose (in-scope).</should>
+    <avoid>out-of-scope actions described in prose.</avoid>
+    <fallback>escalation path; optional for commands — use when out-of-scope handling is non-obvious.</fallback>
   </bounds>
 
   <handoff next="/sc:next1 /sc:next2"/>
@@ -84,11 +84,12 @@ Never add these — SSOT: `.claude/rules/schemas.yaml` (`forbidden_command_field
 
 - `<component name="...">` matches filename stem, `type="command"`
 - All multi-word tag names use `snake_case`
-- Short enums: **Numbered** (`1.` for ordered procedures: `<flow>`), **Labeled** (`- Label:` fixed-set labels: `<bounds>` Should/Avoid/Fallback), **Named** (`- identifier-name:` per-item identifiers: `<outputs>`, `<tools>`, `<gotchas>`); `<examples>` uses `<example>` sub-tags for multi-line items
+- Short enums: **Numbered** (`1.` for ordered procedures: `<flow>`), **Labeled** (`- Label:` fixed-set labels: `<tool_guidance>` Proceed/Ask First/Never), **Named** (`- identifier-name:` per-item identifiers: `<outputs>`, `<tools>`, `<gotchas>`)
+- `<examples>` — compact markdown table with minimal separators `|---|---|` for short uniform rows. For richer illustrations (code blocks, narrative, multi-turn prose), use a standalone `<example>` tag — its body is free-form prose, not locked to a `user:` / `assistant:` shape. `<examples>` and `<example>` are two distinct constructs (see xml-prose-format.md)
 - `<role>` — first line is `/sc:command-name`, then `<mission>`
 - `<mission>` — shares ≥30% significant words with frontmatter `description`
 - `<flow>` — at least two numbered steps in execution order
-- `<bounds>` — body-based labeled lines: `- Should: …` / `- Avoid: …` / `- Fallback: …` (no attributes). `Should` + `Avoid` required; `Fallback` optional (use when out-of-scope handling is non-obvious)
+- `<bounds>` — sub-tag form: `<should>` / `<avoid>` / `<fallback>` (each tag's body is a prose sentence). `<should>` + `<avoid>` required; `<fallback>` optional (use when out-of-scope handling is non-obvious). Sub-tag form keeps `<bounds>` structurally distinct from `<tool_guidance>` (commit `S390` measured Claude conflating the two when both used `- Label:` lines)
 - `<handoff next="...">` — 2-3 natural next commands
 - Optional: `<outputs>`, `<mcp>`, `<tools>`, `<gotchas>`, `<examples>`
 

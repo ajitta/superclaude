@@ -62,16 +62,16 @@ Every mode **must** define all four axes (per `.claude/rules/xml-prose-format.md
   <outcomes>Expected results joined by | pipes on a single prose line.</outcomes>
 
   <examples>
-    <example>
-    user: short scenario.
-    assistant: prose response showing the mode-shaped behavior.
-    </example>
+  | Trigger | Expected behavior |
+  |---|---|
+  | short scenario | one-line shape showing the mode-shaped behavior |
+  | another scenario | another one-line shape |
   </examples>
 
   <bounds>
-  - Should: core capabilities (in-scope description)
-  - Avoid: out-of-scope actions
-  - Fallback: revert to default behavior when the cognitive overlay does not apply
+    <should>core capabilities described in prose (in-scope).</should>
+    <avoid>out-of-scope actions described in prose.</avoid>
+    <fallback>revert to default behavior when the cognitive overlay does not apply.</fallback>
   </bounds>
 
   <handoff next="/sc:command1 /sc:command2"/>
@@ -106,7 +106,7 @@ Operational parameters too detailed for the mode itself go in sibling `type="con
 
 1. Create `src/superclaude/modes/MODE_PascalCase.md` starting with `<component>`
 2. Define all 4 axes: thinking, communication, priorities, behaviors
-3. Add `<bounds>` body-based labeled lines `- Should: …` / `- Avoid: …` / `- Fallback: …` (`Should` + `Avoid` required; `Fallback` recommended for modes — explicit recovery when overlay doesn't apply) and `<handoff>`
+3. Add `<bounds>` sub-tag form `<should>` / `<avoid>` / `<fallback>` (each tag's body is a prose sentence; `<should>` + `<avoid>` required; `<fallback>` recommended for modes — explicit recovery when overlay doesn't apply) and `<handoff>`
 4. Add trigger to `scripts/context_loader.py` TRIGGER_MAP
 5. Add flag to `core/FLAGS.md` modes section
 6. Run `uv run pytest tests/unit/test_mode_structure.py -v`
