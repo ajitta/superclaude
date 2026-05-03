@@ -1,45 +1,7 @@
 <component name="chrome-devtools" type="mcp">
   <role>
     <mission>Browser debugging, performance analysis, accessibility auditing, and memory profiling via Chrome DevTools Protocol</mission>
-    <flags>--perf, --devtools</flags>
   </role>
-
-  <tools note="26 tools across 6 capability domains — v0.21.0">
-    **Page & Navigation:**
-    - `navigate` — go to URL
-    - `go_back` / `go_forward` — browser history
-    - `new_page` — open new tab (supports background param)
-    - `list_pages` — list open tabs
-    - `select_page` — switch tab (supports pageId for multi-agent)
-    - `close_page` — close current tab
-    - `reload` — reload page (option to ignore cache)
-    - `press_key` — keyboard input
-    - `screenshot` — capture page (JPEG quality param)
-
-    **Performance:**
-    - `performance_start_trace` / `performance_stop_trace` — record performance traces
-    - `performance_analyze_insight` — drill into specific insights (insightSetId)
-    - `lighthouse_audit` — run Lighthouse audits (performance, a11y, SEO, best practices)
-
-    **Console & Network:**
-    - `get_console_messages` — with stack traces (v0.14.0+)
-    - `list_network_requests` — paginated, filterable by resource type
-    - `get_network_request` — inspect individual request (headers, body via filePath)
-
-    **DOM & Inspection:**
-    - `snapshot` — accessibility snapshot of page structure
-    - `get_selected_element` — fetch DOM node from DevTools Elements panel
-    - `inject_script` — run script on page load (v0.15.0+)
-
-    **Memory:**
-    - `take_memory_snapshot` — heap snapshot for leak detection
-
-    **Skills (built-in guides):**
-    - Onboarding skill — first-use setup guide
-    - Accessibility debugging — WCAG audit workflow
-    - LCP optimization — Largest Contentful Paint debugging
-    - Memory leak detection — heap snapshot comparison
-  </tools>
 
   <choose>
   Use:

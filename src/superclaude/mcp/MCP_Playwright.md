@@ -12,34 +12,6 @@
   - **vision** (opt-in): coordinate-based interactions
   - **devtools** (opt-in): developer tools features
 
-  <tools note="30+ tools — capability-grouped">
-    **Core (default):**
-    - `browser_navigate` / `browser_go_back` / `browser_go_forward` — navigation
-    - `browser_wait` — wait for condition
-    - `browser_press_key` — keyboard input
-    - `browser_take_screenshot` — capture page
-    - `browser_save_as_pdf` — PDF export (requires --caps=pdf)
-    - `browser_snapshot` — accessibility snapshot (primary assertion tool)
-    - `browser_click` / `browser_drag` / `browser_hover` — mouse interaction
-    - `browser_type` — text input
-    - `browser_select_option` — dropdown selection
-    - `browser_handle_dialog` — alert/confirm/prompt handling
-    - `browser_file_upload` — file input
-    - `browser_tab_new` / `browser_tab_list` / `browser_tab_select` / `browser_tab_close` — tab management
-    - `browser_console_messages` — read console output
-
-    **Network (--caps=network):**
-    - `browser_network_requests` — list captured requests (headers, body)
-    - `browser_network_state_set` — toggle online/offline
-    - `browser_route_set` — mock responses by URL pattern (glob matching)
-    - `browser_route_list` — list active routes
-    - `browser_unroute` — remove routes
-
-    **Storage (--caps=storage):**
-    - `browser_cookie_get` / `browser_cookie_get_all` / `browser_cookie_set` / `browser_cookie_delete` / `browser_cookie_clear`
-    - `browser_localstorage_get` / `browser_localstorage_set` / `browser_localstorage_remove` / `browser_localstorage_clear`
-  </tools>
-
   <choose>
   Use:
   - User journey validation: login → navigate → action → verify state

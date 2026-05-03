@@ -1,7 +1,6 @@
 <component name="tavily" type="mcp">
   <role>
     <mission>Web search and real-time information retrieval for research and current events</mission>
-    <config_req>TAVILY_API_KEY from https://app.tavily.com</config_req>
   </role>
 
   <choose>
@@ -23,31 +22,6 @@ Channel selection (3-way):
 | **Native WebSearch / WebFetch** | MCP+CLI both unavailable (fallback only) |
   </choose>
 
-  <capabilities>
-Web: General searches | News: Time-filtered | Academic: Scholarly articles | Domains: Include/exclude | Extract: Full-text | Freshness: Recent priority | Multi-Round: Iterative | Research: Multi-source synthesis | Crawl: Site-wide content extraction | Map: URL structure discovery
-  </capabilities>
-
-
-  <tools>
-| Tool | Purpose | When |
-|---|---|---|
-| `tavily_search` | Web search with filtering | General queries, news, domain-specific |
-| `tavily_extract` | Extract content from URLs | Full-text from known URLs |
-| `tavily_research` | Multi-source synthesis | Comprehensive research tasks |
-| `tavily_crawl` | Site-wide extraction | Crawl from root URL with depth/breadth |
-| `tavily_map` | URL structure discovery | Map site structure before targeted extraction |
-  </tools>
-
-  ## Search Parameters (tavily_search)
-  - `search_depth`: "basic" | "advanced" | "fast" | "ultra-fast"
-  - `time_range`: "day" | "week" | "month" | "year"
-  - `start_date` / `end_date`: YYYY-MM-DD format for precise date ranges
-  - `include_domains` / `exclude_domains`: domain filtering arrays
-  - `country`: boost results from specific country (full name, e.g., "Japan")
-  - `max_results`: 5-20 (default: 5)
-  - `include_raw_content`: get cleaned HTML of each result
-  - `DEFAULT_PARAMETERS` env var: set default search behavior
-
   ## Search Patterns
   Basic: query → ranked results | Domain: query + include_domains:[arxiv,github] | Time: query + time_range:week | Date: query + start_date/end_date | Deep: query + include_raw_content:true | Research: input → multi-source synthesis | Crawl: url + depth + instructions → pages
 
@@ -59,15 +33,6 @@ Web: General searches | News: Time-filtered | Academic: Scholarly articles | Dom
   ## Strategies
   Multi-Hop: broad → entities → relationships → synthesize | Adaptive: Simple:direct|Complex:variations+boolean+domain|Iterative:refine→gaps
   Credibility: High=academic,gov,official | Medium=industry,expert | Low=forums,social
-
-  ## Error Handling
-| Issue | Fix |
-|-------|-----|
-| API key missing | Check TAVILY_API_KEY env var |
-| Rate limit | Wait + exponential backoff |
-| Timeout | Increase timeout or skip |
-| No results | Expand/modify search terms |
-  Fallback: Native WebSearch → Alt queries → Expand scope → Use cached
 
   <examples>
 | Input | Output | Reason |

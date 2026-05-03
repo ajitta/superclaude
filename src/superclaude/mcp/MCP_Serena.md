@@ -5,57 +5,16 @@
 
   Project auto-activates from CWD. Recovery: call `initial_instructions` if the agent forgets the manual; `check_onboarding_performed` / `onboarding` if setup is unverified.
 
-  <tools note="17 tools active in claude-code context">
-    **Symbol Operations (8):**
-    - `find_symbol` — search by name path pattern (supports substring, depth, kind filtering)
-    - `find_referencing_symbols` — find all references to a symbol
-    - `get_symbols_overview` — high-level file symbol map (call first for new files)
-    - `replace_symbol_body` — replace entire symbol definition
-    - `insert_after_symbol` — insert code after a symbol
-    - `insert_before_symbol` — insert code before a symbol
-    - `rename_symbol` — rename across entire codebase
-    - `safe_delete_symbol` — remove symbol with unused code propagation
-
-    **Memory (6):**
-    - `write_memory` — persist named memory (md format, project-scoped)
-    - `read_memory` — retrieve a named memory
-    - `list_memories` — list all available memories
-    - `delete_memory` — remove a memory
-    - `edit_memory` — regex/literal replace within a memory
-    - `rename_memory` — rename existing memory
-
-    **Project Management (3):**
-    - `check_onboarding_performed` — check setup status
-    - `onboarding` — run initial project setup
-    - `initial_instructions` — load operating manual
-  </tools>
-
   ## Fallback for context-disabled tools
-  These tools exist in upstream Serena but are not exposed in the claude-code context (per upstream README §How Serena Works). Use the native fallback when you would have reached for one.
+  Some upstream Serena tools are not exposed in the `claude-code` context. Use the native fallback:
 
   | Removed Serena tool | Native fallback | When to use |
   |---|---|---|
   | `activate_project` | (automatic via `--project-from-cwd`) | No action needed; verify with `check_onboarding_performed` if uncertain |
-  | `get_current_config` | (none — MCP itself reports tools at startup) | Use `claude mcp list` from shell when you need to verify |
   | `search_for_pattern` | native `Grep` | Regex/text search; same capability, no LSP overhead |
-  | `list_dir` | native `Glob` (e.g., `**/*.py`) | Directory listing and file discovery |
-  | `find_file` | native `Glob` | Filename pattern matching |
+  | `list_dir` / `find_file` | native `Glob` | Directory listing and filename pattern matching |
 
-  ## Thinking Tools (restricted in claude-code context)
-    - `think_about_collected_information` — assess completeness of gathered info
-    - `think_about_task_adherence` — check goal alignment and detect deviation
-    - `think_about_whether_you_are_done` — evaluate completion criteria
-    - `summarize_changes` — document changes made in session
-    - `prepare_for_new_conversation` — prepare context for session handoff
-
-    **Status:** These tools exist in Serena but are NOT active in the `claude-code` context.
-    The `included_optional_tools` setting in `.serena/project.yml` does not override context-level
-    restrictions. When commands reference these tools (reflect.md, save.md),
-    use native reasoning as a fallback.
-
-    **Note:** Serena also has JetBrains Plugin support with additional refactoring capabilities
-    (move, inline, propagate deletions, type hierarchy, find implementations).
-    These are available in the `ide-assistant` context, not `claude-code`.
+  Thinking tools (`think_about_*`, `summarize_changes`, `prepare_for_new_conversation`) and JetBrains-only refactoring tools are not active in the `claude-code` context — use native reasoning when commands reference them.
 
   <choose>
     **Use Serena for:**

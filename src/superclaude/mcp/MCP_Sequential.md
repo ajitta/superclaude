@@ -3,16 +3,6 @@
     <mission>Multi-step reasoning engine for complex analysis and systematic problem solving</mission>
   </role>
 
-  ## Thinking Model
-  Each thought is a step in an evolving chain. The chain can branch, revise, and adapt.
-
-  **Core parameters:**
-  - `thought` — current reasoning step (analysis, hypothesis, revision, or verification)
-  - `thoughtNumber` / `totalThoughts` — position and estimated total (adjustable mid-chain)
-  - `nextThoughtNeeded` — true until a satisfactory answer is reached
-  - `isRevision` + `revisesThought` — mark when reconsidering a previous step
-  - `branchFromThought` + `branchId` — explore alternative paths without losing the main chain
-
   <choose>
   Use:
   - Multi-component problems: 3+ interconnected systems or concerns
