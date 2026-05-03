@@ -295,10 +295,10 @@ class TestTriggerMapPaths:
             for path, _priority in entries:
                 assert "Morphllm" not in path, f"Morphllm found in COMPOSITE_FLAGS[{flag}]: {path}"
 
-    def test_all_mcp_includes_8_servers(self):
-        """--all-mcp should activate exactly 8 MCP docs (5 core + 3 plugin)."""
+    def test_all_mcp_includes_6_servers(self):
+        """--all-mcp should activate exactly 6 MCP docs (4 core + 2 plugin)."""
         all_mcp_paths = {p for p, _ in COMPOSITE_FLAGS["--all-mcp"]}
-        assert len(all_mcp_paths) == 8, f"Expected 8 MCP docs in --all-mcp, got {len(all_mcp_paths)}"
+        assert len(all_mcp_paths) == 6, f"Expected 6 MCP docs in --all-mcp, got {len(all_mcp_paths)}"
 
     def test_frontend_verify_includes_3_servers(self):
         """--frontend-verify should activate Playwright + DevTools + Serena."""
@@ -310,6 +310,6 @@ class TestTriggerMapPaths:
         }
 
     def test_trigger_map_mcp_count(self):
-        """TRIGGER_MAP should have entries for exactly 8 MCP docs."""
+        """TRIGGER_MAP should have entries for exactly 6 MCP docs."""
         mcp_paths = {path for _, path, _ in TRIGGER_MAP if path.startswith("mcp/")}
-        assert len(mcp_paths) == 8, f"Expected 8 MCP trigger paths, got {len(mcp_paths)}: {mcp_paths}"
+        assert len(mcp_paths) == 6, f"Expected 6 MCP trigger paths, got {len(mcp_paths)}: {mcp_paths}"
