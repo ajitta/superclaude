@@ -4,20 +4,20 @@ Tool reference — documentation and configuration for integrated MCP servers.
 
 ## Content Delivery
 
-MCP server docs are loaded on-demand by `context_loader.py` via flag/keyword triggers. Core servers are installed by `install_mcp.py` into Claude Code's `settings.json`. Plugin servers are installed manually by the user.
+MCP server docs are loaded on-demand by `context_loader.py` via flag/keyword triggers. All servers below are installable via `superclaude mcp`. Core servers are auto-suggested in interactive selection; plugin servers must be opted into explicitly with `--servers`.
 
 ## Available MCP Servers
 
-### Core (installed by `superclaude mcp`)
+### Core (auto-suggested by `superclaude mcp`)
 
 | Server | Flag | Package / Version | Mission |
 |--------|------|-------------------|---------|
 | Context7 | `--c7` | `@upstash/context7-mcp` v2.1.6 | Official library documentation and framework patterns |
 | Sequential | `--seq` | `@modelcontextprotocol/server-sequential-thinking` v0.2.0 | Multi-step reasoning for complex analysis |
 | Serena | `--serena` | `serena-agent` (PyPI, pre-1.0) | Semantic code understanding with project memory (17 tools) |
-| Tavily | `--tavily` | Remote MCP (`mcp.tavily.com/mcp`) | Web search and real-time information retrieval |
+| Tavily | `--tavily` | `tavily-ai/skills` (Claude plugin) | Web search, extract, crawl, research |
 
-### Plugin (manual install — see each MCP_*.md for install command)
+### Plugin (opt-in: `superclaude mcp --servers <name>`)
 
 | Server | Flag | Package / Version | Mission |
 |--------|------|-------------------|---------|

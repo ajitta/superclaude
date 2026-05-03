@@ -16,7 +16,20 @@ from typing import Dict, List, Optional, Tuple
 import click
 
 # MCP Server Registry
-# Adapted from commit d4a17fc with modern transport configuration
+# Adapted from commit d4a17fc with modern transport configuration.
+#
+# `category` partitions the registry:
+#   - "core":   auto-suggested for installation; documented in mcp/README.md Core table
+#   - "plugin": opt-in install via `superclaude mcp --servers <name>`; documented in
+#               mcp/README.md Plugin table. Plugin entries do NOT trigger the
+#               serena/uv prerequisite checks unless the user actually selects them.
+#
+# `method` selects the install path:
+#   - "mcp":    `claude mcp add ...` (raw MCP server) — needs `transport`+`command`
+#   - "plugin": `claude plugin marketplace add ...` + `claude plugin install ...`
+#               — needs `marketplace_source` (URL/path/GitHub repo) and
+#               `marketplace_name` (the `name` field from the source's
+#               `.claude-plugin/marketplace.json`)
 MCP_SERVERS = {
     "sequential-thinking": {
         "name": "sequential-thinking",
@@ -24,6 +37,8 @@ MCP_SERVERS = {
         "transport": "stdio",
         "command": "npx -y @modelcontextprotocol/server-sequential-thinking",
         "required": False,
+        "category": "core",
+        "method": "mcp",
     },
     "context7": {
         "name": "context7",
@@ -31,6 +46,8 @@ MCP_SERVERS = {
         "transport": "stdio",
         "command": "npx -y @upstash/context7-mcp",
         "required": False,
+        "category": "core",
+        "method": "mcp",
     },
     "serena": {
         "name": "serena",
@@ -38,17 +55,46 @@ MCP_SERVERS = {
         "transport": "stdio",
         "command": "serena start-mcp-server --context claude-code --project-from-cwd",
         "required": False,
+        "category": "core",
+        "method": "mcp",
     },
     "tavily": {
         "name": "tavily",
-        "description": "Web search and real-time information retrieval for deep research",
-        "transport": "stdio",
-        "command": "npx -y mcp-remote https://mcp.tavily.com/mcp",
+        "description": "Web search, extract, crawl, and research via Tavily's official Claude plugin",
         "required": False,
-        "api_key_env": "TAVILY_API_KEY",
-        "api_key_description": "Tavily API key for web search (get from https://app.tavily.com)",
-        "api_key_in_url": True,
-        "api_key_url_param": "tavilyApiKey",  # URL param name (camelCase)
+        "category": "core",
+        "method": "plugin",
+        "plugin_id": "tavily",
+        "marketplace_source": "tavily-ai/skills",
+        "marketplace_name": "tavily-plugins",
+        # API key requirement is documented at https://docs.tavily.com/documentation/tavily-cli
+        # (set TAVILY_API_KEY env var). Plugin install does not auto-prompt.
+        "post_install_note": (
+            "Set TAVILY_API_KEY in your environment "
+            "(get a key from https://app.tavily.com)"
+        ),
+    },
+    "playwright": {
+        "name": "playwright",
+        "description": "Browser automation, E2E testing, network mocking (Microsoft official)",
+        "transport": "stdio",
+        "command": "npx -y @playwright/mcp@latest",
+        "required": False,
+        "category": "plugin",
+        "method": "mcp",
+    },
+    "chrome-devtools": {
+        "name": "chrome-devtools",
+        "description": "Performance, Lighthouse, accessibility, and memory profiling",
+        "required": False,
+        "category": "plugin",
+        "method": "plugin",
+        # `plugin_id` is the marketplace plugin name (must match the marketplace.json
+        # `plugins[].name` exactly); `name` stays as the user-facing identifier so
+        # `superclaude mcp --servers chrome-devtools` and the doc trigger remain stable.
+        "plugin_id": "chrome-devtools-mcp",
+        "marketplace_source": "ChromeDevTools/chrome-devtools-mcp",
+        "marketplace_name": "chrome-devtools-plugins",
     },
 }
 
@@ -107,8 +153,15 @@ def _run_command(cmd: List[str], **kwargs) -> subprocess.CompletedProcess:
     return subprocess.run(cmd, **kwargs)
 
 
-def check_prerequisites() -> Tuple[bool, List[str]]:
-    """Check if required tools are available."""
+def check_prerequisites(
+    selected_servers: Optional[List[str]] = None,
+) -> Tuple[bool, List[str]]:
+    """Check if required tools are available.
+
+    The serena/uv tooling check is skipped when serena is not in the selection,
+    so plugin-only installs (e.g. playwright, chrome-devtools) don't surface
+    irrelevant warnings.
+    """
     errors = []
 
     # Check Claude CLI
@@ -141,36 +194,40 @@ def check_prerequisites() -> Tuple[bool, List[str]]:
     except (subprocess.TimeoutExpired, FileNotFoundError):
         errors.append("Node.js not found - required for npm-based MCP servers")
 
-    # Check uv for Python-based servers (Serena requires uv)
-    uv_ok = False
-    try:
-        result = _run_command(
-            ["uv", "--version"], capture_output=True, text=True, timeout=10
-        )
-        uv_ok = result.returncode == 0
-    except (subprocess.TimeoutExpired, FileNotFoundError):
+    # Serena-specific tooling: only relevant when serena will be installed.
+    # When selected_servers is None we're being called pre-selection (legacy path),
+    # so retain the original always-warn behavior.
+    needs_serena_tooling = selected_servers is None or "serena" in selected_servers
+    if needs_serena_tooling:
+        # Check uv for Python-based servers (Serena requires uv)
         uv_ok = False
-    if not uv_ok:
-        click.echo("⚠️  uv not found - required to install Serena MCP server", err=True)
-        click.echo(
-            "   Install uv: https://docs.astral.sh/uv/getting-started/installation/",
-            err=True,
-        )
+        try:
+            result = _run_command(
+                ["uv", "--version"], capture_output=True, text=True, timeout=10
+            )
+            uv_ok = result.returncode == 0
+        except (subprocess.TimeoutExpired, FileNotFoundError):
+            uv_ok = False
+        if not uv_ok:
+            click.echo("⚠️  uv not found - required to install Serena MCP server", err=True)
+            click.echo(
+                "   Install uv: https://docs.astral.sh/uv/getting-started/installation/",
+                err=True,
+            )
 
-    # Check serena-agent binary on PATH (installed via uv tool install)
-    try:
-        result = _run_command(
-            ["serena", "--version"], capture_output=True, text=True, timeout=10
-        )
-        if result.returncode != 0:
-            raise FileNotFoundError
-    except (subprocess.TimeoutExpired, FileNotFoundError):
-        click.echo("⚠️  serena binary not found - install with:", err=True)
-        click.echo(
-            "   uv tool install -p 3.13 serena-agent@latest --prerelease=allow",
-            err=True,
-        )
-
+        # Check serena-agent binary on PATH (installed via uv tool install)
+        try:
+            result = _run_command(
+                ["serena", "--version"], capture_output=True, text=True, timeout=10
+            )
+            if result.returncode != 0:
+                raise FileNotFoundError
+        except (subprocess.TimeoutExpired, FileNotFoundError):
+            click.echo("⚠️  serena binary not found - install with:", err=True)
+            click.echo(
+                "   uv tool install -p 3.13 serena-agent@latest --prerelease=allow",
+                err=True,
+            )
 
     return len(errors) == 0, errors
 
@@ -272,11 +329,107 @@ def prompt_for_api_key(
         return None
 
 
+def check_plugin_installed(plugin_name: str) -> bool:
+    """Return True if a Claude Code plugin with this name is installed (any scope).
+
+    Parses `claude plugin list` output for `❯ <plugin>@<marketplace>` headers.
+    Scope-agnostic: matches across user/project/local. Plugin scoping in
+    Claude Code is per-install rather than per-config-file, so a per-scope
+    check would require re-implementing the CLI's plugin manifest reader.
+    """
+    try:
+        result = _run_command(
+            ["claude", "plugin", "list"], capture_output=True, text=True, timeout=60
+        )
+        if result is None or result.returncode != 0 or not result.stdout:
+            return False
+        needle = f"{plugin_name}@"
+        for line in result.stdout.splitlines():
+            stripped = line.strip()
+            if stripped.startswith("❯ ") and needle in stripped:
+                return True
+        return False
+    except (subprocess.TimeoutExpired, subprocess.SubprocessError):
+        return False
+
+
+def install_plugin_server(
+    server_info: Dict, scope: str = "user", dry_run: bool = False
+) -> bool:
+    """Install an MCP-bearing server via the Claude Code plugin marketplace.
+
+    Two-step install:
+      1. `claude plugin marketplace add <source>` (idempotent — re-add is a no-op)
+      2. `claude plugin install <plugin>@<marketplace> --scope <scope>`
+    """
+    display_name = server_info["name"]
+    plugin_name = server_info.get("plugin_id", display_name)
+    source = server_info["marketplace_source"]
+    marketplace = server_info["marketplace_name"]
+    plugin_ref = f"{plugin_name}@{marketplace}"
+
+    click.echo(f"📦 Installing plugin: {display_name}")
+
+    if check_plugin_installed(plugin_name):
+        click.echo(f"   ✅ Already installed: {display_name}")
+        return True
+
+    add_cmd = ["claude", "plugin", "marketplace", "add", source]
+    install_cmd = ["claude", "plugin", "install", plugin_ref, "--scope", scope]
+
+    if dry_run:
+        click.echo(f"   [DRY RUN] Would run: {' '.join(add_cmd)}")
+        click.echo(f"   [DRY RUN] Would run: {' '.join(install_cmd)}")
+        note = server_info.get("post_install_note")
+        if note:
+            click.echo(f"   [DRY RUN] Post-install note: {note}")
+        return True
+
+    try:
+        click.echo(f"   Running: {' '.join(add_cmd)}")
+        add_result = _run_command(add_cmd, capture_output=True, text=True, timeout=120)
+        # Idempotent: an "already added" stderr is non-fatal.
+        if add_result.returncode != 0:
+            stderr = (add_result.stderr or "").lower()
+            if "already" not in stderr:
+                err = (add_result.stderr or "").strip() or "unknown error"
+                click.echo(
+                    f"   ❌ Failed to add marketplace {source}: {err}", err=True
+                )
+                return False
+
+        click.echo(f"   Running: {' '.join(install_cmd)}")
+        install_result = _run_command(
+            install_cmd, capture_output=True, text=True, timeout=180
+        )
+        if install_result.returncode == 0:
+            click.echo(f"   ✅ Successfully installed: {display_name}")
+            note = server_info.get("post_install_note")
+            if note:
+                click.echo(f"   ℹ️  {note}")
+            return True
+
+        err = (install_result.stderr or "").strip() or "unknown error"
+        click.echo(f"   ❌ Failed to install {display_name}: {err}", err=True)
+        return False
+
+    except subprocess.TimeoutExpired:
+        click.echo(f"   ❌ Timeout installing {plugin_name}", err=True)
+        return False
+    except Exception as e:
+        click.echo(f"   ❌ Error installing {plugin_name}: {e}", err=True)
+        return False
+
+
 def install_mcp_server(
     server_info: Dict, scope: str = "user", dry_run: bool = False
 ) -> bool:
     """
     Install a single MCP server using modern Claude Code API.
+
+    Dispatches on `server_info["method"]`:
+      - "plugin" → install via Claude Code plugin marketplace
+      - "mcp" (default) → install via `claude mcp add`
 
     Args:
         server_info: Server configuration dictionary
@@ -286,6 +439,9 @@ def install_mcp_server(
     Returns:
         True if successful, False otherwise
     """
+    if server_info.get("method") == "plugin":
+        return install_plugin_server(server_info, scope=scope, dry_run=dry_run)
+
     server_name = server_info["name"]
     transport = server_info["transport"]
     command = server_info["command"]
@@ -375,23 +531,42 @@ def install_mcp_server(
 
 
 def list_available_servers():
-    """List all available MCP servers."""
+    """List all available MCP servers, grouped by core/plugin category."""
     click.echo("📋 Available MCP Servers:\n")
 
+    by_category: Dict[str, List[dict]] = {"core": [], "plugin": []}
     for server_info in MCP_SERVERS.values():
-        name = server_info["name"]
-        description = server_info["description"]
-        api_key_note = ""
+        category = server_info.get("category", "core")
+        by_category.setdefault(category, []).append(server_info)
 
-        if "api_key_env" in server_info:
-            api_key_note = f" (requires {server_info['api_key_env']})"
+    headings = {
+        "core": "Core (auto-suggested)",
+        "plugin": "Plugin (opt-in via --servers)",
+    }
 
-        # Check if installed
-        is_installed = check_mcp_server_installed(name)
-        status = "✅ installed" if is_installed else "⬜ not installed"
+    for category in ("core", "plugin"):
+        servers = by_category.get(category, [])
+        if not servers:
+            continue
+        click.echo(f"━━ {headings.get(category, category)} ━━")
+        for server_info in servers:
+            name = server_info["name"]
+            description = server_info["description"]
+            api_key_note = ""
 
-        click.echo(f"   {name:25} {status}")
-        click.echo(f"      {description}{api_key_note}")
+            if "api_key_env" in server_info:
+                api_key_note = f" (requires {server_info['api_key_env']})"
+
+            if server_info.get("method") == "plugin":
+                is_installed = check_plugin_installed(
+                    server_info.get("plugin_id", name)
+                )
+            else:
+                is_installed = check_mcp_server_installed(name)
+            status = "✅ installed" if is_installed else "⬜ not installed"
+
+            click.echo(f"   {name:25} {status}")
+            click.echo(f"      {description}{api_key_note}")
         click.echo()
 
     click.echo(f"Total: {len(MCP_SERVERS)} servers available")
@@ -416,7 +591,12 @@ def show_mcp_status():
     installed_count = 0
     for server_info in MCP_SERVERS.values():
         name = server_info["name"]
-        is_installed = check_mcp_server_installed(name)
+        if server_info.get("method") == "plugin":
+            is_installed = check_plugin_installed(
+                server_info.get("plugin_id", name)
+            )
+        else:
+            is_installed = check_mcp_server_installed(name)
 
         if is_installed:
             status = "✅ Active"
@@ -459,12 +639,6 @@ def install_mcp_servers(
     Returns:
         Tuple of (success, message)
     """
-    # Check prerequisites
-    success, errors = check_prerequisites()
-    if not success:
-        error_msg = "Prerequisites not met:\n" + "\n".join(f"  ❌ {e}" for e in errors)
-        return False, error_msg
-
     # Determine which servers to install
     if selected_servers:
         # Use explicitly selected servers
@@ -478,11 +652,17 @@ def install_mcp_servers(
         if not servers_to_install:
             return False, "No valid servers selected"
     else:
-        # Interactive selection
+        # Interactive selection — default offer is core servers only.
+        # Plugin servers must be opted into explicitly via --servers.
         click.echo("📋 Available MCP servers:\n")
 
+        core_servers = [
+            info for info in MCP_SERVERS.values()
+            if info.get("category", "core") == "core"
+        ]
+
         server_options = []
-        for info in MCP_SERVERS.values():
+        for info in core_servers:
             api_note = (
                 f" (requires {info['api_key_env']})" if "api_key_env" in info else ""
             )
@@ -493,28 +673,36 @@ def install_mcp_servers(
         for i, option in enumerate(server_options, 1):
             click.echo(f"   {i}. {option}")
 
-        click.echo("\n   0. Install all servers")
+        click.echo("\n   0. Install all core servers")
+        click.echo("\n💡 Plugin servers (e.g. playwright, chrome-devtools) install via:")
+        click.echo("   superclaude mcp --servers <name>  (see 'superclaude mcp --list')")
         click.echo()
 
         selection = click.prompt(
-            "Select servers to install (comma-separated numbers, or 0 for all)",
+            "Select servers to install (comma-separated numbers, or 0 for all core)",
             default="0",
         )
 
         if selection.strip() == "0":
-            servers_to_install = list(MCP_SERVERS.keys())
+            servers_to_install = [info["name"] for info in core_servers]
         else:
             try:
                 indices = [int(x.strip()) for x in selection.split(",")]
-                server_list = list(MCP_SERVERS.keys())
+                core_names = [info["name"] for info in core_servers]
                 servers_to_install = [
-                    server_list[i - 1] for i in indices if 0 < i <= len(server_list)
+                    core_names[i - 1] for i in indices if 0 < i <= len(core_names)
                 ]
             except (ValueError, IndexError):
                 return False, "Invalid selection"
 
     if not servers_to_install:
         return False, "No servers selected"
+
+    # Check prerequisites (after selection so serena-tooling check is conditional)
+    success, errors = check_prerequisites(selected_servers=servers_to_install)
+    if not success:
+        error_msg = "Prerequisites not met:\n" + "\n".join(f"  ❌ {e}" for e in errors)
+        return False, error_msg
 
     # Install each server
     click.echo(f"\n🔌 Installing {len(servers_to_install)} MCP server(s)...\n")
@@ -559,30 +747,55 @@ def uninstall_mcp_servers(
     failed = 0
     messages: List[str] = []
 
-    sc_server_names = list(MCP_SERVERS.keys())
+    for key, info in MCP_SERVERS.items():
+        server_name = info["name"]
+        is_plugin = info.get("method") == "plugin"
 
-    for server_name in sc_server_names:
-        if not check_mcp_server_installed(server_name, scope=scope, project_root=project_root):
-            skipped += 1
-            continue
+        # Plugin scope check — `check_plugin_installed` is scope-agnostic.
+        # Skip plugins outside `user` scope to avoid false-positive removes.
+        if is_plugin:
+            plugin_id = info.get("plugin_id", server_name)
+            if scope != "user":
+                skipped += 1
+                continue
+            if not check_plugin_installed(plugin_id):
+                skipped += 1
+                continue
+        else:
+            if not check_mcp_server_installed(
+                server_name, scope=scope, project_root=project_root
+            ):
+                skipped += 1
+                continue
+
+        label = "plugin" if is_plugin else "MCP server"
 
         if dry_run:
-            messages.append(f"[DRY-RUN] Would remove MCP server: {server_name} (scope: {scope})")
+            messages.append(
+                f"[DRY-RUN] Would remove {label}: {server_name} (scope: {scope})"
+            )
             removed += 1
             continue
 
-        cmd = ["claude", "mcp", "remove", "--scope", scope, server_name]
+        if is_plugin:
+            plugin_ref = f"{info.get('plugin_id', server_name)}@{info['marketplace_name']}"
+            cmd = ["claude", "plugin", "uninstall", plugin_ref, "--scope", scope]
+        else:
+            cmd = ["claude", "mcp", "remove", "--scope", scope, server_name]
+
         try:
             result = _run_command(cmd, capture_output=True, text=True, timeout=60)
             if result.returncode == 0:
-                messages.append(f"✅ Removed MCP server: {server_name} (scope: {scope})")
+                messages.append(
+                    f"✅ Removed {label}: {server_name} (scope: {scope})"
+                )
                 removed += 1
             else:
                 err = (result.stderr or "").strip() or "unknown error"
-                messages.append(f"❌ Failed to remove MCP server {server_name}: {err}")
+                messages.append(f"❌ Failed to remove {label} {server_name}: {err}")
                 failed += 1
         except (subprocess.TimeoutExpired, subprocess.SubprocessError, FileNotFoundError) as e:
-            messages.append(f"❌ Failed to remove MCP server {server_name}: {e}")
+            messages.append(f"❌ Failed to remove {label} {server_name}: {e}")
             failed += 1
 
     return removed, skipped, failed, messages
