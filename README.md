@@ -223,6 +223,45 @@ For **2-3x faster** execution and **30-50% fewer tokens**, optionally install MC
 - **Without MCPs**: Fully functional, standard performance ✅
 - **With MCPs**: 2-3x faster, 30-50% fewer tokens ⚡
 
+### **Token Optimization (Optional — RTK)**
+
+[`rtk-ai/rtk`](https://github.com/rtk-ai/rtk) is a single Rust binary that transparently rewrites common Bash commands (`git status`, `pnpm install`, `pytest`, …) into compact, LLM-friendly output — typically **60–90% token reduction** on routine ops. Independent project; not bundled with `superclaude`.
+
+```bash
+# Install (pick one)
+brew install rtk                                                                    # macOS / Linux (Homebrew)
+curl -fsSL https://raw.githubusercontent.com/rtk-ai/rtk/refs/heads/master/install.sh | sh   # Linux / macOS
+cargo install --git https://github.com/rtk-ai/rtk                                   # Cargo
+# Windows: download from https://github.com/rtk-ai/rtk/releases (WSL recommended)
+
+# Verify
+rtk --version
+rtk gain                       # token-savings stats
+
+# Enable Claude Code auto-rewrite hook (transparent — no prompt changes needed)
+rtk init -g                    # restart Claude Code after running this
+```
+
+> Once the hook is active, Claude's `git status` calls run as `rtk git status` automatically. Without the hook, prefix manually (`rtk <cmd>`).
+
+### **Persistent Cross-Session Memory (Optional — claude-mem)**
+
+[`thedotmack/claude-mem`](https://github.com/thedotmack/claude-mem) is a memory-compression layer for Claude Code that automatically captures and recalls context across sessions. Independent project; complements `superclaude`'s `/sc:load` + insight pipeline by storing observations queryable via the `mem-search` skill. Requires Node.js ≥18.
+
+```bash
+# Install (pick one)
+npx claude-mem install                                # standard CLI install
+# Or via Claude Code plugin marketplace:
+#   /plugin marketplace add thedotmack/claude-mem
+#   /plugin install claude-mem
+
+# After install: restart Claude Code
+# Web viewer: http://localhost:37777
+# Settings: ~/.claude-mem/settings.json (auto-created)
+```
+
+> Past observations show up at session start (`# $CMEM` block). Query with the `mem-search` skill or `get_observations([IDs])`.
+
 ---
 
 ## 🧭 **Workflows**
