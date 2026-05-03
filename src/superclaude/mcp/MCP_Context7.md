@@ -11,7 +11,7 @@
 
   <tools note="2 tools, strict call order — @upstash/context7-mcp v2.1.6+">
   | Tool | Purpose | Required Input |
-  |------|---------|---------------|
+  |---|---|---|
   | `resolve-library-id` | Name → library ID | `libraryName` |
   | `get-library-docs` | ID → documentation | `context7CompatibleLibraryID`, `topic` |
   </tools>
@@ -51,14 +51,18 @@
 
   <examples>
 | Input | Action | Reason |
-|-------|--------|--------|
+|---|---|---|
 | implement React useEffect | resolve("react") → query(id, "useEffect cleanup") | Official hook patterns |
 | add Auth0 to Next.js | resolve("auth0") → query(id, "Next.js integration") | Auth flow specifics |
 | upgrade Vue 2 to Vue 3 | resolve("vue", version=v3) → query(id, "migration from Vue 2") | Version-specific migration |
 | explain closures | Skip Context7, use native Claude | General CS concept |
   </examples>
 
-  <bounds should="official library docs|version-specific APIs|framework compliance|migration guides" avoid="general concepts|debugging|code review|architecture decisions" fallback="Use WebSearch for non-library docs, WebFetch for specific URLs"/>
+  <bounds>
+    <should>official library docs, version-specific APIs, framework compliance, and migration guides.</should>
+    <avoid>general concepts, debugging, code review, and architecture decisions.</avoid>
+    <fallback>Use WebSearch for non-library docs, WebFetch for specific URLs.</fallback>
+  </bounds>
 
   <handoff next="/sc:implement /sc:analyze /sc:research"/>
 </component>

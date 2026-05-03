@@ -10,9 +10,9 @@ description: SuperClaude command dispatcher - main entry point for all features
 
   <syntax>/sc:[command] [args...]</syntax>
   <flow>
-    1. Parse: Identify the /sc: subcommand and any flags from user input
-    2. Route: Dispatch to the matching command file in commands/sc/
-    3. Execute: Run the command with provided arguments and flags
+  1. Parse: Identify the /sc: subcommand and any flags from user input
+  2. Route: Dispatch to the matching command file in commands/sc/
+  3. Execute: Run the command with provided arguments and flags
   </flow>
 
 
@@ -63,16 +63,16 @@ description: SuperClaude command dispatcher - main entry point for all features
   <examples>
 
 | Input | Output |
-|-------|--------|
+|---|---|
 | `/sc:research React 18 features` | Deep research |
 | `/sc:index-repo` | Create project index |
 | `/sc:agent deep-research` | Launch agent |
 | `/sc:recommend` | Get suggestions |
 
   <example name="unknown-command" type="error-path">
-    <input>/sc:deploy (command does not exist)</input>
-    <why_wrong>'deploy' is not a registered /sc command.</why_wrong>
-    <correct>Use /sc:help to see available commands. For deployment: /sc:build --type prod then /ship</correct>
+    - Input: /sc:deploy (command does not exist)
+    - Why wrong: 'deploy' is not a registered /sc command.
+    - Correct: Use /sc:help to see available commands. For deployment: /sc:build --type prod then /ship
   </example>
   </examples>
 
@@ -88,7 +88,11 @@ description: SuperClaude command dispatcher - main entry point for all features
   - stale-list: Command list may become outdated. When adding new commands, update this dispatcher
   </gotchas>
 
-  <bounds should="command dispatch|feature routing|context-aware help" avoid="execute without explicit command|modify files|bypass command validation" fallback="Ask user for guidance when uncertain"/>
+  <bounds>
+    <should>command dispatch, feature routing, and context-aware help.</should>
+    <avoid>execute without explicit command, modify files, and bypass command validation.</avoid>
+    <fallback>Ask user for guidance when uncertain.</fallback>
+  </bounds>
 
   <handoff next="/sc:recommend /sc:help"/>
 </component>

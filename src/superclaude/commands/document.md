@@ -11,16 +11,16 @@ description: Generate focused documentation for components, functions, APIs, and
   <syntax>/sc:document [target] [--type inline|external|api|guide] [--style brief|detailed]</syntax>
 
   <flow>
-    1. Analyze: Component structure + interfaces
-    2. Identify: Audience + requirements
-    3. Generate: Content by type + style (see outputs)
-    4. Format: Consistent structure
-    5. Integrate: Project doc ecosystem
+  1. Analyze: Component structure + interfaces
+  2. Identify: Audience + requirements
+  3. Generate: Content by type + style (see outputs)
+  4. Format: Consistent structure
+  5. Integrate: Project doc ecosystem
   </flow>
 
   <outputs note="Per --type flag">
 | Type | Output | Metrics |
-|------|--------|---------|
+|---|---|---|
 | inline | JSDoc/docstring in source files | coverage ≥80% |
 | external | `docs/<component>-docs.md` (per-component) | all public APIs |
 | api | `docs/reports/API.md` (living doc, project-wide) | endpoints 100% |
@@ -29,10 +29,10 @@ description: Generate focused documentation for components, functions, APIs, and
 
 
   <tools>
-    - Read: Component + existing docs
-    - Grep: Reference extraction
-    - Write: Doc file creation
-    - Glob: Multi-file organization
+  - Read: Component + existing docs
+  - Grep: Reference extraction
+  - Write: Doc file creation
+  - Glob: Multi-file organization
   </tools>
 
   <patterns>
@@ -45,16 +45,16 @@ description: Generate focused documentation for components, functions, APIs, and
   <examples>
 
 | Input | Output |
-|-------|--------|
+|---|---|
 | `src/auth/login.js --type inline` | JSDoc comments |
 | `src/api --type api --style detailed` | API reference |
 | `payment-module --type guide --style brief` | User docs |
 | `components/ --type external` | Component library docs |
 
   <example name="document-unstable-code" type="error-path">
-    <input>/sc:document src/api --type api --detailed (during active refactoring)</input>
-    <why_wrong>Documenting code that's actively being refactored produces docs that immediately go stale.</why_wrong>
-    <correct>Complete the refactoring first, then /sc:document for stable API surface.</correct>
+    - Input: /sc:document src/api --type api --detailed (during active refactoring)
+    - Why wrong: Documenting code that's actively being refactored produces docs that immediately go stale.
+    - Correct: Complete the refactoring first, then /sc:document for stable API surface.
   </example>
 
   </examples>
@@ -65,10 +65,10 @@ description: Generate focused documentation for components, functions, APIs, and
   - naming: Follow doc_output_convention from RULES.md for file naming (topic-slug-username-date.md)
   </gotchas>
 
-  <bounds should="focused docs|multi-format|ecosystem integration" avoid="doc without analysis|override standards|expose sensitive details" fallback="Ask user for guidance when uncertain">
-
-    Produce documentation, then complete | Preserve source code (except inline comments if --type inline) | Defer feature implementation to /sc:implement → Output: Documentation files per --type flag
-
+  <bounds>
+    <should>focused docs, multi-format, and ecosystem integration.</should>
+    <avoid>doc without analysis, override standards, and expose sensitive details.</avoid>
+    <fallback>Ask user for guidance when uncertain.</fallback>
   </bounds>
 
   <handoff next="/sc:implement /sc:improve"/>

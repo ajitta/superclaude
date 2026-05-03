@@ -53,7 +53,7 @@
 
   <examples>
 | Input | Action | Reason |
-|-------|--------|--------|
+|---|---|---|
 | find all empty catch blocks | ast-grep: `find_code` with `catch ($) {}` | Structural pattern |
 | find eval() usage for security | ast-grep: `find_code` with `eval($$$)` | AST skips strings/comments |
 | find deprecated React lifecycle | ast-grep: `find_code` with `componentWillMount` | Structural class method match |
@@ -61,7 +61,11 @@
 | find TODO comments | Grep (not ast-grep) | Simple text match |
   </examples>
 
-  <bounds should="structural AST search|pattern matching|anti-pattern detection|code analysis" avoid="symbol navigation|reference tracking|runtime analysis|file editing" fallback="Use Serena for symbol operations, Grep for text search, Edit for modifications"/>
+  <bounds>
+    <should>structural AST search, pattern matching, anti-pattern detection, and code analysis.</should>
+    <avoid>symbol navigation, reference tracking, runtime analysis, and file editing.</avoid>
+    <fallback>Use Serena for symbol operations, Grep for text search, Edit for modifications.</fallback>
+  </bounds>
 
   <handoff next="/sc:analyze /sc:improve /sc:cleanup"/>
 </component>

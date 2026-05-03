@@ -47,14 +47,18 @@
 
   <examples>
 | Input | Action | Reason |
-|-------|--------|--------|
+|---|---|---|
 | create React login form | Magic: generate with a11y, validation states, responsive | Production UI component |
 | responsive data table with sorting | Magic: sortable table, mobile-friendly, keyboard nav | Complex UI pattern |
 | add dark mode toggle | Magic: toggle component with prefers-color-scheme | Design system component |
 | write REST API endpoint | Native Claude | Backend logic, not UI |
   </examples>
 
-  <bounds should="UI component generation|design system integration|accessible components|responsive layouts" avoid="backend logic|API design|database operations|business logic" fallback="Use native Claude for non-UI code, Context7 for framework-specific patterns"/>
+  <bounds>
+    <should>UI component generation, design system integration, accessible components, and responsive layouts.</should>
+    <avoid>backend logic, API design, database operations, and business logic.</avoid>
+    <fallback>Use native Claude for non-UI code, Context7 for framework-specific patterns.</fallback>
+  </bounds>
 
   <handoff next="/sc:implement /sc:design --type component /sc:analyze --focus a11y"/>
 </component>

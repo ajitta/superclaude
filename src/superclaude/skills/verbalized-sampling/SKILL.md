@@ -18,11 +18,11 @@ description: Research-backed verbalized sampling for diverse response generation
   </syntax>
 
   <flow>
-    1. Detect: parse flags/brackets/NL → resolve variant + params
-    2. Configure: apply variant defaults → overlay user overrides → clamp to valid ranges
-    3. Generate: execute paper-proven prompt template for selected variant
-    4. Present: format k responses with probability labels (post-hoc descriptive, NOT pre-assigned)
-    5. Synthesize: landscape analysis (convergence, divergence, map, blind spots) unless [no-synthesis]
+  1. Detect: parse flags/brackets/NL → resolve variant + params
+  2. Configure: apply variant defaults → overlay user overrides → clamp to valid ranges
+  3. Generate: execute paper-proven prompt template for selected variant
+  4. Present: format k responses with probability labels (post-hoc descriptive, NOT pre-assigned)
+  5. Synthesize: landscape analysis (convergence, divergence, map, blind spots) unless [no-synthesis]
   </flow>
 
   <variants>
@@ -63,8 +63,10 @@ description: Research-backed verbalized sampling for diverse response generation
     paper-proven — do not modify the distribution-level prompt structure.
   </attribution>
 
-  <bounds should="distribution-level diversity|multi-variant generation|landscape synthesis"
-         avoid="single-answer collapse|pre-assigned perspective roles|calibrated probability claims"/>
+  <bounds>
+    <should>distribution-level diversity, multi-variant generation, and landscape synthesis.</should>
+    <avoid>single-answer collapse, pre-assigned perspective roles, and calibrated probability claims.</avoid>
+  </bounds>
 
   <handoff next="/sc:brainstorm /sc:analyze /sc:design"/>
 </component>

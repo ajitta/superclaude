@@ -18,7 +18,7 @@ Intent Propagation: when delegating to sub-agents, include user's original reque
   Worktree-parallel: when the user is waiting on a long in-progress iteration (spec authoring, deep research, multi-phase plan), propose a worktree-isolated agent (EnterWorktree) for independent side-work — e.g., reviewing the project's own framework/config, drafting follow-up tickets. Separates file-edit surfaces so the two streams never conflict on merge. Decline the split when the side-work needs current conversation state or when the main iteration finishes in <5 minutes.
   <examples>
   | Task | Decision | Why |
-  |------|----------|-----|
+  |---|---|---|
   | "Find where UserAuth is defined" | Direct grep | Single search, instant |
   | "Audit security + performance + a11y" | 3 sub-agents | Independent domains, parallel |
   | "Read this file then edit line 42" | Direct | Sequential dependency |
@@ -62,7 +62,7 @@ Intent Propagation: when delegating to sub-agents, include user's original reque
 [R19] Project Gotcha Capture 🟡: when user corrects a project-specific pattern (files, packages, conventions — not personal style), propose adding to `.claude/rules/gotchas/<domain>.md` (format: `name: description`). Create file with `paths:` frontmatter if absent. User approval required. Ambiguous → prefer project (team-shareable). Skip if already in framework `<gotchas>`.
   <examples>
   | Scenario | Wrong | Right | Rule |
-  |----------|-------|-------|------|
+  |---|---|---|---|
   | User: "fix login bug" | Refactors auth + adds tests + updates docs | Fixes the specific bug, nothing else | Scope 🟡 |
   | Before implementing feature | Starts coding immediately | `git log --oneline -5` + `grep -r "feature_name"` first | Status Check 🔴 |
   | API endpoint returning 500 | Assumes code bug, reads source | Checks: port in use? DB running? env vars set? | Diagnosis 🔴 |
@@ -93,7 +93,7 @@ Earned > Premature: abstract at 2nd occurrence not 1st | inline before extractin
 Do NOT simplify (complexity = essential): Security/auth | Accessibility/WCAG | Compliance (GDPR/HIPAA) | Distributed consensus+retry
   <examples>
   | Request | Over-engineered | Right-sized |
-  |---------|----------------|-------------|
+  |---|---|---|
   | "Add a retry to this API call" | Creates RetryStrategy class with backoff, jitter, circuit breaker | Adds 3-line retry loop with exponential backoff |
   | "Make this configurable" | Config class + env vars + defaults for every tuneable | Asks: does this value actually change? If rarely, hardcode until it does |
   | "Simplify auth middleware" | Removes looks-unnecessary guards | Domain exception: refuses logic simplification, targets only ceremony (docstring/naming) |
@@ -106,7 +106,7 @@ Do NOT simplify (complexity = essential): Security/auth | Accessibility/WCAG | C
   </model_tendencies>
   </anti_over_engineering>
 
-  <thresholds note="Canonical numeric gates — new agents should reuse these; domain-specific variance is expected when justified">
+  <thresholds>
   - Scope tiers: see <checklist_scaling> (single source)
   - Ask-first trigger: >3 units of impact (files, modules, services, tables, endpoints) — unit depends on agent domain
   - Sub-agent trigger: 3+ independent parallel streams OR >20K tokens exploration (see <sub_agent_decision>)
@@ -116,7 +116,7 @@ Do NOT simplify (complexity = essential): Security/auth | Accessibility/WCAG | C
   Variance expected for domain semantics (e.g., backend-architect uses ">2 tables" because DB migration blast radius differs from file count).
   </thresholds>
 
-  <checklist_scaling note="Apply agent <checklist> items proportionally to task scope — prevents heavy process on small tasks. Lines = net diff additions">
+  <checklist_scaling>
   | Scope | Trigger | Apply |
   |-------|---------|-------|
   | Small | ≤2 files, ≤50 added lines, single-purpose fix | Evidence-of-correctness only (tests pass, no regression). Skip risk matrices, coverage targets, stakeholder sign-off, full-doc sections. |

@@ -30,7 +30,7 @@ Web: General searches | News: Time-filtered | Academic: Scholarly articles | Dom
 
   <tools>
 | Tool | Purpose | When |
-|------|---------|------|
+|---|---|---|
 | `tavily_search` | Web search with filtering | General queries, news, domain-specific |
 | `tavily_extract` | Extract content from URLs | Full-text from known URLs |
 | `tavily_research` | Multi-source synthesis | Comprehensive research tasks |
@@ -71,13 +71,17 @@ Web: General searches | News: Time-filtered | Academic: Scholarly articles | Dom
 
   <examples>
 | Input | Output | Reason |
-|-------|--------|--------|
+|---|---|---|
 | latest TypeScript 2024 | Tavily | current tech info |
 | OpenAI updates this week | Tavily | recent news |
 | explain recursion | Native Claude | general concept |
   </examples>
 
-  <bounds should="web search|multi-source synthesis|current information retrieval" avoid="code generation|local file operations|training knowledge questions" fallback="Use native WebSearch for simple queries, WebFetch for single pages"/>
+  <bounds>
+    <should>web search, multi-source synthesis, and current information retrieval.</should>
+    <avoid>code generation, local file operations, and training knowledge questions.</avoid>
+    <fallback>Use native WebSearch for simple queries, WebFetch for single pages.</fallback>
+  </bounds>
 
   <handoff next="/sc:research /sc:analyze"/>
 </component>

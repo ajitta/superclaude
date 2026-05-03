@@ -85,7 +85,7 @@
 
   <examples>
 | Input | Action | Reason |
-|-------|--------|--------|
+|---|---|---|
 | analyze page performance | DevTools: lighthouse_audit → trace → analyze insights | Comprehensive CWV + Lighthouse |
 | debug memory leak in SPA | DevTools: take_memory_snapshot → compare → identify | Heap analysis |
 | check accessibility score | DevTools: lighthouse_audit (a11y category) → snapshot | Automated WCAG |
@@ -93,7 +93,11 @@
 | debug in live Chrome session | DevTools: --auto-connect to existing browser | Reuse dev session |
   </examples>
 
-  <bounds should="performance profiling|Lighthouse audits|Core Web Vitals|memory analysis|accessibility auditing|network inspection|multi-agent pageId routing" avoid="live browser interaction|E2E testing|static code analysis|backend profiling" fallback="Use Playwright for E2E, native Claude for code review"/>
+  <bounds>
+    <should>performance profiling, Lighthouse audits, Core Web Vitals, memory analysis, accessibility auditing, network inspection, and multi-agent pageId routing.</should>
+    <avoid>live browser interaction, E2E testing, static code analysis, and backend profiling.</avoid>
+    <fallback>Use Playwright for E2E, native Claude for code review.</fallback>
+  </bounds>
 
   <handoff next="/sc:analyze --focus perf /sc:improve --type performance /sc:troubleshoot"/>
 </component>

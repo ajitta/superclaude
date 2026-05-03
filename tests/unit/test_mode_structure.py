@@ -91,12 +91,26 @@ class TestModeBoundary:
     """Validate bounds and handoff in every mode file."""
 
     def test_has_bounds(self, mode):
+        """<bounds> must use sub-tag form: <should>, <avoid>, optional <fallback>.
+
+        Per .claude/rules/mode-authoring.md and xml-prose-format.md.
+        Legacy attribute form rejected (commit S390).
+        """
         stem, content = mode
-        assert "<bounds " in content, f"{stem}: missing <bounds> tag"
-        should_attr = extract_xml_attr(content, "bounds", "should")
-        avoid_attr = extract_xml_attr(content, "bounds", "avoid")
-        assert should_attr, f"{stem}: <bounds> missing 'should' attribute"
-        assert avoid_attr, f"{stem}: <bounds> missing 'avoid' attribute"
+        assert "<bounds>" in content, (
+            f"{stem}: missing <bounds> opening tag (sub-tag form)"
+        )
+        body = extract_xml_content(content, "bounds")
+        assert body, f"{stem}: <bounds> body is empty"
+        assert re.search(r"<should>.+?</should>", body, re.DOTALL), (
+            f"{stem}: <bounds> missing <should> sub-tag"
+        )
+        assert re.search(r"<avoid>.+?</avoid>", body, re.DOTALL), (
+            f"{stem}: <bounds> missing <avoid> sub-tag"
+        )
+        assert not re.search(r"<bounds\s+\w+\s*=", content), (
+            f"{stem}: <bounds> uses legacy attribute form — convert to sub-tag form"
+        )
 
     def test_has_handoff(self, mode):
         stem, content = mode

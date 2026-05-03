@@ -11,20 +11,20 @@ description: Feature and code implementation with intelligent agent delegation a
   <syntax>/sc:implement [feature] [--plan docs/plans/...] [--type component|api|service|feature] [--framework react|vue|express] [--safe] [--with-tests]</syntax>
 
   <flow>
-    1. Load: If --plan provided, read plan document and extract tasks; otherwise analyze requirements + tech context
-    2. Plan: Approach + delegate to agents; verify simplest viable approach before building; for plan mode, follow task order exactly
-    3. Checkpoint: If changes affect >3 files → present numbered plan → wait for user approval before editing
-    4. Execute: Code + framework best practices; for plan mode, mark tasks complete as you go
-    5. Phase Gate: After each phase/task group — build + run, then: "Does this already solve the next phase's problem?" If yes, skip with reason
-    6. Validate: Security + quality checks; run verification command per task
-    7. Integrate: Docs + testing recs; report any blockers encountered
+  1. Load: If --plan provided, read plan document and extract tasks; otherwise analyze requirements + tech context
+  2. Plan: Approach + delegate to agents; verify simplest viable approach before building; for plan mode, follow task order exactly
+  3. Checkpoint: If changes affect >3 files → present numbered plan → wait for user approval before editing
+  4. Execute: Code + framework best practices; for plan mode, mark tasks complete as you go
+  5. Phase Gate: After each phase/task group — build + run, then: "Does this already solve the next phase's problem?" If yes, skip with reason
+  6. Validate: Security + quality checks; run verification command per task
+  7. Integrate: Docs + testing recs; report any blockers encountered
   </flow>
 
   <tools>
-    - Write/Edit: Code generation
-    - Read/Grep/Glob: Project analysis
-    - TaskCreate/TaskUpdate: Multi-file progress
-    - Agent: Large-scale delegation
+  - Write/Edit: Code generation
+  - Read/Grep/Glob: Project analysis
+  - TaskCreate/TaskUpdate: Multi-file progress
+  - Agent: Large-scale delegation
   </tools>
 
   <patterns>
@@ -36,15 +36,15 @@ description: Feature and code implementation with intelligent agent delegation a
 
   <examples>
 | Input | Output |
-|-------|--------|
+|---|---|
 | `user profile --type component --framework react` | Magic UI + frontend best practices |
 | `auth API --type api --safe --with-tests` | backend + security agents |
 | `payment system --type feature --with-tests` | Multi-agent coordination |
 | `dashboard widget --framework vue` | C7 Vue patterns |
   <example name="scope-creep" type="error-path">
-    <input>/sc:implement 'add logout button' (agent also refactors auth module and adds session management)</input>
-    <why_wrong>Implementation exceeded requested scope. "Add logout button" does not authorize refactoring adjacent code.</why_wrong>
-    <correct>Implement only the logout button. Suggest separate tasks for auth refactor and session management.</correct>
+    - Input: /sc:implement 'add logout button' (agent also refactors auth module and adds session management)
+    - Why wrong: Implementation exceeded requested scope. "Add logout button" does not authorize refactoring adjacent code.
+    - Correct: Implement only the logout button. Suggest separate tasks for auth refactor and session management.
   </example>
 
   </examples>
@@ -55,10 +55,10 @@ description: Feature and code implementation with intelligent agent delegation a
   - scope-discipline: Build only what was asked. Zero unsolicited files, zero adjacent refactors
   </gotchas>
 
-  <bounds should="intelligent impl|framework best practices|comprehensive testing" avoid="arch decisions without consultation|conflict with security|override safety" fallback="Ask user for guidance when uncertain">
-
-    Implement code changes as requested | Follow framework-specific best practices | Validate security constraints before commit
-
+  <bounds>
+    <should>intelligent impl, framework best practices, and comprehensive testing.</should>
+    <avoid>arch decisions without consultation, conflict with security, and override safety.</avoid>
+    <fallback>Ask user for guidance when uncertain.</fallback>
   </bounds>
 
   <handoff next="/sc:test /sc:build"/>

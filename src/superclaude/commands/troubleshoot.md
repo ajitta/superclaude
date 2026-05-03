@@ -11,20 +11,20 @@ description: Diagnose and resolve issues in code, builds, deployments, and syste
   <syntax>/sc:troubleshoot [issue] [--type bug|build|performance|deployment] [--trace] [--fix]</syntax>
 
   <flow>
-    1. Reproduce: Confirm failure — read full error, identify exact trigger, verify it's consistent
-    2. Investigate: Check git log/diff, trace data flow, find working examples
-    3. Hypothesize: Form specific hypothesis ("X causes Y because Z") — max 3 cycles before escalating to user
-    4. Confirm: Test hypothesis by changing one variable at a time; check environment before code
-    5. Test: Write failing test that reproduces the exact bug (required before any fix)
-    6. Fix: Apply single change addressing root cause — no "while I'm here" fixes
-    7. Verify: Failing test passes, all existing tests pass, no regressions
+  1. Reproduce: Confirm failure — read full error, identify exact trigger, verify it's consistent
+  2. Investigate: Check git log/diff, trace data flow, find working examples
+  3. Hypothesize: Form specific hypothesis ("X causes Y because Z") — max 3 cycles before escalating to user
+  4. Confirm: Test hypothesis by changing one variable at a time; check environment before code
+  5. Test: Write failing test that reproduces the exact bug (required before any fix)
+  6. Fix: Apply single change addressing root cause — no "while I'm here" fixes
+  7. Verify: Failing test passes, all existing tests pass, no regressions
   </flow>
 
   <tools>
-    - Read: Log analysis + state examination
-    - Bash: Diagnostic command execution
-    - Grep: Error pattern detection
-    - Write: Diagnostic reports + documentation
+  - Read: Log analysis + state examination
+  - Bash: Diagnostic command execution
+  - Grep: Error pattern detection
+  - Write: Diagnostic reports + documentation
   </tools>
 
   <patterns>
@@ -38,16 +38,16 @@ description: Diagnose and resolve issues in code, builds, deployments, and syste
   <examples>
 
 | Input | Output |
-|-------|--------|
+|---|---|
 | `'Null pointer in user service' --type bug --trace` | Root cause + targeted fix |
 | `'TypeScript compilation errors' --type build --fix` | Auto-apply safe fixes |
 | `'API response times degraded' --type performance` | Bottleneck + optimization |
 | `'Service not starting' --type deployment --trace` | Environment analysis |
 
   <example name="symptom-only-fix" type="error-path">
-    <input>/sc:troubleshoot 'users report slow page' --fix (applies caching without profiling)</input>
-    <why_wrong>Fixing symptoms without diagnosis. Slow page could be N+1 queries, not a caching issue.</why_wrong>
-    <correct>/sc:troubleshoot 'users report slow page' --trace first → identify bottleneck → then targeted fix</correct>
+    - Input: /sc:troubleshoot 'users report slow page' --fix (applies caching without profiling)
+    - Why wrong: Fixing symptoms without diagnosis. Slow page could be N+1 queries, not a caching issue.
+    - Correct: /sc:troubleshoot 'users report slow page' --trace first → identify bottleneck → then targeted fix
   </example>
 
   </examples>
@@ -57,10 +57,10 @@ description: Diagnose and resolve issues in code, builds, deployments, and syste
   - seq-loop: If sequential thinking reaches the same conclusion twice on the same question, terminate that analysis branch and move to next topic.
   </gotchas>
 
-  <bounds should="systematic diagnosis|validated solutions|safe fixes" avoid="risky fixes without confirm|modify production without permission|arch changes without impact" fallback="Ask user for guidance when uncertain">
-
-    Without --fix: produce diagnostic report, then complete | With --fix: Apply safe fixes only (execution) | Risky fixes require explicit user approval → Output: Diagnostic report; fixes only with --fix flag
-
+  <bounds>
+    <should>systematic diagnosis, validated solutions, and safe fixes.</should>
+    <avoid>risky fixes without confirm, modify production without permission, and arch changes without impact.</avoid>
+    <fallback>Ask user for guidance when uncertain.</fallback>
   </bounds>
 
   <auto_fix_threshold>

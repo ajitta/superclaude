@@ -12,8 +12,8 @@ description: List all available /sc commands and their functionality
 
 
   <flow>
-    1. Display: Complete command list
-    2. Complete: End after display
+  1. Display: Complete command list
+  2. Complete: End after display
   </flow>
 
   <commands>
@@ -103,9 +103,9 @@ description: List all available /sc commands and their functionality
   <examples>
 
   <example name="help-as-execution" type="error-path">
-    <input>/sc:help implement auth (expecting it to run /sc:implement)</input>
-    <why_wrong>help is reference-only. It displays information but does not execute commands.</why_wrong>
-    <correct>Use /sc:implement 'auth system' to execute. Use /sc:help to see what's available.</correct>
+    - Input: /sc:help implement auth (expecting it to run /sc:implement)
+    - Why wrong: help is reference-only. It displays information but does not execute commands.
+    - Correct: Use /sc:implement 'auth system' to execute. Use /sc:help to see what's available.
   </example>
 
   </examples>
@@ -115,10 +115,10 @@ description: List all available /sc commands and their functionality
   - flag-docs: Direct users to core/FLAGS.md for flag documentation, not inline explanations
   </gotchas>
 
-  <bounds should="complete reference display|categorized flag listing|usage examples" avoid="execute commands|create files|activate modes|modify project state" fallback="Ask user for guidance when uncertain">
-
-    Display reference information only, then complete | Do not execute any commands automatically | Do not modify files or project state → Output: Command and flag reference documentation
-
+  <bounds>
+    <should>complete reference display, categorized flag listing, and usage examples.</should>
+    <avoid>execute commands, create files, activate modes, and modify project state.</avoid>
+    <fallback>Ask user for guidance when uncertain.</fallback>
   </bounds>
 
   <handoff next="/sc:recommend /sc:[command]"/>

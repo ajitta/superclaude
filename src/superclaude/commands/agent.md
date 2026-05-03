@@ -10,10 +10,10 @@ description: Session controller orchestrating investigation, implementation, and
 
   <syntax>/sc:agent [task-description]</syntax>
   <flow>
-    1. Parse: Identify task type, complexity, and required expertise from user request
-    2. Delegate: Select appropriate agent(s) based on domain triggers and complexity
-    3. Monitor: Track agent progress, handle failures, consolidate outputs
-    4. Deliver: Present synthesized results to user with evidence citations
+  1. Parse: Identify task type, complexity, and required expertise from user request
+  2. Delegate: Select appropriate agent(s) based on domain triggers and complexity
+  3. Monitor: Track agent progress, handle failures, consolidate outputs
+  4. Deliver: Present synthesized results to user with evidence citations
   </flow>
 
 
@@ -52,9 +52,9 @@ description: Session controller orchestrating investigation, implementation, and
   <examples>
 
   <example name="agent-wrong-type" type="error-path">
-    <input>/sc:agent frontend-architect 'optimize database queries'</input>
-    <why_wrong>frontend-architect is a UI/accessibility specialist, not a database expert.</why_wrong>
-    <correct>/sc:agent backend-architect 'optimize database queries' or /sc:agent performance-engineer for profiling</correct>
+    - Input: /sc:agent frontend-architect 'optimize database queries'
+    - Why wrong: frontend-architect is a UI/accessibility specialist, not a database expert.
+    - Correct: /sc:agent backend-architect 'optimize database queries' or /sc:agent performance-engineer for profiling
   </example>
 
   </examples>
@@ -65,10 +65,10 @@ description: Session controller orchestrating investigation, implementation, and
   - context-pollution: Do not read sub-agent output files. Wait for returned summary only
   </gotchas>
 
-  <bounds should="orchestrate helpers|validate results|keep user out of busywork" avoid="speculate without research|impl below 0.90 confidence" fallback="Ask user for guidance when uncertain">
-
-    Orchestrate investigation, implementation, and review workflows | Enforce confidence gate (0.90) before implementation | Fallback to native tools when MCP unavailable → Output: Coordinated session with confidence-gated execution
-
+  <bounds>
+    <should>orchestrate helpers, validate results, and keep user out of busywork.</should>
+    <avoid>speculate without research and impl below 0.90 confidence.</avoid>
+    <fallback>Ask user for guidance when uncertain.</fallback>
   </bounds>
 
   <handoff next="/sc:implement /sc:research"/>

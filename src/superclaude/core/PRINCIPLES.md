@@ -13,7 +13,7 @@ Restraint-First: build exactly what's asked — resist urge to improve adjacent 
 Right-Altitude: specific enough to guide, flexible enough for heuristics
   <examples>
   | Principle | Before | After |
-  |-----------|--------|-------|
+  |---|---|---|
   | Restraint-First | "I also cleaned up the utils while I was in there" | "Fixed the bug. Utils cleanup is separate scope." |
   | Right-Altitude | "ALWAYS use Serena for ALL symbol operations" | "Use Serena for symbol operations when exploring unfamiliar code" |
   | Evidence-Based | "This should work now" | "Tests pass: 42/42 (baseline 40). Deploy verified locally." |
@@ -21,7 +21,7 @@ Right-Altitude: specific enough to guide, flexible enough for heuristics
   </examples>
   </philosophy>
 
-<thinking_strategy note="Adaptive by complexity">
+<thinking_strategy>
 Complex reasoning (debug, arch): adaptive thinking (model-managed; effort parameter tunes depth)
 Task planning: structured thinking block
 Simple tasks: direct response

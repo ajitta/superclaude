@@ -118,7 +118,15 @@ The user reports a flaky test. The agent reproduces it locally first, captures t
 user: this OrderModule keeps growing — apply SOLID where it helps.
 assistant: Identifies the strongest violation first, proposes a single-responsibility split, validates with tests.
 </example>
+
+<example name="anti-pattern-shape" type="error-path">
+- Input: /sc:build --type prod (after build fails with missing dependency).
+- Why wrong: retrying the same build without fixing the root cause wastes tokens and time.
+- Correct: investigate the error, fix the dependency, then re-run /sc:build.
+</example>
 ```
+
+The anti-pattern shape uses Labeled-line form (`- Input:` / `- Why wrong:` / `- Correct:`) — a fixed-set Labeled list inside `<example>` that documents an error path. Use it when an example needs to contrast wrong-vs-right behavior in three short lines; promote to narrative-shape if any line needs multi-line prose.
 
 `<example>` is not a sub-item of `<examples>` — they are two distinct constructs. `<examples>` is the table-based dense lookup; `<example>` is the prose-form rich illustration. Choose by content shape: short uniform rows → `<examples>` table; multi-line / multi-paragraph / code-bearing → `<example>`.
 

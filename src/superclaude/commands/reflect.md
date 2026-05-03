@@ -12,12 +12,12 @@ description: Task reflection and validation using Serena MCP analysis capabiliti
   <syntax>/sc:reflect [--type task|session|completion] [--analyze] [--validate]</syntax>
 
   <flow>
-    1. Analyze: Assess completeness of collected information
-    2. Validate: Check goal alignment and deviation
+  1. Analyze: Assess completeness of collected information
+  2. Validate: Check goal alignment and deviation
     2.5. Misunderstanding-Audit: Identify moments where user intent was misread during this session. For each: what triggered the misread, what was the actual intent, what rule would prevent it. Save as feedback memory if not already stored.
-    3. Reflect: Evaluate completion criteria
+  3. Reflect: Evaluate completion criteria
     3.5. Gotchas-Gardening: If `.claude/rules/gotchas/` exists, check: (a) files with `# Last reviewed:` older than 90 days → warn, (b) `paths:` glob patterns that match zero files in current project → warn stale pattern, (c) gotcha entries referencing identifiers not found in codebase → warn potential staleness.
-    4. Persist: Write learnings for cross-session capture
+  4. Persist: Write learnings for cross-session capture
   </flow>
 
 
@@ -30,7 +30,7 @@ description: Task reflection and validation using Serena MCP analysis capabiliti
 
   <examples>
   | Input | Output |
-  |-------|--------|
+  |---|---|
   | `--type task --analyze` | Goal alignment validation |
   | `--type session --validate` | Session work quality assessment |
   | `--type completion` | Completion readiness evaluation |
@@ -42,7 +42,11 @@ description: Task reflection and validation using Serena MCP analysis capabiliti
   - baseline-compare: Compare current state against baseline metrics (test counts, pass rates)
   </gotchas>
 
-  <bounds should="comprehensive reflection|cross-session learning" avoid="override completion|bypass integrity" fallback="Without Serena: use Claude auto memory for session persistence"/>
+  <bounds>
+    <should>comprehensive reflection and cross-session learning.</should>
+    <avoid>override completion and bypass integrity.</avoid>
+    <fallback>Without Serena: use Claude auto memory for session persistence.</fallback>
+  </bounds>
 
   <handoff next="/sc:improve /sc:troubleshoot"/>
 </component>

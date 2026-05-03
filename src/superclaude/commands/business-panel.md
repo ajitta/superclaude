@@ -10,10 +10,10 @@ description: Multi-expert business analysis with adaptive interaction modes
 
   <syntax>/sc:business-panel [doc|content] [--experts "names"] [--mode discussion|debate|socratic|adaptive] [--focus domain] [--all-experts] [--synthesis-only] [--structured]</syntax>
   <flow>
-    1. Route: Identify domain and select interaction mode (Discussion, Debate, or Socratic)
-    2. Analyze: Apply 2-3 expert frameworks, surface where they agree and diverge
-    3. Synthesize: Integrate insights across frameworks with trade-off clarity
-    4. Present: Deliver multi-lens analysis with labeled expert attributions
+  1. Route: Identify domain and select interaction mode (Discussion, Debate, or Socratic)
+  2. Analyze: Apply 2-3 expert frameworks, surface where they agree and diverge
+  3. Synthesize: Integrate insights across frameworks with trade-off clarity
+  4. Present: Deliver multi-lens analysis with labeled expert attributions
   </flow>
 
 
@@ -48,16 +48,16 @@ description: Multi-expert business analysis with adaptive interaction modes
   <examples>
 
 | Input | Output |
-|-------|--------|
+|---|---|
 | `market-analysis.md --mode discussion --focus strategy` | Collaborative expert analysis |
 | `'SaaS pricing strategy' --experts "porter,godin" --mode debate` | Adversarial pricing analysis |
 | `startup-pitch.md --mode socratic --all-experts` | Deep questioning with all 9 experts |
 | `competitive-landscape.md --synthesis-only` | Summary synthesis only |
 
   <example name="panel-technical-question" type="error-path">
-    <input>/sc:business-panel 'how to fix my React useState bug'</input>
-    <why_wrong>Business panel provides strategic analysis, not technical debugging. Wrong tool for code issues.</why_wrong>
-    <correct>/sc:troubleshoot for bugs, /sc:explain for concepts. Use /sc:business-panel for market, strategy, competitive analysis.</correct>
+    - Input: /sc:business-panel 'how to fix my React useState bug'
+    - Why wrong: Business panel provides strategic analysis, not technical debugging. Wrong tool for code issues.
+    - Correct: /sc:troubleshoot for bugs, /sc:explain for concepts. Use /sc:business-panel for market, strategy, competitive analysis.
   </example>
 
   </examples>
@@ -68,10 +68,10 @@ description: Multi-expert business analysis with adaptive interaction modes
   - opinion-as-fact: Label which expert framework drives each claim. Never present opinions as consensus
   </gotchas>
 
-  <bounds should="multi-expert analysis|adaptive modes|comprehensive synthesis" avoid="replace professional advice|make decisions for user" fallback="Ask user for guidance when uncertain">
-
-    Produce business analysis document, then complete | Defer business decisions to stakeholders | Preserve code and configurations unchanged → Output: Business analysis synthesis document
-
+  <bounds>
+    <should>multi-expert analysis, adaptive modes, and comprehensive synthesis.</should>
+    <avoid>replace professional advice and make decisions for user.</avoid>
+    <fallback>Ask user for guidance when uncertain.</fallback>
   </bounds>
 
   <handoff next="/sc:brainstorm /sc:design"/>

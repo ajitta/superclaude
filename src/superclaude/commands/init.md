@@ -11,12 +11,12 @@ description: Interactive project environment setup — select and run initializa
   <syntax>/sc:init [tasks] [--quick] [--full]</syntax>
 
   <flow>
-    1. Detect: Scan project root for language/framework indicators (pyproject.toml, package.json, Cargo.toml, go.mod)
-    2. Present: Show interactive task menu with descriptions, dependencies, and detected project context
-    3. Select: Accept user choice — individual tasks (a,b,c...), presets (--quick, --full), or custom combination
-    4. Validate: Check dependency graph, surface missing prerequisites, confirm execution plan
-    5. Execute: Run selected tasks in dependency-aware parallel batches with progress reporting
-    6. Report: Final summary table — task status, artifacts created, memory entries stored
+  1. Detect: Scan project root for language/framework indicators (pyproject.toml, package.json, Cargo.toml, go.mod)
+  2. Present: Show interactive task menu with descriptions, dependencies, and detected project context
+  3. Select: Accept user choice — individual tasks (a,b,c...), presets (--quick, --full), or custom combination
+  4. Validate: Check dependency graph, surface missing prerequisites, confirm execution plan
+  5. Execute: Run selected tasks in dependency-aware parallel batches with progress reporting
+  6. Report: Final summary table — task status, artifacts created, memory entries stored
   </flow>
 
   <menu>
@@ -43,7 +43,7 @@ description: Interactive project environment setup — select and run initializa
   ```
   </menu>
 
-  <dependency_graph note="Execution order">
+  <dependency_graph>
   - Batch 1 (no deps, parallel): a, c, e, f, h, i
   - Batch 2 (wait for prereq): b←a, d←c, g←a
   - Schedule only selected tasks; prompt to add missing prerequisites.
@@ -75,7 +75,7 @@ description: Interactive project environment setup — select and run initializa
 
   <outputs>
   | Artifact | Purpose |
-  |----------|---------|
+  |---|---|
   | Summary table | Task completion status + artifacts list |
   | PROJECT_INDEX.md | Project structure map (task a) |
   | CLAUDE.md | Project configuration for Claude Code (task b) |
@@ -84,15 +84,15 @@ description: Interactive project environment setup — select and run initializa
 
 
   <tools>
-    - Read/Grep/Glob: Project detection and analysis
-    - Write/Edit: CLAUDE.md, PROJECT_INDEX.md, MEMORY.md generation
-    - Bash: Dependency installation, test execution, git history analysis
-    - Agent(repo-index): Delegate structure analysis for task (a)
+  - Read/Grep/Glob: Project detection and analysis
+  - Write/Edit: CLAUDE.md, PROJECT_INDEX.md, MEMORY.md generation
+  - Bash: Dependency installation, test execution, git history analysis
+  - Agent(repo-index): Delegate structure analysis for task (a)
   </tools>
 
   <examples>
   | Input | Output |
-  |-------|--------|
+  |---|---|
   | `/sc:init` | Show interactive menu → await selection |
   | `/sc:init --quick` | Run tasks a,b (structure + CLAUDE.md) |
   | `/sc:init --full` | Run all tasks a-i in parallel batches |
@@ -101,9 +101,9 @@ description: Interactive project environment setup — select and run initializa
   | `/sc:init i` | Scaffold docs/ with PRD, ARCHITECTURE, ADR, UI-GUIDE templates (idempotent) |
 
   <example name="missing-prerequisite" type="error-path">
-    <input>/sc:init d (without selecting c)</input>
-    <why_wrong>Test baseline (d) requires dependencies installed (c). Running tests without deps will fail.</why_wrong>
-    <correct>Detect missing prerequisite → prompt: "Task (d) requires (c). Add dependency check?" → user confirms → run c then d.</correct>
+    - Input: /sc:init d (without selecting c)
+    - Why wrong: Test baseline (d) requires dependencies installed (c). Running tests without deps will fail.
+    - Correct: Detect missing prerequisite → prompt: "Task (d) requires (c). Add dependency check?" → user confirms → run c then d.
   </example>
   </examples>
 
@@ -113,8 +113,10 @@ description: Interactive project environment setup — select and run initializa
   - uv-not-pip: Use `uv` for Python operations in this project
   </gotchas>
 
-  <bounds should="interactive task menu|dependency-aware execution|parallel batching|idempotent setup|safe environment init" avoid="auto-execute without selection|overwrite existing files|install without confirmation|skip dependency validation" fallback="Ask user when project type undetectable or when existing config conflicts with proposed setup">
-    Present menu and execute selected tasks | Validate dependencies before execution | Report results with artifact locations
+  <bounds>
+    <should>interactive task menu, dependency-aware execution, parallel batching, idempotent setup, and safe environment init.</should>
+    <avoid>auto-execute without selection, overwrite existing files, install without confirmation, and skip dependency validation.</avoid>
+    <fallback>Ask user when project type undetectable or when existing config conflicts with proposed setup.</fallback>
   </bounds>
 
   <handoff next="/sc:load /sc:implement /sc:test"/>

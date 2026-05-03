@@ -11,9 +11,9 @@ description: Pre-start validation checklist for any work (plan, design, spec, im
   <syntax>/confidence-check [task description]</syntax>
 
   <flow>
-    1. Run 3 checks below with evidence (Grep, Glob, Read)
-    2. For each: cite concrete evidence (file paths, search results, docs)
-    3. All Yes → proceed. Any No → investigate that item before implementing
+  1. Run 3 checks below with evidence (Grep, Glob, Read)
+  2. For each: cite concrete evidence (file paths, search results, docs)
+  3. All Yes → proceed. Any No → investigate that item before implementing
   </flow>
 
   <checks>
@@ -24,7 +24,7 @@ description: Pre-start validation checklist for any work (plan, design, spec, im
 
   <examples>
   | Input | Output |
-  |-------|--------|
+  |---|---|
   | `/confidence-check add retry logic to API client` | 1. grep "retry" → found in utils/http.py:42. Reuse. 2. requests already in deps. Fits. 3. Error logs show timeout pattern. Clear. → Proceed |
   | `/confidence-check add caching layer` | 1. grep "cache" → none found. New. 2. No cache deps. New pattern. 3. "Why cache?" — no perf data. → Stop, measure first |
   | `/confidence-check write plan for auth feature` | 1. specs dir: no prior auth spec. New. 2. Framework has session middleware pattern. Fits. 3. Goal: multi-tenant auth. Clear. → Proceed |
@@ -37,7 +37,10 @@ description: Pre-start validation checklist for any work (plan, design, spec, im
   - scope-expansion: Confidence check is 3 questions only — do not expand into full architecture review or implementation planning
   </gotchas>
 
-  <bounds should="pre-start validation for any work (plan/design/spec/implementation)|evidence-based checklist" avoid="score/percentage computation|runtime checks|modify artifact"/>
+  <bounds>
+    <should>pre-start validation for any work (plan/design/spec/implementation) and evidence-based checklist.</should>
+    <avoid>score/percentage computation, runtime checks, and modify artifact.</avoid>
+  </bounds>
 
   <handoff next="/sc:implement /sc:plan /sc:design /sc:analyze"/>
 </component>

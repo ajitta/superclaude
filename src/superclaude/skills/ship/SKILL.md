@@ -20,12 +20,12 @@ hooks:
   <syntax>/ship [--pr] [--title "..."] [--base branch] [--exclude pattern] [--dry-run]</syntax>
 
   <flow>
-    1. Status: Run `git status` + `git diff --stat` to assess changes
-    2. Validate: Check branch naming conventions (see references/conventions.md), warn on master/main
-    3. Stage: `git add` relevant files, respecting --exclude patterns and default exclusions
-    4. Commit: Generate conventional commit message from diff analysis, present for approval
-    5. Push: `git push -u origin <branch>` (confirm if first push to remote)
-    6. PR (if --pr): Create PR via `gh pr create` with summary from commits
+  1. Status: Run `git status` + `git diff --stat` to assess changes
+  2. Validate: Check branch naming conventions (see references/conventions.md), warn on master/main
+  3. Stage: `git add` relevant files, respecting --exclude patterns and default exclusions
+  4. Commit: Generate conventional commit message from diff analysis, present for approval
+  5. Push: `git push -u origin <branch>` (confirm if first push to remote)
+  6. PR (if --pr): Create PR via `gh pr create` with summary from commits
   </flow>
 
   <references>
@@ -46,7 +46,7 @@ hooks:
 
   <examples>
 | Input | Output |
-|-------|--------|
+|---|---|
 | `/ship` | Stage + commit + push current changes |
 | `/ship --pr` | Stage + commit + push + create PR |
 | `/ship --pr --title "Add auth" --base main` | Full delivery with custom PR |
@@ -54,7 +54,10 @@ hooks:
 | `/ship --dry-run` | Preview staging, commit message, push target |
   </examples>
 
-  <bounds should="safe delivery automation|conventional commits|PR creation" avoid="force push|commit secrets|push to main without confirmation|skip user approval"/>
+  <bounds>
+    <should>safe delivery automation, conventional commits, and PR creation.</should>
+    <avoid>force push, commit secrets, push to main without confirmation, and skip user approval.</avoid>
+  </bounds>
 
   <handoff next="/sc:test /sc:build"/>
 </component>

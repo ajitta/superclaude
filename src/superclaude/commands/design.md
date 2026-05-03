@@ -11,18 +11,18 @@ description: Design system architecture, APIs, and component interfaces with com
   <syntax>/sc:design [target] [--type architecture|api|component|database] [--format diagram|spec|code]</syntax>
 
   <flow>
-    1. Analyze: Requirements + existing context
-    2. Plan: Design approach + structure
-    3. Design: Comprehensive specs + best practices (see outputs)
-    4. Constraints: Document operational parameters that constrain design — queue/buffer sizes, connection pool limits, external API batch limits, timeout values
-    5. Necessity: For each proposed component, apply [R18] — defer components that lack a specific failure scenario, quantitative evidence, or user-facing impact
-    6. Validate: Requirements coverage ≥90%, maintainability check
-    7. Document: Save design spec to docs/specs/<topic>-design-<username>-YYYY-MM-DD.md (with frontmatter: status: draft, revised: <today>) + diagrams
+  1. Analyze: Requirements + existing context
+  2. Plan: Design approach + structure
+  3. Design: Comprehensive specs + best practices (see outputs)
+  4. Constraints: Document operational parameters that constrain design — queue/buffer sizes, connection pool limits, external API batch limits, timeout values
+  5. Necessity: For each proposed component, apply [R18] — defer components that lack a specific failure scenario, quantitative evidence, or user-facing impact
+  6. Validate: Requirements coverage ≥90%, maintainability check
+  7. Document: Save design spec to docs/specs/<topic>-design-<username>-YYYY-MM-DD.md (with frontmatter: status: draft, revised: <today>) + diagrams
   </flow>
 
   <outputs note="All content in single spec file per invocation">
 | Artifact | Content |
-|----------|---------|
+|---|---|
 | `docs/specs/<topic>-design-<username>-YYYY-MM-DD.md` | Diagram + spec + interface definitions |
   Sections per --type:
   - architecture: system diagram, component boundaries, interface contracts
@@ -33,10 +33,10 @@ description: Design system architecture, APIs, and component interfaces with com
 
 
   <tools>
-    - Read: Requirements analysis
-    - Grep/Glob: System structure investigation
-    - Write: Design documentation
-    - Bash: External design tools
+  - Read: Requirements analysis
+  - Grep/Glob: System structure investigation
+  - Write: Design documentation
+  - Bash: External design tools
   </tools>
 
   <patterns>
@@ -48,15 +48,15 @@ description: Design system architecture, APIs, and component interfaces with com
 
   <examples>
 | Input | Output |
-|-------|--------|
+|---|---|
 | `user-mgmt --type architecture --format diagram` | System architecture |
 | `payment-api --type api --format spec` | API specification |
 | `notification-service --type component --format code` | Component interface |
 | `e-commerce-db --type database --format diagram` | Schema design |
   <example name="design-without-requirements" type="error-path">
-    <input>/sc:design payment-api --type api (with no context about payment provider or requirements)</input>
-    <why_wrong>Designing without requirements leads to assumptions that may not match business needs.</why_wrong>
-    <correct>/sc:brainstorm 'payment system requirements' first → then /sc:design with concrete requirements</correct>
+    - Input: /sc:design payment-api --type api (with no context about payment provider or requirements)
+    - Why wrong: Designing without requirements leads to assumptions that may not match business needs.
+    - Correct: /sc:brainstorm 'payment system requirements' first → then /sc:design with concrete requirements
   </example>
 
   </examples>
@@ -67,10 +67,10 @@ description: Design system architecture, APIs, and component interfaces with com
   - existing-check: Check if a design doc already exists for this topic before creating a new one
   </gotchas>
 
-  <bounds should="comprehensive specs|multi-format output|validation" avoid="generate impl code|modify existing arch|violate constraints" fallback="Ask user for guidance when uncertain">
-
-    Produce design documentation, then complete | Defer implementation code to /sc:implement | Defer source file creation to /sc:implement | Design specs and interfaces only → Output: Architecture/API/Component/Database design documents
-
+  <bounds>
+    <should>comprehensive specs, multi-format output, and validation.</should>
+    <avoid>generate impl code, modify existing arch, and violate constraints.</avoid>
+    <fallback>Ask user for guidance when uncertain.</fallback>
   </bounds>
 
   <handoff next="/sc:plan /sc:implement /sc:workflow"/>

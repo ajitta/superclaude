@@ -11,19 +11,19 @@ description: Provide development estimates for tasks, features, or projects with
   <syntax>/sc:estimate [target] [--type time|effort|complexity] [--unit hours|days|weeks] [--breakdown]</syntax>
 
   <flow>
-    1. Analyze: Scope, complexity, deps, patterns
-    2. Calculate: Methodology + benchmarks
-    3. Validate: Cross-reference + domain expertise
-    4. Present: Breakdown + confidence + risk
-    5. Track: Accuracy for improvement
+  1. Analyze: Scope, complexity, deps, patterns
+  2. Calculate: Methodology + benchmarks
+  3. Validate: Cross-reference + domain expertise
+  4. Present: Breakdown + confidence + risk
+  5. Track: Accuracy for improvement
   </flow>
 
 
   <tools>
-    - Read/Grep/Glob: Codebase complexity analysis
-    - TaskCreate/TaskUpdate: Estimation breakdown tracking
-    - Task: Multi-domain estimation delegation
-    - Bash: Project + dependency analysis
+  - Read/Grep/Glob: Codebase complexity analysis
+  - TaskCreate/TaskUpdate: Estimation breakdown tracking
+  - Task: Multi-domain estimation delegation
+  - Bash: Project + dependency analysis
   </tools>
 
   <patterns>
@@ -36,15 +36,15 @@ description: Provide development estimates for tasks, features, or projects with
   <examples>
 
 | Input | Output |
-|-------|--------|
+|---|---|
 | `'auth system' --type time --unit days --breakdown` | 8 days, 85% confidence |
 | `'monolith to microservices' --type complexity --breakdown` | Risk + dependency map |
 | `'optimize performance' --type effort --unit hours` | Effort by category |
 
   <example name="estimate-no-scope" type="error-path">
-    <input>/sc:estimate 'make it better' --type time</input>
-    <why_wrong>No measurable scope. 'make it better' could mean anything from a typo fix to a full rewrite.</why_wrong>
-    <correct>Define scope first: /sc:estimate 'refactor auth module to use JWT' --type time --breakdown</correct>
+    - Input: /sc:estimate 'make it better' --type time
+    - Why wrong: No measurable scope. 'make it better' could mean anything from a typo fix to a full rewrite.
+    - Correct: Define scope first: /sc:estimate 'refactor auth module to use JWT' --type time --breakdown
   </example>
 
   </examples>
@@ -54,10 +54,10 @@ description: Provide development estimates for tasks, features, or projects with
   - scope-assumptions: Make scope assumptions explicit before estimating
   </gotchas>
 
-  <bounds should="systematic estimates|confidence intervals|multi-agent analysis" avoid="guarantee accuracy|estimate without analysis|override benchmarks" fallback="Ask user for guidance when uncertain">
-
-    Produce estimation report, then complete | Defer implementation to /sc:implement or /sc:workflow | Limit task tracking to estimation scope → Output: Estimation report with breakdown and confidence intervals
-
+  <bounds>
+    <should>systematic estimates, confidence intervals, and multi-agent analysis.</should>
+    <avoid>guarantee accuracy, estimate without analysis, and override benchmarks.</avoid>
+    <fallback>Ask user for guidance when uncertain.</fallback>
   </bounds>
 
   <handoff next="/sc:workflow /sc:implement"/>

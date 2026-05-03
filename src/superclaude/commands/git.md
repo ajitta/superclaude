@@ -11,19 +11,19 @@ description: Git operations with intelligent commit messages and workflow optimi
   <syntax>/sc:git [operation] [args] [--smart-commit] [--interactive] [--pr-status] [--from-pr PR#|URL]</syntax>
 
   <flow>
-    1. Analyze: Repo state + changes
-    2. Validate: Operation appropriateness
-    3. Execute: Git command + automation
-    4. Optimize: Smart commits + patterns
-    5. Report: Status + next steps
+  1. Analyze: Repo state + changes
+  2. Validate: Operation appropriateness
+  3. Execute: Git command + automation
+  4. Optimize: Smart commits + patterns
+  5. Report: Status + next steps
   </flow>
 
 
   <tools>
-    - Bash: Git command execution
-    - Read: Repo state analysis
-    - Grep: Log parsing + status
-    - Write: Commit message generation
+  - Bash: Git command execution
+  - Read: Repo state analysis
+  - Grep: Log parsing + status
+  - Write: Commit message generation
   </tools>
 
   <patterns>
@@ -62,7 +62,7 @@ description: Git operations with intelligent commit messages and workflow optimi
   <examples>
 
 | Input | Output |
-|-------|--------|
+|---|---|
 | `status` | State analysis + recommendations |
 | `commit --smart-commit` | Conventional commit |
 | `merge feature-branch --interactive` | Guided merge |
@@ -70,9 +70,9 @@ description: Git operations with intelligent commit messages and workflow optimi
 | `--from-pr 123` | Resume session from PR #123 |
 
   <example name="force-push-main" type="error-path">
-    <input>/sc:git push --force origin main</input>
-    <why_wrong>Force-pushing to main/master can destroy team members' work and is irreversible.</why_wrong>
-    <correct>Create a feature branch, push there, then open a PR for main.</correct>
+    - Input: /sc:git push --force origin main
+    - Why wrong: Force-pushing to main/master can destroy team members' work and is irreversible.
+    - Correct: Create a feature branch, push there, then open a PR for main.
   </example>
 
   </examples>
@@ -83,10 +83,10 @@ description: Git operations with intelligent commit messages and workflow optimi
   - new-commit: Create new commits, never amend unless explicitly requested
   </gotchas>
 
-  <bounds should="intelligent git ops|conventional commits|workflow guidance|PR status checks" avoid="modify config without auth|destructive without confirm|complex merges requiring manual" fallback="Ask user for guidance when uncertain">
-
-    Execute git operations as requested | Require explicit user confirmation before force push | Require user authorization before modifying git config | Destructive operations require explicit user approval
-
+  <bounds>
+    <should>intelligent git ops, conventional commits, workflow guidance, and PR status checks.</should>
+    <avoid>modify config without auth, destructive without confirm, and complex merges requiring manual.</avoid>
+    <fallback>Ask user for guidance when uncertain.</fallback>
   </bounds>
 
   <safety_rules>

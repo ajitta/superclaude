@@ -142,7 +142,7 @@
 
   <examples>
 | Input | Tool | Reason |
-|-------|------|--------|
+|---|---|---|
 | rename getUserData everywhere | `rename_symbol` | Semantic rename with reference tracking |
 | find all class references | `find_referencing_symbols` | LSP-powered reference discovery |
 | understand UserService class | `get_symbols_overview` → `find_symbol` (depth=1) | Token-efficient exploration |
@@ -152,7 +152,11 @@
 | update console.log to logger | ast-grep + Edit (not Serena) | Pattern-based bulk replacement |
   </examples>
 
-  <bounds should="semantic code understanding|symbol operations|cross-session memory" avoid="simple text edits|bulk pattern replacement|file-level operations" fallback="Use native Grep/Glob/Edit for text-level operations"/>
+  <bounds>
+    <should>semantic code understanding, symbol operations, and cross-session memory.</should>
+    <avoid>simple text edits, bulk pattern replacement, and file-level operations.</avoid>
+    <fallback>Use native Grep/Glob/Edit for text-level operations.</fallback>
+  </bounds>
 
   <handoff next="/sc:reflect /sc:save /sc:load"/>
 </component>

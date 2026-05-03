@@ -11,16 +11,16 @@ description: Systematically clean up code, remove dead code, and optimize projec
   <syntax>/sc:cleanup [target] [--type code|imports|files|docs|all] [--safe|--aggressive] [--interactive] [--dry-run]</syntax>
 
   <flow>
-    1. Analyze: Cleanup opportunities + safety assessment
-    2. Plan: Choose approach + delegate to agents
-    3. Execute: Systematic cleanup per --type
-    4. Validate: Ensure no functionality loss (tests pass)
-    5. Report: Summary + maintenance recs
+  1. Analyze: Cleanup opportunities + safety assessment
+  2. Plan: Choose approach + delegate to agents
+  3. Execute: Systematic cleanup per --type
+  4. Validate: Ensure no functionality loss (tests pass)
+  5. Report: Summary + maintenance recs
   </flow>
 
   <outputs note="Per --type flag">
 | Type | Actions | Report |
-|------|---------|--------|
+|---|---|---|
 | code | Remove dead code | Console: removed items + line count |
 | imports | Remove unused imports | Console: removed imports per file |
 | files | Remove orphan files | Console: deleted file list |
@@ -30,10 +30,10 @@ description: Systematically clean up code, remove dead code, and optimize projec
 
 
   <tools>
-    - Read/Grep/Glob: Analysis + pattern detection
-    - Edit: Safe modification
-    - TaskCreate/TaskUpdate: Progress tracking
-    - Task: Large-scale delegation
+  - Read/Grep/Glob: Analysis + pattern detection
+  - Edit: Safe modification
+  - TaskCreate/TaskUpdate: Progress tracking
+  - Task: Large-scale delegation
   </tools>
 
   <patterns>
@@ -47,7 +47,7 @@ description: Systematically clean up code, remove dead code, and optimize projec
   <examples>
 
 | Input | Output |
-|-------|--------|
+|---|---|
 | `src/ --type code --safe` | Conservative cleanup |
 | `--type imports --safe` | Unused import analysis |
 | `--type all --interactive` | Multi-domain with guidance |
@@ -56,9 +56,9 @@ description: Systematically clean up code, remove dead code, and optimize projec
 | `--type docs` | Auto-fix doc naming convention |
 
   <example name="aggressive-without-review" type="error-path">
-    <input>/sc:cleanup --type all --aggressive (on unfamiliar codebase)</input>
-    <why_wrong>Aggressive cleanup without understanding the codebase risks removing code that appears unused but is dynamically referenced.</why_wrong>
-    <correct>/sc:cleanup --type all --preview first, review results, then /sc:cleanup --type all --safe</correct>
+    - Input: /sc:cleanup --type all --aggressive (on unfamiliar codebase)
+    - Why wrong: Aggressive cleanup without understanding the codebase risks removing code that appears unused but is dynamically referenced.
+    - Correct: /sc:cleanup --type all --preview first, review results, then /sc:cleanup --type all --safe
   </example>
 
   </examples>
@@ -69,10 +69,10 @@ description: Systematically clean up code, remove dead code, and optimize projec
   - verify-unused: Confirm files are truly unused (grep for references) before deleting
   </gotchas>
 
-  <bounds should="systematic cleanup|safety validation|intelligent algorithms" avoid="remove without analysis|override exclusions|compromise functionality" fallback="Ask user for guidance when uncertain">
-
-    Implement cleanup actions as requested | Safe mode (--safe): Only low-risk removals | Interactive mode (--interactive): Confirm each removal
-
+  <bounds>
+    <should>systematic cleanup, safety validation, and intelligent algorithms.</should>
+    <avoid>remove without analysis, override exclusions, and compromise functionality.</avoid>
+    <fallback>Ask user for guidance when uncertain.</fallback>
   </bounds>
 
   <auto_fix_threshold>

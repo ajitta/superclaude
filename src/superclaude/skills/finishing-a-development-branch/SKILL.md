@@ -18,15 +18,15 @@ hooks:
   </role>
 
   <flow>
-    1. Run the test suite: Tests should pass before presenting options — if they fail, report failures and pause
-    2. Detect the base branch: Check whether the repo uses `main` or `master`, and confirm with the user before proceeding
-    3. Present four options:
-       - Merge locally into base branch
-       - Push and create a PR
-       - Keep the branch as-is for later
-       - Discard the branch (requires typed "discard" confirmation)
-    4. Execute the chosen option: For merges, re-run tests after merging — for PRs, use `gh pr create` and report the URL — for discard, wait for explicit confirmation before deleting
-    5. Clean up worktree if applicable: Remove worktrees for merge and discard options — preserve them for PR and keep-as-is options
+  1. Run the test suite: Tests should pass before presenting options — if they fail, report failures and pause
+  2. Detect the base branch: Check whether the repo uses `main` or `master`, and confirm with the user before proceeding
+  3. Present four options:
+  - Merge locally into base branch
+  - Push and create a PR
+  - Keep the branch as-is for later
+  - Discard the branch (requires typed "discard" confirmation)
+  4. Execute the chosen option: For merges, re-run tests after merging — for PRs, use `gh pr create` and report the URL — for discard, wait for explicit confirmation before deleting
+  5. Clean up worktree if applicable: Remove worktrees for merge and discard options — preserve them for PR and keep-as-is options
   </flow>
 
   <constraints>
@@ -41,7 +41,10 @@ hooks:
   - base-branch: After auto-detecting main vs master, always confirm with user. Prevents merge into wrong base
   </gotchas>
 
-  <bounds should="execute chosen completion option, handle worktree cleanup, inform user of result" avoid="proceed with failing tests, force-push without request, auto-merge PRs"/>
+  <bounds>
+    <should>execute chosen completion option, handle worktree cleanup, inform user of result.</should>
+    <avoid>proceed with failing tests, force-push without request, auto-merge PRs.</avoid>
+  </bounds>
 
   <handoff next="/sc:git"/>
 </component>

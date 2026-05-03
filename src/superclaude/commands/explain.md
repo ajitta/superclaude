@@ -11,18 +11,18 @@ description: Provide clear explanations of code, concepts, and system behavior w
   <syntax>/sc:explain [target] [--level basic|intermediate|advanced] [--format text|examples|interactive] [--context domain]</syntax>
 
   <flow>
-    1. Analyze: Target code/concept/system
-    2. Assess: Audience level + depth
-    3. Structure: Progressive complexity
-    4. Generate: Explanations + examples
-    5. Validate: Accuracy + effectiveness
+  1. Analyze: Target code/concept/system
+  2. Assess: Audience level + depth
+  3. Structure: Progressive complexity
+  4. Generate: Explanations + examples
+  5. Validate: Accuracy + effectiveness
   </flow>
 
 
   <tools>
-    - Read/Grep/Glob: Code analysis + pattern ID
-    - TaskCreate/TaskUpdate: Multi-part explanation tracking
-    - Task: Complex explanation delegation
+  - Read/Grep/Glob: Code analysis + pattern ID
+  - TaskCreate/TaskUpdate: Multi-part explanation tracking
+  - Task: Complex explanation delegation
   </tools>
 
   <patterns>
@@ -35,16 +35,16 @@ description: Provide clear explanations of code, concepts, and system behavior w
   <examples>
 
 | Input | Output |
-|-------|--------|
+|---|---|
 | `authentication.js --level basic` | Beginner explanation |
 | `react-hooks --level intermediate --context react` | C7 patterns |
 | `microservices-system --level advanced --format interactive` | Architecture deep-dive |
 | `jwt-authentication --context security --level basic` | Security concepts |
 
   <example name="explain-without-context" type="error-path">
-    <input>/sc:explain 'the code' --level advanced</input>
-    <why_wrong>No file path or specific code reference. 'the code' is too vague to explain anything.</why_wrong>
-    <correct>/sc:explain src/auth/jwt.ts --level advanced or /sc:explain 'JWT refresh token rotation'</correct>
+    - Input: /sc:explain 'the code' --level advanced
+    - Why wrong: No file path or specific code reference. 'the code' is too vague to explain anything.
+    - Correct: /sc:explain src/auth/jwt.ts --level advanced or /sc:explain 'JWT refresh token rotation'
   </example>
 
   </examples>
@@ -55,10 +55,10 @@ description: Provide clear explanations of code, concepts, and system behavior w
   - audience: Check user context/memory for expertise level before choosing explanation depth
   </gotchas>
 
-  <bounds should="clear explanations|agent expertise|framework integration" avoid="explain without analysis|override standards|reveal sensitive" fallback="Ask user for guidance when uncertain">
-
-    Provide explanation, then complete | Preserve code unchanged during explanation | Defer implementation to /sc:implement → Output: Explanation text with examples
-
+  <bounds>
+    <should>clear explanations, agent expertise, and framework integration.</should>
+    <avoid>explain without analysis, override standards, and reveal sensitive.</avoid>
+    <fallback>Ask user for guidance when uncertain.</fallback>
   </bounds>
 
   <handoff next="/sc:implement /sc:improve /sc:document"/>

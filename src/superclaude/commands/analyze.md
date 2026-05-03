@@ -11,17 +11,17 @@ description: Comprehensive code analysis across quality, security, performance, 
   <syntax>/sc:analyze [target] [--focus quality|security|performance|architecture|rules] [--depth quick|deep] [--format text|json|report]</syntax>
 
   <flow>
-    1. Discover: Categorize files by language
-    2. Scan: Domain-specific analysis per --focus
-    3. Evaluate: Prioritized findings + severity (🔴🟡🟢)
-    4. Recommend: Actionable guidance
-    5. Report: Generate output per --format
-    6. Bridge: If findings are actionable (fixable issues, not just informational), suggest: "Would you like to create an implementation plan? → /sc:plan"
+  1. Discover: Categorize files by language
+  2. Scan: Domain-specific analysis per --focus
+  3. Evaluate: Prioritized findings + severity (🔴🟡🟢)
+  4. Recommend: Actionable guidance
+  5. Report: Generate output per --format
+  6. Bridge: If findings are actionable (fixable issues, not just informational), suggest: "Would you like to create an implementation plan? → /sc:plan"
   </flow>
 
   <outputs note="Per --format flag">
   | Format | Output | Content |
-  |--------|--------|---------|
+  |---|---|---|
   | `text` (default) | Console inline | Findings + recommendations inline |
   | `json` | `docs/analysis/<target>-<username>-YYYY-MM-DD.json` | Structured findings as JSON |
   | `report` | `docs/analysis/<target>-<username>-YYYY-MM-DD.md` | Full report with roadmap |
@@ -30,11 +30,11 @@ description: Comprehensive code analysis across quality, security, performance, 
 
 
   <tools>
-    - Glob: File discovery
-    - Grep: Pattern analysis
-    - Read: Source inspection
-    - Bash: External tools
-    - Write: Report generation (--format json|report)
+  - Glob: File discovery
+  - Grep: Pattern analysis
+  - Read: Source inspection
+  - Bash: External tools
+  - Write: Report generation (--format json|report)
   </tools>
 
   <focus_agent_mapping>
@@ -61,7 +61,7 @@ description: Comprehensive code analysis across quality, security, performance, 
   <examples>
 
 | Input | Output |
-|-------|--------|
+|---|---|
 | `/sc:analyze` | Multi-domain findings inline |
 | `src/auth --focus security --deep` | Security vulnerability assessment |
 | `--focus performance --format report` | `docs/analysis/<target>-<user>-YYYY-MM-DD.md` with bottleneck roadmap |
@@ -69,9 +69,9 @@ description: Comprehensive code analysis across quality, security, performance, 
 | `--focus rules` | Rule heatmap + maturity label + recommendations |
 
   <example name="invalid-focus" type="error-path">
-    <input>/sc:analyze --focus everything --scope system</input>
-    <why_wrong>--focus accepts: quality|security|performance|architecture|rules. 'everything' is not valid.</why_wrong>
-    <correct>/sc:analyze --scope system (omit --focus for multi-domain analysis)</correct>
+    - Input: /sc:analyze --focus everything --scope system
+    - Why wrong: --focus accepts: quality|security|performance|architecture|rules. 'everything' is not valid.
+    - Correct: /sc:analyze --scope system (omit --focus for multi-domain analysis)
   </example>
 
   </examples>
@@ -81,8 +81,10 @@ description: Comprehensive code analysis across quality, security, performance, 
   - seq-loop: If sequential thinking reaches the same conclusion twice on the same question, terminate that analysis branch and move to next topic.
   </gotchas>
 
-  <bounds should="static analysis|severity-rated findings|detailed reports" avoid="dynamic/runtime analysis|modify code|analyze external deps" fallback="Ask user for guidance when uncertain">
-    Produce analysis report, then complete | Preserve source code unchanged | Report issues; defer fixes to /sc:improve or /sc:cleanup
+  <bounds>
+    <should>static analysis, severity-rated findings, and detailed reports.</should>
+    <avoid>dynamic/runtime analysis, modify code, and analyze external deps.</avoid>
+    <fallback>Ask user for guidance when uncertain.</fallback>
   </bounds>
 
 

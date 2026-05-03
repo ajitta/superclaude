@@ -140,12 +140,29 @@ class TestCommandCrossFieldConsistency:
         )
 
     def test_has_bounds(self, command):
+        """<bounds> must use sub-tag form: <should>, <avoid>, optional <fallback>.
+
+        Per .claude/rules/command-authoring.md and xml-prose-format.md.
+        Legacy attribute and body-labeled forms are rejected (commit S390).
+        """
         stem, content, _ = command
-        assert "<bounds " in content, f"{stem}: missing <bounds> tag"
-        should_attr = extract_xml_attr(content, "bounds", "should")
-        avoid_attr = extract_xml_attr(content, "bounds", "avoid")
-        assert should_attr, f"{stem}: <bounds> missing 'should' attribute"
-        assert avoid_attr, f"{stem}: <bounds> missing 'avoid' attribute"
+        assert "<bounds>" in content, (
+            f"{stem}: missing <bounds> opening tag (sub-tag form)"
+        )
+        body = extract_xml_content(content, "bounds")
+        assert body, f"{stem}: <bounds> body is empty"
+        assert re.search(r"<should>.+?</should>", body, re.DOTALL), (
+            f"{stem}: <bounds> missing <should> sub-tag"
+        )
+        assert re.search(r"<avoid>.+?</avoid>", body, re.DOTALL), (
+            f"{stem}: <bounds> missing <avoid> sub-tag"
+        )
+        assert not re.search(r"<bounds\s+\w+\s*=", content), (
+            f"{stem}: <bounds> uses legacy attribute form — convert to sub-tag form"
+        )
+        assert not re.search(r"^\s*-\s+(Should|Avoid|Fallback):\s+", body, re.MULTILINE), (
+            f"{stem}: <bounds> uses legacy body-labeled form — convert to sub-tag form"
+        )
 
     def test_has_handoff(self, command):
         stem, content, _ = command

@@ -47,14 +47,18 @@
 
   <examples>
 | Input | Thoughts | Strategy |
-|-------|----------|----------|
+|---|---|---|
 | why is API slow under load | 6-8 | Hypothesis-test: connection pool → query plan → serialization → GC |
 | design auth microservice | 8-12 | Linear: requirements → protocols → token strategy → session → failure modes |
 | debug intermittent test failure | 5-7 | Branch-compare: timing issue vs state leak vs resource contention |
 | evaluate React vs Vue for project | 6-8 | Branch-compare: branch per framework → score on criteria → recommend |
   </examples>
 
-  <bounds should="multi-step reasoning|systematic analysis|hypothesis testing|trade-off evaluation" avoid="code generation|simple explanations|documentation writing" fallback="Use native Claude reasoning for single-step tasks, Adaptive Thinking for moderate complexity"/>
+  <bounds>
+    <should>multi-step reasoning, systematic analysis, hypothesis testing, and trade-off evaluation.</should>
+    <avoid>code generation, simple explanations, and documentation writing.</avoid>
+    <fallback>Use native Claude reasoning for single-step tasks, Adaptive Thinking for moderate complexity.</fallback>
+  </bounds>
 
   <handoff next="/sc:analyze /sc:troubleshoot /sc:research /sc:design"/>
 </component>

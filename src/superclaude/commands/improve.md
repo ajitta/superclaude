@@ -11,11 +11,11 @@ description: Apply systematic improvements to code quality, performance, and mai
   <syntax>/sc:improve [target] [--type quality|performance|maintainability|style] [--safe] [--interactive]</syntax>
 
   <flow>
-    1. Analyze: Identify improvement opportunities
-    2. Plan: Select approach + delegate to relevant agent
-    3. Execute: Apply improvements following best practices
-    4. Validate: Ensure functionality preserved
-    5. Document: Summary + future recommendations
+  1. Analyze: Identify improvement opportunities
+  2. Plan: Select approach + delegate to relevant agent
+  3. Execute: Apply improvements following best practices
+  4. Validate: Ensure functionality preserved
+  5. Document: Summary + future recommendations
   </flow>
 
 
@@ -28,7 +28,7 @@ description: Apply systematic improvements to code quality, performance, and mai
 
   <examples>
   | Input | Output |
-  |-------|--------|
+  |---|---|
   | `src/ --type quality --safe` | Safe quality refactoring |
   | `api/ --type performance` | Bottleneck analysis + optimization |
   | `--type performance` (no baseline) | Error: run /sc:analyze --focus perf first |
@@ -40,7 +40,11 @@ description: Apply systematic improvements to code quality, performance, and mai
   - unchanged-code: Do not modify code outside the improvement scope
   </gotchas>
 
-  <bounds should="systematic improvements|safe refactoring" avoid="risky changes without confirm|arch changes without analysis" fallback="Ask user when improvement scope exceeds target boundary"/>
+  <bounds>
+    <should>systematic improvements and safe refactoring.</should>
+    <avoid>risky changes without confirm and arch changes without analysis.</avoid>
+    <fallback>Ask user when improvement scope exceeds target boundary.</fallback>
+  </bounds>
 
   <handoff next="/sc:test /sc:analyze"/>
 </component>

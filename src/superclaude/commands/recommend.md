@@ -11,10 +11,10 @@ description: Ultra-intelligent command recommendation engine for optimal SuperCl
   <syntax>/sc:recommend [request] [--estimate] [--alternatives] [--expertise beginner|intermediate|expert]</syntax>
 
   <flow>
-    1. Analyze: User request + project context
-    2. Classify: Category + expertise level
-    3. Map: Keywords → commands + flags
-    4. Recommend: Workflow + MCP flags + agents
+  1. Analyze: User request + project context
+  2. Classify: Category + expertise level
+  3. Map: Keywords → commands + flags
+  4. Recommend: Workflow + MCP flags + agents
   </flow>
 
   <keyword_map>
@@ -45,7 +45,7 @@ description: Ultra-intelligent command recommendation engine for optimal SuperCl
 
   <examples>
   | Input | Output |
-  |-------|--------|
+  |---|---|
   | `'login page broken, blank screen'` | debug+web: /sc:troubleshoot --trace --seq → /sc:analyze --focus quality |
   | `'make dashboard load faster'` | perf: /sc:analyze --focus perf → /sc:improve --type performance |
   | `'improve the code'` | ambiguous: ask what aspect (perf/quality/security/arch) → /sc:analyze |
@@ -57,7 +57,11 @@ description: Ultra-intelligent command recommendation engine for optimal SuperCl
   - flag-match: Match recommended flags to actual task needs, not maximum capability
   </gotchas>
 
-  <bounds should="intelligent mapping|project context|expertise adaptation" avoid="execute commands|modify files" fallback="Ask user to clarify when request is too ambiguous to map"/>
+  <bounds>
+    <should>intelligent mapping, project context, and expertise adaptation.</should>
+    <avoid>execute commands and modify files.</avoid>
+    <fallback>Ask user to clarify when request is too ambiguous to map.</fallback>
+  </bounds>
 
   <handoff next="/sc:analyze /sc:implement /sc:design /sc:troubleshoot"/>
 </component>

@@ -88,7 +88,7 @@
 
   <examples>
 | Input | Action | Reason |
-|-------|--------|--------|
+|---|---|---|
 | test login flow | navigate → type → click → assert snapshot | Real browser interaction |
 | verify responsive navbar | screenshot at 3 viewports → compare | Visual validation |
 | test offline behavior | browser_network_state_set(offline) → verify | Network state testing |
@@ -96,7 +96,11 @@
 | test auth cookie handling | browser_cookie_set → navigate → assert | Storage interaction |
   </examples>
 
-  <bounds should="browser automation|E2E testing|visual validation|accessibility testing|network mocking|storage management" avoid="unit testing|API testing|static code analysis|performance profiling" fallback="Use Chrome DevTools for performance, native test runner for unit tests"/>
+  <bounds>
+    <should>browser automation, E2E testing, visual validation, accessibility testing, network mocking, and storage management.</should>
+    <avoid>unit testing, API testing, static code analysis, and performance profiling.</avoid>
+    <fallback>Use Chrome DevTools for performance, native test runner for unit tests.</fallback>
+  </bounds>
 
   <handoff next="/sc:test --type e2e /sc:analyze --focus a11y /sc:review"/>
 </component>

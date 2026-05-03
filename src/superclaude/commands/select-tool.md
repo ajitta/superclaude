@@ -11,11 +11,11 @@ description: Intelligent MCP tool selection based on complexity scoring and oper
   <syntax>/sc:select-tool [operation] [--analyze] [--explain]</syntax>
 
   <flow>
-    1. Parse: Operation type + scope + file count
-    2. Score: Multi-dimensional complexity
-    3. Match: Requirements vs capabilities
-    4. Select: Optimal tool via scoring matrix
-    5. Validate: Selection accuracy + confidence
+  1. Parse: Operation type + scope + file count
+  2. Score: Multi-dimensional complexity
+  3. Match: Requirements vs capabilities
+  4. Select: Optimal tool via scoring matrix
+  5. Validate: Selection accuracy + confidence
   </flow>
 
 
@@ -42,15 +42,15 @@ description: Intelligent MCP tool selection based on complexity scoring and oper
   <examples>
 
 | Input | Output |
-|-------|--------|
+|---|---|
 | `'rename function across 10 files' --analyze` | Serena (LSP, semantic) |
 | `'update console.log to logger.info' --explain` | ast-grep + Edit (structural pattern) |
 | `'save project context'` | Serena (memory direct) |
 
   <example name="wrong-tool-choice" type="error-path">
-    <input>/sc:select-tool 'rename a variable across the project' → suggests ast-grep</input>
-    <why_wrong>Variable renaming is a semantic operation. ast-grep does structural patterns, not semantic renames.</why_wrong>
-    <correct>Serena (LSP-based rename) for semantic operations. ast-grep for structural pattern search only.</correct>
+    - Input: /sc:select-tool 'rename a variable across the project' → suggests ast-grep
+    - Why wrong: Variable renaming is a semantic operation. ast-grep does structural patterns, not semantic renames.
+    - Correct: Serena (LSP-based rename) for semantic operations. ast-grep for structural pattern search only.
   </example>
   </examples>
 
@@ -60,10 +60,10 @@ description: Intelligent MCP tool selection based on complexity scoring and oper
   - mcp-justify: Only recommend MCP when native tools are insufficient. State why
   </gotchas>
 
-  <bounds should="optimal selection|complexity scoring|sub-100ms decision" avoid="override explicit preference|skip analysis|compromise performance" fallback="Ask user for guidance when uncertain">
-
-    Provide tool selection recommendation, then complete | Do not execute the selected tool automatically | Defer execution to the user or calling command → Output: Tool recommendation with scoring rationale
-
+  <bounds>
+    <should>optimal selection, complexity scoring, and sub-100ms decision.</should>
+    <avoid>override explicit preference, skip analysis, and compromise performance.</avoid>
+    <fallback>Ask user for guidance when uncertain.</fallback>
   </bounds>
 
   <handoff next="/sc:implement /sc:analyze"/>
