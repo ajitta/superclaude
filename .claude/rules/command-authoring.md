@@ -33,42 +33,47 @@ Never add these — SSOT: `.claude/rules/schemas.yaml` (`forbidden_command_field
 
 ## XML Template
 
+> Conforms to `.claude/rules/xml-prose-format.md`: single root, `snake_case` section tags, short-line lists (**Numbered** `1.` for ordered procedures, or `-` prefix as **Plain**, **Labeled**, **Named** per item type), plural↔singular containers (`<examples><example>`) for multi-line items.
+
 ```xml
 <component name="command-name" type="command">
 
   <role>
     /sc:command-name
-    <mission>Single sentence matching description</mission>
+    <mission>Single sentence matching description.</mission>
   </role>
 
   <syntax>/sc:command-name [args] [--flags]</syntax>
 
   <flow>
-    1. Step: Description
-    2. Step: Description
+  1. Verb-leading description of the step (≥2 steps; sequence is load-bearing).
   </flow>
 
-  <outputs note="Per execution">
-  | Artifact | Purpose |
-  |----------|---------|
-  | Type | What it produces |
+  <outputs>
+  - Artifact: purpose
   </outputs>
 
   <mcp servers="seq|c7|..."/>
-  <tools>- ToolName: purpose</tools>
+
+  <tools>
+  - ToolName: purpose
+  </tools>
 
   <gotchas>
-  - pattern-name: Concrete failure + action instruction (2-5 items)
+  - pattern-name: concrete failure + action instruction (2-5 items)
   </gotchas>
 
   <examples>
-  | Input | Output |
-  |-------|--------|
-  | `/sc:command-name arg` | Expected result |
+    <example>
+    user: `/sc:command-name arg`
+    assistant: prose describing the expected result.
+    </example>
   </examples>
 
-  <bounds should="core capabilities" avoid="out-of-scope actions" fallback="Escalation path">
-    Completion criteria and handoff behavior
+  <bounds>
+  - Should: core capabilities (in-scope description)
+  - Avoid: out-of-scope actions
+  - Fallback: escalation path (optional for commands — use when out-of-scope handling is non-obvious)
   </bounds>
 
   <handoff next="/sc:next1 /sc:next2"/>
@@ -78,10 +83,12 @@ Never add these — SSOT: `.claude/rules/schemas.yaml` (`forbidden_command_field
 ### XML Rules
 
 - `<component name="...">` matches filename stem, `type="command"`
+- All multi-word tag names use `snake_case`
+- Short enums: **Numbered** (`1.` for ordered procedures: `<flow>`), **Labeled** (`- Label:` fixed-set labels: `<bounds>` Should/Avoid/Fallback), **Named** (`- identifier-name:` per-item identifiers: `<outputs>`, `<tools>`, `<gotchas>`); `<examples>` uses `<example>` sub-tags for multi-line items
 - `<role>` — first line is `/sc:command-name`, then `<mission>`
 - `<mission>` — shares ≥30% significant words with frontmatter `description`
-- `<flow>` — numbered execution steps (≥2)
-- `<bounds>` — `should` + `avoid` required; `fallback` optional (use when out-of-scope handling is non-obvious; example at line 70 demonstrates)
+- `<flow>` — at least two numbered steps in execution order
+- `<bounds>` — body-based labeled lines: `- Should: …` / `- Avoid: …` / `- Fallback: …` (no attributes). `Should` + `Avoid` required; `Fallback` optional (use when out-of-scope handling is non-obvious)
 - `<handoff next="...">` — 2-3 natural next commands
 - Optional: `<outputs>`, `<mcp>`, `<tools>`, `<gotchas>`, `<examples>`
 
@@ -105,4 +112,4 @@ Never add these — SSOT: `.claude/rules/schemas.yaml` (`forbidden_command_field
 | Vague description | Poor `/menu` display | Be specific: "Build X with Y" |
 | Missing `<bounds>` | No scope/safety boundary | Add `should`/`avoid` |
 | Mission doesn't match description | Confusing inconsistency | Align ≥30% word overlap |
-| Decorative `note=` XML attrs | Unparsed boilerplate, token waste | `note=` only for scope/safety/version/reference/quantified constraint |
+| Decorative `note=` XML attrs | Unparsed boilerplate, token waste | See xml-prose-format.md "Attributes vs. Body" — `note=` only for scope/safety/version/reference/quantified constraint |

@@ -160,6 +160,7 @@ CC parser uses literal key matching with mixed conventions; do not reflexively k
 ## Body Structure (XML `<component>`)
 
 > See top-of-file house-style note: this XML body convention diverges from Anthropic's guidance and is intentional.
+> Conforms to `.claude/rules/xml-prose-format.md`: single root, `snake_case` section tags, short-line lists (**Numbered** `1.` for ordered procedures, or `-` prefix as **Plain**, **Labeled**, **Named** per item type), plural↔singular containers (`<examples><example>`) for multi-line items.
 
 본문은 agent와 동일한 XML 패턴. 500줄 초과 시 `references/`로 분리.
 
@@ -170,22 +171,21 @@ CC parser uses literal key matching with mixed conventions; do not reflexively k
   <!-- Optional tags: <references>, <syntax>, <flow>, <tools>, <examples> — skill-shape-dependent -->
 
   <role>                                                     <!-- required -->
-    <mission>Single sentence purpose</mission>
+    <mission>Single sentence purpose.</mission>
   </role>
 
-  <references note="Load on demand — progressive disclosure"> <!-- optional -->
-  - `references/file.md` — What + when to read
+  <references>                                               <!-- optional, load-on-demand -->
+  - `references/file.md` — what it covers + when to load
   </references>
 
   <syntax>/skill-name [args] [--flags]</syntax>              <!-- optional -->
 
   <flow>                                                     <!-- optional -->
-    1. Step one
-    2. Step two
+  1. Verb-leading description (≥2 steps; sequence is load-bearing).
   </flow>
 
   <tools>                                                    <!-- optional -->
-    - ToolName: purpose
+  - ToolName: purpose
   </tools>
 
   <gotchas>                                                  <!-- required -->
@@ -193,12 +193,17 @@ CC parser uses literal key matching with mixed conventions; do not reflexively k
   </gotchas>
 
   <examples>                                                 <!-- optional -->
-  | Input | Output |
-  |-------|--------|
-  | `/skill-name arg` | Expected result |
+    <example>
+    user: `/skill-name arg`
+    assistant: prose describing the expected result.
+    </example>
   </examples>
 
-  <bounds should="core capabilities" avoid="out-of-scope actions"/>  <!-- required -->
+  <bounds>                                                   <!-- required -->
+  - Should: core capabilities (in-scope description)
+  - Avoid: out-of-scope actions
+  - Fallback: (optional — skills are short-lived; implicit fallback is "skill ends, control returns to caller")
+  </bounds>
   <handoff next="/sc:next1 /sc:next2"/>                      <!-- required -->
 </component>
 ```
@@ -207,7 +212,9 @@ Required tags appear in 5/5 shipped skills. Optional tags are skill-shape-depend
 
 ### Body rules
 - `type="skill"` 필수 (agent와 구분)
-- `<bounds>` — `should` + `avoid` required; `fallback` optional. Skills are short-lived — implicit fallback is "skill ends, control returns to caller". Use explicit `fallback=` only if the recovery posture is non-obvious.
+- All multi-word tag names use `snake_case`
+- Short enums: **Numbered** (`1.` for ordered procedures: `<flow>`), **Labeled** (`- Label:` fixed-set labels: `<bounds>` Should/Avoid/Fallback), **Named** (`- identifier-name:` per-item identifiers: `<references>`, `<tools>`, `<gotchas>`); `<examples>` uses `<example>` sub-tags for multi-line user/assistant exchanges
+- `<bounds>` — body-based labeled lines: `- Should: …` / `- Avoid: …` / `- Fallback: …` (no attributes). `Should` + `Avoid` required; `Fallback` optional. Skills are short-lived — implicit fallback is "skill ends, control returns to caller". Use explicit `Fallback:` line only if the recovery posture is non-obvious.
 - `<gotchas>` — **프로젝트 특유** 실패 패턴만 (force-push 금지 같은 일반론은 hooks로). 분기별 리뷰, 90일 미트리거 항목 제거
 - 본문 ≤500 lines. 상세 내용은 `references/`로 분리
 
@@ -252,4 +259,4 @@ These are CC runtime bugs verified open as of 2026-04-25. They affect skill beha
 | `user-invocable: false`로 Claude 차단 시도 | /menu만 가림, 자동 호출은 여전히 가능 | `disable-model-invocation: true`로 교체 |
 | 모든 내용 SKILL.md 인라인 | Level 2 로딩 시 bloat | `<references>` + `references/` |
 | 일반론 gotcha ("force-push 금지") | gotcha 신호 낭비 | 일반 안전규칙은 hooks, gotcha는 프로젝트 특유만 |
-| 장식용 XML `note=` 속성 | 미파싱 boilerplate, 토큰 낭비 | `note=`는 scope/safety/version/reference/quantified constraint일 때만 허용 |
+| 장식용 XML `note=` 속성 | 미파싱 boilerplate, 토큰 낭비 | xml-prose-format.md "Attributes vs. Body" 참조 — scope/safety/version/reference/quantified constraint일 때만 허용 |

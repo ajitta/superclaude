@@ -28,44 +28,52 @@ name: brainstorming
 
 ## The 4-Axis Requirement
 
-Every mode **must** define all four axes. Each axis has a different content style:
+Every mode **must** define all four axes (per `.claude/rules/xml-prose-format.md`):
 
-| Axis | Tag | Purpose | Style | Example |
-|------|-----|---------|-------|---------|
-| **Thinking** | `<thinking>` | Cognitive principles — how to reason | Bullet list of named heuristics (3-5) | `- Diverge then Converge: Generate breadth before filtering` |
-| **Communication** | `<communication>` | Expression style — how to present | Pipe-separated directives (1 line) | `Ask questions over giving answers \| Frame as possibilities` |
-| **Priorities** | `<priorities>` | Trade-offs — what to optimize | `A > B` comparison pairs | `Exploration > efficiency \| Understanding > solution` |
-| **Behaviors** | `<behaviors>` | Action patterns — what to do | Bullet list of named patterns (3-5) | `- Socratic: Ask probing questions to uncover requirements` |
+| Axis | Tag | Purpose | Style |
+|------|-----|---------|-------|
+| **Thinking** | `<thinking>` | Cognitive principles — how to reason | 3-5 `- Principle: explanation` lines |
+| **Communication** | `<communication>` | Expression style — how to present | Single-line prose with directives joined by " \| " |
+| **Priorities** | `<priorities>` | Trade-offs — what to optimize | Single-line prose with `A > B` pairs joined by " \| " |
+| **Behaviors** | `<behaviors>` | Action patterns — what to do | 3-5 `- Pattern-Name: description` lines |
 
 ## XML Template
+
+> Conforms to `.claude/rules/xml-prose-format.md`: single root, `snake_case` section tags, short-line lists (**Numbered** `1.` for ordered procedures, or `-` prefix as **Plain**, **Labeled**, **Named** per item type), plural↔singular containers (`<examples><example>`) for multi-line items. Modes use **Named** for `<thinking>` (Principle-Name) and `<behaviors>` (Pattern-Name); single-line prose for `<communication>`, `<priorities>`, `<outcomes>`. Modes have no ordered-procedure tag.
 
 ```xml
 <component name="mode-name" type="mode">
   <role>
-    <mission>Single sentence defining the cognitive posture</mission>
+    <mission>Single sentence defining the cognitive posture.</mission>
   </role>
 
   <thinking>
-  - Principle: Explanation (3-5 items)
+  - Principle-Name: explanation in prose (3-5 items)
   </thinking>
 
-  <communication>Style directives separated by | pipes</communication>
+  <communication>Style directives joined by | pipes on a single prose line.</communication>
 
-  <priorities>Trade-off A > Trade-off B | C > D (3-5 items)</priorities>
+  <priorities>Trade-off A > Trade-off B | C > D | E > F.</priorities>
 
   <behaviors>
-  - Pattern-Name: Concrete behavioral description (3-5 items)
+  - Pattern-Name: concrete behavioral description (3-5 items)
   </behaviors>
 
-  <outcomes>Expected results separated by | pipes</outcomes>
+  <outcomes>Expected results joined by | pipes on a single prose line.</outcomes>
 
   <examples>
-  | Input | Response |
-  |-------|----------|
-  | "user scenario" | Expected mode-shaped response |
+    <example>
+    user: short scenario.
+    assistant: prose response showing the mode-shaped behavior.
+    </example>
   </examples>
 
-  <bounds should="core capabilities" avoid="out-of-scope actions" fallback="Revert to default behavior when inapplicable"/>
+  <bounds>
+  - Should: core capabilities (in-scope description)
+  - Avoid: out-of-scope actions
+  - Fallback: revert to default behavior when the cognitive overlay does not apply
+  </bounds>
+
   <handoff next="/sc:command1 /sc:command2"/>
 </component>
 ```
@@ -98,7 +106,7 @@ Operational parameters too detailed for the mode itself go in sibling `type="con
 
 1. Create `src/superclaude/modes/MODE_PascalCase.md` starting with `<component>`
 2. Define all 4 axes: thinking, communication, priorities, behaviors
-3. Add `<bounds>` (`should` + `avoid` required; `fallback` recommended for modes — explicit recovery when overlay doesn't apply) and `<handoff>`
+3. Add `<bounds>` body-based labeled lines `- Should: …` / `- Avoid: …` / `- Fallback: …` (`Should` + `Avoid` required; `Fallback` recommended for modes — explicit recovery when overlay doesn't apply) and `<handoff>`
 4. Add trigger to `scripts/context_loader.py` TRIGGER_MAP
 5. Add flag to `core/FLAGS.md` modes section
 6. Run `uv run pytest tests/unit/test_mode_structure.py -v`
@@ -115,4 +123,4 @@ Operational parameters too detailed for the mode itself go in sibling `type="con
 | Tool routing in mode | Tool selection belongs in FLAGS | Move to `core/FLAGS.md` |
 | Vague mission (<10 chars) | Doesn't guide behavior | Be specific about posture |
 | `type="config"` in mode test | Config files aren't modes | Exclude from mode fixture |
-| Decorative `note=` XML attrs | Unparsed boilerplate, token waste | `note=` only for scope/safety/version/reference/quantified constraint |
+| Decorative `note=` XML attrs | Unparsed boilerplate, token waste | See xml-prose-format.md "Attributes vs. Body" — `note=` only for scope/safety/version/reference/quantified constraint |

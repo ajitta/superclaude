@@ -77,11 +77,13 @@ Do not add `effort: xhigh` to an agent just because the domain "feels" coding-he
 
 ## XML Body Structure
 
+> Conforms to `.claude/rules/xml-prose-format.md`: single root, `snake_case` section tags, short-line lists (**Numbered** `1.` for ordered procedures, or `-` prefix as **Plain**, **Labeled**, **Named** per item type), plural↔singular containers (`<examples><example>`) for multi-line items.
+
 ```xml
 <component name="agent-name" type="agent">
   <role>
-    <mission>Single sentence matching description (without triggers)</mission>
-    <mindset>Behavioral philosophy in 1-2 sentences</mindset>
+    <mission>Single sentence matching description, without triggers.</mission>
+    <mindset>Behavioral philosophy in one or two sentences.</mindset>
   </role>
 
   <focus>
@@ -89,51 +91,56 @@ Do not add `effort: xhigh` to an agent just because the domain "feels" coding-he
   </focus>
 
   <actions>
-  1. Verb: Description (4-5 numbered steps)
+  1. Verb-leading description of the step (4-5 steps; sequence is load-bearing).
   </actions>
 
   <outputs>
-  - Type: deliverables (3-4 items)
+  - Type: deliverable purpose (3-4 items)
   </outputs>
 
   <tool_guidance>
-  - Proceed: actions to do freely | Serena-First: prefer symbolic tools for code exploration
-  - Ask First: actions requiring confirmation (with specific thresholds)
-  - Never: actions the agent must never take
+  - Proceed: actions to do freely. Serena-First: prefer symbolic tools for code exploration.
+  - Ask First: actions requiring confirmation, with specific thresholds.
+  - Never: actions the agent must never take.
   </tool_guidance>
 
-  <checklist note="Completion criteria">
-    - [ ] Concrete, verifiable items (3-5)
+  <checklist>
+  - Concrete, verifiable completion criterion stated as one line (3-5 items)
   </checklist>
 
   <memory_guide>
-  - CategoryName: what to remember (≤80 chars)
-    <refs agents="related-agent1,related-agent2"/>
+  - CategoryName-Hyphenated: ≤80 chars description. Related: agent-1, agent-2 (optional, ≤3)
   </memory_guide>
 
   <examples>
-  | Trigger | Output |
-  |---------|--------|
-  | "user input" | Expected agent response pattern |
+    <example>
+    user: short prompt illustrating a trigger.
+    assistant: prose response showing the expected agent behavior.
+    </example>
   </examples>
 
-  <handoff next="/sc:command1 /sc:command2"/>
-
   <gotchas>
-  - pattern-name: Concrete failure + action instruction (2-5 items)
+  - pattern-name: concrete failure + action instruction (2-5 items)
   </gotchas>
 
-  <bounds should="core capabilities" avoid="out-of-scope actions" fallback="Escalation path"/>
+  <bounds>
+  - Should: core capabilities (in-scope description)
+  - Avoid: out-of-scope actions
+  - Fallback: escalation path (recommended for agents — long-lived, explicit recovery posture is high-leverage)
+  </bounds>
+
+  <handoff next="/sc:command1 /sc:command2"/>
 </component>
 ```
 
 ### XML Rules
 
 - `<mission>` — shares ≥30% significant words with `description`
-- `<tool_guidance>` — no attributes, content only (Proceed/Ask First/Never)
-- `<bounds>` — `should` + `avoid` required; `fallback` recommended (agents are long-lived; explicit recovery posture is high-leverage)
+- All multi-word tag names use `snake_case` (`tool_guidance`, `memory_guide`)
+- Short enums: **Numbered** (`1.` for ordered procedures: `<actions>`), **Plain** (`-` for unordered criteria: `<checklist>`), **Labeled** (`- Label:` fixed-set labels: `<tool_guidance>` Proceed/Ask First/Never, `<bounds>` Should/Avoid/Fallback), **Named** (`- identifier-name:` per-item identifiers: `<focus>`, `<outputs>`, `<gotchas>`, `<memory_guide>`); `<examples>` uses `<example>` sub-tags for multi-line user/assistant exchanges
+- `<bounds>` — body-based labeled lines: `- Should: …` / `- Avoid: …` / `- Fallback: …` (no attributes). `Should` + `Avoid` required; `Fallback` recommended (agents are long-lived; explicit recovery posture is high-leverage)
 - `<handoff>` — 2-3 natural next commands
-- `note=` attrs allowed only for: scope, safety ("do NOT"), version gate, reference location, quantified constraint. Remove if tag/content already conveys it
+- `note=` attribute restricted to scope / safety / version / reference / quantified constraint (see xml-prose-format.md "Attributes vs. Body")
 
 ## Memory Guide (required)
 
@@ -142,15 +149,14 @@ Do not add `effort: xhigh` to an agent just because the domain "feels" coding-he
 **Format**:
 ```xml
 <memory_guide>
-- CategoryName: what to remember (1-line, ≤80 chars)
-  <refs agents="related-agent1,related-agent2"/>
+- CategoryName-Hyphenated: what to remember (1-line, ≤80 chars). Related: agent-1, agent-2
 </memory_guide>
 ```
 
 **Rules**:
 - 3-5 categories, specific to the agent's domain
 - PascalCase-Hyphenated names (e.g., `Debug-Patterns`, `API-Decisions`)
-- `<refs agents="...">` — up to 3 related agents
+- Related-agent pointers (≤3) appended inline as "Related: agent-1, agent-2" — no nested `<refs>` tag (would violate xml-prose-format depth rule)
 - Source files always use `memory: project`. The installer rewrites this to match install scope: `user` → `memory: user`, `project` → unchanged, `local` → `memory: local`. This keeps agent memory storage aligned with where the agent is installed (see `cli/install_components.py::_rewrite_agent_memory_scope`).
 
 ## Code Exploration (Serena-First)
