@@ -162,10 +162,7 @@ INSTRUCTION_MAP = {
         "tavily_extract (full-text from URLs), tavily_research (multi-source synthesis), "
         "tavily_crawl (site-wide extraction), tavily_map (URL discovery). "
         "Use for current info post-knowledge-cutoff, multi-source research, fact-checking. "
-        "Channel (3-way): MCP default for <5 queries, in-conversation answers, structured parallel, "
-        "depth=quick|standard. Switch to tavily-cli skill for >=5 chained queries, depth=deep|exhaustive (>=20 sources), "
-        "file output (--output-dir), advanced filters (--include-domains, --time-range), shell pipelines. "
-        "Fallback: native WebSearch/WebFetch only when MCP+CLI both absent."
+        "Fallback: native WebSearch/WebFetch only when MCP unavailable."
     ),
 }
 

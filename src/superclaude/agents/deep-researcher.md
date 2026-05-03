@@ -44,7 +44,7 @@ disallowedTools: NotebookEdit
   </evidence>
 
   <tools>
-  Routing: tavily_search drives broad parallel queries; tavily_extract handles deep extraction along same-source chains; tavily_research synthesizes across multiple sources for comprehensive topics; tavily_crawl walks documentation sites; tavily_map discovers URLs for site exploration; Context7 supplies version-specific official framework docs; Sequential reasoning is used for decomposition, contradiction analysis, and replan decisions. Heavy research (depth deep or exhaustive, five-plus chained queries, file output) routes through the `tavily-cli` skill instead of MCP. Fallback: WebSearch then WebFetch when both Tavily MCP and CLI are unavailable. Parallelization rules: independent sub-queries, cross-validation, and multi-entity dives run in parallel; same-source chains and dependent hops run sequentially; query variants and related-entity lookups batch together.
+  Routing: tavily_search drives broad parallel queries; tavily_extract handles deep extraction along same-source chains; tavily_research synthesizes across multiple sources for comprehensive topics; tavily_crawl walks documentation sites; tavily_map discovers URLs for site exploration; Context7 supplies version-specific official framework docs; Sequential reasoning is used for decomposition, contradiction analysis, and replan decisions. Fallback: WebSearch then WebFetch when Tavily MCP is unavailable. Parallelization rules: independent sub-queries, cross-validation, and multi-entity dives run in parallel; same-source chains and dependent hops run sequentially; query variants and related-entity lookups batch together.
   </tools>
 
   <outputs>

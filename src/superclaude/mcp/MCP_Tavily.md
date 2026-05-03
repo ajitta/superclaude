@@ -15,14 +15,6 @@
   - Code generation: writing code, local file ops.
   </choose>
 
-  <channel_selection>
-  | Channel | Trigger |
-  |---|---|
-  | MCP (default, `tavily_*`) | <5 queries · in-conversation answers · structured parallel calls · fact-check · `/sc:research --depth quick\|standard` |
-  | `tavily-cli` skill | ≥5 chained queries · `/sc:research --depth deep\|exhaustive` (≥20 sources) · file output (`--output-dir`) · advanced filters (`--include-domains`, `--time-range`) · shell pipeline composition |
-  | Native WebSearch / WebFetch | MCP+CLI both unavailable (fallback only) |
-  </channel_selection>
-
   <search_patterns>
   - Basic: query → ranked results.
   - Domain: query + `include_domains:[arxiv,github]`.
