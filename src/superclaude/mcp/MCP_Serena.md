@@ -3,13 +3,7 @@
     <mission>Semantic code understanding with project memory and session persistence</mission>
   </role>
 
-  ## Initialization
-  Project auto-activates from CWD via `--project-from-cwd`. Onboarding runs automatically on first project use.
-
-  Recovery actions (only when needed):
-  - If the agent ignores Serena tools or appears to have forgotten the manual: call `initial_instructions` once. (Permanent fix: install Serena's SessionStart hook — see "Optional: Serena hooks" below.)
-  - To verify project setup: `check_onboarding_performed`.
-  - If onboarding hasn't run: `onboarding`.
+  Project auto-activates from CWD. Recovery: call `initial_instructions` if the agent forgets the manual; `check_onboarding_performed` / `onboarding` if setup is unverified.
 
   <tools note="17 tools active in claude-code context">
     **Symbol Operations (8):**
@@ -99,46 +93,6 @@
     - `next_actions` — queued work items
     - `session_[YYYY-MM-DD]` — dated session snapshots
     - `learnings_[topic]` — accumulated insights by topic
-
-  ## Configuration
-    **Project config:** `.serena/project.yml`
-    - `languages:` — LSP language servers to start
-    - `included_optional_tools:` — enable thinking/context tools
-    - `excluded_tools:` — disable specific tools
-    - `encoding:` — text file encoding (default: utf-8)
-    - `ignore_all_files_in_gitignore:` — respect .gitignore
-
-    **Install:** `claude mcp add --scope user serena -- serena start-mcp-server --context=claude-code --project-from-cwd`
-    (Equivalent shorthand: `serena setup claude-code`. Already installed via old command? `claude mcp remove serena` first, then re-run.)
-
-    **Scope choice** — `superclaude install` accepts `--scope user|project|local`. Upstream `serena setup claude-code` hardcodes `--scope user`; SC defaults to the same. Trade-offs:
-
-    | Scope | Stored in | Effect with `--project-from-cwd` |
-    |---|---|---|
-    | `user` (recommended) | `~/.claude.json` | One registration; auto-detects project per CWD at launch. |
-    | `project` | `.mcp.json` (committed) | Team-shared registration; each clone needs Serena binary locally; `--project-from-cwd` is redundant per-repo but harmless. |
-    | `local` | `~/.claude.json` (per-project) | Per-machine + per-repo; defeats the "register once" benefit of `--project-from-cwd`. |
-
-    **Optional: Serena hooks (recommended by upstream)** — Counteracts agent drift (forgetting Serena's manual mid-session) and missing tool-load on session start. Add to `.claude/settings.json` (user or project scope):
-
-    ```json
-    {
-      "hooks": {
-        "PreToolUse": [
-          { "matcher": "", "hooks": [{ "type": "command", "command": "serena-hooks remind --client=claude-code" }] },
-          { "matcher": "mcp__serena__*", "hooks": [{ "type": "command", "command": "serena-hooks auto-approve --client=claude-code" }] }
-        ],
-        "SessionStart": [
-          { "matcher": "", "hooks": [{ "type": "command", "command": "serena-hooks activate --client=claude-code" }] }
-        ],
-        "Stop": [
-          { "matcher": "", "hooks": [{ "type": "command", "command": "serena-hooks cleanup --client=claude-code" }] }
-        ]
-      }
-    }
-    ```
-
-    Prerequisite: `serena-hooks` binary on PATH (e.g., `uv tool install --from git+https://github.com/oraios/serena serena`). Caveat: the `mcp__serena__*` PreToolUse hook auto-approves all Serena tool calls — if you rely on permission prompts as a guardrail, drop that one entry. Source: `oraios.github.io/serena/02-usage/030_clients.html`.
 
   <examples>
 | Input | Tool | Reason |

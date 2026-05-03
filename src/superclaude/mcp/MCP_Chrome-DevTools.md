@@ -4,12 +4,6 @@
     <flags>--perf, --devtools</flags>
   </role>
 
-  ## Plugin Install (manual)
-  ```
-  claude mcp add chrome-devtools -s user -- npx -y chrome-devtools-mcp@latest
-  ```
-  Or via MCP Docker: `mcp-find("chrome-devtools")` → `mcp-add("chrome-devtools")`
-
   <tools note="26 tools across 6 capability domains — v0.21.0">
     **Page & Navigation:**
     - `navigate` — go to URL

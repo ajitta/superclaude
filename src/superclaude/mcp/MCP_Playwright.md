@@ -3,12 +3,6 @@
     <mission>Browser automation, E2E testing, network mocking, and visual validation via official Microsoft Playwright MCP</mission>
   </role>
 
-  ## Plugin Install (manual)
-  ```
-  claude mcp add playwright -s user -- npx -y @playwright/mcp@latest
-  ```
-  Or via MCP Docker: `mcp-find("playwright")` → `mcp-add("playwright")`
-
   ## Capability System
   Tools are grouped into opt-in capabilities via `--caps=`:
   - **core** (default): navigation, interaction, screenshots, tabs, dialogs
