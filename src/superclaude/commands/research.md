@@ -15,7 +15,7 @@ description: Deep web research with adaptive planning and intelligent search
     2. Plan: Strategy + depth + hop pattern + query decomposition + parallelization map
     3. Execute: Multi-hop search with parallel batching | Evidence collection | Adaptive replan on confidence&lt;0.6 or contradictions&gt;30%
     4. Validate: Cross-source verification | Credibility scoring | Contradiction resolution | Gap check
-    5. Synthesize: Credibility-weighted integration | Structured report → docs/research/&lt;topic&gt;-&lt;username&gt;-YYYY-MM-DD.md
+    5. Synthesize: Credibility-weighted integration | Structured report → docs/research/[topic]-[username]-YYYY-MM-DD.md
   </flow>
 
   <depth note="See modes/RESEARCH_CONFIG.md for full profiles, hop config, and thresholds">
