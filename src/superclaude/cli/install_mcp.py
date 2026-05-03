@@ -34,9 +34,9 @@ MCP_SERVERS = {
     },
     "serena": {
         "name": "serena",
-        "description": "Semantic code analysis and intelligent editing",
+        "description": "Semantic code analysis and intelligent editing (serena-agent on PyPI)",
         "transport": "stdio",
-        "command": "serena start-mcp-server --context=claude-code --project-from-cwd",
+        "command": "serena start-mcp-server --context claude-code --project-from-cwd",
         "required": False,
     },
     "tavily": {
@@ -141,15 +141,35 @@ def check_prerequisites() -> Tuple[bool, List[str]]:
     except (subprocess.TimeoutExpired, FileNotFoundError):
         errors.append("Node.js not found - required for npm-based MCP servers")
 
-    # Check uv for Python-based servers (optional)
+    # Check uv for Python-based servers (Serena requires uv)
+    uv_ok = False
     try:
         result = _run_command(
             ["uv", "--version"], capture_output=True, text=True, timeout=10
         )
-        if result.returncode != 0:
-            click.echo("⚠️  uv not found - required for Serena MCP server", err=True)
+        uv_ok = result.returncode == 0
     except (subprocess.TimeoutExpired, FileNotFoundError):
-        click.echo("⚠️  uv not found - required for Serena MCP server", err=True)
+        uv_ok = False
+    if not uv_ok:
+        click.echo("⚠️  uv not found - required to install Serena MCP server", err=True)
+        click.echo(
+            "   Install uv: https://docs.astral.sh/uv/getting-started/installation/",
+            err=True,
+        )
+
+    # Check serena-agent binary on PATH (installed via uv tool install)
+    try:
+        result = _run_command(
+            ["serena", "--version"], capture_output=True, text=True, timeout=10
+        )
+        if result.returncode != 0:
+            raise FileNotFoundError
+    except (subprocess.TimeoutExpired, FileNotFoundError):
+        click.echo("⚠️  serena binary not found - install with:", err=True)
+        click.echo(
+            "   uv tool install -p 3.13 serena-agent@latest --prerelease=allow",
+            err=True,
+        )
 
 
     return len(errors) == 0, errors

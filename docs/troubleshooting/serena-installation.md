@@ -1,135 +1,120 @@
 # Serena MCP Installation Troubleshooting
 
-## Common Issues and Solutions
+> Canonical install reference: https://oraios.github.io/serena/02-usage/010_installation.html
 
-### Issue: "Failed to spawn: serena" Error
+## Install (canonical)
 
-**Symptoms:**
-```
-error: Failed to spawn: `serena`
-Caused by: No such file or directory (os error 2)
-```
+Install the `serena-agent` PyPI package via `uv tool install`:
 
-**Root Cause:**
-The SuperClaude installer was incorrectly configured to use `uv run serena` instead of `uvx` for Serena MCP server installation.
-
-**Solution:**
-
-1. **Remove existing broken installation:**
-   ```bash
-   claude mcp remove serena
-   ```
-
-2. **Install Serena using correct uvx method:**
-   ```bash
-   uvx --from git+https://github.com/oraios/serena serena --help
-   ```
-
-3. **Register with Claude CLI:**
-   ```bash
-   claude mcp add serena -- uvx --from git+https://github.com/oraios/serena serena start-mcp-server --context ide-assistant
-   ```
-
-4. **Verify installation:**
-   ```bash
-   claude mcp list
-   ```
-
-### Issue: uv vs uvx Confusion
-
-**Difference:**
-- `uv run serena` - Runs serena from local project dependencies (fails if not installed locally)
-- `uvx --from git+https://github.com/oraios/serena serena` - Runs serena directly from GitHub repository
-
-**Correct Usage:**
-Always use `uvx` for Serena, as it's designed to work with remote GitHub repositories.
-
-### GitHub Codespace Specific Issues
-
-**Issue: UV Installation Method**
-If you installed UV with the curl method:
 ```bash
-curl -LsSf https://astral.sh/uv/install.sh | sh
+uv tool install -p 3.13 serena-agent@latest --prerelease=allow
+serena init                # default LSP backend
+# or: serena init -b JetBrains  # JetBrains plugin backend
 ```
 
-Make sure `uvx` is available:
+This places the `serena` binary on PATH so Claude Code can invoke it directly.
+
+## Register with Claude Code
+
+Quick setup (registers at user scope):
+
 ```bash
-uvx --version
+serena setup claude-code
 ```
 
-If not available, install uv with pip:
+Equivalent manual command (user scope, recommended):
+
 ```bash
-pip install uv
+claude mcp add --scope user serena -- serena start-mcp-server \
+  --context claude-code --project-from-cwd
 ```
 
-### Verification Steps
+Per-project alternative (current directory only):
 
-After successful installation, verify Serena is working:
+```bash
+claude mcp add serena -- serena start-mcp-server \
+  --context claude-code --project "$(pwd)"
+```
 
-1. **Check MCP connection:**
+Verify:
+
+```bash
+claude mcp list
+```
+
+## Common Issues
+
+### "Failed to spawn: serena"
+
+The `serena` binary is missing from PATH. Re-run the install command above. If `uv tool install` succeeded but the binary is missing, ensure `~/.local/bin` (or `uv tool dir --bin`) is on PATH.
+
+### Migrating from old uvx-based install
+
+Older guides used `uvx --from git+https://github.com/oraios/serena ...`. Replace with the new install:
+
+```bash
+claude mcp remove serena
+uv tool install -p 3.13 serena-agent@latest --prerelease=allow
+serena setup claude-code
+```
+
+### uv not found
+
+Install `uv` first: https://docs.astral.sh/uv/getting-started/installation/
+
+### Tool adherence drops mid-session
+
+Recent Opus models can drop Serena's manual mid-session. Two upstream-recommended mitigations:
+
+1. Inject the system prompt override at session start:
    ```bash
-   claude mcp list
+   claude --system-prompt="$(serena prompts print-cc-system-prompt-override)"
    ```
+2. Install the Serena hooks (see "Optional: Serena hooks" below) for SessionStart/PreToolUse reminders.
 
-2. **Test basic functionality:**
-   Start Claude Code and verify Serena appears in available MCP servers
+## Optional: Serena hooks
 
-3. **Check logs for errors:**
-   ```bash
-   ls ~/.cache/claude-cli-nodejs/*/mcp-logs-serena/
-   cat ~/.cache/claude-cli-nodejs/*/mcp-logs-serena/latest.txt
-   ```
+Add to `.claude/settings.json` (project) or `~/.claude/settings.json` (user) — counteracts manual drift and auto-approves Serena tool calls:
 
-### Environment-Specific Notes
+```json
+{
+  "hooks": {
+    "PreToolUse": [
+      { "matcher": "", "hooks": [{ "type": "command", "command": "serena-hooks remind --client=claude-code" }] },
+      { "matcher": "mcp__serena__*", "hooks": [{ "type": "command", "command": "serena-hooks auto-approve --client=claude-code" }] }
+    ],
+    "SessionStart": [
+      { "matcher": "", "hooks": [{ "type": "command", "command": "serena-hooks activate --client=claude-code" }] }
+    ],
+    "Stop": [
+      { "matcher": "", "hooks": [{ "type": "command", "command": "serena-hooks cleanup --client=claude-code" }] }
+    ]
+  }
+}
+```
 
-**GitHub Codespaces:**
-- UV is often pre-installed but may not include uvx
-- Default Python environment may need UV package installation
-- Network connectivity for git+https:// URLs required
+The `serena-hooks` binary ships with the `serena-agent` install. Caveat: the `mcp__serena__*` PreToolUse hook auto-approves all Serena tool calls — drop that entry if you rely on permission prompts as a guardrail.
 
-**Local Development:**
-- Ensure uvx is installed: `pip install uv` or `pipx install uv`
-- Verify git access to GitHub repositories
+Source: https://oraios.github.io/serena/02-usage/030_clients.html
 
-**WSL/Linux:**
-- Ensure proper permissions for ~/.claude/ directory
-- Check Python environment compatibility
+## Manual MCP config
 
-### Manual Configuration
-
-If automatic installation fails, manually configure `~/.claude.json`:
+If `claude mcp add` is unavailable, edit `~/.claude.json` directly:
 
 ```json
 {
   "mcpServers": {
     "serena": {
-      "command": "uvx",
-      "args": [
-        "--from",
-        "git+https://github.com/oraios/serena",
-        "serena",
-        "start-mcp-server",
-        "--context",
-        "ide-assistant"
-      ]
+      "command": "serena",
+      "args": ["start-mcp-server", "--context", "claude-code", "--project-from-cwd"]
     }
   }
 }
 ```
 
-### Getting Help
+## Getting Help
 
-If issues persist:
-1. Check [Serena documentation](https://github.com/oraios/serena)
-2. Verify uvx installation: `uvx --version`
-3. Test direct installation: `uvx --from git+https://github.com/oraios/serena serena --help`
-4. Report issues to [SuperClaude Framework](https://github.com/SuperClaude-Org/SuperClaude_Framework/issues)
-
-### Version Information
-
-This troubleshooting guide is for:
-- SuperClaude Framework v4.1.5+
-- Serena MCP (latest from GitHub)
-- UV/UVX package manager
-
-For older versions, refer to legacy documentation or upgrade to latest SuperClaude Framework.
+1. Check upstream docs: https://oraios.github.io/serena/
+2. Verify binary: `serena --version`
+3. Verify uv: `uv --version`
+4. Report issues: https://github.com/SuperClaude-Org/SuperClaude_Framework/issues

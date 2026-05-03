@@ -417,10 +417,12 @@ chmod 755 ~/.claude/sessions/
 # Solution 3: Reinstall Serena server
 # Remove existing Serena registration
 claude mcp remove serena
-# Reinstall using uvx
-uvx --from git+https://github.com/oraios/serena serena --help
-# Re-register with Claude
-claude mcp add serena -- uvx --from git+https://github.com/oraios/serena serena start-mcp-server --context ide-assistant
+# Install serena-agent via uv
+uv tool install -p 3.13 serena-agent@latest --prerelease=allow
+# Re-register with Claude (user scope)
+serena setup claude-code
+# Or manually:
+claude mcp add --scope user serena -- serena start-mcp-server --context claude-code --project-from-cwd
 
 # Verification
 # Session context should persist across Claude Code restarts

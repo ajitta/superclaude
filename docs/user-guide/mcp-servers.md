@@ -96,7 +96,7 @@ export MORPH_API_KEY="your_key_here"
 ### serena 🧭
 **Purpose**: Semantic code understanding with project memory
 **Triggers**: Symbol operations, large codebases, session management
-**Requirements**: Python 3.9+, uv package manager, no API key
+**Requirements**: Python 3.13, `uv` package manager, no API key. Install via `uv tool install -p 3.13 serena-agent@latest --prerelease=allow` then `serena setup claude-code`.
 
 ```bash
 # Automatic activation
@@ -215,8 +215,8 @@ docker compose restart api
       "env": {"MORPH_API_KEY": "${MORPH_API_KEY}"}
     },
     "serena": {
-      "command": "uvx",
-      "args": ["--from", "git+https://github.com/oraios/serena", "serena", "start-mcp-server", "--context", "ide-assistant"]
+      "command": "serena",
+      "args": ["start-mcp-server", "--context", "claude-code", "--project-from-cwd"]
     },
     "tavily": {
       "command": "npx",
