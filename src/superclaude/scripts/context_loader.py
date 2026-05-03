@@ -182,23 +182,14 @@ _BEHAVIORAL_MCPS = {"mcp/MCP_Serena.md", "mcp/MCP_Tavily.md"}
 # Environment variable to control instruction mode (default: enabled)
 USE_INSTRUCTIONS = os.environ.get("CLAUDE_CONTEXT_USE_INSTRUCTIONS", "1") == "1"
 
-# Flag alias/fuzzy matching system
-# Maps common typos, conceptual aliases, and truncations to valid flags
+# Flag alias system — maps conceptual aliases to valid flags
 FLAG_ALIASES: dict[str, list[str]] = {
-    # Conceptual aliases
     "ultrathink": ["seq"],
     "think": ["seq"],
     "think-hard": ["seq"],
     "parallel": ["delegate"],
     "agent": ["delegate"],
-    # Typo corrections
-    "parellel": ["delegate"],
-    "conccurrency": ["concurrency"],
-    "confidenc-check": ["validate"],
-    "confidence-check": ["validate"],
     "iteration": ["iterations"],
-    "loo": ["loop"],
-    "sea": ["serena"],
     "sampling": ["vs"],
     "verbalized": ["vs"],
 }

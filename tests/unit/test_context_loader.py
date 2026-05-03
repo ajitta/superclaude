@@ -78,25 +78,6 @@ class TestResolveFlags:
         assert len(notes) == 1
         assert "auto-corrected" in notes[0]
 
-    def test_alias_parellel_resolves_to_delegate(self):
-        prompt, notes = resolve_flags("run tasks --parellel")
-        assert "--delegate" in prompt
-        assert "--parellel" not in prompt
-        assert "auto-corrected" in notes[0]
-
-    def test_alias_conccurrency_resolves_to_concurrency(self):
-        prompt, notes = resolve_flags("fast run --conccurrency 5")
-        assert "--concurrency" in prompt
-        assert "--conccurrency" not in prompt
-
-    def test_alias_loo_resolves_to_loop(self):
-        prompt, notes = resolve_flags("improve --loo")
-        assert "--loop" in prompt
-
-    def test_alias_sea_resolves_to_serena(self):
-        prompt, notes = resolve_flags("explore --sea")
-        assert "--serena" in prompt
-
     def test_alias_iteration_resolves_to_iterations(self):
         prompt, notes = resolve_flags("run --iteration 3")
         assert "--iterations" in prompt
@@ -131,7 +112,7 @@ class TestResolveFlags:
     # --- Multiple flags ---
 
     def test_multiple_aliases_resolved(self):
-        prompt, notes = resolve_flags("go --ultrathink --parellel")
+        prompt, notes = resolve_flags("go --ultrathink --parallel")
         assert "--seq" in prompt
         assert "--delegate" in prompt
         assert len(notes) == 2
@@ -151,7 +132,7 @@ class TestResolveFlags:
 
     def test_case_insensitive_flag_detection(self):
         """Flags in prompt are lowercased for matching."""
-        prompt, notes = resolve_flags("run --Parellel")
+        prompt, notes = resolve_flags("run --Parallel")
         assert "--delegate" in prompt
 
     # --- Data integrity ---
