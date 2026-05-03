@@ -76,7 +76,7 @@
     - Simple text edits: Edit tool (pattern-based, no LSP needed)
     - File search by name: Glob (faster for simple patterns)
     - Content search: Grep (faster for text patterns)
-    - Bulk pattern replacements: ast-grep + Edit (native)
+    - Bulk pattern replacements: Grep + Edit (native)
     - File reading: Read tool (when you need full file, not symbols)
 
     **Decision rule:** If the operation is about _what the code means_ (symbols, references, types), use Serena. If it's about _what the text says_ (patterns, strings), use native tools.
@@ -149,7 +149,7 @@
 | load project context | `list_memories` → `read_memory` | Project auto-active; just read memory |
 | save work session | `write_memory` | Cross-session persistence |
 | check if task is complete | `think_about_whether_you_are_done` | Structured completion assessment |
-| update console.log to logger | ast-grep + Edit (not Serena) | Pattern-based bulk replacement |
+| update console.log to logger | Grep + Edit (not Serena) | Text pattern bulk replacement |
   </examples>
 
   <bounds>

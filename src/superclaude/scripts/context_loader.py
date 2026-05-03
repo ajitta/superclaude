@@ -105,8 +105,6 @@ TRIGGER_MAP = [
     (r"(--seq|--sequential)", "mcp/MCP_Sequential.md", 2),
     (r"(--play|--playwright|browser.?test|e2e.?test|network.?mock|mock.?api|browser.?automat)", "mcp/MCP_Playwright.md", 2),
     (r"(--perf|--devtools|lighthouse|memory.?leak|core.?web.?vital|cwv|a11y.?audit|accessibility.?audit)", "mcp/MCP_Chrome-DevTools.md", 2),
-    (r"(--magic|/ui\b|21st\.dev|ui.?component.?generat)", "mcp/MCP_Magic.md", 2),
-    (r"(--sg|--ast-grep|ast.?grep|syntax.?tree|structural.?pattern|structural.?search)", "mcp/MCP_AstGrep.md", 2),
     # Business symbols - supplementary reference
     (r"(business.?symbol|strategic.?symbol|business.?example|panel.?example|--structured)", "core/BUSINESS_SYMBOLS.md", 3),
     # Modes — behavioral at P1, operational at P2
@@ -139,9 +137,7 @@ COMPOSITE_FLAGS = {
         ("mcp/MCP_Sequential.md", 2),
         ("mcp/MCP_Playwright.md", 2),
         ("mcp/MCP_Chrome-DevTools.md", 2),
-        ("mcp/MCP_Magic.md", 2),
-        ("mcp/MCP_AstGrep.md", 2),
-    ],  # Note: Morphllm removed; Playwright/DevTools/Magic are plugin-install-only (docs still loaded)
+    ],  # Note: Playwright/DevTools are plugin-install-only (docs still loaded)
 }
 
 # v3.1: Hybrid Injection Map
@@ -180,8 +176,6 @@ TIER_0_MAP = {
     "mcp/MCP_Sequential.md": "Sequential: multi-step reasoning chain. Use for 3+ component problems.",
     "mcp/MCP_Playwright.md": "Playwright: browser E2E + network mocking (--caps=network,storage). navigate → assert.",
     "mcp/MCP_Chrome-DevTools.md": "DevTools: 26 tools. Lighthouse audits, CWV, a11y, memory, --slim mode. trace → analyze → optimize.",
-    "mcp/MCP_Magic.md": "Magic 21st.dev: UI component search → customize → integrate.",
-    "mcp/MCP_AstGrep.md": "ast-grep: structural AST search. dump_tree → test_rule → find_code. For patterns beyond grep.",
     "core/BUSINESS_SYMBOLS.md": "Business symbols + expert selection. 🎯📈💰⚖️🏆🌊 domain mapping.",
 }
 
@@ -208,7 +202,6 @@ FLAG_ALIASES: dict[str, list[str]] = {
     "iteration": ["iterations"],
     "loo": ["loop"],
     "sea": ["serena"],
-    "astgrep": ["ast-grep"],
     "sampling": ["vs"],
     "verbalized": ["vs"],
 }
@@ -243,7 +236,7 @@ AGENT_MAP = {
 VALID_FLAGS = {
     "brainstorm", "business-panel", "research", "introspect", "task-manage",
     "orchestrate", "token-efficient", "c7", "context7", "seq", "sequential",
-    "magic", "serena", "sg", "ast-grep", "play", "playwright", "perf",
+    "serena", "play", "playwright", "perf",
     "devtools", "tavily", "frontend-verify", "all-mcp", "no-mcp",
     "delegate", "concurrency", "loop", "iterations", "validate", "safe-mode",
     "fast", "plan", "uc", "ultracompressed", "scope", "focus",

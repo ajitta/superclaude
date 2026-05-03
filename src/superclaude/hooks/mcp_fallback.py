@@ -26,7 +26,6 @@ MCP_FALLBACKS: dict[str, str] = {
     "tavily": "WebSearch (native)",
     "sequential": "Native reasoning",
     "serena": "Grep/Glob + Edit (no symbol ops or persistence)",
-    "magic": "Write (native — install plugin: npx @21st-dev/magic)",
     "playwright": "--chrome (native — install plugin: npx @playwright/mcp@latest)",
     "devtools": "Playwright (install plugin: npx chrome-devtools-mcp@latest)",
 }

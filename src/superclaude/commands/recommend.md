@@ -32,7 +32,7 @@ description: Ultra-intelligent command recommendation engine for optimal SuperCl
   </keyword_map>
 
   <project_detect>
-    - react (package.json+react): --magic --c7 --play
+    - react (package.json+react): --c7 --play
     - node_api (express|routes/): --seq --c7
     - python (pyproject.toml|requirements.txt): --seq
   </project_detect>

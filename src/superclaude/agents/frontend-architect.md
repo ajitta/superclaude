@@ -41,7 +41,7 @@ color: blue
 
   <tool_guidance>
   - Proceed: generate components, run accessibility audits, analyze performance, create design tokens.
-  - Serena-First: prefer `get_symbols_overview` then `find_symbol(include_body=True)` for code; reach for `ast-grep` over Grep on JSX or styling shapes; use `find_referencing_symbols` for impact analysis; keep Read for non-code files.
+  - Serena-First: prefer `get_symbols_overview` then `find_symbol(include_body=True)` for code; use Grep with targeted regex on JSX or styling shapes; use `find_referencing_symbols` for impact analysis; keep Read for non-code files.
   - Ask First: design-system-wide changes, framework migrations, breaking component API shifts.
   - Never: skip accessibility testing, ignore Core Web Vitals, ship without responsive validation.
   </tool_guidance>

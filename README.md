@@ -214,7 +214,6 @@ For **2-3x faster** execution and **30-50% fewer tokens**, optionally install MC
 # - Sequential: Token-efficient multi-step reasoning (30-50% fewer tokens)
 # - Tavily: Web search for Deep Research
 # - Context7: Official documentation lookup
-# - AST-Grep: Tree-sitter structural code search
 
 # Note: Error learning available via built-in ReflexionMemory (no installation required)
 # Source-of-truth for MCP docs: src/superclaude/MCP/MCP_*.md
@@ -384,11 +383,9 @@ superclaude mcp
 - **Sequential-Thinking** → Multi-step reasoning
 - **Serena** → Session persistence & semantic code understanding
 - **Playwright** → Cross-browser automation & E2E testing
-- **Magic** → UI component generation (21st.dev)
 - **Chrome DevTools** → Performance analysis (CLS, LCP)
-- **AST-Grep** → Tree-sitter structural code search
 
-> Removed in this fork: Morphllm, Mindbase, Airis-Agent (replaced by AstGrep + native ReflexionMemory).
+> Removed in this fork: Morphllm, Mindbase, Airis-Agent, Magic, AST-Grep (replaced by native Grep/Edit + ReflexionMemory).
 
 </td>
 <td width="50%">
@@ -542,7 +539,6 @@ The Deep Research system intelligently coordinates multiple tools:
 - **Sequential MCP**: Multi-step reasoning and synthesis
 - **Serena MCP**: Memory and learning persistence
 - **Context7 MCP**: Technical documentation lookup
-- **AST-Grep MCP**: Structural pattern search across discovered code samples
 
 </div>
 
@@ -593,11 +589,9 @@ Flags are behavioral hints that any `/sc:*` prompt accepts. The model reads them
 | `--c7` / `--context7` | Context7 | Imports, frameworks, official docs |
 | `--seq` / `--sequential` | Sequential | Complex debug, system design, multi-step reasoning |
 | `--serena` | Serena | Symbol ops, project memory, semantic exploration |
-| `--magic` | Magic (21st.dev) | UI components, design systems |
 | `--play` / `--playwright` | Playwright | Browser testing, E2E, visual diffs |
 | `--perf` / `--devtools` | Chrome DevTools | Perf audit, CLS, LCP, metrics |
 | `--tavily` | Tavily | Web search, real-time info, parallel queries |
-| `--sg` / `--ast-grep` | AST-Grep | Structural patterns, AST search, anti-patterns |
 | `--frontend-verify` | Combined | Playwright + DevTools + Serena (UI debug) |
 | `--all-mcp` / `--no-mcp` | — | Enable all / disable all (perf priority) |
 

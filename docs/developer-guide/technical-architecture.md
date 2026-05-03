@@ -29,7 +29,6 @@ This guide documents how SuperClaude's Context-Oriented Configuration Framework 
 ├── PRINCIPLES.md                   # Guiding principles
 ├── ZIG.md                          # Zig language integration
 ├── MCP_Context7.md                 # Context7 MCP integration
-├── MCP_Magic.md                    # Magic MCP integration
 ├── MCP_Morphllm.md                 # Morphllm MCP integration
 ├── MCP_Playwright.md               # Playwright MCP integration
 ├── MCP_Sequential.md               # Sequential MCP integration
@@ -119,7 +118,6 @@ The main `CLAUDE.md` file uses an import system to load multiple context files:
 @PRINCIPLES.md             # Guiding principles
 *SECONDARY*
 @MCP_Context7.md           # Context7 MCP integration
-@MCP_Magic.md              # Magic MCP integration
 @MCP_Morphllm.md           # Morphllm MCP integration
 @MCP_Playwright.md         # Playwright MCP integration
 @MCP_Sequential.md         # Sequential MCP integration

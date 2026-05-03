@@ -117,7 +117,6 @@ Advanced Analysis: diagnostic-reference.md
 |------|---------|----------|
 | `--c7` / `--context7` | Context7 | Official documentation, framework patterns |
 | `--seq` / `--sequential` | Sequential | Complex analysis, debugging, system design |
-| `--magic` | Magic | UI components, design systems, frontend work |
 | `--morph` / `--morphllm` | Morphllm | Bulk transformations, pattern-based edits |
 | `--serena` | Serena | Symbol operations, project memory, large codebases |
 | `--play` / `--playwright` | Playwright | Browser testing, E2E scenarios, visual validation |
@@ -129,10 +128,10 @@ Advanced Analysis: diagnostic-reference.md
 ### React/Next.js Projects
 ```bash
 # Initialize with React patterns
---c7 --magic "implement Next.js authentication with TypeScript"
+--c7 "implement Next.js authentication with TypeScript"
 
 # Component development workflow  
---magic --think "create responsive dashboard component"
+--think "create responsive dashboard component"
 ```
 
 ### Node.js/Express Backend
@@ -204,7 +203,7 @@ Found outdated information or broken examples?
 1. **Session Management**: Always start with `/sc:load`, end with `/sc:save`
 2. **Flag Combinations**: Combine complementary flags: `--think --c7` for documented analysis
 3. **Progressive Complexity**: Start simple, add sophistication incrementally
-4. **Tool Specialization**: Match tools to tasks: Magic for UI, Sequential for analysis
+4. **Tool Specialization**: Match tools to tasks: Sequential for analysis, Context7 for documentation
 
 ### Learning Acceleration
 1. **Follow the Paths**: Use recommended learning sequences for structured growth

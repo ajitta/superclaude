@@ -18,7 +18,7 @@ Before using this guide, verify agent selection works:
 
 # Test frontend agent auto-activation
 /sc:implement "responsive navigation component"  
-# Example behavior: Frontend architect + Magic MCP should activate
+# Example behavior: Frontend architect should activate
 
 # Test systematic analysis
 /sc:troubleshoot "slow API performance"
@@ -65,7 +65,7 @@ Before using this guide, verify agent selection works:
 /sc:troubleshoot "memory leak"      # → performance-engineer auto-activates
 ```
 
-**MCP Servers** provide enhanced capabilities through specialized tools like Context7 (documentation), Sequential (analysis), Magic (UI), Playwright (testing), and Morphllm (code transformation).
+**MCP Servers** provide enhanced capabilities through specialized tools like Context7 (documentation), Sequential (analysis), Playwright (testing), and Morphllm (code transformation).
 
 **Domain Specialists** focus on narrow expertise areas to provide deeper, more accurate solutions than generalist approaches.
 
@@ -599,7 +599,6 @@ Task Flow:
 **Enhanced Capabilities through MCP Servers**:
 - **Context7**: Official documentation patterns for all architects and specialists
 - **Sequential**: Multi-step analysis for root-cause-analyst, system-architect, performance-engineer
-- **Magic**: UI generation for frontend-architect, learning-guide interactive content
 - **Playwright**: Browser testing for quality-engineer, accessibility validation for frontend-architect
 - **Morphllm**: Code transformation for refactoring-expert, bulk changes for python-expert
 - **Serena**: Project memory for all agents, context preservation across sessions
@@ -933,4 +932,4 @@ Master multi-domain requests that trigger optimal agent combinations. Leverage t
 **The SuperClaude Advantage:**
 Experience the power of 14 specialized AI experts working in coordinated response, all through simple, natural language requests. No configuration, no management, just intelligent collaboration that scales with your needs.
 
-🎯 **Ready to experience intelligent agent coordination? Start with `/sc:implement` and discover the magic of specialized AI collaboration.**
+🎯 **Ready to experience intelligent agent coordination? Start with `/sc:implement` and discover specialized AI collaboration.**

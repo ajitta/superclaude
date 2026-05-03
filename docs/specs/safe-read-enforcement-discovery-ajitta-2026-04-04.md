@@ -42,7 +42,7 @@ File is 45KB (.py) — use limit parameter (e.g., limit=500) or Grep to search f
 File is 250KB (.json) — use jq to query specific fields (e.g., jq '.key' file.json) or Read with limit parameter (e.g., limit=500).
 ```
 
-**5-30KB code file gap (intentional):** Code files between 5-30KB are blocked without `limit`. This is by design — the goal is to push the model toward Serena symbolic tools, ast-grep, or Grep for code exploration. The `limit` parameter is always available as an escape hatch.
+**5-30KB code file gap (intentional):** Code files between 5-30KB are blocked without `limit`. This is by design — the goal is to push the model toward Serena symbolic tools or Grep for code exploration. The `limit` parameter is always available as an escape hatch.
 
 ### Layer 2: Rule (Soft Guide) — R16 Strengthening
 
@@ -80,15 +80,13 @@ Key changes:
 ```
 [R17] Serena-First 🟡: code exploration fallback chain:
   1. Serena symbolic tools (get_symbols_overview, find_symbol) — primary
-  2. ast-grep MCP (if configured) — structural AST search fallback
-  3. Grep with targeted patterns — last resort
+  2. Grep with targeted patterns — fallback for structural/text patterns
   reserve Read for non-code files, unknown formats, or when all above insufficient
 ```
 
 Key changes:
 - 🟢 → 🟡 (optimization → strong preference)
-- Explicit fallback chain: Serena → ast-grep MCP → Grep
-- ast-grep only when MCP configured (no broken hints in environments without it)
+- Explicit fallback chain: Serena → Grep
 
 ## Exemption Design
 
@@ -102,7 +100,7 @@ EXEMPT if ANY:
      extensions: {.json, .yaml, .yml, .toml, .cfg, .ini, .env}
 ```
 
-Rationale: Small files (<5KB) and small config files (<30KB) are legitimately read in full. Large config files (e.g., `package-lock.json` at several MB) must still use `limit`. Code files >5KB should use Serena, ast-grep, Grep, or Read with `limit`.
+Rationale: Small files (<5KB) and small config files (<30KB) are legitimately read in full. Large config files (e.g., `package-lock.json` at several MB) must still use `limit`. Code files >5KB should use Serena, Grep, or Read with `limit`.
 
 ## Files to Modify
 
@@ -130,11 +128,10 @@ Rationale: Small files (<5KB) and small config files (<30KB) are legitimately re
 
 ## Risks
 
-- **5-30KB code file friction (intentional):** Code files in this range are blocked without `limit`. This is the desired behavior — pushes model toward Serena/ast-grep/Grep. The `limit` parameter is the escape hatch.
-- **Serena unavailable:** R17 has explicit fallback chain (ast-grep → Grep). No gap.
+- **5-30KB code file friction (intentional):** Code files in this range are blocked without `limit`. This is the desired behavior — pushes model toward Serena/Grep. The `limit` parameter is the escape hatch.
+- **Serena unavailable:** R17 has explicit fallback chain (Grep). No gap.
 - **Large config files:** Config extensions are only exempt below 30KB. Files like `package-lock.json` (several MB) are correctly blocked.
 - **Config false negatives:** Non-standard config extensions (`.conf`, `.properties`) not exempt. Can add later if needed.
-- **ast-grep MCP not documented:** No `mcp/MCP_AstGrep.md` exists yet. R17 uses "(if configured)" qualifier — adequate for now. MCP doc can be added separately.
 
 ## Verification
 

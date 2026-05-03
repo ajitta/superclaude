@@ -58,10 +58,10 @@ class TestMcpFallback:
         # Notify for sequential
         should_notify_fallback("sequential")
 
-        # magic should still notify (first time)
-        should_notify, fallback = should_notify_fallback("magic")
+        # playwright should still notify (first time)
+        should_notify, fallback = should_notify_fallback("playwright")
         assert should_notify is True
-        assert "Write (native" in fallback
+        assert "--chrome (native" in fallback
 
     def test_format_fallback_notification(self, temp_fallback_dir: Path):
         """Test notification message format."""
@@ -116,7 +116,7 @@ class TestMcpFallback:
 
         expected_mcps = [
             "context7", "tavily", "sequential", "serena",
-            "magic", "playwright", "devtools",
+            "playwright", "devtools",
         ]
 
         for mcp in expected_mcps:

@@ -21,7 +21,7 @@ description: Intelligent MCP tool selection based on complexity scoring and oper
 
   <decision_matrix>
     - Symbol ops: Serena (LSP, navigation)
-    - Pattern edits: ast-grep (structural) or Edit (native)
+    - Pattern edits: Edit (native) after Grep/Serena confirms targets
     - Memory ops: Serena (persistence)
     - Threshold >0.6: Serena (accuracy)
     - Threshold <0.4: Native tools (speed)
@@ -30,8 +30,7 @@ description: Intelligent MCP tool selection based on complexity scoring and oper
 
   <patterns>
     - Serena: Semantic ops | LSP | symbol nav | project context
-    - ast-grep: Structural pattern search | anti-pattern detection
-    - Fallback: Serena → ast-grep → Native tools
+    - Fallback: Serena → Native tools (Grep/Glob/Edit)
   </patterns>
 
   <performance>
@@ -44,13 +43,13 @@ description: Intelligent MCP tool selection based on complexity scoring and oper
 | Input | Output |
 |---|---|
 | `'rename function across 10 files' --analyze` | Serena (LSP, semantic) |
-| `'update console.log to logger.info' --explain` | ast-grep + Edit (structural pattern) |
+| `'update console.log to logger.info' --explain` | Grep targets + Edit (text replace) |
 | `'save project context'` | Serena (memory direct) |
 
   <example name="wrong-tool-choice" type="error-path">
-    - Input: /sc:select-tool 'rename a variable across the project' → suggests ast-grep
-    - Why wrong: Variable renaming is a semantic operation. ast-grep does structural patterns, not semantic renames.
-    - Correct: Serena (LSP-based rename) for semantic operations. ast-grep for structural pattern search only.
+    - Input: /sc:select-tool 'rename a variable across the project' → suggests Grep + Edit
+    - Why wrong: Variable renaming is a semantic operation. Plain text replace risks aliasing matches in strings/comments.
+    - Correct: Serena (LSP-based rename) for semantic operations; reserve Grep+Edit for unambiguous text patterns.
   </example>
   </examples>
 

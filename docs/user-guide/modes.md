@@ -236,7 +236,7 @@ Standard Approach: Sequential file-by-file analysis and editing
 Orchestration Approach:
 "🎯 Multi-Tool Coordination Strategy:
  🔍 Phase 1: Serena (semantic analysis) + Sequential (architecture review)
- ⚡ Phase 2: Morphllm (pattern edits) + Magic (UI components) 
+ ⚡ Phase 2: Morphllm (pattern edits)
  🧪 Phase 3: Playwright (testing) + Context7 (documentation patterns)
  🔄 Parallel execution: 3 tools working simultaneously
 \"
@@ -394,7 +394,7 @@ Standard Approach: Consistent, professional baseline for all tasks
 
 # Phase 3: Implementation (Orchestration Mode coordinates tools)
 /sc:implement "frontend and backend systems"
-→ 🎯 Magic (UI) + Context7 (patterns) + Sequential (architecture)
+→ 🎯 Context7 (patterns) + Sequential (architecture)
 → ⚡ Parallel execution optimization
 ```
 

@@ -67,9 +67,8 @@ superclaude mcp --dry-run
 ### Available Servers
 1. **sequential-thinking** - Multi-step problem solving and systematic analysis
 2. **context7** - Official library documentation and code examples
-3. **magic** - Modern UI component generation and design systems (requires API key)
-4. **playwright** - Cross-browser E2E testing and automation
-5. **serena** - Semantic code analysis and intelligent editing
+3. **playwright** - Cross-browser E2E testing and automation
+4. **serena** - Semantic code analysis and intelligent editing
 6. **filesystem-with-morph** - Pattern-based bulk code transformations with filesystem access (requires API key)
 7. **tavily** - Web search and real-time information retrieval (requires API key)
 8. **chrome-devtools** - Chrome DevTools debugging and performance analysis
@@ -80,13 +79,11 @@ superclaude mcp --dry-run
 3. **MCP_Sequential.md** - Token-efficient reasoning
 4. **MCP_Context7.md** - Official documentation lookup
 5. **MCP_Playwright.md** - Browser automation
-6. **MCP_Magic.md** - UI component generation
-7. **MCP_Morphllm.md** - Model transformation
-8. **MCP_Chrome-DevTools.md** - Performance analysis
+6. **MCP_Morphllm.md** - Model transformation
+7. **MCP_Chrome-DevTools.md** - Performance analysis
 
 ### Configuration Files
 - context7.json
-- magic.json
 - morphllm.json
 - playwright.json
 - sequential.json

@@ -181,8 +181,6 @@ class TestTieredInjection:
         "mcp/MCP_Sequential.md",
         "mcp/MCP_Playwright.md",
         "mcp/MCP_Chrome-DevTools.md",
-        "mcp/MCP_Magic.md",
-        "mcp/MCP_AstGrep.md",
     }
     EXPECTED_BEHAVIORAL_MCPS = {
         "mcp/MCP_Serena.md",

@@ -15,7 +15,7 @@ superclaude mcp
 superclaude mcp --servers tavily --servers context7
 
 # Install all servers
-superclaude mcp --servers sequential-thinking context7 magic playwright serena filesystem-with-morph tavily chrome-devtools
+superclaude mcp --servers sequential-thinking context7 playwright serena filesystem-with-morph tavily chrome-devtools
 ```
 
 ## Available MCP Servers
@@ -24,7 +24,6 @@ superclaude mcp --servers sequential-thinking context7 magic playwright serena f
 |--------|-------------|------------------|
 | **sequential-thinking** | Multi-step problem solving and systematic analysis | No |
 | **context7** | Official library documentation and code examples | No |
-| **magic** | Modern UI component generation and design systems | Yes (`TWENTYFIRST_API_KEY`) |
 | **playwright** | Cross-browser E2E testing and automation | No |
 | **serena** | Semantic code analysis and intelligent editing | No |
 | **filesystem-with-morph** | Pattern-based bulk code transformations with filesystem access | Yes (`MORPH_API_KEY`) |
@@ -57,7 +56,6 @@ Some MCP servers require API keys for full functionality. SuperClaude will promp
 ### Getting API Keys
 
 - **Tavily**: Get your API key from [https://app.tavily.com](https://app.tavily.com)
-- **Magic (21st.dev)**: Get your API key from [https://21st.dev](https://21st.dev)
 - **Morphllm**: Get your API key from the Morphllm service
 
 ### Setting API Keys
@@ -75,7 +73,6 @@ You can also set environment variables beforehand:
 
 ```bash
 export TAVILY_API_KEY="your-api-key-here"
-export TWENTYFIRST_API_KEY="your-api-key-here"
 export MORPH_API_KEY="your-api-key-here"
 ```
 
@@ -214,7 +211,6 @@ MCP servers enhance SuperClaude commands with additional capabilities:
 
 - **/sc:research** - Uses Tavily for web search and real-time information
 - **/sc:implement** - Can use Context7 for official documentation
-- **/sc:design** - Can use Magic for UI component generation
 - **/sc:test** - Can use Playwright for browser automation
 
 ## Best Practices

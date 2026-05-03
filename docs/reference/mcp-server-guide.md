@@ -1,6 +1,6 @@
 # MCP Server Troubleshooting Guide
 
-**MCP Server Focus**: Model Context Protocol (MCP) servers provide enhanced capabilities like documentation lookup (Context7), UI generation (Magic), and advanced reasoning (Sequential). This guide covers installation, configuration, and operational troubleshooting for all MCP servers.
+**MCP Server Focus**: Model Context Protocol (MCP) servers provide enhanced capabilities like documentation lookup (Context7) and advanced reasoning (Sequential). This guide covers installation, configuration, and operational troubleshooting for all MCP servers.
 
 **Server-Specific Solutions**: Each MCP server has unique requirements and common failure patterns. This guide provides targeted solutions for each server type and general MCP troubleshooting strategies.
 
@@ -11,7 +11,6 @@
 **Core MCP Servers:**
 - **Context7**: Official documentation lookup and framework patterns
 - **Sequential**: Multi-step reasoning and complex analysis
-- **Magic**: Modern UI component generation from 21st.dev patterns
 - **Playwright**: Browser automation and E2E testing
 - **Morphllm**: Pattern-based code editing with token optimization
 - **Serena**: Semantic code understanding and project memory
@@ -133,28 +132,6 @@ npm update -g
 npm list -g @sequential/mcp-server
 ```
 
-**Issue: Magic UI Generator Installation Problems**
-```bash
-# Error message
-ERROR: @magic/ui-generator installation failed - build dependencies missing
-
-# Diagnosis
-npm list -g @magic/ui-generator
-which gcc make  # Check build tools
-
-# Solution 1: Install build dependencies (Linux)
-sudo apt install build-essential python3-dev
-
-# Solution 2: Install build dependencies (macOS)
-xcode-select --install
-
-# Solution 3: Use pre-built binaries
-npm install -g @magic/ui-generator --ignore-scripts
-
-# Verification
-npm list -g @magic/ui-generator
-```
-
 ## Connection and Communication Issues
 
 ### MCP Server Connection Failures
@@ -229,7 +206,7 @@ ERROR: MCP server port conflicts detected
 
 # Diagnosis
 netstat -tlnp | grep :8000  # Check port usage
-ps aux | grep -E "context7|sequential|magic"
+ps aux | grep -E "context7|sequential"
 
 # Solution 1: Sequential server restart
 # Restart Claude Code to reset all MCP servers
@@ -346,51 +323,6 @@ sudo swapon --show  # Check swap status
 ps aux | grep sequential  # Check process status
 ```
 
-### Magic UI Generator
-
-**Issue: Magic Not Generating UI Components**
-```bash
-# Symptoms: UI component requests not producing expected output
-
-# Diagnosis
-# Check Magic server installation
-npm list -g @magic/ui-generator
-cat ~/.claude/CLAUDE.md | grep -i magic
-
-# Solution 1: Verify Magic server installation
-npm list -g @magic/ui-generator
-npm install -g @magic/ui-generator@latest
-
-# Solution 2: Use explicit Magic activation
-# Include "component", "UI", or "interface" keywords
-
-# Solution 3: Check component request format
-# Use descriptive requests for better Magic activation
-
-# Solution 4: Test Magic server directly
-node -e "const magic = require('@magic/ui-generator'); console.log('Magic loaded');"
-
-# Verification
-# Should produce complete UI components with modern patterns
-```
-
-**Issue: Magic Components Not Framework-Compliant**
-```bash
-# Symptoms: Generated components don't match framework patterns
-
-# Solution 1: Use framework-specific keywords
-# Include "React", "Vue", "Angular" in requests
-
-# Solution 2: Combine with Context7
-# Use both Magic and Context7 for framework-compliant components
-
-# Solution 3: Update Magic server
-npm update -g @magic/ui-generator
-
-# Verification
-# Generated components should follow framework conventions
-```
-
 ### Playwright Browser Automation
 
 **Issue: Playwright Browser Installation Failures**
@@ -504,7 +436,7 @@ claude mcp add serena -- uvx --from git+https://github.com/oraios/serena serena 
 
 # Diagnosis
 # Check MCP server installation and health
-npm list -g | grep -E "context7|sequential|magic|playwright"
+npm list -g | grep -E "context7|sequential|playwright"
 top | grep node
 
 # Solution 1: Selective MCP server usage
@@ -628,7 +560,7 @@ echo "npm version: $(npm --version)"
 
 # Server installations
 echo "=== Installed MCP Servers ==="
-npm list -g | grep -E "context7|sequential|magic|playwright|morphllm|serena"
+npm list -g | grep -E "context7|sequential|playwright|morphllm|serena"
 
 # Process monitoring
 echo "=== Running MCP Processes ==="
@@ -661,13 +593,6 @@ if npm list -g @sequential/mcp-server > /dev/null 2>&1; then
     echo "✅ Sequential installed"
 else
     echo "❌ Sequential missing"
-fi
-
-# Magic test
-if npm list -g @magic/ui-generator > /dev/null 2>&1; then
-    echo "✅ Magic installed"
-else
-    echo "❌ Magic missing"
 fi
 
 # Playwright test
@@ -714,7 +639,7 @@ echo "Stop all Claude Code sessions and wait 30 seconds"
 cp -r ~/.claude ~/.claude.mcp.backup.$(date +%Y%m%d)
 
 # Step 3: Remove all MCP servers
-npm list -g | grep -E "context7|sequential|magic|playwright|morphllm|serena" | awk '{print $2}' | xargs npm uninstall -g
+npm list -g | grep -E "context7|sequential|playwright|morphllm|serena" | awk '{print $2}' | xargs npm uninstall -g
 
 # Step 4: Clear npm cache
 npm cache clean --force
@@ -723,7 +648,7 @@ npm cache clean --force
 python3 -m SuperClaude install --components mcp --force
 
 # Step 6: Verification
-npm list -g | grep -E "context7|sequential|magic|playwright|morphllm|serena"
+npm list -g | grep -E "context7|sequential|playwright|morphllm|serena"
 
 # Step 7: Test functionality
 echo "Test MCP servers in Claude Code after restart"

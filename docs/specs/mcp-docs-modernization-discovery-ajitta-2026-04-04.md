@@ -133,18 +133,7 @@ Research conducted 2026-04-04 against GitHub repos, changelogs, and npm/PyPI reg
 
 ---
 
-### Tier 3 — Minor Updates (4 servers)
-
-#### 6. ast-grep MCP (`MCP_AstGrep.md`)
-
-**Changes:**
-- `find_code` and `find_code_by_rule` now have `max_results` and `output_format` ("text" | "json") parameters
-- AST rule documentation file (`ast-grep.mdc`) included in repo for LLM reference
-- Rule development workflow documented (dump → test → search iterative process)
-
-**Doc impact:** Add parameter notes to tool descriptions. Minor.
-
----
+### Tier 3 — Minor Updates (3 servers)
 
 #### 7. Tavily MCP (`MCP_Tavily.md`)
 
@@ -170,18 +159,6 @@ Research conducted 2026-04-04 against GitHub repos, changelogs, and npm/PyPI reg
 
 ---
 
-#### 9. Magic / 21st.dev (`MCP_Magic.md`)
-
-**Changes:**
-- CLI installation: `npx @21st-dev/cli@latest install <client> --api-key <key>`
-- API key required (via `TWENTYFIRST_API_KEY`, already in install_mcp.py)
-- Component library continuously growing
-- Still same core concept: AI-powered UI component generation
-
-**Doc impact:** Minimal. Could add CLI install note.
-
----
-
 ## Docs-vs-Installer Divergence
 
 | Server | install_mcp.py | MCP doc | Gap |
@@ -189,14 +166,12 @@ Research conducted 2026-04-04 against GitHub repos, changelogs, and npm/PyPI reg
 | Chrome DevTools | `npx -y chrome-devtools-mcp@latest` | `mcp-find("chrome-devtools")` | **Activation method wrong in doc** |
 | Playwright | `npx -y @playwright/mcp@latest` | `mcp-find("playwright")` | **Activation method wrong in doc** |
 | Morphllm | `@morphllm/morphmcp` with `edit_file,warpgrep_codebase_search` | `mcp-find("morphllm")` + generic "Fast Apply" | **Activation + tools wrong in doc** |
-| Magic | `npx -y @21st-dev/magic` | `mcp-find("magic")` | Activation method wrong in doc |
 | Tavily | `npx -y mcp-remote https://mcp.tavily.com/mcp` | No install mentioned | Minor |
 | Serena | `uvx --from git+https://...` | Same uvx command | Aligned |
 | Context7 | `npx -y @upstash/context7-mcp` | No install mentioned | Aligned |
 | Sequential | `npx -y @modelcontextprotocol/server-sequential-thinking` | No install mentioned | Aligned |
-| ast-grep | `uvx --from git+https://...ast-grep-mcp` | No install mentioned | Aligned |
 
-4 docs reference `mcp-find/mcp-add` Docker catalog activation — this pattern is outdated. All servers are now installed directly via install_mcp.py.
+3 docs reference `mcp-find/mcp-add` Docker catalog activation — this pattern is outdated. All servers are now installed directly via install_mcp.py.
 
 ---
 
@@ -217,13 +192,11 @@ Research conducted 2026-04-04 against GitHub repos, changelogs, and npm/PyPI reg
 | `MCP_Serena.md` | Add safe_delete_symbol, rename_memory, update version refs, note JetBrains | Small |
 | `MCP_Context7.md` | Add remote server, version ref, skill-based setup note | Small |
 
-### Phase 3 — Tier 3 Patches (LOW impact, 4 files)
+### Phase 3 — Tier 3 Patches (LOW impact, 2 files)
 
 | File | Action | Estimated Effort |
 |------|--------|-----------------|
-| `MCP_AstGrep.md` | Add max_results/output_format params | Trivial |
 | `MCP_Tavily.md` | Add new search params, DEFAULT_PARAMETERS | Trivial |
-| `MCP_Magic.md` | Fix activation to CLI install, drop mcp-find | Trivial |
 | `MCP_Sequential.md` | No changes needed | None |
 
 ### Phase 4 — Ancillary
@@ -258,7 +231,6 @@ Affected files (MCP docs only — no agent/command/mode files reference this pat
 - `MCP_Chrome-DevTools.md:9-10`
 - `MCP_Playwright.md:8-9`
 - `MCP_Morphllm.md:8-9`
-- `MCP_Magic.md:8-9`
 
 ### `--frontend-verify` Composite Flag
 The concept is still valid (Playwright + DevTools + Serena). References in `FLAGS.md`, `README.md`, `context_loader.py` don't need changes. The individual MCP docs that describe this integration pattern should update the specific tool names used.
@@ -284,7 +256,5 @@ No agent `.md` files directly reference `mcp-find/mcp-add`. The `<mcp servers=".
 | Morphllm | `docs.morphllm.com/mcpquickstart` + `morphllm.com/setup` |
 | Serena | `github.com/oraios/serena` releases + current session tools |
 | Context7 | `github.com/upstash/context7` releases |
-| ast-grep | `github.com/ast-grep/ast-grep-mcp` README |
 | Tavily | `github.com/tavily-ai/tavily-mcp` README |
 | Sequential | `github.com/modelcontextprotocol/servers` |
-| Magic | `21st.dev/magic`, npm `@21st-dev/cli` |

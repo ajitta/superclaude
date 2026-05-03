@@ -35,7 +35,7 @@
 | Output artifact | `docs/specs/YYYY-MM-DD-<topic>-design.md` | `REQUIREMENTS.md` |
 | Review gate | Dispatches `spec-document-reviewer` subagent (max 5 iterations) | None |
 | Handoff target | `writing-plans` skill | `/sc:design`, `/sc:implement` |
-| MCP servers | None declared in frontmatter | `seq\|c7\|magic\|serena` |
+| MCP servers | None declared in frontmatter | `seq\|c7\|serena` |
 | Personas | None | 7 (`arch\|anal\|fe\|be\|sec\|ops\|pm`) |
 
 **Impact:** User calls `/sc:brainstorm` → gets the command's 5-step flow → no spec artifact written → no review loop → handoff to `/sc:implement`, **skipping `writing-plans` entirely**. This violates `core/RULES.md` workflow gates:
@@ -182,7 +182,7 @@ The `confidence-check` skill declares a `PreToolUse` hook matching `WebFetch|Web
 
 | Content | Declares | Missing | Rationale |
 |---------|----------|---------|-----------|
-| `/sc:brainstorm` command | `seq\|c7\|magic\|serena` | `tavily` | Skill body references external research |
+| `/sc:brainstorm` command | `seq\|c7\|serena` | `tavily` | Skill body references external research |
 | `brainstorming` skill | (none in frontmatter) | `seq` at minimum | Complex multi-step reasoning |
 | `/sc:review` command | (none) | `serena` | Cross-file symbol reference analysis |
 | `/sc:cleanup` command | `seq\|c7` | `morph` | Bulk code transformation |

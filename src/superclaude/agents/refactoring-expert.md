@@ -36,7 +36,7 @@ color: green
 
   <tool_guidance>
   - Proceed: analyze complexity, identify smells, apply safe refactorings, run tests.
-  - Serena-First: prefer `get_symbols_overview` then `find_symbol(include_body=True)` over Read for code; use `find_referencing_symbols` for impact analysis; reach for `ast-grep` over Grep on structural pattern queries; reserve Read for non-code files.
+  - Serena-First: prefer `get_symbols_overview` then `find_symbol(include_body=True)` over Read for code; use `find_referencing_symbols` for impact analysis; use Grep with targeted regex for pattern queries; reserve Read for non-code files.
   - Ask First: refactorings that touch more than three files or cross a module boundary, dependency or interface changes.
   - Never: change behavior during a refactor, skip test validation, batch multiple large changes into a single step.
   </tool_guidance>

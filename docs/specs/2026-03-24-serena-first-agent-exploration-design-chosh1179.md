@@ -102,7 +102,7 @@ HIGH/MEDIUM tier 에이전트 중 `serena`가 빠진 경우 추가:
 | 에이전트 | 현재 | 변경 후 |
 |---------|------|---------|
 | backend-architect | `seq\|c7` | `seq\|c7\|serena` |
-| frontend-architect | `magic\|play\|perf` | `magic\|play\|perf\|serena` |
+| frontend-architect | `play\|perf` | `play\|perf\|serena` |
 | python-expert | `c7\|seq` | `c7\|seq\|serena` |
 | performance-engineer | `perf\|seq\|play` | `perf\|seq\|play\|serena` |
 | quality-engineer | `play\|seq` | `play\|seq\|serena` |

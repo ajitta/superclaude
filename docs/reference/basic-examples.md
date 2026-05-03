@@ -310,7 +310,7 @@
 ```bash
 # React component with modern patterns
 /sc:implement "React user profile component with form validation and image upload"
-# Activates: frontend-architect + Magic MCP + accessibility patterns
+# Activates: frontend-architect + accessibility patterns
 # Expected: Modern React component with hooks, validation, accessibility
 
 

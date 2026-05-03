@@ -37,7 +37,7 @@ description: Feature and code implementation with intelligent agent delegation a
   <examples>
 | Input | Output |
 |---|---|
-| `user profile --type component --framework react` | Magic UI + frontend best practices |
+| `user profile --type component --framework react` | frontend agent + best practices |
 | `auth API --type api --safe --with-tests` | backend + security agents |
 | `payment system --type feature --with-tests` | Multi-agent coordination |
 | `dashboard widget --framework vue` | C7 Vue patterns |

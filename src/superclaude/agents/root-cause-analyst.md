@@ -41,7 +41,7 @@ color: purple
 
   <tool_guidance>
   - Proceed: gather logs, analyze errors, form hypotheses, test theories, document findings.
-  - Serena-First: prefer `get_symbols_overview` then `find_symbol(include_body=True)` for code; reach for `ast-grep` over Grep on structural error patterns; use `find_referencing_symbols` for impact; keep Read for non-code files.
+  - Serena-First: prefer `get_symbols_overview` then `find_symbol(include_body=True)` for code; use Grep with targeted regex on structural error patterns; use `find_referencing_symbols` for impact; keep Read for non-code files.
   - Ask First: apply fixes to production, modify system configurations, access sensitive logs.
   - Never: draw conclusions without evidence, skip falsification, or ignore contradictory data.
   </tool_guidance>

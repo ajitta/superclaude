@@ -280,7 +280,6 @@ For organizations requiring extended security support:
 
 **Context7**: Documentation lookup with request sanitization and rate limiting
 **Sequential**: Reasoning engine with controlled execution scope and resource limits
-**Magic**: UI generation with output validation and XSS prevention
 **Playwright**: Browser automation with sandboxed execution environment
 **Morphllm**: Code transformation with input validation and safety checks
 **Serena**: Memory management with secure data persistence and access controls

@@ -16,7 +16,6 @@
 |------|---------|---------|---------------|
 | `--c7` / `--context7` | Context7 | Official docs, framework patterns | Library imports, framework questions |
 | `--seq` / `--sequential` | Sequential | Multi-step reasoning, debugging | Complex debugging, system design |
-| `--magic` | Magic | UI component generation | `/ui` commands, frontend keywords |
 | `--play` / `--playwright` | Playwright | Browser testing, E2E validation | Testing requests, visual validation |
 | `--chrome` / `--devtools` | Chrome DevTools | Performance analysis, debugging | Performance auditing, debugging, layout issues |
 | `--tavily` | Tavily | Web search, real-time info | Web search requests, research queries |
@@ -186,10 +185,10 @@
 
 ### Frontend Development
 ```bash
-/sc:implement "responsive dashboard" --magic --c7
+/sc:implement "responsive dashboard" --c7
 /sc:design component-library --type component --format code
-/sc:test ui-components/ --magic --play
-/sc:improve legacy-ui/ --magic --morph --validate
+/sc:test ui-components/ --play
+/sc:improve legacy-ui/ --morph --validate
 ```
 
 ### Backend Development
@@ -220,7 +219,7 @@
 
 ### Compatible Combinations
 - `--think` + `--c7`: Analysis with documentation
-- `--magic` + `--play`: UI generation with testing
+- `--play` + `--c7`: Browser testing with framework patterns
 - `--serena` + `--morph`: Project memory with transformations
 - `--safe-mode` + `--validate`: Maximum safety
 - `--loop` + `--validate`: Iterative improvement with validation
@@ -235,7 +234,6 @@
 - `--safe-mode` auto-enables `--uc` and `--validate`
 - `--ultrathink` auto-enables all MCP servers
 - `--think-hard` auto-enables `--seq` + `--c7`
-- `--magic` triggers UI-focused agents
 
 ## Troubleshooting Flags
 

@@ -163,7 +163,6 @@ TIER_0_MAP = {
     "mcp/MCP_Sequential.md": "Sequential: multi-step reasoning chain. Use for 3+ component problems.",
     "mcp/MCP_Playwright.md": "Playwright: browser E2E automation. navigate → interact → assert.",
     "mcp/MCP_Chrome-DevTools.md": "DevTools: performance profiling. trace → reproduce → analyze Core Web Vitals.",
-    "mcp/MCP_Magic.md": "Magic 21st.dev: UI component search → customize → integrate.",
     "mcp/MCP_Morphllm.md": "Morphllm: bulk pattern-based multi-file code transforms.",
     "core/BUSINESS_SYMBOLS.md": "Business symbols + expert selection. 🎯📈💰⚖️🏆🌊 domain mapping.",
 }
@@ -335,10 +334,6 @@ INSTRUCTION_MAP = {
         "Workflow: start trace → reproduce issue → stop trace → analyze insights. "
         "Key metrics: CLS, LCP, FID/INP. Use lighthouse_audit for overall scores. "
         "take_screenshot for visual validation."
-    ),
-    "mcp/MCP_Magic.md": (
-        "Magic 21st.dev: UI component library. Search components → preview → customize → integrate. "
-        "Focus on React components, design system tokens, responsive patterns."
     ),
     "mcp/MCP_Morphllm.md": (
         "Morphllm: bulk code transforms via pattern matching. Multi-file edits for: "

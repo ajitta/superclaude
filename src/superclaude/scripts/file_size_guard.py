@@ -2,7 +2,7 @@
 """PreToolUse hook that blocks Read calls on large files to prevent token explosion.
 
 Proactive token conservation: blocks full-file reads above 30KB, pushing the
-model toward Serena symbolic tools, ast-grep, Grep, or paginated Read instead.
+model toward Serena symbolic tools, Grep, or paginated Read instead.
 
 Threshold: 30KB (token conservation, not CC hard limit).
 Bypass: limit parameter, pages parameter (PDF), binary extensions,

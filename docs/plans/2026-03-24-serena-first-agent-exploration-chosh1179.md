@@ -18,7 +18,7 @@
 ### Task 1: backend-architect, frontend-architect, python-expert
 **Files:** Modify: `src/superclaude/agents/backend-architect.md`, `frontend-architect.md`, `python-expert.md`
 - [ ] backend-architect: tool_guidance Proceed에 Serena-First 줄 추가, mcp `seq|c7` → `seq|c7|serena`
-- [ ] frontend-architect: tool_guidance Proceed에 Serena-First 줄 추가, mcp `magic|play|perf` → `magic|play|perf|serena`
+- [ ] frontend-architect: tool_guidance Proceed에 Serena-First 줄 추가, mcp `play|perf` → `play|perf|serena`
 - [ ] python-expert: tool_guidance Proceed에 Serena-First 줄 추가, mcp `c7|seq` → `c7|seq|serena`
 
 ### Task 2: performance-engineer, quality-engineer, security-engineer

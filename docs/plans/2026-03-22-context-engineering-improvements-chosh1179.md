@@ -72,7 +72,7 @@
 ### Task 1.4: Expand INSTRUCTION_MAP to 9 entries
 **Files:** Modify: `src/superclaude/scripts/context_loader.py:146-153`
 - [x] Replace INSTRUCTION_MAP dict with 9 entries (1 core + 8 MCP)
-- [x] Classify MCPs: **behavioral** (Serena, Tavily) get longer instructions (~4 lines); **tool** MCPs (Context7, Sequential, Playwright, DevTools, Magic, Morphllm) get shorter (~2 lines)
+- [x] Classify MCPs: **behavioral** (Serena, Tavily) get longer instructions (~4 lines); **tool** MCPs (Context7, Sequential, Playwright, DevTools, Morphllm) get shorter (~2 lines)
 - [x] Serena instruction must include: initialization sequence, symbolic workflow, decision rule (when Serena vs native), memory conventions
 - [x] Tavily instruction must include: 5 tools, use cases, fallback to WebSearch
 - [x] Run: `echo "--serena" | python src/superclaude/scripts/context_loader.py` — verify short instruction emitted, NOT full .md
@@ -105,7 +105,7 @@
 **Files:** Modify: `src/superclaude/scripts/context_loader.py` (add after INSTRUCTION_MAP)
 - [x] Add `TIER_0_MAP` dict with 7 entries (6 tool MCPs + 1 core): one-line summaries (~15 tokens each)
 - [x] Behavioral MCPs (Serena, Tavily): NOT in TIER_0 — they skip to INSTRUCTION_MAP (Tier 1) [N2]
-- [x] Tool MCPs (Context7, Sequential, Playwright, DevTools, Magic, Morphllm): in TIER_0
+- [x] Tool MCPs (Context7, Sequential, Playwright, DevTools, Morphllm): in TIER_0
 - [x] Core (BUSINESS_SYMBOLS): in TIER_0
 
 ### Task 2.2: Implement tier selection logic
@@ -140,7 +140,7 @@
 ### Task 2.5: Sprint 2 verification
 - [x] Run `uv run pytest` — full suite green
 - [x] Re-measure 3 flag combinations — compare to Sprint 0 baseline
-- [x] Expected: tool MCP flags (--c7, --magic, etc.) → ~80% token reduction; behavioral MCP flags (--serena, --tavily) → ~60% reduction; modes → no change
+- [x] Expected: tool MCP flags (--c7, --morph, etc.) → ~80% token reduction; behavioral MCP flags (--serena, --tavily) → ~60% reduction; modes → no change
 
 ---
 

@@ -121,8 +121,6 @@ class TestMCPWiring:
         "MCP_Sequential.md",
         "MCP_Playwright.md",
         "MCP_Serena.md",
-        "MCP_AstGrep.md",
-        "MCP_Magic.md",
         "MCP_Tavily.md",
         "MCP_Chrome-DevTools.md",
     ]
@@ -139,8 +137,6 @@ class TestMCPWiring:
             "sequential": "Sequential",
             "playwright": "Playwright",
             "serena": "Serena",
-            "ast-grep": "AstGrep",
-            "magic": "Magic",
             "tavily": "Tavily",
             "chrome-devtools": "Chrome-DevTools",
         }

@@ -56,7 +56,7 @@
 └─────────────────┘      └──────────────────┘     └─────────────────┘
 ```
 
-**The Magic**: When you type `/sc:brainstorm`, Claude reads behavioral instructions from installed `.md` files and responds with enhanced capabilities
+**How It Works**: When you type `/sc:brainstorm`, Claude reads behavioral instructions from installed `.md` files and responds with enhanced capabilities
 
 </div>
 
@@ -182,7 +182,6 @@ Task Management
 
 Context7 (docs)  
 Sequential (analysis)  
-Magic (UI)  
 Playwright (testing)
 
 *Enhanced tools*
@@ -254,7 +253,7 @@ Playwright (testing)
 
 | Domain | Trigger | Specialist Activation | MCP Server |
 |--------|---------|----------------------|------------|
-| **Frontend** | UI component request | `@agent-frontend` | Magic |
+| **Frontend** | UI component request | `@agent-frontend` | Context7 |
 | **Backend** | API endpoint creation | `@agent-backend` | Sequential |
 | **Security** | Auth implementation | `@agent-security` | Context7 |
 | **Testing** | E2E test scenarios | `@agent-qa` | Playwright |

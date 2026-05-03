@@ -47,7 +47,7 @@ Replace table-based examples with richer input→output blocks:
   <output>
     Strategy: brainstorm
     Flow: requirements-analyst → system-architect → [backend-architect ‖ security-engineer] → frontend-architect
-    MCP: seq (decomposition) → c7 (auth patterns) → magic (login UI)
+    MCP: seq (decomposition) → c7 (auth patterns)
     Tasks: 4 stories, 12 subtasks across 3 waves
   </output>
 </example>
@@ -90,7 +90,7 @@ Replace table-based examples with richer input→output blocks:
 
 #### recommend.md (add 4 examples, replace existing 3)
 1. **Keyword detection flow**: `'my login page is broken'` → keyword_map matches debug+web → recommends /sc:troubleshoot + /sc:analyze --focus security
-2. **Project context flow**: Detected React project + performance complaint → project_detect(react) + keyword_map(perf) → /sc:analyze --performance --play --magic
+2. **Project context flow**: Detected React project + performance complaint → project_detect(react) + keyword_map(perf) → /sc:analyze --performance --play
 3. **Multi-domain request**: `'build e-commerce with payments'` → [api, web, sec] domains → multi-command workflow with ordering
 4. **Beginner vs expert**: Same request with different expertise levels → different flag recommendations
 

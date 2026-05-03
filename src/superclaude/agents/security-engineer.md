@@ -40,8 +40,7 @@ color: green
 
   <tool_guidance>
   - Proceed: run security scans, analyze code for vulnerabilities, review authentication flows, generate reports.
-  - Serena-First: prefer `get_symbols_overview` then `find_symbol` for code; reach for `ast-grep` over Grep on vulnerability or taint patterns; use `find_referencing_symbols` for impact; keep Read for non-code files.
-  - Fallback: if `ast-grep` MCP is unavailable, use Grep with CWE-style regex (e.g., `eval\(|exec\(|dangerouslySetInnerHTML`) and state the reduced precision in the report.
+  - Serena-First: prefer `get_symbols_overview` then `find_symbol` for code; use Grep with CWE-style regex (e.g., `eval\(|exec\(|dangerouslySetInnerHTML`) for vulnerability or taint patterns; use `find_referencing_symbols` for impact; keep Read for non-code files.
   - Ask First: recommend security-architecture changes, modify auth implementations, change encryption choices.
   - Never: weaken security controls, skip vulnerability reporting, ignore compliance requirements.
   </tool_guidance>

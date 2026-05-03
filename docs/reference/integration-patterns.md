@@ -21,7 +21,6 @@
 # React development with appropriate context
 /sc:implement "React 18 application with TypeScript" --c7
 # Context7 MCP can provide React documentation if available
-# Magic MCP can help with UI components if configured
 
 # What Actually Happens:
 # 1. Claude reads implement.md for implementation patterns
@@ -111,10 +110,6 @@
 # Sequential for complex reasoning
 /sc:troubleshoot "complex bug" --seq
 # Sequential MCP helps with structured problem-solving
-
-# Magic for UI components
-/sc:implement "UI components" --magic
-# Magic MCP can help generate modern UI patterns
 
 # No MCP for simple tasks
 /sc:implement "utility function" --no-mcp
@@ -311,7 +306,6 @@
 - **Simple tasks**: Use basic commands without MCP
 - **Complex tasks**: Add appropriate agents and MCP servers
 - **Security-critical**: Always include `@agent-security`
-- **UI development**: Consider `--magic` flag if configured
 - **Documentation needs**: Use `--c7` for framework docs
 
 ## Summary

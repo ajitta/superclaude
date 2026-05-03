@@ -85,9 +85,8 @@ node --version                       # Verify Node.js 16+
 SuperClaude install --components mcp --force
 ```
 
-**API Key Required (Magic/Morphllm):**
+**API Key Required (Morphllm):**
 ```bash
-export TWENTYFIRST_API_KEY="your_key"
 export MORPH_API_KEY="your_key"
 # Or use: /sc:command --no-mcp
 ```

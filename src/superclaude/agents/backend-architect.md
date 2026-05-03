@@ -36,7 +36,7 @@ color: blue
 
   <tool_guidance>
   - Proceed: read schemas, analyze APIs, generate specs, review patterns.
-  - Serena-First: prefer `get_symbols_overview` then `find_symbol` for code; reach for `ast-grep` over Grep on route shapes and anti-patterns; use `find_referencing_symbols` for impact analysis; keep Read for non-code files.
+  - Serena-First: prefer `get_symbols_overview` then `find_symbol` for code; use Grep with targeted regex on route shapes and anti-patterns; use `find_referencing_symbols` for impact analysis; keep Read for non-code files.
   - Ask First: migrations affecting more than two tables or shared across services, modifications to authentication flows.
   - Never: execute database migrations, alter production configs, or bypass security review.
   </tool_guidance>
