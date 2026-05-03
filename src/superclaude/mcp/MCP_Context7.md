@@ -25,21 +25,24 @@
   - Non-library questions: system design, architecture → native Claude
   </choose>
 
-  ## Token Management
-  - Default: 10,000 tokens per query (sufficient for most lookups)
-  - Reduce to 5,000: simple API signature checks
-  - Increase to 20,000: complex integration patterns, multi-step tutorials
-  - Max 3 calls per question — if not found after 3, use best available result
+  <token_management>
+  - Default: 10,000 tokens per query (sufficient for most lookups).
+  - Reduce to 5,000: simple API signature checks.
+  - Increase to 20,000: complex integration patterns, multi-step tutorials.
+  - Max 3 calls per question — if not found after 3, use the best available result.
+  </token_management>
 
-  ## Version Pinning
-  - `resolve-library-id` returns available versions
-  - Use `/org/project/version` format for version-specific docs
-  - When user specifies a version, always pin it in the query
+  <version_pinning>
+  - `resolve-library-id` returns available versions.
+  - Use `/org/project/version` format for version-specific docs.
+  - When the user specifies a version, always pin it in the query.
+  </version_pinning>
 
-  ## Integration Patterns
-  - **Implementation**: Context7 → verify API → /sc:implement (official patterns first)
-  - **Migration**: Context7:old-version → Context7:new-version → diff → /sc:plan
-  - **Debugging**: Context7 → confirm expected behavior → compare with actual → /sc:troubleshoot
+  <integration_patterns>
+  - Implementation: Context7 → verify API → `/sc:implement` (official patterns first).
+  - Migration: Context7:old-version → Context7:new-version → diff → `/sc:plan`.
+  - Debugging: Context7 → confirm expected behavior → compare with actual → `/sc:troubleshoot`.
+  </integration_patterns>
 
   <examples>
 | Input | Action | Reason |

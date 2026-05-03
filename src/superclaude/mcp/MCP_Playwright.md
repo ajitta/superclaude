@@ -3,14 +3,16 @@
     <mission>Browser automation, E2E testing, network mocking, and visual validation via official Microsoft Playwright MCP</mission>
   </role>
 
-  ## Capability System
+  <capability_system>
   Tools are grouped into opt-in capabilities via `--caps=`:
-  - **core** (default): navigation, interaction, screenshots, tabs, dialogs
-  - **network** (opt-in): request inspection, route mocking, state control
-  - **storage** (opt-in): cookies CRUD, localStorage CRUD
-  - **pdf** (opt-in): PDF generation
-  - **vision** (opt-in): coordinate-based interactions
-  - **devtools** (opt-in): developer tools features
+
+  - core: default — navigation, interaction, screenshots, tabs, dialogs.
+  - network: opt-in — request inspection, route mocking, state control.
+  - storage: opt-in — cookies CRUD, localStorage CRUD.
+  - pdf: opt-in — PDF generation.
+  - vision: opt-in — coordinate-based interactions.
+  - devtools: opt-in — developer tools features.
+  </capability_system>
 
   <choose>
   Use:
@@ -28,29 +30,33 @@
   - Static analysis: code quality → native Claude + /sc:review
   </choose>
 
-  ## Key Flags
-  - `--caps=network,storage` — enable additional capabilities
-  - `--persistent` — persistent browser profile (default: incognito)
-  - `-s=<name>` — session management
-  - `--snapshot-mode=incremental|full|none` — control snapshot generation
-  - `--slim` — token savings mode
-  - `--test-id-attribute=<attr>` — custom test ID selector (default: data-testid)
-  - `--secrets=<path>` — dotenv-format secrets file
-  - `--timeout-action=<ms>` — action timeout (default: 5000)
+  <key_flags>
+  - `--caps=network,storage` — enable additional capabilities.
+  - `--persistent` — persistent browser profile (default: incognito).
+  - `-s=<name>` — session management.
+  - `--snapshot-mode=incremental|full|none` — control snapshot generation.
+  - `--slim` — token savings mode.
+  - `--test-id-attribute=<attr>` — custom test ID selector (default: `data-testid`).
+  - `--secrets=<path>` — dotenv-format secrets file.
+  - `--timeout-action=<ms>` — action timeout (default: 5000).
+  </key_flags>
 
-  ## Network Mocking Patterns
+  <network_mocking_patterns>
   URL patterns support glob matching:
-  - `/api/users` — exact path
-  - `/api/*/details` — wildcard
-  - `/*.{png,jpg}` — file extensions
-  - `/search?q=*` — query params
 
-  ## Integration Patterns
-  - **Frontend verify** (--frontend-verify): Playwright:interaction + DevTools:metrics + Serena:code
-  - **E2E suite**: /sc:test --type e2e → Playwright:execute → screenshot evidence → report
-  - **Visual QA**: Playwright:screenshot → Claude:vision → /sc:review
-  - **A11y audit**: Playwright:snapshot → assert accessible names → /sc:analyze --focus a11y
-  - **API mock testing**: Playwright:browser_route_set → navigate → verify UI with mocked data
+  - `/api/users` — exact path.
+  - `/api/*/details` — wildcard.
+  - `/*.{png,jpg}` — file extensions.
+  - `/search?q=*` — query params.
+  </network_mocking_patterns>
+
+  <integration_patterns>
+  - Frontend-Verify (`--frontend-verify`): Playwright:interaction + DevTools:metrics + Serena:code.
+  - E2E-Suite: `/sc:test --type e2e` → Playwright:execute → screenshot evidence → report.
+  - Visual-QA: Playwright:screenshot → Claude:vision → `/sc:review`.
+  - A11y-Audit: Playwright:snapshot → assert accessible names → `/sc:analyze --focus a11y`.
+  - API-Mock-Testing: Playwright:`browser_route_set` → navigate → verify UI with mocked data.
+  </integration_patterns>
 
   <examples>
 | Input | Action | Reason |

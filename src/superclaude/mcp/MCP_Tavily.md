@@ -4,35 +4,46 @@
   </role>
 
   <choose>
-Use:
-- Structured search: Advanced filtering over WebSearch
-- Multi-source: Search, not single page extraction (use WebFetch)
-- Research: Comprehensive multi-source investigations
-- Current info: Post-knowledge-cutoff events
+  Use:
+  - Structured search: advanced filtering over WebSearch.
+  - Multi-source: search, not single-page extraction (use WebFetch).
+  - Research: comprehensive multi-source investigations.
+  - Current info: post-knowledge-cutoff events.
 
-Avoid:
-- Training knowledge: Simple questions from training
-- Code generation: Writing code, local file ops
-
-Channel selection (3-way):
-| Channel | Trigger |
-|---------|---------|
-| **MCP** (default, `tavily_*`) | <5 queries · in-conversation answers · structured parallel calls · fact-check · `/sc:research --depth quick\|standard` |
-| **`tavily-cli` skill** | ≥5 chained queries · `/sc:research --depth deep\|exhaustive` (≥20 sources) · file output (`--output-dir`) · advanced filters (`--include-domains`, `--time-range`) · shell pipeline composition |
-| **Native WebSearch / WebFetch** | MCP+CLI both unavailable (fallback only) |
+  Avoid:
+  - Training knowledge: simple questions from training.
+  - Code generation: writing code, local file ops.
   </choose>
 
-  ## Search Patterns
-  Basic: query → ranked results | Domain: query + include_domains:[arxiv,github] | Time: query + time_range:week | Date: query + start_date/end_date | Deep: query + include_raw_content:true | Research: input → multi-source synthesis | Crawl: url + depth + instructions → pages
+  <channel_selection>
+  | Channel | Trigger |
+  |---|---|
+  | MCP (default, `tavily_*`) | <5 queries · in-conversation answers · structured parallel calls · fact-check · `/sc:research --depth quick\|standard` |
+  | `tavily-cli` skill | ≥5 chained queries · `/sc:research --depth deep\|exhaustive` (≥20 sources) · file output (`--output-dir`) · advanced filters (`--include-domains`, `--time-range`) · shell pipeline composition |
+  | Native WebSearch / WebFetch | MCP+CLI both unavailable (fallback only) |
+  </channel_selection>
 
-  ## Workflows
-  - Research: Tavily:broad → Sequential:gaps → Tavily:targeted → Sequential:synthesize → Serena:store
-  - Fact-Check: Tavily:verify → Tavily:contradictions → Sequential:evidence → Report
-  - Deep-Research: Plan:decompose → Tavily:search → Route:simple→Tavily|complex→Playwright → Synthesize
+  <search_patterns>
+  - Basic: query → ranked results.
+  - Domain: query + `include_domains:[arxiv,github]`.
+  - Time: query + `time_range:week`.
+  - Date: query + `start_date` / `end_date`.
+  - Deep: query + `include_raw_content:true`.
+  - Research: input → multi-source synthesis.
+  - Crawl: url + depth + instructions → pages.
+  </search_patterns>
 
-  ## Strategies
-  Multi-Hop: broad → entities → relationships → synthesize | Adaptive: Simple:direct|Complex:variations+boolean+domain|Iterative:refine→gaps
-  Credibility: High=academic,gov,official | Medium=industry,expert | Low=forums,social
+  <workflows>
+  - Research: Tavily:broad → Sequential:gaps → Tavily:targeted → Sequential:synthesize → Serena:store.
+  - Fact-Check: Tavily:verify → Tavily:contradictions → Sequential:evidence → report.
+  - Deep-Research: Plan:decompose → Tavily:search → Route (simple → Tavily, complex → Playwright) → synthesize.
+  </workflows>
+
+  <strategies>
+  - Multi-Hop: broad → entities → relationships → synthesize.
+  - Adaptive: simple → direct; complex → variations + boolean + domain; iterative → refine → gaps.
+  - Credibility: high = academic / gov / official; medium = industry / expert; low = forums / social.
+  </strategies>
 
   <examples>
 | Input | Output | Reason |

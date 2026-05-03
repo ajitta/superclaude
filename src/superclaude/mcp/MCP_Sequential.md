@@ -17,23 +17,26 @@
   - Documentation: writing docs doesn't need structured reasoning
   </choose>
 
-  ## Thought Strategies
-  - **Linear**: step 1 → 2 → 3 → conclusion (simple decomposition)
-  - **Hypothesis-test**: hypothesis → evidence → verify → accept/reject → next hypothesis
-  - **Branch-compare**: thought N → branch A → branch B → compare → select best
-  - **Revision**: realize error at step 5 → revise step 3 → continue from corrected base
+  <thought_strategies>
+  - Linear: step 1 → 2 → 3 → conclusion (simple decomposition).
+  - Hypothesis-Test: hypothesis → evidence → verify → accept/reject → next hypothesis.
+  - Branch-Compare: thought N → branch A → branch B → compare → select best.
+  - Revision: realize error at step 5 → revise step 3 → continue from corrected base.
+  </thought_strategies>
 
-  ## When to Adjust
-  - `totalThoughts` too low? Increase mid-chain — don't force premature conclusions
-  - Dead end? Set `isRevision: true` and reconsider the problematic step
-  - Two valid paths? Branch from the decision point, explore both, then compare
-  - `needsMoreThoughts: true` — signals the chain needs extension even at planned end
+  <when_to_adjust>
+  - `totalThoughts` too low? Increase mid-chain — don't force premature conclusions.
+  - Dead end? Set `isRevision: true` and reconsider the problematic step.
+  - Two valid paths? Branch from the decision point, explore both, then compare.
+  - `needsMoreThoughts: true` — signals the chain needs extension even at planned end.
+  </when_to_adjust>
 
-  ## Integration Patterns
-  - **Troubleshooting**: Sequential:hypotheses → test each → Sequential:synthesize → /sc:troubleshoot
-  - **Architecture**: Sequential:requirements → trade-offs → constraints → recommendation → /sc:design
-  - **Research**: Tavily:gather → Sequential:analyze → gaps → Tavily:targeted → Sequential:conclude
-  - **Review**: Read code → Sequential:security-analysis → Sequential:perf-analysis → /sc:review
+  <integration_patterns>
+  - Troubleshooting: Sequential:hypotheses → test each → Sequential:synthesize → `/sc:troubleshoot`.
+  - Architecture: Sequential:requirements → trade-offs → constraints → recommendation → `/sc:design`.
+  - Research: Tavily:gather → Sequential:analyze → gaps → Tavily:targeted → Sequential:conclude.
+  - Review: Read code → Sequential:security-analysis → Sequential:perf-analysis → `/sc:review`.
+  </integration_patterns>
 
   <examples>
 | Input | Thoughts | Strategy |
