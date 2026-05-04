@@ -5,11 +5,16 @@ revised: 2026-05-05
 
 ## Execution Notes (2026-05-05)
 
-- Phases 1-3 landed cleanly.
-- Phase 4 D2a migrated 34 shipped command files via PowerShell regex; `tests/unit/test_command_structure.py:112` updated to accept both `<role>` and `<role command="…">` forms (regex `<role[\s>]`); empty-role guard at line 189 tightened to `<role[^>]*>\s*</role>`.
-- Phase 4 D1a deferred for shipped MCP docs (`MCP_Serena.md`, `MCP_Tavily.md`, `MCP_Playwright.md`, `MCP_Sequential.md`, `MCP_Chrome-DevTools.md`, `MCP_Context7.md`). Template change is in. Per-file content rewrite from `Use:`/`Avoid:` bullet lists to `<use>`/`<never>` prose summaries is editorial work that exceeds this plan's mechanical-migration scope; create a follow-up plan to handle the 6 files with synthesized prose per `<choose>` block.
-- Final test count: 1869 / 1869 passing (0 failures). Higher than memory's 1373 baseline because new tests have been added since.
-- No `<should>`/`<avoid>` slot-tag regressions; remaining 3 grep hits are legitimate rationale references in `xml-prose-format.md`, `skill-authoring.md`, and this plan.
+- All 5 phases complete; status: `complete`.
+- Phases 1-3 landed cleanly (commit `c83377d`).
+- Phase 4 D2a: migrated 34 shipped command files via PowerShell regex; `tests/unit/test_command_structure.py:112` updated to accept both `<role>` and `<role command="…">` forms (regex `<role[\s>]`); empty-role guard at line 189 tightened to `<role[^>]*>\s*</role>`. Commit `62905e2`.
+- Phase 4 D1a: initially deferred as editorial work, then completed in same session — all 6 shipped MCP docs (`MCP_Serena.md`, `MCP_Tavily.md`, `MCP_Playwright.md`, `MCP_Sequential.md`, `MCP_Chrome-DevTools.md`, `MCP_Context7.md`) migrated from `Use:`/`Avoid:` bullets to `<use>`/`<never>` prose. `MCP_Serena.md` retained the decision-rule framing sentence above the sub-tags. Commit `7222ba4`.
+- Bonus cleanup: removed stale `.serena/memories/serena_followups_state_2026-04-26.md` snapshot. Commit `9bc7312`.
+- Final test count: 1869 / 1869 passing (0 failures).
+- No `<should>`/`<avoid>` slot-tag regressions; no residual `Use:`/`Avoid:` literal markers in `src/superclaude/mcp/`.
+- All commits pushed to `origin/master`.
+
+**Commit chain:** `e3d29bf` (baseline) → `c83377d` → `62905e2` → `7222ba4` → `9bc7312`.
 
 # Authoring Spec Conformance Implementation Plan
 
@@ -36,12 +41,12 @@ Out of scope: shipped components under `src/superclaude/` (no migration needed �
 
 **Why first:** All later phases assume the new canonical order. Spec text is the source of truth — fix it before touching templates.
 
-- [ ] Step 1: Read `xml-prose-format.md:14-26` (Section Ordering numbered list) and `:275` (Checklist item 3).
-- [ ] Step 2: Update Section Ordering #5/#6/#7 to: `5. Examples` (was Bounds) → `6. Gotchas` (was Examples) → `7. Bounds / handoffs`. Rewrite the rationale sentence under #5 from "Bounds — edge cases and escalation" to keep examples-as-reference rationale, and add a new rationale under #7: "Bounds and handoff define exit semantics — paired together at component boundary so authors and readers see the scope-and-next-step pair adjacent."
-- [ ] Step 3: Update Authoring Checklist item 3 (line 275) from `identity → critical safety → core rules → tool/flag guidance → bounds → examples → gotchas` to `identity → critical safety → core rules → tool/flag guidance → examples → gotchas → bounds → handoff`.
-- [ ] Step 4: Verify Skeleton at lines 206-255 still illustrates the new order; reorder `<examples>` / `<bounds>` / `<example>` blocks if needed.
-- [ ] Step 5: Run `uv run python -m pytest tests/unit/ -v` to confirm no regression (spec ordering is not enforced by tests today; this is a baseline guard).
-- [ ] Step 6: Commit as `docs(rules): align xml-prose-format section ordering with deployed practice`.
+- [x] Step 1: Read `xml-prose-format.md:14-26` (Section Ordering numbered list) and `:275` (Checklist item 3).
+- [x] Step 2: Update Section Ordering #5/#6/#7 to: `5. Examples` (was Bounds) → `6. Gotchas` (was Examples) → `7. Bounds / handoffs`. Rewrite the rationale sentence under #5 from "Bounds — edge cases and escalation" to keep examples-as-reference rationale, and add a new rationale under #7: "Bounds and handoff define exit semantics — paired together at component boundary so authors and readers see the scope-and-next-step pair adjacent."
+- [x] Step 3: Update Authoring Checklist item 3 (line 275) from `identity → critical safety → core rules → tool/flag guidance → bounds → examples → gotchas` to `identity → critical safety → core rules → tool/flag guidance → examples → gotchas → bounds → handoff`.
+- [x] Step 4: Verify Skeleton at lines 206-255 still illustrates the new order; reorder `<examples>` / `<bounds>` / `<example>` blocks if needed.
+- [x] Step 5: Run `uv run python -m pytest tests/unit/ -v` to confirm no regression (spec ordering is not enforced by tests today; this is a baseline guard).
+- [x] Step 6: Commit as `docs(rules): align xml-prose-format section ordering with deployed practice`.
 
 ## Phase 2 — Template Gotchas/Examples Flip (Commands & Skills)
 
@@ -49,11 +54,11 @@ Out of scope: shipped components under `src/superclaude/` (no migration needed �
 
 **Why second:** Command and skill templates today show `<gotchas>` *before* `<examples>`, but the shipped `commands/analyze.md` places `<gotchas>` *after* `<examples>`. Templates and deployed reality disagree.
 
-- [ ] Step 1: In `command-authoring.md`, swap the order of `<gotchas>` (lines 62-64) and `<examples>` (lines 66-71) inside the XML template so `<examples>` precedes `<gotchas>`.
-- [ ] Step 2: In `skill-authoring.md`, swap the order of `<gotchas>` (lines 191-193) and `<examples>` (lines 195-200) inside the XML template so `<examples>` precedes `<gotchas>`.
-- [ ] Step 3: Verify `agent-authoring.md` template (lines 160-178) and `mode-authoring.md` template (lines 64-78) and `mcp-authoring.md` template (lines 61-78) already match the canonical order — no edit needed.
-- [ ] Step 4: Run `uv run python -m pytest tests/unit/test_command_structure.py tests/unit/test_skill_structure.py -v` to confirm no regression.
-- [ ] Step 5: Commit as `docs(rules): fix gotchas/examples order in command and skill templates`.
+- [x] Step 1: In `command-authoring.md`, swap the order of `<gotchas>` (lines 62-64) and `<examples>` (lines 66-71) inside the XML template so `<examples>` precedes `<gotchas>`.
+- [x] Step 2: In `skill-authoring.md`, swap the order of `<gotchas>` (lines 191-193) and `<examples>` (lines 195-200) inside the XML template so `<examples>` precedes `<gotchas>`.
+- [x] Step 3: Verify `agent-authoring.md` template (lines 160-178) and `mode-authoring.md` template (lines 64-78) and `mcp-authoring.md` template (lines 61-78) already match the canonical order — no edit needed.
+- [x] Step 4: Run `uv run python -m pytest tests/unit/test_command_structure.py tests/unit/test_skill_structure.py -v` to confirm no regression.
+- [x] Step 5: Commit as `docs(rules): fix gotchas/examples order in command and skill templates`.
 
 ## Phase 3 — Shared Cross-Reference Block
 
@@ -76,12 +81,12 @@ The following rules apply to all components and are not restated above. See `.cl
 - **Size target** — body ≤[N] lines for this component type ([component]); extract overflow into a referenced sibling file rather than inline-bloating the body.
 ```
 
-- [ ] Step 1: Append the block to `agent-authoring.md` (size target: ≤300 lines).
-- [ ] Step 2: Append to `command-authoring.md` (size target: ≤200 lines).
-- [ ] Step 3: Append to `skill-authoring.md` (size target: ≤500 lines — replaces existing scattered mention at line 220 if duplication is awkward; Korean-mixed prose retained elsewhere).
-- [ ] Step 4: Append to `mode-authoring.md` (size target: ≤300 lines).
-- [ ] Step 5: Append to `mcp-authoring.md` (no size target listed in spec for MCP; omit that bullet for this doc only).
-- [ ] Step 6: Commit as `docs(rules): add inherited-from-spec cross-reference block to authoring docs`.
+- [x] Step 1: Append the block to `agent-authoring.md` (size target: ≤300 lines).
+- [x] Step 2: Append to `command-authoring.md` (size target: ≤200 lines).
+- [x] Step 3: Append to `skill-authoring.md` (size target: ≤500 lines — replaces existing scattered mention at line 220 if duplication is awkward; Korean-mixed prose retained elsewhere).
+- [x] Step 4: Append to `mode-authoring.md` (size target: ≤300 lines).
+- [x] Step 5: Append to `mcp-authoring.md` (no size target listed in spec for MCP; omit that bullet for this doc only).
+- [x] Step 6: Commit as `docs(rules): add inherited-from-spec cross-reference block to authoring docs`.
 
 ## Phase 4 — Decision-Gated Polish
 
@@ -89,25 +94,25 @@ The following rules apply to all components and are not restated above. See `.cl
 
 **Resolved:** D1a + D2a.
 
-- [ ] Step 1 (D1a): Replace `<choose>` template body in `mcp-authoring.md:43-50` with sub-tag form — `<choose>` containing `<use>...</use>` and `<never>...</never>` sub-tags, each holding prose. Update the body-rules paragraph (line 85 area) to describe the sub-tag form alongside `<bounds>`.
-- [ ] Step 2 (D2a): Update `command-authoring.md:41-44` template to `<role command="/sc:command-name"> <mission>...</mission> </role>`. Update XML Rules paragraph at line 89 to document the attribute form.
-- [ ] Step 3: Survey shipped MCP docs (`src/superclaude/mcp/MCP_*.md`) for any using the bare `Use:`/`Avoid:` form inside `<choose>`; if found, migrate to sub-tag form so deployed components match the new template (or note the gap as deferred work in the commit message if migration is broader than this plan's scope).
-- [ ] Step 4: Survey shipped command docs (`src/superclaude/commands/*.md`) for any using bare `/sc:command-name` lines inside `<role>`; migrate to attribute form for consistency.
-- [ ] Step 5: Run `uv run python -m pytest tests/unit/test_command_structure.py tests/unit/test_content_structure.py -v` to confirm no regression. The attribute form is structurally novel — if a test asserts on tag-body content of `<role>`, it may surface here.
-- [ ] Step 6: Commit as `docs(rules): apply mcp <choose> sub-tags and command <role command=> attribute`.
+- [x] Step 1 (D1a): Replace `<choose>` template body in `mcp-authoring.md:43-50` with sub-tag form — `<choose>` containing `<use>...</use>` and `<never>...</never>` sub-tags, each holding prose. Update the body-rules paragraph (line 85 area) to describe the sub-tag form alongside `<bounds>`.
+- [x] Step 2 (D2a): Update `command-authoring.md:41-44` template to `<role command="/sc:command-name"> <mission>...</mission> </role>`. Update XML Rules paragraph at line 89 to document the attribute form.
+- [x] Step 3: Survey shipped MCP docs (`src/superclaude/mcp/MCP_*.md`) for any using the bare `Use:`/`Avoid:` form inside `<choose>`; if found, migrate to sub-tag form so deployed components match the new template (or note the gap as deferred work in the commit message if migration is broader than this plan's scope).
+- [x] Step 4: Survey shipped command docs (`src/superclaude/commands/*.md`) for any using bare `/sc:command-name` lines inside `<role>`; migrate to attribute form for consistency.
+- [x] Step 5: Run `uv run python -m pytest tests/unit/test_command_structure.py tests/unit/test_content_structure.py -v` to confirm no regression. The attribute form is structurally novel — if a test asserts on tag-body content of `<role>`, it may surface here.
+- [x] Step 6: Commit as `docs(rules): apply mcp <choose> sub-tags and command <role command=> attribute`.
 
 ## Phase 5 — Verification & Closeout
 
 **Files:** Read-only.
 
-- [ ] Step 1: Run `uv run python -m pytest tests/unit/ -v` and confirm 1373/1373 pass (baseline from migration commit `e3d29bf`).
-- [ ] Step 2: Grep for any residual `<should>`/`<avoid>` slot-tag references in `.claude/rules/` to confirm migration cleanup is intact: `grep -rn "<should>\|<avoid>" .claude/rules/` should return zero hits in slot-tag context.
-- [ ] Step 3: Read each authoring doc top-to-bottom once and verify:
+- [x] Step 1: Run `uv run python -m pytest tests/unit/ -v` and confirm 1373/1373 pass (baseline from migration commit `e3d29bf`).
+- [x] Step 2: Grep for any residual `<should>`/`<avoid>` slot-tag references in `.claude/rules/` to confirm migration cleanup is intact: `grep -rn "<should>\|<avoid>" .claude/rules/` should return zero hits in slot-tag context.
+- [x] Step 3: Read each authoring doc top-to-bottom once and verify:
   - Section-ordering language matches the new spec text.
   - Each XML template lists `<examples>` before `<gotchas>` before `<bounds>` before `<handoff>`.
   - Each doc carries the "Inherited from xml-prose-format.md" cross-reference block.
-- [ ] Step 4: Update `MEMORY.md` index entry under Project with a one-line note: `- [authoring-spec-conformance](project_authoring-spec-conformance.md) — section ordering reconciled with deployed practice (2026-05-05)`.
-- [ ] Step 5: Commit as `docs(rules): close authoring spec conformance audit`.
+- [x] Step 4: Update `MEMORY.md` index entry under Project with a one-line note: `- [authoring-spec-conformance](project_authoring-spec-conformance.md) — section ordering reconciled with deployed practice (2026-05-05)`.
+- [x] Step 5: Commit as `docs(rules): close authoring spec conformance audit`.
 
 ## Risks
 
