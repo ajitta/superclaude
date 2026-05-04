@@ -11,18 +11,8 @@
   Never call `get-library-docs` without first resolving the library ID, unless the user provides one explicitly.
 
   <choose>
-  Use:
-  - Version-specific APIs: exact method signatures, parameter types, return values
-  - Migration guides: official upgrade paths between versions
-  - Framework patterns: React hooks, Vue composition, Angular services — official way
-  - Auth flows: OAuth, JWT, session — library-specific implementation
-  - Configuration: build tools, bundlers, linters — correct options
-
-  Avoid:
-  - General concepts: recursion, design patterns, algorithms → native Claude
-  - Debugging help: stack traces, error analysis → Sequential or native
-  - Code review: quality, security assessment → native Claude
-  - Non-library questions: system design, architecture → native Claude
+  <use>version-specific API signatures with exact parameter types and return values, official migration paths between library versions, framework-canonical patterns (React hooks, Vue composition, Angular services — the official way), library-specific auth flow implementation (OAuth, JWT, session), and correct build-tool / bundler / linter configuration options.</use>
+  <never>general programming concepts (recursion, design patterns, algorithms — native Claude), debugging help (stack traces, error analysis — Sequential or native), code-quality and security review (native Claude), and non-library questions about system design or architecture.</never>
   </choose>
 
   <token_management>

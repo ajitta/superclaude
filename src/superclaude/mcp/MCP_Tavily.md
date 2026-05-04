@@ -4,15 +4,8 @@
   </role>
 
   <choose>
-  Use:
-  - Structured search: advanced filtering over WebSearch.
-  - Multi-source: search, not single-page extraction (use WebFetch).
-  - Research: comprehensive multi-source investigations.
-  - Current info: post-knowledge-cutoff events.
-
-  Avoid:
-  - Training knowledge: simple questions from training.
-  - Code generation: writing code, local file ops.
+  <use>structured multi-source web search with advanced filtering (domain include/exclude, time and date ranges, raw-content depth) beyond what native `WebSearch` offers, comprehensive multi-source research investigations with synthesized output, and post-knowledge-cutoff current-info lookup.</use>
+  <never>questions answerable from training, single-page content extraction (use native `WebFetch`), and code generation or local file operations.</never>
   </choose>
 
   <search_patterns>

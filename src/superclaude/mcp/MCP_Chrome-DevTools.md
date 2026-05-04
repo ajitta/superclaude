@@ -4,19 +4,8 @@
   </role>
 
   <choose>
-  Use:
-  - Core Web Vitals: CLS, LCP, INP, TTFB measurement via traces
-  - Lighthouse audits: performance, accessibility, SEO, best practices scores
-  - Memory analysis: heap snapshots, leak detection, GC pressure
-  - Accessibility debugging: automated WCAG checks on live pages
-  - Network inspection: request timing, bundle size, cache behavior
-  - Multi-agent: pageId routing for parallel workflows on different pages
-
-  Avoid:
-  - Live browser interaction: use Playwright (--play)
-  - E2E test flows: use Playwright for user journey validation
-  - Static code analysis: use native Claude for code-level review
-  - Backend profiling: use native tools (perf, flamegraph) for server-side
+  <use>Core Web Vitals measurement (CLS, LCP, INP, TTFB) via traces, Lighthouse audits across performance / accessibility / SEO / best-practices, heap-snapshot memory analysis with leak detection and GC-pressure inspection, automated WCAG accessibility checks on live pages, network request-timing and bundle-size and cache-behavior inspection, and `pageId`-routed multi-agent workflows on different pages.</use>
+  <never>live browser interaction or E2E user-journey scripting (use Playwright via `--play`), static code analysis (use native Claude for code-level review), and server-side backend profiling (use native tools — `perf`, flamegraph).</never>
   </choose>
 
   <key_flags>

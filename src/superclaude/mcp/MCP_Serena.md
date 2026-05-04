@@ -20,22 +20,10 @@
   </fallback_tools>
 
   <choose>
-  Use:
-  - Symbol operations: rename, find references, extract, move (semantic precision).
-  - Cross-file refactoring: rename propagates through all references.
-  - Code understanding: symbol overview before reading full files.
-  - Session persistence: `write_memory` / `read_memory` for cross-session context.
-  - Reflection: `think_about_*` tools for structured self-assessment.
-  - Large projects: multi-language LSP-powered navigation.
+  Decision rule — if the operation is about what the code _means_ (symbols, references, types), Serena; if it is about what the text _says_ (patterns, strings), native tools.
 
-  Avoid:
-  - Simple text edits — native `Edit` (pattern-based, no LSP needed).
-  - File search by name — native `Glob` (faster for simple patterns).
-  - Content search — native `Grep` (faster for text patterns).
-  - Bulk pattern replacements — native `Grep` + `Edit`.
-  - File reading — native `Read` (when you need full file, not symbols).
-
-  Decision rule: if the operation is about _what the code means_ (symbols, references, types), use Serena; if it is about _what the text says_ (patterns, strings), use native tools.
+  <use>symbol-level operations (rename, find references, extract, move), cross-file semantic refactoring where renames propagate through all references, structural code understanding via symbol overview before reading full files, cross-session persistence through `write_memory` / `read_memory`, structured self-assessment via `think_about_*` tools, and LSP-powered navigation in large multi-language projects.</use>
+  <never>simple text edits, filename or content pattern search, bulk find-and-replace, or whole-file reading — those go through native `Edit`, `Glob`, `Grep`, `Read` for lower overhead.</never>
   </choose>
 
   <memory_patterns>

@@ -15,19 +15,8 @@
   </capability_system>
 
   <choose>
-  Use:
-  - User journey validation: login → navigate → action → verify state
-  - Form testing: input, validation, submission, error display
-  - Visual regression: screenshots at responsive breakpoints
-  - Accessibility: assertions via accessibility snapshots
-  - Network mocking: intercept API calls, test error states, offline mode
-  - Storage testing: cookie/localStorage manipulation for auth testing
-
-  Avoid:
-  - Unit tests: component logic → native test runner (vitest, jest)
-  - API testing: backend endpoints → native HTTP tools (curl, fetch)
-  - Performance metrics: CWV, profiling → Chrome DevTools (--perf)
-  - Static analysis: code quality → native Claude + /sc:review
+  <use>end-to-end user-journey validation (login → navigate → action → verify state), form input/validation/submission/error testing, visual regression via screenshots at responsive breakpoints, accessibility assertions through accessibility snapshots, network-call interception for error-state and offline-mode testing, and cookie / localStorage manipulation for auth scenarios.</use>
+  <never>component-level unit tests (use native test runner — vitest, jest), backend API endpoint testing (use native HTTP tools — curl, fetch), Core Web Vitals or profiling work (use Chrome DevTools `--perf`), and static code-quality review (use native Claude + `/sc:review`).</never>
   </choose>
 
   <key_flags>

@@ -4,17 +4,8 @@
   </role>
 
   <choose>
-  Use:
-  - Multi-component problems: 3+ interconnected systems or concerns
-  - Root cause analysis: systematic hypothesis generation and falsification
-  - Architecture decisions: trade-off evaluation with multiple dimensions
-  - Security threat modeling: attack surface enumeration and risk assessment
-  - Planning: multi-phase implementation with dependencies
-
-  Avoid:
-  - Single-step answers: simple lookups, explanations, one-file fixes
-  - Code generation: writing code is not thinking — use native Claude
-  - Documentation: writing docs doesn't need structured reasoning
+  <use>multi-component problem decomposition (3+ interconnected systems or concerns), root-cause analysis with systematic hypothesis generation and falsification, architecture trade-off evaluation across multiple dimensions, security threat modeling with attack-surface enumeration and risk assessment, and multi-phase implementation planning with dependency chains.</use>
+  <never>single-step answers (simple lookups, explanations, one-file fixes), code generation (writing code is not thinking — native Claude is faster), and documentation writing (no structured-reasoning value).</never>
   </choose>
 
   <thought_strategies>
