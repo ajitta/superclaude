@@ -3,8 +3,7 @@ description: Git operations with intelligent commit messages and workflow optimi
 ---
 <component name="git" type="command">
 
-  <role>
-    /sc:git
+  <role command="/sc:git">
     <mission>Git operations with intelligent commit messages and workflow optimization</mission>
   </role>
 

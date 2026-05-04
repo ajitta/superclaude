@@ -3,8 +3,7 @@ description: Multi-expert specification review and improvement using renowned so
 ---
 <component name="spec-panel" type="command">
 
-  <role>
-    /sc:spec-panel
+  <role command="/sc:spec-panel">
     <mission>Multi-expert specification review and improvement using renowned software engineering experts</mission>
   </role>
 

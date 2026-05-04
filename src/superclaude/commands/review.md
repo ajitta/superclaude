@@ -4,8 +4,7 @@ description: Review work products (code, plans, designs, specs) for quality, cor
 
 <component name="review" type="command">
 
-  <role>
-    /sc:review
+  <role command="/sc:review">
     <mission>Review work products — code, plans, designs, specs — for quality, correctness, and alignment with structured feedback</mission>
   </role>
 

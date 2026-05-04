@@ -3,8 +3,7 @@ description: Systematically clean up code, remove dead code, and optimize projec
 ---
 <component name="cleanup" type="command">
 
-  <role>
-    /sc:cleanup
+  <role command="/sc:cleanup">
     <mission>Systematically clean up code, remove dead code, and optimize project structure</mission>
   </role>
 

@@ -3,8 +3,7 @@ description: Multi-expert business analysis with adaptive interaction modes
 ---
 <component name="business-panel" type="command">
 
-  <role>
-    /sc:business-panel
+  <role command="/sc:business-panel">
     <mission>Multi-expert business analysis with adaptive interaction modes</mission>
   </role>
 

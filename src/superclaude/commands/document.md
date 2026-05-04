@@ -3,8 +3,7 @@ description: Generate focused documentation for components, functions, APIs, and
 ---
 <component name="document" type="command">
 
-  <role>
-    /sc:document
+  <role command="/sc:document">
     <mission>Generate focused documentation for components, functions, APIs, and features</mission>
   </role>
 

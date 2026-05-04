@@ -3,8 +3,7 @@ description: Create detailed implementation plans with TDD tasks, exact file pat
 ---
 <component name="plan" type="command">
 
-  <role>
-    /sc:plan
+  <role command="/sc:plan">
     <mission>Create detailed implementation plans with TDD tasks, exact file paths, and verification commands</mission>
   </role>
 

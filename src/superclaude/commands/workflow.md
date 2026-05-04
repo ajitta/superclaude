@@ -3,8 +3,7 @@ description: Generate structured implementation workflows from PRDs and feature 
 ---
 <component name="workflow" type="command">
 
-  <role>
-    /sc:workflow
+  <role command="/sc:workflow">
     <mission>Generate structured implementation workflows from PRDs and feature requirements</mission>
   </role>
 

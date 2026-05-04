@@ -3,8 +3,7 @@ description: Design system architecture, APIs, and component interfaces with com
 ---
 <component name="design" type="command">
 
-  <role>
-    /sc:design
+  <role command="/sc:design">
     <mission>Design system architecture, APIs, and component interfaces with comprehensive specifications</mission>
   </role>
 

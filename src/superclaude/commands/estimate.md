@@ -3,8 +3,7 @@ description: Provide development estimates for tasks, features, or projects with
 ---
 <component name="estimate" type="command">
 
-  <role>
-    /sc:estimate
+  <role command="/sc:estimate">
     <mission>Provide development estimates for tasks, features, or projects with intelligent analysis</mission>
   </role>
 

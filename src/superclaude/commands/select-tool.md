@@ -3,8 +3,7 @@ description: Intelligent MCP tool selection based on complexity scoring and oper
 ---
 <component name="select-tool" type="command">
 
-  <role>
-    /sc:select-tool
+  <role command="/sc:select-tool">
     <mission>Intelligent MCP tool selection based on complexity scoring and operation analysis</mission>
   </role>
 

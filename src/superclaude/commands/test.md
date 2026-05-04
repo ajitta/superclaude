@@ -3,8 +3,7 @@ description: Execute tests with coverage analysis and automated quality reportin
 ---
 <component name="test" type="command">
 
-  <role>
-    /sc:test
+  <role command="/sc:test">
     <mission>Execute tests with coverage analysis and automated quality reporting</mission>
   </role>
 

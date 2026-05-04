@@ -3,8 +3,7 @@ description: Provide clear explanations of code, concepts, and system behavior w
 ---
 <component name="explain" type="command">
 
-  <role>
-    /sc:explain
+  <role command="/sc:explain">
     <mission>Provide clear explanations of code, concepts, and system behavior with educational clarity</mission>
   </role>
 

@@ -3,8 +3,7 @@ description: Capture structured session insights to per-project JSONL for human 
 ---
 <component name="insight" type="command">
 
-  <role>
-    /sc:insight
+  <role command="/sc:insight">
     <mission>Capture structured session insights to per-project JSONL for human and tool analysis</mission>
   </role>
 

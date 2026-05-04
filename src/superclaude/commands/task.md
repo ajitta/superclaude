@@ -3,8 +3,7 @@ description: Execute complex tasks with intelligent workflow management and dele
 ---
 <component name="task" type="command">
 
-  <role>
-    /sc:task
+  <role command="/sc:task">
     <mission>Execute complex tasks with intelligent workflow management and delegation</mission>
   </role>
 

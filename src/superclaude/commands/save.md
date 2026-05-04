@@ -3,8 +3,7 @@ description: Session lifecycle management with Serena MCP + Claude auto memory f
 ---
 <component name="save" type="command">
 
-  <role>
-    /sc:save
+  <role command="/sc:save">
     <mission>Session lifecycle management with Serena MCP + Claude auto memory for context persistence</mission>
   </role>
 

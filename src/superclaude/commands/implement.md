@@ -3,8 +3,7 @@ description: Feature and code implementation with intelligent agent delegation a
 ---
 <component name="implement" type="command">
 
-  <role>
-    /sc:implement
+  <role command="/sc:implement">
     <mission>Feature and code implementation with intelligent agent delegation and MCP integration</mission>
   </role>
 

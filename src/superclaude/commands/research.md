@@ -3,8 +3,7 @@ description: Deep web research with adaptive planning and intelligent search
 ---
 <component name="research" type="command">
 
-  <role>
-    /sc:research
+  <role command="/sc:research">
     <mission>Deep web research with adaptive planning and intelligent search</mission>
   </role>
 

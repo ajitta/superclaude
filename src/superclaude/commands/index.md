@@ -3,8 +3,7 @@ description: Generate comprehensive project documentation and knowledge base wit
 ---
 <component name="index" type="command">
 
-  <role>
-    /sc:index
+  <role command="/sc:index">
     <mission>Generate comprehensive project documentation and knowledge base with intelligent organization</mission>
   </role>
 

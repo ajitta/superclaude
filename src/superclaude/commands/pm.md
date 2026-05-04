@@ -3,8 +3,7 @@ description: Orchestrate sub-agents, manage workflows, and document learnings fo
 ---
 <component name="pm" type="command">
 
-  <role>
-    /sc:pm
+  <role command="/sc:pm">
     <mission>Orchestrate sub-agents, manage workflows, and document learnings</mission>
     <note>Full agent definition in agents/project-manager.md</note>
   </role>

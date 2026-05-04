@@ -3,8 +3,7 @@ description: Comprehensive code analysis across quality, security, performance, 
 ---
 <component name="analyze" type="command">
 
-  <role>
-    /sc:analyze
+  <role command="/sc:analyze">
     <mission>Comprehensive code analysis across quality, security, performance, and architecture domains</mission>
   </role>
 

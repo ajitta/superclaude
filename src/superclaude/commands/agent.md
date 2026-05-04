@@ -3,8 +3,7 @@ description: Session controller orchestrating investigation, implementation, and
 ---
 <component name="agent" type="command">
 
-  <role>
-    /sc:agent
+  <role command="/sc:agent">
     <mission>Session controller orchestrating investigation, implementation, and review workflows</mission>
   </role>
 

@@ -3,8 +3,7 @@ description: Repository indexing with 94% token reduction (58K → 3K)
 ---
 <component name="index-repo" type="command">
 
-  <role>
-    /sc:index-repo
+  <role command="/sc:index-repo">
     <mission>Repository indexing with 94% token reduction (58K → 3K)</mission>
   </role>
 

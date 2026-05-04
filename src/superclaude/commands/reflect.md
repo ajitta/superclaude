@@ -3,8 +3,7 @@ description: Task reflection and validation using Serena MCP analysis capabiliti
 ---
 <component name="reflect" type="command">
 
-  <role>
-    /sc:reflect
+  <role command="/sc:reflect">
     <mission>Task reflection and validation using analysis capabilities</mission>
     <note>For evidence-based completion verification, use /sc:test with the verification workflow</note>
   </role>

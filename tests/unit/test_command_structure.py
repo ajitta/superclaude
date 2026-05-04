@@ -109,7 +109,9 @@ class TestCommandXMLStructure:
 
     def test_has_role(self, command):
         stem, content, _ = command
-        assert "<role>" in content, f"{stem}: missing <role> section"
+        assert re.search(r"<role[\s>]", content), (
+            f"{stem}: missing <role> section (accepts <role> or <role command=...>)"
+        )
 
     def test_has_mission(self, command):
         stem, content, _ = command
@@ -186,7 +188,7 @@ class TestCommandMinimumContent:
         """Check for empty major sections."""
         stem, content, _ = command
         empty_patterns = [
-            r"<role>\s*</role>",
+            r"<role[^>]*>\s*</role>",
             r"<flow>\s*</flow>",
         ]
         for pattern in empty_patterns:

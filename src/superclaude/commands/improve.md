@@ -3,8 +3,7 @@ description: Apply systematic improvements to code quality, performance, and mai
 ---
 <component name="improve" type="command">
 
-  <role>
-    /sc:improve
+  <role command="/sc:improve">
     <mission>Apply systematic improvements to code quality, performance, and maintainability</mission>
   </role>
 

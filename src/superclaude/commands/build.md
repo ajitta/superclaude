@@ -3,8 +3,7 @@ description: Build, compile, and package projects with intelligent error handlin
 ---
 <component name="build" type="command">
 
-  <role>
-    /sc:build
+  <role command="/sc:build">
     <mission>Build, compile, and package projects with intelligent error handling and optimization</mission>
   </role>
 

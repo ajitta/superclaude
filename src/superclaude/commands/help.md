@@ -4,8 +4,7 @@ description: List all available /sc commands and their functionality
 
 <component name="help" type="command">
 
-  <role>
-    /sc:help
+  <role command="/sc:help">
     <mission>List all available /sc commands and their functionality</mission>
   </role>
   <syntax>/sc:help [command-name] [--flags]</syntax>

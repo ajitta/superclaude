@@ -3,8 +3,7 @@ description: Diagnose and resolve issues in code, builds, deployments, and syste
 ---
 <component name="troubleshoot" type="command">
 
-  <role>
-    /sc:troubleshoot
+  <role command="/sc:troubleshoot">
     <mission>Diagnose and resolve issues in code, builds, deployments, and system behavior</mission>
   </role>
 

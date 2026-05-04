@@ -4,8 +4,7 @@ description: Autonomous overnight code improvement loop driven by an objective m
 
 <component name="auto-improve" type="command">
 
-  <role>
-    /sc:auto-improve
+  <role command="/sc:auto-improve">
     <mission>Run an autonomous overnight code improvement loop driven by an objective metric (Karpathy AutoResearch pattern) — mutator proposes changes, eval-cmd measures, single git lineage in an isolated worktree</mission>
   </role>
 

@@ -3,8 +3,7 @@ description: Session lifecycle management with Serena MCP + Claude auto memory f
 ---
 <component name="load" type="command">
 
-  <role>
-    /sc:load
+  <role command="/sc:load">
     <mission>Session lifecycle management with Serena MCP + Claude auto memory for project context loading</mission>
   </role>
 

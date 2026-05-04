@@ -3,8 +3,7 @@ description: Interactive project environment setup — select and run initializa
 ---
 <component name="init" type="command">
 
-  <role>
-    /sc:init
+  <role command="/sc:init">
     <mission>Interactive project environment setup with selectable initialization tasks for first-session onboarding</mission>
   </role>
 

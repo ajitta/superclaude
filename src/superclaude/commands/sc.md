@@ -3,8 +3,7 @@ description: SuperClaude command dispatcher - main entry point for all features
 ---
 <component name="sc" type="command">
 
-  <role>
-    /sc:sc
+  <role command="/sc:sc">
     <mission>SuperClaude command dispatcher - main entry point for all features</mission>
   </role>
 

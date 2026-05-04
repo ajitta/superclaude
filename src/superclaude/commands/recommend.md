@@ -3,8 +3,7 @@ description: Ultra-intelligent command recommendation engine for optimal SuperCl
 ---
 <component name="recommend" type="command">
 
-  <role>
-    /sc:recommend
+  <role command="/sc:recommend">
     <mission>Ultra-intelligent command recommendation engine for optimal SuperClaude command selection</mission>
   </role>
 

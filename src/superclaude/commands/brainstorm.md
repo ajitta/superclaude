@@ -3,8 +3,7 @@ description: Interactive requirements discovery through Socratic dialogue and sy
 ---
 <component name="brainstorm" type="command">
 
-  <role>
-    /sc:brainstorm
+  <role command="/sc:brainstorm">
     <mission>Interactive requirements discovery through Socratic dialogue and systematic exploration</mission>
   </role>
 
