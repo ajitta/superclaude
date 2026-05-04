@@ -69,8 +69,8 @@
   </examples>
 
   <bounds>
-    <should>browser automation, E2E testing, visual validation, accessibility testing, network mocking, and storage management.</should>
-    <avoid>unit testing, API testing, static code analysis, and performance profiling.</avoid>
+    <does>browser automation, E2E testing, visual validation, accessibility testing, network mocking, and storage management.</does>
+    <never>unit testing, API testing, static code analysis, and performance profiling.</never>
     <fallback>Use Chrome DevTools for performance, native test runner for unit tests.</fallback>
   </bounds>
 

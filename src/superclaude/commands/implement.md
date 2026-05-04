@@ -56,8 +56,8 @@ description: Feature and code implementation with intelligent agent delegation a
   </gotchas>
 
   <bounds>
-    <should>intelligent impl, framework best practices, and comprehensive testing.</should>
-    <avoid>arch decisions without consultation, conflict with security, and override safety.</avoid>
+    <does>intelligent impl, framework best practices, and comprehensive testing.</does>
+    <never>arch decisions without consultation, conflict with security, and override safety.</never>
     <fallback>Ask user for guidance when uncertain.</fallback>
   </bounds>
 

@@ -70,21 +70,24 @@ class TestModeXMLStructure:
         assert mission, f"{stem}: missing or empty <mission>"
 
     def test_has_bounds(self, mode):
-        """<bounds> must use sub-tag form: <should>, <avoid>, optional <fallback>."""
+        """<bounds> must use sub-tag form: <does>, <never>, optional <fallback>."""
         stem, content = mode
         assert "<bounds>" in content, (
             f"{stem}: missing <bounds> opening tag (sub-tag form)"
         )
         body = extract_xml_content(content, "bounds")
         assert body, f"{stem}: <bounds> body is empty"
-        assert re.search(r"<should>.+?</should>", body, re.DOTALL), (
-            f"{stem}: <bounds> missing <should> sub-tag"
+        assert re.search(r"<does>.+?</does>", body, re.DOTALL), (
+            f"{stem}: <bounds> missing <does> sub-tag"
         )
-        assert re.search(r"<avoid>.+?</avoid>", body, re.DOTALL), (
-            f"{stem}: <bounds> missing <avoid> sub-tag"
+        assert re.search(r"<never>.+?</never>", body, re.DOTALL), (
+            f"{stem}: <bounds> missing <never> sub-tag"
         )
         assert not re.search(r"<bounds\s+\w+\s*=", content), (
             f"{stem}: <bounds> uses legacy attribute form — convert to sub-tag form"
+        )
+        assert not re.search(r"<should>|<avoid>", content), (
+            f"{stem}: <bounds> uses legacy <should>/<avoid> labels — rename to <does>/<never>"
         )
 
     def test_has_handoff(self, mode):
@@ -134,21 +137,24 @@ class TestMcpXMLStructure:
         assert mission, f"{stem}: missing or empty <mission>"
 
     def test_has_bounds(self, mcp):
-        """<bounds> must use sub-tag form: <should>, <avoid>, optional <fallback>."""
+        """<bounds> must use sub-tag form: <does>, <never>, optional <fallback>."""
         stem, content = mcp
         assert "<bounds>" in content, (
             f"{stem}: missing <bounds> opening tag (sub-tag form)"
         )
         body = extract_xml_content(content, "bounds")
         assert body, f"{stem}: <bounds> body is empty"
-        assert re.search(r"<should>.+?</should>", body, re.DOTALL), (
-            f"{stem}: <bounds> missing <should> sub-tag"
+        assert re.search(r"<does>.+?</does>", body, re.DOTALL), (
+            f"{stem}: <bounds> missing <does> sub-tag"
         )
-        assert re.search(r"<avoid>.+?</avoid>", body, re.DOTALL), (
-            f"{stem}: <bounds> missing <avoid> sub-tag"
+        assert re.search(r"<never>.+?</never>", body, re.DOTALL), (
+            f"{stem}: <bounds> missing <never> sub-tag"
         )
         assert not re.search(r"<bounds\s+\w+\s*=", content), (
             f"{stem}: <bounds> uses legacy attribute form — convert to sub-tag form"
+        )
+        assert not re.search(r"<should>|<avoid>", content), (
+            f"{stem}: <bounds> uses legacy <should>/<avoid> labels — rename to <does>/<never>"
         )
 
     def test_has_handoff(self, mcp):

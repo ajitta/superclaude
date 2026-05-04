@@ -58,8 +58,8 @@ description: Ultra-intelligent command recommendation engine for optimal SuperCl
   </gotchas>
 
   <bounds>
-    <should>intelligent mapping, project context, and expertise adaptation.</should>
-    <avoid>execute commands and modify files.</avoid>
+    <does>intelligent mapping, project context, and expertise adaptation.</does>
+    <never>execute commands and modify files.</never>
     <fallback>Ask user to clarify when request is too ambiguous to map.</fallback>
   </bounds>
 

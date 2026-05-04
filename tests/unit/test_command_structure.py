@@ -140,10 +140,11 @@ class TestCommandCrossFieldConsistency:
         )
 
     def test_has_bounds(self, command):
-        """<bounds> must use sub-tag form: <should>, <avoid>, optional <fallback>.
+        """<bounds> must use sub-tag form: <does>, <never>, optional <fallback>.
 
         Per .claude/rules/command-authoring.md and xml-prose-format.md.
-        Legacy attribute and body-labeled forms are rejected (commit S390).
+        Legacy attribute, body-labeled, and hedging-labeled (<should>/<avoid>)
+        forms are rejected (commit S390 + Opus 4.7 hedging-drop).
         """
         stem, content, _ = command
         assert "<bounds>" in content, (
@@ -151,17 +152,20 @@ class TestCommandCrossFieldConsistency:
         )
         body = extract_xml_content(content, "bounds")
         assert body, f"{stem}: <bounds> body is empty"
-        assert re.search(r"<should>.+?</should>", body, re.DOTALL), (
-            f"{stem}: <bounds> missing <should> sub-tag"
+        assert re.search(r"<does>.+?</does>", body, re.DOTALL), (
+            f"{stem}: <bounds> missing <does> sub-tag"
         )
-        assert re.search(r"<avoid>.+?</avoid>", body, re.DOTALL), (
-            f"{stem}: <bounds> missing <avoid> sub-tag"
+        assert re.search(r"<never>.+?</never>", body, re.DOTALL), (
+            f"{stem}: <bounds> missing <never> sub-tag"
         )
         assert not re.search(r"<bounds\s+\w+\s*=", content), (
             f"{stem}: <bounds> uses legacy attribute form — convert to sub-tag form"
         )
-        assert not re.search(r"^\s*-\s+(Should|Avoid|Fallback):\s+", body, re.MULTILINE), (
+        assert not re.search(r"^\s*-\s+(Should|Avoid|Does|Never|Fallback):\s+", body, re.MULTILINE), (
             f"{stem}: <bounds> uses legacy body-labeled form — convert to sub-tag form"
+        )
+        assert not re.search(r"<should>|<avoid>", content), (
+            f"{stem}: <bounds> uses legacy <should>/<avoid> sub-tags — rename to <does>/<never>"
         )
 
     def test_has_handoff(self, command):

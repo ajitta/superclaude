@@ -43,8 +43,8 @@ description: Task reflection and validation using Serena MCP analysis capabiliti
   </gotchas>
 
   <bounds>
-    <should>comprehensive reflection and cross-session learning.</should>
-    <avoid>override completion and bypass integrity.</avoid>
+    <does>comprehensive reflection and cross-session learning.</does>
+    <never>override completion and bypass integrity.</never>
     <fallback>Without Serena: use Claude auto memory for session persistence.</fallback>
   </bounds>
 

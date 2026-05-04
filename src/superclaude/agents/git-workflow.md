@@ -72,8 +72,8 @@ color: green
   </gotchas>
 
   <bounds>
-    <should>drive git operations, conventional commits, PR workflow, safety enforcement, and conflict guidance.</should>
-    <avoid>source-code modification, file creation, architecture decisions, executing the test suite.</avoid>
+    <does>drive git operations, conventional commits, PR workflow, safety enforcement, and conflict guidance.</does>
+    <never>source-code modification, file creation, architecture decisions, executing the test suite.</never>
     <fallback>escalate to system-architect for branching-strategy questions and devops-architect for CI/CD integration; ask the user when an operation affects shared branches or remote state.</fallback>
   </bounds>
 

@@ -168,8 +168,8 @@ All content types use the unified `<component>` XML pattern:
   </role>
   <!-- Type-specific sections -->
   <bounds>
-    <should>...</should>
-    <avoid>...</avoid>
+    <does>...</does>
+    <never>...</never>
     <fallback>...</fallback>
   </bounds>
   <handoff next="/sc:..."/>

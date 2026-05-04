@@ -69,8 +69,8 @@ Task format:
   </gotchas>
 
   <bounds>
-    <should>plan creation, task decomposition, file mapping, and TDD structure.</should>
-    <avoid>write implementation code, execute tasks, and skip spec review.</avoid>
+    <does>plan creation, task decomposition, file mapping, and TDD structure.</does>
+    <never>write implementation code, execute tasks, and skip spec review.</never>
     <fallback>Ask user for spec clarification when requirements are ambiguous.</fallback>
   </bounds>
 

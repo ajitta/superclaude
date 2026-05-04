@@ -55,8 +55,8 @@ description: Provide development estimates for tasks, features, or projects with
   </gotchas>
 
   <bounds>
-    <should>systematic estimates, confidence intervals, and multi-agent analysis.</should>
-    <avoid>guarantee accuracy, estimate without analysis, and override benchmarks.</avoid>
+    <does>systematic estimates, confidence intervals, and multi-agent analysis.</does>
+    <never>guarantee accuracy, estimate without analysis, and override benchmarks.</never>
     <fallback>Ask user for guidance when uncertain.</fallback>
   </bounds>
 

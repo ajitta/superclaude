@@ -29,8 +29,8 @@
   </examples>
 
   <bounds>
-    <should>hierarchical organization, persistent memory, and checkpoint tracking.</should>
-    <avoid>skip memory ops, lose cross-session context, and bypass task hierarchy.</avoid>
+    <does>hierarchical organization, persistent memory, and checkpoint tracking.</does>
+    <never>skip memory ops, lose cross-session context, and bypass task hierarchy.</never>
     <fallback>Revert to default behavior when inapplicable.</fallback>
   </bounds>
 

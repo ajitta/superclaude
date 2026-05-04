@@ -68,8 +68,8 @@ description: Design system architecture, APIs, and component interfaces with com
   </gotchas>
 
   <bounds>
-    <should>comprehensive specs, multi-format output, and validation.</should>
-    <avoid>generate impl code, modify existing arch, and violate constraints.</avoid>
+    <does>comprehensive specs, multi-format output, and validation.</does>
+    <never>generate impl code, modify existing arch, and violate constraints.</never>
     <fallback>Ask user for guidance when uncertain.</fallback>
   </bounds>
 

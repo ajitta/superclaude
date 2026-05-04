@@ -70,8 +70,8 @@ description: Systematically clean up code, remove dead code, and optimize projec
   </gotchas>
 
   <bounds>
-    <should>systematic cleanup, safety validation, and intelligent algorithms.</should>
-    <avoid>remove without analysis, override exclusions, and compromise functionality.</avoid>
+    <does>systematic cleanup, safety validation, and intelligent algorithms.</does>
+    <never>remove without analysis, override exclusions, and compromise functionality.</never>
     <fallback>Ask user for guidance when uncertain.</fallback>
   </bounds>
 

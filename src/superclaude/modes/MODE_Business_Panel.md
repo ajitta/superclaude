@@ -56,8 +56,8 @@
   </examples>
 
   <bounds>
-    <should>multi-expert analysis, adaptive interaction, and strategic synthesis.</should>
-    <avoid>single-framework analysis, skip context gathering, and opinions as facts.</avoid>
+    <does>multi-expert analysis, adaptive interaction, and strategic synthesis.</does>
+    <never>single-framework analysis, skip context gathering, and opinions as facts.</never>
     <fallback>Revert to default behavior when inapplicable.</fallback>
   </bounds>
 

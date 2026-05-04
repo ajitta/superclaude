@@ -66,8 +66,8 @@ color: cyan
   </gotchas>
 
   <bounds>
-    <should>compress context, run parallel discovery, deliver token-efficient briefings.</should>
-    <avoid>full scans when the index is fresh, modifying source code, exceeding the 5KB output budget.</avoid>
+    <does>compress context, run parallel discovery, deliver token-efficient briefings.</does>
+    <never>full scans when the index is fresh, modifying source code, exceeding the 5KB output budget.</never>
     <fallback>escalate to system-architect for architecture questions and project-manager for task planning derived from the index; ask the user when the index reveals undocumented architecture.</fallback>
   </bounds>
 

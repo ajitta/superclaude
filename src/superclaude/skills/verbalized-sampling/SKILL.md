@@ -64,8 +64,8 @@ description: Research-backed verbalized sampling for diverse response generation
   </attribution>
 
   <bounds>
-    <should>distribution-level diversity, multi-variant generation, and landscape synthesis.</should>
-    <avoid>single-answer collapse, pre-assigned perspective roles, and calibrated probability claims.</avoid>
+    <does>distribution-level diversity, multi-variant generation, and landscape synthesis.</does>
+    <never>single-answer collapse, pre-assigned perspective roles, and calibrated probability claims.</never>
   </bounds>
 
   <handoff next="/sc:brainstorm /sc:analyze /sc:design"/>

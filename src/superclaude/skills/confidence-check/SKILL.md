@@ -38,8 +38,8 @@ description: Pre-start validation checklist for any work (plan, design, spec, im
   </gotchas>
 
   <bounds>
-    <should>pre-start validation for any work (plan/design/spec/implementation) and evidence-based checklist.</should>
-    <avoid>score/percentage computation, runtime checks, and modify artifact.</avoid>
+    <does>pre-start validation for any work (plan/design/spec/implementation) and evidence-based checklist.</does>
+    <never>score/percentage computation, runtime checks, and modify artifact.</never>
   </bounds>
 
   <handoff next="/sc:implement /sc:plan /sc:design /sc:analyze"/>

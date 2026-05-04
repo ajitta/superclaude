@@ -70,8 +70,8 @@ description: Generate comprehensive project documentation and knowledge base wit
   </gotchas>
 
   <bounds>
-    <should>comprehensive docs, multi-agent, and framework patterns.</should>
-    <avoid>override manual docs, generate without analysis, and bypass standards.</avoid>
+    <does>comprehensive docs, multi-agent, and framework patterns.</does>
+    <never>override manual docs, generate without analysis, and bypass standards.</never>
     <fallback>Ask user for guidance when uncertain.</fallback>
   </bounds>
 

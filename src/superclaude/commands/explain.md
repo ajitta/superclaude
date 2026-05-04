@@ -56,8 +56,8 @@ description: Provide clear explanations of code, concepts, and system behavior w
   </gotchas>
 
   <bounds>
-    <should>clear explanations, agent expertise, and framework integration.</should>
-    <avoid>explain without analysis, override standards, and reveal sensitive.</avoid>
+    <does>clear explanations, agent expertise, and framework integration.</does>
+    <never>explain without analysis, override standards, and reveal sensitive.</never>
     <fallback>Ask user for guidance when uncertain.</fallback>
   </bounds>
 

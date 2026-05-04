@@ -65,8 +65,8 @@ description: Build, compile, and package projects with intelligent error handlin
   </gotchas>
 
   <bounds>
-    <should>execute build, error analysis, and optimization recs.</should>
-    <avoid>modify build config, install deps, and deploy.</avoid>
+    <does>execute build, error analysis, and optimization recs.</does>
+    <never>modify build config, install deps, and deploy.</never>
     <fallback>Ask user for guidance when uncertain.</fallback>
   </bounds>
 

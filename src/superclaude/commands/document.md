@@ -66,8 +66,8 @@ description: Generate focused documentation for components, functions, APIs, and
   </gotchas>
 
   <bounds>
-    <should>focused docs, multi-format, and ecosystem integration.</should>
-    <avoid>doc without analysis, override standards, and expose sensitive details.</avoid>
+    <does>focused docs, multi-format, and ecosystem integration.</does>
+    <never>doc without analysis, override standards, and expose sensitive details.</never>
     <fallback>Ask user for guidance when uncertain.</fallback>
   </bounds>
 

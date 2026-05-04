@@ -54,8 +54,8 @@
   </examples>
 
   <bounds>
-    <should>official library docs, version-specific APIs, framework compliance, and migration guides.</should>
-    <avoid>general concepts, debugging, code review, and architecture decisions.</avoid>
+    <does>official library docs, version-specific APIs, framework compliance, and migration guides.</does>
+    <never>general concepts, debugging, code review, and architecture decisions.</never>
     <fallback>Use WebSearch for non-library docs, WebFetch for specific URLs.</fallback>
   </bounds>
 

@@ -91,10 +91,11 @@ class TestModeBoundary:
     """Validate bounds and handoff in every mode file."""
 
     def test_has_bounds(self, mode):
-        """<bounds> must use sub-tag form: <should>, <avoid>, optional <fallback>.
+        """<bounds> must use sub-tag form: <does>, <never>, optional <fallback>.
 
         Per .claude/rules/mode-authoring.md and xml-prose-format.md.
-        Legacy attribute form rejected (commit S390).
+        Legacy attribute form rejected (commit S390); legacy hedging-labeled
+        sub-tags (<should>/<avoid>) rejected per Opus 4.7 hedging-drop rule.
         """
         stem, content = mode
         assert "<bounds>" in content, (
@@ -102,14 +103,17 @@ class TestModeBoundary:
         )
         body = extract_xml_content(content, "bounds")
         assert body, f"{stem}: <bounds> body is empty"
-        assert re.search(r"<should>.+?</should>", body, re.DOTALL), (
-            f"{stem}: <bounds> missing <should> sub-tag"
+        assert re.search(r"<does>.+?</does>", body, re.DOTALL), (
+            f"{stem}: <bounds> missing <does> sub-tag"
         )
-        assert re.search(r"<avoid>.+?</avoid>", body, re.DOTALL), (
-            f"{stem}: <bounds> missing <avoid> sub-tag"
+        assert re.search(r"<never>.+?</never>", body, re.DOTALL), (
+            f"{stem}: <bounds> missing <never> sub-tag"
         )
         assert not re.search(r"<bounds\s+\w+\s*=", content), (
             f"{stem}: <bounds> uses legacy attribute form — convert to sub-tag form"
+        )
+        assert not re.search(r"<should>|<avoid>", content), (
+            f"{stem}: <bounds> uses legacy <should>/<avoid> sub-tags — rename to <does>/<never>"
         )
 
     def test_has_handoff(self, mode):

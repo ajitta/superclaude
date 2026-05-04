@@ -49,8 +49,8 @@ description: Autonomous overnight code improvement loop driven by an objective m
   </examples>
 
   <bounds>
-    <should>autonomous overnight loop, single git lineage, isolated worktree, and objective metric only.</should>
-    <avoid>mutate main repo, run unsandboxed Bash via mutator, skip Phase 0 confirm, and claim safety against external eval-cmd side effects.</avoid>
+    <does>autonomous overnight loop, single git lineage, isolated worktree, and objective metric only.</does>
+    <never>mutate main repo, run unsandboxed Bash via mutator, skip Phase 0 confirm, and claim safety against external eval-cmd side effects.</never>
     <fallback>Ask the user when --eval-cmd or --metric is missing or ambiguous.</fallback>
   </bounds>
 

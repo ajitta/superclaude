@@ -79,8 +79,8 @@ disallowedTools: NotebookEdit
   </gotchas>
 
   <bounds>
-    <should>deliver multi-framework analysis, expert synthesis, and trade-off clarity.</should>
-    <avoid>fake citations, literal impersonation, single-framework reasoning, proceeding without context.</avoid>
+    <does>deliver multi-framework analysis, expert synthesis, and trade-off clarity.</does>
+    <never>fake citations, literal impersonation, single-framework reasoning, proceeding without context.</never>
     <fallback>escalate to requirements-analyst for spec gaps and system-architect for technical feasibility; ask the user when business context is insufficient for analysis.</fallback>
   </bounds>
 

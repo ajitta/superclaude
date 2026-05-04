@@ -71,8 +71,8 @@ Never add these — SSOT: `.claude/rules/schemas.yaml` (`forbidden_command_field
   </examples>
 
   <bounds>
-    <should>core capabilities described in prose (in-scope).</should>
-    <avoid>out-of-scope actions described in prose.</avoid>
+    <does>core capabilities described in prose (in-scope).</does>
+    <never>out-of-scope actions described in prose.</never>
     <fallback>escalation path; optional for commands — use when out-of-scope handling is non-obvious.</fallback>
   </bounds>
 
@@ -89,7 +89,7 @@ Never add these — SSOT: `.claude/rules/schemas.yaml` (`forbidden_command_field
 - `<role>` — first line is `/sc:command-name`, then `<mission>`
 - `<mission>` — shares ≥30% significant words with frontmatter `description`
 - `<flow>` — at least two numbered steps in execution order
-- `<bounds>` — sub-tag form: `<should>` / `<avoid>` / `<fallback>` (each tag's body is a prose sentence). `<should>` + `<avoid>` required; `<fallback>` optional (use when out-of-scope handling is non-obvious). Sub-tag form keeps `<bounds>` structurally distinct from `<tool_guidance>` (commit `S390` measured Claude conflating the two when both used `- Label:` lines)
+- `<bounds>` — sub-tag form: `<does>` / `<never>` / `<fallback>` (each tag's body is a prose sentence). `<does>` + `<never>` required; `<fallback>` optional (use when out-of-scope handling is non-obvious). Sub-tag form keeps `<bounds>` structurally distinct from `<tool_guidance>` (commit `S390` measured Claude conflating the two when both used `- Label:` lines)
 - `<handoff next="...">` — 2-3 natural next commands
 - Optional: `<outputs>`, `<mcp>`, `<tools>`, `<gotchas>`, `<examples>`
 
@@ -111,6 +111,6 @@ Never add these — SSOT: `.claude/rules/schemas.yaml` (`forbidden_command_field
 | `model:` or `permissionMode:` | Agent-only, ignored for commands | Remove |
 | `hooks:` or `context:` | Skill-only — migrate to skill if needed | Remove or migrate |
 | Vague description | Poor `/menu` display | Be specific: "Build X with Y" |
-| Missing `<bounds>` | No scope/safety boundary | Add `should`/`avoid` |
+| Missing `<bounds>` | No scope/safety boundary | Add `<does>`/`<never>` |
 | Mission doesn't match description | Confusing inconsistency | Align ≥30% word overlap |
 | Decorative `note=` XML attrs | Unparsed boilerplate, token waste | See xml-prose-format.md "Attributes vs. Body" — `note=` only for scope/safety/version/reference/quantified constraint |

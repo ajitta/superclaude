@@ -48,8 +48,8 @@
   </examples>
 
   <bounds>
-    <should>multi-step reasoning, systematic analysis, hypothesis testing, and trade-off evaluation.</should>
-    <avoid>code generation, simple explanations, and documentation writing.</avoid>
+    <does>multi-step reasoning, systematic analysis, hypothesis testing, and trade-off evaluation.</does>
+    <never>code generation, simple explanations, and documentation writing.</never>
     <fallback>Use native Claude reasoning for single-step tasks, Adaptive Thinking for moderate complexity.</fallback>
   </bounds>
 

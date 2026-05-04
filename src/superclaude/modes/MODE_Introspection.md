@@ -31,8 +31,8 @@
   </examples>
 
   <bounds>
-    <should>meta-cognitive analysis, reasoning transparency, and pattern detection.</should>
-    <avoid>skip self-examination, hide decision logic, and ignore compliance gaps.</avoid>
+    <does>meta-cognitive analysis, reasoning transparency, and pattern detection.</does>
+    <never>skip self-examination, hide decision logic, and ignore compliance gaps.</never>
     <fallback>Revert to default behavior when inapplicable.</fallback>
   </bounds>
 

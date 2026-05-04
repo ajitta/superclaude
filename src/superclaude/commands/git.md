@@ -84,8 +84,8 @@ description: Git operations with intelligent commit messages and workflow optimi
   </gotchas>
 
   <bounds>
-    <should>intelligent git ops, conventional commits, workflow guidance, and PR status checks.</should>
-    <avoid>modify config without auth, destructive without confirm, and complex merges requiring manual.</avoid>
+    <does>intelligent git ops, conventional commits, workflow guidance, and PR status checks.</does>
+    <never>modify config without auth, destructive without confirm, and complex merges requiring manual.</never>
     <fallback>Ask user for guidance when uncertain.</fallback>
   </bounds>
 

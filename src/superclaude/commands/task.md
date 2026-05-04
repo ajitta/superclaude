@@ -74,8 +74,8 @@ description: Execute complex tasks with intelligent workflow management and dele
   </gotchas>
 
   <bounds>
-    <should>complex task coordination, hierarchical breakdown, dependency analysis, and auto cleanup.</should>
-    <avoid>simple single-file tasks, compromise quality, and operate without validation.</avoid>
+    <does>complex task coordination, hierarchical breakdown, dependency analysis, and auto cleanup.</does>
+    <never>simple single-file tasks, compromise quality, and operate without validation.</never>
     <fallback>Ask user for guidance when uncertain.</fallback>
   </bounds>
 

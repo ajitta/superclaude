@@ -68,8 +68,8 @@ description: Review work products (code, plans, designs, specs) for quality, cor
   </gotchas>
 
   <bounds>
-    <should>work-product review (code/plan/design/spec), quality analysis, security scanning, and 2D spec+quality review.</should>
-    <avoid>auto-merge, auto-approve, and modify artifact without explicit permission.</avoid>
+    <does>work-product review (code/plan/design/spec), quality analysis, security scanning, and 2D spec+quality review.</does>
+    <never>auto-merge, auto-approve, and modify artifact without explicit permission.</never>
     <fallback>Without spec: weight review toward artifact quality dimension.</fallback>
   </bounds>
 

@@ -65,8 +65,8 @@ description: Generate structured implementation workflows from PRDs and feature 
   </gotchas>
 
   <bounds>
-    <should>comprehensive workflows, multi-agent+MCP, and cross-session management.</should>
-    <avoid>execute impl beyond planning, override dev process, and generate without analysis.</avoid>
+    <does>comprehensive workflows, multi-agent+MCP, and cross-session management.</does>
+    <never>execute impl beyond planning, override dev process, and generate without analysis.</never>
     <fallback>Ask user for guidance when uncertain.</fallback>
   </bounds>
 

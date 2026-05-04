@@ -66,8 +66,8 @@ description: Session controller orchestrating investigation, implementation, and
   </gotchas>
 
   <bounds>
-    <should>orchestrate helpers, validate results, and keep user out of busywork.</should>
-    <avoid>speculate without research and impl below 0.90 confidence.</avoid>
+    <does>orchestrate helpers, validate results, and keep user out of busywork.</does>
+    <never>speculate without research and impl below 0.90 confidence.</never>
     <fallback>Ask user for guidance when uncertain.</fallback>
   </bounds>
 

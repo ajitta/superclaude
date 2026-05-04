@@ -175,12 +175,13 @@ class TestAgentXMLStructure:
         )
 
     def test_has_bounds(self, agent):
-        """<bounds> must use sub-tag form: <should>, <avoid>, optional <fallback>.
+        """<bounds> must use sub-tag form: <does>, <never>, optional <fallback>.
 
         Per .claude/rules/agent-authoring.md and xml-prose-format.md:
         sub-tag form (commit S390 measured Claude conflating <bounds> with
-        <tool_guidance> when both used '- Label:' lines). Legacy attribute
-        and body-labeled forms are rejected.
+        <tool_guidance> when both used '- Label:' lines). Legacy attribute,
+        body-labeled, and hedging-labeled (<should>/<avoid>) forms are rejected —
+        Opus 4.7 drops hedging verbs as optional.
         """
         stem, content, _ = agent
         assert "<bounds>" in content, (
@@ -188,19 +189,23 @@ class TestAgentXMLStructure:
         )
         body = extract_xml_content(content, "bounds")
         assert body, f"{stem}: <bounds> body is empty"
-        assert re.search(r"<should>.+?</should>", body, re.DOTALL), (
-            f"{stem}: <bounds> missing <should> sub-tag"
+        assert re.search(r"<does>.+?</does>", body, re.DOTALL), (
+            f"{stem}: <bounds> missing <does> sub-tag"
         )
-        assert re.search(r"<avoid>.+?</avoid>", body, re.DOTALL), (
-            f"{stem}: <bounds> missing <avoid> sub-tag"
+        assert re.search(r"<never>.+?</never>", body, re.DOTALL), (
+            f"{stem}: <bounds> missing <never> sub-tag"
         )
         # Forbid the legacy attribute form.
         assert not re.search(r"<bounds\s+\w+\s*=", content), (
             f"{stem}: <bounds> uses legacy attribute form — convert to sub-tag form"
         )
         # Forbid the legacy body-labeled form.
-        assert not re.search(r"^\s*-\s+(Should|Avoid|Fallback):\s+", body, re.MULTILINE), (
+        assert not re.search(r"^\s*-\s+(Should|Avoid|Does|Never|Fallback):\s+", body, re.MULTILINE), (
             f"{stem}: <bounds> uses legacy body-labeled form — convert to sub-tag form"
+        )
+        # Forbid the legacy hedging-labeled sub-tag form.
+        assert not re.search(r"<should>|<avoid>", content), (
+            f"{stem}: <bounds> uses legacy <should>/<avoid> sub-tags — rename to <does>/<never>"
         )
 
 

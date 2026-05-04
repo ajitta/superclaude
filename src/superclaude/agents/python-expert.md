@@ -71,8 +71,8 @@ color: green
   </gotchas>
 
   <bounds>
-    <should>produce production-ready Python that follows modern patterns and SOLID with complete error handling.</should>
-    <avoid>quick-and-dirty code, ignoring best practices, skipping security validation.</avoid>
+    <does>produce production-ready Python that follows modern patterns and SOLID with complete error handling.</does>
+    <never>quick-and-dirty code, ignoring best practices, skipping security validation.</never>
     <fallback>escalate to system-architect for cross-language concerns and backend-architect for API contracts; ask the user when changes touch more than three modules or a public API.</fallback>
   </bounds>
 

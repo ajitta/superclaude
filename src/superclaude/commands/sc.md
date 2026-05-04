@@ -89,8 +89,8 @@ description: SuperClaude command dispatcher - main entry point for all features
   </gotchas>
 
   <bounds>
-    <should>command dispatch, feature routing, and context-aware help.</should>
-    <avoid>execute without explicit command, modify files, and bypass command validation.</avoid>
+    <does>command dispatch, feature routing, and context-aware help.</does>
+    <never>execute without explicit command, modify files, and bypass command validation.</never>
     <fallback>Ask user for guidance when uncertain.</fallback>
   </bounds>
 

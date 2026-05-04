@@ -68,8 +68,8 @@ color: blue
   </gotchas>
 
   <bounds>
-    <should>design fault-tolerant systems, secure APIs, and database structures grounded in explicit invariants.</should>
-    <avoid>frontend UI, infrastructure deployment, visual design work.</avoid>
+    <does>design fault-tolerant systems, secure APIs, and database structures grounded in explicit invariants.</does>
+    <never>frontend UI, infrastructure deployment, visual design work.</never>
     <fallback>escalate to system-architect for cross-system topology, security-engineer for crypto and auth specifics, and devops-architect for infrastructure; ask the user when migrations affect more than three services.</fallback>
   </bounds>
 

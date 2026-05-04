@@ -82,8 +82,8 @@ description: Comprehensive code analysis across quality, security, performance, 
   </gotchas>
 
   <bounds>
-    <should>static analysis, severity-rated findings, and detailed reports.</should>
-    <avoid>dynamic/runtime analysis, modify code, and analyze external deps.</avoid>
+    <does>static analysis, severity-rated findings, and detailed reports.</does>
+    <never>dynamic/runtime analysis, modify code, and analyze external deps.</never>
     <fallback>Ask user for guidance when uncertain.</fallback>
   </bounds>
 

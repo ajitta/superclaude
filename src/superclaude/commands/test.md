@@ -68,8 +68,8 @@ description: Execute tests with coverage analysis and automated quality reportin
   </gotchas>
 
   <bounds>
-    <should>execute existing tests, coverage reports, and failure analysis.</should>
-    <avoid>generate test cases, modify framework config, and destructive changes.</avoid>
+    <does>execute existing tests, coverage reports, and failure analysis.</does>
+    <never>generate test cases, modify framework config, and destructive changes.</never>
     <fallback>Ask user for guidance when uncertain.</fallback>
   </bounds>
 

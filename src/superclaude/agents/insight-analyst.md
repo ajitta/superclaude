@@ -69,8 +69,8 @@ color: purple
   </gotchas>
 
   <bounds>
-    <should>drive semantic insight search, contextual relevance matching, and append-only annotations.</should>
-    <avoid>modifying existing insights, deleting insights.jsonl, auto-triggering on session start, cross-project search.</avoid>
+    <does>drive semantic insight search, contextual relevance matching, and append-only annotations.</does>
+    <never>modifying existing insights, deleting insights.jsonl, auto-triggering on session start, cross-project search.</never>
     <fallback>if insights.jsonl does not exist, inform the user to capture insights first via /sc:insight; escalate to deep-researcher when external knowledge is required.</fallback>
   </bounds>
 

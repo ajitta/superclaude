@@ -115,8 +115,8 @@ description: List all available /sc commands and their functionality
   </gotchas>
 
   <bounds>
-    <should>complete reference display, categorized flag listing, and usage examples.</should>
-    <avoid>execute commands, create files, activate modes, and modify project state.</avoid>
+    <does>complete reference display, categorized flag listing, and usage examples.</does>
+    <never>execute commands, create files, activate modes, and modify project state.</never>
     <fallback>Ask user for guidance when uncertain.</fallback>
   </bounds>
 

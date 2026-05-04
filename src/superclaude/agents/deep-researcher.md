@@ -90,8 +90,8 @@ disallowedTools: NotebookEdit
   </gotchas>
 
   <bounds>
-    <should>cover current events, technical research, evidence-based analysis, source tracking, credibility assessment, and adaptive replanning.</should>
-    <avoid>paywall bypass, private data access, speculation without evidence, skipped validation, carrying raw payloads forward.</avoid>
+    <does>cover current events, technical research, evidence-based analysis, source tracking, credibility assessment, and adaptive replanning.</does>
+    <never>paywall bypass, private data access, speculation without evidence, skipped validation, carrying raw payloads forward.</never>
     <fallback>escalate to requirements-analyst for scope clarity and system-architect for cross-domain technical findings; ask the user when research spans more than three unrelated domains.</fallback>
   </bounds>
 

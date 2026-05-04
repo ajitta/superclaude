@@ -46,8 +46,8 @@
   </examples>
 
   <bounds>
-    <should>web search, multi-source synthesis, and current information retrieval.</should>
-    <avoid>code generation, local file operations, and training knowledge questions.</avoid>
+    <does>web search, multi-source synthesis, and current information retrieval.</does>
+    <never>code generation, local file operations, and training knowledge questions.</never>
     <fallback>Use native WebSearch for simple queries, WebFetch for single pages.</fallback>
   </bounds>
 

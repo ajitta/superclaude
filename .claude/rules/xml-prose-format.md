@@ -9,6 +9,21 @@
 - **Prose first.** Structured forms only where prose would mush distinct items together.
 - **Token-efficient.** Prefer the simplest form that preserves readability — never reach for a heavier construct than the content needs.
 - **One canonical shape per concept.** No parallel "options"; the rule below picks one form per situation.
+- **Declarative voice is load-bearing, not stylistic.** Opus 4.7 interprets instructions literally and drops hedging ("should", "might", "consider") as optional. Third-person + imperative-as-statement is what makes the rule actually fire — see Anthropic's Opus 4.7 prompting notes at 'https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices'.
+
+## Section Ordering
+
+Within a component body, order sections from most stable to most task-specific. Stable / always-true content earlier in the body is more reliably retained as the harness compacts; safety-critical content placed first survives partial-read previews.
+
+1. **Identity & scope.** `<role>` / `<mission>` / `<mindset>` — who Claude is acting as and what's in/out of scope.
+2. **Critical safety / `critical_*` sub-sections.** Anything where violation has user-visible consequences. Place before any rule that could be relaxed under load.
+3. **Core rules / behaviors.** Stable instructions that apply to every invocation.
+4. **Tool & flag guidance.** How to act, after what to do is set.
+5. **Bounds (`<does>` / `<never>` / `<fallback>`).** Edge cases and escalation.
+6. **Examples (`<examples>` / `<example>`).** Concrete illustrations — last because they're reference material, not directives.
+7. **Gotchas / handoffs.** Cross-references and known traps.
+
+This ordering is recommended, not mechanical. A component whose primary content is examples (e.g., a few-shot skill) may legitimately lead with examples — but identity and safety still come before them.
 
 ## Root Structure
 
@@ -63,11 +78,13 @@ When a section has a **fixed small set of named slots** that need (a) multi-line
 
 ```xml
 <bounds>
-  <should>refactor with proven patterns; preserve behavior.</should>
-  <avoid>adding features mid-refactor; large risky changes.</avoid>
+  <does>refactors with proven patterns; preserves behavior.</does>
+  <never>adds features mid-refactor; makes large risky changes.</never>
   <fallback>escalate to system-architect for boundary changes; ask the user when scope spans more than three modules.</fallback>
 </bounds>
 ```
+
+Slot labels are **directives, not hedging**. `<does>` (declarative present-tense — what Claude actually does), `<never>` (absolute prohibition — Opus 4.7 follows; "should not" gets dropped as optional), `<fallback>` (escalation posture). Legacy `<should>`/`<avoid>` labels are rejected by the structural test suite — Opus 4.7 reads "should" as optional and the spec's own load-bearing-voice rule applies to slot labels too.
 
 Use this form when:
 - The section sits next to a Labeled section using the same `- Label:` shape and Claude must not conflate them (measured boundary blur — see commit `S390`).
@@ -91,11 +108,16 @@ For **dense fixed-shape data** — typically 3+ short rows of trigger → outcom
 
 Reserve for ≤4 columns and short cells. The table form gives the lowest token cost when each row reads on a single line; a row that needs multi-line prose belongs in `<example>` (below).
 
+Tables are not exclusive to `<examples>`. Any dense-lookup tag with ≥6 entries that share a fixed shape (e.g., `<gotchas>`, `<flag_matrix>`, `<error_codes>`) may use the same compact table form. Keep `- name: description` lines as the default for ≤5 entries; promote to a table only when row count makes the line list visually heavy.
+
 ### `<example>` for rich illustrations
 
 When a single example needs multi-paragraph prose, a code block, a before/after comparison, a `user:` / `assistant:` turn, or attribute framing, use `<example>` directly as a standalone tag. One or more `<example>` siblings can appear under the root or under another organizing parent.
 
 `<example>` body is **free-form prose** — pick whichever shape fits the illustration. The format does not prescribe a specific structure; common shapes include:
+
+Markdown headers (`#`, `##`) are permitted inside `<example>` bodies when the illustration mirrors a real markdown artifact (e.g., a report template, a user-facing document, a commit message). The "no markdown headers" rule applies to component-body prose, not to content quoted inside an example.
+
 
 ```xml
 <example name="code-shape">
@@ -232,17 +254,33 @@ A `note=` attribute is allowed only when it carries one of: scope qualifier, saf
 </root_wrapper>
 ```
 
+## Size Targets
+
+Keep components small enough that the harness can load the full body without truncation. Targets are guidelines, not hard caps — exceeding a target is a signal to split content into a referenced detail file (see "progressive disclosure" in Anthropic's skill-authoring docs at 'https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices'), not a block.
+
+| Component type | Body target | Hard ceiling |
+|---|---|---|
+| Command | ≤200 lines | 300 |
+| Agent | ≤300 lines | 500 |
+| Skill (SKILL.md body) | ≤500 lines | 500 (Anthropic guidance) |
+| Mode | ≤300 lines | 500 |
+| Core (FLAGS / PRINCIPLES / RULES) | ≤400 lines | — |
+
+When a component exceeds its target: extract reference material (long examples, deep tables, policy detail) into a sibling file linked from the component body. Component body keeps the always-needed instructions; sibling file holds on-demand detail.
+
 ## Authoring Checklist
 
 1. Wrap the body in one root tag with identifier attributes (`name`, `type`).
 2. Split top-level concerns into `snake_case` section tags.
-3. Nest sub-sections only when a section has ≥2 distinct sub-domains; depth 2 max for plain sub-sections.
-4. Default to prose paragraphs.
-5. For 3-5 short enum items, use a prefixed line: **Numbered** (`1.`) for ordered procedures, **Plain** / **Labeled** / **Named** (`-`) per item type. Skip the prefix for free-form prose.
-6. For a fixed small set of named slots that need multi-line prose or distinct shape from a neighboring Labeled list, use sub-tags (e.g., `<should>`/`<avoid>`/`<fallback>`) instead of `- Label:` lines.
-7. For dense fixed-shape data, use a compact markdown table inside `<examples>` (or similar lookup tag). For rich multi-line illustration, use standalone `<example>` instead.
-8. Other plural↔singular containers (depth 3) are reserved for genuinely multi-line list items.
-9. Keep attributes for short identifiers and structural metadata; move guidance prose into the tag body.
-10. Use third-person ("Claude") and declarative voice.
-11. Quote URLs and model strings in single quotes; UI/feature names in double quotes; runtime values in `{{variable}}`.
-12. Reserve `critical_*` tag prefix for safety-critical sub-sections.
+3. Order sections stable→task-specific: identity → critical safety → core rules → tool/flag guidance → bounds → examples → gotchas.
+4. Nest sub-sections only when a section has ≥2 distinct sub-domains; depth 2 max for plain sub-sections.
+5. Default to prose paragraphs.
+6. For 3-5 short enum items, use a prefixed line: **Numbered** (`1.`) for ordered procedures, **Plain** / **Labeled** / **Named** (`-`) per item type. Skip the prefix for free-form prose.
+7. For a fixed small set of named slots that need multi-line prose or distinct shape from a neighboring Labeled list, use sub-tags (e.g., `<does>`/`<never>`/`<fallback>`) instead of `- Label:` lines. Sub-tag labels are directives — never use hedging verbs (`<should>`, `<avoid>`).
+8. For dense fixed-shape data, use a compact markdown table inside `<examples>`, or inside any dense-lookup tag with ≥6 fixed-shape entries. For rich multi-line illustration, use standalone `<example>` instead.
+9. Other plural↔singular containers (depth 3) are reserved for genuinely multi-line list items.
+10. Keep attributes for short identifiers and structural metadata; move guidance prose into the tag body.
+11. Use third-person ("Claude") and declarative voice — Opus 4.7 drops hedging.
+12. Quote URLs and model strings in single quotes; UI/feature names in double quotes; runtime values in `{{variable}}`.
+13. Reserve `critical_*` tag prefix for safety-critical sub-sections; place them early in the body so partial-read previews catch them.
+14. Stay within the size target for the component type; extract overflow into a referenced sibling file.

@@ -42,8 +42,8 @@ hooks:
   </gotchas>
 
   <bounds>
-    <should>execute chosen completion option, handle worktree cleanup, inform user of result.</should>
-    <avoid>proceed with failing tests, force-push without request, auto-merge PRs.</avoid>
+    <does>execute chosen completion option, handle worktree cleanup, inform user of result.</does>
+    <never>proceed with failing tests, force-push without request, auto-merge PRs.</never>
   </bounds>
 
   <handoff next="/sc:git"/>

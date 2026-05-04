@@ -67,8 +67,8 @@ description: Session lifecycle management with Serena MCP + Claude auto memory f
   </gotchas>
 
   <bounds>
-    <should>Serena integration, auto memory loading, cross-session persistence, and context loading.</should>
-    <avoid>modify structure, load without validation, and override without checkpoint.</avoid>
+    <does>Serena integration, auto memory loading, cross-session persistence, and context loading.</does>
+    <never>modify structure, load without validation, and override without checkpoint.</never>
     <fallback>Without Serena: use Claude auto memory + Read CLAUDE.md/PLANNING.md/TASK.md, Glob for structure. Ask user for guidance when uncertain.</fallback>
   </bounds>
 

@@ -32,8 +32,8 @@
   </examples>
 
   <bounds>
-    <should>collaborative discovery, probing questions, and requirement synthesis.</should>
-    <avoid>prescribe solutions, skip exploration, and make implementation decisions.</avoid>
+    <does>collaborative discovery, probing questions, and requirement synthesis.</does>
+    <never>prescribe solutions, skip exploration, and make implementation decisions.</never>
     <fallback>Revert to default behavior when inapplicable.</fallback>
   </bounds>
 

@@ -103,8 +103,8 @@ description: Capture structured session insights to per-project JSONL for human 
   </gotchas>
 
   <bounds>
-    <should>structured capture via script, jq queries, pending review/promote, and append-only storage.</should>
-    <avoid>modify existing insights, load into LLM context, replace auto memory, and hand-edit insights.jsonl.</avoid>
+    <does>structured capture via script, jq queries, pending review/promote, and append-only storage.</does>
+    <never>modify existing insights, load into LLM context, replace auto memory, and hand-edit insights.jsonl.</never>
     <fallback>If insights.jsonl doesn't exist, the script creates it on first append.</fallback>
   </bounds>
 

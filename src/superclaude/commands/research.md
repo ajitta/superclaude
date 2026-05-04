@@ -50,8 +50,8 @@ description: Deep web research with adaptive planning and intelligent search
   </gotchas>
 
   <bounds>
-    <should>current info, intelligent search, evidence-based, and adaptive replan.</should>
-    <avoid>claims without sources, skip validation, restricted content, and carry raw payloads between hops.</avoid>
+    <does>current info, intelligent search, evidence-based, and adaptive replan.</does>
+    <never>claims without sources, skip validation, restricted content, and carry raw payloads between hops.</never>
     <fallback>Ask user for guidance when uncertain.</fallback>
   </bounds>
 

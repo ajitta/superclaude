@@ -114,8 +114,8 @@ description: Interactive project environment setup — select and run initializa
   </gotchas>
 
   <bounds>
-    <should>interactive task menu, dependency-aware execution, parallel batching, idempotent setup, and safe environment init.</should>
-    <avoid>auto-execute without selection, overwrite existing files, install without confirmation, and skip dependency validation.</avoid>
+    <does>interactive task menu, dependency-aware execution, parallel batching, idempotent setup, and safe environment init.</does>
+    <never>auto-execute without selection, overwrite existing files, install without confirmation, and skip dependency validation.</never>
     <fallback>Ask user when project type undetectable or when existing config conflicts with proposed setup.</fallback>
   </bounds>
 

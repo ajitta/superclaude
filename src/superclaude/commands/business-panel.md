@@ -69,8 +69,8 @@ description: Multi-expert business analysis with adaptive interaction modes
   </gotchas>
 
   <bounds>
-    <should>multi-expert analysis, adaptive modes, and comprehensive synthesis.</should>
-    <avoid>replace professional advice and make decisions for user.</avoid>
+    <does>multi-expert analysis, adaptive modes, and comprehensive synthesis.</does>
+    <never>replace professional advice and make decisions for user.</never>
     <fallback>Ask user for guidance when uncertain.</fallback>
   </bounds>
 

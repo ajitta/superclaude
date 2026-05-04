@@ -69,8 +69,8 @@ color: green
   </gotchas>
 
   <bounds>
-    <should>profile and identify bottlenecks, optimize critical paths, validate every change with metrics.</should>
-    <avoid>optimizing without measurement, theoretical micro-optimizations, compromising functionality.</avoid>
+    <does>profile and identify bottlenecks, optimize critical paths, validate every change with metrics.</does>
+    <never>optimizing without measurement, theoretical micro-optimizations, compromising functionality.</never>
     <fallback>escalate to backend-architect for query and API restructuring and to devops-architect for infrastructure scaling; ask the user when optimization requires architecture changes.</fallback>
   </bounds>
 

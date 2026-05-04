@@ -122,7 +122,7 @@ When memory is enabled, CC auto-injects up to the first 200 lines / 25KB of `MEM
 
 ## XML Body Structure
 
-> Conforms to `.claude/rules/xml-prose-format.md`: single root, `snake_case` section tags, short-line lists (**Numbered** `1.` for ordered procedures, or `-` prefix as **Plain with checkbox**, **Labeled**, **Named** per item type), sub-tag form for fixed labeled slots (`<bounds>` → `<should>`/`<avoid>`/`<fallback>`), compact tables for dense lookups (`<examples>`), and standalone `<example>` for rich multi-line illustrations.
+> Conforms to `.claude/rules/xml-prose-format.md`: single root, `snake_case` section tags, short-line lists (**Numbered** `1.` for ordered procedures, or `-` prefix as **Plain with checkbox**, **Labeled**, **Named** per item type), sub-tag form for fixed labeled slots (`<bounds>` → `<does>`/`<never>`/`<fallback>`), compact tables for dense lookups (`<examples>`), and standalone `<example>` for rich multi-line illustrations.
 
 ```xml
 <component name="agent-name" type="agent">
@@ -169,8 +169,8 @@ When memory is enabled, CC auto-injects up to the first 200 lines / 25KB of `MEM
   </gotchas>
 
   <bounds>
-    <should>core capabilities described in prose (in-scope).</should>
-    <avoid>out-of-scope actions described in prose.</avoid>
+    <does>core capabilities described in prose (in-scope).</does>
+    <never>out-of-scope actions described in prose.</never>
     <fallback>escalation path; recommended for agents — long-lived personas benefit from an explicit recovery posture.</fallback>
   </bounds>
 
@@ -184,7 +184,7 @@ When memory is enabled, CC auto-injects up to the first 200 lines / 25KB of `MEM
 - All multi-word tag names use `snake_case` (`tool_guidance`, `memory_guide`).
 - Short enums: **Numbered** (`1.` ordered procedures: `<actions>`), **Plain with checkbox** (`- [ ]` verification-pending criteria: `<checklist>`), **Labeled** (`- Label:` fixed-set labels: `<tool_guidance>` Proceed/Ask First/Never), **Named** (`- identifier-name:` per-item identifiers: `<focus>`, `<outputs>`, `<gotchas>`, `<memory_guide>`).
 - `<examples>` — compact markdown table with minimal separators `|---|---|` for short uniform rows. For richer illustrations (code blocks, narrative, multi-turn prose), use a standalone `<example>` tag — its body is free-form prose, not locked to a `user:` / `assistant:` shape. `<examples>` and `<example>` are two distinct constructs (see xml-prose-format.md).
-- `<bounds>` — sub-tag form: `<should>` / `<avoid>` / `<fallback>` (each tag's body is a prose sentence). `<should>` + `<avoid>` required; `<fallback>` recommended (agents are long-lived; explicit recovery posture is high-leverage). Sub-tag form keeps `<bounds>` structurally distinct from `<tool_guidance>` (commit `S390` measured Claude conflating the two when both used `- Label:` lines).
+- `<bounds>` — sub-tag form: `<does>` / `<never>` / `<fallback>` (each tag's body is a prose sentence). `<does>` + `<never>` required; `<fallback>` recommended (agents are long-lived; explicit recovery posture is high-leverage). Sub-tag form keeps `<bounds>` structurally distinct from `<tool_guidance>` (commit `S390` measured Claude conflating the two when both used `- Label:` lines).
 - `<handoff>` — 2-3 natural next commands.
 - `note=` attribute restricted to scope / safety / version / reference / quantified constraint (see xml-prose-format.md "Attributes vs. Body").
 - **Voice — third person.** Write "Claude does X", "the agent avoids Y" — never "you" or "I". The body is the agent's full system prompt (not instructions addressed to a model), so it reads as a behavioral spec for the persona.

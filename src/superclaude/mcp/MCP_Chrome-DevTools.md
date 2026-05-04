@@ -55,8 +55,8 @@
   </examples>
 
   <bounds>
-    <should>performance profiling, Lighthouse audits, Core Web Vitals, memory analysis, accessibility auditing, network inspection, and multi-agent pageId routing.</should>
-    <avoid>live browser interaction, E2E testing, static code analysis, and backend profiling.</avoid>
+    <does>performance profiling, Lighthouse audits, Core Web Vitals, memory analysis, accessibility auditing, network inspection, and multi-agent pageId routing.</does>
+    <never>live browser interaction, E2E testing, static code analysis, and backend profiling.</never>
     <fallback>Use Playwright for E2E, native Claude for code review.</fallback>
   </bounds>
 

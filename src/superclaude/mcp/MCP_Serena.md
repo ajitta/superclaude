@@ -64,8 +64,8 @@
   </examples>
 
   <bounds>
-    <should>semantic code understanding, symbol operations, and cross-session memory.</should>
-    <avoid>simple text edits, bulk pattern replacement, and file-level operations.</avoid>
+    <does>semantic code understanding, symbol operations, and cross-session memory.</does>
+    <never>simple text edits, bulk pattern replacement, and file-level operations.</never>
     <fallback>Use native `Grep` / `Glob` / `Edit` for text-level operations.</fallback>
   </bounds>
 

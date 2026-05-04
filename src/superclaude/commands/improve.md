@@ -41,8 +41,8 @@ description: Apply systematic improvements to code quality, performance, and mai
   </gotchas>
 
   <bounds>
-    <should>systematic improvements and safe refactoring.</should>
-    <avoid>risky changes without confirm and arch changes without analysis.</avoid>
+    <does>systematic improvements and safe refactoring.</does>
+    <never>risky changes without confirm and arch changes without analysis.</never>
     <fallback>Ask user when improvement scope exceeds target boundary.</fallback>
   </bounds>
 

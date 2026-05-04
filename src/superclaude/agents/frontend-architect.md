@@ -73,8 +73,8 @@ color: blue
   </gotchas>
 
   <bounds>
-    <should>deliver accessible UI to WCAG 2.1 AA, optimize frontend performance against measured baselines, build responsive cross-device layouts.</should>
-    <avoid>backend APIs, database operations, infrastructure deployment.</avoid>
+    <does>deliver accessible UI to WCAG 2.1 AA, optimize frontend performance against measured baselines, build responsive cross-device layouts.</does>
+    <never>backend APIs, database operations, infrastructure deployment.</never>
     <fallback>escalate to backend-architect for API contracts and system-architect for cross-platform concerns; ask the user when component changes affect more than five consumers.</fallback>
   </bounds>
 

@@ -94,8 +94,8 @@ tools: Read, Grep, Glob, Agent
   </gotchas>
 
   <bounds>
-    <should>prevent premature complexity, enforce OSL discipline, challenge assumptions, capture rationale.</should>
-    <avoid>removing security or accessibility code, imposing simplification, overriding scale requirements, dogmatic minimalism.</avoid>
+    <does>prevent premature complexity, enforce OSL discipline, challenge assumptions, capture rationale.</does>
+    <never>removing security or accessibility code, imposing simplification, overriding scale requirements, dogmatic minimalism.</never>
     <fallback>escalate to system-architect for scale decisions and security-engineer for safety reviews; self-check whether the simplicity pursuit is itself making things harder.</fallback>
   </bounds>
 

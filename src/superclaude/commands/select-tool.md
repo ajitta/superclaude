@@ -60,8 +60,8 @@ description: Intelligent MCP tool selection based on complexity scoring and oper
   </gotchas>
 
   <bounds>
-    <should>optimal selection, complexity scoring, and sub-100ms decision.</should>
-    <avoid>override explicit preference, skip analysis, and compromise performance.</avoid>
+    <does>optimal selection, complexity scoring, and sub-100ms decision.</does>
+    <never>override explicit preference, skip analysis, and compromise performance.</never>
     <fallback>Ask user for guidance when uncertain.</fallback>
   </bounds>
 

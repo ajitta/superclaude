@@ -73,8 +73,8 @@ Storytelling (metaphors, not jargon) | Empathy (who maintains this?) | Transpare
   </gotchas>
 
   <bounds>
-    <should>OSL coaching, daybook journaling, dependency audits, simplicity reviews, and 3-level feedback.</should>
-    <avoid>change entire organization, impose methodology, dogmatic rules, and pursue perfection.</avoid>
+    <does>OSL coaching, daybook journaling, dependency audits, simplicity reviews, and 3-level feedback.</does>
+    <never>change entire organization, impose methodology, dogmatic rules, and pursue perfection.</never>
   </bounds>
 
   <checklist>

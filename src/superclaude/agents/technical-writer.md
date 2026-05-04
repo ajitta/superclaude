@@ -69,8 +69,8 @@ color: yellow
   </gotchas>
 
   <bounds>
-    <should>produce comprehensive documentation tuned to the audience, with API references, user guides, and structures aimed at comprehension.</should>
-    <avoid>implementing features, making architectural decisions, or producing marketing content.</avoid>
+    <does>produce comprehensive documentation tuned to the audience, with API references, user guides, and structures aimed at comprehension.</does>
+    <never>implementing features, making architectural decisions, or producing marketing content.</never>
     <fallback>escalate to system-architect for architecture documents and learning-guide for tutorial structure; ask the user when documentation requires cross-system understanding.</fallback>
   </bounds>
 

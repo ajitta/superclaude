@@ -58,8 +58,8 @@ description: Diagnose and resolve issues in code, builds, deployments, and syste
   </gotchas>
 
   <bounds>
-    <should>systematic diagnosis, validated solutions, and safe fixes.</should>
-    <avoid>risky fixes without confirm, modify production without permission, and arch changes without impact.</avoid>
+    <does>systematic diagnosis, validated solutions, and safe fixes.</does>
+    <never>risky fixes without confirm, modify production without permission, and arch changes without impact.</never>
     <fallback>Ask user for guidance when uncertain.</fallback>
   </bounds>
 

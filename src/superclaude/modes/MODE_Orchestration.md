@@ -22,8 +22,8 @@
   </behaviors>
 
   <bounds>
-    <should>intelligent tool selection, parallel optimization, and resource efficiency.</should>
-    <avoid>use wrong tool for task, ignore system constraints, and sequential when parallel possible.</avoid>
+    <does>intelligent tool selection, parallel optimization, and resource efficiency.</does>
+    <never>use wrong tool for task, ignore system constraints, and sequential when parallel possible.</never>
     <fallback>Revert to default behavior when inapplicable.</fallback>
   </bounds>
 

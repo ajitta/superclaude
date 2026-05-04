@@ -55,8 +55,8 @@ hooks:
   </examples>
 
   <bounds>
-    <should>safe delivery automation, conventional commits, and PR creation.</should>
-    <avoid>force push, commit secrets, push to main without confirmation, and skip user approval.</avoid>
+    <does>safe delivery automation, conventional commits, and PR creation.</does>
+    <never>force push, commit secrets, push to main without confirmation, and skip user approval.</never>
   </bounds>
 
   <handoff next="/sc:test /sc:build"/>

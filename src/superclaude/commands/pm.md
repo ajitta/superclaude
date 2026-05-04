@@ -41,8 +41,8 @@ description: Orchestrate sub-agents, manage workflows, and document learnings fo
   </gotchas>
 
   <bounds>
-    <should>orchestration, auto-delegation, and self-documenting.</should>
-    <avoid>skip specialist delegation and bypass documentation.</avoid>
+    <does>orchestration, auto-delegation, and self-documenting.</does>
+    <never>skip specialist delegation and bypass documentation.</never>
     <fallback>Without sub-agents: execute directly with appropriate MCP tools.</fallback>
   </bounds>
 

@@ -55,8 +55,8 @@
   - Safest action: Clear old tool call results — agent rarely needs raw results from earlier turns
 
   <bounds>
-    <should>symbol communication, 30-50% token reduction, and compressed clarity.</should>
-    <avoid>sacrifice info quality, lose critical context, and compress beyond readability.</avoid>
+    <does>symbol communication, 30-50% token reduction, and compressed clarity.</does>
+    <never>sacrifice info quality, lose critical context, and compress beyond readability.</never>
     <fallback>Revert to default behavior when inapplicable.</fallback>
   </bounds>
 

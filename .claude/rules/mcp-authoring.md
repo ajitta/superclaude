@@ -69,8 +69,8 @@ MCP docs are pure content components. They are not auto-discoverable like agents
   </example>
 
   <bounds>
-    <should>core scope in prose.</should>
-    <avoid>out-of-scope use in prose.</avoid>
+    <does>core scope in prose.</does>
+    <never>out-of-scope use in prose.</never>
     <fallback>native tool / other server / WebSearch when out of scope.</fallback>
   </bounds>
 
@@ -84,7 +84,7 @@ MCP docs are pure content components. They are not auto-discoverable like agents
 - All multi-word tag names use `snake_case`.
 - Required tags: `<role>` (with `<mission>`), `<choose>`, `<bounds>`, `<handoff>`.
 - Optional tags: `<call_order>` (only when call sequence matters — e.g., Context7's resolve→get pair), `<integration_patterns>` (cross-server / cross-command chains), `<examples>` (lookup table), `<example>` (rich illustration).
-- `<bounds>` — sub-tag form `<should>` / `<avoid>` / `<fallback>`. `<fallback>` is the native-tool or alternate-server escape hatch (load-bearing for MCP docs — readers need to know what to do when the server is wrong or unavailable).
+- `<bounds>` — sub-tag form `<does>` / `<never>` / `<fallback>`. `<fallback>` is the native-tool or alternate-server escape hatch (load-bearing for MCP docs — readers need to know what to do when the server is wrong or unavailable).
 - `<handoff next="...">` — 2-3 natural next `/sc:*` commands.
 - Short enums: **Numbered** for ordered call sequences (`<call_order>`); **Named** (`- Identifier-Name:` per-item identifiers) for `<integration_patterns>`.
 

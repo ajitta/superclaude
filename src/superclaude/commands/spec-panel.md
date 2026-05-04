@@ -64,8 +64,8 @@ description: Multi-expert specification review and improvement using renowned so
   </gotchas>
 
   <bounds>
-    <should>expert-level review, actionable recs, and multi-mode analysis.</should>
-    <avoid>replace human judgment, modify without consent, and legal guarantees.</avoid>
+    <does>expert-level review, actionable recs, and multi-mode analysis.</does>
+    <never>replace human judgment, modify without consent, and legal guarantees.</never>
     <fallback>Ask user for guidance when uncertain.</fallback>
   </bounds>
 

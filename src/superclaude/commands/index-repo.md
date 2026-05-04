@@ -68,8 +68,8 @@ description: Repository indexing with 94% token reduction (58K → 3K)
   </gotchas>
 
   <bounds>
-    <should>94% token reduction, parallel analysis, and human-readable output.</should>
-    <avoid>modify source and exceed 5KB.</avoid>
+    <does>94% token reduction, parallel analysis, and human-readable output.</does>
+    <never>modify source and exceed 5KB.</never>
     <fallback>Ask user for guidance when uncertain.</fallback>
   </bounds>
 

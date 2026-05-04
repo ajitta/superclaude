@@ -200,8 +200,8 @@ CC parser uses literal key matching with mixed conventions; do not reflexively k
   </examples>
 
   <bounds>                                                   <!-- required -->
-    <should>core capabilities described in prose (in-scope).</should>
-    <avoid>out-of-scope actions described in prose.</avoid>
+    <does>core capabilities described in prose (in-scope).</does>
+    <never>out-of-scope actions described in prose.</never>
     <fallback>optional — skills are short-lived; implicit fallback is "skill ends, control returns to caller". Use only if the recovery posture is non-obvious.</fallback>
   </bounds>
   <handoff next="/sc:next1 /sc:next2"/>                      <!-- required -->
@@ -215,7 +215,7 @@ Required tags appear in 5/5 shipped skills. Optional tags are skill-shape-depend
 - All multi-word tag names use `snake_case`
 - Short enums: **Numbered** (`1.` for ordered procedures: `<flow>`), **Labeled** (`- Label:` fixed-set labels: `<tool_guidance>` Proceed/Ask First/Never), **Named** (`- identifier-name:` per-item identifiers: `<references>`, `<tools>`, `<gotchas>`)
 - `<examples>` — compact markdown table with minimal separators `|---|---|` for short uniform rows. For richer illustrations (code blocks, narrative, multi-turn prose), use a standalone `<example>` tag — its body is free-form prose, not locked to a `user:` / `assistant:` shape. `<examples>` and `<example>` are two distinct constructs (see xml-prose-format.md).
-- `<bounds>` — sub-tag form: `<should>` / `<avoid>` / `<fallback>` (each tag's body is a prose sentence). `<should>` + `<avoid>` required; `<fallback>` optional. Skills are short-lived — implicit fallback is "skill ends, control returns to caller". Use explicit `<fallback>` only if the recovery posture is non-obvious. Sub-tag form keeps `<bounds>` structurally distinct from `<tool_guidance>` (commit `S390` measured Claude conflating the two when both used `- Label:` lines).
+- `<bounds>` — sub-tag form: `<does>` / `<never>` / `<fallback>` (each tag's body is a prose sentence). `<does>` + `<never>` required; `<fallback>` optional. Skills are short-lived — implicit fallback is "skill ends, control returns to caller". Use explicit `<fallback>` only if the recovery posture is non-obvious. Sub-tag form keeps `<bounds>` structurally distinct from `<tool_guidance>` (commit `S390` measured Claude conflating the two when both used `- Label:` lines).
 - `<gotchas>` — **프로젝트 특유** 실패 패턴만 (force-push 금지 같은 일반론은 hooks로). 분기별 리뷰, 90일 미트리거 항목 제거
 - 본문 ≤500 lines. 상세 내용은 `references/`로 분리
 
@@ -226,7 +226,7 @@ Required tags appear in 5/5 shipped skills. Optional tags are skill-shape-depend
 3. CC 확장 필드(`context`/`agent`/`hooks`)는 top-level, metadata 아래 금지
 4. 부작용 skill은 `disable-model-invocation: true`
 5. 스크립트 경로는 `{{SKILLS_PATH}}` 사용 (하드코딩 금지)
-6. `<bounds>` has `should` + `avoid`
+6. `<bounds>` has `<does>` + `<never>` (legacy `<should>`/`<avoid>` rejected by structure tests)
 7. 본문 ≤500 lines
 8. `make deploy` 후 `/skill-name`으로 실제 호출 테스트
 

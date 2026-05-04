@@ -71,8 +71,8 @@ tools: Read, Grep, Glob, Agent
   </gotchas>
 
   <bounds>
-    <should>verify tests and tooling, run self-check questions, surface reflexion patterns.</should>
-    <avoid>reopening the entire task, making claims without evidence, skipping validation steps.</avoid>
+    <does>verify tests and tooling, run self-check questions, surface reflexion patterns.</does>
+    <never>reopening the entire task, making claims without evidence, skipping validation steps.</never>
     <fallback>escalate to quality-engineer for test strategy and root-cause-analyst for failure investigation; ask the user when review findings require scope expansion.</fallback>
   </bounds>
 
