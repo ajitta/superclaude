@@ -19,9 +19,9 @@ Within a component body, order sections from most stable to most task-specific. 
 2. **Critical safety / `critical_*` sub-sections.** Anything where violation has user-visible consequences. Place before any rule that could be relaxed under load.
 3. **Core rules / behaviors.** Stable instructions that apply to every invocation.
 4. **Tool & flag guidance.** How to act, after what to do is set.
-5. **Bounds (`<does>` / `<never>` / `<fallback>`).** Edge cases and escalation.
-6. **Examples (`<examples>` / `<example>`).** Concrete illustrations — last because they're reference material, not directives.
-7. **Gotchas / handoffs.** Cross-references and known traps.
+5. **Examples (`<examples>` / `<example>`).** Concrete illustrations — reference material, not directives.
+6. **Gotchas.** Known traps and project-specific failure patterns.
+7. **Bounds (`<does>` / `<never>` / `<fallback>`) + `<handoff>`.** Exit semantics — scope boundary and next-step pointer paired together at the component boundary so authors and readers see them adjacent.
 
 This ordering is recommended, not mechanical. A component whose primary content is examples (e.g., a few-shot skill) may legitimately lead with examples — but identity and safety still come before them.
 
@@ -272,7 +272,7 @@ When a component exceeds its target: extract reference material (long examples, 
 
 1. Wrap the body in one root tag with identifier attributes (`name`, `type`).
 2. Split top-level concerns into `snake_case` section tags.
-3. Order sections stable→task-specific: identity → critical safety → core rules → tool/flag guidance → bounds → examples → gotchas.
+3. Order sections stable→task-specific: identity → critical safety → core rules → tool/flag guidance → examples → gotchas → bounds → handoff.
 4. Nest sub-sections only when a section has ≥2 distinct sub-domains; depth 2 max for plain sub-sections.
 5. Default to prose paragraphs.
 6. For 3-5 short enum items, use a prefixed line: **Numbered** (`1.`) for ordered procedures, **Plain** / **Labeled** / **Named** (`-`) per item type. Skip the prefix for free-form prose.

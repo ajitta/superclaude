@@ -40,13 +40,8 @@ MCP docs are pure content components. They are not auto-discoverable like agents
   </role>
 
   <choose>
-  Use:
-  - Trigger context where this server is the right tool.
-  - Another trigger context.
-
-  Avoid:
-  - Context where a native tool or another server is better.
-  - Another out-of-scope context.
+    <use>trigger contexts where this server is the right tool — describe in prose with concrete cases.</use>
+    <never>contexts where a native tool, another server, or no MCP at all is better — describe in prose.</never>
   </choose>
 
   <call_order>                                                <!-- optional, only when sequence is load-bearing -->
@@ -84,6 +79,7 @@ MCP docs are pure content components. They are not auto-discoverable like agents
 - All multi-word tag names use `snake_case`.
 - Required tags: `<role>` (with `<mission>`), `<choose>`, `<bounds>`, `<handoff>`.
 - Optional tags: `<call_order>` (only when call sequence matters — e.g., Context7's resolve→get pair), `<integration_patterns>` (cross-server / cross-command chains), `<examples>` (lookup table), `<example>` (rich illustration).
+- `<choose>` — sub-tag form `<use>` / `<never>`, each body a prose sentence. Mirrors `<bounds>` slot-tag discipline; declarative voice, no hedging vocabulary (no `Avoid:` / `should:`). Sub-tag form keeps `<choose>` structurally distinct from neighboring Labeled sections.
 - `<bounds>` — sub-tag form `<does>` / `<never>` / `<fallback>`. `<fallback>` is the native-tool or alternate-server escape hatch (load-bearing for MCP docs — readers need to know what to do when the server is wrong or unavailable).
 - `<handoff next="...">` — 2-3 natural next `/sc:*` commands.
 - Short enums: **Numbered** for ordered call sequences (`<call_order>`); **Named** (`- Identifier-Name:` per-item identifiers) for `<integration_patterns>`.
@@ -106,6 +102,16 @@ If a section reads like "this is what the server is" rather than "this is how I 
 3. **INSTRUCTION_MAP**: one-line summary string (≤120 chars) shown when the loader injects this doc — Claude reads it before the body lands.
 
 Add a `MCP_<X>.md` with no entries in these maps and it will sit on disk forever, unloaded.
+
+## Inherited from xml-prose-format.md
+
+The following rules apply to all components and are not restated above. See `.claude/rules/xml-prose-format.md` for full text.
+
+- **Single root XML wrapper** — exactly one root tag per component body; sibling sections only at root level.
+- **Long-form embedded enumerations** — lists embedded in running prose use natural-language enumeration ("things include x, y, z"), not bullets.
+- **Quoting conventions** — URLs and model identifier strings in single quotes (`'https://…'`, `'claude-opus-4-7'`); UI / product / feature names in double quotes (`"settings"`); runtime variables in double curly braces (`{{currentDateTime}}`).
+- **Cross-references** — point to other sections by plain English topic, not by tag path.
+- **Markdown headers inside `<example>`** — permitted when the illustration mirrors a real markdown artifact (report template, commit message, user document); the body-prose "no markdown headers" rule does not extend into `<example>` bodies.
 
 ## Checklist
 

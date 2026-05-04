@@ -38,8 +38,7 @@ Never add these — SSOT: `.claude/rules/schemas.yaml` (`forbidden_command_field
 ```xml
 <component name="command-name" type="command">
 
-  <role>
-    /sc:command-name
+  <role command="/sc:command-name">
     <mission>Single sentence matching description.</mission>
   </role>
 
@@ -59,16 +58,16 @@ Never add these — SSOT: `.claude/rules/schemas.yaml` (`forbidden_command_field
   - ToolName: purpose
   </tools>
 
-  <gotchas>
-  - pattern-name: concrete failure + action instruction (2-5 items)
-  </gotchas>
-
   <examples>
   | Trigger | Expected behavior |
   |---|---|
   | `/sc:command-name arg` | one-line response shape |
   | `/sc:command-name arg2` | another one-line shape |
   </examples>
+
+  <gotchas>
+  - pattern-name: concrete failure + action instruction (2-5 items)
+  </gotchas>
 
   <bounds>
     <does>core capabilities described in prose (in-scope).</does>
@@ -86,12 +85,23 @@ Never add these — SSOT: `.claude/rules/schemas.yaml` (`forbidden_command_field
 - All multi-word tag names use `snake_case`
 - Short enums: **Numbered** (`1.` for ordered procedures: `<flow>`), **Labeled** (`- Label:` fixed-set labels: `<tool_guidance>` Proceed/Ask First/Never), **Named** (`- identifier-name:` per-item identifiers: `<outputs>`, `<tools>`, `<gotchas>`)
 - `<examples>` — compact markdown table with minimal separators `|---|---|` for short uniform rows. For richer illustrations (code blocks, narrative, multi-turn prose), use a standalone `<example>` tag — its body is free-form prose, not locked to a `user:` / `assistant:` shape. `<examples>` and `<example>` are two distinct constructs (see xml-prose-format.md)
-- `<role>` — first line is `/sc:command-name`, then `<mission>`
+- `<role command="/sc:command-name">` — `command` attribute carries the slash identifier (matches filename stem); body contains `<mission>` only. Per xml-prose-format "Attributes vs. Body", short identifiers belong as attributes.
 - `<mission>` — shares ≥30% significant words with frontmatter `description`
 - `<flow>` — at least two numbered steps in execution order
 - `<bounds>` — sub-tag form: `<does>` / `<never>` / `<fallback>` (each tag's body is a prose sentence). `<does>` + `<never>` required; `<fallback>` optional (use when out-of-scope handling is non-obvious). Sub-tag form keeps `<bounds>` structurally distinct from `<tool_guidance>` (commit `S390` measured Claude conflating the two when both used `- Label:` lines)
 - `<handoff next="...">` — 2-3 natural next commands
 - Optional: `<outputs>`, `<mcp>`, `<tools>`, `<gotchas>`, `<examples>`
+
+## Inherited from xml-prose-format.md
+
+The following rules apply to all components and are not restated above. See `.claude/rules/xml-prose-format.md` for full text.
+
+- **Single root XML wrapper** — exactly one root tag per component body; sibling sections only at root level.
+- **Long-form embedded enumerations** — lists embedded in running prose use natural-language enumeration ("things include x, y, z"), not bullets.
+- **Quoting conventions** — URLs and model identifier strings in single quotes (`'https://…'`, `'claude-opus-4-7'`); UI / product / feature names in double quotes (`"settings"`); runtime variables in double curly braces (`{{currentDateTime}}`).
+- **Cross-references** — point to other sections by plain English topic, not by tag path.
+- **Markdown headers inside `<example>`** — permitted when the illustration mirrors a real markdown artifact (report template, commit message, user document); the body-prose "no markdown headers" rule does not extend into `<example>` bodies.
+- **Size target** — command body ≤200 lines (hard ceiling 300); extract overflow into a referenced sibling file rather than inline-bloating the body.
 
 ## Checklist
 

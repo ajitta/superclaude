@@ -188,16 +188,16 @@ CC parser uses literal key matching with mixed conventions; do not reflexively k
   - ToolName: purpose
   </tools>
 
-  <gotchas>                                                  <!-- required -->
-  - pattern-name: 구체적 실패 + 행동 지침 (2-5 items)
-  </gotchas>
-
   <examples>                                                 <!-- optional -->
   | Trigger | Expected behavior |
   |---|---|
   | `/skill-name arg` | one-line response shape |
   | `/skill-name arg2` | another one-line shape |
   </examples>
+
+  <gotchas>                                                  <!-- required -->
+  - pattern-name: 구체적 실패 + 행동 지침 (2-5 items)
+  </gotchas>
 
   <bounds>                                                   <!-- required -->
     <does>core capabilities described in prose (in-scope).</does>
@@ -218,6 +218,17 @@ Required tags appear in 5/5 shipped skills. Optional tags are skill-shape-depend
 - `<bounds>` — sub-tag form: `<does>` / `<never>` / `<fallback>` (each tag's body is a prose sentence). `<does>` + `<never>` required; `<fallback>` optional. Skills are short-lived — implicit fallback is "skill ends, control returns to caller". Use explicit `<fallback>` only if the recovery posture is non-obvious. Sub-tag form keeps `<bounds>` structurally distinct from `<tool_guidance>` (commit `S390` measured Claude conflating the two when both used `- Label:` lines).
 - `<gotchas>` — **프로젝트 특유** 실패 패턴만 (force-push 금지 같은 일반론은 hooks로). 분기별 리뷰, 90일 미트리거 항목 제거
 - 본문 ≤500 lines. 상세 내용은 `references/`로 분리
+
+## Inherited from xml-prose-format.md
+
+The following rules apply to all components and are not restated above. See `.claude/rules/xml-prose-format.md` for full text.
+
+- **Single root XML wrapper** — exactly one root tag per component body; sibling sections only at root level.
+- **Long-form embedded enumerations** — lists embedded in running prose use natural-language enumeration ("things include x, y, z"), not bullets.
+- **Quoting conventions** — URLs and model identifier strings in single quotes (`'https://…'`, `'claude-opus-4-7'`); UI / product / feature names in double quotes (`"settings"`); runtime variables in double curly braces (`{{currentDateTime}}`).
+- **Cross-references** — point to other sections by plain English topic, not by tag path.
+- **Markdown headers inside `<example>`** — permitted when the illustration mirrors a real markdown artifact (report template, commit message, user document); the body-prose "no markdown headers" rule does not extend into `<example>` bodies.
+- **Size target** — skill body ≤500 lines (matches Anthropic guidance); extract overflow into `references/` sibling files (progressive disclosure).
 
 ## Validation Checklist
 

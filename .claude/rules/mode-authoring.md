@@ -102,6 +102,17 @@ Every mode **must** define all four axes (per `.claude/rules/xml-prose-format.md
 
 Operational parameters too detailed for the mode itself go in sibling `type="config"` files (e.g., `RESEARCH_CONFIG.md` — depth profiles, confidence thresholds). Not subject to mode validation (no 4-axis requirement), validated by `test_content_structure.py`.
 
+## Inherited from xml-prose-format.md
+
+The following rules apply to all components and are not restated above. See `.claude/rules/xml-prose-format.md` for full text.
+
+- **Single root XML wrapper** — exactly one root tag per component body; sibling sections only at root level.
+- **Long-form embedded enumerations** — lists embedded in running prose use natural-language enumeration ("things include x, y, z"), not bullets.
+- **Quoting conventions** — URLs and model identifier strings in single quotes (`'https://…'`, `'claude-opus-4-7'`); UI / product / feature names in double quotes (`"settings"`); runtime variables in double curly braces (`{{currentDateTime}}`).
+- **Cross-references** — point to other sections by plain English topic, not by tag path.
+- **Markdown headers inside `<example>`** — permitted when the illustration mirrors a real markdown artifact (report template, commit message, user document); the body-prose "no markdown headers" rule does not extend into `<example>` bodies.
+- **Size target** — mode body ≤300 lines (hard ceiling 500); extract overflow into a referenced sibling file rather than inline-bloating the body.
+
 ## Checklist
 
 1. Create `src/superclaude/modes/MODE_PascalCase.md` starting with `<component>`
