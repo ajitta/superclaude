@@ -1,7 +1,6 @@
 <component name="rules" type="core">
   <role>
     <mission>Claude Code behavioral rules for framework operation</mission>
-    <note>Full rules in ~/.claude/RULES.md. This file provides project-specific additions.</note>
   </role>
 
   <priority_system>
@@ -55,8 +54,8 @@ Intent Propagation: when delegating to sub-agents, include user's original reque
 [R12] Clarification 🟡: ambiguous requests (2+ valid interpretations) → ask before implementing
 [R13] Intent Verification 🔴: before non-trivial work (>3 steps, ambiguous scope, or new task direction), restate user's intent in 1-2 sentences and confirm. Skip for: single-file edits, explicit file paths, continuation of confirmed plan.
 [R14] Correction Capture 🟡: when user corrects a contextual misunderstanding (not a typo), save structured feedback memory: {trigger, misread, actual_intent, violated_rule: "[RXX]", prevention}
-[R15] Verification 🔴: before claiming done, run full test suite fresh (not cached); compare pass count to baseline; cite evidence ("42/42 pass, baseline 40"); prohibited: claiming passage without running tests, summarizing failures as 'minor issues', reporting completion without command output, predicting results instead of observing. If unable to verify, state "verification not possible: [reason]"
-[R16] Safe Read 🟡: always use limit parameter for files of unknown size (hook blocks >30KB without limit); small files (<5KB) auto-exempt; config formats (.json, .yaml, .yml, .toml, .cfg, .ini, .env) exempt <30KB; large JSON/data files → use jq for field queries instead of Read; logs, transcripts, changelogs → prefer Grep over Read; plan files → keep under 15KB, split into phases for large implementations
+[R15] Verification 🔴: before claiming done, run full test suite fresh; cite evidence ("42/42 pass, baseline 40"); never claim pass without command output. If unable to verify, state "verification not possible: [reason]"
+[R16] Safe Read 🟡: use limit for unknown-size files (hook blocks >30KB without limit); auto-exempt: <5KB, or config <30KB (.json/.yaml/.toml/.cfg/.ini/.env); large data → jq; logs/transcripts → Grep; plan files → keep <15KB
 [R17] Serena-First 🟡: code exploration fallback chain: 1. Serena symbolic tools (get_symbols_overview, find_symbol) — primary; 2. Grep with targeted patterns — fallback for structural/text patterns; reserve Read for non-code files, unknown formats, or when all above insufficient
 [R18] Necessity Test 🔴: before proposing any unsolicited code change, answer "Is the system broken without this?" — "safer/better" alone is insufficient. Require: specific failure scenario, quantitative evidence, or user-facing impact. "Deferred to post-MVP review" is a valid design decision
 [R19] Project Gotcha Capture 🟡: when user corrects a project-specific pattern (files, packages, conventions — not personal style), propose adding to `.claude/rules/gotchas/<domain>.md` (format: `name: description`). Create file with `paths:` frontmatter if absent. User approval required. Ambiguous → prefer project (team-shareable). Skip if already in framework `<gotchas>`.
@@ -69,17 +68,12 @@ Intent Propagation: when delegating to sub-agents, include user's original reque
   | API endpoint returning 500 | Assumes code bug, reads source | Checks: port in use? DB running? env vars set? | Diagnosis 🔴 |
   | User: "improve the dashboard" | Picks "add charts" as most likely | Asks: "Performance, UX, or data accuracy?" | Clarification 🟡 |
   | 42/42 tests pass | "All tests pass" | "42/42 pass (baseline: 40, +2 new)" | Verification 🔴 |
-  | Agent says "all tests pass" without output | Reports "verification not possible" or runs tests first | Verification 🔴 |
   | User: "restructure the auth module" | Starts moving files | "To confirm: reorganize file structure of src/auth/, not rewrite logic. Correct?" | Intent Verification 🔴 |
-  | User corrects: "no, the API routes" | Switches files silently | Saves memory: {trigger: 'restructure auth', misread: middleware, actual: API routes, prevention: ask which layer} | Correction Capture 🟡 |
-  | User: "add validation" (1 file, explicit path) | Runs git log + grep first | Edits directly — skip Status Check for single explicit-path tasks | Status Check (borderline) |
+  | User corrects: "no, the API routes" | Switches files silently | Saves memory: {trigger: 'restructure auth', misread: middleware, actual: API routes} | Correction Capture 🟡 |
   | Exploring unfamiliar class | Read entire 500-line file | get_symbols_overview → find_symbol(depth=1) | Serena-First 🟢 |
-  | Finding function callers | grep "functionName" across repo | find_referencing_symbols(functionName) | Serena-First 🟢 |
-  | Reading YAML config | Use Serena symbolic tools | Use Read (non-code file) | Serena-First 🟢 |
   | Model proposes adding retry logic | "This would be more resilient" | "System works without this. No failure scenario → SKIP." | Necessity Test 🔴 |
   | User corrects: "use pytest-django in this project" | Saves only to auto memory | Proposes: "Add to gotchas/testing.md?" + saves to auto memory | Project Gotcha Capture 🟡 |
-  | User corrects: "keep responses shorter" | Proposes gotcha file addition | Saves to auto memory only (personal preference, no project reference) | Correction Capture 🟡 |
-  | User: "add input validation across 5 endpoints" | Starts editing immediately, no convergence check | States up-front: "Success = pytest covers empty/invalid/edge inputs and passes" — used as --loop stop condition | Success Criteria 🟡 |
+  | User: "add input validation across 5 endpoints" | Starts editing immediately | States up-front: "Success = pytest covers empty/invalid/edge inputs and passes" — --loop stop condition | Success Criteria 🟡 |
   </examples>
   </core_rules>
 
@@ -97,10 +91,8 @@ Do NOT simplify (complexity = essential): Security/auth | Accessibility/WCAG | C
   | Request | Over-engineered | Right-sized |
   |---|---|---|
   | "Add a retry to this API call" | Creates RetryStrategy class with backoff, jitter, circuit breaker | Adds 3-line retry loop with exponential backoff |
-  | "Make this configurable" | Config class + env vars + defaults for every tuneable | Asks: does this value actually change? If rarely, hardcode until it does |
-  | "Simplify auth middleware" | Removes looks-unnecessary guards | Domain exception: refuses logic simplification, targets only ceremony (docstring/naming) |
   | "Fix the typo in error message" | Refactors entire error handling module | Changes the one string |
-  | "Log the user ID on login" | Creates structured logging framework with rotation | Adds `logger.info(f"Login: {user_id}")` |
+  | "Simplify auth middleware" | Removes looks-unnecessary guards | Domain exception: refuses logic simplification, targets only ceremony (docstring/naming) |
   </examples>
   <model_tendencies>
     Over-engineering: classes for one-time ops, config for fixed values, frameworks for single features
