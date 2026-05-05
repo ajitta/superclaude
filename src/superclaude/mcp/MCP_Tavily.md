@@ -41,7 +41,7 @@
   <bounds>
     <does>web search, multi-source synthesis, and current information retrieval.</does>
     <never>code generation, local file operations, and training knowledge questions.</never>
-    <fallback>Use native WebSearch for simple queries, WebFetch for single pages.</fallback>
+    <fallback>When the MCP server is unavailable, invoke the /tavily-cli skill for full CLI access — including tvly map (URL discovery) and tvly research (multi-source deep research) not available via MCP. Use native WebSearch for simple queries, WebFetch for single pages.</fallback>
   </bounds>
 
   <handoff next="/sc:research /sc:analyze"/>
