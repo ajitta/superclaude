@@ -14,7 +14,6 @@ MCP (Model Context Protocol) servers extend Claude Code's capabilities through s
 - **context7**: Official library documentation and patterns
 - **sequential-thinking**: Multi-step reasoning and analysis
 - **playwright**: Browser automation and E2E testing
-- **filesystem-with-morph**: Pattern-based code transformations
 - **serena**: Semantic code understanding and project memory
 - **tavily**: Web search and real-time information retrieval
 - **chrome-devtools**: Performance analysis and debugging
@@ -30,7 +29,6 @@ MCP (Model Context Protocol) servers extend Claude Code's capabilities through s
 | Library imports, API names | **context7** |
 | `--think`, debugging | **sequential-thinking** |
 | `test`, `e2e`, `browser` | **playwright** |
-| Multi-file edits, refactoring | **filesystem-with-morph** |
 | Large projects, sessions | **serena** |
 | `/sc:research`, `latest`, `current` | **tavily** |
 | `performance`, `debug`, `LCP` | **chrome-devtools** |
@@ -77,20 +75,6 @@ MCP (Model Context Protocol) servers extend Claude Code's capabilities through s
 
 # Manual activation
 /sc:validate "accessibility compliance" --play
-```
-
-### filesystem-with-morph 🔄
-**Purpose**: Efficient pattern-based code transformations
-**Triggers**: Multi-file edits, refactoring, framework migrations
-**Requirements**: Node.js 16+, MORPH_API_KEY
-
-```bash
-# Automatic activation
-/sc:improve legacy-codebase/ --focus maintainability
-# → Applies consistent patterns across files
-
-# API key setup
-export MORPH_API_KEY="your_key_here"
 ```
 
 ### serena 🧭
@@ -209,11 +193,6 @@ docker compose restart api
       "command": "npx",
       "args": ["@playwright/mcp@latest"]
     },
-    "filesystem-with-morph": {
-      "command": "npx",
-      "args": ["-y", "@morphllm/morphmcp"],
-      "env": {"MORPH_API_KEY": "${MORPH_API_KEY}"}
-    },
     "serena": {
       "command": "serena",
       "args": ["start-mcp-server", "--context", "claude-code", "--project-from-cwd"]
@@ -260,7 +239,6 @@ docker compose restart api
 **Common Issues:**
 - **No servers connected**: Check Node.js: `node --version` (need v16+)
 - **Context7 fails**: Clear cache: `npm cache clean --force`
-- **Morphllm errors**: Expected without API keys (paid service)
 - **Server timeouts**: Restart Claude Code session
 
 **Quick Fixes:**
@@ -280,35 +258,26 @@ ls ~/.claude.json
 
 **API Key Configuration:**
 ```bash
-# For Morphllm server (required for bulk transformations)
-export MORPH_API_KEY="your_key_here"
-
 # For Tavily server (required for web search - free tier available)
 export TAVILY_API_KEY="tvly-your_key_here"
 
 # Add to shell profile for persistence
-echo 'export MORPH_API_KEY="your_key"' >> ~/.bashrc
 echo 'export TAVILY_API_KEY="your_key"' >> ~/.bashrc
 ```
 
 **Environment Variable Usage:**
-- ✅ `MORPH_API_KEY` - Required for Morphllm MCP server functionality
 - ✅ `TAVILY_API_KEY` - Required for Tavily MCP server functionality (free tier available)
 - ❌ Other env vars in docs - Examples only, not used by framework
-- 📝 Morphllm is a paid service, Tavily has free tier, framework works without them
+- 📝 Tavily has free tier, framework works without it
 
 ## Server Combinations
 
 **No API Keys (Free)**:
 - context7 + sequential-thinking + playwright + serena
 
-**1 API Key**:
-- Add filesystem-with-morph for large-scale refactoring
-
 **Common Workflows:**
 - **Learning**: context7 + sequential-thinking
 - **Web Development**: context7 + playwright
-- **Enterprise Refactoring**: serena + morphllm + sequential-thinking
 - **Complex Analysis**: sequential-thinking + context7 + serena
 - **Deep Research**: tavily + sequential-thinking + serena + playwright
 - **Current Events**: tavily + context7 + sequential-thinking
