@@ -60,19 +60,14 @@ MCP_SERVERS = {
     },
     "tavily": {
         "name": "tavily",
-        "description": "Web search, extract, crawl, and research via Tavily's official Claude plugin",
+        "description": "Web search, extract, crawl, and research",
+        "transport": "stdio",
+        "command": "npx -y tavily-mcp@latest",
         "required": False,
         "category": "core",
-        "method": "plugin",
-        "plugin_id": "tavily",
-        "marketplace_source": "tavily-ai/skills",
-        "marketplace_name": "tavily-plugins",
-        # API key requirement is documented at https://docs.tavily.com/documentation/tavily-cli
-        # (set TAVILY_API_KEY env var). Plugin install does not auto-prompt.
-        "post_install_note": (
-            "Set TAVILY_API_KEY in your environment "
-            "(get a key from https://app.tavily.com)"
-        ),
+        "method": "mcp",
+        "api_key_env": "TAVILY_API_KEY",
+        "api_key_description": "Tavily API key for web search (get from https://app.tavily.com)",
     },
     "playwright": {
         "name": "playwright",

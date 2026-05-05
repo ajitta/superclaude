@@ -15,7 +15,7 @@ MCP server docs are loaded on-demand by `context_loader.py` via flag/keyword tri
 | Context7 | `--c7` | `@upstash/context7-mcp` v2.1.6 | Official library documentation and framework patterns |
 | Sequential | `--seq` | `@modelcontextprotocol/server-sequential-thinking` v0.2.0 | Multi-step reasoning for complex analysis |
 | Serena | `--serena` | `serena-agent` (PyPI, pre-1.0) | Semantic code understanding with project memory (17 tools) |
-| Tavily | `--tavily` | `tavily-ai/skills` (Claude plugin) | Web search, extract, crawl, research |
+| Tavily | `--tavily` | `tavily-mcp` (npm) | Web search, extract, crawl, research |
 
 ### Plugin (opt-in: `superclaude mcp --servers <name>`)
 
