@@ -62,6 +62,15 @@ Canonical patterns (from CC docs):
 - `Debugging specialist for errors, test failures, and unexpected behavior. Use proactively when encountering any issues.`
 - `Data analysis expert for SQL queries, BigQuery operations, and data insights. Use proactively for data analysis tasks and queries.`
 
+#### Vocabulary cautions
+
+The description sentence is read verbatim into the subagent's system prompt header — wording shifts measurably change behavior. Empirical findings from the agent-naming experiment series (107 trials, see `docs/research/2026-05-06-agent-naming-findings/`):
+
+- **Avoid past-implying phrasing.** `following X practices`, `deep production experience`, `pragmatic tradeoff judgment` — these prime a "this is a continuation of prior work" frame and produced 5/5 and 3/3 context-hallucination rates on long-output tasks (subagents fabricating preexisting files, prior fixes, even narrating edits to their own definition file). The `engineer` and `senior-python-engineer` rename pairs broke from this alone, body unchanged.
+- **Prefer forward-looking voice.** `learning to apply X`, `grounded in X`, `with deep mastery and seasoned judgment` — these did not trigger the failure mode (0/3 hallucinations).
+- **Description is a lever for over-engineering.** Adding a Zen-of-Python clause ("simple is better than complex; values minimal solutions, the smallest abstraction; code that any junior can read") to the same agent name reduced over-engineering signals 25–73% (chars −25%, classes −58%, decorators −65%, TypeVar −100% across 15 trials). Use this lever before reaching for a rename if the goal is anti-overengineering.
+- **`hypothesis`-style advanced patterns are sticky** — directive phrasing only reduced unprompted property-based test usage by ~20%. Some priors require explicit prohibition (`Do not use property-based testing libraries unless asked.`) rather than soft directives.
+
 ### Field reference
 
 **Forbidden in source.** `autonomy` (not a CC field). Any field not in CC's documented agent spec.
