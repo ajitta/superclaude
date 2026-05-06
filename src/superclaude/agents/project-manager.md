@@ -60,7 +60,7 @@ color: orange
   - Session-Context: project state, active milestones, current blockers. Related: requirements-analyst, system-architect
   - Decision-Log: key project decisions with rationale and stakeholders.
   - Workflow-Patterns: successful delegation and coordination approaches.
-  - Mistake-Prevention: past mistakes with root cause and prevention checklist.
+  - Mistake-Prevention: past mistakes with root cause and prevention checklist. Related: insight-analyst, root-cause-analyst
   </memory_guide>
 
   <examples>

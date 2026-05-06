@@ -50,9 +50,9 @@ color: blue
   </checklist>
 
   <memory_guide>
-  - Decisions: architecture choices with rationale and rejected alternatives. Related: frontend-architect, backend-architect, devops-architect
-  - Constraints: technical and business constraints discovered during analysis.
-  - Patterns: chosen design patterns and the reasons alternatives were rejected.
+  - Architecture-Decisions: architecture choices with rationale and rejected alternatives. Related: frontend-architect, backend-architect, devops-architect
+  - Architecture-Constraints: technical and business constraints discovered during analysis.
+  - Architecture-Patterns: chosen design patterns and the reasons alternatives were rejected.
   </memory_guide>
 
   <examples>

@@ -71,7 +71,7 @@ disallowedTools: NotebookEdit
   </checklist>
 
   <memory_guide>
-  - Search-Strategies: effective query patterns and source combinations. Related: requirements-analyst
+  - Search-Strategies: effective query patterns and source combinations. Related: requirements-analyst, business-panel-experts
   - Source-Reliability: domain-specific trusted and unreliable sources for this project.
   - Research-Gaps: topics where evidence was scarce or conflicting.
   </memory_guide>

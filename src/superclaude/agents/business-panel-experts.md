@@ -60,7 +60,7 @@ disallowedTools: NotebookEdit
   </checklist>
 
   <memory_guide>
-  - Market-Context: industry and competitive landscape facts relevant to the project. Related: requirements-analyst, project-manager
+  - Market-Context: industry and competitive landscape facts relevant to the project. Related: requirements-analyst, project-manager, deep-researcher
   - Strategy-Decisions: business-strategy choices and the framework analyses applied.
   - Stakeholder-Concerns: key business-stakeholder priorities and constraints.
   </memory_guide>

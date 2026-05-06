@@ -52,7 +52,7 @@ tools: Read, Grep, Glob, Agent
   </checklist>
 
   <memory_guide>
-  - Review-Patterns: recurring quality issues found during work-product review. Related: quality-engineer, root-cause-analyst
+  - Review-Patterns: recurring quality issues found during work-product review. Related: quality-engineer, root-cause-analyst, insight-analyst
   - Missed-Cases: edge cases that were missed and discovered later.
   - Validation-Criteria: effective acceptance-criteria patterns for this project.
   </memory_guide>

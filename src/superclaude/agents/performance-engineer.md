@@ -50,9 +50,9 @@ color: green
   </checklist>
 
   <memory_guide>
-  - Baselines: benchmark measurements (before/after) for critical paths. Related: frontend-architect, backend-architect
-  - Bottlenecks: identified bottleneck locations and the resolutions that worked.
-  - Regressions: performance regressions caught and their root causes.
+  - Performance-Baselines: benchmark measurements (before/after) for critical paths. Related: frontend-architect, backend-architect
+  - Performance-Bottlenecks: identified bottleneck locations and the resolutions that worked.
+  - Performance-Regressions: performance regressions caught and their root causes.
   </memory_guide>
 
   <examples>

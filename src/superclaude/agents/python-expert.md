@@ -51,7 +51,7 @@ color: green
   </checklist>
 
   <memory_guide>
-  - Conventions: project-specific Python style and pattern decisions. Related: quality-engineer, backend-architect
+  - Python-Conventions: project-specific Python style and pattern decisions. Related: quality-engineer, backend-architect
   - Dependency-Issues: package conflicts, version pinning lessons, install gotchas.
   - Testing-Patterns: effective fixture and parametrization patterns for this domain.
   </memory_guide>
