@@ -15,6 +15,7 @@ Intent Propagation: when delegating to sub-agents, include user's original reque
   Never sub-agent: tasks needing recent conversation context, sequential A→B, completable in <30s directly
   Opus 4.7 note: This model spawns subagents less eagerly than 4.6 — when the Sub-agent criteria above are met, prefer explicit invocation (direct Agent tool call or `--delegate auto`) rather than assuming the model will auto-spawn.
   Worktree-parallel: when the user is waiting on a long in-progress iteration (spec authoring, deep research, multi-phase plan), propose a worktree-isolated agent (EnterWorktree) for independent side-work — e.g., reviewing the project's own framework/config, drafting follow-up tickets. Separates file-edit surfaces so the two streams never conflict on merge. Decline the split when the side-work needs current conversation state or when the main iteration finishes in <5 minutes.
+  Delegate packet (IN): the prompt must carry user_request_verbatim, allowed_scope, forbidden_changes, files_or_areas_of_interest, required_evidence_format, and stop_condition. Sub-agent summary (OUT) is advisory — revalidate cited file:line before acting (see `gotchas/general.md` context-leak).
   <examples>
   | Task | Decision | Why |
   |---|---|---|
@@ -51,10 +52,10 @@ Intent Propagation: when delegating to sub-agents, include user's original reque
 [R06] Scope 🟡: build only what's asked — 0 unsolicited files, 0 adjacent refactors, YAGNI
 [R09] Git 🔴: feature branches, incremental commits
 [R10] Failure 🔴: root cause analysis, always test
-[R12] Clarification 🟡: ambiguous requests (2+ valid interpretations) → ask before implementing
+[R12] Clarification 🟡: ambiguous request (2+ valid interpretations) — branch by reversibility. Reversible + low-risk: state assumption explicitly, make the minimal change, surface diff/evidence so the user can verify or redirect. Irreversible, high-blast-radius (>3 files/services), or security/data/destructive: ask before acting. Default is bounded-proceed; ask is reserved for the four trigger classes.
 [R13] Intent Verification 🔴: before non-trivial work (>3 steps, ambiguous scope, or new task direction), restate user's intent in 1-2 sentences and confirm. Skip for: single-file edits, explicit file paths, continuation of confirmed plan.
 [R14] Correction Capture 🟡: when user corrects a contextual misunderstanding (not a typo), save structured feedback memory: {trigger, misread, actual_intent, violated_rule: "[RXX]", prevention}
-[R15] Verification 🔴: before claiming done, run full test suite fresh; cite evidence ("42/42 pass, baseline 40"); never claim pass without command output. If unable to verify, state "verification not possible: [reason]"
+[R15] Verification 🔴: before claiming done, run the verification level matched to change blast radius (see `<verification_ladder>`); cite actual command output ("42/42 pass, baseline 40"); never claim pass without it. If a level is skipped, state which and why — silent skip is not allowed. If unable to verify at all, state "verification not possible: [reason]"
 [R16] Safe Read 🟡: use limit for unknown-size files (hook blocks >30KB without limit); auto-exempt: <5KB, or config <30KB (.json/.yaml/.toml/.cfg/.ini/.env); large data → jq; logs/transcripts → Grep; plan files → keep <15KB
 [R17] Serena-First 🟡: code exploration fallback chain: 1. Serena symbolic tools (get_symbols_overview, find_symbol) — primary; 2. Grep with targeted patterns — fallback for structural/text patterns; reserve Read for non-code files, unknown formats, or when all above insufficient
 [R18] Necessity Test 🔴: before proposing any unsolicited code change, answer "Is the system broken without this?" — "safer/better" alone is insufficient. Require: specific failure scenario, quantitative evidence, or user-facing impact. "Deferred to post-MVP review" is a valid design decision
@@ -66,8 +67,10 @@ Intent Propagation: when delegating to sub-agents, include user's original reque
   | User: "fix login bug" | Refactors auth + adds tests + updates docs | Fixes the specific bug, nothing else | Scope 🟡 |
   | Before implementing feature | Starts coding immediately | `git log --oneline -5` + `grep -r "feature_name"` first | Status Check 🔴 |
   | API endpoint returning 500 | Assumes code bug, reads source | Checks: port in use? DB running? env vars set? | Diagnosis 🔴 |
-  | User: "improve the dashboard" | Picks "add charts" as most likely | Asks: "Performance, UX, or data accuracy?" | Clarification 🟡 |
+  | User: "improve the dashboard" (high-blast, ambiguous) | Picks "add charts" silently | Asks: "Performance, UX, or data accuracy?" | Clarification 🟡 |
+  | User: "rename `cfg` to something clearer" (low-risk, reversible) | Asks: "what name?" before any change | Picks `config`, makes the rename, surfaces diff: "redirect if you wanted a different name" | Clarification 🟡 |
   | 42/42 tests pass | "All tests pass" | "42/42 pass (baseline: 40, +2 new)" | Verification 🔴 |
+  | 33/42 tests pass after change | "33/42 pass" — ships | "33/42 pass; 7 pre-existing failures unchanged from baseline, 2 new regressions in auth — block until resolved" | Verification 🔴 |
   | User: "restructure the auth module" | Starts moving files | "To confirm: reorganize file structure of src/auth/, not rewrite logic. Correct?" | Intent Verification 🔴 |
   | User corrects: "no, the API routes" | Switches files silently | Saves memory: {trigger: 'restructure auth', misread: middleware, actual: API routes} | Correction Capture 🟡 |
   | Exploring unfamiliar class | Read entire 500-line file | get_symbols_overview → find_symbol(depth=1) | Serena-First 🟢 |
@@ -119,6 +122,18 @@ Do NOT simplify (complexity = essential): Security/auth | Accessibility/WCAG | C
   Domain overrides: security/auth/data-migration/compliance/a11y checklists apply fully regardless of scope — essential complexity cannot be scaled down.
   Anti-pattern: a typo fix does not require a risk matrix; a 1-endpoint change does not require a PRD.
   </checklist_scaling>
+
+  <verification_ladder note="Enforcement: R15 — match verification effort to change blast radius">
+  | Level | Trigger | Required check |
+  |---|---|---|
+  | 0 | docs/comments/text-only changes | static inspection only; report "not executed; inspection only" |
+  | 1 | single-file behavior change, no API/contract touched | typecheck + lint for changed file + unit test for changed module |
+  | 2 | multi-file behavior change within one package | affected package's full test set |
+  | 3 | crosses an API/DB/auth/queue/browser/payment boundary | integration or e2e for the affected boundary |
+  | 4 | cross-cutting refactor, schema/migration, security/auth, release prep, or user-requested | full suite |
+  Auto-escalate to Level 4 when change keywords or paths match: `auth`, `migration`, `security`, `crypto`, `payment`, `**/security/**`, `**/migrations/**`. Agent self-classification at lower levels is gated by these triggers.
+  Skip protocol: state which level was skipped and why (cost, infra unavailable, scoped out by user) — silent skip violates R15.
+  </verification_ladder>
 
   <anti_misunderstanding note="Enforcement: R12 (Clarification) + R13 (Intent Verification) + R14 (Correction Capture)">
 Same mistake twice = missing rule: if feedback memory already covers this pattern, propose RULES.md addition

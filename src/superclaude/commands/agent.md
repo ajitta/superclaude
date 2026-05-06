@@ -61,7 +61,7 @@ description: Session controller orchestrating investigation, implementation, and
 
   <gotchas>
   - scope-leak: Do not let sub-agents expand scope beyond the original user request. Pass user's words verbatim
-  - context-pollution: Do not read sub-agent output files. Wait for returned summary only
+  - context-pollution: Do not read sub-agent output files (pollutes main context with tool noise). Treat the returned summary as advisory, not authoritative — require it to cite {files inspected, commands run, exact evidence, assumptions, residual risks}, then revalidate cited file:line before editing or reporting based on it
   </gotchas>
 
   <bounds>
