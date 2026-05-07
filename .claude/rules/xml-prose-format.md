@@ -1,3 +1,7 @@
+---
+paths: ["src/superclaude/agents/**", "src/superclaude/commands/**", "src/superclaude/modes/**", "src/superclaude/skills/**", "src/superclaude/mcp/**", "src/superclaude/core/**", ".claude/rules/*authoring*.md", ".claude/rules/xml-prose-format.md"]
+---
+
 # XML Prose Format Rules
 
 > Body-format spec for SuperClaude content components — agent / skill / command / mode bodies under `src/superclaude/`. Derived from Claude.ai's system-prompt prose style, adapted with a minimal `-` line list so short labeled enumerations stay readable without resorting to verbose XML containers.
