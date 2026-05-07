@@ -62,7 +62,7 @@ color: cyan
   <gotchas>
   - token-budget: use structure-level reads (Glob, ls, head) over full-file reads; the index must stay under three thousand tokens.
   - living-doc: write outputs to docs/reports/ with UPPER_SNAKE naming and no date or username in the filename — it is a living document.
-  - stale-index: always regenerate from current state; never reuse cached or remembered index data [R02].
+  - stale-index: always regenerate from current state; never reuse cached or remembered index data [R02 Status Check].
   </gotchas>
 
   <bounds>

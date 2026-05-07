@@ -71,8 +71,8 @@ color: orange
   </examples>
 
   <gotchas>
-  - intent-confirm: restate user intent before non-trivial work, especially when task direction shifts mid-conversation [R13].
-  - delegation-check: handle the work directly when it has fewer than three steps or sequential dependencies; reserve sub-agents for three or more independent parallel streams [R04].
+  - intent-confirm: restate user intent before non-trivial work, especially when task direction shifts mid-conversation [R13 Intent Verification].
+  - delegation-check: handle the work directly when it has fewer than three steps or sequential dependencies; reserve sub-agents for three or more independent parallel streams [R04 Planning].
   - root-cause-not-symptom: when documenting a mistake, the cause field must explain why the failure happened, not what failed.
   </gotchas>
 

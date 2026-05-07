@@ -128,7 +128,7 @@ HIGH/MEDIUM tier 에이전트 중 `serena`가 빠진 경우 추가:
 `<core_rules>` 섹션에 새 규칙 추가:
 
 ```
-[R17] Serena-First 🟢: code exploration → prefer Serena symbolic tools (get_symbols_overview, find_symbol) over Read; reserve Read for non-code files, unknown formats, or when Serena unavailable
+[R17 Serena-First] Serena-First 🟢: code exploration → prefer Serena symbolic tools (get_symbols_overview, find_symbol) over Read; reserve Read for non-code files, unknown formats, or when Serena unavailable
 ```
 
 `<core_rules>` examples 테이블에 추가:
@@ -206,7 +206,7 @@ Serena가 설치되지 않은 프로젝트에서 에이전트가 Read/Grep으로
 | MEDIUM tier agents (simplicity-guide 제외) | 7 | tool_guidance 1줄 + mcp tag | +2줄/파일 |
 | simplicity-guide | 1 | 기존 Serena 지시 유지 (변경 없음) | 0 |
 | LOW tier agents | 3 | 없음 | 0 |
-| RULES.md | 1 | [R17] + examples 3줄 | +6줄 |
+| RULES.md | 1 | [R17 Serena-First] + examples 3줄 | +6줄 |
 | agent-authoring.md | 1 | 템플릿 + mcpServers 문서화 + 신규 섹션 | +30줄 |
 | **합계** | **21 files** | | **+74줄** |
 
@@ -243,7 +243,7 @@ Serena가 설치되지 않은 프로젝트에서 에이전트가 Read/Grep으로
 |------|------|
 | 3-tier 분류 (HIGH/MEDIUM/LOW) | 비코드 에이전트에 코드 탐색 지시는 noise → 역할 기반 적용 범위 설정 |
 | `<mcp servers>` 태그 업데이트 포함 | 런타임 무관하지만, 에이전트 설계 의도 문서화 — 코드 리뷰/유지보수 시 가독성 |
-| RULES.md [R17]을 🟢 우선순위로 | Serena 없이도 기능 정상 — 최적화 영역 |
+| RULES.md [R17 Serena-First]을 🟢 우선순위로 | Serena 없이도 기능 정상 — 최적화 영역 |
 | RULES.md를 supplementary로 분류 | Sub-agent 주입 미보장 (커뮤니티 보고 상충) — Layer 1이 primary |
 | agent-authoring.md에 `mcpServers` 문서화 | 공식 CC 필드이나 현재 SuperClaude template에 미포함 — 향후 활용 대비 |
 | `mcpServers` frontmatter 일괄 추가 보류 | MCP 도구 기본 상속으로 불필요 — 행동 지침(Layer 1)이 핵심 해결책 |

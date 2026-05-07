@@ -73,9 +73,9 @@
 
 ## Sprint 3: RULES.md (1 file)
 
-### Task 9: [R17] 규칙 + examples 추가
+### Task 9: [R17 Serena-First] 규칙 + examples 추가
 **Files:** Modify: `src/superclaude/core/RULES.md`
-- [ ] `[R16] Safe Read` 뒤에 `[R17] Serena-First 🟢` 규칙 추가
+- [ ] `[R16 Safe Read] Safe Read` 뒤에 `[R17 Serena-First] Serena-First 🟢` 규칙 추가
 - [ ] `<examples>` 테이블에 Serena-First 3줄 추가 (기존 패턴: `| Scenario | Wrong | Right | Rule |`)
 - [ ] `grep "R17" src/superclaude/core/RULES.md` — 규칙 존재 확인
 

@@ -13,23 +13,23 @@ revised: 2026-04-03
 
 ---
 
-### Task 1: Expand [R13] + Rewrite [R18] + Add [R19] in RULES.md
+### Task 1: Expand [R13 Intent Verification] + Rewrite [R18 Necessity Test] + Add [R19 Project Gotcha Capture] in RULES.md
 
 **Files:** Modify: `src/superclaude/core/RULES.md:39,44`
 
 - [ ] Step 1: Edit R13 (line 39) — append ambiguous verb list after existing text
   ```
-  [R13] Intent Verification 🔴: before non-trivial work (>3 steps, ambiguous scope, or new task direction), restate user's intent in 1-2 sentences and confirm. Skip for: single-file edits, explicit file paths, continuation of confirmed plan. Ambiguous verbs requiring confirmation: adjust/재조정, improve, optimize, strengthen, refactor, clean up, modernize — may mean "review" not "change."
+  [R13 Intent Verification] Intent Verification 🔴: before non-trivial work (>3 steps, ambiguous scope, or new task direction), restate user's intent in 1-2 sentences and confirm. Skip for: single-file edits, explicit file paths, continuation of confirmed plan. Ambiguous verbs requiring confirmation: adjust/재조정, improve, optimize, strengthen, refactor, clean up, modernize — may mean "review" not "change."
   ```
 
 - [ ] Step 2: Rewrite R18 (line 44) — broaden scope to "unsolicited code change", promote to 🔴, add infra-first + execution order
   ```
-  [R18] Necessity Test 🔴: before proposing any unsolicited code change, answer "Is the system broken without this?" — "safer/better" alone is insufficient. Require: specific failure scenario, quantitative evidence, or user-facing impact. Check infra/config/settings before code. "Deferred to post-MVP review" is a valid design decision. Unsolicited = model-initiated, not user-requested. Skip for: explicit change requests, confirmed plan items. Execution order: R13 → R18 → R19.
+  [R18 Necessity Test] Necessity Test 🔴: before proposing any unsolicited code change, answer "Is the system broken without this?" — "safer/better" alone is insufficient. Require: specific failure scenario, quantitative evidence, or user-facing impact. Check infra/config/settings before code. "Deferred to post-MVP review" is a valid design decision. Unsolicited = model-initiated, not user-requested. Skip for: explicit change requests, confirmed plan items. Execution order: R13 → R18 → R19.
   ```
 
 - [ ] Step 3: Add R19 after R18 (new line after 44) — evidence source citation
   ```
-  [R19] Evidence-First 🔴: numbers and metrics must cite source type [code|config|measurement|doc|estimate]. Estimates prefixed with "~" or "약/approx". Skip for: well-known framework defaults, official documentation quotes.
+  [R19 Project Gotcha Capture] Evidence-First 🔴: numbers and metrics must cite source type [code|config|measurement|doc|estimate]. Estimates prefixed with "~" or "약/approx". Skip for: well-known framework defaults, official documentation quotes.
   ```
 
 - [ ] Step 4: Add 3 example rows to the examples table (lines 45-60) for R13 verb, R18 unsolicited, R19 citation

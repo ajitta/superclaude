@@ -506,7 +506,7 @@ No way to know if rules improve behavior. Guide (§2.3): "최소 프롬프트로
 
 **Lightweight approach using existing correction capture:**
 
-1. Add `rule_id` tags to each rule in RULES.md (e.g., `[R01]`, `[R02]`)
+1. Add `rule_id` tags to each rule in RULES.md (e.g., `[R01 Workflow]`, `[R02 Status Check]`)
 2. Extend correction capture format to include violated rule_id
 3. Add `/sc:analyze --focus rules` mode that scans feedback memories for patterns
 4. Quarterly audit: which rules get violated most? Which are never triggered?
@@ -515,15 +515,15 @@ No way to know if rules improve behavior. Guide (§2.3): "최소 프롬프트로
 
 ```xml
 <core_rules>
-  [R01] Workflow 🟡: Status Check → Understand → Plan → Execute → Validate
-  [R02] Status Check 🔴: before implementation, run 2-3 targeted searches
-  [R03] Diagnosis 🔴: generate 3+ hypotheses ranked by simplicity
+  [R01 Workflow] Workflow 🟡: Status Check → Understand → Plan → Execute → Validate
+  [R02 Status Check] Status Check 🔴: before implementation, run 2-3 targeted searches
+  [R03 Diagnosis] Diagnosis 🔴: generate 3+ hypotheses ranked by simplicity
   ...
 </core_rules>
 
 <!-- Correction capture format update -->
 <correction_capture>
-  Format: {trigger, misread, actual_intent, violated_rule: "[R01]", prevention}
+  Format: {trigger, misread, actual_intent, violated_rule: "[R01 Workflow]", prevention}
 </correction_capture>
 ```
 
@@ -531,8 +531,8 @@ No way to know if rules improve behavior. Guide (§2.3): "최소 프롬프트로
 
 | File | Change |
 |------|--------|
-| `src/superclaude/core/RULES.md` | ✅ Add rule_id prefixes [R01]-[R16], update correction format |
-| `src/superclaude/commands/analyze.md` | ✅ `--focus rules` with dual-mode (quality + compliance), maturity label, [R14] bootstrapping |
+| `src/superclaude/core/RULES.md` | ✅ Add rule_id prefixes [R01 Workflow]-[R16 Safe Read], update correction format |
+| `src/superclaude/commands/analyze.md` | ✅ `--focus rules` with dual-mode (quality + compliance), maturity label, [R14 Correction Capture] bootstrapping |
 
 ---
 
@@ -606,7 +606,7 @@ Add `<compaction_strategy>` to save.md:
 **Sprint 3 (Documentation — P2):**
 - [x] #5 Command scope map in help.md
 - [x] #6 Session goal framing in load.md/save.md
-- [x] #7 Rule IDs [R01]-[R16] in RULES.md + `--focus rules` in analyze.md (dual-mode: quality + compliance)
+- [x] #7 Rule IDs [R01 Workflow]-[R16 Safe Read] in RULES.md + `--focus rules` in analyze.md (dual-mode: quality + compliance)
 - [x] #8 Compaction strategy in save.md
 
 **Sprint 4 (Validation):**
@@ -621,7 +621,7 @@ Add `<compaction_strategy>` to save.md:
 | Tier default for MCPs | Tier 0 (1-line) | Tier 1 (compact) | **Tier 0** | Claude already has MCP tool descriptions in system prompt |
 | Tier default for modes | Tier 0 (1-line) | Tier 1 (compact) | **Tier 1** | Modes define behavioral shifts that need more context |
 | Examples format | Narrative paragraphs | Table format | **Table** | Scannable, token-efficient, pattern-matching friendly |
-| Rule IDs | Auto-generated | Manual `[R01]` tags | **Manual** | More memorable, allows semantic grouping |
+| Rule IDs | Auto-generated | Manual `[R01 Workflow]` tags | **Manual** | More memorable, allows semantic grouping |
 | Scope map location | Separate file | Inside help.md | **help.md** | Single source, always accessible via /sc:help |
 
 ---
@@ -633,7 +633,7 @@ Add `<compaction_strategy>` to save.md:
 | Tier 0/1 too terse → Claude misuses MCP | Medium | Auto-escalation to Tier 2 on repeated use; --verbose-context escape hatch |
 | Examples become stale | Low | Examples reference behavioral patterns, not specific code |
 | INSTRUCTION_MAP instructions diverge from full .md | Medium | Generate from .md programmatically (future enhancement) |
-| Rule IDs create maintenance burden | Low | Only 16 core_rules [R01]-[R16]; anti_over_engineering uses prose, not IDs |
+| Rule IDs create maintenance burden | Low | Only 16 core_rules [R01 Workflow]-[R16 Safe Read]; anti_over_engineering uses prose, not IDs |
 | Session goal feels intrusive | Low | Made optional in /sc:load; never auto-prompted |
 
 ---
@@ -659,7 +659,7 @@ Add `<compaction_strategy>` to save.md:
 |----|-----------|--------|-------------|--------|-------|
 | F1 | **Auto-escalation: Tier 0→2 on repeated same-session use** | Spec Improvement #1 | Session-level usage counter in context_loader.py | Medium | Original design included `session_count` param; deferred to Sprint 5. Risk: over-injection if threshold too low |
 | F2 | **Session goal injection via context_loader.py** | Spec Improvement #6 | Session cache file format stable | Low | Currently command-level (load.md/save.md). Code-level would auto-emit `<sc-directive>` at 60%+ context |
-| F3 | **Rule compliance data bootstrapping (Stage 3)** | Spec Improvement #7 | Users actively following [R14] Correction Capture | None | `--focus rules` is ready; needs real feedback memories with `violated_rule: "[RXX]"` to produce compliance heatmap |
+| F3 | **Rule compliance data bootstrapping (Stage 3)** | Spec Improvement #7 | Users actively following [R14 Correction Capture] Correction Capture | None | `--focus rules` is ready; needs real feedback memories with `violated_rule: "[RXX]"` to produce compliance heatmap |
 | F4 | **Rules + Iteration (Stage 4)** | Brainstorm research (PromptWizard, Stanford ACE) | Stage 3 active | High | Auto-suggest rule refinements based on violation patterns. Inspired by PromptWizard's generate→critique→refine loop |
 | F5 | **INSTRUCTION_MAP auto-generation from .md files** | Spec Risks table | Stable .md format + extraction heuristic | Medium | Currently hand-written. Risk of INSTRUCTION_MAP diverging from full .md over time |
 | F6 | **Tier 0 hint accuracy monitoring** | Session 2026-03-22 post-deploy | Production usage data | Low | Context7 Tier 0 hint may cause step-1 skipping. If observed → enrich TIER_0_MAP or promote to Tier 1 |

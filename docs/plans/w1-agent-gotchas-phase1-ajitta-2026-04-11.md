@@ -32,8 +32,8 @@ source: docs/specs/superclaude-weakness-fixes-design-ajitta-2026-04-11.md
 
 ```xml
   <gotchas>
-  - verification-evidence: Cite actual test output, not claims. "42/42 pass" requires running the tests [R15]
-  - scope-creep: Review only what changed — do not reopen entire task or flag pre-existing issues as new findings [R06]
+  - verification-evidence: Cite actual test output, not claims. "42/42 pass" requires running the tests [R15 Verification]
+  - scope-creep: Review only what changed — do not reopen entire task or flag pre-existing issues as new findings [R06 Scope]
   </gotchas>
 ```
 
@@ -50,8 +50,8 @@ source: docs/specs/superclaude-weakness-fixes-design-ajitta-2026-04-11.md
 
 ```xml
   <gotchas>
-  - necessity-gate: Before proposing changes, answer "Is the system broken without this?" [R18]
-  - scope-anchoring: Architecture advice addresses the user's question, not adjacent systems. "While we're here" is out of scope [R06]
+  - necessity-gate: Before proposing changes, answer "Is the system broken without this?" [R18 Necessity Test]
+  - scope-anchoring: Architecture advice addresses the user's question, not adjacent systems. "While we're here" is out of scope [R06 Scope]
   </gotchas>
 ```
 
@@ -68,8 +68,8 @@ source: docs/specs/superclaude-weakness-fixes-design-ajitta-2026-04-11.md
 
 ```xml
   <gotchas>
-  - status-check: Before starting work, run 2-3 targeted searches to verify work isn't already complete [R02]
-  - scope-discipline: Refactor only what's asked — changing file X does not grant permission to refactor X's imports, callers, or tests [R06]
+  - status-check: Before starting work, run 2-3 targeted searches to verify work isn't already complete [R02 Status Check]
+  - scope-discipline: Refactor only what's asked — changing file X does not grant permission to refactor X's imports, callers, or tests [R06 Scope]
   </gotchas>
 ```
 
@@ -86,8 +86,8 @@ source: docs/specs/superclaude-weakness-fixes-design-ajitta-2026-04-11.md
 
 ```xml
   <gotchas>
-  - intent-confirm: Restate user intent before non-trivial work, especially when task direction changes mid-conversation [R13]
-  - delegation-check: Direct work for <3 steps or sequential deps. Sub-agents only for 3+ independent parallel streams [R04]
+  - intent-confirm: Restate user intent before non-trivial work, especially when task direction changes mid-conversation [R13 Intent Verification]
+  - delegation-check: Direct work for <3 steps or sequential deps. Sub-agents only for 3+ independent parallel streams [R04 Planning]
   </gotchas>
 ```
 
@@ -104,8 +104,8 @@ source: docs/specs/superclaude-weakness-fixes-design-ajitta-2026-04-11.md
 
 ```xml
   <gotchas>
-  - intent-confirm: Restate user intent before non-trivial work, especially when task direction changes mid-conversation [R13]
-  - hypothesis-discipline: Generate 3+ hypotheses ranked by simplicity. Do not conclude with first plausible match — falsify before confirming [R03]
+  - intent-confirm: Restate user intent before non-trivial work, especially when task direction changes mid-conversation [R13 Intent Verification]
+  - hypothesis-discipline: Generate 3+ hypotheses ranked by simplicity. Do not conclude with first plausible match — falsify before confirming [R03 Diagnosis]
   </gotchas>
 ```
 

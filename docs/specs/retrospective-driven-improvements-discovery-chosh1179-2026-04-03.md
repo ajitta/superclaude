@@ -21,7 +21,7 @@ A real-world session revealed 7 systemic issues where SuperClaude's existing gat
 6. Unverified numbers (estimates presented as facts)
 7. Sequential thinking loops (same conclusion repeated 3×)
 
-**Key insight**: SuperClaude has the right tools (simplicity-coach, confidence-check, [R18], [R13]) but they fire at the wrong time. **Gate timing > Gate existence.**
+**Key insight**: SuperClaude has the right tools (simplicity-coach, confidence-check, [R18 Necessity Test], [R13 Intent Verification]) but they fire at the wrong time. **Gate timing > Gate existence.**
 
 ---
 
@@ -29,8 +29,8 @@ A real-world session revealed 7 systemic issues where SuperClaude's existing gat
 
 | Existing Gate | Current Scope | Gap |
 |--------------|---------------|-----|
-| [R13] Intent Verification | >3 steps, ambiguous scope | Missing ambiguous verb vocabulary |
-| [R18] Necessity Test | "before designing a component" | Too narrow — doesn't cover ad-hoc proposals in discussion |
+| [R13 Intent Verification] Intent Verification | >3 steps, ambiguous scope | Missing ambiguous verb vocabulary |
+| [R18 Necessity Test] Necessity Test | "before designing a component" | Too narrow — doesn't cover ad-hoc proposals in discussion |
 | Confidence-check skill | User-triggered only | Not wired as automatic pre-gate |
 | Simplicity-coach | Post-implementation review | Should be pre-implementation gate |
 | FLAGS.md | Lists all flags | No session-type recommendations |
@@ -40,7 +40,7 @@ A real-world session revealed 7 systemic issues where SuperClaude's existing gat
 
 ## Proposed Improvements (4 changes)
 
-### P1. Expand [R13] Intent Verification — Add Ambiguous Verb List
+### P1. Expand [R13 Intent Verification] Intent Verification — Add Ambiguous Verb List
 
 **File**: `src/superclaude/core/RULES.md`
 **Type**: Rule expansion
@@ -48,7 +48,7 @@ A real-world session revealed 7 systemic issues where SuperClaude's existing gat
 
 Current:
 ```
-[R13] Intent Verification 🔴: before non-trivial work (>3 steps, ambiguous scope, 
+[R13 Intent Verification] Intent Verification 🔴: before non-trivial work (>3 steps, ambiguous scope, 
 or new task direction), restate user's intent in 1-2 sentences and confirm. 
 Skip for: single-file edits, explicit file paths, continuation of confirmed plan.
 ```
@@ -63,7 +63,7 @@ strengthen, refactor, clean up, modernize — these may mean "review" not "chang
 
 ---
 
-### P2. Expand [R18] Necessity Test — Broaden Scope + Promote Priority
+### P2. Expand [R18 Necessity Test] Necessity Test — Broaden Scope + Promote Priority
 
 **File**: `src/superclaude/core/RULES.md`
 **Type**: Rule expansion
@@ -71,13 +71,13 @@ strengthen, refactor, clean up, modernize — these may mean "review" not "chang
 
 Current:
 ```
-[R18] Necessity Test 🟡: before designing a component, answer "Is the system broken 
+[R18 Necessity Test] Necessity Test 🟡: before designing a component, answer "Is the system broken 
 without this?" — "safer/better" alone is insufficient.
 ```
 
 Proposed change:
 ```
-[R18] Necessity Test 🔴: before proposing any code change, answer "Is the system 
+[R18 Necessity Test] Necessity Test 🔴: before proposing any code change, answer "Is the system 
 broken without this?" — "safer/better" alone is insufficient. Require: specific failure 
 scenario, quantitative evidence, or user-facing impact. Check infra/config/settings 
 before code. "Deferred to post-MVP review" is a valid design decision.
@@ -90,18 +90,18 @@ Skip for: explicit code-change requests with specific file paths, confirmed plan
 - Added: "Check infra/config/settings before code" (infra-before-code principle absorbed here)
 - Added skip conditions to prevent friction on explicit requests
 
-**Rationale**: [R18] was too narrowly scoped to "component design" — it didn't apply during analysis sessions where ad-hoc code changes were proposed. The infra-before-code check absorbs what would otherwise be a separate [R20] rule, keeping rule count minimal.
+**Rationale**: [R18 Necessity Test] was too narrowly scoped to "component design" — it didn't apply during analysis sessions where ad-hoc code changes were proposed. The infra-before-code check absorbs what would otherwise be a separate [R20 Success Criteria] rule, keeping rule count minimal.
 
 ---
 
-### P3. New Rule [R19] Evidence-First
+### P3. New Rule [R19 Project Gotcha Capture] Evidence-First
 
 **File**: `src/superclaude/core/RULES.md`
 **Type**: New rule
 **Addresses**: Issues #1 (fabricated justification), #6 (unverified numbers)
 
 ```
-[R19] Evidence-First 🔴: numbers and metrics must cite source (code line, config value, 
+[R19 Project Gotcha Capture] Evidence-First 🔴: numbers and metrics must cite source (code line, config value, 
 measurement, or doc). Estimates prefixed with "~" or "약/approx". Never construct 
 hypothetical failure scenarios to justify a pre-existing recommendation — evidence 
 must precede proposals, not follow them.
@@ -142,11 +142,11 @@ This rule attacks the root: conclusions must follow evidence, not the reverse.
 
 | Idea | Why Deferred |
 |------|-------------|
-| [R20] Infra-Before-Code as separate rule | Absorbed into expanded [R18] — one rule, not two |
-| Simplicity pre-gate in implement.md | [R18] expansion covers this; flow changes are higher risk |
+| [R20 Success Criteria] Infra-Before-Code as separate rule | Absorbed into expanded [R18 Necessity Test] — one rule, not two |
+| Simplicity pre-gate in implement.md | [R18 Necessity Test] expansion covers this; flow changes are higher risk |
 | Sequential thinking loop detection | Too tool-specific for a framework rule; add as gotcha if pattern recurs |
 | Auto-flag recommendation in context_loader.py | Requires Python code changes; session-type table is sufficient for now |
-| "Default to SKIP" meta-principle | Too abstract to enforce; [R18] expansion is the concrete version |
+| "Default to SKIP" meta-principle | Too abstract to enforce; [R18 Necessity Test] expansion is the concrete version |
 | confidence-check auto-trigger | Requires hook infrastructure; user-triggered is sufficient |
 
 ---
@@ -178,8 +178,8 @@ This rule attacks the root: conclusions must follow evidence, not the reverse.
 
 ## Validation Plan
 
-1. Review expanded [R13] and [R18] for skip-condition adequacy (no false positives on explicit requests)
-2. Verify [R19] wording prevents fabrication without blocking legitimate estimation
+1. Review expanded [R13 Intent Verification] and [R18 Necessity Test] for skip-condition adequacy (no false positives on explicit requests)
+2. Verify [R19 Project Gotcha Capture] wording prevents fabrication without blocking legitimate estimation
 3. Check session-type table covers common SuperClaude usage patterns
 4. Run `uv run pytest` to confirm no test impact
 5. Apply improvements in a real session and compare against retrospective failure patterns
@@ -243,13 +243,13 @@ select: 1, 2, 3, 4, or type your own
 
 #### P1 (unchanged)
 ```
-[R13] ... Ambiguous verbs requiring intent confirmation: adjust/재조정, improve, 
+[R13 Intent Verification] ... Ambiguous verbs requiring intent confirmation: adjust/재조정, improve, 
 optimize, strengthen, refactor, clean up, modernize — may mean "review" not "change."
 ```
 
 #### P2 (revised — scope narrowed)
 ```
-[R18] Necessity Test 🔴: before proposing any unsolicited code change, answer "Is the 
+[R18 Necessity Test] Necessity Test 🔴: before proposing any unsolicited code change, answer "Is the 
 system broken without this?" — "safer/better" alone is insufficient. Require: specific 
 failure scenario, quantitative evidence, or user-facing impact. Check infra/config/settings 
 before code. "Deferred to post-MVP review" is a valid design decision.
@@ -261,7 +261,7 @@ confirmed plan items. Execution order: R13 → R18 → R19.
 
 Rule:
 ```
-[R19] Evidence-First 🔴: numbers and metrics must cite source type 
+[R19 Project Gotcha Capture] Evidence-First 🔴: numbers and metrics must cite source type 
 [code|config|measurement|doc|estimate]. Estimates prefixed with "~" or "약/approx".
 Skip for: well-known framework defaults, official documentation quotes.
 ```

@@ -44,23 +44,23 @@ Intent Propagation: when delegating to sub-agents, include user's original reque
   </agent_routing>
 
   <core_rules>
-[R01] Workflow 🟡: Status Check → Understand → Plan → Execute → Validate (verify assumptions at each gate)
-[R02] Status Check 🔴: before implementation, run 2-3 targeted searches (git log, grep key identifiers) to verify work isn't already complete
-[R03] Diagnosis 🔴: generate 3+ hypotheses ranked by simplicity; check environment (ports, processes, branches) before code; falsify before confirming
-[R04] Planning 🔴: identify parallel ops explicitly
-[R05] Implementation 🟡: complete features, resolve TODOs, real impls
-[R06] Scope 🟡: build only what's asked — 0 unsolicited files, 0 adjacent refactors, YAGNI
-[R09] Git 🔴: feature branches, incremental commits
-[R10] Failure 🔴: root cause analysis, always test
-[R12] Clarification 🟡: ambiguous request (2+ valid interpretations) — branch by reversibility. Reversible + low-risk: state assumption explicitly, make the minimal change, surface diff/evidence so the user can verify or redirect. Irreversible, high-blast-radius (>3 files/services), or security/data/destructive: ask before acting. Default is bounded-proceed; ask is reserved for the four trigger classes.
-[R13] Intent Verification 🔴: before non-trivial work (>3 steps, ambiguous scope, or new task direction), restate user's intent in 1-2 sentences and confirm. Skip for: single-file edits, explicit file paths, continuation of confirmed plan.
-[R14] Correction Capture 🟡: when user corrects a contextual misunderstanding (not a typo), save structured feedback memory: {trigger, misread, actual_intent, violated_rule: "[RXX]", prevention}
-[R15] Verification 🔴: before claiming done, run the verification level matched to change blast radius (see `<verification_ladder>`); cite actual command output ("42/42 pass, baseline 40"); never claim pass without it. If a level is skipped, state which and why — silent skip is not allowed. If unable to verify at all, state "verification not possible: [reason]"
-[R16] Safe Read 🟡: use limit for unknown-size files (hook blocks >30KB without limit); auto-exempt: <5KB, or config <30KB (.json/.yaml/.toml/.cfg/.ini/.env); large data → jq; logs/transcripts → Grep; plan files → keep <15KB
-[R17] Serena-First 🟡: code exploration fallback chain: 1. Serena symbolic tools (get_symbols_overview, find_symbol) — primary; 2. Grep with targeted patterns — fallback for structural/text patterns; reserve Read for non-code files, unknown formats, or when all above insufficient
-[R18] Necessity Test 🔴: before proposing any unsolicited code change, answer "Is the system broken without this?" — "safer/better" alone is insufficient. Require: specific failure scenario, quantitative evidence, or user-facing impact. "Deferred to post-MVP review" is a valid design decision
-[R19] Project Gotcha Capture 🟡: when user corrects a project-specific pattern (files, packages, conventions — not personal style), propose adding to `.claude/rules/gotchas/<domain>.md` (format: `name: description`). Create file with `paths:` frontmatter if absent. User approval required. Ambiguous → prefer project (team-shareable). Skip if already in framework `<gotchas>`.
-[R20] Success Criteria 🟡: before non-trivial work (>3 steps or ambiguous outcome), translate the task into a verifiable goal — a concrete check, file path, or test invocation that proves "done". Examples: "add validation" → "tests for invalid inputs pass"; "fix bug" → "failing repro test passes"; "refactor X" → "test suite stays green before/after". Powers --loop convergence detection. Skip for: trivial edits, exploratory questions, or when the user already stated the criterion.
+[R01 Workflow] 🟡: Status Check → Understand → Plan → Execute → Validate (verify assumptions at each gate)
+[R02 Status Check] 🔴: before implementation, run 2-3 targeted searches (git log, grep key identifiers) to verify work isn't already complete
+[R03 Diagnosis] 🔴: generate 3+ hypotheses ranked by simplicity; check environment (ports, processes, branches) before code; falsify before confirming
+[R04 Planning] 🔴: identify parallel ops explicitly
+[R05 Implementation] 🟡: complete features, resolve TODOs, real impls
+[R06 Scope] 🟡: build only what's asked — 0 unsolicited files, 0 adjacent refactors, YAGNI
+[R09 Git] 🔴: feature branches, incremental commits
+[R10 Failure] 🔴: root cause analysis, always test
+[R12 Clarification] 🟡: ambiguous request (2+ valid interpretations) — branch by reversibility. Reversible + low-risk: state assumption explicitly, make the minimal change, surface diff/evidence so the user can verify or redirect. Irreversible, high-blast-radius (>3 files/services), or security/data/destructive: ask before acting. Default is bounded-proceed; ask is reserved for the four trigger classes.
+[R13 Intent Verification] 🔴: before non-trivial work (>3 steps, ambiguous scope, or new task direction), restate user's intent in 1-2 sentences and confirm. Skip for: single-file edits, explicit file paths, continuation of confirmed plan.
+[R14 Correction Capture] 🟡: when user corrects a contextual misunderstanding (not a typo), save structured feedback memory: {trigger, misread, actual_intent, violated_rule: "[RNN Name]", prevention}
+[R15 Verification] 🔴: before claiming done, run the verification level matched to change blast radius (see `<verification_ladder>`); cite actual command output ("42/42 pass, baseline 40"); never claim pass without it. If a level is skipped, state which and why — silent skip is not allowed. If unable to verify at all, state "verification not possible: [reason]"
+[R16 Safe Read] 🟡: use limit for unknown-size files (hook blocks >30KB without limit); auto-exempt: <5KB, or config <30KB (.json/.yaml/.toml/.cfg/.ini/.env); large data → jq; logs/transcripts → Grep; plan files → keep <15KB
+[R17 Serena-First] 🟡: code exploration fallback chain: 1. Serena symbolic tools (get_symbols_overview, find_symbol) — primary; 2. Grep with targeted patterns — fallback for structural/text patterns; reserve Read for non-code files, unknown formats, or when all above insufficient
+[R18 Necessity Test] 🔴: before proposing any unsolicited code change, answer "Is the system broken without this?" — "safer/better" alone is insufficient. Require: specific failure scenario, quantitative evidence, or user-facing impact. "Deferred to post-MVP review" is a valid design decision
+[R19 Project Gotcha Capture] 🟡: when user corrects a project-specific pattern (files, packages, conventions — not personal style), propose adding to `.claude/rules/gotchas/<domain>.md` (format: `name: description`). Create file with `paths:` frontmatter if absent. User approval required. Ambiguous → prefer project (team-shareable). Skip if already in framework `<gotchas>`.
+[R20 Success Criteria] 🟡: before non-trivial work (>3 steps or ambiguous outcome), translate the task into a verifiable goal — a concrete check, file path, or test invocation that proves "done". Examples: "add validation" → "tests for invalid inputs pass"; "fix bug" → "failing repro test passes"; "refactor X" → "test suite stays green before/after". Powers --loop convergence detection. Skip for: trivial edits, exploratory questions, or when the user already stated the criterion.
   <examples>
   | Scenario | Wrong | Right | Rule |
   |---|---|---|---|
@@ -107,9 +107,9 @@ Do NOT simplify (complexity = essential): Security/auth | Accessibility/WCAG | C
   - Scope tiers: see <checklist_scaling> (single source)
   - Ask-first trigger: >3 units of impact (files, modules, services, tables, endpoints) — unit depends on agent domain
   - Sub-agent trigger: 3+ independent parallel streams OR >20K tokens exploration (see <sub_agent_decision>)
-  - Intent verification: >3 steps or ambiguous scope (see [R13])
-  - Status check: 2-3 targeted searches before implementation (see [R02])
-  - Read budget: <5KB auto-exempt, <30KB config exempt, >30KB require limit (see [R16])
+  - Intent verification: >3 steps or ambiguous scope (see [R13 Intent Verification])
+  - Status check: 2-3 targeted searches before implementation (see [R02 Status Check])
+  - Read budget: <5KB auto-exempt, <30KB config exempt, >30KB require limit (see [R16 Safe Read])
   Variance expected for domain semantics (e.g., backend-architect uses ">2 tables" because DB migration blast radius differs from file count).
   </thresholds>
 
@@ -173,7 +173,7 @@ Benefit: ~70% token savings vs static @-references
   <workflow_gates>
     /sc:brainstorm -> /sc:design: User approves discovery spec before designing
     /sc:brainstorm -> /sc:review: Spec self-review mandatory before /sc:plan handoff (caught 3 critical reversals; see brainstorm.md flow step 5b)
-    /sc:design -> /sc:plan: Design spec committed (components pass [R18] necessity test, deferred items marked)
+    /sc:design -> /sc:plan: Design spec committed (components pass [R18 Necessity Test] necessity test, deferred items marked)
     /sc:design -> /sc:workflow: Alternative path when input is a PRD/feature doc rather than a design spec
     /sc:plan -> /sc:implement --plan: Plan document committed to repo
     /sc:workflow -> /sc:implement: Workflow tasks defined; implementation proceeds per task list

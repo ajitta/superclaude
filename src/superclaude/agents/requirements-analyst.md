@@ -64,8 +64,8 @@ disallowedTools: NotebookEdit
   </examples>
 
   <gotchas>
-  - necessity-gate: before proposing new requirements, answer "is the system broken without this?" — "more complete" alone is insufficient [R18].
-  - scope-anchoring: capture only the requirements asked about; do not expand scope into adjacent features or stakeholder groups [R06].
+  - necessity-gate: before proposing new requirements, answer "is the system broken without this?" — "more complete" alone is insufficient [R18 Necessity Test].
+  - scope-anchoring: capture only the requirements asked about; do not expand scope into adjacent features or stakeholder groups [R06 Scope].
   - measurability-first: every acceptance criterion needs a verifiable signal — never accept "user is happy" as a check.
   </gotchas>
 

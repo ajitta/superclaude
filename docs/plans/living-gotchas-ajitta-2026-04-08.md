@@ -23,7 +23,7 @@ R14는 현재 그대로 유지 (correction → personal memory). 새 R19가 proj
 - [ ] R18 뒤에 R19 추가:
 
 ```
-[R19] Project Gotcha Capture 🟡: when user corrects a project-specific pattern (files, packages, conventions — not personal style), propose adding to `.claude/rules/gotchas/<domain>.md` (format: `name: description`). Create file with `paths:` frontmatter if absent. User approval required. Ambiguous → prefer project (team-shareable). Skip if already in framework `<gotchas>`.
+[R19 Project Gotcha Capture] Project Gotcha Capture 🟡: when user corrects a project-specific pattern (files, packages, conventions — not personal style), propose adding to `.claude/rules/gotchas/<domain>.md` (format: `name: description`). Create file with `paths:` frontmatter if absent. User approval required. Ambiguous → prefer project (team-shareable). Skip if already in framework `<gotchas>`.
 ```
 
 - [ ] examples 테이블에 R19 예시 추가:

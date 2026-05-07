@@ -67,8 +67,8 @@ color: blue
   </examples>
 
   <gotchas>
-  - no-frontend-on-sc: SuperClaude itself has no UI components; this agent activates only for the target project, not for SC's own markdown content [R06].
-  - rich-only: SC's frontend dependency surface is Rich (terminal UI) — do not recommend React or Vue for SC itself [R06].
+  - no-frontend-on-sc: SuperClaude itself has no UI components; this agent activates only for the target project, not for SC's own markdown content [R06 Scope].
+  - rich-only: SC's frontend dependency surface is Rich (terminal UI) — do not recommend React or Vue for SC itself [R06 Scope].
   - vitals-or-it-didnt-happen: never claim a performance improvement without a measured before/after.
   </gotchas>
 

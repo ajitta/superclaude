@@ -40,7 +40,7 @@
 - [x] Removed [R07] Trust, [R08] Language, [R11] Honesty (duplicate Claude defaults)
 - [x] Merged `<conflict_resolution>` + `<agent_orchestration>` into compact `<priority_system>`
 - [x] Removed `<decision_trees>` and `<priority_actions>` (redundant with core_rules)
-- [x] Preserved [R13], [R14], [R16] intact
+- [x] Preserved [R13 Intent Verification], [R14 Correction Capture], [R16 Safe Read] intact
 - [x] All examples tables preserved
 - [x] Archive comment with all removed items on line 123
 

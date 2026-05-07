@@ -137,10 +137,10 @@ Proposed workflow_gates:
 - Update design.md `<handoff>` to include simplicity-coach as suggested next step
 - Update simplicity-coach description to include "design spec 작성 후 과잉 설계 필터링" keyword
 
-## 4. New Rule: [R18] Necessity Test
+## 4. New Rule: [R18 Necessity Test] Necessity Test
 
 ```
-[R18] Necessity Test 🟡: before designing a component, answer: "Is the system broken without this?"
+[R18 Necessity Test] Necessity Test 🟡: before designing a component, answer: "Is the system broken without this?"
   — "Safer/better" alone is insufficient justification for detailed design
   — Require: specific failure scenario, or quantitative evidence, or user-facing impact
   — "Deferred to post-MVP review" is a valid design decision
@@ -159,7 +159,7 @@ Proposed workflow_gates:
 | File | Change | Priority |
 |------|--------|----------|
 | `src/superclaude/commands/design.md` | Add Necessity Gate (3Q test), Principle Consequence step, Operational Constraints section to `<flow>` | P1 |
-| `src/superclaude/core/RULES.md` | Add [R18] Necessity Test rule + examples; update workflow_gates | P1 |
+| `src/superclaude/core/RULES.md` | Add [R18 Necessity Test] Necessity Test rule + examples; update workflow_gates | P1 |
 | `src/superclaude/commands/implement.md` | Add Phase Validation Loop to `<flow>` | P2 |
 | `src/superclaude/commands/review.md` | Add `--scope phase` to `<syntax>` and examples | P2 |
 | `src/superclaude/commands/design.md` | Update `<handoff>` to include simplicity-coach | P3 |
@@ -179,7 +179,7 @@ Proposed workflow_gates:
 
 ### Phase 1: design.md + RULES.md (highest ROI)
 - Add 3 mechanisms to design.md flow
-- Add [R18] to RULES.md core_rules
+- Add [R18 Necessity Test] to RULES.md core_rules
 - Update workflow_gates to include /sc:design
 - **Verification**: Review design.md flow for completeness; run test_command_structure.py
 
@@ -200,7 +200,7 @@ Proposed workflow_gates:
 | Necessity Gate adds friction to small projects | Keep as soft guidance ("recommended for >3 components"), not hard block |
 | Phase Validation slows implementation | Only triggers at phase boundaries; skip for single-phase work |
 | False negatives (gate passes something that should be deferred) | simplicity-guide at review remains as safety net |
-| Rule [R18] too vague | Concrete examples in RULES.md teach better than abstract rules |
+| Rule [R18 Necessity Test] too vague | Concrete examples in RULES.md teach better than abstract rules |
 
 ## 9. Retrospective Origin
 

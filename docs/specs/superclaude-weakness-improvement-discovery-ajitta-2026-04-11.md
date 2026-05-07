@@ -57,7 +57,7 @@ Position 2 — **Agent/Command level** (mid-conversation): Add the 3 most releva
 ```xml
 <!-- In agents that frequently violate R18 (architects, engineers): -->
 <gotchas>
-- necessity-test: Before proposing unsolicited changes, answer "Is the system broken without this?" — "safer/better" alone is insufficient [R18]
+- necessity-test: Before proposing unsolicited changes, answer "Is the system broken without this?" — "safer/better" alone is insufficient [R18 Necessity Test]
 - existing-gotchas: ...
 </gotchas>
 ```
@@ -100,7 +100,7 @@ The fork-not-just-efficiency memory (existing auto-memory) already captures this
 **A. Add context isolation guidance to RULES.md** (new rule or amendment):
 
 ```markdown
-[R20] Context Isolation 🟡: when delegating to sub-agents (--delegate, Agent tool), 
+[R20 Success Criteria] Context Isolation 🟡: when delegating to sub-agents (--delegate, Agent tool), 
 do NOT read sub-agent output files or transcripts during execution. 
 Wait for the summary return. Reading mid-execution defeats isolation purpose.
 ```
@@ -140,7 +140,7 @@ Without enumeration, sophisticated evasion paths remain open:
 Add enumeration to R15 in RULES.md:
 
 ```markdown
-[R15] Verification 🔴: before claiming done, run full test suite fresh (not cached); 
+[R15 Verification] Verification 🔴: before claiming done, run full test suite fresh (not cached); 
 compare pass count to baseline; cite evidence ("42/42 pass, baseline 40"). 
 Prohibited verification patterns:
 - Claim test passage without running tests (prose fabrication)

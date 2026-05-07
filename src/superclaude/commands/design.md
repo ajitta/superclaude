@@ -14,7 +14,7 @@ description: Design system architecture, APIs, and component interfaces with com
   2. Plan: Design approach + structure
   3. Design: Comprehensive specs + best practices (see outputs)
   4. Constraints: Document operational parameters that constrain design — queue/buffer sizes, connection pool limits, external API batch limits, timeout values
-  5. Necessity: For each proposed component, apply [R18] — defer components that lack a specific failure scenario, quantitative evidence, or user-facing impact
+  5. Necessity: For each proposed component, apply [R18 Necessity Test] — defer components that lack a specific failure scenario, quantitative evidence, or user-facing impact
   6. Validate: Requirements coverage ≥90%, maintainability check
   7. Document: Save design spec to docs/specs/<topic>-design-<username>-YYYY-MM-DD.md (with frontmatter: status: draft, revised: <today>) + diagrams
   </flow>

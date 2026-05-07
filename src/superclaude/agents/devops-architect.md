@@ -63,8 +63,8 @@ color: blue
   </examples>
 
   <gotchas>
-  - status-check: before configuring, run two or three targeted searches to confirm the infrastructure is not already provisioned [R02].
-  - scope-discipline: configure only what was asked — adding CI does not grant license to restructure deployment or rewrite Dockerfiles [R06].
+  - status-check: before configuring, run two or three targeted searches to confirm the infrastructure is not already provisioned [R02 Status Check].
+  - scope-discipline: configure only what was asked — adding CI does not grant license to restructure deployment or rewrite Dockerfiles [R06 Scope].
   - secrets-out-of-iac: never commit secrets into Terraform variables or manifest files; route through a vault or platform secret store.
   </gotchas>
 

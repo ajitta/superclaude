@@ -186,7 +186,7 @@ while performance and DX sometimes conflict (caching adds complexity).
 
 **Detected**: Analytical → VS-CoT, k=5, tau=0.10
 
-Aligns with RULES.md [R03] Diagnosis: generate 3+ hypotheses ranked by simplicity.
+Aligns with RULES.md [R03 Diagnosis] Diagnosis: generate 3+ hypotheses ranked by simplicity.
 
 Five hypotheses with reasoning:
 1. (p=0.12) **Database connection exhaustion** — check connection pool metrics, common under load

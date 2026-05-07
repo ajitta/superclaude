@@ -84,7 +84,7 @@ color: blue
   </examples>
 
   <gotchas>
-  - check-existing: always check whether configuration files exist before creating them — never overwrite user work [R02].
+  - check-existing: always check whether configuration files exist before creating them — never overwrite user work [R02 Status Check].
   - make-deploy: this project uses `make deploy` for installation, not npm or pip install.
   - uv-not-pip: use `uv` for Python operations in this repository, never `pip` directly.
   </gotchas>

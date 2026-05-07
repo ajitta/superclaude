@@ -203,7 +203,7 @@ When `--vs` is used with `/sc:brainstorm`, VS parameters interact with brainstor
 # Code review perspectives (standalone, no brainstorm)
 "review this PR from multiple perspectives --vs [k:5]"
 
-# Debugging hypotheses (aligns with RULES.md [R03])
+# Debugging hypotheses (aligns with RULES.md [R03 Diagnosis])
 "why is this endpoint returning 500? --vs cot [k:5]"
 
 # Natural language trigger with bracket params
@@ -394,7 +394,7 @@ Enhanced from original:
 - **Add 3 new SE-focused examples**:
   - Example 6: Architecture decision (microservices vs monolith) — VS-CoT
   - Example 7: Code review perspectives (performance vs readability vs security) — VS-Standard
-  - Example 8: Debugging hypotheses (3+ hypotheses via VS-CoT, aligns with RULES.md [R03])
+  - Example 8: Debugging hypotheses (3+ hypotheses via VS-CoT, aligns with RULES.md [R03 Diagnosis])
 - Keep Common Mistakes section
 - ~300 lines
 
@@ -566,8 +566,8 @@ If VS auto-triggers incorrectly (false positive), the user can suppress it:
 | `/sc:brainstorm --vs` | Distribution-level exploration augments Socratic questioning; personas inform synthesis |
 | `/sc:analyze --vs` | Multiple analytical frameworks with probability weighting |
 | `--seq` (Sequential) | VS-CoT reasoning benefits from sequential thinking MCP |
-| RULES.md [R03] Diagnosis | VS naturally generates 3+ hypotheses ranked by probability |
-| RULES.md [R12] Clarification | VS presents the landscape instead of picking one interpretation |
+| RULES.md [R03 Diagnosis] Diagnosis | VS naturally generates 3+ hypotheses ranked by probability |
+| RULES.md [R12 Clarification] Clarification | VS presents the landscape instead of picking one interpretation |
 
 ---
 

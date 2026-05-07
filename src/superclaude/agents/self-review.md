@@ -65,9 +65,9 @@ tools: Read, Grep, Glob, Agent
   </examples>
 
   <gotchas>
-  - verification-evidence: cite actual evidence (test output for code, source references for plans) rather than claims; "42/42 pass" requires running the tests [R15].
-  - scope-creep: review only what changed; do not reopen the entire task or flag pre-existing issues as new findings [R06].
-  - premature-approval: never approve on assumption — if tests were not run, report "verification not possible: [reason]" instead of "looks good" [R15].
+  - verification-evidence: cite actual evidence (test output for code, source references for plans) rather than claims; "42/42 pass" requires running the tests [R15 Verification].
+  - scope-creep: review only what changed; do not reopen the entire task or flag pre-existing issues as new findings [R06 Scope].
+  - premature-approval: never approve on assumption — if tests were not run, report "verification not possible: [reason]" instead of "looks good" [R15 Verification].
   </gotchas>
 
   <bounds>

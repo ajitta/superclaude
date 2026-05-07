@@ -66,7 +66,7 @@ Can run in parallel with Task 2 (both only need directory from Task 1).
 - [ ] Adapt Examples 1-5 from original: creative (VS-Standard), analytical (VS-CoT), decision (VS-CoT), brainstorming (VS-Multi), custom config. Translate Korean text to English equivalents
 - [ ] Add Example 6: Architecture decision — VS-CoT, microservices vs monolith, k=5
 - [ ] Add Example 7: Code review perspectives — VS-Standard, performance vs readability vs security, k=5
-- [ ] Add Example 8: Debugging hypotheses — VS-CoT, 5 hypotheses for endpoint 500 error, aligns with RULES.md [R03]
+- [ ] Add Example 8: Debugging hypotheses — VS-CoT, 5 hypotheses for endpoint 500 error, aligns with RULES.md [R03 Diagnosis]
 - [ ] Preserve Common Mistakes section from original (5 mistakes)
 - [ ] Keep ~300 lines
 

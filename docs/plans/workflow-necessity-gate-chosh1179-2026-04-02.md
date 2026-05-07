@@ -7,7 +7,7 @@ spec: docs/specs/workflow-necessity-gate-discovery-chosh1179-2026-04-02.md
 # Workflow Necessity Gate — Implementation Plan
 
 **Goal:** Embed over-engineering prevention into /sc:design, /sc:implement, and RULES.md workflow gates.
-**Architecture:** Three markdown files modified — no code changes. Necessity Gate (3-question test) in design.md flow, Phase Validation in implement.md flow, [R18] rule + updated workflow_gates in RULES.md.
+**Architecture:** Three markdown files modified — no code changes. Necessity Gate (3-question test) in design.md flow, Phase Validation in implement.md flow, [R18 Necessity Test] rule + updated workflow_gates in RULES.md.
 **Tech Stack:** Markdown-only (docs-change-safe — zero test risk)
 
 ## Simplicity Filter Applied
@@ -17,7 +17,7 @@ Before planning, each proposed change was tested with the Necessity Gate itself:
 | Change | Q1 Broken? | Q2 Already solved? | Q3 Evidence? | Decision |
 |--------|-----------|-------------------|-------------|----------|
 | design.md Necessity Gate | Yes (57% waste) | No | Yes (44KB→15KB) | **Proceed** |
-| RULES.md [R18] + gates | Partial | Partial ([R06]) | Yes | **Proceed** |
+| RULES.md [R18 Necessity Test] + gates | Partial | Partial ([R06 Scope]) | Yes | **Proceed** |
 | implement.md Phase Validation | Yes (3 runtime bugs) | No | Yes | **Proceed** |
 | review.md --scope phase | No | Partial (--scope diff works) | Weak | **Deferred** |
 | simplicity-coach description | No | No | Weak (1 case) | **Deferred** |
@@ -57,16 +57,16 @@ Result: 6 files → 3 files. 2 changes deferred as nice-to-have.
 
 ---
 
-## Task 2: RULES.md — [R18] Necessity Test + Workflow Gates Update
+## Task 2: RULES.md — [R18 Necessity Test] Necessity Test + Workflow Gates Update
 
 **Files:** Modify: `src/superclaude/core/RULES.md:43,44-58,119-124`
 
-- [ ] Step 1: Insert [R18] after line 43 ([R17]), before `<examples>`:
+- [ ] Step 1: Insert [R18 Necessity Test] after line 43 ([R17 Serena-First]), before `<examples>`:
 ```
-[R18] Necessity Test 🟡: before designing a component, answer "Is the system broken without this?" — "safer/better" alone is insufficient. Require: specific failure scenario, quantitative evidence, or user-facing impact. "Deferred to post-MVP review" is a valid design decision
+[R18 Necessity Test] Necessity Test 🟡: before designing a component, answer "Is the system broken without this?" — "safer/better" alone is insufficient. Require: specific failure scenario, quantitative evidence, or user-facing impact. "Deferred to post-MVP review" is a valid design decision
 ```
 
-- [ ] Step 2: Add [R18] example row to the examples table (after existing rows, before `</examples>`):
+- [ ] Step 2: Add [R18 Necessity Test] example row to the examples table (after existing rows, before `</examples>`):
 ```
   | Designing component "just in case" | "Good practice for resilience" | "Queue+retry self-regulates. No failure scenario without it. Defer." | Necessity Test 🟡 |
 ```
@@ -113,7 +113,7 @@ Result: 6 files → 3 files. 2 changes deferred as nice-to-have.
 
 - [ ] All 3 files pass `test_command_structure.py` (design, implement validated; RULES.md has no structure test)
 - [ ] design.md: flow has 8 numbered steps, handoff updated
-- [ ] RULES.md: [R18] present, examples table has new row, workflow_gates includes /sc:design
+- [ ] RULES.md: [R18 Necessity Test] present, examples table has new row, workflow_gates includes /sc:design
 - [ ] implement.md: flow has 7 numbered steps with Phase Gate
 - [ ] `make deploy` — install to ~/.claude/
 
@@ -125,7 +125,7 @@ feat: add necessity gate to design workflow — prevent over-engineering at sour
 Based on bulk-asset-delete retrospective (57% design waste, 90K token loss):
 - design.md: 3-question necessity test, operational constraints, principle consequence
 - implement.md: phase validation loop (build→run→decide next)
-- RULES.md: [R18] Necessity Test rule, expanded workflow_gates with /sc:design
+- RULES.md: [R18 Necessity Test] Necessity Test rule, expanded workflow_gates with /sc:design
 
 Spec: docs/specs/workflow-necessity-gate-discovery-chosh1179-2026-04-02.md
 ```

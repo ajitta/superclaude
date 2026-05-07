@@ -195,7 +195,7 @@ This buys ~80% of the drift-protection benefit at ~5% of the cost and ~0% of the
 - AGENTS.md (plain markdown) is the dominant industry convention for AI-agent-facing project docs: **0.90**
 - The testability benefit can be achieved with a YAML sidecar at ~5% of the conversion cost: **0.75** (architectural judgment, not a researched claim)
 
-Overall recommendation confidence: **0.85**. The empirical evidence against XML-heavy authoring docs is unusually consistent across (a) Anthropic's own authoritative guidance, (b) multiple independent token benchmarks, (c) the adoption curve of AGENTS.md over tool-specific files, and (d) the canonical Configuration Complexity Clock pattern. The main uncertainty is a possible novel win from doing what no one else has done — but "novel" and "unjustified" are hard to distinguish ex-ante, and the necessity test ([R18]) is not currently passed by the proposal.
+Overall recommendation confidence: **0.85**. The empirical evidence against XML-heavy authoring docs is unusually consistent across (a) Anthropic's own authoritative guidance, (b) multiple independent token benchmarks, (c) the adoption curve of AGENTS.md over tool-specific files, and (d) the canonical Configuration Complexity Clock pattern. The main uncertainty is a possible novel win from doing what no one else has done — but "novel" and "unjustified" are hard to distinguish ex-ante, and the necessity test ([R18 Necessity Test]) is not currently passed by the proposal.
 
 ---
 

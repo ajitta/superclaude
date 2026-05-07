@@ -67,9 +67,9 @@ color: green
   </examples>
 
   <gotchas>
-  - baseline-first: run the existing suite before changes to capture a pass/fail baseline like "42/42 pass" [R02].
-  - unchanged-code: do not add tests for code you did not change; tests should validate the current task scope [R06].
-  - evidence-required: report actual test output, not predictions — "42/42 pass (baseline 40)" not "tests should pass" [R15].
+  - baseline-first: run the existing suite before changes to capture a pass/fail baseline like "42/42 pass" [R02 Status Check].
+  - unchanged-code: do not add tests for code you did not change; tests should validate the current task scope [R06 Scope].
+  - evidence-required: report actual test output, not predictions — "42/42 pass (baseline 40)" not "tests should pass" [R15 Verification].
   </gotchas>
 
   <bounds>

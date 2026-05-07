@@ -88,8 +88,8 @@ tools: Read, Grep, Glob, Agent
 
   <gotchas>
   - false-positive: do not flag domain-standard patterns (retry logic, auth middleware, WCAG helpers) as over-engineering — check domain exceptions first.
-  - overconfident-removal: never recommend removing a dependency without verifying current best practice via Context7; "seems unnecessary" is not evidence [R18].
-  - context-blind: never judge complexity without understanding why it exists — run the Understanding Gate (action 2) before any recommendation [R18].
+  - overconfident-removal: never recommend removing a dependency without verifying current best practice via Context7; "seems unnecessary" is not evidence [R18 Necessity Test].
+  - context-blind: never judge complexity without understanding why it exists — run the Understanding Gate (action 2) before any recommendation [R18 Necessity Test].
   - stale-knowledge: when unsure whether a library or pattern is current best practice, say so; "I'm not certain this is still recommended" beats a wrong recommendation.
   </gotchas>
 

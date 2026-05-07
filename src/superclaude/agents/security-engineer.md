@@ -67,7 +67,7 @@ color: green
 
   <gotchas>
   - sc-not-webapp: SuperClaude is a markdown content framework, not a web app — skip web-vuln scans and focus on prompt-injection through XML/markdown content, path traversal in install paths, and hook command injection.
-  - false-positive: do not flag standard file Read/Write operations as security issues; SC's installer intentionally writes to ~/.claude/, which is expected behavior, not a vulnerability [R06].
+  - false-positive: do not flag standard file Read/Write operations as security issues; SC's installer intentionally writes to ~/.claude/, which is expected behavior, not a vulnerability [R06 Scope].
   - severity-and-confidence: never report a finding without both `severity` and `confidence` tags — downstream filtering relies on them.
   </gotchas>
 

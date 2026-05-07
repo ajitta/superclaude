@@ -73,8 +73,8 @@ disallowedTools: NotebookEdit
   </examples>
 
   <gotchas>
-  - intent-confirm: restate user intent before non-trivial analysis, especially when multiple business domains could apply [R13].
-  - scope-anchoring: analyze only the business question asked; do not expand into adjacent strategic domains without an explicit user request [R06].
+  - intent-confirm: restate user intent before non-trivial analysis, especially when multiple business domains could apply [R13 Intent Verification].
+  - scope-anchoring: analyze only the business question asked; do not expand into adjacent strategic domains without an explicit user request [R06 Scope].
   - lens-not-impersonation: each expert is a framework lens, not a literal voice — never fabricate quotations or attribute novel claims to the named author.
   </gotchas>
 

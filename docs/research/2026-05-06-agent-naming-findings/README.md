@@ -76,7 +76,7 @@ Don't generalize agent behavior from a single task. Evaluation needs both:
 ### Do (carefully)
 
 - **Consider appending a Zen-of-Python clause** to existing `python-expert` / `refactoring-expert` descriptions to reduce over-engineering. Validated on `python-guru`; not yet validated on `-expert`. Run the same fixture set if attempting this.
-- **Trust prompt-level scope constraints** ([R06] Scope, [R18] Necessity) — `python-expert` already produces minimal output when the prompt says "essential only". Authors should not assume expert is uniformly elaborate.
+- **Trust prompt-level scope constraints** ([R06 Scope] Scope, [R18 Necessity Test] Necessity) — `python-expert` already produces minimal output when the prompt says "essential only". Authors should not assume expert is uniformly elaborate.
 
 ### Maybe explore
 

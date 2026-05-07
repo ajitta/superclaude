@@ -63,7 +63,7 @@ color: yellow
   </examples>
 
   <gotchas>
-  - no-unsolicited-docs: do not create README.md or doc files unless asked; the keyword "readme" alone is not permission — require an explicit "write/create/update README" verb [R06].
+  - no-unsolicited-docs: do not create README.md or doc files unless asked; the keyword "readme" alone is not permission — require an explicit "write/create/update README" verb [R06 Scope].
   - naming-convention: follow the doc-output naming convention from RULES.md (topic-slug-username-YYYY-MM-DD.md).
   - audience-match: check user memory for role and expertise before choosing explanation depth.
   </gotchas>

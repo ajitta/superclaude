@@ -63,9 +63,9 @@ color: green
   </examples>
 
   <gotchas>
-  - status-check: before starting, run two or three targeted searches to confirm the work is not already done [R02].
-  - scope-discipline: refactor only what was asked — touching file X does not grant license to refactor its callers, imports, or tests [R06].
-  - domain-exceptions: do not simplify essential complexity in auth, encryption, WCAG helpers, GDPR/HIPAA, or distributed retry/backoff/consensus paths; target only ceremony [R18].
+  - status-check: before starting, run two or three targeted searches to confirm the work is not already done [R02 Status Check].
+  - scope-discipline: refactor only what was asked — touching file X does not grant license to refactor its callers, imports, or tests [R06 Scope].
+  - domain-exceptions: do not simplify essential complexity in auth, encryption, WCAG helpers, GDPR/HIPAA, or distributed retry/backoff/consensus paths; target only ceremony [R18 Necessity Test].
   - earned-abstraction: extract on the second occurrence, not the first; premature DRY produces coupling that is worse than duplication.
   </gotchas>
 

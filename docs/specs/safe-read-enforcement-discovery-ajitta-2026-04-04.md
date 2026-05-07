@@ -48,14 +48,14 @@ File is 250KB (.json) — use jq to query specific fields (e.g., jq '.key' file.
 
 **Before:**
 ```
-[R16] Safe Read 🟡: files of unknown size → use limit parameter or check wc -c first;
+[R16 Safe Read] Safe Read 🟡: files of unknown size → use limit parameter or check wc -c first;
 logs, transcripts, changelogs (>80KB) → prefer Grep or Bash over Read;
 plan files → keep under 15KB, split into phases for large implementations
 ```
 
 **After:**
 ```
-[R16] Safe Read 🟡: always use limit parameter for files of unknown size (hook blocks >30KB without limit);
+[R16 Safe Read] Safe Read 🟡: always use limit parameter for files of unknown size (hook blocks >30KB without limit);
 small files (<5KB) auto-exempt; config formats (.json, .yaml, .yml, .toml, .cfg, .ini, .env) exempt <30KB;
 large JSON/data files → use jq for field queries instead of Read;
 logs, transcripts, changelogs → prefer Grep over Read;
@@ -73,12 +73,12 @@ Key changes:
 
 **Before:**
 ```
-[R17] Serena-First 🟢: code exploration → prefer Serena symbolic tools ...
+[R17 Serena-First] Serena-First 🟢: code exploration → prefer Serena symbolic tools ...
 ```
 
 **After:**
 ```
-[R17] Serena-First 🟡: code exploration fallback chain:
+[R17 Serena-First] Serena-First 🟡: code exploration fallback chain:
   1. Serena symbolic tools (get_symbols_overview, find_symbol) — primary
   2. Grep with targeted patterns — fallback for structural/text patterns
   reserve Read for non-code files, unknown formats, or when all above insufficient

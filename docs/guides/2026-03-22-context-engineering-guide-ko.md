@@ -134,12 +134,12 @@ Anthropic의 가이드에 따르면: "다양하고 대표적인 소수의 예시
 
 | 시나리오 | 잘못된 대응 | 올바른 대응 | 규칙 |
 |---------|-----------|-----------|------|
-| 유저: "로그인 버그 수정해" | 인증 리팩토링 + 테스트 추가 + 문서 갱신 | 해당 버그만 수정 | [R06] Scope 🟡 |
-| 기능 구현 시작 전 | 바로 코딩 시작 | `git log` + `grep`으로 이미 완료됐는지 확인 | [R02] Status Check 🔴 |
-| API 500 에러 | 코드 버그라고 가정 | 포트 점유? DB 실행 중? 환경변수 설정? 먼저 확인 | [R03] Diagnosis 🔴 |
-| 유저: "대시보드 개선해" | "차트 추가"로 추측 | "성능, UX, 데이터 정확도 중 어느 쪽?" 질문 | [R12] Clarification 🟡 |
-| 유저: "auth 모듈 구조 변경" | 파일 이동 시작 | "확인: src/auth/ 파일 구조 재편, 로직 재작성 아님. 맞나요?" | [R13] Intent Verification 🔴 |
-| 유저가 정정: "아니, API 라우트" | 조용히 파일 변경 | 피드백 메모리 저장: {trigger, misread, actual, prevention} | [R14] Correction Capture 🟡 |
+| 유저: "로그인 버그 수정해" | 인증 리팩토링 + 테스트 추가 + 문서 갱신 | 해당 버그만 수정 | [R06 Scope] Scope 🟡 |
+| 기능 구현 시작 전 | 바로 코딩 시작 | `git log` + `grep`으로 이미 완료됐는지 확인 | [R02 Status Check] Status Check 🔴 |
+| API 500 에러 | 코드 버그라고 가정 | 포트 점유? DB 실행 중? 환경변수 설정? 먼저 확인 | [R03 Diagnosis] Diagnosis 🔴 |
+| 유저: "대시보드 개선해" | "차트 추가"로 추측 | "성능, UX, 데이터 정확도 중 어느 쪽?" 질문 | [R12 Clarification] Clarification 🟡 |
+| 유저: "auth 모듈 구조 변경" | 파일 이동 시작 | "확인: src/auth/ 파일 구조 재편, 로직 재작성 아님. 맞나요?" | [R13 Intent Verification] Intent Verification 🔴 |
+| 유저가 정정: "아니, API 라우트" | 조용히 파일 변경 | 피드백 메모리 저장: {trigger, misread, actual, prevention} | [R14 Correction Capture] Correction Capture 🟡 |
 
 ### anti_over_engineering 예시 (3개 시나리오)
 
@@ -230,14 +230,14 @@ Anthropic의 가이드에 따르면: "다양하고 대표적인 소수의 예시
 
 ### 규칙 효과성 추적
 
-모든 핵심 규칙에 [R01]~[R16] ID가 부여되었습니다. Correction Capture (R14) 시 어떤 규칙이 위반됐는지 기록합니다:
+모든 핵심 규칙에 [R01 Workflow]~[R16 Safe Read] ID가 부여되었습니다. Correction Capture (R14) 시 어떤 규칙이 위반됐는지 기록합니다:
 
 ```
 {
   trigger: "유저가 말한 것",
   misread: "내가 이해한 것",
   actual_intent: "실제 의도",
-  violated_rule: "[R06]",
+  violated_rule: "[R06 Scope]",
   prevention: "다음에 이렇게 방지"
 }
 ```
@@ -325,7 +325,7 @@ _get_injection_tier() — 파일별 Tier 결정
 |------|------|
 | `src/superclaude/scripts/context_loader.py` | 3-Tier 주입 엔진 |
 | `src/superclaude/core/FLAGS.md` | 플래그 분류 체계 |
-| `src/superclaude/core/RULES.md` | 규칙 + 예시 ([R01]-[R16]) |
+| `src/superclaude/core/RULES.md` | 규칙 + 예시 ([R01 Workflow]-[R16 Safe Read]) |
 | `src/superclaude/core/PRINCIPLES.md` | 원칙 + 예시 |
 | `src/superclaude/commands/help.md` | 명령어 범위 구분 (scope_map) |
 | `src/superclaude/commands/load.md` | 세션 목표 설정 |

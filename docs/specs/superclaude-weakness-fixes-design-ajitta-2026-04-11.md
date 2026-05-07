@@ -26,12 +26,12 @@ methodology: sequential-thinking (4 steps with self-evaluation loop)
 
 ### Current
 ```
-[R15] Verification 🔴: before claiming done, run full test suite fresh (not cached); compare pass count to baseline; cite evidence ("42/42 pass, baseline 40")
+[R15 Verification] Verification 🔴: before claiming done, run full test suite fresh (not cached); compare pass count to baseline; cite evidence ("42/42 pass, baseline 40")
 ```
 
 ### Proposed
 ```
-[R15] Verification 🔴: before claiming done, run full test suite fresh (not cached); compare pass count to baseline; cite evidence ("42/42 pass, baseline 40"); prohibited: claiming passage without running tests, summarizing failures as 'minor issues', reporting completion without command output, predicting results instead of observing. If unable to verify, state "verification not possible: [reason]"
+[R15 Verification] Verification 🔴: before claiming done, run full test suite fresh (not cached); compare pass count to baseline; cite evidence ("42/42 pass, baseline 40"); prohibited: claiming passage without running tests, summarizing failures as 'minor issues', reporting completion without command output, predicting results instead of observing. If unable to verify, state "verification not possible: [reason]"
 ```
 
 ### Rationale
@@ -80,22 +80,22 @@ skill-authoring.md documents `max 1024자` for description but doesn't explain t
 
 ### R06 — Current
 ```
-[R06] Scope 🟡: build only what's asked, YAGNI
+[R06 Scope] Scope 🟡: build only what's asked, YAGNI
 ```
 
 ### R06 — Proposed
 ```
-[R06] Scope 🟡: build only what's asked — 0 unsolicited files, 0 adjacent refactors, YAGNI
+[R06 Scope] Scope 🟡: build only what's asked — 0 unsolicited files, 0 adjacent refactors, YAGNI
 ```
 
 ### R12 — Current
 ```
-[R12] Clarification 🟡: ambiguous requests (multiple valid interpretations) → ask before implementing
+[R12 Clarification] Clarification 🟡: ambiguous requests (multiple valid interpretations) → ask before implementing
 ```
 
 ### R12 — Proposed
 ```
-[R12] Clarification 🟡: ambiguous requests (2+ valid interpretations) → ask before implementing
+[R12 Clarification] Clarification 🟡: ambiguous requests (2+ valid interpretations) → ask before implementing
 ```
 
 ### Rationale
@@ -132,13 +132,13 @@ Agents are categorized by role, each getting the most relevant critical rule:
 
 | Agent Category | Members | Gotcha Rule | Template Line |
 |---------------|---------|-------------|---------------|
-| **Implementers** | refactoring-expert, python-expert, devops-architect, performance-engineer | R02 Status Check | `- status-check: Before starting work, run 2-3 targeted searches to verify work isn't already complete [R02]` |
-| **Reviewers** | self-review, quality-engineer | R15 Verification | `- verification-evidence: Cite actual test output, not claims. "42/42 pass" requires running the tests [R15]` |
-| **Proposers** | system-architect, simplicity-guide (already has gotchas), requirements-analyst | R18 Necessity Test | `- necessity-gate: Before proposing changes, answer "Is the system broken without this?" [R18]` |
-| **Planners** | project-manager, root-cause-analyst, deep-researcher | R13 Intent Verification | `- intent-confirm: Restate user intent before non-trivial work, especially when task direction changes mid-conversation [R13]` |
-| **Executors** | git-workflow, repo-index, project-initializer | R02 Status Check | `- status-check: Verify current state before executing — check branch, working tree, existing output [R02]` |
+| **Implementers** | refactoring-expert, python-expert, devops-architect, performance-engineer | R02 Status Check | `- status-check: Before starting work, run 2-3 targeted searches to verify work isn't already complete [R02 Status Check]` |
+| **Reviewers** | self-review, quality-engineer | R15 Verification | `- verification-evidence: Cite actual test output, not claims. "42/42 pass" requires running the tests [R15 Verification]` |
+| **Proposers** | system-architect, simplicity-guide (already has gotchas), requirements-analyst | R18 Necessity Test | `- necessity-gate: Before proposing changes, answer "Is the system broken without this?" [R18 Necessity Test]` |
+| **Planners** | project-manager, root-cause-analyst, deep-researcher | R13 Intent Verification | `- intent-confirm: Restate user intent before non-trivial work, especially when task direction changes mid-conversation [R13 Intent Verification]` |
+| **Executors** | git-workflow, repo-index, project-initializer | R02 Status Check | `- status-check: Verify current state before executing — check branch, working tree, existing output [R02 Status Check]` |
 | **Educators** | learning-guide, socratic-mentor, technical-writer | (none — low risk of rule drift) | — |
-| **Analysts** | business-panel-experts, insight-analyst (already has gotchas) | R13 Intent | `- intent-confirm: Confirm which analysis dimension the user wants before deep-diving [R13]` |
+| **Analysts** | business-panel-experts, insight-analyst (already has gotchas) | R13 Intent | `- intent-confirm: Confirm which analysis dimension the user wants before deep-diving [R13 Intent Verification]` |
 
 ### Placement Rule
 Insert gotcha lines BEFORE `<bounds>` tag, after `<handoff>` (matching existing convention in the 5 agents that already have gotchas).

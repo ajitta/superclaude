@@ -348,7 +348,7 @@ make deploy
 |------|--------------|
 | 7 anti-over-engineering rules | Content is universally good advice, not Opus-specific |
 | 3 over-engineering examples | Same — right-sizing examples apply to all models |
-| 16 core rules [R01]-[R16] | Already model-agnostic |
+| 16 core rules [R01 Workflow]-[R16 Safe Read] | Already model-agnostic |
 | context_loader.py | No model detection logic; no Python changes needed |
 | Test suite | No tests validate `model:` field; content changes don't break structure tests |
 | Commands (32 files) | Already model-agnostic |

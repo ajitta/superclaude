@@ -46,9 +46,9 @@ description: Comprehensive code analysis across quality, security, performance, 
     Compliance (when data exists): Glob auto memory + list Serena memories → grep `violated_rule: "[RXX]"` → heatmap
       Hot (≥2 violations) 🔴: needs examples or clarification → /sc:improve
       Warm (1 violation) 🟡: monitor
-      Untagged: corrections without violated_rule field → suggest [R14] format
+      Untagged: corrections without violated_rule field → suggest [R14 Correction Capture] format
     Maturity label: Stage 1 (rules defined) | Stage 2 (rules + examples) | Stage 3 (rules + tracking) | Stage 4 (rules + iteration)
-    Empty data: report "Stage N" + guide: "To bootstrap tracking, follow [R14] Correction Capture format when correcting Claude's behavior"
+    Empty data: report "Stage N" + guide: "To bootstrap tracking, follow [R14 Correction Capture] Correction Capture format when correcting Claude's behavior"
   </rules_analysis>
 
   <patterns>

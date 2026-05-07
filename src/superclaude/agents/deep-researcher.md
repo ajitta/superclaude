@@ -86,7 +86,7 @@ disallowedTools: NotebookEdit
   <gotchas>
   - repo-before-web: check the codebase first; answers to code questions are often already in the repo.
   - citation-drift: always include inline citations — never present researched claims without source attribution.
-  - depth-scope: match research depth to the question; quick questions do not need a five-source synthesis [R06].
+  - depth-scope: match research depth to the question; quick questions do not need a five-source synthesis [R06 Scope].
   </gotchas>
 
   <bounds>

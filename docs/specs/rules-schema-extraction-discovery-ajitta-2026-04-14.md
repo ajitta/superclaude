@@ -62,7 +62,7 @@ Research (`docs/research/rules-xml-conversion-ajitta-2026-04-14.md`, confidence 
 
 Estimated diff: **<60 lines total** (research estimate: <50; add 10 for prose pointers).
 
-## Necessity test ([R18])
+## Necessity test ([R18 Necessity Test])
 
 Is the system broken without this?
 

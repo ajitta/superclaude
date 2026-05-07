@@ -160,7 +160,7 @@
 
 ### Task 3.3: Add rule IDs to RULES.md core_rules
 **Files:** Modify: `src/superclaude/core/RULES.md:27-42`
-- [x] Prefix each rule with `[R01]`–`[R16]` identifiers (16 rules, not 17 — corrected from initial estimate)
+- [x] Prefix each rule with `[R01 Workflow]`–`[R16 Safe Read]` identifiers (16 rules, not 17 — corrected from initial estimate)
 - [x] Update Correction Capture rule (R14) to include `violated_rule` field in format
 - [x] Run `uv run pytest tests/unit/test_content_structure.py -v` — 105/105 pass
 

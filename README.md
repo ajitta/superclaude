@@ -288,7 +288,7 @@ The framework's value comes from chaining commands. Each chain has gates: a step
 | Step | Output | Hard gate before next step |
 |------|--------|----------------------------|
 | `/sc:brainstorm` | `docs/specs/<topic>-discovery-…md` | User approves discovery spec |
-| `/sc:design` | `docs/specs/<topic>-design-…md` | Design committed (components pass [R18] necessity test) |
+| `/sc:design` | `docs/specs/<topic>-design-…md` | Design committed (components pass [R18 Necessity Test] necessity test) |
 | `/sc:review` | Multi-dimensional review of design/plan | Required — `/sc:brainstorm` hard-blocks `/sc:plan` until this runs |
 | `/sc:plan` | `docs/plans/<topic>-…md` (phased TDD tasks, file paths, verify cmds) | Plan committed |
 | `/sc:implement --plan` | Code + per-phase commits | Implementation complete |
