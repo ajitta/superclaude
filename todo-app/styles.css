@@ -1,0 +1,147 @@
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Apple SD Gothic Neo",
+    "Noto Sans KR", sans-serif;
+  background: #f5f5f7;
+  color: #1d1d1f;
+  line-height: 1.4;
+}
+
+main {
+  max-width: 480px;
+  margin: 2.5rem auto;
+  padding: 1.75rem;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+h1 {
+  margin: 0 0 1.25rem;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+#todo-form {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+#todo-input {
+  flex: 1;
+  padding: 0.55rem 0.75rem;
+  border: 1px solid #d2d2d7;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-family: inherit;
+}
+
+#todo-input:focus {
+  outline: 2px solid #007aff;
+  outline-offset: -1px;
+  border-color: transparent;
+}
+
+button {
+  padding: 0.55rem 1rem;
+  border: 1px solid transparent;
+  background: #007aff;
+  color: #fff;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-family: inherit;
+}
+
+button:hover { background: #0066d6; }
+button:focus-visible {
+  outline: 2px solid #007aff;
+  outline-offset: 2px;
+}
+
+#filters {
+  display: flex;
+  gap: 0.25rem;
+  margin-bottom: 0.75rem;
+}
+
+#filters button {
+  flex: 1;
+  background: transparent;
+  color: #6e6e73;
+  border: 1px solid #d2d2d7;
+  font-size: 0.85rem;
+  padding: 0.4rem 0.5rem;
+}
+
+#filters button.active {
+  background: #1d1d1f;
+  color: #fff;
+  border-color: #1d1d1f;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+li {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 0.25rem;
+  border-bottom: 1px solid #f0f0f2;
+}
+
+li:last-child { border-bottom: none; }
+
+li.done .text {
+  text-decoration: line-through;
+  color: #a1a1a6;
+}
+
+li input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #007aff;
+  cursor: pointer;
+}
+
+.text {
+  flex: 1;
+  word-break: break-word;
+}
+
+.delete {
+  background: transparent;
+  color: #ff3b30;
+  border: 1px solid transparent;
+  padding: 0.3rem 0.55rem;
+  font-size: 0.8rem;
+  border-radius: 4px;
+}
+
+.delete:hover {
+  background: #fff0ef;
+  border-color: #ffd0cc;
+}
+
+#empty {
+  text-align: center;
+  color: #a1a1a6;
+  margin: 1rem 0 0;
+  font-size: 0.9rem;
+}
+
+#status {
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid #f0f0f2;
+  color: #6e6e73;
+  font-size: 0.8rem;
+  text-align: right;
+}
