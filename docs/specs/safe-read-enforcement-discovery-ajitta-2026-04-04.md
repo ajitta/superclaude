@@ -73,12 +73,12 @@ Key changes:
 
 **Before:**
 ```
-[R17 Serena-First] Serena-First 🟢: code exploration → prefer Serena symbolic tools ...
+[R17 Symbolic-First] Serena-First 🟢: code exploration → prefer Serena symbolic tools ...
 ```
 
 **After:**
 ```
-[R17 Serena-First] Serena-First 🟡: code exploration fallback chain:
+[R17 Symbolic-First] Serena-First 🟡: code exploration fallback chain:
   1. Serena symbolic tools (get_symbols_overview, find_symbol) — primary
   2. Grep with targeted patterns — fallback for structural/text patterns
   reserve Read for non-code files, unknown formats, or when all above insufficient

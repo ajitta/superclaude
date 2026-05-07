@@ -61,7 +61,7 @@ Result: 6 files → 3 files. 2 changes deferred as nice-to-have.
 
 **Files:** Modify: `src/superclaude/core/RULES.md:43,44-58,119-124`
 
-- [ ] Step 1: Insert [R18 Necessity Test] after line 43 ([R17 Serena-First]), before `<examples>`:
+- [ ] Step 1: Insert [R18 Necessity Test] after line 43 ([R17 Symbolic-First]), before `<examples>`:
 ```
 [R18 Necessity Test] Necessity Test 🟡: before designing a component, answer "Is the system broken without this?" — "safer/better" alone is insufficient. Require: specific failure scenario, quantitative evidence, or user-facing impact. "Deferred to post-MVP review" is a valid design decision
 ```
