@@ -35,6 +35,14 @@ AUTHORING_TEST_MAP = {
 }
 
 
+def _quote_path(path) -> str:
+    """Quote a path for shell=True subprocess. shlex.quote produces POSIX
+    single-quotes that Windows shells (cmd.exe, MSYS make) don't interpret —
+    they reach make/pytest as literal characters and break path parsing on
+    drive-letter colons."""
+    return f'"{path}"' if os.name == "nt" else shlex.quote(str(path))
+
+
 def detect_authoring_test(file_path: str) -> str | None:
     """If a SuperClaude .md authoring file was edited, return targeted pytest cmd."""
     path = Path(file_path)
@@ -47,7 +55,7 @@ def detect_authoring_test(file_path: str) -> str | None:
         if segment in parts:
             for parent in path.resolve().parents:
                 if (parent / "pyproject.toml").exists():
-                    return f"uv run python -m pytest {shlex.quote(str(parent / test_file))} --tb=short -q"
+                    return f"uv run python -m pytest {_quote_path(parent / test_file)} --tb=short -q"
             return None
     return None
 
@@ -60,14 +68,14 @@ def detect_test_command(file_path: str) -> str | None:
     for parent in [path.parent, *path.parents]:
         if (parent / "pyproject.toml").exists() or (parent / "setup.py").exists():
             if (parent / "Makefile").exists():
-                return f"make -C {shlex.quote(str(parent))} test"
+                return f"make -C {_quote_path(parent)} test"
             return "uv run python -m pytest --tb=short -q"
 
         if (parent / "package.json").exists():
             return "npm test --silent"
 
         if (parent / "Makefile").exists():
-            return f"make -C {shlex.quote(str(parent))} test"
+            return f"make -C {_quote_path(parent)} test"
 
         # Stop at git root
         if (parent / ".git").exists():
