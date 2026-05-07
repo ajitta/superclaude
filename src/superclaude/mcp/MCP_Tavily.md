@@ -18,11 +18,11 @@
   - Crawl: url + depth + instructions → pages.
   </search_patterns>
 
-  <workflows>
+  <integration_patterns>
   - Research: Tavily:broad → Sequential:gaps → Tavily:targeted → Sequential:synthesize → Serena:store.
   - Fact-Check: Tavily:verify → Tavily:contradictions → Sequential:evidence → report.
   - Deep-Research: Plan:decompose → Tavily:search → Route (simple → Tavily, complex → Playwright) → synthesize.
-  </workflows>
+  </integration_patterns>
 
   <strategies>
   - Multi-Hop: broad → entities → relationships → synthesize.

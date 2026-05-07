@@ -58,13 +58,13 @@ User-facing workflow entry points accessible as `/sc:*` slash commands. Managed 
 
 CC-native execution containers limited to capabilities that commands and agents cannot provide: lifecycle hooks, tool restrictions, auto-invocation blocking, and script execution.
 
-**Contract:** Skills exist only when CC-native features are required. Workflow procedures belong in commands/. Domain expertise belongs in agents/. Skills provide:
+**Contract:** Skills exist only when CC-native features are required. Multi-step user-facing workflows belong in commands/; skills MAY define an internal `<flow>` for ordered execution within the CC-native capability they wrap. Domain expertise belongs in agents/. Skills provide:
 - `hooks` (PreToolUse, PostToolUse, Stop) — runtime behavior modification
 - `disable-model-invocation` — prevent auto-execution of destructive workflows
 - `allowed-tools` — restrict tool access for safety
 - Script execution via `{{SKILLS_PATH}}` template variables
 
-**Current skills (4):** confidence-check (PreToolUse hook), simplicity-coach (Stop hook + scripts), ship (disable-model-invocation), finishing-a-development-branch (disable-model-invocation + allowed-tools)
+**Current skills (5):** confidence-check (PreToolUse hook), simplicity-coach (Stop hook + scripts), ship (disable-model-invocation), finishing-a-development-branch (disable-model-invocation + allowed-tools), verbalized-sampling (reference skill — auto-invoked on trigger phrases)
 
 **Optional canary manifest:** Skills MAY ship a `canary.yaml` next to `SKILL.md`. Each entry is `{trigger: <user phrase>, expected_pattern: <regex>}`. The canary fixture (`tests/integration/test_skill_canary.py`) iterates manifests and runs `claude -p '<trigger>'` to assert the trigger still routes to the skill. Excluded from default `make test`; run explicitly via `pytest -m canary`. Reference manifests: `confidence-check`, `verbalized-sampling`. Source: 2026-04-25 retrospective §1.1 (silent trigger regression class).
 
@@ -141,7 +141,7 @@ These are not redundant — each serves a distinct purpose in the framework:
 - **Agent** provides domain expertise and tool guidance
 - **Command** orchestrates the workflow and defines the entry point
 
-**Note:** Skills are deliberately absent from the naming trinity. They serve a cross-cutting infrastructure role (hooks, safety), not a domain-specific one. Workflow procedures that were formerly in skills now live in commands.
+**Note:** Skills are deliberately absent from the naming trinity. They serve a cross-cutting infrastructure role (hooks, safety), not a domain-specific one. User-facing multi-step workflows that were formerly in skills now live in commands; skills retain `<flow>` for internal sequencing of their CC-native capability.
 
 ## Authoring Rules
 
@@ -182,6 +182,6 @@ Type-specific required sections:
 |------|-------------------|
 | agent | role, mission, mindset, focus, actions, outputs, tool_guidance, bounds |
 | command | role, mission, syntax, flow, bounds, handoff |
-| skill | role, mission, flow, bounds |
+| skill | role, mission, gotchas, bounds, handoff (flow optional — for ordered internal sequencing) |
 | mode | role, mission, thinking, communication, priorities, behaviors, bounds, handoff |
 | mcp | role, mission, bounds, handoff |
