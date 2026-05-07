@@ -337,3 +337,125 @@ class TestMergeHooksToSettings:
         assert "TaskCompleted" not in settings.get("hooks", {}), (
             "TaskCompleted should be removed after uninstall"
         )
+
+
+class TestHookDedup:
+    """Tests for _dedup_hook_array and idempotent merge behavior.
+
+    Regression: third-party installers (e.g., serena-hooks) re-add identical
+    entries on each `make sync-user`, accumulating duplicates that
+    `_is_superclaude_hook` does not catch (no SC marker). Five real reverts
+    were observed in production before this fix.
+    """
+
+    @pytest.fixture(autouse=True)
+    def _import(self):
+        from superclaude.cli.install_settings import (
+            _dedup_hook_array,
+            _hook_entry_signature,
+            merge_hooks_to_settings,
+        )
+
+        self.dedup = _dedup_hook_array
+        self.signature = _hook_entry_signature
+        self.merge = merge_hooks_to_settings
+
+    def test_signature_matches_identical_entries(self):
+        a = {"matcher": "", "hooks": [{"type": "command", "command": "serena-hooks remind"}]}
+        b = {"matcher": "", "hooks": [{"type": "command", "command": "serena-hooks remind"}]}
+        assert self.signature(a) == self.signature(b)
+
+    def test_signature_distinguishes_matcher(self):
+        a = {"matcher": "", "hooks": [{"command": "x"}]}
+        b = {"matcher": "Bash", "hooks": [{"command": "x"}]}
+        assert self.signature(a) != self.signature(b)
+
+    def test_signature_ignores_comment_metadata(self):
+        a = {"matcher": "", "hooks": [{"command": "x"}]}
+        b = {"_comment": "some note", "matcher": "", "hooks": [{"command": "x"}]}
+        assert self.signature(a) == self.signature(b)
+
+    def test_dedup_collapses_triplicate(self):
+        entry = {"matcher": "", "hooks": [{"command": "serena-hooks remind"}]}
+        result = self.dedup([entry, entry, entry])
+        assert len(result) == 1
+        assert result[0] == entry
+
+    def test_dedup_preserves_distinct(self):
+        a = {"matcher": "", "hooks": [{"command": "cmd-a"}]}
+        b = {"matcher": "", "hooks": [{"command": "cmd-b"}]}
+        result = self.dedup([a, b, a])
+        assert result == [a, b]
+
+    def test_dedup_idempotent_on_clean_array(self):
+        a = {"matcher": "", "hooks": [{"command": "cmd-a"}]}
+        b = {"matcher": "Bash", "hooks": [{"command": "cmd-b"}]}
+        clean = [a, b]
+        assert self.dedup(clean) == clean
+
+    def test_dedup_empty_array(self):
+        assert self.dedup([]) == []
+
+    def test_merge_cleans_third_party_duplicates_on_skip_path(self, tmp_path):
+        """Existing array gets deduped even when SC hooks already present (skip path).
+
+        This is the actual production bug: SC hooks exist (skip merge), but
+        third-party entries pile up across reinstalls because no path cleans them.
+        """
+        base_path = tmp_path / ".claude"
+        base_path.mkdir()
+
+        # Pre-existing settings.json: SC hooks present + 3 duplicate serena entries
+        sc_entry = {"hooks": [{"command": "python ~/.claude/scripts/session_init.py"}]}
+        third_party = {"matcher": "", "hooks": [{"type": "command", "command": "serena-hooks remind"}]}
+        existing = {
+            "hooks": {
+                "PreToolUse": [sc_entry, third_party, third_party, third_party]
+            }
+        }
+        (base_path / "settings.json").write_text(json.dumps(existing, indent=2))
+
+        # Re-run install with same SC hooks (no force) - should hit skip path
+        hooks_config = {"hooks": {"PreToolUse": [sc_entry]}}
+        success, _ = self.merge(base_path, hooks_config, scope="user", force=False)
+        assert success is True
+
+        result = json.loads((base_path / "settings.json").read_text())
+        pretooluse = result["hooks"]["PreToolUse"]
+        # 3 serena duplicates collapsed to 1; SC hook preserved
+        assert len(pretooluse) == 2
+        serena_count = sum(
+            1 for e in pretooluse
+            if any("serena-hooks remind" in h.get("command", "") for h in e.get("hooks", []))
+        )
+        assert serena_count == 1, f"Expected 1 serena entry, got {serena_count}"
+
+    def test_merge_idempotent_with_third_party_accumulation(self, tmp_path):
+        """Running merge N times with a third-party adding 1 entry each time stays bounded."""
+        base_path = tmp_path / ".claude"
+        base_path.mkdir()
+
+        sc_entry = {"hooks": [{"command": "python ~/.claude/scripts/session_init.py"}]}
+        third_party = {"matcher": "", "hooks": [{"type": "command", "command": "serena-hooks remind"}]}
+
+        # Initial install
+        hooks_config = {"hooks": {"PreToolUse": [sc_entry]}}
+        self.merge(base_path, hooks_config, scope="user", force=False)
+
+        # Simulate third-party installer adding entries across 4 syncs
+        for _ in range(4):
+            settings = json.loads((base_path / "settings.json").read_text())
+            settings["hooks"]["PreToolUse"].append(third_party)
+            (base_path / "settings.json").write_text(json.dumps(settings, indent=2))
+            # Subsequent SC merge should dedup the accumulated third-party entries
+            self.merge(base_path, hooks_config, scope="user", force=False)
+
+        result = json.loads((base_path / "settings.json").read_text())
+        pretooluse = result["hooks"]["PreToolUse"]
+        serena_count = sum(
+            1 for e in pretooluse
+            if any("serena-hooks remind" in h.get("command", "") for h in e.get("hooks", []))
+        )
+        assert serena_count == 1, (
+            f"After 4 accumulation rounds, expected 1 serena entry, got {serena_count}"
+        )

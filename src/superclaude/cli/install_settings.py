@@ -67,6 +67,40 @@ def _save_settings(settings_file: Path, settings: dict) -> Tuple[bool, str]:
         return False, f"Failed to save settings: {e}"
 
 
+def _hook_entry_signature(hook_entry: dict) -> tuple:
+    """Return a hashable signature for a hook entry.
+
+    Two entries with the same matcher and the same set of inner hook commands
+    (type, command, timeout) are treated as duplicates regardless of any
+    surrounding metadata (`_comment`, etc.).
+    """
+    matcher = hook_entry.get("matcher", "")
+    inner = tuple(sorted(
+        (h.get("type", ""), h.get("command", ""), h.get("timeout"))
+        for h in hook_entry.get("hooks", [])
+    ))
+    return (matcher, inner)
+
+
+def _dedup_hook_array(hooks: List[dict]) -> List[dict]:
+    """Remove duplicate hook entries, preserving first occurrence.
+
+    Idempotent: running on an already-clean array is a no-op. Used both to
+    clean accumulated duplicates from prior installs (e.g., third-party
+    installers re-adding identical entries without checking) and to keep
+    merged arrays clean.
+    """
+    seen = set()
+    deduped = []
+    for entry in hooks:
+        sig = _hook_entry_signature(entry)
+        if sig in seen:
+            continue
+        seen.add(sig)
+        deduped.append(entry)
+    return deduped
+
+
 def _is_superclaude_hook(hook_entry: dict) -> bool:
     """
     Check if a hook entry belongs to SuperClaude.
@@ -171,14 +205,22 @@ def merge_hooks_to_settings(
     for hook_type, new_hook_array in new_hooks.items():
         existing_array = existing_hooks.get(hook_type, [])
 
+        # Dedup existing entries first. Third-party installers (e.g., Serena)
+        # may re-add identical entries on each install without checking; running
+        # `make sync-user` N times accumulates N copies of unmarked hooks.
+        # Deduping on every merge is idempotent and bounds growth.
+        existing_array = _dedup_hook_array(existing_array)
+
         # Check if SuperClaude hooks already exist
         has_sc_hooks = any(_is_superclaude_hook(h) for h in existing_array)
 
         if has_sc_hooks and not force:
+            existing_hooks[hook_type] = existing_array
             skipped_any = True
             continue
 
         merged_array = _merge_hook_arrays(existing_array, new_hook_array, force)
+        merged_array = _dedup_hook_array(merged_array)
         existing_hooks[hook_type] = merged_array
         merged_any = True
 
