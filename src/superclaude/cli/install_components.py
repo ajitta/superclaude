@@ -382,47 +382,6 @@ def install_hooks_and_scripts(
             failed += 1
             messages.append(f"Failed to merge hooks to settings.json: {e}")
 
-    # 3. Serena-recommended hooks (gated on Serena MCP registration).
-    # Authored by SC per upstream guidance — see src/superclaude/hooks/serena-hooks.json _meta.
-    serena_hooks_file = hooks_source / "serena-hooks.json"
-    if serena_hooks_file.exists():
-        from .install_mcp import check_mcp_server_installed
-
-        mcp_scope = scope if scope in ("user", "project", "local") else None
-        project_root = base_path.parent if mcp_scope in ("project", "local") else None
-        serena_registered = check_mcp_server_installed(
-            "serena", scope=mcp_scope, project_root=project_root
-        )
-
-        if not serena_registered:
-            messages.append(
-                "Serena MCP not registered — skipping recommended hooks. "
-                "Re-run after registering Serena to enable them."
-            )
-        else:
-            try:
-                serena_hooks_config = json.loads(
-                    serena_hooks_file.read_text(encoding="utf-8")
-                )
-                merge_success, merge_msg = merge_hooks_to_settings(
-                    base_path=base_path,
-                    hooks_config=serena_hooks_config,
-                    scope=scope,
-                    force=force,
-                )
-                if merge_success:
-                    installed += 1
-                    messages.append(f"✓ serena-hooks: {merge_msg}")
-                else:
-                    failed += 1
-                    messages.append(f"✗ serena-hooks: {merge_msg}")
-            except json.JSONDecodeError as e:
-                failed += 1
-                messages.append(f"Failed to parse serena-hooks.json: {e}")
-            except OSError as e:
-                failed += 1
-                messages.append(f"Failed to merge serena-hooks: {e}")
-
     return installed, skipped, failed, messages
 
 
