@@ -1,5 +1,5 @@
 ---
-description: Systematically clean up code, remove dead code, and optimize project structure
+description: Systematically clean up code, remove dead code, and optimize project structure. Use ONLY when the user explicitly types `/sc:cleanup` — this performs systematic deletions and structural changes that need explicit authorization. Do NOT auto-trigger on "clean up this function", "remove this import", or any single-file tidying — those are direct edits.
 ---
 <component name="cleanup" type="command">
 

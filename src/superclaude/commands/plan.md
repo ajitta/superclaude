@@ -1,5 +1,5 @@
 ---
-description: Create detailed implementation plans with TDD tasks, exact file paths, and verification commands
+description: Create detailed implementation plans with TDD tasks, exact file paths, and verification commands. Use ONLY when the user explicitly types `/sc:plan` — this produces a committed plan document under docs/plans/. Do NOT auto-trigger on "what's the plan" / "how should we approach this" — those get a 2-3 sentence inline answer, not a plan file.
 ---
 <component name="plan" type="command">
 

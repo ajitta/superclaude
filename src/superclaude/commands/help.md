@@ -1,5 +1,5 @@
 ---
-description: List all available /sc commands and their functionality
+description: List all available /sc commands and their functionality. Use ONLY when the user explicitly types `/sc:help`. Do NOT auto-trigger on general "help me" requests — those need direct assistance, not a command listing.
 ---
 
 <component name="help" type="command">

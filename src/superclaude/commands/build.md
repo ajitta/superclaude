@@ -1,5 +1,5 @@
 ---
-description: Build, compile, and package projects with intelligent error handling and optimization
+description: Build, compile, and package projects with intelligent error handling and optimization. Use ONLY when the user explicitly types `/sc:build` — this orchestrates the project build pipeline with error analysis. Do NOT auto-trigger on running a single build command (npm run build, cargo build) — invoke that via Bash directly.
 ---
 <component name="build" type="command">
 

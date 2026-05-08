@@ -1,5 +1,5 @@
 ---
-description: Session lifecycle management with Serena MCP + Claude auto memory for context persistence
+description: Session lifecycle management with Serena MCP + Claude auto memory for context persistence. Use ONLY when the user explicitly types `/sc:save` — this is a session-end lifecycle action that writes Serena memories and auto-memory entries. Do NOT auto-trigger on "save this", "remember this", or end-of-task completions.
 ---
 <component name="save" type="command">
 

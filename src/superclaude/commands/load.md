@@ -1,5 +1,5 @@
 ---
-description: Session lifecycle management with Serena MCP + Claude auto memory for project context loading
+description: Session lifecycle management with Serena MCP + Claude auto memory for project context loading. Use ONLY when the user explicitly types `/sc:load` — this is a session-start action that primes context from Serena memory and project state. Do NOT auto-trigger on session resumption or "let's continue".
 ---
 <component name="load" type="command">
 

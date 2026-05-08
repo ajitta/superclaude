@@ -1,5 +1,5 @@
 ---
-description: Feature and code implementation with intelligent agent delegation and MCP integration
+description: Feature and code implementation with intelligent agent delegation and MCP integration. Use ONLY when the user explicitly types `/sc:implement` — this runs a multi-step implementation flow with sub-agent delegation. Do NOT auto-trigger on routine "add this function", "fix this bug", or single-file edits — those should be handled directly without the implement orchestration.
 ---
 <component name="implement" type="command">
 

@@ -1,5 +1,5 @@
 ---
-description: Capture structured session insights to per-project JSONL for human and tool analysis
+description: Capture structured session insights to per-project JSONL for human and tool analysis. Use ONLY when the user explicitly types `/sc:insight` (with optional --list/--query/--stats/--review). Do NOT auto-trigger on "let me note this" or general observations — insights are deliberate captures, not auto-snapshots.
 ---
 <component name="insight" type="command">
 

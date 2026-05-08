@@ -1,5 +1,5 @@
 ---
-description: Interactive project environment setup — select and run initialization tasks for first-session onboarding
+description: Interactive project environment setup — select and run initialization tasks for first-session onboarding. Use ONLY when the user explicitly types `/sc:init` — this presents an interactive task picker for first-time project setup. Do NOT auto-trigger on entering a new repo or "set this up".
 ---
 <component name="init" type="command">
 
