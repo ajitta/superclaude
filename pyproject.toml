@@ -99,6 +99,8 @@ addopts = [
     "-v",
     "--strict-markers",
     "--tb=short",
+    "-m",
+    "not canary",
 ]
 markers = [
     "unit: Unit tests",

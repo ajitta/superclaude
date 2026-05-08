@@ -9,11 +9,18 @@ run (network + slow). Invoke explicitly with:
 
     uv run python -m pytest tests/integration/test_skill_canary.py -m canary -v
 
+Defaults: `--model haiku`, 60s timeout. `--bare` is auto-enabled when
+`ANTHROPIC_API_KEY` is set (skips hooks/MCP/plugin-sync/CLAUDE.md
+auto-discovery → ~6s total instead of ~2min). OAuth-based local runs
+fall back to full startup automatically. Override via env vars:
+`CANARY_MODEL=sonnet` or `CANARY_TIMEOUT=90` for stricter validation.
+
 Source: docs/specs/retrospective-followups-discovery-ajitta-2026-04-25.md (A1).
 """
 from __future__ import annotations
 
 import json
+import os
 import re
 import subprocess
 from pathlib import Path
@@ -24,7 +31,10 @@ import yaml
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 SKILLS_ROOT = REPO_ROOT / "src" / "superclaude" / "skills"
-SUBPROCESS_TIMEOUT = 60  # seconds; `claude -p` latency is variable.
+# Default to Haiku for cheaper/faster routing checks; override with CANARY_MODEL
+# (e.g., CANARY_MODEL=sonnet) when validating a specific model's behavior.
+CANARY_MODEL = os.getenv("CANARY_MODEL", "haiku")
+SUBPROCESS_TIMEOUT = int(os.getenv("CANARY_TIMEOUT", "60"))
 
 
 def _iter_canary_cases() -> Iterator[tuple[str, str, str]]:
@@ -50,8 +60,16 @@ def test_skill_trigger_canary(skill: str, trigger: str, pattern: str) -> None:
     Failure means the trigger no longer routes to the skill (regression),
     OR the skill's response stopped containing the expected marker.
     """
+    cmd = ["claude", "-p", trigger, "--model", CANARY_MODEL]
+    # `--bare` strips hooks/MCP/plugin-sync/CLAUDE.md for fast startup but
+    # forces ANTHROPIC_API_KEY auth (no OAuth/keychain). Auto-enable only
+    # when the env var is present so OAuth-based local runs still work.
+    if os.getenv("ANTHROPIC_API_KEY"):
+        cmd.append("--bare")
+    cmd.extend(["--output-format", "json"])
+
     result = subprocess.run(
-        ["claude", "-p", trigger, "--output-format", "json"],
+        cmd,
         capture_output=True,
         text=True,
         timeout=SUBPROCESS_TIMEOUT,
