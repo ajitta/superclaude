@@ -1,5 +1,5 @@
 ---
-description: Multi-expert business analysis with adaptive interaction modes
+description: Multi-expert business analysis with adaptive interaction modes. Use when the user types `/sc:business-panel` or asks for a multi-expert (Porter, Christensen, Drucker, etc.) panel review of a strategy decision. Do NOT auto-trigger on a single-perspective business question or quick "what's the trade-off?" — those get a direct answer.
 ---
 <component name="business-panel" type="command">
 

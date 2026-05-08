@@ -1,5 +1,5 @@
 ---
-description: Ultra-intelligent command recommendation engine for optimal SuperClaude command selection
+description: Ultra-intelligent command recommendation engine for optimal SuperClaude command selection. Use when the user types `/sc:recommend` or asks "which /sc:* command fits my situation?". Do NOT auto-trigger when the right command is already obvious from the user's request — invoke that command directly instead.
 ---
 <component name="recommend" type="command">
 

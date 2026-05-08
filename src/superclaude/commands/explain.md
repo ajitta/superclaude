@@ -1,5 +1,5 @@
 ---
-description: Provide clear explanations of code, concepts, and system behavior with educational clarity
+description: Provide clear explanations of code, concepts, and system behavior with educational clarity. Use when the user types `/sc:explain` or asks for a structured walkthrough with progressive depth, examples, and audience tailoring. Do NOT auto-trigger on "what does this function do?" or short factual lookups — those get a 1-2 sentence direct answer.
 ---
 <component name="explain" type="command">
 

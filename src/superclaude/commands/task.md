@@ -1,5 +1,5 @@
 ---
-description: Execute complex tasks with intelligent workflow management and delegation
+description: Execute complex tasks with intelligent workflow management and delegation. Use when the user types `/sc:task` or hands over a complex multi-step task that needs explicit tracking and sub-agent delegation. Do NOT auto-trigger on single-step actions, small TODOs, or "do X" — those execute directly.
 ---
 <component name="task" type="command">
 

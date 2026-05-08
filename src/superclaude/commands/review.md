@@ -1,5 +1,5 @@
 ---
-description: Review work products (code, plans, designs, specs) for quality, correctness, and alignment with structured feedback
+description: Review work products (code, plans, designs, specs) for quality, correctness, and alignment with structured feedback. Use when the user types `/sc:review`, asks for a "second opinion" / "independent review" of a deliverable, or wants structured feedback on a PR/spec/plan. Do NOT auto-trigger on casual "does this look right?" or "is this OK?" — those get a brief inline answer.
 ---
 
 <component name="review" type="command">

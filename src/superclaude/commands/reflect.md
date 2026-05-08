@@ -1,5 +1,5 @@
 ---
-description: Task reflection and validation using Serena MCP analysis capabilities
+description: Task reflection and validation using Serena MCP analysis capabilities. Use when the user types `/sc:reflect` or asks to validate that a multi-step task is genuinely complete (assumptions surfaced, residuals listed, gaps named). Do NOT auto-trigger after every task close — routine end-of-turn summaries belong inline, not in a reflection pass.
 ---
 <component name="reflect" type="command">
 

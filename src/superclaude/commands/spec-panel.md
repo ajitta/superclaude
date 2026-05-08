@@ -1,5 +1,5 @@
 ---
-description: Multi-expert specification review and improvement using renowned software engineering experts
+description: Multi-expert specification review and improvement using renowned software engineering experts. Use when the user types `/sc:spec-panel` or asks for a multi-expert panel critique (Fowler, Beck, Martin, etc.) of a software spec. Do NOT auto-trigger on a routine spec read or single-reviewer feedback — those get a direct review.
 ---
 <component name="spec-panel" type="command">
 

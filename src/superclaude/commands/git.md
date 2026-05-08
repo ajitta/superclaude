@@ -1,5 +1,5 @@
 ---
-description: Git operations with intelligent commit messages and workflow optimization
+description: Git operations with intelligent commit messages and workflow optimization. Use when the user types `/sc:git` or asks for an intelligent commit message draft, PR body, or guided git workflow. Do NOT auto-trigger on direct git commands like "git status", "git log", "git diff", or "git push" — invoke those via Bash directly.
 ---
 <component name="git" type="command">
 
