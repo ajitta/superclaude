@@ -1,5 +1,5 @@
 ---
-description: Generate comprehensive project documentation and knowledge base with intelligent organization
+description: Generate comprehensive project documentation and knowledge base with intelligent organization. Use ONLY when the user explicitly types `/sc:index` — this generates a multi-file project knowledge base under docs/reports/. Do NOT auto-trigger on "document this" or single-file documentation requests — use /sc:document or direct edits instead.
 ---
 <component name="index" type="command">
 

@@ -1,5 +1,5 @@
 ---
-description: Intelligent MCP tool selection based on complexity scoring and operation analysis
+description: Intelligent MCP tool selection based on complexity scoring and operation analysis. Use ONLY when the user explicitly types `/sc:select-tool` — this is a meta-utility for analyzing which MCP fits a given operation. Do NOT auto-trigger during normal tool selection — pick the appropriate MCP directly based on context.
 ---
 <component name="select-tool" type="command">
 

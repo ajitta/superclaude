@@ -1,5 +1,5 @@
 ---
-description: Repository indexing with 94% token reduction (58K → 3K)
+description: Repository indexing with 94% token reduction (58K → 3K). Use ONLY when the user explicitly types `/sc:index-repo` — this produces a compact PROJECT_INDEX briefing for token-efficient navigation. Do NOT auto-trigger on routine code exploration or "what's in this repo?" — use Glob/Grep/Serena overviews directly.
 ---
 <component name="index-repo" type="command">
 
