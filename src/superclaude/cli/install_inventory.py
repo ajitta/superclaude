@@ -420,20 +420,33 @@ def uninstall_all(
             messages.append(f"❌ {msg}")
             failed += 1
 
-    # 8. Remove .gitignore block for local scope
+    # 8. Remove .git/info/exclude block for local scope (and migrate any
+    #    legacy block from .gitignore for backward-compat)
     if scope == "local":
         project_root = base_path.parent
         if dry_run:
-            gitignore = project_root / ".gitignore"
-            if gitignore.exists() and "superclaude (local scope)" in gitignore.read_text(encoding="utf-8"):
-                messages.append(f"[DRY-RUN] Would remove SC local block from {gitignore}")
+            from .install_git_exclude import (
+                has_exclude_block,
+                has_legacy_gitignore_block,
+            )
+            in_exclude = has_exclude_block(project_root)
+            in_legacy = has_legacy_gitignore_block(project_root)
+            if in_exclude or in_legacy:
+                locations = []
+                if in_exclude:
+                    locations.append(".git/info/exclude")
+                if in_legacy:
+                    locations.append(".gitignore (legacy)")
+                messages.append(
+                    f"[DRY-RUN] Would remove SC local block from {', '.join(locations)}"
+                )
                 removed += 1
             else:
-                messages.append(f"⏭️  No SC local block in {project_root / '.gitignore'}")
+                messages.append(f"⏭️  No SC local block found in {project_root}")
                 skipped += 1
         else:
-            from .install_gitignore import remove_local_gitignore
-            gi_ok, gi_msg = remove_local_gitignore(project_root)
+            from .install_git_exclude import remove_local_git_exclude
+            gi_ok, gi_msg = remove_local_git_exclude(project_root)
             messages.append(f"{'✅' if gi_ok else '❌'} {gi_msg}")
             if gi_ok:
                 removed += 1

@@ -17,7 +17,7 @@ from .install_paths import (
     _get_source_dir,
     _get_target_dir,
 )
-from .install_gitignore import add_local_gitignore
+from .install_git_exclude import add_local_git_exclude
 from .install_settings import (
     CLAUDE_SC_IMPORT,
     check_claude_md_import,
@@ -464,10 +464,12 @@ def install_all(
             messages.append(f"⚠️  {update_msg}")
             messages.append(f"   Add manually: {CLAUDE_SC_IMPORT}")
 
-    # For local scope: add .gitignore block (CC doesn't auto-ignore agents/skills/etc.)
+    # For local scope: add .git/info/exclude block (per-clone, not shared
+    # via the team .gitignore). CC doesn't auto-ignore agents/skills/etc.,
+    # so we manage the per-clone exclude ourselves.
     if scope == "local":
         project_root = base_path.parent
-        gi_ok, gi_msg = add_local_gitignore(project_root)
+        gi_ok, gi_msg = add_local_git_exclude(project_root)
         messages.append(f"{'✅' if gi_ok else '⚠️ '} {gi_msg}")
 
     # Summary
