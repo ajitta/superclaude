@@ -1,5 +1,5 @@
 ---
-description: Generate structured implementation workflows from PRDs and feature requirements
+description: Generate structured implementation workflows from PRDs and feature requirements. Use when the user types `/sc:workflow` or hands over a PRD/feature doc and asks for a task breakdown to commit under docs/plans/. Do NOT auto-trigger on "what's the order of steps" or short ad-hoc task lists — those get an inline 2-3 step answer, not a workflow file.
 ---
 <component name="workflow" type="command">
 

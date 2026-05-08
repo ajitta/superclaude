@@ -1,5 +1,5 @@
 ---
-description: Apply systematic improvements to code quality, performance, and maintainability
+description: Apply systematic improvements to code quality, performance, and maintainability. Use when the user types `/sc:improve` or asks for a multi-file quality/perf/maintainability sweep with measurable targets. Do NOT auto-trigger on "improve this function", "rename this variable", or small single-file refactors — those are direct edits.
 ---
 <component name="improve" type="command">
 

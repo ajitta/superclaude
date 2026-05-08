@@ -1,5 +1,5 @@
 ---
-description: Provide development estimates for tasks, features, or projects with intelligent analysis
+description: Provide development estimates for tasks, features, or projects with intelligent analysis. Use when the user types `/sc:estimate` or asks for a structured estimate (effort, risks, dependencies) for a feature, PRD, or multi-task project. Do NOT auto-trigger on "is this hard?", "how complex is this function?", or quick gut-check questions — those get a one-line answer.
 ---
 <component name="estimate" type="command">
 

@@ -1,5 +1,5 @@
 ---
-description: Deep web research with adaptive planning and intelligent search
+description: Deep web research with adaptive planning and intelligent search. Use when the user types `/sc:research` or asks for multi-source corroboration, version-specific evidence, or contradiction resolution across sources. Do NOT auto-trigger on a single doc lookup, library API question, or "fetch this URL" — use Tavily/WebFetch/Context7 directly.
 ---
 <component name="research" type="command">
 

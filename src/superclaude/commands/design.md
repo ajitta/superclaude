@@ -1,5 +1,5 @@
 ---
-description: Design system architecture, APIs, and component interfaces with comprehensive specifications
+description: Design system architecture, APIs, and component interfaces with comprehensive specifications. Use when the user types `/sc:design`, asks to "design the system/API/interface for X", or wants a committed design spec under docs/specs/. Do NOT auto-trigger on "how should I structure this function", small sketches, or single-component examples — those get an inline answer.
 ---
 <component name="design" type="command">
 

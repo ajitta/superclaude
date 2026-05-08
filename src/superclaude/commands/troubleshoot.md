@@ -1,5 +1,5 @@
 ---
-description: Diagnose and resolve issues in code, builds, deployments, and system behavior
+description: Diagnose and resolve issues in code, builds, deployments, and system behavior. Use when the user types `/sc:troubleshoot` or describes an intermittent failure, recurring symptom, or cross-system issue that needs hypothesis-driven investigation. Do NOT auto-trigger on a clear error message with an obvious fix, syntax errors, or single-file bugs — those get a direct fix.
 ---
 <component name="troubleshoot" type="command">
 

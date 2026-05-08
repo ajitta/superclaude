@@ -1,5 +1,5 @@
 ---
-description: Generate focused documentation for components, functions, APIs, and features
+description: Generate focused documentation for components, functions, APIs, and features. Use when the user types `/sc:document` or asks for structured documentation (API reference, README section, feature guide) with a target audience and template. Do NOT auto-trigger on adding a single docstring, fixing a comment typo, or updating one README line — those are direct edits.
 ---
 <component name="document" type="command">
 
