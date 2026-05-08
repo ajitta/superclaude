@@ -549,6 +549,35 @@ class TestInlineMarker:
         # No marker → no pending file
         assert not (workdir / ".claude" / "insights.pending.jsonl").exists()
 
+    def test_lowercase_insight_and_hyphen_separator_do_not_match(self, workdir, monkeypatch):
+        """Regression: /context output (stored as a synthetic user message) lists
+        agent and skill token meters like 'insight-analyst: 63 tokens' and
+        'sc:insight: 24 tokens'. The marker must require uppercase INSIGHT and
+        a colon separator, otherwise these are false-harvested.
+        """
+        ns, pdir = _harvest(workdir, monkeypatch, "sess1")
+        context_stdout = (
+            "<local-command-stdout> Context Usage\n"
+            "├ insight-analyst: 63 tokens\n"
+            "├ sc:insight: 24 tokens\n"
+            "**(insight-analyst, self-review, project-initializer)** absorbed\n"
+            "Insight: lowercase prefix should also be ignored\n"
+        )
+        _make_transcript(
+            pdir,
+            "sess1",
+            [
+                {
+                    "type": "user",
+                    "isMeta": False,
+                    "uuid": "u1",
+                    "message": {"role": "user", "content": context_stdout},
+                }
+            ],
+        )
+        iw.cmd_harvest(ns)
+        assert not (workdir / ".claude" / "insights.pending.jsonl").exists()
+
 
 class TestMultiMarkerSameLine:
     def test_two_markers_on_one_line_yields_two_entries(self, workdir, monkeypatch):

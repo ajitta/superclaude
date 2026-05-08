@@ -43,8 +43,8 @@ VALID_TYPES = {"feedback", "decision", "discovery", "pattern", "metric", "annota
 # markers on the same physical line each produce their own entry. MULTILINE so
 # $ binds end-of-line, not end-of-string.
 MARKER_RE = re.compile(
-    r"\bINSIGHT\s*[:\-]\s*(.+?)(?=\s*\bINSIGHT\s*[:\-]|$)",
-    re.IGNORECASE | re.MULTILINE,
+    r"\bINSIGHT\s*:\s*(.+?)(?=\s*\bINSIGHT\s*:|$)",
+    re.MULTILINE,
 )
 # Cap transcript scan to keep hook within 10s timeout on huge sessions.
 TRANSCRIPT_TAIL_BYTES = 5 * 1024 * 1024  # 5 MB
