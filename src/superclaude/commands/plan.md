@@ -64,7 +64,7 @@ Task format:
   <gotchas>
   - existing-plan: Check if a plan already exists for this feature before creating a new one
   - scope-match: Plan scope must match user request. Do not expand into adjacent features
-  - phase-vs-pr: Default to "Phase N" framing — single-branch, single-review-cycle execution. Reserve "PR N" for genuine multi-PR work (--pr-bundle), where each change-set gets its own review cycle. Source: 2026-04-25 retrospective §5.1 (4-PR plan was actually executed as 4 phase commits on 1 branch — naming should match reality).
+  - phase-vs-pr: Default to "Phase N" framing — single-branch, single-review-cycle execution. Reserve "PR N" for genuine multi-PR work (--pr-bundle), where each change-set gets its own review cycle. Naming should match reality — past 4-PR plans were actually executed as 4 phase commits on 1 branch.
   </gotchas>
 
   <bounds>

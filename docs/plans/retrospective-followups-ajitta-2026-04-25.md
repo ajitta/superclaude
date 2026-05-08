@@ -95,12 +95,12 @@ test_baseline: "1,777 passed / 24 skipped / 4 canary deselected (was 1,628)"
 **Why/Verify:** 3 critical reversals on a user-approved spec last session (§3.5); soft recommendation insufficient. Verify: grep on installed brainstorm.md (see Step 7).
 
 - [ ] Step 1: Read full brainstorm.md (77 lines)
-- [ ] Step 2: Update `<flow>` — split current step 5 ("Approve") into 5a (Approve) + 5b (Self-review **required** — emit explicit handoff "Run /sc:review on this spec before /sc:plan. Plan handoff is gated on review.")
+- [ ] Step 2: Update `<flow>` — split current step 5 ("Approve") into steps 5 (Approve) + 6 (Self-review **required** — emit explicit handoff "Run /sc:review on this spec before /sc:plan. Plan handoff is gated on review.")
 - [ ] Step 3: Update `<handoff next="..."/>` from `/sc:plan /sc:design /sc:research` to `/sc:review /sc:plan /sc:design /sc:research` (review listed first)
 - [ ] Step 4: Add to `<gotchas>`: `skip-review: do NOT route to /sc:plan when status: draft AND no /sc:review iteration logged. Hard gate, not advisory.`
 - [ ] Step 5: Update `<bounds should="...">` to include "self-review precedes implementation handoff"
 - [ ] Step 6: Sync via `make deploy` (now chains install per Phase 2)
-- [ ] Step 7: Verification (replaces unreliable `claude -p` slash invocation per source §2.4): `grep -E "review|hard.gate|skip-review" ~/.claude/commands/brainstorm.md` — assert all three terms present at expected anchors (handoff line, gotcha line, flow step 5b)
+- [ ] Step 7: Verification (replaces unreliable `claude -p` slash invocation per source §2.4): `grep -E "review|hard.gate|skip-review" ~/.claude/commands/brainstorm.md` — assert all three terms present at expected anchors (handoff line, gotcha line, flow step 6)
 - [ ] Step 8: Commit: `feat(brainstorm): hard-block /sc:plan until /sc:review runs`
 
 ---
@@ -176,7 +176,7 @@ test_baseline: "1,777 passed / 24 skipped / 4 canary deselected (was 1,628)"
 
 - [ ] Step 1: Define heuristic concretely in brainstorm.md: "confirmed = response contains `[a-c]`/`a`/`b`/`c` literal OR contains ≥2 contiguous words from the option's label text. Else delegated."
 - [ ] Step 2: Update brainstorm.md decision-output template — for each Q, capture inline in spec output: `{q: Q1, choice: [c], mode: confirmed|delegated}`
-- [ ] Step 3: Add to brainstorm.md `<flow>` step 5b — "If any decision.mode == delegated, the /sc:review handoff message must explicitly say 'mandatory: N delegated decisions need independent audit'"
+- [ ] Step 3: Add to brainstorm.md `<flow>` step 6 — "If any decision.mode == delegated, the /sc:review handoff message must explicitly say 'mandatory: N delegated decisions need independent audit'"
 - [ ] Step 4: Update `commands/review.md` — accept invocation flag `--audit-delegated` that surfaces only Qs marked delegated
 - [ ] Step 5: Sync via `make deploy`
 - [ ] Step 6: Verification A (delegated): grep installed `~/.claude/commands/brainstorm.md` for "delegated decisions need independent audit" string presence

@@ -1,4 +1,4 @@
-"""Four guards enforcing overnight safety per design §3.5.
+"""Four guards enforcing overnight safety.
 
 - BudgetGuard       : wall-clock deadline
 - PlateauDetector   : 5 consecutive non-improvements -> stop

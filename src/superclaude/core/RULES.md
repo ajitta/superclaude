@@ -172,7 +172,7 @@ Benefit: ~70% token savings vs static @-references
 
   <workflow_gates>
     /sc:brainstorm -> /sc:design: User approves discovery spec before designing
-    /sc:brainstorm -> /sc:review: Spec self-review mandatory before /sc:plan handoff (caught 3 critical reversals; see brainstorm.md flow step 5b)
+    /sc:brainstorm -> /sc:review: Spec self-review mandatory before /sc:plan handoff (caught 3 critical reversals; see brainstorm.md flow step 6)
     /sc:design -> /sc:plan: Design spec committed (components pass [R18 Necessity Test] necessity test, deferred items marked)
     /sc:design -> /sc:workflow: Alternative path when input is a PRD/feature doc rather than a design spec
     /sc:plan -> /sc:implement --plan: Plan document committed to repo

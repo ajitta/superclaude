@@ -10,17 +10,30 @@ description: Interactive requirements discovery through Socratic dialogue and sy
   <syntax>/sc:brainstorm [topic/idea] [--strategy systematic|agile|enterprise] [--depth shallow|normal|deep] [--vs [standard|cot|multi]] [--parallel]</syntax>
 
   <flow>
-  1. Explore: Socratic dialogue + systematic questioning
-  2. Analyze: Multi-agent coordination + domain expertise
-       (--vs): VS distribution generation — k perspectives with probabilities + landscape synthesis.
-               Multi-agent insights inform post-hoc labeling. --depth maps: shallow→brief, normal→balanced, deep→detailed.
-  3. Validate: Feasibility assessment + requirement validation
-  4. Specify: Write spec to docs/specs/<topic>-discovery-<username>-YYYY-MM-DD.md (with frontmatter: status: draft, revised: <today>)
-    5a. Approve: Present spec for user review — do not proceed without confirmation
-    5b. Self-review (REQUIRED hard gate): emit explicit handoff "Run /sc:review on this spec before /sc:plan. Plan handoff is gated on review." — do NOT route directly to /sc:plan. Self-review caught 3 critical reversals on a user-approved spec in source session 2026-04-25 §3.5; soft recommendation is insufficient. Append a §"Self-Review Iteration Log" section to the spec with v1→vN delta after each review round.
-    5c. Decision-mode tagging (for C2 auto-review): for each user-decided question Qi, capture mode in the spec's "Resolved Decisions" table as `confirmed` or `delegated`. Heuristic: `confirmed` = user response to Qi contains a literal option letter (`[a]`/`[b]`/`[c]`, or `a`/`b`/`c` as a standalone token) OR ≥2 contiguous words from the chosen option's label text. Otherwise (bare "yes", "proceed", "looks good", silent acceptance of ★) → `delegated`. If ≥1 decision is `delegated`, the /sc:review handoff in step 5b MUST add the explicit phrase "mandatory: N delegated decisions need independent audit" (where N = count of delegated decisions). Source: 2026-04-25 §5.3.
-  6. Handoff: Route to /sc:review (mandatory) → then /sc:plan after spec status reaches approved-for-plan. When delegated decisions are present, prefer `/sc:review --audit-delegated` to surface only those Qs.
+  1. Explore: Socratic dialogue + systematic questioning.
+  2. Analyze: Multi-agent coordination + domain expertise. With --vs, generate k perspectives with probabilities and a landscape synthesis; --depth tunes detail (shallow→brief, normal→balanced, deep→detailed).
+  3. Validate: Feasibility assessment + requirement validation.
+  4. Specify: Write spec to docs/specs/<topic>-discovery-<username>-YYYY-MM-DD.md (frontmatter: status: draft, revised: <today>).
+  5. Approve: Present spec for user review — do not proceed without confirmation.
+  6. Self-review (REQUIRED hard gate): emit handoff "Run /sc:review on this spec before /sc:plan. Plan handoff is gated on review." Detailed rules below.
+  7. Decision-mode tagging: tag each Resolved Decision as confirmed or delegated. Heuristic below.
+  8. Handoff: Route to /sc:review (mandatory) → /sc:plan after status reaches approved-for-plan. With delegated decisions present, prefer /sc:review --audit-delegated.
   </flow>
+
+  <self_review>
+  Required hard gate before /sc:plan handoff — self-review caught 3 critical reversals on a user-approved spec where soft recommendation alone would have shipped silent regressions, so this gate is not advisory.
+
+  Direct routing to /sc:plan from step 5 is prohibited. After each review round, append a §"Self-Review Iteration Log" section to the spec recording v1→vN delta.
+  </self_review>
+
+  <decision_modes>
+  For each user-decided question Qi, record mode in the spec's "Resolved Decisions" table as confirmed or delegated.
+
+  - confirmed: user response contains a literal option letter (`[a]`/`[b]`/`[c]`, or `a`/`b`/`c` as a standalone token), OR ≥2 contiguous words from the chosen option's label text.
+  - delegated: bare "yes", "proceed", "looks good", or silent acceptance of ★.
+
+  When ≥1 decision is delegated, the /sc:review handoff (step 6) MUST add the explicit phrase "mandatory: N delegated decisions need independent audit" (N = count of delegated decisions).
+  </decision_modes>
 
   <outputs>
 | Artifact | Purpose |
@@ -66,7 +79,7 @@ description: Interactive requirements discovery through Socratic dialogue and sy
   <gotchas>
   - evidence-fabrication: Do not construct hypothetical failure scenarios to justify a pre-existing recommendation. Evidence (code, config, measurements) must precede proposals.
   - seq-loop: If sequential thinking reaches the same conclusion twice on the same question, terminate that analysis branch and move to next topic.
-  - skip-review: do NOT route to /sc:plan when status: draft AND no /sc:review iteration logged. Hard gate, not advisory. Brainstorm output without a self-review round has historically shipped silent reversals (source 2026-04-25 §3.5).
+  - skip-review: do NOT route to /sc:plan when status: draft AND no /sc:review iteration logged. Hard gate, not advisory. Brainstorm output without a self-review round has historically shipped silent reversals.
   </gotchas>
 
   <bounds>

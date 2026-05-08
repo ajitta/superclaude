@@ -69,7 +69,7 @@ To keep the analysis tractable, commands are grouped by what they produce. Karpa
 | /sc:agent | Meta | ✅ | ✅ | ✅ | ✅ | `<task_protocol>` Phase 1-clarify; `<bounds>` impl below 0.90 blocked; `<gotchas>` scope-leak |
 | /sc:analyze | Read-only | ✅ | ✅ | ⚪ | ✅ | `<gotchas>` evidence-fabrication; severity classification; `<bounds>` "never modify code" |
 | /sc:auto-improve | Code-mut | ✅ | ✅ | ✅ | ✅ | Mission line: "Karpathy AutoResearch pattern"; isolated worktree; metric-driven |
-| /sc:brainstorm | Discovery | ✅ | ✅ | ⚪ | ✅ | Socratic flow step 1; `<bounds>` discovery only; spec acceptance gate (5a-5c) — **empirical: baseline already 70% karpathy-shape, skill effect is citation-tightening not shape-change** |
+| /sc:brainstorm | Discovery | ✅ | ✅ | ⚪ | ✅ | Socratic flow step 1; `<bounds>` discovery only; spec acceptance gate (5-7) — **empirical: baseline already 70% karpathy-shape, skill effect is citation-tightening not shape-change** |
 | /sc:build | Code-mut | ✅ | ⚪ | ✅ | ✅ | Validate env step 2; `<bounds>` never modify config; build success/fail evidence |
 | /sc:business-panel | Read-only | ✅ | ✅ | ⚪ | ✅ | `<gotchas>` opinion-as-fact; synthesis required; `<bounds>` "never decide for user" |
 | /sc:cleanup | Code-mut | ✅ | ✅ | ✅ | ✅ | `--safe`/`--dry-run`; `<gotchas>` scope-check + verify-unused; tests-pass post |
@@ -319,10 +319,10 @@ This is qualitatively different from "tighter version of the same output" — it
 To verify the matrix wasn't fabricated, re-validating 3 randomly selected commands by re-reading the source.
 
 ### Random pick 1 — /sc:brainstorm
-- Claim: "Socratic flow step 1; `<bounds>` discovery only; spec acceptance gate (5a-5c)"
+- Claim: "Socratic flow step 1; `<bounds>` discovery only; spec acceptance gate (5-7)"
 - Re-verify: `<flow>` step 1 = "Explore: Socratic dialogue + systematic questioning" ✅
 - Re-verify: `<bounds>` `<does>` = "ambiguous→concrete...self-review precedes implementation handoff" ✅
-- Re-verify: `<flow>` 5a/5b/5c = approve / self-review hard gate / decision-mode tagging ✅
+- Re-verify: `<flow>` 5/6/7 = approve / self-review hard gate / decision-mode tagging ✅
 - **Match: yes**
 
 ### Random pick 2 — /sc:troubleshoot

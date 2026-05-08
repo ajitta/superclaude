@@ -175,7 +175,7 @@ Per-component authoring docs already echo cross-cutting xml-prose rules; this is
 
 ## 10. Handoff
 
-This spec must pass `/sc:review` before progressing to `/sc:plan` (per `/sc:brainstorm` flow step 5b — hard gate, not advisory).
+This spec must pass `/sc:review` before progressing to `/sc:plan` (per `/sc:brainstorm` flow step 6 — hard gate, not advisory).
 
 **Run `/sc:review` on this spec before `/sc:plan`. Plan handoff is gated on review.**
 

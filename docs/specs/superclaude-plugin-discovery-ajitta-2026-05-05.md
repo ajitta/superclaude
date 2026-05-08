@@ -196,8 +196,8 @@ allowed-tools: Read, Write, Edit, Grep, Glob, Agent, WebSearch, WebFetch, Bash
   2. Analyze: Multi-agent coordination via Agent tool when --parallel
   3. Validate: Feasibility assessment
   4. Specify: Write spec to docs/specs/<topic>-discovery-<username>-YYYY-MM-DD.md
-  5b. Self-review (REQUIRED hard gate)
-  6. Handoff: Route to /sc:review (mandatory) → then /sc:plan
+  6. Self-review (REQUIRED hard gate)
+  8. Handoff: Route to /sc:review (mandatory) → then /sc:plan
   </flow>
   <delegate_to_agents note="When --parallel or --depth deep">
   - system-architect — feasibility check on system-spanning briefs
