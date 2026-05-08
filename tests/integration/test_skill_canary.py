@@ -14,8 +14,6 @@ Defaults: `--model haiku`, 60s timeout. `--bare` is auto-enabled when
 auto-discovery → ~6s total instead of ~2min). OAuth-based local runs
 fall back to full startup automatically. Override via env vars:
 `CANARY_MODEL=sonnet` or `CANARY_TIMEOUT=90` for stricter validation.
-
-Source: docs/specs/retrospective-followups-discovery-ajitta-2026-04-25.md (A1).
 """
 from __future__ import annotations
 
