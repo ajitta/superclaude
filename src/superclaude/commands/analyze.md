@@ -81,8 +81,8 @@ description: Comprehensive code analysis across quality, security, performance, 
   </gotchas>
 
   <bounds>
-    <does>static analysis, severity-rated findings, and detailed reports.</does>
-    <never>dynamic/runtime analysis, modify code, and analyze external deps.</never>
+    <does>static analysis, severity-rated findings, detailed reports, and quantitative rules audit (counts, frequencies, heatmaps via --focus rules).</does>
+    <never>dynamic/runtime analysis, modify code, analyze external deps, and qualitative rule-effectiveness narrative (delegate to /sc:reflect).</never>
     <fallback>Ask user for guidance when uncertain.</fallback>
   </bounds>
 
