@@ -78,7 +78,6 @@ description: Git operations with intelligent commit messages and workflow optimi
 
 
   <gotchas>
-  - rtk-prefix: Always use `rtk` prefix for git commands per global CLAUDE.md
   - new-commit: Create new commits, never amend unless explicitly requested
   </gotchas>
 

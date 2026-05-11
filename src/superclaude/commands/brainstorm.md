@@ -48,7 +48,6 @@ description: Interactive requirements discovery through Socratic dialogue and sy
   - Agent: Parallel exploration + multi-agent
   - WebSearch/Tavily: Market research + tech validation
   - sequentialthinking: Requirements analysis, trade-off evaluation
-  - sequentialthinking: Requirements analysis
   </tools>
 
   <patterns>
