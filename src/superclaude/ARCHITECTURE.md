@@ -80,6 +80,8 @@ Python and shell scripts that power SuperClaude's hook system, context loading, 
 
 **Contract:** Scripts are infrastructure plumbing — they should be invisible to the user. They handle context injection, session initialization, skill activation, and formatting hooks.
 
+**Sub-package:** `scripts/auto_improve/` — overnight autonomous code improvement loop powering `/sc:auto-improve` (coordinator, eval_runner, mutator, worktree isolation, results reporter). Distinct from per-event hook scripts; runs as a standalone `python -m superclaude.scripts.auto_improve` entrypoint.
+
 ### Python Infrastructure (not content types)
 
 The following directories support the content framework but are not content types themselves: `cli/` (Click-based CLI and installation logic), `hooks/` (hook system integration), and `utils/` (shared utilities). These are documented in the project `CLAUDE.md`.
@@ -154,8 +156,10 @@ Each content type has a dedicated authoring guide:
 | skills/ | `.claude/rules/skill-authoring.md` | `tests/unit/test_skill_structure.py` |
 | modes/ | `.claude/rules/mode-authoring.md` | `tests/unit/test_mode_structure.py` |
 | core/ | N/A (framework maintainers only) | N/A |
-| mcp/ | N/A (no dedicated rules) | `tests/unit/test_content_structure.py` |
+| mcp/ | `.claude/rules/mcp-authoring.md` | `tests/unit/test_content_structure.py` |
 | scripts/ | Standard Python/shell conventions | `tests/unit/` (per-script) |
+
+Cross-cutting body-format rule: `.claude/rules/xml-prose-format.md` governs XML body prose style for all component bodies under `src/superclaude/` (agents/commands/skills/modes/mcp/core). Authoring meta-docs themselves are exempt — they may use plain Markdown.
 
 ## XML Component Pattern
 
