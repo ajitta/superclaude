@@ -16,7 +16,7 @@ uv pip install -e ".[dev]"                 # Install editable
 uv run superclaude install --list-all      # Test CLI changes
 ```
 
-- **Test baseline**: ~1,628 passing / 1,807 collected on Linux/macOS. Windows `uv run pytest` may hit `Failed to canonicalize script path` (known); fallback chain: `.venv/Scripts/python.exe -m pytest` (direct venv invocation) → WSL → `make test` in CI. Markdown-only changes carry no test risk.
+- **Test baseline**: ~1,904 passing / 1,932 collected (Windows, fresh `.venv`, 52s). `uv run pytest` works on Windows when `.venv` is healthy; the `Failed to canonicalize script path` error means `.venv` is corrupt (often a broken `lib64` symlink) — rebuild it: `rm -rf .venv && uv venv && uv pip install -e ".[dev]"`. Last-resort fallbacks: `.venv/Scripts/python.exe -m pytest` → WSL → `make test` in CI. Markdown-only changes carry no test risk.
 
 ## Make Commands
 
