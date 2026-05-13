@@ -55,6 +55,7 @@ description: Research-backed verbalized sampling for diverse response generation
   - word-diversity: Responses differing only in wording = not diverse. Require framework/approach-level diffs
   - synthesis-verdict: Synthesis = landscape map, not verdict. User chooses
   - prob-word: Use "probability" for Standard/CoT, "confidence" for Multi — per paper ablation
+  - token-cutoff: Long VS distributions (k≥6, turns≥4, or detailed framework analyses) risk reply-token cap mid-stream — past miss: 3+ brainstorm sessions cut off mid-response. Mitigate: (1) drop k to 4-5 unless explicit "wild"/exhaustive; (2) for k+turns budget overflow, emit one perspective per turn, close with `[CONTINUE]` marker so next turn resume from N+1; (3) skip `<synthesis>` block when approaching cap, surface raw distribution + offer synthesis on follow-up
   </gotchas>
 
   <attribution>

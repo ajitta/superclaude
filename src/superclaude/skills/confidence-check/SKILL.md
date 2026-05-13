@@ -1,6 +1,6 @@
 ---
 name: confidence-check
-description: Pre-start check for any work (plan, design, spec, impl). Use when user say 'confidence check', 'validate first', 'before starting work', 'before implementing', or ask to validate assumptions before plan/design/spec/impl. NOT trigger on bare 'before starting' in non-dev contexts (meetings, talks).
+description: Pre-start check for any work (plan, design, spec, impl, refactor, rename, delete). Use when user say 'confidence check', 'validate first', 'before starting work', 'before implementing', 'before refactoring', or ask to validate assumptions before plan/design/spec/impl. Auto-fire on destructive verbs (refactor X, rename Y, delete Z, restructure) since wrong-target detection (e.g., 'auth' matches turning out to be 'authoring') prevent entire wasted refactor. NOT trigger on bare 'before starting' in non-dev contexts (meetings, talks).
 ---
 <component name="confidence-check" type="skill">
 
