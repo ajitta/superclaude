@@ -2,7 +2,7 @@
 
 ## Branch Validation
 
-- master/main: WARN — suggest creating feature branch first
+- master/main: WARN — suggest make feature branch first
 - feature/*|fix/*|docs/*|refactor/*|chore/*: OK
 - Other: WARN — suggest conventional branch name
 
@@ -10,12 +10,12 @@
 
 - feat: new feature
 - fix: bug fix
-- docs: documentation only
-- refactor: code restructuring
-- test: adding/updating tests
+- docs: docs only
+- refactor: code restructure
+- test: add/update tests
 - chore: maintenance, deps, config
 
-Auto-detected from diff content; user approves final message.
+Auto-detect from diff; user approve final message.
 
 ## PR Template
 
@@ -33,7 +33,7 @@ Auto-detected from diff content; user approves final message.
 ## Default Exclusions (never staged)
 
 - .env, .env.* (secrets)
-- credentials.json, *secret*, *token* (credentials)
+- credentials.json, *secret*, *token* (creds)
 - *.log, *.tmp (transient)
 - node_modules/, __pycache__/, .venv/ (generated)
-- User-specified --exclude patterns (glob syntax)
+- User --exclude patterns (glob syntax)

@@ -1,10 +1,10 @@
 ---
-description: Comprehensive code analysis across quality, security, performance, and architecture domains. Use when the user types `/sc:analyze`, asks for an "audit", "review the codebase for X", or names multiple analysis dimensions in one request. Do NOT auto-trigger on reading a single file, looking up a symbol, or asking "what does this function do" — those are direct reads, not multi-domain analysis.
+description: Code analysis across quality, security, performance, architecture domains. Use when user types `/sc:analyze`, asks "audit", "review codebase for X", or names multiple analysis dimensions one request. Do NOT auto-trigger on reading single file, looking up symbol, or "what does this function do" — those direct reads, not multi-domain analysis.
 ---
 <component name="analyze" type="command">
 
   <role command="/sc:analyze">
-    <mission>Comprehensive code analysis across quality, security, performance, and architecture domains</mission>
+    <mission>Code analysis across quality, security, performance, architecture domains</mission>
   </role>
 
   <syntax>/sc:analyze [target] [--focus quality|security|performance|architecture|rules] [--depth quick|deep] [--format text|json|report]</syntax>
@@ -15,7 +15,7 @@ description: Comprehensive code analysis across quality, security, performance, 
   3. Evaluate: Prioritized findings + severity (🔴🟡🟢)
   4. Recommend: Actionable guidance
   5. Report: Generate output per --format
-  6. Bridge: If findings are actionable (fixable issues, not just informational), suggest: "Would you like to create an implementation plan? → /sc:plan"
+  6. Bridge: If findings actionable (fixable issues, not informational), suggest: "Would you like to create an implementation plan? → /sc:plan"
   </flow>
 
   <outputs note="Per --format flag">
@@ -37,7 +37,7 @@ description: Comprehensive code analysis across quality, security, performance, 
   </tools>
 
   <focus_agent_mapping>
-  When --focus is specified and task benefits from specialist depth, delegate to the corresponding agent:
+  When --focus specified and task benefits from specialist depth, delegate to corresponding agent:
   security → @security-engineer | performance → @performance-engineer | quality → @quality-engineer | architecture → @system-architect | a11y → @frontend-architect
   </focus_agent_mapping>
 
@@ -69,20 +69,20 @@ description: Comprehensive code analysis across quality, security, performance, 
 
   <example name="invalid-focus" type="error-path">
     - Input: /sc:analyze --focus everything --scope system
-    - Why wrong: --focus accepts: quality|security|performance|architecture|rules. 'everything' is not valid.
+    - Why wrong: --focus accepts: quality|security|performance|architecture|rules. 'everything' not valid.
     - Correct: /sc:analyze --scope system (omit --focus for multi-domain analysis)
   </example>
 
   </examples>
 
   <gotchas>
-  - evidence-fabrication: Do not construct hypothetical failure scenarios to justify a pre-existing recommendation. Evidence (code, config, measurements) must precede proposals.
-  - seq-loop: If sequential thinking reaches the same conclusion twice on the same question, terminate that analysis branch and move to next topic.
+  - evidence-fabrication: Do not construct hypothetical failure scenarios to justify pre-existing recommendation. Evidence (code, config, measurements) must precede proposals.
+  - seq-loop: If sequential thinking reaches same conclusion twice on same question, terminate that analysis branch, move to next topic.
   </gotchas>
 
   <bounds>
-    <does>static analysis, severity-rated findings, detailed reports, and quantitative rules audit (counts, frequencies, heatmaps via --focus rules).</does>
-    <never>dynamic/runtime analysis, modify code, analyze external deps, and qualitative rule-effectiveness narrative (delegate to /sc:reflect).</never>
+    <does>static analysis, severity-rated findings, detailed reports, quantitative rules audit (counts, frequencies, heatmaps via --focus rules).</does>
+    <never>dynamic/runtime analysis, modify code, analyze external deps, qualitative rule-effectiveness narrative (delegate to /sc:reflect).</never>
     <fallback>Ask user for guidance when uncertain.</fallback>
   </bounds>
 

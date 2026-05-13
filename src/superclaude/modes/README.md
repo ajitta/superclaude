@@ -1,10 +1,10 @@
 # SuperClaude Modes
 
-Mindset overlays — situational cognitive frameworks that modify Claude's thinking, communication, and priorities.
+Mindset overlays — situational cog frameworks that modify Claude thinking, comms, priorities.
 
 ## Content Delivery
 
-Modes are activated on-demand by `context_loader.py` via flag/keyword detection (TRIGGER_MAP). They are **not** managed by Claude Code's native content system — no frontmatter required.
+Modes activate on-demand by `context_loader.py` via flag/keyword detect (TRIGGER_MAP). **Not** managed by Claude Code native content sys — no frontmatter needed.
 
 ## Available Modes
 
@@ -22,13 +22,13 @@ Modes are activated on-demand by `context_loader.py` via flag/keyword detection 
 
 | File | Type | Purpose |
 |------|------|---------|
-| RESEARCH_CONFIG.md | `config` | Deep research operational parameters — depth profiles, confidence thresholds, tool routing |
+| RESEARCH_CONFIG.md | `config` | Deep research op params — depth profiles, confidence thresholds, tool routing |
 
-**Note:** RESEARCH_CONFIG.md is **not** a mode. It provides operational settings for the research mode and is excluded from mode structure validation. It uses `type="config"`, not `type="mode"`.
+**Note:** RESEARCH_CONFIG.md **not** a mode. Gives op settings for research mode, excluded from mode structure validation. Uses `type="config"`, not `type="mode"`.
 
 ## 4-Axis Structure
 
-Every mode defines four axes:
+Every mode define four axes:
 
 | Axis | Tag | What It Controls |
 |------|-----|------------------|
@@ -37,17 +37,17 @@ Every mode defines four axes:
 | Priorities | `<priorities>` | Trade-off guidance — what to optimize |
 | Behaviors | `<behaviors>` | Action patterns — what to do differently |
 
-Modes can be combined (e.g., `--research --uc` for compressed research output).
+Modes combine (e.g., `--research --uc` for compressed research output).
 
 ## Authoring Rules
 
-See `.claude/rules/mode-authoring.md` for the complete authoring specification.
+See `.claude/rules/mode-authoring.md` for full authoring spec.
 
 Validation: `uv run python -m pytest tests/unit/test_mode_structure.py -v`
 
 ## Related
 
-- `core/FLAGS.md` — Flag definitions and auto-detection triggers
+- `core/FLAGS.md` — Flag defs + auto-detect triggers
 - `agents/` — Domain expert agents (modes shape mindset, agents shape expertise)
-- `commands/` — Slash commands that may activate modes
+- `commands/` — Slash commands may activate modes
 - `scripts/context_loader.py` — On-demand delivery mechanism

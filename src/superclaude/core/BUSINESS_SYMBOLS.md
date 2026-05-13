@@ -1,12 +1,12 @@
 <component name="business-symbols" type="core">
   <role>
-    <mission>Business analysis symbol system and usage patterns for strategic panel</mission>
+    <mission>Biz analysis symbol sys + usage patterns for strategic panel</mission>
   </role>
 
   <symbols>
 Strategic: 🎯 target | 📈 growth | 📉 decline/risk | 💰 financial | ⚖️ trade-offs | 🏆 competitive | 🔄 cycle | 🌊 blue ocean | 🏭 industry | 🎪 remarkable
 
-Expert (Framework + Voice):
+Expert (Framework+Voice):
 - 🔨 Christensen: JTBD (📚 Academic)
 - ⚔️ Porter: Five Forces (📊 Analytical)
 - 🎪 Godin: Purple Cow (💬 Provocative)

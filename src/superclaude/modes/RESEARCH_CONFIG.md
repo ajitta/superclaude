@@ -1,6 +1,6 @@
 <component name="research-config" type="config">
   <role>
-    <mission>Deep research configuration and strategy settings</mission>
+    <mission>Deep research config + strategy settings</mission>
   </role>
 
   <defaults>
@@ -8,17 +8,17 @@ planning: unified | max_hops: 5 | confidence: 0.7 | memory: true | parallel: tru
   </defaults>
 
   <parallel_rules>
-- Mandatory: Multiple searches | Batch extractions | Independent analyses | Non-dependent hops
-- Sequential only: Explicit dependency | Rate limit | User request
+- Mandatory: Many searches | Batch extracts | Indep analyses | Non-dep hops
+- Sequential only: Explicit dep | Rate limit | User ask
 - Batch: searches=5, extractions=3, analyses=2, group_by=domain|complexity|resource
   </parallel_rules>
 
   <strategies>
 | Strategy | When | Action |
 |----------|------|--------|
-| Planning-Only | clear query, tech docs | Immediate execution |
+| Planning-Only | clear query, tech docs | Run now |
 | Intent-Planning | ambiguous, broad | Clarify first (max 3 questions) |
-| Unified | complex, collaborative | Present plan, get feedback |
+| Unified | complex, collab | Show plan, get feedback |
   </strategies>
 
   <hop_config max="5" timeout="60s" parallel="true" loop_detect="true">
@@ -31,7 +31,7 @@ planning: unified | max_hops: 5 | confidence: 0.7 | memory: true | parallel: tru
   <confidence weights="relevance:0.5|completeness:0.5" min="0.6" target="0.8"/>
 
   <reflection freq="after_each_hop" triggers="confidence<threshold|contradictions|time@80%">
-assess_quality | identify_gaps | consider_replanning | adjust_strategy
+assess_quality | id_gaps | maybe_replan | tweak_strategy
   </reflection>
 
   <memory case_based="true" pattern_learning="true" cross_session="true" retention_days="30"/>
@@ -40,8 +40,8 @@ assess_quality | identify_gaps | consider_replanning | adjust_strategy
 | Tool | Primary Use | Fallback |
 |------|-------------|----------|
 | tavily | Search, static HTML, public content | native WebSearch, alt queries |
-| playwright | JS required, dynamic, auth, interactive | tavily extraction |
-| sequential | Reasoning, synthesis, analysis | native reasoning |
+| playwright | JS need, dynamic, auth, interactive | tavily extraction |
+| sequential | Reasoning, synth, analysis | native reasoning |
 | context7 | Tech docs, API refs, framework guides | tavily search |
 | serena | Memory, session persistence | session only |
   </tool_routing>
@@ -89,9 +89,9 @@ limits: time=10m|iterations=10|hops=5|memory=100MB
   </optimization>
 
   <errors>
-- tavily: api_key|rate_limit|no_results → native WebSearch, alt queries, expand scope
-- playwright: timeout|nav_failed → skip/increase timeout, mark inaccessible
-- quality: low_confidence|contradictions → replan, seek more sources
+- tavily: api_key|rate_limit|no_results → native WebSearch, alt queries, widen scope
+- playwright: timeout|nav_failed → skip/raise timeout, mark unreachable
+- quality: low_confidence|contradictions → replan, get more sources
   </errors>
 
   <metrics>

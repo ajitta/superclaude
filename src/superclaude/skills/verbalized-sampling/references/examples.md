@@ -100,13 +100,12 @@ that stayed in-office...
 
 **Detected**: Decision task + explicit config → VS-CoT, tau=0.05, k=3
 
-Three responses present different decision frameworks:
+Three responses show different decision frameworks:
 - Financial runway analysis (risk-weighted expected value)
 - Career trajectory optionality (options theory)
 - False dichotomy reframe (part-time freelancing while staying)
 
-Synthesis maps which response optimizes for which value (stability vs freedom vs both)
-and what information the user needs to decide.
+Synthesis map which response optimize for which value (stability vs freedom vs both) + what info user need to decide.
 
 ---
 
@@ -116,13 +115,12 @@ and what information the user needs to decide.
 
 **Detected**: VS-Multi explicitly requested, k=5, turns=3
 
-Execute three turns:
+Run three turns:
 - Turn 1: 5 ideas with confidence levels (mainstream approaches)
 - Turn 2: 5 MORE ideas different from Turn 1 (emerging technologies)
 - Turn 3: 5 FINAL ideas exploring uncovered territory (radical rethinks)
 
-Total: 15 diverse ideas. Synthesis clusters by theme, identifies the most novel cluster,
-and flags commercial viability indicators.
+Total: 15 diverse ideas. Synthesis cluster by theme, find most novel cluster, flag commercial viability signals.
 
 ---
 
@@ -132,15 +130,13 @@ and flags commercial viability indicators.
 [k:7, tau:0.01, vs-cot] What might cause the next financial crisis?
 ```
 
-7 brief, extremely diverse (tau=0.01 = wild mode) analytical responses about potential
-financial crisis triggers, with CoT reasoning.
+7 brief, extreme diverse (tau=0.01 = wild mode) analytical responses on potential financial crisis triggers, with CoT reasoning.
 
 ```
 [k:3, tau:0.20, no-synthesis] Explain quantum entanglement
 ```
 
-3 focused, detailed explanations with moderate diversity (tau=0.20 = conservative),
-without the synthesis layer.
+3 focused, detailed explanations with moderate diversity (tau=0.20 = conservative), no synthesis layer.
 
 ---
 
@@ -150,15 +146,14 @@ without the synthesis layer.
 
 **Detected**: Analytical/decision → VS-CoT, k=5, tau=0.10
 
-Five perspectives on the monolith-to-microservices decision:
+Five views on monolith-to-microservices decision:
 1. (p=0.09) **Team topology alignment** — Conway's Law analysis of current org structure
 2. (p=0.07) **Operational maturity assessment** — "you're not Netflix" pragmatism
 3. (p=0.06) **Strangler fig pattern** — incremental migration, not big bang
 4. (p=0.04) **Modular monolith alternative** — get boundaries right first, split later
 5. (p=0.03) **Cost model inversion** — microservices often cost MORE for teams under 50
 
-Synthesis highlights the key fork: team size and operational maturity determine whether
-microservices help or hurt. Response 4 is often the underexplored middle ground.
+Synthesis highlight key fork: team size + operational maturity decide whether microservices help or hurt. Response 4 often underexplored middle ground.
 
 ---
 
@@ -175,8 +170,7 @@ Five code review lenses:
 4. (p=0.05) **DX / API ergonomics** — error messages, SDK patterns, developer onboarding friction
 5. (p=0.03) **Failure mode analysis** — what happens when Redis is down? DB timeout? Token service unreachable?
 
-Synthesis identifies that security and failure modes often overlap (both care about edge cases),
-while performance and DX sometimes conflict (caching adds complexity).
+Synthesis: security + failure modes often overlap (both care edge cases); performance + DX sometimes conflict (caching add complexity).
 
 ---
 
@@ -186,7 +180,7 @@ while performance and DX sometimes conflict (caching adds complexity).
 
 **Detected**: Analytical → VS-CoT, k=5, tau=0.10
 
-Aligns with RULES.md [R03 Diagnosis] Diagnosis: generate 3+ hypotheses ranked by simplicity.
+Aligns with RULES.md [R03 Diagnosis] Diagnosis: make 3+ hypotheses ranked by simplicity.
 
 Five hypotheses with reasoning:
 1. (p=0.12) **Database connection exhaustion** — check connection pool metrics, common under load
@@ -195,43 +189,33 @@ Five hypotheses with reasoning:
 4. (p=0.05) **Environment variable missing in deployment** — works locally, fails in staging/prod
 5. (p=0.03) **Upstream service timeout** — dependency returns 504, caught as generic 500
 
-Synthesis: Start with hypothesis 1 (most common, easiest to verify: check DB connection metrics).
-Hypothesis 4 is the classic "works on my machine" — verify env parity first if recently deployed.
+Synthesis: Start with hypothesis 1 (most common, easy verify: check DB connection metrics). Hypothesis 4 = classic "works on my machine" — check env parity first if recently deployed.
 
 ---
 
 ## Common Mistakes
 
 ### Mistake 1: Modifying the Core VS Prompt Format
-**Wrong**: Replacing "probability" with emoji scales or letter grades.
-**Why**: The paper empirically tested formats. "Probability" is the best-performing
-format for VS-Standard and VS-CoT. Changing it reduces effectiveness.
-**Fix**: Keep the exact format. Enhance AROUND it, not INSTEAD of it.
+**Wrong**: Swap "probability" for emoji scales or letter grades.
+**Why**: Paper empirically tested formats. "probability" best-performing format for VS-Standard + VS-CoT. Change reduce effectiveness.
+**Fix**: Keep exact format. Enhance AROUND it, not INSTEAD of it.
 
 ### Mistake 2: Pre-Assigning Perspective Roles
 **Wrong**: "Generate one canonical response, one contrarian response, one wild card..."
-**Why**: This constrains the model to YOUR predefined diversity axes instead of letting
-it discover natural diversity from its pretraining distribution.
-**Fix**: Let VS generate freely. Label responses POST-HOC based on what actually emerged.
+**Why**: Constrains model to YOUR predefined diversity axes instead of letting it find natural diversity from its pretraining distribution.
+**Fix**: Let VS make freely. Label responses POST-HOC based on what actually emerge.
 
 ### Mistake 3: Setting k Too High
-**Wrong**: k=10 or k=15 in a single call.
-**Why**: Quality degrades significantly above k=7. The model starts producing
-filler responses to hit the count.
-**Fix**: Use k=5 (default). For more diversity, use VS-Multi (multiple turns)
-instead of higher k.
+**Wrong**: k=10 or k=15 in single call.
+**Why**: Quality drop hard above k=7. Model start make filler responses to hit count.
+**Fix**: Use k=5 (default). For more diversity, use VS-Multi (multiple turns) not higher k.
 
 ### Mistake 4: Treating Probabilities as Calibrated
-**Wrong**: "Response 3 has p=0.04 and Response 1 has p=0.08, so Response 1
-is exactly twice as likely to be correct."
-**Why**: Verbalized probabilities are approximate ordinal rankings, not calibrated
-statistical estimates.
-**Fix**: Use probabilities for rough ranking (high/medium/low confidence), not
-arithmetic comparison.
+**Wrong**: "Response 3 has p=0.04 and Response 1 has p=0.08, so Response 1 is exactly twice as likely to be correct."
+**Why**: Verbalized probabilities = approximate ordinal rankings, not calibrated stats estimates.
+**Fix**: Use probabilities for rough ranking (high/medium/low confidence), not arithmetic compare.
 
 ### Mistake 5: Always Using Synthesis to Pick a Single Winner
 **Wrong**: "Based on synthesis, Response 2 is the best answer."
-**Why**: This re-introduces mode collapse at the meta level. The whole point of VS
-is to show the user the SPACE of valid answers.
-**Fix**: Present the landscape. "Response 2 optimizes for X; Response 4 optimizes
-for Y. Your choice depends on your priority."
+**Why**: Re-introduce mode collapse at meta level. Whole point of VS = show user SPACE of valid answers.
+**Fix**: Show landscape. "Response 2 optimize for X; Response 4 optimize for Y. Your choice depend on priority."

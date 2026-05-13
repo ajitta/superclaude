@@ -1,5 +1,5 @@
 ---
-description: Session lifecycle management with Serena MCP + Claude auto memory for context persistence. Use ONLY when the user explicitly types `/sc:save` — this is a session-end lifecycle action that writes Serena memories and auto-memory entries. Do NOT auto-trigger on "save this", "remember this", or end-of-task completions.
+description: Session lifecycle management with Serena MCP + Claude auto memory for context persistence. Use ONLY when user explicitly types `/sc:save` — session-end lifecycle action that writes Serena memories and auto-memory entries. Do NOT auto-trigger on "save this", "remember this", or end-of-task completions.
 ---
 <component name="save" type="command">
 
@@ -10,20 +10,20 @@ description: Session lifecycle management with Serena MCP + Claude auto memory f
   <syntax>/sc:save [--type session|learnings|context|all] [--summarize] [--checkpoint]</syntax>
 
   <flow>
-  1. Analyze: Session progress + discoveries
+  1. Analyze: session progress + discoveries
   2. Persist (Serena): write_memory("session_[date]", context) → write_memory("learnings_[topic]", insights)
   3. Persist (auto memory): Write/Edit MEMORY.md + topic files for cross-session continuity
-    3.5. Corrections-Review: Scan session for user corrections (rejected approaches, "no I meant...", redirections). For each unrecorded correction, save structured feedback memory with trigger/misread/actual_intent/prevention fields.
-  4. Verify: list_memories() + Read MEMORY.md to confirm both stores
-  5. Checkpoint: Recovery points + progress tracking
-  6. Validate: Data integrity + no duplicates across stores
-  7. Session Goal: If a session goal was set via /sc:load, evaluate completion status (done/partial/deferred)
+    3.5. Corrections-Review: scan session for user corrections (rejected approaches, "no I meant...", redirections). For each unrecorded correction, save structured feedback memory with trigger/misread/actual_intent/prevention fields.
+  4. Verify: list_memories() + Read MEMORY.md confirms both stores
+  5. Checkpoint: recovery points + progress tracking
+  6. Validate: data integrity + no duplicates across stores
+  7. Session Goal: if session goal set via /sc:load, evaluate completion status (done/partial/deferred)
     Fallback (no Serena): Claude auto memory only (MEMORY.md + topic files)
   </flow>
 
   <compaction_strategy>
   Preserve (high signal): architecture decisions + rationale, unresolved issues, key patterns discovered, session goal status
-  Discard (low signal): verbatim tool output, intermediate search results, already-committed diffs, duplicate context
+  Discard (low signal): verbatim tool output, intermediate search results, committed diffs, duplicate context
   Format: structured summary (decisions, todo, context pointers) — not narrative prose
   </compaction_strategy>
 
@@ -46,9 +46,9 @@ description: Session lifecycle management with Serena MCP + Claude auto memory f
 
   <tools>
   - write_memory/read_memory: Serena semantic persistence (primary)
-  - list_memories: Verify Serena memories
+  - list_memories: verify Serena memories
   - Write/Edit: Claude auto memory persistence (supplementary)
-  - Read: Verify auto memory content
+  - Read: verify auto memory content
   </tools>
 
   <patterns>
@@ -69,21 +69,21 @@ description: Session lifecycle management with Serena MCP + Claude auto memory f
 
   <example name="save-incomplete-work" type="error-path">
     - Input: /sc:save --type all --checkpoint (mid-debugging, broken state)
-    - Why wrong: Checkpointing a broken state preserves errors. Next session loads broken context.
-    - Correct: Reach a stable state first (tests pass or revert), then /sc:save --type all --checkpoint.
+    - Why wrong: checkpointing broken state preserves errors. Next session loads broken context.
+    - Correct: reach stable state first (tests pass or revert), then /sc:save --type all --checkpoint.
   </example>
 
   </examples>
 
 
   <gotchas>
-  - no-ephemeral: Do not save current-conversation task details as persistent memory
-  - verify-value: Before saving, ask "Will this be useful in a future conversation?" If no, skip
+  - no-ephemeral: do not save current-conversation task details as persistent memory
+  - verify-value: before saving, ask "Will this be useful in future conversation?" If no, skip
   </gotchas>
 
   <bounds>
-    <does>Serena integration, auto memory sync, auto-checkpoints, and discovery preservation.</does>
-    <never>save without validation, override without checkpoint, and duplicate across stores.</never>
+    <does>Serena integration, auto memory sync, auto-checkpoints, discovery preservation.</does>
+    <never>save without validation, override without checkpoint, duplicate across stores.</never>
     <fallback>Without Serena: use Claude auto memory only (Write/Edit MEMORY.md). Ask user for guidance when uncertain.</fallback>
   </bounds>
 

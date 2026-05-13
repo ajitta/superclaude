@@ -4,14 +4,14 @@ description: SuperClaude command dispatcher - main entry point for all features.
 <component name="sc" type="command">
 
   <role command="/sc:sc">
-    <mission>SuperClaude command dispatcher - main entry point for all features</mission>
+    <mission>SuperClaude command dispatcher - main entry for all features</mission>
   </role>
 
   <syntax>/sc:[command] [args...]</syntax>
   <flow>
-  1. Parse: Identify the /sc: subcommand and any flags from user input
-  2. Route: Dispatch to the matching command file in commands/sc/
-  3. Execute: Run the command with provided arguments and flags
+  1. Parse: identify /sc: subcommand + flags from input
+  2. Route: dispatch to matching command file in commands/sc/
+  3. Execute: run command with args + flags
   </flow>
 
 
@@ -23,31 +23,31 @@ description: SuperClaude command dispatcher - main entry point for all features.
     - business-panel: Multi-expert business analysis
     - cleanup: Dead code removal + structure optimization
     - design: System architecture + API design
-    - document: Focused documentation generation
-    - estimate: Development time/effort estimates
+    - document: Focused doc generation
+    - estimate: Dev time/effort estimates
     - explain: Code + concept explanations
-    - git: Intelligent git operations + PR integration
-    - help: Complete command reference
+    - git: Smart git ops + PR integration
+    - help: Full command reference
     - implement: Feature implementation + MCP integration
-    - improve: Code quality + performance improvements
-    - index: Project documentation + knowledge base
-    - index-repo: Repository indexing (94% token reduction)
+    - improve: Code quality + perf improvements
+    - index: Project docs + knowledge base
+    - index-repo: Repo indexing (94% token reduction)
     - load: Session context loading (Serena)
     - pm: Project Manager Agent (default orchestration)
     - recommend: Get command recommendations
     - reflect: Task reflection + validation
     - research: Deep web research with parallel search
     - save: Session context persistence
-    - select-tool: Intelligent MCP tool selection
+    - select-tool: Smart MCP tool selection
     - sc: Command dispatcher (this command)
-    - spec-panel: Multi-expert specification review
+    - spec-panel: Multi-expert spec review
     - task: Complex task workflow management
     - test: Test execution + coverage analysis
     - troubleshoot: Issue diagnosis + resolution
     - workflow: PRD → implementation workflow
-    - init: Interactive project environment setup
+    - init: Interactive project env setup
     - insight: Capture structured session insights
-    - plan: Detailed implementation plans with TDD tasks
+    - plan: Detailed impl plans with TDD tasks
     - review: Code review with structured feedback
   </commands>
 
@@ -69,9 +69,9 @@ description: SuperClaude command dispatcher - main entry point for all features.
 | `/sc:recommend` | Get suggestions |
 
   <example name="unknown-command" type="error-path">
-    - Input: /sc:deploy (command does not exist)
-    - Why wrong: 'deploy' is not a registered /sc command.
-    - Correct: Use /sc:help to see available commands. For deployment: /sc:build --type prod then /ship
+    - Input: /sc:deploy (command not exist)
+    - Why wrong: 'deploy' not registered /sc command.
+    - Correct: Use /sc:help for available commands. For deployment: /sc:build --type prod then /ship
   </example>
   </examples>
 
@@ -83,13 +83,13 @@ description: SuperClaude command dispatcher - main entry point for all features.
   </meta>
 
   <gotchas>
-  - phantom-command: Do not reference commands that do not exist. Verify against actual files in commands/sc/
-  - stale-list: Command list may become outdated. When adding new commands, update this dispatcher
+  - phantom-command: No reference to commands not exist. Verify against actual files in commands/sc/
+  - stale-list: Command list may go outdated. When adding new commands, update this dispatcher
   </gotchas>
 
   <bounds>
-    <does>command dispatch, feature routing, and context-aware help.</does>
-    <never>execute without explicit command, modify files, and bypass command validation.</never>
+    <does>command dispatch, feature routing, context-aware help.</does>
+    <never>execute without explicit command, modify files, bypass command validation.</never>
     <fallback>Ask user for guidance when uncertain.</fallback>
   </bounds>
 

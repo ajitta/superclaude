@@ -14,7 +14,7 @@
 | depth | brief, balanced, detailed | balanced (brief for Multi) | invalid → balanced |
 | synthesis | on, off | on | [no-synthesis] → off |
 
-Resolution precedence: explicit flags > bracket syntax > NL hints > variant defaults > global defaults
+Precedence: explicit flags > bracket syntax > NL hints > variant defaults > global defaults
 
 ## Diversity Dial (NL → tau mapping)
 
@@ -27,7 +27,7 @@ Resolution precedence: explicit flags > bracket syntax > NL hints > variant defa
 
 Explicit [tau:N] overrides NL detection.
 
-## Prompt Templates (paper-proven — do not modify core structure)
+## Prompt Templates (paper-proven — no touch core structure)
 
 ### VS-Standard
 ```

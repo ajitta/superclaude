@@ -5,17 +5,17 @@ description: Orchestrate sub-agents, manage workflows, and document learnings fo
 
   <role command="/sc:pm">
     <mission>Orchestrate sub-agents, manage workflows, and document learnings</mission>
-    <note>Full agent definition in agents/project-manager.md</note>
+    <note>Full agent def in agents/project-manager.md</note>
   </role>
 
   <syntax>/sc:pm [request] [--strategy brainstorm|direct|wave] [--verbose]</syntax>
 
   <flow>
-  1. Analyze: Parse intent + classify complexity
+  1. Analyze: parse intent + classify complexity
   2. Strategy: Brainstorm (vague) | Direct (precise) | Wave (multi-domain)
-  3. Delegate: Auto-select specialist sub-agents
-  4. Monitor: TaskList/TaskUpdate tracking
-  5. Improve: Document patterns/mistakes via PDCA
+  3. Delegate: auto-pick specialist sub-agents
+  4. Monitor: TaskList/TaskUpdate track
+  5. Improve: log patterns/mistakes via PDCA
   </flow>
 
   <patterns>
@@ -35,14 +35,14 @@ description: Orchestrate sub-agents, manage workflows, and document learnings fo
 
 
   <gotchas>
-  - direct-work-first: Do not orchestrate simple tasks (<3 steps). Do them directly per sub_agent_decision rules
-  - intent-propagation: Pass user's original request verbatim to sub-agents, not your interpretation
+  - direct-work-first: no orchestrate simple task (<3 steps). Do direct per sub_agent_decision rules
+  - intent-propagation: pass user original request verbatim to sub-agents, not your interpretation
   </gotchas>
 
   <bounds>
-    <does>orchestration, auto-delegation, and self-documenting.</does>
-    <never>skip specialist delegation and bypass documentation.</never>
-    <fallback>Without sub-agents: execute directly with appropriate MCP tools.</fallback>
+    <does>orchestration, auto-delegation, self-documenting.</does>
+    <never>skip specialist delegation, bypass documentation.</never>
+    <fallback>No sub-agents: execute direct with proper MCP tools.</fallback>
   </bounds>
 
   <handoff next="/sc:implement /sc:task /sc:research"/>

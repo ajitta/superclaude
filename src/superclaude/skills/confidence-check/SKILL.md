@@ -1,25 +1,25 @@
 ---
 name: confidence-check
-description: Pre-start validation checklist for any work (plan, design, spec, implementation). This skill should be used when the user says 'confidence check', 'validate first', 'before starting work', 'before implementing', or asks to validate assumptions before any plan/design/spec/implementation. Do NOT trigger on the bare phrase 'before starting' in non-development contexts (meetings, conversations).
+description: Pre-start check for any work (plan, design, spec, impl). Use when user say 'confidence check', 'validate first', 'before starting work', 'before implementing', or ask to validate assumptions before plan/design/spec/impl. NOT trigger on bare 'before starting' in non-dev contexts (meetings, talks).
 ---
 <component name="confidence-check" type="skill">
 
   <role>
-    <mission>Prevent wrong-direction execution by validating assumptions BEFORE starting work (plan, design, spec, or implementation)</mission>
+    <mission>Stop wrong-direction work by validate assumptions BEFORE start (plan, design, spec, or impl)</mission>
   </role>
 
   <syntax>/confidence-check [task description]</syntax>
 
   <flow>
-  1. Run 3 checks below with evidence (Grep, Glob, Read)
-  2. For each: cite concrete evidence (file paths, search results, docs)
-  3. All Yes → proceed. Any No → investigate that item before implementing
+  1. Run 3 checks below w/ evidence (Grep, Glob, Read)
+  2. Each: cite hard evidence (file paths, search hits, docs)
+  3. All Yes → go. Any No → dig that one before impl
   </flow>
 
   <checks>
-  1. **Already exists?** — Grep/Glob for similar artifact (code for implementation, prior spec for plan, existing pattern for design). If found, reuse or extend instead of building new
-  2. **Fits existing context?** — Check CLAUDE.md, prior specs/plans, established patterns. Don't introduce new deps/patterns/conventions when existing ones work
-  3. **Root cause / intent understood?** — Bug: can you reproduce? Feature: clear requirements? Plan/design: clear goal + constraints? If not, clarify first
+  1. **Already exists?** — Grep/Glob for similar artifact (code for impl, prior spec for plan, pattern for design). Found → reuse/extend, no rebuild
+  2. **Fits existing context?** — Check CLAUDE.md, prior specs/plans, set patterns. No new deps/patterns/conventions when old ones work
+  3. **Root cause / intent clear?** — Bug: can repro? Feature: reqs clear? Plan/design: goal + constraints clear? Else clarify first
   </checks>
 
   <examples>
@@ -32,14 +32,14 @@ description: Pre-start validation checklist for any work (plan, design, spec, im
   </examples>
 
   <gotchas>
-  - false-positive: Do not flag "already exists" when grep finds unrelated matches (same word in comments or strings). Verify semantic match
-  - skip-evidence: Never claim "fits stack" without actually reading pyproject.toml or package.json. Cite file and line
-  - scope-expansion: Confidence check is 3 questions only — do not expand into full architecture review or implementation planning
+  - false-positive: No flag "already exists" when grep hit unrelated match (same word in comments or strings). Verify semantic match
+  - skip-evidence: Never claim "fits stack" w/o actually read pyproject.toml or package.json. Cite file + line
+  - scope-expansion: Confidence check = 3 questions only — no expand to full architecture review or impl plan
   </gotchas>
 
   <bounds>
-    <does>pre-start validation for any work (plan/design/spec/implementation) and evidence-based checklist.</does>
-    <never>score/percentage computation, runtime checks, and modify artifact.</never>
+    <does>pre-start check for any work (plan/design/spec/impl) + evidence-based checklist.</does>
+    <never>score/percent compute, runtime check, modify artifact.</never>
   </bounds>
 
   <handoff next="/sc:implement /sc:plan /sc:design /sc:analyze"/>

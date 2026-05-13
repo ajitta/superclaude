@@ -1,34 +1,34 @@
 ---
-description: Create detailed implementation plans with TDD tasks, exact file paths, and verification commands. Use ONLY when the user explicitly types `/sc:plan` — this produces a committed plan document under docs/plans/. Do NOT auto-trigger on "what's the plan" / "how should we approach this" — those get a 2-3 sentence inline answer, not a plan file.
+description: Make detailed impl plans w/ TDD tasks, exact file paths, verify commands. Use ONLY when user explicit type `/sc:plan` — make committed plan doc under docs/plans/. NOT auto-trigger on "what's the plan" / "how should we approach this" — those get 2-3 sentence inline answer, not plan file.
 ---
 <component name="plan" type="command">
 
   <role command="/sc:plan">
-    <mission>Create detailed implementation plans with TDD tasks, exact file paths, and verification commands</mission>
+    <mission>Make detailed impl plans w/ TDD tasks, exact file paths, verify commands</mission>
   </role>
 
   <syntax>/sc:plan [spec-or-topic] [--from docs/specs/...] [--output docs/plans/...] [--phases N] [--pr-bundle]</syntax>
 
   <flow>
-  1. Load: Read spec or requirements (from --from path or user description)
-  2. Map: List files to create/modify and their responsibilities
-  3. Decompose: Break into phases (default) — each phase is a single-commit unit on a feature branch, ordered by dependency. Use "Phase N" terminology, NOT "PR N", since plans typically execute as N commits on one branch (single review cycle). For genuine multi-PR work (separate review cycles per change-set), opt-in with --pr-bundle.
-  4. Template: Add plan header (goal, architecture, tech stack)
-  5. Save: Write to docs/plans/<feature-name>-<username>-YYYY-MM-DD.md (with frontmatter: status: draft, revised: <today>)
+  1. Load: Read spec/reqs (from --from path or user desc)
+  2. Map: List files to create/modify + their jobs
+  3. Decompose: Break to phases (default) — each phase = single-commit unit on feature branch, ordered by dep. Use "Phase N" term, NOT "PR N", since plans usually run as N commits on 1 branch (single review cycle). For real multi-PR work (separate review cycles per change-set), opt-in w/ --pr-bundle.
+  4. Template: Add plan header (goal, arch, tech stack)
+  5. Save: Write to docs/plans/<feature-name>-<username>-YYYY-MM-DD.md (w/ frontmatter: status: draft, revised: <today>)
   6. Handoff: Ready for /sc:implement --plan
   </flow>
 
   <outputs>
   | Artifact | Purpose |
   |---|---|
-  | `docs/plans/<name>-<username>-YYYY-MM-DD.md` | Implementation plan with TDD tasks |
+  | `docs/plans/<name>-<username>-YYYY-MM-DD.md` | Impl plan w/ TDD tasks |
   </outputs>
 
 
   <tools>
-  - Read: Spec and codebase analysis
-  - Grep/Glob: File structure mapping
-  - Write: Plan document creation
+  - Read: Spec + codebase analysis
+  - Grep/Glob: File structure map
+  - Write: Plan doc make
   </tools>
 
   <templates>
@@ -51,26 +51,26 @@ Task format:
   <examples>
   | Input | Output |
   |---|---|
-  | `/sc:plan --from docs/specs/auth-design-ajitta-2026-03-17.md` | TDD plan with Phase 1..N (single-branch default) |
-  | `/sc:plan 'add user profiles'` | Plan from description, Phase framing |
+  | `/sc:plan --from docs/specs/auth-design-ajitta-2026-03-17.md` | TDD plan w/ Phase 1..N (single-branch default) |
+  | `/sc:plan 'add user profiles'` | Plan from desc, Phase framing |
   | `/sc:plan --from REQUIREMENTS.md --output docs/plans/profiles.md` | Custom output path |
   | `/sc:plan --from docs/specs/big-refactor.md --pr-bundle` | Multi-PR plan (separate review cycles per change-set; opt-in) |
   | `/sc:plan --from docs/specs/foo.md --phases 4` | Hint preferred phase count when natural |
   </examples>
 
-  <size_note>Plans should stay under 15KB (~4K tokens). For large implementations, split into phase files (e.g., plan-phase1-setup.md, plan-phase2-impl.md). Claude Code's Read tool fails at 25K tokens (~100KB) — oversized plans become unreadable mid-execution.</size_note>
+  <size_note>Plans stay under 15KB (~4K tokens). Big impls — split to phase files (e.g., plan-phase1-setup.md, plan-phase2-impl.md). Claude Code Read tool fail at 25K tokens (~100KB) — oversized plans unreadable mid-exec.</size_note>
 
 
   <gotchas>
-  - existing-plan: Check if a plan already exists for this feature before creating a new one
-  - scope-match: Plan scope must match user request. Do not expand into adjacent features
-  - phase-vs-pr: Default to "Phase N" framing — single-branch, single-review-cycle execution. Reserve "PR N" for genuine multi-PR work (--pr-bundle), where each change-set gets its own review cycle. Naming should match reality — past 4-PR plans were actually executed as 4 phase commits on 1 branch.
+  - existing-plan: Check if plan already exist for this feature before make new one
+  - scope-match: Plan scope must match user req. No expand to adjacent features
+  - phase-vs-pr: Default to "Phase N" framing — single-branch, single-review-cycle exec. Reserve "PR N" for real multi-PR work (--pr-bundle), where each change-set get own review cycle. Naming match reality — past 4-PR plans actually ran as 4 phase commits on 1 branch.
   </gotchas>
 
   <bounds>
-    <does>plan creation, task decomposition, file mapping, and TDD structure.</does>
-    <never>write implementation code, execute tasks, and skip spec review.</never>
-    <fallback>Ask user for spec clarification when requirements are ambiguous.</fallback>
+    <does>plan make, task decompose, file map, TDD structure.</does>
+    <never>write impl code, exec tasks, skip spec review.</never>
+    <fallback>Ask user for spec clarify when reqs ambiguous.</fallback>
   </bounds>
 
   <handoff next="/sc:implement /sc:brainstorm"/>

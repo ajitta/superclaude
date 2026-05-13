@@ -1,18 +1,18 @@
 ---
-description: Session controller orchestrating investigation, implementation, and review workflows. Use ONLY when the user explicitly types `/sc:agent` — this drives a multi-phase orchestration flow. Do NOT auto-trigger when a single sub-agent invocation suffices; use the Agent tool directly for one-off delegations.
+description: Session controller orchestrating investigation, implementation, and review workflows. Use ONLY when user explicitly types `/sc:agent` — drives multi-phase orchestration. Do NOT auto-trigger when single sub-agent invocation suffices; use Agent tool directly for one-off delegations.
 ---
 <component name="agent" type="command">
 
   <role command="/sc:agent">
-    <mission>Session controller orchestrating investigation, implementation, and review workflows</mission>
+    <mission>Session controller orchestrate investigate, implement, review workflows</mission>
   </role>
 
   <syntax>/sc:agent [task-description]</syntax>
   <flow>
-  1. Parse: Identify task type, complexity, and required expertise from user request
-  2. Delegate: Select appropriate agent(s) based on domain triggers and complexity
-  3. Monitor: Track agent progress, handle failures, consolidate outputs
-  4. Deliver: Present synthesized results to user with evidence citations
+  1. Parse: ID task type, complexity, required expertise from request
+  2. Delegate: Pick agent(s) by domain triggers + complexity
+  3. Monitor: Track progress, handle fails, consolidate outputs
+  4. Deliver: Present synth results with evidence citations
   </flow>
 
 
@@ -20,7 +20,7 @@ description: Session controller orchestrating investigation, implementation, and
     - Check: git status --porcelain → 📊 Git: clean|X files|not a repo
     - Remind: 💡 Use /context to confirm token budget
     - Report: Core services: confidence check, deep research, repo index
-    - Wait: Stop until user describes task
+    - Wait: Stop until user describe task
   </startup>
 
   <task_protocol>
@@ -37,22 +37,22 @@ description: Session controller orchestrating investigation, implementation, and
 
   <guidance>
     - @repo-index on first task per session
-    - @deep-researcher before speculating
-    - Log confidence score when it changes
+    - @deep-researcher before speculate
+    - Log confidence score when change
     - If MCP unavailable: fallback to native, flag gap
   </guidance>
 
   <token_discipline>
     - Short status: 🔄 Investigating…, 📊 Confidence: 0.82
     - Collapse redundant summaries; link to prior answers
-    - Archive to memory only if user requests persistence
+    - Archive to memory only if user request persistence
   </token_discipline>
 
   <examples>
 
   <example name="agent-wrong-type" type="error-path">
     - Input: /sc:agent frontend-architect 'optimize database queries'
-    - Why wrong: frontend-architect is a UI/accessibility specialist, not a database expert.
+    - Why wrong: frontend-architect is UI/a11y specialist, not DB expert.
     - Correct: /sc:agent backend-architect 'optimize database queries' or /sc:agent performance-engineer for profiling
   </example>
 
@@ -60,12 +60,12 @@ description: Session controller orchestrating investigation, implementation, and
 
 
   <gotchas>
-  - scope-leak: Do not let sub-agents expand scope beyond the original user request. Pass user's words verbatim
-  - context-pollution: Do not read sub-agent output files (pollutes main context with tool noise). Treat the returned summary as advisory, not authoritative — require it to cite {files inspected, commands run, exact evidence, assumptions, residual risks}, then revalidate cited file:line before editing or reporting based on it
+  - scope-leak: No let sub-agents expand scope past original request. Pass user words verbatim
+  - context-pollution: No read sub-agent output files (pollute main context with tool noise). Treat returned summary as advisory, not authoritative — require cite {files inspected, commands run, exact evidence, assumptions, residual risks}, then revalidate cited file:line before edit or report
   </gotchas>
 
   <bounds>
-    <does>orchestrate helpers, validate results, and keep user out of busywork.</does>
+    <does>orchestrate helpers, validate results, keep user out of busywork.</does>
     <never>speculate without research and impl below 0.90 confidence.</never>
     <fallback>Ask user for guidance when uncertain.</fallback>
   </bounds>

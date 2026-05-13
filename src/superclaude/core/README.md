@@ -1,12 +1,12 @@
 # SuperClaude Core
 
-Framework DNA — always-applied principles and rules that define SuperClaude's identity.
+Framework DNA — always-on principles + rules define SuperClaude identity.
 
 ## Content Delivery
 
-Core files are loaded via `CLAUDE_SC.md` `@import` at session start. They are present in **every** Claude Code session where SuperClaude is installed.
+Core files load via `CLAUDE_SC.md` `@import` at session start. Present in **every** Claude Code session where SuperClaude installed.
 
-**Exception:** BUSINESS_SYMBOLS.md is loaded on-demand by `context_loader.py` when business-panel mode/agent activates.
+**Exception:** BUSINESS_SYMBOLS.md load on-demand by `context_loader.py` when business-panel mode/agent fire.
 
 ## Files
 
@@ -19,13 +19,13 @@ Core files are loaded via `CLAUDE_SC.md` `@import` at session start. They are pr
 
 ## Authoring
 
-Core files are maintained by framework developers only. Changes to always-loaded files directly impact context budget for every session — keep them concise.
+Framework devs only maintain core files. Edits to always-loaded files hit context budget every session — keep terse.
 
 - `CLAUDE_SC.md` chains: `@core/FLAGS.md` → `@core/PRINCIPLES.md` → `@core/RULES.md`
-- BUSINESS_SYMBOLS.md is triggered via `context_loader.py` TRIGGER_MAP
+- BUSINESS_SYMBOLS.md fire via `context_loader.py` TRIGGER_MAP
 
 ## Related
 
-- `CLAUDE_SC.md` — Import chain entry point
-- `modes/` — On-demand cognitive overlays (complement core rules)
+- `CLAUDE_SC.md` — Import chain entry
+- `modes/` — On-demand cognitive overlays (pair with core rules)
 - `scripts/context_loader.py` — On-demand delivery mechanism

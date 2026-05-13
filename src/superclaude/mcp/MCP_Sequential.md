@@ -1,30 +1,30 @@
 <component name="sequential" type="mcp">
   <role>
-    <mission>Multi-step reasoning engine for complex analysis and systematic problem solving</mission>
+    <mission>Multi-step reason engine for complex analyze + systematic problem solve</mission>
   </role>
 
   <choose>
-  <use>multi-component problem decomposition (3+ interconnected systems or concerns), root-cause analysis with systematic hypothesis generation and falsification, architecture trade-off evaluation across multiple dimensions, security threat modeling with attack-surface enumeration and risk assessment, and multi-phase implementation planning with dependency chains.</use>
-  <never>single-step answers (simple lookups, explanations, one-file fixes), code generation (writing code is not thinking — native Claude is faster), and documentation writing (no structured-reasoning value).</never>
+  <use>multi-component problem decomp (3+ interconnect systems/concerns), root-cause analyze w/ systematic hypothesis gen + falsify, architecture trade-off eval cross multi dimension, security threat model w/ attack-surface enum + risk assess, multi-phase impl plan w/ dependency chain.</use>
+  <never>single-step answer (simple lookup, explain, one-file fix), code gen (write code not think — native Claude faster), doc write (no structured-reason value).</never>
   </choose>
 
   <thought_strategies>
-  - Linear: step 1 → 2 → 3 → conclusion (simple decomposition).
+  - Linear: step 1 → 2 → 3 → conclude (simple decomp).
   - Hypothesis-Test: hypothesis → evidence → verify → accept/reject → next hypothesis.
-  - Branch-Compare: thought N → branch A → branch B → compare → select best.
-  - Revision: realize error at step 5 → revise step 3 → continue from corrected base.
+  - Branch-Compare: thought N → branch A → branch B → compare → pick best.
+  - Revision: spot error step 5 → revise step 3 → continue from fix base.
   </thought_strategies>
 
   <when_to_adjust>
-  - `totalThoughts` too low? Increase mid-chain — don't force premature conclusions.
-  - Dead end? Set `isRevision: true` and reconsider the problematic step.
-  - Two valid paths? Branch from the decision point, explore both, then compare.
-  - `needsMoreThoughts: true` — signals the chain needs extension even at planned end.
+  - `totalThoughts` too low? Bump mid-chain — no force premature conclude.
+  - Dead end? Set `isRevision: true`, redo bad step.
+  - Two valid path? Branch from decision point, explore both, compare.
+  - `needsMoreThoughts: true` — signal chain need extend past planned end.
   </when_to_adjust>
 
   <integration_patterns>
-  - Troubleshooting: Sequential:hypotheses → test each → Sequential:synthesize → `/sc:troubleshoot`.
-  - Architecture: Sequential:requirements → trade-offs → constraints → recommendation → `/sc:design`.
+  - Troubleshoot: Sequential:hypotheses → test each → Sequential:synthesize → `/sc:troubleshoot`.
+  - Architecture: Sequential:requirements → trade-offs → constraints → recommend → `/sc:design`.
   - Research: Tavily:gather → Sequential:analyze → gaps → Tavily:targeted → Sequential:conclude.
   - Review: Read code → Sequential:security-analysis → Sequential:perf-analysis → `/sc:review`.
   </integration_patterns>
@@ -39,9 +39,9 @@
   </examples>
 
   <bounds>
-    <does>multi-step reasoning, systematic analysis, hypothesis testing, and trade-off evaluation.</does>
-    <never>code generation, simple explanations, and documentation writing.</never>
-    <fallback>Use native Claude reasoning for single-step tasks, Adaptive Thinking for moderate complexity.</fallback>
+    <does>multi-step reason, systematic analyze, hypothesis test, trade-off eval.</does>
+    <never>code gen, simple explain, doc write.</never>
+    <fallback>Use native Claude reason for single-step task, Adaptive Thinking for moderate complex.</fallback>
   </bounds>
 
   <handoff next="/sc:analyze /sc:troubleshoot /sc:research /sc:design"/>

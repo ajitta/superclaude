@@ -1,50 +1,50 @@
 ---
-description: Task reflection and validation using Serena MCP analysis capabilities. Use when the user types `/sc:reflect` or asks to validate that a multi-step task is genuinely complete (assumptions surfaced, residuals listed, gaps named). Do NOT auto-trigger after every task close — routine end-of-turn summaries belong inline, not in a reflection pass.
+description: Task reflect + validate use Serena MCP analysis. Use when user type `/sc:reflect` or ask validate multi-step task truly done (assumptions surface, residuals list, gaps name). NO auto-trigger after every task close — routine end-turn summary go inline, not reflection pass.
 ---
 <component name="reflect" type="command">
 
   <role command="/sc:reflect">
-    <mission>Task reflection and validation using analysis capabilities</mission>
-    <note>For evidence-based completion verification, use /sc:test with the verification workflow</note>
+    <mission>Task reflect + validate use analysis power</mission>
+    <note>For evidence-based done-check, use /sc:test with verify workflow</note>
   </role>
 
   <syntax>/sc:reflect [--type task|session|completion] [--analyze] [--validate]</syntax>
 
   <flow>
-  1. Analyze: Assess completeness of collected information
-  2. Validate: Check goal alignment and deviation
-    2.5. Misunderstanding-Audit: Identify moments where user intent was misread during this session. For each: what triggered the misread, what was the actual intent, what rule would prevent it. Save as feedback memory if not already stored.
-  3. Reflect: Evaluate completion criteria
-    3.5. Gotchas-Gardening: If `.claude/rules/gotchas/` exists, check: (a) files with `# Last reviewed:` older than 90 days → warn, (b) `paths:` glob patterns that match zero files in current project → warn stale pattern, (c) gotcha entries referencing identifiers not found in codebase → warn potential staleness.
-  4. Persist: Write learnings for cross-session capture
+  1. Analyze: judge completeness of info gathered
+  2. Validate: check goal align + drift
+    2.5. Misunderstanding-Audit: spot moments user intent misread this session. Each: what trigger misread, what actual intent, what rule stop it. Save feedback memory if not stored yet.
+  3. Reflect: weigh done-criteria
+    3.5. Gotchas-Gardening: if `.claude/rules/gotchas/` exist, check: (a) files with `# Last reviewed:` older 90 days → warn, (b) `paths:` glob match zero files in project → warn stale pattern, (c) gotcha entries cite identifiers not in codebase → warn maybe stale.
+  4. Persist: write learnings for cross-session catch
   </flow>
 
 
   <patterns>
-    - Task: approach → goal alignment → deviation → correction
-    - Session: info gathering → completeness → quality → insights
-    - Completion: progress → criteria → remaining work → decision
-    - Gotchas: staleness check → paths: validation → content relevance → prune recommendation
+    - Task: approach → goal align → drift → fix
+    - Session: info gather → completeness → quality → insight
+    - Completion: progress → criteria → work left → decide
+    - Gotchas: stale check → paths: validate → content relevance → prune advice
   </patterns>
 
   <examples>
   | Input | Output |
   |---|---|
-  | `--type task --analyze` | Goal alignment validation |
-  | `--type session --validate` | Session work quality assessment |
-  | `--type completion` | Completion readiness evaluation |
+  | `--type task --analyze` | Goal align validate |
+  | `--type session --validate` | Session work quality check |
+  | `--type completion` | Done-ready judge |
   </examples>
 
 
   <gotchas>
-  - evidence-required: Cite actual test output and file state, not predicted results
-  - baseline-compare: Compare current state against baseline metrics (test counts, pass rates)
+  - evidence-required: cite real test output + file state, not predict result
+  - baseline-compare: compare now-state vs baseline metric (test count, pass rate)
   </gotchas>
 
   <bounds>
-    <does>comprehensive reflection, cross-session learning, and qualitative rule-effectiveness analysis (misread audit and improvement narrative).</does>
-    <never>override completion, bypass integrity, and quantitative rule statistics (delegate to /sc:analyze --focus rules).</never>
-    <fallback>Without Serena: use Claude auto memory for session persistence.</fallback>
+    <does>full reflect, cross-session learn, qualitative rule-effect analysis (misread audit + improvement story).</does>
+    <never>override done, bypass integrity, quantitative rule stats (delegate to /sc:analyze --focus rules).</never>
+    <fallback>No Serena: use Claude auto memory for session persist.</fallback>
   </bounds>
 
   <handoff next="/sc:improve /sc:troubleshoot"/>

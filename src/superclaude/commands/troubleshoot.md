@@ -1,20 +1,20 @@
 ---
-description: Diagnose and resolve issues in code, builds, deployments, and system behavior. Use when the user types `/sc:troubleshoot` or describes an intermittent failure, recurring symptom, or cross-system issue that needs hypothesis-driven investigation. Do NOT auto-trigger on a clear error message with an obvious fix, syntax errors, or single-file bugs — those get a direct fix.
+description: Diagnose + resolve issues in code, builds, deployments, system behavior. Use when user types `/sc:troubleshoot` or describes intermittent failure, recurring symptom, or cross-system issue needing hypothesis-driven investigation. Do NOT auto-trigger on clear error with obvious fix, syntax errors, or single-file bugs — those get direct fix.
 ---
 <component name="troubleshoot" type="command">
 
   <role command="/sc:troubleshoot">
-    <mission>Diagnose and resolve issues in code, builds, deployments, and system behavior</mission>
+    <mission>Diagnose + resolve issues in code, builds, deployments, system behavior</mission>
   </role>
 
   <syntax>/sc:troubleshoot [issue] [--type bug|build|performance|deployment] [--trace] [--fix]</syntax>
 
   <flow>
-  1. Reproduce: Confirm failure — read full error, identify exact trigger, verify it's consistent
+  1. Reproduce: Confirm failure — read full error, identify exact trigger, verify consistent
   2. Investigate: Check git log/diff, trace data flow, find working examples
-  3. Hypothesize: Form specific hypothesis ("X causes Y because Z") — max 3 cycles before escalating to user
+  3. Hypothesize: Form specific hypothesis ("X causes Y because Z") — max 3 cycles before escalate to user
   4. Confirm: Test hypothesis by changing one variable at a time; check environment before code
-  5. Test: Write failing test that reproduces the exact bug (required before any fix)
+  5. Test: Write failing test reproducing exact bug (required before any fix)
   6. Fix: Apply single change addressing root cause — no "while I'm here" fixes
   7. Verify: Failing test passes, all existing tests pass, no regressions
   </flow>
@@ -45,20 +45,20 @@ description: Diagnose and resolve issues in code, builds, deployments, and syste
 
   <example name="symptom-only-fix" type="error-path">
     - Input: /sc:troubleshoot 'users report slow page' --fix (applies caching without profiling)
-    - Why wrong: Fixing symptoms without diagnosis. Slow page could be N+1 queries, not a caching issue.
-    - Correct: /sc:troubleshoot 'users report slow page' --trace first → identify bottleneck → then targeted fix
+    - Why wrong: Fix symptoms without diagnosis. Slow page could be N+1 queries, not caching issue.
+    - Correct: /sc:troubleshoot 'users report slow page' --trace first → identify bottleneck → targeted fix
   </example>
 
   </examples>
 
   <gotchas>
-  - evidence-fabrication: Do not construct hypothetical failure scenarios to justify a pre-existing recommendation. Evidence (code, config, measurements) must precede proposals.
-  - seq-loop: If sequential thinking reaches the same conclusion twice on the same question, terminate that analysis branch and move to next topic.
+  - evidence-fabrication: Do not construct hypothetical failure scenarios to justify pre-existing recommendation. Evidence (code, config, measurements) must precede proposals.
+  - seq-loop: If sequential thinking reaches same conclusion twice on same question, terminate that analysis branch, move to next topic.
   </gotchas>
 
   <bounds>
-    <does>systematic diagnosis, validated solutions, and safe fixes.</does>
-    <never>risky fixes without confirm, modify production without permission, and arch changes without impact.</never>
+    <does>systematic diagnosis, validated solutions, safe fixes.</does>
+    <never>risky fixes without confirm, modify production without permission, arch changes without impact.</never>
     <fallback>Ask user for guidance when uncertain.</fallback>
   </bounds>
 

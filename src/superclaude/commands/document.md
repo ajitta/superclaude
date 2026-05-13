@@ -1,10 +1,10 @@
 ---
-description: Generate focused documentation for components, functions, APIs, and features. Use when the user types `/sc:document` or asks for structured documentation (API reference, README section, feature guide) with a target audience and template. Do NOT auto-trigger on adding a single docstring, fixing a comment typo, or updating one README line — those are direct edits.
+description: Gen focused docs for components, functions, APIs, features. Use when user types `/sc:document` or ask for structured docs (API reference, README section, feature guide) with target audience + template. NOT auto-trigger on add single docstring, fix comment typo, or update one README line — those direct edits.
 ---
 <component name="document" type="command">
 
   <role command="/sc:document">
-    <mission>Generate focused documentation for components, functions, APIs, and features</mission>
+    <mission>Gen focused docs for components, functions, APIs, features</mission>
   </role>
 
   <syntax>/sc:document [target] [--type inline|external|api|guide] [--style brief|detailed]</syntax>
@@ -29,7 +29,7 @@ description: Generate focused documentation for components, functions, APIs, and
 
   <tools>
   - Read: Component + existing docs
-  - Grep: Reference extraction
+  - Grep: Ref extraction
   - Write: Doc file creation
   - Glob: Multi-file organization
   </tools>
@@ -52,21 +52,21 @@ description: Generate focused documentation for components, functions, APIs, and
 
   <example name="document-unstable-code" type="error-path">
     - Input: /sc:document src/api --type api --detailed (during active refactoring)
-    - Why wrong: Documenting code that's actively being refactored produces docs that immediately go stale.
-    - Correct: Complete the refactoring first, then /sc:document for stable API surface.
+    - Why wrong: Doc code mid-refactor → docs stale immediately.
+    - Correct: Finish refactor first, then /sc:document for stable API surface.
   </example>
 
   </examples>
 
 
   <gotchas>
-  - no-unsolicited: Do not create documentation files unless explicitly requested
+  - no-unsolicited: No create doc files unless explicit request
   - naming: Follow doc_output_convention from RULES.md for file naming (topic-slug-username-date.md)
   </gotchas>
 
   <bounds>
-    <does>focused docs, multi-format, and ecosystem integration.</does>
-    <never>doc without analysis, override standards, and expose sensitive details.</never>
+    <does>focused docs, multi-format, ecosystem integration.</does>
+    <never>doc w/o analysis, override standards, expose sensitive details.</never>
     <fallback>Ask user for guidance when uncertain.</fallback>
   </bounds>
 

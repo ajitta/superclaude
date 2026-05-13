@@ -1,6 +1,6 @@
 ---
 name: finishing-a-development-branch
-description: Complete development work with structured options for merge, PR, or cleanup. This skill should be used when the user is done with a feature branch and wants to merge it, create a PR, or clean up branches.
+description: Finish dev work w/ structured opts for merge, PR, or cleanup. Use when user done w/ feature branch + wants merge, PR, or branch cleanup.
 disable-model-invocation: true
 allowed-tools: Bash, Read, Grep, Glob
 hooks:
@@ -14,36 +14,36 @@ hooks:
 <component name="finishing-a-development-branch" type="skill">
 
   <role>
-    <mission>Guide branch completion by verifying tests, presenting options, executing the chosen path, and cleaning up</mission>
+    <mission>Guide branch finish: verify tests, show opts, run chosen path, cleanup</mission>
   </role>
 
   <flow>
-  1. Run the test suite: Tests should pass before presenting options — if they fail, report failures and pause
-  2. Detect the base branch: Check whether the repo uses `main` or `master`, and confirm with the user before proceeding
-  3. Present four options:
-  - Merge locally into base branch
-  - Push and create a PR
-  - Keep the branch as-is for later
-  - Discard the branch (requires typed "discard" confirmation)
-  4. Execute the chosen option: For merges, re-run tests after merging — for PRs, use `gh pr create` and report the URL — for discard, wait for explicit confirmation before deleting
-  5. Clean up worktree if applicable: Remove worktrees for merge and discard options — preserve them for PR and keep-as-is options
+  1. Run test suite: tests must pass b4 opts — if fail, report + pause
+  2. Detect base branch: check `main` vs `master`, confirm w/ user b4 proceed
+  3. Show four opts:
+  - Merge local into base
+  - Push + make PR
+  - Keep branch as-is
+  - Discard branch (need typed "discard" confirm)
+  4. Run chosen opt: merges → re-run tests after — PRs → use `gh pr create` + report URL — discard → wait explicit confirm b4 delete
+  5. Cleanup worktree if applicable: remove for merge + discard — keep for PR + keep-as-is
   </flow>
 
   <constraints>
-  - Do not proceed past step 1 with failing tests
-  - Do not skip typed confirmation for the discard option
-  - Do not force-push without an explicit user request
-  - Do not auto-merge a PR — the review process is separate
+  - No pass step 1 w/ failing tests
+  - No skip typed confirm on discard
+  - No force-push w/o explicit user ask
+  - No auto-merge PR — review separate
   </constraints>
 
   <gotchas>
-  - stash-check: Must check git stash state before deleting worktree. Notify user if stash entries exist
-  - base-branch: After auto-detecting main vs master, always confirm with user. Prevents merge into wrong base
+  - stash-check: check git stash state b4 deleting worktree. Tell user if stash entries exist
+  - base-branch: after auto-detect main vs master, always confirm w/ user. Stops merge into wrong base
   </gotchas>
 
   <bounds>
-    <does>execute chosen completion option, handle worktree cleanup, inform user of result.</does>
-    <never>proceed with failing tests, force-push without request, auto-merge PRs.</never>
+    <does>run chosen finish opt, handle worktree cleanup, tell user result.</does>
+    <never>proceed w/ failing tests, force-push w/o ask, auto-merge PRs.</never>
   </bounds>
 
   <handoff next="/sc:git"/>

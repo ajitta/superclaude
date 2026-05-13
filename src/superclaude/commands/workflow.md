@@ -1,10 +1,10 @@
 ---
-description: Generate structured implementation workflows from PRDs and feature requirements. Use when the user types `/sc:workflow` or hands over a PRD/feature doc and asks for a task breakdown to commit under docs/plans/. Do NOT auto-trigger on "what's the order of steps" or short ad-hoc task lists — those get an inline 2-3 step answer, not a workflow file.
+description: Generate structured implementation workflows from PRDs and feature requirements. Use when user types `/sc:workflow` or hands over PRD/feature doc and asks for task breakdown to commit under docs/plans/. Do NOT auto-trigger on "what's the order of steps" or short ad-hoc task lists — those get inline 2-3 step answer, not workflow file.
 ---
 <component name="workflow" type="command">
 
   <role command="/sc:workflow">
-    <mission>Generate structured implementation workflows from PRDs and feature requirements</mission>
+    <mission>Generate structured implementation workflows from PRDs + feature requirements</mission>
   </role>
 
   <syntax>/sc:workflow [prd-file|feature] [--strategy systematic|agile|enterprise] [--depth shallow|normal|deep] [--parallel]</syntax>
@@ -20,7 +20,7 @@ description: Generate structured implementation workflows from PRDs and feature 
   <outputs>
 | Artifact | Purpose |
 |---|---|
-| `docs/plans/<topic>-workflow-<username>-YYYY-MM-DD.md` | Implementation workflow document (with Status section) |
+| `docs/plans/<topic>-workflow-<username>-YYYY-MM-DD.md` | Implementation workflow doc (with Status section) |
 | TaskCreate/TaskUpdate items | Task tracking hierarchy |
   </outputs>
 
@@ -50,22 +50,22 @@ description: Generate structured implementation workflows from PRDs and feature 
 | `project-brief.md --depth normal` | Cross-session with Serena |
 
   <example name="workflow-no-prd" type="error-path">
-    - Input: /sc:workflow --strategy enterprise --parallel (with no PRD or feature doc)
-    - Why wrong: Workflow generation requires a PRD or feature document as input. No input means no tasks to generate.
-    - Correct: Create a PRD first: /sc:brainstorm → /sc:design → save to file → /sc:workflow PRD.md
+    - Input: /sc:workflow --strategy enterprise --parallel (no PRD or feature doc)
+    - Why wrong: Workflow generation needs PRD or feature doc as input. No input = no tasks to generate.
+    - Correct: Make PRD first: /sc:brainstorm → /sc:design → save to file → /sc:workflow PRD.md
   </example>
 
   </examples>
 
 
   <gotchas>
-  - scope-match: Workflow scope must match the PRD or feature request exactly
-  - step-granularity: Each workflow step should be independently verifiable
+  - scope-match: Workflow scope must match PRD or feature request exactly
+  - step-granularity: Each workflow step independently verifiable
   </gotchas>
 
   <bounds>
-    <does>comprehensive workflows, multi-agent+MCP, and cross-session management.</does>
-    <never>execute impl beyond planning, override dev process, and generate without analysis.</never>
+    <does>comprehensive workflows, multi-agent+MCP, cross-session management.</does>
+    <never>execute impl beyond planning, override dev process, generate without analysis.</never>
     <fallback>Ask user for guidance when uncertain.</fallback>
   </bounds>
 

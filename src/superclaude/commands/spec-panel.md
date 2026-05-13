@@ -1,20 +1,20 @@
 ---
-description: Multi-expert specification review and improvement using renowned software engineering experts. Use when the user types `/sc:spec-panel` or asks for a multi-expert panel critique (Fowler, Beck, Martin, etc.) of a software spec. Do NOT auto-trigger on a routine spec read or single-reviewer feedback — those get a direct review.
+description: Multi-expert spec review + improvement via renowned software engineering experts. Use when user types `/sc:spec-panel` or asks for multi-expert panel critique (Fowler, Beck, Martin, etc.) of software spec. Do NOT auto-trigger on routine spec read or single-reviewer feedback — those get direct review.
 ---
 <component name="spec-panel" type="command">
 
   <role command="/sc:spec-panel">
-    <mission>Multi-expert specification review and improvement using renowned software engineering experts</mission>
+    <mission>Multi-expert spec review + improvement via renowned software engineering experts</mission>
   </role>
 
   <syntax>/sc:spec-panel [spec|@file] [--mode discussion|critique|socratic] [--experts "name1,name2"] [--focus implementability|simplicity|reliability|testing|observability] [--iterations N]</syntax>
 
   <flow>
-  1. Analyze: Parse spec content
-  2. Assemble: Select relevant experts
-  3. Review: Multi-expert analysis
-  4. Collaborate: Expert dialogue
-  5. Synthesize: Improvement roadmap
+  1. Analyze: parse spec
+  2. Assemble: pick experts
+  3. Review: multi-expert analysis
+  4. Collaborate: expert dialogue
+  5. Synthesize: improvement roadmap
   </flow>
 
 
@@ -28,17 +28,17 @@ description: Multi-expert specification review and improvement using renowned so
   </experts>
 
   <modes>
-    - discussion: Sequential expert dialogue building insights
+    - discussion: sequential expert dialogue, builds insights
     - critique: Issue → Severity → Recommendation → Priority
-    - socratic: Deep questioning to surface assumptions
+    - socratic: deep questioning, surface assumptions
   </modes>
 
   <focus_areas>
     - implementability (Osmani,Beck): AI executability, modularity, testability
-    - simplicity (Hickey,Fowler): Essential vs accidental complexity, patterns
-    - reliability (Nygard,Majors): Failure modes, resilience, observability
-    - testing (Beck,Majors): Test strategy, verification, production validation
-    - observability (Majors,Nygard): Debugging, monitoring, incident response
+    - simplicity (Hickey,Fowler): essential vs accidental complexity, patterns
+    - reliability (Nygard,Majors): failure modes, resilience, observability
+    - testing (Beck,Majors): test strategy, verification, prod validation
+    - observability (Majors,Nygard): debugging, monitoring, incident response
   </focus_areas>
 
   <examples>
@@ -50,22 +50,22 @@ description: Multi-expert specification review and improvement using renowned so
 | `@system.yml --mode socratic --iterations 3` | Deep questioning |
 
   <example name="spec-no-document" type="error-path">
-    - Input: /sc:spec-panel --mode critique (with no spec document provided)
-    - Why wrong: Panel review requires a specification document to critique. No input means no structured review possible.
-    - Correct: Provide a spec: /sc:spec-panel @api-spec.yml --mode critique --focus implementability
+    - Input: /sc:spec-panel --mode critique (no spec doc)
+    - Why wrong: panel review needs spec doc to critique. No input = no structured review.
+    - Correct: provide spec: /sc:spec-panel @api-spec.yml --mode critique --focus implementability
   </example>
   </examples>
 
 
   <gotchas>
-  - existing-spec: Check if a spec already exists before starting review. Build on existing work
-  - necessity-test: Apply R18 to each proposed spec addition. Only spec what's needed
+  - existing-spec: check if spec exists before review. Build on existing work
+  - necessity-test: apply R18 to each proposed spec addition. Spec only what needed
   </gotchas>
 
   <bounds>
-    <does>expert-level review, actionable recs, and multi-mode analysis.</does>
-    <never>replace human judgment, modify without consent, and legal guarantees.</never>
-    <fallback>Ask user for guidance when uncertain.</fallback>
+    <does>expert-level review, actionable recs, multi-mode analysis.</does>
+    <never>replace human judgment, modify without consent, legal guarantees.</never>
+    <fallback>ask user for guidance when uncertain.</fallback>
   </bounds>
 
   <handoff next="/sc:design /sc:implement"/>

@@ -1,5 +1,5 @@
 ---
-description: Execute tests with coverage analysis and automated quality reporting. Use ONLY when the user explicitly types `/sc:test` — this runs the full test orchestration with coverage. Do NOT auto-trigger on "run the tests", "run pytest", or executing a single test file — invoke pytest/jest/etc. directly via Bash.
+description: Execute tests with coverage analysis and automated quality reporting. Use ONLY when user explicitly types `/sc:test` — runs full test orchestration with coverage. Do NOT auto-trigger on "run the tests", "run pytest", or executing single test file — invoke pytest/jest/etc. directly via Bash.
 ---
 <component name="test" type="command">
 
@@ -54,7 +54,7 @@ description: Execute tests with coverage analysis and automated quality reportin
 
   <example name="retry-without-diagnosis" type="error-path">
     - Input: /sc:test (after 3 test failures, re-running same tests hoping they pass)
-    - Why wrong: Retrying failing tests without investigating root cause is not productive.
+    - Why wrong: Retrying failing tests without root cause investigation unproductive.
     - Correct: Analyze failure output → /sc:troubleshoot --type bug → fix root cause → /sc:test
   </example>
 
@@ -62,13 +62,13 @@ description: Execute tests with coverage analysis and automated quality reportin
 
 
   <gotchas>
-  - baseline-first: Run existing tests and record baseline before making changes
+  - baseline-first: Run existing tests, record baseline before changes
   - uv-run: Use `uv run pytest` for this project, never `python -m pytest` or bare `pytest`
   </gotchas>
 
   <bounds>
-    <does>execute existing tests, coverage reports, and failure analysis.</does>
-    <never>generate test cases, modify framework config, and destructive changes.</never>
+    <does>execute existing tests, coverage reports, failure analysis.</does>
+    <never>generate test cases, modify framework config, destructive changes.</never>
     <fallback>Ask user for guidance when uncertain.</fallback>
   </bounds>
 

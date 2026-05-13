@@ -1,20 +1,20 @@
 ---
-description: Build, compile, and package projects with intelligent error handling and optimization. Use ONLY when the user explicitly types `/sc:build` — this orchestrates the project build pipeline with error analysis. Do NOT auto-trigger on running a single build command (npm run build, cargo build) — invoke that via Bash directly.
+description: Build, compile, package projects w/ smart err handling + optimize. Use ONLY when user type `/sc:build` — orchestrate build pipeline w/ err analysis. NO auto-trigger on single build cmd (npm run build, cargo build) — use Bash direct.
 ---
 <component name="build" type="command">
 
   <role command="/sc:build">
-    <mission>Build, compile, and package projects with intelligent error handling and optimization</mission>
+    <mission>Build, compile, package projects w/ smart err handling + optimize</mission>
   </role>
 
   <syntax>/sc:build [target] [--type dev|prod|test] [--clean] [--optimize] [--verbose]</syntax>
 
   <flow>
   1. Analyze: Structure, configs, deps
-  2. Validate: Environment + toolchain ready
-  3. Execute: Build + real-time monitoring
+  2. Validate: Env + toolchain ready
+  3. Execute: Build + real-time monitor
   4. Optimize: Artifacts + bundle size (if --optimize)
-  5. Package: Artifacts + generate report
+  5. Package: Artifacts + gen report
   </flow>
 
   <outputs note="Per --type flag">
@@ -27,17 +27,17 @@ description: Build, compile, and package projects with intelligent error handlin
 
 
   <tools>
-  - Bash: Build execution
+  - Bash: Build exec
   - Read: Config analysis
-  - Grep: Error parsing
-  - Glob: Artifact discovery
+  - Grep: Err parse
+  - Glob: Artifact discover
   - Write: Build reports
   </tools>
 
   <patterns>
-    - Environment: dev|prod|test → appropriate config
-    - Error: Build failures → diagnostic + resolution
-    - Optimize: Artifact analysis → size reduction
+    - Env: dev|prod|test → right config
+    - Err: Build fail → diagnostic + fix
+    - Optimize: Artifact analysis → size cut
   </patterns>
 
   <examples>
@@ -50,23 +50,23 @@ description: Build, compile, and package projects with intelligent error handlin
 | `--type dev --verbose` | Dev build + detailed output |
 
   <example name="build-failure-retry" type="error-path">
-    - Input: /sc:build --type prod (after build fails with missing dependency)
-    - Why wrong: Retrying the same build without fixing the root cause wastes tokens and time.
-    - Correct: Investigate error → fix dependency (npm install / uv add) → then /sc:build --type prod
+    - Input: /sc:build --type prod (after build fail w/ missing dep)
+    - Why wrong: Retry same build w/o fix root cause waste tokens + time.
+    - Correct: Investigate err → fix dep (npm install / uv add) → then /sc:build --type prod
   </example>
 
   </examples>
 
 
   <gotchas>
-  - make-deploy: SuperClaude uses `make deploy` for installation. Do not use npm/pip/yarn build
-  - uv-only: Use `uv` for all Python operations. Never use `pip` directly
+  - make-deploy: SuperClaude use `make deploy` for install. No use npm/pip/yarn build
+  - uv-only: Use `uv` for all Python ops. Never use `pip` direct
   </gotchas>
 
   <bounds>
-    <does>execute build, error analysis, and optimization recs.</does>
-    <never>modify build config, install deps, and deploy.</never>
-    <fallback>Ask user for guidance when uncertain.</fallback>
+    <does>exec build, err analysis, optimize recs.</does>
+    <never>modify build config, install deps, deploy.</never>
+    <fallback>Ask user for guidance when unsure.</fallback>
   </bounds>
 
   <handoff next="/sc:test /sc:troubleshoot"/>

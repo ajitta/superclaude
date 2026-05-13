@@ -1,11 +1,11 @@
 <component name="tavily" type="mcp">
   <role>
-    <mission>Web search and real-time information retrieval for research and current events</mission>
+    <mission>Web search + real-time info retrieval for research + current events</mission>
   </role>
 
   <choose>
-  <use>structured multi-source web search with advanced filtering (domain include/exclude, time and date ranges, raw-content depth) beyond what native `WebSearch` offers, comprehensive multi-source research investigations with synthesized output, and post-knowledge-cutoff current-info lookup.</use>
-  <never>questions answerable from training, single-page content extraction (use native `WebFetch`), and code generation or local file operations.</never>
+  <use>structured multi-source web search w/ advanced filter (domain include/exclude, time/date range, raw-content depth) beyond native `WebSearch`; multi-source research w/ synthesized output; post-knowledge-cutoff current-info lookup.</use>
+  <never>questions answerable from training; single-page extract (use native `WebFetch`); code gen or local file ops.</never>
   </choose>
 
   <search_patterns>
@@ -39,9 +39,9 @@
   </examples>
 
   <bounds>
-    <does>web search, multi-source synthesis, and current information retrieval.</does>
-    <never>code generation, local file operations, and training knowledge questions.</never>
-    <fallback>When the MCP server is unavailable, invoke the /tavily-cli skill for full CLI access — including tvly map (URL discovery) and tvly research (multi-source deep research) not available via MCP. Use native WebSearch for simple queries, WebFetch for single pages.</fallback>
+    <does>web search, multi-source synthesis, current info retrieval.</does>
+    <never>code gen, local file ops, training knowledge questions.</never>
+    <fallback>MCP server down → invoke /tavily-cli skill for full CLI access — includes tvly map (URL discovery) + tvly research (multi-source deep research) not in MCP. Native WebSearch for simple queries, WebFetch for single pages.</fallback>
   </bounds>
 
   <handoff next="/sc:research /sc:analyze"/>

@@ -4,16 +4,16 @@ description: Ultra-intelligent command recommendation engine for optimal SuperCl
 <component name="recommend" type="command">
 
   <role command="/sc:recommend">
-    <mission>Ultra-intelligent command recommendation engine for optimal SuperClaude command selection</mission>
+    <mission>Ultra-smart cmd rec engine for best SuperClaude cmd pick</mission>
   </role>
 
   <syntax>/sc:recommend [request] [--estimate] [--alternatives] [--expertise beginner|intermediate|expert]</syntax>
 
   <flow>
-  1. Analyze: User request + project context
-  2. Classify: Category + expertise level
-  3. Map: Keywords → commands + flags
-  4. Recommend: Workflow + MCP flags + agents
+  1. Analyze: user req + proj ctx
+  2. Classify: category + skill lvl
+  3. Map: keywords → cmds + flags
+  4. Rec: workflow + MCP flags + agents
   </flow>
 
   <keyword_map>
@@ -37,9 +37,9 @@ description: Ultra-intelligent command recommendation engine for optimal SuperCl
   </project_detect>
 
   <expertise_adapt>
-    - beginner: Simpler workflows, /sc:explain for concepts, --safe flags
-    - intermediate: Standard recommendations with MCP flags
-    - expert: Terse output, advanced flag combos, parallel workflows
+    - beginner: simpler workflows, /sc:explain for concepts, --safe flags
+    - intermediate: standard recs w/ MCP flags
+    - expert: terse output, advanced flag combos, parallel workflows
   </expertise_adapt>
 
   <examples>
@@ -52,14 +52,14 @@ description: Ultra-intelligent command recommendation engine for optimal SuperCl
 
 
   <gotchas>
-  - simplicity-bias: Recommend the simplest approach first. Complex multi-agent workflows only when justified
-  - flag-match: Match recommended flags to actual task needs, not maximum capability
+  - simplicity-bias: rec simplest first. complex multi-agent flows only when justified
+  - flag-match: match flags to task needs, not max capability
   </gotchas>
 
   <bounds>
-    <does>intelligent mapping, project context, and expertise adaptation.</does>
-    <never>execute commands and modify files.</never>
-    <fallback>Ask user to clarify when request is too ambiguous to map.</fallback>
+    <does>smart mapping, proj ctx, skill adapt.</does>
+    <never>exec cmds, modify files.</never>
+    <fallback>ask user clarify when req too ambiguous to map.</fallback>
   </bounds>
 
   <handoff next="/sc:analyze /sc:implement /sc:design /sc:troubleshoot"/>

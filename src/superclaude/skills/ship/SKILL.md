@@ -12,36 +12,36 @@ hooks:
 <component name="ship" type="skill">
 
   <role>
-    <mission>Automate the delivery workflow: stage → commit → push → PR with safety checks and conventional commits</mission>
+    <mission>Auto delivery flow: stage → commit → push → PR. Safety checks + conventional commits.</mission>
   </role>
 
-  When $ARGUMENTS is provided, ship changes related to that issue or context.
+  $ARGUMENTS given → ship changes tied to that issue/context.
 
   <syntax>/ship [--pr] [--title "..."] [--base branch] [--exclude pattern] [--dry-run]</syntax>
 
   <flow>
-  1. Status: Run `git status` + `git diff --stat` to assess changes
-  2. Validate: Check branch naming conventions (see references/conventions.md), warn on master/main
-  3. Stage: `git add` relevant files, respecting --exclude patterns and default exclusions
-  4. Commit: Generate conventional commit message from diff analysis, present for approval
+  1. Status: run `git status` + `git diff --stat`, assess changes
+  2. Validate: check branch naming (see references/conventions.md), warn if master/main
+  3. Stage: `git add` relevant files, honor --exclude + default excludes
+  4. Commit: build conventional commit msg from diff, show for approval
   5. Push: `git push -u origin <branch>` (confirm if first push to remote)
-  6. PR (if --pr): Create PR via `gh pr create` with summary from commits
+  6. PR (if --pr): `gh pr create`, summary from commits
   </flow>
 
   <references>
-  - `references/conventions.md` — branch naming, commit format, PR template, default exclusions. Read when detailed rules needed
+  - `references/conventions.md` — branch naming, commit format, PR template, default excludes. Read when need detail
   </references>
 
   <tools>
-  - Bash: git commands, gh CLI
-  - Grep: Scan for secrets in staged files
+  - Bash: git, gh CLI
+  - Grep: scan staged files for secrets
   </tools>
 
   <gotchas>
-  - force-push: --force detected by hook and physically blocked. Only regular push allowed
-  - secrets: .env, credentials.json are default exclusions but --include can bypass — warn required
-  - staged-scan: Scan staged files for API keys, tokens, passwords patterns before commit
-  - main-direct: When pushing directly to master/main, suggest creating feature branch first
+  - force-push: --force caught by hook, blocked hard. Regular push only
+  - secrets: .env, credentials.json excluded by default. --include bypasses → must warn
+  - staged-scan: scan staged files for API keys, tokens, passwords pre-commit
+  - main-direct: push direct to master/main → suggest feature branch first
   </gotchas>
 
   <examples>
@@ -55,8 +55,8 @@ hooks:
   </examples>
 
   <bounds>
-    <does>safe delivery automation, conventional commits, and PR creation.</does>
-    <never>force push, commit secrets, push to main without confirmation, and skip user approval.</never>
+    <does>safe delivery auto, conventional commits, PR creation.</does>
+    <never>force push, commit secrets, push main no confirm, skip user approval.</never>
   </bounds>
 
   <handoff next="/sc:test /sc:build"/>

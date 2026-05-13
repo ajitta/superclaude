@@ -1,20 +1,20 @@
 ---
-description: Systematically clean up code, remove dead code, and optimize project structure. Use ONLY when the user explicitly types `/sc:cleanup` — this performs systematic deletions and structural changes that need explicit authorization. Do NOT auto-trigger on "clean up this function", "remove this import", or any single-file tidying — those are direct edits.
+description: Clean code systematic, kill dead code, optimize project structure. Use ONLY when user type `/sc:cleanup` explicit — do systematic delete + structural change, need explicit OK. NO auto-trigger on "clean up this function", "remove this import", or any single-file tidy — those direct edit.
 ---
 <component name="cleanup" type="command">
 
   <role command="/sc:cleanup">
-    <mission>Systematically clean up code, remove dead code, and optimize project structure</mission>
+    <mission>Clean code systematic, kill dead code, optimize project structure</mission>
   </role>
 
   <syntax>/sc:cleanup [target] [--type code|imports|files|docs|all] [--safe|--aggressive] [--interactive] [--dry-run]</syntax>
 
   <flow>
-  1. Analyze: Cleanup opportunities + safety assessment
-  2. Plan: Choose approach + delegate to agents
-  3. Execute: Systematic cleanup per --type
-  4. Validate: Ensure no functionality loss (tests pass)
-  5. Report: Summary + maintenance recs
+  1. Analyze: cleanup chance + safety check
+  2. Plan: pick approach + delegate agent
+  3. Execute: systematic clean per --type
+  4. Validate: no function loss (tests pass)
+  5. Report: summary + maintain rec
   </flow>
 
   <outputs note="Per --type flag">
@@ -29,18 +29,18 @@ description: Systematically clean up code, remove dead code, and optimize projec
 
 
   <tools>
-  - Read/Grep/Glob: Analysis + pattern detection
-  - Edit: Safe modification
-  - TaskCreate/TaskUpdate: Progress tracking
-  - Task: Large-scale delegation
+  - Read/Grep/Glob: analyze + pattern detect
+  - Edit: safe modify
+  - TaskCreate/TaskUpdate: progress track
+  - Task: big-scale delegate
   </tools>
 
   <patterns>
-    - DeadCode: Usage analysis → safe removal
-    - Imports: Dependency analysis → optimization
-    - Structure: Architecture analysis → modular improvements
-    - Docs: Convention validation → rename + move (--dry-run supported)
-    - Safety: Pre/during/post checks
+    - DeadCode: usage analyze → safe remove
+    - Imports: dep analyze → optimize
+    - Structure: arch analyze → modular gain
+    - Docs: convention check → rename + move (--dry-run supported)
+    - Safety: pre/during/post check
   </patterns>
 
   <examples>
@@ -56,22 +56,22 @@ description: Systematically clean up code, remove dead code, and optimize projec
 
   <example name="aggressive-without-review" type="error-path">
     - Input: /sc:cleanup --type all --aggressive (on unfamiliar codebase)
-    - Why wrong: Aggressive cleanup without understanding the codebase risks removing code that appears unused but is dynamically referenced.
-    - Correct: /sc:cleanup --type all --preview first, review results, then /sc:cleanup --type all --safe
+    - Why wrong: aggressive clean w/o understand codebase risk kill code that look unused but dynamic referenced.
+    - Correct: /sc:cleanup --type all --preview first, review result, then /sc:cleanup --type all --safe
   </example>
 
   </examples>
 
 
   <gotchas>
-  - scope-check: Only clean up files in the requested scope. Do not touch adjacent directories
-  - verify-unused: Confirm files are truly unused (grep for references) before deleting
+  - scope-check: only clean files in asked scope. No touch adjacent dirs
+  - verify-unused: confirm files truly unused (grep for refs) before delete
   </gotchas>
 
   <bounds>
-    <does>systematic cleanup, safety validation, and intelligent algorithms.</does>
-    <never>remove without analysis, override exclusions, and compromise functionality.</never>
-    <fallback>Ask user for guidance when uncertain.</fallback>
+    <does>systematic clean, safety check, smart algo.</does>
+    <never>remove w/o analyze, override exclusion, break function.</never>
+    <fallback>Ask user guidance when unsure.</fallback>
   </bounds>
 
   <auto_fix_threshold>

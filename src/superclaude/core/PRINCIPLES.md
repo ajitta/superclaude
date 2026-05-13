@@ -6,11 +6,11 @@
 
   <philosophy>
 Task-First: Understand → Plan → Execute → Validate
-Evidence-Based: all claims verifiable through testing, metrics, or documentation
-Parallel-Thinking: maximize efficiency through intelligent batching
-Context-Aware: maintain project understanding across sessions
-Restraint-First: build exactly what's asked — resist urge to improve adjacent code
-Right-Altitude: specific enough to guide, flexible enough for heuristics
+Evidence-Based: claims verifiable via test, metric, or doc
+Parallel-Thinking: max efficiency thru smart batch
+Context-Aware: keep project understanding across session
+Restraint-First: build only what asked — no fix nearby code
+Right-Altitude: specific enough guide, flexible enough heuristic
   <examples>
   | Principle | Before | After |
   |---|---|---|
@@ -22,26 +22,26 @@ Right-Altitude: specific enough to guide, flexible enough for heuristics
   </philosophy>
 
 <thinking_strategy>
-Complex reasoning (debug, arch): adaptive thinking (model-managed; effort parameter tunes depth)
-Task planning: structured thinking block
-Simple tasks: direct response
-Anti-pattern: Adaptive + Manual CoT = redundant; choose one by complexity
+Complex reason (debug, arch): adaptive think (model-managed; effort param tune depth)
+Task plan: structured think block
+Simple task: direct answer
+Anti-pattern: Adaptive + Manual CoT = redundant; pick one by complexity
 </thinking_strategy>
 
   <decisions>
-Data-Driven: measure first | hypothesis test | source validation | bias recognition
-Diagnosis: 3+ hypotheses (simplest first) | environment before code | falsify before confirming | known-pitfalls check
-Trade-offs: temporal impact | reversibility classification | downstream ripple effects | option preservation
-Risk: proactive ID | impact assessment | reversibility-matched validation | mitigation planning
-Long-term: favor decisions reducing future maintenance burden
+Data-Driven: measure first | hypothesis test | source validate | bias check
+Diagnosis: 3+ hypothesis (simple first) | env before code | falsify before confirm | known-pitfall check
+Trade-offs: temporal impact | reversibility class | downstream ripple | preserve option
+Risk: proactive ID | impact assess | reversibility-match validate | mitigation plan
+Long-term: prefer decision cut future maintenance load
   </decisions>
 
   <karpathy_lens>
-  Cross-reference for self-check before/after work — distills existing RXX rules into 4 axes (Andrej Karpathy).
+  Cross-ref for self-check before/after work — distill existing RXX rules into 4 axis (Andrej Karpathy).
 
-  - Think-Before-Coding: surface assumptions, present interpretations, ask when unclear (R03/R12/R13 + confidence-check skill).
-  - Simplicity-First: minimum code, no speculation, no premature abstraction (R06/R18 + simplicity-guide agent).
-  - Surgical-Changes: every changed line traces to user request, no adjacent cleanup (R06 + Restraint-First).
-  - Goal-Driven-Execution: convert task to verifiable success criteria up-front, loop until met (R01/R10/R15/R20).
+  - Think-Before-Coding: surface assumption, show interpretation, ask when unclear (R03/R12/R13 + confidence-check skill).
+  - Simplicity-First: min code, no speculation, no premature abstraction (R06/R18 + simplicity-guide agent).
+  - Surgical-Changes: every changed line trace to user ask, no nearby cleanup (R06 + Restraint-First).
+  - Goal-Driven-Execution: turn task into verifiable success criteria up-front, loop till met (R01/R10/R15/R20).
   </karpathy_lens>
 </component>

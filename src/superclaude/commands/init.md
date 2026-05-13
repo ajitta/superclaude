@@ -1,21 +1,21 @@
 ---
-description: Interactive project environment setup — select and run initialization tasks for first-session onboarding. Use ONLY when the user explicitly types `/sc:init` — this presents an interactive task picker for first-time project setup. Do NOT auto-trigger on entering a new repo or "set this up".
+description: Interactive project env setup — pick + run init tasks for first-session onboarding. Use ONLY when user explicit type `/sc:init` — show interactive task picker for first-time project setup. NO auto-trigger on enter new repo or "set this up".
 ---
 <component name="init" type="command">
 
   <role command="/sc:init">
-    <mission>Interactive project environment setup with selectable initialization tasks for first-session onboarding</mission>
+    <mission>Interactive project env setup w/ selectable init tasks for first-session onboarding</mission>
   </role>
 
   <syntax>/sc:init [tasks] [--quick] [--full]</syntax>
 
   <flow>
-  1. Detect: Scan project root for language/framework indicators (pyproject.toml, package.json, Cargo.toml, go.mod)
-  2. Present: Show interactive task menu with descriptions, dependencies, and detected project context
-  3. Select: Accept user choice — individual tasks (a,b,c...), presets (--quick, --full), or custom combination
-  4. Validate: Check dependency graph, surface missing prerequisites, confirm execution plan
-  5. Execute: Run selected tasks in dependency-aware parallel batches with progress reporting
-  6. Report: Final summary table — task status, artifacts created, memory entries stored
+  1. Detect: scan project root for lang/framework markers (pyproject.toml, package.json, Cargo.toml, go.mod)
+  2. Present: show interactive task menu w/ descriptions, deps, detected project context
+  3. Select: take user choice — individual tasks (a,b,c...), presets (--quick, --full), or custom combo
+  4. Validate: check dep graph, surface missing prereqs, confirm exec plan
+  5. Execute: run picked tasks in dep-aware parallel batches w/ progress reporting
+  6. Report: final summary table — task status, artifacts made, memory entries stored
   </flow>
 
   <menu>
@@ -109,13 +109,13 @@ description: Interactive project environment setup — select and run initializa
 
   <gotchas>
   - check-existing: Verify files do not already exist before creating. Do not overwrite user configuration
-  - uv-not-pip: Use `uv` for Python operations in this project
+  - uv-not-pip: Use `uv` for Python ops in this project
   </gotchas>
 
   <bounds>
-    <does>interactive task menu, dependency-aware execution, parallel batching, idempotent setup, and safe environment init.</does>
-    <never>auto-execute without selection, overwrite existing files, install without confirmation, and skip dependency validation.</never>
-    <fallback>Ask user when project type undetectable or when existing config conflicts with proposed setup.</fallback>
+    <does>interactive task menu, dep-aware exec, parallel batching, idempotent setup, safe env init.</does>
+    <never>auto-exec w/o selection, overwrite existing files, install w/o confirm, skip dep validation.</never>
+    <fallback>Ask user when project type undetectable or existing config clash w/ proposed setup.</fallback>
   </bounds>
 
   <handoff next="/sc:load /sc:implement /sc:test"/>

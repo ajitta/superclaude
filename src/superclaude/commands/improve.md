@@ -1,5 +1,5 @@
 ---
-description: Apply systematic improvements to code quality, performance, and maintainability. Use when the user types `/sc:improve` or asks for a multi-file quality/perf/maintainability sweep with measurable targets. Do NOT auto-trigger on "improve this function", "rename this variable", or small single-file refactors — those are direct edits.
+description: Apply systematic improvements to code quality, performance, and maintainability. Use when user types `/sc:improve` or asks for multi-file quality/perf/maintainability sweep with measurable targets. Do NOT auto-trigger on "improve this function", "rename this variable", or small single-file refactors — those direct edits.
 ---
 <component name="improve" type="command">
 
@@ -10,11 +10,11 @@ description: Apply systematic improvements to code quality, performance, and mai
   <syntax>/sc:improve [target] [--type quality|performance|maintainability|style] [--safe] [--interactive]</syntax>
 
   <flow>
-  1. Analyze: Identify improvement opportunities
-  2. Plan: Select approach + delegate to relevant agent
-  3. Execute: Apply improvements following best practices
-  4. Validate: Ensure functionality preserved
-  5. Document: Summary + future recommendations
+  1. Analyze: ID improvement opportunities
+  2. Plan: Pick approach + delegate to relevant agent
+  3. Execute: Apply improvements per best practices
+  4. Validate: Functionality preserved
+  5. Document: Summary + future recs
   </flow>
 
 
@@ -22,7 +22,7 @@ description: Apply systematic improvements to code quality, performance, and mai
     - Quality: tech debt ID → refactoring → validation
     - Performance: profiling → bottleneck ID → optimization
     - Maintainability: complexity reduction → structure → docs
-    - Security: vulnerability scan → pattern application → validation
+    - Security: vuln scan → pattern application → validation
   </patterns>
 
   <examples>
@@ -35,8 +35,8 @@ description: Apply systematic improvements to code quality, performance, and mai
 
 
   <gotchas>
-  - necessity-test: Apply R18 before proposing improvements. "safer/better" alone is insufficient justification
-  - halo-improvement: When improving target A, do not also rewrite adjacent function B because it "looks worse by comparison". Each improvement must be the user's explicit target, not bundled cleanup of nearby code that suddenly looks dated next to the improved code.
+  - necessity-test: Apply R18 before proposing improvements. "safer/better" alone insufficient justification
+  - halo-improvement: When improving target A, do not also rewrite adjacent function B because it "looks worse by comparison". Each improvement must be user's explicit target, not bundled cleanup of nearby code that suddenly looks dated next to improved code.
   </gotchas>
 
   <bounds>

@@ -1,10 +1,10 @@
 ---
-description: Provide development estimates for tasks, features, or projects with intelligent analysis. Use when the user types `/sc:estimate` or asks for a structured estimate (effort, risks, dependencies) for a feature, PRD, or multi-task project. Do NOT auto-trigger on "is this hard?", "how complex is this function?", or quick gut-check questions — those get a one-line answer.
+description: Give dev estimates for tasks/features/projects w/ smart analysis. Use when user type `/sc:estimate` or ask structured estimate (effort, risks, deps) for feature, PRD, or multi-task project. NOT auto-trigger on "is this hard?", "how complex is this function?", or quick gut-check — those get one-line answer.
 ---
 <component name="estimate" type="command">
 
   <role command="/sc:estimate">
-    <mission>Provide development estimates for tasks, features, or projects with intelligent analysis</mission>
+    <mission>Give dev estimates for tasks/features/projects w/ smart analysis</mission>
   </role>
 
   <syntax>/sc:estimate [target] [--type time|effort|complexity] [--unit hours|days|weeks] [--breakdown]</syntax>
@@ -42,20 +42,20 @@ description: Provide development estimates for tasks, features, or projects with
 
   <example name="estimate-no-scope" type="error-path">
     - Input: /sc:estimate 'make it better' --type time
-    - Why wrong: No measurable scope. 'make it better' could mean anything from a typo fix to a full rewrite.
+    - Why wrong: No measurable scope. 'make it better' span typo fix to full rewrite.
     - Correct: Define scope first: /sc:estimate 'refactor auth module to use JWT' --type time --breakdown
   </example>
 
   </examples>
 
   <gotchas>
-  - no-time-estimates: Never give time estimates in hours/days. Focus on complexity, dependencies, and risks
-  - scope-assumptions: Make scope assumptions explicit before estimating
+  - no-time-estimates: Never give time estimates in hours/days. Focus complexity, deps, risks
+  - scope-assumptions: Make scope assumptions explicit before estimate
   </gotchas>
 
   <bounds>
-    <does>systematic estimates, confidence intervals, and multi-agent analysis.</does>
-    <never>guarantee accuracy, estimate without analysis, and override benchmarks.</never>
+    <does>systematic estimates, confidence intervals, multi-agent analysis.</does>
+    <never>guarantee accuracy, estimate w/o analysis, override benchmarks.</never>
     <fallback>Ask user for guidance when uncertain.</fallback>
   </bounds>
 

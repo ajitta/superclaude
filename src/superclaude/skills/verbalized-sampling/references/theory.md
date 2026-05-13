@@ -3,53 +3,37 @@
 ## Typicality Bias
 
 ### What It Is
-When human annotators rate LLM responses during RLHF, they systematically prefer text that
-is familiar, easy to read, and predictable. This is a well-established cognitive psychology
-finding — people gravitate toward "typical" exemplars of categories.
+Human raters in RLHF prefer familiar, easy-read, predictable text. Well-known cog-psych finding — people pick "typical" exemplars.
 
 ### How It Causes Mode Collapse
-The typicality bias in preference data trains the reward model to assign higher scores to
-conventional responses. The LLM then optimizes for this reward, compressing its output
-distribution toward a narrow set of "safe" responses. The diverse knowledge from pretraining
-still exists in the weights — it's just suppressed by the alignment layer.
+Biased preferences train reward model to score conventional responses higher. LLM optimizes, squashes output distribution to narrow "safe" set. Pretraining diversity still in weights — alignment layer suppress it.
 
 ### Empirical Verification
-Zhang et al. analyzed 6,874 response pairs from the HelpSteer dataset. They found that
-human raters consistently preferred the responses that the base model ranked as most likely,
-regardless of whether those were actually higher quality.
+Zhang et al. checked 6,874 HelpSteer response pairs. Raters consistently picked responses base model ranked most likely — quality irrelevant.
 
 ### Key Implication
-Mode collapse is a DATA problem (biased preferences), not purely an algorithmic problem
-(RLHF mechanics). This means it can be addressed at inference time by changing prompt
-semantics, without retraining.
+Mode collapse = DATA problem (biased prefs), not pure algorithm problem (RLHF mechanics). Fix at inference via prompt semantics — no retrain needed.
 
 ---
 
 ## Why Distribution-Level Prompts Work
 
 ### The Mode-Shifting Mechanism
-Different prompts collapse to different modes. For an instance-level prompt ("tell me a joke"),
-the mode is the single most typical response. For a distribution-level prompt ("generate 5
-jokes with their probabilities"), the mode is a DISTRIBUTION that approximates what the model
-learned in pretraining.
+Different prompts → different modes. Instance prompt ("tell me a joke") → mode = single most typical response. Distribution prompt ("generate 5 jokes with probabilities") → mode = DISTRIBUTION approximating pretraining.
 
 ### Formal Intuition
-When you ask for a single response: the model outputs argmax of its compressed post-RLHF
-distribution — mode collapse.
+Ask single response → model outputs argmax of compressed post-RLHF distribution → mode collapse.
 
-When you ask for a distribution of responses with probabilities: the model needs to represent
-MULTIPLE modes simultaneously — accesses the broader pretraining distribution.
+Ask distribution with probabilities → model represent MULTIPLE modes at once → access broader pretraining distribution.
 
 ### Evidence
-On the US states enumeration task, VS with Claude produced a distribution with
-KL divergence of only 0.12 from the pretraining corpus (RedPajama) distribution. Direct
-prompting collapsed into repeatedly outputting California and Texas.
+US states enum task: VS with Claude gave distribution with KL divergence 0.12 from RedPajama pretraining. Direct prompting collapsed to California and Texas only.
 
 ---
 
 ## Prompt Format Ablation Results
 
-The paper tested different ways to request the distribution:
+Paper tested formats for requesting distribution:
 
 | Format | What You Ask For | Best For |
 |--------|-----------------|----------|
@@ -57,37 +41,30 @@ The paper tested different ways to request the distribution:
 | "confidence" | Confidence level | VS-Multi |
 | "percentage" | Percentage values | Works, slightly worse |
 
-**Finding**: All formats improve diversity over direct prompting. "Probability" performs
-best for single-call variants. "Confidence" performs best for multi-turn variants.
+**Finding**: All formats beat direct prompting on diversity. "Probability" wins single-call. "Confidence" wins multi-turn.
 
 ### Number of Candidates (k)
-- k=3: Minimum useful diversity. Good for quick queries.
-- k=5: Optimal quality-diversity tradeoff. Paper default.
-- k=7: More diversity but quality starts to degrade.
-- k>7: Diminishing returns, noticeable quality degradation.
+- k=3: Min useful diversity. Good for quick queries.
+- k=5: Best quality-diversity tradeoff. Paper default.
+- k=7: More diversity, quality drops.
+- k>7: Diminishing returns, noticeable quality drop.
 
 ---
 
 ## Combining VS with Other Techniques
 
 ### Temperature
-VS and temperature are orthogonal — they improve diversity through different mechanisms.
-VS changes WHAT the model generates (distribution-level semantics). Temperature changes
-HOW it generates (softmax scaling). Combining them yields further improvements.
+VS and temperature orthogonal — different mechanisms. VS changes WHAT model generates (distribution semantics). Temperature changes HOW (softmax scaling). Combine = more gains.
 
 ### Chain-of-Thought
-VS-CoT explicitly adds reasoning before generation. This pushes the Pareto front — achieving
-the highest diversity while maintaining the highest quality simultaneously. This is the
-recommended variant for any task where reasoning quality matters.
+VS-CoT adds reasoning before generation. Pushes Pareto front — top diversity AND top quality together. Recommended when reasoning quality matters.
 
 ### Multi-Turn
-VS-Multi accumulates diversity across multiple conversation turns. Each turn is instructed
-to generate responses DIFFERENT from previous turns. This achieves the highest absolute
-diversity but at higher token cost.
+VS-Multi stacks diversity across turns. Each turn told to differ from prior turns. Highest absolute diversity, higher token cost.
 
 ### Key Results
-- 1.6-2.1x diversity improvement in creative writing
-- 25.7% improvement in human evaluation
+- 1.6-2.1x diversity gain in creative writing
+- 25.7% gain in human eval
 - 66.8% recovery of base model diversity
-- Larger models benefit more
+- Bigger models benefit more
 - Safety and accuracy preserved

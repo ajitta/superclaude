@@ -1,5 +1,5 @@
 ---
-description: Generate comprehensive project documentation and knowledge base with intelligent organization. Use ONLY when the user explicitly types `/sc:index` — this generates a multi-file project knowledge base under docs/reports/. Do NOT auto-trigger on "document this" or single-file documentation requests — use /sc:document or direct edits instead.
+description: Generate comprehensive project documentation and knowledge base with intelligent organization. Use ONLY when user explicitly types `/sc:index` — generates multi-file project knowledge base under docs/reports/. Do NOT auto-trigger on "document this" or single-file documentation requests — use /sc:document or direct edits instead.
 ---
 <component name="index" type="command">
 
@@ -55,8 +55,8 @@ description: Generate comprehensive project documentation and knowledge base wit
 | `. --type docs` | Knowledge base creation |
 
   <example name="index-huge-monorepo" type="error-path">
-    - Input: /sc:index . --type structure (in a 10,000+ file monorepo)
-    - Why wrong: Indexing an entire large monorepo in one pass exhausts context. Index specific packages instead.
+    - Input: /sc:index . --type structure (in 10,000+ file monorepo)
+    - Why wrong: Indexing entire large monorepo in one pass exhausts context. Index specific packages instead.
     - Correct: /sc:index packages/auth --type structure or /sc:index-repo for token-efficient full indexing
   </example>
 
@@ -69,8 +69,8 @@ description: Generate comprehensive project documentation and knowledge base wit
   </gotchas>
 
   <bounds>
-    <does>comprehensive docs, multi-agent, and framework patterns.</does>
-    <never>override manual docs, generate without analysis, and bypass standards.</never>
+    <does>comprehensive docs, multi-agent, framework patterns.</does>
+    <never>override manual docs, generate without analysis, bypass standards.</never>
     <fallback>Ask user for guidance when uncertain.</fallback>
   </bounds>
 

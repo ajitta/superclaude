@@ -1,36 +1,36 @@
 ---
-description: Feature and code implementation with intelligent agent delegation and MCP integration. Use ONLY when the user explicitly types `/sc:implement` — this runs a multi-step implementation flow with sub-agent delegation. Do NOT auto-trigger on routine "add this function", "fix this bug", or single-file edits — those should be handled directly without the implement orchestration.
+description: Feature + code impl w/ smart agent delegate + MCP. Use ONLY when user explicit type `/sc:implement` — run multi-step impl flow w/ sub-agent delegate. NO auto-trigger on routine "add func", "fix bug", or single-file edit — handle direct w/o implement orchestrate.
 ---
 <component name="implement" type="command">
 
   <role command="/sc:implement">
-    <mission>Feature and code implementation with intelligent agent delegation and MCP integration</mission>
+    <mission>Feature + code impl w/ smart agent delegate + MCP integration</mission>
   </role>
 
   <syntax>/sc:implement [feature] [--plan docs/plans/...] [--type component|api|service|feature] [--framework react|vue|express] [--safe] [--with-tests]</syntax>
 
   <flow>
-  1. Load: If --plan provided, read plan document and extract tasks; otherwise analyze requirements + tech context
-  2. Plan: Approach + delegate to agents; verify simplest viable approach before building; for plan mode, follow task order exactly
-  3. Checkpoint: If changes affect >3 files → present numbered plan → wait for user approval before editing
-  4. Execute: Code + framework best practices; for plan mode, mark tasks complete as you go
-  5. Phase Gate: After each phase/task group — build + run, then: "Does this already solve the next phase's problem?" If yes, skip with reason
-  6. Validate: Security + quality checks; run verification command per task
-  7. Integrate: Docs + testing recs; report any blockers encountered
+  1. Load: If --plan given, read plan doc + extract tasks; else analyze reqs + tech context
+  2. Plan: Approach + delegate to agents; verify simplest viable approach pre-build; for plan mode, follow task order exact
+  3. Checkpoint: If changes hit >3 files → show numbered plan → wait user approval pre-edit
+  4. Execute: Code + framework best practices; for plan mode, mark tasks done as go
+  5. Phase Gate: After each phase/task group — build + run, then: "Does this already solve the next phase's problem?" If yes, skip w/ reason
+  6. Validate: Security + quality checks; run verify cmd per task
+  7. Integrate: Docs + test recs; report any blockers hit
   </flow>
 
   <tools>
-  - Write/Edit: Code generation
+  - Write/Edit: Code gen
   - Read/Grep/Glob: Project analysis
   - TaskCreate/TaskUpdate: Multi-file progress
-  - Agent: Large-scale delegation
+  - Agent: Large-scale delegate
   </tools>
 
   <patterns>
-    - Context: Framework detect → agent + MCP activation
-    - Flow: Requirements → code → validation → integration
-    - Multi-Agent: frontend + backend + security → comprehensive solutions
-    - Quality: Impl → testing → docs → validation
+    - Context: Framework detect → agent + MCP activate
+    - Flow: Reqs → code → validate → integrate
+    - Multi-Agent: frontend + backend + security → full solutions
+    - Quality: Impl → test → docs → validate
   </patterns>
 
   <examples>
@@ -42,22 +42,22 @@ description: Feature and code implementation with intelligent agent delegation a
 | `dashboard widget --framework vue` | C7 Vue patterns |
   <example name="scope-creep" type="error-path">
     - Input: /sc:implement 'add logout button' (agent also refactors auth module and adds session management)
-    - Why wrong: Implementation exceeded requested scope. "Add logout button" does not authorize refactoring adjacent code.
-    - Correct: Implement only the logout button. Suggest separate tasks for auth refactor and session management.
+    - Why wrong: Impl past requested scope. "Add logout button" no authorize refactor adjacent code.
+    - Correct: Impl only logout button. Suggest separate tasks for auth refactor + session mgmt.
   </example>
 
   </examples>
 
 
   <gotchas>
-  - status-check: Run R02 status check before implementing. Grep for existing functionality first
-  - scope-discipline: Build only what was asked. Zero unsolicited files, zero adjacent refactors
+  - status-check: Run R02 status check pre-impl. Grep for existing func first
+  - scope-discipline: Build only what asked. Zero unsolicited files, zero adjacent refactors
   </gotchas>
 
   <bounds>
-    <does>intelligent impl, framework best practices, and comprehensive testing.</does>
-    <never>arch decisions without consultation, conflict with security, and override safety.</never>
-    <fallback>Ask user for guidance when uncertain.</fallback>
+    <does>smart impl, framework best practices, + full testing.</does>
+    <never>arch decisions w/o consult, conflict w/ security, + override safety.</never>
+    <fallback>Ask user guidance when unsure.</fallback>
   </bounds>
 
   <handoff next="/sc:test /sc:build"/>

@@ -1,15 +1,15 @@
 <component name="chrome-devtools" type="mcp">
   <role>
-    <mission>Browser debugging, performance analysis, accessibility auditing, and memory profiling via Chrome DevTools Protocol</mission>
+    <mission>Browser debug, perf analysis, a11y audit, mem profiling via Chrome DevTools Protocol</mission>
   </role>
 
   <choose>
-  <use>Core Web Vitals measurement (CLS, LCP, INP, TTFB) via traces, Lighthouse audits across performance / accessibility / SEO / best-practices, heap-snapshot memory analysis with leak detection and GC-pressure inspection, automated WCAG accessibility checks on live pages, network request-timing and bundle-size and cache-behavior inspection, and `pageId`-routed multi-agent workflows on different pages.</use>
-  <never>live browser interaction or E2E user-journey scripting (use Playwright via `--play`), static code analysis (use native Claude for code-level review), and server-side backend profiling (use native tools — `perf`, flamegraph).</never>
+  <use>Core Web Vitals measure (CLS, LCP, INP, TTFB) via traces, Lighthouse audits over perf / a11y / SEO / best-practices, heap-snapshot mem analysis w/ leak detect + GC-pressure check, auto WCAG a11y checks on live pages, network req-timing + bundle-size + cache-behavior inspect, and `pageId`-routed multi-agent flows on diff pages.</use>
+  <never>live browser interact or E2E user-journey scripts (use Playwright via `--play`), static code analysis (use native Claude for code review), and server-side backend profile (use native tools — `perf`, flamegraph).</never>
   </choose>
 
   <key_flags>
-  - `--slim` — maximum token savings (reduces response verbosity).
+  - `--slim` — max token save (cut response verbosity).
   - `--auto-connect` — reuse existing Chrome session.
   - `--persistent` — persistent browser profile.
   - `--read-only` — disable all mutation tools.
@@ -30,7 +30,7 @@
   - Performance-Audit: DevTools:trace → `lighthouse_audit` → Sequential:analyze → `/sc:improve`.
   - Frontend-Verify (`--frontend-verify`): Playwright:interact + DevTools:profile + Serena:code-review.
   - A11y-Audit: DevTools:accessibility-skill → snapshot → `/sc:analyze --focus a11y`.
-  - Memory-Leak: DevTools:`take_memory_snapshot` → compare snapshots → identify retained objects.
+  - Memory-Leak: DevTools:`take_memory_snapshot` → compare snapshots → find retained objects.
   </integration_patterns>
 
   <examples>
@@ -44,8 +44,8 @@
   </examples>
 
   <bounds>
-    <does>performance profiling, Lighthouse audits, Core Web Vitals, memory analysis, accessibility auditing, network inspection, and multi-agent pageId routing.</does>
-    <never>live browser interaction, E2E testing, static code analysis, and backend profiling.</never>
+    <does>perf profile, Lighthouse audits, Core Web Vitals, mem analysis, a11y audit, network inspect, and multi-agent pageId routing.</does>
+    <never>live browser interact, E2E test, static code analysis, and backend profile.</never>
     <fallback>Use Playwright for E2E, native Claude for code review.</fallback>
   </bounds>
 

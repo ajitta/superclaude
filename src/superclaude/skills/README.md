@@ -1,15 +1,15 @@
 # SuperClaude Skills
 
-CC-native containers for hooks, safety, script execution, and auto-invocation reference knowledge.
+CC-native containers for hooks, safety, script exec, and auto-invoke ref knowledge.
 
 ## When to Use Skills (vs Commands/Agents)
 
 | Need | Content Type | Why |
 |------|-------------|-----|
-| Lifecycle hooks (PreToolUse, Stop) | **Skill** | Only skills can attach runtime hooks |
-| Block auto-invocation | **Skill** | Only skills have `disable-model-invocation` |
+| Lifecycle hooks (PreToolUse, Stop) | **Skill** | Only skills attach runtime hooks |
+| Block auto-invocation | **Skill** | Only skills got `disable-model-invocation` |
 | Tool restriction (allowed-tools) | **Skill** | Only skills whitelist tools at runtime |
-| Script execution | **Skill** | Only skills have `{{SKILLS_PATH}}` resolution |
+| Script execution | **Skill** | Only skills got `{{SKILLS_PATH}}` resolution |
 | Auto-trigger reference knowledge | **Skill** | CC matches skill descriptions to auto-load domain protocols |
 | Workflow procedures | **Command** | Commands define WHAT TO DO |
 | Domain expertise | **Agent** | Agents define WHO TO BE |
@@ -20,19 +20,19 @@ CC-native containers for hooks, safety, script execution, and auto-invocation re
 ### Hook Skills
 | Skill | CC-Native Feature | Purpose |
 |-------|-------------------|---------|
-| `confidence-check` | PreToolUse hook | Injects evidence-focus guidance on WebFetch/WebSearch |
-| `simplicity-coach` | Stop hook + scripts | Runs dependency audit at session end |
+| `confidence-check` | PreToolUse hook | Inject evidence-focus guidance on WebFetch/WebSearch |
+| `simplicity-coach` | Stop hook + scripts | Run dependency audit at session end |
 
 ### Safety Skills
 | Skill | CC-Native Feature | Purpose |
 |-------|-------------------|---------|
-| `ship` | disable-model-invocation | Protects destructive delivery workflow from auto-execution |
-| `finishing-a-development-branch` | disable-model-invocation + allowed-tools | Protects branch completion; restricts to Bash, Read, Grep, Glob |
+| `ship` | disable-model-invocation | Protect destructive delivery workflow from auto-exec |
+| `finishing-a-development-branch` | disable-model-invocation + allowed-tools | Protect branch completion; restrict to Bash, Read, Grep, Glob |
 
 ### Reference Skills
 | Skill | CC-Native Feature | Purpose |
 |-------|-------------------|---------|
-| `verbalized-sampling` | Reference skill (auto-invocation) | Research-backed diverse response generation via distribution-level prompting |
+| `verbalized-sampling` | Reference skill (auto-invocation) | Research-backed diverse response gen via distribution-level prompting |
 
 ## Skill Directory Structure
 
@@ -48,28 +48,28 @@ CC-native containers for hooks, safety, script execution, and auto-invocation re
 
 | Field | Purpose | Example |
 |-------|---------|---------|
-| `description` | Auto-invocation trigger (critical) | Task keywords for detection |
+| `description` | Auto-invoke trigger (critical) | Task keywords for detection |
 | `allowed-tools` | Tool whitelist | `Read, Grep, Glob` |
-| `disable-model-invocation` | Block Claude auto-execution | `true` for destructive workflows |
+| `disable-model-invocation` | Block Claude auto-exec | `true` for destructive workflows |
 | `hooks` | Lifecycle hooks | `PreToolUse`, `Stop` |
 
 ## Skill Discovery
 
-Skills are discovered from (in order):
+Skills found from (in order):
 1. `~/.claude/skills/` — user-level
 2. `.claude/skills/` — project-level
-3. Nested `.claude/skills/` directories (v2.1.6+)
+3. Nested `.claude/skills/` dirs (v2.1.6+)
 
-Skills created or modified are immediately available without restarting (hot reload).
+Skills made or changed available immediately, no restart (hot reload).
 
 ## Authoring Guide
 
-See `.claude/rules/skill-authoring.md` for the complete authoring specification.
+See `.claude/rules/skill-authoring.md` for full authoring spec.
 
-**Key rule:** Create a skill when you need a CC-native capability (hooks, safety, scripts) or auto-invocation reference knowledge (CC description matching). Workflow procedures belong in `commands/`. Domain expertise belongs in `agents/`.
+**Key rule:** Make skill when need CC-native capability (hooks, safety, scripts) or auto-invoke ref knowledge (CC description matching). Workflow procedures go in `commands/`. Domain expertise go in `agents/`.
 
 ## Related
 
 - `commands/` — Workflow entry points (most former skills now live here)
 - `agents/` — Domain expert agents
-- `hooks/` — Hook system that skills integrate with
+- `hooks/` — Hook system skills integrate with
