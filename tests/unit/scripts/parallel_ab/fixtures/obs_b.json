@@ -1,0 +1,16 @@
+{
+  "variant_id": "B",
+  "exit_status": "ok",
+  "tool_calls": [{"name": "Grep", "count": 5}, {"name": "Read", "count": 1}],
+  "files_touched": [],
+  "clarifying_questions": 1,
+  "tokens": {"input": 1500, "output": 3500},
+  "wall_seconds": 18.4,
+  "final_output_sha256": "bbb222dddeee",
+  "axes": {
+    "think_before": "assumption implicit",
+    "simplicity": "k=5 perspectives",
+    "surgical": "no edits",
+    "goal_driven": "criterion implicit"
+  }
+}
