@@ -1,0 +1,10 @@
+scenario:
+  input: "/sc:brainstorm test"
+  baseline_skill: brainstorm
+variants:
+  - id: A
+    flag: ""
+    extra_args: ""
+runner:
+  cli: "claude -p"
+  model: "claude-haiku-4-5"
