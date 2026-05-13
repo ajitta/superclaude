@@ -4,17 +4,17 @@ paths: ["src/superclaude/modes/**", ".claude/rules/mode-authoring.md"]
 
 # Mode Authoring Rules
 
-> **Decision gate:** Create a mode only for **cognitive posture** — how Claude thinks, communicates, and prioritizes.
+> **Decision gate:** Create mode only for **cognitive posture** — how Claude thinks, communicates, prioritizes.
 > - Mode = **HOW TO THINK** (mindset)
 > - Command = **WHAT TO DO** (workflow)
 > - Agent = **WHO TO BE** (domain expertise)
 > - Skill = **WHICH CAPABILITY** (CC-native tool/hook)
 
-Mindset-shifting overlay, not a procedure. Injected on-demand by `context_loader.py` TRIGGER_MAP.
+Mindset-shifting overlay, not procedure. Injected on-demand by `context_loader.py` TRIGGER_MAP.
 
 ## No Frontmatter
 
-Modes are not CC-native content — no YAML frontmatter. Start directly with `<component>`.
+Modes not CC-native — no YAML frontmatter. Start directly with `<component>`.
 
 ```markdown
 <!-- WRONG -->
@@ -86,7 +86,7 @@ Every mode **must** define all four axes (per `.claude/rules/xml-prose-format.md
 
 ## Content Boundaries
 
-**Allowed** (if essential to the mindset):
+**Allowed** (if essential to mindset):
 - Symbol tables (Token Efficiency mode)
 - Expert framework mappings (Business Panel mode)
 - Abbreviation maps
@@ -100,24 +100,24 @@ Every mode **must** define all four axes (per `.claude/rules/xml-prose-format.md
 
 ## Supporting Config Files
 
-Operational parameters too detailed for the mode itself go in sibling `type="config"` files (e.g., `RESEARCH_CONFIG.md` — depth profiles, confidence thresholds). Not subject to mode validation (no 4-axis requirement), validated by `test_content_structure.py`.
+Operational parameters too detailed for mode itself go in sibling `type="config"` files (e.g., `RESEARCH_CONFIG.md` — depth profiles, confidence thresholds). Not subject to mode validation (no 4-axis requirement), validated by `test_content_structure.py`.
 
 ## Inherited from xml-prose-format.md
 
-The following rules apply to all components and are not restated above. See `.claude/rules/xml-prose-format.md` for full text.
+Rules apply to all components, not restated above. See `.claude/rules/xml-prose-format.md` for full text.
 
 - **Single root XML wrapper** — exactly one root tag per component body; sibling sections only at root level.
 - **Long-form embedded enumerations** — lists embedded in running prose use natural-language enumeration ("things include x, y, z"), not bullets.
 - **Quoting conventions** — URLs and model identifier strings in single quotes (`'https://…'`, `'claude-opus-4-7'`); UI / product / feature names in double quotes (`"settings"`); runtime variables in double curly braces (`{{currentDateTime}}`).
-- **Cross-references** — point to other sections by plain English topic, not by tag path.
-- **Markdown headers inside `<example>`** — permitted when the illustration mirrors a real markdown artifact (report template, commit message, user document); the body-prose "no markdown headers" rule does not extend into `<example>` bodies.
-- **Size target** — mode body ≤300 lines (hard ceiling 500); extract overflow into a referenced sibling file rather than inline-bloating the body.
+- **Cross-references** — point to other sections by plain English topic, not tag path.
+- **Markdown headers inside `<example>`** — permitted when illustration mirrors real markdown artifact (report template, commit message, user document); body-prose "no markdown headers" rule does not extend into `<example>` bodies.
+- **Size target** — mode body ≤300 lines (hard ceiling 500); extract overflow into referenced sibling file rather than inline-bloating body.
 
 ## Checklist
 
 1. Create `src/superclaude/modes/MODE_PascalCase.md` starting with `<component>`
 2. Define all 4 axes: thinking, communication, priorities, behaviors
-3. Add `<bounds>` sub-tag form `<does>` / `<never>` / `<fallback>` (each tag's body is a prose sentence; `<does>` + `<never>` required; `<fallback>` recommended for modes — explicit recovery when overlay doesn't apply) and `<handoff>`
+3. Add `<bounds>` sub-tag form `<does>` / `<never>` / `<fallback>` (each tag's body is prose sentence; `<does>` + `<never>` required; `<fallback>` recommended for modes — explicit recovery when overlay doesn't apply) and `<handoff>`
 4. Add trigger to `scripts/context_loader.py` TRIGGER_MAP
 5. Add flag to `core/FLAGS.md` modes section
 6. Run `uv run pytest tests/unit/test_mode_structure.py -v`

@@ -4,11 +4,11 @@ paths: ["src/superclaude/mcp/**", ".claude/rules/mcp-authoring.md"]
 
 # MCP Authoring Rules
 
-> **Decision gate:** Create an `MCP_*.md` for **SuperClaude workflow guidance** layered on top of an MCP server.
-> - MCP doc = **WHEN/HOW to combine** with `/sc:*` commands and other servers (workflow patterns, decision tables)
-> - NOT a tool catalog — CC's native MCP server description and `ToolSearch` already expose every tool, its parameters, and a usage hint.
+> **Decision gate:** Make `MCP_*.md` for **SuperClaude workflow guidance** layered on top of MCP server.
+> - MCP doc = **WHEN/HOW to combine** with `/sc:*` commands + other servers (workflow patterns, decision tables)
+> - NOT tool catalog — CC native MCP server description + `ToolSearch` already expose every tool, params, usage hint.
 >
-> If the only content you want to write is "this server has tools X/Y/Z that do A/B/C", do not create the file. CC already has it.
+> If only content be "this server has tools X/Y/Z that do A/B/C", no make file. CC have it already.
 
 | Component | Role |
 |-----------|------|
@@ -16,17 +16,17 @@ paths: ["src/superclaude/mcp/**", ".claude/rules/mcp-authoring.md"]
 | Command   | WHAT TO DO |
 | Skill     | WHICH CAPABILITY |
 | Mode      | HOW TO THINK |
-| MCP doc   | WHEN/HOW to use a server in SC workflows |
+| MCP doc   | WHEN/HOW to use server in SC workflows |
 
 ## Filename and Location
 
-- Path: `src/superclaude/mcp/MCP_<ServerName>.md` (PascalCase, hyphens allowed: `MCP_Chrome-DevTools.md`).
-- Filename stem after `MCP_` is the **display name**; the lowercase form is what `context_loader.py` matches against (`mcp/MCP_Serena.md` → `serena`).
-- Register the file in `scripts/context_loader.py` TRIGGER_MAP and INSTRUCTION_MAP (see Wiring below). Unregistered files are dead — never loaded at runtime.
+- Path: `src/superclaude/mcp/MCP_<ServerName>.md` (PascalCase, hyphens ok: `MCP_Chrome-DevTools.md`).
+- Filename stem after `MCP_` = **display name**; lowercase form what `context_loader.py` match against (`mcp/MCP_Serena.md` → `serena`).
+- Register file in `scripts/context_loader.py` TRIGGER_MAP + INSTRUCTION_MAP (see Wiring below). Unregistered files dead — never load at runtime.
 
 ## No YAML Frontmatter
 
-MCP docs are pure content components. They are not auto-discoverable like agents/skills — they only enter context via the loader's trigger map. Adding frontmatter buys nothing and breaks the `<component>` root-tag invariant of the XML prose format.
+MCP docs pure content components. Not auto-discoverable like agents/skills — only enter context via loader trigger map. Frontmatter buy nothing + break `<component>` root-tag invariant of XML prose format.
 
 ## XML Template
 
@@ -75,52 +75,52 @@ MCP docs are pure content components. They are not auto-discoverable like agents
 
 ### Body Rules
 
-- `<component name="...">` matches the lowercase server identifier used in `context_loader.py` (e.g., `serena`, `context7`, `chrome-devtools`); `type="mcp"` required.
+- `<component name="...">` match lowercase server identifier used in `context_loader.py` (e.g., `serena`, `context7`, `chrome-devtools`); `type="mcp"` required.
 - All multi-word tag names use `snake_case`.
 - Required tags: `<role>` (with `<mission>`), `<choose>`, `<bounds>`, `<handoff>`.
-- Optional tags: `<call_order>` (only when call sequence matters — e.g., Context7's resolve→get pair), `<integration_patterns>` (cross-server / cross-command chains), `<examples>` (lookup table), `<example>` (rich illustration).
-- `<choose>` — sub-tag form `<use>` / `<never>`, each body a prose sentence. Mirrors `<bounds>` slot-tag discipline; declarative voice, no hedging vocabulary (no `Avoid:` / `should:`). Sub-tag form keeps `<choose>` structurally distinct from neighboring Labeled sections.
-- `<bounds>` — sub-tag form `<does>` / `<never>` / `<fallback>`. `<fallback>` is the native-tool or alternate-server escape hatch (load-bearing for MCP docs — readers need to know what to do when the server is wrong or unavailable).
+- Optional tags: `<call_order>` (only when call sequence matters — e.g., Context7 resolve→get pair), `<integration_patterns>` (cross-server / cross-command chains), `<examples>` (lookup table), `<example>` (rich illustration).
+- `<choose>` — sub-tag form `<use>` / `<never>`, each body prose sentence. Mirror `<bounds>` slot-tag discipline; declarative voice, no hedging vocab (no `Avoid:` / `should:`). Sub-tag form keep `<choose>` structurally distinct from neighbor Labeled sections.
+- `<bounds>` — sub-tag form `<does>` / `<never>` / `<fallback>`. `<fallback>` = native-tool or alternate-server escape hatch (load-bearing for MCP docs — readers need know what do when server wrong or unavailable).
 - `<handoff next="...">` — 2-3 natural next `/sc:*` commands.
 - Short enums: **Numbered** for ordered call sequences (`<call_order>`); **Named** (`- Identifier-Name:` per-item identifiers) for `<integration_patterns>`.
 
 ### Forbidden Body Content (the trim rule)
 
-- **No `<tools>` inventory tables.** Listing every tool with parameters duplicates CC's MCP server description and `ToolSearch` output, costs tokens, and rots when the server adds/renames tools. Drop them.
-- **No `<role>` body beyond `<mission>`.** The server's own description ("what it does") belongs to CC; the SC doc adds workflow value, not tool overview.
-- **No version/install/setup blocks.** Install lives in `cli/install_mcp.py`. Per-server setup hints belong in `mcp/README.md` if anywhere.
-- **No "Token Management" / token-budget sections** unless the budget is server-specific and non-obvious (Context7's per-call token cap is the only confirmed exception today).
+- **No `<tools>` inventory tables.** List every tool with params duplicate CC MCP server description + `ToolSearch` output, cost tokens, rot when server add/rename tools. Drop them.
+- **No `<role>` body beyond `<mission>`.** Server own description ("what it does") belong to CC; SC doc add workflow value, not tool overview.
+- **No version/install/setup blocks.** Install live in `cli/install_mcp.py`. Per-server setup hints belong in `mcp/README.md` if anywhere.
+- **No "Token Management" / token-budget sections** unless budget server-specific + non-obvious (Context7 per-call token cap = only confirmed exception today).
 
-If a section reads like "this is what the server is" rather than "this is how I use the server inside SC", cut it.
+If section read like "this is what server is" rather than "this is how I use server inside SC", cut it.
 
 ## Wiring (mandatory — without this the file is dead)
 
-`scripts/context_loader.py` has three maps you must update for any new file:
+`scripts/context_loader.py` have three maps must update for any new file:
 
-1. **Tool-name auto-load**: when CC fires a `mcp__<server>__*` tool, the loader injects the matching doc. Add the file to the tool-name section (currently lines 96-101 / 129-139 of `context_loader.py`, behind `_BEHAVIORAL_MCPS`).
-2. **Flag-trigger TRIGGER_MAP**: maps user flags (`--c7`, `--seq`, …) to the file. Pick a stable flag and add a regex row.
-3. **INSTRUCTION_MAP**: one-line summary string (≤120 chars) shown when the loader injects this doc — Claude reads it before the body lands.
+1. **Tool-name auto-load**: when CC fire `mcp__<server>__*` tool, loader inject matching doc. Add file to tool-name section (currently lines 96-101 / 129-139 of `context_loader.py`, behind `_BEHAVIORAL_MCPS`).
+2. **Flag-trigger TRIGGER_MAP**: map user flags (`--c7`, `--seq`, …) to file. Pick stable flag + add regex row.
+3. **INSTRUCTION_MAP**: one-line summary string (≤120 chars) shown when loader inject this doc — Claude read before body land.
 
-Add a `MCP_<X>.md` with no entries in these maps and it will sit on disk forever, unloaded.
+Add `MCP_<X>.md` with no entries in these maps + it sit on disk forever, unloaded.
 
 ## Inherited from xml-prose-format.md
 
-The following rules apply to all components and are not restated above. See `.claude/rules/xml-prose-format.md` for full text.
+Following rules apply to all components + not restated above. See `.claude/rules/xml-prose-format.md` for full text.
 
 - **Single root XML wrapper** — exactly one root tag per component body; sibling sections only at root level.
 - **Long-form embedded enumerations** — lists embedded in running prose use natural-language enumeration ("things include x, y, z"), not bullets.
-- **Quoting conventions** — URLs and model identifier strings in single quotes (`'https://…'`, `'claude-opus-4-7'`); UI / product / feature names in double quotes (`"settings"`); runtime variables in double curly braces (`{{currentDateTime}}`).
+- **Quoting conventions** — URLs + model identifier strings in single quotes (`'https://…'`, `'claude-opus-4-7'`); UI / product / feature names in double quotes (`"settings"`); runtime variables in double curly braces (`{{currentDateTime}}`).
 - **Cross-references** — point to other sections by plain English topic, not by tag path.
-- **Markdown headers inside `<example>`** — permitted when the illustration mirrors a real markdown artifact (report template, commit message, user document); the body-prose "no markdown headers" rule does not extend into `<example>` bodies.
+- **Markdown headers inside `<example>`** — permitted when illustration mirror real markdown artifact (report template, commit message, user document); body-prose "no markdown headers" rule no extend into `<example>` bodies.
 
 ## Checklist
 
-1. Create `src/superclaude/mcp/MCP_<Server>.md` — no frontmatter, single `<component name="..." type="mcp">` root.
+1. Make `src/superclaude/mcp/MCP_<Server>.md` — no frontmatter, single `<component name="..." type="mcp">` root.
 2. Drop tool inventories, role descriptions, version/install blocks. Keep `<choose>` / integration / `<bounds>` / `<handoff>`.
 3. Wire all three maps in `scripts/context_loader.py` (tool-name, TRIGGER_MAP, INSTRUCTION_MAP).
-4. Add a row to `mcp/README.md` (Core or Plugin table) with flag and one-line mission.
-5. If the server is core (auto-installed), register it in `cli/install_mcp.py::MCP_SERVERS`.
-6. Run `make sync-user` (or scope-equivalent) and exercise the trigger — confirm the doc lands in context.
+4. Add row to `mcp/README.md` (Core or Plugin table) with flag + one-line mission.
+5. If server core (auto-installed), register in `cli/install_mcp.py::MCP_SERVERS`.
+6. Run `make sync-user` (or scope-equivalent) + exercise trigger — confirm doc land in context.
 
 ## Anti-Patterns
 
