@@ -41,6 +41,7 @@ class ParsedResult:
     output_tokens: int = 0
     tool_calls: tuple[ToolCall, ...] = ()
     axes: dict[str, str] = field(default_factory=dict)
+    is_error: bool = False
 
 
 Spawner = Callable[[list[str], int], Awaitable[SpawnResult]]
@@ -65,6 +66,11 @@ async def _default_spawn(cmd: list[str], timeout_s: int) -> SpawnResult:
     )
 
 
+def _is_slash_command(text: str) -> bool:
+    """True when the scenario input is a slash command (needs skills loaded)."""
+    return text.lstrip().startswith("/")
+
+
 def _build_cmd(variant: Variant, scenario: Scenario, cfg: RunnerCfg) -> list[str]:
     base = cfg.cli.split()  # "claude -p" → ["claude", "-p"]
     cmd: list[str] = [
@@ -72,7 +78,9 @@ def _build_cmd(variant: Variant, scenario: Scenario, cfg: RunnerCfg) -> list[str
         "--model", cfg.model,
         "--output-format", "json",
     ]
-    if cfg.bare:
+    # `--bare` strips skills/plugins; a slash-command input would then resolve
+    # to "Unknown command". Suppress --bare for slash inputs regardless of cfg.
+    if cfg.bare and not _is_slash_command(scenario.input):
         cmd.append("--bare")
     prompt_parts = [
         s for s in (scenario.input, variant.flag, variant.extra_args) if s
@@ -109,6 +117,7 @@ def _parse_output(stdout: bytes) -> ParsedResult:
         input_tokens=int(usage.get("input_tokens", 0)),
         output_tokens=int(usage.get("output_tokens", 0)),
         tool_calls=tool_calls,
+        is_error=bool(d.get("is_error", False)),
     )
 
 
@@ -123,6 +132,11 @@ async def run_variant(
     """Run a single variant via ``claude -p`` and write its observation JSON."""
     out_dir = Path(out_dir)
     cmd = _build_cmd(variant, scenario, runner_cfg)
+    if runner_cfg.bare and _is_slash_command(scenario.input):
+        sys.stderr.write(
+            f"[parallel-ab] variant {variant.id}: --bare suppressed — "
+            f"slash-command input needs skills loaded\n"
+        )
     t0 = time.monotonic()
 
     try:
@@ -162,9 +176,12 @@ async def run_variant(
             )
 
     parsed = _parse_output(result.stdout)
+    # claude -p can return rc=0 with `is_error: true` for API-level failures
+    # (rate limit, overload) — treat those as error, not ok.
+    ok = result.returncode == 0 and not parsed.is_error
     obs = Observation(
         variant_id=variant.id,
-        exit_status="ok" if result.returncode == 0 else "error",
+        exit_status="ok" if ok else "error",
         wall_seconds=time.monotonic() - t0,
         tokens=Tokens(input=parsed.input_tokens, output=parsed.output_tokens),
         tool_calls=parsed.tool_calls,

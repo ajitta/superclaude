@@ -88,12 +88,14 @@ async def test_ok_path_writes_observation(tmp_path: Path):
 
 @pytest.mark.asyncio
 async def test_non_zero_exit_with_oauth_fallback_retries(tmp_path: Path):
+    # plain (non-slash) input so --bare is actually added and the retry can drop it
+    plain = Scenario(input="explain rate limiting", baseline_skill=None)
     spawner = _FakeSpawner([
         SpawnResult(stdout=b"", stderr=b"Error: not authenticated. Please log in.", returncode=1),
         SpawnResult(stdout=_json_stdout(), stderr=b"", returncode=0),
     ])
     obs = await run_variant(
-        _variant(), _scenario(), _cfg(bare=True, oauth_fallback=True), tmp_path,
+        _variant(), plain, _cfg(bare=True, oauth_fallback=True), tmp_path,
         spawner=spawner,
     )
     assert obs.exit_status == "ok"
@@ -167,14 +169,23 @@ async def test_plain_text_stdout_fallback_zero_tokens(tmp_path: Path):
 
 
 def test_build_cmd_includes_bare():
-    cmd = _build_cmd(_variant(), _scenario(), _cfg(bare=True))
+    # non-slash input → --bare is honored
+    plain = Scenario(input="explain rate limiting", baseline_skill=None)
+    cmd = _build_cmd(_variant(), plain, _cfg(bare=True))
     assert "--bare" in cmd
     assert "--model" in cmd
     assert "claude-haiku-4-5" in cmd
 
 
 def test_build_cmd_omits_bare():
-    cmd = _build_cmd(_variant(), _scenario(), _cfg(bare=False))
+    plain = Scenario(input="explain rate limiting", baseline_skill=None)
+    cmd = _build_cmd(_variant(), plain, _cfg(bare=False))
+    assert "--bare" not in cmd
+
+
+def test_build_cmd_suppresses_bare_for_slash_command():
+    # --bare strips skills → a /sc: input would resolve to "Unknown command"
+    cmd = _build_cmd(_variant(), _scenario(), _cfg(bare=True))
     assert "--bare" not in cmd
 
 
@@ -219,3 +230,19 @@ def test_parse_output_extracts_usage_and_tools():
     assert p.input_tokens == 10
     assert p.output_tokens == 20
     assert p.tool_calls == (ToolCall(name="Bash", count=1),)
+
+
+def test_parse_output_extracts_is_error_flag():
+    err_payload = json.dumps({"result": "rate limited", "is_error": True}).encode("utf-8")
+    assert _parse_output(err_payload).is_error is True
+    # absent key defaults to False
+    assert _parse_output(_json_stdout()).is_error is False
+
+
+@pytest.mark.asyncio
+async def test_run_variant_marks_json_is_error_as_error(tmp_path: Path):
+    # claude -p can return rc=0 with is_error=true (API-level failure)
+    payload = json.dumps({"result": "overloaded", "is_error": True}).encode("utf-8")
+    spawner = _FakeSpawner([SpawnResult(stdout=payload, stderr=b"", returncode=0)])
+    obs = await run_variant(_variant(), _scenario(), _cfg(), tmp_path, spawner=spawner)
+    assert obs.exit_status == "error"
