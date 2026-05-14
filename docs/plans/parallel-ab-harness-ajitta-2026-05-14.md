@@ -1,5 +1,5 @@
 ---
-status: implementing
+status: complete
 revised: 2026-05-15
 ---
 
@@ -121,11 +121,11 @@ No edits to existing files except: append to `src/superclaude/scripts/README.md`
 
 **Behavior:** Author 4-variant spec for `/sc:brainstorm rate limiter for a markdown framework` (variants A/B/C/D as in design spec). E2E test gated on `AB_E2E=1` env (default skip — CI does not have `claude -p` auth), invokes `orchestrate(spec_path)`, asserts `matrix.md` + `decision.md` exist and contain 4 rows. Run manually once locally; commit generated `matrix.md` + `decision.md` for reviewers as evidence.
 
-- [ ] Step 1: Author `docs/experiments/brainstorm-ab-2026-05-14/variants.yaml` per spec example.
-- [ ] Step 2: Write `test_parallel_ab_e2e.py` with `pytest.mark.skipif(not os.getenv("AB_E2E"), reason=...)`. Assert: 4 obs files written, matrix.md has 4 rows, decision.md non-empty.
-- [ ] Step 3: Run `AB_E2E=1 uv run pytest tests/integration/test_parallel_ab_e2e.py -v` locally. Cite wall-seconds, total tokens, decision.
-- [ ] Step 4: Inspect `matrix.md` manually — verify columns sane, axes populated, no malformed rows.
-- [ ] Step 5: Commit `feat(parallel-ab): e2e validation against /sc:brainstorm; add experiment artifacts`. Push branch. Open PR.
+- [x] Step 1: Author `docs/experiments/brainstorm-ab-2026-05-14/variants.yaml` per spec example. **Done — 4 variants A/B/C/D, `bare: false` (see deviation below).**
+- [x] Step 2: Write `test_parallel_ab_e2e.py` with `pytest.mark.skipif(not os.getenv("AB_E2E"), reason=...)`. Assert: 4 obs files written, matrix.md has 4 rows, decision.md non-empty. **Done — skipped by default, passes with `AB_E2E=1` (120s).**
+- [x] Step 3: Run `AB_E2E=1 uv run pytest tests/integration/test_parallel_ab_e2e.py -v` locally. **1 passed in 120.18s.** Variant walls: A 32.5s / B 37.4s / C 53.2s / D 33.2s. Output tokens: A 959 / B 850 / C 1939 / D 1012. Decision: winner **A** (fastest passing).
+- [x] Step 4: Inspect `matrix.md` manually — 4 rows, distinct sha per variant, exit=ok all, columns sane. `tools` column shows `—` (no `tools_used` array in `claude -p` JSON), `axes` empty (free-form axes deferred per locked decision). No malformed rows.
+- [x] Step 5: Commit experiment artifacts + e2e test. Push branch. Open PR.
 
 ## Risks & Mitigations
 
@@ -183,13 +183,26 @@ Full suite after Phase 5: **1960 passed, 24 skipped** (baseline 1904 + 56 new). 
 - Task 5: added `__main__.py` (not in original File Map) — required so `python -m superclaude.scripts.parallel_ab` resolves to `cli.main()`.
 - Test count 56 vs ~25 estimated — TDD surfaced more edge cases (pure-helper tests for `_build_cmd`, `_parse_output`, `_looks_like_auth_fail`).
 
-**Phase 6 remaining (manual — needs real `claude -p` auth, out of scope for autonomous run):**
-1. Author `docs/experiments/brainstorm-ab-2026-05-14/variants.yaml` (4 variants A/B/C/D).
-2. Write `tests/integration/test_parallel_ab_e2e.py` gated on `AB_E2E=1`.
-3. Run `AB_E2E=1 uv run python -m superclaude.scripts.parallel_ab docs/experiments/brainstorm-ab-2026-05-14/variants.yaml`.
-4. Inspect generated `matrix.md` + `decision.md`.
-5. Commit experiment artifacts. Push branch. Open PR.
+**2026-05-15 — Phase 6 complete** on branch `feature/parallel-ab-harness`.
+
+| Step | Result |
+|---|---|
+| variants.yaml authored | 4 variants A/B/C/D, `bare: false` |
+| e2e test authored | gated on `AB_E2E=1`, skipped by default |
+| real `claude -p` run | 4 variants, all `exit=ok`, distinct sha/tokens/walls |
+| e2e test pass | `1 passed in 120.18s` with `AB_E2E=1` |
+| integration suite | 14 passed, 24 skipped — zero regression |
+
+**E2E result:** winner **A** (32.5s, 959 output tokens). Walls A 32.5 / B 37.4 / C 53.2 / D 33.2 s.
+
+**Phase 6 deviation — `bare: true` → `bare: false`:**
+Design spec's variant-spec example set `bare: true` (comment: "--bare disables auto-skills load"). First E2E run exposed the flaw: `--bare` strips skills/plugins entirely, so `claude -p --bare "/sc:brainstorm …"` returns `{"result":"Unknown command: /sc:brainstorm","is_error":false}` with **rc=0**. All 4 variants produced identical "Unknown command" output (identical sha), and `exit_status` was `ok` because rc=0 — `oauth_fallback` never fired (it only triggers on rc≠0). Fix: experiment's `variants.yaml` sets `bare: false` with an inline comment. Re-run produced 4 distinct real brainstorm outputs.
+
+**Follow-up candidates (not in this plan's scope):**
+- `spec_loader.py` defaults `bare=True` — wrong default for any `/sc:` scenario. Consider flipping the default, or having the runner detect `/sc:`/`/` prefixed inputs and force `bare=False`.
+- Runner treats `rc=0` as `ok` unconditionally. `claude -p` returns rc=0 for `is_error:false` results that are still failures ("Unknown command"). Runner could inspect the JSON `is_error` / `subtype` fields.
+- Project gotcha worth capturing (R19): `claude -p --bare` + `/sc:` command = silent `Unknown command` at rc=0.
 
 ## Handoff
 
-Branch `feature/parallel-ab-harness` holds Phases 1-5, **not pushed**. Phase 6 is manual (real `claude -p`). Once Phase 6 evidence is captured, push branch + open single PR. Karpathy axes verified after each phase: every changed line traces to spec; no scope creep into `auto_improve/` or `ab_test_workflows.py`; only existing file touched is `scripts/README.md` (1-row append).
+Phases 1-6 complete on branch `feature/parallel-ab-harness`. Push branch + open single PR. Karpathy axes verified: every changed line traces to spec; no scope creep into `auto_improve/` or `ab_test_workflows.py`; Phase 6 added only 2 files (`variants.yaml`, `test_parallel_ab_e2e.py`) + generated experiment artifacts (`obs-*.json`, `matrix.md`, `decision.md`). The `bare` finding logged as a follow-up candidate, not silently fixed (out of Phase 6 scope).

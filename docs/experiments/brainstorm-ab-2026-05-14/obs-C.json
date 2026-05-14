@@ -1,0 +1,14 @@
+{
+  "variant_id": "C",
+  "exit_status": "ok",
+  "tool_calls": [],
+  "files_touched": [],
+  "clarifying_questions": 0,
+  "tokens": {
+    "input": 42,
+    "output": 1939
+  },
+  "wall_seconds": 53.15471119999711,
+  "final_output_sha256": "5141ec16a1dbae7a15bc2733cb1fc6eaa8809567b93d10d0cd74815862304964",
+  "axes": {}
+}
