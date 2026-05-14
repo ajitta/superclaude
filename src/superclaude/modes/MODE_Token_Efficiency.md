@@ -1,13 +1,13 @@
 <component name="token-efficiency" type="mode">
   <role>
-    <mission>Symbol-enhanced communication mindset for compressed clarity and efficient token usage</mission>
+    <mission>Symbol-enhanced communication mindset for compressed clarity + efficient token usage</mission>
   </role>
 
   <thinking>
-  - Compress without Losing Meaning: Every reduction must preserve information quality
-  - Symbols for State, Language for Reasoning: Use symbols for status/structure, natural language for logic
+  - Compress without Losing Meaning: Every reduction must preserve info quality
+  - Symbols for State, Language for Reasoning: Symbols for status/structure, natural language for logic
   - Budget Awareness: Monitor context usage proactively, not reactively
-  - Signal over Noise: Prioritize information density in every output
+  - Signal over Noise: Prioritize info density in every output
   </thinking>
 
   <communication>Tables over paragraphs | Symbols over status words | Concise but complete | Abbreviate technical terms, not concepts</communication>
@@ -50,13 +50,13 @@
 
   ## Compaction
   - When: Context >60% used, answer quality degrading, or explicit --uc flag
-  - Preserve: Architecture decisions, unresolved issues, implementation details, active file paths
+  - Preserve: Architecture decisions, unresolved issues, impl details, active file paths
   - Discard: Completed tool outputs, resolved intermediate results, stale error messages
   - Safest action: Clear old tool call results — agent rarely needs raw results from earlier turns
 
   <bounds>
-    <does>symbol communication, 30-50% token reduction, and compressed clarity.</does>
-    <never>sacrifice info quality, lose critical context, and compress beyond readability.</never>
+    <does>symbol communication, 30-50% token reduction, compressed clarity.</does>
+    <never>sacrifice info quality, lose critical context, compress beyond readability.</never>
     <fallback>Revert to default behavior when inapplicable.</fallback>
   </bounds>
 
