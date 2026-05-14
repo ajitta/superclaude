@@ -155,4 +155,4 @@ open htmlcov/index.html
 - [GitHub Actions Documentation](https://docs.github.com/en/actions)
 - [UV Documentation](https://github.com/astral-sh/uv)
 - [Pytest Documentation](https://docs.pytest.org/)
-- [SuperClaude Testing Guide](../../docs/developer-guide/testing-debugging.md)
+- [SuperClaude Testing Guide](../../CLAUDE.md) (Python Environment + Make Commands sections)
