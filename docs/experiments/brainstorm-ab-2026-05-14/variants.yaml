@@ -1,0 +1,25 @@
+# E2E scenario spec for the Parallel A/B Harness.
+# Run: AB_E2E=1 uv run python -m superclaude.scripts.parallel_ab \
+#   docs/experiments/brainstorm-ab-2026-05-14/variants.yaml
+scenario:
+  input: "/sc:brainstorm rate limiter for a markdown framework"
+  baseline_skill: brainstorm
+variants:
+  - id: A
+    flag: "--vs"
+    extra_args: ""
+  - id: B
+    flag: "--vs[k:5]"
+    extra_args: ""
+  - id: C
+    flag: "--vs[k:3,tau:0.05]"
+    extra_args: ""
+  - id: D
+    flag: ""  # baseline — no verbalized-sampling flag
+    extra_args: ""
+runner:
+  cli: "claude -p"
+  model: "haiku"
+  timeout_seconds: 120
+  bare: false             # --bare strips skills → /sc:brainstorm becomes Unknown command
+  oauth_fallback: true

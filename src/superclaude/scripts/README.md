@@ -20,6 +20,7 @@ Scripts referenced by `hooks.json`, executed by Claude Code hook runtime. Not us
 | `context_reset.py` | Reset context loader state for fresh sessions |
 | `file_size_guard.py` | Blocks Read on files >30KB to save tokens (`SUPERCLAUDE_SIZE_GUARD=0` to disable) |
 | `loop_guard.py` | Circuit breaker — blocks Edit/Write/Bash after 5 identical errors in 15 min (`SUPERCLAUDE_LOOP_GUARD=0` to disable) |
+| `parallel_ab/` | Parallel A/B harness — runs N variants of a prompt/skill via `claude -p`, aggregates observation JSON into matrix.md + decision.md. Entry: `python -m superclaude.scripts.parallel_ab <variants.yaml>`. Env: `AB_MAX_PARALLEL` (default 8), `AB_TIMEOUT_S` (overrides per-variant timeout). |
 
 ### Shell Scripts
 
