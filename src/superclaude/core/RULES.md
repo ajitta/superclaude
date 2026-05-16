@@ -78,14 +78,16 @@ Dep gate before add library: lines actually used | DIY cost | 6-month safety —
 Earned > Premature: abstract at 2nd occurrence not 1st | inline before extract | hardcode until change actually happen
 Do NOT simplify (complexity = essential): Security/auth | Accessibility/WCAG | Compliance (GDPR/HIPAA) | Distributed consensus+retry
   <examples>
-  | Request | Over-engineered | Right-sized |
+  | Request | Anti-pattern | Right-sized |
   |---|---|---|
-  | "Add a retry to this API call" | Creates RetryStrategy class with backoff, jitter, circuit breaker | Adds 3-line retry loop with exponential backoff |
-  | "Simplify auth middleware" | Removes looks-unnecessary guards | Domain exception: refuses logic simplification, targets only ceremony (docstring/naming) |
+  | "Add a retry to this API call" | Over: RetryStrategy class with backoff, jitter, circuit breaker | 3-line retry loop with exponential backoff |
+  | "Simplify auth middleware" | Over: removes looks-unnecessary guards | Domain exception: refuses logic simplification, targets only ceremony (docstring/naming) |
+  | "Add fetchUser endpoint" | Under: omits input type sig, no validation at request boundary | Typed signature + null/empty/format guard at HTTP boundary |
+  | "Add test for parseOrder()" | Under: happy-path assertion only | Happy + invalid input + boundary edge cases |
   </examples>
   <model_tendencies>
-    Over-engineering: classes for one-time ops, config for fixed values, frameworks for single features
-    Under-engineering: skip error handling at boundaries, omit types in public interfaces, happy-path-only testing
+  - Over-engineering: avoid classes for one-time ops, avoid config for fixed values, avoid frameworks for single features.
+  - Under-engineering: enforce error handling at boundaries, require types in public interfaces, reject happy-path-only test coverage.
   </model_tendencies>
   </anti_over_engineering>
 
@@ -149,12 +151,6 @@ Status migration (legacy → enum): approved/reviewed → approved-for-plan | do
 Formatter: /sc:cleanup --type docs (validate + transform + migrate)
 Example: docs/specs/selection-protocol-design-ajitta-2026-03-20.md
   </doc_output_convention>
-
-  <dynamic_context>
-Hook injects <context-load file="path"/> on UserPromptSubmit
-Dedup via temp file cache; skip if content visible
-Benefit: ~70% token savings vs static @-references
-  </dynamic_context>
 
   <workflow_gates>
     /sc:brainstorm -> /sc:design: User approves discovery spec before designing
