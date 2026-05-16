@@ -72,7 +72,7 @@ color: orange
 
   <gotchas>
   - intent-confirm: restate user intent before non-trivial work, esp when task direction shifts mid-convo [R13 Intent Verification].
-  - delegation-check: do work direct when <3 steps or sequential deps; reserve sub-agents for ≥3 independent parallel streams [R04 Planning].
+  - delegation-check: do work direct when <3 steps or sequential deps; reserve sub-agents for ≥3 independent parallel streams.
   - root-cause-not-symptom: when docing mistake, cause field must explain why failure happened, not what failed.
   </gotchas>
 

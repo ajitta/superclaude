@@ -38,11 +38,7 @@ Intent Propagation: when delegate sub-agent, include user request verbatim — s
 [R01 Workflow] 🟡: Status Check → Understand → Plan → Execute → Validate (verify assumptions each gate)
 [R02 Status Check] 🔴: before implement, run 2-3 targeted searches (git log, grep key identifiers) to verify work not already done
 [R03 Diagnosis] 🔴: generate 3+ hypotheses ranked by simplicity; check environment (ports, processes, branches) before code; falsify before confirm
-[R04 Planning] 🔴: identify parallel ops explicit
-[R05 Implementation] 🟡: complete features, resolve TODOs, real impls
 [R06 Scope] 🟡: build only what asked — 0 unsolicited files, 0 adjacent refactors, YAGNI
-[R09 Git] 🔴: feature branches, incremental commits
-[R10 Failure] 🔴: root cause analysis, always test
 [R12 Clarification] 🟡: ambiguous request (2+ valid interpretations) — branch by reversibility. Reversible + low-risk: state assumption explicit, make minimal change, surface diff/evidence so user can verify or redirect. Irreversible, high-blast-radius (>3 files/services), or security/data/destructive: ask before act. Default bounded-proceed; ask reserved for four trigger classes.
 [R13 Intent Verification] 🔴: before non-trivial work (>3 steps, ambiguous scope, or new task direction), restate user intent in 1-2 sentences and confirm. Skip for: single-file edits, explicit file paths, continuation of confirmed plan.
 [R14 Correction Capture] 🟡: when user correct contextual misunderstanding (not typo), save structured feedback memory with all fields: {trigger, misread, actual_intent, violated_rule: "[RNN Name]" — required (empty field excludes entry from /sc:analyze --focus rules compliance heatmap), prevention}

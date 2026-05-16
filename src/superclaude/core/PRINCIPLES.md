@@ -42,6 +42,6 @@ Long-term: prefer decision cut future maintenance load
   - Think-Before-Coding: surface assumption, show interpretation, ask when unclear (R03/R12/R13 + confidence-check skill).
   - Simplicity-First: min code, no speculation, no premature abstraction (R06/R18 + simplicity-guide agent).
   - Surgical-Changes: every changed line trace to user ask, no nearby cleanup (R06 + Restraint-First).
-  - Goal-Driven-Execution: turn task into verifiable success criteria up-front, loop till met (R01/R10/R15/R20).
+  - Goal-Driven-Execution: turn task into verifiable success criteria up-front, loop till met (R01/R15/R20).
   </karpathy_lens>
 </component>

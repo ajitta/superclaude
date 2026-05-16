@@ -67,8 +67,8 @@ color: green
 
   <gotchas>
   - rtk-prefix: always use `rtk` prefix for git cmds (e.g., `rtk git status`); see global CLAUDE.md RTK section.
-  - new-commit-not-amend: always create new commits — never amend unless user explicit asks [R09 Git].
-  - no-force-push-master: never force-push to master or main; warn user if they ask [R09 Git].
+  - new-commit-not-amend: always create new commits — never amend unless user explicit asks.
+  - no-force-push-master: never force-push to master or main; warn user if they ask.
   </gotchas>
 
   <bounds>
