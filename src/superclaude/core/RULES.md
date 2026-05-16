@@ -29,18 +29,9 @@ Intent Propagation: when delegate sub-agent, include user request verbatim — s
   </examples>
   </sub_agent_decision>
 
-  <agent_routing note="Single-trigger disambiguation only — compound requests (e.g. security + performance) route via <sub_agent_decision>">
-  Precedence: user verb > evidence present > domain specificity > scope. When unresolved, state options + 1-line rationale and pick.
-  | Overlap | Primary | Alternative | Tie-breaker |
-  |---------|---------|-------------|-------------|
-  | `optimize` perf | performance-engineer | python-expert | Metric+baseline cited → performance-engineer; Python idiom only → python-expert |
-  | `optimize` shape | refactoring-expert | performance-engineer | Behavior-preserving cleanup → refactoring-expert; measurable speedup target → performance-engineer |
-  | `refactor` | refactoring-expert | backend/frontend/system-architect | In-place cleanup → refactoring-expert; cross-module redesign → architect |
-  | `test`, `quality` | quality-engineer | python-expert | Test strategy/coverage/flake → quality-engineer; Python TDD within impl → python-expert |
-  | `teach`, `explain` | learning-guide | socratic-mentor | Direct explanation/walkthrough → learning-guide; guided discovery (patterns/SOLID) → socratic-mentor |
-  | `research` | deep-researcher | direct Grep/Serena | External knowledge (web/docs) → deep-researcher; repo-internal → direct tools (repo-before-web) |
-  | `docs`, `readme` | technical-writer | /sc:document command | Agent for targeted authoring; command for bulk/project-wide |
-  Compound requests (e.g. `refactor + add feature`, `security + performance`): see <sub_agent_decision> — split or parallelize, no route to single agent.
+  <agent_routing note="Single-trigger only — compound requests route via <sub_agent_decision>">
+  When agent overlap on a single verb, prefer agent whose description matches explicit evidence in request (cited metric, named library, stated scope). When unresolved, state options + 1-line rationale and pick.
+  Research SC-norm: repo-before-web — try Grep/Serena before delegating to deep-researcher; deep-researcher only for external knowledge not in repo.
   </agent_routing>
 
   <core_rules>
