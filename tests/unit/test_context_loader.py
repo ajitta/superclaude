@@ -71,16 +71,23 @@ class TestResolveFlags:
 
     # --- Alias resolution ---
 
-    def test_alias_ultrathink_resolves_to_seq(self):
-        prompt, notes = resolve_flags("analyze code --ultrathink")
-        assert "--seq" in prompt
-        assert "--ultrathink" not in prompt
-        assert len(notes) == 1
-        assert "auto-corrected" in notes[0]
+    def test_flag_aliases_table_is_empty(self):
+        """FLAG_ALIASES intentionally empty — canonical flag names only."""
+        assert FLAG_ALIASES == {}
 
-    def test_alias_iteration_resolves_to_iterations(self):
-        prompt, notes = resolve_flags("run --iteration 3")
-        assert "--iterations" in prompt
+    def test_ultrathink_not_remapped(self):
+        """ultrathink is a CC native deep-reasoning trigger, not an SC alias."""
+        prompt, notes = resolve_flags("analyze code --ultrathink")
+        assert "--ultrathink" in prompt
+        assert "--seq" not in prompt
+        assert notes == []
+
+    def test_removed_alias_parallel_no_auto_remap(self):
+        """--parallel removed as alias; prompt is not silently rewritten."""
+        prompt, notes = resolve_flags("analyze code --parallel")
+        assert "--parallel" in prompt  # preserved verbatim
+        assert "--delegate" not in prompt  # no hidden remap
+        # Fuzzy may or may not suggest; either way, no silent rewrite occurred
 
     # --- Valid flags pass through unchanged ---
 
@@ -111,17 +118,16 @@ class TestResolveFlags:
 
     # --- Multiple flags ---
 
-    def test_multiple_aliases_resolved(self):
-        prompt, notes = resolve_flags("go --ultrathink --parallel")
-        assert "--seq" in prompt
-        assert "--delegate" in prompt
-        assert len(notes) == 2
+    def test_multiple_valid_flags_pass_through(self):
+        prompt, notes = resolve_flags("go --vs --delegate --seq")
+        assert prompt == "go --vs --delegate --seq"
+        assert notes == []
 
-    def test_mixed_valid_and_alias(self):
-        prompt, notes = resolve_flags("run --seq --ultrathink --tavily")
-        assert prompt.count("--seq") == 2  # original + alias resolution
+    def test_mixed_valid_and_unknown(self):
+        prompt, notes = resolve_flags("run --delegate --xyzbogus --tavily")
+        assert "--delegate" in prompt
         assert "--tavily" in prompt
-        assert len(notes) == 1  # only ultrathink triggers notification
+        assert "--xyzbogus" in prompt  # unknown flag preserved
 
     # --- Edge cases ---
 
@@ -131,9 +137,11 @@ class TestResolveFlags:
         assert notes == []
 
     def test_case_insensitive_flag_detection(self):
-        """Flags in prompt are lowercased for matching."""
-        prompt, notes = resolve_flags("run --Parallel")
-        assert "--delegate" in prompt
+        """Valid flags in prompt are lowercased for matching."""
+        prompt, notes = resolve_flags("run --Delegate")
+        # --Delegate matches VALID_FLAGS via lowercase → passes through unchanged
+        assert "--Delegate" in prompt
+        assert notes == []
 
     # --- Data integrity ---
 

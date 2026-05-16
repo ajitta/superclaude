@@ -245,7 +245,6 @@ def verify_lifecycle_events() -> None:
         ("Tier 1  (--serena)",   "--serena rename foo"),
         ("Tier 2  (--brainstorm)", "--brainstorm idea"),
         ("Directive (--loop)",   "--loop iterate"),
-        ("Directive (--p=sec)",  "--p=sec audit"),
         ("Notice (--no-mcp)",    "--no-mcp run something"),
         ("Notice (--verbose-context)", "--c7 --verbose-context q"),
     ]

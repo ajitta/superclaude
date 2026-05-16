@@ -182,43 +182,11 @@ _BEHAVIORAL_MCPS = {"mcp/MCP_Serena.md", "mcp/MCP_Tavily.md"}
 # Environment variable to control instruction mode (default: enabled)
 USE_INSTRUCTIONS = os.environ.get("CLAUDE_CONTEXT_USE_INSTRUCTIONS", "1") == "1"
 
-# Flag alias system — maps conceptual aliases to valid flags
-FLAG_ALIASES: dict[str, list[str]] = {
-    "ultrathink": ["seq"],
-    "think": ["seq"],
-    "think-hard": ["seq"],
-    "parallel": ["delegate"],
-    "agent": ["delegate"],
-    "iteration": ["iterations"],
-    "sampling": ["vs"],
-    "verbalized": ["vs"],
-}
-
-# Agent abbreviation map for --p flag (multi-select: --p=sec,perf,qa)
-AGENT_MAP = {
-    "arch": "system-architect",
-    "fe": "frontend-architect",
-    "be": "backend-architect",
-    "sec": "security-engineer",
-    "qa": "quality-engineer",
-    "ops": "devops-architect",
-    "pm": "project-manager",
-    "perf": "performance-engineer",
-    "refactor": "refactoring-expert",
-    "root": "root-cause-analyst",
-    "req": "requirements-analyst",
-    "educator": "learning-guide",
-    "mentor": "socratic-mentor",
-    "scribe": "technical-writer",
-    "py": "python-expert",
-    "panel": "business-panel-experts",
-    "research": "deep-researcher",
-    "review": "self-review",
-    "index": "repo-index",
-    "simple": "simplicity-guide",
-    "git": "git-workflow",
-    "init": "project-initializer",
-}
+# Flag alias system — empty by design. All canonical flags live in VALID_FLAGS.
+# Typos are caught by the fuzzy-match fallback in resolve_flags (Levenshtein ≤ 2).
+# Conceptual aliases (e.g., --parallel for --delegate) were removed to keep one
+# canonical name per concept; update command docs to use canonical flags directly.
+FLAG_ALIASES: dict[str, list[str]] = {}
 
 # All valid flags for fuzzy matching fallback
 VALID_FLAGS = {
@@ -228,7 +196,12 @@ VALID_FLAGS = {
     "devtools", "tavily", "frontend-verify", "all-mcp", "no-mcp",
     "delegate", "concurrency", "loop", "iterations", "validate", "safe-mode",
     "fast", "plan", "uc", "ultracompressed", "scope", "focus",
-    "bs", "verbose-context", "vs", "p",
+    "bs", "verbose-context", "vs",
+}
+
+# Claude Code native flags / triggers — pass through unchanged, no fuzzy suggestion
+CC_NATIVE_PASSTHROUGH: set[str] = {
+    "ultrathink",
 }
 
 
@@ -248,6 +221,10 @@ def resolve_flags(prompt: str) -> tuple[str, list[str]]:
 
         # Skip already-valid flags
         if flag in VALID_FLAGS:
+            continue
+
+        # Skip CC-native triggers (e.g., ultrathink) — pass through silently
+        if flag in CC_NATIVE_PASSTHROUGH:
             continue
 
         # Check alias table
@@ -552,40 +529,6 @@ _EXECUTION_DIRECTIVES = {
 }
 
 
-def _emit_agent_preference(prompt: str) -> None:
-    """Emit agent preference directives for --p flag. Supports multi-select: --p=sec,perf,qa.
-    Session-deduped: a given --p combo is announced only once per session."""
-    match = re.search(r"--p[=\s]+([a-zA-Z][a-zA-Z0-9,]*)", prompt)
-    if not match:
-        return
-    raw = match.group(1).lower()
-    marker = f"_directive:--p={raw}"
-    if marker in get_loaded_contexts():
-        return
-    abbrevs = [a.strip() for a in raw.split(",") if a.strip()]
-    agents = []
-    unknown = []
-    for abbr in abbrevs:
-        if abbr in AGENT_MAP:
-            agents.append(AGENT_MAP[abbr])
-        else:
-            unknown.append(abbr)
-    if agents:
-        agent_list = ", ".join(f"@{a}" for a in agents)
-        print(
-            f'<sc-directive flag="--p={raw}">'
-            f"Agent preference: delegate to {agent_list} when spawning sub-agents. "
-            f"Use these agents' expertise as the primary lens for this task."
-            f"</sc-directive>"
-        )
-        print()
-        mark_as_loaded(marker)
-    if unknown:
-        valid = ", ".join(sorted(AGENT_MAP.keys()))
-        print(f"<!-- --p: unknown abbreviation(s): {', '.join(unknown)}. Valid: {valid} -->")
-        print()
-
-
 def _emit_execution_directives(prompt: str) -> None:
     """Emit inline behavioral directives for execution flags.
     Session-deduped: each (pattern, matched-flag) combo emits once per session."""
@@ -641,9 +584,6 @@ def main() -> None:
 
     # Execution flag directives (inline behavioral hints — no file injection)
     _emit_execution_directives(prompt)
-
-    # Agent preference directives (--p=sec,perf,qa)
-    _emit_agent_preference(prompt)
 
     # Check triggers and get contexts to load
     contexts = check_triggers(prompt)

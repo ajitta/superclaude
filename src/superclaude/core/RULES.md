@@ -94,7 +94,6 @@ Do NOT simplify (complexity = essential): Security/auth | Accessibility/WCAG | C
   | Request | Over-engineered | Right-sized |
   |---|---|---|
   | "Add a retry to this API call" | Creates RetryStrategy class with backoff, jitter, circuit breaker | Adds 3-line retry loop with exponential backoff |
-  | "Fix the typo in error message" | Refactors entire error handling module | Changes the one string |
   | "Simplify auth middleware" | Removes looks-unnecessary guards | Domain exception: refuses logic simplification, targets only ceremony (docstring/naming) |
   </examples>
   <model_tendencies>

@@ -7,7 +7,7 @@ description: Interactive requirements discovery thru Socratic dialogue + systema
     <mission>Interactive requirements discovery thru Socratic dialogue + systematic exploration</mission>
   </role>
 
-  <syntax>/sc:brainstorm [topic/idea] [--strategy systematic|agile|enterprise] [--depth shallow|normal|deep] [--vs [standard|cot|multi]] [--parallel]</syntax>
+  <syntax>/sc:brainstorm [topic/idea] [--strategy systematic|agile|enterprise] [--depth shallow|normal|deep] [--vs [standard|cot|multi]] [--delegate]</syntax>
 
   <flow>
   1. Explore: Socratic dialogue + systematic questioning.
@@ -62,7 +62,7 @@ description: Interactive requirements discovery thru Socratic dialogue + systema
 | Input | Output |
 |---|---|
 | `'AI project management tool' --strategy systematic --depth deep` | Multi-agent deep analysis |
-| `'real-time collaboration' --strategy agile --parallel` | Parallel frontend/backend/security exploration |
+| `'real-time collaboration' --strategy agile --delegate` | Parallel frontend/backend/security exploration |
 | `'enterprise data analytics' --strategy enterprise --depth deep` | Compliance + validation |
 | `'mobile monetization' --depth normal` | Cross-session w/ Serena |
 | `'API design' --vs cot [k:3, tau:0.20]` | 3 focused API design perspectives via VS-CoT |

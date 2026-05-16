@@ -38,7 +38,7 @@ description: Review work product (code, plan, design, spec) for quality, correct
   </tools>
 
   <focus_agent_mapping>
-  When --p flag or domain context suggest specialist review, delegate to:
+  When domain context suggest specialist review, delegate to:
   security → @security-engineer | performance → @performance-engineer | quality → @quality-engineer | architecture → @system-architect
   </focus_agent_mapping>
 

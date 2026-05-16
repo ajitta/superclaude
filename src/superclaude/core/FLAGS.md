@@ -35,12 +35,7 @@
 --validate: risk >0.7, usage >75%, prod → pre-exec risk assessment
 --safe-mode: usage >85%, prod, critical → max validation, conservative, auto --uc
 --fast: same model, faster output (v2.1.36+)
---p [abbr,...]: agent pref — bias sub-agent delegation toward specific agents. Multi-select: --p=sec,perf,qa
-  Abbrevs: arch(system-architect) fe(frontend) be(backend) sec(security) qa(quality) ops(devops) pm(project-manager) perf(performance) refactor(refactoring) root(root-cause) req(requirements) py(python) panel(business) research(deep-researcher) review(self-review) simple(simplicity) git(git-workflow) scribe(technical-writer) educator(learning) mentor(socratic) index(repo-index) init(project-initializer) insight(insight-analyst)
 --verbose-context: force full .md injection for all triggered contexts, bypassing INSTRUCTION_MAP short instructions. Use when short instructions cause wrong MCP behavior.
-Note: Agent Teams experimental (CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1) — parallel coordination
-Note: see RULES.md anti_over_engineering for scope discipline guardrails
-Note: token use varies by model — monitor ctx usage, use --uc at 60%+
 Note: match flags to session type — analysis/discussion sessions rarely need --delegate/--loop (exec flags); use --seq --tavily --c7 instead
   </execution>
 
@@ -50,11 +45,6 @@ Note: match flags to session type — analysis/discussion sessions rarely need -
 --focus [perf|security|quality|arch|a11y|testing]: target domain
   </output>
 
-  <aliases note="Auto-corrected by context_loader.py — listed for user reference">
-Remaps: --ultrathink/--think* → --seq | --parallel/--agent → --delegate | --sampling/--verbalized → --vs | --sea → --serena | --confidence-check → --validate
-Typo fuzzy-match: Levenshtein ≤ 2 → suggestion in HTML comment
-  </aliases>
-
   <priority_rules>
   - Safety First: --safe-mode > --validate > optimization
   - Explicit Override: user flags > auto-detection
@@ -62,7 +52,4 @@ Typo fuzzy-match: Levenshtein ≤ 2 → suggestion in HTML comment
   - Scope: system > project > module > file
   </priority_rules>
 
-  <mcp_auto_mode>
-  When MCP tool descriptions exceed 10% of ctx, CC defers loading via MCPSearch. Override threshold with `auto:N` | disable by adding `MCPSearch` to `disallowedTools` in agent frontmatter.
-  </mcp_auto_mode>
 </component>

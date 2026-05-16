@@ -7,7 +7,7 @@ description: Generate structured implementation workflows from PRDs and feature 
     <mission>Generate structured implementation workflows from PRDs + feature requirements</mission>
   </role>
 
-  <syntax>/sc:workflow [prd-file|feature] [--strategy systematic|agile|enterprise] [--depth shallow|normal|deep] [--parallel]</syntax>
+  <syntax>/sc:workflow [prd-file|feature] [--strategy systematic|agile|enterprise] [--depth shallow|normal|deep] [--delegate]</syntax>
 
   <flow>
   1. Analyze: Parse PRD + understand requirements
@@ -45,12 +45,12 @@ description: Generate structured implementation workflows from PRDs and feature 
 | Input | Output |
 |---|---|
 | `Claudedocs/PRD/feature.md --strategy systematic --depth deep` | Comprehensive PRD workflow |
-| `'user auth system' --strategy agile --parallel` | Agile + parallel coordination |
+| `'user auth system' --strategy agile --delegate` | Agile + parallel coordination |
 | `enterprise-prd.md --strategy enterprise --depth deep` | Enterprise + compliance |
 | `project-brief.md --depth normal` | Cross-session with Serena |
 
   <example name="workflow-no-prd" type="error-path">
-    - Input: /sc:workflow --strategy enterprise --parallel (no PRD or feature doc)
+    - Input: /sc:workflow --strategy enterprise --delegate (no PRD or feature doc)
     - Why wrong: Workflow generation needs PRD or feature doc as input. No input = no tasks to generate.
     - Correct: Make PRD first: /sc:brainstorm → /sc:design → save to file → /sc:workflow PRD.md
   </example>
