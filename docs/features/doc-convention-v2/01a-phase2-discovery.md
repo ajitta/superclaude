@@ -1,5 +1,5 @@
 ---
-status: draft
+status: approved-for-plan
 revised: 2026-05-18
 ---
 
@@ -23,28 +23,34 @@ Out of scope: validator (Phase 3), bulk legacy migration (deferred), worktree-aw
 
 | # | Question | Decision | Mode |
 |---|---|---|---|
-| Q1 | Where in command body does path-resolution logic live? | New `<output_routing>` section before `<outputs>` — keeps `<flow>` clean | delegated |
-| Q2 | How does command know which feature slug to use? | Conversation-aware: detect existing `docs/features/<slug>/` from context or topic; else prompt | delegated |
-| Q3 | Standalone vs feature decision flow? | Heuristic — existing folder → feature; new topic → ask 1-line "[f]eature or [s]tandalone?" with rationale (≥2 docs expected → feature) | delegated |
-| Q4 | Phase-prefix mapping SSOT? | RULES.md `<doc_output_convention>` (already shipped Phase 1); commands cite "per RULES.md doc_output_convention" — no duplication | delegated |
-| Q5 | Commit strategy? | Single atomic PR — reviewer sees full pattern once; markdown-only so revert-safe | delegated |
-| Q6 | Smoke-test slug? | `_test-feature-folder` per 05-plan.md — underscore prefix flags ephemeral | delegated |
-| Q7 | brainstorm.md flow step 4 self-edit shape? | Path-conditional prose: feature-folder path OR standalone path inline, both shown | delegated |
+| Q1 | Where in command body does path-resolution logic live? | Cite-only — 1-line ref in existing `<outputs>` table header per Q4 SSOT (no new `<output_routing>` section, no per-command duplication, cuts R-2 drift risk + keeps command body ≤200-line target) | delegated |
+| Q2 | How does command know which feature slug to use? | Conversation-aware w/ disambiguation: exact slug match → silent use; multiple partial-match → prompt candidate list; zero match → standalone-vs-feature prompt | delegated |
+| Q3 | Standalone vs feature decision flow? | Heuristic + per-command default: feature-default for brainstorm/design/plan/workflow (multi-doc by nature); standalone-default for research/analyze (often one-off). Override via 1-line `[f]/[s]` prompt | delegated |
+| Q4 | Phase-prefix mapping SSOT? | RULES.md `<doc_output_convention>` (already shipped Phase 1); commands cite "per RULES.md `<doc_output_convention>`" — no duplication | delegated |
+| Q5 | Commit strategy? | Single PR, checkpoint-gated: commit brainstorm.md alone first → smoke test → only if green, add 5 replication commits in same PR. If smoke fails, abort PR. Markdown-only so revert-safe | delegated |
+| Q6 | Smoke-test slug? | `test-feature-folder-temp` — kebab-compliant per 04-design.md feature-slug rule; `-temp` suffix flags ephemeral (leading `_` would violate kebab-case) | delegated |
+| Q7 | brainstorm.md flow step 4 self-edit shape? | Path-conditional prose + R4 README update threaded inline. Step 4 carries write-path decision AND README index regen call | delegated |
 | Q8 | Frontmatter delta for phase docs? | Phase doc gets `{status: draft, revised: <today>}`; standalone unchanged | delegated |
 
 ## Requirements
 
-### R1. Output routing block per command
+### R1. Output routing cite per command (cite-only, no new section)
 
-Each of 6 commands gets new `<output_routing>` section, placed immediately before `<outputs>`. Section body prose:
+Per Q4 SSOT principle: commands MUST NOT restate routing prose. Each of 6 commands gets a 1-line header note prepended to its existing `<outputs>` table body:
 
-> If feature-folder context is in play (existing `docs/features/<slug>/` referenced in conversation, or user passes slug in topic arg), write to `docs/features/<slug>/NN-<phase>.md` using phase prefix per RULES.md `<doc_output_convention>`. Otherwise prompt: "feature folder or standalone? ([f]/[s])" — feature when ≥2 related docs expected; standalone for one-off. Standalone path: `docs/<type>/<slug>-<suffix>-<username>-YYYY-MM-DD.md`.
+> Routing: per RULES.md `<doc_output_convention>` — feature path `docs/features/<slug>/NN-<phase>.md` (existing folder OR user picks `[f]`) | standalone path `docs/<type>/<slug>-<suffix>-<username>-YYYY-MM-DD.md` (user picks `[s]` or no related work expected).
 
-### R2. `<flow>` step that mentions write path updates to conditional shape
+Slug resolution rule (applies before routing): exact slug match against `docs/features/` dir names → silent use; multiple partial-match → prompt candidate list ("matched: foo-refactor, foo-rework; pick [1]/[2]/new"); zero match → 1-line `[f]/[s]` prompt with per-command default ([f] for brainstorm/design/plan/workflow; [s] for research/analyze). User skip = take default.
+
+No separate `<output_routing>` section. Routing is a behavior rule already owned by RULES.md SSOT — duplicating to 6 command bodies would (a) violate Q4, (b) raise R-2 drift risk 6×, (c) push command bodies toward xml-prose-format ≤200-line ceiling.
+
+### R2. `<flow>` step that mentions write path updates to conditional shape + threads R4 README update
+
+Flow step MUST cover routing decision AND (on feature path) README index regen — both inline so R4 is not implicit aspiration.
 
 Example (brainstorm.md step 4):
 
-> Specify: write spec to feature path `docs/features/<slug>/01-discovery.md` (frontmatter: `status: draft, revised: <today>`) OR standalone path `docs/specs/<topic>-discovery-<username>-YYYY-MM-DD.md` per `<output_routing>` decision.
+> Specify (routing per RULES.md `<doc_output_convention>`): on feature path, write spec to `docs/features/<slug>/01-discovery.md` (frontmatter: `status: draft, revised: <today>`) AND update `docs/features/<slug>/README.md` (`updated:` bump + append entry to `## Documents`, advance `phase:` if status enum moved). On standalone path, write to `docs/specs/<topic>-discovery-<username>-YYYY-MM-DD.md` — no README update needed.
 
 ### R3. `<outputs>` table updates
 
@@ -82,10 +88,12 @@ When phase file already exists (e.g., `02-research.md` present, new research run
 
 ## Success Criteria
 
-- [ ] All 6 commands have `<output_routing>` section citing RULES.md `<doc_output_convention>`
-- [ ] All 6 commands' `<flow>` write-step shows conditional path shape
-- [ ] All 6 commands' `<outputs>` table updated per R3
-- [ ] Smoke test: `/sc:brainstorm 'foo' --feature _test-feature-folder` writes `docs/features/_test-feature-folder/01-discovery.md` + updates that README's `Documents` index
+- [ ] All 6 commands' `<outputs>` table prepended with 1-line routing cite to RULES.md `<doc_output_convention>` (cite-only, no new `<output_routing>` section)
+- [ ] All 6 commands' `<flow>` write-step shows conditional path shape AND (feature-path branch) calls README index regen per R4
+- [ ] All 6 commands' `<outputs>` table rows updated per R3 (both feature + standalone path columns)
+- [ ] Slug-resolution rule honored: exact-match silent / multi partial-match prompt / zero match → per-command default
+- [ ] Smoke test: `/sc:brainstorm 'foo' --feature test-feature-folder-temp` writes `docs/features/test-feature-folder-temp/01-discovery.md` + updates that README's `## Documents` index + bumps `updated:` frontmatter
+- [ ] Smoke commit lands BEFORE 5 replication commits (Q5 checkpoint gate)
 - [ ] `make test` passes (baseline ~1,904); markdown-only changes
 - [ ] `make sync-user` deploys updated commands to `~/.claude/superclaude/commands/`
 - [ ] No regression in existing `/sc:*` invocations that hit standalone path
@@ -104,14 +112,22 @@ Level 1 per `<verification_ladder>` — single-file behavior change per command,
 
 ## Open Questions Blocking Phase 2 Execution
 
-None — all 8 brainstorm questions delegated to ★ recommendations. Self-review may surface new ones.
+None — v2 resolved all 5 review findings (2 critical + 3 important). Re-review pass clean before `/sc:plan` handoff.
 
 ## Self-Review Iteration Log
 
 - v1 (2026-05-18 01:55 GMT+9): initial draft. Pending `/sc:review`.
+- v2 (2026-05-18 02:08 GMT+9): `/sc:review --audit-delegated` findings applied. Delta:
+  - **C1** (Q1↔Q4 contradiction): adopted cite-only — dropped `<output_routing>` section requirement; rewrote R1 to 1-line cite in existing `<outputs>` table header. Cuts R-2 drift risk 6×.
+  - **C2** (Q6 kebab-case violation): smoke slug `_test-feature-folder` → `test-feature-folder-temp`. Updated Q6, Success Criteria, + `05-plan.md` L87.
+  - **I1** (Q2 disambiguation): added slug-resolution rule (exact / multi-partial / zero) to R1 + Q2.
+  - **I2** (Q3 default): added per-command defaults — `[f]` for brainstorm/design/plan/workflow, `[s]` for research/analyze.
+  - **I3** (R4 thread): R2 flow-step example now inlines README update call on feature path.
+  - **S2** (Q5 checkpoint): commit brainstorm.md alone → smoke → only-if-green replicate 5. Abort-on-fail clause added.
+  - S1 (drop `<output_routing>` section) folded into C1 fix.
 
 ## Handoff
 
-→ `/sc:review` (mandatory before `/sc:plan`).
+→ `/sc:review` re-pass on v2 → `/sc:plan` if clean.
 
-mandatory: 8 delegated decisions need independent audit
+mandatory: 8 delegated decisions need independent audit (v2 incorporates v1 audit findings)

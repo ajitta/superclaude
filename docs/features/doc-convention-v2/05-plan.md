@@ -84,5 +84,5 @@ Each phase is a separate commit. Rollback via `git revert <commit>`. No data des
 ## Open Questions Blocking Plan Execution
 
 1. Cutoff date confirmation: 2026-05-18 (today) acceptable?
-2. Phase 2 verification: smoke-test slug name? Suggest `_test-feature-folder` to keep visible.
+2. Phase 2 verification: smoke-test slug name? Resolved per `01a-phase2-discovery.md` Q6 v2 — use `test-feature-folder-temp` (kebab-compliant; `-temp` suffix flags ephemeral). Leading `_` rejected because it violates feature-slug kebab-case rule (04-design.md naming rules).
 3. Phase 3 tooling priority: ship validator before or after command updates? Recommend after — commands can write valid output without enforcement, validator catches drift later.
