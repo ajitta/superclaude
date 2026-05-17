@@ -265,6 +265,6 @@ def rules_schemas() -> dict:
 
 ## Handoff
 
-- **Next**: `/sc:implement --plan docs/plans/rules-schema-extraction-ajitta-2026-04-14.md`
-- **Reference**: spec `docs/specs/rules-schema-extraction-discovery-ajitta-2026-04-14.md`, research `docs/research/rules-xml-conversion-ajitta-2026-04-14.md`
+- **Next**: `/sc:implement --plan docs/features/rules-schema-extraction/05-plan.md`
+- **Reference**: spec [`./01-discovery.md`](./01-discovery.md), research `docs/research/rules-xml-conversion-ajitta-2026-04-14.md` (related, separate slug — consider promotion via `/sc:promote-feature rules-xml-conversion`)
 - **Estimate**: ~18 min total (phases 0–5), 5 commits, <60 lines net diff excluding new test file (~40 lines)
