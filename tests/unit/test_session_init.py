@@ -45,11 +45,11 @@ class TestInitHookTracker:
             patch(
                 "superclaude.scripts.session_init.cleanup_old_sessions",
                 create=True,
-            ) as mock_cleanup,
+            ),
             patch(
                 "superclaude.scripts.session_init.get_session_id",
                 create=True,
-            ) as mock_get_id,
+            ),
         ):
             # Mock the lazy imports inside init_hook_tracker
             mock_cleanup_fn = MagicMock(return_value=0)

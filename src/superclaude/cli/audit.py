@@ -27,7 +27,7 @@ def _check_cross_refs(src: Path) -> Dict[str, Any]:
     agents_dir = src / "agents"
     modes_dir = src / "modes"
 
-    HANDOFF_SKIP = {"/sc:[command]"}
+    HANDOFF_SKIP = {"/sc:[command]"}  # noqa: N806 — function-local constant
 
     # Available commands
     available_commands = set()

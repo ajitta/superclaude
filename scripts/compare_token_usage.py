@@ -158,7 +158,7 @@ def print_report(categories: dict, file_details: list, before: str, after: str):
             print(f"   - {short_path}: {df['before']:,} tokens removed")
 
     # Context impact
-    CLAUDE_CONTEXT = 200_000
+    CLAUDE_CONTEXT = 200_000  # noqa: N806 — function-local constant
     print("\nCONTEXT IMPACT:")
     print("-" * 60)
     print(f"Total context usage: {total_after:,} / {CLAUDE_CONTEXT:,} ({(total_after/CLAUDE_CONTEXT)*100:.1f}%)")
