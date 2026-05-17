@@ -205,7 +205,7 @@ def verify_session_dedup() -> None:
 
 def verify_lifecycle_events() -> None:
     """Probe: cache behavior across /clear, /compact, SessionStart(startup) events."""
-    RESET = Path.home() / ".claude" / "superclaude" / "scripts" / "context_reset.py"
+    RESET = Path.home() / ".claude" / "superclaude" / "scripts" / "context_reset.py"  # noqa: N806 — function-local constant path
     print("\n--- Lifecycle event probe: /clear, /compact, SessionStart=startup ---")
 
     def call_reset(source: str) -> str:

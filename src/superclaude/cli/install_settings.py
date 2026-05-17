@@ -453,7 +453,7 @@ def remove_claude_md_import(base_path: Path, scope: str = "user") -> Tuple[bool,
         # For local/project scope: if CLAUDE.md/CLAUDE.local.md has no user content
         # (empty or only the SC-created header), remove it entirely.
         # User scope is excluded — global CLAUDE.md is likely to hold user config independent of SC.
-        SC_HEADERS = {
+        SC_HEADERS = {  # noqa: N806 — function-local constant
             "# Claude Code Configuration (personal, gitignored)",
             "# Claude Code Configuration",
         }

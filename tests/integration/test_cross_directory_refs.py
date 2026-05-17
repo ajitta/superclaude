@@ -132,7 +132,7 @@ class TestMCPWiring:
 
     def test_mcp_config_doc_pairing(self):
         """Every .json in configs/ has a matching MCP_*.md."""
-        CONFIG_TO_DOC = {
+        CONFIG_TO_DOC = {  # noqa: N806 — function-local constant mapping
             "context7": "Context7",
             "sequential": "Sequential",
             "playwright": "Playwright",

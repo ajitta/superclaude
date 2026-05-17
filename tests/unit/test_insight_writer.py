@@ -511,7 +511,7 @@ class TestTimestampFormat:
 
 
 class TestInlineMarker:
-    def test_inline_INSIGHT_in_middle_of_message(self, workdir, monkeypatch):
+    def test_inline_INSIGHT_in_middle_of_message(self, workdir, monkeypatch):  # noqa: N802 — INSIGHT literal under test
         ns, pdir = _harvest(workdir, monkeypatch, "sess1")
         _make_transcript(
             pdir,
@@ -531,7 +531,7 @@ class TestInlineMarker:
         )
         assert d["raw_text"] == "real one"
 
-    def test_word_boundary_ignores_INSIGHTS(self, workdir, monkeypatch):
+    def test_word_boundary_ignores_INSIGHTS(self, workdir, monkeypatch):  # noqa: N802 — INSIGHTS literal under test
         ns, pdir = _harvest(workdir, monkeypatch, "sess1")
         _make_transcript(
             pdir,
@@ -737,7 +737,6 @@ class TestTailScanBoundary:
 class TestAppendDoesNotMutateInput:
     def test_input_dict_unchanged_after_append(self, workdir):
         original = {"type": "feedback", "insight": "x"}
-        snapshot = dict(original)
         _run_append(json.dumps(original))  # JSON serialization already insulates
         # The defensive copy primarily protects in-process reuse; verify the
         # internal append helper does not back-mutate when called with a dict ref
