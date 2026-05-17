@@ -14,14 +14,17 @@ description: Make detailed impl plans w/ TDD tasks, exact file paths, verify com
   2. Map: List files to create/modify + their jobs
   3. Decompose: Break to phases (default) — each phase = single-commit unit on feature branch, ordered by dep. Use "Phase N" term, NOT "PR N", since plans usually run as N commits on 1 branch (single review cycle). For real multi-PR work (separate review cycles per change-set), opt-in w/ --pr-bundle.
   4. Template: Add plan header (goal, arch, tech stack)
-  5. Save: Write to docs/plans/<feature-name>-<username>-YYYY-MM-DD.md (w/ frontmatter: status: draft, revised: <today>)
+  5. Save (routing per RULES.md `<doc_output_convention>`): on feature path, write plan to `docs/features/<slug>/05-plan.md` (frontmatter: `status: draft, revised: <today>`) AND update `docs/features/<slug>/README.md` (`updated:` bump + append entry to `## Documents`, advance `phase:` if status enum moved). On standalone path, write to `docs/plans/<feature-name>-<username>-YYYY-MM-DD.md` — no README update needed.
   6. Handoff: Ready for /sc:implement --plan
   </flow>
 
   <outputs>
+Routing: per RULES.md `<doc_output_convention>` — feature path `docs/features/<slug>/05-plan.md` (existing folder OR user picks `[f]`) | standalone path `docs/plans/<feature-name>-<username>-YYYY-MM-DD.md` (user picks `[s]` or no related work expected). Slug resolution: exact-match silent / multi partial-match prompt / zero match → `[f]/[s]` w/ default `[f]`.
+
   | Artifact | Purpose |
   |---|---|
-  | `docs/plans/<name>-<username>-YYYY-MM-DD.md` | Impl plan w/ TDD tasks |
+  | Feature path: `docs/features/<slug>/05-plan.md` | Phase doc when slug resolves to existing/new feature folder |
+  | Standalone path: `docs/plans/<feature-name>-<username>-YYYY-MM-DD.md` | One-off plan, no related work expected |
   </outputs>
 
 
