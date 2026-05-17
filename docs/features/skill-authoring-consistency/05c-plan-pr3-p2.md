@@ -1,8 +1,8 @@
 ---
 status: draft
 revised: 2026-04-25
-spec: docs/specs/skill-authoring-consistency-discovery-ajitta-2026-04-25.md
-depends-on: docs/plans/skill-authoring-consistency-pr2-p1-ajitta-2026-04-25.md
+spec: ./01-discovery.md
+depends-on: ./05b-plan-pr2-p1.md
 ---
 
 # PR3: P2 Internal Coherence + 4-File `<bounds>` Unification
@@ -121,5 +121,5 @@ depends-on: docs/plans/skill-authoring-consistency-pr2-p1-ajitta-2026-04-25.md
   - Clarify {{SKILLS_PATH}} scope (command: only, not <references>)
   - Annotate field reference with shipped-skill usage counts
 
-  Spec: docs/specs/skill-authoring-consistency-discovery-ajitta-2026-04-25.md
+  Spec: ./01-discovery.md
   ```

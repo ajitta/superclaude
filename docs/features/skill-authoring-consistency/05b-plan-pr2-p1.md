@@ -1,8 +1,8 @@
 ---
 status: draft
 revised: 2026-04-25
-spec: docs/specs/skill-authoring-consistency-discovery-ajitta-2026-04-25.md
-depends-on: docs/plans/skill-authoring-consistency-pr1-p0-ajitta-2026-04-25.md
+spec: ./01-discovery.md
+depends-on: ./05a-plan-pr1-p0.md
 ---
 
 # PR2: P1 Drift Fixes — Update skill-authoring.md to Current Anthropic Truth
@@ -138,5 +138,5 @@ depends-on: docs/plans/skill-authoring-consistency-pr1-p0-ajitta-2026-04-25.md
   - Correct install-path scope (2 targets, not 3)
 
   Plus plugin-distribution investigation (see PR description).
-  Spec: docs/specs/skill-authoring-consistency-discovery-ajitta-2026-04-25.md
+  Spec: ./01-discovery.md
   ```
