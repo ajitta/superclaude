@@ -18,7 +18,7 @@ Replace flat per-type doc dirs (`docs/specs/`, `docs/plans/`, `docs/analysis/`, 
 2. [Plan](./05-plan.md) — 2026-05-18, status: draft — overall migration phases + command updates
 3. [Phase 2 Discovery](./01a-phase2-discovery.md) — 2026-05-18, status: complete — command output routing decisions (v2 review-clean)
 4. [Phase 2 Plan](./05a-plan-phase2.md) — 2026-05-18, status: complete — 7-commit single-PR rollout: brainstorm canary → smoke gate → 5 replications → cleanup
-5. [Open Decisions Resolution](./01b-discovery-open-decisions.md) — 2026-05-18, status: draft — 5 README open decisions resolved (cutoff date, migrate-on-touch, validator, link form, promotion trigger)
+5. [Open Decisions Resolution](./01b-discovery-open-decisions.md) — 2026-05-18, status: approved-for-plan — 5 README open decisions resolved (cutoff date, migrate-on-touch, validator, link form, promotion trigger); review v2 surfaced upstream RULES.md naming-example bug as carry-over
 
 Feature-level discovery (01-) skipped — `/grill-with-docs` session served as upstream discovery. Phase 2 discovery (01a-) scoped to command-edit sub-work only. Phase 2 plan (05a-) is additional plan doc per NNa rule — distinguisher `phase2` distinguishes it from primary `05-plan.md` (overall rollout). Letter suffix per `NNa-<phase>-<distinguisher>` rule for parallel/sub-phase docs within same slot.
 
