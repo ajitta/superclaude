@@ -1,5 +1,5 @@
 ---
-status: approved-for-plan
+status: complete
 revised: 2026-05-18
 ---
 
