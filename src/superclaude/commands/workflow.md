@@ -15,12 +15,16 @@ description: Generate structured implementation workflows from PRDs and feature 
   3. Coordinate: Multi-agent + domain expertise
   4. Execute: Step-by-step workflows + task coordination
   5. Validate: Quality gates + workflow completeness
+  6. Document (routing per RULES.md `<doc_output_convention>`): on feature path, write workflow to `docs/features/<slug>/05-plan.md` (variant — uses `05a-plan-workflow.md` if a primary plan doc already exists per multi-of-same-phase rule; frontmatter: `status: draft, revised: <today>`) AND update `docs/features/<slug>/README.md` (`updated:` bump + append entry to `## Documents`, advance `phase:` if status enum moved). On standalone path, write to `docs/plans/<topic>-workflow-<username>-YYYY-MM-DD.md` — no README update needed.
   </flow>
 
   <outputs>
+Routing: per RULES.md `<doc_output_convention>` — feature path `docs/features/<slug>/05-plan.md` (variant — `05a-plan-workflow.md` if primary plan doc exists per multi-of-same-phase rule; existing folder OR user picks `[f]`) | standalone path `docs/plans/<topic>-workflow-<username>-YYYY-MM-DD.md` (user picks `[s]` or no related work expected). Slug resolution: exact-match silent / multi partial-match prompt / zero match → `[f]/[s]` w/ default `[f]`.
+
 | Artifact | Purpose |
 |---|---|
-| `docs/plans/<topic>-workflow-<username>-YYYY-MM-DD.md` | Implementation workflow doc (with Status section) |
+| Feature path: `docs/features/<slug>/05-plan.md` (or `05a-plan-workflow.md` variant) | Phase doc when slug resolves to existing/new feature folder |
+| Standalone path: `docs/plans/<topic>-workflow-<username>-YYYY-MM-DD.md` | One-off workflow, no related work expected |
 | TaskCreate/TaskUpdate items | Task tracking hierarchy |
   </outputs>
 
