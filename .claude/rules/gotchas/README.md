@@ -10,7 +10,7 @@ Project-specific failure patterns live here. CC load files native.
 
 - **Format**: `- name: description` (one gotcha per line, same as framework `<gotchas>`)
 - **Creation**: `/sc:init` task [h] make `general.md`. Domain files proposed by R19 on first correction.
-- **paths: example**: `paths: ["**/models/**"]` → load only when work on model files
-- **Limits**: 50 lines per file, 100 lines total recommend
+- **paths: example**: `paths: ["**/models/**"]` → load only on model file work
+- **Limits**: 50 lines/file, 100 lines total recommended
 - **Gardening**: `# Last reviewed: YYYY-MM-DD` at top. `/sc:reflect` warn on 90-day+ stale.
 - **Layer priority**: Project gotcha (Layer 2) > Personal preference (Layer 3)
