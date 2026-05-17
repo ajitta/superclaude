@@ -11,7 +11,7 @@ revised: 2026-04-27
 
 **Tech Stack**: Python 3.10+, UV, pytest, Claude Agent SDK, jmespath (jq-style 추출), git worktree, ruff.
 
-**Source spec**: `docs/specs/auto-improve-design-ajitta-2026-04-27.md` (10/10 커버리지)
+**Source spec**: [`./04-design.md`](./04-design.md) (10/10 커버리지)
 **Branch**: `feat/auto-improve` ← `master`
 **Test baseline**: 1,628 passing → 1,628+N (N=신규, 회귀 0)
 
@@ -213,6 +213,6 @@ pyproject.toml                            (jmespath 의존성)
 
 ## Handoff
 
-> **`/sc:implement --plan docs/plans/auto-improve-ajitta-2026-04-27.md`** — Phase 1부터 순차 실행. 각 phase 종료 시 commit + `make test` baseline 검증.
+> **`/sc:implement --plan docs/features/auto-improve/05-plan.md`** — Phase 1부터 순차 실행. 각 phase 종료 시 commit + `make test` baseline 검증.
 
 권장 모델: Phase 1-2 (pure logic) Sonnet 4.6 충분. Phase 3 (Agent SDK) Opus 4.7 권장 (외부 API 통합 디버깅 복잡). Phase 4-5 Sonnet 4.6.
