@@ -1,7 +1,7 @@
 ---
 status: draft
 revised: 2026-04-02
-spec: docs/specs/workflow-necessity-gate-discovery-chosh1179-2026-04-02.md
+spec: ./01-discovery.md
 ---
 
 # Workflow Necessity Gate — Implementation Plan
@@ -127,5 +127,5 @@ Based on bulk-asset-delete retrospective (57% design waste, 90K token loss):
 - implement.md: phase validation loop (build→run→decide next)
 - RULES.md: [R18 Necessity Test] Necessity Test rule, expanded workflow_gates with /sc:design
 
-Spec: docs/specs/workflow-necessity-gate-discovery-chosh1179-2026-04-02.md
+Spec: ./01-discovery.md
 ```
