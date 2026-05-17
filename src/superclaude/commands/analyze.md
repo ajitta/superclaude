@@ -14,16 +14,19 @@ description: Code analysis across quality, security, performance, architecture d
   2. Scan: Domain-specific analysis per --focus
   3. Evaluate: Prioritized findings + severity (🔴🟡🟢)
   4. Recommend: Actionable guidance
-  5. Report: Generate output per --format
+  5. Report (routing per RULES.md `<doc_output_convention>` for `--format report` markdown only): on feature path, write report to `docs/features/<slug>/03-analysis.md` (frontmatter: `status: draft, revised: <today>`) AND update `docs/features/<slug>/README.md` (`updated:` bump + append entry to `## Documents`, advance `phase:` if status enum moved). On standalone path, write to `docs/analysis/<target>-<username>-YYYY-MM-DD.md` — no README update needed. text/json formats unchanged (text = console, json = standalone path only).
   6. Bridge: If findings actionable (fixable issues, not informational), suggest: "Would you like to create an implementation plan? → /sc:plan"
   </flow>
 
-  <outputs note="Per --format flag">
+  <outputs note="Per --format flag; report format dual-routes per RULES.md `<doc_output_convention>`">
+Routing (`--format report` only): per RULES.md `<doc_output_convention>` — feature path `docs/features/<slug>/03-analysis.md` (existing folder OR user picks `[f]`) | standalone path `docs/analysis/<target>-<username>-YYYY-MM-DD.md` (user picks `[s]` or no related work expected, default for one-off analysis). Slug resolution: exact-match silent / multi partial-match prompt / zero match → `[f]/[s]` w/ default `[s]`. text/json unaffected.
+
   | Format | Output | Content |
   |---|---|---|
   | `text` (default) | Console inline | Findings + recommendations inline |
-  | `json` | `docs/analysis/<target>-<username>-YYYY-MM-DD.json` | Structured findings as JSON |
-  | `report` | `docs/analysis/<target>-<username>-YYYY-MM-DD.md` | Full report with roadmap |
+  | `json` | `docs/analysis/<target>-<username>-YYYY-MM-DD.json` | Structured findings as JSON (standalone path only) |
+  | `report` (feature path) | `docs/features/<slug>/03-analysis.md` | Full report with roadmap, when slug resolves to existing/new feature folder |
+  | `report` (standalone path) | `docs/analysis/<target>-<username>-YYYY-MM-DD.md` | Full report, one-off analysis |
   </outputs>
 
 
