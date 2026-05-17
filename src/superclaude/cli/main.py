@@ -730,7 +730,7 @@ def verify_drift_cmd(scope: str, verbose: bool):
         superclaude verify-drift --scope project
     """
     from .install_commands import get_base_path
-    from .verify_drift import DRIFTED, EXTRA, MISSING, OK, verify_drift
+    from .verify_drift import OK, verify_drift
 
     base_path = get_base_path(scope)
     click.echo(f"🔍 Checking installation drift (scope: {scope})...\n")

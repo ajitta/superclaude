@@ -8,6 +8,7 @@ Tests: format_skills_summary, resolve_flags (alias/fuzzy matching),
 from dataclasses import dataclass
 
 from superclaude.scripts.context_loader import (
+    _BEHAVIORAL_MCPS,
     BASE_PATH,
     COMPOSITE_FLAGS,
     FLAG_ALIASES,
@@ -15,7 +16,6 @@ from superclaude.scripts.context_loader import (
     TIER_0_MAP,
     TRIGGER_MAP,
     VALID_FLAGS,
-    _BEHAVIORAL_MCPS,
     _get_injection_tier,
     format_skills_summary,
     resolve_flags,

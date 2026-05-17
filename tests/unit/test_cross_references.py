@@ -126,6 +126,6 @@ class TestAgentTriggerUniqueness:
             if len(owners) > 1
         }
         assert not duplicates, (
-            f"Duplicate trigger keywords found:\n"
+            "Duplicate trigger keywords found:\n"
             + "\n".join(f"  '{k}': {v}" for k, v in sorted(duplicates.items()))
         )

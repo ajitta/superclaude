@@ -4,19 +4,11 @@ Unit tests for Hook Tracker
 Tests session tracking and hook execution management.
 """
 
-import json
 import os
-import time
 from datetime import datetime, timedelta
-from pathlib import Path
 from unittest.mock import patch
 
-import pytest
-
 from superclaude.hooks.hook_tracker import (
-    HOOK_TRACKER_DIR,
-    HOOK_TRACKER_FILE,
-    SESSION_FILE,
     HookExecution,
     SessionData,
     _ensure_tracker_dir,

@@ -8,8 +8,12 @@ Compares source files against installed files to detect drift
 from pathlib import Path
 from typing import Any, Dict
 
-from .install_paths import COMPONENTS, _get_package_root, _get_source_dir, _get_target_dir
-
+from .install_paths import (
+    COMPONENTS,
+    _get_package_root,
+    _get_source_dir,
+    _get_target_dir,
+)
 
 # File status constants
 OK = "OK"

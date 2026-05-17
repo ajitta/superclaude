@@ -8,7 +8,6 @@ Validates:
 - COMPOSITE_FLAGS file references actually exist
 """
 
-import re
 from pathlib import Path
 
 import pytest

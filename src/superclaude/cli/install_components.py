@@ -11,13 +11,13 @@ import sys
 from pathlib import Path
 from typing import List, Tuple
 
+from .install_git_exclude import add_local_git_exclude
 from .install_paths import (
     COMPONENTS,
     _get_package_root,
     _get_source_dir,
     _get_target_dir,
 )
-from .install_git_exclude import add_local_git_exclude
 from .install_settings import (
     CLAUDE_SC_IMPORT,
     check_claude_md_import,
