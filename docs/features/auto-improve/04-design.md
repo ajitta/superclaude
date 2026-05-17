@@ -5,7 +5,7 @@ revised: 2026-04-27
 
 # `/sc:auto-improve` — Architecture Design
 
-**Source spec**: `docs/specs/auto-improve-discovery-ajitta-2026-04-27.md` (v1.4, status: approved-for-plan)
+**Source spec**: [`./01-discovery.md`](./01-discovery.md) (v1.4, status: approved-for-plan)
 **Type**: architecture
 **Scope**: v0.1 MVP design + 3 deferred OQ resolution
 
@@ -257,4 +257,4 @@ src/superclaude/
 
 > **Run `/sc:plan` on this design.** Plan generates TDD task list with file paths and verification commands per `<doc_output_convention>`.
 
-권장: `/sc:plan docs/specs/auto-improve-design-ajitta-2026-04-27.md`
+권장: `/sc:plan docs/features/auto-improve/04-design.md`
