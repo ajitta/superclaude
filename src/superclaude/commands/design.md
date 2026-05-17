@@ -16,13 +16,16 @@ description: Design system architecture, APIs, component interfaces w/ comprehen
   4. Constraints: Document operational params that constrain design — queue/buffer sizes, connection pool limits, external API batch limits, timeout values
   5. Necessity: For each proposed component, apply [R18 Necessity Test] — defer components lacking specific failure scenario, quantitative evidence, or user-facing impact
   6. Validate: Requirements coverage ≥90%, maintainability check
-  7. Document: Save design spec to docs/specs/<topic>-design-<username>-YYYY-MM-DD.md (frontmatter: status: draft, revised: <today>) + diagrams
+  7. Document (routing per RULES.md `<doc_output_convention>`): on feature path, write spec to `docs/features/<slug>/04-design.md` (frontmatter: `status: draft, revised: <today>`) AND update `docs/features/<slug>/README.md` (`updated:` bump + append entry to `## Documents`, advance `phase:` if status enum moved). On standalone path, write to `docs/specs/<topic>-design-<username>-YYYY-MM-DD.md` — no README update needed. Plus diagrams.
   </flow>
 
   <outputs note="All content in single spec file per invocation">
+Routing: per RULES.md `<doc_output_convention>` — feature path `docs/features/<slug>/04-design.md` (existing folder OR user picks `[f]`) | standalone path `docs/specs/<topic>-design-<username>-YYYY-MM-DD.md` (user picks `[s]` or no related work expected). Slug resolution: exact-match silent / multi partial-match prompt / zero match → `[f]/[s]` w/ default `[f]`.
+
 | Artifact | Content |
 |---|---|
-| `docs/specs/<topic>-design-<username>-YYYY-MM-DD.md` | Diagram + spec + interface definitions |
+| Feature path: `docs/features/<slug>/04-design.md` | Phase doc when slug resolves to existing/new feature folder |
+| Standalone path: `docs/specs/<topic>-design-<username>-YYYY-MM-DD.md` | One-off design, no related work expected |
   Sections per --type:
   - architecture: system diagram, component boundaries, interface contracts
   - api: endpoint diagram, request/response specs, OpenAPI schema
