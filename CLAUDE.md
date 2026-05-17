@@ -70,3 +70,17 @@ Project-specific traps: `.claude/rules/gotchas/general.md` (+ domain files with 
 Branch: `master` ← `integration` ← `feature/*`, `fix/*`, `docs/*`
 
 Commits: `feat:`, `fix:`, `docs:`, `refactor:`, `test:`, `chore:`
+
+## Agent skills
+
+### Issue tracker
+
+Issues live as local markdown under `.scratch/<feature>/` (fork has GitHub issues disabled). See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Default vocabulary — label strings match canonical role names verbatim. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context — one `CONTEXT.md` + `docs/adr/` at repo root. See `docs/agents/domain.md`.
