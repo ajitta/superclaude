@@ -14,13 +14,22 @@ description: Deep web research with adaptive planning + smart search. Use when u
   2. Plan: Strategy + depth + hop pattern + query decompose + parallel map
   3. Execute: Multi-hop search w/ parallel batch | Evidence collect | Adaptive replan on confidence&lt;0.6 or contradictions&gt;30%
   4. Validate: Cross-source verify | Credibility score | Contradiction resolve | Gap check
-  5. Synthesize: Credibility-weighted merge | Structured report → docs/research/[topic]-[username]-YYYY-MM-DD.md
+  5. Synthesize (routing per RULES.md `<doc_output_convention>`): credibility-weighted merge; on feature path, write report to `docs/features/<slug>/02-research.md` (frontmatter: `status: draft, revised: <today>`) AND update `docs/features/<slug>/README.md` (`updated:` bump + append entry to `## Documents`, advance `phase:` if status enum moved). On standalone path, write to `docs/research/<topic>-<username>-YYYY-MM-DD.md` — no README update needed.
   </flow>
 
   <depth note="See modes/RESEARCH_CONFIG.md for full profiles, hop config, thresholds">
     quick: 1 hop, auto plan, summary | standard: 2-3 hops, full plan, report
     deep: 3-4 hops, mid-checkpoints | exhaustive: 5+ hops, subagent delegate
   </depth>
+
+  <outputs>
+Routing: per RULES.md `<doc_output_convention>` — feature path `docs/features/<slug>/02-research.md` (existing folder OR user picks `[f]`) | standalone path `docs/research/<topic>-<username>-YYYY-MM-DD.md` (user picks `[s]` or no related work expected, default for one-off research). Slug resolution: exact-match silent / multi partial-match prompt / zero match → `[f]/[s]` w/ default `[s]`.
+
+| Artifact | Purpose |
+|---|---|
+| Feature path: `docs/features/<slug>/02-research.md` | Phase doc when slug resolves to existing/new feature folder |
+| Standalone path: `docs/research/<topic>-<username>-YYYY-MM-DD.md` | One-off research, no related work expected (default) |
+  </outputs>
 
 
   <tools note="Routing in modes/RESEARCH_CONFIG.md tool_routing">
