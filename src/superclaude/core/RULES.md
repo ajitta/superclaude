@@ -143,7 +143,7 @@ Depth: parent first → drill down next turn; ≤3 sub-options → inline [Na] [
 Default (multi-doc work): docs/features/<feature-slug>/
   Required: README.md (frontmatter + index) + numbered phase files
   Phase prefixes: 01-discovery (brainstorm) | 02-research | 03-analysis | 04-design | 05-plan (plan, workflow) | 06+-<custom> (impl notes, retrospective)
-  Multi-of-same-phase: `NNa-<phase>-<distinguisher>.md` (letter = Nth additional, starts at 'a'; distinguisher kebab-case ≤20 chars). Primary slot `NN-<phase>.md` optional — letter clock starts at 'a' even when primary skipped. Use for parallel streams (02a-research-libs, 02b-research-perf), phase-specific sub-discovery within multi-phase feature (01a-phase2-discovery), or mid-implementation discovery (01a-late-discovery).
+  Multi-of-same-phase: `NNa-<phase>-<distinguisher>.md` (letter = Nth additional, starts at 'a'; distinguisher kebab-case ≤20 chars). Primary slot `NN-<phase>.md` optional — letter clock starts at 'a' even when primary skipped. Use for parallel streams (02a-research-libs, 02b-research-perf), phase-specific sub-discovery within multi-phase feature (01a-discovery-phase2), or mid-implementation discovery (01a-discovery-late).
   Superseded versions: move to <feature>/archive/ subdir
   Feature-slug: kebab-case, ≤40 chars, no dates/usernames, locked at dir creation
 
@@ -169,14 +169,14 @@ Frontmatter rules:
 Status enum (per-doc): draft | review | approved-for-plan | implementing | complete | deprecated
 Status migration (legacy → enum): approved/reviewed → approved-for-plan | done/implemented/closed → complete | superseded → deprecated
 
-Cross-links: relative path within feature (./04-design.md) or across (../oauth-flow/05-plan.md). Stable because slugs locked at dir creation.
+Cross-links: relative path within feature (./04-design.md) or across (../oauth-flow/05-plan.md). Stable because slugs locked at dir creation. Cross-feature: relative path only (`../<other-slug>/NN-<phase>.md`). Slug refs (`[[...]]`) not supported.
 
 Formatter: /sc:cleanup --type docs (validate + transform + migrate + README index regen + slug-duplicate lint)
 
 Examples:
   docs/features/auth-refactor/README.md
   docs/features/auth-refactor/04-design.md
-  docs/features/auth-refactor/01a-phase2-discovery.md (additional same-phase doc)
+  docs/features/auth-refactor/01a-discovery-phase2.md (additional same-phase doc)
   docs/specs/selection-protocol-design-ajitta-2026-03-20.md (standalone or legacy)
   docs/adr/0001-event-sourced-orders.md
   </doc_output_convention>
