@@ -16,14 +16,14 @@ Replace flat per-type doc dirs (`docs/specs/`, `docs/plans/`, `docs/analysis/`, 
 
 1. [Design](./04-design.md) — 2026-05-18, status: draft — full feature-folder spec
 2. [Plan](./05-plan.md) — 2026-05-18, status: draft — overall migration phases + command updates
-3. [Phase 2 Discovery](./01a-phase2-discovery.md) — 2026-05-18, status: approved-for-plan — command output routing decisions (v2 review-clean)
-4. [Phase 2 Plan](./05a-plan-phase2.md) — 2026-05-18, status: draft — 7-commit single-PR rollout: brainstorm canary → smoke gate → 5 replications → cleanup
+3. [Phase 2 Discovery](./01a-phase2-discovery.md) — 2026-05-18, status: complete — command output routing decisions (v2 review-clean)
+4. [Phase 2 Plan](./05a-plan-phase2.md) — 2026-05-18, status: complete — 7-commit single-PR rollout: brainstorm canary → smoke gate → 5 replications → cleanup
 
 Feature-level discovery (01-) skipped — `/grill-with-docs` session served as upstream discovery. Phase 2 discovery (01a-) scoped to command-edit sub-work only. Phase 2 plan (05a-) is additional plan doc per NNa rule — distinguisher `phase2` distinguishes it from primary `05-plan.md` (overall rollout). Letter suffix per `NNa-<phase>-<distinguisher>` rule for parallel/sub-phase docs within same slot.
 
 ## Status
 
-Phase: **planning**. Phase 1 shipped (RULES.md rewritten, 9f50a6a). Phase 2 discovery + plan drafted; awaiting `/sc:implement --plan` execution.
+Phase: **planning**. Phase 1 shipped (RULES.md rewritten, 9f50a6a). Phase 2 shipped on branch `feature/phase2-command-routing` — 6 command-routing commits (brainstorm + design + plan + workflow + research + analyze) — awaiting PR merge.
 
 ## Open Decisions
 
