@@ -11,7 +11,7 @@ revised: 2026-05-18
 
 **Tech Stack:** Markdown edits only. No Python/test code. Verification = `/sc:brainstorm` smoke run + `make test` (baseline ~1,904) + `make sync-user` deploy.
 
-**Source spec:** `docs/features/doc-convention-v2/01a-phase2-discovery.md` v2 (status: approved-for-plan)
+**Source spec:** `docs/features/doc-convention-v2/01a-discovery-phase2.md` v2 (status: complete)
 
 ## Files Map
 
@@ -99,7 +99,7 @@ Per-command default for slug-resolution zero-match prompt (per Q3 v2):
 - [ ] 4.3 Full test: `make test` — expect baseline ~1,904 pass, 0 regression (markdown-only)
 - [ ] 4.4 Lint: `make lint`
 - [ ] 4.5 Final `make sync-user` to confirm clean deploy
-- [ ] 4.6 Spec status bump: `01a-phase2-discovery.md` status `approved-for-plan` → `implementing` → `complete` after Phase 3 ships
+- [x] 4.6 Spec status bump: `01a-discovery-phase2.md` status `approved-for-plan` → `implementing` → `complete` after Phase 3 ships (done; status now `complete`)
 - [ ] 4.7 Commit: `chore(docs): clean phase2 smoke artifact + bump feature phase to planning`
 - [ ] 4.8 Open PR titled `feat(commands): Phase 2 — route 6 file-producing commands to feature-folder layout`
 

@@ -16,7 +16,7 @@ Replace flat per-type doc dirs (`docs/specs/`, `docs/plans/`, `docs/analysis/`, 
 
 1. [Design](./04-design.md) — 2026-05-18, status: draft — full feature-folder spec
 2. [Plan](./05-plan.md) — 2026-05-18, status: draft — overall migration phases + command updates
-3. [Phase 2 Discovery](./01a-phase2-discovery.md) — 2026-05-18, status: complete — command output routing decisions (v2 review-clean)
+3. [Phase 2 Discovery](./01a-discovery-phase2.md) — 2026-05-18, status: complete — command output routing decisions (v2 review-clean)
 4. [Phase 2 Plan](./05a-plan-phase2.md) — 2026-05-18, status: complete — 7-commit single-PR rollout: brainstorm canary → smoke gate → 5 replications → cleanup
 5. [Open Decisions Resolution](./01b-discovery-open-decisions.md) — 2026-05-18, status: approved-for-plan — 5 README open decisions resolved (cutoff date, migrate-on-touch, validator, link form, promotion trigger); review v2 surfaced upstream RULES.md naming-example bug as carry-over
 6. [Phase 3 Plan](./05b-plan-phase3.md) — 2026-05-18, status: draft — 5-phase rollout: RULES.md fixes → 01a rename → /sc:promote-feature command → /sc:cleanup --type docs validator → smoke + PR
