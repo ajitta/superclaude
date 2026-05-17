@@ -1,8 +1,8 @@
 ---
 status: draft
 revised: 2026-04-25
-spec: docs/specs/skill-authoring-consistency-discovery-ajitta-2026-04-25.md
-depends-on: docs/plans/skill-authoring-consistency-pr3-p2-ajitta-2026-04-25.md
+spec: ./01-discovery.md
+depends-on: ./05c-plan-pr3-p2.md
 ---
 
 # PR4: P3 Cosmetic — Bilingual Standardization + Conditional Gotchas
@@ -89,7 +89,7 @@ Document each issue's status in PR description.
   - Runtime-quirks subsection: [conditional — N issues confirmed still-open]
     OR: omitted (all cited issues closed/fixed as of 2026-04-25)
 
-  Spec: docs/specs/skill-authoring-consistency-discovery-ajitta-2026-04-25.md
+  Spec: ./01-discovery.md
   ```
 
 ---

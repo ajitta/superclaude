@@ -1,7 +1,7 @@
 ---
 status: draft
 revised: 2026-04-25
-spec: docs/specs/skill-authoring-consistency-discovery-ajitta-2026-04-25.md
+spec: ./01-discovery.md
 ---
 
 # PR1: Remove `when-to-use`, Fold Triggers into `description`
@@ -166,7 +166,7 @@ Pre-composed candidates (review before applying):
   - Retire stale memory entry in reference_cc-native-fields.md
   - Canary probe verified: confidence-check auto-invokes on trigger phrase
 
-  Spec: docs/specs/skill-authoring-consistency-discovery-ajitta-2026-04-25.md
+  Spec: ./01-discovery.md
   ```
 - [ ] No fixture changes (verified absent in Task 1) — note this in commit body or PR description per D11.
 
