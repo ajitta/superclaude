@@ -7,7 +7,7 @@ revised: 2026-04-27
 
 Tracked queue of items deferred from [PR #2](https://github.com/ajitta/superclaude/pull/2) (Serena MCP realignment, merged 2026-04-26). To be handled in a **separate branch**, not in the original realignment scope.
 
-**Source:** [implementation plan](serena-mcp-realignment-ajitta-2026-04-26.md) Non-Goals section; [discovery spec](../specs/serena-mcp-realignment-discovery-ajitta-2026-04-26.md) Q6 + §Hooks recommendation.
+**Source:** [implementation plan](./05-plan.md) Non-Goals section; [discovery spec](./01-discovery.md) Q6 + §Hooks recommendation.
 
 ## Why deferred
 

@@ -11,7 +11,7 @@ revised: 2026-04-26
 
 **Tech Stack:** Markdown content framework (`src/superclaude/`), Python install module (`cli/install_mcp.py`), context-loader Python (`scripts/context_loader.py`). No application code; "tests" = 8 validation gates from spec.
 
-**Source Spec:** `docs/specs/serena-mcp-realignment-discovery-ajitta-2026-04-26.md` (v5, status: approved-for-plan)
+**Source Spec:** [`./01-discovery.md`](./01-discovery.md) (v5, status: approved-for-plan) — promoted from `docs/specs/serena-mcp-realignment-discovery-ajitta-2026-04-26.md` on 2026-05-18
 
 **Branch:** `fix/serena-mcp-realignment` (per CLAUDE.md git conventions; this is a correctness fix for stale references)
 
@@ -202,8 +202,8 @@ revised: 2026-04-26
 - [ ] `git status` clean (or any pending changes are intentional baseline)
 - [ ] `claude mcp list` shows `serena: serena start-mcp-server --context=claude-code --project-from-cwd  - ✓ Connected`
 - [ ] Branch created: `git checkout -b fix/serena-mcp-realignment`
-- [ ] Spec re-read: `docs/specs/serena-mcp-realignment-discovery-ajitta-2026-04-26.md` v5
+- [ ] Spec re-read: [`./01-discovery.md`](./01-discovery.md) v5
 
 ## Handoff
 
-Ready for `/sc:implement --plan docs/plans/serena-mcp-realignment-ajitta-2026-04-26.md`. Each phase is a single commit; total 6 phases, ≤6 commits. Phase 5 may produce zero commits if audit clean.
+Ready for `/sc:implement --plan docs/features/serena-mcp-realignment/05-plan.md`. Each phase is a single commit; total 6 phases, ≤6 commits. Phase 5 may produce zero commits if audit clean.
