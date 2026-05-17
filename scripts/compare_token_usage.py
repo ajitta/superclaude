@@ -24,8 +24,8 @@ Requirements:
 
 import subprocess
 import sys
-from pathlib import Path
 from collections import defaultdict
+from pathlib import Path
 
 try:
     import tiktoken
@@ -168,7 +168,7 @@ def print_report(categories: dict, file_details: list, before: str, after: str):
     # Overhead estimate (for XML-embedded pattern)
     if total_delta > 0:
         avg_overhead = total_delta / total_files
-        print(f"\nOVERHEAD ESTIMATE:")
+        print("\nOVERHEAD ESTIMATE:")
         print(f"Average overhead per file: {avg_overhead:.1f} tokens")
         yaml_est = 60 * total_files
         xml_est = 25 * total_files

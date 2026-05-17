@@ -8,7 +8,6 @@ from typing import Iterable
 
 from .observation import Observation, validate
 
-
 FIXED_COLS = (
     "variant",
     "exit",

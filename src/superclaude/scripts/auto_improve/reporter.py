@@ -12,7 +12,6 @@ from pathlib import Path
 
 from .results_tsv import ResultsTsv
 
-
 _STALE_PID_THRESHOLD_S = 24 * 3600  # PID file older than this is treated as crashed
 
 

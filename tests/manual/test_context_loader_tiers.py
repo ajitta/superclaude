@@ -157,7 +157,8 @@ def verify_verbose_warning() -> None:
 
 def verify_missing_file_skip() -> None:
     """Improvement #3: TIER_0_MAP hint should be skipped if backing file is missing."""
-    import os, tempfile
+    import os
+    import tempfile
     clear_cache()
     fake_root = Path(tempfile.mkdtemp(prefix="sc_fake_"))
     (fake_root / "mcp").mkdir()
@@ -204,7 +205,6 @@ def verify_session_dedup() -> None:
 
 def verify_lifecycle_events() -> None:
     """Probe: cache behavior across /clear, /compact, SessionStart(startup) events."""
-    import os
     RESET = Path.home() / ".claude" / "superclaude" / "scripts" / "context_reset.py"
     print("\n--- Lifecycle event probe: /clear, /compact, SessionStart=startup ---")
 

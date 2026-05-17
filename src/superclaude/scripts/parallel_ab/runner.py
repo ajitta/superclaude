@@ -20,7 +20,6 @@ from .observation import (
 )
 from .spec_loader import RunnerCfg, Scenario, Variant
 
-
 _AUTH_PATTERNS = re.compile(
     r"authent|credential|api[\s\-]?key|unauthor|login",
     re.IGNORECASE,

@@ -10,8 +10,8 @@ import pytest
 from superclaude.scripts.parallel_ab.observation import (
     Observation,
     ObservationError,
-    ToolCall,
     Tokens,
+    ToolCall,
     compute_sha256,
     emit,
     validate,

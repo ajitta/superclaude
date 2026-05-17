@@ -14,7 +14,6 @@ from .observation import Observation, emit
 from .runner import run_variant
 from .spec_loader import ABSpec, RunnerCfg, Scenario, Variant, load_spec
 
-
 DEFAULT_MAX_PARALLEL = 8
 
 RunnerFn = Callable[..., Awaitable[Observation]]

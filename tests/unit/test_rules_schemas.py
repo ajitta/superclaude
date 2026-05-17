@@ -1,7 +1,6 @@
 """Tests for .claude/rules/schemas.yaml — single source of truth for enum rules."""
 from pathlib import Path
 
-import pytest
 import yaml
 
 SCHEMAS_PATH = Path(__file__).parent.parent.parent / ".claude" / "rules" / "schemas.yaml"

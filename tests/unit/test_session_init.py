@@ -8,10 +8,7 @@ and multi-directory CLAUDE.md detection.
 import json
 import subprocess
 from dataclasses import dataclass
-from pathlib import Path
 from unittest.mock import MagicMock, patch
-
-import pytest
 
 from superclaude.scripts.session_init import (
     get_additional_dirs_status,
@@ -20,7 +17,6 @@ from superclaude.scripts.session_init import (
     init_hook_tracker,
     main,
 )
-
 
 # ---------------------------------------------------------------------------
 # Helpers
