@@ -138,18 +138,47 @@ Accept: bare numbers, comma lists, y/n, free text — all valid
 Depth: parent first → drill down next turn; ≤3 sub-options → inline [Na] [Nb] [Nc]
   </selection_protocol>
 
-  <doc_output_convention note="Unified naming for all file-producing commands">
-Topic-based: docs/<type>/<topic-slug>-<suffix?>-<username>-YYYY-MM-DD.md
-Username: `git config user.name` (lowercase, no spaces) — fallback to system username
-Directory: brainstorm→docs/specs/ | design→docs/specs/ | plan→docs/plans/ | workflow→docs/plans/ | analyze→docs/analysis/ | research→docs/research/
-Suffix (shared dirs only): brainstorm→-discovery | design→-design | workflow→-workflow
-Living docs (UPPER_SNAKE, no date/username): index→docs/reports/ | index-repo→docs/reports/ | document --type api→docs/reports/
-Inline only (no file output): test, build, cleanup — results go to console, tool artifacts (coverage/, dist/) preserved
-Frontmatter: specs/+plans/ require {status, revised}. research/+analysis/ optional. reports/ none
-Status enum: draft | review | approved-for-plan | implementing | complete | deprecated
-Status migration (legacy → enum): approved/reviewed → approved-for-plan | done/implemented/closed → complete | superseded → deprecated. /sc:cleanup --type docs handles bulk migration; new docs MUST use enum values.
-Formatter: /sc:cleanup --type docs (validate + transform + migrate)
-Example: docs/specs/selection-protocol-design-ajitta-2026-03-20.md
+  <doc_output_convention note="Unified naming for all file-producing commands. Spec: docs/features/doc-convention-v2/04-design.md">
+
+Default (multi-doc work): docs/features/<feature-slug>/
+  Required: README.md (frontmatter + index) + numbered phase files
+  Phase prefixes: 01-discovery (brainstorm) | 02-research | 03-analysis | 04-design | 05-plan (plan, workflow) | 06+-<custom> (impl notes, retrospective)
+  Multi-of-same-phase: `NNa-<phase>-<distinguisher>.md` (letter = Nth additional, starts at 'a'; distinguisher kebab-case ≤20 chars). Primary slot `NN-<phase>.md` optional — letter clock starts at 'a' even when primary skipped. Use for parallel streams (02a-research-libs, 02b-research-perf), phase-specific sub-discovery within multi-phase feature (01a-phase2-discovery), or mid-implementation discovery (01a-late-discovery).
+  Superseded versions: move to <feature>/archive/ subdir
+  Feature-slug: kebab-case, ≤40 chars, no dates/usernames, locked at dir creation
+
+Standalone (single-doc one-off): docs/<type>/<slug>-<suffix?>-<username>-YYYY-MM-DD.md
+  Type→dir: analyze→analysis/ | research→research/ | design→specs/ | brainstorm→specs/ | plan→plans/ | workflow→plans/
+  Suffix (shared dirs): brainstorm→-discovery | design→-design | workflow→-workflow
+  Standalone criteria: 1 doc total, no follow-on phases, lifespan <1 week. On 2nd related doc: promote via /sc:promote-feature.
+  Legacy pre-cutoff (2026-05-18): stays in place, no bulk move
+
+Living docs (UPPER_SNAKE, no date/username): docs/reports/{PROJECT_INDEX,...}.md (sc:index, sc:index-repo, sc:document --type api)
+ADRs (sequence, unchanged): docs/adr/NNNN-<slug>.md (4-digit, per-dir counter)
+Archive: docs/archive/features/<slug>/ (completed features) | docs/archive/{plans,specs}/ (pre-existing legacy)
+Inline only (no file output): test, build, cleanup — console + tool artifacts (coverage/, dist/)
+
+Username: `git config user.name` (lowercase, no spaces) — fallback OS username
+
+Frontmatter rules:
+  Feature README: {feature, phase, owner, created, updated, related?}. Phase enum: discovery | design | planning | implementing | complete | abandoned
+  Phase doc (inside feature folder): {status, revised}
+  Standalone specs/+plans/: {status, revised}
+  Standalone research/+analysis/: optional {status, revised}
+  Reports/ADRs: none
+Status enum (per-doc): draft | review | approved-for-plan | implementing | complete | deprecated
+Status migration (legacy → enum): approved/reviewed → approved-for-plan | done/implemented/closed → complete | superseded → deprecated
+
+Cross-links: relative path within feature (./04-design.md) or across (../oauth-flow/05-plan.md). Stable because slugs locked at dir creation.
+
+Formatter: /sc:cleanup --type docs (validate + transform + migrate + README index regen + slug-duplicate lint)
+
+Examples:
+  docs/features/auth-refactor/README.md
+  docs/features/auth-refactor/04-design.md
+  docs/features/auth-refactor/01a-phase2-discovery.md (additional same-phase doc)
+  docs/specs/selection-protocol-design-ajitta-2026-03-20.md (standalone or legacy)
+  docs/adr/0001-event-sourced-orders.md
   </doc_output_convention>
 
   <workflow_gates>
