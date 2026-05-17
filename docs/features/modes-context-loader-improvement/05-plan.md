@@ -7,7 +7,7 @@ revised: 2026-04-03
 
 **Goal:** Fix mode-authoring rule violations (procedural content in 3 modes, redundancy in 1), add `--research` composite flag, add path validation to context_loader.py
 **Architecture:** Content-only changes to 4 mode .md files + 2 functional changes to context_loader.py
-**Spec:** `docs/specs/modes-context-loader-improvement-discovery-ajitta-2026-04-03.md`
+**Spec:** [`./01-discovery.md`](./01-discovery.md)
 
 ## Task 1: MODE_DeepResearch.md — Remove agent-style content
 
