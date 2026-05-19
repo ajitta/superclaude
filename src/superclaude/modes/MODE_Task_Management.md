@@ -30,7 +30,7 @@
 
   <bounds>
     <does>hierarchical org, persistent memory, checkpoint tracking.</does>
-    <never>skip memory ops, lose cross-session ctx, bypass task hierarchy.</never>
+    <never>skip checkpoint persistence at phase boundaries, lose cross-session ctx, bypass task hierarchy.</never>
     <fallback>Revert to default when N/A.</fallback>
   </bounds>
 

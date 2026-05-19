@@ -38,7 +38,7 @@ Situational cognitive overlays that modify Claude's thinking, communication, pri
 - `<priorities>` — what to optimize for (trade-off guidance)
 - `<behaviors>` — concrete action patterns
 
-**Supporting files:** RESEARCH_CONFIG.md (type="config") provides operational parameters for the research mode — depth profiles, confidence thresholds, tool routing. It is not a mode itself but ships with modes/ because it's loaded alongside the research mode.
+**Supporting files:** RESEARCH_CONFIG.md (type="config") provides operational parameters for the research mode — depth profiles, confidence thresholds, tool routing. It is not a mode itself and is **not** auto-injected by `context_loader.py`; it ships with modes/ as reference material accessed via cross-refs from `commands/research.md` and the research mode body.
 
 **Contract:** Modes shape mindset, not process. They do not contain step-by-step procedures (→ commands), API references (→ mcp), or tool routing matrices (→ core/FLAGS).
 
