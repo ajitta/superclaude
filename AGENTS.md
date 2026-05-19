@@ -57,12 +57,12 @@ SuperClaude is a **content framework** — markdown files (commands, agents, mod
 
 - **CLAUDE_SC.md import chain**: `@superclaude/CLAUDE_SC.md` → `core/FLAGS.md`, `PRINCIPLES.md`, `RULES.md`
 - **Hooks merge (not replace)**: `install_settings.py` preserves user hooks via marker-based identification
-- Authoring rules live in `.Codex/rules/` (agent, command, skill, mode — auto-loaded by CC)
+- Authoring rules live in `.claude/rules/` (agent, command, skill, mode — auto-loaded by CC)
 - Serena session memories live in `.serena/` (committed for cross-session context)
 
 ## Gotchas
 
-Project-specific traps: `.Codex/rules/gotchas/general.md` (+ domain files with `paths:` frontmatter). Format: `- name: description`. Top trap: do **not** Read sub-agent `*.output` files — wait for the returned summary.
+Project-specific traps: `.claude/rules/gotchas/general.md` (+ domain files with `paths:` frontmatter). Format: `- name: description`. Top trap: do **not** Read sub-agent `*.output` files — wait for the returned summary.
 
 ## Git Workflow
 

@@ -54,6 +54,6 @@ Logic: → leads to | ↔ mutual | ≡ equivalence | ≠ differentiation
   <config_defaults>
 experts: max=5, min=3, auto=true, diversity=true
 analysis: phase=adaptive, synthesis=required, cross_validation=true
-output: symbols=true, templates=true, voice_preservation=0.85
+output: symbols=true, templates=true
   </config_defaults>
 </component>
