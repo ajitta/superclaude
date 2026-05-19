@@ -6,13 +6,13 @@ Framework DNA — always-on principles + rules define SuperClaude identity.
 
 Core files load via `CLAUDE_SC.md` `@import` at session start. Present in **every** Claude Code session where SuperClaude installed.
 
-**Exception:** BUSINESS_SYMBOLS.md load on-demand by `context_loader.py` when business-panel mode/agent fire.
+**Exception:** BUSINESS_SYMBOLS.md load on-demand by `context_loader.py` when business-symbol / panel-example / `--structured` patterns match.
 
 ## Files
 
 | File | Role | Delivery |
 |------|------|----------|
-| FLAGS.md | Behavioral flags, mode triggers, MCP routing, model assignments | Always loaded |
+| FLAGS.md | Behavioral flags, mode triggers, MCP routing, execution + output flags | Always loaded |
 | PRINCIPLES.md | Software engineering principles and decision frameworks | Always loaded |
 | RULES.md | Behavioral guardrails, priority system, anti-over-engineering rules | Always loaded |
 | BUSINESS_SYMBOLS.md | Symbol system for business strategy multi-expert panel | On-demand |
