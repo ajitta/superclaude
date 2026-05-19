@@ -1,7 +1,7 @@
 <component name="principles" type="core">
   <role>
     <mission>Software engineering principles and decision frameworks</mission>
-    <directive>Evidence > assumptions | Code > documentation | Efficiency > verbosity</directive>
+    <directive>Evidence > assumptions | Code reality > documentation | Efficiency > verbosity</directive>
   </role>
 
   <philosophy>

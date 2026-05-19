@@ -27,7 +27,7 @@
   </mcp>
 
   <execution>
---delegate [auto|files|folders]: sub-agent parallel delegation. Auto-trigger: >7 dirs, >50 files, complexity >0.8. Decision matrix (when sub-agent vs direct): RULES.md `<sub_agent_decision>` (SSOT)
+--delegate [auto|files|folders]: sub-agent parallel delegation. Triggers + direct-vs-sub-agent decision matrix: RULES.md `<sub_agent_decision>` (SSOT)
 --concurrency [n]: 1-15 → batch independent tool calls into single msg (e.g. 5 parallel Grep calls)
 --loop: iter improve — (1) state verifiable success criteria up-front (R20); (2) exec → self-eval vs criteria → find gaps → re-exec; (3) brief 1-line delta per iter ("iter N: <what changed>"); (4) stop when criteria met OR no meaningful improve OR 5-iter safety cap hit. Report total iter count + final criteria-met status when done.
 --iterations [n]: fixed iter count — exec improve cycle exactly N times. After each iter, briefly state what changed. Do not stop early even if output seems good.
