@@ -4,7 +4,9 @@ Mindset overlays — situational cog frameworks that modify Claude thinking, com
 
 ## Content Delivery
 
-Modes activate on-demand by `context_loader.py` via flag/keyword detect (TRIGGER_MAP). **Not** managed by Claude Code native content sys — no frontmatter needed.
+Modes activate on-demand by `context_loader.py` via flag/keyword detect. **Not** managed by Claude Code native content sys — no frontmatter needed.
+
+> Tables below list each mode's **primary flag**. Full trigger patterns (aliases like `--bs`, keyword forms like `systematic investigation`, slash commands like `/sc:research`) live in `scripts/context_loader.py` TRIGGER_MAP — SSOT.
 
 ## Available Modes
 

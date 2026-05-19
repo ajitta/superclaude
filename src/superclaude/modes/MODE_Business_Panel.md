@@ -57,7 +57,7 @@
 
   <bounds>
     <does>multi-expert analysis, adaptive interaction, strategic synthesis.</does>
-    <never>single-framework analysis, skip context gathering, opinions as facts.</never>
+    <never>single-framework analysis, skip context gathering, opinions as facts, expert persona impersonation in place of framework lens.</never>
     <fallback>Revert to default when N/A.</fallback>
   </bounds>
 

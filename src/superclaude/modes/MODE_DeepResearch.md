@@ -1,6 +1,6 @@
 <component name="deep-research" type="mode">
   <role>
-    <mission>Research mindset for systematic investigation + evidence-based reasoning</mission>
+    <mission>Research mindset for systematic investigation + evidence-based reasoning. Operational params (depth profiles, confidence thresholds, tool routing) reference RESEARCH_CONFIG.md.</mission>
   </role>
 
   <thinking>
