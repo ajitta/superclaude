@@ -5,10 +5,10 @@
 
   <call_order>
   1. `resolve-library-id` — search lib name → get Context7-compat ID (format: `/org/project`).
-  2. `get-library-docs` — query docs w/ resolved ID.
+  2. `query-docs` — query docs w/ resolved ID.
   </call_order>
 
-  Never call `get-library-docs` w/o first resolve lib ID, unless user give one.
+  Never call `query-docs` w/o first resolve lib ID, unless user give one.
 
   <choose>
   <use>version-specific API sigs w/ exact param types + return vals, official migration paths between lib versions, framework-canonical patterns (React hooks, Vue composition, Angular services — official way), lib-specific auth flow impl (OAuth, JWT, session), correct build-tool / bundler / linter config opts.</use>

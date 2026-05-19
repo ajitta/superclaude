@@ -9,13 +9,13 @@
   </choose>
 
   <search_patterns>
+  MCP exposes only `tavily-search` + `tavily-extract`. Pattern set below applies to `tavily-search`; multi-source research / site crawl / URL map live in `/tavily-cli` skill (see fallback).
+
   - Basic: query → ranked results.
   - Domain: query + `include_domains:[arxiv,github]`.
   - Time: query + `time_range:week`.
   - Date: query + `start_date` / `end_date`.
   - Deep: query + `include_raw_content:true`.
-  - Research: input → multi-source synthesis.
-  - Crawl: url + depth + instructions → pages.
   </search_patterns>
 
   <integration_patterns>

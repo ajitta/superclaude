@@ -30,14 +30,14 @@
   - Performance-Audit: DevTools:trace → `lighthouse_audit` → Sequential:analyze → `/sc:improve`.
   - Frontend-Verify (`--frontend-verify`): Playwright:interact + DevTools:profile + Serena:code-review.
   - A11y-Audit: DevTools:accessibility-skill → snapshot → `/sc:analyze --focus a11y`.
-  - Memory-Leak: DevTools:`take_memory_snapshot` → compare snapshots → find retained objects.
+  - Memory-Leak: DevTools:`take_heapsnapshot` → compare snapshots → find retained objects.
   </integration_patterns>
 
   <examples>
 | Input | Action | Reason |
 |---|---|---|
 | analyze page performance | DevTools: lighthouse_audit → trace → analyze insights | Comprehensive CWV + Lighthouse |
-| debug memory leak in SPA | DevTools: take_memory_snapshot → compare → identify | Heap analysis |
+| debug memory leak in SPA | DevTools: take_heapsnapshot → compare → identify | Heap analysis |
 | check accessibility score | DevTools: lighthouse_audit (a11y category) → snapshot | Automated WCAG |
 | profile network requests | DevTools: list_network_requests → get_network_request | Request timing/size |
 | debug in live Chrome session | DevTools: --auto-connect to existing browser | Reuse dev session |

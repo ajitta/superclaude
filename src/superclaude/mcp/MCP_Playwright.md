@@ -23,7 +23,7 @@
   - `--caps=network,storage` — enable more caps.
   - `--persistent` — persistent browser profile (default: incognito).
   - `-s=<name>` — session mgmt.
-  - `--snapshot-mode=incremental|full|none` — ctrl snapshot gen.
+  - `--snapshot-mode=full|none` — ctrl snapshot gen.
   - `--slim` — token save mode.
   - `--test-id-attribute=<attr>` — custom test ID selector (default: `data-testid`).
   - `--secrets=<path>` — dotenv-format secrets file.
@@ -44,7 +44,7 @@
   - E2E-Suite: `/sc:test --type e2e` → Playwright:execute → screenshot evidence → report.
   - Visual-QA: Playwright:screenshot → Claude:vision → `/sc:review`.
   - A11y-Audit: Playwright:snapshot → assert accessible names → `/sc:analyze --focus a11y`.
-  - API-Mock-Testing: Playwright:`browser_route_set` → nav → verify UI w/ mocked data.
+  - API-Mock-Testing: Playwright:`browser_route` → nav → verify UI w/ mocked data.
   </integration_patterns>
 
   <examples>
@@ -53,7 +53,7 @@
 | test login flow | nav → type → click → assert snapshot | Real browser interact |
 | verify responsive navbar | screenshot at 3 viewports → compare | Visual validate |
 | test offline behavior | browser_network_state_set(offline) → verify | Net state test |
-| mock API error response | browser_route_set(pattern, status:500) → verify UI | Error state test |
+| mock API error response | browser_route(pattern, status:500) → verify UI | Error state test |
 | test auth cookie handling | browser_cookie_set → nav → assert | Storage interact |
   </examples>
 
