@@ -40,7 +40,7 @@ Note: match flags to session type — analysis/discussion sessions rarely need -
   </execution>
 
   <output>
---uc|--ultracompressed: symbol system, 30-50% reduction (trigger: ctx pressure)
+--uc|--ultracompressed: symbol system, 30-50% reduction. Manual/proactive trigger >=60% ctx (per MODE_Token_Efficiency.md); auto via --safe-mode at >=85%
 --scope [file|module|project|system]: analysis boundary
 --focus [perf|security|quality|arch|a11y|testing]: target domain
   </output>

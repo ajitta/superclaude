@@ -25,7 +25,7 @@
   - Status line (v2.1.6+): context_window.used_percentage
   - Check before complex ops: Glob large dirs, multi-file reads
   - Token consumption varies by model — monitor context usage proactively
-  - One major task per session | Use --uc at 60% | Fresh sessions for unrelated tasks
+  - One major task per session | Proactive --uc at >=60% session ctx (auto-activation thresholds in FLAGS.md: --token-efficient 75%, --safe-mode 85%) | Fresh sessions for unrelated tasks
 
   ## Symbols
 | Category | Symbols |
@@ -49,7 +49,7 @@
   </examples>
 
   ## Compaction
-  - When: Context >60% used, answer quality degrading, or explicit --uc flag
+  - When: Context >60% used (proactive — auto-trigger thresholds higher per FLAGS.md), answer quality degrading, or explicit --uc flag
   - Preserve: Architecture decisions, unresolved issues, impl details, active file paths
   - Discard: Completed tool outputs, resolved intermediate results, stale error messages
   - Safest action: Clear old tool call results — agent rarely needs raw results from earlier turns
