@@ -14,7 +14,7 @@ description: Capture structured session insights to per-project JSONL for human 
   2. Capture (default): scan session → propose 3-7 insights → show user for approval → append approved
   3. Capture (text): take user text → infer type + tags → shape as JSON → show → append
   4. Dedup: before propose, run `insight_writer.py list --limit 20` to check recent entries → skip already-captured topics. For annotations, also check existing ref_ts.
-  5. Append: ALWAYS via `python3 {{SCRIPTS_PATH}}/insight_writer.py append --json '<json>'` — NEVER hand-write to insights.jsonl. Script enforce schema, escaping, annotation ref check.
+  5. Append: ALWAYS via `python3 {{SCRIPTS_PATH}}/insight_writer.py append --json '<json>'` — NEVER hand-write to insights.jsonl. Script enforce schema, escaping, annotation ref check. (`{{SCRIPTS_PATH}}` here and below resolves to `~/.claude/superclaude/scripts/` — substitute real path when running; command bodies ship the literal template unresolved.)
   6. Read modes: `--list`, `--query`, `--stats` shell to jq via same script. If jq missing, script print install hint + exit 1 — relay message to user.
   7. Review mode: `--review` call `insight_writer.py review` to list pending markers harvested by SessionEnd/PreCompact hooks. For each wanted entry, propose structured promote (type + tags) + call `insight_writer.py promote --index N --type TYPE [--tags a,b]`.
   </flow>
