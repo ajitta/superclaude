@@ -79,7 +79,7 @@ Anchors verified by grep on `master`, 2026-05-30.
 - Benchmark figures as fact (69.2% / 57.9% / 4×) — secondary-source; confirm against system card before any quote (research §7).
 - Effort control in claude.ai/Cowork, fast-mode pricing, Messages API code — runtime/SDK, not CLAUDE.md content (matches 4.7 D2/D10 deferrals).
 - Model identity prompt — framework stays model-agnostic by design (2026-03-23 spec; 4.7 T3-c).
-- `frontend-architect.md:39` "Opus 4.7 house style" label — version-pinned wording surfaced during Tier-1 implementation; de-pin candidate (same pattern as T1-b), deferred — not in committed Tier-1 scope.
+- `frontend-architect.md:39` "Opus 4.7 house style" label — ✅ de-pinned 2026-05-30 to "a common model default house style" (palette provenance kept in 4.7 B5); completes the shipped-content version-pin sweep.
 
 ## 6. Verification checklist
 

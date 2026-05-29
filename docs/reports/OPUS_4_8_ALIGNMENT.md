@@ -29,8 +29,7 @@ Expected: 0 matches (commit `8edd05d` stance; reinforced by 4.8 `high` default)
 
 ## V6 (carry 4.7 V5) Frontend AI-slop guard present
 Command: `grep -nE "aesthetics|house style|Forbidden defaults" src/superclaude/agents/frontend-architect.md`
-Expected: `<aesthetics>` block present
-Known follow-up: the block still labels the house style "Opus 4.7 house style" — version-pinned wording (see Run results). De-pin candidate, out of Tier-1 scope.
+Expected: `<aesthetics>` block present; house-style label is version-neutral (no "Opus 4.7 house style")
 
 ## V7 (carry 4.7 V6) Review agents use coverage-first finding language
 Command: `grep -l "finding_policy" src/superclaude/agents/{quality-engineer,self-review,security-engineer}.md`
@@ -63,14 +62,14 @@ Status: Tier 3, not run this pass. %-based Token Efficiency thresholds already p
 | V3 | ✅ pass | `agent-authoring.md:92,96` rewritten — "high = default on all surfaces", xhigh/max = "difficult/long-async", no "baseline" |
 | V4 | ✅ pass | `schemas.yaml:18-23` — `xhigh` added; `(default)` moved to `high`; `max` now "Opus 4.6+" |
 | V5 | ✅ pass | `grep "effort:" src/superclaude/agents/` → 0 occurrences across 0 files |
-| V6 | ⚠️ pass w/ follow-up | `<aesthetics>` present at `frontend-architect.md:38-40`; still reads "Opus 4.7 house style" — version-pinned label, de-pin candidate (out of Tier-1 scope) |
+| V6 | ✅ pass | `<aesthetics>` present at `frontend-architect.md:38-40`; "Opus 4.7 house style" label de-pinned → "a common model default house style" (palette provenance stays in 4.7 B5) |
 | V7 | ⏭ carry-forward | unchanged; finding_policy present in 3 review agents per 4.7 V6 |
 | V8 | ⏭ carry-forward | unchanged; no budget_tokens in core/ per 4.7 V7 |
 | V9 | ✅ pass | `xml-prose-format.md:16,91,287` de-pinned to "recent Opus models (4.5+)" |
 | V10 | ✅ pass | `uv run pytest tests/unit/test_agent_structure.py -q` → **722 passed in 1.17s** |
 | V11 | ⏭ deferred | Tier 3 — not run |
 
-**Summary:** 6 ✅ pass · 1 ⚠️ pass-with-follow-up (V6 frontend label) · 3 ⏭ carry-forward · 1 ⏭ deferred (V11). Tier 1 (T1-a/b/c/d) complete.
+**Summary:** 7 ✅ pass · 3 ⏭ carry-forward · 1 ⏭ deferred (V11). Tier 1 (T1-a/b/c/d) complete; frontend label de-pinned same pass.
 
 **Regression:** `uv run pytest tests/unit/{test_agent,test_command,test_mode,test_skill}_structure.py -q` → **1368 passed in 2.42s** (covers the `schemas.yaml` SSOT fixture across all content types). Full `tests/unit/` suite hit **Exit 137** (process killed — Windows env OOM/timeout, not a test failure); targeted structure suite stands as Level-1 evidence for the only test-enforced change (effort enum). Re-run full suite in CI / healthy `.venv` to confirm the ~1,904 baseline.
 
@@ -81,4 +80,4 @@ Status: Tier 3, not run this pass. %-based Token Efficiency thresholds already p
 - `.claude/rules/schemas.yaml` — T1-c, effort enum reconciled (+`xhigh`; not shipped)
 - `docs/reports/OPUS_4_8_ALIGNMENT.md` — T1-d, this artifact
 
-**Deferred (Tier 2/3, unchanged from plan):** subagent spawn-eagerness eval (T2-a), compaction-drift threshold (T2-b), absolute-token audit (V11), `frontend-architect.md:39` "Opus 4.7 house style" de-pin, behavioral Part B suite.
+**Deferred (Tier 2/3, unchanged from plan):** subagent spawn-eagerness eval (T2-a), compaction-drift threshold (T2-b), absolute-token audit (V11), behavioral Part B suite.

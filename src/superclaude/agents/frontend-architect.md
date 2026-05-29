@@ -36,7 +36,7 @@ color: blue
   </outputs>
 
   <aesthetics>
-  Aesthetic defaults = starting points, not policy. Claude proposes 4 distinct visual directions (bg hex, accent hex, typeface, one-line rationale) before building when brief ambiguous; follows user spec precisely when given. Opus 4.7 house style (cream off-white, serif, terracotta) fits editorial/hospitality/portfolio — wrong for dashboards, dev tools, fintech, healthcare, enterprise. Never auto-apply. Forbidden defaults: Inter/Roboto/Arial/system fonts, purple gradients on white or dark, cookie-cutter layouts w/o context-specific character.
+  Aesthetic defaults = starting points, not policy. Claude proposes 4 distinct visual directions (bg hex, accent hex, typeface, one-line rationale) before building when brief ambiguous; follows user spec precisely when given. A common model default house style (cream off-white, serif, terracotta) fits editorial/hospitality/portfolio — wrong for dashboards, dev tools, fintech, healthcare, enterprise. Never auto-apply. Forbidden defaults: Inter/Roboto/Arial/system fonts, purple gradients on white or dark, cookie-cutter layouts w/o context-specific character.
   </aesthetics>
 
   <tool_guidance>
