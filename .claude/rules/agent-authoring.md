@@ -89,11 +89,11 @@ CC permit both `tools` and `disallowedTools` together (deny applied first, then 
 
 **Spawn restrictions (orchestrators only).** `tools: Agent(worker, researcher)` allow-list which subagent types can spawn. Take effect only when agent run as main thread (`claude --agent <name>`); no effect inside regular subagent (subagent no spawn subagent). Bare `Agent` allow any; omit `Agent` from `tools` disable spawning entirely.
 
-**`effort`** (CC v2.1.69+) — **omit by default.** Inherit from parent unless measured evidence show specific value materially change output for agent domain. String values only; `xhigh` need Opus 4.7 + CC 2.1.111+; `max` need Opus 4.6/4.7.
+**`effort`** (CC v2.1.69+) — **omit by default.** Inherit from parent unless measured evidence show specific value materially change output for agent domain. String values only; `xhigh` need Opus 4.7+ + CC 2.1.111+; `max` need Opus 4.6+. Opus 4.8 default is `high` on all surfaces (API + Claude Code).
 
 Precedence: `CLAUDE_CODE_EFFORT_LEVEL` env > frontmatter > session > model default.
 
-When `xhigh` worth setting (Opus 4.7+): Anthropic recommend `xhigh` as baseline for coding/agentic work — at `low`/`medium`, Opus 4.7 under-think edge cases. Two safe paths:
+When `xhigh` worth setting (Opus 4.7+): Opus 4.8 defaults to `high` on all surfaces (Anthropic's best quality/UX balance). Reserve `xhigh` ('extra') / `max` for difficult tasks or long-running async work — not as a blanket coding baseline. If a session runs at `low`/`medium`, the model under-thinks edge cases; two safe paths to raise it:
 1. **Session-level (preferred).** `CLAUDE_CODE_EFFORT_LEVEL=xhigh` or pick `xhigh` at session start — uniform, respect user cost-vs-quality choice.
 2. **Agent-level override.** `effort: xhigh` only when measured quality regression at session default justify it.
 

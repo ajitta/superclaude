@@ -17,9 +17,10 @@ agent_colors:
 # Optional field on agents; validated only when present. Source: .claude/rules/agent-authoring.md.
 effort_values:
   - low       # mechanical/structured tasks
-  - medium    # standard design + analysis (default)
-  - high      # complex reasoning, deep debugging
-  - max       # multi-perspective synthesis (Opus 4.6 only)
+  - medium    # standard design + analysis
+  - high      # complex reasoning, deep debugging (Opus 4.8 default, all surfaces)
+  - xhigh     # difficult tasks + long-running async work (Opus 4.7+; CC 2.1.111+)
+  - max       # multi-perspective synthesis (Opus 4.6+)
 
 # Command frontmatter forbidden fields — these belong on agents/skills, not commands.
 # Source: .claude/rules/command-authoring.md "Forbidden fields" list.

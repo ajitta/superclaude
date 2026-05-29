@@ -13,7 +13,7 @@ paths: ["src/superclaude/agents/**", "src/superclaude/commands/**", "src/supercl
 - **Prose first.** Structured forms only where prose mush distinct items together.
 - **Token-efficient.** Pick simplest form that preserve readability — never reach for heavier construct than content need.
 - **One canonical shape per concept.** No parallel "options"; rule below pick one form per situation.
-- **Declarative voice load-bearing, not stylistic.** Opus 4.7 read instructions literally, drop hedging ("should", "might", "consider") as optional. Third-person + imperative-as-statement make rule actually fire — see Anthropic Opus 4.7 prompting notes at 'https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices'.
+- **Declarative voice load-bearing, not stylistic.** Recent Opus models (4.5+) read instructions literally, drop hedging ("should", "might", "consider") as optional; 4.8 follows instructions even more consistently. Third-person + imperative-as-statement make rule actually fire — see Anthropic prompting best-practices at 'https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices'.
 
 ## Section Ordering
 
@@ -88,7 +88,7 @@ When section has **fixed small set of named slots** that need (a) multi-line pro
 </bounds>
 ```
 
-Slot labels are **directives, not hedging**. `<does>` (declarative present-tense — what Claude actually does), `<never>` (absolute prohibition — Opus 4.7 follows; "should not" get dropped as optional), `<fallback>` (escalation posture). Legacy `<should>`/`<avoid>` labels rejected by structural test suite — Opus 4.7 read "should" as optional, spec own load-bearing-voice rule applies to slot labels too.
+Slot labels are **directives, not hedging**. `<does>` (declarative present-tense — what Claude actually does), `<never>` (absolute prohibition — recent Opus models follow; "should not" get dropped as optional), `<fallback>` (escalation posture). Legacy `<should>`/`<avoid>` labels rejected by structural test suite — recent Opus models read "should" as optional, spec own load-bearing-voice rule applies to slot labels too.
 
 Use this form when:
 - Section sits next to Labeled section using same `- Label:` shape and Claude must not conflate them (measured boundary blur — see commit `S390`).
@@ -284,7 +284,7 @@ When component exceed target: extract reference material (long examples, deep ta
 8. For dense fixed-shape data, use compact markdown table inside `<examples>`, or inside any dense-lookup tag with ≥6 fixed-shape entries. For rich multi-line illustration, use standalone `<example>` instead.
 9. Other plural↔singular containers (depth 3) reserved for genuinely multi-line list items.
 10. Keep attributes for short identifiers and structural metadata; move guidance prose into tag body.
-11. Use third-person ("Claude") and declarative voice — Opus 4.7 drops hedging.
+11. Use third-person ("Claude") and declarative voice — recent Opus models drop hedging.
 12. Quote URLs and model strings in single quotes; UI/feature names in double quotes; runtime values in `{{variable}}`.
 13. Reserve `critical_*` tag prefix for safety-critical sub-sections; place early in body so partial-read previews catch them.
 14. Stay within size target for component type; extract overflow into referenced sibling file.

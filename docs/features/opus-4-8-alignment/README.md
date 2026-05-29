@@ -1,6 +1,6 @@
 ---
 feature: opus-4-8-alignment
-phase: planning
+phase: implementing
 owner: ajitta
 created: 2026-05-30
 updated: 2026-05-30

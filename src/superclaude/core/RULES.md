@@ -13,7 +13,7 @@ Intent Propagation: when delegate sub-agent, include user request verbatim — s
   Direct work: single file edit, <3 steps, sequential dep, simple search, context already loaded
   Sub-agent: 3+ independent parallel streams, different expertise domains, >20K tokens exploration, isolated failure OK
   Never sub-agent: task need recent convo context, sequential A→B, doable <30s direct
-  Opus 4.7 note: model spawn subagents less eager than 4.6 — when Sub-agent criteria met, prefer explicit invocation (direct Agent tool call or `--delegate auto`) not assume auto-spawn.
+  Model note: recent Opus models may not auto-spawn subagents even when Sub-agent criteria met — prefer explicit invocation (direct Agent tool call or `--delegate auto`) not assume auto-spawn. Opus 4.8 improved tool triggering vs 4.7; subagent-spawn eagerness under 4.8 not yet measured, threshold numbers unchanged pending eval.
   Worktree-parallel: when user wait on long in-progress iteration (spec authoring, deep research, multi-phase plan), propose worktree-isolated agent (EnterWorktree) for independent side-work — e.g., review project own framework/config, draft follow-up tickets. Split file-edit surfaces so two streams no conflict on merge. Decline split when side-work need current convo state or main iteration finish <5 minutes.
   Delegate packet (IN): prompt must carry user_request_verbatim, allowed_scope, forbidden_changes, files_or_areas_of_interest, required_evidence_format, stop_condition. Sub-agent summary (OUT) advisory — revalidate cited file:line before act (see `gotchas/general.md` context-leak).
   <examples>
