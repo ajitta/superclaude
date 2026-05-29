@@ -64,14 +64,14 @@ Anchors verified by grep on `master`, 2026-05-30.
 
 - **T2-a — Subagent spawn eagerness under 4.8.** Open question from research §4: "works independently longer" could mean *more self-work* or *more delegation*. Inherits the 4.7 deferred item (T2-b). **Test before** changing any `<sub_agent_decision>` threshold numbers. Harness-limited (see 4.7 B4 — not observable from a sub-agent).
 - **T2-b — Compaction-drift threshold.** 4.8 claims "better compaction recovery / fewer derailments." Measure whether the "~50 turns" re-read-rules practice can be relaxed. Do **not** weaken a safety practice on a vendor claim alone (R18; "do NOT simplify safety").
-- **T2-c — Confirm inherit-only effort.** Mostly verification + documentation: assert no agent ships `effort:` (grep VA4), and record in `agent-authoring.md` that 4.8's `high` default validates inherit-only. No behavioral change.
+- **T2-c — Confirm inherit-only effort.** ✅ **resolved 2026-05-30** (V12 in audit report). Verify-only: `grep "^\s*effort:" src/superclaude/agents/` → 0 across 0 files; `agent-authoring.md:92,96,100` already states 4.8 `high` default + omit-by-default + cost-control. No edit (R18 — doc already current). No behavioral change.
 
 ## 4. Tier 3 — monitor / out-of-scope
 
 - **Dynamic workflows** (CC research preview; Enterprise/Team/Max): plans + runs hundreds of parallel subagents, verifies, reports. Overlaps `--delegate`/`--orchestrate`/`--task-manage`. **Monitor**; revisit at GA — do not redesign delegation around a preview feature.
 - **Mid-conversation system messages + 1,024-tok cache minimum:** SDK/harness, not content. Possible future `context_loader.py`/hook optimization (inject mode/MCP context as system entries; smaller injections now cacheable). **Monitor.**
 - **1M context vs Token Efficiency thresholds:** %-based → no change; note absolute budget is larger.
-- **Absolute-token assumptions audit:** grep for hardcoded context/output token counts that assume a <1M window (truncation thresholds, `context_loader.py` sizing, the `cc-truncation-thresholds` memory). Audit + note only; %-based thresholds already covered (C10).
+- **Absolute-token assumptions audit:** ✅ **resolved 2026-05-30** (V11 in audit report). Grepped all numeric token/size constants — none assume a <1M window. `CHARS_PER_TOKEN` is a ratio; `file_size_guard` 30KB/5KB is a per-op Read guard; `context_loader.MAX_TOKENS_ESTIMATE=8000` is an attention-budget cap (env-override `CLAUDE_CONTEXT_MAX_TOKENS`); `cc-truncation-thresholds` are CC-native, not framework code. %-based thresholds already covered (C10). No code change.
 - **Cosmetic version-string sweep** (`'claude-opus-4-7'` → `'claude-opus-4-8'` across 6 authoring files + `agent-authoring.md:34` ID example): **skip** — pure quote-convention illustrations, version-irrelevant, re-stales in ~41 days (R18 — not broken). *(The `schemas.yaml` effort-enum staleness, originally lumped here, was promoted to T1-c — it is enforced config, not illustration.)*
 
 ## 5. Explicitly deferred / out-of-scope
@@ -123,11 +123,13 @@ Anchors verified by grep on `master`, 2026-05-30.
 ### Part C — regression (after implementation, future /sc:implement step)
 
 ```
-[ ] R1 uv run pytest tests/unit/test_agent_structure.py   Expected: pass — schemas.yaml enum change (+xhigh) is test-enforced
-[ ] R2 uv run pytest tests/unit/        Expected: ~1,904 pass, baseline otherwise unchanged
-[ ] R3 make deploy && superclaude install --list-all   Expected: success
-[ ] R4 grep -r "{{.*PATH" src/superclaude/   Expected: all resolve at install
+[x] R1 uv run pytest tests/unit/test_agent_structure.py   → 722 passed (V10)
+[~] R2 uv run pytest tests/unit/        → Exit 137 (Windows kill, OOM/timeout); re-run in CI / healthy .venv for ~1,904 baseline
+[x] R3 make deploy && superclaude install --list-all   → success: CLI deployed (4.6.0+ajitta); all component groups resolve (commands 35/35, agents 23/23, core 4/4, modes 8/8, mcp 6/6, hooks 12/12, config 1/1; skills 10/5 = superpowers coexistence; templates 0/0)
+[x] R4 grep -r "{{.*PATH" src/superclaude/   → 3 vars (SCRIPTS_PATH/SKILLS_PATH/PYTHON_BIN), all have resolvers; installed hooks.json = 0 leftover braces (resolution fired)
 ```
+
+**R4 side finding (pre-existing, out-of-4.8-scope):** command content is NOT template-resolved — installed `commands/sc/insight.md` ships literal `{{SCRIPTS_PATH}}` ×10. The `.replace` at `install_components.py:335-336` operates only on `hooks.json`; commands rely on the model resolving via the `scripts-path-template` gotcha (`~/.claude/superclaude/scripts/`). Unrelated to 4.8 alignment — flag for separate triage if command-content resolution is wanted.
 
 ## 7. Open decisions (R12 — non-blocking; proceeding on stated defaults, redirect welcome)
 
@@ -145,9 +147,9 @@ Anchors verified by grep on `master`, 2026-05-30.
 | Audit checklist re-stales next release | High | Low | Version-neutral checks where possible; re-run on each upgrade (same as 4.7) |
 | Treating dynamic-workflows preview as stable → premature delegation redesign | Medium | Medium | Tier 3 monitor only; no edits until GA |
 
-## 9. Recommended next steps (pending approval)
+## 9. Recommended next steps
 
-1. Self-review + verify these docs (this session).
-2. On approval: `/sc:implement --plan` Tier 1 (T1-a/b/c/d) as a `docs/`-or-`refactor:`-branch (content + meta-docs only).
-3. Run Part A verification; record results in `docs/reports/OPUS_4_8_ALIGNMENT.md`.
-4. Schedule Part B behavioral tests when a cross-session harness is available (T2-a/b).
+1. ✅ Self-review + verify these docs (done 2026-05-30).
+2. ✅ Tier 1 (T1-a/b/c/d) shipped to `master` — `92cf1a7`; frontend label de-pin `62fb3f6`.
+3. ✅ Part A verification run; results in `docs/reports/OPUS_4_8_ALIGNMENT.md` (V1-V12: 9 pass/audited, 3 carry-forward). T2-c + Tier-3 absolute-token audit closed `a2e630b`.
+4. ⏳ **Remaining — Part B behavioral (harness-blocked):** T2-a spawn-eagerness, T2-b compaction-drift past ~50 turns, B1-B5. Need cross-session / long-session observation; gate only Tier-2 threshold decisions, not shipped edits. Do not weaken compaction-drift safety on a vendor claim (R18).

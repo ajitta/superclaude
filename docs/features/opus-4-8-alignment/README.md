@@ -19,7 +19,8 @@ Track how SuperClaude framework content should respond to Claude Opus 4.8 (relea
 | Phase | Doc | Status | Summary |
 |---|---|---|---|
 | Research | [02-research.md](./02-research.md) | complete | Opus 4.8 behavior + usage, evidence-backed diff vs 4.7, implications for the framework |
-| Plan | [05-plan.md](./05-plan.md) | draft | Tiered improvements (ship / measure / monitor), R18-gated, with verified anchors + verification checklist |
+| Plan | [05-plan.md](./05-plan.md) | implementing | Tiered improvements (ship / measure / monitor), R18-gated, with verified anchors + verification checklist |
+| Audit | [../../reports/OPUS_4_8_ALIGNMENT.md](../../reports/OPUS_4_8_ALIGNMENT.md) | living | Re-runnable content checklist (V1-V12) + run results |
 
 _No separate `03-analysis`/`04-design` doc — the design bridge is research §8 (Implications for SuperClaude)._
 
@@ -31,6 +32,8 @@ _No separate `03-analysis`/`04-design` doc — the design bridge is research §8
 - **Key behavioral reversal:** 4.7 under-triggered tools/subagents; 4.8 explicitly *improves* tool triggering — so the spawn-threshold rewrite stays deferred pending eval, but the version label gets de-pinned.
 - **Monitor (out of scope now):** dynamic workflows (CC research preview), mid-conversation system messages, 1,024-tok cache minimum — harness/SDK-level, not content.
 
-## Gate
+## Status
 
-`05-plan.md` is `draft`. Per `<workflow_gates>`, approval precedes `/sc:implement --plan`. No framework files were changed by this feature yet.
+- **Tier 1 shipped to `master`** — `92cf1a7` (T1-a/b/c/d: subagent note de-pin, declarative-voice de-pin, effort-guidance + enum fix, audit artifact) + `62fb3f6` (frontend house-style label de-pin).
+- **Tier 2-c + Tier 3 in-session slice closed 2026-05-30** — V11 absolute-token audit (no action: no <1M-window hardcoded assumption) + V12 inherit-only confirmation (verify-only). Recorded in the audit report.
+- **Remaining = harness-blocked behavioral only** — T2-a spawn-eagerness, T2-b compaction-drift past ~50 turns, Part B B1-B5. Need cross-session / long-session observation; gate only Tier-2 threshold decisions, not any shipped edit. Do **not** weaken the compaction-drift safety practice on a vendor claim (R18).
