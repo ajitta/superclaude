@@ -62,6 +62,12 @@ SuperClaude is a content framework whose entire job is *configuring a non-determ
 - `tests/unit/test_agent_structure.py::TestAgentDescriptionInterface` — 2 lints × 23 agents = 46 tests, default-run (`make test`), zero network. Guards (1) forbidden hallucination-priming vocab, (2) presence of a CC-idiom delegation trigger. Verified **768 passed** (full file), no regressions.
 - `FORBIDDEN_DESC_PATTERNS` mirrors `agent-authoring.md` "Vocabulary cautions" (now annotated **Enforced**); extend as new exemplars are proven.
 
+**Extended to skills + commands (same session, `/sc:improve --loop`), calibrated per type — not a blind copy:**
+- Skills: `test_skill_structure.py::TestSkillDescriptionTrigger` — trigger-idiom lint for auto-invocable skills (`should be used when` / `Use when` / `use this skill`); `disable-model-invocation` skills are exempt (user-invoked, removed from the auto-invocation classifier). 2 guarded, 3 skipped. Motivated by a real incident (verbalized-sampling bare "VS" auto-invoke false positive).
+- Commands: `test_command_structure.py::TestCommandInvocationContract` — invocation-contract lint: description references its own `/sc:<name>` (positive cue) **and** carries a `Do NOT auto-trigger`/`auto-fire` negative gate (prevents over-firing). 70 tests. Forbidden-vocab deliberately **not** applied — commands are user-invoked workflows, not personas (agent-specific evidence; R18).
+- The calibration was the point: the agent `Use proactiv…` trigger + persona forbidden-vocab lint would false-fail skills (different idiom) and be unjustified on commands.
+- Modes excluded: their triggers live in `context_loader.py` TRIGGER_MAP, not frontmatter — different mechanism, out of this lint's surface.
+
 **Follow-up — Option A (deferred, gated on observed regressions, per user choice "B now + A later").** A behavioral routing canary stays valuable if real "trigger no longer routes to agent X" regressions surface. Ready-to-go design:
 - Manifest: `src/superclaude/agents/canary/<agent>.yaml` (agents are flat files → sibling `canary/` dir, not a per-agent folder), entries `{trigger, expected_signal}`.
 - Harness: extend the `test_skill_canary.py` pattern under `@pytest.mark.canary` (opt-in, excluded from default run).
@@ -84,6 +90,18 @@ SuperClaude is a content framework whose entire job is *configuring a non-determ
 - **P6 name the philosophy** — short `ARCHITECTURE.md` section "Designing for non-deterministic consumers." Cheap; makes the implicit stance explicit (itself pillar 2). Necessity LOW.
 
 ---
+
+## P-R21 — Pillar-3 runtime signature: R21 Failure-Forward (implemented 2026-05-31, /sc:implement)
+
+**Shipped** to `src/superclaude/core/RULES.md` (installed user-scope). Rule `[R21 Failure-Forward]`: on unexpected progress-blocking in-task failure, emit `⚠ failed: X | hypothesis: Y | next: Z`, take one bounded recovery or structured stop; never blind-retry/fabricate/stall; 2-attempt cap; excludes expected/handled errors. Gives pillar 3 the runtime *signature* pillars 1/2/4 already had. Plan: `docs/plans/failure-forward-runtime-ajitta-2026-05-31.md`.
+
+**Two findings from the install→probe loop (both validate the agent-native thesis):**
+
+1. **Observer effect (method bug, then fix).** An in-repo `claude -p` baseline emitted the R21 marker *before R21 was installed* — the probed model read the R21 spec from the plan doc in repo context and complied. Pillar 4 in the flesh (model = API consumer; it acts on the interfaces in its context). Fix: probe from **outside the repo** (home dir loads user-global RULES but not the repo spec). Clean baseline then showed **no marker**.
+
+2. **Pillar-3 signatures are intrinsically less reliable than mode markers.** Clean-env A/B (home dir, R21 installed): the marker fires verbatim on a clearly *unexpected* failure (`command not found`, exit 127), correctly stays silent on a borderline "expected" failure (read a missing file), and on 1 of 2 strong triggers the model produced the failure-forward *behavior* in prose without the exact marker. Contrast `--introspect` (🤔🎯⚡📊💡 fires 100% — **user invokes it explicitly**). R21 is passive + context-judged, so its signature is conditional by design. **Mechanism for *why* pillar 3 is the gap: failure-forward behavior is judgment-gated, so it resists the always-on signature interface pillars get.**
+
+**Necessity verdict (R18, post-evidence):** the failure-forward *behavior* already emerges from R03/R15/gotchas — R21's marginal value is the explicit, greppable *signature* on clear failures, not new behavior. Kept because it (a) fires cleanly on unambiguous triggers, (b) does not over-fire, (c) gives pillar 3 its first observable marker. Resisted forcing 100% marker emission (would add noise — R18).
 
 ## Recommendation
 

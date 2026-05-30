@@ -48,6 +48,7 @@ Intent Propagation: when delegate sub-agent, include user request verbatim — s
 [R18 Necessity Test] 🔴: before propose any unsolicited code change, answer "Is system broken without this?" — "safer/better" alone insufficient. Require: specific failure scenario, quantitative evidence, or user-facing impact. "Deferred to post-MVP review" is valid design decision
 [R19 Project Gotcha Capture] 🟡: when user correct project-specific pattern (files, packages, conventions — not personal style), propose adding to `.claude/rules/gotchas/<domain>.md` (format: `name: description`). Create file with `paths:` frontmatter if absent. User approval required. Ambiguous → prefer project (team-shareable). Skip if already in framework `<gotchas>`.
 [R20 Success Criteria] 🟡: before non-trivial work (>3 steps or ambiguous outcome), translate task into verifiable goal — concrete check, file path, or test invocation that proves "done". Examples: "add validation" → "tests for invalid inputs pass"; "fix bug" → "failing repro test passes"; "refactor X" → "test suite stays green before/after". Powers --loop convergence detection. Skip for: trivial edits, exploratory questions, or when user already stated criterion.
+[R21 Failure-Forward] 🟡: on in-task failure (tool error, test red, missing target, denied permission, empty result where output expected) — emit compact record before next step: `⚠ failed: <what + exact error/signal> | hypothesis: <top cause + evidence> | next: <bounded recovery OR structured stop>`. Then take ONE bounded recovery probe (different approach, not identical retry) OR surface a structured stop if recovery needs user input. Never: silently retry identical action, fabricate output past the failure, stall with no record. Cap: 2 recovery attempts on same failure → escalate to structured stop. Fires only on unexpected progress-blocking failure, not expected/handled errors. Distinct from R03 (pre-fix diagnosis), R15 (success verification), askuserquestion-rejection-fallback (AskUserQuestion-only).
   <examples>
   | Scenario | Wrong | Right | Rule |
   |---|---|---|---|
@@ -64,6 +65,7 @@ Intent Propagation: when delegate sub-agent, include user request verbatim — s
   | Model proposes adding retry logic | "This would be more resilient" | "System works without this. No failure scenario → SKIP." | Necessity Test 🔴 |
   | User corrects: "use pytest-django in this project" | Saves only to auto memory | Proposes: "Add to gotchas/testing.md?" + saves to auto memory | Project Gotcha Capture 🟡 |
   | User: "add input validation across 5 endpoints" | Starts editing immediately | States up-front: "Success = pytest covers empty/invalid/edge inputs and passes" — --loop stop condition | Success Criteria 🟡 |
+  | `pytest` errors: file not found | Retries identical command, or invents a result | `⚠ failed: pytest — file tests/x.py not found \| hypothesis: wrong path (typo/moved) \| next: glob tests/ for real name` then re-run corrected | Failure-Forward 🟡 |
   </examples>
   </core_rules>
 
