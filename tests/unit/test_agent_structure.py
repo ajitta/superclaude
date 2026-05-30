@@ -28,6 +28,27 @@ AGENT_FILES = sorted(
 )
 AGENT_IDS = [f.stem for f in AGENT_FILES]
 
+# Description = model-facing API surface: CC reads it verbatim into the parent
+# classifier to decide delegation, and specific wording measurably shifts
+# subagent behavior. The phrases below empirically prime context-hallucination
+# on long-output tasks (5/5 and 3/3 rates) — see .claude/rules/agent-authoring.md
+# "Vocabulary cautions" and docs/research/2026-05-06-agent-naming-findings/.
+# Extend this list as new failure-priming exemplars are proven. Keep tight:
+# only proven exemplars, to avoid false positives on the allowed forward-looking
+# voice ("grounded in X", "learning to apply X").
+FORBIDDEN_DESC_PATTERNS = [
+    r"following\s+[\w-]+\s+practices",   # primes "continuation of prior work" frame
+    r"deep\s+production\s+experience",
+    r"pragmatic\s+trade-?off\s+judgment",
+]
+
+# CC-idiom delegation trigger — the description must tell the classifier WHEN to
+# delegate ("Use proactively for X.", "Use immediately after Y.", "Use when Z.").
+# Case-sensitive on capital "Use" to avoid matching mid-sentence "use for ...";
+# \w* tolerates the caveman-compressed forms shipped in agents (proactive,
+# immediate) alongside the canonical proactively / immediately.
+CC_IDIOM_TRIGGER = re.compile(r"\bUse (proactiv\w*|immediat\w*|when|for|after)\b")
+
 
 def parse_frontmatter(text: str) -> dict[str, str]:
     """Extract YAML frontmatter from markdown text."""
@@ -240,6 +261,39 @@ class TestAgentCrossFieldConsistency:
             f"{stem}: description shares only {len(matches)}/{len(mission_words)} "
             f"words with mission (need {threshold:.0f}). "
             f"Missing: {mission_words - set(matches)}"
+        )
+
+
+class TestAgentDescriptionInterface:
+    """The frontmatter description is a model-facing API: CC reads it verbatim
+    to decide delegation, and specific wording measurably shifts subagent
+    behavior (107-trial agent-naming study). These deterministic lints guard
+    the empirically-proven failure modes — a static, default-run counterpart to
+    the skill trigger canary (tests/integration/test_skill_canary.py), which is
+    opt-in and network-bound. See docs/research/agent-native-design-ajitta-2026-05-31.md (P1).
+    """
+
+    def test_description_no_hallucination_priming_vocab(self, agent):
+        """Description must avoid phrases proven to prime context-hallucination."""
+        stem, content, fm = agent
+        desc = fm.get("description", "")
+        for pattern in FORBIDDEN_DESC_PATTERNS:
+            assert not re.search(pattern, desc, re.IGNORECASE), (
+                f"{stem}: description contains hallucination-priming phrase "
+                f"matching /{pattern}/ — use forward-looking voice instead "
+                f"('grounded in X', 'learning to apply X'). "
+                f"See agent-authoring.md 'Vocabulary cautions'."
+            )
+
+    def test_description_has_cc_idiom_trigger(self, agent):
+        """Description must carry a CC-idiom delegation trigger sentence."""
+        stem, content, fm = agent
+        desc = fm.get("description", "")
+        assert CC_IDIOM_TRIGGER.search(desc), (
+            f"{stem}: description has no CC-idiom delegation trigger "
+            f"('Use proactively for…', 'Use when…', 'Use immediately after…'). "
+            f"CC reads the description verbatim to route delegation; without a "
+            f"trigger sentence the classifier may never select this agent."
         )
 
 

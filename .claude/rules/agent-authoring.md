@@ -71,6 +71,8 @@ Description sentence read verbatim into subagent system prompt header — word s
 - **Description is lever for over-engineering.** Add Zen-of-Python clause ("simple is better than complex; values minimal solutions, the smallest abstraction; code that any junior can read") to same agent name reduce over-engineering signals 25–73% (chars −25%, classes −58%, decorators −65%, TypeVar −100% across 15 trials). Use this lever before rename if goal is anti-overengineering.
 - **`hypothesis`-style advanced patterns sticky** — directive phrasing only reduce unprompted property-based test usage ~20%. Some priors need explicit prohibition (`Do not use property-based testing libraries unless asked.`) not soft directive.
 
+> **Enforced.** Forbidden exemplars (`following X practices`, `deep production experience`, `pragmatic tradeoff judgment`) + presence of a CC-idiom trigger are checked by `tests/unit/test_agent_structure.py::TestAgentDescriptionInterface` (deterministic, default `make test`). Add newly-proven exemplars to `FORBIDDEN_DESC_PATTERNS`.
+
 ### Field reference
 
 **Forbidden in source.** `autonomy` (not CC field). Any field not in CC documented agent spec.
