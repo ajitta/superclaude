@@ -24,6 +24,15 @@ COMMAND_FILES = sorted(
 )
 COMMAND_IDS = [f.stem for f in COMMAND_FILES]
 
+# Command descriptions are model-facing: /sc:* commands are exposed to the model,
+# which decides whether to invoke them. Every description encodes an invocation
+# contract — a positive cue (references its own /sc:<name>) and a negative gate
+# ("Do NOT auto-trigger on …" / "NOT auto-fire on …") that stops the model
+# over-firing the command on adjacent phrasing. Hallucination-priming vocab is
+# deliberately NOT checked for commands: that failure mode is agent-persona-
+# specific (107-trial study); commands are user-invoked workflows, not personas.
+NEGATIVE_TRIGGER_GATE = re.compile(r"auto-?(trigger|fire)", re.IGNORECASE)
+
 
 def parse_frontmatter(text: str) -> dict[str, str]:
     """Extract YAML frontmatter from markdown text."""
@@ -79,6 +88,36 @@ class TestCommandFrontmatter:
         found = set(fm.keys()) & FORBIDDEN_FIELDS
         assert not found, (
             f"{stem}: frontmatter contains forbidden field(s): {found}"
+        )
+
+
+class TestCommandInvocationContract:
+    """Command descriptions are a model-facing invocation contract.
+
+    /sc:* commands are exposed to the model, which decides whether to invoke
+    them; every description references its own slash command (positive cue) and
+    carries a 'Do NOT auto-trigger' negative gate (prevents over-firing). These
+    deterministic lints guard that contract — the command-shaped counterpart to
+    the agent description-interface lint (test_agent_structure.py). See
+    docs/research/agent-native-design-ajitta-2026-05-31.md (P1-B extension).
+    """
+
+    def test_description_references_own_slash_command(self, command):
+        stem, content, fm = command
+        desc = fm.get("description", "")
+        assert f"/sc:{stem}" in desc, (
+            f"{stem}: description does not reference its own '/sc:{stem}' "
+            f"invocation. The model reads the description to route slash commands; "
+            f"the positive cue must name the command."
+        )
+
+    def test_description_has_negative_trigger_gate(self, command):
+        stem, content, fm = command
+        desc = fm.get("description", "")
+        assert NEGATIVE_TRIGGER_GATE.search(desc), (
+            f"{stem}: description has no 'Do NOT auto-trigger …' negative gate. "
+            f"Without it the model may over-invoke this command on adjacent "
+            f"phrasing instead of waiting for explicit /sc:{stem}."
         )
 
 

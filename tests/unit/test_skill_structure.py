@@ -40,6 +40,17 @@ SIDE_EFFECT_SKILLS = {
     "finishing-a-development-branch",
 }
 
+# Auto-invocable skills (those WITHOUT disable-model-invocation) are selected by
+# CC via description matching, like agents — a skill that loses its trigger idiom
+# silently stops auto-firing (regression). Past incident: verbalized-sampling's
+# bare "VS" abbreviation caused auto-invoke false positives. The idiom differs
+# from agents ("Use proactively"): skills use "(should be) used when" /
+# "use this skill". disable-model-invocation skills are user-invoked only and
+# exempt (description is removed from the auto-invocation classifier).
+SKILL_TRIGGER_IDIOM = re.compile(
+    r"\b(should be used when|used when|use when|use this skill)\b", re.IGNORECASE
+)
+
 # No fork-context skills remain (requesting-code-review migrated to /sc:review)
 FORK_CONTEXT_SKILLS: set[str] = set()
 
@@ -182,6 +193,31 @@ class TestSkillFrontmatterPolicy:
         dirname, content, fm = skill
         assert "agent" not in fm, (
             f"{dirname}: agent: field skills have been migrated to commands"
+        )
+
+
+# --- Description Trigger Tests ---
+
+
+class TestSkillDescriptionTrigger:
+    """Auto-invocable skill descriptions must keep a trigger idiom.
+
+    CC reads the description to decide auto-invocation; a disable-model-invocation
+    skill is user-invoked only, so it is exempt. Static, default-run counterpart
+    to the agent description-interface lint (test_agent_structure.py) and the
+    opt-in skill trigger canary (tests/integration/test_skill_canary.py).
+    """
+
+    def test_auto_invocable_skill_has_trigger_idiom(self, skill):
+        dirname, content, fm = skill
+        if fm.get("disable-model-invocation") == "true":
+            pytest.skip(
+                f"{dirname}: disable-model-invocation (user-invoked) — trigger idiom not required"
+            )
+        assert SKILL_TRIGGER_IDIOM.search(fm.get("description", "")), (
+            f"{dirname}: auto-invocable skill description has no trigger idiom "
+            f"('… should be used when …', 'Use when …', 'use this skill …'). "
+            f"CC reads the description to auto-invoke; without it the skill may never fire."
         )
 
 
