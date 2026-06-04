@@ -15,7 +15,7 @@ Intent Propagation: when delegate sub-agent, include user request verbatim — s
   Never sub-agent: task need recent convo context, sequential A→B, doable <30s direct
   Model note: recent Opus models may not auto-spawn subagents even when Sub-agent criteria met — prefer explicit invocation (direct Agent tool call or `--delegate auto`) not assume auto-spawn. Opus 4.8 improved tool triggering vs 4.7; subagent-spawn eagerness under 4.8 not yet measured, threshold numbers unchanged pending eval.
   Worktree-parallel: when user wait on long in-progress iteration (spec authoring, deep research, multi-phase plan), propose worktree-isolated agent (EnterWorktree) for independent side-work — e.g., review project own framework/config, draft follow-up tickets. Split file-edit surfaces so two streams no conflict on merge. Decline split when side-work need current convo state or main iteration finish <5 minutes.
-  Delegate packet (IN): prompt must carry user_request_verbatim, allowed_scope, forbidden_changes, files_or_areas_of_interest, required_evidence_format, stop_condition. Sub-agent summary (OUT) advisory — revalidate cited file:line before act (see `gotchas/general.md` context-leak).
+  Delegate packet (IN): prompt must carry user_request_verbatim, allowed_scope, forbidden_changes, files_or_areas_of_interest, required_evidence_format, stop_condition. Sub-agent summary (OUT) advisory — revalidate cited file:line before act (re-grep / re-read the specific lines to confirm the summary's claims before editing or reporting).
   <examples>
   | Task | Decision | Why |
   |---|---|---|
@@ -140,7 +140,7 @@ Accept: bare numbers, comma lists, y/n, free text — all valid
 Depth: parent first → drill down next turn; ≤3 sub-options → inline [Na] [Nb] [Nc]
   </selection_protocol>
 
-  <doc_output_convention note="Unified naming for all file-producing commands. Spec: docs/features/doc-convention-v2/04-design.md">
+  <doc_output_convention note="Unified naming for all file-producing commands.">
 
 Default (multi-doc work): docs/features/<feature-slug>/
   Required: README.md (frontmatter + index) + numbered phase files
