@@ -1,4 +1,4 @@
-.PHONY: install deploy sync-user sync-project sync-local uninstall-user uninstall-project uninstall-local test test-plugin doctor verify verify-drift audit clean lint format build-plugin sync-plugin-repo uninstall-legacy help
+.PHONY: install deploy sync-user sync-project sync-local uninstall-user uninstall-project uninstall-local test test-scripts test-plugin doctor verify verify-drift audit clean lint format build-plugin sync-plugin-repo uninstall-legacy help
 
 # Installation (local source, editable) - RECOMMENDED
 install:
@@ -44,9 +44,18 @@ uninstall-local:
 	uv run superclaude uninstall --scope local
 
 # Run tests (canary excluded by default — invoke explicitly: pytest -m canary)
+# tests/unit/scripts excluded via pyproject addopts --ignore — run them with `make test-scripts`
 test:
 	@echo "Running tests..."
 	uv run python -m pytest -m "not canary"
+
+# Run tests/unit/scripts in an ISOLATED pytest process. Excluded from `make test`
+# because they trigger a Windows-only native abort (exit 0xC0000409) when run inside
+# the main suite under memory pressure; a separate process keeps a transient native
+# crash from taking down the whole run. `-o addopts=` clears the inherited --ignore.
+test-scripts:
+	@echo "Running tests/unit/scripts (isolated)..."
+	uv run python -m pytest tests/unit/scripts -o addopts= -v --tb=short
 
 # Test pytest plugin loading
 test-plugin:
@@ -159,7 +168,8 @@ help:
 	@echo "  make verify          - Verify installation is working"
 	@echo ""
 	@echo "🔧 Development:"
-	@echo "  make test            - Run test suite"
+	@echo "  make test            - Run test suite (tests/unit/scripts excluded)"
+	@echo "  make test-scripts    - Run tests/unit/scripts in an isolated process"
 	@echo "  make test-plugin     - Test pytest plugin auto-discovery"
 	@echo "  make doctor          - Run health check"
 	@echo "  make verify-drift    - Check for installation drift"

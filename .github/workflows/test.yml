@@ -47,6 +47,14 @@ jobs:
         run: |
           pytest -v --tb=short --color=yes
 
+      # tests/unit/scripts is excluded from the default run via pyproject addopts
+      # --ignore (it triggers a Windows-only native abort under memory pressure).
+      # Run it here in a separate pytest process so Linux CI keeps covering it.
+      # `-o addopts=` clears the inherited --ignore.
+      - name: Run scripts tests (isolated)
+        run: |
+          pytest tests/unit/scripts -o addopts= -v --tb=short --color=yes
+
       - name: Run tests with coverage
         if: matrix.python-version == '3.10'
         run: |
