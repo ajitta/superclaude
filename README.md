@@ -5,7 +5,7 @@
 #### *A Claude Code content framework — fork-origin, now its own project*
 
 <p>
-  <img src="https://img.shields.io/badge/version-4.5.1+ajitta-blue" alt="Version">
+  <img src="https://img.shields.io/badge/version-4.6.0+ajitta-blue" alt="Version">
   <a href="https://github.com/ajitta/superclaude/actions/workflows/test.yml">
     <img src="https://github.com/ajitta/superclaude/actions/workflows/test.yml/badge.svg" alt="Tests">
   </a>
@@ -50,7 +50,7 @@ Claude Code reads those files at session start, which is how the framework chang
 
 | File | Purpose |
 |------|---------|
-| [`CLAUDE.md`](CLAUDE.md) | Project-specific rules: env (UV), make targets, test baseline (1,628 passing), git workflow |
+| [`CLAUDE.md`](CLAUDE.md) | Project-specific rules: env (UV), make targets, test baseline (1,904 passing), git workflow |
 | [`src/superclaude/ARCHITECTURE.md`](src/superclaude/ARCHITECTURE.md) | Content-framework taxonomy — directory roles, delivery pipelines, content types |
 | [`src/superclaude/CLAUDE_SC.md`](src/superclaude/CLAUDE_SC.md) | The always-loaded import chain → `core/FLAGS.md`, `PRINCIPLES.md`, `RULES.md` |
 | [`.claude/rules/`](.claude/rules) | Authoring specs for agents/commands/skills/modes |
@@ -61,7 +61,7 @@ Claude Code reads those files at session start, which is how the framework chang
 
 ## ⚡ **Quick Installation**
 
-### **Current Stable Version (v4.5.1+ajitta)**
+### **Current Stable Version (v4.6.0+ajitta)**
 
 `superclaude` ships markdown content (commands, agents, modes, MCP docs, core rules, hooks, skills) plus a small CLI that copies it into Claude Code's content directories.
 
