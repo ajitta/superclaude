@@ -88,9 +88,9 @@
         "matcher": "Bash",
         "hooks": [
           {
-            "_comment": "[superclaude] safety — blocks destructive shell commands",
+            "_comment": "[superclaude] safety — blocks destructive shell commands (Python; stdlib-only, no jq/grep/head dependency)",
             "type": "command",
-            "command": "jq -r '.tool_input.command // empty' | head -1 | grep -qE 'rm\\s+-rf\\s+/\\s*$|rm\\s+-rf\\s+/\\*|git\\s+push\\s+.*--force([^-]|$).*(main|master)' && echo 'BLOCKED: destructive command detected (--force-with-lease is allowed)' >&2 && exit 2 || exit 0",
+            "command": "{{PYTHON_BIN}} {{SCRIPTS_PATH}}/destructive_guard.py",
             "timeout": 5
           }
         ]

@@ -17,6 +17,7 @@ from __future__ import annotations
 import json
 import os
 import sys
+import tempfile
 import time
 from pathlib import Path
 
@@ -55,8 +56,24 @@ def _load_state(path: Path) -> dict:
 def _save_state(path: Path, state: dict) -> None:
     try:
         path.parent.mkdir(parents=True, exist_ok=True)
-        with path.open("w", encoding="utf-8") as f:
-            json.dump(state, f)
+        # Atomic write: serialize to a temp file in the same directory, then
+        # os.replace (atomic on POSIX and Windows). Under concurrent same-cwd
+        # subagent fan-out this guarantees a reader/competing writer never sees a
+        # half-written (torn) state file — which would otherwise parse-fail and
+        # silently reset the circuit breaker's error history.
+        fd, tmp = tempfile.mkstemp(
+            dir=str(path.parent), prefix=".loop_guard_", suffix=".tmp"
+        )
+        try:
+            with os.fdopen(fd, "w", encoding="utf-8") as f:
+                json.dump(state, f)
+            os.replace(tmp, path)
+        except OSError:
+            try:
+                os.unlink(tmp)
+            except OSError:
+                pass
+            raise
     except OSError:
         # Fail open — don't crash the hook on write failure
         pass
