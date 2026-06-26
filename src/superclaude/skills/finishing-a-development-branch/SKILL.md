@@ -2,7 +2,7 @@
 name: finishing-a-development-branch
 description: Finish dev work w/ structured opts for merge, PR, or cleanup. Use when user done w/ feature branch + wants merge, PR, or branch cleanup.
 disable-model-invocation: true
-allowed-tools: Bash, Read, Grep, Glob
+allowed-tools: Bash Read Grep Glob
 hooks:
   PreToolUse:
     - matcher: "Bash"

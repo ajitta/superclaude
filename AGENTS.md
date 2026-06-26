@@ -16,7 +16,7 @@ uv pip install -e ".[dev]"                 # Install editable
 uv run superclaude install --list-all      # Test CLI changes
 ```
 
-- **Test baseline**: 1,628 passing / 1,807 collected — do not regress. Markdown-only changes carry no test risk.
+- **Test baseline**: ~1,904 passing / 1,932 collected — do not regress. Markdown-only changes carry no test risk.
 
 ## Make Commands
 

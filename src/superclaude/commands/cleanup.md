@@ -7,7 +7,7 @@ description: Clean code systematic, kill dead code, optimize project structure. 
     <mission>Clean code systematic, kill dead code, optimize project structure</mission>
   </role>
 
-  <syntax>/sc:cleanup [target] [--type code|imports|files|docs|all] [--safe|--aggressive] [--interactive] [--dry-run]</syntax>
+  <syntax>/sc:cleanup [target] [--type code|imports|files|docs|all] [--safe|--aggressive] [--interactive] [--dry-run|--apply]</syntax>
 
   <flow>
   1. Analyze: cleanup chance + safety check
@@ -65,7 +65,7 @@ description: Clean code systematic, kill dead code, optimize project structure. 
   <example name="aggressive-without-review" type="error-path">
     - Input: /sc:cleanup --type all --aggressive (on unfamiliar codebase)
     - Why wrong: aggressive clean w/o understand codebase risk kill code that look unused but dynamic referenced.
-    - Correct: /sc:cleanup --type all --preview first, review result, then /sc:cleanup --type all --safe
+    - Correct: /sc:cleanup --type all --dry-run first, review result, then /sc:cleanup --type all --safe
   </example>
 
   </examples>

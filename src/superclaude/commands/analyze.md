@@ -65,7 +65,7 @@ Routing (`--format report` only): per RULES.md `<doc_output_convention>` — fea
 | Input | Output |
 |---|---|
 | `/sc:analyze` | Multi-domain findings inline |
-| `src/auth --focus security --deep` | Security vulnerability assessment |
+| `src/auth --focus security --depth deep` | Security vulnerability assessment |
 | `--focus performance --format report` | `docs/analysis/<target>-<user>-YYYY-MM-DD.md` with bottleneck roadmap |
 | `src/components --focus quality --format json` | `docs/analysis/<target>-<user>-YYYY-MM-DD.json` with code smell findings |
 | `--focus rules` | Rule heatmap + maturity label + recommendations |

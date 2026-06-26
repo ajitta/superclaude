@@ -253,7 +253,7 @@ EFFORT  │               │  (T1)         │
 
 - **Don't redesign the @import chain** — the architecture is sound; the content needs sharpening
 - **Don't add a hook-based rule reinforcer** (Position 3 of T3) — code change with unclear ROI; defer
-- **Don't consolidate skills** to reduce budget pressure — 5 skills is well within 15K budget
+- **Don't consolidate skills** to reduce budget pressure — 5 skills is well within budget (the 15K figure here is superseded; per `skill-authoring.md` SSOT the per-description budget is ~8,000 chars)
 - **Don't add CoT stripping rules** — T5 is runtime-managed by CC, not a framework concern
 - **Don't triple-repeat ALL rules** — only R13, R18, and R02 warrant agent-level reinforcement
 - **Don't create new files** for these improvements — all changes fit in existing files

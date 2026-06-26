@@ -49,6 +49,8 @@ description: SuperClaude command dispatcher - main entry point for all features.
     - insight: Capture structured session insights
     - plan: Detailed impl plans with TDD tasks
     - review: Code review with structured feedback
+    - auto-improve: Autonomous overnight code improvement loop (Karpathy AutoResearch)
+    - promote-feature: Promote standalone docs into a feature folder
   </commands>
 
   <features>
@@ -76,8 +78,8 @@ description: SuperClaude command dispatcher - main entry point for all features.
   </examples>
 
   <meta>
-    - version: SuperClaude v4.3.0+ajitta
-    - package: superclaude 4.3.0+ajitta
+    - version: SuperClaude v4.6.0+ajitta
+    - package: superclaude 4.6.0+ajitta
     - install: superclaude install
     - docs: github.com/ajitta/superclaude
   </meta>

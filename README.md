@@ -134,7 +134,7 @@ Restart Claude Code, then try a few:
 - `/sc:review` — Multi-dimensional review (code/plan/design)
 - `/sc:research` — Deep web research (Tavily-enhanced)
 - `/sc:insight` — Capture structured session insights to JSONL
-- `/sc` — List all 33 commands
+- `/sc` — List all 35 commands
 
 #### **Update**
 

@@ -88,7 +88,7 @@ argument-hint: "[arg]"            # 0/5 shipped use this — slash command autoc
 
 # Execution
 model: opus                       # 0/5 shipped use this — model override when skill active
-effort: high                      # 0/5 shipped use this — low|medium|high|max; omit by default
+effort: high                      # 0/5 shipped use this — low|medium|high|xhigh|max; omit by default
 allowed-tools: Read Grep Glob     # 1/5 shipped use this — space-separated permission-grant
 paths: ["**/api/**"]              # 0/5 shipped use this — auto-load only on matching files
 context: fork                     # 0/5 shipped use this — isolated subagent execution

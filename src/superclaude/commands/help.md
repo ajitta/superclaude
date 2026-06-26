@@ -49,6 +49,8 @@ description: List all /sc commands + functionality. Use ONLY when user types `/s
     - insight: capture structured session insights
     - plan: detailed impl plans w/ TDD tasks
     - review: code review w/ structured feedback
+    - auto-improve: autonomous overnight code improvement loop (Karpathy AutoResearch)
+    - promote-feature: promote standalone docs into a feature folder
   </commands>
 
   <scope_map>

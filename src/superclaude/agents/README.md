@@ -136,4 +136,4 @@ Agents give conflicting recs → resolve via:
 
 - `commands/` — Workflow entry points routing to agents
 - `modes/` — Cognitive overlays shaping agent behavior
-- `core/FLAGS.md` — Model routing reference
+- `core/FLAGS.md` — Behavioral flags + execution modes (Model Routing lives in this README's section above)
