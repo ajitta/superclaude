@@ -68,6 +68,7 @@ Task format:
   - existing-plan: Check if plan already exist for this feature before make new one
   - scope-match: Plan scope must match user req. No expand to adjacent features
   - phase-vs-pr: Default to "Phase N" framing — single-branch, single-review-cycle exec. Reserve "PR N" for real multi-PR work (--pr-bundle), where each change-set get own review cycle. Naming match reality — past 4-PR plans actually ran as 4 phase commits on 1 branch.
+  - workflow-fanout: Under ultracode Workflow fan-out, subagents RETURN plan markdown — subprocess FS writes are discarded, so the main loop performs the native Write per the outputs routing
   </gotchas>
 
   <bounds>

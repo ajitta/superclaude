@@ -67,6 +67,7 @@ Routing: per RULES.md `<doc_output_convention>` — feature path `docs/features/
   <gotchas>
   - over-architect: Apply R18 necessity test to each proposed component. Only design what needed now
   - existing-check: Check if design doc already exist for this topic before creating new one
+  - workflow-fanout: Under ultracode Workflow fan-out, subagents RETURN design markdown — subprocess FS writes are discarded, so the main loop performs the native Write per the outputs routing
   </gotchas>
 
   <bounds>
@@ -75,5 +76,5 @@ Routing: per RULES.md `<doc_output_convention>` — feature path `docs/features/
     <fallback>Ask user for guidance when uncertain.</fallback>
   </bounds>
 
-  <handoff next="/sc:plan /sc:implement /sc:workflow"/>
+  <handoff next="/sc:plan /sc:implement /sc:roadmap"/>
 </component>

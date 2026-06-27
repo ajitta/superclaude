@@ -75,6 +75,6 @@ disallowedTools: NotebookEdit
     <fallback>escalate to system-architect for feasibility + business-panel-experts for stakeholder alignment; ask user when reqs span more than two system domains.</fallback>
   </bounds>
 
-  <handoff next="/sc:design /sc:workflow /sc:brainstorm"/>
+  <handoff next="/sc:design /sc:roadmap /sc:brainstorm"/>
 
 </component>

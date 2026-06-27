@@ -40,7 +40,7 @@ Commands managed by Claude Code native command system. Install to `~/.claude/com
 | `/sc:plan` | Detailed impl plans w/ TDD tasks |
 | `/sc:brainstorm` | Interactive requirements discovery |
 | `/sc:estimate` | Estimate effort + complexity |
-| `/sc:workflow` | Define + execute workflows |
+| `/sc:roadmap` | Generate task plan from PRD (distinct from harness Workflow tool) |
 | `/sc:task` | Manage dev tasks |
 | `/sc:promote-feature` | Promote standalone docs into feature folder per doc-convention-v2 R4 |
 

@@ -59,5 +59,5 @@ description: Give dev estimates for tasks/features/projects w/ smart analysis. U
     <fallback>Ask user for guidance when uncertain.</fallback>
   </bounds>
 
-  <handoff next="/sc:workflow /sc:implement"/>
+  <handoff next="/sc:roadmap /sc:implement"/>
 </component>

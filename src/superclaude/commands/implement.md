@@ -52,6 +52,7 @@ description: Feature + code impl w/ smart agent delegate + MCP. Use ONLY when us
   <gotchas>
   - status-check: Run R02 status check pre-impl. Grep for existing func first
   - scope-discipline: Build only what asked. Zero unsolicited files, zero adjacent refactors
+  - workflow-fanout: Under ultracode Workflow fan-out, subagents RETURN code/results (subprocess writes are discarded) — the main loop applies the edits AND runs the >3-file checkpoint (flow step 3), since subagents cannot pause for user approval
   </gotchas>
 
   <bounds>

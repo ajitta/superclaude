@@ -44,7 +44,7 @@ description: SuperClaude command dispatcher - main entry point for all features.
     - task: Complex task workflow management
     - test: Test execution + coverage analysis
     - troubleshoot: Issue diagnosis + resolution
-    - workflow: PRD → implementation workflow
+    - roadmap: Generate task plan from PRD
     - init: Interactive project env setup
     - insight: Capture structured session insights
     - plan: Detailed impl plans with TDD tasks

@@ -27,8 +27,8 @@
   </mcp>
 
   <execution>
---delegate [auto|files|folders]: sub-agent parallel delegation. Triggers + direct-vs-sub-agent decision matrix: RULES.md `<sub_agent_decision>` (SSOT)
---concurrency [n]: 1-15 → batch independent tool calls into single msg (e.g. 5 parallel Grep calls)
+--delegate [auto|files|folders]: sub-agent parallel delegation. Triggers + direct-vs-sub-agent decision matrix: RULES.md `<sub_agent_decision>` (SSOT). Governs SC policy only — whether/with-what-intent to delegate via the Agent tool — NOT the harness Workflow tool that executes multi-subagent fan-out (parallel()/pipeline(), the engine SC ships no runtime for). Different primitives: a Workflow fans out with no --delegate set.
+--concurrency [n]: 1-15 → batch independent tool calls into single msg (e.g. 5 parallel Grep calls). Batches tool-calls-per-message, NOT processes — buys no process parallelism. Multi-subagent Workflow fan-out is hard-capped at min(16, cpu-2) (6 on 8-core HW < 15), and that smaller harness cap silently wins on process count.
 --loop: iter improve — (1) state verifiable success criteria up-front (R20); (2) exec → self-eval vs criteria → find gaps → re-exec; (3) brief 1-line delta per iter ("iter N: <what changed>"); (4) stop when criteria met OR no meaningful improve OR 5-iter safety cap hit. Report total iter count + final criteria-met status when done.
 --iterations [n]: fixed iter count — exec improve cycle exactly N times. After each iter, briefly state what changed. Do not stop early even if output seems good.
 --plan: lightweight pre-impl planning → 5-line plan (goal, approach, files, risks, verification) before exec
@@ -40,7 +40,7 @@ Note: match flags to session type — analysis/discussion sessions rarely need -
   </execution>
 
   <output>
---uc|--ultracompressed: symbol system, 30-50% reduction. Manual/proactive trigger >=60% ctx (per MODE_Token_Efficiency.md); auto via --safe-mode at >=85%
+--uc|--ultracompressed: symbol system, 30-50% reduction. Manual/proactive trigger >=60% ctx (per MODE_Token_Efficiency.md); auto via --safe-mode at >=85%. The >=60% proactive band still fires under token-unbounded harness effort modes (e.g. ultracode): it guards context-window overflow (compressed TRANSPORT), not token cost — run exhaustive PROCESS + compressed transport, the two are different levers.
 --scope [file|module|project|system]: analysis boundary
 --focus [perf|security|quality|arch|a11y|testing]: target domain
   </output>

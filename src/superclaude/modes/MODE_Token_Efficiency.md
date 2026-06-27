@@ -27,6 +27,12 @@
   - Token consumption varies by model — monitor context usage proactively
   - One major task per session | Proactive --uc at >=60% session ctx (auto-activation thresholds in FLAGS.md: --token-efficient 75%, --safe-mode 85%) | Fresh sessions for unrelated tasks
 
+  ## Ultracode Posture
+  - Different-Axes: ultracode "cost not a constraint" optimizes PROCESS breadth; --uc/--token-efficient optimizes OUTPUT compression under context-window pressure. Orthogonal levers — coexist as exhaustive process + compressed transport.
+  - Proactive-Holds: under ultracode the >=60% proactive --uc still fires as a window-overflow guard (window pressure != cost concern). Only the reach for --uc purely to save money is dropped; the safety floor (--safe-mode auto-compress) is never relaxed.
+  - Per-Step-Shrink: per-subagent output compression delays context exhaustion but does NOT raise the hard 1000-agent fan-out cap — count caps survive compression.
+  - Advisory-Floor: compressed subagent output stays advisory — compression does not upgrade it to authoritative; revalidate cited file:line before acting on it.
+
   ## Symbols
 | Category | Symbols |
 |----------|---------|

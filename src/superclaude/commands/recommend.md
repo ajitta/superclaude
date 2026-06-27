@@ -26,7 +26,7 @@ description: Ultra-intelligent command recommendation engine for optimal SuperCl
     - ml (machine learning|ai|model): /sc:analyze --focus quality --c7 --seq
     - learn (how|explain|tutorial): /sc:explain --level basic --format examples
     - cleanup (refactor|dead code|tech debt): /sc:cleanup --type code --safe
-    - plan (workflow|plan|phases): /sc:workflow --strategy systematic
+    - plan (workflow|plan|phases): /sc:roadmap --strategy systematic
     - deploy (deploy|ci|cd|pipeline): /sc:build --type prod --optimize
   </keyword_map>
 

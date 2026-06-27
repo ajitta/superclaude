@@ -10,12 +10,14 @@ Intent Propagation: when delegate sub-agent, include user request verbatim — s
   </priority_system>
 
   <sub_agent_decision>
+  Axis: this section governs the single-delegate primitive (one Agent-tool subagent — whether/with-what-intent to spawn). Authoring a multi-subagent Workflow (`parallel`/`pipeline` fan-out) is the orthogonal harness EXECUTION layer: SC decides whether to fan out, the Workflow tool executes it. Both axes apply together; neither overrides the other.
   Direct work: single file edit, <3 steps, sequential dep, simple search, context already loaded
   Sub-agent: 3+ independent parallel streams, different expertise domains, >20K tokens exploration, isolated failure OK
   Never sub-agent: task need recent convo context, sequential A→B, doable <30s direct
   Model note: recent Opus models may not auto-spawn subagents even when Sub-agent criteria met — prefer explicit invocation (direct Agent tool call or `--delegate auto`) not assume auto-spawn. Opus 4.8 improved tool triggering vs 4.7; subagent-spawn eagerness under 4.8 not yet measured, threshold numbers unchanged pending eval.
   Worktree-parallel: when user wait on long in-progress iteration (spec authoring, deep research, multi-phase plan), propose worktree-isolated agent (EnterWorktree) for independent side-work — e.g., review project own framework/config, draft follow-up tickets. Split file-edit surfaces so two streams no conflict on merge. Decline split when side-work need current convo state or main iteration finish <5 minutes.
-  Delegate packet (IN): prompt must carry user_request_verbatim, allowed_scope, forbidden_changes, files_or_areas_of_interest, required_evidence_format, stop_condition. Sub-agent summary (OUT) advisory — revalidate cited file:line before act (re-grep / re-read the specific lines to confirm the summary's claims before editing or reporting).
+  Delegate packet (IN): prompt must carry user_request_verbatim, allowed_scope, forbidden_changes, files_or_areas_of_interest, required_evidence_format, stop_condition. Sub-agent summary (OUT) advisory — revalidate cited file:line before act (re-grep / re-read the specific lines to confirm the summary's claims before editing or reporting). Via a Workflow `agent(prompt, opts)` the six fields pack into the one free-form prompt argument (many-to-one); allowed_scope/forbidden_changes have no `opts` counterpart and stay prose discipline. `opts.schema`/StructuredOutput hardens return shape only — a well-typed citation can be fabricated, so the cited-file:line re-grep stays mandatory; cached/replayed results (Workflow resume-from-cache) may cite stale state and MUST be re-validated against current repo before act (R15 gates resume).
+  Workflow fan-out (OUT): every `parallel()` under SC governance must `log()` dropped/null thunks before `filter(Boolean)` — silent filtering makes the main loop synthesize from a silently-incomplete set, an R15 'claimed done on partial evidence' risk.
   <examples>
   | Task | Decision | Why |
   |---|---|---|
@@ -144,7 +146,7 @@ Depth: parent first → drill down next turn; ≤3 sub-options → inline [Na] [
 
 Default (multi-doc work): docs/features/<feature-slug>/
   Required: README.md (frontmatter + index) + numbered phase files
-  Phase prefixes: 01-discovery (brainstorm) | 02-research | 03-analysis | 04-design | 05-plan (plan, workflow) | 06+-<custom> (impl notes, retrospective)
+  Phase prefixes: 01-discovery (brainstorm) | 02-research | 03-analysis | 04-design | 05-plan (plan, roadmap) | 06+-<custom> (impl notes, retrospective)
   Multi-of-same-phase: `NNa-<phase>-<distinguisher>.md` (letter = Nth additional, starts at 'a'; distinguisher kebab-case ≤20 chars). Primary slot `NN-<phase>.md` optional — letter clock starts at 'a' even when primary skipped. Use for parallel streams (02a-research-libs, 02b-research-perf), phase-specific sub-discovery within multi-phase feature (01a-discovery-phase2), or mid-implementation discovery (01a-discovery-late).
   Superseded versions: move to <feature>/archive/ subdir
   Feature-slug: kebab-case, ≤40 chars, no dates/usernames, locked at dir creation
@@ -187,9 +189,9 @@ Examples:
     /sc:brainstorm -> /sc:design: User approves discovery spec before designing
     /sc:brainstorm -> /sc:review: Spec self-review mandatory before /sc:plan handoff (caught 3 critical reversals; see brainstorm.md flow step 6)
     /sc:design -> /sc:plan: Design spec committed (components pass [R18 Necessity Test] necessity test, deferred items marked)
-    /sc:design -> /sc:workflow: Alternative path when input is a PRD/feature doc rather than a design spec
+    /sc:design -> /sc:roadmap: Alternative path when input is a PRD/feature doc rather than a design spec
     /sc:plan -> /sc:implement --plan: Plan document committed to repo
-    /sc:workflow -> /sc:implement: Workflow tasks defined; implementation proceeds per task list
+    /sc:roadmap -> /sc:implement: Roadmap tasks defined; implementation proceeds per task list
     /sc:implement -> /sc:test: Implementation complete
     /sc:test -> done: Test pass evidence required (actual output, not claims)
   </workflow_gates>

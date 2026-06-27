@@ -44,7 +44,7 @@ description: List all /sc commands + functionality. Use ONLY when user types `/s
     - task: complex task workflow mgmt
     - test: test exec + coverage analysis
     - troubleshoot: issue diagnosis + fix
-    - workflow: PRD → impl workflow
+    - roadmap: PRD → impl task plan
     - init: interactive project env setup
     - insight: capture structured session insights
     - plan: detailed impl plans w/ TDD tasks

@@ -1,13 +1,13 @@
 ---
-description: Generate structured implementation workflows from PRDs and feature requirements. Use when user types `/sc:workflow` or hands over PRD/feature doc and asks for task breakdown to commit under docs/plans/. Do NOT auto-trigger on "what's the order of steps" or short ad-hoc task lists — those get inline 2-3 step answer, not workflow file.
+description: Generate structured implementation workflows from PRDs and feature requirements. Use when user types `/sc:roadmap` or hands over PRD/feature doc and asks for task breakdown to commit under docs/plans/. Do NOT auto-trigger on "what's the order of steps" or short ad-hoc task lists — those get inline 2-3 step answer, not workflow file.
 ---
-<component name="workflow" type="command">
+<component name="roadmap" type="command">
 
-  <role command="/sc:workflow">
+  <role command="/sc:roadmap">
     <mission>Generate structured implementation workflows from PRDs + feature requirements</mission>
   </role>
 
-  <syntax>/sc:workflow [prd-file|feature] [--strategy systematic|agile|enterprise] [--depth shallow|normal|deep] [--delegate]</syntax>
+  <syntax>/sc:roadmap [prd-file|feature] [--strategy systematic|agile|enterprise] [--depth shallow|normal|deep] [--delegate]</syntax>
 
   <flow>
   1. Analyze: Parse PRD + understand requirements
@@ -54,9 +54,9 @@ Routing: per RULES.md `<doc_output_convention>` — feature path `docs/features/
 | `project-brief.md --depth normal` | Cross-session with Serena |
 
   <example name="workflow-no-prd" type="error-path">
-    - Input: /sc:workflow --strategy enterprise --delegate (no PRD or feature doc)
+    - Input: /sc:roadmap --strategy enterprise --delegate (no PRD or feature doc)
     - Why wrong: Workflow generation needs PRD or feature doc as input. No input = no tasks to generate.
-    - Correct: Make PRD first: /sc:brainstorm → /sc:design → save to file → /sc:workflow PRD.md
+    - Correct: Make PRD first: /sc:brainstorm → /sc:design → save to file → /sc:roadmap PRD.md
   </example>
 
   </examples>
@@ -65,6 +65,7 @@ Routing: per RULES.md `<doc_output_convention>` — feature path `docs/features/
   <gotchas>
   - scope-match: Workflow scope must match PRD or feature request exactly
   - step-granularity: Each workflow step independently verifiable
+  - name-vs-harness-tool: /sc:roadmap (SC content command — authors a PRD→task plan document) is distinct from the harness Workflow tool (deterministic multi-subagent execution). This command writes a plan; it does not orchestrate subagent fan-out or run agents.
   </gotchas>
 
   <bounds>

@@ -74,6 +74,6 @@ color: blue
     <fallback>escalate to backend-architect for API specifics, frontend-architect for UI, security-engineer for compliance; ask user when trade-offs cross more than two system boundaries.</fallback>
   </bounds>
 
-  <handoff next="/sc:design /sc:implement /sc:workflow"/>
+  <handoff next="/sc:design /sc:implement /sc:roadmap"/>
 
 </component>
