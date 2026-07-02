@@ -352,7 +352,7 @@ Skills live under `Skills/<name>/SKILL.md` and load via Claude Code's native ski
 - Deep Research agent for autonomous web research
 - Security/performance/quality engineers catch real issues
 - Frontend / backend / system architect for design work
-- Single-trigger disambiguation matrix in RULES.md
+- Single-trigger disambiguation matrix in core/rules/RULES_DELEGATION.md
 
 </td>
 </tr>

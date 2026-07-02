@@ -176,6 +176,24 @@ def install_component(
                 failed += 1
                 failed_names.append(f"{source_file.name}: {e}")
 
+        # core/rules/ holds on-demand rule modules (Phase 2-1 core-lite split)
+        # routed by context_loader — copy nested .md preserving layout.
+        if component == "core":
+            for source_file in source_dir.glob("rules/*.md"):
+                if source_file.stem.upper() == "README":
+                    continue
+                target_file = target_dir / "rules" / source_file.name
+                target_file.parent.mkdir(parents=True, exist_ok=True)
+                if target_file.exists() and not force:
+                    skipped += 1
+                    continue
+                try:
+                    shutil.copy2(source_file, target_file)
+                    installed += 1
+                except Exception as e:
+                    failed += 1
+                    failed_names.append(f"rules/{source_file.name}: {e}")
+
         # templates/ holds nested doc-scaffold directories consumed by
         # /sc:init (not slash commands). Copy each subdirectory verbatim.
         if component == "templates":

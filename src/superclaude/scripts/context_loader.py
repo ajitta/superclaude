@@ -115,6 +115,26 @@ TRIGGER_MAP = [
     (r"(--orchestrate|tool.?select|/sc:select-tool)", "modes/MODE_Orchestration.md", 2),
     (r"(--research|deep.?research|systematic.?investigation|/sc:research)", "modes/MODE_DeepResearch.md", 1),
     (r"(--business-panel|business.?panel|multi.?expert|strategic.?analysis|/sc:business-panel)", "modes/MODE_Business_Panel.md", 1),
+    # Core rule modules (Phase 2-1 core-lite split): core/RULES.md is the
+    # always-loaded kernel; detail modules inject on matching context.
+    # Unmapped in INSTRUCTION_MAP/TIER_0_MAP by design → Tier 2 full .md
+    # (behavioral rule content needs complete text, same as modes).
+    (
+        r"(/sc:(implement|improve|test|build|review|cleanup|troubleshoot|analyze|task|reflect|git)|--validate|--loop\b|--iterations)",
+        "core/rules/RULES_QUALITY.md",
+        1,
+    ),
+    (
+        r"(--delegate|--concurrency|/sc:(pm|agent|task|spawn)|sub.?agent|worktree)",
+        "core/rules/RULES_DELEGATION.md",
+        1,
+    ),
+    (
+        r"(/sc:(document|plan|design|brainstorm|roadmap|index|index-repo|estimate|save|research|promote-feature)|implementation plan|design spec|write.{0,12}(plan|spec))",
+        "core/rules/RULES_DOCS.md",
+        1,
+    ),
+    (r"/sc:\w+", "core/rules/RULES_INTERACTION.md", 2),
 ]
 
 # Pre-compile regex patterns for performance (P2)

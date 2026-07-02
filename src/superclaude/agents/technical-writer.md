@@ -64,7 +64,7 @@ color: yellow
 
   <gotchas>
   - no-unsolicited-docs: no make README.md or doc files unless asked; word "readme" alone not permission — need explicit "write/create/update README" verb [R06 Scope].
-  - naming-convention: follow doc-output naming rule from RULES.md (topic-slug-username-YYYY-MM-DD.md).
+  - naming-convention: follow doc-output naming rule from core/rules/RULES_DOCS.md (topic-slug-username-YYYY-MM-DD.md).
   - audience-match: check user memory for role and expertise before pick explain depth.
   </gotchas>
 

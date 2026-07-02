@@ -9,7 +9,7 @@
 |---|---|
 | vanilla | bare Claude Code, no SC content |
 | sc-full | full `superclaude install --scope project` |
-| sc-core-lite | full install, `core/RULES.md` swapped for `arms/RULES_KERNEL.md` (Phase 2-1 hypothesis) |
+| sc-core-lite | full install, `core/RULES.md` swapped for `arms/RULES_KERNEL.md`. Phase 2-1 hypothesis CONFIRMED + shipped 2026-07-03 — shipped RULES.md is now itself a kernel, so this arm measures kernel-without-modules vs sc-full's kernel+routed-modules (routing-value probe) |
 | sc-command-only | full install, always-loaded core import stripped from CLAUDE.md |
 
 Isolation: every arm runs with `CLAUDE_CONFIG_DIR` pointing at an empty

@@ -1,5 +1,5 @@
 ---
-status: in-progress — Phase 0 closed, Phase 1 matrix + n=3 variance runs DONE 2026-07-03, Phase 2-1 gate OPEN (core-lite=full parity confirmed), 3-1 done
+status: in-progress — Phase 0 closed, Phase 1 DONE, Phase 2-1 SHIPPED 2026-07-03 (kernel 865 tok + 4 on-demand modules), 2-2 pending, 3-1 done
 revised: 2026-07-03
 ---
 
@@ -64,11 +64,13 @@ Shipped: 10 canary-flagged tasks (the 7 eval tasks + 3 prose-rule probes: `--int
 
 ## Phase 2 — Slimming, conditional on Phase 1 results
 
-### 2-1. core-lite split
+### 2-1. core-lite split — **SHIPPED 2026-07-03 (same session as the gate data)**
 
-*2026-07-03 matrix: sc-core-lite scored identical-or-better vs sc-full across all 7 tasks (21/22 vs 20/22). n=3 variance runs resolved the destructive-elicitation anomaly as a variance tail. **Gate OPEN — this is the next implementation item.***
+*Matrix: sc-core-lite scored identical-or-better vs sc-full across all 7 tasks (21/22 vs 20/22); n=3 variance runs resolved the destructive-elicitation anomaly as a variance tail → gate opened and implemented.*
 
-RULES.md ~5.5k tokens → always-loaded kernel ≤ 2k (scope discipline, no-completion-claim-without-verification, destructive-op confirmation, project-rules-priority) + on-demand modules routed by context_loader (mechanism already exists — this is routing-table extension, not new development). verification ladder → implement/review commands only; doc convention → doc-producing commands only.
+Shipped shape: core/RULES.md rewritten as an 865-token kernel (validated eval-arm wording + R-tag anchors + on-demand module map) — standing RULES tax 5,456 → 865 tok (−84%). Four modules under core/rules/ (verbatim section moves): RULES_QUALITY (R01–R21 + ladder + anti-over-engineering + thresholds, ~3.2k tok), RULES_DELEGATION (~1.2k), RULES_DOCS (~1.1k), RULES_INTERACTION (~0.2k). context_loader TRIGGER_MAP routes them Tier-2 full-.md on implement/delegation/doc//sc: contexts (live-verified injection + session dedup). Installer ships core/rules/ (install_components.py nested copy); verify_drift compares it; 4 new drift guards (kernel ≤7600 chars, module↔routing sync, Tier-2 guarantee, kernel map completeness). 23 confirmed stale references updated across commands/agents/READMEs/ARCHITECTURE/evals (39-agent impact-map workflow, adversarially verified). Suite 2030 green.
+
+Original spec: RULES.md ~5.5k tokens → always-loaded kernel ≤ 2k (scope discipline, no-completion-claim-without-verification, destructive-op confirmation, project-rules-priority) + on-demand modules routed by context_loader (mechanism already exists — this is routing-table extension, not new development). verification ladder → implement/review commands only; doc convention → doc-producing commands only.
 
 ### 2-2. Agent rewrite pilot (3 agents, not 23)
 

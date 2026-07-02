@@ -14,12 +14,12 @@ description: Code analysis across quality, security, performance, architecture d
   2. Scan: Domain-specific analysis per --focus
   3. Evaluate: Prioritized findings + severity (🔴🟡🟢)
   4. Recommend: Actionable guidance
-  5. Report (routing per RULES.md `<doc_output_convention>` for `--format report` markdown only): on feature path, write report to `docs/features/<slug>/03-analysis.md` (frontmatter: `status: draft, revised: <today>`) AND update `docs/features/<slug>/README.md` (`updated:` bump + append entry to `## Documents`, advance `phase:` if status enum moved). On standalone path, write to `docs/analysis/<target>-<username>-YYYY-MM-DD.md` — no README update needed. text/json formats unchanged (text = console, json = standalone path only).
+  5. Report (routing per core/rules/RULES_DOCS.md `<doc_output_convention>` for `--format report` markdown only): on feature path, write report to `docs/features/<slug>/03-analysis.md` (frontmatter: `status: draft, revised: <today>`) AND update `docs/features/<slug>/README.md` (`updated:` bump + append entry to `## Documents`, advance `phase:` if status enum moved). On standalone path, write to `docs/analysis/<target>-<username>-YYYY-MM-DD.md` — no README update needed. text/json formats unchanged (text = console, json = standalone path only).
   6. Bridge: If findings actionable (fixable issues, not informational), suggest: "Would you like to create an implementation plan? → /sc:plan"
   </flow>
 
-  <outputs note="Per --format flag; report format dual-routes per RULES.md `<doc_output_convention>`">
-Routing (`--format report` only): per RULES.md `<doc_output_convention>` — feature path `docs/features/<slug>/03-analysis.md` (existing folder OR user picks `[f]`) | standalone path `docs/analysis/<target>-<username>-YYYY-MM-DD.md` (user picks `[s]` or no related work expected, default for one-off analysis). Slug resolution: exact-match silent / multi partial-match prompt / zero match → `[f]/[s]` w/ default `[s]`. text/json unaffected.
+  <outputs note="Per --format flag; report format dual-routes per core/rules/RULES_DOCS.md `<doc_output_convention>`">
+Routing (`--format report` only): per core/rules/RULES_DOCS.md `<doc_output_convention>` — feature path `docs/features/<slug>/03-analysis.md` (existing folder OR user picks `[f]`) | standalone path `docs/analysis/<target>-<username>-YYYY-MM-DD.md` (user picks `[s]` or no related work expected, default for one-off analysis). Slug resolution: exact-match silent / multi partial-match prompt / zero match → `[f]/[s]` w/ default `[s]`. text/json unaffected.
 
   | Format | Output | Content |
   |---|---|---|
@@ -45,7 +45,7 @@ Routing (`--format report` only): per RULES.md `<doc_output_convention>` — fea
   </focus_agent_mapping>
 
   <rules_analysis note="--focus rules: rule effectiveness audit">
-    Quality (always): Read RULES.md → summary: rule count, example coverage, severity distribution
+    Quality (always): Read core/rules/RULES_QUALITY.md (R01–R21 table lives there post core-lite split) → summary: rule count, example coverage, severity distribution
     Compliance (when data exists): Glob auto memory + list Serena memories → grep `violated_rule: "[RXX]"` → heatmap
       Hot (≥2 violations) 🔴: needs examples or clarification → /sc:improve
       Warm (1 violation) 🟡: monitor

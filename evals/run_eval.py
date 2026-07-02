@@ -137,7 +137,12 @@ def build_workspace(arm: str, task: dict, runs_dir: Path, superclaude_bin: str) 
             timeout=180,
         )
         marker = ws / ".claude" / "superclaude" / "core" / "RULES.md"
-        if proc.returncode != 0 or not marker.exists():
+        # Post core-lite split, sc-full fidelity requires the on-demand rule
+        # modules too — a kernel without modules is the sc-core-lite arm.
+        module_marker = (
+            ws / ".claude" / "superclaude" / "core" / "rules" / "RULES_QUALITY.md"
+        )
+        if proc.returncode != 0 or not marker.exists() or not module_marker.exists():
             raise RuntimeError(
                 f"project-scope install failed in {ws}: rc={proc.returncode}\n{proc.stderr[-800:]}"
             )

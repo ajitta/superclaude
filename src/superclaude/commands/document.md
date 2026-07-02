@@ -61,7 +61,7 @@ description: Gen focused docs for components, functions, APIs, features. Use whe
 
   <gotchas>
   - no-unsolicited: No create doc files unless explicit request
-  - naming: Follow doc_output_convention from RULES.md for file naming (topic-slug-username-date.md)
+  - naming: Follow doc_output_convention from core/rules/RULES_DOCS.md for file naming (topic-slug-username-date.md)
   </gotchas>
 
   <bounds>

@@ -180,7 +180,7 @@ Synthesis: security + failure modes often overlap (both care edge cases); perfor
 
 **Detected**: Analytical → VS-CoT, k=5, tau=0.10
 
-Aligns with RULES.md [R03 Diagnosis] Diagnosis: make 3+ hypotheses ranked by simplicity.
+Aligns with core/rules/RULES_QUALITY.md [R03 Diagnosis] Diagnosis: make 3+ hypotheses ranked by simplicity.
 
 Five hypotheses with reasoning:
 1. (p=0.12) **Database connection exhaustion** — check connection pool metrics, common under load

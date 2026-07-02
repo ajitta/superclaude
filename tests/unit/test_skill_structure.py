@@ -257,19 +257,22 @@ class TestSkillBody:
 
 
 class TestWorkflowGates:
-    """Validate workflow gates reference commands in RULES.md."""
+    """Validate workflow gates reference commands in the docs rule module
+    (moved out of RULES.md by the Phase 2-1 core-lite split)."""
 
     def test_rules_has_workflow_gates(self):
-        rules_path = SKILLS_DIR.parent / "core" / "RULES.md"
+        rules_path = SKILLS_DIR.parent / "core" / "rules" / "RULES_DOCS.md"
         content = rules_path.read_text(encoding="utf-8")
-        assert "<workflow_gates" in content, "RULES.md missing <workflow_gates> section"
+        assert "<workflow_gates" in content, (
+            "RULES_DOCS.md missing <workflow_gates> section"
+        )
 
     def test_workflow_gates_reference_commands(self):
-        rules_path = SKILLS_DIR.parent / "core" / "RULES.md"
+        rules_path = SKILLS_DIR.parent / "core" / "rules" / "RULES_DOCS.md"
         content = rules_path.read_text(encoding="utf-8")
         for cmd in ["/sc:brainstorm", "/sc:plan", "/sc:implement", "/sc:test"]:
             assert cmd in content, (
-                f"RULES.md workflow gates missing reference to '{cmd}'"
+                f"RULES_DOCS.md workflow gates missing reference to '{cmd}'"
             )
 
 

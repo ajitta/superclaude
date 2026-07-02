@@ -6,6 +6,7 @@ Tests: format_skills_summary, resolve_flags (alias/fuzzy matching),
 """
 
 from dataclasses import dataclass
+from pathlib import Path
 
 from superclaude.scripts.context_loader import (
     _BEHAVIORAL_MCPS,
@@ -302,3 +303,47 @@ class TestTriggerMapPaths:
         """TRIGGER_MAP should have entries for exactly 6 MCP docs."""
         mcp_paths = {path for _, path, _ in TRIGGER_MAP if path.startswith("mcp/")}
         assert len(mcp_paths) == 6, f"Expected 6 MCP trigger paths, got {len(mcp_paths)}: {mcp_paths}"
+
+
+class TestCoreLiteSplit:
+    """Drift guards for the Phase 2-1 core-lite split: kernel token budget,
+    module routing coverage, and full-injection tier of rule modules."""
+
+    KERNEL_CHAR_BUDGET = 7600  # ~2k tokens at chars/3.8 — roadmap 2-1 ceiling
+
+    SRC_CORE = Path(__file__).resolve().parents[2] / "src" / "superclaude" / "core"
+
+    def _modules(self):
+        return {
+            f"core/rules/{p.name}"
+            for p in (self.SRC_CORE / "rules").glob("*.md")
+            if p.stem.upper() != "README"
+        }
+
+    def test_kernel_stays_within_token_budget(self):
+        kernel = (self.SRC_CORE / "RULES.md").read_text(encoding="utf-8")
+        assert len(kernel) <= self.KERNEL_CHAR_BUDGET, (
+            f"RULES.md kernel {len(kernel)} chars exceeds {self.KERNEL_CHAR_BUDGET} "
+            "(~2k tokens) — move detail into core/rules/ modules instead"
+        )
+
+    def test_every_rule_module_is_routed_by_trigger_map(self):
+        routed = {path for _p, path, _pr in TRIGGER_MAP if path.startswith("core/rules/")}
+        assert self._modules() == routed, (
+            "core/rules/ modules and TRIGGER_MAP routing out of sync"
+        )
+
+    def test_rule_modules_inject_full_md(self):
+        """Rule modules carry behavioral content — must stay Tier 2 (full .md),
+        never silently downgraded to instruction-string tiers."""
+        for path in self._modules():
+            assert _get_injection_tier(path, verbose=False) == 2, (
+                f"{path} not Tier 2 — remove it from INSTRUCTION_MAP/TIER_0_MAP"
+            )
+
+    def test_kernel_module_map_lists_every_module(self):
+        """Kernel's on_demand_modules table is the discovery surface for
+        explicit Reads — every shipped module must be listed."""
+        kernel = (self.SRC_CORE / "RULES.md").read_text(encoding="utf-8")
+        for module in self._modules():
+            assert module in kernel, f"kernel module map missing {module}"

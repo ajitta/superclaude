@@ -13,7 +13,7 @@ description: Interactive requirements discovery thru Socratic dialogue + systema
   1. Explore: Socratic dialogue + systematic questioning.
   2. Analyze: Multi-agent coord + domain expertise. With --vs, gen k perspectives w/ probs + landscape synth; --depth tune detail (shallow→brief, normal→balanced, deep→detailed).
   3. Validate: Feasibility check + requirement validation.
-  4. Specify (routing per RULES.md `<doc_output_convention>`): on feature path, write spec to `docs/features/<slug>/01-discovery.md` (frontmatter: `status: draft, revised: <today>`) AND update `docs/features/<slug>/README.md` (`updated:` bump + append entry to `## Documents`, advance `phase:` if status enum moved). On standalone path, write to `docs/specs/<topic>-discovery-<username>-YYYY-MM-DD.md` — no README update needed.
+  4. Specify (routing per core/rules/RULES_DOCS.md `<doc_output_convention>`): on feature path, write spec to `docs/features/<slug>/01-discovery.md` (frontmatter: `status: draft, revised: <today>`) AND update `docs/features/<slug>/README.md` (`updated:` bump + append entry to `## Documents`, advance `phase:` if status enum moved). On standalone path, write to `docs/specs/<topic>-discovery-<username>-YYYY-MM-DD.md` — no README update needed.
   5. Approve: Show spec for user review — no proceed without confirm.
   6. Self-review (REQUIRED hard gate): emit handoff "Run /sc:review on this spec before /sc:plan. Plan handoff is gated on review." Rules below.
   7. Decision-mode tag: tag each Resolved Decision as confirmed or delegated. Heuristic below.
@@ -36,7 +36,7 @@ description: Interactive requirements discovery thru Socratic dialogue + systema
   </decision_modes>
 
   <outputs>
-Routing: per RULES.md `<doc_output_convention>` — feature path `docs/features/<slug>/01-discovery.md` (existing folder OR user picks `[f]`) | standalone path `docs/specs/<topic>-discovery-<username>-YYYY-MM-DD.md` (user picks `[s]` or no related work expected). Slug resolution: exact-match silent / multi partial-match prompt / zero match → `[f]/[s]` w/ default `[f]`.
+Routing: per core/rules/RULES_DOCS.md `<doc_output_convention>` — feature path `docs/features/<slug>/01-discovery.md` (existing folder OR user picks `[f]`) | standalone path `docs/specs/<topic>-discovery-<username>-YYYY-MM-DD.md` (user picks `[s]` or no related work expected). Slug resolution: exact-match silent / multi partial-match prompt / zero match → `[f]/[s]` w/ default `[f]`.
 
 | Artifact | Purpose |
 |---|---|

@@ -111,6 +111,27 @@ def _check_component(component: str, base_path: Path) -> Dict[str, str]:
             for filename in sorted(target_files - source_files):
                 results[filename] = EXTRA
 
+        # core/rules/ nested modules (Phase 2-1 core-lite split) — compare
+        # with rules/ key prefix so module drift is not silently invisible.
+        if component == "core":
+            rules_src = source_dir / "rules"
+            rules_tgt = target_dir / "rules"
+            src_rules = {
+                f.name for f in rules_src.glob("*.md")
+                if f.stem.upper() != "README"
+            } if rules_src.exists() else set()
+            for filename in sorted(src_rules):
+                results[f"rules/{filename}"] = _compare_files(
+                    rules_src / filename, rules_tgt / filename
+                )
+            if rules_tgt.exists():
+                tgt_rules = {
+                    f.name for f in rules_tgt.glob("*.md")
+                    if f.stem.upper() != "README"
+                }
+                for filename in sorted(tgt_rules - src_rules):
+                    results[f"rules/{filename}"] = EXTRA
+
     return results
 
 

@@ -45,9 +45,9 @@ description: Clean code systematic, kill dead code, optimize project structure. 
 
   <validator_checks note="--type docs only — per doc-convention-v2 01b-discovery-open-decisions.md R1-R3">
     - R1-post-cutoff-non-v2: For each standalone doc in `docs/{specs,plans,research,analysis}/`, read frontmatter or filename date; if date > 2026-05-18 cutoff AND no companion `docs/features/<slug>/` folder, surface warning "v2 non-compliant — consider /sc:promote-feature <slug>". Pre-cutoff legacy explicitly skipped.
-    - R2-cross-feature-link-form: Grep `\[\[[a-z0-9-]+\]\]` pattern across `docs/features/*/*.md` (skip fenced code blocks to avoid false positives on syntax examples). Each match = warning "use relative path per RULES.md cross-links rule (`../<other-slug>/NN-<phase>.md`); slug refs not supported". Standalone-doc matches not flagged (legacy tolerated).
+    - R2-cross-feature-link-form: Grep `\[\[[a-z0-9-]+\]\]` pattern across `docs/features/*/*.md` (skip fenced code blocks to avoid false positives on syntax examples). Each match = warning "use relative path per core/rules/RULES_DOCS.md cross-links rule (`../<other-slug>/NN-<phase>.md`); slug refs not supported". Standalone-doc matches not flagged (legacy tolerated).
     - R3-slug-overlap: Build slug set from (a) `docs/features/<slug>/` dir names + (b) standalone filename slugs (extract per `<slug>-<suffix?>-<username>-YYYY-MM-DD.md` pattern, strip suffix/username/date). Any slug appearing in ≥2 places = "consider promotion" suggestion per Q5 auto-detect mechanism — surface as "candidate: /sc:promote-feature <slug>". Suggestion-only per Q2 manual policy; never auto-migrate.
-    - R-existing-slug-lint: Pre-existing per RULES.md `<doc_output_convention>` formatter mention. Detects same slug used by two standalone docs of same type.
+    - R-existing-slug-lint: Pre-existing per core/rules/RULES_DOCS.md `<doc_output_convention>` formatter mention. Detects same slug used by two standalone docs of same type.
     - R-existing-readme-regen: Auto-regenerate `docs/features/*/README.md` `## Documents` section from current file list when running with `--apply` flag. Read-only with `--dry-run`.
   </validator_checks>
 
