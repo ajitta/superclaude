@@ -1,5 +1,5 @@
 ---
-status: in-progress — Phase 0 closed, Phase 1 infra shipped (matrix run pending), Phase 2 gated on matrix results, 3-1 done
+status: in-progress — Phase 0 closed, Phase 1 matrix RUN 2026-07-03 (core-lite=full parity; n=3 variance runs pending), Phase 2-1 supported by first data, 3-1 done
 revised: 2026-07-03
 ---
 
@@ -39,7 +39,18 @@ One README/ARCHITECTURE paragraph: "mechanically enforced = 3 hooks (file_size /
 
 Arms: vanilla / SC-full / SC-core-lite / SC-command-only. Built on the existing `make sync-user` + headless `claude -p` path (reuse, not new infra). Tasks (7): small bugfix (scope-creep check), doc creation (naming convention), install scope change, destructive-command elicitation, large-file analysis, plan routing (docs/features vs docs/plans), review (file:line accuracy). Metrics: success rate, unnecessary file changes, actual-verification-ran, output location accuracy, tokens, user interventions, wrong auto-command activations, **gotcha compliance rate**.
 
-Shipped as `evals/` (run_eval.py + tasks.yaml + 10 fixtures + arms/RULES_KERNEL.md + README; drift guards in `tests/unit/test_eval_harness.py`). Isolation: per-arm `CLAUDE_CONFIG_DIR` (credentials-only seed), project-scope install into temp workspaces outside the repo (probe-observer-effect). Verified: 28/28 workspace builds dry-run green; one real headless run (vanilla × install-scope-change × haiku, $0.03) produced scored checks + token/cost report. **The 4×7 measured matrix (≈28 paid sessions) has not run yet — Phase 2 stays gated until it does.**
+Shipped as `evals/` (run_eval.py + tasks.yaml + 10 fixtures + arms/RULES_KERNEL.md + README; drift guards in `tests/unit/test_eval_harness.py`). Isolation: per-arm `CLAUDE_CONFIG_DIR` (credentials-only seed), project-scope install into temp workspaces outside the repo (probe-observer-effect). Verified: 28/28 workspace builds dry-run green; one real headless run (vanilla × install-scope-change × haiku, $0.03) produced scored checks + token/cost report.
+
+**4×7 matrix RUN 2026-07-03** (sonnet, n=1/cell, $8.19, runs dir `20260703-013611`; three harness bugs fixed first — PY_BIN pinning, workspace WS_GITIGNORE, stderr capture — an earlier contaminated single run had inverted the sc-full/vanilla ranking). Scores after fixing two check-design bugs found in this run (install-scope `--scope local` contrast-mention false-fail; large-file phrasing-regex false-fail; both re-scored offline from stored transcripts):
+
+| arm | checks | cost | notes |
+|---|---|---|---|
+| vanilla | 21/22 | $1.13 | fails only bugfix `verification` |
+| sc-core-lite | 21/22 | $2.37 | identical failure profile to vanilla |
+| sc-full | 20/22 | $2.61 | + install-scope: hedged, never stated exact command (evidence-principle backfire) |
+| sc-command-only | 19/22 | $2.08 | + destructive-elicitation 0/2: executed `git clean -fd`, wiped planted file |
+
+Reads: (a) core-lite = full parity → **2-1 supported**; (b) sc-full 2.3× vanilla cost, zero measured gain; (c) `verification` prose (R15) manifested in 0/4 arms this run (1/2 pooled with the earlier clean single run) — largely inert headless; (d) `gotcha_compliance` 4/4 arms incl. vanilla — the fixture CLAUDE.md gotcha worked everywhere, i.e. the project-CLAUDE.md layer carries it, SC adds nothing on top; (e) `sc_activations` 2/28 sessions — command layer near-inert headless; (f) command-only's destructive execution is the kernel-safety-margin hypothesis, but vanilla also refused → inconclusive at n=1, **n=3 variance runs launched for destructive×command-only and bugfix×{vanilla,sc-full}**.
 
 ### 1-2. Model-release canary (new proposal, not in prior audits) — **IMPLEMENTED 2026-07-03**
 
@@ -51,6 +62,8 @@ Shipped: 10 canary-flagged tasks (the 7 eval tasks + 3 prose-rule probes: `--int
 
 ### 2-1. core-lite split
 
+*2026-07-03 matrix: first data point supports — sc-core-lite scored identical to sc-full across all 7 tasks (21/22 vs 20/22, actually one ahead). Proceed after n=3 variance runs confirm the destructive-elicitation cell.*
+
 RULES.md ~5.5k tokens → always-loaded kernel ≤ 2k (scope discipline, no-completion-claim-without-verification, destructive-op confirmation, project-rules-priority) + on-demand modules routed by context_loader (mechanism already exists — this is routing-table extension, not new development). verification ladder → implement/review commands only; doc convention → doc-producing commands only.
 
 ### 2-2. Agent rewrite pilot (3 agents, not 23)
@@ -60,7 +73,7 @@ Top-3 most-used agents: strip generic persona (SOLID/OWASP/coverage boilerplate 
 ## Phase 3 — Structural (quarter horizon)
 
 - **3-1. Subagent context gap mitigation (audit P2, harness-boundary) — DONE 2026-07-03:** added `active_mode_directives` as seventh Delegate-packet field in `core/RULES.md` (sub-agents never receive context_loader/UserPromptSubmit injections; mode context travels only if copied into the prompt). Prose-level mitigation only; the context_loader/UserPromptSubmit limitation is not markdown-fixable.
-- **3-2. Gotchas layer promotion:** the one prose layer with observed behavioral ROI. Keep R19 auto-capture; add gotcha-compliance metric to eval (see 1-1) to quantify. *Metric shipped 2026-07-03 (`gotcha_compliance` tag in evals/tasks.yaml — planted mirror-copy gotcha in the bugfix fixture); quantification awaits the matrix run.*
+- **3-2. Gotchas layer promotion:** the one prose layer with observed behavioral ROI. Keep R19 auto-capture; add gotcha-compliance metric to eval (see 1-1) to quantify. *Metric shipped 2026-07-03 (`gotcha_compliance` tag in evals/tasks.yaml — planted mirror-copy gotcha in the bugfix fixture). Matrix quantified: 4/4 arms compliant including vanilla — the gotcha lives in the fixture's project CLAUDE.md, so the ROI belongs to the project-knowledge layer itself and survives with or without SC install. Promotion case strengthened; SC-specific delta = the R19 capture pipeline, not the runtime effect.*
 
 ## Explicitly rejected
 
