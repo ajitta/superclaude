@@ -45,6 +45,12 @@ class TestDestructiveGuard:
             "sudo rm -rf /*",
             "git push --force origin main",
             "git push --force origin master",
+            # 2026-07-02 live-test bypasses — -f shorthand and flag-after-branch
+            "git push -f origin main",
+            "git push -f origin master",
+            "git push origin main -f",
+            "git push origin main --force",
+            "git push -f -u origin master",
         ],
     )
     def test_blocks_destructive(self, cmd):
@@ -59,6 +65,8 @@ class TestDestructiveGuard:
             "git push --force-with-lease origin main",  # safe force-push allowed
             "git push origin main",  # no force
             "git push --force origin feature",  # force but not main/master
+            "git push -f origin feature",  # -f shorthand but not main/master
+            "git push -f origin maintenance",  # 'main' substring, not the branch
             "ls -la",
             "git commit -m 'rm -rf cleanup notes'",
         ],

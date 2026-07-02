@@ -8,13 +8,18 @@ test baseline (``CLAUDE.md``). This version depends only on the Python stdlib �
 the same runtime the other safety hooks already require — so it cannot fail open
 because an external tool is absent.
 
-Blocks (matching the original regex verbatim):
+Blocks:
   - ``rm -rf /``    — wipe filesystem root
   - ``rm -rf /*``   — wipe everything under root
-  - ``git push --force ... main|master`` — clobber a shared branch
+  - force-push to ``main``/``master`` — via ``--force`` OR the ``-f`` shorthand,
+    with the force flag and the branch name in either order (the original regex
+    only caught ``--force`` appearing *before* the branch name; 2026-07-02
+    live-test found ``git push -f origin main`` sailed through)
 
 ``--force-with-lease`` (safe force-push) is allowed by construction: the
-``--force`` branch requires the following character to NOT be a hyphen.
+``--force`` branch requires the following character to NOT be a hyphen, and
+the ``-f`` branch requires a standalone token (not the ``-f`` inside
+``--force-with-lease``).
 
 Respects ``SUPERCLAUDE_DESTRUCTIVE_GUARD=0`` to disable.
 Outputs structured JSON for the Claude Code PreToolUse hook protocol, matching
@@ -25,12 +30,15 @@ import os
 import re
 import sys
 
-# Mirrors the original hooks.json shell regex verbatim (one alternation each):
-#   rm -rf /<eol>  |  rm -rf /*  |  git push ... --force<not-hyphen> ... main/master
+# rm patterns mirror the original hooks.json shell regex verbatim.
+# Force-push pattern (widened 2026-07-02): lookaheads accept the force flag
+# (--force, not --force-with-lease; or standalone -f) and main/master in ANY
+# argument order — the original `--force ... main` ordering missed both
+# `git push -f origin main` and `git push origin main --force`.
 _DESTRUCTIVE = re.compile(
     r"rm\s+-rf\s+/\s*$"
     r"|rm\s+-rf\s+/\*"
-    r"|git\s+push\s+.*--force([^-]|$).*(main|master)"
+    r"|git\s+push\b(?=.*(?:--force(?!-)|(?<!\S)-f\b))(?=.*\b(?:main|master)\b)"
 )
 
 _BLOCK_REASON = "BLOCKED: destructive command detected (--force-with-lease is allowed)"
