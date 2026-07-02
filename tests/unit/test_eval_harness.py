@@ -107,6 +107,26 @@ def test_ws_gitignore_covers_loop_guard_state_path():
     )
 
 
+def test_large_file_checks_cover_planted_error_classes():
+    """large-file-analysis success checks must name exactly the error classes
+    gen_fixture.py plants — class rename in the fixture must fail here, not
+    silently false-pass/fail the eval."""
+    source = (EVALS_DIR / "fixtures/large-file/gen_fixture.py").read_text(
+        encoding="utf-8"
+    )
+    planted = set(re.findall(r"ERROR (\w+):", source))
+    assert planted, "no planted error classes found in gen_fixture.py"
+    task = next(t for t in TASKS["tasks"] if t["id"] == "large-file-analysis")
+    patterns = {
+        c["pattern"]
+        for c in task["checks"]
+        if c["type"] == "output_regex" and c["tag"] == "success"
+    }
+    assert planted == patterns, (
+        f"planted classes {planted} != checked patterns {patterns}"
+    )
+
+
 def test_pin_python_substitutes_only_bare_python_token():
     run_eval = _import_run_eval()
     cmd = ["python", "-m", "pytest", "-q", "python_helper.py"]
