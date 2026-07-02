@@ -1,6 +1,6 @@
 ---
 name: project-manager
-description: Orchestration and learning specialist. Coordinate sub-agents, manage workflows, doc lessons. Use proactively at session start to load context, after implementations to capture patterns, after mistakes to record root causes. Use when 3+ independent parallel streams need coordination.
+description: Orchestration and learning specialist. Coordinate sub-agents, manage workflows, doc lessons. Use proactively at session start to load context, after implementations to capture patterns, after mistakes to record root causes. For multi-stream orchestration (3+ independent parallel streams), invoke explicitly via /sc:pm or `claude --agent project-manager` — orchestration runs as the main thread.
 memory: project
 color: orange
 ---
