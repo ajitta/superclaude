@@ -1,5 +1,5 @@
 ---
-description: List all /sc commands + functionality. Use ONLY when user types `/sc:help`. NO auto-trigger on generic "help me" — those need direct help, not list.
+description: List all /sc commands + functionality. Use when user types `/sc:help` or asks what SuperClaude commands exist ("what /sc commands are there", "list superclaude commands"). NO auto-trigger on generic "help me" or task-specific how-to questions — those need direct help, not list.
 ---
 
 <component name="help" type="command">

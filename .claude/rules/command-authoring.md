@@ -44,7 +44,7 @@ Rules:
 
 - **Both tiers require a negative gate** ("Do NOT auto-trigger on …") naming cheap look-alike requests and their direct alternative. Mechanically enforced: `tests/unit/test_command_structure.py` (`test_description_references_own_slash_command`, `test_description_has_negative_trigger_gate`).
 - **Tier choice heuristic**: command mutates files, runs multi-agent orchestration, or writes committed artifacts → explicit-only. Read-only analysis or console-only output → auto-triggerable is safe.
-- **Explicit-only is wording-level steering, not a hard block.** For a guaranteed block, add `disable-model-invocation: true` — CC strips the description from the model's skill list entirely (same semantics as skills; see skill-authoring.md "disable-model-invocation vs user-invocable"). Not in `forbidden_command_fields`; no shipped command uses it today — prefer wording tier unless a false fire is unacceptable.
+- **Explicit-only is wording-level steering, not a hard block.** For a guaranteed block, add `disable-model-invocation: true` — CC strips the description from the model's skill list entirely (same semantics as skills; see skill-authoring.md "disable-model-invocation vs user-invocable"). Not in `forbidden_command_fields`; shipped example: `auto-improve.md` (unattended code-mutation loop). Prefer wording tier unless a false fire is unacceptable.
 - **Flipping tiers = description edit only**: rewrite the positive cue, keep the negative gate, stay ≤1024 chars (CC skill-description cap). Then `uv run pytest tests/unit/test_command_structure.py` + re-sync (`superclaude install --force --scope user`; `make sync-user` may fail on Windows — see gotchas/general.md).
 
 ## XML Template
