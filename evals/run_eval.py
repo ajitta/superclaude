@@ -46,6 +46,16 @@ IMPORT_LINE = "@.claude/superclaude/CLAUDE_SC.md"
 ARMS = ("vanilla", "sc-full", "sc-core-lite", "sc-command-only")
 DEFAULT_TASK_TIMEOUT = 600
 
+# Harness runs via `uv run` (repo venv, has pytest); the workspace PATH python
+# is whatever the host resolves and may lack it. Checks and setup steps pin
+# this interpreter, and the model subprocess gets its dir prepended to PATH.
+PY_BIN = sys.executable
+
+# Runtime artifacts that are neither model edits nor fixture content — SC's
+# loop_guard writes state into the project .claude/, and any python execution
+# drops __pycache__. Committed in the baseline so git_diff checks stay clean.
+WS_GITIGNORE = "__pycache__/\n*.pyc\n.claude/loop_guard_state.json\n"
+
 
 @dataclass
 class CheckResult:
@@ -97,6 +107,10 @@ def _which(name: str) -> str:
     return path
 
 
+def _pin_python(cmd: list[str]) -> list[str]:
+    return [PY_BIN if part == "python" else part for part in cmd]
+
+
 def _credentials_file() -> Path | None:
     source = Path(os.getenv("CLAUDE_CONFIG_DIR", Path.home() / ".claude"))
     creds = source / ".credentials.json"
@@ -112,6 +126,9 @@ def build_workspace(arm: str, task: dict, runs_dir: Path, superclaude_bin: str) 
     never pollutes git_diff checks."""
     ws = runs_dir / arm / task["id"]
     shutil.copytree(EVALS_DIR / task["fixture"], ws)
+    gitignore = ws / ".gitignore"
+    existing = gitignore.read_text(encoding="utf-8") if gitignore.exists() else ""
+    gitignore.write_text(existing + WS_GITIGNORE, encoding="utf-8")
 
     if arm != "vanilla":
         proc = _run(
@@ -129,7 +146,7 @@ def build_workspace(arm: str, task: dict, runs_dir: Path, superclaude_bin: str) 
         _set_core_import(ws, enabled=arm != "sc-command-only")
 
     for step in task.get("setup", []):
-        proc = _run(list(step), cwd=ws)
+        proc = _run(_pin_python(step), cwd=ws)
         if proc.returncode != 0:
             raise RuntimeError(
                 f"setup step {step} failed in {ws}: {proc.stderr[-400:]}"
@@ -186,6 +203,7 @@ def run_task(
     ]
     env = dict(os.environ)
     env["CLAUDE_CONFIG_DIR"] = str(config_dir)
+    env["PATH"] = str(Path(PY_BIN).parent) + os.pathsep + env.get("PATH", "")
 
     started = time.monotonic()
     try:
@@ -272,8 +290,8 @@ def _check_one(
     check: dict, ctype: str, ws: Path, result_text: str, bash_inputs: str
 ) -> tuple[bool, str]:
     if ctype == "cmd_ok":
-        proc = _run(list(check["cmd"]), cwd=ws)
-        return proc.returncode == 0, proc.stdout[-200:].strip()
+        proc = _run(_pin_python(check["cmd"]), cwd=ws)
+        return proc.returncode == 0, (proc.stdout + proc.stderr)[-200:].strip()
     if ctype == "git_diff_max_files":
         changed = _git_changed(ws)
         return len(changed) <= check["value"], f"changed: {sorted(changed)}"
