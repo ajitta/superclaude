@@ -1,5 +1,5 @@
 ---
-status: in-progress — Phase 0 closed (0-3 warn-tier SHIPPED 2026-07-03), Phase 1 DONE, Phase 2-1 SHIPPED+validated, 2-2 pending, 3-1 done
+status: on-hold — Phase 0 closed (0-3 warn-tier SHIPPED 2026-07-03), Phase 1 DONE, Phase 2-1 SHIPPED+validated, 3-1/3-2 done; 2-2 agent pilot ON HOLD by user decision 2026-07-03 (prereqs when resumed: agent usage data + agent-routing eval tasks)
 revised: 2026-07-03
 ---
 
