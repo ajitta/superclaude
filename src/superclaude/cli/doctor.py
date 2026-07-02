@@ -244,5 +244,7 @@ def _check_claude_md_import() -> Dict[str, Any]:
     return {
         "name": "CLAUDE.md import",
         "passed": False,
-        "details": ["Missing @superclaude/CLAUDE_SC.md import — run 'superclaude install'"],
+        "details": [
+            "Missing @superclaude/CLAUDE_SC.md import — run 'superclaude install'"
+        ],
     }

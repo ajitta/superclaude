@@ -115,7 +115,7 @@ def _resolve_git_exclude_file(project_root: Path) -> Optional[Path]:
         prefix = "gitdir: "
         if not content.startswith(prefix):
             return None
-        git_dir_str = content[len(prefix):].strip()
+        git_dir_str = content[len(prefix) :].strip()
         git_dir = Path(git_dir_str)
         if not git_dir.is_absolute():
             git_dir = (project_root / git_dir).resolve()
@@ -184,7 +184,10 @@ def add_local_git_exclude(project_root: Path) -> Tuple[bool, str]:
     """
     exclude_file = _resolve_git_exclude_file(project_root)
     if exclude_file is None:
-        return True, f"Not a git repository (skipping local-scope exclude setup): {project_root}"
+        return (
+            True,
+            f"Not a git repository (skipping local-scope exclude setup): {project_root}",
+        )
 
     messages: List[str] = []
     legacy_msg = _migrate_legacy_gitignore(project_root)
@@ -209,7 +212,9 @@ def add_local_git_exclude(project_root: Path) -> Tuple[bool, str]:
             updated = block
             action = "created"
         exclude_file.write_text(updated, encoding="utf-8")
-        messages.append(f".git/info/exclude {action} with SC local block: {exclude_file}")
+        messages.append(
+            f".git/info/exclude {action} with SC local block: {exclude_file}"
+        )
         return True, "; ".join(messages)
     except OSError as e:
         messages.append(f"Failed to write {exclude_file}: {e}")
@@ -238,7 +243,9 @@ def remove_local_git_exclude(project_root: Path) -> Tuple[bool, str]:
 
     if not exclude_file.exists():
         if not messages:
-            messages.append(f".git/info/exclude not found (nothing to remove): {exclude_file}")
+            messages.append(
+                f".git/info/exclude not found (nothing to remove): {exclude_file}"
+            )
         return True, "; ".join(messages)
 
     try:
@@ -246,7 +253,9 @@ def remove_local_git_exclude(project_root: Path) -> Tuple[bool, str]:
         stripped, had_block = _strip_block(existing)
         if not had_block:
             if not messages:
-                messages.append(f".git/info/exclude had no SC local block: {exclude_file}")
+                messages.append(
+                    f".git/info/exclude had no SC local block: {exclude_file}"
+                )
             return True, "; ".join(messages)
         exclude_file.write_text(stripped, encoding="utf-8")
         messages.append(f".git/info/exclude SC local block removed: {exclude_file}")

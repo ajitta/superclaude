@@ -79,10 +79,14 @@ def main() -> None:
     claude_dir = DIST_ROOT / ".claude-plugin"
     claude_dir.mkdir(parents=True, exist_ok=True)
 
-    plugin_manifest = render_template(MANIFEST_DIR / "plugin.template.json", placeholders)
+    plugin_manifest = render_template(
+        MANIFEST_DIR / "plugin.template.json", placeholders
+    )
     (claude_dir / "plugin.json").write_text(plugin_manifest + "\n")
 
-    marketplace_manifest = render_template(MANIFEST_DIR / "marketplace.template.json", placeholders)
+    marketplace_manifest = render_template(
+        MANIFEST_DIR / "marketplace.template.json", placeholders
+    )
     (claude_dir / "marketplace.json").write_text(marketplace_manifest + "\n")
 
     # Copy tests into manifest directory

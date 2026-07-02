@@ -3,6 +3,7 @@ Manual test: compare Tier 0 / 1 / 2 injection behavior of context_loader.py.
 
 Run: uv run python tests/manual/test_context_loader_tiers.py
 """
+
 from __future__ import annotations
 
 import json
@@ -159,6 +160,7 @@ def verify_missing_file_skip() -> None:
     """Improvement #3: TIER_0_MAP hint should be skipped if backing file is missing."""
     import os
     import tempfile
+
     clear_cache()
     fake_root = Path(tempfile.mkdtemp(prefix="sc_fake_"))
     (fake_root / "mcp").mkdir()
@@ -169,8 +171,12 @@ def verify_missing_file_skip() -> None:
     payload = json.dumps({"prompt": "--c7 query"})
     result = subprocess.run(
         [sys.executable, str(LOADER)],
-        input=payload, capture_output=True, text=True,
-        encoding="utf-8", cwd=str(REPO), env=env,
+        input=payload,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        cwd=str(REPO),
+        env=env,
     )
     out = result.stdout
     has_skip_marker = "skip mcp/MCP_Context7.md: backing file not installed" in out
@@ -212,7 +218,9 @@ def verify_lifecycle_events() -> None:
         result = subprocess.run(
             [sys.executable, str(RESET)],
             input=json.dumps({"source": source}),
-            capture_output=True, text=True, encoding="utf-8",
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
         )
         return result.stdout.strip()
 
@@ -241,11 +249,11 @@ def verify_lifecycle_events() -> None:
     """Probe: which outputs accumulate across N repeated calls in the same session?"""
     print("\n--- Accumulation probe: 5 repeated calls per pattern ---")
     patterns = [
-        ("Tier 0  (--c7)",       "--c7 lib question"),
-        ("Tier 1  (--serena)",   "--serena rename foo"),
+        ("Tier 0  (--c7)", "--c7 lib question"),
+        ("Tier 1  (--serena)", "--serena rename foo"),
         ("Tier 2  (--brainstorm)", "--brainstorm idea"),
-        ("Directive (--loop)",   "--loop iterate"),
-        ("Notice (--no-mcp)",    "--no-mcp run something"),
+        ("Directive (--loop)", "--loop iterate"),
+        ("Notice (--no-mcp)", "--no-mcp run something"),
         ("Notice (--verbose-context)", "--c7 --verbose-context q"),
     ]
     for label, prompt in patterns:
@@ -261,7 +269,9 @@ def verify_lifecycle_events() -> None:
             sizes.append(len(body))
             body_signatures.append(body)
         unique = len(set(body_signatures))
-        verdict = "DEDUPED" if sizes[1] == 0 else ("ACCUMULATING" if sizes[1] > 0 else "?")
+        verdict = (
+            "DEDUPED" if sizes[1] == 0 else ("ACCUMULATING" if sizes[1] > 0 else "?")
+        )
         print(f"  {label:<32} sizes={sizes}  unique={unique}  → {verdict}")
 
 
@@ -270,10 +280,13 @@ def verify_serena_no_duplicate() -> None:
     clear_cache()
     out, _ = run_loader("--serena rename function")
     has_directive = '<sc-directive flag="--serena">' in out
-    has_context = '<sc-context src="mcp\\MCP_Serena.md">' in out or '<sc-context src="mcp/MCP_Serena.md">' in out
+    has_context = (
+        '<sc-context src="mcp\\MCP_Serena.md">' in out
+        or '<sc-context src="mcp/MCP_Serena.md">' in out
+    )
     print("\n--- Improvement #1 verification: Serena directive deduplication ---")
-    print(f"  <sc-directive flag=\"--serena\"> present: {has_directive}")
-    print(f"  <sc-context src=\"mcp/MCP_Serena.md\"> present: {has_context}")
+    print(f'  <sc-directive flag="--serena"> present: {has_directive}')
+    print(f'  <sc-context src="mcp/MCP_Serena.md"> present: {has_context}')
     if not has_directive and has_context:
         print("  ✅ Directive removed; Tier 1 instruction retained")
     else:
@@ -291,7 +304,11 @@ def main() -> int:
         size_chars = len(out)
         size_tokens = estimate_tokens(out)
         tier_label = classify_output(out)
-        triggered = sc.expected_file in out if sc.expected_file else (out.strip() == "" or "<sc-context" not in out)
+        triggered = (
+            sc.expected_file in out
+            if sc.expected_file
+            else (out.strip() == "" or "<sc-context" not in out)
+        )
 
         rows.append(
             {
@@ -304,12 +321,16 @@ def main() -> int:
                 "triggered": triggered,
                 "note": sc.note,
                 "rc": rc,
-                "preview": (out[:300].replace("\n", " ⏎ ") + ("…" if len(out) > 300 else "")),
+                "preview": (
+                    out[:300].replace("\n", " ⏎ ") + ("…" if len(out) > 300 else "")
+                ),
             }
         )
 
     # Summary table
-    print(f"{'Scenario':<28} {'Expected':<10} {'Got':<32} {'Chars':>7} {'~Tok':>6}  Note")
+    print(
+        f"{'Scenario':<28} {'Expected':<10} {'Got':<32} {'Chars':>7} {'~Tok':>6}  Note"
+    )
     print("-" * 120)
     for r in rows:
         exp = f"T{r['expected_tier']}" if r["expected_tier"] >= 0 else "none"
@@ -338,7 +359,9 @@ def main() -> int:
     print(f"  Tier 2 verbose --c7   ≈ {t2_verbose_c7} tokens  (was Tier 0)")
     print()
     if t0 < t1 < t2_mode and t2_verbose_c7 > t0:
-        print("✅ Expected ordering holds: T0 < T1 < T2 ; --verbose-context inflates T0 → T2")
+        print(
+            "✅ Expected ordering holds: T0 < T1 < T2 ; --verbose-context inflates T0 → T2"
+        )
     else:
         print("⚠️  Ordering deviates from expectation — inspect previews above")
 

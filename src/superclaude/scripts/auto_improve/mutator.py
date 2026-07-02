@@ -66,11 +66,16 @@ class Mutator:
         cmd = [
             self._claude_path(),
             "-p",
-            "--output-format", "json",
-            "--allowed-tools", ALLOWED_TOOLS,
-            "--model", self.model,
-            "--permission-mode", "bypassPermissions",
-            "--add-dir", str(worktree_path),
+            "--output-format",
+            "json",
+            "--allowed-tools",
+            ALLOWED_TOOLS,
+            "--model",
+            self.model,
+            "--permission-mode",
+            "bypassPermissions",
+            "--add-dir",
+            str(worktree_path),
         ]
         try:
             proc = subprocess.run(
@@ -108,9 +113,7 @@ class Mutator:
 
         rationale = (payload.get("result") or "").strip()
         usage = payload.get("usage") or {}
-        tokens = int(usage.get("input_tokens", 0)) + int(
-            usage.get("output_tokens", 0)
-        )
+        tokens = int(usage.get("input_tokens", 0)) + int(usage.get("output_tokens", 0))
 
         if not rationale:
             return MutationResult(

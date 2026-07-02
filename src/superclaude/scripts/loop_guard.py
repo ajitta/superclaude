@@ -158,9 +158,7 @@ def _handle_pre(data: dict) -> None:
     now = time.time()
     entries = _prune(state.get("entries", []), now)
     count = sum(
-        1
-        for e in entries
-        if e.get("signature") == sig and e.get("kind") == "error"
+        1 for e in entries if e.get("signature") == sig and e.get("kind") == "error"
     )
     if count >= BLOCK_THRESHOLD:
         _block(

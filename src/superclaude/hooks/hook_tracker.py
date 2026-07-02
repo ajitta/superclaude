@@ -35,7 +35,9 @@ class HookExecution:
     """Record of a single hook execution."""
 
     hook_id: str
-    hook_type: str  # One of PreToolUse, PostToolUse, Stop, SessionStart, UserPromptSubmit
+    hook_type: (
+        str  # One of PreToolUse, PostToolUse, Stop, SessionStart, UserPromptSubmit
+    )
     executed_at: str  # ISO format timestamp
     source: str  # File that defined the hook (skill name or hooks.json)
 

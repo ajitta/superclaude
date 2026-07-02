@@ -115,7 +115,8 @@ def main():
 
     old_total = sum(measure_file_tokens(base_path, f) for f in core_files_old)
     new_total = (
-        sum(measure_file_tokens(base_path, f) for f in core_files_new) + sc_core_estimate
+        sum(measure_file_tokens(base_path, f) for f in core_files_new)
+        + sc_core_estimate
     )
 
     print(f"Old chain (@5 files):      {old_total:>6} tokens")

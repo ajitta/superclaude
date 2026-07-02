@@ -61,7 +61,9 @@ def main() -> None:
     if source in ("clear", "compact", "startup"):
         was_reset = reset_context_cache()
         if was_reset:
-            print(f"🔄 Context cache reset ({source}) — dynamic contexts will re-inject")
+            print(
+                f"🔄 Context cache reset ({source}) — dynamic contexts will re-inject"
+            )
 
 
 if __name__ == "__main__":

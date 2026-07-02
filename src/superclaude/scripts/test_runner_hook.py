@@ -9,6 +9,7 @@ Respects SUPERCLAUDE_AUTO_TEST=0 env var to disable.
 Checks stop_hook_active to prevent infinite loops (Claude Code best practice).
 Outputs structured JSON systemMessage so Claude can react to results.
 """
+
 import json
 import os
 import shlex
@@ -18,9 +19,21 @@ from pathlib import Path
 
 # File extensions that should trigger test runs
 SOURCE_EXTENSIONS = {
-    ".py", ".js", ".ts", ".jsx", ".tsx",
-    ".go", ".rs", ".java", ".kt", ".rb",
-    ".c", ".cpp", ".h", ".hpp", ".cs",
+    ".py",
+    ".js",
+    ".ts",
+    ".jsx",
+    ".tsx",
+    ".go",
+    ".rs",
+    ".java",
+    ".kt",
+    ".rb",
+    ".c",
+    ".cpp",
+    ".h",
+    ".hpp",
+    ".cs",
 }
 
 # Directories to skip (edits in these don't trigger tests)
@@ -141,14 +154,16 @@ def main() -> None:
             # Last 15 lines of failure output for context
             lines = (result.stdout + result.stderr).strip().splitlines()
             tail = "\n".join(lines[-15:])
-            msg = json.dumps({
-                "systemMessage": f"Tests FAILED after editing {file_name} ({test_cmd}):\n{tail}"
-            })
+            msg = json.dumps(
+                {
+                    "systemMessage": f"Tests FAILED after editing {file_name} ({test_cmd}):\n{tail}"
+                }
+            )
             print(msg)
         else:
-            msg = json.dumps({
-                "systemMessage": f"Tests passed after editing {file_name}"
-            })
+            msg = json.dumps(
+                {"systemMessage": f"Tests passed after editing {file_name}"}
+            )
             print(msg)
 
     except json.JSONDecodeError:

@@ -1,9 +1,12 @@
 """Tests for .claude/rules/schemas.yaml — single source of truth for enum rules."""
+
 from pathlib import Path
 
 import yaml
 
-SCHEMAS_PATH = Path(__file__).parent.parent.parent / ".claude" / "rules" / "schemas.yaml"
+SCHEMAS_PATH = (
+    Path(__file__).parent.parent.parent / ".claude" / "rules" / "schemas.yaml"
+)
 
 EXPECTED_ROLE_GROUPS = {
     "architecture",

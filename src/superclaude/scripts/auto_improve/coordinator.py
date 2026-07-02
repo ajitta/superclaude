@@ -90,8 +90,14 @@ class Coordinator:
                 if not budget.check().pass_:
                     break
                 if not self._run_smoke():
-                    self._record_row(status="smoke_fail", desc="smoke gate failed",
-                                     metric=0.0, tokens=0, wall=0, commit_hash="-")
+                    self._record_row(
+                        status="smoke_fail",
+                        desc="smoke gate failed",
+                        metric=0.0,
+                        tokens=0,
+                        wall=0,
+                        commit_hash="-",
+                    )
                     self._cycle_id += 1
                     if not budget.check().pass_:
                         break

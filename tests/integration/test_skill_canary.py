@@ -15,6 +15,7 @@ auto-discovery → ~6s total instead of ~2min). OAuth-based local runs
 fall back to full startup automatically. Override via env vars:
 `CANARY_MODEL=sonnet` or `CANARY_TIMEOUT=90` for stricter validation.
 """
+
 from __future__ import annotations
 
 import json
@@ -81,7 +82,9 @@ def test_skill_trigger_canary(skill: str, trigger: str, pattern: str) -> None:
     try:
         payload = json.loads(result.stdout)
     except json.JSONDecodeError as exc:
-        pytest.fail(f"non-JSON output from claude -p: {exc}\nstdout={result.stdout[:500]}")
+        pytest.fail(
+            f"non-JSON output from claude -p: {exc}\nstdout={result.stdout[:500]}"
+        )
 
     response = payload.get("result") or payload.get("response") or result.stdout
     assert re.search(pattern, response, flags=re.IGNORECASE), (

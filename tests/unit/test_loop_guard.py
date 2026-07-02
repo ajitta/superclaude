@@ -60,7 +60,9 @@ def post_event(tool_name: str, command: str, error: str) -> dict:
     return {
         "hook_event_name": "PostToolUse",
         "tool_name": tool_name,
-        "tool_input": {"command": command} if tool_name == "Bash" else {"file_path": command},
+        "tool_input": {"command": command}
+        if tool_name == "Bash"
+        else {"file_path": command},
         "tool_response": {"error": error, "exit_code": 1},
     }
 
@@ -70,7 +72,9 @@ def pre_event(tool_name: str, command: str) -> dict:
     return {
         "hook_event_name": "PreToolUse",
         "tool_name": tool_name,
-        "tool_input": {"command": command} if tool_name == "Bash" else {"file_path": command},
+        "tool_input": {"command": command}
+        if tool_name == "Bash"
+        else {"file_path": command},
     }
 
 
@@ -89,9 +93,7 @@ class TestApprove:
 
     def test_post_event_approves(self, project_dir):
         """PostToolUse never blocks — it only records."""
-        result = run_guard(
-            post_event("Bash", "false", "command failed"), project_dir
-        )
+        result = run_guard(post_event("Bash", "false", "command failed"), project_dir)
         assert result["decision"] == "approve"
 
     def test_successful_post_does_not_record(self, project_dir):
@@ -126,20 +128,26 @@ class TestBlockAfterRepeats:
     def test_blocks_at_fifth_repeat(self, project_dir):
         """5 identical errors → 6th PreToolUse for same signature blocked."""
         for _ in range(BLOCK_THRESHOLD):
-            run_guard(post_event("Bash", "make broken", "undefined symbol xyz"), project_dir)
+            run_guard(
+                post_event("Bash", "make broken", "undefined symbol xyz"), project_dir
+            )
         result = run_guard(pre_event("Bash", "make broken"), project_dir)
         assert result["decision"] == "block"
         assert "circuit breaker" in result["reason"].lower()
 
     def test_four_errors_do_not_block(self, project_dir):
         for _ in range(BLOCK_THRESHOLD - 1):
-            run_guard(post_event("Bash", "make broken", "undefined symbol xyz"), project_dir)
+            run_guard(
+                post_event("Bash", "make broken", "undefined symbol xyz"), project_dir
+            )
         result = run_guard(pre_event("Bash", "make broken"), project_dir)
         assert result["decision"] == "approve"
 
     def test_block_message_is_actionable(self, project_dir):
         for _ in range(BLOCK_THRESHOLD):
-            run_guard(post_event("Bash", "make broken", "undefined symbol xyz"), project_dir)
+            run_guard(
+                post_event("Bash", "make broken", "undefined symbol xyz"), project_dir
+            )
         result = run_guard(pre_event("Bash", "make broken"), project_dir)
         assert result["decision"] == "block"
         # Should suggest changing approach
@@ -155,8 +163,12 @@ class TestStateIsolation:
         for _ in range(4):
             run_guard(post_event("Bash", "cmd-A", "err-A"), project_dir)
         run_guard(post_event("Bash", "cmd-B", "err-B"), project_dir)
-        assert run_guard(pre_event("Bash", "cmd-A"), project_dir)["decision"] == "approve"
-        assert run_guard(pre_event("Bash", "cmd-B"), project_dir)["decision"] == "approve"
+        assert (
+            run_guard(pre_event("Bash", "cmd-A"), project_dir)["decision"] == "approve"
+        )
+        assert (
+            run_guard(pre_event("Bash", "cmd-B"), project_dir)["decision"] == "approve"
+        )
 
     def test_successful_call_resets_signature(self, project_dir):
         """4 errors, 1 success on same signature, 4 more errors → no block."""
@@ -179,7 +191,9 @@ class TestStateIsolation:
         """5 Edit errors on foo.py must not block Bash on foo.py."""
         for _ in range(BLOCK_THRESHOLD):
             run_guard(post_event("Edit", "foo.py", "string not found"), project_dir)
-        assert run_guard(pre_event("Bash", "foo.py"), project_dir)["decision"] == "approve"
+        assert (
+            run_guard(pre_event("Bash", "foo.py"), project_dir)["decision"] == "approve"
+        )
 
 
 class TestEnvOptOut:

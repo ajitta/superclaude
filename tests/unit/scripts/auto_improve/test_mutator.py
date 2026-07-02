@@ -84,7 +84,11 @@ def test_mutator_returns_rationale_files_tokens(tmp_path):
 
 def test_mutator_returns_error_on_empty_rationale(tmp_path):
     payload = json.dumps(
-        {"type": "result", "result": "   ", "usage": {"input_tokens": 0, "output_tokens": 0}}
+        {
+            "type": "result",
+            "result": "   ",
+            "usage": {"input_tokens": 0, "output_tokens": 0},
+        }
     )
     with patch("subprocess.run") as run:
         run.return_value = _completed(payload)

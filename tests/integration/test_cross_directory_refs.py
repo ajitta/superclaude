@@ -63,7 +63,6 @@ def parse_agent_mcp_servers(agent_path: Path) -> list[str]:
     return [s.strip() for s in match.group(1).split("|") if s.strip()]
 
 
-
 def parse_hooks_json_script_refs() -> list[str]:
     """Extract script filenames from hooks.json command strings."""
     content = (HOOKS_DIR / "hooks.json").read_text(encoding="utf-8")
@@ -101,12 +100,8 @@ def parse_skill_agent_field(skill_manifest: Path) -> str | None:
 
 
 # --- Collected file lists for parametrize ---
-AGENT_FILES = sorted(
-    f for f in AGENTS_DIR.glob("*.md") if f.name != "README.md"
-)
-COMMAND_FILES = sorted(
-    f for f in COMMANDS_DIR.glob("*.md") if f.name != "README.md"
-)
+AGENT_FILES = sorted(f for f in AGENTS_DIR.glob("*.md") if f.name != "README.md")
+COMMAND_FILES = sorted(f for f in COMMANDS_DIR.glob("*.md") if f.name != "README.md")
 SKILL_MANIFESTS = sorted(SKILLS_DIR.glob("*/SKILL.md"))
 
 
@@ -145,7 +140,9 @@ class TestMCPWiring:
             pytest.skip("mcp/configs/ not found")
         for config_file in configs_dir.glob("*.json"):
             stem = config_file.stem
-            assert stem in CONFIG_TO_DOC, f"No doc mapping for config {config_file.name}"
+            assert stem in CONFIG_TO_DOC, (
+                f"No doc mapping for config {config_file.name}"
+            )
             doc_name = f"MCP_{CONFIG_TO_DOC[stem]}.md"
             assert (MCP_DIR / doc_name).exists(), (
                 f"Config {config_file.name} expects {doc_name} but it's missing"
@@ -173,8 +170,7 @@ class TestHooksScriptPaths:
         for script in scripts:
             script_path = SCRIPTS_DIR / script
             assert script_path.exists(), (
-                f"hooks.json references '{script}' but "
-                f"scripts/{script} does not exist"
+                f"hooks.json references '{script}' but scripts/{script} does not exist"
             )
 
     def test_hooks_json_is_valid_json(self):
@@ -185,7 +181,12 @@ class TestHooksScriptPaths:
     def test_hooks_json_has_expected_event_keys(self):
         content = (HOOKS_DIR / "hooks.json").read_text(encoding="utf-8")
         data = json.loads(content)
-        expected_events = {"SessionStart", "UserPromptSubmit", "PreToolUse", "PostToolUse"}
+        expected_events = {
+            "SessionStart",
+            "UserPromptSubmit",
+            "PreToolUse",
+            "PostToolUse",
+        }
         actual_events = set(data["hooks"].keys())
         assert expected_events <= actual_events, (
             f"Missing hook events: {expected_events - actual_events}"
@@ -240,6 +241,7 @@ class TestInstallPathsMapping:
 
     def test_all_component_source_dirs_exist(self):
         from superclaude.cli.install_paths import COMPONENTS
+
         for component, (source_subdir, _target, _desc) in COMPONENTS.items():
             source_dir = CONTENT_ROOT / source_subdir
             assert source_dir.exists(), (
@@ -249,6 +251,7 @@ class TestInstallPathsMapping:
 
     def test_all_component_keys_match_expected(self):
         from superclaude.cli.install_paths import COMPONENTS
+
         expected = {"commands", "agents", "core", "modes", "mcp", "skills", "templates"}
         assert set(COMPONENTS.keys()) == expected
 
@@ -272,13 +275,10 @@ class TestCoreImportChain:
         for ref in refs:
             ref_path = CONTENT_ROOT / ref
             assert ref_path.exists(), (
-                f"CLAUDE_SC.md references @{ref} but "
-                f"{ref_path} does not exist"
+                f"CLAUDE_SC.md references @{ref} but {ref_path} does not exist"
             )
 
     def test_core_files_exist(self):
         """The 3 core files must exist."""
         for name in ["FLAGS.md", "PRINCIPLES.md", "RULES.md"]:
             assert (CORE_DIR / name).exists(), f"Core file {name} missing"
-
-

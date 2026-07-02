@@ -1,6 +1,7 @@
 """
 Pytest configuration and shared fixtures for SuperClaude tests
 """
+
 from pathlib import Path
 
 import pytest

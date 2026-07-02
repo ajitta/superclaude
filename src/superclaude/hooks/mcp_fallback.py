@@ -18,7 +18,9 @@ from superclaude.hooks.hook_tracker import _ensure_tracker_dir, get_session_id
 from superclaude.utils import atomic_write_json
 
 # Storage for MCP fallback notifications
-MCP_FALLBACK_FILE = Path.home() / ".claude" / ".superclaude_hooks" / "mcp_fallbacks.json"
+MCP_FALLBACK_FILE = (
+    Path.home() / ".claude" / ".superclaude_hooks" / "mcp_fallbacks.json"
+)
 
 # Fallback mapping (see FLAGS.md <mcp> section for flag definitions)
 MCP_FALLBACKS: dict[str, str] = {
@@ -125,5 +127,3 @@ def get_fallback_for(mcp_name: str) -> str:
         Fallback tool name
     """
     return MCP_FALLBACKS.get(mcp_name.lower(), "Native")
-
-

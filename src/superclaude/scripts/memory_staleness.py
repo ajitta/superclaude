@@ -9,6 +9,7 @@ purpose is to convert silent memory degradation into a visible signal.
 
 Source: docs/specs/retrospective-followups-discovery-ajitta-2026-04-25.md (A2).
 """
+
 from __future__ import annotations
 
 import os

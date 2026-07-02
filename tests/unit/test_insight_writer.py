@@ -63,7 +63,9 @@ class TestAppend:
             )
         )
         assert rc == 0
-        line = (workdir / ".claude" / "insights.jsonl").read_text(encoding="utf-8").strip()
+        line = (
+            (workdir / ".claude" / "insights.jsonl").read_text(encoding="utf-8").strip()
+        )
         d = json.loads(line)
         assert d["insight"].startswith('quotes "x"')
         assert "한글" in d["insight"]
@@ -71,7 +73,9 @@ class TestAppend:
     def test_auto_fills_ts_and_author(self, workdir):
         rc = _run_append(json.dumps({"type": "feedback", "insight": "x"}))
         assert rc == 0
-        d = json.loads((workdir / ".claude" / "insights.jsonl").read_text(encoding="utf-8"))
+        d = json.loads(
+            (workdir / ".claude" / "insights.jsonl").read_text(encoding="utf-8")
+        )
         assert "ts" in d
         assert d["author"]  # non-empty
 
@@ -87,13 +91,20 @@ class TestAppend:
 
     def test_batch_append(self, workdir):
         rc = _run_append(
-            json.dumps([
-                {"type": "feedback", "insight": "a"},
-                {"type": "decision", "insight": "b"},
-            ])
+            json.dumps(
+                [
+                    {"type": "feedback", "insight": "a"},
+                    {"type": "decision", "insight": "b"},
+                ]
+            )
         )
         assert rc == 0
-        lines = (workdir / ".claude" / "insights.jsonl").read_text(encoding="utf-8").strip().split("\n")
+        lines = (
+            (workdir / ".claude" / "insights.jsonl")
+            .read_text(encoding="utf-8")
+            .strip()
+            .split("\n")
+        )
         assert len(lines) == 2
 
     def test_annotation_requires_ref_ts(self, workdir, capsys):
@@ -104,7 +115,11 @@ class TestAppend:
     def test_annotation_ref_must_exist(self, workdir, capsys):
         rc = _run_append(
             json.dumps(
-                {"type": "annotation", "insight": "x", "ref_ts": "2999-01-01T00:00:00+09:00"}
+                {
+                    "type": "annotation",
+                    "insight": "x",
+                    "ref_ts": "2999-01-01T00:00:00+09:00",
+                }
             )
         )
         assert rc == 2
@@ -112,7 +127,15 @@ class TestAppend:
 
     def test_annotation_ref_to_existing_passes(self, workdir):
         # Create a real entry first
-        _run_append(json.dumps({"type": "discovery", "insight": "base", "ts": "2026-04-25T22:00:00+09:00"}))
+        _run_append(
+            json.dumps(
+                {
+                    "type": "discovery",
+                    "insight": "base",
+                    "ts": "2026-04-25T22:00:00+09:00",
+                }
+            )
+        )
         rc = _run_append(
             json.dumps(
                 {
@@ -126,7 +149,15 @@ class TestAppend:
 
     def test_annotation_ref_to_other_annotation_rejected(self, workdir, capsys):
         # Create base + annotation, then try to annotate the annotation
-        _run_append(json.dumps({"type": "discovery", "insight": "base", "ts": "2026-04-25T22:00:00+09:00"}))
+        _run_append(
+            json.dumps(
+                {
+                    "type": "discovery",
+                    "insight": "base",
+                    "ts": "2026-04-25T22:00:00+09:00",
+                }
+            )
+        )
         _run_append(
             json.dumps(
                 {
@@ -201,14 +232,21 @@ class TestHarvest:
                     "timestamp": "2026-04-25T22:01:00Z",
                     "message": {
                         "role": "user",
-                        "content": [{"type": "text", "text": "INSIGHT: list content also works"}],
+                        "content": [
+                            {"type": "text", "text": "INSIGHT: list content also works"}
+                        ],
                     },
                 },
             ],
         )
         rc = iw.cmd_harvest(ns)
         assert rc == 0
-        pending = (workdir / ".claude" / "insights.pending.jsonl").read_text(encoding="utf-8").strip().split("\n")
+        pending = (
+            (workdir / ".claude" / "insights.pending.jsonl")
+            .read_text(encoding="utf-8")
+            .strip()
+            .split("\n")
+        )
         assert len(pending) == 2
         texts = [json.loads(p)["raw_text"] for p in pending]
         assert "dedup matters" in texts
@@ -229,7 +267,10 @@ class TestHarvest:
                 {
                     "type": "assistant",
                     "uuid": "a1",
-                    "message": {"role": "assistant", "content": "INSIGHT: assistant skip me"},
+                    "message": {
+                        "role": "assistant",
+                        "content": "INSIGHT: assistant skip me",
+                    },
                 },
                 {
                     "type": "user",
@@ -241,7 +282,12 @@ class TestHarvest:
         )
         rc = iw.cmd_harvest(ns)
         assert rc == 0
-        pending = (workdir / ".claude" / "insights.pending.jsonl").read_text(encoding="utf-8").strip().split("\n")
+        pending = (
+            (workdir / ".claude" / "insights.pending.jsonl")
+            .read_text(encoding="utf-8")
+            .strip()
+            .split("\n")
+        )
         assert len(pending) == 1
         assert "keep me" in json.loads(pending[0])["raw_text"]
 
@@ -329,11 +375,15 @@ class TestReviewPromote:
         import argparse
 
         rc = iw.cmd_promote(
-            argparse.Namespace(index=0, type="discovery", insight=None, tags="harvest,a")
+            argparse.Namespace(
+                index=0, type="discovery", insight=None, tags="harvest,a"
+            )
         )
         assert rc == 0
         # Promoted entry in insights.jsonl
-        line = (workdir / ".claude" / "insights.jsonl").read_text(encoding="utf-8").strip()
+        line = (
+            (workdir / ".claude" / "insights.jsonl").read_text(encoding="utf-8").strip()
+        )
         d = json.loads(line)
         assert d["type"] == "discovery"
         assert d["insight"] == "promote me"
@@ -423,7 +473,9 @@ class TestHarvestFromHook:
         monkeypatch.setattr("sys.stdin", _StdinMock(payload))
         rc = iw.main(["harvest-from-hook"])
         assert rc == 0
-        pending = (workdir / ".claude" / "insights.pending.jsonl").read_text(encoding="utf-8")
+        pending = (workdir / ".claude" / "insights.pending.jsonl").read_text(
+            encoding="utf-8"
+        )
         d = json.loads(pending.strip())
         assert d["source"] == "clear"
         assert d["raw_text"] == "from hook"
@@ -451,7 +503,9 @@ class TestHarvestFromHook:
         rc = iw.main(["harvest-from-hook"])
         assert rc == 0
         d = json.loads(
-            (workdir / ".claude" / "insights.pending.jsonl").read_text(encoding="utf-8").strip()
+            (workdir / ".claude" / "insights.pending.jsonl")
+            .read_text(encoding="utf-8")
+            .strip()
         )
         assert d["source"] == "manual"
 
@@ -468,7 +522,10 @@ class TestHarvestFromHook:
                     "uuid": "u1",
                     "sessionId": "sess1",
                     "timestamp": "2026-04-25T22:00:00Z",
-                    "message": {"role": "user", "content": "INSIGHT: still gets caught"},
+                    "message": {
+                        "role": "user",
+                        "content": "INSIGHT: still gets caught",
+                    },
                 }
             ],
         )
@@ -476,7 +533,9 @@ class TestHarvestFromHook:
         rc = iw.main(["harvest-from-hook"])
         assert rc == 0
         d = json.loads(
-            (workdir / ".claude" / "insights.pending.jsonl").read_text(encoding="utf-8").strip()
+            (workdir / ".claude" / "insights.pending.jsonl")
+            .read_text(encoding="utf-8")
+            .strip()
         )
         assert d["source"] == "other"
 
@@ -521,13 +580,18 @@ class TestInlineMarker:
                     "type": "user",
                     "isMeta": False,
                     "uuid": "u1",
-                    "message": {"role": "user", "content": "lots of context first INSIGHT: real one"},
+                    "message": {
+                        "role": "user",
+                        "content": "lots of context first INSIGHT: real one",
+                    },
                 }
             ],
         )
         iw.cmd_harvest(ns)
         d = json.loads(
-            (workdir / ".claude" / "insights.pending.jsonl").read_text(encoding="utf-8").strip()
+            (workdir / ".claude" / "insights.pending.jsonl")
+            .read_text(encoding="utf-8")
+            .strip()
         )
         assert d["raw_text"] == "real one"
 
@@ -541,7 +605,10 @@ class TestInlineMarker:
                     "type": "user",
                     "isMeta": False,
                     "uuid": "u1",
-                    "message": {"role": "user", "content": "many INSIGHTS: not a marker"},
+                    "message": {
+                        "role": "user",
+                        "content": "many INSIGHTS: not a marker",
+                    },
                 }
             ],
         )
@@ -549,7 +616,9 @@ class TestInlineMarker:
         # No marker → no pending file
         assert not (workdir / ".claude" / "insights.pending.jsonl").exists()
 
-    def test_lowercase_insight_and_hyphen_separator_do_not_match(self, workdir, monkeypatch):
+    def test_lowercase_insight_and_hyphen_separator_do_not_match(
+        self, workdir, monkeypatch
+    ):
         """Regression: /context output (stored as a synthetic user message) lists
         agent and skill token meters like 'insight-analyst: 63 tokens' and
         'sc:insight: 24 tokens'. The marker must require uppercase INSIGHT and
@@ -590,12 +659,20 @@ class TestMultiMarkerSameLine:
                     "type": "user",
                     "isMeta": False,
                     "uuid": "u1",
-                    "message": {"role": "user", "content": "INSIGHT: first INSIGHT: second"},
+                    "message": {
+                        "role": "user",
+                        "content": "INSIGHT: first INSIGHT: second",
+                    },
                 }
             ],
         )
         iw.cmd_harvest(ns)
-        pending = (workdir / ".claude" / "insights.pending.jsonl").read_text(encoding="utf-8").strip().split("\n")
+        pending = (
+            (workdir / ".claude" / "insights.pending.jsonl")
+            .read_text(encoding="utf-8")
+            .strip()
+            .split("\n")
+        )
         assert len(pending) == 2
         texts = [json.loads(p)["raw_text"] for p in pending]
         assert texts == ["first", "second"]
@@ -610,12 +687,20 @@ class TestMultiMarkerSameLine:
                     "type": "user",
                     "isMeta": False,
                     "uuid": "u1",
-                    "message": {"role": "user", "content": "line one INSIGHT: a\nline two INSIGHT: b"},
+                    "message": {
+                        "role": "user",
+                        "content": "line one INSIGHT: a\nline two INSIGHT: b",
+                    },
                 }
             ],
         )
         iw.cmd_harvest(ns)
-        pending = (workdir / ".claude" / "insights.pending.jsonl").read_text(encoding="utf-8").strip().split("\n")
+        pending = (
+            (workdir / ".claude" / "insights.pending.jsonl")
+            .read_text(encoding="utf-8")
+            .strip()
+            .split("\n")
+        )
         texts = sorted(json.loads(p)["raw_text"] for p in pending)
         assert texts == ["a", "b"]
 
@@ -634,6 +719,7 @@ class TestFindTranscriptFallback:
         new.write_text("{}\n", encoding="utf-8")
         # Force mtimes so 'new' is newer
         import os as _os
+
         _os.utime(old, (1000, 1000))
         _os.utime(new, (2000, 2000))
         # No session_id supplied → fallback to most-recent
@@ -662,7 +748,9 @@ class TestFindTranscriptFallback:
 
 
 class TestTailScanBoundary:
-    def test_seek_landing_exactly_at_line_start_keeps_first_line(self, workdir, monkeypatch, tmp_path):
+    def test_seek_landing_exactly_at_line_start_keeps_first_line(
+        self, workdir, monkeypatch, tmp_path
+    ):
         """When tail seek lands exactly after a \\n, the next line is complete and
         must NOT be discarded as a partial line."""
         ns, pdir = _harvest(workdir, monkeypatch, "sess1")
@@ -728,7 +816,7 @@ class TestTailScanBoundary:
         # Verify: file size > TRANSCRIPT_TAIL_BYTES so tail-scan engages
         assert path.stat().st_size > iw.TRANSCRIPT_TAIL_BYTES
         iw.cmd_harvest(ns)
-        pending = (workdir / ".claude" / "insights.pending.jsonl")
+        pending = workdir / ".claude" / "insights.pending.jsonl"
         assert pending.exists(), "target line was discarded — boundary handling bug"
         d = json.loads(pending.read_text(encoding="utf-8").strip())
         assert d["raw_text"] == "keep me"
@@ -786,7 +874,11 @@ class TestTranscriptTailScan:
                 written = path.stat().st_size
             f.write(json.dumps(late) + "\n")
         iw.cmd_harvest(ns)
-        pending = (workdir / ".claude" / "insights.pending.jsonl").read_text(encoding="utf-8").strip()
+        pending = (
+            (workdir / ".claude" / "insights.pending.jsonl")
+            .read_text(encoding="utf-8")
+            .strip()
+        )
         # 'early' is outside the tail window; only 'recent' should be harvested.
         texts = [json.loads(line)["raw_text"] for line in pending.split("\n")]
         assert "recent" in texts

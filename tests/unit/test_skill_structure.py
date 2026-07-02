@@ -18,18 +18,18 @@ SKILLS_DIR = Path(__file__).parent.parent.parent / "src" / "superclaude" / "skil
 
 # All superclaude skill names by category
 HOOK_SKILL_NAMES = {
-    "confidence-check",       # PreToolUse hook + validation script
-    "simplicity-coach",       # Stop hook + dependency-audit script
+    "confidence-check",  # PreToolUse hook + validation script
+    "simplicity-coach",  # Stop hook + dependency-audit script
 }
 
 SAFETY_SKILL_NAMES = {
-    "ship",                          # disable-model-invocation
-    "finishing-a-development-branch", # disable-model-invocation + allowed-tools
+    "ship",  # disable-model-invocation
+    "finishing-a-development-branch",  # disable-model-invocation + allowed-tools
 }
 
 # Reference skills: auto-invocation via description matching, no hooks/safety
 REFERENCE_SKILL_NAMES: set[str] = {
-    "verbalized-sampling",    # Auto-invocation reference skill (no hooks/safety)
+    "verbalized-sampling",  # Auto-invocation reference skill (no hooks/safety)
 }
 
 ALL_SKILL_NAMES = HOOK_SKILL_NAMES | SAFETY_SKILL_NAMES | REFERENCE_SKILL_NAMES
@@ -75,7 +75,9 @@ def parse_frontmatter(text: str) -> dict[str, str]:
             fields[current_key] = value.strip()
         elif current_key and (line.startswith("  ") or line.startswith("\t")):
             # Continuation of multiline value
-            fields[current_key] = (fields.get(current_key, "") + " " + line.strip()).strip()
+            fields[current_key] = (
+                fields.get(current_key, "") + " " + line.strip()
+            ).strip()
     return fields
 
 
@@ -156,9 +158,7 @@ class TestSkillFrontmatter:
     def test_description_not_empty(self, skill):
         dirname, content, fm = skill
         desc = fm.get("description", "")
-        assert len(desc) > 10, (
-            f"{dirname}: description too short ({len(desc)} chars)"
-        )
+        assert len(desc) > 10, f"{dirname}: description too short ({len(desc)} chars)"
 
     def test_no_forbidden_agent_fields(self, skill):
         """Skills must not have agent-only frontmatter fields."""
@@ -240,9 +240,7 @@ class TestSkillBody:
         dirname, content, fm = skill
         body = re.sub(r"^---\n.*?\n---\n?", "", content, flags=re.DOTALL).strip()
         line_count = len(body.splitlines())
-        assert line_count < 500, (
-            f"{dirname}: body has {line_count} lines, max 500"
-        )
+        assert line_count < 500, f"{dirname}: body has {line_count} lines, max 500"
 
     def test_has_title(self, skill):
         """Every skill body should start with a markdown heading."""

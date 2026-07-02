@@ -6,6 +6,7 @@ files do not silently drift out of sync. Addresses the audit finding that four
 sources reported four different version strings (the orphan ``__version__.py``
 held ``0.4.0`` while ``pyproject`` shipped ``4.6.0+ajitta``).
 """
+
 from __future__ import annotations
 
 import re

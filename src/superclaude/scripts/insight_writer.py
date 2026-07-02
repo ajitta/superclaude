@@ -130,7 +130,10 @@ def cmd_append(args: argparse.Namespace) -> int:
     cleaned: list[dict] = []
     for entry in entries:
         if not isinstance(entry, dict):
-            print(f"append: entry must be object, got {type(entry).__name__}", file=sys.stderr)
+            print(
+                f"append: entry must be object, got {type(entry).__name__}",
+                file=sys.stderr,
+            )
             return 2
         # Defensive copy: avoid mutating caller's dict (cmd_promote etc.).
         entry = dict(entry)
@@ -157,7 +160,10 @@ def cmd_append(args: argparse.Namespace) -> int:
                 print("append: annotation requires ref_ts", file=sys.stderr)
                 return 2
             if not _annotation_target_exists(ref_ts):
-                print(f"append: ref_ts '{ref_ts}' does not match any non-annotation entry", file=sys.stderr)
+                print(
+                    f"append: ref_ts '{ref_ts}' does not match any non-annotation entry",
+                    file=sys.stderr,
+                )
                 return 2
         cleaned.append(entry)
 
@@ -193,7 +199,12 @@ def cmd_list(args: argparse.Namespace) -> int:
         return 0
     jq = _require_jq()
     r = subprocess.run(
-        [jq, "-r", r'"\(.ts) [\(.author // "unknown")] [\(.type)] \(.insight)"', str(INSIGHT_FILE)],
+        [
+            jq,
+            "-r",
+            r'"\(.ts) [\(.author // "unknown")] [\(.type)] \(.insight)"',
+            str(INSIGHT_FILE),
+        ],
         capture_output=True,
         text=True,
     )
@@ -303,7 +314,8 @@ def cmd_harvest(args: argparse.Namespace) -> int:
             content = msg.get("content", "")
             if isinstance(content, list):
                 content = " ".join(
-                    c.get("text", "") if isinstance(c, dict) else str(c) for c in content
+                    c.get("text", "") if isinstance(c, dict) else str(c)
+                    for c in content
                 )
             if not isinstance(content, str):
                 continue
@@ -313,9 +325,7 @@ def cmd_harvest(args: argparse.Namespace) -> int:
                     continue
                 # Per-marker uuid: message uuid + offset hash for stable dedup
                 base_uuid = rec.get("uuid", "")
-                marker_id = (
-                    f"{base_uuid}:{hashlib.md5(marker_text.encode('utf-8')).hexdigest()[:8]}"
-                )
+                marker_id = f"{base_uuid}:{hashlib.md5(marker_text.encode('utf-8')).hexdigest()[:8]}"
                 if marker_id in existing_uuids:
                     continue
                 existing_uuids.add(marker_id)
@@ -375,7 +385,9 @@ def cmd_review(args: argparse.Namespace) -> int:
     if not pending:
         print("(no pending insights)")
         return 0
-    print(f"# {len(pending)} pending insight(s) — promote with: insight_writer.py promote --index N --type TYPE")
+    print(
+        f"# {len(pending)} pending insight(s) — promote with: insight_writer.py promote --index N --type TYPE"
+    )
     for i, e in enumerate(pending):
         ts = e.get("user_ts") or e.get("harvested_at", "")
         src = e.get("source", "?")
@@ -388,13 +400,16 @@ def cmd_review(args: argparse.Namespace) -> int:
 def cmd_promote(args: argparse.Namespace) -> int:
     pending = _read_pending()
     if args.index < 0 or args.index >= len(pending):
-        print(f"promote: index {args.index} out of range (have {len(pending)})", file=sys.stderr)
+        print(
+            f"promote: index {args.index} out of range (have {len(pending)})",
+            file=sys.stderr,
+        )
         return 2
     p = pending[args.index]
     insight_text = (args.insight or p.get("raw_text", "")).strip()
     if not insight_text:
         print(
-            f"promote: pending entry {args.index} has empty raw_text; pass --insight \"...\"",
+            f'promote: pending entry {args.index} has empty raw_text; pass --insight "..."',
             file=sys.stderr,
         )
         return 2
@@ -403,7 +418,7 @@ def cmd_promote(args: argparse.Namespace) -> int:
         "type": args.type,
         "insight": insight_text,
         "author": _git_user(),
-        "context": f"harvested from session {p.get('session_id','?')} ({p.get('source','?')})",
+        "context": f"harvested from session {p.get('session_id', '?')} ({p.get('source', '?')})",
     }
     if args.tags:
         entry["tags"] = [t.strip() for t in args.tags.split(",") if t.strip()]
@@ -417,7 +432,9 @@ def cmd_promote(args: argparse.Namespace) -> int:
     # Append succeeded — only now is it safe to remove from pending.
     pending.pop(args.index)
     _write_pending(pending)
-    print(f"promoted index {args.index} → {INSIGHT_FILE} (remaining pending: {len(pending)})")
+    print(
+        f"promoted index {args.index} → {INSIGHT_FILE} (remaining pending: {len(pending)})"
+    )
     return 0
 
 
@@ -432,7 +449,9 @@ def cmd_pending_count(args: argparse.Namespace) -> int:
 
 
 def build_parser() -> argparse.ArgumentParser:
-    p = argparse.ArgumentParser(prog="insight_writer", description=__doc__.split("\n")[0])
+    p = argparse.ArgumentParser(
+        prog="insight_writer", description=__doc__.split("\n")[0]
+    )
     sub = p.add_subparsers(dest="cmd", required=True)
 
     a = sub.add_parser("append")
@@ -452,7 +471,9 @@ def build_parser() -> argparse.ArgumentParser:
     s.set_defaults(fn=cmd_stats)
 
     h = sub.add_parser("harvest")
-    h.add_argument("--source", default="other", help="hook source (clear|compact|other|...)")
+    h.add_argument(
+        "--source", default="other", help="hook source (clear|compact|other|...)"
+    )
     h.add_argument("--session-id", default=os.environ.get("CLAUDE_SESSION_ID"))
     h.add_argument("--cwd", default=None)
     h.set_defaults(fn=cmd_harvest)

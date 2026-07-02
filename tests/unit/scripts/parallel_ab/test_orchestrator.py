@@ -21,9 +21,7 @@ from superclaude.scripts.parallel_ab.spec_loader import RunnerCfg, Scenario, Var
 
 
 def _write_spec(tmp_path: Path, n: int = 3) -> Path:
-    variants = "\n".join(
-        f'  - id: V{i}\n    flag: "--vs[k:{i+1}]"' for i in range(n)
-    )
+    variants = "\n".join(f'  - id: V{i}\n    flag: "--vs[k:{i + 1}]"' for i in range(n))
     content = (
         "scenario:\n"
         "  input: /sc:brainstorm test\n"
@@ -110,9 +108,7 @@ async def test_per_variant_exception_does_not_abort_batch(tmp_path: Path):
 async def test_explicit_out_dir_override(tmp_path: Path):
     spec = _write_spec(tmp_path, n=2)
     custom = tmp_path / "custom_out"
-    decision = await orchestrate(
-        spec, runner_fn=_make_fake_runner(), out_dir=custom
-    )
+    decision = await orchestrate(spec, runner_fn=_make_fake_runner(), out_dir=custom)
     assert decision.parent == custom
 
 
@@ -135,7 +131,9 @@ async def test_timeout_env_overrides_runner_cfg(tmp_path: Path, monkeypatch):
     async def capture_runner(variant, scenario, runner_cfg, out_dir, **_):
         seen_timeout["t"] = runner_cfg.timeout_seconds
         obs = Observation(
-            variant_id=variant.id, exit_status="ok", wall_seconds=0.0,
+            variant_id=variant.id,
+            exit_status="ok",
+            wall_seconds=0.0,
         )
         emit(obs, Path(out_dir) / f"obs-{variant.id}.json")
         return obs

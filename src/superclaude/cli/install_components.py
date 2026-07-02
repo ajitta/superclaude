@@ -29,6 +29,7 @@ from .install_settings import (
 # complementing CC's native tool search which handles tool discovery.
 MCP_DOCS_SKIP: set = set()
 
+
 def _rewrite_agent_memory_scope(content: str, scope: str) -> str:
     """Rewrite agent frontmatter `memory:` to match install scope.
 
@@ -87,10 +88,7 @@ def _safe_target_path(target: Path, base_path: Path) -> bool:
 
 
 def install_component(
-    component: str,
-    base_path: Path = None,
-    force: bool = False,
-    scope: str = "user"
+    component: str, base_path: Path = None, force: bool = False, scope: str = "user"
 ) -> Tuple[int, int, int, List[str]]:
     """
     Install a single component.
@@ -128,7 +126,9 @@ def install_component(
                     if target_skill_dir.exists():
                         if not _safe_target_path(target_skill_dir, target_dir):
                             failed += 1
-                            failed_names.append(f"{skill_dir.name}: symlink outside target")
+                            failed_names.append(
+                                f"{skill_dir.name}: symlink outside target"
+                            )
                             continue
                         shutil.rmtree(target_skill_dir)
                     shutil.copytree(
@@ -230,7 +230,9 @@ def install_component(
     return installed, skipped, failed, failed_names
 
 
-def install_claude_sc_md(base_path: Path = None, force: bool = False) -> Tuple[bool, str]:
+def install_claude_sc_md(
+    base_path: Path = None, force: bool = False
+) -> Tuple[bool, str]:
     """
     Install CLAUDE_SC.md to ~/.claude/superclaude/
 
@@ -265,9 +267,7 @@ def install_claude_sc_md(base_path: Path = None, force: bool = False) -> Tuple[b
 
 
 def install_hooks_and_scripts(
-    base_path: Path = None,
-    force: bool = False,
-    scope: str = "user"
+    base_path: Path = None, force: bool = False, scope: str = "user"
 ) -> Tuple[int, int, int, List[str]]:
     """
     Install hooks configuration and scripts.
@@ -316,7 +316,10 @@ def install_hooks_and_scripts(
         for pattern in patterns:
             for source_file in scripts_source.glob(pattern):
                 # Skip __init__.py and README files
-                if source_file.name == "__init__.py" or source_file.stem.upper() == "README":
+                if (
+                    source_file.name == "__init__.py"
+                    or source_file.stem.upper() == "README"
+                ):
                     continue
 
                 target_file = scripts_target / source_file.name
@@ -348,11 +351,9 @@ def install_hooks_and_scripts(
             python_bin_json_safe = sys.executable.replace("\\", "/")
             if " " in python_bin_json_safe:
                 python_bin_json_safe = f'\\"{python_bin_json_safe}\\"'
-            hooks_content_transformed = (
-                raw_content
-                .replace("{{SCRIPTS_PATH}}", scripts_path_json_safe)
-                .replace("{{PYTHON_BIN}}", python_bin_json_safe)
-            )
+            hooks_content_transformed = raw_content.replace(
+                "{{SCRIPTS_PATH}}", scripts_path_json_safe
+            ).replace("{{PYTHON_BIN}}", python_bin_json_safe)
         except OSError as e:
             failed += 1
             messages.append(f"Failed to read hooks.json: {e}")
@@ -369,9 +370,13 @@ def install_hooks_and_scripts(
             skipped += 1
         else:
             try:
-                target_hooks_json.write_text(hooks_content_transformed, encoding="utf-8")
+                target_hooks_json.write_text(
+                    hooks_content_transformed, encoding="utf-8"
+                )
                 installed += 1
-                messages.append(f"hooks.json installed (scripts path: {scripts_path_for_hooks})")
+                messages.append(
+                    f"hooks.json installed (scripts path: {scripts_path_for_hooks})"
+                )
             except OSError as e:
                 failed += 1
                 messages.append(f"Failed to install hooks.json: {e}")
@@ -381,10 +386,7 @@ def install_hooks_and_scripts(
         try:
             hooks_config = json.loads(hooks_content_transformed)
             merge_success, merge_msg = merge_hooks_to_settings(
-                base_path=base_path,
-                hooks_config=hooks_config,
-                scope=scope,
-                force=force
+                base_path=base_path, hooks_config=hooks_config, scope=scope, force=force
             )
 
             if merge_success:
@@ -404,9 +406,7 @@ def install_hooks_and_scripts(
 
 
 def install_all(
-    base_path: Path = None,
-    force: bool = False,
-    scope: str = "user"
+    base_path: Path = None, force: bool = False, scope: str = "user"
 ) -> Tuple[bool, str]:
     """
     Install all SuperClaude components.
@@ -447,8 +447,8 @@ def install_all(
                 messages.append(f"   - {name}")
 
     # Install hooks and scripts
-    hooks_installed, hooks_skipped, hooks_failed, hooks_messages = install_hooks_and_scripts(
-        base_path, force, scope
+    hooks_installed, hooks_skipped, hooks_failed, hooks_messages = (
+        install_hooks_and_scripts(base_path, force, scope)
     )
     total_installed += hooks_installed
     total_skipped += hooks_skipped
@@ -492,7 +492,9 @@ def install_all(
 
     # Summary
     messages.append("")
-    messages.append(f"📊 Summary: {total_installed} installed, {total_skipped} skipped, {total_failed} failed")
+    messages.append(
+        f"📊 Summary: {total_installed} installed, {total_skipped} skipped, {total_failed} failed"
+    )
     messages.append(f"📁 Installation directory: {base_path}")
 
     if total_skipped > 0:
@@ -521,7 +523,9 @@ def install_commands(target_path: Path = None, force: bool = False) -> Tuple[boo
     # If target_path is provided, use its parent as base_path
     # (legacy behavior expected commands in target_path directly)
     if target_path is not None:
-        base_path = target_path.parent if target_path.name == "commands" else target_path
+        base_path = (
+            target_path.parent if target_path.name == "commands" else target_path
+        )
     else:
         base_path = None
     return install_all(base_path=base_path, force=force)

@@ -204,7 +204,9 @@ def check_prerequisites(
         except (subprocess.TimeoutExpired, FileNotFoundError):
             uv_ok = False
         if not uv_ok:
-            click.echo("⚠️  uv not found - required to install Serena MCP server", err=True)
+            click.echo(
+                "⚠️  uv not found - required to install Serena MCP server", err=True
+            )
             click.echo(
                 "   Install uv: https://docs.astral.sh/uv/getting-started/installation/",
                 err=True,
@@ -236,7 +238,9 @@ def _read_json_safe(path: Path) -> dict:
         return {}
 
 
-def _scope_config_path(scope: str, project_root: Optional[Path] = None) -> Tuple[Path, List[str]]:
+def _scope_config_path(
+    scope: str, project_root: Optional[Path] = None
+) -> Tuple[Path, List[str]]:
     """
     Return (config_file, keypath) for a given MCP scope.
 
@@ -255,7 +259,9 @@ def _scope_config_path(scope: str, project_root: Optional[Path] = None) -> Tuple
     raise ValueError(f"Unknown MCP scope: {scope!r}")
 
 
-def _mcp_servers_in_scope(scope: str, project_root: Optional[Path] = None) -> Dict[str, dict]:
+def _mcp_servers_in_scope(
+    scope: str, project_root: Optional[Path] = None
+) -> Dict[str, dict]:
     """Return the mcpServers dict at the given scope (empty dict if none)."""
     path, keypath = _scope_config_path(scope, project_root)
     data = _read_json_safe(path)
@@ -388,9 +394,7 @@ def install_plugin_server(
             stderr = (add_result.stderr or "").lower()
             if "already" not in stderr:
                 err = (add_result.stderr or "").strip() or "unknown error"
-                click.echo(
-                    f"   ❌ Failed to add marketplace {source}: {err}", err=True
-                )
+                click.echo(f"   ❌ Failed to add marketplace {source}: {err}", err=True)
                 return False
 
         click.echo(f"   Running: {' '.join(install_cmd)}")
@@ -587,9 +591,7 @@ def show_mcp_status():
     for server_info in MCP_SERVERS.values():
         name = server_info["name"]
         if server_info.get("method") == "plugin":
-            is_installed = check_plugin_installed(
-                server_info.get("plugin_id", name)
-            )
+            is_installed = check_plugin_installed(server_info.get("plugin_id", name))
         else:
             is_installed = check_mcp_server_installed(name)
 
@@ -652,7 +654,8 @@ def install_mcp_servers(
         click.echo("📋 Available MCP servers:\n")
 
         core_servers = [
-            info for info in MCP_SERVERS.values()
+            info
+            for info in MCP_SERVERS.values()
             if info.get("category", "core") == "core"
         ]
 
@@ -671,8 +674,7 @@ def install_mcp_servers(
         click.echo("\n   0. Install all core servers")
 
         plugin_servers = [
-            info for info in MCP_SERVERS.values()
-            if info.get("category") == "plugin"
+            info for info in MCP_SERVERS.values() if info.get("category") == "plugin"
         ]
         if plugin_servers:
             click.echo("\n💡 Plugin servers (opt-in — install manually):")
@@ -782,7 +784,9 @@ def uninstall_mcp_servers(
             continue
 
         if is_plugin:
-            plugin_ref = f"{info.get('plugin_id', server_name)}@{info['marketplace_name']}"
+            plugin_ref = (
+                f"{info.get('plugin_id', server_name)}@{info['marketplace_name']}"
+            )
             cmd = ["claude", "plugin", "uninstall", plugin_ref, "--scope", scope]
         else:
             cmd = ["claude", "mcp", "remove", "--scope", scope, server_name]
@@ -790,15 +794,17 @@ def uninstall_mcp_servers(
         try:
             result = _run_command(cmd, capture_output=True, text=True, timeout=60)
             if result.returncode == 0:
-                messages.append(
-                    f"✅ Removed {label}: {server_name} (scope: {scope})"
-                )
+                messages.append(f"✅ Removed {label}: {server_name} (scope: {scope})")
                 removed += 1
             else:
                 err = (result.stderr or "").strip() or "unknown error"
                 messages.append(f"❌ Failed to remove {label} {server_name}: {err}")
                 failed += 1
-        except (subprocess.TimeoutExpired, subprocess.SubprocessError, FileNotFoundError) as e:
+        except (
+            subprocess.TimeoutExpired,
+            subprocess.SubprocessError,
+            FileNotFoundError,
+        ) as e:
             messages.append(f"❌ Failed to remove {label} {server_name}: {e}")
             failed += 1
 

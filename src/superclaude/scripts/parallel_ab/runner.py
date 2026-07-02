@@ -74,16 +74,16 @@ def _build_cmd(variant: Variant, scenario: Scenario, cfg: RunnerCfg) -> list[str
     base = cfg.cli.split()  # "claude -p" → ["claude", "-p"]
     cmd: list[str] = [
         *base,
-        "--model", cfg.model,
-        "--output-format", "json",
+        "--model",
+        cfg.model,
+        "--output-format",
+        "json",
     ]
     # `--bare` strips skills/plugins; a slash-command input would then resolve
     # to "Unknown command". Suppress --bare for slash inputs regardless of cfg.
     if cfg.bare and not _is_slash_command(scenario.input):
         cmd.append("--bare")
-    prompt_parts = [
-        s for s in (scenario.input, variant.flag, variant.extra_args) if s
-    ]
+    prompt_parts = [s for s in (scenario.input, variant.flag, variant.extra_args) if s]
     cmd.append(" ".join(prompt_parts))
     return cmd
 

@@ -60,12 +60,14 @@ def _eval_result(value, exit_code=0, timed_out=False):
 
 def test_phase0_dry_run_baseline_records_cycle_id_zero(repo):
     cfg = _make_config(repo)
-    with patch(
-        "superclaude.scripts.auto_improve.coordinator.run_eval",
-        return_value=_eval_result(10.0),
-    ), patch.object(Coordinator, "_run_smoke", return_value=True), patch.object(
-        Coordinator, "_run_mutator_cycle"
-    ) as mut:
+    with (
+        patch(
+            "superclaude.scripts.auto_improve.coordinator.run_eval",
+            return_value=_eval_result(10.0),
+        ),
+        patch.object(Coordinator, "_run_smoke", return_value=True),
+        patch.object(Coordinator, "_run_mutator_cycle") as mut,
+    ):
         # 1 mutation cycle then budget exhausts
         mut.side_effect = [None]
         c = Coordinator(cfg)
@@ -107,12 +109,14 @@ def test_loop_aborts_on_5_stale_plateau(repo):
         _eval_result(10.0),  # stale 2
         _eval_result(10.0),  # stale 3 -> plateau triggers
     ]
-    with patch(
-        "superclaude.scripts.auto_improve.coordinator.run_eval",
-        side_effect=eval_results,
-    ), patch.object(Coordinator, "_run_smoke", return_value=True), patch.object(
-        Coordinator, "_invoke_mutator"
-    ) as mut:
+    with (
+        patch(
+            "superclaude.scripts.auto_improve.coordinator.run_eval",
+            side_effect=eval_results,
+        ),
+        patch.object(Coordinator, "_run_smoke", return_value=True),
+        patch.object(Coordinator, "_invoke_mutator") as mut,
+    ):
         mut.return_value = MutationResult(rationale="step", tokens_used=10)
         c = Coordinator(cfg)
         cycles = c.run()
@@ -124,20 +128,21 @@ def test_regressed_score_does_not_commit(repo):
     cfg = _make_config(repo, budget_seconds=120)
     eval_results = [
         _eval_result(10.0),  # baseline
-        _eval_result(5.0),   # regression
-        _eval_result(5.0),   # regression
-        _eval_result(5.0),   # regression
-        _eval_result(5.0),   # regression
-        _eval_result(5.0),   # regression -> plateau or budget
+        _eval_result(5.0),  # regression
+        _eval_result(5.0),  # regression
+        _eval_result(5.0),  # regression
+        _eval_result(5.0),  # regression
+        _eval_result(5.0),  # regression -> plateau or budget
     ]
-    with patch(
-        "superclaude.scripts.auto_improve.coordinator.run_eval",
-        side_effect=eval_results,
-    ), patch.object(Coordinator, "_run_smoke", return_value=True), patch.object(
-        Coordinator, "_invoke_mutator"
-    ) as mut, patch.object(
-        Coordinator, "_git_commit"
-    ) as commit:
+    with (
+        patch(
+            "superclaude.scripts.auto_improve.coordinator.run_eval",
+            side_effect=eval_results,
+        ),
+        patch.object(Coordinator, "_run_smoke", return_value=True),
+        patch.object(Coordinator, "_invoke_mutator") as mut,
+        patch.object(Coordinator, "_git_commit") as commit,
+    ):
         mut.return_value = MutationResult(rationale="r", tokens_used=10)
         c = Coordinator(cfg)
         c.run()
@@ -149,12 +154,14 @@ def test_smoke_fail_skips_cycle_no_mutation_attempted(repo):
     cfg = _make_config(repo)
     eval_results = [_eval_result(10.0)]  # baseline only
 
-    with patch(
-        "superclaude.scripts.auto_improve.coordinator.run_eval",
-        side_effect=eval_results,
-    ), patch.object(Coordinator, "_run_smoke", return_value=False), patch.object(
-        Coordinator, "_invoke_mutator"
-    ) as mut:
+    with (
+        patch(
+            "superclaude.scripts.auto_improve.coordinator.run_eval",
+            side_effect=eval_results,
+        ),
+        patch.object(Coordinator, "_run_smoke", return_value=False),
+        patch.object(Coordinator, "_invoke_mutator") as mut,
+    ):
         c = Coordinator(cfg)
         # Force loop to run at most one mutation iteration
         cfg2 = _make_config(repo, budget_seconds=2)
@@ -172,12 +179,14 @@ def test_each_cycle_writes_exactly_one_results_tsv_row(repo):
         _eval_result(11.0),  # stale 1
         _eval_result(11.0),  # stale 2 -> plateau
     ]
-    with patch(
-        "superclaude.scripts.auto_improve.coordinator.run_eval",
-        side_effect=eval_results,
-    ), patch.object(Coordinator, "_run_smoke", return_value=True), patch.object(
-        Coordinator, "_invoke_mutator"
-    ) as mut:
+    with (
+        patch(
+            "superclaude.scripts.auto_improve.coordinator.run_eval",
+            side_effect=eval_results,
+        ),
+        patch.object(Coordinator, "_run_smoke", return_value=True),
+        patch.object(Coordinator, "_invoke_mutator") as mut,
+    ):
         mut.return_value = MutationResult(rationale="r", tokens_used=10)
         c = Coordinator(cfg)
         cycles = c.run()
@@ -202,9 +211,12 @@ def test_pid_file_written_during_setup(repo):
         # Now act as the original method would (record baseline + raise on failure)
         raise SystemExit(0)  # short-circuit teardown
 
-    with patch.object(Coordinator, "_record_baseline_or_die", _capture_pid), patch(
-        "superclaude.scripts.auto_improve.coordinator.run_eval",
-        return_value=_eval_result(1.0),
+    with (
+        patch.object(Coordinator, "_record_baseline_or_die", _capture_pid),
+        patch(
+            "superclaude.scripts.auto_improve.coordinator.run_eval",
+            return_value=_eval_result(1.0),
+        ),
     ):
         c = Coordinator(cfg)
         with pytest.raises(SystemExit):

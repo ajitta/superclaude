@@ -26,23 +26,38 @@ def populated_tsv(tmp_path):
     tsv.init()
     tsv.append(
         ResultRow(
-            cycle_id=0, timestamp="t0", commit_hash="-",
-            metric_value=1.0, status="baseline", desc="dry run",
-            tokens_used=0, wall_seconds=1,
+            cycle_id=0,
+            timestamp="t0",
+            commit_hash="-",
+            metric_value=1.0,
+            status="baseline",
+            desc="dry run",
+            tokens_used=0,
+            wall_seconds=1,
         )
     )
     tsv.append(
         ResultRow(
-            cycle_id=1, timestamp="t1", commit_hash="a" * 40,
-            metric_value=1.5, status="improved", desc="x",
-            tokens_used=100, wall_seconds=2,
+            cycle_id=1,
+            timestamp="t1",
+            commit_hash="a" * 40,
+            metric_value=1.5,
+            status="improved",
+            desc="x",
+            tokens_used=100,
+            wall_seconds=2,
         )
     )
     tsv.append(
         ResultRow(
-            cycle_id=2, timestamp="t2", commit_hash="b" * 40,
-            metric_value=2.0, status="improved", desc="y",
-            tokens_used=200, wall_seconds=3,
+            cycle_id=2,
+            timestamp="t2",
+            commit_hash="b" * 40,
+            metric_value=2.0,
+            status="improved",
+            desc="y",
+            tokens_used=200,
+            wall_seconds=3,
         )
     )
     return p

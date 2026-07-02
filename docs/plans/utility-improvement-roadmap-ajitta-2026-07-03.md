@@ -1,5 +1,5 @@
 ---
-status: in-progress — Phase 0 closed, Phase 1 DONE, Phase 2-1 SHIPPED 2026-07-03 (kernel 865 tok + 4 on-demand modules), 2-2 pending, 3-1 done
+status: in-progress — Phase 0 closed (0-3 warn-tier SHIPPED 2026-07-03), Phase 1 DONE, Phase 2-1 SHIPPED+validated, 2-2 pending, 3-1 done
 revised: 2026-07-03
 ---
 
@@ -29,9 +29,11 @@ revised: 2026-07-03
 
 One README/ARCHITECTURE paragraph: "mechanically enforced = 3 hooks (file_size / destructive / loop); everything else is model-followed prose." Closes audit P3's residual documentation gap. Cost ≈ 0. Shipped as `## Enforcement Boundary` section in `src/superclaude/ARCHITECTURE.md`.
 
-### 0-3. Warn-tier for reversible-but-risky commands — **VERIFIED 2026-07-03, implementation deferred**
+### 0-3. Warn-tier for reversible-but-risky commands — **SHIPPED 2026-07-03**
 
-`git reset --hard` / `clean -fdx` / `branch -D` are legitimate often enough that hard-block is wrong. Candidate mechanism: PreToolUse `hookSpecificOutput.permissionDecision: "ask"` — **empirically verified supported on CC 2.1.198** (probe hook in isolated `CLAUDE_CONFIG_DIR`: Bash call blocked despite `--allowedTools Bash`, landed in `permission_denials` with the hook's reason propagated; headless `-p` semantics: ask → deny). Implementation stays deferred per this item's own do-NOT-rush gate: CC's native Bash permission prompt already covers the tier interactively, and the Phase 1 harness (`destructive-elicitation` task) can now measure whether a warn-tier adds value before any code ships.
+`git reset --hard` / `clean -fdx` / `branch -D` are legitimate often enough that hard-block is wrong. Mechanism: PreToolUse `hookSpecificOutput.permissionDecision: "ask"` — **empirically verified supported on CC 2.1.198** (probe hook in isolated `CLAUDE_CONFIG_DIR`: Bash call blocked despite `--allowedTools Bash`, landed in `permission_denials` with the hook's reason propagated; headless `-p` semantics: ask → deny).
+
+The do-NOT-rush gate opened when the 4×7 matrix measured the failure it guards: one live `git clean -fd` execution in 4 destructive-elicitation trials (sc-command-only arm) that neither prose rules nor model defaults caught — a hard guardrail was the only layer that would have. Shipped as a second tier in `destructive_guard.py`: deny tier unchanged (legacy block JSON), warn tier emits the ask schema with a reason offering reversible alternatives (stash / backup branch / `clean -n`). `SUPERCLAUDE_DESTRUCTIVE_GUARD=0` disables both tiers. +25 tests (warn/no-warn matrix incl. the matrix incident verbatim, ask-schema shape, deny-over-warn precedence, opt-out) — safety suite 55/55.
 
 ## Phase 1 — Measurement infrastructure (gates everything below)
 

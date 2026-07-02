@@ -93,8 +93,7 @@ def validate(d: dict[str, Any]) -> Observation:
 
     tool_calls_raw = d.get("tool_calls") or []
     tool_calls = tuple(
-        ToolCall(name=str(tc["name"]), count=int(tc["count"]))
-        for tc in tool_calls_raw
+        ToolCall(name=str(tc["name"]), count=int(tc["count"])) for tc in tool_calls_raw
     )
 
     files_touched = tuple(str(f) for f in (d.get("files_touched") or []))

@@ -56,17 +56,20 @@ def worktree_dir(tmp_path: Path) -> Path:
 class TestResolveGitExcludeFile:
     def test_regular_repo_returns_info_exclude(self, git_repo: Path):
         from superclaude.cli.install_git_exclude import _resolve_git_exclude_file
+
         result = _resolve_git_exclude_file(git_repo)
         assert result == git_repo / ".git" / "info" / "exclude"
 
     def test_non_git_dir_returns_none(self, non_git_dir: Path):
         from superclaude.cli.install_git_exclude import _resolve_git_exclude_file
+
         assert _resolve_git_exclude_file(non_git_dir) is None
 
     def test_worktree_pointer_resolves_to_worktree_info_exclude(
         self, worktree_dir: Path
     ):
         from superclaude.cli.install_git_exclude import _resolve_git_exclude_file
+
         result = _resolve_git_exclude_file(worktree_dir)
         assert result is not None
         assert result.name == "exclude"
@@ -76,6 +79,7 @@ class TestResolveGitExcludeFile:
     def test_malformed_git_pointer_file_returns_none(self, tmp_path: Path):
         (tmp_path / ".git").write_text("not a gitdir pointer\n", encoding="utf-8")
         from superclaude.cli.install_git_exclude import _resolve_git_exclude_file
+
         assert _resolve_git_exclude_file(tmp_path) is None
 
 
@@ -86,6 +90,7 @@ class TestAddLocalGitExclude:
             MARKER_START,
             add_local_git_exclude,
         )
+
         ok, msg = add_local_git_exclude(git_repo)
         assert ok, msg
         exclude = (git_repo / ".git" / "info" / "exclude").read_text(encoding="utf-8")
@@ -96,8 +101,11 @@ class TestAddLocalGitExclude:
 
     def test_preserves_existing_exclude_content(self, git_repo: Path):
         exclude_file = git_repo / ".git" / "info" / "exclude"
-        exclude_file.write_text("# existing\n.beads/\n**/RECOVERY*.md\n", encoding="utf-8")
+        exclude_file.write_text(
+            "# existing\n.beads/\n**/RECOVERY*.md\n", encoding="utf-8"
+        )
         from superclaude.cli.install_git_exclude import add_local_git_exclude
+
         ok, _ = add_local_git_exclude(git_repo)
         assert ok
         content = exclude_file.read_text(encoding="utf-8")
@@ -110,6 +118,7 @@ class TestAddLocalGitExclude:
             MARKER_START,
             add_local_git_exclude,
         )
+
         add_local_git_exclude(git_repo)
         add_local_git_exclude(git_repo)
         content = (git_repo / ".git" / "info" / "exclude").read_text(encoding="utf-8")
@@ -117,6 +126,7 @@ class TestAddLocalGitExclude:
 
     def test_non_git_dir_silent_skip(self, non_git_dir: Path):
         from superclaude.cli.install_git_exclude import add_local_git_exclude
+
         ok, msg = add_local_git_exclude(non_git_dir)
         assert ok
         assert "Not a git repository" in msg
@@ -127,6 +137,7 @@ class TestAddLocalGitExclude:
             MARKER_START,
             add_local_git_exclude,
         )
+
         ok, _ = add_local_git_exclude(worktree_dir)
         assert ok
         # Resolve the worktree pointer to find the actual exclude file
@@ -142,6 +153,7 @@ class TestAddLocalGitExclude:
             MARKER_START,
             add_local_git_exclude,
         )
+
         legacy = (
             "# project shared\n"
             "node_modules/\n"
@@ -156,9 +168,9 @@ class TestAddLocalGitExclude:
         assert MARKER_START not in gi_content
         assert "node_modules/" in gi_content
         # New location should
-        exclude_content = (
-            git_repo / ".git" / "info" / "exclude"
-        ).read_text(encoding="utf-8")
+        exclude_content = (git_repo / ".git" / "info" / "exclude").read_text(
+            encoding="utf-8"
+        )
         assert MARKER_START in exclude_content
 
 
@@ -169,6 +181,7 @@ class TestRemoveLocalGitExclude:
             add_local_git_exclude,
             remove_local_git_exclude,
         )
+
         exclude_file = git_repo / ".git" / "info" / "exclude"
         exclude_file.write_text("# template\n.beads/\n", encoding="utf-8")
         add_local_git_exclude(git_repo)
@@ -181,12 +194,14 @@ class TestRemoveLocalGitExclude:
 
     def test_no_block_present_is_success(self, git_repo: Path):
         from superclaude.cli.install_git_exclude import remove_local_git_exclude
+
         ok, msg = remove_local_git_exclude(git_repo)
         assert ok
         assert "no SC local block" in msg.lower() or "not found" in msg.lower()
 
     def test_non_git_dir_is_success(self, non_git_dir: Path):
         from superclaude.cli.install_git_exclude import remove_local_git_exclude
+
         ok, _ = remove_local_git_exclude(non_git_dir)
         assert ok
 
@@ -196,6 +211,7 @@ class TestRemoveLocalGitExclude:
             MARKER_START,
             remove_local_git_exclude,
         )
+
         legacy = (
             f"# shared\nnode_modules/\n\n"
             f"{MARKER_START}\n.claude/commands/sc/\n{MARKER_END}\n"
@@ -215,6 +231,7 @@ class TestHasFunctions:
             add_local_git_exclude,
             has_exclude_block,
         )
+
         assert not has_exclude_block(git_repo)
         add_local_git_exclude(git_repo)
         assert has_exclude_block(git_repo)
@@ -225,10 +242,12 @@ class TestHasFunctions:
             MARKER_START,
             has_legacy_gitignore_block,
         )
+
         gitignore = git_repo / ".gitignore"
         gitignore.write_text(f"{MARKER_START}\n.foo\n{MARKER_END}\n", encoding="utf-8")
         assert has_legacy_gitignore_block(git_repo)
 
     def test_has_legacy_false_when_no_gitignore(self, git_repo: Path):
         from superclaude.cli.install_git_exclude import has_legacy_gitignore_block
+
         assert not has_legacy_gitignore_block(git_repo)

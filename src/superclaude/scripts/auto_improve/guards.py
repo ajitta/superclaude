@@ -63,13 +63,17 @@ class RegressionBlock:
 
     def check_score(self, score: Optional[float]) -> GuardVerdict:
         if score is None:
-            return GuardVerdict(pass_=False, reason="metric extraction failed (treated as regression)")
+            return GuardVerdict(
+                pass_=False, reason="metric extraction failed (treated as regression)"
+            )
         if score < self.baseline:
             return GuardVerdict(
                 pass_=False,
                 reason=f"regression: {score} < baseline {self.baseline}",
             )
-        return GuardVerdict(pass_=True, reason=f"score {score} >= baseline {self.baseline}")
+        return GuardVerdict(
+            pass_=True, reason=f"score {score} >= baseline {self.baseline}"
+        )
 
 
 class SmokeGate:

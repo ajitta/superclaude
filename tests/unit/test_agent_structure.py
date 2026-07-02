@@ -13,18 +13,30 @@ import yaml
 
 AGENTS_DIR = Path(__file__).parent.parent.parent / "src" / "superclaude" / "agents"
 
-VALID_PERMISSION_MODES = {"acceptEdits", "default", "plan", "auto", "dontAsk", "bypassPermissions"}
+VALID_PERMISSION_MODES = {
+    "acceptEdits",
+    "default",
+    "plan",
+    "auto",
+    "dontAsk",
+    "bypassPermissions",
+}
 VALID_MEMORY_SCOPES = {"user", "project", "local"}
 
-_SCHEMAS_PATH = Path(__file__).parent.parent.parent / ".claude" / "rules" / "schemas.yaml"
+_SCHEMAS_PATH = (
+    Path(__file__).parent.parent.parent / ".claude" / "rules" / "schemas.yaml"
+)
 _SCHEMAS = yaml.safe_load(_SCHEMAS_PATH.read_text(encoding="utf-8"))
 VALID_COLORS = set(_SCHEMAS["agent_colors"].values())
 VALID_EFFORT_VALUES = set(_SCHEMAS["effort_values"])
 SKILLS_DIR = Path(__file__).parent.parent.parent / "src" / "superclaude" / "skills"
 # All agent .md files (excluding README and _ prefixed test agents)
 AGENT_FILES = sorted(
-    [f for f in AGENTS_DIR.glob("*.md")
-     if f.name != "README.md" and not f.name.startswith("_")]
+    [
+        f
+        for f in AGENTS_DIR.glob("*.md")
+        if f.name != "README.md" and not f.name.startswith("_")
+    ]
 )
 AGENT_IDS = [f.stem for f in AGENT_FILES]
 
@@ -37,7 +49,7 @@ AGENT_IDS = [f.stem for f in AGENT_FILES]
 # only proven exemplars, to avoid false positives on the allowed forward-looking
 # voice ("grounded in X", "learning to apply X").
 FORBIDDEN_DESC_PATTERNS = [
-    r"following\s+[\w-]+\s+practices",   # primes "continuation of prior work" frame
+    r"following\s+[\w-]+\s+practices",  # primes "continuation of prior work" frame
     r"deep\s+production\s+experience",
     r"pragmatic\s+trade-?off\s+judgment",
 ]
@@ -106,9 +118,7 @@ class TestAgentFrontmatter:
     def test_has_description(self, agent):
         stem, content, fm = agent
         assert "description" in fm, f"{stem}: frontmatter missing 'description'"
-        assert len(fm["description"]) > 10, (
-            f"{stem}: description too short"
-        )
+        assert len(fm["description"]) > 10, f"{stem}: description too short"
 
     def test_permission_mode_valid_if_present(self, agent):
         """If permissionMode is set, it must be a valid value."""
@@ -138,9 +148,7 @@ class TestAgentFrontmatter:
     def test_color_valid(self, agent):
         stem, content, fm = agent
         color = fm.get("color", "")
-        assert color in VALID_COLORS, (
-            f"{stem}: color '{color}' not in {VALID_COLORS}"
-        )
+        assert color in VALID_COLORS, f"{stem}: color '{color}' not in {VALID_COLORS}"
 
     def test_no_autonomy_field(self, agent):
         """autonomy is not an official Claude Code field — should not be in frontmatter."""
@@ -164,16 +172,12 @@ class TestAgentXMLStructure:
     def test_component_name_matches(self, agent):
         stem, content, _ = agent
         name = extract_xml_attr(content, "component", "name")
-        assert name == stem, (
-            f"{stem}: component name='{name}' != filename '{stem}'"
-        )
+        assert name == stem, f"{stem}: component name='{name}' != filename '{stem}'"
 
     def test_component_type_is_agent(self, agent):
         stem, content, _ = agent
         ctype = extract_xml_attr(content, "component", "type")
-        assert ctype == "agent", (
-            f"{stem}: component type='{ctype}', expected 'agent'"
-        )
+        assert ctype == "agent", f"{stem}: component type='{ctype}', expected 'agent'"
 
     def test_has_role(self, agent):
         stem, content, _ = agent
@@ -191,9 +195,7 @@ class TestAgentXMLStructure:
 
     def test_has_tool_guidance(self, agent):
         stem, content, _ = agent
-        assert "<tool_guidance" in content, (
-            f"{stem}: missing <tool_guidance> section"
-        )
+        assert "<tool_guidance" in content, f"{stem}: missing <tool_guidance> section"
 
     def test_has_bounds(self, agent):
         """<bounds> must use sub-tag form: <does>, <never>, optional <fallback>.
@@ -221,9 +223,9 @@ class TestAgentXMLStructure:
             f"{stem}: <bounds> uses legacy attribute form — convert to sub-tag form"
         )
         # Forbid the legacy body-labeled form.
-        assert not re.search(r"^\s*-\s+(Should|Avoid|Does|Never|Fallback):\s+", body, re.MULTILINE), (
-            f"{stem}: <bounds> uses legacy body-labeled form — convert to sub-tag form"
-        )
+        assert not re.search(
+            r"^\s*-\s+(Should|Avoid|Does|Never|Fallback):\s+", body, re.MULTILINE
+        ), f"{stem}: <bounds> uses legacy body-labeled form — convert to sub-tag form"
         # Forbid the legacy hedging-labeled sub-tag form.
         assert not re.search(r"<should>|<avoid>", content), (
             f"{stem}: <bounds> uses legacy <should>/<avoid> sub-tags — rename to <does>/<never>"
@@ -250,8 +252,7 @@ class TestAgentCrossFieldConsistency:
         # Extract significant words (4+ chars) from mission
         stopwords = {"with", "that", "this", "from", "through", "about", "into"}
         mission_words = {
-            w.lower()
-            for w in re.findall(r"[a-zA-Z]{4,}", mission)
+            w.lower() for w in re.findall(r"[a-zA-Z]{4,}", mission)
         } - stopwords
         desc_lower = desc.lower()
         matches = [w for w in mission_words if w in desc_lower]
@@ -325,16 +326,15 @@ class TestAgentMemoryGuide:
 
     def test_has_memory_guide(self, agent):
         stem, content, _ = agent
-        assert "<memory_guide>" in content, (
-            f"{stem}: missing <memory_guide> section"
-        )
+        assert "<memory_guide>" in content, f"{stem}: missing <memory_guide> section"
 
     def test_memory_guide_has_categories(self, agent):
         stem, content, _ = agent
         mg = extract_xml_content(content, "memory_guide")
         assert mg, f"{stem}: <memory_guide> is empty"
-        categories = [line.strip() for line in mg.splitlines()
-                      if line.strip().startswith("- ")]
+        categories = [
+            line.strip() for line in mg.splitlines() if line.strip().startswith("- ")
+        ]
         assert len(categories) >= 2, (
             f"{stem}: memory_guide has {len(categories)} categories, need >= 2"
         )
@@ -409,7 +409,6 @@ class TestSimplicityGuideSpecific:
 
     def test_dave_thomas_attribution(self):
         assert "Dave Thomas" in self.content
-
 
 
 class TestAgentOptionalFields:

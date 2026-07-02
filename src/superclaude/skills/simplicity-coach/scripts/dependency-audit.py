@@ -54,11 +54,13 @@ def parse_package_json(filepath: str) -> list:
     for section in ["dependencies", "devDependencies"]:
         if section in data:
             for name, version in data[section].items():
-                deps.append({
-                    "name": name,
-                    "version": version,
-                    "type": "dev" if section == "devDependencies" else "prod",
-                })
+                deps.append(
+                    {
+                        "name": name,
+                        "version": version,
+                        "type": "dev" if section == "devDependencies" else "prod",
+                    }
+                )
     return deps
 
 
@@ -73,10 +75,18 @@ def parse_requirements_txt(filepath: str) -> list:
                     for sep in ["==", ">=", "<=", "~=", "!="]:
                         if sep in line:
                             name, version = line.split(sep, 1)
-                            deps.append({"name": name.strip(), "version": version.strip(), "type": "prod"})
+                            deps.append(
+                                {
+                                    "name": name.strip(),
+                                    "version": version.strip(),
+                                    "type": "prod",
+                                }
+                            )
                             break
                     else:
-                        deps.append({"name": line, "version": "unspecified", "type": "prod"})
+                        deps.append(
+                            {"name": line, "version": "unspecified", "type": "prod"}
+                        )
     except OSError as e:
         print(f"  Warning: Could not read {filepath}: {e}")
     return deps
@@ -92,12 +102,14 @@ def parse_pyproject_toml(filepath: str) -> list:
         return []
 
     # Match [project] dependencies array
-    dep_match = re.search(r'\[project\].*?dependencies\s*=\s*\[(.*?)\]', content, re.DOTALL)
+    dep_match = re.search(
+        r"\[project\].*?dependencies\s*=\s*\[(.*?)\]", content, re.DOTALL
+    )
     if dep_match:
         dep_block = dep_match.group(1)
         for item in re.findall(r'"([^"]+)"', dep_block):
             # Parse "name>=version" or "name[extra]>=version"
-            m = re.match(r'([a-zA-Z0-9_.-]+)(?:\[.*?\])?\s*([><=!~]+)?\s*(.*)?', item)
+            m = re.match(r"([a-zA-Z0-9_.-]+)(?:\[.*?\])?\s*([><=!~]+)?\s*(.*)?", item)
             if m:
                 name = m.group(1)
                 version = (m.group(3) or "unspecified").strip().rstrip('"').rstrip(",")
@@ -105,17 +117,27 @@ def parse_pyproject_toml(filepath: str) -> list:
 
     # Match [project.optional-dependencies] sections
     for section_match in re.finditer(
-        r'\[project\.optional-dependencies\]\s*\n(.*?)(?=\n\[|\Z)', content, re.DOTALL
+        r"\[project\.optional-dependencies\]\s*\n(.*?)(?=\n\[|\Z)", content, re.DOTALL
     ):
         section = section_match.group(1)
-        for group_match in re.finditer(r'(\w+)\s*=\s*\[(.*?)\]', section, re.DOTALL):
+        for group_match in re.finditer(r"(\w+)\s*=\s*\[(.*?)\]", section, re.DOTALL):
             group_name = group_match.group(1)
             for item in re.findall(r'"([^"]+)"', group_match.group(2)):
-                m = re.match(r'([a-zA-Z0-9_.-]+)(?:\[.*?\])?\s*([><=!~]+)?\s*(.*)?', item)
+                m = re.match(
+                    r"([a-zA-Z0-9_.-]+)(?:\[.*?\])?\s*([><=!~]+)?\s*(.*)?", item
+                )
                 if m:
                     name = m.group(1)
-                    version = (m.group(3) or "unspecified").strip().rstrip('"').rstrip(",")
-                    deps.append({"name": name, "version": version, "type": f"optional ({group_name})"})
+                    version = (
+                        (m.group(3) or "unspecified").strip().rstrip('"').rstrip(",")
+                    )
+                    deps.append(
+                        {
+                            "name": name,
+                            "version": version,
+                            "type": f"optional ({group_name})",
+                        }
+                    )
 
     return deps
 
@@ -131,7 +153,7 @@ def parse_pipfile(filepath: str) -> list:
 
     for section, dep_type in [("[packages]", "prod"), ("[dev-packages]", "dev")]:
         match = re.search(
-            rf'\{re.escape(section)}\]\s*\n(.*?)(?=\n\[|\Z)', content, re.DOTALL
+            rf"\{re.escape(section)}\]\s*\n(.*?)(?=\n\[|\Z)", content, re.DOTALL
         )
         if match:
             for line in match.group(1).strip().splitlines():
@@ -143,7 +165,9 @@ def parse_pipfile(filepath: str) -> list:
                         version = parts[1].strip().strip('"').strip("'")
                         if version == "*":
                             version = "any"
-                        deps.append({"name": name, "version": version, "type": dep_type})
+                        deps.append(
+                            {"name": name, "version": version, "type": dep_type}
+                        )
 
     return deps
 
@@ -195,9 +219,15 @@ def generate_report(root: str):
             print(f"### {dep['name']} ({dep['version']}) [{dep['type']}]")
             print()
             print("Simplicity 3 Questions:")
-            print("  1. How many lines of this library do we actually use?        -> [ ]")
-            print("  2. How long would it take to write those lines ourselves?     -> [ ]")
-            print("  3. Are we confident it will remain safe and compatible in 6m? -> [ ]")
+            print(
+                "  1. How many lines of this library do we actually use?        -> [ ]"
+            )
+            print(
+                "  2. How long would it take to write those lines ourselves?     -> [ ]"
+            )
+            print(
+                "  3. Are we confident it will remain safe and compatible in 6m? -> [ ]"
+            )
             print()
 
     print("---")

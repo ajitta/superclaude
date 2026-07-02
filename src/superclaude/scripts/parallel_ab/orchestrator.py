@@ -53,9 +53,7 @@ async def _run_one(
     try:
         return await runner_fn(variant, scenario, cfg, out_dir)
     except Exception as exc:  # noqa: BLE001 — preserve batch even when one runner crashes
-        sys.stderr.write(
-            f"[parallel-ab] variant {variant.id} crashed: {exc!r}\n"
-        )
+        sys.stderr.write(f"[parallel-ab] variant {variant.id} crashed: {exc!r}\n")
         obs = Observation(variant_id=variant.id, exit_status="error")
         emit(obs, out_dir / f"obs-{variant.id}.json")
         return obs
@@ -84,8 +82,7 @@ async def orchestrate(
     out.mkdir(parents=True, exist_ok=True)
 
     tasks = [
-        _run_one(runner_fn, v, spec.scenario, runner_cfg, out)
-        for v in spec.variants
+        _run_one(runner_fn, v, spec.scenario, runner_cfg, out) for v in spec.variants
     ]
     await asyncio.gather(*tasks)
 

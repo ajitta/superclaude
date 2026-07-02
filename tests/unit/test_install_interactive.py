@@ -25,11 +25,10 @@ def mock_install_all():
     imports from install_commands (which re-exports). Patch both.
     """
     ret = (True, "📊 Summary: 0 installed, 0 skipped, 0 failed")
-    with patch(
-        "superclaude.cli.install_components.install_all", return_value=ret
-    ) as m1, patch(
-        "superclaude.cli.install_commands.install_all", return_value=ret
-    ) as m2:
+    with (
+        patch("superclaude.cli.install_components.install_all", return_value=ret) as m1,
+        patch("superclaude.cli.install_commands.install_all", return_value=ret) as m2,
+    ):
         # Expose a unified mock that records calls from either site.
         class _Either:
             @property
@@ -41,9 +40,7 @@ def mock_install_all():
                 return m1.call_args or m2.call_args
 
             def assert_called_once(self):
-                assert self.call_count == 1, (
-                    f"expected 1 call, got {self.call_count}"
-                )
+                assert self.call_count == 1, f"expected 1 call, got {self.call_count}"
 
             def assert_not_called(self):
                 assert self.call_count == 0
@@ -95,9 +92,7 @@ class TestGitInitPrompt:
         with _isolated_cwd(runner, tmp_path):
             with patch("subprocess.run") as mock_run:
                 mock_run.return_value.returncode = 0
-                result = runner.invoke(
-                    main, ["install"], input="3\ny\nn\ny\n"
-                )
+                result = runner.invoke(main, ["install"], input="3\ny\nn\ny\n")
                 assert result.exit_code == 0, result.output
                 assert "Git check" in result.output
                 assert "Initialize a git repo" in result.output
@@ -112,9 +107,7 @@ class TestGitInitPrompt:
         with _isolated_cwd(runner, tmp_path):
             with patch("subprocess.run") as mock_run:
                 # decline git init (n), force n, proceed y
-                result = runner.invoke(
-                    main, ["install"], input="3\nn\nn\ny\n"
-                )
+                result = runner.invoke(main, ["install"], input="3\nn\nn\ny\n")
                 assert result.exit_code == 0, result.output
                 assert "Skipped git init" in result.output
                 assert not mock_run.called

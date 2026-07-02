@@ -22,6 +22,7 @@ from superclaude.scripts.session_init import (
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class FakeCompletedProcess:
     """Minimal stand-in for subprocess.CompletedProcess."""
@@ -115,7 +116,9 @@ class TestGetGitStatus:
     def test_clean_repo(self):
         """Clean repository returns 'Git: clean' message."""
         fake = FakeCompletedProcess(returncode=0, stdout="")
-        with patch("superclaude.scripts.session_init.subprocess.run", return_value=fake):
+        with patch(
+            "superclaude.scripts.session_init.subprocess.run", return_value=fake
+        ):
             result = get_git_status()
 
         assert result == "\U0001f4ca Git: clean"
@@ -123,7 +126,9 @@ class TestGetGitStatus:
     def test_dirty_repo_single_file(self):
         """Single modified file reports '1 files'."""
         fake = FakeCompletedProcess(returncode=0, stdout=" M src/main.py\n")
-        with patch("superclaude.scripts.session_init.subprocess.run", return_value=fake):
+        with patch(
+            "superclaude.scripts.session_init.subprocess.run", return_value=fake
+        ):
             result = get_git_status()
 
         assert result == "\U0001f4ca Git: 1 files"
@@ -132,15 +137,21 @@ class TestGetGitStatus:
         """Multiple modified files reports correct count."""
         porcelain = " M src/main.py\n?? new_file.txt\nA  added.py\n"
         fake = FakeCompletedProcess(returncode=0, stdout=porcelain)
-        with patch("superclaude.scripts.session_init.subprocess.run", return_value=fake):
+        with patch(
+            "superclaude.scripts.session_init.subprocess.run", return_value=fake
+        ):
             result = get_git_status()
 
         assert result == "\U0001f4ca Git: 3 files"
 
     def test_not_a_repo(self):
         """Non-zero return code yields 'not a repo'."""
-        fake = FakeCompletedProcess(returncode=128, stdout="", stderr="fatal: not a git repo")
-        with patch("superclaude.scripts.session_init.subprocess.run", return_value=fake):
+        fake = FakeCompletedProcess(
+            returncode=128, stdout="", stderr="fatal: not a git repo"
+        )
+        with patch(
+            "superclaude.scripts.session_init.subprocess.run", return_value=fake
+        ):
             result = get_git_status()
 
         assert result == "\U0001f4ca Git: not a repo"
@@ -168,7 +179,9 @@ class TestGetGitStatus:
     def test_subprocess_called_with_correct_args(self):
         """Verifies subprocess.run is called with --porcelain and timeout."""
         fake = FakeCompletedProcess(returncode=0, stdout="")
-        with patch("superclaude.scripts.session_init.subprocess.run", return_value=fake) as mock_run:
+        with patch(
+            "superclaude.scripts.session_init.subprocess.run", return_value=fake
+        ) as mock_run:
             get_git_status()
 
         mock_run.assert_called_once_with(
@@ -218,14 +231,21 @@ class TestGetPrStatus:
     def test_no_pr_for_branch_returns_empty(self):
         """Returns empty string when gh pr view fails (no PR exists)."""
         branch = FakeCompletedProcess(returncode=0, stdout="feature/foo\n")
-        pr = FakeCompletedProcess(returncode=1, stdout="", stderr="no pull requests found")
+        pr = FakeCompletedProcess(
+            returncode=1, stdout="", stderr="no pull requests found"
+        )
         with self._mock_subprocess(branch, pr):
             assert get_pr_status() == ""
 
     def test_draft_pr(self):
         """Draft PR shows white circle indicator."""
         branch = FakeCompletedProcess(returncode=0, stdout="feature/foo\n")
-        pr_data = {"isDraft": True, "state": "OPEN", "reviewDecision": "", "url": "https://github.com/org/repo/pull/1"}
+        pr_data = {
+            "isDraft": True,
+            "state": "OPEN",
+            "reviewDecision": "",
+            "url": "https://github.com/org/repo/pull/1",
+        }
         pr = FakeCompletedProcess(returncode=0, stdout=json.dumps(pr_data))
         with self._mock_subprocess(branch, pr):
             result = get_pr_status()
@@ -236,7 +256,12 @@ class TestGetPrStatus:
     def test_approved_pr(self):
         """Approved PR shows green circle indicator."""
         branch = FakeCompletedProcess(returncode=0, stdout="feature/bar\n")
-        pr_data = {"isDraft": False, "state": "OPEN", "reviewDecision": "APPROVED", "url": "https://github.com/org/repo/pull/2"}
+        pr_data = {
+            "isDraft": False,
+            "state": "OPEN",
+            "reviewDecision": "APPROVED",
+            "url": "https://github.com/org/repo/pull/2",
+        }
         pr = FakeCompletedProcess(returncode=0, stdout=json.dumps(pr_data))
         with self._mock_subprocess(branch, pr):
             result = get_pr_status()
@@ -247,7 +272,12 @@ class TestGetPrStatus:
     def test_changes_requested_pr(self):
         """Changes-requested PR shows red circle indicator."""
         branch = FakeCompletedProcess(returncode=0, stdout="fix/bug\n")
-        pr_data = {"isDraft": False, "state": "OPEN", "reviewDecision": "CHANGES_REQUESTED", "url": "https://github.com/org/repo/pull/3"}
+        pr_data = {
+            "isDraft": False,
+            "state": "OPEN",
+            "reviewDecision": "CHANGES_REQUESTED",
+            "url": "https://github.com/org/repo/pull/3",
+        }
         pr = FakeCompletedProcess(returncode=0, stdout=json.dumps(pr_data))
         with self._mock_subprocess(branch, pr):
             result = get_pr_status()
@@ -257,7 +287,12 @@ class TestGetPrStatus:
     def test_pending_review_pr(self):
         """Pending-review PR shows yellow circle indicator."""
         branch = FakeCompletedProcess(returncode=0, stdout="feature/baz\n")
-        pr_data = {"isDraft": False, "state": "OPEN", "reviewDecision": "", "url": "https://github.com/org/repo/pull/4"}
+        pr_data = {
+            "isDraft": False,
+            "state": "OPEN",
+            "reviewDecision": "",
+            "url": "https://github.com/org/repo/pull/4",
+        }
         pr = FakeCompletedProcess(returncode=0, stdout=json.dumps(pr_data))
         with self._mock_subprocess(branch, pr):
             result = get_pr_status()
@@ -267,7 +302,12 @@ class TestGetPrStatus:
     def test_pr_without_url(self):
         """PR status with no URL omits parenthetical."""
         branch = FakeCompletedProcess(returncode=0, stdout="feature/x\n")
-        pr_data = {"isDraft": False, "state": "OPEN", "reviewDecision": "APPROVED", "url": ""}
+        pr_data = {
+            "isDraft": False,
+            "state": "OPEN",
+            "reviewDecision": "APPROVED",
+            "url": "",
+        }
         pr = FakeCompletedProcess(returncode=0, stdout=json.dumps(pr_data))
         with self._mock_subprocess(branch, pr):
             result = get_pr_status()
@@ -311,7 +351,9 @@ class TestGetAdditionalDirsStatus:
 
     def test_disabled_by_default(self, monkeypatch):
         """Returns empty when env var is not set."""
-        monkeypatch.delenv("CLAUDE_CODE_ADDITIONAL_DIRECTORIES_CLAUDE_MD", raising=False)
+        monkeypatch.delenv(
+            "CLAUDE_CODE_ADDITIONAL_DIRECTORIES_CLAUDE_MD", raising=False
+        )
         assert get_additional_dirs_status() == ""
 
     def test_disabled_when_env_zero(self, monkeypatch):
@@ -376,10 +418,18 @@ class TestMain:
     def test_main_prints_git_status(self, capsys):
         """main() includes git status in output."""
         with (
-            patch("superclaude.scripts.session_init.init_hook_tracker", return_value=None),
-            patch("superclaude.scripts.session_init.get_git_status", return_value="\U0001f4ca Git: clean"),
+            patch(
+                "superclaude.scripts.session_init.init_hook_tracker", return_value=None
+            ),
+            patch(
+                "superclaude.scripts.session_init.get_git_status",
+                return_value="\U0001f4ca Git: clean",
+            ),
             patch("superclaude.scripts.session_init.get_pr_status", return_value=""),
-            patch("superclaude.scripts.session_init.get_additional_dirs_status", return_value=""),
+            patch(
+                "superclaude.scripts.session_init.get_additional_dirs_status",
+                return_value="",
+            ),
         ):
             main()
 
@@ -389,10 +439,21 @@ class TestMain:
     def test_main_prints_pr_status_when_present(self, capsys):
         """main() includes PR status when non-empty."""
         with (
-            patch("superclaude.scripts.session_init.init_hook_tracker", return_value=None),
-            patch("superclaude.scripts.session_init.get_git_status", return_value="\U0001f4ca Git: clean"),
-            patch("superclaude.scripts.session_init.get_pr_status", return_value="\U0001f7e2 PR: approved (url)"),
-            patch("superclaude.scripts.session_init.get_additional_dirs_status", return_value=""),
+            patch(
+                "superclaude.scripts.session_init.init_hook_tracker", return_value=None
+            ),
+            patch(
+                "superclaude.scripts.session_init.get_git_status",
+                return_value="\U0001f4ca Git: clean",
+            ),
+            patch(
+                "superclaude.scripts.session_init.get_pr_status",
+                return_value="\U0001f7e2 PR: approved (url)",
+            ),
+            patch(
+                "superclaude.scripts.session_init.get_additional_dirs_status",
+                return_value="",
+            ),
         ):
             main()
 
@@ -402,10 +463,18 @@ class TestMain:
     def test_main_omits_pr_status_when_empty(self, capsys):
         """main() does not print PR line when get_pr_status returns empty."""
         with (
-            patch("superclaude.scripts.session_init.init_hook_tracker", return_value=None),
-            patch("superclaude.scripts.session_init.get_git_status", return_value="\U0001f4ca Git: clean"),
+            patch(
+                "superclaude.scripts.session_init.init_hook_tracker", return_value=None
+            ),
+            patch(
+                "superclaude.scripts.session_init.get_git_status",
+                return_value="\U0001f4ca Git: clean",
+            ),
             patch("superclaude.scripts.session_init.get_pr_status", return_value=""),
-            patch("superclaude.scripts.session_init.get_additional_dirs_status", return_value=""),
+            patch(
+                "superclaude.scripts.session_init.get_additional_dirs_status",
+                return_value="",
+            ),
         ):
             main()
 
@@ -415,10 +484,18 @@ class TestMain:
     def test_main_prints_core_services(self, capsys):
         """main() prints the core services block."""
         with (
-            patch("superclaude.scripts.session_init.init_hook_tracker", return_value=None),
-            patch("superclaude.scripts.session_init.get_git_status", return_value="\U0001f4ca Git: clean"),
+            patch(
+                "superclaude.scripts.session_init.init_hook_tracker", return_value=None
+            ),
+            patch(
+                "superclaude.scripts.session_init.get_git_status",
+                return_value="\U0001f4ca Git: clean",
+            ),
             patch("superclaude.scripts.session_init.get_pr_status", return_value=""),
-            patch("superclaude.scripts.session_init.get_additional_dirs_status", return_value=""),
+            patch(
+                "superclaude.scripts.session_init.get_additional_dirs_status",
+                return_value="",
+            ),
         ):
             main()
 
@@ -430,10 +507,18 @@ class TestMain:
     def test_main_prints_additional_dirs_when_present(self, capsys):
         """main() includes additional dirs status when non-empty."""
         with (
-            patch("superclaude.scripts.session_init.init_hook_tracker", return_value=None),
-            patch("superclaude.scripts.session_init.get_git_status", return_value="\U0001f4ca Git: clean"),
+            patch(
+                "superclaude.scripts.session_init.init_hook_tracker", return_value=None
+            ),
+            patch(
+                "superclaude.scripts.session_init.get_git_status",
+                return_value="\U0001f4ca Git: clean",
+            ),
             patch("superclaude.scripts.session_init.get_pr_status", return_value=""),
-            patch("superclaude.scripts.session_init.get_additional_dirs_status", return_value="\U0001f4c1 Multi-dir: 2 additional CLAUDE.md found"),
+            patch(
+                "superclaude.scripts.session_init.get_additional_dirs_status",
+                return_value="\U0001f4c1 Multi-dir: 2 additional CLAUDE.md found",
+            ),
         ):
             main()
 

@@ -55,9 +55,13 @@ def _setup_full(tmp_path, component_files=None):
                         skill_tgt.mkdir(parents=True, exist_ok=True)
                         (skill_tgt / manifest).write_text(tgt_content, encoding="utf-8")
                 else:
-                    (src_root / src_sub / fname).write_text(src_content, encoding="utf-8")
+                    (src_root / src_sub / fname).write_text(
+                        src_content, encoding="utf-8"
+                    )
                     if tgt_content is not None:
-                        (base_path / tgt_sub / fname).write_text(tgt_content, encoding="utf-8")
+                        (base_path / tgt_sub / fname).write_text(
+                            tgt_content, encoding="utf-8"
+                        )
 
     # CLAUDE_SC.md
     (src_root / "CLAUDE_SC.md").write_text("sc", encoding="utf-8")
@@ -72,12 +76,15 @@ class TestDriftDetection:
 
     def test_clean_no_drift(self, tmp_path):
         """All files match → clean=True."""
-        src_root, base_path = _setup_full(tmp_path, {
-            "commands": {
-                "build.md": ("content", "content"),
-                "test.md": ("abc", "abc"),
+        src_root, base_path = _setup_full(
+            tmp_path,
+            {
+                "commands": {
+                    "build.md": ("content", "content"),
+                    "test.md": ("abc", "abc"),
+                },
             },
-        })
+        )
 
         with _mock_package_root(src_root):
             result = verify_drift(base_path, verbose=True)
@@ -92,9 +99,12 @@ class TestDriftDetection:
 
     def test_missing_file_detected(self, tmp_path):
         """Source file not in target → MISSING."""
-        src_root, base_path = _setup_full(tmp_path, {
-            "commands": {"build.md": ("content", None)},
-        })
+        src_root, base_path = _setup_full(
+            tmp_path,
+            {
+                "commands": {"build.md": ("content", None)},
+            },
+        )
 
         with _mock_package_root(src_root):
             result = verify_drift(base_path, verbose=True)
@@ -105,9 +115,12 @@ class TestDriftDetection:
 
     def test_content_drift_detected(self, tmp_path):
         """Content mismatch → DRIFTED."""
-        src_root, base_path = _setup_full(tmp_path, {
-            "commands": {"build.md": ("source content", "different content")},
-        })
+        src_root, base_path = _setup_full(
+            tmp_path,
+            {
+                "commands": {"build.md": ("source content", "different content")},
+            },
+        )
 
         with _mock_package_root(src_root):
             result = verify_drift(base_path, verbose=True)
@@ -118,10 +131,14 @@ class TestDriftDetection:
 
     def test_extra_file_detected(self, tmp_path):
         """Target file not in source → EXTRA."""
-        src_root, base_path = _setup_full(tmp_path, {
-            "commands": {"build.md": ("src", "src")},
-        })
+        src_root, base_path = _setup_full(
+            tmp_path,
+            {
+                "commands": {"build.md": ("src", "src")},
+            },
+        )
         from superclaude.cli.install_paths import COMPONENTS
+
         tgt_sub = COMPONENTS["commands"][1]
         (base_path / tgt_sub / "orphan.md").write_text("extra", encoding="utf-8")
 
@@ -143,7 +160,9 @@ class TestDriftDetection:
     def test_claude_sc_md_drift(self, tmp_path):
         """CLAUDE_SC.md content mismatch → DRIFTED."""
         src_root, base_path = _setup_full(tmp_path)
-        (base_path / "superclaude" / "CLAUDE_SC.md").write_text("modified", encoding="utf-8")
+        (base_path / "superclaude" / "CLAUDE_SC.md").write_text(
+            "modified", encoding="utf-8"
+        )
 
         with _mock_package_root(src_root):
             result = verify_drift(base_path)
@@ -152,9 +171,12 @@ class TestDriftDetection:
 
     def test_skills_directory_comparison(self, tmp_path):
         """Skills are compared at SKILL.md level within subdirectories."""
-        src_root, base_path = _setup_full(tmp_path, {
-            "skills": {"my-skill/SKILL.md": ("skill content", "skill content")},
-        })
+        src_root, base_path = _setup_full(
+            tmp_path,
+            {
+                "skills": {"my-skill/SKILL.md": ("skill content", "skill content")},
+            },
+        )
 
         with _mock_package_root(src_root):
             result = verify_drift(base_path, verbose=True)
@@ -163,9 +185,12 @@ class TestDriftDetection:
 
     def test_verbose_false_omits_files(self, tmp_path):
         """When verbose=False, file details are not included."""
-        src_root, base_path = _setup_full(tmp_path, {
-            "commands": {"build.md": ("content", "content")},
-        })
+        src_root, base_path = _setup_full(
+            tmp_path,
+            {
+                "commands": {"build.md": ("content", "content")},
+            },
+        )
 
         with _mock_package_root(src_root):
             result = verify_drift(base_path, verbose=False)

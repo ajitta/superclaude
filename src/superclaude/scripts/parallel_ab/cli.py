@@ -14,8 +14,7 @@ def _build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(
         prog="python -m superclaude.scripts.parallel_ab",
         description=(
-            "Run N variants in parallel via claude -p and emit "
-            "matrix.md + decision.md."
+            "Run N variants in parallel via claude -p and emit matrix.md + decision.md."
         ),
     )
     p.add_argument(

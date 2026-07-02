@@ -7,13 +7,7 @@ from pathlib import Path
 import pytest
 
 REPO_ROOT = Path(__file__).parent.parent.parent
-TEMPLATES_SRC = (
-    REPO_ROOT
-    / "src"
-    / "superclaude"
-    / "templates"
-    / "docs-scaffold"
-)
+TEMPLATES_SRC = REPO_ROOT / "src" / "superclaude" / "templates" / "docs-scaffold"
 INIT_MD = REPO_ROOT / "src" / "superclaude" / "commands" / "init.md"
 
 EXPECTED_TEMPLATES = {
@@ -122,7 +116,9 @@ class TestInitCommandDeclaresTaskI:
 
     def test_dependency_graph_lists_i(self, init_body):
         # Task [i] has no deps → should appear in Batch 1
-        dep_section = init_body.split("dependency_graph")[1].split("</dependency_graph>")[0]
+        dep_section = init_body.split("dependency_graph")[1].split(
+            "</dependency_graph>"
+        )[0]
         assert "i" in dep_section.replace(",", " ").split(), (
             "task [i] not listed in dependency_graph"
         )
@@ -139,6 +135,4 @@ class TestInitCommandDeclaresTaskI:
 
     def test_full_preset_includes_i(self, init_body):
         # --full preset must list i among selected tasks
-        assert "a,b,c,d,e,f,g,h,i" in init_body, (
-            "--full preset must include task i"
-        )
+        assert "a,b,c,d,e,f,g,h,i" in init_body, "--full preset must include task i"

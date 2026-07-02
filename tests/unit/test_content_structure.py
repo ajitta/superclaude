@@ -56,9 +56,7 @@ class TestModeXMLStructure:
     def test_component_type_is_mode(self, mode):
         stem, content = mode
         ctype = extract_xml_attr(content, "component", "type")
-        assert ctype == "mode", (
-            f"{stem}: component type='{ctype}', expected 'mode'"
-        )
+        assert ctype == "mode", f"{stem}: component type='{ctype}', expected 'mode'"
 
     def test_has_role(self, mode):
         stem, content = mode
@@ -123,9 +121,7 @@ class TestMcpXMLStructure:
     def test_component_type_is_mcp(self, mcp):
         stem, content = mcp
         ctype = extract_xml_attr(content, "component", "type")
-        assert ctype == "mcp", (
-            f"{stem}: component type='{ctype}', expected 'mcp'"
-        )
+        assert ctype == "mcp", f"{stem}: component type='{ctype}', expected 'mcp'"
 
     def test_has_role(self, mcp):
         stem, content = mcp

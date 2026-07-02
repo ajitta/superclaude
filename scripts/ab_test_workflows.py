@@ -34,14 +34,14 @@ class ABTestAnalyzer:
             print(f"Error: {self.metrics_file} not found")
             return
 
-        with open(self.metrics_file, 'r') as f:
+        with open(self.metrics_file, "r") as f:
             for line in f:
                 if line.strip():
                     self.metrics.append(json.loads(line))
 
     def get_variant_metrics(self, workflow_id: str) -> List[Dict]:
         """Get all metrics for a specific workflow variant"""
-        return [m for m in self.metrics if m['workflow_id'] == workflow_id]
+        return [m for m in self.metrics if m["workflow_id"] == workflow_id]
 
     def extract_metric_values(self, metrics: List[Dict], metric: str) -> List[float]:
         """Extract specific metric values from metrics list"""
@@ -58,28 +58,19 @@ class ABTestAnalyzer:
     def calculate_statistics(self, values: List[float]) -> Dict:
         """Calculate statistical measures"""
         if not values:
-            return {
-                'count': 0,
-                'mean': 0,
-                'median': 0,
-                'stdev': 0,
-                'min': 0,
-                'max': 0
-            }
+            return {"count": 0, "mean": 0, "median": 0, "stdev": 0, "min": 0, "max": 0}
 
         return {
-            'count': len(values),
-            'mean': statistics.mean(values),
-            'median': statistics.median(values),
-            'stdev': statistics.stdev(values) if len(values) > 1 else 0,
-            'min': min(values),
-            'max': max(values)
+            "count": len(values),
+            "mean": statistics.mean(values),
+            "median": statistics.median(values),
+            "stdev": statistics.stdev(values) if len(values) > 1 else 0,
+            "min": min(values),
+            "max": max(values),
         }
 
     def perform_ttest(
-        self,
-        variant_a_values: List[float],
-        variant_b_values: List[float]
+        self, variant_a_values: List[float], variant_b_values: List[float]
     ) -> Tuple[float, float]:
         """
         Perform independent t-test between two variants.
@@ -99,7 +90,7 @@ class ABTestAnalyzer:
         variant_b_stats: Dict,
         p_value: float,
         metric: str,
-        lower_is_better: bool = True
+        lower_is_better: bool = True,
     ) -> str:
         """
         Determine winning variant based on statistics.
@@ -119,12 +110,12 @@ class ABTestAnalyzer:
             return "No significant difference (p ≥ 0.05)"
 
         # Require minimum sample size (20 trials per variant)
-        if variant_a_stats['count'] < 20 or variant_b_stats['count'] < 20:
+        if variant_a_stats["count"] < 20 or variant_b_stats["count"] < 20:
             return f"Insufficient data (need 20 trials, have {variant_a_stats['count']}/{variant_b_stats['count']})"
 
         # Compare means
-        a_mean = variant_a_stats['mean']
-        b_mean = variant_b_stats['mean']
+        a_mean = variant_a_stats["mean"]
+        b_mean = variant_b_stats["mean"]
 
         if lower_is_better:
             if a_mean < b_mean:
@@ -142,11 +133,7 @@ class ABTestAnalyzer:
                 return f"Variant B wins ({improvement:.1f}% better)"
 
     def generate_recommendation(
-        self,
-        winner: str,
-        variant_a_stats: Dict,
-        variant_b_stats: Dict,
-        p_value: float
+        self, winner: str, variant_a_stats: Dict, variant_b_stats: Dict, p_value: float
     ) -> str:
         """Generate actionable recommendation"""
         if "No significant difference" in winner:
@@ -159,7 +146,9 @@ class ABTestAnalyzer:
             return "✅ Keep Variant A as standard (statistically better)"
 
         if "Variant B wins" in winner:
-            if variant_b_stats['mean'] > variant_a_stats['mean'] * 0.8:  # At least 20% better
+            if (
+                variant_b_stats["mean"] > variant_a_stats["mean"] * 0.8
+            ):  # At least 20% better
                 return "🚀 Promote Variant B to standard (significant improvement)"
             else:
                 return "⚠️ Marginal improvement - continue testing before promotion"
@@ -170,8 +159,8 @@ class ABTestAnalyzer:
         self,
         variant_a_id: str,
         variant_b_id: str,
-        metric: str = 'tokens_used',
-        lower_is_better: bool = True
+        metric: str = "tokens_used",
+        lower_is_better: bool = True,
     ) -> str:
         """
         Compare two workflow variants on a specific metric.
@@ -206,7 +195,9 @@ class ABTestAnalyzer:
         t_stat, p_value = self.perform_ttest(a_values, b_values)
 
         # Determine winner
-        winner = self.determine_winner(a_stats, b_stats, p_value, metric, lower_is_better)
+        winner = self.determine_winner(
+            a_stats, b_stats, p_value, metric, lower_is_better
+        )
 
         # Generate recommendation
         recommendation = self.generate_recommendation(winner, a_stats, b_stats, p_value)
@@ -260,51 +251,40 @@ class ABTestAnalyzer:
 
 def main():
     parser = argparse.ArgumentParser(description="A/B test workflow variants")
+    parser.add_argument("--variant-a", required=True, help="Workflow ID for variant A")
+    parser.add_argument("--variant-b", required=True, help="Workflow ID for variant B")
     parser.add_argument(
-        '--variant-a',
-        required=True,
-        help='Workflow ID for variant A'
+        "--metric",
+        default="tokens_used",
+        help="Metric to compare (default: tokens_used)",
     )
     parser.add_argument(
-        '--variant-b',
-        required=True,
-        help='Workflow ID for variant B'
+        "--higher-is-better",
+        action="store_true",
+        help="Higher values are better (default: lower is better)",
     )
-    parser.add_argument(
-        '--metric',
-        default='tokens_used',
-        help='Metric to compare (default: tokens_used)'
-    )
-    parser.add_argument(
-        '--higher-is-better',
-        action='store_true',
-        help='Higher values are better (default: lower is better)'
-    )
-    parser.add_argument(
-        '--output',
-        help='Output file (default: stdout)'
-    )
+    parser.add_argument("--output", help="Output file (default: stdout)")
 
     args = parser.parse_args()
 
     # Find metrics file
-    metrics_file = Path('docs/memory/workflow_metrics.jsonl')
+    metrics_file = Path("docs/memory/workflow_metrics.jsonl")
 
     analyzer = ABTestAnalyzer(metrics_file)
     report = analyzer.compare_variants(
         args.variant_a,
         args.variant_b,
         args.metric,
-        lower_is_better=not args.higher_is_better
+        lower_is_better=not args.higher_is_better,
     )
 
     if args.output:
-        with open(args.output, 'w') as f:
+        with open(args.output, "w") as f:
             f.write(report)
         print(f"Report written to {args.output}")
     else:
         print(report)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

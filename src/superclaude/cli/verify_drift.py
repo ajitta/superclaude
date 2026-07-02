@@ -17,9 +17,9 @@ from .install_paths import (
 
 # File status constants
 OK = "OK"
-MISSING = "MISSING"       # In source but not in target
-DRIFTED = "DRIFTED"       # Content mismatch
-EXTRA = "EXTRA"           # In target but not in source
+MISSING = "MISSING"  # In source but not in target
+DRIFTED = "DRIFTED"  # Content mismatch
+EXTRA = "EXTRA"  # In target but not in source
 
 
 def _get_template_vars(base_path: Path) -> dict:
@@ -29,7 +29,9 @@ def _get_template_vars(base_path: Path) -> dict:
     return {"{{SCRIPTS_PATH}}": scripts, "{{SKILLS_PATH}}": skills}
 
 
-def _compare_files(source: Path, target: Path, template_vars: dict | None = None) -> str:
+def _compare_files(
+    source: Path, target: Path, template_vars: dict | None = None
+) -> str:
     """Compare two files by content. Returns status string.
 
     If template_vars is provided, resolve them in source content before comparing
@@ -79,22 +81,27 @@ def _check_component(component: str, base_path: Path) -> Dict[str, str]:
             elif not target_manifest.exists():
                 results[key] = MISSING
             else:
-                results[key] = _compare_files(source_manifest, target_manifest, template_vars)
+                results[key] = _compare_files(
+                    source_manifest, target_manifest, template_vars
+                )
 
         # Check for extra skill directories in target
         if target_dir.exists():
             source_skill_names = {
-                d.name for d in source_dir.iterdir()
+                d.name
+                for d in source_dir.iterdir()
                 if d.is_dir() and not d.name.startswith(("_", "."))
             }
             for target_skill in sorted(target_dir.iterdir()):
-                if target_skill.is_dir() and target_skill.name not in source_skill_names:
+                if (
+                    target_skill.is_dir()
+                    and target_skill.name not in source_skill_names
+                ):
                     results[f"{target_skill.name}/"] = EXTRA
     else:
         # Standard components: compare .md files (skip README)
         source_files = {
-            f.name for f in source_dir.glob("*.md")
-            if f.stem.upper() != "README"
+            f.name for f in source_dir.glob("*.md") if f.stem.upper() != "README"
         }
 
         for filename in sorted(source_files):
@@ -105,8 +112,7 @@ def _check_component(component: str, base_path: Path) -> Dict[str, str]:
         # Check for extra files in target
         if target_dir.exists():
             target_files = {
-                f.name for f in target_dir.glob("*.md")
-                if f.stem.upper() != "README"
+                f.name for f in target_dir.glob("*.md") if f.stem.upper() != "README"
             }
             for filename in sorted(target_files - source_files):
                 results[filename] = EXTRA
@@ -116,18 +122,18 @@ def _check_component(component: str, base_path: Path) -> Dict[str, str]:
         if component == "core":
             rules_src = source_dir / "rules"
             rules_tgt = target_dir / "rules"
-            src_rules = {
-                f.name for f in rules_src.glob("*.md")
-                if f.stem.upper() != "README"
-            } if rules_src.exists() else set()
+            src_rules = (
+                {f.name for f in rules_src.glob("*.md") if f.stem.upper() != "README"}
+                if rules_src.exists()
+                else set()
+            )
             for filename in sorted(src_rules):
                 results[f"rules/{filename}"] = _compare_files(
                     rules_src / filename, rules_tgt / filename
                 )
             if rules_tgt.exists():
                 tgt_rules = {
-                    f.name for f in rules_tgt.glob("*.md")
-                    if f.stem.upper() != "README"
+                    f.name for f in rules_tgt.glob("*.md") if f.stem.upper() != "README"
                 }
                 for filename in sorted(tgt_rules - src_rules):
                     results[f"rules/{filename}"] = EXTRA

@@ -75,10 +75,12 @@ def _hook_entry_signature(hook_entry: dict) -> tuple:
     surrounding metadata (`_comment`, etc.).
     """
     matcher = hook_entry.get("matcher", "")
-    inner = tuple(sorted(
-        (h.get("type", ""), h.get("command", ""), h.get("timeout"))
-        for h in hook_entry.get("hooks", [])
-    ))
+    inner = tuple(
+        sorted(
+            (h.get("type", ""), h.get("command", ""), h.get("timeout"))
+            for h in hook_entry.get("hooks", [])
+        )
+    )
     return (matcher, inner)
 
 
@@ -129,9 +131,7 @@ def _is_superclaude_hook(hook_entry: dict) -> bool:
 
 
 def _merge_hook_arrays(
-    existing: List[dict],
-    new_hooks: List[dict],
-    force: bool = False
+    existing: List[dict], new_hooks: List[dict], force: bool = False
 ) -> List[dict]:
     """
     Merge two hook arrays, preserving user hooks.
@@ -157,10 +157,7 @@ def _merge_hook_arrays(
 
 
 def merge_hooks_to_settings(
-    base_path: Path,
-    hooks_config: dict,
-    scope: str,
-    force: bool = False
+    base_path: Path, hooks_config: dict, scope: str, force: bool = False
 ) -> Tuple[bool, str]:
     """
     Merge hooks.json content into settings.json.
@@ -240,7 +237,9 @@ def merge_hooks_to_settings(
         return True, f"Hooks merged to {settings_file}"
 
 
-def uninstall_hooks_from_settings(base_path: Path, scope: str = "user") -> Tuple[bool, str]:
+def uninstall_hooks_from_settings(
+    base_path: Path, scope: str = "user"
+) -> Tuple[bool, str]:
     """
     Remove SuperClaude hooks from settings.json (or settings.local.json for local scope),
     preserving user hooks.
@@ -289,7 +288,10 @@ def uninstall_hooks_from_settings(base_path: Path, scope: str = "user") -> Tuple
     if scope in ("local", "project") and not settings:
         try:
             settings_file.unlink()
-            return True, f"SuperClaude hooks removed and empty {settings_filename} deleted"
+            return (
+                True,
+                f"SuperClaude hooks removed and empty {settings_filename} deleted",
+            )
         except OSError as e:
             return False, f"Failed to delete empty {settings_file}: {e}"
 
@@ -320,7 +322,9 @@ def _claude_md_target(base_path: Path, scope: str) -> Tuple[Path, str]:
     return base_path / "CLAUDE.md", CLAUDE_SC_IMPORT
 
 
-def check_claude_md_import(base_path: Path = None, scope: str = "user") -> Tuple[bool, str]:
+def check_claude_md_import(
+    base_path: Path = None, scope: str = "user"
+) -> Tuple[bool, str]:
     """
     Check if CLAUDE.md (or CLAUDE.local.md for local scope) has the CLAUDE_SC.md import.
 
@@ -437,8 +441,12 @@ def remove_claude_md_import(base_path: Path, scope: str = "user") -> Tuple[bool,
         original_content = content
 
         # Remove SuperClaude import lines and related comments (all variants)
-        content = re.sub(r"# SuperClaude Framework\n@\.claude/superclaude/[^\n]+\n?", "", content)
-        content = re.sub(r"# SuperClaude Framework\n@superclaude/[^\n]+\n?", "", content)
+        content = re.sub(
+            r"# SuperClaude Framework\n@\.claude/superclaude/[^\n]+\n?", "", content
+        )
+        content = re.sub(
+            r"# SuperClaude Framework\n@superclaude/[^\n]+\n?", "", content
+        )
         content = re.sub(r"@\.claude/superclaude/[^\n]+\n?", "", content)
         content = re.sub(r"@superclaude/[^\n]+\n?", "", content)
         content = re.sub(r"@superclaude\\[^\n]+\n?", "", content)

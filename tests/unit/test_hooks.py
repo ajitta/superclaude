@@ -20,14 +20,16 @@ class TestHookTracker:
         tracker_dir = tmp_path / ".superclaude_hooks"
         tracker_dir.mkdir(parents=True)
 
-        with patch(
-            "superclaude.hooks.hook_tracker.HOOK_TRACKER_DIR", tracker_dir
-        ), patch(
-            "superclaude.hooks.hook_tracker.HOOK_TRACKER_FILE",
-            tracker_dir / "hook_executions.json",
-        ), patch(
-            "superclaude.hooks.hook_tracker.SESSION_FILE",
-            tracker_dir / "current_session.txt",
+        with (
+            patch("superclaude.hooks.hook_tracker.HOOK_TRACKER_DIR", tracker_dir),
+            patch(
+                "superclaude.hooks.hook_tracker.HOOK_TRACKER_FILE",
+                tracker_dir / "hook_executions.json",
+            ),
+            patch(
+                "superclaude.hooks.hook_tracker.SESSION_FILE",
+                tracker_dir / "current_session.txt",
+            ),
         ):
             yield tracker_dir
 
@@ -47,9 +49,7 @@ class TestHookTracker:
         session2 = get_session_id()
         assert session1 == session2
 
-    def test_has_executed_once_returns_false_initially(
-        self, temp_tracker_dir: Path
-    ):
+    def test_has_executed_once_returns_false_initially(self, temp_tracker_dir: Path):
         """Test that hook shows as not executed initially."""
         from superclaude.hooks.hook_tracker import has_executed_once
 
@@ -185,9 +185,7 @@ class TestHookTracker:
         assert new_session is not None
         assert len(new_session) == 16
 
-    def test_different_matchers_tracked_separately(
-        self, temp_tracker_dir: Path
-    ):
+    def test_different_matchers_tracked_separately(self, temp_tracker_dir: Path):
         """Test that hooks with different matchers are tracked separately."""
         from superclaude.hooks.hook_tracker import (
             has_executed_once,
@@ -292,9 +290,7 @@ allowed-tools:
                 "PostToolUse": [
                     {
                         "matcher": "Write",
-                        "hooks": [
-                            {"type": "command", "command": "echo post"}
-                        ],
+                        "hooks": [{"type": "command", "command": "echo post"}],
                     }
                 ],
             }
@@ -323,9 +319,7 @@ allowed-tools:
                         "once": True,
                     }
                 ],
-                "PostToolUse": [
-                    {"type": "command", "command": "echo post"}
-                ],
+                "PostToolUse": [{"type": "command", "command": "echo post"}],
             }
         }
 
@@ -345,9 +339,7 @@ allowed-tools:
             "hooks": {
                 "Stop": [
                     {
-                        "hooks": [
-                            {"type": "command", "command": "python cleanup.py"}
-                        ],
+                        "hooks": [{"type": "command", "command": "python cleanup.py"}],
                     }
                 ],
             }

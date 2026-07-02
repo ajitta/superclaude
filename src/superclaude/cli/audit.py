@@ -33,8 +33,7 @@ def _check_cross_refs(src: Path) -> Dict[str, Any]:
     available_commands = set()
     if commands_dir.exists():
         available_commands = {
-            f.stem for f in commands_dir.glob("*.md")
-            if f.stem.upper() != "README"
+            f.stem for f in commands_dir.glob("*.md") if f.stem.upper() != "README"
         }
 
     # Scan all content files
@@ -72,9 +71,15 @@ def _check_cross_refs(src: Path) -> Dict[str, Any]:
             for line in fm_match.group(1).splitlines():
                 if line.strip().startswith("description:"):
                     desc = line.partition(":")[2].strip()
-                    t_match = re.search(r"triggers?\s*[-–—]\s*(.+?)(?:\)|$)", desc, re.IGNORECASE)
+                    t_match = re.search(
+                        r"triggers?\s*[-–—]\s*(.+?)(?:\)|$)", desc, re.IGNORECASE
+                    )
                     if t_match:
-                        triggers = [t.strip().lower() for t in t_match.group(1).split(",") if t.strip()]
+                        triggers = [
+                            t.strip().lower()
+                            for t in t_match.group(1).split(",")
+                            if t.strip()
+                        ]
                         for trigger in triggers:
                             trigger_owners[trigger].append(agent_file.stem)
 

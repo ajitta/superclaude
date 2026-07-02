@@ -80,7 +80,9 @@ class InlineHooks:
             entries = []
             for matcher, hook_dicts in groups.items():
                 # Strip matcher from inner hook dicts (it belongs at the outer level)
-                cleaned = [{k: v for k, v in d.items() if k != "matcher"} for d in hook_dicts]
+                cleaned = [
+                    {k: v for k, v in d.items() if k != "matcher"} for d in hook_dicts
+                ]
                 entry: dict = {}
                 if matcher:
                     entry["matcher"] = matcher
@@ -252,5 +254,3 @@ def get_skill_agent(frontmatter: dict) -> str | None:
         Agent name or None if not specified
     """
     return frontmatter.get("agent")
-
-

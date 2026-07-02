@@ -6,6 +6,7 @@ a threshold (default 90 days, configurable via SUPERCLAUDE_MEMORY_STALE_DAYS).
 
 Source: docs/specs/retrospective-followups-discovery-ajitta-2026-04-25.md (A2).
 """
+
 from __future__ import annotations
 
 import importlib.util
@@ -68,7 +69,9 @@ def test_scan_handles_missing_directory(tmp_path: Path) -> None:
 
 def test_scan_handles_malformed_frontmatter(tmp_path: Path) -> None:
     mod = _load_module()
-    (tmp_path / "broken.md").write_text("---\nverified: not-a-date\n---\n", encoding="utf-8")
+    (tmp_path / "broken.md").write_text(
+        "---\nverified: not-a-date\n---\n", encoding="utf-8"
+    )
     # Malformed entries are skipped (not stale, not crashed)
     assert mod.scan_stale_entries(tmp_path, threshold_days=90) == []
 
@@ -81,10 +84,7 @@ def test_encode_project_path_drive_letter(tmp_path: Path) -> None:
         == "C--Users-ajitta-Repos-ajitta-superclaude"
     )
     # Posix-style normalization
-    assert (
-        mod.encode_project_path("/home/user/repos/proj")
-        == "-home-user-repos-proj"
-    )
+    assert mod.encode_project_path("/home/user/repos/proj") == "-home-user-repos-proj"
 
 
 @pytest.mark.parametrize(
@@ -96,7 +96,9 @@ def test_encode_project_path_drive_letter(tmp_path: Path) -> None:
         ("not-a-number", 90),  # malformed env falls back to default
     ],
 )
-def test_threshold_from_env(monkeypatch: pytest.MonkeyPatch, env_value, expected) -> None:
+def test_threshold_from_env(
+    monkeypatch: pytest.MonkeyPatch, env_value, expected
+) -> None:
     mod = _load_module()
     if env_value is None:
         monkeypatch.delenv("SUPERCLAUDE_MEMORY_STALE_DAYS", raising=False)

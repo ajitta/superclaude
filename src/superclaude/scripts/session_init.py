@@ -135,8 +135,13 @@ def get_pr_status() -> str:
     except FileNotFoundError:
         # gh CLI not installed
         return ""
-    except (subprocess.TimeoutExpired, subprocess.CalledProcessError, OSError,
-            json.JSONDecodeError, KeyError):
+    except (
+        subprocess.TimeoutExpired,
+        subprocess.CalledProcessError,
+        OSError,
+        json.JSONDecodeError,
+        KeyError,
+    ):
         return ""
 
 

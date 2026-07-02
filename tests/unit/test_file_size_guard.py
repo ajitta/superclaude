@@ -9,7 +9,13 @@ from pathlib import Path
 
 import pytest
 
-GUARD_SCRIPT = Path(__file__).parent.parent.parent / "src" / "superclaude" / "scripts" / "file_size_guard.py"
+GUARD_SCRIPT = (
+    Path(__file__).parent.parent.parent
+    / "src"
+    / "superclaude"
+    / "scripts"
+    / "file_size_guard.py"
+)
 
 
 def run_guard(tool_input: dict, env_override: dict | None = None) -> dict:
@@ -90,7 +96,9 @@ class TestApprove:
 
     def test_env_var_disabled(self, temp_dir):
         path = _create_file(temp_dir, "big.py", 50_000)
-        result = run_guard({"file_path": path}, env_override={"SUPERCLAUDE_SIZE_GUARD": "0"})
+        result = run_guard(
+            {"file_path": path}, env_override={"SUPERCLAUDE_SIZE_GUARD": "0"}
+        )
         assert result["decision"] == "approve"
 
     def test_empty_input(self):

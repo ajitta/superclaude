@@ -42,7 +42,11 @@ except ImportError:
     MCP_FALLBACKS = {}
 
 # Configuration
-INJECT_MODE = os.environ.get("CLAUDE_CONTEXT_INJECT", "1").lower() in ("1", "true", "yes")  # Default: inject
+INJECT_MODE = os.environ.get("CLAUDE_CONTEXT_INJECT", "1").lower() in (
+    "1",
+    "true",
+    "yes",
+)  # Default: inject
 MAX_TOKENS_ESTIMATE = int(
     os.environ.get("CLAUDE_CONTEXT_MAX_TOKENS", "8000")
 )  # ~8K tokens
@@ -101,20 +105,52 @@ TRIGGER_MAP = [
         "mcp/MCP_Tavily.md",
         1,
     ),
-    (r"(--c7|--context7|library.?docs|framework.?docs|resolve.?library)", "mcp/MCP_Context7.md", 2),
+    (
+        r"(--c7|--context7|library.?docs|framework.?docs|resolve.?library)",
+        "mcp/MCP_Context7.md",
+        2,
+    ),
     (r"(--seq|--sequential)", "mcp/MCP_Sequential.md", 2),
-    (r"(--play|--playwright|browser.?test|e2e.?test|network.?mock|mock.?api|browser.?automat)", "mcp/MCP_Playwright.md", 2),
-    (r"(--perf|--devtools|lighthouse|memory.?leak|core.?web.?vital|cwv|a11y.?audit|accessibility.?audit)", "mcp/MCP_Chrome-DevTools.md", 2),
+    (
+        r"(--play|--playwright|browser.?test|e2e.?test|network.?mock|mock.?api|browser.?automat)",
+        "mcp/MCP_Playwright.md",
+        2,
+    ),
+    (
+        r"(--perf|--devtools|lighthouse|memory.?leak|core.?web.?vital|cwv|a11y.?audit|accessibility.?audit)",
+        "mcp/MCP_Chrome-DevTools.md",
+        2,
+    ),
     # Business symbols - supplementary reference
-    (r"(business.?symbol|strategic.?symbol|business.?example|panel.?example|--structured)", "core/BUSINESS_SYMBOLS.md", 3),
+    (
+        r"(business.?symbol|strategic.?symbol|business.?example|panel.?example|--structured)",
+        "core/BUSINESS_SYMBOLS.md",
+        3,
+    ),
     # Modes — behavioral at P1, operational at P2
     (r"(--brainstorm|--bs)", "modes/MODE_Brainstorming.md", 1),
-    (r"(--introspect|self.?analysis|analyze reasoning)", "modes/MODE_Introspection.md", 2),
+    (
+        r"(--introspect|self.?analysis|analyze reasoning)",
+        "modes/MODE_Introspection.md",
+        2,
+    ),
     (r"(--task-manage)", "modes/MODE_Task_Management.md", 2),
-    (r"(--uc|--ultracompressed|token.?efficient|--token-efficient|--safe-mode)", "modes/MODE_Token_Efficiency.md", 1),
+    (
+        r"(--uc|--ultracompressed|token.?efficient|--token-efficient|--safe-mode)",
+        "modes/MODE_Token_Efficiency.md",
+        1,
+    ),
     (r"(--orchestrate|tool.?select|/sc:select-tool)", "modes/MODE_Orchestration.md", 2),
-    (r"(--research|deep.?research|systematic.?investigation|/sc:research)", "modes/MODE_DeepResearch.md", 1),
-    (r"(--business-panel|business.?panel|multi.?expert|strategic.?analysis|/sc:business-panel)", "modes/MODE_Business_Panel.md", 1),
+    (
+        r"(--research|deep.?research|systematic.?investigation|/sc:research)",
+        "modes/MODE_DeepResearch.md",
+        1,
+    ),
+    (
+        r"(--business-panel|business.?panel|multi.?expert|strategic.?analysis|/sc:business-panel)",
+        "modes/MODE_Business_Panel.md",
+        1,
+    ),
     # Core rule modules (Phase 2-1 core-lite split): core/RULES.md is the
     # always-loaded kernel; detail modules inject on matching context.
     # Unmapped in INSTRUCTION_MAP/TIER_0_MAP by design → Tier 2 full .md
@@ -210,13 +246,41 @@ FLAG_ALIASES: dict[str, list[str]] = {}
 
 # All valid flags for fuzzy matching fallback
 VALID_FLAGS = {
-    "brainstorm", "business-panel", "research", "introspect", "task-manage",
-    "orchestrate", "token-efficient", "c7", "context7", "seq", "sequential",
-    "serena", "play", "playwright", "perf",
-    "devtools", "tavily", "frontend-verify", "all-mcp", "no-mcp",
-    "delegate", "concurrency", "loop", "iterations", "validate", "safe-mode",
-    "fast", "plan", "uc", "ultracompressed", "scope", "focus",
-    "bs", "verbose-context", "vs",
+    "brainstorm",
+    "business-panel",
+    "research",
+    "introspect",
+    "task-manage",
+    "orchestrate",
+    "token-efficient",
+    "c7",
+    "context7",
+    "seq",
+    "sequential",
+    "serena",
+    "play",
+    "playwright",
+    "perf",
+    "devtools",
+    "tavily",
+    "frontend-verify",
+    "all-mcp",
+    "no-mcp",
+    "delegate",
+    "concurrency",
+    "loop",
+    "iterations",
+    "validate",
+    "safe-mode",
+    "fast",
+    "plan",
+    "uc",
+    "ultracompressed",
+    "scope",
+    "focus",
+    "bs",
+    "verbose-context",
+    "vs",
 }
 
 # Claude Code native flags / triggers — pass through unchanged, no fuzzy suggestion
@@ -266,6 +330,7 @@ def resolve_flags(prompt: str) -> tuple[str, list[str]]:
             )
 
     return corrected, notifications
+
 
 # v2.1.0: Skills configuration
 SHOW_SKILLS_SUMMARY = os.environ.get("CLAUDE_SHOW_SKILLS", "1") == "1"
@@ -461,7 +526,7 @@ def output_inject_mode(contexts: list[tuple[str, int]], prompt: str = "") -> Non
         if tier == 0 and context_file in TIER_0_MAP:
             # Defensive: skip hint if backing file is missing (avoids advertising deleted MCPs)
             if not (BASE_PATH / context_file).exists():
-                print(f'<!-- skip {context_file}: backing file not installed -->')
+                print(f"<!-- skip {context_file}: backing file not installed -->")
                 print()
                 continue
             hint = TIER_0_MAP[context_file]
@@ -520,31 +585,39 @@ def output_inject_mode(contexts: list[tuple[str, int]], prompt: str = "") -> Non
 # Execution flag patterns and their behavioral directives
 _EXECUTION_DIRECTIVES = {
     re.compile(r"--iterations\s+(\d+)", re.IGNORECASE): (
-        lambda m: f"<sc-directive flag=\"--iterations {m.group(1)}\">"
-        f"Execute exactly {m.group(1)} improvement iterations. "
-        f"After each iteration: state what changed. Do not stop early."
-        f"</sc-directive>"
+        lambda m: (
+            f'<sc-directive flag="--iterations {m.group(1)}">'
+            f"Execute exactly {m.group(1)} improvement iterations. "
+            f"After each iteration: state what changed. Do not stop early."
+            f"</sc-directive>"
+        )
     ),
     re.compile(r"--loop\b", re.IGNORECASE): (
-        lambda m: "<sc-directive flag=\"--loop\">"
-        "Iterative improvement mode: execute → self-evaluate → identify gaps → re-execute. "
-        "Repeat until no meaningful improvement. Report total iteration count when done."
-        "</sc-directive>"
+        lambda m: (
+            '<sc-directive flag="--loop">'
+            "Iterative improvement mode: execute → self-evaluate → identify gaps → re-execute. "
+            "Repeat until no meaningful improvement. Report total iteration count when done."
+            "</sc-directive>"
+        )
     ),
     re.compile(r"--concurrency\s+(\d+)", re.IGNORECASE): (
-        lambda m: f"<sc-directive flag=\"--concurrency {m.group(1)}\">"
-        f"Batch up to {m.group(1)} independent tool calls per message. "
-        f"Group reads, searches, and other non-dependent operations together."
-        f"</sc-directive>"
+        lambda m: (
+            f'<sc-directive flag="--concurrency {m.group(1)}">'
+            f"Batch up to {m.group(1)} independent tool calls per message. "
+            f"Group reads, searches, and other non-dependent operations together."
+            f"</sc-directive>"
+        )
     ),
     # --serena directive removed: INSTRUCTION_MAP[mcp/MCP_Serena.md] (Tier 1)
     # already provides workflow + decision rules. Avoids ~85 token duplicate.
     re.compile(r"--plan\b", re.IGNORECASE): (
-        lambda _: "<sc-directive flag=\"--plan\">"
-        "Lightweight planning mode: before implementing, generate a concise 5-line plan "
-        "(goal, approach, files to change, risks, verification). "
-        "Present the plan and wait for user approval before proceeding with implementation."
-        "</sc-directive>"
+        lambda _: (
+            '<sc-directive flag="--plan">'
+            "Lightweight planning mode: before implementing, generate a concise 5-line plan "
+            "(goal, approach, files to change, risks, verification). "
+            "Present the plan and wait for user approval before proceeding with implementation."
+            "</sc-directive>"
+        )
     ),
 }
 
@@ -610,7 +683,9 @@ def main() -> None:
 
     # --no-mcp notification — once per session
     if "--no-mcp" in prompt.lower() and "_notice:--no-mcp" not in get_loaded_contexts():
-        print("<!-- --no-mcp: MCP contexts suppressed. Using native tools + WebSearch. -->")
+        print(
+            "<!-- --no-mcp: MCP contexts suppressed. Using native tools + WebSearch. -->"
+        )
         print()
         mark_as_loaded("_notice:--no-mcp")
 

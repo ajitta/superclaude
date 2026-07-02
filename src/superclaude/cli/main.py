@@ -64,7 +64,9 @@ def _in_git_repo(start: Path) -> bool:
     is_flag=True,
     help="Step-by-step wizard: scope, optional git init, force, preview, confirm",
 )
-def install(force: bool, list_only: bool, list_all: bool, scope: str, interactive: bool):
+def install(
+    force: bool, list_only: bool, list_all: bool, scope: str, interactive: bool
+):
     """
     Install all SuperClaude components to Claude Code
 
@@ -110,6 +112,7 @@ def install(force: bool, list_only: bool, list_all: bool, scope: str, interactiv
 
     if interactive or _all_defaults():
         from .install_interactive import run_interactive_install
+
         sys.exit(run_interactive_install())
 
     # Get base path based on scope
@@ -121,7 +124,11 @@ def install(force: bool, list_only: bool, list_all: bool, scope: str, interactiv
         click.echo(f"📋 SuperClaude Components (scope: {scope}):\n")
         for name, info in components.items():
             status = f"{info['installed']}/{info['available']}"
-            icon = "✅" if info['installed'] == info['available'] and info['available'] > 0 else "⬜"
+            icon = (
+                "✅"
+                if info["installed"] == info["available"] and info["available"] > 0
+                else "⬜"
+            )
             click.echo(f"   {icon} {info['description']:40} [{status}]")
             click.echo(f"      └─ {info['target_path']}")
         return
@@ -141,10 +148,7 @@ def install(force: bool, list_only: bool, list_all: bool, scope: str, interactiv
 
     # Hint: suggest --scope local when defaulting to user inside a git repo
     scope_source = click.get_current_context().get_parameter_source("scope")
-    scope_was_default = (
-        scope_source is not None
-        and scope_source.name == "DEFAULT"
-    )
+    scope_was_default = scope_source is not None and scope_source.name == "DEFAULT"
     if scope_was_default and scope == "user" and _in_git_repo(Path.cwd()):
         click.echo(
             "💡 Detected git repo at CWD. If this is a team repo and you want a "
@@ -193,7 +197,9 @@ def install(force: bool, list_only: bool, list_all: bool, scope: str, interactiv
     is_flag=True,
     help="Also remove SuperClaude-registered MCP servers (default: keep, since MCP is shared across tools)",
 )
-def uninstall(scope: str, dry_run: bool, yes: bool, keep_settings: bool, remove_mcp: bool):
+def uninstall(
+    scope: str, dry_run: bool, yes: bool, keep_settings: bool, remove_mcp: bool
+):
     """
     Uninstall all SuperClaude components from Claude Code
 
@@ -269,7 +275,12 @@ def uninstall(scope: str, dry_run: bool, yes: bool, keep_settings: bool, remove_
 @main.command()
 @click.option("--servers", "-s", multiple=True, help="Specific MCP servers to install")
 @click.option("--list", "list_only", is_flag=True, help="List available MCP servers")
-@click.option("--status", "show_status", is_flag=True, help="Show MCP server status with fallbacks")
+@click.option(
+    "--status",
+    "show_status",
+    is_flag=True,
+    help="Show MCP server status with fallbacks",
+)
 @click.option(
     "--scope",
     default="user",
@@ -519,10 +530,14 @@ def agents(list_only: bool, agent_name: str, tokens: bool, scope: str):
             total_frontmatter += frontmatter_tokens
             total_full += full_tokens
 
-            click.echo(f"   {agent_file.stem:30} ~{frontmatter_tokens:4} tokens (full: ~{full_tokens})")
+            click.echo(
+                f"   {agent_file.stem:30} ~{frontmatter_tokens:4} tokens (full: ~{full_tokens})"
+            )
 
         click.echo()
-        click.echo(f"   Total: ~{total_frontmatter} frontmatter, ~{total_full} full load")
+        click.echo(
+            f"   Total: ~{total_frontmatter} frontmatter, ~{total_full} full load"
+        )
         click.echo(f"   Agents: {len(agent_files)}")
         return
 
@@ -531,13 +546,17 @@ def agents(list_only: bool, agent_name: str, tokens: bool, scope: str):
         # Find agent file
         agent_file = None
         for f in agent_files:
-            if f.stem == agent_name or f.stem.replace("-", "_") == agent_name.replace("-", "_"):
+            if f.stem == agent_name or f.stem.replace("-", "_") == agent_name.replace(
+                "-", "_"
+            ):
                 agent_file = f
                 break
 
         if not agent_file:
             click.echo(f"❌ Agent '{agent_name}' not found")
-            click.echo(f"   Available agents: {', '.join(f.stem for f in agent_files[:5])}...")
+            click.echo(
+                f"   Available agents: {', '.join(f.stem for f in agent_files[:5])}..."
+            )
             sys.exit(1)
 
         content = agent_file.read_text(encoding="utf-8")
@@ -548,7 +567,7 @@ def agents(list_only: bool, agent_name: str, tokens: bool, scope: str):
         click.echo(f"📋 Agent: {agent_file.stem}\n")
         click.echo(f"   Name: {fm.get('name', agent_file.stem)}")
         click.echo(f"   Description: {fm.get('description', 'N/A')}")
-        if fm.get('context'):
+        if fm.get("context"):
             click.echo(f"   Context: {fm.get('context')}")
 
         click.echo(f"\n   File: {agent_file}")
@@ -644,6 +663,7 @@ def skills(list_only: bool, skill_name: str, tokens: bool, scope: str):
                 format_token_report,
                 get_context_token_summary,
             )
+
             summary = get_context_token_summary()
             report = format_token_report(summary)
             click.echo(report)
@@ -656,14 +676,18 @@ def skills(list_only: bool, skill_name: str, tokens: bool, scope: str):
     if skill_name:
         skill_dir = None
         for d, m in skill_dirs:
-            if d.name == skill_name or d.name.replace("-", "_") == skill_name.replace("-", "_"):
+            if d.name == skill_name or d.name.replace("-", "_") == skill_name.replace(
+                "-", "_"
+            ):
                 skill_dir = d
                 manifest = m
                 break
 
         if not skill_dir:
             click.echo(f"❌ Skill '{skill_name}' not found")
-            click.echo(f"   Available skills: {', '.join(d.name for d, _ in skill_dirs[:5])}...")
+            click.echo(
+                f"   Available skills: {', '.join(d.name for d, _ in skill_dirs[:5])}..."
+            )
             sys.exit(1)
 
         content = manifest.read_text(encoding="utf-8")
@@ -674,11 +698,11 @@ def skills(list_only: bool, skill_name: str, tokens: bool, scope: str):
         click.echo(f"📋 Skill: {skill_dir.name}\n")
         click.echo(f"   Name: {fm.get('name', skill_dir.name)}")
         click.echo(f"   Description: {fm.get('description', 'N/A')}")
-        if fm.get('context'):
+        if fm.get("context"):
             click.echo(f"   Context: {fm.get('context')}")
-        if fm.get('agent'):
+        if fm.get("agent"):
             click.echo(f"   Agent: {fm.get('agent')}")
-        if fm.get('hooks'):
+        if fm.get("hooks"):
             click.echo(f"   Hooks: {list(fm.get('hooks', {}).keys())}")
 
         click.echo(f"\n   Path: {skill_dir}")
@@ -834,7 +858,9 @@ def audit(scope: str, verbose: bool, check: str, output_format: str, out: Path |
     if output_format == "markdown":
         report_path = out or Path("docs/reports/AUDIT.md")
         report_path.parent.mkdir(parents=True, exist_ok=True)
-        report_path.write_text(_format_audit_markdown(result, scope, check), encoding="utf-8")
+        report_path.write_text(
+            _format_audit_markdown(result, scope, check), encoding="utf-8"
+        )
         click.echo(f"📝 Audit report written to {report_path}")
         if not result["clean"]:
             sys.exit(1)
@@ -846,10 +872,12 @@ def audit(scope: str, verbose: bool, check: str, output_format: str, out: Path |
     if "drift" in result:
         drift = result["drift"]
         icon = "✅" if drift["clean"] else "⚠️"
-        click.echo(f"{icon} Drift: {drift['total_ok']} OK, "
-                    f"{drift['total_drifted']} drifted, "
-                    f"{drift['total_missing']} missing, "
-                    f"{drift['total_extra']} extra")
+        click.echo(
+            f"{icon} Drift: {drift['total_ok']} OK, "
+            f"{drift['total_drifted']} drifted, "
+            f"{drift['total_missing']} missing, "
+            f"{drift['total_extra']} extra"
+        )
         if verbose and not drift["clean"]:
             for component, stats in drift["components"].items():
                 if stats["drifted"] + stats["missing"] + stats["extra"] == 0:
@@ -916,7 +944,9 @@ def _format_audit_markdown(result: dict, scope: str, check: str) -> str:
         ]
         if not drift["clean"]:
             for component, stats in drift["components"].items():
-                non_ok = [(f, s) for f, s in stats.get("files", {}).items() if s != "OK"]
+                non_ok = [
+                    (f, s) for f, s in stats.get("files", {}).items() if s != "OK"
+                ]
                 if not non_ok:
                     continue
                 lines.append(f"### {component}")

@@ -6,6 +6,7 @@ Cross-platform compatible (Windows/macOS/Linux).
 
 Checks stop_hook_active to prevent infinite loops (Claude Code best practice).
 """
+
 import json
 import shutil
 import subprocess

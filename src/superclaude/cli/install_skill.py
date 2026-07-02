@@ -59,6 +59,7 @@ def install_skill_command(
             _resolve_skill_templates,
             _resolve_template_paths,
         )
+
         base_path = target_path.parent  # target_path is base_path/skills
         template_vars = _resolve_template_paths(base_path, scope)
         _resolve_skill_templates(skill_target, template_vars)
@@ -122,5 +123,3 @@ def _is_valid_skill_dir(path: Path) -> bool:
         if item.is_file() and item.suffix in {".ts", ".js", ".py", ".json"}:
             return True
     return False
-
-

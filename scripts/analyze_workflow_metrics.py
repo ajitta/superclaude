@@ -33,7 +33,7 @@ class WorkflowMetricsAnalyzer:
             print(f"Warning: {self.metrics_file} not found")
             return
 
-        with open(self.metrics_file, 'r') as f:
+        with open(self.metrics_file, "r") as f:
             for line in f:
                 if line.strip():
                     self.metrics.append(json.loads(line))
@@ -54,8 +54,7 @@ class WorkflowMetricsAnalyzer:
             raise ValueError(f"Invalid period: {period}")
 
         filtered = [
-            m for m in self.metrics
-            if datetime.fromisoformat(m['timestamp']) >= cutoff
+            m for m in self.metrics if datetime.fromisoformat(m["timestamp"]) >= cutoff
         ]
 
         print(f"Filtered to {len(filtered)} records in last {period}")
@@ -66,16 +65,20 @@ class WorkflowMetricsAnalyzer:
         by_task = defaultdict(list)
 
         for m in metrics:
-            by_task[m['task_type']].append(m)
+            by_task[m["task_type"]].append(m)
 
         results = {}
         for task_type, task_metrics in by_task.items():
             results[task_type] = {
-                'count': len(task_metrics),
-                'avg_tokens': statistics.mean(m['tokens_used'] for m in task_metrics),
-                'avg_time_ms': statistics.mean(m['time_ms'] for m in task_metrics),
-                'success_rate': sum(m['success'] for m in task_metrics) / len(task_metrics) * 100,
-                'avg_files_read': statistics.mean(m.get('files_read', 0) for m in task_metrics),
+                "count": len(task_metrics),
+                "avg_tokens": statistics.mean(m["tokens_used"] for m in task_metrics),
+                "avg_time_ms": statistics.mean(m["time_ms"] for m in task_metrics),
+                "success_rate": sum(m["success"] for m in task_metrics)
+                / len(task_metrics)
+                * 100,
+                "avg_files_read": statistics.mean(
+                    m.get("files_read", 0) for m in task_metrics
+                ),
             }
 
         return results
@@ -85,15 +88,17 @@ class WorkflowMetricsAnalyzer:
         by_complexity = defaultdict(list)
 
         for m in metrics:
-            by_complexity[m['complexity']].append(m)
+            by_complexity[m["complexity"]].append(m)
 
         results = {}
         for complexity, comp_metrics in by_complexity.items():
             results[complexity] = {
-                'count': len(comp_metrics),
-                'avg_tokens': statistics.mean(m['tokens_used'] for m in comp_metrics),
-                'avg_time_ms': statistics.mean(m['time_ms'] for m in comp_metrics),
-                'success_rate': sum(m['success'] for m in comp_metrics) / len(comp_metrics) * 100,
+                "count": len(comp_metrics),
+                "avg_tokens": statistics.mean(m["tokens_used"] for m in comp_metrics),
+                "avg_time_ms": statistics.mean(m["time_ms"] for m in comp_metrics),
+                "success_rate": sum(m["success"] for m in comp_metrics)
+                / len(comp_metrics)
+                * 100,
             }
 
         return results
@@ -103,16 +108,20 @@ class WorkflowMetricsAnalyzer:
         by_workflow = defaultdict(list)
 
         for m in metrics:
-            by_workflow[m['workflow_id']].append(m)
+            by_workflow[m["workflow_id"]].append(m)
 
         results = {}
         for workflow_id, wf_metrics in by_workflow.items():
             results[workflow_id] = {
-                'count': len(wf_metrics),
-                'avg_tokens': statistics.mean(m['tokens_used'] for m in wf_metrics),
-                'median_tokens': statistics.median(m['tokens_used'] for m in wf_metrics),
-                'avg_time_ms': statistics.mean(m['time_ms'] for m in wf_metrics),
-                'success_rate': sum(m['success'] for m in wf_metrics) / len(wf_metrics) * 100,
+                "count": len(wf_metrics),
+                "avg_tokens": statistics.mean(m["tokens_used"] for m in wf_metrics),
+                "median_tokens": statistics.median(
+                    m["tokens_used"] for m in wf_metrics
+                ),
+                "avg_time_ms": statistics.mean(m["time_ms"] for m in wf_metrics),
+                "success_rate": sum(m["success"] for m in wf_metrics)
+                / len(wf_metrics)
+                * 100,
             }
 
         return results
@@ -122,17 +131,17 @@ class WorkflowMetricsAnalyzer:
         by_task_workflow = defaultdict(lambda: defaultdict(list))
 
         for m in metrics:
-            by_task_workflow[m['task_type']][m['workflow_id']].append(m)
+            by_task_workflow[m["task_type"]][m["workflow_id"]].append(m)
 
         best_workflows = {}
         for task_type, workflows in by_task_workflow.items():
             best_workflow = None
-            best_score = float('inf')
+            best_score = float("inf")
 
             for workflow_id, wf_metrics in workflows.items():
                 # Score = avg_tokens (lower is better)
-                avg_tokens = statistics.mean(m['tokens_used'] for m in wf_metrics)
-                success_rate = sum(m['success'] for m in wf_metrics) / len(wf_metrics)
+                avg_tokens = statistics.mean(m["tokens_used"] for m in wf_metrics)
+                success_rate = sum(m["success"] for m in wf_metrics) / len(wf_metrics)
 
                 # Only consider if success rate >= 95%
                 if success_rate >= 0.95:
@@ -151,37 +160,41 @@ class WorkflowMetricsAnalyzer:
 
         # Expected token budgets by complexity
         budgets = {
-            'ultra-light': 800,
-            'light': 2000,
-            'medium': 5000,
-            'heavy': 20000,
-            'ultra-heavy': 50000
+            "ultra-light": 800,
+            "light": 2000,
+            "medium": 5000,
+            "heavy": 20000,
+            "ultra-heavy": 50000,
         }
 
         for m in metrics:
             issues = []
 
             # Check token budget overrun
-            expected_budget = budgets.get(m['complexity'], 5000)
-            if m['tokens_used'] > expected_budget * 1.3:  # 30% over budget
+            expected_budget = budgets.get(m["complexity"], 5000)
+            if m["tokens_used"] > expected_budget * 1.3:  # 30% over budget
                 issues.append(f"Token overrun: {m['tokens_used']} vs {expected_budget}")
 
             # Check success rate
-            if not m['success']:
+            if not m["success"]:
                 issues.append("Task failed")
 
             # Check time performance (light tasks should be fast)
-            if m['complexity'] in ['ultra-light', 'light'] and m['time_ms'] > 10000:
-                issues.append(f"Slow execution: {m['time_ms']}ms for {m['complexity']} task")
+            if m["complexity"] in ["ultra-light", "light"] and m["time_ms"] > 10000:
+                issues.append(
+                    f"Slow execution: {m['time_ms']}ms for {m['complexity']} task"
+                )
 
             if issues:
-                inefficiencies.append({
-                    'timestamp': m['timestamp'],
-                    'task_type': m['task_type'],
-                    'complexity': m['complexity'],
-                    'workflow_id': m['workflow_id'],
-                    'issues': issues
-                })
+                inefficiencies.append(
+                    {
+                        "timestamp": m["timestamp"],
+                        "task_type": m["task_type"],
+                        "complexity": m["complexity"],
+                        "workflow_id": m["workflow_id"],
+                        "issues": issues,
+                    }
+                )
 
         return inefficiencies
 
@@ -189,28 +202,28 @@ class WorkflowMetricsAnalyzer:
         """Calculate token savings vs unlimited baseline"""
         # Unlimited baseline estimates
         baseline = {
-            'ultra-light': 1000,
-            'light': 2500,
-            'medium': 7500,
-            'heavy': 30000,
-            'ultra-heavy': 100000
+            "ultra-light": 1000,
+            "light": 2500,
+            "medium": 7500,
+            "heavy": 30000,
+            "ultra-heavy": 100000,
         }
 
         total_actual = 0
         total_baseline = 0
 
         for m in metrics:
-            total_actual += m['tokens_used']
-            total_baseline += baseline.get(m['complexity'], 7500)
+            total_actual += m["tokens_used"]
+            total_baseline += baseline.get(m["complexity"], 7500)
 
         savings = total_baseline - total_actual
         savings_percent = (savings / total_baseline * 100) if total_baseline > 0 else 0
 
         return {
-            'total_actual': total_actual,
-            'total_baseline': total_baseline,
-            'total_savings': savings,
-            'savings_percent': savings_percent
+            "total_actual": total_actual,
+            "total_baseline": total_baseline,
+            "total_savings": savings,
+            "savings_percent": savings_percent,
         }
 
     def generate_report(self, period: str) -> str:
@@ -229,9 +242,15 @@ class WorkflowMetricsAnalyzer:
         # Overall statistics
         report.append("## Overall Statistics")
         report.append(f"Total Tasks: {len(metrics)}")
-        report.append(f"Success Rate: {sum(m['success'] for m in metrics) / len(metrics) * 100:.1f}%")
-        report.append(f"Avg Tokens: {statistics.mean(m['tokens_used'] for m in metrics):.0f}")
-        report.append(f"Avg Time: {statistics.mean(m['time_ms'] for m in metrics):.0f}ms")
+        report.append(
+            f"Success Rate: {sum(m['success'] for m in metrics) / len(metrics) * 100:.1f}%"
+        )
+        report.append(
+            f"Avg Tokens: {statistics.mean(m['tokens_used'] for m in metrics):.0f}"
+        )
+        report.append(
+            f"Avg Time: {statistics.mean(m['time_ms'] for m in metrics):.0f}ms"
+        )
         report.append("")
 
         # Token savings
@@ -239,7 +258,9 @@ class WorkflowMetricsAnalyzer:
         report.append("## Token Efficiency")
         report.append(f"Actual Usage: {savings['total_actual']:,} tokens")
         report.append(f"Unlimited Baseline: {savings['total_baseline']:,} tokens")
-        report.append(f"Total Savings: {savings['total_savings']:,} tokens ({savings['savings_percent']:.1f}%)")
+        report.append(
+            f"Total Savings: {savings['total_savings']:,} tokens ({savings['savings_percent']:.1f}%)"
+        )
         report.append("")
 
         # By task type
@@ -258,7 +279,7 @@ class WorkflowMetricsAnalyzer:
         # By complexity
         report.append("## Analysis by Complexity")
         by_complexity = self.analyze_by_complexity(metrics)
-        for complexity in ['ultra-light', 'light', 'medium', 'heavy', 'ultra-heavy']:
+        for complexity in ["ultra-light", "light", "medium", "heavy", "ultra-heavy"]:
             if complexity in by_complexity:
                 stats = by_complexity[complexity]
                 report.append(f"\n### {complexity}")
@@ -285,7 +306,7 @@ class WorkflowMetricsAnalyzer:
                 report.append(f"\n  {issue['timestamp']}")
                 report.append(f"    Task: {issue['task_type']} ({issue['complexity']})")
                 report.append(f"    Workflow: {issue['workflow_id']}")
-                for problem in issue['issues']:
+                for problem in issue["issues"]:
                     report.append(f"    - {problem}")
 
         report.append("")
@@ -297,35 +318,29 @@ class WorkflowMetricsAnalyzer:
 def main():
     parser = argparse.ArgumentParser(description="Analyze workflow metrics")
     parser.add_argument(
-        '--period',
-        choices=['week', 'month', 'all'],
-        default='week',
-        help='Analysis time period'
+        "--period",
+        choices=["week", "month", "all"],
+        default="week",
+        help="Analysis time period",
     )
-    parser.add_argument(
-        '--task-type',
-        help='Filter by specific task type'
-    )
-    parser.add_argument(
-        '--output',
-        help='Output file (default: stdout)'
-    )
+    parser.add_argument("--task-type", help="Filter by specific task type")
+    parser.add_argument("--output", help="Output file (default: stdout)")
 
     args = parser.parse_args()
 
     # Find metrics file
-    metrics_file = Path('docs/memory/workflow_metrics.jsonl')
+    metrics_file = Path("docs/memory/workflow_metrics.jsonl")
 
     analyzer = WorkflowMetricsAnalyzer(metrics_file)
     report = analyzer.generate_report(args.period)
 
     if args.output:
-        with open(args.output, 'w') as f:
+        with open(args.output, "w") as f:
             f.write(report)
         print(f"Report written to {args.output}")
     else:
         print(report)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

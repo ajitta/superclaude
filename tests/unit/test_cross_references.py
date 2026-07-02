@@ -31,8 +31,7 @@ def _all_content_files():
     for d in (COMMANDS_DIR, AGENTS_DIR, MODES_DIR):
         if d.exists():
             files.extend(
-                f for f in sorted(d.glob("*.md"))
-                if f.stem.upper() != "README"
+                f for f in sorted(d.glob("*.md")) if f.stem.upper() != "README"
             )
     return files
 
@@ -44,7 +43,6 @@ def _extract_handoff_targets(content: str) -> list[str]:
         return []
     raw = match.group(1)
     return re.findall(r"/sc:([\w-]+)", raw)
-
 
 
 def parse_frontmatter(text: str) -> dict[str, str]:
@@ -65,10 +63,11 @@ ALL_CONTENT_FILES = _all_content_files()
 ALL_CONTENT_IDS = [f"{f.parent.name}/{f.stem}" for f in ALL_CONTENT_FILES]
 
 # Available command names (from commands/ filenames)
-AVAILABLE_COMMANDS = {
-    f.stem for f in COMMANDS_DIR.glob("*.md")
-    if f.stem.upper() != "README"
-} if COMMANDS_DIR.exists() else set()
+AVAILABLE_COMMANDS = (
+    {f.stem for f in COMMANDS_DIR.glob("*.md") if f.stem.upper() != "README"}
+    if COMMANDS_DIR.exists()
+    else set()
+)
 
 
 @pytest.fixture(params=ALL_CONTENT_FILES, ids=ALL_CONTENT_IDS)
@@ -95,7 +94,6 @@ class TestHandoffIntegrity:
             )
 
 
-
 class TestAgentTriggerUniqueness:
     """Agent trigger keywords should not have exact duplicates."""
 
@@ -116,7 +114,9 @@ class TestAgentTriggerUniqueness:
             match = re.search(r"triggers?\s*[-–—]\s*(.+?)(?:\)|$)", desc, re.IGNORECASE)
             if not match:
                 continue
-            triggers = [t.strip().lower() for t in match.group(1).split(",") if t.strip()]
+            triggers = [
+                t.strip().lower() for t in match.group(1).split(",") if t.strip()
+            ]
             for trigger in triggers:
                 trigger_owners[trigger].append(agent_file.stem)
 
@@ -125,7 +125,6 @@ class TestAgentTriggerUniqueness:
             for trigger, owners in trigger_owners.items()
             if len(owners) > 1
         }
-        assert not duplicates, (
-            "Duplicate trigger keywords found:\n"
-            + "\n".join(f"  '{k}': {v}" for k, v in sorted(duplicates.items()))
+        assert not duplicates, "Duplicate trigger keywords found:\n" + "\n".join(
+            f"  '{k}': {v}" for k, v in sorted(duplicates.items())
         )

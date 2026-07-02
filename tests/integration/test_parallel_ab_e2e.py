@@ -6,6 +6,7 @@ scenario through :func:`orchestrate` and asserts the artifacts land.
 
     AB_E2E=1 uv run pytest tests/integration/test_parallel_ab_e2e.py -v
 """
+
 from __future__ import annotations
 
 import asyncio
@@ -29,7 +30,9 @@ def test_parallel_ab_e2e(tmp_path: Path) -> None:
     decision = asyncio.run(orchestrate(SPEC, out_dir=tmp_path))
 
     obs_files = sorted(tmp_path.glob("obs-*.json"))
-    assert len(obs_files) == 4, f"expected 4 obs files, got {[p.name for p in obs_files]}"
+    assert len(obs_files) == 4, (
+        f"expected 4 obs files, got {[p.name for p in obs_files]}"
+    )
 
     matrix = tmp_path / "matrix.md"
     assert matrix.is_file(), "matrix.md not emitted"
@@ -39,7 +42,9 @@ def test_parallel_ab_e2e(tmp_path: Path) -> None:
         if line.startswith("|") and not set(line) <= set("| -:")
     ]
     # header row + 4 variant rows
-    assert len(data_rows) == 5, f"expected header + 4 variant rows, got {len(data_rows)}"
+    assert len(data_rows) == 5, (
+        f"expected header + 4 variant rows, got {len(data_rows)}"
+    )
 
     assert decision.is_file() and decision.name == "decision.md"
     assert decision.read_text(encoding="utf-8").strip(), "decision.md is empty"

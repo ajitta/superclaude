@@ -16,7 +16,11 @@ COMPONENTS = {
     "modes": ("modes", "superclaude/modes", "Behavioral modes"),
     "mcp": ("mcp", "superclaude/mcp", "MCP server documentation"),
     "skills": ("skills", "skills", "Skills"),
-    "templates": ("templates", "superclaude/templates", "Doc scaffold templates (consumed by /sc:init, not slash commands)"),
+    "templates": (
+        "templates",
+        "superclaude/templates",
+        "Doc scaffold templates (consumed by /sc:init, not slash commands)",
+    ),
 }
 
 

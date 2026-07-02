@@ -70,10 +70,10 @@ class _FakeSpawner:
 
 @pytest.mark.asyncio
 async def test_ok_path_writes_observation(tmp_path: Path):
-    spawner = _FakeSpawner([SpawnResult(stdout=_json_stdout(), stderr=b"", returncode=0)])
-    obs = await run_variant(
-        _variant(), _scenario(), _cfg(), tmp_path, spawner=spawner
+    spawner = _FakeSpawner(
+        [SpawnResult(stdout=_json_stdout(), stderr=b"", returncode=0)]
     )
+    obs = await run_variant(_variant(), _scenario(), _cfg(), tmp_path, spawner=spawner)
     assert isinstance(obs, Observation)
     assert obs.exit_status == "ok"
     assert obs.tokens.input == 1240
@@ -89,12 +89,21 @@ async def test_ok_path_writes_observation(tmp_path: Path):
 async def test_non_zero_exit_with_oauth_fallback_retries(tmp_path: Path):
     # plain (non-slash) input so --bare is actually added and the retry can drop it
     plain = Scenario(input="explain rate limiting", baseline_skill=None)
-    spawner = _FakeSpawner([
-        SpawnResult(stdout=b"", stderr=b"Error: not authenticated. Please log in.", returncode=1),
-        SpawnResult(stdout=_json_stdout(), stderr=b"", returncode=0),
-    ])
+    spawner = _FakeSpawner(
+        [
+            SpawnResult(
+                stdout=b"",
+                stderr=b"Error: not authenticated. Please log in.",
+                returncode=1,
+            ),
+            SpawnResult(stdout=_json_stdout(), stderr=b"", returncode=0),
+        ]
+    )
     obs = await run_variant(
-        _variant(), plain, _cfg(bare=True, oauth_fallback=True), tmp_path,
+        _variant(),
+        plain,
+        _cfg(bare=True, oauth_fallback=True),
+        tmp_path,
         spawner=spawner,
     )
     assert obs.exit_status == "ok"
@@ -106,11 +115,16 @@ async def test_non_zero_exit_with_oauth_fallback_retries(tmp_path: Path):
 
 @pytest.mark.asyncio
 async def test_non_zero_exit_without_oauth_fallback_does_not_retry(tmp_path: Path):
-    spawner = _FakeSpawner([
-        SpawnResult(stdout=b"", stderr=b"Error: not authenticated", returncode=1),
-    ])
+    spawner = _FakeSpawner(
+        [
+            SpawnResult(stdout=b"", stderr=b"Error: not authenticated", returncode=1),
+        ]
+    )
     obs = await run_variant(
-        _variant(), _scenario(), _cfg(bare=True, oauth_fallback=False), tmp_path,
+        _variant(),
+        _scenario(),
+        _cfg(bare=True, oauth_fallback=False),
+        tmp_path,
         spawner=spawner,
     )
     assert obs.exit_status == "error"
@@ -120,11 +134,16 @@ async def test_non_zero_exit_without_oauth_fallback_does_not_retry(tmp_path: Pat
 @pytest.mark.asyncio
 async def test_non_zero_exit_without_auth_pattern_does_not_retry(tmp_path: Path):
     # exit=1 but stderr has no auth keywords → don't retry even with oauth_fallback
-    spawner = _FakeSpawner([
-        SpawnResult(stdout=b"", stderr=b"Error: file not found", returncode=1),
-    ])
+    spawner = _FakeSpawner(
+        [
+            SpawnResult(stdout=b"", stderr=b"Error: file not found", returncode=1),
+        ]
+    )
     obs = await run_variant(
-        _variant(), _scenario(), _cfg(bare=True, oauth_fallback=True), tmp_path,
+        _variant(),
+        _scenario(),
+        _cfg(bare=True, oauth_fallback=True),
+        tmp_path,
         spawner=spawner,
     )
     assert obs.exit_status == "error"
@@ -134,9 +153,7 @@ async def test_non_zero_exit_without_auth_pattern_does_not_retry(tmp_path: Path)
 @pytest.mark.asyncio
 async def test_timeout_produces_timeout_obs(tmp_path: Path):
     spawner = _FakeSpawner([asyncio.TimeoutError()])
-    obs = await run_variant(
-        _variant(), _scenario(), _cfg(), tmp_path, spawner=spawner
-    )
+    obs = await run_variant(_variant(), _scenario(), _cfg(), tmp_path, spawner=spawner)
     assert obs.exit_status == "timeout"
     assert (tmp_path / "obs-A.json").exists()
 
@@ -144,9 +161,11 @@ async def test_timeout_produces_timeout_obs(tmp_path: Path):
 @pytest.mark.asyncio
 async def test_tool_calls_parsed_from_json(tmp_path: Path):
     tools = [{"name": "Grep", "count": 3}, {"name": "Read", "count": 2}]
-    spawner = _FakeSpawner([
-        SpawnResult(stdout=_json_stdout(tools=tools), stderr=b"", returncode=0),
-    ])
+    spawner = _FakeSpawner(
+        [
+            SpawnResult(stdout=_json_stdout(tools=tools), stderr=b"", returncode=0),
+        ]
+    )
     obs = await run_variant(_variant(), _scenario(), _cfg(), tmp_path, spawner=spawner)
     assert obs.tool_calls == (
         ToolCall(name="Grep", count=3),
@@ -156,7 +175,9 @@ async def test_tool_calls_parsed_from_json(tmp_path: Path):
 
 @pytest.mark.asyncio
 async def test_plain_text_stdout_fallback_zero_tokens(tmp_path: Path):
-    spawner = _FakeSpawner([SpawnResult(stdout=b"plain text reply", stderr=b"", returncode=0)])
+    spawner = _FakeSpawner(
+        [SpawnResult(stdout=b"plain text reply", stderr=b"", returncode=0)]
+    )
     obs = await run_variant(_variant(), _scenario(), _cfg(), tmp_path, spawner=spawner)
     assert obs.exit_status == "ok"
     assert obs.tokens.input == 0
@@ -222,8 +243,12 @@ def test_parse_output_handles_invalid_json():
 
 
 def test_parse_output_extracts_usage_and_tools():
-    payload = _json_stdout(text="reply", input_tokens=10, output_tokens=20,
-                           tools=[{"name": "Bash", "count": 1}])
+    payload = _json_stdout(
+        text="reply",
+        input_tokens=10,
+        output_tokens=20,
+        tools=[{"name": "Bash", "count": 1}],
+    )
     p = _parse_output(payload)
     assert p.text == "reply"
     assert p.input_tokens == 10
@@ -232,7 +257,9 @@ def test_parse_output_extracts_usage_and_tools():
 
 
 def test_parse_output_extracts_is_error_flag():
-    err_payload = json.dumps({"result": "rate limited", "is_error": True}).encode("utf-8")
+    err_payload = json.dumps({"result": "rate limited", "is_error": True}).encode(
+        "utf-8"
+    )
     assert _parse_output(err_payload).is_error is True
     # absent key defaults to False
     assert _parse_output(_json_stdout()).is_error is False

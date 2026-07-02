@@ -160,6 +160,7 @@ def estimate_agent_tokens(agent_file: Path) -> TokenEstimate | None:
 def get_skill_directories() -> list[Path]:
     """Get all skill directories to scan."""
     from superclaude.utils import get_skill_directories as _get
+
     return _get()
 
 
@@ -240,9 +241,7 @@ def format_token_report(summary: dict) -> str:
     # Skills section
     skills = summary.get("skills", {})
     lines.append(f"Skills ({skills.get('count', 0)}):")
-    lines.append(
-        f"  Frontmatter: ~{skills.get('frontmatter_tokens', 0)} tokens"
-    )
+    lines.append(f"  Frontmatter: ~{skills.get('frontmatter_tokens', 0)} tokens")
     lines.append(f"  Full load:   ~{skills.get('full_tokens', 0)} tokens")
 
     for item in skills.get("items", []):

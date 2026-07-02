@@ -141,7 +141,10 @@ class TestMergeHookArrays:
         sc1 = self._sc_hook("python session_init.py")
         sc2 = {"hooks": [{"command": "python prettier_hook.py"}]}
         existing = [self._user_hook(), sc1, sc2]
-        new = [self._sc_hook("python session_init.py"), {"hooks": [{"command": "python prettier_hook.py"}]}]
+        new = [
+            self._sc_hook("python session_init.py"),
+            {"hooks": [{"command": "python prettier_hook.py"}]},
+        ]
         result = self.merge(existing, new, force=True)
         # User hook + 2 new SC hooks (old ones removed)
         sc_commands = [
@@ -221,9 +224,7 @@ class TestMergeHooksToSettings:
         )
 
         # First install SC hooks
-        merge_hooks_to_settings(
-            base_path, self._sc_hooks_config(), scope="user"
-        )
+        merge_hooks_to_settings(base_path, self._sc_hooks_config(), scope="user")
 
         # Manually add a user hook
         settings = json.loads((base_path / "settings.json").read_text())
@@ -239,9 +240,7 @@ class TestMergeHooksToSettings:
         settings = json.loads((base_path / "settings.json").read_text())
         # User hook should remain
         assert "PostToolUse" in settings["hooks"]
-        post_cmds = [
-            h["hooks"][0]["command"] for h in settings["hooks"]["PostToolUse"]
-        ]
+        post_cmds = [h["hooks"][0]["command"] for h in settings["hooks"]["PostToolUse"]]
         assert "npm run lint" in post_cmds
         assert "python prettier_hook.py" not in post_cmds
         # SessionStart should be gone entirely (was only SC hooks)
@@ -253,13 +252,19 @@ class TestMergeHooksToSettings:
         config["hooks"]["TeammateIdle"] = [
             {
                 "_comment": "[superclaude] experimental",
-                "hooks": [{"command": "echo '[superclaude] Teammate idle — assign next task'"}],
+                "hooks": [
+                    {"command": "echo '[superclaude] Teammate idle — assign next task'"}
+                ],
             }
         ]
         config["hooks"]["TaskCompleted"] = [
             {
                 "_comment": "[superclaude] experimental",
-                "hooks": [{"command": "echo '[superclaude] Task completed — aggregate results'"}],
+                "hooks": [
+                    {
+                        "command": "echo '[superclaude] Task completed — aggregate results'"
+                    }
+                ],
             }
         ]
         return config
@@ -276,7 +281,12 @@ class TestMergeHooksToSettings:
         merge_hooks_to_settings(base_path, config, scope="user")
 
         settings = json.loads((base_path / "settings.json").read_text())
-        for hook_type in ["SessionStart", "PostToolUse", "TeammateIdle", "TaskCompleted"]:
+        for hook_type in [
+            "SessionStart",
+            "PostToolUse",
+            "TeammateIdle",
+            "TaskCompleted",
+        ]:
             entries = settings["hooks"].get(hook_type, [])
             assert len(entries) == len(config["hooks"][hook_type]), (
                 f"{hook_type}: expected {len(config['hooks'][hook_type])} entries, got {len(entries)}"
@@ -361,8 +371,14 @@ class TestHookDedup:
         self.merge = merge_hooks_to_settings
 
     def test_signature_matches_identical_entries(self):
-        a = {"matcher": "", "hooks": [{"type": "command", "command": "serena-hooks remind"}]}
-        b = {"matcher": "", "hooks": [{"type": "command", "command": "serena-hooks remind"}]}
+        a = {
+            "matcher": "",
+            "hooks": [{"type": "command", "command": "serena-hooks remind"}],
+        }
+        b = {
+            "matcher": "",
+            "hooks": [{"type": "command", "command": "serena-hooks remind"}],
+        }
         assert self.signature(a) == self.signature(b)
 
     def test_signature_distinguishes_matcher(self):
@@ -407,11 +423,12 @@ class TestHookDedup:
 
         # Pre-existing settings.json: SC hooks present + 3 duplicate serena entries
         sc_entry = {"hooks": [{"command": "python ~/.claude/scripts/session_init.py"}]}
-        third_party = {"matcher": "", "hooks": [{"type": "command", "command": "serena-hooks remind"}]}
+        third_party = {
+            "matcher": "",
+            "hooks": [{"type": "command", "command": "serena-hooks remind"}],
+        }
         existing = {
-            "hooks": {
-                "PreToolUse": [sc_entry, third_party, third_party, third_party]
-            }
+            "hooks": {"PreToolUse": [sc_entry, third_party, third_party, third_party]}
         }
         (base_path / "settings.json").write_text(json.dumps(existing, indent=2))
 
@@ -425,8 +442,12 @@ class TestHookDedup:
         # 3 serena duplicates collapsed to 1; SC hook preserved
         assert len(pretooluse) == 2
         serena_count = sum(
-            1 for e in pretooluse
-            if any("serena-hooks remind" in h.get("command", "") for h in e.get("hooks", []))
+            1
+            for e in pretooluse
+            if any(
+                "serena-hooks remind" in h.get("command", "")
+                for h in e.get("hooks", [])
+            )
         )
         assert serena_count == 1, f"Expected 1 serena entry, got {serena_count}"
 
@@ -436,7 +457,10 @@ class TestHookDedup:
         base_path.mkdir()
 
         sc_entry = {"hooks": [{"command": "python ~/.claude/scripts/session_init.py"}]}
-        third_party = {"matcher": "", "hooks": [{"type": "command", "command": "serena-hooks remind"}]}
+        third_party = {
+            "matcher": "",
+            "hooks": [{"type": "command", "command": "serena-hooks remind"}],
+        }
 
         # Initial install
         hooks_config = {"hooks": {"PreToolUse": [sc_entry]}}
@@ -453,8 +477,12 @@ class TestHookDedup:
         result = json.loads((base_path / "settings.json").read_text())
         pretooluse = result["hooks"]["PreToolUse"]
         serena_count = sum(
-            1 for e in pretooluse
-            if any("serena-hooks remind" in h.get("command", "") for h in e.get("hooks", []))
+            1
+            for e in pretooluse
+            if any(
+                "serena-hooks remind" in h.get("command", "")
+                for h in e.get("hooks", [])
+            )
         )
         assert serena_count == 1, (
             f"After 4 accumulation rounds, expected 1 serena entry, got {serena_count}"

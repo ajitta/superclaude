@@ -16,7 +16,9 @@ FIXTURES = Path(__file__).parent / "fixtures"
 def _copy_fixtures(dst: Path, names: list[str]) -> None:
     dst.mkdir(parents=True, exist_ok=True)
     for n in names:
-        shutil.copy(FIXTURES / n, dst / n.replace("obs_", "obs-").replace(".json", ".json"))
+        shutil.copy(
+            FIXTURES / n, dst / n.replace("obs_", "obs-").replace(".json", ".json")
+        )
 
 
 def _write_obs(dst: Path, obs: dict) -> None:
@@ -33,7 +35,7 @@ def _ok_obs(vid: str, wall: float = 10.0, output_tokens: int = 1000) -> dict:
         "clarifying_questions": 0,
         "tokens": {"input": 500, "output": output_tokens},
         "wall_seconds": wall,
-        "final_output_sha256": f"{vid.lower()*4}1234567890",
+        "final_output_sha256": f"{vid.lower() * 4}1234567890",
         "axes": {"think_before": f"{vid} note"},
     }
 
@@ -140,7 +142,9 @@ def test_empty_obs_dir_raises(tmp_path: Path):
 
 def test_ignores_unrelated_files(tmp_path: Path):
     _write_obs(tmp_path / "obs-A.json", _ok_obs("A"))
-    (tmp_path / "matrix.md").write_text("stale", encoding="utf-8")  # should not be parsed as obs
+    (tmp_path / "matrix.md").write_text(
+        "stale", encoding="utf-8"
+    )  # should not be parsed as obs
     (tmp_path / "notes.txt").write_text("ignore", encoding="utf-8")
     matrix_path, _ = aggregate(tmp_path)
     assert matrix_path.exists()

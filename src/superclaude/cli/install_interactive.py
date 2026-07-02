@@ -123,9 +123,7 @@ def run_interactive_install() -> int:
 
     click.echo()
     click.echo("Step 3/5: Force reinstall existing files?")
-    force = click.confirm(
-        "  Overwrite already-installed files?", default=False
-    )
+    force = click.confirm("  Overwrite already-installed files?", default=False)
 
     _show_preview(base_path, scope, force)
 

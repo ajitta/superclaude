@@ -92,11 +92,35 @@ def list_all_components(base_path: Path = None) -> Dict[str, Dict[str, Any]]:
 
         # Count source files (excluding README.md and __init__.py)
         if component == "skills":
-            source_count = sum(1 for d in source_dir.iterdir() if d.is_dir() and not d.name.startswith(("_", "."))) if source_dir.exists() else 0
-            installed_count = sum(1 for d in target_dir.iterdir() if d.is_dir() and not d.name.startswith(("_", "."))) if target_dir.exists() else 0
+            source_count = (
+                sum(
+                    1
+                    for d in source_dir.iterdir()
+                    if d.is_dir() and not d.name.startswith(("_", "."))
+                )
+                if source_dir.exists()
+                else 0
+            )
+            installed_count = (
+                sum(
+                    1
+                    for d in target_dir.iterdir()
+                    if d.is_dir() and not d.name.startswith(("_", "."))
+                )
+                if target_dir.exists()
+                else 0
+            )
         else:
-            source_count = sum(1 for f in source_dir.glob("*.md") if f.stem.upper() != "README") if source_dir.exists() else 0
-            installed_count = sum(1 for f in target_dir.glob("*.md") if f.stem.upper() != "README") if target_dir.exists() else 0
+            source_count = (
+                sum(1 for f in source_dir.glob("*.md") if f.stem.upper() != "README")
+                if source_dir.exists()
+                else 0
+            )
+            installed_count = (
+                sum(1 for f in target_dir.glob("*.md") if f.stem.upper() != "README")
+                if target_dir.exists()
+                else 0
+            )
 
         result[component] = {
             "description": description,
@@ -114,12 +138,16 @@ def list_all_components(base_path: Path = None) -> Dict[str, Dict[str, Any]]:
     scripts_available = 0
     if scripts_source.exists():
         scripts_available = sum(1 for f in scripts_source.glob("*.sh"))
-        scripts_available += sum(1 for f in scripts_source.glob("*.py") if f.name != "__init__.py")
+        scripts_available += sum(
+            1 for f in scripts_source.glob("*.py") if f.name != "__init__.py"
+        )
 
     scripts_installed = 0
     if scripts_target.exists():
         scripts_installed = sum(1 for f in scripts_target.glob("*.sh"))
-        scripts_installed += sum(1 for f in scripts_target.glob("*.py") if f.name != "__init__.py")
+        scripts_installed += sum(
+            1 for f in scripts_target.glob("*.py") if f.name != "__init__.py"
+        )
 
     result["scripts"] = {
         "description": "Hook scripts",
@@ -191,7 +219,9 @@ def uninstall_all(
         if dry_run:
             # Count items for dry-run display
             item_count = sum(1 for _ in superclaude_dir.rglob("*") if _.is_file())
-            messages.append(f"[DRY-RUN] Would remove: {superclaude_dir}/ ({item_count} files)")
+            messages.append(
+                f"[DRY-RUN] Would remove: {superclaude_dir}/ ({item_count} files)"
+            )
             removed += 1
         else:
             try:
@@ -210,7 +240,9 @@ def uninstall_all(
     if commands_sc_dir.exists():
         if dry_run:
             item_count = sum(1 for _ in commands_sc_dir.glob("*.md"))
-            messages.append(f"[DRY-RUN] Would remove: {commands_sc_dir}/ ({item_count} files)")
+            messages.append(
+                f"[DRY-RUN] Would remove: {commands_sc_dir}/ ({item_count} files)"
+            )
             removed += 1
         else:
             try:
@@ -219,7 +251,9 @@ def uninstall_all(
                 commands_parent = commands_sc_dir.parent
                 if commands_parent.exists() and not any(commands_parent.iterdir()):
                     commands_parent.rmdir()
-                    messages.append(f"✅ Removed: {commands_sc_dir}/ (and empty {commands_parent.name}/)")
+                    messages.append(
+                        f"✅ Removed: {commands_sc_dir}/ (and empty {commands_parent.name}/)"
+                    )
                 else:
                     messages.append(f"✅ Removed: {commands_sc_dir}/")
                 removed += 1
@@ -256,14 +290,18 @@ def uninstall_all(
                         f.unlink()
                     if not any(agents_dir.iterdir()):
                         agents_dir.rmdir()
-                        messages.append(f"✅ Removed: {agents_dir}/ (empty after SC cleanup)")
+                        messages.append(
+                            f"✅ Removed: {agents_dir}/ (empty after SC cleanup)"
+                        )
                     else:
                         messages.append(
                             f"✅ Removed: {len(sc_agents_present)} SC agent file(s) from {agents_dir}/ (preserved non-SC files)"
                         )
                     removed += 1
                 except Exception as e:
-                    messages.append(f"❌ Failed to remove SC agents from {agents_dir}/: {e}")
+                    messages.append(
+                        f"❌ Failed to remove SC agents from {agents_dir}/: {e}"
+                    )
                     failed += 1
         else:
             messages.append(f"⏭️  No SC agents found in: {agents_dir}/")
@@ -286,9 +324,7 @@ def uninstall_all(
             else set()
         )
         sc_skills_present = [
-            skills_dir / name
-            for name in sc_skill_names
-            if (skills_dir / name).is_dir()
+            skills_dir / name for name in sc_skill_names if (skills_dir / name).is_dir()
         ]
         if sc_skills_present:
             if dry_run:
@@ -302,14 +338,18 @@ def uninstall_all(
                         shutil.rmtree(d)
                     if not any(skills_dir.iterdir()):
                         skills_dir.rmdir()
-                        messages.append(f"✅ Removed: {skills_dir}/ (empty after SC cleanup)")
+                        messages.append(
+                            f"✅ Removed: {skills_dir}/ (empty after SC cleanup)"
+                        )
                     else:
                         messages.append(
                             f"✅ Removed: {len(sc_skills_present)} SC skill(s) from {skills_dir}/ (preserved non-SC skills)"
                         )
                     removed += 1
                 except Exception as e:
-                    messages.append(f"❌ Failed to remove SC skills from {skills_dir}/: {e}")
+                    messages.append(
+                        f"❌ Failed to remove SC skills from {skills_dir}/: {e}"
+                    )
                     failed += 1
         else:
             messages.append(f"⏭️  No SC skills found in: {skills_dir}/")
@@ -368,14 +408,20 @@ def uninstall_all(
                 settings = _load_settings(settings_file)
                 if "hooks" in settings:
                     sc_hook_count = sum(
-                        1 for hook_array in settings["hooks"].values()
-                        for h in hook_array if _is_superclaude_hook(h)
+                        1
+                        for hook_array in settings["hooks"].values()
+                        for h in hook_array
+                        if _is_superclaude_hook(h)
                     )
                     if sc_hook_count > 0:
-                        messages.append(f"[DRY-RUN] Would remove {sc_hook_count} SuperClaude hooks from {settings_filename}")
+                        messages.append(
+                            f"[DRY-RUN] Would remove {sc_hook_count} SuperClaude hooks from {settings_filename}"
+                        )
                         removed += 1
                     else:
-                        messages.append(f"⏭️  No SuperClaude hooks in {settings_filename}")
+                        messages.append(
+                            f"⏭️  No SuperClaude hooks in {settings_filename}"
+                        )
                         skipped += 1
                 else:
                     messages.append(f"⏭️  No hooks section in {settings_filename}")
@@ -403,7 +449,9 @@ def uninstall_all(
         if claude_md_target.exists():
             content = claude_md_target.read_text(encoding="utf-8")
             if "@superclaude" in content or "@.claude/superclaude" in content:
-                messages.append(f"[DRY-RUN] Would remove SuperClaude import from {claude_md_label}")
+                messages.append(
+                    f"[DRY-RUN] Would remove SuperClaude import from {claude_md_label}"
+                )
                 removed += 1
             else:
                 messages.append(f"⏭️  No SuperClaude import in {claude_md_label}")
@@ -429,6 +477,7 @@ def uninstall_all(
                 has_exclude_block,
                 has_legacy_gitignore_block,
             )
+
             in_exclude = has_exclude_block(project_root)
             in_legacy = has_legacy_gitignore_block(project_root)
             if in_exclude or in_legacy:
@@ -446,6 +495,7 @@ def uninstall_all(
                 skipped += 1
         else:
             from .install_git_exclude import remove_local_git_exclude
+
             gi_ok, gi_msg = remove_local_git_exclude(project_root)
             messages.append(f"{'✅' if gi_ok else '❌'} {gi_msg}")
             if gi_ok:
@@ -455,13 +505,18 @@ def uninstall_all(
 
     # 9. Remove SuperClaude-registered MCP servers (scope-aware, preserves user servers)
     if keep_mcp:
-        messages.append("⏭️  Skipped: MCP server cleanup (default; pass --remove-mcp to clean)")
+        messages.append(
+            "⏭️  Skipped: MCP server cleanup (default; pass --remove-mcp to clean)"
+        )
         skipped += 1
     else:
         from .install_mcp import uninstall_mcp_servers
+
         project_root = base_path.parent if scope in ("project", "local") else None
         mcp_removed, mcp_skipped, mcp_failed, mcp_messages = uninstall_mcp_servers(
-            scope=scope, project_root=project_root, dry_run=dry_run,
+            scope=scope,
+            project_root=project_root,
+            dry_run=dry_run,
         )
         messages.extend(mcp_messages)
         if mcp_removed == 0 and mcp_failed == 0:
@@ -483,10 +538,14 @@ def uninstall_all(
     # Summary
     messages.append("")
     if dry_run:
-        messages.append(f"📊 Summary (DRY-RUN): {removed} would be removed, {skipped} not found/skipped")
+        messages.append(
+            f"📊 Summary (DRY-RUN): {removed} would be removed, {skipped} not found/skipped"
+        )
         messages.append("\n💡 Run without --dry-run to actually remove components")
     else:
-        messages.append(f"📊 Summary: {removed} removed, {skipped} skipped, {failed} failed")
+        messages.append(
+            f"📊 Summary: {removed} removed, {skipped} skipped, {failed} failed"
+        )
         messages.append(f"📁 Uninstall directory: {base_path}")
 
         if failed == 0 and removed > 0:

@@ -14,7 +14,9 @@ import yaml
 COMMANDS_DIR = Path(__file__).parent.parent.parent / "src" / "superclaude" / "commands"
 
 # Agent/skill-only fields that should never appear in command frontmatter
-_SCHEMAS_PATH = Path(__file__).parent.parent.parent / ".claude" / "rules" / "schemas.yaml"
+_SCHEMAS_PATH = (
+    Path(__file__).parent.parent.parent / ".claude" / "rules" / "schemas.yaml"
+)
 _SCHEMAS = yaml.safe_load(_SCHEMAS_PATH.read_text(encoding="utf-8"))
 FORBIDDEN_FIELDS = set(_SCHEMAS["forbidden_command_fields"])
 
@@ -86,9 +88,7 @@ class TestCommandFrontmatter:
         """Commands should not contain agent/skill-only fields."""
         stem, content, fm = command
         found = set(fm.keys()) & FORBIDDEN_FIELDS
-        assert not found, (
-            f"{stem}: frontmatter contains forbidden field(s): {found}"
-        )
+        assert not found, f"{stem}: frontmatter contains forbidden field(s): {found}"
 
 
 class TestCommandInvocationContract:
@@ -135,9 +135,7 @@ class TestCommandXMLStructure:
     def test_component_name_matches(self, command):
         stem, content, _ = command
         name = extract_xml_attr(content, "component", "name")
-        assert name == stem, (
-            f"{stem}: component name='{name}' != filename '{stem}'"
-        )
+        assert name == stem, f"{stem}: component name='{name}' != filename '{stem}'"
 
     def test_component_type_is_command(self, command):
         stem, content, _ = command
@@ -168,8 +166,7 @@ class TestCommandCrossFieldConsistency:
         desc = fm.get("description", "")
         stopwords = {"with", "that", "this", "from", "through", "about", "into"}
         mission_words = {
-            w.lower()
-            for w in re.findall(r"[a-zA-Z]{4,}", mission)
+            w.lower() for w in re.findall(r"[a-zA-Z]{4,}", mission)
         } - stopwords
         desc_lower = desc.lower()
         matches = [w for w in mission_words if w in desc_lower]
@@ -202,9 +199,9 @@ class TestCommandCrossFieldConsistency:
         assert not re.search(r"<bounds\s+\w+\s*=", content), (
             f"{stem}: <bounds> uses legacy attribute form — convert to sub-tag form"
         )
-        assert not re.search(r"^\s*-\s+(Should|Avoid|Does|Never|Fallback):\s+", body, re.MULTILINE), (
-            f"{stem}: <bounds> uses legacy body-labeled form — convert to sub-tag form"
-        )
+        assert not re.search(
+            r"^\s*-\s+(Should|Avoid|Does|Never|Fallback):\s+", body, re.MULTILINE
+        ), f"{stem}: <bounds> uses legacy body-labeled form — convert to sub-tag form"
         assert not re.search(r"<should>|<avoid>", content), (
             f"{stem}: <bounds> uses legacy <should>/<avoid> sub-tags — rename to <does>/<never>"
         )

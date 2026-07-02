@@ -44,9 +44,7 @@ class TestModeComponentStructure:
     def test_has_component_type_mode(self, mode):
         stem, content = mode
         ctype = extract_xml_attr(content, "component", "type")
-        assert ctype == "mode", (
-            f"{stem}: component type='{ctype}', expected 'mode'"
-        )
+        assert ctype == "mode", f"{stem}: component type='{ctype}', expected 'mode'"
 
     def test_has_role_and_mission(self, mode):
         stem, content = mode
@@ -135,9 +133,7 @@ class TestModeConventions:
 
     def test_minimum_content(self, mode):
         stem, content = mode
-        assert len(content) > 300, (
-            f"{stem}: mode file too short ({len(content)} chars)"
-        )
+        assert len(content) > 300, f"{stem}: mode file too short ({len(content)} chars)"
 
     def test_no_empty_axes(self, mode):
         """Check for self-closing or empty axis sections."""

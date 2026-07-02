@@ -115,7 +115,11 @@ def test_desc_with_embedded_newlines_stays_single_row(tsv_path):
     assert len(physical_lines) == 2
     rows = tsv.read_all()
     assert len(rows) == 1
-    assert "\n" not in rows[0].desc and "\t" not in rows[0].desc and "\r" not in rows[0].desc
+    assert (
+        "\n" not in rows[0].desc
+        and "\t" not in rows[0].desc
+        and "\r" not in rows[0].desc
+    )
 
 
 def test_read_all_returns_inserted_rows(tsv_path):

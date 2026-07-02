@@ -41,7 +41,10 @@ class TestFormatSkillsSummary:
     def test_single_skill_format(self):
         skills = [FakeTokenEstimate("confidence-check", 103, 2500)]
         result = format_skills_summary(skills)
-        assert result == "<!-- 1 skills installed (confidence-check). ~2500 tokens full load. Use /sc:help for details. -->"
+        assert (
+            result
+            == "<!-- 1 skills installed (confidence-check). ~2500 tokens full load. Use /sc:help for details. -->"
+        )
 
     def test_multiple_skills_format(self):
         skills = [
@@ -50,7 +53,10 @@ class TestFormatSkillsSummary:
             FakeTokenEstimate("simplicity-coach", 90, 3429),
         ]
         result = format_skills_summary(skills)
-        assert result == "<!-- 3 skills installed (confidence-check, ship, simplicity-coach). ~7729 tokens full load. Use /sc:help for details. -->"
+        assert (
+            result
+            == "<!-- 3 skills installed (confidence-check, ship, simplicity-coach). ~7729 tokens full load. Use /sc:help for details. -->"
+        )
 
     def test_output_is_single_line(self):
         skills = [
@@ -180,12 +186,16 @@ class TestTieredInjection:
     def test_tool_mcp_gets_tier_0(self):
         """Tool MCPs (Context7, Playwright, etc.) should get Tier 0."""
         for mcp in self.EXPECTED_TOOL_MCPS:
-            assert _get_injection_tier(mcp, verbose=False) == 0, f"{mcp} should be Tier 0"
+            assert _get_injection_tier(mcp, verbose=False) == 0, (
+                f"{mcp} should be Tier 0"
+            )
 
     def test_behavioral_mcp_gets_tier_1(self):
         """Behavioral MCPs (Serena, Tavily) should get Tier 1."""
         for mcp in self.EXPECTED_BEHAVIORAL_MCPS:
-            assert _get_injection_tier(mcp, verbose=False) == 1, f"{mcp} should be Tier 1"
+            assert _get_injection_tier(mcp, verbose=False) == 1, (
+                f"{mcp} should be Tier 1"
+            )
 
     def test_mode_always_gets_tier_2(self):
         """Modes should always get Tier 2 (full .md)."""
@@ -227,7 +237,9 @@ class TestTieredInjection:
     def test_tier_0_context7_mentions_get_library_docs(self):
         """Context7 Tier 0 hint should reference the correct tool name."""
         hint = TIER_0_MAP["mcp/MCP_Context7.md"]
-        assert "get-library-docs" in hint, "Context7 hint should reference get-library-docs (not query-docs)"
+        assert "get-library-docs" in hint, (
+            "Context7 hint should reference get-library-docs (not query-docs)"
+        )
 
     def test_tier_0_devtools_mentions_lighthouse(self):
         """DevTools Tier 0 hint should reference Lighthouse capability."""
@@ -237,7 +249,9 @@ class TestTieredInjection:
     def test_tier_0_playwright_mentions_caps(self):
         """Playwright Tier 0 hint should reference capability system."""
         hint = TIER_0_MAP["mcp/MCP_Playwright.md"]
-        assert "--caps" in hint or "caps" in hint, "Playwright hint should mention capability system"
+        assert "--caps" in hint or "caps" in hint, (
+            "Playwright hint should mention capability system"
+        )
 
     def test_instruction_map_serena_mentions_safe_delete(self):
         """Serena INSTRUCTION_MAP should mention key symbol operations."""
@@ -252,10 +266,16 @@ class TestTieredInjection:
     def test_no_morphllm_in_any_map(self):
         """Morphllm should not appear in any injection map (removed)."""
         morphllm_key = "mcp/MCP_Morphllm.md"
-        assert morphllm_key not in TIER_0_MAP, "Morphllm should be removed from TIER_0_MAP"
-        assert morphllm_key not in INSTRUCTION_MAP, "Morphllm should be removed from INSTRUCTION_MAP"
+        assert morphllm_key not in TIER_0_MAP, (
+            "Morphllm should be removed from TIER_0_MAP"
+        )
+        assert morphllm_key not in INSTRUCTION_MAP, (
+            "Morphllm should be removed from INSTRUCTION_MAP"
+        )
         assert "morph" not in VALID_FLAGS, "morph should be removed from VALID_FLAGS"
-        assert "morphllm" not in VALID_FLAGS, "morphllm should be removed from VALID_FLAGS"
+        assert "morphllm" not in VALID_FLAGS, (
+            "morphllm should be removed from VALID_FLAGS"
+        )
 
 
 class TestTriggerMapPaths:
@@ -283,12 +303,16 @@ class TestTriggerMapPaths:
         """Morphllm should not appear in any COMPOSITE_FLAGS entry."""
         for flag, entries in COMPOSITE_FLAGS.items():
             for path, _priority in entries:
-                assert "Morphllm" not in path, f"Morphllm found in COMPOSITE_FLAGS[{flag}]: {path}"
+                assert "Morphllm" not in path, (
+                    f"Morphllm found in COMPOSITE_FLAGS[{flag}]: {path}"
+                )
 
     def test_all_mcp_includes_6_servers(self):
         """--all-mcp should activate exactly 6 MCP docs (4 core + 2 plugin)."""
         all_mcp_paths = {p for p, _ in COMPOSITE_FLAGS["--all-mcp"]}
-        assert len(all_mcp_paths) == 6, f"Expected 6 MCP docs in --all-mcp, got {len(all_mcp_paths)}"
+        assert len(all_mcp_paths) == 6, (
+            f"Expected 6 MCP docs in --all-mcp, got {len(all_mcp_paths)}"
+        )
 
     def test_frontend_verify_includes_3_servers(self):
         """--frontend-verify should activate Playwright + DevTools + Serena."""
@@ -302,7 +326,9 @@ class TestTriggerMapPaths:
     def test_trigger_map_mcp_count(self):
         """TRIGGER_MAP should have entries for exactly 6 MCP docs."""
         mcp_paths = {path for _, path, _ in TRIGGER_MAP if path.startswith("mcp/")}
-        assert len(mcp_paths) == 6, f"Expected 6 MCP trigger paths, got {len(mcp_paths)}: {mcp_paths}"
+        assert len(mcp_paths) == 6, (
+            f"Expected 6 MCP trigger paths, got {len(mcp_paths)}: {mcp_paths}"
+        )
 
 
 class TestCoreLiteSplit:
@@ -328,7 +354,9 @@ class TestCoreLiteSplit:
         )
 
     def test_every_rule_module_is_routed_by_trigger_map(self):
-        routed = {path for _p, path, _pr in TRIGGER_MAP if path.startswith("core/rules/")}
+        routed = {
+            path for _p, path, _pr in TRIGGER_MAP if path.startswith("core/rules/")
+        }
         assert self._modules() == routed, (
             "core/rules/ modules and TRIGGER_MAP routing out of sync"
         )

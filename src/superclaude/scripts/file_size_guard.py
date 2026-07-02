@@ -11,6 +11,7 @@ Bypass: limit parameter, pages parameter (PDF), binary extensions,
 Respects SUPERCLAUDE_SIZE_GUARD=0 env var to disable.
 Outputs structured JSON for Claude Code PreToolUse hook protocol.
 """
+
 import json
 import os
 import sys
@@ -24,17 +25,50 @@ SMALL_FILE_THRESHOLD = 5_000
 
 # Extensions to skip (binary/image files have different Read paths)
 BINARY_EXTENSIONS = {
-    ".png", ".jpg", ".jpeg", ".gif", ".bmp", ".ico", ".webp", ".svg",
-    ".pdf", ".zip", ".tar", ".gz", ".bz2", ".7z", ".rar",
-    ".woff", ".woff2", ".ttf", ".eot", ".otf",
-    ".mp3", ".mp4", ".wav", ".avi", ".mov", ".webm",
-    ".pyc", ".pyo", ".so", ".dylib", ".dll", ".exe",
+    ".png",
+    ".jpg",
+    ".jpeg",
+    ".gif",
+    ".bmp",
+    ".ico",
+    ".webp",
+    ".svg",
+    ".pdf",
+    ".zip",
+    ".tar",
+    ".gz",
+    ".bz2",
+    ".7z",
+    ".rar",
+    ".woff",
+    ".woff2",
+    ".ttf",
+    ".eot",
+    ".otf",
+    ".mp3",
+    ".mp4",
+    ".wav",
+    ".avi",
+    ".mov",
+    ".webm",
+    ".pyc",
+    ".pyo",
+    ".so",
+    ".dylib",
+    ".dll",
+    ".exe",
     ".ipynb",
 }
 
 # Config extensions — exempt below SIZE_THRESHOLD
 CONFIG_EXTENSIONS = {
-    ".json", ".yaml", ".yml", ".toml", ".cfg", ".ini", ".env",
+    ".json",
+    ".yaml",
+    ".yml",
+    ".toml",
+    ".cfg",
+    ".ini",
+    ".env",
 }
 
 # Code/JSON extensions for context-aware block messages
@@ -108,10 +142,14 @@ def main() -> None:
 
             # Block files above threshold
             if size >= SIZE_THRESHOLD:
-                print(json.dumps({
-                    "decision": "block",
-                    "reason": _block_message(size, ext),
-                }))
+                print(
+                    json.dumps(
+                        {
+                            "decision": "block",
+                            "reason": _block_message(size, ext),
+                        }
+                    )
+                )
                 return
 
         print(json.dumps({"decision": "approve"}))
