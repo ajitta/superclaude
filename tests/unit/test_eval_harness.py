@@ -81,3 +81,35 @@ def test_scope_typo_fixture_line_stable():
     """probe-scope-restraint asserts on README.md line 3 — guard the fixture."""
     readme = (EVALS_DIR / "fixtures/probe-scope/README.md").read_text(encoding="utf-8")
     assert "recieve" in readme.splitlines()[2]
+
+
+def _import_run_eval():
+    sys.path.insert(0, str(EVALS_DIR))
+    try:
+        import run_eval
+    finally:
+        sys.path.remove(str(EVALS_DIR))
+    return run_eval
+
+
+def test_ws_gitignore_covers_loop_guard_state_path():
+    """WS_GITIGNORE must track loop_guard.py's actual state-file path — if the
+    hook moves its state file, workspace scope checks silently re-contaminate."""
+    source = (REPO_ROOT / "src/superclaude/scripts/loop_guard.py").read_text(
+        encoding="utf-8"
+    )
+    match = re.search(r'Path\(root\)\s*/\s*"([^"]+)"\s*/\s*"([^"]+)"', source)
+    state_path = f"{match.group(1)}/{match.group(2)}"
+    ignored = _import_run_eval().WS_GITIGNORE.splitlines()
+    assert state_path in ignored, (
+        f"loop_guard state path {state_path!r} not in WS_GITIGNORE {ignored} — "
+        "re-sync run_eval.py with scripts/loop_guard.py"
+    )
+
+
+def test_pin_python_substitutes_only_bare_python_token():
+    run_eval = _import_run_eval()
+    cmd = ["python", "-m", "pytest", "-q", "python_helper.py"]
+    pinned = run_eval._pin_python(cmd)
+    assert pinned == [run_eval.PY_BIN, "-m", "pytest", "-q", "python_helper.py"]
+    assert run_eval._pin_python(["git", "status"]) == ["git", "status"]
