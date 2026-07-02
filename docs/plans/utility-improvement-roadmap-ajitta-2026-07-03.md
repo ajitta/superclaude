@@ -1,5 +1,5 @@
 ---
-status: draft
+status: in-progress — Phase 0 closed, Phase 1 infra shipped (matrix run pending), Phase 2 gated on matrix results, 3-1 done
 revised: 2026-07-03
 ---
 
@@ -23,25 +23,29 @@ revised: 2026-07-03
 
 - Regex widened: force-push to main/master now caught via `--force` OR standalone `-f`, flag and branch in any argument order (original ordering also missed `git push origin main --force`). `--force-with-lease` still allowed by construction; `\b(main|master)\b` word-bounded (strictly fewer false positives than before — old pattern matched `mainline`).
 - `tests/unit/test_safety_hooks.py`: +5 block cases (live-test bypasses), +3 allow cases (false-positive guards).
-- Verified: 22-case matrix (11 block / 11 allow) → 22/22 pass in isolated run. **Full `uv run pytest tests/unit/test_safety_hooks.py` on the Windows baseline still pending** (sandbox mount lag prevented in-session suite run).
+- Verified: 22-case matrix (11 block / 11 allow) → 22/22 pass in isolated run. Full `uv run pytest tests/unit/test_safety_hooks.py` on the Windows baseline: **30/30 pass (2026-07-03)** — pending item closed.
 
-### 0-2. Enforcement-vs-prose boundary paragraph (open)
+### 0-2. Enforcement-vs-prose boundary paragraph — **DONE 2026-07-03**
 
-One README/ARCHITECTURE paragraph: "mechanically enforced = 3 hooks (file_size / destructive / loop); everything else is model-followed prose." Closes audit P3's residual documentation gap. Cost ≈ 0.
+One README/ARCHITECTURE paragraph: "mechanically enforced = 3 hooks (file_size / destructive / loop); everything else is model-followed prose." Closes audit P3's residual documentation gap. Cost ≈ 0. Shipped as `## Enforcement Boundary` section in `src/superclaude/ARCHITECTURE.md`.
 
-### 0-3. Warn-tier for reversible-but-risky commands (open question, do NOT rush)
+### 0-3. Warn-tier for reversible-but-risky commands — **VERIFIED 2026-07-03, implementation deferred**
 
-`git reset --hard` / `clean -fdx` / `branch -D` are legitimate often enough that hard-block is wrong. Candidate mechanism: PreToolUse `hookSpecificOutput.permissionDecision: "ask"` — **unverified** in this codebase (0 uses of the schema; CC version support unconfirmed). Verify schema support first; otherwise skip — CC's native Bash permission prompt already covers this tier.
+`git reset --hard` / `clean -fdx` / `branch -D` are legitimate often enough that hard-block is wrong. Candidate mechanism: PreToolUse `hookSpecificOutput.permissionDecision: "ask"` — **empirically verified supported on CC 2.1.198** (probe hook in isolated `CLAUDE_CONFIG_DIR`: Bash call blocked despite `--allowedTools Bash`, landed in `permission_denials` with the hook's reason propagated; headless `-p` semantics: ask → deny). Implementation stays deferred per this item's own do-NOT-rush gate: CC's native Bash permission prompt already covers the tier interactively, and the Phase 1 harness (`destructive-elicitation` task) can now measure whether a warn-tier adds value before any code ships.
 
 ## Phase 1 — Measurement infrastructure (gates everything below)
 
-### 1-1. 4-arm eval harness
+### 1-1. 4-arm eval harness — **BUILT + SMOKE-VERIFIED 2026-07-03** (full matrix run pending)
 
 Arms: vanilla / SC-full / SC-core-lite / SC-command-only. Built on the existing `make sync-user` + headless `claude -p` path (reuse, not new infra). Tasks (7): small bugfix (scope-creep check), doc creation (naming convention), install scope change, destructive-command elicitation, large-file analysis, plan routing (docs/features vs docs/plans), review (file:line accuracy). Metrics: success rate, unnecessary file changes, actual-verification-ran, output location accuracy, tokens, user interventions, wrong auto-command activations, **gotcha compliance rate**.
 
-### 1-2. Model-release canary (new proposal, not in prior audits)
+Shipped as `evals/` (run_eval.py + tasks.yaml + 10 fixtures + arms/RULES_KERNEL.md + README; drift guards in `tests/unit/test_eval_harness.py`). Isolation: per-arm `CLAUDE_CONFIG_DIR` (credentials-only seed), project-scope install into temp workspaces outside the repo (probe-observer-effect). Verified: 28/28 workspace builds dry-run green; one real headless run (vanilla × install-scope-change × haiku, $0.03) produced scored checks + token/cost report. **The 4×7 measured matrix (≈28 paid sessions) has not run yet — Phase 2 stays gated until it does.**
+
+### 1-2. Model-release canary (new proposal, not in prior audits) — **IMPLEMENTED 2026-07-03**
 
 Pin ~10 eval tasks as a canary suite auto-run on each new model release. Converts the recurring per-release "compat polish" cost (evidence: Opus 4.8 alignment commits) from reactive guessing to detected diffs: "which prose rules died on this model" becomes a report, not a feeling.
+
+Shipped: 10 canary-flagged tasks (the 7 eval tasks + 3 prose-rule probes: `--introspect` marker emission, R15 verify-before-claim, scope restraint). Run `uv run python evals/run_eval.py --canary --model <new-model>` per release; red rows in report.md name the dead rules.
 
 ## Phase 2 — Slimming, conditional on Phase 1 results
 
@@ -55,8 +59,8 @@ Top-3 most-used agents: strip generic persona (SOLID/OWASP/coverage boilerplate 
 
 ## Phase 3 — Structural (quarter horizon)
 
-- **3-1. Subagent context gap mitigation (audit P2, harness-boundary):** add "active mode directives copy" field to the RULES.md delegate packet. Prose-level mitigation only; the context_loader/UserPromptSubmit limitation is not markdown-fixable.
-- **3-2. Gotchas layer promotion:** the one prose layer with observed behavioral ROI. Keep R19 auto-capture; add gotcha-compliance metric to eval (see 1-1) to quantify.
+- **3-1. Subagent context gap mitigation (audit P2, harness-boundary) — DONE 2026-07-03:** added `active_mode_directives` as seventh Delegate-packet field in `core/RULES.md` (sub-agents never receive context_loader/UserPromptSubmit injections; mode context travels only if copied into the prompt). Prose-level mitigation only; the context_loader/UserPromptSubmit limitation is not markdown-fixable.
+- **3-2. Gotchas layer promotion:** the one prose layer with observed behavioral ROI. Keep R19 auto-capture; add gotcha-compliance metric to eval (see 1-1) to quantify. *Metric shipped 2026-07-03 (`gotcha_compliance` tag in evals/tasks.yaml — planted mirror-copy gotcha in the bugfix fixture); quantification awaits the matrix run.*
 
 ## Explicitly rejected
 
