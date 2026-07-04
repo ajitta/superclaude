@@ -20,7 +20,7 @@
 --serena: symbol ops, project mem → Serena semantic understanding + Serena-first exploration directive
 --play|--playwright: browser test, E2E, visual → Playwright browser automation
 --perf|--devtools: perf audit, CLS, LCP, metrics → DevTools perf analysis
---tavily: web search, real-time info → Tavily MCP (in-conv search, parallel queries, agent workflows)
+--tavily: web search, real-time info → Tavily Agent Skills (tavily-search/extract/crawl/map/research); Tavily MCP optional in-conv alternative
 --frontend-verify: UI test, frontend debug → Playwright + DevTools + Serena
 --all-mcp: max complexity → enable all MCP servers
 --no-mcp: native-only, perf priority → disable all MCP, use native + WebSearch

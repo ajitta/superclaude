@@ -9,7 +9,7 @@
   </choose>
 
   <search_patterns>
-  MCP exposes only `tavily-search` + `tavily-extract`. Pattern set below applies to `tavily-search`; multi-source research / site crawl / URL map live in `/tavily-cli` skill (see fallback).
+  Primary integration is the Tavily Agent Skills (`tavily-search`, `tavily-extract`, `tavily-crawl`, `tavily-map`, `tavily-research`; install per `mcp/README.md`). This doc covers the optional in-conversation MCP path, which exposes only `tavily-search` + `tavily-extract`. Pattern set below applies to `tavily-search`; multi-source research, site crawl, and URL map live in the `tavily-research` / `tavily-crawl` / `tavily-map` skills.
 
   - Basic: query → ranked results.
   - Domain: query + `include_domains:[arxiv,github]`.
@@ -41,7 +41,7 @@
   <bounds>
     <does>web search, multi-source synthesis, current info retrieval.</does>
     <never>code gen, local file ops, training knowledge questions.</never>
-    <fallback>MCP server down → invoke /tavily-cli skill for full CLI access — includes tvly map (URL discovery) + tvly research (multi-source deep research) not in MCP. Native WebSearch for simple queries, WebFetch for single pages.</fallback>
+    <fallback>Prefer the Tavily Agent Skills (`tavily-search`, `tavily-extract`, `tavily-crawl`, `tavily-map`, `tavily-research`) — the primary integration, covering map + multi-source research not in MCP. MCP unavailable and skills not installed → native WebSearch for simple queries, WebFetch for single pages.</fallback>
   </bounds>
 
   <handoff next="/sc:research /sc:analyze"/>

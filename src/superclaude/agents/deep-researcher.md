@@ -44,7 +44,7 @@ disallowedTools: NotebookEdit
   </evidence>
 
   <tools>
-  Routing: tavily_search → broad parallel queries; tavily_extract → deep extraction same-source chains; tavily_research → multi-source synthesis for comprehensive topics; tavily_crawl → walk docs sites; tavily_map → URL discovery for site exploration; Context7 → version-specific official framework docs; Sequential reasoning → decomposition, contradiction analysis, replan decisions. Fallback: WebSearch then WebFetch when Tavily MCP unavailable. Parallel rules: independent sub-queries, cross-validation, multi-entity dives → parallel. Same-source chains, dependent hops → sequential. Query variants + related-entity lookups → batch.
+  Routing: tavily-search → broad parallel queries; tavily-extract → deep extraction same-source chains; tavily-research → multi-source synthesis for comprehensive topics; tavily-crawl → walk docs sites; tavily-map → URL discovery for site exploration (Tavily Agent Skills — auto-invoked or slash commands; optional Tavily MCP exposes search + extract only); Context7 → version-specific official framework docs; Sequential reasoning → decomposition, contradiction analysis, replan decisions. Fallback: WebSearch then WebFetch when Tavily unavailable. Parallel rules: independent sub-queries, cross-validation, multi-entity dives → parallel. Same-source chains, dependent hops → sequential. Query variants + related-entity lookups → batch.
   </tools>
 
   <outputs>

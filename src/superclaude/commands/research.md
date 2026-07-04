@@ -33,7 +33,7 @@ Routing: per core/rules/RULES_DOCS.md `<doc_output_convention>` — feature path
 
 
   <tools note="Routing in modes/RESEARCH_CONFIG.md tool_routing">
-    - Tavily: tavily_search, tavily_extract, tavily_research, tavily_crawl, tavily_map
+    - Tavily: tavily-search, tavily-extract, tavily-research, tavily-crawl, tavily-map (Agent Skills — auto/slash; MCP path exposes search + extract only)
     - Native: WebSearch/WebFetch (fallback)
     - Sequential: Multi-step reason + replan decide
     - Read/Write: Report gen

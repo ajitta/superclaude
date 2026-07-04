@@ -25,7 +25,7 @@
   <integration_patterns>
   - Troubleshoot: Sequential:hypotheses → test each → Sequential:synthesize → `/sc:troubleshoot`.
   - Architecture: Sequential:requirements → trade-offs → constraints → recommend → `/sc:design`.
-  - Research: Tavily:gather → Sequential:analyze → gaps → Tavily:targeted → Sequential:conclude.
+  - Research: tavily-search:gather → Sequential:analyze → gaps → tavily-search:targeted → Sequential:conclude.
   - Review: Read code → Sequential:security-analysis → Sequential:perf-analysis → `/sc:review`.
   </integration_patterns>
 

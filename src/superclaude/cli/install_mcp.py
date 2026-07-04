@@ -58,13 +58,17 @@ MCP_SERVERS = {
         "category": "core",
         "method": "mcp",
     },
+    # Tavily MCP is opt-in (plugin): the recommended integration is Tavily Agent
+    # Skills (Tavily CLI + `npx skills add tavily-ai/skills`), documented in
+    # mcp/README.md. The MCP server stays available for users who prefer
+    # in-conversation tools but exposes only search + extract.
     "tavily": {
         "name": "tavily",
-        "description": "Web search, extract, crawl, and research",
+        "description": "Web search + extract (optional MCP; prefer Tavily Agent Skills — see mcp/README.md)",
         "transport": "stdio",
         "command": "npx -y tavily-mcp@latest",
         "required": False,
-        "category": "core",
+        "category": "plugin",
         "method": "mcp",
         "api_key_env": "TAVILY_API_KEY",
         "api_key_description": "Tavily API key for web search (get from https://app.tavily.com)",

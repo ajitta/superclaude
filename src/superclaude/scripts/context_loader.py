@@ -213,12 +213,16 @@ INSTRUCTION_MAP = {
         "Prioritize symbolic tools over full file reads."
     ),
     "mcp/MCP_Tavily.md": (
-        "Tavily MCP: tavily_search (web search — search_depth: basic/advanced/fast/ultra-fast, "
-        "time_range: day/week/month/year, start_date/end_date, include_domains/exclude_domains, country), "
-        "tavily_extract (full-text from URLs), tavily_research (multi-source synthesis), "
-        "tavily_crawl (site-wide extraction), tavily_map (URL discovery). "
+        "Tavily web access — primary path is the Tavily Agent Skills (install: Tavily CLI + "
+        "`npx skills add tavily-ai/skills`): tavily-search (web search), tavily-extract (URL→markdown), "
+        "tavily-crawl (multi-page site extraction), tavily-map (URL discovery), tavily-research "
+        "(cited multi-source report), tavily-best-practices (integration reference). Auto-invoked by task "
+        "or explicit slash commands (/tavily-search, /tavily-crawl, /tavily-research, …). "
+        "Optional Tavily MCP exposes only tavily_search + tavily_extract as in-conversation tools "
+        "(search_depth: basic/advanced/fast/ultra-fast, time_range, start_date/end_date, "
+        "include_domains/exclude_domains, country). "
         "Use for current info post-knowledge-cutoff, multi-source research, fact-checking. "
-        "Fallback: native WebSearch/WebFetch only when MCP unavailable."
+        "Fallback: native WebSearch/WebFetch when neither skills nor MCP available."
     ),
 }
 

@@ -212,7 +212,7 @@ For **2-3x faster** execution and **30-50% fewer tokens**, optionally install MC
 # Optional MCP servers for enhanced performance:
 # - Serena: Semantic code understanding (2-3x faster symbol ops)
 # - Sequential: Token-efficient multi-step reasoning (30-50% fewer tokens)
-# - Tavily: Web search for Deep Research
+# - Tavily: Web search/extract/crawl/research — install as Agent Skills (npx skills add tavily-ai/skills); MCP optional
 # - Context7: Official documentation lookup
 
 # Note: Error learning available via built-in ReflexionMemory (no installation required)
@@ -374,7 +374,7 @@ superclaude mcp
 ```
 
 **Available servers:**
-- **Tavily** → Primary web search, extract, crawl, and research (Deep Research). Installed as Claude plugin from [`tavily-ai/skills`](https://github.com/tavily-ai/skills); CLI docs: ['https://docs.tavily.com/documentation/tavily-cli'](https://docs.tavily.com/documentation/tavily-cli)
+- **Tavily** → Web search, extract, crawl, map, research (Deep Research). Recommended: **Agent Skills** via Tavily CLI + `npx skills add tavily-ai/skills` ([tavily-ai/skills](https://github.com/tavily-ai/skills) · [agent-skills docs](https://docs.tavily.com/documentation/agent-skills)). The `--tavily` MCP server is an optional in-conversation alternative (search + extract only).
 - **Context7** → Official documentation lookup
 - **Sequential-Thinking** → Multi-step reasoning
 - **Serena** → Session persistence & semantic code understanding
@@ -514,7 +514,7 @@ superclaude mcp
 # Strategy selection
 /sc:research "market analysis" --strategy planning-only
 
-# Domain-filtered research (uses Tavily MCP)
+# Domain-filtered research (uses Tavily)
 /sc:research "React patterns" --domains reactjs.org,github.com
 ```
 
@@ -530,7 +530,7 @@ superclaude mcp
 ### **Integrated Tool Orchestration**
 
 The Deep Research system intelligently coordinates multiple tools:
-- **Tavily MCP**: Primary web search and discovery
+- **Tavily** (Agent Skills; MCP optional): Primary web search and discovery
 - **Playwright MCP**: Complex content extraction
 - **Sequential MCP**: Multi-step reasoning and synthesis
 - **Serena MCP**: Memory and learning persistence

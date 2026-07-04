@@ -49,7 +49,7 @@ Routing: per core/rules/RULES_DOCS.md `<doc_output_convention>` — feature path
   - Read/Write/Edit: Requirements docs + spec gen
   - TaskCreate/TaskUpdate: Multi-phase exploration tracking
   - Agent: Parallel exploration + multi-agent
-  - WebSearch/Tavily: Market research + tech validation
+  - WebSearch / Tavily search skill: Market research + tech validation
   - sequentialthinking: Requirements analysis, trade-off eval
   </tools>
 
