@@ -107,6 +107,13 @@ poetry.lock
 .claude/loop_guard_state.json
 .claude/insights.pending.jsonl
 .claude/scheduled_tasks.lock
+.claude/skills/
+
+# Agent Skills install artifacts (npx skills add) - per-machine, not framework content
+.agents/
+agent/
+skills/
+skills-lock.json
 
 
 # SuperClaude specific
