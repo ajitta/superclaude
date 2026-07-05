@@ -62,6 +62,7 @@ description: Review work product (code, plan, design, spec) for quality, correct
 
 
   <gotchas>
+  - scope-flag-local: --scope here is command-local artifact-type selector (pr|diff|file|branch|plan|design|spec) — for this command it overrides the global --scope analysis-boundary enum (file|module|project|system) from core/FLAGS.md
   - scope-focus: review only changed code, not whole file or module
   - no-unsolicited-fixes: flag issue but no fix unless asked
   </gotchas>

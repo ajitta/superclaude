@@ -22,9 +22,9 @@ DEFAULT_PROMPT = """\
 You are the mutator agent in a Karpathy-style autoresearch loop. The current
 working directory is an isolated git worktree.
 
-Inspect:
-  - `git log --oneline -20`
-  - `results.tsv`
+Inspect (read files directly with the Read tool):
+  - `results.tsv` — per-cycle history (commit hash, metric value) of prior mutations
+  - project files relevant to the metric
 
 Then propose ONE specific change to improve the project's metric. Apply it
 via Edit/Write tools. Do not run shell commands (Bash is disabled).

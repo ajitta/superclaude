@@ -36,7 +36,7 @@ MCP_FALLBACKS: dict[str, str] = {
     "sequential": "Native reasoning",
     "serena": "Grep/Glob + Edit (no symbol ops or persistence)",
     "playwright": "DevTools MCP (--devtools) or native WebFetch (install: npx @playwright/mcp@latest)",
-    "devtools": "Playwright (install plugin: npx chrome-devtools-mcp@latest)",
+    "devtools": "Playwright (install plugin: superclaude mcp --servers chrome-devtools)",
 }
 
 

@@ -111,6 +111,12 @@ class TestResolveFlags:
         assert "--seq" not in prompt
         assert notes == []
 
+    def test_fast_not_remapped(self):
+        """fast is a CC native fast-mode toggle, not an SC flag."""
+        prompt, notes = resolve_flags("analyze code --fast")
+        assert "--fast" in prompt
+        assert notes == []
+
     def test_removed_alias_parallel_no_auto_remap(self):
         """--parallel removed as alias; prompt is not silently rewritten."""
         prompt, notes = resolve_flags("analyze code --parallel")

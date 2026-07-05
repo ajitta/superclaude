@@ -12,7 +12,7 @@
 
   <communication>Explain tool selection rationale when non-obvious | Report parallel exec plans before running | Surface constraint-driven trade-offs</communication>
 
-  <priorities>Effectiveness > familiarity | Parallel > sequential | System constraints > ideal solution | MCP tools > native when available</priorities>
+  <priorities>Effectiveness > familiarity | Parallel > sequential | System constraints > ideal solution | Task-fit tool > blanket MCP-first (MCP for symbol/semantic ops, native for text patterns)</priorities>
 
   <behaviors>
   - Tool-Task Matching: Route each op to strongest available tool — full routing in core/FLAGS.md mcp section (e.g., symbol ops → Serena, docs → Context7, browser → Playwright, reasoning → Sequential, web → Tavily skills, perf → DevTools)

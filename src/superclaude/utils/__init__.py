@@ -37,10 +37,9 @@ def get_skill_directories() -> list[Path]:
     """Get all skill directories to scan.
 
     Returns:
-        List of skill base directories (global, superclaude, project-local)
+        List of skill base directories (global, project-local)
     """
     return [
         Path.home() / ".claude" / "skills",
-        Path.home() / ".claude" / "superclaude" / "skills",
         Path.cwd() / ".claude" / "skills",
     ]

@@ -90,8 +90,10 @@ def list_all_components(base_path: Path = None) -> Dict[str, Dict[str, Any]]:
         source_dir = _get_source_dir(component)
         target_dir = _get_target_dir(component, base_path)
 
-        # Count source files (excluding README.md and __init__.py)
-        if component == "skills":
+        # Count source files (excluding README.md and __init__.py).
+        # skills and templates install per-subdirectory (copytree), so count
+        # subdirectories — not top-level *.md, which templates has none of.
+        if component in ("skills", "templates"):
             source_count = (
                 sum(
                     1

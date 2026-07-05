@@ -101,6 +101,9 @@ def install_component(
     Returns:
         Tuple of (installed_count, skipped_count, failed_count, failed_names)
     """
+    if base_path is None:
+        base_path = Path.home() / ".claude"
+
     source_dir = _get_source_dir(component)
     target_dir = _get_target_dir(component, base_path)
 

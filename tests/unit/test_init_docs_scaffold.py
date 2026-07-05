@@ -101,6 +101,31 @@ class TestInstallerShipsTemplates:
         assert prd_path.stat().st_mtime == original_mtime
 
 
+class TestInventoryCountsTemplates:
+    def test_list_all_components_counts_templates(self, tmp_path):
+        """Regression: `--list-all` showed templates as [0/0] because the
+        count globbed top-level *.md while templates content is nested
+        per-subdirectory (e.g. templates/docs-scaffold/*.md)."""
+        from superclaude.cli.install_components import install_component
+        from superclaude.cli.install_inventory import list_all_components
+
+        # Before install: source subdirs counted, nothing installed yet
+        info = list_all_components(base_path=tmp_path)["templates"]
+        assert info["available"] >= 1, "templates source must not count as 0"
+        assert info["installed"] == 0
+
+        install_component(
+            component="templates",
+            base_path=tmp_path,
+            force=True,
+            scope="user",
+        )
+
+        info = list_all_components(base_path=tmp_path)["templates"]
+        assert info["installed"] >= 1, "installed templates must not count as 0"
+        assert info["installed"] == info["available"]
+
+
 class TestInitCommandDeclaresTaskI:
     """init.md must declare task [i] across menu, dependency_graph,
     task_outputs, safety_rules, and the --full preset."""
