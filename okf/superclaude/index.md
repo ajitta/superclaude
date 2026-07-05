@@ -6,6 +6,8 @@ okf_version: "0.1"
 
 OKF bundle cataloging the SuperClaude content framework (src/superclaude). Each concept links to its source file via `resource`. Start here, drill into a section index, then a concept.
 
+Authoritative human docs live in `src/superclaude/ARCHITECTURE.md` (taxonomy source of truth) and the per-section `README.md` files. This bundle is a generated, agent-navigable catalog view of that same content.
+
 ## Overview
 
 - [SuperClaude Architecture](/architecture.md): framework taxonomy and delivery pipeline.

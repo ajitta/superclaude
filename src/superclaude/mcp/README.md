@@ -63,3 +63,4 @@ The `--tavily` MCP server (plugin table above) stays available as an in-conversa
 - `core/FLAGS.md` — MCP flag defs + auto-detection
 - `cli/install_mcp.py` — Install registry (`MCP_SERVERS`) for core servers
 - `scripts/context_loader.py` — On-demand delivery mechanism
+- `okf/superclaude/mcp/index.md` — OKF v0.1 catalog: 6 MCP servers as concept docs, resource-linked to source (repo-root bundle)
