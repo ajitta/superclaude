@@ -276,7 +276,6 @@ VALID_FLAGS = {
     "iterations",
     "validate",
     "safe-mode",
-    "fast",
     "plan",
     "uc",
     "ultracompressed",
@@ -290,6 +289,7 @@ VALID_FLAGS = {
 # Claude Code native flags / triggers — pass through unchanged, no fuzzy suggestion
 CC_NATIVE_PASSTHROUGH: set[str] = {
     "ultrathink",
+    "fast",  # CC-native fast mode (/fast toggle) — SC ships no behavior for it
 }
 
 
@@ -599,8 +599,10 @@ _EXECUTION_DIRECTIVES = {
     re.compile(r"--loop\b", re.IGNORECASE): (
         lambda m: (
             '<sc-directive flag="--loop">'
-            "Iterative improvement mode: execute → self-evaluate → identify gaps → re-execute. "
-            "Repeat until no meaningful improvement. Report total iteration count when done."
+            "Iterative improvement mode: state verifiable success criteria first, then "
+            "execute → self-evaluate vs criteria → identify gaps → re-execute. "
+            "Stop when criteria met, no meaningful improvement, or 5-iteration safety cap. "
+            "Report total iteration count and criteria status when done."
             "</sc-directive>"
         )
     ),
