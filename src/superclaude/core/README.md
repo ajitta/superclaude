@@ -35,3 +35,4 @@ Framework devs only maintain core files. Edits to always-loaded files hit contex
 - `CLAUDE_SC.md` — Import chain entry
 - `modes/` — On-demand cognitive overlays (pair with core rules)
 - `scripts/context_loader.py` — On-demand delivery mechanism
+- `okf/superclaude/core/index.md` — OKF v0.1 catalog: 8 core-config files as concept docs, resource-linked to source (repo-root bundle)

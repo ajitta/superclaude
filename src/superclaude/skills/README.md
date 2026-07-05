@@ -73,3 +73,4 @@ See `.claude/rules/skill-authoring.md` for full authoring spec.
 - `commands/` — Workflow entry points (most former skills now live here)
 - `agents/` — Domain expert agents
 - `hooks/` — Hook system skills integrate with
+- `okf/superclaude/skills/index.md` — OKF v0.1 catalog: 5 skills as concept docs, resource-linked to source (repo-root bundle)

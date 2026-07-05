@@ -137,3 +137,4 @@ Agents give conflicting recs → resolve via:
 - `commands/` — Workflow entry points routing to agents
 - `modes/` — Cognitive overlays shaping agent behavior
 - `core/FLAGS.md` — Behavioral flags + execution modes (Model Routing lives in this README's section above)
+- `okf/superclaude/agents/index.md` — OKF v0.1 catalog: 23 agents as concept docs, resource-linked to source (repo-root bundle)
