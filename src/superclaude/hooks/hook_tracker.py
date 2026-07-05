@@ -1,11 +1,15 @@
-"""Hook Execution Tracker for SuperClaude v2.1.0
+"""Hook Session Tracker for SuperClaude
 
-Tracks hook executions per session to support `once: true` functionality.
-Prevents duplicate execution of hooks marked with once=true within a session.
+Provides the fallback session identity used by mcp_fallback.py's
+once-per-session hints, plus cleanup of stale session logs.
+
+Note: once-per-session hook *execution* gating is handled natively by
+Claude Code (`"once": true` in hooks.json), not by this module. Callers
+running inside a hook should prefer the `session_id` field from the hook
+stdin JSON (see context_loader.py) over get_session_id().
 
 Session Management:
-- Session ID is generated at SessionStart or derived from environment
-- Hook executions are logged with timestamps
+- Session ID is generated on first use or derived from environment
 - Old sessions are automatically cleaned up (>24h by default)
 """
 
@@ -52,7 +56,12 @@ class SessionData:
 
 
 def get_session_id() -> str:
-    """Get or generate the current session ID.
+    """Get or generate a fallback session ID.
+
+    Callers running inside a Claude Code hook should prefer the `session_id`
+    field from the hook stdin JSON — it identifies the real CC session. This
+    function is the fallback when that id is unavailable; the cached id
+    persists across CC sessions (it does not rotate per session).
 
     Session ID sources (in priority order):
     1. CLAUDE_SESSION_ID environment variable (if set by Claude Code)
@@ -96,29 +105,6 @@ def get_session_id() -> str:
 def _ensure_tracker_dir() -> None:
     """Ensure the tracker directory exists."""
     HOOK_TRACKER_DIR.mkdir(parents=True, exist_ok=True)
-
-
-def _generate_hook_id(
-    hook_type: str,
-    command: str,
-    source: str,
-    matcher: str | None = None,
-) -> str:
-    """Generate a unique ID for a hook.
-
-    Args:
-        hook_type: Type of hook (PreToolUse, PostToolUse, etc.)
-        command: The hook command
-        source: Source file/skill that defined the hook
-        matcher: Optional tool matcher pattern
-
-    Returns:
-        Unique hook identifier
-    """
-    raw = f"{hook_type}:{source}:{command}"
-    if matcher:
-        raw += f":{matcher}"
-    return hashlib.sha256(raw.encode()).hexdigest()[:12]
 
 
 def _load_tracker_data() -> dict[str, SessionData]:
@@ -173,103 +159,6 @@ def _save_tracker_data(data: dict[str, SessionData]) -> None:
         pass  # Silently fail if we can't write
 
 
-def has_executed_once(
-    hook_type: str,
-    command: str,
-    source: str,
-    matcher: str | None = None,
-    session_id: str | None = None,
-) -> bool:
-    """Check if a hook has already been executed in the current session.
-
-    Args:
-        hook_type: Type of hook (PreToolUse, PostToolUse, etc.)
-        command: The hook command
-        source: Source file/skill that defined the hook
-        matcher: Optional tool matcher pattern
-        session_id: Optional explicit session ID (uses current if not provided)
-
-    Returns:
-        True if hook has already been executed, False otherwise
-    """
-    if session_id is None:
-        session_id = get_session_id()
-
-    hook_id = _generate_hook_id(hook_type, command, source, matcher)
-    data = _load_tracker_data()
-
-    session_data = data.get(session_id)
-    if session_data is None:
-        return False
-
-    return hook_id in session_data.executions
-
-
-def mark_executed(
-    hook_type: str,
-    command: str,
-    source: str,
-    matcher: str | None = None,
-    session_id: str | None = None,
-) -> None:
-    """Mark a hook as executed in the current session.
-
-    Args:
-        hook_type: Type of hook (PreToolUse, PostToolUse, etc.)
-        command: The hook command
-        source: Source file/skill that defined the hook
-        matcher: Optional tool matcher pattern
-        session_id: Optional explicit session ID (uses current if not provided)
-    """
-    if session_id is None:
-        session_id = get_session_id()
-
-    hook_id = _generate_hook_id(hook_type, command, source, matcher)
-    data = _load_tracker_data()
-
-    # Get or create session data
-    if session_id not in data:
-        data[session_id] = SessionData(
-            session_id=session_id,
-            started_at=datetime.now().isoformat(),
-        )
-
-    # Record execution
-    data[session_id].executions[hook_id] = HookExecution(
-        hook_id=hook_id,
-        hook_type=hook_type,
-        executed_at=datetime.now().isoformat(),
-        source=source,
-    )
-
-    _save_tracker_data(data)
-
-
-def should_execute_hook(
-    hook_type: str,
-    command: str,
-    source: str,
-    once: bool = False,
-    matcher: str | None = None,
-) -> bool:
-    """Determine if a hook should be executed.
-
-    Args:
-        hook_type: Type of hook
-        command: The hook command
-        source: Source file/skill
-        once: Whether hook is marked as once-per-session
-        matcher: Optional tool matcher
-
-    Returns:
-        True if hook should be executed, False if it should be skipped
-    """
-    if not once:
-        return True
-
-    return not has_executed_once(hook_type, command, source, matcher)
-
-
 def cleanup_old_sessions(ttl_seconds: int = SESSION_TTL_SECONDS) -> int:
     """Clean up sessions older than TTL.
 
@@ -306,111 +195,3 @@ def cleanup_old_sessions(ttl_seconds: int = SESSION_TTL_SECONDS) -> int:
         _save_tracker_data(data)
 
     return cleaned
-
-
-def reset_session() -> str:
-    """Reset the current session (start a new one).
-
-    Returns:
-        New session ID
-    """
-    # Remove cached session file
-    if SESSION_FILE.exists():
-        try:
-            SESSION_FILE.unlink()
-        except OSError:
-            pass  # Best-effort: new session will be generated regardless
-
-    # Clear any environment variable cache
-    if "CLAUDE_SESSION_ID" in os.environ:
-        del os.environ["CLAUDE_SESSION_ID"]
-
-    # Generate and return new session
-    return get_session_id()
-
-
-def get_session_stats() -> dict:
-    """Get statistics about the current session.
-
-    Returns:
-        Dictionary with session statistics
-    """
-    session_id = get_session_id()
-    data = _load_tracker_data()
-
-    session_data = data.get(session_id)
-    if session_data is None:
-        return {
-            "session_id": session_id,
-            "started_at": None,
-            "hooks_executed": 0,
-            "hook_types": {},
-        }
-
-    # Count by hook type
-    hook_types: dict[str, int] = {}
-    for execution in session_data.executions.values():
-        hook_type = execution.hook_type
-        hook_types[hook_type] = hook_types.get(hook_type, 0) + 1
-
-    return {
-        "session_id": session_id,
-        "started_at": session_data.started_at,
-        "hooks_executed": len(session_data.executions),
-        "hook_types": hook_types,
-    }
-
-
-# Convenience function for CLI/scripts
-def check_and_mark(
-    hook_type: str,
-    command: str,
-    source: str,
-    once: bool = False,
-    matcher: str | None = None,
-) -> bool:
-    """Check if hook should execute and mark it if so - optimized single I/O.
-
-    Atomic operation that checks and marks in one call with single load/save.
-
-    Args:
-        hook_type: Type of hook
-        command: The hook command
-        source: Source file/skill
-        once: Whether hook is marked as once-per-session
-        matcher: Optional tool matcher
-
-    Returns:
-        True if hook should execute (and was marked), False otherwise
-    """
-    if not once:
-        return True
-
-    session_id = get_session_id()
-    hook_id = _generate_hook_id(hook_type, command, source, matcher)
-
-    # Single load
-    data = _load_tracker_data()
-
-    # Check if already executed
-    session_data = data.get(session_id)
-    if session_data and hook_id in session_data.executions:
-        return False
-
-    # Mark as executed
-    if session_id not in data:
-        data[session_id] = SessionData(
-            session_id=session_id,
-            started_at=datetime.now().isoformat(),
-        )
-
-    data[session_id].executions[hook_id] = HookExecution(
-        hook_id=hook_id,
-        hook_type=hook_type,
-        executed_at=datetime.now().isoformat(),
-        source=source,
-    )
-
-    # Single save
-    _save_tracker_data(data)
-    return True

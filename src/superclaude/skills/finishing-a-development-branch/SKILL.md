@@ -8,7 +8,7 @@ hooks:
     - matcher: "Bash"
       hooks:
         - type: command
-          command: "echo \"$CLAUDE_TOOL_INPUT\" | grep -qE 'git branch -D([^a-zA-Z]|$)|git push (--force([^-]|$)|-f([^a-zA-Z]|$))' && echo 'BLOCKED: Destructive git operation. Confirm with user first (--force-with-lease is allowed).' >&2 && exit 2 || exit 0"
+          command: "grep -qE 'git branch -D([^a-zA-Z]|$)|git push (--force([^-]|$)|-f([^a-zA-Z]|$))' && echo 'BLOCKED: Destructive git operation. Confirm with user first (--force-with-lease is allowed).' >&2 && exit 2 || exit 0"
 ---
 
 <component name="finishing-a-development-branch" type="skill">

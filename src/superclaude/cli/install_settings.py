@@ -16,16 +16,21 @@ from superclaude.utils import atomic_write_json
 CLAUDE_SC_IMPORT = "@superclaude/CLAUDE_SC.md"
 
 # Markers to identify SuperClaude hooks (for merge/replace logic).
-# Match is substring-based against `_comment` and `command` fields.
-# `superclaude` catches `[superclaude] ...` _comment prefixes (incl. serena-recommended hooks).
+# Match is substring-based against `_comment` and `command` fields, but every
+# marker is anchored — bare script names like "session_init" would misclassify
+# a user's own hook as SC-owned and silently replace/remove it on install/uninstall.
+# `[superclaude]` catches `[superclaude] ...` _comment prefixes (incl.
+# serena-recommended hooks) and echo-only hook commands.
 SUPERCLAUDE_HOOK_MARKERS = [
-    "superclaude",
-    "session_init",
-    "prettier_hook",
-    "test_runner_hook",
-    "file_size_guard",
-    "BLOCKED: destructive",
+    "[superclaude]",
+    "{{SCRIPTS_PATH}}",  # unresolved template form of the scripts path
+    "BLOCKED: destructive",  # legacy inline destructive-Bash blocker command
 ]
+
+# Resolved {{SCRIPTS_PATH}} form: command references a script under a
+# superclaude scripts directory (absolute user-scope path or
+# $CLAUDE_PROJECT_DIR/.claude/superclaude/scripts; / or \ separators).
+_SC_SCRIPTS_PATH_RE = re.compile(r"superclaude[/\\]scripts[/\\]")
 
 
 def _load_settings(settings_file: Path) -> dict:
@@ -111,8 +116,9 @@ def _is_superclaude_hook(hook_entry: dict) -> bool:
         hook_entry: A hook entry dict with "hooks" array
 
     Returns:
-        True if any hook command contains SuperClaude markers,
-        or the entry's _comment references experimental agent teams
+        True if any hook command references a SuperClaude scripts path
+        (template or resolved) or contains an anchored SuperClaude marker,
+        or a `_comment` carries the `[superclaude]` tag
     """
     # Check _comment field on the hook entry itself
     comment = hook_entry.get("_comment", "")
@@ -122,6 +128,8 @@ def _is_superclaude_hook(hook_entry: dict) -> bool:
     for hook in hook_entry.get("hooks", []):
         cmd = hook.get("command", "")
         if any(marker in cmd for marker in SUPERCLAUDE_HOOK_MARKERS):
+            return True
+        if _SC_SCRIPTS_PATH_RE.search(cmd):
             return True
         # Also check _comment on inner hook objects (e.g. test_runner_hook)
         inner_comment = hook.get("_comment", "")

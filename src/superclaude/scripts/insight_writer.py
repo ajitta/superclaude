@@ -15,8 +15,8 @@ Read paths require jq; write paths are pure Python. Missing jq prints install
 hint to stderr and exits 1.
 
 Hook integration:
-    SessionEnd / PreCompact → harvest --source <reason>
-    SessionStart            → pending-count
+    SessionEnd / PreCompact → harvest-from-hook (stdin JSON: reason/trigger + cwd)
+    SessionStart            → pending-count-from-hook (stdin JSON: cwd)
 
 Transcript discovery: ~/.claude/projects/<encoded-cwd>/<session_id>.jsonl
 where encoded-cwd replaces [:\\/] with '-'.
@@ -356,11 +356,11 @@ def cmd_harvest(args: argparse.Namespace) -> int:
 # ---------- review / promote / pending-count ----------
 
 
-def _read_pending() -> list[dict]:
-    if not PENDING_FILE.exists():
+def _read_pending(path: Path = PENDING_FILE) -> list[dict]:
+    if not path.exists():
         return []
     out: list[dict] = []
-    with PENDING_FILE.open(encoding="utf-8") as f:
+    with path.open(encoding="utf-8") as f:
         for line in f:
             try:
                 out.append(json.loads(line))
@@ -439,7 +439,10 @@ def cmd_promote(args: argparse.Namespace) -> int:
 
 
 def cmd_pending_count(args: argparse.Namespace) -> int:
-    n = len(_read_pending())
+    # Anchor to the hook's cwd (same as cmd_harvest) so the SessionStart notice
+    # reads the pending file harvest wrote, even under non-default hook cwd.
+    cwd = args.cwd or os.getcwd()
+    n = len(_read_pending(Path(cwd) / ".claude" / "insights.pending.jsonl"))
     if n > 0:
         print(f"🟡 {n} pending insight(s) — run /sc:insight --review")
     return 0
@@ -489,37 +492,42 @@ def build_parser() -> argparse.ArgumentParser:
     pr.set_defaults(fn=cmd_promote)
 
     pc = sub.add_parser("pending-count")
+    pc.add_argument("--cwd", default=None)
     pc.set_defaults(fn=cmd_pending_count)
 
     return p
 
 
 def main(argv: list[str] | None = None) -> int:
-    # Special hook entry point: when invoked from PreCompact/SessionEnd hooks,
-    # the harness pipes JSON to stdin. If first arg is "harvest-from-hook",
-    # parse stdin to extract session_id / cwd / source automatically.
+    # Special hook entry points: when invoked from SessionStart/PreCompact/
+    # SessionEnd hooks, the harness pipes JSON to stdin. Parse it to extract
+    # session_id / cwd / reason|trigger automatically.
     if argv is None:
         argv = sys.argv[1:]
 
-    if argv and argv[0] == "harvest-from-hook":
+    if argv and argv[0] in ("harvest-from-hook", "pending-count-from-hook"):
         try:
             data = json.loads(sys.stdin.read() or "{}")
         except json.JSONDecodeError:
             data = {}
-        source = (
-            data.get("source")  # SessionEnd
-            or data.get("trigger")  # PreCompact
-            or "other"
-        )
-        argv = [
-            "harvest",
-            "--source",
-            str(source),
-            "--session-id",
-            str(data.get("session_id", "")),
-            "--cwd",
-            str(data.get("cwd", os.getcwd())),
-        ]
+        cwd = str(data.get("cwd", os.getcwd()))
+        if argv[0] == "pending-count-from-hook":
+            argv = ["pending-count", "--cwd", cwd]
+        else:
+            source = (
+                data.get("reason")  # SessionEnd
+                or data.get("trigger")  # PreCompact
+                or "other"
+            )
+            argv = [
+                "harvest",
+                "--source",
+                str(source),
+                "--session-id",
+                str(data.get("session_id", "")),
+                "--cwd",
+                cwd,
+            ]
 
     args = build_parser().parse_args(argv)
     return args.fn(args)

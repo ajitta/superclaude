@@ -34,7 +34,7 @@ description: Repo index, 94% token cut (58K→3K). Use ONLY when user type `/sc:
       5. Config: *.toml | *.json | *.yaml | *.yml
     - Output:
       - docs/reports/PROJECT_INDEX.md: ~3KB, human, quick ref
-      - docs/reports/PROJECT_INDEX.json: ~10KB, machine, full metadata
+      - docs/reports/PROJECT_INDEX.json: <5KB, machine, full metadata
   </patterns>
 
   <roi>
@@ -49,7 +49,7 @@ description: Repo index, 94% token cut (58K→3K). Use ONLY when user type `/sc:
 
 | Input | Output |
 |---|---|
-| `/index-repo` | make full index |
+| `/sc:index-repo` | make full index |
 | `mode=update` | update existing |
 | `mode=quick` | skip tests |
 

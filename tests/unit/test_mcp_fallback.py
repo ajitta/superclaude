@@ -63,14 +63,18 @@ class TestMcpFallback:
         # playwright should still notify (first time)
         should_notify, fallback = should_notify_fallback("playwright")
         assert should_notify is True
-        assert "--chrome (native" in fallback
+        assert "--devtools" in fallback
 
     def test_format_fallback_notification(self, temp_fallback_dir: Path):
         """Test notification message format."""
         from superclaude.hooks.mcp_fallback import format_fallback_notification
 
         msg = format_fallback_notification("Sequential", "Native reasoning")
-        assert msg == "⚠️ Sequential unavailable → using Native reasoning"
+        # Conditional phrasing — the hook cannot check real availability,
+        # so the hint must not assert the server is down.
+        assert (
+            msg == "ℹ️ If Sequential MCP is unavailable, fall back to: Native reasoning"
+        )
 
     def test_check_mcp_and_notify_returns_message(self, temp_fallback_dir: Path):
         """Test combined check and notify function."""
@@ -80,7 +84,7 @@ class TestMcpFallback:
         result = check_mcp_and_notify("playwright")
         assert result is not None
         assert "Playwright" in result or "playwright" in result
-        assert "--chrome" in result or "plugin" in result.lower()
+        assert "--devtools" in result
 
         # Second call - returns None
         result2 = check_mcp_and_notify("playwright")
@@ -103,6 +107,27 @@ class TestMcpFallback:
         from superclaude.hooks.mcp_fallback import get_fallback_for
 
         assert get_fallback_for("unknown-mcp") == "Native"
+
+    def test_session_id_passthrough_rotates_per_session(self, temp_fallback_dir: Path):
+        """A new CC session id re-arms the hint; same session stays suppressed."""
+        from superclaude.hooks.mcp_fallback import should_notify_fallback
+
+        first, _ = should_notify_fallback("serena", session_id="cc-session-1")
+        assert first is True
+
+        repeat, _ = should_notify_fallback("serena", session_id="cc-session-1")
+        assert repeat is False
+
+        next_session, _ = should_notify_fallback("serena", session_id="cc-session-2")
+        assert next_session is True
+
+    def test_check_mcp_and_notify_passes_session_id(self, temp_fallback_dir: Path):
+        """check_mcp_and_notify keys the hint on the provided CC session id."""
+        from superclaude.hooks.mcp_fallback import check_mcp_and_notify
+
+        assert check_mcp_and_notify("tavily", session_id="cc-a") is not None
+        assert check_mcp_and_notify("tavily", session_id="cc-a") is None
+        assert check_mcp_and_notify("tavily", session_id="cc-b") is not None
 
     def test_case_insensitive_mcp_names(self, temp_fallback_dir: Path):
         """Test MCP names are handled case-insensitively."""

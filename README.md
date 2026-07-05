@@ -573,7 +573,7 @@ Flags are behavioral hints that any `/sc:*` prompt accepts. The model reads them
 | `--research` | Need evidence, citations, external knowledge | Systematic investigation, evidence-based reasoning |
 | `--business-panel` | Strategy/market/competitive analysis | Multi-expert business analysis & synthesis |
 | `--introspect` | Stuck, error recovery, "why is it doing X?" | Exposes thinking with 🤔🎯⚡📊💡 markers |
-| `--task-manage` | >3 steps · >2 dirs · >3 files | Delegation + progressive enhancement |
+| `--task-manage` | >3 steps · >2 dirs · >3 files | Hierarchical task organization + persistent memory checkpoints |
 | `--orchestrate` | Multi-tool, parallel, perf-sensitive | Tool-matrix optimization |
 | `--token-efficient` / `--uc` | Context > 75 % or large ops | Symbol system, 30–50 % reduction |
 | `--vs [standard\|cot\|multi]` | "Multiple perspectives", brainstorm options | Verbalized sampling — probability-weighted candidates. Sub-params: `[k:3-7] [tau:0.01-0.20] [turns:2-5] [no-synthesis]` |

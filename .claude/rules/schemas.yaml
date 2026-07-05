@@ -15,12 +15,13 @@ agent_colors:
 
 # Effort enum — adaptive reasoning depth (CC v2.1.69+).
 # Optional field on agents; validated only when present. Source: .claude/rules/agent-authoring.md.
+# Availability gates are model-generation-specific — verify against current model docs, not pinned versions here.
 effort_values:
   - low       # mechanical/structured tasks
   - medium    # standard design + analysis
-  - high      # complex reasoning, deep debugging (Opus 4.8 default, all surfaces)
-  - xhigh     # difficult tasks + long-running async work (Opus 4.7+; CC 2.1.111+)
-  - max       # multi-perspective synthesis (Opus 4.6+)
+  - high      # complex reasoning, deep debugging (typical flagship default)
+  - xhigh     # difficult tasks + long-running async work (CC 2.1.111+; model-gated)
+  - max       # multi-perspective synthesis (model-gated)
 
 # Command frontmatter forbidden fields — these belong on agents/skills, not commands.
 # Source: .claude/rules/command-authoring.md "Forbidden fields" list.

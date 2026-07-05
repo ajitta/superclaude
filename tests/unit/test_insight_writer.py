@@ -403,7 +403,7 @@ class TestReviewPromote:
     def test_pending_count_zero_silent(self, workdir, capsys):
         import argparse
 
-        rc = iw.cmd_pending_count(argparse.Namespace())
+        rc = iw.cmd_pending_count(argparse.Namespace(cwd=None))
         assert rc == 0
         assert capsys.readouterr().out == ""
 
@@ -425,7 +425,7 @@ class TestReviewPromote:
         capsys.readouterr()  # drain harvest output
         import argparse
 
-        iw.cmd_pending_count(argparse.Namespace())
+        iw.cmd_pending_count(argparse.Namespace(cwd=None))
         out = capsys.readouterr().out
         assert "pending insight" in out
 
@@ -467,8 +467,9 @@ class TestHarvestFromHook:
                 }
             ],
         )
+        # Real SessionEnd payloads carry 'reason' (SessionStart carries 'source').
         payload = json.dumps(
-            {"session_id": "sess1", "cwd": str(workdir), "source": "clear"}
+            {"session_id": "sess1", "cwd": str(workdir), "reason": "clear"}
         )
         monkeypatch.setattr("sys.stdin", _StdinMock(payload))
         rc = iw.main(["harvest-from-hook"])
@@ -546,6 +547,34 @@ class _StdinMock:
 
     def read(self) -> str:
         return self._text
+
+
+class TestPendingCountFromHook:
+    def test_reads_cwd_from_stdin_payload(self, workdir, monkeypatch, capsys):
+        # Pending file lives in a project dir that is NOT the process cwd —
+        # the hook stdin cwd must win (same anchoring as harvest-from-hook).
+        other = workdir / "otherproj"
+        pending = other / ".claude" / "insights.pending.jsonl"
+        pending.parent.mkdir(parents=True)
+        pending.write_text('{"uuid": "u1", "raw_text": "x"}\n', encoding="utf-8")
+        payload = json.dumps(
+            {"session_id": "sess1", "cwd": str(other), "source": "startup"}
+        )
+        monkeypatch.setattr("sys.stdin", _StdinMock(payload))
+        rc = iw.main(["pending-count-from-hook"])
+        assert rc == 0
+        assert "1 pending insight" in capsys.readouterr().out
+
+    def test_malformed_payload_falls_back_to_process_cwd(
+        self, workdir, monkeypatch, capsys
+    ):
+        pending = workdir / ".claude" / "insights.pending.jsonl"
+        pending.parent.mkdir(parents=True)
+        pending.write_text('{"uuid": "u1", "raw_text": "x"}\n', encoding="utf-8")
+        monkeypatch.setattr("sys.stdin", _StdinMock("not-json {garbage"))
+        rc = iw.main(["pending-count-from-hook"])
+        assert rc == 0
+        assert "1 pending insight" in capsys.readouterr().out
 
 
 # ---------- _now_iso (S5) + inline marker (S2) + tail-scan (S4) ----------

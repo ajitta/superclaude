@@ -21,9 +21,9 @@ description: Gen focused docs for components, functions, APIs, features. Use whe
 | Type | Output | Metrics |
 |---|---|---|
 | inline | JSDoc/docstring in source files | coverage ≥80% |
-| external | `docs/<component>-docs.md` (per-component) | all public APIs |
+| external | `docs/reports/<COMPONENT>_DOCS.md` (living doc, per-component) | all public APIs |
 | api | `docs/reports/API.md` (living doc, project-wide) | endpoints 100% |
-| guide | `docs/<topic>-guide.md` (per-topic) | install+usage+examples |
+| guide | `docs/reports/<TOPIC>_GUIDE.md` (living doc, per-topic) | install+usage+examples |
   </outputs>
 
 
@@ -61,7 +61,7 @@ description: Gen focused docs for components, functions, APIs, features. Use whe
 
   <gotchas>
   - no-unsolicited: No create doc files unless explicit request
-  - naming: Follow doc_output_convention from core/rules/RULES_DOCS.md for file naming (topic-slug-username-date.md)
+  - naming: Follow doc_output_convention from core/rules/RULES_DOCS.md — file outputs are living docs (UPPER_SNAKE in docs/reports/, no date/username)
   </gotchas>
 
   <bounds>

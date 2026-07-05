@@ -7,7 +7,7 @@ description: Code analysis across quality, security, performance, architecture d
     <mission>Code analysis across quality, security, performance, architecture domains</mission>
   </role>
 
-  <syntax>/sc:analyze [target] [--focus quality|security|performance|architecture|rules] [--depth quick|deep] [--format text|json|report]</syntax>
+  <syntax>/sc:analyze [target] [--focus perf|security|quality|arch|a11y|testing|rules] [--depth quick|deep] [--format text|json|report]</syntax>
 
   <flow>
   1. Discover: Categorize files by language
@@ -41,7 +41,7 @@ Routing (`--format report` only): per core/rules/RULES_DOCS.md `<doc_output_conv
 
   <focus_agent_mapping>
   When --focus specified and task benefits from specialist depth, delegate to corresponding agent:
-  security → @security-engineer | performance → @performance-engineer | quality → @quality-engineer | architecture → @system-architect | a11y → @frontend-architect
+  security → @security-engineer | perf → @performance-engineer | quality → @quality-engineer | arch → @system-architect | a11y → @frontend-architect
   </focus_agent_mapping>
 
   <rules_analysis note="--focus rules: rule effectiveness audit">
@@ -66,13 +66,13 @@ Routing (`--format report` only): per core/rules/RULES_DOCS.md `<doc_output_conv
 |---|---|
 | `/sc:analyze` | Multi-domain findings inline |
 | `src/auth --focus security --depth deep` | Security vulnerability assessment |
-| `--focus performance --format report` | `docs/analysis/<target>-<user>-YYYY-MM-DD.md` with bottleneck roadmap |
+| `--focus perf --format report` | `docs/analysis/<target>-<user>-YYYY-MM-DD.md` with bottleneck roadmap |
 | `src/components --focus quality --format json` | `docs/analysis/<target>-<user>-YYYY-MM-DD.json` with code smell findings |
 | `--focus rules` | Rule heatmap + maturity label + recommendations |
 
   <example name="invalid-focus" type="error-path">
     - Input: /sc:analyze --focus everything --scope system
-    - Why wrong: --focus accepts: quality|security|performance|architecture|rules. 'everything' not valid.
+    - Why wrong: --focus accepts: perf|security|quality|arch|a11y|testing|rules. 'everything' not valid.
     - Correct: /sc:analyze --scope system (omit --focus for multi-domain analysis)
   </example>
 

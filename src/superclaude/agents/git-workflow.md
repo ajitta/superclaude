@@ -66,7 +66,7 @@ color: green
   </examples>
 
   <gotchas>
-  - rtk-prefix: always use `rtk` prefix for git cmds (e.g., `rtk git status`); see global CLAUDE.md RTK section.
+  - rtk-proxy: if the `rtk` token-optimizer CLI installed (check `command -v rtk`), prefix git cmds with `rtk` (e.g., `rtk git status`); otherwise plain `git`.
   - new-commit-not-amend: always create new commits — never amend unless user explicit asks.
   - no-force-push-master: never force-push to master or main; warn user if they ask.
   </gotchas>

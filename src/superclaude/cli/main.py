@@ -743,10 +743,14 @@ def verify_drift_cmd(scope: str, verbose: bool):
     """
     Check for installation drift between source and installed files.
 
-    Compares each installed file against the package source to detect:
+    Compares installed content against the package source to detect:
     - MISSING: source file not installed
     - DRIFTED: installed file differs from source
     - EXTRA: installed file has no source counterpart
+
+    Coverage: component .md files (incl. core/rules/), skill SKILL.md
+    manifests, and CLAUDE_SC.md. Not checked: templates/, installed
+    scripts/, and the merged hooks.json.
 
     Examples:
         superclaude verify-drift
@@ -839,7 +843,8 @@ def audit(scope: str, verbose: bool, check: str, output_format: str, out: Path |
     Run content integrity audit.
 
     Combines drift detection, cross-reference validation, and content usage
-    checks into a single report.
+    checks into a single report. Drift coverage matches verify-drift
+    (templates/, installed scripts/, and hooks.json are not checked).
 
     Examples:
         superclaude audit

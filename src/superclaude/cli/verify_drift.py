@@ -3,6 +3,10 @@ Drift Detection for SuperClaude Installation
 
 Compares source files against installed files to detect drift
 (content mismatches, missing files, extra files).
+
+Coverage boundary: component *.md files (COMPONENTS, incl. core/rules/),
+skill SKILL.md manifests, and CLAUDE_SC.md only. templates/, installed
+scripts/, and the merged hooks.json are NOT drift-checked.
 """
 
 from pathlib import Path
@@ -48,6 +52,27 @@ def _compare_files(
         for placeholder, value in template_vars.items():
             source_content = source_content.replace(placeholder, value)
     return OK if source_content == target_content else DRIFTED
+
+
+def _compare_agent_with_scope_rewrite(source: Path, target: Path) -> str:
+    """Re-compare an agent file accepting install-time memory-scope rewrites.
+
+    Install rewrites agent frontmatter `memory: project` to the install scope
+    (user/local); a raw compare would report every agent as DRIFTED on a clean
+    non-project-scope install. The base path alone cannot tell user from local
+    scope, so any valid scope variant counts as clean.
+    """
+    from .install_components import _rewrite_agent_memory_scope
+
+    try:
+        source_content = source.read_text(encoding="utf-8")
+        target_content = target.read_text(encoding="utf-8")
+    except (OSError, UnicodeDecodeError):
+        return DRIFTED
+    for scope in ("user", "local"):
+        if _rewrite_agent_memory_scope(source_content, scope) == target_content:
+            return OK
+    return DRIFTED
 
 
 def _check_component(component: str, base_path: Path) -> Dict[str, str]:
@@ -107,7 +132,11 @@ def _check_component(component: str, base_path: Path) -> Dict[str, str]:
         for filename in sorted(source_files):
             source_file = source_dir / filename
             target_file = target_dir / filename
-            results[filename] = _compare_files(source_file, target_file)
+            status = _compare_files(source_file, target_file)
+            if component == "agents" and status == DRIFTED:
+                # Install rewrites `memory: project` to the install scope
+                status = _compare_agent_with_scope_rewrite(source_file, target_file)
+            results[filename] = status
 
         # Check for extra files in target
         if target_dir.exists():

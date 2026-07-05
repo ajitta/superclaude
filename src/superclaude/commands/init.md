@@ -51,7 +51,7 @@ description: Interactive project env setup — pick + run init tasks for first-s
   <task_outputs>
   | Task | Artifact | Location |
   |------|----------|----------|
-  | a | PROJECT_INDEX.md | project root |
+  | a | PROJECT_INDEX.md | docs/reports/ |
   | b | CLAUDE.md | project root |
   | c | Install status report | console |
   | d | Test baseline | auto memory |
@@ -59,7 +59,7 @@ description: Interactive project env setup — pick + run init tasks for first-s
   | f | MCP recommendations | console |
   | g | MEMORY.md + topic files | .claude/memory/ |
   | h | general.md | .claude/rules/gotchas/ |
-  | i | PRD.md, ARCHITECTURE.md, ADR/0001-*.md, UI-GUIDE.md | docs/ (project root) |
+  | i | PRD.md, ARCHITECTURE.md, adr/0001-*.md, UI-GUIDE.md | docs/ (project root) |
   </task_outputs>
 
   <safety_rules>
@@ -68,7 +68,7 @@ description: Interactive project env setup — pick + run init tasks for first-s
   - Test execution (d): warn if test suite is large (>500 tests), offer --quick test flag
   - Memory init (g): merge with existing MEMORY.md, never replace
   - Gotchas init (h): create .claude/rules/gotchas/ directory + general.md only if not exists. Idempotent — skip if gotchas/ already present. Template: 4-line comment header, no frontmatter.
-  - Docs scaffold (i): create docs/ directory and copy PRD.md, ARCHITECTURE.md, UI-GUIDE.md, plus docs/ADR/0001-example.md from ~/.claude/superclaude/templates/docs-scaffold/ (project-scope installs: .claude/superclaude/templates/docs-scaffold/). Idempotent — skip per-file if it already exists; never overwrite user content. UI-GUIDE.md is optional (note this and let user delete for headless projects).
+  - Docs scaffold (i): create docs/ directory and copy PRD.md, ARCHITECTURE.md, UI-GUIDE.md, plus ADR-0001-template.md as docs/adr/0001-example.md, from ~/.claude/superclaude/templates/docs-scaffold/ (project-scope installs: .claude/superclaude/templates/docs-scaffold/). Idempotent — skip per-file if it already exists; never overwrite user content. UI-GUIDE.md is optional (note this and let user delete for headless projects).
   - All tasks: idempotent — safe to re-run, updates rather than duplicates
   </safety_rules>
 

@@ -30,7 +30,7 @@
   ## Ultracode Posture
   - Different-Axes: ultracode "cost not a constraint" optimizes PROCESS breadth; --uc/--token-efficient optimizes OUTPUT compression under context-window pressure. Orthogonal levers — coexist as exhaustive process + compressed transport.
   - Proactive-Holds: under ultracode the >=60% proactive --uc still fires as a window-overflow guard (window pressure != cost concern). Only the reach for --uc purely to save money is dropped; the safety floor (--safe-mode auto-compress) is never relaxed.
-  - Per-Step-Shrink: per-subagent output compression delays context exhaustion but does NOT raise the hard 1000-agent fan-out cap — count caps survive compression.
+  - Per-Step-Shrink: per-subagent output compression delays context exhaustion but does NOT raise the harness agent-count caps (fan-out concurrency min(16, cpu-2); 1000-agent lifetime cap) — count caps survive compression.
   - Advisory-Floor: compressed subagent output stays advisory — compression does not upgrade it to authoritative; revalidate cited file:line before acting on it.
 
   ## Symbols
@@ -55,7 +55,7 @@
   </examples>
 
   ## Compaction
-  - When: Context >60% used (proactive — auto-trigger thresholds higher per FLAGS.md), answer quality degrading, or explicit --uc flag
+  - When: Context >=60% used (proactive — auto-trigger thresholds higher per FLAGS.md), answer quality degrading, or explicit --uc flag
   - Preserve: Architecture decisions, unresolved issues, impl details, active file paths
   - Discard: Completed tool outputs, resolved intermediate results, stale error messages
   - Safest action: Clear old tool call results — agent rarely needs raw results from earlier turns

@@ -18,17 +18,17 @@ SKILLS_DIR = Path(__file__).parent.parent.parent / "src" / "superclaude" / "skil
 
 # All superclaude skill names by category
 HOOK_SKILL_NAMES = {
-    "confidence-check",  # PreToolUse hook + validation script
-    "simplicity-coach",  # Stop hook + dependency-audit script
+    "ship",  # disable-model-invocation + PreToolUse force-push guard
+    "finishing-a-development-branch",  # disable-model-invocation + allowed-tools + PreToolUse destructive-git guard
 }
 
 SAFETY_SKILL_NAMES = {
-    "ship",  # disable-model-invocation
-    "finishing-a-development-branch",  # disable-model-invocation + allowed-tools
+    "simplicity-coach",  # disable-model-invocation + dependency-audit script (no Stop hook)
 }
 
 # Reference skills: auto-invocation via description matching, no hooks/safety
 REFERENCE_SKILL_NAMES: set[str] = {
+    "confidence-check",  # Auto-invocation reference skill (no hooks/safety)
     "verbalized-sampling",  # Auto-invocation reference skill (no hooks/safety)
 }
 
@@ -111,7 +111,7 @@ class TestSkillCoverage:
         assert not missing, f"Missing hook skills: {missing}"
 
     def test_all_safety_skills_present(self):
-        """Both safety skills must exist."""
+        """All safety skills must exist."""
         actual = set(SKILL_IDS)
         missing = SAFETY_SKILL_NAMES - actual
         assert not missing, f"Missing safety skills: {missing}"
@@ -277,8 +277,9 @@ class TestWorkflowGates:
 class TestNoAggressiveLanguage:
     """Validate skills do not contain aggressive enforcement language.
 
-    Per Anthropic Opus 4.6 prompting guidance: 'dial back aggressive language'
-    and 'prefer general instructions over prescriptive steps'.
+    Per Anthropic prompting guidance ('dial back aggressive language',
+    'prefer general instructions over prescriptive steps' — measured
+    Opus 4.6-era, retained under later flagships).
     """
 
     FORBIDDEN_PATTERNS = [

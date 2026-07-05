@@ -4,7 +4,6 @@ Unit tests for Hook Tracker
 Tests session tracking and hook execution management.
 """
 
-import os
 from datetime import datetime, timedelta
 from unittest.mock import patch
 
@@ -12,17 +11,10 @@ from superclaude.hooks.hook_tracker import (
     HookExecution,
     SessionData,
     _ensure_tracker_dir,
-    _generate_hook_id,
     _load_tracker_data,
     _save_tracker_data,
-    check_and_mark,
     cleanup_old_sessions,
     get_session_id,
-    get_session_stats,
-    has_executed_once,
-    mark_executed,
-    reset_session,
-    should_execute_hook,
 )
 
 
@@ -120,32 +112,6 @@ class TestGetSessionId:
             assert session_file.read_text() == session_id
 
 
-class TestGenerateHookId:
-    """Test _generate_hook_id function"""
-
-    def test_basic_generation(self):
-        """Test basic hook ID generation"""
-        hook_id = _generate_hook_id("PreToolUse", "echo test", "skill.md")
-
-        assert len(hook_id) == 12
-        assert all(c in "0123456789abcdef" for c in hook_id)
-
-    def test_with_matcher(self):
-        """Test hook ID with matcher"""
-        hook_id1 = _generate_hook_id("PreToolUse", "echo test", "skill.md", None)
-        hook_id2 = _generate_hook_id("PreToolUse", "echo test", "skill.md", "Write")
-
-        # Different matchers should produce different IDs
-        assert hook_id1 != hook_id2
-
-    def test_deterministic(self):
-        """Test hook ID is deterministic"""
-        id1 = _generate_hook_id("PostToolUse", "cmd", "source")
-        id2 = _generate_hook_id("PostToolUse", "cmd", "source")
-
-        assert id1 == id2
-
-
 class TestTrackerDataPersistence:
     """Test _load_tracker_data and _save_tracker_data"""
 
@@ -198,152 +164,6 @@ class TestTrackerDataPersistence:
         with patch("superclaude.hooks.hook_tracker.HOOK_TRACKER_FILE", tracker_file):
             data = _load_tracker_data()
             assert data == {}
-
-
-class TestHasExecutedOnce:
-    """Test has_executed_once function"""
-
-    def test_not_executed(self, tmp_path, monkeypatch):
-        """Test returns False when not executed"""
-        tracker_dir = tmp_path / "hooks"
-        tracker_file = tracker_dir / "hook_executions.json"
-        session_file = tmp_path / "session.txt"
-
-        monkeypatch.setenv("CLAUDE_SESSION_ID", "test-session")
-
-        with (
-            patch("superclaude.hooks.hook_tracker.HOOK_TRACKER_DIR", tracker_dir),
-            patch("superclaude.hooks.hook_tracker.HOOK_TRACKER_FILE", tracker_file),
-            patch("superclaude.hooks.hook_tracker.SESSION_FILE", session_file),
-        ):
-            result = has_executed_once("PreToolUse", "cmd", "source")
-            assert result is False
-
-    def test_executed(self, tmp_path, monkeypatch):
-        """Test returns True when already executed"""
-        tracker_dir = tmp_path / "hooks"
-        tracker_file = tracker_dir / "hook_executions.json"
-        session_file = tmp_path / "session.txt"
-
-        monkeypatch.setenv("CLAUDE_SESSION_ID", "test-session")
-
-        with (
-            patch("superclaude.hooks.hook_tracker.HOOK_TRACKER_DIR", tracker_dir),
-            patch("superclaude.hooks.hook_tracker.HOOK_TRACKER_FILE", tracker_file),
-            patch("superclaude.hooks.hook_tracker.SESSION_FILE", session_file),
-        ):
-            # Mark as executed
-            mark_executed("PreToolUse", "cmd", "source")
-
-            # Check
-            result = has_executed_once("PreToolUse", "cmd", "source")
-            assert result is True
-
-
-class TestMarkExecuted:
-    """Test mark_executed function"""
-
-    def test_marks_execution(self, tmp_path, monkeypatch):
-        """Test marking execution"""
-        tracker_dir = tmp_path / "hooks"
-        tracker_file = tracker_dir / "hook_executions.json"
-        session_file = tmp_path / "session.txt"
-
-        monkeypatch.setenv("CLAUDE_SESSION_ID", "test-session")
-
-        with (
-            patch("superclaude.hooks.hook_tracker.HOOK_TRACKER_DIR", tracker_dir),
-            patch("superclaude.hooks.hook_tracker.HOOK_TRACKER_FILE", tracker_file),
-            patch("superclaude.hooks.hook_tracker.SESSION_FILE", session_file),
-        ):
-            mark_executed("PostToolUse", "echo done", "skill.md", "Write")
-
-            data = _load_tracker_data()
-            assert "test-session" in data
-            assert len(data["test-session"].executions) == 1
-
-
-class TestShouldExecuteHook:
-    """Test should_execute_hook function"""
-
-    def test_always_executes_when_not_once(self, tmp_path, monkeypatch):
-        """Test hooks without once=true always execute"""
-        monkeypatch.setenv("CLAUDE_SESSION_ID", "test-session")
-
-        result = should_execute_hook("PreToolUse", "cmd", "source", once=False)
-        assert result is True
-
-    def test_checks_once_flag(self, tmp_path, monkeypatch):
-        """Test once=true checks execution history"""
-        tracker_dir = tmp_path / "hooks"
-        tracker_file = tracker_dir / "hook_executions.json"
-        session_file = tmp_path / "session.txt"
-
-        monkeypatch.setenv("CLAUDE_SESSION_ID", "test-session")
-
-        with (
-            patch("superclaude.hooks.hook_tracker.HOOK_TRACKER_DIR", tracker_dir),
-            patch("superclaude.hooks.hook_tracker.HOOK_TRACKER_FILE", tracker_file),
-            patch("superclaude.hooks.hook_tracker.SESSION_FILE", session_file),
-        ):
-            # First time should execute
-            result1 = should_execute_hook("PreToolUse", "cmd", "source", once=True)
-            assert result1 is True
-
-            # Mark as executed
-            mark_executed("PreToolUse", "cmd", "source")
-
-            # Second time should not execute
-            result2 = should_execute_hook("PreToolUse", "cmd", "source", once=True)
-            assert result2 is False
-
-
-class TestCheckAndMark:
-    """Test check_and_mark atomic function"""
-
-    def test_first_execution_returns_true(self, tmp_path, monkeypatch):
-        """Test first execution returns True and marks"""
-        tracker_dir = tmp_path / "hooks"
-        tracker_file = tracker_dir / "hook_executions.json"
-        session_file = tmp_path / "session.txt"
-
-        monkeypatch.setenv("CLAUDE_SESSION_ID", "test-session")
-
-        with (
-            patch("superclaude.hooks.hook_tracker.HOOK_TRACKER_DIR", tracker_dir),
-            patch("superclaude.hooks.hook_tracker.HOOK_TRACKER_FILE", tracker_file),
-            patch("superclaude.hooks.hook_tracker.SESSION_FILE", session_file),
-        ):
-            result = check_and_mark("PreToolUse", "cmd", "source", once=True)
-
-            assert result is True
-            # Should be marked now
-            assert has_executed_once("PreToolUse", "cmd", "source") is True
-
-    def test_second_execution_returns_false(self, tmp_path, monkeypatch):
-        """Test second execution returns False"""
-        tracker_dir = tmp_path / "hooks"
-        tracker_file = tracker_dir / "hook_executions.json"
-        session_file = tmp_path / "session.txt"
-
-        monkeypatch.setenv("CLAUDE_SESSION_ID", "test-session")
-
-        with (
-            patch("superclaude.hooks.hook_tracker.HOOK_TRACKER_DIR", tracker_dir),
-            patch("superclaude.hooks.hook_tracker.HOOK_TRACKER_FILE", tracker_file),
-            patch("superclaude.hooks.hook_tracker.SESSION_FILE", session_file),
-        ):
-            # First call
-            check_and_mark("PreToolUse", "cmd", "source", once=True)
-
-            # Second call
-            result = check_and_mark("PreToolUse", "cmd", "source", once=True)
-            assert result is False
-
-    def test_once_false_always_returns_true(self):
-        """Test once=False always returns True without any I/O"""
-        result = check_and_mark("PreToolUse", "cmd", "source", once=False)
-        assert result is True
 
 
 class TestCleanupOldSessions:
@@ -399,93 +219,6 @@ class TestCleanupOldSessions:
         with patch("superclaude.hooks.hook_tracker.HOOK_TRACKER_FILE", tracker_file):
             cleaned = cleanup_old_sessions()
             assert cleaned == 0
-
-
-class TestResetSession:
-    """Test reset_session function"""
-
-    def test_reset_clears_cached(self, tmp_path, monkeypatch):
-        """Test reset clears cached session"""
-        tracker_dir = tmp_path / "hooks"
-        session_file = tmp_path / "session.txt"
-        session_file.write_text("old-session-id")
-
-        monkeypatch.delenv("CLAUDE_SESSION_ID", raising=False)
-
-        with (
-            patch("superclaude.hooks.hook_tracker.HOOK_TRACKER_DIR", tracker_dir),
-            patch("superclaude.hooks.hook_tracker.SESSION_FILE", session_file),
-        ):
-            new_id = reset_session()
-
-            # Should get a new ID
-            assert new_id != "old-session-id"
-            assert len(new_id) == 16
-
-    def test_reset_clears_env(self, tmp_path, monkeypatch):
-        """Test reset clears environment variable"""
-        tracker_dir = tmp_path / "hooks"
-        session_file = tmp_path / "session.txt"
-
-        monkeypatch.setenv("CLAUDE_SESSION_ID", "env-session")
-
-        with (
-            patch("superclaude.hooks.hook_tracker.HOOK_TRACKER_DIR", tracker_dir),
-            patch("superclaude.hooks.hook_tracker.SESSION_FILE", session_file),
-        ):
-            reset_session()
-
-            # Environment should be cleared
-            assert "CLAUDE_SESSION_ID" not in os.environ
-
-
-class TestGetSessionStats:
-    """Test get_session_stats function"""
-
-    def test_stats_no_session(self, tmp_path, monkeypatch):
-        """Test stats for new session"""
-        tracker_dir = tmp_path / "hooks"
-        tracker_file = tracker_dir / "hook_executions.json"
-        session_file = tmp_path / "session.txt"
-
-        monkeypatch.setenv("CLAUDE_SESSION_ID", "new-session")
-
-        with (
-            patch("superclaude.hooks.hook_tracker.HOOK_TRACKER_DIR", tracker_dir),
-            patch("superclaude.hooks.hook_tracker.HOOK_TRACKER_FILE", tracker_file),
-            patch("superclaude.hooks.hook_tracker.SESSION_FILE", session_file),
-        ):
-            stats = get_session_stats()
-
-            assert stats["session_id"] == "new-session"
-            assert stats["started_at"] is None
-            assert stats["hooks_executed"] == 0
-            assert stats["hook_types"] == {}
-
-    def test_stats_with_executions(self, tmp_path, monkeypatch):
-        """Test stats with hook executions"""
-        tracker_dir = tmp_path / "hooks"
-        tracker_file = tracker_dir / "hook_executions.json"
-        session_file = tmp_path / "session.txt"
-
-        monkeypatch.setenv("CLAUDE_SESSION_ID", "test-session")
-
-        with (
-            patch("superclaude.hooks.hook_tracker.HOOK_TRACKER_DIR", tracker_dir),
-            patch("superclaude.hooks.hook_tracker.HOOK_TRACKER_FILE", tracker_file),
-            patch("superclaude.hooks.hook_tracker.SESSION_FILE", session_file),
-        ):
-            # Mark some executions
-            mark_executed("PreToolUse", "cmd1", "source1")
-            mark_executed("PreToolUse", "cmd2", "source2")
-            mark_executed("PostToolUse", "cmd3", "source3")
-
-            stats = get_session_stats()
-
-            assert stats["session_id"] == "test-session"
-            assert stats["hooks_executed"] == 3
-            assert stats["hook_types"]["PreToolUse"] == 2
-            assert stats["hook_types"]["PostToolUse"] == 1
 
 
 class TestEnsureTrackerDir:

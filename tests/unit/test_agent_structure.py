@@ -204,7 +204,7 @@ class TestAgentXMLStructure:
         sub-tag form (commit S390 measured Claude conflating <bounds> with
         <tool_guidance> when both used '- Label:' lines). Legacy attribute,
         body-labeled, and hedging-labeled (<should>/<avoid>) forms are rejected —
-        Opus 4.7 drops hedging verbs as optional.
+        Recent flagships drop hedging verbs as optional (measured Opus 4.7-era).
         """
         stem, content, _ = agent
         assert "<bounds>" in content, (
@@ -415,7 +415,7 @@ class TestAgentOptionalFields:
     """Validate optional CC-native fields when present (effort, maxTurns, tools, skills)."""
 
     def test_effort_valid_if_present(self, agent):
-        """If effort is set, it must be low/medium/high/max."""
+        """If effort is set, it must be a valid enum value per schemas.yaml (low/medium/high/xhigh/max)."""
         stem, content, fm = agent
         if "effort" in fm:
             assert fm["effort"] in VALID_EFFORT_VALUES, (

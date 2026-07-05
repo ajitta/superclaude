@@ -22,8 +22,8 @@ description: Session lifecycle mgmt w/ Serena MCP + Claude auto memory for proj 
 
   <storage>
     Serena (primary): .serena/memories/ — semantic proj memories, symbol-aware context
-    Auto memory (supplementary): .claude/memory/MEMORY.md (proj-scoped, committable, max 200 lines)
-    Topic files: .claude/memory/{topic}.md (linked from MEMORY.md)
+    Auto memory (supplementary): ~/.claude/projects/{project}/memory/MEMORY.md (CC-native, per-project, first 200 lines auto-load)
+    Topic files: ~/.claude/projects/{project}/memory/{topic}.md (linked from MEMORY.md, load on demand)
     Agent memory: .claude/agent-memory/{name}/MEMORY.md (proj-scoped, per-agent)
   </storage>
 

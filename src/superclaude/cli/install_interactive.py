@@ -142,6 +142,6 @@ def run_interactive_install() -> int:
 
     if success:
         click.echo()
-        click.echo("💡 Next: run `superclaude mcp install` to set up MCP servers.")
+        click.echo("💡 Next: run `superclaude mcp` to set up MCP servers.")
         return 0
     return 1

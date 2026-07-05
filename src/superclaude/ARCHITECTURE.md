@@ -29,7 +29,7 @@ Always-applied principles and rules that define SuperClaude's identity. Loaded v
 **Sub-roles:**
 - **Always-loaded** — FLAGS.md, PRINCIPLES.md, RULES.md (imported by CLAUDE_SC.md, present in every session). RULES.md is a ~0.9k-token kernel (Phase 2-1 core-lite split, measurement-gated by the evals/ 4×7 matrix): four rule classes whose loss is most expensive, plus a map of the on-demand modules.
 - **On-demand rule modules** — core/rules/RULES_{QUALITY,DELEGATION,DOCS,INTERACTION}.md — full R01–R21 detail, verification ladder, delegation matrix, doc conventions, selection protocol. Injected as full .md by context_loader on matching context (implement/review, delegation, doc-producing, /sc: commands); readable explicitly when no trigger fired.
-- **On-demand reference** — BUSINESS_SYMBOLS.md (loaded by context_loader when business-panel mode/agent activates)
+- **On-demand reference** — BUSINESS_SYMBOLS.md (loaded by context_loader on business-symbol/example keywords or `--structured` — not by `--business-panel`, which loads only MODE_Business_Panel.md)
 
 **Contract:** Files in core/ define framework-wide behavior. Always-loaded files must be concise — they consume context in every session.
 
@@ -69,7 +69,7 @@ CC-native execution containers limited to capabilities that commands and agents 
 - `allowed-tools` — restrict tool access for safety
 - Script execution via `{{SKILLS_PATH}}` template variables
 
-**Current skills (5):** confidence-check (PreToolUse hook), simplicity-coach (Stop hook + scripts), ship (disable-model-invocation), finishing-a-development-branch (disable-model-invocation + allowed-tools), verbalized-sampling (reference skill — auto-invoked on trigger phrases)
+**Current skills (5):** confidence-check (reference skill — auto-invoked on trigger phrases), simplicity-coach (disable-model-invocation + scripts), ship (disable-model-invocation + PreToolUse hook), finishing-a-development-branch (disable-model-invocation + allowed-tools + PreToolUse hook), verbalized-sampling (reference skill — auto-invoked on trigger phrases)
 
 **Optional canary manifest:** Skills MAY ship a `canary.yaml` next to `SKILL.md`. Each entry is `{trigger: <user phrase>, expected_pattern: <regex>}`. The canary fixture (`tests/integration/test_skill_canary.py`) iterates manifests and runs `claude -p '<trigger>'` to assert the trigger still routes to the skill. Excluded from default `make test`; run explicitly via `pytest -m canary`. Reference manifests: `confidence-check`, `verbalized-sampling`. Addresses the silent-trigger-regression class.
 

@@ -21,19 +21,50 @@ class TestIsSuperclaudeHook:
         self.is_sc_hook = _is_superclaude_hook
 
     def test_detects_session_init_command(self):
-        """SC hook detected via session_init in command path."""
-        hook = {"hooks": [{"command": "python ~/.claude/scripts/session_init.py"}]}
+        """SC hook detected via resolved superclaude scripts path (user scope)."""
+        hook = {
+            "hooks": [
+                {"command": "python ~/.claude/superclaude/scripts/session_init.py"}
+            ]
+        }
         assert self.is_sc_hook(hook) is True
 
     def test_detects_prettier_hook_command(self):
-        """SC hook detected via prettier_hook in command path."""
-        hook = {"hooks": [{"command": "python ~/.claude/scripts/prettier_hook.py"}]}
+        """SC hook detected via project-scope superclaude scripts path."""
+        hook = {
+            "hooks": [
+                {
+                    "command": "python $CLAUDE_PROJECT_DIR/.claude/superclaude/scripts/prettier_hook.py"
+                }
+            ]
+        }
         assert self.is_sc_hook(hook) is True
 
     def test_detects_test_runner_hook_command(self):
-        """SC hook detected via test_runner_hook in command path."""
-        hook = {"hooks": [{"command": "python ~/.claude/scripts/test_runner_hook.py"}]}
+        """SC hook detected via Windows backslash superclaude scripts path."""
+        hook = {
+            "hooks": [
+                {
+                    "command": "python C:\\Users\\x\\.claude\\superclaude\\scripts\\test_runner_hook.py"
+                }
+            ]
+        }
         assert self.is_sc_hook(hook) is True
+
+    def test_detects_unresolved_template_command(self):
+        """SC hook detected via unresolved {{SCRIPTS_PATH}} template form."""
+        hook = {"hooks": [{"command": "python {{SCRIPTS_PATH}}/session_init.py"}]}
+        assert self.is_sc_hook(hook) is True
+
+    def test_user_hook_with_sc_script_name_not_detected(self):
+        """User hook whose command merely contains an SC script name is NOT SC-owned."""
+        hook = {"hooks": [{"command": "python ~/dotfiles/session_init.py"}]}
+        assert self.is_sc_hook(hook) is False
+
+    def test_user_hook_mentioning_superclaude_not_detected(self):
+        """Bare 'superclaude' word (no scripts path, no bracket tag) is NOT SC-owned."""
+        hook = {"hooks": [{"command": "superclaude doctor --quiet"}]}
+        assert self.is_sc_hook(hook) is False
 
     def test_detects_superclaude_comment(self):
         """SC hook detected via [superclaude] prefix in _comment field."""
@@ -92,7 +123,10 @@ class TestMergeHookArrays:
 
         self.merge = _merge_hook_arrays
 
-    def _sc_hook(self, cmd="python session_init.py"):
+    SC_SCRIPTS = "~/.claude/superclaude/scripts"
+
+    def _sc_hook(self, cmd=None):
+        cmd = cmd or f"python {self.SC_SCRIPTS}/session_init.py"
         return {"hooks": [{"command": cmd}]}
 
     def _user_hook(self, cmd="npm run lint"):
@@ -103,7 +137,10 @@ class TestMergeHookArrays:
         new = [self._sc_hook()]
         result = self.merge([], new)
         assert len(result) == 1
-        assert result[0]["hooks"][0]["command"] == "python session_init.py"
+        assert (
+            result[0]["hooks"][0]["command"]
+            == f"python {self.SC_SCRIPTS}/session_init.py"
+        )
 
     def test_preserves_user_hooks(self):
         """User hooks preserved alongside new SC hooks."""
@@ -113,37 +150,41 @@ class TestMergeHookArrays:
         assert len(result) == 2
         commands = [h["hooks"][0]["command"] for h in result]
         assert "npm run lint" in commands
-        assert "python session_init.py" in commands
+        assert f"python {self.SC_SCRIPTS}/session_init.py" in commands
 
     def test_skips_when_sc_hooks_exist_no_force(self):
         """When SC hooks exist and force=False, returns existing unchanged."""
-        existing = [self._user_hook(), self._sc_hook("python session_init_v1.py")]
-        new = [self._sc_hook("python session_init_v2.py")]
+        v1 = f"python {self.SC_SCRIPTS}/session_init_v1.py"
+        v2 = f"python {self.SC_SCRIPTS}/session_init_v2.py"
+        existing = [self._user_hook(), self._sc_hook(v1)]
+        new = [self._sc_hook(v2)]
         result = self.merge(existing, new, force=False)
         assert len(result) == 2
         commands = [h["hooks"][0]["command"] for h in result]
-        assert "python session_init_v1.py" in commands
-        assert "python session_init_v2.py" not in commands
+        assert v1 in commands
+        assert v2 not in commands
 
     def test_force_replaces_sc_hooks(self):
         """Force=True replaces SC hooks while preserving user hooks."""
-        existing = [self._user_hook(), self._sc_hook("python session_init_v1.py")]
-        new = [self._sc_hook("python session_init_v2.py")]
+        v1 = f"python {self.SC_SCRIPTS}/session_init_v1.py"
+        v2 = f"python {self.SC_SCRIPTS}/session_init_v2.py"
+        existing = [self._user_hook(), self._sc_hook(v1)]
+        new = [self._sc_hook(v2)]
         result = self.merge(existing, new, force=True)
         assert len(result) == 2
         commands = [h["hooks"][0]["command"] for h in result]
         assert "npm run lint" in commands
-        assert "python session_init_v2.py" in commands
-        assert "python session_init_v1.py" not in commands
+        assert v2 in commands
+        assert v1 not in commands
 
     def test_no_duplicates_on_reinstall(self):
         """Force reinstall doesn't create duplicate SC hooks."""
-        sc1 = self._sc_hook("python session_init.py")
-        sc2 = {"hooks": [{"command": "python prettier_hook.py"}]}
+        sc1 = self._sc_hook(f"python {self.SC_SCRIPTS}/session_init.py")
+        sc2 = {"hooks": [{"command": f"python {self.SC_SCRIPTS}/prettier_hook.py"}]}
         existing = [self._user_hook(), sc1, sc2]
         new = [
-            self._sc_hook("python session_init.py"),
-            {"hooks": [{"command": "python prettier_hook.py"}]},
+            self._sc_hook(f"python {self.SC_SCRIPTS}/session_init.py"),
+            {"hooks": [{"command": f"python {self.SC_SCRIPTS}/prettier_hook.py"}]},
         ]
         result = self.merge(existing, new, force=True)
         # User hook + 2 new SC hooks (old ones removed)
@@ -166,6 +207,8 @@ class TestMergeHooksToSettings:
         base.mkdir()
         return base
 
+    SC_SCRIPTS = "~/.claude/superclaude/scripts"
+
     def _sc_hooks_config(self):
         """Sample SC hooks config for testing."""
         return {
@@ -173,12 +216,16 @@ class TestMergeHooksToSettings:
                 "SessionStart": [
                     {
                         "_comment": "[superclaude] session init",
-                        "hooks": [{"command": "python session_init.py"}],
+                        "hooks": [
+                            {"command": f"python {self.SC_SCRIPTS}/session_init.py"}
+                        ],
                     }
                 ],
                 "PostToolUse": [
                     {
-                        "hooks": [{"command": "python prettier_hook.py"}],
+                        "hooks": [
+                            {"command": f"python {self.SC_SCRIPTS}/prettier_hook.py"}
+                        ],
                     }
                 ],
             }
@@ -242,7 +289,7 @@ class TestMergeHooksToSettings:
         assert "PostToolUse" in settings["hooks"]
         post_cmds = [h["hooks"][0]["command"] for h in settings["hooks"]["PostToolUse"]]
         assert "npm run lint" in post_cmds
-        assert "python prettier_hook.py" not in post_cmds
+        assert f"python {self.SC_SCRIPTS}/prettier_hook.py" not in post_cmds
         # SessionStart should be gone entirely (was only SC hooks)
         assert "SessionStart" not in settings["hooks"]
 
@@ -422,7 +469,11 @@ class TestHookDedup:
         base_path.mkdir()
 
         # Pre-existing settings.json: SC hooks present + 3 duplicate serena entries
-        sc_entry = {"hooks": [{"command": "python ~/.claude/scripts/session_init.py"}]}
+        sc_entry = {
+            "hooks": [
+                {"command": "python ~/.claude/superclaude/scripts/session_init.py"}
+            ]
+        }
         third_party = {
             "matcher": "",
             "hooks": [{"type": "command", "command": "serena-hooks remind"}],
@@ -456,7 +507,11 @@ class TestHookDedup:
         base_path = tmp_path / ".claude"
         base_path.mkdir()
 
-        sc_entry = {"hooks": [{"command": "python ~/.claude/scripts/session_init.py"}]}
+        sc_entry = {
+            "hooks": [
+                {"command": "python ~/.claude/superclaude/scripts/session_init.py"}
+            ]
+        }
         third_party = {
             "matcher": "",
             "hooks": [{"type": "command", "command": "serena-hooks remind"}],

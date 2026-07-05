@@ -9,7 +9,7 @@ disable-model-invocation: true
     <mission>Run autonomous overnight code improvement loop driven by objective metric (Karpathy AutoResearch pattern) — mutator propose change, eval-cmd measure, single git lineage in isolated worktree</mission>
   </role>
 
-  <syntax>/sc:auto-improve [project] --eval-cmd [sh] --metric [jmespath] [--budget 8h] [--smoke-cmd sh] [--cycle-timeout 600] [--mutator-model sonnet|opus|haiku] [--scope glob] [--status] [--dry-run]</syntax>
+  <syntax>/sc:auto-improve [project] --eval-cmd [sh] --metric [jmespath] [--budget 8h] [--smoke-cmd sh] [--cycle-timeout 600] [--mutator-model model] [--scope glob] [--status] [--dry-run]</syntax>
 
   <flow>
   1. Parse args + validate `--eval-cmd` and `--metric` present (unless `--status`)
@@ -37,13 +37,14 @@ disable-model-invocation: true
   - eval-cmd-blast-radius: `--eval-cmd` run unsandboxed inside worktree. Network calls, DB writes, external billing — all user responsibility. Do NOT pass command touch production resources
   - cc-session-end: Python worker survive Claude Code session exit (detached subprocess). To stop, kill PID listed in `[worktree]/auto_improve.pid`
   - mutator-tools: mutator agent tool surface restricted to Edit/Write/Read (Bash explicitly disabled) — cannot run shell command inside worktree
+  - mutator-model-freeform: `--mutator-model` accepts any model alias or full ID the harness resolves (default sonnet) — worker enforces no enum; pick cheap (haiku/sonnet) for volume, flagship for hard mutations
   </gotchas>
 
   <examples>
   | Input | Output |
   |---|---|
   | `/sc:auto-improve . --eval-cmd 'python eval.py' --metric 'pass_rate' --budget 4h --scope 'src/**'` | 4h loop optimising pass_rate inside src/ |
-  | `/sc:auto-improve . --eval-cmd 'python bench.py' --metric 'latency_p99' --budget 1h --mutator-model opus` | 1h Opus-driven latency optimisation |
+  | `/sc:auto-improve . --eval-cmd 'python bench.py' --metric 'latency_p99' --budget 1h --mutator-model fable` | 1h flagship-model latency optimisation |
   | `/sc:auto-improve . --status` | print most-recent run summary |
   | `/sc:auto-improve . --eval-cmd 'echo {\"x\":1}' --metric 'x' --dry-run` | record baseline only, no mutations |
   </examples>

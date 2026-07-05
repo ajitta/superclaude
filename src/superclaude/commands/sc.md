@@ -24,7 +24,7 @@ description: SuperClaude command dispatcher - main entry point for all features.
     - cleanup: Dead code removal + structure optimization
     - design: System architecture + API design
     - document: Focused doc generation
-    - estimate: Dev time/effort estimates
+    - estimate: Dev effort/complexity estimates
     - explain: Code + concept explanations
     - git: Smart git ops + PR integration
     - help: Full command reference

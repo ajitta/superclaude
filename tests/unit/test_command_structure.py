@@ -182,7 +182,8 @@ class TestCommandCrossFieldConsistency:
 
         Per .claude/rules/command-authoring.md and xml-prose-format.md.
         Legacy attribute, body-labeled, and hedging-labeled (<should>/<avoid>)
-        forms are rejected (commit S390 + Opus 4.7 hedging-drop).
+        forms are rejected (commit S390 + hedging-drop rule, measured
+        Opus 4.7-era, retained under later flagships).
         """
         stem, content, _ = command
         assert "<bounds>" in content, (

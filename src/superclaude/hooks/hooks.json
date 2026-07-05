@@ -31,7 +31,7 @@
           {
             "_comment": "[superclaude] notify if pending insights from prior session",
             "type": "command",
-            "command": "{{PYTHON_BIN}} {{SCRIPTS_PATH}}/insight_writer.py pending-count",
+            "command": "{{PYTHON_BIN}} {{SCRIPTS_PATH}}/insight_writer.py pending-count-from-hook",
             "timeout": 5
           }
         ]

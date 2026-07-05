@@ -24,7 +24,7 @@ description: List all /sc commands + functionality. Use when user types `/sc:hel
     - cleanup: dead code removal + structure optimization
     - design: system architecture + API design
     - document: focused doc generation
-    - estimate: dev time/effort estimates
+    - estimate: dev effort/complexity estimates
     - explain: code + concept explanations
     - git: smart git ops + PR integration
     - help: this command ref
@@ -97,7 +97,7 @@ description: List all /sc commands + functionality. Use when user types `/sc:hel
     </category>
   </flags>
 
-<priority_rules> - Safety: --safe-mode > --validate > optimization - Override: user flags > auto-detect - Effort: high > medium > low - MCP: --no-mcp beats all MCP flags - Scope: system > project > module > file
+<priority_rules> - Safety: --safe-mode > --validate > optimization - Override: user flags > auto-detect - MCP: --no-mcp beats all MCP flags - Scope: system > project > module > file
 </priority_rules>
 
   <examples>

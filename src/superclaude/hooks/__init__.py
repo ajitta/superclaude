@@ -2,18 +2,13 @@
 
 v2.1.0 Features:
 - inline_hooks: Parse inline hooks from frontmatter
-- hook_tracker: Session-based hook execution tracking (once: true support)
+- hook_tracker: Fallback session identity + stale-session cleanup
+  (once-per-session hook gating is CC-native `once: true`)
 """
 
 from superclaude.hooks.hook_tracker import (
-    check_and_mark,
     cleanup_old_sessions,
     get_session_id,
-    get_session_stats,
-    has_executed_once,
-    mark_executed,
-    reset_session,
-    should_execute_hook,
 )
 from superclaude.hooks.inline_hooks import (
     InlineHook,
@@ -28,13 +23,7 @@ from superclaude.hooks.inline_hooks import (
 __all__ = [
     # hook_tracker
     "get_session_id",
-    "has_executed_once",
-    "mark_executed",
-    "should_execute_hook",
-    "check_and_mark",
     "cleanup_old_sessions",
-    "reset_session",
-    "get_session_stats",
     # inline_hooks
     "InlineHook",
     "InlineHooks",

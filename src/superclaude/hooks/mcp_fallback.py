@@ -1,11 +1,18 @@
-"""MCP Fallback Notification Tracker for SuperClaude
+"""MCP Fallback Hint Tracker for SuperClaude
 
-Tracks MCP fallback notifications per session to support first-notification-only behavior.
+Tracks per-session fallback hints so each MCP's fallback guidance is shown once.
 Uses same session infrastructure as hook_tracker.py.
 
+The hook cannot check actual MCP server availability, so the hint is phrased
+conditionally ("if unavailable") rather than asserting the server is down.
+
 Behavior:
-- First time an MCP fallback is used in a session: Show notification
-- Subsequent uses: Silent fallback, no notification
+- First time an MCP is referenced in a session: Show fallback hint
+- Subsequent uses: Silent, no hint
+
+Session identity: callers should pass the `session_id` from the CC hook
+stdin JSON (context_loader.py does) so the hint re-arms each CC session;
+hook_tracker.get_session_id() is only a non-rotating fallback.
 """
 
 from __future__ import annotations
@@ -28,7 +35,7 @@ MCP_FALLBACKS: dict[str, str] = {
     "tavily": "WebSearch (native)",
     "sequential": "Native reasoning",
     "serena": "Grep/Glob + Edit (no symbol ops or persistence)",
-    "playwright": "--chrome (native — install plugin: npx @playwright/mcp@latest)",
+    "playwright": "DevTools MCP (--devtools) or native WebFetch (install: npx @playwright/mcp@latest)",
     "devtools": "Playwright (install plugin: npx chrome-devtools-mcp@latest)",
 }
 
@@ -58,11 +65,16 @@ def _save_fallback_data(data: dict[str, dict[str, str]]) -> None:
         pass  # Best-effort: fallback still works without persistence
 
 
-def should_notify_fallback(mcp_name: str) -> tuple[bool, str]:
+def should_notify_fallback(
+    mcp_name: str, session_id: str | None = None
+) -> tuple[bool, str]:
     """Check if fallback notification should be shown.
 
     Args:
         mcp_name: Name of the MCP server (lowercase)
+        session_id: CC session id from the hook stdin JSON. Falls back to
+            hook_tracker.get_session_id() (cached, does not rotate per
+            session) when not provided.
 
     Returns:
         Tuple of (should_notify, fallback_tool_name)
@@ -70,7 +82,8 @@ def should_notify_fallback(mcp_name: str) -> tuple[bool, str]:
     mcp_lower = mcp_name.lower()
     fallback = MCP_FALLBACKS.get(mcp_lower, "Native")
 
-    session_id = get_session_id()
+    if session_id is None:
+        session_id = get_session_id()
     data = _load_fallback_data()
 
     session_data = data.get(session_id, {})
@@ -89,28 +102,36 @@ def should_notify_fallback(mcp_name: str) -> tuple[bool, str]:
 
 
 def format_fallback_notification(mcp_name: str, fallback: str) -> str:
-    """Format the fallback notification message.
+    """Format the fallback hint message.
+
+    Phrased conditionally — the hook has no way to check whether the MCP
+    server is actually connected, so it must not assert unavailability.
 
     Args:
         mcp_name: Name of the MCP server
         fallback: Fallback tool name
 
     Returns:
-        Formatted notification string
+        Formatted hint string
     """
-    return f"⚠️ {mcp_name} unavailable → using {fallback}"
+    return f"ℹ️ If {mcp_name} MCP is unavailable, fall back to: {fallback}"
 
 
-def check_mcp_and_notify(mcp_name: str) -> str | None:
-    """Check MCP availability and return notification if needed.
+def check_mcp_and_notify(mcp_name: str, session_id: str | None = None) -> str | None:
+    """Return the fallback hint on first reference this session.
+
+    Does NOT check actual server availability — only tracks whether the
+    hint was already shown this session.
 
     Args:
         mcp_name: Name of the MCP server
+        session_id: CC session id from the hook stdin JSON (see
+            should_notify_fallback)
 
     Returns:
-        Notification string if first time, None if already notified
+        Hint string if first time, None if already shown
     """
-    should_notify, fallback = should_notify_fallback(mcp_name)
+    should_notify, fallback = should_notify_fallback(mcp_name, session_id)
 
     if should_notify:
         return format_fallback_notification(mcp_name, fallback)

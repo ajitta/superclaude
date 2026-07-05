@@ -10,7 +10,7 @@ Modes:
 
 v3.1 Features:
 - Hybrid injection: Mode files → full .md, MCP files → short instructions
-  (Serena + Tavily get full .md due to behavioral patterns)
+  (Serena + Tavily get Tier 1 INSTRUCTION_MAP strings due to behavioral patterns)
 - Composite flags: --frontend-verify (3 MCP), --all-mcp (6 MCP)
 - --no-mcp: suppresses all mcp/ context loading
 - Tightened TRIGGER_MAP regex (no generic single words)
@@ -161,7 +161,7 @@ TRIGGER_MAP = [
         1,
     ),
     (
-        r"(--delegate|--concurrency|/sc:(pm|agent|task|spawn)|sub.?agent|worktree)",
+        r"(--delegate|--concurrency|/sc:(pm|agent|task)|sub.?agent|worktree)",
         "core/rules/RULES_DELEGATION.md",
         1,
     ),
@@ -229,7 +229,7 @@ INSTRUCTION_MAP = {
 # v3.2: Tier 0 — 1-line summaries for tool MCPs (Claude already has tool descriptions)
 # Behavioral MCPs (Serena, Tavily) are NOT here — they use INSTRUCTION_MAP (Tier 1)
 TIER_0_MAP = {
-    "mcp/MCP_Context7.md": "Context7: resolve-library-id first, then get-library-docs. Never skip step 1.",
+    "mcp/MCP_Context7.md": "Context7: resolve-library-id first, then query-docs. Never skip step 1.",
     "mcp/MCP_Sequential.md": "Sequential: multi-step reasoning chain. Use for 3+ component problems.",
     "mcp/MCP_Playwright.md": "Playwright: browser E2E + network mocking (--caps=network,storage). navigate → assert.",
     "mcp/MCP_Chrome-DevTools.md": "DevTools: 26 tools. Lighthouse audits, CWV, a11y, memory, --slim mode. trace → analyze → optimize.",
@@ -444,11 +444,15 @@ def output_directive_mode(contexts: list[tuple[str, int]]) -> None:
         print("These provide detailed guidance for the detected domain.")
 
 
-def check_mcp_fallbacks(contexts: list[tuple[str, int]]) -> list[str]:
+def check_mcp_fallbacks(
+    contexts: list[tuple[str, int]], session_id: str | None = None
+) -> list[str]:
     """Check for MCP fallback notifications (first time only per session).
 
     Args:
         contexts: List of (context_file, priority) tuples
+        session_id: CC session id from hook stdin JSON — keys the
+            once-per-session dedup so hints re-arm each CC session
 
     Returns:
         List of notification strings to display
@@ -466,7 +470,7 @@ def check_mcp_fallbacks(contexts: list[tuple[str, int]]) -> list[str]:
             mcp_name = name_map.get(mcp_name, mcp_name)
 
             if mcp_name in MCP_FALLBACKS:
-                notification = check_mcp_and_notify(mcp_name)
+                notification = check_mcp_and_notify(mcp_name, session_id)
                 if notification:
                     notifications.append(notification)
 
@@ -494,7 +498,11 @@ def _get_injection_tier(context_file: str, verbose: bool) -> int:
     return 2  # Unmapped files get full injection
 
 
-def output_inject_mode(contexts: list[tuple[str, int]], prompt: str = "") -> None:
+def output_inject_mode(
+    contexts: list[tuple[str, int]],
+    prompt: str = "",
+    session_id: str | None = None,
+) -> None:
     """Output context for triggered files.
 
     v3.1: Hybrid injection — MCP files use short instruction strings (Claude already
@@ -517,7 +525,7 @@ def output_inject_mode(contexts: list[tuple[str, int]], prompt: str = "") -> Non
         print()
 
     # v2.2.0: Check MCP fallbacks first
-    fallback_notifications = check_mcp_fallbacks(contexts)
+    fallback_notifications = check_mcp_fallbacks(contexts, session_id)
     for notification in fallback_notifications:
         print(f"<!-- {notification} -->")
     if fallback_notifications:
@@ -656,10 +664,27 @@ def _extract_prompt(stdin_data: str) -> str:
         return stdin_data
 
 
+def _extract_session_id(stdin_data: str) -> str | None:
+    """Extract the CC session_id from hook stdin JSON (None if unavailable).
+
+    Keys mcp_fallback's once-per-session dedup to the real Claude Code
+    session, so hints re-arm each session instead of once per machine.
+    """
+    try:
+        data = json.loads(stdin_data)
+    except (json.JSONDecodeError, TypeError):
+        return None
+    if not isinstance(data, dict):
+        return None
+    session_id = data.get("session_id")
+    return session_id if isinstance(session_id, str) and session_id else None
+
+
 def main() -> None:
     # Read and parse JSON input from Claude Code
     stdin_data = sys.stdin.read() if not sys.stdin.isatty() else ""
     prompt = _extract_prompt(stdin_data)
+    session_id = _extract_session_id(stdin_data)
 
     if not prompt or not prompt.strip():
         return
@@ -700,7 +725,7 @@ def main() -> None:
 
     # Output based on mode
     if INJECT_MODE:
-        output_inject_mode(contexts, prompt=prompt)
+        output_inject_mode(contexts, prompt=prompt, session_id=session_id)
     else:
         output_directive_mode(contexts)
 

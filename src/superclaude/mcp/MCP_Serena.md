@@ -4,7 +4,7 @@
   </role>
 
   <recovery>
-  Project auto-activate from CWD. Recovery: call `initial_instructions` if agent forget manual; `check_onboarding_performed` / `onboarding` if setup unverified.
+  Project auto-activate from CWD. Recovery: call `initial_instructions` if agent forget manual; `onboarding` if setup unverified.
   </recovery>
 
   <fallback_tools>
@@ -12,7 +12,7 @@
 
   | Removed Serena tool | Native fallback | When to use |
   |---|---|---|
-  | `activate_project` | (automatic via `--project-from-cwd`) | No action needed; verify w/ `check_onboarding_performed` if uncertain |
+  | `activate_project` | (automatic via `--project-from-cwd`) | No action needed; verify w/ `onboarding` if uncertain |
   | `search_for_pattern` | native `Grep` | Regex/text search; same capability, no LSP overhead |
   | `list_dir` / `find_file` | native `Glob` | Directory listing + filename pattern matching |
 
@@ -22,13 +22,13 @@
   <choose>
   Decision rule — if op about what code _means_ (symbols, refs, types), Serena; if about what text _says_ (patterns, strings), native tools.
 
-  <use>symbol-level ops (rename, find refs, extract, move), cross-file semantic refactor where renames propagate through all refs, structural code understanding via symbol overview before reading full files, cross-session persistence through `write_memory` / `read_memory`, structured self-assessment via `think_about_*` tools, LSP-powered nav in large multi-language projects.</use>
+  <use>symbol-level ops (rename, find refs, extract, move), cross-file semantic refactor where renames propagate through all refs, structural code understanding via symbol overview before reading full files, cross-session persistence through `write_memory` / `read_memory`, LSP-powered nav in large multi-language projects.</use>
   <never>simple text edits, filename/content pattern search, bulk find-and-replace, whole-file reading — those go through native `Edit`, `Glob`, `Grep`, `Read` for lower overhead.</never>
   </choose>
 
   <memory_patterns>
   - Session-Start: `list_memories` → `read_memory("pm_context")` → report context (project auto-active via `--project-from-cwd`).
-  - During-Work: `think_about_task_adherence` for goal-alignment checks; `write_memory` for checkpoints + discoveries.
+  - During-Work: native reasoning for goal-alignment checks; `write_memory` for checkpoints + discoveries.
   - Session-End: `write_memory("session_[date]", ...)` → `write_memory("learnings_[topic]", ...)` → verify w/ `list_memories`.
 
   Memory naming conventions:
@@ -47,7 +47,7 @@
   | understand UserService class | `get_symbols_overview` → `find_symbol` (depth=1) | Token-efficient exploration |
   | load project context | `list_memories` → `read_memory` | Project auto-active; just read memory |
   | save work session | `write_memory` | Cross-session persistence |
-  | check if task is complete | `think_about_whether_you_are_done` | Structured completion assessment |
+  | check if task is complete | native reasoning (not Serena) | `think_about_*` tools not active in `claude-code` |
   | update console.log to logger | `Grep` + `Edit` (not Serena) | Text pattern bulk replacement |
   </examples>
 

@@ -5,6 +5,7 @@ Tests: format_skills_summary, resolve_flags (alias/fuzzy matching),
        tiered injection (TIER_0_MAP, INSTRUCTION_MAP, _get_injection_tier)
 """
 
+import json
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -17,6 +18,7 @@ from superclaude.scripts.context_loader import (
     TIER_0_MAP,
     TRIGGER_MAP,
     VALID_FLAGS,
+    _extract_session_id,
     _get_injection_tier,
     format_skills_summary,
     resolve_flags,
@@ -30,6 +32,26 @@ class FakeTokenEstimate:
     name: str
     frontmatter_tokens: int
     full_tokens: int
+
+
+class TestExtractSessionId:
+    """_extract_session_id pulls the CC session id from hook stdin JSON."""
+
+    def test_extracts_session_id(self):
+        stdin = json.dumps({"session_id": "abc123", "prompt": "hello"})
+        assert _extract_session_id(stdin) == "abc123"
+
+    def test_missing_session_id_returns_none(self):
+        assert _extract_session_id(json.dumps({"prompt": "hello"})) is None
+
+    def test_invalid_json_returns_none(self):
+        assert _extract_session_id("not json") is None
+
+    def test_non_dict_json_returns_none(self):
+        assert _extract_session_id(json.dumps(["a", "b"])) is None
+
+    def test_empty_session_id_returns_none(self):
+        assert _extract_session_id(json.dumps({"session_id": ""})) is None
 
 
 class TestFormatSkillsSummary:
@@ -234,11 +256,11 @@ class TestTieredInjection:
         for mcp in self.EXPECTED_BEHAVIORAL_MCPS:
             assert mcp in INSTRUCTION_MAP, f"{mcp} missing from INSTRUCTION_MAP"
 
-    def test_tier_0_context7_mentions_get_library_docs(self):
+    def test_tier_0_context7_mentions_query_docs(self):
         """Context7 Tier 0 hint should reference the correct tool name."""
         hint = TIER_0_MAP["mcp/MCP_Context7.md"]
-        assert "get-library-docs" in hint, (
-            "Context7 hint should reference get-library-docs (not query-docs)"
+        assert "query-docs" in hint, (
+            "Context7 hint should reference query-docs (tool renamed from get-library-docs)"
         )
 
     def test_tier_0_devtools_mentions_lighthouse(self):

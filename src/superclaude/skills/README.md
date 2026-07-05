@@ -20,18 +20,18 @@ CC-native containers for hooks, safety, script exec, and auto-invoke ref knowled
 ### Hook Skills
 | Skill | CC-Native Feature | Purpose |
 |-------|-------------------|---------|
-| `confidence-check` | PreToolUse hook | Inject evidence-focus guidance on WebFetch/WebSearch |
-| `simplicity-coach` | Stop hook + scripts | Run dependency audit at session end |
+| `ship` | disable-model-invocation + PreToolUse hook | Protect destructive delivery workflow from auto-exec; hook blocks force push |
+| `finishing-a-development-branch` | disable-model-invocation + allowed-tools + PreToolUse hook | Protect branch completion; restrict to Bash, Read, Grep, Glob; hook blocks destructive git ops |
 
 ### Safety Skills
 | Skill | CC-Native Feature | Purpose |
 |-------|-------------------|---------|
-| `ship` | disable-model-invocation | Protect destructive delivery workflow from auto-exec |
-| `finishing-a-development-branch` | disable-model-invocation + allowed-tools | Protect branch completion; restrict to Bash, Read, Grep, Glob |
+| `simplicity-coach` | disable-model-invocation + scripts | Explicit OSL coaching; dependency audit via in-session script (no Stop hook) |
 
 ### Reference Skills
 | Skill | CC-Native Feature | Purpose |
 |-------|-------------------|---------|
+| `confidence-check` | Reference skill (auto-invocation) | Validate assumptions w/ evidence before plan/design/spec/impl |
 | `verbalized-sampling` | Reference skill (auto-invocation) | Research-backed diverse response gen via distribution-level prompting |
 
 ## Skill Directory Structure

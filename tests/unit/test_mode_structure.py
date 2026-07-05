@@ -93,7 +93,8 @@ class TestModeBoundary:
 
         Per .claude/rules/mode-authoring.md and xml-prose-format.md.
         Legacy attribute form rejected (commit S390); legacy hedging-labeled
-        sub-tags (<should>/<avoid>) rejected per Opus 4.7 hedging-drop rule.
+        sub-tags (<should>/<avoid>) rejected per hedging-drop rule
+        (measured Opus 4.7-era, retained under later flagships).
         """
         stem, content = mode
         assert "<bounds>" in content, (

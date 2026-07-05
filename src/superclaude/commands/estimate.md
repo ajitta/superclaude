@@ -7,7 +7,7 @@ description: Give dev estimates for tasks/features/projects w/ smart analysis. U
     <mission>Give dev estimates for tasks/features/projects w/ smart analysis</mission>
   </role>
 
-  <syntax>/sc:estimate [target] [--type time|effort|complexity] [--unit hours|days|weeks] [--breakdown]</syntax>
+  <syntax>/sc:estimate [target] [--type effort|complexity] [--breakdown]</syntax>
 
   <flow>
   1. Analyze: Scope, complexity, deps, patterns
@@ -27,8 +27,8 @@ description: Give dev estimates for tasks/features/projects w/ smart analysis. U
 
   <patterns>
     - Scope: Requirements → complexity → patterns → risk
-    - Method: Time|Effort|Complexity|Cost approaches
-    - Multi-Domain: Architecture + Performance + Timeline assessment
+    - Method: Effort|Complexity|Cost approaches
+    - Multi-Domain: Architecture + Performance + Dependency assessment
     - Validation: Benchmarks → cross-check → confidence
   </patterns>
 
@@ -36,14 +36,14 @@ description: Give dev estimates for tasks/features/projects w/ smart analysis. U
 
 | Input | Output |
 |---|---|
-| `'auth system' --type time --unit days --breakdown` | 8 days, 85% confidence |
+| `'auth system' --type effort --breakdown` | Relative effort L, 85% confidence |
 | `'monolith to microservices' --type complexity --breakdown` | Risk + dependency map |
-| `'optimize performance' --type effort --unit hours` | Effort by category |
+| `'optimize performance' --type effort` | Effort by category |
 
   <example name="estimate-no-scope" type="error-path">
-    - Input: /sc:estimate 'make it better' --type time
+    - Input: /sc:estimate 'make it better' --type effort
     - Why wrong: No measurable scope. 'make it better' span typo fix to full rewrite.
-    - Correct: Define scope first: /sc:estimate 'refactor auth module to use JWT' --type time --breakdown
+    - Correct: Define scope first: /sc:estimate 'refactor auth module to use JWT' --type effort --breakdown
   </example>
 
   </examples>

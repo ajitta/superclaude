@@ -10,68 +10,70 @@ Agents managed by Claude Code native delegation. Auto-pick from task keywords in
 
 ### Research & Analysis
 
-| Agent | Permission | Description |
-|-------|------------|-------------|
-| `deep-researcher` | acceptEdits | Web research, cross-check, citation-ready synthesis |
-| `root-cause-analyst` | default | Systematic diagnosis via hypothesis test |
-| `requirements-analyst` | default | Requirements via systematic discovery |
-| `insight-analyst` | default | Surface project insights w/ contextual analysis |
+| Agent | Description |
+|-------|-------------|
+| `deep-researcher` | Web research, cross-check, citation-ready synthesis |
+| `root-cause-analyst` | Systematic diagnosis via hypothesis test |
+| `requirements-analyst` | Requirements via systematic discovery |
+| `insight-analyst` | Surface project insights w/ contextual analysis |
 
 ### Architecture & Design
 
-| Agent | Permission | Description |
-|-------|------------|-------------|
-| `system-architect` | plan | System design + long-term arch decisions |
-| `backend-architect` | default | Backend, API design, data integrity |
-| `frontend-architect` | acceptEdits | Frontend arch, a11y, UI patterns |
-| `devops-architect` | default | Infra, CI/CD, deploy automation |
+| Agent | Description |
+|-------|-------------|
+| `system-architect` | System design + long-term arch decisions |
+| `backend-architect` | Backend, API design, data integrity |
+| `frontend-architect` | Frontend arch, a11y, UI patterns |
+| `devops-architect` | Infra, CI/CD, deploy automation |
 
 ### Engineering Specialists
 
-| Agent | Permission | Description |
-|-------|------------|-------------|
-| `python-expert` | acceptEdits | Python best practices, SOLID |
-| `security-engineer` | plan | Security analysis, OWASP, threat modeling |
-| `performance-engineer` | acceptEdits | Perf optimization + profiling |
-| `quality-engineer` | acceptEdits | Test strategy + edge case detection |
-| `refactoring-expert` | default | Code quality + tech debt reduction |
+| Agent | Description |
+|-------|-------------|
+| `python-expert` | Python best practices, SOLID |
+| `security-engineer` | Security analysis, OWASP, threat modeling |
+| `performance-engineer` | Perf optimization + profiling |
+| `quality-engineer` | Test strategy + edge case detection |
+| `refactoring-expert` | Code quality + tech debt reduction |
 
 ### Documentation & Education
 
-| Agent | Permission | Description |
-|-------|------------|-------------|
-| `technical-writer` | default | Tech docs tailored to audience |
-| `learning-guide` | acceptEdits | Progressive learning + practical examples |
-| `socratic-mentor` | default | Teach via guided questioning |
+| Agent | Description |
+|-------|-------------|
+| `technical-writer` | Tech docs tailored to audience |
+| `learning-guide` | Progressive learning + practical examples |
+| `socratic-mentor` | Teach via guided questioning |
 
 ### Project & Business
 
-| Agent | Permission | Description |
-|-------|------------|-------------|
-| `project-initializer` | default | Interactive project setup for first-session onboarding |
-| `project-manager` | default | Orchestration, workflow mgmt, continuous improvement |
-| `business-panel-experts` | plan | Multi-lens biz strategy synthesis + debate |
+| Agent | Description |
+|-------|-------------|
+| `project-initializer` | Interactive project setup for first-session onboarding |
+| `project-manager` | Orchestration, workflow mgmt, continuous improvement |
+| `business-panel-experts` | Multi-lens biz strategy synthesis + debate |
 
 ### Philosophy & Discipline
 
-| Agent | Permission | Description |
-|-------|------------|-------------|
-| `simplicity-guide` | plan | Complexity prevention via Orient-Step-Learn |
+| Agent | Description |
+|-------|-------------|
+| `simplicity-guide` | Complexity prevention via Orient-Step-Learn |
 
 ### Git & Workflow
 
-| Agent | Permission | Description |
-|-------|------------|-------------|
-| `git-workflow` | default | Git ops w/ smart commits, PR workflow, safety enforcement |
+| Agent | Description |
+|-------|-------------|
+| `git-workflow` | Git ops w/ smart commits, PR workflow, safety enforcement |
 
 ### Code Quality
 
-| Agent | Permission | Description |
-|-------|------------|-------------|
-| `self-review` | default | Post-impl validation + reflexion |
-| `repo-index` | acceptEdits | Repo indexing + codebase briefing |
+| Agent | Description |
+|-------|-------------|
+| `self-review` | Post-impl validation + reflexion |
+| `repo-index` | Repo indexing + codebase briefing |
 
 ## Permission Framework
+
+No shipped agent sets `permissionMode` — all inherit the session's permission mode (frontmatter field stripped in 672055c as unreliable). CC-native values remain available for local overrides:
 
 | permissionMode | Effect |
 |---------------|--------|
@@ -86,7 +88,7 @@ Agents managed by Claude Code native delegation. Auto-pick from task keywords in
 | Tier | model: | Agents | Criteria |
 |------|--------|--------|----------|
 | Sonnet | `sonnet` | repo-index, git-workflow, project-initializer, technical-writer, learning-guide, socratic-mentor, quality-engineer, python-expert, performance-engineer, frontend-architect, insight-analyst | Procedural, template-driven, codegen |
-| Opus | *(inherit)* | system-architect, deep-researcher, business-panel-experts, simplicity-guide, root-cause-analyst, requirements-analyst, backend-architect, security-engineer, project-manager, devops-architect, refactoring-expert, self-review | Design judgment, high reversal cost, multi-framework synthesis |
+| Inherit | *(inherit)* | system-architect, deep-researcher, business-panel-experts, simplicity-guide, root-cause-analyst, requirements-analyst, backend-architect, security-engineer, project-manager, devops-architect, refactoring-expert, self-review | Design judgment, high reversal cost, multi-framework synthesis — resolves to the parent session model (current flagship, e.g. Fable 5) |
 
 Override: set `model:` in agent frontmatter to change routing.
 

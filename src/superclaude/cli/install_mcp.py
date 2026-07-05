@@ -621,7 +621,7 @@ def show_mcp_status():
 
     if installed_count < len(MCP_SERVERS):
         click.echo("\n💡 Install with: superclaude mcp --servers <name>")
-        click.echo("   Or install all: superclaude mcp --servers all")
+        click.echo("   Or run `superclaude mcp` and choose 0 for all core servers")
 
 
 def install_mcp_servers(
