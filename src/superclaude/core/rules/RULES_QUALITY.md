@@ -39,11 +39,6 @@
   </examples>
   </core_rules>
 
-  <agent_memory_protocol>
-Capture: user corrections, arch decisions, recurring patterns (3+), unexpected discoveries
-Curate: consolidate at 150 lines; retire unreferenced 90+ days; verify vs current state before act
-  </agent_memory_protocol>
-
   <anti_over_engineering note="Enforcement: R06 (Scope) + R18 (Necessity Test)">
 Bug fix ≠ cleanup | Unchanged code untouched | Exception: design doc explicit scope adjacent improvements → in-scope
 Dep gate before add library: lines actually used | DIY cost | 6-month safety — reject if ≤3 lines used or maintenance unclear

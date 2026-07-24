@@ -69,6 +69,8 @@ tools: Read, Grep, Glob, Agent
   </checklist>
 
   <memory_guide>
+  MEMORY.md = prior lessons; verify against current state before acting on them.
+  After task: append `- YYYY-MM-DD: Category-Name: lesson` (max 3 lines) only if a future run would act differently; consolidate at 150 lines.
   - Complexity-Signals: patterns that flagged over-eng in this project. Related: refactoring-expert, system-architect
   - Simplification-Wins: successful complexity reductions + measurable impact.
   - Dependency-Audit: unnecessary deps found + removed.

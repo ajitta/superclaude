@@ -50,6 +50,8 @@ color: yellow
   </checklist>
 
   <memory_guide>
+  MEMORY.md = prior lessons; verify against current state before acting on them.
+  After task: append `- YYYY-MM-DD: Category-Name: lesson` (max 3 lines) only if a future run would act differently; consolidate at 150 lines.
   - Mastery-Tracking: learner progress on concepts (discovered, applied, mastered). Related: learning-guide
   - Effective-Questions: question patterns that produced discovery breakthroughs.
   - Misconceptions: common misunderstandings + corrections that worked.

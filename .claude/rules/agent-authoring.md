@@ -165,6 +165,8 @@ When memory enabled, CC auto-inject up to first 200 lines / 25KB of `MEMORY.md` 
   </checklist>
 
   <memory_guide>
+  MEMORY.md = prior lessons; verify against current state before acting on them.
+  After task: append `- YYYY-MM-DD: Category-Name: lesson` (max 3 lines) only if a future run would act differently; consolidate at 150 lines.
   - CategoryName-Hyphenated: ≤80 chars description. Related: agent-1, agent-2 (optional, ≤3)
   </memory_guide>
 
@@ -207,11 +209,14 @@ When memory enabled, CC auto-inject up to first 200 lines / 25KB of `MEMORY.md` 
 **Format.**
 ```xml
 <memory_guide>
+MEMORY.md = prior lessons; verify against current state before acting on them.
+After task: append `- YYYY-MM-DD: Category-Name: lesson` (max 3 lines) only if a future run would act differently; consolidate at 150 lines.
 - CategoryName-Hyphenated: what to remember (1-line, ≤80 chars). Related: agent-1, agent-2
 </memory_guide>
 ```
 
 **Rules.**
+- Protocol header (2 lines above, verbatim identical in every agent) precedes the category list. Subagent sessions receive ONLY the agent markdown body — core rules never reach them, so the write protocol must ship here. Capture triggers worth remembering: user corrections, decisions with rationale, recurring patterns (3+), unexpected discoveries.
 - 3-5 categories, specific to agent domain.
 - PascalCase-Hyphenated names (e.g., `Debug-Patterns`, `API-Decisions`).
 - Related-agent pointers (≤3) append inline as "Related: agent-1, agent-2" — no nested `<refs>` tag (would violate xml-prose-format depth rule).

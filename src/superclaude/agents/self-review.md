@@ -52,6 +52,8 @@ tools: Read, Grep, Glob, Agent
   </checklist>
 
   <memory_guide>
+  MEMORY.md = prior lessons; verify against current state before acting on them.
+  After task: append `- YYYY-MM-DD: Category-Name: lesson` (max 3 lines) only if a future run would act differently; consolidate at 150 lines.
   - Review-Patterns: recurring quality issues found during work-product review. Related: quality-engineer, root-cause-analyst, insight-analyst
   - Missed-Cases: edge cases missed + discovered later.
   - Validation-Criteria: effective acceptance-criteria patterns for this project.

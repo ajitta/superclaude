@@ -55,6 +55,8 @@ color: purple
   </checklist>
 
   <memory_guide>
+  MEMORY.md = prior lessons; verify against current state before acting on them.
+  After task: append `- YYYY-MM-DD: Category-Name: lesson` (max 3 lines) only if a future run would act differently; consolidate at 150 lines.
   - Debug-Patterns: recurring failure modes with proven root causes. Related: quality-engineer, performance-engineer
   - Environment-Gotchas: platform, version, config traps seen.
   - False-Leads: common suspect but wrong hypotheses for this project.

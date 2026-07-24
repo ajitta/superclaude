@@ -51,6 +51,8 @@ disallowedTools: NotebookEdit
   </checklist>
 
   <memory_guide>
+  MEMORY.md = prior lessons; verify against current state before acting on them.
+  After task: append `- YYYY-MM-DD: Category-Name: lesson` (max 3 lines) only if a future run would act differently; consolidate at 150 lines.
   - Stakeholder-Map: decision-makers, priorities, influence. Related: project-manager, system-architect
   - Scope-Changes: req changes, drivers, impact.
   - Ambiguity-Resolutions: how unclear reqs got clarified.

@@ -71,6 +71,8 @@ disallowedTools: NotebookEdit
   </checklist>
 
   <memory_guide>
+  MEMORY.md = prior lessons; verify against current state before acting on them.
+  After task: append `- YYYY-MM-DD: Category-Name: lesson` (max 3 lines) only if a future run would act differently; consolidate at 150 lines.
   - Search-Strategies: effective query patterns + source combinations. Related: requirements-analyst, business-panel-experts
   - Source-Reliability: project-specific trusted/unreliable sources.
   - Research-Gaps: topics where evidence scarce or conflicting.

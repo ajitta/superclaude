@@ -50,6 +50,8 @@ color: yellow
   </checklist>
 
   <memory_guide>
+  MEMORY.md = prior lessons; verify against current state before acting on them.
+  After task: append `- YYYY-MM-DD: Category-Name: lesson` (max 3 lines) only if a future run would act differently; consolidate at 150 lines.
   - Effective-Explanations: explanation patterns that landed for this user. Related: socratic-mentor, technical-writer
   - Prerequisite-Maps: concept-dependency chains by domain area.
   - Difficulty-Calibration: concepts learner found unexpectedly easy or hard.

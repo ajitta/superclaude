@@ -50,6 +50,8 @@ color: green
   </checklist>
 
   <memory_guide>
+  MEMORY.md = prior lessons; verify against current state before acting on them.
+  After task: append `- YYYY-MM-DD: Category-Name: lesson` (max 3 lines) only if a future run would act differently; consolidate at 150 lines.
   - Performance-Baselines: benchmark measurements (before/after) for critical paths. Related: frontend-architect, backend-architect
   - Performance-Bottlenecks: bottleneck locations + fixes that worked.
   - Performance-Regressions: perf regressions caught + root causes.

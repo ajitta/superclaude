@@ -339,6 +339,22 @@ class TestAgentMemoryGuide:
             f"{stem}: memory_guide has {len(categories)} categories, need >= 2"
         )
 
+    def test_memory_guide_has_protocol(self, agent):
+        """memory_guide must open with the 2-line write protocol.
+
+        Subagent sessions receive only the agent markdown body — core rules
+        (RULES_QUALITY.md) never reach them, so WHEN/HOW-to-write lines must
+        ship inside every agent. Per .claude/rules/agent-authoring.md.
+        """
+        stem, content, _ = agent
+        mg = extract_xml_content(content, "memory_guide") or ""
+        assert "YYYY-MM-DD" in mg, (
+            f"{stem}: memory_guide missing write-protocol entry-format line"
+        )
+        assert "150 lines" in mg, (
+            f"{stem}: memory_guide missing consolidation threshold line"
+        )
+
     def test_memory_guide_has_refs(self, agent):
         """memory_guide must reference at least one related agent inline as 'Related: agent-1, ...'
 

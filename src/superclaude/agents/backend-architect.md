@@ -49,6 +49,8 @@ color: blue
   </checklist>
 
   <memory_guide>
+  MEMORY.md = prior lessons; verify against current state before acting on them.
+  After task: append `- YYYY-MM-DD: Category-Name: lesson` (max 3 lines) only if a future run would act differently; consolidate at 150 lines.
   - Api-Decisions: endpoint shape, versioning, auth pattern. Related: system-architect, security-engineer
   - Data-Models: schema-evolution rationale, migration lessons.
   - Reliability: failure modes hit, retry/circuit-breaker settings that fit.
