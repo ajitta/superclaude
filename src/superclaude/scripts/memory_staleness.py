@@ -18,8 +18,13 @@ import sys
 from datetime import date, datetime
 from pathlib import Path
 
+from superclaude.utils import project_root
+
 DEFAULT_THRESHOLD_DAYS = 90
 ENV_THRESHOLD = "SUPERCLAUDE_MEMORY_STALE_DAYS"
+# Path.home(), not claude_base(): this directory belongs to Claude Code, which
+# always writes auto-memory under ~/.claude/projects/ regardless of the scope
+# SuperClaude was installed into. Only the project anchor below is ours.
 HOME_PROJECTS = Path.home() / ".claude" / "projects"
 VERIFIED_RE = re.compile(r"^verified:\s*(\d{4}-\d{2}-\d{2})\s*$", re.MULTILINE)
 
@@ -85,7 +90,14 @@ def scan_stale_entries(memory_dir: Path, threshold_days: int) -> list[Path]:
 
 
 def project_memory_dir() -> Path:
-    return HOME_PROJECTS / encode_project_path(os.getcwd()) / "memory"
+    """Locate the active project's CC memory directory.
+
+    Anchored on ``project_root()``, not the hook's CWD: CC encodes the project
+    root into the directory name, so a hook firing from a subdirectory would
+    encode a path that has no memory directory and the scan would silently
+    return nothing.
+    """
+    return HOME_PROJECTS / encode_project_path(str(project_root())) / "memory"
 
 
 def main() -> int:

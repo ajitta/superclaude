@@ -252,6 +252,34 @@ the parser and from `main()`'s hook dispatch. And `project_key()` now passes
 `usedforsecurity=False` to `hashlib.md5`, which bare `md5()` needs to survive a
 FIPS-enforcing Python build.
 
+## Follow-up: a ninth call site the table missed
+
+Post-merge verification found `memory_staleness.py:88` resolving
+`HOME_PROJECTS / encode_project_path(os.getcwd())`. The audit table above lists
+eight call sites; there were nine. It is a live SessionStart hook
+(`hooks.json:17`), and it fails in exactly the D2 shape — measured from
+`src/superclaude`:
+
+| CWD | resolved | exists |
+|---|---|---|
+| project root | `~/.claude/projects/-Users-chosh-Repos-ajitta-superclaude/memory` | yes |
+| `src/superclaude` | `…-superclaude-src-superclaude/memory` | no |
+
+A missing directory makes `scan_stale_entries()` return `[]`, so the staleness
+warning silently never fires. Fixed by anchoring on `project_root()`.
+`HOME_PROJECTS` keeps `Path.home()` deliberately — that directory belongs to
+Claude Code, which writes auto-memory under `~/.claude/projects/` regardless of
+SuperClaude's install scope; only the project anchor was ours to fix.
+
+Verified: new `test_memory_dir_anchored_on_project_root_not_cwd` fails on the old
+resolver and passes on the new one, and the installed hook run from `src/deep` of
+a synthetic project found its stale fixture. Baseline 2080 → 2081.
+
+That the site was missed is D4 itself — the audit enumerated writers of
+`.claude/` paths, and this one writes under `~/.claude/projects/`, so it fell
+outside the grep. The search surface for this rule is every script reachable from
+`hooks.json`, not every script touching `.claude/`.
+
 ## Deviations from the plan
 
 - **C5 needed functions, not re-anchored constants.** `INSIGHT_FILE` /

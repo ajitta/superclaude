@@ -87,6 +87,25 @@ def test_encode_project_path_drive_letter(tmp_path: Path) -> None:
     assert mod.encode_project_path("/home/user/repos/proj") == "-home-user-repos-proj"
 
 
+def test_memory_dir_anchored_on_project_root_not_cwd(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    mod = _load_module()
+    subdir = tmp_path / "src" / "pkg"
+    subdir.mkdir(parents=True)
+    monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(tmp_path))
+    monkeypatch.chdir(subdir)
+    # CC encodes the project root into the memory dir name. Anchoring on CWD
+    # would encode ...-src-pkg, a directory CC never creates, and the scan
+    # would silently find nothing.
+    expected = mod.encode_project_path(str(tmp_path))
+    resolved = mod.project_memory_dir()
+    assert resolved == mod.HOME_PROJECTS / expected / "memory"
+    assert not resolved.parent.name.endswith("-src-pkg"), (
+        f"memory dir followed CWD into the subdirectory: {resolved.parent.name}"
+    )
+
+
 @pytest.mark.parametrize(
     "env_value,expected",
     [
