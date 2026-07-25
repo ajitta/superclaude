@@ -25,15 +25,6 @@ description: Git ops w/ smart commit msgs + workflow optim. Use when user type `
   - Write: Commit msg gen
   </tools>
 
-  <patterns>
-    - SmartCommit: changes → conventional msg
-    - Status: state → rec
-    - Branch: naming + flow
-    - Recovery: conflict fix + restore
-    - PRStatus: gh pr view → review state → confidence
-    - FromPR: --from-pr → checkout → load PR ctx → resume
-  </patterns>
-
   <pr_status_integration note="Claude Code 2.1.37+">
     <description>PR review status indicator</description>
     <command>gh pr view --json state,reviewDecision,isDraft</command>

@@ -1,5 +1,5 @@
 # Project Gotchas — General
-# Last reviewed: 2026-05-14
+# Last reviewed: 2026-07-25
 # Claude 실수할 때마다 여기 한 줄씩 추가.
 # 기존 알려진 프로젝트 트랩 있으면 직접 추가 가능 (R19 자동 캡처 병행).
 

@@ -24,13 +24,6 @@ description: Give clear explain of code, concepts, system behavior with edu clar
   - Task: Complex explain delegate
   </tools>
 
-  <patterns>
-    - Progressive: Basic → intermediate → advanced
-    - Framework: C7 docs → official patterns
-    - Multi-Domain: Technical + clarity + security
-    - Interactive: Static → examples → explore
-  </patterns>
-
   <examples>
 
 | Input | Output |

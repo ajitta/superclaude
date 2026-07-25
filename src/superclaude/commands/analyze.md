@@ -52,12 +52,6 @@ description: Code analysis across quality, security, performance, architecture d
     Empty data: report "Stage N" + guide: "To bootstrap tracking, follow [R14 Correction Capture] Correction Capture format when correcting Claude's behavior"
   </rules_analysis>
 
-  <patterns>
-    - Domain: Quality|Security|Performance|Architecture|Rules → specialized assessment
-    - Recognition: Language detect → appropriate techniques
-    - Severity: Issue classification → prioritized recs
-  </patterns>
-
   <examples>
 
 | Input | Output |

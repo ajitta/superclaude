@@ -18,13 +18,6 @@ description: Apply systematic improvements to code quality, performance, and mai
   </flow>
 
 
-  <patterns>
-    - Quality: tech debt ID → refactoring → validation
-    - Performance: profiling → bottleneck ID → optimization
-    - Maintainability: complexity reduction → structure → docs
-    - Security: vuln scan → pattern application → validation
-  </patterns>
-
   <examples>
   | Input | Output |
   |---|---|

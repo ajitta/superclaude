@@ -37,6 +37,8 @@ Every mode **must** define all four axes (per `.claude/rules/xml-prose-format.md
 | **Priorities** | `<priorities>` | Trade-offs — what to optimize | Single-line prose with `A > B` pairs joined by " \| " |
 | **Behaviors** | `<behaviors>` | Action patterns — what to do | 3-5 `- Pattern-Name: description` lines |
 
+`<outcomes>` is **optional**, not a fifth axis. Include it only when the line states directives the four axes do not already carry (`Confidence score mandatory`, `Contradiction resolve required`). A line listing benefits the mode produces (`Better decisions | Pattern recognition | Self-awareness`) fails the deletion test in `.claude/rules/content-quality.md` — omit it. Shipped example that earns it: `MODE_DeepResearch.md`; modes that dropped theirs: `MODE_Brainstorming.md`, `MODE_Introspection.md`.
+
 ## XML Template
 
 > Conforms to `.claude/rules/xml-prose-format.md`: single root, `snake_case` section tags, short-line lists (**Numbered** `1.` for ordered procedures, or `-` prefix as **Plain**, **Labeled**, **Named** per item type), plural↔singular containers (`<examples><example>`) for multi-line items. Modes use **Named** for `<thinking>` (Principle-Name) and `<behaviors>` (Pattern-Name); single-line prose for `<communication>`, `<priorities>`, `<outcomes>`. Modes have no ordered-procedure tag.
@@ -59,7 +61,8 @@ Every mode **must** define all four axes (per `.claude/rules/xml-prose-format.md
   - Pattern-Name: concrete behavioral description (3-5 items)
   </behaviors>
 
-  <outcomes>Expected results joined by | pipes on a single prose line.</outcomes>
+  <!-- optional — only if it states directives the 4 axes miss; see note above -->
+  <outcomes>Mandatory conditions joined by | pipes on a single prose line.</outcomes>
 
   <examples>
   | Trigger | Expected behavior |

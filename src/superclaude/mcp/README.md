@@ -24,6 +24,8 @@ MCP docs load on-demand via `context_loader.py` thru flag/keyword triggers. All 
 | Chrome DevTools | `--perf` | `chrome-devtools-mcp` v1.0.1 | Perf, Lighthouse, a11y, memory profiling |
 | Tavily | `--tavily` | `tavily-mcp` v0.2.19 (npm) | Web search + extract — optional in-conv MCP; prefer Tavily Agent Skills (below) |
 
+Server **launch flags** (token-saving `--slim`, `--persistent` profiles, `--test-id-attribute`, `--secrets`, timeouts) are upstream package options set in the MCP client config, not SuperClaude behavior — read the package's own README for the current set. The `MCP_*.md` docs deliberately carry none of them (`.claude/rules/mcp-authoring.md` trim rule: no version/install/setup blocks).
+
 ## Tavily Web Access — Agent Skills (recommended)
 
 Tavily's web capabilities install as **Agent Skills** via the Tavily CLI — no MCP server, no `superclaude mcp` step:

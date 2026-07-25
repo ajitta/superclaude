@@ -39,13 +39,6 @@ description: Design system architecture, APIs, component interfaces w/ comprehen
   - Bash: External design tools
   </tools>
 
-  <patterns>
-    - Architecture: Requirements → structure → scalability
-    - API: Interface spec → REST/GraphQL → docs
-    - Component: Functional reqs → interface → guidance
-    - Database: Data reqs → schema → relationships
-  </patterns>
-
   <examples>
 | Input | Output |
 |---|---|

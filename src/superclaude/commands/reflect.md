@@ -20,13 +20,6 @@ description: Task reflect + validate use Serena MCP analysis. Use when user type
   </flow>
 
 
-  <patterns>
-    - Task: approach → goal align → drift → fix
-    - Session: info gather → completeness → quality → insight
-    - Completion: progress → criteria → work left → decide
-    - Gotchas: stale check → paths: validate → content relevance → prune advice
-  </patterns>
-
   <examples>
   | Input | Output |
   |---|---|

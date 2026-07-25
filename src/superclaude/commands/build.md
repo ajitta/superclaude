@@ -34,12 +34,6 @@ description: Build, compile, package projects w/ smart err handling + optimize. 
   - Write: Build reports
   </tools>
 
-  <patterns>
-    - Env: dev|prod|test → right config
-    - Err: Build fail → diagnostic + fix
-    - Optimize: Artifact analysis → size cut
-  </patterns>
-
   <examples>
 
 | Input | Output |

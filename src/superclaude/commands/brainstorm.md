@@ -51,14 +51,6 @@ description: Interactive requirements discovery thru Socratic dialogue + systema
   - sequentialthinking: Requirements analysis, trade-off eval
   </tools>
 
-  <patterns>
-    - Socratic: Question-driven → systematic discovery
-    - Multi-Domain: Cross-functional → full feasibility
-    - Progressive: Systematic → iterative refine
-    - Specification: Concrete requirements → actionable briefs
-    - Verbalized-Sampling: --vs → distribution-level diversity (k candidates, τ dial, prob-weighted landscape)
-  </patterns>
-
   <examples>
 | Input | Output |
 |---|---|

@@ -35,14 +35,6 @@ description: Clean code systematic, kill dead code, optimize project structure. 
   - Task: big-scale delegate
   </tools>
 
-  <patterns>
-    - DeadCode: usage analyze → safe remove
-    - Imports: dep analyze → optimize
-    - Structure: arch analyze → modular gain
-    - Docs: convention check → rename + move (--dry-run supported)
-    - Safety: pre/during/post check
-  </patterns>
-
   <validator_checks note="--type docs only — per doc-convention-v2 01b-discovery-open-decisions.md R1-R3">
     - R1-post-cutoff-non-v2: For each standalone doc in `docs/{specs,plans,research,analysis}/`, read frontmatter or filename date; if date > 2026-05-18 cutoff AND no companion `docs/features/<slug>/` folder, surface warning "v2 non-compliant — consider /sc:promote-feature <slug>". Pre-cutoff legacy explicitly skipped.
     - R2-cross-feature-link-form: Grep `\[\[[a-z0-9-]+\]\]` pattern across `docs/features/*/*.md` (skip fenced code blocks to avoid false positives on syntax examples). Each match = warning "use relative path per core/rules/RULES_DOCS.md cross-links rule (`../<other-slug>/NN-<phase>.md`); slug refs not supported". Standalone-doc matches not flagged (legacy tolerated).

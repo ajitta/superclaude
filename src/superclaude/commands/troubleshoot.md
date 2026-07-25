@@ -26,13 +26,6 @@ description: Diagnose + resolve issues in code, builds, deployments, system beha
   - Write: Diagnostic reports + documentation
   </tools>
 
-  <patterns>
-    - Bug: Error → stack trace → code inspection → fix validation
-    - Build: Log analysis → dependency check → config validation
-    - Performance: Metrics → bottleneck ID → optimization recs
-    - Deployment: Environment → config verification → service validation
-  </patterns>
-
 
   <examples>
 

@@ -34,13 +34,6 @@ description: Gen focused docs for components, functions, APIs, features. Use whe
   - Glob: Multi-file organization
   </tools>
 
-  <patterns>
-    - Inline: Code analysis → JSDoc/docstring
-    - API: Interface extraction → reference + examples
-    - Guide: Feature analysis → tutorial content
-    - External: Overview → specs → integration
-  </patterns>
-
   <examples>
 
 | Input | Output |

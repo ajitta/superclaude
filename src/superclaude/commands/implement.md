@@ -26,13 +26,6 @@ description: Feature + code impl w/ smart agent delegate + MCP. Use ONLY when us
   - Agent: Large-scale delegate
   </tools>
 
-  <patterns>
-    - Context: Framework detect → agent + MCP activate
-    - Flow: Reqs → code → validate → integrate
-    - Multi-Agent: frontend + backend + security → full solutions
-    - Quality: Impl → test → docs → validate
-  </patterns>
-
   <examples>
 | Input | Output |
 |---|---|

@@ -24,13 +24,6 @@ description: Give dev estimates for tasks/features/projects w/ smart analysis. U
   - Bash: Project + dependency analysis
   </tools>
 
-  <patterns>
-    - Scope: Requirements → complexity → patterns → risk
-    - Method: Effort|Complexity|Cost approaches
-    - Multi-Domain: Architecture + Performance + Dependency assessment
-    - Validation: Benchmarks → cross-check → confidence
-  </patterns>
-
   <examples>
 
 | Input | Output |
