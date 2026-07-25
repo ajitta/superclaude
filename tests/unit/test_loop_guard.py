@@ -8,9 +8,10 @@ Contract:
   has accumulated >=5 error entries in the window.
 - Env var SUPERCLAUDE_LOOP_GUARD=0 disables the guard (always approve).
 - Failure modes (bad stdin, write failure, etc.) fail open (approve).
-- State file is scoped to $CLAUDE_PROJECT_DIR/.claude/loop_guard_state.json.
+- State file is scoped to <claude_base>/.superclaude_hooks/loop_guard_<key>.json.
 """
 
+import hashlib
 import json
 import os
 import subprocess
@@ -78,9 +79,24 @@ def pre_event(tool_name: str, command: str) -> dict:
     }
 
 
+def state_file(project_dir: Path) -> Path:
+    """Resolve loop_guard's state file the same way superclaude.utils does.
+
+    Mirrors hook_state_dir() / f"loop_guard_{project_key()}.json" without
+    importing the resolvers, which read CLAUDE_PROJECT_DIR from the *test*
+    process rather than the guard subprocess.
+    """
+    key = hashlib.md5(str(project_dir).encode()).hexdigest()[:8]
+    parent = project_dir / ".claude" / ".superclaude_hooks"
+    parent.mkdir(parents=True, exist_ok=True)
+    return parent / f"loop_guard_{key}.json"
+
+
 @pytest.fixture
 def project_dir(tmp_path):
-    (tmp_path / ".claude").mkdir()
+    # The superclaude/ marker makes claude_base() resolve to this tmp project
+    # instead of falling back to the real ~/.claude, keeping tests hermetic.
+    (tmp_path / ".claude" / "superclaude").mkdir(parents=True)
     return tmp_path
 
 
@@ -213,7 +229,7 @@ class TestSlidingWindow:
     def test_stale_entries_expire(self, project_dir):
         """Entries older than window should not count toward block."""
         # Seed state file directly with 5 old entries
-        state_file = project_dir / ".claude" / "loop_guard_state.json"
+        state_path = state_file(project_dir)
         old_ts = time.time() - (16 * 60)  # 16 min ago, outside 15-min window
         state = {
             "entries": [
@@ -225,12 +241,12 @@ class TestSlidingWindow:
                 for _ in range(BLOCK_THRESHOLD)
             ]
         }
-        state_file.write_text(json.dumps(state))
+        state_path.write_text(json.dumps(state))
         result = run_guard(pre_event("Bash", "make broken"), project_dir)
         assert result["decision"] == "approve"
 
     def test_recent_entries_still_block(self, project_dir):
-        state_file = project_dir / ".claude" / "loop_guard_state.json"
+        state_path = state_file(project_dir)
         recent_ts = time.time() - 60  # 1 min ago
         state = {
             "entries": [
@@ -242,7 +258,7 @@ class TestSlidingWindow:
                 for _ in range(BLOCK_THRESHOLD)
             ]
         }
-        state_file.write_text(json.dumps(state))
+        state_path.write_text(json.dumps(state))
         result = run_guard(pre_event("Bash", "make broken"), project_dir)
         assert result["decision"] == "block"
 
@@ -250,8 +266,8 @@ class TestSlidingWindow:
 class TestFailureModes:
     def test_malformed_state_file_approves(self, project_dir):
         """Corrupted state file must not crash the hook (fail open)."""
-        state_file = project_dir / ".claude" / "loop_guard_state.json"
-        state_file.write_text("not valid json {{{")
+        state_path = state_file(project_dir)
+        state_path.write_text("not valid json {{{")
         result = run_guard(pre_event("Bash", "ls"), project_dir)
         assert result["decision"] == "approve"
 

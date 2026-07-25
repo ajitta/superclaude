@@ -8,8 +8,9 @@ Contract:
   >=5 error entries within a 15-minute window, block and prompt for a
   change of approach.
 
-State lives at $CLAUDE_PROJECT_DIR/.claude/loop_guard_state.json (or cwd
-fallback). Fail-open on any error. Opt out with SUPERCLAUDE_LOOP_GUARD=0.
+State lives at <claude_base>/.superclaude_hooks/loop_guard_<project_key>.json —
+ephemeral, regenerable, and removed by ``superclaude uninstall`` with the rest of
+the scope. Fail-open on any error. Opt out with SUPERCLAUDE_LOOP_GUARD=0.
 """
 
 from __future__ import annotations
@@ -21,13 +22,14 @@ import tempfile
 import time
 from pathlib import Path
 
+from superclaude.utils import hook_state_dir, project_key
+
 BLOCK_THRESHOLD = 5
 WINDOW_SECONDS = 15 * 60
 
 
 def _state_path() -> Path:
-    root = os.environ.get("CLAUDE_PROJECT_DIR") or os.getcwd()
-    return Path(root) / ".claude" / "loop_guard_state.json"
+    return hook_state_dir() / f"loop_guard_{project_key()}.json"
 
 
 def _approve() -> None:

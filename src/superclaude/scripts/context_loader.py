@@ -21,7 +21,6 @@ v2.1.0: Skills discovery and token estimation
 """
 
 import difflib
-import hashlib
 import json
 import os
 import re
@@ -36,7 +35,7 @@ if TYPE_CHECKING:
 # stdlib-only, and hooks.json runs these scripts with the installer's own
 # interpreter ({{PYTHON_BIN}} = sys.executable), which has the package. Silently
 # degrading here would put state and content lookups in the wrong scope.
-from superclaude.utils import claude_base, hook_state_dir
+from superclaude.utils import claude_base, hook_state_dir, project_key
 
 # v2.2.0: MCP fallback notification support
 try:
@@ -58,9 +57,11 @@ MAX_TOKENS_ESTIMATE = int(
 )  # ~8K tokens
 CHARS_PER_TOKEN = 4  # Rough estimate
 
-# Session tracking file (unique per working directory, stored in the active
-# install's own .claude — see superclaude.utils.hook_state_dir)
-SESSION_ID = hashlib.md5(os.getcwd().encode()).hexdigest()[:8]
+# Session tracking file (unique per project, stored in the active install's own
+# .claude — see superclaude.utils.hook_state_dir). Keyed on project_root(), not
+# the CWD: a hook firing from a subdirectory would otherwise read a different
+# cache file and silently re-inject every context.
+SESSION_ID = project_key()
 _CACHE_DIR = hook_state_dir()
 _CACHE_DIR.mkdir(parents=True, exist_ok=True)
 CACHE_FILE = _CACHE_DIR / f"claude_context_{SESSION_ID}.txt"

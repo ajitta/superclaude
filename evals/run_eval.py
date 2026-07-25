@@ -54,7 +54,7 @@ PY_BIN = sys.executable
 # Runtime artifacts that are neither model edits nor fixture content — SC's
 # loop_guard writes state into the project .claude/, and any python execution
 # drops __pycache__. Committed in the baseline so git_diff checks stay clean.
-WS_GITIGNORE = "__pycache__/\n*.pyc\n.claude/loop_guard_state.json\n"
+WS_GITIGNORE = "__pycache__/\n*.pyc\n.claude/.superclaude_hooks/\n"
 
 
 @dataclass

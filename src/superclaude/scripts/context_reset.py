@@ -10,13 +10,11 @@ Registered in hooks.json with matcher: "clear" and "compact".
 
 from __future__ import annotations
 
-import hashlib
 import json
-import os
 import sys
 from pathlib import Path
 
-from superclaude.utils import hook_state_dir
+from superclaude.utils import hook_state_dir, project_key
 
 # Scoped to the active install, so a local-scope install resets its own cache
 # rather than one shared through ~/.claude.
@@ -24,9 +22,8 @@ CACHE_DIR = hook_state_dir()
 
 
 def get_cache_file() -> Path:
-    """Get the context_loader cache file for the current working directory."""
-    session_id = hashlib.md5(os.getcwd().encode()).hexdigest()[:8]
-    return CACHE_DIR / f"claude_context_{session_id}.txt"
+    """Get the context_loader cache file for the current project."""
+    return CACHE_DIR / f"claude_context_{project_key()}.txt"
 
 
 def reset_context_cache() -> bool:

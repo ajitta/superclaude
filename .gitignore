@@ -103,8 +103,10 @@ poetry.lock
 .claude/settings.local.json
 .claude/agent-memory*/
 .claude/.superclaude_hooks/
-.claude/projects/
+# Transitional: loop_guard state moved into .superclaude_hooks/, but a Claude Code
+# session started before the upgrade keeps writing the old path until it restarts.
 .claude/loop_guard_state.json
+.claude/projects/
 .claude/insights.pending.jsonl
 .claude/scheduled_tasks.lock
 .claude/skills/

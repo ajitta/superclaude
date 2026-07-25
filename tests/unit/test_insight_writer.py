@@ -19,8 +19,13 @@ from superclaude.scripts import insight_writer as iw
 
 @pytest.fixture
 def workdir(tmp_path, monkeypatch):
-    """Run each test in an isolated cwd so .claude/ paths don't collide."""
+    """Run each test in an isolated project so .claude/ paths don't collide.
+
+    CLAUDE_PROJECT_DIR is what project_root() anchors on, so chdir alone would
+    let the insight files resolve to the real repo.
+    """
     monkeypatch.chdir(tmp_path)
+    monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(tmp_path))
     return tmp_path
 
 
@@ -550,20 +555,30 @@ class _StdinMock:
 
 
 class TestPendingCountFromHook:
-    def test_reads_cwd_from_stdin_payload(self, workdir, monkeypatch, capsys):
-        # Pending file lives in a project dir that is NOT the process cwd —
-        # the hook stdin cwd must win (same anchoring as harvest-from-hook).
-        other = workdir / "otherproj"
-        pending = other / ".claude" / "insights.pending.jsonl"
+    def test_project_root_wins_over_stdin_cwd(self, workdir, monkeypatch, capsys):
+        # The stdin payload's cwd is the *session* cwd and may be a
+        # subdirectory. Counting must use the project root, the same anchor
+        # harvest/promote/append use — otherwise the two ends of the pending
+        # workflow read different files.
+        subdir = workdir / "packages" / "api"
+        subdir.mkdir(parents=True)
+        (subdir / ".claude").mkdir()
+        (subdir / ".claude" / "insights.pending.jsonl").write_text(
+            '{"uuid": "decoy", "raw_text": "wrong file"}\n', encoding="utf-8"
+        )
+        pending = workdir / ".claude" / "insights.pending.jsonl"
         pending.parent.mkdir(parents=True)
-        pending.write_text('{"uuid": "u1", "raw_text": "x"}\n', encoding="utf-8")
+        pending.write_text(
+            '{"uuid": "u1", "raw_text": "x"}\n{"uuid": "u2", "raw_text": "y"}\n',
+            encoding="utf-8",
+        )
         payload = json.dumps(
-            {"session_id": "sess1", "cwd": str(other), "source": "startup"}
+            {"session_id": "sess1", "cwd": str(subdir), "source": "startup"}
         )
         monkeypatch.setattr("sys.stdin", _StdinMock(payload))
         rc = iw.main(["pending-count-from-hook"])
         assert rc == 0
-        assert "1 pending insight" in capsys.readouterr().out
+        assert "2 pending insight" in capsys.readouterr().out
 
     def test_malformed_payload_falls_back_to_process_cwd(
         self, workdir, monkeypatch, capsys

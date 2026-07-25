@@ -1,10 +1,10 @@
 """Unit tests for scope-aware path resolution in superclaude.utils.
 
-Covers the three helpers that decide which install a running hook belongs to:
-project_root, claude_base, hook_state_dir. Regression target: hook state and
-context lookups used to hardcode ~/.claude (or Path.cwd()), so a local-scope
-install wrote runtime state into user scope and a subdirectory CWD silently
-loaded user-scope content.
+Covers the four helpers that decide which install a running hook belongs to and
+which project it is acting on: project_root, claude_base, hook_state_dir,
+project_key. Regression target: hook state and context lookups used to hardcode
+~/.claude (or Path.cwd()), so a local-scope install wrote runtime state into
+user scope and a subdirectory CWD silently loaded user-scope content.
 """
 
 from __future__ import annotations
@@ -15,6 +15,7 @@ from superclaude.utils import (
     claude_base,
     get_skill_directories,
     hook_state_dir,
+    project_key,
     project_root,
 )
 
@@ -92,6 +93,84 @@ class TestHookStateDir:
         monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(tmp_path))
 
         assert hook_state_dir().parent == content.parent
+
+
+class TestProjectKey:
+    """project_key names per-project state inside a possibly shared state dir."""
+
+    def test_stable_from_subdirectory(self, tmp_path: Path, monkeypatch):
+        """Regression: keying on os.getcwd() gave a subdir its own state file.
+
+        The dedup cache and the loop_guard counters both hang off this key, so a
+        drifting key silently re-injects contexts and resets the circuit breaker.
+        """
+        subdir = tmp_path / "src" / "deep"
+        subdir.mkdir(parents=True)
+        monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(tmp_path))
+
+        monkeypatch.chdir(tmp_path)
+        from_root = project_key()
+        monkeypatch.chdir(subdir)
+
+        assert project_key() == from_root
+
+    def test_differs_across_projects(self, tmp_path: Path, monkeypatch):
+        """A user-scope install shares one state dir across every project."""
+        other = tmp_path / "other"
+        other.mkdir()
+
+        monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(tmp_path))
+        first = project_key()
+        monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(other))
+
+        assert project_key() != first
+
+    def test_is_filename_safe(self, tmp_path: Path, monkeypatch):
+        """The key goes straight into a filename, so it must carry no separators."""
+        monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(tmp_path / "a b" / "c-d.e"))
+
+        key = project_key()
+        assert key.isalnum()
+        assert len(key) == 8
+
+
+class TestContextCacheKeying:
+    """context_reset must delete the file context_loader actually wrote."""
+
+    def test_cache_file_stable_from_subdirectory(self, tmp_path: Path, monkeypatch):
+        """Regression D2: both sides keyed on os.getcwd(), so a hook firing from
+        a subdirectory read a different cache file and dedup silently failed.
+
+        Only the filename is asserted. context_reset.CACHE_DIR resolves
+        hook_state_dir() once at import, which is correct for a one-shot hook
+        subprocess (the env is set before Python starts) but means the directory
+        cannot follow monkeypatched env inside a single test session.
+        """
+        from superclaude.scripts.context_reset import get_cache_file
+
+        subdir = tmp_path / "src" / "deep"
+        subdir.mkdir(parents=True)
+        monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(tmp_path))
+
+        monkeypatch.chdir(tmp_path)
+        from_root = get_cache_file()
+        monkeypatch.chdir(subdir)
+
+        assert get_cache_file() == from_root
+        assert from_root.name == f"claude_context_{project_key()}.txt"
+
+    def test_cache_file_follows_project_not_cwd(self, tmp_path: Path, monkeypatch):
+        """Two projects must not share one dedup cache file."""
+        from superclaude.scripts.context_reset import get_cache_file
+
+        other = tmp_path / "other"
+        other.mkdir()
+
+        monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(tmp_path))
+        first = get_cache_file()
+        monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(other))
+
+        assert get_cache_file() != first
 
 
 class TestSkillDirectories:

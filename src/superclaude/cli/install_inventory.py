@@ -382,25 +382,10 @@ def uninstall_all(
         messages.append(f"⏭️  Not found: {hooks_json}")
         skipped += 1
 
-    # 5a. Remove hook runtime state files (written during normal operation).
-    # Safe to remove — they will be regenerated if SuperClaude is reinstalled.
-    for state_file in (base_path / "loop_guard_state.json",):
-        if state_file.exists():
-            if dry_run:
-                messages.append(f"[DRY-RUN] Would remove: {state_file}")
-                removed += 1
-            else:
-                try:
-                    state_file.unlink()
-                    messages.append(f"✅ Removed: {state_file}")
-                    removed += 1
-                except Exception as e:
-                    messages.append(f"❌ Failed to remove {state_file}: {e}")
-                    failed += 1
-
-    # 5b. Remove the hook state directory (context dedup cache, session tracker,
-    # MCP fallback log). Scoped via superclaude.utils.hook_state_dir, so it sits
-    # under this scope's base_path and is regenerated on next session.
+    # 5a. Remove the hook state directory (context dedup cache, session tracker,
+    # MCP fallback log, loop_guard counters). Every runtime path resolves through
+    # superclaude.utils.hook_state_dir, so this one rmtree covers all of it — see
+    # the two-class rule in that module's docstring.
     state_dir = base_path / ".superclaude_hooks"
     if state_dir.exists():
         if dry_run:

@@ -153,16 +153,19 @@ def get_additional_dirs_status() -> str:
         Status string if additional directories are detected
     """
     import os
-    from pathlib import Path
+
+    from superclaude.utils import project_root
 
     if os.environ.get("CLAUDE_CODE_ADDITIONAL_DIRECTORIES_CLAUDE_MD", "0") != "1":
         return ""
 
-    cwd = Path.cwd()
+    # project_root(), not Path.cwd(): a hook firing from a subdirectory would
+    # otherwise scan the wrong tree and under-report the workspace count.
+    root = project_root()
     additional_count = 0
 
     for pattern in ["packages/*", "apps/*", "libs/*", "services/*"]:
-        for subdir in cwd.glob(pattern):
+        for subdir in root.glob(pattern):
             if subdir.is_dir() and (subdir / "CLAUDE.md").exists():
                 additional_count += 1
 

@@ -1,5 +1,19 @@
-"""Shared utility functions for SuperClaude."""
+"""Shared utility functions for SuperClaude.
 
+Runtime paths resolve here and nowhere else. Two classes, opposite lifetimes:
+
+- Ephemeral machine state (context caches, trackers, circuit-breaker counters)
+  lives under ``hook_state_dir()`` so ``superclaude uninstall`` removes it with
+  the rest of the scope.
+- Durable project data the user owns (``insights.jsonl``) lives under
+  ``project_root() / ".claude"`` so uninstall preserves it.
+
+``os.getcwd()``, ``Path.cwd()`` and CWD-relative literals are bugs in hook and
+script code — hook CWD is not guaranteed to be the project root. See
+`.claude/rules/gotchas/hooks.md`.
+"""
+
+import hashlib
 import json
 import os
 import tempfile
@@ -89,3 +103,21 @@ def hook_state_dir() -> Path:
         <claude_base>/.superclaude_hooks
     """
     return claude_base() / ".superclaude_hooks"
+
+
+def project_key() -> str:
+    """Stable short id for the active project, for per-project state filenames.
+
+    User-scope installs share one ``hook_state_dir()`` across every project, so
+    state that is not session-keyed needs this in its filename to stop two
+    projects contaminating each other. Anchored on ``project_root()`` rather
+    than the CWD so a hook firing from a subdirectory resolves the same id.
+
+    Returns:
+        First 8 hex chars of the MD5 of the project root path
+    """
+    # usedforsecurity=False: this is a filename discriminator, not a digest, and
+    # bare md5() raises under a FIPS-enforcing Python build.
+    return hashlib.md5(
+        str(project_root()).encode(), usedforsecurity=False
+    ).hexdigest()[:8]

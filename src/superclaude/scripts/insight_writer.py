@@ -35,8 +35,24 @@ import subprocess
 import sys
 from pathlib import Path
 
-INSIGHT_FILE = Path(".claude/insights.jsonl")
-PENDING_FILE = Path(".claude/insights.pending.jsonl")
+from superclaude.utils import project_root
+
+
+def _insight_file() -> Path:
+    """Durable insight history — user data, anchored at the project root.
+
+    Resolved per call rather than at import: the project anchor comes from the
+    environment, and a CWD-relative literal would split the history whenever a
+    hook or Bash call runs from a subdirectory.
+    """
+    return project_root() / ".claude" / "insights.jsonl"
+
+
+def _pending_file() -> Path:
+    """Raw INSIGHT: markers awaiting promotion. Same anchor as _insight_file()."""
+    return project_root() / ".claude" / "insights.pending.jsonl"
+
+
 VALID_TYPES = {"feedback", "decision", "discovery", "pattern", "metric", "annotation"}
 # Match INSIGHT: at line start OR inline ('text INSIGHT: rest'). Word boundary
 # prevents matching 'INSIGHTS:' or 'INSIGHTFUL:'. Lazy + lookahead lets multiple
@@ -167,19 +183,19 @@ def cmd_append(args: argparse.Namespace) -> int:
                 return 2
         cleaned.append(entry)
 
-    _ensure_parent(INSIGHT_FILE)
-    with INSIGHT_FILE.open("a", encoding="utf-8") as f:
+    _ensure_parent(_insight_file())
+    with _insight_file().open("a", encoding="utf-8") as f:
         for entry in cleaned:
             f.write(json.dumps(entry, ensure_ascii=False) + "\n")
 
-    print(f"appended {len(cleaned)} insight(s) to {INSIGHT_FILE}")
+    print(f"appended {len(cleaned)} insight(s) to {_insight_file()}")
     return 0
 
 
 def _annotation_target_exists(ref_ts: str) -> bool:
-    if not INSIGHT_FILE.exists():
+    if not _insight_file().exists():
         return False
-    with INSIGHT_FILE.open(encoding="utf-8") as f:
+    with _insight_file().open(encoding="utf-8") as f:
         for line in f:
             try:
                 d = json.loads(line)
@@ -194,7 +210,7 @@ def _annotation_target_exists(ref_ts: str) -> bool:
 
 
 def cmd_list(args: argparse.Namespace) -> int:
-    if not INSIGHT_FILE.exists():
+    if not _insight_file().exists():
         print("(no insights yet)")
         return 0
     jq = _require_jq()
@@ -203,7 +219,7 @@ def cmd_list(args: argparse.Namespace) -> int:
             jq,
             "-r",
             r'"\(.ts) [\(.author // "unknown")] [\(.type)] \(.insight)"',
-            str(INSIGHT_FILE),
+            str(_insight_file()),
         ],
         capture_output=True,
         text=True,
@@ -218,7 +234,7 @@ def cmd_list(args: argparse.Namespace) -> int:
 
 
 def cmd_query(args: argparse.Namespace) -> int:
-    if not INSIGHT_FILE.exists():
+    if not _insight_file().exists():
         print("(no insights yet)")
         return 0
     if "=" not in args.expr:
@@ -234,18 +250,18 @@ def cmd_query(args: argparse.Namespace) -> int:
         filt = "select(.tags // [] | index($v))"
     else:
         filt = f"select(.{key}==$v)"
-    r = subprocess.run([jq, "--arg", "v", value, filt, str(INSIGHT_FILE)], text=True)
+    r = subprocess.run([jq, "--arg", "v", value, filt, str(_insight_file())], text=True)
     return r.returncode
 
 
 def cmd_stats(args: argparse.Namespace) -> int:
-    if not INSIGHT_FILE.exists():
+    if not _insight_file().exists():
         print("(no insights yet)")
         return 0
     jq = _require_jq()
     type_filt = ".type" if args.all else 'select(.type != "annotation") | .type'
     r = subprocess.run(
-        [jq, "-r", type_filt, str(INSIGHT_FILE)],
+        [jq, "-r", type_filt, str(_insight_file())],
         capture_output=True,
         text=True,
     )
@@ -269,16 +285,17 @@ def cmd_stats(args: argparse.Namespace) -> int:
 def cmd_harvest(args: argparse.Namespace) -> int:
     """Scan transcript for INSIGHT: markers → append unique entries to pending.
 
-    Pending file is anchored to args.cwd (the project the hook fired from), not
-    the script's process cwd, so harvest writes to the correct project even if
-    a non-default hook config invoked us from elsewhere.
+    Pending file resolves through _pending_file() like every other writer, so
+    harvest and promote never disagree about which project's file they are on.
+    args.cwd stays the transcript anchor: Claude Code encodes the *session* cwd
+    into the transcript directory name, which is not always the project root.
     """
     cwd = args.cwd or os.getcwd()
     transcript = _find_transcript(args.session_id, cwd)
     if not transcript:
         return 0  # silent: no transcript yet (e.g., first session)
 
-    pending_path = Path(cwd) / ".claude" / "insights.pending.jsonl"
+    pending_path = _pending_file()
 
     existing_uuids: set[str] = set()
     if pending_path.exists():
@@ -356,7 +373,8 @@ def cmd_harvest(args: argparse.Namespace) -> int:
 # ---------- review / promote / pending-count ----------
 
 
-def _read_pending(path: Path = PENDING_FILE) -> list[dict]:
+def _read_pending(path: Path | None = None) -> list[dict]:
+    path = path if path is not None else _pending_file()
     if not path.exists():
         return []
     out: list[dict] = []
@@ -371,11 +389,11 @@ def _read_pending(path: Path = PENDING_FILE) -> list[dict]:
 
 def _write_pending(entries: list[dict]) -> None:
     if not entries:
-        if PENDING_FILE.exists():
-            PENDING_FILE.unlink()
+        if _pending_file().exists():
+            _pending_file().unlink()
         return
-    _ensure_parent(PENDING_FILE)
-    with PENDING_FILE.open("w", encoding="utf-8") as f:
+    _ensure_parent(_pending_file())
+    with _pending_file().open("w", encoding="utf-8") as f:
         for e in entries:
             f.write(json.dumps(e, ensure_ascii=False) + "\n")
 
@@ -433,16 +451,15 @@ def cmd_promote(args: argparse.Namespace) -> int:
     pending.pop(args.index)
     _write_pending(pending)
     print(
-        f"promoted index {args.index} → {INSIGHT_FILE} (remaining pending: {len(pending)})"
+        f"promoted index {args.index} → {_insight_file()} (remaining pending: {len(pending)})"
     )
     return 0
 
 
 def cmd_pending_count(args: argparse.Namespace) -> int:
-    # Anchor to the hook's cwd (same as cmd_harvest) so the SessionStart notice
-    # reads the pending file harvest wrote, even under non-default hook cwd.
-    cwd = args.cwd or os.getcwd()
-    n = len(_read_pending(Path(cwd) / ".claude" / "insights.pending.jsonl"))
+    # Same resolver as cmd_harvest, so the SessionStart notice always reads the
+    # pending file harvest wrote.
+    n = len(_read_pending())
     if n > 0:
         print(f"🟡 {n} pending insight(s) — run /sc:insight --review")
     return 0
@@ -491,8 +508,9 @@ def build_parser() -> argparse.ArgumentParser:
     pr.add_argument("--tags", help="comma-separated tags")
     pr.set_defaults(fn=cmd_promote)
 
+    # No --cwd: the pending file is anchored on project_root(), so accepting a
+    # cwd here would be a flag that silently does nothing.
     pc = sub.add_parser("pending-count")
-    pc.add_argument("--cwd", default=None)
     pc.set_defaults(fn=cmd_pending_count)
 
     return p
@@ -512,7 +530,7 @@ def main(argv: list[str] | None = None) -> int:
             data = {}
         cwd = str(data.get("cwd", os.getcwd()))
         if argv[0] == "pending-count-from-hook":
-            argv = ["pending-count", "--cwd", cwd]
+            argv = ["pending-count"]
         else:
             source = (
                 data.get("reason")  # SessionEnd

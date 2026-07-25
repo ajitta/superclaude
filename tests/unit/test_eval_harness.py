@@ -92,17 +92,22 @@ def _import_run_eval():
     return run_eval
 
 
-def test_ws_gitignore_covers_loop_guard_state_path():
+def test_ws_gitignore_covers_loop_guard_state_path(tmp_path, monkeypatch):
     """WS_GITIGNORE must track loop_guard.py's actual state-file path — if the
-    hook moves its state file, workspace scope checks silently re-contaminate."""
-    source = (REPO_ROOT / "src/superclaude/scripts/loop_guard.py").read_text(
-        encoding="utf-8"
-    )
-    match = re.search(r'Path\(root\)\s*/\s*"([^"]+)"\s*/\s*"([^"]+)"', source)
-    state_path = f"{match.group(1)}/{match.group(2)}"
+    hook moves its state file, workspace scope checks silently re-contaminate.
+
+    Resolved through the real hook resolvers against a project-scope layout,
+    since run_eval installs with --scope project into the workspace.
+    """
+    from superclaude.scripts.loop_guard import _state_path
+
+    (tmp_path / ".claude" / "superclaude").mkdir(parents=True)
+    monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(tmp_path))
+
+    state_dir = _state_path().parent.relative_to(tmp_path).as_posix() + "/"
     ignored = _import_run_eval().WS_GITIGNORE.splitlines()
-    assert state_path in ignored, (
-        f"loop_guard state path {state_path!r} not in WS_GITIGNORE {ignored} — "
+    assert state_dir in ignored, (
+        f"loop_guard state dir {state_dir!r} not in WS_GITIGNORE {ignored} — "
         "re-sync run_eval.py with scripts/loop_guard.py"
     )
 

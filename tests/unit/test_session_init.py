@@ -365,6 +365,7 @@ class TestGetAdditionalDirsStatus:
         """Returns empty when no subdirectories contain CLAUDE.md."""
         monkeypatch.setenv("CLAUDE_CODE_ADDITIONAL_DIRECTORIES_CLAUDE_MD", "1")
         monkeypatch.chdir(tmp_path)
+        monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(tmp_path))
         (tmp_path / "packages").mkdir()
         (tmp_path / "packages" / "core").mkdir()
         # No CLAUDE.md inside
@@ -374,6 +375,7 @@ class TestGetAdditionalDirsStatus:
         """Detects CLAUDE.md files in packages/ subdirectories."""
         monkeypatch.setenv("CLAUDE_CODE_ADDITIONAL_DIRECTORIES_CLAUDE_MD", "1")
         monkeypatch.chdir(tmp_path)
+        monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(tmp_path))
 
         pkg = tmp_path / "packages" / "core"
         pkg.mkdir(parents=True)
@@ -386,6 +388,7 @@ class TestGetAdditionalDirsStatus:
         """Detects CLAUDE.md across packages/, apps/, libs/, services/."""
         monkeypatch.setenv("CLAUDE_CODE_ADDITIONAL_DIRECTORIES_CLAUDE_MD", "1")
         monkeypatch.chdir(tmp_path)
+        monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(tmp_path))
 
         for parent, child in [("packages", "ui"), ("apps", "web"), ("libs", "utils")]:
             d = tmp_path / parent / child
@@ -399,6 +402,7 @@ class TestGetAdditionalDirsStatus:
         """Only counts directories, not files matching the glob."""
         monkeypatch.setenv("CLAUDE_CODE_ADDITIONAL_DIRECTORIES_CLAUDE_MD", "1")
         monkeypatch.chdir(tmp_path)
+        monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(tmp_path))
 
         (tmp_path / "packages").mkdir()
         # Create a file (not directory) that matches the glob

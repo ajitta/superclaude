@@ -87,6 +87,15 @@ Python and shell scripts that power SuperClaude's hook system, context loading, 
 
 **Sub-package:** `scripts/auto_improve/` — overnight autonomous code improvement loop powering `/sc:auto-improve` (coordinator, eval_runner, mutator, worktree isolation, results reporter). Distinct from per-event hook scripts; runs as a standalone `python -m superclaude.scripts.auto_improve` entrypoint.
 
+**Runtime state:** every path a script writes at runtime resolves through `superclaude.utils` — never `os.getcwd()`, `Path.cwd()`, or a CWD-relative literal, since hook CWD is not guaranteed to be the project root. Two classes:
+
+| Class | Resolver | Examples | On uninstall |
+|---|---|---|---|
+| Ephemeral machine state | `hook_state_dir()` → `<claude_base>/.superclaude_hooks/` | context dedup cache, hook tracker, MCP fallback log, loop_guard counters | removed wholesale |
+| Durable project data | `project_root() / ".claude"` | `insights.jsonl`, `insights.pending.jsonl` | preserved |
+
+State that is not session-keyed adds `project_key()` to its filename, because a user-scope install shares one `hook_state_dir()` across every project.
+
 ### Python Infrastructure (not content types)
 
 The following directories support the content framework but are not content types themselves: `cli/` (Click-based CLI and installation logic), `hooks/` (hook system integration), and `utils/` (shared utilities). These are documented in the project `CLAUDE.md`.
