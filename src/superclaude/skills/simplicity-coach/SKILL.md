@@ -19,7 +19,7 @@ Simplicity = filter — pass every decision thru "Is this simpler?"
 
   <references>
   - `references/orient-step-learn-examples.md` — Worked OSL examples (API endpoint, refactoring, tech selection, dep audit, debugging). Read when user need concrete OSL walkthru.
-  - `references/practices-reference.md` — Templates for dep gate, 3-level feedback, daybook, simplicity review, task-type OSL. Read when prep specific practice.
+  - `references/practices-reference.md` — Templates for dep gate, 3-level feedback, daybook, simplicity review. Read when prep specific practice.
   - `assets/dependency-audit-checklist.md` — Printable checklist for Dependency Gate 3 questions. Share with user during audits.
   - `scripts/dependency-audit.py` — Executable audit report. Run via Bash when user request dep audit.
   </references>
@@ -36,7 +36,6 @@ Orient: Clarify w/ user — where now? where go? how know done?
 Understand: Before judge complexity, restate purpose + constraints. If uncertain → ask, no assume.
 Step: One concern at time, verifiable result, no "just in case" code, deliberate on hard-to-reverse decisions
 Learn: Work? Anything new? Adjust direction?
-See `references/orient-step-learn-examples.md` for worked examples.
   </osl_coaching>
 
   <domain_exceptions note="Inherited from simplicity-guide — do NOT apply simplification pressure here">
@@ -46,14 +45,12 @@ Tesler's Law: essential complexity cannot remove, only move
 
   <practices note="Summaries — see references/practices-reference.md for detail">
 Dependency Gate: 3 questions before add any library — how much used? how long DIY? safe in 6 months?
-  See `assets/dependency-audit-checklist.md` for full checklist.
 3-Level Feedback: (1) code bug → fix (2) expectation bug → re-examine (3) process bug → prevent. Record level 3.
 Daybook: `DAYBOOK.md` at project root — Orient/Steps/Decisions/Process Bugs/Notes. Builds intuition.
 Simplicity Review: Readable? Deps removable? Smaller? Coupling? YAGNI? Value?
-  See `references/practices-reference.md` for templates + detail.
   </practices>
 
-  <task_types note="OSL applied per task — see references/practices-reference.md for detail">
+  <task_types note="OSL applied per task">
 New Feature: orient (goal/state/criteria) → one scenario → feedback → next scenario
 Code Review: complexity justified? deps justified? tests catch process bugs? smaller units?
 Refactoring: goal = simpler, not "better" — orient (what complex?) → one simplification → still works?
@@ -68,7 +65,6 @@ Storytelling (metaphors, not jargon) | Empathy (who maintain this?) | Transparen
   <gotchas>
   - osl-skip: No skip Orient phase + jump to Step. Step w/o Orient = directionless work
   - overconfident-judgment: No declare "over-engineered" w/o understand domain context. Ask first, judge second.
-  - domain-blind: Security, a11y, compliance complexity = essential — never recommend simplify these domains
   - script-invocation: dependency-audit.py run via explicit Bash invocation inside this skill session, not via Stop hook
   </gotchas>
 

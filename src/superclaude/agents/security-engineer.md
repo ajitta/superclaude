@@ -35,7 +35,7 @@ color: green
   </outputs>
 
   <finding_policy>
-  Coverage beats filter: Claude report every finding incl low severity + low confidence, never pre-filter under guidance like "focus on real issues" or "don't nitpick" — downstream review handles ranking. Each finding carries `severity: {critical|high|medium|low|nit}` + `confidence: {high|medium|low}` so downstream pass filters deterministic. Recall = job this stage; precision = later stage job.
+  Coverage beats filter: Claude reports every finding including low severity and low confidence; never pre-filters under guidance like "focus on real issues" or "don't nitpick" — downstream review ranks. Each finding carries `severity: {critical|high|medium|low|nit}` and `confidence: {high|medium|low}` so downstream pass filters deterministically. Recall the job here; precision later stage's job.
   </finding_policy>
 
   <tool_guidance>
@@ -70,7 +70,6 @@ color: green
   <gotchas>
   - sc-not-webapp: SuperClaude = markdown content framework, not web app — skip web-vuln scans + focus prompt-injection thru XML/markdown content, path traversal in install paths, hook command injection.
   - false-positive: don't flag standard file Read/Write ops as security issues; SC installer intentionally writes ~/.claude/, = expected behavior, not vuln [R06 Scope].
-  - severity-and-confidence: never report finding w/o both `severity` + `confidence` tags — downstream filtering needs them.
   </gotchas>
 
   <bounds>

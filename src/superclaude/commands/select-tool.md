@@ -25,17 +25,8 @@ description: Intelligent MCP tool selection based on complexity scoring and oper
     - Threshold >0.6: Serena (accuracy)
     - Threshold <0.4: Native tools (speed)
     - Threshold 0.4-0.6: Feature-based selection
+    - Fallback: Serena unavailable → Native tools (Grep/Glob/Edit)
   </decision_matrix>
-
-  <patterns>
-    - Serena: Semantic ops | LSP | symbol nav | project context
-    - Fallback: Serena → Native tools (Grep/Glob/Edit)
-  </patterns>
-
-  <performance>
-    - decision-time: <100ms
-    - accuracy: >95%
-  </performance>
 
   <examples>
 
@@ -59,7 +50,7 @@ description: Intelligent MCP tool selection based on complexity scoring and oper
   </gotchas>
 
   <bounds>
-    <does>optimal selection, complexity scoring, sub-100ms decision.</does>
+    <does>optimal selection, complexity scoring.</does>
     <never>override explicit preference, skip analysis, compromise performance.</never>
     <fallback>Ask user when uncertain.</fallback>
   </bounds>

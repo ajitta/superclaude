@@ -123,7 +123,7 @@ Session Start
 
 | Mechanism | Content Types | Trigger | Budget |
 |-----------|--------------|---------|--------|
-| **Always loaded** | core/ (FLAGS, PRINCIPLES, RULES kernel) | Session start | ~250 lines via @import |
+| **Always loaded** | core/ (FLAGS, PRINCIPLES, RULES kernel) | Session start | ~140 lines via @import |
 | **On-demand** | modes/, mcp/, core/rules/, core/BUSINESS_SYMBOLS | Flag/keyword in prompt | 8K token budget (context_loader) |
 | **CC-native** | agents/, commands/, skills/ | Auto-delegation, /sc:*, hooks/safety | Managed by Claude Code runtime |
 
@@ -143,10 +143,7 @@ Domain: "Business"
   └── commands/business-panel.md      → WHAT TO DO for business analysis (workflow)
 ```
 
-These are not redundant — each serves a distinct purpose in the framework:
-- **Mode** activates the right cognitive posture
-- **Agent** provides domain expertise and tool guidance
-- **Command** orchestrates the workflow and defines the entry point
+These are not redundant — each serves a distinct purpose in the framework.
 
 **Note:** Skills are deliberately absent from the naming trinity. They serve a cross-cutting infrastructure role (hooks, safety), not a domain-specific one. User-facing multi-step workflows that were formerly in skills now live in commands; skills retain `<flow>` for internal sequencing of their CC-native capability.
 

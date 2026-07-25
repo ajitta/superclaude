@@ -27,16 +27,7 @@
   </choose>
 
   <memory_patterns>
-  - Session-Start: `list_memories` → `read_memory("pm_context")` → report context (project auto-active via `--project-from-cwd`).
-  - During-Work: native reasoning for goal-alignment checks; `write_memory` for checkpoints + discoveries.
-  - Session-End: `write_memory("session_[date]", ...)` → `write_memory("learnings_[topic]", ...)` → verify w/ `list_memories`.
-
-  Memory naming conventions:
-  - `pm_context` — PM agent state.
-  - `last_session` — previous session summary.
-  - `next_actions` — queued work items.
-  - `session_[YYYY-MM-DD]` — dated session snapshots.
-  - `learnings_[topic]` — accumulated insights by topic.
+  Session lifecycle flows and memory key names live in `/sc:load` and `/sc:save` — not restated here. During work: native reasoning for goal-alignment checks; `write_memory` for checkpoints + discoveries as they surface.
   </memory_patterns>
 
   <examples>

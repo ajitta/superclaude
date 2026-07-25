@@ -57,12 +57,6 @@ description: Build, compile, package projects w/ smart err handling + optimize. 
 
   </examples>
 
-
-  <gotchas>
-  - make-deploy: SuperClaude use `make deploy` for install. No use npm/pip/yarn build
-  - uv-only: Use `uv` for all Python ops. Never use `pip` direct
-  </gotchas>
-
   <bounds>
     <does>exec build, err analysis, optimize recs.</does>
     <never>modify build config, install deps, deploy.</never>

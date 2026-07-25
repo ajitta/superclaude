@@ -13,12 +13,11 @@ description: Session lifecycle management with Serena MCP + Claude auto memory f
   1. Analyze: session progress + discoveries
   2. Persist (Serena): write_memory("session_[date]", context) → write_memory("learnings_[topic]", insights)
   3. Persist (auto memory): Write/Edit MEMORY.md + topic files for cross-session continuity
-    3.5. Corrections-Review: scan session for user corrections (rejected approaches, "no I meant...", redirections). For each unrecorded correction, save structured feedback memory with trigger/misread/actual_intent/prevention fields.
+    3.5. Corrections-Review: capture unrecorded user corrections per /sc:reflect Misunderstanding-Audit (same feedback-memory fields).
   4. Verify: list_memories() + Read MEMORY.md confirms both stores
   5. Checkpoint: recovery points + progress tracking
   6. Validate: data integrity + no duplicates across stores
   7. Session Goal: if session goal set via /sc:load, evaluate completion status (done/partial/deferred)
-    Fallback (no Serena): Claude auto memory only (MEMORY.md + topic files)
   </flow>
 
   <compaction_strategy>
@@ -50,13 +49,6 @@ description: Session lifecycle management with Serena MCP + Claude auto memory f
   - Write/Edit: Claude auto memory persistence (supplementary)
   - Read: verify auto memory content
   </tools>
-
-  <patterns>
-    - Preservation: Discovery → Serena memory → auto memory → checkpoint
-    - Learning: Accumulation → archival → understanding
-    - Progress: Completion → auto-checkpoint → continuity
-    - Recovery: State → validation → restoration ready
-  </patterns>
 
   <examples>
 

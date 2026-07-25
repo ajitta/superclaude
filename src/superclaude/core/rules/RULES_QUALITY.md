@@ -31,7 +31,7 @@
   | 33/42 tests pass after change | "33/42 pass" — ships | "33/42 pass; 7 pre-existing failures unchanged from baseline, 2 new regressions in auth — block until resolved" | Verification 🔴 |
   | User: "restructure the auth module" | Starts moving files | "To confirm: reorganize file structure of src/auth/, not rewrite logic. Correct?" | Intent Verification 🔴 |
   | User corrects: "no, the API routes" | Switches files silently | Saves memory: {trigger: 'restructure auth', misread: middleware, actual_intent: API routes, violated_rule: '[R13 Intent Verification]', prevention: confirm target subtree before editing} | Correction Capture 🟡 |
-  | Exploring unfamiliar class | Read entire 500-line file | get_symbols_overview → find_symbol(depth=1) | Serena-First 🟢 |
+  | Exploring unfamiliar class | Read entire 500-line file | get_symbols_overview → find_symbol(depth=1) | Symbolic-First 🟡 |
   | Model proposes adding retry logic | "This would be more resilient" | "System works without this. No failure scenario → SKIP." | Necessity Test 🔴 |
   | User corrects: "use pytest-django in this project" | Saves only to auto memory | Proposes: "Add to gotchas/testing.md?" + saves to auto memory | Project Gotcha Capture 🟡 |
   | User: "add input validation across 5 endpoints" | Starts editing immediately | States up-front: "Success = pytest covers empty/invalid/edge inputs and passes" — --loop stop condition | Success Criteria 🟡 |
@@ -94,6 +94,5 @@ Do NOT simplify (complexity = essential): Security/auth | Accessibility/WCAG | C
 Same mistake twice = missing rule: if feedback memory already covers pattern, propose RULES.md addition
 Scope words matter: "add" = new | "improve" = enhance existing | "fix" = repair broken | "strengthen" = reinforce existing | "adjust/readjust" = review applicability, not necessarily change
 Unverified numbers: prefix estimates with ~, distinguish from measured/coded values — never state estimate as fact
-Delegation intent loss: sub-agents receive user original words, not your interpretation
   </anti_misunderstanding>
 </component>

@@ -5,7 +5,7 @@ description: Task reflect + validate use Serena MCP analysis. Use when user type
 
   <role command="/sc:reflect">
     <mission>Task reflect + validate use analysis power</mission>
-    <note>For evidence-based done-check, use /sc:test with verify workflow</note>
+    <note>For evidence-based done-check, use /sc:test</note>
   </role>
 
   <syntax>/sc:reflect [--type task|session|completion] [--analyze] [--validate]</syntax>

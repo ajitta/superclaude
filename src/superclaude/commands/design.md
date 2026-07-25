@@ -16,12 +16,10 @@ description: Design system architecture, APIs, component interfaces w/ comprehen
   4. Constraints: Document operational params that constrain design — queue/buffer sizes, connection pool limits, external API batch limits, timeout values
   5. Necessity: For each proposed component, apply [R18 Necessity Test] — defer components lacking specific failure scenario, quantitative evidence, or user-facing impact
   6. Validate: Requirements coverage ≥90%, maintainability check
-  7. Document (routing per core/rules/RULES_DOCS.md `<doc_output_convention>`): on feature path, write spec to `docs/features/<slug>/04-design.md` (frontmatter: `status: draft, revised: <today>`) AND update `docs/features/<slug>/README.md` (`updated:` bump + append entry to `## Documents`, advance `phase:` if status enum moved). On standalone path, write to `docs/specs/<topic>-design-<username>-YYYY-MM-DD.md` — no README update needed. Plus diagrams.
+  7. Document: feature path `docs/features/<slug>/04-design.md`, standalone `docs/specs/<topic>-design-<username>-YYYY-MM-DD.md` — slug resolution (zero-match default `[f]`), frontmatter, README update per core/rules/RULES_DOCS.md `<doc_output_convention>`. Plus diagrams.
   </flow>
 
   <outputs note="All content in single spec file per invocation">
-Routing: per core/rules/RULES_DOCS.md `<doc_output_convention>` — feature path `docs/features/<slug>/04-design.md` (existing folder OR user picks `[f]`) | standalone path `docs/specs/<topic>-design-<username>-YYYY-MM-DD.md` (user picks `[s]` or no related work expected). Slug resolution: exact-match silent / multi partial-match prompt / zero match → `[f]/[s]` w/ default `[f]`.
-
 | Artifact | Content |
 |---|---|
 | Feature path: `docs/features/<slug>/04-design.md` | Phase doc when slug resolves to existing/new feature folder |
@@ -67,7 +65,7 @@ Routing: per core/rules/RULES_DOCS.md `<doc_output_convention>` — feature path
   <gotchas>
   - over-architect: Apply R18 necessity test to each proposed component. Only design what needed now
   - existing-check: Check if design doc already exist for this topic before creating new one
-  - workflow-fanout: Under ultracode Workflow fan-out, subagents RETURN design markdown — subprocess FS writes are discarded, so the main loop performs the native Write per the outputs routing
+  - workflow-fanout: fan-out subagents RETURN design markdown — subprocess writes discarded; main loop performs the Write per outputs routing (full rule: core/rules/RULES_DELEGATION.md)
   </gotchas>
 
   <bounds>

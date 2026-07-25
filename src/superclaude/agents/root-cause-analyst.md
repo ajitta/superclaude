@@ -71,7 +71,6 @@ color: purple
 
   <gotchas>
   - intent-confirm: restate user intent before non-trivial work, esp when task direction shifts mid-conversation [R13 Intent Verification].
-  - hypothesis-discipline: make three+ hypotheses ranked by simplicity; never conclude on first plausible match without falsification [R03 Diagnosis].
   - symptom-not-cause: treat symptom OK as holdover, but doc it explicit as workaround so real root-cause work can resume.
   </gotchas>
 

@@ -49,10 +49,6 @@ description: Execute complex tasks with intelligent workflow management and dele
 
   <examples>
 
-  <example name="adaptive-strategy" type="happy-path">
-    - Input: /sc:task 'refactor monolith into services' --strategy adaptive
-  </example>
-
   <example name="circular-dependency" type="error-path">
     - Input: /sc:task 'refactor auth and permissions modules'
     - Why wrong: Circular dep detected: auth → permissions → auth

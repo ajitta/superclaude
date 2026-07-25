@@ -35,9 +35,6 @@ description: Execute tests with coverage analysis and automated quality reportin
   </tools>
 
   <patterns>
-    - Discovery: Pattern categorization → runner selection
-    - Coverage: Metrics → comprehensive reporting
-    - E2E: Browser automation → cross-platform validation
     - Watch: File monitoring → continuous execution
     - TDD (--tdd): RED (write one failing test) → GREEN (simplest code to pass) → REFACTOR (clean up under green) → repeat per behavior
   </patterns>
@@ -63,7 +60,6 @@ description: Execute tests with coverage analysis and automated quality reportin
 
   <gotchas>
   - baseline-first: Run existing tests, record baseline before changes
-  - uv-run: Use `uv run pytest` for this project, never `python -m pytest` or bare `pytest`
   </gotchas>
 
   <bounds>

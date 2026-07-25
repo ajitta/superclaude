@@ -62,43 +62,7 @@ description: List all /sc commands + functionality. Use when user types `/sc:hel
   Advisory: business-panel (market/strategy) | spec-panel (tech spec review)
   </scope_map>
 
-  <flags>
-    <category name="Mode">
-      - --brainstorm: collab discovery
-      - --business-panel: multi-expert business analysis
-      - --research: systematic investigation mode
-      - --introspect: expose thinking
-      - --task-manage: systematic org
-      - --orchestrate: parallel tool optim
-      - --token-efficient: 30-50% token cut
-    </category>
-    <category name="MCP">
-      - --c7|--context7: curated docs
-      - --seq|--sequential: multi-step reasoning
-      - --serena: semantic + memory
-      - --play|--playwright: browser automation
-      - --all-mcp: all servers on
-      - --no-mcp: native tools only
-    </category>
-    <category name="Effort">
-      - Claude Code native (not managed by SuperClaude)
-    </category>
-    <category name="Control">
-      - --delegate: sub-agent parallel proc
-      - --concurrency [n]: max concurrent ops (1-15)
-      - --loop: iterative improvement cycles
-      - --validate: pre-exec risk assess
-      - --safe-mode: max validation
-    </category>
-    <category name="Output">
-      - --uc|--ultracompressed: symbol comms
-      - --scope: file|module|project|system
-      - --focus: perf|security|quality|arch|a11y|testing
-    </category>
-  </flags>
-
-<priority_rules> - Safety: --safe-mode > --validate > optimization - Override: user flags > auto-detect - MCP: --no-mcp beats all MCP flags - Scope: system > project > module > file
-</priority_rules>
+  <flags>Render the flag list from core/FLAGS.md (always loaded in context) — one line per flag, grouped by modes / MCP / execution / output. Effort levels are Claude Code native, not managed by SuperClaude.</flags>
 
   <examples>
 

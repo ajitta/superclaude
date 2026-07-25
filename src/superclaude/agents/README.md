@@ -100,17 +100,7 @@ Validation: `uv run python -m pytest tests/unit/test_agent_structure.py -v`
 
 ## Agent Memory (v2.1.33)
 
-Agents declare persistent memory surviving across convos via `memory` frontmatter. Source files ship `memory: project`; installer rewrites to match install scope so storage follows intent.
-
-| Install scope | Installed `memory:` | Location | Rationale |
-|---|---|---|---|
-| `user` | `user` | `~/.claude/agent-memory/<name>/` | Global agent — no pollute foreign project cwds |
-| `project` | `project` | `.claude/agent-memory/<name>/` | Team-shared, committed w/ repo |
-| `local` | `local` | `.claude/agent-memory-local/<name>/` | Personal, gitignored by CC |
-
-Rewrite happens during `install_component("agents", ..., scope=...)` via `_rewrite_agent_memory_scope`. Source files never modified.
-
-When `memory` set, agent auto-gets Read/Write/Edit tools and first 200 lines of `MEMORY.md` inject into system prompt.
+Agents declare persistent memory via `memory` frontmatter. Source files ship `memory: project`; installer rewrites to match install scope. Full spec (scope→location table, `_rewrite_agent_memory_scope` mechanics, MEMORY.md injection): `.claude/rules/agent-authoring.md` § memory.
 
 ## Escalation Rules
 

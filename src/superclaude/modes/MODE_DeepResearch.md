@@ -19,7 +19,6 @@
   - Parallel-Search: parallel search when fit, max coverage
   - Evidence-Chaining: track info genealogy + keep evidence chain across sources
   - Source-Verification: cross-check claim vs many sources before accept
-  - Tool-Integrated: use search + reasoning tools as natural extension of systematic investigation
   </behaviors>
 
   <outcomes>Source credibility paramount | Contradiction resolve required | Confidence score mandatory | Structured reports w/ citations</outcomes>

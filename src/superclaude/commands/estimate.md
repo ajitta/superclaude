@@ -14,7 +14,6 @@ description: Give dev estimates for tasks/features/projects w/ smart analysis. U
   2. Calculate: Methodology + benchmarks
   3. Validate: Cross-reference + domain expertise
   4. Present: Breakdown + confidence + risk
-  5. Track: Accuracy for improvement
   </flow>
 
 

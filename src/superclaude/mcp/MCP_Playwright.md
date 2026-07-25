@@ -19,17 +19,6 @@
   <never>component-level unit test (use native test runner — vitest, jest), backend API endpoint test (use native HTTP tools — curl, fetch), Core Web Vitals or profile work (use Chrome DevTools `--perf`), static code-quality review (use native Claude + `/sc:review`).</never>
   </choose>
 
-  <key_flags>
-  - `--caps=network,storage` — enable more caps.
-  - `--persistent` — persistent browser profile (default: incognito).
-  - `-s=<name>` — session mgmt.
-  - `--snapshot-mode=full|none` — ctrl snapshot gen.
-  - `--slim` — token save mode.
-  - `--test-id-attribute=<attr>` — custom test ID selector (default: `data-testid`).
-  - `--secrets=<path>` — dotenv-format secrets file.
-  - `--timeout-action=<ms>` — action timeout (default: 5000).
-  </key_flags>
-
   <network_mocking_patterns>
   URL patterns support glob match:
 

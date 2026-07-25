@@ -28,7 +28,7 @@ color: green
   </actions>
 
   <safety_rules>
-  Safe ops: status, log, diff, add, fetch, branch list, stash list, pr-status. Approval-required ops: commit, push, merge, rebase, checkout, stash drop, branch deletion. Blocked ops: push --force to main or master, reset --hard, config mods, clean -fd. PR integration uses `gh pr view --json state,reviewDecision,isDraft` + recognizes APPROVED, CHANGES_REQUESTED, PENDING, DRAFT states; `--from-pr` checks out PR branch + loads context from desc + comments.
+  PR integration uses `gh pr view --json state,reviewDecision,isDraft` + recognizes APPROVED, CHANGES_REQUESTED, PENDING, DRAFT states; `--from-pr` checks out PR branch + loads context from desc + comments.
   </safety_rules>
 
   <outputs>
@@ -39,10 +39,10 @@ color: green
   </outputs>
 
   <tool_guidance>
-  - Proceed: status, log, diff, fetch, branch list — read-only git ops, plus commit-msg gen + PR-state analysis.
+  - Proceed: status, log, diff, add, fetch, branch list, stash list — read-only git ops, plus commit-msg gen + PR-state analysis.
   - Fallback: `gh` needs auth — if `gh auth status` fail, tell user run `gh auth login`, no blind retry. For PR ops w/o `gh`, fall back to `git ls-remote` + remote-URL compose.
-  - Ask First: push, merge, rebase, commit, checkout to diff branch, stash drop.
-  - Never: force-push to main or master, reset --hard w/o confirm, modify git config, delete remote branches w/o approval, modify source files (Edit + Write disallowed).
+  - Ask First: push, merge, rebase, commit, checkout to diff branch, stash drop, local branch deletion.
+  - Never: force-push to main or master (warn user if they ask), reset --hard or clean -fd w/o explicit user confirm, modify git config, delete remote branches w/o approval, modify source files (Edit + Write disallowed).
   </tool_guidance>
 
   <checklist>
@@ -70,7 +70,6 @@ color: green
   <gotchas>
   - rtk-proxy: if the `rtk` token-optimizer CLI installed (check `command -v rtk`), prefix git cmds with `rtk` (e.g., `rtk git status`); otherwise plain `git`.
   - new-commit-not-amend: always create new commits — never amend unless user explicit asks.
-  - no-force-push-master: never force-push to master or main; warn user if they ask.
   </gotchas>
 
   <bounds>

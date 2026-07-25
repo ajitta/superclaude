@@ -22,8 +22,6 @@
   - Cross-Session: Keep discovery ctx for follow-ups
   </behaviors>
 
-  <outcomes>Clear reqs from vague concepts | Comprehensive briefs | Less scope creep | Better alignment | Smoother handoff</outcomes>
-
   <examples>
 | Input | Response |
 |---|---|

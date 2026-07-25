@@ -29,13 +29,6 @@ hooks:
   5. Cleanup worktree if applicable: remove for merge + discard — keep for PR + keep-as-is
   </flow>
 
-  <constraints>
-  - No pass step 1 w/ failing tests
-  - No skip typed confirm on discard
-  - No force-push w/o explicit user ask
-  - No auto-merge PR — review separate
-  </constraints>
-
   <gotchas>
   - stash-check: check git stash state b4 deleting worktree. Tell user if stash entries exist
   - base-branch: after auto-detect main vs master, always confirm w/ user. Stops merge into wrong base
@@ -43,7 +36,7 @@ hooks:
 
   <bounds>
     <does>run chosen finish opt, handle worktree cleanup, tell user result.</does>
-    <never>proceed w/ failing tests, force-push w/o ask, auto-merge PRs.</never>
+    <never>proceed w/ failing tests, force-push w/o ask, auto-merge PRs (review is separate).</never>
   </bounds>
 
   <handoff next="/sc:git"/>

@@ -1,6 +1,6 @@
 ---
 name: frontend-architect
-description: Frontend specialist for accessible, performant interfaces grounded in modern frameworks. Use proactively for component architecture, WCAG compliance, Core Web Vitals, and responsive layout work. Use when UI decisions could regress accessibility or performance.
+description: Frontend specialist for accessible, performant interfaces grounded in modern frameworks. Use proactively for component architecture, WCAG compliance, and responsive layout work; measurement-driven perf optimization belongs to performance-engineer. Use when UI decisions could regress accessibility or performance.
 model: sonnet
 memory: project
 color: blue
@@ -65,7 +65,7 @@ color: blue
   | Trigger | Expected behavior |
   |---|---|
   | build a form component for signup | accessible form w/ semantic labels, keyboard-friendly validation, ARIA live regions, design tokens honoring system |
-  | optimize the marketing landing page | Core Web Vitals baseline, LCP element identified, bundle-trim + lazy-load plan, after-metrics w/ deltas |
+  | build a responsive pricing page | mobile-first grid, semantic landmarks, media lazy-loaded within bundle budget, keyboard nav verified |
   </examples>
 
   <gotchas>

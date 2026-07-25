@@ -45,7 +45,6 @@ description: Git ops w/ smart commit msgs + workflow optim. Use when user type `
     </states>
     <usage>
       - /sc:git --pr-status: Show cur branch PR state
-      - Auto w/ PRStatusCheck confidence check
     </usage>
   </pr_status_integration>
 

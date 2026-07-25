@@ -2,12 +2,7 @@
   <meta>Referenced from SKILL.md — detailed templates for practices and task types</meta>
 
   <dependency_gate title="Question Your Dependencies">
-Before add new library, ask three:
-1. How many lines of library we actually use?
-2. How long write those lines ourselves?
-3. Confident stay safe + compatible in 6 months?
-Import tens of thousands of lines for 3-line function = install time bomb.
-Justified when: specialized domain (crypto, compression), mature stable API, use core functionality.
+Dependency Gate questions + justification criteria: see assets/dependency-audit-checklist.md (SSOT). Import tens of thousands of lines for 3-line function = install time bomb.
   </dependency_gate>
 
   <three_level_feedback title="Three Levels of Feedback">
@@ -47,35 +42,4 @@ After finish code, run through questions:
 - Value: What value does this code deliver to user?
 Act of consciously run through these questions is itself the value.
   </simplicity_review>
-
-  <task_type_detail title="OSL Applied Per Task Type">
-New Feature:
-1. Orient: summarize goal, current state, completion criteria
-2. Pick one core user scenario → write minimal code make it work
-3. Get feedback → if direction right, add next scenario
-4. Summarize learnings after each step
-
-Code Review:
-- Only as complex as need to be?
-- Dependencies justified?
-- Tests reveal process bugs, or only catch code bugs?
-- Can break into smaller units?
-
-Refactoring:
-Goal: not "better" but simpler.
-- Orient: What is complex? Why?
-- Step: Apply just one small simplification
-- Learn: Easier to understand? Still works?
-
-Debugging:
-1. How fix this bug? (immediate)
-2. Why occur? (root cause)
-3. How prevent this class of bug from recurring? (process improvement)
-Record answer to third question.
-
-Technology Selection:
-- Evaluate reversibility — prefer easily reversible decisions
-- List trade-offs explicitly
-- "Both probably half right and half wrong" — seek synthesis
-  </task_type_detail>
 </component>

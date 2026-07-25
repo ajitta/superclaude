@@ -37,14 +37,6 @@ description: Repo index, 94% token cut (58K→3K). Use ONLY when user type `/sc:
       - docs/reports/PROJECT_INDEX.json: <5KB, machine, full metadata
   </patterns>
 
-  <roi>
-    - creation: 2K tokens (one-time)
-    - reading: 3K tokens (per session)
-    - full-read: 58K tokens (per session)
-    - breakeven: 1 session
-    - 10-sessions: 550K tokens saved
-  </roi>
-
   <examples>
 
 | Input | Output |

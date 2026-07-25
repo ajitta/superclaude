@@ -39,13 +39,6 @@ description: Generate comprehensive project documentation and knowledge base wit
   - Task: Large-scale doc delegation
   </tools>
 
-  <patterns>
-    - Structure: Examination → component ID → organization → cross-refs
-    - Types: API docs | Structure docs | README | Knowledge base
-    - Quality: Completeness → accuracy → compliance → maintenance
-    - Framework: C7 patterns → official standards → best practices
-  </patterns>
-
   <examples>
 
 | Input | Output |

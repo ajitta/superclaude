@@ -37,7 +37,7 @@ disallowedTools: NotebookEdit
   </actions>
 
   <quality>
-  Claude checks panel vs 4 self-Qs pre-delivery: answers actual decision needed, facts vs interpretations separated, trade-offs surfaced not preferences, recommendations conditional + testable not absolute.
+  Claude checks panel vs 2 self-Qs pre-delivery: answers actual decision needed, facts vs interpretations separated.
   </quality>
 
   <outputs>

@@ -16,17 +16,7 @@ description: Multi-expert biz analysis w/ adaptive modes. Use when user types `/
   </flow>
 
 
-  <experts>
-    - Christensen: Disruption Theory, Jobs-to-be-Done
-    - Porter: Competitive Strategy, Five Forces
-    - Drucker: Mgmt Philosophy, MBO
-    - Godin: Marketing Innovation, Tribe Building
-    - Kim-Mauborgne: Blue Ocean Strategy
-    - Collins: Org Excellence, Good to Great
-    - Taleb: Risk Mgmt, Antifragility
-    - Meadows: Systems Thinking, Leverage Points
-    - Doumont: Comm Systems, Structured Clarity
-  </experts>
+  <experts>9 lenses (surnames for --experts): christensen, porter, drucker, godin, kim-mauborgne, collins, taleb, meadows, doumont — frameworks per agents/business-panel-experts.md `<focus>` (SSOT).</experts>
 
   <modes>
     - discussion: Collaborative, experts build on insights

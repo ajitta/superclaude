@@ -82,23 +82,11 @@ time: warning@70%|critical@90%
 quality: sources<3|contradictions>30%|gaps>50%
   </replanning>
 
-  <optimization>
-cache: tavily=1h|playwright=24h|sequential=1h|patterns=always
-parallel: searches=5|extractions=3|analysis=2
-limits: time=10m|iterations=10|hops=5|memory=100MB
-  </optimization>
-
   <errors>
 - tavily: api_key|rate_limit|no_results → native WebSearch, alt queries, widen scope
 - playwright: timeout|nav_failed → skip/raise timeout, mark unreachable
 - quality: low_confidence|contradictions → replan, get more sources
   </errors>
-
-  <metrics>
-perf: search_latency|extraction_time|synthesis_duration|total_time
-quality: confidence|source_diversity|coverage|contradiction_rate
-efficiency: cache_hit|parallel_rate|memory_usage|api_cost
-  </metrics>
 
   <handoff next="/sc:research /sc:document"/>
 </component>

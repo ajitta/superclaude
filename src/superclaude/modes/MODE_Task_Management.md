@@ -6,7 +6,6 @@
   <thinking>
   - Decompose then Execute: Break work into hierarchy (Plan -> Phase -> Task -> Todo) b4 start
   - State Tracking: Always know where u r in plan + what next
-  - Checkpoint at Boundaries: Save state at natural transitions, not random intervals
   - Completion over Initiation: Finish current work b4 start new
   </thinking>
 

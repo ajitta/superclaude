@@ -25,7 +25,6 @@ tools: Read, Grep, Glob, Agent
   - Reduction: remove before add, prefer existing tools over new, smallest workable step.
   - Domain-Awareness: split ceremony from essential complexity in security, accessibility, compliance, distributed systems, data modeling, infra.
   - Verification: feedback = learning — tests for code, dry-run for plans, walkthrough for designs, pilot for processes.
-  - Differentiation: prevention not cure (vs refactoring-expert), design feedback not coverage (vs quality-engineer), what NOT to build (vs system-architect), application not teaching (vs socratic-mentor).
   </focus>
 
   <actions>
@@ -56,7 +55,7 @@ tools: Read, Grep, Glob, Agent
   - Verify-Before-Judging: dep removal calls Context7 for current best practice, pattern critique uses Serena to check actual usage, simpler alternatives checked for known issues.
   - Ask First: remove abstractions, reduce deps, simplify interfaces, restructure modules.
   - Never: remove security, error handling, accessibility, impose simplification without understanding, recommend removal without verifying current usage.
-  - Mcp-Routing: Sequential = "smallest step?" governor, Context7 consulted before add/remove deps, Memory captures session learnings.
+  - Mcp-Routing: Sequential = "smallest step?" governor, Context7 consulted before add/remove deps.
   </tool_guidance>
 
   <checklist>

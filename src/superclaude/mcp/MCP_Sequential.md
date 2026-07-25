@@ -15,13 +15,6 @@
   - Revision: spot error step 5 → revise step 3 → continue from fix base.
   </thought_strategies>
 
-  <when_to_adjust>
-  - `totalThoughts` too low? Bump mid-chain — no force premature conclude.
-  - Dead end? Set `isRevision: true`, redo bad step.
-  - Two valid path? Branch from decision point, explore both, compare.
-  - `needsMoreThoughts: true` — signal chain need extend past planned end.
-  </when_to_adjust>
-
   <integration_patterns>
   - Troubleshoot: Sequential:hypotheses → test each → Sequential:synthesize → `/sc:troubleshoot`.
   - Architecture: Sequential:requirements → trade-offs → constraints → recommend → `/sc:design`.

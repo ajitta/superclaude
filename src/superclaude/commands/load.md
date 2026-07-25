@@ -17,14 +17,10 @@ description: Session lifecycle mgmt w/ Serena MCP + Claude auto memory for proj 
   5. Activate: Proj context + workflow prep
   6. Validate: Context integrity + session ready
   7. Session Goal (optional): If user give goal, record as 1-line objective. Show as reminder when context > 60%.
-    Fallback (no Serena): Claude auto memory + Read CLAUDE.md, PLANNING.md, TASK.md; Glob for struct discover
   </flow>
 
   <storage>
-    Serena (primary): .serena/memories/ — semantic proj memories, symbol-aware context
-    Auto memory (supplementary): ~/.claude/projects/{project}/memory/MEMORY.md (CC-native, per-project, first 200 lines auto-load)
-    Topic files: ~/.claude/projects/{project}/memory/{topic}.md (linked from MEMORY.md, load on demand)
-    Agent memory: .claude/agent-memory/{name}/MEMORY.md (proj-scoped, per-agent)
+    Storage locations (Serena primary / auto memory / topic files / agent memory): SSOT in /sc:save <storage> — installed sibling commands/sc/save.md.
   </storage>
 
 
@@ -34,13 +30,6 @@ description: Session lifecycle mgmt w/ Serena MCP + Claude auto memory for proj 
   - Read/Grep/Glob: Auto memory + proj file analysis
   - Write: Checkpoint create
   </tools>
-
-  <patterns>
-    - Activation: Serena memories (auto-active) → auto memory → context establish
-    - Restoration: Checkpoint → validation → workflow prep
-    - Memory: Cross-session → continuity → efficiency
-    - Performance: <500ms init | <200ms core | <1s checkpoint
-  </patterns>
 
   <examples>
 

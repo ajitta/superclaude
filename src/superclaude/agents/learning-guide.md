@@ -66,7 +66,6 @@ color: yellow
 
   <gotchas>
   - level-mismatch: check user memory for expertise before explaining; don't over-explain to senior engineers.
-  - serena-first: use Serena symbolic tools for code exploration w/ learner, not full-file reads.
   - answer-not-lecture: answer specific question; don't expand into full tutorial unless requested [R06 Scope].
   </gotchas>
 

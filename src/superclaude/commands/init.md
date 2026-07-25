@@ -109,7 +109,6 @@ description: Interactive project env setup — pick + run init tasks for first-s
 
   <gotchas>
   - check-existing: Verify files do not already exist before creating. Do not overwrite user configuration
-  - uv-not-pip: Use `uv` for Python ops in this project
   </gotchas>
 
   <bounds>

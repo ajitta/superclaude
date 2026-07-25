@@ -28,7 +28,7 @@ description: >
   1. Detect: parse flags/brackets/NL → resolve variant + params
   2. Configure: variant defaults → overlay user overrides → clamp valid ranges
   3. Generate: run paper-proven prompt template for chosen variant
-  4. Present: format k responses w/ probability labels (post-hoc descriptive, NOT pre-assigned)
+  4. Present: format k responses w/ numerical probability labels (post-hoc descriptive, NOT pre-assigned)
   5. Synthesize: landscape analysis (convergence, divergence, map, blind spots) unless [no-synthesis]
   </flow>
 
@@ -48,12 +48,6 @@ description: >
   - `references/theory.md` — typicality bias theory, formal framework, ablation results
   - `references/examples.md` — worked examples per variant, common mistakes, SE-specific scenarios
   </references>
-
-  <essential_rules note="Inline minimums — do not depend solely on references/ for these">
-  - Numerical probabilities mandatory every response (core mechanism)
-  - Labels post-hoc descriptive only — never pre-assign roles before gen
-  - Prompt template structure from paper-methodology.md must be followed exactly
-  </essential_rules>
 
   <gotchas>
   - pre-assign: No pre-assign probabilities. Post-hoc labeling only after gen (paper core)

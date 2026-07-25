@@ -38,10 +38,8 @@ hooks:
   </tools>
 
   <gotchas>
-  - force-push: --force caught by hook, blocked hard. Regular push only
-  - secrets: .env, credentials.json excluded by default. --include bypasses → must warn
+  - secrets: .env, credentials.json excluded by default. User explicitly asking to stage an excluded file → must warn
   - staged-scan: scan staged files for API keys, tokens, passwords pre-commit
-  - main-direct: push direct to master/main → suggest feature branch first
   </gotchas>
 
   <examples>

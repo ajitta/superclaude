@@ -19,6 +19,9 @@ Standalone (single-doc one-off): docs/<type>/<slug>-<suffix?>-<username>-YYYY-MM
   Standalone criteria: 1 doc total, no follow-on phases, lifespan <1 week. On 2nd related doc: promote via /sc:promote-feature.
   Legacy pre-cutoff (2026-05-18): stays in place, no bulk move
 
+Slug resolution (feature vs standalone, file-producing commands): exact match → feature path silently | multiple partial matches → prompt user to pick | zero match → prompt `[f]` new feature folder / `[s]` standalone. Zero-match default per command: `[f]` phase-opening (brainstorm, design, plan, roadmap) | `[s]` one-off-leaning (analyze, research).
+README update on feature-path write: `updated:` bump + append doc entry to `## Documents` + advance `phase:` if status enum moved. Standalone path: no README update.
+
 Living docs (UPPER_SNAKE, no date/username): docs/reports/{PROJECT_INDEX,...}.md (sc:index, sc:index-repo, sc:document --type api)
 ADRs (sequence, unchanged): docs/adr/NNNN-<slug>.md (4-digit, per-dir counter)
 Archive: docs/archive/features/<slug>/ (completed features) | docs/archive/{plans,specs}/ (pre-existing legacy)
@@ -28,7 +31,7 @@ Username: `git config user.name` (lowercase, no spaces) — fallback OS username
 
 Frontmatter rules:
   Feature README: {feature, phase, owner, created, updated, related?}. Phase enum: discovery | design | planning | implementing | complete | abandoned
-  Phase doc (inside feature folder): {status, revised}
+  Phase doc (inside feature folder): {status, revised} — new docs start `status: draft`, `revised: <today>`
   Standalone specs/+plans/: {status, revised}
   Standalone research/+analysis/: optional {status, revised}
   Reports/ADRs: none

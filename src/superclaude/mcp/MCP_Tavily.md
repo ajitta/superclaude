@@ -9,7 +9,7 @@
   </choose>
 
   <search_patterns>
-  Primary integration is the Tavily Agent Skills (`tavily-search`, `tavily-extract`, `tavily-crawl`, `tavily-map`, `tavily-research`; install per `mcp/README.md`). This doc covers the optional in-conversation MCP path, which exposes only `tavily-search` + `tavily-extract`. Pattern set below applies to `tavily-search`; multi-source research, site crawl, and URL map live in the `tavily-research` / `tavily-crawl` / `tavily-map` skills.
+  This doc covers the optional in-conversation MCP path, which exposes only `tavily-search` + `tavily-extract`; crawl, map, and multi-source research live in the Tavily Agent Skills (install per `mcp/README.md`). Pattern set below applies to `tavily-search`.
 
   - Basic: query → ranked results.
   - Domain: query + `include_domains:[arxiv,github]`.

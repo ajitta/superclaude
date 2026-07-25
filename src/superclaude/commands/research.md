@@ -14,7 +14,7 @@ description: Deep web research with adaptive planning + smart search. Use when u
   2. Plan: Strategy + depth + hop pattern + query decompose + parallel map
   3. Execute: Multi-hop search w/ parallel batch | Evidence collect | Adaptive replan on confidence&lt;0.6 or contradictions&gt;30%
   4. Validate: Cross-source verify | Credibility score | Contradiction resolve | Gap check
-  5. Synthesize (routing per core/rules/RULES_DOCS.md `<doc_output_convention>`): credibility-weighted merge; on feature path, write report to `docs/features/<slug>/02-research.md` (frontmatter: `status: draft, revised: <today>`) AND update `docs/features/<slug>/README.md` (`updated:` bump + append entry to `## Documents`, advance `phase:` if status enum moved). On standalone path, write to `docs/research/<topic>-<username>-YYYY-MM-DD.md` — no README update needed.
+  5. Synthesize: credibility-weighted merge; feature path `docs/features/<slug>/02-research.md`, standalone `docs/research/<topic>-<username>-YYYY-MM-DD.md` — slug resolution (zero-match default `[s]`), frontmatter, README update per core/rules/RULES_DOCS.md `<doc_output_convention>`.
   </flow>
 
   <depth note="See modes/RESEARCH_CONFIG.md for full profiles, hop config, thresholds">
@@ -23,8 +23,6 @@ description: Deep web research with adaptive planning + smart search. Use when u
   </depth>
 
   <outputs>
-Routing: per core/rules/RULES_DOCS.md `<doc_output_convention>` — feature path `docs/features/<slug>/02-research.md` (existing folder OR user picks `[f]`) | standalone path `docs/research/<topic>-<username>-YYYY-MM-DD.md` (user picks `[s]` or no related work expected, default for one-off research). Slug resolution: exact-match silent / multi partial-match prompt / zero match → `[f]/[s]` w/ default `[s]`.
-
 | Artifact | Purpose |
 |---|---|
 | Feature path: `docs/features/<slug>/02-research.md` | Phase doc when slug resolves to existing/new feature folder |
@@ -41,15 +39,10 @@ Routing: per core/rules/RULES_DOCS.md `<doc_output_convention>` — feature path
   </tools>
 
   <examples>
-
-  <example name="standard-depth" type="happy-path">
-    - Input: /sc:research 'quantum computing breakthroughs 2025'
-  </example>
-
-  <example name="adaptive-replan" type="happy-path">
-    - Input: /sc:research 'internal company API migration patterns'
-  </example>
-
+| Input | Expected behavior |
+|---|---|
+| `/sc:research 'quantum computing breakthroughs 2025'` | standard depth: 2-3 hops, full report |
+| `/sc:research 'internal company API migration patterns'` | low-confidence sources → adaptive replan |
   </examples>
 
   <gotchas>

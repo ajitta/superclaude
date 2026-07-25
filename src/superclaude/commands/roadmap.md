@@ -1,5 +1,5 @@
 ---
-description: Generate structured implementation workflows from PRDs and feature requirements. Use when user types `/sc:roadmap` or hands over PRD/feature doc and asks for task breakdown to commit under docs/plans/. Do NOT auto-trigger on "what's the order of steps" or short ad-hoc task lists — those get inline 2-3 step answer, not workflow file.
+description: Generate structured implementation workflows from PRDs and feature requirements. Use when user types `/sc:roadmap` or hands over a PRD and wants a phased execution workflow (strategy, dependencies, multi-agent coordination). For a TDD implementation plan with exact file paths from a spec, use /sc:plan. Do NOT auto-trigger on "what's the order of steps" or short ad-hoc task lists — those get inline 2-3 step answer, not workflow file.
 ---
 <component name="roadmap" type="command">
 
@@ -15,12 +15,10 @@ description: Generate structured implementation workflows from PRDs and feature 
   3. Coordinate: Multi-agent + domain expertise
   4. Execute: Step-by-step workflows + task coordination
   5. Validate: Quality gates + workflow completeness
-  6. Document (routing per core/rules/RULES_DOCS.md `<doc_output_convention>`): on feature path, write workflow to `docs/features/<slug>/05-plan.md` (variant — uses `05a-plan-workflow.md` if a primary plan doc already exists per multi-of-same-phase rule; frontmatter: `status: draft, revised: <today>`) AND update `docs/features/<slug>/README.md` (`updated:` bump + append entry to `## Documents`, advance `phase:` if status enum moved). On standalone path, write to `docs/plans/<topic>-workflow-<username>-YYYY-MM-DD.md` — no README update needed.
+  6. Document: feature path `docs/features/<slug>/05-plan.md` (or `05a-plan-workflow.md` if primary plan exists per multi-of-same-phase rule), standalone `docs/plans/<topic>-workflow-<username>-YYYY-MM-DD.md` — slug resolution (zero-match default `[f]`), frontmatter, README update per core/rules/RULES_DOCS.md `<doc_output_convention>`.
   </flow>
 
   <outputs>
-Routing: per core/rules/RULES_DOCS.md `<doc_output_convention>` — feature path `docs/features/<slug>/05-plan.md` (variant — `05a-plan-workflow.md` if primary plan doc exists per multi-of-same-phase rule; existing folder OR user picks `[f]`) | standalone path `docs/plans/<topic>-workflow-<username>-YYYY-MM-DD.md` (user picks `[s]` or no related work expected). Slug resolution: exact-match silent / multi partial-match prompt / zero match → `[f]/[s]` w/ default `[f]`.
-
 | Artifact | Purpose |
 |---|---|
 | Feature path: `docs/features/<slug>/05-plan.md` (or `05a-plan-workflow.md` variant) | Phase doc when slug resolves to existing/new feature folder |
@@ -37,18 +35,11 @@ Routing: per core/rules/RULES_DOCS.md `<doc_output_convention>` — feature path
   - sequentialthinking: Dependency analysis
   </tools>
 
-  <patterns>
-    - PRD: Document parsing → requirement extraction → strategy
-    - Generation: Task decomposition → dependency → planning
-    - Multi-Domain: Cross-functional → comprehensive strategies
-    - Quality: Validation → testing → deployment planning
-  </patterns>
-
   <examples>
 
 | Input | Output |
 |---|---|
-| `Claudedocs/PRD/feature.md --strategy systematic --depth deep` | Comprehensive PRD workflow |
+| `docs/PRD.md --strategy systematic --depth deep` | Comprehensive PRD workflow |
 | `'user auth system' --strategy agile --delegate` | Agile + parallel coordination |
 | `enterprise-prd.md --strategy enterprise --depth deep` | Enterprise + compliance |
 | `project-brief.md --depth normal` | Cross-session with Serena |

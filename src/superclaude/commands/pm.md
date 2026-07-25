@@ -36,7 +36,6 @@ description: Orchestrate sub-agents, manage workflows, and document learnings fo
 
   <gotchas>
   - direct-work-first: no orchestrate simple task (<3 steps). Do direct per sub_agent_decision rules
-  - intent-propagation: pass user original request verbatim to sub-agents, not your interpretation
   </gotchas>
 
   <bounds>

@@ -37,13 +37,6 @@ description: Promote standalone docs sharing a slug into a feature folder per do
   - Write: New README.md scaffold
   </tools>
 
-  <patterns>
-    - Manual gate: dry-run default, --apply explicit for any FS change
-    - Type→phase mapping: filename suffix determines target phase prefix per core/rules/RULES_DOCS.md
-    - Multi-of-same-phase: append letter suffix per `NNa-<phase>-<distinguisher>` when two files target same slot
-    - No auto-rewrite: inbound link warnings list-only, user fixes manually
-  </patterns>
-
   <examples>
   | Input | Output |
   |---|---|

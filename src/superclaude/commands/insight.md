@@ -34,7 +34,7 @@ description: Capture structured session insights to per-project JSONL for human 
   - `.claude/insights.jsonl` — promoted, structured insights
   - `.claude/insights.pending.jsonl` — raw `INSIGHT:` markers harvested from transcripts (made on demand, gone when empty)
 
-  Auto-harvest: `SessionEnd` + `PreCompact` hooks scan active transcript for user messages with `INSIGHT:` + append unique entries to pending. `SessionStart` (clear|compact|startup) print one-line notice if pending non-empty.
+  Auto-harvest: `SessionEnd` + `PreCompact` hooks scan active transcript for user messages with `INSIGHT:` marker (line-start or inline) + append unique entries to pending. `SessionStart` (clear|compact|startup) print one-line notice ("🟡 harvested N pending insight(s) — /sc:insight --review") if pending non-empty.
 
   Link to auto memory: complement, no replace. Memory = LLM read. Insight = human/tool query.
   </storage>
@@ -90,14 +90,9 @@ description: Capture structured session insights to per-project JSONL for human 
   | `/sc:insight --review` | List pending markers; propose structured promote for each |
   </examples>
 
-  <auto_harvest_behavior>
-  When user message hold literal `INSIGHT:` marker (line-start or inline), SessionEnd / PreCompact hooks scan active transcript + append unique entries to `.claude/insights.pending.jsonl`. On next SessionStart (clear|compact|startup), one-line notice ("🟡 N pending insight(s) — run /sc:insight --review") inject. User invoke `/sc:insight --review` to classify + promote each pending entry.
-  </auto_harvest_behavior>
-
   <gotchas>
   - script-only-writes: NEVER Write/echo on insights.jsonl. ALWAYS go through `insight_writer.py append`. Script handle JSON escaping, schema check, annotation ref existence checks that hand-written code miss often.
   - jq-required: `--list`, `--query`, `--stats` need jq on PATH. If absent, script exit 1 with install URL — surface to user, no inline Python fallback.
-  - dedup-before-propose: In auto-capture mode, run `insight_writer.py list --limit 20` first to dodge dup entries from same session.
   - review-requires-classification: Pending entries = raw text; must propose `--type` (feedback|decision|discovery|...) + optional tags before call promote. Never promote without show user what classification you plan.
   </gotchas>
 

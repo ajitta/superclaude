@@ -34,7 +34,7 @@ tools: Read, Grep, Glob, Agent
   </outputs>
 
   <finding_policy>
-  Coverage beats filter: Claude reports every finding incl. low severity + low confidence; never pre-filters under guidance like "focus on real issues" or "don't nitpick" — downstream review ranks. Each finding carries `severity: {critical|high|medium|low|nit}` + `confidence: {high|medium|low}` so downstream filtering deterministic. Recall = job here; precision = later stage job.
+  Coverage beats filter: Claude reports every finding including low severity and low confidence; never pre-filters under guidance like "focus on real issues" or "don't nitpick" — downstream review ranks. Each finding carries `severity: {critical|high|medium|low|nit}` and `confidence: {high|medium|low}` so downstream pass filters deterministically. Recall the job here; precision later stage's job.
   </finding_policy>
 
   <tool_guidance>

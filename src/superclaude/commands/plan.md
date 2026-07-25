@@ -12,15 +12,13 @@ description: Make detailed impl plans w/ TDD tasks, exact file paths, verify com
   <flow>
   1. Load: Read spec/reqs (from --from path or user desc)
   2. Map: List files to create/modify + their jobs
-  3. Decompose: Break to phases (default) — each phase = single-commit unit on feature branch, ordered by dep. Use "Phase N" term, NOT "PR N", since plans usually run as N commits on 1 branch (single review cycle). For real multi-PR work (separate review cycles per change-set), opt-in w/ --pr-bundle.
+  3. Decompose: Break to phases (default) — each phase = single-commit unit on feature branch, ordered by dep (Phase-vs-PR naming: see gotchas).
   4. Template: Add plan header (goal, arch, tech stack)
-  5. Save (routing per core/rules/RULES_DOCS.md `<doc_output_convention>`): on feature path, write plan to `docs/features/<slug>/05-plan.md` (frontmatter: `status: draft, revised: <today>`) AND update `docs/features/<slug>/README.md` (`updated:` bump + append entry to `## Documents`, advance `phase:` if status enum moved). On standalone path, write to `docs/plans/<feature-name>-<username>-YYYY-MM-DD.md` — no README update needed.
+  5. Save: feature path `docs/features/<slug>/05-plan.md`, standalone `docs/plans/<feature-name>-<username>-YYYY-MM-DD.md` — slug resolution (zero-match default `[f]`), frontmatter, README update per core/rules/RULES_DOCS.md `<doc_output_convention>`.
   6. Handoff: Ready for /sc:implement --plan
   </flow>
 
   <outputs>
-Routing: per core/rules/RULES_DOCS.md `<doc_output_convention>` — feature path `docs/features/<slug>/05-plan.md` (existing folder OR user picks `[f]`) | standalone path `docs/plans/<feature-name>-<username>-YYYY-MM-DD.md` (user picks `[s]` or no related work expected). Slug resolution: exact-match silent / multi partial-match prompt / zero match → `[f]/[s]` w/ default `[f]`.
-
   | Artifact | Purpose |
   |---|---|
   | Feature path: `docs/features/<slug>/05-plan.md` | Phase doc when slug resolves to existing/new feature folder |
@@ -68,7 +66,7 @@ Task format:
   - existing-plan: Check if plan already exist for this feature before make new one
   - scope-match: Plan scope must match user req. No expand to adjacent features
   - phase-vs-pr: Default to "Phase N" framing — single-branch, single-review-cycle exec. Reserve "PR N" for real multi-PR work (--pr-bundle), where each change-set get own review cycle. Naming match reality — past 4-PR plans actually ran as 4 phase commits on 1 branch.
-  - workflow-fanout: Under ultracode Workflow fan-out, subagents RETURN plan markdown — subprocess FS writes are discarded, so the main loop performs the native Write per the outputs routing
+  - workflow-fanout: fan-out subagents RETURN plan markdown — subprocess writes discarded; main loop performs the Write per outputs routing (full rule: core/rules/RULES_DELEGATION.md)
   </gotchas>
 
   <bounds>

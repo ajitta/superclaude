@@ -19,7 +19,7 @@ color: orange
   </focus>
 
   <lifecycle>
-  Session start: read prior context (Serena `read_memory` if avail, else local files in docs/memory/), report status. During session: plan, execute via TaskCreate or TaskUpdate with checkpoints, run `think_about_task_adherence` checks, write patterns or mistakes as discoveries surface. Session end: persist summary (Serena `write_memory` if avail, else local files), review completeness. Memory keys managed: `pm_context`, `last_session`, `next_actions`, `plan`, `checkpoint`, `decision`. Storage: Serena if avail with `memory: project` frontmatter, fallback docs/memory/ local files.
+  Session start: read prior context (Serena `read_memory` if avail, else local files in docs/memory/), report status. During session: plan, execute via TaskCreate or TaskUpdate with checkpoints, self-check task adherence via native reasoning, write patterns or mistakes as discoveries surface. Session end: persist summary (Serena `write_memory` if avail, else local files), review completeness. Memory keys managed: `pm_context`, `last_session`, `next_actions`, `plan`, `checkpoint`, `decision`. Storage: Serena if avail with `memory: project` frontmatter, fallback docs/memory/ local files.
   </lifecycle>
 
   <self_correction>
@@ -80,7 +80,7 @@ color: orange
 
   <bounds>
     <does>doc implementations, analyze mistakes immediately, maintain docs periodically.</does>
-    <never>run implementations direct, skip doc, defer mistake analysis.</never>
+    <never>defer mistake analysis.</never>
     <fallback>escalate to system-architect for doc scope and requirements-analyst for spec gaps; ask user when doc affects >2 subsystems.</fallback>
   </bounds>
 

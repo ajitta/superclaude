@@ -4,10 +4,6 @@
     <loading>Injected by context_loader on delegation contexts (--delegate, sub-agent work, orchestration commands); Read explicitly before spawning agents outside those triggers</loading>
   </role>
 
-  <intent_propagation>
-When delegate sub-agent, include user request verbatim — sub-agent no re-interpret intent
-  </intent_propagation>
-
   <sub_agent_decision>
   Axis: this section governs the single-delegate primitive (one Agent-tool subagent — whether/with-what-intent to spawn). Authoring a multi-subagent Workflow (`parallel`/`pipeline` fan-out) is the orthogonal harness EXECUTION layer: SC decides whether to fan out, the Workflow tool executes it. Both axes apply together; neither overrides the other.
   Direct work: single file edit, <3 steps, sequential dep, simple search, context already loaded
@@ -16,7 +12,7 @@ When delegate sub-agent, include user request verbatim — sub-agent no re-inter
   Model note: auto-spawn eagerness varies by model generation — prefer explicit invocation (direct Agent tool call or `--delegate auto`) not assume auto-spawn, whatever the session model. Threshold numbers generation-neutral; re-measure spawn eagerness when session flagship changes (unmeasured on current flagship).
   Worktree-parallel: when user wait on long in-progress iteration (spec authoring, deep research, multi-phase plan), propose worktree-isolated agent (EnterWorktree) for independent side-work — e.g., review project own framework/config, draft follow-up tickets. Split file-edit surfaces so two streams no conflict on merge. Decline split when side-work need current convo state or main iteration finish <5 minutes.
   Delegate packet (IN): prompt must carry user_request_verbatim, allowed_scope, forbidden_changes, files_or_areas_of_interest, required_evidence_format, stop_condition, active_mode_directives (copy operative directives of any active mode into the prompt — sub-agents never receive context_loader/UserPromptSubmit injections, so mode context that must govern the sub-agent travels only if copied; omit when no mode active). Sub-agent summary (OUT) advisory — revalidate cited file:line before act (re-grep / re-read the specific lines to confirm the summary's claims before editing or reporting). Via a Workflow `agent(prompt, opts)` the seven fields pack into the one free-form prompt argument (many-to-one); allowed_scope/forbidden_changes have no `opts` counterpart and stay prose discipline. `opts.schema`/StructuredOutput hardens return shape only — a well-typed citation can be fabricated, so the cited-file:line re-grep stays mandatory; cached/replayed results (Workflow resume-from-cache) may cite stale state and MUST be re-validated against current repo before act (R15 gates resume).
-  Workflow fan-out (OUT): every `parallel()` under SC governance must `log()` dropped/null thunks before `filter(Boolean)` — silent filtering makes the main loop synthesize from a silently-incomplete set, an R15 'claimed done on partial evidence' risk.
+  Workflow fan-out (OUT): every `parallel()` under SC governance must `log()` dropped/null thunks before `filter(Boolean)` — silent filtering makes the main loop synthesize from a silently-incomplete set, an R15 'claimed done on partial evidence' risk. Write-Return: subprocess file writes are discarded — document- or code-producing fan-out RETURNS its artifact and the main loop performs every Write/Edit; approval checkpoints (e.g. >3-unit change) fire in the main loop because subagents cannot pause for the user.
   <examples>
   | Task | Decision | Why |
   |---|---|---|

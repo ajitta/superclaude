@@ -53,14 +53,6 @@ description: SuperClaude command dispatcher - main entry point for all features.
     - promote-feature: Promote standalone docs into a feature folder
   </commands>
 
-  <features>
-    - Parallel execution: multiple searches concurrent
-    - Evidence-based: findings backed by sources
-    - Context-aware: uses repo context when available
-    - Token efficient: optimized minimal usage
-  </features>
-
-
   <examples>
 
 | Input | Output |
@@ -78,9 +70,7 @@ description: SuperClaude command dispatcher - main entry point for all features.
   </examples>
 
   <meta>
-    - version: SuperClaude v4.6.0+ajitta
-    - package: superclaude 4.6.0+ajitta
-    - install: superclaude install
+    - version: 4.6.0+ajitta (SSOT: pyproject.toml — answer version queries via `superclaude --version` when possible)
     - docs: github.com/ajitta/superclaude
   </meta>
 

@@ -15,8 +15,6 @@
 - test: add/update tests
 - chore: maintenance, deps, config
 
-Auto-detect from diff; user approve final message.
-
 ## PR Template
 
 ```markdown

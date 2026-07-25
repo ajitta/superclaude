@@ -66,8 +66,6 @@ Skills made or changed available immediately, no restart (hot reload).
 
 See `.claude/rules/skill-authoring.md` for full authoring spec.
 
-**Key rule:** Make skill when need CC-native capability (hooks, safety, scripts) or auto-invoke ref knowledge (CC description matching). Workflow procedures go in `commands/`. Domain expertise go in `agents/`.
-
 ## Related
 
 - `commands/` — Workflow entry points (most former skills now live here)

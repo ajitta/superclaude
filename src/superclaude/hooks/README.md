@@ -2,10 +2,6 @@
 
 Event-driven automation hooks for Claude Code integration.
 
-## Overview
-
-Hooks allow SuperClaude to automatically execute scripts at specific points during a Claude Code session. This enables features like automatic context loading, code formatting, and session management.
-
 ## Hook Configuration
 
 Hooks are defined in `hooks.json` and support the following events:
@@ -34,36 +30,38 @@ Hooks are defined in `hooks.json` and support the following events:
 
 ## Current Hooks
 
+Script purposes and env toggles: see `../scripts/README.md`.
+
 ### SessionStart
 
-- **session_init.py** (matcher `startup`, once): Initializes SuperClaude context and settings
-- **memory_staleness.py** (matcher `startup`, once): Scans the current project's CC memory directory and prints a stderr summary for any entry whose `verified: <YYYY-MM-DD>` frontmatter is older than `SUPERCLAUDE_MEMORY_STALE_DAYS` (default 90). Non-blocking. See "Memory `verified:` convention" below.
-- **context_reset.py** (matcher `clear|compact|startup`): Resets context_loader's dedup cache so dynamic contexts re-inject after /clear or /compact
-- **insight_writer.py pending-count-from-hook** (matcher `clear|compact|startup`): Notifies if pending insights remain from a prior session (pending file anchored to the `cwd` in the hook's stdin JSON)
+- **session_init.py** (matcher `startup`, once)
+- **memory_staleness.py** (matcher `startup`, once) — see "Memory `verified:` convention" below
+- **context_reset.py** (matcher `clear|compact|startup`)
+- **insight_writer.py pending-count-from-hook** (matcher `clear|compact|startup`)
 
 ### PreCompact
 
-- **insight_writer.py harvest-from-hook**: Harvests `INSIGHT:` markers from the transcript before compaction
+- **insight_writer.py harvest-from-hook**
 
 ### SessionEnd
 
-- **insight_writer.py harvest-from-hook**: Harvests `INSIGHT:` markers on /clear, /exit, logout
+- **insight_writer.py harvest-from-hook**
 
 ### UserPromptSubmit
 
-- **context_loader.py**: Loads appropriate context files dynamically
+- **context_loader.py**
 
 ### PreToolUse
 
-- **file_size_guard.py** (matcher `Read`): Blocks Read on files >30KB for token conservation
-- **destructive_guard.py** (matcher `Bash`): Blocks destructive shell commands (stdlib-only Python)
-- **loop_guard.py** (matcher `Edit|Write|Bash`): Circuit breaker against repeated failing operations (`SUPERCLAUDE_LOOP_GUARD=0` to disable)
+- **file_size_guard.py** (matcher `Read`)
+- **destructive_guard.py** (matcher `Bash`)
+- **loop_guard.py** (matcher `Edit|Write|Bash`)
 
 ### PostToolUse
 
-- **prettier_hook.py** (matcher `Edit|Write`): Auto-formats code after file modifications
-- **test_runner_hook.py** (matcher `Edit|Write`, async): Optional auto-test run after file modifications (`SUPERCLAUDE_AUTO_TEST=0` to disable)
-- **loop_guard.py** (matcher `Edit|Write|Bash`): Circuit breaker — records error/success signatures
+- **prettier_hook.py** (matcher `Edit|Write`)
+- **test_runner_hook.py** (matcher `Edit|Write`, async)
+- **loop_guard.py** (matcher `Edit|Write|Bash`)
 
 ## Configuration Structure
 
@@ -209,13 +207,6 @@ Hook scripts receive JSON via stdin with common and event-specific fields:
 | `Setup` | `agent_type` (if `--agent` specified); triggered by `--init`, `--init-only`, `--maintenance` |
 | `TeammateIdle` | Agent/teammate identifier [experimental, v2.1.33] |
 | `TaskCompleted` | Agent/teammate identifier, task result summary [experimental, v2.1.33] |
-
-### Hook Script Guidelines
-
-- Scripts should exit with code 0 on success (or code 2 to block in PreToolUse/PermissionRequest)
-- Use stderr for error/block messages
-- Keep execution time under the timeout limit
-- Scripts receive context via environment variables and stdin (JSON)
 
 ## Memory `verified:` convention (memory_staleness.py)
 

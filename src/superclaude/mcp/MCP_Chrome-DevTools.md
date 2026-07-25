@@ -8,13 +8,6 @@
   <never>live browser interact or E2E user-journey scripts (use Playwright via `--play`), static code analysis (use native Claude for code review), and server-side backend profile (use native tools — `perf`, flamegraph).</never>
   </choose>
 
-  <key_flags>
-  - `--slim` — max token save (cut response verbosity).
-  - `--auto-connect` — reuse existing Chrome session.
-  - `--persistent` — persistent browser profile.
-  - `--read-only` — disable all mutation tools.
-  </key_flags>
-
   <cwv_thresholds>
   Google Core Web Vitals thresholds:
 
@@ -40,7 +33,6 @@
 | debug memory leak in SPA | DevTools: take_heapsnapshot → compare → identify | Heap analysis |
 | check accessibility score | DevTools: lighthouse_audit (a11y category) → snapshot | Automated WCAG |
 | profile network requests | DevTools: list_network_requests → get_network_request | Request timing/size |
-| debug in live Chrome session | DevTools: --auto-connect to existing browser | Reuse dev session |
   </examples>
 
   <bounds>
