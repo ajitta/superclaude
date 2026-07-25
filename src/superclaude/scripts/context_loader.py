@@ -32,6 +32,12 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from superclaude.scripts.token_estimator import TokenEstimate
 
+# Scope-aware path resolution. Imported unconditionally: superclaude.utils is
+# stdlib-only, and hooks.json runs these scripts with the installer's own
+# interpreter ({{PYTHON_BIN}} = sys.executable), which has the package. Silently
+# degrading here would put state and content lookups in the wrong scope.
+from superclaude.utils import claude_base, hook_state_dir
+
 # v2.2.0: MCP fallback notification support
 try:
     from superclaude.hooks.mcp_fallback import MCP_FALLBACKS, check_mcp_and_notify
@@ -52,9 +58,10 @@ MAX_TOKENS_ESTIMATE = int(
 )  # ~8K tokens
 CHARS_PER_TOKEN = 4  # Rough estimate
 
-# Session tracking file (unique per working directory, stored in user-private dir)
+# Session tracking file (unique per working directory, stored in the active
+# install's own .claude — see superclaude.utils.hook_state_dir)
 SESSION_ID = hashlib.md5(os.getcwd().encode()).hexdigest()[:8]
-_CACHE_DIR = Path.home() / ".claude" / ".superclaude_hooks"
+_CACHE_DIR = hook_state_dir()
 _CACHE_DIR.mkdir(parents=True, exist_ok=True)
 CACHE_FILE = _CACHE_DIR / f"claude_context_{SESSION_ID}.txt"
 
@@ -66,19 +73,17 @@ def _get_base_path() -> Path:
 
     Priority:
     1. SUPERCLAUDE_PATH environment variable (explicit override)
-    2. Project-local: ./.claude/superclaude (if exists)
+    2. Project-local: $CLAUDE_PROJECT_DIR/.claude/superclaude (if exists)
     3. User scope: ~/.claude/superclaude (default)
+
+    Anchored on $CLAUDE_PROJECT_DIR rather than the CWD: hook CWD is not
+    guaranteed to be the project root, and a CWD-based check silently loaded
+    user-scope content when Claude Code started in a subdirectory.
     """
     if os.environ.get("SUPERCLAUDE_PATH"):
         return Path(os.environ["SUPERCLAUDE_PATH"])
 
-    # Check project-local first
-    project_path = Path.cwd() / ".claude" / "superclaude"
-    if project_path.exists():
-        return project_path
-
-    # Fall back to user scope
-    return Path.home() / ".claude" / "superclaude"
+    return claude_base() / "superclaude"
 
 
 BASE_PATH = _get_base_path()

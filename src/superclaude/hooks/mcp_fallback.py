@@ -19,15 +19,12 @@ from __future__ import annotations
 
 import json
 from datetime import datetime
-from pathlib import Path
 
 from superclaude.hooks.hook_tracker import _ensure_tracker_dir, get_session_id
-from superclaude.utils import atomic_write_json
+from superclaude.utils import atomic_write_json, hook_state_dir
 
-# Storage for MCP fallback notifications
-MCP_FALLBACK_FILE = (
-    Path.home() / ".claude" / ".superclaude_hooks" / "mcp_fallbacks.json"
-)
+# Storage for MCP fallback notifications (scoped to the active install)
+MCP_FALLBACK_FILE = hook_state_dir() / "mcp_fallbacks.json"
 
 # Fallback mapping (see FLAGS.md <mcp> section for flag definitions)
 MCP_FALLBACKS: dict[str, str] = {

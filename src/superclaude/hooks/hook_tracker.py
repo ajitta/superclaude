@@ -21,15 +21,14 @@ import os
 import time
 from dataclasses import asdict, dataclass, field
 from datetime import datetime
-from pathlib import Path
 
-from superclaude.utils import atomic_write_json
+from superclaude.utils import atomic_write_json, hook_state_dir
 
 # Default session TTL: 24 hours (configurable via SUPERCLAUDE_SESSION_TTL env var)
 SESSION_TTL_SECONDS = int(os.environ.get("SUPERCLAUDE_SESSION_TTL", 24 * 60 * 60))
 
-# Storage location for hook execution tracking
-HOOK_TRACKER_DIR = Path.home() / ".claude" / ".superclaude_hooks"
+# Storage location for hook execution tracking (scoped to the active install)
+HOOK_TRACKER_DIR = hook_state_dir()
 HOOK_TRACKER_FILE = HOOK_TRACKER_DIR / "hook_executions.json"
 SESSION_FILE = HOOK_TRACKER_DIR / "current_session.txt"
 

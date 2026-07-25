@@ -16,7 +16,11 @@ import os
 import sys
 from pathlib import Path
 
-CACHE_DIR = Path.home() / ".claude" / ".superclaude_hooks"
+from superclaude.utils import hook_state_dir
+
+# Scoped to the active install, so a local-scope install resets its own cache
+# rather than one shared through ~/.claude.
+CACHE_DIR = hook_state_dir()
 
 
 def get_cache_file() -> Path:

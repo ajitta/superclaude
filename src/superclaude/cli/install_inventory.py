@@ -398,6 +398,23 @@ def uninstall_all(
                     messages.append(f"❌ Failed to remove {state_file}: {e}")
                     failed += 1
 
+    # 5b. Remove the hook state directory (context dedup cache, session tracker,
+    # MCP fallback log). Scoped via superclaude.utils.hook_state_dir, so it sits
+    # under this scope's base_path and is regenerated on next session.
+    state_dir = base_path / ".superclaude_hooks"
+    if state_dir.exists():
+        if dry_run:
+            messages.append(f"[DRY-RUN] Would remove: {state_dir}")
+            removed += 1
+        else:
+            try:
+                shutil.rmtree(state_dir)
+                messages.append(f"✅ Removed: {state_dir}")
+                removed += 1
+            except Exception as e:
+                messages.append(f"❌ Failed to remove {state_dir}: {e}")
+                failed += 1
+
     # 6. Remove SuperClaude hooks from settings file (preserve user hooks)
     settings_filename = "settings.local.json" if scope == "local" else "settings.json"
     if keep_settings:

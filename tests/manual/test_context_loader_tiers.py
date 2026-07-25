@@ -12,9 +12,14 @@ import sys
 from dataclasses import dataclass
 from pathlib import Path
 
+from superclaude.utils import hook_state_dir
+
 REPO = Path(__file__).resolve().parents[2]
 LOADER = REPO / "src" / "superclaude" / "scripts" / "context_loader.py"
-CACHE_DIR = Path.home() / ".claude" / ".superclaude_hooks"
+
+# Resolved the same way the loader resolves it, so this follows the active scope
+# instead of assuming ~/.claude.
+CACHE_DIR = hook_state_dir()
 
 
 @dataclass

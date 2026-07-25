@@ -286,7 +286,9 @@ CLAUDE_CONTEXT_USE_INSTRUCTIONS=0
 
 ```bash
 # 캐시 초기화 (새 세션 시작과 동일 효과)
-rm ~/.claude/.superclaude_hooks/claude_context_*.txt
+# 캐시는 설치 스코프를 따릅니다 — project/local 설치는 ./.claude/, user 설치는 ~/.claude/
+rm ./.claude/.superclaude_hooks/claude_context_*.txt    # project/local scope
+rm ~/.claude/.superclaude_hooks/claude_context_*.txt    # user scope
 ```
 
 ---
