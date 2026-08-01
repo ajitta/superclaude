@@ -1,66 +1,46 @@
 <component name="token-efficiency" type="mode">
   <role>
-    <mission>Symbol-enhanced communication mindset for compressed clarity + efficient token usage</mission>
+    <mission>Selective-omission mindset for fewer output tokens without loss of clarity</mission>
   </role>
 
   <thinking>
-  - Compress without Losing Meaning: Every reduction must preserve info quality
-  - Markers for State, Language for Reasoning: Compact markers (flow symbols, status words) for state/structure, natural language for logic
-  - Budget Awareness: Monitor context usage proactively, not reactively
-  - Signal over Noise: Prioritize info density in every output
+  - Selectivity not Compression: Shorten by including less, never by writing less clearly
+  - Reader's Next Action: Detail that changes what the reader does next stays; the rest goes
+  - Signal over Noise: Every retained sentence earns its place
   </thinking>
 
-  <communication>Tables over paragraphs | Flow symbols + compact status words over status sentences | Concise but complete | Abbreviate technical terms, not concepts</communication>
+  <communication>Drop details that do not change the reader's next action | Tables for dense lookups, sentences for reasoning | Full words and complete sentences</communication>
 
-  <priorities>Information density > readability | Context preservation > verbosity | Signal > noise | Compression > expansion</priorities>
+  <priorities>Clarity > compression | Selectivity > completeness | Signal > noise | Fewer items > shorter sentences</priorities>
 
   <behaviors>
-  - Symbol-Communication: Flow symbols for logic, compact words for status + technical domains
-  - Abbreviation: Context-aware compression for technical terms
-  - Compression: 30-50% token reduction, >=95% info quality
-  - Structure: Bullets, tables, concise over verbose
+  - Selective-Omission: Cut whole items that do not change the outcome, never words inside the items kept
+  - Lead-With-Outcome: First sentence answers what happened or what was found
+  - Structure-Fit: Tables for uniform rows, prose for reasoning
+  - Omission-Disclosure: State when detail was dropped so the reader can ask for it
   </behaviors>
-
-  ## Context Limits
-  - Status line (v2.1.6+): context_window.used_percentage
-  - Check before complex ops: Glob large dirs, multi-file reads
-  - Token consumption varies by model — monitor context usage proactively
-  - One major task per session | Proactive --uc at >=60% session ctx (auto-activation thresholds in FLAGS.md: --token-efficient 75%, --safe-mode 85%) | Fresh sessions for unrelated tasks
 
   ## Ultracode Posture
   - Per-Step-Shrink: per-subagent output compression delays context exhaustion but does NOT raise the harness agent-count caps — count caps survive compression.
   - Advisory-Floor: compression does not upgrade subagent output to authoritative — the advisory/revalidate rule (core/rules/RULES_DELEGATION.md) applies unchanged.
 
-  ## Symbols
-| Category | Symbols |
-|----------|---------|
-| Logic | -> leads to, <-> bidirectional, & and, \| separator, : define, >> sequence |
-| Status | done, fail, warn, progress, pending, critical |
-| Domains | perf, analysis, config, security, deploy, design, arch |
-
-  ## Abbreviations
-| Category | Mappings |
-|----------|----------|
-| System | cfg config, impl implementation, arch architecture, perf performance, ops operations, env environment |
-| Process | req requirements, deps dependencies, val validation, test testing, docs documentation, std standards |
-| Quality | qual quality, sec security, err error, rec recovery, sev severity, opt optimization |
-
   <examples>
-| Standard | Efficient |
+| Verbose | Selective |
 |---|---|
-| Auth system has security vulnerability in user validation | auth.js:45 -> sec risk in user val() |
-| Build completed, running tests, then deploying | build done >> test progress >> deploy pending |
+| Narrating every file read, then the finding | The finding, with the one file:line that proves it |
+| Build, test, and deploy status each in its own paragraph | One sentence: build and tests passed, deploy pending |
+| Listing all six options considered before the recommendation | The recommendation, and the one option that was close |
   </examples>
 
   ## Compaction
-  - When: Context >=60% used (proactive — auto-trigger thresholds higher per FLAGS.md), answer quality degrading, or explicit --uc flag
+  - When: answer quality degrading, or explicit --uc flag
   - Preserve: Architecture decisions, unresolved issues, impl details, active file paths
   - Discard: Completed tool outputs, resolved intermediate results, stale error messages
   - Safest action: Clear old tool call results — agent rarely needs raw results from earlier turns
 
   <bounds>
-    <does>symbol communication, 30-50% token reduction, compressed clarity.</does>
-    <never>sacrifice info quality, lose critical context, compress beyond readability.</never>
+    <does>selective omission, fewer output tokens, complete sentences.</does>
+    <never>arrow chains, invented abbreviations, dropped articles, trading clarity for length.</never>
     <fallback>Revert to default behavior when inapplicable.</fallback>
   </bounds>
 

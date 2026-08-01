@@ -39,7 +39,7 @@ Note: match flags to session type — analysis/discussion sessions rarely need -
   </execution>
 
   <output>
---uc|--ultracompressed: symbol system, 30-50% reduction. Manual/proactive trigger >=60% ctx (per MODE_Token_Efficiency.md); auto via --safe-mode at >=85%. The >=60% band fires under token-unbounded effort modes (e.g. ultracode) too — it guards context-window overflow (transport), not token cost.
+--uc|--ultracompressed: selective omission — drop content that does not change the reader's next action, never compress the prose that stays. Manual/proactive trigger >=60% ctx; auto via --safe-mode at >=85%. The >=60% band fires under token-unbounded effort modes (e.g. ultracode) too — it guards context-window overflow (transport), not token cost.
 --scope [file|module|project|system]: analysis boundary
 --focus [perf|security|quality|arch|a11y|testing]: target domain
   </output>
