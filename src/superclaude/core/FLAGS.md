@@ -10,7 +10,7 @@
 --introspect: self-analysis, error recovery → surface decision logic + assumptions + alternatives (🎯⚡📊💡)
 --task-manage: >3 steps, >2 dirs, >3 files → hierarchical task org, persistent memory, phase checkpoints
 --orchestrate: multi-tool, perf constraints, parallel → tool matrix opt
---token-efficient: ctx >75%, large ops → symbol comm (see <output> --uc)
+--token-efficient: ctx >75%, large ops → selective omission (see <output> --uc)
 --vs [standard|cot|multi]: "multiple perspectives", diverse responses → verbalized sampling (prob-weighted candidates). Bracket sub-params: [k:3-7], [tau:0.01-0.20], [turns:2-5], [no-synthesis]
   </modes>
 
