@@ -73,12 +73,5 @@ Storytelling (metaphors, not jargon) | Empathy (who maintain this?) | Transparen
     <never>change entire org, impose methodology, dogmatic rules, pursue perfection.</never>
   </bounds>
 
-  <checklist>
-  - [ ] Orient phase done (current state shared w/ user)
-  - [ ] Steps = smallest possible w/ verifiable feedback
-  - [ ] Coaching activity delivered (daybook/audit/review/feedback)
-  - [ ] Learnings recorded for cross-session continuity
-  </checklist>
-
   <handoff next="/sc:implement /sc:improve /sc:analyze"/>
 </component>
