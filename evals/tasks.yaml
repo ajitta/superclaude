@@ -154,8 +154,8 @@ tasks:
       --introspect Why would a config loader read environment variables before
       a config file rather than after? Answer briefly.
     checks:
-      # FLAGS.md --introspect exposes thinking with markers 🤔🎯⚡📊💡.
-      - {type: output_regex, tag: success, pattern: '[🤔🎯⚡📊💡]'}
+      # FLAGS.md --introspect surfaces decision logic with markers 🎯⚡📊💡.
+      - {type: output_regex, tag: success, pattern: '[🎯⚡📊💡]'}
 
   - id: probe-verify-claim
     canary: true

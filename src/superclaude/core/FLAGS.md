@@ -7,7 +7,7 @@
 --brainstorm: vague reqs, 'maybe' → collab discovery, probing Qs
 --business-panel: multi-expert biz analysis, strategy synth
 --research: systematic investigation, evidence-based reasoning
---introspect: self-analysis, error recovery → expose thinking (🤔🎯⚡📊💡)
+--introspect: self-analysis, error recovery → surface decision logic + assumptions + alternatives (🎯⚡📊💡)
 --task-manage: >3 steps, >2 dirs, >3 files → hierarchical task org, persistent memory, phase checkpoints
 --orchestrate: multi-tool, perf constraints, parallel → tool matrix opt
 --token-efficient: ctx >75%, large ops → symbol comm (see <output> --uc)
