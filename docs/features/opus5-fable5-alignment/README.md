@@ -74,6 +74,19 @@ The per-check comparison shows what actually differed: `file_exists_glob` fails 
 
 `RULES_DOCS.md` is also internally ambiguous here: its standalone criteria ("1 doc total, no follow-on phases") point at `[s]` for this prompt while its zero-match default points at `[f]`. Resolving that is a separate decision from this alignment work.
 
+### Cross-model probe runs
+
+The two probes that most directly exercise these changes, run on three models:
+
+| Probe | sonnet | Opus 5 | Fable 5 |
+|---|---|---|---|
+| `probe-introspect-marker` | 1/1 | 1/1 | 1/1 |
+| `probe-scope-restraint` | 3/3 | 3/3 | 3/3 |
+
+Zero denials on every run. The reduced `--introspect` marker set fires correctly and the `scope_discipline` addition did not disturb scope judgment, on all three.
+
+**Counterfactual: the refusal risk was not reproduced.** Running `probe-introspect-marker` on `claude-fable-5` against the *pre-alignment* content (`d49b498`, original `expose thinking (🤔🎯⚡📊💡)` wording, with only the harness `--` fix applied so the probe could run) also passed 1/1 with zero denials. So CS1 is not empirically motivated — nothing measured here shows the old wording triggered a `reasoning_extraction` refusal. It remains justified on accuracy grounds (`expose thinking` misdescribed what the mode does), and the probes confirm the rewrite cost no capability. See 03-analysis.md CS1 for the full caveat.
+
 ### Limits of this validation
 
 - **n=1 per task.** Single stochastic runs. The `plan-routing` delta is explainable rather than noise-free; re-running would firm it up.
