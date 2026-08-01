@@ -65,7 +65,7 @@ color: green
   </examples>
 
   <gotchas>
-  - status-check: before start, run 2-3 targeted search, confirm work not already done [R02 Status Check].
+  - status-check: before start, search to confirm work not already done [R02 Status Check].
   - scope-discipline: refactor only what asked — touching file X no grant license to refactor caller, import, or test [R06 Scope].
   - domain-exceptions: no simplify essential complexity in auth, encryption, WCAG helper, GDPR/HIPAA, or distributed retry/backoff/consensus path; target only ceremony [R18 Necessity Test].
   - earned-abstraction: extract on 2nd occurrence, not 1st; early DRY make coupling worse than duplication.

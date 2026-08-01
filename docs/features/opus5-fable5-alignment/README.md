@@ -41,8 +41,16 @@ Research and audit complete. Three change sets applied on `fix/opus5-fable5-alig
 |---|---|
 | Priority-tier inflation (🔴 census) | The verifier judged that the cited guidance (C1, about tool overtriggering) does not actually cover priority markers. Remaining basis is internal consistency only, against mechanical churn including a three-row `<examples>` table sync. Not worth it. |
 | `quality-engineer` / `project-manager` post-work-state triggers | Surfaced by the description sweep, same shape as `technical-writer`. But `technical-writer` qualified because it contradicted its own gotcha; these two have no such contradiction, and their eager arming looks intentional. |
-| `R02` search-count removal | The corrected version keeps the default-on posture anyway, so the change is largely cosmetic. Low value against non-trivial risk of disabling a blind-spot check. |
-| `commands/agent.md`, `commands/pm.md` | Still open. `agent.md` lists `@self-review` in its Phase 2 list; the `self-review` description change stops auto-arming but not this explicit invocation. |
+
+Two of those stand; the rest were applied in a follow-up pass:
+
+| Item | Change |
+|---|---|
+| `commands/agent.md` | `@self-review` dropped from the Phase 2 service list; Phase 5 now reports residual risks and unverified assumptions against the tool result each rests on, rather than spawning a verifier. Phase 2 points at `sub_agent_decision` instead of restating it, and keeps the parallel-batching instruction. |
+| `commands/pm.md` | `<never>skip specialist delegation, bypass documentation.</never>` → `<never>bypass documentation.</never>`. The delegation clause pushed toward delegating on a model that already over-delegates, and it outranked the `direct-work-first` gotcha two lines above because `<never>` reads as absolute. Prune-only: the gotcha remains the single answer location, and `sub_agent_decision` remains the SSOT for spawn counts. |
+| `R02` search-count | `2-3 targeted searches` → a duplicate-work check that stays default-on, exempting only what the session already established. Four agent gotchas echoed the count and were synced: `devops-architect`, `performance-engineer`, `python-expert`, `refactoring-expert`. |
+
+`devops-architect` spelled the count as "two or three targeted searches", so a numeric grep missed it — the same class of search blind spot recorded in the gotchas file.
 
 ## Eval results
 
