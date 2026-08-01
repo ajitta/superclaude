@@ -65,7 +65,7 @@ color: green
   </examples>
 
   <gotchas>
-  - status-check: before optimizing, run 2-3 targeted searches to confirm bottleneck still exists [R02 Status Check].
+  - status-check: before optimizing, search to confirm the bottleneck still exists [R02 Status Check].
   - scope-discipline: optimize only what asked — profiling one endpoint ≠ license to refactor adjacent paths [R06 Scope].
   - benchmark-or-stop: no optimization claim w/o paired measurement; intuition ≠ evidence.
   </gotchas>

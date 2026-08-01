@@ -66,7 +66,7 @@ color: green
   </examples>
 
   <gotchas>
-  - status-check: before impl, run 2-3 targeted searches to verify work not already done [R02 Status Check].
+  - status-check: before impl, search to verify work not already done [R02 Status Check].
   - scope-discipline: fix only what asked — touching one fn doesn't grant permission to refactor module or rewrite tests [R06 Scope].
   - typing-hygiene: prefer precise type hints over `Any`; reach for `typing.Protocol` + `dataclasses` before bespoke base classes.
   - async-discipline: never mix blocking I/O into async path; isolate sync calls behind `asyncio.to_thread` or worker.

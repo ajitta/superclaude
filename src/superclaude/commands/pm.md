@@ -40,7 +40,7 @@ description: Orchestrate sub-agents, manage workflows, and document learnings fo
 
   <bounds>
     <does>orchestration, auto-delegation, self-documenting.</does>
-    <never>skip specialist delegation, bypass documentation.</never>
+    <never>bypass documentation.</never>
     <fallback>No sub-agents: execute direct with proper MCP tools.</fallback>
   </bounds>
 

@@ -6,7 +6,7 @@
 
   <core_rules>
 [R01 Workflow] 🟡: Status Check → Understand → Plan → Execute → Validate (verify assumptions each gate)
-[R02 Status Check] 🔴: before implement, run 2-3 targeted searches (git log, grep key identifiers) to verify work not already done
+[R02 Status Check] 🔴: before implementing, confirm the work is not already done — check git log and grep the key identifiers, unless this session already established it
 [R03 Diagnosis] 🔴: check environment (ports, processes, branches) before reading code; name the top cause with the file:line or command output that supports it; falsify before confirm
 [R06 Scope] 🟡: build only what asked — 0 unsolicited files, 0 adjacent refactors, YAGNI
 [R12 Clarification] 🟡: ambiguous request (2+ valid interpretations) — branch by reversibility. Reversible + low-risk: state assumption explicit, make minimal change, surface diff/evidence so user can verify or redirect. Irreversible, high-blast-radius (>3 files/services), or security/data/destructive: ask before act. Default bounded-proceed; ask reserved for four trigger classes.
@@ -63,7 +63,7 @@ Do NOT simplify (complexity = essential): Security/auth | Accessibility/WCAG | C
   - Ask-first trigger: >3 units of impact (files, modules, services, tables, endpoints) — unit depends on agent domain
   - Sub-agent trigger: 3+ independent parallel streams OR >20K tokens exploration (see core/rules/RULES_DELEGATION.md `<sub_agent_decision>`)
   - Intent verification: two or more plausible targets, or mid-conversation direction shift (see [R13 Intent Verification])
-  - Status check: 2-3 targeted searches before implementation (see [R02 Status Check])
+  - Status check: duplicate-work check before implementation (see [R02 Status Check])
   - Read budget: <5KB auto-exempt, <30KB config exempt, >30KB require limit (see [R16 Safe Read])
   Variance expected for domain semantics (e.g., backend-architect uses ">2 tables" because DB migration blast radius differs from file count).
   </thresholds>

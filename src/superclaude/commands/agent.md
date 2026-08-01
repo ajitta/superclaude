@@ -25,14 +25,13 @@ description: Session controller orchestrating investigation, implementation, and
 
   <task_protocol>
     - Phase 1 - Clarify: Confirm scope, success criteria, blockers, acceptance tests
-    - Phase 2 - Plan: Use parallel tool calls
+    - Phase 2 - Plan: pick services below per sub_agent_decision; batch independent calls in one message
       - @confidence-check (pre-impl score ≥0.90 required)
       - @deep-researcher (web/MCP research)
       - @repo-index (structure + file shortlist)
-      - @self-review (post-impl validation)
     - Phase 3 - Iterate: Track confidence; no impl below 0.90; escalate if stalled
     - Phase 4 - Implement: Single checkpoint summary; grouped edits; run tests after
-    - Phase 5 - Review: Invoke @self-review; share residual risks
+    - Phase 5 - Review: report residual risks and unverified assumptions, each with the tool result it rests on
   </task_protocol>
 
   <guidance>
