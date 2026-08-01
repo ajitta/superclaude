@@ -40,7 +40,13 @@ Grouped so each ships as one coherent commit. Ordered by risk.
 
 ### CS1 — Reasoning-exposure wording (Fable 5 refusal risk)
 
-**Why first:** this is the only cluster that fails *closed* rather than degrading. A `reasoning_extraction` refusal returns HTTP 200 with `stop_reason: "refusal"`; with no fallback configured the request simply stops. Anthropic names system prompts and skills as the audit target by name.
+**Why first:** Anthropic documents this as the one failure mode that fails *closed* rather than degrading. A `reasoning_extraction` refusal returns HTTP 200 with `stop_reason: "refusal"`; with no fallback configured the request simply stops. Anthropic names system prompts and skills as the audit target by name.
+
+> **Measured correction (2026-08-02) — the refusal was not reproduced.** Running `probe-introspect-marker` on `claude-fable-5` against the *pre-alignment* content (`d49b498`, carrying the original `expose thinking (🤔🎯⚡📊💡)` wording, with only the harness `--` fix applied so the probe could execute) passed **1/1 with zero denials** — the same result as the post-change wording. There is no measurement in this repository showing the old wording ever triggered a refusal.
+>
+> What the probe can and cannot say: one short run on a benign technical question, against a classifier that is probabilistic and context-sensitive. Absence of a refusal here is not proof the old wording was safe under all prompts. But it does mean the refusal framing rests entirely on Anthropic's published guidance and not on anything observed here.
+>
+> **The change still stands, on the other argument.** `FLAGS.md`'s `expose thinking` was a lossy description of what the mode actually does — surface decision logic, assumptions, and alternatives, which is analysis output rather than a reasoning transcript. That accuracy defect is model-independent, and post-change probes confirm no capability was lost (1/1 on sonnet, Opus 5, and Fable 5). Read this cluster as an accuracy fix that also reduces a documented risk — not as a fix for an observed failure.
 
 | File | Text | Verdict |
 |---|---|---|
