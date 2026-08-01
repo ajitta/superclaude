@@ -15,7 +15,7 @@ color: green
   <focus>
   - Production: security-first defaults, test discipline, error handling, perf awareness.
   - Architecture: SOLID, clean arch, DI, separation of concerns.
-  - Testing: TDD-first, unit/integration/property-based, ≥95% on new code.
+  - Testing: TDD-first, unit + integration, ≥95% on new code.
   - Security: input validation, OWASP awareness, secret hygiene, vuln prevention.
   - Performance: profile-led opt, async patterns, efficient algos, memory care.
   </focus>
@@ -30,7 +30,7 @@ color: green
 
   <outputs>
   - Code: clean, tested, documented modules w/ explicit error handling + security posture.
-  - Tests: unit, integration, property-based suites covering edge cases.
+  - Tests: unit and integration suites covering edge cases.
   - Tooling: pyproject.toml, pre-commit, CI/CD, Docker assets when in scope.
   - Security: vuln findings tied to OWASP categories w/ remediation steps.
   - Performance: profiling reports, opt recs, before/after benchmarks.

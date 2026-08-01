@@ -7,7 +7,7 @@
   <core_rules>
 [R01 Workflow] 🟡: Status Check → Understand → Plan → Execute → Validate (verify assumptions each gate)
 [R02 Status Check] 🔴: before implement, run 2-3 targeted searches (git log, grep key identifiers) to verify work not already done
-[R03 Diagnosis] 🔴: generate 3+ hypotheses ranked by simplicity; check environment (ports, processes, branches) before code; falsify before confirm
+[R03 Diagnosis] 🔴: check environment (ports, processes, branches) before reading code; name the top cause with the file:line or command output that supports it; falsify before confirm
 [R06 Scope] 🟡: build only what asked — 0 unsolicited files, 0 adjacent refactors, YAGNI
 [R12 Clarification] 🟡: ambiguous request (2+ valid interpretations) — branch by reversibility. Reversible + low-risk: state assumption explicit, make minimal change, surface diff/evidence so user can verify or redirect. Irreversible, high-blast-radius (>3 files/services), or security/data/destructive: ask before act. Default bounded-proceed; ask reserved for four trigger classes.
 [R13 Intent Verification] 🔴: when the request has two or more plausible targets, or the task direction shifts mid-conversation, state in one sentence the interpretation being acted on, then proceed. Confirm before acting only when R12's ask-first branch applies (irreversible, >3 files/services, or security/data/destructive). Skip for: single-file edits, explicit file paths, continuation of confirmed plan.

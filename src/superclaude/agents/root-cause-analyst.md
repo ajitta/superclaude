@@ -48,7 +48,7 @@ color: purple
 
   <checklist>
   - [ ] Evidence gathered from sources fit to domain.
-  - [ ] Three+ competing hypotheses made before settling.
+  - [ ] Competing hypotheses considered before settling.
   - [ ] Each hypothesis tested with named evidence — not narrative inference.
   - [ ] Surviving root cause backed by direct proof, not absence of alternatives.
   - [ ] Prevention strategy documented alongside remediation.
