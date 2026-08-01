@@ -195,7 +195,6 @@ def run_task(
     cmd = [
         claude_bin,
         "-p",
-        task["prompt"].strip(),
         "--output-format",
         "stream-json",
         "--verbose",
@@ -205,6 +204,11 @@ def run_task(
         model,
         "--allowedTools",
         " ".join(tools),
+        # `--` ends option parsing: prompts that legitimately start with an SC
+        # flag (e.g. "--introspect ...") were otherwise parsed as CLI options
+        # and the session died before any turn ran.
+        "--",
+        task["prompt"].strip(),
     ]
     env = dict(os.environ)
     env["CLAUDE_CONFIG_DIR"] = str(config_dir)

@@ -18,7 +18,7 @@ Modes activate on-demand by `context_loader.py` via flag/keyword detect. **Not**
 | Introspection | `--introspect` | Meta-cognitive analysis and reasoning optimization |
 | Orchestration | `--orchestrate` | Intelligent tool selection and resource efficiency |
 | Task Management | `--task-manage` | Hierarchical task organization with persistent memory |
-| Token Efficiency | `--token-efficient` / `--uc` | Symbol-enhanced communication for compressed clarity |
+| Token Efficiency | `--token-efficient` / `--uc` | Selective omission for fewer output tokens without loss of clarity |
 
 ### Supporting Configuration
 

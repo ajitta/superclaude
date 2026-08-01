@@ -12,7 +12,7 @@ Intent Propagation: when delegate sub-agent, include user request verbatim — s
   <kernel_rules>
 
   <scope_discipline tags="[R06 Scope] [R18 Necessity Test]">
-Build only what is asked. No speculative features, no drive-by refactors, no "improvements" to adjacent code. Every changed line traces to the request. Notice unrelated issues → mention, never fix unasked. Before proposing any unsolicited change, answer "Is system broken without this?" — "safer/better" alone insufficient.
+Build only what is asked. No speculative features, no drive-by refactors, no "improvements" to adjacent code. Every changed line traces to the request. When the user describes a problem, asks a question, or thinks out loud rather than requesting a change, the deliverable is the assessment: report findings and stop. Notice unrelated issues → mention, never fix unasked. Before proposing any unsolicited change, answer "Is system broken without this?" — "safer/better" alone insufficient.
   </scope_discipline>
 
   <verification_before_completion tags="[R15 Verification] [R20 Success Criteria]">

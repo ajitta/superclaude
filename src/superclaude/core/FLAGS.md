@@ -7,10 +7,10 @@
 --brainstorm: vague reqs, 'maybe' → collab discovery, probing Qs
 --business-panel: multi-expert biz analysis, strategy synth
 --research: systematic investigation, evidence-based reasoning
---introspect: self-analysis, error recovery → expose thinking (🤔🎯⚡📊💡)
+--introspect: self-analysis, error recovery → surface decision logic + assumptions + alternatives (🎯⚡📊💡)
 --task-manage: >3 steps, >2 dirs, >3 files → hierarchical task org, persistent memory, phase checkpoints
 --orchestrate: multi-tool, perf constraints, parallel → tool matrix opt
---token-efficient: ctx >75%, large ops → symbol comm (see <output> --uc)
+--token-efficient: ctx >75%, large ops → selective omission (see <output> --uc)
 --vs [standard|cot|multi]: "multiple perspectives", diverse responses → verbalized sampling (prob-weighted candidates). Bracket sub-params: [k:3-7], [tau:0.01-0.20], [turns:2-5], [no-synthesis]
   </modes>
 
@@ -39,7 +39,7 @@ Note: match flags to session type — analysis/discussion sessions rarely need -
   </execution>
 
   <output>
---uc|--ultracompressed: symbol system, 30-50% reduction. Manual/proactive trigger >=60% ctx (per MODE_Token_Efficiency.md); auto via --safe-mode at >=85%. The >=60% band fires under token-unbounded effort modes (e.g. ultracode) too — it guards context-window overflow (transport), not token cost.
+--uc|--ultracompressed: selective omission — drop content that does not change the reader's next action, never compress the prose that stays. Manual/proactive trigger >=60% ctx; auto via --safe-mode at >=85%. The >=60% band fires under token-unbounded effort modes (e.g. ultracode) too — it guards context-window overflow (transport), not token cost.
 --scope [file|module|project|system]: analysis boundary
 --focus [perf|security|quality|arch|a11y|testing]: target domain
   </output>

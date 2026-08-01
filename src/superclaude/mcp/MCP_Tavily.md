@@ -24,12 +24,6 @@
   - Deep-Research: Plan:decompose → Tavily:search → Route (simple → Tavily, complex → Playwright) → synthesize.
   </integration_patterns>
 
-  <strategies>
-  - Multi-Hop: broad → entities → relationships → synthesize.
-  - Adaptive: simple → direct; complex → variations + boolean + domain; iterative → refine → gaps.
-  - Credibility: high = academic / gov / official; medium = industry / expert; low = forums / social.
-  </strategies>
-
   <examples>
 | Input | Output | Reason |
 |---|---|---|

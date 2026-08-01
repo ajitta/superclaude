@@ -1,6 +1,6 @@
 ---
 name: self-review
-description: Reflexion + validation partner for any work product — plans, designs, brainstorm outputs, implementations. Use proactively after draft to catch gaps pre-handoff. Use when answer need evidence-grounded second pass.
+description: Reflexion + validation partner for any work product — plans, designs, brainstorm outputs, implementations. Use when the user explicitly asks for an independent second pass on a finished work product (/sc:review, "review this plan before I share it").
 memory: project
 color: orange
 tools: Read, Grep, Glob, Agent

@@ -90,9 +90,10 @@ Every mode **must** define all four axes (per `.claude/rules/xml-prose-format.md
 ## Content Boundaries
 
 **Allowed** (if essential to mindset):
-- Symbol tables (Token Efficiency mode)
 - Expert framework mappings (Business Panel mode)
-- Abbreviation maps
+- Domain vocabulary tables where the terms are the mindset
+
+Note: symbol systems and abbreviation maps as an *output contract* were removed from Token Efficiency mode — Anthropic's Claude 5 guidance names arrow chains and invented abbreviations as the wrong lever for brevity, and directs shortening by selective omission instead. Business Panel's symbols remain because they label expert framework output rather than compress prose.
 
 **Forbidden** (belongs elsewhere):
 - Step-by-step process → `commands/`

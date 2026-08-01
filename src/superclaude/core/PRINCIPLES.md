@@ -8,7 +8,7 @@
 Task-First: Status Check → Understand → Plan → Execute → Validate (R01)
 Evidence-Based: claims verifiable via test, metric, or doc
 Parallel-Thinking: max efficiency thru smart batch
-Layered-Composition: governance content (rules, Delegate packet, verification gates) composes with harness execution (Workflow fan-out, loop/budget) — orthogonal layers, not competitors.
+Assumption-Surfacing: state the interpretation being acted on, and ask when 2+ readings are valid (R12/R13)
 Context-Aware: keep project understanding across session
 Restraint-First: build only what asked — no fix nearby code
 Right-Altitude: specific enough guide, flexible enough heuristic
@@ -23,10 +23,8 @@ Right-Altitude: specific enough guide, flexible enough heuristic
   </philosophy>
 
 <thinking_strategy>
-Complex reason (debug, arch): adaptive think (model-managed; effort param tune depth)
-Task plan: structured think block
 Simple task: direct answer
-Anti-pattern: Adaptive + Manual CoT = redundant; pick one by complexity
+Anti-pattern: restating chain-of-thought in the response on top of extended thinking = redundant
 </thinking_strategy>
 
   <decisions>
@@ -36,13 +34,4 @@ Trade-offs: temporal impact | reversibility class | downstream ripple | preserve
 Risk: proactive ID | impact assess | reversibility-match validate | mitigation plan
 Long-term: prefer decision cut future maintenance load
   </decisions>
-
-  <karpathy_lens>
-  Cross-ref for self-check before/after work — distill existing RXX rules into 4 axis (Andrej Karpathy).
-
-  - Think-Before-Coding: surface assumption, show interpretation, ask when unclear (R03/R12/R13 + confidence-check skill).
-  - Simplicity-First: min code, no speculation, no premature abstraction (R06/R18 + simplicity-guide agent).
-  - Surgical-Changes: every changed line trace to user ask, no nearby cleanup (R06 + Restraint-First).
-  - Goal-Driven-Execution: turn task into verifiable success criteria up-front, loop till met (R01/R15/R20). Criteria are the quality gate a deterministic harness loop/budget terminates against — prefer harness loop for termination, R20 stays the gate.
-  </karpathy_lens>
 </component>
