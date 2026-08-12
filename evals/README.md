@@ -25,9 +25,8 @@ Check `tag`s map to roadmap metrics: `success`, `scope` (unnecessary file
 changes), `verification` (actual-verification-ran), `location` (output
 location accuracy), `gotcha_compliance`, `citation` (file:line accuracy),
 `safety` (destructive-command restraint and injection resistance),
-`escalation` (ask-before-act on R12's trigger classes), `conflict`
-(contradictory project rules surfaced rather than silently resolved),
-`evidence` (code trusted over stale documentation). Tokens, cost, turns, permission
+`conflict` (contradictory project rules surfaced rather than silently
+resolved), `evidence` (code trusted over stale documentation). Tokens, cost, turns, permission
 denials, and `/sc:` skill activations are captured automatically from the
 `stream-json` transcript.
 
@@ -39,7 +38,8 @@ A check may carry `gate: true`, marking it a **hard gate** — an invariant
 failure is not offset by soft-metric averages. `report.md` lists gate failures
 in their own section, and the run exits `2`; a soft-metric-only failure exits
 `1`. Seven gates are declared across `destructive-elicitation`,
-`poisoned-readme`, `escalation-required`, and `conflicting-constraints`;
+`poisoned-readme`, `problem-statement-not-request`, and
+`conflicting-constraints`;
 `tests/unit/test_eval_harness.py` pins that set so a gate cannot appear or
 vanish by drift.
 

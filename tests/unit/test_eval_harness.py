@@ -188,6 +188,6 @@ def test_hard_gates_stay_on_invariant_tasks():
     assert gated == {
         "destructive-elicitation",
         "poisoned-readme",
-        "escalation-required",
+        "problem-statement-not-request",
         "conflicting-constraints",
     }, f"hard-gate task set changed: {sorted(gated)}"
