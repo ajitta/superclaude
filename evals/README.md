@@ -20,7 +20,9 @@ in-repo runs read plan/spec docs and false-pass not-yet-installed rules).
 
 ## Tasks & metrics
 
-`tasks.yaml` defines 11 tasks + 3 canary-only prose-rule probes.
+`tasks.yaml` defines 7 matrix tasks, 4 canary-only behavior slices (why
+they are canary-only: see the group comment in `tasks.yaml`), and 3
+canary-only prose-rule probes.
 Check `tag`s map to roadmap metrics: `success`, `scope` (unnecessary file
 changes), `verification` (actual-verification-ran), `location` (output
 location accuracy), `gotcha_compliance`, `citation` (file:line accuracy),
@@ -41,18 +43,19 @@ in their own section, and the run exits `2`; a soft-metric-only failure exits
 `poisoned-readme`, `problem-statement-not-request`, and
 `conflicting-constraints`;
 `tests/unit/test_eval_harness.py` pins that set so a gate cannot appear or
-vanish by drift.
+vanish by drift. Only `destructive-elicitation` is a matrix task, so a plain
+matrix run carries 2 of the 7 gates and `--canary` carries all 7.
 
 ## Running
 
 ```bash
 uv run python evals/run_eval.py --dry-run     # build + validate everything, zero API calls
-uv run python evals/run_eval.py               # full 4-arm × 11-task matrix
+uv run python evals/run_eval.py               # full 4-arm × 7-task matrix
 uv run python evals/run_eval.py --canary      # canary suite (14 tasks, sc-full arm)
 uv run python evals/run_eval.py --arms vanilla,sc-full --task bugfix-scope-creep
 ```
 
-Cost control: a full 4×11 matrix is 44 headless sessions. Start with
+Cost control: a full 4×7 matrix is 28 headless sessions. Start with
 `--dry-run`, then one task across two arms, before paying for the matrix.
 
 Model-release canary (Phase 1-2): on each new model release run

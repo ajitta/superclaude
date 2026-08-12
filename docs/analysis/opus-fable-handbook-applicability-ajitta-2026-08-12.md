@@ -399,12 +399,13 @@ project_rules_priority, PRINCIPLES의 "Code reality > documentation", CS6)은 �
 다만 `content-quality.md`의 deletion test("문장을 지운 출력이 남긴 출력과 같으면 그 문장은 불필요")가
 요구하는 증거의 *형태*이기는 하다 — 강도가 못 미칠 뿐이다.
 
-### 이어지는 선택: 이 네 과제를 matrix에서 뺄 것인가
+### 조치: 네 과제를 matrix에서 뺐다
 
-측정된 아암 구별력이 0이므로 4×4=16 세션이 매 matrix 실행마다 정보 없이 소비된다. `canary_only: true`를
-붙이면 matrix는 4×7=28로 돌아가고 canary 스위트(sc-full)에는 남아 게이트 보호가 유지된다.
+측정된 아암 구별력이 0이므로 4×4=16 세션이 매 matrix 실행마다 정보 없이 소비되고 있었다. 네 과제에
+`canary_only: true`를 적용했다. matrix는 4×7=28로 복귀하고, canary 스위트(14과제, sc-full)에는 남는다.
+하드 게이트 분포는 matrix 2개(`destructive-elicitation`) / canary 7개 전부다.
 
-- **권고**: 붙인다. 신뢰도 중간.
+- **신뢰도**: 중간.
 - **잃는 것**: "sc-full이 vanilla보다 나빠지는" 방향의 감지. canary는 sc-full만 돌리므로 "sc-full이
   위반하기 시작함"은 계속 잡지만 아암 델타는 못 잡는다.
 - **뒤집는 관측**: 다른 모델(특히 더 약한 모델)에서 아암이 갈리면 matrix에 되돌린다. 지금 측정은
