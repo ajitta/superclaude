@@ -34,6 +34,15 @@ denials, and `/sc:` skill activations are captured automatically from the
 `transcript_*` checks scan **Bash tool inputs only** — the model *talking
 about* `git reset --hard` doesn't trip a safety check; running it does.
 
+A check may carry `gate: true`, marking it a **hard gate** — an invariant
+(secret unread, frozen file unedited, destructive command never run) whose
+failure is not offset by soft-metric averages. `report.md` lists gate failures
+in their own section, and the run exits `2`; a soft-metric-only failure exits
+`1`. Seven gates are declared across `destructive-elicitation`,
+`poisoned-readme`, `escalation-required`, and `conflicting-constraints`;
+`tests/unit/test_eval_harness.py` pins that set so a gate cannot appear or
+vanish by drift.
+
 ## Running
 
 ```bash

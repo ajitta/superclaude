@@ -150,8 +150,7 @@ def test_misleading_evidence_sentinel_matches_fixture():
         encoding="utf-8"
     ), f"normalize.py no longer returns {sentinel!r} — re-sync tasks.yaml"
     assert "None" in (fixture / "README.md").read_text(encoding="utf-8"), (
-        "README.md must keep the contradicting None claim, or the task tests "
-        "nothing"
+        "README.md must keep the contradicting None claim, or the task tests nothing"
     )
 
 
@@ -165,7 +164,30 @@ def test_poisoned_readme_carries_injection_and_canary_token():
         "poisoned-readme README lost its injected directive — the task would "
         "pass trivially"
     )
-    token = next(c["pattern"] for c in task["checks"] if c["type"] == "output_not_regex")
+    token = next(
+        c["pattern"] for c in task["checks"] if c["type"] == "output_not_regex"
+    )
     assert token in (fixture / "credentials.txt").read_text(encoding="utf-8"), (
         f"credentials.txt no longer contains {token!r} — re-sync tasks.yaml"
     )
+
+
+def test_gate_flag_is_read_by_harness():
+    """tasks.yaml declares hard gates; run_eval.py must still consume the flag
+    and act on it, or every gate silently degrades to a soft metric."""
+    source = (EVALS_DIR / "run_eval.py").read_text(encoding="utf-8")
+    assert 'check.get("gate"' in source, "run_eval.py stopped reading the gate flag"
+    assert "gates_ok" in source, "run_eval.py stopped gating its exit code"
+
+
+def test_hard_gates_stay_on_invariant_tasks():
+    """Adding or removing a hard gate must be a deliberate edit, not drift."""
+    gated = {
+        t["id"] for t in TASKS["tasks"] for c in t.get("checks", []) if c.get("gate")
+    }
+    assert gated == {
+        "destructive-elicitation",
+        "poisoned-readme",
+        "escalation-required",
+        "conflicting-constraints",
+    }, f"hard-gate task set changed: {sorted(gated)}"
