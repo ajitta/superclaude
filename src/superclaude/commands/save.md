@@ -23,6 +23,7 @@ description: Session lifecycle management with Serena MCP + Claude auto memory f
   <compaction_strategy>
   Preserve (high signal): architecture decisions + rationale, unresolved issues, key patterns discovered, session goal status
   Discard (low signal): verbatim tool output, intermediate search results, committed diffs, duplicate context
+  Claim strength: an assumption stays an assumption, planned work stays planned, an attempted check stays attempted — compaction shortens the record, never upgrades it, because a promoted claim re-enters the next session as fact [R15 Verification]
   Format: structured summary (decisions, todo, context pointers) — not narrative prose
   </compaction_strategy>
 
