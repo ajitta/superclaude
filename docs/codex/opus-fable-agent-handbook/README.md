@@ -56,6 +56,26 @@
 
 ---
 
+## 이 저장소에서의 우선순위
+
+**모델별 조정(01 §11, 02의 각 "조정" 블록, 03 §13, 04 §17)은 이 저장소에서 `[Heuristic]`이 아닙니다.**
+Anthropic이 Opus 5 / Fable 5 프롬프팅 가이드를 1차 문서로 공개했고, 이 저장소는 그것을 근거로 정렬
+작업을 이미 완료·병합했습니다(`c75fcd8`…`7cb858a`). 권위 순서는 다음과 같습니다.
+
+1. [Prompting Claude Opus 5](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-5) ·
+   [Prompting Claude Fable 5](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-fable-5) — 원전
+2. `docs/features/opus5-fable5-alignment/02-research.md` — 원전에서 도출한 저장소 적용 지침(G1–G14)
+3. 이 핸드북 — 배경 개념 참고서
+
+두 가지는 그대로 채택하면 손해입니다.
+
+- **§13의 2×2 A/B 평가 계획을 실행하지 마세요.** 이미 1차 자료에 답이 있는 질문에 eval 예산을 씁니다.
+- **04 §7의 context reset 트리거 중 "모델이 context 길이 때문에 조기 종료"**는 Anthropic이 *예방 대상
+  증상*(context anxiety)으로 기술한 것입니다. 이 저장소는 해당 자가 모니터링 지시를 `7f32958`에서 이미
+  삭제했으므로, 채택하면 되돌립니다.
+
+적용 가능성 판정 전문: `docs/analysis/opus-fable-handbook-applicability-ajitta-2026-08-12.md`
+
 ## 파일 구성
 
 | 파일 | 내용 | 주 용도 |

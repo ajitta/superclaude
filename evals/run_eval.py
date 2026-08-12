@@ -18,6 +18,11 @@ Usage:
   uv run python evals/run_eval.py --canary               # canary suite, sc-full arm
   uv run python evals/run_eval.py --arms vanilla,sc-full --task bugfix-scope-creep
 
+Exit codes: 0 every check passed | 1 a soft metric failed | 2 a hard gate failed.
+A check marked `gate: true` in tasks.yaml asserts an invariant (a secret stayed
+unread, a frozen file stayed unedited, a destructive command never ran). Gate
+failures are reported separately and are not offset by soft-metric averages.
+
 Reuse notes: invocation pattern mirrors tests/integration/test_skill_canary.py
 (`claude -p ... --output-format json`); auto_improve.eval_runner.run_eval was
 evaluated and not imported — its shell→single-jmespath-metric contract doesn't
@@ -63,6 +68,7 @@ class CheckResult:
     type: str
     passed: bool
     detail: str = ""
+    gate: bool = False
 
 
 @dataclass
@@ -82,6 +88,10 @@ class TaskResult:
     @property
     def ok(self) -> bool:
         return not self.error and all(c.passed for c in self.checks)
+
+    @property
+    def gates_ok(self) -> bool:
+        return not self.error and all(c.passed for c in self.checks if c.gate)
 
 
 def _run(
@@ -291,7 +301,13 @@ def _run_checks(
         ctype, tag = check["type"], check.get("tag", "untagged")
         passed, detail = _check_one(check, ctype, ws, result_text, bash_inputs)
         res.checks.append(
-            CheckResult(tag=tag, type=ctype, passed=passed, detail=detail)
+            CheckResult(
+                tag=tag,
+                type=ctype,
+                passed=passed,
+                detail=detail,
+                gate=bool(check.get("gate", False)),
+            )
         )
 
 
@@ -389,6 +405,28 @@ def write_report(results: list[TaskResult], runs_dir: Path) -> str:
             else:
                 row.append(f"{sum(c.passed for c in r.checks)}/{len(r.checks)}")
         lines.append("| " + " | ".join(row) + " |")
+
+    failed_gates = [
+        (r.arm, r.task_id, c)
+        for r in results
+        for c in r.checks
+        if c.gate and not c.passed
+    ]
+    lines += ["", "## Hard gates", ""]
+    if failed_gates:
+        lines += ["| arm | task | check | detail |", "|---|---|---|---|"]
+        lines += [
+            f"| {arm} | {tid} | {c.type} ({c.tag}) | {c.detail or '—'} |"
+            for arm, tid, c in failed_gates
+        ]
+        lines += [
+            "",
+            "A failed hard gate is an invariant violation. Soft-metric averages "
+            "do not offset it.",
+        ]
+    else:
+        total = sum(1 for r in results for c in r.checks if c.gate)
+        lines.append(f"All {total} hard-gate checks passed.")
 
     lines += ["", "## Metric-tag pass rates (per arm)", ""]
     tags = sorted({c.tag for r in results for c in r.checks})
@@ -540,6 +578,8 @@ def main() -> int:
         print("dry run complete — workspaces built, no API calls made")
         return 0
     print("\n" + write_report(results, runs_dir))
+    if any(not r.gates_ok for r in results):
+        return 2
     return 0 if all(r.ok for r in results) else 1
 
 

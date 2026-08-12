@@ -20,23 +20,38 @@ in-repo runs read plan/spec docs and false-pass not-yet-installed rules).
 
 ## Tasks & metrics
 
-`tasks.yaml` defines 7 roadmap tasks + 3 canary-only prose-rule probes.
+`tasks.yaml` defines 7 matrix tasks, 4 canary-only behavior slices (why
+they are canary-only: see the group comment in `tasks.yaml`), and 3
+canary-only prose-rule probes.
 Check `tag`s map to roadmap metrics: `success`, `scope` (unnecessary file
 changes), `verification` (actual-verification-ran), `location` (output
 location accuracy), `gotcha_compliance`, `citation` (file:line accuracy),
-`safety` (destructive-command restraint). Tokens, cost, turns, permission
+`safety` (destructive-command restraint and injection resistance),
+`conflict` (contradictory project rules surfaced rather than silently
+resolved), `evidence` (code trusted over stale documentation). Tokens, cost, turns, permission
 denials, and `/sc:` skill activations are captured automatically from the
 `stream-json` transcript.
 
 `transcript_*` checks scan **Bash tool inputs only** — the model *talking
 about* `git reset --hard` doesn't trip a safety check; running it does.
 
+A check may carry `gate: true`, marking it a **hard gate** — an invariant
+(secret unread, frozen file unedited, destructive command never run) whose
+failure is not offset by soft-metric averages. `report.md` lists gate failures
+in their own section, and the run exits `2`; a soft-metric-only failure exits
+`1`. Seven gates are declared across `destructive-elicitation`,
+`poisoned-readme`, `problem-statement-not-request`, and
+`conflicting-constraints`;
+`tests/unit/test_eval_harness.py` pins that set so a gate cannot appear or
+vanish by drift. Only `destructive-elicitation` is a matrix task, so a plain
+matrix run carries 2 of the 7 gates and `--canary` carries all 7.
+
 ## Running
 
 ```bash
 uv run python evals/run_eval.py --dry-run     # build + validate everything, zero API calls
 uv run python evals/run_eval.py               # full 4-arm × 7-task matrix
-uv run python evals/run_eval.py --canary      # canary suite (10 tasks, sc-full arm)
+uv run python evals/run_eval.py --canary      # canary suite (14 tasks, sc-full arm)
 uv run python evals/run_eval.py --arms vanilla,sc-full --task bugfix-scope-creep
 ```
 
@@ -57,7 +72,9 @@ transcripts under `<arm>/logs/`.
 
 Keep in sync: `review-citations` expected lines in `tasks.yaml` ↔
 `fixtures/review-citations/store.py`; `probe-introspect-marker` regex ↔
-`core/FLAGS.md` `--introspect` marker set.
+`core/FLAGS.md` `--introspect` marker set; the `misleading-evidence`
+sentinel and the `poisoned-readme` canary token ↔ their fixtures. All four
+are pinned by `tests/unit/test_eval_harness.py`.
 
 ## Reuse boundary
 
