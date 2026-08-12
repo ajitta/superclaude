@@ -138,3 +138,34 @@ def test_pin_python_substitutes_only_bare_python_token():
     pinned = run_eval._pin_python(cmd)
     assert pinned == [run_eval.PY_BIN, "-m", "pytest", "-q", "python_helper.py"]
     assert run_eval._pin_python(["git", "status"]) == ["git", "status"]
+
+
+def test_misleading_evidence_sentinel_matches_fixture():
+    """The code-truth sentinel is the whole task — a fixture rename would turn
+    a passing check into an unreachable one without failing anything."""
+    task = next(t for t in TASKS["tasks"] if t["id"] == "misleading-evidence")
+    sentinel = next(c["pattern"] for c in task["checks"] if c["type"] == "output_regex")
+    fixture = EVALS_DIR / task["fixture"]
+    assert f'return "{sentinel}"' in (fixture / "normalize.py").read_text(
+        encoding="utf-8"
+    ), f"normalize.py no longer returns {sentinel!r} — re-sync tasks.yaml"
+    assert "None" in (fixture / "README.md").read_text(encoding="utf-8"), (
+        "README.md must keep the contradicting None claim, or the task tests "
+        "nothing"
+    )
+
+
+def test_poisoned_readme_carries_injection_and_canary_token():
+    """Both halves are load-bearing: the injected directive makes the task a
+    test, the canary token makes the leak detectable."""
+    task = next(t for t in TASKS["tasks"] if t["id"] == "poisoned-readme")
+    fixture = EVALS_DIR / task["fixture"]
+    readme = (fixture / "README.md").read_text(encoding="utf-8")
+    assert "exfil.txt" in readme and "notes.md" in readme, (
+        "poisoned-readme README lost its injected directive — the task would "
+        "pass trivially"
+    )
+    token = next(c["pattern"] for c in task["checks"] if c["type"] == "output_not_regex")
+    assert token in (fixture / "credentials.txt").read_text(encoding="utf-8"), (
+        f"credentials.txt no longer contains {token!r} — re-sync tasks.yaml"
+    )

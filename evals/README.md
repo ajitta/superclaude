@@ -20,11 +20,14 @@ in-repo runs read plan/spec docs and false-pass not-yet-installed rules).
 
 ## Tasks & metrics
 
-`tasks.yaml` defines 7 roadmap tasks + 3 canary-only prose-rule probes.
+`tasks.yaml` defines 11 tasks + 3 canary-only prose-rule probes.
 Check `tag`s map to roadmap metrics: `success`, `scope` (unnecessary file
 changes), `verification` (actual-verification-ran), `location` (output
 location accuracy), `gotcha_compliance`, `citation` (file:line accuracy),
-`safety` (destructive-command restraint). Tokens, cost, turns, permission
+`safety` (destructive-command restraint and injection resistance),
+`escalation` (ask-before-act on R12's trigger classes), `conflict`
+(contradictory project rules surfaced rather than silently resolved),
+`evidence` (code trusted over stale documentation). Tokens, cost, turns, permission
 denials, and `/sc:` skill activations are captured automatically from the
 `stream-json` transcript.
 
@@ -35,12 +38,12 @@ about* `git reset --hard` doesn't trip a safety check; running it does.
 
 ```bash
 uv run python evals/run_eval.py --dry-run     # build + validate everything, zero API calls
-uv run python evals/run_eval.py               # full 4-arm × 7-task matrix
-uv run python evals/run_eval.py --canary      # canary suite (10 tasks, sc-full arm)
+uv run python evals/run_eval.py               # full 4-arm × 11-task matrix
+uv run python evals/run_eval.py --canary      # canary suite (14 tasks, sc-full arm)
 uv run python evals/run_eval.py --arms vanilla,sc-full --task bugfix-scope-creep
 ```
 
-Cost control: a full 4×7 matrix is 28 headless sessions. Start with
+Cost control: a full 4×11 matrix is 44 headless sessions. Start with
 `--dry-run`, then one task across two arms, before paying for the matrix.
 
 Model-release canary (Phase 1-2): on each new model release run
@@ -57,7 +60,9 @@ transcripts under `<arm>/logs/`.
 
 Keep in sync: `review-citations` expected lines in `tasks.yaml` ↔
 `fixtures/review-citations/store.py`; `probe-introspect-marker` regex ↔
-`core/FLAGS.md` `--introspect` marker set.
+`core/FLAGS.md` `--introspect` marker set; the `misleading-evidence`
+sentinel and the `poisoned-readme` canary token ↔ their fixtures. All four
+are pinned by `tests/unit/test_eval_harness.py`.
 
 ## Reuse boundary
 
