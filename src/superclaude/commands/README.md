@@ -77,6 +77,7 @@ Commands managed by Claude Code native command system. Install to `~/.claude/com
 | `/sc:recommend` | Smart command recommendation engine |
 | `/sc:select-tool` | MCP tool select via complexity scoring |
 | `/sc:index` | Gen project docs + knowledge base |
+| `/sc:prompt` | Rewrite a prompt for Opus 5 / Fable 5 — strip folklore, apply model deltas |
 
 ## Authoring Rules
 
@@ -89,4 +90,4 @@ Validation: `uv run python -m pytest tests/unit/test_command_structure.py -v`
 - `agents/` — Domain expert agents commands route to
 - `modes/` — Cognitive overlays commands activate
 - `skills/` — Execution containers w/ hooks + tool restrictions
-- `okf/superclaude/commands/index.md` — OKF v0.1 catalog: 35 commands as concept docs, resource-linked to source (repo-root bundle)
+- `okf/superclaude/commands/index.md` — OKF v0.1 catalog: 36 commands as concept docs, resource-linked to source (repo-root bundle)

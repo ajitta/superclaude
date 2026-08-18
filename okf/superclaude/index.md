@@ -18,7 +18,7 @@ Authoritative human docs live in `src/superclaude/ARCHITECTURE.md` (taxonomy sou
 
 ## Commands
 
-- [Commands index](/commands/index.md): Slash commands (`/sc:*`) that orchestrate multi-step workflows. (35 concepts)
+- [Commands index](/commands/index.md): Slash commands (`/sc:*`) that orchestrate multi-step workflows. (36 concepts)
 
 ## Modes
 

@@ -51,6 +51,7 @@ description: List all /sc commands + functionality. Use when user types `/sc:hel
     - review: code review w/ structured feedback
     - auto-improve: autonomous overnight code improvement loop (Karpathy AutoResearch)
     - promote-feature: promote standalone docs into a feature folder
+    - prompt: rewrite a prompt for Opus 5 / Fable 5
   </commands>
 
   <scope_map>
