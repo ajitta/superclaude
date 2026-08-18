@@ -44,6 +44,7 @@ description: Rewrite a prompt for Claude Opus 5 or Fable 5 — strip prompting f
   | Emphasis inflation | density of `MUST`, `NEVER`, `ALWAYS`, `CRITICAL` | State the real constraint once at normal volume, with its reason |
   | Proactivity boosters | `be thorough`, `do not be lazy`, `do not stop early` | Delete — both targets are proactive by default |
   | Numeric output caps | `at most N words`, `under N bullets` | Replace with audience framing; caps starve reasoning on hard problems |
+  | Severity filters | `only report high-severity`, `be conservative`, `high-confidence only` | Replace with report-everything-plus-severity-and-confidence; filtering during the pass depresses measured recall |
   | Step choreography | `STEP 1:` numbering over judgment work | State outcome, constraints, and verification; keep ordering only where order is real |
   | Prohibition walls | runs of three or more `Do not` / `Never` lines | Keep prohibitions whose failure reproduces; restate the rest positively |
   | Trait claims | `you tend to`, `don't be too verbose` | State the wanted behavior instead of the diagnosed flaw |
