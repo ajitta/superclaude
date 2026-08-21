@@ -143,7 +143,7 @@ stands, and the notice carries the redirect.
 **Files:** Modify: `src/superclaude/commands/{git,brainstorm,design,plan,roadmap,improve,insight,pm,task,troubleshoot,document}.md` | Test: `tests/unit/test_command_structure.py`
 
 - [ ] Rewrite each `description` positive cue to "Use ONLY when user explicitly types `/sc:X`", keeping the existing negative gate and staying ≤1024 chars
-- [x] `git` also carries `disable-model-invocation: true` (applied 2026-08-21) — wording rewrite still due, as `auto-improve` has both
+- [x] `git` done ahead of the batch (2026-08-21): `disable-model-invocation: true` plus the explicit-only rewrite, matching `auto-improve`, which carries both. Ten commands remain
 - [ ] Verify: `uv run pytest tests/unit/test_command_structure.py -v` — the own-slash-command and negative-gate assertions must still pass
 - [ ] Commit
 - [ ] **Hold until Task 1 reports:** the two Tier B → A upgrades (`select-tool`, `index-repo`) and any rewriting of the 15 auto-triggerable descriptions
