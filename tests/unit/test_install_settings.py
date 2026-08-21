@@ -152,17 +152,56 @@ class TestMergeHookArrays:
         assert "npm run lint" in commands
         assert f"python {self.SC_SCRIPTS}/session_init.py" in commands
 
-    def test_skips_when_sc_hooks_exist_no_force(self):
-        """When SC hooks exist and force=False, returns existing unchanged."""
+    def test_adds_unregistered_script_without_force(self):
+        """A script this release ships and the install lacks is added, not skipped.
+
+        Superseding the old contract, which returned `existing` untouched the
+        moment any SuperClaude hook was present. That froze an install's hook set
+        while its content kept updating, and is how a shipped hook stayed
+        unregistered in a real install for weeks.
+        """
         v1 = f"python {self.SC_SCRIPTS}/session_init_v1.py"
         v2 = f"python {self.SC_SCRIPTS}/session_init_v2.py"
         existing = [self._user_hook(), self._sc_hook(v1)]
         new = [self._sc_hook(v2)]
         result = self.merge(existing, new, force=False)
-        assert len(result) == 2
         commands = [h["hooks"][0]["command"] for h in result]
-        assert v1 in commands
-        assert v2 not in commands
+        assert commands[: len(existing)] == [
+            "npm run lint",
+            v1,
+        ], "existing entries must survive a non-force merge verbatim"
+        assert v2 in commands
+
+    def test_registered_script_is_not_re_added(self):
+        """Same script, drifted command: still one registration, not two."""
+        settled = f"python {self.SC_SCRIPTS}/session_init.py"
+        reshipped = f"/usr/bin/python3 {self.SC_SCRIPTS}/session_init.py --verbose"
+        existing = [self._user_hook(), self._sc_hook(settled)]
+
+        result = self.merge(existing, [self._sc_hook(settled)], force=False)
+        assert result == existing, "an identical hook was appended again"
+
+        drifted = self.merge(existing, [self._sc_hook(reshipped)], force=False)
+        assert drifted == existing, (
+            "a path or flag change re-registered a hook that is already installed"
+        )
+
+    def test_one_script_shipped_twice_under_a_matcher(self):
+        """Two subcommands of one script are two hooks, not one.
+
+        A set-based presence check would see the first registration and call the
+        second shipped hook already installed.
+        """
+        harvest = f"python {self.SC_SCRIPTS}/insight_writer.py harvest-from-hook"
+        pending = f"python {self.SC_SCRIPTS}/insight_writer.py pending-count-from-hook"
+        existing = [{"matcher": "", "hooks": [{"command": harvest}]}]
+        new = [{"matcher": "", "hooks": [{"command": harvest}, {"command": pending}]}]
+
+        result = self.merge(existing, new, force=False)
+
+        commands = [h["command"] for entry in result for h in entry["hooks"]]
+        assert commands.count(harvest) == 1, "already-registered hook was doubled"
+        assert pending in commands, "second subcommand never reached the install"
 
     def test_force_replaces_sc_hooks(self):
         """Force=True replaces SC hooks while preserving user hooks."""
@@ -542,3 +581,139 @@ class TestHookDedup:
         assert serena_count == 1, (
             f"After 4 accumulation rounds, expected 1 serena entry, got {serena_count}"
         )
+
+
+class TestNewlyShippedHookReachesAnExistingInstall:
+    """A hook added in a later release must reach an install that predates it.
+
+    The merge used to skip a whole event type once any SuperClaude hook existed
+    under it, so an install updated without --force froze its hook set at
+    whatever was written first while its markdown kept updating. That is how
+    prettier_hook.py ended up shipped-but-unregistered in a real install with
+    twelve of the thirteen hooks present.
+    """
+
+    SC = "~/.claude/superclaude/scripts"
+
+    @pytest.fixture
+    def base_path(self, tmp_path: Path):
+        base = tmp_path / ".claude"
+        base.mkdir()
+        return base
+
+    def _settled_install(self, base_path: Path, extra: list | None = None) -> Path:
+        """An install carrying the previous release's PostToolUse hook only."""
+        settings_file = base_path / "settings.json"
+        settings = {
+            "hooks": {
+                "PostToolUse": [
+                    {
+                        "matcher": "Edit|Write",
+                        "hooks": [
+                            {
+                                "type": "command",
+                                "command": f"python {self.SC}/test_runner_hook.py",
+                                "timeout": 120,
+                            }
+                        ],
+                    },
+                    *(extra or []),
+                ]
+            }
+        }
+        settings_file.write_text(json.dumps(settings, indent=2), encoding="utf-8")
+        return settings_file
+
+    def _shipped(self) -> dict:
+        """This release ships prettier alongside test_runner on the same matcher."""
+        return {
+            "hooks": {
+                "PostToolUse": [
+                    {
+                        "matcher": "Edit|Write",
+                        "hooks": [
+                            {
+                                "type": "command",
+                                "command": f"python {self.SC}/prettier_hook.py",
+                                "timeout": 30,
+                            },
+                            {
+                                "type": "command",
+                                "command": f"python {self.SC}/test_runner_hook.py",
+                                "timeout": 120,
+                            },
+                        ],
+                    }
+                ]
+            }
+        }
+
+    @staticmethod
+    def _registered_scripts(settings_file: Path) -> set:
+        settings = json.loads(settings_file.read_text(encoding="utf-8"))
+        return {
+            hook["command"].rsplit("/", 1)[-1]
+            for entry in settings["hooks"]["PostToolUse"]
+            for hook in entry["hooks"]
+        }
+
+    def test_missing_hook_is_added_without_force(self, base_path: Path):
+        from superclaude.cli.install_settings import merge_hooks_to_settings
+
+        settings_file = self._settled_install(base_path)
+
+        success, msg = merge_hooks_to_settings(
+            base_path, self._shipped(), scope="user", force=False
+        )
+
+        assert success is True, msg
+        assert self._registered_scripts(settings_file) == {
+            "prettier_hook.py",
+            "test_runner_hook.py",
+        }, "a newly shipped hook never reached the install"
+
+    def test_existing_entries_are_left_alone(self, base_path: Path):
+        """Only additions. A user's timeout edit survives a non-force merge."""
+        from superclaude.cli.install_settings import merge_hooks_to_settings
+
+        settings_file = self._settled_install(base_path)
+        before = json.loads(settings_file.read_text(encoding="utf-8"))["hooks"][
+            "PostToolUse"
+        ]
+
+        merge_hooks_to_settings(base_path, self._shipped(), scope="user", force=False)
+
+        after = json.loads(settings_file.read_text(encoding="utf-8"))["hooks"][
+            "PostToolUse"
+        ]
+        assert after[: len(before)] == before, "an existing entry was rewritten"
+
+    def test_repeat_merge_adds_nothing(self, base_path: Path):
+        """Idempotent: the second non-force merge is a no-op."""
+        from superclaude.cli.install_settings import merge_hooks_to_settings
+
+        settings_file = self._settled_install(base_path)
+
+        merge_hooks_to_settings(base_path, self._shipped(), scope="user", force=False)
+        once = settings_file.read_text(encoding="utf-8")
+        merge_hooks_to_settings(base_path, self._shipped(), scope="user", force=False)
+
+        assert settings_file.read_text(encoding="utf-8") == once
+
+    def test_user_hooks_survive(self, base_path: Path):
+        """A non-SuperClaude entry under the same event type is untouched."""
+        from superclaude.cli.install_settings import merge_hooks_to_settings
+
+        user_entry = {
+            "matcher": "Edit",
+            "hooks": [{"type": "command", "command": "python /home/me/mine.py"}],
+        }
+        settings_file = self._settled_install(base_path, extra=[user_entry])
+
+        merge_hooks_to_settings(base_path, self._shipped(), scope="user", force=False)
+
+        entries = json.loads(settings_file.read_text(encoding="utf-8"))["hooks"][
+            "PostToolUse"
+        ]
+        assert user_entry in entries
+

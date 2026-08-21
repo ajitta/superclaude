@@ -4,6 +4,7 @@ Listing & Uninstallation for SuperClaude
 Handles listing available/installed components and full uninstallation.
 """
 
+import json
 import shutil
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
@@ -69,12 +70,44 @@ def list_installed_commands(base_path: Path = None) -> List[str]:
     return sorted(installed)
 
 
-def list_all_components(base_path: Path = None) -> Dict[str, Dict[str, Any]]:
+def _count_shipped_hooks(hooks_json: Path) -> int:
+    """How many individual hook commands this release ships."""
+    if not hooks_json.exists():
+        return 0
+    try:
+        config = json.loads(hooks_json.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return 0
+    return sum(
+        len(entry.get("hooks", []))
+        for array in config.get("hooks", {}).values()
+        if isinstance(array, list)
+        for entry in array
+    )
+
+
+def _count_registered_hooks(settings_file: Path) -> int:
+    """How many of them are actually wired into this scope's settings file."""
+    settings = _load_settings(settings_file)
+    return sum(
+        len(entry.get("hooks", []))
+        for array in settings.get("hooks", {}).values()
+        if isinstance(array, list)
+        for entry in array
+        if _is_superclaude_hook(entry)
+    )
+
+
+def list_all_components(
+    base_path: Path = None, scope: str = "user"
+) -> Dict[str, Dict[str, Any]]:
     """
     List all components with their installation status.
 
     Args:
         base_path: Base installation path (default: ~/.claude)
+        scope: Installation scope, which decides whether hook registrations are
+            read from settings.json or settings.local.json
 
     Returns:
         Dict with component info and status
@@ -170,6 +203,21 @@ def list_all_components(base_path: Path = None) -> Dict[str, Dict[str, Any]]:
         "target_path": str(hooks_target),
         "available": 1 if (hooks_source / "hooks.json").exists() else 0,
         "installed": 1 if hooks_json_installed else 0,
+    }
+
+    # The row above only says hooks.json arrived. Claude Code runs what is in
+    # settings.json, and a non-force install used to leave that frozen while the
+    # content kept updating — so the install read as current while a shipped hook
+    # never fired. This row is the one that shows it.
+    settings_file = base_path / (
+        "settings.local.json" if scope == "local" else "settings.json"
+    )
+    result["hooks_registered"] = {
+        "description": "Hooks registered in settings",
+        "source_path": str(hooks_source / "hooks.json"),
+        "target_path": str(settings_file),
+        "available": _count_shipped_hooks(hooks_source / "hooks.json"),
+        "installed": _count_registered_hooks(settings_file),
     }
 
     return result

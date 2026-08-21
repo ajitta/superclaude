@@ -97,7 +97,7 @@ def _show_preview(base_path: Path, scope: str, force: bool) -> None:
     click.echo(f"  Target:  {base_path}")
     click.echo(f"  Force:   {'yes' if force else 'no'}")
     click.echo()
-    components = list_all_components(base_path=base_path)
+    components = list_all_components(base_path=base_path, scope=scope)
     click.echo("  Components:")
     for _name, info in components.items():
         avail = info.get("available", 0)

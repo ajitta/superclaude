@@ -120,7 +120,7 @@ def install(
 
     # List all components mode
     if list_all:
-        components = list_all_components(base_path=base_path)
+        components = list_all_components(base_path=base_path, scope=scope)
         click.echo(f"📋 SuperClaude Components (scope: {scope}):\n")
         for name, info in components.items():
             status = f"{info['installed']}/{info['available']}"
