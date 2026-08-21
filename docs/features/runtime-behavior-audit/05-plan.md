@@ -238,11 +238,24 @@ hold after a week of real use, reopen the retire option.
 
 **Files:** Modify: `src/superclaude/cli/main.py` / `install_paths.py` (if a defect is found)
 
-- [ ] Test the leading hypothesis first: `main.py:148-157` prints a "Detected git repo at CWD … rerun with --scope local" hint whenever scope falls back to its `user` default inside a git repo. Every install this user ran was from inside a repo, so the CLI nudged toward local scope each time
-- [ ] Decide whether the hint stays, is reworded, or fires only on a team-shared repo
-- [ ] If the hint is not the cause, trace the install path for an outright failure
-- [ ] Verify: a default `superclaude install` from inside a git repo leaves content in `~/.claude/`
-- [ ] Commit
+- [x] **Hypothesis tested, not confirmed.** The hint is informational: it prints, says "Continuing
+  with default (user) scope", and installs to user scope anyway. It also never fires on the bare
+  command, because that never reaches it (below). User-scope content does exist on the machine
+  this ran on, so the hint did not prevent the install
+- [x] Hint reworded anyway — it opened on the detection and buried the action, so a skim read it as
+  an instruction to start over. It now leads with the scope being used and offers `--scope local`
+  second
+- [x] **The outright failure, found and fixed.** `superclaude install` with no flags routes into a
+  five-step wizard. With nothing to answer it, the first prompt reads EOF and the whole command
+  aborts having installed nothing — reproduced at exit 1, 0 files, with `stdin=DEVNULL`. That is
+  the bare form every doc shows, and it is unusable from CI, a script, a pipe, or `claude -p`
+- [x] Detected by exception rather than by `sys.stdin.isatty()`: on Windows `NUL` is a character
+  device, so `isatty()` reports a terminal even at DEVNULL. The wizard already distinguishes its
+  two outcomes — a user who declines returns, a prompt that cannot be read raises — so only the
+  second falls through to a default install. `-i` still fails loudly
+- [x] Verify: a default `superclaude install` from inside a git repo now exits 0 and leaves 36
+  commands in `~/.claude/`, with nothing written into the repo
+- [x] Commit
 
 ---
 

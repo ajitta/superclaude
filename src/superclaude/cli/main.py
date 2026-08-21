@@ -113,7 +113,29 @@ def install(
     if interactive or _all_defaults():
         from .install_interactive import run_interactive_install
 
-        sys.exit(run_interactive_install())
+        try:
+            sys.exit(run_interactive_install())
+        except click.Abort:
+            # The wizard signals its two outcomes differently: a user who
+            # declines gets a return value, and a prompt that cannot be read
+            # raises. So Abort here means nobody was available to answer — CI, a
+            # script, a pipe, `claude -p`. The bare `superclaude install` every
+            # doc shows used to die there having installed nothing, which is the
+            # command the audit says never landed at user scope.
+            #
+            # Detecting this by exception rather than by sys.stdin.isatty():
+            # on Windows NUL is a character device, so isatty() reports a
+            # terminal even with stdin at DEVNULL. -i still fails loudly, since
+            # asking for the wizard explicitly and silently not getting it would
+            # be worse than the error.
+            if interactive:
+                raise
+            click.echo()
+            click.echo(
+                "💡 No input available for the wizard — continuing with defaults "
+                "(scope: user). Pass --scope/--force to choose explicitly."
+            )
+            click.echo()
 
     # Get base path based on scope
     base_path = get_base_path(scope)
@@ -151,9 +173,10 @@ def install(
     scope_was_default = scope_source is not None and scope_source.name == "DEFAULT"
     if scope_was_default and scope == "user" and _in_git_repo(Path.cwd()):
         click.echo(
-            "💡 Detected git repo at CWD. If this is a team repo and you want a "
-            "personal install (auto-gitignored, separate settings), rerun with "
-            "--scope local. Continuing with default (user) scope."
+            "💡 Installing at the default user scope → ~/.claude, which applies "
+            "in every repository. Since this is a git repo, --scope local is the "
+            "alternative: a personal install inside it, auto-gitignored, with its "
+            "own settings."
         )
         click.echo()
 
