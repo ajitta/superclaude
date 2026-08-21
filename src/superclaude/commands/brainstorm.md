@@ -1,5 +1,5 @@
 ---
-description: Interactive requirements discovery thru Socratic dialogue + systematic exploration. Use when user types `/sc:brainstorm`, ask "spec out feature", "discover requirements", or call idea "vague" / "fuzzy". Do NOT auto-trigger on routine code questions, casual "what should we do about X" exploration, or single-answer factual queries — those get direct response, not discovery flow.
+description: Interactive requirements discovery thru Socratic dialogue + systematic exploration. Use ONLY when user explicitly types `/sc:brainstorm` — opens a phased workflow and writes feature docs, so a wrong fire skips the approval gate and creates files unasked. Do NOT auto-trigger on routine code questions, casual "what should we do about X" exploration, or single-answer factual queries — those get direct response, not discovery flow.
 ---
 <component name="brainstorm" type="command">
 

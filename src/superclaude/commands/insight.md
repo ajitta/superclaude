@@ -1,5 +1,5 @@
 ---
-description: Capture structured session insights to per-project JSONL for human + tool analysis. Use when user types `/sc:insight` (with optional --list/--query/--stats/--review) or explicitly asks to record an insight ("record this insight", "capture this as an insight"). NO auto-trigger on "let me note this" or general observation — insights = deliberate capture, no auto-snapshot.
+description: Capture structured session insights to per-project JSONL for human + tool analysis. Use ONLY when user explicitly types `/sc:insight` (with optional --list/--query/--stats/--review) — appends to .claude/insights.jsonl, wrong fire leaves a stored entry to delete. NO auto-trigger on "let me note this" or general observation — insights = deliberate capture, no auto-snapshot.
 ---
 <component name="insight" type="command">
 

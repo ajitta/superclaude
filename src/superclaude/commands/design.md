@@ -1,5 +1,5 @@
 ---
-description: Design system architecture, APIs, component interfaces w/ comprehensive specs. Use when user type `/sc:design`, ask "design the system/API/interface for X", or want committed design spec under docs/specs/. NOT auto-trigger on "how should I structure this function", small sketches, single-component examples — those get inline answer.
+description: Design system architecture, APIs, component interfaces w/ comprehensive specs. Use ONLY when user explicitly types `/sc:design` — commits a spec under docs/specs/, so a wrong fire skips the approval gate and creates files unasked. NOT auto-trigger on "how should I structure this function", small sketches, single-component examples — those get inline answer.
 ---
 <component name="design" type="command">
 
