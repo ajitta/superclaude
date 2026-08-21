@@ -62,4 +62,11 @@ ten downgrades whose worst case is a revertible edit. `git`, whose worst case is
 history, now carries the flag as well (applied 2026-08-21) and keeps its wording downgrade under
 Task 8, matching `auto-improve`, which has both.
 
-Net effect: Tier A shrinks from 22 to 13.
+**Outcome (2026-08-22).** The eleven downgrades shipped. The two upgrades did not: Task 1 found
+that description wording drives no selection at all ([06-diagnostics.md](./06-diagnostics.md)),
+so promoting `select-tool` and `index-repo` would have bought no activation while dropping a bound
+that costs nothing to keep. Tier A ends at **11**, not the 13 projected here — 13 minus those two.
+
+The classification above still stands as a safety ranking, which is what it was for: the
+downgrades bound the blast radius if model invocation ever starts working, and that argument is
+independent of whether it works today.

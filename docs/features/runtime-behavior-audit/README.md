@@ -3,7 +3,7 @@ feature: runtime-behavior-audit
 phase: planning
 owner: chosh1179
 created: 2026-08-21
-updated: 2026-08-21
+updated: 2026-08-22
 ---
 
 # Runtime Behavior Audit
@@ -30,6 +30,7 @@ only. Prompt history covers the full 10 months.
 - [03-analysis.md](./03-analysis.md) — findings A1–A12 with evidence and reproduction
 - [05-plan.md](./05-plan.md) — prioritized remediation plan with verification commands
 - [05a-plan-trigger-tiers.md](./05a-plan-trigger-tiers.md) — Task 8 detail: per-command auto-trigger classification
+- [06-diagnostics.md](./06-diagnostics.md) — Phase 1 results: why commands and agents never fire, with live probes
 
 ## Headline
 

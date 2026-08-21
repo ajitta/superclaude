@@ -18,7 +18,8 @@ existing suite file; content tasks are gated by the structural tests already cov
 **Tech Stack:** Python ≥3.10, UV, pytest (baseline 2102 passed / 28 skipped / 4 deselected), ruff.
 
 **Source:** findings A1–A12 in [03-analysis.md](./03-analysis.md). Per-command trigger detail in
-[05a-plan-trigger-tiers.md](./05a-plan-trigger-tiers.md).
+[05a-plan-trigger-tiers.md](./05a-plan-trigger-tiers.md). Phase 1 results in
+[06-diagnostics.md](./06-diagnostics.md).
 
 ---
 
@@ -44,11 +45,11 @@ on it, so they can proceed in parallel.
 
 **Files:** Create: `docs/features/runtime-behavior-audit/06-diagnostics.md`
 
-- [ ] Take three commands with clean Tier A wording that stay Tier A after Task 8 (`analyze`, `review`, `explain`) and the plugin skills that win the same conversational cues today (caveman, karpathy-guidelines, claude-mem)
-- [ ] For each, determine whether the SuperClaude description is considered and loses, or is never considered at all — the two have different fixes
-- [ ] Check the mechanical preconditions the audit did not: description length against the 1024-char skill cap, whether project-scope commands reach the model's skill list at all, and whether the negative gate ("Do NOT auto-trigger on …") suppresses more than intended
-- [ ] Record the finding and the implied fix in the diagnostics doc
-- [ ] Update Task 8's upgrade half and Task 13's packaging notes from the result
+- [x] Take three commands with clean Tier A wording that stay Tier A after Task 8 (`analyze`, `review`, `explain`) and the plugin skills that win the same conversational cues today (caveman, karpathy-guidelines, claude-mem)
+- [x] For each, determine whether the SuperClaude description is considered and loses, or is never considered at all — the two have different fixes
+- [x] Check the mechanical preconditions the audit did not: description length against the 1024-char skill cap, whether project-scope commands reach the model's skill list at all, and whether the negative gate ("Do NOT auto-trigger on …") suppresses more than intended
+- [x] Record the finding and the implied fix in the diagnostics doc
+- [x] Update Task 8's upgrade half and Task 13's packaging notes from the result
 
 **Why first:** D2 makes this the root cause of A1; everything else is maintenance until it is answered.
 
@@ -56,12 +57,17 @@ on it, so they can proceed in parallel.
 
 **Files:** Append: `docs/features/runtime-behavior-audit/06-diagnostics.md`
 
-- [ ] Trace three sessions where `RULES_DELEGATION.md` `<sub_agent_decision>` should have fired; record what was chosen instead
-- [ ] Classify: routing never suggests the agents, or routing suggests them and they are declined
-- [ ] Feed the result into Task 12's scope
+- [x] Trace three sessions where `RULES_DELEGATION.md` `<sub_agent_decision>` should have fired; record what was chosen instead
+- [x] Classify: routing never suggests the agents, or routing suggests them and they are declined
+- [x] Feed the result into Task 12's scope
 
 **Why:** 22 of 23 agents have zero invocations, but cutting on usage alone would delete agents that
 never got a fair chance to be routed to. If Task 1 finds a shared mechanism, this is it one layer down.
+
+**Result:** routing never suggests them, for two compounding reasons — and it *was* the same
+mechanism one layer down, plus a circular trigger of the agents' own. See
+[06-diagnostics.md](./06-diagnostics.md#task-2--why-delegation-never-reaches-the-agents); Task 12's
+scope changes as a result.
 
 ---
 
@@ -71,12 +77,12 @@ never got a fair chance to be routed to. If Task 1 finds a shared mechanism, thi
 
 **Files:** Modify: `src/superclaude/scripts/context_loader.py:64` | Test: `tests/unit/test_context_loader.py`
 
-- [ ] Write failing test: run the loader twice with one prompt and `session_id` "A" then "B"; assert both emit non-empty output
-- [ ] Verify it fails — today B emits 0 bytes (reproduced: A=779, B=0)
-- [ ] Replace module-level `SESSION_ID = project_key()` / `CACHE_FILE` with a resolver called after `_extract_session_id()`, naming the file `claude_context_{project_key}_{session_id}.txt`; fall back to the project-only name when stdin carries no session id
-- [ ] Thread the resolved path through `get_loaded_contexts()` and `mark_as_loaded()`; rename the misleading `SESSION_ID` constant
-- [ ] Verify it passes: `uv run pytest tests/unit/test_context_loader.py -v`
-- [ ] Commit
+- [x] Write failing test: run the loader twice with one prompt and `session_id` "A" then "B"; assert both emit non-empty output
+- [x] Verify it fails — today B emits 0 bytes (reproduced: A=779, B=0)
+- [x] Replace module-level `SESSION_ID = project_key()` / `CACHE_FILE` with a resolver called after `_extract_session_id()`, naming the file `claude_context_{project_key}_{session_id}.txt`; fall back to the project-only name when stdin carries no session id
+- [x] Thread the resolved path through `get_loaded_contexts()` and `mark_as_loaded()`; rename the misleading `SESSION_ID` constant
+- [x] Verify it passes: `uv run pytest tests/unit/test_context_loader.py -v`
+- [x] Commit
 
 **Risk:** low — the worst outcome is more injection, never less.
 
@@ -84,12 +90,12 @@ never got a fair chance to be routed to. If Task 1 finds a shared mechanism, thi
 
 **Files:** Modify: `tests/conftest.py` | Test: `tests/unit/test_loop_guard.py:274`
 
-- [ ] Write failing test: snapshot `hook_state_dir()` under a patched `HOME`, run the guard against a bare `tmp_path`, assert no new file appears in the real home state dir
-- [ ] Verify it fails — `uv run pytest` currently adds one `loop_guard_<md5>.json` per run
-- [ ] Add an autouse fixture in `tests/conftest.py` pointing `HOME` at `tmp_path` for the unit suite, so any `claude_base()` fallback lands in the sandbox
-- [ ] Audit `test_safety_hooks.py`, `test_scope_paths.py`, `test_eval_harness.py` for the same fallback
-- [ ] Verify: `ls ~/.claude/.superclaude_hooks/ > /tmp/before && uv run pytest && ls ~/.claude/.superclaude_hooks/ | diff /tmp/before -`
-- [ ] Commit
+- [x] Write failing test: snapshot `hook_state_dir()` under a patched `HOME`, run the guard against a bare `tmp_path`, assert no new file appears in the real home state dir
+- [x] Verify it fails — `uv run pytest` currently adds one `loop_guard_<md5>.json` per run
+- [x] Add an autouse fixture in `tests/conftest.py` pointing `HOME` at `tmp_path` for the unit suite, so any `claude_base()` fallback lands in the sandbox
+- [x] Audit `test_safety_hooks.py`, `test_scope_paths.py`, `test_eval_harness.py` for the same fallback
+- [x] Verify: `ls ~/.claude/.superclaude_hooks/ > /tmp/before && uv run pytest && ls ~/.claude/.superclaude_hooks/ | diff /tmp/before -`
+- [x] Commit
 
 **Cleanup (D4, done):** 32 orphan files deleted 2026-08-21; the directory is now empty. Until this
 task lands, every `pytest` run recreates one.
@@ -98,12 +104,12 @@ task lands, every `pytest` run recreates one.
 
 **Files:** Modify: `src/superclaude/cli/install_settings.py` (`merge_hooks_to_settings`) | Test: `tests/unit/test_install_settings.py`
 
-- [ ] Write failing test: settings with one SC hook under `PostToolUse`, merge a two-hook `PostToolUse` config without `--force`, assert both present
-- [ ] Verify it fails — the current per-event-type skip returns "Hooks already exist … (use --force to update)" and drops the new hook
-- [ ] Replace the `has_sc_hooks and not force` early-`continue` with a per-hook check: add any shipped hook whose (matcher, script) signature is absent; leave existing entries untouched unless `--force`. `_hook_entry_signature` and `_dedup_hook_array` already provide the identity
-- [ ] Add a registered-vs-shipped hook count to `superclaude install --list-all` so a frozen install is visible without diffing settings files
-- [ ] Verify: `uv run pytest tests/unit/ -k "settings or hooks" -v`, then re-run the install on `oasis-nakama-dev` and confirm `prettier_hook.py` appears in its `settings.local.json`
-- [ ] Commit
+- [x] Write failing test: settings with one SC hook under `PostToolUse`, merge a two-hook `PostToolUse` config without `--force`, assert both present
+- [x] Verify it fails — the current per-event-type skip returns "Hooks already exist … (use --force to update)" and drops the new hook
+- [x] Replace the `has_sc_hooks and not force` early-`continue` with a per-hook check: add any shipped hook whose (matcher, script) signature is absent; leave existing entries untouched unless `--force`. `_hook_entry_signature` and `_dedup_hook_array` already provide the identity
+- [x] Add a registered-vs-shipped hook count to `superclaude install --list-all` so a frozen install is visible without diffing settings files
+- [x] Verify: `uv run pytest tests/unit/ -k "settings or hooks" -v`, then re-run the install on `oasis-nakama-dev` and confirm `prettier_hook.py` appears in its `settings.local.json`
+- [x] Commit
 
 ---
 
@@ -113,23 +119,23 @@ task lands, every `pytest` run recreates one.
 
 **Files:** Modify: `src/superclaude/scripts/context_loader.py` | Test: `tests/unit/test_context_loader.py`
 
-- [ ] Write failing test: `/sc:analayze` names `/sc:analyze`; `/sc:workflow` names `/sc:roadmap`; an unknown name injects no command context
-- [ ] Verify it fails — both currently emit no notice and still pull 1,469 bytes of command context
-- [ ] Extend the `resolve_flags` Levenshtein ≤ 2 fallback to the `/sc:<name>` token against the 36 command names; add a retired-name map (`workflow → roadmap`)
-- [ ] Emit one comment naming the substitution — never silently rewrite — and suppress command-context injection when the name resolves to nothing
-- [ ] Verify: `uv run pytest tests/unit/test_context_loader.py -v`
-- [ ] Commit
+- [x] Write failing test: `/sc:analayze` names `/sc:analyze`; `/sc:workflow` names `/sc:roadmap`; an unknown name injects no command context
+- [x] Verify it fails — both currently emit no notice and still pull 1,469 bytes of command context
+- [x] Extend the `resolve_flags` Levenshtein ≤ 2 fallback to the `/sc:<name>` token against the 36 command names; add a retired-name map (`workflow → roadmap`)
+- [x] Emit one comment naming the substitution — never silently rewrite — and suppress command-context injection when the name resolves to nothing
+- [x] Verify: `uv run pytest tests/unit/test_context_loader.py -v`
+- [x] Commit
 
 ### Task 7: Deprecation notices for retired flags (A7a, A7b, D5)
 
 **Files:** Modify: `src/superclaude/scripts/context_loader.py` | Test: `tests/unit/test_context_loader.py`
 
-- [ ] Write failing test: `--think-hard` and `--parellel` each produce one notice; `--effort` and `--ultrathink` produce none
-- [ ] Verify it fails — all four are silent today (`--think` 175, `--think-hard` 145, `--effort` 307, `--parellel` 159 uses)
-- [ ] Add a retired-flag map naming the replacement (`--think` family retired in `0cdf20f`; `--effort` removed in `06d972b`, now a native control); map `parallel` to `--delegate` / `--concurrency`
-- [ ] Recognize native Claude Code controls (`--effort`, `--ultrathink`) and stay silent on them
-- [ ] Verify: `uv run pytest tests/unit/test_context_loader.py -v`
-- [ ] Commit
+- [x] Write failing test: `--think-hard` and `--parellel` each produce one notice; `--effort` and `--ultrathink` produce none
+- [x] Verify it fails — all four are silent today (`--think` 175, `--think-hard` 145, `--effort` 307, `--parellel` 159 uses)
+- [x] Add a retired-flag map naming the replacement (`--think` family retired in `0cdf20f`; `--effort` removed in `06d972b`, now a native control); map `parallel` to `--delegate` / `--concurrency`
+- [x] Recognize native Claude Code controls (`--effort`, `--ultrathink`) and stay silent on them
+- [x] Verify: `uv run pytest tests/unit/test_context_loader.py -v`
+- [x] Commit
 
 Per D5 the flag is not restored — the one-canonical-name rule at `context_loader.py:250-255`
 stands, and the notice carries the redirect.
@@ -142,11 +148,15 @@ stands, and the notice carries the redirect.
 
 **Files:** Modify: `src/superclaude/commands/{git,brainstorm,design,plan,roadmap,improve,insight,pm,task,troubleshoot,document}.md` | Test: `tests/unit/test_command_structure.py`
 
-- [ ] Rewrite each `description` positive cue to "Use ONLY when user explicitly types `/sc:X`", keeping the existing negative gate and staying ≤1024 chars
+- [x] Rewrite each `description` positive cue to "Use ONLY when user explicitly types `/sc:X`", keeping the existing negative gate and staying ≤1024 chars
 - [x] `git` done ahead of the batch (2026-08-21): `disable-model-invocation: true` plus the explicit-only rewrite, matching `auto-improve`, which carries both. Ten commands remain
-- [ ] Verify: `uv run pytest tests/unit/test_command_structure.py -v` — the own-slash-command and negative-gate assertions must still pass
-- [ ] Commit
-- [ ] **Hold until Task 1 reports:** the two Tier B → A upgrades (`select-tool`, `index-repo`) and any rewriting of the 15 auto-triggerable descriptions
+- [x] Verify: `uv run pytest tests/unit/test_command_structure.py -v` — the own-slash-command and negative-gate assertions must still pass
+- [x] Commit
+- [x] **Task 1 reported — upgrades declined, not deferred.** Description wording is measured at
+  near-zero throughput ([06-diagnostics.md](./06-diagnostics.md)), so moving `select-tool` and
+  `index-repo` to auto-triggerable buys no activation while dropping a bound that costs nothing to
+  keep. The 15 auto-triggerable descriptions are not rewritten for the same reason. Tier A ends at
+  **11 of 36**, not the 13 this plan projected
 
 **Rationale:** four of the eleven sit behind `RULES_DOCS.md` `workflow_gates` and would create phase
 documents unasked; `git` rewrites history; `improve` mutates code; `troubleshoot` writes a test and
@@ -158,20 +168,20 @@ in [05a-plan-trigger-tiers.md](./05a-plan-trigger-tiers.md).
 
 **Files:** Modify: `src/superclaude/scripts/context_reset.py` (or a helper in `src/superclaude/utils/`) | Test: `tests/unit/test_scope_paths.py`
 
-- [ ] Write failing test: an aged state file in `hook_state_dir()` is removed on `SessionStart` while live state survives
-- [ ] Verify it fails — nothing prunes state files today; `loop_guard.py` prunes entries inside a file, not the files
-- [ ] Delete state files older than 7 days; prune `mcp_fallbacks.json` entries not keyed to the current session; drop keys for servers absent from `MCP_SERVERS` (`magic`, `morphllm`)
-- [ ] Verify: `uv run pytest tests/unit/ -k "scope_paths or mcp_fallback" -v`
-- [ ] Commit
+- [x] Write failing test: an aged state file in `hook_state_dir()` is removed on `SessionStart` while live state survives
+- [x] Verify it fails — nothing prunes state files today; `loop_guard.py` prunes entries inside a file, not the files
+- [x] Delete state files older than 7 days; prune `mcp_fallbacks.json` entries not keyed to the current session; drop keys for servers absent from `MCP_SERVERS` (`magic`, `morphllm`)
+- [x] Verify: `uv run pytest tests/unit/ -k "scope_paths or mcp_fallback" -v`
+- [x] Commit
 
 ### Task 10: Session-start output reflects real state (A10)
 
 **Files:** Modify: `src/superclaude/scripts/session_init.py:202-207` | Test: `tests/unit/test_session_init.py`
 
-- [ ] Write failing test: startup output contains no capability claim the hook did not actually check
-- [ ] Replace the five hardcoded checkmarks with either nothing or a line derived from real state
-- [ ] Verify: `uv run pytest tests/unit/test_session_init.py -v`
-- [ ] Commit
+- [x] Write failing test: startup output contains no capability claim the hook did not actually check
+- [x] Replace the five hardcoded checkmarks with either nothing or a line derived from real state
+- [x] Verify: `uv run pytest tests/unit/test_session_init.py -v`
+- [x] Commit
 
 ---
 
