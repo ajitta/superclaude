@@ -1,6 +1,6 @@
 ---
 status: approved-for-plan
-revised: 2026-08-21
+revised: 2026-08-22
 ---
 
 # Runtime Behavior Audit — Implementation Plan
@@ -226,6 +226,15 @@ hold after a week of real use, reopen the retire option.
 ### Task 13: Package as a Claude Code plugin (A2)
 
 **Files:** Create: `.claude-plugin/plugin.json`, marketplace manifest | Modify: `src/superclaude/hooks/hooks.json`
+
+**Held 2026-08-22, at the user's request.** D1 stands and the plugin is still the destination; what
+moves is the timing. Phase 1 already settled the reason — packaging fixes availability, availability
+is solved at user scope, and the fire count is zero regardless, so packaging alone would reproduce
+the present silence at wider distribution
+([06-diagnostics.md](./06-diagnostics.md#consequences-for-the-plan)). The third box below is the
+precondition, and it is not answerable today: there is no routing mandate for a plugin-scoped
+command to inherit. Resume once that mandate exists and has been measured. Nothing here is
+abandoned — the template-path blocker in the first box remains the first thing to solve on restart.
 
 - [ ] Resolve the blocker first: `{{SCRIPTS_PATH}}` / `{{SKILLS_PATH}}` assume a copy-into-`.claude/` model and must resolve against the plugin root instead
 - [ ] Map `commands/` → plugin commands, `agents/` → plugin agents, `skills/` → plugin skills, hooks → plugin hooks
