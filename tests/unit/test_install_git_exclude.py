@@ -251,3 +251,17 @@ class TestHasFunctions:
         from superclaude.cli.install_git_exclude import has_legacy_gitignore_block
 
         assert not has_legacy_gitignore_block(git_repo)
+
+
+class TestAgentMemoryLocalIsExcluded:
+    """Local scope is the personal, gitignored install — its memory must be too.
+
+    Creating the store at install time makes this material: without the entry,
+    the first agent to write memory leaves untracked files in a team repository.
+    """
+
+    def test_entry_present(self):
+        from superclaude.cli.install_git_exclude import _collect_local_entries
+
+        assert ".claude/agent-memory-local/" in _collect_local_entries()
+

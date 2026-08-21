@@ -8,6 +8,7 @@ and multi-directory CLAUDE.md detection.
 import json
 import subprocess
 from dataclasses import dataclass
+from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 from superclaude.scripts.session_init import (
@@ -485,8 +486,12 @@ class TestMain:
         out = capsys.readouterr().out
         assert "PR:" not in out
 
-    def test_main_prints_core_services(self, capsys):
-        """main() prints the core services block."""
+    def test_main_prints_install_status(self, capsys):
+        """main() closes with a line derived from the install, not a fixed block.
+
+        Superseding an assertion on five hardcoded checkmarks, which passed
+        whether or not anything they named was installed.
+        """
         with (
             patch(
                 "superclaude.scripts.session_init.init_hook_tracker", return_value=None
@@ -504,9 +509,8 @@ class TestMain:
             main()
 
         out = capsys.readouterr().out
-        assert "Core Services Available" in out
-        assert "Confidence Check" in out
-        assert "SC Agent ready" in out
+        assert "SuperClaude:" in out
+        assert "Core Services Available" not in out
 
     def test_main_prints_additional_dirs_when_present(self, capsys):
         """main() includes additional dirs status when non-empty."""
@@ -528,3 +532,63 @@ class TestMain:
 
         out = capsys.readouterr().out
         assert "Multi-dir: 2 additional CLAUDE.md" in out
+
+
+class TestInstallStatusLine:
+    """Session start may only claim what it actually checked.
+
+    Five checkmarks were printed unconditionally on every startup — roughly
+    40-60 tokens saying the same thing whether or not any of it was installed.
+    The framework was in fact absent from user scope for months while this block
+    reported it ready (A2, A10).
+    """
+
+    FIXED_CLAIMS = (
+        "Core Services Available",
+        "Confidence Check (pre-implementation validation)",
+        "Deep Research (web/MCP integration)",
+        "Repository Index (token-efficient exploration)",
+        "PR Status Check (Claude Code 2.1.20+)",
+        "Task Auto-Cleanup (stale task removal)",
+    )
+
+    def test_no_unverified_capability_claims_remain(self):
+        source = (
+            Path(__file__).parent.parent.parent
+            / "src"
+            / "superclaude"
+            / "scripts"
+            / "session_init.py"
+        ).read_text(encoding="utf-8")
+        for claim in self.FIXED_CLAIMS:
+            assert claim not in source, (
+                f"session start still hardcodes {claim!r}, which nothing checks"
+            )
+
+    def test_reports_what_is_installed(self, tmp_path: Path, monkeypatch):
+        from superclaude.scripts.session_init import get_install_status
+
+        monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(tmp_path))
+        base = tmp_path / ".claude"
+        (base / "superclaude").mkdir(parents=True)
+        (base / "commands" / "sc").mkdir(parents=True)
+        for name in ("analyze", "review", "help"):
+            (base / "commands" / "sc" / f"{name}.md").write_text("x", encoding="utf-8")
+        (base / "agents").mkdir()
+        (base / "agents" / "self-review.md").write_text("x", encoding="utf-8")
+
+        line = get_install_status()
+
+        assert "3 commands" in line
+        assert "1 agent" in line
+        assert "project" in line
+
+    def test_absent_install_says_so(self, tmp_path: Path, monkeypatch):
+        """The line that would have caught `0 installed` the first day."""
+        from superclaude.scripts.session_init import get_install_status
+
+        monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(tmp_path))
+
+        line = get_install_status()
+
+        assert "no commands installed" in line.lower()

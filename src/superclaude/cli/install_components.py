@@ -43,6 +43,41 @@ def _rewrite_agent_memory_scope(content: str, scope: str) -> str:
     return content.replace("memory: project\n", f"memory: {scope}\n", 1)
 
 
+# Where each scope's agents keep memory, per .claude/rules/agent-authoring.md.
+# `target` is absent deliberately: it has no documented memory location, and
+# guessing one would scatter agent memory into an arbitrary directory.
+_AGENT_MEMORY_DIRS = {
+    "user": "agent-memory",
+    "project": "agent-memory",
+    "local": "agent-memory-local",
+}
+
+
+def ensure_agent_memory_dir(base_path: Path, scope: str) -> Path | None:
+    """Create the agent memory store this scope's agents will be pointed at.
+
+    Install rewrites every agent's `memory:` to match the scope, but nothing
+    created the directory that rewrite names. The one real local install on
+    record had 23 agents each declaring a store that did not exist.
+
+    Args:
+        base_path: The scope's .claude directory
+        scope: Installation scope
+
+    Returns:
+        The directory, or None for a scope with no documented location
+    """
+    name = _AGENT_MEMORY_DIRS.get(scope)
+    if not name:
+        return None
+    directory = base_path / name
+    try:
+        directory.mkdir(parents=True, exist_ok=True)
+    except OSError:
+        return None
+    return directory
+
+
 def _resolve_template_paths(base_path: Path, scope: str = "user") -> dict:
     """Compute resolved template variable values for a given scope."""
     if scope in ("project", "local"):
@@ -429,6 +464,10 @@ def install_all(
     total_installed = 0
     total_skipped = 0
     total_failed = 0
+
+    # Agents are rewritten to this scope's `memory:` value below; the store that
+    # rewrite names has to exist for it to mean anything.
+    ensure_agent_memory_dir(base_path, scope)
 
     # Install each component
     for component, (_, _, description) in COMPONENTS.items():

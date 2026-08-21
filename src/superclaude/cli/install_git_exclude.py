@@ -55,6 +55,7 @@ def _collect_local_entries() -> List[str]:
             if d.is_dir() and not d.name.startswith(("_", ".")):
                 entries.append(f".claude/skills/{d.name}/")
 
+    entries.append(".claude/agent-memory-local/")
     entries.append(".claude/commands/sc/")
     entries.append(".claude/superclaude/")
     entries.append(".claude/hooks/hooks.json")

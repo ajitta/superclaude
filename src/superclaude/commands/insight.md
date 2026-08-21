@@ -1,5 +1,5 @@
 ---
-description: Capture structured session insights to per-project JSONL for human + tool analysis. Use when user types `/sc:insight` (with optional --list/--query/--stats/--review) or explicitly asks to record an insight ("record this insight", "capture this as an insight"). NO auto-trigger on "let me note this" or general observation — insights = deliberate capture, no auto-snapshot.
+description: Capture structured session insights to per-project JSONL for human + tool analysis. Use ONLY when user explicitly types `/sc:insight` (with optional --list/--query/--stats/--review) — appends to .claude/insights.jsonl, wrong fire leaves a stored entry to delete. NO auto-trigger on "let me note this" or general observation — insights = deliberate capture, no auto-snapshot.
 ---
 <component name="insight" type="command">
 
@@ -34,7 +34,9 @@ description: Capture structured session insights to per-project JSONL for human 
   - `.claude/insights.jsonl` — promoted, structured insights
   - `.claude/insights.pending.jsonl` — raw `INSIGHT:` markers harvested from transcripts (made on demand, gone when empty)
 
-  Auto-harvest: `SessionEnd` + `PreCompact` hooks scan active transcript for user messages with `INSIGHT:` marker (line-start or inline) + append unique entries to pending. `SessionStart` (clear|compact|startup) print one-line notice ("🟡 harvested N pending insight(s) — /sc:insight --review") if pending non-empty.
+  Auto-produce: `Stop` hook ask for one `INSIGHT:` line when working tree changed — at most once per session, skipped on re-entry (`stop_hook_active`), on clean tree, and when `SUPERCLAUDE_INSIGHT_PROMPT=0`. Before this the only producer was the user typing `INSIGHT:` by hand, so pending stayed empty for months.
+
+  Auto-harvest: `SessionEnd` + `PreCompact` hooks scan active transcript for user **and assistant** messages with `INSIGHT:` marker (line-start or inline) + append unique entries to pending; the Stop hook's own request carry `[sc-insight-request]` and never harvest as a marker. `SessionStart` (clear|compact|startup) print one-line notice ("🟡 harvested N pending insight(s) — /sc:insight --review") if pending non-empty.
 
   Link to auto memory: complement, no replace. Memory = LLM read. Insight = human/tool query.
   </storage>

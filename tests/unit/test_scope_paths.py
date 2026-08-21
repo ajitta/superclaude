@@ -141,10 +141,8 @@ class TestContextCacheKeying:
         """Regression D2: both sides keyed on os.getcwd(), so a hook firing from
         a subdirectory read a different cache file and dedup silently failed.
 
-        Only the filename is asserted. context_reset.CACHE_DIR resolves
-        hook_state_dir() once at import, which is correct for a one-shot hook
-        subprocess (the env is set before Python starts) but means the directory
-        cannot follow monkeypatched env inside a single test session.
+        Only the filename is asserted; the directory is covered by
+        TestHookStateDir.
         """
         from superclaude.scripts.context_reset import get_cache_file
 
@@ -171,6 +169,50 @@ class TestContextCacheKeying:
         monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(other))
 
         assert get_cache_file() != first
+
+    def test_cache_file_carries_the_session(self, tmp_path: Path, monkeypatch):
+        """A session id in the payload names a file of its own."""
+        from superclaude.scripts.context_reset import get_cache_file
+
+        monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(tmp_path))
+
+        scoped = get_cache_file("sess-A")
+        assert scoped != get_cache_file()
+        assert scoped.name.endswith("_sess-A.txt")
+
+    def test_reset_spares_a_concurrent_session(self, tmp_path: Path, monkeypatch):
+        """/clear in one window must not starve another window of context.
+
+        Deleting every cache file for the project would force the sibling
+        session to re-inject contexts it already holds — the same starvation,
+        pointed the other way.
+        """
+        from superclaude.scripts.context_reset import (
+            get_cache_file,
+            reset_context_cache,
+        )
+
+        monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(tmp_path))
+
+        mine = get_cache_file("sess-A")
+        theirs = get_cache_file("sess-B")
+        legacy = get_cache_file()
+        for path in (mine, theirs, legacy):
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text("modes/MODE_Brainstorming.md", encoding="utf-8")
+
+        assert reset_context_cache("sess-A") is True
+
+        assert not mine.exists(), "the resetting session kept its stale cache"
+        assert not legacy.exists(), "the pre-session-keying cache was left behind"
+        assert theirs.exists(), "reset clobbered a concurrent session's cache"
+
+    def test_reset_reports_nothing_to_do(self, tmp_path: Path, monkeypatch):
+        """No cache, no claim that one was reset."""
+        from superclaude.scripts.context_reset import reset_context_cache
+
+        monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(tmp_path))
+        assert reset_context_cache("sess-A") is False
 
 
 class TestSkillDirectories:
@@ -227,3 +269,90 @@ class TestContextLoaderBasePath:
         monkeypatch.chdir(subdir)
 
         assert _get_base_path() == content
+
+
+class TestHookStatePruning:
+    """Runtime state must not grow without bound.
+
+    loop_guard prunes entries *inside* a state file; nothing pruned the files.
+    A real user-scope state directory had accumulated 25 context caches and 25
+    loop-guard files, the oldest from a project key that no longer resolves (A8).
+    """
+
+    @staticmethod
+    def _age(path: Path, days: float) -> Path:
+        import os
+        import time
+
+        old = time.time() - days * 86400
+        os.utime(path, (old, old))
+        return path
+
+    def test_aged_state_is_removed(self, tmp_path: Path, monkeypatch):
+        from superclaude.utils import hook_state_dir, prune_hook_state
+
+        monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(tmp_path))
+        state = hook_state_dir()
+        state.mkdir(parents=True, exist_ok=True)
+
+        stale = state / "claude_context_deadbeef.txt"
+        stale.write_text("modes/MODE_Brainstorming.md", encoding="utf-8")
+        self._age(stale, days=30)
+        fresh = state / "claude_context_cafebabe.txt"
+        fresh.write_text("modes/MODE_Brainstorming.md", encoding="utf-8")
+
+        removed = prune_hook_state()
+
+        assert not stale.exists(), "aged state file survived the sweep"
+        assert fresh.exists(), "live state was collected"
+        assert removed == 1
+
+    def test_unknown_files_are_left_alone(self, tmp_path: Path, monkeypatch):
+        """The sweep deletes state it recognises, not whatever shares the dir."""
+        from superclaude.utils import hook_state_dir, prune_hook_state
+
+        monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(tmp_path))
+        state = hook_state_dir()
+        state.mkdir(parents=True, exist_ok=True)
+
+        stranger = state / "someone_elses_notes.md"
+        stranger.write_text("keep me", encoding="utf-8")
+        self._age(stranger, days=90)
+
+        prune_hook_state()
+
+        assert stranger.exists()
+
+    def test_fallback_ledger_is_never_deleted_wholesale(
+        self, tmp_path: Path, monkeypatch
+    ):
+        """mcp_fallbacks.json is pruned by entry, so the file itself stays."""
+        from superclaude.utils import hook_state_dir, prune_hook_state
+
+        monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(tmp_path))
+        state = hook_state_dir()
+        state.mkdir(parents=True, exist_ok=True)
+
+        ledger = state / "mcp_fallbacks.json"
+        ledger.write_text("{}", encoding="utf-8")
+        self._age(ledger, days=90)
+
+        prune_hook_state()
+
+        assert ledger.exists()
+
+    def test_session_start_sweeps(self, tmp_path: Path, monkeypatch):
+        """The sweep is wired to the hook that already runs at session start."""
+        from superclaude.scripts.context_reset import reset_context_cache
+        from superclaude.utils import hook_state_dir
+
+        monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(tmp_path))
+        state = hook_state_dir()
+        state.mkdir(parents=True, exist_ok=True)
+        stale = state / "loop_guard_deadbeef.json"
+        stale.write_text('{"entries": []}', encoding="utf-8")
+        self._age(stale, days=30)
+
+        reset_context_cache("sess-A")
+
+        assert not stale.exists()

@@ -257,7 +257,7 @@ class TestHarvest:
         assert "dedup matters" in texts
         assert "list content also works" in texts
 
-    def test_skips_meta_and_assistant(self, workdir, monkeypatch):
+    def test_skips_meta(self, workdir, monkeypatch):
         ns, pdir = _harvest(workdir, monkeypatch, "sess1")
         _make_transcript(
             pdir,
@@ -268,14 +268,6 @@ class TestHarvest:
                     "isMeta": True,
                     "uuid": "u1",
                     "message": {"role": "user", "content": "INSIGHT: meta skip me"},
-                },
-                {
-                    "type": "assistant",
-                    "uuid": "a1",
-                    "message": {
-                        "role": "assistant",
-                        "content": "INSIGHT: assistant skip me",
-                    },
                 },
                 {
                     "type": "user",
@@ -927,3 +919,117 @@ class TestTranscriptTailScan:
         texts = [json.loads(line)["raw_text"] for line in pending.split("\n")]
         assert "recent" in texts
         assert "very early" not in texts
+
+
+class TestModelEmittedMarkers:
+    """The model has to be able to produce a marker, or nothing ever does.
+
+    Harvest scanned user records only, so the sole producer was the user typing
+    `INSIGHT:` by hand — which happened 5 times in 10 months. 138 entries exist,
+    none after 2026-05-08, with the hooks installed and exiting 0 throughout
+    (A5). Per D3 the subsystem is repaired rather than retired.
+    """
+
+    def test_assistant_marker_is_harvested(self, workdir, monkeypatch):
+        ns, pdir = _harvest(workdir, monkeypatch, "sess1")
+        _make_transcript(
+            pdir,
+            "sess1",
+            [
+                {
+                    "type": "assistant",
+                    "uuid": "a1",
+                    "message": {
+                        "role": "assistant",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "Done. INSIGHT: a per-event-type hook merge froze installs",
+                            }
+                        ],
+                    },
+                }
+            ],
+        )
+
+        assert iw.cmd_harvest(ns) == 0
+
+        pending = (workdir / ".claude" / "insights.pending.jsonl").read_text(
+            encoding="utf-8"
+        )
+        assert "a per-event-type hook merge froze installs" in pending
+
+    def test_the_request_itself_is_not_harvested(self, workdir, monkeypatch):
+        """The prompt asking for a marker must not read as one."""
+        ns, pdir = _harvest(workdir, monkeypatch, "sess1")
+        _make_transcript(
+            pdir,
+            "sess1",
+            [
+                {
+                    "type": "user",
+                    "isMeta": False,
+                    "uuid": "u1",
+                    "message": {
+                        "role": "user",
+                        "content": iw.REQUEST_SENTINEL + " emit one INSIGHT: line",
+                    },
+                }
+            ],
+        )
+
+        assert iw.cmd_harvest(ns) == 0
+        assert not (workdir / ".claude" / "insights.pending.jsonl").exists()
+
+
+class TestInsightRequestHook:
+    """A Stop hook is the only producer that does not have to be typed."""
+
+    def _run(self, workdir, monkeypatch, dirty=True, stop_hook_active=False):
+        import argparse
+
+        monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(workdir))
+        monkeypatch.delenv("SUPERCLAUDE_INSIGHT_PROMPT", raising=False)
+        monkeypatch.setattr(iw, "_working_tree_changed", lambda: dirty)
+        return iw.cmd_request(
+            argparse.Namespace(session_id="sess1", stop_hook_active=stop_hook_active)
+        )
+
+    def test_asks_once_when_the_tree_changed(self, workdir, monkeypatch, capsys):
+        rc = self._run(workdir, monkeypatch)
+
+        assert rc == 0
+        out = json.loads(capsys.readouterr().out)
+        assert out["decision"] == "block"
+        assert iw.REQUEST_SENTINEL in out["reason"]
+
+    def test_second_stop_in_the_same_session_is_silent(
+        self, workdir, monkeypatch, capsys
+    ):
+        """One extra turn per session at most — never a loop."""
+        self._run(workdir, monkeypatch)
+        capsys.readouterr()
+
+        self._run(workdir, monkeypatch)
+
+        assert capsys.readouterr().out.strip() == ""
+
+    def test_clean_tree_is_silent(self, workdir, monkeypatch, capsys):
+        self._run(workdir, monkeypatch, dirty=False)
+        assert capsys.readouterr().out.strip() == ""
+
+    def test_reentry_is_silent(self, workdir, monkeypatch, capsys):
+        """stop_hook_active means this hook already spoke — never answer twice."""
+        self._run(workdir, monkeypatch, stop_hook_active=True)
+        assert capsys.readouterr().out.strip() == ""
+
+    def test_opt_out_is_honoured(self, workdir, monkeypatch, capsys):
+        import argparse
+
+        monkeypatch.setenv("SUPERCLAUDE_INSIGHT_PROMPT", "0")
+        monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(workdir))
+        monkeypatch.setattr(iw, "_working_tree_changed", lambda: True)
+
+        iw.cmd_request(argparse.Namespace(session_id="sess1", stop_hook_active=False))
+
+        assert capsys.readouterr().out.strip() == ""

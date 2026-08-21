@@ -1,5 +1,6 @@
 ---
-description: Git ops w/ smart commit msgs + workflow optim. Use when user type `/sc:git` or ask for smart commit msg draft, PR body, or guided git flow. NO auto-trigger on raw git cmds like "git status", "git log", "git diff", "git push" — invoke via Bash direct.
+description: Git ops w/ smart commit msgs + workflow optim. Use ONLY when user explicit type `/sc:git` — approves history-rewriting ops (push --force, reset --hard, rebase), wrong fire cost a revert. NO auto-trigger on raw git cmds like "git status", "git log", "git diff", "git push", nor on "commit this" / "write a PR body" — invoke via Bash direct.
+disable-model-invocation: true
 ---
 <component name="git" type="command">
 

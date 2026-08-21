@@ -403,3 +403,206 @@ class TestCoreLiteSplit:
         kernel = (self.SRC_CORE / "RULES.md").read_text(encoding="utf-8")
         for module in self._modules():
             assert module in kernel, f"kernel module map missing {module}"
+
+
+LOADER_SCRIPT = (
+    Path(__file__).parent.parent.parent
+    / "src"
+    / "superclaude"
+    / "scripts"
+    / "context_loader.py"
+)
+CONTENT_ROOT = Path(__file__).parent.parent.parent / "src" / "superclaude"
+
+
+def run_loader(
+    prompt: str,
+    project_dir: Path,
+    session_id: str | None = None,
+) -> str:
+    """Invoke context_loader.py as Claude Code does; return its stdout.
+
+    ``SUPERCLAUDE_PATH`` pins the content root so injection does not depend on
+    what happens to be installed on the machine running the suite, and the
+    ``.claude/superclaude`` marker under ``project_dir`` keeps ``claude_base()``
+    — and therefore all hook state — inside the sandbox.
+    """
+    import os
+    import subprocess
+    import sys
+
+    env = os.environ.copy()
+    env["CLAUDE_PROJECT_DIR"] = str(project_dir)
+    env["SUPERCLAUDE_PATH"] = str(CONTENT_ROOT)
+    env["CLAUDE_SHOW_SKILLS"] = "0"
+    payload: dict[str, str] = {"prompt": prompt}
+    if session_id is not None:
+        payload["session_id"] = session_id
+
+    result = subprocess.run(
+        [sys.executable, str(LOADER_SCRIPT)],
+        input=json.dumps(payload),
+        capture_output=True,
+        text=True,
+        env=env,
+    )
+    assert result.returncode == 0, f"loader crashed: {result.stderr}"
+    return result.stdout
+
+
+class TestSessionScopedCache:
+    """The dedup cache is per (project, session), not per project.
+
+    Two Claude Code windows open on one repository are two sessions. Keying the
+    cache on the project alone means the first one to trigger a context marks it
+    loaded for both, and the second is silently starved (A3).
+    """
+
+    PROMPT = "analyze this --seq"
+
+    @staticmethod
+    def _project(tmp_path: Path) -> Path:
+        (tmp_path / ".claude" / "superclaude").mkdir(parents=True, exist_ok=True)
+        return tmp_path
+
+    def _state_dir(self, project: Path) -> Path:
+        return project / ".claude" / ".superclaude_hooks"
+
+    def test_second_session_still_gets_context(self, tmp_path: Path):
+        """Two sessions, one prompt: both must be injected into."""
+        project = self._project(tmp_path)
+
+        first = run_loader(self.PROMPT, project, session_id="session-A")
+        second = run_loader(self.PROMPT, project, session_id="session-B")
+
+        assert first.strip(), "session A received no injection"
+        assert second.strip(), (
+            "session B received no injection — the dedup cache is shared across "
+            "sessions instead of being keyed to one"
+        )
+
+    def test_same_session_still_dedupes(self, tmp_path: Path):
+        """Session keying must not cost the within-session dedup."""
+        project = self._project(tmp_path)
+
+        first = run_loader(self.PROMPT, project, session_id="session-A")
+        repeat = run_loader(self.PROMPT, project, session_id="session-A")
+
+        assert first.strip(), "first prompt of the session received no injection"
+        assert not repeat.strip(), "the same context was injected twice in one session"
+
+    def test_cache_file_is_named_for_the_session(self, tmp_path: Path):
+        """The filename carries both keys, so the two sessions cannot collide."""
+        project = self._project(tmp_path)
+
+        run_loader(self.PROMPT, project, session_id="session-A")
+        run_loader(self.PROMPT, project, session_id="session-B")
+
+        names = sorted(
+            p.name for p in self._state_dir(project).glob("claude_context_*")
+        )
+        assert len(names) == 2, f"expected one cache file per session, got {names}"
+        assert all(n.endswith(("_session-A.txt", "_session-B.txt")) for n in names), (
+            names
+        )
+
+    def test_missing_session_id_falls_back_to_project_key(self, tmp_path: Path):
+        """Stdin without a session id still dedupes, under the project-only name."""
+        from superclaude.utils import project_key
+
+        project = self._project(tmp_path)
+
+        first = run_loader(self.PROMPT, project)
+        repeat = run_loader(self.PROMPT, project)
+
+        assert first.strip(), "first prompt received no injection"
+        assert not repeat.strip(), "fallback path lost its dedup"
+
+        import os
+
+        os.environ["CLAUDE_PROJECT_DIR"] = str(project)
+        try:
+            expected = f"claude_context_{project_key()}.txt"
+        finally:
+            os.environ.pop("CLAUDE_PROJECT_DIR", None)
+        assert (self._state_dir(project) / expected).exists()
+
+
+class TestCommandNameResolution:
+    """A mistyped or retired /sc: name must say so, not look like a real command.
+
+    24 misspelled invocations and 25 uses of /sc:workflow — renamed to roadmap
+    with no alias left behind — resolved to nothing and were answered in silence,
+    while the loader still injected command context for them. A nonexistent
+    command looked to the model exactly like a real one (A7c).
+    """
+
+    @staticmethod
+    def _project(tmp_path: Path) -> Path:
+        (tmp_path / ".claude" / "superclaude").mkdir(parents=True, exist_ok=True)
+        return tmp_path
+
+    def test_typo_names_the_command_it_meant(self, tmp_path: Path):
+        out = run_loader("/sc:analayze this module", self._project(tmp_path), "s1")
+        assert "analayze" in out and "/sc:analyze" in out
+
+    def test_retired_name_names_its_replacement(self, tmp_path: Path):
+        out = run_loader(
+            "/sc:workflow for the auth rework", self._project(tmp_path), "s1"
+        )
+        assert "/sc:workflow" in out and "/sc:roadmap" in out
+
+    def test_unresolvable_name_injects_no_command_context(self, tmp_path: Path):
+        """Silence plus 1,469 bytes of context is the worst of both."""
+        out = run_loader("/sc:zzzzzz now", self._project(tmp_path), "s1")
+        assert "zzzzzz" in out, "an unknown command was answered in silence"
+        assert "context-inject" not in out, (
+            "command context was injected for a command that does not exist"
+        )
+
+    def test_real_command_stays_silent(self, tmp_path: Path):
+        out = run_loader("/sc:analyze this module", self._project(tmp_path), "s1")
+        assert "SuperClaude command:" not in out
+        assert "context-inject" in out, "a real command lost its context"
+
+    def test_one_notice_per_prompt(self, tmp_path: Path):
+        out = run_loader(
+            "/sc:analayze then /sc:analayze again", self._project(tmp_path), "s1"
+        )
+        assert out.count("SuperClaude command:") == 1
+
+
+class TestRetiredFlagNotices:
+    """Flags the framework removed must redirect, not vanish.
+
+    --think (175 uses), --think-hard (145) and --parellel (159) were typed long
+    after their targets were deleted, and produced nothing at all. --ultrathink
+    and --effort are native Claude Code controls, so silence is correct for them
+    (A7a, A7b, D5 — the flag is not restored, the notice carries the redirect).
+    """
+
+    @staticmethod
+    def _project(tmp_path: Path) -> Path:
+        (tmp_path / ".claude" / "superclaude").mkdir(parents=True, exist_ok=True)
+        return tmp_path
+
+    def test_retired_think_flag_redirects(self, tmp_path: Path):
+        out = run_loader("--think-hard about this", self._project(tmp_path), "s1")
+        assert out.count("SuperClaude flag:") == 1
+        assert "--think-hard" in out and "effort" in out
+
+    def test_typo_of_a_retired_flag_redirects(self, tmp_path: Path):
+        """--parellel has no valid flag within edit distance 2, so it stayed silent."""
+        out = run_loader("--parellel please", self._project(tmp_path), "s1")
+        assert out.count("SuperClaude flag:") == 1
+        assert "--delegate" in out or "--concurrency" in out
+
+    def test_native_controls_stay_silent(self, tmp_path: Path):
+        for prompt in ("--effort high", "--ultrathink about it"):
+            out = run_loader(prompt, self._project(tmp_path), "s1")
+            assert "SuperClaude flag:" not in out, f"{prompt} produced a notice"
+
+    def test_valid_flag_typo_still_suggests(self, tmp_path: Path):
+        """The existing fuzzy fallback must survive the retired-flag pass."""
+        out = run_loader("--instrospect this", self._project(tmp_path), "s1")
+        assert "--introspect" in out

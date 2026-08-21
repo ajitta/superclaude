@@ -14,32 +14,53 @@ import json
 import sys
 from pathlib import Path
 
-from superclaude.utils import hook_state_dir, project_key
-
-# Scoped to the active install, so a local-scope install resets its own cache
-# rather than one shared through ~/.claude.
-CACHE_DIR = hook_state_dir()
-
-
-def get_cache_file() -> Path:
-    """Get the context_loader cache file for the current project."""
-    return CACHE_DIR / f"claude_context_{project_key()}.txt"
+from superclaude.utils import (
+    context_cache_file,
+    prune_fallback_ledger,
+    prune_hook_state,
+)
 
 
-def reset_context_cache() -> bool:
-    """Delete the context_loader dedup cache so contexts re-inject on next prompt.
+def get_cache_file(session_id: str | None = None) -> Path:
+    """Get the context_loader cache file for this project and session.
+
+    Omitting the session id yields the project-only name, which is both the
+    pre-session-keying filename and the loader's own fallback.
+    """
+    return context_cache_file(session_id)
+
+
+def reset_context_cache(session_id: str | None = None) -> bool:
+    """Delete this session's dedup cache so contexts re-inject on next prompt.
+
+    Only this session's file and the project-only fallback are removed. A
+    concurrent window on the same repository keeps its own cache — clearing one
+    session must not force another to re-inject everything it already has.
+
+    Args:
+        session_id: Session id from the SessionStart payload, or None
 
     Returns:
-        True if cache was reset, False if no cache existed
+        True if any cache file was removed
     """
-    cache_file = get_cache_file()
-    if cache_file.exists():
+    # SessionStart is the only hook that runs once per session with nothing else
+    # to do, so the sweep for aged state rides along here.
+    prune_hook_state()
+    prune_fallback_ledger(session_id)
+
+    removed = False
+    targets = [get_cache_file(session_id)]
+    if session_id:
+        targets.append(get_cache_file())
+    for target in targets:
+        if not target.exists():
+            continue
         try:
-            cache_file.unlink()
-            return True
+            target.unlink()
+            removed = True
         except OSError:
-            return False
-    return False
+            continue
+    return removed
 
 
 def main() -> None:
@@ -51,16 +72,18 @@ def main() -> None:
 
         data = json.loads(stdin_data)
         source = data.get("source", "")
+        session_id = data.get("session_id")
     except (json.JSONDecodeError, OSError):
         # If we can't read input, reset cache defensively
         source = "unknown"
+        session_id = None
 
     # 'startup' = fresh session (no conversation history) → LLM hasn't seen prior emits
     # 'clear'   = /clear erased history → same situation
     # 'compact' = summary may drop emit details → safer to re-inject
     # 'resume'  = NOT included: history is restored, prior emits still visible to LLM
     if source in ("clear", "compact", "startup"):
-        was_reset = reset_context_cache()
+        was_reset = reset_context_cache(session_id)
         if was_reset:
             print(
                 f"🔄 Context cache reset ({source}) — dynamic contexts will re-inject"

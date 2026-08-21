@@ -1,5 +1,5 @@
 ---
-description: Generate structured implementation workflows from PRDs and feature requirements. Use when user types `/sc:roadmap` or hands over a PRD and wants a phased execution workflow (strategy, dependencies, multi-agent coordination). For a TDD implementation plan with exact file paths from a spec, use /sc:plan. Do NOT auto-trigger on "what's the order of steps" or short ad-hoc task lists — those get inline 2-3 step answer, not workflow file.
+description: Generate structured implementation workflows from PRDs and feature requirements. Use ONLY when user explicitly types `/sc:roadmap` — commits a phased workflow file, so a wrong fire skips the approval gate and creates files unasked. For a TDD implementation plan with exact file paths from a spec, use /sc:plan. Do NOT auto-trigger on "what's the order of steps" or short ad-hoc task lists — those get inline 2-3 step answer, not workflow file.
 ---
 <component name="roadmap" type="command">
 

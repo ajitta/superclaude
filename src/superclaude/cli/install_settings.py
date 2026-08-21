@@ -7,6 +7,7 @@ This is a leaf dependency with no internal imports.
 
 import json
 import re
+from collections import Counter
 from pathlib import Path
 from typing import List, Tuple
 
@@ -31,6 +32,7 @@ SUPERCLAUDE_HOOK_MARKERS = [
 # superclaude scripts directory (absolute user-scope path or
 # $CLAUDE_PROJECT_DIR/.claude/superclaude/scripts; / or \ separators).
 _SC_SCRIPTS_PATH_RE = re.compile(r"superclaude[/\\]scripts[/\\]")
+_HOOK_SCRIPT_RE = re.compile(r"([A-Za-z0-9_]+\.py)(?=\s|$)(.*)$")
 
 
 def _load_settings(settings_file: Path) -> dict:
@@ -87,6 +89,24 @@ def _hook_entry_signature(hook_entry: dict) -> tuple:
         )
     )
     return (matcher, inner)
+
+
+def _hook_script_id(hook: dict) -> str:
+    """Which script an inner hook runs, as its bare filename.
+
+    Deliberately blind to the interpreter, the directory prefix, the arguments
+    and the timeout, so one hook written with a template path and again with a
+    resolved absolute path — or re-shipped with a new flag — counts as the same
+    hook. The non-force merge uses this to decide what is *missing*; matching on
+    the whole command string instead would append a second copy of every hook
+    whose command had drifted, and a doubled loop_guard trips its circuit
+    breaker at half the intended error count.
+
+    A command that runs no .py file falls back to its normalised text.
+    """
+    command = hook.get("command", "")
+    match = _HOOK_SCRIPT_RE.search(command)
+    return match.group(1) if match else " ".join(command.split())
 
 
 def _dedup_hook_array(hooks: List[dict]) -> List[dict]:
@@ -159,9 +179,37 @@ def _merge_hook_arrays(
     if force or not existing_sc_hooks:
         # Replace SuperClaude hooks or add new ones
         return user_hooks + new_hooks
-    else:
-        # Keep existing SuperClaude hooks (skip new ones)
-        return existing
+
+    # Non-force: existing entries are authoritative and stay exactly as written,
+    # so a user's timeout or matcher edit survives. Only hooks this release ships
+    # that are not registered under their matcher yet get appended. Skipping the
+    # whole event type instead — as this used to — froze an install's hook set at
+    # whatever existed when it was first written, while its content kept updating.
+    # Counted, not just a set: if a release ever ships one script twice under the
+    # same matcher (two subcommands, say), a set would call the second one
+    # already-present and drop it. Each registration covers one shipped hook.
+    registered = Counter(
+        (entry.get("matcher", ""), _hook_script_id(hook))
+        for entry in existing_sc_hooks
+        for hook in entry.get("hooks", [])
+    )
+    additions = []
+    for entry in new_hooks:
+        matcher = entry.get("matcher", "")
+        missing = []
+        for hook in entry.get("hooks", []):
+            key = (matcher, _hook_script_id(hook))
+            if registered[key] > 0:
+                registered[key] -= 1
+            else:
+                missing.append(hook)
+        if not missing:
+            continue
+        addition = {key: value for key, value in entry.items() if key != "hooks"}
+        addition["hooks"] = missing
+        additions.append(addition)
+
+    return existing + additions
 
 
 def merge_hooks_to_settings(
@@ -216,18 +264,13 @@ def merge_hooks_to_settings(
         # Deduping on every merge is idempotent and bounds growth.
         existing_array = _dedup_hook_array(existing_array)
 
-        # Check if SuperClaude hooks already exist
-        has_sc_hooks = any(_is_superclaude_hook(h) for h in existing_array)
-
-        if has_sc_hooks and not force:
-            existing_hooks[hook_type] = existing_array
-            skipped_any = True
-            continue
-
         merged_array = _merge_hook_arrays(existing_array, new_hook_array, force)
         merged_array = _dedup_hook_array(merged_array)
         existing_hooks[hook_type] = merged_array
-        merged_any = True
+        if merged_array == existing_array:
+            skipped_any = True
+        else:
+            merged_any = True
 
     settings["hooks"] = existing_hooks
 
@@ -238,9 +281,9 @@ def merge_hooks_to_settings(
         return False, save_msg
 
     if skipped_any and not merged_any:
-        return True, f"Hooks already exist in {settings_file} (use --force to update)"
+        return True, f"Hooks already registered in {settings_file} (--force to replace)"
     elif skipped_any:
-        return True, f"Some hooks merged to {settings_file}, some skipped (existing)"
+        return True, f"New hooks merged to {settings_file}, the rest already registered"
     else:
         return True, f"Hooks merged to {settings_file}"
 
