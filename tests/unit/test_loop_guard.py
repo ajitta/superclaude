@@ -31,6 +31,10 @@ GUARD_SCRIPT = (
 
 BLOCK_THRESHOLD = 5
 
+# Captured at import, before any fixture can redirect HOME, so the assertion
+# below is about the developer's actual home directory and not a sandbox.
+REAL_HOME_STATE = Path(os.path.expanduser("~")) / ".claude" / ".superclaude_hooks"
+
 
 def run_guard(
     payload: dict,
@@ -275,3 +279,23 @@ class TestFailureModes:
         """If .claude/ missing, guard should not crash — create on write."""
         result = run_guard(post_event("Bash", "foo", "err"), tmp_path)
         assert result["decision"] == "approve"
+
+
+class TestNoRealHomeFootprint:
+    """The suite must not write into the developer's own ~/.claude.
+
+    claude_base() falls back to the real home whenever the project dir has no
+    .claude/superclaude marker, which every bare tmp_path lacks. Each run used to
+    leave a fresh loop_guard_<md5(tmp_path)>.json behind; 29 had accumulated.
+    """
+
+    def test_guard_leaves_no_footprint_in_the_real_home(self, tmp_path: Path):
+        before = set(REAL_HOME_STATE.glob("*")) if REAL_HOME_STATE.exists() else set()
+
+        run_guard(post_event("Bash", "footprint-probe", "boom"), tmp_path)
+
+        after = set(REAL_HOME_STATE.glob("*")) if REAL_HOME_STATE.exists() else set()
+        assert after == before, (
+            "the suite wrote into the real ~/.claude: "
+            f"{sorted(p.name for p in after - before)}"
+        )
