@@ -18,6 +18,46 @@ from __future__ import annotations
 import json
 import subprocess
 import sys
+from pathlib import Path
+
+
+def get_install_status() -> str:
+    """One line describing the install that is actually present.
+
+    Replaces five checkmarks printed unconditionally on every startup, naming
+    capabilities nothing had checked. The framework was absent from user scope
+    for months while that block reported it ready; a count read off disk is the
+    line that would have said so on the first day.
+
+    Returns:
+        A single status line, never empty
+    """
+    try:
+        from superclaude.utils import claude_base
+    except ImportError:
+        return "⚠️ SuperClaude: install status unavailable"
+
+    base = claude_base()
+    scope = "user" if base == Path.home() / ".claude" else "project"
+
+    def _count(*parts: str) -> int:
+        directory = base.joinpath(*parts)
+        try:
+            return sum(1 for f in directory.glob("*.md") if f.stem.upper() != "README")
+        except OSError:
+            return 0
+
+    commands = _count("commands", "sc")
+    agents = _count("agents")
+
+    if not commands:
+        return (
+            f"⚠️ SuperClaude: no commands installed at {scope} scope "
+            f"({base}) — run `superclaude install`"
+        )
+
+    agent_word = "agent" if agents == 1 else "agents"
+    return f"🛠️ SuperClaude: {commands} commands, {agents} {agent_word} ({scope} scope)"
 
 
 def reset_context_cache() -> None:
@@ -197,16 +237,8 @@ def main() -> None:
     # 5. Remind token budget
     print("💡 Use /context to confirm token budget.")
 
-    # 6. Core services
-    print()
-    print("🛠️ Core Services Available:")
-    print("  ✅ Confidence Check (pre-implementation validation)")
-    print("  ✅ Deep Research (web/MCP integration)")
-    print("  ✅ Repository Index (token-efficient exploration)")
-    print("  ✅ PR Status Check (Claude Code 2.1.20+)")
-    print("  ✅ Task Auto-Cleanup (stale task removal)")
-    print()
-    print("SC Agent ready — awaiting task assignment.")
+    # 6. What is actually installed
+    print(get_install_status())
 
 
 if __name__ == "__main__":
