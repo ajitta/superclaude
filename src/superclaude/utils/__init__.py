@@ -16,6 +16,7 @@ script code — hook CWD is not guaranteed to be the project root. See
 import hashlib
 import json
 import os
+import re
 import tempfile
 from pathlib import Path
 from typing import Any
@@ -105,6 +106,44 @@ def hook_state_dir() -> Path:
     return claude_base() / ".superclaude_hooks"
 
 
+def session_slug(session_id: str | None) -> str | None:
+    """Filename-safe form of a Claude Code session id, or None if unusable.
+
+    Session ids arrive on hook stdin, so they are stripped to characters that
+    cannot escape the state directory before being used as a path component.
+
+    Args:
+        session_id: Raw session id from hook stdin, or None
+
+    Returns:
+        Sanitised slug, or None when nothing usable remains
+    """
+    if not session_id:
+        return None
+    slug = re.sub(r"[^A-Za-z0-9_-]", "", session_id)[:64]
+    return slug or None
+
+
+def context_cache_file(session_id: str | None = None) -> Path:
+    """Path to context_loader's dedup cache for one (project, session).
+
+    Two Claude Code windows open on one repository are two sessions. Keying this
+    file on the project alone let whichever session triggered a context first
+    mark it loaded for both, starving the second of every context it should have
+    received. Callers holding no session id get the project-only name, which is
+    also the filename used before session keying.
+
+    Args:
+        session_id: Raw session id from hook stdin, or None
+
+    Returns:
+        <hook_state_dir>/claude_context_<project_key>[_<session>].txt
+    """
+    slug = session_slug(session_id)
+    suffix = f"_{slug}" if slug else ""
+    return hook_state_dir() / f"claude_context_{project_key()}{suffix}.txt"
+
+
 def project_key() -> str:
     """Stable short id for the active project, for per-project state filenames.
 
@@ -118,6 +157,6 @@ def project_key() -> str:
     """
     # usedforsecurity=False: this is a filename discriminator, not a digest, and
     # bare md5() raises under a FIPS-enforcing Python build.
-    return hashlib.md5(
-        str(project_root()).encode(), usedforsecurity=False
-    ).hexdigest()[:8]
+    return hashlib.md5(str(project_root()).encode(), usedforsecurity=False).hexdigest()[
+        :8
+    ]

@@ -141,10 +141,8 @@ class TestContextCacheKeying:
         """Regression D2: both sides keyed on os.getcwd(), so a hook firing from
         a subdirectory read a different cache file and dedup silently failed.
 
-        Only the filename is asserted. context_reset.CACHE_DIR resolves
-        hook_state_dir() once at import, which is correct for a one-shot hook
-        subprocess (the env is set before Python starts) but means the directory
-        cannot follow monkeypatched env inside a single test session.
+        Only the filename is asserted; the directory is covered by
+        TestHookStateDir.
         """
         from superclaude.scripts.context_reset import get_cache_file
 
@@ -171,6 +169,50 @@ class TestContextCacheKeying:
         monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(other))
 
         assert get_cache_file() != first
+
+    def test_cache_file_carries_the_session(self, tmp_path: Path, monkeypatch):
+        """A session id in the payload names a file of its own."""
+        from superclaude.scripts.context_reset import get_cache_file
+
+        monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(tmp_path))
+
+        scoped = get_cache_file("sess-A")
+        assert scoped != get_cache_file()
+        assert scoped.name.endswith("_sess-A.txt")
+
+    def test_reset_spares_a_concurrent_session(self, tmp_path: Path, monkeypatch):
+        """/clear in one window must not starve another window of context.
+
+        Deleting every cache file for the project would force the sibling
+        session to re-inject contexts it already holds — the same starvation,
+        pointed the other way.
+        """
+        from superclaude.scripts.context_reset import (
+            get_cache_file,
+            reset_context_cache,
+        )
+
+        monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(tmp_path))
+
+        mine = get_cache_file("sess-A")
+        theirs = get_cache_file("sess-B")
+        legacy = get_cache_file()
+        for path in (mine, theirs, legacy):
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text("modes/MODE_Brainstorming.md", encoding="utf-8")
+
+        assert reset_context_cache("sess-A") is True
+
+        assert not mine.exists(), "the resetting session kept its stale cache"
+        assert not legacy.exists(), "the pre-session-keying cache was left behind"
+        assert theirs.exists(), "reset clobbered a concurrent session's cache"
+
+    def test_reset_reports_nothing_to_do(self, tmp_path: Path, monkeypatch):
+        """No cache, no claim that one was reset."""
+        from superclaude.scripts.context_reset import reset_context_cache
+
+        monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(tmp_path))
+        assert reset_context_cache("sess-A") is False
 
 
 class TestSkillDirectories:

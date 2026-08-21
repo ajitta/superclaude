@@ -35,7 +35,7 @@ if TYPE_CHECKING:
 # stdlib-only, and hooks.json runs these scripts with the installer's own
 # interpreter ({{PYTHON_BIN}} = sys.executable), which has the package. Silently
 # degrading here would put state and content lookups in the wrong scope.
-from superclaude.utils import claude_base, hook_state_dir, project_key
+from superclaude.utils import claude_base, context_cache_file, hook_state_dir
 
 # v2.2.0: MCP fallback notification support
 try:
@@ -57,14 +57,33 @@ MAX_TOKENS_ESTIMATE = int(
 )  # ~8K tokens
 CHARS_PER_TOKEN = 4  # Rough estimate
 
-# Session tracking file (unique per project, stored in the active install's own
-# .claude — see superclaude.utils.hook_state_dir). Keyed on project_root(), not
-# the CWD: a hook firing from a subdirectory would otherwise read a different
-# cache file and silently re-inject every context.
-SESSION_ID = project_key()
+# Dedup cache file, keyed on (project, Claude Code session) and stored in the
+# active install's own .claude — see superclaude.utils.hook_state_dir.
+#
+# The project half is keyed on project_root(), not the CWD: a hook firing from a
+# subdirectory would otherwise read a different cache file and silently
+# re-inject every context. The session half stops two windows open on one
+# repository from starving each other — whichever triggered a context first used
+# to mark it loaded for both, leaving the second window with nothing. A session
+# id only arrives on stdin, so the file is resolved once per run in main(); the
+# project-only name stays as the fallback for callers holding no session id.
 _CACHE_DIR = hook_state_dir()
 _CACHE_DIR.mkdir(parents=True, exist_ok=True)
-CACHE_FILE = _CACHE_DIR / f"claude_context_{SESSION_ID}.txt"
+_ACTIVE_CACHE_FILE: Path | None = None
+
+
+def resolve_cache_file(session_id: str | None) -> Path:
+    """Pin the dedup cache to one (project, session) for the rest of the run."""
+    global _ACTIVE_CACHE_FILE
+    _ACTIVE_CACHE_FILE = context_cache_file(session_id)
+    return _ACTIVE_CACHE_FILE
+
+
+def cache_file() -> Path:
+    """Cache file resolved for this run, or the project-only fallback."""
+    if _ACTIVE_CACHE_FILE is not None:
+        return _ACTIVE_CACHE_FILE
+    return context_cache_file()
 
 
 # Base path for context files
@@ -381,9 +400,9 @@ def format_skills_summary(skills: list["TokenEstimate"]) -> str:
 
 
 def get_loaded_contexts() -> set:
-    """Read already-loaded contexts from session cache."""
-    if CACHE_FILE.exists():
-        return set(CACHE_FILE.read_text().strip().split("\n"))
+    """Read the contexts already injected into this session."""
+    if cache_file().exists():
+        return set(cache_file().read_text().strip().split("\n"))
     return set()
 
 
@@ -394,7 +413,7 @@ def mark_as_loaded(contexts: str | list[str]) -> None:
         loaded.add(contexts)
     else:
         loaded.update(contexts)
-    CACHE_FILE.write_text("\n".join(loaded))
+    cache_file().write_text("\n".join(loaded))
 
 
 def estimate_tokens(content: str) -> int:
@@ -691,6 +710,9 @@ def main() -> None:
     stdin_data = sys.stdin.read() if not sys.stdin.isatty() else ""
     prompt = _extract_prompt(stdin_data)
     session_id = _extract_session_id(stdin_data)
+    # Pin the dedup cache before anything reads it — a concurrent session in the
+    # same project must not consume the injections meant for this one.
+    resolve_cache_file(session_id)
 
     if not prompt or not prompt.strip():
         return

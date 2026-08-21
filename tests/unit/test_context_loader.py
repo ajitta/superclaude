@@ -403,3 +403,125 @@ class TestCoreLiteSplit:
         kernel = (self.SRC_CORE / "RULES.md").read_text(encoding="utf-8")
         for module in self._modules():
             assert module in kernel, f"kernel module map missing {module}"
+
+
+LOADER_SCRIPT = (
+    Path(__file__).parent.parent.parent
+    / "src"
+    / "superclaude"
+    / "scripts"
+    / "context_loader.py"
+)
+CONTENT_ROOT = Path(__file__).parent.parent.parent / "src" / "superclaude"
+
+
+def run_loader(
+    prompt: str,
+    project_dir: Path,
+    session_id: str | None = None,
+) -> str:
+    """Invoke context_loader.py as Claude Code does; return its stdout.
+
+    ``SUPERCLAUDE_PATH`` pins the content root so injection does not depend on
+    what happens to be installed on the machine running the suite, and the
+    ``.claude/superclaude`` marker under ``project_dir`` keeps ``claude_base()``
+    — and therefore all hook state — inside the sandbox.
+    """
+    import os
+    import subprocess
+    import sys
+
+    env = os.environ.copy()
+    env["CLAUDE_PROJECT_DIR"] = str(project_dir)
+    env["SUPERCLAUDE_PATH"] = str(CONTENT_ROOT)
+    payload: dict[str, str] = {"prompt": prompt}
+    if session_id is not None:
+        payload["session_id"] = session_id
+
+    result = subprocess.run(
+        [sys.executable, str(LOADER_SCRIPT)],
+        input=json.dumps(payload),
+        capture_output=True,
+        text=True,
+        env=env,
+    )
+    assert result.returncode == 0, f"loader crashed: {result.stderr}"
+    return result.stdout
+
+
+class TestSessionScopedCache:
+    """The dedup cache is per (project, session), not per project.
+
+    Two Claude Code windows open on one repository are two sessions. Keying the
+    cache on the project alone means the first one to trigger a context marks it
+    loaded for both, and the second is silently starved (A3).
+    """
+
+    PROMPT = "analyze this --seq"
+
+    @staticmethod
+    def _project(tmp_path: Path) -> Path:
+        (tmp_path / ".claude" / "superclaude").mkdir(parents=True)
+        return tmp_path
+
+    def _state_dir(self, project: Path) -> Path:
+        return project / ".claude" / ".superclaude_hooks"
+
+    def test_second_session_still_gets_context(self, tmp_path: Path):
+        """Two sessions, one prompt: both must be injected into."""
+        project = self._project(tmp_path)
+
+        first = run_loader(self.PROMPT, project, session_id="session-A")
+        second = run_loader(self.PROMPT, project, session_id="session-B")
+
+        assert first.strip(), "session A received no injection"
+        assert second.strip(), (
+            "session B received no injection — the dedup cache is shared across "
+            "sessions instead of being keyed to one"
+        )
+
+    def test_same_session_still_dedupes(self, tmp_path: Path):
+        """Session keying must not cost the within-session dedup."""
+        project = self._project(tmp_path)
+
+        first = run_loader(self.PROMPT, project, session_id="session-A")
+        repeat = run_loader(self.PROMPT, project, session_id="session-A")
+
+        assert first.strip(), "first prompt of the session received no injection"
+        assert not repeat.strip(), "the same context was injected twice in one session"
+
+    def test_cache_file_is_named_for_the_session(self, tmp_path: Path):
+        """The filename carries both keys, so the two sessions cannot collide."""
+        project = self._project(tmp_path)
+
+        run_loader(self.PROMPT, project, session_id="session-A")
+        run_loader(self.PROMPT, project, session_id="session-B")
+
+        names = sorted(
+            p.name for p in self._state_dir(project).glob("claude_context_*")
+        )
+        assert len(names) == 2, f"expected one cache file per session, got {names}"
+        assert all(n.endswith(("_session-A.txt", "_session-B.txt")) for n in names), (
+            names
+        )
+
+    def test_missing_session_id_falls_back_to_project_key(self, tmp_path: Path):
+        """Stdin without a session id still dedupes, under the project-only name."""
+        from superclaude.utils import project_key
+
+        project = self._project(tmp_path)
+
+        first = run_loader(self.PROMPT, project)
+        repeat = run_loader(self.PROMPT, project)
+
+        assert first.strip(), "first prompt received no injection"
+        assert not repeat.strip(), "fallback path lost its dedup"
+
+        import os
+
+        os.environ["CLAUDE_PROJECT_DIR"] = str(project)
+        try:
+            expected = f"claude_context_{project_key()}.txt"
+        finally:
+            os.environ.pop("CLAUDE_PROJECT_DIR", None)
+        assert (self._state_dir(project) / expected).exists()
