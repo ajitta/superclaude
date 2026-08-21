@@ -277,3 +277,50 @@ class TestRegisteredHookVisibility:
         row = list_all_components(base_path=base, scope="local")["hooks_registered"]
         assert row["installed"] == 1
         assert row["target_path"].endswith("settings.local.json")
+
+
+class TestAgentMemoryDirectory:
+    """Every agent declares a memory store; nothing created the directory.
+
+    Per .claude/rules/agent-authoring.md a local install rewrites agents to
+    `memory: local`, whose files belong at `.claude/agent-memory-local/<agent>/`.
+    That path did not exist in the one real local install on record, and nothing
+    in the CLI made it — 23 agents each pointing at a store that was not there
+    (A11-b).
+    """
+
+    def test_each_scope_gets_its_own_root(self, tmp_path):
+        from superclaude.cli.install_components import ensure_agent_memory_dir
+
+        base = tmp_path / ".claude"
+        assert ensure_agent_memory_dir(base, "user").name == "agent-memory"
+        assert ensure_agent_memory_dir(base, "project").name == "agent-memory"
+        assert ensure_agent_memory_dir(base, "local").name == "agent-memory-local"
+
+    def test_directory_is_created(self, tmp_path):
+        from superclaude.cli.install_components import ensure_agent_memory_dir
+
+        base = tmp_path / ".claude"
+        created = ensure_agent_memory_dir(base, "local")
+
+        assert created is not None and created.is_dir()
+
+    def test_unknown_scope_creates_nothing(self, tmp_path):
+        """`target` scope has no documented memory location — do not guess one."""
+        from superclaude.cli.install_components import ensure_agent_memory_dir
+
+        base = tmp_path / ".claude"
+        assert ensure_agent_memory_dir(base, "target") is None
+        assert not (base / "agent-memory").exists()
+        assert not (base / "agent-memory-local").exists()
+
+    def test_install_makes_it(self, tmp_path):
+        """End to end: a local install leaves the store its agents point at."""
+        from superclaude.cli.install_components import install_all
+
+        base = tmp_path / ".claude"
+        success, message = install_all(base_path=base, force=True, scope="local")
+
+        assert success, message
+        assert (base / "agent-memory-local").is_dir()
+

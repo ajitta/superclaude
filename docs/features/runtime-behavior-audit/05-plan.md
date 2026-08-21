@@ -205,12 +205,19 @@ hold after a week of real use, reopen the retire option.
 
 ### Task 12: Right-size the agent roster and its memory path (A6, A11-b)
 
-**Files:** Move: `src/superclaude/agents/*.md` → `docs/archive/` | Modify: `src/superclaude/cli/` (memory dir creation) | Test: `tests/unit/test_agent_structure.py`
+**Files:** Modify: `src/superclaude/cli/install_components.py`, `install_git_exclude.py` | Test: `tests/unit/test_cli_install.py`, `test_install_git_exclude.py`
+(the `agents/*.md` → `docs/archive/` move is not made — see the first item)
 
-- [ ] Keep the agents that survive Task 2 plus `self-review`; move the rest to `docs/archive/` so restoring is a file move
-- [ ] Create the scope-appropriate agent memory directory at install time — `memory: local` resolves to `.claude/agent-memory-local/<agent>/` per `.claude/rules/agent-authoring.md:128` and nothing creates it today
-- [ ] Verify: `uv run superclaude install --list` matches the kept roster; a fresh local install produces `.claude/agent-memory-local/`; `uv run pytest`
-- [ ] Commit
+- [x] **Archival half — declined on Task 2's result.** Nothing survives on usage and nothing should
+  be cut on it: 22 agents at zero invocations measures the routing layer, not the roster. Routing
+  never suggests them, and `RULES_DELEGATION.md` loads only once delegation vocabulary has already
+  been used, so no agent was ever given a path to be chosen. Archiving now would delete work that
+  was never tried. Fix routing, re-measure, then subtract — see
+  [06-diagnostics.md](./06-diagnostics.md#consequence-for-task-12)
+- [x] Create the scope-appropriate agent memory directory at install time — `memory: local` resolves to `.claude/agent-memory-local/<agent>/` per `.claude/rules/agent-authoring.md:128` and nothing creates it today
+- [x] Also add `.claude/agent-memory-local/` to the local-scope git-exclude block. Creating the store made the omission material: the first agent to write memory would otherwise leave untracked files in a team repository
+- [x] Verify: a fresh local install produces `.claude/agent-memory-local/`, its agents read `memory: local`, and `git status --untracked-files=all` reports nothing under it; `uv run pytest`
+- [x] Commit
 
 ---
 
