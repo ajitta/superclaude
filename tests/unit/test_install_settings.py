@@ -716,4 +716,3 @@ class TestNewlyShippedHookReachesAnExistingInstall:
             "PostToolUse"
         ]
         assert user_entry in entries
-

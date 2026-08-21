@@ -277,4 +277,3 @@ class TestRegisteredHookVisibility:
         row = list_all_components(base_path=base, scope="local")["hooks_registered"]
         assert row["installed"] == 1
         assert row["target_path"].endswith("settings.local.json")
-

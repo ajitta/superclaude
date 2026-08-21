@@ -434,6 +434,7 @@ def run_loader(
     env = os.environ.copy()
     env["CLAUDE_PROJECT_DIR"] = str(project_dir)
     env["SUPERCLAUDE_PATH"] = str(CONTENT_ROOT)
+    env["CLAUDE_SHOW_SKILLS"] = "0"
     payload: dict[str, str] = {"prompt": prompt}
     if session_id is not None:
         payload["session_id"] = session_id
@@ -461,7 +462,7 @@ class TestSessionScopedCache:
 
     @staticmethod
     def _project(tmp_path: Path) -> Path:
-        (tmp_path / ".claude" / "superclaude").mkdir(parents=True)
+        (tmp_path / ".claude" / "superclaude").mkdir(parents=True, exist_ok=True)
         return tmp_path
 
     def _state_dir(self, project: Path) -> Path:
@@ -525,3 +526,83 @@ class TestSessionScopedCache:
         finally:
             os.environ.pop("CLAUDE_PROJECT_DIR", None)
         assert (self._state_dir(project) / expected).exists()
+
+
+class TestCommandNameResolution:
+    """A mistyped or retired /sc: name must say so, not look like a real command.
+
+    24 misspelled invocations and 25 uses of /sc:workflow — renamed to roadmap
+    with no alias left behind — resolved to nothing and were answered in silence,
+    while the loader still injected command context for them. A nonexistent
+    command looked to the model exactly like a real one (A7c).
+    """
+
+    @staticmethod
+    def _project(tmp_path: Path) -> Path:
+        (tmp_path / ".claude" / "superclaude").mkdir(parents=True, exist_ok=True)
+        return tmp_path
+
+    def test_typo_names_the_command_it_meant(self, tmp_path: Path):
+        out = run_loader("/sc:analayze this module", self._project(tmp_path), "s1")
+        assert "analayze" in out and "/sc:analyze" in out
+
+    def test_retired_name_names_its_replacement(self, tmp_path: Path):
+        out = run_loader(
+            "/sc:workflow for the auth rework", self._project(tmp_path), "s1"
+        )
+        assert "/sc:workflow" in out and "/sc:roadmap" in out
+
+    def test_unresolvable_name_injects_no_command_context(self, tmp_path: Path):
+        """Silence plus 1,469 bytes of context is the worst of both."""
+        out = run_loader("/sc:zzzzzz now", self._project(tmp_path), "s1")
+        assert "zzzzzz" in out, "an unknown command was answered in silence"
+        assert "context-inject" not in out, (
+            "command context was injected for a command that does not exist"
+        )
+
+    def test_real_command_stays_silent(self, tmp_path: Path):
+        out = run_loader("/sc:analyze this module", self._project(tmp_path), "s1")
+        assert "SuperClaude command:" not in out
+        assert "context-inject" in out, "a real command lost its context"
+
+    def test_one_notice_per_prompt(self, tmp_path: Path):
+        out = run_loader(
+            "/sc:analayze then /sc:analayze again", self._project(tmp_path), "s1"
+        )
+        assert out.count("SuperClaude command:") == 1
+
+
+class TestRetiredFlagNotices:
+    """Flags the framework removed must redirect, not vanish.
+
+    --think (175 uses), --think-hard (145) and --parellel (159) were typed long
+    after their targets were deleted, and produced nothing at all. --ultrathink
+    and --effort are native Claude Code controls, so silence is correct for them
+    (A7a, A7b, D5 — the flag is not restored, the notice carries the redirect).
+    """
+
+    @staticmethod
+    def _project(tmp_path: Path) -> Path:
+        (tmp_path / ".claude" / "superclaude").mkdir(parents=True, exist_ok=True)
+        return tmp_path
+
+    def test_retired_think_flag_redirects(self, tmp_path: Path):
+        out = run_loader("--think-hard about this", self._project(tmp_path), "s1")
+        assert out.count("SuperClaude flag:") == 1
+        assert "--think-hard" in out and "effort" in out
+
+    def test_typo_of_a_retired_flag_redirects(self, tmp_path: Path):
+        """--parellel has no valid flag within edit distance 2, so it stayed silent."""
+        out = run_loader("--parellel please", self._project(tmp_path), "s1")
+        assert out.count("SuperClaude flag:") == 1
+        assert "--delegate" in out or "--concurrency" in out
+
+    def test_native_controls_stay_silent(self, tmp_path: Path):
+        for prompt in ("--effort high", "--ultrathink about it"):
+            out = run_loader(prompt, self._project(tmp_path), "s1")
+            assert "SuperClaude flag:" not in out, f"{prompt} produced a notice"
+
+    def test_valid_flag_typo_still_suggests(self, tmp_path: Path):
+        """The existing fuzzy fallback must survive the retired-flag pass."""
+        out = run_loader("--instrospect this", self._project(tmp_path), "s1")
+        assert "--introspect" in out

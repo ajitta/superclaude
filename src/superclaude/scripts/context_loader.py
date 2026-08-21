@@ -315,6 +315,18 @@ VALID_FLAGS = {
 CC_NATIVE_PASSTHROUGH: set[str] = {
     "ultrathink",
     "fast",  # CC-native fast mode (/fast toggle) — SC ships no behavior for it
+    "effort",  # removed from SC in 06d972b; Claude Code owns /effort now
+}
+
+# Flags this framework removed, and where their work went. Typed 479 times
+# between them after the removals landed, every one answered in silence: with no
+# valid flag inside edit distance 2, the fuzzy fallback had nothing to suggest.
+# Per D5 the flags are not restored — the notice carries the redirect.
+RETIRED_FLAGS: dict[str, str] = {
+    "think": "Use the native /effort control (--ultrathink also still works).",
+    "think-hard": "Use the native /effort control (--ultrathink also still works).",
+    "think-harder": "Use the native /effort control (--ultrathink also still works).",
+    "parallel": "Use --delegate for sub-agent fan-out, --concurrency [n] to batch calls.",
 }
 
 
@@ -350,6 +362,21 @@ def resolve_flags(prompt: str) -> tuple[str, list[str]]:
             )
             continue
 
+        # Retired flags, exact then fuzzy. Fuzzy matters as much as exact here:
+        # --parellel was typed 159 times and is a typo *of a flag that no longer
+        # exists*, so neither pass alone would have caught it.
+        if flag in RETIRED_FLAGS:
+            notifications.append(f"--{flag} was retired. {RETIRED_FLAGS[flag]}")
+            continue
+        retired_close = difflib.get_close_matches(flag, RETIRED_FLAGS, n=1, cutoff=0.6)
+        if retired_close:
+            target = retired_close[0]
+            notifications.append(
+                f"--{flag} looks like --{target}, which was retired. "
+                f"{RETIRED_FLAGS[target]}"
+            )
+            continue
+
         # Fuzzy match fallback (Levenshtein distance ≤ 2)
         close = difflib.get_close_matches(flag, VALID_FLAGS, n=3, cutoff=0.6)
         if close:
@@ -359,6 +386,71 @@ def resolve_flags(prompt: str) -> tuple[str, list[str]]:
             )
 
     return corrected, notifications
+
+
+# Commands renamed out from under their users. /sc:workflow was typed 25 times
+# after commands/workflow.md was deleted in 16b89c0 and reborn as roadmap with no
+# alias behind it.
+RETIRED_COMMANDS: dict[str, str] = {
+    "workflow": "roadmap",
+}
+
+_COMMAND_TOKEN_RE = re.compile(r"/sc:([a-zA-Z][\w-]*)")
+
+
+def _known_command_names() -> set[str]:
+    """The command names this install actually ships.
+
+    Read off disk rather than hardcoded, so adding a command cannot silently make
+    itself a typo. The installed layout keeps them in <claude_base>/commands/sc;
+    the source tree keeps them beside the rest of the content. An install with
+    neither resolves nothing, and every check below falls open.
+    """
+    for directory in (claude_base() / "commands" / "sc", BASE_PATH / "commands"):
+        try:
+            names = {
+                f.stem for f in directory.glob("*.md") if f.stem.upper() != "README"
+            }
+        except OSError:
+            continue
+        if names:
+            return names
+    return set()
+
+
+def resolve_command_name(prompt: str) -> tuple[list[str], bool]:
+    """Check the /sc: name in a prompt against what is installed.
+
+    Never rewrites the prompt. A wrong name gets one comment naming what it
+    probably meant, and when nothing plausible exists the caller suppresses
+    command context — injecting it anyway made a command that does not exist look
+    to the model exactly like one that does.
+
+    Returns:
+        (notifications, suppress_command_context)
+    """
+    match = _COMMAND_TOKEN_RE.search(prompt)
+    if not match:
+        return [], False
+
+    name = match.group(1).lower()
+    known = _known_command_names()
+    if not known or name in known:
+        return [], False
+
+    if name in RETIRED_COMMANDS:
+        replacement = RETIRED_COMMANDS[name]
+        return (
+            [f"/sc:{name} was renamed. Use /sc:{replacement}."],
+            replacement not in known,
+        )
+
+    close = difflib.get_close_matches(name, known, n=3, cutoff=0.6)
+    if close:
+        suggestions = ", ".join(f"/sc:{c}" for c in close)
+        return [f"/sc:{name} is not a command. Did you mean: {suggestions}?"], False
+
+    return [f"/sc:{name} is not a command. Run /sc:help for the list."], True
 
 
 # v2.1.0: Skills configuration
@@ -737,8 +829,18 @@ def main() -> None:
     # Execution flag directives (inline behavioral hints — no file injection)
     _emit_execution_directives(prompt)
 
+    # An unknown /sc: name must not read as a real command
+    command_notes, suppress_command_context = resolve_command_name(prompt)
+    for note in command_notes:
+        print(f"<!-- SuperClaude command: {note} -->")
+    if command_notes:
+        print()
+
     # Check triggers and get contexts to load
-    contexts = check_triggers(prompt)
+    trigger_prompt = (
+        _COMMAND_TOKEN_RE.sub("", prompt) if suppress_command_context else prompt
+    )
+    contexts = check_triggers(trigger_prompt)
 
     # --no-mcp notification — once per session
     if "--no-mcp" in prompt.lower() and "_notice:--no-mcp" not in get_loaded_contexts():
