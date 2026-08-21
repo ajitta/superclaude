@@ -1,5 +1,5 @@
 ---
-status: draft
+status: approved-for-plan
 revised: 2026-08-21
 ---
 
@@ -55,10 +55,11 @@ Downgrade to explicit-only (11), currently Tier A:
 Upgrade to auto-triggerable (2), currently Tier B: `select-tool` (console-only analysis,
 *never override explicit preference*) and `index-repo` (output ceiling written into its own bounds).
 
-**A stronger mechanism exists for the worst case.** `auto-improve` is the only command that sets
-`disable-model-invocation: true`, which blocks model selection outright rather than discouraging it
-in prose. A12 counts it as its own tier for that reason. Wording is enough for the ten downgrades
-whose worst case is a revertible edit; `git`, whose worst case is a rewritten history, is the
-candidate for the flag instead.
+**A stronger mechanism for the worst case, applied to `git`.** `disable-model-invocation: true`
+blocks model selection outright rather than discouraging it in prose; `auto-improve` was the only
+command carrying it, and A12 counts it as its own tier for that reason. Wording is enough for the
+ten downgrades whose worst case is a revertible edit. `git`, whose worst case is a rewritten
+history, now carries the flag as well (applied 2026-08-21) and keeps its wording downgrade under
+Task 8, matching `auto-improve`, which has both.
 
 Net effect: Tier A shrinks from 22 to 13.
