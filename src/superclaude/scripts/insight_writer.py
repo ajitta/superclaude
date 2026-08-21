@@ -35,7 +35,12 @@ import subprocess
 import sys
 from pathlib import Path
 
-from superclaude.utils import project_root
+from superclaude.utils import (
+    hook_state_dir,
+    project_key,
+    project_root,
+    session_slug,
+)
 
 
 def _insight_file() -> Path:
@@ -325,7 +330,10 @@ def cmd_harvest(args: argparse.Namespace) -> int:
                 rec = json.loads(raw)
             except json.JSONDecodeError:
                 continue
-            if rec.get("type") != "user" or rec.get("isMeta"):
+            # Assistant records are scanned too. Harvesting user records alone
+            # meant the only producer was the user typing INSIGHT: by hand, which
+            # happened 5 times in 10 months — the subsystem had no other source.
+            if rec.get("type") not in ("user", "assistant") or rec.get("isMeta"):
                 continue
             msg = rec.get("message", {})
             content = msg.get("content", "")
@@ -335,6 +343,10 @@ def cmd_harvest(args: argparse.Namespace) -> int:
                     for c in content
                 )
             if not isinstance(content, str):
+                continue
+            # The Stop hook's own request names the marker it is asking for.
+            # Without this, every request would harvest as an insight.
+            if REQUEST_SENTINEL in content:
                 continue
             for m in MARKER_RE.finditer(content):
                 marker_text = m.group(1).strip()
@@ -465,6 +477,86 @@ def cmd_pending_count(args: argparse.Namespace) -> int:
     return 0
 
 
+# Marks the Stop hook's own request so harvest does not read it back as an
+# insight, and so the model can see which turn it is answering.
+REQUEST_SENTINEL = "[sc-insight-request]"
+
+REQUEST_REASON = (
+    f"{REQUEST_SENTINEL} Before finishing: if this session produced a lesson "
+    "worth keeping — a non-obvious cause, a decision and its reasoning, a trap "
+    "that cost time — end your reply with one line beginning with the word "
+    "INSIGHT followed by a colon and the lesson. One line, specific enough to "
+    "act on months from now. If nothing this session qualifies, say so in a few "
+    "words and stop; do not invent one."
+)
+
+
+def _request_guard_file(session_id: str | None) -> Path:
+    """One-shot marker so a session is asked at most once."""
+    slug = session_slug(session_id) or "nosession"
+    return hook_state_dir() / f"insight_prompt_{project_key()}_{slug}.json"
+
+
+def _working_tree_changed() -> bool:
+    """Whether this project has uncommitted changes.
+
+    A proxy for "the session changed code": exact per-session attribution is not
+    available to a Stop hook, and asking after a read-only session is the cost of
+    being wrong in the harmless direction. Any git failure means no prompt.
+    """
+    try:
+        result = subprocess.run(
+            ["git", "status", "--porcelain"],
+            cwd=str(project_root()),
+            capture_output=True,
+            text=True,
+            timeout=5,
+        )
+    except (OSError, subprocess.SubprocessError):
+        return False
+    return result.returncode == 0 and bool(result.stdout.strip())
+
+
+def cmd_request(args: argparse.Namespace) -> int:
+    """Stop hook: ask the model for one INSIGHT: line, at most once per session.
+
+    The harvester works and has always worked; nothing produced the markers it
+    scans for, so it returned zero for three and a half months. The manual entry
+    point, /sc:insight, is typed a handful of times a year, and a rule attached to
+    /sc:reflect or /sc:save inherits the same problem — those have to be typed
+    too. A Stop hook is the only producer that does not.
+
+    Four gates, because a Stop hook that blocks is intrusive by construction:
+    the opt-out env var, Claude Code's own re-entry flag, one fire per session,
+    and a working tree that actually changed.
+    """
+    if os.environ.get("SUPERCLAUDE_INSIGHT_PROMPT", "1").lower() in (
+        "0",
+        "false",
+        "no",
+    ):
+        return 0
+    # Set by Claude Code when a Stop hook already continued this turn. Without
+    # this check the block below would answer itself forever.
+    if getattr(args, "stop_hook_active", False):
+        return 0
+
+    guard = _request_guard_file(getattr(args, "session_id", None))
+    if guard.exists():
+        return 0
+    if not _working_tree_changed():
+        return 0
+
+    try:
+        guard.parent.mkdir(parents=True, exist_ok=True)
+        guard.write_text(_now_iso(), encoding="utf-8")
+    except OSError:
+        return 0  # cannot guarantee one-shot, so do not ask at all
+
+    print(json.dumps({"decision": "block", "reason": REQUEST_REASON}))
+    return 0
+
+
 # ---------- main ----------
 
 
@@ -513,15 +605,29 @@ def build_parser() -> argparse.ArgumentParser:
     pc = sub.add_parser("pending-count")
     pc.set_defaults(fn=cmd_pending_count)
 
+    rq = sub.add_parser("request")
+    rq.add_argument("--session-id", default=os.environ.get("CLAUDE_SESSION_ID"))
+    rq.add_argument("--stop-hook-active", action="store_true")
+    rq.set_defaults(fn=cmd_request)
+
     return p
 
 
 def main(argv: list[str] | None = None) -> int:
     # Special hook entry points: when invoked from SessionStart/PreCompact/
-    # SessionEnd hooks, the harness pipes JSON to stdin. Parse it to extract
-    # session_id / cwd / reason|trigger automatically.
+    # SessionEnd/Stop hooks, the harness pipes JSON to stdin. Parse it to
+    # extract session_id / cwd / reason|trigger / stop_hook_active automatically.
     if argv is None:
         argv = sys.argv[1:]
+
+    if argv and argv[0] == "request-from-hook":
+        try:
+            data = json.loads(sys.stdin.read() or "{}")
+        except json.JSONDecodeError:
+            data = {}
+        argv = ["request", "--session-id", str(data.get("session_id", ""))]
+        if data.get("stop_hook_active"):
+            argv.append("--stop-hook-active")
 
     if argv and argv[0] in ("harvest-from-hook", "pending-count-from-hook"):
         try:

@@ -592,4 +592,3 @@ class TestInstallStatusLine:
         line = get_install_status()
 
         assert "no commands installed" in line.lower()
-

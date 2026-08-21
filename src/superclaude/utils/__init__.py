@@ -120,6 +120,7 @@ _PRUNABLE_PREFIXES = (
     "loop_guard_",
     "hook_tracker",
     "current_session",
+    "insight_prompt_",
 )
 
 # The fallback ledger is pruned entry by entry, not deleted: one live session's

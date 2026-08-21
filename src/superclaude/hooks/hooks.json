@@ -136,6 +136,18 @@
           }
         ]
       }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "_comment": "[superclaude] ask for one INSIGHT: line when the tree changed — once per session, SUPERCLAUDE_INSIGHT_PROMPT=0 to disable",
+            "type": "command",
+            "command": "{{PYTHON_BIN}} {{SCRIPTS_PATH}}/insight_writer.py request-from-hook",
+            "timeout": 10
+          }
+        ]
+      }
     ]
   }
 }
