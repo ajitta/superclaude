@@ -28,10 +28,10 @@ D1–D6, taken 2026-08-21, are recorded with their reasoning in
 [README.md](./README.md#decisions). Tasks cite them by number.
 
 **One tension, stated plainly.** D2 and Task 8 pull opposite ways: the tier work removes model
-access from nine commands while the root cause is that model access produces no fires. They target
-different halves — the nine are where a wrong fire mutates a repo or skips an approval gate, and the
-D2 fix is making the *safe* commands get selected. So Task 8 ships its downgrades now and holds its
-upgrades until Task 1 reports.
+access from eleven commands while the root cause is that model access produces no fires. They target
+different halves — the eleven are where a wrong fire mutates code, writes repository state, or skips
+an approval gate, and the D2 fix is making the *safe* commands get selected. So Task 8 ships its
+downgrades now and holds its upgrades until Task 1 reports.
 
 ---
 
@@ -44,7 +44,7 @@ on it, so they can proceed in parallel.
 
 **Files:** Create: `docs/features/runtime-behavior-audit/06-diagnostics.md`
 
-- [ ] Take three commands with clean Tier A wording (`analyze`, `troubleshoot`, `review`) and the plugin skills that win the same conversational cues today (caveman, karpathy-guidelines, claude-mem)
+- [ ] Take three commands with clean Tier A wording that stay Tier A after Task 8 (`analyze`, `review`, `explain`) and the plugin skills that win the same conversational cues today (caveman, karpathy-guidelines, claude-mem)
 - [ ] For each, determine whether the SuperClaude description is considered and loses, or is never considered at all — the two have different fixes
 - [ ] Check the mechanical preconditions the audit did not: description length against the 1024-char skill cap, whether project-scope commands reach the model's skill list at all, and whether the negative gate ("Do NOT auto-trigger on …") suppresses more than intended
 - [ ] Record the finding and the implied fix in the diagnostics doc
@@ -140,16 +140,17 @@ stands, and the notice carries the redirect.
 
 ### Task 8: Realign the trigger tier (A12)
 
-**Files:** Modify: `src/superclaude/commands/{git,brainstorm,design,plan,roadmap,improve,insight,pm,task}.md` | Test: `tests/unit/test_command_structure.py`
+**Files:** Modify: `src/superclaude/commands/{git,brainstorm,design,plan,roadmap,improve,insight,pm,task,troubleshoot,document}.md` | Test: `tests/unit/test_command_structure.py`
 
 - [ ] Rewrite each `description` positive cue to "Use ONLY when user explicitly types `/sc:X`", keeping the existing negative gate and staying ≤1024 chars
 - [ ] Verify: `uv run pytest tests/unit/test_command_structure.py -v` — the own-slash-command and negative-gate assertions must still pass
 - [ ] Commit
 - [ ] **Hold until Task 1 reports:** the two Tier B → A upgrades (`select-tool`, `index-repo`) and any rewriting of the 15 auto-triggerable descriptions
 
-**Rationale:** four of the nine sit behind `RULES_DOCS.md` `workflow_gates` and would create phase
-documents unasked; `git` rewrites history; `improve` mutates code; `insight` appends to
-`insights.jsonl`; `pm` and `task` orchestrate sub-agents. Tier A shrinks 22 → 15; full classification
+**Rationale:** four of the eleven sit behind `RULES_DOCS.md` `workflow_gates` and would create phase
+documents unasked; `git` rewrites history; `improve` mutates code; `troubleshoot` writes a test and
+applies a fix; `document --type inline` edits source files; `insight` appends to `insights.jsonl`;
+`pm` and `task` orchestrate sub-agents. Tier A shrinks 22 → 13; full classification
 in [05a-plan-trigger-tiers.md](./05a-plan-trigger-tiers.md).
 
 ### Task 9: Garbage-collect runtime state (A8)

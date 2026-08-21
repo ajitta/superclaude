@@ -29,7 +29,7 @@ only. Prompt history covers the full 10 months.
 
 - [03-analysis.md](./03-analysis.md) — findings A1–A12 with evidence and reproduction
 - [05-plan.md](./05-plan.md) — prioritized remediation plan with verification commands
-- [05a-plan-trigger-tiers.md](./05a-plan-trigger-tiers.md) — Task 6 detail: per-command auto-trigger classification
+- [05a-plan-trigger-tiers.md](./05a-plan-trigger-tiers.md) — Task 8 detail: per-command auto-trigger classification
 
 ## Headline
 
