@@ -14,7 +14,11 @@ import json
 import sys
 from pathlib import Path
 
-from superclaude.utils import context_cache_file
+from superclaude.utils import (
+    context_cache_file,
+    prune_fallback_ledger,
+    prune_hook_state,
+)
 
 
 def get_cache_file(session_id: str | None = None) -> Path:
@@ -39,6 +43,11 @@ def reset_context_cache(session_id: str | None = None) -> bool:
     Returns:
         True if any cache file was removed
     """
+    # SessionStart is the only hook that runs once per session with nothing else
+    # to do, so the sweep for aged state rides along here.
+    prune_hook_state()
+    prune_fallback_ledger(session_id)
+
     removed = False
     targets = [get_cache_file(session_id)]
     if session_id:

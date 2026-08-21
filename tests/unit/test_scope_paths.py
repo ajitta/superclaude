@@ -269,3 +269,90 @@ class TestContextLoaderBasePath:
         monkeypatch.chdir(subdir)
 
         assert _get_base_path() == content
+
+
+class TestHookStatePruning:
+    """Runtime state must not grow without bound.
+
+    loop_guard prunes entries *inside* a state file; nothing pruned the files.
+    A real user-scope state directory had accumulated 25 context caches and 25
+    loop-guard files, the oldest from a project key that no longer resolves (A8).
+    """
+
+    @staticmethod
+    def _age(path: Path, days: float) -> Path:
+        import os
+        import time
+
+        old = time.time() - days * 86400
+        os.utime(path, (old, old))
+        return path
+
+    def test_aged_state_is_removed(self, tmp_path: Path, monkeypatch):
+        from superclaude.utils import hook_state_dir, prune_hook_state
+
+        monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(tmp_path))
+        state = hook_state_dir()
+        state.mkdir(parents=True, exist_ok=True)
+
+        stale = state / "claude_context_deadbeef.txt"
+        stale.write_text("modes/MODE_Brainstorming.md", encoding="utf-8")
+        self._age(stale, days=30)
+        fresh = state / "claude_context_cafebabe.txt"
+        fresh.write_text("modes/MODE_Brainstorming.md", encoding="utf-8")
+
+        removed = prune_hook_state()
+
+        assert not stale.exists(), "aged state file survived the sweep"
+        assert fresh.exists(), "live state was collected"
+        assert removed == 1
+
+    def test_unknown_files_are_left_alone(self, tmp_path: Path, monkeypatch):
+        """The sweep deletes state it recognises, not whatever shares the dir."""
+        from superclaude.utils import hook_state_dir, prune_hook_state
+
+        monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(tmp_path))
+        state = hook_state_dir()
+        state.mkdir(parents=True, exist_ok=True)
+
+        stranger = state / "someone_elses_notes.md"
+        stranger.write_text("keep me", encoding="utf-8")
+        self._age(stranger, days=90)
+
+        prune_hook_state()
+
+        assert stranger.exists()
+
+    def test_fallback_ledger_is_never_deleted_wholesale(
+        self, tmp_path: Path, monkeypatch
+    ):
+        """mcp_fallbacks.json is pruned by entry, so the file itself stays."""
+        from superclaude.utils import hook_state_dir, prune_hook_state
+
+        monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(tmp_path))
+        state = hook_state_dir()
+        state.mkdir(parents=True, exist_ok=True)
+
+        ledger = state / "mcp_fallbacks.json"
+        ledger.write_text("{}", encoding="utf-8")
+        self._age(ledger, days=90)
+
+        prune_hook_state()
+
+        assert ledger.exists()
+
+    def test_session_start_sweeps(self, tmp_path: Path, monkeypatch):
+        """The sweep is wired to the hook that already runs at session start."""
+        from superclaude.scripts.context_reset import reset_context_cache
+        from superclaude.utils import hook_state_dir
+
+        monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(tmp_path))
+        state = hook_state_dir()
+        state.mkdir(parents=True, exist_ok=True)
+        stale = state / "loop_guard_deadbeef.json"
+        stale.write_text('{"entries": []}', encoding="utf-8")
+        self._age(stale, days=30)
+
+        reset_context_cache("sess-A")
+
+        assert not stale.exists()

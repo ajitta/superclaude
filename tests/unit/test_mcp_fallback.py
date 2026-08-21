@@ -178,3 +178,106 @@ class TestMcpFallbackCleanup:
             ),
         ):
             yield tracker_dir
+
+
+class TestFallbackLedgerPruning:
+    """The ledger gains one entry per session and never shed any.
+
+    A real user-scope copy still held a key from the 16-hex scheme retired in
+    April, and hints for `magic` and `morphllm` — MCP servers no longer in the
+    roster at all (A8).
+    """
+
+    def _ledger(self, tmp_path, monkeypatch, data):
+        import json
+
+        from superclaude.utils import hook_state_dir
+
+        monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(tmp_path))
+        state = hook_state_dir()
+        state.mkdir(parents=True, exist_ok=True)
+        path = state / "mcp_fallbacks.json"
+        path.write_text(json.dumps(data), encoding="utf-8")
+        return path
+
+    @staticmethod
+    def _stamp(days_ago: int) -> str:
+        from datetime import datetime, timedelta
+
+        return (datetime.now() - timedelta(days=days_ago)).isoformat()
+
+    def test_aged_sessions_are_dropped(self, tmp_path, monkeypatch):
+        import json
+
+        from superclaude.utils import prune_fallback_ledger
+
+        path = self._ledger(
+            tmp_path,
+            monkeypatch,
+            {
+                "old-session": {"serena": self._stamp(90)},
+                "recent-session": {"serena": self._stamp(1)},
+            },
+        )
+
+        prune_fallback_ledger()
+
+        data = json.loads(path.read_text(encoding="utf-8"))
+        assert "old-session" not in data
+        assert "recent-session" in data
+
+    def test_current_session_survives_regardless_of_age(self, tmp_path, monkeypatch):
+        import json
+
+        from superclaude.utils import prune_fallback_ledger
+
+        path = self._ledger(
+            tmp_path, monkeypatch, {"live": {"serena": self._stamp(90)}}
+        )
+
+        prune_fallback_ledger(session_id="live")
+
+        assert "live" in json.loads(path.read_text(encoding="utf-8"))
+
+    def test_retired_servers_are_dropped(self, tmp_path, monkeypatch):
+        import json
+
+        from superclaude.utils import prune_fallback_ledger
+
+        path = self._ledger(
+            tmp_path,
+            monkeypatch,
+            {
+                "live": {
+                    "serena": self._stamp(0),
+                    "magic": self._stamp(0),
+                    "morphllm": self._stamp(0),
+                }
+            },
+        )
+
+        prune_fallback_ledger(session_id="live")
+
+        assert set(json.loads(path.read_text(encoding="utf-8"))["live"]) == {"serena"}
+
+    def test_emptied_session_is_removed(self, tmp_path, monkeypatch):
+        import json
+
+        from superclaude.utils import prune_fallback_ledger
+
+        path = self._ledger(tmp_path, monkeypatch, {"live": {"magic": self._stamp(0)}})
+
+        prune_fallback_ledger(session_id="live")
+
+        assert json.loads(path.read_text(encoding="utf-8")) == {}
+
+    def test_roster_matches_the_fallback_table(self):
+        """utils keeps its own copy to stay dependency-free — it must not drift.
+
+        If the two disagree, the sweep either deletes hints for a live server or
+        keeps hints for a dead one.
+        """
+        from superclaude.hooks.mcp_fallback import MCP_FALLBACKS
+        from superclaude.utils import CURRENT_MCP_SERVERS
+
+        assert set(MCP_FALLBACKS) == set(CURRENT_MCP_SERVERS)
