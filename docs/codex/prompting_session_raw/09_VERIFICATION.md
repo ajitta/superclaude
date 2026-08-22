@@ -83,7 +83,7 @@ raw session
 
 ## 실행 증거
 
-### 문서 자체
+### 문서 자체 (`@a358bcb`)
 
 ```text
 대상: README.md, 01~09
@@ -94,6 +94,9 @@ trailing whitespace: PASS
 git diff --check: PASS
 총 문서 줄 수: 2,233
 ```
+
+줄 수는 문서를 고칠 때마다 바뀌는 측정치다. 위 값은 원 검증 시점 관측이며 현재
+값은 `wc -l README.md 0[1-9]_*.md`로 재측정한다.
 
 실제 신규 파일은 `git status --short`로 확정해 검사했다. 따라서 untracked 파일을
 보지 못하는 `git diff --check`만으로 PASS를 선언하지 않았다.
