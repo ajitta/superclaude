@@ -2,6 +2,7 @@
 title: SuperClaude 개선·검증 가이드
 status: verified-guide
 last_verified: 2026-08-22
+measured_at: 5b6dc5b
 scope: src/superclaude
 ---
 
@@ -30,13 +31,14 @@ scope: src/superclaude
 | [`07_ai_operator_runbook.md`](07_ai_operator_runbook.md) | Claude/Codex가 실제 변경할 때 | 한 번의 개선 작업을 어떤 계약과 증거로 수행하는가? |
 | [`08_current_findings_and_backlog.md`](08_current_findings_and_backlog.md) | 우선순위 결정 시 | 현재 확인된 사각지대와 다음 개선 후보는 무엇인가? |
 | [`09_VERIFICATION.md`](09_VERIFICATION.md) | 문서 신뢰도 확인 시 | 이 문서 묶음을 무엇과 대조했고 어떤 gap을 수정했는가? |
+| [`10_improvement_plan.md`](10_improvement_plan.md) | 문서가 최신인지 의심될 때 | 마지막 재검증에서 무엇이 낡았고 어떻게 재발을 막는가? |
 
 ## 추천 읽기 경로
 
 - 새 에이전트: `01 → 02 → 07 → 변경 대상별 03 또는 04 → 05`
 - 콘텐츠 저작자: `02 → 03 → 05 → 06`
 - 런타임·설치 개발자: `02 → 04 → 05 → 08`
-- 리뷰어·릴리스 담당자: `05 → 06 → 08 → 09`
+- 리뷰어·릴리스 담당자: `05 → 06 → 08 → 09 → 10`
 
 ## 증거 등급
 
@@ -63,9 +65,17 @@ scope: src/superclaude
 
 ## 문서 갱신 규칙
 
-- 구성요소 수와 테스트 명령은 스냅샷이다. 변경 시 소스에서 다시 계산한다.
+- 수치는 두 계층으로 나눈다. **구성요소 인벤토리**는
+  [`02_component_and_delivery_map.md`](02_component_and_delivery_map.md) §1이 유일한
+  기재 위치이고 `tests/unit/test_codex_component_map.py`가 소스에서 직접 세어 강제한다.
+  **커밋마다 바뀌는 측정치**(pytest 카운트, coverage, description 문자 수, format 대상,
+  mypy 오류, OKF 카운트)는 [`08_current_findings_and_backlog.md`](08_current_findings_and_backlog.md)가
+  소유하며, 값 대신 재측정 명령과 마지막 관측 커밋을 함께 적는다.
+- 문서를 근거로 쓰기 전에 신선도를 확인한다. frontmatter의 `measured_at` SHA에 대해
+  `git log <SHA>..HEAD -- src/superclaude/`가 비어 있지 않으면 해당 수치는 재측정 대상이다.
 - 새 규칙은 기존 단일 진실 공급원(SSOT)을 대체하지 않는다. 이 디렉터리에는
   원문 규칙을 복사하지 않고 링크, 게이트, 작업 순서만 둔다.
 - 현재 발견이 수정되면 `08_current_findings_and_backlog.md`에서 상태와 검증
-  증거를 함께 갱신한다.
+  증거를 함께 갱신한다. 해결된 항목은 삭제하지 않고 §해결된 finding으로 옮겨
+  수정 커밋과 현재 코드 위치를 남긴다.
 - 행동 기본값을 바꾸면 `evals/`에 회귀 케이스를 먼저 또는 동시에 추가한다.

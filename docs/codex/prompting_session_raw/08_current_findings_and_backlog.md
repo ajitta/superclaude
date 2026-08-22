@@ -2,14 +2,20 @@
 title: 현재 검증 사각지대와 개선 백로그
 status: verified-snapshot
 last_verified: 2026-08-22
+measured_at: 5b6dc5b
 scope: repository-wide evidence relevant to src/superclaude
 ---
 
 # 현재 검증 사각지대와 개선 백로그
 
-이 문서는 이번 분석에서 직접 재현했거나 source/test를 대조해 확인한 사실을
-기록한다. 이 작업에서는 결함을 수정하지 않았다. 상태가 바뀌면 증거와 함께
-항목을 갱신한다.
+이 문서는 직접 재현했거나 source/test를 대조해 확인한 사실을 기록한다. 결함 자체는
+수정하지 않는다. 상태가 바뀌면 증거와 함께 항목을 갱신한다.
+
+커밋마다 바뀌는 측정치(pytest 카운트, coverage, description 문자 수, format 대상,
+mypy 오류, OKF 카운트)는 이 문서가 소유한다. 값은 재측정 명령과 마지막 관측 커밋을
+함께 적는다. `git log <SHA>..HEAD -- src/`가 비어 있지 않으면 값을 재측정한다.
+구성요소 인벤토리는 여기 두지 않고
+[`02_component_and_delivery_map.md`](02_component_and_delivery_map.md) §1이 소유한다.
 
 ## 요약
 
@@ -17,7 +23,7 @@ scope: repository-wide evidence relevant to src/superclaude
 |---|---|---|---|
 | F-001 | P0 | FAIL | wheel/sdist에서 `skills/` 전체 누락 |
 | F-002 | P0 | FAIL | `make verify`, `make test-plugin` false-green 가능 |
-| F-003 | P0 | FAIL | 핵심 활성화 실패가 install 성공값에 반영되지 않음 |
+| F-003 | P0 | FIXED | 핵심 활성화 실패가 install 성공값에 반영되지 않음 — `f25d91a`/`e360ca5`에서 해결, §해결된 finding 참조 |
 | F-004 | P1 | REVISE | drift/audit가 runtime payload 일부를 의도적으로 제외 |
 | F-005 | P1 | FAIL | skill authoring guide와 validator 정책 충돌 |
 | F-006 | P1 | REVISE | 기본 pytest가 script suite와 canary를 제외 |
@@ -76,22 +82,6 @@ packaged skill 설치가 실패할 수 있다.
 - 의도적으로 plugin/doctor를 실패시키는 meta-test
 - 성공 메시지는 모든 하위 검사 통과 후에만 출력
 
-## F-003 — install 성공값의 활성화 사각지대
-
-**등급:** `[REPO]` · P0 · TOOL/DIST
-
-`install_components.py:468-470,508-533,547-548`을 대조했다.
-
-- agent memory directory 생성 결과가 누적 failure에 포함되지 않음
-- `CLAUDE_SC.md` 설치 실패가 메시지에만 반영됨
-- `CLAUDE.md`/`CLAUDE.local.md` import 실패가 warning에만 반영됨
-- local git exclude 실패가 warning에만 반영됨
-- 최종 success는 `total_failed == 0`만 확인
-
-모든 항목의 severity가 같을 필요는 없지만, framework가 활성화되지 않는 실패를
-성공으로 반환해서는 안 된다. 필수/선택 activation 항목을 schema로 분류하고 필수
-실패는 nonzero로 전파해야 한다.
-
 ## F-004 — drift/audit coverage boundary
 
 **등급:** `[REPO]` · P1 · DIST
@@ -123,17 +113,17 @@ tests가 같은 schema를 소비한다.
 
 **등급:** `[REPO]` · P1 · EVAL
 
-2026-08-22 실행 결과:
+재측정 명령과 마지막 관측:
 
 ```text
 uv run pytest -q
-→ 2157 passed, 28 skipped, 4 deselected
+→ 2279 passed, 28 skipped, 4 deselected   @5b6dc5b
 
 make test-scripts
-→ 120 passed
+→ 120 passed                              @a358bcb
 
 uv run python evals/run_eval.py --dry-run
-→ 4 arms × 7 tasks, 28 workspace build 성공
+→ 4 arms × 7 tasks, 28 workspace build 성공  @a358bcb
 ```
 
 `pyproject.toml:98-107`은 `tests/unit/scripts`와 `canary`를 기본 제외한다. 실제
@@ -153,8 +143,9 @@ model/CLI가 필요한 canary와 parallel A/B E2E도 조건 없이 전체 green�
 - `RESEARCH_CONFIG.md`는 mode structure fixture 밖에 있음
 - template taxonomy/authoring guide와 UI-GUIDE acceptance가 없음
 - cross-reference 수집은 commands/agents/modes 중심이며 skills/MCP edge를 빠뜨림
-- agent trigger uniqueness는 deprecated `triggers - ...` 형태만 파싱해 현재
-  문장형 description에서는 사실상 검사가 비어 있음
+- agent trigger uniqueness 검사가 없음. `tests/unit/test_agent_structure.py`의
+  `test_description_has_cc_idiom_trigger`는 delegation trigger 문장의 존재만 확인하며,
+  인접 agent 사이의 trigger 중복은 어떤 테스트도 보지 않음
 - structure test 다수는 full YAML/XML semantic parser가 아닌 line/regex 기반
 
 완료 gate: component catalog graph를 한 번 생성해 filename, schema, README,
@@ -164,12 +155,12 @@ loader, installer, handoff, reference의 양방향 parity를 검증한다.
 
 **등급:** `[REPO]` 측정 + `[HYPOTHESIS]` 영향 · P1 · CONTEXT/B12
 
-YAML로 description을 파싱한 현재 문자 수:
+YAML로 description을 파싱한 문자 수 (마지막 관측 `@5b6dc5b`):
 
 ```text
-commands: 11,507
+commands: 11,594
 skills:    1,831
-total:    13,338
+total:    13,425
 ```
 
 재현 시 Markdown 본문에서 `description:` 문자열을 검색하지 않고 각 파일의 YAML
@@ -192,24 +183,34 @@ silent truncation될 위험은 측정해야 한다.
 
 **등급:** `[REPO]` · P1 · TOOL
 
-2026-08-22:
+재측정 명령과 마지막 관측 `@5b6dc5b`:
 
 ```text
 uv run ruff check .
 → pass
 
 uv run ruff format --check .
-→ exit 1
+→ exit 1; 10 files would be reformatted, 104 files already formatted
 ```
 
-기존 재포맷 대상:
+재포맷 대상:
 
-- `tests/unit/test_cli_install.py`
-- `tests/unit/test_install_git_exclude.py`
-- `tests/unit/test_install_interactive.py`
+```text
+src/superclaude/cli/install_inventory.py
+src/superclaude/scripts/context_loader.py
+src/superclaude/scripts/insight_writer.py
+tests/integration/test_readonly_session_is_quiet.py
+tests/unit/test_cli_install.py
+tests/unit/test_context_loader.py
+tests/unit/test_insight_writer.py
+tests/unit/test_install_git_exclude.py
+tests/unit/test_install_interactive.py
+tests/unit/test_install_settings.py
+```
 
-현재 작업이 문서-only라 이 파일을 부수적으로 바꾸지 않는다. 릴리스 hard gate로
-전체 format check를 요구하려면 baseline을 별도 변경으로 정리한다.
+목록의 성격이 바뀐 점에 주의한다. `a358bcb` 시점에는 테스트 파일 3개뿐이었으나 지금은
+배포되는 `src/` 모듈 3개가 포함된다. 수치 증가가 아니라 상태 변화이며, 릴리스 hard
+gate로 전체 format check를 요구하려면 baseline을 별도 변경으로 정리한다.
 
 ## F-010 — 자동 개선/A-B 의미론 공백
 
@@ -288,16 +289,29 @@ user home의 `.claude`에 고정해 확인한다. project/local 설치 진단과
 
 **등급:** `[REPO]` · P2 · EVAL
 
-다음 정확한 명령에서 전체 coverage는 38%였고 `coverage.report.fail_under`가 없다.
+다음 정확한 명령에서 전체 coverage는 42%였고(`@5b6dc5b`, 4,809 stmts / 2,770 miss)
+`coverage.report.fail_under`가 없다.
 
 ```bash
 uv run pytest --cov=superclaude --cov-report=term -q
 ```
 
 coverage target을 `src/superclaude` path로 바꾸면 다른 분모와 결과가 나올 수 있으므로
-baseline 비교에서는 target과 명령을 고정한다. `uv run mypy src/superclaude`는
-hyphenated skill directory 때문에 package-name 단계에서 실패한다. Python-only
-하위 경로를 명시해 실행하면 15개 파일의 43개 오류가 남는다.
+baseline 비교에서는 target과 명령을 고정한다.
+
+mypy도 명령을 고정한다. package 전체 실행은 hyphenated skill directory 때문에
+package-name 단계에서 실패하므로, Python 전용 하위 경로를 명시해야 오류 수를 얻는다.
+
+```bash
+uv run mypy src/superclaude
+# exit 2 — "confidence-check is not a valid Python package name"   @5b6dc5b
+
+uv run mypy src/superclaude/cli src/superclaude/utils src/superclaude/hooks
+# Found 35 errors in 10 files (checked 19 source files)             @5b6dc5b
+```
+
+두 번째 명령의 경로 집합이 새 baseline이다. 이전 기록(15 files, 43 errors)은 실행
+경로를 남기지 않아 재현할 수 없으므로 비교 대상으로 쓰지 않는다.
 
 따라서 현재 “90%” 또는 “mypy clean”을 이미 존재하는 hard gate로 주장하지 않는다.
 먼저 측정 범위와 baseline을 정하고, 변경 파일 또는 위험 모듈부터 점진 gate를
@@ -308,10 +322,15 @@ hyphenated skill directory 때문에 package-name 단계에서 실패한다. Pyt
 **등급:** `[REPO]` · P1 · CONTEXT/DIST
 
 `src/superclaude/ARCHITECTURE.md:204-208`은 `okf/superclaude/`가 각 source
-component를 `resource`로 가리키는 generated catalog라고 선언한다. 현재 작업 트리의
-OKF resource는 source concept 87개와 대응하지만, tracked resource는 82개뿐이다.
-빠진 5개는 모두 `okf/superclaude/skills/*.md`이며 `.gitignore`의 광범위한
-`skills/` 패턴이 무시한다.
+component를 `resource`로 가리키는 generated catalog라고 선언한다. 마지막 관측
+`@5b6dc5b`에서 on-disk resource는 94개, tracked resource는 88개다. 빠진 6개는 모두
+`okf/superclaude/skills/*.md`이며 `.gitignore`의 광범위한 `skills/` 패턴이 무시한다.
+
+```bash
+find okf/superclaude -name '*.md' | wc -l     # 94
+git ls-files okf/superclaude | wc -l          # 88
+git ls-files okf/superclaude | grep -c skills/  # 0
+```
 
 영향: 현재 checkout에서는 catalog가 완전해 보여도 새 clone 또는 배포된 저장소의
 agent-readable catalog에는 skill concept가 없다.
@@ -340,11 +359,39 @@ repository에 없어 현재 `make build-plugin`은 exit 2다.
 - build failure가 sync/release를 nonzero로 차단
 - source와 plugin artifact의 version·inventory parity
 
+## 해결된 finding
+
+여기 있는 항목은 실제 코드로 수정됐다. 재발 여부를 추적할 수 있도록 수정 커밋과 현재
+코드 위치를 함께 남긴다.
+
+### F-003 — install 성공값의 활성화 사각지대 (해결됨)
+
+**등급:** `[REPO]` · P0 · TOOL/DIST · 해결 커밋 `f25d91a`, `e360ca5`
+
+원래 판정은 install 성공값이 활성화 실패 네 종류를 무시한다는 것이었다. 현재 코드는
+네 종류를 모두 누적 실패에 반영한다.
+
+| 활성화 항목 | 현재 위치 | 처리 |
+|---|---|---|
+| agent memory directory | `install_components.py:469-473` | `except OSError` → `total_failed += 1` |
+| `CLAUDE_SC.md` 설치 | `install_components.py:511-515` | 실패 시 `total_failed += 1` |
+| `CLAUDE.md` import | `install_components.py:528-534` | 실패 시 `total_failed += 1` |
+| local scope git exclude | `install_components.py:539-544` | 실패 시 `total_failed += 1` |
+
+`install_components.py:558`의 `overall_success = total_failed == 0`이 그대로이므로,
+활성화 실패는 이제 프로세스 실패로 전파된다. `528-534`에는 판단 근거가 주석으로 남아
+있다: *"Counted, not merely warned: without the import the framework is installed and
+inert, which is the state the summary would otherwise call a success."*
+
+잔여 사항: 필수/선택 activation 항목의 schema 분류는 도입되지 않았다. 현재 구현은 네
+항목을 모두 필수로 취급한다. 선택 항목을 도입할 이유가 생기기 전까지 이는 결함이 아니라
+설계 선택이다.
+
 ## 권장 실행 순서
 
 ```text
 1. F-001 distribution payload completeness
-2. F-002/F-003 exit-status와 install truthfulness
+2. F-002 exit-status truthfulness (F-003은 해결됨)
 3. F-004 clean artifact/runtime parity
 4. F-005 machine-readable authoring schema
 5. F-006/F-009 release gate baseline 정렬

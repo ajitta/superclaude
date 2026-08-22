@@ -9,8 +9,13 @@ scope: src/superclaude
 
 ## 1. 현재 스냅샷
 
-`2026-08-22` 소스 트리에서 캐시와 README를 제외해 센 결과다. 수치는 변경될
-수 있으므로 릴리스 판단에는 다시 계산한다.
+`5b6dc5b` 소스 트리에서 캐시와 README를 제외해 센 결과다. 이 표는 구성요소
+인벤토리의 단일 기재 위치이며, 다른 문서는 값을 복사하지 않고 이 절을 가리킨다.
+`tests/unit/test_codex_component_map.py`가 소스에서 직접 세어 이 표와 대조한다.
+
+pytest 카운트, coverage, description 문자 수처럼 커밋마다 바뀌는 측정치는 이 표에
+두지 않는다. 그 값들은 `08_current_findings_and_backlog.md`가 재측정 명령과 함께
+소유한다.
 
 | 요소 | 현재 수 | 역할 |
 |---|---:|---|
@@ -20,7 +25,7 @@ scope: src/superclaude
 | `core/rules/*.md` | 4 | on-demand 상세 규칙 |
 | `modes/MODE_*.md` | 7 | 인지 자세, HOW TO THINK |
 | `modes/*CONFIG*.md` | 1 | mode 지원 설정 |
-| `mcp/MCP_*.md` | 6 | SC workflow에서 MCP를 WHEN/HOW 사용 |
+| `mcp/MCP_*.md` | 5 | SC workflow에서 MCP를 WHEN/HOW 사용 |
 | `skills/*/SKILL.md` | 5 | CC-native capability/reference |
 | `templates/docs-scaffold/*` | 4 | `/sc:init` 문서 scaffold |
 | distinct hook entry scripts | 10 | `hooks.json`의 14개 등록에서 직접 호출 |

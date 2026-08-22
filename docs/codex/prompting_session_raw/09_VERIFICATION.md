@@ -3,7 +3,9 @@ phase: superclaude-improvement-verification-guides
 verified: 2026-08-22
 status: passed
 score: "8/8 must-haves verified"
-repository_findings_open: F-001..F-016
+measured_at: a358bcb
+revalidated_at: 5b6dc5b
+repository_findings_open: "F-001..F-002, F-004..F-016 (15 open; F-003 fixed)"
 human_verification:
   - "인증·비용이 필요한 model canary/full matrix는 NOT RUN"
 ---
@@ -12,11 +14,15 @@ human_verification:
 
 ## 판정
 
-**문서 목표: PASS — 8/8 must-haves verified.**
+**문서 목표: PASS — 8/8 must-haves verified.** 측정 커밋 `a358bcb`.
 
 이 판정은 문서 묶음이 `src/superclaude`의 분석·개선·검증 가이드로서 정확하고
 실행 가능하다는 뜻이다. `08_current_findings_and_backlog.md`에 기록된 저장소 결함이
-해결됐다는 뜻은 아니다. 현재 저장소에는 F-001~F-016이 열린 상태로 남아 있다.
+해결됐다는 뜻은 아니다.
+
+**판정의 유효 범위.** 이 PASS는 `measured_at` 커밋 기준이다.
+`git log <measured_at>..HEAD -- src/`가 비어 있지 않으면 재검증 전까지 `passed`를
+신뢰하지 않는다. 아래 §재검증이 마지막 재확인 결과를 담는다.
 
 검증은 `gsd-verifier`의 goal-backward audit로 1차 수행했고, 발견된 gap을 수정한
 뒤 main agent가 각 근거와 실행 결과를 다시 확인했다.
@@ -48,6 +54,7 @@ human_verification:
 | `07_ai_operator_runbook.md` | Claude/Codex 실행·보고 계약 | VERIFIED |
 | `08_current_findings_and_backlog.md` | 검증된 현재 상태와 우선순위 | VERIFIED |
 | `09_VERIFICATION.md` | 독립 검증, 수정 내역, 잔여 위험 | VERIFIED |
+| `10_improvement_plan.md` | 문서 셋 재검증 결과와 드리프트 방지 계획 | VERIFIED `@5b6dc5b` |
 
 핵심 연결은 다음과 같다.
 
@@ -91,7 +98,10 @@ git diff --check: PASS
 실제 신규 파일은 `git status --short`로 확정해 검사했다. 따라서 untracked 파일을
 보지 못하는 `git diff --check`만으로 PASS를 선언하지 않았다.
 
-### 저장소 기준선
+### 저장소 기준선 (`@a358bcb`)
+
+아래는 원 검증 시점의 관측이다. 현재 값은 §재검증과
+[`08_current_findings_and_backlog.md`](08_current_findings_and_backlog.md)를 본다.
 
 | 명령 | 결과 |
 |---|---|
@@ -104,7 +114,7 @@ git diff --check: PASS
 | `uv run mypy src/superclaude` | hyphenated package-name 오류; exit 2 |
 | Python-only mypy 범위 | 15 files, 43 errors; exit 1 |
 
-### Distribution과 파생 경로
+### Distribution과 파생 경로 (`@a358bcb`)
 
 | Probe | 결과 |
 |---|---|
@@ -114,6 +124,42 @@ git diff --check: PASS
 | description YAML 합계 | commands 11,507, skills 1,831, total 13,338 |
 | OKF resources | on-disk 87, tracked 82, tracked skill concepts 0 |
 | plugin input | `plugins/superclaude/manifest/metadata.json` missing; F-016 |
+
+## 재검증 `@5b6dc5b`
+
+원 검증 이후 `src/superclaude/`를 바꾼 커밋 9개가 병합됐다. 전체 재검증 결과와 개선
+계획은 [`10_improvement_plan.md`](10_improvement_plan.md)에 있다. 요지만 남긴다.
+
+문서 구조는 통과를 유지한다. frontmatter, 상대 링크, code fence, trailing whitespace
+검사가 신규 문서를 포함해 모두 통과했다.
+
+기준선 변화:
+
+| 항목 | `@a358bcb` | `@5b6dc5b` |
+|---|---|---|
+| `uv run pytest -q` | 2157 passed | 2279 passed, 28 skipped, 4 deselected |
+| coverage TOTAL | 38% | 42% |
+| `ruff format --check .` 대상 | 3 files (모두 tests) | 10 files (`src/` 3개 포함) |
+| commands description | 11,507자 | 11,594자 |
+| description total | 13,338자 | 13,425자 |
+| `mcp/MCP_*.md` | 6 | 5 (`0a37af8` Sequential 제거) |
+| OKF on-disk / tracked | 87 / 82 | 94 / 88 |
+
+finding 상태 변화:
+
+- `F-003` **해결됨**. `install_components.py`가 활성화 실패 네 종류를 모두
+  `total_failed`에 반영한다. 상세는 `08`의 §해결된 finding.
+- 나머지 15개는 재현된다. `F-001`은 wheel/sdist에 `superclaude/skills/` 0개로 그대로
+  재현됐고, 대조군(templates 4, commands 38)은 정상이다.
+- `F-007`의 근거 서술을 정정했다. agent trigger uniqueness 검사가 없다는 결론은
+  유효하지만, `triggers` 필드 파싱은 현재 테스트에 존재하지 않는다.
+- `F-009`는 성격이 바뀌었다. 재포맷 대상에 배포되는 `src/` 모듈 3개가 포함된다.
+- `F-014`의 mypy 값은 실행 경로가 기록되지 않아 재현할 수 없었다. 명령을 고정한 새
+  baseline으로 교체했다.
+
+재발 방지: 구성요소 인벤토리는 `02` §1을 단일 기재 위치로 두고
+`tests/unit/test_codex_component_map.py`가 소스에서 직접 세어 대조한다. 커밋마다 바뀌는
+측정치는 `08`이 재측정 명령과 관측 커밋을 함께 소유하며 테스트로 강제하지 않는다.
 
 ## NOT RUN과 잔여 위험
 

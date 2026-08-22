@@ -16,7 +16,7 @@ uv pip install -e ".[dev]"                 # Install editable
 uv run superclaude install --list-all      # Test CLI changes
 ```
 
-- **Test baseline**: 2279 passing / 28 skipped / 4 deselected, 0 failures (measured 2026-08-22) — do not regress. No known pre-existing failures: a failure is a regression. Markdown-only changes carry no test risk.
+- **Test baseline**: 2292 passing / 28 skipped / 4 deselected, 0 failures (measured 2026-08-22) — do not regress. No known pre-existing failures: a failure is a regression. Markdown-only changes carry no test risk.
 
 ## Make Commands
 
