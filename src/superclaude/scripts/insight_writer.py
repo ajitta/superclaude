@@ -497,24 +497,118 @@ def _request_guard_file(session_id: str | None) -> Path:
     return hook_state_dir() / f"insight_prompt_{project_key()}_{slug}.json"
 
 
-def _working_tree_changed() -> bool:
-    """Whether this project has uncommitted changes.
+# Paths the framework itself writes inside a project worktree. A project- or
+# local-scope install keeps its runtime cache, its pending markers and its agent
+# memory store under <project>/.claude, and project scope gets no git-exclude
+# block at all — so without this filter the framework's own files answered
+# "did the session change code?" with yes, and a read-only session ended on a
+# blocking Stop. Filtering here holds in every scope, which the exclude list
+# alone cannot do.
+_FRAMEWORK_OWNED_PATHS = (
+    ".claude/.superclaude_hooks/",
+    ".claude/insights.jsonl",
+    ".claude/insights.pending.jsonl",
+    ".claude/agent-memory/",
+    ".claude/agent-memory-local/",
+)
 
-    A proxy for "the session changed code": exact per-session attribution is not
-    available to a Stop hook, and asking after a read-only session is the cost of
-    being wrong in the harmless direction. Any git failure means no prompt.
+
+def _status_lines() -> list[str] | None:
+    """Sorted `git status --porcelain` lines, framework-owned paths removed.
+
+    Returns None when git cannot answer at all — no repository, no git on PATH,
+    a timeout — which every caller treats as "do not prompt".
     """
     try:
         result = subprocess.run(
-            ["git", "status", "--porcelain"],
+            # -uall: without it git collapses an untracked directory to a
+            # single `?? .claude/` line, and a framework-owned path inside it
+            # can no longer be recognised or filtered.
+            ["git", "status", "--porcelain", "-uall"],
             cwd=str(project_root()),
             capture_output=True,
             text=True,
             timeout=5,
         )
     except (OSError, subprocess.SubprocessError):
+        return None
+    if result.returncode != 0:
+        return None
+
+    lines = []
+    for raw in result.stdout.splitlines():
+        if len(raw) < 4:
+            continue
+        path = raw[3:]
+        if " -> " in path:  # rename/copy: the destination is what exists now
+            path = path.split(" -> ", 1)[1]
+        path = path.strip().strip('"')
+        if any(path.startswith(owned) for owned in _FRAMEWORK_OWNED_PATHS):
+            continue
+        lines.append(raw)
+    return sorted(lines)
+
+
+def _working_tree_changed() -> bool:
+    """Whether this project has uncommitted changes the user cares about.
+
+    The fallback proxy, used when no session baseline was recorded. Any git
+    failure means no prompt.
+    """
+    return bool(_status_lines())
+
+
+def _tree_fingerprint() -> str | None:
+    """A hash of the working tree's status, or None when git cannot answer."""
+    lines = _status_lines()
+    if lines is None:
+        return None
+    return hashlib.sha256("\n".join(lines).encode("utf-8")).hexdigest()
+
+
+def _session_baseline_file(session_id: str | None) -> Path:
+    """Where SessionStart records what the tree looked like before the session."""
+    slug = session_slug(session_id) or "nosession"
+    return hook_state_dir() / f"insight_baseline_{project_key()}_{slug}.json"
+
+
+def cmd_session_baseline(args: argparse.Namespace) -> int:
+    """SessionStart: remember the tree so Stop can tell what this session did.
+
+    Without it the gate could only ask "is the tree dirty now", which a
+    repository dirty before the session started answers yes on the very first
+    turn — spending the one request a session gets on a turn that changed
+    nothing.
+    """
+    fingerprint = _tree_fingerprint()
+    if fingerprint is None:
+        return 0
+    path = _session_baseline_file(getattr(args, "session_id", None))
+    try:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(
+            json.dumps({"fingerprint": fingerprint, "at": _now_iso()}),
+            encoding="utf-8",
+        )
+    except OSError:
+        pass  # a missing baseline degrades to the proxy, it does not break Stop
+    return 0
+
+
+def _session_changed_code(session_id: str | None) -> bool:
+    """Did *this* session change code, rather than "is the tree dirty"."""
+    current = _tree_fingerprint()
+    if current is None:
         return False
-    return result.returncode == 0 and bool(result.stdout.strip())
+    try:
+        recorded = json.loads(
+            _session_baseline_file(session_id).read_text(encoding="utf-8")
+        ).get("fingerprint")
+    except (OSError, json.JSONDecodeError, AttributeError):
+        recorded = None
+    if not recorded:
+        return bool(_status_lines())
+    return current != recorded
 
 
 def cmd_request(args: argparse.Namespace) -> int:
@@ -528,7 +622,7 @@ def cmd_request(args: argparse.Namespace) -> int:
 
     Four gates, because a Stop hook that blocks is intrusive by construction:
     the opt-out env var, Claude Code's own re-entry flag, one fire per session,
-    and a working tree that actually changed.
+    and a working tree this session actually changed.
     """
     if os.environ.get("SUPERCLAUDE_INSIGHT_PROMPT", "1").lower() in (
         "0",
@@ -544,7 +638,7 @@ def cmd_request(args: argparse.Namespace) -> int:
     guard = _request_guard_file(getattr(args, "session_id", None))
     if guard.exists():
         return 0
-    if not _working_tree_changed():
+    if not _session_changed_code(getattr(args, "session_id", None)):
         return 0
 
     try:
@@ -605,6 +699,10 @@ def build_parser() -> argparse.ArgumentParser:
     pc = sub.add_parser("pending-count")
     pc.set_defaults(fn=cmd_pending_count)
 
+    sb = sub.add_parser("session-baseline")
+    sb.add_argument("--session-id", default=os.environ.get("CLAUDE_SESSION_ID"))
+    sb.set_defaults(fn=cmd_session_baseline)
+
     rq = sub.add_parser("request")
     rq.add_argument("--session-id", default=os.environ.get("CLAUDE_SESSION_ID"))
     rq.add_argument("--stop-hook-active", action="store_true")
@@ -636,6 +734,12 @@ def main(argv: list[str] | None = None) -> int:
             data = {}
         cwd = str(data.get("cwd", os.getcwd()))
         if argv[0] == "pending-count-from-hook":
+            # SessionStart is the only event that runs before the session can
+            # change anything, so the baseline is recorded here rather than in a
+            # fifteenth hook and a second interpreter spawn.
+            cmd_session_baseline(
+                argparse.Namespace(session_id=str(data.get("session_id", "")))
+            )
             argv = ["pending-count"]
         else:
             source = (

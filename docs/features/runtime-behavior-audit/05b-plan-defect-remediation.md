@@ -246,6 +246,12 @@ State stays under `claude_base()` — see the constraint at the top of this docu
       (`test_insight_writer.py:996`)
 - [ ] Verify: `uv run pytest tests/unit/ -k "insight or git_exclude" -v`
 
+**Residual, accepted.** The exclude block is a per-clone `.git/info/exclude` written only for local
+scope, so a project-scope install still shows `.claude/.superclaude_hooks/` in the user's own
+`git status`. The Stop gate no longer reads it, which is the defect; making the tree visually clean
+for project scope would mean extending `install_git_exclude` beyond its stated local-only contract,
+and that was declined. A project that wants a clean status adds the path to its own `.gitignore`.
+
 ### Task 4 — Stop-hook timing and the INSIGHT pipeline (N4, N7, N11; Codex 13)
 
 **Files:** Modify `src/superclaude/scripts/insight_writer.py`, `src/superclaude/hooks/hooks.json`, `src/superclaude/commands/insight.md` | Test: `tests/unit/test_insight_writer.py`

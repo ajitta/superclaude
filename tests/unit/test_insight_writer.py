@@ -990,7 +990,7 @@ class TestInsightRequestHook:
 
         monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(workdir))
         monkeypatch.delenv("SUPERCLAUDE_INSIGHT_PROMPT", raising=False)
-        monkeypatch.setattr(iw, "_working_tree_changed", lambda: dirty)
+        monkeypatch.setattr(iw, "_session_changed_code", lambda _session: dirty)
         return iw.cmd_request(
             argparse.Namespace(session_id="sess1", stop_hook_active=stop_hook_active)
         )
@@ -1028,8 +1028,145 @@ class TestInsightRequestHook:
 
         monkeypatch.setenv("SUPERCLAUDE_INSIGHT_PROMPT", "0")
         monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(workdir))
-        monkeypatch.setattr(iw, "_working_tree_changed", lambda: True)
+        monkeypatch.setattr(iw, "_session_changed_code", lambda _session: True)
 
         iw.cmd_request(argparse.Namespace(session_id="sess1", stop_hook_active=False))
 
         assert capsys.readouterr().out.strip() == ""
+
+
+def _committed_repo(tmp_path, monkeypatch):
+    """A real git repository with one commit, anchored for the hook resolvers."""
+    import subprocess
+
+    for cmd in (
+        ["git", "init", "-q"],
+        ["git", "config", "user.email", "test@example.com"],
+        ["git", "config", "user.name", "test"],
+    ):
+        subprocess.run(cmd, cwd=tmp_path, check=True)
+    (tmp_path / "tracked.txt").write_text("hello\n", encoding="utf-8")
+    subprocess.run(["git", "add", "-A"], cwd=tmp_path, check=True)
+    subprocess.run(["git", "commit", "-qm", "base"], cwd=tmp_path, check=True)
+    monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(tmp_path))
+    return tmp_path
+
+
+class TestFrameworkStateIsNotAUserChange:
+    """SuperClaude's own runtime files must not read as "the session changed code".
+
+    The gate asked whether `git status --porcelain` printed anything. In a
+    project- or local-scope install the framework writes its context cache,
+    pending-insight file and agent-memory store inside the worktree, and nothing
+    excludes them for project scope at all — so a session that read one file and
+    edited nothing ended with a blocking Stop asking for a lesson it did not
+    have. This repository only looked clean because its .gitignore was written
+    by hand.
+    """
+
+    def test_runtime_cache_is_ignored(self, tmp_path, monkeypatch):
+        import superclaude.scripts.insight_writer as iw
+
+        repo = _committed_repo(tmp_path, monkeypatch)
+        state = repo / ".claude" / ".superclaude_hooks"
+        state.mkdir(parents=True)
+        (state / "claude_context_abc.txt").write_text("cached\n", encoding="utf-8")
+
+        assert iw._working_tree_changed() is False
+
+    def test_pending_insights_are_ignored(self, tmp_path, monkeypatch):
+        import superclaude.scripts.insight_writer as iw
+
+        repo = _committed_repo(tmp_path, monkeypatch)
+        (repo / ".claude").mkdir()
+        (repo / ".claude" / "insights.pending.jsonl").write_text(
+            '{"text": "x"}\n', encoding="utf-8"
+        )
+
+        assert iw._working_tree_changed() is False
+
+    def test_agent_memory_is_ignored(self, tmp_path, monkeypatch):
+        import superclaude.scripts.insight_writer as iw
+
+        repo = _committed_repo(tmp_path, monkeypatch)
+        memory = repo / ".claude" / "agent-memory" / "system-architect"
+        memory.mkdir(parents=True)
+        (memory / "notes.md").write_text("note\n", encoding="utf-8")
+
+        assert iw._working_tree_changed() is False
+
+    def test_a_real_edit_still_counts(self, tmp_path, monkeypatch):
+        import superclaude.scripts.insight_writer as iw
+
+        repo = _committed_repo(tmp_path, monkeypatch)
+        (repo / "tracked.txt").write_text("edited\n", encoding="utf-8")
+
+        assert iw._working_tree_changed() is True
+
+    def test_a_new_source_file_still_counts(self, tmp_path, monkeypatch):
+        import superclaude.scripts.insight_writer as iw
+
+        repo = _committed_repo(tmp_path, monkeypatch)
+        (repo / "new_module.py").write_text("x = 1\n", encoding="utf-8")
+
+        assert iw._working_tree_changed() is True
+
+
+class TestSessionBaselineDecidesTheAsk:
+    """"Is the tree dirty" is not "did this session change code".
+
+    A repository dirty before the session started satisfied the old gate on the
+    very first turn, so the one request a session gets was spent on a turn that
+    changed nothing. Recording a fingerprint at SessionStart and diffing at Stop
+    asks the question the prompt text actually claims to ask.
+    """
+
+    def test_pre_existing_dirt_does_not_trigger(self, tmp_path, monkeypatch, capsys):
+        import superclaude.scripts.insight_writer as iw
+
+        repo = _committed_repo(tmp_path, monkeypatch)
+        monkeypatch.setattr(iw, "hook_state_dir", lambda: tmp_path / ".git" / "sc-state")
+        (repo / "tracked.txt").write_text("dirty before the session\n", encoding="utf-8")
+
+        iw.main(["session-baseline", "--session-id", "s1"])
+        capsys.readouterr()
+
+        iw.main(["request", "--session-id", "s1"])
+
+        assert capsys.readouterr().out.strip() == "", (
+            "a session that changed nothing was asked for a lesson"
+        )
+
+    def test_a_change_after_the_baseline_triggers(self, tmp_path, monkeypatch, capsys):
+        import json
+
+        import superclaude.scripts.insight_writer as iw
+
+        repo = _committed_repo(tmp_path, monkeypatch)
+        monkeypatch.setattr(iw, "hook_state_dir", lambda: tmp_path / ".git" / "sc-state")
+
+        iw.main(["session-baseline", "--session-id", "s2"])
+        capsys.readouterr()
+        (repo / "tracked.txt").write_text("changed during the session\n", encoding="utf-8")
+
+        iw.main(["request", "--session-id", "s2"])
+
+        payload = json.loads(capsys.readouterr().out)
+        assert payload["decision"] == "block"
+
+    def test_without_a_baseline_it_falls_back_to_the_proxy(
+        self, tmp_path, monkeypatch, capsys
+    ):
+        """An install whose SessionStart hook is not registered still works."""
+        import json
+
+        import superclaude.scripts.insight_writer as iw
+
+        repo = _committed_repo(tmp_path, monkeypatch)
+        monkeypatch.setattr(iw, "hook_state_dir", lambda: tmp_path / ".git" / "sc-state")
+        (repo / "tracked.txt").write_text("dirty\n", encoding="utf-8")
+
+        iw.main(["request", "--session-id", "s3"])
+
+        payload = json.loads(capsys.readouterr().out)
+        assert payload["decision"] == "block"

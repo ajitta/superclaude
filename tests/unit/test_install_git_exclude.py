@@ -265,3 +265,26 @@ class TestAgentMemoryLocalIsExcluded:
 
         assert ".claude/agent-memory-local/" in _collect_local_entries()
 
+
+
+class TestFrameworkStateIsExcluded:
+    """Runtime state the framework writes into the worktree must not be untracked.
+
+    A local install left `.claude/.superclaude_hooks/` and any un-promoted
+    `.claude/insights.pending.jsonl` visible to `git status`, which is both noise
+    in the user's own diff and the signal the Stop hook reads as "this session
+    changed code".
+    """
+
+    def test_runtime_paths_are_listed(self):
+        from superclaude.cli.install_git_exclude import _collect_local_entries
+
+        entries = _collect_local_entries()
+
+        for path in (
+            ".claude/.superclaude_hooks/",
+            ".claude/insights.pending.jsonl",
+            ".claude/agent-memory/",
+            ".claude/agent-memory-local/",
+        ):
+            assert path in entries, f"{path} is written at runtime but not excluded"
