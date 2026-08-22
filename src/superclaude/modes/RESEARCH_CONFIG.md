@@ -41,7 +41,6 @@ assess_quality | id_gaps | maybe_replan | tweak_strategy
 |------|-------------|----------|
 | tavily | Search, static HTML, public content | native WebSearch, alt queries |
 | playwright | JS need, dynamic, auth, interactive | tavily extraction |
-| sequential | Reasoning, synth, analysis | native reasoning |
 | context7 | Tech docs, API refs, framework guides | tavily search |
 | serena | Memory, session persistence | session only |
   </tool_routing>

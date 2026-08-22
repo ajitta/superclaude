@@ -40,13 +40,6 @@ SCENARIOS: list[Scenario] = [
         note="Tool MCP → 1-line hint",
     ),
     Scenario(
-        name="T0-sequential",
-        prompt="--seq debug this multi-step issue",
-        expected_tier=0,
-        expected_file="mcp/MCP_Sequential.md",
-        note="Tool MCP → 1-line hint",
-    ),
-    Scenario(
         name="T0-business-symbols",
         prompt="show me business symbol legend",
         expected_tier=0,
@@ -200,7 +193,7 @@ def verify_session_dedup() -> None:
     """Improvement #4: skills summary should appear on 1st call, not 2nd in same session."""
     clear_cache()
     out1, _ = run_loader("--c7 first call")
-    out2, _ = run_loader("--seq second call same session")
+    out2, _ = run_loader("--play second call same session")
     has1 = "skills installed" in out1
     has2 = "skills installed" in out2
     delta = len(out1) - len(out2)

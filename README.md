@@ -50,7 +50,7 @@ Claude Code reads those files at session start, which is how the framework chang
 
 | File | Purpose |
 |------|---------|
-| [`CLAUDE.md`](CLAUDE.md) | Project-specific rules: env (UV), make targets, test baseline (2285 passing), git workflow |
+| [`CLAUDE.md`](CLAUDE.md) | Project-specific rules: env (UV), make targets, test baseline (2279 passing), git workflow |
 | [`src/superclaude/ARCHITECTURE.md`](src/superclaude/ARCHITECTURE.md) | Content-framework taxonomy — directory roles, delivery pipelines, content types |
 | [`src/superclaude/CLAUDE_SC.md`](src/superclaude/CLAUDE_SC.md) | The always-loaded import chain → `core/FLAGS.md`, `PRINCIPLES.md`, `RULES.md` |
 | [`.claude/rules/`](.claude/rules) | Authoring specs for agents/commands/skills/modes |
@@ -206,12 +206,11 @@ where superclaude         # Check install path (Windows)
 
 ### **Enhanced Performance (Optional MCPs)**
 
-For **2-3x faster** execution and **30-50% fewer tokens**, optionally install MCP servers:
+For **2-3x faster** symbol operations, optionally install MCP servers:
 
 ```bash
 # Optional MCP servers for enhanced performance:
 # - Serena: Semantic code understanding (2-3x faster symbol ops)
-# - Sequential: Token-efficient multi-step reasoning (30-50% fewer tokens)
 # - Tavily: Web search/extract/crawl/research — install as Agent Skills (npx skills add tavily-ai/skills); MCP optional
 # - Context7: Official documentation lookup
 
@@ -376,12 +375,11 @@ superclaude mcp
 **Available servers:**
 - **Tavily** → Web search, extract, crawl, map, research (Deep Research). Recommended: **Agent Skills** via Tavily CLI + `npx skills add tavily-ai/skills` ([tavily-ai/skills](https://github.com/tavily-ai/skills) · [agent-skills docs](https://docs.tavily.com/documentation/agent-skills)). The `--tavily` MCP server is an optional in-conversation alternative (search + extract only).
 - **Context7** → Official documentation lookup
-- **Sequential-Thinking** → Multi-step reasoning
 - **Serena** → Session persistence & semantic code understanding
 - **Playwright** → Cross-browser automation & E2E testing (Microsoft official). Repo: ['https://github.com/microsoft/playwright-cli'](https://github.com/microsoft/playwright-cli)
 - **Chrome DevTools** → Performance, Lighthouse, accessibility, and memory profiling (CLS, LCP). Installed as Claude plugin from [`ChromeDevTools/chrome-devtools-mcp`](https://github.com/ChromeDevTools/chrome-devtools-mcp)
 
-> Removed in this fork: Morphllm, Mindbase, Airis-Agent, Magic, AST-Grep (replaced by native Grep/Edit + ReflexionMemory).
+> Removed in this fork: Morphllm, Mindbase, Airis-Agent, Magic, AST-Grep (replaced by native Grep/Edit + ReflexionMemory), Sequential-Thinking (Opus 5 / Fable 5 reason natively between tool calls — see [`docs/codex/sequential-thinking-validity-2026-08-22/`](docs/codex/sequential-thinking-validity-2026-08-22/)).
 
 </td>
 <td width="50%">
@@ -532,7 +530,6 @@ superclaude mcp
 The Deep Research system intelligently coordinates multiple tools:
 - **Tavily** (Agent Skills; MCP optional): Primary web search and discovery
 - **Playwright MCP**: Complex content extraction
-- **Sequential MCP**: Multi-step reasoning and synthesis
 - **Serena MCP**: Memory and learning persistence
 - **Context7 MCP**: Technical documentation lookup
 
@@ -553,7 +550,7 @@ The Deep Research system intelligently coordinates multiple tools:
 | Slash commands (33) | [`src/superclaude/Commands/`](src/superclaude/Commands) · `superclaude install --list-all` |
 | Agents (23) | [`src/superclaude/Agents/`](src/superclaude/Agents) |
 | Modes (7) | [`src/superclaude/Modes/`](src/superclaude/Modes) |
-| MCP servers (8) | [`src/superclaude/MCP/`](src/superclaude/MCP) |
+| MCP servers (5) | [`src/superclaude/MCP/`](src/superclaude/MCP) |
 | Skills (5) | [`src/superclaude/Skills/`](src/superclaude/Skills) |
 | Core rules (always-loaded) | [`FLAGS.md`](src/superclaude/core/FLAGS.md) · [`PRINCIPLES.md`](src/superclaude/core/PRINCIPLES.md) · [`RULES.md`](src/superclaude/core/RULES.md) |
 | Authoring specs for new content | [`.claude/rules/`](.claude/rules) |
@@ -563,7 +560,7 @@ The Deep Research system intelligently coordinates multiple tools:
 
 ## 🚩 **Flags**
 
-Flags are behavioral hints that any `/sc:*` prompt accepts. The model reads them inline — no setup, no separate config — and aliases (e.g. `--ultrathink` → `--seq`) are auto-corrected. SSOT: [`src/superclaude/core/FLAGS.md`](src/superclaude/core/FLAGS.md).
+Flags are behavioral hints that any `/sc:*` prompt accepts. The model reads them inline — no setup, no separate config — and aliases (e.g. `--sea` → `--serena`) are auto-corrected. SSOT: [`src/superclaude/core/FLAGS.md`](src/superclaude/core/FLAGS.md).
 
 #### Modes — switch the conversational stance
 
@@ -583,7 +580,6 @@ Flags are behavioral hints that any `/sc:*` prompt accepts. The model reads them
 | Flag | Server | Use for |
 |------|--------|---------|
 | `--c7` / `--context7` | Context7 | Imports, frameworks, official docs |
-| `--seq` / `--sequential` | Sequential | Complex debug, system design, multi-step reasoning |
 | `--serena` | Serena | Symbol ops, project memory, semantic exploration |
 | `--play` / `--playwright` | Playwright | Browser testing, E2E, visual diffs |
 | `--perf` / `--devtools` | Chrome DevTools | Perf audit, CLS, LCP, metrics |
@@ -615,14 +611,14 @@ Flags are behavioral hints that any `/sc:*` prompt accepts. The model reads them
 
 > **Priority when flags conflict:** `--safe-mode` > `--validate` > optimization · explicit user flags > auto-detection · `--no-mcp` overrides individual MCP flags.
 
-> **Aliases auto-corrected at load time:** `--ultrathink` / `--think*` → `--seq` · `--parallel` / `--agent` → `--delegate` · `--sampling` / `--verbalized` → `--vs` · `--sea` → `--serena` · `--confidence-check` → `--validate`. Typos within Levenshtein ≤ 2 trigger a suggestion comment.
+> **Aliases auto-corrected at load time:** `--parallel` / `--agent` → `--delegate` · `--sampling` / `--verbalized` → `--vs` · `--sea` → `--serena` · `--confidence-check` → `--validate`. Retired flags (`--think*`, `--seq` / `--sequential`) get a redirect notice instead of a rewrite. Typos within Levenshtein ≤ 2 trigger a suggestion comment.
 
 #### Examples
 
 ```bash
 /sc:research "Rust async runtime tradeoffs" --depth deep --tavily --c7
 /sc:implement "user export endpoint" --plan --p=be,sec --validate
-/sc:analyze src/auth/ --focus security --scope module --seq
+/sc:analyze src/auth/ --focus security --scope module
 /sc:improve src/api/handlers.py --loop --iterations 3 --serena
 /sc:brainstorm "should we migrate to gRPC?" --vs multi
 ```

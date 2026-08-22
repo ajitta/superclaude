@@ -46,7 +46,7 @@ description: Diagnose + resolve issues in code, builds, deployments, system beha
 
   <gotchas>
   - evidence-fabrication: Do not construct hypothetical failure scenarios to justify pre-existing recommendation. Evidence (code, config, measurements) must precede proposals.
-  - seq-loop: If sequential thinking reaches same conclusion twice on same question, terminate that analysis branch, move to next topic.
+  - analysis-loop: If reasoning reaches same conclusion twice on same question, terminate that line of analysis, move to next topic.
   </gotchas>
 
   <bounds>

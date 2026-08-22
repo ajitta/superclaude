@@ -14,7 +14,7 @@
   <priorities>Effectiveness > familiarity | Parallel > sequential | System constraints > ideal solution | Task-fit tool > blanket MCP-first (MCP for symbol/semantic ops, native for text patterns)</priorities>
 
   <behaviors>
-  - Tool-Task Matching: Route each op to strongest available tool — full routing in core/FLAGS.md mcp section (e.g., symbol ops → Serena, docs → Context7, browser → Playwright, reasoning → Sequential, web → Tavily skills, perf → DevTools)
+  - Tool-Task Matching: Route each op to strongest available tool — full routing in core/FLAGS.md mcp section (e.g., symbol ops → Serena, docs → Context7, browser → Playwright, web → Tavily skills, perf → DevTools)
   - Batching: Group independent ops into concurrent exec blocks
   - Constraint-Adaptive: Degrade gracefully when preferred tools unavailable
   - Verification-First: Consult official docs before infra/config changes — never assume correctness
@@ -27,7 +27,7 @@
   - Cap-Aware: author for the harness caps (concurrency cap per --concurrency in core/FLAGS.md; lifetime 1000 agents), not requested width.
   - Write-Return: subprocess file writes are discarded — fan-out RETURNS artifacts, main loop performs every Write; approval checkpoints fire in the main loop (full rule: core/rules/RULES_DELEGATION.md).
   - Schema-vs-Evidence: opts.schema hardens return shape only, never evidence truth — cited-file:line revalidation per core/rules/RULES_DELEGATION.md stays mandatory.
-  - Context-Carry: mode and MCP injection is main-loop-only; a subagent needing Sequential, Context7, or Tavily gets it named in the agent() prompt, never auto-injected.
+  - Context-Carry: mode and MCP injection is main-loop-only; a subagent needing Context7 or Tavily gets it named in the agent() prompt, never auto-injected.
   </fan_out_execution>
 
   <examples>

@@ -13,7 +13,6 @@ MCP docs load on-demand via `context_loader.py` thru flag/keyword triggers. All 
 | Server | Flag | Package / Version | Mission |
 |--------|------|-------------------|---------|
 | Context7 | `--c7` | `@upstash/context7-mcp` v2.2.5 | Official library docs + framework patterns |
-| Sequential | `--seq` | `@modelcontextprotocol/server-sequential-thinking` 2025.12.18 | Multi-step reasoning for complex analysis |
 | Serena | `--serena` | `serena-agent` (PyPI, v1.5.1) | Semantic code understanding w/ project memory |
 
 ### Plugin (opt-in: `superclaude mcp --servers <name>`)
@@ -52,10 +51,6 @@ The `--tavily` MCP server (plugin table above) stays available as an in-conversa
 
 | From → To | Purpose |
 |-----------|---------|
-| Context7 → Sequential | Docs given → strategy analyzed |
-| Sequential → Playwright | Test strategy planned → tests run |
-| Sequential → DevTools | Perf strategy planned → metrics verified |
-| Serena → Sequential | Symbol context + memory → arch analysis |
 | Tavily → Context7 | Updates searched → stable docs given |
 | Tavily → Playwright | URLs found → complex content extracted |
 | Playwright → DevTools | Flow automated → perf analyzed |
@@ -65,4 +60,4 @@ The `--tavily` MCP server (plugin table above) stays available as an in-conversa
 - `core/FLAGS.md` — MCP flag defs + auto-detection
 - `cli/install_mcp.py` — Install registry (`MCP_SERVERS`) for core servers
 - `scripts/context_loader.py` — On-demand delivery mechanism
-- `okf/superclaude/mcp/index.md` — OKF v0.1 catalog: 6 MCP servers as concept docs, resource-linked to source (repo-root bundle; dev tree only — not shipped to `~/.claude/` at install)
+- `okf/superclaude/mcp/index.md` — OKF v0.1 catalog: 5 MCP servers as concept docs, resource-linked to source (repo-root bundle; dev tree only — not shipped to `~/.claude/` at install)

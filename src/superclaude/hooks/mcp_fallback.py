@@ -30,7 +30,6 @@ MCP_FALLBACK_FILE = hook_state_dir() / "mcp_fallbacks.json"
 MCP_FALLBACKS: dict[str, str] = {
     "context7": "Tavily/WebSearch",
     "tavily": "WebSearch (native)",
-    "sequential": "Native reasoning",
     "serena": "Grep/Glob + Edit (no symbol ops or persistence)",
     "playwright": "DevTools MCP (--devtools) or native WebFetch (install: npx @playwright/mcp@latest)",
     "devtools": "Playwright (install plugin: superclaude mcp --servers chrome-devtools)",

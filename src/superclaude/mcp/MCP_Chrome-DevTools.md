@@ -20,7 +20,7 @@
   </cwv_thresholds>
 
   <integration_patterns>
-  - Performance-Audit: DevTools:trace → `lighthouse_audit` → Sequential:analyze → `/sc:improve`.
+  - Performance-Audit: DevTools:trace → `lighthouse_audit` → analyze → `/sc:improve`.
   - Frontend-Verify (`--frontend-verify`): Playwright:interact + DevTools:profile + Serena:code-review.
   - A11y-Audit: DevTools:accessibility-skill → snapshot → `/sc:analyze --focus a11y`.
   - Memory-Leak: DevTools:`take_heapsnapshot` → compare snapshots → find retained objects.

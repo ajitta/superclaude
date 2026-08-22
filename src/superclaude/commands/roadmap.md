@@ -32,7 +32,6 @@ description: Generate structured implementation workflows from PRDs and feature 
   - TaskCreate/TaskUpdate: Multi-phase progress tracking
   - Task: Parallel workflow + multi-agent
   - WebSearch: Tech research + framework validation
-  - sequentialthinking: Dependency analysis
   </tools>
 
   <examples>

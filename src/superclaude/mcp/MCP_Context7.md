@@ -12,7 +12,7 @@
 
   <choose>
   <use>version-specific API sigs w/ exact param types + return vals, official migration paths between lib versions, framework-canonical patterns (React hooks, Vue composition, Angular services — official way), lib-specific auth flow impl (OAuth, JWT, session), correct build-tool / bundler / linter config opts.</use>
-  <never>general prog concepts (recursion, design patterns, algos — native Claude), debug help (stack traces, error analysis — Sequential or native), code-quality + security review (native Claude), non-lib questions on sys design or arch.</never>
+  <never>general prog concepts (recursion, design patterns, algos — native Claude), debug help (stack traces, error analysis — native Claude), code-quality + security review (native Claude), non-lib questions on sys design or arch.</never>
   </choose>
 
   <token_management>

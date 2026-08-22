@@ -19,8 +19,8 @@
   </search_patterns>
 
   <integration_patterns>
-  - Research: Tavily:broad → Sequential:gaps → Tavily:targeted → Sequential:synthesize → Serena:store.
-  - Fact-Check: Tavily:verify → Tavily:contradictions → Sequential:evidence → report.
+  - Research: Tavily:broad → identify gaps → Tavily:targeted → synthesize → Serena:store.
+  - Fact-Check: Tavily:verify → Tavily:contradictions → weigh evidence → report.
   - Deep-Research: Plan:decompose → Tavily:search → Route (simple → Tavily, complex → Playwright) → synthesize.
   </integration_patterns>
 

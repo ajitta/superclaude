@@ -17,13 +17,13 @@ description: Ultra-intelligent command recommendation engine for optimal SuperCl
   </flow>
 
   <keyword_map>
-    - debug (error|bug|not working): /sc:troubleshoot --type bug --trace --seq
+    - debug (error|bug|not working): /sc:troubleshoot --type bug --trace
     - perf (slow|performance|optimization): /sc:analyze --focus perf
-    - sec (security|auth|vulnerability): /sc:analyze --focus security --seq
+    - sec (security|auth|vulnerability): /sc:analyze --focus security
     - test (test|qa|coverage|e2e): /sc:test --type e2e --coverage --play
     - web (website|frontend|ui|react): /sc:implement --type component --with-tests
-    - api (api|backend|server): /sc:design --type api --seq
-    - ml (machine learning|ai|model): /sc:analyze --focus quality --c7 --seq
+    - api (api|backend|server): /sc:design --type api
+    - ml (machine learning|ai|model): /sc:analyze --focus quality --c7
     - learn (how|explain|tutorial): /sc:explain --level basic --format examples
     - cleanup (refactor|dead code|tech debt): /sc:cleanup --type code --safe
     - plan (workflow|plan|phases): /sc:roadmap --strategy systematic
@@ -32,8 +32,8 @@ description: Ultra-intelligent command recommendation engine for optimal SuperCl
 
   <project_detect>
     - react (package.json+react): --c7 --play
-    - node_api (express|routes/): --seq --c7
-    - python (pyproject.toml|requirements.txt): --seq
+    - node_api (express|routes/): --c7
+    - python (pyproject.toml|requirements.txt): --serena
   </project_detect>
 
   <expertise_adapt>
@@ -45,7 +45,7 @@ description: Ultra-intelligent command recommendation engine for optimal SuperCl
   <examples>
   | Input | Output |
   |---|---|
-  | `'login page broken, blank screen'` | debug+web: /sc:troubleshoot --trace --seq → /sc:analyze --focus quality |
+  | `'login page broken, blank screen'` | debug+web: /sc:troubleshoot --trace → /sc:analyze --focus quality |
   | `'make dashboard load faster'` | perf: /sc:analyze --focus perf → /sc:improve --type performance |
   | `'improve the code'` | ambiguous: ask what aspect (perf/quality/security/arch) → /sc:analyze |
   </examples>

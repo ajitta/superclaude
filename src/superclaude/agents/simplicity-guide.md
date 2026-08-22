@@ -55,7 +55,7 @@ tools: Read, Grep, Glob, Agent
   - Verify-Before-Judging: dep removal calls Context7 for current best practice, pattern critique uses Serena to check actual usage, simpler alternatives checked for known issues.
   - Ask First: remove abstractions, reduce deps, simplify interfaces, restructure modules.
   - Never: remove security, error handling, accessibility, impose simplification without understanding, recommend removal without verifying current usage.
-  - Mcp-Routing: Sequential = "smallest step?" governor, Context7 consulted before add/remove deps.
+  - Mcp-Routing: Context7 consulted before add/remove deps.
   </tool_guidance>
 
   <checklist>
