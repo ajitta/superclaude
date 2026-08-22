@@ -536,3 +536,42 @@ class TestHookRegistrationIsCheckedByIdentity:
         _success, message = uninstall_all(base_path=base, scope="user", dry_run=True)
 
         assert "2 SuperClaude hooks" in message, message
+
+
+class TestFailuresReachTheSummary:
+    """`0 failed` has to mean nothing failed.
+
+    `ensure_agent_memory_dir` swallowed OSError and returned None, and the caller
+    discarded the return value — so agents were rewritten to point at a store
+    that could not be created while the install reported success. Three more
+    steps printed ❌ or ⚠️ without touching the failure count, which is how
+    `overall_success` could be True with a ❌ on screen.
+    """
+
+    def test_a_blocked_memory_directory_fails_the_install(self, tmp_path):
+        from superclaude.cli.install_components import install_all
+
+        base = tmp_path / ".claude"
+        base.mkdir(parents=True)
+        # A regular file where the store belongs: mkdir raises FileExistsError.
+        (base / "agent-memory-local").write_text("not a directory", encoding="utf-8")
+
+        success, message = install_all(base_path=base, force=True, scope="local")
+
+        assert not success, message
+        assert "0 failed" not in message, message
+
+    def test_an_unsupported_scope_is_not_a_failure(self, tmp_path):
+        """`target` has no documented store; absence by design is not an error."""
+        from superclaude.cli.install_components import ensure_agent_memory_dir
+
+        assert ensure_agent_memory_dir(tmp_path / ".claude", "target") is None
+
+    def test_a_healthy_install_still_reports_success(self, tmp_path):
+        from superclaude.cli.install_components import install_all
+
+        success, message = install_all(
+            base_path=tmp_path / ".claude", force=True, scope="local"
+        )
+
+        assert success, message

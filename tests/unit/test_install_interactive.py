@@ -219,3 +219,66 @@ class TestScopeHintWording:
         assert "Installing SuperClaude components" not in result.output
         mock_install_all.assert_not_called()
 
+
+
+class TestCancellingNeverInstalls:
+    """An abort inside the wizard is a person cancelling, not an empty stdin.
+
+    `click.Abort` carried both meanings — Click raises it for EOF *and* for
+    Ctrl-C — and the bare-install path read every Abort as "nobody was there"
+    and installed to user scope anyway. So Ctrl-C installed, and a user who had
+    already chosen local or project scope got a user-scope install instead of a
+    cancel. Whether input exists is now decided before the wizard opens, so an
+    Abort inside it can only mean cancellation.
+    """
+
+    def test_an_abort_inside_the_wizard_installs_nothing(
+        self, runner, tmp_path, monkeypatch, mock_install_all
+    ):
+        """Ctrl-C reaches this path as click.Abort, exactly like EOF used to."""
+        import click as _click
+
+        import superclaude.cli.install_interactive as wizard
+
+        def _abort():
+            raise _click.Abort()
+
+        monkeypatch.setattr(wizard, "run_interactive_install", _abort)
+
+        with _isolated_cwd(runner, tmp_path):
+            result = runner.invoke(main, ["install"], input="1\n")
+
+        assert result.exit_code != 0, result.output
+        mock_install_all.assert_not_called()
+
+    def test_eof_after_choosing_a_scope_does_not_install_to_user(
+        self, runner, tmp_path, mock_install_all
+    ):
+        """The reported failure: pick local, then stop answering."""
+        with _isolated_cwd(runner, tmp_path):
+            result = runner.invoke(main, ["install"], input="3\n")
+
+        assert result.exit_code != 0, result.output
+        mock_install_all.assert_not_called()
+        assert "No input available for the wizard" not in result.output, (
+            "a scope the user did not choose was installed as a fallback"
+        )
+
+    def test_no_input_at_all_still_installs_the_default(self, runner, tmp_path):
+        """CI, a pipe, `claude -p`: the bare command must still finish."""
+        from click.testing import CliRunner
+
+        from superclaude.cli.main import install
+
+        result = CliRunner().invoke(install, [], input="")
+
+        assert result.exit_code == 0, result.output
+        assert "No input available for the wizard" in result.output
+        assert "Installing SuperClaude components" in result.output
+
+    def test_answers_provided_run_the_wizard(self, runner, tmp_path, mock_install_all):
+        """Piped answers are input, so the wizard must still open for them."""
+        with _isolated_cwd(runner, tmp_path):
+            result = runner.invoke(main, ["install"], input="1\nn\nn\n")
+
+        assert "Step 1/5" in result.output

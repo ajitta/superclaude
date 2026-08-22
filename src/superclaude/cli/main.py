@@ -33,6 +33,40 @@ def _in_git_repo(start: Path) -> bool:
     return False
 
 
+def _stdin_can_answer() -> bool:
+    """Whether an interactive prompt could actually be answered.
+
+    Not `sys.stdin.isatty()` alone: on Windows NUL is a character device, so
+    isatty() reports a terminal even at DEVNULL. A terminal is taken at its
+    word; anything else has to have bytes waiting, which is what separates
+    `echo 1 | superclaude install` from `superclaude install < /dev/null`.
+    """
+    stream = sys.stdin
+    if stream is None or getattr(stream, "closed", False):
+        return False
+    try:
+        if stream.isatty():
+            return True
+    except (OSError, ValueError):
+        return False
+    buffer = getattr(stream, "buffer", None)
+    if buffer is None:
+        return False
+    try:
+        if hasattr(buffer, "peek"):
+            return bool(buffer.peek(1))
+        # An in-memory stream (a test runner's, typically) has no peek but can
+        # be rewound, so look one byte ahead and put it back.
+        if buffer.seekable():
+            here = buffer.tell()
+            waiting = buffer.read(1)
+            buffer.seek(here)
+            return bool(waiting)
+    except (OSError, ValueError):
+        return False
+    return False
+
+
 @main.command()
 @click.option(
     "--force",
@@ -111,31 +145,24 @@ def install(
         return True
 
     if interactive or _all_defaults():
-        from .install_interactive import run_interactive_install
+        from . import install_interactive
 
-        try:
-            sys.exit(run_interactive_install())
-        except click.Abort:
-            # The wizard signals its two outcomes differently: a user who
-            # declines gets a return value, and a prompt that cannot be read
-            # raises. So Abort here means nobody was available to answer — CI, a
-            # script, a pipe, `claude -p`. The bare `superclaude install` every
-            # doc shows used to die there having installed nothing, which is the
-            # command the audit says never landed at user scope.
-            #
-            # Detecting this by exception rather than by sys.stdin.isatty():
-            # on Windows NUL is a character device, so isatty() reports a
-            # terminal even with stdin at DEVNULL. -i still fails loudly, since
-            # asking for the wizard explicitly and silently not getting it would
-            # be worse than the error.
-            if interactive:
-                raise
+        # Whether anything can answer the wizard is decided *before* it opens.
+        # It used to be inferred afterwards from click.Abort — but Click raises
+        # Abort for Ctrl-C as well as for EOF, so cancelling installed to user
+        # scope, and a user who had already chosen local or project scope got
+        # user scope instead of a cancel. With the question settled up front, an
+        # Abort inside the wizard can only mean a person aborted it, and -i
+        # stops needing to be a special case.
+        if not interactive and not _stdin_can_answer():
             click.echo()
             click.echo(
                 "💡 No input available for the wizard — continuing with defaults "
                 "(scope: user). Pass --scope/--force to choose explicitly."
             )
             click.echo()
+        else:
+            sys.exit(install_interactive.run_interactive_install())
 
     # Get base path based on scope
     base_path = get_base_path(scope)
