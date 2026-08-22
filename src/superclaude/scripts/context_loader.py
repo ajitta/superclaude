@@ -35,7 +35,7 @@ if TYPE_CHECKING:
 # stdlib-only, and hooks.json runs these scripts with the installer's own
 # interpreter ({{PYTHON_BIN}} = sys.executable), which has the package. Silently
 # degrading here would put state and content lookups in the wrong scope.
-from superclaude.utils import claude_base, context_cache_file, hook_state_dir
+from superclaude.utils import claude_base, context_cache_file
 
 # v2.2.0: MCP fallback notification support
 try:
@@ -67,8 +67,6 @@ CHARS_PER_TOKEN = 4  # Rough estimate
 # to mark it loaded for both, leaving the second window with nothing. A session
 # id only arrives on stdin, so the file is resolved once per run in main(); the
 # project-only name stays as the fallback for callers holding no session id.
-_CACHE_DIR = hook_state_dir()
-_CACHE_DIR.mkdir(parents=True, exist_ok=True)
 _ACTIVE_CACHE_FILE: Path | None = None
 
 
@@ -601,7 +599,12 @@ def mark_as_loaded(contexts: str | list[str]) -> None:
         loaded.add(contexts)
     else:
         loaded.update(contexts)
-    cache_file().write_text("\n".join(loaded))
+    # Created here rather than at import: importing this module used to mkdir in
+    # the developer's real home during pytest collection, before any fixture had
+    # redirected HOME.
+    path = cache_file()
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text("\n".join(loaded))
 
 
 def estimate_tokens(content: str) -> int:

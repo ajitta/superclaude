@@ -356,3 +356,91 @@ class TestHookStatePruning:
         reset_context_cache("sess-A")
 
         assert not stale.exists()
+
+
+class TestStateHygiene:
+    """The sweep and the session-start reset both named the wrong thing.
+
+    `_PRUNABLE_PREFIXES` claimed a `hook_tracker` file that has never existed —
+    the tracker writes `hook_executions.json` — so the one file the sweep was
+    written for was the one it never collected. And `session_init` reset the
+    context cache with no session id at all, deleting the project-only fallback
+    a concurrent session without an id is using, while `context_reset` on the
+    same SessionStart event already did it correctly with the id from stdin.
+    """
+
+    def test_the_sweep_collects_the_tracker_file(self, tmp_path, monkeypatch):
+        import time
+
+        from superclaude.utils import STATE_MAX_AGE_DAYS, prune_hook_state
+
+        monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(tmp_path))
+        state = tmp_path / ".claude" / ".superclaude_hooks"
+        state.mkdir(parents=True)
+        (tmp_path / ".claude" / "superclaude").mkdir()
+        aged = state / "hook_executions.json"
+        aged.write_text("{}", encoding="utf-8")
+        old = time.time() - (STATE_MAX_AGE_DAYS + 1) * 86400
+        import os
+
+        os.utime(aged, (old, old))
+
+        prune_hook_state()
+
+        assert not aged.exists(), "the sweep left the file it was written to collect"
+
+    def test_session_init_does_not_reset_blind(self):
+        """One reset per SessionStart, by the hook that knows the session."""
+        from pathlib import Path as _Path
+
+        source = (
+            _Path(__file__).parent.parent.parent
+            / "src"
+            / "superclaude"
+            / "scripts"
+            / "session_init.py"
+        ).read_text(encoding="utf-8")
+
+        assert "reset_context_cache()" not in source, (
+            "session_init still resets the cache without a session id"
+        )
+
+
+class TestImportingAHookWritesNothing:
+    """Importing a hook module must not touch the filesystem.
+
+    `context_loader` resolved its cache directory at module import and created
+    it there. Under pytest that happens during collection, before any fixture
+    has redirected HOME, so every run left a directory in the developer's real
+    home — the same class of leak the sandbox fixture was written to stop, one
+    layer earlier than the fixture can reach.
+    """
+
+    def test_context_loader_creates_nothing_on_import(self, tmp_path):
+        import os
+        import subprocess
+        import sys
+        from pathlib import Path as _Path
+
+        home = tmp_path / "home"
+        home.mkdir()
+        src = _Path(__file__).parent.parent.parent / "src"
+
+        result = subprocess.run(
+            [sys.executable, "-c", "import superclaude.scripts.context_loader"],
+            cwd=tmp_path,
+            capture_output=True,
+            text=True,
+            timeout=60,
+            env={
+                "PATH": os.environ.get("PATH", ""),
+                "HOME": str(home),
+                "USERPROFILE": str(home),
+                "PYTHONPATH": str(src),
+            },
+        )
+
+        assert result.returncode == 0, result.stderr
+        assert not (home / ".claude").exists(), (
+            "importing the loader created state in the home directory"
+        )
