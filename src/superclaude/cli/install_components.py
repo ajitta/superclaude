@@ -360,10 +360,12 @@ def install_hooks_and_scripts(
                 ):
                     continue
 
+                # Build output, not user content: an upgrade refreshes it even
+                # without --force. Skipping it while settings.json still received
+                # the package's hooks.json let a release register a subcommand the
+                # installed script did not implement — argparse exit 2, the
+                # blocking code on Stop, on every turn.
                 target_file = scripts_target / source_file.name
-                if target_file.exists() and not force:
-                    skipped += 1
-                    continue
 
                 try:
                     shutil.copy2(source_file, target_file)
@@ -403,21 +405,17 @@ def install_hooks_and_scripts(
         hooks_target.mkdir(parents=True, exist_ok=True)
         target_hooks_json = hooks_target / "hooks.json"
 
-        if target_hooks_json.exists() and not force:
-            messages.append("hooks.json already exists (use --force to update)")
-            skipped += 1
-        else:
-            try:
-                target_hooks_json.write_text(
-                    hooks_content_transformed, encoding="utf-8"
-                )
-                installed += 1
-                messages.append(
-                    f"hooks.json installed (scripts path: {scripts_path_for_hooks})"
-                )
-            except OSError as e:
-                failed += 1
-                messages.append(f"Failed to install hooks.json: {e}")
+        # Same reason as the scripts above: this file has to describe the release
+        # whose scripts are on disk, so it is rewritten regardless of --force.
+        try:
+            target_hooks_json.write_text(hooks_content_transformed, encoding="utf-8")
+            installed += 1
+            messages.append(
+                f"hooks.json installed (scripts path: {scripts_path_for_hooks})"
+            )
+        except OSError as e:
+            failed += 1
+            messages.append(f"Failed to install hooks.json: {e}")
 
     # 2b. Merge hooks to settings.json (ensures Claude Code recognizes hooks)
     if hooks_content_transformed is not None:

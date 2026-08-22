@@ -324,3 +324,96 @@ class TestAgentMemoryDirectory:
         assert success, message
         assert (base / "agent-memory-local").is_dir()
 
+
+
+class TestFrameworkArtifactsAlwaysUpdate:
+    """Scripts and hooks.json are build outputs, so an upgrade must refresh them.
+
+    `superclaude install` without `--force` used to skip any script already on
+    disk while still merging the *package's* hooks.json into settings.json. A
+    release that adds a hook therefore registered a subcommand the installed
+    script did not implement: `insight_writer.py request-from-hook` reached
+    argparse, exited 2 — the blocking code on `Stop` — and pushed usage text back
+    into the model on every turn. The mirror failure is that none of a release's
+    script fixes shipped either.
+
+    These files are SuperClaude-owned outputs, not user-editable content, so
+    `--force` keeps its meaning for settings, commands, agents and core only.
+    """
+
+    def test_stale_script_is_replaced_without_force(self, tmp_path):
+        from superclaude.cli.install_components import install_hooks_and_scripts
+
+        base = tmp_path / ".claude"
+        scripts_target = base / "superclaude" / "scripts"
+        scripts_target.mkdir(parents=True)
+        stale = scripts_target / "insight_writer.py"
+        stale.write_text("# previous release, no request subcommand\n", encoding="utf-8")
+
+        installed, _skipped, failed, messages = install_hooks_and_scripts(
+            base_path=base, force=False, scope="user"
+        )
+
+        assert failed == 0, messages
+        assert "request-from-hook" in stale.read_text(encoding="utf-8"), (
+            "a non-force install left the previous release's script in place while "
+            "registering a hook that needs the new one"
+        )
+        assert installed > 0
+
+    def test_stale_hooks_json_is_replaced_without_force(self, tmp_path):
+        from superclaude.cli.install_components import install_hooks_and_scripts
+
+        base = tmp_path / ".claude"
+        hooks_target = base / "hooks"
+        hooks_target.mkdir(parents=True)
+        stale = hooks_target / "hooks.json"
+        stale.write_text('{"hooks": {}}\n', encoding="utf-8")
+
+        _installed, _skipped, failed, messages = install_hooks_and_scripts(
+            base_path=base, force=False, scope="user"
+        )
+
+        assert failed == 0, messages
+        assert "Stop" in stale.read_text(encoding="utf-8"), (
+            "the on-disk hooks.json still describes a previous release"
+        )
+
+    def test_every_registered_command_is_supported_by_its_script(self):
+        """The invariant that would have caught the version skew at authoring time.
+
+        Each `command` in hooks.json names a script and, sometimes, a subcommand.
+        Both have to exist in the shipped script.
+        """
+        import json
+        import re
+        from pathlib import Path
+
+        package_root = Path(__file__).parent.parent.parent / "src" / "superclaude"
+        config = json.loads(
+            (package_root / "hooks" / "hooks.json").read_text(encoding="utf-8")
+        )
+
+        unsupported = []
+        for event, entries in config.get("hooks", {}).items():
+            for entry in entries:
+                for hook in entry.get("hooks", []):
+                    command = hook.get("command", "")
+                    match = re.search(r"([A-Za-z0-9_]+\.py)(.*)$", command)
+                    assert match, f"{event}: cannot parse command {command!r}"
+
+                    script = package_root / "scripts" / match.group(1)
+                    if not script.exists():
+                        unsupported.append(f"{event}: {match.group(1)} does not ship")
+                        continue
+
+                    source = script.read_text(encoding="utf-8")
+                    for token in match.group(2).split():
+                        if token.startswith("-"):
+                            continue
+                        if f'"{token}"' not in source and f"'{token}'" not in source:
+                            unsupported.append(
+                                f"{event}: {match.group(1)} does not accept {token!r}"
+                            )
+
+        assert not unsupported, "\n".join(unsupported)
