@@ -7,12 +7,14 @@
         "matcher": "startup",
         "hooks": [
           {
+            "_comment": "[superclaude] session bootstrap — hook session tracking, cleanup of sessions older than 24h, PR-review status line",
             "type": "command",
             "command": "{{PYTHON_BIN}} {{SCRIPTS_PATH}}/session_init.py",
             "timeout": 10,
             "once": true
           },
           {
+            "_comment": "[superclaude] warns when Claude Code memory entries are older than SUPERCLAUDE_MEMORY_STALE_DAYS (default 90); non-blocking",
             "type": "command",
             "command": "{{PYTHON_BIN}} {{SCRIPTS_PATH}}/memory_staleness.py",
             "timeout": 5,
@@ -24,6 +26,7 @@
         "matcher": "clear|compact|startup",
         "hooks": [
           {
+            "_comment": "[superclaude] clears the context_loader dedup cache on /clear and /compact so dynamic contexts are re-injected",
             "type": "command",
             "command": "{{PYTHON_BIN}} {{SCRIPTS_PATH}}/context_reset.py",
             "timeout": 5
@@ -65,6 +68,7 @@
       {
         "hooks": [
           {
+            "_comment": "[superclaude] injects trigger-matched context (modes, MCP docs, rules) into the prompt",
             "type": "command",
             "command": "{{PYTHON_BIN}} {{SCRIPTS_PATH}}/context_loader.py",
             "timeout": 5
@@ -112,6 +116,7 @@
         "matcher": "Edit|Write",
         "hooks": [
           {
+            "_comment": "[superclaude] runs prettier on edited .ts/.tsx/.js/.jsx files when prettier is available",
             "type": "command",
             "command": "{{PYTHON_BIN}} {{SCRIPTS_PATH}}/prettier_hook.py",
             "timeout": 30
