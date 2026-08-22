@@ -30,7 +30,7 @@ only. Prompt history covers the full 10 months.
 - [03-analysis.md](./03-analysis.md) — findings A1–A12 with evidence and reproduction
 - [05-plan.md](./05-plan.md) — prioritized remediation plan with verification commands
 - [05a-plan-trigger-tiers.md](./05a-plan-trigger-tiers.md) — Task 8 detail: per-command auto-trigger classification
-- [05b-plan-defect-remediation.md](./05b-plan-defect-remediation.md) — Claude-side verification of the external audit, plus the 13 defects it missed
+- [05b-plan-defect-remediation.md](./05b-plan-defect-remediation.md) — Claude-side verification of the external audit, the 13 defects it missed, and the remediation (complete)
 - [06-diagnostics.md](./06-diagnostics.md) — Phase 1 results: why commands and agents never fire, with live probes
 
 ## Headline

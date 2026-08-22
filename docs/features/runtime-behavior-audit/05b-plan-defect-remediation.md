@@ -1,5 +1,5 @@
 ---
-status: approved-for-plan
+status: complete
 revised: 2026-08-22
 ---
 
@@ -190,15 +190,15 @@ reaches an upgrading user at all.
 
 **Files:** Modify `src/superclaude/cli/install_components.py` | Test: `tests/unit/test_cli_install.py`
 
-- [ ] Failing test first: write a stub `insight_writer.py` without `request-from-hook` into the
+- [x] Failing test first: write a stub `insight_writer.py` without `request-from-hook` into the
       target, run `install_all(force=False)`, assert the installed script carries the `request`
       subparser afterwards
-- [ ] Drop the `exists() and not force → skip` guard for `scripts/*.py` (`:363-366`) and
+- [x] Drop the `exists() and not force → skip` guard for `scripts/*.py` (`:363-366`) and
       `.claude/hooks/hooks.json` (`:405-407`). These are SuperClaude-only build outputs, not
       user-editable content; `--force` keeps its meaning for settings, commands, agents and core
-- [ ] Add a suite-level invariant: every `command` in `hooks.json` resolves to a subcommand the
+- [x] Add a suite-level invariant: every `command` in `hooks.json` resolves to a subcommand the
       shipped script actually accepts — the regression that would have caught N1 at authoring time
-- [ ] Verify: `uv run pytest tests/unit/ -k "install" -v`
+- [x] Verify: `uv run pytest tests/unit/ -k "install" -v`
 
 ### Task 2 — One hook identity for merge, force, uninstall and inventory (Codex 1, 2, 3, 4; N6)
 
@@ -207,23 +207,23 @@ reaches an upgrading user at all.
 Sub-steps land in this order; inventory before ownership would report "missing" for hooks the merge
 logic still considers present.
 
-- [ ] **Identity.** Extend `_hook_script_id()` to `(script filename, stable entrypoint/subcommand)`,
+- [x] **Identity.** Extend `_hook_script_id()` to `(script filename, stable entrypoint/subcommand)`,
       normalising only genuinely mutable options. Ship the argument-normalisation rule in the same
       change: without one, every existing registration whose args drifted is reclassified as missing
       and gets a duplicate appended — N6, amplified
-- [ ] **Ownership.** Move `_is_superclaude_hook()` from outer-entry to inner-hook granularity.
+- [x] **Ownership.** Move `_is_superclaude_hook()` from outer-entry to inner-hook granularity.
       `--force` replaces SuperClaude inner hooks in place, preserving order and any user inner hooks
       in the same entry. `uninstall_hooks_from_settings()` uses the same decomposition and drops an
       entry only when it ends up empty
-- [ ] **Retired sweep.** Before a force merge, walk all existing event types rather than only those
+- [x] **Retired sweep.** Before a force merge, walk all existing event types rather than only those
       present in the new config, remove SuperClaude inner hooks, then clean empty entries and events
-- [ ] **Inventory.** Compare normalized identity sets; report `matched / shipped` with separate
+- [x] **Inventory.** Compare normalized identity sets; report `matched / shipped` with separate
       `missing`, `obsolete` and `duplicate` counts. Fix `--dry-run` (`install_inventory.py:462-467`)
       to count inner hooks so it agrees with `_count_shipped_hooks`
-- [ ] Regression tests: a user inner hook at head, middle and tail of a mixed entry under both force
+- [x] Regression tests: a user inner hook at head, middle and tail of a mixed entry under both force
       and uninstall; matcher drift yields one entry not two; a retired event is swept by force; 14
       obsolete hooks report `0/14` with `obsolete: 14`
-- [ ] Verify: `uv run pytest tests/unit/ -k "settings or hooks or install" -v`
+- [x] Verify: `uv run pytest tests/unit/ -k "settings or hooks or install" -v`
 
 ### Task 3 — State-location policy and the dirty-tree gate (Codex 11, 12; N5)
 
@@ -231,20 +231,20 @@ logic still considers present.
 
 State stays under `claude_base()` — see the constraint at the top of this document.
 
-- [ ] **Defensive filter.** `_working_tree_changed()` parses `git status --porcelain` paths instead
+- [x] **Defensive filter.** `_working_tree_changed()` parses `git status --porcelain` paths instead
       of testing the output for non-emptiness, and ignores framework-owned paths
       (`.claude/.superclaude_hooks/`, `.claude/insights*.jsonl`, `.claude/agent-memory*/`). This
       holds in every scope, including project scope, which gets no exclude block at all
-- [ ] **Exclusion.** Add the same three paths to `_collect_local_entries()`
-- [ ] **Session baseline.** Record a `git status` fingerprint at `SessionStart` and diff at `Stop`,
+- [x] **Exclusion.** Add the same three paths to `_collect_local_entries()`
+- [x] **Session baseline.** Record a `git status` fingerprint at `SessionStart` and diff at `Stop`,
       so "did this session change code" stops being a proxy for "is the tree dirty". The one-shot
       guard becomes "a qualifying change was asked about", not "the first dirty observation". The
       baseline file lives in `hook_state_dir()`, already covered by the filter above
-- [ ] **Un-mock the test.** Add an end-to-end test on a fresh committed repository: install, run a
+- [x] **Un-mock the test.** Add an end-to-end test on a fresh committed repository: install, run a
       read-only prompt through the loader, assert `git status --porcelain` is clean and the Stop hook
       emits nothing. The current Stop tests monkeypatch `_working_tree_changed` universally
       (`test_insight_writer.py:996`)
-- [ ] Verify: `uv run pytest tests/unit/ -k "insight or git_exclude" -v`
+- [x] Verify: `uv run pytest tests/unit/ -k "insight or git_exclude" -v`
 
 **Residual, accepted.** The exclude block is a per-clone `.git/info/exclude` written only for local
 scope, so a project-scope install still shows `.claude/.superclaude_hooks/` in the user's own
@@ -256,94 +256,94 @@ and that was declined. A project that wants a clean status adds the path to its 
 
 **Files:** Modify `src/superclaude/scripts/insight_writer.py`, `src/superclaude/hooks/hooks.json`, `src/superclaude/commands/insight.md` | Test: `tests/unit/test_insight_writer.py`
 
-- [ ] **Event/prompt mismatch (N4).** Either move the request off per-turn `Stop`, or rewrite
+- [x] **Event/prompt mismatch (N4).** Either move the request off per-turn `Stop`, or rewrite
       `REQUEST_REASON` to ask for what a mid-session turn can actually answer. Pair the choice with
       harvesting on the same event — today the answer given at `Stop` is only collected by a later
       `PreCompact` or `SessionEnd`, and is lost if neither fires
-- [ ] **Transcript path (N7).** Read `transcript_path` from the hook payload; keep `_find_transcript`
+- [x] **Transcript path (N7).** Read `transcript_path` from the hook payload; keep `_find_transcript`
       as fallback only
-- [ ] **Harvest scope (Codex 13).** Correlate markers to the request rather than scanning every
+- [x] **Harvest scope (Codex 13).** Correlate markers to the request rather than scanning every
       assistant record, and skip `isSidechain` records
-- [ ] **Sentinel (N11).** Strip the sentinel span, do not drop the record
-- [ ] **Dedup (Codex 13).** Add a durable harvested-UUID ledger, shipped together with its storage
+- [x] **Sentinel (N11).** Strip the sentinel span, do not drop the record
+- [x] **Dedup (Codex 13).** Add a durable harvested-UUID ledger, shipped together with its storage
       justification and its pruning rule — under `hook_state_dir()` it needs a name the sweep
       protects, and it grows one line per marker forever otherwise
-- [ ] Regression tests: an explanatory `INSIGHT:` inside a document is not harvested;
+- [x] Regression tests: an explanatory `INSIGHT:` inside a document is not harvested;
       harvest → promote → harvest of one transcript yields one entry; a reply quoting the sentinel
       while carrying a real marker is harvested
-- [ ] Verify: `uv run pytest tests/unit/test_insight_writer.py -v`
+- [x] Verify: `uv run pytest tests/unit/test_insight_writer.py -v`
 
 ### Task 5 — Context-loader input gating (N3; Codex 9, 10)
 
 **Files:** Modify `src/superclaude/scripts/context_loader.py` | Test: `tests/unit/test_context_loader.py`
 
-- [ ] **Context gate (N3).** Strip fenced code blocks and inline-code spans before any flag scanning,
+- [x] **Context gate (N3).** Strip fenced code blocks and inline-code spans before any flag scanning,
       and apply the gate to all three consumers — `resolve_flags()` (`:346`), the `--verbose-context`
       check (`:636`) and `_EXECUTION_DIRECTIVES` (`:715-761`). Behavioral directives must never fire
       from quoted text
-- [ ] **Fuzzy threshold (Codex 9).** Raise the retired-flag cutoff well above `0.6` and correct the
+- [x] **Fuzzy threshold (Codex 9).** Raise the retired-flag cutoff well above `0.6` and correct the
       comments at `:280-281` and `:380`, which claim Levenshtein ≤ 2 while the code uses `difflib`.
       Do **not** gate the notice on `/sc:` invocation: the evidence motivating the feature is 479
       `--think*` and 159 `--parallel` uses typed in bare prompts, so a `/sc:`-only gate would
       suppress it exactly where the data says it is needed. The fence exclusion is the gate that
       survives its own evidence
-- [ ] **Command tokens (Codex 10).** Iterate every `/sc:` token, emit a per-token notice, and strip
+- [x] **Command tokens (Codex 10).** Iterate every `/sc:` token, emit a per-token notice, and strip
       only unresolvable tokens — `_COMMAND_TOKEN_RE.sub("", prompt)` at `:840-842` currently removes
       valid ones too
-- [ ] Negative tests: `cargo test --parallel`, `curl --link`, `pytest --no-parallel`,
+- [x] Negative tests: `cargo test --parallel`, `curl --link`, `pytest --no-parallel`,
       `tool --parallelism 4`, `git status --porcelain`, and a fenced block containing
       `--verbose-context` — all silent, no directive emitted
-- [ ] Verify: `uv run pytest tests/unit/test_context_loader.py -v`
+- [x] Verify: `uv run pytest tests/unit/test_context_loader.py -v`
 
 ### Task 6 — Installer failure honesty and cancel semantics (Codex 5, 6; N12)
 
 **Files:** Modify `src/superclaude/cli/main.py`, `src/superclaude/cli/install_components.py` | Test: `tests/unit/test_install_interactive.py`, `tests/unit/test_cli_install.py`
 
-- [ ] **Cancel (Codex 5).** Decide unattended-ness before entering the wizard using a positive
+- [x] **Cancel (Codex 5).** Decide unattended-ness before entering the wizard using a positive
       non-interactive signal, and route only that path to the default install. Deleting the `Abort`
       fallback outright would restore the defect this merge fixed (bare install completing nothing in
       CI or `claude -p`), so the detector has to be built, not just removed. Any `Abort` raised after
       a prompt has started stays a cancel
-- [ ] Rewrite `test_install_interactive.py:165-179`, which currently pins the present behavior as
+- [x] Rewrite `test_install_interactive.py:165-179`, which currently pins the present behavior as
       intended
-- [ ] New tests: bare stdin EOF; EOF after the first prompt; EOF after a local or project scope
+- [x] New tests: bare stdin EOF; EOF after the first prompt; EOF after a local or project scope
       choice; `KeyboardInterrupt` at each step. No fallback install fires in any of them, and no run
       installs to a scope the user did not pick
-- [ ] **Failure propagation (Codex 6, N12).** Give `ensure_agent_memory_dir()` a return that
+- [x] **Failure propagation (Codex 6, N12).** Give `ensure_agent_memory_dir()` a return that
       separates "no location by design" from "mkdir failed", count that failure, and count
       `install_claude_sc_md`, the CLAUDE.md import update and the git-exclude write in `total_failed`
       so `overall_success` cannot be `True` with a ❌ on screen. Tests: permission denied, a regular
       file at the memory path, a read-only parent
-- [ ] Verify: `uv run pytest tests/unit/ -k "install" -v`
+- [x] Verify: `uv run pytest tests/unit/ -k "install" -v`
 
 ### Task 7 — Test isolation and state hygiene (N8, N9, N10)
 
 **Files:** Modify `tests/conftest.py`, `src/superclaude/hooks/mcp_fallback.py`, `src/superclaude/hooks/hook_tracker.py`, `src/superclaude/scripts/context_loader.py`, `src/superclaude/utils/__init__.py`, `src/superclaude/scripts/session_init.py`
 
-- [ ] Convert the three import-time `hook_state_dir()` constants to call-time resolvers or lazy
+- [x] Convert the three import-time `hook_state_dir()` constants to call-time resolvers or lazy
       accessors so `sandbox_home` actually holds
-- [ ] Add the empirical regression: snapshot `~/.claude/.superclaude_hooks` before and after a full
+- [x] Add the empirical regression: snapshot `~/.claude/.superclaude_hooks` before and after a full
       `uv run pytest` and assert no delta — the existing `loop_guard`-only probe does not prove it
-- [ ] Fix `_PRUNABLE_PREFIXES`: `"hook_tracker"` → `"hook_executions"`, with a test that the sweep
+- [x] Fix `_PRUNABLE_PREFIXES`: `"hook_tracker"` → `"hook_executions"`, with a test that the sweep
       collects an aged tracker file
-- [ ] Pass the `SessionStart` session id through `session_init.reset_context_cache()`
-- [ ] Verify: `uv run pytest tests/unit/ -k "scope_paths or mcp_fallback or session_init" -v`
+- [x] Pass the `SessionStart` session id through `session_init.reset_context_cache()`
+- [x] Verify: `uv run pytest tests/unit/ -k "scope_paths or mcp_fallback or session_init" -v`
 
 ### Task 8 — Command description contracts (Codex 8; N13)
 
 **Files:** Modify `src/superclaude/commands/git.md`, `src/superclaude/commands/troubleshoot.md` | Test: `tests/unit/test_command_structure.py`
 
-- [ ] `git.md:2` — remove "approves history-rewriting ops"; state that invoking the command
+- [x] `git.md:2` — remove "approves history-rewriting ops"; state that invoking the command
       authorises the workflow only, and that each destructive sub-operation needs its own
       confirmation naming the operation and target. Delete "wrong fire cost a revert", which
       contradicts the same file's `git.md:64` ("Force-push main/master destroy team work +
       irreversible")
-- [ ] `troubleshoot.md:2` — condition the "writes a failing test and applies the fix" claim on
+- [x] `troubleshoot.md:2` — condition the "writes a failing test and applies the fix" claim on
       `--fix`, matching its `<bounds>`
-- [ ] Add a structural lint asserting that no description claims an action its `<bounds><never>` or
+- [x] Add a structural lint asserting that no description claims an action its `<bounds><never>` or
       `<approval_required>` block gates. Today's lint (`NEGATIVE_TRIGGER_GATE`,
       `test_command_structure.py:36`) is lexical only, which is why both files passed
-- [ ] Verify: `uv run pytest tests/unit/test_command_structure.py -v`
+- [x] Verify: `uv run pytest tests/unit/test_command_structure.py -v`
 
 ---
 
@@ -363,6 +363,28 @@ and that was declined. A project that wants a clean status adds the path to its 
 - `install_interactive.py` renders the `hooks_registered` row with an "N new, M kept" action label
   that is meaningless for a settings-registration count
 
+## Outcome
+
+All eight tasks landed on `fix/runtime-audit-remediation`, one commit each, test-first. Suite moved
+from 2157 to 2285 passing with no regressions.
+
+Three things went differently from the plan and are worth recording:
+
+- **Task 6 needed no test rewrite.** The plan expected
+  `test_install_interactive.py:165-179` to have to change, because it pinned the fallback install as
+  intended behaviour. Deciding unattended-ness *before* the wizard opens rather than inferring it
+  from `click.Abort` afterwards keeps that test true — the bare command still finishes unattended —
+  while making every Abort inside the wizard a cancellation. The test stands unmodified.
+- **Task 5's gate is two rules, not one.** Stripping code formatting was enough for the reproduced
+  P1, because the sub-agent report quoted the flag names in backticks. It is not enough for
+  `cargo test --parallel`, which is plain prose, so a known-runner rule sits beside it. That rule
+  deliberately over-reaches — "explain how python handles --loop" is suppressed — because the cost
+  of over-reaching is a missing notice and the cost of under-reaching is a directive nobody typed.
+- **Codex finding 4 was pulled forward.** The plan filed it as P3 and the inventory work landed with
+  Task 2 anyway: shipping the identity function and then leaving the diagnostic comparing integers
+  would have meant the row still certified the state the new force sweep had just been written to
+  clear.
+
 ## Verification
 
 Per task: the named `uv run pytest` selection, written failing-first.
@@ -370,7 +392,7 @@ Per task: the named `uv run pytest` selection, written failing-first.
 Global, after every task:
 
 ```
-uv run pytest      # expect 2157 passed, 28 skipped, 4 deselected — any failure is a regression
+uv run pytest      # expect 2285 passed, 28 skipped, 4 deselected — any failure is a regression
 make lint
 ```
 
