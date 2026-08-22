@@ -606,3 +606,98 @@ class TestRetiredFlagNotices:
         """The existing fuzzy fallback must survive the retired-flag pass."""
         out = run_loader("--instrospect this", self._project(tmp_path), "s1")
         assert "--introspect" in out
+
+
+class TestFlagsAreReadWhereTheyAreUsed:
+    """A flag string in text is not a flag the user is using.
+
+    Every `--name` in the payload was a candidate, so a pasted shell command, a
+    quoted option in a review, or a sub-agent report listing flag names produced
+    advice about flags nobody typed — and, worse, fired real behaviour:
+    `--verbose-context` forces full .md injection at 5-10x the token cost, and
+    `--plan`, `--loop`, `--iterations` and `--concurrency` inject execution
+    directives. Both were reproduced from a report that merely quoted the names.
+    """
+
+    def _notices(self, prompt):
+        from superclaude.scripts.context_loader import resolve_flags
+
+        return resolve_flags(prompt)[1]
+
+    def test_a_shell_command_option_is_left_alone(self):
+        for line in (
+            "cargo test --parallel",
+            "run pytest --no-parallel for me",
+            "curl --link https://example.com",
+            "git status --porcelain",
+            "npm run build --verbose",
+        ):
+            assert self._notices(line) == [], f"{line!r} produced flag advice"
+
+    def test_a_quoted_flag_is_a_mention_not_a_use(self):
+        assert self._notices("the docs say `--parallel` was removed") == []
+        assert self._notices("```\n--think-hard --verbose-context\n```") == []
+        assert self._notices("> quoting: --think-hard") == []
+
+    def test_a_typed_retired_flag_is_still_answered(self):
+        """The 479 --think* and 159 --parallel uses were typed as bare prompts."""
+        assert len(self._notices("analyze this repo --think-hard")) == 1
+        assert len(self._notices("--parellel run the tests")) == 1
+
+    def test_native_controls_stay_silent(self):
+        assert self._notices("--ultrathink about this") == []
+
+    def test_verbose_context_does_not_fire_from_quoted_text(self, capsys):
+        from superclaude.scripts.context_loader import output_inject_mode
+
+        output_inject_mode([], prompt="the flag `--verbose-context` exists")
+        assert "forcing full .md injection" not in capsys.readouterr().out
+
+    def test_verbose_context_still_fires_when_typed(self, capsys):
+        from superclaude.scripts.context_loader import output_inject_mode
+
+        output_inject_mode([], prompt="explain this --verbose-context")
+        assert "forcing full .md injection" in capsys.readouterr().out
+
+    def test_execution_directives_do_not_fire_from_quoted_text(self, capsys):
+        from superclaude.scripts.context_loader import _emit_execution_directives
+
+        _emit_execution_directives("the report mentions `--plan` and ```--loop```")
+        assert capsys.readouterr().out.strip() == ""
+
+
+class TestEveryCommandTokenIsChecked:
+    """A prompt can name more than one command, and each one has to be right.
+
+    Only the first `/sc:` token was inspected, so a valid name up front let every
+    later unknown one through unremarked. The reverse was worse: when the first
+    token was unresolvable, suppression stripped *all* `/sc:` tokens from the
+    trigger prompt, taking a valid command's context with it.
+    """
+
+    def _resolve(self, prompt, monkeypatch):
+        from superclaude.scripts import context_loader as cl
+
+        monkeypatch.setattr(cl, "_known_command_names", lambda: {"analyze", "review"})
+        return cl.resolve_command_name(prompt)
+
+    def test_a_later_unknown_name_is_named(self, monkeypatch):
+        notes, _suppressed = self._resolve("/sc:analyze then /sc:zzzzzz", monkeypatch)
+
+        assert any("zzzzzz" in note for note in notes)
+
+    def test_suppression_keeps_a_valid_command(self, monkeypatch):
+        from superclaude.scripts import context_loader as cl
+
+        _notes, suppressed = self._resolve("/sc:zzzzzz and /sc:analyze", monkeypatch)
+
+        assert suppressed == {"zzzzzz"}
+        assert cl.strip_unresolved_commands("/sc:zzzzzz and /sc:analyze", suppressed) == (
+            " and /sc:analyze"
+        )
+
+    def test_all_valid_names_suppress_nothing(self, monkeypatch):
+        notes, suppressed = self._resolve("/sc:analyze and /sc:review", monkeypatch)
+
+        assert notes == []
+        assert suppressed == set()
