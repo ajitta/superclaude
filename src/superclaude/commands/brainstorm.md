@@ -48,7 +48,6 @@ description: Interactive requirements discovery thru Socratic dialogue + systema
   - TaskCreate/TaskUpdate: Multi-phase exploration tracking
   - Agent: Parallel exploration + multi-agent
   - WebSearch / Tavily search skill: Market research + tech validation
-  - sequentialthinking: Requirements analysis, trade-off eval
   </tools>
 
   <examples>
@@ -70,7 +69,7 @@ description: Interactive requirements discovery thru Socratic dialogue + systema
 
   <gotchas>
   - evidence-fabrication: No construct hypothetical failure scenarios to justify pre-existing rec. Evidence (code, config, measurements) must precede proposals.
-  - seq-loop: If sequential thinking hit same conclusion twice on same question, kill that analysis branch + move to next topic.
+  - analysis-loop: If reasoning hit same conclusion twice on same question, kill that line of analysis + move to next topic.
   - skip-review: do NOT route to /sc:plan when status: draft AND no /sc:review iteration logged. Hard gate, not advisory. Brainstorm output without self-review round has shipped silent reversals before.
   </gotchas>
 

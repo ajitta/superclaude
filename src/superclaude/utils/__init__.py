@@ -134,7 +134,7 @@ FALLBACK_LEDGER_NAME = "mcp_fallbacks.json"
 # dropped. Kept here rather than imported from superclaude.hooks.mcp_fallback so
 # this module stays dependency-free, and asserted equal by the test suite.
 CURRENT_MCP_SERVERS = frozenset(
-    {"context7", "tavily", "sequential", "serena", "playwright", "devtools"}
+    {"context7", "tavily", "serena", "playwright", "devtools"}
 )
 
 

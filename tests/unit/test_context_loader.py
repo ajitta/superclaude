@@ -107,8 +107,7 @@ class TestResolveFlags:
     def test_ultrathink_not_remapped(self):
         """ultrathink is a CC native deep-reasoning trigger, not an SC alias."""
         prompt, notes = resolve_flags("analyze code --ultrathink")
-        assert "--ultrathink" in prompt
-        assert "--seq" not in prompt
+        assert prompt == "analyze code --ultrathink"
         assert notes == []
 
     def test_fast_not_remapped(self):
@@ -127,8 +126,8 @@ class TestResolveFlags:
     # --- Valid flags pass through unchanged ---
 
     def test_valid_flag_unchanged(self):
-        prompt, notes = resolve_flags("analyze --seq --tavily --c7")
-        assert prompt == "analyze --seq --tavily --c7"
+        prompt, notes = resolve_flags("analyze --serena --tavily --c7")
+        assert prompt == "analyze --serena --tavily --c7"
         assert notes == []
 
     def test_no_flags_returns_unchanged(self):
@@ -139,11 +138,11 @@ class TestResolveFlags:
     # --- Fuzzy matching ---
 
     def test_fuzzy_suggests_close_match(self):
-        prompt, notes = resolve_flags("run --seqq")
-        # Should suggest --seq as a close match
+        prompt, notes = resolve_flags("run --tavilyy")
+        # Should suggest --tavily as a close match
         assert len(notes) == 1
         assert "not a recognized flag" in notes[0]
-        assert "--seq" in notes[0]
+        assert "--tavily" in notes[0]
 
     def test_totally_unknown_flag_no_suggestion(self):
         prompt, notes = resolve_flags("run --xyzzy123")
@@ -154,8 +153,8 @@ class TestResolveFlags:
     # --- Multiple flags ---
 
     def test_multiple_valid_flags_pass_through(self):
-        prompt, notes = resolve_flags("go --vs --delegate --seq")
-        assert prompt == "go --vs --delegate --seq"
+        prompt, notes = resolve_flags("go --vs --delegate --serena")
+        assert prompt == "go --vs --delegate --serena"
         assert notes == []
 
     def test_mixed_valid_and_unknown(self):
@@ -167,7 +166,7 @@ class TestResolveFlags:
     # --- Edge cases ---
 
     def test_flag_with_value_preserved(self):
-        prompt, notes = resolve_flags("run --concurrency 5 --seq")
+        prompt, notes = resolve_flags("run --concurrency 5 --serena")
         assert "--concurrency 5" in prompt
         assert notes == []
 
@@ -199,10 +198,9 @@ class TestResolveFlags:
 class TestTieredInjection:
     """Test 3-tier context injection system."""
 
-    # Expected MCP docs (8 total: 5 core + 3 plugin, Morphllm removed)
+    # Expected MCP docs (5 total: 3 tool + 2 behavioral; Sequential removed)
     EXPECTED_TOOL_MCPS = {
         "mcp/MCP_Context7.md",
-        "mcp/MCP_Sequential.md",
         "mcp/MCP_Playwright.md",
         "mcp/MCP_Chrome-DevTools.md",
     }
@@ -335,11 +333,11 @@ class TestTriggerMapPaths:
                     f"Morphllm found in COMPOSITE_FLAGS[{flag}]: {path}"
                 )
 
-    def test_all_mcp_includes_6_servers(self):
-        """--all-mcp should activate exactly 6 MCP docs (4 core + 2 plugin)."""
+    def test_all_mcp_includes_5_servers(self):
+        """--all-mcp should activate exactly 5 MCP docs (3 core + 2 plugin)."""
         all_mcp_paths = {p for p, _ in COMPOSITE_FLAGS["--all-mcp"]}
-        assert len(all_mcp_paths) == 6, (
-            f"Expected 6 MCP docs in --all-mcp, got {len(all_mcp_paths)}"
+        assert len(all_mcp_paths) == 5, (
+            f"Expected 5 MCP docs in --all-mcp, got {len(all_mcp_paths)}"
         )
 
     def test_frontend_verify_includes_3_servers(self):
@@ -352,10 +350,10 @@ class TestTriggerMapPaths:
         }
 
     def test_trigger_map_mcp_count(self):
-        """TRIGGER_MAP should have entries for exactly 6 MCP docs."""
+        """TRIGGER_MAP should have entries for exactly 5 MCP docs."""
         mcp_paths = {path for _, path, _ in TRIGGER_MAP if path.startswith("mcp/")}
-        assert len(mcp_paths) == 6, (
-            f"Expected 6 MCP trigger paths, got {len(mcp_paths)}: {mcp_paths}"
+        assert len(mcp_paths) == 5, (
+            f"Expected 5 MCP trigger paths, got {len(mcp_paths)}: {mcp_paths}"
         )
 
 
@@ -458,7 +456,7 @@ class TestSessionScopedCache:
     loaded for both, and the second is silently starved (A3).
     """
 
-    PROMPT = "analyze this --seq"
+    PROMPT = "analyze this --serena"
 
     @staticmethod
     def _project(tmp_path: Path) -> Path:
@@ -590,6 +588,12 @@ class TestRetiredFlagNotices:
         out = run_loader("--think-hard about this", self._project(tmp_path), "s1")
         assert out.count("SuperClaude flag:") == 1
         assert "--think-hard" in out and "effort" in out
+
+    def test_retired_seq_flag_redirects(self, tmp_path: Path):
+        """--seq outlived Sequential MCP; the notice has to say where it went."""
+        out = run_loader("--seq debug this", self._project(tmp_path), "s1")
+        assert out.count("SuperClaude flag:") == 1
+        assert "--seq" in out and "native reasoning" in out.lower()
 
     def test_typo_of_a_retired_flag_redirects(self, tmp_path: Path):
         """--parellel has no valid flag within edit distance 2, so it stayed silent."""

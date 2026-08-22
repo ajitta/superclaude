@@ -97,7 +97,7 @@ If section read like "this is what server is" rather than "this is how I use ser
 
 `scripts/context_loader.py` matches the **user prompt text** (UserPromptSubmit hook only — it does NOT intercept `mcp__<server>__*` tool calls), so a new file must be wired into these maps:
 
-1. **TRIGGER_MAP**: map user flags (`--c7`, `--seq`, …) + keyword regexes to the file. Pick stable flag + add regex row.
+1. **TRIGGER_MAP**: map user flags (`--c7`, `--serena`, …) + keyword regexes to the file. Pick stable flag + add regex row.
 2. **COMPOSITE_FLAGS**: if the server participates in `--frontend-verify` / `--all-mcp`, add it to the matching composite-flag set so those umbrella flags pull the doc.
 3. **INSTRUCTION_MAP**: one-line summary string (≤120 chars) shown when loader inject this doc — Claude read before body land.
 4. **`_BEHAVIORAL_MCPS`** (behavioral servers only): add the server here to force Tier-1 always-on injection regardless of explicit flag.
@@ -133,4 +133,4 @@ Following rules apply to all components + not restated above. See `.claude/rules
 | File present, no `context_loader.py` entry | File never loads | Wire TRIGGER_MAP + INSTRUCTION_MAP (and COMPOSITE_FLAGS / `_BEHAVIORAL_MCPS` if applicable) |
 | Install/setup instructions in body | Wrong layer; rots fast | Move to `cli/install_mcp.py` or `mcp/README.md` |
 | Decorative `note=` XML attributes | Token waste | See xml-prose-format.md "Attributes vs. Body" — `note=` only for scope/safety/version/reference/quantified constraint |
-| Generic "use Sequential for hard problems" | Vague trigger; no value over CC native | Replace with concrete trigger contexts in `<choose>` and chained `/sc:*` patterns in `<integration_patterns>` |
+| Generic "use this server for hard problems" | Vague trigger; no value over CC native | Replace with concrete trigger contexts in `<choose>` and chained `/sc:*` patterns in `<integration_patterns>` |

@@ -31,15 +31,6 @@ import click
 #               `marketplace_name` (the `name` field from the source's
 #               `.claude-plugin/marketplace.json`)
 MCP_SERVERS = {
-    "sequential-thinking": {
-        "name": "sequential-thinking",
-        "description": "Multi-step problem solving and systematic analysis",
-        "transport": "stdio",
-        "command": "npx -y @modelcontextprotocol/server-sequential-thinking",
-        "required": False,
-        "category": "core",
-        "method": "mcp",
-    },
     "context7": {
         "name": "context7",
         "description": "Official library documentation and code examples",
@@ -607,11 +598,6 @@ def show_mcp_status():
 
         # Get fallback from mapping
         fallback_key = name.lower().replace("-", "")
-        # Handle special mappings
-        fallback_map = {
-            "sequentialthinking": "sequential",
-        }
-        fallback_key = fallback_map.get(fallback_key, fallback_key)
         fallback = fallbacks.get(fallback_key, "Native")
 
         click.echo(f"│ {name:19} │ {status:8} │ {fallback:19} │")

@@ -33,7 +33,6 @@ description: Deep web research with adaptive planning + smart search. Use when u
   <tools note="Routing in modes/RESEARCH_CONFIG.md tool_routing">
     - Tavily: tavily-search, tavily-extract, tavily-research, tavily-crawl, tavily-map (Agent Skills — auto/slash; MCP path exposes search + extract only)
     - Native: WebSearch/WebFetch (fallback)
-    - Sequential: Multi-step reason + replan decide
     - Read/Write: Report gen
     - Serena: Cross-session research memory
   </tools>

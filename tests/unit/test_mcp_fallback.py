@@ -37,28 +37,28 @@ class TestMcpFallback:
         """Test first notification returns True."""
         from superclaude.hooks.mcp_fallback import should_notify_fallback
 
-        should_notify, fallback = should_notify_fallback("sequential")
+        should_notify, fallback = should_notify_fallback("context7")
         assert should_notify is True
-        assert fallback == "Native reasoning"
+        assert fallback == "Tavily/WebSearch"
 
     def test_should_notify_fallback_second_time(self, temp_fallback_dir: Path):
         """Test second notification returns False."""
         from superclaude.hooks.mcp_fallback import should_notify_fallback
 
         # First call
-        should_notify_fallback("sequential")
+        should_notify_fallback("context7")
 
         # Second call - should not notify
-        should_notify, fallback = should_notify_fallback("sequential")
+        should_notify, fallback = should_notify_fallback("context7")
         assert should_notify is False
-        assert fallback == "Native reasoning"
+        assert fallback == "Tavily/WebSearch"
 
     def test_different_mcps_tracked_separately(self, temp_fallback_dir: Path):
         """Test that different MCPs are tracked independently."""
         from superclaude.hooks.mcp_fallback import should_notify_fallback
 
-        # Notify for sequential
-        should_notify_fallback("sequential")
+        # Notify for context7
+        should_notify_fallback("context7")
 
         # playwright should still notify (first time)
         should_notify, fallback = should_notify_fallback("playwright")
@@ -69,12 +69,10 @@ class TestMcpFallback:
         """Test notification message format."""
         from superclaude.hooks.mcp_fallback import format_fallback_notification
 
-        msg = format_fallback_notification("Sequential", "Native reasoning")
+        msg = format_fallback_notification("Context7", "Tavily/WebSearch")
         # Conditional phrasing — the hook cannot check real availability,
         # so the hint must not assert the server is down.
-        assert (
-            msg == "ℹ️ If Sequential MCP is unavailable, fall back to: Native reasoning"
-        )
+        assert msg == "ℹ️ If Context7 MCP is unavailable, fall back to: Tavily/WebSearch"
 
     def test_check_mcp_and_notify_returns_message(self, temp_fallback_dir: Path):
         """Test combined check and notify function."""
@@ -96,7 +94,6 @@ class TestMcpFallback:
 
         assert get_fallback_for("context7") == "Tavily/WebSearch"
         assert get_fallback_for("tavily") == "WebSearch (native)"
-        assert get_fallback_for("sequential") == "Native reasoning"
         assert (
             get_fallback_for("serena")
             == "Grep/Glob + Edit (no symbol ops or persistence)"
@@ -134,10 +131,10 @@ class TestMcpFallback:
         from superclaude.hooks.mcp_fallback import should_notify_fallback
 
         # Use uppercase
-        should_notify_fallback("SEQUENTIAL")
+        should_notify_fallback("CONTEXT7")
 
         # Lowercase should see as already notified
-        should_notify, _ = should_notify_fallback("sequential")
+        should_notify, _ = should_notify_fallback("context7")
         assert should_notify is False
 
     def test_mcp_fallback_mapping_complete(self):
@@ -147,7 +144,6 @@ class TestMcpFallback:
         expected_mcps = [
             "context7",
             "tavily",
-            "sequential",
             "serena",
             "playwright",
             "devtools",

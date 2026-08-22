@@ -113,7 +113,6 @@ class TestMCPWiring:
 
     EXPECTED_MCP_DOCS = [
         "MCP_Context7.md",
-        "MCP_Sequential.md",
         "MCP_Playwright.md",
         "MCP_Serena.md",
         "MCP_Tavily.md",
@@ -129,7 +128,6 @@ class TestMCPWiring:
         """Every .json in configs/ has a matching MCP_*.md."""
         CONFIG_TO_DOC = {  # noqa: N806 — function-local constant mapping
             "context7": "Context7",
-            "sequential": "Sequential",
             "playwright": "Playwright",
             "serena": "Serena",
             "tavily": "Tavily",

@@ -133,7 +133,6 @@ TRIGGER_MAP = [
         "mcp/MCP_Context7.md",
         2,
     ),
-    (r"(--seq|--sequential)", "mcp/MCP_Sequential.md", 2),
     (
         r"(--play|--playwright|browser.?test|e2e.?test|network.?mock|mock.?api|browser.?automat)",
         "mcp/MCP_Playwright.md",
@@ -213,7 +212,6 @@ COMPOSITE_FLAGS = {
         ("mcp/MCP_Serena.md", 1),
         ("mcp/MCP_Tavily.md", 1),
         ("mcp/MCP_Context7.md", 2),
-        ("mcp/MCP_Sequential.md", 2),
         ("mcp/MCP_Playwright.md", 2),
         ("mcp/MCP_Chrome-DevTools.md", 2),
     ],  # Note: Playwright/DevTools are plugin-install-only (docs still loaded)
@@ -253,7 +251,6 @@ INSTRUCTION_MAP = {
 # Behavioral MCPs (Serena, Tavily) are NOT here — they use INSTRUCTION_MAP (Tier 1)
 TIER_0_MAP = {
     "mcp/MCP_Context7.md": "Context7: resolve-library-id first, then query-docs. Never skip step 1.",
-    "mcp/MCP_Sequential.md": "Sequential: multi-step reasoning chain. Use for 3+ component problems.",
     "mcp/MCP_Playwright.md": "Playwright: browser E2E + network mocking (--caps=network,storage). navigate → assert.",
     "mcp/MCP_Chrome-DevTools.md": "DevTools: 26 tools. Lighthouse audits, CWV, a11y, memory. trace → analyze → optimize.",
     "core/BUSINESS_SYMBOLS.md": "Business symbols + expert selection. 🎯📈💰⚖️🏆🌊 domain mapping.",
@@ -346,8 +343,6 @@ VALID_FLAGS = {
     "token-efficient",
     "c7",
     "context7",
-    "seq",
-    "sequential",
     "serena",
     "play",
     "playwright",
@@ -389,6 +384,10 @@ RETIRED_FLAGS: dict[str, str] = {
     "think-hard": "Use the native /effort control (--ultrathink also still works).",
     "think-harder": "Use the native /effort control (--ultrathink also still works).",
     "parallel": "Use --delegate for sub-agent fan-out, --concurrency [n] to batch calls.",
+    # Sequential MCP dropped: it is an external scratchpad, not a reasoning
+    # engine, and Opus 5 / Fable 5 already think between tool calls natively.
+    "seq": "Sequential MCP removed — native reasoning covers it; use /effort for depth.",
+    "sequential": "Sequential MCP removed — native reasoning covers it; use /effort for depth.",
 }
 
 
