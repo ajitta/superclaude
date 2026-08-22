@@ -122,6 +122,7 @@ _PRUNABLE_PREFIXES = (
     "current_session",
     "insight_prompt_",
     "insight_baseline_",
+    "insight_answered_",
 )
 
 # The fallback ledger is pruned entry by entry, not deleted: one live session's

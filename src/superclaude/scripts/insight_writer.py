@@ -287,6 +287,40 @@ def cmd_stats(args: argparse.Namespace) -> int:
 # ---------- harvest ----------
 
 
+# Marker ids already filed, kept past the pending row that carried them.
+# Dedup read the pending file alone, and promote removes the row it promotes —
+# so PreCompact harvest → promote → SessionEnd harvest of the same transcript
+# re-created an entry the user had already dealt with. Deliberately not one of
+# the prunable prefixes: a swept ledger forgets, and forgetting is the bug.
+# Bounded instead, oldest first, because it only ever needs the recent past.
+HARVEST_LEDGER_MAX = 2000
+
+
+def _harvest_ledger_file() -> Path:
+    return hook_state_dir() / f"insight_harvested_{project_key()}.json"
+
+
+def _read_harvest_ledger() -> list[str]:
+    try:
+        data = json.loads(_harvest_ledger_file().read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return []
+    uuids = data.get("uuids") if isinstance(data, dict) else None
+    return [str(u) for u in uuids] if isinstance(uuids, list) else []
+
+
+def _extend_harvest_ledger(marker_ids: list[str]) -> None:
+    if not marker_ids:
+        return
+    kept = (_read_harvest_ledger() + marker_ids)[-HARVEST_LEDGER_MAX:]
+    path = _harvest_ledger_file()
+    try:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps({"uuids": kept}), encoding="utf-8")
+    except OSError:
+        pass  # a lost ledger costs a duplicate, never a crash
+
+
 def cmd_harvest(args: argparse.Namespace) -> int:
     """Scan transcript for INSIGHT: markers → append unique entries to pending.
 
@@ -296,13 +330,19 @@ def cmd_harvest(args: argparse.Namespace) -> int:
     into the transcript directory name, which is not always the project root.
     """
     cwd = args.cwd or os.getcwd()
-    transcript = _find_transcript(args.session_id, cwd)
+    # Claude Code names the transcript on stdin. Rebuilding the path from cwd and
+    # session id, then falling back to the newest file in that directory, reads
+    # the other window's live session whenever two are open on one repository.
+    given = getattr(args, "transcript_path", None)
+    transcript = Path(given) if given else None
+    if transcript is None or not transcript.exists():
+        transcript = _find_transcript(args.session_id, cwd)
     if not transcript:
         return 0  # silent: no transcript yet (e.g., first session)
 
     pending_path = _pending_file()
 
-    existing_uuids: set[str] = set()
+    existing_uuids: set[str] = set(_read_harvest_ledger())
     if pending_path.exists():
         with pending_path.open(encoding="utf-8") as f:
             for line in f:
@@ -312,6 +352,7 @@ def cmd_harvest(args: argparse.Namespace) -> int:
                     continue
 
     new_entries: list[dict] = []
+    request_seen = False
     with transcript.open("rb") as raw_f:
         # Tail-only scan for huge transcripts. Small files read in full.
         size = transcript.stat().st_size
@@ -335,6 +376,10 @@ def cmd_harvest(args: argparse.Namespace) -> int:
             # happened 5 times in 10 months — the subsystem had no other source.
             if rec.get("type") not in ("user", "assistant") or rec.get("isMeta"):
                 continue
+            # A sub-agent's transcript is not this session's lesson, and the
+            # branch never saw the request it would be answering.
+            if rec.get("isSidechain"):
+                continue
             msg = rec.get("message", {})
             content = msg.get("content", "")
             if isinstance(content, list):
@@ -345,8 +390,26 @@ def cmd_harvest(args: argparse.Namespace) -> int:
             if not isinstance(content, str):
                 continue
             # The Stop hook's own request names the marker it is asking for.
-            # Without this, every request would harvest as an insight.
+            # Strip the sentinel rather than dropping the record: an answer that
+            # quotes the prompt it is answering — "you asked for X, here it is" —
+            # is a normal shape, and dropping it discarded the very line the
+            # request had just asked for. The request text itself is written to
+            # avoid a literal marker, so what remains cannot self-harvest.
             if REQUEST_SENTINEL in content:
+                request_seen = True
+                if rec.get("type") == "user":
+                    # This record *is* the request — Claude Code delivers a Stop
+                    # reason in the user role. Never harvest it.
+                    continue
+                # An assistant record carrying the sentinel is a reply quoting
+                # the prompt it answers. Strip the sentinel and keep the reply:
+                # dropping the record discarded the very line just asked for.
+                content = content.replace(REQUEST_SENTINEL, " ")
+            # An assistant marker counts when it answers a request. Every other
+            # occurrence is the model explaining, quoting or repeating the format
+            # — a document about this subsystem would otherwise file itself. A
+            # user typing the marker is explicit intent and always counts.
+            if rec.get("type") == "assistant" and not request_seen:
                 continue
             for m in MARKER_RE.finditer(content):
                 marker_text = m.group(1).strip()
@@ -377,8 +440,10 @@ def cmd_harvest(args: argparse.Namespace) -> int:
     with pending_path.open("a", encoding="utf-8") as f:
         for e in new_entries:
             f.write(json.dumps(e, ensure_ascii=False) + "\n")
+    _extend_harvest_ledger([e["uuid"] for e in new_entries])
 
-    print(f"🟡 harvested {len(new_entries)} pending insight(s) — /sc:insight --review")
+    if not getattr(args, "quiet", False):
+        print(f"🟡 harvested {len(new_entries)} pending insight(s) — /sc:insight --review")
     return 0
 
 
@@ -481,13 +546,18 @@ def cmd_pending_count(args: argparse.Namespace) -> int:
 # insight, and so the model can see which turn it is answering.
 REQUEST_SENTINEL = "[sc-insight-request]"
 
+# Stop runs at the end of every assistant turn, not at the end of the session,
+# so this asks about the work just done rather than about a session that is
+# still running — the earlier "before finishing" wording asked for a
+# retrospective on a task that had barely started. It deliberately never writes
+# a literal marker, so the request cannot harvest as its own answer.
 REQUEST_REASON = (
-    f"{REQUEST_SENTINEL} Before finishing: if this session produced a lesson "
+    f"{REQUEST_SENTINEL} This turn changed code. If that work produced a lesson "
     "worth keeping — a non-obvious cause, a decision and its reasoning, a trap "
     "that cost time — end your reply with one line beginning with the word "
     "INSIGHT followed by a colon and the lesson. One line, specific enough to "
-    "act on months from now. If nothing this session qualifies, say so in a few "
-    "words and stop; do not invent one."
+    "act on months from now. If nothing here qualifies, say so in a few words "
+    "and stop; do not invent one."
 )
 
 
@@ -611,6 +681,40 @@ def _session_changed_code(session_id: str | None) -> bool:
     return current != recorded
 
 
+def _answer_collected_file(session_id: str | None) -> Path:
+    """One-shot marker for the post-request harvest."""
+    slug = session_slug(session_id) or "nosession"
+    return hook_state_dir() / f"insight_answered_{project_key()}_{slug}.json"
+
+
+def _collect_answer_once(args: argparse.Namespace) -> None:
+    """Harvest the reply to this session's request, exactly once, silently.
+
+    Stop output has to be either nothing or the block JSON, so the harvest
+    notice is suppressed here; the SessionStart count reports the total.
+    """
+    marker = _answer_collected_file(getattr(args, "session_id", None))
+    if marker.exists():
+        return
+    try:
+        marker.parent.mkdir(parents=True, exist_ok=True)
+        marker.write_text(_now_iso(), encoding="utf-8")
+    except OSError:
+        return
+    try:
+        cmd_harvest(
+            argparse.Namespace(
+                cwd=getattr(args, "cwd", None) or os.getcwd(),
+                session_id=getattr(args, "session_id", None),
+                source="stop",
+                transcript_path=getattr(args, "transcript_path", None),
+                quiet=True,
+            )
+        )
+    except Exception:
+        pass  # a Stop hook never fails the turn over a bookkeeping scan
+
+
 def cmd_request(args: argparse.Namespace) -> int:
     """Stop hook: ask the model for one INSIGHT: line, at most once per session.
 
@@ -635,8 +739,13 @@ def cmd_request(args: argparse.Namespace) -> int:
     if getattr(args, "stop_hook_active", False):
         return 0
 
-    guard = _request_guard_file(getattr(args, "session_id", None))
+    session_id = getattr(args, "session_id", None)
+    guard = _request_guard_file(session_id)
     if guard.exists():
+        # The answer lands in the turn after the ask, and Stop never harvested —
+        # only PreCompact and SessionEnd do, so a session that ends without
+        # either lost the line it had just requested. Collect it here, once.
+        _collect_answer_once(args)
         return 0
     if not _session_changed_code(getattr(args, "session_id", None)):
         return 0
@@ -682,6 +791,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     h.add_argument("--session-id", default=os.environ.get("CLAUDE_SESSION_ID"))
     h.add_argument("--cwd", default=None)
+    h.add_argument("--transcript-path", default=None)
     h.set_defaults(fn=cmd_harvest)
 
     r = sub.add_parser("review")
@@ -705,6 +815,8 @@ def build_parser() -> argparse.ArgumentParser:
 
     rq = sub.add_parser("request")
     rq.add_argument("--session-id", default=os.environ.get("CLAUDE_SESSION_ID"))
+    rq.add_argument("--cwd", default=None)
+    rq.add_argument("--transcript-path", default=None)
     rq.add_argument("--stop-hook-active", action="store_true")
     rq.set_defaults(fn=cmd_request)
 
@@ -723,7 +835,15 @@ def main(argv: list[str] | None = None) -> int:
             data = json.loads(sys.stdin.read() or "{}")
         except json.JSONDecodeError:
             data = {}
-        argv = ["request", "--session-id", str(data.get("session_id", ""))]
+        argv = [
+            "request",
+            "--session-id",
+            str(data.get("session_id", "")),
+            "--cwd",
+            str(data.get("cwd", os.getcwd())),
+        ]
+        if data.get("transcript_path"):
+            argv += ["--transcript-path", str(data["transcript_path"])]
         if data.get("stop_hook_active"):
             argv.append("--stop-hook-active")
 
@@ -756,6 +876,8 @@ def main(argv: list[str] | None = None) -> int:
                 "--cwd",
                 cwd,
             ]
+            if data.get("transcript_path"):
+                argv += ["--transcript-path", str(data["transcript_path"])]
 
     args = build_parser().parse_args(argv)
     return args.fn(args)
