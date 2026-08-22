@@ -177,7 +177,7 @@ PyPI wheel/sdist만 검사해 distribution parity를 완료로 판정하지 않�
 | `make build-plugin` | 선언된 plugin source/manifest + unified source payload | clean build, manifest schema, agents/commands/hooks/scripts/skills inventory |
 | `make sync-plugin-repo` | 검증된 plugin artifact | build 성공 선행, target 확인, sync 후 exact parity |
 
-현재 OKF의 skill concept는 작업 트리에는 5개가 있지만 `.gitignore`의 광범위한
+현재 OKF의 skill concept는 작업 트리에는 6개가 있지만 `.gitignore`의 광범위한
 `skills/` 패턴 때문에 tracked catalog에는 0개다. 또한 plugin builder가 요구하는
 `plugins/superclaude/manifest/metadata.json`이 없어 `make build-plugin`이 실패한다.
 둘 다 별도 current finding이며, 경로를 유지할지 폐기할지 결정하기 전에는 release

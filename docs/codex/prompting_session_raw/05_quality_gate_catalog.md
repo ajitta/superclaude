@@ -2,10 +2,12 @@
 title: SuperClaude 품질 게이트 카탈로그
 status: working-guide
 last_verified: 2026-08-22
-baseline:
-  default_pytest: 2157 passed, 28 skipped, 4 deselected
-  isolated_script_pytest: 120 passed
+measured_at: 5b6dc5b
 ---
+
+기준선 수치는 이 문서에 두지 않는다. 현재 baseline과 재측정 명령은
+[`08_current_findings_and_backlog.md`](08_current_findings_and_backlog.md)의 `F-006`,
+`F-009`, `F-014`가 소유한다.
 
 # SuperClaude 품질 게이트 카탈로그
 
@@ -51,8 +53,9 @@ uv run pytest tests/unit/test_rules_schemas.py -v
 콘텐츠 타입별로 `test_*_structure.py`를 추가한다. Markdown-only guide 변경에는
 Python formatting gate를 N/A로 둘 수 있다.
 
-현재 전체 `uv run ruff format --check .`는 기존 테스트 파일 3개 때문에 실패한다.
-새 변경의 실패와 기존 baseline을 분리해서 보고하되, 릴리스 전체 gate로 쓰려면
+현재 전체 `uv run ruff format --check .`는 실패한다. 대상 파일 목록과 마지막 관측은
+[`08_current_findings_and_backlog.md`](08_current_findings_and_backlog.md)의 `F-009`에
+있다. 새 변경의 실패와 기존 baseline을 분리해서 보고하되, 릴리스 전체 gate로 쓰려면
 baseline부터 정리해야 한다.
 
 ### G2 — graph와 wiring 무결성
