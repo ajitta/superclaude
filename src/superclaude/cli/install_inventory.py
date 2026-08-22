@@ -6,6 +6,7 @@ Handles listing available/installed components and full uninstallation.
 
 import json
 import shutil
+from collections import Counter
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
@@ -17,8 +18,10 @@ from .install_paths import (
     get_base_path,
 )
 from .install_settings import (
+    _hook_script_id,
     _is_superclaude_hook,
     _load_settings,
+    _split_entry,
     remove_claude_md_import,
     uninstall_hooks_from_settings,
 )
@@ -96,6 +99,67 @@ def _count_registered_hooks(settings_file: Path) -> int:
         for entry in array
         if _is_superclaude_hook(entry)
     )
+
+
+def _hook_identity_counts(hooks_section: dict, superclaude_only: bool) -> Counter:
+    """Count hook registrations by (event, script, entry point).
+
+    The matcher is deliberately out of the key: it is the user's to edit, and a
+    narrowed matcher is still the same hook wired to the same script.
+    """
+    counts: Counter = Counter()
+    for event, array in hooks_section.items():
+        if not isinstance(array, list):
+            continue
+        for entry in array:
+            if superclaude_only:
+                inner, _user = _split_entry(entry)
+            else:
+                inner = entry.get("hooks", [])
+            for hook in inner:
+                script, subcommand = _hook_script_id(hook)
+                counts[(event, script, subcommand)] += 1
+    return counts
+
+
+def _hook_registration_report(hooks_json: Path, settings_file: Path) -> Dict[str, int]:
+    """Compare shipped hook identities against registered ones.
+
+    Counting each side and comparing the two integers said `14/14 ✅` for
+    fourteen obsolete registrations — the row certified an install whose
+    settings pointed at scripts the release no longer ships. Identity is the
+    only comparison that answers the question the row claims to answer.
+    """
+    shipped: Counter = Counter()
+    if hooks_json.exists():
+        try:
+            config = json.loads(hooks_json.read_text(encoding="utf-8"))
+            shipped = _hook_identity_counts(config.get("hooks", {}), False)
+        except (json.JSONDecodeError, OSError):
+            shipped = Counter()
+
+    registered = _hook_identity_counts(
+        _load_settings(settings_file).get("hooks", {}), True
+    )
+
+    matched = sum(min(count, registered[key]) for key, count in shipped.items())
+    missing = sum(
+        max(0, count - registered[key]) for key, count in shipped.items()
+    )
+    duplicate = sum(
+        max(0, registered[key] - count) for key, count in shipped.items()
+    )
+    obsolete = sum(
+        count for key, count in registered.items() if key not in shipped
+    )
+
+    return {
+        "shipped": sum(shipped.values()),
+        "matched": matched,
+        "missing": missing,
+        "duplicate": duplicate,
+        "obsolete": obsolete,
+    }
 
 
 def list_all_components(
@@ -212,12 +276,16 @@ def list_all_components(
     settings_file = base_path / (
         "settings.local.json" if scope == "local" else "settings.json"
     )
+    report = _hook_registration_report(hooks_source / "hooks.json", settings_file)
     result["hooks_registered"] = {
         "description": "Hooks registered in settings",
         "source_path": str(hooks_source / "hooks.json"),
         "target_path": str(settings_file),
-        "available": _count_shipped_hooks(hooks_source / "hooks.json"),
-        "installed": _count_registered_hooks(settings_file),
+        "available": report["shipped"],
+        "installed": report["matched"],
+        "missing": report["missing"],
+        "obsolete": report["obsolete"],
+        "duplicate": report["duplicate"],
     }
 
     return result
@@ -459,11 +527,14 @@ def uninstall_all(
             if settings_file.exists():
                 settings = _load_settings(settings_file)
                 if "hooks" in settings:
+                    # Inner hooks, matching what the rest of the CLI calls a
+                    # hook — counting entries under-reported what uninstall
+                    # actually removes.
                     sc_hook_count = sum(
-                        1
+                        len(_split_entry(entry)[0])
                         for hook_array in settings["hooks"].values()
-                        for h in hook_array
-                        if _is_superclaude_hook(h)
+                        if isinstance(hook_array, list)
+                        for entry in hook_array
                     )
                     if sc_hook_count > 0:
                         messages.append(

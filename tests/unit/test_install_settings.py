@@ -716,3 +716,308 @@ class TestNewlyShippedHookReachesAnExistingInstall:
             "PostToolUse"
         ]
         assert user_entry in entries
+
+
+class TestInnerHookOwnership:
+    """Ownership is per inner hook, not per outer entry.
+
+    One Claude settings entry carries a single matcher and a list of inner
+    hooks, so a user's own command can sit next to a SuperClaude one. Judging
+    the whole entry SuperClaude-owned made `--force` and `uninstall` delete the
+    user's command with it — silently, and against the docstring's own promise
+    to preserve user hooks.
+    """
+
+    @staticmethod
+    def _mixed_entry(user_first: bool = False):
+        sc = {"type": "command", "command": "python .../superclaude/scripts/prettier_hook.py"}
+        user = {"type": "command", "command": "npm run user-lint"}
+        inner = [user, sc] if user_first else [sc, user]
+        return {"matcher": "Edit", "hooks": inner}
+
+    def test_force_keeps_the_user_hook_in_its_entry(self):
+        from superclaude.cli.install_settings import _merge_hook_arrays
+
+        shipped = [
+            {
+                "matcher": "Edit",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "python /new/superclaude/scripts/prettier_hook.py",
+                    }
+                ],
+            }
+        ]
+
+        merged = _merge_hook_arrays([self._mixed_entry()], shipped, force=True)
+
+        commands = [h["command"] for entry in merged for h in entry.get("hooks", [])]
+        assert "npm run user-lint" in commands
+        assert any("/new/superclaude/scripts/prettier_hook.py" in c for c in commands)
+        assert not any(c.startswith("python .../") for c in commands), (
+            "the previous SuperClaude command survived a force merge"
+        )
+
+    def test_force_keeps_a_leading_user_hook_too(self):
+        from superclaude.cli.install_settings import _merge_hook_arrays
+
+        merged = _merge_hook_arrays([self._mixed_entry(user_first=True)], [], force=True)
+
+        commands = [h["command"] for entry in merged for h in entry.get("hooks", [])]
+        assert commands == ["npm run user-lint"]
+
+    def test_uninstall_keeps_the_user_hook(self, tmp_path):
+        import json
+
+        from superclaude.cli.install_settings import uninstall_hooks_from_settings
+
+        base = tmp_path / ".claude"
+        base.mkdir()
+        settings_file = base / "settings.json"
+        settings_file.write_text(
+            json.dumps({"hooks": {"PostToolUse": [self._mixed_entry()]}}),
+            encoding="utf-8",
+        )
+
+        success, message = uninstall_hooks_from_settings(base, scope="user")
+
+        assert success, message
+        remaining = json.loads(settings_file.read_text(encoding="utf-8"))
+        commands = [
+            h["command"]
+            for array in remaining.get("hooks", {}).values()
+            for entry in array
+            for h in entry.get("hooks", [])
+        ]
+        assert commands == ["npm run user-lint"]
+
+    def test_force_does_not_reorder_user_entries(self):
+        from superclaude.cli.install_settings import _merge_hook_arrays
+
+        user_entry = {"matcher": "Write", "hooks": [{"type": "command", "command": "user-a"}]}
+        sc_entry = {
+            "matcher": "Edit",
+            "hooks": [
+                {"type": "command", "command": "python /old/superclaude/scripts/x.py"}
+            ],
+        }
+        shipped = [
+            {
+                "matcher": "Edit",
+                "hooks": [
+                    {"type": "command", "command": "python /new/superclaude/scripts/x.py"}
+                ],
+            }
+        ]
+
+        merged = _merge_hook_arrays([sc_entry, user_entry], shipped, force=True)
+
+        assert merged[-1]["hooks"][0]["command"].startswith("python /new/")
+        assert [e["matcher"] for e in merged[:-1]] == ["Write"]
+
+
+class TestHookIdentityCarriesTheSubcommand:
+    """One script, two entry points, is two hooks.
+
+    Identity was the bare `.py` filename, so a release that moved a script to a
+    new subcommand could not deliver it: the old registration matched, the new
+    subcommand was called already-present, and the wrong entry point kept
+    running. The rule has to survive flag drift, though, or every re-shipped
+    option appends a duplicate.
+    """
+
+    def test_a_different_subcommand_is_a_different_hook(self):
+        from superclaude.cli.install_settings import _merge_hook_arrays
+
+        existing = [
+            {
+                "matcher": "",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "python /sc/superclaude/scripts/insight_writer.py pending-count-from-hook",
+                    }
+                ],
+            }
+        ]
+        shipped = [
+            {
+                "matcher": "",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "python /sc/superclaude/scripts/insight_writer.py harvest-from-hook",
+                    },
+                    {
+                        "type": "command",
+                        "command": "python /sc/superclaude/scripts/insight_writer.py pending-count-from-hook",
+                    },
+                ],
+            }
+        ]
+
+        merged = _merge_hook_arrays(existing, shipped, force=False)
+        commands = [h["command"] for entry in merged for h in entry.get("hooks", [])]
+
+        assert sum("harvest-from-hook" in c for c in commands) == 1
+        assert sum("pending-count-from-hook" in c for c in commands) == 1
+
+    def test_flag_drift_does_not_append_a_duplicate(self):
+        from superclaude.cli.install_settings import _merge_hook_arrays
+
+        existing = [
+            {
+                "matcher": "Edit",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "python /sc/superclaude/scripts/loop_guard.py --threshold 5",
+                    }
+                ],
+            }
+        ]
+        shipped = [
+            {
+                "matcher": "Edit",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "python /sc/superclaude/scripts/loop_guard.py",
+                    }
+                ],
+            }
+        ]
+
+        merged = _merge_hook_arrays(existing, shipped, force=False)
+        commands = [h["command"] for entry in merged for h in entry.get("hooks", [])]
+
+        assert len(commands) == 1, commands
+
+    def test_a_user_matcher_edit_is_preserved_not_duplicated(self):
+        from superclaude.cli.install_settings import _merge_hook_arrays
+
+        existing = [
+            {
+                "matcher": "clear|startup",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "python /sc/superclaude/scripts/context_reset.py",
+                    }
+                ],
+            }
+        ]
+        shipped = [
+            {
+                "matcher": "clear|compact|startup",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "python /sc/superclaude/scripts/context_reset.py",
+                    }
+                ],
+            }
+        ]
+
+        merged = _merge_hook_arrays(existing, shipped, force=False)
+
+        assert len(merged) == 1, merged
+        assert merged[0]["matcher"] == "clear|startup"
+
+
+class TestForceSweepsRetiredEvents:
+    """`--force` means "replace with what this release ships", everywhere.
+
+    The merge walked only the event types present in the new config, so a
+    SuperClaude hook left on an event a later release dropped kept firing — and
+    kept calling a script that is no longer shipped.
+    """
+
+    def test_a_retired_event_is_removed(self, tmp_path):
+        import json
+
+        from superclaude.cli.install_settings import merge_hooks_to_settings
+
+        base = tmp_path / ".claude"
+        base.mkdir()
+        settings_file = base / "settings.json"
+        settings_file.write_text(
+            json.dumps(
+                {
+                    "hooks": {
+                        "TeammateIdle": [
+                            {
+                                "hooks": [
+                                    {
+                                        "type": "command",
+                                        "command": "python /sc/superclaude/scripts/gone.py",
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            ),
+            encoding="utf-8",
+        )
+
+        shipped = {
+            "hooks": {
+                "Stop": [
+                    {
+                        "hooks": [
+                            {
+                                "type": "command",
+                                "command": "python /sc/superclaude/scripts/insight_writer.py request-from-hook",
+                            }
+                        ]
+                    }
+                ]
+            }
+        }
+
+        success, message = merge_hooks_to_settings(base, shipped, "user", force=True)
+
+        assert success, message
+        events = json.loads(settings_file.read_text(encoding="utf-8"))["hooks"]
+        assert "TeammateIdle" not in events
+        assert "Stop" in events
+
+    def test_a_user_hook_on_a_retired_event_survives(self, tmp_path):
+        import json
+
+        from superclaude.cli.install_settings import merge_hooks_to_settings
+
+        base = tmp_path / ".claude"
+        base.mkdir()
+        settings_file = base / "settings.json"
+        settings_file.write_text(
+            json.dumps(
+                {
+                    "hooks": {
+                        "TeammateIdle": [
+                            {
+                                "hooks": [
+                                    {
+                                        "type": "command",
+                                        "command": "python /sc/superclaude/scripts/gone.py",
+                                    },
+                                    {"type": "command", "command": "notify-send idle"},
+                                ]
+                            }
+                        ]
+                    }
+                }
+            ),
+            encoding="utf-8",
+        )
+
+        success, message = merge_hooks_to_settings(
+            base, {"hooks": {"Stop": []}}, "user", force=True
+        )
+
+        assert success, message
+        events = json.loads(settings_file.read_text(encoding="utf-8"))["hooks"]
+        commands = [h["command"] for e in events.get("TeammateIdle", []) for h in e["hooks"]]
+        assert commands == ["notify-send idle"]

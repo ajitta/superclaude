@@ -153,6 +153,15 @@ def install(
             )
             click.echo(f"   {icon} {info['description']:40} [{status}]")
             click.echo(f"      └─ {info['target_path']}")
+            # Counts alone cannot say whether the registered hooks are the
+            # shipped ones, so name the mismatch when there is one.
+            drift = ", ".join(
+                f"{info[key]} {key}"
+                for key in ("missing", "obsolete", "duplicate")
+                if info.get(key)
+            )
+            if drift:
+                click.echo(f"      └─ {drift}")
         return
 
     # List commands only mode

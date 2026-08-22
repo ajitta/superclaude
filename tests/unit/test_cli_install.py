@@ -417,3 +417,122 @@ class TestFrameworkArtifactsAlwaysUpdate:
                             )
 
         assert not unsupported, "\n".join(unsupported)
+
+
+class TestHookRegistrationIsCheckedByIdentity:
+    """`N/N ✅` has to mean the shipped hooks are the registered hooks.
+
+    The row compared two integers. Fourteen obsolete SuperClaude hooks and
+    fourteen shipped ones read as `14/14 ✅`, certifying an install whose
+    settings pointed at scripts this release no longer has — the exact state a
+    `--force` install could not clear.
+    """
+
+    SC = "~/.claude/superclaude/scripts"
+
+    def _base(self, tmp_path, hooks: dict):
+        import json
+
+        base = tmp_path / ".claude"
+        (base / "hooks").mkdir(parents=True)
+        (base / "hooks" / "hooks.json").write_text("{}", encoding="utf-8")
+        (base / "settings.json").write_text(
+            json.dumps({"hooks": hooks}), encoding="utf-8"
+        )
+        return base
+
+    def test_obsolete_hooks_do_not_read_as_installed(self, tmp_path):
+        from superclaude.cli.install_inventory import (
+            _count_shipped_hooks,
+            list_all_components,
+        )
+        from superclaude.cli.install_paths import _get_package_root
+
+        shipped = _count_shipped_hooks(_get_package_root() / "hooks" / "hooks.json")
+        base = self._base(
+            tmp_path,
+            {
+                "PostToolUse": [
+                    {
+                        "matcher": "Edit",
+                        "hooks": [
+                            {"command": f"python {self.SC}/retired_{i}.py"}
+                            for i in range(shipped)
+                        ],
+                    }
+                ]
+            },
+        )
+
+        row = list_all_components(base_path=base, scope="user")["hooks_registered"]
+
+        assert row["available"] == shipped
+        assert row["installed"] == 0, "obsolete registrations counted as installed"
+        assert row["obsolete"] == shipped
+        assert row["missing"] == shipped
+
+    def test_a_matching_registration_counts(self, tmp_path):
+        from superclaude.cli.install_inventory import list_all_components
+
+        base = self._base(
+            tmp_path,
+            {
+                "PostToolUse": [
+                    {
+                        "matcher": "Edit|Write",
+                        "hooks": [{"command": f"python {self.SC}/prettier_hook.py"}],
+                    }
+                ]
+            },
+        )
+
+        row = list_all_components(base_path=base, scope="user")["hooks_registered"]
+
+        assert row["installed"] == 1
+        assert row["obsolete"] == 0
+
+    def test_a_duplicate_registration_is_named(self, tmp_path):
+        from superclaude.cli.install_inventory import list_all_components
+
+        base = self._base(
+            tmp_path,
+            {
+                "PostToolUse": [
+                    {
+                        "matcher": "Edit|Write",
+                        "hooks": [
+                            {"command": f"python {self.SC}/prettier_hook.py"},
+                            {"command": f"python {self.SC}/prettier_hook.py"},
+                        ],
+                    }
+                ]
+            },
+        )
+
+        row = list_all_components(base_path=base, scope="user")["hooks_registered"]
+
+        assert row["installed"] == 1
+        assert row["duplicate"] == 1
+
+    def test_dry_run_uninstall_counts_inner_hooks(self, tmp_path):
+        """`--dry-run` said "N hooks" while counting entries, so it under-reported."""
+        from superclaude.cli.install_inventory import uninstall_all
+
+        base = self._base(
+            tmp_path,
+            {
+                "PostToolUse": [
+                    {
+                        "matcher": "Edit",
+                        "hooks": [
+                            {"command": f"python {self.SC}/prettier_hook.py"},
+                            {"command": f"python {self.SC}/loop_guard.py"},
+                        ],
+                    }
+                ]
+            },
+        )
+
+        _success, message = uninstall_all(base_path=base, scope="user", dry_run=True)
+
+        assert "2 SuperClaude hooks" in message, message
