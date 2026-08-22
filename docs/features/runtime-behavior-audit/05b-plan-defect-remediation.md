@@ -15,18 +15,21 @@ itself is [05-plan.md](./05-plan.md); the root-cause diagnostics are [06-diagnos
 
 The Codex report is **accurate but incomplete**. All 13 of its claims were re-checked against the
 real source rather than against the report's own line numbers: **12 CONFIRMED, 1 PARTLY TRUE, 0
-wrong**. A blind-spot pass plus first-hand verification added **13 further findings**, three of them
+wrong**. A blind-spot pass plus first-hand verification added **13 further findings**, four of them
 P1. One of the new P1s outranks everything in the Codex report, because it breaks every user who
 upgrades with the documented command.
 
-| Severity | Codex | New | Total |
-|---|---:|---:|---:|
-| P1 | 4 (one demoted to P2) | 4 | 7 |
-| P2 | 6 (one promoted from P3) | 5 | 11 |
-| P3 | 3 | 4 (+1 doc) | 8 |
-| **Total** | **13** | **13** | **26** |
+| Source | Fixed | Deferred |
+|---|---:|---:|
+| Codex, findings 1–13 | 12 | 1 (finding 7) |
+| New, findings N1–N13 | 13 | 0 |
+| New, below the N-list | 0 | 5 |
+| **Total** | **25** | **6** |
 
-This plan fixes the 7 P1 and 11 P2 items. The 8 P3 items are recorded at the end for a follow-up.
+Severity drove the order, not the cut: the 7 P1 and 17 P2 items set the task sequence, and the
+lower-severity findings that shared a file or an identity decision with them were fixed in the same
+pass rather than left to drift. Codex 4 and 10 landed that way, inside Tasks 2 and 5. What remains is
+[deferred](#deferred-to-a-follow-up-p3) — six items, none of which is load-bearing.
 
 ## Two constraints that shape every fix
 
