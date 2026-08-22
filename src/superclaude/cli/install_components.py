@@ -71,10 +71,11 @@ def ensure_agent_memory_dir(base_path: Path, scope: str) -> Path | None:
     if not name:
         return None
     directory = base_path / name
-    try:
-        directory.mkdir(parents=True, exist_ok=True)
-    except OSError:
-        return None
+    # OSError propagates on purpose. Swallowing it returned the same None as an
+    # unsupported scope, and the caller could not tell "no store by design" from
+    # "the store could not be created" — so agents were rewritten to point at a
+    # directory that did not exist while the install reported success.
+    directory.mkdir(parents=True, exist_ok=True)
     return directory
 
 
@@ -360,10 +361,12 @@ def install_hooks_and_scripts(
                 ):
                     continue
 
+                # Build output, not user content: an upgrade refreshes it even
+                # without --force. Skipping it while settings.json still received
+                # the package's hooks.json let a release register a subcommand the
+                # installed script did not implement — argparse exit 2, the
+                # blocking code on Stop, on every turn.
                 target_file = scripts_target / source_file.name
-                if target_file.exists() and not force:
-                    skipped += 1
-                    continue
 
                 try:
                     shutil.copy2(source_file, target_file)
@@ -403,21 +406,17 @@ def install_hooks_and_scripts(
         hooks_target.mkdir(parents=True, exist_ok=True)
         target_hooks_json = hooks_target / "hooks.json"
 
-        if target_hooks_json.exists() and not force:
-            messages.append("hooks.json already exists (use --force to update)")
-            skipped += 1
-        else:
-            try:
-                target_hooks_json.write_text(
-                    hooks_content_transformed, encoding="utf-8"
-                )
-                installed += 1
-                messages.append(
-                    f"hooks.json installed (scripts path: {scripts_path_for_hooks})"
-                )
-            except OSError as e:
-                failed += 1
-                messages.append(f"Failed to install hooks.json: {e}")
+        # Same reason as the scripts above: this file has to describe the release
+        # whose scripts are on disk, so it is rewritten regardless of --force.
+        try:
+            target_hooks_json.write_text(hooks_content_transformed, encoding="utf-8")
+            installed += 1
+            messages.append(
+                f"hooks.json installed (scripts path: {scripts_path_for_hooks})"
+            )
+        except OSError as e:
+            failed += 1
+            messages.append(f"Failed to install hooks.json: {e}")
 
     # 2b. Merge hooks to settings.json (ensures Claude Code recognizes hooks)
     if hooks_content_transformed is not None:
@@ -467,7 +466,11 @@ def install_all(
 
     # Agents are rewritten to this scope's `memory:` value below; the store that
     # rewrite names has to exist for it to mean anything.
-    ensure_agent_memory_dir(base_path, scope)
+    try:
+        ensure_agent_memory_dir(base_path, scope)
+    except OSError as e:
+        total_failed += 1
+        messages.append(f"❌ Agent memory store: {e}")
 
     # Install each component
     for component, (_, _, description) in COMPONENTS.items():
@@ -508,6 +511,8 @@ def install_all(
     # Install CLAUDE_SC.md
     success, msg = install_claude_sc_md(base_path, force)
     messages.append(f"{'✅' if success else '❌'} {msg}")
+    if not success:
+        total_failed += 1
 
     # Check and update CLAUDE.md import (CLAUDE.local.md for local scope)
     messages.append("")
@@ -521,6 +526,10 @@ def install_all(
         if update_success:
             messages.append(f"✅ {update_msg}")
         else:
+            # Counted, not merely warned: without the import the framework is
+            # installed and inert, which is the state the summary would
+            # otherwise call a success.
+            total_failed += 1
             messages.append(f"⚠️  {update_msg}")
             messages.append(f"   Add manually: {CLAUDE_SC_IMPORT}")
 
@@ -531,6 +540,8 @@ def install_all(
         project_root = base_path.parent
         gi_ok, gi_msg = add_local_git_exclude(project_root)
         messages.append(f"{'✅' if gi_ok else '⚠️ '} {gi_msg}")
+        if not gi_ok:
+            total_failed += 1
 
     # Summary
     messages.append("")

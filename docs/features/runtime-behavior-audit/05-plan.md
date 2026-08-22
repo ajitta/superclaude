@@ -15,7 +15,7 @@ diagnostic comes first), the hook scripts in `scripts/` (injection, state, guard
 `cli/` (install-time merge and scope), and packaging on top. Code tasks are test-first against an
 existing suite file; content tasks are gated by the structural tests already covering them.
 
-**Tech Stack:** Python ≥3.10, UV, pytest (baseline 2102 passed / 28 skipped / 4 deselected), ruff.
+**Tech Stack:** Python ≥3.10, UV, pytest (baseline 2285 passed / 28 skipped / 4 deselected), ruff.
 
 **Source:** findings A1–A12 in [03-analysis.md](./03-analysis.md). Per-command trigger detail in
 [05a-plan-trigger-tiers.md](./05a-plan-trigger-tiers.md). Phase 1 results in
@@ -282,7 +282,7 @@ Every phase ends green against the baseline. It is echoed in `CLAUDE.md`, `AGENT
 `README.md` — update all three together if it moves.
 
 ```
-uv run pytest      # expect 2102 passed, 28 skipped, 4 deselected
+uv run pytest      # expect 2285 passed, 28 skipped, 4 deselected
 make lint
 ```
 

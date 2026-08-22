@@ -35,7 +35,7 @@ if TYPE_CHECKING:
 # stdlib-only, and hooks.json runs these scripts with the installer's own
 # interpreter ({{PYTHON_BIN}} = sys.executable), which has the package. Silently
 # degrading here would put state and content lookups in the wrong scope.
-from superclaude.utils import claude_base, context_cache_file, hook_state_dir
+from superclaude.utils import claude_base, context_cache_file
 
 # v2.2.0: MCP fallback notification support
 try:
@@ -67,8 +67,6 @@ CHARS_PER_TOKEN = 4  # Rough estimate
 # to mark it loaded for both, leaving the second window with nothing. A session
 # id only arrives on stdin, so the file is resolved once per run in main(); the
 # project-only name stays as the fallback for callers holding no session id.
-_CACHE_DIR = hook_state_dir()
-_CACHE_DIR.mkdir(parents=True, exist_ok=True)
 _ACTIVE_CACHE_FILE: Path | None = None
 
 
@@ -267,8 +265,72 @@ _BEHAVIORAL_MCPS = {"mcp/MCP_Serena.md", "mcp/MCP_Tavily.md"}
 # Environment variable to control instruction mode (default: enabled)
 USE_INSTRUCTIONS = os.environ.get("CLAUDE_CONTEXT_USE_INSTRUCTIONS", "1") == "1"
 
+# Where a flag is being *used* rather than *mentioned*.
+#
+# Every `--name` in the payload used to be a candidate, so a pasted shell
+# command, a quoted option in a review, or a sub-agent report listing flag names
+# produced advice about flags nobody typed. That half is noise. The other half
+# is not: `--verbose-context` forces full .md injection at 5-10x the token cost
+# and the execution flags inject behavioural directives, so quoted text could
+# change how the session runs. Both were reproduced from a report that only
+# quoted the names.
+#
+# Two rules, each matching how the strings actually appear. Code formatting —
+# fences, inline spans, blockquotes — marks a name being talked about. And an
+# option on a line that starts with an external runner belongs to that runner:
+# `cargo test --parallel` is cargo's flag, not this framework's.
+_FENCED_CODE_RE = re.compile(r"```.*?```", re.DOTALL)
+_INLINE_CODE_RE = re.compile(r"`[^`\n]+`")
+_BLOCKQUOTE_RE = re.compile(r"^\s*>.*$", re.MULTILINE)
+_WORD_RE = re.compile(r"[A-Za-z][\w.-]*")
+
+# Runners whose own options collide with SuperClaude names. A runner anywhere
+# ahead of the option on its line claims it — `run pytest --no-parallel for me`
+# is as much pytest's flag as `pytest --no-parallel` is. That over-reaches on a
+# line like "explain how python handles --loop", and the trade is deliberate:
+# the cost of over-reaching is one missing notice, and the cost of under-
+# reaching is a behavioural directive fired by text nobody typed. Not exhaustive
+# by design, for the same reason.
+_EXTERNAL_RUNNERS = frozenset(
+    {
+        "bun", "cargo", "curl", "docker", "eslint", "gh", "git", "go", "gradle",
+        "jest", "kubectl", "make", "mvn", "node", "npm", "npx", "pip", "pnpm",
+        "poetry", "prettier", "pytest", "python", "python3", "ruff", "rustc",
+        "terraform", "tsc", "uv", "uvx", "vitest", "wget", "yarn",
+    }
+)
+
+
+def scannable_prompt(prompt: str) -> str:
+    """The prompt with mentioned-not-used regions blanked out.
+
+    Blanks rather than deletes, so nothing downstream depends on offsets that
+    would shift.
+    """
+    text = _FENCED_CODE_RE.sub(" ", prompt)
+    if "```" in text:  # an unterminated fence opens a region that never closes
+        text = text[: text.index("```")]
+    text = _INLINE_CODE_RE.sub(" ", text)
+    text = _BLOCKQUOTE_RE.sub(" ", text)
+
+    kept = []
+    for line in text.splitlines():
+        head = line.split("--", 1)[0]
+        runner = any(
+            word.group(0).lower() in _EXTERNAL_RUNNERS for word in _WORD_RE.finditer(head)
+        )
+        kept.append("" if runner else line)
+    return "\n".join(kept)
+
+
+# How close a mistyped flag has to be to a retired name before we name it.
+# difflib.SequenceMatcher similarity, not edit distance: --parellel/--parallel
+# scores 0.88, while --link/--think scored 0.67 and produced advice to change a
+# valid curl option.
+RETIRED_FUZZY_CUTOFF = 0.8
+
 # Flag alias system — empty by design. All canonical flags live in VALID_FLAGS.
-# Typos are caught by the fuzzy-match fallback in resolve_flags (Levenshtein ≤ 2).
+# Typos are caught by the fuzzy-match fallback in resolve_flags (difflib ≥ 0.6).
 # Conceptual aliases (e.g., --parallel for --delegate) were removed to keep one
 # canonical name per concept; update command docs to use canonical flags directly.
 FLAG_ALIASES: dict[str, list[str]] = {}
@@ -338,10 +400,11 @@ def resolve_flags(prompt: str) -> tuple[str, list[str]]:
     """
     notifications: list[str] = []
     corrected = prompt
+    scannable = scannable_prompt(prompt)
 
     # Find all --flag patterns (flags may have values after them)
     flag_pattern = re.compile(r"--([a-zA-Z][\w-]*)")
-    for match in flag_pattern.finditer(prompt):
+    for match in flag_pattern.finditer(scannable):
         flag = match.group(1).lower()
 
         # Skip already-valid flags
@@ -368,7 +431,12 @@ def resolve_flags(prompt: str) -> tuple[str, list[str]]:
         if flag in RETIRED_FLAGS:
             notifications.append(f"--{flag} was retired. {RETIRED_FLAGS[flag]}")
             continue
-        retired_close = difflib.get_close_matches(flag, RETIRED_FLAGS, n=1, cutoff=0.6)
+        # Tighter than the valid-flag pass below: a retired name carries a
+        # replacement instruction, so a wrong match tells the user to change
+        # something that was right. 0.6 called --link a typo of --think.
+        retired_close = difflib.get_close_matches(
+            flag, RETIRED_FLAGS, n=1, cutoff=RETIRED_FUZZY_CUTOFF
+        )
         if retired_close:
             target = retired_close[0]
             notifications.append(
@@ -377,7 +445,7 @@ def resolve_flags(prompt: str) -> tuple[str, list[str]]:
             )
             continue
 
-        # Fuzzy match fallback (Levenshtein distance ≤ 2)
+        # Fuzzy match fallback — difflib similarity, not edit distance
         close = difflib.get_close_matches(flag, VALID_FLAGS, n=3, cutoff=0.6)
         if close:
             suggestions = ", ".join(f"--{c}" for c in close)
@@ -418,7 +486,7 @@ def _known_command_names() -> set[str]:
     return set()
 
 
-def resolve_command_name(prompt: str) -> tuple[list[str], bool]:
+def resolve_command_name(prompt: str) -> tuple[list[str], set[str]]:
     """Check the /sc: name in a prompt against what is installed.
 
     Never rewrites the prompt. A wrong name gets one comment naming what it
@@ -426,31 +494,57 @@ def resolve_command_name(prompt: str) -> tuple[list[str], bool]:
     command context — injecting it anyway made a command that does not exist look
     to the model exactly like one that does.
 
+    Every token is checked, not just the first: a valid name up front used to let
+    every later unknown one through unremarked.
+
     Returns:
-        (notifications, suppress_command_context)
+        (notifications, names that resolve to nothing)
     """
-    match = _COMMAND_TOKEN_RE.search(prompt)
-    if not match:
-        return [], False
-
-    name = match.group(1).lower()
     known = _known_command_names()
-    if not known or name in known:
-        return [], False
+    if not known:
+        return [], set()
 
-    if name in RETIRED_COMMANDS:
-        replacement = RETIRED_COMMANDS[name]
-        return (
-            [f"/sc:{name} was renamed. Use /sc:{replacement}."],
-            replacement not in known,
-        )
+    notifications: list[str] = []
+    unresolved: set[str] = set()
+    for name in dict.fromkeys(
+        m.group(1).lower() for m in _COMMAND_TOKEN_RE.finditer(prompt)
+    ):
+        if name in known:
+            continue
 
-    close = difflib.get_close_matches(name, known, n=3, cutoff=0.6)
-    if close:
-        suggestions = ", ".join(f"/sc:{c}" for c in close)
-        return [f"/sc:{name} is not a command. Did you mean: {suggestions}?"], False
+        if name in RETIRED_COMMANDS:
+            replacement = RETIRED_COMMANDS[name]
+            notifications.append(f"/sc:{name} was renamed. Use /sc:{replacement}.")
+            if replacement not in known:
+                unresolved.add(name)
+            continue
 
-    return [f"/sc:{name} is not a command. Run /sc:help for the list."], True
+        close = difflib.get_close_matches(name, known, n=3, cutoff=0.6)
+        if close:
+            suggestions = ", ".join(f"/sc:{c}" for c in close)
+            notifications.append(
+                f"/sc:{name} is not a command. Did you mean: {suggestions}?"
+            )
+            continue
+
+        notifications.append(f"/sc:{name} is not a command. Run /sc:help for the list.")
+        unresolved.add(name)
+
+    return notifications, unresolved
+
+
+def strip_unresolved_commands(prompt: str, unresolved: set[str]) -> str:
+    """Remove only the tokens that name nothing, leaving valid ones in place.
+
+    Suppression used to run `_COMMAND_TOKEN_RE.sub("", prompt)`, which removed
+    every `/sc:` token — so one unresolvable name in a prompt also cost a valid
+    command its context.
+    """
+    if not unresolved:
+        return prompt
+    return _COMMAND_TOKEN_RE.sub(
+        lambda m: "" if m.group(1).lower() in unresolved else m.group(0), prompt
+    )
 
 
 # v2.1.0: Skills configuration
@@ -505,7 +599,12 @@ def mark_as_loaded(contexts: str | list[str]) -> None:
         loaded.add(contexts)
     else:
         loaded.update(contexts)
-    cache_file().write_text("\n".join(loaded))
+    # Created here rather than at import: importing this module used to mkdir in
+    # the developer's real home during pytest collection, before any fixture had
+    # redirected HOME.
+    path = cache_file()
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text("\n".join(loaded))
 
 
 def estimate_tokens(content: str) -> int:
@@ -633,7 +732,9 @@ def output_inject_mode(
     skipped_files = []
 
     # v3.2: --verbose-context overrides INSTRUCTION_MAP (force full .md)
-    verbose = bool(re.search(r"--verbose-context", prompt, re.IGNORECASE))
+    verbose = bool(
+        re.search(r"--verbose-context", scannable_prompt(prompt), re.IGNORECASE)
+    )
     if verbose:
         print(
             "<!-- SuperClaude --verbose-context: forcing full .md injection for "
@@ -758,8 +859,9 @@ def _emit_execution_directives(prompt: str) -> None:
     Session-deduped: each (pattern, matched-flag) combo emits once per session."""
     loaded = get_loaded_contexts()
     new_marks = []
+    scannable = scannable_prompt(prompt)
     for pattern, directive_fn in _EXECUTION_DIRECTIVES.items():
-        match = pattern.search(prompt)
+        match = pattern.search(scannable)
         if not match:
             continue
         marker = f"_directive:{pattern.pattern}:{match.group(0).lower()}"
@@ -830,20 +932,21 @@ def main() -> None:
     _emit_execution_directives(prompt)
 
     # An unknown /sc: name must not read as a real command
-    command_notes, suppress_command_context = resolve_command_name(prompt)
+    command_notes, unresolved_commands = resolve_command_name(prompt)
     for note in command_notes:
         print(f"<!-- SuperClaude command: {note} -->")
     if command_notes:
         print()
 
     # Check triggers and get contexts to load
-    trigger_prompt = (
-        _COMMAND_TOKEN_RE.sub("", prompt) if suppress_command_context else prompt
-    )
+    trigger_prompt = strip_unresolved_commands(prompt, unresolved_commands)
     contexts = check_triggers(trigger_prompt)
 
     # --no-mcp notification — once per session
-    if "--no-mcp" in prompt.lower() and "_notice:--no-mcp" not in get_loaded_contexts():
+    if (
+        "--no-mcp" in scannable_prompt(prompt).lower()
+        and "_notice:--no-mcp" not in get_loaded_contexts()
+    ):
         print(
             "<!-- --no-mcp: MCP contexts suppressed. Using native tools + WebSearch. -->"
         )

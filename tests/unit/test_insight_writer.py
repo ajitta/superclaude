@@ -931,11 +931,23 @@ class TestModelEmittedMarkers:
     """
 
     def test_assistant_marker_is_harvested(self, workdir, monkeypatch):
+        """The request is part of the fixture because it is part of the flow.
+
+        An assistant marker is harvested when it answers the Stop hook's
+        request. Unprompted ones are the model explaining the format rather
+        than reporting a lesson — see TestHarvestOnlyTakesAnsweredMarkers.
+        """
         ns, pdir = _harvest(workdir, monkeypatch, "sess1")
         _make_transcript(
             pdir,
             "sess1",
             [
+                {
+                    "type": "user",
+                    "isMeta": False,
+                    "uuid": "r1",
+                    "message": {"role": "user", "content": iw.REQUEST_REASON},
+                },
                 {
                     "type": "assistant",
                     "uuid": "a1",
@@ -990,7 +1002,7 @@ class TestInsightRequestHook:
 
         monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(workdir))
         monkeypatch.delenv("SUPERCLAUDE_INSIGHT_PROMPT", raising=False)
-        monkeypatch.setattr(iw, "_working_tree_changed", lambda: dirty)
+        monkeypatch.setattr(iw, "_session_changed_code", lambda _session: dirty)
         return iw.cmd_request(
             argparse.Namespace(session_id="sess1", stop_hook_active=stop_hook_active)
         )
@@ -1028,8 +1040,451 @@ class TestInsightRequestHook:
 
         monkeypatch.setenv("SUPERCLAUDE_INSIGHT_PROMPT", "0")
         monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(workdir))
-        monkeypatch.setattr(iw, "_working_tree_changed", lambda: True)
+        monkeypatch.setattr(iw, "_session_changed_code", lambda _session: True)
 
         iw.cmd_request(argparse.Namespace(session_id="sess1", stop_hook_active=False))
 
         assert capsys.readouterr().out.strip() == ""
+
+
+def _committed_repo(tmp_path, monkeypatch):
+    """A real git repository with one commit, anchored for the hook resolvers."""
+    import subprocess
+
+    for cmd in (
+        ["git", "init", "-q"],
+        ["git", "config", "user.email", "test@example.com"],
+        ["git", "config", "user.name", "test"],
+    ):
+        subprocess.run(cmd, cwd=tmp_path, check=True)
+    (tmp_path / "tracked.txt").write_text("hello\n", encoding="utf-8")
+    subprocess.run(["git", "add", "-A"], cwd=tmp_path, check=True)
+    subprocess.run(["git", "commit", "-qm", "base"], cwd=tmp_path, check=True)
+    monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(tmp_path))
+    return tmp_path
+
+
+class TestFrameworkStateIsNotAUserChange:
+    """SuperClaude's own runtime files must not read as "the session changed code".
+
+    The gate asked whether `git status --porcelain` printed anything. In a
+    project- or local-scope install the framework writes its context cache,
+    pending-insight file and agent-memory store inside the worktree, and nothing
+    excludes them for project scope at all — so a session that read one file and
+    edited nothing ended with a blocking Stop asking for a lesson it did not
+    have. This repository only looked clean because its .gitignore was written
+    by hand.
+    """
+
+    def test_runtime_cache_is_ignored(self, tmp_path, monkeypatch):
+        import superclaude.scripts.insight_writer as iw
+
+        repo = _committed_repo(tmp_path, monkeypatch)
+        state = repo / ".claude" / ".superclaude_hooks"
+        state.mkdir(parents=True)
+        (state / "claude_context_abc.txt").write_text("cached\n", encoding="utf-8")
+
+        assert iw._working_tree_changed() is False
+
+    def test_pending_insights_are_ignored(self, tmp_path, monkeypatch):
+        import superclaude.scripts.insight_writer as iw
+
+        repo = _committed_repo(tmp_path, monkeypatch)
+        (repo / ".claude").mkdir()
+        (repo / ".claude" / "insights.pending.jsonl").write_text(
+            '{"text": "x"}\n', encoding="utf-8"
+        )
+
+        assert iw._working_tree_changed() is False
+
+    def test_agent_memory_is_ignored(self, tmp_path, monkeypatch):
+        import superclaude.scripts.insight_writer as iw
+
+        repo = _committed_repo(tmp_path, monkeypatch)
+        memory = repo / ".claude" / "agent-memory" / "system-architect"
+        memory.mkdir(parents=True)
+        (memory / "notes.md").write_text("note\n", encoding="utf-8")
+
+        assert iw._working_tree_changed() is False
+
+    def test_a_real_edit_still_counts(self, tmp_path, monkeypatch):
+        import superclaude.scripts.insight_writer as iw
+
+        repo = _committed_repo(tmp_path, monkeypatch)
+        (repo / "tracked.txt").write_text("edited\n", encoding="utf-8")
+
+        assert iw._working_tree_changed() is True
+
+    def test_a_new_source_file_still_counts(self, tmp_path, monkeypatch):
+        import superclaude.scripts.insight_writer as iw
+
+        repo = _committed_repo(tmp_path, monkeypatch)
+        (repo / "new_module.py").write_text("x = 1\n", encoding="utf-8")
+
+        assert iw._working_tree_changed() is True
+
+
+class TestSessionBaselineDecidesTheAsk:
+    """"Is the tree dirty" is not "did this session change code".
+
+    A repository dirty before the session started satisfied the old gate on the
+    very first turn, so the one request a session gets was spent on a turn that
+    changed nothing. Recording a fingerprint at SessionStart and diffing at Stop
+    asks the question the prompt text actually claims to ask.
+    """
+
+    def test_pre_existing_dirt_does_not_trigger(self, tmp_path, monkeypatch, capsys):
+        import superclaude.scripts.insight_writer as iw
+
+        repo = _committed_repo(tmp_path, monkeypatch)
+        monkeypatch.setattr(iw, "hook_state_dir", lambda: tmp_path / ".git" / "sc-state")
+        (repo / "tracked.txt").write_text("dirty before the session\n", encoding="utf-8")
+
+        iw.main(["session-baseline", "--session-id", "s1"])
+        capsys.readouterr()
+
+        iw.main(["request", "--session-id", "s1"])
+
+        assert capsys.readouterr().out.strip() == "", (
+            "a session that changed nothing was asked for a lesson"
+        )
+
+    def test_a_change_after_the_baseline_triggers(self, tmp_path, monkeypatch, capsys):
+        import json
+
+        import superclaude.scripts.insight_writer as iw
+
+        repo = _committed_repo(tmp_path, monkeypatch)
+        monkeypatch.setattr(iw, "hook_state_dir", lambda: tmp_path / ".git" / "sc-state")
+
+        iw.main(["session-baseline", "--session-id", "s2"])
+        capsys.readouterr()
+        (repo / "tracked.txt").write_text("changed during the session\n", encoding="utf-8")
+
+        iw.main(["request", "--session-id", "s2"])
+
+        payload = json.loads(capsys.readouterr().out)
+        assert payload["decision"] == "block"
+
+    def test_without_a_baseline_it_falls_back_to_the_proxy(
+        self, tmp_path, monkeypatch, capsys
+    ):
+        """An install whose SessionStart hook is not registered still works."""
+        import json
+
+        import superclaude.scripts.insight_writer as iw
+
+        repo = _committed_repo(tmp_path, monkeypatch)
+        monkeypatch.setattr(iw, "hook_state_dir", lambda: tmp_path / ".git" / "sc-state")
+        (repo / "tracked.txt").write_text("dirty\n", encoding="utf-8")
+
+        iw.main(["request", "--session-id", "s3"])
+
+        payload = json.loads(capsys.readouterr().out)
+        assert payload["decision"] == "block"
+
+
+def _assistant(uuid: str, text: str, **extra) -> dict:
+    record = {
+        "type": "assistant",
+        "isMeta": False,
+        "uuid": uuid,
+        "sessionId": "sess1",
+        "timestamp": "2026-08-22T10:00:00Z",
+        "message": {"role": "assistant", "content": text},
+    }
+    record.update(extra)
+    return record
+
+
+def _pending_texts(workdir):
+    path = workdir / ".claude" / "insights.pending.jsonl"
+    if not path.exists():
+        return []
+    return [
+        json.loads(line)["raw_text"]
+        for line in path.read_text(encoding="utf-8").splitlines()
+        if line.strip()
+    ]
+
+
+class TestHarvestOnlyTakesAnsweredMarkers:
+    """An assistant marker counts when it answers the request, not otherwise.
+
+    Widening the scan from user records to every assistant record gave the
+    subsystem a producer, and simultaneously made every explanation of the
+    marker into an entry: a document quoting it, a review of this very file, a
+    reply repeating an earlier answer. A user typing the marker is explicit
+    intent and still always counts.
+    """
+
+    def test_an_unprompted_assistant_marker_is_not_harvested(
+        self, workdir, monkeypatch
+    ):
+        ns, pdir = _harvest(workdir, monkeypatch, "sess1")
+        _make_transcript(
+            pdir,
+            "sess1",
+            [_assistant("a1", "The format is a line beginning INSIGHT: like this.")],
+        )
+
+        assert iw.cmd_harvest(ns) == 0
+        assert _pending_texts(workdir) == []
+
+    def test_an_answer_to_the_request_is_harvested(self, workdir, monkeypatch):
+        ns, pdir = _harvest(workdir, monkeypatch, "sess1")
+        _make_transcript(
+            pdir,
+            "sess1",
+            [
+                {
+                    "type": "user",
+                    "isMeta": False,
+                    "uuid": "r1",
+                    "sessionId": "sess1",
+                    "message": {"role": "user", "content": iw.REQUEST_REASON},
+                },
+                _assistant("a1", "Done. INSIGHT: the cache key needed the session id."),
+            ],
+        )
+
+        assert iw.cmd_harvest(ns) == 0
+        assert _pending_texts(workdir) == ["the cache key needed the session id."]
+
+    def test_a_user_typed_marker_never_needs_a_request(self, workdir, monkeypatch):
+        ns, pdir = _harvest(workdir, monkeypatch, "sess1")
+        _make_transcript(
+            pdir,
+            "sess1",
+            [
+                {
+                    "type": "user",
+                    "isMeta": False,
+                    "uuid": "u1",
+                    "sessionId": "sess1",
+                    "message": {"role": "user", "content": "INSIGHT: typed by hand"},
+                }
+            ],
+        )
+
+        assert iw.cmd_harvest(ns) == 0
+        assert _pending_texts(workdir) == ["typed by hand"]
+
+    def test_a_reply_quoting_the_request_still_yields_its_marker(
+        self, workdir, monkeypatch
+    ):
+        """The sentinel marks the request, not everything that mentions it."""
+        ns, pdir = _harvest(workdir, monkeypatch, "sess1")
+        _make_transcript(
+            pdir,
+            "sess1",
+            [
+                {
+                    "type": "user",
+                    "isMeta": False,
+                    "uuid": "r1",
+                    "sessionId": "sess1",
+                    "message": {"role": "user", "content": iw.REQUEST_REASON},
+                },
+                _assistant(
+                    "a1",
+                    f"You asked {iw.REQUEST_SENTINEL} for a lesson. "
+                    "INSIGHT: quoting the prompt is not disqualifying.",
+                ),
+            ],
+        )
+
+        assert iw.cmd_harvest(ns) == 0
+        assert _pending_texts(workdir) == [
+            "quoting the prompt is not disqualifying."
+        ]
+
+    def test_sub_agent_records_are_skipped(self, workdir, monkeypatch):
+        """A sub-agent's transcript is not this session's lesson."""
+        ns, pdir = _harvest(workdir, monkeypatch, "sess1")
+        _make_transcript(
+            pdir,
+            "sess1",
+            [
+                {
+                    "type": "user",
+                    "isMeta": False,
+                    "uuid": "r1",
+                    "sessionId": "sess1",
+                    "message": {"role": "user", "content": iw.REQUEST_REASON},
+                },
+                _assistant("a1", "INSIGHT: from a branch", isSidechain=True),
+            ],
+        )
+
+        assert iw.cmd_harvest(ns) == 0
+        assert _pending_texts(workdir) == []
+
+
+class TestHarvestRemembersWhatItPromoted:
+    """Dedup has to outlive the pending row it was reading.
+
+    Marker ids were read only from the pending file, and promote removes the row
+    it promotes. `PreCompact` harvest → promote → `SessionEnd` harvest of the
+    same transcript therefore re-created an entry the user had already filed.
+    """
+
+    def test_a_promoted_marker_is_not_harvested_again(self, workdir, monkeypatch):
+        import argparse
+
+        ns, pdir = _harvest(workdir, monkeypatch, "sess1")
+        _make_transcript(
+            pdir,
+            "sess1",
+            [
+                {
+                    "type": "user",
+                    "isMeta": False,
+                    "uuid": "r1",
+                    "sessionId": "sess1",
+                    "message": {"role": "user", "content": iw.REQUEST_REASON},
+                },
+                _assistant("a1", "INSIGHT: promoted once, harvested once"),
+            ],
+        )
+
+        iw.cmd_harvest(ns)
+        assert len(_pending_texts(workdir)) == 1
+
+        iw.cmd_promote(
+            argparse.Namespace(
+                index=0, type="discovery", tags=None, author=None, insight=None
+            )
+        )
+        assert _pending_texts(workdir) == []
+
+        iw.cmd_harvest(ns)
+        assert _pending_texts(workdir) == [], (
+            "an already-promoted marker came back as pending"
+        )
+
+
+class TestTranscriptComesFromThePayload:
+    """Claude Code names the transcript; guessing it can read another window's.
+
+    `_find_transcript` rebuilt the path from cwd and session id and fell back to
+    the most recently modified file in that directory — which, with two windows
+    open on one repository, is the other window's live session.
+    """
+
+    def test_the_given_path_wins_over_the_guess(self, workdir, monkeypatch):
+        import argparse
+
+        _ns, pdir = _harvest(workdir, monkeypatch, "sess1")
+        _make_transcript(
+            pdir,
+            "sess1",
+            [
+                {
+                    "type": "user",
+                    "isMeta": False,
+                    "uuid": "u1",
+                    "sessionId": "sess1",
+                    "message": {"role": "user", "content": "INSIGHT: the guessed one"},
+                }
+            ],
+        )
+        named = _make_transcript(
+            workdir / "elsewhere",
+            "other",
+            [
+                {
+                    "type": "user",
+                    "isMeta": False,
+                    "uuid": "u2",
+                    "sessionId": "other",
+                    "message": {"role": "user", "content": "INSIGHT: the named one"},
+                }
+            ],
+        )
+
+        iw.cmd_harvest(
+            argparse.Namespace(
+                cwd=str(workdir),
+                session_id="sess1",
+                source="clear",
+                transcript_path=str(named),
+            )
+        )
+
+        assert _pending_texts(workdir) == ["the named one"]
+
+
+class TestStopCollectsItsOwnAnswer:
+    """The reply arrives a turn after the ask, and Stop used to never read it.
+
+    Only PreCompact and SessionEnd harvest, so a session that ended without
+    either — a closed terminal, a crash — asked for a lesson and then threw the
+    answer away.
+    """
+
+    def test_the_next_stop_harvests_the_reply(self, workdir, monkeypatch, capsys):
+        import argparse
+
+        _ns, pdir = _harvest(workdir, monkeypatch, "sess-answer")
+        monkeypatch.setattr(iw, "_session_changed_code", lambda _session: True)
+        monkeypatch.delenv("SUPERCLAUDE_INSIGHT_PROMPT", raising=False)
+
+        def _request():
+            return iw.cmd_request(
+                argparse.Namespace(
+                    session_id="sess-answer",
+                    stop_hook_active=False,
+                    cwd=str(workdir),
+                    transcript_path=None,
+                )
+            )
+
+        _request()
+        assert json.loads(capsys.readouterr().out)["decision"] == "block"
+
+        _make_transcript(
+            pdir,
+            "sess-answer",
+            [
+                {
+                    "type": "user",
+                    "isMeta": False,
+                    "uuid": "r1",
+                    "message": {"role": "user", "content": iw.REQUEST_REASON},
+                },
+                _assistant("a1", "INSIGHT: the answer must survive a lost SessionEnd"),
+            ],
+        )
+
+        _request()
+
+        assert capsys.readouterr().out.strip() == "", "Stop spoke twice in one session"
+        assert _pending_texts(workdir) == [
+            "the answer must survive a lost SessionEnd"
+        ]
+
+    def test_it_collects_only_once(self, workdir, monkeypatch, capsys):
+        import argparse
+
+        _ns, pdir = _harvest(workdir, monkeypatch, "sess-once")
+        monkeypatch.setattr(iw, "_session_changed_code", lambda _session: True)
+        monkeypatch.delenv("SUPERCLAUDE_INSIGHT_PROMPT", raising=False)
+        calls = []
+        real_harvest = iw.cmd_harvest
+        monkeypatch.setattr(
+            iw, "cmd_harvest", lambda args: (calls.append(args), real_harvest(args))[1]
+        )
+
+        for _ in range(3):
+            iw.cmd_request(
+                argparse.Namespace(
+                    session_id="sess-once",
+                    stop_hook_active=False,
+                    cwd=str(workdir),
+                    transcript_path=None,
+                )
+            )
+        capsys.readouterr()
+
+        assert len(calls) == 1

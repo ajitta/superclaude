@@ -121,6 +121,51 @@ class TestCommandInvocationContract:
         )
 
 
+class TestDescriptionDoesNotOutrunTheBody:
+    """A description must not claim what the body gates.
+
+    Two shapes got through the existing lints, which are lexical only. `git.md`
+    said invoking it "approves history-rewriting ops" while `<approval_required>`
+    listed those same three operations as needing approval — one reading of that
+    sentence is that typing the command *is* the approval. And
+    `troubleshoot.md` said it "writes a failing test and applies the fix"
+    unconditionally, while the fix is behind `--fix` and `<bounds><never>` says
+    risky fixes need confirm.
+
+    The description is read by the model as the routing contract, so a claim it
+    makes there outranks a qualification the body makes later.
+    """
+
+    APPROVAL_VERBS = re.compile(r"\bapprove[sd]?\b|\bauthoriz\w*\b|\bgrants?\b")
+
+    def test_no_approval_claim_when_the_body_requires_approval(self, command):
+        stem, content, fm = command
+        if "<approval_required>" not in content:
+            return
+        desc = fm.get("description", "")
+        match = self.APPROVAL_VERBS.search(desc)
+        assert match is None, (
+            f"{stem}: description says {match.group(0)!r} while the body lists "
+            f"operations under <approval_required>. Invoking a command cannot be "
+            f"the approval for the operations it gates — say what the command "
+            f"does and leave approval to the body."
+        )
+
+    def test_an_opt_in_mutation_is_named_with_its_flag(self, command):
+        """A `--fix`-style flag is opt-in; the description must say so."""
+        stem, content, fm = command
+        if "--fix" not in content:
+            return
+        desc = fm.get("description", "")
+        claims_fix = re.search(r"applies the fix|applies fixes|apply the fix", desc)
+        if not claims_fix:
+            return
+        assert "--fix" in desc, (
+            f"{stem}: description claims it applies the fix, but the fix is behind "
+            f"the opt-in --fix flag. Name the flag or drop the claim."
+        )
+
+
 class TestCommandXMLStructure:
     """Validate XML component structure in every command file."""
 

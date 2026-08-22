@@ -324,3 +324,254 @@ class TestAgentMemoryDirectory:
         assert success, message
         assert (base / "agent-memory-local").is_dir()
 
+
+
+class TestFrameworkArtifactsAlwaysUpdate:
+    """Scripts and hooks.json are build outputs, so an upgrade must refresh them.
+
+    `superclaude install` without `--force` used to skip any script already on
+    disk while still merging the *package's* hooks.json into settings.json. A
+    release that adds a hook therefore registered a subcommand the installed
+    script did not implement: `insight_writer.py request-from-hook` reached
+    argparse, exited 2 — the blocking code on `Stop` — and pushed usage text back
+    into the model on every turn. The mirror failure is that none of a release's
+    script fixes shipped either.
+
+    These files are SuperClaude-owned outputs, not user-editable content, so
+    `--force` keeps its meaning for settings, commands, agents and core only.
+    """
+
+    def test_stale_script_is_replaced_without_force(self, tmp_path):
+        from superclaude.cli.install_components import install_hooks_and_scripts
+
+        base = tmp_path / ".claude"
+        scripts_target = base / "superclaude" / "scripts"
+        scripts_target.mkdir(parents=True)
+        stale = scripts_target / "insight_writer.py"
+        stale.write_text("# previous release, no request subcommand\n", encoding="utf-8")
+
+        installed, _skipped, failed, messages = install_hooks_and_scripts(
+            base_path=base, force=False, scope="user"
+        )
+
+        assert failed == 0, messages
+        assert "request-from-hook" in stale.read_text(encoding="utf-8"), (
+            "a non-force install left the previous release's script in place while "
+            "registering a hook that needs the new one"
+        )
+        assert installed > 0
+
+    def test_stale_hooks_json_is_replaced_without_force(self, tmp_path):
+        from superclaude.cli.install_components import install_hooks_and_scripts
+
+        base = tmp_path / ".claude"
+        hooks_target = base / "hooks"
+        hooks_target.mkdir(parents=True)
+        stale = hooks_target / "hooks.json"
+        stale.write_text('{"hooks": {}}\n', encoding="utf-8")
+
+        _installed, _skipped, failed, messages = install_hooks_and_scripts(
+            base_path=base, force=False, scope="user"
+        )
+
+        assert failed == 0, messages
+        assert "Stop" in stale.read_text(encoding="utf-8"), (
+            "the on-disk hooks.json still describes a previous release"
+        )
+
+    def test_every_registered_command_is_supported_by_its_script(self):
+        """The invariant that would have caught the version skew at authoring time.
+
+        Each `command` in hooks.json names a script and, sometimes, a subcommand.
+        Both have to exist in the shipped script.
+        """
+        import json
+        import re
+        from pathlib import Path
+
+        package_root = Path(__file__).parent.parent.parent / "src" / "superclaude"
+        config = json.loads(
+            (package_root / "hooks" / "hooks.json").read_text(encoding="utf-8")
+        )
+
+        unsupported = []
+        for event, entries in config.get("hooks", {}).items():
+            for entry in entries:
+                for hook in entry.get("hooks", []):
+                    command = hook.get("command", "")
+                    match = re.search(r"([A-Za-z0-9_]+\.py)(.*)$", command)
+                    assert match, f"{event}: cannot parse command {command!r}"
+
+                    script = package_root / "scripts" / match.group(1)
+                    if not script.exists():
+                        unsupported.append(f"{event}: {match.group(1)} does not ship")
+                        continue
+
+                    source = script.read_text(encoding="utf-8")
+                    for token in match.group(2).split():
+                        if token.startswith("-"):
+                            continue
+                        if f'"{token}"' not in source and f"'{token}'" not in source:
+                            unsupported.append(
+                                f"{event}: {match.group(1)} does not accept {token!r}"
+                            )
+
+        assert not unsupported, "\n".join(unsupported)
+
+
+class TestHookRegistrationIsCheckedByIdentity:
+    """`N/N ✅` has to mean the shipped hooks are the registered hooks.
+
+    The row compared two integers. Fourteen obsolete SuperClaude hooks and
+    fourteen shipped ones read as `14/14 ✅`, certifying an install whose
+    settings pointed at scripts this release no longer has — the exact state a
+    `--force` install could not clear.
+    """
+
+    SC = "~/.claude/superclaude/scripts"
+
+    def _base(self, tmp_path, hooks: dict):
+        import json
+
+        base = tmp_path / ".claude"
+        (base / "hooks").mkdir(parents=True)
+        (base / "hooks" / "hooks.json").write_text("{}", encoding="utf-8")
+        (base / "settings.json").write_text(
+            json.dumps({"hooks": hooks}), encoding="utf-8"
+        )
+        return base
+
+    def test_obsolete_hooks_do_not_read_as_installed(self, tmp_path):
+        from superclaude.cli.install_inventory import (
+            _count_shipped_hooks,
+            list_all_components,
+        )
+        from superclaude.cli.install_paths import _get_package_root
+
+        shipped = _count_shipped_hooks(_get_package_root() / "hooks" / "hooks.json")
+        base = self._base(
+            tmp_path,
+            {
+                "PostToolUse": [
+                    {
+                        "matcher": "Edit",
+                        "hooks": [
+                            {"command": f"python {self.SC}/retired_{i}.py"}
+                            for i in range(shipped)
+                        ],
+                    }
+                ]
+            },
+        )
+
+        row = list_all_components(base_path=base, scope="user")["hooks_registered"]
+
+        assert row["available"] == shipped
+        assert row["installed"] == 0, "obsolete registrations counted as installed"
+        assert row["obsolete"] == shipped
+        assert row["missing"] == shipped
+
+    def test_a_matching_registration_counts(self, tmp_path):
+        from superclaude.cli.install_inventory import list_all_components
+
+        base = self._base(
+            tmp_path,
+            {
+                "PostToolUse": [
+                    {
+                        "matcher": "Edit|Write",
+                        "hooks": [{"command": f"python {self.SC}/prettier_hook.py"}],
+                    }
+                ]
+            },
+        )
+
+        row = list_all_components(base_path=base, scope="user")["hooks_registered"]
+
+        assert row["installed"] == 1
+        assert row["obsolete"] == 0
+
+    def test_a_duplicate_registration_is_named(self, tmp_path):
+        from superclaude.cli.install_inventory import list_all_components
+
+        base = self._base(
+            tmp_path,
+            {
+                "PostToolUse": [
+                    {
+                        "matcher": "Edit|Write",
+                        "hooks": [
+                            {"command": f"python {self.SC}/prettier_hook.py"},
+                            {"command": f"python {self.SC}/prettier_hook.py"},
+                        ],
+                    }
+                ]
+            },
+        )
+
+        row = list_all_components(base_path=base, scope="user")["hooks_registered"]
+
+        assert row["installed"] == 1
+        assert row["duplicate"] == 1
+
+    def test_dry_run_uninstall_counts_inner_hooks(self, tmp_path):
+        """`--dry-run` said "N hooks" while counting entries, so it under-reported."""
+        from superclaude.cli.install_inventory import uninstall_all
+
+        base = self._base(
+            tmp_path,
+            {
+                "PostToolUse": [
+                    {
+                        "matcher": "Edit",
+                        "hooks": [
+                            {"command": f"python {self.SC}/prettier_hook.py"},
+                            {"command": f"python {self.SC}/loop_guard.py"},
+                        ],
+                    }
+                ]
+            },
+        )
+
+        _success, message = uninstall_all(base_path=base, scope="user", dry_run=True)
+
+        assert "2 SuperClaude hooks" in message, message
+
+
+class TestFailuresReachTheSummary:
+    """`0 failed` has to mean nothing failed.
+
+    `ensure_agent_memory_dir` swallowed OSError and returned None, and the caller
+    discarded the return value — so agents were rewritten to point at a store
+    that could not be created while the install reported success. Three more
+    steps printed ❌ or ⚠️ without touching the failure count, which is how
+    `overall_success` could be True with a ❌ on screen.
+    """
+
+    def test_a_blocked_memory_directory_fails_the_install(self, tmp_path):
+        from superclaude.cli.install_components import install_all
+
+        base = tmp_path / ".claude"
+        base.mkdir(parents=True)
+        # A regular file where the store belongs: mkdir raises FileExistsError.
+        (base / "agent-memory-local").write_text("not a directory", encoding="utf-8")
+
+        success, message = install_all(base_path=base, force=True, scope="local")
+
+        assert not success, message
+        assert "0 failed" not in message, message
+
+    def test_an_unsupported_scope_is_not_a_failure(self, tmp_path):
+        """`target` has no documented store; absence by design is not an error."""
+        from superclaude.cli.install_components import ensure_agent_memory_dir
+
+        assert ensure_agent_memory_dir(tmp_path / ".claude", "target") is None
+
+    def test_a_healthy_install_still_reports_success(self, tmp_path):
+        from superclaude.cli.install_components import install_all
+
+        success, message = install_all(
+            base_path=tmp_path / ".claude", force=True, scope="local"
+        )
+
+        assert success, message

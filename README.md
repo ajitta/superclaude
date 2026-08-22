@@ -50,7 +50,7 @@ Claude Code reads those files at session start, which is how the framework chang
 
 | File | Purpose |
 |------|---------|
-| [`CLAUDE.md`](CLAUDE.md) | Project-specific rules: env (UV), make targets, test baseline (2157 passing), git workflow |
+| [`CLAUDE.md`](CLAUDE.md) | Project-specific rules: env (UV), make targets, test baseline (2285 passing), git workflow |
 | [`src/superclaude/ARCHITECTURE.md`](src/superclaude/ARCHITECTURE.md) | Content-framework taxonomy — directory roles, delivery pipelines, content types |
 | [`src/superclaude/CLAUDE_SC.md`](src/superclaude/CLAUDE_SC.md) | The always-loaded import chain → `core/FLAGS.md`, `PRINCIPLES.md`, `RULES.md` |
 | [`.claude/rules/`](.claude/rules) | Authoring specs for agents/commands/skills/modes |

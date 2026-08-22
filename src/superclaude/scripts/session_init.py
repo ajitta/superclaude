@@ -60,16 +60,6 @@ def get_install_status() -> str:
     return f"🛠️ SuperClaude: {commands} commands, {agents} {agent_word} ({scope} scope)"
 
 
-def reset_context_cache() -> None:
-    """Reset context_loader dedup cache so new session gets fresh injections."""
-    try:
-        from superclaude.scripts.context_reset import reset_context_cache as _reset
-
-        _reset()
-    except ImportError:
-        pass
-
-
 def init_hook_tracker() -> str | None:
     """Initialize hook tracker and cleanup old sessions.
 
@@ -215,8 +205,10 @@ def get_additional_dirs_status() -> str:
 
 
 def main() -> None:
-    # 0. Reset context cache from prior session (CWD-based cache persists across sessions)
-    reset_context_cache()
+    # The context cache reset belongs to context_reset.py, the other SessionStart
+    # hook: it reads the session id off stdin, and this one does not. Calling it
+    # from here passed no id, so it deleted the project-only fallback cache that
+    # a concurrent session without an id is using.
 
     # 1. Initialize hook tracker (cleanup old sessions)
     init_hook_tracker()

@@ -91,22 +91,35 @@ def _hook_entry_signature(hook_entry: dict) -> tuple:
     return (matcher, inner)
 
 
-def _hook_script_id(hook: dict) -> str:
-    """Which script an inner hook runs, as its bare filename.
+def _hook_script_id(hook: dict) -> Tuple[str, str]:
+    """Which entry point an inner hook runs: (script filename, subcommand).
 
-    Deliberately blind to the interpreter, the directory prefix, the arguments
-    and the timeout, so one hook written with a template path and again with a
-    resolved absolute path — or re-shipped with a new flag — counts as the same
-    hook. The non-force merge uses this to decide what is *missing*; matching on
-    the whole command string instead would append a second copy of every hook
+    Blind to the interpreter, the directory prefix, flags and the timeout, so
+    one hook written with a template path and again with a resolved absolute
+    path — or re-shipped with a new option — counts as the same hook. Matching
+    on the whole command string instead would append a second copy of every hook
     whose command had drifted, and a doubled loop_guard trips its circuit
     breaker at half the intended error count.
+
+    The subcommand is *not* dropped, though. One script can carry several entry
+    points (`insight_writer.py harvest-from-hook` and `… request-from-hook` are
+    different hooks on different events), and filename-only identity made a
+    release that moved a hook to a new subcommand undeliverable: the old
+    registration matched, the new subcommand was called already-present, and the
+    wrong entry point kept running.
+
+    Only the first bare argument counts as the subcommand — anything starting
+    with `-` is an option, and options are exactly what drifts between releases.
 
     A command that runs no .py file falls back to its normalised text.
     """
     command = hook.get("command", "")
     match = _HOOK_SCRIPT_RE.search(command)
-    return match.group(1) if match else " ".join(command.split())
+    if not match:
+        return (" ".join(command.split()), "")
+    tokens = match.group(2).split()
+    subcommand = tokens[0] if tokens and not tokens[0].startswith("-") else ""
+    return (match.group(1), subcommand)
 
 
 def _dedup_hook_array(hooks: List[dict]) -> List[dict]:
@@ -158,6 +171,61 @@ def _is_superclaude_hook(hook_entry: dict) -> bool:
     return False
 
 
+def _is_superclaude_inner_hook(hook: dict) -> bool:
+    """Whether one inner hook is SuperClaude's, judged on its own command.
+
+    The unit that matters for ownership. A settings entry carries one matcher
+    and a list of inner hooks, so a user's own command can sit beside a
+    SuperClaude one; judging the whole entry deleted the user's command along
+    with ours on `--force` and on uninstall.
+    """
+    cmd = hook.get("command", "")
+    if any(marker in cmd for marker in SUPERCLAUDE_HOOK_MARKERS):
+        return True
+    if _SC_SCRIPTS_PATH_RE.search(cmd):
+        return True
+    return any(
+        marker in hook.get("_comment", "") for marker in SUPERCLAUDE_HOOK_MARKERS
+    )
+
+
+def _split_entry(hook_entry: dict) -> Tuple[List[dict], List[dict]]:
+    """Split one entry's inner hooks into (SuperClaude's, the user's).
+
+    An entry whose own `_comment` carries the marker was written whole by this
+    installer, so everything inside it is ours.
+    """
+    inner = hook_entry.get("hooks", [])
+    comment = hook_entry.get("_comment", "")
+    if any(marker in comment for marker in SUPERCLAUDE_HOOK_MARKERS):
+        return list(inner), []
+
+    sc_hooks = [h for h in inner if _is_superclaude_inner_hook(h)]
+    user_hooks = [h for h in inner if not _is_superclaude_inner_hook(h)]
+    return sc_hooks, user_hooks
+
+
+def _strip_sc_inner_hooks(hook_array: List[dict]) -> Tuple[List[dict], bool]:
+    """Remove SuperClaude inner hooks, keeping entries that still hold user ones.
+
+    Entry order is preserved, so a user hook stays where the user put it. An
+    entry left with nothing inside is dropped rather than written back empty.
+    """
+    kept: List[dict] = []
+    changed = False
+    for entry in hook_array:
+        sc_hooks, user_hooks = _split_entry(entry)
+        if not sc_hooks:
+            kept.append(entry)
+            continue
+        changed = True
+        if user_hooks:
+            reduced = {key: value for key, value in entry.items() if key != "hooks"}
+            reduced["hooks"] = user_hooks
+            kept.append(reduced)
+    return kept, changed
+
+
 def _merge_hook_arrays(
     existing: List[dict], new_hooks: List[dict], force: bool = False
 ) -> List[dict]:
@@ -172,39 +240,64 @@ def _merge_hook_arrays(
     Returns:
         Merged hooks array
     """
-    # Separate user hooks from SuperClaude hooks
-    user_hooks = [h for h in existing if not _is_superclaude_hook(h)]
-    existing_sc_hooks = [h for h in existing if _is_superclaude_hook(h)]
+    if force:
+        # Replace ours, in place: an entry that also holds a user hook keeps that
+        # hook at its original position, and only entries left empty disappear.
+        # Rebuilding as `user_entries + new_hooks` instead hoisted every user
+        # entry ahead of ours, silently changing execution order.
+        kept, _changed = _strip_sc_inner_hooks(existing)
+        return kept + new_hooks
 
-    if force or not existing_sc_hooks:
-        # Replace SuperClaude hooks or add new ones
-        return user_hooks + new_hooks
+    existing_sc_hooks = [h for h in existing if _is_superclaude_hook(h)]
+    if not existing_sc_hooks:
+        return existing + new_hooks
 
     # Non-force: existing entries are authoritative and stay exactly as written,
     # so a user's timeout or matcher edit survives. Only hooks this release ships
-    # that are not registered under their matcher yet get appended. Skipping the
-    # whole event type instead — as this used to — froze an install's hook set at
-    # whatever existed when it was first written, while its content kept updating.
-    # Counted, not just a set: if a release ever ships one script twice under the
-    # same matcher (two subcommands, say), a set would call the second one
+    # that are not registered yet get appended. Skipping the whole event type
+    # instead — as this used to — froze an install's hook set at whatever existed
+    # when it was first written, while its content kept updating.
+    #
+    # Counted, not just a set: a release may ship one script twice under the same
+    # matcher (two subcommands), and a set would call the second one
     # already-present and drop it. Each registration covers one shipped hook.
-    registered = Counter(
-        (entry.get("matcher", ""), _hook_script_id(hook))
-        for entry in existing_sc_hooks
-        for hook in entry.get("hooks", [])
-    )
-    additions = []
+    #
+    # Two passes, because the matcher is the user's to edit. The first consumes
+    # exact (matcher, entry point) matches, which is what a legitimate two-matcher
+    # shipping needs. The second lets an entry point registered under *some* other
+    # matcher count, so narrowing `clear|compact|startup` to `clear|startup` keeps
+    # the user's matcher instead of appending a second registration that then runs
+    # the same hook twice per session.
+    registered_here = Counter()
+    registered_anywhere = Counter()
+    for entry in existing_sc_hooks:
+        matcher = entry.get("matcher", "")
+        sc_hooks, _user_hooks = _split_entry(entry)
+        for hook in sc_hooks:
+            hook_id = _hook_script_id(hook)
+            registered_here[(matcher, hook_id)] += 1
+            registered_anywhere[hook_id] += 1
+
+    unmatched = []
     for entry in new_hooks:
         matcher = entry.get("matcher", "")
-        missing = []
         for hook in entry.get("hooks", []):
-            key = (matcher, _hook_script_id(hook))
-            if registered[key] > 0:
-                registered[key] -= 1
+            hook_id = _hook_script_id(hook)
+            if registered_here[(matcher, hook_id)] > 0:
+                registered_here[(matcher, hook_id)] -= 1
+                registered_anywhere[hook_id] -= 1
             else:
-                missing.append(hook)
-        if not missing:
+                unmatched.append((entry, hook, hook_id))
+
+    missing_by_entry: dict = {}
+    for entry, hook, hook_id in unmatched:
+        if registered_anywhere[hook_id] > 0:
+            registered_anywhere[hook_id] -= 1
             continue
+        missing_by_entry.setdefault(id(entry), (entry, []))[1].append(hook)
+
+    additions = []
+    for entry, missing in missing_by_entry.values():
         addition = {key: value for key, value in entry.items() if key != "hooks"}
         addition["hooks"] = missing
         additions.append(addition)
@@ -253,6 +346,27 @@ def merge_hooks_to_settings(
     existing_hooks = settings["hooks"]
     merged_any = False
     skipped_any = False
+
+    # `--force` means "replace with what this release ships", and that has to
+    # include events this release no longer ships. Walking only the new config's
+    # event types left a SuperClaude hook on a retired event firing forever,
+    # calling a script that is not installed any more. User hooks on the same
+    # event are kept by the same inner-hook rule as everywhere else.
+    if force:
+        for hook_type in list(existing_hooks.keys()):
+            if hook_type in new_hooks:
+                continue
+            hook_array = existing_hooks[hook_type]
+            if not isinstance(hook_array, list):
+                continue
+            kept, changed = _strip_sc_inner_hooks(hook_array)
+            if not changed:
+                continue
+            merged_any = True
+            if kept:
+                existing_hooks[hook_type] = kept
+            else:
+                del existing_hooks[hook_type]
 
     # Merge each hook type (SessionStart, PostToolUse, etc.)
     for hook_type, new_hook_array in new_hooks.items():
@@ -316,12 +430,14 @@ def uninstall_hooks_from_settings(
     existing_hooks = settings["hooks"]
     cleaned_any = False
 
-    # Remove SuperClaude hooks from each hook type
+    # Remove SuperClaude hooks from each hook type, per inner hook: a user
+    # command sharing an entry with ours has to survive uninstall.
     for hook_type, hook_array in list(existing_hooks.items()):
-        # Keep only user hooks
-        user_hooks = [h for h in hook_array if not _is_superclaude_hook(h)]
+        if not isinstance(hook_array, list):
+            continue
+        user_hooks, changed = _strip_sc_inner_hooks(hook_array)
 
-        if len(user_hooks) < len(hook_array):
+        if changed:
             cleaned_any = True
 
         if user_hooks:

@@ -56,6 +56,11 @@ def _collect_local_entries() -> List[str]:
                 entries.append(f".claude/skills/{d.name}/")
 
     entries.append(".claude/agent-memory-local/")
+    entries.append(".claude/agent-memory/")
+    # Runtime state and un-promoted markers: rebuildable, framework-owned, and
+    # written inside the worktree by every project- or local-scope install.
+    entries.append(".claude/.superclaude_hooks/")
+    entries.append(".claude/insights.pending.jsonl")
     entries.append(".claude/commands/sc/")
     entries.append(".claude/superclaude/")
     entries.append(".claude/hooks/hooks.json")

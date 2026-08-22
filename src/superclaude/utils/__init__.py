@@ -118,9 +118,11 @@ STATE_MAX_AGE_DAYS = 7
 _PRUNABLE_PREFIXES = (
     "claude_context_",
     "loop_guard_",
-    "hook_tracker",
+    "hook_executions",  # hook_tracker.py's file; the sweep named the module
     "current_session",
     "insight_prompt_",
+    "insight_baseline_",
+    "insight_answered_",
 )
 
 # The fallback ledger is pruned entry by entry, not deleted: one live session's
