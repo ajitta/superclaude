@@ -15,7 +15,7 @@
   </modes>
 
   <mcp>
---c7|--context7: imports, frameworks, official docs → Context7 curated docs (claude.ai connector, not a `superclaude mcp` server)
+--c7|--context7: force Context7 lookup — resolve + query before writing or changing library-facing code, incl. refactoring/debugging that the connector's own instructions exclude. Connector-provided (not a `superclaude mcp` server); its server instructions + tool descriptions already cover when-to-use, resolve-then-query order, and the 3-call cap, so no MCP doc ships
 --serena: symbol ops, project mem → Serena semantic understanding + Serena-first exploration directive
 --play|--playwright: browser test, E2E, visual → Playwright browser automation
 --perf|--devtools: perf audit, CLS, LCP, metrics → DevTools perf analysis

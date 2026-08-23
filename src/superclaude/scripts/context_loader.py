@@ -128,11 +128,6 @@ TRIGGER_MAP = [
         1,
     ),
     (
-        r"(--c7|--context7|library.?docs|framework.?docs|resolve.?library)",
-        "mcp/MCP_Context7.md",
-        2,
-    ),
-    (
         r"(--play|--playwright|browser.?test|e2e.?test|network.?mock|mock.?api|browser.?automat)",
         "mcp/MCP_Playwright.md",
         2,
@@ -210,7 +205,6 @@ COMPOSITE_FLAGS = {
     "--all-mcp": [
         ("mcp/MCP_Serena.md", 1),
         ("mcp/MCP_Tavily.md", 1),
-        ("mcp/MCP_Context7.md", 2),
         ("mcp/MCP_Playwright.md", 2),
         ("mcp/MCP_Chrome-DevTools.md", 2),
     ],  # Note: Playwright/DevTools are plugin-install-only (docs still loaded)
@@ -249,7 +243,6 @@ INSTRUCTION_MAP = {
 # v3.2: Tier 0 — 1-line summaries for tool MCPs (Claude already has tool descriptions)
 # Behavioral MCPs (Serena, Tavily) are NOT here — they use INSTRUCTION_MAP (Tier 1)
 TIER_0_MAP = {
-    "mcp/MCP_Context7.md": "Context7: resolve-library-id first, then query-docs. Never skip step 1.",
     "mcp/MCP_Playwright.md": "Playwright: browser E2E + network mocking (--caps=network,storage). navigate → assert.",
     "mcp/MCP_Chrome-DevTools.md": "DevTools: 26 tools. Lighthouse audits, CWV, a11y, memory. trace → analyze → optimize.",
     "core/BUSINESS_SYMBOLS.md": "Business symbols + expert selection. 🎯📈💰⚖️🏆🌊 domain mapping.",
@@ -848,6 +841,14 @@ def output_inject_mode(
             print(f"<!-- ⚠️ Budget exceeded: skipped {skipped_names} -->")
 
 
+# Context7 ships as a claude.ai connector whose server instructions and tool
+# descriptions already state when to use it, the resolve-then-query order, and the
+# 3-call cap — so there is no mcp/MCP_Context7.md left to trigger on. The flag
+# survives as a directive because the connector's trigger is question-shaped
+# ("whenever the user asks about a library") and it excludes refactoring and
+# debugging outright; --c7 is what overrides both.
+_C7_PATTERN = re.compile(r"--c7\b|--context7\b|--all-mcp\b", re.IGNORECASE)
+
 # Execution flag patterns and their behavioral directives
 _EXECUTION_DIRECTIVES = {
     re.compile(r"--iterations\s+(\d+)", re.IGNORECASE): (
@@ -878,6 +879,16 @@ _EXECUTION_DIRECTIVES = {
     ),
     # --serena directive removed: INSTRUCTION_MAP[mcp/MCP_Serena.md] (Tier 1)
     # already provides workflow + decision rules. Avoids ~85 token duplicate.
+    _C7_PATTERN: (
+        lambda m: (
+            f'<sc-directive flag="{m.group(0).lower()}">'
+            "Context7 lookup is mandatory for this task, not question-triggered: resolve "
+            "and query before writing or changing library-facing code, and during "
+            "refactoring and debugging, which the connector's own instructions otherwise "
+            "exclude. Pin the version when one is known."
+            "</sc-directive>"
+        )
+    ),
     re.compile(r"--plan\b", re.IGNORECASE): (
         lambda _: (
             '<sc-directive flag="--plan">'
@@ -890,7 +901,7 @@ _EXECUTION_DIRECTIVES = {
 }
 
 
-def _emit_execution_directives(prompt: str) -> None:
+def _emit_execution_directives(prompt: str, session_id: str | None = None) -> None:
     """Emit inline behavioral directives for execution flags.
     Session-deduped: each (pattern, matched-flag) combo emits once per session."""
     loaded = get_loaded_contexts()
@@ -908,6 +919,15 @@ def _emit_execution_directives(prompt: str) -> None:
         new_marks.append(marker)
     if new_marks:
         mark_as_loaded(new_marks)
+
+    # check_mcp_fallbacks() derives the server name from an "mcp/MCP_*.md" path, so
+    # dropping Context7's doc also dropped its "connector not enabled" notice. The
+    # flag carries it instead.
+    if MCP_FALLBACK_AVAILABLE and _C7_PATTERN.search(scannable):
+        notification = check_mcp_and_notify("context7", session_id)
+        if notification:
+            print(f"<!-- {notification} -->")
+            print()
 
 
 def _extract_prompt(stdin_data: str) -> str:
@@ -965,7 +985,7 @@ def main() -> None:
                 mark_as_loaded("_skills_summary")
 
     # Execution flag directives (inline behavioral hints — no file injection)
-    _emit_execution_directives(prompt)
+    _emit_execution_directives(prompt, session_id)
 
     # An unknown /sc: name must not read as a real command
     command_notes, unresolved_commands = resolve_command_name(prompt)

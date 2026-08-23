@@ -109,7 +109,9 @@ calls in 31 days, and its tools are deferred so it costs no resident context.
 **That proposal is now wrong.** Commit `9c0412b` made the claude.ai connector the framework's
 only documented source for Context7 — the npx `@upstash/context7-mcp` server was removed
 from `cli/install_mcp.py::MCP_SERVERS`. Disabling the connector would leave the `--c7` flag
-and `mcp/MCP_Context7.md` pointing at nothing.
+pointing at nothing. (`mcp/MCP_Context7.md` was itself deleted afterwards: the connector's
+server instructions and the two tool descriptions already carried everything it said, so the
+flag now fires an inline directive in `context_loader.py` instead of a doc.)
 
 Zero calls in the window is now a signal that Context7 is under-used, not that it is
 redundant. Leave it enabled.

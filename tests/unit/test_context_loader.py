@@ -198,9 +198,10 @@ class TestResolveFlags:
 class TestTieredInjection:
     """Test 3-tier context injection system."""
 
-    # Expected MCP docs (5 total: 3 tool + 2 behavioral; Sequential removed)
+    # Expected MCP docs (4 total: 2 tool + 2 behavioral; Sequential and
+    # Context7 removed — Context7 is a claude.ai connector that ships its own
+    # server instructions, so no doc and no Tier 0 hint)
     EXPECTED_TOOL_MCPS = {
-        "mcp/MCP_Context7.md",
         "mcp/MCP_Playwright.md",
         "mcp/MCP_Chrome-DevTools.md",
     }
@@ -231,7 +232,7 @@ class TestTieredInjection:
 
     def test_verbose_context_forces_tier_2(self):
         """--verbose-context should force Tier 2 for everything."""
-        assert _get_injection_tier("mcp/MCP_Context7.md", verbose=True) == 2
+        assert _get_injection_tier("mcp/MCP_Playwright.md", verbose=True) == 2
         assert _get_injection_tier("mcp/MCP_Serena.md", verbose=True) == 2
         assert _get_injection_tier("modes/MODE_Brainstorming.md", verbose=True) == 2
 
@@ -259,13 +260,6 @@ class TestTieredInjection:
         """Every behavioral MCP should have an INSTRUCTION_MAP entry."""
         for mcp in self.EXPECTED_BEHAVIORAL_MCPS:
             assert mcp in INSTRUCTION_MAP, f"{mcp} missing from INSTRUCTION_MAP"
-
-    def test_tier_0_context7_mentions_query_docs(self):
-        """Context7 Tier 0 hint should reference the correct tool name."""
-        hint = TIER_0_MAP["mcp/MCP_Context7.md"]
-        assert "query-docs" in hint, (
-            "Context7 hint should reference query-docs (tool renamed from get-library-docs)"
-        )
 
     def test_tier_0_devtools_mentions_lighthouse(self):
         """DevTools Tier 0 hint should reference Lighthouse capability."""
@@ -333,11 +327,13 @@ class TestTriggerMapPaths:
                     f"Morphllm found in COMPOSITE_FLAGS[{flag}]: {path}"
                 )
 
-    def test_all_mcp_includes_5_servers(self):
-        """--all-mcp should activate exactly 5 MCP docs (3 core + 2 plugin)."""
+    def test_all_mcp_includes_4_servers(self):
+        """--all-mcp should activate exactly 4 MCP docs (2 core + 2 plugin).
+        Context7 is not among them: it ships no doc, and --all-mcp reaches it
+        through _C7_PATTERN in _EXECUTION_DIRECTIVES instead."""
         all_mcp_paths = {p for p, _ in COMPOSITE_FLAGS["--all-mcp"]}
-        assert len(all_mcp_paths) == 5, (
-            f"Expected 5 MCP docs in --all-mcp, got {len(all_mcp_paths)}"
+        assert len(all_mcp_paths) == 4, (
+            f"Expected 4 MCP docs in --all-mcp, got {len(all_mcp_paths)}"
         )
 
     def test_frontend_verify_includes_3_servers(self):
@@ -350,10 +346,10 @@ class TestTriggerMapPaths:
         }
 
     def test_trigger_map_mcp_count(self):
-        """TRIGGER_MAP should have entries for exactly 5 MCP docs."""
+        """TRIGGER_MAP should have entries for exactly 4 MCP docs (Context7 has none)."""
         mcp_paths = {path for _, path, _ in TRIGGER_MAP if path.startswith("mcp/")}
-        assert len(mcp_paths) == 5, (
-            f"Expected 5 MCP trigger paths, got {len(mcp_paths)}: {mcp_paths}"
+        assert len(mcp_paths) == 4, (
+            f"Expected 4 MCP trigger paths, got {len(mcp_paths)}: {mcp_paths}"
         )
 
 
@@ -668,6 +664,56 @@ class TestFlagsAreReadWhereTheyAreUsed:
 
         _emit_execution_directives("the report mentions `--plan` and ```--loop```")
         assert capsys.readouterr().out.strip() == ""
+
+
+class TestContext7HasNoDocOnlyAFlag:
+    """Context7 ships as a claude.ai connector, so its MCP doc was deleted: the
+    connector's own server instructions and the two tool descriptions already
+    carried when-to-use, resolve-then-query order, version-pin format and the
+    3-call cap. What they do not carry is the reason the flag survives — the
+    connector fires on the user *asking about* a library and excludes
+    refactoring and debugging outright, so --c7 is the override.
+    """
+
+    def _emit(self, prompt, monkeypatch, capsys):
+        from superclaude.scripts import context_loader as cl
+
+        monkeypatch.setattr(cl, "get_loaded_contexts", lambda: set())
+        monkeypatch.setattr(cl, "mark_as_loaded", lambda _marks: None)
+        monkeypatch.setattr(cl, "MCP_FALLBACK_AVAILABLE", False)
+        cl._emit_execution_directives(prompt)
+        return capsys.readouterr().out
+
+    def test_no_context7_doc_ships(self):
+        mcp_dir = Path(__file__).resolve().parents[2] / "src" / "superclaude" / "mcp"
+        assert not (mcp_dir / "MCP_Context7.md").exists()
+
+    def test_no_context7_wiring_remains(self):
+        assert "mcp/MCP_Context7.md" not in TIER_0_MAP
+        assert "mcp/MCP_Context7.md" not in INSTRUCTION_MAP
+        assert all(path != "mcp/MCP_Context7.md" for _, path, _ in TRIGGER_MAP)
+
+    def test_typed_c7_still_forces_a_lookup(self, monkeypatch, capsys):
+        out = self._emit("--c7 add stripe checkout to this route", monkeypatch, capsys)
+        assert '<sc-directive flag="--c7">' in out
+        assert "mandatory" in out
+
+    def test_all_mcp_reaches_context7_too(self, monkeypatch, capsys):
+        """--all-mcp lost its Context7 entry in COMPOSITE_FLAGS, so the
+        directive is the only thing left carrying it."""
+        out = self._emit("--all-mcp go", monkeypatch, capsys)
+        assert "<sc-directive" in out
+
+    def test_a_quoted_c7_is_a_mention_not_a_use(self, monkeypatch, capsys):
+        out = self._emit("the docs mention `--c7` somewhere", monkeypatch, capsys)
+        assert "sc-directive" not in out
+
+    def test_the_directive_does_not_restate_the_connector(self, monkeypatch, capsys):
+        """Every line the connector or a tool description already says is a
+        line this directive must not spend context on."""
+        out = self._emit("--c7 go", monkeypatch, capsys).lower()
+        for duplicated in ("resolve-library-id", "3 times", "prefer this over"):
+            assert duplicated not in out, f"directive restates {duplicated!r}"
 
 
 class TestEveryCommandTokenIsChecked:

@@ -32,7 +32,7 @@ Context7 ships as a **claude.ai connector**, not a `superclaude mcp` server. Ena
 2. Restart Claude Code (or run `/mcp`) to pick up the connection.
 3. Verify with `/mcp` — the server lists as `Context7`.
 
-Tool names are unchanged (`resolve-library-id`, then `query-docs`), so the `--c7` flag and `MCP_Context7.md` workflow guidance apply as written.
+No `MCP_Context7.md` ships: the connector injects its own server instructions and the tool descriptions carry the resolve-then-query order, version-pinning format, and 3-call cap. The `--c7` flag stays, as an inline directive in `context_loader.py` that forces a lookup where the connector's question-shaped trigger would not fire.
 
 `/mcp disable` is per-project: turning Context7 off in one project leaves it on elsewhere. Do **not** register `@upstash/context7-mcp` via `superclaude mcp` alongside the connector — the same tools would surface under two server names and the model would pick between duplicates.
 

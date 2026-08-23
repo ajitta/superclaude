@@ -33,10 +33,10 @@ class Scenario:
 
 SCENARIOS: list[Scenario] = [
     Scenario(
-        name="T0-context7",
-        prompt="--c7 how do I use react query?",
+        name="T0-playwright",
+        prompt="--play run the e2e test suite",
         expected_tier=0,
-        expected_file="mcp/MCP_Context7.md",
+        expected_file="mcp/MCP_Playwright.md",
         note="Tool MCP → 1-line hint",
     ),
     Scenario(
@@ -75,10 +75,10 @@ SCENARIOS: list[Scenario] = [
         note="Mode file → full .md always",
     ),
     Scenario(
-        name="T2-verbose-override-c7",
-        prompt="--c7 --verbose-context how to use react query",
+        name="T2-verbose-override-playwright",
+        prompt="--play --verbose-context run the e2e test suite",
         expected_tier=2,
-        expected_file="mcp/MCP_Context7.md",
+        expected_file="mcp/MCP_Playwright.md",
         note="--verbose-context overrides Tier 0 → full .md",
     ),
     Scenario(
@@ -162,11 +162,11 @@ def verify_missing_file_skip() -> None:
     clear_cache()
     fake_root = Path(tempfile.mkdtemp(prefix="sc_fake_"))
     (fake_root / "mcp").mkdir()
-    # Intentionally do NOT create MCP_Context7.md — file should be reported missing.
+    # Intentionally do NOT create MCP_Playwright.md — file should be reported missing.
     env = os.environ.copy()
     env["SUPERCLAUDE_PATH"] = str(fake_root)
     env["CLAUDE_SHOW_SKILLS"] = "0"  # silence skills summary for clean output
-    payload = json.dumps({"prompt": "--c7 query"})
+    payload = json.dumps({"prompt": "--play run e2e"})
     result = subprocess.run(
         [sys.executable, str(LOADER)],
         input=payload,
@@ -177,7 +177,7 @@ def verify_missing_file_skip() -> None:
         env=env,
     )
     out = result.stdout
-    has_skip_marker = "skip mcp/MCP_Context7.md: backing file not installed" in out
+    has_skip_marker = "skip mcp/MCP_Playwright.md: backing file not installed" in out
     has_hint = "<sc-context-hint" in out
     print("\n--- Improvement #3 verification: missing-file defensive skip ---")
     print(f"  Skip marker present:        {has_skip_marker}")

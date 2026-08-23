@@ -33,10 +33,12 @@ import click
 MCP_SERVERS = {
     # Context7 is deliberately absent: it ships as a claude.ai connector, enabled
     # from the connector directory rather than registered by `superclaude mcp`.
-    # The `--c7` flag, `mcp/MCP_Context7.md`, and the fallback hint all stay —
-    # only the install path moved. See mcp/README.md "Context7 — claude.ai
-    # connector". Registering the npx `@upstash/context7-mcp` server here would
-    # duplicate the connector's tools under a second server name.
+    # The `--c7` flag and its fallback hint stay, both now carried by the inline
+    # directive in scripts/context_loader.py; `mcp/MCP_Context7.md` is gone,
+    # because the connector's server instructions and tool descriptions already
+    # say everything it said. See mcp/README.md "Context7 — claude.ai connector".
+    # Registering the npx `@upstash/context7-mcp` server here would duplicate the
+    # connector's tools under a second server name.
     "serena": {
         "name": "serena",
         "description": "Semantic code analysis and intelligent editing (serena-agent on PyPI)",

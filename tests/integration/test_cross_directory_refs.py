@@ -33,7 +33,7 @@ pytestmark = pytest.mark.integration
 def parse_flags_mcp_section() -> dict[str, str]:
     """Parse <mcp> block from FLAGS.md for flag names.
 
-    Returns: {"c7": "MCP_Context7.md", "context7": "MCP_Context7.md", ...}
+    Returns: {"serena": "serena", "tavily": "tavily", ...} — alias to itself.
     """
     content = (CORE_DIR / "FLAGS.md").read_text(encoding="utf-8")
     match = re.search(r"<mcp>(.*?)</mcp>", content, re.DOTALL)
@@ -111,8 +111,9 @@ SKILL_MANIFESTS = sorted(SKILLS_DIR.glob("*/SKILL.md"))
 class TestMCPWiring:
     """FLAGS.md MCP flags → MCP doc files."""
 
+    # Context7 has no doc: it ships as a claude.ai connector whose server
+    # instructions and tool descriptions carry the guidance a doc would.
     EXPECTED_MCP_DOCS = [
-        "MCP_Context7.md",
         "MCP_Playwright.md",
         "MCP_Serena.md",
         "MCP_Tavily.md",
@@ -127,7 +128,6 @@ class TestMCPWiring:
     def test_mcp_config_doc_pairing(self):
         """Every .json in configs/ has a matching MCP_*.md."""
         CONFIG_TO_DOC = {  # noqa: N806 — function-local constant mapping
-            "context7": "Context7",
             "playwright": "Playwright",
             "serena": "Serena",
             "tavily": "Tavily",
