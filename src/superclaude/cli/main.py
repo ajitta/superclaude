@@ -358,7 +358,7 @@ def mcp(servers, list_only, show_status, scope, dry_run):
     Examples:
         superclaude mcp --list
         superclaude mcp --status
-        superclaude mcp --servers tavily --servers context7
+        superclaude mcp --servers tavily --servers playwright
         superclaude mcp --scope project
         superclaude mcp --dry-run
     """

@@ -31,15 +31,12 @@ import click
 #               `marketplace_name` (the `name` field from the source's
 #               `.claude-plugin/marketplace.json`)
 MCP_SERVERS = {
-    "context7": {
-        "name": "context7",
-        "description": "Official library documentation and code examples",
-        "transport": "stdio",
-        "command": "npx -y @upstash/context7-mcp",
-        "required": False,
-        "category": "core",
-        "method": "mcp",
-    },
+    # Context7 is deliberately absent: it ships as a claude.ai connector, enabled
+    # from the connector directory rather than registered by `superclaude mcp`.
+    # The `--c7` flag, `mcp/MCP_Context7.md`, and the fallback hint all stay —
+    # only the install path moved. See mcp/README.md "Context7 — claude.ai
+    # connector". Registering the npx `@upstash/context7-mcp` server here would
+    # duplicate the connector's tools under a second server name.
     "serena": {
         "name": "serena",
         "description": "Semantic code analysis and intelligent editing (serena-agent on PyPI)",

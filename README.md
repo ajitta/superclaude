@@ -109,7 +109,7 @@ What gets installed (per scope):
 ```bash
 superclaude mcp                        # interactive picker (default scope: user)
 superclaude mcp --list                 # list available servers
-superclaude mcp --servers tavily context7
+superclaude mcp --servers tavily playwright
 superclaude mcp --servers serena       # register Serena (CLI must already be installed)
 superclaude mcp --scope project        # write to ./.mcp.json (team-shared)
 superclaude mcp --scope local          # write to ~/.claude.json local block
@@ -212,7 +212,7 @@ For **2-3x faster** symbol operations, optionally install MCP servers:
 # Optional MCP servers for enhanced performance:
 # - Serena: Semantic code understanding (2-3x faster symbol ops)
 # - Tavily: Web search/extract/crawl/research — install as Agent Skills (npx skills add tavily-ai/skills); MCP optional
-# - Context7: Official documentation lookup
+# - Context7: Official documentation lookup — enable as a claude.ai connector (not `superclaude mcp`)
 
 # Note: Error learning available via built-in ReflexionMemory (no installation required)
 # Source-of-truth for MCP docs: src/superclaude/MCP/MCP_*.md
@@ -366,7 +366,7 @@ Skills live under `Skills/<name>/SKILL.md` and load via Claude Code's native ski
 superclaude mcp --list
 
 # Install specific servers
-superclaude mcp --servers tavily context7
+superclaude mcp --servers tavily playwright
 
 # Interactive installation
 superclaude mcp
@@ -374,7 +374,7 @@ superclaude mcp
 
 **Available servers:**
 - **Tavily** → Web search, extract, crawl, map, research (Deep Research). Recommended: **Agent Skills** via Tavily CLI + `npx skills add tavily-ai/skills` ([tavily-ai/skills](https://github.com/tavily-ai/skills) · [agent-skills docs](https://docs.tavily.com/documentation/agent-skills)). The `--tavily` MCP server is an optional in-conversation alternative (search + extract only).
-- **Context7** → Official documentation lookup
+- **Context7** → Official documentation lookup. Enabled as a **claude.ai connector** (claude.ai → Settings → Connectors), not via `superclaude mcp` — the `--c7` flag and its workflow doc apply unchanged.
 - **Serena** → Session persistence & semantic code understanding
 - **Playwright** → Cross-browser automation & E2E testing (Microsoft official). Repo: ['https://github.com/microsoft/playwright-cli'](https://github.com/microsoft/playwright-cli)
 - **Chrome DevTools** → Performance, Lighthouse, accessibility, and memory profiling (CLS, LCP). Installed as Claude plugin from [`ChromeDevTools/chrome-devtools-mcp`](https://github.com/ChromeDevTools/chrome-devtools-mcp)
@@ -531,7 +531,7 @@ The Deep Research system intelligently coordinates multiple tools:
 - **Tavily** (Agent Skills; MCP optional): Primary web search and discovery
 - **Playwright MCP**: Complex content extraction
 - **Serena MCP**: Memory and learning persistence
-- **Context7 MCP**: Technical documentation lookup
+- **Context7** (claude.ai connector): Technical documentation lookup
 
 </div>
 
