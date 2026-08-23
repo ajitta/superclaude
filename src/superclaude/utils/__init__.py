@@ -13,14 +13,18 @@ script code — hook CWD is not guaranteed to be the project root. See
 `.claude/rules/gotchas/hooks.md`.
 """
 
-import hashlib
 import json
 import os
 import re
-import tempfile
 import time
 from pathlib import Path
 from typing import Any
+
+# `hashlib` and `tempfile` are imported inside the two functions that use them.
+# Every hook script pays this module's import cost on every tool call, and
+# `tempfile` alone is 3.0ms of it — spent even on the read-only PreToolUse paths
+# that never write state. Keep new module-level imports out of here for the same
+# reason.
 
 
 def atomic_write_json(path: Path, data: Any, indent: int = 2) -> None:
@@ -34,6 +38,8 @@ def atomic_write_json(path: Path, data: Any, indent: int = 2) -> None:
         data: JSON-serializable data
         indent: JSON indentation level
     """
+    import tempfile
+
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     fd, tmp_path = tempfile.mkstemp(dir=path.parent, suffix=".tmp")
@@ -294,6 +300,8 @@ def project_key() -> str:
     Returns:
         First 8 hex chars of the MD5 of the project root path
     """
+    import hashlib
+
     # usedforsecurity=False: this is a filename discriminator, not a digest, and
     # bare md5() raises under a FIPS-enforcing Python build.
     return hashlib.md5(str(project_root()).encode(), usedforsecurity=False).hexdigest()[

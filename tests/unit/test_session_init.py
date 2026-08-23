@@ -11,6 +11,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
+import pytest
+
 from superclaude.scripts.session_init import (
     get_additional_dirs_status,
     get_git_status,
@@ -200,6 +202,21 @@ class TestGetGitStatus:
 
 class TestGetPrStatus:
     """Test get_pr_status for various PR states and error conditions."""
+
+    @pytest.fixture(autouse=True)
+    def _isolated_pr_cache(self, tmp_path: Path, monkeypatch):
+        """Give every test its own PR-status cache.
+
+        ``get_pr_status`` caches the rendered line per branch to skip the 552ms
+        ``gh pr view`` round-trip. Without this fixture the cache resolves to the
+        real ``hook_state_dir()``: tests sharing a branch name read each other's
+        writes (a "no PR" test poisons the draft-PR test with an empty string),
+        and the suite leaves state files in the developer's real project. Pinning
+        ``CLAUDE_PROJECT_DIR`` is what anchors the resolver — ``chdir`` alone does
+        not, because ``project_root()`` reads the env first.
+        """
+        monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(tmp_path))
+        (tmp_path / ".claude" / "superclaude").mkdir(parents=True, exist_ok=True)
 
     def _mock_subprocess(self, branch_result, pr_result=None):
         """Helper to mock two sequential subprocess.run calls (branch + gh pr)."""

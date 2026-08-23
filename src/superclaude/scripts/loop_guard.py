@@ -18,11 +18,15 @@ from __future__ import annotations
 import json
 import os
 import sys
-import tempfile
 import time
 from pathlib import Path
 
 from superclaude.utils import hook_state_dir, project_key
+
+# `tempfile` is imported inside _save_state. This hook fires on every Edit,
+# Write, and Bash call, and its whole runtime is interpreter start plus imports
+# — the logic itself is inside the noise. The PreToolUse path never writes, so
+# it should not pay tempfile's 3.0ms import.
 
 BLOCK_THRESHOLD = 5
 WINDOW_SECONDS = 15 * 60
@@ -56,6 +60,8 @@ def _load_state(path: Path) -> dict:
 
 
 def _save_state(path: Path, state: dict) -> None:
+    import tempfile
+
     try:
         path.parent.mkdir(parents=True, exist_ok=True)
         # Atomic write: serialize to a temp file in the same directory, then
