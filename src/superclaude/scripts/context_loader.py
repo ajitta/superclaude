@@ -20,7 +20,6 @@ v2.2.0: MCP fallback notification support
 v2.1.0: Skills discovery and token estimation
 """
 
-import difflib
 import json
 import os
 import re
@@ -397,6 +396,10 @@ def resolve_flags(prompt: str) -> tuple[str, list[str]]:
     Returns:
         Tuple of (corrected_prompt, list of notification messages)
     """
+    # difflib (3.8ms) is only reached on the unrecognized-flag path. This hook
+    # runs on every prompt, and most prompts carry no misspelled flag.
+    import difflib
+
     notifications: list[str] = []
     corrected = prompt
     scannable = scannable_prompt(prompt)
@@ -493,12 +496,17 @@ def resolve_command_name(prompt: str) -> tuple[list[str], set[str]]:
     command context — injecting it anyway made a command that does not exist look
     to the model exactly like one that does.
 
+    difflib is imported inside the function for the same reason as in
+    resolve_flags: it only serves the wrong-name suggestion path.
+
     Every token is checked, not just the first: a valid name up front used to let
     every later unknown one through unremarked.
 
     Returns:
         (notifications, names that resolve to nothing)
     """
+    import difflib
+
     known = _known_command_names()
     if not known:
         return [], set()

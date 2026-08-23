@@ -43,10 +43,15 @@ output is never persisted. Any figure derived from them is a floor, not a total.
 - Phase 0 (observation reconciliation) — complete
 - Phase 1 (profiling) — complete
 - Phase 2 (lever decisions) — complete
-- Phase 3 (implementation) — levers 1 and 3 landed; lever 2 deferred, lever 4 unstarted
+- Phase 3 (implementation) — complete: levers 1, 3, and 4 landed; lever 2 rejected
 
 Phase 1 rejected the lever Phase 0 had ranked first and surfaced a larger one that
 profiling alone could reveal: a `gh pr view` network round-trip inside `session_init.py`,
-552ms on every session start on a feature branch. That call is now cached per branch, and
-`tempfile` no longer loads on the read-only hook paths. Measured together: about 0.6s per
-session start on a feature branch, with the safety hooks left independent.
+552ms on every session start on a feature branch. That call is now cached per branch,
+`tempfile` no longer loads on the read-only hook paths, and `context_loader.py` stopped
+importing `yaml` and `difflib` on every prompt. Measured together: about 0.6s per session
+start on a feature branch plus 21ms per prompt, with the safety hooks left independent.
+
+The one lever not taken — merging the two Bash guards into a single process — was rejected
+because the installer cannot retire a hook registration outside `--force`, so shipping it
+would leave existing installs running the old registration *and* the new one.

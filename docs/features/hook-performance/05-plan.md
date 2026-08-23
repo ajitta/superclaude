@@ -17,14 +17,38 @@ that did not exist before profiling now leads.
 | Rank | Lever | Measured saving | Verdict |
 |---|---|---|---|
 | 1 | Cache the `gh pr view` call in `session_init.py` | 552ms → 0.05ms per cached session start on a feature branch | **Accepted, implemented** |
-| 2 | Merge `destructive_guard.py` + `loop_guard.py` into one dispatcher process on the Bash PreToolUse matcher | ~0.9s/session (estimate) | **Deferred** — re-evaluate after lever 3's effect is observed in real sessions |
+| 2 | Merge `destructive_guard.py` + `loop_guard.py` into one dispatcher process on the Bash PreToolUse matcher | ~24ms per Bash call, ~0.67s/session | **Rejected at this scope** — see below |
 | 3 | Defer `tempfile` past the read-only paths in `superclaude.utils` and `loop_guard.py` | 2.3ms per PreToolUse call, ~0.07s/session | **Accepted, implemented** |
-| 4 | Lazy-import `yaml`, `difflib`, `inspect`/`dataclasses` in `context_loader.py` | ~17ms/prompt, ~0.05s/session (estimate) | Not started — low value |
+| 4 | Lazy-import `difflib` and the `superclaude.hooks` re-exports | **21ms/prompt** (62.8ms → 41.4ms), ~0.06s/session | **Accepted, implemented** — saving was larger than estimated |
 
 Lever 1 is a single blocking network round-trip and was both the largest and the cheapest
 to change. Lever 2 trades the failure isolation between two safety hooks for its saving and
 is held back deliberately: levers 1 and 3 together recover roughly 0.6s per session on a
 feature branch with no change to that isolation.
+
+### Lever 2 — rejected: the installer cannot retire a hook registration
+
+Merging the two Bash guards means `hooks.json` stops shipping the standalone
+`destructive_guard.py` registration. `_merge_hook_arrays()` in
+`cli/install_settings.py` does not remove a SuperClaude hook that a release stops
+shipping: outside `--force`, "existing entries are authoritative and stay exactly as
+written", and only newly shipped hooks are appended. `superclaude install` defaults to
+`force=False`.
+
+So an existing install upgrading normally would end up with **both** the retired
+standalone registration and the new merged dispatcher. `destructive_guard`'s check would
+run twice per Bash call and the spawn count would go **up**, inverting the lever's purpose.
+Only a `--force` install would clean it up, and end users are not required to pass it.
+
+Making lever 2 safe therefore requires a new installer capability — retiring
+SuperClaude-owned hook registrations that a release has dropped — inside the code path
+whose central invariant is that it must never remove a user's own hooks. That is a larger
+and far riskier change than merging two scripts, and it buys ~0.67s/session on top of the
+~0.6s levers 1, 3, and 4 already delivered without touching either the installer or the
+guards' failure isolation.
+
+Rejected at this scope. If hook-registration retirement is ever built for another reason,
+re-open this lever then.
 
 ### Correction — lever 3 was over-estimated
 
@@ -88,9 +112,17 @@ unchanged and only its freshness moves.
   PostToolUse path calls.
 - `tests/unit/test_session_init.py` — new autouse fixture pinning `CLAUDE_PROJECT_DIR` for
   `TestGetPrStatus`. See "Regression found during implementation".
+- `hooks/__init__.py` — the two re-exports now resolve through a PEP 562 `__getattr__`.
+  Importing any submodule of the package runs this file, so the eager re-exports made
+  `context_loader.py` load `inline_hooks` -> `yaml` on every prompt for a
+  `parse_frontmatter` it never calls. No caller imports these names from the package, so
+  the names are kept only to preserve the documented API.
+- `scripts/context_loader.py` — `difflib` moved into `resolve_flags()` and
+  `resolve_command_name()`; it only serves the fuzzy-suggestion path for a misspelled flag
+  or command name, which most prompts never reach. Measured 62.8ms -> 41.4ms per prompt,
+  confirmed over two runs.
 
-Lever 2 remains available and lever 4 unstarted; both need a fresh decision before any
-further work.
+Lever 2 is rejected (see above) and no lever remains open.
 
 ## Success criteria
 
