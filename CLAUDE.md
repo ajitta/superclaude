@@ -7,40 +7,13 @@ Guidance for Claude Code when working in this repository.
 This project uses **UV** for all Python operations. Never use `pip` or `python -m pytest` directly.
 
 ```bash
-uv run pytest                              # Full suite
-uv run pytest tests/unit/ -v               # Unit tests only
-uv run pytest tests/integration/ -v        # Integration tests
-uv run pytest -k "test_agent"              # By name pattern
-
-uv pip install -e ".[dev]"                 # Install editable
 uv run superclaude install --list-all      # Test CLI changes
 ```
 
 - **Test baseline**: 2292 passing / 28 skipped / 4 deselected, 0 failures (measured 2026-08-22). No known pre-existing failures — a failure is a regression. `uv run pytest` works on Windows when `.venv` is healthy; the `Failed to canonicalize script path` error means `.venv` is corrupt (often a broken `lib64` symlink) — rebuild it: `rm -rf .venv && uv venv && uv pip install -e ".[dev]"`. Last-resort fallbacks: `.venv/Scripts/python.exe -m pytest` → WSL → `make test` in CI. Markdown-only changes carry no test risk.
 
-## Make Commands
-
-```bash
-make install       # uv pip install -e ".[dev]"
-make deploy        # Deploy CLI (editable, uv tool install). Content sync is separate.
-make sync-user     # Force-sync src/ content to ~/.claude/ (user scope) — for headless `claude -p` testing
-make sync-project  # Force-sync to ./.claude/ (project scope, team-shared)
-make sync-local    # Force-sync to ./.claude/ (local scope, gitignored)
-make uninstall-user    # Uninstall from ~/.claude/ (interactive confirm)
-make uninstall-project # Uninstall from ./.claude/ (project scope)
-make uninstall-local   # Uninstall from ./.claude/ (local scope, gitignored)
-make test          # uv run pytest
-make test-plugin   # Verify pytest plugin loads
-make verify        # Full installation check
-make lint          # ruff check
-make format        # ruff format
-make doctor        # Health check
-make clean         # Remove artifacts
-```
-
 ## Code Style
 
-- Python ≥3.10, ruff (line-length 88, ignores E501)
 - Run `make format` before committing
 
 ## Developer Environment

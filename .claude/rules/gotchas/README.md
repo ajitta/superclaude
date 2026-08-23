@@ -1,3 +1,7 @@
+---
+paths: [".claude/rules/gotchas/**"]
+---
+
 # Project Gotchas Subsystem
 
 Project-specific failure patterns live here. CC load files native.
