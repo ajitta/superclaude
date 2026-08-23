@@ -17,7 +17,6 @@ def runner() -> CliRunner:
     return CliRunner()
 
 
-
 @pytest.fixture
 def mock_install_all():
     """Patch install_all in both bind sites so neither path touches the FS.
@@ -55,9 +54,7 @@ def _isolated_cwd(runner: CliRunner, tmp_path: Path):
 
 
 class TestNoFlagsTriggersWizard:
-    def test_no_flags_enters_interactive(
-        self, runner, tmp_path, mock_install_all
-    ):
+    def test_no_flags_enters_interactive(self, runner, tmp_path, mock_install_all):
         # Choose user scope (1), no force, confirm proceed.
         # Inputs map to: scope choice, force confirm, proceed confirm.
         with _isolated_cwd(runner, tmp_path):
@@ -71,9 +68,7 @@ class TestNoFlagsTriggersWizard:
         assert kwargs["scope"] == "user"
         assert kwargs["force"] is False
 
-    def test_explicit_flag_enters_interactive(
-        self, runner, tmp_path, mock_install_all
-    ):
+    def test_explicit_flag_enters_interactive(self, runner, tmp_path, mock_install_all):
         with _isolated_cwd(runner, tmp_path):
             result = runner.invoke(main, ["install", "-i"], input="1\nn\ny\n")
         assert result.exit_code == 0, result.output
@@ -129,9 +124,7 @@ class TestGitInitPrompt:
 
 
 class TestAbortPath:
-    def test_abort_at_final_confirm(
-        self, runner, tmp_path, mock_install_all
-    ):
+    def test_abort_at_final_confirm(self, runner, tmp_path, mock_install_all):
         # scope=1, force=n, proceed=n
         with _isolated_cwd(runner, tmp_path):
             result = runner.invoke(main, ["install"], input="1\nn\nn\n")
@@ -206,19 +199,22 @@ class TestScopeHintWording:
             "the hint still opens on the detection rather than on what it is doing"
         )
 
-    def test_declining_the_wizard_still_aborts(self, runner, tmp_path, mock_install_all):
+    def test_declining_the_wizard_still_aborts(
+        self, runner, tmp_path, mock_install_all
+    ):
         """A user who says no must not be overridden by the fallback.
 
         The wizard reports its two outcomes differently on purpose: declining
         returns, and an unreadable prompt raises. Only the second falls through.
         """
         with _isolated_cwd(runner, tmp_path):
-            result = runner.invoke(main, ["install"], input="1" + chr(10) + "n" + chr(10) + "n" + chr(10))
+            result = runner.invoke(
+                main, ["install"], input="1" + chr(10) + "n" + chr(10) + "n" + chr(10)
+            )
 
         assert result.exit_code == 1
         assert "Installing SuperClaude components" not in result.output
         mock_install_all.assert_not_called()
-
 
 
 class TestCancellingNeverInstalls:

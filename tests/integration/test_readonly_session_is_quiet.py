@@ -133,7 +133,9 @@ def test_read_only_session_leaves_a_clean_tree_and_a_silent_stop(
 def test_a_session_that_edits_code_is_still_asked(project, tmp_path, sandbox_home):
     session = {"session_id": "e2e-edit", "cwd": str(project)}
 
-    _run("insight_writer.py", ["pending-count-from-hook"], session, project, sandbox_home)
+    _run(
+        "insight_writer.py", ["pending-count-from-hook"], session, project, sandbox_home
+    )
     (project / "app.py").write_text("print('changed')\n", encoding="utf-8")
 
     stop = _run(

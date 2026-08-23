@@ -289,10 +289,38 @@ _WORD_RE = re.compile(r"[A-Za-z][\w.-]*")
 # by design, for the same reason.
 _EXTERNAL_RUNNERS = frozenset(
     {
-        "bun", "cargo", "curl", "docker", "eslint", "gh", "git", "go", "gradle",
-        "jest", "kubectl", "make", "mvn", "node", "npm", "npx", "pip", "pnpm",
-        "poetry", "prettier", "pytest", "python", "python3", "ruff", "rustc",
-        "terraform", "tsc", "uv", "uvx", "vitest", "wget", "yarn",
+        "bun",
+        "cargo",
+        "curl",
+        "docker",
+        "eslint",
+        "gh",
+        "git",
+        "go",
+        "gradle",
+        "jest",
+        "kubectl",
+        "make",
+        "mvn",
+        "node",
+        "npm",
+        "npx",
+        "pip",
+        "pnpm",
+        "poetry",
+        "prettier",
+        "pytest",
+        "python",
+        "python3",
+        "ruff",
+        "rustc",
+        "terraform",
+        "tsc",
+        "uv",
+        "uvx",
+        "vitest",
+        "wget",
+        "yarn",
     }
 )
 
@@ -313,7 +341,8 @@ def scannable_prompt(prompt: str) -> str:
     for line in text.splitlines():
         head = line.split("--", 1)[0]
         runner = any(
-            word.group(0).lower() in _EXTERNAL_RUNNERS for word in _WORD_RE.finditer(head)
+            word.group(0).lower() in _EXTERNAL_RUNNERS
+            for word in _WORD_RE.finditer(head)
         )
         kept.append("" if runner else line)
     return "\n".join(kept)

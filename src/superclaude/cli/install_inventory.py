@@ -143,15 +143,9 @@ def _hook_registration_report(hooks_json: Path, settings_file: Path) -> Dict[str
     )
 
     matched = sum(min(count, registered[key]) for key, count in shipped.items())
-    missing = sum(
-        max(0, count - registered[key]) for key, count in shipped.items()
-    )
-    duplicate = sum(
-        max(0, registered[key] - count) for key, count in shipped.items()
-    )
-    obsolete = sum(
-        count for key, count in registered.items() if key not in shipped
-    )
+    missing = sum(max(0, count - registered[key]) for key, count in shipped.items())
+    duplicate = sum(max(0, registered[key] - count) for key, count in shipped.items())
+    obsolete = sum(count for key, count in registered.items() if key not in shipped)
 
     return {
         "shipped": sum(shipped.values()),

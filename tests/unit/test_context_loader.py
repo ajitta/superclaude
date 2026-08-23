@@ -696,9 +696,9 @@ class TestEveryCommandTokenIsChecked:
         _notes, suppressed = self._resolve("/sc:zzzzzz and /sc:analyze", monkeypatch)
 
         assert suppressed == {"zzzzzz"}
-        assert cl.strip_unresolved_commands("/sc:zzzzzz and /sc:analyze", suppressed) == (
-            " and /sc:analyze"
-        )
+        assert cl.strip_unresolved_commands(
+            "/sc:zzzzzz and /sc:analyze", suppressed
+        ) == (" and /sc:analyze")
 
     def test_all_valid_names_suppress_nothing(self, monkeypatch):
         notes, suppressed = self._resolve("/sc:analyze and /sc:review", monkeypatch)

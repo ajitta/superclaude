@@ -443,7 +443,9 @@ def cmd_harvest(args: argparse.Namespace) -> int:
     _extend_harvest_ledger([e["uuid"] for e in new_entries])
 
     if not getattr(args, "quiet", False):
-        print(f"🟡 harvested {len(new_entries)} pending insight(s) — /sc:insight --review")
+        print(
+            f"🟡 harvested {len(new_entries)} pending insight(s) — /sc:insight --review"
+        )
     return 0
 
 

@@ -960,7 +960,7 @@ class TestModelEmittedMarkers:
                             }
                         ],
                     },
-                }
+                },
             ],
         )
 
@@ -1125,7 +1125,7 @@ class TestFrameworkStateIsNotAUserChange:
 
 
 class TestSessionBaselineDecidesTheAsk:
-    """"Is the tree dirty" is not "did this session change code".
+    """ "Is the tree dirty" is not "did this session change code".
 
     A repository dirty before the session started satisfied the old gate on the
     very first turn, so the one request a session gets was spent on a turn that
@@ -1137,8 +1137,12 @@ class TestSessionBaselineDecidesTheAsk:
         import superclaude.scripts.insight_writer as iw
 
         repo = _committed_repo(tmp_path, monkeypatch)
-        monkeypatch.setattr(iw, "hook_state_dir", lambda: tmp_path / ".git" / "sc-state")
-        (repo / "tracked.txt").write_text("dirty before the session\n", encoding="utf-8")
+        monkeypatch.setattr(
+            iw, "hook_state_dir", lambda: tmp_path / ".git" / "sc-state"
+        )
+        (repo / "tracked.txt").write_text(
+            "dirty before the session\n", encoding="utf-8"
+        )
 
         iw.main(["session-baseline", "--session-id", "s1"])
         capsys.readouterr()
@@ -1155,11 +1159,15 @@ class TestSessionBaselineDecidesTheAsk:
         import superclaude.scripts.insight_writer as iw
 
         repo = _committed_repo(tmp_path, monkeypatch)
-        monkeypatch.setattr(iw, "hook_state_dir", lambda: tmp_path / ".git" / "sc-state")
+        monkeypatch.setattr(
+            iw, "hook_state_dir", lambda: tmp_path / ".git" / "sc-state"
+        )
 
         iw.main(["session-baseline", "--session-id", "s2"])
         capsys.readouterr()
-        (repo / "tracked.txt").write_text("changed during the session\n", encoding="utf-8")
+        (repo / "tracked.txt").write_text(
+            "changed during the session\n", encoding="utf-8"
+        )
 
         iw.main(["request", "--session-id", "s2"])
 
@@ -1175,7 +1183,9 @@ class TestSessionBaselineDecidesTheAsk:
         import superclaude.scripts.insight_writer as iw
 
         repo = _committed_repo(tmp_path, monkeypatch)
-        monkeypatch.setattr(iw, "hook_state_dir", lambda: tmp_path / ".git" / "sc-state")
+        monkeypatch.setattr(
+            iw, "hook_state_dir", lambda: tmp_path / ".git" / "sc-state"
+        )
         (repo / "tracked.txt").write_text("dirty\n", encoding="utf-8")
 
         iw.main(["request", "--session-id", "s3"])
@@ -1295,9 +1305,7 @@ class TestHarvestOnlyTakesAnsweredMarkers:
         )
 
         assert iw.cmd_harvest(ns) == 0
-        assert _pending_texts(workdir) == [
-            "quoting the prompt is not disqualifying."
-        ]
+        assert _pending_texts(workdir) == ["quoting the prompt is not disqualifying."]
 
     def test_sub_agent_records_are_skipped(self, workdir, monkeypatch):
         """A sub-agent's transcript is not this session's lesson."""
@@ -1460,9 +1468,7 @@ class TestStopCollectsItsOwnAnswer:
         _request()
 
         assert capsys.readouterr().out.strip() == "", "Stop spoke twice in one session"
-        assert _pending_texts(workdir) == [
-            "the answer must survive a lost SessionEnd"
-        ]
+        assert _pending_texts(workdir) == ["the answer must survive a lost SessionEnd"]
 
     def test_it_collects_only_once(self, workdir, monkeypatch, capsys):
         import argparse

@@ -325,7 +325,6 @@ class TestAgentMemoryDirectory:
         assert (base / "agent-memory-local").is_dir()
 
 
-
 class TestFrameworkArtifactsAlwaysUpdate:
     """Scripts and hooks.json are build outputs, so an upgrade must refresh them.
 
@@ -348,7 +347,9 @@ class TestFrameworkArtifactsAlwaysUpdate:
         scripts_target = base / "superclaude" / "scripts"
         scripts_target.mkdir(parents=True)
         stale = scripts_target / "insight_writer.py"
-        stale.write_text("# previous release, no request subcommand\n", encoding="utf-8")
+        stale.write_text(
+            "# previous release, no request subcommand\n", encoding="utf-8"
+        )
 
         installed, _skipped, failed, messages = install_hooks_and_scripts(
             base_path=base, force=False, scope="user"

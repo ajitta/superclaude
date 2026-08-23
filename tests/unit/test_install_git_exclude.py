@@ -266,7 +266,6 @@ class TestAgentMemoryLocalIsExcluded:
         assert ".claude/agent-memory-local/" in _collect_local_entries()
 
 
-
 class TestFrameworkStateIsExcluded:
     """Runtime state the framework writes into the worktree must not be untracked.
 

@@ -730,7 +730,10 @@ class TestInnerHookOwnership:
 
     @staticmethod
     def _mixed_entry(user_first: bool = False):
-        sc = {"type": "command", "command": "python .../superclaude/scripts/prettier_hook.py"}
+        sc = {
+            "type": "command",
+            "command": "python .../superclaude/scripts/prettier_hook.py",
+        }
         user = {"type": "command", "command": "npm run user-lint"}
         inner = [user, sc] if user_first else [sc, user]
         return {"matcher": "Edit", "hooks": inner}
@@ -762,7 +765,9 @@ class TestInnerHookOwnership:
     def test_force_keeps_a_leading_user_hook_too(self):
         from superclaude.cli.install_settings import _merge_hook_arrays
 
-        merged = _merge_hook_arrays([self._mixed_entry(user_first=True)], [], force=True)
+        merged = _merge_hook_arrays(
+            [self._mixed_entry(user_first=True)], [], force=True
+        )
 
         commands = [h["command"] for entry in merged for h in entry.get("hooks", [])]
         assert commands == ["npm run user-lint"]
@@ -795,7 +800,10 @@ class TestInnerHookOwnership:
     def test_force_does_not_reorder_user_entries(self):
         from superclaude.cli.install_settings import _merge_hook_arrays
 
-        user_entry = {"matcher": "Write", "hooks": [{"type": "command", "command": "user-a"}]}
+        user_entry = {
+            "matcher": "Write",
+            "hooks": [{"type": "command", "command": "user-a"}],
+        }
         sc_entry = {
             "matcher": "Edit",
             "hooks": [
@@ -806,7 +814,10 @@ class TestInnerHookOwnership:
             {
                 "matcher": "Edit",
                 "hooks": [
-                    {"type": "command", "command": "python /new/superclaude/scripts/x.py"}
+                    {
+                        "type": "command",
+                        "command": "python /new/superclaude/scripts/x.py",
+                    }
                 ],
             }
         ]
@@ -1019,5 +1030,7 @@ class TestForceSweepsRetiredEvents:
 
         assert success, message
         events = json.loads(settings_file.read_text(encoding="utf-8"))["hooks"]
-        commands = [h["command"] for e in events.get("TeammateIdle", []) for h in e["hooks"]]
+        commands = [
+            h["command"] for e in events.get("TeammateIdle", []) for h in e["hooks"]
+        ]
         assert commands == ["notify-send idle"]
