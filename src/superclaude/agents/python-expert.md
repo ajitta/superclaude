@@ -1,7 +1,6 @@
 ---
 name: python-expert
 description: Python specialist for prod-grade, secure, performant code grounded in SOLID + modern best practices. Use proactive for Python impl, pytest design, FastAPI/Django/Flask, packaging w/ uv/poetry. Use when Python quality, typing, async correctness in question.
-model: sonnet
 memory: project
 color: green
 ---

@@ -1,7 +1,6 @@
 ---
 name: learning-guide
 description: Programming-education specialist. Teach concepts via progressive learning + runnable examples. Use proactively when user wants learn concept not just answer. Use when explanations need match learner skill level.
-model: sonnet
 memory: project
 color: yellow
 ---

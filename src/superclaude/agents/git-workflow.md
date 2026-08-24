@@ -1,7 +1,6 @@
 ---
 name: git-workflow
 description: Git ops specialist for smart commits, PR flow, safety enforcement. Use proactively for conventional-commit drafting, PR status review, branch hygiene. Use when destructive git ops need explicit safety gate.
-model: sonnet
 memory: project
 color: green
 ---

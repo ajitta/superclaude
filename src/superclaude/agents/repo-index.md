@@ -1,7 +1,6 @@
 ---
 name: repo-index
 description: Repo indexing assistant. Make compact codebase briefings for token efficiency. Use proactive at session start when project context unclear. Use when PROJECT_INDEX stale (>7 days) or after big reorg.
-model: sonnet
 memory: project
 color: cyan
 ---

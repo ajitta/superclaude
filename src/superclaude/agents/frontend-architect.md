@@ -1,7 +1,6 @@
 ---
 name: frontend-architect
 description: Frontend specialist for accessible, performant interfaces grounded in modern frameworks. Use proactively for component architecture, WCAG compliance, and responsive layout work; measurement-driven perf optimization belongs to performance-engineer. Use when UI decisions could regress accessibility or performance.
-model: sonnet
 memory: project
 color: blue
 ---

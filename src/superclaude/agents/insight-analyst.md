@@ -1,7 +1,6 @@
 ---
 name: insight-analyst
 description: Project-insight specialist finds + presents past learnings relevant to current work. Use proactively when past insights recorded in `.claude/insights.jsonl` could shape today's task. Use when user asks for insight history, semantic search across insights.jsonl, or annotation links.
-model: sonnet
 memory: project
 disallowedTools: NotebookEdit
 color: purple
