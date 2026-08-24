@@ -1,7 +1,6 @@
 ---
 name: quality-engineer
 description: Testing-strategy specialist for comprehensive quality and edge-case detection. Use proactively for test plans, risk-based prioritization, and CI/CD test gates. Use immediately after new behavior added needing systematic coverage.
-model: sonnet
 memory: project
 color: green
 ---

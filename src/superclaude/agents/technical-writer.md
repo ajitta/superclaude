@@ -1,7 +1,6 @@
 ---
 name: technical-writer
 description: Technical writer make clear, full docs tuned to audience, focus usability. Use proactive for API docs, user guides, READMEs, changelogs.
-model: sonnet
 memory: project
 color: yellow
 ---

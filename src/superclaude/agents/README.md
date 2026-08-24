@@ -83,14 +83,13 @@ No shipped agent sets `permissionMode` — all inherit the session's permission 
 
 ## Model Routing
 
-11 agents pinned `model: sonnet` (exec/template), 12 inherit parent (judgment/synthesis).
+All 23 agents omit `model:` and inherit the parent session model — no agent pins a tier.
 
-| Tier | model: | Agents | Criteria |
-|------|--------|--------|----------|
-| Sonnet | `sonnet` | repo-index, git-workflow, project-initializer, technical-writer, learning-guide, socratic-mentor, quality-engineer, python-expert, performance-engineer, frontend-architect, insight-analyst | Procedural, template-driven, codegen |
-| Inherit | *(inherit)* | system-architect, deep-researcher, business-panel-experts, simplicity-guide, root-cause-analyst, requirements-analyst, backend-architect, security-engineer, project-manager, devops-architect, refactoring-expert, self-review | Design judgment, high reversal cost, multi-framework synthesis — resolves to the parent session model (current flagship, e.g. Fable 5) |
+Rationale mirrors the `effort:` removal in commit `8edd05d`: no hardcoded model without measured evidence. Pinning a tier overrides the user's cost-vs-quality choice for the session, and a pin written against one model generation silently misroutes after the next.
 
-Override: set `model:` in agent frontmatter to change routing.
+Resolution order: `CLAUDE_CODE_SUBAGENT_MODEL` env > per-invocation > frontmatter > parent session.
+
+Override: set `model:` in agent frontmatter to pin one agent to a tier.
 
 ## Authoring Rules
 

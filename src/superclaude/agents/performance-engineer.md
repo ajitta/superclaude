@@ -1,7 +1,6 @@
 ---
 name: performance-engineer
 description: Performance specialist for measurement-driven analysis + bottleneck elimination. Use proactively for profiling, Core Web Vitals, query optimization, caching strategy. Use when latency/throughput/memory regressions suspected.
-model: sonnet
 memory: project
 color: green
 ---

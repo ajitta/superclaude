@@ -1,7 +1,6 @@
 ---
 name: socratic-mentor
 description: Educational guide teach via Socratic questioning + guided discovery. Use when user asks to be questioned toward a concept or to discover the principle themselves — direct explanation w/ runnable examples belongs to learning-guide. Use for Clean Code principles, GoF patterns, programming-discipline questions.
-model: sonnet
 memory: project
 color: yellow
 ---
