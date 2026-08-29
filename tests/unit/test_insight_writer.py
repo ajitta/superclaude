@@ -1261,6 +1261,35 @@ class TestHarvestOnlyTakesAnsweredMarkers:
         assert iw.cmd_harvest(ns) == 0
         assert _pending_texts(workdir) == ["the cache key needed the session id."]
 
+    def test_the_request_is_recognized_even_when_claude_code_marks_it_isMeta(
+        self, workdir, monkeypatch
+    ):
+        """Claude Code delivers the Stop hook's block reason as an isMeta record.
+
+        The top-level filter dropped every isMeta record before its content
+        was ever inspected, so the sentinel was never seen and no reply's
+        marker ever counted — found live in a real transcript on 2026-08-29,
+        independent of the reply-splitting bug fixed above.
+        """
+        ns, pdir = _harvest(workdir, monkeypatch, "sess1")
+        _make_transcript(
+            pdir,
+            "sess1",
+            [
+                {
+                    "type": "user",
+                    "isMeta": True,
+                    "uuid": "r1",
+                    "sessionId": "sess1",
+                    "message": {"role": "user", "content": iw.REQUEST_REASON},
+                },
+                _assistant("a1", "Done. INSIGHT: the cache key needed the session id."),
+            ],
+        )
+
+        assert iw.cmd_harvest(ns) == 0
+        assert _pending_texts(workdir) == ["the cache key needed the session id."]
+
     def test_a_user_typed_marker_never_needs_a_request(self, workdir, monkeypatch):
         ns, pdir = _harvest(workdir, monkeypatch, "sess1")
         _make_transcript(
@@ -1310,7 +1339,7 @@ class TestHarvestOnlyTakesAnsweredMarkers:
     def test_a_later_unrelated_assistant_turn_is_not_harvested(
         self, workdir, monkeypatch
     ):
-        """The allowance is consumed by the one reply — it must not leak onward.
+        """The window closes on the next real user turn — it must not leak past it.
 
         A sticky flag let every assistant record for the rest of the scan
         through once any request had been answered, so a later turn merely
@@ -1331,11 +1360,52 @@ class TestHarvestOnlyTakesAnsweredMarkers:
                     "message": {"role": "user", "content": iw.REQUEST_REASON},
                 },
                 _assistant("a1", "Done. INSIGHT: the cache key needed the session id."),
+                {
+                    "type": "user",
+                    "isMeta": False,
+                    "uuid": "u2",
+                    "sessionId": "sess1",
+                    "message": {
+                        "role": "user",
+                        "content": "document the insight command",
+                    },
+                },
                 _assistant(
                     "a2",
                     "The pending file stores raw `INSIGHT:` markers harvested "
                     "from transcripts.",
                 ),
+            ],
+        )
+
+        assert iw.cmd_harvest(ns) == 0
+        assert _pending_texts(workdir) == ["the cache key needed the session id."]
+
+    def test_a_reply_split_across_assistant_records_is_still_harvested(
+        self, workdir, monkeypatch
+    ):
+        """Extended thinking splits one logical reply into several records.
+
+        A thinking block and its text block land as separate assistant
+        records sharing one turn, no user record between them. Closing the
+        window on the first assistant record — instead of the next real user
+        record — missed the marker whenever it landed in a later block: the
+        actual 2026-08-29 regression, not the synthetic 2026-05-08 one.
+        """
+        ns, pdir = _harvest(workdir, monkeypatch, "sess1")
+        _make_transcript(
+            pdir,
+            "sess1",
+            [
+                {
+                    "type": "user",
+                    "isMeta": False,
+                    "uuid": "r1",
+                    "sessionId": "sess1",
+                    "message": {"role": "user", "content": iw.REQUEST_REASON},
+                },
+                _assistant("a1-thinking", ""),
+                _assistant("a1-text", "INSIGHT: the cache key needed the session id."),
             ],
         )
 

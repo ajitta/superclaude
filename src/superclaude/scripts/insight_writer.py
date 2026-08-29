@@ -374,7 +374,7 @@ def cmd_harvest(args: argparse.Namespace) -> int:
             # Assistant records are scanned too. Harvesting user records alone
             # meant the only producer was the user typing INSIGHT: by hand, which
             # happened 5 times in 10 months — the subsystem had no other source.
-            if rec.get("type") not in ("user", "assistant") or rec.get("isMeta"):
+            if rec.get("type") not in ("user", "assistant"):
                 continue
             # A sub-agent's transcript is not this session's lesson, and the
             # branch never saw the request it would be answering.
@@ -399,24 +399,40 @@ def cmd_harvest(args: argparse.Namespace) -> int:
                 awaiting_reply = True
                 if rec.get("type") == "user":
                     # This record *is* the request — Claude Code delivers a Stop
-                    # reason in the user role. Never harvest it.
+                    # reason in the user role, marked isMeta. The isMeta skip
+                    # below must not run before this check: it would otherwise
+                    # discard the request before its sentinel is ever seen, and
+                    # awaiting_reply would never turn True at all (2026-08-29).
+                    # Never harvest it either way.
                     continue
                 # An assistant record carrying the sentinel is a reply quoting
                 # the prompt it answers. Strip the sentinel and keep the reply:
                 # dropping the record discarded the very line just asked for.
                 content = content.replace(REQUEST_SENTINEL, " ")
-            # An assistant marker counts only for the one reply that answers a
-            # request, so the allowance is consumed the instant an assistant
-            # record uses it. Left sticky for the rest of the scan, any later
-            # turn that merely explains, quotes, or documents the marker format
-            # — this file's own spec authored mid-session, say — harvested its
-            # `INSIGHT:` mentions as if they were real (2026-05-08 false-positive
-            # batch). A user typing the marker is explicit intent and always
-            # counts, regardless of this flag.
-            if rec.get("type") == "assistant":
-                if not awaiting_reply:
-                    continue
+            elif rec.get("type") == "user":
+                # A genuine next turn (or a tool result) closes the window a
+                # request opened. Closing it per-assistant-record instead once
+                # missed real answers: extended thinking splits one logical
+                # reply into several assistant records — a thinking block, then
+                # the text block — sharing the same turn, and the marker can
+                # land in either. Left open until a real user record intervenes,
+                # the window still cannot leak into a later, unrelated turn: one
+                # always sits between this reply and the next (2026-08-29).
                 awaiting_reply = False
+            # isMeta records other than the request above carry no lesson of
+            # their own — system reminders, hook bookkeeping. Skipped only now,
+            # after the sentinel check: skipping any earlier discarded the
+            # request itself before its content was ever inspected, since
+            # Claude Code delivers it marked isMeta too (2026-08-29).
+            if rec.get("isMeta"):
+                continue
+            # An assistant marker counts only while answering a request. Every
+            # other occurrence is the model explaining, quoting or repeating the
+            # format — a document about this subsystem would otherwise file
+            # itself (2026-05-08 false-positive batch). A user typing the marker
+            # is explicit intent and always counts, regardless of this flag.
+            if rec.get("type") == "assistant" and not awaiting_reply:
+                continue
             for m in MARKER_RE.finditer(content):
                 marker_text = m.group(1).strip()
                 if not marker_text:
