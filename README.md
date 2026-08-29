@@ -402,7 +402,7 @@ superclaude mcp
 ### 📓 **Insight Pipeline**
 **`/sc:insight` + hook-driven harvest:**
 - Per-project JSONL store at `.claude/insights.jsonl`
-- Script-based writer (`scripts/insight_writer.py`) with append/promote
+- `superclaude insight` CLI (append/list/query/stats/review/promote)
 - PreCompact / SessionEnd hooks auto-harvest pending insights
 - Empty/non-string entries rejected at the writer boundary
 - Searchable for human and tool analysis across sessions

@@ -1599,3 +1599,76 @@ class TestStopCollectsItsOwnAnswer:
         capsys.readouterr()
 
         assert len(calls) == 1
+
+
+# ---------- CLI entry point ----------
+
+
+class TestCliEntryPoint:
+    """`superclaude insight` is the only invocation that always resolves.
+
+    The script imports superclaude.utils, which is absent from the install tree
+    (~/.claude/superclaude/ ships content, not the package), so a bare
+    `python3 .../insight_writer.py` raises ModuleNotFoundError. Hooks dodge it
+    by baking the installer's sys.executable as {{PYTHON_BIN}}; everything
+    user-facing goes through the console script instead.
+    """
+
+    def test_subcommand_is_registered(self):
+        from superclaude.cli.main import main as cli
+
+        assert "insight" in cli.commands
+
+    def test_review_routes_through_cli(self, workdir):
+        from click.testing import CliRunner
+
+        from superclaude.cli.main import main as cli
+
+        pending = workdir / ".claude" / "insights.pending.jsonl"
+        pending.parent.mkdir(parents=True, exist_ok=True)
+        pending.write_text(
+            json.dumps({"ts": "2026-08-29T00:00:00Z", "raw_text": "marker one"}) + "\n",
+            encoding="utf-8",
+        )
+
+        result = CliRunner().invoke(cli, ["insight", "review"])
+
+        assert result.exit_code == 0, result.output
+        assert "marker one" in result.output
+
+    def test_options_forward_to_argparse(self, workdir):
+        from click.testing import CliRunner
+
+        from superclaude.cli.main import main as cli
+
+        payload = json.dumps({"type": "discovery", "insight": "forwarded through cli"})
+        result = CliRunner().invoke(cli, ["insight", "append", "--json", payload])
+
+        assert result.exit_code == 0, result.output
+        stored = (workdir / ".claude" / "insights.jsonl").read_text(encoding="utf-8")
+        assert "forwarded through cli" in stored
+
+    def test_usage_names_the_console_script(self):
+        # prog must read 'superclaude insight', not 'insight_writer' — a user
+        # copying the usage line has to get a command that actually runs.
+        assert iw.build_parser("superclaude insight").prog == "superclaude insight"
+        assert iw.build_parser().prog == "insight_writer"
+
+    def test_command_doc_prescribes_cli_not_bare_python(self):
+        doc = (
+            Path(__file__).resolve().parents[2]
+            / "src"
+            / "superclaude"
+            / "commands"
+            / "insight.md"
+        ).read_text(encoding="utf-8")
+
+        # The gotcha line quotes the broken form deliberately; every other
+        # mention would be an instruction to run it.
+        prescriptions = [
+            line
+            for line in doc.splitlines()
+            if "python3" in line and "never-bare-python" not in line
+        ]
+        assert prescriptions == [], prescriptions
+        assert "superclaude insight review" in doc

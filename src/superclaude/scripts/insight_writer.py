@@ -14,6 +14,11 @@ Subcommands:
 Read paths require jq; write paths are pure Python. Missing jq prints install
 hint to stderr and exits 1.
 
+Invocation: `superclaude insight <subcommand>` — the console script carries the
+environment where superclaude.utils resolves. Running this file under a bare
+`python3` fails with ModuleNotFoundError unless that interpreter happens to have
+the package; hooks avoid it by baking {{PYTHON_BIN}} = the installer's sys.executable.
+
 Hook integration:
     SessionEnd / PreCompact → harvest-from-hook (stdin JSON: reason/trigger + cwd)
     SessionStart            → pending-count-from-hook (stdin JSON: cwd)
@@ -505,7 +510,7 @@ def cmd_review(args: argparse.Namespace) -> int:
         print("(no pending insights)")
         return 0
     print(
-        f"# {len(pending)} pending insight(s) — promote with: insight_writer.py promote --index N --type TYPE"
+        f"# {len(pending)} pending insight(s) — promote with: superclaude insight promote --index N --type TYPE"
     )
     for i, e in enumerate(pending):
         ts = e.get("user_ts") or e.get("harvested_at", "")
@@ -787,10 +792,8 @@ def cmd_request(args: argparse.Namespace) -> int:
 # ---------- main ----------
 
 
-def build_parser() -> argparse.ArgumentParser:
-    p = argparse.ArgumentParser(
-        prog="insight_writer", description=__doc__.split("\n")[0]
-    )
+def build_parser(prog: str = "insight_writer") -> argparse.ArgumentParser:
+    p = argparse.ArgumentParser(prog=prog, description=__doc__.split("\n")[0])
     sub = p.add_subparsers(dest="cmd", required=True)
 
     a = sub.add_parser("append")
@@ -847,7 +850,7 @@ def build_parser() -> argparse.ArgumentParser:
     return p
 
 
-def main(argv: list[str] | None = None) -> int:
+def main(argv: list[str] | None = None, prog: str = "insight_writer") -> int:
     # Special hook entry points: when invoked from SessionStart/PreCompact/
     # SessionEnd/Stop hooks, the harness pipes JSON to stdin. Parse it to
     # extract session_id / cwd / reason|trigger / stop_hook_active automatically.
@@ -903,7 +906,7 @@ def main(argv: list[str] | None = None) -> int:
             if data.get("transcript_path"):
                 argv += ["--transcript-path", str(data["transcript_path"])]
 
-    args = build_parser().parse_args(argv)
+    args = build_parser(prog).parse_args(argv)
     return args.fn(args)
 
 

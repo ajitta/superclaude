@@ -1042,6 +1042,32 @@ def _format_audit_markdown(result: dict, scope: str, check: str) -> str:
     return "\n".join(lines) + "\n"
 
 
+@main.command(
+    context_settings={"ignore_unknown_options": True, "allow_extra_args": True},
+    add_help_option=False,
+)
+@click.argument("args", nargs=-1, type=click.UNPROCESSED)
+def insight(args):
+    """
+    Capture and review session insights (/sc:insight backend).
+
+    Forwards to insight_writer's own parser, so `superclaude insight --help`
+    lists every subcommand. This entry point exists because the script imports
+    superclaude.utils, which only the installing interpreter can resolve — a
+    bare `python3 ~/.claude/superclaude/scripts/insight_writer.py` raises
+    ModuleNotFoundError. The console script always carries its own environment.
+
+    Examples:
+        superclaude insight review
+        superclaude insight list --limit 20
+        superclaude insight promote --index 0 --type discovery --tags harvest
+        superclaude insight append --json '{"type":"feedback","insight":"..."}'
+    """
+    from superclaude.scripts.insight_writer import main as insight_main
+
+    sys.exit(insight_main(list(args), prog="superclaude insight"))
+
+
 @main.command()
 def version():
     """Show SuperClaude version"""

@@ -13,10 +13,10 @@ description: Capture structured session insights to per-project JSONL for human 
   1. Mode: pick mode — capture (default/text), list, query, stats, or review (process pending harvested markers)
   2. Capture (default): scan session → propose 3-7 insights → show user for approval → append approved
   3. Capture (text): take user text → infer type + tags → shape as JSON → show → append
-  4. Dedup: before propose, run `insight_writer.py list --limit 20` to check recent entries → skip already-captured topics. For annotations, also check existing ref_ts.
-  5. Append: ALWAYS via `python3 {{SCRIPTS_PATH}}/insight_writer.py append --json '<json>'` — NEVER hand-write to insights.jsonl. Script enforce schema, escaping, annotation ref check. (`{{SCRIPTS_PATH}}` here and below resolves to `~/.claude/superclaude/scripts/` — substitute real path when running; command bodies ship the literal template unresolved.)
+  4. Dedup: before propose, run `superclaude insight list --limit 20` to check recent entries → skip already-captured topics. For annotations, also check existing ref_ts.
+  5. Append: ALWAYS via `superclaude insight append --json '<json>'` — NEVER hand-write to insights.jsonl. Script enforce schema, escaping, annotation ref check.
   6. Read modes: `--list`, `--query`, `--stats` shell to jq via same script. If jq missing, script print install hint + exit 1 — relay message to user.
-  7. Review mode: `--review` call `insight_writer.py review` to list pending markers harvested by SessionEnd/PreCompact hooks. For each wanted entry, propose structured promote (type + tags) + call `insight_writer.py promote --index N --type TYPE [--tags a,b]`.
+  7. Review mode: `--review` call `superclaude insight review` to list pending markers harvested by SessionEnd/PreCompact hooks. For each wanted entry, propose structured promote (type + tags) + call `superclaude insight promote --index N --type TYPE [--tags a,b]`.
   </flow>
 
   <outputs>
@@ -58,26 +58,26 @@ description: Capture structured session insights to per-project JSONL for human 
   </schema>
 
   <tools>
-  - Bash: call `insight_writer.py` (append/list/query/stats/review/promote). All file I/O on insights.jsonl go through this script.
+  - Bash: call `superclaude insight` (append/list/query/stats/review/promote). All file I/O on insights.jsonl go through this CLI.
   </tools>
 
   <script_reference>
   Append one entry:
-    python3 {{SCRIPTS_PATH}}/insight_writer.py append --json '{"type":"feedback","insight":"...","tags":["..."]}'
+    superclaude insight append --json '{"type":"feedback","insight":"...","tags":["..."]}'
 
   Append many (batch):
-    python3 {{SCRIPTS_PATH}}/insight_writer.py append --json '[{...},{...}]'
+    superclaude insight append --json '[{...},{...}]'
 
   Read paths (need jq):
-    python3 {{SCRIPTS_PATH}}/insight_writer.py list [--limit 20]
-    python3 {{SCRIPTS_PATH}}/insight_writer.py query type=feedback
-    python3 {{SCRIPTS_PATH}}/insight_writer.py query tags=rules
-    python3 {{SCRIPTS_PATH}}/insight_writer.py stats [--all]
+    superclaude insight list [--limit 20]
+    superclaude insight query type=feedback
+    superclaude insight query tags=rules
+    superclaude insight stats [--all]
 
   Pending review/promote:
-    python3 {{SCRIPTS_PATH}}/insight_writer.py review
-    python3 {{SCRIPTS_PATH}}/insight_writer.py promote --index 0 --type discovery --tags harvest,a,b
-    python3 {{SCRIPTS_PATH}}/insight_writer.py promote --index 0 --type pattern --insight "rewritten one-liner"
+    superclaude insight review
+    superclaude insight promote --index 0 --type discovery --tags harvest,a,b
+    superclaude insight promote --index 0 --type pattern --insight "rewritten one-liner"
   </script_reference>
 
   <examples>
@@ -93,7 +93,8 @@ description: Capture structured session insights to per-project JSONL for human 
   </examples>
 
   <gotchas>
-  - script-only-writes: NEVER Write/echo on insights.jsonl. ALWAYS go through `insight_writer.py append`. Script handle JSON escaping, schema check, annotation ref existence checks that hand-written code miss often.
+  - script-only-writes: NEVER Write/echo on insights.jsonl. ALWAYS go through `superclaude insight append`. Script handle JSON escaping, schema check, annotation ref existence checks that hand-written code miss often.
+  - never-bare-python: NEVER invoke `python3 ~/.claude/superclaude/scripts/insight_writer.py` direct — script import `superclaude.utils`, absent from the install tree, so bare python3 raise ModuleNotFoundError. Only the console script `superclaude insight` (and hooks, which bake the installer interpreter) carry a resolving environment.
   - jq-required: `--list`, `--query`, `--stats` need jq on PATH. If absent, script exit 1 with install URL — surface to user, no inline Python fallback.
   - review-requires-classification: Pending entries = raw text; must propose `--type` (feedback|decision|discovery|...) + optional tags before call promote. Never promote without show user what classification you plan.
   </gotchas>
