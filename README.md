@@ -554,7 +554,7 @@ The Deep Research system intelligently coordinates multiple tools:
 | Skills (5) | [`src/superclaude/Skills/`](src/superclaude/Skills) |
 | Core rules (always-loaded) | [`FLAGS.md`](src/superclaude/core/FLAGS.md) · [`PRINCIPLES.md`](src/superclaude/core/PRINCIPLES.md) · [`RULES.md`](src/superclaude/core/RULES.md) |
 | Authoring specs for new content | [`.claude/rules/`](.claude/rules) |
-| Health & drift checks | `superclaude doctor` · `superclaude verify-drift` |
+| Health & drift checks | `superclaude doctor` · `superclaude verify-drift` · `superclaude context reset` |
 
 ---
 

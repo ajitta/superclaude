@@ -85,7 +85,7 @@ Python and shell scripts that power SuperClaude's hook system, context loading, 
 
 **Contract:** Scripts are infrastructure plumbing — they should be invisible to the user. They handle context injection, session initialization, skill activation, and formatting hooks.
 
-**Sub-package:** `scripts/auto_improve/` — overnight autonomous code improvement loop powering `/sc:auto-improve` (coordinator, eval_runner, mutator, worktree isolation, results reporter). Distinct from per-event hook scripts; runs as a standalone `python -m superclaude.scripts.auto_improve` entrypoint.
+**Sub-package:** `scripts/auto_improve/` — overnight autonomous code improvement loop powering `/sc:auto-improve` (coordinator, eval_runner, mutator, worktree isolation, results reporter). Distinct from per-event hook scripts; runs as a standalone `superclaude auto-improve` console entrypoint (`uv run python -m superclaude.scripts.auto_improve` in a dev checkout).
 
 **Runtime state:** every path a script writes at runtime resolves through `superclaude.utils` — never `os.getcwd()`, `Path.cwd()`, or a CWD-relative literal, since hook CWD is not guaranteed to be the project root. Two classes:
 

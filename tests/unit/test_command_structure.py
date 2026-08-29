@@ -35,6 +35,24 @@ COMMAND_IDS = [f.stem for f in COMMAND_FILES]
 # specific (107-trial study); commands are user-invoked workflows, not personas.
 NEGATIVE_TRIGGER_GATE = re.compile(r"auto-?(trigger|fire)", re.IGNORECASE)
 
+# A command doc that tells the model to run a superclaude script with a bare
+# `python`/`python3` prescribes an invocation that only resolves by luck of
+# PATH: ~/.claude/superclaude/ ships content, not the package, and the
+# {{PYTHON_BIN}} substitution that saves hooks never runs over command
+# markdown (install_components.py covers hooks.json + skills only). Console
+# subcommands (`superclaude insight`, `superclaude auto-improve`) are the only
+# invocations that always carry a resolving interpreter.
+# `{{SCRIPTS_PATH}}` is the form command markdown is meant to reach for, and it
+# resolves at install time to ~/.claude/superclaude/scripts/ — i.e. exactly the
+# broken invocation — so the template spelling has to be caught too. The `uv run`
+# prefix is the one legitimate bare-module form (dev checkout) and is exempt.
+_BARE_PYTHON_PRESCRIPTION = re.compile(
+    r"(?<!uv run )python3?\s+"
+    r"(?:-m\s+superclaude\b|[^\s`]*(?:superclaude|\{\{SCRIPTS_PATH\}\})[^\s`]*\.py)"
+)
+# Gotcha lines quote the broken form on purpose; they carry this identifier.
+_BARE_PYTHON_EXEMPT = "never-bare-python"
+
 
 def parse_frontmatter(text: str) -> dict[str, str]:
     """Extract YAML frontmatter from markdown text."""
@@ -277,3 +295,57 @@ class TestCommandMinimumContent:
             assert not re.search(pattern, content), (
                 f"{stem}: empty section found matching {pattern}"
             )
+
+
+class TestCommandDocsPrescribeConsoleEntry:
+    """No command doc may prescribe a bare-python invocation of a SC script.
+
+    The install tree ships content, not the package, so
+    `python3 ~/.claude/superclaude/scripts/X.py` and
+    `python -m superclaude.scripts.X` raise ModuleNotFoundError for any
+    interpreter that is not the installing one. Hooks dodge this because
+    install_components.py bakes sys.executable as {{PYTHON_BIN}}, and that
+    substitution never reaches command markdown. Console subcommands are the
+    only invocation a command doc may hand the model. Lines carrying the
+    `never-bare-python` identifier are exempt: those gotchas quote the broken
+    form deliberately.
+    """
+
+    def test_no_bare_python_prescription(self, command):
+        stem, content, _ = command
+        prescriptions = [
+            line
+            for line in content.splitlines()
+            if _BARE_PYTHON_PRESCRIPTION.search(line)
+            and _BARE_PYTHON_EXEMPT not in line
+        ]
+        assert prescriptions == [], (
+            f"{stem}: prescribes bare python for a superclaude script; "
+            f"use the console subcommand instead: {prescriptions}"
+        )
+
+
+# A guard nobody probes is a guard nobody knows is inverted: the sweep above
+# passes just as happily on a regex that matches nothing. These pin what the
+# pattern must catch and what it must leave alone.
+@pytest.mark.parametrize(
+    ("line", "is_prescription"),
+    [
+        ("3. Spawn worker: `python -m superclaude.scripts.auto_improve [args]`", True),
+        ("run `python3 ~/.claude/superclaude/scripts/insight_writer.py review`", True),
+        ("run `python3 {{SCRIPTS_PATH}}/insight_writer.py --review`", True),
+        ("`uv run python -m superclaude.scripts.parallel_ab spec.yaml`", False),
+        ("/sc:auto-improve . --eval-cmd 'python eval.py' --metric pass_rate", False),
+        ("3. Spawn worker: `superclaude auto-improve [args]`", False),
+    ],
+    ids=[
+        "bare-module",
+        "resolved-install-path",
+        "scripts-path-template",
+        "uv-run-dev-form",
+        "users-own-eval-cmd",
+        "console-subcommand",
+    ],
+)
+def test_bare_python_pattern_discriminates(line, is_prescription):
+    assert bool(_BARE_PYTHON_PRESCRIPTION.search(line)) is is_prescription

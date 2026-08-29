@@ -14,7 +14,7 @@ disable-model-invocation: true
   <flow>
   1. Parse args + validate `--eval-cmd` and `--metric` present (unless `--status`)
   2. Phase 0 confirm: warn user `--eval-cmd` run unsandboxed, ask explicit y/n confirm before spawn worker (skip when `--status`)
-  3. Spawn Python worker: `python -m superclaude.scripts.auto_improve [args]` background; write PID to worktree
+  3. Spawn worker: `superclaude auto-improve [args]` backgrounded with `&`, `start /b`, or `Start-Process` — never PowerShell `Start-Job`, measured to kill the worker when its shell exits. Worker writes its own PID to the worktree
   4. Print where follow progress (`tail -f [worktree]/results.tsv`) and exit immediately
   5. `--status` branch: read most-recent worktree results.tsv + PID, print morning summary, exit
   </flow>
@@ -35,9 +35,10 @@ disable-model-invocation: true
   <gotchas>
   - improve-vs-auto: `/sc:improve` interactive variant; `/sc:auto-improve` autonomous overnight. Confirm intent before invoke — share tab-completion namespace
   - eval-cmd-blast-radius: `--eval-cmd` run unsandboxed inside worktree. Network calls, DB writes, external billing — all user responsibility. Do NOT pass command touch production resources
-  - cc-session-end: Python worker survive Claude Code session exit (detached subprocess). To stop, kill PID listed in `[worktree]/auto_improve.pid`
+  - cc-session-end: Survival across Claude Code session exit is UNVERIFIED on Windows — no real teardown has been measured; the worker does outlive its spawning shell. Confirm the PID in `[worktree]/auto_improve.pid` is a LIVE process, not merely present — a hard-killed worker leaves it stale. That PID stops the coordinator only; an `--eval-cmd` already in flight breaks away and keeps running
   - mutator-tools: mutator agent tool surface restricted to Edit/Write/Read (Bash explicitly disabled) — cannot run shell command inside worktree
   - mutator-model-freeform: `--mutator-model` accepts any model alias or full ID the harness resolves (default sonnet) — worker enforces no enum; pick cheap (haiku/sonnet) for volume, flagship for hard mutations
+  - never-bare-python: NEVER substitute `python -m superclaude.scripts.auto_improve` for the console entry — worker import `superclaude.scripts.auto_improve.*`, absent from the install tree, so bare python resolve only by luck of PATH. `superclaude auto-improve` carry the installing interpreter; inside a dev checkout `uv run python -m ...` equivalent.
   </gotchas>
 
   <examples>

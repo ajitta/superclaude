@@ -10,9 +10,11 @@ from pathlib import Path
 from .orchestrator import OrchestratorError, orchestrate
 
 
-def _build_parser() -> argparse.ArgumentParser:
+def _build_parser(
+    prog: str = "python -m superclaude.scripts.parallel_ab",
+) -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(
-        prog="python -m superclaude.scripts.parallel_ab",
+        prog=prog,
         description=(
             "Run N variants in parallel via claude -p and emit matrix.md + decision.md."
         ),
@@ -31,8 +33,11 @@ def _build_parser() -> argparse.ArgumentParser:
     return p
 
 
-def main(argv: list[str] | None = None) -> int:
-    args = _build_parser().parse_args(argv)
+def main(
+    argv: list[str] | None = None,
+    prog: str = "python -m superclaude.scripts.parallel_ab",
+) -> int:
+    args = _build_parser(prog).parse_args(argv)
     try:
         decision = asyncio.run(orchestrate(args.spec, out_dir=args.out_dir))
     except OrchestratorError as exc:

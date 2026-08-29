@@ -1068,6 +1068,515 @@ def insight(args):
     sys.exit(insight_main(list(args), prog="superclaude insight"))
 
 
+@main.command(
+    name="auto-improve",
+    context_settings={"ignore_unknown_options": True, "allow_extra_args": True},
+    add_help_option=False,
+)
+@click.argument("args", nargs=-1, type=click.UNPROCESSED)
+def auto_improve_cmd(args):
+    """
+    Run the autonomous code-improvement loop (/sc:auto-improve backend).
+
+    Forwards to the worker's own parser, so `superclaude auto-improve --help`
+    lists every flag. This entry point exists because the worker imports
+    superclaude.scripts.auto_improve.*, which only the installing interpreter
+    can resolve — a bare `python -m superclaude.scripts.auto_improve` outside a
+    checkout raises ModuleNotFoundError. The console script always carries its
+    own environment.
+
+    Examples:
+        superclaude auto-improve --project . --eval-cmd 'pytest --json-report' --metric summary.passed --budget 8h
+        superclaude auto-improve --project . --status
+        superclaude auto-improve --project . --eval-cmd 'python eval.py' --metric pass_rate --dry-run
+    """
+    from superclaude.scripts.auto_improve.cli import main as auto_improve_main
+
+    sys.exit(auto_improve_main(list(args), prog="superclaude auto-improve"))
+
+
+@main.command(
+    name="parallel-ab",
+    context_settings={"ignore_unknown_options": True, "allow_extra_args": True},
+    add_help_option=False,
+)
+@click.argument("args", nargs=-1, type=click.UNPROCESSED)
+def parallel_ab_cmd(args):
+    """
+    Run N prompt/skill variants in parallel and aggregate the results.
+
+    Forwards to the harness's own parser, so `superclaude parallel-ab --help`
+    lists every flag. This entry point exists because the harness imports
+    superclaude.scripts.parallel_ab.*, which only the installing interpreter
+    can resolve — a bare `python -m superclaude.scripts.parallel_ab` outside a
+    checkout raises ModuleNotFoundError. The console script always carries its
+    own environment.
+
+    Examples:
+        superclaude parallel-ab docs/experiments/brainstorm-ab/variants.yaml
+        superclaude parallel-ab variants.yaml --out-dir /tmp/ab-run
+    """
+    from superclaude.scripts.parallel_ab.cli import main as parallel_ab_main
+
+    sys.exit(parallel_ab_main(list(args), prog="superclaude parallel-ab"))
+
+
+# --- `superclaude context` -------------------------------------------------
+#
+# context_loader.py and context_reset.py both import superclaude.*, so neither
+# is runnable as a bare `python3 ~/.claude/superclaude/scripts/X.py` (see
+# .claude/rules/gotchas/hooks.md `script-needs-console-entry`). `reset` gives
+# context_reset.py its human path; `explain` gives context_loader.py a dry run.
+#
+# `explain` runs the loader as a subprocess, exactly the way
+# tests/unit/test_context_loader.py's run_loader does, and never imports it for
+# execution. The loader is the UserPromptSubmit hot path (hooks.json, 5s
+# timeout) with no in-process test coverage, so the answer is taken from the
+# real thing rather than from a second copy of its matching logic.
+
+# Markers context_loader prints. Parsed rather than re-derived so the file list,
+# the tiers and the Tier 2 token counts all come from the loader itself.
+_CTX_HINT_RE = re.compile(r'^<sc-context-hint src="([^"]+)">(.*)</sc-context-hint>$')
+_CTX_INSTRUCTION_RE = re.compile(r'^<sc-context src="([^"]+)">$')
+_CTX_INJECT_RE = re.compile(r'^<context-inject file="([^"]+)" tokens="~(\d+)">$')
+_CTX_LOAD_RE = re.compile(r'^<context-load file="(.+)"/>$')
+_CTX_DIRECTIVE_RE = re.compile(r'^<sc-directive flag="([^"]+)">')
+_CTX_TOTAL_RE = re.compile(r"^<!-- Context loaded: \d+ files \(~(\d+) tokens\) -->$")
+_CTX_SKIPPED_RE = re.compile(r"^<!--.*Budget exceeded: skipped (.+) -->$")
+_CTX_NOTICE_RE = re.compile(r"^<!--\s*(.*?)\s*-->$")
+
+
+def _context_content_root() -> tuple[Path, str | None]:
+    """Content root a dry run should read, plus a note when the anchors disagree.
+
+    ``SUPERCLAUDE_PATH`` wins because that is the loader's own first priority.
+    Otherwise a scoped install is looked for under ``$CLAUDE_PROJECT_DIR`` —
+    the anchor ``claude_base()`` resolves from — with the CWD as the fallback
+    when that variable is unset, then user scope when neither directory holds a
+    ``.claude/superclaude``.
+
+    Reading the variable is not the same as calling ``project_root()``, which
+    .claude/rules/gotchas/hooks.md `cli-vs-hook-cwd` reserves for hook code, and
+    the two cases pull in opposite directions: ``install_paths`` decides where
+    the USER wants content written and so follows the shell, while this reports
+    what the HOOK would read and so has to follow the hook's anchor. Under the
+    CWD rule alone, an ``explain`` run from a subdirectory of a project-scope
+    install silently answers user scope. When the anchors disagree the caller
+    prints both rather than picking one in silence.
+
+    Returns:
+        (content root, note naming the disagreement, or None when they agree)
+    """
+    import os
+
+    override = os.environ.get("SUPERCLAUDE_PATH")
+    if override:
+        return Path(override), None
+
+    def scoped(base: Path) -> Path:
+        local = base / ".claude" / "superclaude"
+        return local if local.is_dir() else Path.home() / ".claude" / "superclaude"
+
+    anchor = os.environ.get("CLAUDE_PROJECT_DIR")
+    if not anchor:
+        return scoped(Path.cwd()), None
+
+    from_anchor = scoped(Path(anchor))
+    from_cwd = scoped(Path.cwd())
+    if from_anchor == from_cwd:
+        return from_anchor, None
+    return from_anchor, (
+        f"$CLAUDE_PROJECT_DIR={anchor} decides this, as it does for the hook; "
+        f"this directory alone would have answered {from_cwd}"
+    )
+
+
+def _packaged_loader() -> Path:
+    """The context_loader.py copy this CLI runs: the one shipped in this package.
+
+    The UserPromptSubmit hook runs the INSTALLED copy instead
+    (hooks.json's ``{{SCRIPTS_PATH}}/context_loader.py``, which
+    ``install_components._resolve_template_paths`` resolves to
+    ``<content root>/scripts``), so the two can drift apart.
+    """
+    return Path(__file__).resolve().parent.parent / "scripts" / "context_loader.py"
+
+
+def _loader_copies_differ(installed: Path, packaged: Path) -> bool:
+    """True when the hook's loader is not byte-identical to the one just run.
+
+    A correctly synced install still has two distinct PATHS, so naming them
+    without a verdict would not tell a user chasing a phantom whether the copy
+    the hook runs is the copy that was explained. Unreadable or absent counts as
+    no difference: this is one disclosure line, not a gate —
+    ``superclaude verify-drift`` is the real check.
+    """
+    try:
+        return installed.read_bytes() != packaged.read_bytes()
+    except OSError:
+        return False
+
+
+def _run_loader_isolated(prompt: str, content_root: Path) -> str:
+    """Run context_loader.py on ``prompt`` without touching real hook state.
+
+    Every write the loader makes lands under ``hook_state_dir()``, which resolves
+    from ``$CLAUDE_PROJECT_DIR``. Pointing the child at a throwaway directory
+    with a ``.claude/superclaude`` marker therefore redirects all of it — the
+    session dedup cache AND the ``mcp_fallbacks.json`` ledger, which
+    hooks/mcp_fallback.py writes on a server's first reference in a session —
+    and the directory is deleted when this returns. ``SUPERCLAUDE_PATH`` is
+    passed explicitly so the redirect does not also move the content being
+    explained. The session id is synthetic and derived from the prompt, so it
+    can never collide with a live session's cache.
+
+    Only the child's environment is built here; ``os.environ`` is not modified.
+    """
+    import hashlib
+    import json
+    import os
+    import subprocess
+    import tempfile
+
+    loader = _packaged_loader()
+    if not loader.is_file():
+        raise click.ClickException(f"context_loader.py not found at {loader}")
+
+    session_id = "sc-explain-" + hashlib.sha256(prompt.encode("utf-8")).hexdigest()[:16]
+
+    with tempfile.TemporaryDirectory(prefix="sc-context-explain-") as sandbox:
+        (Path(sandbox) / ".claude" / "superclaude").mkdir(parents=True, exist_ok=True)
+        env = os.environ.copy()
+        env["CLAUDE_PROJECT_DIR"] = sandbox
+        env["SUPERCLAUDE_PATH"] = str(content_root)
+        env["CLAUDE_SHOW_SKILLS"] = "0"  # once-per-session banner, not prompt-triggered
+        try:
+            result = subprocess.run(
+                [sys.executable, str(loader)],
+                input=json.dumps({"prompt": prompt, "session_id": session_id}),
+                capture_output=True,
+                text=True,
+                env=env,
+                timeout=60,
+            )
+        except subprocess.TimeoutExpired:
+            raise click.ClickException(
+                "context_loader.py did not finish in 60s"
+            ) from None
+
+    if result.returncode != 0:
+        raise click.ClickException(
+            f"context_loader.py exited {result.returncode}: {result.stderr.strip()}"
+        )
+    return result.stdout
+
+
+def _parse_loader_output(stdout: str, content_root: Path) -> dict:
+    """Turn the loader's stdout into the pieces the report prints."""
+    from superclaude.scripts.token_estimator import estimate_tokens
+
+    contexts: list[dict] = []
+    directives: list[str] = []
+    notices: list[str] = []
+    dropped: list[str] = []
+    total: int | None = None
+
+    lines = stdout.splitlines()
+    i = 0
+    while i < len(lines):
+        line = lines[i]
+
+        hint = _CTX_HINT_RE.match(line)
+        if hint:
+            contexts.append(
+                {
+                    "file": hint.group(1),
+                    "tier": 0,
+                    "tokens": estimate_tokens(hint.group(2)),
+                }
+            )
+            i += 1
+            continue
+
+        instruction = _CTX_INSTRUCTION_RE.match(line)
+        if instruction:
+            body: list[str] = []
+            i += 1
+            while i < len(lines) and lines[i] != "</sc-context>":
+                body.append(lines[i])
+                i += 1
+            i += 1
+            contexts.append(
+                {
+                    "file": instruction.group(1),
+                    "tier": 1,
+                    "tokens": estimate_tokens("\n".join(body)),
+                }
+            )
+            continue
+
+        inject = _CTX_INJECT_RE.match(line)
+        if inject:
+            i += 1
+            while i < len(lines) and lines[i] != "</context-inject>":
+                i += 1
+            i += 1
+            # The loader declares the count it charged against the budget; a
+            # recount here could disagree with the number that did the dropping.
+            contexts.append(
+                {
+                    "file": inject.group(1),
+                    "tier": 2,
+                    "tokens": int(inject.group(2)),
+                }
+            )
+            continue
+
+        load = _CTX_LOAD_RE.match(line)  # CLAUDE_CONTEXT_INJECT=0 (directive mode)
+        if load:
+            named = load.group(1)
+            rel = named[len(str(content_root)) :].lstrip("/\\") or named
+            contexts.append({"file": rel, "tier": None, "tokens": None})
+            i += 1
+            continue
+
+        directive = _CTX_DIRECTIVE_RE.match(line)
+        if directive:
+            directives.append(directive.group(1))
+            i += 1
+            continue
+
+        summary = _CTX_TOTAL_RE.match(line)
+        if summary:
+            total = int(summary.group(1))
+            i += 1
+            continue
+
+        skipped = _CTX_SKIPPED_RE.match(line)
+        if skipped:
+            dropped = [name.strip() for name in skipped.group(1).split(",")]
+            i += 1
+            continue
+
+        notice = _CTX_NOTICE_RE.match(line)
+        if notice and notice.group(1):
+            notices.append(notice.group(1))
+            i += 1
+            continue
+
+        i += 1
+
+    if total is None:
+        total = sum(c["tokens"] or 0 for c in contexts)
+    return {
+        "contexts": contexts,
+        "directives": directives,
+        "notices": notices,
+        "dropped": dropped,
+        "total": total,
+    }
+
+
+def _attribute_triggers(prompt: str) -> dict[str, str]:
+    """Map context file -> the trigger that would have fired for it.
+
+    The loader stays the authority on WHICH files inject; this only explains
+    WHY, by reading context_loader's own TRIGGER_MAP and COMPOSITE_FLAGS. The
+    lowercased raw prompt and the composites-before-patterns order mirror
+    ``check_triggers``; a file the loader emitted with no attribution is
+    reported as such rather than guessed at.
+    """
+    from superclaude.scripts.context_loader import COMPOSITE_FLAGS, TRIGGER_MAP
+
+    lowered = prompt.lower()
+    attribution: dict[str, str] = {}
+    for flag, entries in COMPOSITE_FLAGS.items():
+        if flag in lowered:
+            for context_file, _ in entries:
+                attribution.setdefault(context_file, f"composite flag {flag}")
+    for pattern, context_file, _ in TRIGGER_MAP:
+        found = pattern.search(lowered)
+        if found:
+            attribution.setdefault(context_file, f'matched "{found.group(0)}"')
+    return attribution
+
+
+@main.group(name="context")
+def context_group():
+    """Inspect and reset context_loader state.
+
+    `explain` is a dry run: it shows which context files a prompt would inject
+    and what they cost. `reset` clears the dedup cache so contexts re-inject.
+    """
+
+
+@context_group.command(
+    name="explain", context_settings={"ignore_unknown_options": True}
+)
+@click.argument("prompt", nargs=-1, type=click.UNPROCESSED)
+def context_explain(prompt):
+    """
+    Dry run: show which context files PROMPT would inject, and why.
+
+    Runs THIS PACKAGE's copy of context_loader.py as a subprocess against a
+    throwaway state directory and a synthetic session id, so the report cannot
+    consume the dedup entries or the one-per-session MCP hints of a live
+    session. Nothing under the real .superclaude_hooks/ is read or written.
+
+    The UserPromptSubmit hook runs the INSTALLED copy, so the copy that ran is
+    named in the output and a byte difference from the installed one is flagged:
+    on a drifted install the two can answer differently.
+
+    The run always simulates a FRESH session: a live session that already
+    received one of these files would not receive it again, and the
+    once-per-session installed-skills banner is suppressed rather than shown.
+
+    Examples:
+        superclaude context explain "--serena rename this symbol"
+        superclaude context explain --brainstorm a new CLI
+    """
+    import os
+
+    # Mirrors context_loader.MAX_TOKENS_ESTIMATE, which that module freezes at
+    # import: reading the env here is what keeps the reported budget equal to
+    # the one the freshly-started child actually enforced.
+    budget = int(os.environ.get("CLAUDE_CONTEXT_MAX_TOKENS", "8000"))
+
+    text = " ".join(prompt).strip()
+    if not text:
+        raise click.UsageError('PROMPT is required, e.g. "--serena rename this"')
+
+    content_root, root_note = _context_content_root()
+    if not content_root.is_dir():
+        click.echo(f"⚠️  content root not found: {content_root}")
+        click.echo(
+            "   install content first (superclaude install) or set SUPERCLAUDE_PATH"
+        )
+
+    report = _parse_loader_output(
+        _run_loader_isolated(text, content_root), content_root
+    )
+    attribution = _attribute_triggers(text)
+
+    packaged = _packaged_loader()
+    installed = content_root / "scripts" / "context_loader.py"
+
+    click.echo(f"prompt:  {text}")
+    click.echo(f"content: {content_root}")
+    if root_note:
+        click.echo(f"         {root_note}")
+    click.echo(f"budget:  {budget} tokens")
+    click.echo(f"loader:  {packaged} (this package's copy)")
+    if installed != packaged and _loader_copies_differ(installed, packaged):
+        click.echo(f"         ⚠️  the hook runs {installed}, whose bytes differ")
+        click.echo("         re-sync it (superclaude install) or see verify-drift")
+    click.echo("session: dry run — fresh session simulated, no cache read or written")
+    click.echo(
+        "skills:  installed-skills banner suppressed "
+        "(once-per-session, not prompt-triggered)"
+    )
+    click.echo("")
+
+    contexts = report["contexts"]
+    if not contexts:
+        click.echo("would inject no context files.")
+    else:
+        click.echo(
+            f"would inject {len(contexts)} context file(s) "
+            f"(~{report['total']} of {budget} tokens):"
+        )
+        for entry in contexts:
+            tier = "tier ?" if entry["tier"] is None else f"tier {entry['tier']}"
+            cost = "     " if entry["tokens"] is None else f"~{entry['tokens']:<5}"
+            why = attribution.get(
+                entry["file"], "no matching trigger (composite or dedup)"
+            )
+            click.echo(f"  {tier}  {cost} {entry['file']}  <- {why}")
+
+    if report["dropped"]:
+        click.echo("")
+        click.echo("dropped by the token budget:")
+        for name in report["dropped"]:
+            click.echo(f"  {name}")
+
+    if report["directives"]:
+        click.echo("")
+        click.echo("execution directives (behavioral, no file injection):")
+        for flag in report["directives"]:
+            click.echo(f"  {flag}")
+
+    if report["notices"]:
+        click.echo("")
+        click.echo("loader notices:")
+        for note in report["notices"]:
+            click.echo(f"  {note}")
+
+
+@context_group.command(name="reset")
+@click.option(
+    "--session",
+    "session_id",
+    default=None,
+    metavar="ID",
+    help="Session to reset. Defaults to $CLAUDE_CODE_SESSION_ID, then to the "
+    "project-only cache name.",
+)
+def context_reset_cmd(session_id):
+    """
+    Delete this project's context dedup cache so contexts re-inject.
+
+    The same reset the SessionStart hook runs on /clear and /compact, exposed
+    for manual use — context_reset.py imports superclaude.utils, so a bare
+    `python3 ~/.claude/superclaude/scripts/context_reset.py` cannot run it.
+
+    Also prunes hook state older than 7 days and the MCP fallback ledger, so
+    MCP fallback hints re-arm. Everything removed is a rebuildable cache.
+
+    The target is resolved as: --session, then $CLAUDE_CODE_SESSION_ID, then the
+    project-only cache name. That variable is not set in every environment, so
+    the resolved path and the removed count are always printed.
+
+    Examples:
+        superclaude context reset
+        superclaude context reset --session abc123
+    """
+    import os
+
+    from superclaude.scripts.context_reset import get_cache_file, reset_context_cache
+
+    if session_id:
+        source = "--session"
+    else:
+        session_id = os.environ.get("CLAUDE_CODE_SESSION_ID") or None
+        source = "$CLAUDE_CODE_SESSION_ID" if session_id else "project-only fallback"
+
+    # Mirrors reset_context_cache's own target list (context_reset.py): the
+    # session file, plus the project-only name a pre-session-keying run left.
+    # De-duplicated because session_slug() strips an id to [A-Za-z0-9_-], so one
+    # that sanitizes to empty (`--session '///'`) names the same file twice —
+    # printed twice, and counted twice in "reset N cache file(s)".
+    candidates = [get_cache_file(session_id)]
+    if session_id:
+        candidates.append(get_cache_file())
+    targets = list(dict.fromkeys(candidates))
+
+    click.echo(f"session: {session_id or '(none)'} — from {source}")
+    for target in targets:
+        click.echo(f"cache:   {target}")
+
+    existed = [t for t in targets if t.exists()]
+    reset_context_cache(session_id)
+    removed = [t for t in existed if not t.exists()]
+
+    for target in removed:
+        click.echo(f"removed: {target}")
+    if removed:
+        click.echo(f"reset {len(removed)} cache file(s)")
+    else:
+        looked = ", ".join(str(t) for t in targets)
+        click.echo(f"nothing to reset (looked at {looked})")
+
+
 @main.command()
 def version():
     """Show SuperClaude version"""
