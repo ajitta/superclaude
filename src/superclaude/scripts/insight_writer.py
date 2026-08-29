@@ -352,7 +352,7 @@ def cmd_harvest(args: argparse.Namespace) -> int:
                     continue
 
     new_entries: list[dict] = []
-    request_seen = False
+    awaiting_reply = False
     with transcript.open("rb") as raw_f:
         # Tail-only scan for huge transcripts. Small files read in full.
         size = transcript.stat().st_size
@@ -396,7 +396,7 @@ def cmd_harvest(args: argparse.Namespace) -> int:
             # request had just asked for. The request text itself is written to
             # avoid a literal marker, so what remains cannot self-harvest.
             if REQUEST_SENTINEL in content:
-                request_seen = True
+                awaiting_reply = True
                 if rec.get("type") == "user":
                     # This record *is* the request — Claude Code delivers a Stop
                     # reason in the user role. Never harvest it.
@@ -405,12 +405,18 @@ def cmd_harvest(args: argparse.Namespace) -> int:
                 # the prompt it answers. Strip the sentinel and keep the reply:
                 # dropping the record discarded the very line just asked for.
                 content = content.replace(REQUEST_SENTINEL, " ")
-            # An assistant marker counts when it answers a request. Every other
-            # occurrence is the model explaining, quoting or repeating the format
-            # — a document about this subsystem would otherwise file itself. A
-            # user typing the marker is explicit intent and always counts.
-            if rec.get("type") == "assistant" and not request_seen:
-                continue
+            # An assistant marker counts only for the one reply that answers a
+            # request, so the allowance is consumed the instant an assistant
+            # record uses it. Left sticky for the rest of the scan, any later
+            # turn that merely explains, quotes, or documents the marker format
+            # — this file's own spec authored mid-session, say — harvested its
+            # `INSIGHT:` mentions as if they were real (2026-05-08 false-positive
+            # batch). A user typing the marker is explicit intent and always
+            # counts, regardless of this flag.
+            if rec.get("type") == "assistant":
+                if not awaiting_reply:
+                    continue
+                awaiting_reply = False
             for m in MARKER_RE.finditer(content):
                 marker_text = m.group(1).strip()
                 if not marker_text:

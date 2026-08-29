@@ -1307,6 +1307,41 @@ class TestHarvestOnlyTakesAnsweredMarkers:
         assert iw.cmd_harvest(ns) == 0
         assert _pending_texts(workdir) == ["quoting the prompt is not disqualifying."]
 
+    def test_a_later_unrelated_assistant_turn_is_not_harvested(
+        self, workdir, monkeypatch
+    ):
+        """The allowance is consumed by the one reply — it must not leak onward.
+
+        A sticky flag let every assistant record for the rest of the scan
+        through once any request had been answered, so a later turn merely
+        documenting the marker format harvested itself. Regression for the
+        2026-05-08 false-positive batch: this file's own spec, authored later
+        in the same session, harvested its `INSIGHT:` code-span mentions.
+        """
+        ns, pdir = _harvest(workdir, monkeypatch, "sess1")
+        _make_transcript(
+            pdir,
+            "sess1",
+            [
+                {
+                    "type": "user",
+                    "isMeta": False,
+                    "uuid": "r1",
+                    "sessionId": "sess1",
+                    "message": {"role": "user", "content": iw.REQUEST_REASON},
+                },
+                _assistant("a1", "Done. INSIGHT: the cache key needed the session id."),
+                _assistant(
+                    "a2",
+                    "The pending file stores raw `INSIGHT:` markers harvested "
+                    "from transcripts.",
+                ),
+            ],
+        )
+
+        assert iw.cmd_harvest(ns) == 0
+        assert _pending_texts(workdir) == ["the cache key needed the session id."]
+
     def test_sub_agent_records_are_skipped(self, workdir, monkeypatch):
         """A sub-agent's transcript is not this session's lesson."""
         ns, pdir = _harvest(workdir, monkeypatch, "sess1")
