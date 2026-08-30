@@ -580,7 +580,7 @@ def doctor(verbose: bool, scope: str | None):
     type=click.Choice(["user", "project", "local"]),
     help="Scope to check: user (~/.claude/) or project (./.claude/)",
 )
-def agents(list_only: bool, agent_name: str, tokens: bool, scope: str):
+def agents(list_only: bool, agent_name: str, tokens: bool, scope: str | None):
     """
     Manage and inspect SuperClaude agents
 
@@ -595,9 +595,10 @@ def agents(list_only: bool, agent_name: str, tokens: bool, scope: str):
         superclaude agents --tokens
         superclaude agents --scope project --list
     """
-    from .install_commands import get_base_path
+    from .install_paths import resolve_reporting_target
 
-    base_path = get_base_path(scope)
+    # Read-only: reporting walks up to the install, writing follows the shell.
+    scope, base_path = resolve_reporting_target(None if _scope_was_default() else scope)
     agents_path = base_path / "agents"
 
     if not agents_path.exists():
@@ -711,11 +712,11 @@ def agents(list_only: bool, agent_name: str, tokens: bool, scope: str):
 )
 @click.option(
     "--scope",
-    default="user",
+    default=None,
     type=click.Choice(["user", "project", "local"]),
-    help="Scope to check: user (~/.claude/) or project (./.claude/)",
+    help="Scope to check (default: detected from the current directory or above)",
 )
-def skills(list_only: bool, skill_name: str, tokens: bool, scope: str):
+def skills(list_only: bool, skill_name: str, tokens: bool, scope: str | None):
     """
     Manage and inspect SuperClaude skills
 
@@ -729,9 +730,10 @@ def skills(list_only: bool, skill_name: str, tokens: bool, scope: str):
         superclaude skills --info confidence-check
         superclaude skills --tokens
     """
-    from .install_commands import get_base_path
+    from .install_paths import resolve_reporting_target
 
-    base_path = get_base_path(scope)
+    # Read-only: reporting walks up to the install, writing follows the shell.
+    scope, base_path = resolve_reporting_target(None if _scope_was_default() else scope)
     skills_path = base_path / "skills"
 
     if not skills_path.exists():

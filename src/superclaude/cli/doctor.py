@@ -19,6 +19,29 @@ from superclaude.utils import settings_filename
 from .install_paths import resolve_reporting_target
 
 
+def _repair_command(scope: str, base_path: Path) -> str:
+    """The install invocation that repairs *this* scope, with where to run it.
+
+    doctor resolves the install by walking up from the CWD; `superclaude
+    install` writes to `Path.cwd() / ".claude"` for project and local scope
+    (install_paths.get_base_path, pinned by the cli-vs-hook-cwd rule). Printing
+    a bare command therefore told a user standing in a subdirectory to install a
+    second, nested copy of the framework there, leaving the install doctor had
+    just diagnosed untouched — and the next doctor run resolved to the stray
+    copy and called it healthy.
+
+    Args:
+        scope: Scope being diagnosed
+        base_path: That scope's .claude directory
+
+    Returns:
+        A command string safe to follow verbatim
+    """
+    if scope == "user":
+        return "run 'superclaude install --scope user'"
+    return f"run 'superclaude install --scope {scope}' from {base_path.parent}"
+
+
 def run_doctor(scope: str | None = None) -> Dict[str, Any]:
     """
     Run SuperClaude health checks
@@ -38,10 +61,10 @@ def run_doctor(scope: str | None = None) -> Dict[str, Any]:
 
     checks = [
         _check_pytest_plugin(),
-        _check_skills_installed(base_path),
+        _check_skills_installed(base_path, scope),
         _check_configuration(),
         _check_hooks_installed(base_path, scope),
-        _check_claude_sc_md(base_path),
+        _check_claude_sc_md(base_path, scope),
         _check_claude_md_import(base_path, scope),
     ]
 
@@ -100,7 +123,7 @@ def _check_pytest_plugin() -> Dict[str, Any]:
         }
 
 
-def _check_skills_installed(base_path: Path) -> Dict[str, Any]:
+def _check_skills_installed(base_path: Path, scope: str) -> Dict[str, Any]:
     """
     Check whether the skills SuperClaude ships are installed in this scope.
 
@@ -110,6 +133,7 @@ def _check_skills_installed(base_path: Path) -> Dict[str, Any]:
 
     Args:
         base_path: Base installation path of the scope being checked
+        scope: Installation scope, which decides how to phrase the repair
 
     Returns:
         Check result dict
@@ -142,7 +166,7 @@ def _check_skills_installed(base_path: Path) -> Dict[str, Any]:
         "passed": False,
         "details": [
             f"{len(installed)}/{len(shipped)} installed at {skills_dir}",
-            f"Missing: {', '.join(missing)} — run 'superclaude install'",
+            f"Missing: {', '.join(missing)} — {_repair_command(scope, base_path)}",
         ],
     }
 
@@ -235,12 +259,12 @@ def _check_hooks_installed(base_path: Path, scope: str) -> Dict[str, Any]:
         "passed": False,
         "details": [
             f"No SuperClaude hook registered for: {', '.join(missing)}",
-            f"Checked {settings_file} — run 'superclaude install --scope {scope}'",
+            f"Checked {settings_file} — {_repair_command(scope, base_path)}",
         ],
     }
 
 
-def _check_claude_sc_md(base_path: Path) -> Dict[str, Any]:
+def _check_claude_sc_md(base_path: Path, scope: str) -> Dict[str, Any]:
     """
     Check that CLAUDE_SC.md is installed in this scope.
 
@@ -260,7 +284,7 @@ def _check_claude_sc_md(base_path: Path) -> Dict[str, Any]:
     return {
         "name": "CLAUDE_SC.md",
         "passed": False,
-        "details": [f"Not found at {sc_md} — run 'superclaude install'"],
+        "details": [f"Not found at {sc_md} — {_repair_command(scope, base_path)}"],
     }
 
 

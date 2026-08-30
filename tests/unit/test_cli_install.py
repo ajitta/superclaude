@@ -634,19 +634,31 @@ class TestInstalledCountIsSuperClaudeOnly:
         assert row["installed"] == 0
 
     def test_foreign_agent_markdown_does_not_inflate_the_count(self, tmp_path):
+        """Installs a strict subset, so returning the source count cannot pass.
+
+        Installing every shipped agent plus one foreign file made the assertion
+        hold for the correct implementation and for one that never reads the
+        target directory at all.
+        """
         from superclaude.cli.install_inventory import list_all_components
 
         base = tmp_path / ".claude"
         agents = base / "agents"
         agents.mkdir(parents=True)
         shipped = self._shipped("agents")
-        for name in shipped:
+        installed = shipped[: len(shipped) // 2]
+        assert 0 < len(installed) < len(shipped)
+        for name in installed:
             (agents / name).write_text("---\n", encoding="utf-8")
-        (agents / "someone-elses-agent.md").write_text("---\n", encoding="utf-8")
+        for i in range(5):
+            (agents / f"someone-elses-agent-{i}.md").write_text(
+                "---\n", encoding="utf-8"
+            )
 
         row = list_all_components(base_path=base, scope="local")["agents"]
 
-        assert row["installed"] == len(shipped)
+        assert row["installed"] == len(installed)
+        assert row["available"] == len(shipped)
 
     def test_a_missing_shipped_file_still_reads_as_missing(self, tmp_path):
         from superclaude.cli.install_inventory import list_all_components

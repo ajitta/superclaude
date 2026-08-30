@@ -29,6 +29,18 @@ def _make_scoped_install(root: Path) -> Path:
     return content_dir
 
 
+SC_HOOK_SETTINGS = (
+    '{"hooks": {"SessionStart": [{"matcher": "*", "hooks": [{"type": "command",'
+    ' "command": "$CLAUDE_PROJECT_DIR/.claude/superclaude/scripts/session_init.py"}]}]}}'
+)
+
+
+def _register_hooks(base: Path, filename: str) -> None:
+    """Write the hook registration `install` writes for a scope."""
+    base.mkdir(parents=True, exist_ok=True)
+    (base / filename).write_text(SC_HOOK_SETTINGS, encoding="utf-8")
+
+
 def _make_user_install(home: Path, monkeypatch) -> Path:
     """Install at user scope in a fake home, and point Path.home() at it.
 
@@ -41,6 +53,7 @@ def _make_user_install(home: Path, monkeypatch) -> Path:
     (home / ".claude" / "CLAUDE.md").write_text(
         "@superclaude/CLAUDE_SC.md\n", encoding="utf-8"
     )
+    _register_hooks(home / ".claude", "settings.json")
     monkeypatch.setattr(Path, "home", staticmethod(lambda: home))
     return home / ".claude"
 
@@ -507,7 +520,7 @@ class TestDetectScope:
         (home / "CLAUDE.local.md").write_text(
             "@.claude/superclaude/CLAUDE_SC.md\n", encoding="utf-8"
         )
-        (home / ".claude" / "settings.local.json").write_text("{}", encoding="utf-8")
+        _register_hooks(home / ".claude", "settings.local.json")
         monkeypatch.setattr(Path, "home", staticmethod(lambda: home))
 
         assert detect_scope(home) == "local"
@@ -565,6 +578,105 @@ class TestDetectScope:
         monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(tmp_path))
 
         assert detect_scope() == "project"
+
+
+class TestScopeSignalRanking:
+    """Signals are ranked by who writes them, strongest first.
+
+    Two earlier orderings each got a real case wrong by trusting a
+    hand-writable file: a personal CLAUDE.local.md masked a team's
+    project-scope install, and a $HOME guard placed above the local test hid a
+    local install rooted at $HOME.
+    """
+
+    def test_project_install_survives_a_personal_claude_local_md(
+        self, tmp_path: Path, monkeypatch
+    ):
+        """CLAUDE.local.md is hand-authored — this repo's CLAUDE.md says to write it."""
+        home = tmp_path / "home"
+        home.mkdir()
+        monkeypatch.setattr(Path, "home", staticmethod(lambda: home))
+        project = home / "team"
+        _make_scoped_install(project)
+        (project / ".claude" / "CLAUDE.md").write_text(
+            "@superclaude/CLAUDE_SC.md\n", encoding="utf-8"
+        )
+        _register_hooks(project / ".claude", "settings.json")
+        (project / "CLAUDE.local.md").write_text(
+            "@.claude/superclaude/CLAUDE_SC.md\n", encoding="utf-8"
+        )
+
+        assert detect_scope(project) == "project"
+
+    def test_local_hooks_outrank_a_project_import_line(
+        self, tmp_path: Path, monkeypatch
+    ):
+        home = tmp_path / "home"
+        home.mkdir()
+        monkeypatch.setattr(Path, "home", staticmethod(lambda: home))
+        project = home / "proj"
+        _make_scoped_install(project)
+        (project / ".claude" / "CLAUDE.md").write_text(
+            "@superclaude/CLAUDE_SC.md\n", encoding="utf-8"
+        )
+        _register_hooks(project / ".claude", "settings.local.json")
+
+        assert detect_scope(project) == "local"
+
+    def test_foreign_hooks_are_not_evidence(self, tmp_path: Path, monkeypatch):
+        """Another plugin's hooks in settings.local.json must not name the scope."""
+        home = tmp_path / "home"
+        home.mkdir()
+        monkeypatch.setattr(Path, "home", staticmethod(lambda: home))
+        project = home / "proj"
+        _make_scoped_install(project)
+        (project / ".claude" / "settings.local.json").write_text(
+            '{"hooks": {"SessionStart": [{"matcher": "*", "hooks": '
+            '[{"type": "command", "command": "echo from another plugin"}]}]}}',
+            encoding="utf-8",
+        )
+        (project / ".claude" / "CLAUDE.md").write_text(
+            "@superclaude/CLAUDE_SC.md\n", encoding="utf-8"
+        )
+
+        assert detect_scope(project) == "project"
+
+    def test_import_lines_still_decide_when_no_hooks_are_registered(
+        self, tmp_path: Path, monkeypatch
+    ):
+        """install --keep-settings leaves the weaker signals as the only ones."""
+        home = tmp_path / "home"
+        home.mkdir()
+        monkeypatch.setattr(Path, "home", staticmethod(lambda: home))
+        project = home / "proj"
+        _make_scoped_install(project)
+        (project / "CLAUDE.local.md").write_text(
+            "@.claude/superclaude/CLAUDE_SC.md\n", encoding="utf-8"
+        )
+
+        assert detect_scope(project) == "local"
+
+    def test_unparseable_settings_file_is_not_hook_evidence(
+        self, tmp_path: Path, monkeypatch
+    ):
+        """A corrupt file must not win the top rung and outrank a real import.
+
+        Its bare existence is still the last-resort tiebreak, which is why this
+        pins the ranking rather than the file being ignored outright.
+        """
+        home = tmp_path / "home"
+        home.mkdir()
+        monkeypatch.setattr(Path, "home", staticmethod(lambda: home))
+        project = home / "proj"
+        _make_scoped_install(project)
+        (project / ".claude" / "settings.local.json").write_text(
+            "{not json", encoding="utf-8"
+        )
+        (project / ".claude" / "CLAUDE.md").write_text(
+            "@superclaude/CLAUDE_SC.md\n", encoding="utf-8"
+        )
+
+        assert detect_scope(project) == "project"
 
 
 class TestSameDir:
@@ -668,20 +780,47 @@ class TestResolveReportingTarget:
         assert scope == "user"
         assert base_path == base
 
-    def test_find_install_root_skips_the_home_directory(
+    def test_home_is_a_candidate_and_is_named_user_scope(
         self, tmp_path: Path, monkeypatch
     ):
-        """~/.claude/superclaude is the user install, not a project one."""
-        from superclaude.cli.install_paths import find_install_root
+        """Skipping $HOME made detect_scope's local-at-home branch unreachable.
+
+        $HOME is now an ordinary candidate; naming it correctly is
+        detect_scope's job, which it does from the settings file install wrote.
+        """
+        from superclaude.cli.install_paths import (
+            find_install_root,
+            resolve_reporting_target,
+        )
 
         home = tmp_path / "home"
         home.mkdir()
-        _make_user_install(home, monkeypatch)
+        base = _make_user_install(home, monkeypatch)
         deep = home / "repos" / "unrelated"
         deep.mkdir(parents=True)
 
-        assert find_install_root(deep) is None
-        assert find_install_root(home) is None
+        assert find_install_root(deep) == home
+        assert resolve_reporting_target(start=deep) == ("user", base)
+
+    def test_local_install_at_home_reaches_the_cli(self, tmp_path: Path, monkeypatch):
+        """detect_scope and resolve_reporting_target must not disagree.
+
+        They did: detect_scope supported a local install at $HOME and had a
+        test for it, while find_install_root skipped $HOME so the CLI never
+        reached that branch.
+        """
+        from superclaude.cli.install_paths import resolve_reporting_target
+
+        home = tmp_path / "home"
+        home.mkdir()
+        _make_scoped_install(home)
+        _register_hooks(home / ".claude", "settings.local.json")
+        monkeypatch.setattr(Path, "home", staticmethod(lambda: home))
+        deep = home / "work"
+        deep.mkdir()
+
+        assert detect_scope(home) == "local"
+        assert resolve_reporting_target(start=deep) == ("local", home / ".claude")
 
     def test_a_project_install_under_home_is_still_found(
         self, tmp_path: Path, monkeypatch
@@ -720,7 +859,7 @@ class TestResolveReportingTarget:
 
         home = tmp_path / "home"
         home.mkdir()
-        _make_user_install(home, monkeypatch)
+        monkeypatch.setattr(Path, "home", staticmethod(lambda: home))
         elsewhere = home / "repos" / "unrelated"
         elsewhere.mkdir(parents=True)
         monkeypatch.chdir(elsewhere)

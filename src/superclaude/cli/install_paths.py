@@ -8,7 +8,7 @@ it without a cycle. superclaude.utils is allowed — it imports nothing from cli
 
 from pathlib import Path
 
-from superclaude.utils import detect_scope, same_dir
+from superclaude.utils import detect_scope
 
 # Component definitions: (source_subdir, target_subdir, description)
 # Note: hooks and scripts are handled specially by install_hooks_and_scripts()
@@ -47,10 +47,12 @@ def get_base_path(scope: str = "user") -> Path:
 def find_install_root(start: Path) -> Path | None:
     """Nearest ancestor of ``start`` holding a project/local install, if any.
 
-    The home directory is skipped: ``~/.claude/superclaude`` is the user-scope
-    install, not a project one, and returning it made every directory under
-    $HOME look like a project install on any machine with the default scope
-    installed.
+    $HOME is a candidate like any other. Skipping it — the first attempt at
+    stopping a user-scope install from reading as a project one — made
+    ``detect_scope``'s local-at-$HOME branch unreachable through the CLI, so the
+    two disagreed for an install that is legal to create. Naming the scope is
+    ``detect_scope``'s job and it now ranks $HOME correctly; this function only
+    finds the directory.
 
     Args:
         start: Directory to search from, inclusive
@@ -58,10 +60,7 @@ def find_install_root(start: Path) -> Path | None:
     Returns:
         The directory containing ``.claude/superclaude``, or None
     """
-    home = Path.home()
     for candidate in [start, *start.parents]:
-        if same_dir(candidate, home):
-            continue
         if (candidate / ".claude" / "superclaude").is_dir():
             return candidate
     return None

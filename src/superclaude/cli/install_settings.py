@@ -11,22 +11,15 @@ from collections import Counter
 from pathlib import Path
 from typing import List, Tuple
 
-from superclaude.utils import atomic_write_json, settings_filename
+from superclaude.utils import (
+    SUPERCLAUDE_HOOK_MARKERS,
+    atomic_write_json,
+    is_superclaude_hook,
+    settings_filename,
+)
 
 # Import line to add to CLAUDE.md
 CLAUDE_SC_IMPORT = "@superclaude/CLAUDE_SC.md"
-
-# Markers to identify SuperClaude hooks (for merge/replace logic).
-# Match is substring-based against `_comment` and `command` fields, but every
-# marker is anchored — bare script names like "session_init" would misclassify
-# a user's own hook as SC-owned and silently replace/remove it on install/uninstall.
-# `[superclaude]` catches `[superclaude] ...` _comment prefixes (incl.
-# serena-recommended hooks) and echo-only hook commands.
-SUPERCLAUDE_HOOK_MARKERS = [
-    "[superclaude]",
-    "{{SCRIPTS_PATH}}",  # unresolved template form of the scripts path
-    "BLOCKED: destructive",  # legacy inline destructive-Bash blocker command
-]
 
 # Resolved {{SCRIPTS_PATH}} form: command references a script under a
 # superclaude scripts directory (absolute user-scope path or
@@ -142,33 +135,13 @@ def _dedup_hook_array(hooks: List[dict]) -> List[dict]:
 
 
 def _is_superclaude_hook(hook_entry: dict) -> bool:
+    """Whether a settings hook entry belongs to SuperClaude.
+
+    Thin alias: the predicate and its markers live in ``superclaude.utils`` so
+    scope detection can apply the same judgement without importing the cli
+    package. Kept as a name because this module's readers look for it here.
     """
-    Check if a hook entry belongs to SuperClaude.
-
-    Args:
-        hook_entry: A hook entry dict with "hooks" array
-
-    Returns:
-        True if any hook command references a SuperClaude scripts path
-        (template or resolved) or contains an anchored SuperClaude marker,
-        or a `_comment` carries the `[superclaude]` tag
-    """
-    # Check _comment field on the hook entry itself
-    comment = hook_entry.get("_comment", "")
-    if any(marker in comment for marker in SUPERCLAUDE_HOOK_MARKERS):
-        return True
-
-    for hook in hook_entry.get("hooks", []):
-        cmd = hook.get("command", "")
-        if any(marker in cmd for marker in SUPERCLAUDE_HOOK_MARKERS):
-            return True
-        if _SC_SCRIPTS_PATH_RE.search(cmd):
-            return True
-        # Also check _comment on inner hook objects (e.g. test_runner_hook)
-        inner_comment = hook.get("_comment", "")
-        if any(marker in inner_comment for marker in SUPERCLAUDE_HOOK_MARKERS):
-            return True
-    return False
+    return is_superclaude_hook(hook_entry)
 
 
 def _is_superclaude_inner_hook(hook: dict) -> bool:
@@ -511,7 +484,12 @@ def check_claude_md_import(
     if not claude_md.exists():
         return False, f"{target_label} not found"
 
-    content = claude_md.read_text(encoding="utf-8")
+    # doctor delegates this check, and doctor must report rather than traceback:
+    # the code it replaced caught OSError and returned a failing result.
+    try:
+        content = claude_md.read_text(encoding="utf-8")
+    except (OSError, UnicodeDecodeError):
+        return False, f"{target_label} is unreadable"
 
     # Check for import pattern (with or without leading @, cross-platform paths)
     escaped = re.escape(import_line)

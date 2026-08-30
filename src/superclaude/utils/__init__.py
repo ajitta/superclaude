@@ -100,20 +100,94 @@ def claude_base() -> Path:
     return Path.home() / ".claude"
 
 
-def detect_scope(root: Path | None = None) -> str:
-    """Name the install scope visible from ``root``, for read-only reporting.
+# Markers identifying a hook registration as SuperClaude's. Hoisted here from
+# install_settings because scope detection needs the same judgement: which
+# settings file the *installer* wrote is the only signal that separates local
+# from project scope reliably. Every marker is anchored — bare script names like
+# "session_init" would misclassify a user's own hook as ours.
+SUPERCLAUDE_HOOK_MARKERS = [
+    "[superclaude]",
+    "{{SCRIPTS_PATH}}",  # unresolved template form of the scripts path
+    "BLOCKED: destructive",  # legacy inline destructive-Bash blocker command
+]
 
-    ``claude_base()`` answers *which .claude*; commands that print a scope, pick
-    a settings filename, or resolve the CLAUDE.md import target also need *which
-    of the two scopes sharing that directory*. Project and local install the
-    same content to ``<project>/.claude``, so the import line each one writes is
-    the discriminator — a literal string, unlike a hook-marker scan that would
-    match any settings file merely mentioning a superclaude path.
+# Resolved {{SCRIPTS_PATH}} form: a command referencing a script under a
+# superclaude scripts directory (absolute user-scope path or
+# $CLAUDE_PROJECT_DIR/.claude/superclaude/scripts; / or \ separators).
+_SC_SCRIPTS_PATH_RE = re.compile(r"superclaude[/\\]scripts[/\\]")
+
+
+def is_superclaude_hook(hook_entry: dict) -> bool:
+    """Whether a settings hook entry belongs to SuperClaude.
+
+    Args:
+        hook_entry: A hook entry dict with a "hooks" array
+
+    Returns:
+        True if any hook command references a SuperClaude scripts path
+        (template or resolved) or carries an anchored SuperClaude marker, or a
+        `_comment` carries the `[superclaude]` tag
+    """
+    comment = hook_entry.get("_comment", "")
+    if any(marker in comment for marker in SUPERCLAUDE_HOOK_MARKERS):
+        return True
+
+    for hook in hook_entry.get("hooks", []):
+        cmd = hook.get("command", "")
+        if any(marker in cmd for marker in SUPERCLAUDE_HOOK_MARKERS):
+            return True
+        if _SC_SCRIPTS_PATH_RE.search(cmd):
+            return True
+        inner_comment = hook.get("_comment", "")
+        if any(marker in inner_comment for marker in SUPERCLAUDE_HOOK_MARKERS):
+            return True
+    return False
+
+
+def _has_superclaude_hooks(settings_file: Path) -> bool:
+    """Whether a settings file carries at least one SuperClaude hook entry."""
+    try:
+        settings = json.loads(settings_file.read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+        return False
+    if not isinstance(settings, dict):
+        return False
+    hooks = settings.get("hooks", {})
+    if not isinstance(hooks, dict):
+        return False
+    return any(
+        is_superclaude_hook(entry)
+        for array in hooks.values()
+        if isinstance(array, list)
+        for entry in array
+        if isinstance(entry, dict)
+    )
+
+
+def detect_scope(root: Path | None = None) -> str:
+    """Name the install scope rooted at ``root``.
+
+    Project and local scope install the same content to ``<root>/.claude``, so
+    naming one means reading evidence. The signals are ranked by **who wrote
+    them**, strongest first, because the two earlier orderings each got a real
+    case wrong by trusting a weak signal:
+
+    1. A settings file carrying SuperClaude hooks. Only ``install`` writes
+       these, and only local scope uses ``settings.local.json`` — the one
+       signal that cannot be produced by hand.
+    2. ``$HOME`` itself. ``~/.claude/CLAUDE.md`` carries the same import line a
+       *project* install writes, so without this rung a user-scope install was
+       named "project".
+    3. The CLAUDE.md import lines. Hand-writable — this repo's own CLAUDE.md
+       tells developers to author ``CLAUDE.local.md`` by hand — so a personal
+       one used to mask a team's project-scope install and send doctor to the
+       wrong settings file. Consulted only when no hooks are registered at all
+       (``install --keep-settings``, or a user who removed them).
 
     Args:
         root: Directory to resolve from; defaults to ``project_root()``. The CLI
-            passes ``Path.cwd()`` so ``superclaude`` behaves the same whether or
-            not it runs inside a Claude Code session.
+            passes an explicit root so ``superclaude`` behaves the same whether
+            or not it runs inside a Claude Code session.
 
     Returns:
         "user", "project", or "local"
@@ -122,26 +196,26 @@ def detect_scope(root: Path | None = None) -> str:
     base = root / ".claude"
     if not (base / "superclaude").exists():
         return "user"
-    # Local scope is tested first, ahead of the home guard: installing local
-    # scope at $HOME is legal, and a home guard placed above this reported it as
-    # user scope, sending doctor to settings.json and ~/.claude/CLAUDE.md while
-    # the install had written settings.local.json and ~/CLAUDE.local.md. No
-    # collision to fear here — user scope writes its import to
-    # ~/.claude/CLAUDE.md, never to ~/CLAUDE.local.md.
+
+    at_home = same_dir(root, Path.home())
+
+    # 1. Installer-written evidence.
+    if _has_superclaude_hooks(base / settings_filename("local")):
+        return "local"
+    if _has_superclaude_hooks(base / settings_filename("user")):
+        return "user" if at_home else "project"
+
+    # 2. A .claude directly under $HOME is user scope unless local hooks said
+    #    otherwise above.
+    if at_home:
+        return "user"
+
+    # 3. Hand-writable evidence, weakest last.
     if _file_contains(root / "CLAUDE.local.md", "@.claude/superclaude/CLAUDE_SC.md"):
         return "local"
-    # Otherwise a .claude directly under $HOME is user scope by definition. The
-    # project test below cannot tell the two apart on its own: the
-    # "@superclaude/CLAUDE_SC.md" it looks for in ~/.claude/CLAUDE.md is exactly
-    # what installing at user scope writes.
-    if same_dir(root, Path.home()):
-        return "user"
     if _file_contains(base / "CLAUDE.md", "@superclaude/CLAUDE_SC.md"):
         return "project"
-    # Content is installed but no import is wired. The settings file carrying the
-    # hooks is the remaining signal; local scope is the only one that uses
-    # settings.local.json.
-    if (base / "settings.local.json").exists():
+    if (base / settings_filename("local")).exists():
         return "local"
     return "project"
 
