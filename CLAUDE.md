@@ -10,7 +10,7 @@ This project uses **UV** for all Python operations. Never use `pip` or `python -
 uv run superclaude install --list-all      # Test CLI changes
 ```
 
-- **Tests**: `uv run pytest` must exit 0. No known pre-existing failures — a red test is a regression from your change, never a known issue. It works on Windows when `.venv` is healthy; the `Failed to canonicalize script path` error means `.venv` is corrupt (often a broken `lib64` symlink) — rebuild it: `rm -rf .venv && uv venv && uv pip install -e ".[dev]"`. Last-resort fallbacks: `.venv/Scripts/python.exe -m pytest` → WSL → `make test` in CI. Markdown-only changes carry no test risk.
+- **Tests**: `uv run pytest` must exit 0. No known pre-existing failures — a red test is a regression from your change, never a known issue. It works on Windows when `.venv` is healthy; the `Failed to canonicalize script path` error means `.venv` is corrupt (often a broken `lib64` symlink) — rebuild it: `rm -rf .venv && uv venv && uv pip install -e ".[dev]"`. Last-resort fallbacks: `.venv/Scripts/python.exe -m pytest` → WSL → `make test` in CI. Markdown is linted too — content counts, cross-refs and doc structure have tests, so a docs-only change still needs the suite.
 
 ## Code Style
 

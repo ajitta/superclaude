@@ -25,12 +25,12 @@
 
 | Commands | Agents | Modes | MCP Servers | Skills |
 |:--------:|:------:|:-----:|:-----------:|:------:|
-| **33**   | **23** | **7** | **8**       | **5**  |
+| **36**   | **23** | **7** | **4**       | **5**  |
 | Slash    | Domain-expert | Behavioral | Integrations | Procedural |
 
 </div>
 
-33 slash commands cover the development lifecycle from brainstorming to deployment. 5 procedural skills (`confidence-check`, `ship`, `simplicity-coach`, `verbalized-sampling`, `finishing-a-development-branch`) auto-load on matching prompts.
+36 slash commands cover the development lifecycle from brainstorming to deployment. 5 procedural skills (`confidence-check`, `ship`, `simplicity-coach`, `verbalized-sampling`, `finishing-a-development-branch`) auto-load on matching prompts.
 
 ---
 
@@ -94,7 +94,7 @@ What gets installed (per scope):
 
 ```
 <scope>/
-├── commands/sc/        # 33 slash commands (/sc:plan, /sc:implement, …)
+├── commands/sc/        # 36 slash commands (/sc:plan, /sc:implement, …)
 ├── agents/             # 23 agent definitions
 ├── skills/             # 5 procedural skills
 ├── superclaude/        # core rules, modes, mcp docs, scripts
@@ -324,7 +324,7 @@ This fork is a personal, opinionated reshape of the framework: different MCP set
 
 ---
 
-## 🎉 **What's new in v4.5+ajitta**
+## 🎉 **What's new in this fork**
 
 *Procedural skills, an insight pipeline, scope-explicit deployment, and tightened brainstorm → plan → implement → review workflow gates.*
 
@@ -359,7 +359,7 @@ Skills live under `Skills/<name>/SKILL.md` and load via Claude Code's native ski
 <td width="50%">
 
 ### 🔧 **MCP Server Integration**
-**8 curated servers** (lean default — no token bloat):
+**Curated and lean by default** (no token bloat):
 
 ```bash
 # List available MCP servers
@@ -547,10 +547,10 @@ The Deep Research system intelligently coordinates multiple tools:
 | Project rules, build & test loop | [`CLAUDE.md`](CLAUDE.md) |
 | Project-specific gotchas | [`.claude/rules/gotchas/`](.claude/rules/gotchas) |
 | Serena MCP troubleshooting | [`docs/troubleshooting/serena-installation.md`](docs/troubleshooting/serena-installation.md) |
-| Slash commands (33) | [`src/superclaude/Commands/`](src/superclaude/Commands) · `superclaude install --list-all` |
+| Slash commands (36) | [`src/superclaude/Commands/`](src/superclaude/Commands) · `superclaude install --list-all` |
 | Agents (23) | [`src/superclaude/Agents/`](src/superclaude/Agents) |
 | Modes (7) | [`src/superclaude/Modes/`](src/superclaude/Modes) |
-| MCP servers (5) | [`src/superclaude/MCP/`](src/superclaude/MCP) |
+| MCP servers (4) | [`src/superclaude/MCP/`](src/superclaude/MCP) |
 | Skills (5) | [`src/superclaude/Skills/`](src/superclaude/Skills) |
 | Core rules (always-loaded) | [`FLAGS.md`](src/superclaude/core/FLAGS.md) · [`PRINCIPLES.md`](src/superclaude/core/PRINCIPLES.md) · [`RULES.md`](src/superclaude/core/RULES.md) |
 | Authoring specs for new content | [`.claude/rules/`](.claude/rules) |
@@ -560,7 +560,7 @@ The Deep Research system intelligently coordinates multiple tools:
 
 ## 🚩 **Flags**
 
-Flags are behavioral hints that any `/sc:*` prompt accepts. The model reads them inline — no setup, no separate config — and aliases (e.g. `--sea` → `--serena`) are auto-corrected. SSOT: [`src/superclaude/core/FLAGS.md`](src/superclaude/core/FLAGS.md).
+Flags are behavioral hints that any `/sc:*` prompt accepts. The model reads them inline — no setup, no separate config. SSOT: [`src/superclaude/core/FLAGS.md`](src/superclaude/core/FLAGS.md).
 
 #### Modes — switch the conversational stance
 
@@ -591,7 +591,7 @@ Flags are behavioral hints that any `/sc:*` prompt accepts. The model reads them
 
 | Flag | Effect |
 |------|--------|
-| `--delegate [auto\|files\|folders]` | Sub-agent parallel delegation. Auto-trigger: > 7 dirs, > 50 files, complexity > 0.8 |
+| `--delegate [auto\|files\|folders]` | Sub-agent parallel delegation. Decision matrix: [`RULES_DELEGATION.md`](src/superclaude/core/rules/RULES_DELEGATION.md) `<sub_agent_decision>` |
 | `--concurrency [n]` | Batch independent tool calls (1–15) into a single message |
 | `--loop` | Iterative improvement — repeat until no meaningful improvement found |
 | `--iterations [n]` | Fixed iteration count — exactly N cycles, with per-iteration delta report |
@@ -611,7 +611,7 @@ Flags are behavioral hints that any `/sc:*` prompt accepts. The model reads them
 
 > **Priority when flags conflict:** `--safe-mode` > `--validate` > optimization · explicit user flags > auto-detection · `--no-mcp` overrides individual MCP flags.
 
-> **Aliases auto-corrected at load time:** `--parallel` / `--agent` → `--delegate` · `--sampling` / `--verbalized` → `--vs` · `--sea` → `--serena` · `--confidence-check` → `--validate`. Retired flags (`--think*`, `--seq` / `--sequential`) get a redirect notice instead of a rewrite. Typos within Levenshtein ≤ 2 trigger a suggestion comment.
+> **Retired flags** (`--think*`, `--parallel`, `--seq` / `--sequential`) get a redirect notice rather than a rewrite. An unrecognized flag is matched by difflib similarity — not edit distance — first against retired names (cutoff 0.8), then against valid ones (cutoff 0.6), and the closest become a suggestion comment. Nothing is silently rewritten: `context_loader.py` ships an empty alias table.
 
 #### Examples
 
@@ -631,58 +631,61 @@ MIT — see [`LICENSE`](LICENSE).
 
 ---
 
-## 📋 **All 33 Commands**
+## 📋 **All Commands**
 
 <details>
 <summary><b>Click to expand full command list</b></summary>
 
-### 🧠 Planning & Design (5)
+### 🧠 Planning & Design
 - `/sc:brainstorm` — Structured brainstorming through Socratic dialogue
 - `/sc:design` — System architecture, APIs, component interfaces
 - `/sc:plan` — Detailed implementation plans with TDD tasks
 - `/sc:estimate` — Time/effort estimation
 - `/sc:spec-panel` — Multi-expert specification review
+- `/sc:roadmap` — Phased implementation workflow from a PRD or feature doc
 
-### 💻 Development (5)
+### 💻 Development
 - `/sc:implement` — Code implementation
 - `/sc:build` — Build workflows
 - `/sc:improve` — Code improvements
 - `/sc:cleanup` — Refactoring & dead-code removal
 - `/sc:explain` — Code explanation
 
-### 🧪 Testing & Quality (5)
+### 🧪 Testing & Quality
 - `/sc:test` — Test generation
 - `/sc:analyze` — Code analysis (quality, security, perf, arch)
 - `/sc:troubleshoot` — Diagnose & resolve issues
 - `/sc:reflect` — Task retrospectives
 - `/sc:review` — Multi-dimensional review of work products
 
-### 📚 Documentation (2)
+### 📚 Documentation
 - `/sc:document` — Doc generation
+- `/sc:promote-feature` — Consolidate standalone docs into a feature folder
 - `/sc:help` — Command help
 
-### 🔧 Version Control (1)
+### 🔧 Version Control
 - `/sc:git` — Git operations with intelligent commits
 
-### 📊 Project Management (3)
+### 📊 Project Management
 - `/sc:pm` — Project management & sub-agent orchestration
 - `/sc:task` — Task tracking
-- `/sc:workflow` — Workflow automation
+- `/sc:auto-improve` — Autonomous metric-driven improvement loop
 
-### 🔍 Research & Analysis (2)
+### 🔍 Research & Analysis
 - `/sc:research` — Deep web research
 - `/sc:business-panel` — Multi-expert business analysis
 
-### 🗂️ Session & Memory (3)
+### 🗂️ Session & Memory
 - `/sc:load` — Load session context (Serena + auto memory)
 - `/sc:save` — Save session context
 - `/sc:insight` — Capture structured insights to JSONL
 
-### 🎯 Utilities (7)
+### 🎯 Utilities
 - `/sc:agent` — AI agent dispatcher
 - `/sc:init` — Interactive project environment setup
 - `/sc:index` / `/sc:index-repo` — Repository indexing (94% token reduction)
 - `/sc:recommend` — Command recommendation engine
+- `/sc:prompt` — Rewrite a prompt for Claude Opus 5 / Fable 5
 - `/sc:select-tool` — Intelligent MCP tool selection
 - `/sc:sc` — Show all commands
 

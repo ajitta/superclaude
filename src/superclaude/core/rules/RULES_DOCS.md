@@ -27,6 +27,16 @@ ADRs (sequence, unchanged): docs/adr/NNNN-<slug>.md (4-digit, per-dir counter)
 Archive: docs/archive/features/<slug>/ (completed features) | docs/archive/{plans,specs}/ (pre-existing legacy)
 Inline only (no file output): test, build, cleanup — console + tool artifacts (coverage/, dist/)
 
+Durability routing (writing INTO a doc the session always loads: CLAUDE.md, AGENTS.md, `.claude/rules/**`, any file the start-of-session import chain pulls in)
+  Admissible: invariants — true until someone deliberately changes the system — plus frozen evidence for them (past-tense measurement, version floor, citation). A date is fine; an expiring truth value is not.
+  Expiry test: name the routine event that falsifies the sentence (file added, version shipped, upstream fix, a week passing). Nothing in the project notices that event → not an invariant. Route it:
+    task state, to-do, next step → TodoWrite | docs/features/<slug>/
+    progress log, "what's new", migration narrative → commit body | CHANGELOG | features/ retrospective
+    dated observation, open upstream bug → `.claude/rules/gotchas/<domain>.md` ([R19], and /sc:reflect ages it) | the tracker link alone
+    cross-session learning → /sc:insight (`.claude/insights.jsonl`) | Serena memory | auto memory
+    derived count, inventory, version → delete the value; name the command that computes it, or pin it in a test that counts the source
+  Pin a derived value to its source, never to another doc copy — copies go stale together and stay green. Guard with an absence/total lint that checks EVERY occurrence of the shape, not a presence lint that checks the first: a presence lint proves one copy is current and lets its siblings drift.
+
 Username: `git config user.name` (lowercase, no spaces) — fallback OS username
 
 Frontmatter rules:

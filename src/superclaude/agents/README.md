@@ -83,7 +83,7 @@ No shipped agent sets `permissionMode` — all inherit the session's permission 
 
 ## Model Routing
 
-All 23 agents omit `model:` and inherit the parent session model — no agent pins a tier.
+Every agent omits `model:` and inherits the parent session model — no agent pins a tier.
 
 Rationale mirrors the `effort:` removal in commit `8edd05d`: no hardcoded model without measured evidence. Pinning a tier overrides the user's cost-vs-quality choice for the session, and a pin written against one model generation silently misroutes after the next.
 
@@ -128,4 +128,4 @@ Agents give conflicting recs → resolve via:
 - `commands/` — Workflow entry points routing to agents
 - `modes/` — Cognitive overlays shaping agent behavior
 - `core/FLAGS.md` — Behavioral flags + execution modes (Model Routing lives in this README's section above)
-- `okf/superclaude/agents/index.md` — OKF v0.1 catalog: 23 agents as concept docs, resource-linked to source (repo-root bundle)
+- `okf/superclaude/agents/index.md` — OKF v0.1 catalog: agents as concept docs, resource-linked to source (repo-root bundle)

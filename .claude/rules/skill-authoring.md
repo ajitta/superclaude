@@ -63,7 +63,7 @@ src/superclaude/skills/my-skill/
 └── assets/           ← templates, binaries
 ```
 
-Install paths (per `src/superclaude/cli/install_components.py:46-55`):
+Install paths (per `src/superclaude/cli/install_components.py`):
 - `--scope user` (default): `src/superclaude/skills/ → ~/.claude/skills/` (absolute, posix-resolved).
 - `--scope project` or `--scope local`: `src/superclaude/skills/ → ./.claude/skills/` (relative).
 
@@ -71,7 +71,7 @@ Install paths (per `src/superclaude/cli/install_components.py:46-55`):
 
 All fields **top-level**. `metadata:` only for user-defined info (author, version) — never nest CC fields under it.
 
-> *Annotations reflect actual usage as of 2026-04-25 across 5 shipped skills. Aspirational fields kept for reference but marked.*
+> *Annotations describe how the shipped skills use each field. Fields no shipped skill uses are kept for reference and marked as such.*
 
 ```yaml
 ---
@@ -249,9 +249,7 @@ Rules below apply to all components, not restated above. See `.claude/rules/xml-
 
 ## Runtime Quirks (CC version-pinned)
 
-<!-- last reviewed: 2026-04-25; verify quarterly, remove fixed issues -->
-
-CC runtime bugs verified open as of 2026-04-25. Affect skill behavior at runtime, not authoring correctness. Re-verify quarterly.
+Claude Code issues that affect skill behavior at runtime, not authoring correctness. The tracker holds the status — check the link before working around one; do not mirror open/closed state here.
 
 - **#17688** — Skill-scoped hooks defined in SKILL.md frontmatter not triggered within plugins. https://github.com/anthropics/claude-code/issues/17688
 - **#40630** — Skill-scoped hooks not propagated to forked subagent when `context: fork` set. https://github.com/anthropics/claude-code/issues/40630

@@ -1,5 +1,5 @@
 ---
-paths: ["src/superclaude/**", ".claude/rules/content-quality.md"]
+paths: ["src/superclaude/**", ".claude/rules/*.md", "CLAUDE.md", "AGENTS.md", "README.md"]
 ---
 
 # Content Quality Rules — Audit Checklist & Pruning Guide
@@ -8,7 +8,7 @@ paths: ["src/superclaude/**", ".claude/rules/content-quality.md"]
 > **Scope.** Content QUALITY only — does each sentence earn its context cost? Schema/field/format rules stay in `*-authoring.md` + `xml-prose-format.md` (SSOT); this file never restates them.
 > **Core thesis.** A good component is not a document of many instructions — it is the minimal control surface that makes a probabilistic model act the same way every time.
 
-## The Four Criteria
+## The Criteria
 
 ### 1. Trigger — who invokes, at what context cost
 
@@ -44,6 +44,10 @@ Three accumulation failures to hunt:
 
 Prefer deleting over adding. Growth pressure is the default failure mode of a content framework.
 
+### 5. Durability — does the sentence expire on its own
+
+A sentence that can become false without anyone editing it does not belong in an always-loaded doc. Ask what routine event falsifies it; if nothing in the repo notices that event, route it out. Destinations per content class: `core/rules/RULES_DOCS.md` `<doc_output_convention>` → *Durability routing* (SSOT).
+
 ## Audit Checklist (per file)
 
 | Area | Question |
@@ -55,6 +59,7 @@ Prefer deleting over adding. Growth pressure is the default failure mode of a co
 | Phases | Does an early step see the final goal and rush the middle? |
 | Duplication | Does any rule have two or more full answer locations? |
 | Deletion test | If this sentence is removed, does actual output change? |
+| Durability | Can this sentence become false with nobody editing it? Then route it out. |
 
 ## Improvement Workflow
 

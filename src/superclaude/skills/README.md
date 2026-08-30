@@ -15,7 +15,7 @@ CC-native containers for hooks, safety, script exec, and auto-invoke ref knowled
 | Domain expertise | **Agent** | Agents define WHO TO BE |
 | Cognitive overlay | **Mode** | Modes define HOW TO THINK |
 
-## Current Skills (5)
+## Shipped Skills
 
 ### Hook Skills
 | Skill | CC-Native Feature | Purpose |
@@ -71,4 +71,4 @@ See `.claude/rules/skill-authoring.md` for full authoring spec.
 - `commands/` — Workflow entry points (most former skills now live here)
 - `agents/` — Domain expert agents
 - `hooks/` — Hook system skills integrate with
-- `okf/superclaude/skills/index.md` — OKF v0.1 catalog: 5 skills as concept docs, resource-linked to source (repo-root bundle)
+- `okf/superclaude/skills/index.md` — OKF v0.1 catalog: skills as concept docs, resource-linked to source (repo-root bundle)

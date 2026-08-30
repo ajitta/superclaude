@@ -16,7 +16,7 @@ uv pip install -e ".[dev]"                 # Install editable
 uv run superclaude install --list-all      # Test CLI changes
 ```
 
-- **Tests**: `uv run pytest` must exit 0. No known pre-existing failures: a red test is a regression from your change, never a known issue. Markdown-only changes carry no test risk.
+- **Tests**: `uv run pytest` must exit 0. No known pre-existing failures: a red test is a regression from your change, never a known issue. Markdown is linted too — content counts, cross-refs and doc structure have tests, so a docs-only change still needs the suite.
 
 ## Make Commands
 
