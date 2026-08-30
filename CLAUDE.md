@@ -4,12 +4,13 @@ Guidance for Claude Code when working in this repository.
 
 ## Python Environment
 
-This project uses **UV** for all Python operations. Never use `pip` or `python -m pytest` directly.
+This project uses **UV** for all Python operations. Never use `pip`, `python -m pytest`, or `uv sync` directly.
 
 ```bash
 uv run superclaude install --list-all      # Test CLI changes
 ```
 
+- **Never `uv sync`**: the dev toolchain is declared in `[project.optional-dependencies].dev`, not a default dependency group, so `uv sync` prunes black, ruff, mypy and pytest-cov and the suite stops running. `uv sync --dry-run` lists what it would remove. Install and repair with `uv pip install -e ".[dev]"`.
 - **Tests**: `uv run pytest` must exit 0. No known pre-existing failures — a red test is a regression from your change, never a known issue. It works on Windows when `.venv` is healthy; the `Failed to canonicalize script path` error means `.venv` is corrupt (often a broken `lib64` symlink) — rebuild it: `rm -rf .venv && uv venv && uv pip install -e ".[dev]"`. Last-resort fallbacks: `.venv/Scripts/python.exe -m pytest` → WSL → `make test` in CI. Markdown is linted too — content counts, cross-refs and doc structure have tests, so a docs-only change still needs the suite.
 
 ## Code Style
