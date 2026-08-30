@@ -13,10 +13,12 @@ from pathlib import Path
 
 from superclaude.utils import (
     claude_base,
+    detect_scope,
     get_skill_directories,
     hook_state_dir,
     project_key,
     project_root,
+    settings_filename,
 )
 
 
@@ -25,6 +27,22 @@ def _make_scoped_install(root: Path) -> Path:
     content_dir = root / ".claude" / "superclaude"
     content_dir.mkdir(parents=True)
     return content_dir
+
+
+def _make_user_install(home: Path, monkeypatch) -> Path:
+    """Install at user scope in a fake home, and point Path.home() at it.
+
+    Includes the ~/.claude/CLAUDE.md that installing at user scope writes. That
+    file is the reason a fake home is needed rather than a bare directory: its
+    import line is identical to the one a project-scope install writes, so any
+    test using a marker-only fixture cannot see the two being confused.
+    """
+    (home / ".claude" / "superclaude").mkdir(parents=True)
+    (home / ".claude" / "CLAUDE.md").write_text(
+        "@superclaude/CLAUDE_SC.md\n", encoding="utf-8"
+    )
+    monkeypatch.setattr(Path, "home", staticmethod(lambda: home))
+    return home / ".claude"
 
 
 class TestProjectRoot:
@@ -444,3 +462,270 @@ class TestImportingAHookWritesNothing:
         assert not (home / ".claude").exists(), (
             "importing the loader created state in the home directory"
         )
+
+
+class TestDetectScope:
+    """detect_scope names which of the three scopes an install belongs to.
+
+    claude_base only answers "which .claude"; project and local share one
+    directory, so the CLAUDE.md import each writes is what separates them.
+    Regression target: doctor, verify-drift and audit defaulted to user scope
+    and reported a healthy local install as missing, while the startup banner's
+    two-way test labelled a local install "project scope".
+    """
+
+    def test_user_scope_when_no_project_content(self, tmp_path: Path, monkeypatch):
+        monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(tmp_path))
+
+        assert detect_scope() == "user"
+
+    def test_home_scoped_install_is_user_not_project(self, tmp_path: Path, monkeypatch):
+        """~/.claude/CLAUDE.md holds the same import a project install writes.
+
+        Without a home guard the project branch matched it and named the default
+        install scope "project" — the one value the reporting commands exist to
+        state correctly.
+        """
+        home = tmp_path / "home"
+        home.mkdir()
+        _make_user_install(home, monkeypatch)
+
+        assert detect_scope(home) == "user"
+
+    def test_local_install_rooted_at_home_is_local_not_user(
+        self, tmp_path: Path, monkeypatch
+    ):
+        """Installing local scope at $HOME is legal, so the home guard is not first.
+
+        With the guard ahead of the CLAUDE.local.md test, this read as user
+        scope and doctor went looking in settings.json and ~/.claude/CLAUDE.md
+        while the install had written settings.local.json and ~/CLAUDE.local.md.
+        """
+        home = tmp_path / "home"
+        home.mkdir()
+        _make_scoped_install(home)
+        (home / "CLAUDE.local.md").write_text(
+            "@.claude/superclaude/CLAUDE_SC.md\n", encoding="utf-8"
+        )
+        (home / ".claude" / "settings.local.json").write_text("{}", encoding="utf-8")
+        monkeypatch.setattr(Path, "home", staticmethod(lambda: home))
+
+        assert detect_scope(home) == "local"
+
+    def test_local_scope_from_claude_local_md(self, tmp_path: Path, monkeypatch):
+        _make_scoped_install(tmp_path)
+        (tmp_path / "CLAUDE.local.md").write_text(
+            "@.claude/superclaude/CLAUDE_SC.md\n", encoding="utf-8"
+        )
+        monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(tmp_path))
+
+        assert detect_scope() == "local"
+
+    def test_project_scope_from_claude_md(self, tmp_path: Path, monkeypatch):
+        _make_scoped_install(tmp_path)
+        (tmp_path / ".claude" / "CLAUDE.md").write_text(
+            "@superclaude/CLAUDE_SC.md\n", encoding="utf-8"
+        )
+        monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(tmp_path))
+
+        assert detect_scope() == "project"
+
+    def test_settings_local_json_breaks_the_tie_without_an_import(
+        self, tmp_path: Path, monkeypatch
+    ):
+        _make_scoped_install(tmp_path)
+        (tmp_path / ".claude" / "settings.local.json").write_text(
+            "{}", encoding="utf-8"
+        )
+        monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(tmp_path))
+
+        assert detect_scope() == "local"
+
+    def test_project_scope_is_the_fallback_for_installed_content(
+        self, tmp_path: Path, monkeypatch
+    ):
+        _make_scoped_install(tmp_path)
+        monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(tmp_path))
+
+        assert detect_scope() == "project"
+
+    def test_explicit_root_overrides_the_environment(self, tmp_path: Path, monkeypatch):
+        """The CLI passes Path.cwd() so it behaves the same outside a session."""
+        elsewhere = tmp_path / "elsewhere"
+        elsewhere.mkdir()
+        _make_scoped_install(elsewhere)
+        monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(tmp_path))
+
+        assert detect_scope() == "user"
+        assert detect_scope(elsewhere) == "project"
+
+    def test_unreadable_import_file_does_not_raise(self, tmp_path: Path, monkeypatch):
+        _make_scoped_install(tmp_path)
+        (tmp_path / "CLAUDE.local.md").mkdir()  # a directory, not a readable file
+        monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(tmp_path))
+
+        assert detect_scope() == "project"
+
+
+class TestSameDir:
+    """same_dir is public because install_paths needs the same comparison."""
+
+    def test_resolves_symlinks(self, tmp_path: Path):
+        from superclaude.utils import same_dir
+
+        real = tmp_path / "real"
+        real.mkdir()
+        link = tmp_path / "link"
+        link.symlink_to(real)
+
+        assert same_dir(link, real) is True
+
+    def test_different_directories_are_not_the_same(self, tmp_path: Path):
+        from superclaude.utils import same_dir
+
+        left = tmp_path / "a"
+        right = tmp_path / "b"
+        left.mkdir()
+        right.mkdir()
+
+        assert same_dir(left, right) is False
+
+
+class TestSettingsFilename:
+    """Local scope keeps its hooks in the gitignored settings.local.json."""
+
+    def test_local_scope_uses_settings_local_json(self):
+        assert settings_filename("local") == "settings.local.json"
+
+    def test_other_scopes_share_settings_json(self):
+        assert settings_filename("user") == "settings.json"
+        assert settings_filename("project") == "settings.json"
+
+
+class TestResolveReportingTarget:
+    """doctor / verify-drift / audit walk up to the install; install does not.
+
+    Regression target: run from a subdirectory, the read-only commands fell back
+    to user scope and reported a healthy local install as absent — the same
+    false report that defaulting to user scope produced from the project root.
+    """
+
+    def test_walks_up_to_the_install(self, tmp_path: Path):
+        from superclaude.cli.install_paths import resolve_reporting_target
+
+        _make_scoped_install(tmp_path)
+        (tmp_path / "CLAUDE.local.md").write_text(
+            "@.claude/superclaude/CLAUDE_SC.md\n", encoding="utf-8"
+        )
+        deep = tmp_path / "src" / "pkg" / "cli"
+        deep.mkdir(parents=True)
+
+        scope, base_path = resolve_reporting_target(start=deep)
+
+        assert scope == "local"
+        assert base_path == tmp_path / ".claude"
+
+    def test_explicit_user_scope_never_walks_up(self, tmp_path: Path):
+        from superclaude.cli.install_paths import resolve_reporting_target
+
+        _make_scoped_install(tmp_path)
+
+        scope, base_path = resolve_reporting_target("user", start=tmp_path)
+
+        assert scope == "user"
+        assert base_path == Path.home() / ".claude"
+
+    def test_explicit_scope_names_the_found_install(self, tmp_path: Path):
+        from superclaude.cli.install_paths import resolve_reporting_target
+
+        _make_scoped_install(tmp_path)
+        deep = tmp_path / "src"
+        deep.mkdir()
+
+        scope, base_path = resolve_reporting_target("local", start=deep)
+
+        assert scope == "local"
+        assert base_path == tmp_path / ".claude"
+
+    def test_falls_back_to_user_scope_outside_any_install(
+        self, tmp_path: Path, monkeypatch
+    ):
+        """The real walk-up, not a stub: it must not mistake $HOME for a project.
+
+        Stubbing find_install_root to None here is what let the bug ship — the
+        assertion held while the function it replaced was returning $HOME.
+        """
+        from superclaude.cli.install_paths import resolve_reporting_target
+
+        home = tmp_path / "home"
+        home.mkdir()
+        base = _make_user_install(home, monkeypatch)
+        elsewhere = home / "repos" / "unrelated" / "src"
+        elsewhere.mkdir(parents=True)
+
+        scope, base_path = resolve_reporting_target(start=elsewhere)
+
+        assert scope == "user"
+        assert base_path == base
+
+    def test_find_install_root_skips_the_home_directory(
+        self, tmp_path: Path, monkeypatch
+    ):
+        """~/.claude/superclaude is the user install, not a project one."""
+        from superclaude.cli.install_paths import find_install_root
+
+        home = tmp_path / "home"
+        home.mkdir()
+        _make_user_install(home, monkeypatch)
+        deep = home / "repos" / "unrelated"
+        deep.mkdir(parents=True)
+
+        assert find_install_root(deep) is None
+        assert find_install_root(home) is None
+
+    def test_a_project_install_under_home_is_still_found(
+        self, tmp_path: Path, monkeypatch
+    ):
+        from superclaude.cli.install_paths import find_install_root
+
+        home = tmp_path / "home"
+        home.mkdir()
+        _make_user_install(home, monkeypatch)
+        project = home / "repos" / "myproject"
+        project.mkdir(parents=True)
+        _make_scoped_install(project)
+
+        assert find_install_root(project / "src") == project
+
+    def test_explicit_project_scope_names_the_found_install(self, tmp_path: Path):
+        from superclaude.cli.install_paths import resolve_reporting_target
+
+        _make_scoped_install(tmp_path)
+        (tmp_path / "CLAUDE.local.md").write_text(
+            "@.claude/superclaude/CLAUDE_SC.md\n", encoding="utf-8"
+        )
+        deep = tmp_path / "src"
+        deep.mkdir()
+
+        scope, base_path = resolve_reporting_target("project", start=deep)
+
+        assert scope == "project"
+        assert base_path == tmp_path / ".claude"
+
+    def test_explicit_local_scope_names_the_cwd_when_no_install_is_found(
+        self, tmp_path: Path, monkeypatch
+    ):
+        """--scope local with nothing installed points where install would write."""
+        from superclaude.cli.install_paths import resolve_reporting_target
+
+        home = tmp_path / "home"
+        home.mkdir()
+        _make_user_install(home, monkeypatch)
+        elsewhere = home / "repos" / "unrelated"
+        elsewhere.mkdir(parents=True)
+        monkeypatch.chdir(elsewhere)
+
+        scope, base_path = resolve_reporting_target("local", start=elsewhere)
+
+        assert scope == "local"
+        assert base_path == Path.cwd() / ".claude"

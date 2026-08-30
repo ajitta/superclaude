@@ -25,6 +25,12 @@ def main():
     pass
 
 
+def _scope_was_default() -> bool:
+    """True when --scope was not passed and click supplied the default."""
+    source = click.get_current_context().get_parameter_source("scope")
+    return source is not None and source.name == "DEFAULT"
+
+
 def _in_git_repo(start: Path) -> bool:
     """Return True if start (or any parent) contains a .git directory/file."""
     for p in [start, *start.parents]:
@@ -123,6 +129,8 @@ def install(
         superclaude install --scope local
         superclaude install --list
     """
+    from superclaude.utils import detect_scope
+
     from .install_commands import (
         get_base_path,
         install_all,
@@ -130,6 +138,7 @@ def install(
         list_available_commands,
         list_installed_commands,
     )
+    from .install_paths import find_install_root
 
     # Decide whether to run the interactive wizard.
     # Trigger paths:
@@ -166,6 +175,20 @@ def install(
 
     # Get base path based on scope
     base_path = get_base_path(scope)
+
+    # The listing branches below return before the --scope hint further down, so
+    # a user with a local install saw [0/23] on every row with nothing saying
+    # why — while `superclaude doctor` reported the same install healthy. The
+    # listing follows the scope install would write to; it just has to name the
+    # install it is not showing.
+    if (list_all or list_only) and _scope_was_default() and scope == "user":
+        other = find_install_root(Path.cwd())
+        if other is not None:
+            click.echo(
+                f"💡 Listing the default user scope. A {detect_scope(other)}-scope "
+                f"install also exists at {other / '.claude'} — pass "
+                f"--scope {detect_scope(other)} to list that one.\n"
+            )
 
     # List all components mode
     if list_all:
@@ -205,9 +228,7 @@ def install(
         return
 
     # Hint: suggest --scope local when defaulting to user inside a git repo
-    scope_source = click.get_current_context().get_parameter_source("scope")
-    scope_was_default = scope_source is not None and scope_source.name == "DEFAULT"
-    if scope_was_default and scope == "user" and _in_git_repo(Path.cwd()):
+    if _scope_was_default() and scope == "user" and _in_git_repo(Path.cwd()):
         click.echo(
             "💡 Installing at the default user scope → ~/.claude, which applies "
             "in every repository. Since this is a git repo, --scope local is the "
@@ -480,20 +501,39 @@ def install_skill(skill_name: str, scope: str, force: bool):
     is_flag=True,
     help="Show detailed diagnostic information",
 )
-def doctor(verbose: bool):
+@click.option(
+    "--scope",
+    default=None,
+    type=click.Choice(["user", "project", "local"]),
+    help="Scope to check (default: detected from the current directory or above)",
+)
+def doctor(verbose: bool, scope: str | None):
     """
     Check SuperClaude installation health
 
     Verifies:
         - pytest plugin loaded correctly
-        - Skills installed (if any)
+        - Skills this release ships are installed in the scope
         - Configuration files present
+        - SuperClaude hooks registered in the scope's settings file
+        - CLAUDE_SC.md installed and imported
+
+    Scope is detected by walking up from the working directory when not given,
+    so a local- or project-scope install is checked where it actually lives,
+    including from a subdirectory of the project.
+
+    Examples:
+        superclaude doctor
+        superclaude doctor --verbose
+        superclaude doctor --scope user
     """
     from .doctor import run_doctor
 
-    click.echo("🔍 SuperClaude Doctor\n")
+    results = run_doctor(scope=scope)
 
-    results = run_doctor(verbose=verbose)
+    click.echo(
+        f"🔍 SuperClaude Doctor (scope: {results['scope']} — {results['base_path']})\n"
+    )
 
     # Display results
     for check in results["checks"]:
@@ -793,12 +833,12 @@ def skills(list_only: bool, skill_name: str, tokens: bool, scope: str):
 @main.command(name="verify-drift")
 @click.option(
     "--scope",
-    default="user",
+    default=None,
     type=click.Choice(["user", "project", "local"]),
-    help="Installation scope: user (~/.claude/) or project (./.claude/)",
+    help="Installation scope (default: detected from the current directory or above)",
 )
 @click.option("--verbose", is_flag=True, help="Show per-file details")
-def verify_drift_cmd(scope: str, verbose: bool):
+def verify_drift_cmd(scope: str | None, verbose: bool):
     """
     Check for installation drift between source and installed files.
 
@@ -811,15 +851,22 @@ def verify_drift_cmd(scope: str, verbose: bool):
     manifests, and CLAUDE_SC.md. Not checked: templates/, installed
     scripts/, and the merged hooks.json.
 
+    EXTRA is not reported for skills: .claude/skills is shared with every other
+    tool that installs skills, so a directory SuperClaude does not ship is
+    normal there. The trade-off is that a skill dropped by a release is not
+    reported either — install never prunes, so remove it by hand.
+
     Examples:
         superclaude verify-drift
         superclaude verify-drift --verbose
         superclaude verify-drift --scope project
     """
-    from .install_commands import get_base_path
+    from .install_paths import resolve_reporting_target
     from .verify_drift import OK, verify_drift
 
-    base_path = get_base_path(scope)
+    # Defaulting to user scope reported a healthy local install as 85 missing
+    # files under a "run superclaude install --force" remediation line.
+    scope, base_path = resolve_reporting_target(scope)
     click.echo(f"🔍 Checking installation drift (scope: {scope})...\n")
 
     result = verify_drift(base_path, verbose=verbose)
@@ -873,9 +920,9 @@ def verify_drift_cmd(scope: str, verbose: bool):
 @main.command()
 @click.option(
     "--scope",
-    default="user",
+    default=None,
     type=click.Choice(["user", "project", "local"]),
-    help="Installation scope: user (~/.claude/) or project (./.claude/)",
+    help="Installation scope (default: detected from the current directory or above)",
 )
 @click.option("--verbose", is_flag=True, help="Show detailed results")
 @click.option(
@@ -897,13 +944,16 @@ def verify_drift_cmd(scope: str, verbose: bool):
     default=None,
     help="Output path for --format markdown (default: docs/reports/AUDIT.md)",
 )
-def audit(scope: str, verbose: bool, check: str, output_format: str, out: Path | None):
+def audit(
+    scope: str | None, verbose: bool, check: str, output_format: str, out: Path | None
+):
     """
     Run content integrity audit.
 
     Combines drift detection, cross-reference validation, and content usage
     checks into a single report. Drift coverage matches verify-drift
-    (templates/, installed scripts/, and hooks.json are not checked).
+    (templates/, installed scripts/, and hooks.json are not checked, and EXTRA
+    is not reported for the shared skills directory).
 
     Examples:
         superclaude audit
@@ -911,9 +961,9 @@ def audit(scope: str, verbose: bool, check: str, output_format: str, out: Path |
         superclaude audit --format markdown --out docs/reports/AUDIT.md
     """
     from .audit import run_audit
-    from .install_commands import get_base_path
+    from .install_paths import resolve_reporting_target
 
-    base_path = get_base_path(scope)
+    scope, base_path = resolve_reporting_target(scope)
 
     # Markdown format always needs per-file detail
     effective_verbose = verbose or output_format == "markdown"

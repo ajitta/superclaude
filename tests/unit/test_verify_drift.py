@@ -196,3 +196,56 @@ class TestDriftDetection:
             result = verify_drift(base_path, verbose=False)
 
         assert result["components"]["commands"]["files"] == {}
+
+
+class TestSharedSkillsDirectoryIsNotDrift:
+    """.claude/skills is shared, so a foreign skill is not SuperClaude's drift.
+
+    Regression target: a real user-scope directory reported "30 extra" for
+    skills belonging to other tools, under a remediation line
+    ("superclaude install --force") that does nothing about them.
+    """
+
+    def test_foreign_skill_directory_is_not_reported(self, tmp_path):
+        src_root, base_path = _setup_full(
+            tmp_path,
+            {"skills": {"my-skill/SKILL.md": ("skill content", "skill content")}},
+        )
+        foreign = base_path / "skills" / "someone-elses-skill"
+        foreign.mkdir(parents=True)
+        (foreign / "SKILL.md").write_text("not ours", encoding="utf-8")
+
+        with _mock_package_root(src_root):
+            result = verify_drift(base_path, verbose=True)
+
+        skills = result["components"]["skills"]
+        assert skills["extra"] == 0
+        assert "someone-elses-skill/" not in skills["files"]
+        assert result["clean"] is True
+
+    def test_a_missing_shipped_skill_is_still_reported(self, tmp_path):
+        src_root, base_path = _setup_full(
+            tmp_path, {"skills": {"my-skill/SKILL.md": ("skill content", None)}}
+        )
+        foreign = base_path / "skills" / "someone-elses-skill"
+        foreign.mkdir(parents=True)
+        (foreign / "SKILL.md").write_text("not ours", encoding="utf-8")
+
+        with _mock_package_root(src_root):
+            result = verify_drift(base_path, verbose=True)
+
+        assert result["components"]["skills"]["files"]["my-skill/SKILL.md"] == MISSING
+
+    def test_owned_directories_still_report_extra_files(self, tmp_path):
+        """A command left behind by an earlier release is real drift."""
+        src_root, base_path = _setup_full(
+            tmp_path, {"commands": {"build.md": ("content", "content")}}
+        )
+        (base_path / "commands" / "sc" / "retired.md").write_text(
+            "from an older release", encoding="utf-8"
+        )
+
+        with _mock_package_root(src_root):
+            result = verify_drift(base_path, verbose=True)
+
+        assert result["components"]["commands"]["files"]["retired.md"] == EXTRA

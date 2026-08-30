@@ -4,6 +4,8 @@ Unit tests for CLI install command
 Tests the command installation functionality.
 """
 
+from pathlib import Path
+
 from superclaude.cli.install_commands import (
     install_commands,
     list_available_commands,
@@ -576,3 +578,141 @@ class TestFailuresReachTheSummary:
         )
 
         assert success, message
+
+
+class TestInstalledCountIsSuperClaudeOnly:
+    """--list-all counts what SuperClaude ships, not what shares the directory.
+
+    Regression target: `installed` counted every subdirectory of the shared
+    target, so 30 third-party skills in .claude/skills rendered `[13/5]` on a
+    fully correct install. The same defect was latent for agents and commands
+    the moment a foreign .md landed in either.
+    """
+
+    def _shipped(self, component: str) -> list[str]:
+        from superclaude.cli.install_inventory import (
+            _source_dir_names,
+            _source_md_names,
+        )
+        from superclaude.cli.install_paths import _get_source_dir
+
+        source = _get_source_dir(component)
+        names = (
+            _source_dir_names(source)
+            if component in ("skills", "templates")
+            else _source_md_names(source)
+        )
+        return sorted(names)
+
+    def _install_skills(self, base, names):
+        for name in names:
+            skill_dir = base / "skills" / name
+            skill_dir.mkdir(parents=True, exist_ok=True)
+            (skill_dir / "SKILL.md").write_text(f"# {name}\n", encoding="utf-8")
+
+    def test_foreign_skills_do_not_inflate_the_count(self, tmp_path):
+        from superclaude.cli.install_inventory import list_all_components
+
+        base = tmp_path / ".claude"
+        shipped = self._shipped("skills")
+        self._install_skills(base, shipped)
+        self._install_skills(base, [f"foreign-{i}" for i in range(30)])
+
+        row = list_all_components(base_path=base, scope="local")["skills"]
+
+        assert row["installed"] == len(shipped)
+        assert row["available"] == len(shipped)
+
+    def test_foreign_skills_alone_count_as_none_installed(self, tmp_path):
+        from superclaude.cli.install_inventory import list_all_components
+
+        base = tmp_path / ".claude"
+        self._install_skills(base, [f"foreign-{i}" for i in range(30)])
+
+        row = list_all_components(base_path=base, scope="local")["skills"]
+
+        assert row["installed"] == 0
+
+    def test_foreign_agent_markdown_does_not_inflate_the_count(self, tmp_path):
+        from superclaude.cli.install_inventory import list_all_components
+
+        base = tmp_path / ".claude"
+        agents = base / "agents"
+        agents.mkdir(parents=True)
+        shipped = self._shipped("agents")
+        for name in shipped:
+            (agents / name).write_text("---\n", encoding="utf-8")
+        (agents / "someone-elses-agent.md").write_text("---\n", encoding="utf-8")
+
+        row = list_all_components(base_path=base, scope="local")["agents"]
+
+        assert row["installed"] == len(shipped)
+
+    def test_a_missing_shipped_file_still_reads_as_missing(self, tmp_path):
+        from superclaude.cli.install_inventory import list_all_components
+
+        base = tmp_path / ".claude"
+        shipped = self._shipped("skills")
+        self._install_skills(base, shipped[1:])
+
+        row = list_all_components(base_path=base, scope="local")["skills"]
+
+        assert row["installed"] == len(shipped) - 1
+
+
+class TestListingNamesTheOtherScope:
+    """--list-all returns before the --scope hint, so it carries its own.
+
+    A user with a local install saw [0/23] on every row and nothing saying why,
+    while `superclaude doctor` called the same install healthy.
+    """
+
+    def _run(self, args, home, cwd, monkeypatch):
+        from click.testing import CliRunner
+
+        from superclaude.cli.main import main
+
+        monkeypatch.setattr(Path, "home", staticmethod(lambda: home))
+        monkeypatch.chdir(cwd)
+        return CliRunner().invoke(main, args)
+
+    def _make_local_install(self, project: Path) -> None:
+        (project / ".claude" / "superclaude").mkdir(parents=True)
+        (project / "CLAUDE.local.md").write_text(
+            "@.claude/superclaude/CLAUDE_SC.md\n", encoding="utf-8"
+        )
+
+    def test_default_scope_listing_names_the_local_install(self, tmp_path, monkeypatch):
+        home = tmp_path / "home"
+        home.mkdir()
+        project = home / "project"
+        project.mkdir()
+        self._make_local_install(project)
+
+        result = self._run(["install", "--list-all"], home, project, monkeypatch)
+
+        assert "local-scope install also exists" in result.output
+        assert str(project / ".claude") in result.output
+
+    def test_explicit_scope_does_not_get_the_pointer(self, tmp_path, monkeypatch):
+        home = tmp_path / "home"
+        home.mkdir()
+        project = home / "project"
+        project.mkdir()
+        self._make_local_install(project)
+
+        result = self._run(
+            ["install", "--list-all", "--scope", "local"], home, project, monkeypatch
+        )
+
+        assert "also exists" not in result.output
+
+    def test_no_pointer_without_another_install(self, tmp_path, monkeypatch):
+        home = tmp_path / "home"
+        home.mkdir()
+        elsewhere = home / "elsewhere"
+        elsewhere.mkdir()
+
+        result = self._run(["install", "--list-all"], home, elsewhere, monkeypatch)
+
+        assert "also exists" not in result.output

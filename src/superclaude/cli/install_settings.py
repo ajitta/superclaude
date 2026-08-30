@@ -11,7 +11,7 @@ from collections import Counter
 from pathlib import Path
 from typing import List, Tuple
 
-from superclaude.utils import atomic_write_json
+from superclaude.utils import atomic_write_json, settings_filename
 
 # Import line to add to CLAUDE.md
 CLAUDE_SC_IMPORT = "@superclaude/CLAUDE_SC.md"
@@ -329,8 +329,8 @@ def merge_hooks_to_settings(
         - local: Merges to ./.claude/settings.local.json (CC auto-gitignores)
         - target: Merges to {target}/.claude/settings.json (absolute paths)
     """
-    settings_filename = "settings.local.json" if scope == "local" else "settings.json"
-    settings_file = base_path / settings_filename
+    filename = settings_filename(scope)
+    settings_file = base_path / filename
     new_hooks = hooks_config.get("hooks", {})
 
     if not new_hooks:
@@ -416,16 +416,16 @@ def uninstall_hooks_from_settings(
     Returns:
         Tuple of (success, message)
     """
-    settings_filename = "settings.local.json" if scope == "local" else "settings.json"
-    settings_file = base_path / settings_filename
+    filename = settings_filename(scope)
+    settings_file = base_path / filename
 
     if not settings_file.exists():
-        return True, f"No {settings_filename} found (nothing to clean)"
+        return True, f"No {filename} found (nothing to clean)"
 
     settings = _load_settings(settings_file)
 
     if "hooks" not in settings or not settings["hooks"]:
-        return True, f"No hooks in {settings_filename}"
+        return True, f"No hooks in {filename}"
 
     existing_hooks = settings["hooks"]
     cleaned_any = False
@@ -457,7 +457,7 @@ def uninstall_hooks_from_settings(
             settings_file.unlink()
             return (
                 True,
-                f"SuperClaude hooks removed and empty {settings_filename} deleted",
+                f"SuperClaude hooks removed and empty {filename} deleted",
             )
         except OSError as e:
             return False, f"Failed to delete empty {settings_file}: {e}"
@@ -471,7 +471,7 @@ def uninstall_hooks_from_settings(
     if cleaned_any:
         return True, f"SuperClaude hooks removed from {settings_file}"
     else:
-        return True, f"No SuperClaude hooks found in {settings_filename}"
+        return True, f"No SuperClaude hooks found in {filename}"
 
 
 def _claude_md_target(base_path: Path, scope: str) -> Tuple[Path, str]:

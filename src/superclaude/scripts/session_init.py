@@ -18,7 +18,6 @@ from __future__ import annotations
 import json
 import subprocess
 import sys
-from pathlib import Path
 
 
 def get_install_status() -> str:
@@ -33,12 +32,14 @@ def get_install_status() -> str:
         A single status line, never empty
     """
     try:
-        from superclaude.utils import claude_base
+        from superclaude.utils import claude_base, detect_scope
     except ImportError:
         return "⚠️ SuperClaude: install status unavailable"
 
     base = claude_base()
-    scope = "user" if base == Path.home() / ".claude" else "project"
+    # A two-way user/project test reported a local install as "project scope".
+    # The two share <project>/.claude, so only detect_scope() separates them.
+    scope = detect_scope()
 
     def _count(*parts: str) -> int:
         directory = base.joinpath(*parts)

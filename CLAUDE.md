@@ -10,7 +10,7 @@ This project uses **UV** for all Python operations. Never use `pip` or `python -
 uv run superclaude install --list-all      # Test CLI changes
 ```
 
-- **Test baseline**: 2292 passing / 28 skipped / 4 deselected, 0 failures (measured 2026-08-22). No known pre-existing failures — a failure is a regression. `uv run pytest` works on Windows when `.venv` is healthy; the `Failed to canonicalize script path` error means `.venv` is corrupt (often a broken `lib64` symlink) — rebuild it: `rm -rf .venv && uv venv && uv pip install -e ".[dev]"`. Last-resort fallbacks: `.venv/Scripts/python.exe -m pytest` → WSL → `make test` in CI. Markdown-only changes carry no test risk.
+- **Test baseline**: 2467 passing / 28 skipped / 4 deselected, 0 failures (measured 2026-08-30). No known pre-existing failures — a failure is a regression. `uv run pytest` works on Windows when `.venv` is healthy; the `Failed to canonicalize script path` error means `.venv` is corrupt (often a broken `lib64` symlink) — rebuild it: `rm -rf .venv && uv venv && uv pip install -e ".[dev]"`. Last-resort fallbacks: `.venv/Scripts/python.exe -m pytest` → WSL → `make test` in CI. Markdown-only changes carry no test risk.
 
 ## Code Style
 

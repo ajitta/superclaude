@@ -600,6 +600,28 @@ class TestInstallStatusLine:
         assert "1 agent" in line
         assert "project" in line
 
+    def test_local_scope_is_not_labelled_project(self, tmp_path: Path, monkeypatch):
+        """Local and project share <project>/.claude, so a two-way test lied.
+
+        The banner read `(project scope)` on every local install, which is the
+        scope name the user has to pass back to `superclaude install`.
+        """
+        from superclaude.scripts.session_init import get_install_status
+
+        monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(tmp_path))
+        base = tmp_path / ".claude"
+        (base / "superclaude").mkdir(parents=True)
+        (base / "commands" / "sc").mkdir(parents=True)
+        (base / "commands" / "sc" / "analyze.md").write_text("x", encoding="utf-8")
+        (tmp_path / "CLAUDE.local.md").write_text(
+            "@.claude/superclaude/CLAUDE_SC.md\n", encoding="utf-8"
+        )
+
+        line = get_install_status()
+
+        assert "local scope" in line
+        assert "project scope" not in line
+
     def test_absent_install_says_so(self, tmp_path: Path, monkeypatch):
         """The line that would have caught `0 installed` the first day."""
         from superclaude.scripts.session_init import get_install_status

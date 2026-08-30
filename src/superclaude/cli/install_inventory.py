@@ -10,6 +10,8 @@ from collections import Counter
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
+from superclaude.utils import settings_filename
+
 from .install_paths import (
     COMPONENTS,
     _get_package_root,
@@ -122,6 +124,24 @@ def _hook_identity_counts(hooks_section: dict, superclaude_only: bool) -> Counte
     return counts
 
 
+def _source_dir_names(source_dir: Path) -> set:
+    """Names of the subdirectories a component ships (skills, templates)."""
+    if not source_dir.exists():
+        return set()
+    return {
+        d.name
+        for d in source_dir.iterdir()
+        if d.is_dir() and not d.name.startswith(("_", "."))
+    }
+
+
+def _source_md_names(source_dir: Path) -> set:
+    """Filenames of the .md files a component ships, README excluded."""
+    if not source_dir.exists():
+        return set()
+    return {f.name for f in source_dir.glob("*.md") if f.stem.upper() != "README"}
+
+
 def _hook_registration_report(hooks_json: Path, settings_file: Path) -> Dict[str, int]:
     """Compare shipped hook identities against registered ones.
 
@@ -184,36 +204,22 @@ def list_all_components(
         # Count source files (excluding README.md and __init__.py).
         # skills and templates install per-subdirectory (copytree), so count
         # subdirectories — not top-level *.md, which templates has none of.
+        #
+        # Both sides are counted by *name*, and the installed side is the
+        # intersection with the source. Counting everything in the target dir
+        # instead rendered `[13/5]` on a correct install, because .claude/skills
+        # is shared with skills SuperClaude does not ship.
         if component in ("skills", "templates"):
-            source_count = (
-                sum(
-                    1
-                    for d in source_dir.iterdir()
-                    if d.is_dir() and not d.name.startswith(("_", "."))
-                )
-                if source_dir.exists()
-                else 0
-            )
-            installed_count = (
-                sum(
-                    1
-                    for d in target_dir.iterdir()
-                    if d.is_dir() and not d.name.startswith(("_", "."))
-                )
-                if target_dir.exists()
-                else 0
+            source_names = _source_dir_names(source_dir)
+            installed_count = sum(
+                1 for name in source_names if (target_dir / name).is_dir()
             )
         else:
-            source_count = (
-                sum(1 for f in source_dir.glob("*.md") if f.stem.upper() != "README")
-                if source_dir.exists()
-                else 0
+            source_names = _source_md_names(source_dir)
+            installed_count = sum(
+                1 for name in source_names if (target_dir / name).is_file()
             )
-            installed_count = (
-                sum(1 for f in target_dir.glob("*.md") if f.stem.upper() != "README")
-                if target_dir.exists()
-                else 0
-            )
+        source_count = len(source_names)
 
         result[component] = {
             "description": description,
@@ -267,9 +273,7 @@ def list_all_components(
     # settings.json, and a non-force install used to leave that frozen while the
     # content kept updating — so the install read as current while a shipped hook
     # never fired. This row is the one that shows it.
-    settings_file = base_path / (
-        "settings.local.json" if scope == "local" else "settings.json"
-    )
+    settings_file = base_path / settings_filename(scope)
     report = _hook_registration_report(hooks_source / "hooks.json", settings_file)
     result["hooks_registered"] = {
         "description": "Hooks registered in settings",
@@ -511,13 +515,13 @@ def uninstall_all(
                 failed += 1
 
     # 6. Remove SuperClaude hooks from settings file (preserve user hooks)
-    settings_filename = "settings.local.json" if scope == "local" else "settings.json"
+    filename = settings_filename(scope)
     if keep_settings:
-        messages.append(f"⏭️  Skipped: {settings_filename} hooks (--keep-settings)")
+        messages.append(f"⏭️  Skipped: {filename} hooks (--keep-settings)")
         skipped += 1
     else:
         if dry_run:
-            settings_file = base_path / settings_filename
+            settings_file = base_path / filename
             if settings_file.exists():
                 settings = _load_settings(settings_file)
                 if "hooks" in settings:
@@ -532,19 +536,17 @@ def uninstall_all(
                     )
                     if sc_hook_count > 0:
                         messages.append(
-                            f"[DRY-RUN] Would remove {sc_hook_count} SuperClaude hooks from {settings_filename}"
+                            f"[DRY-RUN] Would remove {sc_hook_count} SuperClaude hooks from {filename}"
                         )
                         removed += 1
                     else:
-                        messages.append(
-                            f"⏭️  No SuperClaude hooks in {settings_filename}"
-                        )
+                        messages.append(f"⏭️  No SuperClaude hooks in {filename}")
                         skipped += 1
                 else:
-                    messages.append(f"⏭️  No hooks section in {settings_filename}")
+                    messages.append(f"⏭️  No hooks section in {filename}")
                     skipped += 1
             else:
-                messages.append(f"⏭️  No {settings_filename} found")
+                messages.append(f"⏭️  No {filename} found")
                 skipped += 1
         else:
             success, msg = uninstall_hooks_from_settings(base_path, scope=scope)

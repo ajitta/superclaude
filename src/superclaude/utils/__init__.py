@@ -100,6 +100,98 @@ def claude_base() -> Path:
     return Path.home() / ".claude"
 
 
+def detect_scope(root: Path | None = None) -> str:
+    """Name the install scope visible from ``root``, for read-only reporting.
+
+    ``claude_base()`` answers *which .claude*; commands that print a scope, pick
+    a settings filename, or resolve the CLAUDE.md import target also need *which
+    of the two scopes sharing that directory*. Project and local install the
+    same content to ``<project>/.claude``, so the import line each one writes is
+    the discriminator — a literal string, unlike a hook-marker scan that would
+    match any settings file merely mentioning a superclaude path.
+
+    Args:
+        root: Directory to resolve from; defaults to ``project_root()``. The CLI
+            passes ``Path.cwd()`` so ``superclaude`` behaves the same whether or
+            not it runs inside a Claude Code session.
+
+    Returns:
+        "user", "project", or "local"
+    """
+    root = root or project_root()
+    base = root / ".claude"
+    if not (base / "superclaude").exists():
+        return "user"
+    # Local scope is tested first, ahead of the home guard: installing local
+    # scope at $HOME is legal, and a home guard placed above this reported it as
+    # user scope, sending doctor to settings.json and ~/.claude/CLAUDE.md while
+    # the install had written settings.local.json and ~/CLAUDE.local.md. No
+    # collision to fear here — user scope writes its import to
+    # ~/.claude/CLAUDE.md, never to ~/CLAUDE.local.md.
+    if _file_contains(root / "CLAUDE.local.md", "@.claude/superclaude/CLAUDE_SC.md"):
+        return "local"
+    # Otherwise a .claude directly under $HOME is user scope by definition. The
+    # project test below cannot tell the two apart on its own: the
+    # "@superclaude/CLAUDE_SC.md" it looks for in ~/.claude/CLAUDE.md is exactly
+    # what installing at user scope writes.
+    if same_dir(root, Path.home()):
+        return "user"
+    if _file_contains(base / "CLAUDE.md", "@superclaude/CLAUDE_SC.md"):
+        return "project"
+    # Content is installed but no import is wired. The settings file carrying the
+    # hooks is the remaining signal; local scope is the only one that uses
+    # settings.local.json.
+    if (base / "settings.local.json").exists():
+        return "local"
+    return "project"
+
+
+def same_dir(left: Path, right: Path) -> bool:
+    """True when both paths name the same directory, symlinks resolved.
+
+    Public because ``install_paths.find_install_root`` needs the same comparison
+    to skip $HOME, and a second copy there would reintroduce the duplication
+    ``settings_filename`` exists to prevent.
+
+    Args:
+        left: First path
+        right: Second path
+
+    Returns:
+        True when both resolve to the same directory
+    """
+    try:
+        return left.resolve() == right.resolve()
+    except OSError:
+        return left == right
+
+
+def _file_contains(path: Path, needle: str) -> bool:
+    """True when ``path`` is readable and contains ``needle``."""
+    try:
+        return needle in path.read_text(encoding="utf-8")
+    except (OSError, UnicodeDecodeError):
+        return False
+
+
+def settings_filename(scope: str) -> str:
+    """Name of the settings file a scope's hooks are merged into.
+
+    Local scope keeps its hooks in settings.local.json, which Claude Code
+    gitignores; user and project scope share settings.json. Single answer
+    location: the same conditional was inlined at four call sites across
+    install_settings and install_inventory, which is four places to miss when a
+    scope's settings target changes.
+
+    Args:
+        scope: "user", "project", or "local"
+
+    Returns:
+        "settings.local.json" for local scope, else "settings.json"
+    """
+    return "settings.local.json" if scope == "local" else "settings.json"
+
+
 def hook_state_dir() -> Path:
     """Runtime state directory for hook scripts, scoped to the active install.
 

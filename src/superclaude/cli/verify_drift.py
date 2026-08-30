@@ -6,7 +6,10 @@ Compares source files against installed files to detect drift
 
 Coverage boundary: component *.md files (COMPONENTS, incl. core/rules/),
 skill SKILL.md manifests, and CLAUDE_SC.md only. templates/, installed
-scripts/, and the merged hooks.json are NOT drift-checked.
+scripts/, and the merged hooks.json are NOT drift-checked, and EXTRA is not
+reported for skills — .claude/skills is shared with every other tool that
+installs skills (see _check_component). Restated for the user in the
+`superclaude verify-drift` help text; keep the two in step.
 """
 
 from pathlib import Path
@@ -110,19 +113,14 @@ def _check_component(component: str, base_path: Path) -> Dict[str, str]:
                     source_manifest, target_manifest, template_vars
                 )
 
-        # Check for extra skill directories in target
-        if target_dir.exists():
-            source_skill_names = {
-                d.name
-                for d in source_dir.iterdir()
-                if d.is_dir() and not d.name.startswith(("_", "."))
-            }
-            for target_skill in sorted(target_dir.iterdir()):
-                if (
-                    target_skill.is_dir()
-                    and target_skill.name not in source_skill_names
-                ):
-                    results[f"{target_skill.name}/"] = EXTRA
+        # No EXTRA sweep here. .claude/skills is shared with Claude Code and
+        # every plugin that ships skills, so a directory SuperClaude does not
+        # ship is the normal case, not drift: a real user-scope directory
+        # reported "30 extra" for skills belonging to other tools, under a
+        # remediation line ("superclaude install --force") that does nothing
+        # about them. Components in directories SuperClaude owns outright
+        # (commands/sc, superclaude/) still report EXTRA below, which is what
+        # surfaces a file left behind by an earlier release.
     else:
         # Standard components: compare .md files (skip README)
         source_files = {

@@ -2,10 +2,13 @@
 Path Resolution for SuperClaude Installation
 
 Provides path constants and resolution functions used by all install modules.
-This is a leaf dependency with no internal imports.
+Leaf dependency: imports no other cli module, so every install module can import
+it without a cycle. superclaude.utils is allowed — it imports nothing from cli.
 """
 
 from pathlib import Path
+
+from superclaude.utils import detect_scope, same_dir
 
 # Component definitions: (source_subdir, target_subdir, description)
 # Note: hooks and scripts are handled specially by install_hooks_and_scripts()
@@ -39,6 +42,60 @@ def get_base_path(scope: str = "user") -> Path:
         return Path.cwd() / ".claude"
     else:  # user (default)
         return Path.home() / ".claude"
+
+
+def find_install_root(start: Path) -> Path | None:
+    """Nearest ancestor of ``start`` holding a project/local install, if any.
+
+    The home directory is skipped: ``~/.claude/superclaude`` is the user-scope
+    install, not a project one, and returning it made every directory under
+    $HOME look like a project install on any machine with the default scope
+    installed.
+
+    Args:
+        start: Directory to search from, inclusive
+
+    Returns:
+        The directory containing ``.claude/superclaude``, or None
+    """
+    home = Path.home()
+    for candidate in [start, *start.parents]:
+        if same_dir(candidate, home):
+            continue
+        if (candidate / ".claude" / "superclaude").is_dir():
+            return candidate
+    return None
+
+
+def resolve_reporting_target(
+    scope: str | None = None, start: Path | None = None
+) -> tuple[str, Path]:
+    """Scope and base path for the read-only commands: doctor, verify-drift, audit.
+
+    These walk up to the install, unlike ``get_base_path``, which deliberately
+    anchors on the CWD because ``superclaude install`` writes where the user is
+    standing. Reporting has no such constraint, and not walking up reproduced
+    the failure this resolver exists to remove: run from ``src/``, every command
+    reported a healthy local install as absent.
+
+    An explicit --scope still decides the scope name; ``user`` always resolves
+    to the home directory and never walks up.
+
+    Args:
+        scope: Scope the user asked for, or None to detect
+        start: Directory to resolve from; defaults to the CWD
+
+    Returns:
+        Tuple of (scope name, base installation path)
+    """
+    if scope == "user":
+        return "user", get_base_path("user")
+
+    root = find_install_root(start or Path.cwd())
+    if root is None:
+        resolved = scope or "user"
+        return resolved, get_base_path(resolved)
+    return scope or detect_scope(root), root / ".claude"
 
 
 def _get_package_root() -> Path:
