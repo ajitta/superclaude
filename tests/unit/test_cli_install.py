@@ -660,11 +660,13 @@ class TestInstalledCountIsSuperClaudeOnly:
         assert row["installed"] == len(shipped) - 1
 
 
-class TestListingNamesTheOtherScope:
-    """--list-all returns before the --scope hint, so it carries its own.
+class TestListingResolvesTheInstallInEffect:
+    """--list/--list-all report on an install, so they walk up to it.
 
-    A user with a local install saw [0/23] on every row and nothing saying why,
-    while `superclaude doctor` called the same install healthy.
+    Following the write path's user-scope default instead printed [0/23] on
+    every row inside a project with a local install, while `superclaude doctor`
+    called that same install healthy. Writing still follows the shell — only
+    reporting walks up.
     """
 
     def _run(self, args, home, cwd, monkeypatch):
@@ -682,7 +684,7 @@ class TestListingNamesTheOtherScope:
             "@.claude/superclaude/CLAUDE_SC.md\n", encoding="utf-8"
         )
 
-    def test_default_scope_listing_names_the_local_install(self, tmp_path, monkeypatch):
+    def test_list_all_reports_the_local_install(self, tmp_path, monkeypatch):
         home = tmp_path / "home"
         home.mkdir()
         project = home / "project"
@@ -691,10 +693,21 @@ class TestListingNamesTheOtherScope:
 
         result = self._run(["install", "--list-all"], home, project, monkeypatch)
 
-        assert "local-scope install also exists" in result.output
+        assert "(scope: local)" in result.output
         assert str(project / ".claude") in result.output
 
-    def test_explicit_scope_does_not_get_the_pointer(self, tmp_path, monkeypatch):
+    def test_list_reports_the_local_install(self, tmp_path, monkeypatch):
+        home = tmp_path / "home"
+        home.mkdir()
+        project = home / "project"
+        project.mkdir()
+        self._make_local_install(project)
+
+        result = self._run(["install", "--list"], home, project, monkeypatch)
+
+        assert "(scope: local)" in result.output
+
+    def test_explicit_scope_still_wins(self, tmp_path, monkeypatch):
         home = tmp_path / "home"
         home.mkdir()
         project = home / "project"
@@ -702,12 +715,14 @@ class TestListingNamesTheOtherScope:
         self._make_local_install(project)
 
         result = self._run(
-            ["install", "--list-all", "--scope", "local"], home, project, monkeypatch
+            ["install", "--list-all", "--scope", "user"], home, project, monkeypatch
         )
 
-        assert "also exists" not in result.output
+        assert "(scope: user)" in result.output
 
-    def test_no_pointer_without_another_install(self, tmp_path, monkeypatch):
+    def test_falls_back_to_user_scope_with_no_install_above(
+        self, tmp_path, monkeypatch
+    ):
         home = tmp_path / "home"
         home.mkdir()
         elsewhere = home / "elsewhere"
@@ -715,4 +730,47 @@ class TestListingNamesTheOtherScope:
 
         result = self._run(["install", "--list-all"], home, elsewhere, monkeypatch)
 
-        assert "also exists" not in result.output
+        assert "(scope: user)" in result.output
+
+    def test_home_install_is_not_reported_as_project(self, tmp_path, monkeypatch):
+        """The walk-up skips $HOME, so a user install stays named user scope."""
+        home = tmp_path / "home"
+        (home / ".claude" / "superclaude").mkdir(parents=True)
+        (home / ".claude" / "CLAUDE.md").write_text(
+            "@superclaude/CLAUDE_SC.md\n", encoding="utf-8"
+        )
+        elsewhere = home / "elsewhere"
+        elsewhere.mkdir()
+
+        result = self._run(["install", "--list-all"], home, elsewhere, monkeypatch)
+
+        assert "(scope: user)" in result.output
+
+
+class TestWritePathKeepsTheShellAnchor:
+    """Rebinding scope for the listing branches must not reach the install path.
+
+    Both listing branches return, so it cannot today — this pins that, because
+    the rebinding sits in the same function as the write path a few lines below.
+    """
+
+    def test_plain_install_still_targets_user_scope(self, tmp_path, monkeypatch):
+        from click.testing import CliRunner
+
+        from superclaude.cli.main import main
+
+        home = tmp_path / "home"
+        home.mkdir()
+        project = home / "project"
+        (project / ".claude" / "superclaude").mkdir(parents=True)
+        (project / "CLAUDE.local.md").write_text(
+            "@.claude/superclaude/CLAUDE_SC.md\n", encoding="utf-8"
+        )
+        monkeypatch.setattr(Path, "home", staticmethod(lambda: home))
+        monkeypatch.setenv("HOME", str(home))
+        monkeypatch.chdir(project)
+
+        result = CliRunner().invoke(main, ["install", "--force"])
+
+        assert "(scope: user)" in result.output
+        assert (home / ".claude" / "superclaude" / "CLAUDE_SC.md").exists()

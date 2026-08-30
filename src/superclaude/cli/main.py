@@ -129,8 +129,6 @@ def install(
         superclaude install --scope local
         superclaude install --list
     """
-    from superclaude.utils import detect_scope
-
     from .install_commands import (
         get_base_path,
         install_all,
@@ -138,7 +136,7 @@ def install(
         list_available_commands,
         list_installed_commands,
     )
-    from .install_paths import find_install_root
+    from .install_paths import resolve_reporting_target
 
     # Decide whether to run the interactive wizard.
     # Trigger paths:
@@ -176,19 +174,21 @@ def install(
     # Get base path based on scope
     base_path = get_base_path(scope)
 
-    # The listing branches below return before the --scope hint further down, so
-    # a user with a local install saw [0/23] on every row with nothing saying
-    # why — while `superclaude doctor` reported the same install healthy. The
-    # listing follows the scope install would write to; it just has to name the
-    # install it is not showing.
-    if (list_all or list_only) and _scope_was_default() and scope == "user":
-        other = find_install_root(Path.cwd())
-        if other is not None:
-            click.echo(
-                f"💡 Listing the default user scope. A {detect_scope(other)}-scope "
-                f"install also exists at {other / '.claude'} — pass "
-                f"--scope {detect_scope(other)} to list that one.\n"
-            )
+    # --list and --list-all report on an install rather than write one: the rows
+    # are installed/available counts and hook-registration drift for content
+    # already on disk, not a preview of what install would put there. So they
+    # resolve scope the way doctor, verify-drift and audit do — walk up to the
+    # install in effect — while writing below keeps the CWD anchor. One rule,
+    # no exception: reporting follows the install, writing follows the shell.
+    #
+    # Listing the write-path default instead printed [0/23] on every row inside
+    # a project with a local install, with nothing saying why, while
+    # `superclaude doctor` called that same install healthy. Both listing
+    # branches return, so rebinding here cannot reach the install path.
+    if list_all or list_only:
+        scope, base_path = resolve_reporting_target(
+            None if _scope_was_default() else scope
+        )
 
     # List all components mode
     if list_all:
