@@ -1,10 +1,16 @@
-"""Version + doc-baseline drift lint (I6 / audit P8).
+"""Version + doc-count drift lint (I6 / audit P8).
 
 A single source of truth for the package version (``pyproject.toml``) and a
-deterministic guard that the version + test-baseline strings echoed in other
+deterministic guard that the version strings and content counts echoed in other
 files do not silently drift out of sync. Addresses the audit finding that four
 sources reported four different version strings (the orphan ``__version__.py``
 held ``0.4.0`` while ``pyproject`` shipped ``4.6.0+ajitta``).
+
+The test-pass-count baseline that used to be linted here was deleted
+2026-08-30: it compared the three doc copies to each other and never to the
+suite, so all three could be stale together and stay green, while every commit
+that added a test had to edit all three. See
+``test_docs_do_not_hardcode_a_pass_count``.
 """
 
 from __future__ import annotations
@@ -22,6 +28,10 @@ _AGENTS_MD = _ROOT / "AGENTS.md"
 _COMMANDS_DIR = _ROOT / "src" / "superclaude" / "commands"
 _SC_DISPATCHER = _COMMANDS_DIR / "sc.md"
 _HELP = _COMMANDS_DIR / "help.md"
+
+# Docs an agent auto-loads; none of them may restate the suite's pass count.
+_AGENT_DOCS = (_README, _CLAUDE_MD, _AGENTS_MD)
+_PASS_COUNT_RE = re.compile(r"\d[\d,]*\s+(?:passing|passed)")
 
 
 def _command_file_count() -> int:
@@ -44,12 +54,6 @@ def _pyproject_version() -> str:
     return m.group(1)
 
 
-def _first_passing_baseline(text: str) -> str | None:
-    """Extract the first 'N passing' test-baseline number, digits only."""
-    m = re.search(r"([\d,]+)\s+passing", text)
-    return m.group(1).replace(",", "") if m else None
-
-
 def test_pyproject_is_the_single_version_source():
     """The runtime package version must equal the pyproject canonical version."""
     import superclaude
@@ -66,6 +70,23 @@ def test_orphan_version_module_removed():
     )
 
 
+@pytest.mark.parametrize("path", _AGENT_DOCS, ids=lambda p: p.name)
+def test_docs_do_not_hardcode_a_pass_count(path):
+    """No doc may restate the suite's pass count.
+
+    Deleted 2026-08-30. The count lived in three docs, so every commit that
+    added a test had to edit all three, and the lint that guarded it compared
+    the copies to each other rather than to the suite -- all three could be
+    stale together and stay green. The load-bearing invariant is "pytest exits
+    0", which CI asserts directly.
+    """
+    hit = _PASS_COUNT_RE.search(path.read_text(encoding="utf-8"))
+    assert hit is None, (
+        f"{path.name} hardcodes a test pass count ({hit.group(0)!r}) -- remove it. "
+        "The suite's exit code is the signal; a number in prose only goes stale."
+    )
+
+
 def test_readme_version_matches_pyproject():
     """The version advertised in README must match the canonical pyproject version."""
     version = _pyproject_version()
@@ -76,36 +97,12 @@ def test_readme_version_matches_pyproject():
     )
 
 
-def test_readme_baseline_matches_claude_md():
-    """README and CLAUDE.md must cite the same test-pass baseline."""
-    readme_baseline = _first_passing_baseline(_README.read_text(encoding="utf-8"))
-    claude_baseline = _first_passing_baseline(_CLAUDE_MD.read_text(encoding="utf-8"))
-    if readme_baseline is None or claude_baseline is None:
-        pytest.skip("a 'N passing' baseline is not stated in both docs")
-    assert readme_baseline == claude_baseline, (
-        f"test baseline drift: README says {readme_baseline}, "
-        f"CLAUDE.md says {claude_baseline}"
-    )
-
-
 def test_sc_dispatcher_version_matches_pyproject():
     """The /sc:sc dispatcher <meta> version must match the canonical pyproject version."""
     version = _pyproject_version()
     text = _SC_DISPATCHER.read_text(encoding="utf-8")
     assert version in text, (
         f"commands/sc.md <meta> version drifted — does not mention {version!r}"
-    )
-
-
-def test_agents_md_baseline_matches_claude_md():
-    """AGENTS.md (Codex doc) and CLAUDE.md must cite the same test-pass baseline."""
-    agents_baseline = _first_passing_baseline(_AGENTS_MD.read_text(encoding="utf-8"))
-    claude_baseline = _first_passing_baseline(_CLAUDE_MD.read_text(encoding="utf-8"))
-    if agents_baseline is None or claude_baseline is None:
-        pytest.skip("a 'N passing' baseline is not stated in both docs")
-    assert agents_baseline == claude_baseline, (
-        f"test baseline drift: AGENTS.md says {agents_baseline}, "
-        f"CLAUDE.md says {claude_baseline}"
     )
 
 
