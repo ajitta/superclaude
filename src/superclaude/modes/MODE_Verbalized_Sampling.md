@@ -35,7 +35,7 @@
 Precedence: explicit flags > brackets > NL hints > variant defaults > global defaults. `/sc:brainstorm --depth` maps shallow→brief, normal→balanced, deep→detailed.
   </params>
 
-  <diversity_dial note="NL signal resolves tau; explicit [tau:N] overrides">
+  <diversity_dial>
 | Signal | tau | Tail instruction (literal, goes in the prompt) |
 |---|---|---|
 | "focused", "conservative", "safe" | 0.20 | "the distribution" |

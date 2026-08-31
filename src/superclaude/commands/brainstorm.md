@@ -57,7 +57,7 @@ description: Interactive requirements discovery thru Socratic dialogue + systema
 | `'real-time collaboration' --strategy agile --delegate` | Parallel frontend/backend/security exploration |
 | `'enterprise data analytics' --strategy enterprise --depth deep` | Compliance + validation |
 | `'mobile monetization' --depth normal` | Cross-session w/ Serena |
-| `'API design' --vs cot [k:3, tau:0.20]` | 3 focused API design perspectives via VS-CoT |
+| `'API design' --vs cot [k:3] [tau:0.20]` | 3 focused API design perspectives via VS-CoT |
 | `'product ideas' --vs multi [tau:0.01]` | Exhaustive brainstorm: 15 wild ideas (5×3 turns) |
 | `'migration strategy' --vs --depth deep` | Auto-detect VS-CoT, detailed depth, 5 perspectives |
   <example name="brainstorm-then-implement" type="error-path">
