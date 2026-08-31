@@ -47,6 +47,7 @@ description: Diagnose + resolve issues in code, builds, deployments, system beha
   <gotchas>
   - evidence-fabrication: Do not construct hypothetical failure scenarios to justify pre-existing recommendation. Evidence (code, config, measurements) must precede proposals.
   - analysis-loop: If reasoning reaches same conclusion twice on same question, terminate that line of analysis, move to next topic.
+  - three-failure-levels: a failure sits at one of three levels — (1) bug in the code → fix it; (2) bug in expectations, i.e. the test or the requirement is itself wrong → re-examine it before "fixing" working code; (3) bug in the process → structural cause, the most valuable to record. Level 2 is the one most often skipped, and skipping it turns a wrong requirement into a wrong fix.
   </gotchas>
 
   <bounds>

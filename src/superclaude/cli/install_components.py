@@ -13,6 +13,7 @@ from typing import List, Tuple
 
 from .install_git_exclude import add_local_git_exclude
 from .install_paths import (
+    find_legacy_skills,
     COMPONENTS,
     _get_package_root,
     _get_source_dir,
@@ -79,33 +80,6 @@ def ensure_agent_memory_dir(base_path: Path, scope: str) -> Path | None:
     return directory
 
 
-def _resolve_template_paths(base_path: Path, scope: str = "user") -> dict:
-    """Compute resolved template variable values for a given scope."""
-    if scope in ("project", "local"):
-        scripts = ".claude/superclaude/scripts"
-        skills = ".claude/skills"
-    else:
-        # Use as_posix() to avoid Windows backslashes breaking YAML parsing
-        scripts = (base_path / "superclaude" / "scripts").resolve().as_posix()
-        skills = (base_path / "skills").resolve().as_posix()
-    return {"{{SCRIPTS_PATH}}": scripts, "{{SKILLS_PATH}}": skills}
-
-
-def _resolve_skill_templates(skill_dir: Path, template_vars: dict) -> None:
-    """Replace template variables in SKILL.md files within a copied skill directory."""
-    for manifest in ("SKILL.md", "skill.md"):
-        skill_md = skill_dir / manifest
-        if skill_md.exists():
-            content = skill_md.read_text(encoding="utf-8")
-            changed = False
-            for placeholder, value in template_vars.items():
-                if placeholder in content:
-                    content = content.replace(placeholder, value)
-                    changed = True
-            if changed:
-                skill_md.write_text(content, encoding="utf-8")
-
-
 def _safe_target_path(target: Path, base_path: Path) -> bool:
     """Check that a target path is safe (not a symlink to outside base_path).
 
@@ -153,118 +127,81 @@ def install_component(
     failed = 0
     failed_names = []
 
-    # Handle skills directory specially (has subdirectories)
-    if component == "skills":
-        for skill_dir in source_dir.iterdir():
-            if skill_dir.is_dir() and not skill_dir.name.startswith(("_", ".")):
-                target_skill_dir = target_dir / skill_dir.name
-                if target_skill_dir.exists() and not force:
-                    skipped += 1
-                    continue
-                try:
-                    if target_skill_dir.exists():
-                        if not _safe_target_path(target_skill_dir, target_dir):
-                            failed += 1
-                            failed_names.append(
-                                f"{skill_dir.name}: symlink outside target"
-                            )
-                            continue
-                        shutil.rmtree(target_skill_dir)
-                    shutil.copytree(
-                        skill_dir,
-                        target_skill_dir,
-                        ignore=shutil.ignore_patterns(
-                            "__pycache__", "*.pyc", ".DS_Store"
-                        ),
-                    )
-                    # Resolve template variables in SKILL.md
-                    template_vars = _resolve_template_paths(base_path, scope)
-                    _resolve_skill_templates(target_skill_dir, template_vars)
-                    installed += 1
-                except Exception as e:
-                    failed += 1
-                    failed_names.append(f"{skill_dir.name}: {e}")
+    # Copy .md files (excluding README.md and filtered MCP docs)
+    for source_file in source_dir.glob("*.md"):
+        # Skip README files
+        if source_file.stem.upper() == "README":
+            continue
 
-    else:
-        # Copy .md files (excluding README.md and filtered MCP docs)
-        for source_file in source_dir.glob("*.md"):
-            # Skip README files
+        # Skip redundant MCP docs (MCP auto-mode provides tool descriptions)
+        if component == "mcp" and source_file.name in MCP_DOCS_SKIP:
+            skipped += 1
+            continue
+
+        target_file = target_dir / source_file.name
+        if target_file.exists() and not force:
+            skipped += 1
+            continue
+        try:
+            if component == "agents":
+                content = source_file.read_text(encoding="utf-8")
+                target_file.write_text(
+                    _rewrite_agent_memory_scope(content, scope),
+                    encoding="utf-8",
+                )
+            else:
+                shutil.copy2(source_file, target_file)
+            installed += 1
+        except Exception as e:
+            failed += 1
+            failed_names.append(f"{source_file.name}: {e}")
+
+    # core/rules/ holds on-demand rule modules (Phase 2-1 core-lite split)
+    # routed by context_loader — copy nested .md preserving layout.
+    if component == "core":
+        for source_file in source_dir.glob("rules/*.md"):
             if source_file.stem.upper() == "README":
                 continue
-
-            # Skip redundant MCP docs (MCP auto-mode provides tool descriptions)
-            if component == "mcp" and source_file.name in MCP_DOCS_SKIP:
-                skipped += 1
-                continue
-
-            target_file = target_dir / source_file.name
+            target_file = target_dir / "rules" / source_file.name
+            target_file.parent.mkdir(parents=True, exist_ok=True)
             if target_file.exists() and not force:
                 skipped += 1
                 continue
             try:
-                if component == "agents":
-                    content = source_file.read_text(encoding="utf-8")
-                    target_file.write_text(
-                        _rewrite_agent_memory_scope(content, scope),
-                        encoding="utf-8",
-                    )
-                else:
-                    shutil.copy2(source_file, target_file)
+                shutil.copy2(source_file, target_file)
                 installed += 1
             except Exception as e:
                 failed += 1
-                failed_names.append(f"{source_file.name}: {e}")
+                failed_names.append(f"rules/{source_file.name}: {e}")
 
-        # core/rules/ holds on-demand rule modules (Phase 2-1 core-lite split)
-        # routed by context_loader — copy nested .md preserving layout.
-        if component == "core":
-            for source_file in source_dir.glob("rules/*.md"):
-                if source_file.stem.upper() == "README":
-                    continue
-                target_file = target_dir / "rules" / source_file.name
-                target_file.parent.mkdir(parents=True, exist_ok=True)
-                if target_file.exists() and not force:
-                    skipped += 1
-                    continue
-                try:
-                    shutil.copy2(source_file, target_file)
-                    installed += 1
-                except Exception as e:
-                    failed += 1
-                    failed_names.append(f"rules/{source_file.name}: {e}")
-
-        # templates/ holds nested doc-scaffold directories consumed by
-        # /sc:init (not slash commands). Copy each subdirectory verbatim.
-        if component == "templates":
-            for sub_dir in source_dir.iterdir():
-                if not sub_dir.is_dir():
-                    continue
-                if sub_dir.name.startswith(("_", ".")):
-                    continue
-                target_sub = target_dir / sub_dir.name
-                if target_sub.exists() and not force:
-                    skipped += 1
-                    continue
-                try:
-                    if target_sub.exists():
-                        if not _safe_target_path(target_sub, target_dir):
-                            failed += 1
-                            failed_names.append(
-                                f"{sub_dir.name}: symlink outside target"
-                            )
-                            continue
-                        shutil.rmtree(target_sub)
-                    shutil.copytree(
-                        sub_dir,
-                        target_sub,
-                        ignore=shutil.ignore_patterns(
-                            "__pycache__", "*.pyc", ".DS_Store"
-                        ),
-                    )
-                    installed += 1
-                except Exception as e:
-                    failed += 1
-                    failed_names.append(f"{sub_dir.name}: {e}")
+    # templates/ holds nested doc-scaffold directories consumed by
+    # /sc:init (not slash commands). Copy each subdirectory verbatim.
+    if component == "templates":
+        for sub_dir in source_dir.iterdir():
+            if not sub_dir.is_dir():
+                continue
+            if sub_dir.name.startswith(("_", ".")):
+                continue
+            target_sub = target_dir / sub_dir.name
+            if target_sub.exists() and not force:
+                skipped += 1
+                continue
+            try:
+                if target_sub.exists():
+                    if not _safe_target_path(target_sub, target_dir):
+                        failed += 1
+                        failed_names.append(f"{sub_dir.name}: symlink outside target")
+                        continue
+                    shutil.rmtree(target_sub)
+                shutil.copytree(
+                    sub_dir,
+                    target_sub,
+                    ignore=shutil.ignore_patterns("__pycache__", "*.pyc", ".DS_Store"),
+                )
+                installed += 1
+            except Exception as e:
+                failed += 1
+                failed_names.append(f"{sub_dir.name}: {e}")
 
     return installed, skipped, failed, failed_names
 
@@ -471,6 +408,21 @@ def install_all(
     except OSError as e:
         total_failed += 1
         messages.append(f"❌ Agent memory store: {e}")
+
+    # Upgrade path: drop skills a pre-removal release installed. Uninstall prunes
+    # them too, but nobody upgrading runs uninstall, and leaving them means the
+    # auto-invocable ones keep firing with no source left to explain them.
+    stale_skills = find_legacy_skills(base_path)
+    if stale_skills:
+        try:
+            for d in stale_skills:
+                shutil.rmtree(d)
+            messages.append(
+                f"🧹 Removed {len(stale_skills)} skill(s) from a pre-removal release"
+            )
+        except OSError as e:
+            total_failed += 1
+            messages.append(f"❌ Legacy skill cleanup: {e}")
 
     # Install each component
     for component, (_, _, description) in COMPONENTS.items():

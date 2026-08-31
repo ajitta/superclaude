@@ -70,6 +70,8 @@ disable-model-invocation: true
 
   <gotchas>
   - new-commit: Make new commits, never amend unless asked
+  - retest-after-merge: re-run the test suite AFTER a merge lands. Both sides green does not mean the merge is green — semantic conflicts pass textual merge
+  - base-branch-confirm: auto-detect `main` vs `master`, then confirm with the user before merging. Stops merges into the wrong base
   </gotchas>
 
   <bounds>

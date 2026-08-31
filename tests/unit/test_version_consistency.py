@@ -74,15 +74,11 @@ def _component_counts() -> dict[str, int]:
         d = _COMPONENTS_DIR / sub
         return sum(1 for f in d.glob(pattern) if f.name != "README.md")
 
-    skills = _COMPONENTS_DIR / "skills"
     return {
         "commands": _md("commands"),
         "agents": _md("agents"),
         "modes": _md("modes", "MODE_*.md"),
         "mcp": _md("mcp", "MCP_*.md"),
-        "skills": sum(
-            1 for d in skills.iterdir() if d.is_dir() and not d.name.startswith("_")
-        ),
     }
 
 
@@ -188,18 +184,15 @@ _README_COUNT_PATTERNS = [
     ("modes", re.compile(r"\|\s*Modes \((\d+)\)"), True),
     ("mcp", re.compile(r"(\d+)\s+(?:curated\s+)?(?:MCP\s+)?servers\b", re.I), False),
     ("mcp", re.compile(r"\|\s*MCP servers \((\d+)\)"), True),
-    ("skills", re.compile(r"(\d+)\s+(?:procedural\s+)?skills\b", re.I), True),
-    ("skills", re.compile(r"\|\s*Skills \((\d+)\)"), True),
 ]
 
 # The headline badge table: label row, separator row, bold-number row, adjacent.
 # Line-bounded on purpose -- an unbounded gap let the label row pair with an
 # unrelated five-number row elsewhere in the file and validate the wrong table.
 _BADGE_TABLE_RE = re.compile(
-    r"\|\s*Commands\s*\|\s*Agents\s*\|\s*Modes\s*\|\s*MCP Servers\s*\|\s*Skills\s*\|[^\n]*\n"
+    r"\|\s*Commands\s*\|\s*Agents\s*\|\s*Modes\s*\|\s*MCP Servers\s*\|[^\n]*\n"
     r"\|[^\n]*\n"
-    r"\|\s*\*\*(\d+)\*\*\s*\|\s*\*\*(\d+)\*\*\s*\|\s*\*\*(\d+)\*\*\s*"
-    r"\|\s*\*\*(\d+)\*\*\s*\|\s*\*\*(\d+)\*\*\s*\|"
+    r"\|\s*\*\*(\d+)\*\*\s*\|\s*\*\*(\d+)\*\*\s*\|\s*\*\*(\d+)\*\*\s*\|\s*\*\*(\d+)\*\*\s*\|"
 )
 
 
@@ -230,13 +223,11 @@ def test_every_readme_component_count_matches_source(key, pattern, required):
 
 
 def test_readme_badge_table_matches_source():
-    """The headline badge table's five numbers must equal the source counts."""
+    """The headline badge table's four numbers must equal the source counts."""
     m = _BADGE_TABLE_RE.search(_README.read_text(encoding="utf-8"))
-    assert m, "README.md has no Commands/Agents/Modes/MCP Servers/Skills badge table"
+    assert m, "README.md has no Commands/Agents/Modes/MCP Servers badge table"
     counts = _component_counts()
-    stated = dict(
-        zip(("commands", "agents", "modes", "mcp", "skills"), map(int, m.groups()))
-    )
+    stated = dict(zip(("commands", "agents", "modes", "mcp"), map(int, m.groups())))
     assert stated == counts, f"README badge table says {stated}, tree has {counts}"
 
 

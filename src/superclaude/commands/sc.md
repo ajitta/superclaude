@@ -66,7 +66,7 @@ description: SuperClaude command dispatcher - main entry point for all features.
   <example name="unknown-command" type="error-path">
     - Input: /sc:deploy (command not exist)
     - Why wrong: 'deploy' not registered /sc command.
-    - Correct: Use /sc:help for available commands. For deployment: /sc:build --type prod then /ship
+    - Correct: Use /sc:help for available commands. For deployment: /sc:build --type prod then /sc:git
   </example>
   </examples>
 

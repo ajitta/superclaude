@@ -14,7 +14,6 @@ paths: ["src/superclaude/mcp/**", ".claude/rules/mcp-authoring.md"]
 |-----------|------|
 | Agent     | WHO TO BE |
 | Command   | WHAT TO DO |
-| Skill     | WHICH CAPABILITY |
 | Mode      | HOW TO THINK |
 | MCP doc   | WHEN/HOW to use server in SC workflows |
 

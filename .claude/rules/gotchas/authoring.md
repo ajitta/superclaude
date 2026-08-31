@@ -4,7 +4,7 @@ paths: ["src/superclaude/**", ".claude/rules/**", "scripts/**"]
 
 # Project Gotchas — Authoring
 # Last reviewed: 2026-07-25
-# Content-framework authoring traps (agents/commands/skills/modes/core).
+# Content-framework authoring traps (agents/commands/modes/core).
 
 - install-tree-boundary: Files outside `src/superclaude/` (e.g., `.claude/rules/schemas.yaml`, `tests/`, repo-root docs) NOT shipped to `~/.claude/` at install. Installed content link to them → break on user machine. Keep installed content self-contained or copy needed refs into `src/superclaude/`.
 - dynamic-vs-static-load: `core/BUSINESS_SYMBOLS.md` + `core/rules/RULES_*.md` modules NOT always-loaded — injected on-demand by `src/superclaude/scripts/context_loader.py` TRIGGER_MAP. Always-loaded core = three in `CLAUDE_SC.md` @import chain (FLAGS/PRINCIPLES/RULES), and RULES.md is only the ~0.9k-token kernel post Phase 2-1 split — R01-R21 detail/ladders/conventions live in the on-demand modules. Check `context_loader.py` before assert load mode.

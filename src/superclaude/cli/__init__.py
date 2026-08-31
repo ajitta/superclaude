@@ -2,7 +2,6 @@
 SuperClaude CLI
 
 Commands:
-    - superclaude install-skill project-manager  # Install PM Agent skill
     - superclaude doctor                   # Check installation health
     - superclaude version                  # Show version
 """

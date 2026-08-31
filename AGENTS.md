@@ -46,18 +46,18 @@ make clean         # Remove artifacts
 ## Developer Environment
 
 - `make deploy` runs `uv tool install --force --editable .` (CLI editable) only. Content sync is a separate scope-explicit step: `make sync-user` / `sync-project` / `sync-local`. The `--force` in sync targets is intentional — needed for non-interactive headless `Codex -p` test scenarios. For interactive dev sync use `superclaude install -i`.
-- Template variables `{{SCRIPTS_PATH}}` and `{{SKILLS_PATH}}` resolved at install time
+- Template variable `{{SCRIPTS_PATH}}` resolved at install time
 - Experimental Agent Teams: `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`
 
 ## Architecture
 
-SuperClaude is a **content framework** — markdown files (commands, agents, modes, skills, MCP docs, core config) installed into `~/.Codex/` to configure Codex's behavior. Ships a CLI (`superclaude`) and a pytest plugin for auto-markers.
+SuperClaude is a **content framework** — markdown files (commands, agents, modes, MCP docs, core config) installed into `~/.Codex/` to configure Codex's behavior. Ships a CLI (`superclaude`) and a pytest plugin for auto-markers.
 
 **Full taxonomy:** `src/superclaude/ARCHITECTURE.md` (directory roles, delivery pipelines, content types).
 
 - **CLAUDE_SC.md import chain**: `@superclaude/CLAUDE_SC.md` → `core/FLAGS.md`, `PRINCIPLES.md`, `RULES.md`
 - **Hooks merge (not replace)**: `install_settings.py` preserves user hooks via marker-based identification
-- Authoring rules live in `.claude/rules/` (agent, command, skill, mode — auto-loaded by CC)
+- Authoring rules live in `.claude/rules/` (agent, command, mode — auto-loaded by CC)
 - Serena session memories live in `.serena/` (committed for cross-session context)
 
 ## Gotchas

@@ -23,13 +23,12 @@ pytest 카운트, coverage, description 문자 수처럼 커밋마다 바뀌는 
 | `commands/*.md` | 36 | `/sc:*` 사용자 workflow, WHAT TO DO |
 | `core` always-loaded | 3 | FLAGS, PRINCIPLES, RULES kernel |
 | `core/rules/*.md` | 4 | on-demand 상세 규칙 |
-| `modes/MODE_*.md` | 7 | 인지 자세, HOW TO THINK |
+| `modes/MODE_*.md` | 8 | 인지 자세, HOW TO THINK |
 | `modes/*CONFIG*.md` | 1 | mode 지원 설정 |
 | `mcp/MCP_*.md` | 4 | SC workflow에서 MCP를 WHEN/HOW 사용 |
-| `skills/*/SKILL.md` | 5 | CC-native capability/reference |
 | `templates/docs-scaffold/*` | 4 | `/sc:init` 문서 scaffold |
 | distinct hook entry scripts | 10 | `hooks.json`의 14개 등록에서 직접 호출 |
-| 전체 Python module | 59 | CLI, hook, 자동화, 공용 경로, plugin |
+| 전체 Python module | 55 | CLI, hook, 자동화, 공용 경로, plugin |
 
 ## 2. 전달과 강제 경계
 

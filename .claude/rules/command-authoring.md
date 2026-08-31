@@ -7,10 +7,9 @@ paths: ["src/superclaude/commands/**", ".claude/rules/command-authoring.md"]
 > **Decision gate:** Make command for **user-facing workflow entry** (`/sc:*` slash commands).
 > - Command = **WHAT TO DO** (ordered workflow)
 > - Agent = **WHO TO BE** (domain expertise, auto-delegated)
-> - Skill = **WHICH CAPABILITY** (CC-native tool/hook)
 > - Mode = **HOW TO THINK** (cognitive overlay)
 >
-> Need tool restrictions, hooks, or subagent execution? → use skill, not command.
+> Need tool restrictions, hooks, or subagent execution? Those are skill-only fields in Claude Code, and SuperClaude ships no skills — treat the need as a signal to reconsider the design, not as a migration target.
 
 ## YAML Frontmatter
 
@@ -29,7 +28,7 @@ Never add — SSOT: `.claude/rules/schemas.yaml` (`forbidden_command_fields`):
 - `name` — derived from filename (e.g., `build.md` → `/sc:build`)
 - `model`, `permissionMode`, `memory`, `color` — agent-only
 - `autonomy` — not official CC field
-- `context`, `agent`, `hooks` — skill-only (migrate to skill if needed)
+- `context`, `agent`, `hooks` — skill-only in CC; SuperClaude ships no skills, so a command needing them has no home here
 
 ## Trigger Policy (auto vs explicit-only)
 
@@ -44,7 +43,7 @@ Rules:
 
 - **Both tiers require a negative gate** ("Do NOT auto-trigger on …") naming cheap look-alike requests and their direct alternative. Mechanically enforced: `tests/unit/test_command_structure.py` (`test_description_references_own_slash_command`, `test_description_has_negative_trigger_gate`).
 - **Tier choice heuristic**: command mutates files, runs multi-agent orchestration, or writes committed artifacts → explicit-only. Read-only analysis or console-only output → auto-triggerable is safe.
-- **Explicit-only is wording-level steering, not a hard block.** For a guaranteed block, add `disable-model-invocation: true` — CC strips the description from the model's skill list entirely (same semantics as skills; see skill-authoring.md "disable-model-invocation vs user-invocable"). Not in `forbidden_command_fields`; shipped example: `auto-improve.md` (unattended code-mutation loop). Prefer wording tier unless a false fire is unacceptable.
+- **Explicit-only is wording-level steering, not a hard block.** For a guaranteed block, add `disable-model-invocation: true` — CC strips the description from the model's skill list entirely, so the model cannot invoke it at all — only the user can, by typing the command. Not in `forbidden_command_fields`; shipped example: `auto-improve.md` (unattended code-mutation loop). Prefer wording tier unless a false fire is unacceptable.
 - **Flipping tiers = description edit only**: rewrite the positive cue, keep the negative gate, stay ≤1024 chars (CC skill-description cap). Then `uv run pytest tests/unit/test_command_structure.py` + re-sync (`superclaude install --force --scope user`; `make sync-user` may fail on Windows — see gotchas/general.md).
 
 ## XML Template
@@ -135,7 +134,7 @@ Rules below apply to all components, not restated above. See `.claude/rules/xml-
 |-------------|-----------|-----|
 | `name:` in frontmatter | Filename is the command name | Remove |
 | `model:` or `permissionMode:` | Agent-only, ignored for commands | Remove |
-| `hooks:` or `context:` | Skill-only — migrate to skill if needed | Remove or migrate |
+| `hooks:` or `context:` | Skill-only in CC; SuperClaude ships no skills | Remove |
 | Vague description | Poor `/menu` display | Be specific: "Build X with Y" |
 | Missing `<bounds>` | No scope/safety boundary | Add `<does>`/`<never>` |
 | Mission doesn't match description | Confusing inconsistency | Align ≥30% word overlap |

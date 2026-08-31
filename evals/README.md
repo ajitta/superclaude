@@ -78,7 +78,6 @@ are pinned by `tests/unit/test_eval_harness.py`.
 
 ## Reuse boundary
 
-Invocation pattern mirrors `tests/integration/test_skill_canary.py`.
 `auto_improve.eval_runner.run_eval` was evaluated for reuse and not
 imported: its contract is shell→single-jmespath-metric, which doesn't cover
 stream-json transcript scanning or multi-check scoring.

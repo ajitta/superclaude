@@ -8,7 +8,6 @@ paths: ["src/superclaude/modes/**", ".claude/rules/mode-authoring.md"]
 > - Mode = **HOW TO THINK** (mindset)
 > - Command = **WHAT TO DO** (workflow)
 > - Agent = **WHO TO BE** (domain expertise)
-> - Skill = **WHICH CAPABILITY** (CC-native tool/hook)
 
 Mindset-shifting overlay, not procedure. Injected on-demand by `context_loader.py` TRIGGER_MAP.
 

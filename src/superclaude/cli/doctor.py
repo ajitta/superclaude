@@ -61,7 +61,6 @@ def run_doctor(scope: str | None = None) -> Dict[str, Any]:
 
     checks = [
         _check_pytest_plugin(),
-        _check_skills_installed(base_path, scope),
         _check_configuration(),
         _check_hooks_installed(base_path, scope),
         _check_claude_sc_md(base_path, scope),
@@ -121,54 +120,6 @@ def _check_pytest_plugin() -> Dict[str, Any]:
             "passed": False,
             "details": ["pytest not installed"],
         }
-
-
-def _check_skills_installed(base_path: Path, scope: str) -> Dict[str, Any]:
-    """
-    Check whether the skills SuperClaude ships are installed in this scope.
-
-    Counted against the source manifest rather than by listing the directory:
-    .claude/skills is shared with every other tool that installs skills, so a
-    raw listing reports someone else's work as SuperClaude's.
-
-    Args:
-        base_path: Base installation path of the scope being checked
-        scope: Installation scope, which decides how to phrase the repair
-
-    Returns:
-        Check result dict
-    """
-    from .install_inventory import _source_dir_names
-    from .install_paths import _get_source_dir
-
-    skills_dir = base_path / "skills"
-    shipped = _source_dir_names(_get_source_dir("skills"))
-    installed = sorted(
-        name
-        for name in shipped
-        if (skills_dir / name / "SKILL.md").exists()
-        or (skills_dir / name / "skill.md").exists()
-    )
-
-    if len(installed) == len(shipped):
-        return {
-            "name": "Skills installed",
-            "passed": True,
-            "details": [
-                f"{len(installed)}/{len(shipped)} installed: {', '.join(installed)}"
-                if installed
-                else "No skills shipped by this release"
-            ],
-        }
-    missing = sorted(shipped - set(installed))
-    return {
-        "name": "Skills installed",
-        "passed": False,
-        "details": [
-            f"{len(installed)}/{len(shipped)} installed at {skills_dir}",
-            f"Missing: {', '.join(missing)} — {_repair_command(scope, base_path)}",
-        ],
-    }
 
 
 def _check_configuration() -> Dict[str, Any]:

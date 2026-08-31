@@ -4,12 +4,10 @@ Drift Detection for SuperClaude Installation
 Compares source files against installed files to detect drift
 (content mismatches, missing files, extra files).
 
-Coverage boundary: component *.md files (COMPONENTS, incl. core/rules/),
-skill SKILL.md manifests, and CLAUDE_SC.md only. templates/, installed
-scripts/, and the merged hooks.json are NOT drift-checked, and EXTRA is not
-reported for skills — .claude/skills is shared with every other tool that
-installs skills (see _check_component). Restated for the user in the
-`superclaude verify-drift` help text; keep the two in step.
+Coverage boundary: component *.md files (COMPONENTS, incl. core/rules/) and
+CLAUDE_SC.md only. templates/, installed scripts/, and the merged hooks.json
+are NOT drift-checked. Restated for the user in the `superclaude verify-drift`
+help text; keep the two in step.
 """
 
 from pathlib import Path
@@ -29,21 +27,8 @@ DRIFTED = "DRIFTED"  # Content mismatch
 EXTRA = "EXTRA"  # In target but not in source
 
 
-def _get_template_vars(base_path: Path) -> dict:
-    """Get template variables that install resolves in SKILL.md files."""
-    scripts = (base_path / "superclaude" / "scripts").resolve().as_posix()
-    skills = (base_path / "skills").resolve().as_posix()
-    return {"{{SCRIPTS_PATH}}": scripts, "{{SKILLS_PATH}}": skills}
-
-
-def _compare_files(
-    source: Path, target: Path, template_vars: dict | None = None
-) -> str:
-    """Compare two files by content. Returns status string.
-
-    If template_vars is provided, resolve them in source content before comparing
-    (skills have {{SKILLS_PATH}} etc. replaced at install time).
-    """
+def _compare_files(source: Path, target: Path) -> str:
+    """Compare two files by content. Returns status string."""
     if not target.exists():
         return MISSING
     try:
@@ -51,9 +36,6 @@ def _compare_files(
         target_content = target.read_text(encoding="utf-8")
     except (OSError, UnicodeDecodeError):
         return DRIFTED
-    if template_vars:
-        for placeholder, value in template_vars.items():
-            source_content = source_content.replace(placeholder, value)
     return OK if source_content == target_content else DRIFTED
 
 
@@ -87,83 +69,48 @@ def _check_component(component: str, base_path: Path) -> Dict[str, str]:
     if not source_dir.exists():
         return results
 
-    if component == "skills":
-        # Skills have template variables resolved at install time
-        template_vars = _get_template_vars(base_path)
+    # Standard components: compare .md files (skip README)
+    source_files = {
+        f.name for f in source_dir.glob("*.md") if f.stem.upper() != "README"
+    }
 
-        for skill_dir in sorted(source_dir.iterdir()):
-            if not skill_dir.is_dir() or skill_dir.name.startswith(("_", ".")):
-                continue
-            source_manifest = skill_dir / "SKILL.md"
-            if not source_manifest.exists():
-                source_manifest = skill_dir / "skill.md"
-            if not source_manifest.exists():
-                continue
+    for filename in sorted(source_files):
+        source_file = source_dir / filename
+        target_file = target_dir / filename
+        status = _compare_files(source_file, target_file)
+        if component == "agents" and status == DRIFTED:
+            # Install rewrites `memory: project` to the install scope
+            status = _compare_agent_with_scope_rewrite(source_file, target_file)
+        results[filename] = status
 
-            target_skill_dir = target_dir / skill_dir.name
-            target_manifest = target_skill_dir / source_manifest.name
-            key = f"{skill_dir.name}/{source_manifest.name}"
-
-            if not target_skill_dir.exists():
-                results[key] = MISSING
-            elif not target_manifest.exists():
-                results[key] = MISSING
-            else:
-                results[key] = _compare_files(
-                    source_manifest, target_manifest, template_vars
-                )
-
-        # No EXTRA sweep here. .claude/skills is shared with Claude Code and
-        # every plugin that ships skills, so a directory SuperClaude does not
-        # ship is the normal case, not drift: a real user-scope directory
-        # reported "30 extra" for skills belonging to other tools, under a
-        # remediation line ("superclaude install --force") that does nothing
-        # about them. Components in directories SuperClaude owns outright
-        # (commands/sc, superclaude/) still report EXTRA below, which is what
-        # surfaces a file left behind by an earlier release.
-    else:
-        # Standard components: compare .md files (skip README)
-        source_files = {
-            f.name for f in source_dir.glob("*.md") if f.stem.upper() != "README"
+    # Check for extra files in target
+    if target_dir.exists():
+        target_files = {
+            f.name for f in target_dir.glob("*.md") if f.stem.upper() != "README"
         }
+        for filename in sorted(target_files - source_files):
+            results[filename] = EXTRA
 
-        for filename in sorted(source_files):
-            source_file = source_dir / filename
-            target_file = target_dir / filename
-            status = _compare_files(source_file, target_file)
-            if component == "agents" and status == DRIFTED:
-                # Install rewrites `memory: project` to the install scope
-                status = _compare_agent_with_scope_rewrite(source_file, target_file)
-            results[filename] = status
-
-        # Check for extra files in target
-        if target_dir.exists():
-            target_files = {
-                f.name for f in target_dir.glob("*.md") if f.stem.upper() != "README"
-            }
-            for filename in sorted(target_files - source_files):
-                results[filename] = EXTRA
-
-        # core/rules/ nested modules (Phase 2-1 core-lite split) — compare
-        # with rules/ key prefix so module drift is not silently invisible.
-        if component == "core":
-            rules_src = source_dir / "rules"
-            rules_tgt = target_dir / "rules"
-            src_rules = (
-                {f.name for f in rules_src.glob("*.md") if f.stem.upper() != "README"}
-                if rules_src.exists()
-                else set()
+    # core/rules/ nested modules (Phase 2-1 core-lite split) — compare
+    # with rules/ key prefix so module drift is not silently invisible.
+    if component == "core":
+        rules_src = source_dir / "rules"
+        rules_tgt = target_dir / "rules"
+        src_rules = (
+            {f.name for f in rules_src.glob("*.md") if f.stem.upper() != "README"}
+            if rules_src.exists()
+            else set()
+        )
+        for filename in sorted(src_rules):
+            results[f"rules/{filename}"] = _compare_files(
+                rules_src / filename, rules_tgt / filename
             )
-            for filename in sorted(src_rules):
-                results[f"rules/{filename}"] = _compare_files(
-                    rules_src / filename, rules_tgt / filename
-                )
-            if rules_tgt.exists():
-                tgt_rules = {
-                    f.name for f in rules_tgt.glob("*.md") if f.stem.upper() != "README"
-                }
-                for filename in sorted(tgt_rules - src_rules):
-                    results[f"rules/{filename}"] = EXTRA
+        if rules_tgt.exists():
+            tgt_rules = {
+                f.name for f in rules_tgt.glob("*.md") if f.stem.upper() != "README"
+            }
+            for filename in sorted(tgt_rules - src_rules):
+                results[f"rules/{filename}"] = EXTRA
 
     return results
 

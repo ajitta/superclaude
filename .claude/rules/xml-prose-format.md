@@ -1,10 +1,10 @@
 ---
-paths: ["src/superclaude/agents/**", "src/superclaude/commands/**", "src/superclaude/modes/**", "src/superclaude/skills/**", "src/superclaude/mcp/**", "src/superclaude/core/**", ".claude/rules/*authoring*.md", ".claude/rules/xml-prose-format.md"]
+paths: ["src/superclaude/agents/**", "src/superclaude/commands/**", "src/superclaude/modes/**", "src/superclaude/mcp/**", "src/superclaude/core/**", ".claude/rules/*authoring*.md", ".claude/rules/xml-prose-format.md"]
 ---
 
 # XML Prose Format Rules
 
-> Body-format spec for SuperClaude content components — agent / skill / command / mode bodies under `src/superclaude/`. Derive from Claude.ai system-prompt prose style, adapt with minimal `-` line list so short labeled enums stay readable without verbose XML containers.
+> Body-format spec for SuperClaude content components — agent / command / mode bodies under `src/superclaude/`. Derive from Claude.ai system-prompt prose style, adapt with minimal `-` line list so short labeled enums stay readable without verbose XML containers.
 > Format-only — content/policy of any specific component out of scope.
 > **Scope.** Rule govern component bodies. `*-authoring.md` meta-docs in `.claude/rules/` document rule for human authors, may use plain Markdown (headers, tables) — they not themselves SuperClaude components.
 
@@ -266,7 +266,6 @@ Keep components small enough that harness can load full body without truncation.
 |---|---|---|
 | Command | ≤200 lines | 300 |
 | Agent | ≤300 lines | 500 |
-| Skill (SKILL.md body) | ≤500 lines | 500 (Anthropic guidance) |
 | Mode | ≤300 lines | 500 |
 | Core (FLAGS / PRINCIPLES / RULES) | ≤400 lines | — |
 

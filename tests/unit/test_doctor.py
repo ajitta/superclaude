@@ -16,23 +16,13 @@ from superclaude.cli.doctor import (
     _check_claude_md_import,
     _check_claude_sc_md,
     _check_hooks_installed,
-    _check_skills_installed,
     run_doctor,
 )
 from superclaude.cli.install_inventory import _source_dir_names
 from superclaude.cli.install_paths import _get_source_dir
 
-SHIPPED_SKILLS = sorted(_source_dir_names(_get_source_dir("skills")))
 
 SC_HOOK_EVENTS = ["SessionStart", "UserPromptSubmit", "PostToolUse", "PreToolUse"]
-
-
-def _install_skills(base_path: Path, names: list[str]) -> None:
-    """Lay down SKILL.md manifests the way install does."""
-    for name in names:
-        skill_dir = base_path / "skills" / name
-        skill_dir.mkdir(parents=True, exist_ok=True)
-        (skill_dir / "SKILL.md").write_text(f"# {name}\n", encoding="utf-8")
 
 
 def _sc_hook_entry(script: str) -> dict:
@@ -61,39 +51,6 @@ def _foreign_hook_entry() -> dict:
 def _write_settings(path: Path, hooks: dict) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps({"hooks": hooks}), encoding="utf-8")
-
-
-class TestSkillsCheck:
-    """The skills check counts what SuperClaude ships, not what shares the dir."""
-
-    def test_passes_when_every_shipped_skill_is_present(self, tmp_path: Path):
-        _install_skills(tmp_path, SHIPPED_SKILLS)
-
-        result = _check_skills_installed(tmp_path, "local")
-
-        assert result["passed"] is True
-
-    def test_foreign_skills_do_not_stand_in_for_missing_ones(self, tmp_path: Path):
-        _install_skills(tmp_path, [f"someone-elses-skill-{i}" for i in range(30)])
-
-        result = _check_skills_installed(tmp_path, "local")
-
-        assert result["passed"] is False
-        assert "0/" in result["details"][0]
-
-    def test_foreign_skills_do_not_break_a_complete_install(self, tmp_path: Path):
-        _install_skills(tmp_path, SHIPPED_SKILLS + ["someone-elses-skill"])
-
-        result = _check_skills_installed(tmp_path, "local")
-
-        assert result["passed"] is True
-        assert "someone-elses-skill" not in result["details"][0]
-
-    def test_reports_the_scope_directory_it_looked_in(self, tmp_path: Path):
-        result = _check_skills_installed(tmp_path, "local")
-
-        assert result["passed"] is False
-        assert str(tmp_path / "skills") in " ".join(result["details"])
 
 
 class TestHooksCheck:
@@ -220,7 +177,6 @@ class TestRunDoctor:
         (project / "CLAUDE.local.md").write_text(
             "@.claude/superclaude/CLAUDE_SC.md\n", encoding="utf-8"
         )
-        _install_skills(base_path, SHIPPED_SKILLS)
         _write_settings(
             base_path / "settings.local.json",
             {event: [_sc_hook_entry("session_init.py")] for event in SC_HOOK_EVENTS},
@@ -228,7 +184,7 @@ class TestRunDoctor:
         return base_path
 
     def _disk_checks(self, result: dict) -> list[dict]:
-        """The four checks that read the install; the other two read the env."""
+        """The three checks that read the install; the other two read the env."""
         environment = {"pytest plugin loaded", "Configuration"}
         return [c for c in result["checks"] if c["name"] not in environment]
 
@@ -266,7 +222,7 @@ class TestRunDoctor:
 
         result = run_doctor()
 
-        assert len(result["checks"]) == 6
+        assert len(result["checks"]) == 5
 
 
 class TestRepairCommandNamesWhereToRun:
@@ -302,7 +258,6 @@ class TestRepairCommandNamesWhereToRun:
         (base / "superclaude").mkdir(parents=True)
 
         checks = [
-            _check_skills_installed(base, "local"),
             _check_claude_sc_md(base, "local"),
             _check_hooks_installed(base, "local"),
             _check_claude_md_import(base, "local"),

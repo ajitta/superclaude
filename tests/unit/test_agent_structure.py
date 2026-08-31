@@ -269,9 +269,8 @@ class TestAgentDescriptionInterface:
     """The frontmatter description is a model-facing API: CC reads it verbatim
     to decide delegation, and specific wording measurably shifts subagent
     behavior (107-trial agent-naming study). These deterministic lints guard
-    the empirically-proven failure modes — a static, default-run counterpart to
-    the skill trigger canary (tests/integration/test_skill_canary.py), which is
-    opt-in and network-bound. See docs/research/agent-native-design-ajitta-2026-05-31.md (P1).
+    the empirically-proven failure modes. See
+    docs/research/agent-native-design-ajitta-2026-05-31.md (P1).
     """
 
     def test_description_no_hallucination_priming_vocab(self, agent):

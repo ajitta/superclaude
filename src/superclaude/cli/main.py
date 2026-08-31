@@ -113,7 +113,6 @@ def install(
     Installs:
     - Slash commands to commands/sc/
     - Agent definitions to agents/
-    - Skills to skills/
     - Behavioral modes to superclaude/modes/
     - Framework files to superclaude/ (core, mcp)
 
@@ -287,7 +286,6 @@ def uninstall(
     - superclaude/ directory (core, modes, mcp, scripts)
     - commands/sc/ directory (slash commands)
     - agents/ directory
-    - skills/ directory
     - hooks/hooks.json file
     - SuperClaude hooks from settings.json (preserves user hooks)
     - @superclaude import from CLAUDE.md
@@ -450,52 +448,6 @@ def update(scope: str):
 
 
 @main.command()
-@click.argument("skill_name")
-@click.option(
-    "--scope",
-    default="user",
-    type=click.Choice(["user", "project", "local"]),
-    help="Installation scope: user (~/.claude/) or project (./.claude/)",
-)
-@click.option(
-    "--force",
-    is_flag=True,
-    help="Force reinstall if skill already exists",
-)
-def install_skill(skill_name: str, scope: str, force: bool):
-    """
-    Install a SuperClaude skill to Claude Code
-
-    SKILL_NAME: Name of the skill to install (e.g., project-manager)
-
-    Scopes:
-    - user (default): Install to ~/.claude/skills/
-    - project: Install to ./.claude/skills/
-
-    Example:
-        superclaude install-skill project-manager
-        superclaude install-skill project-manager --scope project --force
-    """
-    from .install_commands import get_base_path
-    from .install_skill import install_skill_command
-
-    base_path = get_base_path(scope)
-    target_path = base_path / "skills"
-
-    click.echo(f"📦 Installing skill '{skill_name}' (scope: {scope})...")
-
-    success, message = install_skill_command(
-        skill_name=skill_name, target_path=target_path, force=force, scope=scope
-    )
-
-    if success:
-        click.echo(f"✅ {message}")
-    else:
-        click.echo(f"❌ {message}", err=True)
-        sys.exit(1)
-
-
-@main.command()
 @click.option(
     "--verbose",
     is_flag=True,
@@ -513,7 +465,6 @@ def doctor(verbose: bool, scope: str | None):
 
     Verifies:
         - pytest plugin loaded correctly
-        - Skills this release ships are installed in the scope
         - Configuration files present
         - SuperClaude hooks registered in the scope's settings file
         - CLAUDE_SC.md installed and imported
@@ -692,146 +643,6 @@ def agents(list_only: bool, agent_name: str, tokens: bool, scope: str | None):
     click.echo("   Use --info <agent> for details, --tokens for estimates")
 
 
-@main.command()
-@click.option(
-    "--list",
-    "list_only",
-    is_flag=True,
-    help="List all available skills",
-)
-@click.option(
-    "--info",
-    "skill_name",
-    default=None,
-    help="Show details for a specific skill",
-)
-@click.option(
-    "--tokens",
-    is_flag=True,
-    help="Show token estimates for all skills",
-)
-@click.option(
-    "--scope",
-    default=None,
-    type=click.Choice(["user", "project", "local"]),
-    help="Scope to check (default: detected from the current directory or above)",
-)
-def skills(list_only: bool, skill_name: str, tokens: bool, scope: str | None):
-    """
-    Manage and inspect SuperClaude skills
-
-    v2.1.0 Features:
-    - Skill discovery with frontmatter parsing
-    - Token estimation for context budgeting
-    - Skill detail inspection
-
-    Examples:
-        superclaude skills --list
-        superclaude skills --info confidence-check
-        superclaude skills --tokens
-    """
-    from .install_paths import resolve_reporting_target
-
-    # Read-only: reporting walks up to the install, writing follows the shell.
-    scope, base_path = resolve_reporting_target(None if _scope_was_default() else scope)
-    skills_path = base_path / "skills"
-
-    if not skills_path.exists():
-        click.echo(f"⚠️  No skills installed at {skills_path}")
-        click.echo("   Run 'superclaude install' first")
-        sys.exit(1)
-
-    # Discover skills (directories with SKILL.md)
-    skill_dirs = []
-    for item in skills_path.iterdir():
-        if item.is_dir() and not item.name.startswith("_"):
-            manifest = item / "SKILL.md"
-            if not manifest.exists():
-                manifest = item / "skill.md"
-            if manifest.exists():
-                skill_dirs.append((item, manifest))
-
-    skill_dirs.sort(key=lambda x: x[0].name)
-
-    if not skill_dirs:
-        click.echo(f"⚠️  No skills found in {skills_path}")
-        sys.exit(1)
-
-    # Token estimation mode
-    if tokens:
-        try:
-            from superclaude.scripts.token_estimator import (
-                format_token_report,
-                get_context_token_summary,
-            )
-
-            summary = get_context_token_summary()
-            report = format_token_report(summary)
-            click.echo(report)
-        except ImportError:
-            click.echo("⚠️  Token estimator not available")
-            sys.exit(1)
-        return
-
-    # Info mode
-    if skill_name:
-        skill_dir = None
-        for d, m in skill_dirs:
-            if d.name == skill_name or d.name.replace("-", "_") == skill_name.replace(
-                "-", "_"
-            ):
-                skill_dir = d
-                manifest = m
-                break
-
-        if not skill_dir:
-            click.echo(f"❌ Skill '{skill_name}' not found")
-            click.echo(
-                f"   Available skills: {', '.join(d.name for d, _ in skill_dirs[:5])}..."
-            )
-            sys.exit(1)
-
-        content = manifest.read_text(encoding="utf-8")
-
-        # Parse frontmatter
-        fm = parse_frontmatter(content)
-
-        click.echo(f"📋 Skill: {skill_dir.name}\n")
-        click.echo(f"   Name: {fm.get('name', skill_dir.name)}")
-        click.echo(f"   Description: {fm.get('description', 'N/A')}")
-        if fm.get("context"):
-            click.echo(f"   Context: {fm.get('context')}")
-        if fm.get("agent"):
-            click.echo(f"   Agent: {fm.get('agent')}")
-        if fm.get("hooks"):
-            click.echo(f"   Hooks: {list(fm.get('hooks', {}).keys())}")
-
-        click.echo(f"\n   Path: {skill_dir}")
-
-        # Count files
-        file_count = sum(1 for f in skill_dir.glob("**/*") if f.is_file())
-        click.echo(f"   Files: {file_count}")
-        return
-
-    # Default: list skills
-    click.echo(f"📋 Available Skills (scope: {scope}):\n")
-
-    for skill_dir, manifest in skill_dirs:
-        content = manifest.read_text(encoding="utf-8")
-
-        # Parse frontmatter
-        fm = parse_frontmatter(content)
-        description = fm.get("description", "N/A")
-        if len(description) > 40:
-            description = description[:37] + "..."
-        context = " [fork]" if fm.get("context") == "fork" else ""
-
-        click.echo(f"   {skill_dir.name:25} {description}{context}")
-
-    click.echo(f"\n   Total: {len(skill_dirs)} skills")
-    click.echo("   Use --info <skill> for details, --tokens for estimates")
-
-
 @main.command(name="verify-drift")
 @click.option(
     "--scope",
@@ -849,14 +660,8 @@ def verify_drift_cmd(scope: str | None, verbose: bool):
     - DRIFTED: installed file differs from source
     - EXTRA: installed file has no source counterpart
 
-    Coverage: component .md files (incl. core/rules/), skill SKILL.md
-    manifests, and CLAUDE_SC.md. Not checked: templates/, installed
-    scripts/, and the merged hooks.json.
-
-    EXTRA is not reported for skills: .claude/skills is shared with every other
-    tool that installs skills, so a directory SuperClaude does not ship is
-    normal there. The trade-off is that a skill dropped by a release is not
-    reported either — install never prunes, so remove it by hand.
+    Coverage: component .md files (incl. core/rules/) and CLAUDE_SC.md.
+    Not checked: templates/, installed scripts/, and the merged hooks.json.
 
     Examples:
         superclaude verify-drift
@@ -954,8 +759,7 @@ def audit(
 
     Combines drift detection, cross-reference validation, and content usage
     checks into a single report. Drift coverage matches verify-drift
-    (templates/, installed scripts/, and hooks.json are not checked, and EXTRA
-    is not reported for the shared skills directory).
+    (templates/, installed scripts/, and hooks.json are not checked).
 
     Examples:
         superclaude audit
@@ -1155,7 +959,7 @@ def auto_improve_cmd(args):
 @click.argument("args", nargs=-1, type=click.UNPROCESSED)
 def parallel_ab_cmd(args):
     """
-    Run N prompt/skill variants in parallel and aggregate the results.
+    Run N prompt variants in parallel and aggregate the results.
 
     Forwards to the harness's own parser, so `superclaude parallel-ab --help`
     lists every flag. This entry point exists because the harness imports
@@ -1248,7 +1052,7 @@ def _packaged_loader() -> Path:
 
     The UserPromptSubmit hook runs the INSTALLED copy instead
     (hooks.json's ``{{SCRIPTS_PATH}}/context_loader.py``, which
-    ``install_components._resolve_template_paths`` resolves to
+    ``install_components.install_hooks_and_scripts`` resolves to
     ``<content root>/scripts``), so the two can drift apart.
     """
     return Path(__file__).resolve().parent.parent / "scripts" / "context_loader.py"

@@ -145,11 +145,6 @@ class TestInventoryCommandsResolveTheInstall:
         assert "(scope: local)" in result.output
         assert "No agents installed" not in result.output
 
-    def test_skills_lists_the_local_install(self, local_install):
-        result = _run(["skills", "--list"])
-
-        assert "(scope: local)" in result.output
-
     def test_list_all_reports_the_local_install(self, local_install):
         result = _run(["install", "--list-all"])
 

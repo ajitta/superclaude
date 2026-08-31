@@ -26,7 +26,6 @@ Authoritative human docs live in `src/superclaude/ARCHITECTURE.md` (taxonomy sou
 
 ## Skills
 
-- [Skills index](/skills/index.md): Reusable capability modules loaded on trigger (confidence-check, ship, simplicity-coach …). (5 concepts)
 
 ## MCP Servers
 
