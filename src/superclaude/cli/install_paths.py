@@ -18,7 +18,6 @@ COMPONENTS = {
     "core": ("core", "superclaude/core", "Core framework (PRINCIPLES, FLAGS, RULES)"),
     "modes": ("modes", "superclaude/modes", "Behavioral modes"),
     "mcp": ("mcp", "superclaude/mcp", "MCP server documentation"),
-    "skills": ("skills", "skills", "Skills"),
     "templates": (
         "templates",
         "superclaude/templates",
@@ -112,7 +111,7 @@ def _get_source_dir(component: str) -> Path:
     Get source directory for a component.
 
     Args:
-        component: Component name (commands, agents, core, modes, mcp, skills)
+        component: Component name (commands, agents, core, modes, mcp, templates)
 
     Returns:
         Path to component source directory
@@ -140,3 +139,32 @@ def _get_target_dir(component: str, base_path: Path = None) -> Path:
 
     target_subdir = COMPONENTS[component][1]
     return base_path / target_subdir
+
+
+# Skills shipped by releases before the skills layer was deleted. SuperClaude
+# ships no skills now, so there is no source dir to diff against — the names are
+# listed literally. Both install and uninstall prune them: without the install
+# side, an upgrade leaves the directories in place, the two auto-invocable ones
+# (confidence-check, verbalized-sampling) keep firing with no source left to
+# explain them, and a local-scope install no longer git-excludes them, so they
+# surface as untracked files in a team repo.
+LEGACY_SKILL_NAMES = (
+    "confidence-check",
+    "finishing-a-development-branch",
+    "ship",
+    "simplicity-coach",
+    "verbalized-sampling",
+)
+
+
+def find_legacy_skills(base_path: Path) -> list:
+    """Installed skill directories left behind by a pre-removal release.
+
+    Only the exact shipped names are matched: ``.claude/skills`` is shared with
+    every other tool that installs skills, so anything else there is someone
+    else's and must be left alone.
+    """
+    skills_dir = base_path / "skills"
+    return [
+        skills_dir / name for name in LEGACY_SKILL_NAMES if (skills_dir / name).is_dir()
+    ]

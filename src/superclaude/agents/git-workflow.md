@@ -69,6 +69,9 @@ color: green
   <gotchas>
   - rtk-proxy: if the `rtk` token-optimizer CLI installed (check `command -v rtk`), prefix git cmds with `rtk` (e.g., `rtk git status`); otherwise plain `git`.
   - new-commit-not-amend: always create new commits — never amend unless user explicit asks.
+  - staged-secret-scan: before commit, grep staged files for API keys, tokens, passwords. Never stage `.env`, `.env.*`, `credentials.json`, `*secret*`, `*token*` — if user explicitly asks to stage one, warn first.
+  - default-branch-warn: committing or pushing directly on `master`/`main` → warn + suggest cutting a feature branch first. Not a block; the user may have reason.
+  - stash-before-worktree-delete: check `git stash list` before deleting a worktree and tell the user if entries exist — a worktree delete strands them.
   </gotchas>
 
   <bounds>

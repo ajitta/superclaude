@@ -43,7 +43,6 @@ SKIP_DIRS = {"node_modules", "__pycache__", ".venv", "dist", "build", ".git"}
 AUTHORING_TEST_MAP = {
     "agents": "tests/unit/test_agent_structure.py",
     "commands": "tests/unit/test_command_structure.py",
-    "skills": "tests/unit/test_skill_structure.py",
     "modes": "tests/unit/test_mode_structure.py",
 }
 

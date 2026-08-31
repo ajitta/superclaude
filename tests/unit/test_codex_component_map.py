@@ -70,7 +70,6 @@ def _actual_counts() -> dict[str, int]:
         "modes/MODE_*.md": _count_md(_component_dir("modes"), "MODE_*.md"),
         "modes/*CONFIG*.md": _count_md(_component_dir("modes"), "*CONFIG*.md"),
         "mcp/MCP_*.md": _count_md(_component_dir("mcp"), "MCP_*.md"),
-        "skills/*/SKILL.md": len(list(_component_dir("skills").glob("*/SKILL.md"))),
         "templates/docs-scaffold/*": len(
             [
                 p
@@ -93,7 +92,6 @@ _ROW_KEYS = {
     "`modes/MODE_*.md`": "modes/MODE_*.md",
     "`modes/*CONFIG*.md`": "modes/*CONFIG*.md",
     "`mcp/MCP_*.md`": "mcp/MCP_*.md",
-    "`skills/*/SKILL.md`": "skills/*/SKILL.md",
     "`templates/docs-scaffold/*`": "templates/docs-scaffold/*",
     "distinct hook entry scripts": "distinct hook entry scripts",
     "전체 Python module": "전체 Python module",

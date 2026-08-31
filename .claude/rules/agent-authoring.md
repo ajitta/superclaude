@@ -7,7 +7,6 @@ paths: ["src/superclaude/agents/**", ".claude/rules/agent-authoring.md"]
 > **Decision gate.** Make agent for **domain expertise** that CC auto-delegate on description match.
 > - Agent = **WHO TO BE** (domain expert persona)
 > - Command = **WHAT TO DO** (user-invoked workflow)
-> - Skill = **WHICH CAPABILITY** (CC-native tool/hook)
 > - Mode = **HOW TO THINK** (cognitive overlay)
 
 > **What CC load.** Subagent session hold only markdown body (system prompt) plus min env context — *not* parent CC system prompt, *not* parent skills. Write body self-contained. Subagent no spawn more subagents (only main thread can, via `--agent` + `Agent` in `tools`); design each agent return one summary, no nested delegation.
@@ -37,7 +36,7 @@ tools: Read, Grep, Glob, Agent              # allow-list (comma-separated)
 disallowedTools: Edit, Write                # deny-list (applied first, then `tools` resolved against remainder)
 effort: high                                # low | medium | high | xhigh | max  (string, not 1-5)
 maxTurns: 20                                # positive integer turn cap
-skills: [confidence-check]                  # full skill body injected at startup; subagent does NOT inherit parent skills
+skills: [some-installed-skill]              # full skill body injected at startup; subagent does NOT inherit parent skills
 mcpServers: [serena]                        # references to configured servers, or inline definitions
 
 # Advanced — rarely set in SuperClaude agents
@@ -110,7 +109,7 @@ No add `effort: xhigh` because domain "feels" coding-heavy — session default c
 | Extended | 25-30 | Deep research, complex debugging |
 | Unlimited | *omit* | Orchestrators (project-manager) |
 
-**`skills`** — full skill body inject at startup (~500 tokens each). Subagent **not** inherit skills from parent — list explicit. No preload skills with `disable-model-invocation: true` (CC skip and warn to debug log). Name match `src/superclaude/skills/` directory.
+**`skills`** — full skill body inject at startup (~500 tokens each). Subagent **not** inherit skills from parent — list explicit. No preload skills with `disable-model-invocation: true` (CC skip and warn to debug log). SuperClaude ships no skills of its own — names refer to skills installed in `~/.claude/skills/` or `.claude/skills/`.
 
 **`model`** — default `inherit` (use parent model). Use `sonnet` for execution/template/code; omit (inherit) for design judgment / synthesis. Resolution order: `CLAUDE_CODE_SUBAGENT_MODEL` env > per-invocation > frontmatter > parent. Full routing list: `agents/README.md` Model Routing.
 
@@ -251,7 +250,7 @@ Rules below apply to all components, not restated above. See `.claude/rules/xml-
 3. Pick tool access pattern — one of `tools` or `disallowedTools`, never both.
 4. Set `maxTurns`; omit `effort` unless measured evidence justify it.
 5. Pick `color` by role group; pick `model` by cognitive complexity (omit to inherit).
-6. Consider `skills: [confidence-check]` for analytical agents.
+6. `skills:` preloads an installed skill's body. SuperClaude ships none — only name one that is actually installed in the target scope.
 7. Add `<memory_guide>` (required) and `<gotchas>` (recommended).
 8. Run `uv run pytest tests/unit/test_agent_structure.py -v`.
 9. Update `src/superclaude/agents/README.md` table.

@@ -31,6 +31,6 @@ forbidden_command_fields:
   - memory         # agent-only
   - color          # agent-only
   - autonomy       # not an official CC field
-  - context        # skill-only
-  - agent          # skill-only
-  - hooks          # skill-only
+  - context        # skill-only in CC; SuperClaude ships no skills
+  - agent          # skill-only in CC; SuperClaude ships no skills
+  - hooks          # skill-only in CC; SuperClaude ships no skills

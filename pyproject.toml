@@ -102,15 +102,12 @@ addopts = [
     # tests/unit/scripts/ temporarily excluded: native crash (exit 0xC0000409,
     # stack buffer overrun) during collection/run. Re-enable once root cause fixed.
     "--ignore=tests/unit/scripts",
-    "-m",
-    "not canary",
 ]
 markers = [
     "unit: Unit tests",
     "integration: Integration tests",
     "hallucination: Hallucination detection tests",
     "performance: Performance benchmark tests",
-    "canary: Per-skill trigger regression tests (slow; invoke claude -p; excluded from default run)",
 ]
 
 [tool.coverage.run]

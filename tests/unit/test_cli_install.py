@@ -580,98 +580,6 @@ class TestFailuresReachTheSummary:
         assert success, message
 
 
-class TestInstalledCountIsSuperClaudeOnly:
-    """--list-all counts what SuperClaude ships, not what shares the directory.
-
-    Regression target: `installed` counted every subdirectory of the shared
-    target, so 30 third-party skills in .claude/skills rendered `[13/5]` on a
-    fully correct install. The same defect was latent for agents and commands
-    the moment a foreign .md landed in either.
-    """
-
-    def _shipped(self, component: str) -> list[str]:
-        from superclaude.cli.install_inventory import (
-            _source_dir_names,
-            _source_md_names,
-        )
-        from superclaude.cli.install_paths import _get_source_dir
-
-        source = _get_source_dir(component)
-        names = (
-            _source_dir_names(source)
-            if component in ("skills", "templates")
-            else _source_md_names(source)
-        )
-        return sorted(names)
-
-    def _install_skills(self, base, names):
-        for name in names:
-            skill_dir = base / "skills" / name
-            skill_dir.mkdir(parents=True, exist_ok=True)
-            (skill_dir / "SKILL.md").write_text(f"# {name}\n", encoding="utf-8")
-
-    def test_foreign_skills_do_not_inflate_the_count(self, tmp_path):
-        from superclaude.cli.install_inventory import list_all_components
-
-        base = tmp_path / ".claude"
-        shipped = self._shipped("skills")
-        self._install_skills(base, shipped)
-        self._install_skills(base, [f"foreign-{i}" for i in range(30)])
-
-        row = list_all_components(base_path=base, scope="local")["skills"]
-
-        assert row["installed"] == len(shipped)
-        assert row["available"] == len(shipped)
-
-    def test_foreign_skills_alone_count_as_none_installed(self, tmp_path):
-        from superclaude.cli.install_inventory import list_all_components
-
-        base = tmp_path / ".claude"
-        self._install_skills(base, [f"foreign-{i}" for i in range(30)])
-
-        row = list_all_components(base_path=base, scope="local")["skills"]
-
-        assert row["installed"] == 0
-
-    def test_foreign_agent_markdown_does_not_inflate_the_count(self, tmp_path):
-        """Installs a strict subset, so returning the source count cannot pass.
-
-        Installing every shipped agent plus one foreign file made the assertion
-        hold for the correct implementation and for one that never reads the
-        target directory at all.
-        """
-        from superclaude.cli.install_inventory import list_all_components
-
-        base = tmp_path / ".claude"
-        agents = base / "agents"
-        agents.mkdir(parents=True)
-        shipped = self._shipped("agents")
-        installed = shipped[: len(shipped) // 2]
-        assert 0 < len(installed) < len(shipped)
-        for name in installed:
-            (agents / name).write_text("---\n", encoding="utf-8")
-        for i in range(5):
-            (agents / f"someone-elses-agent-{i}.md").write_text(
-                "---\n", encoding="utf-8"
-            )
-
-        row = list_all_components(base_path=base, scope="local")["agents"]
-
-        assert row["installed"] == len(installed)
-        assert row["available"] == len(shipped)
-
-    def test_a_missing_shipped_file_still_reads_as_missing(self, tmp_path):
-        from superclaude.cli.install_inventory import list_all_components
-
-        base = tmp_path / ".claude"
-        shipped = self._shipped("skills")
-        self._install_skills(base, shipped[1:])
-
-        row = list_all_components(base_path=base, scope="local")["skills"]
-
-        assert row["installed"] == len(shipped) - 1
-
-
 class TestListingResolvesTheInstallInEffect:
     """--list/--list-all report on an install, so they walk up to it.
 
@@ -786,3 +694,70 @@ class TestWritePathKeepsTheShellAnchor:
 
         assert "(scope: user)" in result.output
         assert (home / ".claude" / "superclaude" / "CLAUDE_SC.md").exists()
+
+
+class TestLegacySkillsArePrunedOnUpgrade:
+    """Skills from a pre-removal release must not survive an upgrade.
+
+    The layer was deleted, so there is no source dir to diff an install against.
+    Without an explicit prune the directories stay forever: the two
+    auto-invocable ones (confidence-check, verbalized-sampling) keep firing with
+    no source left to explain them, and a local-scope install no longer
+    git-excludes them, so they surface as untracked files in a team repo.
+    """
+
+    LEGACY = (
+        "confidence-check",
+        "finishing-a-development-branch",
+        "ship",
+        "simplicity-coach",
+        "verbalized-sampling",
+    )
+
+    def _seed(self, base_path: Path, names) -> None:
+        for name in names:
+            d = base_path / "skills" / name
+            d.mkdir(parents=True, exist_ok=True)
+            (d / "SKILL.md").write_text("---\nname: x\n---\n", encoding="utf-8")
+
+    def test_install_removes_them(self, tmp_path):
+        from superclaude.cli.install_components import install_all
+
+        self._seed(tmp_path, self.LEGACY)
+
+        success, _ = install_all(base_path=tmp_path, force=True, scope="project")
+
+        assert success is True
+        for name in self.LEGACY:
+            assert not (tmp_path / "skills" / name).exists(), (
+                f"{name} survived the install — an upgrade leaves it firing forever"
+            )
+
+    def test_install_preserves_skills_superclaude_never_shipped(self, tmp_path):
+        """.claude/skills is shared; only the exact shipped names may be touched."""
+        from superclaude.cli.install_components import install_all
+
+        self._seed(tmp_path, [*self.LEGACY, "someone-elses-skill"])
+
+        install_all(base_path=tmp_path, force=True, scope="project")
+
+        assert (tmp_path / "skills" / "someone-elses-skill" / "SKILL.md").exists()
+
+    def test_uninstall_removes_them_too(self, tmp_path):
+        from superclaude.cli.install_inventory import uninstall_all
+
+        self._seed(tmp_path, [*self.LEGACY, "someone-elses-skill"])
+
+        uninstall_all(base_path=tmp_path, dry_run=False)
+
+        for name in self.LEGACY:
+            assert not (tmp_path / "skills" / name).exists()
+        assert (tmp_path / "skills" / "someone-elses-skill").exists()
+
+    def test_a_clean_install_says_nothing_about_them(self, tmp_path):
+        """No legacy dirs present -> no cleanup line in the summary."""
+        from superclaude.cli.install_components import install_all
+
+        _success, message = install_all(base_path=tmp_path, force=True, scope="project")
+
+        assert "pre-removal" not in message

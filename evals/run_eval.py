@@ -23,8 +23,8 @@ A check marked `gate: true` in tasks.yaml asserts an invariant (a secret stayed
 unread, a frozen file stayed unedited, a destructive command never ran). Gate
 failures are reported separately and are not offset by soft-metric averages.
 
-Reuse notes: invocation pattern mirrors tests/integration/test_skill_canary.py
-(`claude -p ... --output-format json`); auto_improve.eval_runner.run_eval was
+Reuse notes: invokes `claude -p ... --output-format json` directly;
+auto_improve.eval_runner.run_eval was
 evaluated and not imported — its shell→single-jmespath-metric contract doesn't
 cover stream-json transcripts or multi-check scoring.
 """

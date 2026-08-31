@@ -13,6 +13,7 @@ from typing import Any, Dict, List, Tuple
 from superclaude.utils import settings_filename
 
 from .install_paths import (
+    find_legacy_skills,
     COMPONENTS,
     _get_package_root,
     _get_source_dir,
@@ -125,7 +126,7 @@ def _hook_identity_counts(hooks_section: dict, superclaude_only: bool) -> Counte
 
 
 def _source_dir_names(source_dir: Path) -> set:
-    """Names of the subdirectories a component ships (skills, templates)."""
+    """Names of the subdirectories a component ships (templates)."""
     if not source_dir.exists():
         return set()
     return {
@@ -202,14 +203,13 @@ def list_all_components(
         target_dir = _get_target_dir(component, base_path)
 
         # Count source files (excluding README.md and __init__.py).
-        # skills and templates install per-subdirectory (copytree), so count
+        # templates installs per-subdirectory (copytree), so count
         # subdirectories — not top-level *.md, which templates has none of.
         #
         # Both sides are counted by *name*, and the installed side is the
-        # intersection with the source. Counting everything in the target dir
-        # instead rendered `[13/5]` on a correct install, because .claude/skills
-        # is shared with skills SuperClaude does not ship.
-        if component in ("skills", "templates"):
+        # intersection with the source, so a directory SuperClaude does not ship
+        # is never counted as installed.
+        if component == "templates":
             source_names = _source_dir_names(source_dir)
             installed_count = sum(
                 1 for name in source_names if (target_dir / name).is_dir()
@@ -426,52 +426,28 @@ def uninstall_all(
         messages.append(f"⏭️  Not found: {agents_dir}/")
         skipped += 1
 
-    # 4. Remove SuperClaude-installed skills (preserves user-added skills)
-    skills_dir = base_path / "skills"
-    skills_source = _get_source_dir("skills")
-    if skills_dir.exists():
-        sc_skill_names = (
-            {
-                d.name
-                for d in skills_source.iterdir()
-                if d.is_dir() and not d.name.startswith(("_", "."))
-            }
-            if skills_source.exists()
-            else set()
-        )
-        sc_skills_present = [
-            skills_dir / name for name in sc_skill_names if (skills_dir / name).is_dir()
-        ]
-        if sc_skills_present:
-            if dry_run:
+    # 4. Remove skills a pre-removal release installed (install prunes them too)
+    stale = find_legacy_skills(base_path)
+    if stale:
+        if dry_run:
+            messages.append(
+                f"[DRY-RUN] Would remove: {len(stale)} skill(s) from a pre-removal release"
+            )
+            removed += 1
+        else:
+            try:
+                for d in stale:
+                    shutil.rmtree(d)
                 messages.append(
-                    f"[DRY-RUN] Would remove: {len(sc_skills_present)} SC skill(s) from {skills_dir}/"
+                    f"✅ Removed: {len(stale)} skill(s) from a pre-removal release "
+                    f"(preserved non-SuperClaude skills)"
                 )
                 removed += 1
-            else:
-                try:
-                    for d in sc_skills_present:
-                        shutil.rmtree(d)
-                    if not any(skills_dir.iterdir()):
-                        skills_dir.rmdir()
-                        messages.append(
-                            f"✅ Removed: {skills_dir}/ (empty after SC cleanup)"
-                        )
-                    else:
-                        messages.append(
-                            f"✅ Removed: {len(sc_skills_present)} SC skill(s) from {skills_dir}/ (preserved non-SC skills)"
-                        )
-                    removed += 1
-                except Exception as e:
-                    messages.append(
-                        f"❌ Failed to remove SC skills from {skills_dir}/: {e}"
-                    )
-                    failed += 1
-        else:
-            messages.append(f"⏭️  No SC skills found in: {skills_dir}/")
-            skipped += 1
+            except OSError as e:
+                messages.append(f"❌ Failed to remove legacy skills: {e}")
+                failed += 1
     else:
-        messages.append(f"⏭️  Not found: {skills_dir}/")
+        messages.append("⏭️  No skills from a pre-removal release found")
         skipped += 1
 
     # 5. Remove .claude/hooks/hooks.json file

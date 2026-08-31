@@ -15,7 +15,7 @@
 
 </div>
 
-> **Origin & relationship to upstream.** `superclaude` started as a fork of [SuperClaude_Framework](https://github.com/SuperClaude-Org/SuperClaude_Framework) (Kazuki Nakai, NomenAK, Mithun Gowda B). It has since diverged — different MCP set, procedural skills system, insight pipeline, scope-explicit install, tightened workflow gates — and is **no longer a downstream of upstream**. The two projects share neither roadmap nor maintainers.
+> **Origin & relationship to upstream.** `superclaude` started as a fork of [SuperClaude_Framework](https://github.com/SuperClaude-Org/SuperClaude_Framework) (Kazuki Nakai, NomenAK, Mithun Gowda B). It has since diverged — different MCP set, insight pipeline, scope-explicit install, tightened workflow gates — and is **no longer a downstream of upstream**. The two projects share neither roadmap nor maintainers.
 
 ---
 
@@ -23,14 +23,14 @@
 
 ## 📊 **At a glance**
 
-| Commands | Agents | Modes | MCP Servers | Skills |
-|:--------:|:------:|:-----:|:-----------:|:------:|
-| **36**   | **23** | **7** | **4**       | **5**  |
-| Slash    | Domain-expert | Behavioral | Integrations | Procedural |
+| Commands | Agents | Modes | MCP Servers |
+|:--------:|:------:|:-----:|:-----------:|
+| **36**   | **23** | **8** | **4**       |
+| Slash    | Domain-expert | Behavioral | Integrations |
 
 </div>
 
-36 slash commands cover the development lifecycle from brainstorming to deployment. 5 procedural skills (`confidence-check`, `ship`, `simplicity-coach`, `verbalized-sampling`, `finishing-a-development-branch`) auto-load on matching prompts.
+36 slash commands cover the development lifecycle from brainstorming to deployment. 8 behavioral modes auto-load on matching flags and keywords.
 
 ---
 
@@ -53,7 +53,7 @@ Claude Code reads those files at session start, which is how the framework chang
 | [`CLAUDE.md`](CLAUDE.md) | Project-specific rules: env (UV), make targets, how to run the tests, git workflow |
 | [`src/superclaude/ARCHITECTURE.md`](src/superclaude/ARCHITECTURE.md) | Content-framework taxonomy — directory roles, delivery pipelines, content types |
 | [`src/superclaude/CLAUDE_SC.md`](src/superclaude/CLAUDE_SC.md) | The always-loaded import chain → `core/FLAGS.md`, `PRINCIPLES.md`, `RULES.md` |
-| [`.claude/rules/`](.claude/rules) | Authoring specs for agents/commands/skills/modes |
+| [`.claude/rules/`](.claude/rules) | Authoring specs for agents/commands/modes |
 | [`.claude/rules/gotchas/`](.claude/rules/gotchas) | Project-specific traps (e.g. *do not Read sub-agent `*.output` files*) |
 | [`SECURITY.md`](SECURITY.md) | Security disclosure policy |
 
@@ -63,7 +63,7 @@ Claude Code reads those files at session start, which is how the framework chang
 
 ### **Current Stable Version (v4.8.0+ajitta)**
 
-`superclaude` ships markdown content (commands, agents, modes, MCP docs, core rules, hooks, skills) plus a small CLI that copies it into Claude Code's content directories.
+`superclaude` ships markdown content (commands, agents, modes, MCP docs, core rules, hooks) plus a small CLI that copies it into Claude Code's content directories.
 
 #### **1. Install the CLI**
 
@@ -96,7 +96,6 @@ What gets installed (per scope):
 <scope>/
 ├── commands/sc/        # 36 slash commands (/sc:plan, /sc:implement, …)
 ├── agents/             # 23 agent definitions
-├── skills/             # 5 procedural skills
 ├── superclaude/        # core rules, modes, mcp docs, scripts
 ├── hooks/hooks.json    # SessionStart / PreCompact / SessionEnd / etc.
 └── settings(.local).json  # framework hooks merged in (your existing hooks preserved)
@@ -164,7 +163,6 @@ The uninstall is marker-based: it removes only the hooks and the `@superclaude` 
 | Command | Scopes | Default |
 |---------|--------|---------|
 | `superclaude install` / `update` / `uninstall` | `user`, `project`, `local` | `user` |
-| `superclaude install-skill` | `user`, `project` | `user` |
 | `superclaude mcp` | `user`, `project`, `local` | `user` |
 
 | Scope | Path | When to use |
@@ -305,7 +303,7 @@ The framework's value comes from chaining commands. Each chain has gates: a step
 | **External research** | `/sc:research --depth deep --tavily --c7` → `/sc:reflect` |
 | **Codebase onboarding** | `/sc:load` → `/sc:index-repo` → `/sc:explain` |
 | **Strategy / market** | `/sc:business-panel` → `/sc:reflect` |
-| **End of branch** | `/sc:review` → `/sc:test` → `/sc:git` (commit) → `ship` skill (PR) |
+| **End of branch** | `/sc:review` → `/sc:test` → `/sc:git` (commit + PR) |
 
 #### Tips
 
@@ -320,27 +318,26 @@ The framework's value comes from chaining commands. Each chain has gates: a step
 
 `superclaude` builds on the original [SuperClaude_Framework](https://github.com/SuperClaude-Org/SuperClaude_Framework) by Kazuki Nakai, NomenAK, and Mithun Gowda B. To support that upstream project's authors directly, see their channels on the upstream repo — sponsorship goes to them, not to this fork.
 
-This fork is a personal, opinionated reshape of the framework: different MCP set, skills system, insight pipeline, scope-explicit deploy, tightened workflow gates. It is **not** maintained by the upstream authors.
+This fork is a personal, opinionated reshape of the framework: different MCP set, insight pipeline, scope-explicit deploy, tightened workflow gates. It is **not** maintained by the upstream authors.
 
 ---
 
 ## 🎉 **What's new in this fork**
 
-*Procedural skills, an insight pipeline, scope-explicit deployment, and tightened brainstorm → plan → implement → review workflow gates.*
+*An insight pipeline, scope-explicit deployment, and tightened brainstorm → plan → implement → review workflow gates.*
 
 <div align="center">
 <table>
 <tr>
 <td width="50%">
 
-### 🧩 **Procedural Skills System**
-**5 auto-loaded skills** that fire on matching prompts:
-- **confidence-check** → Pre-implementation validation gate
-- **simplicity-coach** → Orient-Step-Learn discipline, anti over-engineering
-- **verbalized-sampling** → Probability-weighted candidate generation (`--vs`)
-- **ship** / **finishing-a-development-branch** → End-of-branch workflow
+### 🛡️ **Hook-Enforced Safety**
+Rules that must hold are enforced by hooks, not prose:
+- **destructive_guard** → blocks force-push to `main`/`master`, asks on `reset --hard` / `clean -f` / `branch -D`
+- **file_size_guard** → blocks unbounded `Read` on files >30KB
+- **loop_guard** → circuit breaker on repeated failing edits
 
-Skills live under `Skills/<name>/SKILL.md` and load via Claude Code's native skill loader — no boilerplate.
+Hooks merge into your `settings.json` — your existing hooks are preserved. See `docs/adr/0001-hooks-are-the-enforcement-boundary.md`.
 
 </td>
 <td width="50%">
@@ -385,7 +382,7 @@ superclaude mcp
 <td width="50%">
 
 ### 🎯 **Behavioral Modes**
-**7 adaptive modes** for different contexts:
+**8 adaptive modes** for different contexts:
 - **Brainstorming** → Socratic discovery for vague requests
 - **Business Panel** → Multi-expert strategic analysis
 - **Deep Research** → Autonomous web research
@@ -393,6 +390,7 @@ superclaude mcp
 - **Token-Efficiency** → 30-50% context savings via symbol system
 - **Task Management** → Systematic organization
 - **Introspection** → Meta-cognitive analysis & error recovery
+- **Verbalized Sampling** → Probability-weighted candidate distributions (`--vs`)
 
 </td>
 </tr>
@@ -416,7 +414,6 @@ superclaude mcp
 - Auto-trigger `/sc:review` on delegated decisions
 - Plan default: phase framing; opt-in `--pr-bundle` for multi-PR
 - `verified:` convention + SessionStart memory-staleness warning
-- Per-skill canary manifests guard against trigger regressions
 
 </td>
 </tr>
@@ -549,9 +546,8 @@ The Deep Research system intelligently coordinates multiple tools:
 | Serena MCP troubleshooting | [`docs/troubleshooting/serena-installation.md`](docs/troubleshooting/serena-installation.md) |
 | Slash commands (36) | [`src/superclaude/Commands/`](src/superclaude/Commands) · `superclaude install --list-all` |
 | Agents (23) | [`src/superclaude/Agents/`](src/superclaude/Agents) |
-| Modes (7) | [`src/superclaude/Modes/`](src/superclaude/Modes) |
+| Modes (8) | [`src/superclaude/Modes/`](src/superclaude/Modes) |
 | MCP servers (4) | [`src/superclaude/MCP/`](src/superclaude/MCP) |
-| Skills (5) | [`src/superclaude/Skills/`](src/superclaude/Skills) |
 | Core rules (always-loaded) | [`FLAGS.md`](src/superclaude/core/FLAGS.md) · [`PRINCIPLES.md`](src/superclaude/core/PRINCIPLES.md) · [`RULES.md`](src/superclaude/core/RULES.md) |
 | Authoring specs for new content | [`.claude/rules/`](.claude/rules) |
 | Health & drift checks | `superclaude doctor` · `superclaude verify-drift` · `superclaude context reset` |

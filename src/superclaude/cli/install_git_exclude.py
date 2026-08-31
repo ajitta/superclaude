@@ -36,10 +36,9 @@ MARKER_END = "# <<< superclaude (local scope) <<<"
 def _collect_local_entries() -> List[str]:
     """Enumerate SC-installed paths for the local-scope exclude block.
 
-    Agents and skills are listed per-file/per-dir so team-shared content in
-    ``.claude/agents/`` and ``.claude/skills/`` keeps working. Commands and
-    the superclaude core live in SC-only subdirectories, so directory-level
-    ignores are safe there.
+    Agents are listed per-file so team-shared content in ``.claude/agents/``
+    keeps working. Commands and the superclaude core live in SC-only
+    subdirectories, so directory-level ignores are safe there.
     """
     entries: List[str] = []
 
@@ -48,12 +47,6 @@ def _collect_local_entries() -> List[str]:
         for f in sorted(agents_src.glob("*.md")):
             if f.stem.upper() != "README":
                 entries.append(f".claude/agents/{f.name}")
-
-    skills_src = _get_source_dir("skills")
-    if skills_src.exists():
-        for d in sorted(skills_src.iterdir()):
-            if d.is_dir() and not d.name.startswith(("_", ".")):
-                entries.append(f".claude/skills/{d.name}/")
 
     entries.append(".claude/agent-memory-local/")
     entries.append(".claude/agent-memory/")

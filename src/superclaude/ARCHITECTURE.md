@@ -11,7 +11,6 @@ core/           Framework DNA       Constitution    Always loaded (CLAUDE_SC.md)
 modes/          Mindset overlay     Mood/Posture    On-demand (context_loader)
 agents/         Domain expert       Specialist      CC-native delegation
 commands/       Workflow entry      Menu item       CC-native /sc:*
-skills/         Runtime hooks       Safety gate     CC-native (hooks + safety only)
 mcp/            Tool docs+config    Tool manual     context_loader + install_mcp
 scripts/        Hook infra          Plumbing        hooks.json → settings.json
 ```
@@ -59,20 +58,6 @@ User-facing workflow entry points accessible as `/sc:*` slash commands. Managed 
 
 **Contract:** Commands define what to do, not how to think. They route to agents, activate modes, and orchestrate tool usage. Each command has syntax, flow steps, and handoff chains.
 
-### skills/ — RUNTIME HOOKS & SAFETY
-
-CC-native execution containers limited to capabilities that commands and agents cannot provide: lifecycle hooks, tool restrictions, auto-invocation blocking, and script execution.
-
-**Contract:** Skills exist only when CC-native features are required. Multi-step user-facing workflows belong in commands/; skills MAY define an internal `<flow>` for ordered execution within the CC-native capability they wrap. Domain expertise belongs in agents/. Skills provide:
-- `hooks` (PreToolUse, PostToolUse, Stop) — runtime behavior modification
-- `disable-model-invocation` — prevent auto-execution of destructive workflows
-- `allowed-tools` — restrict tool access for safety
-- Script execution via `{{SKILLS_PATH}}` template variables
-
-**Current skills (5):** confidence-check (reference skill — auto-invoked on trigger phrases), simplicity-coach (disable-model-invocation + scripts), ship (disable-model-invocation + PreToolUse hook), finishing-a-development-branch (disable-model-invocation + allowed-tools + PreToolUse hook), verbalized-sampling (reference skill — auto-invoked on trigger phrases)
-
-**Optional canary manifest:** Skills MAY ship a `canary.yaml` next to `SKILL.md`. Each entry is `{trigger: <user phrase>, expected_pattern: <regex>}`. The canary fixture (`tests/integration/test_skill_canary.py`) iterates manifests and runs `claude -p '<trigger>'` to assert the trigger still routes to the skill. Excluded from default `make test`; run explicitly via `pytest -m canary`. Reference manifests: `confidence-check`, `verbalized-sampling`. Addresses the silent-trigger-regression class.
-
 ### mcp/ — TOOL REFERENCE
 
 Documentation and configuration for MCP (Model Context Protocol) servers. Server docs are loaded on-demand by context_loader.py; server configs are installed by `install_mcp.py`.
@@ -83,7 +68,7 @@ Documentation and configuration for MCP (Model Context Protocol) servers. Server
 
 Python and shell scripts that power SuperClaude's hook system, context loading, and session management. Referenced by `hooks.json` and executed by Claude Code's hook runtime.
 
-**Contract:** Scripts are infrastructure plumbing — they should be invisible to the user. They handle context injection, session initialization, skill activation, and formatting hooks.
+**Contract:** Scripts are infrastructure plumbing — they should be invisible to the user. They handle context injection, session initialization, and formatting hooks.
 
 **Sub-package:** `scripts/auto_improve/` — overnight autonomous code improvement loop powering `/sc:auto-improve` (coordinator, eval_runner, mutator, worktree isolation, results reporter). Distinct from per-event hook scripts; runs as a standalone `superclaude auto-improve` console entrypoint (`uv run python -m superclaude.scripts.auto_improve` in a dev checkout).
 
@@ -116,14 +101,10 @@ Session Start
   │                    (TRIGGER_MAP matching, session dedup,
   │                     8K token budget, hybrid injection)
   ▼
-4. CC auto-detection → skills/                                ← description keyword matching
-  │                    (name + description loaded at startup,
-  │                     full SKILL.md on invocation)
-  ▼
-5. User invokes → commands/                                   ← /sc:* slash commands
+4. User invokes → commands/                                   ← /sc:* slash commands
   │
   ▼
-6. CC delegation → agents/                                    ← task-based agent selection
+5. CC delegation → agents/                                    ← task-based agent selection
                    (description triggers, model routing,
                     permissionMode enforcement)
 ```
@@ -134,7 +115,7 @@ Session Start
 |-----------|--------------|---------|--------|
 | **Always loaded** | core/ (FLAGS, PRINCIPLES, RULES kernel) | Session start | ~140 lines via @import |
 | **On-demand** | modes/, mcp/, core/rules/, core/BUSINESS_SYMBOLS | Flag/keyword in prompt | 8K token budget (context_loader) |
-| **CC-native** | agents/, commands/, skills/ | Auto-delegation, /sc:*, hooks/safety | Managed by Claude Code runtime |
+| **CC-native** | agents/, commands/ | Auto-delegation, /sc:* | Managed by Claude Code runtime |
 
 ## Naming Trinity
 
@@ -154,8 +135,6 @@ Domain: "Business"
 
 These are not redundant — each serves a distinct purpose in the framework.
 
-**Note:** Skills are deliberately absent from the naming trinity. They serve a cross-cutting infrastructure role (hooks, safety), not a domain-specific one. User-facing multi-step workflows that were formerly in skills now live in commands; skills retain `<flow>` for internal sequencing of their CC-native capability.
-
 ## Authoring Rules
 
 Each content type has a dedicated authoring guide:
@@ -164,20 +143,19 @@ Each content type has a dedicated authoring guide:
 |-------------|----------------|-----------------|
 | agents/ | `.claude/rules/agent-authoring.md` | `tests/unit/test_agent_structure.py` |
 | commands/ | `.claude/rules/command-authoring.md` | `tests/unit/test_command_structure.py` |
-| skills/ | `.claude/rules/skill-authoring.md` | `tests/unit/test_skill_structure.py` |
 | modes/ | `.claude/rules/mode-authoring.md` | `tests/unit/test_mode_structure.py` |
 | core/ | N/A (framework maintainers only) | N/A |
 | mcp/ | `.claude/rules/mcp-authoring.md` | `tests/unit/test_content_structure.py` |
 | scripts/ | Standard Python/shell conventions | `tests/unit/` (per-script) |
 
-Cross-cutting body-format rule: `.claude/rules/xml-prose-format.md` governs XML body prose style for all component bodies under `src/superclaude/` (agents/commands/skills/modes/mcp/core). Authoring meta-docs themselves are exempt — they may use plain Markdown.
+Cross-cutting body-format rule: `.claude/rules/xml-prose-format.md` governs XML body prose style for all component bodies under `src/superclaude/` (agents/commands/modes/mcp/core). Authoring meta-docs themselves are exempt — they may use plain Markdown.
 
 ## XML Component Pattern
 
 All content types use the unified `<component>` XML pattern:
 
 ```xml
-<component name="{name}" type="{agent|command|skill|mode|mcp|core}">
+<component name="{name}" type="{agent|command|mode|mcp|core}">
   <role>
     <mission>Single-sentence purpose</mission>
   </role>
@@ -197,12 +175,11 @@ Type-specific required sections:
 |------|-------------------|
 | agent | role, mission, mindset, focus, actions, outputs, tool_guidance, bounds |
 | command | role, mission, syntax, flow, bounds, handoff |
-| skill | role, mission, gotchas, bounds, handoff (flow optional — for ordered internal sequencing) |
 | mode | role, mission, thinking, communication, priorities, behaviors, bounds, handoff |
 | mcp | role, mission, bounds, handoff |
 
 ## Machine-Navigable Catalog (OKF)
 
-`okf/superclaude/` mirrors this taxonomy as an [Open Knowledge Format](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md) (OKF) v0.1 knowledge bundle — one concept doc per component (agent, command, mode, skill, MCP server, core file), each carrying a `resource` pointer back to its source in this tree. Navigation is progressive-disclosure: bundle `index.md` → section `index.md` → concept.
+`okf/superclaude/` mirrors this taxonomy as an [Open Knowledge Format](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md) (OKF) v0.1 knowledge bundle — one concept doc per component (agent, command, mode, MCP server, core file), each carrying a `resource` pointer back to its source in this tree. Navigation is progressive-disclosure: bundle `index.md` → section `index.md` → concept.
 
 This document stays the human-authored source of truth for the taxonomy; the bundle is a generated, agent-navigable catalog view of the same content. Regenerate the bundle after adding a component so the catalog stays in sync.

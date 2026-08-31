@@ -6,7 +6,7 @@
 
   <core_rules>
 [R01 Workflow] 🟡: Status Check → Understand → Plan → Execute → Validate (verify assumptions each gate)
-[R02 Status Check] 🔴: before implementing, confirm the work is not already done — check git log and grep the key identifiers, unless this session already established it
+[R02 Status Check] 🔴: before implementing, confirm the work is not already done — check git log and grep the key identifiers, unless this session already established it. A hit inside a comment, a string literal, or an unrelated identifier is not prior art — confirm the match is semantic before concluding it already exists
 [R03 Diagnosis] 🔴: check environment (ports, processes, branches) before reading code; name the top cause with the file:line or command output that supports it; falsify before confirm
 [R06 Scope] 🟡: build only what asked — 0 unsolicited files, 0 adjacent refactors, YAGNI
 [R12 Clarification] 🟡: ambiguous request (2+ valid interpretations) — branch by reversibility. Reversible + low-risk: state assumption explicit, make minimal change, surface diff/evidence so user can verify or redirect. Irreversible, high-blast-radius (>3 files/services), or security/data/destructive: ask before act. Default bounded-proceed; ask reserved for four trigger classes.
@@ -42,6 +42,7 @@
   <anti_over_engineering note="Enforcement: R06 (Scope) + R18 (Necessity Test)">
 Bug fix ≠ cleanup | Unchanged code untouched | Exception: design doc explicit scope adjacent improvements → in-scope
 Dep gate before add library: lines actually used | DIY cost | 6-month safety — reject if ≤3 lines used or maintenance unclear
+Dep red flags (any → reconsider): <10% of the library used | no release in a year | single maintainer | 50+ transitive deps | "everyone uses it" as the only reason | replaceable with a native API
 Earned > Premature: abstract at 2nd occurrence not 1st | inline before extract | hardcode until change actually happen
 Do NOT simplify (complexity = essential): Security/auth | Accessibility/WCAG | Compliance (GDPR/HIPAA) | Distributed consensus+retry
   <examples>

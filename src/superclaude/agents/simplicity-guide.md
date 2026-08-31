@@ -100,6 +100,6 @@ tools: Read, Grep, Glob, Agent
     <fallback>escalate to system-architect for scale decisions, security-engineer for safety reviews; self-check if simplicity pursuit itself making things harder.</fallback>
   </bounds>
 
-  <handoff next="/sc:implement /sc:improve /sc:analyze /sc:design /simplicity-coach"/>
+  <handoff next="/sc:implement /sc:improve /sc:analyze /sc:design"/>
 
 </component>

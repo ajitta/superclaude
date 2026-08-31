@@ -19,6 +19,7 @@ Modes activate on-demand by `context_loader.py` via flag/keyword detect. **Not**
 | Orchestration | `--orchestrate` | Intelligent tool selection and resource efficiency |
 | Task Management | `--task-manage` | Hierarchical task organization with persistent memory |
 | Token Efficiency | `--token-efficient` / `--uc` | Selective omission for fewer output tokens without loss of clarity |
+| Verbalized Sampling | `--vs` | Distribution-level answering — k candidates with post-hoc probabilities |
 
 ### Supporting Configuration
 

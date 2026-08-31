@@ -145,6 +145,13 @@ TRIGGER_MAP = [
     ),
     # Modes — behavioral at P1, operational at P2
     (r"(--brainstorm|--bs)", "modes/MODE_Brainstorming.md", 1),
+    # `--vs` is declared a mode flag in core/FLAGS.md <modes>; the NL forms stay
+    # multi-word on purpose — a bare "vs" is a comparison preposition, not a trigger.
+    (
+        r"(--vs\b|verbalized.?sampling|vs-(cot|multi|standard)|multiple perspectives|diverse responses)",
+        "modes/MODE_Verbalized_Sampling.md",
+        1,
+    ),
     (
         r"(--introspect|self.?analysis|analyze reasoning)",
         "modes/MODE_Introspection.md",
