@@ -4,7 +4,9 @@ title: "Business Panel Mode"
 description: "Multi-expert business analysis with adaptive interaction (discussion, debate, Socratic)."
 resource: "src/superclaude/modes/MODE_Business_Panel.md"
 tags: [mode]
-timestamp: 2026-07-05
+generated:
+  by: process:okf-migrate
+  at: 2026-07-05
 ---
 
 # Business Panel Mode

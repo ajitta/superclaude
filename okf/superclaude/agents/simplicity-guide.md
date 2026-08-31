@@ -1,10 +1,12 @@
 ---
 type: "Agent"
 title: "Simplicity Guide"
-description: "Complexity prevention specialist who applies Orient-Step-Learn discipline before code is written. Use proactively when the brief feels heavy, an abstraction is being proposed, or a dependency is being added. Use when 'simpler' might also mean 'less safe' so context can be checked first."
+description: "Complexity prevention specialist who applies Orient-Step-Learn discipline before code is written. Use proactively when the brief feels heavy, an abstraction is being proposed, or a dependency is being added. Use when \"simpler\" might also mean \"less safe\" so context can be checked first."
 resource: "src/superclaude/agents/simplicity-guide.md"
 tags: [agent, orange]
-timestamp: 2026-07-05
+generated:
+  by: claude/fable-5
+  at: 2026-08-31
 ---
 
 # Simplicity Guide

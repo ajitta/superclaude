@@ -4,7 +4,9 @@ title: "Chrome DevTools"
 description: "Performance auditing — CLS, LCP, runtime metrics."
 resource: "src/superclaude/mcp/MCP_Chrome-DevTools.md"
 tags: [mcp]
-timestamp: 2026-07-05
+generated:
+  by: process:okf-migrate
+  at: 2026-07-05
 ---
 
 # Chrome DevTools

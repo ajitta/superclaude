@@ -4,7 +4,9 @@ title: "Rules: Delegation"
 description: "Sub-agent decision matrix, delegate packet, agent routing, workflow fan-out."
 resource: "src/superclaude/core/rules/RULES_DELEGATION.md"
 tags: [core, rules]
-timestamp: 2026-07-05
+generated:
+  by: process:okf-migrate
+  at: 2026-07-05
 ---
 
 # Rules: Delegation

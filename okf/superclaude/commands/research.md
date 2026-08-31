@@ -1,10 +1,12 @@
 ---
 type: "Command"
 title: "Research"
-description: "Deep web research with adaptive planning + smart search. Use when user type `/sc:research` or ask multi-source corroboration, version-specific evidence, or contradiction resolve across sources. Do NOT auto-trigger on single doc lookup, library API question, or 'fetch this URL' — use Tavily/WebFetch/Context7 direct."
+description: "Deep web research with adaptive planning + smart search. Use when user type `/sc:research` or ask multi-source corroboration, version-specific evidence, or contradiction resolve across sources. Do NOT auto-trigger on single doc lookup, library API question, or \"fetch this URL\" — use Tavily/WebFetch/Context7 direct."
 resource: "src/superclaude/commands/research.md"
 tags: [command]
-timestamp: 2026-07-05
+generated:
+  by: claude/fable-5
+  at: 2026-08-31
 ---
 
 # Research

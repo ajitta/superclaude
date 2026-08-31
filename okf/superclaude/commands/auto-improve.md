@@ -1,10 +1,12 @@
 ---
 type: "Command"
 title: "Auto Improve"
-description: "Autonomous overnight code improvement loop driven by objective metric (Karpathy AutoResearch pattern). Use ONLY when user explicit type `/sc:auto-improve` — run long unattended loop mutate code, implicit trigger unsafe. Do NOT auto-trigger on phrase like 'improve the code', 'make it better', 'optimize this'."
+description: "Autonomous overnight code improvement loop driven by objective metric (Karpathy AutoResearch pattern). Use ONLY when user explicit type `/sc:auto-improve` — run long unattended loop mutate code, implicit trigger unsafe. Do NOT auto-trigger on phrase like \"improve the code\", \"make it better\", \"optimize this\"."
 resource: "src/superclaude/commands/auto-improve.md"
 tags: [command]
-timestamp: 2026-07-05
+generated:
+  by: claude/fable-5
+  at: 2026-08-31
 ---
 
 # Auto Improve

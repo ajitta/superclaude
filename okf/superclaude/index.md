@@ -1,5 +1,5 @@
 ---
-okf_version: "0.1"
+okf_version: "0.2"
 ---
 
 # SuperClaude Framework
@@ -22,14 +22,11 @@ Authoritative human docs live in `src/superclaude/ARCHITECTURE.md` (taxonomy sou
 
 ## Modes
 
-- [Modes index](/modes/index.md): Behavioral execution modes toggled by flags (brainstorm, research, token-efficient …). (8 concepts)
-
-## Skills
-
+- [Modes index](/modes/index.md): Behavioral execution modes toggled by flags (brainstorm, research, token-efficient …). (9 concepts)
 
 ## MCP Servers
 
-- [MCP Servers index](/mcp/index.md): Model Context Protocol server integrations documented for tool selection. (6 concepts)
+- [MCP Servers index](/mcp/index.md): Model Context Protocol server integrations documented for tool selection. (4 concepts)
 
 ## Core Config
 

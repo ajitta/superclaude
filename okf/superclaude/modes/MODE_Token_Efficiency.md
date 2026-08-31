@@ -1,15 +1,17 @@
 ---
 type: "Mode"
 title: "Token Efficiency Mode"
-description: "Symbol-based compressed communication (--uc), 30-50% token reduction."
+description: "Selective omission (--uc) — fewer output tokens by dropping content that does not change the reader's next action, never compressing the prose that stays."
 resource: "src/superclaude/modes/MODE_Token_Efficiency.md"
 tags: [mode]
-timestamp: 2026-07-05
+generated:
+  by: claude/fable-5
+  at: 2026-08-31
 ---
 
 # Token Efficiency Mode
 
-Symbol-based compressed communication (--uc), 30-50% token reduction.
+Selective omission (--uc) — fewer output tokens by dropping content that does not change the reader's next action, never compressing the prose that stays.
 
 Source of truth: `src/superclaude/modes/MODE_Token_Efficiency.md`.
 

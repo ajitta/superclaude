@@ -4,7 +4,9 @@ title: "Agent"
 description: "Session controller orchestrating investigation, implementation, and review workflows. Use ONLY when user explicitly types `/sc:agent` — drives multi-phase orchestration. Do NOT auto-trigger when single sub-agent invocation suffices; use Agent tool directly for one-off delegations."
 resource: "src/superclaude/commands/agent.md"
 tags: [command]
-timestamp: 2026-07-05
+generated:
+  by: process:okf-migrate
+  at: 2026-07-05
 ---
 
 # Agent

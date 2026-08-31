@@ -1,15 +1,17 @@
 ---
 type: "Agent"
 title: "Frontend Architect"
-description: "Frontend specialist for accessible, performant interfaces grounded in modern frameworks. Use proactively for component architecture, WCAG compliance, Core Web Vitals, and responsive layout work. Use when UI decisions could regress accessibility or performance."
+description: "Frontend specialist for accessible, performant interfaces grounded in modern frameworks. Use proactively for component architecture, WCAG compliance, and responsive layout work; measurement-driven perf optimization belongs to performance-engineer. Use when UI decisions could regress accessibility or performance."
 resource: "src/superclaude/agents/frontend-architect.md"
 tags: [agent, blue]
-timestamp: 2026-07-05
+generated:
+  by: claude/fable-5
+  at: 2026-08-31
 ---
 
 # Frontend Architect
 
-Frontend specialist for accessible, performant interfaces grounded in modern frameworks. Use proactively for component architecture, WCAG compliance, Core Web Vitals, and responsive layout work. Use when UI decisions could regress accessibility or performance.
+Frontend specialist for accessible, performant interfaces grounded in modern frameworks. Use proactively for component architecture, WCAG compliance, and responsive layout work; measurement-driven perf optimization belongs to performance-engineer. Use when UI decisions could regress accessibility or performance.
 
 Source of truth: `src/superclaude/agents/frontend-architect.md`.
 

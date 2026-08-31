@@ -4,7 +4,9 @@ title: "SuperClaude Architecture"
 description: "SuperClaude is a content framework — markdown (commands, agents, modes, MCP docs, core config) installed into ~/.claude/ to configure Claude Code behavior. Ships a CLI (superclaude) and a pytest plugin."
 resource: "src/superclaude/ARCHITECTURE.md"
 tags: [overview, architecture]
-timestamp: 2026-07-05
+generated:
+  by: process:okf-migrate
+  at: 2026-07-05
 ---
 
 # SuperClaude Architecture

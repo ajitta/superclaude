@@ -8,6 +8,6 @@ Behavioral execution modes toggled by flags (brainstorm, research, token-efficie
 - [Introspection Mode](/modes/MODE_Introspection.md): Self-analysis and error-recovery mode that exposes reasoning with markers.
 - [Task Management Mode](/modes/MODE_Task_Management.md): Hierarchical task organization with persistent memory and phase checkpoints for work spanning >3 steps or multiple files/dirs.
 - [Orchestration Mode](/modes/MODE_Orchestration.md): Tool-matrix optimization for multi-tool, parallel, performance-constrained execution.
-- [Token Efficiency Mode](/modes/MODE_Token_Efficiency.md): Symbol-based compressed communication (--uc), 30-50% token reduction.
+- [Token Efficiency Mode](/modes/MODE_Token_Efficiency.md): Selective omission (--uc) — fewer output tokens by dropping content that does not change the reader's next action, never compressing the prose that stays.
 - [Verbalized Sampling Mode](/modes/MODE_Verbalized_Sampling.md): Distribution-level answering (--vs) — k candidate responses with post-hoc probabilities instead of one modal answer.
 - [Research Config](/modes/RESEARCH_CONFIG.md): Configuration parameters for Deep Research mode (depth, planning, hop limits).

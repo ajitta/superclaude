@@ -4,7 +4,9 @@ title: "Research Config"
 description: "Configuration parameters for Deep Research mode (depth, planning, hop limits)."
 resource: "src/superclaude/modes/RESEARCH_CONFIG.md"
 tags: [mode]
-timestamp: 2026-07-05
+generated:
+  by: process:okf-migrate
+  at: 2026-07-05
 ---
 
 # Research Config

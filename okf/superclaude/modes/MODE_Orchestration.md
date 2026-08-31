@@ -4,7 +4,9 @@ title: "Orchestration Mode"
 description: "Tool-matrix optimization for multi-tool, parallel, performance-constrained execution."
 resource: "src/superclaude/modes/MODE_Orchestration.md"
 tags: [mode]
-timestamp: 2026-07-05
+generated:
+  by: process:okf-migrate
+  at: 2026-07-05
 ---
 
 # Orchestration Mode

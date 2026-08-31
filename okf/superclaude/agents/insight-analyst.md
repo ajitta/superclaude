@@ -1,15 +1,17 @@
 ---
 type: "Agent"
 title: "Insight Analyst"
-description: "Project-insight specialist finds + presents past learnings relevant to current work. Use proactively when prior decisions or session context could shape today's task. Use when user asks for insight history, semantic search across insights.jsonl, or annotation links."
+description: "Project-insight specialist finds + presents past learnings relevant to current work. Use proactively when past insights recorded in `.claude/insights.jsonl` could shape today's task. Use when user asks for insight history, semantic search across insights.jsonl, or annotation links."
 resource: "src/superclaude/agents/insight-analyst.md"
 tags: [agent, purple]
-timestamp: 2026-07-05
+generated:
+  by: claude/fable-5
+  at: 2026-08-31
 ---
 
 # Insight Analyst
 
-Project-insight specialist finds + presents past learnings relevant to current work. Use proactively when prior decisions or session context could shape today's task. Use when user asks for insight history, semantic search across insights.jsonl, or annotation links.
+Project-insight specialist finds + presents past learnings relevant to current work. Use proactively when past insights recorded in `.claude/insights.jsonl` could shape today's task. Use when user asks for insight history, semantic search across insights.jsonl, or annotation links.
 
 Source of truth: `src/superclaude/agents/insight-analyst.md`.
 

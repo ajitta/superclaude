@@ -1,10 +1,12 @@
 ---
 type: "Command"
 title: "Load"
-description: "Session lifecycle mgmt w/ Serena MCP + Claude auto memory for proj context load. Use ONLY when user explicitly type `/sc:load` — session-start action prime context from Serena memory + proj state. Do NOT auto-trigger on session resume or 'let's continue'."
+description: "Session lifecycle mgmt w/ Serena MCP + Claude auto memory for proj context load. Use ONLY when user explicitly type `/sc:load` — session-start action prime context from Serena memory + proj state. Do NOT auto-trigger on session resume or \"let's continue\"."
 resource: "src/superclaude/commands/load.md"
 tags: [command]
-timestamp: 2026-07-05
+generated:
+  by: claude/fable-5
+  at: 2026-08-31
 ---
 
 # Load

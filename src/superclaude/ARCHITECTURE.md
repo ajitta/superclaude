@@ -180,6 +180,6 @@ Type-specific required sections:
 
 ## Machine-Navigable Catalog (OKF)
 
-`okf/superclaude/` mirrors this taxonomy as an [Open Knowledge Format](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md) (OKF) v0.1 knowledge bundle — one concept doc per component (agent, command, mode, MCP server, core file), each carrying a `resource` pointer back to its source in this tree. Navigation is progressive-disclosure: bundle `index.md` → section `index.md` → concept.
+`okf/superclaude/` mirrors this taxonomy as an [Open Knowledge Format](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md) (OKF) v0.2 knowledge bundle — one concept doc per component (agent, command, mode, MCP server, core file), each carrying a `resource` pointer back to its source in this tree. Navigation is progressive-disclosure: bundle `index.md` → section `index.md` → concept.
 
 This document stays the human-authored source of truth for the taxonomy; the bundle is a generated, agent-navigable catalog view of the same content. Regenerate the bundle after adding a component so the catalog stays in sync.

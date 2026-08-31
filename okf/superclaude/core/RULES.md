@@ -4,7 +4,9 @@ title: "Rules"
 description: "Always-loaded behavioral kernel — four rule classes; detail in core/rules/."
 resource: "src/superclaude/core/RULES.md"
 tags: [core]
-timestamp: 2026-07-05
+generated:
+  by: process:okf-migrate
+  at: 2026-07-05
 ---
 
 # Rules

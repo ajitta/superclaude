@@ -4,7 +4,9 @@ title: "Brainstorming Mode"
 description: "Collaborative discovery for vague requirements — probing questions turn fuzzy ideas into concrete specs."
 resource: "src/superclaude/modes/MODE_Brainstorming.md"
 tags: [mode]
-timestamp: 2026-07-05
+generated:
+  by: process:okf-migrate
+  at: 2026-07-05
 ---
 
 # Brainstorming Mode

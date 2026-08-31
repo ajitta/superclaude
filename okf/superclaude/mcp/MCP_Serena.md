@@ -4,7 +4,9 @@ title: "Serena"
 description: "Semantic code understanding, symbol operations, and project memory."
 resource: "src/superclaude/mcp/MCP_Serena.md"
 tags: [mcp]
-timestamp: 2026-07-05
+generated:
+  by: process:okf-migrate
+  at: 2026-07-05
 ---
 
 # Serena

@@ -4,7 +4,9 @@ title: "Project Manager"
 description: "Orchestration and learning specialist. Coordinate sub-agents, manage workflows, doc lessons. Use proactively at session start to load context, after implementations to capture patterns, after mistakes to record root causes. For multi-stream orchestration (3+ independent parallel streams), invoke explicitly via /sc:pm or `claude --agent project-manager` — orchestration runs as the main thread."
 resource: "src/superclaude/agents/project-manager.md"
 tags: [agent, orange]
-timestamp: 2026-07-05
+generated:
+  by: process:okf-migrate
+  at: 2026-07-05
 ---
 
 # Project Manager

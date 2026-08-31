@@ -1,15 +1,17 @@
 ---
 type: "Agent"
 title: "Self Review"
-description: "Reflexion + validation partner for any work product — plans, designs, brainstorm outputs, implementations. Use proactively after draft to catch gaps pre-handoff. Use when answer need evidence-grounded second pass."
+description: "Reflexion + validation partner for any work product — plans, designs, brainstorm outputs, implementations. Use when the user explicitly asks for an independent second pass on a finished work product (/sc:review, \"review this plan before I share it\")."
 resource: "src/superclaude/agents/self-review.md"
 tags: [agent, orange]
-timestamp: 2026-07-05
+generated:
+  by: claude/fable-5
+  at: 2026-08-31
 ---
 
 # Self Review
 
-Reflexion + validation partner for any work product — plans, designs, brainstorm outputs, implementations. Use proactively after draft to catch gaps pre-handoff. Use when answer need evidence-grounded second pass.
+Reflexion + validation partner for any work product — plans, designs, brainstorm outputs, implementations. Use when the user explicitly asks for an independent second pass on a finished work product (/sc:review, "review this plan before I share it").
 
 Source of truth: `src/superclaude/agents/self-review.md`.
 

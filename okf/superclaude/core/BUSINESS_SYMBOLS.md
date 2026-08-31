@@ -4,7 +4,9 @@ title: "Business Symbols"
 description: "Symbol vocabulary for business-panel analysis output."
 resource: "src/superclaude/core/BUSINESS_SYMBOLS.md"
 tags: [core]
-timestamp: 2026-07-05
+generated:
+  by: process:okf-migrate
+  at: 2026-07-05
 ---
 
 # Business Symbols

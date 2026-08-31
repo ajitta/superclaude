@@ -4,7 +4,9 @@ title: "Principles"
 description: "Software engineering principles and decision frameworks (evidence > assumptions)."
 resource: "src/superclaude/core/PRINCIPLES.md"
 tags: [core]
-timestamp: 2026-07-05
+generated:
+  by: process:okf-migrate
+  at: 2026-07-05
 ---
 
 # Principles

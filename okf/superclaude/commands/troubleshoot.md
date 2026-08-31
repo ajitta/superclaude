@@ -1,15 +1,17 @@
 ---
 type: "Command"
 title: "Troubleshoot"
-description: "Diagnose + resolve issues in code, builds, deployments, system behavior. Use when user types `/sc:troubleshoot` or describes intermittent failure, recurring symptom, or cross-system issue needing hypothesis-driven investigation. Do NOT auto-trigger on clear error with obvious fix, syntax errors, or single-file bugs — those get direct fix."
+description: "Diagnose + resolve issues in code, builds, deployments, system behavior. Use ONLY when user explicitly types `/sc:troubleshoot` — diagnose + propose; write a failing test and apply the fix only with `--fix`, and risky fixes still need confirm. Do NOT auto-trigger on clear error with obvious fix, syntax errors, or single-file bugs — those get direct fix."
 resource: "src/superclaude/commands/troubleshoot.md"
 tags: [command]
-timestamp: 2026-07-05
+generated:
+  by: claude/fable-5
+  at: 2026-08-31
 ---
 
 # Troubleshoot
 
-Diagnose + resolve issues in code, builds, deployments, system behavior. Use when user types `/sc:troubleshoot` or describes intermittent failure, recurring symptom, or cross-system issue needing hypothesis-driven investigation. Do NOT auto-trigger on clear error with obvious fix, syntax errors, or single-file bugs — those get direct fix.
+Diagnose + resolve issues in code, builds, deployments, system behavior. Use ONLY when user explicitly types `/sc:troubleshoot` — diagnose + propose; write a failing test and apply the fix only with `--fix`, and risky fixes still need confirm. Do NOT auto-trigger on clear error with obvious fix, syntax errors, or single-file bugs — those get direct fix.
 
 Source of truth: `src/superclaude/commands/troubleshoot.md`.
 

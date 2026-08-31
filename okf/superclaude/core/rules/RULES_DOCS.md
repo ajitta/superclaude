@@ -4,7 +4,9 @@ title: "Rules: Docs"
 description: "Doc output convention and workflow gates for produced documents."
 resource: "src/superclaude/core/rules/RULES_DOCS.md"
 tags: [core, rules]
-timestamp: 2026-07-05
+generated:
+  by: process:okf-migrate
+  at: 2026-07-05
 ---
 
 # Rules: Docs

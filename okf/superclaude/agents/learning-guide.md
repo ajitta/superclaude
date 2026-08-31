@@ -4,7 +4,9 @@ title: "Learning Guide"
 description: "Programming-education specialist. Teach concepts via progressive learning + runnable examples. Use proactively when user wants learn concept not just answer. Use when explanations need match learner skill level."
 resource: "src/superclaude/agents/learning-guide.md"
 tags: [agent, yellow]
-timestamp: 2026-07-05
+generated:
+  by: process:okf-migrate
+  at: 2026-07-05
 ---
 
 # Learning Guide

@@ -1,10 +1,12 @@
 ---
 type: "Command"
 title: "Analyze"
-description: "Code analysis across quality, security, performance, architecture domains. Use when user types `/sc:analyze`, asks 'audit', 'review codebase for X', or names multiple analysis dimensions one request. Do NOT auto-trigger on reading single file, looking up symbol, or 'what does this function do' — those direct reads, not multi-domain analysis."
+description: "Code analysis across quality, security, performance, architecture domains. Use when user types `/sc:analyze`, asks \"audit\", \"review codebase for X\", or names multiple analysis dimensions one request. Do NOT auto-trigger on reading single file, looking up symbol, or \"what does this function do\" — those direct reads, not multi-domain analysis."
 resource: "src/superclaude/commands/analyze.md"
 tags: [command]
-timestamp: 2026-07-05
+generated:
+  by: claude/fable-5
+  at: 2026-08-31
 ---
 
 # Analyze

@@ -4,7 +4,9 @@ title: "Tavily"
 description: "Real-time web search/extract/crawl via Tavily Agent Skills (MCP optional)."
 resource: "src/superclaude/mcp/MCP_Tavily.md"
 tags: [mcp]
-timestamp: 2026-07-05
+generated:
+  by: process:okf-migrate
+  at: 2026-07-05
 ---
 
 # Tavily
