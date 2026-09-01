@@ -5,7 +5,7 @@
 #### *A Claude Code content framework — fork-origin, now its own project*
 
 <p>
-  <img src="https://img.shields.io/badge/version-4.8.0+ajitta-blue" alt="Version">
+  <img src="https://img.shields.io/badge/version-4.9.0+ajitta-blue" alt="Version">
   <a href="https://github.com/ajitta/superclaude/actions/workflows/test.yml">
     <img src="https://github.com/ajitta/superclaude/actions/workflows/test.yml/badge.svg" alt="Tests">
   </a>
@@ -61,7 +61,7 @@ Claude Code reads those files at session start, which is how the framework chang
 
 ## ⚡ **Quick Installation**
 
-### **Current Stable Version (v4.8.0+ajitta)**
+### **Current Stable Version (v4.9.0+ajitta)**
 
 `superclaude` ships markdown content (commands, agents, modes, MCP docs, core rules, hooks) plus a small CLI that copies it into Claude Code's content directories.
 
@@ -400,7 +400,7 @@ superclaude mcp
 ### 📓 **Insight Pipeline**
 **`/sc:insight` + hook-driven harvest:**
 - Per-project JSONL store at `.claude/insights.jsonl`
-- `superclaude insight` CLI (append/list/query/stats/review/promote)
+- `superclaude insight` CLI (append/list/query/stats/review/promote/discard)
 - PreCompact / SessionEnd hooks auto-harvest pending insights
 - Empty/non-string entries rejected at the writer boundary
 - Searchable for human and tool analysis across sessions
