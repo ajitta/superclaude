@@ -562,6 +562,50 @@ def cmd_promote(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_discard(args: argparse.Namespace) -> int:
+    """Drop pending rows that will never be promoted (harvest false positives).
+
+    Promotion was the only exit from pending, so noise — text that merely quoted
+    the marker — could only be cleared by filing it as a real insight or by
+    leaving the SessionStart notice permanently lit. No ledger write here: the
+    uuid was filed at harvest time, so a discarded row stays discarded.
+    """
+    pending = _read_pending()
+    try:
+        indices = sorted(
+            {int(tok) for tok in str(args.index).split(",") if tok.strip()},
+            reverse=True,
+        )
+    except ValueError:
+        print(
+            f"discard: --index takes comma-separated integers, got {args.index!r}",
+            file=sys.stderr,
+        )
+        return 2
+    if not indices:
+        print("discard: --index requires at least one index", file=sys.stderr)
+        return 2
+    out_of_range = [i for i in indices if i < 0 or i >= len(pending)]
+    if out_of_range:
+        # All-or-nothing: a typo in one index must not silently drop the others.
+        listed = ", ".join(str(i) for i in sorted(out_of_range))
+        print(
+            f"discard: index {listed} out of range (have {len(pending)})",
+            file=sys.stderr,
+        )
+        return 2
+    # Descending, so each pop leaves the still-unprocessed lower indices valid.
+    for i in indices:
+        text = pending.pop(i).get("raw_text", "").replace("\n", " ")
+        # Echo the text: discard has no undo, so scrollback is the only copy.
+        print(f"discarded [{i}] {text[:120]}")
+    _write_pending(pending)
+    print(
+        f"discarded {len(indices)} pending insight(s) (remaining pending: {len(pending)})"
+    )
+    return 0
+
+
 def cmd_pending_count(args: argparse.Namespace) -> int:
     # Same resolver as cmd_harvest, so the SessionStart notice always reads the
     # pending file harvest wrote.
@@ -830,6 +874,10 @@ def build_parser(prog: str = "insight_writer") -> argparse.ArgumentParser:
     pr.add_argument("--insight", help="override raw_text")
     pr.add_argument("--tags", help="comma-separated tags")
     pr.set_defaults(fn=cmd_promote)
+
+    dc = sub.add_parser("discard")
+    dc.add_argument("--index", required=True, help="comma-separated indices to drop")
+    dc.set_defaults(fn=cmd_discard)
 
     # No --cwd: the pending file is anchored on project_root(), so accepting a
     # cwd here would be a flag that silently does nothing.

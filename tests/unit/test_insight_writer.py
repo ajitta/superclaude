@@ -427,6 +427,128 @@ class TestReviewPromote:
         assert "pending insight" in out
 
 
+# ---------- discard ----------
+
+
+def _seed_pending(workdir, monkeypatch, markers: list[str]):
+    """Harvest one transcript carrying `markers`, leaving that many pending rows."""
+    ns, pdir = _harvest(workdir, monkeypatch, "sess1")
+    _make_transcript(
+        pdir,
+        "sess1",
+        [
+            {
+                "type": "user",
+                "isMeta": False,
+                "uuid": f"u{i}",
+                "sessionId": "sess1",
+                "timestamp": "2026-04-25T22:00:00Z",
+                "message": {"role": "user", "content": f"INSIGHT: {m}"},
+            }
+            for i, m in enumerate(markers)
+        ],
+    )
+    iw.cmd_harvest(ns)
+    return workdir / ".claude" / "insights.pending.jsonl"
+
+
+class TestDiscard:
+    def test_discard_single_index(self, workdir, monkeypatch):
+        import argparse
+
+        pending_file = _seed_pending(workdir, monkeypatch, ["keep me", "drop me"])
+        rc = iw.cmd_discard(argparse.Namespace(index="1"))
+        assert rc == 0
+        rows = [
+            json.loads(line)
+            for line in pending_file.read_text(encoding="utf-8").splitlines()
+            if line.strip()
+        ]
+        assert [r["raw_text"] for r in rows] == ["keep me"]
+
+    def test_discard_multiple_indices_are_all_dropped(self, workdir, monkeypatch):
+        # Ascending input: the pops must run descending or the shift drops the
+        # wrong rows — the exact footgun that motivated multi-index support.
+        import argparse
+
+        pending_file = _seed_pending(workdir, monkeypatch, ["a", "b", "c", "d"])
+        rc = iw.cmd_discard(argparse.Namespace(index="0,1,2"))
+        assert rc == 0
+        rows = [
+            json.loads(line)
+            for line in pending_file.read_text(encoding="utf-8").splitlines()
+            if line.strip()
+        ]
+        assert [r["raw_text"] for r in rows] == ["d"]
+
+    def test_discard_removes_pending_file_when_emptied(self, workdir, monkeypatch):
+        import argparse
+
+        pending_file = _seed_pending(workdir, monkeypatch, ["only one"])
+        assert iw.cmd_discard(argparse.Namespace(index="0")) == 0
+        assert not pending_file.exists()
+
+    def test_discard_does_not_append_to_insights(self, workdir, monkeypatch):
+        import argparse
+
+        _seed_pending(workdir, monkeypatch, ["noise"])
+        iw.cmd_discard(argparse.Namespace(index="0"))
+        assert not (workdir / ".claude" / "insights.jsonl").exists()
+
+    def test_discard_out_of_range_drops_nothing(self, workdir, monkeypatch, capsys):
+        # All-or-nothing: index 0 is valid but must survive the rejected batch.
+        import argparse
+
+        pending_file = _seed_pending(workdir, monkeypatch, ["a", "b"])
+        rc = iw.cmd_discard(argparse.Namespace(index="0,99"))
+        assert rc == 2
+        assert "out of range" in capsys.readouterr().err
+        rows = [
+            line
+            for line in pending_file.read_text(encoding="utf-8").splitlines()
+            if line.strip()
+        ]
+        assert len(rows) == 2
+
+    def test_discard_rejects_non_integer_index(self, workdir, monkeypatch, capsys):
+        import argparse
+
+        pending_file = _seed_pending(workdir, monkeypatch, ["a"])
+        rc = iw.cmd_discard(argparse.Namespace(index="0,oops"))
+        assert rc == 2
+        assert "comma-separated integers" in capsys.readouterr().err
+        assert pending_file.exists()
+
+    def test_discard_empty_index_is_rejected(self, workdir, monkeypatch, capsys):
+        import argparse
+
+        _seed_pending(workdir, monkeypatch, ["a"])
+        rc = iw.cmd_discard(argparse.Namespace(index=","))
+        assert rc == 2
+        assert "at least one index" in capsys.readouterr().err
+
+    def test_discarded_marker_is_not_harvested_again(self, workdir, monkeypatch):
+        # The harvest ledger files uuids at harvest time, so discard needs no
+        # ledger write of its own — a re-harvest of the same transcript must
+        # not resurrect the row the user threw away.
+        import argparse
+
+        pending_file = _seed_pending(workdir, monkeypatch, ["noise"])
+        iw.cmd_discard(argparse.Namespace(index="0"))
+        assert not pending_file.exists()
+
+        ns, _ = _harvest(workdir, monkeypatch, "sess1")
+        iw.cmd_harvest(ns)
+        assert not pending_file.exists(), "a discarded marker came back as pending"
+
+    def test_discard_echoes_text_before_dropping(self, workdir, monkeypatch, capsys):
+        import argparse
+
+        _seed_pending(workdir, monkeypatch, ["the only surviving copy"])
+        iw.cmd_discard(argparse.Namespace(index="0"))
+        assert "the only surviving copy" in capsys.readouterr().out
+
+
 # ---------- jq error path ----------
 
 
