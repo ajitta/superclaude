@@ -34,8 +34,7 @@
 
   ## Compaction
   - When: answer quality degrading, or explicit --uc flag
-  - Preserve: Architecture decisions, unresolved issues, impl details, active file paths
-  - Discard: Completed tool outputs, resolved intermediate results, stale error messages
+  - Preserve/discard list: SSOT in /sc:save `<compaction_strategy>` (installed sibling commands/sc/save.md)
   - Safest action: Clear old tool call results — agent rarely needs raw results from earlier turns
 
   <bounds>
