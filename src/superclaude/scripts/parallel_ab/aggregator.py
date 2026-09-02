@@ -58,9 +58,12 @@ def _tools_summary(obs: Observation) -> str:
 
 def _row(obs: Observation, axes_cols: list[str]) -> str:
     sha_short = obs.final_output_sha256[:8] if obs.final_output_sha256 else "—"
+    exit_cell = obs.exit_status
+    if obs.refusal_category:
+        exit_cell = f"{obs.exit_status} ({obs.refusal_category})"
     cells = [
         obs.variant_id,
-        obs.exit_status,
+        exit_cell,
         f"{obs.wall_seconds:.1f}",
         str(obs.tokens.input),
         str(obs.tokens.output),

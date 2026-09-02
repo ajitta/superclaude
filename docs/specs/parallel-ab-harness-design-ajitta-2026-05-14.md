@@ -1,6 +1,6 @@
 ---
 status: draft
-revised: 2026-05-14
+revised: 2026-09-03
 ---
 
 # Parallel A/B Harness — Design
@@ -70,6 +70,8 @@ runner:
 ```
 
 ### Observation schema
+
+`exit_status` is one of `ok | error | timeout | refusal`. `refusal` means the model declined the turn (Fable 5.x safety classifiers, API `stop_reason: "refusal"`); it is emitted with one extra key, `"refusal_category"` (the `stop_details.category` such as `cyber`, `bio`, `reasoning_extraction`, or `unknown` when the CLI payload carries no category), which is absent on every other status.
 
 ```json
 {

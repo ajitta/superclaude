@@ -59,9 +59,14 @@ Cost control: a full 4×7 matrix is 28 headless sessions. Start with
 `--dry-run`, then one task across two arms, before paying for the matrix.
 
 Model-release canary (Phase 1-2): on each new model release run
-`--canary --model <new-model>`; red rows in the report name which prose
-rules died on that model — a detected diff instead of reactive compat
-guessing.
+`--canary --model <new-model>` (for example `--model claude-fable-5-1`);
+red rows in the report name which prose rules died on that model — a
+detected diff instead of reactive compat guessing. A task the model
+declined shows as `REFUSED` in the matrix and is listed with its
+`stop_details.category` under "Refusals", separately from harness errors,
+so a `reasoning_extraction` or `cyber` trip on a new model's classifiers
+is visible as such. Run the same command on a `master` worktree first to
+separate regression from pre-existing failure.
 
 ## Results
 

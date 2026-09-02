@@ -84,6 +84,9 @@ class TaskResult:
     permission_denials: int = 0
     sc_activations: int = 0
     error: str = ""
+    # stop_details.category when the model refused the turn ("" otherwise).
+    # A refusal is also recorded in `error`, so ok/gates_ok stay false.
+    refusal_category: str = ""
 
     @property
     def ok(self) -> bool:
@@ -253,6 +256,39 @@ def run_task(
     return res
 
 
+def _detect_refusal(payload: dict) -> str | None:
+    """Return the refusal category when *payload* records a model refusal.
+
+    Fable 5.x safety classifiers end a turn with the API's
+    ``stop_reason: "refusal"`` and ``stop_details.category`` (cyber, bio,
+    reasoning_extraction, ...). In stream-json the ``assistant`` events carry
+    the API message object with both fields, so the category comes from there.
+    The ``result`` event carries a top-level ``stop_reason`` but no
+    ``stop_details`` (Claude Code 2.1.258 result schema), so a result-level
+    refusal reports ``"unknown"`` and must never override a category already
+    captured. A ``subtype`` naming a refusal also counts, as a fallback.
+    """
+    if not isinstance(payload, dict):
+        return None
+    refused = payload.get("stop_reason") == "refusal" or "refusal" in str(
+        payload.get("subtype") or ""
+    )
+    if not refused:
+        return None
+    details = payload.get("stop_details") or {}
+    category = details.get("category") if isinstance(details, dict) else None
+    return str(category) if category else "unknown"
+
+
+def _mark_refusal(res: TaskResult, category: str) -> None:
+    # Never downgrade: the assistant event names the category, the later
+    # result event only knows "unknown".
+    if category == "unknown" and res.refusal_category:
+        return
+    res.refusal_category = category
+    res.error = f"refusal (category={category})"
+
+
 def _parse_stream(stream: str, res: TaskResult) -> tuple[str, str]:
     """Extract final result text, usage metrics, and Bash tool inputs from a
     stream-json transcript."""
@@ -266,7 +302,12 @@ def _parse_stream(stream: str, res: TaskResult) -> tuple[str, str]:
         etype = event.get("type")
         if etype == "result":
             result_text = event.get("result") or ""
-            if event.get("is_error"):
+            category = _detect_refusal(event)
+            if category is not None:
+                _mark_refusal(res, category)
+            # A refusal is the more specific signal; keep it over the generic
+            # error text when both are present on the same run.
+            if event.get("is_error") and not res.refusal_category:
                 res.error = f"claude error result: {result_text[:200]}"
             usage = event.get("usage") or {}
             res.tokens_in = usage.get("input_tokens", 0) + usage.get(
@@ -277,7 +318,11 @@ def _parse_stream(stream: str, res: TaskResult) -> tuple[str, str]:
             res.num_turns = event.get("num_turns", 0)
             res.permission_denials = len(event.get("permission_denials") or [])
         elif etype == "assistant":
-            for block in (event.get("message") or {}).get("content", []):
+            message = event.get("message") or {}
+            category = _detect_refusal(message)
+            if category is not None:
+                _mark_refusal(res, category)
+            for block in message.get("content", []):
                 if block.get("type") != "tool_use":
                     continue
                 name = block.get("name", "")
@@ -400,6 +445,8 @@ def write_report(results: list[TaskResult], runs_dir: Path) -> str:
             r = next((x for x in results if x.arm == arm and x.task_id == tid), None)
             if r is None:
                 row.append("—")
+            elif r.refusal_category:
+                row.append("REFUSED")
             elif r.error:
                 row.append("ERR")
             else:
@@ -427,6 +474,20 @@ def write_report(results: list[TaskResult], runs_dir: Path) -> str:
     else:
         total = sum(1 for r in results for c in r.checks if c.gate)
         lines.append(f"All {total} hard-gate checks passed.")
+
+    refusals = [r for r in results if r.refusal_category]
+    lines += ["", "## Refusals", ""]
+    if refusals:
+        lines += ["| arm | task | category |", "|---|---|---|"]
+        lines += [f"| {r.arm} | {r.task_id} | {r.refusal_category} |" for r in refusals]
+        lines += [
+            "",
+            "A refusal is the model declining the turn, not a harness error. On a "
+            "model-release canary it names the prose rule or task wording that "
+            "trips the new model's classifiers.",
+        ]
+    else:
+        lines.append("No refusals.")
 
     lines += ["", "## Metric-tag pass rates (per arm)", ""]
     tags = sorted({c.tag for r in results for c in r.checks})

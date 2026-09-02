@@ -272,3 +272,99 @@ async def test_run_variant_marks_json_is_error_as_error(tmp_path: Path):
     spawner = _FakeSpawner([SpawnResult(stdout=payload, stderr=b"", returncode=0)])
     obs = await run_variant(_variant(), _scenario(), _cfg(), tmp_path, spawner=spawner)
     assert obs.exit_status == "error"
+
+
+# ── refusal classification (Fable 5.x stop_reason "refusal") ─────────────────
+
+
+def _refusal_stdout(category: str | None = "cyber") -> bytes:
+    payload = {
+        "type": "result",
+        "subtype": "success",
+        "result": "I can't help with that request.",
+        "stop_reason": "refusal",
+        "usage": {"input_tokens": 900, "output_tokens": 40},
+        "tools_used": [],
+    }
+    if category is not None:
+        payload["stop_details"] = {"category": category}
+    return json.dumps(payload).encode("utf-8")
+
+
+def test_parse_output_detects_refusal_with_category():
+    parsed = _parse_output(_refusal_stdout("reasoning_extraction"))
+    assert parsed.refusal_category == "reasoning_extraction"
+    assert parsed.is_error is False
+
+
+def test_parse_output_refusal_without_category_is_unknown():
+    assert _parse_output(_refusal_stdout(None)).refusal_category == "unknown"
+
+
+def test_parse_output_normal_result_has_no_refusal():
+    assert _parse_output(_json_stdout()).refusal_category is None
+
+
+@pytest.mark.asyncio
+async def test_refusal_gets_its_own_exit_status(tmp_path: Path):
+    # rc=0 and is_error absent: without classification this would read as ok
+    # and the refusal text would be hashed as a real answer.
+    spawner = _FakeSpawner(
+        [SpawnResult(stdout=_refusal_stdout("cyber"), stderr=b"", returncode=0)]
+    )
+    obs = await run_variant(_variant(), _scenario(), _cfg(), tmp_path, spawner=spawner)
+    assert obs.exit_status == "refusal"
+    assert obs.refusal_category == "cyber"
+    loaded = json.loads((tmp_path / "obs-A.json").read_text(encoding="utf-8"))
+    assert loaded["exit_status"] == "refusal"
+    assert loaded["refusal_category"] == "cyber"
+
+
+def test_parse_output_subtype_fallback_yields_unknown():
+    payload = json.loads(_refusal_stdout(None))
+    del payload["stop_reason"]
+    payload["subtype"] = "error_refusal"
+    parsed = _parse_output(json.dumps(payload).encode("utf-8"))
+    assert parsed.refusal_category == "unknown"
+
+
+@pytest.mark.parametrize("details", ["cyber", ["cyber"], 7])
+def test_parse_output_non_dict_stop_details_yields_unknown(details):
+    payload = json.loads(_refusal_stdout(None))
+    payload["stop_details"] = details
+    parsed = _parse_output(json.dumps(payload).encode("utf-8"))
+    assert parsed.refusal_category == "unknown"
+
+
+def test_parse_output_near_miss_is_not_a_refusal():
+    # Refusal-sounding text with a normal stop_reason must not trip the detector:
+    # it keys on the API fields, not on the wording of the answer.
+    payload = json.loads(_json_stdout(text="I can't help with that, but here is why."))
+    payload["stop_reason"] = "end_turn"
+    payload["subtype"] = "success"
+    assert _parse_output(json.dumps(payload).encode("utf-8")).refusal_category is None
+
+
+@pytest.mark.asyncio
+async def test_refusal_wins_over_is_error_and_nonzero_rc(tmp_path: Path):
+    # The refusal is the more specific signal: keep it even when the run also
+    # reports is_error or a non-zero exit, so the matrix never hides a refusal
+    # behind a generic error.
+    payload = json.loads(_refusal_stdout("bio"))
+    payload["is_error"] = True
+    spawner = _FakeSpawner(
+        [
+            SpawnResult(
+                stdout=json.dumps(payload).encode("utf-8"), stderr=b"", returncode=1
+            )
+        ]
+    )
+    obs = await run_variant(
+        _variant(),
+        _scenario(),
+        _cfg(bare=False, oauth_fallback=False),
+        tmp_path,
+        spawner=spawner,
+    )
+    assert obs.exit_status == "refusal"
+    assert obs.refusal_category == "bio"

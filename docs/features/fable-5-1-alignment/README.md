@@ -30,12 +30,12 @@ Fable 5.1 changed little at the prompt level. Anthropic states that Fable 5 prom
 
 ## Status
 
-Analysis and plan drafted. Nothing applied. Harness facts checked against the Claude Code docs on 2026-09-03 (a `PreCompact` hook cannot inject compaction instructions; a `fable` alias selects Fable 5.1; refusal JSON fields and effort exposure are undocumented). Awaiting the user decisions listed in [05-plan.md section 4](./05-plan.md#4-open-questions), chiefly canary spend on `claude-fable-5-1`.
+Plan approved 2026-09-03 and being applied on `feature/fable-5-1-alignment` (branched from `master`; no `integration` branch exists). Harness facts checked against the Claude Code docs the same day (a `PreCompact` hook cannot inject compaction instructions; a `fable` alias selects Fable 5.1; refusal JSON fields and effort exposure are undocumented). Open questions in [05-plan.md section 4](./05-plan.md#4-open-questions) were resolved by their stated defaults; the canary spend on `claude-fable-5-1` remains the user's call and gates CS-D.
 
 | Change set | Status |
 |---|---|
-| CS-A sediment (`prompt.md`, listings, one comment) | proposed |
-| CS-B delegation run-alongside + compaction SSOT | proposed |
-| CS-C refusal classification in headless runners | proposed |
-| CS-D long-output sentence in `RULES_DOCS.md` (measurement-gated); compaction hook dropped after the fact check | proposed |
-| CS-E deferred items with promotion triggers | recorded |
+| CS-A sediment (`prompt.md`, listings, one comment) | applied, `6dda706` |
+| CS-B delegation run-alongside + compaction SSOT | applied, `d24bc69` |
+| CS-C refusal classification in headless runners | applied after adversarial review (one high-severity fix folded in); commit hash in `git log` on the branch |
+| CS-D long-output sentence in `RULES_DOCS.md` (measurement-gated); compaction hook dropped after the fact check | waiting on canary spend approval |
+| CS-E deferred items with promotion triggers | recorded; G-j found already covered by `git_diff_max_files` |

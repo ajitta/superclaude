@@ -13,7 +13,7 @@ from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any
 
-EXIT_STATUSES = {"ok", "error", "timeout"}
+EXIT_STATUSES = {"ok", "error", "timeout", "refusal"}
 
 KNOWN_KEYS = {
     "variant_id",
@@ -25,6 +25,7 @@ KNOWN_KEYS = {
     "wall_seconds",
     "final_output_sha256",
     "axes",
+    "refusal_category",
 }
 
 
@@ -55,6 +56,10 @@ class Observation:
     wall_seconds: float = 0.0
     final_output_sha256: str = ""
     axes: dict[str, str] = field(default_factory=dict)
+    # Set only when exit_status == "refusal": the model's stop_details.category
+    # (cyber | bio | reasoning_extraction | ...) or "unknown" when the payload
+    # carried the refusal without a category.
+    refusal_category: str = ""
 
 
 def compute_sha256(text: str) -> str:
@@ -114,11 +119,12 @@ def validate(d: dict[str, Any]) -> Observation:
         wall_seconds=float(d.get("wall_seconds", 0.0)),
         final_output_sha256=str(d.get("final_output_sha256", "")),
         axes=dict(d.get("axes") or {}),
+        refusal_category=str(d.get("refusal_category", "")),
     )
 
 
 def _to_dict(obs: Observation) -> dict[str, Any]:
-    return {
+    d: dict[str, Any] = {
         "variant_id": obs.variant_id,
         "exit_status": obs.exit_status,
         "tool_calls": [asdict(tc) for tc in obs.tool_calls],
@@ -129,6 +135,11 @@ def _to_dict(obs: Observation) -> dict[str, Any]:
         "final_output_sha256": obs.final_output_sha256,
         "axes": dict(obs.axes),
     }
+    # Emitted only on a refusal so non-refusal observations keep the exact
+    # schema shape documented in the design spec.
+    if obs.refusal_category:
+        d["refusal_category"] = obs.refusal_category
+    return d
 
 
 def emit(obs: Observation, path: Path) -> None:

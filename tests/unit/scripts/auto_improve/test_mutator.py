@@ -148,3 +148,48 @@ def test_mutator_pipes_prompt_via_stdin(tmp_path):
     cmd = run.call_args.args[0]
     assert "optimize the metric" not in cmd  # prompt NOT in argv
     assert run.call_args.kwargs.get("input") == "optimize the metric"
+
+
+def test_mutator_refusal_is_not_accepted_as_rationale(tmp_path):
+    # claude -p returns rc=0 on a safety refusal with the refusal text in
+    # `result`; without classification that text became the mutation rationale.
+    payload = json.loads(_fake_claude_response("I can't help with that."))
+    payload["stop_reason"] = "refusal"
+    payload["stop_details"] = {"category": "cyber"}
+    with patch("subprocess.run") as run:
+        run.return_value = _completed(json.dumps(payload))
+        result = Mutator().mutate(worktree_path=tmp_path)
+    assert result.refused is True
+    assert result.refusal_category == "cyber"
+    assert result.rationale == ""
+    assert result.error is not None and "refused" in result.error
+    assert result.tokens_used == 1234
+
+
+def test_mutator_normal_result_is_not_refused(tmp_path):
+    with patch("subprocess.run") as run:
+        run.return_value = _completed(_fake_claude_response("reduced lr"))
+        result = Mutator().mutate(worktree_path=tmp_path)
+    assert result.refused is False
+    assert result.refusal_category == ""
+
+
+def test_mutator_subtype_refusal_without_stop_reason_is_unknown_category(tmp_path):
+    payload = json.loads(_fake_claude_response("declined"))
+    payload["subtype"] = "error_refusal"
+    with patch("subprocess.run") as run:
+        run.return_value = _completed(json.dumps(payload))
+        result = Mutator().mutate(worktree_path=tmp_path)
+    assert result.refused is True
+    assert result.refusal_category == "unknown"
+
+
+def test_mutator_refusal_with_blank_result_reports_refusal_not_r3(tmp_path):
+    payload = json.loads(_fake_claude_response("   "))
+    payload["stop_reason"] = "refusal"
+    with patch("subprocess.run") as run:
+        run.return_value = _completed(json.dumps(payload))
+        result = Mutator().mutate(worktree_path=tmp_path)
+    assert result.refused is True
+    assert "refused" in (result.error or "")
+    assert "R3" not in (result.error or "")

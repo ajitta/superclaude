@@ -234,3 +234,34 @@ def test_pid_file_removed_on_exit(repo):
         c = Coordinator(cfg)
         c.run()
     assert not c.pid_path.exists()
+
+
+def test_refused_mutation_is_recorded_not_applied(repo):
+    """A refusal returns rc=0 with refusal text; the coordinator must log it as
+    a mutation_error row and never run the eval on it."""
+    cfg = _make_config(repo, budget_seconds=5)
+    with (
+        patch(
+            "superclaude.scripts.auto_improve.coordinator.run_eval",
+            return_value=_eval_result(10.0),
+        ) as ev,
+        patch.object(Coordinator, "_run_smoke", return_value=True),
+        patch.object(Coordinator, "_invoke_mutator") as mut,
+        patch.object(Coordinator, "_git_commit") as commit,
+    ):
+        mut.return_value = MutationResult(
+            rationale="",
+            tokens_used=5,
+            error="mutator refused (category=cyber); rationale discarded",
+            refused=True,
+            refusal_category="cyber",
+        )
+        c = Coordinator(cfg)
+        c.run()
+    rows = ResultsTsv(c.tsv_path).read_all()
+    refused_rows = [r for r in rows if r.status == "mutation_error"]
+    assert refused_rows, [r.status for r in rows]
+    assert all("refused" in r.desc for r in refused_rows)
+    assert commit.call_count == 0
+    # only the baseline eval ran; refused cycles never reach run_eval
+    assert ev.call_count == 1

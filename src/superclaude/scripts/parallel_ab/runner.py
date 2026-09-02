@@ -41,9 +41,38 @@ class ParsedResult:
     tool_calls: tuple[ToolCall, ...] = ()
     axes: dict[str, str] = field(default_factory=dict)
     is_error: bool = False
+    # None = no refusal; otherwise the stop_details.category or "unknown".
+    refusal_category: str | None = None
 
 
 Spawner = Callable[[list[str], int], Awaitable[SpawnResult]]
+
+
+def detect_refusal(payload: dict) -> str | None:
+    """Return the refusal category when *payload* records a model refusal.
+
+    Claude Fable 5.x safety classifiers end a turn with the API's
+    ``stop_reason: "refusal"`` plus ``stop_details.category`` (``cyber``,
+    ``bio``, ``reasoning_extraction``, ...). The ``--output-format json``
+    result object carries a top-level ``stop_reason`` but no ``stop_details``
+    (Claude Code 2.1.258 result schema; the category lives on the assistant
+    message, which only stream-json exposes), so this runner detects the
+    refusal reliably and reports the category as ``"unknown"`` unless the
+    CLI adds it. A ``subtype`` naming a refusal counts as a fallback. A
+    refusal is not ``is_error``: the CLI returns rc=0 and the refusal text
+    lands in ``result``, which is why callers must not treat that text as a
+    normal answer.
+    """
+    if not isinstance(payload, dict):
+        return None
+    refused = payload.get("stop_reason") == "refusal" or "refusal" in str(
+        payload.get("subtype") or ""
+    )
+    if not refused:
+        return None
+    details = payload.get("stop_details") or {}
+    category = details.get("category") if isinstance(details, dict) else None
+    return str(category) if category else "unknown"
 
 
 async def _default_spawn(cmd: list[str], timeout_s: int) -> SpawnResult:
@@ -117,6 +146,7 @@ def _parse_output(stdout: bytes) -> ParsedResult:
         output_tokens=int(usage.get("output_tokens", 0)),
         tool_calls=tool_calls,
         is_error=bool(d.get("is_error", False)),
+        refusal_category=detect_refusal(d),
     )
 
 
@@ -176,16 +206,27 @@ async def run_variant(
 
     parsed = _parse_output(result.stdout)
     # claude -p can return rc=0 with `is_error: true` for API-level failures
-    # (rate limit, overload) — treat those as error, not ok.
-    ok = result.returncode == 0 and not parsed.is_error
+    # (rate limit, overload) — treat those as error, not ok. A safety refusal
+    # also returns rc=0, with the refusal text in `result`; it gets its own
+    # exit status so the matrix can tell "the model declined" from "the run
+    # broke", which is the signal a model-release canary needs.
+    refused = parsed.refusal_category is not None
+    ok = result.returncode == 0 and not parsed.is_error and not refused
+    if ok:
+        exit_status = "ok"
+    elif refused:
+        exit_status = "refusal"
+    else:
+        exit_status = "error"
     obs = Observation(
         variant_id=variant.id,
-        exit_status="ok" if ok else "error",
+        exit_status=exit_status,
         wall_seconds=time.monotonic() - t0,
         tokens=Tokens(input=parsed.input_tokens, output=parsed.output_tokens),
         tool_calls=parsed.tool_calls,
         final_output_sha256=compute_sha256(parsed.text),
         axes=parsed.axes,
+        refusal_category=parsed.refusal_category or "",
     )
     return _write_obs(obs, out_dir)
 
