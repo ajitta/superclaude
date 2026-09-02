@@ -368,3 +368,87 @@ async def test_refusal_wins_over_is_error_and_nonzero_rc(tmp_path: Path):
     )
     assert obs.exit_status == "refusal"
     assert obs.refusal_category == "bio"
+
+
+# ── stream-json parsing (assistant events carry the refusal category) ────────
+
+
+def _stream_stdout(
+    *,
+    category: str | None = None,
+    result_stop_reason: bool = False,
+    tool_names: tuple[str, ...] = ("Read", "Read", "Grep"),
+    text: str = "streamed answer",
+) -> bytes:
+    content = [
+        {"type": "tool_use", "id": f"t{i}", "name": n, "input": {}}
+        for i, n in enumerate(tool_names)
+    ]
+    message = {
+        "role": "assistant",
+        "content": content,
+        "stop_reason": "tool_use",
+        "stop_details": None,
+    }
+    if category is not None:
+        message["stop_reason"] = "refusal"
+        message["stop_details"] = {"category": category}
+    result = {
+        "type": "result",
+        "subtype": "success",
+        "result": text,
+        "usage": {"input_tokens": 700, "output_tokens": 90},
+        "total_cost_usd": 0.02,
+        "num_turns": 2,
+    }
+    if result_stop_reason:
+        # CLI 2.1.258 result schema: top-level stop_reason, no stop_details.
+        result["stop_reason"] = "refusal"
+    events = [
+        {"type": "system", "subtype": "init", "model": "claude-fable-5-1"},
+        {"type": "assistant", "message": message},
+        result,
+    ]
+    return ("\n".join(json.dumps(e) for e in events) + "\n").encode("utf-8")
+
+
+def test_build_cmd_requests_stream_json_with_verbose():
+    cmd = _build_cmd(_variant(), _scenario(), _cfg())
+    assert cmd[cmd.index("--output-format") + 1] == "stream-json"
+    assert "--verbose" in cmd
+
+
+def test_stream_parse_recovers_category_from_assistant_message():
+    parsed = _parse_output(
+        _stream_stdout(category="reasoning_extraction", result_stop_reason=True)
+    )
+    assert parsed.refusal_category == "reasoning_extraction"
+    assert parsed.text == "streamed answer"
+    assert parsed.input_tokens == 700 and parsed.output_tokens == 90
+
+
+def test_stream_parse_counts_tool_use_blocks_when_result_has_no_tools_used():
+    parsed = _parse_output(_stream_stdout())
+    assert parsed.refusal_category is None
+    assert parsed.tool_calls == (
+        ToolCall(name="Grep", count=1),
+        ToolCall(name="Read", count=2),
+    )
+
+
+def test_stream_parse_result_only_refusal_is_unknown():
+    parsed = _parse_output(_stream_stdout(result_stop_reason=True))
+    assert parsed.refusal_category == "unknown"
+
+
+def test_stream_parse_skips_non_json_lines():
+    raw = b"warning: something\n" + _stream_stdout(category="cyber")
+    assert _parse_output(raw).refusal_category == "cyber"
+
+
+def test_single_object_json_still_parses():
+    # The legacy --output-format json shape stays supported for old observations.
+    parsed = _parse_output(_json_stdout(tools=[{"name": "Read", "count": 2}]))
+    assert parsed.text == "hello"
+    assert parsed.tool_calls == (ToolCall(name="Read", count=2),)
+    assert parsed.refusal_category is None
