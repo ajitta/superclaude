@@ -202,6 +202,7 @@ def run_task(
     claude_bin: str,
     model: str,
     defaults: dict,
+    effort: str | None = None,
 ) -> TaskResult:
     res = TaskResult(arm=arm, task_id=task["id"])
     tools = task.get("allowed_tools", defaults.get("allowed_tools", []))
@@ -215,6 +216,10 @@ def run_task(
         str(task.get("max_turns", defaults.get("max_turns", 12))),
         "--model",
         model,
+        # Session effort (low|medium|high|xhigh|max); omitted = model default.
+        # Lets a probe measure an xhigh-only behavior without changing the
+        # canary's default-effort baseline.
+        *(["--effort", effort] if effort else []),
         "--allowedTools",
         " ".join(tools),
         # `--` ends option parsing: prompts that legitimately start with an SC
@@ -542,6 +547,12 @@ def main() -> int:
     )
     ap.add_argument("--model", default="sonnet")
     ap.add_argument(
+        "--effort",
+        default=None,
+        help="session effort passed to claude -p (low|medium|high|xhigh|max); "
+        "omit for the model default",
+    )
+    ap.add_argument(
         "--runs-dir",
         default=None,
         help="output dir (default: <system temp>/superclaude-evals/<timestamp>)",
@@ -630,6 +641,7 @@ def main() -> int:
                 claude_bin,
                 args.model,
                 defaults,
+                args.effort,
             )
             results.append(res)
             status = "ok" if res.ok else (res.error or "checks failed")
