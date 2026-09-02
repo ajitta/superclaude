@@ -30,7 +30,7 @@ memory: project                             # source value always "project"; ins
 color: blue                                 # role-group mapping below
 
 # Optional — omit to inherit from parent session
-model: inherit                              # inherit | sonnet | opus | haiku | full ID (e.g. claude-opus-4-7). Default: inherit
+model: sonnet                               # sonnet | opus | haiku | fable | full ID (e.g. claude-fable-5-1). Omit the field to inherit the session model (default); `inherit` is not a documented value
 permissionMode: default                     # default | acceptEdits | auto | dontAsk | bypassPermissions | plan
 tools: Read, Grep, Glob, Agent              # allow-list (comma-separated)
 disallowedTools: Edit, Write                # deny-list (applied first, then `tools` resolved against remainder)

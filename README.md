@@ -376,7 +376,7 @@ superclaude mcp
 - **Playwright** → Cross-browser automation & E2E testing (Microsoft official). Repo: ['https://github.com/microsoft/playwright-cli'](https://github.com/microsoft/playwright-cli)
 - **Chrome DevTools** → Performance, Lighthouse, accessibility, and memory profiling (CLS, LCP). Installed as Claude plugin from [`ChromeDevTools/chrome-devtools-mcp`](https://github.com/ChromeDevTools/chrome-devtools-mcp)
 
-> Removed in this fork: Morphllm, Mindbase, Airis-Agent, Magic, AST-Grep (replaced by native Grep/Edit + ReflexionMemory), Sequential-Thinking (Opus 5 / Fable 5 reason natively between tool calls — see [`docs/codex/sequential-thinking-validity-2026-08-22/`](docs/codex/sequential-thinking-validity-2026-08-22/)).
+> Removed in this fork: Morphllm, Mindbase, Airis-Agent, Magic, AST-Grep (replaced by native Grep/Edit + ReflexionMemory), Sequential-Thinking (Claude 5-family models reason natively between tool calls — see [`docs/codex/sequential-thinking-validity-2026-08-22/`](docs/codex/sequential-thinking-validity-2026-08-22/)).
 
 </td>
 <td width="50%">
@@ -681,7 +681,7 @@ MIT — see [`LICENSE`](LICENSE).
 - `/sc:init` — Interactive project environment setup
 - `/sc:index` / `/sc:index-repo` — Repository indexing (94% token reduction)
 - `/sc:recommend` — Command recommendation engine
-- `/sc:prompt` — Rewrite a prompt for Claude Opus 5 / Fable 5
+- `/sc:prompt` — Rewrite a prompt for Claude Opus 5 / Fable 5.1
 - `/sc:select-tool` — Intelligent MCP tool selection
 - `/sc:sc` — Show all commands
 

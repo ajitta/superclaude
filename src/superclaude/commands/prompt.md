@@ -1,18 +1,18 @@
 ---
-description: Rewrite a prompt for Claude Opus 5 or Fable 5 — strip prompting folklore that degrades these models, apply model-specific behavioral deltas, mark missing context as placeholders. Use when user types `/sc:prompt`, asks to improve or tune a prompt for Opus 5 / Fable 5, or hands over a rough request to sharpen before sending. Do NOT auto-trigger on general prompt-engineering questions, on "what does this prompt do", or on auditing prompt files across a repo — those get a direct answer or `/claude-api prompt-audit`.
+description: Rewrite a prompt for Claude Opus 5 or Fable 5.1 — strip prompting folklore that degrades these models, apply model-specific behavioral deltas, mark missing context as placeholders. Use when user types `/sc:prompt`, asks to improve or tune a prompt for Opus 5 / Fable 5.1, or hands over a rough request to sharpen before sending. Do NOT auto-trigger on general prompt-engineering questions, on "what does this prompt do", or on auditing prompt files across a repo — those get a direct answer or `/claude-api prompt-audit`.
 ---
 
 <component name="prompt" type="command">
 
   <role command="/sc:prompt">
-    <mission>Rewrite a single prompt for Claude Opus 5 or Fable 5 — strip prompting folklore that degrades these models, apply model-specific behavioral deltas, and mark missing context as placeholders.</mission>
+    <mission>Rewrite a single prompt for Claude Opus 5 or Fable 5.1 — strip prompting folklore that degrades these models, apply model-specific behavioral deltas, and mark missing context as placeholders.</mission>
   </role>
 
-  <syntax>/sc:prompt [prompt-text|path] [--model opus5|fable5] [--target cc|api] [--out path]</syntax>
+  <syntax>/sc:prompt [prompt-text|path] [--model opus5|fable51] [--target cc|api] [--out path]</syntax>
 
   <flow>
   1. Capture the prompt from the inline argument, a file path, or the intent the user just described — and name which source was used.
-  2. Resolve target model ('claude-opus-5' or 'claude-fable-5') and surface (cc or api). When either is unstated, infer from the session and record the assumption in one line.
+  2. Resolve target model ('claude-opus-5' or 'claude-fable-5-1') and surface (cc or api). `fable5` is accepted as a legacy alias for the Fable column, since Fable 5 prompts run unchanged on Fable 5.1. When either is unstated, infer from the session and record the assumption in one line.
   3. Diagnose in both directions — the folklore present that degrades the target model, and the context the prompt is missing.
   4. Apply the model delta, touching only axes the prompt actually exercises. A prompt with no delegation gets no delegation cap.
   5. Rewrite. Context only the user holds becomes a `[FILL: …]` placeholder, never an invention.
@@ -23,14 +23,17 @@ description: Rewrite a prompt for Claude Opus 5 or Fable 5 — strip prompting f
   <model_delta>
   The two targets pull in opposite directions on several axes. An unresolved target model produces the inverse of the correct edit.
 
-  | Axis | 'claude-opus-5' | 'claude-fable-5' |
+  | Axis | 'claude-opus-5' | 'claude-fable-5-1' |
   |---|---|---|
-  | Verification instructions | Delete — it self-verifies unprompted, and "double-check" causes over-verification | Add — long runs need an explicit checking cadence plus fresh-context verifier subagents |
-  | Subagent delegation | Cap it — this model reaches for subagents readily | Encourage it — asynchronous delegation is a strength |
-  | Prescriptiveness | Add scope discipline; it expands task scope | De-prescribe — step-by-step scaffolding lowers output quality |
-  | Verbosity | A brief conciseness instruction cuts length; effort is not the lever | A communication-style section steers it; instruction following is strong |
-  | Written deliverables | Calibrate file length explicitly | A lead-with-outcome instruction covers it |
-  | Native failure modes | Scope expansion, self-correction narration | Early stopping, context anxiety, unrequested adjacent actions |
+  | Verification instructions | Delete — it self-verifies unprompted, and "double-check" causes over-verification | Keep only claim-grounding (report what a tool result shows); add a fresh-context, read-only verifier with a PASS/FAIL verdict only for long autonomous builds beyond what the model solves reliably alone |
+  | Subagent delegation | Cap it — this model reaches for subagents readily | Keep it; tell the lead to continue independent work while workers run, and to reuse a long-lived worker for follow-ups, since cache reads are cheap |
+  | Tool-call batching | Issues parallel calls as expected | In loops where the next reads are implied rather than named it may issue one call per turn; append the one-sentence batching nudge each turn (a turn-scoped system message on `--target api`) |
+  | Progress updates | Narrates readily; give it a cadence | Writes fewer updates; delete any hold-for-final line first, then add a when-and-what line only if the interface shows text between calls |
+  | Task completion | Pair scope discipline with "finish the whole task" | The same, and on autonomous workloads add the documented two-block autonomy text; leave it out of human-in-the-loop prompts |
+  | Prescriptiveness | Add scope discipline; it expands task scope | De-prescribe; state what to leave out (nearby fixes, extra committed test files) |
+  | Verbosity and formatting | A brief conciseness instruction cuts length; effort is not the lever | Prose runs denser than Fable 5: define mannered prose as the anti-pattern; remove anti-formatting rules, because it under-formats |
+  | Written deliverables | Calibrate file length explicitly | Lead with the outcome; at `xhigh` or `max` append the single-limit note naming `max_tokens` |
+  | Native failure modes | Scope expansion, self-correction narration | Early stopping, unrequested adjacent actions, one call per turn in implied loops, whole-file rewrites, over-committed tests, memory answers at `low`, unmarked quotation of sources |
   | Intent framing | Full task specification up front in one turn | The reason behind the request, not just the request |
   </model_delta>
 
@@ -42,7 +45,9 @@ description: Rewrite a prompt for Claude Opus 5 or Fable 5 — strip prompting f
   | Thinking incantations | `think step by step`, scratchpad tag instructions | Delete — redundant on thinking models and a cause of over-planning |
   | Self-check phrasing | `double-check`, `re-verify before responding` | Delete for 'claude-opus-5' — this inverts the usual best practice |
   | Emphasis inflation | density of `MUST`, `NEVER`, `ALWAYS`, `CRITICAL` | State the real constraint once at normal volume, with its reason |
-  | Proactivity boosters | `be thorough`, `do not be lazy`, `do not stop early` | Delete — both targets are proactive by default |
+  | Proactivity boosters | `be thorough`, `do not be lazy`, bare `do not stop early` | Delete the slogans. Where the prompt drives autonomous multi-step work, replace them with the documented autonomy block (operating autonomously, reversible steps proceed, the assessment exception, check the last paragraph): a mechanism with a stated trigger, not a booster. On `--target cc` the harness already injects it, so add it only for `--target api` |
+  | Narration suppression | `hold all findings for the final response`, `no commentary between steps` | Delete for 'claude-fable-5-1' — it already under-narrates |
+  | Anti-formatting rules | `no bullet points`, `never use headers`, `avoid bold` | Replace with a conditional rule (lists when the content is multifaceted, plain prose when asked) for 'claude-fable-5-1' |
   | Numeric output caps | `at most N words`, `under N bullets` | Replace with audience framing; caps starve reasoning on hard problems |
   | Severity filters | `only report high-severity`, `be conservative`, `high-confidence only` | Replace with report-everything-plus-severity-and-confidence; filtering during the pass depresses measured recall |
   | Step choreography | `STEP 1:` numbering over judgment work | State outcome, constraints, and verification; keep ordering only where order is real |
@@ -58,8 +63,9 @@ description: Rewrite a prompt for Claude Opus 5 or Fable 5 — strip prompting f
   - Audience: who reads the output and what they do with it.
   - Environment: the product, the codebase, and the constraints not visible from the request itself.
   - Quality-bar: what good means here, what done looks like, and how success gets checked — stated as an environment fact rather than an instruction to self-check.
-  - Reason: why the work is being asked for — 'claude-fable-5' connects task to intent when given the reason.
+  - Reason: why the work is being asked for — 'claude-fable-5-1' connects task to intent when given the reason.
   - Boundaries: what the task must not touch, and which actions fall outside it.
+  - Compaction contract (`--target api`, client-side compaction only): the six things a summary must keep — problems and their resolutions, options tried or set aside, decisions and constraints stated exactly, current position, open items, and exact specifics.
   </context_targets>
 
   <fact_sourcing>
@@ -70,7 +76,7 @@ description: Rewrite a prompt for Claude Opus 5 or Fable 5 — strip prompting f
   - Rewritten-prompt: the improved prompt, fenced and ready to copy.
   - Change-delta: removals, additions, and rewrites, each with its reason.
   - Placeholders: the fill-in slots only the user can complete.
-  - Request-config: effort, thinking display, and max_tokens floor — `--target api` only.
+  - Request-config: effort, thinking display, `max_tokens` floor, refusal fallback target, and the per-turn batching nudge placement — `--target api` only.
   </outputs>
 
   <tools>
@@ -83,7 +89,7 @@ description: Rewrite a prompt for Claude Opus 5 or Fable 5 — strip prompting f
   | Trigger | Expected behavior |
   |---|---|
   | `/sc:prompt "refactor the auth module"` | Rewrite for the session model, flag missing audience and done-criteria |
-  | `/sc:prompt --model fable5 --target api ./sys.md` | De-prescribe the file, add reason framing, emit effort and max_tokens config |
+  | `/sc:prompt --model fable51 --target api ./sys.md` | De-prescribe the file, add reason framing, emit effort and max_tokens config |
   | `/sc:prompt --model opus5 ./agent.md` | Strip self-check lines, cap delegation, add scope discipline |
   | `/sc:prompt` on an already-clean prompt | Report the prompt as clean and emit no diff |
   </examples>
@@ -94,6 +100,7 @@ description: Rewrite a prompt for Claude Opus 5 or Fable 5 — strip prompting f
   - model-required: An unresolved target model yields opposite instructions on delegation and verification. State the assumed model before rewriting.
   - clean-is-valid: A clean prompt gets reported as clean. A manufactured diff is worse than an empty one.
   - facts-not-memory: Effort ladders and verbatim tuning blocks get read from the `claude-api` skill, never recalled.
+  - booster-vs-mechanism: The autonomy block is not a proactivity booster; deleting it under the booster rule reintroduces early stopping on 'claude-fable-5-1'.
   </gotchas>
 
   <bounds>
