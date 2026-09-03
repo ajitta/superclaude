@@ -15,7 +15,7 @@ revised: 2026-09-04
 
 ## 1. Change sets
 
-Ordered by certainty. CS-A and CS-B need no probe (correctness under the framework's own rules). CS-C is code with unit tests. CS-D is behavior and is measurement-gated. CS-E is deferred.
+Ordered by certainty. CS-A and CS-B need no probe (correctness under the framework's own rules). CS-C is code with unit tests. CS-D is behavior and is measurement-gated. CS-E was deferred at approval and promoted on 2026-09-04 by user decision.
 
 ### CS-A — Sediment: Fable 5.1 as the current Fable target
 
@@ -124,16 +124,20 @@ Gate: run a doc-producing task (`plan-routing` is the closest existing canary ta
 
 **D2. Claude Code compaction instruction — dropped.** The hooks reference states that Claude Code discards a `PreCompact` hook's `systemMessage` and `continue` fields, so the six-item list cannot be installed into native compaction. The session-save SSOT (B2) is the whole fix; `context_reset.py`'s post-compact re-injection of dynamic contexts remains the mitigation for rule drift. The manual path, `/compact <instructions>`, exists for the user and needs nothing from the framework.
 
-### CS-E — Deferred, with the trigger that would promote each
+### CS-E — Deferred at approval, promoted 2026-09-04
 
-| Item | Promote when |
-|---|---|
-| G-f `self-review` verdict `PASS` / `FAIL` (criterion, evidence, repro) / `UNVERIFIED` | A downstream consumer needs to filter verdicts deterministically |
-| G-g Feature contracts (`status: fail` until evidence) in `/sc:roadmap` and `/sc:task` output | A premature "done" on a multi-phase roadmap is observed in an eval or a session |
-| G-h Low-effort search nudge in `MODE_DeepResearch.md` | A research session at `low`/`medium` answers a fast-moving question from memory |
-| G-i One worked example with rationale for quoting in research outputs | A research deliverable reproduces a source passage unmarked |
-| G-j Eval check counting committed test files under `scope` | Already covered: `bugfix-scope-creep` carries `git_diff_max_files: 2` under the `scope` tag, so an extra committed test file fails that check today. No new check added; the `quality-engineer` trigger is revisited only if that check starts failing on Fable 5.1 |
-| Chatspeak hygiene (`b4`, `u r`, `w/`, `thru`) across 20+ files | Opportunistically, one file at a time when that file is edited for another reason |
+Promoted by user decision on 2026-09-04 before any recorded trigger fired. Each item is one to three lines in a file that loads only on its own context (a delegated agent, a typed command, the research mode), so the always-loaded tier is still unchanged. Wording follows the Fable 5.1 prompting guide where the guide gives text (G-h, G-i) and the notes' evaluator and long-running-harness patterns where it does not (G-f, G-g). The chatspeak sweep keeps its opportunistic rule: the four files edited here were cleaned, no others.
+
+| Item | Recorded trigger | Applied |
+|---|---|---|
+| G-f `self-review` verdict vocabulary | A downstream consumer needs to filter verdicts deterministically | `agents/self-review.md` `<outputs>`: one verdict per dimension, `PASS`, `FAIL` with the criterion, the evidence, and the steps that reproduce it, or `UNVERIFIED` with the reason the check could not run. The `premature-approval` gotcha now reports `UNVERIFIED: [reason]` instead of "verification not possible", so the agent carries one vocabulary |
+| G-g Feature contracts | A premature "done" on a multi-phase roadmap is observed | `commands/roadmap.md` flow step 5 writes each feature as a contract that starts `status: fail` with an empty `evidence` list and flips to `pass` only by citing the check that passed. `commands/task.md` step 2 gives each task the same start and step 6 the same flip, with a sub-agent's result named as a claim to check. R15 stays the rule; this is the shape the rule's evidence is recorded in |
+| G-h Low-effort search nudge | A research session at `low`/`medium` answers a fast-moving question from memory | `modes/MODE_DeepResearch.md` `<behaviors>` gains `Name-Verification`, the guide's nudge compressed to one line: an unrecognized or fast-moving name is itself the thing to verify, searched as the user wrote it, and familiarity is not a reason to skip |
+| G-i Quoting example | A research deliverable reproduces a source passage unmarked | `modes/MODE_DeepResearch.md` gains one `<example>` in the shape the guide prescribes (request, response, why it is correct), the guide's own text with its tool lines as `[WebSearch: …]`, plus a directive in `<communication>` to mark reproduced wording as a quotation and reword the rest |
+| G-j Over-committed tests | Already covered | No change; `bugfix-scope-creep` `git_diff_max_files: 2` under the `scope` tag remains the check |
+| Chatspeak hygiene | Opportunistic, per file edited for another reason | `self-review.md` (three `w/`, one `til`) and `MODE_DeepResearch.md` (two `w/`, one `Ack`) cleaned as ride-alongs; `roadmap.md` and `task.md` carried none. 41 files still match the sweep pattern and stay on the opportunistic rule |
+
+Gate: unit suite and install sync only, the same bar as CS-A and CS-B. G-h and G-i are behavior nudges and the canary has no research task, so they ship unmeasured. The observation that would confirm or refute G-h is the first research session at `low` or `medium` effort that names a fast-moving product; for G-i, any research deliverable whose reproduced wording is now marked.
 
 ---
 
