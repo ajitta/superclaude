@@ -1,18 +1,18 @@
 ---
-description: Multi-expert biz analysis w/ adaptive modes. Use when user types `/sc:business-panel` or asks multi-expert (Porter, Christensen, Drucker, etc.) panel review of strategy decision. Do NOT auto-trigger on single-perspective biz question or quick "what's trade-off?" — those get direct answer.
+description: Multi-expert biz analysis with adaptive modes. Use when user types `/sc:business-panel` or asks multi-expert (Porter, Christensen, Drucker, etc.) panel review of strategy decision. Do NOT auto-trigger on single-perspective biz question or quick "what's trade-off?" — those get direct answer.
 ---
 <component name="business-panel" type="command">
 
   <role command="/sc:business-panel">
-    <mission>Multi-expert biz analysis w/ adaptive modes</mission>
+    <mission>Multi-expert biz analysis with adaptive modes</mission>
   </role>
 
   <syntax>/sc:business-panel [doc|content] [--experts "names"] [--mode discussion|debate|socratic|adaptive] [--focus domain] [--all-experts] [--synthesis-only] [--structured]</syntax>
   <flow>
   1. Route: ID domain + pick mode (Discussion, Debate, Socratic)
   2. Analyze: Apply 2-3 expert frameworks, surface agree/diverge
-  3. Synthesize: Integrate cross-framework w/ trade-off clarity
-  4. Present: Multi-lens analysis w/ labeled expert attributions
+  3. Synthesize: Integrate cross-framework with trade-off clarity
+  4. Present: Multi-lens analysis with labeled expert attributions
   </flow>
 
 
@@ -40,7 +40,7 @@ description: Multi-expert biz analysis w/ adaptive modes. Use when user types `/
 |---|---|
 | `market-analysis.md --mode discussion --focus strategy` | Collaborative expert analysis |
 | `'SaaS pricing strategy' --experts "porter,godin" --mode debate` | Adversarial pricing analysis |
-| `startup-pitch.md --mode socratic --all-experts` | Deep questioning w/ all 9 experts |
+| `startup-pitch.md --mode socratic --all-experts` | Deep questioning with all 9 experts |
 | `competitive-landscape.md --synthesis-only` | Summary synthesis only |
 
   <example name="panel-technical-question" type="error-path">

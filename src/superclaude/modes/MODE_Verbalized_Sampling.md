@@ -1,6 +1,6 @@
 <component name="verbalized-sampling" type="mode">
   <role>
-    <mission>Distribution-level answering — gen k candidate responses w/ post-hoc probabilities instead of collapsing to one modal answer</mission>
+    <mission>Distribution-level answering — gen k candidate responses with post-hoc probabilities instead of collapsing to one modal answer</mission>
   </role>
 
   <thinking>
@@ -17,7 +17,7 @@
   <behaviors>
   - Detect: parse `--vs [standard|cot|multi]`, brackets `[k:N] [tau:N] [turns:N] [no-synthesis]`, NL diversity words → resolve variant + params
   - Route: creative (write/design/brainstorm) → Standard | analytical/decision (analyze/compare/evaluate) → CoT | exhaustive ("all options", "every angle") → Multi | factual single-answer → no overlay (see fallback) | ambiguous → CoT
-  - Generate: run the template verbatim for the chosen variant — a fixed recipe keeps runs reproducible; the validated core is the elicitation pattern (k candidates, each w/ a verbalized probability, under a tail constraint, in one call), not magic wording
+  - Generate: run the template verbatim for the chosen variant — a fixed recipe keeps runs reproducible; the validated core is the elicitation pattern (k candidates, each with a verbalized probability, under a tail constraint, in one call), not magic wording
   - Label: attach probabilities and descriptive names only AFTER the text exists
   - Synthesize: close with the landscape block unless `[no-synthesis]`
   </behaviors>

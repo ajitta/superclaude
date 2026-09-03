@@ -1,10 +1,10 @@
 ---
-description: Design system architecture, APIs, component interfaces w/ comprehensive specs. Use ONLY when user explicitly types `/sc:design` — commits a spec under docs/specs/, so a wrong fire skips the approval gate and creates files unasked. NOT auto-trigger on "how should I structure this function", small sketches, single-component examples — those get inline answer.
+description: Design system architecture, APIs, component interfaces with comprehensive specs. Use ONLY when user explicitly types `/sc:design` — commits a spec under docs/specs/, so a wrong fire skips the approval gate and creates files unasked. NOT auto-trigger on "how should I structure this function", small sketches, single-component examples — those get inline answer.
 ---
 <component name="design" type="command">
 
   <role command="/sc:design">
-    <mission>Design system architecture, APIs, component interfaces w/ comprehensive specs</mission>
+    <mission>Design system architecture, APIs, component interfaces with comprehensive specs</mission>
   </role>
 
   <syntax>/sc:design [target] [--type architecture|api|component|database] [--format diagram|spec|code]</syntax>
@@ -48,8 +48,8 @@ description: Design system architecture, APIs, component interfaces w/ comprehen
 | `e-commerce-db --type database --format diagram` | Schema design |
   <example name="design-without-requirements" type="error-path">
     - Input: /sc:design payment-api --type api (no context about payment provider or requirements)
-    - Why wrong: Design w/o requirements lead to assumptions that may not match business needs.
-    - Correct: /sc:brainstorm 'payment system requirements' first → then /sc:design w/ concrete requirements
+    - Why wrong: Design without requirements lead to assumptions that may not match business needs.
+    - Correct: /sc:brainstorm 'payment system requirements' first → then /sc:design with concrete requirements
   </example>
 
   </examples>

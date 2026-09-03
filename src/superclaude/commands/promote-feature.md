@@ -24,7 +24,7 @@ description: Promote standalone docs sharing a slug into a feature folder per do
   | Artifact | Purpose |
   |---|---|
   | `docs/features/<slug>/` | New feature folder containing moved + renamed files |
-  | `docs/features/<slug>/README.md` | Scaffolded index w/ frontmatter + Documents list |
+  | `docs/features/<slug>/README.md` | Scaffolded index with frontmatter + Documents list |
   | Inbound link warning report | Console list of files holding stale paths to old standalone names |
   | Dry-run plan (default) | Console table of intended moves without filesystem change |
   </outputs>
@@ -66,7 +66,7 @@ description: Promote standalone docs sharing a slug into a feature folder per do
   </gotchas>
 
   <bounds>
-    <does>scan standalone candidates, confirm move set, create feature folder + scaffold README, move files w/ git mv, emit inbound link warnings.</does>
+    <does>scan standalone candidates, confirm move set, create feature folder + scaffold README, move files with git mv, emit inbound link warnings.</does>
     <never>auto-rewrite inbound links, overwrite existing feature folder, run without explicit --apply flag, move docs outside the named slug, modify frontmatter beyond status/revised add.</never>
     <fallback>Ask user when slug match is ambiguous, when feature folder exists, or when type→phase mapping unclear for non-standard filename pattern.</fallback>
   </bounds>

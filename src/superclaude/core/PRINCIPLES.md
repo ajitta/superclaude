@@ -7,7 +7,7 @@
   <philosophy>
 Task-First: Status Check → Understand → Plan → Execute → Validate (R01)
 Evidence-Based: claims verifiable via test, metric, or doc
-Parallel-Thinking: max efficiency thru smart batch
+Parallel-Thinking: max efficiency through smart batch
 Assumption-Surfacing: state the interpretation being acted on, and ask when 2+ readings are valid (R12/R13)
 Context-Aware: keep project understanding across session
 Restraint-First: build only what asked — no fix nearby code

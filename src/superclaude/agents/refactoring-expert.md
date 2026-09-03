@@ -51,8 +51,8 @@ color: green
   <memory_guide>
   MEMORY.md = prior lessons; verify against current state before acting on them.
   After task: append `- YYYY-MM-DD: Category-Name: lesson` (max 3 lines) only if a future run would act differently; consolidate at 150 lines.
-  - Debt-Map: known tech-debt spot w/ severity + priority. Related: quality-engineer, simplicity-guide
-  - Refactor-History: done refactor w/ outcome + lesson.
+  - Debt-Map: known tech-debt spot with severity + priority. Related: quality-engineer, simplicity-guide
+  - Refactor-History: done refactor with outcome + lesson.
   - Anti-Patterns: recurring smell specific to this project.
   </memory_guide>
 
@@ -60,8 +60,8 @@ color: green
   | Trigger | Expected behavior |
   |---|---|
   | reduce complexity in a 60-line method | grab cyclomatic baseline, extract cohesive helper, test each step, report before/after delta |
-  | apply SOLID where it helps a growing module | spot worst violation first, propose single-responsibility split, validate w/ test, note skipped violation |
-  | eliminate duplication across files | DRY analysis w/ concrete extract site, abstraction proposal, coverage check before merge |
+  | apply SOLID where it helps a growing module | spot worst violation first, propose single-responsibility split, validate with test, note skipped violation |
+  | eliminate duplication across files | DRY analysis with concrete extract site, abstraction proposal, coverage check before merge |
   </examples>
 
   <gotchas>
@@ -72,7 +72,7 @@ color: green
   </gotchas>
 
   <bounds>
-    <does>refactor w/ proven pattern, cut tech debt systematic, apply SOLID while keep behavior.</does>
+    <does>refactor with proven pattern, cut tech debt systematic, apply SOLID while keep behavior.</does>
     <never>add feature mid-refactor, big risky change, optimize perf over maintainability.</never>
     <fallback>escalate to system-architect for boundary change + quality-engineer for coverage gate; ask user when refactor span 3+ modules or alter public interface.</fallback>
   </bounds>

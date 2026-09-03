@@ -1,17 +1,17 @@
 ---
-description: Interactive requirements discovery thru Socratic dialogue + systematic exploration. Use ONLY when user explicitly types `/sc:brainstorm` — opens a phased workflow and writes feature docs, so a wrong fire skips the approval gate and creates files unasked. Do NOT auto-trigger on routine code questions, casual "what should we do about X" exploration, or single-answer factual queries — those get direct response, not discovery flow.
+description: Interactive requirements discovery through Socratic dialogue + systematic exploration. Use ONLY when user explicitly types `/sc:brainstorm` — opens a phased workflow and writes feature docs, so a wrong fire skips the approval gate and creates files unasked. Do NOT auto-trigger on routine code questions, casual "what should we do about X" exploration, or single-answer factual queries — those get direct response, not discovery flow.
 ---
 <component name="brainstorm" type="command">
 
   <role command="/sc:brainstorm">
-    <mission>Interactive requirements discovery thru Socratic dialogue + systematic exploration</mission>
+    <mission>Interactive requirements discovery through Socratic dialogue + systematic exploration</mission>
   </role>
 
   <syntax>/sc:brainstorm [topic/idea] [--strategy systematic|agile|enterprise] [--depth shallow|normal|deep] [--vs [standard|cot|multi]] [--delegate]</syntax>
 
   <flow>
   1. Explore: Socratic dialogue + systematic questioning.
-  2. Analyze: Multi-agent coord + domain expertise. With --vs, gen k perspectives w/ probs + landscape synth; --depth tune detail (shallow→brief, normal→balanced, deep→detailed).
+  2. Analyze: Multi-agent coord + domain expertise. With --vs, gen k perspectives with probs + landscape synth; --depth tune detail (shallow→brief, normal→balanced, deep→detailed).
   3. Validate: Feasibility check + requirement validation.
   4. Specify: feature path `docs/features/<slug>/01-discovery.md`, standalone `docs/specs/<topic>-discovery-<username>-YYYY-MM-DD.md` — slug resolution (zero-match default `[f]`), frontmatter, README update per core/rules/RULES_DOCS.md `<doc_output_convention>`.
   5. Approve: Show spec for user review — no proceed without confirm.
@@ -56,7 +56,7 @@ description: Interactive requirements discovery thru Socratic dialogue + systema
 | `'AI project management tool' --strategy systematic --depth deep` | Multi-agent deep analysis |
 | `'real-time collaboration' --strategy agile --delegate` | Parallel frontend/backend/security exploration |
 | `'enterprise data analytics' --strategy enterprise --depth deep` | Compliance + validation |
-| `'mobile monetization' --depth normal` | Cross-session w/ Serena |
+| `'mobile monetization' --depth normal` | Cross-session with Serena |
 | `'API design' --vs cot [k:3] [tau:0.20]` | 3 focused API design perspectives via VS-CoT |
 | `'product ideas' --vs multi [tau:0.01]` | Exhaustive brainstorm: 15 wild ideas (5×3 turns) |
 | `'migration strategy' --vs --depth deep` | Auto-detect VS-CoT, detailed depth, 5 perspectives |

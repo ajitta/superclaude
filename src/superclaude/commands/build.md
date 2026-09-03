@@ -1,10 +1,10 @@
 ---
-description: Build, compile, package projects w/ smart err handling + optimize. Use ONLY when user type `/sc:build` — orchestrate build pipeline w/ err analysis. NO auto-trigger on single build cmd (npm run build, cargo build) — use Bash direct.
+description: Build, compile, package projects with smart err handling + optimize. Use ONLY when user type `/sc:build` — orchestrate build pipeline with err analysis. NO auto-trigger on single build cmd (npm run build, cargo build) — use Bash direct.
 ---
 <component name="build" type="command">
 
   <role command="/sc:build">
-    <mission>Build, compile, package projects w/ smart err handling + optimize</mission>
+    <mission>Build, compile, package projects with smart err handling + optimize</mission>
   </role>
 
   <syntax>/sc:build [target] [--type dev|prod|test] [--clean] [--optimize] [--verbose]</syntax>
@@ -44,8 +44,8 @@ description: Build, compile, package projects w/ smart err handling + optimize. 
 | `--type dev --verbose` | Dev build + detailed output |
 
   <example name="build-failure-retry" type="error-path">
-    - Input: /sc:build --type prod (after build fail w/ missing dep)
-    - Why wrong: Retry same build w/o fix root cause waste tokens + time.
+    - Input: /sc:build --type prod (after build fail with missing dep)
+    - Why wrong: Retry same build without fix root cause waste tokens + time.
     - Correct: Investigate err → fix dep (npm install / uv add) → then /sc:build --type prod
   </example>
 

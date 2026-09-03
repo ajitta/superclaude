@@ -4,7 +4,7 @@ Tool ref — docs + config for integrated MCP servers.
 
 ## Content Delivery
 
-MCP docs load on-demand via `context_loader.py` thru flag/keyword triggers. Servers in the Core + Plugin tables install via `superclaude mcp`; Core auto-suggested in interactive pick, Plugin must opt-in explicit w/ `--servers`. Context7 + Tavily are externally provided — see their sections below.
+MCP docs load on-demand via `context_loader.py` through flag/keyword triggers. Servers in the Core + Plugin tables install via `superclaude mcp`; Core auto-suggested in interactive pick, Plugin must opt-in explicit with `--servers`. Context7 + Tavily are externally provided — see their sections below.
 
 ## Available MCP Servers
 
@@ -12,7 +12,7 @@ MCP docs load on-demand via `context_loader.py` thru flag/keyword triggers. Serv
 
 | Server | Flag | Package / Version | Mission |
 |--------|------|-------------------|---------|
-| Serena | `--serena` | `serena-agent` (PyPI, v1.5.1) | Semantic code understanding w/ project memory |
+| Serena | `--serena` | `serena-agent` (PyPI, v1.5.1) | Semantic code understanding with project memory |
 
 ### Plugin (opt-in: `superclaude mcp --servers <name>`)
 
@@ -48,7 +48,7 @@ Skills: `tavily-search`, `tavily-extract`, `tavily-crawl`, `tavily-map`, `tavily
 
 The `--tavily` MCP server (plugin table above) stays available as an in-conversation alternative but exposes only search + extract; the skills add crawl, map, and multi-source research.
 
-> **Last verified**: 2026-07-04. Run `/sc:research` w/ `--tavily` to check newer versions.
+> **Last verified**: 2026-07-04. Run `/sc:research` with `--tavily` to check newer versions.
 
 ## Composite Flags
 

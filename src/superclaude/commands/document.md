@@ -59,7 +59,7 @@ description: Gen focused docs for components, functions, APIs, features. Use ONL
 
   <bounds>
     <does>focused docs, multi-format, ecosystem integration.</does>
-    <never>doc w/o analysis, override standards, expose sensitive details.</never>
+    <never>doc without analysis, override standards, expose sensitive details.</never>
     <fallback>Ask user for guidance when uncertain.</fallback>
   </bounds>
 

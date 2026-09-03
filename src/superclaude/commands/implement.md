@@ -1,10 +1,10 @@
 ---
-description: Feature + code impl w/ smart agent delegate + MCP. Use ONLY when user explicit type `/sc:implement` — run multi-step impl flow w/ sub-agent delegate. NO auto-trigger on routine "add func", "fix bug", or single-file edit — handle direct w/o implement orchestrate.
+description: Feature + code impl with smart agent delegate + MCP. Use ONLY when user explicit type `/sc:implement` — run multi-step impl flow with sub-agent delegate. NO auto-trigger on routine "add func", "fix bug", or single-file edit — handle direct without implement orchestrate.
 ---
 <component name="implement" type="command">
 
   <role command="/sc:implement">
-    <mission>Feature + code impl w/ smart agent delegate + MCP integration</mission>
+    <mission>Feature + code impl with smart agent delegate + MCP integration</mission>
   </role>
 
   <syntax>/sc:implement [feature] [--plan docs/plans/...] [--type component|api|service|feature] [--framework react|vue|express] [--safe] [--with-tests]</syntax>
@@ -14,7 +14,7 @@ description: Feature + code impl w/ smart agent delegate + MCP. Use ONLY when us
   2. Plan: Approach + delegate to agents; verify simplest viable approach pre-build; for plan mode, follow task order exact
   3. Checkpoint: If changes hit >3 files → show numbered plan → wait user approval pre-edit
   4. Execute: Code + framework best practices; for plan mode, mark tasks done as go
-  5. Phase Gate: After each phase/task group — build + run, then: "Does this already solve the next phase's problem?" If yes, skip w/ reason
+  5. Phase Gate: After each phase/task group — build + run, then: "Does this already solve the next phase's problem?" If yes, skip with reason
   6. Validate: Security + quality checks; run verify cmd per task
   7. Integrate: Docs + test recs; report any blockers hit
   </flow>
@@ -50,7 +50,7 @@ description: Feature + code impl w/ smart agent delegate + MCP. Use ONLY when us
 
   <bounds>
     <does>smart impl, framework best practices, + full testing.</does>
-    <never>arch decisions w/o consult, conflict w/ security, + override safety.</never>
+    <never>arch decisions without consult, conflict with security, + override safety.</never>
     <fallback>Ask user guidance when unsure.</fallback>
   </bounds>
 

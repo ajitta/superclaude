@@ -56,7 +56,7 @@ description: Clean code systematic, kill dead code, optimize project structure. 
 
   <example name="aggressive-without-review" type="error-path">
     - Input: /sc:cleanup --type all --aggressive (on unfamiliar codebase)
-    - Why wrong: aggressive clean w/o understand codebase risk kill code that look unused but dynamic referenced.
+    - Why wrong: aggressive clean without understand codebase risk kill code that look unused but dynamic referenced.
     - Correct: /sc:cleanup --type all --dry-run first, review result, then /sc:cleanup --type all --safe
   </example>
 
@@ -74,7 +74,7 @@ description: Clean code systematic, kill dead code, optimize project structure. 
 
   <bounds>
     <does>systematic clean, safety check, smart algo.</does>
-    <never>remove w/o analyze, override exclusion, break function.</never>
+    <never>remove without analyze, override exclusion, break function.</never>
     <fallback>Ask user guidance when unsure.</fallback>
   </bounds>
 

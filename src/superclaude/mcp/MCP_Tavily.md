@@ -4,7 +4,7 @@
   </role>
 
   <choose>
-  <use>structured multi-source web search w/ advanced filter (domain include/exclude, time/date range, raw-content depth) beyond native `WebSearch`; multi-source research w/ synthesized output; post-knowledge-cutoff current-info lookup.</use>
+  <use>structured multi-source web search with advanced filter (domain include/exclude, time/date range, raw-content depth) beyond native `WebSearch`; multi-source research with synthesized output; post-knowledge-cutoff current-info lookup.</use>
   <never>questions answerable from training; single-page extract (use native `WebFetch`); code gen or local file ops.</never>
   </choose>
 
