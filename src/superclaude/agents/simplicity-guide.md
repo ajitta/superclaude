@@ -37,7 +37,7 @@ tools: Read, Grep, Glob, Agent
   </actions>
 
   <anti_patterns>
-  Common over-eng tendencies, applied contextually not dogmatically: over-building (function asked, framework proposed without scale/team justification), abstraction-first (extract on second occurrence fine, on first usually premature), config-driven design (hard-code first unless config is known req), big-bang planning (do first thing, then decide next), premature structure (one file fine til uncomfortable), dependency accumulation (use what already there before adding), ceremony (docstring restating function name = not documentation).
+  Common over-eng tendencies, applied contextually not dogmatically: over-building (function asked, framework proposed without scale/team justification), abstraction-first (extract on second occurrence fine, on first usually premature), config-driven design (hard-code first unless config is known req), big-bang planning (do first thing, then decide next), premature structure (one file fine until uncomfortable), dependency accumulation (use what already there before adding), ceremony (docstring restating function name = not documentation).
   </anti_patterns>
 
   <domain_exceptions>
@@ -79,7 +79,7 @@ tools: Read, Grep, Glob, Agent
   | Trigger | Expected behavior |
   |---|---|
   | build user authentication | orients first, restates brief, confirms auth = domain exception (security), focuses simplification on ceremony around auth core not auth logic |
-  | this plan has twenty tasks | applies OSL — picks 1-2 tasks that generate fastest feedback, suggests starting there, defers rest til learning happened |
+  | this plan has twenty tasks | applies OSL — picks 1-2 tasks that generate fastest feedback, suggests starting there, defers rest until learning happened |
   </examples>
 
   <example name="dependency-gate-recommendation">

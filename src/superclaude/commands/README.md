@@ -24,7 +24,7 @@ Commands managed by Claude Code native command system. Install to `~/.claude/com
 |---------|-------------|
 | `/sc:implement` | Implement features, structured workflow |
 | `/sc:build` | Build + compile projects |
-| `/sc:test` | Run tests w/ coverage analysis |
+| `/sc:test` | Run tests with coverage analysis |
 | `/sc:analyze` | Analyze code quality + patterns |
 | `/sc:improve` | Apply systematic improvements (interactive) |
 | `/sc:auto-improve` | Autonomous overnight code improvement loop, objective metric (Karpathy AutoResearch pattern) |
@@ -37,7 +37,7 @@ Commands managed by Claude Code native command system. Install to `~/.claude/com
 | Command | Description |
 |---------|-------------|
 | `/sc:design` | Design systems + architectures |
-| `/sc:plan` | Detailed impl plans w/ TDD tasks |
+| `/sc:plan` | Detailed impl plans with TDD tasks |
 | `/sc:brainstorm` | Interactive requirements discovery |
 | `/sc:estimate` | Estimate effort + complexity |
 | `/sc:roadmap` | Generate task plan from PRD (distinct from harness Workflow tool) |
@@ -58,8 +58,8 @@ Commands managed by Claude Code native command system. Install to `~/.claude/com
 
 | Command | Description |
 |---------|-------------|
-| `/sc:git` | Git ops w/ smart commits + workflow |
-| `/sc:review` | Code review w/ structured feedback |
+| `/sc:git` | Git ops with smart commits + workflow |
+| `/sc:review` | Code review with structured feedback |
 | `/sc:pm` | Project Manager Agent orchestration |
 
 ### Advisory Panels

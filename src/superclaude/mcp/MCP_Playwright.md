@@ -15,7 +15,7 @@
   </capability_system>
 
   <choose>
-  <use>end-to-end user-journey validate (login → nav → action → verify state), form input/validate/submit/error test, visual regression via screenshots at responsive breakpoints, a11y assert thru a11y snapshots, net-call intercept for error-state + offline-mode test, cookie/localStorage manip for auth scenarios.</use>
+  <use>end-to-end user-journey validate (login → nav → action → verify state), form input/validate/submit/error test, visual regression via screenshots at responsive breakpoints, a11y assert through a11y snapshots, net-call intercept for error-state + offline-mode test, cookie/localStorage manip for auth scenarios.</use>
   <never>component-level unit test (use native test runner — vitest, jest), backend API endpoint test (use native HTTP tools — curl, fetch), Core Web Vitals or profile work (use Chrome DevTools `--perf`), static code-quality review (use native Claude + `/sc:review`).</never>
   </choose>
 
@@ -33,7 +33,7 @@
   - E2E-Suite: `/sc:test --type e2e` → Playwright:execute → screenshot evidence → report.
   - Visual-QA: Playwright:screenshot → Claude:vision → `/sc:review`.
   - A11y-Audit: Playwright:snapshot → assert accessible names → `/sc:analyze --focus a11y`.
-  - API-Mock-Testing: Playwright:`browser_route` → nav → verify UI w/ mocked data.
+  - API-Mock-Testing: Playwright:`browser_route` → nav → verify UI with mocked data.
   </integration_patterns>
 
   <examples>

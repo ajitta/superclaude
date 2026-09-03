@@ -4,7 +4,7 @@ description: Deep web research with adaptive planning + smart search. Use when u
 <component name="research" type="command">
 
   <role command="/sc:research">
-    <mission>Deep web research w/ adaptive plan + smart search</mission>
+    <mission>Deep web research with adaptive plan + smart search</mission>
   </role>
 
   <syntax>/sc:research "[query]" [--depth quick|standard|deep|exhaustive] [--strategy planning|intent|unified]</syntax>
@@ -12,7 +12,7 @@ description: Deep web research with adaptive planning + smart search. Use when u
   <flow>
   1. Understand: Complexity + ambiguity check | Success criteria | Prior research check
   2. Plan: Strategy + depth + hop pattern + query decompose + parallel map
-  3. Execute: Multi-hop search w/ parallel batch | Evidence collect | Adaptive replan on confidence&lt;0.6 or contradictions&gt;30%
+  3. Execute: Multi-hop search with parallel batch | Evidence collect | Adaptive replan on confidence&lt;0.6 or contradictions&gt;30%
   4. Validate: Cross-source verify | Credibility score | Contradiction resolve | Gap check
   5. Synthesize: credibility-weighted merge; feature path `docs/features/<slug>/02-research.md`, standalone `docs/research/<topic>-<username>-YYYY-MM-DD.md` — slug resolution (zero-match default `[s]`), frontmatter, README update per core/rules/RULES_DOCS.md `<doc_output_convention>`.
   </flow>
@@ -46,12 +46,12 @@ description: Deep web research with adaptive planning + smart search. Use when u
 
   <gotchas>
   - single-source: No conclude from 1 source. Cross-verify ≥2 sources
-  - source-quality: No Wikipedia/Reddit as primary. Cross-check w/ primary sources
+  - source-quality: No Wikipedia/Reddit as primary. Cross-check with primary sources
   </gotchas>
 
   <bounds>
     <does>current info, smart search, evidence-based, adaptive replan.</does>
-    <never>claims w/o sources, skip validate, restricted content, carry raw payloads between hops.</never>
+    <never>claims without sources, skip validate, restricted content, carry raw payloads between hops.</never>
     <fallback>Ask user guide when unsure.</fallback>
   </bounds>
 

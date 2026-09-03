@@ -4,17 +4,17 @@ description: Interactive project env setup — pick + run init tasks for first-s
 <component name="init" type="command">
 
   <role command="/sc:init">
-    <mission>Interactive project env setup w/ selectable init tasks for first-session onboarding</mission>
+    <mission>Interactive project env setup with selectable init tasks for first-session onboarding</mission>
   </role>
 
   <syntax>/sc:init [tasks] [--quick] [--full]</syntax>
 
   <flow>
   1. Detect: scan project root for lang/framework markers (pyproject.toml, package.json, Cargo.toml, go.mod)
-  2. Present: show interactive task menu w/ descriptions, deps, detected project context
+  2. Present: show interactive task menu with descriptions, deps, detected project context
   3. Select: take user choice — individual tasks (a,b,c...), presets (--quick, --full), or custom combo
   4. Validate: check dep graph, surface missing prereqs, confirm exec plan
-  5. Execute: run picked tasks in dep-aware parallel batches w/ progress reporting
+  5. Execute: run picked tasks in dep-aware parallel batches with progress reporting
   6. Report: final summary table — task status, artifacts made, memory entries stored
   </flow>
 
@@ -113,8 +113,8 @@ description: Interactive project env setup — pick + run init tasks for first-s
 
   <bounds>
     <does>interactive task menu, dep-aware exec, parallel batching, idempotent setup, safe env init.</does>
-    <never>auto-exec w/o selection, overwrite existing files, install w/o confirm, skip dep validation.</never>
-    <fallback>Ask user when project type undetectable or existing config clash w/ proposed setup.</fallback>
+    <never>auto-exec without selection, overwrite existing files, install without confirm, skip dep validation.</never>
+    <fallback>Ask user when project type undetectable or existing config clash with proposed setup.</fallback>
   </bounds>
 
   <handoff next="/sc:load /sc:implement /sc:test"/>

@@ -4,7 +4,7 @@
   </role>
 
   <choose>
-  <use>Core Web Vitals measure (CLS, LCP, INP, TTFB) via traces, Lighthouse audits over perf / a11y / SEO / best-practices, heap-snapshot mem analysis w/ leak detect + GC-pressure check, auto WCAG a11y checks on live pages, network req-timing + bundle-size + cache-behavior inspect, and `pageId`-routed multi-agent flows on diff pages.</use>
+  <use>Core Web Vitals measure (CLS, LCP, INP, TTFB) via traces, Lighthouse audits over perf / a11y / SEO / best-practices, heap-snapshot mem analysis with leak detect + GC-pressure check, auto WCAG a11y checks on live pages, network req-timing + bundle-size + cache-behavior inspect, and `pageId`-routed multi-agent flows on diff pages.</use>
   <never>live browser interact or E2E user-journey scripts (use Playwright via `--play`), static code analysis (use native Claude for code review), and server-side backend profile (use native tools — `perf`, flamegraph).</never>
   </choose>
 

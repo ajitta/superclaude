@@ -38,7 +38,7 @@ description: Ultra-intelligent command recommendation engine for optimal SuperCl
 
   <expertise_adapt>
     - beginner: simpler workflows, /sc:explain for concepts, --safe flags
-    - intermediate: standard recs w/ MCP flags
+    - intermediate: standard recs with MCP flags
     - expert: terse output, advanced flag combos, parallel workflows
   </expertise_adapt>
 

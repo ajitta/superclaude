@@ -15,7 +15,7 @@ Agents managed by Claude Code native delegation. Auto-pick from task keywords in
 | `deep-researcher` | Web research, cross-check, citation-ready synthesis |
 | `root-cause-analyst` | Systematic diagnosis via hypothesis test |
 | `requirements-analyst` | Requirements via systematic discovery |
-| `insight-analyst` | Surface project insights w/ contextual analysis |
+| `insight-analyst` | Surface project insights with contextual analysis |
 
 ### Architecture & Design
 
@@ -62,7 +62,7 @@ Agents managed by Claude Code native delegation. Auto-pick from task keywords in
 
 | Agent | Description |
 |-------|-------------|
-| `git-workflow` | Git ops w/ smart commits, PR workflow, safety enforcement |
+| `git-workflow` | Git ops with smart commits, PR workflow, safety enforcement |
 
 ### Code Quality
 
@@ -115,7 +115,7 @@ Agents give conflicting recs → resolve via:
 | Conflict | Resolution | Rationale |
 |----------|-----------|-----------|
 | security-engineer vs performance-engineer | security wins | Security constraints non-negotiable |
-| simplicity-guide vs system-architect | data decides — measure complexity vs scale | Neither overrides w/o evidence |
+| simplicity-guide vs system-architect | data decides — measure complexity vs scale | Neither overrides without evidence |
 | refactoring-expert vs quality-engineer | quality-engineer sets coverage gate, refactoring-expert executes within | Tests define safe refactor boundaries |
 | frontend-architect vs backend-architect | API contract negotiation — both propose, user decides | Interface boundaries need explicit agreement |
 | python-expert vs system-architect | system-architect for cross-lang/service boundaries, python-expert within Python scope | Scope determines authority |

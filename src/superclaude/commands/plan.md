@@ -1,10 +1,10 @@
 ---
-description: Make detailed impl plans w/ TDD tasks, exact file paths, verify commands. Use ONLY when user explicitly types `/sc:plan` — commits a plan doc under docs/plans/, so a wrong fire skips the approval gate and creates files unasked. NOT auto-trigger on "what's the plan" / "how should we approach this" — those get 2-3 sentence inline answer, not plan file.
+description: Make detailed impl plans with TDD tasks, exact file paths, verify commands. Use ONLY when user explicitly types `/sc:plan` — commits a plan doc under docs/plans/, so a wrong fire skips the approval gate and creates files unasked. NOT auto-trigger on "what's the plan" / "how should we approach this" — those get 2-3 sentence inline answer, not plan file.
 ---
 <component name="plan" type="command">
 
   <role command="/sc:plan">
-    <mission>Make detailed impl plans w/ TDD tasks, exact file paths, verify commands</mission>
+    <mission>Make detailed impl plans with TDD tasks, exact file paths, verify commands</mission>
   </role>
 
   <syntax>/sc:plan [spec-or-topic] [--from docs/specs/...] [--output docs/plans/...] [--phases N] [--pr-bundle]</syntax>
@@ -52,7 +52,7 @@ Task format:
   <examples>
   | Input | Output |
   |---|---|
-  | `/sc:plan --from docs/specs/auth-design-ajitta-2026-03-17.md` | TDD plan w/ Phase 1..N (single-branch default) |
+  | `/sc:plan --from docs/specs/auth-design-ajitta-2026-03-17.md` | TDD plan with Phase 1..N (single-branch default) |
   | `/sc:plan 'add user profiles'` | Plan from desc, Phase framing |
   | `/sc:plan --from REQUIREMENTS.md --output docs/plans/profiles.md` | Custom output path |
   | `/sc:plan --from docs/specs/big-refactor.md --pr-bundle` | Multi-PR plan (separate review cycles per change-set; opt-in) |

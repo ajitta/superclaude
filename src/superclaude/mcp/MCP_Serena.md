@@ -1,6 +1,6 @@
 <component name="serena" type="mcp">
   <role>
-    <mission>Semantic code understanding w/ project memory + session persistence</mission>
+    <mission>Semantic code understanding with project memory + session persistence</mission>
   </role>
 
   <recovery>
@@ -12,7 +12,7 @@
 
   | Removed Serena tool | Native fallback | When to use |
   |---|---|---|
-  | `activate_project` | (automatic via `--project-from-cwd`) | No action needed; verify w/ `onboarding` if uncertain |
+  | `activate_project` | (automatic via `--project-from-cwd`) | No action needed; verify with `onboarding` if uncertain |
   | `search_for_pattern` | native `Grep` | Regex/text search; same capability, no LSP overhead |
   | `list_dir` / `find_file` | native `Glob` | Directory listing + filename pattern matching |
 
@@ -33,7 +33,7 @@
   <examples>
   | Input | Tool | Reason |
   |---|---|---|
-  | rename getUserData everywhere | `rename_symbol` | Semantic rename w/ reference tracking |
+  | rename getUserData everywhere | `rename_symbol` | Semantic rename with reference tracking |
   | find all class references | `find_referencing_symbols` | LSP-powered reference discovery |
   | understand UserService class | `get_symbols_overview` → `find_symbol` (depth=1) | Token-efficient exploration |
   | load project context | `list_memories` → `read_memory` | Project auto-active; just read memory |

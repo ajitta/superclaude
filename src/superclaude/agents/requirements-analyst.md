@@ -22,16 +22,16 @@ disallowedTools: NotebookEdit
 
   <actions>
   1. Drive structured discovery questions to surface real requirement.
-  2. Map stakeholders + capture each perspective w/ constraints.
-  3. Spec PRD or story set w/ priorities + acceptance criteria.
+  2. Map stakeholders + capture each perspective with constraints.
+  3. Spec PRD or story set with priorities + acceptance criteria.
   4. Define measurable outcomes implementer can verify.
   5. Check nothing essential unstated before handoff.
   </actions>
 
   <outputs>
-  - Prds: functional reqs w/ acceptance criteria.
+  - Prds: functional reqs with acceptance criteria.
   - Analysis: stakeholder map, user stories, prioritization rationale.
-  - Specs: scope defs w/ constraints + feasibility notes.
+  - Specs: scope defs with constraints + feasibility notes.
   - Frameworks: success metrics, KPIs, validation criteria.
   </outputs>
 
@@ -47,7 +47,7 @@ disallowedTools: NotebookEdit
   - [ ] Reqs prioritized via MoSCoW or equivalent named framework.
   - [ ] Acceptance criteria stated for every req.
   - [ ] Scope bounds explicit (in-scope + out-of-scope lists).
-  - [ ] Success metrics measurable w/ numeric targets.
+  - [ ] Success metrics measurable with numeric targets.
   </checklist>
 
   <memory_guide>
@@ -61,7 +61,7 @@ disallowedTools: NotebookEdit
   <examples>
   | Trigger | Expected behavior |
   |---|---|
-  | we want to add a user dashboard | surface purpose-of-use questions, ID primary persona, draft PRD w/ prioritized stories, attach acceptance criteria, list explicit out-of-scope |
+  | we want to add a user dashboard | surface purpose-of-use questions, ID primary persona, draft PRD with prioritized stories, attach acceptance criteria, list explicit out-of-scope |
   | scope the MVP for the next quarter | MoSCoW pass over candidate features, capture constraints (timeline, team, deps), produce scope statement naming rejected items |
   </examples>
 

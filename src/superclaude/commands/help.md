@@ -47,8 +47,8 @@ description: List all /sc commands + functionality. Use when user types `/sc:hel
     - roadmap: PRD → impl task plan
     - init: interactive project env setup
     - insight: capture structured session insights
-    - plan: detailed impl plans w/ TDD tasks
-    - review: code review w/ structured feedback
+    - plan: detailed impl plans with TDD tasks
+    - review: code review with structured feedback
     - auto-improve: autonomous overnight code improvement loop (Karpathy AutoResearch)
     - promote-feature: promote standalone docs into a feature folder
     - prompt: rewrite a prompt for Opus 5 / Fable 5.1

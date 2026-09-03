@@ -1,11 +1,11 @@
 ---
-description: Git ops w/ smart commit msgs + workflow optim. Use ONLY when user explicit type `/sc:git` — invoking it select the workflow only; push --force, reset --hard and rebase each still need their own confirm naming operation + target. NO auto-trigger on raw git cmds like "git status", "git log", "git diff", "git push", nor on "commit this" / "write a PR body" — invoke via Bash direct.
+description: Git ops with smart commit msgs + workflow optim. Use ONLY when user explicit type `/sc:git` — invoking it select the workflow only; push --force, reset --hard and rebase each still need their own confirm naming operation + target. NO auto-trigger on raw git cmds like "git status", "git log", "git diff", "git push", nor on "commit this" / "write a PR body" — invoke via Bash direct.
 disable-model-invocation: true
 ---
 <component name="git" type="command">
 
   <role command="/sc:git">
-    <mission>Git ops w/ smart commit msgs + workflow optim</mission>
+    <mission>Git ops with smart commit msgs + workflow optim</mission>
   </role>
 
   <syntax>/sc:git [operation] [args] [--smart-commit] [--interactive] [--pr-status] [--from-pr PR#|URL]</syntax>
@@ -76,7 +76,7 @@ disable-model-invocation: true
 
   <bounds>
     <does>smart git ops, conventional commits, flow guide, PR status check.</does>
-    <never>change config w/o auth, destruct w/o confirm, complex merge needing manual.</never>
+    <never>change config without auth, destruct without confirm, complex merge needing manual.</never>
     <fallback>Ask user when unsure.</fallback>
   </bounds>
 

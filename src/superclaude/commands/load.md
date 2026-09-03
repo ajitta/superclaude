@@ -1,16 +1,16 @@
 ---
-description: Session lifecycle mgmt w/ Serena MCP + Claude auto memory for proj context load. Use ONLY when user explicitly type `/sc:load` — session-start action prime context from Serena memory + proj state. Do NOT auto-trigger on session resume or "let's continue".
+description: Session lifecycle mgmt with Serena MCP + Claude auto memory for proj context load. Use ONLY when user explicitly type `/sc:load` — session-start action prime context from Serena memory + proj state. Do NOT auto-trigger on session resume or "let's continue".
 ---
 <component name="load" type="command">
 
   <role command="/sc:load">
-    <mission>Session lifecycle mgmt w/ Serena MCP + Claude auto memory for proj context load</mission>
+    <mission>Session lifecycle mgmt with Serena MCP + Claude auto memory for proj context load</mission>
   </role>
 
   <syntax>/sc:load [target] [--type project|config|deps|checkpoint] [--refresh] [--analyze]</syntax>
 
   <flow>
-  1. Initialize: MCP auto-activate from CWD; verify w/ check_onboarding_performed()
+  1. Initialize: MCP auto-activate from CWD; verify with check_onboarding_performed()
   2. Load (Serena): list_memories() → read_memory("pm_context") → read_memory("last_session") → read_memory("next_actions")
   3. Load (auto memory): MEMORY.md (auto-load) + topic files linked from MEMORY.md
   4. Discover: Proj struct + reqs (get_symbols_overview, Read/Grep/Glob)
@@ -42,8 +42,8 @@ description: Session lifecycle mgmt w/ Serena MCP + Claude auto memory for proj 
 
   <example name="load-wrong-project" type="error-path">
     - Input: /sc:load /path/to/wrong/project --type project
-    - Why wrong: Load context for wrong proj pollute session w/ irrelevant info.
-    - Correct: Verify proj path first (ls, git remote -v), then /sc:load w/ confirmed path.
+    - Why wrong: Load context for wrong proj pollute session with irrelevant info.
+    - Correct: Verify proj path first (ls, git remote -v), then /sc:load with confirmed path.
   </example>
 
   </examples>
@@ -56,7 +56,7 @@ description: Session lifecycle mgmt w/ Serena MCP + Claude auto memory for proj 
 
   <bounds>
     <does>Serena integration, auto memory load, cross-session persist, context load.</does>
-    <never>modify struct, load w/o validation, override w/o checkpoint.</never>
+    <never>modify struct, load without validation, override without checkpoint.</never>
     <fallback>Without Serena: use Claude auto memory + Read CLAUDE.md/PLANNING.md/TASK.md, Glob for struct. Ask user for guidance when uncertain.</fallback>
   </bounds>
 
