@@ -154,3 +154,27 @@ def test_decision_paragraph_non_empty(tmp_path: Path):
     _write_obs(tmp_path / "obs-A.json", _ok_obs("A"))
     _, decision_path = aggregate(tmp_path)
     assert len(decision_path.read_text(encoding="utf-8").strip()) > 20
+
+
+def _refusal_obs(vid: str, category: str = "cyber") -> dict:
+    d = _ok_obs(vid)
+    d["exit_status"] = "refusal"
+    d["refusal_category"] = category
+    return d
+
+
+def test_refusal_row_renders_category_in_exit_cell(tmp_path: Path):
+    _write_obs(tmp_path / "obs-A.json", _refusal_obs("A", "cyber"))
+    _write_obs(tmp_path / "obs-B.json", _ok_obs("B"))
+    matrix_path, decision_path = aggregate(tmp_path)
+    matrix = matrix_path.read_text(encoding="utf-8")
+    assert "| A | refusal (cyber) |" in matrix
+    assert "| B | ok |" in matrix
+    # a refused variant never wins
+    assert "**B**" in decision_path.read_text(encoding="utf-8")
+
+
+def test_all_refused_means_no_winner(tmp_path: Path):
+    _write_obs(tmp_path / "obs-A.json", _refusal_obs("A", "reasoning_extraction"))
+    _, decision_path = aggregate(tmp_path)
+    assert "No clear winner" in decision_path.read_text(encoding="utf-8")

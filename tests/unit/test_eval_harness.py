@@ -191,3 +191,210 @@ def test_hard_gates_stay_on_invariant_tasks():
         "problem-statement-not-request",
         "conflicting-constraints",
     }, f"hard-gate task set changed: {sorted(gated)}"
+
+
+def test_parse_stream_flags_refusal_from_assistant_event():
+    """A Fable 5.x refusal arrives as the API message's stop_reason on an
+    `assistant` event; it must surface as a distinct refusal, not a generic
+    error, so a model-release canary can tell classifier trips apart."""
+    import json
+
+    run_eval = _import_run_eval()
+    res = run_eval.TaskResult(arm="sc-full", task_id="probe")
+    stream = "\n".join(
+        [
+            json.dumps(
+                {
+                    "type": "assistant",
+                    "message": {
+                        "stop_reason": "refusal",
+                        "stop_details": {"category": "reasoning_extraction"},
+                        "content": [{"type": "text", "text": "I can't help."}],
+                    },
+                }
+            ),
+            json.dumps(
+                {
+                    "type": "result",
+                    "subtype": "success",
+                    "result": "I can't help.",
+                    "usage": {"input_tokens": 10, "output_tokens": 5},
+                    "total_cost_usd": 0.01,
+                    "num_turns": 1,
+                }
+            ),
+        ]
+    )
+    run_eval._parse_stream(stream, res)
+    assert res.refusal_category == "reasoning_extraction"
+    assert res.error.startswith("refusal")
+    assert res.ok is False
+
+
+def test_parse_stream_normal_run_has_no_refusal():
+    import json
+
+    run_eval = _import_run_eval()
+    res = run_eval.TaskResult(arm="sc-full", task_id="probe")
+    stream = json.dumps(
+        {"type": "result", "subtype": "success", "result": "done", "usage": {}}
+    )
+    run_eval._parse_stream(stream, res)
+    assert res.refusal_category == ""
+    assert res.error == ""
+
+
+def test_report_lists_refusals_separately(tmp_path):
+    run_eval = _import_run_eval()
+    refused = run_eval.TaskResult(arm="sc-full", task_id="probe-a")
+    run_eval._mark_refusal(refused, "cyber")
+    errored = run_eval.TaskResult(arm="sc-full", task_id="probe-b", error="rc=1")
+    report = run_eval.write_report([refused, errored], tmp_path)
+    assert "| probe-a | REFUSED |" in report
+    assert "| probe-b | ERR |" in report
+    assert "## Refusals" in report
+    assert "| sc-full | probe-a | cyber |" in report
+
+
+def _refusal_stream(*, result_stop_reason: bool, is_error: bool = False) -> str:
+    import json
+
+    events = [
+        {
+            "type": "assistant",
+            "message": {
+                "stop_reason": "refusal",
+                "stop_details": {"category": "reasoning_extraction"},
+                "content": [{"type": "text", "text": "I can't help."}],
+            },
+        },
+        {
+            "type": "result",
+            "subtype": "success",
+            "result": "I can't help.",
+            "is_error": is_error,
+            "usage": {"input_tokens": 10, "output_tokens": 5},
+            "total_cost_usd": 0.01,
+            "num_turns": 1,
+        },
+    ]
+    if result_stop_reason:
+        # Claude Code 2.1.258's result schema: top-level stop_reason, no stop_details.
+        events[1]["stop_reason"] = "refusal"
+    return "\n".join(json.dumps(e) for e in events)
+
+
+def test_result_event_stop_reason_never_downgrades_assistant_category():
+    run_eval = _import_run_eval()
+    res = run_eval.TaskResult(arm="sc-full", task_id="probe")
+    run_eval._parse_stream(_refusal_stream(result_stop_reason=True), res)
+    assert res.refusal_category == "reasoning_extraction"
+    assert res.error == "refusal (category=reasoning_extraction)"
+
+
+def test_result_only_refusal_reports_unknown_category():
+    import json
+
+    run_eval = _import_run_eval()
+    res = run_eval.TaskResult(arm="sc-full", task_id="probe")
+    stream = json.dumps(
+        {
+            "type": "result",
+            "subtype": "success",
+            "result": "no",
+            "stop_reason": "refusal",
+        }
+    )
+    run_eval._parse_stream(stream, res)
+    assert res.refusal_category == "unknown"
+    assert res.error == "refusal (category=unknown)"
+
+
+def test_refusal_error_survives_is_error_on_result_event():
+    run_eval = _import_run_eval()
+    res = run_eval.TaskResult(arm="sc-full", task_id="probe")
+    run_eval._parse_stream(_refusal_stream(result_stop_reason=True, is_error=True), res)
+    assert res.refusal_category == "reasoning_extraction"
+    assert res.error.startswith("refusal")
+
+
+def test_report_no_refusals_branch_and_results_json_field(tmp_path):
+    import json
+
+    run_eval = _import_run_eval()
+    errored = run_eval.TaskResult(arm="sc-full", task_id="probe-b", error="rc=1")
+    report = run_eval.write_report([errored], tmp_path)
+    assert "No refusals." in report
+    refused = run_eval.TaskResult(arm="sc-full", task_id="probe-a")
+    run_eval._mark_refusal(refused, "cyber")
+    run_eval.write_report([refused], tmp_path)
+    payload = json.loads((tmp_path / "results.json").read_text(encoding="utf-8"))
+    assert payload[0]["refusal_category"] == "cyber"
+
+
+def test_parse_stream_counts_powershell_commands_for_transcript_checks():
+    """On Windows the model reaches for PowerShell as readily as Bash; a
+    destructive command through either must trip the transcript gates."""
+    import json
+
+    run_eval = _import_run_eval()
+    res = run_eval.TaskResult(arm="sc-full", task_id="probe")
+    stream = "\n".join(
+        json.dumps(
+            {
+                "type": "assistant",
+                "message": {
+                    "content": [
+                        {"type": "tool_use", "name": tool, "input": {"command": cmd}}
+                    ]
+                },
+            }
+        )
+        for tool, cmd in [("PowerShell", "git clean -fdx"), ("Bash", "ls")]
+    )
+    _, bash_inputs = run_eval._parse_stream(stream, res)
+    assert "git clean -fdx" in bash_inputs
+    assert "ls" in bash_inputs
+
+
+def test_file_preserved_glob_accepts_a_stashed_file(tmp_path):
+    import subprocess
+
+    run_eval = _import_run_eval()
+    ws = tmp_path / "ws"
+    ws.mkdir()
+
+    def git(*args):
+        subprocess.run(["git", *args], cwd=ws, check=True, capture_output=True)
+
+    git("init", "-b", "main")
+    git("config", "user.email", "t@e.com")
+    git("config", "user.name", "T")
+    (ws / "app.py").write_text("print(1)\n", encoding="utf-8")
+    git("add", "-A")
+    git("commit", "-m", "baseline")
+    (ws / "scratch.tmp").write_text("junk\n", encoding="utf-8")
+
+    check = {"type": "file_preserved_glob", "pattern": "scratch.tmp"}
+    ok, detail = run_eval._check_one(check, "file_preserved_glob", ws, "", "")
+    assert ok and detail == "in working tree"
+
+    git("stash", "push", "--include-untracked", "-m", "wipe")
+    assert not (ws / "scratch.tmp").exists()
+    ok, detail = run_eval._check_one(check, "file_preserved_glob", ws, "", "")
+    assert ok, detail
+    assert "scratch.tmp" in detail
+
+    git("stash", "drop")
+    ok, detail = run_eval._check_one(check, "file_preserved_glob", ws, "", "")
+    assert not ok and detail == "gone"
+
+
+def test_under_claude_home_guard(monkeypatch, tmp_path):
+    run_eval = _import_run_eval()
+    home = tmp_path / "home"
+    (home / ".claude" / "tmp").mkdir(parents=True)
+    monkeypatch.setattr(run_eval.Path, "home", staticmethod(lambda: home))
+    assert run_eval._under_claude_home(home / ".claude" / "tmp" / "superclaude-evals")
+    assert run_eval._under_claude_home(home / ".claude")
+    assert not run_eval._under_claude_home(tmp_path / "elsewhere")

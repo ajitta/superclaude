@@ -234,3 +234,94 @@ def test_pid_file_removed_on_exit(repo):
         c = Coordinator(cfg)
         c.run()
     assert not c.pid_path.exists()
+
+
+def test_refused_mutation_is_recorded_not_applied(repo):
+    """A refusal returns rc=0 with refusal text; the coordinator must log it as
+    a mutation_error row and never run the eval on it."""
+    cfg = _make_config(repo, budget_seconds=5)
+    with (
+        patch(
+            "superclaude.scripts.auto_improve.coordinator.run_eval",
+            return_value=_eval_result(10.0),
+        ) as ev,
+        patch.object(Coordinator, "_run_smoke", return_value=True),
+        patch.object(Coordinator, "_invoke_mutator") as mut,
+        patch.object(Coordinator, "_git_commit") as commit,
+    ):
+        mut.return_value = MutationResult(
+            rationale="",
+            tokens_used=5,
+            error="mutator refused (category=cyber); rationale discarded",
+            refused=True,
+            refusal_category="cyber",
+        )
+        c = Coordinator(cfg)
+        c.run()
+    rows = ResultsTsv(c.tsv_path).read_all()
+    refused_rows = [r for r in rows if r.status == "mutation_error"]
+    assert refused_rows, [r.status for r in rows]
+    assert all("refused" in r.desc for r in refused_rows)
+    assert commit.call_count == 0
+    # only the baseline eval ran; refused cycles never reach run_eval
+    assert ev.call_count == 1
+
+
+def test_consecutive_refusals_stop_the_loop(repo):
+    """A refusal on the mutator prompt is deterministic; after
+    MAX_CONSECUTIVE_REFUSALS in a row the loop stops instead of spending the
+    whole budget on identical refusals."""
+    from superclaude.scripts.auto_improve.coordinator import MAX_CONSECUTIVE_REFUSALS
+
+    cfg = _make_config(repo, budget_seconds=3600)
+    with (
+        patch(
+            "superclaude.scripts.auto_improve.coordinator.run_eval",
+            return_value=_eval_result(10.0),
+        ),
+        patch.object(Coordinator, "_run_smoke", return_value=True),
+        patch.object(Coordinator, "_invoke_mutator") as mut,
+    ):
+        mut.return_value = MutationResult(
+            rationale="",
+            tokens_used=5,
+            error="mutator refused (category=cyber); rationale discarded",
+            refused=True,
+            refusal_category="cyber",
+        )
+        c = Coordinator(cfg)
+        cycles = c.run()
+    assert mut.call_count == MAX_CONSECUTIVE_REFUSALS
+    rows = ResultsTsv(c.tsv_path).read_all()
+    assert cycles == 1 + MAX_CONSECUTIVE_REFUSALS  # baseline + refused cycles
+    assert [r.status for r in rows][1:] == ["mutation_error"] * MAX_CONSECUTIVE_REFUSALS
+
+
+def test_non_refused_error_resets_the_refusal_streak(repo):
+    from superclaude.scripts.auto_improve.coordinator import MAX_CONSECUTIVE_REFUSALS
+
+    cfg = _make_config(repo, budget_seconds=3600)
+    refused = MutationResult(
+        rationale="",
+        tokens_used=1,
+        error="mutator refused (category=bio)",
+        refused=True,
+    )
+    plain_error = MutationResult(rationale="", tokens_used=1, error="claude exited 1")
+    sequence = (
+        [refused] * (MAX_CONSECUTIVE_REFUSALS - 1)
+        + [plain_error]
+        + [refused] * MAX_CONSECUTIVE_REFUSALS
+    )
+    with (
+        patch(
+            "superclaude.scripts.auto_improve.coordinator.run_eval",
+            return_value=_eval_result(10.0),
+        ),
+        patch.object(Coordinator, "_run_smoke", return_value=True),
+        patch.object(Coordinator, "_invoke_mutator", side_effect=sequence) as mut,
+    ):
+        c = Coordinator(cfg)
+        c.run()
+    # the plain error broke the streak, so the stop came only after the second run of refusals
+    assert mut.call_count == len(sequence)

@@ -39,6 +39,33 @@ class MutationResult:
     rationale: str
     tokens_used: int
     error: Optional[str] = None
+    # True when the model declined the turn (stop_reason "refusal"). The
+    # refusal text never becomes a rationale; `error` carries the category.
+    refused: bool = False
+    refusal_category: str = ""
+
+
+def detect_refusal(payload: dict) -> Optional[str]:
+    """Return the refusal category when the ``claude -p`` payload records a
+    safety refusal, else None.
+
+    The CLI returns rc=0 on a refusal and puts the refusal text in ``result``,
+    so without this check the text would be accepted as a mutation rationale.
+    The ``--output-format json`` result object carries a top-level
+    ``stop_reason`` but no ``stop_details`` (Claude Code 2.1.258 result
+    schema), so the category is usually ``"unknown"`` here; a ``subtype``
+    naming a refusal counts as a fallback.
+    """
+    if not isinstance(payload, dict):
+        return None
+    refused = payload.get("stop_reason") == "refusal" or "refusal" in str(
+        payload.get("subtype") or ""
+    )
+    if not refused:
+        return None
+    details = payload.get("stop_details") or {}
+    category = details.get("category") if isinstance(details, dict) else None
+    return str(category) if category else "unknown"
 
 
 class Mutator:
@@ -114,6 +141,18 @@ class Mutator:
         rationale = (payload.get("result") or "").strip()
         usage = payload.get("usage") or {}
         tokens = int(usage.get("input_tokens", 0)) + int(usage.get("output_tokens", 0))
+
+        category = detect_refusal(payload)
+        if category is not None:
+            # Edits the agent made before the refusal stay in the worktree,
+            # like any other mutation_error; only the rationale is discarded.
+            return MutationResult(
+                rationale="",
+                tokens_used=tokens,
+                error=f"mutator refused (category={category}); rationale discarded",
+                refused=True,
+                refusal_category=category,
+            )
 
         if not rationale:
             return MutationResult(

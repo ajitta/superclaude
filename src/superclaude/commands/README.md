@@ -77,7 +77,7 @@ Commands managed by Claude Code native command system. Install to `~/.claude/com
 | `/sc:recommend` | Smart command recommendation engine |
 | `/sc:select-tool` | MCP tool select via complexity scoring |
 | `/sc:index` | Gen project docs + knowledge base |
-| `/sc:prompt` | Rewrite a prompt for Opus 5 / Fable 5 — strip folklore, apply model deltas |
+| `/sc:prompt` | Rewrite a prompt for Opus 5 / Fable 5.1 — strip folklore, apply model deltas |
 
 ## Authoring Rules
 

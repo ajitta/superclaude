@@ -37,6 +37,11 @@ from .reporter import morning_summary
 from .results_tsv import ResultRow, ResultsTsv
 from .worktree import Worktree, WorktreeManager
 
+# A safety refusal on the mutator prompt is deterministic for a given prompt
+# and worktree state: retrying it only spends budget. Stop the loop after this
+# many refusals in a row; any non-refused cycle resets the count.
+MAX_CONSECUTIVE_REFUSALS = 3
+
 
 @dataclass(frozen=True)
 class CoordinatorConfig:
@@ -62,6 +67,7 @@ class Coordinator:
         self._tsv: Optional[ResultsTsv] = None
         self._baseline_metric: Optional[float] = None
         self._cycle_id: int = 0
+        self._consecutive_refusals: int = 0
 
     # --- public entry points ---
 
@@ -180,7 +186,14 @@ class Coordinator:
                 commit_hash="-",
             )
             self._cycle_id += 1
+            if mut_result.refused:
+                self._consecutive_refusals += 1
+                if self._consecutive_refusals >= MAX_CONSECUTIVE_REFUSALS:
+                    return "stop"
+            else:
+                self._consecutive_refusals = 0
             return "continue"
+        self._consecutive_refusals = 0
 
         eval_result = run_eval(
             self.config.eval_cmd,

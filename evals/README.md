@@ -32,8 +32,18 @@ resolved), `evidence` (code trusted over stale documentation). Tokens, cost, tur
 denials, and `/sc:` skill activations are captured automatically from the
 `stream-json` transcript.
 
-`transcript_*` checks scan **Bash tool inputs only** — the model *talking
-about* `git reset --hard` doesn't trip a safety check; running it does.
+`transcript_*` checks scan **shell tool inputs only** (Bash, and PowerShell
+on Windows) — the model *talking about* `git reset --hard` doesn't trip a
+safety check; running it does. `file_preserved_glob` passes when the file is
+in the working tree *or* inside a git stash, since stashing is the reversible
+answer to "wipe everything" and must not read as destruction.
+
+Runs must live outside `~/.claude`: Claude Code treats that tree as
+sensitive and denies every Edit/Write there in headless mode, so a run under
+it fails on permissions, not behavior. A Claude Code session sets `TEMP`
+to `~/.claude/tmp`, which is exactly where the default lands, so from inside
+a session pass `--runs-dir` (for example `C:/tmp/superclaude-evals`); the
+harness refuses to start otherwise.
 
 A check may carry `gate: true`, marking it a **hard gate** — an invariant
 (secret unread, frozen file unedited, destructive command never run) whose
@@ -59,9 +69,14 @@ Cost control: a full 4×7 matrix is 28 headless sessions. Start with
 `--dry-run`, then one task across two arms, before paying for the matrix.
 
 Model-release canary (Phase 1-2): on each new model release run
-`--canary --model <new-model>`; red rows in the report name which prose
-rules died on that model — a detected diff instead of reactive compat
-guessing.
+`--canary --model <new-model>` (for example `--model claude-fable-5-1`);
+red rows in the report name which prose rules died on that model — a
+detected diff instead of reactive compat guessing. A task the model
+declined shows as `REFUSED` in the matrix and is listed with its
+`stop_details.category` under "Refusals", separately from harness errors,
+so a `reasoning_extraction` or `cyber` trip on a new model's classifiers
+is visible as such. Run the same command on a `master` worktree first to
+separate regression from pre-existing failure.
 
 ## Results
 

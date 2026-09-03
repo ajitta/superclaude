@@ -132,3 +132,20 @@ def test_files_touched_default_empty_when_missing():
     del d["files_touched"]
     obs = validate(d)
     assert obs.files_touched == ()
+
+
+def test_refusal_exit_status_round_trips_with_category(tmp_path: Path):
+    d = _sample_dict()
+    d["exit_status"] = "refusal"
+    d["refusal_category"] = "bio"
+    obs = validate(d)
+    assert obs.exit_status == "refusal"
+    assert obs.refusal_category == "bio"
+    out = tmp_path / "obs-r.json"
+    emit(obs, out)
+    reloaded = validate(json.loads(out.read_text(encoding="utf-8")))
+    assert reloaded.refusal_category == "bio"
+
+
+def test_refusal_category_defaults_empty():
+    assert validate(_sample_dict()).refusal_category == ""

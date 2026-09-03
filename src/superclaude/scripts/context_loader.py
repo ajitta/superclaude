@@ -413,7 +413,7 @@ RETIRED_FLAGS: dict[str, str] = {
     "think-harder": "Use the native /effort control (--ultrathink also still works).",
     "parallel": "Use --delegate for sub-agent fan-out, --concurrency [n] to batch calls.",
     # Sequential MCP dropped: it is an external scratchpad, not a reasoning
-    # engine, and Opus 5 / Fable 5 already think between tool calls natively.
+    # engine, and Claude 5-family models already think between tool calls natively.
     "seq": "Sequential MCP removed — native reasoning covers it; use /effort for depth.",
     "sequential": "Sequential MCP removed — native reasoning covers it; use /effort for depth.",
 }
