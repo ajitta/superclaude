@@ -8,7 +8,7 @@ it without a cycle. superclaude.utils is allowed — it imports nothing from cli
 
 from pathlib import Path
 
-from superclaude.utils import detect_scope
+from superclaude.utils import detect_scope, same_dir
 
 # Component definitions: (source_subdir, target_subdir, description)
 # Note: hooks and scripts are handled specially by install_hooks_and_scripts()
@@ -53,15 +53,26 @@ def find_install_root(start: Path) -> Path | None:
     ``detect_scope``'s job and it now ranks $HOME correctly; this function only
     finds the directory.
 
+    The walk stops at $HOME, inclusive. An install above the home directory is
+    never the project's, and continuing past it made the answer depend on the
+    machine: a start directory under the OS temp root (which Windows and a
+    Claude Code session both place under the user profile) found the real
+    user-scope install two levels up and reported it as a project one, even
+    with ``Path.home`` pointed elsewhere. When ``start`` is not under $HOME the
+    walk reaches the filesystem root as before.
+
     Args:
         start: Directory to search from, inclusive
 
     Returns:
         The directory containing ``.claude/superclaude``, or None
     """
+    home = Path.home()
     for candidate in [start, *start.parents]:
         if (candidate / ".claude" / "superclaude").is_dir():
             return candidate
+        if same_dir(candidate, home):
+            break
     return None
 
 

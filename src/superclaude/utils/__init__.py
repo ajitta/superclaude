@@ -224,8 +224,8 @@ def same_dir(left: Path, right: Path) -> bool:
     """True when both paths name the same directory, symlinks resolved.
 
     Public because ``install_paths.find_install_root`` needs the same comparison
-    to skip $HOME, and a second copy there would reintroduce the duplication
-    ``settings_filename`` exists to prevent.
+    to stop its walk-up at $HOME, and a second copy there would reintroduce the
+    duplication ``settings_filename`` exists to prevent.
 
     Args:
         left: First path

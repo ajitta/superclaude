@@ -868,3 +868,44 @@ class TestResolveReportingTarget:
 
         assert scope == "local"
         assert base_path == Path.cwd() / ".claude"
+
+    def test_an_install_above_home_is_never_the_project(
+        self, tmp_path: Path, monkeypatch
+    ):
+        """The walk-up stops at $HOME, inclusive.
+
+        Both default temp roots on Windows sit under the user profile, so a
+        test directory's ancestors include the real $HOME and its real
+        user-scope install. Walking past the faked $HOME found that install
+        and reported it as a project one, which made this suite's outcome
+        depend on where pytest put its temp dir.
+        """
+        from superclaude.cli.install_paths import (
+            find_install_root,
+            resolve_reporting_target,
+        )
+
+        above = tmp_path
+        _make_scoped_install(above)  # an install strictly above $HOME
+        home = tmp_path / "home"
+        home.mkdir()
+        monkeypatch.setattr(Path, "home", staticmethod(lambda: home))
+        deep = home / "repos" / "unrelated"
+        deep.mkdir(parents=True)
+
+        assert find_install_root(deep) is None
+        assert resolve_reporting_target(start=deep) == ("user", home / ".claude")
+
+    def test_walk_up_reaches_root_when_start_is_outside_home(
+        self, tmp_path: Path, monkeypatch
+    ):
+        from superclaude.cli.install_paths import find_install_root
+
+        home = tmp_path / "home"
+        home.mkdir()
+        monkeypatch.setattr(Path, "home", staticmethod(lambda: home))
+        project = tmp_path / "srv" / "app"
+        (project / "src").mkdir(parents=True)
+        _make_scoped_install(project)
+
+        assert find_install_root(project / "src") == project
