@@ -19,6 +19,7 @@ from .observation import (
     emit,
 )
 from .spec_loader import RunnerCfg, Scenario, Variant
+from superclaude.utils import detect_refusal
 
 _AUTH_PATTERNS = re.compile(
     r"authent|credential|api[\s\-]?key|unauthor|login",
@@ -46,33 +47,6 @@ class ParsedResult:
 
 
 Spawner = Callable[[list[str], int], Awaitable[SpawnResult]]
-
-
-def detect_refusal(payload: dict) -> str | None:
-    """Return the refusal category when *payload* records a model refusal.
-
-    Claude Fable 5.x safety classifiers end a turn with the API's
-    ``stop_reason: "refusal"`` plus ``stop_details.category`` (``cyber``,
-    ``bio``, ``reasoning_extraction``, ...). The ``result`` object carries a
-    top-level ``stop_reason`` but no ``stop_details`` (Claude Code 2.1.258
-    result schema); the category lives on the assistant message, which the
-    stream-json ``assistant`` events expose. Callers pass the assistant
-    message first and the result object second and never let the result's
-    ``"unknown"`` replace a category. A ``subtype`` naming a refusal counts
-    as a fallback. A refusal is not ``is_error``: the CLI returns rc=0 and
-    the refusal text lands in ``result``, which is why callers must not treat
-    that text as a normal answer.
-    """
-    if not isinstance(payload, dict):
-        return None
-    refused = payload.get("stop_reason") == "refusal" or "refusal" in str(
-        payload.get("subtype") or ""
-    )
-    if not refused:
-        return None
-    details = payload.get("stop_details") or {}
-    category = details.get("category") if isinstance(details, dict) else None
-    return str(category) if category else "unknown"
 
 
 async def _default_spawn(cmd: list[str], timeout_s: int) -> SpawnResult:

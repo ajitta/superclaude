@@ -220,6 +220,36 @@ def detect_scope(root: Path | None = None) -> str:
     return "project"
 
 
+def detect_refusal(payload: Any) -> str | None:
+    """Return the refusal category when a ``claude -p`` payload records a
+    model refusal, else None.
+
+    Claude Fable 5.x safety classifiers end a turn with the API's
+    ``stop_reason: "refusal"`` plus ``stop_details.category`` (``cyber``,
+    ``bio``, ``reasoning_extraction``, ...). The CLI's result object carries a
+    top-level ``stop_reason`` but no ``stop_details`` (Claude Code 2.1.258
+    result schema); the category lives on the assistant message, which only
+    stream-json exposes. So callers check the assistant message first and the
+    result object second, and never let the result's ``"unknown"`` replace a
+    category. A ``subtype`` naming a refusal counts as a fallback. A refusal
+    is not ``is_error``: the CLI returns rc=0 with the refusal text in
+    ``result``, which is why that text must never pass as a normal answer.
+
+    Shared by the parallel-A/B runner and the auto-improve mutator; the eval
+    harness under ``evals/`` keeps a copy pinned to this one by a test.
+    """
+    if not isinstance(payload, dict):
+        return None
+    refused = payload.get("stop_reason") == "refusal" or "refusal" in str(
+        payload.get("subtype") or ""
+    )
+    if not refused:
+        return None
+    details = payload.get("stop_details") or {}
+    category = details.get("category") if isinstance(details, dict) else None
+    return str(category) if category else "unknown"
+
+
 def same_dir(left: Path, right: Path) -> bool:
     """True when both paths name the same directory, symlinks resolved.
 

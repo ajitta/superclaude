@@ -517,3 +517,26 @@ def test_nonzero_exit_without_result_event_is_a_plain_error(tmp_path, monkeypatc
     )
     assert res.error == "claude rc=1: boom"
     assert res.checks == []
+
+
+def test_evals_refusal_detector_matches_the_package_one():
+    """evals/ keeps its own copy of the refusal detector (it does not import
+    the package); pin it to superclaude.utils.detect_refusal behaviorally so
+    the two cannot drift apart silently."""
+    from superclaude.utils import detect_refusal
+
+    run_eval = _import_run_eval()
+    payloads = [
+        {},
+        {"stop_reason": "end_turn"},
+        {"stop_reason": "refusal"},
+        {"stop_reason": "refusal", "stop_details": {"category": "cyber"}},
+        {"stop_reason": "refusal", "stop_details": "cyber"},
+        {"stop_reason": "refusal", "stop_details": None},
+        {"subtype": "error_refusal"},
+        {"subtype": "success", "result": "I can't help"},
+        "not a dict",
+        None,
+    ]
+    for p in payloads:
+        assert run_eval._detect_refusal(p) == detect_refusal(p), p

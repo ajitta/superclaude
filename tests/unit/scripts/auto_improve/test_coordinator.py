@@ -325,3 +325,67 @@ def test_non_refused_error_resets_the_refusal_streak(repo):
         c.run()
     # the plain error broke the streak, so the stop came only after the second run of refusals
     assert mut.call_count == len(sequence)
+
+
+def test_rollback_preserves_results_tsv_history(repo):
+    """results.tsv is untracked in the worktree; `git clean -fd` in rollback
+    deleted it, and the next append recreated it header-less with the
+    baseline gone. A regressed cycle must leave the full history in place."""
+    cfg = _make_config(repo, budget_seconds=2, plateau_window=3)
+    calls = {"n": 0}
+
+    def eval_side_effect(*_a, **_k):
+        calls["n"] += 1
+        return _eval_result(10.0 if calls["n"] == 1 else 5.0)
+
+    with (
+        patch(
+            "superclaude.scripts.auto_improve.coordinator.run_eval",
+            side_effect=eval_side_effect,
+        ),
+        patch.object(Coordinator, "_run_smoke", return_value=True),
+        patch.object(Coordinator, "_invoke_mutator") as mut,
+    ):
+        mut.return_value = MutationResult(rationale="r", tokens_used=1)
+        c = Coordinator(cfg)
+        c.run()
+    text = c.tsv_path.read_text(encoding="utf-8")
+    assert text.startswith("# cycle_id"), text[:80]
+    rows = ResultsTsv(c.tsv_path).read_all()
+    assert rows[0].status == "baseline"
+    assert "regressed" in {r.status for r in rows[1:]}
+
+
+def test_mutation_error_rolls_back_partial_edits(repo):
+    """A refused or failed mutation may have edited files before stopping;
+    those edits must not become the next cycle's baseline."""
+    cfg = _make_config(repo, budget_seconds=2)
+
+    def refused_after_editing(self):
+        (self._worktree.path / "README.md").write_text("mangled", encoding="utf-8")
+        (self._worktree.path / "stray.py").write_text("x = 1\n", encoding="utf-8")
+        return MutationResult(
+            rationale="",
+            tokens_used=1,
+            error="mutator refused (category=cyber); rationale discarded",
+            refused=True,
+            refusal_category="cyber",
+        )
+
+    with (
+        patch(
+            "superclaude.scripts.auto_improve.coordinator.run_eval",
+            return_value=_eval_result(10.0),
+        ),
+        patch.object(Coordinator, "_run_smoke", return_value=True),
+        patch.object(Coordinator, "_invoke_mutator", refused_after_editing),
+    ):
+        c = Coordinator(cfg)
+        c.run()
+    wt = c._worktree.path
+    assert (wt / "README.md").read_text(encoding="utf-8") == "seed"
+    assert not (wt / "stray.py").exists()
+    assert c.tsv_path.exists()
+    rows = ResultsTsv(c.tsv_path).read_all()
+    assert rows[0].status == "baseline"
+    assert any(r.status == "mutation_error" for r in rows)

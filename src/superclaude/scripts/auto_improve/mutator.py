@@ -14,6 +14,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
 
+from superclaude.utils import detect_refusal
+
 DEFAULT_MODEL = "sonnet"
 ALLOWED_TOOLS = "Edit Write Read"
 DEFAULT_TIMEOUT_S = 600  # matches CoordinatorConfig.cycle_timeout_seconds default
@@ -43,29 +45,6 @@ class MutationResult:
     # refusal text never becomes a rationale; `error` carries the category.
     refused: bool = False
     refusal_category: str = ""
-
-
-def detect_refusal(payload: dict) -> Optional[str]:
-    """Return the refusal category when the ``claude -p`` payload records a
-    safety refusal, else None.
-
-    The CLI returns rc=0 on a refusal and puts the refusal text in ``result``,
-    so without this check the text would be accepted as a mutation rationale.
-    The ``--output-format json`` result object carries a top-level
-    ``stop_reason`` but no ``stop_details`` (Claude Code 2.1.258 result
-    schema), so the category is usually ``"unknown"`` here; a ``subtype``
-    naming a refusal counts as a fallback.
-    """
-    if not isinstance(payload, dict):
-        return None
-    refused = payload.get("stop_reason") == "refusal" or "refusal" in str(
-        payload.get("subtype") or ""
-    )
-    if not refused:
-        return None
-    details = payload.get("stop_details") or {}
-    category = details.get("category") if isinstance(details, dict) else None
-    return str(category) if category else "unknown"
 
 
 class Mutator:

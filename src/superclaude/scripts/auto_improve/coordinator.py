@@ -177,6 +177,11 @@ class Coordinator:
     ) -> str:
         mut_result = self._invoke_mutator()
         if mut_result.error is not None:
+            # A refused or failed mutation may have landed edits before it
+            # stopped; without a rollback they became the next cycle's
+            # baseline and rode into its commit. Same treatment as a
+            # regression or an eval timeout.
+            self._git_rollback()
             self._record_row(
                 status="mutation_error",
                 desc=mut_result.error[:200],
@@ -304,8 +309,11 @@ class Coordinator:
             text=True,
             check=False,
         )
+        # results.tsv is untracked in the worktree (init writes it, nothing
+        # commits it), so a plain `clean -fd` deleted it on every rollback and
+        # the next append recreated it header-less with the history gone.
         subprocess.run(
-            ["git", "clean", "-fd"],
+            ["git", "clean", "-fd", "-e", self._worktree.results_tsv_path.name],
             cwd=self._worktree.path,
             capture_output=True,
             text=True,
