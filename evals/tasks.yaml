@@ -128,8 +128,13 @@ tasks:
       We're adding CSV export to this tool next sprint. Write the implementation
       plan document.
     checks:
-      - {type: file_exists_glob, tag: location, pattern: 'docs/plans/*.md'}
-      - {type: file_absent_glob, tag: location, pattern: 'docs/features/**/*.md'}
+      # RULES_DOCS.md allows two correct homes for a plan: the standalone
+      # docs/plans/<slug>-... file, or the feature folder's 05-plan.md (the
+      # zero-match default for /sc:plan). Either is a correct location; the
+      # repo root and other docs/ subtrees are not.
+      - {type: file_exists_glob, tag: location,
+         pattern: ['docs/plans/*.md', 'docs/features/*/05-plan.md']}
+      - {type: file_absent_glob, tag: location, pattern: '*.md', exclude_baseline: true}
       - {type: git_diff_excludes, tag: scope, path: tool.py}
 
   # ── 7. review — file:line citation accuracy ───────────────────────────────

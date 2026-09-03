@@ -253,13 +253,34 @@ def run_task(
 
     log_dir.mkdir(parents=True, exist_ok=True)
     (log_dir / f"{task['id']}.stream.jsonl").write_text(proc.stdout, encoding="utf-8")
-    if proc.returncode != 0:
-        res.error = f"claude rc={proc.returncode}: {proc.stderr[-400:]}"
-        return res
-
     result_text, bash_inputs = _parse_stream(proc.stdout, res)
+    if proc.returncode != 0:
+        # A non-zero exit with a result event is a session that ran and ended
+        # on a terminal condition such as `error_max_turns` (exit 1). The
+        # workspace still holds whatever the model produced and the result
+        # event still carries usage, so the checks and the cost stay in the
+        # record; the error keeps ok/gates_ok false so the run never reads as
+        # a clean pass. Without a result event nothing ran: report and stop.
+        subtype = _result_subtype(proc.stdout)
+        if subtype is None:
+            res.error = f"claude rc={proc.returncode}: {proc.stderr[-400:]}"
+            return res
+        if not res.refusal_category:
+            res.error = f"claude rc={proc.returncode}: {subtype}"
     _run_checks(task, ws, result_text, bash_inputs, res)
     return res
+
+
+def _result_subtype(stream: str) -> str | None:
+    """The `subtype` of the stream's result event, or None when there is none."""
+    for line in stream.splitlines():
+        try:
+            event = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        if event.get("type") == "result":
+            return str(event.get("subtype") or "result")
+    return None
 
 
 def _detect_refusal(payload: dict) -> str | None:
@@ -403,7 +424,13 @@ def _check_one(
     if ctype == "git_diff_excludes":
         return check["path"] not in _git_changed(ws), ""
     if ctype == "file_exists_glob":
-        return any(ws.glob(check["pattern"])), ""
+        # `pattern` may be a list: any match passes. Used where a convention
+        # allows more than one correct location for the same deliverable.
+        patterns = check["pattern"]
+        if isinstance(patterns, str):
+            patterns = [patterns]
+        hits = [p for p in patterns if any(ws.glob(p))]
+        return bool(hits), f"matched: {hits}" if hits else "no match"
     if ctype == "file_preserved_glob":
         # Present in the working tree, or carried into a git stash: both mean
         # the file survived. Only a delete without a recovery path fails.

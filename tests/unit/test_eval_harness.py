@@ -398,3 +398,122 @@ def test_under_claude_home_guard(monkeypatch, tmp_path):
     assert run_eval._under_claude_home(home / ".claude" / "tmp" / "superclaude-evals")
     assert run_eval._under_claude_home(home / ".claude")
     assert not run_eval._under_claude_home(tmp_path / "elsewhere")
+
+
+def test_file_exists_glob_accepts_a_pattern_list(tmp_path):
+    run_eval = _import_run_eval()
+    ws = tmp_path
+    (ws / "docs" / "features" / "csv-export").mkdir(parents=True)
+    (ws / "docs" / "features" / "csv-export" / "05-plan.md").write_text("# plan\n")
+    check = {"pattern": ["docs/plans/*.md", "docs/features/*/05-plan.md"]}
+    ok, detail = run_eval._check_one(check, "file_exists_glob", ws, "", "")
+    assert ok and "docs/features/*/05-plan.md" in detail
+    ok, detail = run_eval._check_one(
+        {"pattern": ["docs/plans/*.md"]}, "file_exists_glob", ws, "", ""
+    )
+    assert not ok and detail == "no match"
+    # a bare string keeps working
+    ok, _ = run_eval._check_one(
+        {"pattern": "docs/features/*/05-plan.md"}, "file_exists_glob", ws, "", ""
+    )
+    assert ok
+
+
+def test_plan_routing_accepts_both_convention_locations():
+    """RULES_DOCS.md names two correct homes for a plan; the task must not
+    score the convention-mandated feature folder as a wrong location."""
+    task = next(t for t in TASKS["tasks"] if t["id"] == "plan-routing")
+    exists = next(c for c in task["checks"] if c["type"] == "file_exists_glob")
+    assert set(exists["pattern"]) == {"docs/plans/*.md", "docs/features/*/05-plan.md"}
+    assert not any(
+        c["type"] == "file_absent_glob" and "features" in str(c.get("pattern"))
+        for c in task["checks"]
+    )
+
+
+def test_result_subtype_reads_the_result_event():
+    import json
+
+    run_eval = _import_run_eval()
+    stream = "\n".join(
+        [
+            json.dumps({"type": "assistant", "message": {"content": []}}),
+            json.dumps({"type": "result", "subtype": "error_max_turns", "result": ""}),
+        ]
+    )
+    assert run_eval._result_subtype(stream) == "error_max_turns"
+    assert run_eval._result_subtype("not json\n") is None
+
+
+def test_max_turns_exit_keeps_usage_and_checks(tmp_path, monkeypatch):
+    """`error_max_turns` exits 1 after the model has worked; the run must keep
+    its usage and be scored on the workspace, while `ok` stays false."""
+    import json
+    import subprocess
+
+    run_eval = _import_run_eval()
+    ws = tmp_path / "ws"
+    (ws / "docs" / "plans").mkdir(parents=True)
+    (ws / "docs" / "plans" / "csv.md").write_text("# plan\n", encoding="utf-8")
+    stream = "\n".join(
+        [
+            json.dumps({"type": "assistant", "message": {"content": []}}),
+            json.dumps(
+                {
+                    "type": "result",
+                    "subtype": "error_max_turns",
+                    "is_error": True,
+                    "result": "",
+                    "usage": {"input_tokens": 100, "output_tokens": 50},
+                    "total_cost_usd": 0.42,
+                    "num_turns": 13,
+                }
+            ),
+        ]
+    )
+
+    def fake_run(cmd, **kwargs):
+        return subprocess.CompletedProcess(cmd, 1, stdout=stream, stderr="")
+
+    monkeypatch.setattr(run_eval.subprocess, "run", fake_run)
+    task = {
+        "id": "t",
+        "prompt": "do the thing",
+        "checks": [
+            {
+                "type": "file_exists_glob",
+                "tag": "location",
+                "pattern": "docs/plans/*.md",
+            }
+        ],
+    }
+    res = run_eval.run_task(
+        "sc-full", task, ws, tmp_path / "cfg", tmp_path / "logs", "claude", "m", {}
+    )
+    assert res.error.startswith("claude rc=1: error_max_turns")
+    assert res.cost_usd == 0.42 and res.num_turns == 13 and res.tokens_out == 50
+    assert [c.passed for c in res.checks] == [True]
+    assert res.ok is False
+
+
+def test_nonzero_exit_without_result_event_is_a_plain_error(tmp_path, monkeypatch):
+    import subprocess
+
+    run_eval = _import_run_eval()
+    ws = tmp_path / "ws"
+    ws.mkdir()
+
+    def fake_run(cmd, **kwargs):
+        return subprocess.CompletedProcess(cmd, 1, stdout="", stderr="boom")
+
+    monkeypatch.setattr(run_eval.subprocess, "run", fake_run)
+    task = {
+        "id": "t",
+        "prompt": "do the thing",
+        "checks": [{"type": "file_exists_glob", "pattern": "*.md"}],
+    }
+    res = run_eval.run_task(
+        "sc-full", task, ws, tmp_path / "cfg", tmp_path / "logs", "claude", "m", {}
+    )
+    assert res.error == "claude rc=1: boom"
+    assert res.checks == []

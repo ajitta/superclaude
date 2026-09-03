@@ -54,8 +54,9 @@ def local_install(tmp_path, monkeypatch):
 
     project = home / "project"
     project.mkdir()
-    result = CliRunner().invoke(main, ["install", "--scope", "local", "--force"])
-    assert result.exit_code == 0, result.output
+    # chdir first: a local-scope install writes to the CWD, and running it
+    # before the chdir installed into whatever directory pytest started in,
+    # which for a developer is the real repo's dev-tree .claude/.
     monkeypatch.chdir(project)
     result = CliRunner().invoke(main, ["install", "--scope", "local", "--force"])
     assert result.exit_code == 0, result.output
