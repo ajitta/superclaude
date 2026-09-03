@@ -6,6 +6,8 @@
 
   <doc_output_convention note="Unified naming for all file-producing commands.">
 
+Long documents: settle the structure and the hard decisions before writing, then write the document once; drafting it in full while reasoning and again as output doubles the turn without improving it.
+
 Default (multi-doc work): docs/features/<feature-slug>/
   Required: README.md (frontmatter + index) + numbered phase files
   Phase prefixes: 01-discovery (brainstorm) | 02-research | 03-analysis | 04-design | 05-plan (plan, roadmap) | 06+-<custom> (impl notes, retrospective)
