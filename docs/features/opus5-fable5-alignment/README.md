@@ -3,7 +3,7 @@ feature: opus5-fable5-alignment
 phase: analysis
 owner: ajitta
 created: 2026-08-02
-updated: 2026-08-02
+updated: 2026-09-04
 ---
 
 # Opus 5 / Fable 5 Alignment
@@ -73,6 +73,8 @@ Canary suite (`evals/run_eval.py --canary`, `sc-full` arm, model `sonnet`, $2.51
 The per-check comparison shows what actually differed: `file_exists_glob` fails on **both** runs, so neither satisfied the task. On `master` the model created **no plan document at all** (`file_absent_glob` passed with `unexpected: []`); on the branch it created `docs/features/csv-export/05-plan.md` plus a README. The branch produced the deliverable at the convention-mandated path and scored *lower* for it — the eval currently rewards inaction.
 
 `RULES_DOCS.md` is also internally ambiguous here: its standalone criteria ("1 doc total, no follow-on phases") point at `[s]` for this prompt while its zero-match default points at `[f]`. Resolving that is a separate decision from this alignment work.
+
+Resolved on the task side on 2026-09-04: the convention names both locations as correct, so `plan-routing` now accepts either and forbids only a repo-root plan. See [../fable-5-1-alignment/README.md](../fable-5-1-alignment/README.md).
 
 ### Cross-model probe runs
 
