@@ -1,9 +1,9 @@
 ---
 feature: fable-5-1-alignment
-phase: implementing
+phase: complete
 owner: ajitta
 created: 2026-09-03
-updated: 2026-09-03
+updated: 2026-09-04
 related: ../opus5-fable5-alignment/
 ---
 
@@ -30,12 +30,15 @@ Fable 5.1 changed little at the prompt level. Anthropic states that Fable 5 prom
 
 ## Status
 
-Plan approved 2026-09-03 and being applied on `feature/fable-5-1-alignment` (branched from `master`; no `integration` branch exists). Harness facts checked against the Claude Code docs the same day (a `PreCompact` hook cannot inject compaction instructions; a `fable` alias selects Fable 5.1; refusal JSON fields and effort exposure are undocumented). Open questions in [05-plan.md section 4](./05-plan.md#4-open-questions) were resolved by their stated defaults; the canary spend on `claude-fable-5-1` remains the user's call and gates CS-D.
+Complete 2026-09-04. All change sets applied on `feature/fable-5-1-alignment` and merged to `master`. Two Fable 5.1 canary runs (master baseline and branch) score identically on all 14 tasks: 13/14 fully passing, 7/7 hard gates, 0 refusals; the one shared miss is `plan-routing`, the task-versus-convention conflict recorded in August. CS-D measured at xhigh (n=2 per arm): means down 11% duration and 18% output tokens, ranges overlapping. Total eval spend across both canary runs, the invalidated first run, and the four CS-D runs: about $35.
 
 | Change set | Status |
 |---|---|
 | CS-A sediment (`prompt.md`, listings, one comment) | applied, `6dda706` |
 | CS-B delegation run-alongside + compaction SSOT | applied, `d24bc69` |
-| CS-C refusal classification in headless runners | applied after adversarial review (one high-severity fix folded in); commit hash in `git log` on the branch |
-| CS-D long-output sentence in `RULES_DOCS.md` (measurement-gated); compaction hook dropped after the fact check | waiting on canary spend approval |
-| CS-E deferred items with promotion triggers | recorded; G-j found already covered by `git_diff_max_files` |
+| CS-C refusal classification in headless runners | applied, `196d3e0`; follow-ups `c110e8f` (auto-improve stops after 3 consecutive refusals), `5ea27cb` (parallel_ab reads stream-json for the category) |
+| CS-D long-output sentence in `RULES_DOCS.md` | applied, `fbff547`; gate met weakly (see 05-plan.md section 3) |
+| CS-E deferred items | recorded in 05-plan.md; G-j found already covered by `git_diff_max_files` |
+| Harness | `d8d1610` (`--effort` passthrough), `e8caf0e` (runs outside `~/.claude`, PowerShell in transcript gates, stash-aware `file_preserved_glob`) |
+
+Open, deliberately: `plan-routing` versus `RULES_DOCS.md`'s zero-match `[f]` default for `plan` (August decision, untouched); refused `auto_improve` cycles leave earlier edits in the worktree like any `mutation_error`; the refusal detector exists as three small copies because `evals/` does not import the package.
