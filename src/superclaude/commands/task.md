@@ -11,11 +11,11 @@ description: Execute complex tasks with intelligent workflow management and dele
 
   <flow>
   1. Analyze: Parse requirements + dependency mapping
-  2. Decompose: Break into Epic → Story → Task hierarchy
+  2. Decompose: Break into Epic → Story → Task hierarchy; each task is a contract that starts `status: fail` with an empty `evidence` list
   3. Strategy: Pick execution order (sequential for deps, parallel for independent, adaptive for mixed)
   4. Checkpoint: Changes affect >3 files → present numbered plan → wait for user approval
   5. Execute: Intelligent delegation + parallel where possible
-  6. Validate: Quality gates + completion verification
+  6. Validate: Quality gates + completion verification — a task flips to `pass` (completed in TaskUpdate) only when its `evidence` cites the check that passed (exit code, test output, observed outcome); a sub-agent's result is a claim to check, not evidence
   7. Cleanup: Auto-remove stale/completed tasks (--cleanup)
   </flow>
 

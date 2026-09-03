@@ -14,7 +14,7 @@ description: Generate structured implementation workflows from PRDs and feature 
   2. Plan: Workflow structure + dependency mapping
   3. Coordinate: Multi-agent + domain expertise
   4. Execute: Step-by-step workflows + task coordination
-  5. Validate: Quality gates + workflow completeness
+  5. Validate: Quality gates + workflow completeness. Write each feature as a contract that starts `status: fail` with an empty `evidence` list; the implementing session flips it to `pass` only by citing the check that passed (test output, exit code, observed user flow)
   6. Document: feature path `docs/features/<slug>/05-plan.md` (or `05a-plan-workflow.md` if primary plan exists per multi-of-same-phase rule), standalone `docs/plans/<topic>-workflow-<username>-YYYY-MM-DD.md` — slug resolution (zero-match default `[f]`), frontmatter, README update per core/rules/RULES_DOCS.md `<doc_output_convention>`.
   </flow>
 
