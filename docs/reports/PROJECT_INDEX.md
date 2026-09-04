@@ -5,7 +5,7 @@ Structure only — **no inventory counts are pinned here**; see [Counting things
 
 ## What this project is
 
-A **content framework**: markdown files (commands, agents, modes, skills, MCP docs,
+A **content framework**: markdown files (commands, agents, modes, MCP docs,
 core config) installed into `~/.claude/` to configure Claude Code's behavior. It
 ships a `superclaude` CLI and a pytest plugin for auto-markers. The markdown *is*
 the product; the Python is the delivery mechanism.
@@ -24,14 +24,13 @@ superclaude/
 │   ├── commands/             # /sc:* command definitions (.md)
 │   ├── agents/               # sub-agent definitions (.md)
 │   ├── modes/                # behavioral modes (.md)
-│   ├── skills/               # skills, some with references/ progressive disclosure
 │   ├── mcp/                  # MCP_*.md docs, one per managed server
 │   ├── core/                 # always-loaded: FLAGS, PRINCIPLES, RULES
 │   │   └── rules/            # on-demand rule modules (QUALITY, DELEGATION, DOCS, INTERACTION)
 │   ├── hooks/                # hook entry scripts + hooks.json
 │   ├── scripts/              # installed to ~/.claude/superclaude/scripts/
 │   ├── templates/            # docs-scaffold/ etc., copied at init time
-│   ├── execution/  utils/    # runtime helpers, path resolvers
+│   ├── utils/                # path resolvers (project_root, claude_base, hook_state_dir)
 ├── tests/{unit,integration,manual}/
 ├── docs/                     # see "Docs layout" below
 ├── .claude/                  # dev-tree config: rules/, commands/, superclaude/
@@ -47,7 +46,7 @@ superclaude/
 | How is content organized and delivered? | `src/superclaude/ARCHITECTURE.md` |
 | How do I work in this repo? | `CLAUDE.md`, `AGENTS.md` |
 | What traps have bitten before? | `.claude/rules/gotchas/` (`general.md`, `authoring.md`, `hooks.md`) |
-| How do I author an agent/command/skill/mode? | `.claude/rules/` |
+| How do I author an agent/command/mode/MCP doc? | `.claude/rules/` |
 | What are the doc conventions? | `src/superclaude/core/rules/RULES_DOCS.md` |
 | What's the product supposed to be? | `docs/PRD.md` |
 | Why is it built this way? | `docs/adr/` |
@@ -66,12 +65,12 @@ superclaude/
 
 ## Counting things
 
-Inventory counts (commands, agents, skills, MCP servers, modules) are **derived
+Inventory counts (commands, agents, modes, MCP servers, modules) are **derived
 values**. They are not written here, because a doc copy goes stale silently.
 
 ```bash
 # component counts, straight from the source tree
-for d in commands agents modes skills mcp core; do
+for d in commands agents modes mcp core; do
   printf '%s: %s\n' "$d" "$(find src/superclaude/$d -name '*.md' ! -name 'README.md' | wc -l)"
 done
 
