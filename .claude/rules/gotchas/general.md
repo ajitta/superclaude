@@ -1,5 +1,5 @@
 # Project Gotchas — General
-# Last reviewed: 2026-07-25
+# Last reviewed: 2026-09-03
 # Claude 실수할 때마다 여기 한 줄씩 추가.
 # 기존 알려진 프로젝트 트랩 있으면 직접 추가 가능 (R19 자동 캡처 병행).
 
@@ -13,3 +13,4 @@
 - grep-longline-blindspot: Grep `content` mode return "No matches found" on very long lines (~460+ chars); same pattern in `files_with_matches` mode find file fine. Agent/skill frontmatter `description:` is exactly this shape (spec allow 1024-1536 chars) AND highest-value audit target (CC read it verbatim into delegation classifier). Any content-mode grep over descriptions = false-negative risk; absence of hit is NOT evidence of absence. Use `files_with_matches` or direct Read for frontmatter sweep. Measured 2026-08-02; still reproducible on `src/superclaude/commands/prompt.md:2` (530 chars, plain ASCII, no BOM — line length is the only variable)
 - windows-make-sync-broken: `make sync-user` 실패 가능 on Windows — `uv run superclaude install` `.venv\lib64` symlink 정리 시 권한 거부 (os error 5). Symptom: `.venv/` 안에 `lib64 → lib` symlink + `pyvenv.cfg` 만 (no `lib/`, no `Scripts/`). Fallback: `superclaude install --force --scope user` 직접 (uv 우회, 0.5s). Root fix: `rm .venv/lib64 && uv venv` venv 재생성. Affect: `make deploy`, `make sync-*`, `make` 호출 hook 전부
 - codex-module-count-drift: `src/superclaude/` 아래 `.py` 추가/삭제 → `docs/codex/prompting_session_raw/02_component_and_delivery_map.md` §1 하드코딩 "전체 Python module" 카운트 stale → `tests/unit/test_codex_component_map.py::test_documented_count_matches_source` 즉시 red. 파일 추가와 무관해 보이는 docs 테스트라 원인 추적에 시간 샘. 같은 커밋에서 재계산해 갱신: `uv run python -c "from pathlib import Path; print(len(list(Path('src/superclaude').rglob('*.py'))))"`
+- uv-run-reverts-pip-upgrade: `uv pip install -e ".[dev]" --upgrade` 로 올린 버전은 다음 `uv run` 한 번에 조용히 되돌아감 — `uv run`이 gitignored `uv.lock` 기준으로 default dep set을 auto-sync ("Uninstalled N packages" 한 줄만 뜨고 실패 아님). 측정 2026-09-03: 8개 upgrade → `uv run pytest` 직후 6개(click/rich/pytest/packaging/pygments/markdown-it-py) lock 버전으로 복귀, dev-extra 로만 닿는 2개(ast-serialize←mypy, platformdirs←black)만 생존. 즉 생존 여부 = "lock의 default closure에 있냐"이지 `--upgrade` 성공 여부가 아님. 로컬에서 진짜 올리려면 `uv lock --upgrade` 로 lock을 먼저 옮길 것. 단 `uv.lock`은 gitignored이고 CI는 `uv pip install --system -e ".[dev]"` 로 매번 최신 재해결하므로, lock은 CI를 고정해 주지 않음 — 새 ruff/black 규칙은 lock과 무관하게 CI로 바로 들어옴
