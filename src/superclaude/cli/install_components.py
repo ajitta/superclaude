@@ -408,13 +408,14 @@ def _registered_sc_commands(settings_file: Path) -> List[str]:
 def _legacy_scripts_notice(legacy_scripts: Path, settings_file: Path) -> str:
     """What to tell the user about script copies a previous release installed.
 
-    Never removed by the installer: Claude Code snapshots hook commands at
-    session start, so a session already running — this project's, or on a
-    user-scope install any project's — keeps executing the OLD registration
-    against these files, and python's "can't open file" is exit 2, the blocking
-    code on PreToolUse and Stop. Which advice is right depends on the settings
-    file just written: while any registration still names the copies (a hook
-    this release no longer ships, kept by a non-force install), telling the
+    Never removed by the installer. Whether a running Claude Code session keeps
+    its start-of-session hook commands or reloads a rewritten settings file is
+    version-dependent (observed to reload, 2026-09-05), a registration a
+    non-force install left in legacy form (a hook this release no longer ships)
+    still runs these files, and python's "can't open file" is exit 2, the
+    blocking code on PreToolUse and Stop — deleting them can block every tool
+    call in a live session. Which advice is right depends on the settings file
+    just written: while any registration still names the copies, telling the
     user to delete them would turn a working install into a blocked one.
     """
     still_used = sum(

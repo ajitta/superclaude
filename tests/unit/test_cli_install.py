@@ -356,11 +356,11 @@ class TestFrameworkArtifactsAlwaysUpdate:
     def test_legacy_script_copies_are_left_in_place_and_named(self, tmp_path):
         """A previous release's copies are NOT deleted on upgrade.
 
-        Claude Code snapshots hook commands at session start, so a session
-        already running keeps executing the old registration against these
-        files; python's "can't open file" is exit 2, the blocking code, and
-        deleting them under a live session blocks every tool call until
-        restart. The install says what they are and when to remove them.
+        A session on an older Claude Code, or a registration a non-force
+        install left in legacy form, still runs these files; python's "can't
+        open file" is exit 2, the blocking code, and deleting them under such a
+        session blocks every tool call until restart. The install says what
+        they are and when to remove them.
         """
         from superclaude.cli.install_components import install_hooks
 
