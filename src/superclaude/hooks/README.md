@@ -30,38 +30,38 @@ Hooks are defined in `hooks.json` and support the following events:
 
 ## Current Hooks
 
-Script purposes and env toggles: see `../scripts/README.md`.
+Every command is `superclaude hook <name>` — the console script, dispatched in `cli/entry.py` before the click app loads and resolved through the registry in `cli/hook_dispatch.py`. The scripts run from inside the installed package; nothing is copied into the install tree and no command names an interpreter or a path, so a committed project-scope `settings.json` is the same bytes on every machine. Script purposes and env toggles: see `../scripts/README.md`.
 
 ### SessionStart
 
-- **session_init.py** (matcher `startup`, once)
-- **memory_staleness.py** (matcher `startup`, once) — see "Memory `verified:` convention" below
-- **context_reset.py** (matcher `clear|compact|startup`)
-- **insight_writer.py pending-count-from-hook** (matcher `clear|compact|startup`)
+- `superclaude hook session_init` (matcher `startup`, once)
+- `superclaude hook memory_staleness` (matcher `startup`, once) — see "Memory `verified:` convention" below
+- `superclaude hook context_reset` (matcher `clear|compact|startup`)
+- `superclaude hook insight_writer pending-count-from-hook` (matcher `clear|compact|startup`)
 
 ### PreCompact
 
-- **insight_writer.py harvest-from-hook**
+- `superclaude hook insight_writer harvest-from-hook`
 
 ### SessionEnd
 
-- **insight_writer.py harvest-from-hook**
+- `superclaude hook insight_writer harvest-from-hook`
 
 ### UserPromptSubmit
 
-- **context_loader.py**
+- `superclaude hook context_loader`
 
 ### PreToolUse
 
-- **file_size_guard.py** (matcher `Read`)
-- **destructive_guard.py** (matcher `Bash`)
-- **loop_guard.py** (matcher `Edit|Write|Bash`)
+- `superclaude hook file_size_guard` (matcher `Read`)
+- `superclaude hook destructive_guard` (matcher `Bash`)
+- `superclaude hook loop_guard` (matcher `Edit|Write|Bash`)
 
 ### PostToolUse
 
-- **prettier_hook.py** (matcher `Edit|Write`)
-- **test_runner_hook.py** (matcher `Edit|Write`, async)
-- **loop_guard.py** (matcher `Edit|Write|Bash`)
+- `superclaude hook prettier_hook` (matcher `Edit|Write`)
+- `superclaude hook test_runner_hook` (matcher `Edit|Write`, async)
+- `superclaude hook loop_guard` (matcher `Edit|Write|Bash`)
 
 ## Configuration Structure
 
@@ -74,7 +74,7 @@ Script purposes and env toggles: see `../scripts/README.md`.
         "hooks": [
           {
             "type": "command",
-            "command": "python script.py",
+            "command": "superclaude hook <name>",
             "timeout": 10
           }
         ]
@@ -94,11 +94,12 @@ Script purposes and env toggles: see `../scripts/README.md`.
 | `timeout` | number | Maximum execution time (default: 10 min since v2.1.3) |
 | `once` | boolean | Execute only once per session (v2.1.20+) |
 
-### Template Variables
+### Runtime Variables (Claude Code)
+
+SuperClaude's own commands use none of these — `superclaude hook <name>` carries no path to substitute. They are available to any command Claude Code runs:
 
 | Variable | Description |
 |----------|-------------|
-| `{{SCRIPTS_PATH}}` | Path to SuperClaude scripts directory |
 | `${CLAUDE_SESSION_ID}` | Current session ID (v2.1.9+) |
 | `${CLAUDE_PROJECT_DIR}` | Project directory path (v1.0.58+) |
 | `${CLAUDE_PLUGIN_ROOT}` | Plugin root directory (for plugins) |
@@ -155,10 +156,11 @@ PreToolUse hooks can return JSON to modify behavior:
 
 ### Adding New Hooks
 
-1. Create the script in `scripts/` directory
-2. Add hook configuration to `hooks.json`
-3. Test the hook in a Claude Code session
-4. Update this README
+1. Create the script in `scripts/` — `main()` reads the event JSON from stdin; `None` or an int return is the exit code, and `sys.exit(2)` blocks
+2. Register it in `cli/hook_dispatch.py` `HOOKS` (`tests/unit/test_hook_dispatch.py` fails until hooks.json, the registry and `scripts/` agree)
+3. Add the registration to `hooks.json` as `superclaude hook <name>`
+4. Test it: `echo '{...}' | superclaude hook <name>`, then in a Claude Code session
+5. Update this README
 
 ### Exit Codes
 

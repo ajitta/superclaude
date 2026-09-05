@@ -17,7 +17,7 @@ hint to stderr and exits 1.
 Invocation: `superclaude insight <subcommand>` — the console script carries the
 environment where superclaude.utils resolves. Running this file under a bare
 `python3` fails with ModuleNotFoundError unless that interpreter happens to have
-the package; hooks avoid it by baking {{PYTHON_BIN}} = the installer's sys.executable.
+the package; hooks avoid it by running `superclaude hook insight_writer <subcommand>`.
 
 Hook integration:
     SessionEnd / PreCompact → harvest-from-hook (stdin JSON: reason/trigger + cwd)

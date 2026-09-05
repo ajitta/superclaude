@@ -9,14 +9,14 @@
           {
             "_comment": "[superclaude] session bootstrap — hook session tracking, cleanup of sessions older than 24h, PR-review status line",
             "type": "command",
-            "command": "{{PYTHON_BIN}} {{SCRIPTS_PATH}}/session_init.py",
+            "command": "superclaude hook session_init",
             "timeout": 10,
             "once": true
           },
           {
             "_comment": "[superclaude] warns when Claude Code memory entries are older than SUPERCLAUDE_MEMORY_STALE_DAYS (default 90); non-blocking",
             "type": "command",
-            "command": "{{PYTHON_BIN}} {{SCRIPTS_PATH}}/memory_staleness.py",
+            "command": "superclaude hook memory_staleness",
             "timeout": 5,
             "once": true
           }
@@ -28,13 +28,13 @@
           {
             "_comment": "[superclaude] clears the context_loader dedup cache on /clear and /compact so dynamic contexts are re-injected",
             "type": "command",
-            "command": "{{PYTHON_BIN}} {{SCRIPTS_PATH}}/context_reset.py",
+            "command": "superclaude hook context_reset",
             "timeout": 5
           },
           {
             "_comment": "[superclaude] notify if pending insights from prior session",
             "type": "command",
-            "command": "{{PYTHON_BIN}} {{SCRIPTS_PATH}}/insight_writer.py pending-count-from-hook",
+            "command": "superclaude hook insight_writer pending-count-from-hook",
             "timeout": 5
           }
         ]
@@ -46,7 +46,7 @@
           {
             "_comment": "[superclaude] harvest INSIGHT: markers from transcript before compaction",
             "type": "command",
-            "command": "{{PYTHON_BIN}} {{SCRIPTS_PATH}}/insight_writer.py harvest-from-hook",
+            "command": "superclaude hook insight_writer harvest-from-hook",
             "timeout": 10
           }
         ]
@@ -58,7 +58,7 @@
           {
             "_comment": "[superclaude] harvest INSIGHT: markers on /clear, /exit, logout",
             "type": "command",
-            "command": "{{PYTHON_BIN}} {{SCRIPTS_PATH}}/insight_writer.py harvest-from-hook",
+            "command": "superclaude hook insight_writer harvest-from-hook",
             "timeout": 10
           }
         ]
@@ -70,7 +70,7 @@
           {
             "_comment": "[superclaude] injects trigger-matched context (modes, MCP docs, rules) into the prompt",
             "type": "command",
-            "command": "{{PYTHON_BIN}} {{SCRIPTS_PATH}}/context_loader.py",
+            "command": "superclaude hook context_loader",
             "timeout": 5
           }
         ]
@@ -83,7 +83,7 @@
           {
             "_comment": "[superclaude] safety — blocks Read on files >30KB for token conservation",
             "type": "command",
-            "command": "{{PYTHON_BIN}} {{SCRIPTS_PATH}}/file_size_guard.py",
+            "command": "superclaude hook file_size_guard",
             "timeout": 5
           }
         ]
@@ -94,7 +94,7 @@
           {
             "_comment": "[superclaude] safety — blocks destructive shell commands (Python; stdlib-only, no jq/grep/head dependency)",
             "type": "command",
-            "command": "{{PYTHON_BIN}} {{SCRIPTS_PATH}}/destructive_guard.py",
+            "command": "superclaude hook destructive_guard",
             "timeout": 5
           }
         ]
@@ -105,7 +105,7 @@
           {
             "_comment": "[superclaude] safety — circuit breaker (SUPERCLAUDE_LOOP_GUARD=0 to disable)",
             "type": "command",
-            "command": "{{PYTHON_BIN}} {{SCRIPTS_PATH}}/loop_guard.py",
+            "command": "superclaude hook loop_guard",
             "timeout": 5
           }
         ]
@@ -118,13 +118,13 @@
           {
             "_comment": "[superclaude] runs prettier on edited .ts/.tsx/.js/.jsx files when prettier is available",
             "type": "command",
-            "command": "{{PYTHON_BIN}} {{SCRIPTS_PATH}}/prettier_hook.py",
+            "command": "superclaude hook prettier_hook",
             "timeout": 30
           },
           {
             "_comment": "[superclaude] optional — set SUPERCLAUDE_AUTO_TEST=0 to disable",
             "type": "command",
-            "command": "{{PYTHON_BIN}} {{SCRIPTS_PATH}}/test_runner_hook.py",
+            "command": "superclaude hook test_runner_hook",
             "async": true,
             "timeout": 120
           }
@@ -136,7 +136,7 @@
           {
             "_comment": "[superclaude] safety — circuit breaker records error/success signatures",
             "type": "command",
-            "command": "{{PYTHON_BIN}} {{SCRIPTS_PATH}}/loop_guard.py",
+            "command": "superclaude hook loop_guard",
             "timeout": 5
           }
         ]
@@ -148,7 +148,7 @@
           {
             "_comment": "[superclaude] ask for one INSIGHT: line when the tree changed — once per session, SUPERCLAUDE_INSIGHT_PROMPT=0 to disable",
             "type": "command",
-            "command": "{{PYTHON_BIN}} {{SCRIPTS_PATH}}/insight_writer.py request-from-hook",
+            "command": "superclaude hook insight_writer request-from-hook",
             "timeout": 10
           }
         ]

@@ -13,11 +13,11 @@ from typing import Any, Dict, List, Tuple
 from superclaude.utils import settings_filename
 
 from .install_paths import (
-    find_legacy_skills,
     COMPONENTS,
     _get_package_root,
     _get_source_dir,
     _get_target_dir,
+    find_legacy_skills,
     get_base_path,
 )
 from .install_settings import (
@@ -228,33 +228,6 @@ def list_all_components(
             "available": source_count,
             "installed": installed_count,
         }
-
-    # Scripts (special handling - now in superclaude/scripts/)
-    scripts_source = package_root / "scripts"
-    scripts_target = base_path / "superclaude" / "scripts"
-
-    # Count scripts
-    scripts_available = 0
-    if scripts_source.exists():
-        scripts_available = sum(1 for f in scripts_source.glob("*.sh"))
-        scripts_available += sum(
-            1 for f in scripts_source.glob("*.py") if f.name != "__init__.py"
-        )
-
-    scripts_installed = 0
-    if scripts_target.exists():
-        scripts_installed = sum(1 for f in scripts_target.glob("*.sh"))
-        scripts_installed += sum(
-            1 for f in scripts_target.glob("*.py") if f.name != "__init__.py"
-        )
-
-    result["scripts"] = {
-        "description": "Hook scripts",
-        "source_path": str(scripts_source),
-        "target_path": str(scripts_target),
-        "available": scripts_available,
-        "installed": scripts_installed,
-    }
 
     # Hooks configuration (now in .claude/hooks/hooks.json)
     hooks_source = package_root / "hooks"

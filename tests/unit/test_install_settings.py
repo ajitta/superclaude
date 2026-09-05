@@ -21,7 +21,7 @@ class TestIsSuperclaudeHook:
         self.is_sc_hook = _is_superclaude_hook
 
     def test_detects_session_init_command(self):
-        """SC hook detected via resolved superclaude scripts path (user scope)."""
+        """SC hook detected via the legacy resolved scripts path (user scope)."""
         hook = {
             "hooks": [
                 {"command": "python ~/.claude/superclaude/scripts/session_init.py"}
@@ -30,7 +30,7 @@ class TestIsSuperclaudeHook:
         assert self.is_sc_hook(hook) is True
 
     def test_detects_prettier_hook_command(self):
-        """SC hook detected via project-scope superclaude scripts path."""
+        """SC hook detected via the legacy project-scope scripts path."""
         hook = {
             "hooks": [
                 {
@@ -41,7 +41,7 @@ class TestIsSuperclaudeHook:
         assert self.is_sc_hook(hook) is True
 
     def test_detects_test_runner_hook_command(self):
-        """SC hook detected via Windows backslash superclaude scripts path."""
+        """SC hook detected via the legacy Windows-backslash scripts path."""
         hook = {
             "hooks": [
                 {
@@ -52,8 +52,20 @@ class TestIsSuperclaudeHook:
         assert self.is_sc_hook(hook) is True
 
     def test_detects_unresolved_template_command(self):
-        """SC hook detected via unresolved {{SCRIPTS_PATH}} template form."""
+        """SC hook detected via the legacy unresolved {{SCRIPTS_PATH}} form."""
         hook = {"hooks": [{"command": "python {{SCRIPTS_PATH}}/session_init.py"}]}
+        assert self.is_sc_hook(hook) is True
+
+    def test_detects_console_entry_command(self):
+        """SC hook detected via `superclaude hook <name>`, the form every
+        shipped command takes — no path, no interpreter to match on."""
+        hook = {"hooks": [{"command": "superclaude hook session_init"}]}
+        assert self.is_sc_hook(hook) is True
+
+    def test_detects_console_entry_command_with_subcommand(self):
+        hook = {
+            "hooks": [{"command": "superclaude hook insight_writer harvest-from-hook"}]
+        }
         assert self.is_sc_hook(hook) is True
 
     def test_user_hook_with_sc_script_name_not_detected(self):
@@ -1034,3 +1046,86 @@ class TestForceSweepsRetiredEvents:
             h["command"] for e in events.get("TeammateIdle", []) for h in e["hooks"]
         ]
         assert commands == ["notify-send idle"]
+
+
+class TestHookIdentityAcrossCommandForms:
+    """`superclaude hook <name>` and the previous release's `<python>
+    <dir>/<name>.py` are the same hook.
+
+    Identity decides what a non-force upgrade appends. If the two forms read
+    as different hooks, an install over a legacy registration appends every
+    shipped hook beside its old twin — and a doubled loop_guard trips its
+    circuit breaker at half the intended error count.
+    """
+
+    LEGACY = "/usr/bin/python3 /home/x/.claude/superclaude/scripts"
+
+    def test_console_entry_and_legacy_path_are_the_same_hook(self):
+        from superclaude.cli.install_settings import _hook_script_id
+
+        current = _hook_script_id(
+            {"command": "superclaude hook insight_writer harvest-from-hook"}
+        )
+        legacy = _hook_script_id(
+            {"command": f"{self.LEGACY}/insight_writer.py harvest-from-hook"}
+        )
+
+        assert current == legacy == ("insight_writer", "harvest-from-hook")
+
+    def test_the_subcommand_still_separates_entry_points(self):
+        from superclaude.cli.install_settings import _hook_script_id
+
+        harvest = _hook_script_id(
+            {"command": "superclaude hook insight_writer harvest-from-hook"}
+        )
+        request = _hook_script_id(
+            {"command": "superclaude hook insight_writer request-from-hook"}
+        )
+
+        assert harvest != request
+
+    def test_an_option_is_not_a_subcommand(self):
+        from superclaude.cli.install_settings import _hook_script_id
+
+        assert _hook_script_id({"command": "superclaude hook loop_guard --quiet"}) == (
+            "loop_guard",
+            "",
+        )
+
+    def test_a_command_in_neither_form_falls_back_to_its_text(self):
+        from superclaude.cli.install_settings import _hook_script_id
+
+        assert _hook_script_id({"command": "npm   run lint"}) == ("npm run lint", "")
+
+    def test_a_non_force_upgrade_over_a_legacy_registration_appends_nothing(self):
+        from superclaude.cli.install_settings import _merge_hook_arrays
+
+        existing = [
+            {
+                "matcher": "Edit|Write|Bash",
+                "hooks": [
+                    {
+                        "_comment": "[superclaude] safety — circuit breaker",
+                        "type": "command",
+                        "command": f"{self.LEGACY}/loop_guard.py",
+                        "timeout": 5,
+                    }
+                ],
+            }
+        ]
+        shipped = [
+            {
+                "matcher": "Edit|Write|Bash",
+                "hooks": [
+                    {
+                        "_comment": "[superclaude] safety — circuit breaker",
+                        "type": "command",
+                        "command": "superclaude hook loop_guard",
+                        "timeout": 5,
+                    }
+                ],
+            }
+        ]
+
+        assert _merge_hook_arrays(existing, shipped, force=False) == existing
+        assert _merge_hook_arrays(existing, shipped, force=True) == shipped

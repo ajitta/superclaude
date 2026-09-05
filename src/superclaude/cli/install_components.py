@@ -7,17 +7,16 @@ and the top-level install_all orchestration.
 
 import json
 import shutil
-import sys
 from pathlib import Path
 from typing import List, Tuple
 
 from .install_git_exclude import add_git_exclude
 from .install_paths import (
-    find_legacy_skills,
     COMPONENTS,
     _get_package_root,
     _get_source_dir,
     _get_target_dir,
+    find_legacy_skills,
 )
 from .install_settings import (
     CLAUDE_SC_IMPORT,
@@ -242,20 +241,29 @@ def install_claude_sc_md(
         return False, f"Failed to install CLAUDE_SC.md: {e}"
 
 
-def install_hooks_and_scripts(
+def install_hooks(
     base_path: Path = None, force: bool = False, scope: str = "user"
 ) -> Tuple[int, int, int, List[str]]:
     """
-    Install hooks configuration and scripts.
+    Install the hook registration.
 
     This function:
-    1. Copies scripts from src/superclaude/scripts/ to .claude/superclaude/scripts/
-    2. Transforms hooks/hooks.json with correct paths and copies to .claude/hooks/hooks.json
+    1. Copies hooks/hooks.json to <base>/hooks/hooks.json, verbatim
+    2. Merges its hooks into this scope's settings file
+
+    Every command is ``superclaude hook <name>``. The console script resolves
+    its own interpreter and its own copy of the package, so nothing here is
+    rewritten per machine and a project-scope settings.json is the same bytes on
+    every teammate's checkout. Earlier releases copied the scripts to
+    ``<base>/superclaude/scripts/`` and baked the installer's interpreter and
+    that directory into each command; a hook command no longer carries a path
+    at any scope, so the worktree anchor question (which directory the command
+    should name) no longer arises.
 
     Args:
         base_path: Base installation path (default: ~/.claude)
-        force: Force reinstall
-        scope: Installation scope ("user", "project", or "target")
+        force: Replace this scope's SuperClaude hook registrations
+        scope: Installation scope ("user", "project", or "local")
 
     Returns:
         Tuple of (installed_count, skipped_count, failed_count, messages)
@@ -264,9 +272,7 @@ def install_hooks_and_scripts(
         base_path = Path.home() / ".claude"
 
     package_root = _get_package_root()
-    scripts_source = package_root / "scripts"
     hooks_source = package_root / "hooks"
-    scripts_target = base_path / "superclaude" / "scripts"
     hooks_target = base_path / "hooks"
 
     installed = 0
@@ -274,114 +280,79 @@ def install_hooks_and_scripts(
     failed = 0
     messages = []
 
-    # Determine scripts path based on scope
-    # - project scope: $CLAUDE_PROJECT_DIR-based path. .claude/settings.json is
-    #   team-shared, so the script half of the command must not name one
-    #   machine's checkout. Docs: https://code.claude.com/docs/en/hooks — hook
-    #   CWD is NOT guaranteed project root; $CLAUDE_PROJECT_DIR is the official
-    #   env var for project-root-relative paths.
-    # - user/local/target scope: absolute path. Nothing here is shared
-    #   (settings.local.json is gitignored by definition and already carries an
-    #   absolute {{PYTHON_BIN}}), and the variable is not a synonym for "this
-    #   install": in a git worktree Claude Code reads settings from the MAIN
-    #   worktree while expanding $CLAUDE_PROJECT_DIR to the linked one, so every
-    #   hook path missed by a whole directory. Absolute is CWD-independent too.
-    if scope == "project":
-        scripts_path_for_hooks = "$CLAUDE_PROJECT_DIR/.claude/superclaude/scripts"
-    else:
-        scripts_path_for_hooks = str(scripts_target.resolve())
+    # The registration only works where Claude Code's hook shell can resolve
+    # `superclaude`. That shell inherits the launching shell's PATH (measured
+    # 2026-09-05: ~/.local/bin — where uv, pipx and Claude Code's own native
+    # installer put their scripts — was present), so this process's PATH is the
+    # closest proxy available. A warning, not a failure: the two shells are not
+    # guaranteed to agree in either direction.
+    if shutil.which("superclaude") is None:
+        messages.append(
+            "⚠️  `superclaude` is not on PATH in this shell. Every hook runs "
+            "`superclaude hook <name>` and exits 127 where Claude Code cannot "
+            "find it — put the console script's directory on PATH "
+            "(uv: `uv tool update-shell`; pipx: `pipx ensurepath`)."
+        )
 
-    # 1. Copy scripts to .claude/superclaude/scripts/
-    if scripts_source.exists():
-        scripts_target.mkdir(parents=True, exist_ok=True)
+    # Script copies from a release whose hooks ran them directly. Deliberately
+    # NOT removed: Claude Code snapshots hook commands at session start, so a
+    # session already running — this project's, or on a user-scope install any
+    # project's — keeps executing the OLD registration against these files, and
+    # python's "can't open file" is exit 2, the blocking code on PreToolUse and
+    # Stop. Deleting them under a live session blocks every tool call until
+    # restart. The user removes them once no such session is left.
+    legacy_scripts = base_path / "superclaude" / "scripts"
+    if legacy_scripts.is_dir():
+        messages.append(
+            f"ℹ️  {legacy_scripts} holds script copies from a release whose hooks "
+            "ran them directly; hooks now run `superclaude hook <name>`. Left in "
+            "place for sessions still on the previous registration — remove it "
+            "after restarting Claude Code."
+        )
 
-        patterns = ["*.sh", "*.py"]
-        for pattern in patterns:
-            for source_file in scripts_source.glob(pattern):
-                # Skip __init__.py and README files
-                if (
-                    source_file.name == "__init__.py"
-                    or source_file.stem.upper() == "README"
-                ):
-                    continue
-
-                # Build output, not user content: an upgrade refreshes it even
-                # without --force. Skipping it while settings.json still received
-                # the package's hooks.json let a release register a subcommand the
-                # installed script did not implement — argparse exit 2, the
-                # blocking code on Stop, on every turn.
-                target_file = scripts_target / source_file.name
-
-                try:
-                    shutil.copy2(source_file, target_file)
-                    installed += 1
-                except Exception as e:
-                    failed += 1
-                    messages.append(f"Failed to copy {source_file.name}: {e}")
-
-    # 2. Read and transform hooks.json once (reused for copy + merge)
     hooks_json_file = hooks_source / "hooks.json"
-    hooks_content_transformed = None
-
-    if hooks_json_file.exists():
-        try:
-            raw_content = hooks_json_file.read_text(encoding="utf-8")
-            # Use forward slashes for JSON compatibility (works on all platforms)
-            scripts_path_json_safe = scripts_path_for_hooks.replace("\\", "/")
-            # Python binary: bake absolute path to the Python running the installer.
-            # Avoids Windows `python3` absence (legacy installer), Store Python edge cases,
-            # and cross-shell $PATH differences. Matches pipx/uv/pre-commit pattern.
-            # Forward slashes for JSON compatibility; escape inner quotes if path has spaces
-            # (e.g., "C:/Program Files/Python/python.exe" → \"C:/Program Files/...\" for JSON).
-            python_bin_json_safe = sys.executable.replace("\\", "/")
-            if " " in python_bin_json_safe:
-                python_bin_json_safe = f'\\"{python_bin_json_safe}\\"'
-            hooks_content_transformed = raw_content.replace(
-                "{{SCRIPTS_PATH}}", scripts_path_json_safe
-            ).replace("{{PYTHON_BIN}}", python_bin_json_safe)
-        except OSError as e:
-            failed += 1
-            messages.append(f"Failed to read hooks.json: {e}")
-    else:
+    if not hooks_json_file.exists():
         messages.append("hooks.json not found, skipping hooks configuration")
+        return installed, skipped, failed, messages
 
-    # 2a. Copy transformed hooks.json to .claude/hooks/hooks.json
-    if hooks_content_transformed is not None:
+    try:
+        hooks_content = hooks_json_file.read_text(encoding="utf-8")
+    except OSError as e:
+        failed += 1
+        messages.append(f"Failed to read hooks.json: {e}")
+        return installed, skipped, failed, messages
+
+    # 1. Copy hooks.json to <base>/hooks/hooks.json. Build output, not user
+    # content: rewritten regardless of --force so the file on disk describes
+    # the release that is installed.
+    try:
         hooks_target.mkdir(parents=True, exist_ok=True)
-        target_hooks_json = hooks_target / "hooks.json"
+        (hooks_target / "hooks.json").write_text(hooks_content, encoding="utf-8")
+        installed += 1
+        messages.append("hooks.json installed")
+    except OSError as e:
+        failed += 1
+        messages.append(f"Failed to install hooks.json: {e}")
 
-        # Same reason as the scripts above: this file has to describe the release
-        # whose scripts are on disk, so it is rewritten regardless of --force.
-        try:
-            target_hooks_json.write_text(hooks_content_transformed, encoding="utf-8")
+    # 2. Merge hooks into the settings file (what Claude Code actually reads)
+    try:
+        hooks_config = json.loads(hooks_content)
+        merge_success, merge_msg = merge_hooks_to_settings(
+            base_path=base_path, hooks_config=hooks_config, scope=scope, force=force
+        )
+
+        if merge_success:
             installed += 1
-            messages.append(
-                f"hooks.json installed (scripts path: {scripts_path_for_hooks})"
-            )
-        except OSError as e:
+            messages.append(f"✓ {merge_msg}")
+        else:
             failed += 1
-            messages.append(f"Failed to install hooks.json: {e}")
-
-    # 2b. Merge hooks to settings.json (ensures Claude Code recognizes hooks)
-    if hooks_content_transformed is not None:
-        try:
-            hooks_config = json.loads(hooks_content_transformed)
-            merge_success, merge_msg = merge_hooks_to_settings(
-                base_path=base_path, hooks_config=hooks_config, scope=scope, force=force
-            )
-
-            if merge_success:
-                installed += 1
-                messages.append(f"✓ {merge_msg}")
-            else:
-                failed += 1
-                messages.append(f"✗ {merge_msg}")
-        except json.JSONDecodeError as e:
-            failed += 1
-            messages.append(f"Failed to parse hooks.json for merge: {e}")
-        except OSError as e:
-            failed += 1
-            messages.append(f"Failed to merge hooks to settings.json: {e}")
+            messages.append(f"✗ {merge_msg}")
+    except json.JSONDecodeError as e:
+        failed += 1
+        messages.append(f"Failed to parse hooks.json for merge: {e}")
+    except OSError as e:
+        failed += 1
+        messages.append(f"Failed to merge hooks to settings.json: {e}")
 
     return installed, skipped, failed, messages
 
@@ -450,20 +421,20 @@ def install_all(
             for name in failed_names:
                 messages.append(f"   - {name}")
 
-    # Install hooks and scripts
-    hooks_installed, hooks_skipped, hooks_failed, hooks_messages = (
-        install_hooks_and_scripts(base_path, force, scope)
+    # Install the hook registration
+    hooks_installed, hooks_skipped, hooks_failed, hooks_messages = install_hooks(
+        base_path, force, scope
     )
     total_installed += hooks_installed
     total_skipped += hooks_skipped
     total_failed += hooks_failed
 
     if hooks_installed > 0:
-        messages.append(f"✅ Hooks and scripts: {hooks_installed} installed")
+        messages.append(f"✅ Hook registration: {hooks_installed} installed")
     if hooks_skipped > 0:
-        messages.append(f"⏭️  Hooks and scripts: {hooks_skipped} skipped")
+        messages.append(f"⏭️  Hook registration: {hooks_skipped} skipped")
     if hooks_failed > 0:
-        messages.append(f"❌ Hooks and scripts: {hooks_failed} failed")
+        messages.append(f"❌ Hook registration: {hooks_failed} failed")
     for msg in hooks_messages:
         messages.append(f"   {msg}")
 

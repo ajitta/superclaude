@@ -66,7 +66,7 @@ Documentation and configuration for MCP (Model Context Protocol) servers. Server
 
 ### scripts/ — INFRASTRUCTURE
 
-Python and shell scripts that power SuperClaude's hook system, context loading, and session management. Referenced by `hooks.json` and executed by Claude Code's hook runtime.
+Python and shell scripts that power SuperClaude's hook system, context loading, and session management. Every `hooks.json` command is `superclaude hook <name>` (registry: `cli/hook_dispatch.py`, dispatched in `cli/entry.py` ahead of the click app), so Claude Code's hook runtime runs the copy inside the installed package — nothing is copied into the install tree and no command carries an interpreter or a path.
 
 **Contract:** Scripts are infrastructure plumbing — they should be invisible to the user. They handle context injection, session initialization, and formatting hooks.
 

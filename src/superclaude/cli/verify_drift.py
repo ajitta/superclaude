@@ -5,8 +5,8 @@ Compares source files against installed files to detect drift
 (content mismatches, missing files, extra files).
 
 Coverage boundary: component *.md files (COMPONENTS, incl. core/rules/) and
-CLAUDE_SC.md only. templates/, installed scripts/, and the merged hooks.json
-are NOT drift-checked. Restated for the user in the `superclaude verify-drift`
+CLAUDE_SC.md only. templates/ and the merged hooks.json are NOT
+drift-checked. Restated for the user in the `superclaude verify-drift`
 help text; keep the two in step.
 """
 

@@ -12,10 +12,11 @@ SuperClaude content (agents/skills/commands/superclaude/etc.) we manage
 the exclude file ourselves.
 
 The block is scope-dependent. Local scope excludes everything it installs —
-none of it is the team's. Project scope excludes only what cannot be shared:
-the two files carrying ``{{PYTHON_BIN}}`` (the installing machine's absolute
-interpreter, which every teammate's install rewrites) and rebuildable runtime
-state. Content stays tracked, because sharing it is what project scope is for.
+none of it is the team's. Project scope excludes only rebuildable runtime
+state: content and the hook registration (``settings.json``,
+``hooks/hooks.json``) stay tracked, because sharing them is what the scope is
+for, and every hook command is ``superclaude hook <name>`` — no interpreter, no
+script path — so each teammate's install writes the same bytes.
 
 The block is generated file-by-file from the shipped source inventory so
 team-shared files co-located in the same directories (e.g. a team-authored
@@ -58,11 +59,12 @@ def _has_any_marker(content: str) -> bool:
     return any(start in content for start, _ in _ALL_MARKER_PAIRS)
 
 
-# Paths a project-scope install must keep out of the team's history. Each one
-# either carries {{PYTHON_BIN}} — the absolute interpreter of whichever machine
-# ran the install, so every teammate's install rewrites the same lines — or is
-# rebuildable runtime state. Everything else a project install writes is
-# machine-independent content and stays tracked.
+# Paths a project-scope install must keep out of the team's history: runtime
+# state, rebuildable and written inside the worktree by every install.
+# Everything else a project install writes is machine-independent and stays
+# tracked — including settings.json and hooks/hooks.json, whose commands are
+# `superclaude hook <name>`. (Releases before the console entry baked the
+# installing machine's interpreter into both, and listed them here.)
 #
 # `.claude/agent-memory/` is deliberately absent. A project-scope install creates
 # it, so it shows up untracked, but committing reviewed team memory is a
@@ -73,8 +75,6 @@ def _has_any_marker(content: str) -> bool:
 _PROJECT_SCOPE_ENTRIES = [
     ".claude/.superclaude_hooks/",
     ".claude/insights.pending.jsonl",
-    ".claude/hooks/hooks.json",
-    ".claude/settings.json",
 ]
 
 
@@ -85,8 +85,8 @@ def _collect_entries(scope: str = "local") -> List[str]:
     keeps working. Commands and the superclaude core live in SC-only
     subdirectories, so directory-level ignores are safe there.
 
-    Project scope gets the fixed machine-specific subset instead: its whole
-    purpose is that the content IS committed.
+    Project scope gets the fixed runtime-state subset instead: its whole
+    purpose is that the content — and the hook registration — IS committed.
     """
     if scope == "project":
         return list(_PROJECT_SCOPE_ENTRIES)

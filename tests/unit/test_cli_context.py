@@ -1,8 +1,9 @@
 """`superclaude context explain` / `superclaude context reset`.
 
 Both scripts behind these subcommands import ``superclaude.*``, so neither is
-runnable as a bare ``python3 ~/.claude/superclaude/scripts/X.py`` — the console
-subcommand is the only human path (gotchas/hooks.md ``script-needs-console-entry``).
+runnable under a bare ``python3`` outside the package — the console subcommand
+is the only human path, and the hooks reach the same scripts as
+``superclaude hook <name>`` (gotchas/hooks.md ``script-needs-console-entry``).
 
 Every test pins ``CLAUDE_PROJECT_DIR`` as well as the CWD: ``project_root()``
 reads the env first, so ``monkeypatch.chdir`` alone would let the resolvers
@@ -229,41 +230,14 @@ class TestContextExplain:
         assert after != before
         assert any(name.startswith("claude_context_") for name in after)
 
-    def test_it_names_the_loader_copy_that_actually_ran(self, project: Path):
-        """The hook runs the INSTALLED loader ({{SCRIPTS_PATH}}/context_loader.py);
-        explain runs this package's copy. Claiming to run "the UserPromptSubmit
-        hook" without naming the file lets a user on a drifted install chase a
-        phantom — explain describing the new loader, the hook running the old."""
+    def test_it_names_the_loader_that_ran(self, project: Path):
+        """The UserPromptSubmit hook runs `superclaude hook context_loader` —
+        this package's loader — and explain runs the same file. Naming it keeps
+        the report checkable against the source rather than against a claim."""
         result = CliRunner().invoke(main, ["context", "explain", "--serena rename x"])
 
         assert result.exit_code == 0, result.output
         assert f"loader:  {LOADER_SCRIPT}" in result.output
-
-    def test_a_drifted_installed_copy_is_flagged(
-        self, project: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-    ):
-        """Naming the two paths is not enough on its own: a healthy install also
-        has two different paths. Only a byte difference distinguishes drift."""
-        stale = tmp_path / "installed-content"
-        (stale / "scripts").mkdir(parents=True)
-        (stale / "scripts" / "context_loader.py").write_text(
-            "# an older context_loader\n", encoding="utf-8"
-        )
-        monkeypatch.setenv("SUPERCLAUDE_PATH", str(stale))
-
-        result = CliRunner().invoke(main, ["context", "explain", "--serena rename x"])
-
-        assert result.exit_code == 0, result.output
-        assert "bytes differ" in result.output
-        assert str(stale / "scripts" / "context_loader.py") in result.output
-
-    def test_a_byte_identical_installed_copy_is_not_flagged(self, project: Path):
-        """Control for the above: the fixture points SUPERCLAUDE_PATH at this
-        checkout, so the copy the hook would run IS the copy that ran."""
-        result = CliRunner().invoke(main, ["context", "explain", "--serena rename x"])
-
-        assert result.exit_code == 0, result.output
-        assert "bytes differ" not in result.output
 
     def test_the_suppressed_skills_banner_is_disclosed(self, project: Path):
         """explain forces CLAUDE_SHOW_SKILLS=0, so the once-per-session

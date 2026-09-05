@@ -21,11 +21,17 @@ from superclaude.utils import (
 # Import line to add to CLAUDE.md
 CLAUDE_SC_IMPORT = "@superclaude/CLAUDE_SC.md"
 
-# Resolved {{SCRIPTS_PATH}} form: command references a script under a
-# superclaude scripts directory (absolute user-scope path or
-# $CLAUDE_PROJECT_DIR/.claude/superclaude/scripts; / or \ separators).
+# Legacy registration form (releases before the console entry): a command
+# naming a script copy under a superclaude scripts directory (absolute
+# user-scope path or $CLAUDE_PROJECT_DIR/.claude/superclaude/scripts; / or \
+# separators). Still recognised so an upgrade replaces those registrations.
 _SC_SCRIPTS_PATH_RE = re.compile(r"superclaude[/\\]scripts[/\\]")
-_HOOK_SCRIPT_RE = re.compile(r"([A-Za-z0-9_]+\.py)(?=\s|$)(.*)$")
+# Entry point of a hook command: the current `superclaude hook <name>
+# [subcommand]` form, then the legacy `<interpreter> <dir>/<name>.py
+# [subcommand]` form. Both capture the bare name, so a hook registered under
+# the old form and shipped under the new one is the same hook.
+_HOOK_ENTRY_RE = re.compile(r"(?:^|\s)superclaude\s+hook\s+([A-Za-z0-9_]+)(.*)$")
+_HOOK_SCRIPT_RE = re.compile(r"([A-Za-z0-9_]+)\.py(?=\s|$)(.*)$")
 
 
 def _load_settings(settings_file: Path) -> dict:
@@ -85,17 +91,18 @@ def _hook_entry_signature(hook_entry: dict) -> tuple:
 
 
 def _hook_script_id(hook: dict) -> Tuple[str, str]:
-    """Which entry point an inner hook runs: (script filename, subcommand).
+    """Which entry point an inner hook runs: (hook name, subcommand).
 
-    Blind to the interpreter, the directory prefix, flags and the timeout, so
-    one hook written with a template path and again with a resolved absolute
-    path — or re-shipped with a new option — counts as the same hook. Matching
-    on the whole command string instead would append a second copy of every hook
+    Blind to the command form, the interpreter, the directory prefix, flags and
+    the timeout, so one hook registered as `<python> <dir>/loop_guard.py` by a
+    previous release and shipped as `superclaude hook loop_guard` now — or
+    re-shipped with a new option — counts as the same hook. Matching on the
+    whole command string instead would append a second copy of every hook
     whose command had drifted, and a doubled loop_guard trips its circuit
     breaker at half the intended error count.
 
     The subcommand is *not* dropped, though. One script can carry several entry
-    points (`insight_writer.py harvest-from-hook` and `… request-from-hook` are
+    points (`insight_writer harvest-from-hook` and `… request-from-hook` are
     different hooks on different events), and filename-only identity made a
     release that moved a hook to a new subcommand undeliverable: the old
     registration matched, the new subcommand was called already-present, and the
@@ -104,10 +111,10 @@ def _hook_script_id(hook: dict) -> Tuple[str, str]:
     Only the first bare argument counts as the subcommand — anything starting
     with `-` is an option, and options are exactly what drifts between releases.
 
-    A command that runs no .py file falls back to its normalised text.
+    A command in neither form falls back to its normalised text.
     """
     command = hook.get("command", "")
-    match = _HOOK_SCRIPT_RE.search(command)
+    match = _HOOK_ENTRY_RE.search(command) or _HOOK_SCRIPT_RE.search(command)
     if not match:
         return (" ".join(command.split()), "")
     tokens = match.group(2).split()
@@ -289,7 +296,7 @@ def merge_hooks_to_settings(
 
     Args:
         base_path: Installation base path (.claude directory)
-        hooks_config: Transformed hooks config (paths already substituted)
+        hooks_config: Parsed hooks.json content
         scope: Installation scope ("user", "project", or "target")
         force: Replace existing SuperClaude hooks if True
 
@@ -297,11 +304,12 @@ def merge_hooks_to_settings(
         Tuple of (success, message)
 
     Scope behavior:
-        - user: Merges to ~/.claude/settings.json (absolute paths)
-        - project: Merges to ./.claude/settings.json (per-clone: the file
-          carries this machine's interpreter, so install git-excludes it)
+        - user: Merges to ~/.claude/settings.json
+        - project: Merges to ./.claude/settings.json (team-shared: every
+          command is `superclaude hook <name>`, so the file is the same bytes
+          on every checkout and stays tracked)
         - local: Merges to ./.claude/settings.local.json (CC auto-gitignores)
-        - target: Merges to {target}/.claude/settings.json (absolute paths)
+        - target: Merges to {target}/.claude/settings.json
     """
     filename = settings_filename(scope)
     settings_file = base_path / filename

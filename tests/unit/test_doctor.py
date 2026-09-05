@@ -15,6 +15,7 @@ from pathlib import Path
 from superclaude.cli.doctor import (
     _check_claude_md_import,
     _check_claude_sc_md,
+    _check_console_entry,
     _check_hooks_installed,
     run_doctor,
 )
@@ -185,7 +186,7 @@ class TestRunDoctor:
 
     def _disk_checks(self, result: dict) -> list[dict]:
         """The three checks that read the install; the other two read the env."""
-        environment = {"pytest plugin loaded", "Configuration"}
+        environment = {"pytest plugin loaded", "Configuration", "superclaude on PATH"}
         return [c for c in result["checks"] if c["name"] not in environment]
 
     def test_detects_local_scope_from_the_working_directory(
@@ -222,7 +223,7 @@ class TestRunDoctor:
 
         result = run_doctor()
 
-        assert len(result["checks"]) == 5
+        assert len(result["checks"]) == 6
 
 
 class TestRepairCommandNamesWhereToRun:
@@ -269,3 +270,28 @@ class TestRepairCommandNamesWhereToRun:
                     continue
                 assert "--scope local" in detail, detail
                 assert str(project) in detail, detail
+
+
+class TestConsoleEntryCheck:
+    """Every hook command is `superclaude hook <name>`; a PATH that cannot
+    resolve the console script makes all of them exit 127 in Claude Code."""
+
+    def test_passes_and_names_the_script_it_found(self, monkeypatch):
+        monkeypatch.setattr(
+            "superclaude.cli.doctor.shutil.which",
+            lambda name: "/home/x/.local/bin/superclaude",
+        )
+
+        result = _check_console_entry()
+
+        assert result["passed"] is True
+        assert "/home/x/.local/bin/superclaude" in result["details"][0]
+
+    def test_fails_with_the_path_repair_when_missing(self, monkeypatch):
+        monkeypatch.setattr("superclaude.cli.doctor.shutil.which", lambda name: None)
+
+        result = _check_console_entry()
+
+        assert result["passed"] is False
+        assert any("127" in line for line in result["details"])
+        assert any("PATH" in line for line in result["details"])

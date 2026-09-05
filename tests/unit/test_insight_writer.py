@@ -1731,9 +1731,9 @@ class TestCliEntryPoint:
 
     The script imports superclaude.utils, which is absent from the install tree
     (~/.claude/superclaude/ ships content, not the package), so a bare
-    `python3 .../insight_writer.py` raises ModuleNotFoundError. Hooks dodge it
-    by baking the installer's sys.executable as {{PYTHON_BIN}}; everything
-    user-facing goes through the console script instead.
+    `python3 .../insight_writer.py` raises ModuleNotFoundError. Hooks reach it
+    as `superclaude hook insight_writer <subcommand>`; everything user-facing
+    goes through `superclaude insight`, the same console script.
     """
 
     def test_subcommand_is_registered(self):

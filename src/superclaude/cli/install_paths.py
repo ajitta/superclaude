@@ -11,7 +11,7 @@ from pathlib import Path
 from superclaude.utils import detect_scope, same_dir
 
 # Component definitions: (source_subdir, target_subdir, description)
-# Note: hooks and scripts are handled specially by install_hooks_and_scripts()
+# Note: the hook registration is handled separately by install_hooks()
 COMPONENTS = {
     "commands": ("commands", "commands/sc", "Slash commands"),
     "agents": ("agents", "agents", "Agent definitions"),

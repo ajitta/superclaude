@@ -167,13 +167,15 @@ def claude_base() -> Path:
 # "session_init" would misclassify a user's own hook as ours.
 SUPERCLAUDE_HOOK_MARKERS = [
     "[superclaude]",
-    "{{SCRIPTS_PATH}}",  # unresolved template form of the scripts path
+    "superclaude hook ",  # the console entry every shipped hook command runs
+    "{{SCRIPTS_PATH}}",  # legacy: unresolved template form of the scripts path
     "BLOCKED: destructive",  # legacy inline destructive-Bash blocker command
 ]
 
-# Resolved {{SCRIPTS_PATH}} form: a command referencing a script under a
-# superclaude scripts directory (absolute user-scope path or
-# $CLAUDE_PROJECT_DIR/.claude/superclaude/scripts; / or \ separators).
+# Legacy resolved form (releases before the console entry): a command naming a
+# script copy under a superclaude scripts directory (absolute user-scope path
+# or $CLAUDE_PROJECT_DIR/.claude/superclaude/scripts; / or \ separators). Kept
+# so an upgrade still recognises — and replaces — those registrations.
 _SC_SCRIPTS_PATH_RE = re.compile(r"superclaude[/\\]scripts[/\\]")
 
 
@@ -184,9 +186,9 @@ def is_superclaude_hook(hook_entry: dict) -> bool:
         hook_entry: A hook entry dict with a "hooks" array
 
     Returns:
-        True if any hook command references a SuperClaude scripts path
-        (template or resolved) or carries an anchored SuperClaude marker, or a
-        `_comment` carries the `[superclaude]` tag
+        True if any hook command runs `superclaude hook`, references a legacy
+        SuperClaude scripts path (template or resolved) or carries an anchored
+        SuperClaude marker, or a `_comment` carries the `[superclaude]` tag
     """
     comment = hook_entry.get("_comment", "")
     if any(marker in comment for marker in SUPERCLAUDE_HOOK_MARKERS):

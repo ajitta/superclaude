@@ -22,9 +22,10 @@ delivery mechanism. There is no engine, daemon, or proxy in the loop.
   sub-agents, skills, hooks, MCP); the framework ships content in exactly those
   shapes rather than teaching a new abstraction.
 - **Secondary — a team sharing that baseline.** `--scope project` commits
-  `.claude/` content to the repo, keeping the hook registration
-  (`settings.json`, `hooks/hooks.json`) per-clone because it names the
-  installing machine's interpreter; `--scope local` gives one teammate a
+  `.claude/` content and the hook registration (`settings.json`,
+  `hooks/hooks.json`) to the repo — every hook command is
+  `superclaude hook <name>`, so the files are identical on every checkout;
+  `--scope local` gives one teammate a
   personal install inside a shared repo, gitignored, on `settings.local.json` +
   `CLAUDE.local.md`. Conventions assume multiple people and multiple repos —
   doc filenames carry a username for exactly this reason.

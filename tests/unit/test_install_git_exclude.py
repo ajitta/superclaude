@@ -292,26 +292,35 @@ class TestFrameworkStateIsExcluded:
 class TestProjectScopeBlock:
     """What project scope may and may not keep out of the team's history.
 
-    Project scope exists so the team shares `.claude/` content. The two files
-    it cannot share are the ones carrying `{{PYTHON_BIN}}` — the installing
-    machine's absolute interpreter — because every teammate's own install
-    rewrites those same lines, producing a diff per developer.
+    Project scope exists so the team shares `.claude/` — content and the hook
+    registration alike. Every hook command is `superclaude hook <name>`, so
+    settings.json and hooks/hooks.json are the same bytes on every checkout,
+    and nothing an install writes is per-developer except runtime state.
+    (Releases before the console entry baked the installing machine's absolute
+    interpreter into both, and had to exclude them per clone.)
     """
 
-    def test_block_excludes_the_machine_specific_files(self, git_repo: Path):
+    def test_block_excludes_only_runtime_state(self, git_repo: Path):
         from superclaude.cli.install_git_exclude import _collect_entries
 
         entries = _collect_entries("project")
 
-        assert ".claude/settings.json" in entries
-        assert ".claude/hooks/hooks.json" in entries
+        assert entries == [
+            ".claude/.superclaude_hooks/",
+            ".claude/insights.pending.jsonl",
+        ]
 
     def test_block_leaves_shared_content_tracked(self, git_repo: Path):
         from superclaude.cli.install_git_exclude import _collect_entries
 
         entries = _collect_entries("project")
 
-        for shared in (".claude/superclaude/", ".claude/commands/sc/"):
+        for shared in (
+            ".claude/superclaude/",
+            ".claude/commands/sc/",
+            ".claude/settings.json",
+            ".claude/hooks/hooks.json",
+        ):
             assert shared not in entries, (
                 f"{shared} is machine-independent content; excluding it would "
                 "defeat the scope"
@@ -338,7 +347,8 @@ class TestProjectScopeBlock:
         assert ok, msg
         content = (git_repo / ".git" / "info" / "exclude").read_text(encoding="utf-8")
         assert MARKER_START in content
-        assert ".claude/settings.json" in content
+        assert ".claude/.superclaude_hooks/" in content
+        assert ".claude/settings.json" not in content
         assert ".claude/superclaude/" not in content
 
 

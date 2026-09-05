@@ -11,6 +11,7 @@ actually looked at SuperClaude.
 """
 
 import json
+import shutil
 from pathlib import Path
 from typing import Any, Dict
 
@@ -63,6 +64,7 @@ def run_doctor(scope: str | None = None) -> Dict[str, Any]:
         _check_pytest_plugin(),
         _check_configuration(),
         _check_hooks_installed(base_path, scope),
+        _check_console_entry(),
         _check_claude_sc_md(base_path, scope),
         _check_claude_md_import(base_path, scope),
     ]
@@ -146,6 +148,40 @@ def _check_configuration() -> Dict[str, Any]:
             "passed": False,
             "details": [f"Could not import superclaude: {e}"],
         }
+
+
+def _check_console_entry() -> Dict[str, Any]:
+    """
+    Check that the `superclaude` console script resolves on PATH.
+
+    Every registered hook command is `superclaude hook <name>`. Where Claude
+    Code's hook shell cannot find the script, all of them exit 127 and the
+    framework silently stops acting. That shell inherits the launching shell's
+    PATH (measured 2026-09-05), so this process's PATH is the closest proxy
+    available — a pass here does not certify a Claude Code launched from an
+    environment with a narrower PATH.
+
+    Returns:
+        Check result dict
+    """
+    label = "superclaude on PATH"
+    found = shutil.which("superclaude")
+    if found:
+        return {
+            "name": label,
+            "passed": True,
+            "details": [f"Hook commands run `superclaude hook <name>` — {found}"],
+        }
+    return {
+        "name": label,
+        "passed": False,
+        "details": [
+            "`superclaude` not found on PATH: every `superclaude hook <name>` "
+            "registration exits 127 in Claude Code",
+            "Put the console script's directory on PATH "
+            "(uv: `uv tool update-shell`; pipx: `pipx ensurepath`)",
+        ],
+    }
 
 
 def _check_hooks_installed(base_path: Path, scope: str) -> Dict[str, Any]:
