@@ -36,7 +36,7 @@
 
 ## 🎯 **Overview**
 
-`superclaude` is a **content framework** for Claude Code: a directory of markdown (commands, agents, modes, MCP docs, core rules) plus a small CLI / pytest plugin that installs that content into Claude Code's content directories — `~/.claude/` (user), `./.claude/` (project), or `./.claude/` (local, gitignored).
+`superclaude` is a **content framework** for Claude Code: a directory of markdown (commands, agents, modes, MCP docs, core rules) plus a small CLI / pytest plugin that installs that content into Claude Code's content directories — `~/.claude/` (user), `./.claude/` (project, committed), or `./.claude/` (local, personal — kept out of git through the clone's `.git/info/exclude`).
 
 Claude Code reads those files at session start, which is how the framework changes its behavior. There is no runtime engine, no daemon, no proxy.
 
@@ -82,8 +82,8 @@ make deploy
 ```bash
 superclaude install                    # default: --scope user (~/.claude/, global)
 superclaude install --scope project    # team-shared, committed to ./.claude/
-superclaude install --scope local      # personal-in-team-repo (./.claude/, gitignored,
-                                       #   uses settings.local.json + CLAUDE.local.md)
+superclaude install --scope local      # personal-in-team-repo (./.claude/, kept out of git via
+                                       #   .git/info/exclude; settings.local.json + CLAUDE.local.md)
 superclaude install --force            # overwrite an existing install
 superclaude install -i                 # interactive wizard (scope → preview → confirm)
 superclaude install --list             # show available components, install nothing
@@ -96,10 +96,12 @@ What gets installed (per scope):
 <scope>/
 ├── commands/sc/        # 36 slash commands (/sc:plan, /sc:implement, …)
 ├── agents/             # 23 agent definitions
-├── superclaude/        # core rules, modes, mcp docs, scripts
+├── superclaude/        # core rules, modes, mcp docs
 ├── hooks/hooks.json    # SessionStart / PreCompact / SessionEnd / etc.
 └── settings(.local).json  # framework hooks merged in (your existing hooks preserved)
 ```
+
+Every hook command is `superclaude hook <name>` — no interpreter path, no script copy — so a project-scope `settings.json` is the same bytes on every machine and can be committed. A reinstall over an older release rewrites its `<python> …/<script>.py` registrations to that form. Runtime state (`.claude/.superclaude_hooks/`, pending insights) stays out of git through the clone's `.git/info/exclude`, never your `.gitignore`.
 
 #### **3. Install MCP servers (optional)**
 
@@ -111,7 +113,7 @@ superclaude mcp --list                 # list available servers
 superclaude mcp --servers tavily playwright
 superclaude mcp --servers serena       # register Serena (CLI must already be installed)
 superclaude mcp --scope project        # write to ./.mcp.json (team-shared)
-superclaude mcp --scope local          # write to ~/.claude.json local block
+superclaude mcp --scope local          # per-project block inside ~/.claude.json
 ```
 
 > **Serena init/stale-entry issues?** See [`docs/troubleshooting/serena-installation.md`](docs/troubleshooting/serena-installation.md).
@@ -120,7 +122,7 @@ superclaude mcp --scope local          # write to ~/.claude.json local block
 
 ```bash
 superclaude install --list-all          # component-by-component status
-superclaude doctor                      # health check
+superclaude doctor                      # pytest plugin, hooks, CLAUDE_SC import, `superclaude` on PATH
 superclaude verify-drift                # detect drift between source and installed copy
 superclaude version
 ```
@@ -133,14 +135,13 @@ Restart Claude Code, then try a few:
 - `/sc:review` — Multi-dimensional review (code/plan/design)
 - `/sc:research` — Deep web research (Tavily-enhanced)
 - `/sc:insight` — Capture structured session insights to JSONL
-- `/sc` — List all 36 commands
+- `/sc:help` — List all 36 commands
 
 #### **Update**
 
 ```bash
 superclaude update                     # default: --scope user
-superclaude update --scope project
-superclaude update --force             # re-copy even unchanged files
+superclaude update --scope project     # (update takes --scope only; use `install --force` to re-copy everything)
 ```
 
 #### **Uninstall**
@@ -150,13 +151,13 @@ superclaude uninstall --dry-run        # preview, no changes
 superclaude uninstall                  # default: --scope user, asks to confirm
 superclaude uninstall -y               # skip confirmation
 superclaude uninstall --scope project  # remove from ./.claude/
-superclaude uninstall --scope local    # also removes CLAUDE.local.md + cleans .gitignore
+superclaude uninstall --scope local    # also removes CLAUDE.local.md + its .git/info/exclude block
 superclaude uninstall --keep-settings  # leave settings.json hooks alone
 superclaude uninstall --remove-mcp     # also unregister framework-installed MCP servers
                                        #   (default keeps them — they're shared with other tools)
 ```
 
-The uninstall is marker-based: it removes only the hooks and the `@superclaude` import that the installer wrote. User-added hooks, MCP servers, and CLAUDE.md content are preserved unless you explicitly opt out.
+The uninstall is marker-based: it removes only the hooks and the `@superclaude/CLAUDE_SC.md` import that the installer wrote. User-added hooks, MCP servers, and CLAUDE.md content are preserved unless you explicitly opt out.
 
 #### **CLI scope summary**
 
@@ -169,7 +170,7 @@ The uninstall is marker-based: it removes only the hooks and the `@superclaude` 
 |-------|------|-------------|
 | `user` | `~/.claude/` | Personal global install (default — daily use) |
 | `project` | `./.claude/` (committed) | Team-shared, checked into git |
-| `local` | `./.claude/` (gitignored) | Personal install inside a team repo (uses `settings.local.json`, `CLAUDE.local.md`) |
+| `local` | `./.claude/` (kept out of git via `.git/info/exclude`) | Personal install inside a team repo (uses `settings.local.json`, `CLAUDE.local.md`) |
 
 **For contributors/developers:**
 ```bash
@@ -186,7 +187,7 @@ make deploy
 # Sync framework content to a scope (force-sync — for headless `claude -p`)
 make sync-user      # → ~/.claude/        (global, recommended for daily use)
 make sync-project   # → ./.claude/        (team-shared, committed)
-make sync-local     # → ./.claude/        (local-only, gitignored)
+make sync-local     # → ./.claude/        (local-only, excluded from git per clone)
 
 # Verify installation
 uv tool list              # List installed tools
@@ -202,23 +203,16 @@ where superclaude         # Check install path (Windows)
 | Use | `superclaude ...` | Run from anywhere |
 | Uninstall | `make uninstall-user` / `uninstall-project` / `uninstall-local` | Scope-explicit removal |
 
-### **Enhanced Performance (Optional MCPs)**
+### **Optional MCP servers**
 
-For **2-3x faster** symbol operations, optionally install MCP servers:
+The framework is fully functional without any MCP server. Each one adds a capability its flag switches on:
 
-```bash
-# Optional MCP servers for enhanced performance:
-# - Serena: Semantic code understanding (2-3x faster symbol ops)
-# - Tavily: Web search/extract/crawl/research — install as Agent Skills (npx skills add tavily-ai/skills); MCP optional
-# - Context7: Official documentation lookup — enable as a claude.ai connector (not `superclaude mcp`)
+- **Serena** — symbol-level code navigation and edits, plus cross-session project memory (`--serena`, `/sc:load`, `/sc:save`)
+- **Tavily** — web search / extract / crawl / research. Recommended as Agent Skills (`npx skills add tavily-ai/skills`); the MCP server is the optional in-conversation alternative (`--tavily`)
+- **Context7** — official documentation lookup, enabled as a claude.ai connector rather than through `superclaude mcp` (`--c7`)
+- **Playwright**, **Chrome DevTools** — browser automation and performance audits (`--play`, `--perf`)
 
-# Note: Error learning available via built-in ReflexionMemory (no installation required)
-# Source-of-truth for MCP docs: src/superclaude/MCP/MCP_*.md
-```
-
-**Performance Comparison:**
-- **Without MCPs**: Fully functional, standard performance ✅
-- **With MCPs**: 2-3x faster, 30-50% fewer tokens ⚡
+Source of truth for each server's usage: `src/superclaude/mcp/MCP_*.md` and `src/superclaude/mcp/README.md`.
 
 ### **Token Optimization (Optional — RTK)**
 
@@ -284,10 +278,10 @@ The framework's value comes from chaining commands. Each chain has gates: a step
 
 | Step | Output | Hard gate before next step |
 |------|--------|----------------------------|
-| `/sc:brainstorm` | `docs/specs/<topic>-discovery-…md` | User approves discovery spec |
-| `/sc:design` | `docs/specs/<topic>-design-…md` | Design committed (components pass [R18 Necessity Test] necessity test) |
+| `/sc:brainstorm` | `docs/features/<slug>/01-discovery.md` (one-off: `docs/specs/<slug>-discovery-<user>-<date>.md`) | User approves discovery spec |
+| `/sc:design` | `docs/features/<slug>/04-design.md` (one-off: `docs/specs/…-design-…md`) | Design committed (components pass the [R18] necessity test) |
 | `/sc:review` | Multi-dimensional review of design/plan | Required — `/sc:brainstorm` hard-blocks `/sc:plan` until this runs |
-| `/sc:plan` | `docs/plans/<topic>-…md` (phased TDD tasks, file paths, verify cmds) | Plan committed |
+| `/sc:plan` | `docs/features/<slug>/05-plan.md` (one-off: `docs/plans/…md`) — phased TDD tasks, file paths, verify cmds | Plan committed |
 | `/sc:implement --plan` | Code + per-phase commits | Implementation complete |
 | `/sc:test` | Test pass evidence (`42/42 pass, baseline 40`) | Real output, not predictions |
 | `/sc:reflect` | Retrospective + insights captured to `.claude/insights.jsonl` | — |
@@ -297,8 +291,8 @@ The framework's value comes from chaining commands. Each chain has gates: a step
 | Goal | Chain |
 |------|-------|
 | **Investigate a bug** | `/sc:troubleshoot` → `/sc:analyze --focus <domain>` → `/sc:implement --plan` → `/sc:test` |
-| **Performance work** | `/sc:analyze --focus perf --scope module` → `/sc:improve --loop --p=perf` → `/sc:test` |
-| **Security audit** | `/sc:analyze --focus security` → `/sc:review` → `/sc:improve --p=sec` |
+| **Performance work** | `/sc:analyze --focus perf --scope module` → `/sc:improve --loop --focus perf` → `/sc:test` |
+| **Security audit** | `/sc:analyze --focus security` → `/sc:review` → `/sc:improve --focus security` |
 | **Refactor** | `/sc:analyze --focus quality` → `/sc:plan` → `/sc:improve --loop` → `/sc:test` |
 | **External research** | `/sc:research --depth deep --tavily --c7` → `/sc:reflect` |
 | **Codebase onboarding** | `/sc:load` → `/sc:index-repo` → `/sc:explain` |
@@ -309,7 +303,7 @@ The framework's value comes from chaining commands. Each chain has gates: a step
 
 - **Skip steps when the input already exists.** If you already have a written spec, jump straight to `/sc:plan`. The gates exist to prevent skipping *unfinished* work, not to force ceremony.
 - **`--plan` flag** on `/sc:implement` makes it consume a committed plan document. Without `--plan`, it works from the latest message.
-- **`/sc:review` runs many lenses in parallel** (correctness, scope, risk, alignment). Treat its output as a checklist, not a verdict.
+- **`/sc:review` scores two dimensions** — fidelity to the spec and quality of the artifact — and groups findings as Critical / Important / Suggestion. Treat its output as a checklist, not a verdict. `--audit-delegated` re-examines only the decisions the model made on your behalf.
 - **`/sc:reflect` writes insights to `.claude/insights.jsonl`** which `/sc:load` later reads — over time the framework remembers what worked.
 
 ---
@@ -337,7 +331,7 @@ Rules that must hold are enforced by hooks, not prose:
 - **file_size_guard** → blocks unbounded `Read` on files >30KB
 - **loop_guard** → circuit breaker on repeated failing edits
 
-Hooks merge into your `settings.json` — your existing hooks are preserved. See `docs/adr/0001-hooks-are-the-enforcement-boundary.md`.
+Every hook runs as `superclaude hook <name>` (a console entry, dispatched before the CLI loads), so hooks cost ~20 ms and `settings.json` carries no machine-specific bytes. Hooks merge into your `settings.json` — your existing hooks are preserved. See `docs/adr/0001-hooks-are-the-enforcement-boundary.md`.
 
 </td>
 <td width="50%">
@@ -371,12 +365,12 @@ superclaude mcp
 
 **Available servers:**
 - **Tavily** → Web search, extract, crawl, map, research (Deep Research). Recommended: **Agent Skills** via Tavily CLI + `npx skills add tavily-ai/skills` ([tavily-ai/skills](https://github.com/tavily-ai/skills) · [agent-skills docs](https://docs.tavily.com/documentation/agent-skills)). The `--tavily` MCP server is an optional in-conversation alternative (search + extract only).
-- **Context7** → Official documentation lookup. Enabled as a **claude.ai connector** (claude.ai → Settings → Connectors), not via `superclaude mcp` — the `--c7` flag and its workflow doc apply unchanged.
+- **Context7** → Official documentation lookup. Enabled as a **claude.ai connector** (claude.ai → Settings → Connectors), not via `superclaude mcp` — `--c7` stays as an inline directive in `core/FLAGS.md`; no MCP doc ships for it.
 - **Serena** → Session persistence & semantic code understanding
 - **Playwright** → Cross-browser automation & E2E testing (Microsoft official). Repo: ['https://github.com/microsoft/playwright-cli'](https://github.com/microsoft/playwright-cli)
 - **Chrome DevTools** → Performance, Lighthouse, accessibility, and memory profiling (CLS, LCP). Installed as Claude plugin from [`ChromeDevTools/chrome-devtools-mcp`](https://github.com/ChromeDevTools/chrome-devtools-mcp)
 
-> Removed in this fork: Morphllm, Mindbase, Airis-Agent, Magic, AST-Grep (replaced by native Grep/Edit + ReflexionMemory), Sequential-Thinking (Claude 5-family models reason natively between tool calls — see [`docs/codex/sequential-thinking-validity-2026-08-22/`](docs/codex/sequential-thinking-validity-2026-08-22/)).
+> Removed in this fork: Morphllm, Mindbase, Airis-Agent, Magic, AST-Grep (native Grep/Edit cover it), Sequential-Thinking (Claude 5-family models reason natively between tool calls — see [`docs/codex/sequential-thinking-validity-2026-08-22/`](docs/codex/sequential-thinking-validity-2026-08-22/)).
 
 </td>
 <td width="50%">
@@ -387,7 +381,7 @@ superclaude mcp
 - **Business Panel** → Multi-expert strategic analysis
 - **Deep Research** → Autonomous web research
 - **Orchestration** → Efficient tool coordination
-- **Token-Efficiency** → 30-50% context savings via symbol system
+- **Token-Efficiency** → selective omission under context pressure (`--uc`): drop what does not change the next action, never compress what stays
 - **Task Management** → Systematic organization
 - **Introspection** → Meta-cognitive analysis & error recovery
 - **Verbalized Sampling** → Probability-weighted candidate distributions (`--vs`)
@@ -411,7 +405,7 @@ superclaude mcp
 ### 🚦 **Tightened Workflow Gates**
 **Brainstorm → Plan → Implement → Review:**
 - `/sc:brainstorm` hard-blocks `/sc:plan` until `/sc:review` runs
-- Auto-trigger `/sc:review` on delegated decisions
+- `/sc:review --audit-delegated` re-examines the decisions the model made on your behalf
 - Plan default: phase framing; opt-in `--pr-bundle` for multi-PR
 - `verified:` convention + SessionStart memory-staleness warning
 
@@ -425,15 +419,16 @@ superclaude mcp
 - `make deploy` — installs the CLI only (`uv tool install --force --editable .`)
 - `make sync-user` / `sync-project` / `sync-local` — force-sync markdown content to chosen scope
 - `make uninstall-user` / `uninstall-project` / `uninstall-local` — mirror targets
-- `superclaude install/uninstall/update --scope user|project` — consistent flag across CLI
+- `superclaude install/uninstall/update --scope user|project|local` — consistent flag across CLI
 
 </td>
 <td width="50%">
 
 ### 🪝 **Hook Subsystem**
 **Settings-merge install + targeted hooks:**
-- `install_settings.py` preserves user hooks via marker-based identification
-- `test_runner_hook` uses `python -m pytest` (avoids Windows uv canonicalize bug)
+- `install_settings.py` preserves user hooks via marker-based identification and rewrites a previous release's `<python> …/<script>.py` registrations to `superclaude hook <name>`
+- `superclaude doctor` checks that the `superclaude` on PATH has the `hook` subcommand — the package whose hooks actually run
+- `test_runner_hook` runs `uv run python -m pytest` (avoids the Windows uv canonicalize bug)
 - SessionStart: git status + memory staleness warning
 - PreCompact / SessionEnd: insight harvest
 - Hooks are additive — your existing config survives reinstall
@@ -486,12 +481,12 @@ superclaude mcp
 </td>
 <td width="50%">
 
-### 🧠 **Case-Based Learning**
-**Cross-session intelligence:**
-- Pattern recognition and reuse
-- Strategy optimization over time
-- Successful query formulations saved
-- Performance improvement tracking
+### 🧠 **Cross-Session Memory**
+**Research memory through Serena:**
+- Findings and query formulations saved with `/sc:save`
+- Recalled by `/sc:load` at the next session start
+- Reflection after every hop: assess quality, find gaps, replan
+- Serena optional — without it, research is single-session
 
 </td>
 </tr>
@@ -506,21 +501,23 @@ superclaude mcp
 # Controlled depth — pass flags after the query
 /sc:research "quantum computing breakthroughs" --depth exhaustive
 
-# Strategy selection
-/sc:research "market analysis" --strategy planning-only
+# Strategy selection: planning | intent | unified (default)
+/sc:research "market analysis" --strategy planning
 
-# Domain-filtered research (uses Tavily)
-/sc:research "React patterns" --domains reactjs.org,github.com
+# Pick the sources explicitly
+/sc:research "React patterns" --tavily --c7
 ```
 
 ### **Research Depth Levels**
 
-| Depth | Sources | Hops | Time | Best For |
-|:-----:|:-------:|:----:|:----:|----------|
-| **Quick** | 5-10 | 1 | ~2min | Quick facts, simple queries |
-| **Standard** | 10-20 | 3 | ~5min | General research (default) |
-| **Deep** | 20-40 | 4 | ~8min | Comprehensive analysis |
-| **Exhaustive** | 40+ | 5 | ~10min | Academic-level research |
+| Depth | Sources | Hops | Time | Confidence target | Best For |
+|:-----:|:-------:|:----:|:----:|:-----------------:|----------|
+| **Quick** | 10 | 1 | ~2min | 0.6 | Quick facts, simple queries |
+| **Standard** | 20 | 3 | ~5min | 0.7 | General research (default) |
+| **Deep** | 40 | 4 | ~8min | 0.8 | Comprehensive analysis |
+| **Exhaustive** | 50+ | 5 | ~10min | 0.9 | Academic-level research |
+
+Profiles are defined in [`modes/RESEARCH_CONFIG.md`](src/superclaude/modes/RESEARCH_CONFIG.md).
 
 ### **Integrated Tool Orchestration**
 
@@ -536,7 +533,7 @@ The Deep Research system intelligently coordinates multiple tools:
 
 ## 📚 **References**
 
-> The legacy `docs/` tree is upstream-derived and **not maintained** in this fork. Treat the table below as the source of truth.
+> `docs/archive/` holds the upstream-derived legacy tree and is not maintained. The rest of `docs/` — `features/`, `adr/`, `research/`, `agents/` — is this project's own. The table below names the source of truth per topic.
 
 | Topic | Source of truth |
 |-------|-----------------|
@@ -544,13 +541,17 @@ The Deep Research system intelligently coordinates multiple tools:
 | Project rules, build & test loop | [`CLAUDE.md`](CLAUDE.md) |
 | Project-specific gotchas | [`.claude/rules/gotchas/`](.claude/rules/gotchas) |
 | Serena MCP troubleshooting | [`docs/troubleshooting/serena-installation.md`](docs/troubleshooting/serena-installation.md) |
-| Slash commands (36) | [`src/superclaude/Commands/`](src/superclaude/Commands) · `superclaude install --list-all` |
-| Agents (23) | [`src/superclaude/Agents/`](src/superclaude/Agents) |
-| Modes (8) | [`src/superclaude/Modes/`](src/superclaude/Modes) |
-| MCP servers (4) | [`src/superclaude/MCP/`](src/superclaude/MCP) |
+| Slash commands (36) | [`src/superclaude/commands/`](src/superclaude/commands) · `superclaude install --list-all` |
+| Agents (23) | [`src/superclaude/agents/`](src/superclaude/agents) |
+| Modes (8) | [`src/superclaude/modes/`](src/superclaude/modes) |
+| MCP servers (4) | [`src/superclaude/mcp/`](src/superclaude/mcp) |
+| Hooks (registry + scripts) | [`src/superclaude/cli/hook_dispatch.py`](src/superclaude/cli/hook_dispatch.py) · [`src/superclaude/hooks/hooks.json`](src/superclaude/hooks/hooks.json) · [`src/superclaude/scripts/`](src/superclaude/scripts) |
+| Architecture decisions | [`docs/adr/`](docs/adr) |
+| Feature work (discovery → plan → retrospective) | [`docs/features/`](docs/features) |
+| Agent conventions (issue tracker, triage labels, domain docs) | [`docs/agents/`](docs/agents) |
 | Core rules (always-loaded) | [`FLAGS.md`](src/superclaude/core/FLAGS.md) · [`PRINCIPLES.md`](src/superclaude/core/PRINCIPLES.md) · [`RULES.md`](src/superclaude/core/RULES.md) |
 | Authoring specs for new content | [`.claude/rules/`](.claude/rules) |
-| Health & drift checks | `superclaude doctor` · `superclaude verify-drift` · `superclaude context reset` |
+| Health & drift checks | `superclaude doctor` · `superclaude verify-drift` · `superclaude audit` · `superclaude context explain` / `reset` |
 
 ---
 
@@ -565,10 +566,10 @@ Flags are behavioral hints that any `/sc:*` prompt accepts. The model reads them
 | `--brainstorm` | Vague request, "maybe", unclear scope | Collaborative discovery, probing questions before code |
 | `--research` | Need evidence, citations, external knowledge | Systematic investigation, evidence-based reasoning |
 | `--business-panel` | Strategy/market/competitive analysis | Multi-expert business analysis & synthesis |
-| `--introspect` | Stuck, error recovery, "why is it doing X?" | Exposes thinking with 🤔🎯⚡📊💡 markers |
+| `--introspect` | Stuck, error recovery, "why is it doing X?" | Surfaces decision logic, assumptions and alternatives (🎯⚡📊💡 markers) |
 | `--task-manage` | >3 steps · >2 dirs · >3 files | Hierarchical task organization + persistent memory checkpoints |
 | `--orchestrate` | Multi-tool, parallel, perf-sensitive | Tool-matrix optimization |
-| `--token-efficient` / `--uc` | Context > 75 % or large ops | Symbol system, 30–50 % reduction |
+| `--token-efficient` / `--uc` | Context ≥ 60 % or large ops (auto with `--safe-mode`) | Selective omission — drop what does not change the next action; never compress what stays |
 | `--vs [standard\|cot\|multi]` | "Multiple perspectives", brainstorm options | Verbalized sampling — probability-weighted candidates. Sub-params: `[k:3-7] [tau:0.01-0.20] [turns:2-5] [no-synthesis]` |
 
 #### MCP servers — opt in or out per turn
@@ -594,8 +595,6 @@ Flags are behavioral hints that any `/sc:*` prompt accepts. The model reads them
 | `--plan` | 5-line plan (goal · approach · files · risks · verification) before execution |
 | `--validate` | Pre-execution risk assessment (risk > 0.7, prod) |
 | `--safe-mode` | Max validation, conservative behavior, auto `--uc` |
-| `--fast` | Faster output, same model |
-| `--p [abbr,…]` | Bias agent delegation: `sec`, `perf`, `qa`, `arch`, `fe`, `be`, `ops`, `refactor`, `root`, `py`, `research`, `review`, `simple`, `git`, `scribe`, `educator`, `mentor`, `index`, `insight` (multi-select with comma) |
 | `--verbose-context` | Force full `.md` injection (bypass short-instruction map) |
 
 #### Scope & focus
@@ -613,7 +612,7 @@ Flags are behavioral hints that any `/sc:*` prompt accepts. The model reads them
 
 ```bash
 /sc:research "Rust async runtime tradeoffs" --depth deep --tavily --c7
-/sc:implement "user export endpoint" --plan --p=be,sec --validate
+/sc:implement "user export endpoint" --plan --validate --delegate auto
 /sc:analyze src/auth/ --focus security --scope module
 /sc:improve src/api/handlers.py --loop --iterations 3 --serena
 /sc:brainstorm "should we migrate to gRPC?" --vs multi
@@ -648,7 +647,7 @@ MIT — see [`LICENSE`](LICENSE).
 - `/sc:explain` — Code explanation
 
 ### 🧪 Testing & Quality
-- `/sc:test` — Test generation
+- `/sc:test` — Run tests with coverage and quality reporting
 - `/sc:analyze` — Code analysis (quality, security, perf, arch)
 - `/sc:troubleshoot` — Diagnose & resolve issues
 - `/sc:reflect` — Task retrospectives
@@ -677,14 +676,14 @@ MIT — see [`LICENSE`](LICENSE).
 - `/sc:insight` — Capture structured insights to JSONL
 
 ### 🎯 Utilities
-- `/sc:agent` — AI agent dispatcher
+- `/sc:agent` — Session controller: investigate → implement → review orchestration
 - `/sc:init` — Interactive project environment setup
 - `/sc:index` / `/sc:index-repo` — Repository indexing (94% token reduction)
 - `/sc:recommend` — Command recommendation engine
 - `/sc:prompt` — Rewrite a prompt for Claude Opus 5 / Fable 5.1
 - `/sc:select-tool` — Intelligent MCP tool selection
-- `/sc:sc` — Show all commands
+- `/sc:sc` — Command dispatcher (routes to the other `/sc:*` commands)
 
-**Source files:** [`src/superclaude/Commands/`](src/superclaude/Commands) — each command is a single markdown file with frontmatter. After install, run `superclaude install --list-all` for a full inventory.
+**Source files:** [`src/superclaude/commands/`](src/superclaude/commands) — each command is a single markdown file with frontmatter. After install, run `superclaude install --list-all` for a full inventory.
 
 </details>
