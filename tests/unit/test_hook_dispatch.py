@@ -2,8 +2,10 @@
 
 Two things break silently here and these tests pin both. The registry has to
 cover exactly what hooks.json ships: a name registered in hooks.json but not in
-``HOOKS`` exits 2 — the blocking code on PreToolUse and Stop — on the first
-tool call of every session. And the fast path has to stay fast: ``entry.py``
+``HOOKS`` runs nothing, and the exit code for it is pinned at 1 — loud in
+stderr, but never 2, which would block every tool call of a teammate whose
+package is older than the committed settings.json (why: ``hook_dispatch.py``'s
+module docstring). And the fast path has to stay fast: ``entry.py``
 dispatches ``hook`` before importing click (why and the numbers:
 ``hook_dispatch.py``'s module docstring); one stray import of
 ``superclaude.cli.main`` from that path doubles every hook's cost without
@@ -110,10 +112,13 @@ class TestRunHook:
         for name in HOOKS:
             assert name in out
 
-    def test_unknown_name_exits_2_and_names_it(self, capsys):
+    def test_unknown_name_exits_1_and_names_it(self, capsys):
+        """1 on purpose: a project-scope settings.json can name a hook that a
+        teammate's older package does not have, and 2 would block their
+        session until they upgrade. Fail open, but say so."""
         from superclaude.cli.hook_dispatch import run_hook
 
-        assert run_hook(["no_such_hook"]) == 2
+        assert run_hook(["no_such_hook"]) == 1
         assert "no_such_hook" in capsys.readouterr().err
 
     def test_arguments_to_a_stdin_only_hook_are_refused(self, fake_hook, capsys):
@@ -122,7 +127,7 @@ class TestRunHook:
         fake_hook(lambda: calls.append("ran"))
         from superclaude.cli.hook_dispatch import run_hook
 
-        assert run_hook(["fake", "harvest-from-hook"]) == 2
+        assert run_hook(["fake", "harvest-from-hook"]) == 1
         assert calls == [], "the script ran despite the refused argument"
         assert "takes no arguments" in capsys.readouterr().err
 
@@ -222,7 +227,7 @@ class TestEntryFastPath:
         )
         assert result.returncode == 0, result.stderr
 
-    def test_an_unknown_hook_exits_2_through_entry(self, tmp_path):
+    def test_an_unknown_hook_exits_1_through_entry(self, tmp_path):
         result = _run_entry(
             "import sys\n"
             "sys.argv = ['superclaude', 'hook', 'no_such_hook']\n"
@@ -230,7 +235,7 @@ class TestEntryFastPath:
             "raise SystemExit(main())\n",
             tmp_path,
         )
-        assert result.returncode == 2
+        assert result.returncode == 1
         assert "no_such_hook" in result.stderr
 
     def test_the_shims_own_directory_is_dropped_from_sys_path(
@@ -281,9 +286,10 @@ class TestClickRegistration:
         assert result.exit_code == 0, result.output
         assert "context_loader" in result.output
 
-    def test_unknown_hook_via_click_exits_2(self):
+    def test_unknown_hook_via_click_exits_1(self):
+        """The click fallback passes run_hook's code through unchanged."""
         from superclaude.cli.main import main as cli
 
         result = CliRunner().invoke(cli, ["hook", "no_such_hook"])
 
-        assert result.exit_code == 2
+        assert result.exit_code == 1

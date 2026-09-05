@@ -19,7 +19,7 @@ None set via /sc:load. Tree clean at `3878106` on master.
 - Hidden test dependency on the install: the routing-table tests read the runtime install location and fell through to `~/.claude/superclaude` when nothing was installed.
 
 ## Set aside or still open (by decision, not done)
-- Exit 2 for an unknown hook name: kept, awaiting a call between blocking loudly and fail-open for un-upgraded teammates (`b6be725`).
+- Exit 2 for an unknown hook name: DECIDED later the same day — unknown name and stray argument now exit 1 (stderr still names it, script does not run, tool call not blocked), so a committed settings.json newer than a teammate's package degrades to one absent hook instead of a session lockout. Bare `superclaude hook` keeps usage-error 2. Reasoning in `hook_dispatch.py`'s module docstring; pinned by `test_hook_dispatch.py`.
 - Pre-existing worktree bug: `add_git_exclude` writes to a per-worktree `info/exclude` that git never reads. Surfaced by the review, marked "separate fix", NOT landed as of `3878106` (`install_git_exclude.py` still resolves the per-worktree path around lines 172–199).
 - Carried from the 09-03 session: optional third CS-D measurement pair (~$4) to firm up the weak gate; plan-routing `max_turns` 12 while Fable 5.1 used 13 once.
 - Feature folders not touched this week: `opus5-fable5-alignment` at phase analysis (updated 09-04 by `387f1af`), `hook-performance` and `runtime-behavior-audit` at planning since August.

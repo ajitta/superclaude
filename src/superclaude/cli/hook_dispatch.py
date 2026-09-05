@@ -18,9 +18,14 @@ importing the click application, and this module imports nothing from
 click group from here silently doubles the cost of every hook.
 
 The registry is an allowlist, not an ``importlib`` of whatever name arrives. A
-typo in hooks.json exits 2 with the name in stderr — the blocking code on
-PreToolUse — so a misregistration is loud on the first tool call rather than
-silently running nothing.
+name that is not in it exits 1 with the name in stderr: loud, and the script
+does not run, but NOT exit 2, the code that blocks the tool call on PreToolUse
+and Stop. The same path fires when a committed project-scope settings.json
+names a hook newer than the teammate's installed package (settings travel with
+the repo, the package does not), and a typo and a version skew are
+indistinguishable here. Exit 2 would lock every Bash/Read/Edit/Write of that
+teammate's session behind an upgrade they have not made yet; exit 1 leaves the
+new hook absent and everything else working. Decided 2026-09-05.
 """
 
 from __future__ import annotations
@@ -80,8 +85,10 @@ def run_hook(argv: list[str]) -> int:
     name, rest = argv[0], argv[1:]
     spec = HOOKS.get(name)
     if spec is None:
+        # 1, not 2: see the module docstring. A bare `superclaude hook` above
+        # keeps the usage-error 2 — no hooks.json registration is nameless.
         sys.stderr.write(f"superclaude hook: unknown hook {name!r}\n\n{usage()}")
-        return 2
+        return 1
 
     module_name, forwards_argv = spec
     module = importlib.import_module(module_name)
@@ -93,6 +100,6 @@ def run_hook(argv: list[str]) -> int:
                 f"superclaude hook {name}: takes no arguments "
                 f"(got {' '.join(rest)!r})\n"
             )
-            return 2
+            return 1
         rc = module.main()
     return 0 if rc is None else int(rc)
