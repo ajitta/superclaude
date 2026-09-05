@@ -95,7 +95,7 @@ def _stdin_can_answer() -> bool:
     "--scope",
     default="user",
     type=click.Choice(["user", "project", "local"]),
-    help="Installation scope: user (~/.claude/), project (./.claude/ team-shared), or local (./.claude/ personal, gitignored)",
+    help="Installation scope: user (~/.claude/), project (./.claude/ team-shared content), or local (./.claude/ personal, gitignored)",
 )
 @click.option(
     "--interactive",
@@ -118,7 +118,8 @@ def install(
 
     Scopes:
     - user (default): Install to ~/.claude/ (global, personal)
-    - project: Install to ./.claude/ (team-shared, committed to repo)
+    - project: Install to ./.claude/ (team-shared content committed to repo;
+      settings.json + hooks/hooks.json stay per-clone via .git/info/exclude)
     - local: Install to ./.claude/ (personal in team repo; auto-gitignored, hooks to settings.local.json, CLAUDE.local.md at project root)
 
     Examples:

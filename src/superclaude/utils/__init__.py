@@ -84,19 +84,79 @@ def project_root() -> Path:
     return Path(os.environ.get("CLAUDE_PROJECT_DIR") or Path.cwd())
 
 
+def main_worktree_root(root: Path) -> Path | None:
+    """Main worktree of ``root``, when ``root`` is a linked git worktree.
+
+    A linked worktree's ``.git`` is a file holding ``gitdir: <path>``; that
+    gitdir holds a ``commondir`` file pointing at the main worktree's git
+    directory, whose parent is the main worktree itself. Both hops are plain
+    file reads — no ``git`` subprocess, because this sits in the startup path
+    of every hook.
+
+    ``commondir`` may be absolute, so the answer can point anywhere on disk —
+    linked worktrees legitimately live far from their repository, which is why
+    the result is not constrained to the project tree. The caller gates on an
+    install actually existing there, and ``claude_base()`` already trusts
+    project-local content, so this widens WHERE that trust may point rather than
+    what is trusted. Deliberate, and the reason a bare ``.git`` pointer alone is
+    never enough.
+
+    Returns:
+        The main worktree's root, or None for a plain checkout, a
+        non-repository, or a malformed pointer chain
+    """
+    pointer = root / ".git"
+    try:
+        if not pointer.is_file():
+            return None
+        text = pointer.read_text(encoding="utf-8").strip()
+    except OSError:
+        return None
+    prefix = "gitdir:"
+    if not text.startswith(prefix):
+        return None
+    git_dir = Path(text[len(prefix) :].strip())
+    if not git_dir.is_absolute():
+        git_dir = (root / git_dir).resolve()
+    try:
+        common = (git_dir / "commondir").read_text(encoding="utf-8").strip()
+    except OSError:
+        return None
+    if not common:
+        return None
+    common_dir = Path(common)
+    if not common_dir.is_absolute():
+        common_dir = (git_dir / common_dir).resolve()
+    return common_dir.parent
+
+
 def claude_base() -> Path:
     """Resolve the .claude directory of the install whose hooks are running.
 
     Project and local scope keep framework content under
     ``<project>/.claude/superclaude``, so its presence identifies the active
-    scope. User scope is the fallback.
+    scope. A linked git worktree is checked against its main worktree before
+    user scope: Claude Code reads the settings file that registered these hooks
+    from the MAIN worktree while setting $CLAUDE_PROJECT_DIR to the linked one,
+    so the two anchors disagree there and the install lives at the main root.
+    Falling straight to ~/.claude instead is silent — content and hook state
+    resolve to a directory that usually holds no install at all.
+
+    ``project_root()`` deliberately keeps pointing at the linked worktree: code
+    and content follow the install, per-project data follows the session.
 
     Returns:
-        Project-local .claude when a scoped install is present, else ~/.claude
+        Project-local .claude when a scoped install is present, the main
+        worktree's when this is a linked worktree carrying one, else ~/.claude
     """
     root = project_root() / ".claude"
     if (root / "superclaude").exists():
         return root
+    main_root = main_worktree_root(project_root())
+    if main_root is not None:
+        main_base = main_root / ".claude"
+        if (main_base / "superclaude").exists():
+            return main_base
     return Path.home() / ".claude"
 
 

@@ -1,14 +1,21 @@
 """
-Local-scope git exclude management for SuperClaude.
+Per-clone git exclude management for SuperClaude.
 
 Writes and removes a marker-delimited block of patterns into the per-clone
 local exclude file (``.git/info/exclude``) — NOT the team-shared
-``.gitignore`` — so SuperClaude's local-scope install artifacts are
-ignored without polluting team-shared ignore rules.
+``.gitignore`` — so SuperClaude's install artifacts are ignored without
+polluting team-shared ignore rules. Per-clone is the whole point: every
+teammate's own install writes their own block, with no coordination.
 
 CC natively gitignores only ``settings.local.json``; for the rest of the
 SuperClaude content (agents/skills/commands/superclaude/etc.) we manage
 the exclude file ourselves.
+
+The block is scope-dependent. Local scope excludes everything it installs —
+none of it is the team's. Project scope excludes only what cannot be shared:
+the two files carrying ``{{PYTHON_BIN}}`` (the installing machine's absolute
+interpreter, which every teammate's install rewrites) and rebuildable runtime
+state. Content stays tracked, because sharing it is what project scope is for.
 
 The block is generated file-by-file from the shipped source inventory so
 team-shared files co-located in the same directories (e.g. a team-authored
@@ -29,17 +36,61 @@ from typing import List, Optional, Tuple
 
 from .install_paths import _get_source_dir
 
-MARKER_START = "# >>> superclaude (local scope) >>>"
-MARKER_END = "# <<< superclaude (local scope) <<<"
+MARKER_START = "# >>> superclaude >>>"
+MARKER_END = "# <<< superclaude <<<"
+
+# Marker text from before the block became scope-aware. Kept so an install that
+# predates the rename replaces its block instead of leaving a second one behind.
+# A second migration path is this module's established shape, not a new
+# exception: _migrate_legacy_gitignore already carries the .gitignore ->
+# info/exclude move for the same reason. The alternative — keeping the old text —
+# would write "(local scope)" into every project-scope user's exclude file, which
+# is a false statement in generated output.
+_LEGACY_MARKER_PAIRS = [
+    ("# >>> superclaude (local scope) >>>", "# <<< superclaude (local scope) <<<"),
+]
+
+_ALL_MARKER_PAIRS = [(MARKER_START, MARKER_END), *_LEGACY_MARKER_PAIRS]
 
 
-def _collect_local_entries() -> List[str]:
-    """Enumerate SC-installed paths for the local-scope exclude block.
+def _has_any_marker(content: str) -> bool:
+    """Whether ``content`` carries an SC block under any marker generation."""
+    return any(start in content for start, _ in _ALL_MARKER_PAIRS)
+
+
+# Paths a project-scope install must keep out of the team's history. Each one
+# either carries {{PYTHON_BIN}} — the absolute interpreter of whichever machine
+# ran the install, so every teammate's install rewrites the same lines — or is
+# rebuildable runtime state. Everything else a project install writes is
+# machine-independent content and stays tracked.
+#
+# `.claude/agent-memory/` is deliberately absent. A project-scope install creates
+# it, so it shows up untracked, but committing reviewed team memory is a
+# documented option (docs/research/agent-memory-utilization-ajitta-2026-07-24.md
+# calls the PR diff the poisoning trust boundary). Excluding it here would take
+# that choice away from the team; a team that does not want it says so in
+# .gitignore, which is where team-level decisions belong.
+_PROJECT_SCOPE_ENTRIES = [
+    ".claude/.superclaude_hooks/",
+    ".claude/insights.pending.jsonl",
+    ".claude/hooks/hooks.json",
+    ".claude/settings.json",
+]
+
+
+def _collect_entries(scope: str = "local") -> List[str]:
+    """Enumerate the paths a scope's exclude block should carry.
 
     Agents are listed per-file so team-shared content in ``.claude/agents/``
     keeps working. Commands and the superclaude core live in SC-only
     subdirectories, so directory-level ignores are safe there.
+
+    Project scope gets the fixed machine-specific subset instead: its whole
+    purpose is that the content IS committed.
     """
+    if scope == "project":
+        return list(_PROJECT_SCOPE_ENTRIES)
+
     entries: List[str] = []
 
     agents_src = _get_source_dir("agents")
@@ -63,19 +114,42 @@ def _collect_local_entries() -> List[str]:
     return entries
 
 
-def _build_block() -> str:
+def _build_block(scope: str = "local") -> str:
     lines = [MARKER_START]
-    lines.extend(_collect_local_entries())
+    lines.extend(_collect_entries(scope))
     lines.append(MARKER_END)
     return "\n".join(lines) + "\n"
 
 
 def _strip_block(content: str) -> Tuple[str, bool]:
-    """Return (content_without_block, had_block)."""
-    start = content.find(MARKER_START)
+    """Return (content without every SC block, whether any was found).
+
+    Both marker generations are stripped, so upgrading across the rename
+    replaces the old block rather than appending a second one beside it.
+
+    Terminates because every removal is strictly shrinking: a pair only reports
+    a hit when both markers were found, and the marker lines themselves are
+    dropped. That is also why the caller needs no "strip failed silently" guard.
+    """
+    had_any = False
+    while True:
+        for start_marker, end_marker in _ALL_MARKER_PAIRS:
+            stripped, had = _strip_one_block(content, start_marker, end_marker)
+            if had:
+                content, had_any = stripped, True
+                break
+        else:
+            return content, had_any
+
+
+def _strip_one_block(
+    content: str, start_marker: str, end_marker: str
+) -> Tuple[str, bool]:
+    """Return (content_without_block, had_block) for one marker pair."""
+    start = content.find(start_marker)
     if start == -1:
         return content, False
-    end = content.find(MARKER_END, start)
+    end = content.find(end_marker, start)
     if end == -1:
         return content, False
     end_of_line = content.find("\n", end)
@@ -130,7 +204,7 @@ def has_legacy_gitignore_block(project_root: Path) -> bool:
     if not gitignore.exists():
         return False
     try:
-        return MARKER_START in gitignore.read_text(encoding="utf-8")
+        return _has_any_marker(gitignore.read_text(encoding="utf-8"))
     except OSError:
         return False
 
@@ -141,7 +215,7 @@ def has_exclude_block(project_root: Path) -> bool:
     if exclude_file is None or not exclude_file.exists():
         return False
     try:
-        return MARKER_START in exclude_file.read_text(encoding="utf-8")
+        return _has_any_marker(exclude_file.read_text(encoding="utf-8"))
     except OSError:
         return False
 
@@ -172,20 +246,25 @@ def _migrate_legacy_gitignore(project_root: Path) -> Optional[str]:
         return f"⚠️  Failed to migrate legacy {gitignore}: {e}"
 
 
-def add_local_git_exclude(project_root: Path) -> Tuple[bool, str]:
-    """Add/refresh SuperClaude local-scope block in ``.git/info/exclude``.
+def add_git_exclude(project_root: Path, scope: str = "local") -> Tuple[bool, str]:
+    """Add/refresh the SuperClaude block in ``.git/info/exclude``.
 
     Idempotent by marker: an existing block is replaced so subsequent
-    installs pick up newly shipped agents or skills.
+    installs pick up newly shipped agents, and so switching scope in place
+    replaces the block rather than stacking a second one.
 
     Silent skip on non-git directories. Migrates a legacy block from
     ``<root>/.gitignore`` if present.
+
+    Args:
+        project_root: The checkout to write the exclude block into
+        scope: Install scope deciding which paths the block lists
     """
     exclude_file = _resolve_git_exclude_file(project_root)
     if exclude_file is None:
         return (
             True,
-            f"Not a git repository (skipping local-scope exclude setup): {project_root}",
+            f"Not a git repository (skipping exclude setup): {project_root}",
         )
 
     messages: List[str] = []
@@ -193,15 +272,12 @@ def add_local_git_exclude(project_root: Path) -> Tuple[bool, str]:
     if legacy_msg is not None:
         messages.append(legacy_msg)
 
-    block = _build_block()
+    block = _build_block(scope)
 
     try:
         if exclude_file.exists():
             existing = exclude_file.read_text(encoding="utf-8")
             stripped, had_block = _strip_block(existing)
-            if had_block and stripped == existing:
-                # Defensive: strip failed silently; fall back to append.
-                had_block = False
             base = stripped if had_block else existing
             separator = "" if base.endswith("\n") or not base else "\n"
             updated = base + separator + ("\n" if base else "") + block
@@ -212,7 +288,7 @@ def add_local_git_exclude(project_root: Path) -> Tuple[bool, str]:
             action = "created"
         exclude_file.write_text(updated, encoding="utf-8")
         messages.append(
-            f".git/info/exclude {action} with SC local block: {exclude_file}"
+            f".git/info/exclude {action} with SC {scope} block: {exclude_file}"
         )
         return True, "; ".join(messages)
     except OSError as e:
@@ -220,8 +296,8 @@ def add_local_git_exclude(project_root: Path) -> Tuple[bool, str]:
         return False, "; ".join(messages)
 
 
-def remove_local_git_exclude(project_root: Path) -> Tuple[bool, str]:
-    """Remove SuperClaude local-scope block from ``.git/info/exclude``.
+def remove_git_exclude(project_root: Path) -> Tuple[bool, str]:
+    """Remove the SuperClaude block from ``.git/info/exclude``.
 
     Also removes a legacy block from ``<root>/.gitignore`` if present.
     The exclude file itself is preserved (only the marker block is
@@ -252,12 +328,10 @@ def remove_local_git_exclude(project_root: Path) -> Tuple[bool, str]:
         stripped, had_block = _strip_block(existing)
         if not had_block:
             if not messages:
-                messages.append(
-                    f".git/info/exclude had no SC local block: {exclude_file}"
-                )
+                messages.append(f".git/info/exclude had no SC block: {exclude_file}")
             return True, "; ".join(messages)
         exclude_file.write_text(stripped, encoding="utf-8")
-        messages.append(f".git/info/exclude SC local block removed: {exclude_file}")
+        messages.append(f".git/info/exclude SC block removed: {exclude_file}")
         return True, "; ".join(messages)
     except OSError as e:
         messages.append(f"Failed to update {exclude_file}: {e}")

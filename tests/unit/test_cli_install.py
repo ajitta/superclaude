@@ -761,3 +761,94 @@ class TestLegacySkillsArePrunedOnUpgrade:
         _success, message = install_all(base_path=tmp_path, force=True, scope="project")
 
         assert "pre-removal" not in message
+
+
+class TestHookScriptPathPerScope:
+    """Which anchor each scope's hook command names, and why they differ.
+
+    A linked git worktree is where the two anchors part company: Claude Code
+    reads the settings file that registered the hook from the MAIN worktree
+    while expanding ``$CLAUDE_PROJECT_DIR`` to the linked one. A command built
+    from that variable then misses by a whole directory, so only the scope
+    whose settings file is genuinely shared should pay for portability.
+    """
+
+    @staticmethod
+    def _hook_commands(base, scope):
+        """Commands as Claude Code will read them: from the settings file.
+
+        Deliberately NOT ``.claude/hooks/hooks.json``. Both are written from the
+        same transformed content today, but the settings file is the one CC
+        actually loads and the one that broke in a worktree; asserting on the
+        intermediate artifact would keep this test green through a regression in
+        the merge path.
+        """
+        import json
+
+        from superclaude.utils import settings_filename
+
+        config = json.loads(
+            (base / settings_filename(scope)).read_text(encoding="utf-8")
+        )
+        return [
+            hook["command"]
+            for event in config["hooks"].values()
+            for group in event
+            for hook in group["hooks"]
+            if "superclaude" in hook.get("command", "")
+        ]
+
+    def test_local_scope_bakes_an_absolute_scripts_path(self, tmp_path):
+        from superclaude.cli.install_components import install_hooks_and_scripts
+
+        base = tmp_path / ".claude"
+        scope = "local"
+        _installed, _skipped, failed, messages = install_hooks_and_scripts(
+            base_path=base, force=True, scope=scope
+        )
+
+        assert failed == 0, messages
+        commands = self._hook_commands(base, scope)
+        assert commands
+        expected = str((base / "superclaude" / "scripts").resolve())
+        for command in commands:
+            assert "$CLAUDE_PROJECT_DIR" not in command, (
+                "settings.local.json is never shared and already carries an "
+                "absolute interpreter, so the variable buys nothing and breaks "
+                "in a worktree"
+            )
+            assert expected in command
+
+    def test_project_scope_keeps_the_shared_anchor(self, tmp_path):
+        from superclaude.cli.install_components import install_hooks_and_scripts
+
+        base = tmp_path / ".claude"
+        scope = "project"
+        _installed, _skipped, failed, messages = install_hooks_and_scripts(
+            base_path=base, force=True, scope=scope
+        )
+
+        assert failed == 0, messages
+        commands = self._hook_commands(base, scope)
+        assert commands
+        for command in commands:
+            assert "$CLAUDE_PROJECT_DIR/.claude/superclaude/scripts" in command, (
+                "project scope's settings.json is committed, so the script half "
+                "must not name one machine's checkout"
+            )
+
+    def test_user_scope_is_unchanged(self, tmp_path):
+        from superclaude.cli.install_components import install_hooks_and_scripts
+
+        base = tmp_path / ".claude"
+        scope = "user"
+        _installed, _skipped, failed, messages = install_hooks_and_scripts(
+            base_path=base, force=True, scope=scope
+        )
+
+        assert failed == 0, messages
+        expected = str((base / "superclaude" / "scripts").resolve())
+        commands = self._hook_commands(base, scope)
+        assert commands
+        for command in commands:
+            assert expected in command

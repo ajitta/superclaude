@@ -298,7 +298,8 @@ def merge_hooks_to_settings(
 
     Scope behavior:
         - user: Merges to ~/.claude/settings.json (absolute paths)
-        - project: Merges to ./.claude/settings.json (team-shared)
+        - project: Merges to ./.claude/settings.json (per-clone: the file
+          carries this machine's interpreter, so install git-excludes it)
         - local: Merges to ./.claude/settings.local.json (CC auto-gitignores)
         - target: Merges to {target}/.claude/settings.json (absolute paths)
     """

@@ -31,8 +31,9 @@ def get_base_path(scope: str = "user") -> Path:
     Get base installation path based on scope.
 
     Args:
-        scope: "user" for ~/.claude/, "project" for ./.claude/ (team-shared),
-               or "local" for ./.claude/ (personal, gitignored)
+        scope: "user" for ~/.claude/, "project" for ./.claude/ (team-shared
+               content; the hook registration stays per-clone), or "local" for
+               ./.claude/ (personal, gitignored)
 
     Returns:
         Path to base installation directory
