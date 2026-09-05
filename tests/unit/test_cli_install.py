@@ -885,3 +885,294 @@ class TestHookCommandsCarryNoMachineBytes:
 
         shipped = (_get_package_root() / "hooks" / "hooks.json").read_bytes()
         assert (base / "hooks" / "hooks.json").read_bytes() == shipped
+
+
+def _legacy_registration(base: Path, names: list[str], interpreter: str) -> None:
+    """A settings.json the previous release would have written: resolved
+    interpreter plus a script copy under <base>/superclaude/scripts/."""
+    import json
+
+    scripts = base / "superclaude" / "scripts"
+    scripts.mkdir(parents=True, exist_ok=True)
+    entries = []
+    for name in names:
+        (scripts / f"{name}.py").write_text("# previous release\n", encoding="utf-8")
+        entries.append(
+            {
+                "matcher": "Bash",
+                "hooks": [
+                    {
+                        "_comment": f"[superclaude] {name}",
+                        "type": "command",
+                        "command": f"{interpreter} {scripts}/{name}.py",
+                        "timeout": 5,
+                    }
+                ],
+            }
+        )
+    (base / "settings.json").write_text(
+        json.dumps({"hooks": {"PreToolUse": entries}}), encoding="utf-8"
+    )
+
+
+def _sc_commands(base: Path, scope: str) -> list[str]:
+    import json
+
+    from superclaude.utils import settings_filename
+
+    config = json.loads((base / settings_filename(scope)).read_text(encoding="utf-8"))
+    return [
+        hook["command"]
+        for event in config["hooks"].values()
+        for group in event
+        for hook in group["hooks"]
+    ]
+
+
+class TestUpgradeFromALegacyRegistration:
+    """The default (non-force) install over a previous release's registration.
+
+    That release's commands named the installing machine's interpreter and
+    checkout. Project scope now commits the file, so leaving those commands
+    in place on the default upgrade exposed them for commit — while the
+    legacy-scripts notice told the user to delete the directory those very
+    commands still ran.
+    """
+
+    def test_non_force_rewrites_every_legacy_command(self, tmp_path):
+        from superclaude.cli.install_components import install_hooks
+
+        base = tmp_path / ".claude"
+        _legacy_registration(
+            base, ["destructive_guard", "loop_guard"], "/opt/py/bin/python3"
+        )
+
+        _i, _s, failed, messages = install_hooks(
+            base_path=base, force=False, scope="user"
+        )
+
+        assert failed == 0, messages
+        commands = _sc_commands(base, "user")
+        assert commands and all(c.startswith("superclaude hook ") for c in commands), (
+            commands
+        )
+        assert any("2 legacy command(s) rewritten" in m for m in messages), messages
+
+    def test_notice_says_remove_after_restart_once_nothing_runs_the_copies(
+        self, tmp_path
+    ):
+        from superclaude.cli.install_components import install_hooks
+
+        base = tmp_path / ".claude"
+        _legacy_registration(base, ["loop_guard"], "/opt/py/bin/python3")
+
+        _i, _s, _f, messages = install_hooks(base_path=base, force=False, scope="user")
+
+        notice = [m for m in messages if m.startswith("ℹ️")]
+        assert len(notice) == 1, messages
+        assert "remove it after restarting" in notice[0]
+        assert "do not remove" not in notice[0]
+
+    def test_notice_forbids_removal_while_a_registration_still_runs_the_copies(
+        self, tmp_path
+    ):
+        """A hook this release no longer ships stays in its legacy form on a
+        non-force install, so the copies it runs must stay too."""
+        from superclaude.cli.install_components import install_hooks
+
+        base = tmp_path / ".claude"
+        _legacy_registration(base, ["retired_thing"], "/opt/py/bin/python3")
+
+        _i, _s, _f, messages = install_hooks(base_path=base, force=False, scope="user")
+
+        notice = [m for m in messages if m.startswith("ℹ️")]
+        assert len(notice) == 1, messages
+        assert "do not remove" in notice[0]
+        assert "--force" in notice[0]
+        assert (base / "superclaude" / "scripts" / "retired_thing.py").exists()
+
+
+class TestConsoleScriptWarning:
+    """The installer's only signal for the PATH blocker the request named.
+
+    It reads the probe rather than a bare `shutil.which`: under `uv run` — every
+    `make sync-*` target — which() found the venv shim the user's shell never
+    sees, so the warning could not fire from the documented install path.
+    """
+
+    @staticmethod
+    def _messages(monkeypatch, tmp_path, probe: dict) -> list[str]:
+        from superclaude.cli import install_components
+
+        monkeypatch.setattr(install_components, "probe_console_script", lambda: probe)
+        _i, _s, _f, messages = install_components.install_hooks(
+            base_path=tmp_path / ".claude", force=True, scope="user"
+        )
+        return [m for m in messages if m.startswith("⚠️")]
+
+    def test_missing_script_names_path_and_the_exit_code(self, tmp_path, monkeypatch):
+        warnings = self._messages(
+            monkeypatch,
+            tmp_path,
+            {"path": None, "excluded": None, "has_hook": None, "version": None},
+        )
+
+        assert len(warnings) == 1, warnings
+        assert "PATH" in warnings[0] and "127" in warnings[0]
+
+    def test_an_excluded_own_bin_is_named(self, tmp_path, monkeypatch):
+        warnings = self._messages(
+            monkeypatch,
+            tmp_path,
+            {
+                "path": None,
+                "excluded": "/repo/.venv/bin",
+                "has_hook": None,
+                "version": None,
+            },
+        )
+
+        assert "/repo/.venv/bin" in warnings[0]
+
+    def test_a_script_without_the_hook_subcommand_is_reported(
+        self, tmp_path, monkeypatch
+    ):
+        warnings = self._messages(
+            monkeypatch,
+            tmp_path,
+            {
+                "path": "/usr/local/bin/superclaude",
+                "excluded": None,
+                "has_hook": False,
+                "version": "4.8.0",
+            },
+        )
+
+        assert len(warnings) == 1, warnings
+        assert "no `hook` subcommand" in warnings[0] and "4.8.0" in warnings[0]
+
+    def test_a_different_version_on_path_is_reported(self, tmp_path, monkeypatch):
+        warnings = self._messages(
+            monkeypatch,
+            tmp_path,
+            {
+                "path": "/usr/local/bin/superclaude",
+                "excluded": None,
+                "has_hook": True,
+                "version": "0.0.1",
+            },
+        )
+
+        assert len(warnings) == 1, warnings
+        assert "0.0.1" in warnings[0]
+
+    def test_a_matching_script_warns_about_nothing(self, tmp_path, monkeypatch):
+        from superclaude import __version__
+
+        warnings = self._messages(
+            monkeypatch,
+            tmp_path,
+            {
+                "path": "/usr/local/bin/superclaude",
+                "excluded": None,
+                "has_hook": True,
+                "version": __version__,
+            },
+        )
+
+        assert warnings == []
+
+
+class TestRegistrationFilesAreWrittenWithLF:
+    """Project scope commits settings.json and hooks/hooks.json. Text mode with
+    no newline argument writes CRLF on Windows, which would make every Windows
+    teammate's install dirty both files. Windows is not available here, so the
+    write sites are checked for the argument that pins the newline."""
+
+    def test_settings_json_writer_pins_newline_and_encoding(
+        self, tmp_path, monkeypatch
+    ):
+        import os
+
+        from superclaude import utils
+
+        seen = {}
+        real_fdopen = os.fdopen
+
+        def recording_fdopen(fd, *args, **kwargs):
+            seen.update(kwargs)
+            return real_fdopen(fd, *args, **kwargs)
+
+        monkeypatch.setattr(utils.os, "fdopen", recording_fdopen)
+        utils.atomic_write_json(tmp_path / "settings.json", {"hooks": {}})
+
+        assert seen.get("newline") == "\n", seen
+        assert seen.get("encoding") == "utf-8", seen
+
+    def test_hooks_json_copy_pins_newline_and_encoding(self, tmp_path, monkeypatch):
+        import builtins
+
+        from superclaude.cli import install_components
+
+        seen = {}
+
+        def recording_open(path, *args, **kwargs):
+            if str(path).endswith("hooks.json") and args and "w" in args[0]:
+                seen.update(kwargs)
+            return builtins.open(path, *args, **kwargs)
+
+        monkeypatch.setattr(install_components, "open", recording_open, raising=False)
+        install_components.install_hooks(
+            base_path=tmp_path / ".claude", force=True, scope="user"
+        )
+
+        assert seen.get("newline") == "\n", seen
+        assert seen.get("encoding") == "utf-8", seen
+
+
+class TestTeamIgnoreOfTheRegistrationIsReported:
+    """Project scope stopped excluding settings.json so the team can commit it,
+    but a team-level .gitignore can still hide it — this repository's own
+    .gitignore does — and the install used to say nothing."""
+
+    @staticmethod
+    def _isolated_repo(tmp_path, monkeypatch):
+        """The developer's global excludes file must not decide these tests."""
+        import subprocess
+
+        empty = tmp_path / "empty-gitconfig"
+        empty.write_text("", encoding="utf-8")
+        monkeypatch.setenv("GIT_CONFIG_GLOBAL", str(empty))
+        monkeypatch.setenv("GIT_CONFIG_NOSYSTEM", "1")
+        repo = tmp_path / "repo"
+        repo.mkdir()
+        subprocess.run(["git", "init", "-q", str(repo)], check=True)
+        return repo
+
+    def test_install_all_names_the_rule(self, tmp_path, monkeypatch):
+        from superclaude.cli.install_components import install_all
+
+        repo = self._isolated_repo(tmp_path, monkeypatch)
+        (repo / ".gitignore").write_text(
+            "# team rules\n.claude/settings.json\n", encoding="utf-8"
+        )
+
+        _ok, message = install_all(
+            base_path=repo / ".claude", force=True, scope="project"
+        )
+
+        assert ".gitignore:2 ignores .claude/settings.json" in message, message
+        assert "hooks/hooks.json" not in [
+            line for line in message.splitlines() if "ignores" in line
+        ], "hooks.json is not ignored here and must not be reported"
+
+    def test_a_clean_repo_gets_no_ignore_warning(self, tmp_path, monkeypatch):
+        from superclaude.cli.install_components import install_all
+
+        repo = self._isolated_repo(tmp_path, monkeypatch)
+
+        _ok, message = install_all(
+            base_path=repo / ".claude", force=True, scope="project"
+        )
+
+        assert "ignores .claude/" not in message, message

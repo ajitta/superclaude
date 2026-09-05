@@ -4,10 +4,10 @@ Two things break silently here and these tests pin both. The registry has to
 cover exactly what hooks.json ships: a name registered in hooks.json but not in
 ``HOOKS`` exits 2 — the blocking code on PreToolUse and Stop — on the first
 tool call of every session. And the fast path has to stay fast: ``entry.py``
-dispatches ``hook`` before importing click because the click import alone
-(~40ms) costs more than a whole hook run (~20ms, measured 2026-09-05) and hooks
-fire three times per Bash tool call; one stray import of ``superclaude.cli.main``
-from the dispatch path doubles every hook's cost without failing anything.
+dispatches ``hook`` before importing click (why and the numbers:
+``hook_dispatch.py``'s module docstring); one stray import of
+``superclaude.cli.main`` from that path doubles every hook's cost without
+failing anything.
 
 Filed at tests/unit/ top level on purpose: pyproject addopts carries
 ``--ignore=tests/unit/scripts``, so a guard under tests/unit/scripts/ never runs.
@@ -138,9 +138,11 @@ class TestRunHook:
 
         assert run_hook(["fake"]) == 3
 
-    def test_a_guards_system_exit_propagates(self, fake_hook):
-        """The guards block with sys.exit(2) from inside main(); that must
-        reach the process exit code exactly as under `python guard.py`."""
+    def test_a_system_exit_from_main_propagates(self, fake_hook):
+        """insight_writer's argparse exits 2 from inside main(); a script that
+        chooses to exit directly must reach the process exit code exactly as
+        under `python script.py`. (The shipped guards block by printing a
+        decision and returning, so this is not their path.)"""
 
         def blocking():
             sys.exit(2)
@@ -230,6 +232,25 @@ class TestEntryFastPath:
         )
         assert result.returncode == 2
         assert "no_such_hook" in result.stderr
+
+    def test_the_shims_own_directory_is_dropped_from_sys_path(
+        self, tmp_path, monkeypatch
+    ):
+        """`~/.local/bin` is a shared user bin; a stray `json.py` there would
+        shadow the stdlib for every hook. The old form ran from a directory
+        SuperClaude owned, and entry keeps that property."""
+        import sys as _sys
+
+        from superclaude.cli import entry
+
+        shim = tmp_path / "bin" / "superclaude"
+        shim.parent.mkdir()
+        shim.write_text("#!/usr/bin/env python\n", encoding="utf-8")
+        monkeypatch.setattr(_sys, "argv", [str(shim), "hook", "--help"])
+        monkeypatch.setattr(_sys, "path", [str(shim.parent), *_sys.path])
+
+        assert entry.main() == 0
+        assert str(shim.parent) not in _sys.path
 
     def test_everything_else_reaches_the_click_app(self, tmp_path):
         result = _run_entry(

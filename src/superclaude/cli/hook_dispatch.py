@@ -65,8 +65,10 @@ def run_hook(argv: list[str]) -> int:
     """Run the hook named by ``argv[0]``; return the process exit code.
 
     A script's ``main()`` keeps its own contract: ``None`` means 0, an int is
-    returned as-is, and a ``SystemExit`` raised inside (the guards' exit 2)
-    propagates untouched, exactly as under ``python <script>.py``.
+    returned as-is, and a ``SystemExit`` raised inside propagates untouched,
+    exactly as under ``python <script>.py``. (The shipped guards block by
+    printing ``{"decision": "block"}`` and exiting 0; the SystemExit path is
+    argparse's exit 2 in insight_writer and any future script that exits.)
     """
     if not argv:
         sys.stderr.write(usage())

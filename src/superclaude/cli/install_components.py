@@ -10,16 +10,23 @@ import shutil
 from pathlib import Path
 from typing import List, Tuple
 
-from .install_git_exclude import add_git_exclude
+from superclaude import __version__
+from superclaude.utils import is_legacy_hook_command, settings_filename
+
+from .install_git_exclude import add_git_exclude, find_team_ignores
 from .install_paths import (
     COMPONENTS,
     _get_package_root,
     _get_source_dir,
     _get_target_dir,
     find_legacy_skills,
+    probe_console_script,
 )
 from .install_settings import (
     CLAUDE_SC_IMPORT,
+    _is_superclaude_hook,
+    _load_settings,
+    _split_entry,
     check_claude_md_import,
     merge_hooks_to_settings,
     update_claude_md_import,
@@ -280,35 +287,7 @@ def install_hooks(
     failed = 0
     messages = []
 
-    # The registration only works where Claude Code's hook shell can resolve
-    # `superclaude`. That shell inherits the launching shell's PATH (measured
-    # 2026-09-05: ~/.local/bin — where uv, pipx and Claude Code's own native
-    # installer put their scripts — was present), so this process's PATH is the
-    # closest proxy available. A warning, not a failure: the two shells are not
-    # guaranteed to agree in either direction.
-    if shutil.which("superclaude") is None:
-        messages.append(
-            "⚠️  `superclaude` is not on PATH in this shell. Every hook runs "
-            "`superclaude hook <name>` and exits 127 where Claude Code cannot "
-            "find it — put the console script's directory on PATH "
-            "(uv: `uv tool update-shell`; pipx: `pipx ensurepath`)."
-        )
-
-    # Script copies from a release whose hooks ran them directly. Deliberately
-    # NOT removed: Claude Code snapshots hook commands at session start, so a
-    # session already running — this project's, or on a user-scope install any
-    # project's — keeps executing the OLD registration against these files, and
-    # python's "can't open file" is exit 2, the blocking code on PreToolUse and
-    # Stop. Deleting them under a live session blocks every tool call until
-    # restart. The user removes them once no such session is left.
-    legacy_scripts = base_path / "superclaude" / "scripts"
-    if legacy_scripts.is_dir():
-        messages.append(
-            f"ℹ️  {legacy_scripts} holds script copies from a release whose hooks "
-            "ran them directly; hooks now run `superclaude hook <name>`. Left in "
-            "place for sessions still on the previous registration — remove it "
-            "after restarting Claude Code."
-        )
+    messages.extend(_console_script_warnings())
 
     hooks_json_file = hooks_source / "hooks.json"
     if not hooks_json_file.exists():
@@ -324,10 +303,15 @@ def install_hooks(
 
     # 1. Copy hooks.json to <base>/hooks/hooks.json. Build output, not user
     # content: rewritten regardless of --force so the file on disk describes
-    # the release that is installed.
+    # the release that is installed. newline pinned: text mode would write CRLF
+    # on Windows into a file project scope commits (atomic_write_json pins the
+    # same for settings.json).
     try:
         hooks_target.mkdir(parents=True, exist_ok=True)
-        (hooks_target / "hooks.json").write_text(hooks_content, encoding="utf-8")
+        with open(
+            hooks_target / "hooks.json", "w", encoding="utf-8", newline="\n"
+        ) as f:
+            f.write(hooks_content)
         installed += 1
         messages.append("hooks.json installed")
     except OSError as e:
@@ -354,7 +338,103 @@ def install_hooks(
         failed += 1
         messages.append(f"Failed to merge hooks to settings.json: {e}")
 
+    legacy_scripts = base_path / "superclaude" / "scripts"
+    if legacy_scripts.is_dir():
+        messages.append(
+            _legacy_scripts_notice(legacy_scripts, base_path / settings_filename(scope))
+        )
+
     return installed, skipped, failed, messages
+
+
+def _console_script_warnings() -> List[str]:
+    """Warn when the `superclaude` Claude Code's hook shell will find cannot run hooks.
+
+    Every registration is `superclaude hook <name>`, so the hooks work only where
+    that shell resolves a console script of this release. The probe
+    (install_paths.probe_console_script) searches this process's PATH minus the
+    running interpreter's own bin — under `uv run` that is the project venv,
+    which the user's shell sees only while activated — and asks the script it
+    finds whether it has the `hook` subcommand and which version it is. Still a
+    proxy: the hook shell inherits the launching shell's PATH (measured
+    2026-09-05 on macOS; Windows unmeasured), not this process's.
+    """
+    probe = probe_console_script()
+    where = probe["path"]
+    fix = (
+        "put this release's console script on PATH "
+        "(uv: `uv tool update-shell`; pipx: `pipx ensurepath`)"
+    )
+    if where is None:
+        excluded = (
+            f" `{probe['excluded']}` was left out of the search: Claude Code's shell "
+            "sees it only while that environment is active there."
+            if probe["excluded"]
+            else ""
+        )
+        return [
+            "⚠️  `superclaude` is not on PATH. Every hook runs `superclaude hook "
+            f"<name>` and exits 127 where Claude Code cannot find it — {fix}.{excluded}"
+        ]
+    if not probe["has_hook"]:
+        return [
+            f"⚠️  PATH resolves `superclaude` to {where}, which has no `hook` "
+            f"subcommand ({probe['version'] or 'unknown version'}); every hook exits "
+            f"2 there, the blocking code. Upgrade that install or {fix}."
+        ]
+    if probe["version"] and probe["version"] != __version__:
+        return [
+            f"⚠️  PATH resolves `superclaude` to {where} (version {probe['version']}), "
+            f"not this install ({__version__}); Claude Code runs that version's hooks."
+        ]
+    return []
+
+
+def _registered_sc_commands(settings_file: Path) -> List[str]:
+    """Commands of every SuperClaude-owned inner hook in a settings file."""
+    hooks = _load_settings(settings_file).get("hooks", {})
+    if not isinstance(hooks, dict):
+        return []
+    return [
+        hook.get("command", "")
+        for array in hooks.values()
+        if isinstance(array, list)
+        for entry in array
+        if isinstance(entry, dict) and _is_superclaude_hook(entry)
+        for hook in _split_entry(entry)[0]
+    ]
+
+
+def _legacy_scripts_notice(legacy_scripts: Path, settings_file: Path) -> str:
+    """What to tell the user about script copies a previous release installed.
+
+    Never removed by the installer: Claude Code snapshots hook commands at
+    session start, so a session already running — this project's, or on a
+    user-scope install any project's — keeps executing the OLD registration
+    against these files, and python's "can't open file" is exit 2, the blocking
+    code on PreToolUse and Stop. Which advice is right depends on the settings
+    file just written: while any registration still names the copies (a hook
+    this release no longer ships, kept by a non-force install), telling the
+    user to delete them would turn a working install into a blocked one.
+    """
+    still_used = sum(
+        1
+        for cmd in _registered_sc_commands(settings_file)
+        if is_legacy_hook_command(cmd)
+    )
+    if still_used:
+        return (
+            f"ℹ️  {still_used} registration(s) in {settings_file.name} still run the "
+            f"script copies under {legacy_scripts} — do not remove that directory; "
+            "`superclaude install --force` rewrites every registration to "
+            "`superclaude hook <name>`."
+        )
+    return (
+        f"ℹ️  {legacy_scripts} holds script copies from a release whose hooks ran "
+        "them directly; hooks now run `superclaude hook <name>`. Left in place for "
+        "sessions still on the previous registration — remove it after restarting "
+        "Claude Code."
+    )
 
 
 def install_all(
@@ -472,6 +552,21 @@ def install_all(
         project_root = base_path.parent
         gi_ok, gi_msg = add_git_exclude(project_root, scope)
         messages.append(f"{'✅' if gi_ok else '⚠️ '} {gi_msg}")
+        # Project scope stopped excluding the registration so the team can
+        # commit it, but a team-level .gitignore (this very repository carries
+        # `.claude/settings.json`) or a global excludes file can still hide it —
+        # silently, with install reporting success. Tracked files are never
+        # reported, so an already-committed registration stays quiet.
+        if scope == "project":
+            for source, line, path in find_team_ignores(
+                project_root, [".claude/settings.json", ".claude/hooks/hooks.json"]
+            ):
+                messages.append(
+                    f"⚠️  {source}:{line} ignores {path} — project scope commits the "
+                    "hook registration, and this rule keeps it out of the team's "
+                    "history; remove the rule, or use --scope local for a personal "
+                    "install"
+                )
         if not gi_ok:
             total_failed += 1
 

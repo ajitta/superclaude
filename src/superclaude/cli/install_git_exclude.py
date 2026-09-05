@@ -32,6 +32,8 @@ Worktree support: when ``<root>/.git`` is a file (a worktree pointer),
 the worktree-specific gitdir's ``info/exclude`` is used.
 """
 
+import re
+import subprocess
 from pathlib import Path
 from typing import List, Optional, Tuple
 
@@ -336,3 +338,65 @@ def remove_git_exclude(project_root: Path) -> Tuple[bool, str]:
     except OSError as e:
         messages.append(f"Failed to update {exclude_file}: {e}")
         return False, "; ".join(messages)
+
+
+# One `git check-ignore -v` line: `<source>:<linenum>:<pattern>\t<path>`. The
+# source is matched greedily so a Windows drive letter (`C:/Users/x/.gitignore`)
+# keeps its line number.
+_CHECK_IGNORE_LINE_RE = re.compile(
+    r"^(?P<source>.*):(?P<line>\d+):(?P<pattern>.*)\t(?P<path>.*)$"
+)
+
+
+def _parse_check_ignore(stdout: str) -> List[Tuple[str, str, str]]:
+    """(source, line, path) for every rule that actually hides its path.
+
+    Two kinds of line are dropped. A negation pattern (`!.claude/settings.json`)
+    is printed by `-v` as the winning rule, yet it means the path is NOT
+    ignored — reporting it would tell the user to delete the whitelist that
+    makes the file committable. A rule from an `info/exclude` file is per-clone
+    (SuperClaude's own block, or the user's), not a team rule, so it is not what
+    this check is about.
+    """
+    found: List[Tuple[str, str, str]] = []
+    for line in stdout.splitlines():
+        match = _CHECK_IGNORE_LINE_RE.match(line)
+        if not match:
+            continue
+        if match["pattern"].startswith("!"):
+            continue
+        if match["source"].replace("\\", "/").endswith("info/exclude"):
+            continue
+        found.append((match["source"], match["line"], match["path"]))
+    return found
+
+
+def find_team_ignores(
+    project_root: Path, paths: List[str]
+) -> List[Tuple[str, str, str]]:
+    """Team-level ignore rules that hide ``paths`` from the team's history.
+
+    Project scope promises the hook registration is committed, and this module
+    stopped excluding it — but a team-level ``.gitignore`` or a global excludes
+    file can still hide it, silently: install reports success and nothing ever
+    reaches the repository. ``git check-ignore -v`` names the rule that wins.
+    Tracked files are never reported (git's own rule), so an already-committed
+    registration stays quiet; negation patterns and per-clone ``info/exclude``
+    rules are dropped by ``_parse_check_ignore``.
+
+    Returns:
+        (source, line, path) per ignored path; empty when nothing is ignored,
+        when this is not a git repository, or when git is unavailable.
+    """
+    try:
+        result = subprocess.run(
+            ["git", "-C", str(project_root), "check-ignore", "-v", "--", *paths],
+            capture_output=True,
+            text=True,
+            timeout=15,
+        )
+    except (OSError, subprocess.TimeoutExpired):
+        return []
+    if result.returncode != 0:  # 1: nothing ignored; 128: not a repository
+        return []
+    return _parse_check_ignore(result.stdout)

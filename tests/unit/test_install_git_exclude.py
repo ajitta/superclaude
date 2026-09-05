@@ -400,3 +400,128 @@ class TestMarkerGenerationMigration:
         content = exclude_file.read_text(encoding="utf-8")
         assert legacy_start not in content
         assert "user-pattern" in content
+
+
+def _real_repo(tmp_path: Path, monkeypatch) -> Path:
+    """A real repository — `git check-ignore` needs one, the fake `.git/` of
+    the `git_repo` fixture is not enough. The developer's global git config is
+    shut out so a machine-wide excludes file cannot decide these tests."""
+    import subprocess
+
+    empty = tmp_path / "empty-gitconfig"
+    empty.write_text("", encoding="utf-8")
+    monkeypatch.setenv("GIT_CONFIG_GLOBAL", str(empty))
+    monkeypatch.setenv("GIT_CONFIG_NOSYSTEM", "1")
+    subprocess.run(["git", "init", "-q", str(tmp_path)], check=True)
+    return tmp_path
+
+
+class TestFindTeamIgnores:
+    """`git check-ignore -v` names the rule that hides a registration file."""
+
+    def test_a_gitignore_rule_is_reported_with_its_source_and_line(
+        self, tmp_path: Path, monkeypatch
+    ):
+        from superclaude.cli.install_git_exclude import find_team_ignores
+
+        repo = _real_repo(tmp_path, monkeypatch)
+        (repo / ".gitignore").write_text(
+            "# team rules\n.claude/settings.json\n", encoding="utf-8"
+        )
+
+        found = find_team_ignores(
+            repo, [".claude/settings.json", ".claude/hooks/hooks.json"]
+        )
+
+        assert found == [(".gitignore", "2", ".claude/settings.json")]
+
+    def test_nothing_ignored_is_an_empty_list(self, tmp_path: Path, monkeypatch):
+        from superclaude.cli.install_git_exclude import find_team_ignores
+
+        assert (
+            find_team_ignores(
+                _real_repo(tmp_path, monkeypatch), [".claude/settings.json"]
+            )
+            == []
+        )
+
+    def test_a_tracked_file_is_never_reported(self, tmp_path: Path, monkeypatch):
+        """git's own rule: an already-committed registration stays quiet even
+        when a later ignore rule matches it."""
+        import subprocess
+
+        from superclaude.cli.install_git_exclude import find_team_ignores
+
+        repo = _real_repo(tmp_path, monkeypatch)
+        target = repo / ".claude" / "settings.json"
+        target.parent.mkdir(parents=True)
+        target.write_text("{}", encoding="utf-8")
+        git = ["git", "-C", str(repo), "-c", "user.email=t@t", "-c", "user.name=t"]
+        subprocess.run([*git, "add", ".claude/settings.json"], check=True)
+        subprocess.run([*git, "commit", "-q", "-m", "track"], check=True)
+        (repo / ".gitignore").write_text(".claude/settings.json\n", encoding="utf-8")
+
+        assert find_team_ignores(repo, [".claude/settings.json"]) == []
+
+    def test_a_non_repository_is_an_empty_list(self, tmp_path: Path):
+        from superclaude.cli.install_git_exclude import find_team_ignores
+
+        assert find_team_ignores(tmp_path, [".claude/settings.json"]) == []
+
+    def test_a_negation_that_whitelists_the_file_is_not_an_ignore(
+        self, tmp_path: Path, monkeypatch
+    ):
+        """`.claude/*` + `!.claude/settings.json` is the common way to commit the
+        registration while hiding the rest of .claude; check-ignore -v prints the
+        negation as the winning rule, and it must not be reported as hiding."""
+        from superclaude.cli.install_git_exclude import find_team_ignores
+
+        repo = _real_repo(tmp_path, monkeypatch)
+        (repo / ".gitignore").write_text(
+            ".claude/*\n!.claude/settings.json\n", encoding="utf-8"
+        )
+
+        found = find_team_ignores(
+            repo, [".claude/settings.json", ".claude/hooks/hooks.json"]
+        )
+
+        assert found == [(".gitignore", "1", ".claude/hooks/hooks.json")]
+
+    def test_a_per_clone_exclude_rule_is_not_a_team_rule(
+        self, tmp_path: Path, monkeypatch
+    ):
+        from superclaude.cli.install_git_exclude import find_team_ignores
+
+        repo = _real_repo(tmp_path, monkeypatch)
+        (repo / ".git" / "info").mkdir(exist_ok=True)
+        (repo / ".git" / "info" / "exclude").write_text(
+            ".claude/settings.json\n", encoding="utf-8"
+        )
+
+        assert find_team_ignores(repo, [".claude/settings.json"]) == []
+
+
+class TestCheckIgnoreParsing:
+    """The `-v` line format, incl. a Windows drive letter in the source."""
+
+    def test_a_drive_letter_source_keeps_its_line_number(self):
+        from superclaude.cli.install_git_exclude import _parse_check_ignore
+
+        line = "C:/Users/alice/.gitignore_global:3:.claude/settings.json\t.claude/settings.json"
+
+        assert _parse_check_ignore(line + "\n") == [
+            ("C:/Users/alice/.gitignore_global", "3", ".claude/settings.json")
+        ]
+
+    def test_negations_and_info_exclude_sources_are_dropped(self):
+        from superclaude.cli.install_git_exclude import _parse_check_ignore
+
+        stdout = (
+            ".gitignore:2:!.claude/settings.json\t.claude/settings.json\n"
+            ".git/info/exclude:49:.claude/hooks/hooks.json\t.claude/hooks/hooks.json\n"
+            ".gitignore:7:.claude/agents/\t.claude/agents/x.md\n"
+        )
+
+        assert _parse_check_ignore(stdout) == [
+            (".gitignore", "7", ".claude/agents/x.md")
+        ]

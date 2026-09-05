@@ -20,7 +20,7 @@ the product; the Python is the delivery mechanism.
 superclaude/
 ├── src/superclaude/          # the package — CLI + shipped content
 │   ├── ARCHITECTURE.md       # ★ taxonomy SSOT: directory roles, delivery pipelines
-│   ├── cli/                  # install/uninstall/mcp/doctor commands (click)
+│   ├── cli/                  # install/uninstall/mcp/doctor commands (click); entry.py + hook_dispatch.py run `superclaude hook <name>`
 │   ├── commands/             # /sc:* command definitions (.md)
 │   ├── agents/               # sub-agent definitions (.md)
 │   ├── modes/                # behavioral modes (.md)
@@ -28,7 +28,7 @@ superclaude/
 │   ├── core/                 # always-loaded: FLAGS, PRINCIPLES, RULES
 │   │   └── rules/            # on-demand rule modules (QUALITY, DELEGATION, DOCS, INTERACTION)
 │   ├── hooks/                # hook entry scripts + hooks.json
-│   ├── scripts/              # installed to ~/.claude/superclaude/scripts/
+│   ├── scripts/              # hook scripts, run in place as `superclaude hook <name>` — never copied to the install tree
 │   ├── templates/            # docs-scaffold/ etc., copied at init time
 │   ├── utils/                # path resolvers (project_root, claude_base, hook_state_dir)
 ├── tests/{unit,integration,manual}/
