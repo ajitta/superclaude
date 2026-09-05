@@ -9,9 +9,9 @@ import json
 from dataclasses import dataclass
 from pathlib import Path
 
+import superclaude
 from superclaude.scripts.context_loader import (
     _BEHAVIORAL_MCPS,
-    BASE_PATH,
     COMPOSITE_FLAGS,
     FLAG_ALIASES,
     INSTRUCTION_MAP,
@@ -298,19 +298,27 @@ class TestTieredInjection:
         )
 
 
+# The installer copies these files out of the source tree verbatim, so the
+# source tree is the fixture. context_loader.BASE_PATH is the runtime install
+# location and resolves to an empty ~/.claude/superclaude on a machine with no
+# install: checking against it made two tests red on `superclaude uninstall`
+# (2026-09-05) without any change to the routing tables.
+SOURCE_TREE = Path(superclaude.__file__).parent
+
+
 class TestTriggerMapPaths:
-    """Verify all TRIGGER_MAP and COMPOSITE_FLAGS paths resolve to existing files."""
+    """Verify all TRIGGER_MAP and COMPOSITE_FLAGS paths name files the installer ships."""
 
     def test_all_trigger_map_paths_exist(self):
-        """Every file referenced in TRIGGER_MAP must exist."""
+        """Every file referenced in TRIGGER_MAP must exist in the source tree."""
         for _pattern, path, _priority in TRIGGER_MAP:
-            assert (BASE_PATH / path).exists(), f"TRIGGER_MAP path missing: {path}"
+            assert (SOURCE_TREE / path).exists(), f"TRIGGER_MAP path missing: {path}"
 
     def test_all_composite_flag_paths_exist(self):
-        """Every file referenced in COMPOSITE_FLAGS must exist."""
+        """Every file referenced in COMPOSITE_FLAGS must exist in the source tree."""
         for flag, entries in COMPOSITE_FLAGS.items():
             for path, _priority in entries:
-                assert (BASE_PATH / path).exists(), (
+                assert (SOURCE_TREE / path).exists(), (
                     f"COMPOSITE_FLAGS[{flag}] path missing: {path}"
                 )
 
