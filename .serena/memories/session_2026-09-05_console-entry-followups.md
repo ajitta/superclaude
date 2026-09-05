@@ -20,7 +20,7 @@ None set via /sc:load. Tree clean at `3878106` on master.
 
 ## Set aside or still open (by decision, not done)
 - Exit 2 for an unknown hook name: DECIDED later the same day — unknown name and stray argument now exit 1 (stderr still names it, script does not run, tool call not blocked), so a committed settings.json newer than a teammate's package degrades to one absent hook instead of a session lockout. Bare `superclaude hook` keeps usage-error 2. Reasoning in `hook_dispatch.py`'s module docstring; pinned by `test_hook_dispatch.py`.
-- Pre-existing worktree bug: `add_git_exclude` writes to a per-worktree `info/exclude` that git never reads. Surfaced by the review, marked "separate fix", NOT landed as of `3878106` (`install_git_exclude.py` still resolves the per-worktree path around lines 172–199).
+- Pre-existing worktree bug: `add_git_exclude` wrote to a per-worktree `info/exclude` that git never reads. FIXED later the same day: `_resolve_git_exclude_file` follows the gitdir's `commondir` (relative or absolute) to the common `info/exclude`; a pointer without `commondir` (submodule) keeps the gitdir itself. Reproduced first on git 2.55 in a throwaway `git worktree add` repo (`check-ignore` exit 1 from the per-worktree file, match from the common one). Consequence: one exclude block per clone, shared by every worktree; uninstall from one worktree un-excludes the others.
 - Carried from the 09-03 session: optional third CS-D measurement pair (~$4) to firm up the weak gate; plan-routing `max_turns` 12 while Fable 5.1 used 13 once.
 - Feature folders not touched this week: `opus5-fable5-alignment` at phase analysis (updated 09-04 by `387f1af`), `hook-performance` and `runtime-behavior-audit` at planning since August.
 

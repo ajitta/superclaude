@@ -28,13 +28,19 @@ def non_git_dir(tmp_path: Path) -> Path:
 
 @pytest.fixture
 def worktree_dir(tmp_path: Path) -> Path:
-    """A worktree-style directory: ``.git`` is a file pointing to a gitdir.
+    """A linked worktree as ``git worktree add`` lays it out.
 
     Layout:
-        tmp_path/main/.git/                          ← main repo gitdir
+        tmp_path/main/.git/                          ← common gitdir
+        tmp_path/main/.git/info/                     ← the info/ git reads
         tmp_path/main/.git/worktrees/feature/        ← worktree-specific gitdir
-        tmp_path/main/.git/worktrees/feature/info/   ← worktree info dir
+        tmp_path/main/.git/worktrees/feature/commondir  ← "../.." (relative)
+        tmp_path/main/.git/worktrees/feature/info/   ← present, never read
         tmp_path/feature/.git                        ← worktree pointer file
+
+    The ``commondir`` file is what git itself writes; the per-worktree
+    ``info/`` is created too so a regression back to it has somewhere to
+    land and the assertions can see it.
     """
     main = tmp_path / "main"
     main.mkdir()
@@ -44,6 +50,7 @@ def worktree_dir(tmp_path: Path) -> Path:
     worktree_gitdir = main_gitdir / "worktrees" / "feature"
     worktree_gitdir.mkdir(parents=True)
     (worktree_gitdir / "info").mkdir()
+    (worktree_gitdir / "commondir").write_text("../..\n", encoding="utf-8")
 
     worktree_root = tmp_path / "feature"
     worktree_root.mkdir()
@@ -65,16 +72,67 @@ class TestResolveGitExcludeFile:
 
         assert _resolve_git_exclude_file(non_git_dir) is None
 
-    def test_worktree_pointer_resolves_to_worktree_info_exclude(
+    def test_worktree_pointer_resolves_to_the_common_info_exclude(
         self, worktree_dir: Path
     ):
+        """Git reads ``info/`` through the common dir; the per-worktree
+        ``info/exclude`` is never consulted (git 2.55, measured 2026-09-05).
+        Until that day this resolver returned the per-worktree file."""
         from superclaude.cli.install_git_exclude import _resolve_git_exclude_file
 
         result = _resolve_git_exclude_file(worktree_dir)
-        assert result is not None
-        assert result.name == "exclude"
-        assert "worktrees" in result.parts
-        assert "feature" in result.parts
+        expected = worktree_dir.parent / "main" / ".git" / "info" / "exclude"
+        assert result == expected.resolve()
+        assert "worktrees" not in result.parts
+
+    def test_absolute_commondir_is_followed(self, tmp_path: Path):
+        """``commondir`` may be absolute (worktrees can live anywhere)."""
+        common = tmp_path / "elsewhere" / "repo.git"
+        (common / "info").mkdir(parents=True)
+        gitdir = common / "worktrees" / "wt"
+        gitdir.mkdir(parents=True)
+        (gitdir / "commondir").write_text(f"{common}\n", encoding="utf-8")
+        root = tmp_path / "wt"
+        root.mkdir()
+        (root / ".git").write_text(f"gitdir: {gitdir}\n", encoding="utf-8")
+        from superclaude.cli.install_git_exclude import _resolve_git_exclude_file
+
+        assert _resolve_git_exclude_file(root) == common / "info" / "exclude"
+
+    def test_pointer_without_commondir_uses_the_gitdir_itself(self, tmp_path: Path):
+        """A submodule's ``.git`` is also a pointer file, but its gitdir
+        (``.git/modules/<name>``) is a complete git directory with no
+        ``commondir`` — its own ``info/exclude`` is the one git reads."""
+        superproject = tmp_path / "super"
+        gitdir = superproject / ".git" / "modules" / "sub"
+        (gitdir / "info").mkdir(parents=True)
+        root = superproject / "sub"
+        root.mkdir()
+        (root / ".git").write_text("gitdir: ../.git/modules/sub\n", encoding="utf-8")
+        from superclaude.cli.install_git_exclude import _resolve_git_exclude_file
+
+        assert _resolve_git_exclude_file(root) == gitdir.resolve() / "info" / "exclude"
+
+    def test_stale_commondir_returns_none_and_creates_nothing(self, tmp_path: Path):
+        """A worktree whose repository moved or was deleted still has a
+        ``commondir``; following it blindly had ``add_git_exclude`` mkdir the
+        vanished git directory and report success (probed 2026-09-05)."""
+        gone = tmp_path / "GONE" / "repo.git"
+        gitdir = tmp_path / "stale-gitdir"
+        gitdir.mkdir()
+        (gitdir / "commondir").write_text(f"{gone}\n", encoding="utf-8")
+        root = tmp_path / "wt"
+        root.mkdir()
+        (root / ".git").write_text(f"gitdir: {gitdir}\n", encoding="utf-8")
+        from superclaude.cli.install_git_exclude import (
+            _resolve_git_exclude_file,
+            add_git_exclude,
+        )
+
+        assert _resolve_git_exclude_file(root) is None
+        ok, msg = add_git_exclude(root)
+        assert ok and "Not a git repository" in msg
+        assert not gone.exists(), "conjured a git directory for a stale worktree"
 
     def test_malformed_git_pointer_file_returns_none(self, tmp_path: Path):
         (tmp_path / ".git").write_text("not a gitdir pointer\n", encoding="utf-8")
@@ -132,7 +190,7 @@ class TestAddLocalGitExclude:
         assert "Not a git repository" in msg
         assert not (non_git_dir / ".gitignore").exists()
 
-    def test_worktree_writes_to_worktree_gitdir(self, worktree_dir: Path):
+    def test_worktree_writes_to_the_common_exclude(self, worktree_dir: Path):
         from superclaude.cli.install_git_exclude import (
             MARKER_START,
             add_git_exclude,
@@ -140,12 +198,37 @@ class TestAddLocalGitExclude:
 
         ok, _ = add_git_exclude(worktree_dir)
         assert ok
-        # Resolve the worktree pointer to find the actual exclude file
-        pointer = (worktree_dir / ".git").read_text(encoding="utf-8").strip()
-        gitdir = Path(pointer.removeprefix("gitdir: ").strip())
-        exclude_file = gitdir / "info" / "exclude"
-        assert exclude_file.exists()
-        assert MARKER_START in exclude_file.read_text(encoding="utf-8")
+        main_gitdir = worktree_dir.parent / "main" / ".git"
+        common_exclude = main_gitdir / "info" / "exclude"
+        assert MARKER_START in common_exclude.read_text(encoding="utf-8")
+        dead_exclude = main_gitdir / "worktrees" / "feature" / "info" / "exclude"
+        assert not dead_exclude.exists(), "wrote the file git never reads"
+
+    def test_worktree_remove_and_has_act_on_the_clones_one_file(
+        self, worktree_dir: Path
+    ):
+        """One exclude file per clone: a block written from the worktree is
+        visible from the main checkout, and removing it from the worktree
+        un-excludes the main checkout too — git's layout, not a choice."""
+        from superclaude.cli.install_git_exclude import (
+            MARKER_START,
+            add_git_exclude,
+            has_exclude_block,
+            remove_git_exclude,
+        )
+
+        main_root = worktree_dir.parent / "main"
+        ok, _ = add_git_exclude(worktree_dir)
+        assert ok
+        assert has_exclude_block(worktree_dir)
+        assert has_exclude_block(main_root)
+
+        ok, msg = remove_git_exclude(worktree_dir)
+        assert ok and "removed" in msg
+        assert not has_exclude_block(worktree_dir)
+        assert not has_exclude_block(main_root)
+        common_exclude = main_root / ".git" / "info" / "exclude"
+        assert MARKER_START not in common_exclude.read_text(encoding="utf-8")
 
     def test_legacy_gitignore_block_migrated(self, git_repo: Path):
         from superclaude.cli.install_git_exclude import (

@@ -28,8 +28,17 @@ Backward-compat: the marker convention matches the previous
 ``.gitignore`` is migrated automatically (removed from ``.gitignore``)
 during install/uninstall.
 
-Worktree support: when ``<root>/.git`` is a file (a worktree pointer),
-the worktree-specific gitdir's ``info/exclude`` is used.
+Worktree support: when ``<root>/.git`` is a file (a worktree pointer), the
+block goes to the COMMON git directory's ``info/exclude`` — the one file git
+reads for every worktree of the clone. ``.git/worktrees/<name>/info/exclude``
+is never read (measured 2026-09-05, git 2.55: a pattern there leaves
+``check-ignore`` at exit 1), which is what this module wrote until then. One
+file per clone has consequences git's layout dictates: worktrees installed at
+the same scope write identical blocks (the patterns are relative), a sibling
+worktree installed at a DIFFERENT scope replaces the block — marker-keyed,
+last install wins, so a project-scope install in one worktree un-excludes a
+local-scope install in another — and a removal from any worktree un-excludes
+them all.
 """
 
 import re
@@ -169,15 +178,27 @@ def _strip_one_block(
 
 
 def _resolve_git_exclude_file(project_root: Path) -> Optional[Path]:
-    """Resolve ``<git-dir>/info/exclude`` for a project root.
+    """Resolve the ``info/exclude`` git actually reads for a project root.
 
     Returns None for non-git directories or malformed worktree pointers.
     Handles three cases:
 
     - ``.git/`` is a directory (regular repo) → ``<root>/.git/info/exclude``
-    - ``.git`` is a file (worktree pointer)   → parses ``gitdir:`` and uses
-      that worktree's ``info/exclude`` (per-worktree by git's design)
-    - neither exists                          → None
+    - ``.git`` is a file (``gitdir:`` pointer) → the gitdir's ``commondir``
+      file, when present, names the common git directory and the answer is
+      ``<commondir>/info/exclude``: git resolves ``info/`` through the common
+      dir, so a linked worktree's own ``info/exclude`` is dead. Without a
+      ``commondir`` the gitdir is complete on its own (a submodule's
+      ``.git/modules/<name>``) and its ``info/exclude`` is the one git reads.
+      A ``commondir`` naming a directory that no longer exists → None, like a
+      malformed pointer: a stale worktree (its repository moved or deleted)
+      must not have a git directory conjured for it by ``mkdir(parents=True)``.
+    - neither exists                           → None
+
+    Plain file reads, no ``git`` subprocess — the same two hops as
+    ``superclaude.utils.main_worktree_root``, which answers a different
+    question (the main worktree's root, not its git directory: a bare
+    repository's worktrees have a common dir with no worktree above it).
     """
     git_path = project_root / ".git"
     if git_path.is_dir():
@@ -196,6 +217,17 @@ def _resolve_git_exclude_file(project_root: Path) -> Optional[Path]:
             git_dir = (project_root / git_dir).resolve()
         if not git_dir.is_dir():
             return None
+        try:
+            common = (git_dir / "commondir").read_text(encoding="utf-8").strip()
+        except OSError:
+            common = ""
+        if common:
+            common_dir = Path(common)
+            if not common_dir.is_absolute():
+                common_dir = (git_dir / common_dir).resolve()
+            if not common_dir.is_dir():
+                return None
+            git_dir = common_dir
         return git_dir / "info" / "exclude"
     return None
 
