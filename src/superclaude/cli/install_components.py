@@ -11,7 +11,7 @@ import sys
 from pathlib import Path
 from typing import List, Tuple
 
-from .install_git_exclude import add_local_git_exclude
+from .install_git_exclude import add_git_exclude
 from .install_paths import (
     find_legacy_skills,
     COMPONENTS,
@@ -275,11 +275,18 @@ def install_hooks_and_scripts(
     messages = []
 
     # Determine scripts path based on scope
-    # - project/local scope: $CLAUDE_PROJECT_DIR-based path (portable, CWD-independent)
-    #   Docs: https://code.claude.com/docs/en/hooks — hook CWD is NOT guaranteed project root;
-    #   $CLAUDE_PROJECT_DIR is the official env var for project-root-relative paths.
-    # - user/target scope: absolute path (works from anywhere)
-    if scope in ("project", "local"):
+    # - project scope: $CLAUDE_PROJECT_DIR-based path. .claude/settings.json is
+    #   team-shared, so the script half of the command must not name one
+    #   machine's checkout. Docs: https://code.claude.com/docs/en/hooks — hook
+    #   CWD is NOT guaranteed project root; $CLAUDE_PROJECT_DIR is the official
+    #   env var for project-root-relative paths.
+    # - user/local/target scope: absolute path. Nothing here is shared
+    #   (settings.local.json is gitignored by definition and already carries an
+    #   absolute {{PYTHON_BIN}}), and the variable is not a synonym for "this
+    #   install": in a git worktree Claude Code reads settings from the MAIN
+    #   worktree while expanding $CLAUDE_PROJECT_DIR to the linked one, so every
+    #   hook path missed by a whole directory. Absolute is CWD-independent too.
+    if scope == "project":
         scripts_path_for_hooks = "$CLAUDE_PROJECT_DIR/.claude/superclaude/scripts"
     else:
         scripts_path_for_hooks = str(scripts_target.resolve())
@@ -485,12 +492,14 @@ def install_all(
             messages.append(f"⚠️  {update_msg}")
             messages.append(f"   Add manually: {CLAUDE_SC_IMPORT}")
 
-    # For local scope: add .git/info/exclude block (per-clone, not shared
-    # via the team .gitignore). CC doesn't auto-ignore agents/skills/etc.,
-    # so we manage the per-clone exclude ourselves.
-    if scope == "local":
+    # Add the .git/info/exclude block (per-clone, not shared via the team
+    # .gitignore). CC doesn't auto-ignore agents/skills/etc., so we manage the
+    # per-clone exclude ourselves. Local scope excludes everything it installs;
+    # project scope only the files that cannot be shared — see
+    # install_git_exclude._collect_entries.
+    if scope in ("local", "project"):
         project_root = base_path.parent
-        gi_ok, gi_msg = add_local_git_exclude(project_root)
+        gi_ok, gi_msg = add_git_exclude(project_root, scope)
         messages.append(f"{'✅' if gi_ok else '⚠️ '} {gi_msg}")
         if not gi_ok:
             total_failed += 1

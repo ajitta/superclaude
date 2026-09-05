@@ -16,6 +16,7 @@ from superclaude.utils import (
     detect_scope,
     get_skill_directories,
     hook_state_dir,
+    main_worktree_root,
     project_key,
     project_root,
     settings_filename,
@@ -909,3 +910,116 @@ class TestResolveReportingTarget:
         _make_scoped_install(project)
 
         assert find_install_root(project / "src") == project
+
+
+def _make_linked_worktree(
+    tmp_path: Path, with_install: bool = True
+) -> tuple[Path, Path]:
+    """Build a main checkout and a linked worktree pointing back at it.
+
+    Mirrors what ``git worktree add`` lays down: the linked checkout's ``.git``
+    is a file naming its own gitdir under the main repo, and that gitdir holds
+    a ``commondir`` pointing at the main repo's git directory.
+
+    Returns:
+        (main worktree root, linked worktree root)
+    """
+    main = tmp_path / "main"
+    main_gitdir = main / ".git"
+    (main_gitdir / "worktrees" / "wt").mkdir(parents=True)
+    if with_install:
+        (main / ".claude" / "superclaude").mkdir(parents=True)
+    (main_gitdir / "worktrees" / "wt" / "commondir").write_text(
+        "../..\n", encoding="utf-8"
+    )
+
+    linked = tmp_path / "wt"
+    linked.mkdir()
+    (linked / ".git").write_text(
+        f"gitdir: {main_gitdir / 'worktrees' / 'wt'}\n", encoding="utf-8"
+    )
+    return main, linked
+
+
+class TestLinkedWorktreeAnchors:
+    """The one place $CLAUDE_PROJECT_DIR is not a synonym for "this install".
+
+    Claude Code reads the settings file that registered a hook from the MAIN
+    worktree, but sets $CLAUDE_PROJECT_DIR to the linked one. Resolving content
+    and hook state from the variable alone lands on a directory that usually
+    holds no install, and does so silently.
+    """
+
+    def test_claude_base_resolves_to_the_main_worktrees_install(
+        self, tmp_path, monkeypatch
+    ):
+        main, linked = _make_linked_worktree(tmp_path)
+        home = tmp_path / "home"
+        (home / ".claude").mkdir(parents=True)
+        monkeypatch.setattr(Path, "home", staticmethod(lambda: home))
+        monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(linked))
+
+        assert claude_base() == main / ".claude"
+
+    def test_project_root_still_names_the_linked_worktree(self, tmp_path, monkeypatch):
+        """Code follows the install; per-project data follows the session."""
+        _main, linked = _make_linked_worktree(tmp_path)
+        monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(linked))
+
+        assert project_root() == linked
+
+    def test_hook_state_follows_the_install_not_the_worktree(
+        self, tmp_path, monkeypatch
+    ):
+        main, linked = _make_linked_worktree(tmp_path)
+        home = tmp_path / "home"
+        (home / ".claude").mkdir(parents=True)
+        monkeypatch.setattr(Path, "home", staticmethod(lambda: home))
+        monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(linked))
+
+        assert hook_state_dir() == main / ".claude" / ".superclaude_hooks"
+
+    def test_worktrees_of_one_repo_keep_distinct_state_filenames(
+        self, tmp_path, monkeypatch
+    ):
+        """Sharing the state DIR is safe only because the key still varies."""
+        main, linked = _make_linked_worktree(tmp_path)
+
+        monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(main))
+        main_key = project_key()
+        monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(linked))
+
+        assert project_key() != main_key
+
+    def test_main_worktree_without_an_install_falls_back_to_user_scope(
+        self, tmp_path, monkeypatch
+    ):
+        _main, linked = _make_linked_worktree(tmp_path, with_install=False)
+        home = tmp_path / "home"
+        (home / ".claude").mkdir(parents=True)
+        monkeypatch.setattr(Path, "home", staticmethod(lambda: home))
+        monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(linked))
+
+        assert claude_base() == home / ".claude"
+
+
+class TestMainWorktreeRoot:
+    def test_plain_checkout_is_not_a_linked_worktree(self, tmp_path):
+        (tmp_path / ".git").mkdir()
+
+        assert main_worktree_root(tmp_path) is None
+
+    def test_directory_without_git_returns_none(self, tmp_path):
+        assert main_worktree_root(tmp_path) is None
+
+    def test_pointer_without_gitdir_prefix_returns_none(self, tmp_path):
+        (tmp_path / ".git").write_text("not a pointer\n", encoding="utf-8")
+
+        assert main_worktree_root(tmp_path) is None
+
+    def test_pointer_to_a_gitdir_without_commondir_returns_none(self, tmp_path):
+        gitdir = tmp_path / "elsewhere"
+        gitdir.mkdir()
+        (tmp_path / ".git").write_text(f"gitdir: {gitdir}\n", encoding="utf-8")
+
+        assert main_worktree_root(tmp_path) is None

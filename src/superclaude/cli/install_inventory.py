@@ -563,9 +563,9 @@ def uninstall_all(
             messages.append(f"❌ {msg}")
             failed += 1
 
-    # 8. Remove .git/info/exclude block for local scope (and migrate any
-    #    legacy block from .gitignore for backward-compat)
-    if scope == "local":
+    # 8. Remove the .git/info/exclude block for the scopes that write one
+    #    (and migrate any legacy block from .gitignore for backward-compat)
+    if scope in ("local", "project"):
         project_root = base_path.parent
         if dry_run:
             from .install_git_exclude import (
@@ -582,16 +582,16 @@ def uninstall_all(
                 if in_legacy:
                     locations.append(".gitignore (legacy)")
                 messages.append(
-                    f"[DRY-RUN] Would remove SC local block from {', '.join(locations)}"
+                    f"[DRY-RUN] Would remove SC block from {', '.join(locations)}"
                 )
                 removed += 1
             else:
-                messages.append(f"⏭️  No SC local block found in {project_root}")
+                messages.append(f"⏭️  No SC block found in {project_root}")
                 skipped += 1
         else:
-            from .install_git_exclude import remove_local_git_exclude
+            from .install_git_exclude import remove_git_exclude
 
-            gi_ok, gi_msg = remove_local_git_exclude(project_root)
+            gi_ok, gi_msg = remove_git_exclude(project_root)
             messages.append(f"{'✅' if gi_ok else '❌'} {gi_msg}")
             if gi_ok:
                 removed += 1

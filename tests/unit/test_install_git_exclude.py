@@ -88,10 +88,10 @@ class TestAddLocalGitExclude:
         from superclaude.cli.install_git_exclude import (
             MARKER_END,
             MARKER_START,
-            add_local_git_exclude,
+            add_git_exclude,
         )
 
-        ok, msg = add_local_git_exclude(git_repo)
+        ok, msg = add_git_exclude(git_repo)
         assert ok, msg
         exclude = (git_repo / ".git" / "info" / "exclude").read_text(encoding="utf-8")
         assert MARKER_START in exclude
@@ -104,9 +104,9 @@ class TestAddLocalGitExclude:
         exclude_file.write_text(
             "# existing\n.beads/\n**/RECOVERY*.md\n", encoding="utf-8"
         )
-        from superclaude.cli.install_git_exclude import add_local_git_exclude
+        from superclaude.cli.install_git_exclude import add_git_exclude
 
-        ok, _ = add_local_git_exclude(git_repo)
+        ok, _ = add_git_exclude(git_repo)
         assert ok
         content = exclude_file.read_text(encoding="utf-8")
         assert ".beads/" in content
@@ -116,18 +116,18 @@ class TestAddLocalGitExclude:
     def test_idempotent_no_duplication(self, git_repo: Path):
         from superclaude.cli.install_git_exclude import (
             MARKER_START,
-            add_local_git_exclude,
+            add_git_exclude,
         )
 
-        add_local_git_exclude(git_repo)
-        add_local_git_exclude(git_repo)
+        add_git_exclude(git_repo)
+        add_git_exclude(git_repo)
         content = (git_repo / ".git" / "info" / "exclude").read_text(encoding="utf-8")
         assert content.count(MARKER_START) == 1
 
     def test_non_git_dir_silent_skip(self, non_git_dir: Path):
-        from superclaude.cli.install_git_exclude import add_local_git_exclude
+        from superclaude.cli.install_git_exclude import add_git_exclude
 
-        ok, msg = add_local_git_exclude(non_git_dir)
+        ok, msg = add_git_exclude(non_git_dir)
         assert ok
         assert "Not a git repository" in msg
         assert not (non_git_dir / ".gitignore").exists()
@@ -135,10 +135,10 @@ class TestAddLocalGitExclude:
     def test_worktree_writes_to_worktree_gitdir(self, worktree_dir: Path):
         from superclaude.cli.install_git_exclude import (
             MARKER_START,
-            add_local_git_exclude,
+            add_git_exclude,
         )
 
-        ok, _ = add_local_git_exclude(worktree_dir)
+        ok, _ = add_git_exclude(worktree_dir)
         assert ok
         # Resolve the worktree pointer to find the actual exclude file
         pointer = (worktree_dir / ".git").read_text(encoding="utf-8").strip()
@@ -151,7 +151,7 @@ class TestAddLocalGitExclude:
         from superclaude.cli.install_git_exclude import (
             MARKER_END,
             MARKER_START,
-            add_local_git_exclude,
+            add_git_exclude,
         )
 
         legacy = (
@@ -161,7 +161,7 @@ class TestAddLocalGitExclude:
         )
         gitignore = git_repo / ".gitignore"
         gitignore.write_text(legacy, encoding="utf-8")
-        ok, _ = add_local_git_exclude(git_repo)
+        ok, _ = add_git_exclude(git_repo)
         assert ok
         # Legacy gitignore should no longer contain the SC block
         gi_content = gitignore.read_text(encoding="utf-8")
@@ -178,14 +178,14 @@ class TestRemoveLocalGitExclude:
     def test_removes_block_preserves_other_content(self, git_repo: Path):
         from superclaude.cli.install_git_exclude import (
             MARKER_START,
-            add_local_git_exclude,
-            remove_local_git_exclude,
+            add_git_exclude,
+            remove_git_exclude,
         )
 
         exclude_file = git_repo / ".git" / "info" / "exclude"
         exclude_file.write_text("# template\n.beads/\n", encoding="utf-8")
-        add_local_git_exclude(git_repo)
-        ok, _ = remove_local_git_exclude(git_repo)
+        add_git_exclude(git_repo)
+        ok, _ = remove_git_exclude(git_repo)
         assert ok
         content = exclude_file.read_text(encoding="utf-8")
         assert MARKER_START not in content
@@ -193,23 +193,23 @@ class TestRemoveLocalGitExclude:
         assert "# template" in content
 
     def test_no_block_present_is_success(self, git_repo: Path):
-        from superclaude.cli.install_git_exclude import remove_local_git_exclude
+        from superclaude.cli.install_git_exclude import remove_git_exclude
 
-        ok, msg = remove_local_git_exclude(git_repo)
+        ok, msg = remove_git_exclude(git_repo)
         assert ok
         assert "no SC local block" in msg.lower() or "not found" in msg.lower()
 
     def test_non_git_dir_is_success(self, non_git_dir: Path):
-        from superclaude.cli.install_git_exclude import remove_local_git_exclude
+        from superclaude.cli.install_git_exclude import remove_git_exclude
 
-        ok, _ = remove_local_git_exclude(non_git_dir)
+        ok, _ = remove_git_exclude(non_git_dir)
         assert ok
 
     def test_legacy_gitignore_block_also_removed(self, git_repo: Path):
         from superclaude.cli.install_git_exclude import (
             MARKER_END,
             MARKER_START,
-            remove_local_git_exclude,
+            remove_git_exclude,
         )
 
         legacy = (
@@ -218,7 +218,7 @@ class TestRemoveLocalGitExclude:
         )
         gitignore = git_repo / ".gitignore"
         gitignore.write_text(legacy, encoding="utf-8")
-        ok, _ = remove_local_git_exclude(git_repo)
+        ok, _ = remove_git_exclude(git_repo)
         assert ok
         gi_content = gitignore.read_text(encoding="utf-8")
         assert MARKER_START not in gi_content
@@ -228,12 +228,12 @@ class TestRemoveLocalGitExclude:
 class TestHasFunctions:
     def test_has_exclude_block_true_after_add(self, git_repo: Path):
         from superclaude.cli.install_git_exclude import (
-            add_local_git_exclude,
+            add_git_exclude,
             has_exclude_block,
         )
 
         assert not has_exclude_block(git_repo)
-        add_local_git_exclude(git_repo)
+        add_git_exclude(git_repo)
         assert has_exclude_block(git_repo)
 
     def test_has_legacy_gitignore_block_true_when_present(self, git_repo: Path):
@@ -261,9 +261,9 @@ class TestAgentMemoryLocalIsExcluded:
     """
 
     def test_entry_present(self):
-        from superclaude.cli.install_git_exclude import _collect_local_entries
+        from superclaude.cli.install_git_exclude import _collect_entries
 
-        assert ".claude/agent-memory-local/" in _collect_local_entries()
+        assert ".claude/agent-memory-local/" in _collect_entries()
 
 
 class TestFrameworkStateIsExcluded:
@@ -276,9 +276,9 @@ class TestFrameworkStateIsExcluded:
     """
 
     def test_runtime_paths_are_listed(self):
-        from superclaude.cli.install_git_exclude import _collect_local_entries
+        from superclaude.cli.install_git_exclude import _collect_entries
 
-        entries = _collect_local_entries()
+        entries = _collect_entries()
 
         for path in (
             ".claude/.superclaude_hooks/",
@@ -287,3 +287,106 @@ class TestFrameworkStateIsExcluded:
             ".claude/agent-memory-local/",
         ):
             assert path in entries, f"{path} is written at runtime but not excluded"
+
+
+class TestProjectScopeBlock:
+    """What project scope may and may not keep out of the team's history.
+
+    Project scope exists so the team shares `.claude/` content. The two files
+    it cannot share are the ones carrying `{{PYTHON_BIN}}` — the installing
+    machine's absolute interpreter — because every teammate's own install
+    rewrites those same lines, producing a diff per developer.
+    """
+
+    def test_block_excludes_the_machine_specific_files(self, git_repo: Path):
+        from superclaude.cli.install_git_exclude import _collect_entries
+
+        entries = _collect_entries("project")
+
+        assert ".claude/settings.json" in entries
+        assert ".claude/hooks/hooks.json" in entries
+
+    def test_block_leaves_shared_content_tracked(self, git_repo: Path):
+        from superclaude.cli.install_git_exclude import _collect_entries
+
+        entries = _collect_entries("project")
+
+        for shared in (".claude/superclaude/", ".claude/commands/sc/"):
+            assert shared not in entries, (
+                f"{shared} is machine-independent content; excluding it would "
+                "defeat the scope"
+            )
+        assert not any(e.startswith(".claude/agents/") for e in entries)
+
+    def test_local_scope_still_excludes_everything_it_installs(self, git_repo: Path):
+        from superclaude.cli.install_git_exclude import _collect_entries
+
+        entries = _collect_entries("local")
+
+        assert ".claude/superclaude/" in entries
+        assert ".claude/commands/sc/" in entries
+        assert ".claude/settings.local.json" in entries
+
+    def test_written_block_reflects_the_scope(self, git_repo: Path):
+        from superclaude.cli.install_git_exclude import (
+            MARKER_START,
+            add_git_exclude,
+        )
+
+        ok, msg = add_git_exclude(git_repo, "project")
+
+        assert ok, msg
+        content = (git_repo / ".git" / "info" / "exclude").read_text(encoding="utf-8")
+        assert MARKER_START in content
+        assert ".claude/settings.json" in content
+        assert ".claude/superclaude/" not in content
+
+
+class TestMarkerGenerationMigration:
+    """The marker lost its ``(local scope)`` label once project scope used it.
+
+    An install predating the rename must have its block replaced, not joined by
+    a second one — two blocks would leave stale patterns behind forever.
+    """
+
+    def test_legacy_block_is_replaced_not_duplicated(self, git_repo: Path):
+        from superclaude.cli.install_git_exclude import (
+            _LEGACY_MARKER_PAIRS,
+            MARKER_START,
+            add_git_exclude,
+        )
+
+        legacy_start, legacy_end = _LEGACY_MARKER_PAIRS[0]
+        exclude_file = git_repo / ".git" / "info" / "exclude"
+        exclude_file.write_text(
+            f"{legacy_start}\n.claude/stale-entry/\n{legacy_end}\n",
+            encoding="utf-8",
+        )
+
+        ok, msg = add_git_exclude(git_repo, "local")
+
+        assert ok, msg
+        content = exclude_file.read_text(encoding="utf-8")
+        assert legacy_start not in content
+        assert ".claude/stale-entry/" not in content
+        assert content.count(MARKER_START) == 1
+
+    def test_removal_strips_a_legacy_block(self, git_repo: Path):
+        from superclaude.cli.install_git_exclude import (
+            _LEGACY_MARKER_PAIRS,
+            remove_git_exclude,
+        )
+
+        legacy_start, legacy_end = _LEGACY_MARKER_PAIRS[0]
+        exclude_file = git_repo / ".git" / "info" / "exclude"
+        exclude_file.write_text(
+            f"user-pattern\n{legacy_start}\n.claude/superclaude/\n{legacy_end}\n",
+            encoding="utf-8",
+        )
+
+        ok, msg = remove_git_exclude(git_repo)
+
+        assert ok, msg
+        content = exclude_file.read_text(encoding="utf-8")
+        assert legacy_start not in content
+        assert "user-pattern" in content
