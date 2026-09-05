@@ -20,7 +20,7 @@ uv run superclaude install --list-all      # Test CLI changes
 ## Developer Environment
 
 - `make deploy` runs `uv tool install --force --editable .` (CLI editable) only. Content sync is a separate scope-explicit step: `make sync-user` / `sync-project` / `sync-local`. The `--force` in sync targets is intentional — needed for non-interactive headless `claude -p` test scenarios. For interactive dev sync use `superclaude install -i`.
-- Template variable `{{SCRIPTS_PATH}}` resolved at install time
+- Hook commands are `superclaude hook <name>` (console entry; registry in `cli/hook_dispatch.py`) — no install-time template, no machine-specific bytes in a committed settings.json
 - Experimental Agent Teams: `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`
 - Personal config: `CLAUDE.local.md` (gitignored) imports `@.claude/superclaude/CLAUDE_SC.md` for framework activation in dev tree
 

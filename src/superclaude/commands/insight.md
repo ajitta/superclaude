@@ -96,7 +96,7 @@ description: Capture structured session insights to per-project JSONL for human 
 
   <gotchas>
   - script-only-writes: NEVER Write/echo on insights.jsonl. ALWAYS go through `superclaude insight append`. Script handle JSON escaping, schema check, annotation ref existence checks that hand-written code miss often.
-  - never-bare-python: NEVER invoke `python3 ~/.claude/superclaude/scripts/insight_writer.py` direct — script import `superclaude.utils`, absent from the install tree, so bare python3 raise ModuleNotFoundError. Only the console script `superclaude insight` (and hooks, which bake the installer interpreter) carry a resolving environment.
+  - never-bare-python: NEVER invoke `python3 ~/.claude/superclaude/scripts/insight_writer.py` direct — script import `superclaude.utils`, absent from the install tree, so bare python3 raise ModuleNotFoundError. Only the console script carries a resolving environment — `superclaude insight` for humans, `superclaude hook insight_writer` for the hooks.
   - jq-required: `--list`, `--query`, `--stats` need jq on PATH. If absent, script exit 1 with install URL — surface to user, no inline Python fallback.
   - review-requires-classification: Pending entries = raw text; must propose `--type` (feedback|decision|discovery|...) + optional tags before call promote. Never promote without show user what classification you plan.
   - discard-is-final: `discard` drop pending rows without filing them, and the harvest ledger keep the uuid — so a discarded marker never come back. Show user the rows + reason, get OK, then call. Batch every unwanted index into ONE `--index a,b,c` call: promote and discard both pop by index, so sequential single-index calls shift the list under you.

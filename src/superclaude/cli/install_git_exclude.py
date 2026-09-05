@@ -12,10 +12,11 @@ SuperClaude content (agents/skills/commands/superclaude/etc.) we manage
 the exclude file ourselves.
 
 The block is scope-dependent. Local scope excludes everything it installs —
-none of it is the team's. Project scope excludes only what cannot be shared:
-the two files carrying ``{{PYTHON_BIN}}`` (the installing machine's absolute
-interpreter, which every teammate's install rewrites) and rebuildable runtime
-state. Content stays tracked, because sharing it is what project scope is for.
+none of it is the team's. Project scope excludes only rebuildable runtime
+state: content and the hook registration (``settings.json``,
+``hooks/hooks.json``) stay tracked, because sharing them is what the scope is
+for, and every hook command is ``superclaude hook <name>`` — no interpreter, no
+script path — so each teammate's install writes the same bytes.
 
 The block is generated file-by-file from the shipped source inventory so
 team-shared files co-located in the same directories (e.g. a team-authored
@@ -31,6 +32,8 @@ Worktree support: when ``<root>/.git`` is a file (a worktree pointer),
 the worktree-specific gitdir's ``info/exclude`` is used.
 """
 
+import re
+import subprocess
 from pathlib import Path
 from typing import List, Optional, Tuple
 
@@ -58,11 +61,12 @@ def _has_any_marker(content: str) -> bool:
     return any(start in content for start, _ in _ALL_MARKER_PAIRS)
 
 
-# Paths a project-scope install must keep out of the team's history. Each one
-# either carries {{PYTHON_BIN}} — the absolute interpreter of whichever machine
-# ran the install, so every teammate's install rewrites the same lines — or is
-# rebuildable runtime state. Everything else a project install writes is
-# machine-independent content and stays tracked.
+# Paths a project-scope install must keep out of the team's history: runtime
+# state, rebuildable and written inside the worktree by every install.
+# Everything else a project install writes is machine-independent and stays
+# tracked — including settings.json and hooks/hooks.json, whose commands are
+# `superclaude hook <name>`. (Releases before the console entry baked the
+# installing machine's interpreter into both, and listed them here.)
 #
 # `.claude/agent-memory/` is deliberately absent. A project-scope install creates
 # it, so it shows up untracked, but committing reviewed team memory is a
@@ -73,8 +77,6 @@ def _has_any_marker(content: str) -> bool:
 _PROJECT_SCOPE_ENTRIES = [
     ".claude/.superclaude_hooks/",
     ".claude/insights.pending.jsonl",
-    ".claude/hooks/hooks.json",
-    ".claude/settings.json",
 ]
 
 
@@ -85,8 +87,8 @@ def _collect_entries(scope: str = "local") -> List[str]:
     keeps working. Commands and the superclaude core live in SC-only
     subdirectories, so directory-level ignores are safe there.
 
-    Project scope gets the fixed machine-specific subset instead: its whole
-    purpose is that the content IS committed.
+    Project scope gets the fixed runtime-state subset instead: its whole
+    purpose is that the content — and the hook registration — IS committed.
     """
     if scope == "project":
         return list(_PROJECT_SCOPE_ENTRIES)
@@ -336,3 +338,65 @@ def remove_git_exclude(project_root: Path) -> Tuple[bool, str]:
     except OSError as e:
         messages.append(f"Failed to update {exclude_file}: {e}")
         return False, "; ".join(messages)
+
+
+# One `git check-ignore -v` line: `<source>:<linenum>:<pattern>\t<path>`. The
+# source is matched greedily so a Windows drive letter (`C:/Users/x/.gitignore`)
+# keeps its line number.
+_CHECK_IGNORE_LINE_RE = re.compile(
+    r"^(?P<source>.*):(?P<line>\d+):(?P<pattern>.*)\t(?P<path>.*)$"
+)
+
+
+def _parse_check_ignore(stdout: str) -> List[Tuple[str, str, str]]:
+    """(source, line, path) for every rule that actually hides its path.
+
+    Two kinds of line are dropped. A negation pattern (`!.claude/settings.json`)
+    is printed by `-v` as the winning rule, yet it means the path is NOT
+    ignored — reporting it would tell the user to delete the whitelist that
+    makes the file committable. A rule from an `info/exclude` file is per-clone
+    (SuperClaude's own block, or the user's), not a team rule, so it is not what
+    this check is about.
+    """
+    found: List[Tuple[str, str, str]] = []
+    for line in stdout.splitlines():
+        match = _CHECK_IGNORE_LINE_RE.match(line)
+        if not match:
+            continue
+        if match["pattern"].startswith("!"):
+            continue
+        if match["source"].replace("\\", "/").endswith("info/exclude"):
+            continue
+        found.append((match["source"], match["line"], match["path"]))
+    return found
+
+
+def find_team_ignores(
+    project_root: Path, paths: List[str]
+) -> List[Tuple[str, str, str]]:
+    """Team-level ignore rules that hide ``paths`` from the team's history.
+
+    Project scope promises the hook registration is committed, and this module
+    stopped excluding it — but a team-level ``.gitignore`` or a global excludes
+    file can still hide it, silently: install reports success and nothing ever
+    reaches the repository. ``git check-ignore -v`` names the rule that wins.
+    Tracked files are never reported (git's own rule), so an already-committed
+    registration stays quiet; negation patterns and per-clone ``info/exclude``
+    rules are dropped by ``_parse_check_ignore``.
+
+    Returns:
+        (source, line, path) per ignored path; empty when nothing is ignored,
+        when this is not a git repository, or when git is unavailable.
+    """
+    try:
+        result = subprocess.run(
+            ["git", "-C", str(project_root), "check-ignore", "-v", "--", *paths],
+            capture_output=True,
+            text=True,
+            timeout=15,
+        )
+    except (OSError, subprocess.TimeoutExpired):
+        return []
+    if result.returncode != 0:  # 1: nothing ignored; 128: not a repository
+        return []
+    return _parse_check_ignore(result.stdout)

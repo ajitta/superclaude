@@ -21,7 +21,7 @@ class TestIsSuperclaudeHook:
         self.is_sc_hook = _is_superclaude_hook
 
     def test_detects_session_init_command(self):
-        """SC hook detected via resolved superclaude scripts path (user scope)."""
+        """SC hook detected via the legacy resolved scripts path (user scope)."""
         hook = {
             "hooks": [
                 {"command": "python ~/.claude/superclaude/scripts/session_init.py"}
@@ -30,7 +30,7 @@ class TestIsSuperclaudeHook:
         assert self.is_sc_hook(hook) is True
 
     def test_detects_prettier_hook_command(self):
-        """SC hook detected via project-scope superclaude scripts path."""
+        """SC hook detected via the legacy project-scope scripts path."""
         hook = {
             "hooks": [
                 {
@@ -41,7 +41,7 @@ class TestIsSuperclaudeHook:
         assert self.is_sc_hook(hook) is True
 
     def test_detects_test_runner_hook_command(self):
-        """SC hook detected via Windows backslash superclaude scripts path."""
+        """SC hook detected via the legacy Windows-backslash scripts path."""
         hook = {
             "hooks": [
                 {
@@ -52,8 +52,20 @@ class TestIsSuperclaudeHook:
         assert self.is_sc_hook(hook) is True
 
     def test_detects_unresolved_template_command(self):
-        """SC hook detected via unresolved {{SCRIPTS_PATH}} template form."""
+        """SC hook detected via the legacy unresolved {{SCRIPTS_PATH}} form."""
         hook = {"hooks": [{"command": "python {{SCRIPTS_PATH}}/session_init.py"}]}
+        assert self.is_sc_hook(hook) is True
+
+    def test_detects_console_entry_command(self):
+        """SC hook detected via `superclaude hook <name>`, the form every
+        shipped command takes — no path, no interpreter to match on."""
+        hook = {"hooks": [{"command": "superclaude hook session_init"}]}
+        assert self.is_sc_hook(hook) is True
+
+    def test_detects_console_entry_command_with_subcommand(self):
+        hook = {
+            "hooks": [{"command": "superclaude hook insight_writer harvest-from-hook"}]
+        }
         assert self.is_sc_hook(hook) is True
 
     def test_user_hook_with_sc_script_name_not_detected(self):
@@ -1034,3 +1046,330 @@ class TestForceSweepsRetiredEvents:
             h["command"] for e in events.get("TeammateIdle", []) for h in e["hooks"]
         ]
         assert commands == ["notify-send idle"]
+
+
+class TestHookIdentityAcrossCommandForms:
+    """`superclaude hook <name>` and the previous release's `<python>
+    <dir>/<name>.py` are the same hook — as is the console script invoked by
+    an absolute path.
+
+    Identity decides what a non-force upgrade appends. If two forms read as
+    different hooks, an install over an existing registration appends every
+    shipped hook beside its twin — and a doubled loop_guard trips its circuit
+    breaker at half the intended error count. Pinning `~/.local/bin/superclaude`
+    is exactly the workaround a user reaches for when Claude Code's hook shell
+    has a narrow PATH, so that form has to be both owned and identified.
+    """
+
+    LEGACY = "/usr/bin/python3 /home/x/.claude/superclaude/scripts"
+    PINNED = "/Users/alice/.local/bin/superclaude hook loop_guard"
+    PINNED_WINDOWS = "C:/Users/bob/.local/bin/superclaude.exe hook loop_guard"
+    # A directory with a space forces quoting — the default all-users Windows
+    # location and any "First Last" user name produce exactly this.
+    PINNED_QUOTED = (
+        '"C:/Program Files/Python312/Scripts/superclaude.exe" hook loop_guard'
+    )
+    PINNED_QUOTED_POSIX = "'/Users/first last/.local/bin/superclaude' hook loop_guard"
+
+    def test_console_entry_and_legacy_path_are_the_same_hook(self):
+        from superclaude.cli.install_settings import _hook_script_id
+
+        current = _hook_script_id(
+            {"command": "superclaude hook insight_writer harvest-from-hook"}
+        )
+        legacy = _hook_script_id(
+            {"command": f"{self.LEGACY}/insight_writer.py harvest-from-hook"}
+        )
+
+        assert current == legacy == ("insight_writer", "harvest-from-hook")
+
+    def test_the_subcommand_still_separates_entry_points(self):
+        from superclaude.cli.install_settings import _hook_script_id
+
+        harvest = _hook_script_id(
+            {"command": "superclaude hook insight_writer harvest-from-hook"}
+        )
+        request = _hook_script_id(
+            {"command": "superclaude hook insight_writer request-from-hook"}
+        )
+
+        assert harvest != request
+
+    def test_an_option_is_not_a_subcommand(self):
+        from superclaude.cli.install_settings import _hook_script_id
+
+        assert _hook_script_id({"command": "superclaude hook loop_guard --quiet"}) == (
+            "loop_guard",
+            "",
+        )
+
+    @pytest.mark.parametrize(
+        "suffix",
+        [
+            "| tee /tmp/lg.log",
+            "2>>/tmp/hooks.log",
+            "; echo ok",
+            "|| true",
+            "&& echo done",
+        ],
+    )
+    def test_a_shell_operator_after_the_name_is_not_a_subcommand(self, suffix):
+        """A user who wraps our command in a pipeline runs the same hook; the
+        operator must not become an identity of its own, or the shipped hook is
+        appended beside it on every non-force install."""
+        from superclaude.cli.install_settings import _hook_script_id
+
+        assert _hook_script_id(
+            {"command": f"superclaude hook loop_guard {suffix}"}
+        ) == (
+            "loop_guard",
+            "",
+        )
+
+    def test_a_command_in_neither_form_falls_back_to_its_text(self):
+        from superclaude.cli.install_settings import _hook_script_id
+
+        assert _hook_script_id({"command": "npm   run lint"}) == ("npm run lint", "")
+
+    @pytest.mark.parametrize(
+        "command", [PINNED, PINNED_WINDOWS, PINNED_QUOTED, PINNED_QUOTED_POSIX]
+    )
+    def test_a_path_prefixed_console_script_is_the_same_hook(self, command):
+        from superclaude.cli.install_settings import (
+            _hook_script_id,
+            _is_superclaude_hook,
+        )
+
+        assert _hook_script_id({"command": command}) == ("loop_guard", "")
+        assert _is_superclaude_hook({"hooks": [{"command": command}]}) is True
+
+    def test_a_pinned_console_path_is_kept_and_not_doubled(self):
+        """The user's workaround for a narrow hook-shell PATH survives a
+        non-force install: not appended beside, not rewritten away."""
+        from superclaude.cli.install_settings import _merge_hook_arrays
+
+        existing = [{"matcher": "Edit", "hooks": [{"command": self.PINNED}]}]
+        shipped = [
+            {
+                "matcher": "Edit",
+                "hooks": [
+                    {
+                        "_comment": "[superclaude] x",
+                        "command": "superclaude hook loop_guard",
+                    }
+                ],
+            }
+        ]
+
+        merged = _merge_hook_arrays(existing, shipped, force=False)
+
+        assert [h["command"] for e in merged for h in e["hooks"]] == [self.PINNED]
+
+    def test_a_non_force_upgrade_rewrites_a_legacy_command_and_keeps_the_users_edits(
+        self,
+    ):
+        """The command is ours; the matcher, timeout and position are the
+        user's. A legacy `<python> <dir>/<name>.py` command names the installing
+        machine, which a committed project-scope settings.json must not carry,
+        so it is rewritten in place — nothing appended, nothing else touched."""
+        from superclaude.cli.install_settings import _merge_hook_arrays
+
+        existing = [
+            {
+                "matcher": "Edit|Write",
+                "hooks": [
+                    {
+                        "_comment": "[superclaude] safety — circuit breaker",
+                        "type": "command",
+                        "command": f"{self.LEGACY}/loop_guard.py",
+                        "timeout": 7,
+                    }
+                ],
+            }
+        ]
+        shipped = [
+            {
+                "matcher": "Edit|Write|Bash",
+                "hooks": [
+                    {
+                        "_comment": "[superclaude] safety — circuit breaker",
+                        "type": "command",
+                        "command": "superclaude hook loop_guard",
+                        "timeout": 5,
+                    }
+                ],
+            }
+        ]
+
+        merged = _merge_hook_arrays(existing, shipped, force=False)
+
+        assert len(merged) == 1 and len(merged[0]["hooks"]) == 1
+        assert merged[0]["matcher"] == "Edit|Write"
+        assert merged[0]["hooks"][0]["timeout"] == 7
+        assert merged[0]["hooks"][0]["command"] == "superclaude hook loop_guard"
+        assert existing[0]["hooks"][0]["command"].endswith("loop_guard.py"), (
+            "the caller's objects were mutated; the changed-or-not comparison "
+            "in merge_hooks_to_settings relies on them staying as loaded"
+        )
+        assert _merge_hook_arrays(existing, shipped, force=True) == shipped
+
+    def test_a_legacy_hook_this_release_no_longer_ships_is_left_alone(self):
+        from superclaude.cli.install_settings import _merge_hook_arrays
+
+        existing = [
+            {
+                "matcher": "Edit",
+                "hooks": [
+                    {
+                        "_comment": "[superclaude] retired",
+                        "command": f"{self.LEGACY}/retired_thing.py",
+                    }
+                ],
+            }
+        ]
+        shipped = [
+            {
+                "matcher": "Edit",
+                "hooks": [
+                    {
+                        "_comment": "[superclaude] x",
+                        "command": "superclaude hook loop_guard",
+                    }
+                ],
+            }
+        ]
+
+        merged = _merge_hook_arrays(existing, shipped, force=False)
+        commands = [h["command"] for e in merged for h in e["hooks"]]
+
+        assert commands == [
+            f"{self.LEGACY}/retired_thing.py",
+            "superclaude hook loop_guard",
+        ]
+
+
+def _shipped_hooks_config() -> dict:
+    import json
+
+    root = Path(__file__).resolve().parents[2] / "src" / "superclaude"
+    return json.loads((root / "hooks" / "hooks.json").read_text(encoding="utf-8"))
+
+
+class TestMergeWritesOnlyWhenTheHooksChange:
+    """A committed settings.json must not be dirtied by an install that had
+    nothing to merge.
+
+    The merge used to save unconditionally, so a file another writer had last
+    saved — Claude Code's own settings UI ends the file with a newline, this
+    installer did not — came back modified on every teammate's install while
+    the message said "already registered". Zero churn is the whole point of
+    making the file team-shared.
+    """
+
+    def _settings_with_shipped_hooks(self, base: Path, force_layout: bool) -> bytes:
+        import json
+
+        config = _shipped_hooks_config()
+        text = json.dumps({"hooks": config["hooks"]}, indent=4, ensure_ascii=False)
+        if force_layout:
+            text += "\n"
+        base.mkdir(parents=True, exist_ok=True)
+        (base / "settings.json").write_text(text, encoding="utf-8")
+        return (base / "settings.json").read_bytes()
+
+    @pytest.mark.parametrize("force", [False, True])
+    def test_an_already_current_file_is_not_rewritten(self, tmp_path, force):
+        from superclaude.cli.install_settings import merge_hooks_to_settings
+
+        base = tmp_path / ".claude"
+        before = self._settings_with_shipped_hooks(base, force_layout=True)
+
+        ok, message = merge_hooks_to_settings(
+            base, _shipped_hooks_config(), scope="project", force=force
+        )
+
+        assert ok, message
+        assert (base / "settings.json").read_bytes() == before, (
+            "the file was re-serialised although the hooks section did not change"
+        )
+        assert "already registered" in message
+
+    def test_a_legacy_registration_is_rewritten_and_the_message_says_so(self, tmp_path):
+        import json
+
+        from superclaude.cli.install_settings import merge_hooks_to_settings
+
+        base = tmp_path / ".claude"
+        base.mkdir(parents=True)
+        legacy = {
+            "hooks": {
+                "PreToolUse": [
+                    {
+                        "matcher": "Bash",
+                        "hooks": [
+                            {
+                                "_comment": "[superclaude] safety",
+                                "type": "command",
+                                "command": (
+                                    "/opt/py/bin/python3 /home/x/.claude/superclaude/"
+                                    "scripts/destructive_guard.py"
+                                ),
+                                "timeout": 5,
+                            }
+                        ],
+                    }
+                ]
+            }
+        }
+        (base / "settings.json").write_text(json.dumps(legacy), encoding="utf-8")
+
+        ok, message = merge_hooks_to_settings(
+            base, _shipped_hooks_config(), scope="user", force=False
+        )
+
+        assert ok, message
+        assert "1 legacy command(s) rewritten" in message
+        written = json.loads((base / "settings.json").read_text(encoding="utf-8"))
+        commands = [
+            h["command"]
+            for array in written["hooks"].values()
+            for entry in array
+            for h in entry["hooks"]
+        ]
+        assert all(c.startswith("superclaude hook ") for c in commands), commands
+
+    def test_force_removing_a_retired_legacy_hook_does_not_claim_a_rewrite(
+        self, tmp_path
+    ):
+        """The count is of rewrites, not of legacy commands that went away for
+        any reason: a retired hook `--force` deletes was not rewritten."""
+        import json
+
+        from superclaude.cli.install_settings import merge_hooks_to_settings
+
+        base = tmp_path / ".claude"
+        base.mkdir(parents=True)
+        retired = {
+            "hooks": {
+                "PreToolUse": [
+                    {
+                        "matcher": "Bash",
+                        "hooks": [
+                            {
+                                "_comment": "[superclaude] retired",
+                                "type": "command",
+                                "command": "/opt/py/bin/python3 /h/.claude/superclaude/scripts/retired_thing.py",
+                            }
+                        ],
+                    }
+                ]
+            }
+        }
+        (base / "settings.json").write_text(json.dumps(retired), encoding="utf-8")
+
+        ok, message = merge_hooks_to_settings(
+            base, _shipped_hooks_config(), scope="user", force=True
+        )
+
+        assert ok, message
+        assert "rewritten" not in message, message

@@ -56,7 +56,13 @@ def _always_loaded_core() -> int:
 def _hook_entry_scripts() -> tuple[int, int]:
     """(distinct scripts, total registrations) referenced by hooks.json."""
     raw = (_PKG / "hooks" / "hooks.json").read_text(encoding="utf-8")
-    refs = re.findall(r"([A-Za-z0-9_]+\.py)", json.dumps(json.loads(raw)))
+    commands = [
+        hook["command"]
+        for array in json.loads(raw)["hooks"].values()
+        for entry in array
+        for hook in entry["hooks"]
+    ]
+    refs = [re.match(r"superclaude hook ([A-Za-z0-9_]+)", c).group(1) for c in commands]
     return len(set(refs)), len(refs)
 
 

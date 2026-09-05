@@ -31,9 +31,10 @@ if TYPE_CHECKING:
     from superclaude.scripts.token_estimator import TokenEstimate
 
 # Scope-aware path resolution. Imported unconditionally: superclaude.utils is
-# stdlib-only, and hooks.json runs these scripts with the installer's own
-# interpreter ({{PYTHON_BIN}} = sys.executable), which has the package. Silently
-# degrading here would put state and content lookups in the wrong scope.
+# stdlib-only, and hooks.json runs this script as `superclaude hook
+# context_loader`, i.e. under the console script's own interpreter, which has
+# the package. Silently degrading here would put state and content lookups in
+# the wrong scope.
 from superclaude.utils import claude_base, context_cache_file
 
 # v2.2.0: MCP fallback notification support

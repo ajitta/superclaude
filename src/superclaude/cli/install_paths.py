@@ -6,12 +6,19 @@ Leaf dependency: imports no other cli module, so every install module can import
 it without a cycle. superclaude.utils is allowed — it imports nothing from cli.
 """
 
+import functools
+import os
+import re
+import shutil
+import subprocess
+import sys
 from pathlib import Path
+from typing import Any, Dict, List, Optional
 
 from superclaude.utils import detect_scope, same_dir
 
 # Component definitions: (source_subdir, target_subdir, description)
-# Note: hooks and scripts are handled specially by install_hooks_and_scripts()
+# Note: the hook registration is handled separately by install_hooks()
 COMPONENTS = {
     "commands": ("commands", "commands/sc", "Slash commands"),
     "agents": ("agents", "agents", "Agent definitions"),
@@ -180,3 +187,62 @@ def find_legacy_skills(base_path: Path) -> list:
     return [
         skills_dir / name for name in LEGACY_SKILL_NAMES if (skills_dir / name).is_dir()
     ]
+
+
+def _run(argv: List[str]) -> Optional[subprocess.CompletedProcess]:
+    try:
+        return subprocess.run(argv, capture_output=True, text=True, timeout=15)
+    except (OSError, subprocess.TimeoutExpired):
+        return None
+
+
+@functools.lru_cache(maxsize=1)
+def probe_console_script() -> Dict[str, Any]:
+    """Where Claude Code's hook shell will find `superclaude`, and what it can do.
+
+    Searches this process's PATH minus, when this interpreter is a virtual
+    environment, its own bin directory. `uv run` (every `make sync-*` target)
+    prepends the project venv, so a plain `shutil.which` found the venv's shim
+    even when the user's shell — the one Claude Code inherits PATH from — had no
+    `superclaude` at all, and the warning this feeds could never fire from the
+    documented install path. A base interpreter's scripts directory is left in:
+    `/usr/bin` after a system pip install, `C:\\PythonXY\\Scripts` from a
+    python.org install, a conda base — those are the user's permanent PATH
+    entries, and excluding them made a working layout read as broken. The
+    script that is found is asked for `hook --help` (does it carry the
+    subcommand at all?) and its version, because whichever `superclaude` PATH
+    resolves is the package whose hooks run, not necessarily the one writing
+    the registration.
+
+    Cached: one probe per process; the answer cannot change mid-install.
+
+    Returns:
+        ``path``: the console script, or None. ``excluded``: the own-bin PATH
+        entry that was left out, or None. ``has_hook``: whether it answers
+        `hook --help` with exit 0 (None when nothing was found). ``version``:
+        what its `--version` reports, or None.
+    """
+    in_virtualenv = sys.prefix != getattr(sys, "base_prefix", sys.prefix)
+    own_bin = Path(sys.prefix) / ("Scripts" if os.name == "nt" else "bin")
+    excluded = None
+    search: List[str] = []
+    for entry in os.environ.get("PATH", "").split(os.pathsep):
+        if in_virtualenv and entry and same_dir(Path(entry), own_bin):
+            excluded = entry
+            continue
+        search.append(entry)
+    found = shutil.which("superclaude", path=os.pathsep.join(search))
+    probe: Dict[str, Any] = {
+        "path": found,
+        "excluded": excluded,
+        "has_hook": None,
+        "version": None,
+    }
+    if found is None:
+        return probe
+    help_run = _run([found, "hook", "--help"])
+    probe["has_hook"] = help_run is not None and help_run.returncode == 0
+    version_run = _run([found, "--version"])
+    match = re.search(r"version\s+(\S+)", version_run.stdout if version_run else "")
+    probe["version"] = match.group(1) if match else None
+    return probe

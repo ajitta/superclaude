@@ -6,6 +6,8 @@ Tests the command installation functionality.
 
 from pathlib import Path
 
+import pytest
+
 from superclaude.cli.install_commands import (
     install_commands,
     list_available_commands,
@@ -328,44 +330,56 @@ class TestAgentMemoryDirectory:
 
 
 class TestFrameworkArtifactsAlwaysUpdate:
-    """Scripts and hooks.json are build outputs, so an upgrade must refresh them.
+    """hooks.json is a build output, so an upgrade must refresh it.
 
-    `superclaude install` without `--force` used to skip any script already on
-    disk while still merging the *package's* hooks.json into settings.json. A
-    release that adds a hook therefore registered a subcommand the installed
-    script did not implement: `insight_writer.py request-from-hook` reached
-    argparse, exited 2 — the blocking code on `Stop` — and pushed usage text back
-    into the model on every turn. The mirror failure is that none of a release's
-    script fixes shipped either.
-
-    These files are SuperClaude-owned outputs, not user-editable content, so
-    `--force` keeps its meaning for settings, commands, agents and core only.
+    The scripts a hook runs ship inside the package now — every command is
+    `superclaude hook <name>` — so the version skew that motivated this class
+    (a release registering `insight_writer request-from-hook` against an
+    installed script copy that did not implement it: argparse exit 2, the
+    blocking code on `Stop`, on every turn) cannot recur: the script and the
+    registration come from the same install. What is still on disk per
+    install, hooks.json, is SuperClaude-owned output, not user-editable content,
+    so `--force` keeps its meaning for settings, commands, agents and core only.
     """
 
-    def test_stale_script_is_replaced_without_force(self, tmp_path):
-        from superclaude.cli.install_components import install_hooks_and_scripts
+    def test_no_script_copies_are_installed(self, tmp_path):
+        from superclaude.cli.install_components import install_hooks
 
         base = tmp_path / ".claude"
-        scripts_target = base / "superclaude" / "scripts"
-        scripts_target.mkdir(parents=True)
-        stale = scripts_target / "insight_writer.py"
-        stale.write_text(
-            "# previous release, no request subcommand\n", encoding="utf-8"
-        )
-
-        installed, _skipped, failed, messages = install_hooks_and_scripts(
-            base_path=base, force=False, scope="user"
+        _installed, _skipped, failed, messages = install_hooks(
+            base_path=base, force=True, scope="user"
         )
 
         assert failed == 0, messages
-        assert "request-from-hook" in stale.read_text(encoding="utf-8"), (
-            "a non-force install left the previous release's script in place while "
-            "registering a hook that needs the new one"
+        assert not (base / "superclaude" / "scripts").exists()
+
+    def test_legacy_script_copies_are_left_in_place_and_named(self, tmp_path):
+        """A previous release's copies are NOT deleted on upgrade.
+
+        Claude Code snapshots hook commands at session start, so a session
+        already running keeps executing the old registration against these
+        files; python's "can't open file" is exit 2, the blocking code, and
+        deleting them under a live session blocks every tool call until
+        restart. The install says what they are and when to remove them.
+        """
+        from superclaude.cli.install_components import install_hooks
+
+        base = tmp_path / ".claude"
+        legacy = base / "superclaude" / "scripts"
+        legacy.mkdir(parents=True)
+        (legacy / "loop_guard.py").write_text("# previous release\n", encoding="utf-8")
+
+        _installed, _skipped, failed, messages = install_hooks(
+            base_path=base, force=True, scope="user"
         )
-        assert installed > 0
+
+        assert failed == 0, messages
+        assert (legacy / "loop_guard.py").exists()
+        notice = [m for m in messages if str(legacy) in m]
+        assert notice and "restart" in notice[0].lower(), messages
 
     def test_stale_hooks_json_is_replaced_without_force(self, tmp_path):
-        from superclaude.cli.install_components import install_hooks_and_scripts
+        from superclaude.cli.install_components import install_hooks
 
         base = tmp_path / ".claude"
         hooks_target = base / "hooks"
@@ -373,7 +387,7 @@ class TestFrameworkArtifactsAlwaysUpdate:
         stale = hooks_target / "hooks.json"
         stale.write_text('{"hooks": {}}\n', encoding="utf-8")
 
-        _installed, _skipped, failed, messages = install_hooks_and_scripts(
+        _installed, _skipped, failed, messages = install_hooks(
             base_path=base, force=False, scope="user"
         )
 
@@ -385,12 +399,16 @@ class TestFrameworkArtifactsAlwaysUpdate:
     def test_every_registered_command_is_supported_by_its_script(self):
         """The invariant that would have caught the version skew at authoring time.
 
-        Each `command` in hooks.json names a script and, sometimes, a subcommand.
-        Both have to exist in the shipped script.
+        Each `command` in hooks.json is `superclaude hook <name> [subcommand]`.
+        The name has to be in the dispatcher's registry, arguments may only go
+        to a hook that forwards them, and a subcommand has to be one the shipped
+        script's own parser accepts.
         """
         import json
         import re
         from pathlib import Path
+
+        from superclaude.cli.hook_dispatch import HOOKS
 
         package_root = Path(__file__).parent.parent.parent / "src" / "superclaude"
         config = json.loads(
@@ -402,21 +420,32 @@ class TestFrameworkArtifactsAlwaysUpdate:
             for entry in entries:
                 for hook in entry.get("hooks", []):
                     command = hook.get("command", "")
-                    match = re.search(r"([A-Za-z0-9_]+\.py)(.*)$", command)
+                    match = re.fullmatch(
+                        r"superclaude hook ([A-Za-z0-9_]+)(.*)", command
+                    )
                     assert match, f"{event}: cannot parse command {command!r}"
 
-                    script = package_root / "scripts" / match.group(1)
-                    if not script.exists():
-                        unsupported.append(f"{event}: {match.group(1)} does not ship")
+                    name = match.group(1)
+                    if name not in HOOKS:
+                        unsupported.append(f"{event}: {name} is not a registered hook")
+                        continue
+                    _module, forwards_argv = HOOKS[name]
+                    tokens = match.group(2).split()
+                    if tokens and not forwards_argv:
+                        unsupported.append(
+                            f"{event}: {name} takes no arguments but is given {tokens}"
+                        )
                         continue
 
-                    source = script.read_text(encoding="utf-8")
-                    for token in match.group(2).split():
+                    source = (package_root / "scripts" / f"{name}.py").read_text(
+                        encoding="utf-8"
+                    )
+                    for token in tokens:
                         if token.startswith("-"):
                             continue
                         if f'"{token}"' not in source and f"'{token}'" not in source:
                             unsupported.append(
-                                f"{event}: {match.group(1)} does not accept {token!r}"
+                                f"{event}: {name} does not accept {token!r}"
                             )
 
         assert not unsupported, "\n".join(unsupported)
@@ -763,14 +792,16 @@ class TestLegacySkillsArePrunedOnUpgrade:
         assert "pre-removal" not in message
 
 
-class TestHookScriptPathPerScope:
-    """Which anchor each scope's hook command names, and why they differ.
+class TestHookCommandsCarryNoMachineBytes:
+    """The registration is the same bytes on every machine, at every scope.
 
-    A linked git worktree is where the two anchors part company: Claude Code
-    reads the settings file that registered the hook from the MAIN worktree
-    while expanding ``$CLAUDE_PROJECT_DIR`` to the linked one. A command built
-    from that variable then misses by a whole directory, so only the scope
-    whose settings file is genuinely shared should pay for portability.
+    Releases before the console entry baked two machine-specific halves into
+    each command: the installer's interpreter and the directory holding a copy
+    of the script. Project scope's committed settings.json was therefore
+    rewritten by every teammate's install, and a linked git worktree — where
+    Claude Code reads settings from the MAIN worktree but expands
+    ``$CLAUDE_PROJECT_DIR`` to the linked one — broke every hook that named a
+    directory through that variable. `superclaude hook <name>` names neither.
     """
 
     @staticmethod
@@ -778,10 +809,9 @@ class TestHookScriptPathPerScope:
         """Commands as Claude Code will read them: from the settings file.
 
         Deliberately NOT ``.claude/hooks/hooks.json``. Both are written from the
-        same transformed content today, but the settings file is the one CC
-        actually loads and the one that broke in a worktree; asserting on the
-        intermediate artifact would keep this test green through a regression in
-        the merge path.
+        same content today, but the settings file is the one CC actually loads;
+        asserting on the intermediate artifact would keep this test green
+        through a regression in the merge path.
         """
         import json
 
@@ -798,57 +828,351 @@ class TestHookScriptPathPerScope:
             if "superclaude" in hook.get("command", "")
         ]
 
-    def test_local_scope_bakes_an_absolute_scripts_path(self, tmp_path):
-        from superclaude.cli.install_components import install_hooks_and_scripts
+    @pytest.mark.parametrize("scope", ["user", "project", "local"])
+    def test_every_command_is_the_bare_console_entry(self, tmp_path, scope):
+        import sys
+
+        from superclaude.cli.install_components import install_hooks
 
         base = tmp_path / ".claude"
-        scope = "local"
-        _installed, _skipped, failed, messages = install_hooks_and_scripts(
+        _installed, _skipped, failed, messages = install_hooks(
             base_path=base, force=True, scope=scope
         )
 
         assert failed == 0, messages
         commands = self._hook_commands(base, scope)
         assert commands
-        expected = str((base / "superclaude" / "scripts").resolve())
         for command in commands:
-            assert "$CLAUDE_PROJECT_DIR" not in command, (
-                "settings.local.json is never shared and already carries an "
-                "absolute interpreter, so the variable buys nothing and breaks "
-                "in a worktree"
+            assert command.startswith("superclaude hook "), command
+            assert str(tmp_path) not in command, "install directory baked in"
+            assert sys.executable not in command, "interpreter baked in"
+            assert "$CLAUDE_PROJECT_DIR" not in command, "worktree-fragile anchor"
+            assert ".py" not in command, "script path baked in"
+
+    def test_two_machines_write_byte_identical_settings(self, tmp_path, monkeypatch):
+        """Project scope's whole promise: two developers, two interpreters, two
+        checkout paths, one committed settings.json with no diff between them."""
+        import sys
+
+        from superclaude.cli.install_components import install_hooks
+
+        written = []
+        for machine, interpreter in (
+            ("alice", "/opt/homebrew/bin/python3.13"),
+            ("bob", "C:/Users/bob/AppData/Local/Programs/Python/python.exe"),
+        ):
+            base = tmp_path / machine / "checkout" / ".claude"
+            monkeypatch.setattr(sys, "executable", interpreter)
+            _installed, _skipped, failed, messages = install_hooks(
+                base_path=base, force=True, scope="project"
             )
-            assert expected in command
-
-    def test_project_scope_keeps_the_shared_anchor(self, tmp_path):
-        from superclaude.cli.install_components import install_hooks_and_scripts
-
-        base = tmp_path / ".claude"
-        scope = "project"
-        _installed, _skipped, failed, messages = install_hooks_and_scripts(
-            base_path=base, force=True, scope=scope
-        )
-
-        assert failed == 0, messages
-        commands = self._hook_commands(base, scope)
-        assert commands
-        for command in commands:
-            assert "$CLAUDE_PROJECT_DIR/.claude/superclaude/scripts" in command, (
-                "project scope's settings.json is committed, so the script half "
-                "must not name one machine's checkout"
+            assert failed == 0, messages
+            written.append(
+                (
+                    (base / "settings.json").read_bytes(),
+                    (base / "hooks" / "hooks.json").read_bytes(),
+                )
             )
 
-    def test_user_scope_is_unchanged(self, tmp_path):
-        from superclaude.cli.install_components import install_hooks_and_scripts
+        assert written[0] == written[1]
+
+    def test_the_installed_hooks_json_is_the_shipped_one_verbatim(self, tmp_path):
+        from superclaude.cli.install_components import install_hooks
+        from superclaude.cli.install_paths import _get_package_root
 
         base = tmp_path / ".claude"
-        scope = "user"
-        _installed, _skipped, failed, messages = install_hooks_and_scripts(
-            base_path=base, force=True, scope=scope
+        install_hooks(base_path=base, force=True, scope="project")
+
+        shipped = (_get_package_root() / "hooks" / "hooks.json").read_bytes()
+        assert (base / "hooks" / "hooks.json").read_bytes() == shipped
+
+
+def _legacy_registration(base: Path, names: list[str], interpreter: str) -> None:
+    """A settings.json the previous release would have written: resolved
+    interpreter plus a script copy under <base>/superclaude/scripts/."""
+    import json
+
+    scripts = base / "superclaude" / "scripts"
+    scripts.mkdir(parents=True, exist_ok=True)
+    entries = []
+    for name in names:
+        (scripts / f"{name}.py").write_text("# previous release\n", encoding="utf-8")
+        entries.append(
+            {
+                "matcher": "Bash",
+                "hooks": [
+                    {
+                        "_comment": f"[superclaude] {name}",
+                        "type": "command",
+                        "command": f"{interpreter} {scripts}/{name}.py",
+                        "timeout": 5,
+                    }
+                ],
+            }
+        )
+    (base / "settings.json").write_text(
+        json.dumps({"hooks": {"PreToolUse": entries}}), encoding="utf-8"
+    )
+
+
+def _sc_commands(base: Path, scope: str) -> list[str]:
+    import json
+
+    from superclaude.utils import settings_filename
+
+    config = json.loads((base / settings_filename(scope)).read_text(encoding="utf-8"))
+    return [
+        hook["command"]
+        for event in config["hooks"].values()
+        for group in event
+        for hook in group["hooks"]
+    ]
+
+
+class TestUpgradeFromALegacyRegistration:
+    """The default (non-force) install over a previous release's registration.
+
+    That release's commands named the installing machine's interpreter and
+    checkout. Project scope now commits the file, so leaving those commands
+    in place on the default upgrade exposed them for commit — while the
+    legacy-scripts notice told the user to delete the directory those very
+    commands still ran.
+    """
+
+    def test_non_force_rewrites_every_legacy_command(self, tmp_path):
+        from superclaude.cli.install_components import install_hooks
+
+        base = tmp_path / ".claude"
+        _legacy_registration(
+            base, ["destructive_guard", "loop_guard"], "/opt/py/bin/python3"
+        )
+
+        _i, _s, failed, messages = install_hooks(
+            base_path=base, force=False, scope="user"
         )
 
         assert failed == 0, messages
-        expected = str((base / "superclaude" / "scripts").resolve())
-        commands = self._hook_commands(base, scope)
-        assert commands
-        for command in commands:
-            assert expected in command
+        commands = _sc_commands(base, "user")
+        assert commands and all(c.startswith("superclaude hook ") for c in commands), (
+            commands
+        )
+        assert any("2 legacy command(s) rewritten" in m for m in messages), messages
+
+    def test_notice_says_remove_after_restart_once_nothing_runs_the_copies(
+        self, tmp_path
+    ):
+        from superclaude.cli.install_components import install_hooks
+
+        base = tmp_path / ".claude"
+        _legacy_registration(base, ["loop_guard"], "/opt/py/bin/python3")
+
+        _i, _s, _f, messages = install_hooks(base_path=base, force=False, scope="user")
+
+        notice = [m for m in messages if m.startswith("ℹ️")]
+        assert len(notice) == 1, messages
+        assert "remove it after restarting" in notice[0]
+        assert "do not remove" not in notice[0]
+
+    def test_notice_forbids_removal_while_a_registration_still_runs_the_copies(
+        self, tmp_path
+    ):
+        """A hook this release no longer ships stays in its legacy form on a
+        non-force install, so the copies it runs must stay too."""
+        from superclaude.cli.install_components import install_hooks
+
+        base = tmp_path / ".claude"
+        _legacy_registration(base, ["retired_thing"], "/opt/py/bin/python3")
+
+        _i, _s, _f, messages = install_hooks(base_path=base, force=False, scope="user")
+
+        notice = [m for m in messages if m.startswith("ℹ️")]
+        assert len(notice) == 1, messages
+        assert "do not remove" in notice[0]
+        assert "--force" in notice[0]
+        assert (base / "superclaude" / "scripts" / "retired_thing.py").exists()
+
+
+class TestConsoleScriptWarning:
+    """The installer's only signal for the PATH blocker the request named.
+
+    It reads the probe rather than a bare `shutil.which`: under `uv run` — every
+    `make sync-*` target — which() found the venv shim the user's shell never
+    sees, so the warning could not fire from the documented install path.
+    """
+
+    @staticmethod
+    def _messages(monkeypatch, tmp_path, probe: dict) -> list[str]:
+        from superclaude.cli import install_components
+
+        monkeypatch.setattr(install_components, "probe_console_script", lambda: probe)
+        _i, _s, _f, messages = install_components.install_hooks(
+            base_path=tmp_path / ".claude", force=True, scope="user"
+        )
+        return [m for m in messages if m.startswith("⚠️")]
+
+    def test_missing_script_names_path_and_the_exit_code(self, tmp_path, monkeypatch):
+        warnings = self._messages(
+            monkeypatch,
+            tmp_path,
+            {"path": None, "excluded": None, "has_hook": None, "version": None},
+        )
+
+        assert len(warnings) == 1, warnings
+        assert "PATH" in warnings[0] and "127" in warnings[0]
+
+    def test_an_excluded_own_bin_is_named(self, tmp_path, monkeypatch):
+        warnings = self._messages(
+            monkeypatch,
+            tmp_path,
+            {
+                "path": None,
+                "excluded": "/repo/.venv/bin",
+                "has_hook": None,
+                "version": None,
+            },
+        )
+
+        assert "/repo/.venv/bin" in warnings[0]
+
+    def test_a_script_without_the_hook_subcommand_is_reported(
+        self, tmp_path, monkeypatch
+    ):
+        warnings = self._messages(
+            monkeypatch,
+            tmp_path,
+            {
+                "path": "/usr/local/bin/superclaude",
+                "excluded": None,
+                "has_hook": False,
+                "version": "4.8.0",
+            },
+        )
+
+        assert len(warnings) == 1, warnings
+        assert "no `hook` subcommand" in warnings[0] and "4.8.0" in warnings[0]
+
+    def test_a_different_version_on_path_is_reported(self, tmp_path, monkeypatch):
+        warnings = self._messages(
+            monkeypatch,
+            tmp_path,
+            {
+                "path": "/usr/local/bin/superclaude",
+                "excluded": None,
+                "has_hook": True,
+                "version": "0.0.1",
+            },
+        )
+
+        assert len(warnings) == 1, warnings
+        assert "0.0.1" in warnings[0]
+
+    def test_a_matching_script_warns_about_nothing(self, tmp_path, monkeypatch):
+        from superclaude import __version__
+
+        warnings = self._messages(
+            monkeypatch,
+            tmp_path,
+            {
+                "path": "/usr/local/bin/superclaude",
+                "excluded": None,
+                "has_hook": True,
+                "version": __version__,
+            },
+        )
+
+        assert warnings == []
+
+
+class TestRegistrationFilesAreWrittenWithLF:
+    """Project scope commits settings.json and hooks/hooks.json. Text mode with
+    no newline argument writes CRLF on Windows, which would make every Windows
+    teammate's install dirty both files. Windows is not available here, so the
+    write sites are checked for the argument that pins the newline."""
+
+    def test_settings_json_writer_pins_newline_and_encoding(
+        self, tmp_path, monkeypatch
+    ):
+        import os
+
+        from superclaude import utils
+
+        seen = {}
+        real_fdopen = os.fdopen
+
+        def recording_fdopen(fd, *args, **kwargs):
+            seen.update(kwargs)
+            return real_fdopen(fd, *args, **kwargs)
+
+        monkeypatch.setattr(utils.os, "fdopen", recording_fdopen)
+        utils.atomic_write_json(tmp_path / "settings.json", {"hooks": {}})
+
+        assert seen.get("newline") == "\n", seen
+        assert seen.get("encoding") == "utf-8", seen
+
+    def test_hooks_json_copy_pins_newline_and_encoding(self, tmp_path, monkeypatch):
+        import builtins
+
+        from superclaude.cli import install_components
+
+        seen = {}
+
+        def recording_open(path, *args, **kwargs):
+            if str(path).endswith("hooks.json") and args and "w" in args[0]:
+                seen.update(kwargs)
+            return builtins.open(path, *args, **kwargs)
+
+        monkeypatch.setattr(install_components, "open", recording_open, raising=False)
+        install_components.install_hooks(
+            base_path=tmp_path / ".claude", force=True, scope="user"
+        )
+
+        assert seen.get("newline") == "\n", seen
+        assert seen.get("encoding") == "utf-8", seen
+
+
+class TestTeamIgnoreOfTheRegistrationIsReported:
+    """Project scope stopped excluding settings.json so the team can commit it,
+    but a team-level .gitignore can still hide it — this repository's own
+    .gitignore does — and the install used to say nothing."""
+
+    @staticmethod
+    def _isolated_repo(tmp_path, monkeypatch):
+        """The developer's global excludes file must not decide these tests."""
+        import subprocess
+
+        empty = tmp_path / "empty-gitconfig"
+        empty.write_text("", encoding="utf-8")
+        monkeypatch.setenv("GIT_CONFIG_GLOBAL", str(empty))
+        monkeypatch.setenv("GIT_CONFIG_NOSYSTEM", "1")
+        repo = tmp_path / "repo"
+        repo.mkdir()
+        subprocess.run(["git", "init", "-q", str(repo)], check=True)
+        return repo
+
+    def test_install_all_names_the_rule(self, tmp_path, monkeypatch):
+        from superclaude.cli.install_components import install_all
+
+        repo = self._isolated_repo(tmp_path, monkeypatch)
+        (repo / ".gitignore").write_text(
+            "# team rules\n.claude/settings.json\n", encoding="utf-8"
+        )
+
+        _ok, message = install_all(
+            base_path=repo / ".claude", force=True, scope="project"
+        )
+
+        assert ".gitignore:2 ignores .claude/settings.json" in message, message
+        assert "hooks/hooks.json" not in [
+            line for line in message.splitlines() if "ignores" in line
+        ], "hooks.json is not ignored here and must not be reported"
+
+    def test_a_clean_repo_gets_no_ignore_warning(self, tmp_path, monkeypatch):
+        from superclaude.cli.install_components import install_all
+
+        repo = self._isolated_repo(tmp_path, monkeypatch)
+
+        _ok, message = install_all(
+            base_path=repo / ".claude", force=True, scope="project"
+        )
+
+        assert "ignores .claude/" not in message, message

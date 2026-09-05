@@ -14,9 +14,10 @@ import json
 from pathlib import Path
 from typing import Any, Dict
 
+from superclaude import __version__
 from superclaude.utils import settings_filename
 
-from .install_paths import resolve_reporting_target
+from .install_paths import probe_console_script, resolve_reporting_target
 
 
 def _repair_command(scope: str, base_path: Path) -> str:
@@ -63,6 +64,7 @@ def run_doctor(scope: str | None = None) -> Dict[str, Any]:
         _check_pytest_plugin(),
         _check_configuration(),
         _check_hooks_installed(base_path, scope),
+        _check_console_entry(),
         _check_claude_sc_md(base_path, scope),
         _check_claude_md_import(base_path, scope),
     ]
@@ -146,6 +148,74 @@ def _check_configuration() -> Dict[str, Any]:
             "passed": False,
             "details": [f"Could not import superclaude: {e}"],
         }
+
+
+def _check_console_entry() -> Dict[str, Any]:
+    """
+    Check that the `superclaude` Claude Code's hook shell finds can run this release's hooks.
+
+    Every registered hook command is `superclaude hook <name>`, so whichever
+    console script PATH resolves is the package whose hooks run. The probe
+    (install_paths.probe_console_script) leaves out the running interpreter's
+    own bin — under `uv run` that is the project venv, which the user's shell
+    sees only while activated — and asks the script it finds for `hook --help`
+    and its version. This process's PATH is still a proxy for the hook shell's:
+    that shell inherits the launching shell's PATH (measured 2026-09-05 on
+    macOS; Windows unmeasured), and a Claude Code launched from a GUI with a
+    narrower PATH can fail while this passes.
+
+    Returns:
+        Check result dict
+    """
+    label = "superclaude on PATH"
+    probe = probe_console_script()
+    where = probe["path"]
+    fix = (
+        "Put this release's console script on PATH ahead of any other "
+        "(uv: `uv tool update-shell`; pipx: `pipx ensurepath`)"
+    )
+    if where is None:
+        details = [
+            "`superclaude` not found on PATH: every `superclaude hook <name>` "
+            "registration exits 127 in Claude Code",
+            fix,
+        ]
+        if probe["excluded"]:
+            details.insert(
+                1,
+                f"{probe['excluded']} was left out of the search — Claude Code's "
+                "shell sees it only while that environment is active there",
+            )
+        return {"name": label, "passed": False, "details": details}
+    if not probe["has_hook"]:
+        return {
+            "name": label,
+            "passed": False,
+            "details": [
+                f"{where} has no `hook` subcommand "
+                f"({probe['version'] or 'unknown version'}): every hook exits 2 "
+                "there, the blocking code",
+                fix,
+            ],
+        }
+    if probe["version"] and probe["version"] != __version__:
+        return {
+            "name": label,
+            "passed": False,
+            "details": [
+                f"{where} is version {probe['version']}; this install is "
+                f"{__version__} — Claude Code runs that version's hooks",
+                fix,
+            ],
+        }
+    return {
+        "name": label,
+        "passed": True,
+        "details": [
+            f"Hook commands run `superclaude hook <name>` — {where} "
+            f"({probe['version'] or 'version unknown'})"
+        ],
+    }
 
 
 def _check_hooks_installed(base_path: Path, scope: str) -> Dict[str, Any]:

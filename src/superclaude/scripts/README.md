@@ -4,7 +4,7 @@ Hook infra — Python + shell scripts for context loading, session mgmt, automat
 
 ## Content Delivery
 
-Referenced by `hooks.json`, executed by the Claude Code hook runtime — directory-role SSOT: `../ARCHITECTURE.md` §scripts/.
+Run by the Claude Code hook runtime as `superclaude hook <name>` (registry: `../cli/hook_dispatch.py`), i.e. from inside the installed package — nothing here is copied into the install tree. Directory-role SSOT: `../ARCHITECTURE.md` §scripts/.
 
 ## Available Scripts
 
@@ -26,7 +26,7 @@ Referenced by `hooks.json`, executed by the Claude Code hook runtime — directo
 
 ### Subpackages
 
-Subpackages import `superclaude.*`, so they resolve only under the installing interpreter — not from the copied `~/.claude/superclaude/scripts/` dir. Invoke them through the console entries (`superclaude auto-improve`, `superclaude parallel-ab`); inside a dev checkout `uv run python -m superclaude.scripts.<pkg>` is equivalent. A bare `python -m superclaude.scripts.<pkg>` outside a checkout raises ModuleNotFoundError.
+Subpackages import `superclaude.*`, so they resolve only under an interpreter holding the package. Invoke them through the console entries (`superclaude auto-improve`, `superclaude parallel-ab`); inside a dev checkout `uv run python -m superclaude.scripts.<pkg>` is equivalent. A bare `python -m superclaude.scripts.<pkg>` outside a checkout raises ModuleNotFoundError.
 
 | Package | Purpose |
 |---|---|

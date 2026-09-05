@@ -15,6 +15,7 @@ from pathlib import Path
 from superclaude.cli.doctor import (
     _check_claude_md_import,
     _check_claude_sc_md,
+    _check_console_entry,
     _check_hooks_installed,
     run_doctor,
 )
@@ -184,8 +185,8 @@ class TestRunDoctor:
         return base_path
 
     def _disk_checks(self, result: dict) -> list[dict]:
-        """The three checks that read the install; the other two read the env."""
-        environment = {"pytest plugin loaded", "Configuration"}
+        """The three checks that read the install; the other three read the env."""
+        environment = {"pytest plugin loaded", "Configuration", "superclaude on PATH"}
         return [c for c in result["checks"] if c["name"] not in environment]
 
     def test_detects_local_scope_from_the_working_directory(
@@ -222,7 +223,7 @@ class TestRunDoctor:
 
         result = run_doctor()
 
-        assert len(result["checks"]) == 5
+        assert len(result["checks"]) == 6
 
 
 class TestRepairCommandNamesWhereToRun:
@@ -269,3 +270,85 @@ class TestRepairCommandNamesWhereToRun:
                     continue
                 assert "--scope local" in detail, detail
                 assert str(project) in detail, detail
+
+
+class TestConsoleEntryCheck:
+    """Every hook command is `superclaude hook <name>`; the check asks the probe
+    which console script Claude Code's hook shell will find and whether that
+    one can run this release's hooks."""
+
+    @staticmethod
+    def _with_probe(monkeypatch, probe: dict) -> dict:
+        monkeypatch.setattr(
+            "superclaude.cli.doctor.probe_console_script", lambda: probe
+        )
+        return _check_console_entry()
+
+    def test_passes_and_names_the_script_and_version(self, monkeypatch):
+        from superclaude import __version__
+
+        result = self._with_probe(
+            monkeypatch,
+            {
+                "path": "/home/x/.local/bin/superclaude",
+                "excluded": None,
+                "has_hook": True,
+                "version": __version__,
+            },
+        )
+
+        assert result["passed"] is True
+        assert "/home/x/.local/bin/superclaude" in result["details"][0]
+        assert __version__ in result["details"][0]
+
+    def test_fails_with_the_path_repair_when_missing(self, monkeypatch):
+        result = self._with_probe(
+            monkeypatch,
+            {"path": None, "excluded": None, "has_hook": None, "version": None},
+        )
+
+        assert result["passed"] is False
+        assert any("127" in line for line in result["details"])
+        assert any("PATH" in line for line in result["details"])
+
+    def test_names_the_own_bin_it_left_out(self, monkeypatch):
+        result = self._with_probe(
+            monkeypatch,
+            {
+                "path": None,
+                "excluded": "/repo/.venv/bin",
+                "has_hook": None,
+                "version": None,
+            },
+        )
+
+        assert result["passed"] is False
+        assert any("/repo/.venv/bin" in line for line in result["details"])
+
+    def test_fails_when_the_found_script_lacks_the_hook_subcommand(self, monkeypatch):
+        result = self._with_probe(
+            monkeypatch,
+            {
+                "path": "/usr/local/bin/superclaude",
+                "excluded": None,
+                "has_hook": False,
+                "version": "4.8.0",
+            },
+        )
+
+        assert result["passed"] is False
+        assert any("no `hook` subcommand" in line for line in result["details"])
+
+    def test_fails_when_path_resolves_a_different_version(self, monkeypatch):
+        result = self._with_probe(
+            monkeypatch,
+            {
+                "path": "/usr/local/bin/superclaude",
+                "excluded": None,
+                "has_hook": True,
+                "version": "0.0.1",
+            },
+        )
+
+        assert result["passed"] is False
+        assert any("0.0.1" in line for line in result["details"])

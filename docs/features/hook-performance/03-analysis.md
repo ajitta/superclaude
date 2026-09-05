@@ -5,6 +5,8 @@ revised: 2026-08-23
 
 # Hook Performance — Measurement and Attribution
 
+> **Superseded invocation path (2026-09-05).** The figures below were measured when each hook ran as `{{PYTHON_BIN}} {{SCRIPTS_PATH}}/<script>.py`. Hooks now run as `superclaude hook <name>` through `cli/entry.py` → `cli/hook_dispatch.py`, which imports the same script inside the console script's interpreter; the console form measured ~20ms per hook on 2026-09-05 (`.claude/rules/gotchas/hooks.md` `hook-fast-path-no-click`). The numbers below are the old form's and are historical.
+
 ## Hook inventory
 
 `src/superclaude/hooks/hooks.json` registers 14 hooks across 10 distinct scripts. Each

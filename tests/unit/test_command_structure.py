@@ -37,14 +37,14 @@ NEGATIVE_TRIGGER_GATE = re.compile(r"auto-?(trigger|fire)", re.IGNORECASE)
 
 # A command doc that tells the model to run a superclaude script with a bare
 # `python`/`python3` prescribes an invocation that only resolves by luck of
-# PATH: ~/.claude/superclaude/ ships content, not the package, and the
-# {{PYTHON_BIN}} substitution that saves hooks never runs over command
-# markdown (install_components.py covers hooks.json + skills only). Console
-# subcommands (`superclaude insight`, `superclaude auto-improve`) are the only
-# invocations that always carry a resolving interpreter.
-# `{{SCRIPTS_PATH}}` is the form command markdown is meant to reach for, and it
-# resolves at install time to ~/.claude/superclaude/scripts/ — i.e. exactly the
-# broken invocation — so the template spelling has to be caught too. The `uv run`
+# PATH: ~/.claude/superclaude/ ships content, not the package, so the script's
+# `superclaude.*` imports fail under any interpreter but one holding the
+# package. Console subcommands (`superclaude insight`, `superclaude hook`,
+# `superclaude auto-improve`) are the only invocations that always carry a
+# resolving interpreter — the hooks themselves run `superclaude hook <name>`.
+# `{{SCRIPTS_PATH}}` was the install-time template that releases before the
+# console entry resolved to ~/.claude/superclaude/scripts/ — i.e. exactly the
+# broken invocation — and a doc still spelling it is still caught. The `uv run`
 # prefix is the one legitimate bare-module form (dev checkout) and is exempt.
 _BARE_PYTHON_PRESCRIPTION = re.compile(
     r"(?<!uv run )python3?\s+"
@@ -303,12 +303,11 @@ class TestCommandDocsPrescribeConsoleEntry:
     The install tree ships content, not the package, so
     `python3 ~/.claude/superclaude/scripts/X.py` and
     `python -m superclaude.scripts.X` raise ModuleNotFoundError for any
-    interpreter that is not the installing one. Hooks dodge this because
-    install_components.py bakes sys.executable as {{PYTHON_BIN}}, and that
-    substitution never reaches command markdown. Console subcommands are the
-    only invocation a command doc may hand the model. Lines carrying the
-    `never-bare-python` identifier are exempt: those gotchas quote the broken
-    form deliberately.
+    interpreter not holding the package. Hooks dodge this by running
+    `superclaude hook <name>` — the console script — and a console subcommand
+    is likewise the only invocation a command doc may hand the model. Lines
+    carrying the `never-bare-python` identifier are exempt: those gotchas quote
+    the broken form deliberately.
     """
 
     def test_no_bare_python_prescription(self, command):

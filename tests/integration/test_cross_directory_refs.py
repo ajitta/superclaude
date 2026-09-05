@@ -72,9 +72,9 @@ def parse_hooks_json_script_refs() -> list[str]:
         for entry in entries:
             for hook in entry.get("hooks", []):
                 cmd = hook.get("command", "")
-                match = re.search(r"\{\{SCRIPTS_PATH\}\}/(\S+\.py)", cmd)
+                match = re.search(r"superclaude hook ([A-Za-z0-9_]+)", cmd)
                 if match:
-                    scripts.add(match.group(1))
+                    scripts.add(f"{match.group(1)}.py")
     return sorted(scripts)
 
 

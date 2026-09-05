@@ -11,7 +11,7 @@
 #      - commands/sc/   : 30+ slash commands
 #      - agents/        : Agent definitions
 #      - skills/        : Skills
-#      - scripts/       : Hook runtime scripts (session_init.py, context_loader.py, …)
+#      - (hook scripts run from the package as `superclaude hook <name>`; nothing is copied to scripts/)
 #      - settings.json  : Hook configurations merged from hooks/hooks.json
 #      - superclaude/   : Core framework (core, modes, mcp, CLAUDE_SC.md)
 #   4. Verifies installation

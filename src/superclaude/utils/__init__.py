@@ -44,7 +44,10 @@ def atomic_write_json(path: Path, data: Any, indent: int = 2) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     fd, tmp_path = tempfile.mkstemp(dir=path.parent, suffix=".tmp")
     try:
-        with os.fdopen(fd, "w") as f:
+        # newline pinned: text mode would write CRLF on Windows, and this is
+        # how a project-scope settings.json — committed, and promised identical
+        # on every teammate's checkout — gets written.
+        with os.fdopen(fd, "w", encoding="utf-8", newline="\n") as f:
             json.dump(data, f, indent=indent)
         os.replace(tmp_path, path)
     except BaseException:
@@ -167,14 +170,37 @@ def claude_base() -> Path:
 # "session_init" would misclassify a user's own hook as ours.
 SUPERCLAUDE_HOOK_MARKERS = [
     "[superclaude]",
-    "{{SCRIPTS_PATH}}",  # unresolved template form of the scripts path
+    "{{SCRIPTS_PATH}}",  # legacy: unresolved template form of the scripts path
     "BLOCKED: destructive",  # legacy inline destructive-Bash blocker command
 ]
 
-# Resolved {{SCRIPTS_PATH}} form: a command referencing a script under a
-# superclaude scripts directory (absolute user-scope path or
-# $CLAUDE_PROJECT_DIR/.claude/superclaude/scripts; / or \ separators).
+# The console-entry form every shipped hook command takes: `superclaude hook
+# <name> [subcommand]`. The prefix admits a directory, a Windows suffix and a
+# closing quote (`~/.local/bin/superclaude hook x`, `C:/.../superclaude.exe hook
+# x`, `"C:/Program Files/.../superclaude.exe" hook x` — a path with a space has
+# to be quoted): pinning the absolute path is the user's workaround when Claude
+# Code's hook shell has a narrow PATH, and that pinned command is still ours —
+# judged otherwise, a non-force install appended every shipped hook beside it.
+# Group 1 is the hook name, group 2 whatever follows it.
+CONSOLE_HOOK_RE = re.compile(
+    r"(?:^|[\s/\\])superclaude(?:\.exe)?[\"']?\s+hook\s+([A-Za-z0-9_]+)(.*)$"
+)
+
+# Legacy resolved form (releases before the console entry): a command naming a
+# script copy under a superclaude scripts directory (absolute user-scope path
+# or $CLAUDE_PROJECT_DIR/.claude/superclaude/scripts; / or \ separators). Kept
+# so an upgrade still recognises — and migrates — those registrations.
 _SC_SCRIPTS_PATH_RE = re.compile(r"superclaude[/\\]scripts[/\\]")
+
+
+def is_legacy_hook_command(command: str) -> bool:
+    """Whether a hook command is a pre-console-entry registration.
+
+    An interpreter plus a script copy under a superclaude scripts directory,
+    resolved or still templated: these carry the installing machine's paths,
+    which is what the console entry removed, so an install rewrites them.
+    """
+    return "{{SCRIPTS_PATH}}" in command or bool(_SC_SCRIPTS_PATH_RE.search(command))
 
 
 def is_superclaude_hook(hook_entry: dict) -> bool:
@@ -184,9 +210,9 @@ def is_superclaude_hook(hook_entry: dict) -> bool:
         hook_entry: A hook entry dict with a "hooks" array
 
     Returns:
-        True if any hook command references a SuperClaude scripts path
-        (template or resolved) or carries an anchored SuperClaude marker, or a
-        `_comment` carries the `[superclaude]` tag
+        True if any hook command runs `superclaude hook`, references a legacy
+        SuperClaude scripts path (template or resolved) or carries an anchored
+        SuperClaude marker, or a `_comment` carries the `[superclaude]` tag
     """
     comment = hook_entry.get("_comment", "")
     if any(marker in comment for marker in SUPERCLAUDE_HOOK_MARKERS):
@@ -196,7 +222,7 @@ def is_superclaude_hook(hook_entry: dict) -> bool:
         cmd = hook.get("command", "")
         if any(marker in cmd for marker in SUPERCLAUDE_HOOK_MARKERS):
             return True
-        if _SC_SCRIPTS_PATH_RE.search(cmd):
+        if CONSOLE_HOOK_RE.search(cmd) or is_legacy_hook_command(cmd):
             return True
         inner_comment = hook.get("_comment", "")
         if any(marker in inner_comment for marker in SUPERCLAUDE_HOOK_MARKERS):

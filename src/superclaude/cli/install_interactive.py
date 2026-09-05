@@ -64,11 +64,11 @@ def _maybe_git_init(scope: str, project_root: Path) -> Tuple[bool, str]:
         )
     else:
         click.echo(
-            "  Project scope shares .claude/ content through git. The hook "
-            "registration (settings.json, hooks/hooks.json) is excluded "
-            "per-clone — it names this machine's Python, so every teammate's "
-            "install would rewrite it. Without git, files install but won't "
-            "be versioned."
+            "  Project scope shares .claude/ content and the hook registration "
+            "(settings.json, hooks/hooks.json) through git — every hook "
+            "command is `superclaude hook <name>`, so each teammate's install "
+            "writes the same bytes. Without git, files install but won't be "
+            "versioned."
         )
 
     if click.confirm("  Initialize a git repo here?", default=False):

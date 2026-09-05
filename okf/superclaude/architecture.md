@@ -15,7 +15,7 @@ SuperClaude is a content framework — markdown (commands, agents, modes, MCP do
 
 Source of truth: `src/superclaude/ARCHITECTURE.md`.
 
-Delivery: source markdown resolves the {{SCRIPTS_PATH}} template var at install time, then installs into user/project/local scope.
+Delivery: source markdown installs verbatim into user/project/local scope; hooks register as `superclaude hook <name>` console-entry commands, so no install-time template variable remains.
 
 # Links
 

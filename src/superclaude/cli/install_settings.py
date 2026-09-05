@@ -5,15 +5,18 @@ Handles settings.json merge/unmerge, hook identification, and CLAUDE.md import m
 This is a leaf dependency with no internal imports.
 """
 
+import copy
 import json
 import re
 from collections import Counter
 from pathlib import Path
-from typing import List, Tuple
+from typing import List, Optional, Tuple
 
 from superclaude.utils import (
+    CONSOLE_HOOK_RE,
     SUPERCLAUDE_HOOK_MARKERS,
     atomic_write_json,
+    is_legacy_hook_command,
     is_superclaude_hook,
     settings_filename,
 )
@@ -21,11 +24,16 @@ from superclaude.utils import (
 # Import line to add to CLAUDE.md
 CLAUDE_SC_IMPORT = "@superclaude/CLAUDE_SC.md"
 
-# Resolved {{SCRIPTS_PATH}} form: command references a script under a
-# superclaude scripts directory (absolute user-scope path or
-# $CLAUDE_PROJECT_DIR/.claude/superclaude/scripts; / or \ separators).
-_SC_SCRIPTS_PATH_RE = re.compile(r"superclaude[/\\]scripts[/\\]")
-_HOOK_SCRIPT_RE = re.compile(r"([A-Za-z0-9_]+\.py)(?=\s|$)(.*)$")
+# Entry point of a legacy `<interpreter> <dir>/<name>.py [subcommand]` command
+# (releases before the console entry). The current form is
+# utils.CONSOLE_HOOK_RE. Both capture the bare name, so a hook registered
+# under the old form and shipped under the new one is the same hook.
+_HOOK_SCRIPT_RE = re.compile(r"([A-Za-z0-9_]+)\.py(?=\s|$)(.*)$")
+# What may follow the entry point and count as its subcommand: a bare word such
+# as `harvest-from-hook`. An option (`--quiet`) and a shell operator or
+# redirection (`|`, `&&`, `2>>log`) are not subcommands — a user who wraps our
+# command in a pipeline still runs the same hook.
+_SUBCOMMAND_RE = re.compile(r"[A-Za-z0-9_][A-Za-z0-9_-]*")
 
 
 def _load_settings(settings_file: Path) -> dict:
@@ -85,33 +93,35 @@ def _hook_entry_signature(hook_entry: dict) -> tuple:
 
 
 def _hook_script_id(hook: dict) -> Tuple[str, str]:
-    """Which entry point an inner hook runs: (script filename, subcommand).
+    """Which entry point an inner hook runs: (hook name, subcommand).
 
-    Blind to the interpreter, the directory prefix, flags and the timeout, so
-    one hook written with a template path and again with a resolved absolute
-    path — or re-shipped with a new option — counts as the same hook. Matching
-    on the whole command string instead would append a second copy of every hook
+    Blind to the command form, the interpreter, the directory prefix, flags and
+    the timeout, so one hook registered as `<python> <dir>/loop_guard.py` by a
+    previous release and shipped as `superclaude hook loop_guard` now — or
+    re-shipped with a new option — counts as the same hook. Matching on the
+    whole command string instead would append a second copy of every hook
     whose command had drifted, and a doubled loop_guard trips its circuit
     breaker at half the intended error count.
 
     The subcommand is *not* dropped, though. One script can carry several entry
-    points (`insight_writer.py harvest-from-hook` and `… request-from-hook` are
+    points (`insight_writer harvest-from-hook` and `… request-from-hook` are
     different hooks on different events), and filename-only identity made a
     release that moved a hook to a new subcommand undeliverable: the old
     registration matched, the new subcommand was called already-present, and the
     wrong entry point kept running.
 
-    Only the first bare argument counts as the subcommand — anything starting
-    with `-` is an option, and options are exactly what drifts between releases.
+    Only a bare word directly after the entry point counts as the subcommand —
+    an option (`-`-prefixed) is exactly what drifts between releases, and a shell
+    operator or redirection a user appended is not part of the hook's identity.
 
-    A command that runs no .py file falls back to its normalised text.
+    A command in neither form falls back to its normalised text.
     """
     command = hook.get("command", "")
-    match = _HOOK_SCRIPT_RE.search(command)
+    match = CONSOLE_HOOK_RE.search(command) or _HOOK_SCRIPT_RE.search(command)
     if not match:
         return (" ".join(command.split()), "")
     tokens = match.group(2).split()
-    subcommand = tokens[0] if tokens and not tokens[0].startswith("-") else ""
+    subcommand = tokens[0] if tokens and _SUBCOMMAND_RE.fullmatch(tokens[0]) else ""
     return (match.group(1), subcommand)
 
 
@@ -155,7 +165,7 @@ def _is_superclaude_inner_hook(hook: dict) -> bool:
     cmd = hook.get("command", "")
     if any(marker in cmd for marker in SUPERCLAUDE_HOOK_MARKERS):
         return True
-    if _SC_SCRIPTS_PATH_RE.search(cmd):
+    if CONSOLE_HOOK_RE.search(cmd) or is_legacy_hook_command(cmd):
         return True
     return any(
         marker in hook.get("_comment", "") for marker in SUPERCLAUDE_HOOK_MARKERS
@@ -200,7 +210,10 @@ def _strip_sc_inner_hooks(hook_array: List[dict]) -> Tuple[List[dict], bool]:
 
 
 def _merge_hook_arrays(
-    existing: List[dict], new_hooks: List[dict], force: bool = False
+    existing: List[dict],
+    new_hooks: List[dict],
+    force: bool = False,
+    stats: Optional[dict] = None,
 ) -> List[dict]:
     """
     Merge two hook arrays, preserving user hooks.
@@ -209,6 +222,8 @@ def _merge_hook_arrays(
         existing: Existing hooks array from settings.json
         new_hooks: New SuperClaude hooks to add
         force: If True, replace existing SuperClaude hooks
+        stats: When given, ``stats["rewritten"]`` accumulates how many legacy
+            commands the non-force merge rewrote to the console form
 
     Returns:
         Merged hooks array
@@ -225,9 +240,10 @@ def _merge_hook_arrays(
     if not existing_sc_hooks:
         return existing + new_hooks
 
-    # Non-force: existing entries are authoritative and stay exactly as written,
-    # so a user's timeout or matcher edit survives. Only hooks this release ships
-    # that are not registered yet get appended. Skipping the whole event type
+    # Non-force: existing entries are authoritative and stay as written — matcher,
+    # timeout, position — so a user's edit survives; the one exception is a
+    # legacy-form command, which _migrate_legacy_commands rewrites. Only hooks
+    # this release ships that are not registered yet get appended. Skipping the whole event type
     # instead — as this used to — froze an install's hook set at whatever existed
     # when it was first written, while its content kept updating.
     #
@@ -275,7 +291,60 @@ def _merge_hook_arrays(
         addition["hooks"] = missing
         additions.append(addition)
 
-    return existing + additions
+    migrated, rewritten = _migrate_legacy_commands(existing, new_hooks)
+    if stats is not None:
+        stats["rewritten"] = stats.get("rewritten", 0) + rewritten
+    return migrated + additions
+
+
+def _migrate_legacy_commands(
+    existing: List[dict], new_hooks: List[dict]
+) -> Tuple[List[dict], int]:
+    """Rewrite our legacy-form commands to the shipped form, and nothing else.
+
+    The command string is not the user's to edit — matcher, timeout and position
+    are. A `<python> <dir>/<name>.py` registration from a release before the
+    console entry names the installing machine's interpreter and checkout,
+    which is exactly what a committed project-scope settings.json must not
+    carry; leaving it in place on the default (non-force) upgrade exposed those
+    bytes for commit the moment install stopped excluding the file. Only
+    legacy-form commands are touched: a console-form command with a pinned
+    directory (`~/.local/bin/superclaude hook x`) is the user's own workaround
+    for a narrow hook-shell PATH and stays, and only a console-form replacement
+    is written: this is a migration to the console entry, not a general command
+    refresh. Entries that change are copied, not mutated, so the caller's "did
+    anything change" comparison stays honest. Returns the migrated array and the
+    number of commands rewritten.
+    """
+    shipped_by_id: dict = {}
+    for entry in new_hooks:
+        for hook in entry.get("hooks", []):
+            shipped_by_id.setdefault(_hook_script_id(hook), hook.get("command", ""))
+
+    migrated: List[dict] = []
+    rewritten = 0
+    for entry in existing:
+        sc_hooks, _user_hooks = _split_entry(entry)
+        ours = {id(hook) for hook in sc_hooks}
+        inner: List[dict] = []
+        changed = False
+        for hook in entry.get("hooks", []):
+            command = hook.get("command", "")
+            replacement = shipped_by_id.get(_hook_script_id(hook))
+            if (
+                id(hook) in ours
+                and is_legacy_hook_command(command)
+                and replacement
+                and CONSOLE_HOOK_RE.search(replacement)
+                and replacement != command
+            ):
+                inner.append({**hook, "command": replacement})
+                changed = True
+                rewritten += 1
+            else:
+                inner.append(hook)
+        migrated.append({**entry, "hooks": inner} if changed else entry)
+    return migrated, rewritten
 
 
 def merge_hooks_to_settings(
@@ -289,7 +358,7 @@ def merge_hooks_to_settings(
 
     Args:
         base_path: Installation base path (.claude directory)
-        hooks_config: Transformed hooks config (paths already substituted)
+        hooks_config: Parsed hooks.json content
         scope: Installation scope ("user", "project", or "target")
         force: Replace existing SuperClaude hooks if True
 
@@ -297,11 +366,12 @@ def merge_hooks_to_settings(
         Tuple of (success, message)
 
     Scope behavior:
-        - user: Merges to ~/.claude/settings.json (absolute paths)
-        - project: Merges to ./.claude/settings.json (per-clone: the file
-          carries this machine's interpreter, so install git-excludes it)
+        - user: Merges to ~/.claude/settings.json
+        - project: Merges to ./.claude/settings.json (team-shared: every
+          command is `superclaude hook <name>`, so the file is the same bytes
+          on every checkout and stays tracked)
         - local: Merges to ./.claude/settings.local.json (CC auto-gitignores)
-        - target: Merges to {target}/.claude/settings.json (absolute paths)
+        - target: Merges to {target}/.claude/settings.json
     """
     filename = settings_filename(scope)
     settings_file = base_path / filename
@@ -318,8 +388,8 @@ def merge_hooks_to_settings(
         settings["hooks"] = {}
 
     existing_hooks = settings["hooks"]
-    merged_any = False
-    skipped_any = False
+    before = copy.deepcopy(existing_hooks)
+    stats: dict = {}
 
     # `--force` means "replace with what this release ships", and that has to
     # include events this release no longer ships. Walking only the new config's
@@ -336,7 +406,6 @@ def merge_hooks_to_settings(
             kept, changed = _strip_sc_inner_hooks(hook_array)
             if not changed:
                 continue
-            merged_any = True
             if kept:
                 existing_hooks[hook_type] = kept
             else:
@@ -352,28 +421,31 @@ def merge_hooks_to_settings(
         # Deduping on every merge is idempotent and bounds growth.
         existing_array = _dedup_hook_array(existing_array)
 
-        merged_array = _merge_hook_arrays(existing_array, new_hook_array, force)
-        merged_array = _dedup_hook_array(merged_array)
-        existing_hooks[hook_type] = merged_array
-        if merged_array == existing_array:
-            skipped_any = True
-        else:
-            merged_any = True
+        merged_array = _merge_hook_arrays(existing_array, new_hook_array, force, stats)
+        existing_hooks[hook_type] = _dedup_hook_array(merged_array)
 
     settings["hooks"] = existing_hooks
 
-    # Save updated settings
-    success, save_msg = _save_settings(settings_file, settings)
+    # Written only when the hooks section changed. An unconditional rewrite
+    # re-serialised a file another writer (Claude Code's own settings UI, an
+    # editor) had last saved with a trailing newline or other formatting, so
+    # every teammate's install dirtied the committed file while reporting that
+    # nothing needed merging.
+    if existing_hooks == before:
+        hint = "" if force else " (--force to replace)"
+        return True, f"Hooks already registered in {settings_file}{hint}"
 
+    success, save_msg = _save_settings(settings_file, settings)
     if not success:
         return False, save_msg
 
-    if skipped_any and not merged_any:
-        return True, f"Hooks already registered in {settings_file} (--force to replace)"
-    elif skipped_any:
-        return True, f"New hooks merged to {settings_file}, the rest already registered"
-    else:
-        return True, f"Hooks merged to {settings_file}"
+    rewritten = stats.get("rewritten", 0)
+    note = (
+        f" ({rewritten} legacy command(s) rewritten to `superclaude hook <name>`)"
+        if rewritten > 0
+        else ""
+    )
+    return True, f"Hooks merged to {settings_file}{note}"
 
 
 def uninstall_hooks_from_settings(
