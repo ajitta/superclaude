@@ -71,7 +71,7 @@ description: Rewrite a prompt for Claude Opus 5 or Fable 5.1 — strip prompting
   </context_targets>
 
   <fact_sourcing>
-  Behavioral facts that change between model releases — effort ladders, verbatim tuning blocks, request parameters, pricing — come from the `claude-api` skill's model-migration reference, read at invocation time. The delta table in this command carries direction only, which ages far more slowly than numbers. Recalled values never substitute for a read.
+  Behavioral facts that change between model releases — effort ladders, verbatim tuning blocks, request parameters, pricing — come from the `claude-api` skill's model-migration reference. The read is triggered by need, not by invocation: it happens when such a fact is about to enter the rewrite, and a pass that emits no request configuration and quotes no verbatim block never reaches that point — the common case on `--target cc`. When it does happen, grep the reference for the target model's `Behavioral shifts (prompt-tunable)` and effort-ladder headings and read those sections only; never the guide whole, and never by line number, which moves with every skill release. The delta table in this command carries direction only, which ages far more slowly than numbers. Recalled values never substitute for a read.
 
   Environment facts — whether a file or directory exists, git state, project conventions, where a document lives — come from the repository, read at invocation time. An environment fact is either read or it is a `[FILL: …]` slot; there is no third source. Evidence wording ("confirmed", "measured") belongs only to a fact a tool call in this session actually returned.
   </fact_sourcing>
@@ -84,9 +84,9 @@ description: Rewrite a prompt for Claude Opus 5 or Fable 5.1 — strip prompting
   </outputs>
 
   <tools>
-  - Skill: invoke `claude-api` for release-current model behavior facts.
+  - Skill: `claude-api` for release-current model behavior facts — under the fact-sourcing gate and its section-scoping, not on every invocation.
   - Read: load the prompt when a file path is given.
-  - Grep: confirm an environment fact — a path, a symbol, a convention — before it enters the rewrite.
+  - Grep: confirm an environment fact — a path, a symbol, a convention — before it enters the rewrite, and locate the heading of the `claude-api` section to read when a model fact is needed.
   - Bash: read-only repo state (`git status`, `git worktree list`, `ls`) when the prompt's subject is the repository itself.
   - Write: save the rewritten prompt when the user names a destination.
   </tools>
@@ -106,7 +106,7 @@ description: Rewrite a prompt for Claude Opus 5 or Fable 5.1 — strip prompting
   - opus5-verify-inversion: Never add self-check phrasing for 'claude-opus-5'. Standard prompt-engineering habit produces exactly the wrong edit here.
   - model-required: An unresolved target model yields opposite instructions on delegation and verification. State the assumed model before rewriting.
   - clean-is-valid: A clean prompt gets reported as clean. A manufactured diff is worse than an empty one.
-  - facts-not-memory: Model facts (effort ladders, verbatim tuning blocks) get read from the `claude-api` skill; environment facts (paths, git state, whether a directory is a subtree) get read from the repository. Neither gets recalled. An unverified environment fact is the costliest defect this command can ship, because the user pastes the rewrite into a fresh session without re-checking it.
+  - facts-not-memory: A model fact that reaches the output (effort ladder, verbatim tuning block) gets read from the `claude-api` skill under the fact-sourcing gate; an environment fact (paths, git state, whether a directory is a subtree) gets read from the repository. Neither gets recalled — but a fact the rewrite never emits does not get read either, and pulling the whole migration guide to source one number is its own defect. An unverified environment fact is the costliest defect this command can ship, because the user pastes the rewrite into a fresh session without re-checking it.
   - booster-vs-mechanism: The autonomy block is not a proactivity booster; deleting it under the booster rule reintroduces early stopping on 'claude-fable-5-1'.
   </gotchas>
 
