@@ -57,10 +57,10 @@ test = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/SuperClaude-Org/SuperClaude_Framework"
-GitHub = "https://github.com/SuperClaude-Org/SuperClaude_Framework"
-"Bug Tracker" = "https://github.com/SuperClaude-Org/SuperClaude_Framework/issues"
-Documentation = "https://github.com/SuperClaude-Org/SuperClaude_Framework/blob/main/README.md"
+Homepage = "https://github.com/ajitta/superclaude"
+GitHub = "https://github.com/ajitta/superclaude"
+Documentation = "https://github.com/ajitta/superclaude/blob/master/README.md"
+Upstream = "https://github.com/SuperClaude-Org/SuperClaude_Framework"
 
 # ⭐ CLI commands (hatchling format)
 [project.scripts]
