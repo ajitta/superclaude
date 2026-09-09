@@ -14,7 +14,7 @@ description: Rewrite a prompt for Claude Opus 5 or Fable 5.1 — strip prompting
   1. Capture the prompt from the inline argument, a file path, or the intent the user just described — and name which source was used.
   2. Resolve target model ('claude-opus-5' or 'claude-fable-5-1') and surface (cc or api). `fable5` is accepted as a legacy alias for the Fable column, since Fable 5 prompts run unchanged on Fable 5.1. When either is unstated, infer from the session and record the assumption in one line.
   3. Diagnose in both directions — the folklore present that degrades the target model, and the context the prompt is missing.
-  4. Apply the model delta, touching only axes the prompt actually exercises. A prompt with no delegation gets no delegation cap.
+  4. Apply the model delta — read the target's section of the migration reference first, then touch only the axes the prompt actually exercises. A prompt with no delegation gets no delegation cap.
   5. Rewrite. Any context not read this session and not supplied by the user becomes a `[FILL: …]` placeholder, never an invention.
   6. Report the change delta. Removals tie to a named pattern or a documented model behavior; additions tie to their source — a file read this session, the user's own words, or a `[FILL: …]` slot. An addition with no source does not get reported, it gets deleted.
   7. Emit request configuration for `--target api` only: effort tier, `thinking.display`, and the `max_tokens` floor, read from the fact source rather than recalled.
@@ -23,7 +23,7 @@ description: Rewrite a prompt for Claude Opus 5 or Fable 5.1 — strip prompting
   <model_delta>
   The two targets pull in opposite directions on several axes. An unresolved target model produces the inverse of the correct edit.
 
-  On `--target cc` the Claude Code harness already injects scope discipline, task completion, self-correction, and the delegation cap. Rows marked † are `--target api` only — re-attaching them for cc adds tokens and no new information.
+  This table is a mirror, not a source. Every row compresses the migration reference's `Behavioral shifts (prompt-tunable)` section for one of the two targets down to direction, and it is authoritative only while that reference is unreachable — when it is on the machine it gets read and it wins on conflict. The `--target cc` suppression is the command's own, because it comes from the harness rather than from the reference: Claude Code already injects scope discipline, task completion, self-correction, and the delegation cap, so rows marked † are `--target api` only — re-attaching them for cc adds tokens and no new information.
 
   | Axis | 'claude-opus-5' | 'claude-fable-5-1' |
   |---|---|---|
@@ -40,7 +40,7 @@ description: Rewrite a prompt for Claude Opus 5 or Fable 5.1 — strip prompting
   </model_delta>
 
   <removal_targets>
-  Folklore that helped older models and degrades these two. Signals are greppable — run them over the prompt rather than eyeballing.
+  Folklore that helped older models and degrades these two. This detector is the command's own, not a mirror: the reference describes model behavior, not the prompt habits that trip it. Signals are greppable — run them over the prompt rather than eyeballing. Where a row's action names a target model, its direction still comes from the delta rule above.
 
   | Pattern | Signal | Action |
   |---|---|---|
@@ -71,7 +71,7 @@ description: Rewrite a prompt for Claude Opus 5 or Fable 5.1 — strip prompting
   </context_targets>
 
   <fact_sourcing>
-  Behavioral facts that change between model releases — effort ladders, verbatim tuning blocks, request parameters, pricing — come from the `claude-api` skill's model-migration reference. The read is triggered by need, not by invocation: it happens when such a fact is about to enter the rewrite, and a pass that emits no request configuration and quotes no verbatim block never reaches that point — the common case on `--target cc`. When it does happen, find that file by globbing for the skill's `model-migration` reference — its install root differs by machine and by scope, so a fixed path is wrong — then grep it for the target model's `Behavioral shifts (prompt-tunable)` and effort-ladder headings and read those sections only; never the guide whole, and never by line number, which moves with every skill release. The delta table in this command carries direction only, which ages far more slowly than numbers. Recalled values never substitute for a read.
+  Per-model behavioral facts — direction, effort ladders, verbatim tuning blocks, request parameters — are owned by the `claude-api` skill's model-migration reference, not by this command. The read happens whenever a model-conditional edit is about to enter the rewrite, which is the common case on both targets rather than the rare one; only a prompt that exercises no delta axis skips it. Reach the reference as a file rather than by invoking the skill, whose own body is far larger than the section needed. The framework's prompt hook resolves the path and the target's line ranges into context at invocation — when that note is present, read the range it names; when it is absent, glob for the `model-migration` reference yourself, since the install root differs by machine and by scope and a fixed path is wrong. Then scope the read by anchoring on the `## Migrating to Claude <target>` heading and taking the first `### Behavioral shifts (prompt-tunable)` that follows it — that heading appears once per model in the file and by itself identifies none of them — plus the target's effort ladder on `--target api`. Never the guide whole, and never by line number, which moves with every release. Recalled values never substitute for a read, and the mirror table substitutes for one only while the reference is off the machine.
 
   Environment facts — whether a file or directory exists, git state, project conventions, where a document lives — come from the repository, read at invocation time. An environment fact is either read or it is a `[FILL: …]` slot; there is no third source. Evidence wording ("confirmed", "measured") belongs only to a fact a tool call in this session actually returned.
   </fact_sourcing>
@@ -84,10 +84,9 @@ description: Rewrite a prompt for Claude Opus 5 or Fable 5.1 — strip prompting
   </outputs>
 
   <tools>
-  - Skill: `claude-api` for release-current model behavior facts — under the fact-sourcing gate and its section-scoping, not on every invocation.
-  - Read: load the prompt when a file path is given.
-  - Glob: locate the `claude-api` reference file when a model fact is needed, since its path is not fixed across machines.
-  - Grep: confirm an environment fact — a path, a symbol, a convention — before it enters the rewrite, and locate the heading of the `claude-api` section to read when a model fact is needed.
+  - Read: load the prompt when a file path is given, and load the anchored section of the `claude-api` model-migration reference — read as a file, which works whether or not the skill itself is installed.
+  - Glob: locate that reference file, since its path is not fixed across machines.
+  - Grep: confirm an environment fact — a path, a symbol, a convention — before it enters the rewrite, and locate the model anchor and the behavioral-shifts heading under it.
   - Bash: read-only repo state (`git status`, `git worktree list`, `ls`) when the prompt's subject is the repository itself.
   - Write: save the rewritten prompt when the user names a destination.
   </tools>
@@ -107,14 +106,14 @@ description: Rewrite a prompt for Claude Opus 5 or Fable 5.1 — strip prompting
   - opus5-verify-inversion: Never add self-check phrasing for 'claude-opus-5'. Standard prompt-engineering habit produces exactly the wrong edit here.
   - model-required: An unresolved target model yields opposite instructions on delegation and verification. State the assumed model before rewriting.
   - clean-is-valid: A clean prompt gets reported as clean. A manufactured diff is worse than an empty one.
-  - facts-not-memory: A model fact that reaches the output (effort ladder, verbatim tuning block) gets read from the `claude-api` skill under the fact-sourcing gate; an environment fact (paths, git state, whether a directory is a subtree) gets read from the repository. Neither gets recalled — but a fact the rewrite never emits does not get read either, and pulling the whole migration guide to source one number is its own defect. An unverified environment fact is the costliest defect this command can ship, because the user pastes the rewrite into a fresh session without re-checking it.
+  - facts-not-memory: A model fact gets read from the migration reference, an environment fact (paths, git state, whether a directory is a subtree) from the repository. Neither gets recalled, and the mirror table does not stand in for a reference sitting unread on the machine — that is a stale answer, not a saved read. The saving is in scoping the read to one anchored section; pulling the whole guide to source one number is its own defect. An unverified environment fact is the costliest defect this command can ship, because the user pastes the rewrite into a fresh session without re-checking it.
   - booster-vs-mechanism: The autonomy block is not a proactivity booster; deleting it under the booster rule reintroduces early stopping on 'claude-fable-5-1'.
   </gotchas>
 
   <bounds>
     <does>rewrites a single prompt for a named target model, strips degrading folklore, adds the context the prompt lacks, marks user-only context as placeholders, and emits request configuration for API targets.</does>
     <never>audits or edits prompt files across a repository, invents context it has not read, or treats brevity as the objective.</never>
-    <fallback>When the `claude-api` skill is unavailable, the delta table here carries the rewrite and the report states that release-current facts were not read. Repository-wide prompt-file audits route to `/claude-api prompt-audit`.</fallback>
+    <fallback>When the migration reference is not on the machine, the mirror table here carries the rewrite and the report states that the reference was not read. Repository-wide prompt-file audits route to `/claude-api prompt-audit`.</fallback>
   </bounds>
 
   <handoff next="/sc:brainstorm /sc:implement /sc:review"/>

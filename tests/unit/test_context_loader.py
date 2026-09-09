@@ -759,3 +759,132 @@ class TestEveryCommandTokenIsChecked:
 
         assert notes == []
         assert suppressed == set()
+
+
+class TestMigrationReferenceResolution:
+    """/sc:prompt's model facts live outside the install tree.
+
+    The command ships a mirror of the claude-api model-migration reference and
+    that mirror is authoritative only while the reference is unreachable. The
+    rule is enforceable only if the reference is located at invocation time, so
+    these cover the three states the hook can inject: located, absent, and
+    present-but-renamed.
+    """
+
+    OPUS = "## Migrating to Claude Opus 5"
+    FABLE = "## Migrating to Claude Fable 5.1"
+    FABLE_DELTA = "## Migrating to Claude Fable 5.1 from Claude Fable 5"
+    SHIFTS = "### Behavioral shifts (prompt-tunable)"
+
+    def _reference(self, tmp_path, body=None):
+        ref = tmp_path / "plugins" / "marketplaces" / "m" / "skills"
+        ref = ref / "claude-api" / "shared" / "model-migration.md"
+        ref.parent.mkdir(parents=True)
+        ref.write_text(body if body is not None else self._body(), encoding="utf-8")
+        return ref
+
+    def _body(self):
+        return "\n".join(
+            [
+                "# Model Migration Guide",  # 1
+                self.OPUS,  # 2
+                "prose",  # 3
+                self.SHIFTS,  # 4
+                "**Longer responses.**",  # 5
+                "### Claude Opus 5 Migration Checklist",  # 6
+                "- [ ] **[BLOCKS]** update the model string",  # 7
+                self.FABLE,  # 8
+                self.SHIFTS,  # 9
+                "**Longer turns.**",  # 10
+                self.FABLE_DELTA,  # 11
+                "prose",  # 12
+                self.SHIFTS,  # 13
+                "**Batch independent tool calls.**",  # 14
+            ]
+        )
+
+    def test_ranges_run_to_the_end_of_the_model_section(self, tmp_path):
+        from superclaude.scripts import context_loader as cl
+
+        ranges = cl.migration_reference_ranges(self._reference(tmp_path))
+
+        # The checklist after the shifts heading carries direction the mirror
+        # table uses, so the range may not stop at the first sibling "###".
+        assert ranges["claude-opus-5"] == ["L4-7"]
+
+    def test_both_fable_sections_are_located(self, tmp_path):
+        from superclaude.scripts import context_loader as cl
+
+        ranges = cl.migration_reference_ranges(self._reference(tmp_path))
+
+        assert ranges["claude-fable-5-1"] == ["L9-10", "L13-14"]
+
+    def test_renamed_anchor_yields_no_range(self, tmp_path):
+        from superclaude.scripts import context_loader as cl
+
+        body = self._body().replace(self.SHIFTS, "### Prompt-tunable behaviour")
+        ranges = cl.migration_reference_ranges(self._reference(tmp_path, body))
+
+        assert ranges == {}
+
+    def test_newest_copy_wins(self, tmp_path):
+        from superclaude.scripts import context_loader as cl
+
+        old = tmp_path / "skills" / "claude-api" / "shared" / "model-migration.md"
+        old.parent.mkdir(parents=True)
+        old.write_text("old", encoding="utf-8")
+        import os
+
+        os.utime(old, (1, 1))
+        new = self._reference(tmp_path)
+
+        assert cl.find_migration_reference([tmp_path]) == new
+
+    def test_absent_reference_resolves_to_none(self, tmp_path):
+        from superclaude.scripts import context_loader as cl
+
+        assert cl.find_migration_reference([tmp_path]) is None
+
+
+class TestPromptCommandReferenceInjection:
+    """What the hook prints for each of those states."""
+
+    def _emit(self, prompt, monkeypatch, capsys, path=None, ranges=None):
+        from superclaude.scripts import context_loader as cl
+
+        monkeypatch.setattr(cl, "find_migration_reference", lambda *a, **k: path)
+        monkeypatch.setattr(cl, "migration_reference_ranges", lambda p: ranges or {})
+        cl._emit_prompt_command_reference(prompt)
+        return capsys.readouterr().out
+
+    def test_other_commands_emit_nothing(self, monkeypatch, capsys):
+        out = self._emit("/sc:analyze the module", monkeypatch, capsys, Path("/ref.md"))
+
+        assert out == ""
+
+    def test_located_reference_names_path_and_ranges(self, monkeypatch, capsys):
+        out = self._emit(
+            "/sc:prompt ./x.md",
+            monkeypatch,
+            capsys,
+            Path("/ref.md"),
+            {"claude-opus-5": ["L10-20"]},
+        )
+
+        assert "/ref.md" in out
+        assert "'claude-opus-5' L10-20" in out
+        assert "wins over the mirror table" in out
+
+    def test_absent_reference_hands_the_mirror_authority(self, monkeypatch, capsys):
+        out = self._emit("/sc:prompt ./x.md", monkeypatch, capsys, None)
+
+        assert "no claude-api model-migration reference" in out
+        assert "authoritative" in out
+        assert "not read" in out
+
+    def test_renamed_anchors_are_reported_not_silently_mirrored(
+        self, monkeypatch, capsys
+    ):
+        out = self._emit("/sc:prompt ./x.md", monkeypatch, capsys, Path("/ref.md"), {})
+
+        assert "anchors have moved" in out

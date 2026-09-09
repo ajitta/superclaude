@@ -938,6 +938,141 @@ def _emit_execution_directives(prompt: str, session_id: str | None = None) -> No
             print()
 
 
+# /sc:prompt takes its per-model direction from the claude-api skill's
+# model-migration reference, which lives outside the install tree at a path that
+# differs by machine and by scope. The command ships a mirror of that reference
+# and the mirror is authoritative only while the reference is unreachable — a
+# rule prose alone cannot enforce, since the model cannot prefer a file nobody
+# told it the location of. Resolving it here turns the rule into an injected
+# fact and hands over the line ranges, so the read costs one Read instead of a
+# glob and two greps.
+_PROMPT_COMMAND_PATTERN = re.compile(r"/sc:prompt\b")
+
+_MIGRATION_REF_GLOBS = (
+    "plugins/marketplaces/*/skills/claude-api/shared/model-migration.md",
+    "plugins/cache/*/*/*/skills/claude-api/shared/model-migration.md",
+    "skills/claude-api/shared/model-migration.md",
+)
+
+# Anchors in file order. The behavioral-shifts heading repeats once per model
+# section and identifies none of them on its own, so each range is found by
+# anchoring on the model heading first. Fable carries two sections — the
+# migration section and the 5 -> 5.1 delta — and the command's table draws on
+# both.
+_MIGRATION_REF_ANCHORS = (
+    ("claude-opus-5", "## Migrating to Claude Opus 5"),
+    ("claude-fable-5-1", "## Migrating to Claude Fable 5.1"),
+    ("claude-fable-5-1", "## Migrating to Claude Fable 5.1 from Claude Fable 5"),
+)
+_MIGRATION_REF_SECTION = "### Behavioral shifts (prompt-tunable)"
+
+
+def find_migration_reference(roots: list[Path] | None = None) -> Path | None:
+    """Locate the claude-api model-migration reference on this machine.
+
+    Newest mtime wins: the marketplace clone auto-updates, and a plugin-cache
+    copy pinned to an older release can sit beside it.
+    """
+    if roots is None:
+        roots = [claude_base()]
+        home_base = Path.home() / ".claude"
+        if home_base not in roots:
+            roots.append(home_base)
+    found: list[Path] = []
+    for root in roots:
+        for pattern in _MIGRATION_REF_GLOBS:
+            try:
+                found.extend(p for p in root.glob(pattern) if p.is_file())
+            except OSError:
+                continue
+    newest: Path | None = None
+    newest_mtime = -1.0
+    for candidate in found:
+        try:
+            mtime = candidate.stat().st_mtime
+        except OSError:
+            continue
+        if mtime > newest_mtime:
+            newest, newest_mtime = candidate, mtime
+    return newest
+
+
+def migration_reference_ranges(path: Path) -> dict[str, list[str]]:
+    """Line ranges of each target model's prompt-tunable material.
+
+    One range per model section: from its behavioral-shifts heading to the end
+    of that section. Empty when the reference has renamed or dropped those
+    headings — drift the command has to see rather than mirror silently.
+    """
+    try:
+        lines = path.read_text(encoding="utf-8").splitlines()
+    except OSError:
+        return {}
+    ranges: dict[str, list[str]] = {}
+    for model, anchor in _MIGRATION_REF_ANCHORS:
+        start = next(
+            (i for i, line in enumerate(lines) if line.rstrip() == anchor), None
+        )
+        if start is None:
+            continue
+        section = next(
+            (
+                i
+                for i in range(start + 1, len(lines))
+                if lines[i].rstrip() == _MIGRATION_REF_SECTION
+            ),
+            None,
+        )
+        if section is None:
+            continue
+        # To the end of the model's section, not to the next "###": the
+        # sub-sections that follow the shifts heading (the migration checklist,
+        # the long-running-agent recommendations) carry direction the command's
+        # table mirrors, and stopping at the first sibling heading drops it.
+        end = next(
+            (i for i in range(section + 1, len(lines)) if lines[i].startswith("## ")),
+            len(lines),
+        )
+        ranges.setdefault(model, []).append(f"L{section + 1}-{end}")
+    return ranges
+
+
+def _emit_prompt_command_reference(prompt: str) -> None:
+    """Tell /sc:prompt where its model facts live, or that they are not here."""
+    if not _PROMPT_COMMAND_PATTERN.search(scannable_prompt(prompt)):
+        return
+    try:
+        path = find_migration_reference()
+    except OSError:
+        path = None
+    if path is None:
+        print(
+            "<!-- SuperClaude /sc:prompt: no claude-api model-migration reference "
+            "on this machine — the mirror table in the command is authoritative, "
+            "and the report states that the reference was not read. -->"
+        )
+        print()
+        return
+    ranges = migration_reference_ranges(path)
+    if not ranges:
+        print(
+            f"<!-- SuperClaude /sc:prompt: claude-api model-migration reference at "
+            f"{path} — its model anchors have moved, so locate the target's "
+            "behavioral-shifts section by hand before trusting the mirror table. -->"
+        )
+        print()
+        return
+    located = "; ".join(
+        f"'{model}' {', '.join(spans)}" for model, spans in ranges.items()
+    )
+    print(
+        f"<!-- SuperClaude /sc:prompt: claude-api model-migration reference at "
+        f"{path} — {located}. Read the target model's section before applying "
+        "the delta; on conflict it wins over the mirror table in the command. -->"
+    )
+    print()
+
+
 def _extract_prompt(stdin_data: str) -> str:
     """Extract prompt from UserPromptSubmit JSON input, with raw text fallback."""
     try:
@@ -1001,6 +1136,11 @@ def main() -> None:
         print(f"<!-- SuperClaude command: {note} -->")
     if command_notes:
         print()
+
+    # /sc:prompt sources its per-model facts from outside the install tree;
+    # resolving the reference here is what makes "upstream wins over the mirror"
+    # actionable instead of a rule the command has to remember.
+    _emit_prompt_command_reference(prompt)
 
     # Check triggers and get contexts to load
     trigger_prompt = strip_unresolved_commands(prompt, unresolved_commands)
