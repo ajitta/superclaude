@@ -19,9 +19,15 @@ from superclaude.utils import detect_scope, same_dir
 
 # Component definitions: (source_subdir, target_subdir, description)
 # Note: the hook registration is handled separately by install_hooks()
+#
+# Two target kinds. `commands/sc`, `superclaude/*`: SuperClaude-only directories,
+# removed wholesale on uninstall. `agents`, `output-styles`: Claude Code's own
+# content directories, shared with the user's files, so install and uninstall
+# touch only the filenames this release ships (SHARED_TARGET_COMPONENTS).
 COMPONENTS = {
     "commands": ("commands", "commands/sc", "Slash commands"),
     "agents": ("agents", "agents", "Agent definitions"),
+    "output-styles": ("output-styles", "output-styles", "Output styles"),
     "core": ("core", "superclaude/core", "Core framework (PRINCIPLES, FLAGS, RULES)"),
     "modes": ("modes", "superclaude/modes", "Behavioral modes"),
     "mcp": ("mcp", "superclaude/mcp", "MCP server documentation"),
@@ -31,6 +37,20 @@ COMPONENTS = {
         "Doc scaffold templates (consumed by /sc:init, not slash commands)",
     ),
 }
+
+
+# Components whose target directory Claude Code reads for the user's own files
+# too. Uninstall removes only the shipped filenames there, and a local-scope
+# install git-excludes them file by file, never the directory.
+SHARED_TARGET_COMPONENTS = ("agents", "output-styles")
+
+
+def shipped_md_names(component: str) -> set:
+    """Filenames of the .md files a component ships, README excluded."""
+    source_dir = _get_source_dir(component)
+    if not source_dir.exists():
+        return set()
+    return {f.name for f in source_dir.glob("*.md") if f.stem.upper() != "README"}
 
 
 def get_base_path(scope: str = "user") -> Path:
@@ -130,7 +150,7 @@ def _get_source_dir(component: str) -> Path:
     Get source directory for a component.
 
     Args:
-        component: Component name (commands, agents, core, modes, mcp, templates)
+        component: Component name (a COMPONENTS key)
 
     Returns:
         Path to component source directory

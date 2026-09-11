@@ -14,11 +14,13 @@ from superclaude.utils import settings_filename
 
 from .install_paths import (
     COMPONENTS,
+    SHARED_TARGET_COMPONENTS,
     _get_package_root,
     _get_source_dir,
     _get_target_dir,
     find_legacy_skills,
     get_base_path,
+    shipped_md_names,
 )
 from .install_settings import (
     _hook_script_id,
@@ -262,6 +264,61 @@ def list_all_components(
     return result
 
 
+def _uninstall_shared_component(
+    component: str, base_path: Path, dry_run: bool
+) -> Tuple[int, int, int, List[str]]:
+    """Remove a component's shipped files from a directory the user also writes to.
+
+    ``agents/`` and ``output-styles/`` are Claude Code's own content directories:
+    the user's hand-written agents and styles sit next to what SuperClaude
+    installed, so only the filenames this release ships are removed, and the
+    directory goes only once it is empty.
+
+    Returns:
+        Tuple of (removed_count, skipped_count, failed_count, messages)
+    """
+    target_dir = _get_target_dir(component, base_path)
+    label = COMPONENTS[component][1]  # the directory name: agents, output-styles
+    if not target_dir.exists():
+        return 0, 1, 0, [f"⏭️  Not found: {target_dir}/"]
+
+    present = [
+        target_dir / name
+        for name in sorted(shipped_md_names(component))
+        if (target_dir / name).is_file()
+    ]
+    if not present:
+        return 0, 1, 0, [f"⏭️  No SC {label} found in: {target_dir}/"]
+
+    if dry_run:
+        return (
+            1,
+            0,
+            0,
+            [
+                f"[DRY-RUN] Would remove: {len(present)} SC {label} file(s) "
+                f"from {target_dir}/"
+            ],
+        )
+    try:
+        for f in present:
+            f.unlink()
+        if not any(target_dir.iterdir()):
+            target_dir.rmdir()
+            return 1, 0, 0, [f"✅ Removed: {target_dir}/ (empty after SC cleanup)"]
+        return (
+            1,
+            0,
+            0,
+            [
+                f"✅ Removed: {len(present)} SC {label} file(s) from {target_dir}/ "
+                "(preserved non-SC files)"
+            ],
+        )
+    except OSError as e:
+        return 0, 0, 1, [f"❌ Failed to remove SC {label} from {target_dir}/: {e}"]
+
+
 def uninstall_all(
     base_path: Path = None,
     scope: str = "user",
@@ -273,11 +330,12 @@ def uninstall_all(
     Uninstall all SuperClaude components.
 
     This function removes:
-    1. .claude/superclaude/ directory (entire directory)
-    2. .claude/hooks/hooks.json file
-    3. SuperClaude hooks from settings.json (preserves user hooks)
-    4. @superclaude import from CLAUDE.md
-    5. MCP servers registered by SuperClaude at the given scope
+    1. .claude/superclaude/ directory (entire directory) and commands/sc/
+    2. The shipped files in agents/ and output-styles/ (user files preserved)
+    3. .claude/hooks/hooks.json file
+    4. SuperClaude hooks from settings.json (preserves user hooks)
+    5. @superclaude import from CLAUDE.md
+    6. MCP servers registered by SuperClaude at the given scope
        (scope-aware; user-added servers are preserved)
 
     Args:
@@ -353,51 +411,16 @@ def uninstall_all(
         messages.append(f"⏭️  Not found: {commands_sc_dir}/")
         skipped += 1
 
-    # 3. Remove SuperClaude-installed agents (preserves user-added agents)
-    agents_dir = base_path / "agents"
-    agents_source = _get_source_dir("agents")
-    if agents_dir.exists():
-        sc_agent_names = (
-            {f.name for f in agents_source.glob("*.md")}
-            if agents_source.exists()
-            else set()
+    # 3. Remove shipped files from the directories Claude Code shares with the
+    #    user's own content (agents/, output-styles/); user-added files stay.
+    for component in SHARED_TARGET_COMPONENTS:
+        c_removed, c_skipped, c_failed, c_messages = _uninstall_shared_component(
+            component, base_path, dry_run
         )
-        sc_agents_present = [
-            agents_dir / name
-            for name in sc_agent_names
-            if (agents_dir / name).is_file()
-        ]
-        if sc_agents_present:
-            if dry_run:
-                messages.append(
-                    f"[DRY-RUN] Would remove: {len(sc_agents_present)} SC agent file(s) from {agents_dir}/"
-                )
-                removed += 1
-            else:
-                try:
-                    for f in sc_agents_present:
-                        f.unlink()
-                    if not any(agents_dir.iterdir()):
-                        agents_dir.rmdir()
-                        messages.append(
-                            f"✅ Removed: {agents_dir}/ (empty after SC cleanup)"
-                        )
-                    else:
-                        messages.append(
-                            f"✅ Removed: {len(sc_agents_present)} SC agent file(s) from {agents_dir}/ (preserved non-SC files)"
-                        )
-                    removed += 1
-                except Exception as e:
-                    messages.append(
-                        f"❌ Failed to remove SC agents from {agents_dir}/: {e}"
-                    )
-                    failed += 1
-        else:
-            messages.append(f"⏭️  No SC agents found in: {agents_dir}/")
-            skipped += 1
-    else:
-        messages.append(f"⏭️  Not found: {agents_dir}/")
-        skipped += 1
+        removed += c_removed
+        skipped += c_skipped
+        failed += c_failed
+        messages.extend(c_messages)
 
     # 4. Remove skills a pre-removal release installed (install prunes them too)
     stale = find_legacy_skills(base_path)

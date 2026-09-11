@@ -608,3 +608,41 @@ class TestCheckIgnoreParsing:
         assert _parse_check_ignore(stdout) == [
             (".gitignore", "7", ".claude/agents/x.md")
         ]
+
+
+class TestSharedDirectoriesAreExcludedPerFile:
+    """`agents/` and `output-styles/` are Claude Code's, shared with user files.
+
+    A local-scope install must exclude exactly the shipped filenames there: a
+    directory-level ignore would hide a team's hand-written agent or style, and
+    a missing entry leaves the personal install visible to `git status`.
+    Project scope tracks them — that is what the scope is for.
+    """
+
+    def test_local_scope_lists_each_shipped_style_file(self):
+        from superclaude.cli.install_git_exclude import _collect_entries
+        from superclaude.cli.install_paths import shipped_md_names
+
+        entries = _collect_entries("local")
+
+        shipped = shipped_md_names("output-styles")
+        assert shipped, "no output style ships"
+        for name in shipped:
+            assert f".claude/output-styles/{name}" in entries
+        assert ".claude/output-styles/" not in entries, "directory-level ignore"
+
+    def test_local_scope_still_lists_each_agent_file(self):
+        from superclaude.cli.install_git_exclude import _collect_entries
+        from superclaude.cli.install_paths import shipped_md_names
+
+        entries = _collect_entries("local")
+
+        for name in shipped_md_names("agents"):
+            assert f".claude/agents/{name}" in entries
+
+    def test_project_scope_tracks_them(self):
+        from superclaude.cli.install_git_exclude import _collect_entries
+
+        entries = _collect_entries("project")
+
+        assert not any(e.startswith(".claude/output-styles/") for e in entries)

@@ -135,7 +135,7 @@ source manifest와 artifact manifest를 exact 또는 명시적 allowlist로 비�
 
 - CLI/hooks/utils Python modules와 entry points
 - `CLAUDE_SC.md`
-- commands, agents, core, modes, MCP docs
+- commands, agents, output styles, core, modes, MCP docs
 - skill별 `SKILL.md`, canary, scripts, references, assets
 - template 하위 파일 전체
 - `auto_improve`, `parallel_ab` subpackages

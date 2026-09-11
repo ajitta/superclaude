@@ -16,6 +16,10 @@ Authoritative human docs live in `src/superclaude/ARCHITECTURE.md` (taxonomy sou
 
 - [Agents index](/agents/index.md): Specialized sub-agents delegated for domain work (design, security, testing, research). (23 concepts)
 
+## Output Styles
+
+- [Output Styles index](/output-styles/index.md): Claude Code output styles — response voice for every turn, user-selected via `/config`. (1 concept)
+
 ## Commands
 
 - [Commands index](/commands/index.md): Slash commands (`/sc:*`) that orchestrate multi-step workflows. (36 concepts)

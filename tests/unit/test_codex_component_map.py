@@ -70,6 +70,7 @@ def _actual_counts() -> dict[str, int]:
     distinct_hooks, _ = _hook_entry_scripts()
     return {
         "agents/*.md": _count_md(_component_dir("agents")),
+        "output-styles/*.md": _count_md(_component_dir("output-styles")),
         "commands/*.md": _count_md(_component_dir("commands")),
         "core always-loaded": _always_loaded_core(),
         "core/rules/*.md": _count_md(_component_dir("core") / "rules"),
@@ -92,6 +93,7 @@ def _actual_counts() -> dict[str, int]:
 # the backticked path keeps the mapping readable when a row is reworded.
 _ROW_KEYS = {
     "`agents/*.md`": "agents/*.md",
+    "`output-styles/*.md`": "output-styles/*.md",
     "`commands/*.md`": "commands/*.md",
     "`core` always-loaded": "core always-loaded",
     "`core/rules/*.md`": "core/rules/*.md",

@@ -36,7 +36,7 @@
 
 ## 🎯 **Overview**
 
-`superclaude` is a **content framework** for Claude Code: a directory of markdown (commands, agents, modes, MCP docs, core rules) plus a small CLI / pytest plugin that installs that content into Claude Code's content directories — `~/.claude/` (user), `./.claude/` (project, committed), or `./.claude/` (local, personal — kept out of git through the clone's `.git/info/exclude`).
+`superclaude` is a **content framework** for Claude Code: a directory of markdown (commands, agents, output styles, modes, MCP docs, core rules) plus a small CLI / pytest plugin that installs that content into Claude Code's content directories — `~/.claude/` (user), `./.claude/` (project, committed), or `./.claude/` (local, personal — kept out of git through the clone's `.git/info/exclude`).
 
 Claude Code reads those files at session start, which is how the framework changes its behavior. There is no runtime engine, no daemon, no proxy.
 
@@ -96,6 +96,7 @@ What gets installed (per scope):
 <scope>/
 ├── commands/sc/        # 36 slash commands (/sc:plan, /sc:implement, …)
 ├── agents/             # 23 agent definitions
+├── output-styles/      # output styles (pick one via /config → Output style)
 ├── superclaude/        # core rules, modes, mcp docs
 ├── hooks/hooks.json    # SessionStart / PreCompact / SessionEnd / etc.
 └── settings(.local).json  # framework hooks merged in (your existing hooks preserved)

@@ -10,6 +10,7 @@ Content Type    Role                Analogy         Delivery
 core/           Framework DNA       Constitution    Always loaded (CLAUDE_SC.md)
 modes/          Mindset overlay     Mood/Posture    On-demand (context_loader)
 agents/         Domain expert       Specialist      CC-native delegation
+output-styles/  Response voice      House style     CC-native, user-selected (/config)
 commands/       Workflow entry      Menu item       CC-native /sc:*
 mcp/            Tool docs+config    Tool manual     context_loader + install_mcp
 scripts/        Hook infra          Plumbing        hooks.json → settings.json
@@ -51,6 +52,12 @@ Situational cognitive overlays that modify Claude's thinking, communication, pri
 Domain expert agents with specialized knowledge, behaviors, and tool preferences. Managed by Claude Code's native agent delegation system — auto-selected based on task keywords in the `description` frontmatter field.
 
 **Contract:** Each agent is a self-contained definition with frontmatter (identity + permissions) and XML body (expertise + behavior). Agents receive tasks from commands and produce structured outputs.
+
+### output-styles/ — HOW EVERY RESPONSE READS
+
+Claude Code output styles: Markdown with YAML frontmatter that replaces the tone and format instructions in Claude Code's system prompt for every response. Installed to `<scope>/output-styles/`, the directory Claude Code scans natively; the user selects one via `/config` → **Output style**, which writes `outputStyle` to `.claude/settings.local.json`. Nothing in SuperClaude loads or injects them.
+
+**Contract:** Plain Markdown prose, not the `<component>` pattern. `keep-coding-instructions: true` always, so Claude Code's own software-engineering instructions survive. Language-neutral: the style ships to every user, so it names patterns, never one language's phrases. A style shapes voice for every turn; a mode shapes mindset for a task.
 
 ### commands/ — WHAT TO INVOKE
 
@@ -115,7 +122,7 @@ Session Start
 |-----------|--------------|---------|--------|
 | **Always loaded** | core/ (FLAGS, PRINCIPLES, RULES kernel) | Session start | ~140 lines via @import |
 | **On-demand** | modes/, mcp/, core/rules/, core/BUSINESS_SYMBOLS | Flag/keyword in prompt | 8K token budget (context_loader) |
-| **CC-native** | agents/, commands/ | Auto-delegation, /sc:* | Managed by Claude Code runtime |
+| **CC-native** | agents/, commands/, output-styles/ | Auto-delegation, /sc:*, selected style | Managed by Claude Code runtime |
 
 ## Naming Trinity
 
@@ -143,6 +150,7 @@ Each content type has a dedicated authoring guide:
 |-------------|----------------|-----------------|
 | agents/ | `.claude/rules/agent-authoring.md` | `tests/unit/test_agent_structure.py` |
 | commands/ | `.claude/rules/command-authoring.md` | `tests/unit/test_command_structure.py` |
+| output-styles/ | `.claude/rules/output-style-authoring.md` | `tests/unit/test_output_style_structure.py` |
 | modes/ | `.claude/rules/mode-authoring.md` | `tests/unit/test_mode_structure.py` |
 | core/ | N/A (framework maintainers only) | N/A |
 | mcp/ | `.claude/rules/mcp-authoring.md` | `tests/unit/test_content_structure.py` |

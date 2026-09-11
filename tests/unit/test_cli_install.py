@@ -1176,3 +1176,107 @@ class TestTeamIgnoreOfTheRegistrationIsReported:
         )
 
         assert "ignores .claude/" not in message, message
+
+
+class TestOutputStylesInstallIntoClaudeCodesDirectory:
+    """Output styles land where Claude Code reads them and leave the user's own alone.
+
+    `<scope>/output-styles/` is Claude Code's directory, shared with styles the
+    user wrote by hand. Install must put the shipped file there (not under
+    `superclaude/`, which Claude Code never scans), and uninstall must remove
+    only the shipped filenames, so a hand-written style survives.
+    """
+
+    SHIPPED = "plain-language.md"
+
+    def test_install_copies_the_style_where_claude_code_scans(self, tmp_path):
+        from superclaude.cli.install_components import install_all
+
+        success, message = install_all(base_path=tmp_path, force=True, scope="project")
+
+        assert success is True, message
+        installed = tmp_path / "output-styles" / self.SHIPPED
+        assert installed.is_file()
+        assert "Output styles: 1 installed" in message
+        source = (
+            Path(__file__).parents[2]
+            / "src"
+            / "superclaude"
+            / "output-styles"
+            / self.SHIPPED
+        )
+        assert installed.read_bytes() == source.read_bytes(), "copied verbatim"
+
+    def test_listing_counts_it(self, tmp_path):
+        from superclaude.cli.install_components import install_all
+        from superclaude.cli.install_inventory import list_all_components
+
+        install_all(base_path=tmp_path, force=True, scope="project")
+        row = list_all_components(base_path=tmp_path, scope="project")["output-styles"]
+
+        assert row["available"] >= 1
+        assert row["installed"] == row["available"]
+
+    def test_uninstall_removes_only_the_shipped_style(self, tmp_path):
+        from superclaude.cli.install_components import install_all
+        from superclaude.cli.install_inventory import uninstall_all
+
+        install_all(base_path=tmp_path, force=True, scope="project")
+        own = tmp_path / "output-styles" / "my-team-voice.md"
+        own.write_text("---\nname: Team Voice\n---\nBe terse.\n", encoding="utf-8")
+
+        success, message = uninstall_all(base_path=tmp_path, scope="project")
+
+        assert success is True, message
+        assert not (tmp_path / "output-styles" / self.SHIPPED).exists()
+        assert own.is_file(), "a hand-written style must survive uninstall"
+        assert "SC output-styles file(s)" in message
+
+    @pytest.mark.parametrize("component_dir", ["agents", "output-styles"])
+    def test_uninstall_leaves_a_user_readme_alone(self, tmp_path, component_dir):
+        """README.md is never shipped, so it is never SuperClaude's to remove.
+
+        The agents-only uninstall built its removal set from the source glob
+        including README.md, so a hand-written `.claude/agents/README.md` was
+        deleted on uninstall. The shared helper excludes it for both directories.
+        """
+        from superclaude.cli.install_components import install_all
+        from superclaude.cli.install_inventory import uninstall_all
+
+        install_all(base_path=tmp_path, force=True, scope="project")
+        readme = tmp_path / component_dir / "README.md"
+        readme.write_text("# our team's notes\n", encoding="utf-8")
+
+        uninstall_all(base_path=tmp_path, scope="project")
+
+        assert readme.is_file(), f"{component_dir}/README.md was never shipped"
+
+    def test_uninstall_drops_the_directory_once_empty(self, tmp_path):
+        from superclaude.cli.install_components import install_all
+        from superclaude.cli.install_inventory import uninstall_all
+
+        install_all(base_path=tmp_path, force=True, scope="project")
+
+        uninstall_all(base_path=tmp_path, scope="project")
+
+        assert not (tmp_path / "output-styles").exists()
+
+    def test_dry_run_names_it_without_removing(self, tmp_path):
+        from superclaude.cli.install_components import install_all
+        from superclaude.cli.install_inventory import uninstall_all
+
+        install_all(base_path=tmp_path, force=True, scope="project")
+
+        _ok, message = uninstall_all(base_path=tmp_path, scope="project", dry_run=True)
+
+        assert "Would remove: 1 SC output-styles file(s)" in message
+        assert (tmp_path / "output-styles" / self.SHIPPED).is_file()
+
+    def test_verify_drift_covers_it(self, tmp_path):
+        from superclaude.cli.install_components import install_all
+        from superclaude.cli.verify_drift import verify_drift
+
+        install_all(base_path=tmp_path, force=True, scope="project")
+        result = verify_drift(tmp_path, verbose=True)
+
+        assert result["components"]["output-styles"]["files"][self.SHIPPED] == "OK"

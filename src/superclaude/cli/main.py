@@ -113,6 +113,7 @@ def install(
     Installs:
     - Slash commands to commands/sc/
     - Agent definitions to agents/
+    - Output styles to output-styles/ (select one via /config)
     - Behavioral modes to superclaude/modes/
     - Framework files to superclaude/ (core, mcp)
 
@@ -287,7 +288,7 @@ def uninstall(
     Removes:
     - superclaude/ directory (core, modes, mcp, templates)
     - commands/sc/ directory (slash commands)
-    - agents/ directory
+    - shipped files in agents/ and output-styles/ (your own files stay)
     - hooks/hooks.json file
     - SuperClaude hooks from settings.json (preserves user hooks)
     - @superclaude import from CLAUDE.md

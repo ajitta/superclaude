@@ -21,6 +21,7 @@ Delivery: source markdown installs verbatim into user/project/local scope; hooks
 
 - [Bundle index](/index.md)
 - [Agents](/agents/index.md)
+- [Output Styles](/output-styles/index.md)
 - [Commands](/commands/index.md)
 - [Modes](/modes/index.md)
 - [MCP Servers](/mcp/index.md)

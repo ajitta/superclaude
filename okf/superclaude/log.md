@@ -1,5 +1,9 @@
 # Log
 
+## 2026-09-11
+
+- **Creation**: Output Styles section (1 concept) — `src/superclaude/output-styles/` became an installed component (Claude Code output style, installed to `<scope>/output-styles/`, user-selected via `/config`).
+
 ## 2026-08-31
 
 - **Update**: Migrated the whole bundle v0.1 → v0.2 (`timestamp` → `generated`, root `okf_version: "0.2"`), via okf-validate --migrate.
