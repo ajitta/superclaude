@@ -11,6 +11,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Awaitable, Callable
 
+from superclaude.utils import detect_refusal
+
 from .observation import (
     Observation,
     Tokens,
@@ -19,7 +21,6 @@ from .observation import (
     emit,
 )
 from .spec_loader import RunnerCfg, Scenario, Variant
-from superclaude.utils import detect_refusal
 
 _AUTH_PATTERNS = re.compile(
     r"authent|credential|api[\s\-]?key|unauthor|login",

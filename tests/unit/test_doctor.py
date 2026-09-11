@@ -19,9 +19,6 @@ from superclaude.cli.doctor import (
     _check_hooks_installed,
     run_doctor,
 )
-from superclaude.cli.install_inventory import _source_dir_names
-from superclaude.cli.install_paths import _get_source_dir
-
 
 SC_HOOK_EVENTS = ["SessionStart", "UserPromptSubmit", "PostToolUse", "PreToolUse"]
 

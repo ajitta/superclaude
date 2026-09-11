@@ -1383,7 +1383,7 @@ class TestHarvestOnlyTakesAnsweredMarkers:
         assert iw.cmd_harvest(ns) == 0
         assert _pending_texts(workdir) == ["the cache key needed the session id."]
 
-    def test_the_request_is_recognized_even_when_claude_code_marks_it_isMeta(
+    def test_the_request_is_recognized_even_when_claude_code_marks_it_is_meta(
         self, workdir, monkeypatch
     ):
         """Claude Code delivers the Stop hook's block reason as an isMeta record.
