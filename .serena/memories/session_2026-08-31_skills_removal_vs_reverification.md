@@ -25,7 +25,7 @@ A 3-lens adversarial review (evidence accuracy / repo consistency / regression) 
 - Files: MODE_Verbalized_Sampling.md corrected; core/FLAGS.md --vs gains "ideation/landscape queries, not factual QA"; docs/research/verbalized-sampling-reverification-chosh1179-2026-08-31.md records per-claim verdicts.
 - uv run pytest: 2461 passed / 0 failed (on branch and again on merged master); make sync-local clean; installed copy byte-identical.
 
-## Open
-Two pre-existing items deliberately not fixed (out of scope, both info-severity):
-- MODE_Verbalized_Sampling.md diversity_dial `note=` restates precedence already in the params body.
-- commands/brainstorm.md:60 example uses comma-combined bracket `[k:3, tau:0.20]` vs documented `[k:3] [tau:0.20]`.
+## Open — both closed since (verified 2026-09-11)
+Two pre-existing items were deliberately not fixed here (out of scope, both info-severity); neither is present any more:
+- ~~MODE_Verbalized_Sampling.md diversity_dial `note=` restates precedence already in the params body.~~ `<diversity_dial>` carries no `note=`.
+- ~~commands/brainstorm.md:60 example uses comma-combined bracket `[k:3, tau:0.20]`.~~ The line reads `[k:3] [tau:0.20]`, matching the documented form.

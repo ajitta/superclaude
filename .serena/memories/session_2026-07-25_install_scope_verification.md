@@ -26,9 +26,15 @@ Commit `52b5517` on master, pushed. 12 files, +252/-27. Branch `fix/hook-state-s
 Tests 2062 → 2075 (13 new in `tests/unit/test_scope_paths.py`, including subdirectory regression cases). Baseline strings updated in CLAUDE.md, AGENTS.md, README.md.
 
 ## Open
-`install_inventory.py:104` — `installed_count` for `skills`/`templates` counts every subdirectory of the shared target dir, so foreign skills inflate it and `--list-all` shows ⬜ `[13/5]` on a correct install. Same latent defect for `agents`/`commands`. Cosmetic; not fixed.
+~~`install_inventory.py:104` — `installed_count` counts every subdirectory of the shared target dir, so foreign skills inflate it.~~ **Resolved** (verified 2026-09-11): both sides are counted by *name* and the installed side is the intersection with the source, so a directory SuperClaude does not ship is never counted — `install_inventory.py:205-223`.
 
 Proposed but not applied: a `.claude/rules/gotchas/` entry capturing the `Path.cwd()`-in-hooks trap (R19 capture).
 
 ## Next session
 Hooks in the session that made the change were still running the pre-fix code — a Claude Code restart is required before the new resolvers take effect in a live session.
+
+## Superseded since (checked 2026-09-11)
+The delivery mechanism this session reasoned about is gone; the scoping decisions survive, their implementation does not.
+- **`{{PYTHON_BIN}}` / `{{SCRIPTS_PATH}}` no longer exist.** Since the console entry (`19575ac`, 2026-09-05) every hook is `superclaude hook <name>` and no script copies are installed. `{{SCRIPTS_PATH}}` survives only in `utils.SUPERCLAUDE_HOOK_MARKERS` to recognise pre-console-entry registrations. "The two shipped hook scripts" is also stale — every script under `src/superclaude/scripts/` imports `superclaude.utils` unconditionally now, for the same reason given here.
+- **"Anchor on `$CLAUDE_PROJECT_DIR`, not CWD" narrowed.** After the worktree fix (`59ff880`, 2026-09-05) only *project* scope keeps that anchor; every other scope bakes the absolute path, because a linked worktree reads the main worktree's settings file while expanding `$CLAUDE_PROJECT_DIR` to the linked one. See the 2026-09-05 save.
+- The state-dir TTL prune recorded here as "declined" **ships**: `utils/__init__.py` `prune_hook_state()`, `STATE_MAX_AGE_DAYS = 7`, called every SessionStart. Corrected in the 2026-09-01 save.

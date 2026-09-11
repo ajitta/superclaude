@@ -1,5 +1,9 @@
 # SuperClaude — Project Overview
 
-Canonical source: `CLAUDE.md` (repo root, auto-loaded every session) + `src/superclaude/ARCHITECTURE.md` (full taxonomy).
+Canonical source: `CLAUDE.md` (repo root, auto-loaded every session) + `src/superclaude/ARCHITECTURE.md`
+(full taxonomy: directory roles, delivery pipelines, content types).
 
-No copies kept here — duplicates drift. Past incident: this file pinned test baseline 1,628 while the real suite grew past 1,900. That number is now recorded nowhere: `uv run pytest` must exit 0, and the count itself was deleted from the docs on 2026-08-30 because it went stale on every commit that added a test.
+No copies kept here — duplicates drift, and nothing compares a copy to reality, so a stale one
+survives a green suite. This file once pinned test baseline 1,628 while the real suite grew past
+1,900. The general form of that failure, with the SSOT for each class of number, is the
+`stale-number-copies` entry in `.claude/rules/gotchas/general.md`.
