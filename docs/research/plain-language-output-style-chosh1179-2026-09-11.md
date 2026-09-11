@@ -72,3 +72,35 @@ Residual: bold is still used as an inline heading ("**Runner setup.**") in both 
 ## 4. Not shipped, kept for a Korean variant
 
 Korean-specific 번역투 instances (~을 가지다, ~에 의해 피동, ~에 있어서, ~에 다름 아니다, '-들' 남용, 무생물 주어) are documented in the 국립국어원 paper above and belong in a user's own CLAUDE.md or a per-language style, not in the global file. Claims about "~하는 것이 중요합니다", "~알아보겠습니다", 존댓말 겹침 and 개조식 as AI markers had community sources only and were not adopted.
+
+## 5. Rule-level probe and two wording revisions, 2026-09-11 evening
+
+A rule-level probe (twelve prompts aimed at one rule each, two conditions, Opus 5 throughout and Fable 5.1 on four; fixtures were session scratch and are not committed) found the closing rule the least reliable one in the file. A short Korean mail request ended with a conditional offer ("원하시면 ~해 드릴게요", "~하고 싶으면 말씀해 주세요") in 3 of 4 styled runs on Opus 5, and a Korean troubleshooting answer ended with "로그 붙여주시면 좁혀드릴게요" in 2 of 3. English long-form answers dropped their offers under the style, so the miss is concentrated in Korean short and diagnostic replies, where a polite invitation to request changes reads as register rather than as an offer.
+
+One root cause, two edits. The offer rule lived in two sections ("automatic offers to continue" under AI mannerisms, "offer of variants" under Work reports) and neither named the failing shape. The mannerisms mention was removed and the Work-reports sentence now reads: "Otherwise state what you assumed and stop: no moral, slogan, recap, ceremonial closing, or offer of variants, adjustments, or further work." The positive half comes first because the passing Fable answer already did exactly that (stated the name it assumed, told the reader to change it). Body 594 to 598 words.
+
+Re-measured under the new wording, style condition only, same method as §3:
+
+| prompt | model | runs | ends with an offer | ends with a reader-side note |
+|---|---|---|---|---|
+| ko cancel-meeting mail | Opus 5 | 5 | 0 (was 3 of 4) | 2 (fill-in hint, date check; the reader acts) |
+| ko CrashLoopBackOff order | Opus 5 | 3 | 0 (was 2 of 3) | 0 |
+| en CI 12 to 45 min | Opus 5 | 2 | 2, both "Paste the step timings and I'll narrow it" | 0 |
+| en Rust in 2026 | Opus 5 | 1 | 0 | 0 |
+| en rename report | Opus 5 | 1 | 0 | 0 |
+| ko cancel-meeting mail | Fable 5.1 | 2 | 0 | 1 |
+
+The CI answer's closing ask is the blocker case the second sentence permits: the cause cannot be named without the timings. Its shape moved from "To go further I need: ..." to "Paste ... and I'll narrow it", an offer in form; not iterated. Single-day, single-wording measurement; the variance warning in §3 applies.
+
+### Dash rule, same evening
+
+The other weak rule from the probe was the dash: styled Korean answers used the em dash as a label-to-gloss separator ("- `137` — 메모리 한도 초과"), 5 to 11 per answer against 0 in the default condition, which laid the same content out as a table. The shipped sentence, "Punctuate with commas, colons, or parentheses before reaching for a dash", ranks punctuation but leaves the label position looking like the permitted last resort. Three wordings were measured, each on the CrashLoopBackOff prompt and on a new list-shaped prompt (HTTP 401/403/404/409/422/429, Korean), styled runs on Opus 5 with Fable 5.1 spot checks; the cell lists em dashes per run.
+
+| wording | ko CrashLoopBackOff | ko HTTP status codes | Fable 5.1 |
+|---|---|---|---|
+| shipped: "before reaching for a dash" | 6, 5, 5, 7, 6, 11 | not run | 0, 0 (PKCE and pre-commit prompts) |
+| "; a list label takes a colon" | 0, 0, 4, 0, 0 | 1, 6, 6 | 0, 0 |
+| "; a label and its explanation take a colon" | 0, 0, 6 | 6, 0, 0, 0, 6 | 0, 0 |
+| now shipped: ", and join a heading, bold term, or list label to its explanation with a colon" | 0, 0, 0 | 1, 0, 0, 0, 0 | 0, 0 |
+
+The second wording emptied the bulleted shape and the dashes moved to bold paragraph leads ("**401 vs 403** — ...") and headings ("## 401 Unauthorized — ..."), which the model did not read as labels; the third wording did not move them either. Naming the three positions did. Under the final wording the model often lays a code-gloss list out as a table, as the default condition does. The one remaining dash sits in an unbolded bullet inside a 747-word answer. Two sentences were cut to stay under the 600-word cap, both by the deletion test: "or an introductory roadmap" (already covered by "previews of what follows" in the opening rule) and "Choose precise common words over inflated stock language" (covered by "familiar words" in Prose and "stock phrases" in the preceding paragraph). Body 598 words.
