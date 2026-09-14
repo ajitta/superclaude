@@ -93,7 +93,7 @@ SuperClaude is a content framework whose entire job is *configuring a non-determ
 
 ## P-R21 — Pillar-3 runtime signature: R21 Failure-Forward (implemented 2026-05-31, /sc:implement)
 
-**Shipped** to `src/superclaude/core/RULES.md` (installed user-scope). Rule `[R21 Failure-Forward]`: on unexpected progress-blocking in-task failure, emit `⚠ failed: X | hypothesis: Y | next: Z`, take one bounded recovery or structured stop; never blind-retry/fabricate/stall; 2-attempt cap; excludes expected/handled errors. Gives pillar 3 the runtime *signature* pillars 1/2/4 already had. Plan: `docs/plans/failure-forward-runtime-ajitta-2026-05-31.md`.
+**Shipped** to `src/superclaude/core/RULES.md` (installed user-scope). Rule `[R21 Failure-Forward]`: on unexpected progress-blocking in-task failure, emit `⚠ failed: X | hypothesis: Y | next: Z`, take one bounded recovery or structured stop; never blind-retry/fabricate/stall; 2-attempt cap; excludes expected/handled errors. Gives pillar 3 the runtime *signature* pillars 1/2/4 already had. Plan: `docs/archive/plans/failure-forward-runtime-ajitta-2026-05-31.md`.
 
 **Two findings from the install→probe loop (both validate the agent-native thesis):**
 

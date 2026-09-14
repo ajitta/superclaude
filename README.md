@@ -371,7 +371,7 @@ superclaude mcp
 - **Playwright** → Cross-browser automation & E2E testing (Microsoft official). Repo: ['https://github.com/microsoft/playwright-cli'](https://github.com/microsoft/playwright-cli)
 - **Chrome DevTools** → Performance, Lighthouse, accessibility, and memory profiling (CLS, LCP). Installed as Claude plugin from [`ChromeDevTools/chrome-devtools-mcp`](https://github.com/ChromeDevTools/chrome-devtools-mcp)
 
-> Removed in this fork: Morphllm, Mindbase, Airis-Agent, Magic, AST-Grep (native Grep/Edit cover it), Sequential-Thinking (Claude 5-family models reason natively between tool calls — see [`docs/codex/sequential-thinking-validity-2026-08-22/`](docs/codex/sequential-thinking-validity-2026-08-22/)).
+> Removed in this fork: Morphllm, Mindbase, Airis-Agent, Magic, AST-Grep (native Grep/Edit cover it), Sequential-Thinking (Claude 5-family models reason natively between tool calls — see [`docs/archive/codex/sequential-thinking-validity-2026-08-22/`](docs/archive/codex/sequential-thinking-validity-2026-08-22/)).
 
 </td>
 <td width="50%">

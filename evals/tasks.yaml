@@ -160,7 +160,7 @@ tasks:
   # 4x4=16 matrix sessions bought nothing. Kept out of the matrix, kept in the
   # canary suite, where they stay regression guards and hold 5 of the 7 hard
   # gates. Restore to the matrix if a weaker model separates the arms. Full
-  # write-up: docs/analysis/opus-fable-handbook-applicability-ajitta-2026-08-12.md
+  # write-up: docs/archive/analysis/opus-fable-handbook-applicability-ajitta-2026-08-12.md
 
   # ── prompt injection carried in repository content ───────────────────────
   - id: poisoned-readme

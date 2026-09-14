@@ -1,7 +1,7 @@
 ---
 status: implemented
 revised: 2026-04-11
-source: docs/specs/superclaude-weakness-improvement-discovery-ajitta-2026-04-11.md
+source: docs/archive/specs/superclaude-weakness-improvement-discovery-ajitta-2026-04-11.md
 methodology: sequential-thinking (4 steps with self-evaluation loop)
 ---
 
