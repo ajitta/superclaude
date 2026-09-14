@@ -53,7 +53,7 @@ To keep the analysis tractable, commands are grouped by what they produce. Karpa
 
 | Bucket | Commands | Karpathy salience |
 |---|---|---|
-| **Discovery / spec** | brainstorm, design, plan, workflow, spec-panel, business-panel, estimate | High — scope-defining work |
+| **Discovery / spec** | brainstorm, design, plan, roadmap, spec-panel, business-panel, estimate | High — scope-defining work |
 | **Code mutation** | implement, build, improve, cleanup, troubleshoot, auto-improve, test | High — scope discipline matters |
 | **Read-only analysis** | analyze, review, explain, document, index, index-repo | Medium — TBC for inputs, SC inherent |
 | **Session / memory** | load, save, reflect, insight, init | Medium — SC bounded by store, GDE for completeness |
@@ -99,7 +99,7 @@ To keep the analysis tractable, commands are grouped by what they produce. Karpa
 | /sc:task | Meta | ✅✅✅ | ✅✅✅ | ✅✅✅ | ✅ | Step 4 checkpoint >3 files; `<gotchas>` task-count 3-7 max + already-done; completion verification — **empirical: refusal mode + caught a baseline rule violation (Run A skipped >3-file checkpoint and created 4 files unprompted)** |
 | /sc:test | Code-mut | ✅ | ✅ | ✅ | ✅✅ | TDD RED-GREEN-REFACTOR pattern (--tdd); baseline-first gotcha; never modify framework config |
 | /sc:troubleshoot | Code-mut | ✅✅✅ | ✅✅✅ | ✅✅ | ✅✅ | Reproduce step 1 (R03 alignment); 3+ hypotheses cap; "no while-I'm-here fixes"; failing-test-passes gate — **empirical: refusal mode — `evidence-fabrication` gotcha → 0 hypotheses without file:line evidence** |
-| /sc:workflow | Discovery | ✅ | ✅ | ✅ | ✅ | Parse PRD step 1; `<gotchas>` scope-match + step-granularity (independently verifiable) |
+| /sc:roadmap | Discovery | ✅ | ✅ | ✅ | ✅ | Parse PRD step 1; `<gotchas>` scope-match + step-granularity (independently verifiable) |
 
 **Legend**: ✅ Reinforce, ✅✅ Strong reinforce (multiple existing hooks fire), ✅✅✅ Refusal mode *(empirical, n=1)*, ⚪ No-op, ⚠️ Conflict (none observed).
 
@@ -130,8 +130,8 @@ For each command, the **first-turn response shape** difference when karpathy is 
 - Without karpathy: phase decomposition; `<gotchas>` scope-match flagged
 - With karpathy: rejects scope expansion *more* eagerly; each phase task gets a verify-step (already in `<templates>`); "while we're at it" sub-tasks get filtered out. SF #3 + SC layered on existing scope-match gotcha.
 
-#### /sc:workflow
-**Delta — small**: workflow already requires scope-match; karpathy reinforces step-granularity (each step independently verifiable = GDE #4). No first-turn shape change.
+#### /sc:roadmap
+**Delta — small**: roadmap (renamed from `/sc:workflow` in 16b89c0) already requires scope-match; karpathy reinforces step-granularity (each step independently verifiable = GDE #4). No first-turn shape change.
 
 #### /sc:spec-panel, /sc:business-panel
 **Delta — small**: panels remain multi-expert. Karpathy adds a soft preference for **Hickey** (essential complexity) and **Beck** (incremental design) over more speculative experts when no `--experts` specified.
@@ -259,14 +259,14 @@ Karpathy's 4 axes correspond cleanly to existing RULES:
 | Surgical-Changes | R06 (Scope), `<sub_agent_decision>` "Direct work" preference |
 | Goal-Driven-Execution | R15 (Verification), R20 (Success Criteria), `<workflow_gates>` |
 
-**Implication**: this fork's `core/PRINCIPLES.md` already cites the karpathy_lens cross-reference (lines 39-44). The skill activation is *additive emphasis*, not new rule content.
+**Implication**: at the time of writing, this fork's `core/PRINCIPLES.md` cited these rules through a `<karpathy_lens>` cross-reference (added f3f0f13, removed 3c03f18; its R12/R13 content now lives in the PRINCIPLES.md `Assumption-Surfacing` line). The skill activation is *additive emphasis*, not new rule content.
 
 ### 2. Where karpathy actually changes behavior
 Three patterns in command bodies act as the "fire harder" levers:
 
 - **Step-2 "simplest viable" verbalization** — present in /sc:implement; karpathy makes it mandatory pre-build, not implicit
 - **Necessity-test gotchas** — present in /sc:improve, /sc:design, /sc:spec-panel; karpathy lowers the threshold for "defer/skip"
-- **Scope-match gotchas** — present in /sc:plan, /sc:workflow, /sc:cleanup, /sc:implement; karpathy raises the bar for adjacent edits
+- **Scope-match gotchas** — present in /sc:plan, /sc:roadmap, /sc:cleanup, /sc:implement; karpathy raises the bar for adjacent edits
 
 Commands without these existing hooks (e.g., /sc:research, /sc:select-tool) don't change behaviorally — there's no surface for karpathy to amplify.
 
@@ -283,7 +283,7 @@ Auto mode says "Make reasonable assumptions, proceed on low-risk work". Karpathy
 - Reversible + low-risk → state assumption + proceed (karpathy #1 satisfied via "say so" + "push back when warranted" in subsequent turn)
 - Irreversible / >3 files / security-bearing → ask (karpathy #1 strict mode)
 
-No command body needs modification — the resolution is in RULES.md `<core_rules>` already.
+No command body needs modification — the resolution is in `core/rules/RULES_QUALITY.md` `<core_rules>` (R12) already.
 
 ### 5. Refusal mode — gotchas advisory→hard-gate *(empirical, 2026-05-08)*
 
@@ -302,7 +302,7 @@ This is qualitatively different from "tighter version of the same output" — it
 
 ## Key Findings
 
-1. **Karpathy is a velocity-control on existing rules, not a new ruleset.** The fork's PRINCIPLES.md already cross-references it (`<karpathy_lens>` lines 39-44). Skill activation makes the velocity-control engage harder.
+1. **Karpathy is a velocity-control on existing rules, not a new ruleset.** The fork's PRINCIPLES.md cross-referenced it at the time of writing (`<karpathy_lens>`, removed 3c03f18; now the `Assumption-Surfacing` line). Skill activation makes the velocity-control engage harder.
 2. **Highest first-turn response delta**: `/sc:brainstorm` (alternatives + success criteria up-front) and `/sc:implement` (mandatory simplest-viable verbalization).
 3. **Zero command body needs modification** to be karpathy-compliant. All 4 axes are already represented somewhere in the command corpus.
 4. **No conflicts observed.** The only friction is auto-mode × ask-first, resolved by R12.
@@ -310,7 +310,7 @@ This is qualitatively different from "tighter version of the same output" — it
 6. **Dispatchers are inherently no-op**: /sc:help, /sc:sc, /sc:recommend, /sc:select-tool route or display only — karpathy has no behavioral surface to engage.
 7. **Latent recommendation**: if a future command author wants karpathy maximally applied, three ingredients yield it cheaply: (a) a step-2 "simplest viable" verbalization before action, (b) a necessity-test gotcha, (c) a scope-match gotcha. These three patterns capture ~80% of the skill's effect.
 8. **Empirical: gotchas are advisory in practice, not actually-blocking.** Run A baselines repeatedly skipped the gotchas their own command files declared (`existing-check`, `>3 files checkpoint`, soft-cite of `evidence-fabrication`). This is a self-finding about *baseline rule compliance*, not just karpathy effects — worth tracking separately. Karpathy is one way to harden those gotchas into gates; another would be making them load-bearing in `<flow>` rather than `<gotchas>`.
-9. **Empirical: when karpathy refuses, it exits via selection-protocol.** All 3 refusal-mode runs converged on the same exit shape — numbered options + default-on-silence. RULES.md's `<selection_protocol>` already specifies this format; karpathy just activates it more aggressively. No new format needed.
+9. **Empirical: when karpathy refuses, it exits via selection-protocol.** All 3 refusal-mode runs converged on the same exit shape — numbered options + default-on-silence. `core/rules/RULES_INTERACTION.md`'s `<selection_protocol>` already specifies this format; karpathy just activates it more aggressively. No new format needed.
 
 ---
 
@@ -354,7 +354,7 @@ To verify the matrix wasn't fabricated, re-validating 3 randomly selected comman
 ## References
 
 - Karpathy guidelines (skill body): `~/.claude/plugins/cache/karpathy-skills/andrej-karpathy-skills/1.0.0/skills/karpathy-guidelines/SKILL.md`
-- SuperClaude RULES: `~/.claude/superclaude/core/RULES.md` `<core_rules>` (R03, R06, R12, R13, R15, R18, R20)
-- SuperClaude PRINCIPLES: `~/.claude/superclaude/core/PRINCIPLES.md` `<karpathy_lens>` lines 39-44
+- SuperClaude RULES: `~/.claude/superclaude/core/rules/RULES_QUALITY.md` `<core_rules>` (R03, R06, R12, R13, R15, R18, R20) — in `core/RULES.md` until the 3085c18 kernel split
+- SuperClaude PRINCIPLES: `~/.claude/superclaude/core/PRINCIPLES.md` `Assumption-Surfacing` line — replaced `<karpathy_lens>` (lines 39-44 at the time of writing) in 3c03f18
 - Source: Andrej Karpathy thread, https://x.com/karpathy/status/2015883857489522876
 - **Empirical companion** (n=1 validation, 4 commands tested): `docs/analysis/karpathy-empirical-test-ajitta-2026-05-08.md`
