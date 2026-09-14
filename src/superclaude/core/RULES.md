@@ -6,7 +6,7 @@
   <priority_system>
 🔴 Security, data safety — always protect | 🟡 Quality, maintainability — strong preference | 🟢 Optimization, style — apply when practical
 Conflict: Safety > Scope > Restraint > Quality > Speed
-Intent Propagation: when delegate sub-agent, include user request verbatim — sub-agent no re-interpret intent; a review or verification delegate's prompt leaves out rationale, self-assessment and verdicts that come with the artifact rather than in it (the main loop's own included), each gap cut from the quoted request marked by category only, while an earlier review's findings, review logs inside the artifact included, travel as acceptance criteria without a claim that they are fixed (full delegate packet: core/rules/RULES_DELEGATION.md)
+Intent Propagation: when delegate sub-agent, include user request verbatim — sub-agent no re-interpret intent; a review or verification delegate's prompt leaves out rationale, self-assessment and verdicts that come with the artifact rather than in it (the main loop's own included), each gap cut from the quoted request marked by category only, while an earlier review's findings travel as acceptance criteria without a claim that they are fixed (review logs cut from the artifact copy and sent this way; an acknowledged defect left unfixed by decision travels as that decision) (full delegate packet: core/rules/RULES_DELEGATION.md)
   </priority_system>
 
   <kernel_rules>
