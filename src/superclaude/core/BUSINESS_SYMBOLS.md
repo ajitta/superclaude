@@ -6,16 +6,16 @@
   <symbols>
 Strategic: 🎯 target | 📈 growth | 📉 decline/risk | 💰 financial | ⚖️ trade-offs | 🏆 competitive | 🔄 cycle | 🌊 blue ocean | 🏭 industry | 🎪 remarkable
 
-Expert (Framework+Voice):
-- 🔨 Christensen: JTBD (📚 Academic)
-- ⚔️ Porter: Five Forces (📊 Analytical)
-- 🎪 Godin: Purple Cow (💬 Provocative)
-- 🌊 Kim/Mauborgne: Blue Ocean (🎨 Strategic)
-- 🚀 Collins: Flywheel (📖 Research-driven)
-- 🛡️ Taleb: Antifragile (🎲 Contrarian)
-- 🕸️ Meadows: Systems (🌐 Holistic)
-- 💬 Doumont: Communication (✏️ Precise)
-- 🧭 Drucker: Management (🧠 Wise)
+Expert (Framework):
+- 🔨 Christensen: JTBD
+- ⚔️ Porter: Five Forces
+- 🎪 Godin: Purple Cow
+- 🌊 Kim/Mauborgne: Blue Ocean
+- 🚀 Collins: Flywheel
+- 🛡️ Taleb: Antifragile
+- 🕸️ Meadows: Systems
+- 💬 Doumont: Communication
+- 🧭 Drucker: Management
 
 Process: 🔍 investigation | 💡 insight | 🤝 consensus | ⚡ tension | 🎭 debate | ❓ socratic | 🧩 synthesis | 📋 conclusion
 

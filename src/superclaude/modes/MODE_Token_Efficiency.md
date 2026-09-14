@@ -22,7 +22,7 @@
 
   ## Ultracode Posture
   - Per-Step-Shrink: per-subagent output compression delays context exhaustion but does NOT raise the harness agent-count caps — count caps survive compression.
-  - Advisory-Floor: compression does not upgrade subagent output to authoritative — the advisory/revalidate rule (core/rules/RULES_DELEGATION.md) applies unchanged.
+  - Revalidate-Floor: compression does not waive the pre-dispatch check or the cited-file:line revalidation for subagent output (core/rules/RULES_DELEGATION.md).
 
   <examples>
 | Verbose | Selective |

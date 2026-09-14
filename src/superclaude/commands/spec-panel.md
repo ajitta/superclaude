@@ -13,7 +13,7 @@ description: Multi-expert spec review + improvement via renowned software engine
   1. Analyze: parse spec
   2. Assemble: pick experts
   3. Review: multi-expert analysis
-  4. Collaborate: expert dialogue
+  4. Collaborate: expert dialogue that notes explicitly where experts disagree; when none disagree, state the consensus and what it rests on, and if --experts was not given, first re-check expert selection against focus_areas for the user's --focus (all areas when none was given)
   5. Synthesize: improvement roadmap
   </flow>
 
@@ -60,6 +60,8 @@ description: Multi-expert spec review + improvement via renowned software engine
   <gotchas>
   - existing-spec: check if spec exists before review. Build on existing work
   - necessity-test: apply R18 to each proposed spec addition. Spec only what needed
+  - lens-not-impersonation: each expert = framework lens, not literal voice — never fabricate quotes or attribute novel claims to named author. The question beside each expert is the lens; the answer is the panel's own finding
+  - iteration-escalation: with --iterations N, each pass surfaces findings absent from earlier passes; when a pass repeats one, change the lens (another focus area, or another expert, inside the user's --focus and --experts when given), not the severity; a pass that still finds nothing new, or has no lens left inside those flags, says so instead of padding, and the remaining passes still run. Panel form of the analysis-loop gotcha in /sc:analyze
   </gotchas>
 
   <bounds>

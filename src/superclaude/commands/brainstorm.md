@@ -32,7 +32,7 @@ description: Interactive requirements discovery through Socratic dialogue + syst
   - confirmed: user response has literal option letter (`[a]`/`[b]`/`[c]`, or `a`/`b`/`c` as standalone token), OR ≥2 contiguous words from chosen option label text.
   - delegated: bare "yes", "proceed", "looks good", or silent accept of ★.
 
-  When ≥1 decision delegated, /sc:review handoff (step 6) MUST add literal phrase "mandatory: N delegated decisions need independent audit" (N = count of delegated decisions).
+  When ≥1 decision delegated, /sc:review handoff (step 8) MUST add literal phrase "mandatory: N delegated decisions need independent audit" (N = count of delegated decisions).
   </decision_modes>
 
   <outputs>

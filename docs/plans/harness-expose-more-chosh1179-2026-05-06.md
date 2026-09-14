@@ -9,7 +9,7 @@ revised: 2026-05-06
 
 This document tracks harness-layer follow-ups that pair with the prompt-layer fixes shipped on 2026-05-06:
 
-- `gotchas/general.md` + `commands/agent.md` — sub-agent summary is advisory; revalidation required
+- `gotchas/general.md` + `commands/agent.md` — sub-agent summary is advisory; revalidation required (2026-09-14: the rule now lives in the `core/rules/RULES_DELEGATION.md` delegate packet, which judges the summary against a pre-dispatch check; both gotchas point to it)
 - `RULES.md` R12 — bounded-proceed default; ask only for irreversible / high-blast / security
 - `RULES.md` R15 + `<verification_ladder>` — 5-level verification scaling with auto-escalation triggers
 - `RULES.md` `<sub_agent_decision>` — delegate packet IN schema + OUT pointer
@@ -50,7 +50,7 @@ Risk: too rigid for exploratory work. Manifest must be opt-in, and "set scope: s
 
 ### 3. Sub-agent evidence schema validation
 
-Goal: the new `gotchas` rule says the summary "must cite {files inspected, commands run, evidence, assumptions, risks}". Today this is honor-system. Mechanize it.
+Goal: the new `gotchas` rule says the summary "must cite {files inspected, commands run, evidence, assumptions, risks}" (since 2026-09-14 this list is the delegate packet's default evidence format in `core/rules/RULES_DELEGATION.md`). Today this is honor-system. Mechanize it.
 
 Sketch:
 - Update `src/superclaude/scripts/` with `subagent_evidence_check.py`
@@ -59,7 +59,7 @@ Sketch:
 - If any required field is missing, append a system reminder asking the main agent to request the missing fields from the sub-agent (or to revalidate manually before acting)
 - Soft enforcement (reminder, not block) to avoid breaking when sub-agent legitimately has nothing to report in a field
 
-Rationale: pairs the prompt-level revalidation rule with a structural check. Without the schema gate, "advisory" decays back to "trust by habit" within a few sessions.
+Rationale: pairs the prompt-level revalidation rule with a structural check. Without the schema gate, the revalidation rule decays back to "trust by habit" within a few sessions.
 
 Risk: false positives on simple delegations where most fields are empty. Mitigate by allowing explicit "n/a" values.
 
