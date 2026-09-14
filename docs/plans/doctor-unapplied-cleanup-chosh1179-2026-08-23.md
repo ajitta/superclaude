@@ -121,7 +121,7 @@ redundant. Leave it enabled.
 `claude-mem`'s `worker-service.cjs` is the largest single hook cost measured anywhere in the
 scan — 1,834.6ms mean, 4,751ms max on SessionStart, larger than SuperClaude's entire
 per-session hook budget. It is a third-party plugin; see
-[../features/hook-performance/03-analysis.md](../features/hook-performance/03-analysis.md)
+[../features/hook-performance/03-analysis.md](../archive/features/hook-performance/03-analysis.md)
 for the measurement.
 
 ## Findings that needed no action
@@ -138,4 +138,4 @@ for the measurement.
   write-capable, interpreters, or `gh api`, all excluded from allowlisting.
 - No hook exceeded its threshold at the time of the scan. The hook costs that were worth
   attention turned out to be a separate investigation — see
-  [../features/hook-performance/](../features/hook-performance/).
+  [../features/hook-performance/](../archive/features/hook-performance/).

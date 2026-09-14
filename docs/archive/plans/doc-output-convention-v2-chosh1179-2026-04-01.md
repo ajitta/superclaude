@@ -7,7 +7,7 @@ revised: 2026-04-01
 
 **Goal:** 13개 커맨드/코어 파일의 문서 출력 패턴을 v2 convention으로 변경
 **Architecture:** 마크다운 파일의 문자열 교체 (코드 변경 없음)
-**Spec:** `docs/specs/doc-output-convention-v2-design-chosh1179-2026-04-01.md`
+**Spec:** `docs/archive/specs/doc-output-convention-v2-design-chosh1179-2026-04-01.md`
 
 ---
 

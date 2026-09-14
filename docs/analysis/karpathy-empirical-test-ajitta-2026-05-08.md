@@ -116,7 +116,7 @@ Necessity test (R18) 메모: 셋 다 답하기 전엔 spec 안 씁니다.
 
 ### Run A — Baseline output (verbatim, brief)
 ```
-Design spec written to `docs/specs/simple-note-api-design-ajitta-2026-05-08.md` —
+Design spec written to `docs/archive/specs/simple-note-api-design-ajitta-2026-05-08.md` —
 REST CRUD on a single `notes` resource, cursor pagination, no auth (deferred with trigger),
 schema portable across SQLite/Postgres. Assumptions are surfaced in §1; six features
 deferred per R18 in §7 with revisit triggers.
@@ -126,7 +126,7 @@ different stack), say so and I'll revise. Otherwise next step is `/sc:plan` agai
 this spec.
 ```
 
-**Side effect**: spec file actually created at `docs/specs/simple-note-api-design-ajitta-2026-05-08.md`.
+**Side effect**: spec file actually created at `docs/archive/specs/simple-note-api-design-ajitta-2026-05-08.md`.
 
 ### Run B — With karpathy prefix (verbatim, abbreviated)
 ```
@@ -324,7 +324,7 @@ Test 4 surfaced a **hook misfire**: Stop-hook runs `make -C 'C:\Users\ajitta\Rep
 - **n=1 per condition.** Direction-of-effect only; magnitudes are not reliable.
 - **Karpathy via prefix injection ≠ skill activation.** Real skill activation may have additional behaviors (slot in deeper system context, interact with other skills) that prefix injection misses.
 - **Toy topics.** Real-world tasks have richer context that may shift the refusal-vs-execute boundary either direction.
-- **Side effects landed in repo**: `docs/specs/simple-note-api-design-ajitta-2026-05-08.md`, `todo-app/` directory. Both reversible (`rm`).
+- **Side effects landed in repo**: `docs/archive/specs/simple-note-api-design-ajitta-2026-05-08.md`, `todo-app/` directory. Both reversible (`rm`).
 
 ## Recommended next steps
 

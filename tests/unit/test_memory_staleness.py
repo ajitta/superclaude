@@ -4,7 +4,7 @@ The hook scans the current project's CC memory directory and emits a stderr
 warning for any entry whose `verified: <YYYY-MM-DD>` frontmatter is older than
 a threshold (default 90 days, configurable via SUPERCLAUDE_MEMORY_STALE_DAYS).
 
-Source: docs/specs/retrospective-followups-discovery-ajitta-2026-04-25.md (A2).
+Source: docs/archive/specs/retrospective-followups-discovery-ajitta-2026-04-25.md (A2).
 """
 
 from __future__ import annotations

@@ -1,7 +1,7 @@
 """Observation schema for parallel-A/B harness.
 
 Matches the JSON schema in
-``docs/specs/parallel-ab-harness-design-ajitta-2026-05-14.md``.
+``docs/archive/specs/parallel-ab-harness-design-ajitta-2026-05-14.md``.
 """
 
 from __future__ import annotations

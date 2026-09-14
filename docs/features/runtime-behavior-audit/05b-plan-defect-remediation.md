@@ -5,7 +5,7 @@ revised: 2026-08-22
 
 # Defect Remediation — Claude-side Verification of the `6d6f09b` Audit
 
-An independent re-verification of [`docs/codex/runtime-behavior-audit-6d6f09b-verification/`](../../codex/runtime-behavior-audit-6d6f09b-verification/README.md),
+An independent re-verification of [`docs/archive/codex/runtime-behavior-audit-6d6f09b-verification/`](../../archive/codex/runtime-behavior-audit-6d6f09b-verification/README.md),
 plus the defects that verification did not cover, and the plan that fixes both.
 
 **Source:** merge `6d6f09b` (23 files under `src/superclaude/**`). Implementation plan for the merge

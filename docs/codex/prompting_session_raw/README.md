@@ -30,8 +30,8 @@ scope: src/superclaude
 | [`06_behavioral_eval_playbook.md`](06_behavioral_eval_playbook.md) | 프롬프트 행동 변경 시 | golden task, hard gate, A/B, canary를 어떻게 운영하는가? |
 | [`07_ai_operator_runbook.md`](07_ai_operator_runbook.md) | Claude/Codex가 실제 변경할 때 | 한 번의 개선 작업을 어떤 계약과 증거로 수행하는가? |
 | [`08_current_findings_and_backlog.md`](08_current_findings_and_backlog.md) | 우선순위 결정 시 | 현재 확인된 사각지대와 다음 개선 후보는 무엇인가? |
-| [`09_VERIFICATION.md`](09_VERIFICATION.md) | 문서 신뢰도 확인 시 | 이 문서 묶음을 무엇과 대조했고 어떤 gap을 수정했는가? |
-| [`10_improvement_plan.md`](10_improvement_plan.md) | 문서가 최신인지 의심될 때 | 마지막 재검증에서 무엇이 낡았고 어떻게 재발을 막는가? |
+| [`09_VERIFICATION.md`](../../archive/codex/prompting_session_raw/09_VERIFICATION.md) | 문서 신뢰도 확인 시 | 이 문서 묶음을 무엇과 대조했고 어떤 gap을 수정했는가? |
+| [`10_improvement_plan.md`](../../archive/codex/prompting_session_raw/10_improvement_plan.md) | 문서가 최신인지 의심될 때 | 마지막 재검증에서 무엇이 낡았고 어떻게 재발을 막는가? |
 
 ## 추천 읽기 경로
 

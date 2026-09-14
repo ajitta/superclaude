@@ -11,7 +11,7 @@ revised: 2026-05-15
 
 **Tech Stack:** Python 3.10+, asyncio (subprocess pool), PyYAML (spec parsing), stdlib `json` + `subprocess`. No new external deps. Tests via `pytest` + `pytest-asyncio` (already available — `auto_improve` uses async patterns).
 
-**Spec source:** `docs/specs/parallel-ab-harness-design-ajitta-2026-05-14.md`
+**Spec source:** `docs/archive/specs/parallel-ab-harness-design-ajitta-2026-05-14.md`
 
 ## Decisions Locked from Spec Open Questions
 

@@ -14,15 +14,14 @@ User-facing documentation is the framework content itself — its SSOT lives in 
 
 | Dir | Holds |
 |---|---|
-| `specs/` | Discovery + design docs for in-flight work |
+| `specs/` | Discovery + design docs for in-flight work (created when a standalone spec is written; none in flight as of 2026-09-15) |
 | `plans/` | Implementation plans for in-flight work |
 | `research/` | External research, evidence gathering |
 | `analysis/` | Codebase analysis, retrospectives |
 | `reports/` | Living reference docs (`UPPER_SNAKE`, no date) |
-| `guides/` | Standalone how-to guides |
 | `experiments/` | A/B harness outputs |
 | `troubleshooting/` | Active install/runtime troubleshooting |
-| `archive/` | Terminal-status docs + legacy upstream user-docs — see `archive/README.md` |
+| `archive/` | Finished or no-longer-valid docs + legacy upstream user-docs — see `archive/README.md` |
 
 ## Why no user guide here
 

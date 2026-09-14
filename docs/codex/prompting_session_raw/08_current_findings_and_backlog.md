@@ -278,7 +278,7 @@ user home의 `.claude`에 고정해 확인한다. project/local 설치 진단과
 
 **등급:** `[REPO]` · P2 · CONTEXT
 
-`docs/testing/procedures.md`는 존재하지 않는 옛 테스트 파일, direct `pytest`,
+`docs/archive/legacy-userdocs/testing/procedures.md`는 존재하지 않는 옛 테스트 파일, direct `pytest`,
 `black`, `flake8`, `setup/`, 강제되지 않는 90% coverage를 설명한다. 현재 프로젝트
 규칙은 UV와 ruff를 사용하며 `AGENTS.md`, `pyproject.toml`, `Makefile`이 우선이다.
 

@@ -7,7 +7,7 @@ threshold (default 90 days; configurable via SUPERCLAUDE_MEMORY_STALE_DAYS).
 Non-blocking: exits 0 even when stale entries are found. The warning's only
 purpose is to convert silent memory degradation into a visible signal.
 
-Source: docs/specs/retrospective-followups-discovery-ajitta-2026-04-25.md (A2).
+Source: docs/archive/specs/retrospective-followups-discovery-ajitta-2026-04-25.md (A2).
 """
 
 from __future__ import annotations

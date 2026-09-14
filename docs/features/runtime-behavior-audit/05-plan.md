@@ -270,7 +270,7 @@ abandoned — the template-path blocker in the first box remains the first thing
 
 ## Out of scope
 
-- Caveman mode (D6). Verified separately in [`docs/analysis/caveman-mode-verification-chosh1179-2026-08-21.md`](../../analysis/caveman-mode-verification-chosh1179-2026-08-21.md); staying as-is.
+- Caveman mode (D6). Verified separately in [`docs/archive/analysis/caveman-mode-verification-chosh1179-2026-08-21.md`](../../archive/analysis/caveman-mode-verification-chosh1179-2026-08-21.md); staying as-is.
 - Rewriting `RULES`/`PRINCIPLES` to compete with karpathy-guidelines. The overlap is real (A1) but no log evidence shows the SuperClaude versions being rejected on quality.
 - Changes to `/sc:` command bodies. Nothing in the audit implicates them; only descriptions change.
 - Backfilling `.claude/insights.jsonl` or agent memory. Task 11 fixes the flow, not the history.
