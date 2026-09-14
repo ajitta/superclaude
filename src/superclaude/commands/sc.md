@@ -71,7 +71,7 @@ description: SuperClaude command dispatcher - main entry point for all features.
   </examples>
 
   <meta>
-    - version: 4.13.0+ajitta (SSOT: pyproject.toml — answer version queries via `superclaude --version` when possible)
+    - version: 4.14.0+ajitta (SSOT: pyproject.toml — answer version queries via `superclaude --version` when possible)
     - docs: github.com/ajitta/superclaude
   </meta>
 
