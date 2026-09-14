@@ -219,7 +219,7 @@ Where the shipped text departed from §4 after the first review (§8.6 lists the
 - P1 Row A extends to code-writing prompts on S17 alone, the branch P1 allows when the limit is named.
 - P1 Row B also asks for several independent candidates where one hint stands in for evidence (F4, S8's second remedy). §8.1's (d) and (e) measured it before §8.6 changed the row again; §8.6 reruns them on the current text.
 - P2's copied `lens-not-impersonation` gotcha adds one sentence, because the spec panel's expert list puts a quoted question beside each name and the copy alone would read those as forbidden quotes.
-- P4 landed in five places, not three: the token-efficiency mode's floor item and the operator runbook in `docs/codex/` also carried the "advisory" rule. `/sc:review` gets a pointer telling the reader to Read the packet rule, because the loader never injects `RULES_DELEGATION.md` on that command. The packet also gained a tie-break for a user request that carries the rationale; §8.6 records its current form.
+- P4 landed in five places, not three: the token-efficiency mode's floor item and the operator runbook in `docs/codex/` also carried the "advisory" rule. `/sc:review` gets a pointer telling the reader to Read the packet rule, because the loader injects `RULES_DELEGATION.md` only when the prompt carries a delegation trigger (`--delegate`, `--concurrency`, `/sc:pm|agent|task`, sub-agent or worktree), which a plain `/sc:review` does not. The packet also gained a tie-break for a user request that carries the rationale; §8.6 records its current form.
 
 ### 8.6 Second review of the branch
 

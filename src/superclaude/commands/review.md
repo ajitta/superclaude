@@ -34,7 +34,7 @@ description: Review work product (code, plan, design, spec) for quality, correct
   - Grep: search pattern across changed file
   - Read: examine file content + context
   - Bash: run test + lint command
-  - Agent: dispatch isolated reviewer subagent for big review (--structured); Read the delegate packet rule in core/rules/RULES_DELEGATION.md before dispatch, since it sets what the reviewer's prompt leaves out
+  - Agent: dispatch isolated reviewer subagent for big review (--structured) and for the --audit-delegated re-eval (step 8); Read the delegate packet rule in core/rules/RULES_DELEGATION.md before dispatch, since it sets what the reviewer's prompt leaves out
   </tools>
 
   <focus_agent_mapping>
