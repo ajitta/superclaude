@@ -49,8 +49,8 @@ escalation_condition:
 5. hook/CLI면 `.claude/rules/gotchas/hooks.md`와 관련 테스트를 읽는다.
 6. 동일 basename, rule, trigger, threshold의 모든 사본을 검색한다.
 
-Subagent `*.output` 파일을 직접 읽지 않는다. main agent는 위임 전에 기대 결과와 판정 기준을
-적어 두고, 돌아온 요약을 그 기준으로 판정한 뒤 인용한 file:line과 명령을 다시 확인한다
+Subagent `*.output` 파일을 직접 읽지 않는다. main agent는 위임 전에 기대하는 증거 형태와 판정 기준을
+적어 두고(예측 판정은 적지 않는다. 심어 둔 결함처럼 이미 아는 정답은 판정 기준에 두되 위임 프롬프트에는 넣지 않는다), 돌아온 요약을 그 기준으로 판정한 뒤 인용한 file:line과 명령을 다시 확인한다
 (`src/superclaude/core/rules/RULES_DELEGATION.md` delegate packet 규칙).
 
 ## 4. Step 2 — 문제를 재현하고 분류
