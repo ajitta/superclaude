@@ -4,7 +4,7 @@
   </role>
 
   <recovery>
-  Project auto-activate from CWD. Recovery: call `initial_instructions` if agent forget manual; `onboarding` if setup unverified.
+  Project auto-activate from CWD. Recovery: call `initial_instructions` if agent forget manual; `onboarding` only when `list_memories` returns none (it performs onboarding, not a check).
   </recovery>
 
   <fallback_tools>
@@ -12,7 +12,7 @@
 
   | Removed Serena tool | Native fallback | When to use |
   |---|---|---|
-  | `activate_project` | (automatic via `--project-from-cwd`) | No action needed; verify with `onboarding` if uncertain |
+  | `activate_project` | (automatic via `--project-from-cwd`) | No action needed |
   | `search_for_pattern` | native `Grep` | Regex/text search; same capability, no LSP overhead |
   | `list_dir` / `find_file` | native `Glob` | Directory listing + filename pattern matching |
 

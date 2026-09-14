@@ -29,6 +29,8 @@ claude mcp add --scope user serena -- serena start-mcp-server \
   --context claude-code --project-from-cwd
 ```
 
+Do not add `--mode=no-memories`: it removes Serena's memory tools (`list_memories`, `read_memory`, `write_memory`, …) and `onboarding`, which `/sc:load` and `/sc:save` use as their primary store.
+
 Per-project alternative (current directory only):
 
 ```bash
@@ -70,11 +72,11 @@ Recent Opus models can drop Serena's manual mid-session. Two upstream-recommende
    ```bash
    claude --system-prompt="$(serena prompts print-cc-system-prompt-override)"
    ```
-2. Install the Serena hooks (see "Optional: Serena hooks" below) for SessionStart/PreToolUse reminders.
+2. Consider the Serena hooks (see "Optional: Serena hooks" below); read each entry's caveat before adding it.
 
 ## Optional: Serena hooks
 
-Add to `.claude/settings.json` (project) or `~/.claude/settings.json` (user) — counteracts manual drift and auto-approves Serena tool calls:
+Upstream's full set for Claude Code, to add to `.claude/settings.json` (project) or `~/.claude/settings.json` (user). Pick entries individually — see what each one does below:
 
 ```json
 {
@@ -86,14 +88,19 @@ Add to `.claude/settings.json` (project) or `~/.claude/settings.json` (user) —
     "SessionStart": [
       { "matcher": "", "hooks": [{ "type": "command", "command": "serena-hooks activate --client=claude-code" }] }
     ],
-    "Stop": [
+    "SessionEnd": [
       { "matcher": "", "hooks": [{ "type": "command", "command": "serena-hooks cleanup --client=claude-code" }] }
     ]
   }
 }
 ```
 
-The `serena-hooks` binary ships with the `serena-agent` install. Caveat: the `mcp__serena__*` PreToolUse hook auto-approves all Serena tool calls — drop that entry if you rely on permission prompts as a guardrail.
+The `serena-hooks` binary ships with the `serena-agent` install.
+
+- `remind` denies the Grep or Read call that reaches its threshold since the last Serena symbolic tool call (serena-agent 1.7.0: the 3rd Grep, the 3rd code-file Read, or the 4th of the two combined; other tools neither count nor reset; at most one deny per 2 minutes). Grep counts whatever the file type, so in markdown-heavy repositories — SuperClaude itself included — it blocks searches no symbolic tool can replace and the agent falls back to shell `grep`. Leave it out for such repositories.
+- `activate` tells the agent at session start to call `activate_project`. The `claude-code` context disables that tool once a project is given, so with `--project-from-cwd` the instruction cannot be followed; leave it out for that registration.
+- `auto-approve` approves Serena's symbolic tools (find, insert, replace, rename and delete symbol, and similar) while Claude Code runs in `acceptEdits` or `auto` permission mode — leave it out if you rely on permission prompts as a guardrail. Memory, onboarding, diagnostics and other non-symbolic tools keep the normal approval flow, so `/sc:save` still prompts on `write_memory` unless a `mcp__serena__write_memory` allow rule covers it.
+- `cleanup` deletes the per-session counters `remind` writes under `~/.serena/hook_data/`, so it is only needed alongside `remind`. It belongs on `SessionEnd`: `Stop` fires after every turn.
 
 Source: https://oraios.github.io/serena/02-usage/030_clients.html
 
