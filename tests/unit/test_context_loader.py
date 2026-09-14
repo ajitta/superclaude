@@ -871,7 +871,7 @@ class TestPromptCommandReferenceInjection:
             {"claude-opus-5": ["L10-20"]},
         )
 
-        assert "/ref.md" in out
+        assert str(Path("/ref.md")) in out
         assert "'claude-opus-5' L10-20" in out
         assert "wins over the mirror table" in out
 
