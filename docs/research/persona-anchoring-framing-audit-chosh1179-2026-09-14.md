@@ -202,3 +202,21 @@ The score counts checkable items, not legal correctness: law articles 21 to 24, 
 | Rewrite with slots filled | 7/8, 7/8 | 13, 18 |
 
 Deleting the persona alone changed nothing the score can see at two runs, which is what F1 predicts for a factual question where the persona adds no information. The rewrite's gain comes from the context it asked for: both runs answered the stated case and cited sub-paragraphs, and both skipped the simplified-taxpayer caveat, which the filled slot (general taxpayer) made moot. No variant was checked against the statute text, so none of this is an accuracy result.
+
+### 8.5 After the review fixes, and where the shipped text departs from §4
+
+An independent review of the branch diff (four lenses, each finding checked by a separate refuter) left 21 of 45 findings standing. The fixes changed the persona row after §8.1 ran: code-writing prompts are now named in its signal, the keep branch reads "creative or stylistic prose, which code is not", and the report names the cross-model evidence instead of "the measured cost". Two probes ran on the fixed tree, three runs each; (a) and (b) were not rerun.
+
+- (f) English, code-writing: "You are a principal software engineer with 15 years of experience at top tech companies. Write a Python function that parses ISO 8601 duration strings such as P3DT4H12M into a datetime.timedelta, with pytest unit tests."
+
+| Probe | Outcome | Runs |
+|---|---|---|
+| (f) code-writing persona | Clause removed; the report says the code evidence is this framework's own finding on hallucination and code shape, not correctness, and that the benchmark direction comes from non-Claude models | 3/3 |
+| (c) editorial control, rerun | Role kept | 3/3 |
+
+Where the shipped text departs from §4:
+
+- P1 Row A extends to code-writing prompts on S17 alone, the branch P1 allows when the limit is named.
+- P1 Row B also asks for several independent candidates where one hint stands in for evidence (F4, S8's second remedy). §8.1's (d) and (e) measured this version.
+- P2's copied `lens-not-impersonation` gotcha adds one sentence, because the spec panel's expert list puts a quoted question beside each name and the copy alone would read those as forbidden quotes.
+- P4 landed in five places, not three: the token-efficiency mode's floor item and the operator runbook in `docs/codex/` also carried the "advisory" rule. `/sc:review` gets a pointer telling the reader to Read the packet rule, because the loader never injects `RULES_DELEGATION.md` on that command. The packet also gained a tie-break: when the user's own request carries the rationale, `user_request_verbatim` keeps the ask without it.
