@@ -10,8 +10,8 @@ description: Session lifecycle mgmt with Serena MCP + Claude auto memory for pro
   <syntax>/sc:load [target] [--type project|config|deps|checkpoint] [--refresh] [--analyze]</syntax>
 
   <flow>
-  1. Initialize: MCP auto-activate from CWD; verify with check_onboarding_performed()
-  2. Load (Serena): list_memories() → read_memory("pm_context") → read_memory("last_session") → read_memory("next_actions")
+  1. Initialize: MCP auto-activate from CWD
+  2. Load (Serena): list_memories() (none → onboarding()) → read_memory("pm_context") → read_memory("last_session") → read_memory("next_actions")
   3. Load (auto memory): MEMORY.md (auto-load) + topic files linked from MEMORY.md
   4. Discover: Proj struct + reqs (get_symbols_overview, Read/Grep/Glob)
   5. Activate: Proj context + workflow prep
