@@ -188,3 +188,17 @@ Not an `evals/tasks.yaml` task: the harness arms vary installed content, while P
 | `get_permissions` | 3/3 detected as critical | 3/3 detected as critical |
 
 The canary sits at ceiling and does not discriminate on Opus 5 at this difficulty, so it neither supports nor contradicts P4 on this model. With the rationale present, the permissions reviewers returned more findings (9, 9 and 6 against 6, 7 and 6), several of them rebutting the rationale's claims. A discriminating version needs a defect whose detection rate without the rationale sits well below 3/3.
+
+### 8.4 Downstream run of probe (b)
+
+The rewrite layer alone proves nothing about answers, so probe (b) also ran downstream: `claude -p "<prompt>" --model claude-opus-5` from an empty directory, two runs per variant. Variants: the original with its persona; the original with only the persona sentence deleted; and run 1's rewrite with its slots filled (general taxpayer, software development, a US company with no Korean place of business, paid in foreign currency by direct transfer, second 2026 period, a first-time filer as reader, statute and supporting document per requirement as the quality bar).
+
+The score counts checkable items, not legal correctness: law articles 21 to 24, decree article 33, the personal-service exemption, supporting documents, the no-domestic-place-of-business condition, foreign-currency receipt, offshore supply, and the simplified-taxpayer caveat.
+
+| Variant | Items covered (run 1, run 2) | Distinct article citations |
+|---|---|---|
+| Original with persona | 7/8, 7/8 | 7, 5 |
+| Persona sentence deleted only | 8/8, 6/8 | 3, 4 |
+| Rewrite with slots filled | 7/8, 7/8 | 13, 18 |
+
+Deleting the persona alone changed nothing the score can see at two runs, which is what F1 predicts for a factual question where the persona adds no information. The rewrite's gain comes from the context it asked for: both runs answered the stated case and cited sub-paragraphs, and both skipped the simplified-taxpayer caveat, which the filled slot (general taxpayer) made moot. No variant was checked against the statute text, so none of this is an accuracy result.
