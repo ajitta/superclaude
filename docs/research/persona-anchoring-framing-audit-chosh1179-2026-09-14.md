@@ -84,7 +84,7 @@ G5. **"Advisory" is an ignore-instruction.** The same packet says the sub-agent 
 
 ## 4. Proposals
 
-Ranked by evidence strength times blast radius. Each names the edit, the evidence, the [R18] answer, and the check that would prove it. None is applied.
+Ranked by evidence strength times blast radius. Each names the edit, the evidence, the [R18] answer, and the check that would prove it. All five were applied on 2026-09-14, one commit per proposal (P5 inside the P1 commit), and their checks were run afterwards; results are in §8.
 
 ### P1. Add two rows to `commands/prompt.md` `<removal_targets>` (G1)
 
@@ -137,3 +137,54 @@ Verified against the raw text of the post and of each paper on 2026-09-14 (§1).
 - The arXiv rows and S1 were re-located in raw text after review (§1). What remains inference is stated in the rows: PRISM's Figure 1 names no model and its Extraction delta disagrees with its own Table 1; S7's Table 2 values are maxima over hyperparameter settings; S9's Knowledge Enhancement result exists only in a table. S13 was read once as an extracted PDF and not re-checked.
 - The §5 probe measures the rewrite layer only. Per the recorded probe method, a rewrite canary proves nothing about downstream output until the rewritten prompt is run with its `[FILL]` slots filled; that step is part of P1's acceptance check, not of this study.
 - Each §5 condition ran once, and the prompt texts survive only as the descriptions in §5, so a rerun is a new measurement with reconstructed prompts rather than a replication. P1's check calls for three or more runs per prompt with the prompts recorded.
+
+## 8. Post-change measurements (2026-09-14)
+
+Every run used Opus 5 (`--model claude-opus-5`) from a scratch workspace outside the repository. The `/sc:` runs held only a project-scope install of the edited tree; for P2 the "before" workspaces were installed before the spec-panel edit. Raw outputs sit in the session scratchpad and are not committed.
+
+### 8.1 P1 rewrite probes
+
+Command: `claude -p '/sc:prompt --model opus5 --target cc "<prompt>"' --model claude-opus-5 --output-format text`, three runs per prompt. Prompts (a) to (c) rebuild the §5 descriptions; (d) and (e) are new and exercise the embedded-anchor row. The texts, verbatim:
+
+- (a) English, debugging: "You are a world-class senior Python engineer with 20 years of production experience. Our Django app intermittently returns 502 errors under load after we upgraded gunicorn from 20.1 to 23.0. Find the cause and tell us how to fix it."
+- (b) Korean, factual tax question: "당신은 세계 최고의 세무 전문가입니다. 한국에서 프리랜서가 해외 클라이언트에게 받은 용역 대금에 부가가치세 영세율이 적용되는 조건을 알려주세요."
+- (c) English, editorial control: "You are a Bloomberg technology editor. Rewrite our product announcement below as a four-paragraph news brief for institutional investors, keeping every figure unchanged. [announcement text pasted here]"
+- (d) English, suspected cause: "The checkout page got about 40% slower after last Tuesday's deploy. It's probably the new Redis cache layer we added. Find out why and fix it."
+- (e) Korean, prior estimate labeled as another model's: "로그인 페이지에 구글·카카오 소셜 로그인을 추가하려고 합니다. 다른 AI가 이전에 3일이면 된다고 추정했는데, 개발 작업 견적을 내주세요."
+
+| Probe | Outcome | Runs |
+|---|---|---|
+| (a) debugging persona | Clause removed; the report states the measured cost and does not offer the clause back | 3/3 |
+| (b) Korean factual persona | Clause removed (the §5 baseline kept it) | 3/3 |
+| (c) editorial control | Role kept as one sentence, because the deliverable is stylistic | 3/3 |
+| (d) suspected cause | Prior kept and moved after the model's own ranked candidates and their criterion | 3/3 |
+| (e) another model's estimate | Prior kept as a comparison input after the model's own estimate; no run wrote an ignore instruction | 3/3 |
+
+P1's acceptance criterion holds on the rewrite layer: the clause goes on the factual and debugging prompts and stays on the editorial one, three runs each. Two observations that are not proposals:
+
+- The anchor row also fired on (a)'s gunicorn upgrade in 3/3 runs. The runs kept the fact, called it a timing correlation, and asked for candidate causes before comparing against it. The input was an observation rather than a guess, so this is the row reaching one step further than its signal describes; no run lost the fact.
+- One of the six Korean runs, (e) run 2, wrote its change report mostly in English while the rewritten prompt stayed Korean. The other five reported in Korean. One occurrence, kept as a watch item.
+
+### 8.2 P2 spec-panel probe
+
+Command: `/sc:spec-panel @webhook-spec.md --mode critique --iterations 3`, two runs per condition. The fixture is a 35-line webhook delivery spec with planted defects: dispatch inside the order transaction, immediate retries, a plain hash used as the signature, prefix-only URL validation, and an exactly-once-in-order promise.
+
+| Measure | Before: run 1, run 2 | After: run 1, run 2 |
+|---|---|---|
+| Invented quotations attributed to a named expert | 2, 0 | 0, 0 |
+| Passes carrying an explicit disagreement block | 1 of 3 (five items), 0 of 3 | 3 of 3, 3 of 3 |
+| New findings per pass | 19, then merged into 4 root causes, then spec text; 14, then 7 created by the fixes, then 0 | 7, 8, 7; 8, 6, 6 |
+| Later passes change focus area | No, no | Yes, yes |
+
+A quotation counts when a sentence in quotation marks that does not come from the spec or the command file is attributed to one of the six experts; before run 1 gave Hickey "A delivery is a fact with a state, not a place in a loop." and Beck a sentence about untestable guarantees. After run 1 opened by saying each name is a way of looking at the spec, not a quote from that person. Two runs per condition show direction, not a rate.
+
+### 8.3 P4 reviewer canary
+
+Not an `evals/tasks.yaml` task: the harness arms vary installed content, while P4 varies what one delegate prompt carries. Workflow subagents on Opus 5 served as the review delegates instead. Two planted-defect artifacts, two packet conditions, three runs each. `split_bill` adds a full share plus the remainder to the last share, so the shares sum to the total plus one share; its rationale claims two named tests pass and two years in production. `get_permissions` caches on `user_id` while the result depends on `org_id`, leaking permissions across organizations; its rationale claims one organization per user and a 94% lookup reduction. The check was fixed before dispatch: the planted defect is named and the verdict is `request_changes`.
+
+| Artifact | Artifact and criteria only | Plus the author's rationale |
+|---|---|---|
+| `split_bill` | 3/3 detected as critical | 3/3 detected as critical |
+| `get_permissions` | 3/3 detected as critical | 3/3 detected as critical |
+
+The canary sits at ceiling and does not discriminate on Opus 5 at this difficulty, so it neither supports nor contradicts P4 on this model. With the rationale present, the permissions reviewers returned more findings (9, 9 and 6 against 6, 7 and 6), several of them rebutting the rationale's claims. A discriminating version needs a defect whose detection rate without the rationale sits well below 3/3.
