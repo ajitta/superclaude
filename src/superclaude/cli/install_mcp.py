@@ -49,12 +49,12 @@ MCP_SERVERS = {
         "method": "mcp",
     },
     # Tavily MCP is opt-in (plugin): the recommended integration is Tavily Agent
-    # Skills (Tavily CLI + `npx skills add tavily-ai/skills`), documented in
+    # Skills (Tavily CLI `tvly init`, or `npx skills add https://github.com/tavily-ai/skills`), documented in
     # mcp/README.md. The MCP server stays available for users who prefer
-    # in-conversation tools but exposes only search + extract.
+    # in-conversation tools (search, extract, crawl, map, research).
     "tavily": {
         "name": "tavily",
-        "description": "Web search + extract (optional MCP; prefer Tavily Agent Skills — see mcp/README.md)",
+        "description": "Web search, extract, crawl, map, research (optional MCP; prefer Tavily Agent Skills — see mcp/README.md)",
         "transport": "stdio",
         "command": "npx -y tavily-mcp@latest",
         "required": False,
@@ -142,14 +142,44 @@ def _run_command(cmd: List[str], **kwargs) -> subprocess.CompletedProcess:
     return subprocess.run(cmd, **kwargs)
 
 
+# Node.js versions accepted for the npm-based servers. This is chrome-devtools-mcp's
+# `engines.node` range ("^20.19.0 || ^22.12.0 || >=23"), the strictest of the three;
+# @playwright/mcp asks for 18+ and tavily-mcp for 20+, both satisfied by it.
+NODE_VERSION_REQUIREMENT = "20.19+, 22.12+ or 23+"
+
+
+def _node_version_ok(version: str) -> Optional[bool]:
+    """Return True/False for a `node --version` string, None when unparseable."""
+    parts = version.strip().lstrip("v").split(".")
+    try:
+        major = int(parts[0])
+        minor = int(parts[1]) if len(parts) > 1 else 0
+    except (ValueError, IndexError):
+        return None
+    if major >= 23:
+        return True
+    if major == 22:
+        return minor >= 12
+    if major == 20:
+        return minor >= 19
+    return False
+
+
+def _server_needs_node(server_name: str) -> bool:
+    """True for servers that run through npx, directly or via a Claude plugin."""
+    info = MCP_SERVERS.get(server_name, {})
+    return info.get("method") == "plugin" or info.get("command", "").startswith("npx")
+
+
 def check_prerequisites(
     selected_servers: Optional[List[str]] = None,
 ) -> Tuple[bool, List[str]]:
     """Check if required tools are available.
 
-    The serena/uv tooling check is skipped when serena is not in the selection,
-    so plugin-only installs (e.g. playwright, chrome-devtools) don't surface
-    irrelevant warnings.
+    Checks are scoped to the selection: the Node.js check runs only when an
+    npm-based server is selected, and the serena/uv tooling check only when
+    serena is. With selected_servers=None (pre-selection legacy path) every
+    check runs.
     """
     errors = []
 
@@ -163,25 +193,27 @@ def check_prerequisites(
     except (subprocess.TimeoutExpired, FileNotFoundError):
         errors.append("Claude CLI not found - required for MCP server management")
 
-    # Check Node.js for npm-based servers
-    try:
-        result = _run_command(
-            ["node", "--version"], capture_output=True, text=True, timeout=10
-        )
-        if result.returncode != 0:
-            errors.append("Node.js not found - required for npm-based MCP servers")
-        else:
-            version = result.stdout.strip()
-            try:
-                version_num = int(version.lstrip("v").split(".")[0])
-                if version_num < 18:
+    # Check Node.js, only when an npm-based server is in the selection
+    needs_node = selected_servers is None or any(
+        _server_needs_node(s) for s in selected_servers
+    )
+    if needs_node:
+        try:
+            result = _run_command(
+                ["node", "--version"], capture_output=True, text=True, timeout=10
+            )
+            if result.returncode != 0:
+                errors.append("Node.js not found - required for npm-based MCP servers")
+            else:
+                version = (result.stdout or "").strip()
+                if _node_version_ok(version) is False:
                     errors.append(
-                        f"Node.js version {version} found, but version 18+ required"
+                        f"Node.js {version} found, but npm-based MCP servers need "
+                        f"{NODE_VERSION_REQUIREMENT} (chrome-devtools-mcp engines range; "
+                        "Node 18 is end-of-life)"
                     )
-            except (ValueError, IndexError):
-                pass
-    except (subprocess.TimeoutExpired, FileNotFoundError):
-        errors.append("Node.js not found - required for npm-based MCP servers")
+        except (subprocess.TimeoutExpired, FileNotFoundError):
+            errors.append("Node.js not found - required for npm-based MCP servers")
 
     # Serena-specific tooling: only relevant when serena will be installed.
     # When selected_servers is None we're being called pre-selection (legacy path),
@@ -216,7 +248,7 @@ def check_prerequisites(
         except (subprocess.TimeoutExpired, FileNotFoundError):
             click.echo("⚠️  serena binary not found - install with:", err=True)
             click.echo(
-                "   uv tool install -p 3.13 serena-agent@latest --prerelease=allow",
+                "   uv tool install -p 3.13 serena-agent && serena init",
                 err=True,
             )
 

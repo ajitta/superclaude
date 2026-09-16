@@ -209,7 +209,7 @@ where superclaude         # Check install path (Windows)
 The framework is fully functional without any MCP server. Each one adds a capability its flag switches on:
 
 - **Serena** — symbol-level code navigation and edits, plus cross-session project memory (`--serena`, `/sc:load`, `/sc:save`)
-- **Tavily** — web search / extract / crawl / research. Recommended as Agent Skills (`npx skills add tavily-ai/skills`); the MCP server is the optional in-conversation alternative (`--tavily`)
+- **Tavily** — web search / extract / crawl / map / research. Recommended as Agent Skills (Tavily CLI `tvly init`, or `npx skills add https://github.com/tavily-ai/skills`); the MCP server is the optional in-conversation alternative (`--tavily`)
 - **Context7** — official documentation lookup, enabled as a claude.ai connector rather than through `superclaude mcp` (`--c7`)
 - **Playwright**, **Chrome DevTools** — browser automation and performance audits (`--play`, `--perf`)
 
@@ -365,10 +365,10 @@ superclaude mcp
 ```
 
 **Available servers:**
-- **Tavily** → Web search, extract, crawl, map, research (Deep Research). Recommended: **Agent Skills** via Tavily CLI + `npx skills add tavily-ai/skills` ([tavily-ai/skills](https://github.com/tavily-ai/skills) · [agent-skills docs](https://docs.tavily.com/documentation/agent-skills)). The `--tavily` MCP server is an optional in-conversation alternative (search + extract only).
+- **Tavily** → Web search, extract, crawl, map, research (Deep Research). Recommended: **Agent Skills** via the Tavily CLI (`tvly init` installs them; skills only: `npx skills add https://github.com/tavily-ai/skills`) ([tavily-ai/skills](https://github.com/tavily-ai/skills) · [agent-skills docs](https://docs.tavily.com/documentation/agent-skills)). The `--tavily` MCP server is an optional in-conversation alternative exposing the same five operations as tools.
 - **Context7** → Official documentation lookup. Enabled as a **claude.ai connector** (claude.ai → Settings → Connectors), not via `superclaude mcp` — `--c7` stays as an inline directive in `core/FLAGS.md`; no MCP doc ships for it.
 - **Serena** → Session persistence & semantic code understanding
-- **Playwright** → Cross-browser automation & E2E testing (Microsoft official). Repo: ['https://github.com/microsoft/playwright-cli'](https://github.com/microsoft/playwright-cli)
+- **Playwright** → Cross-browser automation & E2E testing (Microsoft official). MCP: [`microsoft/playwright-mcp`](https://github.com/microsoft/playwright-mcp); CLI + skill alternative preferred for coding agents: [`microsoft/playwright-cli`](https://github.com/microsoft/playwright-cli)
 - **Chrome DevTools** → Performance, Lighthouse, accessibility, and memory profiling (CLS, LCP). Installed as Claude plugin from [`ChromeDevTools/chrome-devtools-mcp`](https://github.com/ChromeDevTools/chrome-devtools-mcp)
 
 > Removed in this fork: Morphllm, Mindbase, Airis-Agent, Magic, AST-Grep (native Grep/Edit cover it), Sequential-Thinking (Claude 5-family models reason natively between tool calls — see [`docs/archive/codex/sequential-thinking-validity-2026-08-22/`](docs/archive/codex/sequential-thinking-validity-2026-08-22/)).

@@ -4,7 +4,7 @@
   </role>
 
   <choose>
-  <use>Core Web Vitals measure (CLS, LCP, INP, TTFB) via traces, Lighthouse audits over perf / a11y / SEO / best-practices, heap-snapshot mem analysis with leak detect + GC-pressure check, auto WCAG a11y checks on live pages, network req-timing + bundle-size + cache-behavior inspect, and `pageId`-routed multi-agent flows on diff pages.</use>
+  <use>Core Web Vitals measure (CLS, LCP, INP, TTFB) via `performance_start_trace` → `performance_stop_trace` → `performance_analyze_insight`, Lighthouse audits over a11y / SEO / best-practices via `lighthouse_audit` (it excludes performance — traces carry that), heap-snapshot mem analysis with `compare_heapsnapshots` + retainer/retaining-path queries, auto WCAG a11y checks on live pages, network req-timing + bundle-size + cache-behavior inspect, and `pageId`-routed multi-agent flows on diff pages.</use>
   <never>live browser interact or E2E user-journey scripts (use Playwright via `--play`), static code analysis (use native Claude for code review), and server-side backend profile (use native tools — `perf`, flamegraph).</never>
   </choose>
 
@@ -20,18 +20,18 @@
   </cwv_thresholds>
 
   <integration_patterns>
-  - Performance-Audit: DevTools:trace → `lighthouse_audit` → analyze → `/sc:improve`.
+  - Performance-Audit: `performance_start_trace` (reload + autoStop) → `performance_stop_trace` → `performance_analyze_insight` per insight → `/sc:improve`.
   - Frontend-Verify (`--frontend-verify`): Playwright:interact + DevTools:profile + Serena:code-review.
-  - A11y-Audit: DevTools:accessibility-skill → snapshot → `/sc:analyze --focus a11y`.
-  - Memory-Leak: DevTools:`take_heapsnapshot` → compare snapshots → find retained objects.
+  - A11y-Audit: `lighthouse_audit` → read the accessibility section of the report + `take_snapshot` (a11y tree) → `/sc:analyze --focus a11y`.
+  - Memory-Leak: `take_heapsnapshot` before/after → `compare_heapsnapshots` → `get_heapsnapshot_retaining_paths` on the grown classes.
   </integration_patterns>
 
   <examples>
 | Input | Action | Reason |
 |---|---|---|
-| analyze page performance | DevTools: lighthouse_audit → trace → analyze insights | Comprehensive CWV + Lighthouse |
-| debug memory leak in SPA | DevTools: take_heapsnapshot → compare → identify | Heap analysis |
-| check accessibility score | DevTools: lighthouse_audit (a11y category) → snapshot | Automated WCAG |
+| analyze page performance | DevTools: performance_start_trace → performance_stop_trace → performance_analyze_insight | CWV come from the trace, not Lighthouse |
+| debug memory leak in SPA | DevTools: take_heapsnapshot ×2 → compare_heapsnapshots → get_heapsnapshot_retaining_paths | Heap diff + retainers |
+| check accessibility score | DevTools: lighthouse_audit → accessibility section → take_snapshot | Automated WCAG; the audit has no category filter |
 | profile network requests | DevTools: list_network_requests → get_network_request | Request timing/size |
   </examples>
 

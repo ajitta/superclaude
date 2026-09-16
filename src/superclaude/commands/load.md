@@ -11,7 +11,7 @@ description: Session lifecycle mgmt with Serena MCP + Claude auto memory for pro
 
   <flow>
   1. Initialize: MCP auto-activate from CWD
-  2. Load (Serena): list_memories() (none → onboarding()) → read_memory("pm_context") → read_memory("last_session") → read_memory("next_actions")
+  2. Load (Serena): list_memories() (none → onboarding()) → read_memory("pm_context") → read_memory("last_session") → read_memory("next_actions"); memory tools absent → direct-file fallback (bounds)
   3. Load (auto memory): MEMORY.md (auto-load) + topic files linked from MEMORY.md
   4. Discover: Proj struct + reqs (get_symbols_overview, Read/Grep/Glob)
   5. Activate: Proj context + workflow prep
@@ -57,7 +57,7 @@ description: Session lifecycle mgmt with Serena MCP + Claude auto memory for pro
   <bounds>
     <does>Serena integration, auto memory load, cross-session persist, context load.</does>
     <never>modify struct, load without validation, override without checkpoint.</never>
-    <fallback>Without Serena: use Claude auto memory + Read CLAUDE.md/PLANNING.md/TASK.md, Glob for struct. Ask user for guidance when uncertain.</fallback>
+    <fallback>Serena memory tools absent (server missing, or connected with `--mode=no-memories`): Glob + Read `.serena/memories/*.md` directly — plain markdown, same names as the memory tools use — plus Claude auto memory + Read CLAUDE.md/PLANNING.md/TASK.md, Glob for struct. Ask user for guidance when uncertain.</fallback>
   </bounds>
 
   <handoff next="/sc:analyze /sc:index-repo /sc:task"/>

@@ -227,22 +227,25 @@ INSTRUCTION_MAP = {
     # Behavioral MCPs — complex decision rules and workflow patterns
     "mcp/MCP_Serena.md": (
         "Serena: symbol ops (find_symbol, replace_symbol_body, get_symbols_overview, "
-        "insert_before/after_symbol, find_referencing_symbols, rename_symbol, safe_delete_symbol). "
+        "insert_before/after_symbol, find_referencing_symbols, find_declaration, find_implementations, "
+        "rename_symbol, safe_delete_symbol, get_diagnostics_for_file, replace_in_files). "
         "Workflow: get_symbols_overview → find_symbol(name_path, include_body=True) → edit. "
         "Decision: symbol meaning (references, types, rename, delete) → Serena; text patterns → native Grep/Edit. "
         "Memory: list_memories → read/write/edit/rename/delete_memory. Project auto-active via --project-from-cwd; run onboarding only if list_memories returns none. "
-        "Note: thinking tools (think_about_*, summarize_changes) NOT active in claude-code context. "
+        "Note: thinking tools (think_about_*, summarize_changes) were removed upstream — use native reasoning. "
         "Prioritize symbolic tools over full file reads."
     ),
     "mcp/MCP_Tavily.md": (
         "Tavily web access — primary path is the Tavily Agent Skills (install: Tavily CLI + "
-        "`npx skills add tavily-ai/skills`): tavily-search (web search), tavily-extract (URL→markdown), "
-        "tavily-crawl (multi-page site extraction), tavily-map (URL discovery), tavily-research "
-        "(cited multi-source report), tavily-best-practices (integration reference). Auto-invoked by task "
+        "`tvly init`, or `npx skills add https://github.com/tavily-ai/skills`): tavily-search (web search), "
+        "tavily-extract (URL→markdown), tavily-crawl (multi-page site extraction), tavily-map (URL discovery), "
+        "tavily-research (cited multi-source report), tavily-dynamic-search (filter/dedupe large results "
+        "outside context), tavily-cli (setup + command choice), tavily-best-practices (integration reference). "
+        "Auto-invoked by task "
         "or explicit slash commands (/tavily-search, /tavily-crawl, /tavily-research, …). "
-        "Optional Tavily MCP exposes only tavily_search + tavily_extract as in-conversation tools "
-        "(search_depth: basic/advanced/fast/ultra-fast, time_range, start_date/end_date, "
-        "include_domains/exclude_domains, country). "
+        "Optional Tavily MCP exposes tavily_search, tavily_extract, tavily_crawl, tavily_map, tavily_research "
+        "as in-conversation tools (search: search_depth basic/advanced/fast/ultra-fast, time_range, "
+        "start_date/end_date, include_domains/exclude_domains, country). "
         "Use for current info post-knowledge-cutoff, multi-source research, fact-checking. "
         "Fallback: native WebSearch/WebFetch when neither skills nor MCP available."
     ),
@@ -251,8 +254,8 @@ INSTRUCTION_MAP = {
 # v3.2: Tier 0 — 1-line summaries for tool MCPs (Claude already has tool descriptions)
 # Behavioral MCPs (Serena, Tavily) are NOT here — they use INSTRUCTION_MAP (Tier 1)
 TIER_0_MAP = {
-    "mcp/MCP_Playwright.md": "Playwright: browser E2E + network mocking (--caps=network,storage). navigate → assert.",
-    "mcp/MCP_Chrome-DevTools.md": "DevTools: 26 tools. Lighthouse audits, CWV, a11y, memory. trace → analyze → optimize.",
+    "mcp/MCP_Playwright.md": "Playwright: playwright-cli skill if installed, else MCP browser_* (--caps). navigate → assert.",
+    "mcp/MCP_Chrome-DevTools.md": "DevTools: CWV via perf trace, Lighthouse a11y/SEO, heap-snapshot diff. trace → analyze → optimize.",
     "core/BUSINESS_SYMBOLS.md": "Business symbols + expert selection. 🎯📈💰⚖️🏆🌊 domain mapping.",
 }
 
