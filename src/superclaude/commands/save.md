@@ -11,10 +11,10 @@ description: Session lifecycle management with Serena MCP + Claude auto memory f
 
   <flow>
   1. Analyze: session progress + discoveries
-  2. Persist (Serena): write_memory("session_[date]", context) → write_memory("learnings_[topic]", insights)
+  2. Persist (Serena): write_memory("session_[date]", context) → write_memory("learnings_[topic]", insights); memory tools absent → direct-file fallback (bounds)
   3. Persist (auto memory): Write/Edit MEMORY.md + topic files for cross-session continuity
     3.5. Corrections-Review: capture unrecorded user corrections per /sc:reflect Misunderstanding-Audit (same feedback-memory fields).
-  4. Verify: list_memories() + Read MEMORY.md confirms both stores
+  4. Verify: list_memories() (tools absent → Glob `.serena/memories/`) + Read MEMORY.md confirms both stores
   5. Checkpoint: recovery points + progress tracking
   6. Validate: data integrity + no duplicates across stores
   7. Session Goal: if session goal set via /sc:load, evaluate completion status (done/partial/deferred)
@@ -77,7 +77,7 @@ description: Session lifecycle management with Serena MCP + Claude auto memory f
   <bounds>
     <does>Serena integration, auto memory sync, auto-checkpoints, discovery preservation.</does>
     <never>save without validation, override without checkpoint, duplicate across stores.</never>
-    <fallback>Without Serena: use Claude auto memory only (Write/Edit MEMORY.md). Ask user for guidance when uncertain.</fallback>
+    <fallback>Serena memory tools absent (server missing, or connected with `--mode=no-memories`): Write `.serena/memories/<name>.md` directly — flat basename only, no path segments, same names as the memory tools use — plus Claude auto memory (Write/Edit MEMORY.md). Ask user for guidance when uncertain.</fallback>
   </bounds>
 
   <handoff next="/sc:load /sc:reflect"/>

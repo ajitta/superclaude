@@ -7,12 +7,12 @@
 Install the `serena-agent` PyPI package via `uv tool install`:
 
 ```bash
-uv tool install -p 3.13 serena-agent@latest --prerelease=allow
+uv tool install -p 3.13 serena-agent
 serena init                # default LSP backend
 # or: serena init -b JetBrains  # JetBrains plugin backend
 ```
 
-This places the `serena` binary on PATH so Claude Code can invoke it directly.
+This places the `serena` binary on PATH so Claude Code can invoke it directly. Upgrade later with `uv tool upgrade serena-agent`.
 
 ## Register with Claude Code
 
@@ -56,7 +56,8 @@ Older guides used `uvx --from git+https://github.com/oraios/serena ...`. Replace
 
 ```bash
 claude mcp remove serena
-uv tool install -p 3.13 serena-agent@latest --prerelease=allow
+uv tool install -p 3.13 serena-agent
+serena init
 serena setup claude-code
 ```
 

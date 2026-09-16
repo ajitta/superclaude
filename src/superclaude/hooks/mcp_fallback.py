@@ -29,9 +29,9 @@ MCP_FALLBACK_FILE = hook_state_dir() / "mcp_fallbacks.json"
 # Fallback mapping (see FLAGS.md <mcp> section for flag definitions)
 MCP_FALLBACKS: dict[str, str] = {
     "context7": "Tavily/WebSearch",
-    "tavily": "WebSearch (native)",
+    "tavily": "Tavily Agent Skills (tvly CLI), then native WebSearch",
     "serena": "Grep/Glob + Edit (no symbol ops or persistence)",
-    "playwright": "DevTools MCP (--devtools) or native WebFetch (install: npx @playwright/mcp@latest)",
+    "playwright": "playwright-cli skill if installed, else DevTools MCP (--devtools) or native WebFetch (install either: mcp/README.md 'Playwright — CLI or MCP')",
     "devtools": "Playwright (install plugin: superclaude mcp --servers chrome-devtools)",
 }
 

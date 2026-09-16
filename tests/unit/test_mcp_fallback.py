@@ -93,7 +93,10 @@ class TestMcpFallback:
         from superclaude.hooks.mcp_fallback import get_fallback_for
 
         assert get_fallback_for("context7") == "Tavily/WebSearch"
-        assert get_fallback_for("tavily") == "WebSearch (native)"
+        assert (
+            get_fallback_for("tavily")
+            == "Tavily Agent Skills (tvly CLI), then native WebSearch"
+        )
         assert (
             get_fallback_for("serena")
             == "Grep/Glob + Edit (no symbol ops or persistence)"
