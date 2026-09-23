@@ -681,7 +681,7 @@ MIT — see [`LICENSE`](LICENSE).
 - `/sc:init` — Interactive project environment setup
 - `/sc:index` / `/sc:index-repo` — Repository indexing (94% token reduction)
 - `/sc:recommend` — Command recommendation engine
-- `/sc:prompt` — Rewrite a prompt for Claude Opus 5 / Fable 5.1
+- `/sc:prompt` — Rewrite a prompt for Claude Opus 5.5 / Fable 5.1. On an Opus 5.5 session, pass a prompt that asks for written-out reasoning as a file path: pasted inline, it can be declined before the command runs
 - `/sc:select-tool` — Intelligent MCP tool selection
 - `/sc:sc` — Command dispatcher (routes to the other `/sc:*` commands)
 

@@ -111,7 +111,7 @@ No add `effort: xhigh` because domain "feels" coding-heavy — session default c
 
 **`skills`** — full skill body inject at startup (~500 tokens each). Subagent **not** inherit skills from parent — list explicit. No preload skills with `disable-model-invocation: true` (CC skip and warn to debug log). SuperClaude ships no skills of its own — names refer to skills installed in `~/.claude/skills/` or `.claude/skills/`.
 
-**`model`** — default `inherit` (use parent model). Use `sonnet` for execution/template/code; omit (inherit) for design judgment / synthesis. Resolution order: `CLAUDE_CODE_SUBAGENT_MODEL` env > per-invocation > frontmatter > parent. Full routing list: `agents/README.md` Model Routing.
+**`model`** — omit it: no shipped agent pins a model, and an omitted field follows Claude Code's subagent resolution order. Resolution order and the Fable opt-in paths: `agents/README.md` Model Routing (SSOT).
 
 **`permissionMode`** — most agents inherit (omit). Use `plan` for read-only research agents that no accept edits. `bypassPermissions` write to `.git`, `.claude`, `.vscode` etc. without prompt — never set on source-shipped agent. Parent `bypassPermissions` / `acceptEdits` / `auto` modes take precedence, override subagent setting.
 
@@ -249,7 +249,7 @@ Rules below apply to all components, not restated above. See `.claude/rules/xml-
 2. Write 1-3 sentence `description` end with CC-idiom trigger ("Use proactively for…", "Use immediately after…", "Use when…").
 3. Pick tool access pattern — one of `tools` or `disallowedTools`, never both.
 4. Set `maxTurns`; omit `effort` unless measured evidence justify it.
-5. Pick `color` by role group; pick `model` by cognitive complexity (omit to inherit).
+5. Pick `color` by role group; omit `model` (see the `model` field rule above).
 6. `skills:` preloads an installed skill's body. SuperClaude ships none — only name one that is actually installed in the target scope.
 7. Add `<memory_guide>` (required) and `<gotchas>` (recommended).
 8. Run `uv run pytest tests/unit/test_agent_structure.py -v`.

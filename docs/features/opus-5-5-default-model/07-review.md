@@ -65,3 +65,52 @@ Verdicts before fixes: A1, A2, A4, A6, A9, A12 pass; A3, A5, A7, A8, A10, A13 pa
 
 - The P7 probe and the P3 canaries have not run; both are verify steps of unimplemented proposals.
 - The 2026-08-25 de-pin date comes from auto-memory, not a re-read of the commit.
+
+## Round 3: the implementation
+
+`/sc:review` of the uncommitted diff on `fix/opus-5-5-default-model` against 04-design. Three independent reviewers ran in parallel, one lens each: spec fidelity and copy consistency (L1), factual accuracy against the downloaded official pages and the local migration reference (L2), and `commands/prompt.md` as an instruction set plus the raw probe outputs (L3). Each received the diff, the spec, the raw probe outputs with the criteria written before them, and earlier rounds' findings as acceptance criteria. None received the author's reasons for departing from the spec, the probe verdicts, or this file. The main loop re-read every cited line in the diff and in the source before applying a finding. No finding was Critical. Tests and lint were green before and after: `uv run pytest` 2637 passed, 25 skipped; `ruff check .` and `ruff format --check .` clean.
+
+### Applied
+
+| Finding (reviewers) | Evidence re-checked | Resolution |
+|---|---|---|
+| The P2 line said "2.5× Opus 5.5 at list price", leaving out cache reads (L1, L2) | Fable 5.1 overview: cache read $0.25/MTok; What's new: $0.20; announcement: cache reads "make up the majority of agentic and coding work costs" | The line states no ratio ("it is priced above Opus 5.5"), since `agents/README.md` carries the prices, and passes any model only on the user's request. 04-design P2 amended |
+| The `"summarized"` note in the interim request config was credited to the prompting guide (L1, L2, L3) | `model-migration.md:1730` says it, in the Fable 5.1 section only; the guide (line 91) names only `"updates"` | Dropped from `prompt.md` and from 04-design P3 |
+| The "Answer directly without deliberating." keep clause applied to every target (L2, L3) | Guide line 52 offers it for Opus 5.5; `model-migration.md:972` says delete any don't-reason rule on Opus 5 | Scoped to 'claude-opus-5-5'; "with quality measured" reworded to the guide's condition, "measure quality when you add it" |
+| The No-thinking row's `effort: low` and the interim `medium` default had no precedence (L3) | Canary C1-en-55 emitted `medium` although it moved the rule's intent to effort | Interim line: "`medium` unless a removal row below sets it". A second canary (C1-en-55-r2) still chose `medium`, because the row fired only "when the rule was there for latency"; the condition was dropped on guide line 44 ("Lowering effort reduces thinking … more reliably than prompt instructions do"). See 08 §3 for the third run |
+| The runtime hook note says the reference section "wins over the mirror table" without the interim exception (L1, L2, L3) | `context_loader.py:1072-1075`; reproduced by L3 with `_emit_prompt_command_reference` | Note and the code comment at `:946` carry the exception; `test_context_loader.py:876` still matches |
+| "No Opus 5.5 section" was decided from a "today" remark and the hook's ranges, not a check (L3) | C1-ko-55-file read the Opus 5 range and never searched for a 5.5 heading | `<fact_sourcing>` takes the fallback only when a Grep for the target's own `## Migrating to Claude <model>` heading finds none. Both reruns grepped the headings first |
+| `reasoning_extraction` "never retried" was stated for every model (L1, L2, L3) | Guide line 85 says it for Opus 5.5; for Fable the reference says only that "some categories decline with no fallback" (`:1666`) | Row and both docstrings scope the retry claim to Opus 5.5; the row says the classifiers "can decline" (guide wording) |
+| The docstrings listed `bio` and `reasoning_extraction` for Opus 5 (L2, L3) | `model-migration.md:1664` "Claude Opus 5's cyber-only classifiers"; model-config line 510 mentions "a biology flag on Opus 5", so the sources disagree on `bio` | Docstrings say the set differs by model and that Opus 5 has no `reasoning_extraction`, and make no claim about `bio` on Opus 5 |
+| "Both targets" wording left at three places (L1) | `prompt.md` Verifiability switch, Prefill row, fact-sourcing | "Both families" for the user-decided Verifiability row, "every target" for the other two |
+| The detector rows' own per-model reasons conflicted with the gotcha's "one exception" and the intro's "direction still comes from the delta rule" (L1, L2, L3) | `prompt.md` removal intro and `facts-not-memory` | Intro: a row without its own reason takes its direction from the delta rule; the gotcha names both exceptions |
+| The fact-sourcing section's last sentence still stated the old absolute (L3) | `prompt.md` fact-sourcing closing sentence | Adds "its interim text only while the reference lacks the target's section" |
+| Session inference left sessions on other models undefined; "Opus-family" would send an Opus 4.8 session to the Opus 5 direction (L3) | `model-migration.md:1079`: Opus 4.8's delegation direction is the opposite | Opus 5 and 5.5 sessions resolve to their own IDs, Fable 5.x to 'claude-fable-5-1'; any other model infers no target |
+| The unattended-run clause left out when to add the paragraph (L2) | Guide line 71: "from the first request of the session" | Added |
+| The self-check inversion was stated for Opus 5.5 without saying it is carried (L2) | `model-migration.md:1069` frames it for Opus 5 | Row and gotcha say 'claude-opus-5-5' carries it |
+| P1 table: `--model fable` "cannot leave a user on Fable by accident" ignored resumed sessions; `/model fable` in `-p` mode is not saved; forks keep the session model (L2, L3) | model-config lines 141 and 133; sub-agents line 1143 | Rows corrected |
+| P1 paragraph dropped "your evals" and re-aimed the "single sitting" quote (L1, L2) | choosing.md line 46; model-config line 69 | Reworded to the sources |
+| `.claude/rules/agent-authoring.md:114` still said "default `inherit`" and "Use `sonnet`" while pointing to the README as SSOT (L1, L2, L3) | `agents/README.md:86` "Every agent omits `model:`"; sub-agents line 302 | Line rewritten to "omit it"; line 33's `model: sonnet` example stays in 04 §4's deferred docs pass |
+| P7 folded numbered labels into the cream/serif/terracotta house style, and "section or step" did not match what the probes saw (L1, L2, L3) | Probes: leading-zero numbers on steps and list items, on white and off-white pages alike | A separate never-auto-apply default: numbered "01/02/03" labels "on sections, steps or list items" |
+| Inline Korean prompts with a reasoning write-out are declined on the session before the command runs (L1, L3) | 3/3 on the edited tree; a master-tree control was declined too (4/4 in all); the same text by file path passed 2/2; English inline passed | Not caused by this branch. Text in `prompt.md` cannot help, since the command never loads, so the root README's `/sc:prompt` entry says to pass such a prompt as a file path on an Opus 5.5 session. 04-design P3 Verify now passes the Korean canary by file |
+| 04-design disagreed with the implementation on the No-thinking row for Opus 5 and on the unattended paragraph (L1, L3) | `model-migration.md:972`; the command's `<tools>` has no reader for the guide | 04-design P3 item 4 and Verify amended; status moved to `implementing` |
+
+### Declined, with the reason
+
+| Finding | Reason |
+|---|---|
+| Scope `think carefully` to Opus 5.5 chat prompts (L2) | The row's existing reason, "redundant on thinking models", holds for all three targets: thinking is on by default on Opus 5 (`model-migration.md:927-929`) and always on for Opus 5.5 and Fable. The reference's positive use of "Think carefully through the problem" is for Opus 4.7 and Sonnet 5 at `low` (`:738`, `:1222`), neither a target |
+| Carry the ~200-word unattended paragraph verbatim as interim text (L1) | `<fact_sourcing>` gives verbatim tuning blocks to the reference, not the command; P4 would delete it again; the `[FILL]` slot names the URL |
+| The fallback is stated in both `<fact_sourcing>` and `<bounds>` (L3) | 04-design P3 item 3 asks for both places |
+| The P2 line changes nothing measured, since 8/8 delegations already omitted `model` (L3) | It governs the case the eight runs did not exercise: a user asking for a model, or an escalation that looks tempting |
+| Treat off-white section bands after the edit as the guide's pattern and tighten the clause (L3) | Two runs per cell; the guide names "a cream or off-white background". 08 reports the bands as reduced, not absent |
+| Update the `okf/superclaude/commands/` copies (L1) | Stale since before Fable 5.1 and generated separately; out of this change |
+| The insight Stop hook replaced canary `result` text (L3) | Outside the diff; noted in 08 as probe noise |
+
+D3 was applied on 04-design's recommendation rather than on a recorded user answer (L3 asked); 08 says so.
+
+### Still unverified after round 3
+
+- One run per canary condition; two per P7 cell.
+- Whether `reasoning_extraction` declines skip server-side fallback on Fable 5.1 (the Refusals-and-fallback page was not fetched).
+- Interactive-session behavior of every change; all probes were headless.

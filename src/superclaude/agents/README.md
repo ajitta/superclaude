@@ -87,9 +87,19 @@ Every agent omits `model:` and inherits the parent session model — no agent pi
 
 Rationale mirrors the `effort:` removal in commit `8edd05d`: no hardcoded model without measured evidence. Pinning a tier overrides the user's cost-vs-quality choice for the session, and a pin written against one model generation silently misroutes after the next.
 
-Resolution order: `CLAUDE_CODE_SUBAGENT_MODEL` env > per-invocation > frontmatter > parent session.
+Resolution order: per-invocation `model` parameter > frontmatter `model:` > `CLAUDE_CODE_SUBAGENT_MODEL` > main conversation model (Claude Code v2.1.251+).
 
-Override: set `model:` in agent frontmatter to pin one agent to a tier.
+Moving work to Fable 5.1 is the user's call. Each path lasts a different length:
+
+| Path | How long it lasts |
+|---|---|
+| `claude --model fable` | That session only (a later `--continue` or `--resume` of it restores Fable). The recommended "when needed" path, because it never changes the saved default |
+| `/model fable` | Saved to user settings, so later sessions also start on Fable, until `/model default`; in `-p` mode it applies to that session only |
+| `/model` picker, `s` on the Fable row | This session only; the saved default stays unchanged |
+| Asking for one delegation on Fable | That delegation only: the Agent tool call carries `model: "fable"` |
+| `CLAUDE_CODE_SUBAGENT_MODEL=fable` | Every subagent that no per-invocation parameter or frontmatter assigns a model (built-in Explore and Plan, and forks, excepted) |
+
+When Fable 5.1: Anthropic's routing advice is "Most workloads start with Claude Opus 5.5"; move to Fable 5.1 when your evals at `xhigh` or `max` effort still fall short on demanding reasoning or long-horizon agentic work. Claude Code describes Fable as suited to "tasks larger than a single sitting". At list price Fable 5.1 costs 2.5× Opus 5.5 on input and output ($10/$50 against $4/$20 per MTok) and 1.25× on cache reads ($0.25 against $0.20), which Anthropic says "make up the majority of agentic and coding work costs". Where a plan bills Fable to usage credits, `-p` mode and the Agent SDK bill it without the consent prompt that interactive sessions show.
 
 ## Authoring Rules
 
