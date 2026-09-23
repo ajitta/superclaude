@@ -944,7 +944,8 @@ def _emit_execution_directives(prompt: str, session_id: str | None = None) -> No
 # /sc:prompt takes its per-model direction from the claude-api skill's
 # model-migration reference, which lives outside the install tree at a path that
 # differs by machine and by scope. The command ships a mirror of that reference
-# and the mirror is authoritative only while the reference is unreachable — a
+# and the mirror is authoritative only while the reference is unreachable (text
+# the command marks interim covers a target the reference has no section for) — a
 # rule prose alone cannot enforce, since the model cannot prefer a file nobody
 # told it the location of. Resolving it here turns the rule into an injected
 # fact and hands over the line ranges, so the read costs one Read instead of a
@@ -1071,7 +1072,9 @@ def _emit_prompt_command_reference(prompt: str) -> None:
     print(
         f"<!-- SuperClaude /sc:prompt: claude-api model-migration reference at "
         f"{path} — {located}. Read the target model's section before applying "
-        "the delta; on conflict it wins over the mirror table in the command. -->"
+        "the delta; on conflict it wins over the mirror table in the command, "
+        "except text the command marks interim for a target the reference has "
+        "no section for. -->"
     )
     print()
 

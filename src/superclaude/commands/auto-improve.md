@@ -37,7 +37,7 @@ disable-model-invocation: true
   - eval-cmd-blast-radius: `--eval-cmd` run unsandboxed inside worktree. Network calls, DB writes, external billing — all user responsibility. Do NOT pass command touch production resources
   - cc-session-end: Survival across Claude Code session exit is UNVERIFIED on Windows — no real teardown has been measured; the worker does outlive its spawning shell. Confirm the PID in `[worktree]/auto_improve.pid` is a LIVE process, not merely present — a hard-killed worker leaves it stale. That PID stops the coordinator only; an `--eval-cmd` already in flight breaks away and keeps running
   - mutator-tools: mutator agent tool surface restricted to Edit/Write/Read (Bash explicitly disabled) — cannot run shell command inside worktree
-  - mutator-model-freeform: `--mutator-model` accepts any model alias or full ID the harness resolves (default sonnet) — worker enforces no enum; pick cheap (haiku/sonnet) for volume, flagship for hard mutations
+  - mutator-model-freeform: `--mutator-model` accepts any model alias or full ID the harness resolves (default sonnet) — worker enforces no enum; pick cheap (haiku/sonnet) for volume, flagship for hard mutations. Each cycle runs `claude -p`, so where a plan bills Fable to usage credits a `fable` mutator bills them with no consent prompt
   - never-bare-python: NEVER substitute `python -m superclaude.scripts.auto_improve` for the console entry — worker import `superclaude.scripts.auto_improve.*`, absent from the install tree, so bare python resolve only by luck of PATH. `superclaude auto-improve` carry the installing interpreter; inside a dev checkout `uv run python -m ...` equivalent.
   </gotchas>
 
