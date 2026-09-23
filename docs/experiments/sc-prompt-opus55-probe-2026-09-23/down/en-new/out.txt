@@ -1,0 +1,104 @@
+# orders-api Deployment: reliability review
+
+This manifest can't reach 99.9% as written. With these settings the pod will probably never become healthy. If it did, every rollout, node drain, crash or loss of zone 2a would take the whole service down. Findings are ordered by severity.
+
+## High
+
+**1. `spec.replicas: 1`**
+- **Problem:** There is only one pod. Any crash, eviction, node drain or rollout means a full outage lasting at least the ~40 s JVM startup.
+- **Severity / confidence:** High, high confidence.
+- **Fix:** Run at least 3 replicas, one per AZ. The right steady-state count depends on per-pod throughput, which the manifest doesn't show. Load-test one pod and size so that losing a whole zone still leaves enough capacity for 300 rps.
+
+**2. `spec.strategy.rollingUpdate` (`maxSurge: 0`, `maxUnavailable: 100%`)**
+- **Problem:** Every rollout terminates all old pods before any new pod starts, so each deploy is a planned outage. Adding replicas won't fix this.
+- **Severity / confidence:** High, high confidence.
+- **Fix:** Set `maxSurge: 1` (or 25%) and `maxUnavailable: 0`.
+
+**3. `containers[0].resources.limits.memory: 256Mi` vs `JAVA_OPTS -Xms512m -Xmx512m`**
+- **Problem:** The heap alone is twice the container limit, before counting metaspace, thread stacks and direct buffers. `-Xms512m` reserves the full heap at startup, so the container will likely be OOMKilled during startup or soon after it takes load. That leads to CrashLoopBackOff.
+- **Severity / confidence:** High, high confidence.
+- **Fix:** Make the memory limit at least heap + ~50%, for example 768Mi–1Gi for a 512m heap. Alternatively, replace the fixed `-Xmx` with `-XX:MaxRAMPercentage=75` and set memory `requests` equal to `limits`.
+
+**4. `livenessProbe` (`initialDelaySeconds: 0`, `periodSeconds: 2`, `failureThreshold: 1`)**
+- **Problem:** The probe starts immediately and restarts the container after one failed check, so the container gets about 2 s to answer. The JVM needs about 40 s, so the container is killed before it ever serves and loops forever. Once running, a single GC pause longer than the default 1 s `timeoutSeconds` also triggers a restart, most likely at peak load.
+- **Severity / confidence:** High, high confidence.
+- **Fix:**
+  - Add a `startupProbe` that allows about 90–120 s (for example `periodSeconds: 5`, `failureThreshold: 24`).
+  - Relax liveness to `periodSeconds: 10`, `timeoutSeconds: 3`, `failureThreshold: 3`.
+- **Needs confirming:** that `/healthz` exists. Spring Boot's default is `/actuator/health`, and a 404 here would also cause restart loops. Also confirm it doesn't check downstream dependencies like the database, because a DB blip would then restart every pod.
+
+**5. No `readinessProbe`**
+- **Problem:** Pods are marked Ready and get traffic as soon as the container starts, which is about 40 s before Spring can serve. The rollout also moves on without waiting for the app. An overloaded or failing pod is never taken out of rotation.
+- **Severity / confidence:** High, high confidence.
+- **Fix:** Add a readiness probe on `/actuator/health/readiness` (for example period 5 s, failureThreshold 3) and set `minReadySeconds: 10`.
+
+**6. `nodeSelector: topology.kubernetes.io/zone: ap-northeast-2a`**
+- **Problem:** Every pod is pinned to one AZ, so a 2a outage is a full outage no matter how many replicas run. If 2a runs short of capacity or instances, cluster-autoscaler can only add nodes there and pods stay Pending.
+- **Severity / confidence:** High, high confidence.
+- **Fix:** Remove the selector. Add `topologySpreadConstraints` on `topology.kubernetes.io/zone` with `maxSkew: 1`, plus a second constraint on `kubernetes.io/hostname`.
+- **Needs confirming:** that the managed node groups are one per AZ (or multi-AZ with `--balance-similar-node-groups`). Otherwise the autoscaler may not create nodes in the zone the scheduler needs.
+
+**7. `terminationGracePeriodSeconds: 0`**
+- **Problem:** Pods are SIGKILLed immediately on every rollout, drain and scale-down. In-flight requests fail. The ALB also keeps sending new requests to the dead pod IP until target deregistration completes, which shows up as 502/504s.
+- **Severity / confidence:** High, high confidence.
+- **Fix:**
+  - Set the grace period to about 45–60 s.
+  - Add a `preStop` sleep of about 15–20 s so the ALB can deregister the pod first.
+  - Enable Spring `server.shutdown=graceful`.
+  - Keep the ALB target group's deregistration delay shorter than the grace period.
+
+**8. No PodDisruptionBudget (defined elsewhere)**
+- **Problem:** Node drains during managed node group upgrades or cluster-autoscaler scale-down can evict all pods at once.
+- **Severity / confidence:** High, high confidence.
+- **Fix:** Once replicas are at least 3, add a PDB with `maxUnavailable: 1`. Don't pair a PDB with `replicas: 1`: it would either block drains or give no protection.
+
+## Medium
+
+**9. `image: ...:latest`**
+- **Problem:**
+  - `kubectl rollout undo` goes back to the same tag, so rollback may not actually restore the old code.
+  - Nodes that pulled at different times can run different builds.
+  - With the implicit `imagePullPolicy: Always`, a registry outage blocks every new pod from starting.
+- **Severity / confidence:** Medium-high, high confidence.
+- **Fix:** Deploy immutable version tags or digests.
+
+**10. `resources` has no CPU request (memory request defaults to the limit)**
+- **Problem:** Without a CPU request, pods can be packed onto busy nodes and throttled by neighbours. That stretches the 40 s startup, which makes the probe issues worse, and hurts latency. Cluster-autoscaler and any future HPA both work from requests, so they can't size the service correctly.
+- **Severity / confidence:** Medium, high confidence.
+- **Fix:** Set a CPU request from measured usage (for example 500m–1). Avoid a tight CPU limit, since it throttles JVM startup and GC.
+
+**11. ALB → ClusterIP Service implies `target-type: ip` (context not shown)**
+- **Problem:** With IP targets, Kubernetes readiness and ALB target health are separate. Without pod readiness gates, a rollout can remove old pods before the ALB has marked the new ones healthy, causing short 5xx bursts even with the fixes above.
+- **Severity / confidence:** Medium, medium confidence.
+- **Needs confirming:** that this is the AWS Load Balancer Controller in IP mode, and what health-check path and interval the ALB uses.
+- **Fix if so:** Label namespace `shop` with `elbv2.k8s.aws/pod-readiness-gate-inject=enabled`.
+
+**12. No HPA (defined elsewhere)**
+- **Problem:** A fixed replica count can't absorb spikes above the planned peak, and a zone loss concentrates all load on the remaining pods.
+- **Severity / confidence:** Medium, medium confidence.
+- **Needs confirming:** the traffic shape (how spiky it is) and per-pod capacity.
+- **Fix:** Either size the fixed replicas to survive one zone down at peak, or add an HPA on CPU with `minReplicas: 3`. Because of the 40 s startup, scale out with some headroom.
+
+## Low
+
+**13. No `priorityClassName`**
+- **Problem:** Under node pressure or preemption, this customer-facing API is treated the same as batch or low-value workloads.
+- **Severity / confidence:** Low, medium confidence. It depends on what else runs on these nodes.
+- **Fix:** Assign an appropriate priority class.
+
+**14. JVM without explicit container sizing flags**
+- **Problem:** With no CPU limit, the JVM sizes GC and thread pools from the node's total core count, which can cause erratic pause behaviour on large nodes.
+- **Severity / confidence:** Low, low-medium confidence.
+- **Fix:** Set `-XX:ActiveProcessorCount` or a CPU limit that matches the request.
+
+**15. `/healthz` is served on the application port 8080**
+- **Problem:** If the request thread pool is saturated, probes queue behind real traffic and fail, which restarts pods that are busy but healthy.
+- **Severity / confidence:** Low, medium confidence.
+- **Fix:** Serve actuator on a separate management port (`management.server.port`).
+
+## Outside reliability scope (not reviewed)
+
+- No `securityContext`: runs as root by default, with no `readOnlyRootFilesystem` and no dropped capabilities.
+- No NetworkPolicy, so any pod in the cluster can reach orders-api.
+- The default ServiceAccount is used, with its token automounted.
+- `:latest` also weakens supply-chain traceability (you can't tell which build is running).
