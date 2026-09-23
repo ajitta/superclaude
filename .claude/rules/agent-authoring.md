@@ -249,7 +249,7 @@ Rules below apply to all components, not restated above. See `.claude/rules/xml-
 2. Write 1-3 sentence `description` end with CC-idiom trigger ("Use proactively for…", "Use immediately after…", "Use when…").
 3. Pick tool access pattern — one of `tools` or `disallowedTools`, never both.
 4. Set `maxTurns`; omit `effort` unless measured evidence justify it.
-5. Pick `color` by role group; pick `model` by cognitive complexity (omit to inherit).
+5. Pick `color` by role group; omit `model` (see the `model` field rule above).
 6. `skills:` preloads an installed skill's body. SuperClaude ships none — only name one that is actually installed in the target scope.
 7. Add `<memory_guide>` (required) and `<gotchas>` (recommended).
 8. Run `uv run pytest tests/unit/test_agent_structure.py -v`.
