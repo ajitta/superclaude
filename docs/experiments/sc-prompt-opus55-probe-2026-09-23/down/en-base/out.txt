@@ -1,0 +1,199 @@
+# Reliability review: `orders-api` Deployment
+
+**Verdict:** This spec will not run. The liveness probe kills the JVM before it can start, so the pod goes into CrashLoopBackOff. If you fixed only that, the memory limit is below the heap size and the pod would be OOMKilled. It would also have downtime on every deploy, node drain and zone failure, and it would drop in-flight orders.
+
+I list the findings by severity, show how they combine, give a corrected manifest, and end with the claims I double-checked.
+
+---
+
+## P0: The pod cannot run as written
+
+### 1. Liveness probe kills the JVM during startup
+```yaml
+initialDelaySeconds: 0
+periodSeconds: 2
+failureThreshold: 1
+# timeoutSeconds: (default 1)
+```
+- The kubelet starts probing as soon as the container starts. A JVM service usually takes 10–60 seconds before it listens on 8080. The first probe gets "connection refused", and with `failureThreshold: 1` a single failure restarts the container. The pod enters **CrashLoopBackOff and never becomes healthy.**
+- Even after a successful start, one GC pause or slow response longer than the default **1 s timeout** restarts the container. With 1 replica, each restart is a full outage, and the restart loses the JVM warm-up (JIT), so the next start is slow again.
+- **Fix:** add a `startupProbe` that allows for the worst-case startup time. Make liveness tolerant (period about 10 s, timeout 2–5 s, failureThreshold 3). Liveness should check only that the process is alive, not downstream dependencies. Otherwise a slow database restarts every pod at once.
+
+### 2. The JVM heap is larger than the container memory limit
+```yaml
+JAVA_OPTS: "-Xms512m -Xmx512m"
+limits.memory: 256Mi
+```
+- The heap alone is allowed to reach **2× the container limit**. The JVM also uses memory outside the heap: metaspace, code cache, thread stacks, GC structures and direct buffers, often 100–300 MiB more.
+- Heap pages are touched lazily (unless `AlwaysPreTouch` is set), so the pod may survive briefly. Once real load pushes resident memory past 256 Mi, the kernel **OOMKills** it (exit 137). There is no Java `OutOfMemoryError` and no heap dump, so the cause is hard to see.
+- **Fix:** size the limit as heap plus overhead. Alternatively, drop `-Xmx` and use `-XX:MaxRAMPercentage=75` so the heap follows the limit. Also check that the image's entrypoint actually reads `JAVA_OPTS`. That is a shell-script convention, not something the JVM reads. `JAVA_TOOL_OPTIONS` is read by the JVM itself.
+
+---
+
+## P1: Guaranteed downtime
+
+### 3. `replicas: 1` is a single point of failure
+Any restart, eviction, node failure, drain, deploy or OOMKill takes the whole service down. An orders API should run at least 3 replicas.
+
+### 4. The rollout strategy is effectively `Recreate`
+```yaml
+maxSurge: 0
+maxUnavailable: 100%
+```
+`maxSurge` rounds up (0 → 0) and `maxUnavailable` rounds down (100% of 1 → 1). The controller therefore kills the old pod **before** creating the new one, so **every deploy is a full outage.** It stays an outage until the new pod is Ready, which with finding #1 is never. Even with more replicas, `maxUnavailable: 100%` allows all of them to be removed at once.
+**Fix:** `maxSurge: 1`, `maxUnavailable: 0`, plus a readiness probe and `minReadySeconds`.
+
+### 5. No readiness probe
+Without one, the container counts as Ready as soon as it starts. Two problems follow:
+- Traffic is sent before the app listens, so clients get connection-refused errors.
+- The rollout controller treats the new pod as healthy immediately. A broken release can therefore roll out completely without ever being gated.
+
+### 6. `terminationGracePeriodSeconds: 0`
+- The pod gets SIGKILL immediately and has no chance to shut down. In-flight order requests are cut off mid-transaction, which can mean lost orders, orders charged but not recorded, or retries that create duplicates. Connection pools, message-consumer offsets and log/metric buffers are not flushed.
+- The same instant kill applies to liveness-triggered restarts and evictions.
+- No `preStop` hook either. Endpoint removal spreads through the cluster asynchronously, so even with a grace period, load balancers and kube-proxy keep sending traffic for a few seconds after SIGTERM. A short `preStop` sleep covers that window.
+- **Fix:** set the grace period to about 30–60 s, add a `preStop` sleep of about 5–15 s, and make sure the app drains on SIGTERM (for example, Spring Boot `server.shutdown=graceful`).
+
+### 7. Pinned to one availability zone
+```yaml
+nodeSelector:
+  topology.kubernetes.io/zone: ap-northeast-2a
+```
+- If ap-northeast-2a fails, the service is down and cannot be rescheduled elsewhere.
+- If that zone runs short of capacity, new pods stay Pending, including during a deploy (see #4).
+- There are also no `topologySpreadConstraints` or anti-affinity rules. So even with more replicas, they could all land on one node.
+- **Check first:** the zone pin may be deliberate, for example because of a zonal EBS volume or to stay close to a single-AZ database. If so, that dependency is the real single point of failure and needs its own fix. Removing the selector alone won't be enough.
+
+### 8. No PodDisruptionBudget
+Node drains (upgrades, autoscaler scale-down, spot reclamation) can evict the pod freely. Note that with 1 replica, a PDB with `minAvailable: 1` would block drains entirely. You need at least 2 replicas before a PDB makes sense.
+
+---
+
+## P2: Degraded or unpredictable behaviour
+
+### 9. `image: ...:latest`
+- **Builds aren't reproducible:** after a reschedule, different pods can run different code with no change to the spec.
+- **Rollback doesn't work:** `kubectl rollout undo` goes back to a spec that still says `:latest`, which is the same image.
+- **Pushing a new image doesn't deploy anything:** the pod template hasn't changed, so no rollout is triggered.
+- **Registry dependency:** `:latest` makes `imagePullPolicy` default to `Always`, so a registry outage stops pods from starting even when the image is cached on the node.
+- **Fix:** use an immutable version tag, ideally with an `@sha256:` digest.
+
+### 10. No CPU request or limit, and no explicit memory request
+- When only a limit is set, the memory request defaults to the limit (256Mi). CPU has no request at all, which means about 2 CPU shares under contention. The scheduler places the pod anywhere, and on a busy node JVM startup and GC slow down badly. That makes probe failures (#1) even more likely.
+- The QoS class is Burstable (memory set, CPU not), so the pod is evicted before Guaranteed pods under node pressure.
+- With no CPU limit, the JVM sees every core on the node and sizes its GC and common-pool threads to match. That's fine in itself, but set a realistic CPU request.
+
+### 11. Smaller gaps
+- No `minReadySeconds`, so a pod that crashes 5 seconds after becoming Ready still counts as available during a rollout.
+- No HPA for a customer-facing API. Load spikes would hit a single pod.
+- `-XX:+ExitOnOutOfMemoryError` is not set. A JVM with a broken heap can stay up as a zombie instead of restarting cleanly.
+- No `priorityClassName`, so this revenue-critical pod has the same preemption priority as batch jobs.
+
+---
+
+## How the problems combine
+1. **Startup:** liveness fails at t≈0 and the container restarts, over and over (CrashLoopBackOff).
+2. **If probes were fixed:** load raises the heap above 256Mi, the pod is OOMKilled, it restarts, JIT warm-up is lost and latency rises.
+3. **Every deploy:** the only pod is killed with no grace period, in-flight orders are lost, and the service is down until the new pod starts. Without a readiness probe, it gets traffic before it's ready.
+4. **Zone failure or node drain:** full outage with nowhere to reschedule.
+
+---
+
+## Corrected manifest
+The numbers are starting points. Tune them from real startup time and memory metrics.
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: orders-api
+  namespace: shop
+spec:
+  replicas: 3
+  minReadySeconds: 10
+  revisionHistoryLimit: 5
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: orders-api
+  template:
+    metadata:
+      labels:
+        app: orders-api
+    spec:
+      terminationGracePeriodSeconds: 45
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: topology.kubernetes.io/zone
+          whenUnsatisfiable: DoNotSchedule
+          labelSelector:
+            matchLabels: {app: orders-api}
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels: {app: orders-api}
+      containers:
+        - name: orders-api
+          image: registry.example.com/shop/orders-api:1.4.2@sha256:<digest>
+          ports:
+            - name: http
+              containerPort: 8080
+          env:
+            - name: JAVA_TOOL_OPTIONS
+              value: "-XX:MaxRAMPercentage=75 -XX:+ExitOnOutOfMemoryError"
+          resources:
+            requests:
+              cpu: 500m
+              memory: 1Gi
+            limits:
+              memory: 1Gi          # heap ≈ 768Mi + ~256Mi non-heap
+          startupProbe:
+            httpGet: {path: /healthz, port: http}
+            periodSeconds: 5
+            failureThreshold: 30   # allows up to 150s to start
+          readinessProbe:
+            httpGet: {path: /ready, port: http}   # may check dependencies
+            periodSeconds: 5
+            timeoutSeconds: 2
+            failureThreshold: 3
+          livenessProbe:
+            httpGet: {path: /healthz, port: http} # process-only check
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+          lifecycle:
+            preStop:
+              sleep:
+                seconds: 10        # K8s ≥1.30; else exec ["sleep","10"]
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: orders-api
+  namespace: shop
+spec:
+  maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: orders-api
+```
+
+Notes on the fix:
+- **`/ready`:** this assumes the app exposes a readiness endpoint separate from `/healthz`. If it doesn't, use `/healthz` for both probes for now and add a separate endpoint later.
+- **`preStop` sleep:** the `sleep` action is on by default from Kubernetes 1.30. The `exec` form needs a `sleep` binary in the image, which distroless images don't have.
+- **Zone spread:** `DoNotSchedule` spreads pods strictly across zones. If a zone's nodes are still registered but unhealthy, replacement pods can stay Pending. If you'd rather have availability than strict spread during a zone outage, use `ScheduleAnyway`.
+- **HPA:** add one targeting CPU or RPS once the requests are realistic.
+
+---
+
+## Claims I double-checked
+- **Rounding:** `maxUnavailable` percentages round down and `maxSurge` rounds up, so 100% of 1 replica is 1 and a surge of 0 stays 0. The old pod is killed first, which confirms #4.
+- **Grace period 0 in a pod spec:** it means stop immediately with the kill signal. The kubectl conversion of `--grace-period=0` to 1 applies only to the CLI flag, not the spec field.
+- **Memory request:** with only a limit set, the request defaults to the limit. CPU is unset, so its request is 0 unless a namespace LimitRange sets a default. Check whether `shop` has one.
+- **No readiness probe:** the pod is Ready as soon as the container is running, which confirms #5.
+- **Heap vs. limit:** OOM depends on how much memory is actually used, not on what `-Xms` reserves. So "OOMKilled under load" is certain, but "OOMKilled immediately" is not, and I didn't claim it.

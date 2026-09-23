@@ -1,0 +1,74 @@
+I rewrote the prompt for Claude Opus 5.5 (`claude-opus-5-5`) called through the API. The migration reference has no Opus 5.5 section yet: I searched it for "Opus 5.5" and "opus-5-5" and found nothing. So I used its **Migrating to Claude Opus 5** section instead, including "Behavioral shifts (prompt-tunable)" and the effort guidance. Where the command marks text as interim for Opus 5.5 (from the Opus 5.5 prompting guide), that text takes precedence.
+
+## Rewritten prompt
+
+```text
+You're reviewing a Kubernetes Deployment manifest for reliability problems before it goes to [FILL: target environment — production / staging]. The review is read by [FILL: audience — e.g., the team that owns this service], who will use it to decide what to change before rollout.
+
+Context the manifest doesn't show:
+- Cluster: [FILL: Kubernetes version, managed platform or self-hosted, node autoscaling setup]
+- Workload: [FILL: what the service does, stateless or stateful, traffic pattern, availability target]
+- Related objects defined elsewhere: [FILL: PodDisruptionBudget / HPA / Service / NetworkPolicy for this workload, or "none"]
+- Failure modes that matter most: [FILL: e.g., rollouts, node drains, pod crashes, resource pressure, zone outage]
+
+<manifest>
+[FILL: the Deployment YAML]
+</manifest>
+
+Report every reliability problem you find, including minor and uncertain ones. For each finding give:
+- the field or path in the manifest it concerns
+- what goes wrong, and under what condition
+- severity (high / medium / low) and your confidence
+- the concrete fix
+Order findings by severity. Where a finding depends on context the manifest doesn't show, say what you would need to know instead of assuming it.
+
+Deliver what was asked, at the scope intended: this is a reliability review. If you notice problems outside reliability, list them at the end, one line each, without reviewing them in depth. [FILL: return a corrected manifest too, or findings only]
+
+Keep responses focused, brief, and concise: each finding in a few sentences, without restating the manifest or giving general Kubernetes background.
+```
+
+## Change delta
+
+**Removed**
+
+| Original text | Pattern | Why |
+|---|---|---|
+| "You are a senior SRE." | Expert persona used to boost accuracy | Across models, measurements show a persona leaves accuracy on factual and diagnostic work the same or lower. I replaced it with an audience and a quality bar. Adding the clause back is not harmless. |
+| "Think carefully" | Thinking incantation | Opus 5.5 always thinks, so this adds nothing and can cause over-planning. |
+| "write out your reasoning step by step" | Reasoning write-out | On Opus 5.5, classifiers can decline this under the `reasoning_extraction` category, and server-side fallback returns that decline instead of retrying. The reasoning is now available through `thinking.display: "summarized"`. The per-finding "what goes wrong, under what condition" field keeps the useful part: a justification for each finding. |
+| "Be thorough, do not be lazy." | Proactivity boosters | They are slogans. The intent now lives in "report every problem, with severity and confidence". This is a single review, not multi-step autonomous work, so I did not add the autonomy block. |
+| "Double-check your answer before responding." | Self-check phrasing | The reference's section on self-check instructions says phrasing like "double-check your answer" triggers extra work. Opus 5 checks its own work without being asked, and Opus 5.5 carries that over. This reverses the usual advice. |
+
+**Added**
+
+| Addition | Source |
+|---|---|
+| Report everything, with severity and confidence | Reference, "Severity filters still depress measured recall": ask for everything with confidence and severity, then filter in a separate pass. This replaces your "be thorough". |
+| Reliability-only scope; other issues get one line each | Reference, "Task scope expansion": the model can add steps nobody asked for. The wording is taken from the scope-discipline block. |
+| "Say what you would need to know" | The same block's "check in only when different readings would lead to materially different work" |
+| Conciseness line | Reference, "Longer user-facing responses": a short conciseness instruction cut response length by about 20%. |
+| Audience, cluster, workload, related objects, failure modes, output form | `[FILL: …]` slots. I have not read any of this. |
+| `<manifest>` block | Your prompt says "attached YAML". It becomes a slot. |
+
+**Not applied, because the prompt doesn't touch these axes:** subagent delegation cap, tool-call batching nudge, progress-update cadence, and the unattended-run paragraph. This is a single human-in-the-loop review, not an unattended run.
+
+## Placeholders to fill
+
+1. Target environment
+2. Audience
+3. Cluster details
+4. Workload details
+5. Related objects defined elsewhere, such as a PodDisruptionBudget or HPA
+6. Failure modes that matter most
+7. The manifest itself
+8. Whether to return a corrected manifest or findings only
+
+## Request configuration (`--target api`)
+
+- **Model:** `claude-opus-5-5`
+- **Effort:** `medium` (interim, from the Opus 5.5 prompting guide). Use `xhigh` or `max` only after you've measured a quality gain. The Opus 5 section also says `low` and `medium` are unusually strong for code review and stay accurate at lower effort.
+- **Thinking:** adaptive, the default. It can't be disabled: a `disabled` or `budget_tokens` setting returns HTTP 400.
+- **`thinking.display`:** `"summarized"`, so you can read the reasoning you used to ask for in the response. Raw thinking is never returned.
+- **`max_tokens`:** the reference sets a floor only for `xhigh`/`max` (at least 64K). The interim 128,000 is for long agentic turns, and this is neither. There is no documented floor at `medium`. Don't set it tight: `max_tokens` caps thinking and response text together, and a tight value truncates the answer partway through.
+- **Refusal handling:** check `stop_reason == "refusal"` before reading `content`. The reference only gives a fallback for Opus 5, which sends cyber-category refusals to Opus 4.8. It has nothing for 5.5, so the fallback target is unconfirmed. A reliability review of Kubernetes config is unlikely to trigger the cyber classifiers.
+- **Batching nudge:** not applicable. There's no tool loop, and parallel calls already work as expected on the Opus side.

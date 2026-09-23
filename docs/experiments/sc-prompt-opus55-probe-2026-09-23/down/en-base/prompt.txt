@@ -1,0 +1,43 @@
+You are a senior SRE. Think carefully and write out your reasoning step by step. Review the attached Kubernetes deployment YAML for reliability problems. Be thorough, do not be lazy. Double-check your answer before responding.
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: orders-api
+  namespace: shop
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 100%
+  selector:
+    matchLabels:
+      app: orders-api
+  template:
+    metadata:
+      labels:
+        app: orders-api
+    spec:
+      terminationGracePeriodSeconds: 0
+      nodeSelector:
+        topology.kubernetes.io/zone: ap-northeast-2a
+      containers:
+        - name: orders-api
+          image: registry.example.com/shop/orders-api:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: JAVA_OPTS
+              value: "-Xms512m -Xmx512m"
+          resources:
+            limits:
+              memory: 256Mi
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 0
+            periodSeconds: 2
+            failureThreshold: 1

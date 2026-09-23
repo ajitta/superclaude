@@ -1,0 +1,62 @@
+You're reviewing a Kubernetes Deployment manifest for reliability problems before it goes to production. The review is read by the team that owns this service, who will use it to decide what to change before rollout.
+
+Context the manifest doesn't show:
+- Cluster: EKS 1.30, managed node groups across three AZs (ap-northeast-2a/b/c), cluster-autoscaler enabled
+- Workload: orders-api, a stateless Spring Boot HTTP API behind an ALB; ~300 rps at peak; JVM startup takes about 40 seconds; availability target 99.9%
+- Related objects defined elsewhere: a ClusterIP Service only; no PodDisruptionBudget, no HPA, no NetworkPolicy
+- Failure modes that matter most: rollouts, node drains, pod crashes, zone outage
+
+<manifest>
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: orders-api
+  namespace: shop
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 100%
+  selector:
+    matchLabels:
+      app: orders-api
+  template:
+    metadata:
+      labels:
+        app: orders-api
+    spec:
+      terminationGracePeriodSeconds: 0
+      nodeSelector:
+        topology.kubernetes.io/zone: ap-northeast-2a
+      containers:
+        - name: orders-api
+          image: registry.example.com/shop/orders-api:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: JAVA_OPTS
+              value: "-Xms512m -Xmx512m"
+          resources:
+            limits:
+              memory: 256Mi
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 0
+            periodSeconds: 2
+            failureThreshold: 1
+</manifest>
+
+Report every reliability problem you find, including minor and uncertain ones. For each finding give:
+- the field or path in the manifest it concerns
+- what goes wrong, and under what condition
+- severity (high / medium / low) and your confidence
+- the concrete fix
+Order findings by severity. Where a finding depends on context the manifest doesn't show, say what you would need to know instead of assuming it.
+
+Deliver what was asked, at the scope intended: this is a reliability review. If you notice problems outside reliability, list them at the end, one line each, without reviewing them in depth. Return findings only, no corrected manifest.
+
+Keep responses focused, brief, and concise: each finding in a few sentences, without restating the manifest or giving general Kubernetes background.
