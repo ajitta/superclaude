@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f3f7fb">
+  <meta name="description" content="ajitta/superclaude is an independent Claude Code content framework with slash commands, agents, modes, rules, and hooks. Install its CLI, choose a scope, and explore the project on GitHub.">
+  <link rel="canonical" href="https://ajitta.github.io/superclaude/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="superclaude — Claude Code content framework">
+  <meta property="og:description" content="Commands, agents, modes, and hooks for Claude Code, installed with a scope-explicit CLI.">
+  <meta property="og:url" content="https://ajitta.github.io/superclaude/">
+  <title>superclaude — Claude Code content framework</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --paper: #f3f7fb;
+      --ink: #15253b;
+      --muted: #486078;
+      --line: #b9cbdc;
+      --blue: #174f96;
+      --blue-deep: #123c70;
+      --sky: #e2effb;
+      --terminal: #14263b;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; background: var(--paper); color: var(--ink); font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    a { color: var(--blue); text-underline-offset: .22em; }
+    a:hover { color: var(--blue-deep); }
+    a:focus-visible { outline: 3px solid var(--blue); outline-offset: 4px; }
+    ::selection { background: #a7d4f7; color: var(--ink); }
+    .wrap { width: min(1110px, calc(100% - 3rem)); margin-inline: auto; }
+    .site-header { border-bottom: 1px solid var(--line); }
+    .header-inner { display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; min-height: 72px; }
+    .wordmark { color: var(--ink); font-size: 1.12rem; font-weight: 800; letter-spacing: -.04em; text-decoration: none; }
+    nav { display: flex; flex-wrap: wrap; gap: .7rem 1.5rem; font-size: .9rem; font-weight: 650; }
+    nav a { text-decoration: none; }
+    .hero { padding: clamp(4.5rem, 9vw, 7.5rem) 0 5rem; }
+    .hero-grid { display: grid; grid-template-columns: minmax(0, 1.02fr) minmax(300px, .98fr); gap: clamp(2rem, 6vw, 5.5rem); align-items: center; }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 { max-width: 11ch; margin-bottom: 1.5rem; font-size: clamp(3.1rem, 6.1vw, 5.8rem); font-weight: 780; letter-spacing: -.04em; line-height: 1.02; }
+    .lead { max-width: 58ch; color: var(--muted); font-size: clamp(1.08rem, 1.6vw, 1.28rem); line-height: 1.55; }
+    .actions { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem 1.5rem; margin-top: 2rem; }
+    .button { display: inline-flex; align-items: center; min-height: 48px; padding: .65rem 1.15rem; border-radius: 7px; background: var(--blue); color: #fff; font-weight: 750; text-decoration: none; }
+    .button:hover { background: var(--blue-deep); color: #fff; }
+    .text-link { font-weight: 700; }
+    .model { border: 1px solid var(--line); border-radius: 12px; background: #fff; overflow: hidden; }
+    .model-head { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--line); background: var(--sky); font-size: .85rem; font-weight: 750; letter-spacing: .06em; text-transform: uppercase; }
+    .model-row { display: grid; grid-template-columns: 8rem 1fr; gap: 1rem; padding: 1rem 1.5rem; border-bottom: 1px solid var(--line); }
+    .model-row:last-child { border-bottom: 0; }
+    .model-row strong { color: var(--blue); }
+    .model-row span { color: var(--muted); }
+    section { scroll-margin-top: 2rem; }
+    .content { padding-block: 5.25rem; }
+    h2 { font-size: clamp(2rem, 3.8vw, 3.1rem); letter-spacing: -.035em; line-height: 1.12; }
+    .section-intro { max-width: 68ch; margin-bottom: 2.7rem; color: var(--muted); font-size: 1.08rem; }
+    .capabilities { display: grid; grid-template-columns: repeat(2, 1fr); gap: 2rem 3rem; }
+    .capability { padding-top: 1.1rem; border-top: 2px solid var(--blue); }
+    .capability h3 { margin-bottom: .55rem; font-size: 1.24rem; letter-spacing: -.02em; }
+    .capability p { margin: 0; color: var(--muted); }
+    .install { background: #dceaf6; }
+    .install .wrap { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: 3rem; align-items: center; }
+    .install p { color: #334f69; }
+    .install code, .examples code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+    pre { overflow-x: auto; margin: 0; padding: 1.5rem; border-radius: 8px; background: var(--terminal); color: #f2f7fc; font: .9rem/1.9 ui-monospace, SFMono-Regular, Menlo, monospace; }
+    pre code { font: inherit; }
+    .scope-strip { margin-top: 1.2rem; color: #334f69; font-size: .9rem; }
+    .examples { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: 3rem; }
+    .example { padding: 1.1rem 0; border-top: 1px solid var(--line); }
+    .example:last-child { border-bottom: 1px solid var(--line); }
+    .example code { color: var(--blue); font-size: .95rem; font-weight: 700; }
+    .example p { margin: .3rem 0 0; color: var(--muted); }
+    .origin { padding-block: 2.4rem; border-block: 1px solid var(--line); background: #e9f2fa; }
+    .origin .wrap { display: grid; grid-template-columns: minmax(0, .6fr) minmax(0, 1.4fr); gap: 2.5rem; }
+    .origin h2 { margin: 0; font-size: 1.5rem; letter-spacing: -.02em; }
+    .origin p { margin: 0; color: var(--muted); }
+    footer { padding-block: 2.5rem; color: var(--muted); font-size: .9rem; }
+    footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 1rem 2rem; }
+    footer p { max-width: 75ch; margin: 0; }
+    @media (max-width: 760px) {
+      .wrap { width: min(100% - 2rem, 620px); }
+      .header-inner { align-items: flex-start; flex-direction: column; justify-content: center; padding-block: 1rem; }
+      .hero { padding-block: 4rem; }
+      .hero-grid, .install .wrap, .examples, .origin .wrap { grid-template-columns: 1fr; }
+      .capabilities { grid-template-columns: 1fr; gap: 1.5rem; }
+      .content { padding-block: 4rem; }
+      .model-row { grid-template-columns: 6.5rem 1fr; padding-inline: 1rem; }
+      .install .wrap, .examples { gap: 1.5rem; }
+    }
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a class="wordmark" href="#top">superclaude</a>
+      <nav aria-label="Main navigation">
+        <a href="#framework">Framework</a>
+        <a href="#install">Install</a>
+        <a href="#commands">Commands</a>
+        <a href="https://github.com/ajitta/superclaude">GitHub ↗</a>
+      </nav>
+    </div>
+  </header>
+  <main id="top">
+    <section class="hero">
+      <div class="wrap hero-grid">
+        <div>
+          <h1>Shape how Claude Code works.</h1>
+          <p class="lead">superclaude is an independent Claude Code content framework: commands, agents, modes, rules, and hooks installed into a scope you choose.</p>
+          <div class="actions">
+            <a class="button" href="#install">Get started</a>
+            <a class="text-link" href="https://github.com/ajitta/superclaude">Explore the GitHub repository ↗</a>
+          </div>
+        </div>
+        <div class="model" aria-label="Framework content and installation scopes">
+          <div class="model-head">Content + scope</div>
+          <div class="model-row"><strong>Commands</strong><span>Slash commands for planning, implementation, review, and more.</span></div>
+          <div class="model-row"><strong>Agents</strong><span>Domain-specific roles for delegated work.</span></div>
+          <div class="model-row"><strong>Modes</strong><span>Behavioral guidance selected by context.</span></div>
+          <div class="model-row"><strong>Hooks</strong><span>Session and tool boundaries that enforce workflow rules.</span></div>
+          <div class="model-row"><strong>CLI</strong><span>Install at user, project, or local scope.</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="framework" class="content">
+      <div class="wrap">
+        <h2>A content framework for Claude Code</h2>
+        <p class="section-intro">The CLI copies framework files into Claude Code's content directories. Claude Code reads them at session start; the framework does not run a proxy or daemon.</p>
+        <div class="capabilities">
+          <article class="capability"><h3>Workflows you can invoke</h3><p>Use <code>/sc:brainstorm</code>, <code>/sc:plan</code>, <code>/sc:implement</code>, and <code>/sc:review</code> across the development cycle.</p></article>
+          <article class="capability"><h3>Specialized agents and modes</h3><p>Agent definitions and behavioral modes supply task-specific instructions when Claude Code loads the installed content.</p></article>
+          <article class="capability"><h3>Hook-enforced rules</h3><p>Hooks help preserve workflow rules across sessions and tool calls while the installer merges with existing hook settings.</p></article>
+          <article class="capability"><h3>Optional integrations</h3><p>The core works without MCP servers. Add supported integrations separately when a task needs them.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section id="install" class="content install">
+      <div class="wrap">
+        <div>
+          <h2>Install the CLI and content</h2>
+          <p>Clone this repository, install the CLI with <code>uv</code> via <code>make deploy</code>, then install the framework content. Restart Claude Code after installation.</p>
+          <a href="https://github.com/ajitta/superclaude#-quick-installation">Full installation and scope options ↗</a>
+        </div>
+        <div>
+          <pre><code>git clone https://github.com/ajitta/superclaude.git
+cd superclaude
+make deploy
+superclaude install --scope user</code></pre>
+          <p class="scope-strip">Choose <code>--scope project</code> for a committed team install or <code>--scope local</code> for personal files inside a project.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="commands" class="content">
+      <div class="wrap examples">
+        <div>
+          <h2>Try a command</h2>
+          <p class="section-intro">After restarting Claude Code, begin with a specific task or use <code>/sc:help</code> to see the available commands.</p>
+        </div>
+        <div>
+          <div class="example"><code>/sc:brainstorm</code><p>Explore an underspecified request.</p></div>
+          <div class="example"><code>/sc:plan</code><p>Turn a task into an implementation plan.</p></div>
+          <div class="example"><code>/sc:implement</code><p>Work through the implementation.</p></div>
+          <div class="example"><code>/sc:review</code><p>Review code, a plan, or a design.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="origin">
+      <div class="wrap">
+        <h2>About this project</h2>
+        <p>This <a href="https://github.com/ajitta/superclaude">ajitta repository</a> began as a fork of <a href="https://github.com/SuperClaude-Org/SuperClaude_Framework">SuperClaude Framework</a> and has since diverged into an independent project. It does not share a roadmap or maintainers with upstream and is not affiliated with or endorsed by Anthropic.</p>
+      </div>
+    </section>
+  </main>
+  <footer>
+    <div class="wrap">
+      <p>Source, installation details, architecture, and contributor guidance are maintained in the repository.</p>
+      <a href="https://github.com/ajitta/superclaude">View source on GitHub ↗</a>
+    </div>
+  </footer>
+</body>
+</html>
