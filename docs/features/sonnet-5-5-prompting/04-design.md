@@ -107,7 +107,7 @@ Change `utils/__init__.py:313-317` and the pinned copy in `evals/run_eval.py` to
 
 ## 4. Deferred, with the event that would reopen them
 
-- **`test_runner_hook` false failure (S12).** When `pyproject.toml` declares no pytest, the hook reports "Tests FAILED" on correct code, and in 2/2 probes the model spent a turn on it. Model-agnostic, so out of this feature's scope. Reopen as its own `fix/` branch: skip the run (or report "no test runner available") when `uv run python -c "import pytest"` fails.
+- **`test_runner_hook` false failure (S12).** *Resolved in 4.17.2 on `fix/test-runner-missing-pytest`: a runner that cannot start (pytest missing, no npm test script, no make test target) now reports "Tests not run" instead of "Tests FAILED".* When `pyproject.toml` declares no pytest, the hook reports "Tests FAILED" on correct code, and in 2/2 probes the model spent a turn on it. Model-agnostic, so out of this feature's scope. Reopen as its own `fix/` branch: skip the run (or report "no test runner available") when `uv run python -c "import pytest"` fails.
 - **G2 early check-in on long tasks.** Not reproduced by the short fixture. Reopen if a `low`/`medium` Sonnet session is seen stopping mid-task to ask something it could answer itself. The candidate fix is the guide's first paragraph in a mode such as `--task-manage`, not in the kernel.
 - **G10 mid-turn user messages.** Only headless runs were probed. Reopen if an interactive Sonnet 5.5 session is seen treating a typed message as an injection while SuperClaude hooks are active.
 - **Deleting the interim Opus 5.5 text entirely (Q1 item 3).** Reopen once a fresh `claude-api` skill install is confirmed to carry the Opus 5.5 section.

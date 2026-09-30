@@ -12,6 +12,7 @@ Outputs structured JSON systemMessage so Claude can react to results.
 
 import json
 import os
+import re
 import shlex
 import subprocess
 import sys
@@ -69,6 +70,29 @@ def detect_authoring_test(file_path: str) -> str | None:
                 if (parent / "pyproject.toml").exists():
                     return f"uv run python -m pytest {_quote_path(parent / test_file)} --tb=short -q"
             return None
+    return None
+
+
+# Output shapes meaning "the runner itself is not available", as opposed to a
+# test that ran and failed. Anchored to the runner's name so that a missing
+# project module ("No module named 'calc'") still counts as a real failure.
+_RUNNER_UNAVAILABLE = (
+    (re.compile(r"No module named '?pytest'?"), "pytest is not installed"),
+    (re.compile(r'Missing script: "?test"?'), "package.json has no test script"),
+    (re.compile(r"No rule to make target '?test'?"), "the Makefile has no test target"),
+)
+
+
+def runner_unavailable(output: str) -> str | None:
+    """Return why the test runner could not start, or None if tests ran.
+
+    A project whose pyproject.toml does not declare pytest makes
+    `uv run python -m pytest` exit non-zero before any test runs. Reporting
+    that as "Tests FAILED" sends the model to debug correct code.
+    """
+    for pattern, reason in _RUNNER_UNAVAILABLE:
+        if pattern.search(output):
+            return reason
     return None
 
 
@@ -149,9 +173,23 @@ def main() -> None:
 
         file_name = Path(file_path).name
 
-        if result.returncode != 0:
+        combined = result.stdout + result.stderr
+        reason = runner_unavailable(combined) if result.returncode != 0 else None
+
+        if reason:
+            msg = json.dumps(
+                {
+                    "systemMessage": (
+                        f"Tests not run after editing {file_name} ({test_cmd}): "
+                        f"{reason}. This says nothing about the edit; run the "
+                        "project's own test command to check it."
+                    )
+                }
+            )
+            print(msg)
+        elif result.returncode != 0:
             # Last 15 lines of failure output for context
-            lines = (result.stdout + result.stderr).strip().splitlines()
+            lines = combined.strip().splitlines()
             tail = "\n".join(lines[-15:])
             msg = json.dumps(
                 {
