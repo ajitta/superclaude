@@ -774,6 +774,8 @@ class TestMigrationReferenceResolution:
     OPUS = "## Migrating to Claude Opus 5"
     FABLE = "## Migrating to Claude Fable 5.1"
     FABLE_DELTA = "## Migrating to Claude Fable 5.1 from Claude Fable 5"
+    OPUS55 = "## Migrating to Claude Opus 5.5"
+    SONNET55 = "## Migrating to Claude Sonnet 5.5"
     SHIFTS = "### Behavioral shifts (prompt-tunable)"
 
     def _reference(self, tmp_path, body=None):
@@ -800,6 +802,13 @@ class TestMigrationReferenceResolution:
                 "prose",  # 12
                 self.SHIFTS,  # 13
                 "**Batch independent tool calls.**",  # 14
+                self.OPUS55,  # 15
+                self.SHIFTS,  # 16
+                "**Re-evaluate Claude Opus 5-specific instructions.**",  # 17
+                self.SONNET55,  # 18
+                "prose",  # 19
+                self.SHIFTS,  # 20
+                "**Verification on coding tasks.**",  # 21
             ]
         )
 
@@ -818,6 +827,32 @@ class TestMigrationReferenceResolution:
         ranges = cl.migration_reference_ranges(self._reference(tmp_path))
 
         assert ranges["claude-fable-5-1"] == ["L9-10", "L13-14"]
+
+    def test_five_five_sections_are_located(self, tmp_path):
+        from superclaude.scripts import context_loader as cl
+
+        ranges = cl.migration_reference_ranges(self._reference(tmp_path))
+
+        assert ranges["claude-opus-5-5"] == ["L16-17"]
+        assert ranges["claude-sonnet-5-5"] == ["L20-21"]
+
+    def test_opus_5_anchor_ignores_the_opus_5_5_heading(self, tmp_path):
+        from superclaude.scripts import context_loader as cl
+
+        # "## Migrating to Claude Opus 5" is a prefix of the 5.5 heading; a
+        # prefix match would give claude-opus-5 a second range.
+        ranges = cl.migration_reference_ranges(self._reference(tmp_path))
+
+        assert ranges["claude-opus-5"] == ["L4-7"]
+
+    def test_reference_without_five_five_sections_omits_their_keys(self, tmp_path):
+        from superclaude.scripts import context_loader as cl
+
+        body = "\n".join(self._body().splitlines()[:14])
+        ranges = cl.migration_reference_ranges(self._reference(tmp_path, body))
+
+        assert "claude-opus-5-5" not in ranges
+        assert "claude-sonnet-5-5" not in ranges
 
     def test_renamed_anchor_yields_no_range(self, tmp_path):
         from superclaude.scripts import context_loader as cl

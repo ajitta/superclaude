@@ -1,6 +1,6 @@
 ---
 feature: sonnet-5-5-prompting
-phase: design
+phase: complete
 owner: ajitta
 created: 2026-09-30
 updated: 2026-09-30
@@ -18,7 +18,7 @@ Claude Sonnet 5.5 shipped on 2026-09-28, and from Claude Code v2.1.284 the `sonn
 - **The upstream gate has lifted.** The `claude-api` skill's migration reference now has Opus 5.5 and Sonnet 5.5 sections (commit `8a1541c`, 2026-09-29). This unblocks the prior feature's P4 and lets the interim Opus 5.5 text be retired.
 - **The inline refusal extends to Sonnet 5.5.** A `/sc:prompt` argument that asks for written-out reasoning was declined as `reasoning_extraction` before the command ran, as on Opus 5.5.
 
-Proposals Q1–Q4 are ready. Q5 is optional. D1–D3 are recommended choices awaiting the user ([04-design.md](./04-design.md) §2).
+Q1–Q5 are implemented on branch `fix/sonnet-5-5-prompting` (4.17.0+ajitta), with D1–D3 settled on the recommendations; four canaries on Sonnet 5.5 passed ([08-implementation.md](./08-implementation.md)).
 
 ## Documents
 
@@ -26,3 +26,4 @@ Proposals Q1–Q4 are ready. Q5 is optional. D1–D3 are recommended choices awa
 - [03-analysis.md](./03-analysis.md): which deltas the kernel already covers, the S1–S16 surface inventory, and the three-way verification inversion
 - [03a-analysis-probes.md](./03a-analysis-probes.md): headless probes on `claude-sonnet-5-5`, covering `/sc:prompt` inference and refusal, reasoning-exposure modes, kernel vs bare on scope and verification, and hook text after tool results
 - [04-design.md](./04-design.md): proposals Q1–Q5, user decisions D1–D3, rejected ideas, deferred items
+- [08-implementation.md](./08-implementation.md): what shipped, departures from 04-design, test and canary results

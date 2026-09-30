@@ -5,7 +5,7 @@
 #### *A Claude Code content framework — fork-origin, now its own project*
 
 <p>
-  <img src="https://img.shields.io/badge/version-4.16.0+ajitta-blue" alt="Version">
+  <img src="https://img.shields.io/badge/version-4.17.0+ajitta-blue" alt="Version">
   <a href="https://github.com/ajitta/superclaude/actions/workflows/test.yml">
     <img src="https://github.com/ajitta/superclaude/actions/workflows/test.yml/badge.svg" alt="Tests">
   </a>
@@ -61,7 +61,7 @@ Claude Code reads those files at session start, which is how the framework chang
 
 ## ⚡ **Quick Installation**
 
-### **Current Stable Version (v4.16.0+ajitta)**
+### **Current Stable Version (v4.17.0+ajitta)**
 
 `superclaude` ships markdown content (commands, agents, modes, MCP docs, core rules, hooks) plus a small CLI that copies it into Claude Code's content directories.
 
@@ -681,7 +681,7 @@ MIT — see [`LICENSE`](LICENSE).
 - `/sc:init` — Interactive project environment setup
 - `/sc:index` / `/sc:index-repo` — Repository indexing (94% token reduction)
 - `/sc:recommend` — Command recommendation engine
-- `/sc:prompt` — Rewrite a prompt for Claude Opus 5.5 / Fable 5.1. On an Opus 5.5 session, pass a prompt that asks for written-out reasoning as a file path: pasted inline, it can be declined before the command runs
+- `/sc:prompt` — Rewrite a prompt for Claude Opus 5.5 / Sonnet 5.5 / Fable 5.1. On an Opus 5.5 or Sonnet 5.5 session, pass a prompt that asks for written-out reasoning as a file path: pasted inline, it can be declined before the command runs
 - `/sc:select-tool` — Intelligent MCP tool selection
 - `/sc:sc` — Command dispatcher (routes to the other `/sc:*` commands)
 
