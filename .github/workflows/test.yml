@@ -125,9 +125,11 @@ jobs:
         run: |
           pytest --trace-config 2>&1 | grep -q "superclaude" && echo "✅ Plugin loaded successfully" || (echo "❌ Plugin not loaded" && exit 1)
 
-      - name: Check available fixtures
+      - name: Check plugin markers
+        # The plugin ships markers and a report header, not fixtures (the
+        # pm_agent fixtures went with b8cd144).
         run: |
-          pytest --fixtures | grep -E "(confidence_checker|self_check_protocol|reflexion_pattern|token_budget|pm_context)"
+          pytest --markers | grep -E "^@pytest.mark.(unit|integration|hallucination|performance):"
 
   doctor-check:
     name: SuperClaude Doctor Check
@@ -151,9 +153,13 @@ jobs:
         run: |
           uv pip install --system -e ".[dev]"
 
+      - name: Install to user scope
+        run: |
+          superclaude install --scope user --force
+
       - name: Run doctor command
         run: |
-          superclaude doctor --verbose
+          superclaude doctor --verbose --scope user
 
   test-summary:
     name: Test Summary
