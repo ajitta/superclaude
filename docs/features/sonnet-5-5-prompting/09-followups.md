@@ -69,3 +69,27 @@ Setup: `claude -p`, Claude Code 2.1.284, SuperClaude installed from this branch.
 
 - G10: an interactive Sonnet 5.5 session with SuperClaude hooks and a typed mid-turn message.
 - G2 and G4 on long tasks (tens of minutes). The fixture tasks finish in under two minutes.
+
+## 6. Second independent review (4.18.1)
+
+A second `claude -p --model opus --effort high` reviewer (claude-opus-5-5, 50 turns, $3.67) checked everything after 4.17.0 in a disposable copy. Sections 08 §5 and this file were withheld from that copy. It found 2 high, 6 medium and 6 low defects. Each finding was re-checked against the code before it was acted on.
+
+| # | Finding | Severity | Resolution |
+|---|---|---|---|
+| H1 | The hook searched only `claude_base()` and `~/.claude`. A user-scope SuperClaude beside a project-scope claude-api skill, or a `CLAUDE_CONFIG_DIR`, was reported as "no reference", and the §1 stop rule then forbade looking | high | New `migration_reference_roots()` searches the project `.claude`, `claude_base()`, `CLAUDE_CONFIG_DIR` and `~/.claude`. The note names those roots, and the rule now says "don't search outside `.claude` directories". Two tests added; the fake-HOME scenario was reproduced and now finds the project copy |
+| H2 | `runner_unavailable()` searched the whole output with unanchored patterns. A real failure quoting "No module named pytest", a missing `pytest_asyncio` plugin, or `No rule to make target 'test-data.json', needed by 'test'` came back as "not run" | high | Each pattern must match a whole line. Any pytest session line (`collected`, the summary, `N passed/failed`) forces "tests ran", and exit 0 is never classified. The reviewer's `make test` case now reports "Tests FAILED" end to end |
+| M3 | `npm test --silent` prints nothing when the script is missing, so the npm pattern never fired; the `npm init` placeholder script was reported as FAILED | medium | `package.json` is checked before running. A missing, empty or `no test specified` script means no command. Make's `` `test' `` quoting is accepted, `uv: not found` is classified, and pytest exit 5 reports "collected no tests" |
+| M4 | The Sonnet self-check row said "replace", but the verification cell covered only prompts that change code, so non-code prompts had no rule | medium | The row now uses the same scope: on non-code prompts it deletes. Canary N1 (airline support prompt): "Removed, not replaced ... because that swap applies only to prompts that change code" |
+| M5 | The `(Opus 5.5 prompting guide)` mark still covered the whole request config, most of which the reference carries | medium | The request config is now attributed to the reference's Opus 5.5 subsections; the mark remains only on the unattended paragraph and the 128,000 figure |
+| M6 | "Cite the section read" pointed at 64K/64,000 figures outside the range the hook names | medium | Both configs name the `### Breaking change 1` subsection to read. Canary N2: "`max_tokens`: 64,000, which the reference says has worked well ... The prompting guide gives 128,000" |
+| M7 | The okf plain-language lead lost its sentence break (the source description has no final period) | medium | Restored |
+| M8 | The CI marker check passed without the plugin, because `pyproject.toml` declares the same markers | medium | CI now checks the `SuperClaude: ` report header in `pytest --collect-only -q` output: 1 match with the plugin, 0 with `-p no:superclaude` |
+| L9 | `04-design` resolution note claimed coverage that did not work | low | Rewritten to point here |
+| L10 | The return-code guard was untested (mutation M2 survived) | low | `test_success_is_never_classified`. Six mutations of the hook are now all caught |
+| L11 | Narration row cited only the guide | low | It now cites the guide and the reference section |
+| L12 | A model section without a shifts heading borrowed the next model's range | low | The search is bounded to the model's own `## ` section. Test added; mutating back to an unbounded search makes it fail |
+| L13 | Blank-line nits | — | Not in the real repo; an artifact of how the review copy was stripped |
+| L14 | Missing `uv`, and pytest exit 5, reported as FAILED | low | Covered by M3 |
+| Other | The feature README and 08 still said the interim text stays | low | Updated |
+
+After the fixes: 2671 passed, 25 skipped, 0 failed; ruff is clean; the mirror table is still 13 × 4; `migration_reference_ranges()` on the 8a1541c reference is unchanged.

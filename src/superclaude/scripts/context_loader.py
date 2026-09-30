@@ -35,7 +35,7 @@ if TYPE_CHECKING:
 # context_loader`, i.e. under the console script's own interpreter, which has
 # the package. Silently degrading here would put state and content lookups in
 # the wrong scope.
-from superclaude.utils import claude_base, context_cache_file
+from superclaude.utils import claude_base, context_cache_file, project_root
 
 # v2.2.0: MCP fallback notification support
 try:
@@ -975,6 +975,25 @@ _MIGRATION_REF_ANCHORS = (
 _MIGRATION_REF_SECTION = "### Behavioral shifts (prompt-tunable)"
 
 
+def migration_reference_roots() -> list[Path]:
+    """Every .claude directory Claude Code can load the claude-api skill from.
+
+    The install scope of SuperClaude says nothing about where the skill lives:
+    a user-scope SuperClaude sits beside a project-scope skill, and
+    CLAUDE_CONFIG_DIR moves the user directory. Search all of them.
+    """
+    candidates = [claude_base(), project_root() / ".claude"]
+    config_dir = os.environ.get("CLAUDE_CONFIG_DIR")
+    if config_dir:
+        candidates.append(Path(config_dir))
+    candidates.append(Path.home() / ".claude")
+    roots: list[Path] = []
+    for root in candidates:
+        if root not in roots:
+            roots.append(root)
+    return roots
+
+
 def find_migration_reference(roots: list[Path] | None = None) -> Path | None:
     """Locate the claude-api model-migration reference on this machine.
 
@@ -982,10 +1001,7 @@ def find_migration_reference(roots: list[Path] | None = None) -> Path | None:
     copy pinned to an older release can sit beside it.
     """
     if roots is None:
-        roots = [claude_base()]
-        home_base = Path.home() / ".claude"
-        if home_base not in roots:
-            roots.append(home_base)
+        roots = migration_reference_roots()
     found: list[Path] = []
     for root in roots:
         for pattern in _MIGRATION_REF_GLOBS:
@@ -1023,24 +1039,27 @@ def migration_reference_ranges(path: Path) -> dict[str, list[str]]:
         )
         if start is None:
             continue
+        # The model's section ends at the next "## " heading. The shifts
+        # heading is searched only inside it, so a section without one yields
+        # no range instead of borrowing the next model's.
+        end = next(
+            (i for i in range(start + 1, len(lines)) if lines[i].startswith("## ")),
+            len(lines),
+        )
         section = next(
             (
                 i
-                for i in range(start + 1, len(lines))
+                for i in range(start + 1, end)
                 if lines[i].rstrip() == _MIGRATION_REF_SECTION
             ),
             None,
         )
         if section is None:
             continue
-        # To the end of the model's section, not to the next "###": the
-        # sub-sections that follow the shifts heading (the migration checklist,
-        # the long-running-agent recommendations) carry direction the command's
-        # table mirrors, and stopping at the first sibling heading drops it.
-        end = next(
-            (i for i in range(section + 1, len(lines)) if lines[i].startswith("## ")),
-            len(lines),
-        )
+        # The range runs from the shifts heading to the end of the model's
+        # section, not to the next "###": the sub-sections that follow it (the
+        # migration checklist, the long-running-agent recommendations) carry
+        # direction the command's table mirrors.
         ranges.setdefault(model, []).append(f"L{section + 1}-{end}")
     return ranges
 
@@ -1056,8 +1075,9 @@ def _emit_prompt_command_reference(prompt: str) -> None:
     if path is None:
         print(
             "<!-- SuperClaude /sc:prompt: no claude-api model-migration reference "
-            "on this machine — the mirror table in the command is authoritative, "
-            "and the report states that the reference was not read. -->"
+            "in the project, user or CLAUDE_CONFIG_DIR .claude directories — the "
+            "mirror table in the command is authoritative, and the report states "
+            "that the reference was not read. -->"
         )
         print()
         return

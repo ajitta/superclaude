@@ -12,7 +12,7 @@ Branch `fix/sonnet-5-5-prompting` implements Q1–Q5 of [04-design.md](./04-desi
 | Proposal | Files | Change |
 |---|---|---|
 | Q1 | `scripts/context_loader.py`, `tests/unit/test_context_loader.py` | Anchors `## Migrating to Claude Opus 5.5` and `## Migrating to Claude Sonnet 5.5` added. Three tests: both 5.5 ranges located; `claude-opus-5` keeps only its own range (prefix guard); an older reference copy yields no 5.5 keys |
-| Q1 | `commands/prompt.md` | The interim Opus 5.5 text now applies only on a reference copy with no Opus 5.5 section, not unconditionally "until upstream adds one" |
+| Q1 | `commands/prompt.md` | The interim Opus 5.5 text now applies only on a reference copy with no Opus 5.5 section, not unconditionally "until upstream adds one" (superseded in 4.18.0: interim text retired, see 09-followups §1) |
 | Q2 | `commands/prompt.md` | `sonnet55` flag → `claude-sonnet-5-5`; Sonnet 5.5 sessions infer it; other models never default to the Opus column. New `'claude-sonnet-5-5'` column on all ten axes plus a new Tool use axis. Sonnet request configuration. Removal rows: Thinking incantations (Sonnet JSON exception), Reasoning write-out, Self-check phrasing (replace, not delete), Narration suppression, new Tool discouragement row. Example row, `opus5-verify-inversion` gotcha, and the fallback in `<fact_sourcing>` and `<bounds>` |
 | Q2 | `commands/help.md`, `commands/sc.md`, `commands/README.md`, root `README.md` | "Opus 5.5 / Sonnet 5.5 / Fable 5.1" |
 | Q3 | root `README.md`, `commands/prompt.md` | The inline-reasoning refusal warning names Sonnet 5.5; new `inline-reasoning-refusal` gotcha |

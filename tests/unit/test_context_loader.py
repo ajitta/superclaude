@@ -848,6 +848,15 @@ class TestMigrationReferenceResolution:
         assert "claude-opus-5" not in ranges
         assert ranges["claude-opus-5-5"] == ["L3-4"]
 
+    def test_section_without_shifts_heading_does_not_borrow_the_next(self, tmp_path):
+        from superclaude.scripts import context_loader as cl
+
+        body = "\n".join(["# G", self.OPUS55, "prose", self.SONNET55, self.SHIFTS, "x"])
+        ranges = cl.migration_reference_ranges(self._reference(tmp_path, body))
+
+        assert "claude-opus-5-5" not in ranges
+        assert ranges["claude-sonnet-5-5"] == ["L5-6"]
+
     def test_reference_without_five_five_sections_omits_their_keys(self, tmp_path):
         from superclaude.scripts import context_loader as cl
 
@@ -877,6 +886,37 @@ class TestMigrationReferenceResolution:
         new = self._reference(tmp_path)
 
         assert cl.find_migration_reference([tmp_path]) == new
+
+    def test_project_scope_skill_found_beside_user_scope_install(
+        self, tmp_path, monkeypatch
+    ):
+        from superclaude.scripts import context_loader as cl
+
+        home, proj = tmp_path / "home", tmp_path / "proj"
+        (home / ".claude").mkdir(parents=True)
+        ref = proj / ".claude" / "skills" / "claude-api" / "shared"
+        ref.mkdir(parents=True)
+        (ref / "model-migration.md").write_text("x", encoding="utf-8")
+        monkeypatch.setattr(cl, "claude_base", lambda: home / ".claude")
+        monkeypatch.setattr(cl, "project_root", lambda: proj)
+        monkeypatch.setattr(cl.Path, "home", classmethod(lambda c: home))
+        monkeypatch.delenv("CLAUDE_CONFIG_DIR", raising=False)
+
+        assert cl.find_migration_reference() == ref / "model-migration.md"
+
+    def test_claude_config_dir_is_searched(self, tmp_path, monkeypatch):
+        from superclaude.scripts import context_loader as cl
+
+        cfg = tmp_path / "cfg"
+        ref = cfg / "skills" / "claude-api" / "shared"
+        ref.mkdir(parents=True)
+        (ref / "model-migration.md").write_text("x", encoding="utf-8")
+        monkeypatch.setattr(cl, "claude_base", lambda: tmp_path / "a")
+        monkeypatch.setattr(cl, "project_root", lambda: tmp_path / "b")
+        monkeypatch.setattr(cl.Path, "home", classmethod(lambda c: tmp_path / "c"))
+        monkeypatch.setenv("CLAUDE_CONFIG_DIR", str(cfg))
+
+        assert cl.find_migration_reference() == ref / "model-migration.md"
 
     def test_absent_reference_resolves_to_none(self, tmp_path):
         from superclaude.scripts import context_loader as cl
