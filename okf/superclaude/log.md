@@ -1,5 +1,9 @@
 # Log
 
+## 2026-09-30
+
+- **Update**: Re-synced 14 concept descriptions (frontmatter, body lead, section index entry) from current source frontmatter — 3 agents (python-expert, security-engineer, socratic-mentor), 10 commands (brainstorm, build, business-panel, design, estimate, git, implement, load, plan, prompt) and the plain-language output style. `/sc:prompt` now lists Opus 5.5, Sonnet 5.5, Opus 5 and Fable 5.1 (was "Opus 5 or Fable 5"). Core, mode and MCP concepts carry no source frontmatter and were not touched.
+
 ## 2026-09-11
 
 - **Creation**: Output Styles section (1 concept) — `src/superclaude/output-styles/` became an installed component (Claude Code output style, installed to `<scope>/output-styles/`, user-selected via `/config`).

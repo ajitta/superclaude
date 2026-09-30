@@ -1,17 +1,17 @@
 ---
 type: "Command"
 title: "Build"
-description: "Build, compile, package projects w/ smart err handling + optimize. Use ONLY when user type `/sc:build` — orchestrate build pipeline w/ err analysis. NO auto-trigger on single build cmd (npm run build, cargo build) — use Bash direct."
+description: "Build, compile, package projects with smart err handling + optimize. Use ONLY when user type `/sc:build` — orchestrate build pipeline with err analysis. NO auto-trigger on single build cmd (npm run build, cargo build) — use Bash direct."
 resource: "src/superclaude/commands/build.md"
 tags: [command]
 generated:
-  by: process:okf-migrate
-  at: 2026-07-05
+  by: claude/opus-5-5
+  at: 2026-09-30
 ---
 
 # Build
 
-Build, compile, package projects w/ smart err handling + optimize. Use ONLY when user type `/sc:build` — orchestrate build pipeline w/ err analysis. NO auto-trigger on single build cmd (npm run build, cargo build) — use Bash direct.
+Build, compile, package projects with smart err handling + optimize. Use ONLY when user type `/sc:build` — orchestrate build pipeline with err analysis. NO auto-trigger on single build cmd (npm run build, cargo build) — use Bash direct.
 
 Source of truth: `src/superclaude/commands/build.md`.
 

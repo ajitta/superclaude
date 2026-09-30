@@ -1,17 +1,17 @@
 ---
 type: "OutputStyle"
 title: "Plain Language"
-description: "Direct, specific prose in the user's language, without AI mannerisms or decorative structure."
+description: "Direct, specific prose in the user's language, without AI mannerisms or decorative structure"
 resource: "src/superclaude/output-styles/plain-language.md"
 tags: [output-style]
 generated:
-  by: process:okf-migrate
-  at: 2026-09-11
+  by: claude/opus-5-5
+  at: 2026-09-30
 ---
 
 # Plain Language
 
-Direct, specific prose in the user's language, without AI mannerisms or decorative structure. Language-neutral by contract: names patterns (decorative contrast, empty signpost, ceremonial closing), never one language's phrases. Keeps Claude Code's coding instructions (`keep-coding-instructions: true`).
+Direct, specific prose in the user's language, without AI mannerisms or decorative structure Language-neutral by contract: names patterns (decorative contrast, empty signpost, ceremonial closing), never one language's phrases. Keeps Claude Code's coding instructions (`keep-coding-instructions: true`).
 
 Source of truth: `src/superclaude/output-styles/plain-language.md`.
 
