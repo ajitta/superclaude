@@ -962,11 +962,15 @@ _MIGRATION_REF_GLOBS = (
 # section and identifies none of them on its own, so each range is found by
 # anchoring on the model heading first. Fable carries two sections — the
 # migration section and the 5 -> 5.1 delta — and the command's table draws on
-# both.
+# both. Matching is whole-line, so the Opus 5 anchor never matches the Opus 5.5
+# heading. A reference copy older than the 5.5 sections simply yields no range
+# for those keys, and the command falls back as its fact_sourcing says.
 _MIGRATION_REF_ANCHORS = (
     ("claude-opus-5", "## Migrating to Claude Opus 5"),
     ("claude-fable-5-1", "## Migrating to Claude Fable 5.1"),
     ("claude-fable-5-1", "## Migrating to Claude Fable 5.1 from Claude Fable 5"),
+    ("claude-opus-5-5", "## Migrating to Claude Opus 5.5"),
+    ("claude-sonnet-5-5", "## Migrating to Claude Sonnet 5.5"),
 )
 _MIGRATION_REF_SECTION = "### Behavioral shifts (prompt-tunable)"
 

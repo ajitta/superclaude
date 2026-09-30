@@ -310,12 +310,15 @@ def detect_refusal(payload: Any) -> str | None:
     """Return the refusal category when a ``claude -p`` payload records a
     model refusal, else None.
 
-    Safety classifiers on Fable 5.x, Opus 5.5 and Opus 5 end a turn with the
-    API's ``stop_reason: "refusal"`` plus ``stop_details.category`` (``cyber``,
-    ``bio``, ``reasoning_extraction``, ...; the set differs by model, and Opus 5
-    has no ``reasoning_extraction``). On Opus 5.5 server-side fallback returns a
-    ``reasoning_extraction`` decline instead of retrying it, so a caller that
-    sees that category changes the prompt. The CLI's result object carries a
+    Safety classifiers on Fable 5.x, Opus 5.5, Sonnet 5.5 and Opus 5 end a turn
+    with the API's ``stop_reason: "refusal"`` plus ``stop_details.category``
+    (``cyber``, ``bio``, ``reasoning_extraction``, ...; the set differs by model,
+    and Opus 5 has no ``reasoning_extraction``). On Opus 5.5 and Sonnet 5.5
+    server-side fallback returns a ``reasoning_extraction`` decline instead of
+    retrying it (Sonnet 5.5 retries only ``cyber`` and ``frontier_llm``, on
+    Sonnet 5), so a caller that sees that category changes the prompt. The
+    auto-improve mutator's default ``sonnet`` alias resolves to Sonnet 5.5 from
+    Claude Code 2.1.284. The CLI's result object carries a
     top-level ``stop_reason`` but no ``stop_details`` (Claude Code 2.1.258
     result schema); the category lives on the assistant message, which only
     stream-json exposes. So callers check the assistant message first and the

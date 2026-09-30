@@ -51,7 +51,7 @@ description: SuperClaude command dispatcher - main entry point for all features.
     - review: Code review with structured feedback
     - auto-improve: Autonomous overnight code improvement loop (Karpathy AutoResearch)
     - promote-feature: Promote standalone docs into a feature folder
-    - prompt: Rewrite a prompt for Opus 5.5 / Fable 5.1
+    - prompt: Rewrite a prompt for Opus 5.5 / Sonnet 5.5 / Fable 5.1
   </commands>
 
   <examples>
@@ -71,7 +71,7 @@ description: SuperClaude command dispatcher - main entry point for all features.
   </examples>
 
   <meta>
-    - version: 4.16.0+ajitta (SSOT: pyproject.toml — answer version queries via `superclaude --version` when possible)
+    - version: 4.17.0+ajitta (SSOT: pyproject.toml — answer version queries via `superclaude --version` when possible)
     - docs: github.com/ajitta/superclaude
   </meta>
 
