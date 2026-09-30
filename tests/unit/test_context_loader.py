@@ -839,11 +839,14 @@ class TestMigrationReferenceResolution:
     def test_opus_5_anchor_ignores_the_opus_5_5_heading(self, tmp_path):
         from superclaude.scripts import context_loader as cl
 
-        # "## Migrating to Claude Opus 5" is a prefix of the 5.5 heading; a
-        # prefix match would give claude-opus-5 a second range.
-        ranges = cl.migration_reference_ranges(self._reference(tmp_path))
+        # "## Migrating to Claude Opus 5" is a prefix of the 5.5 heading. With
+        # only the 5.5 section present, a prefix match would hand its range to
+        # claude-opus-5.
+        body = "\n".join(["# Model Migration Guide", self.OPUS55, self.SHIFTS, "x"])
+        ranges = cl.migration_reference_ranges(self._reference(tmp_path, body))
 
-        assert ranges["claude-opus-5"] == ["L4-7"]
+        assert "claude-opus-5" not in ranges
+        assert ranges["claude-opus-5-5"] == ["L3-4"]
 
     def test_reference_without_five_five_sections_omits_their_keys(self, tmp_path):
         from superclaude.scripts import context_loader as cl

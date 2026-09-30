@@ -51,3 +51,26 @@ Costs: $0.23–0.25 per run. Raw outputs stayed in the session scratchpad.
 
 - C1 and C4 paraphrased or slotted the guide's keep-working and no-unrequested-additions paragraphs, because those sit in the prompting guide, not in the reference's behavioral-shifts range. Correct under the command's no-invention rule; a later reference release may carry them.
 - In the no-reference runs the model ran `find /` for the reference and found pytest fixture copies and sibling scratch copies; it rejected them as sources (2/2 explicitly). The command's glob guidance does not scope the search; left as is, since the rejection held.
+
+## 5. Independent review and fixes (4.17.1)
+
+An independent `claude -p --model opus --effort high` reviewer (resolved `claude-opus-5-5`, 53 turns, $3.60) checked the change in a disposable copy. The copy held the diff, 04-design and the four official sources, but not this record or the author's verdict. It found no high-severity defects. Each finding below was re-checked against the cited lines before it was acted on.
+
+| # | Finding | Severity | Resolution |
+|---|---|---|---|
+| D1 | The prefix-guard test passed with prefix matching restored: `next()` takes only the first match, so the fixture could not fail | medium | The fixture now holds only the 5.5 section and asserts `claude-opus-5` is absent. Mutation-checked: with `startswith(anchor)` the test fails |
+| D2 | The Sonnet column told the rewrite to add three guide paragraphs that are not on the machine, with no sourcing rule. Runs paraphrased them | medium | Each is now a `[FILL: …]` slot naming the guide URL, as the Opus 5.5 precedent does. Canary C5 emitted both slots |
+| D3 | The `<fact_sourcing>` closing sentence and the `facts-not-memory` gotcha omitted the new Sonnet-column exception | medium | Both now name it |
+| D4 | The `opus55` example still said the Opus 5 section is read in place of the Opus 5.5 one | medium | It now names the Opus 5.5 section, or the Opus 5 section on an older copy |
+| D5 | The spec's 64,000 citation from the reference was missing | low-medium | Added, with "cite whichever section was read" |
+| D6 | The interim Opus 5.5 condition excluded machines with no reference at all | low | The condition now covers "no copy, or a copy without the section" |
+| D7 | The Narration row gave a causal claim ("go quiet behind it") that the sources do not make | low | The row now cites the guide's instruction to remove such lines |
+| D8 | The positioning quotes were attributed loosely | low | The row now credits the announcement and the prompting guide separately |
+| D9 | The docstrings said "Sonnet 5.5 retries"; it is server-side fallback that retries. The two copies had drifted | low | Both copies now say server-side fallback and match each other |
+| D11 | The feature README summary still read as pre-fix | low | Updated |
+| D13 | The real-check cell was unscoped, and `display` had no adaptive-thinking condition | low | Scoped to prompts that change code; `display` is now conditioned on adaptive thinking (and `between_tools` rejects it) |
+| D10 | "Never default to the Opus column" goes beyond Q2.1 | low | **Kept, as a recorded departure.** 03a probes A2–A5 showed that the Opus default inverts the verification edit. On a non-5.5 session, asking or naming a non-Opus assumption is the safe branch |
+| D12 | `okf/` copies still say "Opus 5 or Fable 5" | low | **Out of scope.** Stale since 2026-08-31, before this change |
+| D13c | "near-miss tool-name casing" is listed as a native failure mode although the harness fix was rejected | low | **Kept.** Listing a failure mode is description, not a harness change |
+
+After the fixes: `uv run pytest` gives 2638 passed and 1 failed. The failure is the pre-existing doctor PATH check; the reviewer traced it to the check excluding the venv's own `bin`. ruff check and format are clean, and the mirror table is still 13 rows × 4 columns.

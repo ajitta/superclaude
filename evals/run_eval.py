@@ -291,8 +291,8 @@ def _detect_refusal(payload: dict) -> str | None:
     (cyber, bio, reasoning_extraction, ...; the set differs by model, and Opus 5
     has no reasoning_extraction). On Opus 5.5 and Sonnet 5.5 server-side
     fallback returns a reasoning_extraction decline instead of retrying it
-    (Sonnet 5.5 retries only cyber and frontier_llm, on Sonnet 5), so a caller
-    that sees that category changes the prompt. In stream-json the ``assistant`` events carry
+    (on Sonnet 5.5, server-side fallback retries only cyber and frontier_llm, on
+    Sonnet 5), so a caller that sees that category changes the prompt. In stream-json the ``assistant`` events carry
     the API message object with both fields, so the category comes from there.
     The ``result`` event carries a top-level ``stop_reason`` but no
     ``stop_details`` (Claude Code 2.1.258 result schema), so a result-level
