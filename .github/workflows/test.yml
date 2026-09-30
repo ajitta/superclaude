@@ -125,11 +125,12 @@ jobs:
         run: |
           pytest --trace-config 2>&1 | grep -q "superclaude" && echo "✅ Plugin loaded successfully" || (echo "❌ Plugin not loaded" && exit 1)
 
-      - name: Check plugin markers
+      - name: Check plugin report header
         # The plugin ships markers and a report header, not fixtures (the
-        # pm_agent fixtures went with b8cd144).
+        # pm_agent fixtures went with b8cd144). pyproject.toml also declares
+        # the markers, so only the header proves the plugin itself loaded.
         run: |
-          pytest --markers | grep -E "^@pytest.mark.(unit|integration|hallucination|performance):"
+          pytest --collect-only -q -p no:cacheprovider | grep -q "^SuperClaude: "
 
   doctor-check:
     name: SuperClaude Doctor Check

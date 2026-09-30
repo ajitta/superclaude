@@ -73,27 +73,77 @@ def detect_authoring_test(file_path: str) -> str | None:
     return None
 
 
-# Output shapes meaning "the runner itself is not available", as opposed to a
-# test that ran and failed. Anchored to the runner's name so that a missing
-# project module ("No module named 'calc'") still counts as a real failure.
+# Output lines meaning "the runner itself could not start", as opposed to a
+# test that ran and failed. Each pattern must match a whole line, so a test
+# assertion that merely quotes the text, a missing pytest plugin
+# ("No module named 'pytest_asyncio'") or a missing prerequisite of the test
+# target ("... needed by 'test'") still count as real failures.
 _RUNNER_UNAVAILABLE = (
-    (re.compile(r"No module named '?pytest'?"), "pytest is not installed"),
-    (re.compile(r'Missing script: "?test"?'), "package.json has no test script"),
-    (re.compile(r"No rule to make target '?test'?"), "the Makefile has no test target"),
+    (
+        re.compile(r"^(?:\S+: )?No module named '?pytest'?\s*$", re.M),
+        "pytest is not installed",
+    ),
+    (
+        re.compile(
+            r"^(?:\S*sh: (?:(?:line )?\d+: )?)?uv: (?:command )?not found\s*$", re.M
+        ),
+        "uv is not installed",
+    ),
+    (
+        re.compile(r'^npm (?:ERR!|error) Missing script: "test"\s*$', re.M),
+        "package.json has no test script",
+    ),
+    (
+        re.compile(
+            r"^make(?:\[\d+\])?: \*\*\* No rule to make target [`']test'\.\s+Stop\.\s*$",
+            re.M,
+        ),
+        "the Makefile has no test target",
+    ),
 )
 
+# A pytest session summary or collection line means tests ran, whatever else
+# the output contains.
+_PYTEST_SESSION = re.compile(
+    r"^collected \d+ items?|^=+ .*\bin [\d.]+s\b.*=+$|^\d+ (?:passed|failed|errors?)\b",
+    re.M,
+)
 
-def runner_unavailable(output: str) -> str | None:
+# pytest's own exit code for "no tests were collected".
+_PYTEST_NO_TESTS = 5
+
+# The default test script `npm init` writes: it always fails and tests nothing.
+_NPM_PLACEHOLDER = "no test specified"
+
+
+def runner_unavailable(output: str, returncode: int) -> str | None:
     """Return why the test runner could not start, or None if tests ran.
 
     A project whose pyproject.toml does not declare pytest makes
     `uv run python -m pytest` exit non-zero before any test runs. Reporting
-    that as "Tests FAILED" sends the model to debug correct code.
+    that as "Tests FAILED" sends the model to debug correct code. Only a
+    non-zero exit with no pytest session in the output qualifies.
     """
+    if returncode == 0:
+        return None
+    if returncode == _PYTEST_NO_TESTS and "no tests ran" in output:
+        return "pytest collected no tests"
+    if _PYTEST_SESSION.search(output):
+        return None
     for pattern, reason in _RUNNER_UNAVAILABLE:
         if pattern.search(output):
             return reason
     return None
+
+
+def _npm_has_test_script(package_json: Path) -> bool:
+    """True when package.json defines a real `test` script."""
+    try:
+        scripts = json.loads(package_json.read_text(encoding="utf-8")).get("scripts")
+    except (OSError, ValueError, AttributeError):
+        return True  # unreadable: let npm report it
+    script = (scripts or {}).get("test", "") if isinstance(scripts, dict) else ""
+    return bool(script.strip()) and _NPM_PLACEHOLDER not in script
 
 
 def detect_test_command(file_path: str) -> str | None:
@@ -108,6 +158,10 @@ def detect_test_command(file_path: str) -> str | None:
             return "uv run python -m pytest --tb=short -q"
 
         if (parent / "package.json").exists():
+            # `npm test --silent` prints nothing when the script is missing,
+            # so check the script before running rather than parse its output.
+            if not _npm_has_test_script(parent / "package.json"):
+                return None
             return "npm test --silent"
 
         if (parent / "Makefile").exists():
@@ -174,7 +228,7 @@ def main() -> None:
         file_name = Path(file_path).name
 
         combined = result.stdout + result.stderr
-        reason = runner_unavailable(combined) if result.returncode != 0 else None
+        reason = runner_unavailable(combined, result.returncode)
 
         if reason:
             msg = json.dumps(

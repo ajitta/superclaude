@@ -11,7 +11,7 @@ generated:
 
 # Plain Language
 
-Direct, specific prose in the user's language, without AI mannerisms or decorative structure Language-neutral by contract: names patterns (decorative contrast, empty signpost, ceremonial closing), never one language's phrases. Keeps Claude Code's coding instructions (`keep-coding-instructions: true`).
+Direct, specific prose in the user's language, without AI mannerisms or decorative structure. Language-neutral by contract: names patterns (decorative contrast, empty signpost, ceremonial closing), never one language's phrases. Keeps Claude Code's coding instructions (`keep-coding-instructions: true`).
 
 Source of truth: `src/superclaude/output-styles/plain-language.md`.
 
