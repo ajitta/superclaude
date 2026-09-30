@@ -27,3 +27,4 @@ Q1–Q5 are implemented on branch `fix/sonnet-5-5-prompting` (4.17.0+ajitta), wi
 - [03a-analysis-probes.md](./03a-analysis-probes.md): headless probes on `claude-sonnet-5-5`, covering `/sc:prompt` inference and refusal, reasoning-exposure modes, kernel vs bare on scope and verification, and hook text after tool results
 - [04-design.md](./04-design.md): proposals Q1–Q5, user decisions D1–D3, rejected ideas, deferred items
 - [08-implementation.md](./08-implementation.md): what shipped, departures from 04-design, test and canary results
+- [09-followups.md](./09-followups.md): interim Opus 5.5 text retired, CI repaired, okf re-sync, low/xhigh and fallback probes
