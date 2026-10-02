@@ -5,6 +5,8 @@ revised: 2026-10-02
 
 # 11 — claude.ai upload needs a plugin manifest
 
+> **Superseded in part by [13](./13-review.md) §2.** The manifest no longer sits in the skill folder. It lives in `portable-skills/plugin-manifests/` and is injected only into the zip, because in the source folder it renamed the skill in Codex. The "Side effects" claim below that Codex ignores `.claude-plugin/` was wrong.
+
 ## Problem
 
 The user uploaded the zip to claude.ai and got an error. The upload wanted a zip manifest: a top-level file declaring the plugin's components.

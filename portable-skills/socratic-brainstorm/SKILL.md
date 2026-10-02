@@ -4,7 +4,7 @@ description: Brainstorming partner that uses modern Socratic questioning (Paul's
 license: MIT
 metadata:
   author: ajitta
-  version: "3.1.0"
+  version: "3.2.0"
   lineage: "1.x approach restored after 2.0.0 moved to socratic-elenchus"
   source: "https://github.com/ajitta/superclaude/tree/master/docs/features/socratic-brainstorm-skill"
 ---
@@ -42,7 +42,7 @@ If the idea is already precise (clear scope, owner, success measure, no open que
 
 Ask for the idea in one or two sentences if they haven't given it that way. Then **steelman** it: restate the strongest honest version, mark what you assumed versus what they said, and ask "맞나요? / Is that right?". Don't probe an unconfirmed restatement. Re-confirm after a correction. Keep this restatement as the *working thesis* and update it whenever an answer changes it.
 
-## Step 2 — Probe (elenchus)
+## Step 2 — Probe
 
 Choose each question from the six types. Usual order: clarify, then assumptions and evidence, then viewpoints and implications. Question the frame whenever it looks off. Probe ideas: [references/question-bank.md](references/question-bank.md).
 
@@ -72,13 +72,13 @@ Rhythm:
 - Around half the budget, give a one-line pacing cue ("거의 다 왔어요, 두세 개만 더").
 - Lenses (premortem, expert viewpoints, SCAMPER) are optional extras for when the idea calls for one; pick at most two. See the question bank.
 
-## Step 3 — Diverge (maieutics)
+## Step 3 — Diverge
 
 Skip this step if the session was pure stress-testing and the user doesn't want options.
 
 1. Ask the user for their own options first: "이걸 이루는 다른 방법 세 가지만 떠올려 볼래요? 엉뚱해도 좋아요." Build on each one ("yes, and…") before judging any.
 2. Push the edges once: the cheapest version, the most extreme version, the do-nothing option.
-3. Only then add **at most 3** options of your own, labeled as yours ("제 쪽 아이디어:"), each a single line. Number every option so far.
+3. Only then add **at most 3** options of your own, labeled as yours ("제 쪽 아이디어:"), each a single line. Number every option so far; this one message may run past the line limit, so keep each option to one short line.
 
 ## Step 4 — Converge
 
@@ -95,10 +95,10 @@ Record each decision as **confirmed** (the user named the option or its words) o
 Before the verdict, re-read the dialogue once for contradictions between turns that weren't adjacent. Then state one verdict honestly:
 
 - **Sharpened**: the thesis was actually tested and held, and now has explicit scope, assumptions and constraints. Say which tests did not happen ("반례로는 안 눌러봤어요").
-- **Open (aporia)**: a real hole remains. Name it plainly. It counts as a result, not a failure. If the "plan" is mostly "find out X first", the verdict is open.
+- **Open**: a real hole remains. Name it plainly. It counts as a result, not a failure. If the "plan" is mostly "find out X first", the verdict is open.
 - **Refuted**: two of the user's answers collided, you quoted both and asked which yields, and their substantive answer still couldn't reconcile them. A stop signal is not that answer; in that case the verdict is open.
 
-Then print the brief using the template in [references/brief-template.md](references/brief-template.md): thesis before and after, decisions (confirmed or delegated), assumptions (validated, unvalidated, or risky), open questions, options considered, parking lot, and one next step. Build it only from the user's answers; invent nothing. In chat or on mobile, the brief lives in the message. If a filesystem is available and the user wants a file, save it where they say (default `notes/brainstorm/<slug>-YYYYMMDD.md`), read it back, and report the path. Ask before saving anything personal into a shared repository.
+Then print the brief using the template in [references/brief-template.md](references/brief-template.md): thesis before and after, decisions (confirmed or delegated), assumptions (validated, unvalidated, or risky), open questions, options considered, criteria, parking lot, what was not tested, and one next step. Build it only from the user's answers; invent nothing. In chat or on mobile, the brief lives in the message. If a filesystem is available and the user wants a file, save it where they say (default `notes/brainstorm/<slug>-YYYYMMDD.md`), read it back, and report the path. Ask before saving anything personal into a shared repository.
 
 End with the next step and stop. Don't start building.
 

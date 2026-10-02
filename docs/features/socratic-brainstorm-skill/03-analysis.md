@@ -56,4 +56,4 @@ Published skills each pick one half (§02-2). The SuperClaude assets already enc
 
 ## 4. Size budget
 
-socratic-method is 420 lines and still needed a reference file. Phone sessions and Codex's 8k-char skill list argue for a short core: target SKILL.md ≤ 200 lines, with the question bank and brief template in `references/` (progressive disclosure is supported by Claude Code, claude.ai with code execution, and Codex).
+socratic-method is 420 lines and still needed a reference file. Phone sessions and Codex's skill-list budget (~2% of context) argue for a short core: target SKILL.md ≤ 200 lines, with the question bank and brief template in `references/` (progressive disclosure is supported by Claude Code, claude.ai with code execution, and Codex).
