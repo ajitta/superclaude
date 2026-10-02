@@ -29,8 +29,9 @@ python3 portable-skills/package.py --check  # validate only
 
 - Claude Code: `/socratic-brainstorm <idea>`
 - Codex: `$socratic-brainstorm <idea>`
-- Anywhere, in words: "소크라테스식으로 브레인스토밍 해줘: <idea>", "question me about <idea>", "poke holes in this plan". Add "세게"/`stress` to stress-test, "가볍게"/`quick` for a short pass.
+- Claude (chat, mobile, Code), in words: "소크라테스식으로 브레인스토밍 해줘: <idea>", "question me about <idea>", "poke holes in this plan". Add "세게"/`stress` to stress-test, "가볍게"/`quick` for a short pass.
+- Codex needs the `$socratic-brainstorm` mention: implicit invocation is off, so plain wording does not load the skill there.
 
-The skill doesn't parse flags; it reads mode and depth from your wording. Codex won't fire it implicitly (`agents/openai.yaml`). On Claude, the description is written to fire only on explicit requests.
+The skill doesn't parse flags; it reads mode and depth from your wording. Codex won't fire it implicitly (`agents/openai.yaml`). On Claude, the description is written to fire only on explicit requests, which includes asking for it in words.
 
 Design notes and probe results: [docs/features/socratic-brainstorm-skill](../docs/features/socratic-brainstorm-skill/README.md).

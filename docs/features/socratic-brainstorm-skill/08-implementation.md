@@ -38,6 +38,17 @@ No change under `src/superclaude`, so no framework version bump; the skill carri
 | F | stress + quick, "카페 창업 … 반박해줘" | `stress` picked with reason; falsification probe asked ("내가 틀렸구나 하게 만들 숫자나 장면"); after "그냥 잘 될 것 같아" the brief marked that belief **risky** and wrote the condition into the thesis. Verdict open. |
 | Sym | Skill reached through a symlink `.claude/skills/x → ../../skills/x` | Loaded and ran. |
 
+**Codex probes**: Codex CLI 0.158.0, `codex exec -s read-only` with model `gpt-6.1-sol`. Skill in the scratch repo's `.agents/skills/`; multi-turn via `codex exec resume <id>`.
+
+| ID | Prompt | What happened |
+|---|---|---|
+| X1 | `$socratic-brainstorm 사내 점심 메뉴 추천 앱…` | Skill loaded; mode stated, steelman with the assumed purpose marked, "핵심인가요?" |
+| M | `$socratic-brainstorm` + the B scenario, 5 turns | One ask per turn; evidence probe on "다들 코딩 배우고 싶어하잖아"; contradiction surfaced by quoting both answers; on "됐어, 정리해줘" the verdict was **open**, not refuted. Same outcome as Claude run B. The brief came out as a compact bullet list instead of the full template (sections merged); content stayed within the user's answers. |
+| N1 | Same idea in plain words, no `$` | Skill **not** loaded (0 mentions in the transcript), as `allow_implicit_invocation: false` intends. The model still asked one question per turn on its own. |
+| N2 | "딕셔너리를 값 기준으로 정렬…" | Skill not loaded. |
+
+Consequence: on Codex, the `$socratic-brainstorm` mention is required. The README is corrected to say so.
+
 **Defects found by probing and fixed:**
 
 1. *Compound asks* ("어디서 사 마시고, 그걸 어떻게 알았어요?") in F and in 2/2 re-runs: one question mark, two asks. A "count question marks" rule didn't fix it (2/3 still compound). Rewriting Rule 1 as "one ask; two asks joined in one sentence count as two; offering possible answers to the same ask is fine" gave 3/3 single asks on the same prompt.
@@ -46,6 +57,5 @@ No change under `src/superclaude`, so no framework version bump; the skill carri
 
 **Not verified here:**
 
-- **Codex.** The Codex CLI on this VM has an expired login (`401 token_expired`, refresh token already used), so `$socratic-brainstorm` could not be run. The folder layout and `agents/openai.yaml` follow developers.openai.com/codex/skills; a live run is pending a `codex login`.
 - **claude.ai upload / mobile app.** Needs the account UI. The frontmatter uses only the six keys the upload accepts, and the validator enforces that. The upload itself has not been run.
 - **Mobile Code tab slash registration** (anthropics/claude-code#48696) is not tested; the README tells users to invoke by wording there.

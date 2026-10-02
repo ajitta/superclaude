@@ -58,4 +58,3 @@ Chose (a). Mobile chat has no repo, and a file write in a shared repo can leak p
 
 - **ChatGPT mobile chat (non-Codex)**: needs a published plugin in the OpenAI plugin directory (02 §3). Trigger: the user wants it in plain ChatGPT, not Codex.
 - **Marketplace distribution** (ajitta/claude-plugins catalog, Codex `.agents/plugins/marketplace.json`): wait until v1 has been used for real; the zip + copy paths cover all surfaces now.
-- **Codex live probe**: the Codex CLI on the build VM has an expired login (08 §2).
