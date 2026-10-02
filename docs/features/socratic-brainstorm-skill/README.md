@@ -15,8 +15,8 @@ SuperClaude already does Socratic brainstorming, but only inside Claude Code and
 
 Two skills now ship, both portable to Claude (incl. mobile) and Codex:
 
-- **`socratic-brainstorm` (3.0.0):** modern Socratic questioning (Paul's six types, one question at a time), then the user's own options plus up to 3 labeled model options, convergence by criteria, and a verdict + brief with a next step. Use it to leave with options and a plan.
-- **`socratic-elenchus` (1.0.0):** Plato's elenchus. "What is X?", premises the user agrees to, a contradiction built from them, the user revises; revisions are the ideas; usually aporia; no advice. Use it to find out whether you really know what you mean.
+- **`socratic-brainstorm` (3.1.0):** modern Socratic questioning (Paul's six types, one question at a time), then the user's own options plus up to 3 labeled model options, convergence by criteria, and a verdict + brief with a next step. Use it to leave with options and a plan.
+- **`socratic-elenchus` (1.1.0):** Plato's elenchus. "What is X?", premises the user agrees to, a contradiction built from them, the user revises; revisions are the ideas; usually aporia; no advice. Use it to find out whether you really know what you mean.
 
 History: v1 shipped as `socratic-brainstorm` 1.0.0 and was mislabeled as the Socratic method. 2.0.0 rebuilt it as the elenchus. After comparing the two, the user kept both: the elenchus moved to its own skill, and the v1 approach returned under an honest description ([10](./10-two-skills.md)).
 
@@ -32,7 +32,8 @@ History: v1 shipped as `socratic-brainstorm` 1.0.0 and was mislabeled as the Soc
 - [09-elenchus-redesign.md](./09-elenchus-redesign.md): the elenchus version (now `socratic-elenchus`): why v1 was not the Socratic method, the elenchus from the dialogues with citations, what changed, committed zip, Claude + Codex probes
 - [10-two-skills.md](./10-two-skills.md): the split into two skills, honest labels, routing probe between them
 - [11-plugin-upload.md](./11-plugin-upload.md): claude.ai upload rejected the zip; each skill is now also a single-skill plugin
+- [12-followups.md](./12-followups.md): historical banners, Codex multi-turn after the split, ambiguous-routing probe and fix, marketplace + catalog, independent review
 
 ## Use it
 
-See [portable-skills/README.md](../../../portable-skills/README.md). Short version: download the zip(s) from [portable-skills/releases/](../../../portable-skills/releases/) and upload each at claude.ai › Customize › Plugins › Add › Upload plugin. For Codex, copy the folder to `~/.agents/skills/` or to a repo's `.agents/skills/`.
+See [portable-skills/README.md](../../../portable-skills/README.md). Short version: download the zip(s) from [portable-skills/releases/](../../../portable-skills/releases/) and upload each at claude.ai › Customize › Plugins › Add › Upload plugin. In Claude Code: `/plugin marketplace add ajitta/superclaude`, then `/plugin install socratic-elenchus@ajitta-socratic` (or `socratic-brainstorm@ajitta-socratic`). For Codex, copy the folder to `~/.agents/skills/` or to a repo's `.agents/skills/`.

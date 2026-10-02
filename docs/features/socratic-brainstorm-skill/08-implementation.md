@@ -5,6 +5,8 @@ revised: 2026-10-02
 
 # 08 — Implementation and verification
 
+> **Historical.** Records v1 (1.0.0), whose body is now `socratic-brainstorm` 3.0.0. Paths moved: `dist/portable-skills/` → `portable-skills/releases/`. Zips now carry a plugin manifest ([11](./11-plugin-upload.md)).
+
 ## 1. What shipped
 
 | Path | Content |

@@ -4,7 +4,7 @@ description: Brainstorming partner that uses modern Socratic questioning (Paul's
 license: MIT
 metadata:
   author: ajitta
-  version: "3.0.0"
+  version: "3.1.0"
   lineage: "1.x approach restored after 2.0.0 moved to socratic-elenchus"
   source: "https://github.com/ajitta/superclaude/tree/master/docs/features/socratic-brainstorm-skill"
 ---
@@ -33,6 +33,8 @@ Read the request for an idea, a mode and a depth. Options can arrive in any word
 - **Depth**: `quick` (~4 probes), `standard` (default, ~8-10 probes), `deep` (no budget; offer a checkpoint every ~5 probes).
 
 If the idea is missing, ask for it. If the mode is unclear, state your pick and why in one line ("돈이 걸린 결정이라 stress로 갈게요, 바꾸려면 말해줘요") and move on. Don't ask for depth separately.
+
+If the request only says "Socratic" in general ("소크라테스식으로", "소크라테스처럼 질문해줘", "socratic method") and does not ask for brainstorming or options, add one line to that same message: this session tests the idea and ends with options and a plan; for the strict dialogue of Plato's dialogues (definitions, contradictions, no advice), they can ask for `socratic-elenchus`. Then continue; don't wait for an answer.
 
 If the idea is already precise (clear scope, owner, success measure, no open questions) or the user signals they want answers, not questions, say so and offer: record it as-is, or probe the one aspect they name. Don't manufacture doubt.
 

@@ -5,6 +5,8 @@ revised: 2026-10-02
 
 # 02 — Research: Socratic brainstorming, in this repo and as published skills
 
+> **Historical (one-skill era).** Written when the plan was a single `socratic-brainstorm` skill. §1-2 (repo inventory, published skills) still hold. In §3 the claude.ai install path is outdated: uploads go through Customize › Plugins and need `.claude-plugin/plugin.json` (see [11](./11-plugin-upload.md)). The current state is in [README](./README.md).
+
 Goal of the feature: one portable skill that runs Socratic brainstorming in Claude (chat, Claude Code, cloud sessions) and Codex, including from the phone.
 
 Method: grep of `src/superclaude` at `16b8fbd` (4.18.1+ajitta); external skills downloaded raw from GitHub and read in full; platform facts from official docs fetched as Markdown on 2026-10-02. Tags: **OFFICIAL** = vendor docs, **REPO** = this repo, **COMMUNITY** = third-party repos/forums, **INFERRED** = this document's reasoning.

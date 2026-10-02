@@ -1,7 +1,7 @@
 {
   "name": "socratic-elenchus",
   "displayName": "Socratic Elenchus",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "The method of Plato's early dialogues: what is X, premises you agree to, a contradiction built from them, and your revised definitions as the new ideas. Usually ends in aporia. No advice.",
   "author": {
     "name": "ajitta",

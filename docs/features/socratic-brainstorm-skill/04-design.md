@@ -5,6 +5,8 @@ revised: 2026-10-02
 
 # 04 — Design
 
+> **Historical (one-skill era).** D1-D5 still apply to both skills. D3 (elenchus + diverge in one skill) was later split into two skills ([10](./10-two-skills.md)). The "Deferred" list is superseded by [12](./12-followups.md).
+
 ## 1. Shape
 
 One skill, `socratic-brainstorm`, instruction-only:
