@@ -1,0 +1,7 @@
+interface:
+  display_name: "Socratic Elenchus"
+  short_description: "Plato-style elenchus: define the key idea, test it with your own premises, revise until aporia"
+  default_prompt: "Use $socratic-elenchus to examine this idea: "
+
+policy:
+  allow_implicit_invocation: false
