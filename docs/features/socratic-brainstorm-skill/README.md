@@ -31,7 +31,8 @@ History: v1 shipped as `socratic-brainstorm` 1.0.0 and was mislabeled as the Soc
 - [08-implementation.md](./08-implementation.md): the v1 approach (now `socratic-brainstorm` 3.0.0): what shipped, tests, live probe results, defects fixed, what remains unverified
 - [09-elenchus-redesign.md](./09-elenchus-redesign.md): the elenchus version (now `socratic-elenchus`): why v1 was not the Socratic method, the elenchus from the dialogues with citations, what changed, committed zip, Claude + Codex probes
 - [10-two-skills.md](./10-two-skills.md): the split into two skills, honest labels, routing probe between them
+- [11-plugin-upload.md](./11-plugin-upload.md): claude.ai upload rejected the zip; each skill is now also a single-skill plugin
 
 ## Use it
 
-See [portable-skills/README.md](../../../portable-skills/README.md). Short version: download the zip(s) from [portable-skills/releases/](../../../portable-skills/releases/) and upload them at claude.ai › Customize › Skills. For Codex, copy the folder to `~/.agents/skills/` or to a repo's `.agents/skills/`.
+See [portable-skills/README.md](../../../portable-skills/README.md). Short version: download the zip(s) from [portable-skills/releases/](../../../portable-skills/releases/) and upload each at claude.ai › Customize › Plugins › Add › Upload plugin. For Codex, copy the folder to `~/.agents/skills/` or to a repo's `.agents/skills/`.

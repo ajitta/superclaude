@@ -88,3 +88,24 @@ def test_committed_zip_matches_source(skill, tmp_path, monkeypatch):
     assert rebuilt.read_bytes() == committed.read_bytes(), (
         "stale zip; run: python3 portable-skills/package.py"
     )
+
+
+@pytest.mark.parametrize("skill", _SKILLS, ids=lambda p: p.name)
+def test_zip_is_a_plugin_upload(skill):
+    """claude.ai's upload requires .claude-plugin/plugin.json inside the zip,
+    at the root or under one top-level folder. Without it the upload fails."""
+    import zipfile
+
+    names = zipfile.ZipFile(_DIR / "releases" / f"{skill.name}.zip").namelist()
+    assert f"{skill.name}/.claude-plugin/plugin.json" in names
+    assert f"{skill.name}/SKILL.md" in names
+    assert {n.split("/")[0] for n in names} == {skill.name}, "one top-level folder only"
+
+
+def test_validator_rejects_missing_manifest(tmp_path):
+    bad = tmp_path / "demo-skill"
+    bad.mkdir()
+    (bad / "SKILL.md").write_text(
+        "---\nname: demo-skill\ndescription: Demo.\n---\nbody\n", encoding="utf-8"
+    )
+    assert any("plugin.json missing" in e for e in _packager().validate(bad))
