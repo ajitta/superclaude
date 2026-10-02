@@ -3,7 +3,7 @@
 
 Checks each skill against the Agent Skills spec subset that every target
 accepts (claude.ai upload / Skills API reject any other frontmatter key),
-then writes dist/portable-skills/<name>.zip with the skill folder at the zip root.
+then writes portable-skills/releases/<name>.zip (committed) with the skill folder at the zip root.
 
 Usage: python3 portable-skills/package.py [--check]   (stdlib only)
 """
@@ -16,7 +16,7 @@ import zipfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
-DIST = ROOT.parent / "dist" / "portable-skills"
+DIST = ROOT / "releases"
 ALLOWED_KEYS = {
     "name",
     "description",
@@ -91,7 +91,12 @@ def package(skill_dir: Path) -> Path:
     with zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED) as zf:
         for f in sorted(skill_dir.rglob("*")):
             if f.is_file() and "__pycache__" not in f.parts and f.name != ".DS_Store":
-                zf.write(f, f.relative_to(skill_dir.parent).as_posix())
+                info = zipfile.ZipInfo(
+                    f.relative_to(skill_dir.parent).as_posix(), (1980, 1, 1, 0, 0, 0)
+                )
+                info.compress_type = zipfile.ZIP_DEFLATED
+                info.external_attr = 0o644 << 16
+                zf.writestr(info, f.read_bytes())
     return out
 
 

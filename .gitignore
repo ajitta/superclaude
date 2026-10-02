@@ -218,3 +218,6 @@ docs/memory/solutions_learned.jsonl
 .envrc
 docs/memory/solutions_learned.jsonl
 rtk/history.db
+
+# Portable skill upload bundles are committed on purpose (download from GitHub)
+!portable-skills/releases/*.zip
