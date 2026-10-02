@@ -11,13 +11,15 @@
       "name": "socratic-brainstorm",
       "source": "./portable-skills/socratic-brainstorm",
       "description": "Modern Socratic questioning (one question at a time) to test an idea, then your own options plus up to three labeled ones, convergence by criteria, and an honest verdict with a short brief.",
-      "category": "productivity"
+      "category": "productivity",
+      "version": "3.2.0"
     },
     {
       "name": "socratic-elenchus",
       "source": "./portable-skills/socratic-elenchus",
       "description": "The method of Plato's early dialogues: what is X, premises you agree to, a contradiction built from them, and your revised definitions as the new ideas. Usually ends in aporia. No advice.",
-      "category": "productivity"
+      "category": "productivity",
+      "version": "1.2.0"
     }
   ]
 }

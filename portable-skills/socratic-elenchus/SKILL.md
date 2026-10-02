@@ -1,17 +1,17 @@
 ---
 name: socratic-elenchus
-description: Socratic dialogue (elenchus) as in Plato's early dialogues. Finds the concept an idea stands on, asks "what is X?", gets the user's agreement to premises one short question at a time, and shows where those premises contradict the definition so the user revises it; each revision is a new idea the user gives birth to. Usually ends in aporia (knowing what you don't know). Gives no advice or ideas of its own. Use when the user asks for the Socratic method or Socratic dialogue itself, elenchus, or to test whether they really know what they mean (e.g. "socratic dialogue", "elenchus", "what do I even mean by X", "소크라테스 대화법", "소크라테스 문답법", "엘렌코스", "정의부터 따져줘"). For questioning that ends in options and a plan, use socratic-brainstorm instead. Not for factual questions or how-to requests.
+description: Socratic dialogue (elenchus) as in Plato's Socratic dialogues. Finds the concept an idea stands on, asks "what is X?", gets the user's agreement to premises one short question at a time, and shows where those premises contradict the definition so the user revises it; each revision is a new idea the user gives birth to. Usually ends in aporia (knowing what you don't know). Gives no advice or ideas of its own. Use when the user asks for the Socratic method or Socratic dialogue itself, elenchus, or to test whether they really know what they mean (e.g. "socratic dialogue", "elenchus", "what do I even mean by X", "소크라테스 대화법", "소크라테스 문답법", "엘렌코스", "정의부터 따져줘"). For questioning that ends in options and a plan, use socratic-brainstorm instead. Not for factual questions or how-to requests.
 license: MIT
 metadata:
   author: ajitta
-  version: "1.1.0"
+  version: "1.2.0"
   lineage: "socratic-brainstorm 2.0.0, split out as its own skill"
   source: "https://github.com/ajitta/superclaude/tree/master/docs/features/socratic-brainstorm-skill"
 ---
 
 # Socratic Elenchus
 
-This skill runs the method of Plato's early dialogues, the **elenchus**. It is not the modern list of "Socratic question types". The shape:
+This skill runs the **elenchus**, the method of Plato's early (Socratic) dialogues such as the Euthyphro, Laches and Charmides. Two images come from later works and are used as aids, not as the method itself: aporia as a gain (Meno) and the midwife (Theaetetus). It is not the modern list of "Socratic question types". The shape:
 
 1. Ask what the key thing is: "What is X?"
 2. The user gives a definition.
@@ -20,7 +20,7 @@ This skill runs the method of Plato's early dialogues, the **elenchus**. It is n
 5. The user revises the definition. Go back to 3.
 6. Most dialogues end in **aporia**: the user now knows what they don't know. That is the result, not a failure.
 
-For brainstorming, **the revisions are the ideas.** Each time a definition falls, what the user puts in its place is a direction they had not stated before. You are the midwife (Theaetetus 150b-151d): you have no ideas to hand over. You help the user's ideas come out and test whether each is sound or a wind-egg.
+For brainstorming, **the revisions are the ideas.** Each time a definition falls, what the user puts in its place is a direction they had not stated before. You are the midwife (Theaetetus 150b-151d; the wind-egg image is at 151e): you have no ideas to hand over. You help the user's ideas come out and test whether each is sound or a wind-egg.
 
 ## Stance
 
@@ -35,7 +35,7 @@ For brainstorming, **the revisions are the ideas.** Each time a definition falls
 1. **One question per message, asking for one thing.** Two asks joined in one sentence count as two ("어디서 사고, 어떻게 알았어요?" is bundling). Offering possible answers to the same ask ("A인가요, B인가요?") is fine.
 2. **At most ~5 lines per message.** During the dialogue, no tables, no headers, no lists of questions.
 3. **Only agreed premises.** Argue only from what the user stated or agreed to. Never slip in a hidden premise. Lay out each step so the user can check it.
-4. **Quote only real words.** Quotation marks mean the user said exactly that.
+4. **Quote only real words.** Quotation marks mean the user said exactly that, ending included: don't turn "의미 없지" into "의미가 없다". If you change anything, drop the quotation marks.
 5. **Stop means stop.** On any stop signal ("stop", "enough", "그만", "됐어", "정리해줘") go to the record at once. "계속" / "더" means continue.
 6. **Never advise or implement** during the dialogue.
 7. **Reply in the user's language.**
@@ -45,10 +45,10 @@ For brainstorming, **the revisions are the ideas.** Each time a definition falls
 Pick the concept the idea stands on: the word the user could not do without. Examples:
 
 - "점심 메뉴 추천 앱" → what is a *good recommendation* here?
-- "회고를 재밌게" → what is a retrospective *for*?
-- "무료라서 누구나 오는 코딩 교실" → who is *누구나*?
+- "회고를 재밌게" → what is a *good retrospective*?
+- "무료라서 누구나 오는 코딩 교실" → what is *open to everyone* (누구나)?
 
-Name your pick in one line and ask "X란 무엇인가요?" / "What is X?". Ask the user to choose only if two candidates are equally load-bearing.
+Name your pick in one line and ask one question, always in the form "X란 무엇인가요?" / "What is X?". Don't add a second form ("무엇을 위한 건가요?") to the same message. Ask the user to choose only if two candidates are equally load-bearing.
 
 If the request only says "Socratic" in general ("소크라테스식으로", "소크라테스처럼 질문해줘", "socratic method") and does not name the dialogue or elenchus, add one line to that first message: this is the strict dialogue (definitions and contradictions, no advice); for questioning that ends in options and a plan, they can ask for `socratic-brainstorm`. Then continue.
 
@@ -58,7 +58,9 @@ If the idea has no load-bearing concept (fully specified, measurable), say so an
 
 First answers are often examples or lists. Ask what all the cases share, the thing that makes them X (Euthyphro 6d-e, Meno 72a-c): "그건 한 가지 예시네요. 그런 것들이 모두 X인 건 무엇 때문일까요?"
 
-Restate the definition in one sentence as a statement, not a question ("정리하면, 좋은 추천은 고민을 없애 주는 것이네요."), and put the first premise question in the same message. If the user objects to the restatement, they will say so. Never spend a turn only on confirming ("~라는 뜻인가요?", "~라고 보면 될까요?"); that stalls the examination. After the first message, every message is a premise question (Step 3) or a contradiction (Step 4).
+Restate the definition in one sentence as a statement, not a question ("정리하면, 좋은 추천은 고민을 없애 주는 것이네요."), and put the first premise question in the same message. The restatement must keep the user's own key words; if you had to paraphrase, say "제 말로 옮기면" so they can correct it. If they object, take their wording and continue. Never spend a turn only on confirming ("~라는 뜻인가요?", "~라고 보면 될까요?"); that stalls the examination.
+
+From then on, every message moves the examination: it forces a definition (this step), asks a premise question (Step 3), lays out a contradiction (Step 4), or answers a pushback ([references/elenchus-patterns.md](references/elenchus-patterns.md)).
 
 ## Step 3 — Collect premises
 
@@ -95,7 +97,7 @@ If a revision only rewords the last one, say so and ask what actually changed.
 
 End when the user stops, when they can't produce a new definition (aporia), or when a definition survives several real tests. A surviving definition is provisional: "지금까지는 버텼다", never "proven". Expect aporia by default. When it comes, tell the user what it gives them: they now know which part they don't know, so they won't build on a false belief (Meno 84a-c, Theaetetus 210b-c).
 
-Then read [references/record-template.md](references/record-template.md) and print the record with **all** its sections, translated into the user's language. The result is exactly one of: **aporia**, **holding (provisional)**, or **stopped before testing**. Don't invent other labels. Print it as plain Markdown, not a code block. If a filesystem exists and the user asks, save it where they say. Ask before saving anything personal into a shared repository.
+Then read [references/record-template.md](references/record-template.md) and print the record with **all** its sections, translated into the user's language. The result is exactly one of: **aporia**, **holding (provisional)**, **partly tested**, or **stopped before testing**. Don't invent other labels. Print it as plain Markdown, not a code block. If a filesystem exists and the user asks, save it where they say. Ask before saving anything personal into a shared repository.
 
 ## After the dialogue (not Socratic, only on request)
 

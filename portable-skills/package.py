@@ -1,11 +1,21 @@
 #!/usr/bin/env python3
 """Validate portable skills under portable-skills/ and package them for upload.
 
-Checks each skill against the Agent Skills spec subset that every target
-accepts (claude.ai upload / Skills API reject any other frontmatter key),
-then writes portable-skills/releases/<name>.zip (committed) with the skill folder at the zip
-root. Each skill folder is also a single-skill plugin (.claude-plugin/plugin.json),
-because claude.ai uploads go through Customize > Plugins, which requires the manifest.
+Source folders (portable-skills/<name>/) are plain Agent Skills: no
+.claude-plugin/ inside. Codex 0.160 registers a skill folder that contains
+.claude-plugin/plugin.json under the plugin namespace (<name>:<name>), and Claude
+Code loads such a folder in .claude/skills/ as a `skills-dir` plugin. claude.ai,
+however, uploads through Customize > Plugins and rejects a zip without
+.claude-plugin/plugin.json. So the manifest lives in plugin-manifests/<name>.json
+and is injected only into the release zip:
+
+    releases/<name>.zip
+      <name>/.claude-plugin/plugin.json   (from plugin-manifests/<name>.json)
+      <name>/SKILL.md, references/, agents/openai.yaml
+
+A plugin with SKILL.md at its root and no skills/ directory loads as a single
+skill. The zip is byte-reproducible on every OS (fixed timestamps, modes,
+create_system, LF line endings for text files).
 
 Usage: python3 portable-skills/package.py [--check]   (stdlib only)
 """
@@ -20,6 +30,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
 DIST = ROOT / "releases"
+MANIFESTS = ROOT / "plugin-manifests"
 ALLOWED_KEYS = {
     "name",
     "description",
@@ -30,14 +41,22 @@ ALLOWED_KEYS = {
 }
 NAME_RE = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
 MAX_BODY_LINES = 200
+# skills/ voids the single-skill-at-root rule; claude.ai refuses a plugin with a
+# top-level bin/; a manifest dir in the source changes the Codex skill name.
+FORBIDDEN_DIRS = ("skills", "bin", ".claude-plugin", ".codex-plugin")
+TEXT_SUFFIXES = {".md", ".json", ".yaml", ".yml", ".txt"}
 
 
-def frontmatter(text: str) -> tuple[dict, str]:
+def frontmatter(text: str) -> tuple[dict, dict, str]:
+    """Return (top-level keys, metadata map, body). Minimal YAML subset:
+    `key: value` lines, plus one indented level of `key: value` under metadata."""
+    text = text.replace("\r\n", "\n")
     if not text.startswith("---\n"):
         raise ValueError("SKILL.md must start with '---' on line 1")
     end = text.index("\n---\n", 4)
     block, body = text[4:end], text[end + 5 :]
     data: dict = {}
+    meta: dict = {}
     current = None
     for line in block.splitlines():
         if not line.strip():
@@ -45,12 +64,16 @@ def frontmatter(text: str) -> tuple[dict, str]:
         if line.startswith((" ", "\t")):
             if current is None:
                 raise ValueError(f"indented line before any key: {line!r}")
-            data[current] = (data[current] + "\n" + line.strip()).strip()
+            if current == "metadata":
+                k, _, v = line.strip().partition(":")
+                meta[k.strip()] = v.strip().strip('"')
+            else:
+                data[current] = (data[current] + "\n" + line.strip()).strip()
             continue
         key, _, value = line.partition(":")
         current = key.strip()
         data[current] = value.strip().strip('"')
-    return data, body
+    return data, meta, body
 
 
 def validate(skill_dir: Path) -> list[str]:
@@ -59,7 +82,7 @@ def validate(skill_dir: Path) -> list[str]:
     if not skill_md.is_file():
         return [f"{skill_dir.name}: SKILL.md missing"]
     try:
-        data, body = frontmatter(skill_md.read_text(encoding="utf-8"))
+        data, meta, body = frontmatter(skill_md.read_text(encoding="utf-8"))
     except ValueError as e:
         return [f"{skill_dir.name}: {e}"]
     extra = set(data) - ALLOWED_KEYS
@@ -79,54 +102,72 @@ def validate(skill_dir: Path) -> list[str]:
         errors.append("description contains angle brackets")
     if len(data.get("compatibility", "")) > 500:
         errors.append("compatibility > 500 chars")
+    for d in FORBIDDEN_DIRS:
+        if (skill_dir / d).exists():
+            errors.append(
+                f"{d}/ must not be in the source folder "
+                "(changes the Codex skill name or how the plugin loads)"
+            )
     n = len(body.splitlines())
     if n > MAX_BODY_LINES:
         errors.append(f"body {n} lines > {MAX_BODY_LINES}")
     for link in re.findall(r"\]\(([^)#]+)\)", body):
         if not link.startswith("http") and not (skill_dir / link).exists():
             errors.append(f"broken relative link {link}")
-    errors.extend(_validate_manifest(skill_dir, name, data.get("metadata", "")))
+    version = meta.get("version")
+    if not version:
+        errors.append("metadata.version missing")
+    errors.extend(_validate_manifest(name, version))
     return [f"{skill_dir.name}: {e}" for e in errors]
 
 
-def _validate_manifest(skill_dir: Path, name: str, metadata: str) -> list[str]:
-    """claude.ai's upload goes through Customize > Plugins, which requires
-    .claude-plugin/plugin.json; without it the upload is rejected. A plugin with
-    SKILL.md at its root and no skills/ dir loads as a single skill."""
-    manifest = skill_dir / ".claude-plugin" / "plugin.json"
-    if not manifest.is_file():
-        return [
-            ".claude-plugin/plugin.json missing (claude.ai plugin upload rejects the zip)"
-        ]
+def _validate_manifest(name: str, version: str | None) -> list[str]:
+    path = MANIFESTS / f"{name}.json"
+    if not path.is_file():
+        return [f"plugin-manifests/{name}.json missing (claude.ai upload needs it)"]
     try:
-        data = json.loads(manifest.read_text(encoding="utf-8"))
+        data = json.loads(path.read_text(encoding="utf-8"))
     except json.JSONDecodeError as e:
-        return [f"plugin.json is not valid JSON: {e}"]
+        return [f"plugin-manifests/{name}.json is not valid JSON: {e}"]
     errors = []
     if data.get("name") != name:
-        errors.append(f"plugin.json name {data.get('name')!r} != skill name {name!r}")
-    m = re.search(r'version:\s*"?([^"\n]+)"?', metadata)
-    if m and data.get("version") != m.group(1).strip():
+        errors.append(f"manifest name {data.get('name')!r} != skill name {name!r}")
+    if version and data.get("version") != version:
         errors.append(
-            f"plugin.json version {data.get('version')!r} != SKILL.md metadata.version {m.group(1).strip()!r}"
+            f"manifest version {data.get('version')!r} != SKILL.md metadata.version {version!r}"
         )
     if not data.get("description"):
-        errors.append("plugin.json description missing")
+        errors.append("manifest description missing")
+    if "skills" in data:
+        errors.append("manifest 'skills' key voids the single-skill layout")
     return errors
+
+
+def _normalized(path: Path) -> bytes:
+    data = path.read_bytes()
+    if path.suffix in TEXT_SUFFIXES:
+        data = data.replace(b"\r\n", b"\n")
+    return data
 
 
 def package(skill_dir: Path) -> Path:
     DIST.mkdir(parents=True, exist_ok=True)
     out = DIST / f"{skill_dir.name}.zip"
+    files = {
+        f.relative_to(skill_dir.parent).as_posix(): _normalized(f)
+        for f in skill_dir.rglob("*")
+        if f.is_file() and "__pycache__" not in f.parts and f.name != ".DS_Store"
+    }
+    files[f"{skill_dir.name}/.claude-plugin/plugin.json"] = _normalized(
+        MANIFESTS / f"{skill_dir.name}.json"
+    )
     with zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED) as zf:
-        for f in sorted(skill_dir.rglob("*")):
-            if f.is_file() and "__pycache__" not in f.parts and f.name != ".DS_Store":
-                info = zipfile.ZipInfo(
-                    f.relative_to(skill_dir.parent).as_posix(), (1980, 1, 1, 0, 0, 0)
-                )
-                info.compress_type = zipfile.ZIP_DEFLATED
-                info.external_attr = 0o644 << 16
-                zf.writestr(info, f.read_bytes())
+        for arcname in sorted(files):
+            info = zipfile.ZipInfo(arcname, (1980, 1, 1, 0, 0, 0))
+            info.compress_type = zipfile.ZIP_DEFLATED
+            info.create_system = 3  # unix; ZipInfo defaults to 0 on Windows
+            info.external_attr = 0o644 << 16
+            zf.writestr(info, files[arcname])
     return out
 
 

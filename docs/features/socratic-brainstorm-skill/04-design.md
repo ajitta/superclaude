@@ -5,7 +5,10 @@ revised: 2026-10-02
 
 # 04 — Design
 
-> **Historical (one-skill era).** D1-D5 still apply to both skills. D3 (elenchus + diverge in one skill) was later split into two skills ([10](./10-two-skills.md)). The "Deferred" list is superseded by [12](./12-followups.md).
+> **Historical (one-skill era).** This is the design of v1, whose body is now `socratic-brainstorm`. D1, D2, D4 and D5 still apply to both skills. Later changes:
+> - D3 (elenchus + diverge in one skill) was replaced by two skills: `socratic-brainstorm` and `socratic-elenchus`. The elenchus design and its Plato sources are in [09](./09-elenchus-redesign.md); the split and routing are in [10](./10-two-skills.md).
+> - The plugin manifest needed for the claude.ai upload is in [11](./11-plugin-upload.md) and [13](./13-review.md) §2 (manifest kept out of the source folder).
+> - §4 Deferred is superseded: the Claude Code marketplace and catalog shipped ([12](./12-followups.md) §3); Codex plugin distribution is still deferred.
 
 ## 1. Shape
 
@@ -13,7 +16,7 @@ One skill, `socratic-brainstorm`, instruction-only:
 
 ```
 portable-skills/socratic-brainstorm/
-├── SKILL.md                      # 109 lines: rules, Steps 0-5, pitfalls
+├── SKILL.md                      # rules, Steps 0-5, pitfalls (109 lines at v1)
 ├── references/question-bank.md   # six types, tactics, optional lenses (KO/EN)
 ├── references/brief-template.md  # verdict + brief sections
 └── agents/openai.yaml            # Codex: explicit-only, display name

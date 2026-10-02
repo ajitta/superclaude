@@ -59,4 +59,4 @@ Merged remote branches deleted: `feature/socratic-brainstorm-skill`, `feature/so
 
 ## 5. Independent review
 
-See §6 (filled after the run).
+See [13-review.md](./13-review.md).
