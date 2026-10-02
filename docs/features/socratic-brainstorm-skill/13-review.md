@@ -71,3 +71,13 @@ The user added `ajitta/claude-plugins` in claude.ai and got install errors for t
 
 Fix: `package.py` now also writes `portable-skills/plugins/<name>/`, a committed copy of the skill folder plus the manifest. Both marketplaces point there. The test `test_plugin_dir_matches_skill_plus_manifest` requires the copy to equal the skill folder plus the manifest byte for byte; appending a line to a SKILL.md fails it. The skill folders stay manifest-free for Codex. Marketplace entries no longer carry `version`, because `plugin.json` owns it.
 
+## 7. Catalog listing withdrawn (user decision, 2026-10-03)
+
+The claude.ai marketplace still would not install the two entries from `ajitta/claude-plugins` after §6. The user dropped the catalog route, and the entries were removed (claude-plugins, commit "revert: drop the socratic entries"). These install paths remain:
+
+- claude.ai: Upload plugin with `releases/<name>.zip` (user-confirmed working)
+- Claude Code: `/plugin marketplace add ajitta/superclaude`, then `<name>@ajitta-socratic` (verified end to end)
+- Codex: copy the folder into `.agents/skills/`
+
+Not established: why claude.ai rejected the `git-subdir` entries. Candidates are git-subdir handling on claude.ai, or the plugin living in another repository than the marketplace. claude.ai did not report a specific error.
+

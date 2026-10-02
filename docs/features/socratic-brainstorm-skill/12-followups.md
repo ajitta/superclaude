@@ -49,7 +49,7 @@ Re-run (n = 6):
 ## 3. Distribution
 
 - **Self-hosted marketplace** in this repo: `.claude-plugin/marketplace.json` named `ajitta-socratic`, with relative sources into `portable-skills/`. `claude plugin validate .` passes. Install with `/plugin marketplace add ajitta/superclaude`, then `/plugin install socratic-elenchus@ajitta-socratic`.
-- **Catalog**: ajitta/claude-plugins lists both through `git-subdir` sources pointing at this repo.
+- **Catalog**: ajitta/claude-plugins listed both through `git-subdir` sources; withdrawn later because claude.ai would not install them ([13](./13-review.md) §7).
 - A test pins the marketplace entries to the skill folders and their `plugin.json` names. A rename that leaves a stale entry would install nothing, yet `validate` would still pass (claude-plugin-distribution skill, "Drift guard").
 - **Codex marketplace: not added.** The OpenAI portable plugin layout wants skills under `skills/<name>/` with a root `plugin.json` (developers.openai.com/plugins/build/plugins, "Create a plugin manually"). That conflicts with the single-skill-at-root layout claude.ai and Claude Code use here. Codex users copy the folder into `.agents/skills/` (unchanged). Revisit if Codex distribution is wanted.
 
