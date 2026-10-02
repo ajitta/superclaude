@@ -44,9 +44,9 @@ def test_frontmatter_parses_as_yaml_with_spec_keys_only(skill):
     assert data["name"] == skill.name
     assert 1 <= len(data["description"]) <= 1024
     meta = data.get("metadata", {})
-    assert all(
-        isinstance(v, str) for v in meta.values()
-    ), "metadata values must be strings"
+    assert all(isinstance(v, str) for v in meta.values()), (
+        "metadata values must be strings"
+    )
 
 
 @pytest.mark.parametrize("skill", _SKILLS, ids=lambda p: p.name)
