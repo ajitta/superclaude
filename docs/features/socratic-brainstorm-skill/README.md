@@ -24,7 +24,7 @@ History: v1 shipped as `socratic-brainstorm` 1.0.0 and was mislabeled as the Soc
 - **Verified:**
   - Claude Code (Sonnet 5.5) and Codex (`gpt-6.1-sol`), multi-turn, for both methods.
   - Routing between the two skills.
-  - Marketplace install end to end.
+  - Marketplace install end to end (this repo's own marketplace; the claude-plugins catalog listing was withdrawn).
   - Independent review; full test suite; CI.
 - **Not verified:** the claude.ai upload of the current zips and the mobile app.
 
