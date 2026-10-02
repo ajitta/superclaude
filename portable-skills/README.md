@@ -9,6 +9,10 @@ Skills here follow the [Agent Skills spec](https://agentskills.io/specification)
 
 They work well in sequence: run `socratic-elenchus` to settle what the key word means, then `socratic-brainstorm` on the sharpened idea. Installing both is fine. Each description names the other, and Claude picked the right one for 7 of 7 test phrasings.
 
+## Why each skill folder is also a plugin
+
+claude.ai takes uploads through Customize › Plugins, which rejects a zip without `.claude-plugin/plugin.json` (the error asks for a top-level manifest declaring the plugin's components). Each skill folder therefore carries a minimal manifest. A plugin with `SKILL.md` at its root and no `skills/` directory loads as a single skill (Claude Code plugins reference). Codex and `.claude/skills/` copies ignore the `.claude-plugin/` folder. `package.py` fails if the manifest is missing or its `name`/`version` disagree with `SKILL.md`.
+
 ## Validate and package
 
 ```bash
@@ -24,7 +28,7 @@ Replace `<skill>` with `socratic-brainstorm` or `socratic-elenchus`.
 
 | Where you want it | How | Reaches mobile? |
 |---|---|---|
-| **Claude, everywhere** (recommended) | Download `releases/<skill>.zip` and upload it at claude.ai › Customize › Skills (needs Settings › Capabilities › Code execution on). The upload screen is not in the mobile app; use a desktop or mobile browser once. | Yes: chat in the iOS/Android app, the app's Code tab (cloud sessions), and Claude Code in the terminal via account sync (v2.1.273+). |
+| **Claude, everywhere** (recommended) | Download `releases/<skill>.zip`, then claude.ai › Customize › Plugins › Add › Upload plugin. The zip is a single-skill plugin (`.claude-plugin/plugin.json` + `SKILL.md`). The upload screen is not in the mobile app; use a desktop or mobile browser once. | Yes: chat in the iOS/Android app, the app's Code tab (cloud sessions), and Claude Code in the terminal via account sync (v2.1.273+). |
 | Claude Code, one machine | `cp -r portable-skills/<skill> ~/.claude/skills/` | No. Cloud sessions don't read `~/.claude/skills`. |
 | Claude Code, one repo (incl. cloud sessions on that repo) | Commit the folder to `<repo>/.claude/skills/<skill>/` | Yes, for sessions on that repo. In the mobile harness `/<skill>` may not register (anthropics/claude-code#48696); ask for it in words instead. |
 | Codex CLI / IDE / ChatGPT desktop | `cp -r portable-skills/<skill> ~/.agents/skills/` | No. |
@@ -34,7 +38,8 @@ Replace `<skill>` with `socratic-brainstorm` or `socratic-elenchus`.
 
 | | socratic-brainstorm | socratic-elenchus |
 |---|---|---|
-| Claude Code | `/socratic-brainstorm <idea>` | `/socratic-elenchus <idea>` |
+| Claude Code (copied into `.claude/skills/`) | `/socratic-brainstorm <idea>` | `/socratic-elenchus <idea>` |
+| Claude Code (installed as a plugin) | `/socratic-brainstorm:socratic-brainstorm <idea>` | `/socratic-elenchus:socratic-elenchus <idea>` |
 | Codex (`$` required; implicit invocation is off) | `$socratic-brainstorm <idea>` | `$socratic-elenchus <idea>` |
 | Claude in words | "소크라테스식 브레인스토밍 해줘", "질문으로 아이디어 다듬어줘", "이 계획 반박해줘" | "소크라테스 대화법으로 따져줘", "엘렌코스로 검증해줘", "'X'가 뭔지부터 정의로 따져줘" |
 

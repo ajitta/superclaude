@@ -3,13 +3,16 @@
 
 Checks each skill against the Agent Skills spec subset that every target
 accepts (claude.ai upload / Skills API reject any other frontmatter key),
-then writes portable-skills/releases/<name>.zip (committed) with the skill folder at the zip root.
+then writes portable-skills/releases/<name>.zip (committed) with the skill folder at the zip
+root. Each skill folder is also a single-skill plugin (.claude-plugin/plugin.json),
+because claude.ai uploads go through Customize > Plugins, which requires the manifest.
 
 Usage: python3 portable-skills/package.py [--check]   (stdlib only)
 """
 
 from __future__ import annotations
 
+import json
 import re
 import sys
 import zipfile
@@ -82,7 +85,34 @@ def validate(skill_dir: Path) -> list[str]:
     for link in re.findall(r"\]\(([^)#]+)\)", body):
         if not link.startswith("http") and not (skill_dir / link).exists():
             errors.append(f"broken relative link {link}")
+    errors.extend(_validate_manifest(skill_dir, name, data.get("metadata", "")))
     return [f"{skill_dir.name}: {e}" for e in errors]
+
+
+def _validate_manifest(skill_dir: Path, name: str, metadata: str) -> list[str]:
+    """claude.ai's upload goes through Customize > Plugins, which requires
+    .claude-plugin/plugin.json; without it the upload is rejected. A plugin with
+    SKILL.md at its root and no skills/ dir loads as a single skill."""
+    manifest = skill_dir / ".claude-plugin" / "plugin.json"
+    if not manifest.is_file():
+        return [
+            ".claude-plugin/plugin.json missing (claude.ai plugin upload rejects the zip)"
+        ]
+    try:
+        data = json.loads(manifest.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as e:
+        return [f"plugin.json is not valid JSON: {e}"]
+    errors = []
+    if data.get("name") != name:
+        errors.append(f"plugin.json name {data.get('name')!r} != skill name {name!r}")
+    m = re.search(r'version:\s*"?([^"\n]+)"?', metadata)
+    if m and data.get("version") != m.group(1).strip():
+        errors.append(
+            f"plugin.json version {data.get('version')!r} != SKILL.md metadata.version {m.group(1).strip()!r}"
+        )
+    if not data.get("description"):
+        errors.append("plugin.json description missing")
+    return errors
 
 
 def package(skill_dir: Path) -> Path:
