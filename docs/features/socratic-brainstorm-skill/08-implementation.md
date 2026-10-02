@@ -23,6 +23,8 @@ No change under `src/superclaude`, so no framework version bump; the skill carri
 
 **Tests.** `uv run pytest -q`: full suite green (2677 passed, 25 skipped after adding the 6 new tests). Mutation check: adding `disable-model-invocation` to `ALLOWED_KEYS` makes `test_validator_rejects_claude_code_only_key` fail; reverted.
 
+**CI.** `Tests` workflow on `feature/socratic-brainstorm-skill`: all 7 jobs green (run 37013601665). The first run failed `ruff format --check` on the new test (formatted with black locally); fixed by `ruff format`.
+
 **Package.** `python3 portable-skills/package.py` → `ok socratic-brainstorm`; zip root is `socratic-brainstorm/` with 4 files. Frontmatter also parsed with PyYAML: keys `description, license, metadata, name`.
 
 **Live probes**: Claude Code 2.1.284, `claude -p --model sonnet` (Sonnet 5.5), skill copied into a scratch repo's `.claude/skills/`. Multi-turn via `--resume`. n = 1 per cell unless stated. These record what happened, not rates.
