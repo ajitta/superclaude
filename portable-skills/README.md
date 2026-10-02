@@ -7,7 +7,7 @@ Skills here follow the [Agent Skills spec](https://agentskills.io/specification)
 | [socratic-brainstorm](./socratic-brainstorm/SKILL.md) | Modern Socratic questioning (six question types, one at a time) tests your idea. Then you list your options, it adds up to 3 labeled ones, you converge by criteria. Ends with a verdict (sharpened / open / refuted) and a brief with a next step. | You want to leave with options and a plan. | [socratic-brainstorm.zip](./releases/socratic-brainstorm.zip) |
 | [socratic-elenchus](./socratic-elenchus/SKILL.md) | The method of Plato's early dialogues: "what is X?", premises you agree to one at a time, a contradiction built from them, you revise the definition. Your revisions are the new ideas. Usually ends in aporia. No advice at all. | You want to find out whether you really know what you mean. | [socratic-elenchus.zip](./releases/socratic-elenchus.zip) |
 
-They work well in sequence: run `socratic-elenchus` to settle what the key word means, then `socratic-brainstorm` on the sharpened idea. Installing both is fine. Each description names the other, and Claude picked the right one for 7 of 7 test phrasings.
+They work well in sequence: run `socratic-elenchus` to settle what the key word means, then `socratic-brainstorm` on the sharpened idea. Installing both is fine. Each description names the other, and explicit phrasings route correctly. A bare "소크라테스식으로" can land in either; the skill then says which style it is and how to ask for the other.
 
 ## Why each skill folder is also a plugin
 
@@ -29,6 +29,7 @@ Replace `<skill>` with `socratic-brainstorm` or `socratic-elenchus`.
 | Where you want it | How | Reaches mobile? |
 |---|---|---|
 | **Claude, everywhere** (recommended) | Download `releases/<skill>.zip`, then claude.ai › Customize › Plugins › Add › Upload plugin. The zip is a single-skill plugin (`.claude-plugin/plugin.json` + `SKILL.md`). The upload screen is not in the mobile app; use a desktop or mobile browser once. | Yes: chat in the iOS/Android app, the app's Code tab (cloud sessions), and Claude Code in the terminal via account sync (v2.1.273+). |
+| Claude Code, as a plugin | `/plugin marketplace add ajitta/superclaude`, then `/plugin install <skill>@ajitta-socratic`. Also listed in the [ajitta/claude-plugins](https://github.com/ajitta/claude-plugins) catalog as `<skill>@ajitta` | No. Plugins from user settings don't load in cloud sessions. |
 | Claude Code, one machine | `cp -r portable-skills/<skill> ~/.claude/skills/` | No. Cloud sessions don't read `~/.claude/skills`. |
 | Claude Code, one repo (incl. cloud sessions on that repo) | Commit the folder to `<repo>/.claude/skills/<skill>/` | Yes, for sessions on that repo. In the mobile harness `/<skill>` may not register (anthropics/claude-code#48696); ask for it in words instead. |
 | Codex CLI / IDE / ChatGPT desktop | `cp -r portable-skills/<skill> ~/.agents/skills/` | No. |

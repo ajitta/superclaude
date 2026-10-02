@@ -5,6 +5,8 @@ revised: 2026-10-02
 
 # 03 — Analysis: what the skill must take, and from where
 
+> **Historical (one-skill era).** This analysis produced v1, which mislabeled modern Socratic questioning as the Socratic method ([09](./09-elenchus-redesign.md) §1). It still describes what `socratic-brainstorm` 3.0.0 does. The strict method is in [09](./09-elenchus-redesign.md). The current state is in [README](./README.md).
+
 ## 1. Method synthesis
 
 Two classical moves, both Socratic, map onto brainstorming's two halves:

@@ -10,6 +10,7 @@ docs/features/socratic-brainstorm-skill/02-research.md §3.
 from __future__ import annotations
 
 import importlib.util
+import json
 from pathlib import Path
 
 import pytest
@@ -109,3 +110,19 @@ def test_validator_rejects_missing_manifest(tmp_path):
         "---\nname: demo-skill\ndescription: Demo.\n---\nbody\n", encoding="utf-8"
     )
     assert any("plugin.json missing" in e for e in _packager().validate(bad))
+
+
+def test_marketplace_lists_every_portable_skill():
+    """A renamed plugin.json with a stale marketplace entry installs nothing,
+    while `claude plugin validate` still passes. Pin the two together."""
+    market = json.loads(
+        (_ROOT / ".claude-plugin" / "marketplace.json").read_text(encoding="utf-8")
+    )
+    entries = {p["name"]: p["source"] for p in market["plugins"]}
+    assert set(entries) == {s.name for s in _SKILLS}
+    for skill in _SKILLS:
+        assert entries[skill.name] == f"./portable-skills/{skill.name}"
+        manifest = json.loads(
+            (skill / ".claude-plugin" / "plugin.json").read_text(encoding="utf-8")
+        )
+        assert manifest["name"] == skill.name

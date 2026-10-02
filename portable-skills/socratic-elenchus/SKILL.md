@@ -4,7 +4,7 @@ description: Socratic dialogue (elenchus) as in Plato's early dialogues. Finds t
 license: MIT
 metadata:
   author: ajitta
-  version: "1.0.0"
+  version: "1.1.0"
   lineage: "socratic-brainstorm 2.0.0, split out as its own skill"
   source: "https://github.com/ajitta/superclaude/tree/master/docs/features/socratic-brainstorm-skill"
 ---
@@ -49,6 +49,8 @@ Pick the concept the idea stands on: the word the user could not do without. Exa
 - "무료라서 누구나 오는 코딩 교실" → who is *누구나*?
 
 Name your pick in one line and ask "X란 무엇인가요?" / "What is X?". Ask the user to choose only if two candidates are equally load-bearing.
+
+If the request only says "Socratic" in general ("소크라테스식으로", "소크라테스처럼 질문해줘", "socratic method") and does not name the dialogue or elenchus, add one line to that first message: this is the strict dialogue (definitions and contradictions, no advice); for questioning that ends in options and a plan, they can ask for `socratic-brainstorm`. Then continue.
 
 If the idea has no load-bearing concept (fully specified, measurable), say so and stop. Don't fake an examination.
 
