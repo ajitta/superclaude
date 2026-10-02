@@ -43,7 +43,7 @@ Replace `<skill>` with `socratic-brainstorm` or `socratic-elenchus`.
 
 | Where you want it | How | Reaches mobile? |
 |---|---|---|
-| **Claude, everywhere** (recommended) | Download `releases/<skill>.zip`, then claude.ai › Customize › Plugins › Add › Upload plugin. The upload screen is not in the mobile app; use a desktop or mobile browser once. | Yes: chat in the iOS/Android app, the app's Code tab (cloud sessions), and Claude Code in the terminal via account sync (v2.1.273+). |
+| **Claude, everywhere** (recommended) | Download `releases/<skill>.zip`, then claude.ai › Customize › **Plugins** › Add › Upload plugin. Not Customize › Skills: that screen rejects this zip ("a skill cannot contain a plugin manifest"). The upload screen is not in the mobile app; use a desktop or mobile browser once. | Yes: chat in the iOS/Android app, the app's Code tab (cloud sessions), and Claude Code in the terminal via account sync (v2.1.273+). |
 | Claude Code, as a plugin | `/plugin marketplace add ajitta/superclaude`, then `/plugin install <skill>@ajitta-socratic`. Also listed in the [ajitta/claude-plugins](https://github.com/ajitta/claude-plugins) catalog as `<skill>@ajitta` | No. Plugins from user settings don't load in cloud sessions. |
 | Claude Code, one machine | `cp -r portable-skills/<skill> ~/.claude/skills/` | No. Cloud sessions don't read `~/.claude/skills`. |
 | Claude Code, one repo (incl. cloud sessions on that repo) | Commit the folder to `<repo>/.claude/skills/<skill>/` | Yes, for sessions on that repo. In the mobile harness `/<skill>` may not register (anthropics/claude-code#48696); ask for it in words instead. |

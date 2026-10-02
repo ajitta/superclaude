@@ -57,3 +57,11 @@ Each finding was reproduced or re-checked before fixing.
 - The claude.ai upload of the current zips, and the mobile app. The reviewer found indirect evidence that an earlier upload succeeded: this account's sync manifest lists both skills with `source: plugin` at 3.0.0 / 1.0.0.
 - `~/.claude/skills/` and trusted-workspace loading (no longer affected, since source folders carry no manifest).
 - Codex cloud tasks and the ChatGPT desktop app.
+
+## 5. claude.ai upload result (user, 2026-10-03)
+
+- Customize › **Skills** rejected the 3.2.0 / 1.2.0 zip: "a skill cannot contain a plugin manifest. remove it or upload this content as a plugin".
+- Customize › **Plugins** installed it.
+
+The two screens have opposite rules: Plugins requires the manifest and Skills forbids it. The Plugins path is the documented one, and it works, so no separate skill-only zip is shipped. The README now names the screen and quotes the Skills error.
+
