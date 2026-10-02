@@ -75,3 +75,16 @@ def test_validator_rejects_name_folder_mismatch(tmp_path):
         "---\nname: other-name\ndescription: Demo.\n---\nbody\n", encoding="utf-8"
     )
     assert any("!= folder" in e for e in _packager().validate(bad))
+
+
+@pytest.mark.parametrize("skill", _SKILLS, ids=lambda p: p.name)
+def test_committed_zip_matches_source(skill, tmp_path, monkeypatch):
+    """releases/<name>.zip is what users upload; it must not lag the source."""
+    committed = _DIR / "releases" / f"{skill.name}.zip"
+    assert committed.is_file(), "run: python3 portable-skills/package.py"
+    pkg = _packager()
+    monkeypatch.setattr(pkg, "DIST", tmp_path)
+    rebuilt = pkg.package(skill)
+    assert rebuilt.read_bytes() == committed.read_bytes(), (
+        "stale zip; run: python3 portable-skills/package.py"
+    )
