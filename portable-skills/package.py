@@ -12,6 +12,8 @@ and is injected only into the release zip:
     releases/<name>.zip
       <name>/.claude-plugin/plugin.json   (from plugin-manifests/<name>.json)
       <name>/SKILL.md, references/, agents/openai.yaml
+    plugins/<name>/                       same content, unzipped; marketplaces
+                                          (claude.ai and Claude Code) point here
 
 A plugin with SKILL.md at its root and no skills/ directory loads as a single
 skill. The zip is byte-reproducible on every OS (fixed timestamps, modes,
@@ -30,6 +32,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
 DIST = ROOT / "releases"
+PLUGINS = ROOT / "plugins"
 MANIFESTS = ROOT / "plugin-manifests"
 ALLOWED_KEYS = {
     "name",
@@ -150,17 +153,42 @@ def _normalized(path: Path) -> bytes:
     return data
 
 
+def plugin_files(skill_dir: Path) -> dict:
+    """The single-skill plugin: the skill folder plus the injected manifest.
+    Keys are paths relative to the plugin folder."""
+    files = {
+        f.relative_to(skill_dir).as_posix(): _normalized(f)
+        for f in skill_dir.rglob("*")
+        if f.is_file() and "__pycache__" not in f.parts and f.name != ".DS_Store"
+    }
+    files[".claude-plugin/plugin.json"] = _normalized(
+        MANIFESTS / f"{skill_dir.name}.json"
+    )
+    return files
+
+
+def write_plugin_dir(skill_dir: Path) -> Path:
+    """Write plugins/<name>/ for marketplaces. claude.ai's marketplace skips a
+    plugin folder without .claude-plugin/plugin.json, but the skill folder must
+    not carry one (Codex renames it). So marketplaces point at this generated
+    copy, and tests keep it identical to the skill folder plus the manifest."""
+    out = PLUGINS / skill_dir.name
+    if out.exists():
+        for f in sorted(out.rglob("*"), reverse=True):
+            f.unlink() if f.is_file() else f.rmdir()
+    for rel, data in plugin_files(skill_dir).items():
+        dest = out / rel
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        dest.write_bytes(data)
+    return out
+
+
 def package(skill_dir: Path) -> Path:
     DIST.mkdir(parents=True, exist_ok=True)
     out = DIST / f"{skill_dir.name}.zip"
     files = {
-        f.relative_to(skill_dir.parent).as_posix(): _normalized(f)
-        for f in skill_dir.rglob("*")
-        if f.is_file() and "__pycache__" not in f.parts and f.name != ".DS_Store"
+        f"{skill_dir.name}/{rel}": data for rel, data in plugin_files(skill_dir).items()
     }
-    files[f"{skill_dir.name}/.claude-plugin/plugin.json"] = _normalized(
-        MANIFESTS / f"{skill_dir.name}.json"
-    )
     with zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED) as zf:
         for arcname in sorted(files):
             info = zipfile.ZipInfo(arcname, (1980, 1, 1, 0, 0, 0))
@@ -180,7 +208,17 @@ def main() -> int:
     if errors:
         return 1
     for s in skills:
-        print("ok", s.name, "" if check_only else f"-> {package(s)}")
+        if check_only:
+            print("ok", s.name)
+        else:
+            print(
+                "ok",
+                s.name,
+                "->",
+                package(s).name,
+                "+",
+                write_plugin_dir(s).relative_to(ROOT),
+            )
     return 0
 
 

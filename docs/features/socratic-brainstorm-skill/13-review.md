@@ -65,3 +65,9 @@ Each finding was reproduced or re-checked before fixing.
 
 The two screens have opposite rules: Plugins requires the manifest and Skills forbids it. The Plugins path is the documented one, and it works, so no separate skill-only zip is shipped. The README now names the screen and quotes the Skills error.
 
+## 6. claude.ai marketplace skipped both plugins (user, 2026-10-03)
+
+The user added `ajitta/claude-plugins` in claude.ai and got install errors for the two Socratic entries, and they were skipped. Cause: after §2 moved `plugin.json` out of the skill folders, the catalog's `git-subdir` sources pointed at folders with no manifest. Claude Code installs such a folder, with the marketplace entry acting as the manifest (verified in §3). claude.ai's marketplace does not; like Upload plugin, it needs `.claude-plugin/plugin.json`.
+
+Fix: `package.py` now also writes `portable-skills/plugins/<name>/`, a committed copy of the skill folder plus the manifest. Both marketplaces point there. The test `test_plugin_dir_matches_skill_plus_manifest` requires the copy to equal the skill folder plus the manifest byte for byte; appending a line to a SKILL.md fails it. The skill folders stay manifest-free for Codex. Marketplace entries no longer carry `version`, because `plugin.json` owns it.
+

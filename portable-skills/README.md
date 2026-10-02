@@ -15,8 +15,9 @@ They work well in sequence: run `socratic-elenchus` to settle what the key word 
 portable-skills/
 ├── socratic-brainstorm/        plain Agent Skill (SKILL.md, references/, agents/openai.yaml)
 ├── socratic-elenchus/          plain Agent Skill
-├── plugin-manifests/<skill>.json   plugin manifest, injected only into the zip
-└── releases/<skill>.zip        <skill>/ + <skill>/.claude-plugin/plugin.json
+├── plugin-manifests/<skill>.json   plugin manifest (not inside the skill folder)
+├── plugins/<skill>/            generated: skill + .claude-plugin/plugin.json; marketplaces point here
+└── releases/<skill>.zip        the same as a zip, for Upload plugin
 ```
 
 Why the manifest is not in the skill folder:
@@ -26,7 +27,9 @@ Why the manifest is not in the skill folder:
   - Codex 0.160 registers such a folder as `<skill>:<skill>`, so `$<skill>` stops resolving.
   - Claude Code loads it from `.claude/skills/` as a `<skill>@skills-dir` plugin after workspace trust, not as a plain skill.
 
-`package.py` refuses a `.claude-plugin/`, `skills/` or `bin/` directory in a source folder. It also refuses a missing manifest, and a manifest whose `name`/`version` disagrees with `SKILL.md`.
+- claude.ai's marketplace (Add marketplace) skips a plugin folder without `plugin.json`. So marketplaces point at the generated `plugins/<skill>/`, never at the skill folder itself.
+
+`package.py` writes `plugins/` and `releases/`. It refuses a `.claude-plugin/`, `skills/` or `bin/` directory in a source folder. It also refuses a missing manifest, and a manifest whose `name`/`version` disagrees with `SKILL.md`.
 
 ## Validate and package
 
