@@ -79,5 +79,4 @@ The claude.ai marketplace still would not install the two entries from `ajitta/c
 - Claude Code: `/plugin marketplace add ajitta/superclaude`, then `<name>@ajitta-socratic` (verified end to end)
 - Codex: copy the folder into `.agents/skills/`
 
-Not established: why claude.ai rejected the `git-subdir` entries. Candidates are git-subdir handling on claude.ai, or the plugin living in another repository than the marketplace. claude.ai did not report a specific error.
-
+**Correction (user, same day):** the cause was the claude.ai flow, not the entries. On claude.ai, Customize › Plugins › Add › Add marketplace only registers the catalog; each plugin must then be added from the plugin browse list (Discover). After step 1 alone, nothing is installed. The `git-subdir` theory above was wrong. Whether §6's `plugin.json` copies were also needed is not known, since the two-step flow was not tried before §6. They stay, because Upload plugin requires the manifest anyway.
