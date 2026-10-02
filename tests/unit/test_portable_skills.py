@@ -182,15 +182,38 @@ def test_zip_is_a_plugin_upload(skill):
     assert not any(n.startswith(f"{skill.name}/bin/") for n in names)
 
 
+@pytest.mark.parametrize("skill", _SKILLS, ids=lambda p: p.name)
+def test_plugin_dir_matches_skill_plus_manifest(skill):
+    """plugins/<name>/ is what marketplaces install. claude.ai skips a plugin
+    without .claude-plugin/plugin.json, so it carries one; it must otherwise be
+    byte-identical to the skill folder."""
+    pkg = _packager()
+    expected = pkg.plugin_files(skill)
+    plugin_dir = _DIR / "plugins" / skill.name
+    actual = {
+        f.relative_to(plugin_dir).as_posix(): f.read_bytes().replace(b"\r\n", b"\n")
+        for f in plugin_dir.rglob("*")
+        if f.is_file()
+    }
+    assert actual == expected, (
+        "stale plugins/ copy; run: python3 portable-skills/package.py"
+    )
+    manifest = json.loads(actual[".claude-plugin/plugin.json"])
+    assert manifest["name"] == skill.name
+    assert manifest["version"] == _skill_version(skill)
+
+
 def test_marketplace_lists_every_portable_skill():
     """A stale marketplace entry installs nothing while `claude plugin validate`
-    still passes. With no plugin.json in the source folder, the entry is the
-    manifest, so its version must track SKILL.md."""
+    still passes. Entries point at the generated plugin folders, which carry
+    plugin.json (claude.ai's marketplace skips plugins without one)."""
     market = json.loads(
         (_ROOT / ".claude-plugin" / "marketplace.json").read_text(encoding="utf-8")
     )
     entries = {p["name"]: p for p in market["plugins"]}
     assert set(entries) == {s.name for s in _SKILLS}
     for skill in _SKILLS:
-        assert entries[skill.name]["source"] == f"./portable-skills/{skill.name}"
-        assert entries[skill.name]["version"] == _skill_version(skill)
+        assert (
+            entries[skill.name]["source"] == f"./portable-skills/plugins/{skill.name}"
+        )
+        assert "version" not in entries[skill.name], "plugin.json owns the version"
