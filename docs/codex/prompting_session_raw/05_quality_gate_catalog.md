@@ -241,7 +241,7 @@ PY
 | MCP/mode common | `uv run pytest tests/unit/test_content_structure.py -v` |
 | cross refs | `uv run pytest tests/unit/test_cross_references.py -v` |
 | context delivery | `uv run pytest tests/unit/test_content_usage.py tests/unit/test_context_loader.py -v` |
-| hooks | `uv run pytest tests/unit/test_hooks.py tests/unit/test_safety_hooks.py -v` |
+| hooks | `uv run pytest tests/unit/test_safety_hooks.py -v` |
 | runtime paths | `uv run pytest tests/unit/test_scope_paths.py -v` |
 | install | `uv run pytest tests/unit/test_cli_install.py tests/unit/test_install_settings.py -v` |
 | template | `uv run pytest tests/unit/test_init_docs_scaffold.py -v` |

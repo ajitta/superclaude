@@ -31,7 +31,7 @@ superclaude/
 │   ├── scripts/              # hook scripts, run in place as `superclaude hook <name>` — never copied to the install tree
 │   ├── templates/            # docs-scaffold/ etc., copied at init time
 │   ├── utils/                # path resolvers (project_root, claude_base, hook_state_dir)
-├── tests/{unit,integration,manual}/
+├── tests/{unit,integration}/
 ├── docs/                     # see "Docs layout" below
 ├── .claude/                  # dev-tree config: rules/, commands/, superclaude/
 ├── .serena/memories/         # committed cross-session context

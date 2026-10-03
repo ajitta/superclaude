@@ -5,6 +5,6 @@ itself — `make help` lists the targets, and they change more often than any co
 
 Two facts the Makefile does not state:
 
-- CI's lint gate is `ruff check src/ tests/` (both workflows). `make lint` runs `ruff check .`,
+- CI's lint gate is `ruff check src/ tests/` (test.yml). `make lint` runs `ruff check .`,
   a wider net — passing CI's command is the actual bar.
 - `make format` *writes* (`ruff format .`); CI only checks (`ruff format --check src/ tests/`).
