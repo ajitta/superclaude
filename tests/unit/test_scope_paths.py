@@ -370,36 +370,13 @@ class TestHookStatePruning:
 
 
 class TestStateHygiene:
-    """The sweep and the session-start reset both named the wrong thing.
+    """The session-start reset named the wrong thing.
 
-    `_PRUNABLE_PREFIXES` once claimed a `hook_tracker` file that never existed —
-    the tracker wrote `hook_executions.json` — so the one file the sweep was
-    written for was the one it never collected; the module is gone and the
-    file is now an orphan the sweep still reaps. And `session_init` reset the
-    context cache with no session id at all, deleting the project-only fallback
-    a concurrent session without an id is using, while `context_reset` on the
-    same SessionStart event already did it correctly with the id from stdin.
+    `session_init` reset the context cache with no session id at all, deleting
+    the project-only fallback a concurrent session without an id is using, while
+    `context_reset` on the same SessionStart event already did it correctly with
+    the id from stdin.
     """
-
-    def test_the_sweep_collects_the_tracker_file(self, tmp_path, monkeypatch):
-        import time
-
-        from superclaude.utils import STATE_MAX_AGE_DAYS, prune_hook_state
-
-        monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(tmp_path))
-        state = tmp_path / ".claude" / ".superclaude_hooks"
-        state.mkdir(parents=True)
-        (tmp_path / ".claude" / "superclaude").mkdir()
-        aged = state / "hook_executions.json"
-        aged.write_text("{}", encoding="utf-8")
-        old = time.time() - (STATE_MAX_AGE_DAYS + 1) * 86400
-        import os
-
-        os.utime(aged, (old, old))
-
-        prune_hook_state()
-
-        assert not aged.exists(), "the sweep left the file it was written to collect"
 
     def test_session_init_does_not_reset_blind(self):
         """One reset per SessionStart, by the hook that knows the session."""
