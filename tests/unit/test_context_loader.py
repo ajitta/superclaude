@@ -18,8 +18,8 @@ from superclaude.scripts.context_loader import (
     TIER_0_MAP,
     TRIGGER_MAP,
     VALID_FLAGS,
-    _extract_session_id,
     _get_injection_tier,
+    _parse_hook_input,
     format_skills_summary,
     resolve_flags,
 )
@@ -34,24 +34,25 @@ class FakeTokenEstimate:
     full_tokens: int
 
 
-class TestExtractSessionId:
-    """_extract_session_id pulls the CC session id from hook stdin JSON."""
+class TestParseHookInput:
+    """_parse_hook_input pulls the prompt and the CC session id from hook stdin."""
 
     def test_extracts_session_id(self):
         stdin = json.dumps({"session_id": "abc123", "prompt": "hello"})
-        assert _extract_session_id(stdin) == "abc123"
+        assert _parse_hook_input(stdin) == ("hello", "abc123")
 
     def test_missing_session_id_returns_none(self):
-        assert _extract_session_id(json.dumps({"prompt": "hello"})) is None
+        assert _parse_hook_input(json.dumps({"prompt": "hello"})) == ("hello", None)
 
     def test_invalid_json_returns_none(self):
-        assert _extract_session_id("not json") is None
+        assert _parse_hook_input("not json") == ("not json", None)
 
     def test_non_dict_json_returns_none(self):
-        assert _extract_session_id(json.dumps(["a", "b"])) is None
+        stdin = json.dumps(["a", "b"])
+        assert _parse_hook_input(stdin) == (stdin, None)
 
     def test_empty_session_id_returns_none(self):
-        assert _extract_session_id(json.dumps({"session_id": ""})) is None
+        assert _parse_hook_input(json.dumps({"session_id": ""}))[1] is None
 
 
 class TestFormatSkillsSummary:

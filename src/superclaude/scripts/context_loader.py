@@ -1103,36 +1103,31 @@ def _emit_prompt_command_reference(prompt: str) -> None:
     print()
 
 
-def _extract_prompt(stdin_data: str) -> str:
-    """Extract prompt from UserPromptSubmit JSON input, with raw text fallback."""
-    try:
-        data = json.loads(stdin_data)
-        return data.get("prompt", stdin_data)
-    except (json.JSONDecodeError, TypeError):
-        return stdin_data
+def _parse_hook_input(stdin_data: str) -> tuple[str, str | None]:
+    """Split hook stdin into (prompt, CC session_id or None).
 
-
-def _extract_session_id(stdin_data: str) -> str | None:
-    """Extract the CC session_id from hook stdin JSON (None if unavailable).
-
-    Keys mcp_fallback's once-per-session dedup to the real Claude Code
-    session, so hints re-arm each session instead of once per machine.
+    The prompt is the JSON "prompt" field, else the raw text (stdin that is not
+    a JSON object is itself the prompt). The session id keys mcp_fallback's
+    once-per-session dedup to the real Claude Code session, so hints re-arm each
+    session instead of once per machine.
     """
     try:
         data = json.loads(stdin_data)
     except (json.JSONDecodeError, TypeError):
-        return None
+        data = None
     if not isinstance(data, dict):
-        return None
+        return stdin_data, None
     session_id = data.get("session_id")
-    return session_id if isinstance(session_id, str) and session_id else None
+    return (
+        data.get("prompt", stdin_data),
+        session_id if isinstance(session_id, str) and session_id else None,
+    )
 
 
 def main() -> None:
     # Read and parse JSON input from Claude Code
     stdin_data = sys.stdin.read() if not sys.stdin.isatty() else ""
-    prompt = _extract_prompt(stdin_data)
-    session_id = _extract_session_id(stdin_data)
+    prompt, session_id = _parse_hook_input(stdin_data)
     # Pin the dedup cache before anything reads it — a concurrent session in the
     # same project must not consume the injections meant for this one.
     resolve_cache_file(session_id)
