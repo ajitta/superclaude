@@ -234,10 +234,7 @@ def main() -> None:
     if pr_status:
         print(pr_status)
 
-    # 3. Remind token budget
-    print("💡 Use /context to confirm token budget.")
-
-    # 4. What is actually installed
+    # 3. What is actually installed
     print(get_install_status())
 
 
