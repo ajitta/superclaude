@@ -104,7 +104,7 @@ def _safe_target_path(target: Path, base_path: Path) -> bool:
 
 
 def install_component(
-    component: str, base_path: Path = None, force: bool = False, scope: str = "user"
+    component: str, base_path: Path, force: bool = False, scope: str = "user"
 ) -> Tuple[int, int, int, List[str]]:
     """
     Install a single component.
@@ -117,9 +117,6 @@ def install_component(
     Returns:
         Tuple of (installed_count, skipped_count, failed_count, failed_names)
     """
-    if base_path is None:
-        base_path = Path.home() / ".claude"
-
     source_dir = _get_source_dir(component)
     target_dir = _get_target_dir(component, base_path)
 
@@ -212,9 +209,7 @@ def install_component(
     return installed, skipped, failed, failed_names
 
 
-def install_claude_sc_md(
-    base_path: Path = None, force: bool = False
-) -> Tuple[bool, str]:
+def install_claude_sc_md(base_path: Path, force: bool = False) -> Tuple[bool, str]:
     """
     Install CLAUDE_SC.md to ~/.claude/superclaude/
 
@@ -225,9 +220,6 @@ def install_claude_sc_md(
     Returns:
         Tuple of (success, message)
     """
-    if base_path is None:
-        base_path = Path.home() / ".claude"
-
     package_root = _get_package_root()
     source_file = package_root / "CLAUDE_SC.md"
     target_dir = base_path / "superclaude"
@@ -249,7 +241,7 @@ def install_claude_sc_md(
 
 
 def install_hooks(
-    base_path: Path = None, force: bool = False, scope: str = "user"
+    base_path: Path, force: bool = False, scope: str = "user"
 ) -> Tuple[int, int, int, List[str]]:
     """
     Install the hook registration.
@@ -268,16 +260,13 @@ def install_hooks(
     should name) no longer arises.
 
     Args:
-        base_path: Base installation path (default: ~/.claude)
+        base_path: Base installation path
         force: Replace this scope's SuperClaude hook registrations
         scope: Installation scope ("user", "project", or "local")
 
     Returns:
         Tuple of (installed_count, skipped_count, failed_count, messages)
     """
-    if base_path is None:
-        base_path = Path.home() / ".claude"
-
     package_root = _get_package_root()
     hooks_source = package_root / "hooks"
     hooks_target = base_path / "hooks"
@@ -439,22 +428,19 @@ def _legacy_scripts_notice(legacy_scripts: Path, settings_file: Path) -> str:
 
 
 def install_all(
-    base_path: Path = None, force: bool = False, scope: str = "user"
+    base_path: Path, force: bool = False, scope: str = "user"
 ) -> Tuple[bool, str]:
     """
     Install all SuperClaude components.
 
     Args:
-        base_path: Base installation path (default: ~/.claude)
+        base_path: Base installation path
         force: Force reinstall if components exist
         scope: Installation scope ("user", "project", or "target")
 
     Returns:
         Tuple of (success: bool, message: str)
     """
-    if base_path is None:
-        base_path = Path.home() / ".claude"
-
     messages = []
     total_installed = 0
     total_skipped = 0

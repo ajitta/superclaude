@@ -31,14 +31,6 @@ def _scope_was_default() -> bool:
     return source is not None and source.name == "DEFAULT"
 
 
-def _in_git_repo(start: Path) -> bool:
-    """Return True if start (or any parent) contains a .git directory/file."""
-    for p in [start, *start.parents]:
-        if (p / ".git").exists():
-            return True
-    return False
-
-
 def _stdin_can_answer() -> bool:
     """Whether an interactive prompt could actually be answered.
 
@@ -229,7 +221,9 @@ def install(
         return
 
     # Hint: suggest --scope local when defaulting to user inside a git repo
-    if _scope_was_default() and scope == "user" and _in_git_repo(Path.cwd()):
+    from .install_interactive import _has_git
+
+    if _scope_was_default() and scope == "user" and _has_git(Path.cwd()):
         click.echo(
             "💡 Installing at the default user scope → ~/.claude, which applies "
             "in every repository. Since this is a git repo, --scope local is the "

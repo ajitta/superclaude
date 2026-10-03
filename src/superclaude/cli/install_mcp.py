@@ -5,7 +5,6 @@ Installs and manages MCP servers using the latest Claude Code API.
 Based on the installer logic from commit d4a17fc but adapted for modern Claude Code.
 """
 
-import json
 import os
 import platform
 import shlex
@@ -14,6 +13,8 @@ from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
 import click
+
+from .install_settings import _load_settings
 
 # MCP Server Registry
 # Adapted from commit d4a17fc with modern transport configuration.
@@ -255,15 +256,6 @@ def check_prerequisites(
     return len(errors) == 0, errors
 
 
-def _read_json_safe(path: Path) -> dict:
-    """Read a JSON file, returning {} on any error (missing/invalid/unreadable)."""
-    try:
-        with open(path, "r", encoding="utf-8") as f:
-            return json.load(f)
-    except (FileNotFoundError, json.JSONDecodeError, OSError):
-        return {}
-
-
 def _scope_config_path(
     scope: str, project_root: Optional[Path] = None
 ) -> Tuple[Path, List[str]]:
@@ -290,7 +282,7 @@ def _mcp_servers_in_scope(
 ) -> Dict[str, dict]:
     """Return the mcpServers dict at the given scope (empty dict if none)."""
     path, keypath = _scope_config_path(scope, project_root)
-    data = _read_json_safe(path)
+    data = _load_settings(path)
     for key in keypath:
         if not isinstance(data, dict):
             return {}

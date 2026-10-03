@@ -83,20 +83,13 @@ class TestInstallCommands:
 
     def test_list_installed_commands(self, tmp_path):
         """Test listing installed commands"""
-        # Note: list_installed_commands checks ~/.claude/commands/sc by default
-        # We can't easily test this without mocking, so just verify it returns a list
-        installed = list_installed_commands()
-        assert isinstance(installed, list)
+        assert list_installed_commands(base_path=tmp_path) == []
 
-        # After install to temp dir
         install_all(base_path=tmp_path, force=False)
 
-        # Commands are in commands/sc/ subdirectory
-        commands_dir = tmp_path / "commands" / "sc"
-
-        # Verify files exist
-        command_files = list(commands_dir.glob("*.md"))
-        assert len(command_files) > 0
+        installed = list_installed_commands(base_path=tmp_path)
+        assert "research" in installed
+        assert installed == list_available_commands()
 
     def test_available_commands_format(self):
         """Test that available commands have expected format"""

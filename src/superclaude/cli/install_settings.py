@@ -535,9 +535,7 @@ def _claude_md_target(base_path: Path, scope: str) -> Tuple[Path, str]:
     return base_path / "CLAUDE.md", CLAUDE_SC_IMPORT
 
 
-def check_claude_md_import(
-    base_path: Path = None, scope: str = "user"
-) -> Tuple[bool, str]:
+def check_claude_md_import(base_path: Path, scope: str = "user") -> Tuple[bool, str]:
     """
     Check if CLAUDE.md (or CLAUDE.local.md for local scope) has the CLAUDE_SC.md import.
 
@@ -548,9 +546,6 @@ def check_claude_md_import(
     Returns:
         Tuple of (has_import: bool, status_message: str)
     """
-    if base_path is None:
-        base_path = Path.home() / ".claude"
-
     claude_md, import_line = _claude_md_target(base_path, scope)
     target_label = claude_md.name
 
@@ -579,7 +574,7 @@ def check_claude_md_import(
 
 
 def update_claude_md_import(
-    base_path: Path = None, force: bool = False, scope: str = "user"
+    base_path: Path, force: bool = False, scope: str = "user"
 ) -> Tuple[bool, str]:
     """
     Add CLAUDE_SC.md import to CLAUDE.md (or CLAUDE.local.md for local scope) if not present.
@@ -592,9 +587,6 @@ def update_claude_md_import(
     Returns:
         Tuple of (success: bool, message: str)
     """
-    if base_path is None:
-        base_path = Path.home() / ".claude"
-
     claude_md, import_line = _claude_md_target(base_path, scope)
     target_label = claude_md.name
 
