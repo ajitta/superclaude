@@ -25,21 +25,15 @@ import re
 import sys
 from pathlib import Path
 
+# v2.2.0: MCP fallback notification support
+from superclaude.hooks.mcp_fallback import MCP_FALLBACKS, check_mcp_and_notify
+
 # Scope-aware path resolution. Imported unconditionally: superclaude.utils is
 # stdlib-only, and hooks.json runs this script as `superclaude hook
 # context_loader`, i.e. under the console script's own interpreter, which has
 # the package. Silently degrading here would put state and content lookups in
 # the wrong scope.
 from superclaude.utils import claude_base, context_cache_file, project_root
-
-# v2.2.0: MCP fallback notification support
-try:
-    from superclaude.hooks.mcp_fallback import MCP_FALLBACKS, check_mcp_and_notify
-
-    MCP_FALLBACK_AVAILABLE = True
-except ImportError:
-    MCP_FALLBACK_AVAILABLE = False
-    MCP_FALLBACKS = {}
 
 # Configuration
 INJECT_MODE = os.environ.get("CLAUDE_CONTEXT_INJECT", "1").lower() in (
@@ -215,7 +209,7 @@ COMPOSITE_FLAGS = {
 
 # v3.1: Hybrid Injection Map
 # Only entries reachable by _get_injection_tier() belong here:
-#   - Behavioral MCPs (Serena, Tavily) → Tier 1 via _BEHAVIORAL_MCPS check
+#   - Behavioral MCPs (Serena, Tavily) → Tier 1 via their INSTRUCTION_MAP entry
 #   - Tool MCPs and core files use TIER_0_MAP (Tier 0) instead — do NOT duplicate here
 # Mode files → always Tier 2 (full .md injection)
 INSTRUCTION_MAP = {
@@ -253,9 +247,6 @@ TIER_0_MAP = {
     "mcp/MCP_Chrome-DevTools.md": "DevTools: CWV via perf trace, Lighthouse a11y/SEO, heap-snapshot diff. trace → analyze → optimize.",
     "core/BUSINESS_SYMBOLS.md": "Business symbols + expert selection. 🎯📈💰⚖️🏆🌊 domain mapping.",
 }
-
-# Behavioral MCPs that need Tier 1 (INSTRUCTION_MAP), not Tier 0
-_BEHAVIORAL_MCPS = {"mcp/MCP_Serena.md", "mcp/MCP_Tavily.md"}
 
 # Environment variable to control instruction mode (default: enabled)
 USE_INSTRUCTIONS = os.environ.get("CLAUDE_CONTEXT_USE_INSTRUCTIONS", "1") == "1"
@@ -353,12 +344,6 @@ def scannable_prompt(prompt: str) -> str:
 # valid curl option.
 RETIRED_FUZZY_CUTOFF = 0.8
 
-# Flag alias system — empty by design. All canonical flags live in VALID_FLAGS.
-# Typos are caught by the fuzzy-match fallback in resolve_flags (difflib ≥ 0.6).
-# Conceptual aliases (e.g., --parallel for --delegate) were removed to keep one
-# canonical name per concept; update command docs to use canonical flags directly.
-FLAG_ALIASES: dict[str, list[str]] = {}
-
 # All valid flags for fuzzy matching fallback
 VALID_FLAGS = {
     "brainstorm",
@@ -419,7 +404,7 @@ RETIRED_FLAGS: dict[str, str] = {
 
 
 def resolve_flags(prompt: str) -> tuple[str, list[str]]:
-    """Resolve flag aliases and typos in a prompt.
+    """Resolve flag typos in a prompt.
 
     Returns:
         Tuple of (corrected_prompt, list of notification messages)
@@ -443,16 +428,6 @@ def resolve_flags(prompt: str) -> tuple[str, list[str]]:
 
         # Skip CC-native triggers (e.g., ultrathink) — pass through silently
         if flag in CC_NATIVE_PASSTHROUGH:
-            continue
-
-        # Check alias table
-        if flag in FLAG_ALIASES:
-            replacements = FLAG_ALIASES[flag]
-            replacement_str = " ".join(f"--{r}" for r in replacements)
-            corrected = corrected.replace(f"--{match.group(1)}", replacement_str, 1)
-            notifications.append(
-                f"--{flag} → auto-corrected to {replacement_str} (alias)"
-            )
             continue
 
         # Retired flags, exact then fuzzy. Fuzzy matters as much as exact here:
@@ -670,9 +645,6 @@ def check_mcp_fallbacks(
     Returns:
         List of notification strings to display
     """
-    if not MCP_FALLBACK_AVAILABLE:
-        return []
-
     notifications = []
     for context_file, _ in contexts:
         # Extract MCP name from path like "mcp/MCP_Serena.md"
@@ -702,8 +674,6 @@ def _get_injection_tier(context_file: str, verbose: bool) -> int:
         return 2
     if context_file.startswith("modes/"):
         return 2  # Modes always need full behavioral content
-    if context_file in _BEHAVIORAL_MCPS:
-        return 1  # Serena, Tavily need operational instructions
     if context_file in TIER_0_MAP:
         return 0  # Tool MCPs get 1-line hints
     if context_file in INSTRUCTION_MAP:
@@ -891,7 +861,7 @@ def _emit_execution_directives(prompt: str, session_id: str | None = None) -> No
     # check_mcp_fallbacks() derives the server name from an "mcp/MCP_*.md" path, so
     # dropping Context7's doc also dropped its "connector not enabled" notice. The
     # flag carries it instead.
-    if MCP_FALLBACK_AVAILABLE and _C7_PATTERN.search(scannable):
+    if _C7_PATTERN.search(scannable):
         notification = check_mcp_and_notify("context7", session_id)
         if notification:
             print(f"<!-- {notification} -->")
@@ -1085,7 +1055,7 @@ def main() -> None:
     if not prompt or not prompt.strip():
         return
 
-    # v3.2: Resolve flag aliases and typos before processing
+    # v3.2: Resolve flag typos before processing
     prompt, flag_notifications = resolve_flags(prompt)
     if flag_notifications:
         for note in flag_notifications:

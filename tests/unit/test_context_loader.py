@@ -10,9 +10,7 @@ from pathlib import Path
 
 import superclaude
 from superclaude.scripts.context_loader import (
-    _BEHAVIORAL_MCPS,
     COMPOSITE_FLAGS,
-    FLAG_ALIASES,
     INSTRUCTION_MAP,
     TIER_0_MAP,
     TRIGGER_MAP,
@@ -46,12 +44,6 @@ class TestParseHookInput:
 
 class TestResolveFlags:
     """Test flag alias resolution and fuzzy matching."""
-
-    # --- Alias resolution ---
-
-    def test_flag_aliases_table_is_empty(self):
-        """FLAG_ALIASES intentionally empty — canonical flag names only."""
-        assert FLAG_ALIASES == {}
 
     def test_ultrathink_not_remapped(self):
         """ultrathink is a CC native deep-reasoning trigger, not an SC alias."""
@@ -126,23 +118,6 @@ class TestResolveFlags:
         assert "--Delegate" in prompt
         assert notes == []
 
-    # --- Data integrity ---
-
-    def test_all_alias_targets_are_valid(self):
-        """Every alias must resolve to a valid flag."""
-        for alias, targets in FLAG_ALIASES.items():
-            for target in targets:
-                assert target in VALID_FLAGS, (
-                    f"Alias --{alias} maps to --{target} which is not in VALID_FLAGS"
-                )
-
-    def test_no_alias_is_also_valid(self):
-        """No alias should shadow a valid flag."""
-        for alias in FLAG_ALIASES:
-            assert alias not in VALID_FLAGS, (
-                f"--{alias} is in both FLAG_ALIASES and VALID_FLAGS"
-            )
-
 
 class TestTieredInjection:
     """Test 3-tier context injection system."""
@@ -189,8 +164,7 @@ class TestTieredInjection:
         """TIER_0_MAP and INSTRUCTION_MAP may share keys but should not
         both be applied — tier logic selects one or the other."""
         # Behavioral MCPs should be in INSTRUCTION_MAP but NOT in TIER_0_MAP
-        for mcp in _BEHAVIORAL_MCPS:
-            assert mcp in INSTRUCTION_MAP, f"{mcp} missing from INSTRUCTION_MAP"
+        for mcp in INSTRUCTION_MAP:
             assert mcp not in TIER_0_MAP, f"{mcp} should NOT be in TIER_0_MAP"
 
     def test_all_tier_0_entries_are_concise(self):
@@ -636,7 +610,7 @@ class TestContext7HasNoDocOnlyAFlag:
 
         monkeypatch.setattr(cl, "get_loaded_contexts", lambda: set())
         monkeypatch.setattr(cl, "mark_as_loaded", lambda _marks: None)
-        monkeypatch.setattr(cl, "MCP_FALLBACK_AVAILABLE", False)
+        monkeypatch.setattr(cl, "check_mcp_and_notify", lambda *a, **k: None)
         cl._emit_execution_directives(prompt)
         return capsys.readouterr().out
 
