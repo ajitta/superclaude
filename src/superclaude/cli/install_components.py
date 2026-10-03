@@ -492,17 +492,14 @@ def install_all(
                 messages.append(f"   - {name}")
 
     # Install the hook registration
-    hooks_installed, hooks_skipped, hooks_failed, hooks_messages = install_hooks(
+    hooks_installed, _, hooks_failed, hooks_messages = install_hooks(
         base_path, force, scope
     )
     total_installed += hooks_installed
-    total_skipped += hooks_skipped
     total_failed += hooks_failed
 
     if hooks_installed > 0:
         messages.append(f"✅ Hook registration: {hooks_installed} installed")
-    if hooks_skipped > 0:
-        messages.append(f"⏭️  Hook registration: {hooks_skipped} skipped")
     if hooks_failed > 0:
         messages.append(f"❌ Hook registration: {hooks_failed} failed")
     for msg in hooks_messages:
@@ -520,9 +517,7 @@ def install_all(
     if has_import:
         messages.append(f"✅ {check_msg}")
     else:
-        update_success, update_msg = update_claude_md_import(
-            base_path, force=False, scope=scope
-        )
+        update_success, update_msg = update_claude_md_import(base_path, scope=scope)
         if update_success:
             messages.append(f"✅ {update_msg}")
         else:

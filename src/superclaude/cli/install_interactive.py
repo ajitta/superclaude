@@ -11,7 +11,6 @@ from __future__ import annotations
 
 import subprocess
 from pathlib import Path
-from typing import Tuple
 
 import click
 
@@ -45,15 +44,12 @@ def _prompt_scope() -> str:
     return SCOPES[choice - 1][0]
 
 
-def _maybe_git_init(scope: str, project_root: Path) -> Tuple[bool, str]:
-    """Offer `git init` when scope needs git but none is present.
-
-    Returns (proceed, note) where proceed=False means user aborted.
-    """
+def _maybe_git_init(scope: str, project_root: Path) -> None:
+    """Offer `git init` when scope needs git but none is present."""
     if scope not in ("project", "local"):
-        return True, ""
+        return
     if _has_git(project_root):
-        return True, ""
+        return
 
     click.echo()
     click.echo(f"Step 2/5: Git check — no .git found at {project_root}")
@@ -81,16 +77,12 @@ def _maybe_git_init(scope: str, project_root: Path) -> Tuple[bool, str]:
                 text=True,
             )
             click.echo(f"  ✅ git init complete at {project_root}")
-            return True, "git initialized"
         except FileNotFoundError:
             click.echo("  ⚠️  git not found in PATH — skipping init.")
-            return True, "git not available"
         except subprocess.CalledProcessError as e:
             click.echo(f"  ⚠️  git init failed: {e.stderr.strip() or e}")
-            return True, "git init failed"
     else:
         click.echo("  Skipped git init. Continuing.")
-        return True, "git init skipped"
 
 
 def _show_preview(base_path: Path, scope: str, force: bool) -> None:
@@ -119,10 +111,7 @@ def run_interactive_install() -> int:
     base_path = get_base_path(scope)
     project_root = base_path.parent if scope in ("project", "local") else Path.cwd()
 
-    proceed, _note = _maybe_git_init(scope, project_root)
-    if not proceed:
-        click.echo("Aborted.")
-        return 1
+    _maybe_git_init(scope, project_root)
 
     click.echo()
     click.echo("Step 3/5: Force reinstall existing files?")

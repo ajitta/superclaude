@@ -546,15 +546,12 @@ def check_claude_md_import(base_path: Path, scope: str = "user") -> Tuple[bool, 
     return False, f"{target_label} does not import CLAUDE_SC.md"
 
 
-def update_claude_md_import(
-    base_path: Path, force: bool = False, scope: str = "user"
-) -> Tuple[bool, str]:
+def update_claude_md_import(base_path: Path, scope: str = "user") -> Tuple[bool, str]:
     """
     Add CLAUDE_SC.md import to CLAUDE.md (or CLAUDE.local.md for local scope) if not present.
 
     Args:
         base_path: Base installation path
-        force: Force update even if import exists
         scope: Installation scope
 
     Returns:
@@ -566,18 +563,12 @@ def update_claude_md_import(
     # Check if already has import
     has_import, status = check_claude_md_import(base_path, scope)
 
-    if has_import and not force:
+    if has_import:
         return True, status
 
     # Create or update CLAUDE.md / CLAUDE.local.md
     if claude_md.exists():
         content = claude_md.read_text(encoding="utf-8")
-
-        # If force, replace any existing superclaude imports
-        if force:
-            content = re.sub(r"@\.claude/superclaude/[^\n]+\n?", "", content)
-            content = re.sub(r"@superclaude/[^\n]+\n?", "", content)
-            content = re.sub(r"@superclaude\\[^\n]+\n?", "", content)
 
         if import_line not in content:
             if not content.endswith("\n"):
