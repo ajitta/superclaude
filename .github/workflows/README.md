@@ -24,10 +24,6 @@ This directory contains CI/CD workflows for SuperClaude Framework.
 **Triggers**: Manual or release tags
 **Purpose**: Publish package to PyPI
 
-### 3. **readme-quality-check.yml** (Existing)
-**Triggers**: Push/PR affecting README files
-**Purpose**: Validate README quality and consistency
-
 ## Local Testing
 
 Before pushing, run these commands locally:
