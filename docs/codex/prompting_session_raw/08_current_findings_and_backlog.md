@@ -36,7 +36,7 @@ mypy 오류)는 이 문서가 소유한다. 값은 재측정 명령과 마지막
 | F-013 | P2 | REVISE | testing 문서와 실제 UV/pytest 구성이 drift |
 | F-014 | P2 | REVISE | coverage/mypy가 선언적 기대와 실행 가능한 gate로 정렬되지 않음 |
 | F-015 | P1 | CLOSED | `okf/` 삭제로 폐기 — §해결된 finding 참조 |
-| F-016 | P1 | FAIL | plugin build 경로의 입력 manifest/source가 없어 실행 불가 |
+| F-016 | P1 | CLOSED | plugin build 경로 삭제로 폐기 — §해결된 finding 참조 |
 
 ## F-001 — 배포 artifact에서 skills 누락
 
@@ -299,23 +299,6 @@ uv run mypy src/superclaude/cli src/superclaude/utils src/superclaude/hooks
 먼저 측정 범위와 baseline을 정하고, 변경 파일 또는 위험 모듈부터 점진 gate를
 도입한다.
 
-## F-016 — plugin build 경로 실행 불가
-
-**등급:** `[REPO]` · P1 · DIST/TOOL
-
-`Makefile:121-139`는 `make build-plugin`과 `sync-plugin-repo`를 지원 경로로
-노출한다. 하지만 `scripts/build_superclaude_plugin.py:16-22`가 요구하는
-`plugins/superclaude/manifest/metadata.json`과 template/source payload가 tracked
-repository에 없어 현재 `make build-plugin`은 exit 2다.
-
-완료 gate:
-
-- plugin 경로를 유지할지 폐기할지 명시
-- 유지한다면 unified `src/superclaude`와 plugin input의 SSOT 관계 확정
-- clean build에서 manifest schema와 agents/commands/hooks/scripts/skills payload 검사
-- build failure가 sync/release를 nonzero로 차단
-- source와 plugin artifact의 version·inventory parity
-
 ## 해결된 finding
 
 여기 있는 항목은 실제 코드로 수정됐다. 재발 여부를 추적할 수 있도록 수정 커밋과 현재
@@ -366,6 +349,17 @@ repo에 없었고 손으로 유지됐다. 유지하지 않기로 하고 `okf/`�
 다섯 component README의 포인터를 삭제했다. 다시 만든다면 generator와 재생성 명령을 SSOT로
 먼저 지정해야 한다.
 
+### F-016 — plugin build 경로 실행 불가 (폐기됨)
+
+**등급:** `[REPO]` · P1 · DIST/TOOL · 폐기 결정 over-engineering-audit D02
+
+원래 판정은 `make build-plugin`이 입력인 `plugins/superclaude/manifest/metadata.json`과
+source payload 없이 exit 2로 끝난다는 것이었다. `plugins/superclaude/`는 b8cd144에서
+삭제됐고 입력을 되살릴 계획이 없어, `build-plugin`, `sync-plugin-repo`, `PLUGIN_*` 변수,
+`scripts/build_superclaude_plugin.py`와 (같이 죽은) `make translate`를 삭제했다.
+pytest plugin을 확인하는 `make test-plugin`은 그대로다. repo root `.claude-plugin/` 계획
+(runtime-behavior-audit Task 13)은 별개 경로라 영향이 없다.
+
 ## 권장 실행 순서
 
 ```text
@@ -375,9 +369,8 @@ repo에 없었고 손으로 유지됐다. 유지하지 않기로 하고 `okf/`�
 4. F-005 machine-readable authoring schema
 5. F-006/F-009 release gate baseline 정렬
 6. F-007 semantic graph validator
-7. F-016 plugin 파생 전달 경로 복구 또는 폐기 (F-015 OKF는 폐기)
-8. F-010 automation correctness gates
-9. F-011 CLI functional gate (F-012는 publish 경로 삭제로 폐기)
-10. F-008 behavioral registry budget 측정
-11. F-013/F-014 문서·점진 품질 게이트 정리
+7. F-010 automation correctness gates
+8. F-011 CLI functional gate (F-012는 publish 경로 삭제로 폐기)
+9. F-008 behavioral registry budget 측정
+10. F-013/F-014 문서·점진 품질 게이트 정리
 ```

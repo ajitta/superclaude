@@ -156,7 +156,7 @@ soft 개선은 hard gate가 모두 통과한 뒤에만 비교한다.
 | citation | planted code defects | multi-file citation |
 | trigger | 일부 skill canary | agent/command/mode positive+negative |
 | long horizon | 제한적 | compaction strength, resume safety |
-| distribution | 없음 | wheel-installed invocation, plugin parity |
+| distribution | 없음 | wheel-installed invocation |
 | escalation | 없음 | 실제 high-impact missing decision |
 
 추가 우선순위는 현재 실패 비용과 coverage 공백을 기준으로 정한다.

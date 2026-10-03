@@ -79,7 +79,6 @@ mode/MCP/core module ↔ loader tier
 component ↔ installer target
 hook config ↔ script
 skill ↔ supporting files
-source payload ↔ plugin manifest/artifact
 ```
 
 현재 graph 검사는 모든 edge를 다루지 않는다. skills/MCP handoff, agent의 문장형
@@ -150,8 +149,7 @@ Hard gate:
 - wheel-installed CLI로 component 설치가 성공한다.
 - placeholder가 설치본에 남지 않는다.
 - 핵심 활성화 실패가 process nonzero로 전파된다.
-- plugin처럼 선언된 파생 경로는 tracked inventory와 clean build가
-  source taxonomy와 일치하거나, 지원 중단이 명시된다.
+- 선언된 파생 전달 경로는 없다 (`okf/`와 plugin build는 폐기됨).
 
 현재 `skills/` 누락으로 이 gate는 실패한다. `F-001` 참조.
 
@@ -250,7 +248,6 @@ PY
 | drift | `uv run pytest tests/unit/test_verify_drift.py -v` |
 | eval schema | `uv run pytest tests/unit/test_eval_harness.py -v` |
 | package metadata | `uv run pytest tests/unit/test_version_consistency.py -v` |
-| plugin delivery | `make build-plugin` clean artifact check |
 
 ## 5. Gate evidence schema
 

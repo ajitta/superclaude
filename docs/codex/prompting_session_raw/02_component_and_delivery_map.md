@@ -55,9 +55,6 @@ Tool lifecycle
 Installation
   └─ cli/install_*                                 source → user/project/local scope
 
-Derived delivery
-  └─ scripts/build_superclaude_plugin.py           separate plugin artifact path
-
 Evaluation
   ├─ tests/                                        schema, unit, integration
   └─ evals/                                        behavior and regression
@@ -181,15 +178,6 @@ Evaluation
   채택, observation schema drift.
 - 검증 초점: 별도 격리 테스트 프로세스, dry-run/smoke, worktree unchanged,
   regression block, 결과 schema.
-
-### plugin artifact
-
-- `make build-plugin`/`sync-plugin-repo`: PyPI와 별개인 plugin artifact 경로.
-  입력 SSOT, manifest, source payload parity가 명시돼야 한다.
-- 위험: source는 갱신됐지만 plugin은 stale/missing, build 명령만 존재하고 입력
-  manifest는 없음.
-- 검증 초점: clean plugin build, manifest schema, payload parity, sync 전 nonzero
-  propagation.
 
 ## 4. 변경 파급도
 

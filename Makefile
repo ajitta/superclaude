@@ -1,4 +1,4 @@
-.PHONY: install deploy sync-user sync-project sync-local uninstall-user uninstall-project uninstall-local test test-scripts test-plugin doctor verify verify-drift clean lint format build-plugin sync-plugin-repo uninstall-legacy help
+.PHONY: install deploy sync-user sync-project sync-local uninstall-user uninstall-project uninstall-local test test-scripts test-plugin doctor verify verify-drift clean lint format uninstall-legacy help
 
 # Installation (local source, editable) - RECOMMENDED
 install:
@@ -110,49 +110,6 @@ clean:
 	find . -type d -name .pytest_cache -exec rm -rf {} +
 	find . -type d -name .ruff_cache -exec rm -rf {} +
 
-PLUGIN_DIST := dist/plugins/superclaude
-PLUGIN_REPO ?= ../SuperClaude_Plugin
-
-.PHONY: build-plugin
-build-plugin: ## Build SuperClaude plugin artefacts into dist/
-	@echo "🛠️  Building SuperClaude plugin from unified sources..."
-	@uv run python scripts/build_superclaude_plugin.py
-
-.PHONY: sync-plugin-repo
-sync-plugin-repo: build-plugin ## Sync built plugin artefacts into ../SuperClaude_Plugin
-	@if [ ! -d "$(PLUGIN_REPO)" ]; then \
-		echo "❌ Target plugin repository not found at $(PLUGIN_REPO)"; \
-		echo "   Set PLUGIN_REPO=/path/to/SuperClaude_Plugin when running make."; \
-		exit 1; \
-	fi
-	@echo "📦 Syncing artefacts to $(PLUGIN_REPO)..."
-	@rsync -a --delete $(PLUGIN_DIST)/agents/ $(PLUGIN_REPO)/agents/
-	@rsync -a --delete $(PLUGIN_DIST)/commands/ $(PLUGIN_REPO)/commands/
-	@rsync -a --delete $(PLUGIN_DIST)/hooks/ $(PLUGIN_REPO)/hooks/
-	@rsync -a --delete $(PLUGIN_DIST)/scripts/ $(PLUGIN_REPO)/scripts/
-	@rsync -a --delete $(PLUGIN_DIST)/skills/ $(PLUGIN_REPO)/skills/
-	@rsync -a --delete $(PLUGIN_DIST)/.claude-plugin/ $(PLUGIN_REPO)/.claude-plugin/
-	@echo "✅ Sync complete."
-
-# Translate README to multiple languages using Neural CLI
-translate:
-	@echo "🌐 Translating README using Neural CLI (Ollama + qwen2.5:3b)..."
-	@if [ ! -f ~/.local/bin/neural-cli ]; then \
-		echo "📦 Installing neural-cli..."; \
-		mkdir -p ~/.local/bin; \
-		ln -sf ~/github/neural/src-tauri/target/release/neural-cli ~/.local/bin/neural-cli; \
-		echo "✅ neural-cli installed to ~/.local/bin/"; \
-	fi
-	@echo ""
-	@echo "🇨🇳 Translating to Simplified Chinese..."
-	@~/.local/bin/neural-cli translate README.md --from English --to "Simplified Chinese" --output README-zh.md
-	@echo ""
-	@echo "🇯🇵 Translating to Japanese..."
-	@~/.local/bin/neural-cli translate README.md --from English --to Japanese --output README-ja.md
-	@echo ""
-	@echo "✅ Translation complete!"
-	@echo "📝 Files updated: README-zh.md, README-ja.md"
-
 # Show help
 help:
 	@echo "SuperClaude Framework - Available commands:"
@@ -171,13 +128,6 @@ help:
 	@echo "  make lint            - Run linter (ruff check)"
 	@echo "  make format          - Format code (ruff format)"
 	@echo "  make clean           - Clean build artifacts"
-	@echo ""
-	@echo "🔌 Plugin Packaging:"
-	@echo "  make build-plugin    - Build SuperClaude plugin artefacts into dist/"
-	@echo "  make sync-plugin-repo - Sync artefacts into ../SuperClaude_Plugin"
-	@echo ""
-	@echo "📚 Documentation:"
-	@echo "  make translate       - Translate README to Chinese and Japanese"
 	@echo ""
 	@echo "🧹 Cleanup:"
 	@echo "  make uninstall-user    - Uninstall from user scope (~/.claude/)"

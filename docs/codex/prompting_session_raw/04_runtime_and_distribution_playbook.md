@@ -171,14 +171,7 @@ editable source나 현재 project dependency가 검사를 오염할 수 있다. 
 
 PyPI wheel/sdist만 검사해 distribution parity를 완료로 판정하지 않는다.
 
-| 경로 | 입력 계약 | 필수 gate |
-|---|---|---|
-| `make build-plugin` | 선언된 plugin source/manifest + unified source payload | clean build, manifest schema, agents/commands/hooks/scripts/skills inventory |
-| `make sync-plugin-repo` | 검증된 plugin artifact | build 성공 선행, target 확인, sync 후 exact parity |
-
-현재 plugin builder가 요구하는 `plugins/superclaude/manifest/metadata.json`이 없어
-`make build-plugin`이 실패한다. 별도 current finding이며, 경로를 유지할지 폐기할지
-결정하기 전에는 release gate에서 조용히 제외하지 않는다.
+`okf/`와 plugin build 경로는 폐기했다 (`docs/features/over-engineering-audit` 참조).
 
 ## 8. Drift와 audit의 의미
 
