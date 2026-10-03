@@ -557,50 +557,6 @@ def list_available_servers():
     click.echo(f"Total: {len(MCP_SERVERS)} servers available")
 
 
-def show_mcp_status():
-    """Show MCP server status with fallback info."""
-    # Import fallback mappings
-    fallbacks = {}
-    try:
-        from superclaude.hooks.mcp_fallback import MCP_FALLBACKS
-
-        fallbacks = MCP_FALLBACKS
-    except ImportError:
-        pass
-
-    click.echo("📊 MCP Server Status\n")
-    click.echo("┌─────────────────────┬──────────┬─────────────────────┐")
-    click.echo("│ Server              │ Status   │ Fallback            │")
-    click.echo("├─────────────────────┼──────────┼─────────────────────┤")
-
-    installed_count = 0
-    for server_info in MCP_SERVERS.values():
-        name = server_info["name"]
-        if server_info.get("method") == "plugin":
-            is_installed = check_plugin_installed(server_info.get("plugin_id", name))
-        else:
-            is_installed = check_mcp_server_installed(name)
-
-        if is_installed:
-            status = "✅ Active"
-            installed_count += 1
-        else:
-            status = "⬜ —"
-
-        # Get fallback from mapping
-        fallback_key = name.lower().replace("-", "")
-        fallback = fallbacks.get(fallback_key, "Native")
-
-        click.echo(f"│ {name:19} │ {status:8} │ {fallback:19} │")
-
-    click.echo("└─────────────────────┴──────────┴─────────────────────┘")
-    click.echo(f"\n📈 {installed_count}/{len(MCP_SERVERS)} servers active")
-
-    if installed_count < len(MCP_SERVERS):
-        click.echo("\n💡 Install with: superclaude mcp --servers <name>")
-        click.echo("   Or run `superclaude mcp` and choose 0 for all core servers")
-
-
 def install_mcp_servers(
     selected_servers: Optional[List[str]] = None,
     scope: str = "user",
