@@ -1,7 +1,7 @@
 """
 Unit tests for session_init script.
 
-Tests session initialization, git status formatting and PR status checking.
+Tests session initialization and PR status checking.
 """
 
 import json
@@ -13,7 +13,6 @@ from unittest.mock import patch
 import pytest
 
 from superclaude.scripts.session_init import (
-    get_git_status,
     get_pr_status,
     main,
 )
@@ -30,93 +29,6 @@ class FakeCompletedProcess:
     returncode: int
     stdout: str = ""
     stderr: str = ""
-
-
-# ---------------------------------------------------------------------------
-# TestGetGitStatus
-# ---------------------------------------------------------------------------
-
-
-class TestGetGitStatus:
-    """Test get_git_status formatting for various repository states."""
-
-    def test_clean_repo(self):
-        """Clean repository returns 'Git: clean' message."""
-        fake = FakeCompletedProcess(returncode=0, stdout="")
-        with patch(
-            "superclaude.scripts.session_init.subprocess.run", return_value=fake
-        ):
-            result = get_git_status()
-
-        assert result == "\U0001f4ca Git: clean"
-
-    def test_dirty_repo_single_file(self):
-        """Single modified file reports '1 files'."""
-        fake = FakeCompletedProcess(returncode=0, stdout=" M src/main.py\n")
-        with patch(
-            "superclaude.scripts.session_init.subprocess.run", return_value=fake
-        ):
-            result = get_git_status()
-
-        assert result == "\U0001f4ca Git: 1 files"
-
-    def test_dirty_repo_multiple_files(self):
-        """Multiple modified files reports correct count."""
-        porcelain = " M src/main.py\n?? new_file.txt\nA  added.py\n"
-        fake = FakeCompletedProcess(returncode=0, stdout=porcelain)
-        with patch(
-            "superclaude.scripts.session_init.subprocess.run", return_value=fake
-        ):
-            result = get_git_status()
-
-        assert result == "\U0001f4ca Git: 3 files"
-
-    def test_not_a_repo(self):
-        """Non-zero return code yields 'not a repo'."""
-        fake = FakeCompletedProcess(
-            returncode=128, stdout="", stderr="fatal: not a git repo"
-        )
-        with patch(
-            "superclaude.scripts.session_init.subprocess.run", return_value=fake
-        ):
-            result = get_git_status()
-
-        assert result == "\U0001f4ca Git: not a repo"
-
-    def test_timeout_returns_not_a_repo(self):
-        """Subprocess timeout is handled gracefully."""
-        with patch(
-            "superclaude.scripts.session_init.subprocess.run",
-            side_effect=subprocess.TimeoutExpired(cmd="git", timeout=5),
-        ):
-            result = get_git_status()
-
-        assert result == "\U0001f4ca Git: not a repo"
-
-    def test_oserror_returns_not_a_repo(self):
-        """OSError (git not installed) is handled gracefully."""
-        with patch(
-            "superclaude.scripts.session_init.subprocess.run",
-            side_effect=OSError("git not found"),
-        ):
-            result = get_git_status()
-
-        assert result == "\U0001f4ca Git: not a repo"
-
-    def test_subprocess_called_with_correct_args(self):
-        """Verifies subprocess.run is called with --porcelain and timeout."""
-        fake = FakeCompletedProcess(returncode=0, stdout="")
-        with patch(
-            "superclaude.scripts.session_init.subprocess.run", return_value=fake
-        ) as mock_run:
-            get_git_status()
-
-        mock_run.assert_called_once_with(
-            ["git", "status", "--porcelain"],
-            capture_output=True,
-            text=True,
-            timeout=5,
-        )
 
 
 # ---------------------------------------------------------------------------
@@ -291,27 +203,9 @@ class TestGetPrStatus:
 class TestMain:
     """Test main() orchestration and output."""
 
-    def test_main_prints_git_status(self, capsys):
-        """main() includes git status in output."""
-        with (
-            patch(
-                "superclaude.scripts.session_init.get_git_status",
-                return_value="\U0001f4ca Git: clean",
-            ),
-            patch("superclaude.scripts.session_init.get_pr_status", return_value=""),
-        ):
-            main()
-
-        out = capsys.readouterr().out
-        assert "Git: clean" in out
-
     def test_main_prints_pr_status_when_present(self, capsys):
         """main() includes PR status when non-empty."""
         with (
-            patch(
-                "superclaude.scripts.session_init.get_git_status",
-                return_value="\U0001f4ca Git: clean",
-            ),
             patch(
                 "superclaude.scripts.session_init.get_pr_status",
                 return_value="\U0001f7e2 PR: approved (url)",
@@ -325,10 +219,6 @@ class TestMain:
     def test_main_omits_pr_status_when_empty(self, capsys):
         """main() does not print PR line when get_pr_status returns empty."""
         with (
-            patch(
-                "superclaude.scripts.session_init.get_git_status",
-                return_value="\U0001f4ca Git: clean",
-            ),
             patch("superclaude.scripts.session_init.get_pr_status", return_value=""),
         ):
             main()
@@ -343,10 +233,6 @@ class TestMain:
         whether or not anything they named was installed.
         """
         with (
-            patch(
-                "superclaude.scripts.session_init.get_git_status",
-                return_value="\U0001f4ca Git: clean",
-            ),
             patch("superclaude.scripts.session_init.get_pr_status", return_value=""),
         ):
             main()

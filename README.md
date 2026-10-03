@@ -430,7 +430,7 @@ superclaude mcp
 - `install_settings.py` preserves user hooks via marker-based identification and rewrites a previous release's `<python> …/<script>.py` registrations to `superclaude hook <name>`
 - `superclaude doctor` checks that the `superclaude` on PATH has the `hook` subcommand — the package whose hooks actually run
 - `test_runner_hook` runs `uv run python -m pytest` (avoids the Windows uv canonicalize bug)
-- SessionStart: git status + memory staleness warning
+- SessionStart: install-status line, PR-review status and memory staleness warning
 - PreCompact / SessionEnd: insight harvest
 - Hooks are additive — your existing config survives reinstall
 

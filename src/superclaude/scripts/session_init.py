@@ -56,26 +56,6 @@ def get_install_status() -> str:
     return f"🛠️ SuperClaude: {commands} commands, {agents} {agent_word} ({scope} scope)"
 
 
-def get_git_status() -> str:
-    """Check git status and return formatted string."""
-    try:
-        result = subprocess.run(
-            ["git", "status", "--porcelain"],
-            capture_output=True,
-            text=True,
-            timeout=5,
-        )
-        if result.returncode == 0:
-            status = result.stdout.strip()
-            if not status:
-                return "📊 Git: clean"
-            count = len([line for line in status.split("\n") if line])
-            return f"📊 Git: {count} files"
-        return "📊 Git: not a repo"
-    except (subprocess.TimeoutExpired, subprocess.CalledProcessError, OSError):
-        return "📊 Git: not a repo"
-
-
 PR_STATUS_TTL_SECONDS = 600
 
 
@@ -226,15 +206,12 @@ def main() -> None:
     # from here passed no id, so it deleted the project-only fallback cache that
     # a concurrent session without an id is using.
 
-    # 1. Check git status
-    print(get_git_status())
-
-    # 2. Check PR status (Claude Code 2.1.20+)
+    # 1. Check PR status (Claude Code 2.1.20+)
     pr_status = get_pr_status()
     if pr_status:
         print(pr_status)
 
-    # 3. What is actually installed
+    # 2. What is actually installed
     print(get_install_status())
 
 

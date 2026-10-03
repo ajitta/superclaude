@@ -5,7 +5,7 @@
         "matcher": "startup",
         "hooks": [
           {
-            "_comment": "[superclaude] session bootstrap — PR-review status line",
+            "_comment": "[superclaude] session bootstrap — PR-review status line, install-status line",
             "type": "command",
             "command": "superclaude hook session_init",
             "timeout": 10,
