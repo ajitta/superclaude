@@ -15,7 +15,7 @@ from pathlib import Path
 from typing import Any, Dict
 
 from superclaude import __version__
-from superclaude.utils import settings_filename
+from superclaude.utils import is_superclaude_hook, settings_filename
 
 from .install_paths import probe_console_script, resolve_reporting_target
 
@@ -233,8 +233,6 @@ def _check_hooks_installed(base_path: Path, scope: str) -> Dict[str, Any]:
     Returns:
         Check result dict
     """
-    from .install_settings import _is_superclaude_hook
-
     filename = settings_filename(scope)
     settings_file = base_path / filename
     label = f"Hooks in {filename}"
@@ -261,7 +259,7 @@ def _check_hooks_installed(base_path: Path, scope: str) -> Dict[str, Any]:
         event
         for event in expected
         if not any(
-            _is_superclaude_hook(entry)
+            is_superclaude_hook(entry)
             for entry in hooks.get(event, [])
             if isinstance(entry, dict)
         )

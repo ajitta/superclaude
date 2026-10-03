@@ -11,7 +11,11 @@ from pathlib import Path
 from typing import List, Tuple
 
 from superclaude import __version__
-from superclaude.utils import is_legacy_hook_command, settings_filename
+from superclaude.utils import (
+    is_legacy_hook_command,
+    is_superclaude_hook,
+    settings_filename,
+)
 
 from .install_git_exclude import add_git_exclude, find_team_ignores
 from .install_paths import (
@@ -24,7 +28,6 @@ from .install_paths import (
 )
 from .install_settings import (
     CLAUDE_SC_IMPORT,
-    _is_superclaude_hook,
     _load_settings,
     _split_entry,
     check_claude_md_import,
@@ -389,7 +392,7 @@ def _registered_sc_commands(settings_file: Path) -> List[str]:
         for array in hooks.values()
         if isinstance(array, list)
         for entry in array
-        if isinstance(entry, dict) and _is_superclaude_hook(entry)
+        if isinstance(entry, dict) and is_superclaude_hook(entry)
         for hook in _split_entry(entry)[0]
     ]
 

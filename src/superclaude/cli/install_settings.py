@@ -18,6 +18,7 @@ from superclaude.utils import (
     atomic_write_json,
     is_legacy_hook_command,
     is_superclaude_hook,
+    is_superclaude_inner_hook,
     settings_filename,
 )
 
@@ -144,34 +145,6 @@ def _dedup_hook_array(hooks: List[dict]) -> List[dict]:
     return deduped
 
 
-def _is_superclaude_hook(hook_entry: dict) -> bool:
-    """Whether a settings hook entry belongs to SuperClaude.
-
-    Thin alias: the predicate and its markers live in ``superclaude.utils`` so
-    scope detection can apply the same judgement without importing the cli
-    package. Kept as a name because this module's readers look for it here.
-    """
-    return is_superclaude_hook(hook_entry)
-
-
-def _is_superclaude_inner_hook(hook: dict) -> bool:
-    """Whether one inner hook is SuperClaude's, judged on its own command.
-
-    The unit that matters for ownership. A settings entry carries one matcher
-    and a list of inner hooks, so a user's own command can sit beside a
-    SuperClaude one; judging the whole entry deleted the user's command along
-    with ours on `--force` and on uninstall.
-    """
-    cmd = hook.get("command", "")
-    if any(marker in cmd for marker in SUPERCLAUDE_HOOK_MARKERS):
-        return True
-    if CONSOLE_HOOK_RE.search(cmd) or is_legacy_hook_command(cmd):
-        return True
-    return any(
-        marker in hook.get("_comment", "") for marker in SUPERCLAUDE_HOOK_MARKERS
-    )
-
-
 def _split_entry(hook_entry: dict) -> Tuple[List[dict], List[dict]]:
     """Split one entry's inner hooks into (SuperClaude's, the user's).
 
@@ -183,8 +156,8 @@ def _split_entry(hook_entry: dict) -> Tuple[List[dict], List[dict]]:
     if any(marker in comment for marker in SUPERCLAUDE_HOOK_MARKERS):
         return list(inner), []
 
-    sc_hooks = [h for h in inner if _is_superclaude_inner_hook(h)]
-    user_hooks = [h for h in inner if not _is_superclaude_inner_hook(h)]
+    sc_hooks = [h for h in inner if is_superclaude_inner_hook(h)]
+    user_hooks = [h for h in inner if not is_superclaude_inner_hook(h)]
     return sc_hooks, user_hooks
 
 
@@ -236,7 +209,7 @@ def _merge_hook_arrays(
         kept, _changed = _strip_sc_inner_hooks(existing)
         return kept + new_hooks
 
-    existing_sc_hooks = [h for h in existing if _is_superclaude_hook(h)]
+    existing_sc_hooks = [h for h in existing if is_superclaude_hook(h)]
     if not existing_sc_hooks:
         return existing + new_hooks
 

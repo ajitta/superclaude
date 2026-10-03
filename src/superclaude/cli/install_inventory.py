@@ -10,7 +10,7 @@ from collections import Counter
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
-from superclaude.utils import settings_filename
+from superclaude.utils import is_superclaude_hook, settings_filename
 
 from .install_paths import (
     COMPONENTS,
@@ -25,7 +25,6 @@ from .install_paths import (
 )
 from .install_settings import (
     _hook_script_id,
-    _is_superclaude_hook,
     _load_settings,
     _split_entry,
     remove_claude_md_import,
@@ -80,7 +79,7 @@ def _count_registered_hooks(settings_file: Path) -> int:
         for array in settings.get("hooks", {}).values()
         if isinstance(array, list)
         for entry in array
-        if _is_superclaude_hook(entry)
+        if is_superclaude_hook(entry)
     )
 
 

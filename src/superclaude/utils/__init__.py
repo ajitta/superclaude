@@ -203,6 +203,24 @@ def is_legacy_hook_command(command: str) -> bool:
     return "{{SCRIPTS_PATH}}" in command or bool(_SC_SCRIPTS_PATH_RE.search(command))
 
 
+def is_superclaude_inner_hook(hook: dict) -> bool:
+    """Whether one inner hook is SuperClaude's, judged on its own command.
+
+    The unit that matters for ownership. A settings entry carries one matcher
+    and a list of inner hooks, so a user's own command can sit beside a
+    SuperClaude one; judging the whole entry deleted the user's command along
+    with ours on `--force` and on uninstall.
+    """
+    cmd = hook.get("command", "")
+    if any(marker in cmd for marker in SUPERCLAUDE_HOOK_MARKERS):
+        return True
+    if CONSOLE_HOOK_RE.search(cmd) or is_legacy_hook_command(cmd):
+        return True
+    return any(
+        marker in hook.get("_comment", "") for marker in SUPERCLAUDE_HOOK_MARKERS
+    )
+
+
 def is_superclaude_hook(hook_entry: dict) -> bool:
     """Whether a settings hook entry belongs to SuperClaude.
 
@@ -218,16 +236,7 @@ def is_superclaude_hook(hook_entry: dict) -> bool:
     if any(marker in comment for marker in SUPERCLAUDE_HOOK_MARKERS):
         return True
 
-    for hook in hook_entry.get("hooks", []):
-        cmd = hook.get("command", "")
-        if any(marker in cmd for marker in SUPERCLAUDE_HOOK_MARKERS):
-            return True
-        if CONSOLE_HOOK_RE.search(cmd) or is_legacy_hook_command(cmd):
-            return True
-        inner_comment = hook.get("_comment", "")
-        if any(marker in inner_comment for marker in SUPERCLAUDE_HOOK_MARKERS):
-            return True
-    return False
+    return any(is_superclaude_inner_hook(h) for h in hook_entry.get("hooks", []))
 
 
 def _has_superclaude_hooks(settings_file: Path) -> bool:
