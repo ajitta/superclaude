@@ -1,6 +1,6 @@
 ---
 feature: over-engineering-audit
-phase: implementing
+phase: complete
 owner: ajitta
 created: 2026-10-03
 updated: 2026-10-03
@@ -26,11 +26,38 @@ dependencies: rich, black, scipy and pytest-benchmark.
 
 ## Status
 
-All seven batches are implemented on branch `feature/over-engineering-audit`, in the 37 commits
-`32d881b..3923153`. Together they change 192 files, +555/−8369 lines. A review of that range was
-followed by one docs commit that fixes four stale references. Every commit passes `uv run pytest`
-and both ruff checks on Windows, each one checked in isolation. Still open: Linux CI, and the
-merge.
+Complete. All 42 approved findings (38 as specified, 4 narrowed) are implemented in the 37 commits
+`32d881b..3923153`, which change 192 files, +555/−8369 lines. A review of that range found four
+stale doc references, fixed in `9282cd7`. Every commit passes `uv run pytest` and both ruff checks
+on Windows, each one checked in isolation.
+
+The branch was merged to `master` at `50653fa` on 2026-10-03 and shipped in 4.19.0+ajitta
+(`c515e8b`). Linux CI is green on the branch (run 37123073709) and on the merge (run
+37123261367), including the isolated `tests/unit/scripts` step on Python 3.10, 3.11 and 3.12.
+
+| Batch | Findings | Commits |
+|---|---|---|
+| B1 | F04, F08, F16, F28, F35f, F22, F35j | `30603a2..f95a9bb` |
+| B2 | F18, F24, F09, F11 with F02-A, F17 | `35d1f4d..264c79f` |
+| B3 | F19, F35g with F32 (a)–(c), F34, F35e, F35l, F21, F25 | `92e98c3..d99edc8` |
+| B4 | F10 with F27 and F33, F35a, F35m.e, F35d, F35h, F23 with F35k, F35m.b, F35m.c, F35m.d | `74da0c0..74d5295` |
+| B5 | F05, F13 with the `inline_hooks` cascade, F29 (`version` only) | `f1f4c2d..e3aed51` |
+| B6 | F07-b, F20 (narrowed), F35b | `7db2c1a..3dc85f5` |
+| B7 | F01, F26 with F02-B and `make translate`, F36 (narrowed) | `50b62af..3923153` |
+
+Not implemented, by decision: F03, F06, F12, F14, F15, F31 and F35c are kept; F30, F35m.a, F07-a
+and F32 (d) are skipped; F35i is moot (see [05-plan.md](./05-plan.md)).
+
+The plan's last done-when check, that `git grep` finds no removed name outside `docs/archive/` and
+this folder, holds only for live references. A sweep on 2026-10-03 found no code, test or
+instruction that still uses a removed name. The remaining matches are records of the removal:
+
+- the codex backlog entries that close F-015 and F-016;
+- the "since-deleted" note in gotcha `hook-path-scope`;
+- the `TestStateHygiene` docstring;
+- the prune comment in `src/superclaude/utils/__init__.py`;
+- dated `.serena/memories/`, `docs/analysis/`, `docs/research/` and `.claude/insights.jsonl`
+  entries.
 
 Where the work departs from the specs:
 
@@ -41,6 +68,11 @@ Where the work departs from the specs:
 - **F13:** the cascade removed one module, not two, because B4 had already deleted `hook_tracker.py`.
 - **F23, known limit:** `insight list` and `query` now print through Python, so on a non-UTF-8
   console they fail on characters the code page cannot encode, as `insight review` already did.
+
+One follow-up is left. `_PRUNABLE_PREFIXES` in `src/superclaude/utils/__init__.py` still lists
+`hook_executions` and `current_session`, the two state files the deleted `hook_tracker` wrote, so
+the sweep reaps them on machines that ran an older release. Drop both in the first release after
+4.19.0. The mypy type gate (codex F-014) stays open; it was never part of this audit (D13).
 
 ## Documents
 
