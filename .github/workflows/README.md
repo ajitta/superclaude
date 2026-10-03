@@ -10,12 +10,10 @@ This directory contains CI/CD workflows for SuperClaude Framework.
 - **test**: Run tests on Python 3.10, 3.11, 3.12
   - Install UV and dependencies
   - Run full test suite
-  - Generate coverage report (Python 3.10 only)
-  - Upload to Codecov
-- **lint**: Run ruff linter and format checker
-- **plugin-check**: Verify pytest plugin loads correctly
-- **doctor-check**: Run `superclaude doctor` health check
-- **test-summary**: Aggregate results from all jobs
+- **checks**: Lint, plugin and doctor checks on Python 3.10
+  - Run ruff linter and format checker
+  - Verify the pytest plugin loads (report header)
+  - Run `superclaude doctor` health check
 
 **Status Badge**:
 ```markdown
@@ -85,7 +83,6 @@ uv run superclaude doctor --verbose
     │ • Unit tests│         │ • Python 3.10  │
     │ • Lint      │         │ • Python 3.11  │
     │ • Format    │         │ • Python 3.12  │
-    │             │         │ • Coverage     │
     │ ~2-3 min    │         │ • Lint         │
     └─────────────┘         │ • Plugin check │
                             │ • Doctor check │
@@ -96,9 +93,7 @@ uv run superclaude doctor --verbose
 
 ## Coverage Reporting
 
-Coverage reports are generated for Python 3.10 and uploaded to Codecov.
-
-To view coverage locally:
+CI does not run coverage. To view coverage locally:
 ```bash
 uv run pytest --cov=superclaude --cov-report=html
 open htmlcov/index.html
@@ -118,10 +113,6 @@ open htmlcov/index.html
 ### Plugin not loading in CI
 - Verify entry point in `pyproject.toml`: `[project.entry-points.pytest11]`
 - Check plugin is installed: `uv run pytest --trace-config`
-
-### Coverage upload fails
-- This is non-blocking (fail_ci_if_error: false)
-- Check Codecov token in repository secrets
 
 ## Maintenance
 
@@ -147,8 +138,7 @@ open htmlcov/index.html
 3. **Clear names**: Job and step names should be descriptive
 4. **Version pinning**: Pin action versions (@v4, @v5)
 5. **Matrix testing**: Test on multiple Python versions
-6. **Non-blocking coverage**: Don't fail on coverage upload errors
-7. **Manual triggers**: Add `workflow_dispatch` for debugging
+6. **Manual triggers**: Add `workflow_dispatch` for debugging
 
 ## Resources
 
