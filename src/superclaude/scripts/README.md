@@ -16,7 +16,6 @@ Run by the Claude Code hook runtime as `superclaude hook <name>` (registry: `../
 | `session_init.py` | Session init — load SuperClaude context at startup |
 | `memory_staleness.py` | SessionStart warning for auto-memory entries whose `verified:` date is stale (`SUPERCLAUDE_MEMORY_STALE_DAYS`, default 90) |
 | `insight_writer.py` | Insight capture/harvest for `/sc:insight` — SessionStart pending-count, PreCompact/SessionEnd transcript harvest |
-| `token_estimator.py` | Context window usage estimation |
 | `prettier_hook.py` | Code formatting hook via Prettier |
 | `test_runner_hook.py` | Test execution hook (`SUPERCLAUDE_AUTO_TEST=0` to disable) |
 | `context_reset.py` | Reset context loader state for fresh sessions. Manual: `superclaude context reset` |

@@ -17,7 +17,6 @@ v3.1 Features:
 - Session dedup via cache file, cross-platform compatible
 
 v2.2.0: MCP fallback notification support
-v2.1.0: Skills discovery and token estimation
 """
 
 import json
@@ -25,10 +24,6 @@ import os
 import re
 import sys
 from pathlib import Path
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from superclaude.scripts.token_estimator import TokenEstimate
 
 # Scope-aware path resolution. Imported unconditionally: superclaude.utils is
 # stdlib-only, and hooks.json runs this script as `superclaude hook
@@ -587,44 +582,6 @@ def strip_unresolved_commands(prompt: str, unresolved: set[str]) -> str:
     )
 
 
-# v2.1.0: Skills configuration
-SHOW_SKILLS_SUMMARY = os.environ.get("CLAUDE_SHOW_SKILLS", "1") == "1"
-
-
-def get_skill_estimates() -> list["TokenEstimate"]:
-    """Get token estimates for all installed skills.
-
-    Returns:
-        List of TokenEstimate objects for all skills
-    """
-    try:
-        from superclaude.scripts.token_estimator import get_all_skill_estimates
-
-        return get_all_skill_estimates()
-    except ImportError:
-        return []
-
-
-def format_skills_summary(skills: list["TokenEstimate"]) -> str:
-    """Format skills summary for context output.
-
-    Compact single-line format to minimize attention budget dilution.
-    Full skill details available via /sc:help.
-
-    Args:
-        skills: List of TokenEstimate objects
-
-    Returns:
-        Formatted skills summary string
-    """
-    if not skills:
-        return ""
-
-    skill_names = ", ".join(s.name for s in skills)
-    total_full = sum(s.full_tokens for s in skills)
-    return f"<!-- {len(skills)} skills installed ({skill_names}). ~{total_full} tokens full load. Use /sc:help for details. -->"
-
-
 def get_loaded_contexts() -> set:
     """Read the contexts already injected into this session."""
     if cache_file().exists():
@@ -1134,16 +1091,6 @@ def main() -> None:
         for note in flag_notifications:
             print(f"<!-- SuperClaude flag: {note} -->")
         print()
-
-    # v2.1.0: Output skills summary if enabled — once per session (cache-marked)
-    if SHOW_SKILLS_SUMMARY and "_skills_summary" not in get_loaded_contexts():
-        skills = get_skill_estimates()
-        if skills:
-            summary = format_skills_summary(skills)
-            if summary:
-                print(summary)
-                print()
-                mark_as_loaded("_skills_summary")
 
     # Execution flag directives (inline behavioral hints — no file injection)
     _emit_execution_directives(prompt, session_id)

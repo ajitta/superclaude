@@ -786,7 +786,6 @@ def _run_loader_isolated(prompt: str, content_root: Path) -> str:
         env = os.environ.copy()
         env["CLAUDE_PROJECT_DIR"] = sandbox
         env["SUPERCLAUDE_PATH"] = str(content_root)
-        env["CLAUDE_SHOW_SKILLS"] = "0"  # once-per-session banner, not prompt-triggered
         try:
             result = subprocess.run(
                 [sys.executable, str(loader)],
@@ -810,7 +809,7 @@ def _run_loader_isolated(prompt: str, content_root: Path) -> str:
 
 def _parse_loader_output(stdout: str, content_root: Path) -> dict:
     """Turn the loader's stdout into the pieces the report prints."""
-    from superclaude.scripts.token_estimator import estimate_tokens
+    from superclaude.scripts.context_loader import estimate_tokens
 
     contexts: list[dict] = []
     directives: list[str] = []
@@ -963,8 +962,7 @@ def context_explain(prompt):
     or written. The loader that ran is named in the output.
 
     The run always simulates a FRESH session: a live session that already
-    received one of these files would not receive it again, and the
-    once-per-session installed-skills banner is suppressed rather than shown.
+    received one of these files would not receive it again.
 
     Examples:
         superclaude context explain "--serena rename this symbol"
@@ -1000,10 +998,6 @@ def context_explain(prompt):
     click.echo(f"budget:  {budget} tokens")
     click.echo(f"loader:  {_packaged_loader()}")
     click.echo("session: dry run — fresh session simulated, no cache read or written")
-    click.echo(
-        "skills:  installed-skills banner suppressed "
-        "(once-per-session, not prompt-triggered)"
-    )
     click.echo("")
 
     contexts = report["contexts"]

@@ -58,22 +58,6 @@ def atomic_write_json(path: Path, data: Any, indent: int | None = 2) -> None:
         raise
 
 
-def get_skill_directories() -> list[Path]:
-    """Get all skill directories to scan.
-
-    Project-local skills are found via project_root(), not the CWD: a hook
-    running from a subdirectory used to see only user-scope skills, so the
-    installed-skill count under-reported project and local scope installs.
-
-    Returns:
-        List of skill base directories (global, project-local)
-    """
-    return [
-        Path.home() / ".claude" / "skills",
-        project_root() / ".claude" / "skills",
-    ]
-
-
 def project_root() -> Path:
     """Project root for hook-relative paths.
 

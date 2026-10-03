@@ -14,7 +14,6 @@ from pathlib import Path
 from superclaude.utils import (
     claude_base,
     detect_scope,
-    get_skill_directories,
     hook_state_dir,
     main_worktree_root,
     project_key,
@@ -245,26 +244,6 @@ class TestContextCacheKeying:
 
         monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(tmp_path))
         assert reset_context_cache("sess-A") is False
-
-
-class TestSkillDirectories:
-    """get_skill_directories finds project skills from any CWD."""
-
-    def test_project_dir_from_subdirectory(self, tmp_path: Path, monkeypatch):
-        """Regression: a subdir CWD reported only user-scope skills."""
-        (tmp_path / ".claude" / "skills").mkdir(parents=True)
-        subdir = tmp_path / "src" / "deep"
-        subdir.mkdir(parents=True)
-
-        monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(tmp_path))
-        monkeypatch.chdir(subdir)
-
-        assert tmp_path / ".claude" / "skills" in get_skill_directories()
-
-    def test_user_scope_always_included(self, tmp_path: Path, monkeypatch):
-        monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(tmp_path))
-
-        assert Path.home() / ".claude" / "skills" in get_skill_directories()
 
 
 class TestContextLoaderBasePath:
