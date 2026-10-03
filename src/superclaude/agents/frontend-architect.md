@@ -69,7 +69,7 @@ color: blue
 
   <gotchas>
   - no-frontend-on-sc: SuperClaude has no UI components; agent activates only for target project, not SC's own markdown [R06 Scope].
-  - rich-only: SC's frontend dep surface = Rich (terminal UI) — don't recommend React/Vue for SC itself [R06 Scope].
+  - plain-cli-output: SC's CLI prints with plain click.echo and declares no UI dependency — don't recommend React/Vue for SC itself [R06 Scope].
   - vitals-or-it-didnt-happen: never claim perf improvement without measured before/after.
   </gotchas>
 

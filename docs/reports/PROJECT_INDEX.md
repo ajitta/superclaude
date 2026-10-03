@@ -98,7 +98,7 @@ uv run superclaude install --list-all  # smoke-test CLI changes
 
 **Do not run `uv sync`.** The dev toolchain lives in
 `[project.optional-dependencies].dev`, not a default group, so `uv sync` prunes
-it — black, ruff, mypy, pytest-cov and friends get uninstalled and the suite
+it — ruff, mypy, pytest-cov and friends get uninstalled and the suite
 stops running. Rebuild the venv with `uv venv && uv pip install -e ".[dev]"`.
 
 ## Git

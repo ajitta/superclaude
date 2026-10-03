@@ -34,7 +34,6 @@ classifiers = [
 dependencies = [
     "pytest>=7.0.0",
     "click>=8.0.0",
-    "rich>=13.0.0",
     "jmespath>=1.0.0",
     "pyyaml>=6.0.0",  # YAML frontmatter parsing (v2.1.0)
 ]
@@ -42,9 +41,7 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
     "pytest-cov>=4.0.0",
-    "pytest-benchmark>=4.0.0",
     "pytest-asyncio>=0.23.0",
-    "black>=22.0",
     "ruff>=0.1.0",
     "mypy>=1.0",
 ]

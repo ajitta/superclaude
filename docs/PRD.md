@@ -113,9 +113,6 @@ The load-bearing set. Anything not on this list is support for something on it.
   `pyproject.toml` addopts) after a native crash (exit `0xC0000409`) during
   collection. Root-cause and re-enable, or delete the suite? — owner:
   maintainer; decide before the next change to hook scripts.
-- **`rich>=13.0.0` is a declared runtime dependency with no import anywhere in
-  the tree.** CLI output is plain `click.echo`. Adopt it (and rewrite
-  `docs/UI-GUIDE.md`) or drop the dependency? — owner: maintainer.
 - **`/sc:init` task (g) writes project memory to `.claude/memory/`, which
   nothing loads.** The store actually read is the per-project auto-memory under
   `~/.claude/projects/<slug>/memory/`. Align the command spec to the live path,

@@ -65,7 +65,7 @@ color: blue
 
   <gotchas>
   - content-not-service: SuperClaude = content framework, not web service. Do not propose API endpoints, databases, service mesh for SC itself. Backend advice apply to target project [R06 Scope].
-  - cli-simplicity: SC CLI use Click and Rich. No async frameworks, ORMs, message queues for CLI layer [R06 Scope].
+  - cli-simplicity: SC CLI use Click with plain click.echo output. No async frameworks, ORMs, message queues for CLI layer [R06 Scope].
   - invariant-first: write invariants before endpoints. APIs protecting vague model leak inconsistency.
   </gotchas>
 
