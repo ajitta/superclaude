@@ -9,6 +9,8 @@ from pathlib import Path
 
 import pytest
 
+from tests.unit.md_helpers import extract_xml_attr, extract_xml_content
+
 MODES_DIR = Path(__file__).parent.parent.parent / "src" / "superclaude" / "modes"
 MCP_DIR = Path(__file__).parent.parent.parent / "src" / "superclaude" / "mcp"
 
@@ -19,20 +21,6 @@ MODE_IDS = [f.stem for f in MODE_FILES]
 # MCP files: MCP_*.md
 MCP_FILES = sorted(MCP_DIR.glob("MCP_*.md"))
 MCP_IDS = [f.stem for f in MCP_FILES]
-
-
-def extract_xml_attr(text: str, tag: str, attr: str) -> str | None:
-    """Extract an attribute value from the first occurrence of an XML tag."""
-    pattern = rf"<{tag}\b[^>]*\b{attr}=[\"']([^\"']*)[\"']"
-    match = re.search(pattern, text)
-    return match.group(1) if match else None
-
-
-def extract_xml_content(text: str, tag: str) -> str | None:
-    """Extract text content from the first occurrence of an XML tag."""
-    pattern = rf"<{tag}\b[^>]*>(.*?)</{tag}>"
-    match = re.search(pattern, text, re.DOTALL)
-    return match.group(1).strip() if match else None
 
 
 # --- Mode Tests ---

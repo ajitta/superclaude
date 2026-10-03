@@ -12,6 +12,8 @@ from pathlib import Path
 
 import pytest
 
+from tests.unit.md_helpers import parse_frontmatter
+
 # Directories
 _SRC = Path(__file__).parent.parent.parent / "src" / "superclaude"
 COMMANDS_DIR = _SRC / "commands"
@@ -43,19 +45,6 @@ def _extract_handoff_targets(content: str) -> list[str]:
         return []
     raw = match.group(1)
     return re.findall(r"/sc:([\w-]+)", raw)
-
-
-def parse_frontmatter(text: str) -> dict[str, str]:
-    """Extract YAML frontmatter from markdown text."""
-    match = re.match(r"^---\n(.*?)\n---", text, re.DOTALL)
-    if not match:
-        return {}
-    fields = {}
-    for line in match.group(1).strip().splitlines():
-        if ":" in line:
-            key, _, value = line.partition(":")
-            fields[key.strip()] = value.strip()
-    return fields
 
 
 # Collect all content files for parametrized tests

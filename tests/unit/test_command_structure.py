@@ -11,6 +11,12 @@ from pathlib import Path
 import pytest
 import yaml
 
+from tests.unit.md_helpers import (
+    extract_xml_attr,
+    extract_xml_content,
+    parse_frontmatter,
+)
+
 COMMANDS_DIR = Path(__file__).parent.parent.parent / "src" / "superclaude" / "commands"
 
 # Agent/skill-only fields that should never appear in command frontmatter
@@ -52,33 +58,6 @@ _BARE_PYTHON_PRESCRIPTION = re.compile(
 )
 # Gotcha lines quote the broken form on purpose; they carry this identifier.
 _BARE_PYTHON_EXEMPT = "never-bare-python"
-
-
-def parse_frontmatter(text: str) -> dict[str, str]:
-    """Extract YAML frontmatter from markdown text."""
-    match = re.match(r"^---\n(.*?)\n---", text, re.DOTALL)
-    if not match:
-        return {}
-    fields = {}
-    for line in match.group(1).strip().splitlines():
-        if ":" in line:
-            key, _, value = line.partition(":")
-            fields[key.strip()] = value.strip()
-    return fields
-
-
-def extract_xml_attr(text: str, tag: str, attr: str) -> str | None:
-    """Extract an attribute value from the first occurrence of an XML tag."""
-    pattern = rf"<{tag}\b[^>]*\b{attr}=[\"']([^\"']*)[\"']"
-    match = re.search(pattern, text)
-    return match.group(1) if match else None
-
-
-def extract_xml_content(text: str, tag: str) -> str | None:
-    """Extract text content from the first occurrence of an XML tag."""
-    pattern = rf"<{tag}\b[^>]*>(.*?)</{tag}>"
-    match = re.search(pattern, text, re.DOTALL)
-    return match.group(1).strip() if match else None
 
 
 @pytest.fixture(params=COMMAND_FILES, ids=COMMAND_IDS)
