@@ -36,7 +36,7 @@ superclaude/
 ├── .claude/                  # dev-tree config: rules/, commands/, superclaude/
 ├── .serena/memories/         # committed cross-session context
 ├── Makefile                  # deploy / sync-* / test / lint / format / verify
-└── pyproject.toml            # version SSOT, pytest/black/ruff/mypy config
+└── pyproject.toml            # version SSOT, pytest/ruff/mypy config
 ```
 
 ## Entry points

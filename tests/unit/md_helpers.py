@@ -1,6 +1,6 @@
 """Markdown parsers the content-structure tests share.
 
-Not a test module (``python_files = ["test_*.py"]`` skips it) — a helper the
+Not a test module (pytest's default ``python_files`` skips it) — a helper the
 agent, command, mode, content and cross-reference tests import so each parser has
 one definition site instead of a byte-identical copy per test file.
 """
