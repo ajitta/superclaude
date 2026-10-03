@@ -125,7 +125,7 @@ superclaude mcp --scope local          # per-project block inside ~/.claude.json
 superclaude install --list-all          # component-by-component status
 superclaude doctor                      # pytest plugin, hooks, CLAUDE_SC import, `superclaude` on PATH
 superclaude verify-drift                # detect drift between source and installed copy
-superclaude version
+superclaude --version
 ```
 
 Restart Claude Code, then try a few:

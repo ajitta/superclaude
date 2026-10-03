@@ -1105,11 +1105,5 @@ def context_reset_cmd(session_id):
         click.echo(f"nothing to reset (looked at {looked})")
 
 
-@main.command()
-def version():
-    """Show SuperClaude version"""
-    click.echo(f"SuperClaude version {__version__}")
-
-
 if __name__ == "__main__":
     main()
