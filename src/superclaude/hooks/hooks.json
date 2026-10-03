@@ -7,7 +7,7 @@
         "matcher": "startup",
         "hooks": [
           {
-            "_comment": "[superclaude] session bootstrap — hook session tracking, cleanup of sessions older than 24h, PR-review status line",
+            "_comment": "[superclaude] session bootstrap — PR-review status line",
             "type": "command",
             "command": "superclaude hook session_init",
             "timeout": 10,

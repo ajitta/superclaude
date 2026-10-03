@@ -36,6 +36,5 @@ Subpackages import `superclaude.*`, so they resolve only under an interpreter ho
 ## Related
 
 - `hooks/hooks.json` — Hook defs referencing these scripts
-- `hooks/hook_tracker.py` — Fallback session id + stale-session cleanup (`once: true` gating is CC-native)
 - `modes/` — Content loaded by context_loader.py
 - `mcp/` — Content loaded by context_loader.py

@@ -393,9 +393,10 @@ class TestHookStatePruning:
 class TestStateHygiene:
     """The sweep and the session-start reset both named the wrong thing.
 
-    `_PRUNABLE_PREFIXES` claimed a `hook_tracker` file that has never existed —
-    the tracker writes `hook_executions.json` — so the one file the sweep was
-    written for was the one it never collected. And `session_init` reset the
+    `_PRUNABLE_PREFIXES` once claimed a `hook_tracker` file that never existed —
+    the tracker wrote `hook_executions.json` — so the one file the sweep was
+    written for was the one it never collected; the module is gone and the
+    file is now an orphan the sweep still reaps. And `session_init` reset the
     context cache with no session id at all, deleting the project-only fallback
     a concurrent session without an id is using, while `context_reset` on the
     same SessionStart event already did it correctly with the id from stdin.

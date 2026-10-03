@@ -435,7 +435,7 @@ def uninstall_all(
         messages.append(f"⏭️  Not found: {hooks_json}")
         skipped += 1
 
-    # 5a. Remove the hook state directory (context dedup cache, session tracker,
+    # 5a. Remove the hook state directory (context dedup cache,
     # MCP fallback log, loop_guard counters). Every runtime path resolves through
     # superclaude.utils.hook_state_dir, so this one rmtree covers all of it — see
     # the two-class rule in that module's docstring.

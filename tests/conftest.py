@@ -28,18 +28,10 @@ def sandbox_home(tmp_path_factory, monkeypatch):
     # path resolved at module import, which happens during collection — before
     # any fixture runs — so those constants still point at the developer's real
     # home. Re-point them here, once, rather than in each test that remembers to.
-    import superclaude.hooks.hook_tracker as hook_tracker
     import superclaude.hooks.mcp_fallback as mcp_fallback
     from superclaude.utils import hook_state_dir
 
     state = hook_state_dir()
-    monkeypatch.setattr(hook_tracker, "HOOK_TRACKER_DIR", state, raising=False)
-    monkeypatch.setattr(
-        hook_tracker, "HOOK_TRACKER_FILE", state / "hook_executions.json", raising=False
-    )
-    monkeypatch.setattr(
-        hook_tracker, "SESSION_FILE", state / "current_session.txt", raising=False
-    )
     monkeypatch.setattr(
         mcp_fallback, "MCP_FALLBACK_FILE", state / "mcp_fallbacks.json", raising=False
     )

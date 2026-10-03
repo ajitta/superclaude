@@ -68,7 +68,7 @@ CWD는 project root라고 보장되지 않으므로 `superclaude.utils` resolver
 
 | 상태 | 위치 | 수명 | uninstall |
 |---|---|---|---|
-| context cache, tracker, loop counter, fallback ledger | `hook_state_dir()` | 재생성 가능 | 제거 가능 |
+| context cache, loop counter, fallback ledger | `hook_state_dir()` | 재생성 가능 | 제거 가능 |
 | insight 등 사용자 소유 project data | `project_root()/.claude` | durable | 보존 |
 
 새 writer를 추가할 때 다음을 결정한다.

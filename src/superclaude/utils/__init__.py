@@ -420,7 +420,8 @@ STATE_MAX_AGE_DAYS = 7
 _PRUNABLE_PREFIXES = (
     "claude_context_",
     "loop_guard_",
-    "hook_executions",  # hook_tracker.py's file; the sweep named the module
+    # orphans of the removed hook_tracker; drop after one release
+    "hook_executions",
     "current_session",
     "insight_prompt_",
     "insight_baseline_",

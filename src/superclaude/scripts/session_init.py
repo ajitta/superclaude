@@ -4,10 +4,6 @@
 Auto-executed when Claude Code session starts.
 Cross-platform compatible (Windows/macOS/Linux).
 
-v2.1.0 Features:
-- Hook session tracking initialization
-- Old session cleanup (>24h)
-
 v2.2.0 Features (Claude Code 2.1.20 Integration):
 - PR review status indicator display
 - Multi-directory CLAUDE.md awareness
@@ -59,30 +55,6 @@ def get_install_status() -> str:
 
     agent_word = "agent" if agents == 1 else "agents"
     return f"🛠️ SuperClaude: {commands} commands, {agents} {agent_word} ({scope} scope)"
-
-
-def init_hook_tracker() -> str | None:
-    """Initialize hook tracker and cleanup old sessions.
-
-    Returns:
-        Session ID or None if tracker unavailable
-    """
-    try:
-        from superclaude.hooks.hook_tracker import (
-            cleanup_old_sessions,
-            get_session_id,
-        )
-
-        # Cleanup old sessions (>24h)
-        cleaned = cleanup_old_sessions()
-        if cleaned > 0:
-            print(f"🧹 Cleaned {cleaned} old hook session(s)", file=sys.stderr)
-
-        # Get/create current session
-        session_id = get_session_id()
-        return session_id
-    except ImportError:
-        return None
 
 
 def get_git_status() -> str:
@@ -284,26 +256,23 @@ def main() -> None:
     # from here passed no id, so it deleted the project-only fallback cache that
     # a concurrent session without an id is using.
 
-    # 1. Initialize hook tracker (cleanup old sessions)
-    init_hook_tracker()
-
-    # 2. Check git status
+    # 1. Check git status
     print(get_git_status())
 
-    # 3. Check PR status (Claude Code 2.1.20+)
+    # 2. Check PR status (Claude Code 2.1.20+)
     pr_status = get_pr_status()
     if pr_status:
         print(pr_status)
 
-    # 4. Check for additional directories (monorepo)
+    # 3. Check for additional directories (monorepo)
     additional_dirs = get_additional_dirs_status()
     if additional_dirs:
         print(additional_dirs)
 
-    # 5. Remind token budget
+    # 4. Remind token budget
     print("💡 Use /context to confirm token budget.")
 
-    # 6. What is actually installed
+    # 5. What is actually installed
     print(get_install_status())
 
 

@@ -9,7 +9,7 @@ import json
 import subprocess
 from dataclasses import dataclass
 from pathlib import Path
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 import pytest
 
@@ -17,7 +17,6 @@ from superclaude.scripts.session_init import (
     get_additional_dirs_status,
     get_git_status,
     get_pr_status,
-    init_hook_tracker,
     main,
 )
 
@@ -33,79 +32,6 @@ class FakeCompletedProcess:
     returncode: int
     stdout: str = ""
     stderr: str = ""
-
-
-# ---------------------------------------------------------------------------
-# TestInitHookTracker
-# ---------------------------------------------------------------------------
-
-
-class TestInitHookTracker:
-    """Test init_hook_tracker session initialization and cleanup."""
-
-    def test_returns_session_id_on_success(self):
-        """init_hook_tracker returns a session ID when hook_tracker is available."""
-        with (
-            patch(
-                "superclaude.scripts.session_init.cleanup_old_sessions",
-                create=True,
-            ),
-            patch(
-                "superclaude.scripts.session_init.get_session_id",
-                create=True,
-            ),
-        ):
-            # Mock the lazy imports inside init_hook_tracker
-            mock_cleanup_fn = MagicMock(return_value=0)
-            mock_get_id_fn = MagicMock(return_value="abc123def456")
-
-            # We need to patch the actual import mechanism
-            import superclaude.hooks.hook_tracker as ht_mod
-
-            with (
-                patch.object(ht_mod, "cleanup_old_sessions", mock_cleanup_fn),
-                patch.object(ht_mod, "get_session_id", mock_get_id_fn),
-            ):
-                result = init_hook_tracker()
-
-            assert result == "abc123def456"
-            mock_cleanup_fn.assert_called_once()
-            mock_get_id_fn.assert_called_once()
-
-    def test_returns_none_on_import_error(self):
-        """init_hook_tracker returns None when hook_tracker is not importable."""
-        with patch.dict(
-            "sys.modules",
-            {"superclaude.hooks.hook_tracker": None},
-        ):
-            result = init_hook_tracker()
-            assert result is None
-
-    def test_prints_cleanup_count_when_sessions_cleaned(self, capsys):
-        """init_hook_tracker prints cleanup message when old sessions are removed."""
-        import superclaude.hooks.hook_tracker as ht_mod
-
-        with (
-            patch.object(ht_mod, "cleanup_old_sessions", return_value=3),
-            patch.object(ht_mod, "get_session_id", return_value="sess-id"),
-        ):
-            init_hook_tracker()
-
-        captured = capsys.readouterr()
-        assert "Cleaned 3 old hook session(s)" in captured.err
-
-    def test_no_cleanup_message_when_zero_sessions(self, capsys):
-        """init_hook_tracker is silent when no sessions are cleaned."""
-        import superclaude.hooks.hook_tracker as ht_mod
-
-        with (
-            patch.object(ht_mod, "cleanup_old_sessions", return_value=0),
-            patch.object(ht_mod, "get_session_id", return_value="sess-id"),
-        ):
-            init_hook_tracker()
-
-        captured = capsys.readouterr()
-        assert "Cleaned" not in captured.err
 
 
 # ---------------------------------------------------------------------------
@@ -441,9 +367,6 @@ class TestMain:
         """main() includes git status in output."""
         with (
             patch(
-                "superclaude.scripts.session_init.init_hook_tracker", return_value=None
-            ),
-            patch(
                 "superclaude.scripts.session_init.get_git_status",
                 return_value="\U0001f4ca Git: clean",
             ),
@@ -461,9 +384,6 @@ class TestMain:
     def test_main_prints_pr_status_when_present(self, capsys):
         """main() includes PR status when non-empty."""
         with (
-            patch(
-                "superclaude.scripts.session_init.init_hook_tracker", return_value=None
-            ),
             patch(
                 "superclaude.scripts.session_init.get_git_status",
                 return_value="\U0001f4ca Git: clean",
@@ -485,9 +405,6 @@ class TestMain:
     def test_main_omits_pr_status_when_empty(self, capsys):
         """main() does not print PR line when get_pr_status returns empty."""
         with (
-            patch(
-                "superclaude.scripts.session_init.init_hook_tracker", return_value=None
-            ),
             patch(
                 "superclaude.scripts.session_init.get_git_status",
                 return_value="\U0001f4ca Git: clean",
@@ -511,9 +428,6 @@ class TestMain:
         """
         with (
             patch(
-                "superclaude.scripts.session_init.init_hook_tracker", return_value=None
-            ),
-            patch(
                 "superclaude.scripts.session_init.get_git_status",
                 return_value="\U0001f4ca Git: clean",
             ),
@@ -532,9 +446,6 @@ class TestMain:
     def test_main_prints_additional_dirs_when_present(self, capsys):
         """main() includes additional dirs status when non-empty."""
         with (
-            patch(
-                "superclaude.scripts.session_init.init_hook_tracker", return_value=None
-            ),
             patch(
                 "superclaude.scripts.session_init.get_git_status",
                 return_value="\U0001f4ca Git: clean",
