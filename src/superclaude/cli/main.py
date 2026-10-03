@@ -463,7 +463,6 @@ def doctor(verbose: bool, scope: str | None):
 
     Verifies:
         - pytest plugin loaded correctly
-        - Configuration files present
         - SuperClaude hooks registered in the scope's settings file
         - `superclaude` resolvable on PATH, which every hook command needs
         - CLAUDE_SC.md installed and imported

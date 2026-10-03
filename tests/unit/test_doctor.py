@@ -182,8 +182,8 @@ class TestRunDoctor:
         return base_path
 
     def _disk_checks(self, result: dict) -> list[dict]:
-        """The three checks that read the install; the other three read the env."""
-        environment = {"pytest plugin loaded", "Configuration", "superclaude on PATH"}
+        """The three checks that read the install; the other two read the env."""
+        environment = {"pytest plugin loaded", "superclaude on PATH"}
         return [c for c in result["checks"] if c["name"] not in environment]
 
     def test_detects_local_scope_from_the_working_directory(
@@ -220,7 +220,7 @@ class TestRunDoctor:
 
         result = run_doctor()
 
-        assert len(result["checks"]) == 6
+        assert len(result["checks"]) == 5
 
 
 class TestRepairCommandNamesWhereToRun:
