@@ -1009,16 +1009,9 @@ def find_migration_reference(roots: list[Path] | None = None) -> Path | None:
                 found.extend(p for p in root.glob(pattern) if p.is_file())
             except OSError:
                 continue
-    newest: Path | None = None
-    newest_mtime = -1.0
-    for candidate in found:
-        try:
-            mtime = candidate.stat().st_mtime
-        except OSError:
-            continue
-        if mtime > newest_mtime:
-            newest, newest_mtime = candidate, mtime
-    return newest
+    # A file that vanishes between glob and stat raises OSError, which the one
+    # caller already treats as "no reference found".
+    return max(found, key=lambda p: p.stat().st_mtime, default=None)
 
 
 def migration_reference_ranges(path: Path) -> dict[str, list[str]]:
