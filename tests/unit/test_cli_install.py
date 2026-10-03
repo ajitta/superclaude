@@ -8,8 +8,8 @@ from pathlib import Path
 
 import pytest
 
-from superclaude.cli.install_commands import (
-    install_commands,
+from superclaude.cli.install_components import install_all
+from superclaude.cli.install_inventory import (
     list_available_commands,
     list_installed_commands,
 )
@@ -29,9 +29,7 @@ class TestInstallCommands:
 
     def test_install_commands_to_temp_dir(self, tmp_path):
         """Test installing commands to a temporary directory"""
-        target_dir = tmp_path / "commands"
-
-        success, message = install_commands(target_path=target_dir, force=False)
+        success, message = install_all(base_path=tmp_path, force=False)
 
         assert success is True
         assert "installed" in message.lower()
@@ -50,23 +48,19 @@ class TestInstallCommands:
 
     def test_install_commands_skip_existing(self, tmp_path):
         """Test that existing commands are skipped without --force"""
-        target_dir = tmp_path / "commands"
-
         # First install
-        success1, message1 = install_commands(target_path=target_dir, force=False)
+        success1, message1 = install_all(base_path=tmp_path, force=False)
         assert success1 is True
 
         # Second install without force
-        success2, message2 = install_commands(target_path=target_dir, force=False)
+        success2, message2 = install_all(base_path=tmp_path, force=False)
         assert success2 is True
         assert "skipped" in message2.lower()
 
     def test_install_commands_force_reinstall(self, tmp_path):
         """Test force reinstall of existing commands"""
-        target_dir = tmp_path / "commands"
-
         # First install
-        success1, message1 = install_commands(target_path=target_dir, force=False)
+        success1, message1 = install_all(base_path=tmp_path, force=False)
         assert success1 is True
 
         # Commands are in commands/sc/ subdirectory
@@ -78,7 +72,7 @@ class TestInstallCommands:
         assert research_file.read_text() == "modified"
 
         # Force reinstall
-        success2, message2 = install_commands(target_path=target_dir, force=True)
+        success2, message2 = install_all(base_path=tmp_path, force=True)
         assert success2 is True
         assert "installed" in message2.lower()
 
@@ -89,15 +83,13 @@ class TestInstallCommands:
 
     def test_list_installed_commands(self, tmp_path):
         """Test listing installed commands"""
-        target_dir = tmp_path / "commands"
-
         # Note: list_installed_commands checks ~/.claude/commands/sc by default
         # We can't easily test this without mocking, so just verify it returns a list
         installed = list_installed_commands()
         assert isinstance(installed, list)
 
         # After install to temp dir
-        install_commands(target_path=target_dir, force=False)
+        install_all(base_path=tmp_path, force=False)
 
         # Commands are in commands/sc/ subdirectory
         commands_dir = tmp_path / "commands" / "sc"
@@ -105,19 +97,6 @@ class TestInstallCommands:
         # Verify files exist
         command_files = list(commands_dir.glob("*.md"))
         assert len(command_files) > 0
-
-    def test_install_commands_creates_target_directory(self, tmp_path):
-        """Test that target directory is created if it doesn't exist"""
-        target_dir = tmp_path / "nested" / "commands"
-
-        assert not target_dir.exists()
-
-        success, message = install_commands(target_path=target_dir, force=False)
-
-        assert success is True
-        # Commands are in commands/sc/ subdirectory
-        commands_dir = tmp_path / "nested" / "commands" / "sc"
-        assert commands_dir.exists()
 
     def test_available_commands_format(self):
         """Test that available commands have expected format"""
@@ -134,9 +113,7 @@ class TestInstallCommands:
 
     def test_research_command_exists(self, tmp_path):
         """Test that research command specifically gets installed"""
-        target_dir = tmp_path / "commands"
-
-        install_commands(target_path=target_dir, force=False)
+        install_all(base_path=tmp_path, force=False)
 
         # Commands are in commands/sc/ subdirectory
         commands_dir = tmp_path / "commands" / "sc"
@@ -164,38 +141,14 @@ class TestInstallCommandsEdgeCases:
 
     def test_install_to_nonexistent_parent(self, tmp_path):
         """Test installation to path with nonexistent parent directories"""
-        target_dir = tmp_path / "a" / "b" / "c" / "commands"
+        base = tmp_path / "a" / "b" / "c"
 
-        success, message = install_commands(target_path=target_dir, force=False)
+        success, message = install_all(base_path=base, force=False)
 
         assert success is True
         # Commands are in commands/sc/ subdirectory
         commands_dir = tmp_path / "a" / "b" / "c" / "commands" / "sc"
         assert commands_dir.exists()
-
-    def test_empty_target_directory_ok(self, tmp_path):
-        """Test that installation works with empty target directory"""
-        target_dir = tmp_path / "commands"
-        target_dir.mkdir()
-
-        success, message = install_commands(target_path=target_dir, force=False)
-
-        assert success is True
-
-
-def test_cli_integration():
-    """
-    Integration test: verify CLI can import and use install functions
-
-    This tests that the CLI main.py can successfully import the functions
-    """
-    from superclaude.cli.install_commands import (
-        list_available_commands,
-    )
-
-    # Should not raise ImportError
-    commands = list_available_commands()
-    assert len(commands) > 0
 
 
 class TestRegisteredHookVisibility:

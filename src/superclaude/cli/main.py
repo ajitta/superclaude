@@ -131,14 +131,13 @@ def install(
         superclaude install --scope local
         superclaude install --list
     """
-    from .install_commands import (
-        get_base_path,
-        install_all,
+    from .install_components import install_all
+    from .install_inventory import (
         list_all_components,
         list_available_commands,
         list_installed_commands,
     )
-    from .install_paths import resolve_reporting_target
+    from .install_paths import get_base_path, resolve_reporting_target
 
     # Decide whether to run the interactive wizard.
     # Trigger paths:
@@ -311,7 +310,8 @@ def uninstall(
         superclaude uninstall --remove-mcp     # Also remove SuperClaude-registered MCP servers
     """
     keep_mcp = not remove_mcp
-    from .install_commands import get_base_path, uninstall_all
+    from .install_inventory import uninstall_all
+    from .install_paths import get_base_path
 
     base_path = get_base_path(scope)
 
@@ -435,7 +435,8 @@ def update(scope: str):
         superclaude update
         superclaude update --scope project
     """
-    from .install_commands import get_base_path, install_all
+    from .install_components import install_all
+    from .install_paths import get_base_path
 
     base_path = get_base_path(scope)
 

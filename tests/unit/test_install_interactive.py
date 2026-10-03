@@ -19,33 +19,14 @@ def runner() -> CliRunner:
 
 @pytest.fixture
 def mock_install_all():
-    """Patch install_all in both bind sites so neither path touches the FS.
+    """Patch install_all so neither path touches the FS.
 
-    The wizard imports from install_components; the non-interactive path
-    imports from install_commands (which re-exports). Patch both.
+    Both the wizard and the non-interactive path import it lazily from
+    install_components, so one patch covers them.
     """
     ret = (True, "📊 Summary: 0 installed, 0 skipped, 0 failed")
-    with (
-        patch("superclaude.cli.install_components.install_all", return_value=ret) as m1,
-        patch("superclaude.cli.install_commands.install_all", return_value=ret) as m2,
-    ):
-        # Expose a unified mock that records calls from either site.
-        class _Either:
-            @property
-            def call_count(self):
-                return m1.call_count + m2.call_count
-
-            @property
-            def call_args(self):
-                return m1.call_args or m2.call_args
-
-            def assert_called_once(self):
-                assert self.call_count == 1, f"expected 1 call, got {self.call_count}"
-
-            def assert_not_called(self):
-                assert self.call_count == 0
-
-        yield _Either()
+    with patch("superclaude.cli.install_components.install_all", return_value=ret) as m:
+        yield m
 
 
 def _isolated_cwd(runner: CliRunner, tmp_path: Path):
