@@ -1,6 +1,6 @@
 ---
 feature: over-engineering-audit
-phase: planning
+phase: implementing
 owner: ajitta
 created: 2026-10-03
 updated: 2026-10-03
@@ -24,8 +24,23 @@ The owner decisions were taken on 2026-10-03 (see [Decisions](#decisions)):
 By the verifiers' estimates, the approved cuts come to roughly 7.5k–8k lines and four
 dependencies: rich, black, scipy and pytest-benchmark.
 
-No code has changed yet. The cuts are carried out on branch `feature/over-engineering-audit`,
-batch by batch, following [05-plan.md](./05-plan.md).
+## Status
+
+All seven batches are implemented on branch `feature/over-engineering-audit`, in the 37 commits
+`32d881b..3923153`. Together they change 192 files, +555/−8369 lines. A review of that range was
+followed by one docs commit that fixes four stale references. Every commit passes `uv run pytest`
+and both ruff checks on Windows, each one checked in isolation. Still open: Linux CI, and the
+merge.
+
+Where the work departs from the specs:
+
+- **F17:** the sdist `exclude` block stays. A bare `README.md` in `include` matches every nested
+  README, and `.git*` in the block is what keeps `.github/workflows/README.md` out of the sdist.
+- **F35a:** the `session_init` docstring keeps its PR-status bullet, because the PR line stays (D09).
+- **F21:** doctor's pytest-plugin check now only looks up the `pytest11` entry point.
+- **F13:** the cascade removed one module, not two, because B4 had already deleted `hook_tracker.py`.
+- **F23, known limit:** `insight list` and `query` now print through Python, so on a non-UTF-8
+  console they fail on characters the code page cannot encode, as `insight review` already did.
 
 ## Documents
 

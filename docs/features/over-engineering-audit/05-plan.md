@@ -1,5 +1,5 @@
 ---
-status: approved-for-plan
+status: implementing
 revised: 2026-10-03
 ---
 
