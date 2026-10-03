@@ -20,23 +20,11 @@ This directory contains CI/CD workflows for SuperClaude Framework.
 [![Tests](https://github.com/SuperClaude-Org/SuperClaude_Framework/actions/workflows/test.yml/badge.svg)](https://github.com/SuperClaude-Org/SuperClaude_Framework/actions/workflows/test.yml)
 ```
 
-### 2. **quick-check.yml** - Fast PR Feedback
-**Triggers**: Pull requests to `master` or `integration`
-**Jobs**:
-- **quick-test**: Fast check on Python 3.10 only
-  - Run unit tests only (faster)
-  - Run linter
-  - Check formatting
-  - Verify plugin loads
-  - 10 minute timeout
-
-**Purpose**: Provide rapid feedback on PRs before running full test matrix.
-
-### 3. **publish-pypi.yml** (Existing)
+### 2. **publish-pypi.yml** (Existing)
 **Triggers**: Manual or release tags
 **Purpose**: Publish package to PyPI
 
-### 4. **readme-quality-check.yml** (Existing)
+### 3. **readme-quality-check.yml** (Existing)
 **Triggers**: Push/PR affecting README files
 **Purpose**: Validate README quality and consistency
 
@@ -74,21 +62,19 @@ uv run superclaude doctor --verbose
 │   Push/PR Created   │
 └──────────┬──────────┘
            │
-           ├─────────────────────────┐
-           │                         │
-    ┌──────▼──────┐         ┌───────▼────────┐
-    │ Quick Check │         │  Full Test     │
-    │  (PR only)  │         │   Matrix       │
-    │             │         │                │
-    │ • Unit tests│         │ • Python 3.10  │
-    │ • Lint      │         │ • Python 3.11  │
-    │ • Format    │         │ • Python 3.12  │
-    │ ~2-3 min    │         │ • Lint         │
-    └─────────────┘         │ • Plugin check │
-                            │ • Doctor check │
-                            │                │
-                            │ ~5-8 min       │
-                            └────────────────┘
+    ┌──────▼─────────┐
+    │  Full Test     │
+    │   Matrix       │
+    │                │
+    │ • Python 3.10  │
+    │ • Python 3.11  │
+    │ • Python 3.12  │
+    │ • Lint         │
+    │ • Plugin check │
+    │ • Doctor check │
+    │                │
+    │ ~5-8 min       │
+    └────────────────┘
 ```
 
 ## Coverage Reporting
@@ -128,17 +114,15 @@ open htmlcov/index.html
 3. Test locally with new version first
 
 ### Modifying Test Strategy
-- **quick-check.yml**: For fast PR feedback (unit tests only)
 - **test.yml**: For comprehensive validation (full matrix)
 
 ## Best Practices
 
 1. **Keep workflows fast**: Use caching, parallel jobs
-2. **Fail fast**: Use `-x` flag in pytest for quick-check
-3. **Clear names**: Job and step names should be descriptive
-4. **Version pinning**: Pin action versions (@v4, @v5)
-5. **Matrix testing**: Test on multiple Python versions
-6. **Manual triggers**: Add `workflow_dispatch` for debugging
+2. **Clear names**: Job and step names should be descriptive
+3. **Version pinning**: Pin action versions (@v4, @v5)
+4. **Matrix testing**: Test on multiple Python versions
+5. **Manual triggers**: Add `workflow_dispatch` for debugging
 
 ## Resources
 
