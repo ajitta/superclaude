@@ -32,7 +32,7 @@ mypy 오류, OKF 카운트)는 이 문서가 소유한다. 값은 재측정 명�
 | F-009 | P1 | FAIL | 전체 ruff format check baseline이 green이 아님 |
 | F-010 | P1 | REVISE | auto-improve/parallel_ab가 품질·scope를 완전히 강제하지 않음 |
 | F-011 | P1 | REVISE | MCP installer·doctor·pytest plugin의 직접 검증 공백 |
-| F-012 | P1 | FAIL | publish workflow가 full gate와 artifact 기능 검사를 선행하지 않음 |
+| F-012 | P1 | CLOSED | publish workflow와 `.env.example` 삭제로 폐기 — §해결된 finding 참조 |
 | F-013 | P2 | REVISE | testing 문서와 실제 UV/pytest 구성이 drift |
 | F-014 | P2 | REVISE | coverage/mypy가 선언적 기대와 실행 가능한 gate로 정렬되지 않음 |
 | F-015 | P1 | FAIL | tracked OKF catalog에서 skill concept 5개 누락 |
@@ -256,24 +256,6 @@ user home의 `.claude`에 고정해 확인한다. project/local 설치 진단과
 - clean wheel에서 console/pytest entry point와 marker behavior 검증
 - install-skill의 packaged source 부재·supporting file·destination 검증
 
-## F-012 — publish workflow의 release gate 공백
-
-**등급:** `[REPO]` · P1 · DIST/B15
-
-`.github/workflows/publish-pypi.yml:24-115`의 publish job은 full test job 의존성
-없이 pip/build/twine으로 바로 build·publish한다. Payload inventory와
-`superclaude install` 기능 검사는 없다. TestPyPI smoke도 import와 CLI stdout만
-보고 subprocess return code를 assert하지 않는다 (`149-170`). Entry point 정의는
-소문자 `superclaude`인데 smoke는 `SuperClaude`를 호출한다.
-
-완료 gate:
-
-- 프로젝트 UV 명령과 lock을 사용하는 build
-- `make test`, `make test-scripts`, lint, artifact parity 성공 후에만 publish
-- wheel을 임시 환경에 설치해 `superclaude install`과 pytest plugin 실행
-- CLI subprocess nonzero, skills/templates 누락, unresolved placeholder에서 실패
-- production publish도 동일 artifact를 사용하고 gate를 우회하지 않음
-
 ## F-013 — 테스트 문서 drift
 
 **등급:** `[REPO]` · P2 · CONTEXT
@@ -387,6 +369,18 @@ inert, which is the state the summary would otherwise call a success."*
 항목을 모두 필수로 취급한다. 선택 항목을 도입할 이유가 생기기 전까지 이는 결함이 아니라
 설계 선택이다.
 
+### F-012 — publish workflow의 release gate 공백 (폐기됨)
+
+**등급:** `[REPO]` · P1 · DIST/B15 · 폐기 결정 over-engineering-audit D08
+
+원래 판정은 `publish-pypi.yml`이 full gate 없이 build·publish한다는 것이었다. 이 fork의
+version `4.18.1+ajitta`는 PEP 440 local version이라 PyPI가 받지 않고, repo에는 Actions
+secret도 없어 workflow는 한 번도 실행되지 않았다. 게시 경로를 유지하지 않기로 하고
+`.github/workflows/publish-pypi.yml`과 `.env.example`을 삭제했다. 다시 게시하려면 새
+배포명과 local label 없는 version이 먼저 필요하다. 그때 새 workflow는 full gate 성공 뒤에만
+publish하고, 설치한 wheel로 `superclaude install`과 pytest plugin을 실행하며, smoke의
+subprocess return code를 assert해야 한다.
+
 ## 권장 실행 순서
 
 ```text
@@ -398,7 +392,7 @@ inert, which is the state the summary would otherwise call a success."*
 6. F-007 semantic graph validator
 7. F-015/F-016 OKF·plugin 파생 전달 경로 복구 또는 폐기
 8. F-010 automation correctness gates
-9. F-011/F-012 CLI·publish functional gate
+9. F-011 CLI functional gate (F-012는 publish 경로 삭제로 폐기)
 10. F-008 behavioral registry budget 측정
 11. F-013/F-014 문서·점진 품질 게이트 정리
 ```

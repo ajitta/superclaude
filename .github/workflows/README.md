@@ -20,10 +20,6 @@ This directory contains CI/CD workflows for SuperClaude Framework.
 [![Tests](https://github.com/SuperClaude-Org/SuperClaude_Framework/actions/workflows/test.yml/badge.svg)](https://github.com/SuperClaude-Org/SuperClaude_Framework/actions/workflows/test.yml)
 ```
 
-### 2. **publish-pypi.yml** (Existing)
-**Triggers**: Manual or release tags
-**Purpose**: Publish package to PyPI
-
 ## Local Testing
 
 Before pushing, run these commands locally:
