@@ -110,7 +110,6 @@ def _run_loader_directly(prompt: str, project_dir: Path, session_id: str) -> str
     env = os.environ.copy()
     env["CLAUDE_PROJECT_DIR"] = str(project_dir)
     env["SUPERCLAUDE_PATH"] = str(CONTENT_ROOT)
-    env["CLAUDE_SHOW_SKILLS"] = "0"
     result = subprocess.run(
         [sys.executable, str(LOADER_SCRIPT)],
         input=json.dumps({"prompt": prompt, "session_id": session_id}),
@@ -238,16 +237,6 @@ class TestContextExplain:
 
         assert result.exit_code == 0, result.output
         assert f"loader:  {LOADER_SCRIPT}" in result.output
-
-    def test_the_suppressed_skills_banner_is_disclosed(self, project: Path):
-        """explain forces CLAUDE_SHOW_SKILLS=0, so the once-per-session
-        "N skills installed" banner a real first prompt receives never appears.
-        Suppressing it is defensible; suppressing it silently is not."""
-        result = CliRunner().invoke(main, ["context", "explain", "--serena rename x"])
-
-        assert result.exit_code == 0, result.output
-        assert "skills installed" not in result.output, "banner really is suppressed"
-        assert "banner suppressed" in result.output
 
 
 class TestContextContentRoot:

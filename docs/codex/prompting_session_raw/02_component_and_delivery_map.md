@@ -29,7 +29,7 @@ pytest 카운트, coverage, description 문자 수처럼 커밋마다 바뀌는 
 | `mcp/MCP_*.md` | 4 | SC workflow에서 MCP를 WHEN/HOW 사용 |
 | `templates/docs-scaffold/*` | 4 | `/sc:init` 문서 scaffold |
 | distinct hook entry scripts | 10 | `hooks.json`의 14개 등록에서 직접 호출 |
-| 전체 Python module | 57 | CLI, hook, 자동화, 공용 경로, plugin |
+| 전체 Python module | 52 | CLI, hook, 자동화, 공용 경로, plugin |
 
 ## 2. 전달과 강제 경계
 
@@ -55,10 +55,6 @@ Tool lifecycle
 Installation
   └─ cli/install_*                                 source → user/project/local scope
 
-Derived delivery
-  ├─ okf/superclaude                               generated agent catalog
-  └─ scripts/build_superclaude_plugin.py           separate plugin artifact path
-
 Evaluation
   ├─ tests/                                        schema, unit, integration
   └─ evals/                                        behavior and regression
@@ -83,9 +79,9 @@ Evaluation
 - `__init__.py`: runtime version/header가 참조하는 package metadata.
 - `ARCHITECTURE.md`: taxonomy, delivery, enforcement boundary의 사람용 SSOT.
 - 위험: `pyproject.toml`, runtime header, README/dispatcher의 version drift 또는
-  architecture가 선언한 파생 catalog 경로의 미갱신.
-- 검증 초점: `tests/unit/test_version_consistency.py`, source taxonomy와 파생
-  catalog/delivery manifest의 양방향 parity.
+  architecture가 선언한 경로의 미갱신.
+- 검증 초점: `tests/unit/test_version_consistency.py`, source taxonomy와
+  delivery manifest의 양방향 parity.
 
 ### `core/`
 
@@ -156,7 +152,7 @@ Evaluation
 
 ### `cli/`
 
-- 역할: 설치·제거·목록·doctor·audit·drift와 scope-specific delivery.
+- 역할: 설치·제거·목록·doctor·drift와 scope-specific delivery.
 - source→target mapping은 `install_paths.py::COMPONENTS`가 소유.
 - 위험: source와 wheel의 차이, merge-vs-replace 위반, scope rewrite 오류,
   검증 명령의 false green.
@@ -182,17 +178,6 @@ Evaluation
   채택, observation schema drift.
 - 검증 초점: 별도 격리 테스트 프로세스, dry-run/smoke, worktree unchanged,
   regression block, 결과 schema.
-
-### 파생 catalog와 plugin artifact
-
-- `okf/superclaude/`: `ARCHITECTURE.md`가 선언한 generated, agent-navigable view.
-  source component마다 정확히 하나의 tracked `resource`가 있어야 한다.
-- `make build-plugin`/`sync-plugin-repo`: PyPI와 별개인 plugin artifact 경로.
-  입력 SSOT, manifest, source payload parity가 명시돼야 한다.
-- 위험: source는 갱신됐지만 catalog나 plugin은 stale/missing, ignore pattern이
-  generated skill concept까지 숨김, build 명령만 존재하고 입력 manifest는 없음.
-- 검증 초점: tracked-file 기준 양방향 inventory, duplicate/missing resource,
-  clean plugin build, manifest schema, payload parity, sync 전 nonzero propagation.
 
 ## 4. 변경 파급도
 

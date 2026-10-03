@@ -31,12 +31,12 @@ superclaude/
 │   ├── scripts/              # hook scripts, run in place as `superclaude hook <name>` — never copied to the install tree
 │   ├── templates/            # docs-scaffold/ etc., copied at init time
 │   ├── utils/                # path resolvers (project_root, claude_base, hook_state_dir)
-├── tests/{unit,integration,manual}/
+├── tests/{unit,integration}/
 ├── docs/                     # see "Docs layout" below
 ├── .claude/                  # dev-tree config: rules/, commands/, superclaude/
 ├── .serena/memories/         # committed cross-session context
 ├── Makefile                  # deploy / sync-* / test / lint / format / verify
-└── pyproject.toml            # version SSOT, pytest/black/ruff/mypy config
+└── pyproject.toml            # version SSOT, pytest/ruff/mypy config
 ```
 
 ## Entry points
@@ -98,7 +98,7 @@ uv run superclaude install --list-all  # smoke-test CLI changes
 
 **Do not run `uv sync`.** The dev toolchain lives in
 `[project.optional-dependencies].dev`, not a default group, so `uv sync` prunes
-it — black, ruff, mypy, pytest-cov and friends get uninstalled and the suite
+it — ruff, mypy, pytest-cov and friends get uninstalled and the suite
 stops running. Rebuild the venv with `uv venv && uv pip install -e ".[dev]"`.
 
 ## Git

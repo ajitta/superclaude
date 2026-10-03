@@ -17,7 +17,6 @@ v3.1 Features:
 - Session dedup via cache file, cross-platform compatible
 
 v2.2.0: MCP fallback notification support
-v2.1.0: Skills discovery and token estimation
 """
 
 import json
@@ -25,10 +24,9 @@ import os
 import re
 import sys
 from pathlib import Path
-from typing import TYPE_CHECKING
 
-if TYPE_CHECKING:
-    from superclaude.scripts.token_estimator import TokenEstimate
+# v2.2.0: MCP fallback notification support
+from superclaude.hooks.mcp_fallback import MCP_FALLBACKS, check_mcp_and_notify
 
 # Scope-aware path resolution. Imported unconditionally: superclaude.utils is
 # stdlib-only, and hooks.json runs this script as `superclaude hook
@@ -36,15 +34,6 @@ if TYPE_CHECKING:
 # the package. Silently degrading here would put state and content lookups in
 # the wrong scope.
 from superclaude.utils import claude_base, context_cache_file, project_root
-
-# v2.2.0: MCP fallback notification support
-try:
-    from superclaude.hooks.mcp_fallback import MCP_FALLBACKS, check_mcp_and_notify
-
-    MCP_FALLBACK_AVAILABLE = True
-except ImportError:
-    MCP_FALLBACK_AVAILABLE = False
-    MCP_FALLBACKS = {}
 
 # Configuration
 INJECT_MODE = os.environ.get("CLAUDE_CONTEXT_INJECT", "1").lower() in (
@@ -220,7 +209,7 @@ COMPOSITE_FLAGS = {
 
 # v3.1: Hybrid Injection Map
 # Only entries reachable by _get_injection_tier() belong here:
-#   - Behavioral MCPs (Serena, Tavily) → Tier 1 via _BEHAVIORAL_MCPS check
+#   - Behavioral MCPs (Serena, Tavily) → Tier 1 via their INSTRUCTION_MAP entry
 #   - Tool MCPs and core files use TIER_0_MAP (Tier 0) instead — do NOT duplicate here
 # Mode files → always Tier 2 (full .md injection)
 INSTRUCTION_MAP = {
@@ -258,9 +247,6 @@ TIER_0_MAP = {
     "mcp/MCP_Chrome-DevTools.md": "DevTools: CWV via perf trace, Lighthouse a11y/SEO, heap-snapshot diff. trace → analyze → optimize.",
     "core/BUSINESS_SYMBOLS.md": "Business symbols + expert selection. 🎯📈💰⚖️🏆🌊 domain mapping.",
 }
-
-# Behavioral MCPs that need Tier 1 (INSTRUCTION_MAP), not Tier 0
-_BEHAVIORAL_MCPS = {"mcp/MCP_Serena.md", "mcp/MCP_Tavily.md"}
 
 # Environment variable to control instruction mode (default: enabled)
 USE_INSTRUCTIONS = os.environ.get("CLAUDE_CONTEXT_USE_INSTRUCTIONS", "1") == "1"
@@ -358,12 +344,6 @@ def scannable_prompt(prompt: str) -> str:
 # valid curl option.
 RETIRED_FUZZY_CUTOFF = 0.8
 
-# Flag alias system — empty by design. All canonical flags live in VALID_FLAGS.
-# Typos are caught by the fuzzy-match fallback in resolve_flags (difflib ≥ 0.6).
-# Conceptual aliases (e.g., --parallel for --delegate) were removed to keep one
-# canonical name per concept; update command docs to use canonical flags directly.
-FLAG_ALIASES: dict[str, list[str]] = {}
-
 # All valid flags for fuzzy matching fallback
 VALID_FLAGS = {
     "brainstorm",
@@ -424,7 +404,7 @@ RETIRED_FLAGS: dict[str, str] = {
 
 
 def resolve_flags(prompt: str) -> tuple[str, list[str]]:
-    """Resolve flag aliases and typos in a prompt.
+    """Resolve flag typos in a prompt.
 
     Returns:
         Tuple of (corrected_prompt, list of notification messages)
@@ -448,16 +428,6 @@ def resolve_flags(prompt: str) -> tuple[str, list[str]]:
 
         # Skip CC-native triggers (e.g., ultrathink) — pass through silently
         if flag in CC_NATIVE_PASSTHROUGH:
-            continue
-
-        # Check alias table
-        if flag in FLAG_ALIASES:
-            replacements = FLAG_ALIASES[flag]
-            replacement_str = " ".join(f"--{r}" for r in replacements)
-            corrected = corrected.replace(f"--{match.group(1)}", replacement_str, 1)
-            notifications.append(
-                f"--{flag} → auto-corrected to {replacement_str} (alias)"
-            )
             continue
 
         # Retired flags, exact then fuzzy. Fuzzy matters as much as exact here:
@@ -587,44 +557,6 @@ def strip_unresolved_commands(prompt: str, unresolved: set[str]) -> str:
     )
 
 
-# v2.1.0: Skills configuration
-SHOW_SKILLS_SUMMARY = os.environ.get("CLAUDE_SHOW_SKILLS", "1") == "1"
-
-
-def get_skill_estimates() -> list["TokenEstimate"]:
-    """Get token estimates for all installed skills.
-
-    Returns:
-        List of TokenEstimate objects for all skills
-    """
-    try:
-        from superclaude.scripts.token_estimator import get_all_skill_estimates
-
-        return get_all_skill_estimates()
-    except ImportError:
-        return []
-
-
-def format_skills_summary(skills: list["TokenEstimate"]) -> str:
-    """Format skills summary for context output.
-
-    Compact single-line format to minimize attention budget dilution.
-    Full skill details available via /sc:help.
-
-    Args:
-        skills: List of TokenEstimate objects
-
-    Returns:
-        Formatted skills summary string
-    """
-    if not skills:
-        return ""
-
-    skill_names = ", ".join(s.name for s in skills)
-    total_full = sum(s.full_tokens for s in skills)
-    return f"<!-- {len(skills)} skills installed ({skill_names}). ~{total_full} tokens full load. Use /sc:help for details. -->"
-
-
 def get_loaded_contexts() -> set:
     """Read the contexts already injected into this session."""
     if cache_file().exists():
@@ -713,9 +645,6 @@ def check_mcp_fallbacks(
     Returns:
         List of notification strings to display
     """
-    if not MCP_FALLBACK_AVAILABLE:
-        return []
-
     notifications = []
     for context_file, _ in contexts:
         # Extract MCP name from path like "mcp/MCP_Serena.md"
@@ -745,8 +674,6 @@ def _get_injection_tier(context_file: str, verbose: bool) -> int:
         return 2
     if context_file.startswith("modes/"):
         return 2  # Modes always need full behavioral content
-    if context_file in _BEHAVIORAL_MCPS:
-        return 1  # Serena, Tavily need operational instructions
     if context_file in TIER_0_MAP:
         return 0  # Tool MCPs get 1-line hints
     if context_file in INSTRUCTION_MAP:
@@ -934,7 +861,7 @@ def _emit_execution_directives(prompt: str, session_id: str | None = None) -> No
     # check_mcp_fallbacks() derives the server name from an "mcp/MCP_*.md" path, so
     # dropping Context7's doc also dropped its "connector not enabled" notice. The
     # flag carries it instead.
-    if MCP_FALLBACK_AVAILABLE and _C7_PATTERN.search(scannable):
+    if _C7_PATTERN.search(scannable):
         notification = check_mcp_and_notify("context7", session_id)
         if notification:
             print(f"<!-- {notification} -->")
@@ -1009,16 +936,9 @@ def find_migration_reference(roots: list[Path] | None = None) -> Path | None:
                 found.extend(p for p in root.glob(pattern) if p.is_file())
             except OSError:
                 continue
-    newest: Path | None = None
-    newest_mtime = -1.0
-    for candidate in found:
-        try:
-            mtime = candidate.stat().st_mtime
-        except OSError:
-            continue
-        if mtime > newest_mtime:
-            newest, newest_mtime = candidate, mtime
-    return newest
+    # A file that vanishes between glob and stat raises OSError, which the one
+    # caller already treats as "no reference found".
+    return max(found, key=lambda p: p.stat().st_mtime, default=None)
 
 
 def migration_reference_ranges(path: Path) -> dict[str, list[str]]:
@@ -1103,36 +1023,31 @@ def _emit_prompt_command_reference(prompt: str) -> None:
     print()
 
 
-def _extract_prompt(stdin_data: str) -> str:
-    """Extract prompt from UserPromptSubmit JSON input, with raw text fallback."""
-    try:
-        data = json.loads(stdin_data)
-        return data.get("prompt", stdin_data)
-    except (json.JSONDecodeError, TypeError):
-        return stdin_data
+def _parse_hook_input(stdin_data: str) -> tuple[str, str | None]:
+    """Split hook stdin into (prompt, CC session_id or None).
 
-
-def _extract_session_id(stdin_data: str) -> str | None:
-    """Extract the CC session_id from hook stdin JSON (None if unavailable).
-
-    Keys mcp_fallback's once-per-session dedup to the real Claude Code
-    session, so hints re-arm each session instead of once per machine.
+    The prompt is the JSON "prompt" field, else the raw text (stdin that is not
+    a JSON object is itself the prompt). The session id keys mcp_fallback's
+    once-per-session dedup to the real Claude Code session, so hints re-arm each
+    session instead of once per machine.
     """
     try:
         data = json.loads(stdin_data)
     except (json.JSONDecodeError, TypeError):
-        return None
+        data = None
     if not isinstance(data, dict):
-        return None
+        return stdin_data, None
     session_id = data.get("session_id")
-    return session_id if isinstance(session_id, str) and session_id else None
+    return (
+        data.get("prompt", stdin_data),
+        session_id if isinstance(session_id, str) and session_id else None,
+    )
 
 
 def main() -> None:
     # Read and parse JSON input from Claude Code
     stdin_data = sys.stdin.read() if not sys.stdin.isatty() else ""
-    prompt = _extract_prompt(stdin_data)
-    session_id = _extract_session_id(stdin_data)
+    prompt, session_id = _parse_hook_input(stdin_data)
     # Pin the dedup cache before anything reads it — a concurrent session in the
     # same project must not consume the injections meant for this one.
     resolve_cache_file(session_id)
@@ -1140,22 +1055,12 @@ def main() -> None:
     if not prompt or not prompt.strip():
         return
 
-    # v3.2: Resolve flag aliases and typos before processing
+    # v3.2: Resolve flag typos before processing
     prompt, flag_notifications = resolve_flags(prompt)
     if flag_notifications:
         for note in flag_notifications:
             print(f"<!-- SuperClaude flag: {note} -->")
         print()
-
-    # v2.1.0: Output skills summary if enabled — once per session (cache-marked)
-    if SHOW_SKILLS_SUMMARY and "_skills_summary" not in get_loaded_contexts():
-        skills = get_skill_estimates()
-        if skills:
-            summary = format_skills_summary(skills)
-            if summary:
-                print(summary)
-                print()
-                mark_as_loaded("_skills_summary")
 
     # Execution flag directives (inline behavioral hints — no file injection)
     _emit_execution_directives(prompt, session_id)

@@ -89,4 +89,3 @@ Validation: `uv run python -m pytest tests/unit/test_command_structure.py -v`
 
 - `agents/` — Domain expert agents commands route to
 - `modes/` — Cognitive overlays commands activate
-- `okf/superclaude/commands/index.md` — OKF v0.1 catalog: commands as concept docs, resource-linked to source (repo-root bundle)

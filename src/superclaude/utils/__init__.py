@@ -27,7 +27,7 @@ from typing import Any
 # reason.
 
 
-def atomic_write_json(path: Path, data: Any, indent: int = 2) -> None:
+def atomic_write_json(path: Path, data: Any, indent: int | None = 2) -> None:
     """Write JSON data atomically using temp file + os.replace.
 
     Prevents data corruption from crashes during write by writing to
@@ -56,22 +56,6 @@ def atomic_write_json(path: Path, data: Any, indent: int = 2) -> None:
         except OSError:
             pass
         raise
-
-
-def get_skill_directories() -> list[Path]:
-    """Get all skill directories to scan.
-
-    Project-local skills are found via project_root(), not the CWD: a hook
-    running from a subdirectory used to see only user-scope skills, so the
-    installed-skill count under-reported project and local scope installs.
-
-    Returns:
-        List of skill base directories (global, project-local)
-    """
-    return [
-        Path.home() / ".claude" / "skills",
-        project_root() / ".claude" / "skills",
-    ]
 
 
 def project_root() -> Path:
@@ -203,6 +187,24 @@ def is_legacy_hook_command(command: str) -> bool:
     return "{{SCRIPTS_PATH}}" in command or bool(_SC_SCRIPTS_PATH_RE.search(command))
 
 
+def is_superclaude_inner_hook(hook: dict) -> bool:
+    """Whether one inner hook is SuperClaude's, judged on its own command.
+
+    The unit that matters for ownership. A settings entry carries one matcher
+    and a list of inner hooks, so a user's own command can sit beside a
+    SuperClaude one; judging the whole entry deleted the user's command along
+    with ours on `--force` and on uninstall.
+    """
+    cmd = hook.get("command", "")
+    if any(marker in cmd for marker in SUPERCLAUDE_HOOK_MARKERS):
+        return True
+    if CONSOLE_HOOK_RE.search(cmd) or is_legacy_hook_command(cmd):
+        return True
+    return any(
+        marker in hook.get("_comment", "") for marker in SUPERCLAUDE_HOOK_MARKERS
+    )
+
+
 def is_superclaude_hook(hook_entry: dict) -> bool:
     """Whether a settings hook entry belongs to SuperClaude.
 
@@ -218,16 +220,7 @@ def is_superclaude_hook(hook_entry: dict) -> bool:
     if any(marker in comment for marker in SUPERCLAUDE_HOOK_MARKERS):
         return True
 
-    for hook in hook_entry.get("hooks", []):
-        cmd = hook.get("command", "")
-        if any(marker in cmd for marker in SUPERCLAUDE_HOOK_MARKERS):
-            return True
-        if CONSOLE_HOOK_RE.search(cmd) or is_legacy_hook_command(cmd):
-            return True
-        inner_comment = hook.get("_comment", "")
-        if any(marker in inner_comment for marker in SUPERCLAUDE_HOOK_MARKERS):
-            return True
-    return False
+    return any(is_superclaude_inner_hook(h) for h in hook_entry.get("hooks", []))
 
 
 def _has_superclaude_hooks(settings_file: Path) -> bool:
@@ -411,7 +404,8 @@ STATE_MAX_AGE_DAYS = 7
 _PRUNABLE_PREFIXES = (
     "claude_context_",
     "loop_guard_",
-    "hook_executions",  # hook_tracker.py's file; the sweep named the module
+    # orphans of the removed hook_tracker; drop after one release
+    "hook_executions",
     "current_session",
     "insight_prompt_",
     "insight_baseline_",

@@ -59,6 +59,15 @@ class TestApprove:
         result = run_guard({"file_path": path})
         assert result["decision"] == "approve"
 
+    def test_invalid_json_on_stdin_fails_open(self):
+        result = subprocess.run(
+            [sys.executable, str(GUARD_SCRIPT)],
+            input="not json",
+            capture_output=True,
+            text=True,
+        )
+        assert json.loads(result.stdout.strip()) == {"decision": "approve"}
+
     def test_with_limit_parameter(self, temp_dir):
         path = _create_file(temp_dir, "big.py", 35_000)
         result = run_guard({"file_path": path, "limit": 500})

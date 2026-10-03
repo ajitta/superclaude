@@ -5,8 +5,8 @@ Proactive token conservation: blocks full-file reads above 30KB, pushing the
 model toward Serena symbolic tools, Grep, or paginated Read instead.
 
 Threshold: 30KB (token conservation, not CC hard limit).
-Bypass: limit parameter, pages parameter (PDF), binary extensions,
-        small files (<5KB), config extensions (<30KB).
+Bypass: limit parameter, pages parameter (PDF), binary extensions, files
+        under 30KB.
 
 Respects SUPERCLAUDE_SIZE_GUARD=0 env var to disable.
 Outputs structured JSON for Claude Code PreToolUse hook protocol.
@@ -19,9 +19,6 @@ from pathlib import Path
 
 # 30KB — proactive token conservation threshold
 SIZE_THRESHOLD = 30_000
-
-# Small files exempt unconditionally
-SMALL_FILE_THRESHOLD = 5_000
 
 # Extensions to skip (binary/image files have different Read paths)
 BINARY_EXTENSIONS = {
@@ -60,17 +57,6 @@ BINARY_EXTENSIONS = {
     ".ipynb",
 }
 
-# Config extensions — exempt below SIZE_THRESHOLD
-CONFIG_EXTENSIONS = {
-    ".json",
-    ".yaml",
-    ".yml",
-    ".toml",
-    ".cfg",
-    ".ini",
-    ".env",
-}
-
 # Code/JSON extensions for context-aware block messages
 JSON_EXTENSIONS = {".json", ".jsonl", ".ndjson"}
 
@@ -91,73 +77,36 @@ def _block_message(size: int, ext: str) -> str:
     )
 
 
+def _block_reason(tool_input: dict) -> str | None:
+    """Why this Read should be blocked, or None to let it through."""
+    # If limit or pages is set, caller is paginating — allow
+    if tool_input.get("limit") is not None or tool_input.get("pages") is not None:
+        return None
+    file_path = tool_input.get("file_path", "")
+    if not file_path:
+        return None
+    ext = Path(file_path).suffix.lower()
+    # Binary files have different Read paths
+    if ext in BINARY_EXTENSIONS or not os.path.isfile(file_path):
+        return None
+    size = os.path.getsize(file_path)
+    return _block_message(size, ext) if size >= SIZE_THRESHOLD else None
+
+
 def main() -> None:
+    reason = None
     # Respect opt-out env var
-    if os.environ.get("SUPERCLAUDE_SIZE_GUARD", "1") == "0":
-        print(json.dumps({"decision": "approve"}))
-        return
+    if os.environ.get("SUPERCLAUDE_SIZE_GUARD", "1") != "0":
+        try:
+            stdin_data = sys.stdin.read() if not sys.stdin.isatty() else ""
+            if stdin_data:
+                reason = _block_reason(json.loads(stdin_data).get("tool_input", {}))
+        except (json.JSONDecodeError, OSError):
+            pass  # Don't block on hook errors — fail open
 
-    try:
-        stdin_data = sys.stdin.read() if not sys.stdin.isatty() else ""
-        if not stdin_data:
-            print(json.dumps({"decision": "approve"}))
-            return
-
-        data = json.loads(stdin_data)
-        tool_input = data.get("tool_input", {})
-
-        file_path = tool_input.get("file_path", "")
-        has_limit = tool_input.get("limit") is not None
-        has_pages = tool_input.get("pages") is not None
-
-        # If limit or pages is set, caller is paginating — allow
-        if has_limit or has_pages:
-            print(json.dumps({"decision": "approve"}))
-            return
-
-        if not file_path:
-            print(json.dumps({"decision": "approve"}))
-            return
-
-        ext = Path(file_path).suffix.lower()
-
-        # Skip binary files
-        if ext in BINARY_EXTENSIONS:
-            print(json.dumps({"decision": "approve"}))
-            return
-
-        # Check file size
-        if os.path.isfile(file_path):
-            size = os.path.getsize(file_path)
-
-            # Small files exempt unconditionally
-            if size < SMALL_FILE_THRESHOLD:
-                print(json.dumps({"decision": "approve"}))
-                return
-
-            # Config extensions exempt below threshold
-            if ext in CONFIG_EXTENSIONS and size < SIZE_THRESHOLD:
-                print(json.dumps({"decision": "approve"}))
-                return
-
-            # Block files above threshold
-            if size >= SIZE_THRESHOLD:
-                print(
-                    json.dumps(
-                        {
-                            "decision": "block",
-                            "reason": _block_message(size, ext),
-                        }
-                    )
-                )
-                return
-
-        print(json.dumps({"decision": "approve"}))
-
-    except json.JSONDecodeError:
-        # Don't block on hook errors — fail open
-        print(json.dumps({"decision": "approve"}))
-    except OSError:
+    if reason:
+        print(json.dumps({"decision": "block", "reason": reason}))
+    else:
         print(json.dumps({"decision": "approve"}))
 
 

@@ -190,11 +190,6 @@ class TestHooksScriptPaths:
             f"Missing hook events: {expected_events - actual_events}"
         )
 
-    def test_hooks_json_schema_version_present(self):
-        content = (HOOKS_DIR / "hooks.json").read_text(encoding="utf-8")
-        data = json.loads(content)
-        assert "schema_version" in data
-
 
 class TestAgentModeMapping:
     """Agent <mcp servers="..."/> → FLAGS.md MCP abbreviations."""

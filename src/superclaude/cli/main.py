@@ -11,7 +11,6 @@ from pathlib import Path
 import click
 
 from superclaude import __version__
-from superclaude.hooks.inline_hooks import parse_frontmatter
 
 
 @click.group()
@@ -29,14 +28,6 @@ def _scope_was_default() -> bool:
     """True when --scope was not passed and click supplied the default."""
     source = click.get_current_context().get_parameter_source("scope")
     return source is not None and source.name == "DEFAULT"
-
-
-def _in_git_repo(start: Path) -> bool:
-    """Return True if start (or any parent) contains a .git directory/file."""
-    for p in [start, *start.parents]:
-        if (p / ".git").exists():
-            return True
-    return False
 
 
 def _stdin_can_answer() -> bool:
@@ -131,14 +122,13 @@ def install(
         superclaude install --scope local
         superclaude install --list
     """
-    from .install_commands import (
-        get_base_path,
-        install_all,
+    from .install_components import install_all
+    from .install_inventory import (
         list_all_components,
         list_available_commands,
         list_installed_commands,
     )
-    from .install_paths import resolve_reporting_target
+    from .install_paths import get_base_path, resolve_reporting_target
 
     # Decide whether to run the interactive wizard.
     # Trigger paths:
@@ -179,7 +169,7 @@ def install(
     # --list and --list-all report on an install rather than write one: the rows
     # are installed/available counts and hook-registration drift for content
     # already on disk, not a preview of what install would put there. So they
-    # resolve scope the way doctor, verify-drift and audit do — walk up to the
+    # resolve scope the way doctor and verify-drift do — walk up to the
     # install in effect — while writing below keeps the CWD anchor. One rule,
     # no exception: reporting follows the install, writing follows the shell.
     #
@@ -230,7 +220,9 @@ def install(
         return
 
     # Hint: suggest --scope local when defaulting to user inside a git repo
-    if _scope_was_default() and scope == "user" and _in_git_repo(Path.cwd()):
+    from .install_interactive import _has_git
+
+    if _scope_was_default() and scope == "user" and _has_git(Path.cwd()):
         click.echo(
             "💡 Installing at the default user scope → ~/.claude, which applies "
             "in every repository. Since this is a git repo, --scope local is the "
@@ -311,7 +303,8 @@ def uninstall(
         superclaude uninstall --remove-mcp     # Also remove SuperClaude-registered MCP servers
     """
     keep_mcp = not remove_mcp
-    from .install_commands import get_base_path, uninstall_all
+    from .install_inventory import uninstall_all
+    from .install_paths import get_base_path
 
     base_path = get_base_path(scope)
 
@@ -357,12 +350,6 @@ def uninstall(
 @click.option("--servers", "-s", multiple=True, help="Specific MCP servers to install")
 @click.option("--list", "list_only", is_flag=True, help="List available MCP servers")
 @click.option(
-    "--status",
-    "show_status",
-    is_flag=True,
-    help="Show MCP server status with fallbacks",
-)
-@click.option(
     "--scope",
     default="user",
     type=click.Choice(["local", "project", "user"]),
@@ -373,29 +360,20 @@ def uninstall(
     is_flag=True,
     help="Show what would be installed without actually installing",
 )
-def mcp(servers, list_only, show_status, scope, dry_run):
+def mcp(servers, list_only, scope, dry_run):
     """
     Install and manage MCP servers for Claude Code
 
     Examples:
         superclaude mcp --list
-        superclaude mcp --status
         superclaude mcp --servers tavily --servers playwright
         superclaude mcp --scope project
         superclaude mcp --dry-run
     """
-    from .install_mcp import (
-        install_mcp_servers,
-        list_available_servers,
-        show_mcp_status,
-    )
+    from .install_mcp import install_mcp_servers, list_available_servers
 
     if list_only:
         list_available_servers()
-        return
-
-    if show_status:
-        show_mcp_status()
         return
 
     click.echo(f"🔌 Installing MCP servers (scope: {scope})...")
@@ -435,7 +413,8 @@ def update(scope: str):
         superclaude update
         superclaude update --scope project
     """
-    from .install_commands import get_base_path, install_all
+    from .install_components import install_all
+    from .install_paths import get_base_path
 
     base_path = get_base_path(scope)
 
@@ -468,7 +447,6 @@ def doctor(verbose: bool, scope: str | None):
 
     Verifies:
         - pytest plugin loaded correctly
-        - Configuration files present
         - SuperClaude hooks registered in the scope's settings file
         - `superclaude` resolvable on PATH, which every hook command needs
         - CLAUDE_SC.md installed and imported
@@ -509,142 +487,6 @@ def doctor(verbose: bool, scope: str | None):
     else:
         click.echo(f"⚠️  {total - passed}/{total} checks failed")
         sys.exit(1)
-
-
-@main.command()
-@click.option(
-    "--list",
-    "list_only",
-    is_flag=True,
-    help="List all available agents",
-)
-@click.option(
-    "--info",
-    "agent_name",
-    default=None,
-    help="Show details for a specific agent",
-)
-@click.option(
-    "--tokens",
-    is_flag=True,
-    help="Show token estimates for all agents",
-)
-@click.option(
-    "--scope",
-    default="user",
-    type=click.Choice(["user", "project", "local"]),
-    help="Scope to check: user (~/.claude/) or project (./.claude/)",
-)
-def agents(list_only: bool, agent_name: str, tokens: bool, scope: str | None):
-    """
-    Manage and inspect SuperClaude agents
-
-    v2.1.0 Features:
-    - Agent discovery and listing
-    - Token estimation for context budgeting
-    - Agent detail inspection
-
-    Examples:
-        superclaude agents --list
-        superclaude agents --info backend-architect
-        superclaude agents --tokens
-        superclaude agents --scope project --list
-    """
-    from .install_paths import resolve_reporting_target
-
-    # Read-only: reporting walks up to the install, writing follows the shell.
-    scope, base_path = resolve_reporting_target(None if _scope_was_default() else scope)
-    agents_path = base_path / "agents"
-
-    if not agents_path.exists():
-        click.echo(f"⚠️  No agents installed at {agents_path}")
-        click.echo("   Run 'superclaude install' first")
-        sys.exit(1)
-
-    # Discover agents
-    agent_files = sorted(agents_path.glob("*.md"))
-
-    if not agent_files:
-        click.echo(f"⚠️  No agent files found in {agents_path}")
-        sys.exit(1)
-
-    # Token estimation mode
-    if tokens:
-        click.echo(f"📊 Agent Token Estimates (scope: {scope}):\n")
-        total_frontmatter = 0
-        total_full = 0
-
-        for agent_file in agent_files:
-            content = agent_file.read_text(encoding="utf-8")
-            full_tokens = len(content) // 4  # CHARS_PER_TOKEN
-
-            # Extract frontmatter
-            match = re.match(r"^---\n(.*?)\n---", content, re.DOTALL)
-            frontmatter_tokens = len(match.group(1)) // 4 if match else 0
-
-            total_frontmatter += frontmatter_tokens
-            total_full += full_tokens
-
-            click.echo(
-                f"   {agent_file.stem:30} ~{frontmatter_tokens:4} tokens (full: ~{full_tokens})"
-            )
-
-        click.echo()
-        click.echo(
-            f"   Total: ~{total_frontmatter} frontmatter, ~{total_full} full load"
-        )
-        click.echo(f"   Agents: {len(agent_files)}")
-        return
-
-    # Info mode - show details for specific agent
-    if agent_name:
-        # Find agent file
-        agent_file = None
-        for f in agent_files:
-            if f.stem == agent_name or f.stem.replace("-", "_") == agent_name.replace(
-                "-", "_"
-            ):
-                agent_file = f
-                break
-
-        if not agent_file:
-            click.echo(f"❌ Agent '{agent_name}' not found")
-            click.echo(
-                f"   Available agents: {', '.join(f.stem for f in agent_files[:5])}..."
-            )
-            sys.exit(1)
-
-        content = agent_file.read_text(encoding="utf-8")
-
-        # Parse frontmatter
-        fm = parse_frontmatter(content)
-
-        click.echo(f"📋 Agent: {agent_file.stem}\n")
-        click.echo(f"   Name: {fm.get('name', agent_file.stem)}")
-        click.echo(f"   Description: {fm.get('description', 'N/A')}")
-        if fm.get("context"):
-            click.echo(f"   Context: {fm.get('context')}")
-
-        click.echo(f"\n   File: {agent_file}")
-        click.echo(f"   Tokens: ~{len(content) // 4}")
-        return
-
-    # Default: list agents
-    click.echo(f"📋 Available Agents (scope: {scope}):\n")
-
-    for agent_file in agent_files:
-        content = agent_file.read_text(encoding="utf-8")
-
-        # Parse frontmatter for description
-        fm = parse_frontmatter(content)
-        description = fm.get("description", "N/A")
-        if len(description) > 50:
-            description = description[:47] + "..."
-
-        click.echo(f"   {agent_file.stem:25} {description}")
-
-    click.echo(f"\n   Total: {len(agent_files)} agents")
-    click.echo("   Use --info <agent> for details, --tokens for estimates")
 
 
 @main.command(name="verify-drift")
@@ -726,180 +568,6 @@ def verify_drift_cmd(scope: str | None, verbose: bool):
         )
         click.echo("   Run 'superclaude install --force' to re-sync")
         sys.exit(1)
-
-
-@main.command()
-@click.option(
-    "--scope",
-    default=None,
-    type=click.Choice(["user", "project", "local"]),
-    help="Installation scope (default: detected from the current directory or above)",
-)
-@click.option("--verbose", is_flag=True, help="Show detailed results")
-@click.option(
-    "--check",
-    type=click.Choice(["drift", "cross-refs", "usage", "all"]),
-    default="all",
-    help="Which check to run (default: all)",
-)
-@click.option(
-    "--format",
-    "output_format",
-    type=click.Choice(["text", "markdown"]),
-    default="text",
-    help="Output format (default: text). markdown writes a committed report.",
-)
-@click.option(
-    "--out",
-    type=click.Path(dir_okay=False, path_type=Path),
-    default=None,
-    help="Output path for --format markdown (default: docs/reports/AUDIT.md)",
-)
-def audit(
-    scope: str | None, verbose: bool, check: str, output_format: str, out: Path | None
-):
-    """
-    Run content integrity audit.
-
-    Combines drift detection, cross-reference validation, and content usage
-    checks into a single report. Drift coverage matches verify-drift
-    (templates/ and hooks.json are not checked).
-
-    Examples:
-        superclaude audit
-        superclaude audit --check drift --verbose
-        superclaude audit --format markdown --out docs/reports/AUDIT.md
-    """
-    from .audit import run_audit
-    from .install_paths import resolve_reporting_target
-
-    scope, base_path = resolve_reporting_target(scope)
-
-    # Markdown format always needs per-file detail
-    effective_verbose = verbose or output_format == "markdown"
-    result = run_audit(base_path, verbose=effective_verbose, check=check)
-
-    if output_format == "markdown":
-        report_path = out or Path("docs/reports/AUDIT.md")
-        report_path.parent.mkdir(parents=True, exist_ok=True)
-        report_path.write_text(
-            _format_audit_markdown(result, scope, check), encoding="utf-8"
-        )
-        click.echo(f"📝 Audit report written to {report_path}")
-        if not result["clean"]:
-            sys.exit(1)
-        return
-
-    click.echo(f"🔍 SuperClaude Audit (scope: {scope}, check: {check})\n")
-
-    # Drift results
-    if "drift" in result:
-        drift = result["drift"]
-        icon = "✅" if drift["clean"] else "⚠️"
-        click.echo(
-            f"{icon} Drift: {drift['total_ok']} OK, "
-            f"{drift['total_drifted']} drifted, "
-            f"{drift['total_missing']} missing, "
-            f"{drift['total_extra']} extra"
-        )
-        if verbose and not drift["clean"]:
-            for component, stats in drift["components"].items():
-                if stats["drifted"] + stats["missing"] + stats["extra"] == 0:
-                    continue
-                click.echo(f"   {component}:")
-                for filename, status in stats.get("files", {}).items():
-                    if status != "OK":
-                        click.echo(f"      - [{status}] {filename}")
-
-    # Cross-reference results
-    if "cross_refs" in result:
-        xref = result["cross_refs"]
-        icon = "✅" if xref["clean"] else "⚠️"
-        click.echo(f"{icon} Cross-refs: {xref['total_issues']} issues")
-        if verbose and not xref["clean"]:
-            for category, items in xref["issues"].items():
-                if items:
-                    click.echo(f"   {category}:")
-                    for item in items:
-                        click.echo(f"      - {item}")
-
-    # Usage results
-    if "usage" in result:
-        usage = result["usage"]
-        icon = "✅" if usage["clean"] else "⚠️"
-        click.echo(f"{icon} Usage: {usage['total_issues']} issues")
-        if verbose and not usage["clean"]:
-            for issue in usage["issues"]:
-                click.echo(f"      - {issue}")
-
-    # Overall
-    click.echo()
-    if result["clean"]:
-        click.echo("✅ All checks passed")
-    else:
-        click.echo("⚠️  Issues found — see above for details")
-        sys.exit(1)
-
-
-def _format_audit_markdown(result: dict, scope: str, check: str) -> str:
-    """Render audit result as a committable markdown health report."""
-    from datetime import datetime, timezone
-
-    lines = [
-        "# SuperClaude Audit Report",
-        "",
-        f"- **Generated:** {datetime.now(timezone.utc).isoformat(timespec='seconds')}",
-        f"- **Scope:** `{scope}`",
-        f"- **Checks:** `{check}`",
-        f"- **Status:** {'✅ Clean' if result['clean'] else '⚠️ Issues found'}",
-        "",
-    ]
-
-    if "drift" in result:
-        drift = result["drift"]
-        lines += [
-            "## Drift",
-            "",
-            f"- OK: {drift['total_ok']}",
-            f"- Drifted: {drift['total_drifted']}",
-            f"- Missing: {drift['total_missing']}",
-            f"- Extra: {drift['total_extra']}",
-            "",
-        ]
-        if not drift["clean"]:
-            for component, stats in drift["components"].items():
-                non_ok = [
-                    (f, s) for f, s in stats.get("files", {}).items() if s != "OK"
-                ]
-                if not non_ok:
-                    continue
-                lines.append(f"### {component}")
-                lines.append("")
-                for filename, status in non_ok:
-                    lines.append(f"- `{status}` — `{filename}`")
-                lines.append("")
-
-    if "cross_refs" in result:
-        xref = result["cross_refs"]
-        lines += [f"## Cross-references ({xref['total_issues']} issues)", ""]
-        if not xref["clean"]:
-            for category, items in xref["issues"].items():
-                if items:
-                    lines.append(f"### {category}")
-                    lines.append("")
-                    for item in items:
-                        lines.append(f"- {item}")
-                    lines.append("")
-
-    if "usage" in result:
-        usage = result["usage"]
-        lines += [f"## Usage ({usage['total_issues']} issues)", ""]
-        if not usage["clean"]:
-            for issue in usage["issues"]:
-                lines.append(f"- {issue}")
-            lines.append("")
-
-    return "\n".join(lines) + "\n"
 
 
 @main.command(
@@ -1118,7 +786,6 @@ def _run_loader_isolated(prompt: str, content_root: Path) -> str:
         env = os.environ.copy()
         env["CLAUDE_PROJECT_DIR"] = sandbox
         env["SUPERCLAUDE_PATH"] = str(content_root)
-        env["CLAUDE_SHOW_SKILLS"] = "0"  # once-per-session banner, not prompt-triggered
         try:
             result = subprocess.run(
                 [sys.executable, str(loader)],
@@ -1142,7 +809,7 @@ def _run_loader_isolated(prompt: str, content_root: Path) -> str:
 
 def _parse_loader_output(stdout: str, content_root: Path) -> dict:
     """Turn the loader's stdout into the pieces the report prints."""
-    from superclaude.scripts.token_estimator import estimate_tokens
+    from superclaude.scripts.context_loader import estimate_tokens
 
     contexts: list[dict] = []
     directives: list[str] = []
@@ -1295,8 +962,7 @@ def context_explain(prompt):
     or written. The loader that ran is named in the output.
 
     The run always simulates a FRESH session: a live session that already
-    received one of these files would not receive it again, and the
-    once-per-session installed-skills banner is suppressed rather than shown.
+    received one of these files would not receive it again.
 
     Examples:
         superclaude context explain "--serena rename this symbol"
@@ -1332,10 +998,6 @@ def context_explain(prompt):
     click.echo(f"budget:  {budget} tokens")
     click.echo(f"loader:  {_packaged_loader()}")
     click.echo("session: dry run — fresh session simulated, no cache read or written")
-    click.echo(
-        "skills:  installed-skills banner suppressed "
-        "(once-per-session, not prompt-triggered)"
-    )
     click.echo("")
 
     contexts = report["contexts"]
@@ -1435,12 +1097,6 @@ def context_reset_cmd(session_id):
     else:
         looked = ", ".join(str(t) for t in targets)
         click.echo(f"nothing to reset (looked at {looked})")
-
-
-@main.command()
-def version():
-    """Show SuperClaude version"""
-    click.echo(f"SuperClaude version {__version__}")
 
 
 if __name__ == "__main__":

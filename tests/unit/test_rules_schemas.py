@@ -45,9 +45,3 @@ def test_red_not_in_agent_colors():
     assert "red" not in set(data["agent_colors"].values()), (
         "red must not be in agent_colors (drift fix regression guard)"
     )
-
-
-def test_conftest_fixture_rules_schemas_loads(rules_schemas):
-    assert isinstance(rules_schemas, dict)
-    for key in ("agent_colors", "effort_values", "forbidden_command_fields"):
-        assert key in rules_schemas

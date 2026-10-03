@@ -10,25 +10,13 @@ from pathlib import Path
 
 import pytest
 
+from tests.unit.md_helpers import extract_xml_attr, extract_xml_content
+
 MODES_DIR = Path(__file__).parent.parent.parent / "src" / "superclaude" / "modes"
 
 # Mode files: MODE_*.md (excludes RESEARCH_CONFIG.md which is type="config")
 MODE_FILES = sorted(MODES_DIR.glob("MODE_*.md"))
 MODE_IDS = [f.stem for f in MODE_FILES]
-
-
-def extract_xml_attr(text: str, tag: str, attr: str) -> str | None:
-    """Extract an attribute value from the first occurrence of an XML tag."""
-    pattern = rf"<{tag}\b[^>]*\b{attr}=[\"']([^\"']*)[\"']"
-    match = re.search(pattern, text)
-    return match.group(1) if match else None
-
-
-def extract_xml_content(text: str, tag: str) -> str | None:
-    """Extract text content from the first occurrence of an XML tag."""
-    pattern = rf"<{tag}\b[^>]*>(.*?)</{tag}>"
-    match = re.search(pattern, text, re.DOTALL)
-    return match.group(1).strip() if match else None
 
 
 @pytest.fixture(params=MODE_FILES, ids=MODE_IDS)

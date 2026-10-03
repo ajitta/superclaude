@@ -3,16 +3,13 @@
 
 Subcommands:
     append      Write a structured insight to .claude/insights.jsonl (stdin or --json)
-    list        Show recent insights (jq required)
-    query       Filter insights by key=value (jq required)
-    stats       Type/tag distribution (jq required)
+    list        Show recent insights
+    query       Filter insights by key=value
+    stats       Type distribution
     harvest     Scan current session transcript for INSIGHT: markers → pending
     review      List entries in .claude/insights.pending.jsonl
     promote     Move a pending entry to insights.jsonl as a structured insight
     pending-count   Print count of pending entries (for SessionStart notice)
-
-Read paths require jq; write paths are pure Python. Missing jq prints install
-hint to stderr and exits 1.
 
 Invocation: `superclaude insight <subcommand>` — the console script carries the
 environment where superclaude.utils resolves. Running this file under a bare
@@ -35,9 +32,9 @@ import hashlib
 import json
 import os
 import re
-import shutil
 import subprocess
 import sys
+from collections import Counter
 from pathlib import Path
 
 from superclaude.utils import (
@@ -100,17 +97,6 @@ def _git_user() -> str:
     except (OSError, subprocess.TimeoutExpired):
         pass
     return os.environ.get("USER") or os.environ.get("USERNAME") or "unknown"
-
-
-def _require_jq() -> str:
-    jq = shutil.which("jq")
-    if not jq:
-        print(
-            "jq not found — install: https://jqlang.github.io/jq/download/",
-            file=sys.stderr,
-        )
-        sys.exit(1)
-    return jq
 
 
 def _encode_cwd(cwd: str) -> str:
@@ -216,35 +202,23 @@ def _annotation_target_exists(ref_ts: str) -> bool:
     return False
 
 
-# ---------- read paths (jq) ----------
+# ---------- read paths ----------
 
 
 def cmd_list(args: argparse.Namespace) -> int:
-    if not _insight_file().exists():
+    rows = _read_pending(_insight_file())
+    if not rows:
         print("(no insights yet)")
         return 0
-    jq = _require_jq()
-    r = subprocess.run(
-        [
-            jq,
-            "-r",
-            r'"\(.ts) [\(.author // "unknown")] [\(.type)] \(.insight)"',
-            str(_insight_file()),
-        ],
-        capture_output=True,
-        text=True,
-    )
-    if r.returncode != 0:
-        print(r.stderr, file=sys.stderr)
-        return r.returncode
-    lines = r.stdout.strip().split("\n")
-    for line in lines[-args.limit :]:
-        print(line)
+    for d in rows[-args.limit :]:
+        author = d.get("author") or "unknown"
+        print(f"{d.get('ts')} [{author}] [{d.get('type')}] {d.get('insight')}")
     return 0
 
 
 def cmd_query(args: argparse.Namespace) -> int:
-    if not _insight_file().exists():
+    rows = _read_pending(_insight_file())
+    if not rows:
         print("(no insights yet)")
         return 0
     if "=" not in args.expr:
@@ -254,36 +228,23 @@ def cmd_query(args: argparse.Namespace) -> int:
     if not key.isidentifier():
         print(f"query: invalid key '{key}' (must be identifier)", file=sys.stderr)
         return 2
-    jq = _require_jq()
-    # Pass value via --arg to prevent jq-syntax injection from model-supplied text.
-    if key == "tags":
-        filt = "select(.tags // [] | index($v))"
-    else:
-        filt = f"select(.{key}==$v)"
-    r = subprocess.run([jq, "--arg", "v", value, filt, str(_insight_file())], text=True)
-    return r.returncode
+    for d in rows:
+        hit = value in (d.get("tags") or []) if key == "tags" else d.get(key) == value
+        if hit:
+            print(json.dumps(d, ensure_ascii=False, indent=2))
+    return 0
 
 
 def cmd_stats(args: argparse.Namespace) -> int:
-    if not _insight_file().exists():
+    rows = _read_pending(_insight_file())
+    if not rows:
         print("(no insights yet)")
         return 0
-    jq = _require_jq()
-    type_filt = ".type" if args.all else 'select(.type != "annotation") | .type'
-    r = subprocess.run(
-        [jq, "-r", type_filt, str(_insight_file())],
-        capture_output=True,
-        text=True,
+    counts = Counter(
+        d.get("type") for d in rows if args.all or d.get("type") != "annotation"
     )
-    if r.returncode != 0:
-        print(r.stderr, file=sys.stderr)
-        return r.returncode
-    counts: dict[str, int] = {}
-    for line in r.stdout.strip().split("\n"):
-        if line:
-            counts[line] = counts.get(line, 0) + 1
     print("Type distribution:")
-    for t, n in sorted(counts.items(), key=lambda x: -x[1]):
+    for t, n in counts.most_common():
         print(f"  {n:>4}  {t}")
     print(f"Total: {sum(counts.values())}")
     return 0
@@ -690,15 +651,6 @@ def _status_lines() -> list[str] | None:
             continue
         lines.append(raw)
     return sorted(lines)
-
-
-def _working_tree_changed() -> bool:
-    """Whether this project has uncommitted changes the user cares about.
-
-    The fallback proxy, used when no session baseline was recorded. Any git
-    failure means no prompt.
-    """
-    return bool(_status_lines())
 
 
 def _tree_fingerprint() -> str | None:

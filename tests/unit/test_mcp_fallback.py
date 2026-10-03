@@ -25,54 +25,27 @@ class TestMcpFallback:
                 "superclaude.hooks.mcp_fallback.MCP_FALLBACK_FILE",
                 tracker_dir / "mcp_fallbacks.json",
             ),
-            patch("superclaude.hooks.hook_tracker.HOOK_TRACKER_DIR", tracker_dir),
-            patch(
-                "superclaude.hooks.hook_tracker.SESSION_FILE",
-                tracker_dir / "current_session.txt",
-            ),
         ):
             yield tracker_dir
 
-    def test_should_notify_fallback_first_time(self, temp_fallback_dir: Path):
-        """Test first notification returns True."""
-        from superclaude.hooks.mcp_fallback import should_notify_fallback
-
-        should_notify, fallback = should_notify_fallback("context7")
-        assert should_notify is True
-        assert fallback == "Tavily/WebSearch"
-
-    def test_should_notify_fallback_second_time(self, temp_fallback_dir: Path):
-        """Test second notification returns False."""
-        from superclaude.hooks.mcp_fallback import should_notify_fallback
-
-        # First call
-        should_notify_fallback("context7")
-
-        # Second call - should not notify
-        should_notify, fallback = should_notify_fallback("context7")
-        assert should_notify is False
-        assert fallback == "Tavily/WebSearch"
-
     def test_different_mcps_tracked_separately(self, temp_fallback_dir: Path):
         """Test that different MCPs are tracked independently."""
-        from superclaude.hooks.mcp_fallback import should_notify_fallback
+        from superclaude.hooks.mcp_fallback import check_mcp_and_notify
 
-        # Notify for context7
-        should_notify_fallback("context7")
+        # Notify for context7. Conditional phrasing — the hook cannot check real
+        # availability, so the hint must not assert the server is down.
+        msg = check_mcp_and_notify("context7")
+        assert msg == "ℹ️ If context7 MCP is unavailable, fall back to: Tavily/WebSearch"
 
         # playwright should still notify (first time)
-        should_notify, fallback = should_notify_fallback("playwright")
-        assert should_notify is True
-        assert "--devtools" in fallback
+        msg = check_mcp_and_notify("playwright")
+        assert msg is not None
+        assert "--devtools" in msg
 
-    def test_format_fallback_notification(self, temp_fallback_dir: Path):
-        """Test notification message format."""
-        from superclaude.hooks.mcp_fallback import format_fallback_notification
-
-        msg = format_fallback_notification("Context7", "Tavily/WebSearch")
-        # Conditional phrasing — the hook cannot check real availability,
-        # so the hint must not assert the server is down.
-        assert msg == "ℹ️ If Context7 MCP is unavailable, fall back to: Tavily/WebSearch"
+        # an MCP with no fallback entry still gets a hint, naming Native
+        msg = check_mcp_and_notify("unknown-mcp")
+        assert msg is not None
+        assert msg.endswith("fall back to: Native")
 
     def test_check_mcp_and_notify_returns_message(self, temp_fallback_dir: Path):
         """Test combined check and notify function."""
@@ -88,39 +61,6 @@ class TestMcpFallback:
         result2 = check_mcp_and_notify("playwright")
         assert result2 is None
 
-    def test_get_fallback_for_known_mcp(self, temp_fallback_dir: Path):
-        """Test fallback lookup for known MCP."""
-        from superclaude.hooks.mcp_fallback import get_fallback_for
-
-        assert get_fallback_for("context7") == "Tavily/WebSearch"
-        assert (
-            get_fallback_for("tavily")
-            == "Tavily Agent Skills (tvly CLI), then native WebSearch"
-        )
-        assert (
-            get_fallback_for("serena")
-            == "Grep/Glob + Edit (no symbol ops or persistence)"
-        )
-
-    def test_get_fallback_for_unknown_mcp(self, temp_fallback_dir: Path):
-        """Test fallback lookup for unknown MCP returns Native."""
-        from superclaude.hooks.mcp_fallback import get_fallback_for
-
-        assert get_fallback_for("unknown-mcp") == "Native"
-
-    def test_session_id_passthrough_rotates_per_session(self, temp_fallback_dir: Path):
-        """A new CC session id re-arms the hint; same session stays suppressed."""
-        from superclaude.hooks.mcp_fallback import should_notify_fallback
-
-        first, _ = should_notify_fallback("serena", session_id="cc-session-1")
-        assert first is True
-
-        repeat, _ = should_notify_fallback("serena", session_id="cc-session-1")
-        assert repeat is False
-
-        next_session, _ = should_notify_fallback("serena", session_id="cc-session-2")
-        assert next_session is True
-
     def test_check_mcp_and_notify_passes_session_id(self, temp_fallback_dir: Path):
         """check_mcp_and_notify keys the hint on the provided CC session id."""
         from superclaude.hooks.mcp_fallback import check_mcp_and_notify
@@ -131,14 +71,13 @@ class TestMcpFallback:
 
     def test_case_insensitive_mcp_names(self, temp_fallback_dir: Path):
         """Test MCP names are handled case-insensitively."""
-        from superclaude.hooks.mcp_fallback import should_notify_fallback
+        from superclaude.hooks.mcp_fallback import check_mcp_and_notify
 
         # Use uppercase
-        should_notify_fallback("CONTEXT7")
+        check_mcp_and_notify("CONTEXT7")
 
         # Lowercase should see as already notified
-        should_notify, _ = should_notify_fallback("context7")
-        assert should_notify is False
+        assert check_mcp_and_notify("context7") is None
 
     def test_mcp_fallback_mapping_complete(self):
         """Test all expected MCPs have fallback mappings."""
@@ -169,11 +108,6 @@ class TestMcpFallbackCleanup:
             patch(
                 "superclaude.hooks.mcp_fallback.MCP_FALLBACK_FILE",
                 tracker_dir / "mcp_fallbacks.json",
-            ),
-            patch("superclaude.hooks.hook_tracker.HOOK_TRACKER_DIR", tracker_dir),
-            patch(
-                "superclaude.hooks.hook_tracker.SESSION_FILE",
-                tracker_dir / "current_session.txt",
             ),
         ):
             yield tracker_dir

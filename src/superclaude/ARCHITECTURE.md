@@ -83,7 +83,7 @@ Python and shell scripts that power SuperClaude's hook system, context loading, 
 
 | Class | Resolver | Examples | On uninstall |
 |---|---|---|---|
-| Ephemeral machine state | `hook_state_dir()` → `<claude_base>/.superclaude_hooks/` | context dedup cache, hook tracker, MCP fallback log, loop_guard counters | removed wholesale |
+| Ephemeral machine state | `hook_state_dir()` → `<claude_base>/.superclaude_hooks/` | context dedup cache, MCP fallback log, loop_guard counters | removed wholesale |
 | Durable project data | `project_root() / ".claude"` | `insights.jsonl`, `insights.pending.jsonl` | preserved |
 
 State that is not session-keyed adds `project_key()` to its filename, because a user-scope install shares one `hook_state_dir()` across every project.
@@ -185,9 +185,3 @@ Type-specific required sections:
 | command | role, mission, syntax, flow, bounds, handoff |
 | mode | role, mission, thinking, communication, priorities, behaviors, bounds, handoff |
 | mcp | role, mission, bounds, handoff |
-
-## Machine-Navigable Catalog (OKF)
-
-`okf/superclaude/` mirrors this taxonomy as an [Open Knowledge Format](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md) (OKF) v0.2 knowledge bundle — one concept doc per component (agent, command, mode, MCP server, core file), each carrying a `resource` pointer back to its source in this tree. Navigation is progressive-disclosure: bundle `index.md` → section `index.md` → concept.
-
-This document stays the human-authored source of truth for the taxonomy; the bundle is a generated, agent-navigable catalog view of the same content. Regenerate the bundle after adding a component so the catalog stays in sync.

@@ -11,11 +11,12 @@ actually looked at SuperClaude.
 """
 
 import json
+from importlib.metadata import entry_points
 from pathlib import Path
 from typing import Any, Dict
 
 from superclaude import __version__
-from superclaude.utils import settings_filename
+from superclaude.utils import is_superclaude_hook, settings_filename
 
 from .install_paths import probe_console_script, resolve_reporting_target
 
@@ -62,7 +63,6 @@ def run_doctor(scope: str | None = None) -> Dict[str, Any]:
 
     checks = [
         _check_pytest_plugin(),
-        _check_configuration(),
         _check_hooks_installed(base_path, scope),
         _check_console_entry(),
         _check_claude_sc_md(base_path, scope),
@@ -79,75 +79,23 @@ def run_doctor(scope: str | None = None) -> Dict[str, Any]:
 
 def _check_pytest_plugin() -> Dict[str, Any]:
     """
-    Check if pytest plugin is loaded
+    Check that the SuperClaude pytest plugin's entry point is registered
 
     Returns:
         Check result dict
     """
-    try:
-        import pytest
-
-        # Try to get pytest config
-        try:
-            config = pytest.Config.fromdictargs({}, [])
-            plugins = config.pluginmanager.list_plugin_distinfo()
-
-            # Check if superclaude plugin is loaded
-            superclaude_loaded = any(
-                "superclaude" in str(plugin[0]).lower() for plugin in plugins
-            )
-
-            if superclaude_loaded:
-                return {
-                    "name": "pytest plugin loaded",
-                    "passed": True,
-                    "details": ["SuperClaude pytest plugin is active"],
-                }
-            else:
-                return {
-                    "name": "pytest plugin loaded",
-                    "passed": False,
-                    "details": ["SuperClaude plugin not found in pytest plugins"],
-                }
-        except Exception as e:
-            return {
-                "name": "pytest plugin loaded",
-                "passed": False,
-                "details": [f"Could not check pytest plugins: {e}"],
-            }
-
-    except ImportError:
-        return {
-            "name": "pytest plugin loaded",
-            "passed": False,
-            "details": ["pytest not installed"],
-        }
-
-
-def _check_configuration() -> Dict[str, Any]:
-    """
-    Check SuperClaude configuration
-
-    Returns:
-        Check result dict
-    """
-    # Check if package is importable
-    try:
-        import superclaude
-
-        version = superclaude.__version__
-
-        return {
-            "name": "Configuration",
-            "passed": True,
-            "details": [f"SuperClaude {version} installed correctly"],
-        }
-    except ImportError as e:
-        return {
-            "name": "Configuration",
-            "passed": False,
-            "details": [f"Could not import superclaude: {e}"],
-        }
+    found = any(
+        ep.value.split(".")[0] == "superclaude" for ep in entry_points(group="pytest11")
+    )
+    return {
+        "name": "pytest plugin loaded",
+        "passed": found,
+        "details": [
+            "SuperClaude pytest plugin is active"
+            if found
+            else "SuperClaude plugin not found in pytest plugins"
+        ],
+    }
 
 
 def _check_console_entry() -> Dict[str, Any]:
@@ -233,8 +181,6 @@ def _check_hooks_installed(base_path: Path, scope: str) -> Dict[str, Any]:
     Returns:
         Check result dict
     """
-    from .install_settings import _is_superclaude_hook
-
     filename = settings_filename(scope)
     settings_file = base_path / filename
     label = f"Hooks in {filename}"
@@ -261,7 +207,7 @@ def _check_hooks_installed(base_path: Path, scope: str) -> Dict[str, Any]:
         event
         for event in expected
         if not any(
-            _is_superclaude_hook(entry)
+            is_superclaude_hook(entry)
             for entry in hooks.get(event, [])
             if isinstance(entry, dict)
         )

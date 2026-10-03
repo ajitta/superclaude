@@ -69,7 +69,7 @@ scope: src/superclaude
   [`02_component_and_delivery_map.md`](02_component_and_delivery_map.md) §1이 유일한
   기재 위치이고 `tests/unit/test_codex_component_map.py`가 소스에서 직접 세어 강제한다.
   **커밋마다 바뀌는 측정치**(pytest 카운트, coverage, description 문자 수, format 대상,
-  mypy 오류, OKF 카운트)는 [`08_current_findings_and_backlog.md`](08_current_findings_and_backlog.md)가
+  mypy 오류)는 [`08_current_findings_and_backlog.md`](08_current_findings_and_backlog.md)가
   소유하며, 값 대신 재측정 명령과 마지막 관측 커밋을 함께 적는다.
 - 문서를 근거로 쓰기 전에 신선도를 확인한다. frontmatter의 `measured_at` SHA에 대해
   `git log <SHA>..HEAD -- src/superclaude/`가 비어 있지 않으면 해당 수치는 재측정 대상이다.

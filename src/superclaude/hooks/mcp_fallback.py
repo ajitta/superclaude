@@ -1,7 +1,6 @@
 """MCP Fallback Hint Tracker for SuperClaude
 
 Tracks per-session fallback hints so each MCP's fallback guidance is shown once.
-Uses same session infrastructure as hook_tracker.py.
 
 The hook cannot check actual MCP server availability, so the hint is phrased
 conditionally ("if unavailable") rather than asserting the server is down.
@@ -12,7 +11,7 @@ Behavior:
 
 Session identity: callers should pass the `session_id` from the CC hook
 stdin JSON (context_loader.py does) so the hint re-arms each CC session;
-hook_tracker.get_session_id() is only a non-rotating fallback.
+callers without one share the session "default".
 """
 
 from __future__ import annotations
@@ -20,7 +19,6 @@ from __future__ import annotations
 import json
 from datetime import datetime
 
-from superclaude.hooks.hook_tracker import _ensure_tracker_dir, get_session_id
 from superclaude.utils import atomic_write_json, hook_state_dir
 
 # Storage for MCP fallback notifications (scoped to the active install)
@@ -54,93 +52,35 @@ def _load_fallback_data() -> dict[str, dict[str, str]]:
 
 def _save_fallback_data(data: dict[str, dict[str, str]]) -> None:
     """Save fallback notification data."""
-    _ensure_tracker_dir()
     try:
         atomic_write_json(MCP_FALLBACK_FILE, data)
     except OSError:
         pass  # Best-effort: fallback still works without persistence
 
 
-def should_notify_fallback(
-    mcp_name: str, session_id: str | None = None
-) -> tuple[bool, str]:
-    """Check if fallback notification should be shown.
-
-    Args:
-        mcp_name: Name of the MCP server (lowercase)
-        session_id: CC session id from the hook stdin JSON. Falls back to
-            hook_tracker.get_session_id() (cached, does not rotate per
-            session) when not provided.
-
-    Returns:
-        Tuple of (should_notify, fallback_tool_name)
-    """
-    mcp_lower = mcp_name.lower()
-    fallback = MCP_FALLBACKS.get(mcp_lower, "Native")
-
-    if session_id is None:
-        session_id = get_session_id()
-    data = _load_fallback_data()
-
-    session_data = data.get(session_id, {})
-
-    if mcp_lower in session_data:
-        # Already notified this session
-        return False, fallback
-
-    # First time - mark and return True
-    if session_id not in data:
-        data[session_id] = {}
-    data[session_id][mcp_lower] = datetime.now().isoformat()
-    _save_fallback_data(data)
-
-    return True, fallback
-
-
-def format_fallback_notification(mcp_name: str, fallback: str) -> str:
-    """Format the fallback hint message.
-
-    Phrased conditionally — the hook has no way to check whether the MCP
-    server is actually connected, so it must not assert unavailability.
-
-    Args:
-        mcp_name: Name of the MCP server
-        fallback: Fallback tool name
-
-    Returns:
-        Formatted hint string
-    """
-    return f"ℹ️ If {mcp_name} MCP is unavailable, fall back to: {fallback}"
-
-
 def check_mcp_and_notify(mcp_name: str, session_id: str | None = None) -> str | None:
     """Return the fallback hint on first reference this session.
 
     Does NOT check actual server availability — only tracks whether the
-    hint was already shown this session.
+    hint was already shown this session. The hint is phrased conditionally:
+    the hook has no way to check whether the MCP server is actually
+    connected, so it must not assert unavailability.
 
     Args:
         mcp_name: Name of the MCP server
-        session_id: CC session id from the hook stdin JSON (see
-            should_notify_fallback)
+        session_id: CC session id from the hook stdin JSON; callers without
+            one share the session "default"
 
     Returns:
         Hint string if first time, None if already shown
     """
-    should_notify, fallback = should_notify_fallback(mcp_name, session_id)
+    mcp_lower = mcp_name.lower()
+    data = _load_fallback_data()
+    seen = data.setdefault(session_id or "default", {})
+    if mcp_lower in seen:
+        return None
 
-    if should_notify:
-        return format_fallback_notification(mcp_name, fallback)
-    return None
-
-
-def get_fallback_for(mcp_name: str) -> str:
-    """Get the fallback tool for an MCP server.
-
-    Args:
-        mcp_name: Name of the MCP server
-
-    Returns:
-        Fallback tool name
-    """
-    return MCP_FALLBACKS.get(mcp_name.lower(), "Native")
+    seen[mcp_lower] = datetime.now().isoformat()
+    _save_fallback_data(data)
+    fallback = MCP_FALLBACKS.get(mcp_lower, "Native")
+    return f"ℹ️ If {mcp_name} MCP is unavailable, fall back to: {fallback}"

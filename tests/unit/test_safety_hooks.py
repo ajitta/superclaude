@@ -198,8 +198,7 @@ class TestLoopGuardAtomicWrite:
     def test_no_temp_file_left_behind(self, tmp_path):
         p = tmp_path / "state.json"
         loop_guard._save_state(p, {"entries": []})
-        leftovers = list(p.parent.glob(".loop_guard_*"))
-        assert leftovers == []
+        assert list(p.parent.iterdir()) == [p]
 
     def test_rewrite_replaces_atomically(self, tmp_path):
         p = tmp_path / "state.json"

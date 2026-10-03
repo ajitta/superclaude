@@ -9,7 +9,6 @@ from __future__ import annotations
 
 import json
 import re
-import shutil
 from pathlib import Path
 
 import pytest
@@ -549,21 +548,102 @@ class TestDiscard:
         assert "the only surviving copy" in capsys.readouterr().out
 
 
-# ---------- jq error path ----------
+# ---------- read paths ----------
+
+_ROWS = [
+    {
+        "ts": "2026-10-01T10:00:00+09:00",
+        "author": "ajitta",
+        "type": "feedback",
+        "insight": "first",
+        "tags": ["rules", "x"],
+    },
+    {
+        "ts": "2026-10-01T11:00:00+09:00",
+        "type": "decision",
+        "insight": "no author",
+        "tags": [],
+    },
+    {
+        "ts": "2026-10-01T12:00:00+09:00",
+        "author": "bob",
+        "type": "annotation",
+        "insight": "note",
+        "ref_ts": "2026-10-01T10:00:00+09:00",
+    },
+    {
+        "ts": "2026-10-01T13:00:00+09:00",
+        "author": "bob",
+        "type": "feedback",
+        "insight": "last",
+        "tags": ["rules"],
+    },
+]
 
 
-class TestJqRequired:
-    def test_list_errors_when_jq_missing(self, workdir, monkeypatch, capsys):
-        # Simulate jq missing on PATH
-        monkeypatch.setattr(shutil, "which", lambda name: None)
-        # Need at least one entry so we hit the jq path
-        _run_append(json.dumps({"type": "feedback", "insight": "x"}))
+class TestReadPaths:
+    """list/query/stats read insights.jsonl in-process: no jq on PATH needed."""
+
+    @pytest.fixture(autouse=True)
+    def _seed(self, workdir):
+        path = workdir / ".claude" / "insights.jsonl"
+        path.parent.mkdir(parents=True)
+        lines = [json.dumps(r, ensure_ascii=False) for r in _ROWS]
+        lines.insert(2, "not json")  # a malformed line is skipped, not fatal
+        path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+    def test_list_prints_the_last_rows(self, capsys):
         import argparse
 
-        with pytest.raises(SystemExit) as exc:
-            iw.cmd_list(argparse.Namespace(limit=20))
-        assert exc.value.code == 1
-        assert "jq not found" in capsys.readouterr().err
+        assert iw.cmd_list(argparse.Namespace(limit=3)) == 0
+        assert capsys.readouterr().out.splitlines() == [
+            "2026-10-01T11:00:00+09:00 [unknown] [decision] no author",
+            "2026-10-01T12:00:00+09:00 [bob] [annotation] note",
+            "2026-10-01T13:00:00+09:00 [bob] [feedback] last",
+        ]
+
+    def test_query_matches_a_field_and_a_tag(self, capsys):
+        import argparse
+
+        assert iw.cmd_query(argparse.Namespace(expr="type=feedback")) == 0
+        matched = capsys.readouterr().out
+        assert matched.count('"type": "feedback"') == 2
+        assert '  "insight": "first",' in matched  # pretty-printed, indent 2
+
+        assert iw.cmd_query(argparse.Namespace(expr="tags=rules")) == 0
+        assert capsys.readouterr().out.count('"insight"') == 2
+
+        assert iw.cmd_query(argparse.Namespace(expr="tags=x")) == 0
+        assert capsys.readouterr().out.count('"insight"') == 1
+
+    def test_query_rejects_a_bad_expression(self, capsys):
+        import argparse
+
+        assert iw.cmd_query(argparse.Namespace(expr="a-b=1")) == 2
+        assert iw.cmd_query(argparse.Namespace(expr="nokey")) == 2
+        assert capsys.readouterr().out == ""
+
+    def test_stats_counts_types_and_hides_annotations_by_default(self, capsys):
+        import argparse
+
+        assert iw.cmd_stats(argparse.Namespace(all=False)) == 0
+        out = capsys.readouterr().out
+        assert "     2  feedback" in out
+        assert "annotation" not in out
+        assert "Total: 3" in out
+
+        assert iw.cmd_stats(argparse.Namespace(all=True)) == 0
+        out = capsys.readouterr().out
+        assert "     1  annotation" in out
+        assert "Total: 4" in out
+
+    def test_an_empty_history_says_so(self, workdir, capsys):
+        import argparse
+
+        (workdir / ".claude" / "insights.jsonl").unlink()
+        assert iw.cmd_list(argparse.Namespace(limit=5)) == 0
+        assert iw.cmd_stats(argparse.Namespace(all=False)) == 0
+        assert capsys.readouterr().out.count("(no insights yet)") == 2
 
 
 # ---------- harvest-from-hook argv translation (S3) ----------
@@ -1206,7 +1286,7 @@ class TestFrameworkStateIsNotAUserChange:
         state.mkdir(parents=True)
         (state / "claude_context_abc.txt").write_text("cached\n", encoding="utf-8")
 
-        assert iw._working_tree_changed() is False
+        assert iw._status_lines() == []
 
     def test_pending_insights_are_ignored(self, tmp_path, monkeypatch):
         import superclaude.scripts.insight_writer as iw
@@ -1217,7 +1297,7 @@ class TestFrameworkStateIsNotAUserChange:
             '{"text": "x"}\n', encoding="utf-8"
         )
 
-        assert iw._working_tree_changed() is False
+        assert iw._status_lines() == []
 
     def test_agent_memory_is_ignored(self, tmp_path, monkeypatch):
         import superclaude.scripts.insight_writer as iw
@@ -1227,7 +1307,7 @@ class TestFrameworkStateIsNotAUserChange:
         memory.mkdir(parents=True)
         (memory / "notes.md").write_text("note\n", encoding="utf-8")
 
-        assert iw._working_tree_changed() is False
+        assert iw._status_lines() == []
 
     def test_a_real_edit_still_counts(self, tmp_path, monkeypatch):
         import superclaude.scripts.insight_writer as iw
@@ -1235,7 +1315,7 @@ class TestFrameworkStateIsNotAUserChange:
         repo = _committed_repo(tmp_path, monkeypatch)
         (repo / "tracked.txt").write_text("edited\n", encoding="utf-8")
 
-        assert iw._working_tree_changed() is True
+        assert iw._status_lines()
 
     def test_a_new_source_file_still_counts(self, tmp_path, monkeypatch):
         import superclaude.scripts.insight_writer as iw
@@ -1243,7 +1323,7 @@ class TestFrameworkStateIsNotAUserChange:
         repo = _committed_repo(tmp_path, monkeypatch)
         (repo / "new_module.py").write_text("x = 1\n", encoding="utf-8")
 
-        assert iw._working_tree_changed() is True
+        assert iw._status_lines()
 
 
 class TestSessionBaselineDecidesTheAsk:

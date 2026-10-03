@@ -1,13 +1,11 @@
 {
-  "description": "SuperClaude hooks for session management and code formatting. Async hooks supported (v2.1.34+).",
-  "schema_version": "2.1.37",
   "hooks": {
     "SessionStart": [
       {
         "matcher": "startup",
         "hooks": [
           {
-            "_comment": "[superclaude] session bootstrap — hook session tracking, cleanup of sessions older than 24h, PR-review status line",
+            "_comment": "[superclaude] session bootstrap — PR-review status line, install-status line",
             "type": "command",
             "command": "superclaude hook session_init",
             "timeout": 10,

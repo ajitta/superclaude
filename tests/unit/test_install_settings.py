@@ -12,13 +12,13 @@ import pytest
 
 
 class TestIsSuperclaudeHook:
-    """Tests for _is_superclaude_hook identification logic."""
+    """Tests for is_superclaude_hook identification logic."""
 
     @pytest.fixture(autouse=True)
     def _import(self):
-        from superclaude.cli.install_settings import _is_superclaude_hook
+        from superclaude.utils import is_superclaude_hook
 
-        self.is_sc_hook = _is_superclaude_hook
+        self.is_sc_hook = is_superclaude_hook
 
     def test_detects_session_init_command(self):
         """SC hook detected via the legacy resolved scripts path (user scope)."""
@@ -452,7 +452,7 @@ class TestHookDedup:
 
     Regression: third-party installers (e.g., serena-hooks) re-add identical
     entries on each `make sync-user`, accumulating duplicates that
-    `_is_superclaude_hook` does not catch (no SC marker). Five real reverts
+    `is_superclaude_hook` does not catch (no SC marker). Five real reverts
     were observed in production before this fix.
     """
 
@@ -1135,13 +1135,11 @@ class TestHookIdentityAcrossCommandForms:
         "command", [PINNED, PINNED_WINDOWS, PINNED_QUOTED, PINNED_QUOTED_POSIX]
     )
     def test_a_path_prefixed_console_script_is_the_same_hook(self, command):
-        from superclaude.cli.install_settings import (
-            _hook_script_id,
-            _is_superclaude_hook,
-        )
+        from superclaude.cli.install_settings import _hook_script_id
+        from superclaude.utils import is_superclaude_hook
 
         assert _hook_script_id({"command": command}) == ("loop_guard", "")
-        assert _is_superclaude_hook({"hooks": [{"command": command}]}) is True
+        assert is_superclaude_hook({"hooks": [{"command": command}]}) is True
 
     def test_a_pinned_console_path_is_kept_and_not_doubled(self):
         """The user's workaround for a narrow hook-shell PATH survives a

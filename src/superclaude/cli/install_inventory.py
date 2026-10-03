@@ -10,7 +10,7 @@ from collections import Counter
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
-from superclaude.utils import settings_filename
+from superclaude.utils import is_superclaude_hook, settings_filename
 
 from .install_paths import (
     COMPONENTS,
@@ -20,11 +20,11 @@ from .install_paths import (
     _get_target_dir,
     find_legacy_skills,
     get_base_path,
+    md_names,
     shipped_md_names,
 )
 from .install_settings import (
     _hook_script_id,
-    _is_superclaude_hook,
     _load_settings,
     _split_entry,
     remove_claude_md_import,
@@ -39,43 +39,20 @@ def list_available_commands() -> List[str]:
     Returns:
         List of command names
     """
-    source_dir = _get_source_dir("commands")
-
-    if not source_dir.exists():
-        return []
-
-    commands = []
-    for file in source_dir.glob("*.md"):
-        if file.stem != "README":
-            commands.append(file.stem)
-
-    return sorted(commands)
+    return sorted(Path(n).stem for n in md_names(_get_source_dir("commands")))
 
 
-def list_installed_commands(base_path: Path = None) -> List[str]:
+def list_installed_commands(base_path: Path) -> List[str]:
     """
     List installed commands.
 
     Args:
-        base_path: Base installation path (default: ~/.claude)
+        base_path: Base installation path
 
     Returns:
         List of installed command names
     """
-    if base_path is None:
-        base_path = Path.home() / ".claude"
-
-    commands_dir = base_path / "commands" / "sc"
-
-    if not commands_dir.exists():
-        return []
-
-    installed = []
-    for file in commands_dir.glob("*.md"):
-        if file.stem != "README":
-            installed.append(file.stem)
-
-    return sorted(installed)
+    return sorted(Path(n).stem for n in md_names(base_path / "commands" / "sc"))
 
 
 def _count_shipped_hooks(hooks_json: Path) -> int:
@@ -102,7 +79,7 @@ def _count_registered_hooks(settings_file: Path) -> int:
         for array in settings.get("hooks", {}).values()
         if isinstance(array, list)
         for entry in array
-        if _is_superclaude_hook(entry)
+        if is_superclaude_hook(entry)
     )
 
 
@@ -136,13 +113,6 @@ def _source_dir_names(source_dir: Path) -> set:
         for d in source_dir.iterdir()
         if d.is_dir() and not d.name.startswith(("_", "."))
     }
-
-
-def _source_md_names(source_dir: Path) -> set:
-    """Filenames of the .md files a component ships, README excluded."""
-    if not source_dir.exists():
-        return set()
-    return {f.name for f in source_dir.glob("*.md") if f.stem.upper() != "README"}
 
 
 def _hook_registration_report(hooks_json: Path, settings_file: Path) -> Dict[str, int]:
@@ -180,22 +150,19 @@ def _hook_registration_report(hooks_json: Path, settings_file: Path) -> Dict[str
 
 
 def list_all_components(
-    base_path: Path = None, scope: str = "user"
+    base_path: Path, scope: str = "user"
 ) -> Dict[str, Dict[str, Any]]:
     """
     List all components with their installation status.
 
     Args:
-        base_path: Base installation path (default: ~/.claude)
+        base_path: Base installation path
         scope: Installation scope, which decides whether hook registrations are
             read from settings.json or settings.local.json
 
     Returns:
         Dict with component info and status
     """
-    if base_path is None:
-        base_path = Path.home() / ".claude"
-
     result = {}
     package_root = _get_package_root()
 
@@ -217,7 +184,7 @@ def list_all_components(
                 1 for name in source_names if (target_dir / name).is_dir()
             )
         else:
-            source_names = _source_md_names(source_dir)
+            source_names = shipped_md_names(component)
             installed_count = sum(
                 1 for name in source_names if (target_dir / name).is_file()
             )
@@ -468,7 +435,7 @@ def uninstall_all(
         messages.append(f"⏭️  Not found: {hooks_json}")
         skipped += 1
 
-    # 5a. Remove the hook state directory (context dedup cache, session tracker,
+    # 5a. Remove the hook state directory (context dedup cache,
     # MCP fallback log, loop_guard counters). Every runtime path resolves through
     # superclaude.utils.hook_state_dir, so this one rmtree covers all of it — see
     # the two-class rule in that module's docstring.

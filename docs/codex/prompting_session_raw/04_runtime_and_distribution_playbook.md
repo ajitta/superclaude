@@ -68,7 +68,7 @@ CWD는 project root라고 보장되지 않으므로 `superclaude.utils` resolver
 
 | 상태 | 위치 | 수명 | uninstall |
 |---|---|---|---|
-| context cache, tracker, loop counter, fallback ledger | `hook_state_dir()` | 재생성 가능 | 제거 가능 |
+| context cache, loop counter, fallback ledger | `hook_state_dir()` | 재생성 가능 | 제거 가능 |
 | insight 등 사용자 소유 project data | `project_root()/.claude` | durable | 보존 |
 
 새 writer를 추가할 때 다음을 결정한다.
@@ -171,17 +171,7 @@ editable source나 현재 project dependency가 검사를 오염할 수 있다. 
 
 PyPI wheel/sdist만 검사해 distribution parity를 완료로 판정하지 않는다.
 
-| 경로 | 입력 계약 | 필수 gate |
-|---|---|---|
-| `okf/superclaude/` | `src/superclaude` content taxonomy | tracked resource exact parity, unique pointer, index count |
-| `make build-plugin` | 선언된 plugin source/manifest + unified source payload | clean build, manifest schema, agents/commands/hooks/scripts/skills inventory |
-| `make sync-plugin-repo` | 검증된 plugin artifact | build 성공 선행, target 확인, sync 후 exact parity |
-
-현재 OKF의 skill concept는 작업 트리에는 6개가 있지만 `.gitignore`의 광범위한
-`skills/` 패턴 때문에 tracked catalog에는 0개다. 또한 plugin builder가 요구하는
-`plugins/superclaude/manifest/metadata.json`이 없어 `make build-plugin`이 실패한다.
-둘 다 별도 current finding이며, 경로를 유지할지 폐기할지 결정하기 전에는 release
-gate에서 조용히 제외하지 않는다.
+`okf/`와 plugin build 경로는 폐기했다 (`docs/features/over-engineering-audit` 참조).
 
 ## 8. Drift와 audit의 의미
 

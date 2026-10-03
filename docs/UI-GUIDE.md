@@ -96,7 +96,7 @@ this is inconsistent — `install_mcp.py` uses it, most of `main.py` does not.
 |---|---|
 | Emoji-only status column | Breaks the moment the glyph does not render |
 | ANSI color as the only signal | Lost in logs and pipes; the CLI has no color layer at all |
-| Introducing `rich` rendering for one command | Two renderers on one surface; `rich` is currently declared but unused (see `docs/PRD.md` open questions) |
+| Introducing `rich` rendering for one command | Two renderers on one surface; `rich` is not a dependency of this package |
 | Spinner / progress animation | Corrupts redirected output |
 | A prompt without the stdin gate | Hangs headless sessions |
 | Echoing a secret or a full environment value | Leaks into scrollback and logs |
@@ -105,7 +105,7 @@ this is inconsistent — `install_mcp.py` uses it, most of `main.py` does not.
 
 ## Example
 
-`install --list-all` in `src/superclaude/cli/main.py:196` is the reference
+`install --list-all` in `src/superclaude/cli/main.py:186` is the reference
 implementation: banner with scope, glyph + width-aligned description + count,
 `└─` detail line, and a second `└─` only when there is drift to report.
 

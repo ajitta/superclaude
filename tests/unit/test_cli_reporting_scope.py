@@ -124,27 +124,8 @@ class TestVerifyDriftResolvesTheInstall:
         assert "scope: user" in result.output
 
 
-class TestAuditResolvesTheInstall:
-    def test_reports_the_local_install_from_a_subdirectory(self, local_install):
-        result = _run(["audit"])
-
-        assert "scope: local" in result.output
-
-    def test_clean_install_passes(self, local_install):
-        result = _run(["audit"])
-
-        assert "All checks passed" in result.output
-        assert result.exit_code == 0
-
-
 class TestInventoryCommandsResolveTheInstall:
-    """agents and skills never write, so they follow the same rule."""
-
-    def test_agents_lists_the_local_install(self, local_install):
-        result = _run(["agents", "--list"])
-
-        assert "(scope: local)" in result.output
-        assert "No agents installed" not in result.output
+    """`install --list-all` reports on an install and never writes, so it follows the same rule."""
 
     def test_list_all_reports_the_local_install(self, local_install):
         result = _run(["install", "--list-all"])

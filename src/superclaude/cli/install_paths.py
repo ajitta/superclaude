@@ -45,12 +45,17 @@ COMPONENTS = {
 SHARED_TARGET_COMPONENTS = ("agents", "output-styles")
 
 
+def md_names(directory: Path) -> set:
+    """Filenames of the .md files in a directory, README excluded.
+
+    A missing directory has none: Path.glob yields nothing for it.
+    """
+    return {f.name for f in directory.glob("*.md") if f.stem.upper() != "README"}
+
+
 def shipped_md_names(component: str) -> set:
     """Filenames of the .md files a component ships, README excluded."""
-    source_dir = _get_source_dir(component)
-    if not source_dir.exists():
-        return set()
-    return {f.name for f in source_dir.glob("*.md") if f.stem.upper() != "README"}
+    return md_names(_get_source_dir(component))
 
 
 def get_base_path(scope: str = "user") -> Path:
@@ -107,7 +112,7 @@ def find_install_root(start: Path) -> Path | None:
 def resolve_reporting_target(
     scope: str | None = None, start: Path | None = None
 ) -> tuple[str, Path]:
-    """Scope and base path for the read-only commands: doctor, verify-drift, audit.
+    """Scope and base path for the read-only commands: doctor, verify-drift.
 
     These walk up to the install, unlike ``get_base_path``, which deliberately
     anchors on the CWD because ``superclaude install`` writes where the user is
@@ -162,20 +167,17 @@ def _get_source_dir(component: str) -> Path:
     return package_dir
 
 
-def _get_target_dir(component: str, base_path: Path = None) -> Path:
+def _get_target_dir(component: str, base_path: Path) -> Path:
     """
     Get target directory for a component.
 
     Args:
         component: Component name
-        base_path: Base installation path (default: ~/.claude)
+        base_path: Base installation path
 
     Returns:
         Path to target directory
     """
-    if base_path is None:
-        base_path = Path.home() / ".claude"
-
     target_subdir = COMPONENTS[component][1]
     return base_path / target_subdir
 

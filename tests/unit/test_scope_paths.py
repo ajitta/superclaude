@@ -14,7 +14,6 @@ from pathlib import Path
 from superclaude.utils import (
     claude_base,
     detect_scope,
-    get_skill_directories,
     hook_state_dir,
     main_worktree_root,
     project_key,
@@ -247,26 +246,6 @@ class TestContextCacheKeying:
         assert reset_context_cache("sess-A") is False
 
 
-class TestSkillDirectories:
-    """get_skill_directories finds project skills from any CWD."""
-
-    def test_project_dir_from_subdirectory(self, tmp_path: Path, monkeypatch):
-        """Regression: a subdir CWD reported only user-scope skills."""
-        (tmp_path / ".claude" / "skills").mkdir(parents=True)
-        subdir = tmp_path / "src" / "deep"
-        subdir.mkdir(parents=True)
-
-        monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(tmp_path))
-        monkeypatch.chdir(subdir)
-
-        assert tmp_path / ".claude" / "skills" in get_skill_directories()
-
-    def test_user_scope_always_included(self, tmp_path: Path, monkeypatch):
-        monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(tmp_path))
-
-        assert Path.home() / ".claude" / "skills" in get_skill_directories()
-
-
 class TestContextLoaderBasePath:
     """context_loader._get_base_path composes the same resolution."""
 
@@ -393,9 +372,10 @@ class TestHookStatePruning:
 class TestStateHygiene:
     """The sweep and the session-start reset both named the wrong thing.
 
-    `_PRUNABLE_PREFIXES` claimed a `hook_tracker` file that has never existed —
-    the tracker writes `hook_executions.json` — so the one file the sweep was
-    written for was the one it never collected. And `session_init` reset the
+    `_PRUNABLE_PREFIXES` once claimed a `hook_tracker` file that never existed —
+    the tracker wrote `hook_executions.json` — so the one file the sweep was
+    written for was the one it never collected; the module is gone and the
+    file is now an orphan the sweep still reaps. And `session_init` reset the
     context cache with no session id at all, deleting the project-only fallback
     a concurrent session without an id is using, while `context_reset` on the
     same SessionStart event already did it correctly with the id from stdin.
@@ -483,7 +463,7 @@ class TestDetectScope:
 
     claude_base only answers "which .claude"; project and local share one
     directory, so the CLAUDE.md import each writes is what separates them.
-    Regression target: doctor, verify-drift and audit defaulted to user scope
+    Regression target: doctor and verify-drift defaulted to user scope
     and reported a healthy local install as missing, while the startup banner's
     two-way test labelled a local install "project scope".
     """
@@ -716,7 +696,7 @@ class TestSettingsFilename:
 
 
 class TestResolveReportingTarget:
-    """doctor / verify-drift / audit walk up to the install; install does not.
+    """doctor / verify-drift walk up to the install; install does not.
 
     Regression target: run from a subdirectory, the read-only commands fell back
     to user scope and reported a healthy local install as absent — the same

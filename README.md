@@ -125,7 +125,7 @@ superclaude mcp --scope local          # per-project block inside ~/.claude.json
 superclaude install --list-all          # component-by-component status
 superclaude doctor                      # pytest plugin, hooks, CLAUDE_SC import, `superclaude` on PATH
 superclaude verify-drift                # detect drift between source and installed copy
-superclaude version
+superclaude --version
 ```
 
 Restart Claude Code, then try a few:
@@ -430,7 +430,7 @@ superclaude mcp
 - `install_settings.py` preserves user hooks via marker-based identification and rewrites a previous release's `<python> …/<script>.py` registrations to `superclaude hook <name>`
 - `superclaude doctor` checks that the `superclaude` on PATH has the `hook` subcommand — the package whose hooks actually run
 - `test_runner_hook` runs `uv run python -m pytest` (avoids the Windows uv canonicalize bug)
-- SessionStart: git status + memory staleness warning
+- SessionStart: install-status line, PR-review status and memory staleness warning
 - PreCompact / SessionEnd: insight harvest
 - Hooks are additive — your existing config survives reinstall
 
@@ -552,7 +552,7 @@ The Deep Research system intelligently coordinates multiple tools:
 | Agent conventions (issue tracker, triage labels, domain docs) | [`docs/agents/`](docs/agents) |
 | Core rules (always-loaded) | [`FLAGS.md`](src/superclaude/core/FLAGS.md) · [`PRINCIPLES.md`](src/superclaude/core/PRINCIPLES.md) · [`RULES.md`](src/superclaude/core/RULES.md) |
 | Authoring specs for new content | [`.claude/rules/`](.claude/rules) |
-| Health & drift checks | `superclaude doctor` · `superclaude verify-drift` · `superclaude audit` · `superclaude context explain` / `reset` |
+| Health & drift checks | `superclaude doctor` · `superclaude verify-drift` · `superclaude context explain` / `reset` |
 
 ---
 

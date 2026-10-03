@@ -1,108 +1,49 @@
 """
 Unit tests for context_loader
 
-Tests: format_skills_summary, resolve_flags (alias/fuzzy matching),
+Tests: resolve_flags (alias/fuzzy matching),
        tiered injection (TIER_0_MAP, INSTRUCTION_MAP, _get_injection_tier)
 """
 
 import json
-from dataclasses import dataclass
 from pathlib import Path
 
 import superclaude
 from superclaude.scripts.context_loader import (
-    _BEHAVIORAL_MCPS,
     COMPOSITE_FLAGS,
-    FLAG_ALIASES,
     INSTRUCTION_MAP,
     TIER_0_MAP,
     TRIGGER_MAP,
     VALID_FLAGS,
-    _extract_session_id,
     _get_injection_tier,
-    format_skills_summary,
+    _parse_hook_input,
     resolve_flags,
 )
 
 
-@dataclass
-class FakeTokenEstimate:
-    """Minimal stand-in for TokenEstimate."""
-
-    name: str
-    frontmatter_tokens: int
-    full_tokens: int
-
-
-class TestExtractSessionId:
-    """_extract_session_id pulls the CC session id from hook stdin JSON."""
+class TestParseHookInput:
+    """_parse_hook_input pulls the prompt and the CC session id from hook stdin."""
 
     def test_extracts_session_id(self):
         stdin = json.dumps({"session_id": "abc123", "prompt": "hello"})
-        assert _extract_session_id(stdin) == "abc123"
+        assert _parse_hook_input(stdin) == ("hello", "abc123")
 
     def test_missing_session_id_returns_none(self):
-        assert _extract_session_id(json.dumps({"prompt": "hello"})) is None
+        assert _parse_hook_input(json.dumps({"prompt": "hello"})) == ("hello", None)
 
     def test_invalid_json_returns_none(self):
-        assert _extract_session_id("not json") is None
+        assert _parse_hook_input("not json") == ("not json", None)
 
     def test_non_dict_json_returns_none(self):
-        assert _extract_session_id(json.dumps(["a", "b"])) is None
+        stdin = json.dumps(["a", "b"])
+        assert _parse_hook_input(stdin) == (stdin, None)
 
     def test_empty_session_id_returns_none(self):
-        assert _extract_session_id(json.dumps({"session_id": ""})) is None
-
-
-class TestFormatSkillsSummary:
-    """Test format_skills_summary output format."""
-
-    def test_empty_skills_returns_empty_string(self):
-        assert format_skills_summary([]) == ""
-
-    def test_single_skill_format(self):
-        skills = [FakeTokenEstimate("confidence-check", 103, 2500)]
-        result = format_skills_summary(skills)
-        assert (
-            result
-            == "<!-- 1 skills installed (confidence-check). ~2500 tokens full load. Use /sc:help for details. -->"
-        )
-
-    def test_multiple_skills_format(self):
-        skills = [
-            FakeTokenEstimate("confidence-check", 103, 2500),
-            FakeTokenEstimate("ship", 80, 1800),
-            FakeTokenEstimate("simplicity-coach", 90, 3429),
-        ]
-        result = format_skills_summary(skills)
-        assert (
-            result
-            == "<!-- 3 skills installed (confidence-check, ship, simplicity-coach). ~7729 tokens full load. Use /sc:help for details. -->"
-        )
-
-    def test_output_is_single_line(self):
-        skills = [
-            FakeTokenEstimate("a", 10, 100),
-            FakeTokenEstimate("b", 20, 200),
-        ]
-        result = format_skills_summary(skills)
-        assert "\n" not in result
-
-    def test_output_is_html_comment(self):
-        skills = [FakeTokenEstimate("test", 10, 100)]
-        result = format_skills_summary(skills)
-        assert result.startswith("<!--")
-        assert result.endswith("-->")
+        assert _parse_hook_input(json.dumps({"session_id": ""}))[1] is None
 
 
 class TestResolveFlags:
     """Test flag alias resolution and fuzzy matching."""
-
-    # --- Alias resolution ---
-
-    def test_flag_aliases_table_is_empty(self):
-        """FLAG_ALIASES intentionally empty — canonical flag names only."""
-        assert FLAG_ALIASES == {}
 
     def test_ultrathink_not_remapped(self):
         """ultrathink is a CC native deep-reasoning trigger, not an SC alias."""
@@ -177,23 +118,6 @@ class TestResolveFlags:
         assert "--Delegate" in prompt
         assert notes == []
 
-    # --- Data integrity ---
-
-    def test_all_alias_targets_are_valid(self):
-        """Every alias must resolve to a valid flag."""
-        for alias, targets in FLAG_ALIASES.items():
-            for target in targets:
-                assert target in VALID_FLAGS, (
-                    f"Alias --{alias} maps to --{target} which is not in VALID_FLAGS"
-                )
-
-    def test_no_alias_is_also_valid(self):
-        """No alias should shadow a valid flag."""
-        for alias in FLAG_ALIASES:
-            assert alias not in VALID_FLAGS, (
-                f"--{alias} is in both FLAG_ALIASES and VALID_FLAGS"
-            )
-
 
 class TestTieredInjection:
     """Test 3-tier context injection system."""
@@ -240,8 +164,7 @@ class TestTieredInjection:
         """TIER_0_MAP and INSTRUCTION_MAP may share keys but should not
         both be applied — tier logic selects one or the other."""
         # Behavioral MCPs should be in INSTRUCTION_MAP but NOT in TIER_0_MAP
-        for mcp in _BEHAVIORAL_MCPS:
-            assert mcp in INSTRUCTION_MAP, f"{mcp} missing from INSTRUCTION_MAP"
+        for mcp in INSTRUCTION_MAP:
             assert mcp not in TIER_0_MAP, f"{mcp} should NOT be in TIER_0_MAP"
 
     def test_all_tier_0_entries_are_concise(self):
@@ -436,7 +359,6 @@ def run_loader(
     env = os.environ.copy()
     env["CLAUDE_PROJECT_DIR"] = str(project_dir)
     env["SUPERCLAUDE_PATH"] = str(CONTENT_ROOT)
-    env["CLAUDE_SHOW_SKILLS"] = "0"
     payload: dict[str, str] = {"prompt": prompt}
     if session_id is not None:
         payload["session_id"] = session_id
@@ -688,7 +610,7 @@ class TestContext7HasNoDocOnlyAFlag:
 
         monkeypatch.setattr(cl, "get_loaded_contexts", lambda: set())
         monkeypatch.setattr(cl, "mark_as_loaded", lambda _marks: None)
-        monkeypatch.setattr(cl, "MCP_FALLBACK_AVAILABLE", False)
+        monkeypatch.setattr(cl, "check_mcp_and_notify", lambda *a, **k: None)
         cl._emit_execution_directives(prompt)
         return capsys.readouterr().out
 

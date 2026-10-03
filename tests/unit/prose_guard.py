@@ -1,6 +1,6 @@
 """The unit a prose guard over shipped markdown should scope itself to.
 
-Not a test module (``python_files = ["test_*.py"]`` skips it) — a helper the
+Not a test module (pytest's default ``python_files`` skips it) — a helper the
 drift guards import so the *unit derivation* has one definition site.
 
 Guards that read shipped markdown and assert "this document never prescribes X"

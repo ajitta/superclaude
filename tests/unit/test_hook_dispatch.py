@@ -260,13 +260,13 @@ class TestEntryFastPath:
     def test_everything_else_reaches_the_click_app(self, tmp_path):
         result = _run_entry(
             "import sys\n"
-            "sys.argv = ['superclaude', 'version']\n"
+            "sys.argv = ['superclaude', '--version']\n"
             "from superclaude.cli.entry import main\n"
             "main()\n",
             tmp_path,
         )
         assert result.returncode == 0, result.stderr
-        assert "SuperClaude version" in result.stdout
+        assert "SuperClaude, version" in result.stdout
 
 
 class TestClickRegistration:

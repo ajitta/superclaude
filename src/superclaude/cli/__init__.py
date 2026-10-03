@@ -3,7 +3,6 @@ SuperClaude CLI
 
 Commands:
     - superclaude doctor                   # Check installation health
-    - superclaude version                  # Show version
     - superclaude hook <name>              # Run one hook script (hooks.json form)
 
 The console script enters through ``entry.py``, which dispatches ``hook`` ahead
