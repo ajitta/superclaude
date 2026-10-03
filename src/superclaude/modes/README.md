@@ -54,4 +54,3 @@ Validation: `uv run python -m pytest tests/unit/test_mode_structure.py -v`
 - `agents/` — Domain expert agents (modes shape mindset, agents shape expertise)
 - `commands/` — Slash commands may activate modes
 - `scripts/context_loader.py` — On-demand delivery mechanism
-- `okf/superclaude/modes/index.md` — OKF v0.1 catalog: modes as concept docs, resource-linked to source (repo-root bundle)

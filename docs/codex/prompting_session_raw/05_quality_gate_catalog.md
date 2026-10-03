@@ -79,7 +79,6 @@ mode/MCP/core module ↔ loader tier
 component ↔ installer target
 hook config ↔ script
 skill ↔ supporting files
-source component ↔ tracked OKF resource
 source payload ↔ plugin manifest/artifact
 ```
 
@@ -151,7 +150,7 @@ Hard gate:
 - wheel-installed CLI로 component 설치가 성공한다.
 - placeholder가 설치본에 남지 않는다.
 - 핵심 활성화 실패가 process nonzero로 전파된다.
-- OKF 또는 plugin처럼 선언된 파생 경로는 tracked inventory와 clean build가
+- plugin처럼 선언된 파생 경로는 tracked inventory와 clean build가
   source taxonomy와 일치하거나, 지원 중단이 명시된다.
 
 현재 `skills/` 누락으로 이 gate는 실패한다. `F-001` 참조.
@@ -251,7 +250,7 @@ PY
 | drift | `uv run pytest tests/unit/test_verify_drift.py -v` |
 | eval schema | `uv run pytest tests/unit/test_eval_harness.py -v` |
 | package metadata | `uv run pytest tests/unit/test_version_consistency.py -v` |
-| OKF/plugin delivery | tracked inventory parity + `make build-plugin` clean artifact check |
+| plugin delivery | `make build-plugin` clean artifact check |
 
 ## 5. Gate evidence schema
 

@@ -75,4 +75,3 @@ Microsoft ships both `@playwright/mcp` (the `--play` plugin above) and `playwrig
 - `core/FLAGS.md` — MCP flag defs + auto-detection
 - `cli/install_mcp.py` — Install registry (`MCP_SERVERS`) for core servers (Context7 deliberately absent — connector, not install target)
 - `scripts/context_loader.py` — On-demand delivery mechanism
-- `okf/superclaude/mcp/index.md` — OKF v0.1 catalog: MCP servers as concept docs, resource-linked to source (repo-root bundle; dev tree only — not shipped to `~/.claude/` at install)

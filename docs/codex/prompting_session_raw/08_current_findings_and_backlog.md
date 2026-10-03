@@ -12,7 +12,7 @@ scope: repository-wide evidence relevant to src/superclaude
 수정하지 않는다. 상태가 바뀌면 증거와 함께 항목을 갱신한다.
 
 커밋마다 바뀌는 측정치(pytest 카운트, coverage, description 문자 수, format 대상,
-mypy 오류, OKF 카운트)는 이 문서가 소유한다. 값은 재측정 명령과 마지막 관측 커밋을
+mypy 오류)는 이 문서가 소유한다. 값은 재측정 명령과 마지막 관측 커밋을
 함께 적는다. `git log <SHA>..HEAD -- src/`가 비어 있지 않으면 값을 재측정한다.
 구성요소 인벤토리는 여기 두지 않고
 [`02_component_and_delivery_map.md`](02_component_and_delivery_map.md) §1이 소유한다.
@@ -35,7 +35,7 @@ mypy 오류, OKF 카운트)는 이 문서가 소유한다. 값은 재측정 명�
 | F-012 | P1 | CLOSED | publish workflow와 `.env.example` 삭제로 폐기 — §해결된 finding 참조 |
 | F-013 | P2 | REVISE | testing 문서와 실제 UV/pytest 구성이 drift |
 | F-014 | P2 | REVISE | coverage/mypy가 선언적 기대와 실행 가능한 gate로 정렬되지 않음 |
-| F-015 | P1 | FAIL | tracked OKF catalog에서 skill concept 5개 누락 |
+| F-015 | P1 | CLOSED | `okf/` 삭제로 폐기 — §해결된 finding 참조 |
 | F-016 | P1 | FAIL | plugin build 경로의 입력 manifest/source가 없어 실행 불가 |
 
 ## F-001 — 배포 artifact에서 skills 누락
@@ -299,31 +299,6 @@ uv run mypy src/superclaude/cli src/superclaude/utils src/superclaude/hooks
 먼저 측정 범위와 baseline을 정하고, 변경 파일 또는 위험 모듈부터 점진 gate를
 도입한다.
 
-## F-015 — tracked OKF catalog에서 skill concept 누락
-
-**등급:** `[REPO]` · P1 · CONTEXT/DIST
-
-`src/superclaude/ARCHITECTURE.md:204-208`은 `okf/superclaude/`가 각 source
-component를 `resource`로 가리키는 generated catalog라고 선언한다. 마지막 관측
-`@5b6dc5b`에서 on-disk resource는 94개, tracked resource는 88개다. 빠진 6개는 모두
-`okf/superclaude/skills/*.md`이며 `.gitignore`의 광범위한 `skills/` 패턴이 무시한다.
-
-```bash
-find okf/superclaude -name '*.md' | wc -l     # 94
-git ls-files okf/superclaude | wc -l          # 88
-git ls-files okf/superclaude | grep -c skills/  # 0
-```
-
-영향: 현재 checkout에서는 catalog가 완전해 보여도 새 clone 또는 배포된 저장소의
-agent-readable catalog에는 skill concept가 없다.
-
-완료 gate:
-
-- source concept와 `git ls-files okf/superclaude` resource의 양방향 exact parity
-- resource target 존재, uniqueness, index count 검사
-- generator와 재생성 명령을 SSOT로 지정
-- skill source와 OKF concept가 의도적으로 tracked되는 ignore 예외
-
 ## F-016 — plugin build 경로 실행 불가
 
 **등급:** `[REPO]` · P1 · DIST/TOOL
@@ -381,6 +356,16 @@ secret도 없어 workflow는 한 번도 실행되지 않았다. 게시 경로를
 publish하고, 설치한 wheel로 `superclaude install`과 pytest plugin을 실행하며, smoke의
 subprocess return code를 assert해야 한다.
 
+### F-015 — tracked OKF catalog에서 skill concept 누락 (폐기됨)
+
+**등급:** `[REPO]` · P1 · CONTEXT/DIST · 폐기 결정 over-engineering-audit D01
+
+원래 판정은 `okf/superclaude/` catalog의 skill concept 6개를 `.gitignore`의 `skills/`
+패턴이 무시해 tracked resource가 88개뿐이라는 것이었다. 이 catalog를 생성·검증·읽는 코드는
+repo에 없었고 손으로 유지됐다. 유지하지 않기로 하고 `okf/`와 `ARCHITECTURE.md`의 OKF 절,
+다섯 component README의 포인터를 삭제했다. 다시 만든다면 generator와 재생성 명령을 SSOT로
+먼저 지정해야 한다.
+
 ## 권장 실행 순서
 
 ```text
@@ -390,7 +375,7 @@ subprocess return code를 assert해야 한다.
 4. F-005 machine-readable authoring schema
 5. F-006/F-009 release gate baseline 정렬
 6. F-007 semantic graph validator
-7. F-015/F-016 OKF·plugin 파생 전달 경로 복구 또는 폐기
+7. F-016 plugin 파생 전달 경로 복구 또는 폐기 (F-015 OKF는 폐기)
 8. F-010 automation correctness gates
 9. F-011 CLI functional gate (F-012는 publish 경로 삭제로 폐기)
 10. F-008 behavioral registry budget 측정
