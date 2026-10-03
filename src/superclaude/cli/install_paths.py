@@ -112,7 +112,7 @@ def find_install_root(start: Path) -> Path | None:
 def resolve_reporting_target(
     scope: str | None = None, start: Path | None = None
 ) -> tuple[str, Path]:
-    """Scope and base path for the read-only commands: doctor, verify-drift, audit.
+    """Scope and base path for the read-only commands: doctor, verify-drift.
 
     These walk up to the install, unlike ``get_base_path``, which deliberately
     anchors on the CWD because ``superclaude install`` writes where the user is

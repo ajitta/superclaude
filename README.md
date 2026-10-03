@@ -552,7 +552,7 @@ The Deep Research system intelligently coordinates multiple tools:
 | Agent conventions (issue tracker, triage labels, domain docs) | [`docs/agents/`](docs/agents) |
 | Core rules (always-loaded) | [`FLAGS.md`](src/superclaude/core/FLAGS.md) · [`PRINCIPLES.md`](src/superclaude/core/PRINCIPLES.md) · [`RULES.md`](src/superclaude/core/RULES.md) |
 | Authoring specs for new content | [`.claude/rules/`](.claude/rules) |
-| Health & drift checks | `superclaude doctor` · `superclaude verify-drift` · `superclaude audit` · `superclaude context explain` / `reset` |
+| Health & drift checks | `superclaude doctor` · `superclaude verify-drift` · `superclaude context explain` / `reset` |
 
 ---
 

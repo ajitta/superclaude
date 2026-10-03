@@ -29,7 +29,7 @@ pytest 카운트, coverage, description 문자 수처럼 커밋마다 바뀌는 
 | `mcp/MCP_*.md` | 4 | SC workflow에서 MCP를 WHEN/HOW 사용 |
 | `templates/docs-scaffold/*` | 4 | `/sc:init` 문서 scaffold |
 | distinct hook entry scripts | 10 | `hooks.json`의 14개 등록에서 직접 호출 |
-| 전체 Python module | 55 | CLI, hook, 자동화, 공용 경로, plugin |
+| 전체 Python module | 54 | CLI, hook, 자동화, 공용 경로, plugin |
 
 ## 2. 전달과 강제 경계
 
@@ -156,7 +156,7 @@ Evaluation
 
 ### `cli/`
 
-- 역할: 설치·제거·목록·doctor·audit·drift와 scope-specific delivery.
+- 역할: 설치·제거·목록·doctor·drift와 scope-specific delivery.
 - source→target mapping은 `install_paths.py::COMPONENTS`가 소유.
 - 위험: source와 wheel의 차이, merge-vs-replace 위반, scope rewrite 오류,
   검증 명령의 false green.

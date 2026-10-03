@@ -484,7 +484,7 @@ class TestDetectScope:
 
     claude_base only answers "which .claude"; project and local share one
     directory, so the CLAUDE.md import each writes is what separates them.
-    Regression target: doctor, verify-drift and audit defaulted to user scope
+    Regression target: doctor and verify-drift defaulted to user scope
     and reported a healthy local install as missing, while the startup banner's
     two-way test labelled a local install "project scope".
     """
@@ -717,7 +717,7 @@ class TestSettingsFilename:
 
 
 class TestResolveReportingTarget:
-    """doctor / verify-drift / audit walk up to the install; install does not.
+    """doctor / verify-drift walk up to the install; install does not.
 
     Regression target: run from a subdirectory, the read-only commands fell back
     to user scope and reported a healthy local install as absent — the same
