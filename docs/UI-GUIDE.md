@@ -105,7 +105,7 @@ this is inconsistent — `install_mcp.py` uses it, most of `main.py` does not.
 
 ## Example
 
-`install --list-all` in `src/superclaude/cli/main.py:187` is the reference
+`install --list-all` in `src/superclaude/cli/main.py:186` is the reference
 implementation: banner with scope, glyph + width-aligned description + count,
 `└─` detail line, and a second `└─` only when there is drift to report.
 

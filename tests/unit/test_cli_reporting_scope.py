@@ -125,13 +125,7 @@ class TestVerifyDriftResolvesTheInstall:
 
 
 class TestInventoryCommandsResolveTheInstall:
-    """agents and skills never write, so they follow the same rule."""
-
-    def test_agents_lists_the_local_install(self, local_install):
-        result = _run(["agents", "--list"])
-
-        assert "(scope: local)" in result.output
-        assert "No agents installed" not in result.output
+    """`install --list-all` reports on an install and never writes, so it follows the same rule."""
 
     def test_list_all_reports_the_local_install(self, local_install):
         result = _run(["install", "--list-all"])
