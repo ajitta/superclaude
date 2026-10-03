@@ -54,8 +54,6 @@ instruction that still uses a removed name. The remaining matches are records of
 
 - the codex backlog entries that close F-015 and F-016;
 - the "since-deleted" note in gotcha `hook-path-scope`;
-- the `TestStateHygiene` docstring;
-- the prune comment in `src/superclaude/utils/__init__.py`;
 - dated `.serena/memories/`, `docs/analysis/`, `docs/research/` and `.claude/insights.jsonl`
   entries.
 
@@ -69,10 +67,11 @@ Where the work departs from the specs:
 - **F23, known limit:** `insight list` and `query` now print through Python, so on a non-UTF-8
   console they fail on characters the code page cannot encode, as `insight review` already did.
 
-One follow-up is left. `_PRUNABLE_PREFIXES` in `src/superclaude/utils/__init__.py` still lists
-`hook_executions` and `current_session`, the two state files the deleted `hook_tracker` wrote, so
-the sweep reaps them on machines that ran an older release. Drop both in the first release after
-4.19.0. The mypy type gate (codex F-014) stays open; it was never part of this audit (D13).
+4.19.0 kept `hook_executions` and `current_session` in `_PRUNABLE_PREFIXES` for one release, so
+the sweep would reap the two state files the deleted `hook_tracker` left behind. Both prefixes and
+their sweep test were dropped after that release. A machine that skips 4.19.0 keeps the two small
+files, which nothing reads. The mypy type gate (codex F-014) stays open; it was never part of this
+audit (D13).
 
 ## Documents
 
