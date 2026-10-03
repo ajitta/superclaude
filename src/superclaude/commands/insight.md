@@ -15,7 +15,7 @@ description: Capture structured session insights to per-project JSONL for human 
   3. Capture (text): take user text → infer type + tags → shape as JSON → show → append
   4. Dedup: before propose, run `superclaude insight list --limit 20` to check recent entries → skip already-captured topics. For annotations, also check existing ref_ts.
   5. Append: ALWAYS via `superclaude insight append --json '<json>'` — NEVER hand-write to insights.jsonl. Script enforce schema, escaping, annotation ref check.
-  6. Read modes: `--list`, `--query`, `--stats` shell to jq via same script. If jq missing, script print install hint + exit 1 — relay message to user.
+  6. Read modes: `--list`, `--query`, `--stats` read insights.jsonl through the same script.
   7. Review mode: `--review` call `superclaude insight review` to list pending markers harvested by SessionEnd/PreCompact hooks. For each wanted entry, propose structured promote (type + tags) + call `superclaude insight promote --index N --type TYPE [--tags a,b]`. Unwanted entries (harvest false positives) drop via `superclaude insight discard --index N[,N]` — show user which ones + why before call, since discard has no undo.
   </flow>
 
@@ -25,7 +25,7 @@ description: Capture structured session insights to per-project JSONL for human 
   | capture | Appended line(s) to `.claude/insights.jsonl` |
   | `--list` | Formatted recent insights (last 20) |
   | `--query key=value` | Filtered insights matching key=value |
-  | `--stats` | Type distribution, top tags, count |
+  | `--stats` | Type distribution, total |
   | `--review` | Pending harvested markers + promote/discard flow |
   </outputs>
 
@@ -68,7 +68,7 @@ description: Capture structured session insights to per-project JSONL for human 
   Append many (batch):
     superclaude insight append --json '[{...},{...}]'
 
-  Read paths (need jq):
+  Read paths:
     superclaude insight list [--limit 20]
     superclaude insight query type=feedback
     superclaude insight query tags=rules
@@ -97,14 +97,13 @@ description: Capture structured session insights to per-project JSONL for human 
   <gotchas>
   - script-only-writes: NEVER Write/echo on insights.jsonl. ALWAYS go through `superclaude insight append`. Script handle JSON escaping, schema check, annotation ref existence checks that hand-written code miss often.
   - never-bare-python: NEVER invoke `python3 ~/.claude/superclaude/scripts/insight_writer.py` direct — script import `superclaude.utils`, absent from the install tree, so bare python3 raise ModuleNotFoundError. Only the console script carries a resolving environment — `superclaude insight` for humans, `superclaude hook insight_writer` for the hooks.
-  - jq-required: `--list`, `--query`, `--stats` need jq on PATH. If absent, script exit 1 with install URL — surface to user, no inline Python fallback.
   - review-requires-classification: Pending entries = raw text; must propose `--type` (feedback|decision|discovery|...) + optional tags before call promote. Never promote without show user what classification you plan.
   - discard-is-final: `discard` drop pending rows without filing them, and the harvest ledger keep the uuid — so a discarded marker never come back. Show user the rows + reason, get OK, then call. Batch every unwanted index into ONE `--index a,b,c` call: promote and discard both pop by index, so sequential single-index calls shift the list under you.
   - promote-descending-indices: When promote several entries one by one, go highest index first (`cmd_promote` pop by index). Ascending order silently file the wrong rows.
   </gotchas>
 
   <bounds>
-    <does>structured capture via script, jq queries, pending review/promote/discard, append-only storage.</does>
+    <does>structured capture via script, list/query/stats, pending review/promote/discard, append-only storage.</does>
     <never>modify existing insights, load to LLM context, replace auto memory, hand-edit insights.jsonl.</never>
     <fallback>If insights.jsonl missing, script make it on first append.</fallback>
   </bounds>
