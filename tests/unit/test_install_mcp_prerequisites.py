@@ -104,11 +104,3 @@ def test_npm_server_selection_reports_missing_node():
         ok, errors = install_mcp.check_prerequisites(selected_servers=["playwright"])
     assert ok is False
     assert errors == ["Node.js not found - required for npm-based MCP servers"]
-
-
-def test_no_selection_runs_every_check():
-    """selected_servers=None is the pre-selection path and keeps the old always-check behaviour."""
-    with patch.object(install_mcp, "_run_command", _fake_run("v18.20.0")):
-        ok, errors = install_mcp.check_prerequisites(selected_servers=None)
-    assert ok is False
-    assert any("v18.20.0" in e for e in errors)

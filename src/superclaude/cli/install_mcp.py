@@ -45,7 +45,6 @@ MCP_SERVERS = {
         "description": "Semantic code analysis and intelligent editing (serena-agent on PyPI)",
         "transport": "stdio",
         "command": "serena start-mcp-server --context claude-code --project-from-cwd",
-        "required": False,
         "category": "core",
         "method": "mcp",
     },
@@ -58,7 +57,6 @@ MCP_SERVERS = {
         "description": "Web search, extract, crawl, map, research (optional MCP; prefer Tavily Agent Skills — see mcp/README.md)",
         "transport": "stdio",
         "command": "npx -y tavily-mcp@latest",
-        "required": False,
         "category": "plugin",
         "method": "mcp",
         "api_key_env": "TAVILY_API_KEY",
@@ -69,14 +67,12 @@ MCP_SERVERS = {
         "description": "Browser automation, E2E testing, network mocking (Microsoft official)",
         "transport": "stdio",
         "command": "npx -y @playwright/mcp@latest",
-        "required": False,
         "category": "plugin",
         "method": "mcp",
     },
     "chrome-devtools": {
         "name": "chrome-devtools",
         "description": "Performance, Lighthouse, accessibility, and memory profiling",
-        "required": False,
         "category": "plugin",
         "method": "plugin",
         # `plugin_id` is the marketplace plugin name (must match the marketplace.json
@@ -172,15 +168,12 @@ def _server_needs_node(server_name: str) -> bool:
     return info.get("method") == "plugin" or info.get("command", "").startswith("npx")
 
 
-def check_prerequisites(
-    selected_servers: Optional[List[str]] = None,
-) -> Tuple[bool, List[str]]:
+def check_prerequisites(selected_servers: List[str]) -> Tuple[bool, List[str]]:
     """Check if required tools are available.
 
     Checks are scoped to the selection: the Node.js check runs only when an
     npm-based server is selected, and the serena/uv tooling check only when
-    serena is. With selected_servers=None (pre-selection legacy path) every
-    check runs.
+    serena is.
     """
     errors = []
 
@@ -195,9 +188,7 @@ def check_prerequisites(
         errors.append("Claude CLI not found - required for MCP server management")
 
     # Check Node.js, only when an npm-based server is in the selection
-    needs_node = selected_servers is None or any(
-        _server_needs_node(s) for s in selected_servers
-    )
+    needs_node = any(_server_needs_node(s) for s in selected_servers)
     if needs_node:
         try:
             result = _run_command(
@@ -217,9 +208,7 @@ def check_prerequisites(
             errors.append("Node.js not found - required for npm-based MCP servers")
 
     # Serena-specific tooling: only relevant when serena will be installed.
-    # When selected_servers is None we're being called pre-selection (legacy path),
-    # so retain the original always-warn behavior.
-    needs_serena_tooling = selected_servers is None or "serena" in selected_servers
+    needs_serena_tooling = "serena" in selected_servers
     if needs_serena_tooling:
         # Check uv for Python-based servers (Serena requires uv)
         uv_ok = False
@@ -399,9 +388,6 @@ def install_plugin_server(
     if dry_run:
         click.echo(f"   [DRY RUN] Would run: {' '.join(add_cmd)}")
         click.echo(f"   [DRY RUN] Would run: {' '.join(install_cmd)}")
-        note = server_info.get("post_install_note")
-        if note:
-            click.echo(f"   [DRY RUN] Post-install note: {note}")
         return True
 
     try:
@@ -421,9 +407,6 @@ def install_plugin_server(
         )
         if install_result.returncode == 0:
             click.echo(f"   ✅ Successfully installed: {display_name}")
-            note = server_info.get("post_install_note")
-            if note:
-                click.echo(f"   ℹ️  {note}")
             return True
 
         err = (install_result.stderr or "").strip() or "unknown error"
@@ -481,16 +464,7 @@ def install_mcp_server(
             server_info.get("api_key_description", f"API key for {server_name}"),
         )
 
-        # Check if API key should be in URL or as env var
-        if api_key and server_info.get("api_key_in_url"):
-            # Append API key to URL in command (for mcp-remote style)
-            url_param = server_info.get("api_key_url_param", api_key_env)
-            if "?" in command:
-                command = f"{command}&{url_param}={api_key}"
-            else:
-                command = f"{command}?{url_param}={api_key}"
-        elif api_key:
-            # Standard env var approach
+        if api_key:
             env_args = ["--env", f"{api_key_env}={api_key}"]
 
     # Build installation command using modern Claude Code API
@@ -507,10 +481,6 @@ def install_mcp_server(
     if env_args:
         cmd.extend(env_args)
 
-    # Add static env vars from server config (e.g. ENABLED_TOOLS)
-    for key, value in server_info.get("env", {}).items():
-        cmd.extend(["--env", f"{key}={value}"])
-
     # Add separator
     cmd.append("--")
 
@@ -524,10 +494,8 @@ def install_mcp_server(
         return True
 
     try:
-        # Mask API keys in log output
-        safe_command = _mask_secret(command, api_key) if api_key else command
         click.echo(
-            f"   Running: claude mcp add --transport {transport} {server_name} -- {safe_command}"
+            f"   Running: claude mcp add --transport {transport} {server_name} -- {command}"
         )
         result = _run_command(cmd, capture_output=True, text=True, timeout=120)
 
