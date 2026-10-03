@@ -21,12 +21,7 @@ import sys
 import time
 from pathlib import Path
 
-from superclaude.utils import hook_state_dir, project_key
-
-# `tempfile` is imported inside _save_state. This hook fires on every Edit,
-# Write, and Bash call, and its whole runtime is interpreter start plus imports
-# — the logic itself is inside the noise. The PreToolUse path never writes, so
-# it should not pay tempfile's 3.0ms import.
+from superclaude.utils import atomic_write_json, hook_state_dir, project_key
 
 BLOCK_THRESHOLD = 5
 WINDOW_SECONDS = 15 * 60
@@ -60,44 +55,23 @@ def _load_state(path: Path) -> dict:
 
 
 def _save_state(path: Path, state: dict) -> None:
-    import tempfile
-
+    # Atomic (temp file + os.replace): under concurrent same-cwd subagent
+    # fan-out a reader or competing writer never sees a half-written state
+    # file, which would parse-fail and silently reset the error history.
+    # utils imports tempfile only when it writes, so the PreToolUse path,
+    # which never writes, does not pay for it.
     try:
-        path.parent.mkdir(parents=True, exist_ok=True)
-        # Atomic write: serialize to a temp file in the same directory, then
-        # os.replace (atomic on POSIX and Windows). Under concurrent same-cwd
-        # subagent fan-out this guarantees a reader/competing writer never sees a
-        # half-written (torn) state file — which would otherwise parse-fail and
-        # silently reset the circuit breaker's error history.
-        fd, tmp = tempfile.mkstemp(
-            dir=str(path.parent), prefix=".loop_guard_", suffix=".tmp"
-        )
-        try:
-            with os.fdopen(fd, "w", encoding="utf-8") as f:
-                json.dump(state, f)
-            os.replace(tmp, path)
-        except OSError:
-            try:
-                os.unlink(tmp)
-            except OSError:
-                pass
-            raise
+        atomic_write_json(path, state, indent=None)
     except OSError:
-        # Fail open — don't crash the hook on write failure
-        pass
+        pass  # Fail open — don't crash the hook on write failure
 
 
 def _input_fingerprint(tool_name: str, tool_input: dict) -> str:
     """Build a stable fingerprint from the tool's primary input field."""
     if not isinstance(tool_input, dict):
         return ""
-    if tool_name == "Bash":
-        primary = str(tool_input.get("command", ""))
-    elif tool_name in ("Edit", "Write", "NotebookEdit"):
-        primary = str(tool_input.get("file_path", ""))
-    else:
-        primary = str(next(iter(tool_input.values()), ""))
-    return primary.strip()[:120]
+    key = "command" if tool_name == "Bash" else "file_path"
+    return str(tool_input.get(key, "")).strip()[:120]
 
 
 def _signature(tool_name: str, tool_input: dict) -> str:

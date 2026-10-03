@@ -27,7 +27,7 @@ from typing import Any
 # reason.
 
 
-def atomic_write_json(path: Path, data: Any, indent: int = 2) -> None:
+def atomic_write_json(path: Path, data: Any, indent: int | None = 2) -> None:
     """Write JSON data atomically using temp file + os.replace.
 
     Prevents data corruption from crashes during write by writing to
