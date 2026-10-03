@@ -1,8 +1,7 @@
 """
 Unit tests for session_init script.
 
-Tests session initialization, git status formatting, PR status checking,
-and multi-directory CLAUDE.md detection.
+Tests session initialization, git status formatting and PR status checking.
 """
 
 import json
@@ -14,7 +13,6 @@ from unittest.mock import patch
 import pytest
 
 from superclaude.scripts.session_init import (
-    get_additional_dirs_status,
     get_git_status,
     get_pr_status,
     main,
@@ -286,76 +284,6 @@ class TestGetPrStatus:
 
 
 # ---------------------------------------------------------------------------
-# TestGetAdditionalDirsStatus
-# ---------------------------------------------------------------------------
-
-
-class TestGetAdditionalDirsStatus:
-    """Test get_additional_dirs_status monorepo detection."""
-
-    def test_disabled_by_default(self, monkeypatch):
-        """Returns empty when env var is not set."""
-        monkeypatch.delenv(
-            "CLAUDE_CODE_ADDITIONAL_DIRECTORIES_CLAUDE_MD", raising=False
-        )
-        assert get_additional_dirs_status() == ""
-
-    def test_disabled_when_env_zero(self, monkeypatch):
-        """Returns empty when env var is '0'."""
-        monkeypatch.setenv("CLAUDE_CODE_ADDITIONAL_DIRECTORIES_CLAUDE_MD", "0")
-        assert get_additional_dirs_status() == ""
-
-    def test_no_additional_dirs(self, tmp_path, monkeypatch):
-        """Returns empty when no subdirectories contain CLAUDE.md."""
-        monkeypatch.setenv("CLAUDE_CODE_ADDITIONAL_DIRECTORIES_CLAUDE_MD", "1")
-        monkeypatch.chdir(tmp_path)
-        monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(tmp_path))
-        (tmp_path / "packages").mkdir()
-        (tmp_path / "packages" / "core").mkdir()
-        # No CLAUDE.md inside
-        assert get_additional_dirs_status() == ""
-
-    def test_detects_packages_claude_md(self, tmp_path, monkeypatch):
-        """Detects CLAUDE.md files in packages/ subdirectories."""
-        monkeypatch.setenv("CLAUDE_CODE_ADDITIONAL_DIRECTORIES_CLAUDE_MD", "1")
-        monkeypatch.chdir(tmp_path)
-        monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(tmp_path))
-
-        pkg = tmp_path / "packages" / "core"
-        pkg.mkdir(parents=True)
-        (pkg / "CLAUDE.md").write_text("# Core")
-
-        result = get_additional_dirs_status()
-        assert "1 additional CLAUDE.md" in result
-
-    def test_detects_multiple_patterns(self, tmp_path, monkeypatch):
-        """Detects CLAUDE.md across packages/, apps/, libs/, services/."""
-        monkeypatch.setenv("CLAUDE_CODE_ADDITIONAL_DIRECTORIES_CLAUDE_MD", "1")
-        monkeypatch.chdir(tmp_path)
-        monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(tmp_path))
-
-        for parent, child in [("packages", "ui"), ("apps", "web"), ("libs", "utils")]:
-            d = tmp_path / parent / child
-            d.mkdir(parents=True)
-            (d / "CLAUDE.md").write_text(f"# {child}")
-
-        result = get_additional_dirs_status()
-        assert "3 additional CLAUDE.md" in result
-
-    def test_ignores_files_not_directories(self, tmp_path, monkeypatch):
-        """Only counts directories, not files matching the glob."""
-        monkeypatch.setenv("CLAUDE_CODE_ADDITIONAL_DIRECTORIES_CLAUDE_MD", "1")
-        monkeypatch.chdir(tmp_path)
-        monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(tmp_path))
-
-        (tmp_path / "packages").mkdir()
-        # Create a file (not directory) that matches the glob
-        (tmp_path / "packages" / "not-a-dir").write_text("file")
-
-        assert get_additional_dirs_status() == ""
-
-
-# ---------------------------------------------------------------------------
 # TestMain
 # ---------------------------------------------------------------------------
 
@@ -371,10 +299,6 @@ class TestMain:
                 return_value="\U0001f4ca Git: clean",
             ),
             patch("superclaude.scripts.session_init.get_pr_status", return_value=""),
-            patch(
-                "superclaude.scripts.session_init.get_additional_dirs_status",
-                return_value="",
-            ),
         ):
             main()
 
@@ -392,10 +316,6 @@ class TestMain:
                 "superclaude.scripts.session_init.get_pr_status",
                 return_value="\U0001f7e2 PR: approved (url)",
             ),
-            patch(
-                "superclaude.scripts.session_init.get_additional_dirs_status",
-                return_value="",
-            ),
         ):
             main()
 
@@ -410,10 +330,6 @@ class TestMain:
                 return_value="\U0001f4ca Git: clean",
             ),
             patch("superclaude.scripts.session_init.get_pr_status", return_value=""),
-            patch(
-                "superclaude.scripts.session_init.get_additional_dirs_status",
-                return_value="",
-            ),
         ):
             main()
 
@@ -432,34 +348,12 @@ class TestMain:
                 return_value="\U0001f4ca Git: clean",
             ),
             patch("superclaude.scripts.session_init.get_pr_status", return_value=""),
-            patch(
-                "superclaude.scripts.session_init.get_additional_dirs_status",
-                return_value="",
-            ),
         ):
             main()
 
         out = capsys.readouterr().out
         assert "SuperClaude:" in out
         assert "Core Services Available" not in out
-
-    def test_main_prints_additional_dirs_when_present(self, capsys):
-        """main() includes additional dirs status when non-empty."""
-        with (
-            patch(
-                "superclaude.scripts.session_init.get_git_status",
-                return_value="\U0001f4ca Git: clean",
-            ),
-            patch("superclaude.scripts.session_init.get_pr_status", return_value=""),
-            patch(
-                "superclaude.scripts.session_init.get_additional_dirs_status",
-                return_value="\U0001f4c1 Multi-dir: 2 additional CLAUDE.md found",
-            ),
-        ):
-            main()
-
-        out = capsys.readouterr().out
-        assert "Multi-dir: 2 additional CLAUDE.md" in out
 
 
 class TestInstallStatusLine:

@@ -6,7 +6,6 @@ Cross-platform compatible (Windows/macOS/Linux).
 
 v2.2.0 Features (Claude Code 2.1.20 Integration):
 - PR review status indicator display
-- Multi-directory CLAUDE.md awareness
 """
 
 from __future__ import annotations
@@ -221,35 +220,6 @@ def get_pr_status() -> str:
         return ""
 
 
-def get_additional_dirs_status() -> str:
-    """
-    Check for additional CLAUDE.md directories (monorepo support).
-
-    Returns:
-        Status string if additional directories are detected
-    """
-    import os
-
-    from superclaude.utils import project_root
-
-    if os.environ.get("CLAUDE_CODE_ADDITIONAL_DIRECTORIES_CLAUDE_MD", "0") != "1":
-        return ""
-
-    # project_root(), not Path.cwd(): a hook firing from a subdirectory would
-    # otherwise scan the wrong tree and under-report the workspace count.
-    root = project_root()
-    additional_count = 0
-
-    for pattern in ["packages/*", "apps/*", "libs/*", "services/*"]:
-        for subdir in root.glob(pattern):
-            if subdir.is_dir() and (subdir / "CLAUDE.md").exists():
-                additional_count += 1
-
-    if additional_count > 0:
-        return f"📁 Multi-dir: {additional_count} additional CLAUDE.md found"
-    return ""
-
-
 def main() -> None:
     # The context cache reset belongs to context_reset.py, the other SessionStart
     # hook: it reads the session id off stdin, and this one does not. Calling it
@@ -264,15 +234,10 @@ def main() -> None:
     if pr_status:
         print(pr_status)
 
-    # 3. Check for additional directories (monorepo)
-    additional_dirs = get_additional_dirs_status()
-    if additional_dirs:
-        print(additional_dirs)
-
-    # 4. Remind token budget
+    # 3. Remind token budget
     print("💡 Use /context to confirm token budget.")
 
-    # 5. What is actually installed
+    # 4. What is actually installed
     print(get_install_status())
 
 
