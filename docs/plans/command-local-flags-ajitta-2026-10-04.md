@@ -35,7 +35,7 @@ revised: 2026-10-04
 
 ## Phase 0: 브랜치
 
-- [ ] master에서 `git switch -c fix/command-local-flags`. 이 계획서(현재 untracked)는 Phase 1 커밋에 함께 넣는다.
+- [x] master에서 `git switch -c fix/command-local-flags`. 이 계획서(현재 untracked)는 Phase 1 커밋에 함께 넣는다.
 
 ## Phase 1: hook이 명령이 선언한 플래그를 건너뜀 (커밋 1개)
 
@@ -43,7 +43,7 @@ revised: 2026-10-04
 
 **Files:** Test: `tests/unit/test_context_loader.py` (새 클래스 `TestCommandDeclaredFlags`)
 
-- [ ] Step 1: 실패하는 테스트를 쓴다. `tmp_path/fake.md`를 `encoding="utf-8"`로 쓰고 내용은 `<syntax>/sc:fake [--safe] [--plan path]</syntax>`와 `<flags>\n- --safe: x\n- --plan <path>: y\n</flags>`로 한다. `monkeypatch.setattr(cl, "_command_dirs", lambda: (tmp_path,))`로 연결한다. 지시문 테스트에서는 `TestContext7HasNoDocOnlyAFlag._emit`(:608-615)처럼 `get_loaded_contexts`, `mark_as_loaded`, `check_mcp_and_notify`를 막는다.
+- [x] Step 1: 실패하는 테스트를 쓴다. `tmp_path/fake.md`를 `encoding="utf-8"`로 쓰고 내용은 `<syntax>/sc:fake [--safe] [--plan path]</syntax>`와 `<flags>\n- --safe: x\n- --plan <path>: y\n</flags>`로 한다. `monkeypatch.setattr(cl, "_command_dirs", lambda: (tmp_path,))`로 연결한다. 지시문 테스트에서는 `TestContext7HasNoDocOnlyAFlag._emit`(:608-615)처럼 `get_loaded_contexts`, `mark_as_loaded`, `check_mcp_and_notify`를 막는다.
   - `/sc:fake build it --safe` → 알림 0개
   - `/sc:FAKE build it --safe` → 알림 0개 (명령 이름 소문자화)
   - `/sc:other --safe` (`other.md` 없음) → 알림 1개
@@ -51,21 +51,21 @@ revised: 2026-10-04
   - `/sc:fake --instrospect` → 알림 1개 (전역 오타는 명령 안에서도 잡힘)
   - `/sc:fake --plan docs/x.md` → `sc-directive flag="--plan"` 없음
   - `/sc:other --plan docs/x.md` → `sc-directive flag="--plan"` 있음
-- [ ] Step 2: `uv run pytest tests/unit/test_context_loader.py -k CommandDeclared -q`를 실행한다. `_command_dirs`가 아직 없으므로 `AttributeError`로 실패해야 한다.
+- [x] Step 2: `uv run pytest tests/unit/test_context_loader.py -k CommandDeclared -q`를 실행한다. `_command_dirs`가 아직 없으므로 `AttributeError`로 실패해야 한다.
 
 ### Task 1.2: context_loader 구현
 
 **Files:** Modify: `src/superclaude/scripts/context_loader.py` (:406-461 `resolve_flags`, :474-491 `_known_command_names`, :842-859 `_emit_execution_directives`)
 
-- [ ] Step 3: 최소 구현.
+- [x] Step 3: 최소 구현.
   - `_command_dirs()`는 `(claude_base() / "commands" / "sc", BASE_PATH / "commands")`를 반환한다. `_known_command_names()`도 이 함수를 쓰도록 바꾼다.
   - `flag_entries(text) -> set[str]`: `<flags>(.*?)</flags>`(`re.S`) 안에서 `^\s*- --([a-z][\w-]*)`(`re.MULTILINE`)에 맞는 이름을 모은다. Phase 2 구조 테스트도 이 함수를 쓰므로 hook과 테스트가 같은 파서를 공유한다.
   - `_command_flags(name)`: `_command_dirs()` 순서대로 처음 존재하는 `<dir>/<name>.md`를 `read_text(encoding="utf-8")`로 읽어 `flag_entries`에 넘긴다. 다른 파일 읽기(:755, :952)와 같은 방식이다. `(OSError, UnicodeDecodeError)`가 나면 빈 집합을 돌려준다(fail-open). cp949 같은 로캘에서 기본 인코딩으로 읽으면 `→ ≥ —`가 든 명령 파일에서 hook이 죽기 때문이다.
   - `_declared_flags(scannable)`: `_COMMAND_TOKEN_RE`로 찾은 이름을 소문자로 바꿔(`resolve_command_name` :519-520과 같음) 각각의 `_command_flags`를 합친다.
   - `resolve_flags`: `CC_NATIVE_PASSTHROUGH` 검사 다음, retired 검사 앞에 `if flag in declared: continue`를 넣는다. `declared`는 처음 인식하지 못한 플래그를 만났을 때 한 번만 계산하므로, 평범한 프롬프트에는 파일 읽기가 붙지 않는다.
   - `_emit_execution_directives`: 패턴이 맞으면 `match.group(0)`에서 플래그 이름을 꺼내고, `_declared_flags(scannable)`(처음 매치될 때 한 번 계산)에 들어 있으면 건너뛴다.
-- [ ] Step 4: `uv run pytest tests/unit/test_context_loader.py -q`가 통과하고, 이어서 `uv run pytest`가 exit 0인지 확인한다.
-- [ ] Step 5: `make format` 후 이 계획서와 함께 커밋한다: `fix(hook): skip command-declared flags in typo notice and global directives`
+- [x] Step 4: `uv run pytest tests/unit/test_context_loader.py -q`가 통과하고, 이어서 `uv run pytest`가 exit 0인지 확인한다.
+- [x] Step 5: `make format` 후 이 계획서와 함께 커밋한다: `fix(hook): skip command-declared flags in typo notice and global directives`
 
 ## Phase 2: `<flags>` 계약과 33개 명령 정의 (커밋 1개)
 
@@ -73,31 +73,31 @@ revised: 2026-10-04
 
 **Files:** Test: `tests/unit/test_command_structure.py` (새 클래스 `TestCommandFlagsAreDefined`), `tests/unit/test_context_loader.py`
 
-- [ ] Step 1: 실패하는 테스트를 쓴다.
+- [x] Step 1: 실패하는 테스트를 쓴다.
   - `test_every_syntax_flag_is_defined`: `<syntax>` 플래그에서 `VALID_FLAGS`를 뺀 집합이 `flag_entries(content)` 안에 모두 들어 있어야 한다.
   - `test_every_defined_flag_is_in_syntax`: `flag_entries(content)`가 `<syntax>` 플래그의 부분집합이어야 한다. syntax에서 사라진 플래그의 정의가 남는 것을 막는다.
   - 실제 파일 회귀 테스트 2개: `_command_dirs`를 `(CONTENT_ROOT / "commands",)`(`test_context_loader.py:340`)로 바꿔 끼운다. `BASE_PATH`는 설치 콘텐츠 디렉터리(`claude_base()/"superclaude"`, :77-96)라서 `commands/`가 없으므로 쓰면 안 된다. 기대 결과: `/sc:implement auth API --type api --safe --with-tests` → 알림 0개, `/sc:implement --plan docs/plans/x.md` → `--plan` 지시문 없음.
-- [ ] Step 2: 실행하면 명령 33개와 회귀 테스트 2개가 실패해야 한다.
+- [x] Step 2: 실행하면 명령 33개와 회귀 테스트 2개가 실패해야 한다.
 
 ### Task 2.2: 작성 규칙
 
 **Files:** Modify: `.claude/rules/command-authoring.md` (XML Template, XML Rules의 규칙과 "Optional:" 줄, Checklist)
 
-- [ ] Step 3: 템플릿에서 `<flow>` 바로 다음에 `<flags>` 블록(`- --flag-name <value>: behavior.`)을 넣고, "Optional:" 목록에 `<flags>`를 추가한다. XML Rules에 다음 규칙을 넣는다. "`<syntax>`의 플래그 중 `core/FLAGS.md` 전역 플래그가 아닌 것은 모두 여기에 정의한다. 한 줄에 하나씩 쓰고, 파싱되는 부분은 `- --name`이다. 다른 섹션에 이미 정의가 있으면 항목은 그 섹션을 주제 이름으로 가리키기만 하고 내용을 다시 쓰지 않는다. 전역 플래그 이름을 다른 뜻으로 쓸 때도 여기에 정의한다. 그러면 이 명령에서는 hook이 그 이름의 전역 지시문을 주입하지 않는다." Checklist 1번에도 반영한다.
+- [x] Step 3: 템플릿에서 `<flow>` 바로 다음에 `<flags>` 블록(`- --flag-name <value>: behavior.`)을 넣고, "Optional:" 목록에 `<flags>`를 추가한다. XML Rules에 다음 규칙을 넣는다. "`<syntax>`의 플래그 중 `core/FLAGS.md` 전역 플래그가 아닌 것은 모두 여기에 정의한다. 한 줄에 하나씩 쓰고, 파싱되는 부분은 `- --name`이다. 다른 섹션에 이미 정의가 있으면 항목은 그 섹션을 주제 이름으로 가리키기만 하고 내용을 다시 쓰지 않는다. 전역 플래그 이름을 다른 뜻으로 쓸 때도 여기에 정의한다. 그러면 이 명령에서는 hook이 그 이름의 전역 지시문을 주입하지 않는다." Checklist 1번에도 반영한다.
 
 ### Task 2.3: 명령별 `<flags>` 작성
 
 **Files:** Modify: `src/superclaude/commands/*.md` 33개 (`<flow>` 바로 다음에 삽입)
 
-- [ ] Step 4: 한 플래그의 정의는 한 곳에만 둔다(`content-quality.md` 4번).
+- [x] Step 4: 한 플래그의 정의는 한 곳에만 둔다(`content-quality.md` 4번).
   - 아래 표에 있는 플래그는 표의 정의를 그대로 넣는다. ★는 본문 근거가 없거나 근거를 넘어서는 뜻이다.
   - 표에 없는 43개는 본문에 이미 정의가 있다(flow 단계, `<outputs>`, `<patterns>`, `<depth>`, gotcha, frontmatter description). 항목은 그 정의를 주제 이름으로 가리키는 한 줄로 쓰고, 원래 문장은 손대지 않는다. 예: `- --tdd: cycle in the TDD pattern.`
   - business-panel: 이미 `- --flag:` 형식인 `<options>`를 `<flags>`로 이름만 바꿔 `<flow>` 다음으로 옮긴다. `--mode` 항목을 추가해 `<modes>` 섹션을 가리키고, `--focus` 항목 끝에 "unrelated to the global --focus"를 붙인다.
   - review: `scope-flag-local` gotcha(:65)를 `--scope` 항목으로 옮기고 gotcha는 지운다. `--structured`(:37)와 `--audit-delegated`(flow 8)는 가리키는 항목으로 쓴다.
   - help: 기존 `<flags>` 산문을 `- --flags:` 항목 하나로 바꾼다.
   - test: `<does>`에 "root-cause fixes when --fix is given"을 추가해 `--fix` 정의와 bounds가 서로 어긋나지 않게 한다.
-- [ ] Step 5: `uv run pytest tests/unit/test_command_structure.py tests/unit/test_context_loader.py -q`가 통과하고, 이어서 `uv run pytest`가 exit 0인지 확인한다. 가장 긴 명령(`prompt.md`, 134줄)도 200줄 목표 안에 있어야 한다.
-- [ ] Step 6: 커밋한다: `docs(commands): define every command-local flag in <flags>`
+- [x] Step 5: `uv run pytest tests/unit/test_command_structure.py tests/unit/test_context_loader.py -q`가 통과하고, 이어서 `uv run pytest`가 exit 0인지 확인한다. 가장 긴 명령(`prompt.md`, 134줄)도 200줄 목표 안에 있어야 한다.
+- [x] Step 6: 커밋한다: `docs(commands): define every command-local flag in <flags>`
 
 | 명령 | 플래그 | 정의 (본문에 그대로) | 근거 |
 |---|---|---|---|
@@ -164,14 +164,14 @@ revised: 2026-10-04
 
 hook은 원본을 그대로 복사한 설치본 `.claude/commands/sc/`를 먼저 읽는다. 그래서 동기화하기 전에는 Phase 2의 `<flags>`가 hook에 보이지 않는다.
 
-- [ ] Step 1: `superclaude doctor --scope local`로 local scope 설치 상태를 확인한다(2026-10-04에 healthy 확인함). 그다음 `superclaude install --force --scope local`을 실행한다. user scope는 동기화하지 않는다(`sync-scope-creates`).
-- [ ] Step 2: hook을 직접 실행해 확인한다. 실행할 때마다 새 `session_id`(`verify-1`부터 `verify-4`까지)를 넣는다. `session_id`가 없으면 공용 fallback 캐시(:62-73)를 쓰게 되고, 앞선 실행에서 찍힌 지시문 표시가 남아 있으면 "지시문 없음" 확인이 거짓으로 통과한다.
+- [x] Step 1: `superclaude doctor --scope local`로 local scope 설치 상태를 확인한다(2026-10-04에 healthy 확인함). 그다음 `superclaude install --force --scope local`을 실행한다. user scope는 동기화하지 않는다(`sync-scope-creates`).
+- [x] Step 2: hook을 직접 실행해 확인한다. 실행할 때마다 새 `session_id`(`verify-1`부터 `verify-4`까지)를 넣는다. `session_id`가 없으면 공용 fallback 캐시(:62-73)를 쓰게 되고, 앞선 실행에서 찍힌 지시문 표시가 남아 있으면 "지시문 없음" 확인이 거짓으로 통과한다.
   - `{"prompt":"/sc:implement auth API --type api --safe --with-tests","session_id":"verify-1"}` → `not a recognized flag`가 없어야 한다.
   - `{"prompt":"/sc:implement --plan docs/plans/x.md","session_id":"verify-2"}` → `sc-directive flag="--plan"`이 없어야 한다.
   - 대조군 `{"prompt":"/sc:analyze --plan docs/plans/x.md","session_id":"verify-3"}` → `sc-directive flag="--plan"`이 있어야 한다.
   - `{"prompt":"--safe go","session_id":"verify-4"}` → `Did you mean: --safe-mode?`가 나와야 한다.
   - 각 줄은 `echo '<json>' | superclaude hook context_loader`로 실행한다.
-- [ ] Step 3: `git checkout master && git merge --no-ff fix/command-local-flags`를 한 명령으로 실행해 병합한다(`editable-tool-branch-switch`). push한 뒤 master CI를 확인한다.
+- [x] Step 3: `git checkout master && git merge --no-ff fix/command-local-flags`를 한 명령으로 실행해 병합한다(`editable-tool-branch-switch`). push한 뒤 master CI를 확인한다.
 
 ## 위험
 
