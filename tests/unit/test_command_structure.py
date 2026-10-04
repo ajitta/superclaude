@@ -308,6 +308,58 @@ class TestCommandFlagsAreDefined:
         )
 
 
+# A flow step's label: the text before the first ":" on a numbered <flow> line,
+# parenthetical dropped ("1. Load (Serena): ..." -> "load").
+_FLOW_LABEL = re.compile(r"^\s*\d+(?:\.\d+)?\.\s+(.+?):", re.MULTILINE)
+# "the Analyze step", "the /sc:brainstorm Decision-mode tag step",
+# "the Test, Fix and Verify steps".
+_STEP_POINTER = re.compile(
+    r"\b[Tt]he (?:(/sc:[a-z][\w-]*) )?([A-Z`][^.;:()|\n]*?) steps?\b"
+)
+_LABEL_LIST_SEP = re.compile(r"\s*,\s*(?:and\s+)?|\s+and\s+")
+
+
+def _flow_labels(content: str) -> set[str]:
+    flow = extract_xml_content(content, "flow") or ""
+    return {
+        re.sub(r"\s*\(.*?\)", "", label).strip().lower()
+        for label in _FLOW_LABEL.findall(flow)
+    }
+
+
+class TestCommandStepRefs:
+    """Flow steps are pointed at by label, and every label resolves.
+
+    A pointer by number ("flow step 3") lands on the wrong step without notice
+    once the flow is reordered; a pointer by label fails here instead.
+    """
+
+    def test_no_numbered_step_refs(self, command):
+        stem, content, _ = command
+        numbered = re.findall(r"\bsteps? \d+", content)
+        assert not numbered, (
+            f"{stem}: points at flow steps by number {numbered}; use the label"
+        )
+
+    def test_named_step_refs_resolve(self, command):
+        stem, content, _ = command
+        unresolved = []
+        for match in _STEP_POINTER.finditer(content):
+            other, names = match.groups()
+            target = content
+            if other:
+                path = COMMANDS_DIR / f"{other.removeprefix('/sc:')}.md"
+                assert path.exists(), f"{stem}: {match.group(0)!r} names no command"
+                target = path.read_text(encoding="utf-8")
+            labels = _flow_labels(target)
+            unresolved += [
+                f"{match.group(0)!r} -> {name}"
+                for name in _LABEL_LIST_SEP.split(names)
+                if name.lower() not in labels
+            ]
+        assert not unresolved, f"{stem}: no flow step has the label: {unresolved}"
+
+
 class TestCommandDocsPrescribeConsoleEntry:
     """No command doc may prescribe a bare-python invocation of a SC script.
 

@@ -19,7 +19,7 @@ description: Make detailed impl plans with TDD tasks, exact file paths, verify c
   </flow>
 
   <flags>
-  - --from <path>: spec read in flow step 1.
+  - --from <path>: spec read in the Load step.
   - --output <path>: write the plan to this path instead of the convention path.
   - --phases N: preferred phase count; a hint applied only when the work splits that way naturally.
   - --pr-bundle: multi-PR framing, defined in the phase-vs-pr gotcha.

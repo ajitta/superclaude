@@ -20,7 +20,7 @@ description: Code analysis across quality, security, performance, architecture d
 
   <flags>
   - --depth quick|deep: quick reports the top findings from one pass; deep covers the whole target and ties every finding to file:line evidence.
-  - --format text|json|report: output format and destination per the outputs table; report also runs flow step 5.
+  - --format text|json|report: output format and destination per the outputs table; report also runs the Report step.
   </flags>
 
   <outputs note="Per --format flag; report format dual-routes per core/rules/RULES_DOCS.md `<doc_output_convention>`">

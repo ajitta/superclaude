@@ -11,18 +11,18 @@ description: Rewrite a prompt for Claude Opus 5.5, Sonnet 5.5, Opus 5 or Fable 5
   <syntax>/sc:prompt [prompt-text|path] [--model opus55|sonnet55|opus5|fable51] [--target cc|api] [--out path]</syntax>
 
   <flow>
-  1. Capture the prompt from the inline argument, a file path, or the intent the user just described — and name which source was used.
-  2. Resolve target model and surface (cc or api). Every flag resolves to a model ID first: `opus55` → 'claude-opus-5-5', `sonnet55` → 'claude-sonnet-5-5', `opus5` → 'claude-opus-5', `fable51` → 'claude-fable-5-1', and `fable5` is accepted as a legacy alias for 'claude-fable-5-1', since Fable 5 prompts run unchanged on Fable 5.1. When either is unstated, infer from the session: an Opus 5 or Opus 5.5 session resolves to its own ID in the Opus column, a Sonnet 5.5 session to 'claude-sonnet-5-5' in the Sonnet column, a Fable 5.x session to 'claude-fable-5-1', and a one-line assumption names the model ID and the column used. A session on any other model (an earlier Sonnet, Haiku) infers no target: ask for `--model`, or state the target assumed and why — never default to the Opus column, whose verification edit is the inverse of Sonnet's.
-  3. Diagnose in both directions — the folklore present that degrades the target model, and the context the prompt is missing.
-  4. Apply the model delta — read the target's section of the migration reference first, then touch only the axes the prompt actually exercises. A prompt with no delegation gets no delegation cap.
-  5. Rewrite. Any context not read this session and not supplied by the user becomes a `[FILL: …]` placeholder, never an invention.
-  6. Report the change delta. Removals tie to a named pattern or a documented model behavior; additions tie to their source — a file read this session, the user's own words, or a `[FILL: …]` slot. An addition with no source does not get reported, it gets deleted.
-  7. Emit request configuration for `--target api` only: effort tier, `thinking.display`, and the `max_tokens` floor, read from the fact source rather than recalled.
+  1. Capture: Capture the prompt from the inline argument, a file path, or the intent the user just described — and name which source was used.
+  2. Resolve: Resolve target model and surface (cc or api). Every flag resolves to a model ID first: `opus55` → 'claude-opus-5-5', `sonnet55` → 'claude-sonnet-5-5', `opus5` → 'claude-opus-5', `fable51` → 'claude-fable-5-1', and `fable5` is accepted as a legacy alias for 'claude-fable-5-1', since Fable 5 prompts run unchanged on Fable 5.1. When either is unstated, infer from the session: an Opus 5 or Opus 5.5 session resolves to its own ID in the Opus column, a Sonnet 5.5 session to 'claude-sonnet-5-5' in the Sonnet column, a Fable 5.x session to 'claude-fable-5-1', and a one-line assumption names the model ID and the column used. A session on any other model (an earlier Sonnet, Haiku) infers no target: ask for `--model`, or state the target assumed and why — never default to the Opus column, whose verification edit is the inverse of Sonnet's.
+  3. Diagnose: Diagnose in both directions — the folklore present that degrades the target model, and the context the prompt is missing.
+  4. Apply: Apply the model delta — read the target's section of the migration reference first, then touch only the axes the prompt actually exercises. A prompt with no delegation gets no delegation cap.
+  5. Rewrite: Rewrite. Any context not read this session and not supplied by the user becomes a `[FILL: …]` placeholder, never an invention.
+  6. Report: Report the change delta. Removals tie to a named pattern or a documented model behavior; additions tie to their source — a file read this session, the user's own words, or a `[FILL: …]` slot. An addition with no source does not get reported, it gets deleted.
+  7. Emit: Emit request configuration for `--target api` only: effort tier, `thinking.display`, and the `max_tokens` floor, read from the fact source rather than recalled.
   </flow>
 
   <flags>
-  - --model opus55|sonnet55|opus5|fable51: target model, resolved in flow step 2.
-  - --target cc|api: target surface, resolved in flow step 2.
+  - --model opus55|sonnet55|opus5|fable51: target model, resolved in the Resolve step.
+  - --target cc|api: target surface, resolved in the Resolve step.
   - --out <path>: destination for saving the rewritten prompt, per the Write entry in tools.
   </flags>
 

@@ -22,7 +22,7 @@ description: Session lifecycle mgmt with Serena MCP + Claude auto memory for pro
   <flags>
   - --type project|config|deps|checkpoint: what to load: project memory and structure, configuration files, dependency manifests, or the saved checkpoint the target names (e.g. session_123).
   - --refresh: re-read sources and replace loaded memory instead of reusing it.
-  - --analyze: on top of the structure flow step 4 always reports, assess the project's state: test status, open TODOs and recent changes.
+  - --analyze: on top of the structure the Discover step always reports, assess the project's state: test status, open TODOs and recent changes.
   </flags>
 
   <storage>

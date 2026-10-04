@@ -53,7 +53,7 @@ description: Feature + code impl with smart agent delegate + MCP. Use ONLY when 
   <gotchas>
   - status-check: Run R02 status check pre-impl. Grep for existing func first
   - scope-discipline: Build only what asked. Zero unsolicited files, zero adjacent refactors
-  - workflow-fanout: fan-out subagents RETURN code/results — subprocess writes discarded; main loop applies edits and runs the >3-file checkpoint (flow step 3) (full rule: core/rules/RULES_DELEGATION.md)
+  - workflow-fanout: fan-out subagents RETURN code/results — subprocess writes discarded; main loop applies edits and runs the >3-file checkpoint (the Checkpoint step) (full rule: core/rules/RULES_DELEGATION.md)
   </gotchas>
 
   <bounds>
