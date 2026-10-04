@@ -20,6 +20,11 @@ description: Interactive requirements discovery through Socratic dialogue + syst
   8. Handoff: Route to /sc:review (mandatory) → /sc:plan after status reach approved-for-plan. With delegated decisions, prefer /sc:review --audit-delegated.
   </flow>
 
+  <flags>
+  - --strategy systematic|agile|enterprise: systematic works through every requirement area in order; agile splits the work into parallel streams (e.g. frontend, backend, security) and iterates; enterprise adds compliance and validation requirements throughout.
+  - --depth shallow|normal|deep: detail level set in flow step 2 (Analyze).
+  </flags>
+
   <self_review>
   Required hard gate before /sc:plan handoff — self-review caught 3 critical reversals on user-approved spec where soft rec alone would ship silent regressions, so gate not advisory.
 

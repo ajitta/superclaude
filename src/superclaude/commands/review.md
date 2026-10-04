@@ -21,6 +21,12 @@ description: Review work product (code, plan, design, spec) for quality, correct
   8. Delegated-decision audit (--audit-delegated): when called on spec with "Resolved Decisions" table, scope review to ONLY row where `mode` is `delegated` (per /sc:brainstorm step 7 heuristic). Recorded choice already read at Gather, so re-eval goes to one isolated delegate (independent stream, not a double-check) under delegate packet rule in core/rules/RULES_DELEGATION.md: it gets each delegated Q and its options as recorded (where spec records none, the Q alone, delegate forms own candidates, report notes it), never the recorded choice or a ★/recommendation marker. Limit: a delegate that can read the repo can still find the recorded choice; its files inspected and commands run show whether it did, and the report says so. Surface for each: original Q, delegate's pick, recorded choice, agree/differ; a row whose recorded outcome defers the choice compares against the option the spec recommended, or reports the pick alone when none was recommended. Other row skipped. Delegated decision historically need explicit audit; user-confirmed choice already pass direct user judgment.
   </flow>
 
+  <flags>
+  - --scope pr|diff|file|branch|plan|design|spec: command-local artifact-type selector, unrelated to the global --scope analysis-boundary enum (file|module|project|system).
+  - --structured: isolated reviewer subagent dispatch, per the Agent entry in the tools section.
+  - --audit-delegated: delegated-decision audit, per flow step 8.
+  </flags>
+
   <outputs>
   | Artifact | Purpose |
   |---|---|
@@ -62,7 +68,6 @@ description: Review work product (code, plan, design, spec) for quality, correct
 
 
   <gotchas>
-  - scope-flag-local: --scope here is command-local artifact-type selector (pr|diff|file|branch|plan|design|spec) — for this command it overrides the global --scope analysis-boundary enum (file|module|project|system) from core/FLAGS.md
   - scope-focus: review only changed code, not whole file or module
   - no-unsolicited-fixes: flag issue but no fix unless asked
   </gotchas>

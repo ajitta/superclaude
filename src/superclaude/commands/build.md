@@ -17,6 +17,13 @@ description: Build, compile, package projects with smart err handling + optimize
   5. Package: Artifacts + gen report
   </flow>
 
+  <flags>
+  - --type dev|prod|test: build variant; artifact directory and report per the outputs table.
+  - --clean: delete the output directory of the chosen --type (dist-dev/, dist/ or dist-test/) before building; nothing outside it, and never git clean.
+  - --optimize: runs flow step 4 (Optimize).
+  - --verbose: run the build tool in its verbose mode and report the full output, not a summary.
+  </flags>
+
   <outputs note="Per --type flag">
 | Type | Artifacts | Report |
 |---|---|---|

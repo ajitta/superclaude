@@ -19,6 +19,18 @@ disable-model-invocation: true
   5. `--status` branch: read most-recent worktree results.tsv + PID, print morning summary, exit
   </flow>
 
+  <flags>
+  - --eval-cmd <sh>: command that measures the metric each cycle; runs unsandboxed (flow step 2, eval-cmd-blast-radius gotcha).
+  - --metric <jmespath>: objective metric the loop optimises, recorded as metric_value in results.tsv; required by flow step 1.
+  - --budget <dur>: wall-clock limit for the whole loop (default 8h).
+  - --smoke-cmd <sh>: health check run at the start of each cycle; a failing check logs `smoke_fail` and skips that cycle.
+  - --cycle-timeout <sec>: timeout for each smoke, mutate and eval step (default 600).
+  - --mutator-model <model>: model for the mutator agent; see the mutator-model-freeform gotcha.
+  - --scope <glob>: glob limiting the files the mutator edits (advisory, default `**`); unrelated to the global --scope.
+  - --status: the status branch in flow step 5; prints the most-recent run summary and exits.
+  - --dry-run: record the baseline metric only; no mutations.
+  </flags>
+
   <outputs>
 | Artifact | Purpose |
 |---|---|

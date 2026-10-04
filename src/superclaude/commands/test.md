@@ -17,6 +17,14 @@ description: Execute tests with coverage analysis and automated quality reportin
   5. Report: Generate outputs per flags
   </flow>
 
+  <flags>
+  - --type unit|integration|e2e|all: which suite runs; e2e runs Playwright browser tests; all runs every suite.
+  - --tdd: cycle in the TDD pattern.
+  - --coverage: collect coverage and report it against the thresholds (line ≥80%, branch ≥70%).
+  - --watch: run the project's watch mode, re-running affected tests on change.
+  - --fix: on failure, find the root cause as /sc:troubleshoot --type bug would and fix the code, then re-run; never edit a test just to make it pass.
+  </flags>
+
   <outputs>
 | Flag | Output | Metrics |
 |---|---|---|
@@ -63,7 +71,7 @@ description: Execute tests with coverage analysis and automated quality reportin
   </gotchas>
 
   <bounds>
-    <does>execute existing tests, coverage reports, failure analysis.</does>
+    <does>execute existing tests, coverage reports, failure analysis, root-cause fixes when --fix is given.</does>
     <never>generate test cases outside an explicit --tdd request, modify framework config, destructive changes.</never>
     <fallback>Ask user for guidance when uncertain.</fallback>
   </bounds>

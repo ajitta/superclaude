@@ -416,6 +416,7 @@ def resolve_flags(prompt: str) -> tuple[str, list[str]]:
     notifications: list[str] = []
     corrected = prompt
     scannable = scannable_prompt(prompt)
+    declared: set[str] | None = None
 
     # Find all --flag patterns (flags may have values after them)
     flag_pattern = re.compile(r"--([a-zA-Z][\w-]*)")
@@ -428,6 +429,13 @@ def resolve_flags(prompt: str) -> tuple[str, list[str]]:
 
         # Skip CC-native triggers (e.g., ultrathink) — pass through silently
         if flag in CC_NATIVE_PASSTHROUGH:
+            continue
+
+        # A flag the named /sc: command declares is that command's own. Read
+        # the command files only here, where a flag went unrecognized.
+        if declared is None:
+            declared = _declared_flags(scannable)
+        if flag in declared:
             continue
 
         # Retired flags, exact then fuzzy. Fuzzy matters as much as exact here:
@@ -469,6 +477,51 @@ RETIRED_COMMANDS: dict[str, str] = {
 }
 
 _COMMAND_TOKEN_RE = re.compile(r"/sc:([a-zA-Z][\w-]*)")
+_FLAGS_BLOCK_RE = re.compile(r"<flags>(.*?)</flags>", re.DOTALL)
+_FLAG_ENTRY_RE = re.compile(r"^\s*- --([a-z][\w-]*)", re.MULTILINE)
+
+
+def _command_dirs() -> tuple[Path, ...]:
+    """Where command files live, in lookup order: installed, then source tree."""
+    return (claude_base() / "commands" / "sc", BASE_PATH / "commands")
+
+
+def flag_entries(text: str) -> set[str]:
+    """The flag names a command file declares in its <flags> section.
+
+    The command-structure test parses with this too, so the hook and the test
+    cannot disagree about what counts as a declaration.
+    """
+    block = _FLAGS_BLOCK_RE.search(text)
+    return set(_FLAG_ENTRY_RE.findall(block.group(1))) if block else set()
+
+
+def _command_flags(name: str) -> set[str]:
+    """The flags /sc:<name> declares. An unreadable file declares nothing.
+
+    utf-8 is explicit because command files carry → ≥ —, which a cp949 or
+    cp1252 locale cannot decode — and a hook that raises here fails every /sc:
+    prompt carrying an unrecognized flag.
+    """
+    for directory in _command_dirs():
+        path = directory / f"{name}.md"
+        if path.is_file():
+            try:
+                return flag_entries(path.read_text(encoding="utf-8"))
+            except (OSError, UnicodeDecodeError):
+                return set()
+    return set()
+
+
+def _declared_flags(scannable: str) -> set[str]:
+    """Flags owned by the /sc: commands a prompt names.
+
+    A command-local flag is not a typo of a global one, and a global name a
+    command redefines must not fire the global directive: /sc:implement --plan
+    takes a plan file, while the global --plan asks for a 5-line plan.
+    """
+    names = {m.group(1).lower() for m in _COMMAND_TOKEN_RE.finditer(scannable)}
+    return set().union(*(_command_flags(name) for name in names))
 
 
 def _known_command_names() -> set[str]:
@@ -479,7 +532,7 @@ def _known_command_names() -> set[str]:
     the source tree keeps them beside the rest of the content. An install with
     neither resolves nothing, and every check below falls open.
     """
-    for directory in (claude_base() / "commands" / "sc", BASE_PATH / "commands"):
+    for directory in _command_dirs():
         try:
             names = {
                 f.stem for f in directory.glob("*.md") if f.stem.upper() != "README"
@@ -845,9 +898,15 @@ def _emit_execution_directives(prompt: str, session_id: str | None = None) -> No
     loaded = get_loaded_contexts()
     new_marks = []
     scannable = scannable_prompt(prompt)
+    declared: set[str] | None = None
     for pattern, directive_fn in _EXECUTION_DIRECTIVES.items():
         match = pattern.search(scannable)
         if not match:
+            continue
+        # A command that declares this flag name gave it its own meaning.
+        if declared is None:
+            declared = _declared_flags(scannable)
+        if match.group(0)[2:].split()[0].lower() in declared:
             continue
         marker = f"_directive:{pattern.pattern}:{match.group(0).lower()}"
         if marker in loaded:

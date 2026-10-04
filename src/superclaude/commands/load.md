@@ -19,6 +19,12 @@ description: Session lifecycle mgmt with Serena MCP + Claude auto memory for pro
   7. Session Goal (optional): If user give goal, record as 1-line objective. Show as reminder when context > 60%.
   </flow>
 
+  <flags>
+  - --type project|config|deps|checkpoint: what to load: project memory and structure, configuration files, dependency manifests, or the saved checkpoint the target names (e.g. session_123).
+  - --refresh: re-read sources and replace loaded memory instead of reusing it.
+  - --analyze: on top of the structure flow step 4 always reports, assess the project's state: test status, open TODOs and recent changes.
+  </flags>
+
   <storage>
     Storage locations (Serena primary / auto memory / topic files / agent memory): SSOT in /sc:save <storage> — installed sibling commands/sc/save.md.
   </storage>

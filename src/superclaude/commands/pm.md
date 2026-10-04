@@ -18,6 +18,11 @@ description: Orchestrate sub-agents, manage workflows, and document learnings fo
   5. Improve: log patterns/mistakes via PDCA
   </flow>
 
+  <flags>
+  - --strategy brainstorm|direct|wave: force the strategy flow step 2 otherwise picks.
+  - --verbose: report each sub-agent dispatch and result as it happens, not only the final summary.
+  </flags>
+
   <patterns>
     - Vague: requirements-analyst → system-architect → specialists
     - Clear: c7 → refactoring-expert → quality-engineer

@@ -20,6 +20,12 @@ description: Rewrite a prompt for Claude Opus 5.5, Sonnet 5.5, Opus 5 or Fable 5
   7. Emit request configuration for `--target api` only: effort tier, `thinking.display`, and the `max_tokens` floor, read from the fact source rather than recalled.
   </flow>
 
+  <flags>
+  - --model opus55|sonnet55|opus5|fable51: target model, resolved in flow step 2.
+  - --target cc|api: target surface, resolved in flow step 2.
+  - --out <path>: destination for saving the rewritten prompt, per the Write entry in tools.
+  </flags>
+
   <model_delta>
   The model families pull in opposite directions on several axes — verification most of all: the Opus column deletes self-check instructions, the Sonnet column turns them into a real-check requirement. An unresolved target model produces the inverse of the correct edit.
 

@@ -18,6 +18,13 @@ disable-model-invocation: true
   5. Report: Status + next
   </flow>
 
+  <flags>
+  - --smart-commit: draft a conventional-commit message from the staged diff and show it before committing.
+  - --interactive: walk through the operation step by step and confirm each decision (e.g. conflict resolution) with the user.
+  - --pr-status: the PR review status check in the PR status integration section.
+  - --from-pr <PR#|URL>: checks out the PR branch and loads its context; see the from_pr section.
+  </flags>
+
 
   <tools>
   - Bash: Git cmd exec

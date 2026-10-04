@@ -18,6 +18,11 @@ description: Code analysis across quality, security, performance, architecture d
   6. Bridge: If findings actionable (fixable issues, not informational), suggest: "Would you like to create an implementation plan? → /sc:plan"
   </flow>
 
+  <flags>
+  - --depth quick|deep: quick reports the top findings from one pass; deep covers the whole target and ties every finding to file:line evidence.
+  - --format text|json|report: output format and destination per the outputs table; report also runs flow step 5.
+  </flags>
+
   <outputs note="Per --format flag; report format dual-routes per core/rules/RULES_DOCS.md `<doc_output_convention>`">
   | Format | Output | Content |
   |---|---|---|

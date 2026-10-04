@@ -16,6 +16,12 @@ description: Ultra-intelligent command recommendation engine for optimal SuperCl
   4. Rec: workflow + MCP flags + agents
   </flow>
 
+  <flags>
+  - --estimate: add an effort estimate for the recommended command sequence.
+  - --alternatives: list other viable commands with a one-line trade-off each.
+  - --expertise beginner|intermediate|expert: explanation depth per the expertise adaptation section.
+  </flags>
+
   <keyword_map>
     - debug (error|bug|not working): /sc:troubleshoot --type bug --trace
     - perf (slow|performance|optimization): /sc:analyze --focus perf

@@ -63,6 +63,10 @@ Rules:
   1. Verb-leading description of the step (≥2 steps; sequence is load-bearing).
   </flow>
 
+  <flags>
+  - --flag-name <value>: behavior the flag turns on.
+  </flags>
+
   <outputs>
   - Artifact: purpose
   </outputs>
@@ -101,9 +105,10 @@ Rules:
 - `<role command="/sc:command-name">` — `command` attribute carries slash identifier (matches filename stem); body contains `<mission>` only. Per xml-prose-format "Attributes vs. Body", short identifiers belong as attributes.
 - `<mission>` — shares ≥30% significant words with frontmatter `description`
 - `<flow>` — ≥2 numbered steps in execution order
+- `<flags>` — every `<syntax>` flag that is not a core/FLAGS.md global gets one `- --name <value>: behavior` line; `- --name` is what the hook and `test_command_structure.py` parse. A flag already defined elsewhere in the body (a flow step, `<outputs>`, a gotcha) gets a line pointing to that section by topic, not a restatement. A global name the command gives its own meaning is defined here too, and inside this command the hook then stops injecting that name's global directive (implement's `--plan` takes a plan path, not the global 5-line plan)
 - `<bounds>` — sub-tag form: `<does>` / `<never>` / `<fallback>` (each body prose sentence). `<does>` + `<never>` required; `<fallback>` optional (use when out-of-scope handling non-obvious). Sub-tag form keeps `<bounds>` structurally distinct from `<tool_guidance>` (commit `S390` measured Claude conflating two when both used `- Label:` lines)
 - `<handoff next="...">` — 2-3 natural next commands
-- Optional: `<outputs>`, `<tools>`, `<gotchas>`, `<examples>`
+- Optional: `<flags>` (required once `<syntax>` offers a non-global flag), `<outputs>`, `<tools>`, `<gotchas>`, `<examples>`
 
 ## Inherited from xml-prose-format.md
 
@@ -118,7 +123,7 @@ Rules below apply to all components, not restated above. See `.claude/rules/xml-
 
 ## Checklist
 
-1. Create `src/superclaude/commands/<name>.md` with frontmatter + XML
+1. Create `src/superclaude/commands/<name>.md` with frontmatter + XML; define every non-global `<syntax>` flag in `<flags>`
 2. Verify `<component name="...">` matches filename
 3. Write specific `description` (shown in `/menu`) — pick trigger tier + negative gate per "Trigger Policy"
 4. Add `<gotchas>` for project-specific failure patterns

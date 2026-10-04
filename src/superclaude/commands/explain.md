@@ -17,6 +17,12 @@ description: Give clear explain of code, concepts, system behavior with edu clar
   5. Validate: Accuracy + effective
   </flow>
 
+  <flags>
+  - --level basic|intermediate|advanced: audience level that flow step 2 otherwise infers: basic assumes no domain knowledge, advanced assumes the reader knows the domain.
+  - --context <domain>: domain that frames the explanation (e.g. react, security); for a library, look up its current docs first.
+  - --format text|examples|interactive: text: prose; examples: lead with runnable examples; interactive: explain in steps with one comprehension question between steps.
+  </flags>
+
 
   <tools>
   - Read/Grep/Glob: Code analyze + pattern ID

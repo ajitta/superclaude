@@ -19,6 +19,12 @@ description: Task reflect + validate use Serena MCP analysis. Use when user type
   4. Persist: write learnings for cross-session catch
   </flow>
 
+  <flags>
+  - --type task|session|completion: task: the current task's goal alignment; session: all work this session; completion: done-ready judgment.
+  - --analyze: goal alignment: compare the work done against the task's stated goal, item by item.
+  - --validate: quality check of the delivered work: verification actually run, claims backed by evidence, gaps named; unrelated to the global --validate.
+  </flags>
+
 
   <examples>
   | Input | Output |

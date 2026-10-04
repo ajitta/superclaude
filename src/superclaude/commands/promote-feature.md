@@ -20,6 +20,12 @@ description: Promote standalone docs sharing a slug into a feature folder per do
   8. Report: print summary — N files moved, N inbound warnings, feature folder path
   </flow>
 
+  <flags>
+  - --dry-run: default mode, defined in flow step 3.
+  - --apply: defined in flow step 3.
+  - --from <path>: promote this one file as the primary doc instead of scanning by slug; its slug must still match <slug>.
+  </flags>
+
   <outputs>
   | Artifact | Purpose |
   |---|---|

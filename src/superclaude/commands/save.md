@@ -20,6 +20,12 @@ description: Session lifecycle management with Serena MCP + Claude auto memory f
   7. Session Goal: if session goal set via /sc:load, evaluate completion status (done/partial/deferred)
   </flow>
 
+  <flags>
+  - --type session|learnings|context|all: what to save, per the outputs table.
+  - --summarize: also write a summary of the session's work and learned patterns.
+  - --checkpoint: recovery points, per the Checkpoint step of the flow.
+  </flags>
+
   <compaction_strategy>
   Preserve (high signal): (1) problems hit and how they were resolved; (2) approaches tried or set aside, and why; (3) what was asked, decided, ruled out, or set as a constraint — stated exactly; (4) where the work stands, including session goal status; (5) what is open or promised next; (6) exact names, numbers, paths, commands, and wording that would be hard to reconstruct
   Discard (low signal): verbatim tool output, intermediate search results, committed diffs, duplicate context

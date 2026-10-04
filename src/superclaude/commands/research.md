@@ -17,6 +17,11 @@ description: Deep web research with adaptive planning + smart search. Use when u
   5. Synthesize: credibility-weighted merge; feature path `docs/features/<slug>/02-research.md`, standalone `docs/research/<topic>-<username>-YYYY-MM-DD.md` — slug resolution (zero-match default `[s]`), frontmatter, README update per core/rules/RULES_DOCS.md `<doc_output_convention>`.
   </flow>
 
+  <flags>
+  - --depth quick|standard|deep|exhaustive: hops and validation per the depth profiles section.
+  - --strategy planning|intent|unified: planning, intent and unified as defined in modes/RESEARCH_CONFIG.md (unified is the default).
+  </flags>
+
   <depth note="See modes/RESEARCH_CONFIG.md for full profiles, hop config, thresholds">
     quick: 1 hop, auto plan, summary | standard: 2-3 hops, full plan, report
     deep: 3-4 hops, mid-checkpoints | exhaustive: 5+ hops, subagent delegate

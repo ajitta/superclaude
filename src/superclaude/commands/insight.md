@@ -19,6 +19,13 @@ description: Capture structured session insights to per-project JSONL for human 
   7. Review mode: `--review` call `superclaude insight review` to list pending markers harvested by SessionEnd/PreCompact hooks. For each wanted entry, propose structured promote (type + tags) + call `superclaude insight promote --index N --type TYPE [--tags a,b]`. Unwanted entries (harvest false positives) drop via `superclaude insight discard --index N[,N]` — show user which ones + why before call, since discard has no undo.
   </flow>
 
+  <flags>
+  - --list: read mode, defined in flow step 6.
+  - --query key=value: read mode, defined in flow step 6.
+  - --stats: read mode, defined in flow step 6.
+  - --review: review mode, defined in flow step 7.
+  </flags>
+
   <outputs>
   | Mode | Output |
   |---|---|
