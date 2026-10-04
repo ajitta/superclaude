@@ -748,6 +748,33 @@ class TestCommandDeclaredFlags:
         assert 'sc-directive flag="--plan"' in out
 
 
+class TestShippedCommandFlags:
+    """The reported prompts, against the command files that ship.
+
+    The source tree, not BASE_PATH: BASE_PATH is the installed content dir
+    (<claude_base>/superclaude), which holds no commands/ in any install.
+    """
+
+    def _cl(self, monkeypatch):
+        from superclaude.scripts import context_loader as cl
+
+        monkeypatch.setattr(cl, "_command_dirs", lambda: (CONTENT_ROOT / "commands",))
+        return cl
+
+    def test_implement_safe_is_not_a_typo(self, monkeypatch):
+        cl = self._cl(monkeypatch)
+        prompt = "/sc:implement auth API --type api --safe --with-tests"
+        assert cl.resolve_flags(prompt)[1] == []
+
+    def test_implement_plan_is_not_the_global_plan(self, monkeypatch, capsys):
+        cl = self._cl(monkeypatch)
+        monkeypatch.setattr(cl, "get_loaded_contexts", lambda: set())
+        monkeypatch.setattr(cl, "mark_as_loaded", lambda _marks: None)
+        monkeypatch.setattr(cl, "check_mcp_and_notify", lambda *a, **k: None)
+        cl._emit_execution_directives("/sc:implement --plan docs/plans/x.md")
+        assert 'sc-directive flag="--plan"' not in capsys.readouterr().out
+
+
 class TestMigrationReferenceResolution:
     """/sc:prompt's model facts live outside the install tree.
 

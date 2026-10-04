@@ -17,6 +17,15 @@ description: Clean code systematic, kill dead code, optimize project structure. 
   5. Report: summary + maintain rec
   </flow>
 
+  <flags>
+  - --type code|imports|files|docs|all: what to clean; actions per type in the outputs table and flow step 3.
+  - --safe: change only the safe tier of the auto-fix threshold (unused imports, dead variables, empty files); list approval-required items (exported functions, config files, shared modules) without changing them; unrelated to the global --safe-mode.
+  - --aggressive: also change approval-required items, each after the user approves it; remove code with no static reference only after a search for dynamic references (string lookups, reflection, config) finds none.
+  - --interactive: show each change group and apply it only after the user accepts it; under --dry-run nothing is applied and the accepted groups form the preview.
+  - --dry-run: read-only preview, nothing applied; defined for --type docs in the validator checks section.
+  - --apply: runs the low-risk transforms for --type docs; see the manual-gate gotcha.
+  </flags>
+
   <outputs note="Per --type flag">
 | Type | Actions | Report |
 |---|---|---|

@@ -132,7 +132,7 @@ revised: 2026-10-04
 | improve | `--safe` | change nothing that code outside the target depends on: changes to exported functions, config files or shared modules are listed as proposals, not applied; unrelated to the global --safe-mode | ★ cleanup 등급, 사용자 결정 |
 | improve | `--interactive` | present each improvement and apply it only after the user accepts it | ★ |
 | index | `--format md\|json\|yaml` | md writes the files in the outputs table; json or yaml writes the same stem with that extension (e.g. docs/reports/API.json) | ★ outputs:23-25 |
-| load | `--type project\|config\|deps\|checkpoint` | what to load: project memory and structure, configuration files, dependency manifests, or the latest saved checkpoint | ★ ex:39,41 |
+| load | `--type project\|config\|deps\|checkpoint` | what to load: project memory and structure, configuration files, dependency manifests, or the saved checkpoint the target names (e.g. session_123) | ★ ex:39,41,46 |
 | load | `--refresh` | re-read sources and replace loaded memory instead of reusing it | ★ ex:41 |
 | load | `--analyze` | on top of the structure flow step 4 always reports, assess the project's state: test status, open TODOs and recent changes | ★ ex:39 |
 | plan | `--output <path>` | write the plan to this path instead of the convention path | ex:57 |
@@ -140,7 +140,7 @@ revised: 2026-10-04
 | pm | `--strategy …` | force the strategy flow step 2 otherwise picks | flow:15 |
 | pm | `--verbose` | report each sub-agent dispatch and result as it happens, not only the final summary | ★ |
 | promote-feature | `--from <path>` | promote this one file as the primary doc instead of scanning by slug; its slug must still match <slug> | ex:45, never:70 |
-| prompt | `--out <path>` | write the rewritten prompt to this file instead of returning it inline | ★ (구현 시 prompt.md의 출력 처리와 대조) |
+| prompt | `--out <path>` | (구현 시 대조 결과 본문 `<tools>` Write가 이미 정의 → 가리키는 항목으로 씀: destination for saving the rewritten prompt, per the Write entry in tools) | prompt.md `<tools>` Write |
 | recommend | `--estimate` | add an effort estimate for the recommended command sequence | ★ |
 | recommend | `--alternatives` | list other viable commands with a one-line trade-off each | ★ |
 | recommend | `--expertise …` | explanation depth per the expertise adaptation section | recommend.md:39 |

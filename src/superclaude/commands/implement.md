@@ -19,6 +19,14 @@ description: Feature + code impl with smart agent delegate + MCP. Use ONLY when 
   7. Integrate: Docs + test recs; report any blockers hit
   </flow>
 
+  <flags>
+  - --plan <path>: implement from this plan doc in its task order; unrelated to the global --plan, whose 5-line-plan directive does not apply.
+  - --type component|api|service|feature: selects the lead agent: component → frontend-architect, api and service → backend-architect, feature → multi-agent coordination.
+  - --framework react|vue|express: follow this framework's conventions and look up its current docs (Context7) before writing framework-facing code.
+  - --safe: build the feature without changing existing exported functions, config files or shared modules; a change the feature needs there is shown first and waits for approval; unrelated to the global --safe-mode.
+  - --with-tests: write tests for the new behavior with the code and run them in the Validate step.
+  </flags>
+
   <tools>
   - Write/Edit: Code gen
   - Read/Grep/Glob: Project analysis

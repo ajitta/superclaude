@@ -11,6 +11,7 @@ from pathlib import Path
 import pytest
 import yaml
 
+from superclaude.scripts.context_loader import VALID_FLAGS, flag_entries
 from tests.unit.md_helpers import (
     extract_xml_attr,
     extract_xml_content,
@@ -274,6 +275,37 @@ class TestCommandMinimumContent:
             assert not re.search(pattern, content), (
                 f"{stem}: empty section found matching {pattern}"
             )
+
+
+class TestCommandFlagsAreDefined:
+    """Every flag a command's <syntax> offers has a <flags> entry.
+
+    Flags that lived only in <syntax> and the examples table left the model to
+    guess their meaning from the name, and left the hook to call them typos:
+    `/sc:implement --safe` drew "Did you mean: --safe-mode?". Global flags
+    (core/FLAGS.md) are exempt unless a command gives the name its own meaning.
+    """
+
+    @staticmethod
+    def _syntax_flags(content: str) -> set[str]:
+        syntax = re.search(r"<syntax>(.*?)</syntax>", content, re.DOTALL)
+        return set(re.findall(r"--([a-z][\w-]*)", syntax.group(1))) if syntax else set()
+
+    def test_every_syntax_flag_is_defined(self, command):
+        stem, content, _ = command
+        missing = self._syntax_flags(content) - VALID_FLAGS - flag_entries(content)
+        assert not missing, (
+            f"{stem}: <syntax> offers {sorted(missing)} with no `- --name:` entry "
+            f"in <flags>"
+        )
+
+    def test_every_defined_flag_is_in_syntax(self, command):
+        stem, content, _ = command
+        orphaned = flag_entries(content) - self._syntax_flags(content)
+        assert not orphaned, (
+            f"{stem}: <flags> defines {sorted(orphaned)}, which <syntax> no "
+            f"longer offers"
+        )
 
 
 class TestCommandDocsPrescribeConsoleEntry:

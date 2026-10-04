@@ -15,6 +15,10 @@ description: List all /sc commands + functionality. Use when user types `/sc:hel
   2. Complete: end after display
   </flow>
 
+  <flags>
+  - --flags: Render the flag list from core/FLAGS.md (always loaded in context) — one line per flag, grouped by modes / MCP / execution / output. Effort levels are Claude Code native, not managed by SuperClaude.
+  </flags>
+
   <commands>
     - agent: session control + workflow orchestration
     - analyze: code analysis — quality, security, perf, architecture
@@ -62,8 +66,6 @@ description: List all /sc commands + functionality. Use when user types `/sc:hel
   Discovery: brainstorm (Socratic requirements) | research (evidence-based investigation)
   Advisory: business-panel (market/strategy) | spec-panel (tech spec review)
   </scope_map>
-
-  <flags>Render the flag list from core/FLAGS.md (always loaded in context) — one line per flag, grouped by modes / MCP / execution / output. Effort levels are Claude Code native, not managed by SuperClaude.</flags>
 
   <examples>
 

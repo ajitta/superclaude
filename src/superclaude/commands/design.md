@@ -19,6 +19,11 @@ description: Design system architecture, APIs, component interfaces with compreh
   7. Document: feature path `docs/features/<slug>/04-design.md`, standalone `docs/specs/<topic>-design-<username>-YYYY-MM-DD.md` — slug resolution (zero-match default `[f]`), frontmatter, README update per core/rules/RULES_DOCS.md `<doc_output_convention>`. Plus diagrams.
   </flow>
 
+  <flags>
+  - --type architecture|api|component|database: design kind; sections per type in the outputs table.
+  - --format diagram|spec|code: diagram: Mermaid diagram; spec: written specification; code: interface definitions (types, signatures) with no implementation.
+  </flags>
+
   <outputs note="All content in single spec file per invocation">
 | Artifact | Content |
 |---|---|

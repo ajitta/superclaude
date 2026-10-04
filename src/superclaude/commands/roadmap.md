@@ -18,6 +18,11 @@ description: Generate structured implementation workflows from PRDs and feature 
   6. Document: feature path `docs/features/<slug>/05-plan.md` (or `05a-plan-workflow.md` if primary plan exists per multi-of-same-phase rule), standalone `docs/plans/<topic>-workflow-<username>-YYYY-MM-DD.md` — slug resolution (zero-match default `[f]`), frontmatter, README update per core/rules/RULES_DOCS.md `<doc_output_convention>`.
   </flow>
 
+  <flags>
+  - --strategy systematic|agile|enterprise: systematic works through every requirement area in order; agile splits the work into parallel streams (e.g. frontend, backend, security) and iterates; enterprise adds compliance and validation requirements throughout.
+  - --depth shallow|normal|deep: detail per workflow step: shallow brief, normal balanced, deep adds acceptance criteria and risks.
+  </flags>
+
   <outputs>
 | Artifact | Purpose |
 |---|---|

@@ -17,6 +17,12 @@ description: Apply systematic improvements to code quality, performance, and mai
   5. Document: Summary + future recs
   </flow>
 
+  <flags>
+  - --type quality|performance|maintainability|style: dimension to improve; performance needs a measured baseline first, else stop and point to /sc:analyze --focus perf.
+  - --safe: change nothing that code outside the target depends on: changes to exported functions, config files or shared modules are listed as proposals, not applied; unrelated to the global --safe-mode.
+  - --interactive: present each improvement and apply it only after the user accepts it.
+  </flags>
+
 
   <examples>
   | Input | Output |

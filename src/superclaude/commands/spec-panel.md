@@ -17,6 +17,11 @@ description: Multi-expert spec review + improvement via renowned software engine
   5. Synthesize: improvement roadmap
   </flow>
 
+  <flags>
+  - --mode discussion|critique|socratic: review style, per the modes section.
+  - --experts "name1,name2": panel members, per the experts section.
+  </flags>
+
 
   <experts>
     - Osmani (AI implementability, modular specs): "Can an AI agent execute this section by section?"

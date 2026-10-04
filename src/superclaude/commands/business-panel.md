@@ -15,6 +15,14 @@ description: Multi-expert biz analysis with adaptive modes. Use when user types 
   4. Present: Multi-lens analysis with labeled expert attributions
   </flow>
 
+  <flags>
+    - --experts: Pick specific: "porter,christensen,meadows"
+    - --mode discussion|debate|socratic|adaptive: one of the four modes in the modes section
+    - --focus: Auto-pick for domain; unrelated to the global --focus
+    - --all-experts: Include all 9
+    - --synthesis-only: Skip detail, show synthesis
+    - --structured: Use symbol system
+  </flags>
 
   <experts>9 lenses (surnames for --experts): christensen, porter, drucker, godin, kim-mauborgne, collins, taleb, meadows, doumont — frameworks per agents/business-panel-experts.md `<focus>` (SSOT).</experts>
 
@@ -24,14 +32,6 @@ description: Multi-expert biz analysis with adaptive modes. Use when user types 
     - socratic: Question-driven for deep learning
     - adaptive: System picks by content
   </modes>
-
-  <options>
-    - --experts: Pick specific: "porter,christensen,meadows"
-    - --focus: Auto-pick for domain
-    - --all-experts: Include all 9
-    - --synthesis-only: Skip detail, show synthesis
-    - --structured: Use symbol system
-  </options>
 
 
   <examples>

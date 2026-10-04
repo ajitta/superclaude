@@ -18,6 +18,11 @@ description: Interactive project env setup — pick + run init tasks for first-s
   6. Report: final summary table — task status, artifacts made, memory entries stored
   </flow>
 
+  <flags>
+  - --quick: preset, defined in flow step 3 and the menu.
+  - --full: preset, defined in flow step 3 and the menu.
+  </flags>
+
   <menu>
   ```
   Project Initializer

@@ -17,6 +17,11 @@ description: Intelligent MCP tool selection based on complexity scoring and oper
   5. Validate: accuracy + confidence
   </flow>
 
+  <flags>
+  - --analyze: show the complexity score and the decision-matrix rule that picked the tool.
+  - --explain: explain the choice in plain terms, including why the runner-up loses.
+  </flags>
+
 
   <decision_matrix>
     - Symbol ops: Serena (LSP, navigation)

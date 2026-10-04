@@ -17,6 +17,11 @@ description: Gen focused docs for components, functions, APIs, features. Use ONL
   5. Integrate: Project doc ecosystem
   </flow>
 
+  <flags>
+  - --type inline|external|api|guide: doc kind; output and metrics per type in the outputs table.
+  - --style brief|detailed: brief: purpose and usage only; detailed: adds parameters, return values, errors and examples.
+  </flags>
+
   <outputs note="Per --type flag">
 | Type | Output | Metrics |
 |---|---|---|

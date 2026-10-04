@@ -19,6 +19,11 @@ description: Execute complex tasks with intelligent workflow management and dele
   7. Cleanup: Auto-remove stale/completed tasks (--cleanup)
   </flow>
 
+  <flags>
+  - --strategy sequential|parallel|adaptive: force the execution order flow step 3 otherwise picks.
+  - --cleanup: stale and completed task removal, per the task cleanup section.
+  </flags>
+
   <task_cleanup note="Claude Code 2.1.37+">
     <description>Auto task cleanup via TaskUpdate delete feature</description>
     <cleanable_states>

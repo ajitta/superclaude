@@ -16,6 +16,11 @@ description: Give dev estimates for tasks/features/projects with smart analysis.
   4. Present: Breakdown + confidence + risk
   </flow>
 
+  <flags>
+  - --type effort|complexity: effort: relative size with a confidence level, by category; complexity: risks and a dependency map.
+  - --breakdown: split the estimate per sub-task instead of giving one total.
+  </flags>
+
 
   <tools>
   - Read/Grep/Glob: Codebase complexity analysis

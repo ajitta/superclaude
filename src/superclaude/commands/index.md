@@ -17,6 +17,11 @@ description: Generate comprehensive project documentation and knowledge base wit
   5. Maintain: Preserve <!-- MANUAL --> marked sections
   </flow>
 
+  <flags>
+  - --type docs|api|structure|readme: output file and metrics per type, in the outputs table.
+  - --format md|json|yaml: md writes the files in the outputs table; json or yaml writes the same stem with that extension (e.g. docs/reports/API.json).
+  </flags>
+
   <outputs note="Per --type flag">
 | Type | Output File | Metrics |
 |---|---|---|
