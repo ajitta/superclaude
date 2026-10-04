@@ -67,8 +67,6 @@ Rules:
   - Artifact: purpose
   </outputs>
 
-  <mcp servers="seq|c7|..."/>
-
   <tools>
   - ToolName: purpose
   </tools>
@@ -105,7 +103,7 @@ Rules:
 - `<flow>` — ≥2 numbered steps in execution order
 - `<bounds>` — sub-tag form: `<does>` / `<never>` / `<fallback>` (each body prose sentence). `<does>` + `<never>` required; `<fallback>` optional (use when out-of-scope handling non-obvious). Sub-tag form keeps `<bounds>` structurally distinct from `<tool_guidance>` (commit `S390` measured Claude conflating two when both used `- Label:` lines)
 - `<handoff next="...">` — 2-3 natural next commands
-- Optional: `<outputs>`, `<mcp>`, `<tools>`, `<gotchas>`, `<examples>`
+- Optional: `<outputs>`, `<tools>`, `<gotchas>`, `<examples>`
 
 ## Inherited from xml-prose-format.md
 

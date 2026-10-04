@@ -73,7 +73,7 @@ SKILL_MANIFESTS = sorted(SKILLS_DIR.glob("*/SKILL.md"))
 
 
 class TestMCPWiring:
-    """FLAGS.md MCP flags → MCP doc files."""
+    """EXPECTED_MCP_DOCS ↔ mcp/MCP_*.md files (none missing, none orphaned)."""
 
     # Context7 has no doc: it ships as a claude.ai connector whose server
     # instructions and tool descriptions carry the guidance a doc would.
