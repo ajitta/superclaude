@@ -49,7 +49,7 @@ description: Gen focused docs for components, functions, APIs, features. Use ONL
 | `components/ --type external` | Component library docs |
 
   <example name="document-unstable-code" type="error-path">
-    - Input: /sc:document src/api --type api --detailed (during active refactoring)
+    - Input: /sc:document src/api --type api --style detailed (during active refactoring)
     - Why wrong: Doc code mid-refactor → docs stale immediately.
     - Correct: Finish refactor first, then /sc:document for stable API surface.
   </example>
