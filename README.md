@@ -215,27 +215,6 @@ The framework is fully functional without any MCP server. Each one adds a capabi
 
 Source of truth for each server's usage: `src/superclaude/mcp/MCP_*.md` and `src/superclaude/mcp/README.md`.
 
-### **Token Optimization (Optional — RTK)**
-
-[`rtk-ai/rtk`](https://github.com/rtk-ai/rtk) is a single Rust binary that transparently rewrites common Bash commands (`git status`, `pnpm install`, `pytest`, …) into compact, LLM-friendly output — typically **60–90% token reduction** on routine ops. Independent project; not bundled with `superclaude`.
-
-```bash
-# Install (pick one)
-brew install rtk                                                                    # macOS / Linux (Homebrew)
-curl -fsSL https://raw.githubusercontent.com/rtk-ai/rtk/refs/heads/master/install.sh | sh   # Linux / macOS
-cargo install --git https://github.com/rtk-ai/rtk                                   # Cargo
-# Windows: download from https://github.com/rtk-ai/rtk/releases (WSL recommended)
-
-# Verify
-rtk --version
-rtk gain                       # token-savings stats
-
-# Enable Claude Code auto-rewrite hook (transparent — no prompt changes needed)
-rtk init -g                    # restart Claude Code after running this
-```
-
-> Once the hook is active, Claude's `git status` calls run as `rtk git status` automatically. Without the hook, prefix manually (`rtk <cmd>`).
-
 ### **Persistent Cross-Session Memory (Optional — claude-mem)**
 
 [`thedotmack/claude-mem`](https://github.com/thedotmack/claude-mem) is a memory-compression layer for Claude Code that automatically captures and recalls context across sessions. Independent project; complements `superclaude`'s `/sc:load` + insight pipeline by storing observations queryable via the `mem-search` skill. Requires Node.js ≥18.
