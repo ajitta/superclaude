@@ -3,8 +3,6 @@
 Verifies wiring integrity across core/, agents/, modes/, mcp/, hooks/, scripts/, commands/.
 These tests read the real source tree (no mocking) and catch silent breakages
 in text-based cross-references that the Python type system cannot enforce.
-
-Design doc: docs/test-design-cross-ref-integration.md
 """
 
 import json
@@ -28,39 +26,6 @@ pytestmark = pytest.mark.integration
 
 
 # --- Parsing helpers ---
-
-
-def parse_flags_mcp_section() -> dict[str, str]:
-    """Parse <mcp> block from FLAGS.md for flag names.
-
-    Returns: {"serena": "serena", "tavily": "tavily", ...} — alias to itself.
-    """
-    content = (CORE_DIR / "FLAGS.md").read_text(encoding="utf-8")
-    match = re.search(r"<mcp>(.*?)</mcp>", content, re.DOTALL)
-    if not match:
-        return {}
-
-    # Extract all --flag entries
-    flags = {}
-    for line in match.group(1).strip().split("\n"):
-        line = line.strip()
-        if not line.startswith("--"):
-            continue
-        # e.g. "--c7|--context7: imports, frameworks, official docs → Context7 curated docs"
-        flag_part = line.split(":")[0].strip()
-        aliases = [f.strip().lstrip("-") for f in flag_part.split("|")]
-        for alias in aliases:
-            flags[alias] = alias
-    return flags
-
-
-def parse_agent_mcp_servers(agent_path: Path) -> list[str]:
-    """Extract MCP server abbreviations from <mcp servers="..."/> in an agent file."""
-    content = agent_path.read_text(encoding="utf-8")
-    match = re.search(r'<mcp\s+servers=["\']([^"\']*)["\']', content)
-    if not match:
-        return []
-    return [s.strip() for s in match.group(1).split("|") if s.strip()]
 
 
 def parse_hooks_json_script_refs() -> list[str]:
@@ -100,7 +65,6 @@ def parse_skill_agent_field(skill_manifest: Path) -> str | None:
 
 
 # --- Collected file lists for parametrize ---
-AGENT_FILES = sorted(f for f in AGENTS_DIR.glob("*.md") if f.name != "README.md")
 COMMAND_FILES = sorted(f for f in COMMANDS_DIR.glob("*.md") if f.name != "README.md")
 SKILL_MANIFESTS = sorted(SKILLS_DIR.glob("*/SKILL.md"))
 
@@ -125,27 +89,6 @@ class TestMCPWiring:
             doc_path = MCP_DIR / doc_name
             assert doc_path.exists(), f"Expected MCP doc {doc_name} not found"
 
-    def test_mcp_config_doc_pairing(self):
-        """Every .json in configs/ has a matching MCP_*.md."""
-        CONFIG_TO_DOC = {  # noqa: N806 — function-local constant mapping
-            "playwright": "Playwright",
-            "serena": "Serena",
-            "tavily": "Tavily",
-            "chrome-devtools": "Chrome-DevTools",
-        }
-        configs_dir = MCP_DIR / "configs"
-        if not configs_dir.exists():
-            pytest.skip("mcp/configs/ not found")
-        for config_file in configs_dir.glob("*.json"):
-            stem = config_file.stem
-            assert stem in CONFIG_TO_DOC, (
-                f"No doc mapping for config {config_file.name}"
-            )
-            doc_name = f"MCP_{CONFIG_TO_DOC[stem]}.md"
-            assert (MCP_DIR / doc_name).exists(), (
-                f"Config {config_file.name} expects {doc_name} but it's missing"
-            )
-
     def test_no_orphan_mcp_doc_files(self):
         """No MCP_*.md file without a known mapping."""
         known = set(self.EXPECTED_MCP_DOCS)
@@ -157,6 +100,9 @@ class TestMCPWiring:
 # NOTE: TestTriggerMapPaths removed — context_trigger_map.py and
 # context_injection.py were deleted; trigger wiring moved to runtime
 # config files instead of importable modules.
+
+# NOTE: TestAgentModeMapping and test_mcp_config_doc_pairing removed — agent
+# <mcp servers> tags (672055ce) and mcp/configs/ (899b0b74) no longer exist.
 
 
 class TestHooksScriptPaths:
@@ -189,22 +135,6 @@ class TestHooksScriptPaths:
         assert expected_events <= actual_events, (
             f"Missing hook events: {expected_events - actual_events}"
         )
-
-
-class TestAgentModeMapping:
-    """Agent <mcp servers="..."/> → FLAGS.md MCP abbreviations."""
-
-    @pytest.mark.parametrize("agent_path", AGENT_FILES, ids=lambda p: p.stem)
-    def test_agent_mcp_abbreviations_are_valid(self, agent_path):
-        servers = parse_agent_mcp_servers(agent_path)
-        if not servers:
-            pytest.skip(f"{agent_path.stem} has no <mcp servers>")
-        flags_mcp = parse_flags_mcp_section()
-        for server in servers:
-            assert server in flags_mcp, (
-                f"Agent {agent_path.stem} references MCP server '{server}' "
-                f"not found in FLAGS.md <mcp> section"
-            )
 
 
 class TestSkillAgentRouting:
