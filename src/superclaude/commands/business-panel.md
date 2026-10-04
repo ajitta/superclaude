@@ -18,7 +18,7 @@ description: Multi-expert biz analysis with adaptive modes. Use when user types 
   <flags>
   - --experts "names": panel members by surname from the experts section, e.g. "porter,christensen,meadows".
   - --mode discussion|debate|socratic|adaptive: one of the four modes in the modes section.
-  - --focus domain: business domain (e.g. strategy, risk) that picks the 2-3 experts the Analyze step applies; ignored when --experts or --all-experts is given; unrelated to the global --focus.
+  - --focus domain: business domain (e.g. strategy, risk) that picks the experts the Analyze step applies; ignored when --experts or --all-experts is given; unrelated to the global --focus.
   - --all-experts: include all 9 experts in the experts section.
   - --synthesis-only: skip per-expert detail and show only the synthesis.
   - --structured: use the business symbol system (core/BUSINESS_SYMBOLS.md).

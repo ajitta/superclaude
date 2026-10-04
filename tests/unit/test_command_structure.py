@@ -285,11 +285,14 @@ _GLOBAL_FLAG_LINE = re.compile(
 
 
 def _global_flag_values() -> dict[str, set[str] | None]:
-    """Values each global flag allows: none when unbracketed, None when free ([n])."""
+    """Values each global flag allows: an empty set when unbracketed, None when free ([n])."""
     text = (COMMANDS_DIR.parent / "core" / "FLAGS.md").read_text(encoding="utf-8")
     values: dict[str, set[str] | None] = {}
     for names, listed in _GLOBAL_FLAG_LINE.findall(text):
-        allowed = set(listed.split("|")) if "|" in listed else None if listed else set()
+        if "|" in listed:
+            allowed = set(listed.split("|"))
+        else:
+            allowed = None if listed else set()
         for name in names.split("|"):
             values[name[2:]] = allowed
     return values
@@ -336,9 +339,9 @@ class TestCommandFlagsAreDefined:
         counts too: implement's --plan takes a path.
         """
         stem, content, _ = command
-        assert {"focus", "scope", "plan"} <= GLOBAL_FLAG_VALUES.keys(), (
-            "core/FLAGS.md flag lines no longer parse"
-        )
+        assert (
+            GLOBAL_FLAG_VALUES.get("focus") and GLOBAL_FLAG_VALUES.get("plan") == set()
+        ), "core/FLAGS.md flag lines no longer parse"
         syntax = extract_xml_content(content, "syntax") or ""
         undefined = {}
         for name, allowed in GLOBAL_FLAG_VALUES.items():
@@ -359,9 +362,11 @@ class TestCommandFlagsAreDefined:
 # parenthetical dropped ("1. Load (Serena): ..." -> "load").
 _FLOW_LABEL = re.compile(r"^\s*\d+(?:\.\d+)?\.\s+(.+?):", re.MULTILINE)
 # "the Analyze step", "the /sc:brainstorm Decision-mode tag step",
-# "the Test, Fix and Verify steps".
+# "the Test, Fix and Verify steps". A label never crosses another "the", so
+# "the PR body names the Report step" reads as the Report step.
 _STEP_POINTER = re.compile(
-    r"\b[Tt]he (?:(/sc:[a-z][\w-]*) )?([A-Z`][^.;:()|\n]*?) steps?\b"
+    r"\b[Tt]he (?:(/sc:[a-z][\w-]*) )?"
+    r"([A-Z`](?:(?!\b[Tt]he\b)[^.;:()|\n])*?) steps?\b"
 )
 _LABEL_LIST_SEP = re.compile(r"\s*,\s*(?:and\s+)?|\s+and\s+")
 

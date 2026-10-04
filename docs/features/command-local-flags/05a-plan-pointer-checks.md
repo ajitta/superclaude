@@ -50,7 +50,7 @@ revised: 2026-10-04
 - [x] Step 1: 테스트를 쓴다. 블록 추출은 기존 `md_helpers.extract_xml_content`를 쓴다.
   - `_flow_labels(content) -> set[str]`: `<flow>` 블록에서 `re.M`으로 `^\s*\d+(?:\.\d+)?\.\s+(.+?):` 줄의 첫 `:` 앞을 이름으로 잡는다. 괄호 부분(`\s*\(.*?\)`)을 지우고 소문자로 바꾼다. `Load (Serena)`는 `load`, `2.5. Misunderstanding-Audit:`은 `misunderstanding-audit`가 된다.
   - `test_no_numbered_step_refs`: `re.findall(r"\bsteps? \d+", content)`가 비어 있어야 한다. 소문자만 본다(plan.md `<templates>`의 `Step 1:`은 대상이 아님).
-  - `test_named_step_refs_resolve`: `` \b[Tt]he (?:(/sc:[a-z][\w-]*) )?([A-Z`][^.;:()|\n]*?) steps?\b ``에 맞는 참조마다 이름을 `\s*,\s*(?:and\s+)?|\s+and\s+`로 나눈다. `/sc:<name>`이 붙으면 `COMMANDS_DIR / f"{name}.md"`가 있어야 하고(assert), 없으면 자기 자신이 대상이다. 각 이름(소문자)이 대상의 `_flow_labels`에 있어야 한다. 소문자로 시작하는 문구(git의 "the operation step by step")는 대상이 아니다.
+  - `test_named_step_refs_resolve`: `` \b[Tt]he (?:(/sc:[a-z][\w-]*) )?([A-Z`](?:(?!\b[Tt]he\b)[^.;:()|\n])*?) steps?\b ``에 맞는 참조마다(이름은 다른 "the"를 넘지 않는다) 이름을 `\s*,\s*(?:and\s+)?|\s+and\s+`로 나눈다. `/sc:<name>`이 붙으면 `COMMANDS_DIR / f"{name}.md"`가 있어야 하고(assert), 없으면 자기 자신이 대상이다. 각 이름(소문자)이 대상의 `_flow_labels`에 있어야 한다. 소문자로 시작하는 문구(git의 "the operation step by step")는 대상이 아니다.
 - [x] Step 2: `uv run pytest tests/unit/test_command_structure.py -k StepRefs -q`. `test_no_numbered_step_refs`가 16개 명령에서 실패하고, `test_named_step_refs_resolve`는 통과해야 한다(기존 3개).
 
 ### Task 1.2: flow 이름과 명령 안 참조 교체
@@ -145,7 +145,7 @@ auto-improve:30 칸의 이중 백틱은 표 안의 마크다운 표기다. 파�
 **Files:** Test: `tests/unit/test_command_structure.py` (`TestCommandFlagsAreDefined`에 추가)
 
 - [x] Step 1: `test_global_flag_with_own_values_is_defined`를 쓴다.
-  - `COMMANDS_DIR.parent / "core" / "FLAGS.md"`에서 `re.M`으로 `^(--[\w-]+(?:\|--[\w-]+)*)(?: \[([^\]]*)\])?:` 줄을 읽는다. `|`로 나눈 이름마다 허용 값을 정한다. 대괄호가 없으면 값을 받지 않는다(빈 집합). `[a|b]`이면 그 값들이다. `[n]`처럼 `|`가 없는 자리표시자는 자유 값이라 검사하지 않는다(spec-panel `--iterations N`). 파싱 결과에 `focus`, `scope`, `plan`이 있는지 assert해서, FLAGS.md 형식이 바뀌어 아무것도 못 읽는 경우 테스트가 그냥 통과하지 않게 한다.
+  - `COMMANDS_DIR.parent / "core" / "FLAGS.md"`에서 `re.M`으로 `^(--[\w-]+(?:\|--[\w-]+)*)(?: \[([^\]]*)\])?:` 줄을 읽는다. `|`로 나눈 이름마다 허용 값을 정한다. 대괄호가 없으면 값을 받지 않는다(빈 집합). `[a|b]`이면 그 값들이다. `[n]`처럼 `|`가 없는 자리표시자는 자유 값이라 검사하지 않는다(spec-panel `--iterations N`). 파싱 결과에서 `focus`의 값 목록이 비어 있지 않고 `plan`은 값을 받지 않는지 assert해서, FLAGS.md 형식이 바뀌어 아무것도 못 읽는 경우 테스트가 그냥 통과하지 않게 한다.
   - `<syntax>`에서 `--{name}(?![\w-])(?:[ \t]+(?!\[?-)\[?([^\]\s]+))?`로 값을 잡고(뒤따르는 `[--flag]`나 다음 줄은 값으로 보지 않는다) `"<>`를 벗겨 `|`로 나눈다. 값이 없으면(`[--delegate]`) 건너뛴다. 허용되지 않는 값이 하나라도 있으면 `flag_entries(content)`에 그 이름이 있어야 한다.
 - [x] Step 2: 실행하면 analyze만 `{'rules'}`로 실패해야 한다(auto-improve·review `--scope`, business-panel·spec-panel `--focus`, implement `--plan`은 항목이 있음). 값이 없는 전역 플래그 분기도 확인한다. implement.md의 `- --plan <path>:` 항목을 지우면 implement도 실패해야 한다. 확인 후 `git checkout -- src/superclaude/commands/implement.md`.
 
@@ -165,7 +165,7 @@ auto-improve:30 칸의 이중 백틱은 표 안의 마크다운 표기다. 파�
   <flags>
   - --experts "names": panel members by surname from the experts section, e.g. "porter,christensen,meadows".
   - --mode discussion|debate|socratic|adaptive: one of the four modes in the modes section.
-  - --focus domain: business domain (e.g. strategy, risk) that picks the 2-3 experts the Analyze step applies; ignored when --experts or --all-experts is given; unrelated to the global --focus.
+  - --focus domain: business domain (e.g. strategy, risk) that picks the experts the Analyze step applies; ignored when --experts or --all-experts is given; unrelated to the global --focus.
   - --all-experts: include all 9 experts in the experts section.
   - --synthesis-only: skip per-expert detail and show only the synthesis.
   - --structured: use the business symbol system (core/BUSINESS_SYMBOLS.md).
@@ -177,7 +177,7 @@ auto-improve:30 칸의 이중 백틱은 표 안의 마크다운 표기다. 파�
 
 ## Phase 5: 동기화와 병합 (커밋 1개)
 
-- [ ] Step 1: `superclaude doctor --scope local`로 확인한 뒤 `superclaude install --force --scope local`. 이어서 `diff -rq src/superclaude/commands .claude/commands/sc`에서 `__init__.py`, `__pycache__`, `README.md` 외의 차이가 없고, `diff -q src/superclaude/core/rules/RULES_DOCS.md .claude/superclaude/core/rules/RULES_DOCS.md`도 같아야 한다. user scope는 동기화하지 않는다(`sync-scope-creates`).
+- [x] Step 1: `superclaude doctor --scope local`로 확인한 뒤 `superclaude install --force --scope local`. 이어서 `diff -rq src/superclaude/commands .claude/commands/sc`에서 `__init__.py`, `__pycache__`, `README.md` 외의 차이가 없고, `diff -q src/superclaude/core/rules/RULES_DOCS.md .claude/superclaude/core/rules/RULES_DOCS.md`도 같아야 한다. user scope는 동기화하지 않는다(`sync-scope-creates`).
 - [ ] Step 2: 이 계획서를 `status: complete`로, README `phase:`를 `complete`로 바꾸고 날짜(`revised:`, `updated:`)를 그날로 맞춘다. Step 1–2의 체크박스도 이 커밋에서 체크한다. 이전 단계 체크박스는 단계마다 이미 체크되어 있어야 한다(`plan-checklist-vs-status`). 커밋: `docs(plans): mark flag-pointer-checks plan complete`
 - 병합(체크박스 없음, 계획서가 병합 전에 완료 상태로 커밋되므로): `git checkout master && git merge --no-ff docs/flag-pointer-checks -m "Merge docs/flag-pointer-checks: check flow-step and <flags> pointers"`를 한 명령으로 실행한다(`editable-tool-branch-switch`). push 후 master CI를 확인한다.
 
