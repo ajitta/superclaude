@@ -13,7 +13,7 @@ revised: 2026-10-04
 
 ## 근거
 
-- 선행 작업: [command-local-flags 계획](../../plans/command-local-flags-ajitta-2026-10-04.md), 리뷰 후속 커밋 `eafd5e96`.
+- 선행 작업: [command-local-flags 계획](./05-plan.md), 리뷰 후속 커밋 `eafd5e96`.
 - 단계 번호 참조가 16개 명령에 29개 있다(`<flags>` 안 23개, 밖 6개). 이 중 review.md:21은 다른 명령(brainstorm)의 단계 번호를 가리킨다. commands 밖에도 2개 있다: `src/superclaude/core/rules/RULES_DOCS.md:67`(brainstorm 6단계)과 `.claude/rules/gotchas/general.md:21`(implement 4단계). flow 순서가 바뀌면 참조가 조용히 틀어지고, 이를 잡는 테스트가 없다.
 - "the X step" 형식의 이름 참조는 3개(implement `the Validate step`, save `the Checkpoint step`, troubleshoot `the Test, Fix and Verify steps`)이고 모두 해석된다. 라벨만 쓴 참조도 4개 있다: save.md:16 `per /sc:reflect Misunderstanding-Audit`, review.md:21 `read at Gather`, troubleshoot.md:25 `stop after Confirm`, auto-improve.md:67 `skip Phase 0 confirm`. 이 4개는 테스트가 보지 못한다.
 - `<flags>`의 섹션류 참조 26개는 아래 규칙으로 모두 해석된다(2026-10-04 scratchpad 시험 파서). 형식 밖 참조는 3개다: auto-improve `--eval-cmd`의 "(flow step 2, eval-cmd-blast-radius gotcha)", init `--quick`·`--full`의 "the menu". Phase 1이 이 3개를 형식 안으로 옮기므로 Phase 2 시점에는 29개다.
