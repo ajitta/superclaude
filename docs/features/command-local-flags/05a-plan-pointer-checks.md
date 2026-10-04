@@ -1,5 +1,5 @@
 ---
-status: draft
+status: complete
 revised: 2026-10-04
 ---
 
@@ -178,7 +178,7 @@ auto-improve:30 칸의 이중 백틱은 표 안의 마크다운 표기다. 파�
 ## Phase 5: 동기화와 병합 (커밋 1개)
 
 - [x] Step 1: `superclaude doctor --scope local`로 확인한 뒤 `superclaude install --force --scope local`. 이어서 `diff -rq src/superclaude/commands .claude/commands/sc`에서 `__init__.py`, `__pycache__`, `README.md` 외의 차이가 없고, `diff -q src/superclaude/core/rules/RULES_DOCS.md .claude/superclaude/core/rules/RULES_DOCS.md`도 같아야 한다. user scope는 동기화하지 않는다(`sync-scope-creates`).
-- [ ] Step 2: 이 계획서를 `status: complete`로, README `phase:`를 `complete`로 바꾸고 날짜(`revised:`, `updated:`)를 그날로 맞춘다. Step 1–2의 체크박스도 이 커밋에서 체크한다. 이전 단계 체크박스는 단계마다 이미 체크되어 있어야 한다(`plan-checklist-vs-status`). 커밋: `docs(plans): mark flag-pointer-checks plan complete`
+- [x] Step 2: 이 계획서를 `status: complete`로, README `phase:`를 `complete`로 바꾸고 날짜(`revised:`, `updated:`)를 그날로 맞춘다. Step 1–2의 체크박스도 이 커밋에서 체크한다. 이전 단계 체크박스는 단계마다 이미 체크되어 있어야 한다(`plan-checklist-vs-status`). 커밋: `docs(plans): mark flag-pointer-checks plan complete`
 - 병합(체크박스 없음, 계획서가 병합 전에 완료 상태로 커밋되므로): `git checkout master && git merge --no-ff docs/flag-pointer-checks -m "Merge docs/flag-pointer-checks: check flow-step and <flags> pointers"`를 한 명령으로 실행한다(`editable-tool-branch-switch`). push 후 master CI를 확인한다.
 
 ## 위험

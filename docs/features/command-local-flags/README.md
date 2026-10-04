@@ -1,6 +1,6 @@
 ---
 feature: command-local-flags
-phase: planning
+phase: complete
 owner: ajitta
 created: 2026-10-04
 updated: 2026-10-04
