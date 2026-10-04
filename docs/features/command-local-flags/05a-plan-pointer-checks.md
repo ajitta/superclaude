@@ -159,7 +159,7 @@ auto-improve:30 칸의 이중 백틱은 표 안의 마크다운 표기다. 파�
 
 **Files:** Modify: `src/superclaude/commands/business-panel.md` (`<flags>` 블록)
 
-- [ ] Step 1: 블록을 아래로 바꾼다. 들여쓰기는 2칸, 값 표기는 `<syntax>`(`--experts "names"`, `--focus domain`)와 같게 한다. 예시 도메인은 `core/BUSINESS_SYMBOLS.md`의 도메인 표에 있는 것만 쓴다.
+- [x] Step 1: 블록을 아래로 바꾼다. 들여쓰기는 2칸, 값 표기는 `<syntax>`(`--experts "names"`, `--focus domain`)와 같게 한다. 예시 도메인은 `core/BUSINESS_SYMBOLS.md`의 도메인 표에 있는 것만 쓴다.
 
 ```
   <flags>
@@ -172,8 +172,8 @@ auto-improve:30 칸의 이중 백틱은 표 안의 마크다운 표기다. 파�
   </flags>
 ```
 
-- [ ] Step 2: `uv run pytest tests/unit/test_command_structure.py -q` 통과(Phase 1이 `the Analyze step`, Phase 2가 experts·modes 섹션을 해석). 이어서 `uv run pytest` exit 0.
-- [ ] Step 3: `make format && make lint`, 커밋: `docs(business-panel): define --focus and align <flags> with other commands`
+- [x] Step 2: `uv run pytest tests/unit/test_command_structure.py -q` 통과(Phase 1이 `the Analyze step`, Phase 2가 experts·modes 섹션을 해석). 이어서 `uv run pytest` exit 0.
+- [x] Step 3: `make format && make lint`, 커밋: `docs(business-panel): define --focus and align <flags> with other commands`
 
 ## Phase 5: 동기화와 병합 (커밋 1개)
 

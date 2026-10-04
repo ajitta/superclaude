@@ -16,12 +16,12 @@ description: Multi-expert biz analysis with adaptive modes. Use when user types 
   </flow>
 
   <flags>
-    - --experts: Pick specific: "porter,christensen,meadows"
-    - --mode discussion|debate|socratic|adaptive: one of the four modes in the modes section
-    - --focus: Auto-pick for domain; unrelated to the global --focus
-    - --all-experts: Include all 9
-    - --synthesis-only: Skip detail, show synthesis
-    - --structured: Use symbol system
+  - --experts "names": panel members by surname from the experts section, e.g. "porter,christensen,meadows".
+  - --mode discussion|debate|socratic|adaptive: one of the four modes in the modes section.
+  - --focus domain: business domain (e.g. strategy, risk) that picks the 2-3 experts the Analyze step applies; ignored when --experts or --all-experts is given; unrelated to the global --focus.
+  - --all-experts: include all 9 experts in the experts section.
+  - --synthesis-only: skip per-expert detail and show only the synthesis.
+  - --structured: use the business symbol system (core/BUSINESS_SYMBOLS.md).
   </flags>
 
   <experts>9 lenses (surnames for --experts): christensen, porter, drucker, godin, kim-mauborgne, collins, taleb, meadows, doumont — frameworks per agents/business-panel-experts.md `<focus>` (SSOT).</experts>
