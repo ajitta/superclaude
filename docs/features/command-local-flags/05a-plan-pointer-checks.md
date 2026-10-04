@@ -144,16 +144,16 @@ auto-improve:30 칸의 이중 백틱은 표 안의 마크다운 표기다. 파�
 
 **Files:** Test: `tests/unit/test_command_structure.py` (`TestCommandFlagsAreDefined`에 추가)
 
-- [ ] Step 1: `test_global_flag_with_own_values_is_defined`를 쓴다.
+- [x] Step 1: `test_global_flag_with_own_values_is_defined`를 쓴다.
   - `COMMANDS_DIR.parent / "core" / "FLAGS.md"`에서 `re.M`으로 `^(--[\w-]+(?:\|--[\w-]+)*)(?: \[([^\]]*)\])?:` 줄을 읽는다. `|`로 나눈 이름마다 허용 값을 정한다. 대괄호가 없으면 값을 받지 않는다(빈 집합). `[a|b]`이면 그 값들이다. `[n]`처럼 `|`가 없는 자리표시자는 자유 값이라 검사하지 않는다(spec-panel `--iterations N`). 파싱 결과에 `focus`, `scope`, `plan`이 있는지 assert해서, FLAGS.md 형식이 바뀌어 아무것도 못 읽는 경우 테스트가 그냥 통과하지 않게 한다.
   - `<syntax>`에서 `--{name}(?![\w-])(?:[ \t]+(?!\[?-)\[?([^\]\s]+))?`로 값을 잡고(뒤따르는 `[--flag]`나 다음 줄은 값으로 보지 않는다) `"<>`를 벗겨 `|`로 나눈다. 값이 없으면(`[--delegate]`) 건너뛴다. 허용되지 않는 값이 하나라도 있으면 `flag_entries(content)`에 그 이름이 있어야 한다.
-- [ ] Step 2: 실행하면 analyze만 `{'rules'}`로 실패해야 한다(auto-improve·review `--scope`, business-panel·spec-panel `--focus`, implement `--plan`은 항목이 있음). 값이 없는 전역 플래그 분기도 확인한다. implement.md의 `- --plan <path>:` 항목을 지우면 implement도 실패해야 한다. 확인 후 `git checkout -- src/superclaude/commands/implement.md`.
+- [x] Step 2: 실행하면 analyze만 `{'rules'}`로 실패해야 한다(auto-improve·review `--scope`, business-panel·spec-panel `--focus`, implement `--plan`은 항목이 있음). 값이 없는 전역 플래그 분기도 확인한다. implement.md의 `- --plan <path>:` 항목을 지우면 implement도 실패해야 한다. 확인 후 `git checkout -- src/superclaude/commands/implement.md`.
 
 ### Task 3.2: analyze 항목과 규칙
 
-- [ ] Step 3: analyze.md `<flags>` 첫 줄에 넣는다: `- --focus perf|security|quality|arch|a11y|testing|rules: the global --focus domains, plus rules, which runs the rules analysis section.` 이 줄은 Phase 2 테스트로 `<rules_analysis>`에 해석된다. 이제 hook은 `/sc:analyze`에서 `--focus`를 선언된 플래그로 본다. `--focus`는 전역 지시문이 없고 `VALID_FLAGS`에 있으므로 동작은 같다.
-- [ ] Step 4: command-authoring.md `<flags>` 줄의 기존 문장 "A global name the command gives its own meaning is defined here too"를 `` A global name the command gives its own meaning is defined here too (`test_command_structure.py` catches a `<syntax>` value core/FLAGS.md does not allow, including any value for a global that takes none; a redefinition without a value, such as reflect's `--validate`, goes unchecked) ``로 바꾼다. 뒤의 ", and inside this command ..."는 그대로 둔다. 새 문장은 만들지 않는다.
-- [ ] Step 5: `uv run pytest` exit 0, `make format && make lint`, 커밋: `test(commands): require an entry when a global flag takes its own values`
+- [x] Step 3: analyze.md `<flags>` 첫 줄에 넣는다: `- --focus perf|security|quality|arch|a11y|testing|rules: the global --focus domains, plus rules, which runs the rules analysis section.` 이 줄은 Phase 2 테스트로 `<rules_analysis>`에 해석된다. 이제 hook은 `/sc:analyze`에서 `--focus`를 선언된 플래그로 본다. `--focus`는 전역 지시문이 없고 `VALID_FLAGS`에 있으므로 동작은 같다.
+- [x] Step 4: command-authoring.md `<flags>` 줄의 기존 문장 "A global name the command gives its own meaning is defined here too"를 `` A global name the command gives its own meaning is defined here too (`test_command_structure.py` catches a `<syntax>` value core/FLAGS.md does not allow, including any value for a global that takes none; a redefinition without a value, such as reflect's `--validate`, goes unchecked) ``로 바꾼다. 뒤의 ", and inside this command ..."는 그대로 둔다. 새 문장은 만들지 않는다.
+- [x] Step 5: `uv run pytest` exit 0, `make format && make lint`, 커밋: `test(commands): require an entry when a global flag takes its own values`
 
 ## Phase 4: business-panel `<flags>` (커밋 1개)
 

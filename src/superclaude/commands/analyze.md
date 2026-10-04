@@ -19,6 +19,7 @@ description: Code analysis across quality, security, performance, architecture d
   </flow>
 
   <flags>
+  - --focus perf|security|quality|arch|a11y|testing|rules: the global --focus domains, plus rules, which runs the rules analysis section.
   - --depth quick|deep: quick reports the top findings from one pass; deep covers the whole target and ties every finding to file:line evidence.
   - --format text|json|report: output format and destination per the outputs table; report also runs the Report step.
   </flags>

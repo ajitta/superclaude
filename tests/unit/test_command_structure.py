@@ -277,6 +277,27 @@ class TestCommandMinimumContent:
             )
 
 
+# core/FLAGS.md flag lines: "--plan: ...", "--c7|--context7: ...",
+# "--focus [perf|security|...]: ...", "--iterations [n]: ...".
+_GLOBAL_FLAG_LINE = re.compile(
+    r"^(--[\w-]+(?:\|--[\w-]+)*)(?: \[([^\]]*)\])?:", re.MULTILINE
+)
+
+
+def _global_flag_values() -> dict[str, set[str] | None]:
+    """Values each global flag allows: none when unbracketed, None when free ([n])."""
+    text = (COMMANDS_DIR.parent / "core" / "FLAGS.md").read_text(encoding="utf-8")
+    values: dict[str, set[str] | None] = {}
+    for names, listed in _GLOBAL_FLAG_LINE.findall(text):
+        allowed = set(listed.split("|")) if "|" in listed else None if listed else set()
+        for name in names.split("|"):
+            values[name[2:]] = allowed
+    return values
+
+
+GLOBAL_FLAG_VALUES = _global_flag_values()
+
+
 class TestCommandFlagsAreDefined:
     """Every flag a command's <syntax> offers has a <flags> entry.
 
@@ -305,6 +326,32 @@ class TestCommandFlagsAreDefined:
         assert not orphaned, (
             f"{stem}: <flags> defines {sorted(orphaned)}, which <syntax> no "
             f"longer offers"
+        )
+
+    def test_global_flag_with_own_values_is_defined(self, command):
+        """A global given values core/FLAGS.md does not allow means something else here.
+
+        The tests above exempt global names, so spec-panel's --focus shipped its
+        own domains with no entry (b6026ba2). A global that takes no value
+        counts too: implement's --plan takes a path.
+        """
+        stem, content, _ = command
+        assert {"focus", "scope", "plan"} <= GLOBAL_FLAG_VALUES.keys(), (
+            "core/FLAGS.md flag lines no longer parse"
+        )
+        syntax = extract_xml_content(content, "syntax") or ""
+        undefined = {}
+        for name, allowed in GLOBAL_FLAG_VALUES.items():
+            if allowed is None:
+                continue
+            value = rf"--{re.escape(name)}(?![\w-])(?:[ \t]+(?!\[?-)\[?([^\]\s]+))?"
+            for match in re.finditer(value, syntax):
+                own = set((match.group(1) or "").strip('"<>').split("|")) - {""}
+                if own - allowed and name not in flag_entries(content):
+                    undefined[name] = sorted(own - allowed)
+        assert not undefined, (
+            f"{stem}: <syntax> gives global flags its own values {undefined} with "
+            f"no `- --name:` entry in <flags>"
         )
 
 
