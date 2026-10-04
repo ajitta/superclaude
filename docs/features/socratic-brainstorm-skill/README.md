@@ -3,7 +3,7 @@ feature: socratic-brainstorm-skill
 phase: complete
 owner: ajitta
 created: 2026-10-02
-updated: 2026-10-02
+updated: 2026-10-05
 related: ../../../portable-skills/README.md
 ---
 
@@ -39,6 +39,7 @@ History: v1 shipped as `socratic-brainstorm` 1.0.0 and was mislabeled as the Soc
 - [11-plugin-upload.md](./11-plugin-upload.md): claude.ai upload rejected the zip; each skill is now also a single-skill plugin
 - [12-followups.md](./12-followups.md): historical banners, Codex multi-turn after the split, ambiguous-routing probe and fix, marketplace + catalog
 - [13-review.md](./13-review.md): independent review (1 high, 6 medium, 12 low), each finding reproduced and fixed; manifest moved out of the source folders
+- [14-pages-guide.md](./14-pages-guide.md): proposal (draft) for a plugin install section on the GitHub Pages site; naming review of marketplace, plugin and skill names
 
 ## Use it
 
