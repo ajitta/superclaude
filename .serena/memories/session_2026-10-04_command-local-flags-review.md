@@ -25,4 +25,5 @@ Goal set via `/goal`: review + refine the earlier command-local-flags work (8818
 - Flow census (heuristic grep): 36 command flows; 10 with approval/confirm gates; 21 with a Validate/Verify step (Opus 5 over-verification angle; review/troubleshoot verify steps are part of the deliverable).
 
 ## Open (to-dos live in claude-mem work_state list `command-local-flags`)
+**Update:** all four items closed later on 2026-10-04 (flow stays numbered, 05a merged b45bd0cd, housekeeping done). See `mem:session_2026-10-04_flag-pointer-checks`.
 1. Decide flow direction. 2. Revise 05a. 3. `/sc:review --plan` then `/sc:implement --plan`. 4. Optional: `/sc:promote-feature command-local-flags`, delete merged local branch `docs/command-local-flags-refine`, `/sc:insight --review`.
