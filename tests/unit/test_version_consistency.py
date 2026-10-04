@@ -169,6 +169,25 @@ def test_sc_dispatcher_version_matches_pyproject():
     )
 
 
+_CHANGELOG = _ROOT / "CHANGELOG.md"
+_RELEASE_HEADING = re.compile(r"(?m)^## \[([^\]]+)\] - \d{4}-\d{2}-\d{2}$")
+
+
+def test_changelog_leads_with_the_current_version():
+    """CHANGELOG.md's newest release heading is the pyproject version.
+
+    The previous CHANGELOG stopped at 4.2.1 while releases went on to 4.19.0,
+    and was deleted as a stale file (6b0ac5c3). Tying the newest entry to the
+    version makes a bump without an entry fail.
+    """
+    releases = _RELEASE_HEADING.findall(_CHANGELOG.read_text(encoding="utf-8"))
+    assert releases, "CHANGELOG.md has no '## [version] - YYYY-MM-DD' heading"
+    assert releases[0] == _pyproject_version(), (
+        f"CHANGELOG.md's newest release is {releases[0]!r}, but pyproject.toml "
+        f"is at {_pyproject_version()!r} — add an entry for this release"
+    )
+
+
 # Every shape in which README states a component count: (counter key, pattern,
 # required). The pattern is deliberately broad -- narrow phrasing is how the
 # presence-form predecessor failed, and how a first draft of this test failed
