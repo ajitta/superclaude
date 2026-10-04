@@ -215,24 +215,6 @@ The framework is fully functional without any MCP server. Each one adds a capabi
 
 Source of truth for each server's usage: `src/superclaude/mcp/MCP_*.md` and `src/superclaude/mcp/README.md`.
 
-### **Persistent Cross-Session Memory (Optional — claude-mem)**
-
-[`thedotmack/claude-mem`](https://github.com/thedotmack/claude-mem) is a memory-compression layer for Claude Code that automatically captures and recalls context across sessions. Independent project; complements `superclaude`'s `/sc:load` + insight pipeline by storing observations queryable via the `mem-search` skill. Requires Node.js ≥18.
-
-```bash
-# Install (pick one)
-npx claude-mem install                                # standard CLI install
-# Or via Claude Code plugin marketplace:
-#   /plugin marketplace add thedotmack/claude-mem
-#   /plugin install claude-mem
-
-# After install: restart Claude Code
-# Web viewer: http://localhost:37777
-# Settings: ~/.claude-mem/settings.json (auto-created)
-```
-
-> Past observations show up at session start (`# $CMEM` block). Query with the `mem-search` skill or `get_observations([IDs])`.
-
 ---
 
 ## 🧭 **Workflows**
