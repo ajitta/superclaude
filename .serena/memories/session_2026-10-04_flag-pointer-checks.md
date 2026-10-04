@@ -27,5 +27,10 @@ Goal (`/goal`): `/sc:review --plan` on `docs/features/command-local-flags/05a-pl
 - business-panel expert counts disagree across files (flow "2-3", BUSINESS_SYMBOLS.md 4 per domain / min 3, agent "3-6"). This predates the session.
 - A reviewer noted `--bs` is in `VALID_FLAGS` but not in core/FLAGS.md. Not investigated.
 
+## Release
+- Version bumped to 4.20.0+ajitta (commit 57759b55, merge 05cd65b3, master CI run 37208098558 success). Same 4 files as the 4.19.0 bump: pyproject.toml, `src/superclaude/__init__.py`, README badge + "Current Stable Version", `commands/sc.md` meta. Historical 4.19.0 mentions in the over-engineering-audit README were left as is.
+- Minor (not patch) because the hook changed behavior (8818fab8: declared flags skip the typo notice and global directives) and every command gained `<flags>` with tests. This was offered to the user as a choice; no objection was recorded.
+- `superclaude --version` reports 4.20.0+ajitta; local scope re-synced (installed sc.md shows 4.20.0). User scope is not installed and was not touched.
+
 ## Open
 - None. claude-mem work_state `command-local-flags` is closed. The unmerged, unrelated branch `feature/workflow-v5-implementation` was left as is.
