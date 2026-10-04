@@ -20,6 +20,7 @@ description: Multi-expert spec review + improvement via renowned software engine
   <flags>
   - --mode discussion|critique|socratic: review style, per the modes section.
   - --experts "name1,name2": panel members, per the experts section.
+  - --focus implementability|simplicity|reliability|testing|observability: review lenses, per the focus areas section; a command-local enum, unrelated to the global --focus.
   </flags>
 
 

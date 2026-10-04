@@ -22,7 +22,7 @@ description: Diagnose + resolve issues in code, builds, deployments, system beha
   <flags>
   - --type bug|build|performance|deployment: problem class: bug starts from reproduction and stack trace, build from compiler and dependency output, performance from a measurement, deployment from environment and config.
   - --trace: trace the data flow and execution path up to the failure before naming a cause.
-  - --fix: gates the failing-test and fix steps, per the rule in the command description.
+  - --fix: run the Test, Fix and Verify steps; without it, stop after Confirm and propose the fix. A fix in the approval-required tier of the auto-fix threshold still waits for confirmation.
   </flags>
 
   <tools>
