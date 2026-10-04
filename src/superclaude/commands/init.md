@@ -19,8 +19,8 @@ description: Interactive project env setup — pick + run init tasks for first-s
   </flow>
 
   <flags>
-  - --quick: preset, defined in flow step 3 and the menu.
-  - --full: preset, defined in flow step 3 and the menu.
+  - --quick: preset, defined in the Select step and the menu section.
+  - --full: preset, defined in the Select step and the menu section.
   </flags>
 
   <menu>

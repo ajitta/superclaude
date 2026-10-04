@@ -19,7 +19,7 @@ description: Orchestrate sub-agents, manage workflows, and document learnings fo
   </flow>
 
   <flags>
-  - --strategy brainstorm|direct|wave: force the strategy flow step 2 otherwise picks.
+  - --strategy brainstorm|direct|wave: force the strategy the Strategy step otherwise picks.
   - --verbose: report each sub-agent dispatch and result as it happens, not only the final summary.
   </flags>
 

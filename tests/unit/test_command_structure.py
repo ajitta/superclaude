@@ -277,6 +277,30 @@ class TestCommandMinimumContent:
             )
 
 
+# core/FLAGS.md flag lines: "--plan: ...", "--c7|--context7: ...",
+# "--focus [perf|security|...]: ...", "--iterations [n]: ...".
+_GLOBAL_FLAG_LINE = re.compile(
+    r"^(--[\w-]+(?:\|--[\w-]+)*)(?: \[([^\]]*)\])?:", re.MULTILINE
+)
+
+
+def _global_flag_values() -> dict[str, set[str] | None]:
+    """Values each global flag allows: an empty set when unbracketed, None when free ([n])."""
+    text = (COMMANDS_DIR.parent / "core" / "FLAGS.md").read_text(encoding="utf-8")
+    values: dict[str, set[str] | None] = {}
+    for names, listed in _GLOBAL_FLAG_LINE.findall(text):
+        if "|" in listed:
+            allowed = set(listed.split("|"))
+        else:
+            allowed = None if listed else set()
+        for name in names.split("|"):
+            values[name[2:]] = allowed
+    return values
+
+
+GLOBAL_FLAG_VALUES = _global_flag_values()
+
+
 class TestCommandFlagsAreDefined:
     """Every flag a command's <syntax> offers has a <flags> entry.
 
@@ -306,6 +330,134 @@ class TestCommandFlagsAreDefined:
             f"{stem}: <flags> defines {sorted(orphaned)}, which <syntax> no "
             f"longer offers"
         )
+
+    def test_global_flag_with_own_values_is_defined(self, command):
+        """A global given values core/FLAGS.md does not allow means something else here.
+
+        The tests above exempt global names, so spec-panel's --focus shipped its
+        own domains with no entry (b6026ba2). A global that takes no value
+        counts too: implement's --plan takes a path.
+        """
+        stem, content, _ = command
+        assert (
+            GLOBAL_FLAG_VALUES.get("focus") and GLOBAL_FLAG_VALUES.get("plan") == set()
+        ), "core/FLAGS.md flag lines no longer parse"
+        syntax = extract_xml_content(content, "syntax") or ""
+        undefined = {}
+        for name, allowed in GLOBAL_FLAG_VALUES.items():
+            if allowed is None:
+                continue
+            value = rf"--{re.escape(name)}(?![\w-])(?:[ \t]+(?!\[?-)\[?([^\]\s]+))?"
+            for match in re.finditer(value, syntax):
+                own = set((match.group(1) or "").strip('"<>').split("|")) - {""}
+                if own - allowed and name not in flag_entries(content):
+                    undefined[name] = sorted(own - allowed)
+        assert not undefined, (
+            f"{stem}: <syntax> gives global flags its own values {undefined} with "
+            f"no `- --name:` entry in <flags>"
+        )
+
+
+# A flow step's label: the text before the first ":" on a numbered <flow> line,
+# parenthetical dropped ("1. Load (Serena): ..." -> "load").
+_FLOW_LABEL = re.compile(r"^\s*\d+(?:\.\d+)?\.\s+(.+?):", re.MULTILINE)
+# "the Analyze step", "the /sc:brainstorm Decision-mode tag step",
+# "the Test, Fix and Verify steps". A label never crosses another "the", so
+# "the PR body names the Report step" reads as the Report step.
+_STEP_POINTER = re.compile(
+    r"\b[Tt]he (?:(/sc:[a-z][\w-]*) )?"
+    r"([A-Z`](?:(?!\b[Tt]he\b)[^.;:()|\n])*?) steps?\b"
+)
+_LABEL_LIST_SEP = re.compile(r"\s*,\s*(?:and\s+)?|\s+and\s+")
+
+
+def _flow_labels(content: str) -> set[str]:
+    flow = extract_xml_content(content, "flow") or ""
+    return {
+        re.sub(r"\s*\(.*?\)", "", label).strip().lower()
+        for label in _FLOW_LABEL.findall(flow)
+    }
+
+
+class TestCommandStepRefs:
+    """Flow steps are pointed at by label, and every label resolves.
+
+    A pointer by number ("flow step 3") lands on the wrong step without notice
+    once the flow is reordered; a pointer by label fails here instead.
+    """
+
+    def test_no_numbered_step_refs(self, command):
+        stem, content, _ = command
+        numbered = re.findall(r"\bsteps? \d+", content)
+        assert not numbered, (
+            f"{stem}: points at flow steps by number {numbered}; use the label"
+        )
+
+    def test_named_step_refs_resolve(self, command):
+        stem, content, _ = command
+        unresolved = []
+        for match in _STEP_POINTER.finditer(content):
+            other, names = match.groups()
+            target = content
+            if other:
+                path = COMMANDS_DIR / f"{other.removeprefix('/sc:')}.md"
+                assert path.exists(), f"{stem}: {match.group(0)!r} names no command"
+                target = path.read_text(encoding="utf-8")
+            labels = _flow_labels(target)
+            unresolved += [
+                f"{match.group(0)!r} -> {name}"
+                for name in _LABEL_LIST_SEP.split(names)
+                if name.lower() not in labels
+            ]
+        assert not unresolved, f"{stem}: no flow step has the label: {unresolved}"
+
+
+# A <flags> line pointing at another part of the body: "the outputs table",
+# "the phase-vs-pr gotcha", "the Write entry in the tools section".
+_FLAGS_POINTER = re.compile(
+    r"\bthe ([\w`/ -]+?) (section|table|gotcha|pattern|threshold"
+    r"|entry in (?:the )?tools(?: section)?)\b"
+)
+# Section tags open a line, which keeps out inline placeholders like `<focus>`.
+_LINE_TAG = re.compile(r"^\s*<([a-z][\w-]*)[\s>]", re.MULTILINE)
+
+
+def _has_item(content: str, block: str, item: str) -> bool:
+    body = extract_xml_content(content, block) or ""
+    return re.search(rf"^\s*- {re.escape(item)}", body, re.MULTILINE) is not None
+
+
+class TestCommandFlagPointers:
+    """A <flags> line that points at a section, gotcha or tool finds it.
+
+    Renaming a tag or a gotcha would otherwise leave the pointer aimed at
+    nothing. Pointers in other forms go unchecked; command-authoring.md lists
+    the checked forms.
+    """
+
+    def test_flags_pointers_resolve(self, command):
+        stem, content, _ = command
+        flags = extract_xml_content(content, "flags")
+        if not flags:
+            return
+        tags = set(_LINE_TAG.findall(content))
+        unresolved = []
+        for match in _FLAGS_POINTER.finditer(flags):
+            name, kind = match.group(1).split(" the ")[-1], match.group(2)
+            key = re.sub(r"[- ]", "_", name.lower())
+            if kind in ("section", "table"):
+                found = any(key == tag or key.startswith(tag) for tag in tags)
+            elif kind == "threshold":
+                found = f"{key}_threshold" in tags
+            elif kind == "gotcha":
+                found = _has_item(content, "gotchas", f"{name}:")
+            elif kind == "pattern":
+                found = _has_item(content, "patterns", name)
+            else:
+                found = _has_item(content, "tools", f"{name}:")
+            if not found:
+                unresolved.append(match.group(0))
+        assert not unresolved, f"{stem}: <flags> points at nothing: {unresolved}"
 
 
 class TestCommandDocsPrescribeConsoleEntry:

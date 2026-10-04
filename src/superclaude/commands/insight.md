@@ -20,10 +20,10 @@ description: Capture structured session insights to per-project JSONL for human 
   </flow>
 
   <flags>
-  - --list: read mode, defined in flow step 6.
-  - --query key=value: read mode, defined in flow step 6.
-  - --stats: read mode, defined in flow step 6.
-  - --review: review mode, defined in flow step 7.
+  - --list: read mode, defined in the Read modes step.
+  - --query key=value: read mode, defined in the Read modes step.
+  - --stats: read mode, defined in the Read modes step.
+  - --review: review mode, defined in the Review mode step.
   </flags>
 
   <outputs>

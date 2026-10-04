@@ -20,7 +20,7 @@ description: Execute complex tasks with intelligent workflow management and dele
   </flow>
 
   <flags>
-  - --strategy sequential|parallel|adaptive: force the execution order flow step 3 otherwise picks.
+  - --strategy sequential|parallel|adaptive: force the execution order the Strategy step otherwise picks.
   - --cleanup: stale and completed task removal, per the task cleanup section.
   </flags>
 
@@ -71,7 +71,7 @@ description: Execute complex tasks with intelligent workflow management and dele
   <gotchas>
   - task-count: No excessive sub-tasks. Break into 3-7 tasks max per feature
   - already-done: Check git log and existing code before creating implementation tasks
-  - workflow-task-state: Under ultracode Workflow fan-out, harness task-state may not survive the subagent boundary — the main loop owns TaskCreate/TaskUpdate and the >3-file approval checkpoint (flow step 4); subagents return task results and cannot pause for input
+  - workflow-task-state: Under ultracode Workflow fan-out, harness task-state may not survive the subagent boundary — the main loop owns TaskCreate/TaskUpdate and the >3-file approval checkpoint (the Checkpoint step); subagents return task results and cannot pause for input
   </gotchas>
 
   <bounds>

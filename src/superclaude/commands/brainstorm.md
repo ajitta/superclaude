@@ -22,13 +22,13 @@ description: Interactive requirements discovery through Socratic dialogue + syst
 
   <flags>
   - --strategy systematic|agile|enterprise: systematic works through every requirement area in order; agile splits the work into parallel streams (e.g. frontend, backend, security) and iterates; enterprise adds compliance and validation requirements throughout.
-  - --depth shallow|normal|deep: detail level set in flow step 2 (Analyze).
+  - --depth shallow|normal|deep: detail level set in the Analyze step.
   </flags>
 
   <self_review>
   Required hard gate before /sc:plan handoff — self-review caught 3 critical reversals on user-approved spec where soft rec alone would ship silent regressions, so gate not advisory.
 
-  Direct route to /sc:plan from step 5 forbidden. After each review round, append §"Self-Review Iteration Log" section to spec recording v1→vN delta.
+  Direct route to /sc:plan from the Approve step forbidden. After each review round, append §"Self-Review Iteration Log" section to spec recording v1→vN delta.
   </self_review>
 
   <decision_modes>
@@ -37,7 +37,7 @@ description: Interactive requirements discovery through Socratic dialogue + syst
   - confirmed: user response has literal option letter (`[a]`/`[b]`/`[c]`, or `a`/`b`/`c` as standalone token), OR ≥2 contiguous words from chosen option label text.
   - delegated: bare "yes", "proceed", "looks good", or silent accept of ★.
 
-  When ≥1 decision delegated, /sc:review handoff (step 8) MUST add literal phrase "mandatory: N delegated decisions need independent audit" (N = count of delegated decisions).
+  When ≥1 decision delegated, /sc:review handoff (the Handoff step) MUST add literal phrase "mandatory: N delegated decisions need independent audit" (N = count of delegated decisions).
   </decision_modes>
 
   <outputs>
