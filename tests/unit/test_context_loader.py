@@ -683,6 +683,71 @@ class TestEveryCommandTokenIsChecked:
         assert suppressed == set()
 
 
+class TestCommandDeclaredFlags:
+    """A flag a command declares in its <flags> is that command's flag.
+
+    `/sc:implement auth --safe` drew "--safe is not a recognized flag. Did you
+    mean: --safe-mode?", and `/sc:implement --plan docs/plans/x.md` drew the
+    global --plan directive (write a 5-line plan, wait for approval) although
+    implement's --plan names a plan file to follow.
+    """
+
+    def _fake_command(self, tmp_path, monkeypatch):
+        from superclaude.scripts import context_loader as cl
+
+        (tmp_path / "fake.md").write_text(
+            "<syntax>/sc:fake [--safe] [--plan path]</syntax>\n"
+            "<flags>\n- --safe: x\n- --plan <path>: y\n</flags>\n",
+            encoding="utf-8",
+        )
+        monkeypatch.setattr(cl, "_command_dirs", lambda: (tmp_path,))
+        return cl
+
+    def _directives(self, prompt, tmp_path, monkeypatch, capsys):
+        cl = self._fake_command(tmp_path, monkeypatch)
+        monkeypatch.setattr(cl, "get_loaded_contexts", lambda: set())
+        monkeypatch.setattr(cl, "mark_as_loaded", lambda _marks: None)
+        monkeypatch.setattr(cl, "check_mcp_and_notify", lambda *a, **k: None)
+        cl._emit_execution_directives(prompt)
+        return capsys.readouterr().out
+
+    def test_declared_flag_gets_no_typo_notice(self, tmp_path, monkeypatch):
+        cl = self._fake_command(tmp_path, monkeypatch)
+        assert cl.resolve_flags("/sc:fake build it --safe")[1] == []
+
+    def test_command_name_case_does_not_matter(self, tmp_path, monkeypatch):
+        cl = self._fake_command(tmp_path, monkeypatch)
+        assert cl.resolve_flags("/sc:FAKE build it --safe")[1] == []
+
+    def test_undeclaring_command_still_gets_the_notice(self, tmp_path, monkeypatch):
+        cl = self._fake_command(tmp_path, monkeypatch)
+        assert len(cl.resolve_flags("/sc:other --safe")[1]) == 1
+
+    def test_bare_flag_still_gets_the_notice(self, tmp_path, monkeypatch):
+        cl = self._fake_command(tmp_path, monkeypatch)
+        assert len(cl.resolve_flags("--safe go")[1]) == 1
+
+    def test_global_typo_is_still_caught_inside_a_command(self, tmp_path, monkeypatch):
+        cl = self._fake_command(tmp_path, monkeypatch)
+        assert len(cl.resolve_flags("/sc:fake --instrospect")[1]) == 1
+
+    def test_declared_flag_suppresses_the_global_directive(
+        self, tmp_path, monkeypatch, capsys
+    ):
+        out = self._directives(
+            "/sc:fake --plan docs/x.md", tmp_path, monkeypatch, capsys
+        )
+        assert 'sc-directive flag="--plan"' not in out
+
+    def test_undeclaring_command_keeps_the_global_directive(
+        self, tmp_path, monkeypatch, capsys
+    ):
+        out = self._directives(
+            "/sc:other --plan docs/x.md", tmp_path, monkeypatch, capsys
+        )
+        assert 'sc-directive flag="--plan"' in out
+
+
 class TestMigrationReferenceResolution:
     """/sc:prompt's model facts live outside the install tree.
 
