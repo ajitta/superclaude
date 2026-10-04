@@ -360,6 +360,54 @@ class TestCommandStepRefs:
         assert not unresolved, f"{stem}: no flow step has the label: {unresolved}"
 
 
+# A <flags> line pointing at another part of the body: "the outputs table",
+# "the phase-vs-pr gotcha", "the Write entry in the tools section".
+_FLAGS_POINTER = re.compile(
+    r"\bthe ([\w`/ -]+?) (section|table|gotcha|pattern|threshold"
+    r"|entry in (?:the )?tools(?: section)?)\b"
+)
+# Section tags open a line, which keeps out inline placeholders like `<focus>`.
+_LINE_TAG = re.compile(r"^\s*<([a-z][\w-]*)[\s>]", re.MULTILINE)
+
+
+def _has_item(content: str, block: str, item: str) -> bool:
+    body = extract_xml_content(content, block) or ""
+    return re.search(rf"^\s*- {re.escape(item)}", body, re.MULTILINE) is not None
+
+
+class TestCommandFlagPointers:
+    """A <flags> line that points at a section, gotcha or tool finds it.
+
+    Renaming a tag or a gotcha would otherwise leave the pointer aimed at
+    nothing. Pointers in other forms go unchecked; command-authoring.md lists
+    the checked forms.
+    """
+
+    def test_flags_pointers_resolve(self, command):
+        stem, content, _ = command
+        flags = extract_xml_content(content, "flags")
+        if not flags:
+            return
+        tags = set(_LINE_TAG.findall(content))
+        unresolved = []
+        for match in _FLAGS_POINTER.finditer(flags):
+            name, kind = match.group(1).split(" the ")[-1], match.group(2)
+            key = re.sub(r"[- ]", "_", name.lower())
+            if kind in ("section", "table"):
+                found = any(key == tag or key.startswith(tag) for tag in tags)
+            elif kind == "threshold":
+                found = f"{key}_threshold" in tags
+            elif kind == "gotcha":
+                found = _has_item(content, "gotchas", f"{name}:")
+            elif kind == "pattern":
+                found = _has_item(content, "patterns", name)
+            else:
+                found = _has_item(content, "tools", f"{name}:")
+            if not found:
+                unresolved.append(match.group(0))
+        assert not unresolved, f"{stem}: <flags> points at nothing: {unresolved}"
+
+
 class TestCommandDocsPrescribeConsoleEntry:
     """No command doc may prescribe a bare-python invocation of a SC script.
 

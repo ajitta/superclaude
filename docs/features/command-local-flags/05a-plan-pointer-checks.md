@@ -113,7 +113,7 @@ auto-improve:30 칸의 이중 백틱은 표 안의 마크다운 표기다. 파�
   - `<flags>` 줄의 "gets a line pointing to that section by topic, not a restatement"를 "gets a line pointing to it (a flow step by its label, a section by topic), not a restatement"로 바꾼다. flow 단계를 가리키는 방법이 파일 안에서 하나가 되게 하기 위해서다.
 - [x] Step 7: `uv run pytest tests/unit/test_command_structure.py -q` 통과, 이어서 `uv run pytest` exit 0.
 - [x] Step 8: `make format && make lint` 후 커밋: `docs(commands): point at flow steps by label, not number`
-- [ ] Step 9: 이름 검사가 고장을 잡는지 일부러 깨 보고 되돌린다. brainstorm.md의 `5. Approve:`를 `5. Approval:`로, `7. Decision-mode tag:`를 `7. Decision mode tag:`로 바꾸면 brainstorm(같은 명령 참조)과 review(다른 명령 참조)가 실패해야 한다. 확인 후 `git checkout -- src/superclaude/commands/brainstorm.md`.
+- [x] Step 9: 이름 검사가 고장을 잡는지 일부러 깨 보고 되돌린다. brainstorm.md의 `5. Approve:`를 `5. Approval:`로, `7. Decision-mode tag:`를 `7. Decision mode tag:`로 바꾸면 brainstorm(같은 명령 참조)과 review(다른 명령 참조)가 실패해야 한다. 확인 후 `git checkout -- src/superclaude/commands/brainstorm.md`.
 
 ## Phase 2: `<flags>` 섹션 참조 검사 (커밋 1개)
 
@@ -121,7 +121,7 @@ auto-improve:30 칸의 이중 백틱은 표 안의 마크다운 표기다. 파�
 
 **Files:** Test: `tests/unit/test_command_structure.py` (새 클래스 `TestCommandFlagPointers`)
 
-- [ ] Step 1: `test_flags_pointers_resolve`를 쓴다. `<flags>` 블록에서 `` \bthe ([\w`/ -]+?) (section|table|gotcha|pattern|threshold|entry in (?:the )?tools(?: section)?)\b ``를 찾는다. 대상 이름은 잡힌 문구의 마지막 ` the ` 뒤다("the four modes in the modes section" → `modes`). 키는 이름을 소문자로 바꾸고 `-`와 공백을 `_`로 바꾼 것이다. 본문의 태그는 `re.M`으로 `^\s*<([a-z][\w-]*)[\s>]`에 맞는 줄 머리 태그다(`note=` 같은 속성은 허용하고, 문장 안의 `<focus>` 같은 자리표시자는 뺀다).
+- [x] Step 1: `test_flags_pointers_resolve`를 쓴다. `<flags>` 블록에서 `` \bthe ([\w`/ -]+?) (section|table|gotcha|pattern|threshold|entry in (?:the )?tools(?: section)?)\b ``를 찾는다. 대상 이름은 잡힌 문구의 마지막 ` the ` 뒤다("the four modes in the modes section" → `modes`). 키는 이름을 소문자로 바꾸고 `-`와 공백을 `_`로 바꾼 것이다. 본문의 태그는 `re.M`으로 `^\s*<([a-z][\w-]*)[\s>]`에 맞는 줄 머리 태그다(`note=` 같은 속성은 허용하고, 문장 안의 `<focus>` 같은 자리표시자는 뺀다).
 
 | 종류 | 해석 |
 |---|---|
@@ -131,12 +131,12 @@ auto-improve:30 칸의 이중 백틱은 표 안의 마크다운 표기다. 파�
 | pattern | `<patterns>`에 `{이름}`으로 시작하는 항목이 있음 |
 | entry in tools | `<tools>`에 `- {이름}:` 항목이 있음 |
 
-- [ ] Step 2: 지금 내용으로는 통과해야 한다(29개). 테스트가 고장을 잡는지 일부러 깨 보고 되돌린다. plan.md:75의 gotcha 항목 `- phase-vs-pr:`만 `- phase-vs-prx:`로 바꾸고(:25의 참조는 그대로), spec-panel.md의 `<focus_areas>`와 `</focus_areas>`를 `<areas>`와 `</areas>`로 바꾸면 두 명령이 실패해야 한다. 확인 후 `git checkout -- src/superclaude/commands/plan.md src/superclaude/commands/spec-panel.md`.
+- [x] Step 2: 지금 내용으로는 통과해야 한다(29개). 테스트가 고장을 잡는지 일부러 깨 보고 되돌린다. plan.md:75의 gotcha 항목 `- phase-vs-pr:`만 `- phase-vs-prx:`로 바꾸고(:25의 참조는 그대로), spec-panel.md의 `<focus_areas>`와 `</focus_areas>`를 `<areas>`와 `</areas>`로 바꾸면 두 명령이 실패해야 한다. 확인 후 `git checkout -- src/superclaude/commands/plan.md src/superclaude/commands/spec-panel.md`.
 
 ### Task 2.2: 작성 규칙
 
-- [ ] Step 3: command-authoring.md의 `<flags>` 줄은 마침표 없이 `5-line plan)`으로 끝난다. 그 뒤에 마침표와 공백을 넣고 이어서 더한다: `` A pointer takes one of these forms, which `test_command_structure.py` resolves: `the <Label> step` (see Step pointers), `the <topic> section|table`, `the <name> gotcha`, `the <name> pattern`, `the <topic> threshold`, `the <Tool> entry in the tools section`; a pointer in any other form goes unchecked. ``
-- [ ] Step 4: `uv run pytest` exit 0, `make format && make lint`, 커밋: `test(commands): resolve section and gotcha pointers in <flags>`
+- [x] Step 3: command-authoring.md의 `<flags>` 줄은 마침표 없이 `5-line plan)`으로 끝난다. 그 뒤에 마침표와 공백을 넣고 이어서 더한다: `` A pointer takes one of these forms, which `test_command_structure.py` resolves: `the <Label> step` (see Step pointers), `the <topic> section|table`, `the <name> gotcha`, `the <name> pattern`, `the <topic> threshold`, `the <Tool> entry in the tools section`; a pointer in any other form goes unchecked. ``
+- [x] Step 4: `uv run pytest` exit 0, `make format && make lint`, 커밋: `test(commands): resolve section and gotcha pointers in <flags>`
 
 ## Phase 3: 전역 플래그에 자기 값 (커밋 1개)
 
