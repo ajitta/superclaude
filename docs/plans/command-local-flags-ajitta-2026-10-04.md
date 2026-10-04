@@ -1,5 +1,5 @@
 ---
-status: implementing
+status: complete
 revised: 2026-10-04
 ---
 
