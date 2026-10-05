@@ -94,8 +94,8 @@ revised: 2026-10-05
 - [x] Step 2: `.github/workflows/test.yml:17` matrix에 `"3.13"`을 추가한다. README가 `-p 3.13`을 안내하므로 그 버전을 CI가 검사해야 한다. lint job(:68, `"3.10"`)은 바꾸지 않는다.
 - [x] Step 3: `uv run pytest`가 exit 0인지 확인한다.
 - [x] Step 4: `make format` 후 커밋한다: `docs: install the CLI from git with uv tool, no clone needed`. matrix 변경도 같은 커밋에 넣고, 본문에 3.13을 추가한 이유를 한 줄 적는다.
-- [ ] Step 5: `git checkout master && git merge --no-ff docs/uv-tool-install -m "…"`를 한 명령으로 실행하고 push한 뒤 CI를 확인한다(gotcha `editable-tool-branch-switch`). 3.13 job이 새로 생기므로 Python 4개 버전 job이 모두 green이어야 한다. 3.13에서만 실패하면 README의 `-p`를 CI가 통과한 가장 높은 버전으로 낮추고 원인을 따로 기록한다.
-- [ ] Step 6: push 뒤 실제 `git+https://github.com/ajitta/superclaude.git`로 Task 1.1 Step 1을 한 번 더 실행한다.
+- [x] Step 5: `git checkout master && git merge --no-ff docs/uv-tool-install -m "…"`를 한 명령으로 실행하고 push한 뒤 CI를 확인한다(gotcha `editable-tool-branch-switch`). 3.13 job이 새로 생기므로 Python 4개 버전 job이 모두 green이어야 한다. 3.13에서만 실패하면 README의 `-p`를 CI가 통과한 가장 높은 버전으로 낮추고 원인을 따로 기록한다.
+- [x] Step 6: push 뒤 실제 `git+https://github.com/ajitta/superclaude.git`로 Task 1.1 Step 1을 한 번 더 실행한다.
 
 ## Phase 2: plugin 모드 hook 런타임 (브랜치 `feature/sc-plugin`, 커밋 1개)
 
