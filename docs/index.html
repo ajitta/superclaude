@@ -61,16 +61,32 @@
     .capability h3 { margin-bottom: .55rem; font-size: 1.24rem; letter-spacing: -.02em; }
     .capability p { margin: 0; color: var(--muted); }
     .install { background: #dceaf6; }
-    .install .wrap { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: 3rem; align-items: center; }
+    .install .wrap { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: 3rem; align-items: start; }
     .install p { color: #334f69; }
     .install code, .examples code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
-    pre { overflow-x: auto; margin: 0; padding: 1.5rem; border-radius: 8px; background: var(--terminal); color: #f2f7fc; font: .9rem/1.9 ui-monospace, SFMono-Regular, Menlo, monospace; }
-    pre code { font: inherit; }
-    .scope-strip { margin-top: 1.2rem; color: #334f69; font-size: .9rem; }
+    .steps { margin: 0; padding: 0; list-style: none; counter-reset: step; }
+    .steps > li { counter-increment: step; padding: 1.1rem 0 1.2rem; border-top: 1px solid var(--line); }
+    .steps > li:first-child { border-top: 0; padding-top: 0; }
+    .steps h3, .update h3 { margin-bottom: .6rem; font-size: 1.05rem; }
+    .steps h3::before { content: counter(step) ". "; color: var(--blue); }
+    .hint { margin: .7rem 0 .45rem; font-size: .92rem; }
+    /* One command per row: click the text to select all of it, or use the Copy button. */
+    .cmd { display: flex; align-items: center; gap: .6rem; margin-top: .45rem; padding: .5rem .5rem .5rem 1rem; border-radius: 8px; background: var(--terminal); }
+    .cmd code { flex: 1; min-width: 0; overflow-x: auto; white-space: pre; color: #f2f7fc; font-size: .9rem; line-height: 1.9; user-select: all; }
+    .copy { flex: none; min-height: 34px; padding: .25rem .75rem; border: 1px solid #5d7a99; border-radius: 6px; background: transparent; color: #f2f7fc; font: 700 .8rem/1 system-ui, -apple-system, "Segoe UI", sans-serif; cursor: pointer; }
+    .copy:hover { background: #22405f; }
+    .copy:focus-visible { outline: 3px solid #a7d4f7; outline-offset: 2px; }
+    .cmd-light { padding-left: 0; background: transparent; }
+    .cmd-light code { color: var(--blue); font-size: .95rem; font-weight: 700; }
+    .cmd-light .copy { border-color: var(--line); color: var(--blue); }
+    .cmd-light .copy:hover { background: var(--sky); }
+    .cmd-light .copy:focus-visible { outline-color: var(--blue); }
+    .update { margin-top: 2rem; }
+    .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
     .examples { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: 3rem; }
     .example { padding: 1.1rem 0; border-top: 1px solid var(--line); }
     .example:last-child { border-bottom: 1px solid var(--line); }
-    .example code { color: var(--blue); font-size: .95rem; font-weight: 700; }
+    .example .cmd { margin-top: 0; padding-block: 0; }
     .example p { margin: .3rem 0 0; color: var(--muted); }
     .origin { padding-block: 2.4rem; border-block: 1px solid var(--line); background: #e9f2fa; }
     .origin .wrap { display: grid; grid-template-columns: minmax(0, .6fr) minmax(0, 1.4fr); gap: 2.5rem; }
@@ -83,7 +99,7 @@
       .wrap { width: min(100% - 2rem, 620px); }
       .header-inner { align-items: flex-start; flex-direction: column; justify-content: center; padding-block: 1rem; }
       .hero { padding-block: 4rem; }
-      .hero-grid, .install .wrap, .examples, .origin .wrap { grid-template-columns: 1fr; }
+      .hero-grid, .install .wrap, .examples, .origin .wrap { grid-template-columns: minmax(0, 1fr); }
       .capabilities { grid-template-columns: 1fr; gap: 1.5rem; }
       .content { padding-block: 4rem; }
       .model-row { grid-template-columns: 6.5rem 1fr; padding-inline: 1rem; }
@@ -143,15 +159,36 @@
       <div class="wrap">
         <div>
           <h2>Install the CLI and content</h2>
-          <p>Clone this repository, install the CLI with <code>uv</code> via <code>make deploy</code>, then install the framework content. Restart Claude Code after installation.</p>
+          <p>No clone needed. Install the CLI from the latest release with <a href="https://docs.astral.sh/uv/getting-started/installation/">uv</a>, then install the framework content into a scope.</p>
+          <p><code>@stable</code> always points at the <a href="https://github.com/ajitta/superclaude/releases">latest release</a>. To pin one, replace it with that release's tag, <code>@v&lt;version&gt;</code>.</p>
           <a href="https://github.com/ajitta/superclaude#-quick-installation">Full installation and scope options ↗</a>
         </div>
         <div>
-          <pre><code>git clone https://github.com/ajitta/superclaude.git
-cd superclaude
-make deploy
-superclaude install --scope user</code></pre>
-          <p class="scope-strip">Choose <code>--scope project</code> for a committed team install or <code>--scope local</code> for personal files inside a project.</p>
+          <ol class="steps">
+            <li>
+              <h3>Install the CLI</h3>
+              <div class="cmd"><code>uv tool install -p 3.13 git+https://github.com/ajitta/superclaude.git@stable</code></div>
+              <p class="hint">If your shell then can't find <code>superclaude</code>, run this and open a new terminal:</p>
+              <div class="cmd"><code>uv tool update-shell</code></div>
+            </li>
+            <li>
+              <h3>Install the content</h3>
+              <div class="cmd"><code>superclaude install --scope user</code></div>
+              <p class="hint">For a committed team install, or personal files inside one project, run one of these in the project instead:</p>
+              <div class="cmd"><code>superclaude install --scope project</code></div>
+              <div class="cmd"><code>superclaude install --scope local</code></div>
+            </li>
+            <li>
+              <h3>Restart Claude Code</h3>
+              <p class="hint">Then run <code>/sc:help</code> to list the commands.</p>
+            </li>
+          </ol>
+          <div class="update">
+            <h3>Update to a new release</h3>
+            <p class="hint">Upgrade the CLI, then refresh each scope you installed:</p>
+            <div class="cmd"><code>uv tool upgrade superclaude</code></div>
+            <div class="cmd"><code>superclaude update --scope user</code></div>
+          </div>
         </div>
       </div>
     </section>
@@ -163,10 +200,10 @@ superclaude install --scope user</code></pre>
           <p class="section-intro">After restarting Claude Code, begin with a specific task or use <code>/sc:help</code> to see the available commands.</p>
         </div>
         <div>
-          <div class="example"><code>/sc:brainstorm</code><p>Explore an underspecified request.</p></div>
-          <div class="example"><code>/sc:plan</code><p>Turn a task into an implementation plan.</p></div>
-          <div class="example"><code>/sc:implement</code><p>Work through the implementation.</p></div>
-          <div class="example"><code>/sc:review</code><p>Review code, a plan, or a design.</p></div>
+          <div class="example"><div class="cmd cmd-light"><code>/sc:brainstorm</code></div><p>Explore an underspecified request.</p></div>
+          <div class="example"><div class="cmd cmd-light"><code>/sc:plan</code></div><p>Turn a task into an implementation plan.</p></div>
+          <div class="example"><div class="cmd cmd-light"><code>/sc:implement</code></div><p>Work through the implementation.</p></div>
+          <div class="example"><div class="cmd cmd-light"><code>/sc:review</code></div><p>Review code, a plan, or a design.</p></div>
         </div>
       </div>
     </section>
@@ -184,5 +221,38 @@ superclaude install --scope user</code></pre>
       <a href="https://github.com/ajitta/superclaude">View source on GitHub ↗</a>
     </div>
   </footer>
+  <p id="copy-status" class="sr-only" aria-live="polite"></p>
+  <script>
+    // Add a Copy button to each command row; without JavaScript the rows still select on click.
+    document.querySelectorAll('.cmd').forEach(function (row) {
+      var code = row.querySelector('code');
+      var button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'copy';
+      button.textContent = 'Copy';
+      button.setAttribute('aria-label', 'Copy ' + code.textContent);
+      row.appendChild(button);
+      button.addEventListener('click', function () {
+        var status = document.getElementById('copy-status');
+        var show = function (label, message) {
+          button.textContent = label;
+          status.textContent = message;
+          setTimeout(function () { button.textContent = 'Copy'; }, 1600);
+        };
+        var selectForManualCopy = function () {
+          var range = document.createRange();
+          range.selectNodeContents(code);
+          var selection = window.getSelection();
+          selection.removeAllRanges();
+          selection.addRange(range);
+          show('Selected', 'Command selected; press Ctrl+C or ⌘C to copy.');
+        };
+        if (!navigator.clipboard) { selectForManualCopy(); return; }
+        navigator.clipboard.writeText(code.textContent).then(function () {
+          show('Copied', 'Copied: ' + code.textContent);
+        }, selectForManualCopy);
+      });
+    });
+  </script>
 </body>
 </html>
