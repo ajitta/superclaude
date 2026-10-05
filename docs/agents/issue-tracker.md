@@ -2,7 +2,7 @@
 
 Issues and PRDs for this repo live as markdown files in `.scratch/`.
 
-GitHub issues are disabled on `ajitta/superclaude` (this fork). Upstream issues belong to `SuperClaude-Org/SuperClaude_Framework` and are reserved for contribution-back work, not daily fork development.
+GitHub issues are disabled on `ajitta/superclaude`.
 
 ## Conventions
 

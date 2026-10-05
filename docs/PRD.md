@@ -74,7 +74,7 @@ The load-bearing set. Anything not on this list is support for something on it.
 - **No duplicated user prose docs.** The inherited `docs/user-guide/` tree was
   archived 2026-05-15 because it contradicted the live SSOT; content docs live
   next to the content in `src/superclaude/`.
-- **No GitHub issue tracker.** The fork has issues disabled; work items are
+- **No GitHub issue tracker.** GitHub issues are disabled; work items are
   markdown under `.scratch/<feature>/` (`docs/agents/issue-tracker.md`).
 - **No UI beyond terminal text.** See `docs/UI-GUIDE.md` for the one surface
   that does exist.
