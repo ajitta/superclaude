@@ -160,19 +160,25 @@ def test_readme_version_matches_pyproject():
     )
 
 
-_INSTALL_URL_RE = re.compile(r"git\+https://github\.com/ajitta/superclaude\.git(\S*)")
+_INSTALL_URL_RE = re.compile(
+    r"git\+https://github\.com/ajitta/superclaude\.git([^\s<]*)"
+)
+# The Pages site (docs/index.html) still showed the clone + `make deploy` install
+# after README moved to `@stable` on 2026-10-05, because no test read it.
+_INSTALL_DOCS = (_README, _ROOT / "docs" / "index.html")
 
 
-def test_readme_installs_a_release_not_master():
-    """Every README install URL names a release: ``@stable`` or a ``@v<version>`` tag.
+@pytest.mark.parametrize("doc", _INSTALL_DOCS, ids=lambda p: p.name)
+def test_install_docs_install_a_release_not_master(doc: Path):
+    """Every install URL names a release: ``@stable`` or a ``@v<version>`` tag.
 
     A bare git URL installs master HEAD, so every merge reached users before a
     release did (the stage-1 README, 2026-10-05). ``make release`` moves stable.
     """
-    refs = _INSTALL_URL_RE.findall(_README.read_text(encoding="utf-8"))
-    assert refs, "README.md no longer shows the uv tool install URL"
+    refs = _INSTALL_URL_RE.findall(doc.read_text(encoding="utf-8"))
+    assert refs, f"{doc.name} no longer shows the uv tool install URL"
     bad = [r for r in refs if not (r == "@stable" or r.startswith("@v"))]
-    assert not bad, f"README install URL without @stable or @v<version>: {bad}"
+    assert not bad, f"{doc.name} install URL without @stable or @v<version>: {bad}"
 
 
 def test_sc_dispatcher_version_matches_pyproject():
