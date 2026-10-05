@@ -61,7 +61,8 @@
     .capability h3 { margin-bottom: .55rem; font-size: 1.24rem; letter-spacing: -.02em; }
     .capability p { margin: 0; color: var(--muted); }
     .install { background: #dceaf6; }
-    .install .wrap { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: 3rem; align-items: start; }
+    .install .wrap { display: grid; grid-template-columns: minmax(0, 1fr); gap: 2.5rem; }
+    .install .wrap > div:first-child { max-width: 68ch; }
     .install p { color: #334f69; }
     .install code, .examples code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
     .steps { margin: 0; padding: 0; list-style: none; counter-reset: step; }
@@ -89,6 +90,9 @@
     .example:last-child { border-bottom: 1px solid var(--line); }
     .example .cmd { margin-top: 0; padding-block: 0; }
     .example p { margin: .3rem 0 0; color: var(--muted); }
+    .goal { margin-top: 2.2rem; }
+    .goal h3 { margin-bottom: .5rem; font-size: 1.05rem; }
+    .goal p { margin: .5rem 0; color: var(--muted); }
     .origin { padding-block: 2.4rem; border-block: 1px solid var(--line); background: #e9f2fa; }
     .origin .wrap { display: grid; grid-template-columns: minmax(0, .6fr) minmax(0, 1.4fr); gap: 2.5rem; }
     .origin h2 { margin: 0; font-size: 1.5rem; letter-spacing: -.02em; }
@@ -100,7 +104,7 @@
       .wrap { width: min(100% - 2rem, 620px); }
       .header-inner { align-items: flex-start; flex-direction: column; justify-content: center; padding-block: 1rem; }
       .hero { padding-block: 4rem; }
-      .hero-grid, .install .wrap, .examples, .origin .wrap { grid-template-columns: minmax(0, 1fr); }
+      .hero-grid, .examples, .origin .wrap { grid-template-columns: minmax(0, 1fr); }
       .capabilities { grid-template-columns: 1fr; gap: 1.5rem; }
       .content { padding-block: 4rem; }
       .model-row { grid-template-columns: 6.5rem 1fr; padding-inline: 1rem; }
@@ -213,6 +217,12 @@
           <div class="example"><div class="cmd cmd-light"><code>/sc:plan</code></div><p>Turn a task into an implementation plan.</p></div>
           <div class="example"><div class="cmd cmd-light"><code>/sc:implement</code></div><p>Work through the implementation.</p></div>
           <div class="example"><div class="cmd cmd-light"><code>/sc:review</code></div><p>Review code, a plan, or a design.</p></div>
+          <div class="goal">
+            <h3>Run a command toward a goal</h3>
+            <p>Claude Code's <a href="https://code.claude.com/docs/en/goal"><code>/goal</code></a> sets a completion condition, and Claude keeps working turn after turn until a separate model judges it met. The condition is also Claude's first instruction, so a command named in it runs as part of the goal:</p>
+            <div class="cmd cmd-light"><code>/goal sc:review the current diff, fix every finding, and review again until it reports none</code></div>
+            <p>Run <code>/goal</code> alone to check progress, or <code>/goal clear</code> to stop early.</p>
+          </div>
         </div>
       </div>
     </section>
