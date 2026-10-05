@@ -71,9 +71,9 @@
     .steps h3::before { content: counter(step) ". "; color: var(--blue); }
     .hint { margin: .7rem 0 .45rem; font-size: .92rem; }
     .os { margin: .9rem 0 0; color: var(--muted); font-size: .85rem; font-weight: 750; }
-    /* One command per row: click the text to select all of it, or use the Copy button. */
+    /* One command per row: click the text to select all of it, or use the Copy button. A long command wraps on screen only; the copied text stays one line. */
     .cmd { display: flex; align-items: center; gap: .6rem; margin-top: .45rem; padding: .5rem .5rem .5rem 1rem; border-radius: 8px; background: var(--terminal); }
-    .cmd code { flex: 1; min-width: 0; overflow-x: auto; white-space: pre; color: #f2f7fc; font-size: .9rem; line-height: 1.9; user-select: all; }
+    .cmd code { flex: 1; min-width: 0; white-space: pre-wrap; overflow-wrap: anywhere; color: #f2f7fc; font-size: .9rem; line-height: 1.7; padding-block: .2rem; user-select: all; }
     .copy { flex: none; min-height: 34px; padding: .25rem .75rem; border: 1px solid #5d7a99; border-radius: 6px; background: transparent; color: #f2f7fc; font: 700 .8rem/1 system-ui, -apple-system, "Segoe UI", sans-serif; cursor: pointer; }
     .copy:hover { background: #22405f; }
     .copy:focus-visible { outline: 3px solid #a7d4f7; outline-offset: 2px; }
