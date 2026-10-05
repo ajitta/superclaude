@@ -72,6 +72,9 @@
     .steps h3::before { content: counter(step) ". "; color: var(--blue); }
     .hint { margin: .7rem 0 .45rem; font-size: .92rem; }
     .os { margin: .9rem 0 0; color: var(--muted); font-size: .85rem; font-weight: 750; }
+    /* One level in: choices that belong to the step above (pick one OS). */
+    .sub { margin-left: 1.1rem; padding-left: 1.1rem; border-left: 2px solid var(--line); }
+    .sub > .os:first-child { margin-top: .6rem; }
     /* One command per row: click the text to select all of it, or use the Copy button. A long command wraps on screen only; the copied text stays one line. */
     .cmd { display: flex; align-items: center; gap: .6rem; margin-top: .45rem; padding: .5rem .5rem .5rem 1rem; border-radius: 8px; background: var(--terminal); }
     .cmd code { flex: 1; min-width: 0; white-space: pre-wrap; overflow-wrap: anywhere; color: #f2f7fc; font-size: .9rem; line-height: 1.7; padding-block: .2rem; user-select: all; }
@@ -121,6 +124,7 @@
         <a href="#framework">Framework</a>
         <a href="#install">Install</a>
         <a href="#commands">Commands</a>
+        <a href="#plugins">Plugins</a>
         <a href="https://github.com/ajitta/superclaude">GitHub ↗</a>
       </nav>
     </div>
@@ -173,10 +177,12 @@
             <li>
               <h3>Install uv</h3>
               <p class="hint">Skip this step if <code>uv --version</code> already works. Otherwise run the line for your OS, then open a new terminal.</p>
-              <p class="os">macOS / Linux</p>
-              <div class="cmd"><code>curl -LsSf https://astral.sh/uv/install.sh | sh</code></div>
-              <p class="os">Windows</p>
-              <div class="cmd"><code>powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"</code></div>
+              <div class="sub">
+                <p class="os">macOS / Linux</p>
+                <div class="cmd"><code>curl -LsSf https://astral.sh/uv/install.sh | sh</code></div>
+                <p class="os">Windows</p>
+                <div class="cmd"><code>powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"</code></div>
+              </div>
             </li>
             <li>
               <h3>Install the CLI</h3>
@@ -223,6 +229,44 @@
             <div class="cmd cmd-light"><code>/goal sc:review the current diff, fix every finding, and review again until it reports none</code></div>
             <p>Run <code>/goal</code> alone to check progress, or <code>/goal clear</code> to stop early.</p>
           </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="plugins" class="content install">
+      <div class="wrap">
+        <div>
+          <h2>Socratic plugins for Claude Code</h2>
+          <p>Two plugins from this repository's marketplace, each holding one skill with the same name. They are separate from the framework: you install them inside Claude Code, without uv or the <code>superclaude</code> CLI.</p>
+          <p>Not the same as <code>/sc:brainstorm</code>, which turns a feature request into requirements and writes docs. These skills only ask questions and never implement anything.</p>
+          <a href="https://github.com/ajitta/superclaude/tree/master/portable-skills">Install on claude.ai or Codex ↗</a>
+        </div>
+        <div>
+          <ol class="steps">
+            <li>
+              <h3>Add the marketplace</h3>
+              <p class="hint">Run this in Claude Code. It registers the marketplace, named <code>ajitta-socratic</code>, and installs nothing by itself.</p>
+              <div class="cmd"><code>/plugin marketplace add ajitta/superclaude</code></div>
+            </li>
+            <li>
+              <h3>Install one plugin or both</h3>
+              <div class="cmd"><code>/plugin install socratic-brainstorm@ajitta-socratic</code></div>
+              <div class="cmd"><code>/plugin install socratic-elenchus@ajitta-socratic</code></div>
+            </li>
+            <li>
+              <h3>Use it</h3>
+              <p class="hint">Claude Code names a plugin's skill <code>plugin:skill</code>, so the command repeats the name. Add your idea after it, or just ask in words ("poke holes in this plan").</p>
+              <div class="example">
+                <div class="cmd cmd-light"><code>/socratic-brainstorm:socratic-brainstorm</code></div>
+                <p>Tests your idea one question at a time, draws out your options, adds up to three of its own, and ends with a verdict (sharpened, open, or refuted) and a short brief. Pick it when you want to leave with a plan.</p>
+              </div>
+              <div class="example">
+                <div class="cmd cmd-light"><code>/socratic-elenchus:socratic-elenchus</code></div>
+                <p>The method of Plato's dialogues: "what is X?", premises you agree to, a contradiction built from them, and a definition you revise. No advice. Pick it to find out whether you know what you mean.</p>
+              </div>
+              <p class="hint">To use both, settle the key word with elenchus first, then brainstorm. Plugins installed from user settings do not load in cloud sessions.</p>
+            </li>
+          </ol>
         </div>
       </div>
     </section>
