@@ -2,9 +2,25 @@
 
 User-visible changes to this fork of SuperClaude: behavior, commands, flags, CLI subcommands, hooks, make targets, dependencies, and what an upgrade asks of you. Internal refactors and tests are in the commit log.
 
-The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html) with a `+ajitta` local suffix, and `pyproject.toml` is the version source.
+The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html), and `pyproject.toml` is the version source. A release is tagged `vX.Y.Z`, and the `stable` branch points at the latest one.
 
 Releases before 4.19.0 are not listed. Their history is the git log; the upstream-era changelog, last entry 4.2.1, is `CHANGELOG.md` at commit `6b0ac5c3^`.
+
+## [4.20.1] - 2026-10-05
+
+### Changed
+
+- Version numbers drop the `+ajitta` local suffix. This release is `4.20.1`, and its tag is `v4.20.1`.
+- README installs the CLI with `uv tool install -p 3.13 git+https://github.com/ajitta/superclaude.git@stable`, with no clone. `stable` is a branch that moves only when a release is made, so `uv tool upgrade superclaude` pulls the latest release rather than whatever was last merged to master. To pin a release, install `@v<version>` instead.
+
+### Added
+
+- Each release is a GitHub release with a `v<version>` tag, and its notes are this file's entry for that version. `make release` creates it from a clean, pushed master HEAD whose Tests workflow passed, then moves `stable` to it.
+
+### Upgrade notes
+
+- If you installed from the git URL without `@stable` (the README said so for a few hours on 2026-10-05), that install follows master. Run `uv tool install -p 3.13 git+https://github.com/ajitta/superclaude.git@stable` once; `--force` is not needed. After that, `uv tool upgrade superclaude` stays on releases.
+- Installed content changed only in the version line of `/sc:sc`. `superclaude update --scope <scope>` refreshes it for each installed scope; skip scopes that `superclaude doctor --scope <scope>` reports as not installed, because `update` creates an install where none exists.
 
 ## [4.20.0+ajitta] - 2026-10-04
 
