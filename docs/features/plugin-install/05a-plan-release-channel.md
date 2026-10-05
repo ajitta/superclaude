@@ -111,21 +111,21 @@ A를 고른 이유: B의 태그(특정 버전 고정, 롤백)와 C의 "ref 하�
 
 - [x] `uv run pytest` exit 0, `make format`.
 - [x] 커밋: `docs: install the latest release from the stable branch; add make release`.
-- [ ] `git checkout master && git merge --no-ff docs/release-channel -m "…"`를 한 명령으로 실행한다(gotcha `editable-tool-branch-switch`). push하고 Tests workflow가 green인지 확인한다.
+- [x] `git checkout master && git merge --no-ff docs/release-channel -m "…"`를 한 명령으로 실행한다(gotcha `editable-tool-branch-switch`). push하고 Tests workflow가 green인지 확인한다.
 
 ## Phase 2: 4.20.1 bump, `+ajitta` 삭제 (브랜치 `chore/version-4.20.1`, 커밋 1개)
 
 접미사만 지우고 버전을 4.20.0으로 두지 않는 이유가 있다. PEP 440에서 `4.20.0`은 `4.20.0+ajitta`보다 낮은 버전이고, 같은 코드에 이름이 둘 생긴다. 새 patch 번호를 쓰면 둘 다 피할 수 있다. 이 릴리스에는 기능 변경이 없다.
 
-- [ ] `pyproject.toml:7`, `src/superclaude/__init__.py:7`, `README.md:8`, `README.md:64`, `src/superclaude/commands/sc.md:74`를 `4.20.1`로 바꾼다. README badge는 `version-4.20.1-blue`가 된다.
-- [ ] `CHANGELOG.md:5`의 "with a `+ajitta` local suffix"를 지우고, 버전은 `X.Y.Z`, 태그는 `vX.Y.Z`, 최신 릴리스는 `stable` 브랜치라고 적는다.
-- [ ] CHANGELOG에 `## [4.20.1] - <date>` 절을 쓴다.
+- [x] `pyproject.toml:7`, `src/superclaude/__init__.py:7`, `README.md:8`, `README.md:64`, `src/superclaude/commands/sc.md:74`를 `4.20.1`로 바꾼다. README badge는 `version-4.20.1-blue`가 된다.
+- [x] `CHANGELOG.md:5`의 "with a `+ajitta` local suffix"를 지우고, 버전은 `X.Y.Z`, 태그는 `vX.Y.Z`, 최신 릴리스는 `stable` 브랜치라고 적는다.
+- [x] CHANGELOG에 `## [4.20.1] - <date>` 절을 쓴다.
   - Changed: 버전에서 `+ajitta` 접미사를 없앴다. README가 `@stable`(최신 릴리스)을 설치한다.
   - Added: 릴리스마다 GitHub Release와 `v<version>` 태그를 만든다.
   - Upgrade notes: "`@stable` 없이 git URL로 설치했다면 그 설치는 master를 따라간다. `uv tool install -p 3.13 git+https://github.com/ajitta/superclaude.git@stable`을 한 번 다시 실행하라(`--force` 불필요)." 이후 `superclaude update --scope <s>`.
-- [ ] `uv run pytest` exit 0. `test_version_consistency.py`가 다섯 곳과 CHANGELOG 제목을 pyproject와 맞춘다.
-- [ ] `make format`, 커밋 `chore: bump version to 4.20.1, drop the +ajitta suffix`, 한 명령으로 병합, push, CI green 확인.
-- [ ] 보류 중인 [05-plan.md](./05-plan.md)의 `4.21.0+ajitta`는 재개할 때 `4.21.0`으로 읽는다. 그 계획의 보류 메모에 이 한 줄을 같은 커밋으로 덧붙인다.
+- [x] `uv run pytest` exit 0. `test_version_consistency.py`가 다섯 곳과 CHANGELOG 제목을 pyproject와 맞춘다.
+- [x] `make format`, 커밋 `chore: bump version to 4.20.1, drop the +ajitta suffix`, 한 명령으로 병합, push, CI green 확인.
+- [x] 보류 중인 [05-plan.md](./05-plan.md)의 `4.21.0+ajitta`는 재개할 때 `4.21.0`으로 읽는다. 그 계획의 보류 메모에 이 한 줄을 같은 커밋으로 덧붙인다.
 
 ## Phase 3: 첫 릴리스 v4.20.1
 

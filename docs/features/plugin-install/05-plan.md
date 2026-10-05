@@ -99,7 +99,7 @@ revised: 2026-10-05
 
 ## Phase 2: plugin 모드 hook 런타임 (브랜치 `feature/sc-plugin`, 커밋 1개)
 
-> 2026-10-05 사용자 결정: 2단계(Phase 2~5, plugin 모드)는 보류한다. 1단계만 진행했다.
+> 2026-10-05 사용자 결정: 2단계(Phase 2~5, plugin 모드)는 보류한다. 1단계만 진행했다. 재개할 때 아래의 `4.21.0+ajitta`는 `4.21.0`으로 읽는다(버전 접미사는 4.20.1에서 없앴다, [05a-plan-release-channel.md](./05a-plan-release-channel.md)).
 
 - [ ] master에서 `git switch -c feature/sc-plugin`.
 
