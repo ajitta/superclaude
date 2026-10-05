@@ -70,6 +70,7 @@
     .steps h3, .update h3 { margin-bottom: .6rem; font-size: 1.05rem; }
     .steps h3::before { content: counter(step) ". "; color: var(--blue); }
     .hint { margin: .7rem 0 .45rem; font-size: .92rem; }
+    .os { margin: .9rem 0 0; color: var(--muted); font-size: .85rem; font-weight: 750; }
     /* One command per row: click the text to select all of it, or use the Copy button. */
     .cmd { display: flex; align-items: center; gap: .6rem; margin-top: .45rem; padding: .5rem .5rem .5rem 1rem; border-radius: 8px; background: var(--terminal); }
     .cmd code { flex: 1; min-width: 0; overflow-x: auto; white-space: pre; color: #f2f7fc; font-size: .9rem; line-height: 1.9; user-select: all; }
@@ -159,12 +160,20 @@
       <div class="wrap">
         <div>
           <h2>Install the CLI and content</h2>
-          <p>No clone needed. Install the CLI from the latest release with <a href="https://docs.astral.sh/uv/getting-started/installation/">uv</a>, then install the framework content into a scope.</p>
+          <p>No clone needed. Install <a href="https://docs.astral.sh/uv/getting-started/installation/">uv</a> if you don't have it, install the CLI from the latest release with it, then install the framework content into a scope.</p>
           <p><code>@stable</code> always points at the <a href="https://github.com/ajitta/superclaude/releases">latest release</a>. To pin one, replace it with that release's tag, <code>@v&lt;version&gt;</code>.</p>
           <a href="https://github.com/ajitta/superclaude#-quick-installation">Full installation and scope options ↗</a>
         </div>
         <div>
           <ol class="steps">
+            <li>
+              <h3>Install uv</h3>
+              <p class="hint">Skip this step if <code>uv --version</code> already works. Otherwise run the line for your OS, then open a new terminal.</p>
+              <p class="os">macOS / Linux</p>
+              <div class="cmd"><code>curl -LsSf https://astral.sh/uv/install.sh | sh</code></div>
+              <p class="os">Windows</p>
+              <div class="cmd"><code>powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"</code></div>
+            </li>
             <li>
               <h3>Install the CLI</h3>
               <div class="cmd"><code>uv tool install -p 3.13 git+https://github.com/ajitta/superclaude.git@stable</code></div>
