@@ -66,6 +66,8 @@ Project-specific traps: `.claude/rules/gotchas/general.md` (+ domain files with 
 
 ## Git Workflow
 
-Branch: `master` ← `integration` ← `feature/*`, `fix/*`, `docs/*`
+Branch: `stable` (release channel, moved only by `make release`) ← `master` ← `feature/*`, `fix/*`, `docs/*`
+
+Release: version-bump branch merged and green on master → `make release`
 
 Commits: `feat:`, `fix:`, `docs:`, `refactor:`, `test:`, `chore:`

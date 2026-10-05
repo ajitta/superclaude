@@ -1,4 +1,4 @@
-.PHONY: install deploy sync-user sync-project sync-local uninstall-user uninstall-project uninstall-local test test-scripts test-plugin doctor verify verify-drift clean lint format uninstall-legacy help
+.PHONY: install deploy sync-user sync-project sync-local uninstall-user uninstall-project uninstall-local test test-scripts test-plugin doctor verify verify-drift clean lint format release uninstall-legacy help
 
 # Installation (local source, editable) - RECOMMENDED
 install:
@@ -111,6 +111,19 @@ clean:
 	find . -type d -name .ruff_cache -exec rm -rf {} +
 
 # Show help
+# Release master HEAD: GitHub release v<version> (notes = newest CHANGELOG section), then move stable to it.
+release:
+	@set -e; \
+	V=$$(sed -n 's/^version = "\(.*\)"/\1/p' pyproject.toml); SHA=$$(git rev-parse HEAD); \
+	test "$$(git branch --show-current)" = master || { echo "❌ not on master"; exit 1; }; \
+	git diff --quiet HEAD || { echo "❌ uncommitted changes"; exit 1; }; \
+	git fetch -q origin master; test "$$SHA" = "$$(git rev-parse origin/master)" || { echo "❌ HEAD is not origin/master"; exit 1; }; \
+	test "$$(gh run list --commit $$SHA --workflow Tests --json conclusion --jq '.[0].conclusion')" = success || { echo "❌ Tests not green for $$SHA"; exit 1; }; \
+	awk '/^## \[/{n++; next} n==1' CHANGELOG.md > .release-notes.md; \
+	gh release create "v$$V" --target "$$SHA" --title "v$$V" --notes-file .release-notes.md; rm -f .release-notes.md; \
+	git push origin "$$SHA:refs/heads/stable"; \
+	echo "✅ v$$V released; stable → $$SHA"
+
 help:
 	@echo "SuperClaude Framework - Available commands:"
 	@echo ""
@@ -128,6 +141,7 @@ help:
 	@echo "  make lint            - Run linter (ruff check)"
 	@echo "  make format          - Format code (ruff format)"
 	@echo "  make clean           - Clean build artifacts"
+	@echo "  make release         - Release master HEAD: GitHub release v<version>, move stable"
 	@echo ""
 	@echo "🧹 Cleanup:"
 	@echo "  make uninstall-user    - Uninstall from user scope (~/.claude/)"

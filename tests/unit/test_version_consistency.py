@@ -160,6 +160,21 @@ def test_readme_version_matches_pyproject():
     )
 
 
+_INSTALL_URL_RE = re.compile(r"git\+https://github\.com/ajitta/superclaude\.git(\S*)")
+
+
+def test_readme_installs_a_release_not_master():
+    """Every README install URL names a release: ``@stable`` or a ``@v<version>`` tag.
+
+    A bare git URL installs master HEAD, so every merge reached users before a
+    release did (the stage-1 README, 2026-10-05). ``make release`` moves stable.
+    """
+    refs = _INSTALL_URL_RE.findall(_README.read_text(encoding="utf-8"))
+    assert refs, "README.md no longer shows the uv tool install URL"
+    bad = [r for r in refs if not (r == "@stable" or r.startswith("@v"))]
+    assert not bad, f"README install URL without @stable or @v<version>: {bad}"
+
+
 def test_sc_dispatcher_version_matches_pyproject():
     """The /sc:sc dispatcher <meta> version must match the canonical pyproject version."""
     version = _pyproject_version()
