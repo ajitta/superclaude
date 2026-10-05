@@ -134,6 +134,14 @@ Restart Claude Code, then try a few:
 - `/sc:insight` — Capture structured session insights to JSONL
 - `/sc:help` — List all 36 commands
 
+To keep a command running until a result holds, put it in a [`/goal`](https://code.claude.com/docs/en/goal). `/goal` sets a completion condition, and Claude keeps working turn after turn until a separate model judges it met. The condition is also Claude's first instruction, so a command named in it runs as part of the goal:
+
+```
+/goal sc:review the current diff, fix every finding, and review again until it reports none
+```
+
+Run `/goal` alone to check progress, or `/goal clear` to stop early.
+
 #### **Update**
 
 ```bash
