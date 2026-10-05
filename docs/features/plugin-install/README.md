@@ -12,4 +12,5 @@ updated: 2026-10-05
 
 ## Documents
 
-- [05-plan.md](./05-plan.md): 1단계(README만 변경)와 2단계(plugin manifest, core 주입 hook, 검증, 4.21.0 릴리스) 구현 계획
+- [05-plan.md](./05-plan.md): 1단계(README만 변경)와 2단계(plugin manifest, core 주입 hook, 검증, 4.21.0 릴리스) 구현 계획. 1단계 완료, 2단계 보류
+- [05a-plan-release-channel.md](./05a-plan-release-channel.md): README가 master HEAD 대신 릴리스를 설치하게 하는 계획(태그 + GitHub Release + `stable` 브랜치, `make release`, `+ajitta` 삭제와 첫 릴리스 4.20.1)
