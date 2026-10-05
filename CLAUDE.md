@@ -1,62 +1,7 @@
 # CLAUDE.md
 
-Guidance for Claude Code when working in this repository.
+@AGENTS.md
 
-## Python Environment
+## Claude Code
 
-This project uses **UV** for all Python operations. Never use `pip`, `python -m pytest`, or `uv sync` directly.
-
-```bash
-uv run superclaude install --list-all      # Test CLI changes
-```
-
-- **Never `uv sync`**: the dev toolchain is declared in `[project.optional-dependencies].dev`, not a default dependency group, so `uv sync` prunes ruff, mypy, pytest-cov and pytest-asyncio and the suite stops running. `uv sync --dry-run` lists what it would remove. Install and repair with `uv pip install -e ".[dev]"`.
-- **Tests**: `uv run pytest` must exit 0. No known pre-existing failures — a red test is a regression from your change, never a known issue. It works on Windows when `.venv` is healthy; the `Failed to canonicalize script path` error means `.venv` is corrupt (often a broken `lib64` symlink) — rebuild it: `rm -rf .venv && uv venv && uv pip install -e ".[dev]"`. Last-resort fallbacks: `.venv/Scripts/python.exe -m pytest` → WSL → `make test` in CI. Markdown is linted too — content counts, cross-refs and doc structure have tests, so a docs-only change still needs the suite.
-
-## Code Style
-
-- Run `make format` before committing
-
-## Developer Environment
-
-- `make deploy` runs `uv tool install --force --editable .` (CLI editable) only. Content sync is a separate scope-explicit step: `make sync-user` / `sync-project` / `sync-local`. The `--force` in sync targets is intentional — needed for non-interactive headless `claude -p` test scenarios. For interactive dev sync use `superclaude install -i`.
-- Hook commands are `superclaude hook <name>` (console entry; registry in `cli/hook_dispatch.py`) — no install-time template, no machine-specific bytes in a committed settings.json
-- Experimental Agent Teams: `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`
 - Personal config: `CLAUDE.local.md` (gitignored) imports `@.claude/superclaude/CLAUDE_SC.md` for framework activation in dev tree
-
-## Architecture
-
-SuperClaude is a **content framework** — markdown files (commands, agents, modes, MCP docs, core config) installed into `~/.claude/` to configure Claude Code's behavior. Ships a CLI (`superclaude`) and a pytest plugin for auto-markers.
-
-**Full taxonomy:** `src/superclaude/ARCHITECTURE.md` (directory roles, delivery pipelines, content types).
-
-- **CLAUDE_SC.md import chain**: `@.claude/superclaude/CLAUDE_SC.md` → `core/FLAGS.md`, `PRINCIPLES.md`, `RULES.md` (path after install or sync)
-- **Hooks merge (not replace)**: `install_settings.py` preserves user hooks via marker-based identification
-- Authoring rules live in `.claude/rules/` (agent, command, mode — auto-loaded by CC)
-- Serena session memories live in `.serena/` (committed for cross-session context)
-
-## Gotchas
-
-Project-specific traps: `.claude/rules/gotchas/general.md` (+ domain files with `paths:` frontmatter). Format: `- name: description`. Top trap: do **not** Read sub-agent `*.output` files — wait for the returned summary.
-
-## Git Workflow
-
-Branch: `stable` (release channel, moved only by `make release`) ← `master` ← `feature/*`, `fix/*`, `docs/*`
-
-Release: version-bump branch merged and green on master → `make release`
-
-Commits: `feat:`, `fix:`, `docs:`, `refactor:`, `test:`, `chore:`
-
-## Agent skills
-
-### Issue tracker
-
-Issues live as local markdown under `.scratch/<feature>/` (GitHub issues are disabled). See `docs/agents/issue-tracker.md`.
-
-### Triage labels
-
-Default vocabulary — label strings match canonical role names verbatim. See `docs/agents/triage-labels.md`.
-
-### Domain docs
-
-Single-context — one `CONTEXT.md` + `docs/adr/` at repo root. See `docs/agents/domain.md`.
