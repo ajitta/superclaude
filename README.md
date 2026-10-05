@@ -184,6 +184,7 @@ The uninstall is marker-based: it removes only the hooks and the `@superclaude/C
 # Initial setup (editable mode for development)
 git clone https://github.com/ajitta/superclaude.git
 cd superclaude
+uv venv -p 3.13                        # uv pip install needs a venv to install into
 uv pip install -e ".[dev]"
 
 # Development cycle
