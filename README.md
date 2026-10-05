@@ -68,10 +68,10 @@ Claude Code reads those files at session start, which is how the framework chang
 #### **1. Install the CLI**
 
 ```bash
-uv tool install -p 3.13 git+https://github.com/ajitta/superclaude.git
+uv tool install -p 3.13 git+https://github.com/ajitta/superclaude.git@stable
 ```
 
-No clone needed. If your shell then can't find `superclaude`, run `uv tool update-shell` and open a new terminal. Working on SuperClaude itself? See *For contributors/developers* below.
+No clone needed. `stable` is the latest release; to pin one, replace `@stable` with its tag, `@v<version>` (see [Releases](https://github.com/ajitta/superclaude/releases)). If your shell then can't find `superclaude`, run `uv tool update-shell` and open a new terminal. Working on SuperClaude itself? See *For contributors/developers* below.
 
 #### **2. Install framework content with `superclaude install`**
 
@@ -137,7 +137,7 @@ Restart Claude Code, then try a few:
 #### **Update**
 
 ```bash
-uv tool upgrade superclaude            # pull the latest CLI + content from git
+uv tool upgrade superclaude            # pull the latest release
 superclaude update                     # default: --scope user
 superclaude update --scope project     # (update takes --scope only; use `install --force` to re-copy everything)
 ```

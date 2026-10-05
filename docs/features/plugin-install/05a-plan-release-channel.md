@@ -51,8 +51,8 @@ A를 고른 이유: B의 태그(특정 버전 고정, 롤백)와 C의 "ref 하�
 
 ## Phase 0: 브랜치와 `stable` 선생성
 
-- [ ] master에서 `git switch -c docs/release-channel`.
-- [ ] `git push origin 0ad12f69:refs/heads/stable`.
+- [x] master에서 `git switch -c docs/release-channel`.
+- [x] `git push origin 0ad12f69:refs/heads/stable`.
   - 이 커밋의 `src/superclaude`와 `pyproject.toml`은 4.20.0 bump(`05cd65b3`)와 같다(`git diff --quiet 05cd65b3 0ad12f69 -- src/superclaude pyproject.toml`).
   - README가 `@stable`을 가리키기 전에 브랜치가 있어야 한다. 그래야 Phase 1 push부터 첫 릴리스까지 설치가 실패하는 구간이 없고, 그동안 `@stable`은 4.20.0 코드를 준다.
 
@@ -62,7 +62,7 @@ A를 고른 이유: B의 태그(특정 버전 고정, 롤백)와 C의 "ref 하�
 
 **Files:** Modify: `Makefile` (`.PHONY`, 새 target, `help` 목록 한 줄)
 
-- [ ] Step 1: target을 추가한다. 이 target은 master HEAD를 릴리스한다.
+- [x] Step 1: target을 추가한다. 이 target은 master HEAD를 릴리스한다.
   - 미리 확인하는 조건:
     - 현재 브랜치가 master다.
     - 작업 트리가 깨끗하다.
@@ -84,7 +84,7 @@ A를 고른 이유: B의 태그(특정 버전 고정, 롤백)와 C의 "ref 하�
   	echo "✅ v$$V released; stable → $$SHA"
   ```
   `sed`가 잡는 줄은 `pyproject.toml:7` 하나뿐이다(`^version = `로 시작하는 줄이 그것 하나다). recipe는 지금의 다른 target처럼 Git Bash `sh`에서 실행된다.
-- [ ] Step 2: 실제로 실행하지 않고 확인한다.
+- [x] Step 2: 실제로 실행하지 않고 확인한다.
   - `make -n release`가 recipe를 출력하는지 본다.
   - `awk '/^## \[/{n++; next} n==1' CHANGELOG.md | head -3`의 출력이 최신 절의 `### Added`로 시작하는지 본다.
 
@@ -92,25 +92,25 @@ A를 고른 이유: B의 태그(특정 버전 고정, 롤백)와 C의 "ref 하�
 
 **Files:** Modify: `README.md` (설치 1단계, Update 절)
 
-- [ ] Step 1: install 줄을 `uv tool install -p 3.13 git+https://github.com/ajitta/superclaude.git@stable`로 바꾸고, `stable`은 최신 릴리스라고 한 문장 적는다. 특정 버전을 고정하려면 `@stable` 대신 `@v<version>`을 쓰고, 버전 목록은 Releases 페이지에 있다고 덧붙인다. 버전 숫자는 새로 적지 않는다(gotcha `stale-number-copies`).
-- [ ] Step 2: Update 절의 주석을 `# pull the latest release`로 바꾼다.
+- [x] Step 1: install 줄을 `uv tool install -p 3.13 git+https://github.com/ajitta/superclaude.git@stable`로 바꾸고, `stable`은 최신 릴리스라고 한 문장 적는다. 특정 버전을 고정하려면 `@stable` 대신 `@v<version>`을 쓰고, 버전 목록은 Releases 페이지에 있다고 덧붙인다. 버전 숫자는 새로 적지 않는다(gotcha `stale-number-copies`).
+- [x] Step 2: Update 절의 주석을 `# pull the latest release`로 바꾼다.
 
 ### Task 1.3: README install URL 검사
 
 **Files:** Test: `tests/unit/test_version_consistency.py`
 
-- [ ] Step 1: README에 나오는 `git+https://github.com/ajitta/superclaude.git`의 모든 출현이 `@stable` 또는 `@v`로 끝나는지 검사한다. 첫 출현만 보지 않고 모든 출현을 본다(RULES_DOCS durability 규칙의 absence lint). 2단계 plugin 절처럼 나중에 URL을 복사해 넣는 경우를 잡기 위해서다. 테스트는 Task 1.2 전의 README로 먼저 실패하는 것을 확인한다.
+- [x] Step 1: README에 나오는 `git+https://github.com/ajitta/superclaude.git`의 모든 출현이 `@stable` 또는 `@v`로 끝나는지 검사한다. 첫 출현만 보지 않고 모든 출현을 본다(RULES_DOCS durability 규칙의 absence lint). 2단계 plugin 절처럼 나중에 URL을 복사해 넣는 경우를 잡기 위해서다. 테스트는 Task 1.2 전의 README로 먼저 실패하는 것을 확인한다.
 
 ### Task 1.4: 브랜치 문서
 
 **Files:** Modify: `CLAUDE.md` (:44), `AGENTS.md` (:69)
 
-- [ ] Step 1: 두 파일의 해당 줄을 `Branch: \`stable\` (release channel, moved only by \`make release\`) ← \`master\` ← \`feature/*\`, \`fix/*\`, \`docs/*\``로 바꾼다. 그 아래에 "Release: version-bump branch merged and green on master → `make release`" 한 줄을 둔다. 두 문장 모두 누군가 바꾸기 전까지 참이므로 항상 로드되는 문서에 두어도 된다.
+- [x] Step 1: 두 파일의 해당 줄을 `Branch: \`stable\` (release channel, moved only by \`make release\`) ← \`master\` ← \`feature/*\`, \`fix/*\`, \`docs/*\``로 바꾼다. 그 아래에 "Release: version-bump branch merged and green on master → `make release`" 한 줄을 둔다. 두 문장 모두 누군가 바꾸기 전까지 참이므로 항상 로드되는 문서에 두어도 된다.
 
 ### Task 1.5: 검증과 병합
 
-- [ ] `uv run pytest` exit 0, `make format`.
-- [ ] 커밋: `docs: install the latest release from the stable branch; add make release`.
+- [x] `uv run pytest` exit 0, `make format`.
+- [x] 커밋: `docs: install the latest release from the stable branch; add make release`.
 - [ ] `git checkout master && git merge --no-ff docs/release-channel -m "…"`를 한 명령으로 실행한다(gotcha `editable-tool-branch-switch`). push하고 Tests workflow가 green인지 확인한다.
 
 ## Phase 2: 4.20.1 bump, `+ajitta` 삭제 (브랜치 `chore/version-4.20.1`, 커밋 1개)
