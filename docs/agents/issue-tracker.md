@@ -2,7 +2,7 @@
 
 Issues and PRDs for this repo live as markdown files in `.scratch/`.
 
-GitHub issues are disabled on `ajitta/superclaude`.
+Do not open GitHub issues for `ajitta/superclaude`; `.scratch/` is the tracker.
 
 ## Conventions
 

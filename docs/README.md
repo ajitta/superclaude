@@ -8,7 +8,7 @@ User-facing documentation is the framework content itself — its SSOT lives in 
 - Agents — `src/superclaude/agents/README.md`
 - Modes / Skills / MCP / Core — `src/superclaude/{modes,skills,mcp}/` and `src/superclaude/core/`
 - Architecture — `src/superclaude/ARCHITECTURE.md`
-- Dev setup, test, make targets — repo-root `CLAUDE.md`
+- Dev setup, test — repo-root `AGENTS.md` (imported by `CLAUDE.md`); make targets — `make help`
 
 ## Layout
 
