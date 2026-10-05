@@ -51,7 +51,7 @@ Commits: `feat:`, `fix:`, `docs:`, `refactor:`, `test:`, `chore:`
 
 ### Issue tracker
 
-Issues live as local markdown under `.scratch/<feature>/` (fork has GitHub issues disabled). See `docs/agents/issue-tracker.md`.
+Issues live as local markdown under `.scratch/<feature>/` (GitHub issues are disabled). See `docs/agents/issue-tracker.md`.
 
 ### Triage labels
 
