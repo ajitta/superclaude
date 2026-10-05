@@ -1,5 +1,5 @@
 ---
-status: draft
+status: complete
 revised: 2026-10-05
 ---
 
@@ -129,14 +129,14 @@ A를 고른 이유: B의 태그(특정 버전 고정, 롤백)와 C의 "ref 하�
 
 ## Phase 3: 첫 릴리스 v4.20.1
 
-- [ ] master HEAD가 4.20.1 bump 병합이고 CI가 green인 상태에서 `make release`를 실행한다.
+- [x] master HEAD가 4.20.1 bump 병합이고 CI가 green인 상태에서 `make release`를 실행한다.
   - `gh release view v4.20.1`의 본문이 CHANGELOG 4.20.1 절과 같은지 본다.
   - `git ls-remote origin stable`이 HEAD와 같은지 본다.
-- [ ] scratch `UV_TOOL_DIR`/HOME에서 확인한다(1단계 Task 1.1과 같은 격리 방식).
+- [x] scratch `UV_TOOL_DIR`/HOME에서 확인한다(1단계 Task 1.1과 같은 격리 방식).
   - `uv tool install -p 3.13 git+https://github.com/ajitta/superclaude.git@stable`의 `direct_url.json` `commit_id`가 릴리스 커밋이고, `superclaude --version`이 `4.20.1`이다.
   - `superclaude install --scope user`, `doctor`, `verify-drift`가 통과한다.
   - `uv tool upgrade superclaude`가 커밋을 바꾸지 않는다.
-- [ ] `@v4.20.1`로 한 번 더 설치해서 태그로 고정하는 경로도 확인한다.
+- [x] `@v4.20.1`로 한 번 더 설치해서 태그로 고정하는 경로도 확인한다.
 
 ## 위험
 
