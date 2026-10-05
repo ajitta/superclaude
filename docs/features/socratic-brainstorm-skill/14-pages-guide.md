@@ -1,5 +1,5 @@
 ---
-status: draft
+status: complete
 revised: 2026-10-05
 ---
 
@@ -13,7 +13,15 @@ Proposal to add a section to https://ajitta.github.io/superclaude/ that explains
 /plugin install socratic-elenchus@ajitta-socratic
 ```
 
-Not applied yet. §5 is the drop-in HTML.
+**Applied 2026-10-05** as `<section id="plugins">`, with these changes from §5 because the page changed after this proposal was written:
+
+- **Separate-from-the-framework sentence:** the Install section no longer starts with `git clone` (it installs uv, then the CLI from `@stable`), so "no clone, no `make deploy`" became "you install them inside Claude Code, without uv or the `superclaude` CLI".
+- **Commands:** the `<pre>` block and `.scope-strip` class are gone from the page. Each command is its own copyable row (`.cmd`), in three numbered steps like the Install section: add the marketplace, install one plugin or both, use it.
+- **Plugin entries:** the bare-name labels became copyable `/socratic-brainstorm:socratic-brainstorm` and `/socratic-elenchus:socratic-elenchus` rows, with the `plugin:skill` explanation above them.
+- **Layout:** `.install .wrap` is one column now, so the section is too. Anchor and nav link are `#plugins` / "Plugins" (§4 said `#skills`), matching the terminology rule in §3.
+- **Re-checked before applying:** no commits to `.claude-plugin/` or `portable-skills/` since this proposal; versions brainstorm 3.2.0, elenchus 1.2.0; manifest copies equal; `claude plugin validate .` passes.
+
+§5 below is the original proposal, kept as written.
 
 ## 1. What was checked (2026-10-05)
 
@@ -58,7 +66,7 @@ Three things look inconsistent from outside that table:
 
 `ajitta-socratic` says the marketplace does not install the framework; its description states "The SuperClaude framework itself is installed with the superclaude CLI, not from this marketplace". Renamed to `superclaude`, `@superclaude` would read as the framework. Anyone who added the marketplace since 2026-10-03 has plugin IDs ending in `@ajitta-socratic` and might have to reinstall after a rename. How Claude Code matches a renamed marketplace to existing installs was not checked.
 
-**Open dependency:** the draft plan `docs/features/plugin-install/05-plan.md` (2026-10-05, uncommitted when this was written) adds an `sc` plugin to this same marketplace and rewrites its description. If it ships, the first reason above no longer holds and `sc@ajitta-socratic` widens the mismatch. That plan also keeps the name, for the same reinstall reason. Settle the name there before either change ships.
+**Open dependency:** (stage 2 of that plan is on hold as of 2026-10-05) the draft plan `docs/features/plugin-install/05-plan.md` (2026-10-05, uncommitted when this was written) adds an `sc` plugin to this same marketplace and rewrites its description. If it ships, the first reason above no longer holds and `sc@ajitta-socratic` widens the mismatch. That plan also keeps the name, for the same reinstall reason. Settle the name there before either change ships.
 
 ### Why keep the repeated name
 
