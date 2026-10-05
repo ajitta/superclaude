@@ -68,14 +68,10 @@ Claude Code reads those files at session start, which is how the framework chang
 #### **1. Install the CLI**
 
 ```bash
-git clone https://github.com/ajitta/superclaude.git
-cd superclaude
-
-# Editable uv tool install — `superclaude` becomes available globally.
-make deploy
-# Equivalent without make:
-# uv tool install --force --editable .
+uv tool install -p 3.13 git+https://github.com/ajitta/superclaude.git
 ```
+
+No clone needed. If your shell then can't find `superclaude`, run `uv tool update-shell` and open a new terminal. Working on SuperClaude itself? See *For contributors/developers* below.
 
 #### **2. Install framework content with `superclaude install`**
 
@@ -141,6 +137,7 @@ Restart Claude Code, then try a few:
 #### **Update**
 
 ```bash
+uv tool upgrade superclaude            # pull the latest CLI + content from git
 superclaude update                     # default: --scope user
 superclaude update --scope project     # (update takes --scope only; use `install --force` to re-copy everything)
 ```
@@ -156,6 +153,7 @@ superclaude uninstall --scope local    # also removes CLAUDE.local.md + its .git
 superclaude uninstall --keep-settings  # leave settings.json hooks alone
 superclaude uninstall --remove-mcp     # also unregister framework-installed MCP servers
                                        #   (default keeps them — they're shared with other tools)
+uv tool uninstall superclaude          # finally, remove the CLI itself
 ```
 
 The uninstall is marker-based: it removes only the hooks and the `@superclaude/CLAUDE_SC.md` import that the installer wrote. User-added hooks, MCP servers, and CLAUDE.md content are preserved unless you explicitly opt out.
@@ -176,6 +174,8 @@ The uninstall is marker-based: it removes only the hooks and the `@superclaude/C
 **For contributors/developers:**
 ```bash
 # Initial setup (editable mode for development)
+git clone https://github.com/ajitta/superclaude.git
+cd superclaude
 uv pip install -e ".[dev]"
 
 # Development cycle
