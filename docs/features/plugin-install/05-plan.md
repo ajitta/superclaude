@@ -58,7 +58,7 @@ revised: 2026-10-05
 
 ## Phase 0: 1단계 브랜치
 
-- [ ] master에서 `git switch -c docs/uv-tool-install`. 이 계획 문서(현재 untracked)와 feature README는 Phase 1 커밋에 함께 넣는다.
+- [x] master에서 `git switch -c docs/uv-tool-install`. 이 계획 문서(현재 untracked)와 feature README는 Phase 1 커밋에 함께 넣는다.
 
 ## Phase 1: CLI만 설치 (README, 커밋 1개)
 
@@ -66,7 +66,7 @@ revised: 2026-10-05
 
 코드를 바꾸지 않는 단계다. 실제 dev tool 설치와 `~/.claude`를 건드리지 않도록 tool 디렉터리와 HOME을 scratchpad로 돌린다(gotcha `sync-scope-creates`, `venv-inherited-by-worktree`). Windows의 `Path.home()`은 `USERPROFILE`을 읽으므로 둘 다 설정한다.
 
-- [ ] Step 1: 설치와 content 배치를 확인한다.
+- [x] Step 1: 설치와 content 배치를 확인한다.
   ```bash
   S=<scratchpad>; export UV_TOOL_DIR="$S/tools" UV_TOOL_BIN_DIR="$S/bin"
   uv tool install -p 3.13 "git+file:///C:/Users/ajitta/Repos/ajitta/superclaude@master"
@@ -78,26 +78,28 @@ revised: 2026-10-05
   env HOME="$H" USERPROFILE="$H" PATH="$S/bin:$PATH" superclaude doctor --scope user
   env HOME="$H" USERPROFILE="$H" PATH="$S/bin:$PATH" superclaude verify-drift --scope user
   ```
-- [ ] Step 2: `uv tool upgrade superclaude`가 git source에서 동작하는지 확인한다.
-- [ ] Step 3: 하나라도 실패하면 README를 고치기 전에 원인을 찾아 이 계획에 Task를 추가한다. 예상 원인은 hatchling이 `.gitignore`를 따르면서 빠지는 파일이다.
+- [x] Step 2: `uv tool upgrade superclaude`가 git source에서 동작하는지 확인한다.
+- [x] Step 3: 하나라도 실패하면 README를 고치기 전에 원인을 찾아 이 계획에 Task를 추가한다. 예상 원인은 hatchling이 `.gitignore`를 따르면서 빠지는 파일이다.
 
 ### Task 1.2: README 설치 절
 
 **Files:** Modify: `README.md` (:62-105 설치, :141-146 Update, Uninstall 절, :176-205 기여자 절), `.github/workflows/test.yml` (:17)
 
-- [ ] Step 1:
+- [x] Step 1:
   - "1. Install the CLI"를 `uv tool install -p 3.13 git+https://github.com/ajitta/superclaude.git`로 바꾼다. `superclaude`를 찾을 수 없으면 `uv tool update-shell`을 실행하라고 덧붙인다(설치기가 이미 같은 안내를 출력함, `install_components.py:337-340`).
   - Update 절: `uv tool upgrade superclaude` 다음 `superclaude update --scope <s>`.
   - Uninstall 절 끝에 `uv tool uninstall superclaude`.
   - `git clone` + `make deploy`는 기여자 절로만 옮긴다.
   - `4.20.0+ajitta` 문자열과 36/23 개수 표기는 그대로 둔다(`test_version_consistency.py:153`, README count lint).
-- [ ] Step 2: `.github/workflows/test.yml:17` matrix에 `"3.13"`을 추가한다. README가 `-p 3.13`을 안내하므로 그 버전을 CI가 검사해야 한다. lint job(:68, `"3.10"`)은 바꾸지 않는다.
-- [ ] Step 3: `uv run pytest`가 exit 0인지 확인한다.
-- [ ] Step 4: `make format` 후 커밋한다: `docs: install the CLI from git with uv tool, no clone needed`. matrix 변경도 같은 커밋에 넣고, 본문에 3.13을 추가한 이유를 한 줄 적는다.
+- [x] Step 2: `.github/workflows/test.yml:17` matrix에 `"3.13"`을 추가한다. README가 `-p 3.13`을 안내하므로 그 버전을 CI가 검사해야 한다. lint job(:68, `"3.10"`)은 바꾸지 않는다.
+- [x] Step 3: `uv run pytest`가 exit 0인지 확인한다.
+- [x] Step 4: `make format` 후 커밋한다: `docs: install the CLI from git with uv tool, no clone needed`. matrix 변경도 같은 커밋에 넣고, 본문에 3.13을 추가한 이유를 한 줄 적는다.
 - [ ] Step 5: `git checkout master && git merge --no-ff docs/uv-tool-install -m "…"`를 한 명령으로 실행하고 push한 뒤 CI를 확인한다(gotcha `editable-tool-branch-switch`). 3.13 job이 새로 생기므로 Python 4개 버전 job이 모두 green이어야 한다. 3.13에서만 실패하면 README의 `-p`를 CI가 통과한 가장 높은 버전으로 낮추고 원인을 따로 기록한다.
 - [ ] Step 6: push 뒤 실제 `git+https://github.com/ajitta/superclaude.git`로 Task 1.1 Step 1을 한 번 더 실행한다.
 
 ## Phase 2: plugin 모드 hook 런타임 (브랜치 `feature/sc-plugin`, 커밋 1개)
+
+> 2026-10-05 사용자 결정: 2단계(Phase 2~5, plugin 모드)는 보류한다. 1단계만 진행했다.
 
 - [ ] master에서 `git switch -c feature/sc-plugin`.
 
