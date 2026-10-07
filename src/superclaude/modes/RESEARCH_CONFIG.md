@@ -48,12 +48,12 @@ planning: objectives+strategy+criteria | execution: ≥3 independent sources, no
   </gates>
 
   <credibility>
-| Tier | Score | Sources |
-|------|-------|---------|
-| 1 | 0.9-1.0 | Academic, Gov, Official, Peer-reviewed |
-| 2 | 0.7-0.9 | Established media, Industry, Expert |
-| 3 | 0.5-0.7 | Community, Wikipedia, Verified social |
-| 4 | 0.3-0.5 | Forums, Unverified, Personal blogs |
+| Tier | Sources |
+|------|---------|
+| 1 | Academic, Gov, Official, Peer-reviewed |
+| 2 | Established media, Industry, Expert |
+| 3 | Community, Wikipedia, Verified social |
+| 4 | Forums, Unverified, Personal blogs |
   </credibility>
 
   <depth_profiles>
