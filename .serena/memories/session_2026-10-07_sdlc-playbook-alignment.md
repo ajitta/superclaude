@@ -9,7 +9,7 @@ Branch `docs/intent-command-plan` off master 04b55604, 10 commits 81fcb509..c011
 - Decided: `/sc:intent` is a separate command, not a brainstorm flag — brainstorm reinterprets; intent captures verbatim before analysis.
 - Ruled out (R18): evals in CI, auto-mode/permissions.allow guidance, REVIEW.md policy file, PR babysit loop, metrics tooling, org policy-skill slot, test_runner_hook narrowing, Maintain→intent loop.
 - Reversed: the test_file_guard hook (test-file lock during /sc:troubleshoot --fix) was built, reviewed and then removed at the user's decision — a hook whose trigger depends on language/layout conventions is worse than a prose rule ("모델의 능력이 프로즈 규칙으로 통할거라고 예상"). Only the `fix-not-test` gotcha + "commit the failing test" step remain in troubleshoot.md. Do not re-propose.
-- Cost decision: release gate = `make canary-gates` (4 hard-gate tasks: destructive-elicitation, poisoned-readme, problem-statement-not-request, conflicting-constraints; sonnet default; `--effort low`), triggered only by `src/superclaude/core` or `hooks.json` changes; the full 14-task canary is for model releases only; never Fable headless (bills usage credits).
+- Cost decision: release gate = `make canary-gates` (4 hard-gate tasks: destructive-elicitation, poisoned-readme, problem-statement-not-request, conflicting-constraints; sonnet default; `--effort low`), triggered only by `src/superclaude/core` or `hooks.json` changes; the full `--canary` suite is for model releases only; never Fable headless (bills usage credits).
 
 ## Shipped (commit → content)
 
@@ -29,8 +29,8 @@ Branch `docs/intent-command-plan` off master 04b55604, 10 commits 81fcb509..c011
 ## Open / next
 
 - Merge `docs/intent-command-plan` to master, push.
-- Version bump 4.22.0: CHANGELOG `### Added` (intent, verifier, --permission-mode, plan/design/review gate edits, fix-not-test, CANARY_OK gate, gotcha budget) — test_version_consistency accepts only dated release headings equal to pyproject, so this lands in the bump commit; close intent-command plan Task 6 and set both feature READMEs to `phase: complete`.
-- Before release: `make canary-gates` (first real run; also try `--permission-mode auto` once to measure prose-gate survival), then `CANARY_OK=1 make release`.
-- Optional: use `/sc:intent` once on a real Large task — the Save path (file + README) was never exercised headlessly.
+- Version bump 4.22.0: CHANGELOG `### Added` (intent, verifier, --permission-mode, plan/design/review gate edits, fix-not-test, CANARY_OK gate, gotcha budget) — test_version_consistency accepts only dated release headings equal to pyproject, so this lands in the bump commit; close intent-command plan Task 6 and the sdlc-playbook-alignment README; the intent-command plan and README stay `implementing` until Task 7 Step 4 has run.
+- Before release: `make canary-gates EVAL_ARGS="--runs-dir C:/tmp/sc-evals/gate-1"` (first real run; in-session the default runs dir is refused), optionally once more with `--permission-mode auto` and a new dir, then `CANARY_OK=1 make release`.
+- Prerequisite for closing intent-command: run `/sc:intent` once interactively on a Large task (Save path: file + README), record it in 05-plan Proof, check Task 7 Step 4, then set plan `status: complete` and README `phase: complete`.
 
 Related: `mem:session_2026-10-07_prompt-audit-verify-and-merge` (earlier today, 4.21.0 release).

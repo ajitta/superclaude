@@ -13,7 +13,7 @@ description: Review work product (code, plan, design, spec) for quality, correct
   <flow>
   1. Scope: pick review range — PR/diff/file/branch for code, or plan/design/spec doc path
   2. Gather: read target artifact + related context (spec/plan if reviewing code; parent spec if reviewing plan; requirements if reviewing design; `00-intent.md` from the feature folder when present). Find in docs/specs/ or docs/plans/ if present
-  3. Review-2D: Dim 1 (spec fidelity) — artifact match intent (the feature's `00-intent.md` when present, else the spec)? Dim 2 (artifact quality) — correctness for code, planning rigor for plan, architectural soundness for design, requirement coverage for spec. Dim 3 (always-loaded docs) — did the change make CLAUDE.md, AGENTS.md or `.claude/rules/**` stale (a command, path, count or convention they state)? Report as a finding. No spec → weight shift to Dim 2
+  3. Review: Dim 1 (spec fidelity) — artifact match intent (the spec, and the feature's `00-intent.md` when present)? Dim 2 (artifact quality) — correctness for code, planning rigor for plan, architectural soundness for design, requirement coverage for spec. Dim 3 (always-loaded docs) — did the change make CLAUDE.md, AGENTS.md, `.claude/rules/**` or any file the session-start import chain pulls in stale (a command, path, count or convention they state)? Report as a finding. No spec → weight shift to Dim 2
   4. Challenge: before categorize, answer plain — What condition make approach fail? What gap easy to miss? What hardest to change 6 months from now?
   5. Categorize: group finding as Critical (must fix) | Important (should fix) | Suggestion (nice to have)
   6. Verify: evidence fit artifact type — tests+lint for code, executability+completeness for plan, trade-off rationale for design, acceptance criteria for spec
@@ -56,7 +56,7 @@ description: Review work product (code, plan, design, spec) for quality, correct
   | `/sc:review src/auth/` | Review all files in auth directory |
   | `/sc:review --scope plan docs/plans/foo.md` | Review plan doc: traceability + gaps + dependencies |
   | `/sc:review --scope design docs/specs/bar.md` | Review design: goal fit + trade-offs + architectural gaps |
-  | `/sc:review --scope branch --structured` | 2D review with subagent dispatch |
+  | `/sc:review --scope branch --structured` | Review with subagent dispatch |
 
   <example name="pushback-protocol" type="info">
     When review finding wrong, push back with evidence:
@@ -73,7 +73,7 @@ description: Review work product (code, plan, design, spec) for quality, correct
   </gotchas>
 
   <bounds>
-    <does>work-product review (code/plan/design/spec), quality analysis, security scan, 2D spec+quality review.</does>
+    <does>work-product review (code/plan/design/spec), quality analysis, security scan, spec+quality review plus a staleness check on always-loaded docs.</does>
     <never>auto-merge, auto-approve, modify artifact without explicit permission.</never>
     <fallback>No spec: weight review toward artifact quality dim.</fallback>
   </bounds>

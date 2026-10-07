@@ -9,7 +9,7 @@ scope: src/superclaude
 
 ## 1. 현재 스냅샷
 
-`5b6dc5b` 소스 트리에서 캐시와 README를 제외해 센 결과다. 이 표는 구성요소
+현재 소스 트리에서 캐시와 README를 제외해 센 결과다. 이 표는 구성요소
 인벤토리의 단일 기재 위치이며, 다른 문서는 값을 복사하지 않고 이 절을 가리킨다.
 `tests/unit/test_codex_component_map.py`가 소스에서 직접 세어 이 표와 대조한다.
 

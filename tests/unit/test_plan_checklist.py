@@ -13,7 +13,8 @@ import pytest
 
 _REPO = Path(__file__).resolve().parents[2]
 _PLAN_GLOBS = ("docs/features/*/*plan*.md", "docs/plans/*.md")
-_STATUS = re.compile(r"^status:\s*(\S+)", re.M)
+_FRONTMATTER = re.compile(r"\A---\n(.*?)\n---\n", re.S)
+_STATUS = re.compile(r"^status:\s*['\"]?([A-Za-z-]+)", re.M)
 _OPEN_BOX = re.compile(r"^\s*- \[ \]", re.M)
 
 
@@ -24,19 +25,30 @@ def _plan_docs() -> list[Path]:
     return found
 
 
+def _complete_plans() -> list[Path]:
+    """Filter at collection so plans still in progress add no skips."""
+    complete = []
+    for plan in _plan_docs():
+        frontmatter = _FRONTMATTER.match(plan.read_text(encoding="utf-8"))
+        status = frontmatter and _STATUS.search(frontmatter.group(1))
+        if status and status.group(1).lower() == "complete":
+            complete.append(plan)
+    return complete
+
+
 @pytest.mark.parametrize(
-    "plan", _plan_docs(), ids=lambda p: str(p.relative_to(_REPO)).replace("\\", "/")
+    "plan",
+    _complete_plans(),
+    ids=lambda p: str(p.relative_to(_REPO)).replace("\\", "/"),
 )
 def test_complete_plan_has_no_open_checkbox(plan: Path):
     text = plan.read_text(encoding="utf-8")
-    status = _STATUS.search(text)
-    if not status or status.group(1) != "complete":
-        pytest.skip("not a completed plan")
     open_boxes = len(_OPEN_BOX.findall(text))
     assert open_boxes == 0, (
         f"{plan.relative_to(_REPO)} is `status: complete` but has {open_boxes} "
-        "unchecked task box(es) — check the box the code backs, or record the "
-        "departure under `## Deviations` and leave status at `implementing`"
+        "unchecked task box(es) — check the box the code backs, mark a task "
+        "dropped by decision `- [x] ~~task~~` with its reason under "
+        "`## Deviations`, or leave status at `implementing`"
     )
 
 

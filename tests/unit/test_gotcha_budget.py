@@ -35,6 +35,21 @@ def test_every_gotcha_entry_within_budget(path: Path):
     )
 
 
+@pytest.mark.parametrize(
+    "path",
+    [p for p in sorted(_GOTCHAS.glob("*.md")) if p.name != "README.md"],
+    ids=lambda p: p.name,
+)
+def test_every_list_line_is_a_measured_entry(path: Path):
+    """A `- ` line whose name falls outside _ENTRY would skip the budget."""
+    stray = [
+        line[:40]
+        for line in path.read_text(encoding="utf-8").splitlines()
+        if line.startswith("- ") and not _ENTRY.match(line)
+    ]
+    assert not stray, f"{path.name}: lines not in `- name: ` form: {stray}"
+
+
 def test_budget_is_stated_in_readme():
     text = (_GOTCHAS / "README.md").read_text(encoding="utf-8")
     assert f"{ENTRY_BUDGET} characters" in text, (

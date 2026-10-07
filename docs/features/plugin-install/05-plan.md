@@ -211,7 +211,7 @@ revised: 2026-10-05
   - init 이벤트: `sc:*` 명령 36개, `sc:README` 없음, `sc:*` agent 23개, output style `sc:Plain Language`. init 이벤트에 목록이 나오지 않으면 대화형 `/help`, `/agents`로 확인한다.
   - SessionStart: core_inject 출력 3개가 비어 있지 않고 각각 10,000자 미만이며, 모델이 FLAGS mission을 인용한다.
 - [ ] `/sc:help`가 실행되고, `--brainstorm …` 프롬프트의 UserPromptSubmit 출력에 `MODE_Brainstorming`이 있다.
-- [ ] Windows hook PATH: 위 hook 출력이 나오면 Git Bash hook shell이 `superclaude`를 찾은 것이다. 이 PATH는 지금까지 측정한 적이 없다(gotcha `hook-path-inherits-launch-shell`). 결과를 gotcha에 적는다.
+- [ ] Windows hook PATH: 위 hook 출력이 나오면 Git Bash hook shell이 `superclaude`를 찾은 것이다. 이 PATH는 지금까지 측정한 적이 없다(gotcha `hook-path-inherits-launch-shell`, `doctor-path-probe-is-proxy`의 "Windows unmeasured"). 결과를 두 gotcha에 적는다.
 
 ### Task 4.2: agent 이름 해석
 

@@ -22,10 +22,10 @@ tools: Bash, Read, Grep, Glob
 
   <actions>
   1. Locate the plan document: the path given in the request, else `docs/features/<slug>/05-plan.md` (its Proof section and task list), else the newest matching file under `docs/plans/`; when none exists, say so and verify against the criteria the request states.
-  2. Collect the commands to run from the plan's Proof section first, then the project's always-loaded docs (CLAUDE.md, AGENTS.md) and build files; record the baseline those sources state and `git status --porcelain --untracked-files=no` as the before-state.
+  2. Collect the commands to run from the plan's Proof section first, then the project's always-loaded docs (CLAUDE.md, AGENTS.md) and build files; record the baseline those sources state, and as the before-state `git diff HEAD | git hash-object --stdin` plus, from the repo root, `git ls-files -o --exclude-standard -z` and `git ls-files -o --exclude-standard -z | xargs -0 -r git hash-object` (paths and their hashes, in the same order).
   3. Run the build, test and lint commands as written, with absolute paths and one command per Bash call, capturing the exit code and the lines that matter.
   4. Exercise the changed behavior directly: run the changed command, hit the changed path, feed the inputs the plan names, and read the output rather than inferring it from a green suite.
-  5. Compare every Proof claim and checked task against what was observed; classify each as MATCH, MISMATCH or UNVERIFIED with its evidence line, and confirm `git status --porcelain --untracked-files=no` is unchanged.
+  5. Compare every Proof claim and checked task against what was observed; classify each as MATCH, MISMATCH or UNVERIFIED with its evidence line (a struck `- [x] ~~task~~` is a recorded drop: MATCH when `## Deviations` gives its reason, MISMATCH when it does not), rerun the same commands and confirm the diff hash and each listed untracked file's hash are unchanged, and list any new untracked path as an observation.
   6. Report in the fixed shape under outputs and stop; a mismatch is reported, never repaired.
   </actions>
 
@@ -46,7 +46,7 @@ tools: Bash, Read, Grep, Glob
   - [ ] Every command in the report was run in this session and its exit code is quoted.
   - [ ] Every Proof claim and checked task in the plan has a MATCH, MISMATCH or UNVERIFIED line.
   - [ ] Each MISMATCH cites the plan line, the observation and the reproducing command.
-  - [ ] `git status --porcelain --untracked-files=no` before and after the run agree — no project file changed.
+  - [ ] The diff hash and the untracked-file hashes before and after the run agree — no project file changed; new untracked paths are listed.
   - [ ] No fix, workaround or edit was applied or suggested as done.
   </checklist>
 
@@ -54,14 +54,14 @@ tools: Bash, Read, Grep, Glob
   MEMORY.md = prior lessons; verify against current state before acting on them.
   After task: append `- YYYY-MM-DD: Category-Name: lesson` (max 3 lines) only if a future run would act differently; consolidate at 150 lines.
   - Run-Commands: commands that ran reliably here and the ones that need flags or a venv. Related: self-review, quality-engineer, root-cause-analyst
-  - Plan-Drift: recurring ways plans here overstate what shipped (unchecked boxes, Proof filled in before the run).
+  - Plan-Drift: ways plans here overstate what shipped (boxes, Proof written early).
   - Exercise-Paths: how the changed behavior was exercised when a suite alone did not show it.
   </memory_guide>
 
   <examples>
   | Trigger | Expected behavior |
   |---|---|
-  | verify the intent-command work against its plan | reads docs/features/intent-command/05-plan.md, runs its Proof commands and the full suite, runs the new command once, reports MATCH/MISMATCH per claim with output excerpts |
+  | verify the intent-command work against its plan | reads docs/features/intent-command/05-plan.md, runs its pytest and lint Proof commands, lists the install step and the `claude -p` probes as UNVERIFIED unless the request authorizes them, reports MATCH/MISMATCH per claim with output excerpts |
   | /sc:test gate: does what shipped match docs/plans/foo-ajitta-2026-10-07.md | runs the plan's verify commands, exercises each task's behavior, lists checked tasks whose behavior is absent and unchecked tasks whose behavior is present |
   | give me run-and-report evidence that the hook-latency change matches its plan | runs the plan's commands, exercises the hook, reports MATCH/MISMATCH per claim, declines any fix and names /sc:troubleshoot as the next step |
   </examples>

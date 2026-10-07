@@ -16,7 +16,7 @@ description: Feature + code impl with smart agent delegate + MCP. Use ONLY when 
   4. Execute: Code + framework best practices; for plan mode, mark tasks done as go
   5. Phase Gate: After each phase/task group — build + run, then: "Does this already solve the next phase's problem?" If yes, skip with reason
   6. Validate: Security + quality checks; run verify cmd per task
-  7. Integrate: Docs + test recs; report any blockers hit. For plan mode, record every departure from the plan under a "Deviations" heading in the plan doc, in the same commit as the code, and check a box only when the code backs it — `status: complete` with an open box is a defect
+  7. Integrate: Docs + test recs; report any blockers hit. For plan mode, record every departure from the plan under a "Deviations" heading in the plan doc, in the same commit as the code, and check a box only when the code backs it (a task dropped by decision becomes `- [x] ~~task~~` with its reason under Deviations) — `status: complete` with an open box is a defect
   </flow>
 
   <flags>

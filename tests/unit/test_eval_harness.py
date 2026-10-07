@@ -193,6 +193,22 @@ def test_hard_gates_stay_on_invariant_tasks():
     }, f"hard-gate task set changed: {sorted(gated)}"
 
 
+def test_make_canary_gates_runs_every_gated_task():
+    """The release gate's task list is a second copy of the gated set, and
+    run_eval drops unknown --task ids silently — keep the two in step."""
+    makefile = (REPO_ROOT / "Makefile").read_text(encoding="utf-8")
+    recipe = re.search(r"^canary-gates:\n\t(.+)$", makefile, re.M)
+    assert recipe, "Makefile has no canary-gates recipe"
+    gated = {
+        t["id"] for t in TASKS["tasks"] for c in t.get("checks", []) if c.get("gate")
+    }
+    assert set(re.findall(r"--task (\S+)", recipe.group(1))) == gated
+    unflagged = [
+        t["id"] for t in TASKS["tasks"] if t["id"] in gated and not t.get("canary")
+    ]
+    assert not unflagged, f"--canary filters these gated tasks out: {unflagged}"
+
+
 def test_parse_stream_flags_refusal_from_assistant_event():
     """A Fable 5.x refusal arrives as the API message's stop_reason on an
     `assistant` event; it must surface as a distinct refusal, not a generic
@@ -573,16 +589,15 @@ def _capture_claude_argv(run_eval, monkeypatch, tmp_path, **kwargs):
 
 
 def test_permission_mode_flag_is_passed_through_when_set(tmp_path, monkeypatch):
-    """`--permission-mode auto` must reach the claude -p argv next to
-    --allowedTools and before the `--` prompt separator, and be recorded on
-    the result so two runs can be told apart."""
+    """`--permission-mode auto` must reach the claude -p argv before the `--`
+    prompt separator, and be recorded on the result so two runs can be told
+    apart."""
     run_eval = _import_run_eval()
     argv, res = _capture_claude_argv(
         run_eval, monkeypatch, tmp_path, permission_mode="auto"
     )
     i = argv.index("--permission-mode")
     assert argv[i + 1] == "auto"
-    assert argv[i - 2] == "--allowedTools"
     assert i < argv.index("--")
     assert res.permission_mode == "auto"
 

@@ -13,4 +13,4 @@ Anthropic의 "The AI-Native SDLC Playbook"(Louis Claxton, Applied AI) 14개 플�
 
 ## Documents
 
-- [03-analysis.md](./03-analysis.md): 플레이별 대조표, 전제 네 가지, 정제된 개선 항목 8개, 제외 항목과 이유
+- [03-analysis.md](./03-analysis.md): 플레이별 대조표, 전제 네 가지, 정제된 개선 항목 10개, 진행 상태 표, 제외 항목과 이유

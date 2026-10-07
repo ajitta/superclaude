@@ -179,7 +179,7 @@ TRIGGER_MAP = [
         1,
     ),
     (
-        r"(/sc:(document|plan|design|brainstorm|roadmap|index|index-repo|estimate|save|research|promote-feature)|implementation plan|design spec|write.{0,12}(plan|spec))",
+        r"(/sc:(analyze|document|plan|design|brainstorm|intent|roadmap|index|index-repo|estimate|save|research|promote-feature)|/sc:cleanup\b.*--type\s+(docs|all)|implementation plan|design spec|write.{0,12}(plan|spec))",
         "core/rules/RULES_DOCS.md",
         1,
     ),

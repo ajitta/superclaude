@@ -314,6 +314,28 @@ class TestCoreLiteSplit:
             "core/rules/ modules and TRIGGER_MAP routing out of sync"
         )
 
+    def test_doc_writing_commands_load_rules_docs(self):
+        """A command that hands doc naming to RULES_DOCS <doc_output_convention>
+        must get that module injected, or its Save step runs without the rules
+        (/sc:intent shipped that way)."""
+        # cleanup writes files only in its docs pass, which --type all includes
+        extra = {"cleanup": (" --type docs", " --type all")}
+        commands = sorted((SOURCE_TREE / "commands").glob("*.md"))
+        citing = [
+            md.stem
+            for md in commands
+            if md.stem != "README"
+            and "doc_output_convention" in md.read_text(encoding="utf-8")
+        ]
+        assert "intent" in citing, "command scan found no doc writers"
+        for name in citing:
+            for suffix in extra.get(name, ("",)):
+                prompt = f"/sc:{name} target{suffix}"
+                routed = {path for p, path, _pr in TRIGGER_MAP if p.search(prompt)}
+                assert "core/rules/RULES_DOCS.md" in routed, (
+                    f"{prompt!r} does not inject RULES_DOCS"
+                )
+
     def test_rule_modules_inject_full_md(self):
         """Rule modules carry behavioral content — must stay Tier 2 (full .md),
         never silently downgraded to instruction-string tiers."""

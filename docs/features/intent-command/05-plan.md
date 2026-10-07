@@ -7,7 +7,7 @@ revised: 2026-10-07
 
 **Goal:** 요청을 분석 전에 요청자의 표현 그대로 다섯 항목으로 기록하는 `/sc:intent` 커맨드를 추가하고, brainstorm·review·reflect가 그 파일을 의도의 원본으로 읽게 한다.
 
-**Architecture:** 커맨드는 `src/superclaude/commands/intent.md` 한 파일이다(XML 컴포넌트, 플래그 없음). 산출물은 `docs/features/<slug>/00-intent.md`이며 RULES_DOCS의 phase prefix 체계 맨 앞에 `00-intent`를 추가한다. 소비자는 세 커맨드의 flow 한 줄씩이다. 커맨드 이름은 디스크에서 읽히므로(`context_loader._known_command_names`) 레지스트리 등록은 없고, README의 커맨드 수와 컴포넌트 맵의 수만 갱신한다.
+**Architecture:** 커맨드는 `src/superclaude/commands/intent.md` 한 파일이다(XML 컴포넌트, 플래그 없음). 산출물은 `docs/features/<slug>/00-intent.md`이며 RULES_DOCS의 phase prefix 체계 맨 앞에 `00-intent`를 추가한다. 소비자는 세 커맨드의 flow 한 줄씩이다. 커맨드 이름은 디스크에서 읽히므로(`context_loader._known_command_names`) 레지스트리 등록은 없고, README의 커맨드 수와 컴포넌트 맵의 수만 갱신한다(예외는 Deviations의 RULES_DOCS 트리거).
 
 **Tech Stack:** Markdown + XML 컴포넌트, pytest 구조 테스트(`test_command_structure.py`, `test_cross_references.py`, `test_version_consistency.py`), `superclaude install --force --scope local`.
 
@@ -23,7 +23,7 @@ Out (R18 미통과, 별도 결정 필요): `--from <ticket|file>` 플래그, sta
 - 트리거 티어는 explicit-only. 커밋 산출물을 쓰므로 command-authoring 규칙의 "writes committed artifacts → explicit-only"에 해당한다.
 - 플래그 없음. `<syntax>`는 `/sc:intent [request]`뿐이라 `<flags>` 섹션도 두지 않는다.
 - Feature README `phase` enum에 `intent`를 추가한다(discovery 앞). 00-intent만 있는 폴더의 phase가 `discovery`로 표시되는 거짓말을 피하기 위해서다.
-- 적용 티어: Large 체인 필수, Medium 선택, Trivial·Small 해당 없음. README 티어 표는 Large 행과 전체 체인 다이어그램만 바꾼다.
+- 적용 티어: Large 체인 필수, Medium 선택, Trivial·Small 해당 없음. README는 티어 표의 Large 행과 Medium 행 주석, 전체 체인 다이어그램, 하드 게이트 표 한 행을 바꾼다.
 
 ## Risks
 
@@ -78,7 +78,7 @@ Out (R18 미통과, 별도 결정 필요): `--from <ticket|file>` 플래그, sta
 - [x] Step 1: phase prefix 목록 맨 앞에 `00-intent (intent)` 추가
 - [x] Step 2: Feature README phase enum을 `intent | discovery | design | planning | implementing | complete | abandoned`로
 - [x] Step 3: workflow_gates 첫 줄에 `/sc:intent -> /sc:brainstorm | /sc:plan: User approves the intent text in their own words; file committed before analysis starts` 추가
-- [x] Step 4: promote-feature 매핑에 `intent→00-intent.md` 추가
+- [x] ~~Step 4: promote-feature 매핑에 `intent→00-intent.md` 추가~~ (철회, Deviations)
 - [x] Step 5: 관련 테스트 green
 
 ### Task 4: 소비자 세 곳
@@ -105,8 +105,20 @@ Out (R18 미통과, 별도 결정 필요): `--from <ticket|file>` 플래그, sta
 - [x] Step 1: `superclaude doctor --scope local` 로 local scope 설치 확인 후 `superclaude install --force --scope local`
 - [x] Step 2: `echo '{"prompt":"/sc:intent test"}' | superclaude hook context_loader` 출력에 "is not a command"가 없어야 함
 - [x] Step 3: `uv run pytest` exit 0, `make lint` clean
-- [x] Step 4: `/sc:intent`를 실제로 한 번 실행해 Trivial 요청에는 파일을 만들지 않고, Large 요청에는 질문 5개 이내로 00-intent.md를 만드는지 확인. 결과를 이 문서의 "Proof"에 적는다
-- [x] Step 5: `feat: add /sc:intent command` 로 커밋, 이 plan의 체크박스 갱신과 README `phase: implementing → complete` 를 같은 커밋에
+- [ ] Step 4: `/sc:intent`를 실제로 한 번 실행해 Trivial 요청에는 파일을 만들지 않고, Large 요청에는 질문 5개 이내로 00-intent.md를 만드는지 확인. 결과를 이 문서의 "Proof"에 적는다
+- [x] Step 5: `feat: add /sc:intent command` 로 커밋, 이 plan의 체크박스 갱신과 README `phase: planning → implementing` 을 같은 커밋에 (`complete`는 Task 6과 Step 4 이후)
+
+## Deviations
+
+- Task 1 사양 Save: zero-match 기본 `[f]` 대신 "zero match → 새 feature 폴더". intent에는 standalone 경로가 없어(Scope Out) `[s]` 선택지가 갈 곳이 없다.
+- Task 1 사양 Save: frontmatter `status: draft` 대신 `approved-for-plan`. 파일은 Approve 단계 뒤에만 쓰이므로 draft로 저장하면 상태를 옮기는 단계가 없다.
+- Task 1 사양 골격: 본문 `Status` 줄 제거. status는 frontmatter에만 두어 두 곳이 어긋나지 않게 한다.
+- Task 1 사양 `<tools>`: Glob(slug 대조), Edit(기존 README 항목), Bash(`git config user.name`) 추가. Read만으로는 폴더 목록을 볼 수 없다.
+- Task 1 사양 `<gotchas>`: existing-intent 추가. 같은 폴더에 00-intent.md가 이미 있으면 덮어쓰지 않고 수정 또는 archive/ 이동을 묻는다.
+- Task 3 Step 4 철회: promote-feature의 Scan은 standalone 문서만 찾고 intent에는 standalone 형식이 없어 매핑이 발동할 수 없다.
+- Task 4 범위 밖 소비자: /sc:plan Load 단계도 같은 폴더의 00-intent.md를 읽는다. Handoff가 Medium 작업을 /sc:plan으로 넘기는데 `--from` 없이는 기록이 전달되지 않았다.
+- 범위 밖 변경: context_loader TRIGGER_MAP의 RULES_DOCS 트리거에 `intent` 추가와 `test_context_loader.py::test_doc_writing_commands_load_rules_docs`. Save 단계가 slug 해석·README 갱신을 RULES_DOCS에 맡기는데 /sc:intent에는 그 모듈이 주입되지 않았다.
+- Task 7 Step 4: headless에는 승인 턴이 없어 Save 경로를 실행하지 못했다. 대화형으로 한 번 실행할 때까지 열어 둔다.
 
 ## Proof
 
@@ -114,7 +126,7 @@ Out (R18 미통과, 별도 결정 필요): `--from <ticket|file>` 플래그, sta
 
 - `uv run pytest -q tests/unit/test_command_structure.py tests/unit/test_cross_references.py tests/unit/test_version_consistency.py` → `1049 passed`; full `uv run pytest` → `2889 passed, 1 skipped` (baseline before the command: 2863); `make lint` → `All checks passed!`. Before Task 2 the roster tests were red as planned (6 failed: README roster + both dispatcher lists).
 - `superclaude install --force --scope local` then `echo '{"prompt":"/sc:intent test"}' | superclaude hook context_loader` → no "is not a command" line (count 0).
-- Headless probes from the repo root (`claude -p … --allowedTools Read,Glob,Grep,Write --output-format json`):
+- Headless probes from the repo root against intent.md at 7de4b521, before the Deviations edits (`claude -p … --allowedTools Read,Glob,Grep,Write --output-format json`):
   - `/sc:intent rename this variable` → 1 turn, no file written; reply names the request Trivial, says no intent record is written, and asks for the file, identifier and new name to do the rename directly.
-  - `/sc:intent exports time out for big customers; the ops team gets paged every Monday and we cannot change the auth layer` → 2 turns, no file written; reply resolves the slug to a new folder `docs/features/export-timeouts/` (zero-match `[f]`), lists the three fields the seed already fills, asks exactly two questions for the empty ones (proposed outcome, affected systems), and states nothing is written before approval. The Save path itself was not exercised: headless has no approval turn.
+  - `/sc:intent exports time out for big customers; the ops team gets paged every Monday and we cannot change the auth layer` → 2 turns, no file written; reply resolves the slug to a new folder `docs/features/export-timeouts/` (then the zero-match `[f]` default; same outcome under the Deviations rule), lists the three fields the seed already fills, asks exactly two questions for the empty ones (proposed outcome, affected systems), and states nothing is written before approval. The Save path itself was not exercised: headless has no approval turn.
 - Task 6 is open on purpose: `test_version_consistency.py` accepts only dated release headings whose newest version equals `pyproject.toml`, so the CHANGELOG line lands in the version-bump commit.

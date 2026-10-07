@@ -67,9 +67,12 @@ DEFAULT_TASK_TIMEOUT = 600
 PY_BIN = sys.executable
 
 # Runtime artifacts that are neither model edits nor fixture content — SC's
-# loop_guard writes state into the project .claude/, and any python execution
-# drops __pycache__. Committed in the baseline so git_diff checks stay clean.
-WS_GITIGNORE = "__pycache__/\n*.pyc\n.claude/.superclaude_hooks/\n"
+# loop_guard writes state into the project .claude/, memory-bearing subagents
+# write .claude/agent-memory*/, and any python execution drops __pycache__. Committed in the baseline so git_diff checks stay clean.
+WS_GITIGNORE = (
+    "__pycache__/\n*.pyc\n.claude/.superclaude_hooks/\n"
+    ".claude/agent-memory/\n.claude/agent-memory-local/\n"
+)
 
 
 @dataclass
@@ -237,9 +240,8 @@ def run_task(
         "--allowedTools",
         " ".join(tools),
         # Permission mode; omitted = Claude Code default. `auto` injects an
-        # "execute immediately" reminder that can override prose checkpoints
-        # in commands, so the canary gates are rerun under it to see which
-        # survive.
+        # "execute immediately" reminder that can override prose stop rules,
+        # so the gated probes are rerun under it to see which survive.
         *(["--permission-mode", permission_mode] if permission_mode else []),
         # `--` ends option parsing: prompts that legitimately start with an SC
         # flag (e.g. "--introspect ...") were otherwise parsed as CLI options

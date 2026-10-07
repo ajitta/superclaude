@@ -188,8 +188,9 @@ def _resolve_git_exclude_file(project_root: Path) -> Optional[Path]:
     - ``.git/`` is a directory (regular repo) → ``<root>/.git/info/exclude``
     - ``.git`` is a file (``gitdir:`` pointer) → the gitdir's ``commondir``
       file, when present, names the common git directory and the answer is
-      ``<commondir>/info/exclude``: git resolves ``info/`` through the common
-      dir, so a linked worktree's own ``info/exclude`` is dead. Without a
+      ``<commondir>/info/exclude``: git resolves ``info/exclude`` through the
+      common dir (per file: ``info/sparse-checkout`` stays per-worktree), so a
+      linked worktree's own ``info/exclude`` is dead. Without a
       ``commondir`` the gitdir is complete on its own (a submodule's
       ``.git/modules/<name>``) and its ``info/exclude`` is the one git reads.
       A ``commondir`` naming a directory that no longer exists → None, like a

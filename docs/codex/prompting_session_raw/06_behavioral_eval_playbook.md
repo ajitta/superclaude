@@ -38,7 +38,7 @@ Actual outcome evaluation
 
 - 4 arms: `vanilla`, `sc-full`, `sc-core-lite`, `sc-command-only`
 - 7 matrix tasks
-- 14-task sc-full canary
+- canary-flagged sc-full canary (`canary: true` in `evals/tasks.yaml`)
 - `gate: true`로 선언된 7 security/constraint hard gates
 - source와 host user config에서 격리된 임시 workspace
 - check/tag, token, cost, turn, permission denial, `/sc:` activation 기록

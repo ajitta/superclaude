@@ -41,7 +41,7 @@ description: Execute tests with coverage analysis and automated quality reportin
   - Glob: Test discovery + patterns
   - Grep: Result parsing + failure analysis
   - Write: Coverage reports + summaries
-  - Agent: dispatch the `verifier` agent for a fresh-context run-and-report pass — it runs the project's commands, exercises the changed behavior, compares with the plan doc (05-plan.md Proof section and task list) and reports every mismatch without fixing; the user invokes it explicitly, it never auto-triggers
+  - Agent: dispatch the `verifier` agent for a fresh-context run-and-report pass — it runs the project's commands, exercises the changed behavior, compares with the plan doc (05-plan.md Proof section and task list) and reports every mismatch without fixing; its description limits it to explicit requests for run-and-report evidence
   </tools>
 
   <patterns>

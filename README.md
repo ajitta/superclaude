@@ -235,7 +235,7 @@ The framework's value comes from chaining commands. Each chain has gates: a step
 | Tier | Trigger | Recommended chain |
 |------|---------|-------------------|
 | **Trivial** | Typo · 1-line fix · rename · obvious bug with known fix | Direct edit. No `/sc:*` needed. |
-| **Small** | Single file · ≤ 50 added lines · clear scope | `/sc:implement` (or `/sc:improve`) **`--plan`** → `/sc:test` |
+| **Small** | Single file · ≤ 50 added lines · clear scope | Direct request (or `/sc:improve`) with the global **`--plan`** (5-line plan, approve) → `/sc:test` |
 | **Medium** | 3–10 files · multi-purpose · clear requirements | `/sc:plan` → `/sc:implement --plan` → `/sc:test` → `/sc:reflect` (optional: `/sc:intent` first) |
 | **Large** | > 10 files · cross-cutting · ambiguous scope · new system | `/sc:intent` → `/sc:brainstorm` → `/sc:design` → `/sc:review` → `/sc:plan` → `/sc:implement --plan` → `/sc:test` → `/sc:reflect` |
 
@@ -251,10 +251,10 @@ The framework's value comes from chaining commands. Each chain has gates: a step
 |------|--------|----------------------------|
 | `/sc:intent` | `docs/features/<slug>/00-intent.md` — problem, proposed outcome, affected users and systems, constraints, open questions, in the requester's words | User approves the wording; committed before analysis starts |
 | `/sc:brainstorm` | `docs/features/<slug>/01-discovery.md` (one-off: `docs/specs/<slug>-discovery-<user>-<date>.md`) | User approves discovery spec |
-| `/sc:design` | `docs/features/<slug>/04-design.md` (one-off: `docs/specs/…-design-…md`) | Design committed (components pass the [R18] necessity test) |
+| `/sc:design` | `docs/features/<slug>/04-design.md` (one-off: `docs/specs/…-design-…md`) | Design committed (components pass the [R18] necessity test; Areas of concern resolved) |
 | `/sc:review` | Multi-dimensional review of design/plan | Required — `/sc:brainstorm` hard-blocks `/sc:plan` until this runs |
 | `/sc:plan` | `docs/features/<slug>/05-plan.md` (one-off: `docs/plans/…md`) — phased TDD tasks, file paths, verify cmds | Plan committed |
-| `/sc:implement --plan` | Code + per-phase commits | Implementation complete |
+| `/sc:implement --plan` | Code + per-phase commits | Implementation complete; plan checkboxes and Deviations match the code |
 | `/sc:test` | Test pass evidence (`42/42 pass, baseline 40`) | Real output, not predictions |
 | `/sc:reflect` | Retrospective + insights captured to `.claude/insights.jsonl` | — |
 
@@ -262,7 +262,7 @@ The framework's value comes from chaining commands. Each chain has gates: a step
 
 | Goal | Chain |
 |------|-------|
-| **Investigate a bug** | `/sc:troubleshoot` → `/sc:analyze --focus <domain>` → `/sc:implement --plan` → `/sc:test` |
+| **Investigate a bug** | `/sc:troubleshoot` → `/sc:analyze --focus <domain>` → `/sc:plan` → `/sc:implement --plan` → `/sc:test` |
 | **Performance work** | `/sc:analyze --focus perf --scope module` → `/sc:improve --loop --focus perf` → `/sc:test` |
 | **Security audit** | `/sc:analyze --focus security` → `/sc:review` → `/sc:improve --focus security` |
 | **Refactor** | `/sc:analyze --focus quality` → `/sc:plan` → `/sc:improve --loop` → `/sc:test` |
@@ -584,7 +584,7 @@ Flags are behavioral hints that any `/sc:*` prompt accepts. The model reads them
 
 ```bash
 /sc:research "Rust async runtime tradeoffs" --depth deep --tavily --c7
-/sc:implement "user export endpoint" --plan --validate --delegate auto
+/sc:implement --plan docs/features/user-export/05-plan.md --validate --delegate auto
 /sc:analyze src/auth/ --focus security --scope module
 /sc:improve src/api/handlers.py --loop --iterations 3 --serena
 /sc:brainstorm "should we migrate to gRPC?" --vs multi

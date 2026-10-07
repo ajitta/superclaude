@@ -21,7 +21,7 @@ description: Design system architecture, APIs, component interfaces with compreh
   </flow>
 
   <flags>
-  - --from <path>: discovery or intent doc read in the Analyze step; without it the slug folder's `00-intent.md` and `01-discovery.md` are read when present.
+  - --from <path>: discovery or intent doc, read in the Analyze step.
   - --type architecture|api|component|database: design kind; sections per type in the outputs table.
   - --format diagram|spec|code: diagram: Mermaid diagram; spec: written specification; code: interface definitions (types, signatures) with no implementation.
   </flags>

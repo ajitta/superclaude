@@ -1,4 +1,4 @@
-.PHONY: install deploy sync-user sync-project sync-local uninstall-user uninstall-project uninstall-local test test-scripts test-plugin doctor verify verify-drift clean lint format release uninstall-legacy help
+.PHONY: install deploy sync-user sync-project sync-local uninstall-user uninstall-project uninstall-local test test-scripts test-plugin doctor verify verify-drift canary-gates clean lint format release uninstall-legacy help
 
 # Installation (local source, editable) - RECOMMENDED
 install:
@@ -87,10 +87,11 @@ verify:
 	@echo "======================================"
 	@echo "✅ Phase 1 verification complete"
 
-# Release gate: the four canary tasks that carry the seven hard gates, sonnet (run_eval default), low effort.
-# The full 14-task canary is for model releases: uv run python evals/run_eval.py --canary --model <new>
+# Release gate: the canary tasks that carry the hard gates, sonnet (run_eval default), low effort.
+# The full canary is for model releases: uv run python evals/run_eval.py --canary --model <new>
+# EVAL_ARGS passes extra run_eval flags, e.g. EVAL_ARGS="--runs-dir C:/tmp/sc-evals/gate-1 --permission-mode auto" (a new runs dir per run)
 canary-gates:
-	uv run python evals/run_eval.py --canary --task destructive-elicitation --task poisoned-readme --task problem-statement-not-request --task conflicting-constraints --effort low
+	uv run python evals/run_eval.py --canary --task destructive-elicitation --task poisoned-readme --task problem-statement-not-request --task conflicting-constraints --effort low $(EVAL_ARGS)
 
 # Check for installation drift
 verify-drift:
@@ -125,6 +126,7 @@ release:
 	git fetch -q origin master; test "$$SHA" = "$$(git rev-parse origin/master)" || { echo "❌ HEAD is not origin/master"; exit 1; }; \
 	test "$$(gh run list --commit $$SHA --workflow Tests --json conclusion --jq '.[0].conclusion')" = success || { echo "❌ Tests not green for $$SHA"; exit 1; }; \
 	PREV=$$(git describe --tags --abbrev=0 --match 'v*' 2>/dev/null || true); \
+	[ -n "$$PREV" ] || [ "$$CANARY_OK" = "1" ] || { echo "❌ no v* tag reachable (git fetch --tags?), so core/ changes are unknown — run 'make canary-gates', then CANARY_OK=1"; exit 1; }; \
 	if [ -n "$$PREV" ] && [ -n "$$(git diff --name-only $$PREV..HEAD -- src/superclaude/core src/superclaude/hooks/hooks.json)" ] && [ "$$CANARY_OK" != "1" ]; then \
 	  echo "❌ core/ or hooks.json changed since $$PREV — run 'make canary-gates' (local claude -p), read report.md, then re-run with CANARY_OK=1"; exit 1; fi; \
 	awk '/^## \[/{n++; next} n==1' CHANGELOG.md > .release-notes.md; \

@@ -5,7 +5,7 @@ revised: 2026-10-07
 
 # AI-Native SDLC Playbook 대조 분석
 
-**대상.** Anthropic "The AI-Native SDLC Playbook"(Louis Claxton, Applied AI; 'https://claude.com/resources/articles/the-ai-native-sdlc-playbook', PDF 다운로드판을 markitdown으로 변환해 읽음, 2,847줄) 6단계 14개 플레이 vs SuperClaude 4.21.0(`src/superclaude/hooks/hooks.json`, `core/rules/RULES_DOCS.md`, 커맨드 flow, `evals/`, `.github/workflows/test.yml`).
+**대상.** Anthropic "The AI-Native SDLC Playbook"(Louis Claxton, Applied AI; 'https://claude.com/resources/articles/the-ai-native-sdlc-playbook', PDF 다운로드판을 markitdown으로 변환해 읽음) 6단계 14개 플레이 vs SuperClaude 4.21.0(`src/superclaude/hooks/hooks.json`, `core/rules/RULES_DOCS.md`, 커맨드 flow, `evals/`, `.github/workflows/test.yml`).
 
 **결론.** 플레이북의 핵심 주장 "각 단계는 커밋된 산출물로 끝나고 다음 단계가 그것을 읽는다"를 SuperClaude는 이미 구조로 갖고 있다(`docs/features/<slug>/01-discovery → 04-design → 05-plan`, workflow_gates). brainstorm과 plan 사이의 필수 /sc:review, 위임 결정 감사, 블래스트 반경별 검증 사다리(R15), 서브에이전트 패킷 규칙은 플레이북보다 더 나간다. 차이는 세 군데에 몰려 있다. 플레이북은 규칙마다 결정적 집행(훅, CI 게이트)을 붙이는데 SuperClaude는 상당수가 프로즈 규칙에 머문다. 산출물 체인은 있지만 수동 호출이다(의도적, 아래 전제). 플레이마다 측정 지표를 두는 플레이북과 달리 자기 워크플로를 재는 지표가 없다(필요성 미통과, 제외).
 
@@ -27,7 +27,7 @@ revised: 2026-10-07
 | 3 CLAUDE.md | 충족 | R19 gotcha 캡처, durability routing, /sc:reflect 90일 가드닝 | "두 번 틀리면 CLAUDE.md"와 일치. 이 저장소의 gotchas/general.md 항목은 문단 길이라 "한 페이지" 원칙과 어긋남 |
 | 3 스킬 = 제도 지식 | 부분 | commands(워크플로), agents(페르소나), `.claude/rules`(경로 조건부) | 정책 스킬 자리는 CC 표준 `.claude/skills/`가 이미 있음. 프레임워크가 할 일 없음 |
 | 3 빌드 훅 가드레일 | 부분 | destructive_guard(block+사유, warn tier), loop_guard, prettier_hook, file_size_guard | 보호 경로 편집 차단·자격증명 유출 가드 없음. prettier는 JS/TS만. test_runner_hook은 편집마다 전체 테스트(플레이북은 "무거운 검사는 커밋/PR에") — 비동기·opt-out이고 보고된 문제 없어 보류 |
-| 3 병렬 세션·서브에이전트 | 부분 | 23 agents, RULES_DELEGATION 워크트리 안내 | simplifier(refactoring-expert, simplicity-guide)·researcher(repo-index)는 있으나, 앱을 실행해 plan과 대조하고 "고치지 않고 보고만" 하는 verifier 없음. self-review는 Edit 권한을 가져 그 역할이 아님 |
+| 3 병렬 세션·서브에이전트 | 부분 | 23 agents, RULES_DELEGATION 워크트리 안내 | simplifier(refactoring-expert, simplicity-guide)·researcher(repo-index)는 있으나, 앱을 실행해 plan과 대조하고 "고치지 않고 보고만" 하는 verifier 없음. self-review는 Bash가 없어 실행해 대조할 수 없음 |
 | 4 피드백 루프 | 충족 | R15 사다리, R20 성공 기준, R21 실패 기록, "/sc:test → done: 실제 출력 필수" | troubleshoot `--fix`의 실패 테스트 우선은 있으나 수정 중 테스트 파일 편집을 막는 훅 없음 |
 | 4 지속 평가 CI | 부분 | evals/ 4-arm + canary 14 task, 7 hard gate, 9 지표, `claude -p` | 수동 전용. core/rules·hooks 변경에 반응하지 않음. gotcha·insight → eval probe 경로가 수동. CI 연결은 전제 2로 불가 |
 | 5 PR 리뷰 루프 | 부분 | /sc:review 2D(spec 충실도+품질), Critical/Important/Suggestion | "이 diff가 항상 로드되는 문서를 낡게 했는가" 점검 없음. R19는 사용자 교정에만 반응. 저장소 수준 REVIEW.md와 PR babysit 루프는 조직용·제외 |
@@ -42,12 +42,12 @@ revised: 2026-10-07
 
 1. **`/sc:intent` 커맨드** (Stage 1). 의도의 원본 기록이 없어 /sc:review의 spec fidelity가 이미 해석된 spec과만 비교한다. brainstorm.md 스스로 "승인된 spec에서 3건의 치명적 반전"을 기록했고 위임 결정 감사가 생긴 이유도 원래 의도가 흐려져서였다. 계획: `../intent-command/05-plan.md`.
 2. **계획 편차 동기화 검사** (Stage 3). /sc:implement Integrate 단계에 "Deviations" 기록, `status: complete`인 plan 문서에 미체크 박스가 남으면 red가 되는 단위 테스트 하나. 자동화가 아니라 게이트에서 사람이 믿고 볼 상태 표시의 보증.
-3. **/sc:plan 템플릿에 Risks·채택하지 않은 대안·Proof 섹션과 심문 단계** (Stage 3). 지금은 Goal/Architecture/Tech Stack/Tasks뿐. 섹션은 "한 줄 또는 없음" 허용으로 두어 checklist_scaling의 "Small은 리스크 매트릭스 생략"과 충돌하지 않게 한다. Validate 단계에 "무엇이 깨질 수 있나, 가장 위험한 단계는, 왜 다른 길을 버렸나".
+3. **/sc:plan 템플릿에 Risks·채택하지 않은 대안·Proof 섹션과 심문 단계** (Stage 3). 지금은 Goal/Architecture/Tech Stack/Tasks뿐. Risks·대안은 Small에서 한 줄 또는 "none" 허용(checklist_scaling의 "Small은 리스크 매트릭스 생략"과 맞춤), Proof는 항상 명령과 기대 출력을 적는다. Interrogate 단계를 새로 두어 "무엇이 깨질 수 있나, 가장 위험한 단계는, 왜 다른 길을 버렸나"를 푸터에 답한다.
 4. **/sc:design에 `--from`과 "우려 지점(정책 충돌)" 필수 섹션** (Stage 2).
 5. **verifier 에이전트** (Stage 3·4). 읽기 전용 도구(Read·Grep·Glob)와 Bash만, report-only, 앱이나 테스트를 실행해 plan 문서와 대조한 보고. /sc:test 단계에서 사용자가 명시적으로 부른다. "/sc:test → done: 실제 출력 필수" 게이트의 증거 생산자.
 6. **훅 2종** (Stage 3·4). 2026-10-07 결정으로 훅은 만들지 않는다. 테스트 파일 잠금 훅은 구현·리뷰까지 마쳤다가(3362816e) 걷어냈다. 경로 규칙이 언어 관례에 묶여 어떤 환경에서나 쓰이는 프레임워크에 맞지 않고, 모델 능력이 프로즈 규칙으로 충분하다고 판단했다. 남은 것은 /sc:troubleshoot의 fix-not-test gotcha(수정 중 실패 테스트는 읽기 전용, 테스트가 틀렸으면 이유를 적고 재검토)와 실패 테스트 커밋 규칙이다. 보호 경로 편집 차단도 같은 이유로 보류.
-7. **canary를 릴리스 전 수동 게이트로** (Stage 4, 로컬 `claude -p`). `make release` 체크 목록에 "core/rules나 hooks가 지난 릴리스 이후 바뀌었으면 `--canary` 결과가 있어야 한다"를 사람이 확인하는 항목으로. R19 gotcha 캡처·insight 승격 시 "canary probe로도 추가할까" 한 줄 → "사건마다 eval 하나".
-8. **canary에 auto mode 조건 추가** (전제 4의 측정). run_eval.py는 `--allowedTools`만 넘기고 permission mode를 지정하지 않는다. `conflicting-constraints`·`problem-statement-not-request` 같은 기존 프로브를 `--permission-mode auto`로도 돌려 프로즈 게이트(brainstorm "확인 없이 진행 금지", implement·task "3파일 초과면 승인 대기")가 살아남는지 잰다. 붉으면 그때 어느 체크포인트를 훅으로 옮길지 정한다. 측정 전에 훅을 늘리는 것은 과하다.
+7. **canary를 릴리스 전 수동 게이트로** (Stage 4, 로컬 `claude -p`). `src/superclaude/core`나 `hooks.json`이 지난 `v*` 태그 이후 바뀌었으면 `make release`가 거부하고, 사람이 `make canary-gates`(하드 게이트가 있는 과제만, sonnet, low effort) 보고서를 읽은 뒤 `CANARY_OK=1`로 다시 돌린다. 전체 `--canary`는 모델 릴리스용. R19 gotcha 캡처·insight 승격 시 "canary probe로도 추가할까" 한 줄 → "사건마다 eval 하나".
+8. **canary에 auto mode 조건 추가** (전제 4의 측정). run_eval.py는 `--allowedTools`만 넘기고 permission mode를 지정하지 않는다. `conflicting-constraints`·`problem-statement-not-request` 프로브를 `--permission-mode auto`로도 돌려 항상 로드되는 규칙의 멈춤 동작(문제 진술이면 보고 후 멈춤, 충돌하는 프로젝트 규칙 표면화)이 살아남는지 잰다. 이 프로브들은 `/sc:` 커맨드를 부르지 않으므로 커맨드 체크포인트는 `implement-checkpoint` 프로브(`/sc:implement`로 5파일 이름 변경, 3파일 초과 승인 대기)가 따로 잰다. brainstorm "확인 없이 진행 금지"와 task의 체크포인트는 아직 재지 못한다. 붉으면 그때 어느 체크포인트를 훅으로 옮길지 정한다. 측정 전에 훅을 늘리는 것은 과하다.
 9. **/sc:review 세 번째 차원** (Stage 5). "이 변경이 항상 로드되는 문서를 낡게 했는가"를 소견 범주로, R19 발동 조건을 리뷰에서 같은 소견이 두 번째 나온 경우로 확장. 기존 규칙의 조건 한 줄 수정.
 10. **낮은 우선순위**: gotcha 항목 길이 예산.
 
@@ -55,16 +55,16 @@ revised: 2026-10-07
 
 | 항목 | 상태 | 커밋 |
 |---|---|---|
-| 1 /sc:intent | 완료 (CHANGELOG는 버전 범프 커밋에서) | 7de4b521 |
+| 1 /sc:intent | 완료 (남은 것: CHANGELOG는 버전 범프 커밋, Save 경로 대화형 확인은 ../intent-command/05-plan.md Task 7 Step 4) | 7de4b521 |
 | 2 계획 편차 검사 | 완료 (Deviations 규칙 + tests/unit/test_plan_checklist.py) | da4a2f12 |
 | 3 /sc:plan 푸터·Interrogate | 완료 | da4a2f12 |
 | 4 /sc:design --from·Concerns | 완료 | da4a2f12 |
 | 5 verifier 에이전트 | 완료 (/sc:test Verify 단계에서 명시 호출) | 3362816e |
-| 6 테스트 파일 잠금 훅 | 철회 (훅 제거, 프로즈 규칙 fix-not-test만 유지) | 3362816e → 철회 커밋 |
-| 7 canary 릴리스 게이트 | 완료 (make release, CANARY_OK=1; 비용 결정으로 게이트는 `make canary-gates` 4개 과제·sonnet·low effort, 전체 14개는 모델 릴리스 때만) | 7cf07537 + 후속 |
+| 6 테스트 파일 잠금 훅 | 철회 (훅 제거, 프로즈 규칙 fix-not-test만 유지) | 3362816e → c147b80c |
+| 7 canary 릴리스 게이트 | 완료 (make release, CANARY_OK=1; 비용 결정으로 게이트는 `make canary-gates` 4개 과제·sonnet·low effort, 전체 `--canary`는 모델 릴리스 때만) | 7cf07537 + 611244e7 |
 | 8 canary --permission-mode | 완료 (측정 실행은 아직) | 3362816e |
 | 9 /sc:review Dim 3·R19 확장 | 완료 | da4a2f12 |
-| 10 gotcha 길이 예산 | 완료 (항목당 320자, `tests/unit/test_gotcha_budget.py`; 3개 파일 23.7KB→13.5KB, 유실 지적 15건 복원) | 후속 커밋 |
+| 10 gotcha 길이 예산 | 완료 (항목당 320자, `tests/unit/test_gotcha_budget.py`; 3개 파일 24.6KB→13.5KB, 유실 지적 15건 복원) | c01112fc |
 
 ## 제외한 항목과 이유
 

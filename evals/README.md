@@ -21,8 +21,9 @@ in-repo runs read plan/spec docs and false-pass not-yet-installed rules).
 ## Tasks & metrics
 
 `tasks.yaml` defines 7 matrix tasks, 4 canary-only behavior slices (why
-they are canary-only: see the group comment in `tasks.yaml`), and 3
-canary-only prose-rule probes.
+they are canary-only: see the group comment in `tasks.yaml`), 3
+canary-only prose-rule probes, and 1 canary-only command-checkpoint probe
+(`implement-checkpoint`).
 Check `tag`s map to roadmap metrics: `success`, `scope` (unnecessary file
 changes), `verification` (actual-verification-ran), `location` (output
 location accuracy), `gotcha_compliance`, `citation` (file:line accuracy),
@@ -61,18 +62,18 @@ matrix run carries 2 of the 7 gates and `--canary` carries all 7.
 ```bash
 uv run python evals/run_eval.py --dry-run     # build + validate everything, zero API calls
 uv run python evals/run_eval.py               # full 4-arm × 7-task matrix
-uv run python evals/run_eval.py --canary      # canary suite (14 tasks, sc-full arm)
+uv run python evals/run_eval.py --canary      # canary suite (canary-flagged tasks, sc-full arm)
 uv run python evals/run_eval.py --canary --permission-mode auto   # same suite under auto mode
 uv run python evals/run_eval.py --arms vanilla,sc-full --task bugfix-scope-creep
 ```
 
-`--permission-mode auto` reruns the canary under auto mode, whose injected "execute immediately" reminder may override the prose checkpoints in commands (brainstorm's no-proceed-without-confirmation, implement/task's wait-for-approval past three files); the `conflicting-constraints` and `problem-statement-not-request` probes measure whether they survive, and the mode is recorded in `results.json` (`permission_mode` per row) and the `report.md` header so two runs can be told apart.
+`--permission-mode auto` reruns the canary under auto mode, whose injected "execute immediately" reminder may override prose stop rules. The `conflicting-constraints` and `problem-statement-not-request` probes measure whether the always-loaded rules' stop behavior survives it (report-and-stop on a problem statement, surfacing a conflicting project rule). `implement-checkpoint` invokes `/sc:implement` on a five-file rename and measures its wait-for-approval checkpoint; brainstorm's and task's checkpoints are not measured yet. The mode is recorded in `results.json` (`permission_mode` per row) and the `report.md` header so two runs can be told apart.
 
 Cost control: a full 4×7 matrix is 28 headless sessions. Start with
 `--dry-run`, then one task across two arms, before paying for the matrix.
 
 Model-release canary (Phase 1-2): on each new model release run
-`--canary --model <new-model>` (for example `--model claude-fable-5-1`);
+`--canary --model <new-model>` (a new Sonnet or Opus id; never Fable, see Release gate);
 red rows in the report name which prose rules died on that model — a
 detected diff instead of reactive compat guessing. A task the model
 declined shows as `REFUSED` in the matrix and is listed with its
@@ -84,14 +85,20 @@ separate regression from pre-existing failure.
 ## Release gate
 
 `make release` checks whether `src/superclaude/core` or `hooks.json` changed
-since the last `v*` tag and refuses unless `CANARY_OK=1` is set. The gate is
+since the last `v*` tag and refuses unless `CANARY_OK=1` is set; with no
+reachable `v*` tag it refuses too. The gate is
 manual on purpose and deliberately small: `make canary-gates` runs only the four
 tasks that carry the seven hard gates (`destructive-elicitation`,
 `poisoned-readme`, `problem-statement-not-request`, `conflicting-constraints`)
-on the default sonnet model at low effort — 4 sessions instead of 14. Read
+on the default sonnet model at low effort — 4 sessions instead of the full suite. Read
 `report.md`, then release with `CANARY_OK=1 make release`. The full `--canary`
 run keeps its original job, the model-release canary above, and is not part of
-the release gate. Never pass a Fable model to a headless run: it bills usage
+the release gate. Inside a Claude Code session the temp dir sits under `~/.claude`,
+which run_eval refuses as a runs dir; pass a new, empty one per run through
+`EVAL_ARGS` (run_eval timestamps only its default dir, and a reused dir fails on
+the first workspace copy), e.g.
+`make canary-gates EVAL_ARGS="--runs-dir C:/tmp/sc-evals/gate-1"` (add
+`--permission-mode auto` the same way, with its own dir). Never pass a Fable model to a headless run: it bills usage
 credits outside the subscription. There is no CI run of this suite. Each gotcha
 or insight that records a behavior failure gets a probe in `tasks.yaml` so the
 regression stays caught.
