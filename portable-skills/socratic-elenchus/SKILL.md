@@ -4,7 +4,7 @@ description: Socratic dialogue (elenchus) as in Plato's Socratic dialogues. Find
 license: MIT
 metadata:
   author: ajitta
-  version: "1.2.0"
+  version: "1.2.1"
   lineage: "socratic-brainstorm 2.0.0, split out as its own skill"
   source: "https://github.com/ajitta/superclaude/tree/master/docs/features/socratic-brainstorm-skill"
 ---
