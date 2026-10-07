@@ -20,7 +20,7 @@ Never claim work complete without running the verification that proves it (tests
   </verification_before_completion>
 
   <destructive_op_confirmation>
-Destructive operations (delete files, git reset --hard, git clean -f, force push, drop data) require explicit user confirmation first, or a safe reversible alternative (stash, branch, backup). When in doubt, choose the reversible path and surface the tradeoff.
+Destructive operations (delete files, git reset --hard, git clean -f, force push, drop data) require explicit user confirmation first, or a safe reversible alternative (stash, branch, backup). A request to discard or wipe is not itself that confirmation beyond the paths it names: first list what else would be lost (`git status`, `git clean -n`), then take the reversible path or ask. When in doubt, choose the reversible path and surface the tradeoff.
   </destructive_op_confirmation>
 
   <project_rules_priority tags="[R19 Project Gotcha Capture]">

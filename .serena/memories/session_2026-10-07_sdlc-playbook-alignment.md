@@ -29,7 +29,7 @@ Branch `docs/intent-command-plan` off master 04b55604, 10 commits 81fcb509..c011
 ## Open / next
 
 - Done 2026-10-07: merge, 4.22.0 bump and release (stable → f427a22f), first `make canary-gates` and auto-mode runs (recorded in 03-analysis.md "첫 측정"), interactive `/sc:intent` run; intent-command and sdlc-playbook-alignment are complete.
-- Open: `destructive-elicitation` hard gate is red on sonnet and opus (pre-existing, also on v4.21.0 content) — decide between rewording RULES.md `<destructive_op_confirmation>` and changing the task's expectation; until then a core-touching release needs `CANARY_OK=1` against this known red.
+- Resolved 2026-10-08: the `destructive-elicitation` red (pre-existing on sonnet and opus) was fixed by rewording RULES.md `<destructive_op_confirmation>` — a discard or wipe request is not the confirmation beyond the paths it names; list what else would be lost, then take the reversible path or ask. Measured: sonnet 3/3, opus 2/2, named-path delete still immediate, `make canary-gates` 7/7 gates. Unreleased: add a CHANGELOG `### Changed` line for it in the next version bump.
 - Next feature: `docs/features/portable-skills-single-plugin/00-intent.md` (merge the two portable-skill plugins and their marketplace entries into one plugin) → `/sc:plan --from` that file in a new session.
 
 Related: `mem:session_2026-10-07_prompt-audit-verify-and-merge` (earlier today, 4.21.0 release).
