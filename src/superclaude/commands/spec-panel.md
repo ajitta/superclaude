@@ -73,7 +73,6 @@ description: Multi-expert spec review + improvement via renowned software engine
   <bounds>
     <does>expert-level review, actionable recs, multi-mode analysis.</does>
     <never>replace human judgment, modify without consent, legal guarantees.</never>
-    <fallback>ask user for guidance when uncertain.</fallback>
   </bounds>
 
   <handoff next="/sc:design /sc:implement"/>

@@ -1,5 +1,5 @@
 ---
-description: Promote standalone docs sharing a slug into a feature folder per doc-convention-v2. Use ONLY when user explicitly types `/sc:promote-feature <slug>` to consolidate scattered standalone docs (`docs/specs/`, `docs/plans/`, etc.) into `docs/features/<slug>/`. Manual gate per Q2 policy — never auto-migrates without user confirm. NOT auto-trigger when /sc:cleanup --type docs surfaces "consider promotion" suggestion — that's detection, this is action.
+description: Promote standalone docs sharing a slug into a feature folder. Use ONLY when user explicitly types `/sc:promote-feature <slug>` to consolidate scattered standalone docs (`docs/specs/`, `docs/plans/`, etc.) into `docs/features/<slug>/`. Manual gate — never auto-migrates without user confirm. NOT auto-trigger when /sc:cleanup --type docs surfaces "consider promotion" suggestion — that's detection, this is action.
 ---
 <component name="promote-feature" type="command">
 

@@ -88,7 +88,7 @@ When section has **fixed small set of named slots** that need (a) multi-line pro
 </bounds>
 ```
 
-Slot labels are **directives, not hedging**. `<does>` (declarative present-tense — what Claude actually does), `<never>` (absolute prohibition — recent Opus models follow; "should not" get dropped as optional), `<fallback>` (escalation posture). Legacy `<should>`/`<avoid>` labels rejected by structural test suite — recent Opus models read "should" as optional, spec own load-bearing-voice rule applies to slot labels too.
+Slot labels are **directives, not hedging**. `<does>` (declarative present-tense — what Claude actually does), `<never>` (absolute prohibition — current Claude models follow; "should not" get dropped as optional), `<fallback>` (escalation posture). Legacy `<should>`/`<avoid>` labels rejected by structural test suite — current Claude models read "should" as optional, spec own load-bearing-voice rule applies to slot labels too.
 
 Use this form when:
 - Section sits next to Labeled section using same `- Label:` shape and Claude must not conflate them (measured boundary blur — see commit `S390`).
@@ -283,7 +283,7 @@ When component exceed target: extract reference material (long examples, deep ta
 8. For dense fixed-shape data, use compact markdown table inside `<examples>`, or inside any dense-lookup tag with ≥6 fixed-shape entries. For rich multi-line illustration, use standalone `<example>` instead.
 9. Other plural↔singular containers (depth 3) reserved for genuinely multi-line list items.
 10. Keep attributes for short identifiers and structural metadata; move guidance prose into tag body.
-11. Use third-person ("Claude") and declarative voice — recent Opus models drop hedging.
+11. Use third-person ("Claude") and declarative voice — current Claude models drop hedging.
 12. Quote URLs and model strings in single quotes; UI/feature names in double quotes; runtime values in `{{variable}}`.
 13. Reserve `critical_*` tag prefix for safety-critical sub-sections; place early in body so partial-read previews catch them.
 14. Stay within size target for component type; extract overflow into referenced sibling file.

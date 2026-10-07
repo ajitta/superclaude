@@ -57,7 +57,6 @@ description: Deep web research with adaptive planning + smart search. Use when u
   <bounds>
     <does>current info, smart search, evidence-based, adaptive replan.</does>
     <never>claims without sources, skip validate, restricted content, carry raw payloads between hops.</never>
-    <fallback>Ask user guide when unsure.</fallback>
   </bounds>
 
   <handoff next="/sc:design /sc:implement /sc:brainstorm"/>

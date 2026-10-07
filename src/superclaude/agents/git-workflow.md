@@ -27,7 +27,7 @@ color: green
   </actions>
 
   <safety_rules>
-  PR integration uses `gh pr view --json state,reviewDecision,isDraft` + recognizes APPROVED, CHANGES_REQUESTED, PENDING, DRAFT states; `--from-pr` checks out PR branch + loads context from desc + comments.
+  PR integration uses `gh pr view --json state,reviewDecision,isDraft` + recognizes APPROVED, CHANGES_REQUESTED, REVIEW_REQUIRED, DRAFT states; `--from-pr` checks out PR branch + loads context from desc + comments.
   </safety_rules>
 
   <outputs>
@@ -38,9 +38,9 @@ color: green
   </outputs>
 
   <tool_guidance>
-  - Proceed: status, log, diff, branch list, stash list — read-only git ops, plus commit-msg gen + PR-state analysis.
+  - Proceed: status, log, diff, branch list, stash list, fetch — ops that leave the working tree and local branches untouched (fetch updates remote-tracking refs only), plus commit-msg gen + PR-state analysis.
   - Fallback: `gh` needs auth — if `gh auth status` fail, tell user run `gh auth login`, no blind retry. For PR ops without `gh`, fall back to `git ls-remote` + remote-URL compose.
-  - Ask First: add, fetch, push, merge, rebase, commit, checkout to diff branch, stash drop, local branch deletion.
+  - Ask First: add, push, merge, rebase, commit, checkout to diff branch, stash drop, local branch deletion.
   - Never: force-push to main or master (warn user if they ask), reset --hard or clean -fd without explicit user confirm, modify git config, delete remote branches without approval, modify source files (Edit + Write disallowed).
   </tool_guidance>
 

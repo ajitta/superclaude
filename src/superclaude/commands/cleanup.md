@@ -47,7 +47,7 @@ description: Clean code systematic, kill dead code, optimize project structure. 
   <validator_checks note="--type docs only">
     - R1-post-cutoff-non-v2: For each standalone doc in `docs/{specs,plans,research,analysis}/`, read frontmatter or filename date; if date > 2026-05-18 cutoff AND no companion `docs/features/<slug>/` folder, surface warning "v2 non-compliant — consider /sc:promote-feature <slug>". Pre-cutoff legacy explicitly skipped.
     - R2-cross-feature-link-form: Grep `\[\[[a-z0-9-]+\]\]` pattern across `docs/features/*/*.md` (skip fenced code blocks to avoid false positives on syntax examples). Each match = warning "use relative path per core/rules/RULES_DOCS.md cross-links rule (`../<other-slug>/NN-<phase>.md`); slug refs not supported". Standalone-doc matches not flagged (legacy tolerated).
-    - R3-slug-overlap: Build slug set from (a) `docs/features/<slug>/` dir names + (b) standalone filename slugs (extract per `<slug>-<suffix?>-<username>-YYYY-MM-DD.md` pattern, strip suffix/username/date). Any slug appearing in ≥2 places = "consider promotion" suggestion per Q5 auto-detect mechanism — surface as "candidate: /sc:promote-feature <slug>". Suggestion-only per Q2 manual policy; never auto-migrate.
+    - R3-slug-overlap: Build slug set from (a) `docs/features/<slug>/` dir names + (b) standalone filename slugs (extract per `<slug>-<suffix?>-<username>-YYYY-MM-DD.md` pattern, strip suffix/username/date). Any slug appearing in ≥2 places = "consider promotion" suggestion — surface as "candidate: /sc:promote-feature <slug>". Suggestion-only; never auto-migrate.
     - R-existing-slug-lint: Pre-existing per core/rules/RULES_DOCS.md `<doc_output_convention>` formatter mention. Detects same slug used by two standalone docs of same type.
     - R-existing-readme-regen: Auto-regenerate `docs/features/*/README.md` `## Documents` section from current file list when running with `--apply` flag. Read-only with `--dry-run`.
   </validator_checks>
@@ -77,7 +77,7 @@ description: Clean code systematic, kill dead code, optimize project structure. 
   - verify-unused: confirm files truly unused (grep for refs) before delete
   - date-parse-fallback: R1 date check pulls from frontmatter `created:`/`revised:` first, falls back to filename `-YYYY-MM-DD` suffix, then mtime. mtime can drift after git rename and produce false positives; prefer frontmatter when present.
   - code-block-false-positive: R2 `[[...]]` pattern matches markdown wiki-syntax but also literal `[[...]]` examples inside fenced code blocks; pre-filter ` ``` ` blocks before matching to avoid noise.
-  - slug-overlap-noise: R3 may flag legitimately distinct features sharing kebab prefix (e.g., `auth-flow` vs `auth-v2`). Output is suggestion-only per Q2 policy; user judges per case. False positives are tolerable.
+  - slug-overlap-noise: R3 may flag legitimately distinct features sharing kebab prefix (e.g., `auth-flow` vs `auth-v2`). Output is suggestion-only; user judges per case. False positives are tolerable.
   - manual-gate: --type docs validator never auto-migrates. `--apply` only runs low-risk transforms (frontmatter shape fix, README index regen). Bulk promotion is /sc:promote-feature scope.
   </gotchas>
 

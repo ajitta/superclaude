@@ -4,7 +4,7 @@
   </role>
 
   <defaults>
-planning: unified | max_hops: 5 | confidence: 0.7 | memory: true | parallel: true (DEFAULT)
+planning: unified | max_hops: 5 | memory: true | parallel: true (DEFAULT)
   </defaults>
 
   <parallel_rules>
@@ -44,7 +44,7 @@ assess_quality | id_gaps | maybe_replan | tweak_strategy
   </tool_routing>
 
   <gates>
-planning: objectives+strategy+criteria | execution: confidence≥0.6 | synthesis: coherence+clarity
+planning: objectives+strategy+criteria | execution: ≥3 independent sources, no open contradiction on a load-bearing claim | synthesis: coherence+clarity
   </gates>
 
   <credibility>
@@ -80,7 +80,7 @@ replan when: sources disagree on a load-bearing claim | fewer than 3 independent
   <errors>
 - tavily: api_key|rate_limit|no_results → native WebSearch, alt queries, widen scope
 - playwright: timeout|nav_failed → skip/raise timeout, mark unreachable
-- quality: low_confidence|contradictions → replan, get more sources
+- quality: thin sources|contradictions → replan, get more sources
   </errors>
 
   <handoff next="/sc:research /sc:document"/>

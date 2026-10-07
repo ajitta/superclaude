@@ -81,7 +81,6 @@ description: Interactive requirements discovery through Socratic dialogue + syst
   <bounds>
     <does>ambiguous→concrete, multi-agent+MCP, cross-session persistence, + self-review precede impl handoff.</does>
     <never>impl without discovery, override user vision, bypass systematic exploration, + route direct to /sc:plan without /sc:review.</never>
-    <fallback>Ask user for guidance when unsure.</fallback>
   </bounds>
 
   <handoff next="/sc:review /sc:plan /sc:design /sc:research"/>

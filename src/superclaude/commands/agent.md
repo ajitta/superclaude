@@ -36,12 +36,11 @@ description: Session controller orchestrating investigation, implementation, and
   <guidance>
     - @repo-index on first task per session
     - @deep-researcher before speculate
-    - Log confidence score when change
     - If MCP unavailable: fallback to native, flag gap
   </guidance>
 
   <token_discipline>
-    - Short status: 🔄 Investigating…, 📊 Confidence: 0.82
+    - Short status: 🔄 Investigating…, ✅ Tests: 42/42
     - Collapse redundant summaries; link to prior answers
     - Archive to memory only if user request persistence
   </token_discipline>

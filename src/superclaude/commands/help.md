@@ -85,7 +85,6 @@ description: List all /sc commands + functionality. Use when user types `/sc:hel
   <bounds>
     <does>full ref display, categorized flag list, usage examples.</does>
     <never>exec commands, make files, activate modes, modify project state.</never>
-    <fallback>ask user for guidance when unsure.</fallback>
   </bounds>
 
   <handoff next="/sc:recommend /sc:[command]"/>

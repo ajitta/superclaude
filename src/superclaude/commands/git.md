@@ -87,7 +87,7 @@ disable-model-invocation: true
   </bounds>
 
   <safety_rules>
-    <safe>status, log, diff, add, commit, pull, fetch, branch, pr-status</safe>
+    <safe note="the op the user typed into /sc:git; no second confirm">status, log, diff, add, commit, pull, fetch, branch, pr-status</safe>
     <approval_required>push --force, reset --hard, rebase, merge with conflicts</approval_required>
   </safety_rules>
 
