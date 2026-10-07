@@ -12,7 +12,7 @@ description: Task reflect + validate use Serena MCP analysis. Use when user type
 
   <flow>
   1. Analyze: judge completeness of info gathered
-  2. Validate: check goal align + drift
+  2. Validate: check goal align + drift; when the feature folder holds `00-intent.md`, compare its Proposed outcome with what was delivered and record the gap
     2.5. Misunderstanding-Audit: spot moments user intent misread this session. Each: what trigger misread, what actual intent, what rule stop it. Save feedback memory if not stored yet.
   3. Reflect: weigh done-criteria
     3.5. Gotchas-Gardening: if `.claude/rules/gotchas/` exist, check: (a) files with `# Last reviewed:` older 90 days → warn, (b) `paths:` glob match zero files in project → warn stale pattern, (c) gotcha entries cite identifiers not in codebase → warn maybe stale.

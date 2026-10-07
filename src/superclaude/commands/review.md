@@ -12,8 +12,8 @@ description: Review work product (code, plan, design, spec) for quality, correct
 
   <flow>
   1. Scope: pick review range — PR/diff/file/branch for code, or plan/design/spec doc path
-  2. Gather: read target artifact + related context (spec/plan if reviewing code; parent spec if reviewing plan; requirements if reviewing design). Find in docs/specs/ or docs/plans/ if present
-  3. Review-2D: Dim 1 (spec fidelity) — artifact match intent? Dim 2 (artifact quality) — correctness for code, planning rigor for plan, architectural soundness for design, requirement coverage for spec. No spec → weight shift to Dim 2
+  2. Gather: read target artifact + related context (spec/plan if reviewing code; parent spec if reviewing plan; requirements if reviewing design; `00-intent.md` from the feature folder when present). Find in docs/specs/ or docs/plans/ if present
+  3. Review-2D: Dim 1 (spec fidelity) — artifact match intent (the feature's `00-intent.md` when present, else the spec)? Dim 2 (artifact quality) — correctness for code, planning rigor for plan, architectural soundness for design, requirement coverage for spec. No spec → weight shift to Dim 2
   4. Challenge: before categorize, answer plain — What condition make approach fail? What gap easy to miss? What hardest to change 6 months from now?
   5. Categorize: group finding as Critical (must fix) | Important (should fix) | Suggestion (nice to have)
   6. Verify: evidence fit artifact type — tests+lint for code, executability+completeness for plan, trade-off rationale for design, acceptance criteria for spec

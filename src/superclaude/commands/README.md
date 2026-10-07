@@ -38,6 +38,7 @@ Commands managed by Claude Code native command system. Install to `~/.claude/com
 |---------|-------------|
 | `/sc:design` | Design systems + architectures |
 | `/sc:plan` | Detailed impl plans with TDD tasks |
+| `/sc:intent` | Capture a request in the requester's own words before analysis |
 | `/sc:brainstorm` | Interactive requirements discovery |
 | `/sc:estimate` | Estimate effort + complexity |
 | `/sc:roadmap` | Generate task plan from PRD (distinct from harness Workflow tool) |

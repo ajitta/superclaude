@@ -10,7 +10,7 @@ description: Interactive requirements discovery through Socratic dialogue + syst
   <syntax>/sc:brainstorm [topic/idea] [--strategy systematic|agile|enterprise] [--depth shallow|normal|deep] [--vs [standard|cot|multi]] [--delegate]</syntax>
 
   <flow>
-  1. Explore: Socratic dialogue + systematic questioning.
+  1. Explore: Socratic dialogue + systematic questioning. When the slug folder holds `00-intent.md`, read it first and keep its wording as the anchor; 01-discovery records an "Intent coverage" table mapping each of its five fields to how discovery made it concrete.
   2. Analyze: Multi-agent coord + domain expertise. With --vs, gen k perspectives with probs + landscape synth; --depth tune detail (shallow→brief, normal→balanced, deep→detailed).
   3. Validate: Feasibility check + requirement validation.
   4. Specify: feature path `docs/features/<slug>/01-discovery.md`, standalone `docs/specs/<topic>-discovery-<username>-YYYY-MM-DD.md` — slug resolution (zero-match default `[f]`), frontmatter, README update per core/rules/RULES_DOCS.md `<doc_output_convention>`.

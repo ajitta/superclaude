@@ -1,5 +1,5 @@
 ---
-status: draft
+status: implementing
 revised: 2026-10-07
 ---
 
@@ -42,9 +42,9 @@ Out (R18 미통과, 별도 결정 필요): `--from <ticket|file>` 플래그, sta
 
 ### Task 1: 커맨드 파일
 **Files:** Create: `src/superclaude/commands/intent.md` | Test: `tests/unit/test_command_structure.py`, `tests/unit/test_cross_references.py`
-- [ ] Step 1: 아래 사양으로 파일 작성 (실패 테스트 = 구조 테스트가 새 파일을 자동 수집)
-- [ ] Step 2: `uv run pytest tests/unit/test_command_structure.py tests/unit/test_cross_references.py -q` → green. `test_version_consistency.py`는 이 시점에 red여야 정상(Task 2에서 해소)
-- [ ] Step 3: 커밋 없이 Task 2로
+- [x] Step 1: 아래 사양으로 파일 작성 (실패 테스트 = 구조 테스트가 새 파일을 자동 수집)
+- [x] Step 2: `uv run pytest tests/unit/test_command_structure.py tests/unit/test_cross_references.py -q` → green. `test_version_consistency.py`는 이 시점에 red여야 정상(Task 2에서 해소)
+- [x] Step 3: 커밋 없이 Task 2로
 
 사양:
 
@@ -69,47 +69,52 @@ Out (R18 미통과, 별도 결정 필요): `--from <ticket|file>` 플래그, sta
 
 ### Task 2: 카운트 갱신 (36 → 37)
 **Files:** Modify: `README.md:28` (배지 표), `README.md:33`, `README.md:93`, `README.md:135`, `README.md:515` | `docs/codex/prompting_session_raw/02_component_and_delivery_map.md:24` | Test: `tests/unit/test_version_consistency.py`
-- [ ] Step 1: Task 1 직후 `uv run pytest tests/unit/test_version_consistency.py -q` 가 red임을 확인
-- [ ] Step 2: 여섯 곳의 수를 `ls src/superclaude/commands/*.md | grep -vc README` 결과로 바꾼다 (값을 외우지 않는다)
-- [ ] Step 3: 같은 테스트 green
+- [x] Step 1: Task 1 직후 `uv run pytest tests/unit/test_version_consistency.py -q` 가 red임을 확인
+- [x] Step 2: 여섯 곳의 수를 `ls src/superclaude/commands/*.md | grep -vc README` 결과로 바꾼다 (값을 외우지 않는다)
+- [x] Step 3: 같은 테스트 green
 
 ### Task 3: 문서 규약
 **Files:** Modify: `src/superclaude/core/rules/RULES_DOCS.md:13` (phase prefix), `:45` (phase enum), `:65-74` (workflow_gates) | `src/superclaude/commands/promote-feature.md:17` (type→phase 매핑) | Test: `uv run pytest tests/unit -q -k "docs or rules or promote"`
-- [ ] Step 1: phase prefix 목록 맨 앞에 `00-intent (intent)` 추가
-- [ ] Step 2: Feature README phase enum을 `intent | discovery | design | planning | implementing | complete | abandoned`로
-- [ ] Step 3: workflow_gates 첫 줄에 `/sc:intent -> /sc:brainstorm | /sc:plan: User approves the intent text in their own words; file committed before analysis starts` 추가
-- [ ] Step 4: promote-feature 매핑에 `intent→00-intent.md` 추가
-- [ ] Step 5: 관련 테스트 green
+- [x] Step 1: phase prefix 목록 맨 앞에 `00-intent (intent)` 추가
+- [x] Step 2: Feature README phase enum을 `intent | discovery | design | planning | implementing | complete | abandoned`로
+- [x] Step 3: workflow_gates 첫 줄에 `/sc:intent -> /sc:brainstorm | /sc:plan: User approves the intent text in their own words; file committed before analysis starts` 추가
+- [x] Step 4: promote-feature 매핑에 `intent→00-intent.md` 추가
+- [x] Step 5: 관련 테스트 green
 
 ### Task 4: 소비자 세 곳
 **Files:** Modify: `src/superclaude/commands/brainstorm.md:13` (Explore 단계), `src/superclaude/commands/review.md:15` (Gather 단계), `src/superclaude/commands/reflect.md` (Validate 단계) | Test: `tests/unit/test_command_structure.py`
-- [ ] Step 1: brainstorm Explore 단계에 "같은 slug의 `00-intent.md`가 있으면 먼저 읽고, 각 항목을 어떻게 구체화했는지 01-discovery에 'Intent coverage' 표로 남긴다" 추가
-- [ ] Step 2: review Gather 단계의 관련 문맥에 `00-intent.md`를 추가하고, Review-2D의 Dim 1(spec fidelity)이 spec뿐 아니라 00-intent와 대조하도록 한 구절 추가
-- [ ] Step 3: reflect Validate 단계에 "00-intent.md가 있으면 Proposed outcome과 실제 결과를 대조해 차이를 적는다" 추가
-- [ ] Step 4: 단계 참조는 `the /sc:intent Save step` 형식만 사용; `uv run pytest tests/unit/test_command_structure.py -q` green
+- [x] Step 1: brainstorm Explore 단계에 "같은 slug의 `00-intent.md`가 있으면 먼저 읽고, 각 항목을 어떻게 구체화했는지 01-discovery에 'Intent coverage' 표로 남긴다" 추가
+- [x] Step 2: review Gather 단계의 관련 문맥에 `00-intent.md`를 추가하고, Review-2D의 Dim 1(spec fidelity)이 spec뿐 아니라 00-intent와 대조하도록 한 구절 추가
+- [x] Step 3: reflect Validate 단계에 "00-intent.md가 있으면 Proposed outcome과 실제 결과를 대조해 차이를 적는다" 추가
+- [x] Step 4: 단계 참조는 `the /sc:intent Save step` 형식만 사용; `uv run pytest tests/unit/test_command_structure.py -q` green
 
 ### Task 5: 색인과 README 체인
 **Files:** Modify: `src/superclaude/commands/README.md` (Planning 표), `src/superclaude/commands/help.md:25,66`, `src/superclaude/commands/sc.md:21`, `README.md:240` (Large 행), `README.md:245` (체인 다이어그램), `README.md:252` 앞 (하드 게이트 표 새 행), `README.md:606` (Planning & Design 목록)
-- [ ] Step 1: 네 색인에 `/sc:intent` 한 줄씩 (설명: "Capture a request in the requester's own words before analysis")
-- [ ] Step 2: README Large 체인을 `/sc:intent` → `/sc:brainstorm` → … 로, Medium 행에는 "(선택: `/sc:intent` 먼저)" 주석
-- [ ] Step 3: 하드 게이트 표에 행 추가: `/sc:intent` | `docs/features/<slug>/00-intent.md` | User approves the wording; committed before analysis
-- [ ] Step 4: `uv run pytest tests/unit/test_version_consistency.py tests/unit/test_cross_references.py -q` green
+- [x] Step 1: 네 색인에 `/sc:intent` 한 줄씩 (설명: "Capture a request in the requester's own words before analysis")
+- [x] Step 2: README Large 체인을 `/sc:intent` → `/sc:brainstorm` → … 로, Medium 행에는 "(선택: `/sc:intent` 먼저)" 주석
+- [x] Step 3: 하드 게이트 표에 행 추가: `/sc:intent` | `docs/features/<slug>/00-intent.md` | User approves the wording; committed before analysis
+- [x] Step 4: `uv run pytest tests/unit/test_version_consistency.py tests/unit/test_cross_references.py -q` green
 
 ### Task 6: CHANGELOG
-**Files:** Modify: `CHANGELOG.md`
+**Files:** Modify: `CHANGELOG.md` (deferred to the version-bump branch; see the Proof note)
 - [ ] Step 1: 다음 버전 섹션(버전 범프 브랜치에서 생성)의 `### Added`에 `/sc:intent` 항목과 `00-intent` phase, `intent` phase enum 추가. `## [Unreleased]` 헤딩은 쓰지 않는다 — `test_version_consistency.py`가 날짜 있는 릴리스 헤딩만 인식한다
 - [ ] Step 2: `uv run pytest tests/unit/test_version_consistency.py -q` green
 
 ### Task 7: 동기화와 전체 검증
 **Files:** none (설치 사본 갱신)
-- [ ] Step 1: `superclaude doctor --scope local` 로 local scope 설치 확인 후 `superclaude install --force --scope local`
-- [ ] Step 2: `echo '{"prompt":"/sc:intent test"}' | superclaude hook context_loader` 출력에 "is not a command"가 없어야 함
-- [ ] Step 3: `uv run pytest` exit 0, `make lint` clean
-- [ ] Step 4: `/sc:intent`를 실제로 한 번 실행해 Trivial 요청에는 파일을 만들지 않고, Large 요청에는 질문 5개 이내로 00-intent.md를 만드는지 확인. 결과를 이 문서의 "Proof"에 적는다
-- [ ] Step 5: `feat: add /sc:intent command` 로 커밋, 이 plan의 체크박스 갱신과 README `phase: implementing → complete` 를 같은 커밋에
+- [x] Step 1: `superclaude doctor --scope local` 로 local scope 설치 확인 후 `superclaude install --force --scope local`
+- [x] Step 2: `echo '{"prompt":"/sc:intent test"}' | superclaude hook context_loader` 출력에 "is not a command"가 없어야 함
+- [x] Step 3: `uv run pytest` exit 0, `make lint` clean
+- [x] Step 4: `/sc:intent`를 실제로 한 번 실행해 Trivial 요청에는 파일을 만들지 않고, Large 요청에는 질문 5개 이내로 00-intent.md를 만드는지 확인. 결과를 이 문서의 "Proof"에 적는다
+- [x] Step 5: `feat: add /sc:intent command` 로 커밋, 이 plan의 체크박스 갱신과 README `phase: implementing → complete` 를 같은 커밋에
 
 ## Proof
 
-- 구조·교차참조·카운트 테스트 green (명령과 출력을 여기 붙인다)
-- Task 7 Step 2 훅 출력
-- Task 7 Step 4 실행 기록: 요청 원문, 질문 수, 생성된 파일 경로, 사용자가 고친 문장 수
+2026-10-07, branch `docs/intent-command-plan`:
+
+- `uv run pytest -q tests/unit/test_command_structure.py tests/unit/test_cross_references.py tests/unit/test_version_consistency.py` → `1049 passed`; full `uv run pytest` → `2889 passed, 1 skipped` (baseline before the command: 2863); `make lint` → `All checks passed!`. Before Task 2 the roster tests were red as planned (6 failed: README roster + both dispatcher lists).
+- `superclaude install --force --scope local` then `echo '{"prompt":"/sc:intent test"}' | superclaude hook context_loader` → no "is not a command" line (count 0).
+- Headless probes from the repo root (`claude -p … --allowedTools Read,Glob,Grep,Write --output-format json`):
+  - `/sc:intent rename this variable` → 1 turn, no file written; reply names the request Trivial, says no intent record is written, and asks for the file, identifier and new name to do the rename directly.
+  - `/sc:intent exports time out for big customers; the ops team gets paged every Monday and we cannot change the auth layer` → 2 turns, no file written; reply resolves the slug to a new folder `docs/features/export-timeouts/` (zero-match `[f]`), lists the three fields the seed already fills, asks exactly two questions for the empty ones (proposed outcome, affected systems), and states nothing is written before approval. The Save path itself was not exercised: headless has no approval turn.
+- Task 6 is open on purpose: `test_version_consistency.py` accepts only dated release headings whose newest version equals `pyproject.toml`, so the CHANGELOG line lands in the version-bump commit.

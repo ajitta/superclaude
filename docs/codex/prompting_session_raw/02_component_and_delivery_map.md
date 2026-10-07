@@ -21,7 +21,7 @@ pytest 카운트, coverage, description 문자 수처럼 커밋마다 바뀌는 
 |---|---:|---|
 | `agents/*.md` | 23 | 도메인 전문성, WHO TO BE |
 | `output-styles/*.md` | 1 | Claude Code output style, HOW EVERY RESPONSE READS |
-| `commands/*.md` | 36 | `/sc:*` 사용자 workflow, WHAT TO DO |
+| `commands/*.md` | 37 | `/sc:*` 사용자 workflow, WHAT TO DO |
 | `core` always-loaded | 3 | FLAGS, PRINCIPLES, RULES kernel |
 | `core/rules/*.md` | 4 | on-demand 상세 규칙 |
 | `modes/MODE_*.md` | 8 | 인지 자세, HOW TO THINK |

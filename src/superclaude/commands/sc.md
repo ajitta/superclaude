@@ -47,6 +47,7 @@ description: SuperClaude command dispatcher - main entry point for all features.
     - roadmap: Generate task plan from PRD
     - init: Interactive project env setup
     - insight: Capture structured session insights
+    - intent: Capture a request in the requester's own words before analysis
     - plan: Detailed impl plans with TDD tasks
     - review: Code review with structured feedback
     - auto-improve: Autonomous overnight code improvement loop (Karpathy AutoResearch)

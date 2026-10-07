@@ -10,7 +10,7 @@ Long documents: settle the structure and the hard decisions before writing, then
 
 Default (multi-doc work): docs/features/<feature-slug>/
   Required: README.md (frontmatter + index) + numbered phase files
-  Phase prefixes: 01-discovery (brainstorm) | 02-research | 03-analysis | 04-design | 05-plan (plan, roadmap) | 06+-<custom> (impl notes, retrospective)
+  Phase prefixes: 00-intent (intent) | 01-discovery (brainstorm) | 02-research | 03-analysis | 04-design | 05-plan (plan, roadmap) | 06+-<custom> (impl notes, retrospective)
   Multi-of-same-phase: `NNa-<phase>-<distinguisher>.md` (letter = Nth additional, starts at 'a'; distinguisher kebab-case ≤20 chars). Primary slot `NN-<phase>.md` optional — letter clock starts at 'a' even when primary skipped. Use for parallel streams (02a-research-libs, 02b-research-perf), phase-specific sub-discovery within multi-phase feature (01a-discovery-phase2), or mid-implementation discovery (01a-discovery-late).
   Superseded versions: move to <feature>/archive/ subdir
   Feature-slug: kebab-case, ≤40 chars, no dates/usernames, locked at dir creation
@@ -42,7 +42,7 @@ Durability routing (writing INTO a doc the session always loads: CLAUDE.md, AGEN
 Username: `git config user.name` (lowercase, no spaces) — fallback OS username
 
 Frontmatter rules:
-  Feature README: {feature, phase, owner, created, updated, related?}. Phase enum: discovery | design | planning | implementing | complete | abandoned
+  Feature README: {feature, phase, owner, created, updated, related?}. Phase enum: intent | discovery | design | planning | implementing | complete | abandoned
   Phase doc (inside feature folder): {status, revised} — new docs start `status: draft`, `revised: <today>`
   Standalone specs/+plans/: {status, revised}
   Standalone research/+analysis/: optional {status, revised}
@@ -63,6 +63,7 @@ Examples:
   </doc_output_convention>
 
   <workflow_gates>
+    /sc:intent -> /sc:brainstorm | /sc:plan: User approves the intent text in their own words; file committed before analysis starts
     /sc:brainstorm -> /sc:design: User approves discovery spec before designing
     /sc:brainstorm -> /sc:review: Spec self-review mandatory before /sc:plan handoff (caught 3 critical reversals; see the /sc:brainstorm Self-review step)
     /sc:design -> /sc:plan: Design spec committed (components pass [R18 Necessity Test] necessity test, deferred items marked)
