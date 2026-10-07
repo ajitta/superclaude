@@ -18,11 +18,17 @@ Claude Code scans skills/ by default and loads each skill as <plugin>:<skill>, s
 the manifest needs no `skills` key. The zip is byte-reproducible on every OS
 (fixed timestamps, modes, create_system, LF line endings for text files).
 
+Claude Code updates an installed plugin only when its version changes. So
+plugin-release.json (not shipped) records a digest of the skill files for the
+current plugin version, and a build refuses changed skill files under the same
+version. Before a version is first released, delete the record and rebuild.
+
 Usage: python3 portable-skills/package.py [--check]   (stdlib only)
 """
 
 from __future__ import annotations
 
+import hashlib
 import json
 import re
 import sys
@@ -33,6 +39,7 @@ ROOT = Path(__file__).resolve().parent
 DIST = ROOT / "releases"
 PLUGINS = ROOT / "plugins"
 MANIFEST = ROOT / "plugin-manifest.json"
+RELEASE = ROOT / "plugin-release.json"
 ALLOWED_KEYS = {
     "name",
     "description",
@@ -165,6 +172,55 @@ def plugin_files(skills: list[Path]) -> dict:
     return files
 
 
+def content_digest(skills: list[Path]) -> str:
+    """sha256 over the plugin's files minus the manifest, so a version bump
+    alone leaves it unchanged."""
+    h = hashlib.sha256()
+    for rel, data in sorted(plugin_files(skills).items()):
+        if rel != ".claude-plugin/plugin.json":
+            h.update(rel.encode() + b"\0" + data + b"\0")
+    return h.hexdigest()
+
+
+def _release_state(skills: list[Path]) -> tuple[str, str, dict]:
+    version = json.loads(MANIFEST.read_text(encoding="utf-8"))["version"]
+    try:
+        recorded = json.loads(RELEASE.read_text(encoding="utf-8"))
+    except FileNotFoundError:
+        recorded = {}
+    return version, content_digest(skills), recorded
+
+
+def _bump_error(version: str) -> str:
+    return (
+        f"skill files changed since plugin {version}: bump version in "
+        "plugin-manifest.json, then run package.py"
+    )
+
+
+def check_release(skills: list[Path]) -> list[str]:
+    version, digest, recorded = _release_state(skills)
+    if recorded.get("version") != version:
+        return [
+            f"plugin-release.json records {recorded.get('version')!r}, "
+            f"plugin-manifest.json says {version!r}: run package.py"
+        ]
+    if recorded.get("digest") != digest:
+        return [_bump_error(version)]
+    return []
+
+
+def record_release(skills: list[Path]) -> list[str]:
+    version, digest, recorded = _release_state(skills)
+    if recorded.get("version") == version and recorded.get("digest") != digest:
+        return [_bump_error(version)]
+    RELEASE.write_text(
+        json.dumps({"version": version, "digest": digest}, indent=2) + "\n",
+        encoding="utf-8",
+    )
+    return []
+
+
 def write_plugin_dir(skills: list[Path]) -> Path:
     """Write plugins/<plugin>/ for marketplaces. claude.ai's marketplace skips a
     plugin folder without .claude-plugin/plugin.json, but a skill folder must
@@ -200,6 +256,8 @@ def main() -> int:
     check_only = "--check" in sys.argv
     skills = sorted(p for p in ROOT.iterdir() if (p / "SKILL.md").is_file())
     errors = validate_manifest() + [e for s in skills for e in validate(s)]
+    if not errors:
+        errors = check_release(skills) if check_only else record_release(skills)
     for e in errors:
         print("ERROR", e)
     if errors:

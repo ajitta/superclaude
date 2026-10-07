@@ -69,28 +69,28 @@ Out: Codex 사이드카 `agents/openai.yaml`(한글 없음), 과거 기록(`docs
 
 ### Task 4: 라우팅과 응답 언어 probe
 **Files:** 없음 (결과는 Proof에 기록)
-- [ ] Step 1: 준비. 저장소 밖 빈 디렉터리에서 `claude -p --plugin-dir portable-skills/plugins/socratic --model sonnet --output-format stream-json --verbose`로 첫 턴만 실행하고 Skill 호출을 읽는다. init 이벤트에 `socratic-brainstorm@synced`·`socratic-elenchus@synced`(이 기기의 claude.ai 사본)가 보이면 실행하는 동안만 `claude plugin disable`로 끄고 끝나면 `enable`로 되돌린다.
-- [ ] Step 2: [10-two-skills.md](../socratic-brainstorm-skill/10-two-skills.md) §3의 일곱 프롬프트를 n=1로 실행한다. 기준선은 7/7이고, 스킬 이름만 `socratic:` 접두사로 바뀐다. 한국어 프롬프트의 첫 응답은 한국어여야 한다.
-- [ ] Step 3: [12-followups.md](../socratic-brainstorm-skill/12-followups.md)의 모호한 프롬프트 두 개("소크라테스식으로 해줘: 점심 앱", "소크라테스처럼 질문해줘: 코딩 교실")를 n=2로 실행한다. 어느 스킬이 로드되든 첫 메시지에 다른 스킬을 가리키는 한 줄이 한국어로 있어야 한다.
-- [ ] Step 4: 멈춤 신호. 스킬마다 한 번, 한국어 첫 턴 뒤 `--resume <session> "그만"` → brainstorm은 Step 5(판정과 brief)로, elenchus는 기록으로 바로 가야 한다.
-- [ ] Step 5: 기준선보다 나빠지면 멈추고 Deviations에 기록한다. 영어 트리거 문구를 고쳐 다시 실행하고, 한국어를 되돌려 넣지는 않는다.
+- [x] Step 1: 준비. 저장소 밖 빈 디렉터리에서 `claude -p --plugin-dir portable-skills/plugins/socratic --model sonnet --output-format stream-json --verbose`로 첫 턴만 실행하고 Skill 호출을 읽는다. init 이벤트에 `socratic-brainstorm@synced`·`socratic-elenchus@synced`(이 기기의 claude.ai 사본)가 보이면 실행하는 동안만 `claude plugin disable`로 끄고 끝나면 `enable`로 되돌린다.
+- [x] Step 2: [10-two-skills.md](../socratic-brainstorm-skill/10-two-skills.md) §3의 일곱 프롬프트를 n=1로 실행한다. 기준선은 7/7이고, 스킬 이름만 `socratic:` 접두사로 바뀐다. 한국어 프롬프트의 첫 응답은 한국어여야 한다.
+- [x] Step 3: [12-followups.md](../socratic-brainstorm-skill/12-followups.md)의 모호한 프롬프트 두 개("소크라테스식으로 해줘: 점심 앱", "소크라테스처럼 질문해줘: 코딩 교실")를 n=2로 실행한다. 어느 스킬이 로드되든 첫 메시지에 다른 스킬을 가리키는 한 줄이 한국어로 있어야 한다.
+- [x] Step 4: 멈춤 신호. 스킬마다 한 번, 한국어 첫 턴 뒤 `--resume <session> "그만"` → brainstorm은 Step 5(판정과 brief)로, elenchus는 기록으로 바로 가야 한다.
+- [x] Step 5: 기준선보다 나빠지면 멈추고 Deviations에 기록한다. 영어 트리거 문구를 고쳐 다시 실행하고, 한국어를 되돌려 넣지는 않는다.
 
 ### Task 4a: 스킬 파일이 바뀌면 플러그인 버전 bump 강제
 **Files:** Create: `portable-skills/plugin-release.json` | Modify: `portable-skills/package.py`, `tests/unit/test_portable_skills.py`
 
 1.0.0의 내용은 Task 4 Step 5에서 문구가 바뀔 수 있어 Task 4 뒤에 둔다.
-- [ ] Step 1: 테스트
+- [x] Step 1: 테스트
   - `test_release_record_matches_content`: `check_release(_SKILLS) == []`
   - `test_changed_skills_need_a_new_plugin_version`: 임시 manifest(1.0.0)와 digest가 다른 기록 → `check_release`가 bump 오류를 내고, `record_release`는 기록을 덮어쓰지 않고 거부한다
   - `test_new_plugin_version_is_recorded`: manifest 1.0.1, 기록 1.0.0 → `record_release`가 {1.0.1, 현재 digest}를 쓰고, 이후 `check_release`는 `[]`
-- [ ] Step 2: red 확인
-- [ ] Step 3: `package.py`
+- [x] Step 2: red 확인
+- [x] Step 3: `package.py`
   - `RELEASE = ROOT / "plugin-release.json"`, 내용은 `{"version", "digest"}`. 설치 파일이 아니므로 `plugin_files()`에 넣지 않는다.
   - `content_digest(skills)`: `plugin_files()`에서 `.claude-plugin/plugin.json`을 뺀 경로와 바이트를 정렬해 sha256. manifest를 빼므로 버전만 올려도 digest는 같다.
   - `check_release()`: 기록 없음 또는 기록 버전 ≠ manifest 버전 → "run package.py". 같은 버전인데 digest가 다름 → "skill files changed since plugin X: bump version in plugin-manifest.json".
   - `record_release()`: 같은 버전에 digest가 다르면 거부하고, 그 외에는 기록을 쓴다. `main()`의 `--check`는 `check_release` 오류를 보고하고, 빌드 모드는 패키징 전에 `record_release`를 부르며 거부되면 1로 끝난다.
-- [ ] Step 4: `uv run python portable-skills/package.py` → 기록 {1.0.0, digest} 생성, 테스트 green, `make lint`
-- [ ] Step 5: 커밋 `feat(portable-skills): require a plugin version bump when skill files change`
+- [x] Step 4: `uv run python portable-skills/package.py` → 기록 {1.0.0, digest} 생성, 테스트 green, `make lint`
+- [x] Step 5: 커밋 `feat(portable-skills): require a plugin version bump when skill files change`
 
 ### Task 5: 실제 저장소로 이전 경로 probe
 **Files:** 없음 (scratchpad만 사용, 결과는 Proof에 기록)
@@ -153,13 +153,18 @@ Out: Codex 사이드카 `agents/openai.yaml`(한글 없음), 과거 기록(`docs
 
 - Task 1 Step 4: 이전 마켓플레이스 테스트는 Task 2 전까지 red일 것으로 적었지만 green으로 남았다. 그 테스트는 항목의 `source` 폴더가 있는지 보지 않아서, 폴더가 지워진 항목도 통과시켰다. Task 2의 새 테스트에 `source` 폴더 존재 확인을 추가했다.
 - Task 2 커밋(5fcfb00a)에 `plugins/socratic/skills/`가 빠졌다. `.gitignore`의 `skills/`(npx skills add 산출물용)가 경로 고정 없이 모든 `skills/` 디렉터리를 제외했다. 로컬 테스트는 디스크의 파일로 통과했지만 새 checkout에서는 실패했을 것이다. `!portable-skills/plugins/*/skills/` 예외를 추가하고 후속 커밋으로 폴더를 넣었다.
+- Task 4 Step 1: `@synced` 사본은 `claude plugin disable`/`enable` 대신 실행마다 `--settings '{"enabledPlugins":{"socratic-brainstorm@synced":false,"socratic-elenchus@synced":false}}'`로 껐다. init 이벤트에 `socratic` 플러그인과 `socratic:` 스킬 두 개만 남는 것을 확인했고, 사용자 설정은 바뀌지 않는다. 끄지 않은 첫 확인 실행에서는 모델이 `@synced`의 `socratic-elenchus:socratic-elenchus`를 골랐다.
 
 ## Proof
 
 - `uv run pytest tests/unit/test_portable_skills.py -q` → 전부 통과(`test_shipped_plugin_has_no_hangul`, `test_release_record_matches_content`, `test_install_docs_match_the_marketplace` 포함). 전체 `uv run pytest` → exit 0(기준선 2953 passed, 1 skipped). `make lint` → `All checks passed!`
 - `uv run python portable-skills/package.py --check` → 스킬 두 개 `ok`
 - `claude plugin validate portable-skills/plugins/socratic`와 `claude plugin validate .` → `✔ Validation passed`
-- Task 4: 명시 프롬프트 7/7, 모호한 프롬프트에 안내 줄, 한국어 응답, "그만" 처리
+- Task 4 (2026-10-08, ef4e8e91의 `plugins/socratic`, `claude -p --plugin-dir … --model sonnet --effort low`, 첫 턴의 Skill 호출을 stream-json에서 읽음):
+  - 명시 프롬프트 7/7: 10-two-skills §3의 B 세 개 → `socratic:socratic-brainstorm`, E 세 개 → `socratic:socratic-elenchus`, "파이썬 리스트 중복 제거하는 법" → 스킬 없음. 첫 응답은 모두 한국어.
+  - 모호한 프롬프트 4회: "소크라테스식으로 해줘: 점심 앱" 2회 → brainstorm, "소크라테스처럼 질문해줘: 코딩 교실" 2회 → elenchus. 네 번 모두 다른 스킬을 가리키는 한 줄이 한국어로 있었다(예: "선택지와 계획까지 가는 질문을 원하시면 `socratic-brainstorm`을 요청하세요.").
+  - `--resume` 후 "그만": brainstorm → "판정: 열림(Open)"과 brief, elenchus → "검증 전에 중단" 기록. 둘 다 한국어.
+- Task 4a: `plugin-release.json` = {1.0.0, digest}. SKILL.md에 한 줄을 임시로 더하자 `package.py`와 `--check`가 둘 다 exit 1 (`skill files changed since plugin 1.0.0: bump version in plugin-manifest.json, then run package.py`), 기록 파일은 바뀌지 않았다. 원복 후 `--check` 통과.
 - Task 5: `socratic@ajitta-socratic ✔ enabled` 하나, `Skills (2)`
 - Task 8: claude.ai 업로드에서 두 스킬이 보이고 elenchus가 한국어로 시작함 (사용자 확인)
 

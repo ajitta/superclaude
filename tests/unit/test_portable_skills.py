@@ -223,6 +223,52 @@ def test_plugin_dir_matches_skills_plus_manifest():
     )
 
 
+def test_release_record_matches_content():
+    """Claude Code updates an installed plugin only when its version changes,
+    so skill files that changed under the same plugin version never reach
+    users. plugin-release.json records the skill-file digest per version."""
+    assert _packager().check_release(_SKILLS) == []
+
+
+def _release_fixture(tmp_path, monkeypatch, version, recorded):
+    pkg = _packager()
+    manifest = tmp_path / "plugin-manifest.json"
+    manifest.write_text(
+        json.dumps({"name": "demo", "version": version, "description": "d"}),
+        encoding="utf-8",
+    )
+    release = tmp_path / "plugin-release.json"
+    release.write_text(json.dumps(recorded), encoding="utf-8")
+    monkeypatch.setattr(pkg, "MANIFEST", manifest)
+    monkeypatch.setattr(pkg, "RELEASE", release)
+    skill = _write_skill(
+        tmp_path,
+        "demo-skill",
+        'name: demo-skill\ndescription: Demo.\nmetadata:\n  version: "1.0.0"\n',
+    )
+    return pkg, [skill], release
+
+
+def test_changed_skills_need_a_new_plugin_version(tmp_path, monkeypatch):
+    recorded = {"version": "1.0.0", "digest": "0" * 64}
+    pkg, skills, release = _release_fixture(tmp_path, monkeypatch, "1.0.0", recorded)
+    assert any("bump version" in e for e in pkg.check_release(skills))
+    assert any("bump version" in e for e in pkg.record_release(skills))
+    assert json.loads(release.read_text(encoding="utf-8")) == recorded
+
+
+def test_new_plugin_version_is_recorded(tmp_path, monkeypatch):
+    recorded = {"version": "1.0.0", "digest": "0" * 64}
+    pkg, skills, release = _release_fixture(tmp_path, monkeypatch, "1.0.1", recorded)
+    assert any("run package.py" in e for e in pkg.check_release(skills))
+    assert pkg.record_release(skills) == []
+    assert json.loads(release.read_text(encoding="utf-8")) == {
+        "version": "1.0.1",
+        "digest": pkg.content_digest(skills),
+    }
+    assert pkg.check_release(skills) == []
+
+
 _HANGUL = re.compile("[ᄀ-ᇿ㄰-㆏ꥠ-꥿가-퟿]")
 
 
