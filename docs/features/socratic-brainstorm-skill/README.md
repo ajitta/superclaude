@@ -15,8 +15,8 @@ SuperClaude already does Socratic brainstorming, but only inside Claude Code and
 
 Two skills now ship, both portable to Claude (incl. mobile) and Codex:
 
-- **`socratic-brainstorm` (3.2.0):** modern Socratic questioning (Paul's six types, one question at a time), then the user's own options plus up to 3 labeled model options, convergence by criteria, and a verdict + brief with a next step. Use it to leave with options and a plan.
-- **`socratic-elenchus` (1.2.0):** Plato's elenchus. "What is X?", premises the user agrees to, a contradiction built from them, the user revises; revisions are the ideas; usually aporia; no advice. Use it to find out whether you really know what you mean.
+- **`socratic-brainstorm` (3.2.1):** modern Socratic questioning (Paul's six types, one question at a time), then the user's own options plus up to 3 labeled model options, convergence by criteria, and a verdict + brief with a next step. Use it to leave with options and a plan.
+- **`socratic-elenchus` (1.2.1):** Plato's elenchus. "What is X?", premises the user agrees to, a contradiction built from them, the user revises; revisions are the ideas; usually aporia; no advice. Use it to find out whether you really know what you mean.
 
 History: v1 shipped as `socratic-brainstorm` 1.0.0 and was mislabeled as the Socratic method. 2.0.0 rebuilt it as the elenchus. After comparing the two, the user kept both: the elenchus moved to its own skill, and the v1 approach returned under an honest description ([10](./10-two-skills.md)).
 

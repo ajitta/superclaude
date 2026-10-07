@@ -6,6 +6,30 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Ver
 
 Releases before 4.19.0 are not listed. Their history is the git log; the upstream-era changelog, last entry 4.2.1, is `CHANGELOG.md` at commit `6b0ac5c3^`.
 
+## [4.21.0] - 2026-10-07
+
+### Changed
+
+- Installed content (commands, agents, modes, MCP docs, core rules) was audited against the Claude Opus 5.5 prompting guidance and cleaned up. Scores that no tool computes are gone: research confidence thresholds and time budgets, and the `/sc:agent` 0.90 confidence gate, which now waits on confirmed scope, success criteria and acceptance checks instead. Replanning triggers in `/sc:research`, `deep-researcher` and `RESEARCH_CONFIG.md` are stated in words (sources disagree on a load-bearing claim, fewer than 3 independent sources, core question unanswered). Caps-lock emphasis, pinned "Opus 4.x" model claims and the generic "ask the user when unsure" fallback line are removed where the authoring rule makes them optional.
+- Source credibility is one scale: the four tiers in `RESEARCH_CONFIG.md` (tier 1 highest), named from `deep-researcher` and `/sc:research`. The agent's separate 1–5 scale and the config's 0.x score column are gone.
+- `git-workflow` agent: `git add` now asks first (it was listed as a read-only op); `git fetch` proceeds and is labelled for what it writes (remote-tracking refs only). PR review state is GitHub's `REVIEW_REQUIRED`; the `PENDING` value never existed. `/sc:git` keeps `add`, `commit`, `pull` and `fetch` as safe because the user typed the op.
+- `/sc:agent` no longer lists the removed `confidence-check` service. `/sc:promote-feature`, `/sc:cleanup --type docs` and the commands README no longer cite the doc-convention-v2 discovery document, which no longer exists.
+- `business-panel-experts` picks its own analysis mode instead of asking first. `python-expert` checks diff coverage on changed code; the overall line and branch gate belongs to `quality-engineer`. `project-manager` is no longer suggested for proactive use at session start. `MCP_Tavily.md` no longer bans questions "answerable from training".
+- `MODE_Orchestration` cites the Workflow fan-out process cap from `core/FLAGS.md` (min(16, cpu−2)) instead of an unsourced per-session agent cap.
+- Portable skills `socratic-brainstorm` 3.2.1 and `socratic-elenchus` 1.2.1: the per-message length rule reads "a turn fits a phone screen without scrolling" instead of a line count. Re-upload `portable-skills/releases/<skill>.zip`, or `/plugin update` in Claude Code, to get it.
+- Contributor instructions live in `AGENTS.md`; `CLAUDE.md` imports it. The repo no longer calls itself a fork, and CI runs on Python 3.10 and 3.13.
+
+### Fixed
+
+- R16 Safe Read states the hook's single rule: a Read of 30 KB or more needs `limit` or `pages`. No 5 KB or config-file exemption exists in `file_size_guard.py`.
+- `/sc:init` task (g) names the live auto-memory path (`~/.claude/projects/<project>/memory/`) instead of `.claude/memory/`, which nothing loads. `/sc:auto-improve` maps its positional project argument to `--project`. `/sc:help` no longer says `/sc:build` deploys.
+- Serena project memories and the workflows README name `AGENTS.md` and the actual `make lint` target (`ruff check`; the format check runs in CI).
+
+### Upgrade notes
+
+- Installed content changed across many commands, agents, modes and core rules. `superclaude update --scope <scope>` refreshes it for each installed scope; skip scopes that `superclaude doctor --scope <scope>` reports as not installed, because `update` creates an install where none exists.
+- After the update, the `git-workflow` agent asks before `git add`; answer once per staging step or stage yourself.
+
 ## [4.20.1] - 2026-10-05
 
 ### Changed

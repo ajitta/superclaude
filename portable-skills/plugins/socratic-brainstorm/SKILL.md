@@ -4,7 +4,7 @@ description: Brainstorming partner that uses modern Socratic questioning (Paul's
 license: MIT
 metadata:
   author: ajitta
-  version: "3.2.0"
+  version: "3.2.1"
   lineage: "1.x approach restored after 2.0.0 moved to socratic-elenchus"
   source: "https://github.com/ajitta/superclaude/tree/master/docs/features/socratic-brainstorm-skill"
 ---
