@@ -64,7 +64,7 @@ revised: 2026-10-07
 | 7 canary 릴리스 게이트 | 완료 (make release, CANARY_OK=1; 비용 결정으로 게이트는 `make canary-gates` 4개 과제·sonnet·low effort, 전체 14개는 모델 릴리스 때만) | 7cf07537 + 후속 |
 | 8 canary --permission-mode | 완료 (측정 실행은 아직) | 3362816e |
 | 9 /sc:review Dim 3·R19 확장 | 완료 | da4a2f12 |
-| 10 gotcha 길이 예산 | 미착수 (사용자 메모라 사용자 판단) | — |
+| 10 gotcha 길이 예산 | 완료 (항목당 320자, `tests/unit/test_gotcha_budget.py`; 3개 파일 23.7KB→13.5KB, 유실 지적 15건 복원) | 후속 커밋 |
 
 ## 제외한 항목과 이유
 
