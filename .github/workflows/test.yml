@@ -3,8 +3,11 @@ name: Tests
 on:
   push:
     branches: [master]
+    # Serena session memories: no test reads them
+    paths-ignore: ['.serena/**']
   pull_request:
     branches: [master]
+    paths-ignore: ['.serena/**']
   workflow_dispatch:
 
 jobs:
