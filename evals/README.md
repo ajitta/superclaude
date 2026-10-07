@@ -78,6 +78,15 @@ so a `reasoning_extraction` or `cyber` trip on a new model's classifiers
 is visible as such. Run the same command on a `master` worktree first to
 separate regression from pre-existing failure.
 
+## Release gate
+
+`make release` checks whether `src/superclaude/core`, `hooks` or `scripts` changed
+since the last `v*` tag and refuses unless `CANARY_OK=1` is set. The gate is
+manual on purpose: run `--canary` locally (`claude -p` under the logged-in
+session, no API key), read `report.md`, then release with `CANARY_OK=1 make
+release`. There is no CI run of this suite. Each gotcha or insight that records
+a behavior failure gets a probe in `tasks.yaml` so the regression stays caught.
+
 ## Results
 
 Each run writes to `<temp>/superclaude-evals/<timestamp>/`:

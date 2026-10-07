@@ -119,6 +119,9 @@ release:
 	git diff --quiet HEAD || { echo "❌ uncommitted changes"; exit 1; }; \
 	git fetch -q origin master; test "$$SHA" = "$$(git rev-parse origin/master)" || { echo "❌ HEAD is not origin/master"; exit 1; }; \
 	test "$$(gh run list --commit $$SHA --workflow Tests --json conclusion --jq '.[0].conclusion')" = success || { echo "❌ Tests not green for $$SHA"; exit 1; }; \
+	PREV=$$(git describe --tags --abbrev=0 --match 'v*' 2>/dev/null || true); \
+	if [ -n "$$PREV" ] && [ -n "$$(git diff --name-only $$PREV..HEAD -- src/superclaude/core src/superclaude/hooks src/superclaude/scripts)" ] && [ "$$CANARY_OK" != "1" ]; then \
+	  echo "❌ core/, hooks/ or scripts/ changed since $$PREV — run 'uv run python evals/run_eval.py --canary' (local claude -p), read report.md, then re-run with CANARY_OK=1"; exit 1; fi; \
 	awk '/^## \[/{n++; next} n==1' CHANGELOG.md > .release-notes.md; \
 	gh release create "v$$V" --target "$$SHA" --title "v$$V" --notes-file .release-notes.md; rm -f .release-notes.md; \
 	git push origin "$$SHA:refs/heads/stable"; \
@@ -141,7 +144,7 @@ help:
 	@echo "  make lint            - Run linter (ruff check)"
 	@echo "  make format          - Format code (ruff format)"
 	@echo "  make clean           - Clean build artifacts"
-	@echo "  make release         - Release master HEAD: GitHub release v<version>, move stable"
+	@echo "  make release         - Release master HEAD: GitHub release v<version>, move stable (CANARY_OK=1 after a canary run when core/hooks/scripts changed)"
 	@echo ""
 	@echo "🧹 Cleanup:"
 	@echo "  make uninstall-user    - Uninstall from user scope (~/.claude/)"
