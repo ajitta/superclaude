@@ -27,10 +27,17 @@
 - Routing probe (Task 4, sonnet low, `--plugin-dir`, synced copies off via `--settings`): explicit 7/7 (baseline 7/7), Korean replies, ambiguous prompts carry the pointer line 4/4, "그만" → brief / record.
 - Migration: local git probe (Task 5) and real GitHub after push: old 3.2.1/1.2.1 installs → one `socratic@ajitta-socratic` 1.0.0, `Skills (2)`, enabledPlugins rewritten.
 - Final: full suite 2964 passed, 1 skipped (baseline 2953); master CI Tests 3.10/3.13 + lint/plugin/doctor success; Pages deploy success.
-- CI change: YAML parses; the da9f3329 push (it touches test.yml) ran Tests and all three jobs succeeded.
+- CI change: YAML parses; the da9f3329 push (it touches test.yml) ran Tests and all three jobs succeeded. The `.serena`-only push 2619fb2f ran Pages only, no Tests.
+
+## Later the same session: stable as the release channel (v4.23.1)
+- User: "push할때마다 CI TEST 돌게하지말고, release 만들때 한번하게". Prerequisite agreed: users must not follow master. Probe (scratch bare repo, master plugin 1.0.1 vs stable 1.0.0): CC records no marketplace ref, `marketplace update` re-clones from the default branch, so existing users move to the new default at their next update; the installed plugin moves only on `plugin update` (also to a lower version); new users land on the default.
+- GitHub default branch and Pages source → `stable` (gh, 16:52Z). Docs: README dev clone `-b master`, AGENTS.md branch line, portable-skills README, Pages fork hint (4f5a884b).
+- Push 500s: every git push to the repo returned `remote rejected (Internal Server Error)` for ~10 min (SSH and HTTPS, new and existing commits, master and temp refs) while the REST API created refs fine and githubstatus was green; the background retry succeeded at 17:02:48Z. Same symptom in the 2026-10-07 session without any settings change, so the settings switch is not shown to be the cause.
+- `test.yml` lost its push trigger; `make ci` dispatches Tests on origin/master and waits (reuses a green run); `make release` calls it (7e091b99). Trap fixed before commit: a `$(MAKE)` line runs even under `make -n`, which would have run the whole release, so the recipe calls plain `make ci`.
+- v4.23.1 released through the new path (Tests run 37656993227 green → release → stable 9d086bbc); Pages rebuilt from stable and the live site shows the new fork hint. CHANGELOG 4.23.1 records the channel and CI change.
+- GitHub now suggests a "Compare & pull request" from master into stable after pushes; never open it.
 
 ## Open
-- Not yet observed: a `.serena`-only push actually skipping Tests. The next push that only commits a session memory shows it (expect no Tests run for that SHA; Pages still runs).
 - claude.ai Add-marketplace route with `renames`: user check, meaningful only if the marketplace was added there before.
 
 ## Pointers
