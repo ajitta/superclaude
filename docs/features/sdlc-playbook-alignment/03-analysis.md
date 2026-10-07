@@ -5,7 +5,7 @@ revised: 2026-10-07
 
 # AI-Native SDLC Playbook 대조 분석
 
-**대상.** Anthropic "The AI-Native SDLC Playbook"(Louis Claxton, Applied AI; `docs/research/claude.com/AI Native SDLC Playbook_designv2/`에 markitdown 변환본, 2,847줄) 6단계 14개 플레이 vs SuperClaude 4.21.0(`src/superclaude/hooks/hooks.json`, `core/rules/RULES_DOCS.md`, 커맨드 flow, `evals/`, `.github/workflows/test.yml`).
+**대상.** Anthropic "The AI-Native SDLC Playbook"(Louis Claxton, Applied AI; 'https://claude.com/resources/articles/the-ai-native-sdlc-playbook', PDF 다운로드판을 markitdown으로 변환해 읽음, 2,847줄) 6단계 14개 플레이 vs SuperClaude 4.21.0(`src/superclaude/hooks/hooks.json`, `core/rules/RULES_DOCS.md`, 커맨드 flow, `evals/`, `.github/workflows/test.yml`).
 
 **결론.** 플레이북의 핵심 주장 "각 단계는 커밋된 산출물로 끝나고 다음 단계가 그것을 읽는다"를 SuperClaude는 이미 구조로 갖고 있다(`docs/features/<slug>/01-discovery → 04-design → 05-plan`, workflow_gates). brainstorm과 plan 사이의 필수 /sc:review, 위임 결정 감사, 블래스트 반경별 검증 사다리(R15), 서브에이전트 패킷 규칙은 플레이북보다 더 나간다. 차이는 세 군데에 몰려 있다. 플레이북은 규칙마다 결정적 집행(훅, CI 게이트)을 붙이는데 SuperClaude는 상당수가 프로즈 규칙에 머문다. 산출물 체인은 있지만 수동 호출이다(의도적, 아래 전제). 플레이마다 측정 지표를 두는 플레이북과 달리 자기 워크플로를 재는 지표가 없다(필요성 미통과, 제외).
 
@@ -61,7 +61,7 @@ revised: 2026-10-07
 | 4 /sc:design --from·Concerns | 완료 | da4a2f12 |
 | 5 verifier 에이전트 | 완료 (/sc:test Verify 단계에서 명시 호출) | 3362816e |
 | 6 테스트 파일 잠금 훅 | 철회 (훅 제거, 프로즈 규칙 fix-not-test만 유지) | 3362816e → 철회 커밋 |
-| 7 canary 릴리스 게이트 | 완료 (make release, CANARY_OK=1) | 7cf07537 |
+| 7 canary 릴리스 게이트 | 완료 (make release, CANARY_OK=1; 비용 결정으로 게이트는 `make canary-gates` 4개 과제·sonnet·low effort, 전체 14개는 모델 릴리스 때만) | 7cf07537 + 후속 |
 | 8 canary --permission-mode | 완료 (측정 실행은 아직) | 3362816e |
 | 9 /sc:review Dim 3·R19 확장 | 완료 | da4a2f12 |
 | 10 gotcha 길이 예산 | 미착수 (사용자 메모라 사용자 판단) | — |
@@ -83,7 +83,7 @@ brainstorm→review 필수 게이트, 위임 결정 감사, 검증 사다리, �
 
 ## 출처
 
-- 플레이북 변환본: `docs/research/claude.com/AI Native SDLC Playbook_designv2/AI Native SDLC Playbook_designv2.md` (git 미추적)
+- Anthropic, "The AI-native SDLC playbook" (Louis Claxton, 2026-08-21), 'https://claude.com/resources/articles/the-ai-native-sdlc-playbook' (PDF 다운로드 제공; Claude Academy 코스 'https://academy.claude.com/courses/ai-native-sdlc-playbook/introduction')
 - Anthropic, "Auto mode is now the default in Claude Code for Pro, Max, and Team plans", 2026-08-07, 'https://claude.com/blog/auto-mode-default-in-claude-code'
 - Claude Code Docs, What's new Week 32 (2026-08-03~07), 'https://code.claude.com/docs/en/whats-new/2026-w32'
 - Anthropic Engineering, "How we built Claude Code auto mode", 2026-03-25, 'https://www.anthropic.com/engineering/claude-code-auto-mode'

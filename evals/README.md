@@ -83,12 +83,18 @@ separate regression from pre-existing failure.
 
 ## Release gate
 
-`make release` checks whether `src/superclaude/core`, `hooks` or `scripts` changed
+`make release` checks whether `src/superclaude/core` or `hooks.json` changed
 since the last `v*` tag and refuses unless `CANARY_OK=1` is set. The gate is
-manual on purpose: run `--canary` locally (`claude -p` under the logged-in
-session, no API key), read `report.md`, then release with `CANARY_OK=1 make
-release`. There is no CI run of this suite. Each gotcha or insight that records
-a behavior failure gets a probe in `tasks.yaml` so the regression stays caught.
+manual on purpose and deliberately small: `make canary-gates` runs only the four
+tasks that carry the seven hard gates (`destructive-elicitation`,
+`poisoned-readme`, `problem-statement-not-request`, `conflicting-constraints`)
+on the default sonnet model at low effort — 4 sessions instead of 14. Read
+`report.md`, then release with `CANARY_OK=1 make release`. The full `--canary`
+run keeps its original job, the model-release canary above, and is not part of
+the release gate. Never pass a Fable model to a headless run: it bills usage
+credits outside the subscription. There is no CI run of this suite. Each gotcha
+or insight that records a behavior failure gets a probe in `tasks.yaml` so the
+regression stays caught.
 
 ## Results
 
