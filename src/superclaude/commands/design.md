@@ -7,19 +7,21 @@ description: Design system architecture, APIs, component interfaces with compreh
     <mission>Design system architecture, APIs, component interfaces with comprehensive specs</mission>
   </role>
 
-  <syntax>/sc:design [target] [--type architecture|api|component|database] [--format diagram|spec|code]</syntax>
+  <syntax>/sc:design [target] [--from docs/features/<slug>/01-discovery.md] [--type architecture|api|component|database] [--format diagram|spec|code]</syntax>
 
   <flow>
-  1. Analyze: Requirements + existing context
+  1. Analyze: Requirements + existing context; read the `--from` doc, or the slug folder's `00-intent.md` and `01-discovery.md` when present
   2. Plan: Design approach + structure
   3. Design: Comprehensive specs + best practices (see outputs)
   4. Constraints: Document operational params that constrain design — queue/buffer sizes, connection pool limits, external API batch limits, timeout values
   5. Necessity: For each proposed component, apply [R18 Necessity Test] — defer components lacking specific failure scenario, quantitative evidence, or user-facing impact
-  6. Validate: Requirements coverage ≥90%, maintainability check
-  7. Document: feature path `docs/features/<slug>/04-design.md`, standalone `docs/specs/<topic>-design-<username>-YYYY-MM-DD.md` — slug resolution (zero-match default `[f]`), frontmatter, README update per core/rules/RULES_DOCS.md `<doc_output_convention>`. Plus diagrams.
+  6. Concerns: List every point where two constraints or policies conflict, or where the design cannot satisfy the intent — the owner resolves these before /sc:plan
+  7. Validate: Requirements coverage ≥90%, maintainability check
+  8. Document: feature path `docs/features/<slug>/04-design.md`, standalone `docs/specs/<topic>-design-<username>-YYYY-MM-DD.md` — slug resolution (zero-match default `[f]`), frontmatter, README update per core/rules/RULES_DOCS.md `<doc_output_convention>`. Plus diagrams.
   </flow>
 
   <flags>
+  - --from <path>: discovery or intent doc read in the Analyze step; without it the slug folder's `00-intent.md` and `01-discovery.md` are read when present.
   - --type architecture|api|component|database: design kind; sections per type in the outputs table.
   - --format diagram|spec|code: diagram: Mermaid diagram; spec: written specification; code: interface definitions (types, signatures) with no implementation.
   </flags>
@@ -34,6 +36,7 @@ description: Design system architecture, APIs, component interfaces with compreh
   - api: endpoint diagram, request/response specs, OpenAPI schema
   - component: component diagram, prop/state specs, type definitions
   - database: ERD, schema definitions, migration plan
+  Required in every type: an "Areas of concern" section listing policy conflicts and unmet intent, or "none".
   </outputs>
 
 

@@ -13,9 +13,10 @@ description: Make detailed impl plans with TDD tasks, exact file paths, verify c
   1. Load: Read spec/reqs (from --from path or user desc)
   2. Map: List files to create/modify + their jobs
   3. Decompose: Break to phases (default) — each phase = single-commit unit on feature branch, ordered by dep (Phase-vs-PR naming: see gotchas).
-  4. Template: Add plan header (goal, arch, tech stack)
-  5. Save: feature path `docs/features/<slug>/05-plan.md`, standalone `docs/plans/<feature-name>-<username>-YYYY-MM-DD.md` — slug resolution (zero-match default `[f]`), frontmatter, README update per core/rules/RULES_DOCS.md `<doc_output_convention>`.
-  6. Handoff: Ready for /sc:implement --plan
+  4. Template: Add plan header (goal, arch, tech stack) and footer (risks, alternatives not taken, proof) — one line or "none" per footer section is acceptable for Small scope
+  5. Interrogate: Answer in the footer what the change could break, which step is riskiest, and which options were not taken and why; a plan an engineer who never saw the conversation could execute is the bar
+  6. Save: feature path `docs/features/<slug>/05-plan.md`, standalone `docs/plans/<feature-name>-<username>-YYYY-MM-DD.md` — slug resolution (zero-match default `[f]`), frontmatter, README update per core/rules/RULES_DOCS.md `<doc_output_convention>`.
+  7. Handoff: Ready for /sc:implement --plan
   </flow>
 
   <flags>
@@ -54,6 +55,14 @@ Task format:
   - [ ] Step 3: Write minimal implementation
   - [ ] Step 4: Verify it passes
   - [ ] Step 5: Commit
+
+Plan footer:
+  ## Risks
+  [What could break; the riskiest step and why]
+  ## Alternatives not taken
+  [Option — why not]
+  ## Proof
+  [The check that proves done: command + expected output]
   </templates>
 
   <examples>

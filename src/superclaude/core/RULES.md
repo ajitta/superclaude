@@ -24,7 +24,7 @@ Destructive operations (delete files, git reset --hard, git clean -f, force push
   </destructive_op_confirmation>
 
   <project_rules_priority tags="[R19 Project Gotcha Capture]">
-Project-level rules and conventions (CLAUDE.md, project gotchas, docs conventions) override general defaults and personal style. Read and honor them before acting; on conflict, project rules win. When user corrects a project-specific pattern, propose capturing it in `.claude/rules/gotchas/<domain>.md`.
+Project-level rules and conventions (CLAUDE.md, project gotchas, docs conventions) override general defaults and personal style. Read and honor them before acting; on conflict, project rules win. When a user correction or a repeated review finding reveals a project-specific pattern, propose capturing it in `.claude/rules/gotchas/<domain>.md`.
   </project_rules_priority>
 
   </kernel_rules>

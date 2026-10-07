@@ -45,6 +45,7 @@ Frontmatter rules:
   Feature README: {feature, phase, owner, created, updated, related?}. Phase enum: intent | discovery | design | planning | implementing | complete | abandoned
   Phase doc (inside feature folder): {status, revised} — new docs start `status: draft`, `revised: <today>`
   Standalone specs/+plans/: {status, revised}
+  Plan docs (feature or standalone): `status: complete` only when every task checkbox is checked; departures from the plan go under `## Deviations` in the same commit as the code that departed
   Standalone research/+analysis/: optional {status, revised}
   Reports/ADRs: none
 Status enum (per-doc): draft | review | approved-for-plan | implementing | complete | deprecated
@@ -70,7 +71,7 @@ Examples:
     /sc:design -> /sc:roadmap: Alternative path when input is a PRD/feature doc rather than a design spec
     /sc:plan -> /sc:implement --plan: Plan document committed to repo
     /sc:roadmap -> /sc:implement: Roadmap tasks defined; implementation proceeds per task list
-    /sc:implement -> /sc:test: Implementation complete
+    /sc:implement -> /sc:test: Implementation complete; plan doc checkboxes and its Deviations section match the code
     /sc:test -> done: Test pass evidence required (actual output, not claims)
   </workflow_gates>
 </component>
