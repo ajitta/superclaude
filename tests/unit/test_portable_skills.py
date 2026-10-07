@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import re
 import sys
 import zipfile
 from pathlib import Path
@@ -220,6 +221,27 @@ def test_plugin_dir_matches_skills_plus_manifest():
     assert [p.name for p in (_DIR / "plugins").iterdir()] == [_plugin_name()], (
         "plugins/ holds only the one plugin"
     )
+
+
+_HANGUL = re.compile("[ᄀ-ᇿ㄰-㆏ꥠ-꥿가-퟿]")
+
+
+def test_shipped_plugin_has_no_hangul():
+    """The installed plugin is English only; replies follow the user's
+    language through each skill's "Reply in the user's language" rule."""
+    shipped = dict(_packager().plugin_files(_SKILLS))
+    plugin_dir = _DIR / "plugins" / _plugin_name()
+    for f in plugin_dir.rglob("*"):
+        if f.is_file():
+            rel = f.relative_to(_DIR).as_posix()
+            shipped[rel] = f.read_bytes()
+    hits = [
+        f"{rel}:{n}"
+        for rel, data in shipped.items()
+        for n, line in enumerate(data.decode("utf-8").splitlines(), 1)
+        if _HANGUL.search(line)
+    ]
+    assert not hits, f"Hangul in shipped files: {hits}"
 
 
 def _marketplace() -> dict:

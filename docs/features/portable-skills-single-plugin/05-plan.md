@@ -56,16 +56,16 @@ Out: Codex 사이드카 `agents/openai.yaml`(한글 없음), 과거 기록(`docs
 
 ### Task 3: 설치되는 파일에서 한국어 제거
 **Files:** Modify: `portable-skills/socratic-brainstorm/SKILL.md`, `portable-skills/socratic-brainstorm/references/question-bank.md`, `portable-skills/socratic-elenchus/SKILL.md`, `portable-skills/socratic-elenchus/references/elenchus-patterns.md`, `tests/unit/test_portable_skills.py` | Generate: `plugins/socratic/`, `releases/socratic.zip`
-- [ ] Step 1: `test_shipped_plugin_has_no_hangul`: `plugin_files()`의 모든 파일과 `plugins/socratic/` 아래 모든 파일에 한글(U+1100–11FF, U+3130–318F, U+A960–A97F, U+AC00–D7FF)이 없다. 실패 메시지에는 파일과 줄 번호를 넣는다.
-- [ ] Step 2: red 확인 (지금 네 파일에 한글 줄이 있다: 13, 9, 18, 22줄)
-- [ ] Step 3: 네 파일을 영어로 바꾼다. 문장이 하던 일은 그대로 둔다.
+- [x] Step 1: `test_shipped_plugin_has_no_hangul`: `plugin_files()`의 모든 파일과 `plugins/socratic/` 아래 모든 파일에 한글(U+1100–11FF, U+3130–318F, U+A960–A97F, U+AC00–D7FF)이 없다. 실패 메시지에는 파일과 줄 번호를 넣는다.
+- [x] Step 2: red 확인 (지금 네 파일에 한글 줄이 있다: 13, 9, 18, 22줄)
+- [x] Step 3: 네 파일을 영어로 바꾼다. 문장이 하던 일은 그대로 둔다.
   - description: 한국어 트리거 예시를 지우고 영어 트리거만 남긴다. 서로를 가리키는 문장은 유지한다(라우팅). 1024자 상한.
   - 멈춤·계속 신호: 영어 신호 목록 뒤에 "or the same in the user's language"를 붙인다.
   - 예시 질문, 묶음 질문, 인용, 기록 형식 예시(`(정의)`, `(동의)` 포함): 같은 요점을 보여 주는 영어 예시로 바꾼다. 인용 규칙 예시는 어미만 바뀐 인용을 영어의 같은 경우로 바꾼다.
   - question-bank와 elenchus-patterns: 영어·한국어 쌍은 영어만 남기고, 한국어만 있는 행은 번역한다.
   - SKILL.md 본문 200줄 상한 유지. `metadata.version` → brainstorm 3.3.0, elenchus 1.3.0. 플러그인 버전은 아직 배포 전이라 1.0.0 유지.
-- [ ] Step 4: `uv run python portable-skills/package.py` → 테스트 전체 green, `claude plugin validate portable-skills/plugins/socratic` 통과
-- [ ] Step 5: 커밋 `feat(portable-skills): ship the skill files in English only`
+- [x] Step 4: `uv run python portable-skills/package.py` → 테스트 전체 green, `claude plugin validate portable-skills/plugins/socratic` 통과
+- [x] Step 5: 커밋 `feat(portable-skills): ship the skill files in English only`
 
 ### Task 4: 라우팅과 응답 언어 probe
 **Files:** 없음 (결과는 Proof에 기록)
