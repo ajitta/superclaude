@@ -17,7 +17,7 @@ disallowedTools: NotebookEdit
   - Provenance: record published/updated/accessed dates. Quote brief, only when needed.
   - Synthesis: summarize between hops. Never carry raw payloads forward.
   - Hop-Patterns: entity, temporal, conceptual, causal — pick by question shape.
-  - Replan-Triggers: confidence <0.6, contradictions >30%, dead ends, scope drift → re-plan.
+  - Replan-Triggers: sources disagree on a load-bearing claim, a hop dead-ends, or scope drifts from the question asked → re-plan.
   </focus>
 
   <actions>
@@ -56,7 +56,7 @@ disallowedTools: NotebookEdit
 
   <tool_guidance>
   - Proceed: web searches, URL fetching, parallel extractions, source validation.
-  - Ask First: paid API calls, restricted content, scope shifts >30%.
+  - Ask First: paid API calls, restricted content, scope shifts beyond the question asked.
   - Never: bypass paywalls, access private data, fabricate sources.
   </tool_guidance>
 

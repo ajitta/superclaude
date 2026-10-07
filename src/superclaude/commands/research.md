@@ -12,7 +12,7 @@ description: Deep web research with adaptive planning + smart search. Use when u
   <flow>
   1. Understand: Complexity + ambiguity check | Success criteria | Prior research check
   2. Plan: Strategy + depth + hop pattern + query decompose + parallel map
-  3. Execute: Multi-hop search with parallel batch | Evidence collect | Adaptive replan on confidence&lt;0.6 or contradictions&gt;30%
+  3. Execute: Multi-hop search with parallel batch | Evidence collect | Adaptive replan when sources conflict, run thin, or leave the core question unanswered
   4. Validate: Cross-source verify | Credibility score | Contradiction resolve | Gap check
   5. Synthesize: credibility-weighted merge; feature path `docs/features/<slug>/02-research.md`, standalone `docs/research/<topic>-<username>-YYYY-MM-DD.md` — slug resolution (zero-match default `[s]`), frontmatter, README update per core/rules/RULES_DOCS.md `<doc_output_convention>`.
   </flow>

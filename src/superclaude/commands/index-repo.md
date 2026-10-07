@@ -61,7 +61,6 @@ description: Repo index, 94% token cut (58K→3K). Use ONLY when user type `/sc:
   <bounds>
     <does>94% token cut, parallel scan, human output.</does>
     <never>modify source, exceed 5KB.</never>
-    <fallback>Ask user when unsure.</fallback>
   </bounds>
 
   <handoff next="/sc:analyze /sc:index"/>

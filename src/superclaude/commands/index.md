@@ -41,7 +41,7 @@ description: Generate comprehensive project documentation and knowledge base wit
   - Read/Grep/Glob: Structure analysis + content extraction
   - Write: Doc creation + cross-referencing
   - TaskCreate/TaskUpdate: Multi-component progress
-  - Task: Large-scale doc delegation
+  - Agent: Large-scale doc delegation
   </tools>
 
   <examples>
@@ -69,7 +69,6 @@ description: Generate comprehensive project documentation and knowledge base wit
   <bounds>
     <does>comprehensive docs, multi-agent, framework patterns.</does>
     <never>override manual docs, generate without analysis, bypass standards.</never>
-    <fallback>Ask user for guidance when uncertain.</fallback>
   </bounds>
 
   <handoff next="/sc:implement /sc:improve"/>

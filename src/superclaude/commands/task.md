@@ -24,7 +24,7 @@ description: Execute complex tasks with intelligent workflow management and dele
   - --cleanup: stale and completed task removal, per the task cleanup section.
   </flags>
 
-  <task_cleanup note="Claude Code 2.1.37+">
+  <task_cleanup>
     <description>Auto task cleanup via TaskUpdate delete feature</description>
     <cleanable_states>
       - completed: Finished tasks
@@ -77,7 +77,6 @@ description: Execute complex tasks with intelligent workflow management and dele
   <bounds>
     <does>complex task coordination, hierarchical breakdown, dependency analysis, auto cleanup.</does>
     <never>simple single-file tasks, compromise quality, operate without validation.</never>
-    <fallback>Ask user for guidance when uncertain.</fallback>
   </bounds>
 
   <handoff next="/sc:test /sc:implement"/>

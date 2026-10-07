@@ -24,7 +24,7 @@
   Posture for the Workflow tool — the deterministic multi-subagent executor the framework governs in policy (delegation decision, Delegate packet, verification ladder) but ships no runtime for. Author a Workflow when work splits into 3+ independent streams or exceeds ~20K-token exploration; use a single Agent-tool delegate for one stream; stay solo on trivial or conversational turns.
   - Pipeline-Default: chain dependent stages with pipeline (no barrier, stages stream); reserve parallel (full barrier — every thunk finishes before continuing) for genuinely independent streams that must rejoin.
   - Packet-Prompt: the Workflow executor forwards no parent intent or system prompt — the Delegate packet (core/rules/RULES_DELEGATION.md) travels in each agent() prompt.
-  - Cap-Aware: author for the harness caps (concurrency cap per --concurrency in core/FLAGS.md; lifetime 1000 agents), not requested width.
+  - Cap-Aware: author for the harness caps (concurrency cap per --concurrency in core/FLAGS.md; per-session lifetime agent cap), not requested width.
   - Write-Return: subprocess file writes are discarded — fan-out RETURNS artifacts, main loop performs every Write; approval checkpoints fire in the main loop (full rule: core/rules/RULES_DELEGATION.md).
   - Schema-vs-Evidence: opts.schema hardens return shape only, never evidence truth — cited-file:line revalidation per core/rules/RULES_DELEGATION.md stays mandatory.
   - Context-Carry: mode and MCP injection is main-loop-only; a subagent needing Context7 or Tavily gets it named in the agent() prompt, never auto-injected.

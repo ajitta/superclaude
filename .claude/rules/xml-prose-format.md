@@ -13,7 +13,7 @@ paths: ["src/superclaude/agents/**", "src/superclaude/commands/**", "src/supercl
 - **Prose first.** Structured forms only where prose mush distinct items together.
 - **Token-efficient.** Pick simplest form that preserve readability — never reach for heavier construct than content need.
 - **One canonical shape per concept.** No parallel "options"; rule below pick one form per situation.
-- **Declarative voice load-bearing, not stylistic.** Recent Opus models (4.5+) read instructions literally, drop hedging ("should", "might", "consider") as optional; 4.8 follows instructions even more consistently. Third-person + imperative-as-statement make rule actually fire — see Anthropic prompting best-practices at 'https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices'.
+- **Declarative voice load-bearing, not stylistic.** Current Claude models read instructions literally and drop hedging ("should", "might", "consider") as optional. Third-person + imperative-as-statement make rule actually fire — see Anthropic prompting best-practices at 'https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices'.
 
 ## Section Ordering
 

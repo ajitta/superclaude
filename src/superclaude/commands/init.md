@@ -62,7 +62,7 @@ description: Interactive project env setup — pick + run init tasks for first-s
   | d | Test baseline | auto memory |
   | e | Convention summary | auto memory |
   | f | MCP recommendations | console |
-  | g | MEMORY.md + topic files | .claude/memory/ |
+  | g | MEMORY.md + topic files | auto memory (~/.claude/projects/<project>/memory/) |
   | h | general.md | .claude/rules/gotchas/ |
   | i | PRD.md, ARCHITECTURE.md, adr/0001-*.md, UI-GUIDE.md | docs/ (project root) |
   </task_outputs>

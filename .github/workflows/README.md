@@ -27,7 +27,7 @@ The same checks, run locally before pushing:
 ```bash
 uv run pytest                                  # full suite
 uv run pytest tests/unit/scripts -o addopts=   # scripts tests
-make lint                                      # ruff check + format check
+make lint                                      # ruff check (format check runs in CI)
 uv run pytest --collect-only -q | grep "^SuperClaude: "   # plugin loads
 uv run superclaude doctor --verbose
 ```

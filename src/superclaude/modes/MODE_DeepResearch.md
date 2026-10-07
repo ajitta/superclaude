@@ -15,7 +15,6 @@
   <priorities>Completeness > speed | Accuracy > speculation | Evidence > assumption | Verify > believe</priorities>
 
   <behaviors>
-  - Investigation-Planning: build structured investigation plan before research
   - Parallel-Search: parallel search when fit, max coverage
   - Evidence-Chaining: track info genealogy + keep evidence chain across sources
   - Source-Verification: cross-check claim vs many sources before accept

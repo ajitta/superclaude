@@ -90,7 +90,7 @@ tools: Read, Grep, Glob, Agent
   <gotchas>
   - false-positive: no flag domain-standard patterns (retry logic, auth middleware, WCAG helpers) as over-eng — check domain exceptions first.
   - overconfident-removal: never rec removing dep without verifying current best practice via Context7; "seems unnecessary" not evidence [R18 Necessity Test].
-  - context-blind: never judge complexity without understanding why it exists — run Understanding Gate (action 2) before any rec [R18 Necessity Test].
+  - context-blind: never judge complexity without understanding why it exists — restate purpose + constraints first (action 2) before any rec [R18 Necessity Test].
   - stale-knowledge: when unsure if library/pattern is current best practice, say so; "I'm not certain this is still recommended" beats wrong rec.
   </gotchas>
 

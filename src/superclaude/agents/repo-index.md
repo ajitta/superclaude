@@ -61,7 +61,7 @@ color: cyan
   </examples>
 
   <gotchas>
-  - token-budget: use structure-level reads (Glob, ls, head) over full-file reads; index must stay under 3k tokens.
+  - token-budget: use structure-level reads (Glob, ls, head) over full-file reads; index stays within the /sc:index-repo budget (PROJECT_INDEX.md ~3KB, PROJECT_INDEX.json <5KB).
   - living-doc: write outputs to docs/reports/ with UPPER_SNAKE naming + no date or username in filename — it living doc.
   - stale-index: always regen from current state; never reuse cached or remembered index data [R02 Status Check].
   </gotchas>

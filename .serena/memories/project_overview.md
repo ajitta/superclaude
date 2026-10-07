@@ -1,6 +1,6 @@
 # SuperClaude — Project Overview
 
-Canonical source: `CLAUDE.md` (repo root, auto-loaded every session) + `src/superclaude/ARCHITECTURE.md`
+Canonical source: `AGENTS.md` (imported by `CLAUDE.md`, loaded every session) + `src/superclaude/ARCHITECTURE.md`
 (full taxonomy: directory roles, delivery pipelines, content types).
 
 No copies kept here — duplicates drift, and nothing compares a copy to reality, so a stale one

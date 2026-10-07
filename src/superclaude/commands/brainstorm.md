@@ -15,7 +15,7 @@ description: Interactive requirements discovery through Socratic dialogue + syst
   3. Validate: Feasibility check + requirement validation.
   4. Specify: feature path `docs/features/<slug>/01-discovery.md`, standalone `docs/specs/<topic>-discovery-<username>-YYYY-MM-DD.md` — slug resolution (zero-match default `[f]`), frontmatter, README update per core/rules/RULES_DOCS.md `<doc_output_convention>`.
   5. Approve: Show spec for user review — no proceed without confirm.
-  6. Self-review (REQUIRED hard gate): emit handoff "Run /sc:review on this spec before /sc:plan. Plan handoff is gated on review." Rules below.
+  6. Self-review (hard gate): emit handoff "Run /sc:review on this spec before /sc:plan. Plan handoff is gated on review." Rules below.
   7. Decision-mode tag: tag each Resolved Decision as confirmed or delegated. Heuristic below.
   8. Handoff: Route to /sc:review (mandatory) → /sc:plan after status reach approved-for-plan. With delegated decisions, prefer /sc:review --audit-delegated.
   </flow>
@@ -37,7 +37,7 @@ description: Interactive requirements discovery through Socratic dialogue + syst
   - confirmed: user response has literal option letter (`[a]`/`[b]`/`[c]`, or `a`/`b`/`c` as standalone token), OR ≥2 contiguous words from chosen option label text.
   - delegated: bare "yes", "proceed", "looks good", or silent accept of ★.
 
-  When ≥1 decision delegated, /sc:review handoff (the Handoff step) MUST add literal phrase "mandatory: N delegated decisions need independent audit" (N = count of delegated decisions).
+  When ≥1 decision delegated, /sc:review handoff (the Handoff step) adds the literal phrase "mandatory: N delegated decisions need independent audit" (N = count of delegated decisions).
   </decision_modes>
 
   <outputs>

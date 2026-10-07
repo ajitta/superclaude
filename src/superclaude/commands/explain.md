@@ -27,7 +27,7 @@ description: Give clear explain of code, concepts, system behavior with edu clar
   <tools>
   - Read/Grep/Glob: Code analyze + pattern ID
   - TaskCreate/TaskUpdate: Multi-part explain track
-  - Task: Complex explain delegate
+  - Agent: Complex explain delegate
   </tools>
 
   <examples>
@@ -56,7 +56,6 @@ description: Give clear explain of code, concepts, system behavior with edu clar
   <bounds>
     <does>clear explain, agent expertise, framework integration.</does>
     <never>explain without analyze, override standards, reveal sensitive.</never>
-    <fallback>Ask user for guidance when uncertain.</fallback>
   </bounds>
 
   <handoff next="/sc:implement /sc:improve /sc:document"/>

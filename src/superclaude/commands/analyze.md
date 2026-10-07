@@ -49,7 +49,7 @@ description: Code analysis across quality, security, performance, architecture d
   </focus_agent_mapping>
 
   <rules_analysis note="--focus rules: rule effectiveness audit">
-    Quality (always): Read core/rules/RULES_QUALITY.md (R01–R21 table lives there post core-lite split) → summary: rule count, example coverage, severity distribution
+    Quality (always): Read core/rules/RULES_QUALITY.md (R01–R21 table) → summary: rule count, example coverage, severity distribution
     Compliance (when data exists): Glob auto memory + list Serena memories → grep `violated_rule: "[RXX]"` → heatmap
       Hot (≥2 violations) 🔴: needs examples or clarification → /sc:improve
       Warm (1 violation) 🟡: monitor
@@ -84,7 +84,6 @@ description: Code analysis across quality, security, performance, architecture d
   <bounds>
     <does>static analysis, severity-rated findings, detailed reports, quantitative rules audit (counts, frequencies, heatmaps via --focus rules).</does>
     <never>dynamic/runtime analysis, modify code, analyze external deps, qualitative rule-effectiveness narrative (delegate to /sc:reflect).</never>
-    <fallback>Ask user for guidance when uncertain.</fallback>
   </bounds>
 
 

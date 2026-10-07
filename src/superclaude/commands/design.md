@@ -69,7 +69,6 @@ description: Design system architecture, APIs, component interfaces with compreh
   <bounds>
     <does>comprehensive specs, multi-format output, validation.</does>
     <never>generate impl code, modify existing arch, violate constraints.</never>
-    <fallback>Ask user for guidance when uncertain.</fallback>
   </bounds>
 
   <handoff next="/sc:plan /sc:implement /sc:roadmap"/>

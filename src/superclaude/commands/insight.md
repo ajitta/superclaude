@@ -14,7 +14,7 @@ description: Capture structured session insights to per-project JSONL for human 
   2. Capture (default): scan session → propose 3-7 insights → show user for approval → append approved
   3. Capture (text): take user text → infer type + tags → shape as JSON → show → append
   4. Dedup: before propose, run `superclaude insight list --limit 20` to check recent entries → skip already-captured topics. For annotations, also check existing ref_ts.
-  5. Append: ALWAYS via `superclaude insight append --json '<json>'` — NEVER hand-write to insights.jsonl. Script enforce schema, escaping, annotation ref check.
+  5. Append: via `superclaude insight append --json '<json>'`, not by hand-writing insights.jsonl. Script enforce schema, escaping, annotation ref check.
   6. Read modes: `--list`, `--query`, `--stats` read insights.jsonl through the same script.
   7. Review mode: `--review` call `superclaude insight review` to list pending markers harvested by SessionEnd/PreCompact hooks. For each wanted entry, propose structured promote (type + tags) + call `superclaude insight promote --index N --type TYPE [--tags a,b]`. Unwanted entries (harvest false positives) drop via `superclaude insight discard --index N[,N]` — show user which ones + why before call, since discard has no undo.
   </flow>
@@ -41,7 +41,7 @@ description: Capture structured session insights to per-project JSONL for human 
   - `.claude/insights.jsonl` — promoted, structured insights
   - `.claude/insights.pending.jsonl` — raw `INSIGHT:` markers harvested from transcripts (made on demand, gone when empty)
 
-  Auto-produce: `Stop` hook ask for one `INSIGHT:` line on the first turn that changed code. `Stop` run per turn, not per session, so the gate compare a `SessionStart` tree fingerprint against the current one — "dirty tree" alone fire on a repo already dirty before the session. Framework-owned paths (`.superclaude_hooks/`, pending markers, agent memory) excluded from that compare. At most once per session; skipped on re-entry (`stop_hook_active`), on no session change, and when `SUPERCLAUDE_INSIGHT_PROMPT=0`. Before this the only producer was the user typing `INSIGHT:` by hand, so pending stayed empty for months.
+  Auto-produce: `Stop` hook ask for one `INSIGHT:` line on the first turn that changed code. `Stop` run per turn, not per session, so the gate compare a `SessionStart` tree fingerprint against the current one — "dirty tree" alone fire on a repo already dirty before the session. Framework-owned paths (`.superclaude_hooks/`, pending markers, agent memory) excluded from that compare. At most once per session; skipped on re-entry (`stop_hook_active`), on no session change, and when `SUPERCLAUDE_INSIGHT_PROMPT=0`.
 
   Auto-harvest: `SessionEnd` + `PreCompact` hooks scan the transcript Claude Code names on stdin for `INSIGHT:` markers (line-start or inline) + append unique entries to pending. User markers always count; assistant markers count only after the Stop request in the same transcript, so docs and examples quoting the format no file themselves. Sub-agent (`isSidechain`) records skipped. The request itself carry `[sc-insight-request]` and never harvest; a reply quoting it still do. Filed marker ids kept in a durable ledger, so promote no let the same marker re-harvest. The turn after the ask, `Stop` collect the answer once, so a session ending without `SessionEnd` no lose it. `SessionStart` (clear|compact|startup) print one-line notice ("🟡 harvested N pending insight(s) — /sc:insight --review") if pending non-empty.
 
@@ -102,8 +102,8 @@ description: Capture structured session insights to per-project JSONL for human 
   </examples>
 
   <gotchas>
-  - script-only-writes: NEVER Write/echo on insights.jsonl. ALWAYS go through `superclaude insight append`. Script handle JSON escaping, schema check, annotation ref existence checks that hand-written code miss often.
-  - never-bare-python: NEVER invoke `python3 ~/.claude/superclaude/scripts/insight_writer.py` direct — script import `superclaude.utils`, absent from the install tree, so bare python3 raise ModuleNotFoundError. Only the console script carries a resolving environment — `superclaude insight` for humans, `superclaude hook insight_writer` for the hooks.
+  - script-only-writes: write insights.jsonl only through `superclaude insight append`, never Write/echo. Script handle JSON escaping, schema check, annotation ref existence checks that hand-written code miss often.
+  - never-bare-python: run insight operations only through the console entry — the script import `superclaude.utils`, which only the console entry's interpreter resolves — `superclaude insight` for humans, `superclaude hook insight_writer` for the hooks.
   - review-requires-classification: Pending entries = raw text; must propose `--type` (feedback|decision|discovery|...) + optional tags before call promote. Never promote without show user what classification you plan.
   - discard-is-final: `discard` drop pending rows without filing them, and the harvest ledger keep the uuid — so a discarded marker never come back. Show user the rows + reason, get OK, then call. Batch every unwanted index into ONE `--index a,b,c` call: promote and discard both pop by index, so sequential single-index calls shift the list under you.
   - promote-descending-indices: When promote several entries one by one, go highest index first (`cmd_promote` pop by index). Ascending order silently file the wrong rows.

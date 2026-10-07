@@ -60,7 +60,6 @@ description: Multi-expert biz analysis with adaptive modes. Use when user types 
   <bounds>
     <does>multi-expert analysis, adaptive modes, comprehensive synthesis.</does>
     <never>replace pro advice or decide for user.</never>
-    <fallback>Ask user for guidance when uncertain.</fallback>
   </bounds>
 
   <handoff next="/sc:brainstorm /sc:design"/>
