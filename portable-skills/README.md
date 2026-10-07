@@ -47,7 +47,7 @@ When you change a skill, bump its `metadata.version` in `SKILL.md` and the `vers
 
 ## Install
 
-The plugin routes install both skills as `socratic`. For the copy routes, replace `<skill>` with `socratic-brainstorm` or `socratic-elenchus`.
+The plugin routes install both skills as `socratic`. For the copy routes, replace `<skill>` with `socratic-brainstorm` or `socratic-elenchus`. The Claude Code marketplace follows the repository's default branch, `stable`, so a change reaches it when a release moves `stable`.
 
 | Where you want it | How | Reaches mobile? |
 |---|---|---|

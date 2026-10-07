@@ -41,7 +41,7 @@ Project-specific traps: `.claude/rules/gotchas/general.md` (+ domain files with 
 
 ## Git Workflow
 
-Branch: `stable` (release channel, moved only by `make release`) ← `master` ← `feature/*`, `fix/*`, `docs/*`
+Branch: `stable` (release channel and GitHub default branch, moved only by `make release`; the plugin marketplace and Pages serve it) ← `master` (development; clone with `-b master`) ← `feature/*`, `fix/*`, `docs/*`
 
 Release: version-bump branch merged and green on master → `make release`
 
