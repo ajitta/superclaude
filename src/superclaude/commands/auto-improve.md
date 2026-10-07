@@ -14,7 +14,7 @@ disable-model-invocation: true
   <flow>
   1. Parse: Parse args + validate `--eval-cmd` and `--metric` present (unless `--status`)
   2. Phase 0 confirm: warn user `--eval-cmd` run unsandboxed, ask explicit y/n confirm before spawn worker (skip when `--status`)
-  3. Spawn worker: `superclaude auto-improve [args]` backgrounded with `&`, `start /b`, or `Start-Process` — never PowerShell `Start-Job`, measured to kill the worker when its shell exits. Worker writes its own PID to the worktree
+  3. Spawn worker: `superclaude auto-improve [args]` (positional project → `--project <project>`) backgrounded with `&`, `start /b`, or `Start-Process` — never PowerShell `Start-Job`, measured to kill the worker when its shell exits. Worker writes its own PID to the worktree
   4. Print: Print where follow progress (`tail -f [worktree]/results.tsv`) and exit immediately
   5. `--status` branch: read most-recent worktree results.tsv + PID, print morning summary, exit
   </flow>
@@ -50,7 +50,7 @@ disable-model-invocation: true
   - cc-session-end: Survival across Claude Code session exit is UNVERIFIED on Windows — no real teardown has been measured; the worker does outlive its spawning shell. Confirm the PID in `[worktree]/auto_improve.pid` is a LIVE process, not merely present — a hard-killed worker leaves it stale. That PID stops the coordinator only; an `--eval-cmd` already in flight breaks away and keeps running
   - mutator-tools: mutator agent tool surface restricted to Edit/Write/Read (Bash explicitly disabled) — cannot run shell command inside worktree
   - mutator-model-freeform: `--mutator-model` accepts any model alias or full ID the harness resolves (default sonnet) — worker enforces no enum; pick cheap (haiku/sonnet) for volume, flagship for hard mutations. Each cycle runs `claude -p`, so where a plan bills Fable to usage credits a `fable` mutator bills them with no consent prompt
-  - never-bare-python: NEVER substitute `python -m superclaude.scripts.auto_improve` for the console entry — worker import `superclaude.scripts.auto_improve.*`, absent from the install tree, so bare python resolve only by luck of PATH. `superclaude auto-improve` carry the installing interpreter; inside a dev checkout `uv run python -m ...` equivalent.
+  - never-bare-python: do not substitute `python -m superclaude.scripts.auto_improve` for the console entry — worker import `superclaude.scripts.auto_improve.*`, absent from the install tree, so bare python resolve only by luck of PATH. `superclaude auto-improve` carry the installing interpreter; inside a dev checkout `uv run python -m ...` equivalent.
   </gotchas>
 
   <examples>

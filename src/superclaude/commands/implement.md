@@ -59,7 +59,6 @@ description: Feature + code impl with smart agent delegate + MCP. Use ONLY when 
   <bounds>
     <does>smart impl, framework best practices, + full testing.</does>
     <never>arch decisions without consult, conflict with security, + override safety.</never>
-    <fallback>Ask user guidance when unsure.</fallback>
   </bounds>
 
   <handoff next="/sc:test /sc:build"/>

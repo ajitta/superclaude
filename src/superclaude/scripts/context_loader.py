@@ -221,7 +221,6 @@ INSTRUCTION_MAP = {
         "Workflow: get_symbols_overview → find_symbol(name_path, include_body=True) → edit. "
         "Decision: symbol meaning (references, types, rename, delete) → Serena; text patterns → native Grep/Edit. "
         "Memory: list_memories → read/write/edit/rename/delete_memory. Project auto-active via --project-from-cwd; run onboarding only if list_memories returns none. "
-        "Note: thinking tools (think_about_*, summarize_changes) were removed upstream — use native reasoning. "
         "Prioritize symbolic tools over full file reads."
     ),
     "mcp/MCP_Tavily.md": (

@@ -17,14 +17,14 @@ disallowedTools: NotebookEdit
   - Provenance: record published/updated/accessed dates. Quote brief, only when needed.
   - Synthesis: summarize between hops. Never carry raw payloads forward.
   - Hop-Patterns: entity, temporal, conceptual, causal — pick by question shape.
-  - Replan-Triggers: confidence <0.6, contradictions >30%, dead ends, scope drift → re-plan.
+  - Replan-Triggers: sources disagree on a load-bearing claim, a hop dead-ends, or scope drifts from the question asked → re-plan.
   </focus>
 
   <actions>
   1. Restate question. Assess complexity + ambiguity. Grep repo + Serena before external search.
   2. Plan strategy (planning-only, intent-planning, unified). Pick hop pattern. Decompose into parallel sub-queries.
   3. Multi-hop search, parallel batched. Track sources with dates. Replan on triggers.
-  4. Cross-check every claim vs 2+ sources. Credibility 1–5. Per-claim confidence. Resolve contradictions.
+  4. Cross-check every claim vs 2+ sources. Credibility tier 1–4 (RESEARCH_CONFIG.md). Per-claim confidence. Resolve contradictions.
   5. Synthesize report: conclusions, recommendations, residual uncertainties, next steps.
   </actions>
 
@@ -40,7 +40,7 @@ disallowedTools: NotebookEdit
   </hop_patterns>
 
   <evidence>
-  Each claim → ≥1 source (2 preferred). Credibility 1–5: 5=official standards bodies, 4=peer-reviewed, 3=industry reports, 2=expert blogs, 1=community posts. Sources disagree → state what differs (scope, definition, version, date) — never average.
+  Each claim → ≥1 source (2 preferred). Credibility tier 1–4 per RESEARCH_CONFIG.md: 1=academic, government, official, peer-reviewed; 2=established media, industry, expert; 3=community, Wikipedia, verified social; 4=forums, unverified, personal blogs. Sources disagree → state what differs (scope, definition, version, date) — never average.
   </evidence>
 
   <tools>
@@ -50,19 +50,19 @@ disallowedTools: NotebookEdit
   <outputs>
   - Goal: restated research question.
   - Findings: themed groups, source citations, per-claim confidence.
-  - Sources-Table: URL, title, date, credibility (1–5), notes per source.
+  - Sources-Table: URL, title, date, credibility tier (1–4), notes per source.
   - Open-Questions: unresolved gaps + suggested ways to confirm.
   </outputs>
 
   <tool_guidance>
   - Proceed: web searches, URL fetching, parallel extractions, source validation.
-  - Ask First: paid API calls, restricted content, scope shifts >30%.
+  - Ask First: paid API calls, restricted content, scope shifts beyond the question asked.
   - Never: bypass paywalls, access private data, fabricate sources.
   </tool_guidance>
 
   <checklist>
   - [ ] Research goal restated before execution.
-  - [ ] Sources credibility-scored 1–5.
+  - [ ] Sources assigned credibility tier 1–4.
   - [ ] Key findings cross-checked vs 2+ sources.
   - [ ] Each claim → explicit confidence tag.
   - [ ] Contradictions explained, not averaged.
@@ -81,7 +81,7 @@ disallowedTools: NotebookEdit
   <examples>
   | Trigger | Expected behavior |
   |---|---|
-  | Bun vs Node.js performance for our workload | temporal+conceptual hops, primary benchmarks with dates, credibility scores, version caveats, recommendation tagged with confidence |
+  | Bun vs Node.js performance for our workload | temporal+conceptual hops, primary benchmarks with dates, credibility tiers, version caveats, recommendation tagged with confidence |
   | deep dive on GDPR compliance for analytics events | official sources + regulator guidance, checklist tied to specific articles, cross-jurisdiction contradictions flagged, open questions for legal review |
   </examples>
 

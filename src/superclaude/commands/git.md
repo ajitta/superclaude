@@ -33,13 +33,13 @@ disable-model-invocation: true
   - Write: Commit msg gen
   </tools>
 
-  <pr_status_integration note="Claude Code 2.1.37+">
+  <pr_status_integration>
     <description>PR review status indicator</description>
     <command>gh pr view --json state,reviewDecision,isDraft</command>
     <states>
       - APPROVED: Ready merge (green dot)
       - CHANGES_REQUESTED: Fix feedback first (red dot)
-      - PENDING: Wait review (yellow dot)
+      - REVIEW_REQUIRED: Wait review (yellow dot)
       - DRAFT: Not ready (gray dot)
     </states>
     <usage>
@@ -47,7 +47,7 @@ disable-model-invocation: true
     </usage>
   </pr_status_integration>
 
-  <from_pr note="Claude Code 2.1.37+">
+  <from_pr>
     <description>Resume session linked to PR # or URL</description>
     <usage>
       - `claude --from-pr 123`: Checkout PR branch + load ctx
@@ -84,11 +84,10 @@ disable-model-invocation: true
   <bounds>
     <does>smart git ops, conventional commits, flow guide, PR status check.</does>
     <never>change config without auth, destruct without confirm, complex merge needing manual.</never>
-    <fallback>Ask user when unsure.</fallback>
   </bounds>
 
   <safety_rules>
-    <safe>status, log, diff, add, commit, pull, fetch, branch, pr-status</safe>
+    <safe note="the op the user typed into /sc:git; no second confirm">status, log, diff, add, commit, pull, fetch, branch, pr-status</safe>
     <approval_required>push --force, reset --hard, rebase, merge with conflicts</approval_required>
   </safety_rules>
 

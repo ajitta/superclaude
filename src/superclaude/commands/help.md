@@ -61,7 +61,7 @@ description: List all /sc commands + functionality. Use when user types `/sc:hel
   <scope_map>
   Analysis: analyze (static quality metrics) | review (PR/diff-level) | reflect (post-impl self-check)
   Project mgmt: task (single-session tracking) | pm (multi-session orchestration)
-  Impl: implement (write/modify code) | build (compile, package, deploy)
+  Impl: implement (write/modify code) | build (compile, package)
   Docs: document (prose for humans) | index (structured knowledge base) | index-repo (repo catalog)
   Discovery: brainstorm (Socratic requirements) | research (evidence-based investigation)
   Advisory: business-panel (market/strategy) | spec-panel (tech spec review)
@@ -85,7 +85,6 @@ description: List all /sc commands + functionality. Use when user types `/sc:hel
   <bounds>
     <does>full ref display, categorized flag list, usage examples.</does>
     <never>exec commands, make files, activate modes, modify project state.</never>
-    <fallback>ask user for guidance when unsure.</fallback>
   </bounds>
 
   <handoff next="/sc:recommend /sc:[command]"/>

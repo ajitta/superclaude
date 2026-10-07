@@ -61,7 +61,6 @@ description: Build, compile, package projects with smart err handling + optimize
   <bounds>
     <does>exec build, err analysis, optimize recs.</does>
     <never>modify build config, install deps, deploy.</never>
-    <fallback>Ask user for guidance when unsure.</fallback>
   </bounds>
 
   <handoff next="/sc:test /sc:troubleshoot"/>

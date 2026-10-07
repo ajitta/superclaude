@@ -35,7 +35,7 @@ description: Generate structured implementation workflows from PRDs and feature 
   <tools>
   - Read/Write/Edit: PRD analysis + workflow docs
   - TaskCreate/TaskUpdate: Multi-phase progress tracking
-  - Task: Parallel workflow + multi-agent
+  - Agent: Parallel workflow + multi-agent
   - WebSearch: Tech research + framework validation
   </tools>
 
@@ -66,7 +66,6 @@ description: Generate structured implementation workflows from PRDs and feature 
   <bounds>
     <does>comprehensive workflows, multi-agent+MCP, cross-session management.</does>
     <never>execute impl beyond planning, override dev process, generate without analysis.</never>
-    <fallback>Ask user for guidance when uncertain.</fallback>
   </bounds>
 
   <handoff next="/sc:implement /sc:task"/>

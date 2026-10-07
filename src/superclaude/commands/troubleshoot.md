@@ -59,7 +59,6 @@ description: Diagnose + resolve issues in code, builds, deployments, system beha
   <bounds>
     <does>systematic diagnosis, validated solutions, safe fixes.</does>
     <never>risky fixes without confirm, modify production without permission, arch changes without impact.</never>
-    <fallback>Ask user for guidance when uncertain.</fallback>
   </bounds>
 
   <auto_fix_threshold>

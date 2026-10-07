@@ -1,10 +1,10 @@
 ---
-description: Promote standalone docs sharing a slug into a feature folder per doc-convention-v2. Use ONLY when user explicitly types `/sc:promote-feature <slug>` to consolidate scattered standalone docs (`docs/specs/`, `docs/plans/`, etc.) into `docs/features/<slug>/`. Manual gate per Q2 policy — never auto-migrates without user confirm. NOT auto-trigger when /sc:cleanup --type docs surfaces "consider promotion" suggestion — that's detection, this is action.
+description: Promote standalone docs sharing a slug into a feature folder. Use ONLY when user explicitly types `/sc:promote-feature <slug>` to consolidate scattered standalone docs (`docs/specs/`, `docs/plans/`, etc.) into `docs/features/<slug>/`. Manual gate — never auto-migrates without user confirm. NOT auto-trigger when /sc:cleanup --type docs surfaces "consider promotion" suggestion — that's detection, this is action.
 ---
 <component name="promote-feature" type="command">
 
   <role command="/sc:promote-feature">
-    <mission>Promote standalone docs sharing slug into feature folder per doc-convention-v2 R4</mission>
+    <mission>Promote standalone docs sharing slug into feature folder</mission>
   </role>
 
   <syntax>/sc:promote-feature &lt;slug&gt; [--dry-run|--apply] [--from docs/specs/...]</syntax>
@@ -16,7 +16,7 @@ description: Promote standalone docs sharing a slug into a feature folder per do
   4. Create: ensure `docs/features/<slug>/` does NOT exist (abort with error if it does — slug collision); `mkdir` it.
   5. Move: `git mv` each match to target phase-prefix name per core/rules/RULES_DOCS.md type→phase mapping (brainstorm/discovery→01-discovery.md, research→02-research.md, analyze→03-analysis.md, design→04-design.md, plan/workflow→05-plan.md or 05a-plan-workflow.md if both); preserve frontmatter; on multi-of-same-phase use NNa suffix per format spec
   6. Scaffold: write `docs/features/<slug>/README.md` with frontmatter (`feature: <slug>, phase: discovery, owner: <git user>, created: <today>, updated: <today>`) + Purpose stub + Documents index listing moved files
-  7. Warn: grep repo for inbound paths matching old standalone names (`docs/specs/<slug>-*`, etc.); emit warning list of files holding stale links — user fixes manually (no auto-rewrite per R-3 mitigation, avoids silent breakage)
+  7. Warn: grep repo for inbound paths matching old standalone names (`docs/specs/<slug>-*`, etc.); emit warning list of files holding stale links — user fixes manually (no auto-rewrite, avoids silent breakage)
   8. Report: print summary — N files moved, N inbound warnings, feature folder path
   </flow>
 

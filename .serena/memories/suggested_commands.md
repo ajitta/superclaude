@@ -1,6 +1,6 @@
 # Suggested Commands
 
-Canonical sources: `CLAUDE.md` (Python Environment, Developer Environment) and the `Makefile`
+Canonical sources: `AGENTS.md` (Python Environment, Developer Environment) and the `Makefile`
 itself — `make help` lists the targets, and they change more often than any copy here would.
 
 Two facts the Makefile does not state:

@@ -16,7 +16,7 @@
   | `search_for_pattern` | native `Grep` | Regex/text search; same capability, no LSP overhead |
   | `list_dir` / `find_file` | native `Glob` | Directory listing + filename pattern matching |
 
-  The thinking tools (`think_about_*`, `summarize_changes`, `prepare_for_new_conversation`) were removed upstream — use native reasoning when older commands reference them. `jet_brains_*` refactor tools are optional and off by default (JetBrains backend only).
+  `jet_brains_*` refactor tools are optional and off by default (JetBrains backend only).
   </fallback_tools>
 
   <choose>
@@ -40,7 +40,6 @@
   | confirm an edit compiles | `get_diagnostics_for_file` | LSP errors/warnings for the touched file, no build run |
   | load project context | `list_memories` → `read_memory` | Project auto-active; just read memory |
   | save work session | `write_memory` | Cross-session persistence |
-  | check if task is complete | native reasoning (not Serena) | `think_about_*` tools removed upstream |
   | update console.log to logger | `Grep` + `Edit` (not Serena) | Text pattern bulk replacement |
   </examples>
 

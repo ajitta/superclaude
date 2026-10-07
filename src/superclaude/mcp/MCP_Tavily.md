@@ -5,7 +5,7 @@
 
   <choose>
   <use>structured multi-source web search with advanced filter (domain include/exclude, time/date range, raw-content depth) beyond native `WebSearch`; multi-source research with synthesized output; post-knowledge-cutoff current-info lookup.</use>
-  <never>questions answerable from training; single-page extract (use native `WebFetch`); code gen or local file ops.</never>
+  <never>single-page extract (use native `WebFetch`); code gen or local file ops.</never>
   </choose>
 
   <search_patterns>
@@ -34,7 +34,7 @@
 
   <bounds>
     <does>web search, multi-source synthesis, current info retrieval.</does>
-    <never>code gen, local file ops, training knowledge questions.</never>
+    <never>code gen, local file ops.</never>
     <fallback>Prefer the Tavily Agent Skills — the six operation skills (`tavily-search`, `tavily-extract`, `tavily-crawl`, `tavily-map`, `tavily-research`, `tavily-dynamic-search`; `tavily-cli` and `tavily-best-practices` are setup and reference) — the primary integration: results are filtered before they enter context and crawl output can be saved as local markdown. MCP unavailable and skills not installed → native WebSearch for simple queries, WebFetch for single pages.</fallback>
   </bounds>
 

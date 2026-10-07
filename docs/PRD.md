@@ -113,10 +113,6 @@ The load-bearing set. Anything not on this list is support for something on it.
   `pyproject.toml` addopts) after a native crash (exit `0xC0000409`) during
   collection. Root-cause and re-enable, or delete the suite? — owner:
   maintainer; decide before the next change to hook scripts.
-- **`/sc:init` task (g) writes project memory to `.claude/memory/`, which
-  nothing loads.** The store actually read is the per-project auto-memory under
-  `~/.claude/projects/<slug>/memory/`. Align the command spec to the live path,
-  or make `.claude/memory/` real? — owner: maintainer.
 - **ADR backlog.** Other load-bearing decisions — durability routing for
   derived values, scope-explicit installs, the fork divergence itself — are
   recorded only as prose spread across `RULES_DOCS.md` and `README.md`. Promote

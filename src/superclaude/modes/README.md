@@ -46,7 +46,7 @@ Modes combine (e.g., `--research --uc` for compressed research output).
 
 See `.claude/rules/mode-authoring.md` for full authoring spec.
 
-Validation: `uv run python -m pytest tests/unit/test_mode_structure.py -v`
+Validation: `uv run pytest tests/unit/test_mode_structure.py -v`
 
 ## Related
 

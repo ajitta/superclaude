@@ -25,7 +25,7 @@ description: Give dev estimates for tasks/features/projects with smart analysis.
   <tools>
   - Read/Grep/Glob: Codebase complexity analysis
   - TaskCreate/TaskUpdate: Estimation breakdown tracking
-  - Task: Multi-domain estimation delegation
+  - Agent: Multi-domain estimation delegation
   - Bash: Project + dependency analysis
   </tools>
 
@@ -53,7 +53,6 @@ description: Give dev estimates for tasks/features/projects with smart analysis.
   <bounds>
     <does>systematic estimates, confidence intervals, multi-agent analysis.</does>
     <never>guarantee accuracy, estimate without analysis, override benchmarks.</never>
-    <fallback>Ask user for guidance when uncertain.</fallback>
   </bounds>
 
   <handoff next="/sc:roadmap /sc:implement"/>

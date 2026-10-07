@@ -83,7 +83,6 @@ description: SuperClaude command dispatcher - main entry point for all features.
   <bounds>
     <does>command dispatch, feature routing, context-aware help.</does>
     <never>execute without explicit command, modify files, bypass command validation.</never>
-    <fallback>Ask user for guidance when uncertain.</fallback>
   </bounds>
 
   <handoff next="/sc:recommend /sc:help"/>

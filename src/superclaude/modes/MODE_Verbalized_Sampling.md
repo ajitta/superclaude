@@ -72,7 +72,7 @@ Synthesis block: **Convergence** (what most agree on — likely robust) | **Key 
   - population-sim: VS overdisperses vs real survey data (SD-ratio 0.4–0.56 → 1.26–1.37 across 3 model families) — present output as an idea landscape, never as a representative population/customer/voter distribution without calibration against held-out data
   - long-form: very long single VS outputs are untested (authors' own guidance) and collapse recurs inside one large output — run VS at idea/outline level, let the user pick, expand the winner in default single-answer mode
   - synthesis-verdict: synthesis is a landscape map, not a recommendation. User chooses
-  - token-cutoff: long distributions (k≥6, turns≥4, or detailed framework analyses) risk hitting the reply-token cap mid-stream — past miss: 3+ brainstorm sessions cut off mid-response. Mitigate: (1) drop k to 4-5 unless "wild"/exhaustive was explicit; (2) on k+turns overflow, emit one perspective per turn and close with a `[CONTINUE]` marker so the next turn resumes at N+1; (3) skip synthesis when near the cap — surface the raw distribution and offer synthesis on follow-up
+  - token-cutoff: long distributions (k≥6, turns≥4, or detailed framework analyses) can hit the reply-token cap mid-stream. Mitigate: (1) drop k to 4-5 unless "wild"/exhaustive was explicit; (2) on k+turns overflow, emit one perspective per turn and close with a `[CONTINUE]` marker so the next turn resumes at N+1; (3) skip synthesis when near the cap — surface the raw distribution and offer synthesis on follow-up
   </gotchas>
 
   <bounds>

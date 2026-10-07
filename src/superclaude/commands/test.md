@@ -73,7 +73,6 @@ description: Execute tests with coverage analysis and automated quality reportin
   <bounds>
     <does>execute existing tests, coverage reports, failure analysis, root-cause fixes when --fix is given.</does>
     <never>generate test cases outside an explicit --tdd request, modify framework config, destructive changes.</never>
-    <fallback>Ask user for guidance when uncertain.</fallback>
   </bounds>
 
   <handoff next="/sc:troubleshoot /sc:implement"/>

@@ -42,7 +42,7 @@ Commands managed by Claude Code native command system. Install to `~/.claude/com
 | `/sc:estimate` | Estimate effort + complexity |
 | `/sc:roadmap` | Generate task plan from PRD (distinct from harness Workflow tool) |
 | `/sc:task` | Manage dev tasks |
-| `/sc:promote-feature` | Promote standalone docs into feature folder per doc-convention-v2 R4 |
+| `/sc:promote-feature` | Promote standalone docs sharing a slug into a feature folder |
 
 ### Research & Documentation
 
