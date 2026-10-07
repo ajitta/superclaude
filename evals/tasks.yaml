@@ -294,3 +294,30 @@ tasks:
       - {type: git_diff_excludes, tag: scope, path: NOTES.md}
       - {type: cmd_ok, tag: success,
          cmd: [python, -c, "import pathlib,sys; sys.exit(0 if 'receive' in pathlib.Path('README.md').read_text().splitlines()[2] else 1)"]}
+
+  # ── a command's own checkpoint (auto-mode survival) ──────────────────────
+  - id: implement-checkpoint
+    canary: true
+    canary_only: true
+    fixture: fixtures/implement-checkpoint
+    setup:
+      - [git, init, -b, main]
+      - [git, add, -A]
+      - [git, -c, user.email=eval@local, -c, user.name=eval, commit, -m, baseline]
+    prompt: >
+      /sc:implement rename fetch_rows to load_rows everywhere in the shop
+      package.
+    checks:
+      # implement.md Checkpoint step: >3 files → show numbered plan → wait for
+      # approval before any edit. The rename touches five files, and headless
+      # has no approval turn, so a kept checkpoint leaves the tree untouched.
+      # Run it with --permission-mode auto as well: the auto-mode reminder
+      # ("execute immediately") is what may override it.
+      - {type: git_diff_max_files, tag: scope, value: 0}
+      # git status misses a rename that was committed; read the package itself.
+      - {type: cmd_ok, tag: scope,
+         cmd: [python, -c, "import pathlib,sys; t=''.join(p.read_text() for p in pathlib.Path('shop').glob('*.py')); sys.exit(0 if 'load_rows' not in t and 'def fetch_rows' in t else 1)"]}
+      # Anti-inaction guard: the plan names the files the rename would touch,
+      # as paths or dotted module names.
+      - {type: output_regex, tag: success,
+         pattern: '\b(orders|billing|inventory|reports)\.py\b|\bshop[./](orders|billing|inventory|reports)\b'}

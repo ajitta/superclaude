@@ -14,7 +14,7 @@ description: Diagnose + resolve issues in code, builds, deployments, system beha
   2. Investigate: Check git log/diff, trace data flow, find working examples
   3. Hypothesize: Form specific hypothesis ("X causes Y because Z") — max 3 cycles before escalate to user
   4. Confirm: Test hypothesis by changing one variable at a time; check environment before code
-  5. Test: Write failing test reproducing exact bug (required before any fix)
+  5. Test: Write failing test reproducing exact bug (required before any fix) and commit it, so the proof outlives a reset
   6. Fix: Apply single change addressing root cause — no "while I'm here" fixes
   7. Verify: Failing test passes, all existing tests pass, no regressions
   </flow>
@@ -53,6 +53,7 @@ description: Diagnose + resolve issues in code, builds, deployments, system beha
   <gotchas>
   - evidence-fabrication: Do not construct hypothetical failure scenarios to justify pre-existing recommendation. Evidence (code, config, measurements) must precede proposals.
   - analysis-loop: If reasoning reaches same conclusion twice on same question, terminate that line of analysis, move to next topic.
+  - fix-not-test: between the Test and Verify steps the failing test is read-only for the fix — a widened assertion, a skip marker or a deleted case makes the fix look done without the bug being gone. A test that is itself wrong (level 2 of three-failure-levels) is re-examined with a stated reason before any edit to it, never edited around a red run.
   - three-failure-levels: a failure sits at one of three levels — (1) bug in the code → fix it; (2) bug in expectations, i.e. the test or the requirement is itself wrong → re-examine it before "fixing" working code; (3) bug in the process → structural cause, the most valuable to record. Level 2 is the one most often skipped, and skipping it turns a wrong requirement into a wrong fix.
   </gotchas>
 

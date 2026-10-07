@@ -32,10 +32,10 @@ def worktree_dir(tmp_path: Path) -> Path:
 
     Layout:
         tmp_path/main/.git/                          ← common gitdir
-        tmp_path/main/.git/info/                     ← the info/ git reads
+        tmp_path/main/.git/info/                     ← the info/exclude git reads
         tmp_path/main/.git/worktrees/feature/        ← worktree-specific gitdir
         tmp_path/main/.git/worktrees/feature/commondir  ← "../.." (relative)
-        tmp_path/main/.git/worktrees/feature/info/   ← present, never read
+        tmp_path/main/.git/worktrees/feature/info/   ← present; its exclude is never read
         tmp_path/feature/.git                        ← worktree pointer file
 
     The ``commondir`` file is what git itself writes; the per-worktree
@@ -75,7 +75,8 @@ class TestResolveGitExcludeFile:
     def test_worktree_pointer_resolves_to_the_common_info_exclude(
         self, worktree_dir: Path
     ):
-        """Git reads ``info/`` through the common dir; the per-worktree
+        """Git reads ``info/exclude`` through the common dir (per file:
+        ``info/sparse-checkout`` stays per-worktree); the per-worktree
         ``info/exclude`` is never consulted (git 2.55, measured 2026-09-05).
         Until that day this resolver returned the per-worktree file."""
         from superclaude.cli.install_git_exclude import _resolve_git_exclude_file

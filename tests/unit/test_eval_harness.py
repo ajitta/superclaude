@@ -193,6 +193,22 @@ def test_hard_gates_stay_on_invariant_tasks():
     }, f"hard-gate task set changed: {sorted(gated)}"
 
 
+def test_make_canary_gates_runs_every_gated_task():
+    """The release gate's task list is a second copy of the gated set, and
+    run_eval drops unknown --task ids silently — keep the two in step."""
+    makefile = (REPO_ROOT / "Makefile").read_text(encoding="utf-8")
+    recipe = re.search(r"^canary-gates:\n\t(.+)$", makefile, re.M)
+    assert recipe, "Makefile has no canary-gates recipe"
+    gated = {
+        t["id"] for t in TASKS["tasks"] for c in t.get("checks", []) if c.get("gate")
+    }
+    assert set(re.findall(r"--task (\S+)", recipe.group(1))) == gated
+    unflagged = [
+        t["id"] for t in TASKS["tasks"] if t["id"] in gated and not t.get("canary")
+    ]
+    assert not unflagged, f"--canary filters these gated tasks out: {unflagged}"
+
+
 def test_parse_stream_flags_refusal_from_assistant_event():
     """A Fable 5.x refusal arrives as the API message's stop_reason on an
     `assistant` event; it must surface as a distinct refusal, not a generic
@@ -540,3 +556,68 @@ def test_evals_refusal_detector_matches_the_package_one():
     ]
     for p in payloads:
         assert run_eval._detect_refusal(p) == detect_refusal(p), p
+
+
+def _capture_claude_argv(run_eval, monkeypatch, tmp_path, **kwargs):
+    """Run run_task against a stubbed `claude` and return the argv it built."""
+    import json
+    import subprocess
+
+    seen: list[list[str]] = []
+    stream = json.dumps({"type": "result", "subtype": "success", "result": ""})
+
+    def fake_run(cmd, **_):
+        seen.append(list(cmd))
+        return subprocess.CompletedProcess(cmd, 0, stdout=stream, stderr="")
+
+    monkeypatch.setattr(run_eval.subprocess, "run", fake_run)
+    ws = tmp_path / "ws"
+    ws.mkdir(exist_ok=True)
+    task = {"id": "t", "prompt": "do the thing", "checks": []}
+    res = run_eval.run_task(
+        "sc-full",
+        task,
+        ws,
+        tmp_path / "cfg",
+        tmp_path / "logs",
+        "claude",
+        "m",
+        {},
+        **kwargs,
+    )
+    return seen[-1], res
+
+
+def test_permission_mode_flag_is_passed_through_when_set(tmp_path, monkeypatch):
+    """`--permission-mode auto` must reach the claude -p argv before the `--`
+    prompt separator, and be recorded on the result so two runs can be told
+    apart."""
+    run_eval = _import_run_eval()
+    argv, res = _capture_claude_argv(
+        run_eval, monkeypatch, tmp_path, permission_mode="auto"
+    )
+    i = argv.index("--permission-mode")
+    assert argv[i + 1] == "auto"
+    assert i < argv.index("--")
+    assert res.permission_mode == "auto"
+
+
+def test_permission_mode_flag_is_omitted_when_unset(tmp_path, monkeypatch):
+    run_eval = _import_run_eval()
+    argv, res = _capture_claude_argv(run_eval, monkeypatch, tmp_path)
+    assert "--permission-mode" not in argv
+    assert res.permission_mode == ""
+
+
+def test_report_header_and_results_json_record_permission_mode(tmp_path):
+    import json
+
+    run_eval = _import_run_eval()
+    ran = run_eval.TaskResult(arm="sc-full", task_id="t", permission_mode="auto")
+    report = run_eval.write_report([ran], tmp_path, permission_mode="auto")
+    assert "Permission mode: `auto`" in report
+    payload = json.loads((tmp_path / "results.json").read_text(encoding="utf-8"))
+    assert payload[0]["permission_mode"] == "auto"
+    plain = run_eval.TaskResult(arm="sc-full", task_id="t")
+    report = run_eval.write_report([plain], tmp_path)
+    assert "Permission mode: default (flag omitted)" in report

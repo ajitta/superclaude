@@ -219,5 +219,8 @@ docs/memory/solutions_learned.jsonl
 docs/memory/solutions_learned.jsonl
 rtk/history.db
 
+# Downloaded research sources (PDF + markitdown output); docs cite the public URL instead
+docs/research/claude.com/
+
 # Portable skill upload bundles are committed on purpose (download from GitHub)
 !portable-skills/releases/*.zip

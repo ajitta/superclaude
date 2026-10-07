@@ -25,12 +25,12 @@
 
 | Commands | Agents | Modes | MCP Servers |
 |:--------:|:------:|:-----:|:-----------:|
-| **36**   | **23** | **8** | **4**       |
+| **37**   | **24** | **8** | **4**       |
 | Slash    | Domain-expert | Behavioral | Integrations |
 
 </div>
 
-36 slash commands cover the development lifecycle from brainstorming to deployment. 8 behavioral modes auto-load on matching flags and keywords.
+37 slash commands cover the development lifecycle from brainstorming to deployment. 8 behavioral modes auto-load on matching flags and keywords.
 
 ---
 
@@ -90,8 +90,8 @@ What gets installed (per scope):
 
 ```
 <scope>/
-├── commands/sc/        # 36 slash commands (/sc:plan, /sc:implement, …)
-├── agents/             # 23 agent definitions
+├── commands/sc/        # 37 slash commands (/sc:plan, /sc:implement, …)
+├── agents/             # 24 agent definitions
 ├── output-styles/      # output styles (pick one via /config → Output style)
 ├── superclaude/        # core rules, modes, mcp docs
 ├── hooks/hooks.json    # SessionStart / PreCompact / SessionEnd / etc.
@@ -132,7 +132,7 @@ Restart Claude Code, then try a few:
 - `/sc:review` — Multi-dimensional review (code/plan/design)
 - `/sc:research` — Deep web research (Tavily-enhanced)
 - `/sc:insight` — Capture structured session insights to JSONL
-- `/sc:help` — List all 36 commands
+- `/sc:help` — List all 37 commands
 
 To keep a command running until a result holds, put it in a [`/goal`](https://code.claude.com/docs/en/goal). `/goal` sets a completion condition, and Claude keeps working turn after turn until a separate model judges it met. The condition is also Claude's first instruction, so a command named in it runs as part of the goal:
 
@@ -235,25 +235,26 @@ The framework's value comes from chaining commands. Each chain has gates: a step
 | Tier | Trigger | Recommended chain |
 |------|---------|-------------------|
 | **Trivial** | Typo · 1-line fix · rename · obvious bug with known fix | Direct edit. No `/sc:*` needed. |
-| **Small** | Single file · ≤ 50 added lines · clear scope | `/sc:implement` (or `/sc:improve`) **`--plan`** → `/sc:test` |
-| **Medium** | 3–10 files · multi-purpose · clear requirements | `/sc:plan` → `/sc:implement --plan` → `/sc:test` → `/sc:reflect` |
-| **Large** | > 10 files · cross-cutting · ambiguous scope · new system | `/sc:brainstorm` → `/sc:design` → `/sc:review` → `/sc:plan` → `/sc:implement --plan` → `/sc:test` → `/sc:reflect` |
+| **Small** | Single file · ≤ 50 added lines · clear scope | Direct request (or `/sc:improve`) with the global **`--plan`** (5-line plan, approve) → `/sc:test` |
+| **Medium** | 3–10 files · multi-purpose · clear requirements | `/sc:plan` → `/sc:implement --plan` → `/sc:test` → `/sc:reflect` (optional: `/sc:intent` first) |
+| **Large** | > 10 files · cross-cutting · ambiguous scope · new system | `/sc:intent` → `/sc:brainstorm` → `/sc:design` → `/sc:review` → `/sc:plan` → `/sc:implement --plan` → `/sc:test` → `/sc:reflect` |
 
 #### The full chain (large tasks)
 
 ```text
-/sc:brainstorm   →   /sc:design   →   /sc:review   →   /sc:plan   →   /sc:implement --plan   →   /sc:test   →   /sc:reflect
-   discover           specify          gate              decompose       build (TDD)                 verify        learn
-   (Socratic)         (architecture)   (multi-lens)      (phases)        (per task)                  (baseline)    (capture)
+/sc:intent   →   /sc:brainstorm   →   /sc:design   →   /sc:review   →   /sc:plan   →   /sc:implement --plan   →   /sc:test   →   /sc:reflect
+   capture          discover           specify          gate              decompose       build (TDD)                 verify        learn
+   (own words)      (Socratic)         (architecture)   (multi-lens)      (phases)        (per task)                  (baseline)    (capture)
 ```
 
 | Step | Output | Hard gate before next step |
 |------|--------|----------------------------|
+| `/sc:intent` | `docs/features/<slug>/00-intent.md` — problem, proposed outcome, affected users and systems, constraints, open questions, in the requester's words | User approves the wording; committed before analysis starts |
 | `/sc:brainstorm` | `docs/features/<slug>/01-discovery.md` (one-off: `docs/specs/<slug>-discovery-<user>-<date>.md`) | User approves discovery spec |
-| `/sc:design` | `docs/features/<slug>/04-design.md` (one-off: `docs/specs/…-design-…md`) | Design committed (components pass the [R18] necessity test) |
+| `/sc:design` | `docs/features/<slug>/04-design.md` (one-off: `docs/specs/…-design-…md`) | Design committed (components pass the [R18] necessity test; Areas of concern resolved) |
 | `/sc:review` | Multi-dimensional review of design/plan | Required — `/sc:brainstorm` hard-blocks `/sc:plan` until this runs |
 | `/sc:plan` | `docs/features/<slug>/05-plan.md` (one-off: `docs/plans/…md`) — phased TDD tasks, file paths, verify cmds | Plan committed |
-| `/sc:implement --plan` | Code + per-phase commits | Implementation complete |
+| `/sc:implement --plan` | Code + per-phase commits | Implementation complete; plan checkboxes and Deviations match the code |
 | `/sc:test` | Test pass evidence (`42/42 pass, baseline 40`) | Real output, not predictions |
 | `/sc:reflect` | Retrospective + insights captured to `.claude/insights.jsonl` | — |
 
@@ -261,7 +262,7 @@ The framework's value comes from chaining commands. Each chain has gates: a step
 
 | Goal | Chain |
 |------|-------|
-| **Investigate a bug** | `/sc:troubleshoot` → `/sc:analyze --focus <domain>` → `/sc:implement --plan` → `/sc:test` |
+| **Investigate a bug** | `/sc:troubleshoot` → `/sc:analyze --focus <domain>` → `/sc:plan` → `/sc:implement --plan` → `/sc:test` |
 | **Performance work** | `/sc:analyze --focus perf --scope module` → `/sc:improve --loop --focus perf` → `/sc:test` |
 | **Security audit** | `/sc:analyze --focus security` → `/sc:review` → `/sc:improve --focus security` |
 | **Refactor** | `/sc:analyze --focus quality` → `/sc:plan` → `/sc:improve --loop` → `/sc:test` |
@@ -308,8 +309,8 @@ Every hook runs as `superclaude hook <name>` (a console entry, dispatched before
 <td width="50%">
 
 ### 🤖 **Smarter Agent System**
-**23 specialized agents** with domain expertise:
-- New: **insight-analyst**, **repo-index**, **self-review**, **simplicity-guide**, **technical-writer**, **project-initializer**
+**24 specialized agents** with domain expertise:
+- New: **insight-analyst**, **repo-index**, **self-review**, **simplicity-guide**, **technical-writer**, **project-initializer**, **verifier**
 - Deep Research agent for autonomous web research
 - Security/performance/quality engineers catch real issues
 - Frontend / backend / system architect for design work
@@ -512,8 +513,8 @@ The Deep Research system intelligently coordinates multiple tools:
 | Project rules, build & test loop | [`CLAUDE.md`](CLAUDE.md) |
 | Project-specific gotchas | [`.claude/rules/gotchas/`](.claude/rules/gotchas) |
 | Serena MCP troubleshooting | [`docs/troubleshooting/serena-installation.md`](docs/troubleshooting/serena-installation.md) |
-| Slash commands (36) | [`src/superclaude/commands/`](src/superclaude/commands) · `superclaude install --list-all` |
-| Agents (23) | [`src/superclaude/agents/`](src/superclaude/agents) |
+| Slash commands (37) | [`src/superclaude/commands/`](src/superclaude/commands) · `superclaude install --list-all` |
+| Agents (24) | [`src/superclaude/agents/`](src/superclaude/agents) |
 | Modes (8) | [`src/superclaude/modes/`](src/superclaude/modes) |
 | MCP servers (4) | [`src/superclaude/mcp/`](src/superclaude/mcp) |
 | Hooks (registry + scripts) | [`src/superclaude/cli/hook_dispatch.py`](src/superclaude/cli/hook_dispatch.py) · [`src/superclaude/hooks/hooks.json`](src/superclaude/hooks/hooks.json) · [`src/superclaude/scripts/`](src/superclaude/scripts) |
@@ -583,7 +584,7 @@ Flags are behavioral hints that any `/sc:*` prompt accepts. The model reads them
 
 ```bash
 /sc:research "Rust async runtime tradeoffs" --depth deep --tavily --c7
-/sc:implement "user export endpoint" --plan --validate --delegate auto
+/sc:implement --plan docs/features/user-export/05-plan.md --validate --delegate auto
 /sc:analyze src/auth/ --focus security --scope module
 /sc:improve src/api/handlers.py --loop --iterations 3 --serena
 /sc:brainstorm "should we migrate to gRPC?" --vs multi
@@ -603,6 +604,7 @@ MIT — see [`LICENSE`](LICENSE).
 <summary><b>Click to expand full command list</b></summary>
 
 ### 🧠 Planning & Design
+- `/sc:intent` — Capture a request in the requester's own words before analysis
 - `/sc:brainstorm` — Structured brainstorming through Socratic dialogue
 - `/sc:design` — System architecture, APIs, component interfaces
 - `/sc:plan` — Detailed implementation plans with TDD tasks

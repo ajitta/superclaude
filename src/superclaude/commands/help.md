@@ -51,6 +51,7 @@ description: List all /sc commands + functionality. Use when user types `/sc:hel
     - roadmap: PRD → impl task plan
     - init: interactive project env setup
     - insight: capture structured session insights
+    - intent: capture a request in the requester's own words before analysis
     - plan: detailed impl plans with TDD tasks
     - review: code review with structured feedback
     - auto-improve: autonomous overnight code improvement loop (Karpathy AutoResearch)
@@ -63,7 +64,7 @@ description: List all /sc commands + functionality. Use when user types `/sc:hel
   Project mgmt: task (single-session tracking) | pm (multi-session orchestration)
   Impl: implement (write/modify code) | build (compile, package)
   Docs: document (prose for humans) | index (structured knowledge base) | index-repo (repo catalog)
-  Discovery: brainstorm (Socratic requirements) | research (evidence-based investigation)
+  Discovery: intent (request in the requester's words, before analysis) | brainstorm (Socratic requirements) | research (evidence-based investigation)
   Advisory: business-panel (market/strategy) | spec-panel (tech spec review)
   </scope_map>
 
