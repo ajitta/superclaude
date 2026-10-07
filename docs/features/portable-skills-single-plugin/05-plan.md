@@ -16,7 +16,7 @@ Branch: `feat/portable-skills-single-plugin` (계획 문서 커밋이 첫 커밋
 ## Decisions (기본값, `/sc:implement` 전에 바꿀 수 있음)
 
 - 플러그인 이름 `socratic`. 슬래시 명령은 `/socratic:socratic-brainstorm`, `/socratic:socratic-elenchus`. 마켓플레이스 이름 `ajitta-socratic`은 그대로 둔다. 바꾸면 모든 설치 id와 `renames` 조회가 깨진다.
-- 버전: `plugin.json`은 `1.0.0`에서 시작한다. 각 SKILL.md의 `metadata.version`은 유지하고, 한국어 제거로 description의 트리거 문구가 바뀌므로 minor를 올린다(brainstorm 3.3.0, elenchus 1.3.0). 이후 스킬을 고칠 때는 스킬 버전과 플러그인 버전을 함께 올린다. Claude Code는 플러그인 버전이 바뀔 때만 업데이트한다.
+- 버전: `plugin.json`은 `1.0.0`에서 시작한다. 각 SKILL.md의 `metadata.version`은 유지하고, 한국어 제거로 description의 트리거 문구가 바뀌므로 minor를 올린다(brainstorm 3.3.0, elenchus 1.3.0). Claude Code는 플러그인 버전이 바뀔 때만 업데이트하므로, 스킬 파일이 바뀌었는데 플러그인 버전이 그대로면 테스트와 `package.py`가 실패하게 한다(Task 4a). 지금까지는 "스킬 버전 = 플러그인 버전" 검사가 이 역할을 했고, 새 구조에서는 그 검사가 없어진다.
 - 한국어 없음: 설치되는 파일(`plugins/socratic/` 전체와 `releases/socratic.zip`)에 한글이 한 글자도 없어야 하며 테스트로 고정한다. 플러그인은 원본 폴더의 복사본이라 원본 SKILL.md와 references도 영어로 바꾼다. Codex와 복사 설치 사용자도 같은 파일을 받는다. 응답 언어는 기존 규칙 7("Reply in the user's language")이 맡는다. 설치되지 않는 `portable-skills/README.md`와 `docs/`의 한국어 호출 예시는 그대로 둔다.
 - manifest는 `portable-skills/plugin-manifest.json` 하나로 하고 `plugin-manifests/`는 지운다.
 - `renames`: `{"socratic-brainstorm": "socratic", "socratic-elenchus": "socratic"}`. append-only로 영구 유지하고 테스트로 고정한다. 지우는 플러그인이 없으므로 `forceRemoveDeletedPlugins`는 쓰지 않는다.
@@ -75,6 +75,23 @@ Out: Codex 사이드카 `agents/openai.yaml`(한글 없음), 과거 기록(`docs
 - [ ] Step 4: 멈춤 신호. 스킬마다 한 번, 한국어 첫 턴 뒤 `--resume <session> "그만"` → brainstorm은 Step 5(판정과 brief)로, elenchus는 기록으로 바로 가야 한다.
 - [ ] Step 5: 기준선보다 나빠지면 멈추고 Deviations에 기록한다. 영어 트리거 문구를 고쳐 다시 실행하고, 한국어를 되돌려 넣지는 않는다.
 
+### Task 4a: 스킬 파일이 바뀌면 플러그인 버전 bump 강제
+**Files:** Create: `portable-skills/plugin-release.json` | Modify: `portable-skills/package.py`, `tests/unit/test_portable_skills.py`
+
+1.0.0의 내용은 Task 4 Step 5에서 문구가 바뀔 수 있어 Task 4 뒤에 둔다.
+- [ ] Step 1: 테스트
+  - `test_release_record_matches_content`: `check_release(_SKILLS) == []`
+  - `test_changed_skills_need_a_new_plugin_version`: 임시 manifest(1.0.0)와 digest가 다른 기록 → `check_release`가 bump 오류를 내고, `record_release`는 기록을 덮어쓰지 않고 거부한다
+  - `test_new_plugin_version_is_recorded`: manifest 1.0.1, 기록 1.0.0 → `record_release`가 {1.0.1, 현재 digest}를 쓰고, 이후 `check_release`는 `[]`
+- [ ] Step 2: red 확인
+- [ ] Step 3: `package.py`
+  - `RELEASE = ROOT / "plugin-release.json"`, 내용은 `{"version", "digest"}`. 설치 파일이 아니므로 `plugin_files()`에 넣지 않는다.
+  - `content_digest(skills)`: `plugin_files()`에서 `.claude-plugin/plugin.json`을 뺀 경로와 바이트를 정렬해 sha256. manifest를 빼므로 버전만 올려도 digest는 같다.
+  - `check_release()`: 기록 없음 또는 기록 버전 ≠ manifest 버전 → "run package.py". 같은 버전인데 digest가 다름 → "skill files changed since plugin X: bump version in plugin-manifest.json".
+  - `record_release()`: 같은 버전에 digest가 다르면 거부하고, 그 외에는 기록을 쓴다. `main()`의 `--check`는 `check_release` 오류를 보고하고, 빌드 모드는 패키징 전에 `record_release`를 부르며 거부되면 1로 끝난다.
+- [ ] Step 4: `uv run python portable-skills/package.py` → 기록 {1.0.0, digest} 생성, 테스트 green, `make lint`
+- [ ] Step 5: 커밋 `feat(portable-skills): require a plugin version bump when skill files change`
+
 ### Task 5: 실제 저장소로 이전 경로 probe
 **Files:** 없음 (scratchpad만 사용, 결과는 Proof에 기록)
 - [ ] Step 1: 02-research 경우 B를 이 저장소로 반복한다. 격리된 `CLAUDE_CONFIG_DIR`과 scratchpad bare clone(`main` = master 커밋)을 쓰고, `http://127.0.0.1:8765/<repo>.git`으로 등록한 뒤 `GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=url.file:///<scratch>/.insteadOf GIT_CONFIG_VALUE_0=http://127.0.0.1:8765/`로 연결한다.
@@ -87,7 +104,7 @@ Out: Codex 사이드카 `agents/openai.yaml`(한글 없음), 과거 기록(`docs
 - [ ] Step 2: Layout: `plugin-manifest.json`, `plugins/socratic/skills/<skill>/`, `releases/socratic.zip`. "SKILL.md at its root … single skill" 문장은 "생성된 플러그인은 스킬마다 `skills/<skill>/`에 두고 원본 폴더는 일반 스킬로 남긴다"로 바꾼다. 스킬 파일은 영어로만 쓰고 응답은 사용자 언어를 따른다는 한 줄을 넣는다.
 - [ ] Step 3: Install은 claude.ai 업로드 `socratic.zip`, 마켓플레이스 `/plugin install socratic@ajitta-socratic`. 복사 설치 행은 스킬별 그대로. Invoke의 플러그인 행은 `/socratic:<skill>`.
 - [ ] Step 4: 새 절 "Moving from the two plugins": Claude Code는 `/plugin marketplace update ajitta-socratic` 뒤 다음 세션에서 `socratic`으로 넘어간다. `/plugin`이 `Plugin "socratic-brainstorm" not found in marketplace`를 보이면(renames를 모르는 이전 버전) 두 플러그인을 `/plugin uninstall`하고 `/plugin install socratic@ajitta-socratic`. claude.ai 업로드 사용자는 Customize › Plugins에서 이전 두 개를 지우고 `socratic.zip`을 올린다. 지우지 않으면 같은 스킬이 두 번 로드된다.
-- [ ] Step 5: Validate and package 절: 스킬을 고치면 그 스킬의 `metadata.version`과 `plugin-manifest.json`의 `version`을 함께 올린다.
+- [ ] Step 5: Validate and package 절: 스킬을 고치면 그 스킬의 `metadata.version`과 `plugin-manifest.json`의 `version`을 함께 올린다. 플러그인 버전을 그대로 두면 `package.py`와 테스트가 `plugin-release.json`의 digest 불일치로 실패한다. 아직 배포하지 않은 버전을 고칠 때만 `plugin-release.json`을 지우고 `package.py`를 다시 실행해 기록을 새로 만든다.
 
 ### Task 7: docs/index.html (Pages)
 **Files:** Modify: `docs/index.html` (nav 129행, `#plugins` 섹션 240–276행), `tests/unit/test_portable_skills.py`
@@ -119,7 +136,7 @@ Out: Codex 사이드카 `agents/openai.yaml`(한글 없음), 과거 기록(`docs
 - `renames`를 모르는 Claude Code 버전에서는 마켓플레이스를 업데이트하면 경우 A가 된다. 최소 버전은 문서에 없다. Task 6의 수동 이전 안내로 완화한다.
 - claude.ai가 두 스킬 zip을 받는지는 확인되지 않았다. Task 8이 머지 전 게이트다. claude.ai Add marketplace 경로의 `renames` 적용은 머지 뒤에야 확인할 수 있고, Task 6 안내가 그 경우도 다룬다.
 - 한쪽 스킬만 설치했던 사용자도 두 스킬을 받는다. 의도 기록이 원한 결과다.
-- 플러그인 버전을 올렸는지는 테스트가 확인하지 않는다. 지금의 스킬 버전과 같은 수준의 빈틈이다.
+- Task 4a 뒤에도 스킬 파일을 바꾸고 SKILL.md의 `metadata.version`을 올리지 않는 것은 잡지 못한다(지금과 같은 수준이고, Claude Code 배포에는 플러그인 버전만 쓰인다). 배포된 버전의 기록을 지우고 다시 만드는 우회도 막지 못한다.
 
 ## Alternatives not taken
 
@@ -128,6 +145,8 @@ Out: Codex 사이드카 `agents/openai.yaml`(한글 없음), 과거 기록(`docs
 - `forceRemoveDeletedPlugins`만 쓰기: 이전 플러그인을 지우기만 하고 새 플러그인을 설치하지 않아 "기존 설치가 깨지면 안 됨"을 어긴다.
 - 이전 이름을 `dependencies`로 연결하는 shim 플러그인: 마켓플레이스 항목이 셋이 된다.
 - 원본은 한국어로 두고 빌드 때만 걸러 내기: 번역은 자동으로 할 수 없고 원본과 설치본이 갈라진다. 원본을 영어로 바꾼다.
+- `plugin.json`에서 `version` 생략(Claude Code가 커밋 SHA로 추적): 저장소의 무관한 커밋마다 업데이트로 보이고, claude.ai 업로드가 version 없는 manifest를 받는지 확인되지 않았다.
+- 스킬 버전을 `plugin.json`의 `metadata`에 기록해 비교: 설치 파일에 들어가고, claude.ai 업로드가 그 키를 받는지 모른다. git 이력 비교는 CI의 얕은 clone에서 깨진다.
 - `plugins/socratic/skills/`에서 원본 폴더로 symlink: Windows에서는 Developer Mode나 관리자 권한이 필요하고 zip에는 symlink를 담을 수 없다.
 
 ## Deviations
@@ -137,7 +156,7 @@ Out: Codex 사이드카 `agents/openai.yaml`(한글 없음), 과거 기록(`docs
 
 ## Proof
 
-- `uv run pytest tests/unit/test_portable_skills.py -q` → 전부 통과(`test_shipped_plugin_has_no_hangul`, `test_install_docs_match_the_marketplace` 포함). 전체 `uv run pytest` → exit 0(기준선 2953 passed, 1 skipped). `make lint` → `All checks passed!`
+- `uv run pytest tests/unit/test_portable_skills.py -q` → 전부 통과(`test_shipped_plugin_has_no_hangul`, `test_release_record_matches_content`, `test_install_docs_match_the_marketplace` 포함). 전체 `uv run pytest` → exit 0(기준선 2953 passed, 1 skipped). `make lint` → `All checks passed!`
 - `uv run python portable-skills/package.py --check` → 스킬 두 개 `ok`
 - `claude plugin validate portable-skills/plugins/socratic`와 `claude plugin validate .` → `✔ Validation passed`
 - Task 4: 명시 프롬프트 7/7, 모호한 프롬프트에 안내 줄, 한국어 응답, "그만" 처리
