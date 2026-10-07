@@ -1,23 +1,21 @@
 {
   "$schema": "https://code.claude.com/schemas/marketplace.json",
   "name": "ajitta-socratic",
-  "description": "Two portable Socratic skills from portable-skills/: a questioning-led brainstorm and Plato's elenchus. The SuperClaude framework itself is installed with the superclaude CLI, not from this marketplace.",
+  "description": "One plugin holding the two portable Socratic skills from portable-skills/: a questioning-led brainstorm and Plato's elenchus. The SuperClaude framework itself is installed with the superclaude CLI, not from this marketplace.",
   "owner": {
     "name": "ajitta",
     "email": "ajitta@gmail.com"
   },
   "plugins": [
     {
-      "name": "socratic-brainstorm",
-      "source": "./portable-skills/plugins/socratic-brainstorm",
-      "description": "Modern Socratic questioning (one question at a time) to test an idea, then your own options plus up to three labeled ones, convergence by criteria, and an honest verdict with a short brief.",
-      "category": "productivity"
-    },
-    {
-      "name": "socratic-elenchus",
-      "source": "./portable-skills/plugins/socratic-elenchus",
-      "description": "The method of Plato's early dialogues: what is X, premises you agree to, a contradiction built from them, and your revised definitions as the new ideas. Usually ends in aporia. No advice.",
+      "name": "socratic",
+      "source": "./portable-skills/plugins/socratic",
+      "description": "Two Socratic skills. socratic-brainstorm tests an idea one question at a time, then your own options plus up to three labeled ones, convergence by criteria, and an honest verdict with a short brief. socratic-elenchus runs Plato's what-is-X dialogue: premises you agree to, a contradiction built from them, and your revised definitions. Usually ends in aporia. No advice.",
       "category": "productivity"
     }
-  ]
+  ],
+  "renames": {
+    "socratic-brainstorm": "socratic",
+    "socratic-elenchus": "socratic"
+  }
 }

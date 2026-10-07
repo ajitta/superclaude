@@ -108,11 +108,13 @@ poetry.lock
 .claude/scheduled_tasks.lock
 .claude/skills/
 
-# Agent Skills install artifacts (npx skills add) - per-machine, not framework content
-.agents/
-agent/
-skills/
-skills-lock.json
+# Agent Skills install artifacts (npx skills add) - per-machine, not framework content.
+# Anchored to the repo root: an unanchored `skills/` also hid
+# portable-skills/plugins/socratic/skills/ from commits.
+/.agents/
+/agent/
+/skills/
+/skills-lock.json
 
 
 # SuperClaude specific

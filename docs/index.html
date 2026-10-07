@@ -126,7 +126,7 @@
         <a href="#framework">Framework</a>
         <a href="#install">Install</a>
         <a href="#commands">Commands</a>
-        <a href="#plugins">Plugins</a>
+        <a href="#plugins">Plugin</a>
         <a href="#develop">Develop</a>
         <a href="https://github.com/ajitta/superclaude">GitHub ↗</a>
       </nav>
@@ -240,8 +240,8 @@
     <section id="plugins" class="content install">
       <div class="wrap">
         <div>
-          <h2>Socratic plugins for Claude Code</h2>
-          <p>Two plugins from this repository's marketplace, each holding one skill with the same name. They are separate from the framework: you install them inside Claude Code, without uv or the <code>superclaude</code> CLI.</p>
+          <h2>Socratic plugin for Claude Code</h2>
+          <p>One plugin from this repository's marketplace, <code>socratic</code>, holding two skills. It is separate from the framework: you install it inside Claude Code, without uv or the <code>superclaude</code> CLI.</p>
           <p>Not the same as <code>/sc:brainstorm</code>, which turns a feature request into requirements and writes docs. These skills only ask questions and never implement anything.</p>
           <a href="https://github.com/ajitta/superclaude/tree/master/portable-skills">Install on claude.ai or Codex ↗</a>
         </div>
@@ -253,19 +253,19 @@
               <div class="cmd"><code>/plugin marketplace add ajitta/superclaude</code></div>
             </li>
             <li>
-              <h3>Install one plugin or both</h3>
-              <div class="cmd"><code>/plugin install socratic-brainstorm@ajitta-socratic</code></div>
-              <div class="cmd"><code>/plugin install socratic-elenchus@ajitta-socratic</code></div>
+              <h3>Install the plugin</h3>
+              <div class="cmd"><code>/plugin install socratic@ajitta-socratic</code></div>
+              <p class="hint">Had the two earlier plugins, <code>socratic-brainstorm</code> and <code>socratic-elenchus</code>? Run <code>/plugin marketplace update ajitta-socratic</code>; they move to <code>socratic</code> at the next session.</p>
             </li>
             <li>
               <h3>Use it</h3>
-              <p class="hint">Claude Code names a plugin's skill <code>plugin:skill</code>, so the command repeats the name. Add your idea after it, or just ask in words ("poke holes in this plan").</p>
+              <p class="hint">Claude Code names a plugin's skill <code>plugin:skill</code>, so each command starts with <code>socratic:</code>. Add your idea after it, or just ask in words ("poke holes in this plan").</p>
               <div class="example">
-                <div class="cmd cmd-light"><code>/socratic-brainstorm:socratic-brainstorm</code></div>
+                <div class="cmd cmd-light"><code>/socratic:socratic-brainstorm</code></div>
                 <p>Tests your idea one question at a time, draws out your options, adds up to three of its own, and ends with a verdict (sharpened, open, or refuted) and a short brief. Pick it when you want to leave with a plan.</p>
               </div>
               <div class="example">
-                <div class="cmd cmd-light"><code>/socratic-elenchus:socratic-elenchus</code></div>
+                <div class="cmd cmd-light"><code>/socratic:socratic-elenchus</code></div>
                 <p>The method of Plato's dialogues: "what is X?", premises you agree to, a contradiction built from them, and a definition you revise. No advice. Pick it to find out whether you know what you mean.</p>
               </div>
               <p class="hint">To use both, settle the key word with elenchus first, then brainstorm. Plugins installed from user settings do not load in cloud sessions.</p>
