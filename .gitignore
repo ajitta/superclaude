@@ -119,9 +119,6 @@ skills-lock.json
 .beads/
 .serena/*
 !.serena/memories/
-# session records too: a Beads bd-init line in .git/info/exclude (**/SESSION*.md) hides them on
-# case-insensitive git, and .gitignore outranks info/exclude
-!.serena/memories/session_*.md
 .superclaude/
 *.backup
 *.bak
