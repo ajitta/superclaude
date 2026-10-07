@@ -188,6 +188,13 @@ def test_zip_build_is_os_independent(tmp_path, monkeypatch):
     assert rebuilt.read_bytes() == committed.read_bytes()
 
 
+def test_releases_hold_only_the_plugin_zip():
+    """The per-skill zips were replaced by the one plugin zip once its
+    claude.ai upload was confirmed; a leftover zip would be a second install."""
+    names = sorted(p.name for p in (_DIR / "releases").iterdir())
+    assert names == [f"{_plugin_name()}.zip"]
+
+
 def test_zip_is_a_plugin_upload():
     """claude.ai's upload requires .claude-plugin/plugin.json inside the zip,
     under the single top-level folder. Each skill sits in skills/<skill>/; a

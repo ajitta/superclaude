@@ -118,10 +118,10 @@ Out: Codex 사이드카 `agents/openai.yaml`(한글 없음), 과거 기록(`docs
 
 ### Task 8: claude.ai 업로드 확인, 이전 zip 제거
 **Files:** Delete: `portable-skills/releases/socratic-brainstorm.zip`, `portable-skills/releases/socratic-elenchus.zip` | Modify: `tests/unit/test_portable_skills.py`
-- [ ] Step 1 (사용자): claude.ai › Customize › Plugins에서 기존 업로드 두 개를 지우고 Add › Upload plugin으로 `portable-skills/releases/socratic.zip`을 올린다. 두 스킬이 모두 보이는지, "소크라테스 대화법으로 따져줘: 사내 점심 메뉴 추천 앱"이 elenchus로 로드되어 한국어 "…이란 무엇인가요?"로 시작하는지 확인한다. 업로드가 거부되면 멈춘다. 이전 zip을 남기고 Deviations에 기록한 뒤, 머지 전에 claude.ai 경로를 다시 계획한다.
-- [ ] Step 2: `test_releases_hold_only_the_plugin_zip`(`releases/`에는 `socratic.zip`만) → red
-- [ ] Step 3: `git rm` 이전 zip 두 개 → green, 전체 `uv run pytest` exit 0
-- [ ] Step 4: 커밋 `chore(portable-skills): drop the per-skill release zips`
+- [x] Step 1 (사용자): claude.ai › Customize › Plugins에서 기존 업로드 두 개를 지우고 Add › Upload plugin으로 `portable-skills/releases/socratic.zip`을 올린다. 두 스킬이 모두 보이는지, "소크라테스 대화법으로 따져줘: 사내 점심 메뉴 추천 앱"이 elenchus로 로드되어 한국어 "…이란 무엇인가요?"로 시작하는지 확인한다. 업로드가 거부되면 멈춘다. 이전 zip을 남기고 Deviations에 기록한 뒤, 머지 전에 claude.ai 경로를 다시 계획한다.
+- [x] Step 2: `test_releases_hold_only_the_plugin_zip`(`releases/`에는 `socratic.zip`만) → red
+- [x] Step 3: `git rm` 이전 zip 두 개 → green, 전체 `uv run pytest` exit 0
+- [x] Step 4: 커밋 `chore(portable-skills): drop the per-skill release zips`
 
 ### Task 9: 마무리
 - [ ] Step 1: `uv run python portable-skills/package.py --check`, 전체 `uv run pytest`, `make lint`를 다시 실행하고 Proof에 출력을 기록한다.
@@ -155,6 +155,7 @@ Out: Codex 사이드카 `agents/openai.yaml`(한글 없음), 과거 기록(`docs
 - Task 2 커밋(5fcfb00a)에 `plugins/socratic/skills/`가 빠졌다. `.gitignore`의 `skills/`(npx skills add 산출물용)가 경로 고정 없이 모든 `skills/` 디렉터리를 제외했다. 로컬 테스트는 디스크의 파일로 통과했지만 새 checkout에서는 실패했을 것이다. `!portable-skills/plugins/*/skills/` 예외를 추가하고 후속 커밋으로 폴더를 넣었다.
 - Task 4 Step 1: `@synced` 사본은 `claude plugin disable`/`enable` 대신 실행마다 `--settings '{"enabledPlugins":{"socratic-brainstorm@synced":false,"socratic-elenchus@synced":false}}'`로 껐다. init 이벤트에 `socratic` 플러그인과 `socratic:` 스킬 두 개만 남는 것을 확인했고, 사용자 설정은 바뀌지 않는다. 끄지 않은 첫 확인 실행에서는 모델이 `@synced`의 `socratic-elenchus:socratic-elenchus`를 골랐다.
 - Task 7 Step 6: 브라우저를 열어 보는 대신 headless Chrome으로 측정했다. Windows headless 창은 503px 아래로 줄지 않아, 페이지를 360px·390px iframe에 넣고(`--allow-file-access-from-files`) `#plugins` 안 요소의 오른쪽 끝과 문서 `scrollWidth`를 비교했다.
+- Task 8 Step 1: 순서를 바꿔 새 `socratic.zip`을 먼저 올리고, 업로드가 된 뒤에 이전 두 플러그인을 지웠다. 새 zip이 거부되더라도 아무것도 지워지지 않게 하기 위해서다.
 
 ## Proof
 
@@ -168,7 +169,7 @@ Out: Codex 사이드카 `agents/openai.yaml`(한글 없음), 과거 기록(`docs
 - Task 4a: `plugin-release.json` = {1.0.0, digest}. SKILL.md에 한 줄을 임시로 더하자 `package.py`와 `--check`가 둘 다 exit 1 (`skill files changed since plugin 1.0.0: bump version in plugin-manifest.json, then run package.py`), 기록 파일은 바뀌지 않았다. 원복 후 `--check` 통과.
 - Task 5 (2026-10-08): scratchpad bare clone을 master 44a41d85로 두고 격리 설정에서 `socratic-brainstorm@ajitta-socratic` 3.2.1, `socratic-elenchus@ajitta-socratic` 1.2.1 설치 → `main`을 8dc55f71로 옮기고 `claude plugin marketplace update ajitta-socratic` → `claude -p` 한 번 → `claude plugin list`에 `socratic@ajitta-socratic` 1.0.0 `✔ enabled` 하나, `claude plugin details` → `Skills (2)  socratic-brainstorm, socratic-elenchus`, `enabledPlugins`는 `socratic@ajitta-socratic: true` 하나.
 - Task 7: `test_install_docs_match_the_marketplace` 통과. 360px·390px iframe(viewport 345·375px)에서 `#plugins` 넘침 0, 페이지 가로 스크롤 없음.
-- Task 8: claude.ai 업로드에서 두 스킬이 보이고 elenchus가 한국어로 시작함 (사용자 확인)
+- Task 8 (2026-10-08, 사용자 확인): claude.ai › Customize › Plugins › Upload plugin으로 e15cb65c의 `releases/socratic.zip` 업로드 성공, 이전 두 플러그인 삭제, 두 스킬 모두 표시, "소크라테스 대화법으로 따져줘: 사내 점심 메뉴 추천 앱"이 elenchus로 한국어 "…이란 무엇인가요?"로 시작. 이후 `test_releases_hold_only_the_plugin_zip` 통과.
 
 ## Handoff
 
