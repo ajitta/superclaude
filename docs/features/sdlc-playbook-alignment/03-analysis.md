@@ -1,5 +1,5 @@
 ---
-status: review
+status: implementing
 revised: 2026-10-07
 ---
 
@@ -50,6 +50,21 @@ revised: 2026-10-07
 8. **canary에 auto mode 조건 추가** (전제 4의 측정). run_eval.py는 `--allowedTools`만 넘기고 permission mode를 지정하지 않는다. `conflicting-constraints`·`problem-statement-not-request` 같은 기존 프로브를 `--permission-mode auto`로도 돌려 프로즈 게이트(brainstorm "확인 없이 진행 금지", implement·task "3파일 초과면 승인 대기")가 살아남는지 잰다. 붉으면 그때 어느 체크포인트를 훅으로 옮길지 정한다. 측정 전에 훅을 늘리는 것은 과하다.
 9. **/sc:review 세 번째 차원** (Stage 5). "이 변경이 항상 로드되는 문서를 낡게 했는가"를 소견 범주로, R19 발동 조건을 리뷰에서 같은 소견이 두 번째 나온 경우로 확장. 기존 규칙의 조건 한 줄 수정.
 10. **낮은 우선순위**: gotcha 항목 길이 예산.
+
+## 진행 상태 (2026-10-07, 브랜치 docs/intent-command-plan)
+
+| 항목 | 상태 | 커밋 |
+|---|---|---|
+| 1 /sc:intent | 완료 (CHANGELOG는 버전 범프 커밋에서) | 7de4b521 |
+| 2 계획 편차 검사 | 완료 (Deviations 규칙 + tests/unit/test_plan_checklist.py) | da4a2f12 |
+| 3 /sc:plan 푸터·Interrogate | 완료 | da4a2f12 |
+| 4 /sc:design --from·Concerns | 완료 | da4a2f12 |
+| 5 verifier 에이전트 | 완료 (/sc:test Verify 단계에서 명시 호출) | 3362816e |
+| 6 테스트 파일 잠금 훅 | 완료 (Edit/Write만; 셸 편집 차단은 보류) | 3362816e |
+| 7 canary 릴리스 게이트 | 완료 (make release, CANARY_OK=1) | 7cf07537 |
+| 8 canary --permission-mode | 완료 (측정 실행은 아직) | 3362816e |
+| 9 /sc:review Dim 3·R19 확장 | 완료 | da4a2f12 |
+| 10 gotcha 길이 예산 | 미착수 (사용자 메모라 사용자 판단) | — |
 
 ## 제외한 항목과 이유
 

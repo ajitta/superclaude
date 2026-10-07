@@ -1,6 +1,6 @@
 ---
 feature: sdlc-playbook-alignment
-phase: discovery
+phase: implementing
 owner: ajitta
 created: 2026-10-07
 updated: 2026-10-07
