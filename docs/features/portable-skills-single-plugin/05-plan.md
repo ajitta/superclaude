@@ -94,27 +94,27 @@ Out: Codex 사이드카 `agents/openai.yaml`(한글 없음), 과거 기록(`docs
 
 ### Task 5: 실제 저장소로 이전 경로 probe
 **Files:** 없음 (scratchpad만 사용, 결과는 Proof에 기록)
-- [ ] Step 1: 02-research 경우 B를 이 저장소로 반복한다. 격리된 `CLAUDE_CONFIG_DIR`과 scratchpad bare clone(`main` = master 커밋)을 쓰고, `http://127.0.0.1:8765/<repo>.git`으로 등록한 뒤 `GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=url.file:///<scratch>/.insteadOf GIT_CONFIG_VALUE_0=http://127.0.0.1:8765/`로 연결한다.
-- [ ] Step 2: 이전 두 플러그인을 설치한다. `git update-ref refs/heads/main <branch HEAD>`로 옮긴다(hook이 `push -f`를 막는다). `claude plugin marketplace update ajitta-socratic`, `claude -p "say ok"`를 한 번 실행한다(로그인 확인 전에 설치가 일어난다).
-- [ ] Step 3: `claude plugin list` → `socratic@ajitta-socratic ✔ enabled` 하나, `claude plugin details socratic@ajitta-socratic` → `Skills (2)  socratic-brainstorm, socratic-elenchus`. 다르면 멈추고 Deviations에 기록한다.
+- [x] Step 1: 02-research 경우 B를 이 저장소로 반복한다. 격리된 `CLAUDE_CONFIG_DIR`과 scratchpad bare clone(`main` = master 커밋)을 쓰고, `http://127.0.0.1:8765/<repo>.git`으로 등록한 뒤 `GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=url.file:///<scratch>/.insteadOf GIT_CONFIG_VALUE_0=http://127.0.0.1:8765/`로 연결한다.
+- [x] Step 2: 이전 두 플러그인을 설치한다. `git update-ref refs/heads/main <branch HEAD>`로 옮긴다(hook이 `push -f`를 막는다). `claude plugin marketplace update ajitta-socratic`, `claude -p "say ok"`를 한 번 실행한다(로그인 확인 전에 설치가 일어난다).
+- [x] Step 3: `claude plugin list` → `socratic@ajitta-socratic ✔ enabled` 하나, `claude plugin details socratic@ajitta-socratic` → `Skills (2)  socratic-brainstorm, socratic-elenchus`. 다르면 멈추고 Deviations에 기록한다.
 
 ### Task 6: portable-skills/README.md
 **Files:** Modify: `portable-skills/README.md`
-- [ ] Step 1: 표의 Upload zip 열 대신 표 아래에 "두 스킬은 플러그인 `socratic` 하나로 배포된다"와 `releases/socratic.zip` 링크를 둔다.
-- [ ] Step 2: Layout: `plugin-manifest.json`, `plugins/socratic/skills/<skill>/`, `releases/socratic.zip`. "SKILL.md at its root … single skill" 문장은 "생성된 플러그인은 스킬마다 `skills/<skill>/`에 두고 원본 폴더는 일반 스킬로 남긴다"로 바꾼다. 스킬 파일은 영어로만 쓰고 응답은 사용자 언어를 따른다는 한 줄을 넣는다.
-- [ ] Step 3: Install은 claude.ai 업로드 `socratic.zip`, 마켓플레이스 `/plugin install socratic@ajitta-socratic`. 복사 설치 행은 스킬별 그대로. Invoke의 플러그인 행은 `/socratic:<skill>`.
-- [ ] Step 4: 새 절 "Moving from the two plugins": Claude Code는 `/plugin marketplace update ajitta-socratic` 뒤 다음 세션에서 `socratic`으로 넘어간다. `/plugin`이 `Plugin "socratic-brainstorm" not found in marketplace`를 보이면(renames를 모르는 이전 버전) 두 플러그인을 `/plugin uninstall`하고 `/plugin install socratic@ajitta-socratic`. claude.ai 업로드 사용자는 Customize › Plugins에서 이전 두 개를 지우고 `socratic.zip`을 올린다. 지우지 않으면 같은 스킬이 두 번 로드된다.
-- [ ] Step 5: Validate and package 절: 스킬을 고치면 그 스킬의 `metadata.version`과 `plugin-manifest.json`의 `version`을 함께 올린다. 플러그인 버전을 그대로 두면 `package.py`와 테스트가 `plugin-release.json`의 digest 불일치로 실패한다. 아직 배포하지 않은 버전을 고칠 때만 `plugin-release.json`을 지우고 `package.py`를 다시 실행해 기록을 새로 만든다.
+- [x] Step 1: 표의 Upload zip 열 대신 표 아래에 "두 스킬은 플러그인 `socratic` 하나로 배포된다"와 `releases/socratic.zip` 링크를 둔다.
+- [x] Step 2: Layout: `plugin-manifest.json`, `plugins/socratic/skills/<skill>/`, `releases/socratic.zip`. "SKILL.md at its root … single skill" 문장은 "생성된 플러그인은 스킬마다 `skills/<skill>/`에 두고 원본 폴더는 일반 스킬로 남긴다"로 바꾼다. 스킬 파일은 영어로만 쓰고 응답은 사용자 언어를 따른다는 한 줄을 넣는다.
+- [x] Step 3: Install은 claude.ai 업로드 `socratic.zip`, 마켓플레이스 `/plugin install socratic@ajitta-socratic`. 복사 설치 행은 스킬별 그대로. Invoke의 플러그인 행은 `/socratic:<skill>`.
+- [x] Step 4: 새 절 "Moving from the two plugins": Claude Code는 `/plugin marketplace update ajitta-socratic` 뒤 다음 세션에서 `socratic`으로 넘어간다. `/plugin`이 `Plugin "socratic-brainstorm" not found in marketplace`를 보이면(renames를 모르는 이전 버전) 두 플러그인을 `/plugin uninstall`하고 `/plugin install socratic@ajitta-socratic`. claude.ai 업로드 사용자는 Customize › Plugins에서 이전 두 개를 지우고 `socratic.zip`을 올린다. 지우지 않으면 같은 스킬이 두 번 로드된다.
+- [x] Step 5: Validate and package 절: 스킬을 고치면 그 스킬의 `metadata.version`과 `plugin-manifest.json`의 `version`을 함께 올린다. 플러그인 버전을 그대로 두면 `package.py`와 테스트가 `plugin-release.json`의 digest 불일치로 실패한다. 아직 배포하지 않은 버전을 고칠 때만 `plugin-release.json`을 지우고 `package.py`를 다시 실행해 기록을 새로 만든다.
 
 ### Task 7: docs/index.html (Pages)
 **Files:** Modify: `docs/index.html` (nav 129행, `#plugins` 섹션 240–276행), `tests/unit/test_portable_skills.py`
-- [ ] Step 1: `test_install_docs_match_the_marketplace`: `docs/index.html`과 `portable-skills/README.md`에 `/plugin install <entry>@<marketplace>`가 있다(값은 `marketplace.json`에서 읽는다). `renames`의 이전 이름으로 된 `/plugin install` 줄은 없다. `docs/index.html`에는 스킬마다 `/<plugin>:<skill>`이 있다. → red
-- [ ] Step 2: nav 링크 문구 `Plugins` → `Plugin`. 제목 "Socratic plugins for Claude Code" → "Socratic plugin for Claude Code".
-- [ ] Step 3: 소개 "Two plugins from this repository's marketplace, each holding one skill with the same name." → 이 저장소 마켓플레이스의 플러그인 하나 `socratic`이 두 스킬을 담는다는 문장. `/sc:brainstorm`과의 구분 문단은 유지한다.
-- [ ] Step 4: 2단계 제목 "Install one plugin or both" → "Install the plugin", 명령은 `/plugin install socratic@ajitta-socratic` 한 줄. 3단계 힌트는 스킬 명령이 `socratic:`으로 시작한다는 설명으로 바꾸고, 예시 명령은 `/socratic:socratic-brainstorm`, `/socratic:socratic-elenchus`로 바꾼다. 스킬 설명 문단은 유지한다.
-- [ ] Step 5: 2단계 아래에 이전 사용자용 힌트 한 줄: 두 플러그인을 쓰고 있었다면 `/plugin marketplace update ajitta-socratic`, 다음 세션에서 `socratic`으로 넘어간다.
-- [ ] Step 6: 테스트 green, 전체 `uv run pytest` exit 0. 브라우저에서 `docs/index.html`을 열어 `#plugins` 섹션의 명령 블록이 좁은 폭(390px)에서 넘치지 않는지 본다.
-- [ ] Step 7: 기능 README `phase: implementing`, `updated`. 커밋 `docs(portable-skills): install and migrate the single socratic plugin` (Task 6, 7 함께)
+- [x] Step 1: `test_install_docs_match_the_marketplace`: `docs/index.html`과 `portable-skills/README.md`에 `/plugin install <entry>@<marketplace>`가 있다(값은 `marketplace.json`에서 읽는다). `renames`의 이전 이름으로 된 `/plugin install` 줄은 없다. `docs/index.html`에는 스킬마다 `/<plugin>:<skill>`이 있다. → red
+- [x] Step 2: nav 링크 문구 `Plugins` → `Plugin`. 제목 "Socratic plugins for Claude Code" → "Socratic plugin for Claude Code".
+- [x] Step 3: 소개 "Two plugins from this repository's marketplace, each holding one skill with the same name." → 이 저장소 마켓플레이스의 플러그인 하나 `socratic`이 두 스킬을 담는다는 문장. `/sc:brainstorm`과의 구분 문단은 유지한다.
+- [x] Step 4: 2단계 제목 "Install one plugin or both" → "Install the plugin", 명령은 `/plugin install socratic@ajitta-socratic` 한 줄. 3단계 힌트는 스킬 명령이 `socratic:`으로 시작한다는 설명으로 바꾸고, 예시 명령은 `/socratic:socratic-brainstorm`, `/socratic:socratic-elenchus`로 바꾼다. 스킬 설명 문단은 유지한다.
+- [x] Step 5: 2단계 아래에 이전 사용자용 힌트 한 줄: 두 플러그인을 쓰고 있었다면 `/plugin marketplace update ajitta-socratic`, 다음 세션에서 `socratic`으로 넘어간다.
+- [x] Step 6: 테스트 green, 전체 `uv run pytest` exit 0. 브라우저에서 `docs/index.html`을 열어 `#plugins` 섹션의 명령 블록이 좁은 폭(390px)에서 넘치지 않는지 본다.
+- [x] Step 7: 기능 README `phase: implementing`, `updated`. 커밋 `docs(portable-skills): install and migrate the single socratic plugin` (Task 6, 7 함께)
 
 ### Task 8: claude.ai 업로드 확인, 이전 zip 제거
 **Files:** Delete: `portable-skills/releases/socratic-brainstorm.zip`, `portable-skills/releases/socratic-elenchus.zip` | Modify: `tests/unit/test_portable_skills.py`
@@ -154,6 +154,7 @@ Out: Codex 사이드카 `agents/openai.yaml`(한글 없음), 과거 기록(`docs
 - Task 1 Step 4: 이전 마켓플레이스 테스트는 Task 2 전까지 red일 것으로 적었지만 green으로 남았다. 그 테스트는 항목의 `source` 폴더가 있는지 보지 않아서, 폴더가 지워진 항목도 통과시켰다. Task 2의 새 테스트에 `source` 폴더 존재 확인을 추가했다.
 - Task 2 커밋(5fcfb00a)에 `plugins/socratic/skills/`가 빠졌다. `.gitignore`의 `skills/`(npx skills add 산출물용)가 경로 고정 없이 모든 `skills/` 디렉터리를 제외했다. 로컬 테스트는 디스크의 파일로 통과했지만 새 checkout에서는 실패했을 것이다. `!portable-skills/plugins/*/skills/` 예외를 추가하고 후속 커밋으로 폴더를 넣었다.
 - Task 4 Step 1: `@synced` 사본은 `claude plugin disable`/`enable` 대신 실행마다 `--settings '{"enabledPlugins":{"socratic-brainstorm@synced":false,"socratic-elenchus@synced":false}}'`로 껐다. init 이벤트에 `socratic` 플러그인과 `socratic:` 스킬 두 개만 남는 것을 확인했고, 사용자 설정은 바뀌지 않는다. 끄지 않은 첫 확인 실행에서는 모델이 `@synced`의 `socratic-elenchus:socratic-elenchus`를 골랐다.
+- Task 7 Step 6: 브라우저를 열어 보는 대신 headless Chrome으로 측정했다. Windows headless 창은 503px 아래로 줄지 않아, 페이지를 360px·390px iframe에 넣고(`--allow-file-access-from-files`) `#plugins` 안 요소의 오른쪽 끝과 문서 `scrollWidth`를 비교했다.
 
 ## Proof
 
@@ -165,7 +166,8 @@ Out: Codex 사이드카 `agents/openai.yaml`(한글 없음), 과거 기록(`docs
   - 모호한 프롬프트 4회: "소크라테스식으로 해줘: 점심 앱" 2회 → brainstorm, "소크라테스처럼 질문해줘: 코딩 교실" 2회 → elenchus. 네 번 모두 다른 스킬을 가리키는 한 줄이 한국어로 있었다(예: "선택지와 계획까지 가는 질문을 원하시면 `socratic-brainstorm`을 요청하세요.").
   - `--resume` 후 "그만": brainstorm → "판정: 열림(Open)"과 brief, elenchus → "검증 전에 중단" 기록. 둘 다 한국어.
 - Task 4a: `plugin-release.json` = {1.0.0, digest}. SKILL.md에 한 줄을 임시로 더하자 `package.py`와 `--check`가 둘 다 exit 1 (`skill files changed since plugin 1.0.0: bump version in plugin-manifest.json, then run package.py`), 기록 파일은 바뀌지 않았다. 원복 후 `--check` 통과.
-- Task 5: `socratic@ajitta-socratic ✔ enabled` 하나, `Skills (2)`
+- Task 5 (2026-10-08): scratchpad bare clone을 master 44a41d85로 두고 격리 설정에서 `socratic-brainstorm@ajitta-socratic` 3.2.1, `socratic-elenchus@ajitta-socratic` 1.2.1 설치 → `main`을 8dc55f71로 옮기고 `claude plugin marketplace update ajitta-socratic` → `claude -p` 한 번 → `claude plugin list`에 `socratic@ajitta-socratic` 1.0.0 `✔ enabled` 하나, `claude plugin details` → `Skills (2)  socratic-brainstorm, socratic-elenchus`, `enabledPlugins`는 `socratic@ajitta-socratic: true` 하나.
+- Task 7: `test_install_docs_match_the_marketplace` 통과. 360px·390px iframe(viewport 345·375px)에서 `#plugins` 넘침 0, 페이지 가로 스크롤 없음.
 - Task 8: claude.ai 업로드에서 두 스킬이 보이고 elenchus가 한국어로 시작함 (사용자 확인)
 
 ## Handoff

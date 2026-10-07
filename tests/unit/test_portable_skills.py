@@ -318,3 +318,18 @@ def test_marketplace_renames_keep_old_installs():
     assert old.items() <= renames.items()
     assert all(v is None or v in current for v in renames.values())
     assert not current & set(renames)
+
+
+def test_install_docs_match_the_marketplace():
+    """The Pages site and the README copy the install commands by hand; tie
+    them to marketplace.json so a renamed plugin cannot leave them stale."""
+    market = _marketplace()
+    install = [f"/plugin install {e['name']}@{market['name']}" for e in market["plugins"]]
+    stale = [f"/plugin install {old}@{market['name']}" for old in market["renames"]]
+    pages = (_ROOT / "docs" / "index.html").read_text(encoding="utf-8")
+    readme = (_DIR / "README.md").read_text(encoding="utf-8")
+    for name, doc in (("docs/index.html", pages), ("portable-skills/README.md", readme)):
+        assert all(cmd in doc for cmd in install), f"{name} lacks {install}"
+        assert not any(cmd in doc for cmd in stale), f"{name} still installs {stale}"
+    for skill in _SKILLS:
+        assert f"/{_plugin_name()}:{skill.name}" in pages
