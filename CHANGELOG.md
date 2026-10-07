@@ -6,6 +6,20 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Ver
 
 Releases before 4.19.0 are not listed. Their history is the git log; the upstream-era changelog, last entry 4.2.1, is `CHANGELOG.md` at commit `6b0ac5c3^`.
 
+## [4.23.0] - 2026-10-08
+
+### Changed
+
+- The portable skills `socratic-brainstorm` 3.3.0 and `socratic-elenchus` 1.3.0 ship as one plugin, `socratic` 1.0.0: one marketplace entry (`/plugin install socratic@ajitta-socratic`), one upload zip (`portable-skills/releases/socratic.zip`), and the skill commands `/socratic:socratic-brainstorm` and `/socratic:socratic-elenchus`. The per-skill plugins and zips are gone. The skill files are now English only; each skill still replies in the user's language.
+- Core rule `destructive_op_confirmation`: a request to discard or wipe is not itself the confirmation beyond the paths it names. The model first lists what else would be lost (`git status`, `git clean -n`), then takes the reversible path or asks. A delete of named paths still runs at once.
+
+### Upgrade notes
+
+- Claude Code users of the two earlier plugins: run `/plugin marketplace update ajitta-socratic`. The marketplace's `renames` map moves both to `socratic@ajitta-socratic` at the next session start. If `/plugin` reports `Plugin "socratic-brainstorm" not found in marketplace` (a Claude Code version without `renames` support), uninstall both and run `/plugin install socratic@ajitta-socratic`.
+- claude.ai upload users: in Customize › Plugins, remove the two earlier plugins and upload `portable-skills/releases/socratic.zip`. Keeping both loads each skill twice.
+- Run `superclaude update --scope <scope>` for each installed scope to get the reworded rule; skip scopes that `superclaude doctor --scope <scope>` reports as not installed, because `update` creates an install where none exists.
+- Contributors: after changing a portable skill, bump its `metadata.version` and the `version` in `portable-skills/plugin-manifest.json`. `portable-skills/package.py` and the tests refuse changed skill files under an unchanged plugin version.
+
 ## [4.22.0] - 2026-10-07
 
 ### Added
