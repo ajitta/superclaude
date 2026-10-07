@@ -32,27 +32,27 @@ Out: Codex 사이드카 `agents/openai.yaml`(한글 없음), 과거 기록(`docs
 
 ### Task 1: 단일 플러그인 생성
 **Files:** Create: `portable-skills/plugin-manifest.json` | Modify: `portable-skills/package.py`, `tests/unit/test_portable_skills.py` | Delete: `portable-skills/plugin-manifests/`, `portable-skills/plugins/socratic-brainstorm/`, `portable-skills/plugins/socratic-elenchus/` | Generate: `portable-skills/plugins/socratic/`, `portable-skills/releases/socratic.zip`
-- [ ] Step 1: 테스트를 새 구조로 바꾼다. 스킬별 검사(validator, frontmatter, Codex 이름, 원본 폴더의 `skills/`·`bin/`·`.claude-plugin/` 금지)는 그대로 둔다.
+- [x] Step 1: 테스트를 새 구조로 바꾼다. 스킬별 검사(validator, frontmatter, Codex 이름, 원본 폴더의 `skills/`·`bin/`·`.claude-plugin/` 금지)는 그대로 둔다.
   - manifest: 새 `validate_manifest()`는 파일 없음, 잘못된 JSON, `name`·`version`·`description` 누락, `skills` 키를 오류로 낸다. `test_validator_rejects_missing_manifest`는 이 함수 기준으로 다시 쓴다. `test_validator_reads_version_not_a_lookalike_key`는 `spec-version`만 있는 SKILL.md가 `metadata.version missing`을 내는지 본다.
   - zip: `releases/socratic.zip`이 모든 스킬로 다시 빌드한 결과와 바이트 단위로 같다(OS 독립 테스트 포함). 최상위 폴더는 `socratic/` 하나다. `.claude-plugin/plugin.json`의 `name`은 manifest와 같고, 스킬마다 `socratic/skills/<skill>/SKILL.md`가 있다. `socratic/SKILL.md`(있으면 단일 스킬로 로드된다)와 `socratic/bin/`은 없다.
   - 플러그인 폴더: `plugins/socratic/`이 `plugin_files()`와 같고 `plugins/` 아래에는 `socratic/`만 있다.
-- [ ] Step 2: `uv run pytest tests/unit/test_portable_skills.py -q` → 새 테스트 red 확인
-- [ ] Step 3: 구현
+- [x] Step 2: `uv run pytest tests/unit/test_portable_skills.py -q` → 새 테스트 red 확인
+- [x] Step 3: 구현
   - `package.py`: `MANIFEST = ROOT / "plugin-manifest.json"`. `validate()`에서 `_validate_manifest` 호출을 빼고 `validate_manifest()`를 둔다. `plugin_files(skills)`는 `.claude-plugin/plugin.json`과 `skills/<skill>/<rel>`을 반환한다. `write_plugin_dir(skills)`와 `package(skills)`는 스킬 목록을 받고, zip 최상위 폴더는 manifest `name`이다. `main()`은 플러그인 하나를 빌드한다. 모듈 docstring의 레이아웃 그림과 `FORBIDDEN_DIRS` 주석도 맞춘다.
   - `plugin-manifest.json`: `name: socratic`, `displayName: Socratic`, `version: 1.0.0`, 두 스킬을 한 문장으로 설명하는 영어 `description`, 기존과 같은 `author`·`license`·`homepage`.
   - `git rm -r`로 `plugin-manifests`와 이전 `plugins/` 폴더 두 개를 지우고 `uv run python portable-skills/package.py`를 실행한다. 이전 zip은 더 이상 생성되지 않지만 Task 8까지 남겨 둔다.
-- [ ] Step 4: Task 1 테스트 green, `claude plugin validate portable-skills/plugins/socratic` → `✔ Validation passed`, `make format && make lint`. 마켓플레이스 테스트는 Task 2 전까지 red가 정상이다.
-- [ ] Step 5: 커밋하지 않고 Task 2로
+- [x] Step 4: Task 1 테스트 green, `claude plugin validate portable-skills/plugins/socratic` → `✔ Validation passed`, `make format && make lint`. 마켓플레이스 테스트는 Task 2 전까지 red가 정상이다.
+- [x] Step 5: 커밋하지 않고 Task 2로
 
 ### Task 2: 마켓플레이스 항목 하나와 renames
 **Files:** Modify: `.claude-plugin/marketplace.json`, `tests/unit/test_portable_skills.py`
-- [ ] Step 1: `test_marketplace_lists_every_portable_skill`를 둘로 나눈다.
+- [x] Step 1: `test_marketplace_lists_every_portable_skill`를 둘로 나눈다.
   - 항목은 정확히 하나다. `name`은 manifest `name`, `source`는 `./portable-skills/plugins/socratic`, `version` 키는 없다.
   - `renames`는 `{"socratic-brainstorm": "socratic", "socratic-elenchus": "socratic"}`를 포함한다. 모든 값은 현재 항목 이름이거나 `null`이고, 현재 항목 이름과 같은 키는 없다. docstring에 02-research 경우 A를 근거로 적는다.
-- [ ] Step 2: red 확인
-- [ ] Step 3: `socratic` 항목 하나(`description`, `category: productivity`)와 `renames`. 마켓플레이스 `description`은 "두 스킬을 담은 플러그인 하나"로 고친다.
-- [ ] Step 4: `claude plugin validate .` → `✔ Validation passed`, 전체 `uv run pytest` exit 0, `make lint`
-- [ ] Step 5: 커밋 `feat(portable-skills): ship both skills as one socratic plugin`
+- [x] Step 2: red 확인
+- [x] Step 3: `socratic` 항목 하나(`description`, `category: productivity`)와 `renames`. 마켓플레이스 `description`은 "두 스킬을 담은 플러그인 하나"로 고친다.
+- [x] Step 4: `claude plugin validate .` → `✔ Validation passed`, 전체 `uv run pytest` exit 0, `make lint`
+- [x] Step 5: 커밋 `feat(portable-skills): ship both skills as one socratic plugin`
 
 ### Task 3: 설치되는 파일에서 한국어 제거
 **Files:** Modify: `portable-skills/socratic-brainstorm/SKILL.md`, `portable-skills/socratic-brainstorm/references/question-bank.md`, `portable-skills/socratic-elenchus/SKILL.md`, `portable-skills/socratic-elenchus/references/elenchus-patterns.md`, `tests/unit/test_portable_skills.py` | Generate: `plugins/socratic/`, `releases/socratic.zip`
@@ -132,7 +132,7 @@ Out: Codex 사이드카 `agents/openai.yaml`(한글 없음), 과거 기록(`docs
 
 ## Deviations
 
-(없음)
+- Task 1 Step 4: 이전 마켓플레이스 테스트는 Task 2 전까지 red일 것으로 적었지만 green으로 남았다. 그 테스트는 항목의 `source` 폴더가 있는지 보지 않아서, 폴더가 지워진 항목도 통과시켰다. Task 2의 새 테스트에 `source` 폴더 존재 확인을 추가했다.
 
 ## Proof
 

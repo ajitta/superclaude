@@ -1,0 +1,12 @@
+{
+  "name": "socratic",
+  "displayName": "Socratic",
+  "version": "1.0.0",
+  "description": "Two Socratic skills: socratic-brainstorm tests an idea one question at a time and ends with your options, a verdict and a short brief; socratic-elenchus runs Plato's what-is-X dialogue on your definitions, usually ending in aporia, with no advice.",
+  "author": {
+    "name": "ajitta",
+    "url": "https://github.com/ajitta"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/ajitta/superclaude/tree/master/portable-skills"
+}
