@@ -98,6 +98,17 @@
         ]
       },
       {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "_comment": "[superclaude] safety — blocks Edit/Write on test files while `superclaude hook test_file_guard lock` is set (/sc:troubleshoot --fix); SUPERCLAUDE_TEST_LOCK=0 to disable",
+            "type": "command",
+            "command": "superclaude hook test_file_guard check",
+            "timeout": 5
+          }
+        ]
+      },
+      {
         "matcher": "Edit|Write|Bash",
         "hooks": [
           {

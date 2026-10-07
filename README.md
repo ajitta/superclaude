@@ -25,7 +25,7 @@
 
 | Commands | Agents | Modes | MCP Servers |
 |:--------:|:------:|:-----:|:-----------:|
-| **37**   | **23** | **8** | **4**       |
+| **37**   | **24** | **8** | **4**       |
 | Slash    | Domain-expert | Behavioral | Integrations |
 
 </div>
@@ -91,7 +91,7 @@ What gets installed (per scope):
 ```
 <scope>/
 ├── commands/sc/        # 37 slash commands (/sc:plan, /sc:implement, …)
-├── agents/             # 23 agent definitions
+├── agents/             # 24 agent definitions
 ├── output-styles/      # output styles (pick one via /config → Output style)
 ├── superclaude/        # core rules, modes, mcp docs
 ├── hooks/hooks.json    # SessionStart / PreCompact / SessionEnd / etc.
@@ -302,6 +302,7 @@ Rules that must hold are enforced by hooks, not prose:
 - **destructive_guard** → blocks force-push to `main`/`master`, asks on `reset --hard` / `clean -f` / `branch -D`
 - **file_size_guard** → blocks unbounded `Read` on files >30KB
 - **loop_guard** → circuit breaker on repeated failing edits
+- **test_file_guard** → blocks `Edit`/`Write` on test files while `/sc:troubleshoot --fix` holds its lock (the Edit and Write tools; a shell edit is outside the lock), so a fix cannot quietly weaken the test that proves it
 
 Every hook runs as `superclaude hook <name>` (a console entry, dispatched before the CLI loads), so hooks cost ~20 ms and `settings.json` carries no machine-specific bytes. Hooks merge into your `settings.json` — your existing hooks are preserved. See `docs/adr/0001-hooks-are-the-enforcement-boundary.md`.
 
@@ -309,8 +310,8 @@ Every hook runs as `superclaude hook <name>` (a console entry, dispatched before
 <td width="50%">
 
 ### 🤖 **Smarter Agent System**
-**23 specialized agents** with domain expertise:
-- New: **insight-analyst**, **repo-index**, **self-review**, **simplicity-guide**, **technical-writer**, **project-initializer**
+**24 specialized agents** with domain expertise:
+- New: **insight-analyst**, **repo-index**, **self-review**, **simplicity-guide**, **technical-writer**, **project-initializer**, **verifier**
 - Deep Research agent for autonomous web research
 - Security/performance/quality engineers catch real issues
 - Frontend / backend / system architect for design work
@@ -514,7 +515,7 @@ The Deep Research system intelligently coordinates multiple tools:
 | Project-specific gotchas | [`.claude/rules/gotchas/`](.claude/rules/gotchas) |
 | Serena MCP troubleshooting | [`docs/troubleshooting/serena-installation.md`](docs/troubleshooting/serena-installation.md) |
 | Slash commands (37) | [`src/superclaude/commands/`](src/superclaude/commands) · `superclaude install --list-all` |
-| Agents (23) | [`src/superclaude/agents/`](src/superclaude/agents) |
+| Agents (24) | [`src/superclaude/agents/`](src/superclaude/agents) |
 | Modes (8) | [`src/superclaude/modes/`](src/superclaude/modes) |
 | MCP servers (4) | [`src/superclaude/mcp/`](src/superclaude/mcp) |
 | Hooks (registry + scripts) | [`src/superclaude/cli/hook_dispatch.py`](src/superclaude/cli/hook_dispatch.py) · [`src/superclaude/hooks/hooks.json`](src/superclaude/hooks/hooks.json) · [`src/superclaude/scripts/`](src/superclaude/scripts) |

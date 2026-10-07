@@ -44,8 +44,8 @@ revised: 2026-10-07
 2. **계획 편차 동기화 검사** (Stage 3). /sc:implement Integrate 단계에 "Deviations" 기록, `status: complete`인 plan 문서에 미체크 박스가 남으면 red가 되는 단위 테스트 하나. 자동화가 아니라 게이트에서 사람이 믿고 볼 상태 표시의 보증.
 3. **/sc:plan 템플릿에 Risks·채택하지 않은 대안·Proof 섹션과 심문 단계** (Stage 3). 지금은 Goal/Architecture/Tech Stack/Tasks뿐. 섹션은 "한 줄 또는 없음" 허용으로 두어 checklist_scaling의 "Small은 리스크 매트릭스 생략"과 충돌하지 않게 한다. Validate 단계에 "무엇이 깨질 수 있나, 가장 위험한 단계는, 왜 다른 길을 버렸나".
 4. **/sc:design에 `--from`과 "우려 지점(정책 충돌)" 필수 섹션** (Stage 2).
-5. **verifier 에이전트** (Stage 3·4). Bash·Read만, report-only, 앱이나 테스트를 실행해 plan 문서와 대조한 보고. /sc:test 단계에서 사용자가 명시적으로 부른다. "/sc:test → done: 실제 출력 필수" 게이트의 증거 생산자.
-6. **훅 2종** (Stage 3·4). troubleshoot `--fix` 중 테스트 파일 편집 잠금을 먼저. 보호 경로 편집 차단은 설정 리스트가 필요해 실제로 보호할 경로가 생길 때까지 보류. 둘 다 destructive_guard처럼 차단 사유와 우회 경로를 출력. 전제 4(auto mode가 프로즈 게이트를 침식)로 우선순위가 올라감.
+5. **verifier 에이전트** (Stage 3·4). 읽기 전용 도구(Read·Grep·Glob)와 Bash만, report-only, 앱이나 테스트를 실행해 plan 문서와 대조한 보고. /sc:test 단계에서 사용자가 명시적으로 부른다. "/sc:test → done: 실제 출력 필수" 게이트의 증거 생산자.
+6. **훅 2종** (Stage 3·4). troubleshoot `--fix` 중 테스트 파일 편집 잠금을 먼저. 보호 경로 편집 차단은 설정 리스트가 필요해 실제로 보호할 경로가 생길 때까지 보류. 둘 다 destructive_guard처럼 차단 사유와 우회 경로를 출력. 전제 4(auto mode가 프로즈 게이트를 침식)로 우선순위가 올라감. 구현된 잠금은 Edit/Write 도구만 막고 셸 편집(sed, `git checkout --`, rm)은 밖이다. Bash 쪽 패턴 차단은 2026-10-07 리뷰에서 지적됐고 보류한다.
 7. **canary를 릴리스 전 수동 게이트로** (Stage 4, 로컬 `claude -p`). `make release` 체크 목록에 "core/rules나 hooks가 지난 릴리스 이후 바뀌었으면 `--canary` 결과가 있어야 한다"를 사람이 확인하는 항목으로. R19 gotcha 캡처·insight 승격 시 "canary probe로도 추가할까" 한 줄 → "사건마다 eval 하나".
 8. **canary에 auto mode 조건 추가** (전제 4의 측정). run_eval.py는 `--allowedTools`만 넘기고 permission mode를 지정하지 않는다. `conflicting-constraints`·`problem-statement-not-request` 같은 기존 프로브를 `--permission-mode auto`로도 돌려 프로즈 게이트(brainstorm "확인 없이 진행 금지", implement·task "3파일 초과면 승인 대기")가 살아남는지 잰다. 붉으면 그때 어느 체크포인트를 훅으로 옮길지 정한다. 측정 전에 훅을 늘리는 것은 과하다.
 9. **/sc:review 세 번째 차원** (Stage 5). "이 변경이 항상 로드되는 문서를 낡게 했는가"를 소견 범주로, R19 발동 조건을 리뷰에서 같은 소견이 두 번째 나온 경우로 확장. 기존 규칙의 조건 한 줄 수정.

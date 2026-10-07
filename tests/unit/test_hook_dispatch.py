@@ -52,7 +52,7 @@ def _shipped_names() -> set[str]:
 
 
 class TestRegistry:
-    """hooks.json, the registry and scripts/ name the same ten hooks."""
+    """hooks.json, the registry and scripts/ name the same hooks."""
 
     def test_every_shipped_command_dispatches(self):
         from superclaude.cli.hook_dispatch import HOOKS
@@ -67,8 +67,9 @@ class TestRegistry:
             assert module_name == f"superclaude.scripts.{name}", name
             assert callable(importlib.import_module(module_name).main), name
 
-    def test_only_insight_writer_takes_arguments(self):
-        """The one script with subcommands is the one hooks.json passes them to."""
+    def test_argv_hooks_are_the_ones_hooks_json_passes_arguments_to(self):
+        """A script with subcommands (insight_writer, test_file_guard) is
+        registered with one in hooks.json; every other registration is bare."""
         from superclaude.cli.hook_dispatch import HOOKS
 
         with_args = {

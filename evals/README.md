@@ -62,8 +62,11 @@ matrix run carries 2 of the 7 gates and `--canary` carries all 7.
 uv run python evals/run_eval.py --dry-run     # build + validate everything, zero API calls
 uv run python evals/run_eval.py               # full 4-arm × 7-task matrix
 uv run python evals/run_eval.py --canary      # canary suite (14 tasks, sc-full arm)
+uv run python evals/run_eval.py --canary --permission-mode auto   # same suite under auto mode
 uv run python evals/run_eval.py --arms vanilla,sc-full --task bugfix-scope-creep
 ```
+
+`--permission-mode auto` reruns the canary under auto mode, whose injected "execute immediately" reminder may override the prose checkpoints in commands (brainstorm's no-proceed-without-confirmation, implement/task's wait-for-approval past three files); the `conflicting-constraints` and `problem-statement-not-request` probes measure whether they survive, and the mode is recorded in `results.json` (`permission_mode` per row) and the `report.md` header so two runs can be told apart.
 
 Cost control: a full 4×7 matrix is 28 headless sessions. Start with
 `--dry-run`, then one task across two arms, before paying for the matrix.

@@ -22,6 +22,7 @@ Run by the Claude Code hook runtime as `superclaude hook <name>` (registry: `../
 | `file_size_guard.py` | Blocks Read on files >30KB to save tokens (`SUPERCLAUDE_SIZE_GUARD=0` to disable) |
 | `loop_guard.py` | Circuit breaker — blocks Edit/Write/Bash after 5 identical errors in 15 min (`SUPERCLAUDE_LOOP_GUARD=0` to disable) |
 | `destructive_guard.py` | Blocks irreversibly destructive Bash commands (`rm -rf /`, force-push to main/master) — stdlib-only, cannot fail open on missing jq/grep |
+| `test_file_guard.py` | Test-file lock for `/sc:troubleshoot --fix` — `check` (hooks.json, PreToolUse Edit\|Write) blocks edits to test files while the lock is set; `lock` / `unlock` / `status` by hand as `superclaude hook test_file_guard <sub>` (`SUPERCLAUDE_TEST_LOCK=0` to disable) |
 
 ### Subpackages
 

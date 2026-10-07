@@ -15,6 +15,7 @@ description: Execute tests with coverage analysis and automated quality reportin
   3. Execute: Run + real-time progress
   4. Analyze: Coverage reports + failure diagnostics
   5. Report: Generate outputs per flags
+  6. Verify: when the user asks for independent evidence, dispatch the verifier (the Agent entry in the tools section) and attach its report to the output
   </flow>
 
   <flags>
@@ -40,6 +41,7 @@ description: Execute tests with coverage analysis and automated quality reportin
   - Glob: Test discovery + patterns
   - Grep: Result parsing + failure analysis
   - Write: Coverage reports + summaries
+  - Agent: dispatch the `verifier` agent for a fresh-context run-and-report pass — it runs the project's commands, exercises the changed behavior, compares with the plan doc (05-plan.md Proof section and task list) and reports every mismatch without fixing; the user invokes it explicitly, it never auto-triggers
   </tools>
 
   <patterns>

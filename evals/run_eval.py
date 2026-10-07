@@ -50,6 +50,15 @@ EVALS_DIR = Path(__file__).resolve().parent
 KERNEL_FILE = EVALS_DIR / "arms" / "RULES_KERNEL.md"
 IMPORT_LINE = "@.claude/superclaude/CLAUDE_SC.md"
 ARMS = ("vanilla", "sc-full", "sc-core-lite", "sc-command-only")
+# `claude -p --permission-mode` values; None leaves the flag off (CLI default).
+PERMISSION_MODES = (  # `claude --help` 2.1.292; omit the flag for the CLI default
+    "acceptEdits",
+    "auto",
+    "bypassPermissions",
+    "dontAsk",
+    "manual",
+    "plan",
+)
 DEFAULT_TASK_TIMEOUT = 600
 
 # Harness runs via `uv run` (repo venv, has pytest); the workspace PATH python
@@ -88,6 +97,9 @@ class TaskResult:
     # stop_details.category when the model refused the turn ("" otherwise).
     # A refusal is also recorded in `error`, so ok/gates_ok stay false.
     refusal_category: str = ""
+    # The --permission-mode value the session ran under ("" = flag omitted),
+    # so two results.json files from different modes can be told apart.
+    permission_mode: str = ""
 
     @property
     def ok(self) -> bool:
@@ -204,8 +216,9 @@ def run_task(
     model: str,
     defaults: dict,
     effort: str | None = None,
+    permission_mode: str | None = None,
 ) -> TaskResult:
-    res = TaskResult(arm=arm, task_id=task["id"])
+    res = TaskResult(arm=arm, task_id=task["id"], permission_mode=permission_mode or "")
     tools = task.get("allowed_tools", defaults.get("allowed_tools", []))
     cmd = [
         claude_bin,
@@ -223,6 +236,11 @@ def run_task(
         *(["--effort", effort] if effort else []),
         "--allowedTools",
         " ".join(tools),
+        # Permission mode; omitted = Claude Code default. `auto` injects an
+        # "execute immediately" reminder that can override prose checkpoints
+        # in commands, so the canary gates are rerun under it to see which
+        # survive.
+        *(["--permission-mode", permission_mode] if permission_mode else []),
         # `--` ends option parsing: prompts that legitimately start with an SC
         # flag (e.g. "--introspect ...") were otherwise parsed as CLI options
         # and the session died before any turn ran.
@@ -496,7 +514,9 @@ def _git_baseline(ws: Path) -> set[str]:
 # ── reporting ────────────────────────────────────────────────────────────────
 
 
-def write_report(results: list[TaskResult], runs_dir: Path) -> str:
+def write_report(
+    results: list[TaskResult], runs_dir: Path, permission_mode: str | None = None
+) -> str:
     payload = [
         {**vars(r), "checks": [vars(c) for c in r.checks], "ok": r.ok} for r in results
     ]
@@ -506,8 +526,11 @@ def write_report(results: list[TaskResult], runs_dir: Path) -> str:
 
     arms = sorted({r.arm for r in results})
     tasks = sorted({r.task_id for r in results})
+    mode = f"`{permission_mode}`" if permission_mode else "default (flag omitted)"
     lines = [
         "# Eval report",
+        "",
+        f"Permission mode: {mode}",
         "",
         "| task | " + " | ".join(arms) + " |",
         "|---|" + "---|" * len(arms),
@@ -621,6 +644,12 @@ def main() -> int:
         "omit for the model default",
     )
     ap.add_argument(
+        "--permission-mode",
+        default=None,
+        choices=PERMISSION_MODES,
+        help="permission mode passed to claude -p; omit to leave the flag off",
+    )
+    ap.add_argument(
         "--runs-dir",
         default=None,
         help="output dir (default: <system temp>/superclaude-evals/<timestamp>)",
@@ -704,7 +733,12 @@ def main() -> int:
             except (RuntimeError, subprocess.TimeoutExpired) as exc:
                 print(f"{label} BUILD FAIL: {exc}")
                 results.append(
-                    TaskResult(arm=arm, task_id=task["id"], error=f"build: {exc}")
+                    TaskResult(
+                        arm=arm,
+                        task_id=task["id"],
+                        error=f"build: {exc}",
+                        permission_mode=args.permission_mode or "",
+                    )
                 )
                 continue
             if args.dry_run:
@@ -720,6 +754,7 @@ def main() -> int:
                 args.model,
                 defaults,
                 args.effort,
+                args.permission_mode,
             )
             results.append(res)
             status = "ok" if res.ok else (res.error or "checks failed")
@@ -728,7 +763,7 @@ def main() -> int:
     if args.dry_run:
         print("dry run complete — workspaces built, no API calls made")
         return 0
-    print("\n" + write_report(results, runs_dir))
+    print("\n" + write_report(results, runs_dir, args.permission_mode))
     if any(not r.gates_ok for r in results):
         return 2
     return 0 if all(r.ok for r in results) else 1

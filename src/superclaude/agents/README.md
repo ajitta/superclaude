@@ -70,6 +70,7 @@ Agents managed by Claude Code native delegation. Auto-pick from task keywords in
 |-------|-------------|
 | `self-review` | Post-impl validation + reflexion |
 | `repo-index` | Repo indexing + codebase briefing |
+| `verifier` | Run-and-report check of shipped behavior against its plan doc; report-only, invoked explicitly |
 
 ## Permission Framework
 
