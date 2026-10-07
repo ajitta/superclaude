@@ -18,7 +18,7 @@ scripts/        Hook infra          Plumbing        hooks.json → settings.json
 
 ## Enforcement Boundary
 
-Only four hooks are mechanically enforced — `file_size_guard.py` (blocks Read on files >30KB), `destructive_guard.py` (two tiers: hard-blocks irreversible commands like `rm -rf /` and force-push to main; warn-tier `permissionDecision: "ask"` on reversible-but-risky `git reset --hard` / `clean -f` / `branch -D`, which prompts interactively and denies headless), `loop_guard.py` (circuit breaker on repeated identical failures) and `test_file_guard.py` (blocks Edit/Write on test files while `/sc:troubleshoot --fix` holds its lock). These act at the Claude Code hook layer regardless of what the model decides. Everything else in this framework — core rules, modes, agents, commands — is model-followed prose: it shapes behavior through context, and compliance depends on the model honoring it. When a guarantee matters, it must live in a hook, not a rule.
+Only three hooks are mechanically enforced — `file_size_guard.py` (blocks Read on files >30KB), `destructive_guard.py` (two tiers: hard-blocks irreversible commands like `rm -rf /` and force-push to main; warn-tier `permissionDecision: "ask"` on reversible-but-risky `git reset --hard` / `clean -f` / `branch -D`, which prompts interactively and denies headless), and `loop_guard.py` (circuit breaker on repeated identical failures). These act at the Claude Code hook layer regardless of what the model decides. Everything else in this framework — core rules, modes, agents, commands — is model-followed prose: it shapes behavior through context, and compliance depends on the model honoring it. When a guarantee matters, it must live in a hook, not a rule.
 
 ## Directory Roles
 

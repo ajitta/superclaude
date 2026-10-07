@@ -25,7 +25,7 @@ independent of what the model decided.
 ## Decision
 
 Behavior that must hold regardless of the model's judgment is implemented as a
-Claude Code hook; everything else stays prose. Four `PreToolUse` guards carry
+Claude Code hook; everything else stays prose. Three `PreToolUse` guards carry
 the guarantees today:
 
 - `file_size_guard.py` — blocks a full-file `Read` above 30KB unless the caller
@@ -36,9 +36,6 @@ the guarantees today:
 - `loop_guard.py` — circuit breaker; `PostToolUse` records failing call
   signatures and `PreToolUse` blocks the sixth identical failure inside a
   15-minute window.
-- `test_file_guard.py` (added 2026-10-07) — conditional: while
-  `/sc:troubleshoot --fix` holds its lock, blocks `Edit`/`Write` on test files;
-  escape hatch `SUPERCLAUDE_TEST_LOCK=0`. Shell edits are outside the lock.
 
 Each guard honors a `SUPERCLAUDE_*_GUARD=0` escape hatch: the boundary is drawn
 against the model's judgment, not against a human who deliberately opts out.
@@ -50,8 +47,7 @@ rule line.
 
 - **Positive:** the guarantee is independent of model, model version, and
   context pressure, and it is testable — `tests/unit/test_safety_hooks.py`,
-  `test_file_size_guard.py`, `test_loop_guard.py`, `test_test_file_guard.py`
-  assert it directly. Prose has
+  `test_file_size_guard.py`, `test_loop_guard.py` assert it directly. Prose has
   no equivalent assertion.
 - **Positive:** the always-loaded rule set stays a kernel. Because guarantees
   are not carried by repetition, `core/RULES.md` can hold four rule classes

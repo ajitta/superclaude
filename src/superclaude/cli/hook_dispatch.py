@@ -36,13 +36,11 @@ import sys
 # Hook name -> (module, forwards argv). The name is the script's module stem so
 # `grep <name>` finds the registration, the script and the tests together.
 #
-# Two scripts take arguments. insight_writer's hooks.json registrations name a
+# Only insight_writer takes arguments: its hooks.json registrations name a
 # subcommand (`harvest-from-hook`, `request-from-hook`, ...) and its own
-# argparse parser reads them, the same way `superclaude insight` forwards;
-# test_file_guard runs as `check` from hooks.json and as `lock` / `unlock` /
-# `status` by hand (/sc:troubleshoot --fix). Every other script reads stdin
-# and nothing else, and a stray argument on one of those is a hooks.json typo —
-# refused rather than ignored.
+# argparse parser reads them, the same way `superclaude insight` forwards. Every
+# other script reads stdin and nothing else, and a stray argument on one of
+# those is a hooks.json typo — refused rather than ignored.
 HOOKS: dict[str, tuple[str, bool]] = {
     "context_loader": ("superclaude.scripts.context_loader", False),
     "context_reset": ("superclaude.scripts.context_reset", False),
@@ -53,7 +51,6 @@ HOOKS: dict[str, tuple[str, bool]] = {
     "memory_staleness": ("superclaude.scripts.memory_staleness", False),
     "prettier_hook": ("superclaude.scripts.prettier_hook", False),
     "session_init": ("superclaude.scripts.session_init", False),
-    "test_file_guard": ("superclaude.scripts.test_file_guard", True),
     "test_runner_hook": ("superclaude.scripts.test_runner_hook", False),
 }
 

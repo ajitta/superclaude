@@ -28,8 +28,8 @@ pytest 카운트, coverage, description 문자 수처럼 커밋마다 바뀌는 
 | `modes/*CONFIG*.md` | 1 | mode 지원 설정 |
 | `mcp/MCP_*.md` | 4 | SC workflow에서 MCP를 WHEN/HOW 사용 |
 | `templates/docs-scaffold/*` | 4 | `/sc:init` 문서 scaffold |
-| distinct hook entry scripts | 11 | `hooks.json`의 15개 등록에서 직접 호출 |
-| 전체 Python module | 53 | CLI, hook, 자동화, 공용 경로, plugin |
+| distinct hook entry scripts | 10 | `hooks.json`의 14개 등록에서 직접 호출 |
+| 전체 Python module | 52 | CLI, hook, 자동화, 공용 경로, plugin |
 
 ## 2. 전달과 강제 경계
 
@@ -143,7 +143,7 @@ Evaluation
 ### `hooks/`, `scripts/`, `utils/`
 
 - `hooks.json`: lifecycle wiring과 timeout/matcher 계약.
-- hook scripts: context, formatting, test, insight, size/destructive/loop/test-file-lock guard.
+- hook scripts: context, formatting, test, insight, size/destructive/loop guard.
 - `utils`: project/install scope와 runtime state 경로의 SSOT.
 - 위험: hook CWD를 project root로 오인, user/local state 혼합, fail-open guard,
   matcher와 stdin schema drift, async 결과를 완료로 오인.

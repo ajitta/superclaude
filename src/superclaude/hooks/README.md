@@ -55,7 +55,6 @@ Every command is `superclaude hook <name>` — the console script, dispatched in
 
 - `superclaude hook file_size_guard` (matcher `Read`)
 - `superclaude hook destructive_guard` (matcher `Bash`)
-- `superclaude hook test_file_guard check` (matcher `Edit|Write`) — blocks only while `superclaude hook test_file_guard lock` is set (`/sc:troubleshoot --fix`)
 - `superclaude hook loop_guard` (matcher `Edit|Write|Bash`)
 
 ### PostToolUse

@@ -45,7 +45,7 @@ revised: 2026-10-07
 3. **/sc:plan 템플릿에 Risks·채택하지 않은 대안·Proof 섹션과 심문 단계** (Stage 3). 지금은 Goal/Architecture/Tech Stack/Tasks뿐. 섹션은 "한 줄 또는 없음" 허용으로 두어 checklist_scaling의 "Small은 리스크 매트릭스 생략"과 충돌하지 않게 한다. Validate 단계에 "무엇이 깨질 수 있나, 가장 위험한 단계는, 왜 다른 길을 버렸나".
 4. **/sc:design에 `--from`과 "우려 지점(정책 충돌)" 필수 섹션** (Stage 2).
 5. **verifier 에이전트** (Stage 3·4). 읽기 전용 도구(Read·Grep·Glob)와 Bash만, report-only, 앱이나 테스트를 실행해 plan 문서와 대조한 보고. /sc:test 단계에서 사용자가 명시적으로 부른다. "/sc:test → done: 실제 출력 필수" 게이트의 증거 생산자.
-6. **훅 2종** (Stage 3·4). troubleshoot `--fix` 중 테스트 파일 편집 잠금을 먼저. 보호 경로 편집 차단은 설정 리스트가 필요해 실제로 보호할 경로가 생길 때까지 보류. 둘 다 destructive_guard처럼 차단 사유와 우회 경로를 출력. 전제 4(auto mode가 프로즈 게이트를 침식)로 우선순위가 올라감. 구현된 잠금은 Edit/Write 도구만 막고 셸 편집(sed, `git checkout --`, rm)은 밖이다. Bash 쪽 패턴 차단은 2026-10-07 리뷰에서 지적됐고 보류한다.
+6. **훅 2종** (Stage 3·4). 2026-10-07 결정으로 훅은 만들지 않는다. 테스트 파일 잠금 훅은 구현·리뷰까지 마쳤다가(3362816e) 걷어냈다. 경로 규칙이 언어 관례에 묶여 어떤 환경에서나 쓰이는 프레임워크에 맞지 않고, 모델 능력이 프로즈 규칙으로 충분하다고 판단했다. 남은 것은 /sc:troubleshoot의 fix-not-test gotcha(수정 중 실패 테스트는 읽기 전용, 테스트가 틀렸으면 이유를 적고 재검토)와 실패 테스트 커밋 규칙이다. 보호 경로 편집 차단도 같은 이유로 보류.
 7. **canary를 릴리스 전 수동 게이트로** (Stage 4, 로컬 `claude -p`). `make release` 체크 목록에 "core/rules나 hooks가 지난 릴리스 이후 바뀌었으면 `--canary` 결과가 있어야 한다"를 사람이 확인하는 항목으로. R19 gotcha 캡처·insight 승격 시 "canary probe로도 추가할까" 한 줄 → "사건마다 eval 하나".
 8. **canary에 auto mode 조건 추가** (전제 4의 측정). run_eval.py는 `--allowedTools`만 넘기고 permission mode를 지정하지 않는다. `conflicting-constraints`·`problem-statement-not-request` 같은 기존 프로브를 `--permission-mode auto`로도 돌려 프로즈 게이트(brainstorm "확인 없이 진행 금지", implement·task "3파일 초과면 승인 대기")가 살아남는지 잰다. 붉으면 그때 어느 체크포인트를 훅으로 옮길지 정한다. 측정 전에 훅을 늘리는 것은 과하다.
 9. **/sc:review 세 번째 차원** (Stage 5). "이 변경이 항상 로드되는 문서를 낡게 했는가"를 소견 범주로, R19 발동 조건을 리뷰에서 같은 소견이 두 번째 나온 경우로 확장. 기존 규칙의 조건 한 줄 수정.
@@ -60,7 +60,7 @@ revised: 2026-10-07
 | 3 /sc:plan 푸터·Interrogate | 완료 | da4a2f12 |
 | 4 /sc:design --from·Concerns | 완료 | da4a2f12 |
 | 5 verifier 에이전트 | 완료 (/sc:test Verify 단계에서 명시 호출) | 3362816e |
-| 6 테스트 파일 잠금 훅 | 완료 (Edit/Write만; 셸 편집 차단은 보류) | 3362816e |
+| 6 테스트 파일 잠금 훅 | 철회 (훅 제거, 프로즈 규칙 fix-not-test만 유지) | 3362816e → 철회 커밋 |
 | 7 canary 릴리스 게이트 | 완료 (make release, CANARY_OK=1) | 7cf07537 |
 | 8 canary --permission-mode | 완료 (측정 실행은 아직) | 3362816e |
 | 9 /sc:review Dim 3·R19 확장 | 완료 | da4a2f12 |
