@@ -1,5 +1,5 @@
 ---
-status: draft
+status: complete
 revised: 2026-10-08
 ---
 
@@ -124,9 +124,9 @@ Out: Codex 사이드카 `agents/openai.yaml`(한글 없음), 과거 기록(`docs
 - [x] Step 4: 커밋 `chore(portable-skills): drop the per-skill release zips`
 
 ### Task 9: 마무리
-- [ ] Step 1: `uv run python portable-skills/package.py --check`, 전체 `uv run pytest`, `make lint`를 다시 실행하고 Proof에 출력을 기록한다.
-- [ ] Step 2: 이 계획의 체크박스와 Deviations를 코드와 맞추고 `status: complete`.
-- [ ] Step 3: 머지 전에 Handoff의 GitHub 경로 확인용 격리 설정을 만들고 이전 두 플러그인을 설치해 둔다. master 머지와 push는 사용자 요청이 있을 때만 한다.
+- [x] Step 1: `uv run python portable-skills/package.py --check`, 전체 `uv run pytest`, `make lint`를 다시 실행하고 Proof에 출력을 기록한다.
+- [x] Step 2: 이 계획의 체크박스와 Deviations를 코드와 맞추고 `status: complete`.
+- [x] Step 3: 머지 전에 Handoff의 GitHub 경로 확인용 격리 설정을 만들고 이전 두 플러그인을 설치해 둔다. master 머지와 push는 사용자 요청이 있을 때만 한다.
 
 ## Risks
 
@@ -156,11 +156,12 @@ Out: Codex 사이드카 `agents/openai.yaml`(한글 없음), 과거 기록(`docs
 - Task 4 Step 1: `@synced` 사본은 `claude plugin disable`/`enable` 대신 실행마다 `--settings '{"enabledPlugins":{"socratic-brainstorm@synced":false,"socratic-elenchus@synced":false}}'`로 껐다. init 이벤트에 `socratic` 플러그인과 `socratic:` 스킬 두 개만 남는 것을 확인했고, 사용자 설정은 바뀌지 않는다. 끄지 않은 첫 확인 실행에서는 모델이 `@synced`의 `socratic-elenchus:socratic-elenchus`를 골랐다.
 - Task 7 Step 6: 브라우저를 열어 보는 대신 headless Chrome으로 측정했다. Windows headless 창은 503px 아래로 줄지 않아, 페이지를 360px·390px iframe에 넣고(`--allow-file-access-from-files`) `#plugins` 안 요소의 오른쪽 끝과 문서 `scrollWidth`를 비교했다.
 - Task 8 Step 1: 순서를 바꿔 새 `socratic.zip`을 먼저 올리고, 업로드가 된 뒤에 이전 두 플러그인을 지웠다. 새 zip이 거부되더라도 아무것도 지워지지 않게 하기 위해서다.
+- Task 9 Step 1: e15cb65c의 `test_install_docs_match_the_marketplace`가 `ruff format --check`에 걸렸다(줄 길이). Task 1과 2에서 돌린 `make format` 뒤에 추가한 테스트라 다시 돌리지 않았던 것이다. 마무리 커밋에서 포맷했다.
 
 ## Proof
 
-- `uv run pytest tests/unit/test_portable_skills.py -q` → 전부 통과(`test_shipped_plugin_has_no_hangul`, `test_release_record_matches_content`, `test_install_docs_match_the_marketplace` 포함). 전체 `uv run pytest` → exit 0(기준선 2953 passed, 1 skipped). `make lint` → `All checks passed!`
-- `uv run python portable-skills/package.py --check` → 스킬 두 개 `ok`
+- Task 9 (2026-10-08, 브랜치 HEAD): `uv run pytest tests/unit/test_portable_skills.py -q` → 33 passed. 전체 `uv run pytest -q` → 2963 passed, 1 skipped (기준선 2953 passed, 1 skipped). `make lint` → `All checks passed!`, `uv run ruff format --check src tests` → `212 files already formatted`. 새로 clone한 브랜치 사본에서 `test_portable_skills.py` 33 passed, `package.py --check` 통과.
+- `uv run python portable-skills/package.py --check` → `ok socratic-brainstorm`, `ok socratic-elenchus`
 - `claude plugin validate portable-skills/plugins/socratic`와 `claude plugin validate .` → `✔ Validation passed`
 - Task 4 (2026-10-08, ef4e8e91의 `plugins/socratic`, `claude -p --plugin-dir … --model sonnet --effort low`, 첫 턴의 Skill 호출을 stream-json에서 읽음):
   - 명시 프롬프트 7/7: 10-two-skills §3의 B 세 개 → `socratic:socratic-brainstorm`, E 세 개 → `socratic:socratic-elenchus`, "파이썬 리스트 중복 제거하는 법" → 스킬 없음. 첫 응답은 모두 한국어.
@@ -174,4 +175,4 @@ Out: Codex 사이드카 `agents/openai.yaml`(한글 없음), 과거 기록(`docs
 ## Handoff
 
 - 다음 버전 bump 커밋에 넣을 CHANGELOG 줄: `### Changed`(두 portable 스킬이 플러그인 `socratic` 하나로 배포됨, 슬래시 명령 `/socratic:<skill>`, 스킬 파일은 영어로만 쓰이고 응답은 사용자 언어를 따름, 3.3.0 / 1.3.0)와 `### Upgrade notes`(`/plugin marketplace update ajitta-socratic`, claude.ai 업로드 교체 절차).
-- 실제 GitHub 경로 확인: 머지 전에 격리된 `CLAUDE_CONFIG_DIR`(push 때까지 남는 경로)에서 `claude plugin marketplace add ajitta/superclaude`로 이전 두 플러그인을 설치해 둔다. push 뒤 같은 설정에서 `claude plugin marketplace update ajitta-socratic`, `claude -p` 한 번, `claude plugin list` → `socratic@ajitta-socratic ✔ enabled`. 마켓플레이스를 지웠다 다시 추가하면 플러그인도 함께 제거되므로 그 방법은 쓰지 않는다. 이 기기의 `socratic-brainstorm@synced`(3.2.0), `socratic-elenchus@synced`(1.2.0)는 claude.ai 업로드 동기화 사본이라 마켓플레이스 이전과 무관하고, Task 8 Step 1에서 함께 바뀐다.
+- 실제 GitHub 경로 확인: `C:/tmp/sc-socratic-migrate/cfg`에 GitHub master 44a41d85의 이전 두 플러그인(3.2.1, 1.2.1)을 설치해 두었다(Task 9 Step 3). push 뒤 `CLAUDE_CONFIG_DIR=C:/tmp/sc-socratic-migrate/cfg`로 `claude plugin marketplace update ajitta-socratic`, `claude -p` 한 번, `claude plugin list` → `socratic@ajitta-socratic ✔ enabled`. 마켓플레이스를 지웠다 다시 추가하면 플러그인도 함께 제거되므로 그 방법은 쓰지 않는다. 이 기기의 `socratic-brainstorm@synced`(3.2.0), `socratic-elenchus@synced`(1.2.0)는 claude.ai 업로드 동기화 사본이라 마켓플레이스 이전과 무관하고, Task 8 Step 1에서 함께 바뀐다.
