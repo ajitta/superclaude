@@ -6,6 +6,18 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Ver
 
 Releases before 4.19.0 are not listed. Their history is the git log; the upstream-era changelog, last entry 4.2.1, is `CHANGELOG.md` at commit `6b0ac5c3^`.
 
+## [4.23.1] - 2026-10-08
+
+### Changed
+
+- `stable` is now the repository's default branch and the source of the Pages site. The Claude Code plugin marketplace (`/plugin marketplace add ajitta/superclaude`) and the site follow it, so they change when a release moves `stable`, not on every push to `master`.
+- CI no longer runs on push. `make ci` runs the Tests workflow on `origin/master` and waits, reusing a green run for that commit; `make release` calls it before it moves `stable`. Pull requests to `master` still run Tests.
+
+### Upgrade notes
+
+- Plugin users: nothing to do. The next `/plugin marketplace update ajitta-socratic` reads `stable`.
+- Contributors: clone with `git clone -b master`, because a plain clone now checks out `stable`. Run `make ci` when you need CI results before a release.
+
 ## [4.23.0] - 2026-10-08
 
 ### Changed
