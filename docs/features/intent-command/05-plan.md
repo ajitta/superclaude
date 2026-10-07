@@ -97,8 +97,8 @@ Out (R18 미통과, 별도 결정 필요): `--from <ticket|file>` 플래그, sta
 
 ### Task 6: CHANGELOG
 **Files:** Modify: `CHANGELOG.md` (deferred to the version-bump branch; see the Proof note)
-- [ ] Step 1: 다음 버전 섹션(버전 범프 브랜치에서 생성)의 `### Added`에 `/sc:intent` 항목과 `00-intent` phase, `intent` phase enum 추가. `## [Unreleased]` 헤딩은 쓰지 않는다 — `test_version_consistency.py`가 날짜 있는 릴리스 헤딩만 인식한다
-- [ ] Step 2: `uv run pytest tests/unit/test_version_consistency.py -q` green
+- [x] Step 1: 다음 버전 섹션(버전 범프 브랜치에서 생성)의 `### Added`에 `/sc:intent` 항목과 `00-intent` phase, `intent` phase enum 추가. `## [Unreleased]` 헤딩은 쓰지 않는다 — `test_version_consistency.py`가 날짜 있는 릴리스 헤딩만 인식한다
+- [x] Step 2: `uv run pytest tests/unit/test_version_consistency.py -q` green
 
 ### Task 7: 동기화와 전체 검증
 **Files:** none (설치 사본 갱신)
@@ -129,4 +129,4 @@ Out (R18 미통과, 별도 결정 필요): `--from <ticket|file>` 플래그, sta
 - Headless probes from the repo root against intent.md at 7de4b521, before the Deviations edits (`claude -p … --allowedTools Read,Glob,Grep,Write --output-format json`):
   - `/sc:intent rename this variable` → 1 turn, no file written; reply names the request Trivial, says no intent record is written, and asks for the file, identifier and new name to do the rename directly.
   - `/sc:intent exports time out for big customers; the ops team gets paged every Monday and we cannot change the auth layer` → 2 turns, no file written; reply resolves the slug to a new folder `docs/features/export-timeouts/` (then the zero-match `[f]` default; same outcome under the Deviations rule), lists the three fields the seed already fills, asks exactly two questions for the empty ones (proposed outcome, affected systems), and states nothing is written before approval. The Save path itself was not exercised: headless has no approval turn.
-- Task 6 is open on purpose: `test_version_consistency.py` accepts only dated release headings whose newest version equals `pyproject.toml`, so the CHANGELOG line lands in the version-bump commit.
+- Task 6 landed in the 4.22.0 version-bump commit (`chore/version-4.22.0`): `test_version_consistency.py` accepts only dated release headings whose newest version equals `pyproject.toml`.

@@ -6,6 +6,31 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Ver
 
 Releases before 4.19.0 are not listed. Their history is the git log; the upstream-era changelog, last entry 4.2.1, is `CHANGELOG.md` at commit `6b0ac5c3^`.
 
+## [4.22.0] - 2026-10-07
+
+### Added
+
+- `/sc:intent` records a request in the requester's own words before any analysis: problem, proposed outcome, affected users and systems, constraints and open questions, at most one page, saved after the user approves it to `docs/features/<slug>/00-intent.md` with `status: approved-for-plan`. Trivial and Small requests get no file. The docs convention gains the `00-intent` phase file and the `intent` README phase; the Large chain in the README starts with it, and it is optional before Medium work. `/sc:brainstorm`, `/sc:design`, `/sc:plan`, `/sc:review` and `/sc:reflect` read the record when the feature folder has one.
+- `verifier` agent: runs the project's build, test and run commands, exercises the changed behavior and compares it with the plan document, reporting MATCH, MISMATCH or UNVERIFIED per claim without fixing anything. `/sc:test` dispatches it when you ask for independent evidence.
+- `make canary-gates` runs the canary tasks that carry the hard gates locally (`claude -p`, sonnet, low effort; no API key). `EVAL_ARGS` passes extra `run_eval.py` flags; inside a Claude Code session pass a new `--runs-dir` outside `~/.claude` for each run.
+- `evals/run_eval.py --permission-mode <mode>` runs tasks under a Claude Code permission mode such as `auto`; the mode is recorded in `results.json` and the `report.md` header. The new `implement-checkpoint` canary probe asks `/sc:implement` for a five-file rename and checks that it stops at its approval checkpoint.
+
+### Changed
+
+- `make release` refuses when `src/superclaude/core` or `hooks/hooks.json` changed since the last `v*` tag, or when no `v*` tag is reachable, unless `CANARY_OK=1` is set after reading a `make canary-gates` report.
+- `/sc:plan` plans end with Risks, Alternatives not taken and Proof, and a new Interrogate step answers what could break, which step is riskiest and why other options were dropped. Small plans may write "none" for risks and alternatives; Proof always names the command and its expected output.
+- `/sc:implement --plan` records every departure from the plan under `## Deviations` in the plan doc, in the same commit as the code, and checks a box only when the code backs it. A task dropped by decision is marked `- [x] ~~task~~` with its reason. The `/sc:implement → /sc:test` gate requires the boxes and Deviations to match the code.
+- `/sc:design` takes `--from <path>` (a discovery or intent doc) and every design has an "Areas of concern" section listing policy conflicts and unmet intent; the design → plan gate requires them resolved.
+- `/sc:review` adds a third dimension, whether the change made an always-loaded doc (CLAUDE.md, AGENTS.md, `.claude/rules/**` or anything the session-start imports pull in) stale, and checks spec fidelity against both the spec and `00-intent.md`. R19 now also proposes a project gotcha when a review raises the same project-specific finding a second time.
+- `/sc:troubleshoot` commits the failing reproduction test before the fix, and the fix-not-test gotcha keeps that test read-only while fixing.
+- `/sc:analyze` reports and `/sc:cleanup --type docs|all` now load the docs convention rules (`core/rules/RULES_DOCS.md`), as `/sc:intent` does.
+- The delegation rule against spawning a sub-agent to double-check finished work applies only when nobody asked; an explicitly requested verifier is allowed.
+
+### Upgrade notes
+
+- Run `superclaude update --scope <scope>` for each installed scope to get `/sc:intent`, the `verifier` agent and the changed commands and rules; skip scopes that `superclaude doctor --scope <scope>` reports as not installed, because `update` creates an install where none exists.
+- Contributors: `make release` now needs `CANARY_OK=1` after a `make canary-gates` run whenever core rules or `hooks.json` changed since the last release.
+
 ## [4.21.0] - 2026-10-07
 
 ### Changed
