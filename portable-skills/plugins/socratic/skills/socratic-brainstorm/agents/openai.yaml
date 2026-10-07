@@ -1,0 +1,7 @@
+interface:
+  display_name: "Socratic Brainstorm"
+  short_description: "Question an idea one step at a time, grow options, end with an honest verdict"
+  default_prompt: "Use $socratic-brainstorm to question me about this idea: "
+
+policy:
+  allow_implicit_invocation: false

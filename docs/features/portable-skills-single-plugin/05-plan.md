@@ -133,6 +133,7 @@ Out: Codex 사이드카 `agents/openai.yaml`(한글 없음), 과거 기록(`docs
 ## Deviations
 
 - Task 1 Step 4: 이전 마켓플레이스 테스트는 Task 2 전까지 red일 것으로 적었지만 green으로 남았다. 그 테스트는 항목의 `source` 폴더가 있는지 보지 않아서, 폴더가 지워진 항목도 통과시켰다. Task 2의 새 테스트에 `source` 폴더 존재 확인을 추가했다.
+- Task 2 커밋(5fcfb00a)에 `plugins/socratic/skills/`가 빠졌다. `.gitignore`의 `skills/`(npx skills add 산출물용)가 경로 고정 없이 모든 `skills/` 디렉터리를 제외했다. 로컬 테스트는 디스크의 파일로 통과했지만 새 checkout에서는 실패했을 것이다. `!portable-skills/plugins/*/skills/` 예외를 추가하고 후속 커밋으로 폴더를 넣었다.
 
 ## Proof
 

@@ -113,6 +113,8 @@ poetry.lock
 agent/
 skills/
 skills-lock.json
+# ...but the generated portable plugin keeps its skills in skills/<skill>/
+!portable-skills/plugins/*/skills/
 
 
 # SuperClaude specific
