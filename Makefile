@@ -1,4 +1,4 @@
-.PHONY: install deploy sync-user sync-project sync-local uninstall-user uninstall-project uninstall-local test test-scripts test-plugin doctor verify verify-drift canary-gates clean lint format release uninstall-legacy help
+.PHONY: install deploy sync-user sync-project sync-local uninstall-user uninstall-project uninstall-local test test-scripts test-plugin doctor verify verify-drift canary-gates clean lint format ci release uninstall-legacy help
 
 # Installation (local source, editable) - RECOMMENDED
 install:
@@ -116,19 +116,36 @@ clean:
 	find . -type d -name .pytest_cache -exec rm -rf {} +
 	find . -type d -name .ruff_cache -exec rm -rf {} +
 
+# Run the Tests workflow on origin/master HEAD and wait; reuse a green run for that commit.
+# CI does not run on push: master is not a release channel (stable is the default branch).
+ci:
+	@set -e; \
+	git fetch -q origin master; SHA=$$(git rev-parse origin/master); \
+	if [ "$$(gh run list --commit $$SHA --workflow Tests --status success --json databaseId --jq length)" != 0 ]; then \
+	  echo "✅ Tests already green for $$SHA"; exit 0; fi; \
+	gh workflow run Tests --ref master; RID=; \
+	for i in $$(seq 1 30); do \
+	  RID=$$(gh run list --commit $$SHA --workflow Tests --event workflow_dispatch --json databaseId,status --jq '[.[] | select(.status != "completed")][0].databaseId // empty'); \
+	  [ -n "$$RID" ] && break; sleep 2; done; \
+	[ -n "$$RID" ] || { echo "❌ no Tests run started for $$SHA"; exit 1; }; \
+	echo "▶ Tests run $$RID on $$SHA"; \
+	gh run watch $$RID --exit-status > /dev/null || { echo "❌ Tests failed: gh run view $$RID"; exit 1; }; \
+	echo "✅ Tests green for $$SHA"
+
 # Show help
-# Release master HEAD: GitHub release v<version> (notes = newest CHANGELOG section), then move stable to it.
+# Release master HEAD: run Tests (make ci), GitHub release v<version> (notes = newest CHANGELOG section), then move stable to it.
+# Calls plain `make ci`, not $(MAKE): make runs a $(MAKE) line even under -n, which would run this whole recipe.
 release:
 	@set -e; \
 	V=$$(sed -n 's/^version = "\(.*\)"/\1/p' pyproject.toml); SHA=$$(git rev-parse HEAD); \
 	test "$$(git branch --show-current)" = master || { echo "❌ not on master"; exit 1; }; \
 	git diff --quiet HEAD || { echo "❌ uncommitted changes"; exit 1; }; \
 	git fetch -q origin master; test "$$SHA" = "$$(git rev-parse origin/master)" || { echo "❌ HEAD is not origin/master"; exit 1; }; \
-	test "$$(gh run list --commit $$SHA --workflow Tests --json conclusion --jq '.[0].conclusion')" = success || { echo "❌ Tests not green for $$SHA"; exit 1; }; \
 	PREV=$$(git describe --tags --abbrev=0 --match 'v*' 2>/dev/null || true); \
 	[ -n "$$PREV" ] || [ "$$CANARY_OK" = "1" ] || { echo "❌ no v* tag reachable (git fetch --tags?), so core/ changes are unknown — run 'make canary-gates', then CANARY_OK=1"; exit 1; }; \
 	if [ -n "$$PREV" ] && [ -n "$$(git diff --name-only $$PREV..HEAD -- src/superclaude/core src/superclaude/hooks/hooks.json)" ] && [ "$$CANARY_OK" != "1" ]; then \
 	  echo "❌ core/ or hooks.json changed since $$PREV — run 'make canary-gates' (local claude -p), read report.md, then re-run with CANARY_OK=1"; exit 1; fi; \
+	make --no-print-directory ci; \
 	awk '/^## \[/{n++; next} n==1' CHANGELOG.md > .release-notes.md; \
 	gh release create "v$$V" --target "$$SHA" --title "v$$V" --notes-file .release-notes.md; rm -f .release-notes.md; \
 	git push origin "$$SHA:refs/heads/stable"; \
@@ -152,7 +169,8 @@ help:
 	@echo "  make format          - Format code (ruff format)"
 	@echo "  make clean           - Clean build artifacts"
 	@echo "  make canary-gates    - Run the four hard-gate canary tasks locally (claude -p, sonnet, low effort)"
-	@echo "  make release         - Release master HEAD: GitHub release v<version>, move stable (CANARY_OK=1 after make canary-gates when core/ or hooks.json changed)"
+	@echo "  make ci              - Run the Tests workflow on origin/master and wait (CI does not run on push)"
+	@echo "  make release         - Release master HEAD: make ci, GitHub release v<version>, move stable (CANARY_OK=1 after make canary-gates when core/ or hooks.json changed)"
 	@echo ""
 	@echo "🧹 Cleanup:"
 	@echo "  make uninstall-user    - Uninstall from user scope (~/.claude/)"

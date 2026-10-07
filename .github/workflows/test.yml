@@ -1,12 +1,11 @@
 name: Tests
 
+# No push trigger: master is not a release channel (stable, the default branch,
+# is). `make release` runs this through `make ci` before it moves stable.
 on:
-  push:
-    branches: [master]
-    # Serena session memories: no test reads them
-    paths-ignore: ['.serena/**']
   pull_request:
     branches: [master]
+    # Serena session memories: no test reads them
     paths-ignore: ['.serena/**']
   workflow_dispatch:
 
