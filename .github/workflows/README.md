@@ -2,7 +2,7 @@
 
 ## test.yml
 
-**Triggers**: push and pull request to `master`, manual dispatch
+**Triggers**: push and pull request to `master`, manual dispatch. A push or pull request whose changed files are all under `.serena/` (session memories, which no test reads) does not run it.
 
 **Jobs**:
 - **test**: Python 3.10 and 3.13 (the oldest supported version and the newest)
@@ -13,7 +13,7 @@
   - Pytest plugin loads (its `SuperClaude: ` report header)
   - `superclaude install --scope user` followed by `superclaude doctor`
 
-`make release` refuses to release a commit whose `Tests` run is not green, so this workflow is part of the release path.
+`make release` refuses to release a commit whose `Tests` run is not green, so this workflow is part of the release path. If the commit to release only touched `.serena/`, it has no run; start one with `gh workflow run Tests --ref master` first.
 
 **Status Badge**:
 ```markdown
