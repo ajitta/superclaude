@@ -4,5 +4,5 @@ SuperClaude Framework
 Content framework for Claude Code — agents, commands, modes, skills, and hooks.
 """
 
-__version__ = "4.21.0"
+__version__ = "4.22.0"
 __author__ = "NomenAK, Mithun Gowda B"
