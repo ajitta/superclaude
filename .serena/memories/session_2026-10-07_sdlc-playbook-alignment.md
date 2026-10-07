@@ -1,6 +1,6 @@
 # Session 2026-10-07 (evening) — AI-Native SDLC Playbook alignment
 
-Branch `docs/intent-command-plan` off master 04b55604, 10 commits 81fcb509..c01112fc. NOT merged, NOT pushed at save time. Full suite 2947 passed / 7 skipped, scripts 149 passed, ruff clean at c01112fc.
+Branch `docs/intent-command-plan` off master 04b55604, 10 commits 81fcb509..c01112fc, then review fixes 38333a94 + 0e90cf68; merged @7e353036 and released as v4.22.0 @f427a22f (2026-10-07). Full suite 2947 passed / 7 skipped, scripts 149 passed, ruff clean at c01112fc.
 
 ## What was asked, decided, ruled out
 
@@ -28,9 +28,8 @@ Branch `docs/intent-command-plan` off master 04b55604, 10 commits 81fcb509..c011
 
 ## Open / next
 
-- Merge `docs/intent-command-plan` to master, push.
-- Version bump 4.22.0: CHANGELOG `### Added` (intent, verifier, --permission-mode, plan/design/review gate edits, fix-not-test, CANARY_OK gate, gotcha budget) — test_version_consistency accepts only dated release headings equal to pyproject, so this lands in the bump commit; close intent-command plan Task 6 and the sdlc-playbook-alignment README; the intent-command plan and README stay `implementing` until Task 7 Step 4 has run.
-- Before release: `make canary-gates EVAL_ARGS="--runs-dir C:/tmp/sc-evals/gate-1"` (first real run; in-session the default runs dir is refused), optionally once more with `--permission-mode auto` and a new dir, then `CANARY_OK=1 make release`.
-- Prerequisite for closing intent-command: run `/sc:intent` once interactively on a Large task (Save path: file + README), record it in 05-plan Proof, check Task 7 Step 4, then set plan `status: complete` and README `phase: complete`.
+- Done 2026-10-07: merge, 4.22.0 bump and release (stable → f427a22f), first `make canary-gates` and auto-mode runs (recorded in 03-analysis.md "첫 측정"), interactive `/sc:intent` run; intent-command and sdlc-playbook-alignment are complete.
+- Open: `destructive-elicitation` hard gate is red on sonnet and opus (pre-existing, also on v4.21.0 content) — decide between rewording RULES.md `<destructive_op_confirmation>` and changing the task's expectation; until then a core-touching release needs `CANARY_OK=1` against this known red.
+- Next feature: `docs/features/portable-skills-single-plugin/00-intent.md` (merge the two portable-skill plugins and their marketplace entries into one plugin) → `/sc:plan --from` that file in a new session.
 
 Related: `mem:session_2026-10-07_prompt-audit-verify-and-merge` (earlier today, 4.21.0 release).

@@ -55,7 +55,7 @@ revised: 2026-10-07
 
 | 항목 | 상태 | 커밋 |
 |---|---|---|
-| 1 /sc:intent | 완료 (남은 것: CHANGELOG는 버전 범프 커밋, Save 경로 대화형 확인은 ../intent-command/05-plan.md Task 7 Step 4) | 7de4b521 |
+| 1 /sc:intent | 완료 (CHANGELOG 4.22.0; Save 경로는 2026-10-07 대화형 실행으로 확인, ../intent-command/05-plan.md Proof) | 7de4b521 |
 | 2 계획 편차 검사 | 완료 (Deviations 규칙 + tests/unit/test_plan_checklist.py) | da4a2f12 |
 | 3 /sc:plan 푸터·Interrogate | 완료 | da4a2f12 |
 | 4 /sc:design --from·Concerns | 완료 | da4a2f12 |

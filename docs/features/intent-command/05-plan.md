@@ -1,5 +1,5 @@
 ---
-status: implementing
+status: complete
 revised: 2026-10-07
 ---
 
@@ -105,7 +105,7 @@ Out (R18 미통과, 별도 결정 필요): `--from <ticket|file>` 플래그, sta
 - [x] Step 1: `superclaude doctor --scope local` 로 local scope 설치 확인 후 `superclaude install --force --scope local`
 - [x] Step 2: `echo '{"prompt":"/sc:intent test"}' | superclaude hook context_loader` 출력에 "is not a command"가 없어야 함
 - [x] Step 3: `uv run pytest` exit 0, `make lint` clean
-- [ ] Step 4: `/sc:intent`를 실제로 한 번 실행해 Trivial 요청에는 파일을 만들지 않고, Large 요청에는 질문 5개 이내로 00-intent.md를 만드는지 확인. 결과를 이 문서의 "Proof"에 적는다
+- [x] Step 4: `/sc:intent`를 실제로 한 번 실행해 Trivial 요청에는 파일을 만들지 않고, Large 요청에는 질문 5개 이내로 00-intent.md를 만드는지 확인. 결과를 이 문서의 "Proof"에 적는다
 - [x] Step 5: `feat: add /sc:intent command` 로 커밋, 이 plan의 체크박스 갱신과 README `phase: planning → implementing` 을 같은 커밋에 (`complete`는 Task 6과 Step 4 이후)
 
 ## Deviations
@@ -118,7 +118,7 @@ Out (R18 미통과, 별도 결정 필요): `--from <ticket|file>` 플래그, sta
 - Task 3 Step 4 철회: promote-feature의 Scan은 standalone 문서만 찾고 intent에는 standalone 형식이 없어 매핑이 발동할 수 없다.
 - Task 4 범위 밖 소비자: /sc:plan Load 단계도 같은 폴더의 00-intent.md를 읽는다. Handoff가 Medium 작업을 /sc:plan으로 넘기는데 `--from` 없이는 기록이 전달되지 않았다.
 - 범위 밖 변경: context_loader TRIGGER_MAP의 RULES_DOCS 트리거에 `intent` 추가와 `test_context_loader.py::test_doc_writing_commands_load_rules_docs`. Save 단계가 slug 해석·README 갱신을 RULES_DOCS에 맡기는데 /sc:intent에는 그 모듈이 주입되지 않았다.
-- Task 7 Step 4: headless에는 승인 턴이 없어 Save 경로를 실행하지 못했다. 대화형으로 한 번 실행할 때까지 열어 둔다.
+- Task 7 Step 4: headless에는 승인 턴이 없어 Save 경로를 실행하지 못했고, 2026-10-07 대화형 실행으로 확인했다(Proof). 그 요청은 Large보다 Medium에 가까웠지만 이 단계가 확인하려던 것은 Save 경로다.
 
 ## Proof
 
@@ -129,4 +129,5 @@ Out (R18 미통과, 별도 결정 필요): `--from <ticket|file>` 플래그, sta
 - Headless probes from the repo root against intent.md at 7de4b521, before the Deviations edits (`claude -p … --allowedTools Read,Glob,Grep,Write --output-format json`):
   - `/sc:intent rename this variable` → 1 turn, no file written; reply names the request Trivial, says no intent record is written, and asks for the file, identifier and new name to do the rename directly.
   - `/sc:intent exports time out for big customers; the ops team gets paged every Monday and we cannot change the auth layer` → 2 turns, no file written; reply resolves the slug to a new folder `docs/features/export-timeouts/` (then the zero-match `[f]` default; same outcome under the Deviations rule), lists the three fields the seed already fills, asks exactly two questions for the empty ones (proposed outcome, affected systems), and states nothing is written before approval. The Save path itself was not exercised: headless has no approval turn.
+- Interactive run, 2026-10-07, installed 4.22.0 (master f427a22f): `/sc:intent "portable-skills가 분리된 PLUGGIN에 있는데 통탑하여 하나의 플러그인에 넣고 싶어. 마켓플레이스도 하나의 플러그인으로 처리하고 싶어"` → three questions, one per empty field (problem, affected users, constraints); the draft quoted the request and the selected answers verbatim; nothing was written before approval; the slug partly matched `plugin-install` and `socratic-brainstorm-skill`, so it asked for the folder; the new folder got `00-intent.md` with `status: approved-for-plan` and a README with `phase: intent` (`docs/features/portable-skills-single-plugin/`). The user confirmed the files were created.
 - Task 6 landed in the 4.22.0 version-bump commit (`chore/version-4.22.0`): `test_version_consistency.py` accepts only dated release headings whose newest version equals `pyproject.toml`.
