@@ -6,6 +6,19 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Ver
 
 Releases before 4.19.0 are not listed. Their history is the git log; the upstream-era changelog, last entry 4.2.1, is `CHANGELOG.md` at commit `6b0ac5c3^`.
 
+## [4.24.0] - 2026-10-09
+
+### Changed
+
+- Generated docs have a 25 KB per-file limit, up from the 15 KB that applied to plans only. It covers every feature, plan and standalone doc; living docs under `docs/reports/` and ADRs are exempt. The number leaves headroom below the 30 KB Read size guard, so the next stage can read a doc whole.
+- A feature doc over the limit splits by topic into `NNa-` sibling files. A plan from `/sc:plan` or `/sc:roadmap` splits by phase: the plan file becomes an index with one checkbox per phase, and each phase goes to `05<letter>-plan-<phase-name>.md` with its own `status`. A standalone doc stays one file; when one is expected to be large, the feature-folder option is recommended at slug resolution.
+- `/sc:implement --plan` handles a split plan: it reads the index first and each phase file when that phase starts, writes Deviations into the phase file, and marks the index complete when its last phase box is checked.
+- A new `NNa-` file takes the first letter not yet used in the folder, `archive/` included. `/sc:roadmap` and `/sc:promote-feature` no longer always write `05a-plan-workflow.md`.
+
+### Upgrade notes
+
+- Nothing to do. Existing docs over the limit stay as they are; the rule applies to docs written from now on.
+
 ## [4.23.1] - 2026-10-08
 
 ### Changed
