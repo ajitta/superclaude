@@ -8,10 +8,15 @@
 
 Long documents: settle the structure and the hard decisions before writing, then write the document once; drafting it in full while reasoning and again as output doubles the turn without improving it.
 
+Size: each feature, plan or standalone doc file stays under 25KB, leaving headroom below the 30KB size guard so the next stage reads it whole; living docs and ADRs are exempt. Decide the split with the structure: a feature doc expected over the limit is written as split files from the start, and measuring after writing is the check. Over the limit:
+  Feature doc: split by topic into `NNa-` siblings (Multi-of-same-phase below); the primary file keeps the summary and a link to each; the README lists every file.
+  Plan (05 slot, /sc:plan and /sc:roadmap output): re-read mid-exec, so split by phase. The plan file becomes the index (header, shared rules, phase order with one checkbox per phase linking its file, footer); each phase goes to `05<letter>-plan-<phase-name>.md` (distinguisher rules apply) with its own frontmatter {status, revised} and a header line linking back to the index. A phase file still over the limit means the phase is too big for one commit: split the phase.
+  Standalone doc: one file by definition, never split. Expected over the limit → recommend `[f]` at slug resolution (below); declined, written to an explicit path, or already over → it stays one file.
+
 Default (multi-doc work): docs/features/<feature-slug>/
   Required: README.md (frontmatter + index) + numbered phase files
   Phase prefixes: 00-intent (intent) | 01-discovery (brainstorm) | 02-research | 03-analysis | 04-design | 05-plan (plan, roadmap) | 06+-<custom> (impl notes, retrospective)
-  Multi-of-same-phase: `NNa-<phase>-<distinguisher>.md` (letter = Nth additional, starts at 'a'; distinguisher kebab-case ≤20 chars). Primary slot `NN-<phase>.md` optional — letter clock starts at 'a' even when primary skipped. Use for parallel streams (02a-research-libs, 02b-research-perf), phase-specific sub-discovery within multi-phase feature (01a-discovery-phase2), or mid-implementation discovery (01a-discovery-late).
+  Multi-of-same-phase: `NNa-<phase>-<distinguisher>.md` (letter = first one not yet used for that NN in the folder, `archive/` included, so files written earlier keep theirs; distinguisher kebab-case ≤20 chars). Primary slot `NN-<phase>.md` optional — letters start at 'a' even when primary skipped. Use for parallel streams (02a-research-libs, 02b-research-perf), phase-specific sub-discovery within multi-phase feature (01a-discovery-phase2), mid-implementation discovery (01a-discovery-late), or a size split (Size above).
   Superseded versions: move to <feature>/archive/ subdir
   Feature-slug: kebab-case, ≤40 chars, no dates/usernames, locked at dir creation
 

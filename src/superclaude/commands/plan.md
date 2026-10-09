@@ -30,6 +30,7 @@ description: Make detailed impl plans with TDD tasks, exact file paths, verify c
   | Artifact | Purpose |
   |---|---|
   | Feature path: `docs/features/<slug>/05-plan.md` | Phase doc when slug resolves to existing/new feature folder |
+  | Split plan: `docs/features/<slug>/05<letter>-plan-<phase>.md` | One file per phase when the plan exceeds the size limit; the plan file becomes the index (RULES_DOCS Size) |
   | Standalone path: `docs/plans/<feature-name>-<username>-YYYY-MM-DD.md` | One-off plan, no related work expected |
   </outputs>
 
@@ -75,7 +76,7 @@ Plan footer:
   | `/sc:plan --from docs/specs/foo.md --phases 4` | Hint preferred phase count when natural |
   </examples>
 
-  <size_note>Plans stay under 15KB (~4K tokens). Big impls — split to phase files (e.g., plan-phase1-setup.md, plan-phase2-impl.md). Claude Code Read tool fail at 25K tokens (~100KB) — oversized plans unreadable mid-exec.</size_note>
+  <size_note>Per-file size limit and the by-phase split of an over-limit plan: core/rules/RULES_DOCS.md `<doc_output_convention>` (Size).</size_note>
 
 
   <gotchas>

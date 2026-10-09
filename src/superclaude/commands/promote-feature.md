@@ -14,7 +14,7 @@ description: Promote standalone docs sharing a slug into a feature folder. Use O
   2. Match: filter candidates whose extracted slug equals `<slug>` (exact); show partial-match candidates separately (suffix or username differs)
   3. Confirm: present match set as table to user — `[file path] → [target phase-prefix path]`. Default `--dry-run` exits here with summary. `--apply` proceeds.
   4. Create: ensure `docs/features/<slug>/` does NOT exist (abort with error if it does — slug collision); `mkdir` it.
-  5. Move: `git mv` each match to target phase-prefix name per core/rules/RULES_DOCS.md type→phase mapping (brainstorm/discovery→01-discovery.md, research→02-research.md, analyze→03-analysis.md, design→04-design.md, plan/workflow→05-plan.md or 05a-plan-workflow.md if both); preserve frontmatter; on multi-of-same-phase use NNa suffix per format spec
+  5. Move: `git mv` each match to target phase-prefix name per core/rules/RULES_DOCS.md type→phase mapping (brainstorm/discovery→01-discovery.md, research→02-research.md, analyze→03-analysis.md, design→04-design.md, plan/workflow→05-plan.md or 05<letter>-plan-workflow.md, first free letter, if both); preserve frontmatter; on multi-of-same-phase use NNa suffix per format spec
   6. Scaffold: write `docs/features/<slug>/README.md` with frontmatter (`feature: <slug>, phase: discovery, owner: <git user>, created: <today>, updated: <today>`) + Purpose stub + Documents index listing moved files
   7. Warn: grep repo for inbound paths matching old standalone names (`docs/specs/<slug>-*`, etc.); emit warning list of files holding stale links — user fixes manually (no auto-rewrite, avoids silent breakage)
   8. Report: print summary — N files moved, N inbound warnings, feature folder path
