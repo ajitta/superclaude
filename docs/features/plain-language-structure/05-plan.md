@@ -39,6 +39,8 @@ done
 uv run python "$P/metrics.py" "$P/out" > "$P/out/metrics.tsv"
 ```
 
+`--output-format text` 출력에는 모델 ID가 없다. 그래서 측정 묶음마다 한 번은 `claude -p "hi" --model opus --output-format json`을 실행해 모델 ID를 기록한다. user-scope 플러그인 훅(SessionStart 컨텍스트 주입 등)은 측정 디렉터리에서도 그대로 실행된다. 두 조건에 똑같이 들어가므로 A/B 비교는 성립하지만, 2026-09-11 측정과 환경이 같지는 않다. 이 차이를 `06-measurement.md`에 적는다.
+
 `$P/prompts.tsv` (탭 구분, 8개, 언어 2개 × 모양 4개):
 
 | id | prompt | 기대 모양 |
@@ -66,55 +68,59 @@ uv run python "$P/metrics.py" "$P/out" > "$P/out/metrics.tsv"
 
 **판정 기준.** 한 셀에서 어떤 모양이 "있음"이라는 것은 3회 실행 중 2회 이상 나왔다는 뜻이다. 실행마다 편차가 크기 때문이다(연구 문서 64행).
 
+S1~S3은 기본 조건과 비교하는 상대 기준이다. 기본 조건에 그 모양이 있는 셀만 판정 대상이고, 그런 셀에서는 스타일 조건에도 그 모양이 있어야 한다. 기본 조건에도 그 모양이 없는 셀은 판정에서 빼고, 뺐다는 사실을 기록한다. 그 모양이 없는 원인은 스타일이 아니기 때문이다.
+
 | 기준 | 스타일 조건에서 통과 조건 |
 |---|---|
-| S1 steps | `*-steps`: `numbered`와 `nested` 모두 있음 (en, ko 각각) |
-| S2 compare | `*-compare`: `tables` 있음 (en, ko 각각) |
-| S3 causes | `*-causes`: `bullets` 또는 `numbered` 있음 |
-| S4 과교정 감시 | `*-narrative`: 3회 모두 `tables` = 0, `headers` ≤ 1 |
-| S5 기존 규칙 회귀 | 프롬프트별 `emdash` 평균이 Phase 1 스타일 값 이하, `offer` = 0이 3회 중 2회 이상 |
+| S1 steps | `*-steps`: 기본 조건에 있는 `numbered`, `nested`가 스타일 조건에도 있음 (en, ko 각각) |
+| S2 compare | `*-compare`: 기본 조건에 있는 `tables`가 스타일 조건에도 있음 (en, ko 각각) |
+| S3 causes | `*-causes`: 기본 조건에 있는 `bullets` 또는 `numbered`가 스타일 조건에도 있음 |
+| S4 과교정 감시 | `*-narrative`: 3회 모두 `tables` = 0, `headers` ≤ 1, `numbered`와 `bullets` 평균이 각각 기본 조건 평균 이하 |
+| S5 기존 규칙 회귀 | 프롬프트별 `emdash` 평균 ≤ 기본 조건 평균. 기본 조건 평균이 0이면 답변당 1개 이하. 그리고 `offer` = 0이 3회 중 2회 이상 |
 | S6 분량 | 프롬프트별 스타일 `words` 평균 ≤ 기본 조건 평균 × 1.05 |
 | L1 문장 길이 | 프롬프트별 스타일 `sent_len` 평균 ≤ 기본 조건 평균 × 1.05 |
 
 ## Phase 순서
 
 - [ ] Phase 1: Opus 5.5 기준선 측정 (src 변경 없음)
-- [ ] Phase 2: 구조 문구 교체 (`:3`, `:23`, `:33`, `:48`)
-- [ ] Phase 3: 문장 길이 문구 교체 (`:7`, `:23`). Phase 1 게이트를 통과할 때만 실행한다.
-- [ ] Phase 4: 병합과 local scope 동기화
+- [ ] Phase 2: 구조 문구 교체 (`:3`, `:23`, `:33`, `:48`, `output-styles/README.md:15`)
+- [ ] Phase 3: 문장 길이 문구 교체 (`:7`, `:23`). Phase 2 측정 결과가 게이트를 넘을 때만 실행한다.
+- [ ] Phase 4: local scope 동기화와 계획 종료
 
 ### Task 1: 기준선 측정
 
 **Files:** Create: `docs/features/plain-language-structure/06-measurement.md` | Update: `docs/features/plain-language-structure/README.md`
 
-- [ ] Step 1: 위 측정 방법으로 현재 `plain-language.md`를 측정한다(8 프롬프트 × 2 조건 × 3회 = 48회).
-- [ ] Step 2: 실패를 확인한다. 기본 조건은 통과하는데 스타일 조건은 S1~S3 중 하나 이상에서 실패해야 구조 가설이 확인된다. 스타일 조건도 S1~S3을 모두 통과하면 Opus 5.5에서는 가설이 반증된 것이다. 이 경우 결과를 기록하고 Phase 2~4를 하지 않은 채 보고한다.
-- [ ] Step 3: 문장 길이 게이트를 판정한다. 8개 프롬프트 중 3개 이상에서 스타일 `sent_len`이 기본 조건 × 1.15 이상이면 Phase 3을 실행하고, 아니면 Phase 3을 `- [x] ~~Phase 3~~`로 표시하고 `## Deviations`에 이유를 적는다.
-- [ ] Step 4: `06-measurement.md`에 `claude --version`, 프롬프트 표, `metrics.tsv`의 조건별 평균 표, S1~S6·L1 판정을 기록한다. README `## Documents`에 항목을 추가하고 `updated:`를 갱신한다.
+- [ ] Step 1: 측정 도구를 만든다. 위 프롬프트 표를 탭으로 구분해 `$P/prompts.tsv`에 저장하고, 지표 정의대로 `$P/metrics.py`를 작성한다. 두 파일은 커밋하지 않는다. 스크립트가 맞게 세는지 확인하려면, Step 2에서 나온 답변 중 2개(목록이 있는 답변 하나와 표가 있는 답변 하나)의 `numbered`, `nested`, `tables`, `bullets`를 손으로 세어 스크립트 결과와 맞춰 본다. 다르면 스크립트를 고친 뒤 다시 센다.
+- [ ] Step 2: 위 측정 방법으로 현재 `plain-language.md`를 측정한다(8 프롬프트 × 2 조건 × 3회 = 48회).
+- [ ] Step 3: 실패를 확인한다. 스타일 조건이 S1~S3 중 하나 이상에서 실패해야 구조 가설이 확인된다. 판정할 셀이 하나도 없거나(기본 조건에도 모양이 없음) 스타일 조건이 판정 대상 셀을 모두 통과하면, Opus 5.5에서는 가설이 반증된 것이다. 이 경우 결과를 기록하고 Phase 2~4를 하지 않은 채 보고한다. L1은 이 단계에서 참고용으로만 기록한다.
+- [ ] Step 4: `06-measurement.md`에 `claude --version`, 모델 ID, 프롬프트 표, `metrics.tsv`의 조건별 평균 표, S1~S6·L1 판정, 판정에서 뺀 셀을 기록한다. README `## Documents`에 항목을 추가하고 `updated:`를 갱신한다.
 - [ ] Step 5: Commit `docs(plain-language): record the Opus 5.5 structure baseline`
 
 ### Task 2: 구조 문구 교체
 
-**Files:** Modify: `src/superclaude/output-styles/plain-language.md:3,23,33,48` | Test: `tests/unit/test_output_style_structure.py`
+**Files:** Modify: `src/superclaude/output-styles/plain-language.md:3,23,33,48`, `src/superclaude/output-styles/README.md:15` | Test: `tests/unit/test_output_style_structure.py`
 
 교체 문구(첫 시도). 단어 수는 `wc -w`로 셌다.
 
 | 줄 | 현재 | 교체 | 단어 변화 |
 |---|---|---|---|
 | `:3` | `description: Direct, specific prose in the user's language, without AI mannerisms or decorative structure` | `description: Direct, specific prose in the user's language, without AI mannerisms` | frontmatter라 본문 단어 수와 무관 |
-| `:23` 둘째 문장 | Use paragraphs by default, bullets for parallel items or steps, headings only when they help navigation, and bold only for a term the reader must find again. | Use numbered steps with nested sub-steps, bullets for parallel items, a table for comparisons across attributes, paragraphs for reasoning, headings only when they help navigation, and bold only for a term the reader must find again. | 27 → 36 (+9) |
+| `output-styles/README.md:15` | Purpose 칸: "…without AI mannerisms or decorative structure" | `:3`의 새 description과 같은 문구 | 스타일 본문 아님. 이 사본이 같은지 확인하는 테스트는 없다 |
+| `:23` 둘째 문장 | Use paragraphs by default, bullets for parallel items or steps, headings only when they help navigation, and bold only for a term the reader must find again. | Use numbered steps for sequences, with sub-steps nested, bullets for parallel items, tables for comparisons, paragraphs for reasoning, headings only when they help navigation, and bold only for a term the reader must find again. | 27 → 35 (+8) |
 | `:23` 마지막 문장 | Do not force groups of three or symmetry. | (삭제, `:33`으로 합침) | −8 |
 | `:33` 둘째 문장 | Do not invent categories or lists to make a simple point appear comprehensive. | Do not force threes or symmetry, or invent categories to look comprehensive. | 13 → 12 (−1) |
 | `:48` | 4. Template transitions, ornamental contrasts, and unnecessary formatting are gone, and the wording reads as native. | 4. Template transitions and ornamental contrasts are gone, form follows content, and the wording reads as native. | 16 → 17 (+1) |
 
-본문은 598 → 599단어가 된다. `:33`에서 "lists"를 뺀 이유는, 이 단어가 목록을 피하라는 신호를 한 번 더 주기 때문이다.
+본문은 598단어에서 그대로 598단어다. "for sequences"는 번호 목록을 쓸 조건이다. 이 조건이 없으면 모든 답을 번호 목록으로 쓰라는 뜻으로 읽힐 수 있다. `:33`에서 "lists"를 뺀 이유는, 이 단어가 목록을 피하라는 신호를 한 번 더 주기 때문이다.
 
 - [ ] Step 1: 실패하는 테스트는 Task 1의 기준선이다(S1~S3 중 실패한 기준).
-- [ ] Step 2: 위 표대로 교체한다.
+- [ ] Step 2: 위 표대로 교체한다. `README.md:15`도 같은 커밋에서 바꾼다.
 - [ ] Step 3: `uv run pytest tests/unit/test_output_style_structure.py -q`를 실행한다. 단어 한도 테스트와 언어 중립 테스트가 통과해야 한다.
-- [ ] Step 4: 같은 방법으로 스타일 조건만 다시 측정한다(기본 조건은 Task 1 값을 재사용). S1~S6이 모두 통과해야 한다. 실패하면 단어 한도 안에서 문구를 바꿔 다시 측정한다. 시도는 최대 3회이고, 시도마다 문구와 수치를 `06-measurement.md`에 남긴다(연구 문서 §5 방식). 3회 안에 통과하지 못하면 멈추고 보고한다.
-- [ ] Step 5: `uv run pytest`가 0으로 끝나고 `make lint`가 통과해야 한다.
-- [ ] Step 6: Commit `fix(output-style): name the shapes that take lists and tables in Plain Language`. 측정 결과는 `06-measurement.md`에 추가하고, 이 커밋에 함께 넣는다.
+- [ ] Step 4: 같은 방법으로 스타일 조건만 다시 측정한다. 기본 조건은 Task 1 값을 재사용하되, `claude --version`이 Task 1과 다르면 기본 조건도 다시 측정한다. S1~S6이 모두 통과해야 한다. 실패하면 단어 한도 안에서 문구를 바꿔 다시 측정한다. 시도는 최대 3회이고, 시도마다 문구와 수치를 `06-measurement.md`에 남긴다(연구 문서 §5 방식). 3회 안에 통과하지 못하면 멈추고 보고한다.
+- [ ] Step 5: 문장 길이 게이트를 판정한다. Step 4에서 통과한 문구로 측정한 값을 쓴다. 목록과 표가 늘면 긴 문장도 같이 줄어들 수 있기 때문이다. 8개 프롬프트 중 3개 이상에서 스타일 `sent_len`이 기본 조건 × 1.15 이상이면 Task 3을 실행한다. 그렇지 않으면 Phase 3 줄과 Task 3의 Step 1~6을 모두 `- [x] ~~…~~`로 표시하고, `## Deviations`에 수치와 함께 이유를 적는다.
+- [ ] Step 6: `uv run pytest`가 0으로 끝나고 `make lint`가 통과해야 한다.
+- [ ] Step 7: Commit `fix(output-style): name the shapes that take lists and tables in Plain Language`. 측정 결과는 `06-measurement.md`에 추가하고, 이 커밋에 함께 넣는다.
 
 ### Task 3: 문장 길이 문구 교체 (조건부)
 
@@ -125,30 +131,32 @@ uv run python "$P/metrics.py" "$P/out" > "$P/out/metrics.tsv"
 | `:7` 둘째 문장 | Keep enough detail to be useful; brevity must not make the response abrupt or incomplete. | Keep the detail the request needs and no more. | 15 → 9 (−6) |
 | `:23` 첫 문장 끝 | do not turn concision into fragments | split a sentence that joins two conditions | 6 → 7 (+1) |
 
-본문은 599 → 594단어가 된다.
+본문은 598 → 593단어가 된다.
 
-- [ ] Step 1: 실패하는 테스트는 Task 1에서 L1을 넘은 프롬프트들이다.
+- [ ] Step 1: 실패하는 테스트는 Task 2 Step 5에서 L1을 넘은 프롬프트들이다.
 - [ ] Step 2: 위 표대로 교체한다.
 - [ ] Step 3: `uv run pytest tests/unit/test_output_style_structure.py -q`가 통과해야 한다.
 - [ ] Step 4: 스타일 조건만 다시 측정한다. L1이 통과하고 S1~S6이 계속 통과해야 한다. `words`가 기본 조건의 70% 아래로 떨어지면 과교정으로 본다. 이 경우 `:7`을 원래 문장으로 되돌리고 `:23` 교체만 남긴 채 다시 측정한다. 시도 횟수 제한과 기록 방법은 Task 2와 같다.
 - [ ] Step 5: `uv run pytest`가 0으로 끝나고 `make lint`가 통과해야 한다.
 - [ ] Step 6: Commit `fix(output-style): split long sentences in Plain Language`, `06-measurement.md` 포함.
 
-### Task 4: 병합과 동기화
+### Task 4: 동기화와 계획 종료
 
 **Files:** Modify: `docs/features/plain-language-structure/README.md`, `05-plan.md` (frontmatter)
 
-- [ ] Step 1: `master`로 `--no-ff` 병합하고 푸시한다.
-- [ ] Step 2: `superclaude doctor --scope local`로 local 설치가 있는지 확인한 뒤 `superclaude install --force --scope local`을 실행한다(gotcha `sync-scope-creates`, `windows-make-sync-broken`). `.claude/output-styles/plain-language.md`가 저장소 파일과 같아야 한다(`diff`의 출력이 없어야 함).
-- [ ] Step 3: 이 문서의 체크박스를 모두 체크했는지 확인하고 `status: complete`로 바꾼다. README는 `phase: complete`로 바꾼다.
-- [ ] Step 4: Commit `docs(plain-language): close the structure plan`. CHANGELOG 항목은 다음 버전 bump 커밋에서 `### Changed` 아래에 쓴다. 예: "Plain Language output style: steps come out as numbered lists with nested sub-steps, comparisons as tables."
+- [ ] Step 1: 브랜치에서 `superclaude doctor --scope local`로 local 설치가 있는지 확인한 뒤 `superclaude install --force --scope local`을 실행한다(gotcha `sync-scope-creates`, `windows-make-sync-broken`). 설치는 작업 트리에서 하므로, 이때 설치되는 내용은 병합될 내용과 같다. `.claude/output-styles/plain-language.md`가 저장소 파일과 같아야 한다(`diff`의 출력이 없어야 함).
+- [ ] Step 2: 이 문서의 체크박스를 모두 체크했는지 확인하고 `status: complete`로 바꾼다. README는 `phase: complete`로 바꾼다.
+- [ ] Step 3: 브랜치에서 Commit `docs(plain-language): close the structure plan`.
+
+체크리스트 밖의 마무리: 닫는 커밋 다음에 `master`로 `--no-ff` 병합하고 푸시한다. 병합 단계를 체크박스로 두지 않은 이유는, 병합보다 먼저 만드는 닫는 커밋에서는 이 박스를 체크할 수 없기 때문이다. CHANGELOG 항목은 다음 버전 bump 커밋에서 `### Changed` 아래에 쓴다. 예: "Plain Language output style: steps come out as numbered lists with nested sub-steps, comparisons as tables."
 
 ## Risks
 
 - **측정 해석 (가장 위험한 단계, Task 2 Step 4):** 실행마다 편차가 크다(같은 문구에서 헤더가 0개였다가 5개). 3회 중 2회 기준을 써도 통과와 실패가 우연일 수 있다. 판정이 경계에 걸리면 해당 셀만 3회 더 돌려 6회 중 4회로 판정한다.
 - **과교정:** 표 규칙 때문에 대조군 질문에도 표나 헤더가 생길 수 있다. S4로 감시한다. 연구 문서 70행의 "bold as inline heading" 잔여 문제가 커질 수도 있다.
 - **기존 규칙 회귀:** 표와 목록이 늘면 레이블 뒤 대시(연구 문서 §5)와 끝맺음 제안이 다시 나타날 수 있다. S5로 감시한다.
-- **단어 예산:** Phase 2가 끝나면 여유가 1단어뿐이다. Task 2 Step 4에서 다시 쓰는 문구도 600단어를 넘으면 안 된다.
+- **단어 예산:** Phase 2가 끝나도 여유는 2단어뿐이다(Phase 3까지 하면 7단어). Task 2 Step 4에서 다시 쓰는 문구도 600단어를 넘으면 안 된다.
+- **사본 불일치:** description은 `output-styles/README.md:15`에도 복사되어 있다. 이 사본이 같은지 확인하는 테스트가 없으므로, Task 2 Step 2에서 함께 바꾸지 않으면 suite가 통과한 채로 문구가 어긋난다.
 - **사용자 노출:** `description`은 `/config` picker에 보이는 문구다. `name`은 바꾸지 않으므로 기존 `outputStyle` 설정은 그대로 동작한다.
 - **모델 범위:** Opus 5.5만 측정한다. Fable 5.1은 기본 조건에서도 헤더가 0개였으므로 효과가 다를 수 있다.
 
@@ -164,10 +172,11 @@ uv run python "$P/metrics.py" "$P/out" > "$P/out/metrics.tsv"
 
 ## Proof
 
-- `uv run pytest tests/unit/test_output_style_structure.py -q`: 모두 통과해야 한다. 단어 한도 테스트가 599(Phase 3를 하면 594) ≤ 600으로 통과한다.
+- `uv run pytest tests/unit/test_output_style_structure.py -q`: 모두 통과해야 한다. 단어 한도 테스트는 598(Phase 3까지 하면 593) ≤ 600이라서 통과한다.
 - `uv run pytest`: 0으로 끝나야 한다.
 - `uv run python "$P/metrics.py" "$P/out"`: 스타일 조건이 S1~S6을 통과하고, Phase 3을 했다면 L1도 통과해야 한다. 판정 표는 `06-measurement.md`에 기록한다.
 - `diff src/superclaude/output-styles/plain-language.md .claude/output-styles/plain-language.md`: 출력이 없어야 한다.
+- `grep -rn "decorative structure" src/`: 출력이 없어야 한다(description 사본까지 모두 바뀌었다는 확인).
 
 ## Deviations
 
