@@ -1,5 +1,5 @@
 ---
-status: draft
+status: implementing
 revised: 2026-10-10
 ---
 
@@ -121,7 +121,7 @@ measure() {
 
 ## Phase 순서
 
-- [ ] Phase 1: 측정 도구 확인과 Sonnet 5.5 기준선 측정 (src 변경 없음)
+- [x] Phase 1: 측정 도구 확인과 Sonnet 5.5 기준선 측정 (src 변경 없음)
 - [ ] Phase 2: 구조 문구 교체 (`:3`, `:23`, `:33`, `:48`, `output-styles/README.md:15`)
 - [ ] Phase 3: 문장 길이 문구 교체 (`:23`, 필요하면 `:7`). Phase 2 측정 결과가 L1 진입 조건을 넘을 때만 실행한다.
 - [ ] Phase 4: local scope 동기화와 계획 종료
@@ -130,28 +130,28 @@ measure() {
 
 **Files:** Create: `docs/features/plain-language-structure/06-measurement.md` | Modify: `05-plan.md`, `README.md` (frontmatter)
 
-- [ ] Step 1: 측정 도구를 만든다. 위 프롬프트 표를 탭으로 구분해 `$P/prompts.tsv`에 저장하고, 지표 정의대로 `$P/metrics.py`를 작성한다. 두 파일은 커밋하지 않는다.
-- [ ] Step 2: 설정이 실제로 먹히는지 확인한다. 아래 확인을 모두 통과해야 다음 단계로 간다.
+- [x] Step 1: 측정 도구를 만든다. 위 프롬프트 표를 탭으로 구분해 `$P/prompts.tsv`에 저장하고, 지표 정의대로 `$P/metrics.py`를 작성한다. 두 파일은 커밋하지 않는다.
+- [x] Step 2: 설정이 실제로 먹히는지 확인한다. 아래 확인을 모두 통과해야 다음 단계로 간다.
   - **스타일 주입:** `$S_STY`로 "Quote the first sentence of any output-style instructions you were given."를 물으면 "Write natural, direct prose in the user's language."가 나와야 한다. `$S_DEF`로 물으면 나오지 않아야 한다.
   - **플러그인 차단:** `$S_DEF`로 "Does your context contain any text mentioning claude-mem or context-mode? Answer yes or no and quote one line."를 묻는다. `--settings` 없이 같은 질문을 한 결과와 비교한다.
   - **차단이 안 될 때:** `S_DEF='{}'`, `S_STY='{"outputStyle":"Plain Language"}'`로 바꾼다. 그러면 이후 모든 측정에서 기본 조건을 다시 돌려야 한다(`conds="default style"`). 이 사실을 `06-measurement.md`에 적는다.
   - **모델 기록:** `claude -p "hi" --model "$M" --output-format json`을 실행해 모델 ID를 기록한다.
-- [ ] Step 3: 스크립트가 맞게 세는지 확인한다.
+- [x] Step 3: 스크립트가 맞게 세는지 확인한다.
   - `en-steps`와 `ko-compare` 두 줄만 담은 TSV로 `measure smoke <tsv> "default style"`을 실행한다.
   - 출력 파일 12개가 모두 비어 있지 않아야 한다. 각 답변은 자기 프롬프트에만 답해야 한다. 한국어 프롬프트에는 한국어 답이 나와야 한다(Windows에서 인자 인코딩 확인).
   - 목록이 있는 답변, 표가 있는 답변, 문단 위주의 답변을 하나씩 골라 모든 지표를 손으로 센다. 스크립트 결과와 다르면 스크립트를 고치고 다시 센다.
-- [ ] Step 4: `measure base "$P/prompts.tsv" "default style"`를 실행한다(8 프롬프트 × 2 조건 × 3회 = 48회).
-- [ ] Step 5: 구조 가설을 판정한다. 스타일 조건이 S1~S3 중 하나 이상에서 실패해야 가설이 확인된다.
+- [x] Step 4: `measure base "$P/prompts.tsv" "default style"`를 실행한다(8 프롬프트 × 2 조건 × 3회 = 48회).
+- [x] Step 5: 구조 가설을 판정한다. 스타일 조건이 S1~S3 중 하나 이상에서 실패해야 가설이 확인된다.
   - **반증되는 경우:** 판정할 셀이 하나도 없거나 스타일 조건이 판정 대상 셀을 모두 통과하면, Sonnet 5.5에서는 가설이 반증된 것이다. 그러면 "중단 경로"의 반증 절차를 따른다.
   - **기록만 하는 값:** S4~S6 값(이후 회귀 기준의 기준값)과 L1 비율은 여기서 기록만 한다.
-- [ ] Step 6: 이 문서를 `status: implementing`, README를 `phase: implementing`으로 바꾼다. `06-measurement.md`에 아래를 기록한다. README `## Documents`에 항목을 추가하고 `updated:`를 갱신한다.
+- [x] Step 6: 이 문서를 `status: implementing`, README를 `phase: implementing`으로 바꾼다. `06-measurement.md`에 아래를 기록한다. README `## Documents`에 항목을 추가하고 `updated:`를 갱신한다.
   - `claude --version`과 모델 ID
   - 플러그인 차단 여부
   - 프롬프트 표
   - `out-base/metrics.tsv`의 조건별 평균 표
   - S1~S3 판정과 판정에서 뺀 셀
   - S4~S6 기준값과 L1 비율
-- [ ] Step 7: Commit `docs(plain-language): record the Sonnet 5.5 structure baseline`
+- [x] Step 7: Commit `docs(plain-language): record the Sonnet 5.5 structure baseline`
 
 ### Task 2: 구조 문구 교체
 
@@ -238,7 +238,6 @@ measure() {
 ## Risks
 
 - **측정 해석 (가장 위험한 단계, Task 2 Step 4):** 실행마다 편차가 크다(같은 문구에서 헤더가 0개였다가 5개). 3회 측정으로는 방향만 알 수 있고 크기는 알 수 없다(연구 문서 64행). 회귀 기준은 합계와 허용 폭을 두어 우연한 실패를 줄였다.
-- **플러그인 차단 실패:** 측정 시점마다 `claude-mem`이 주입하는 내용이 달라진다. 대응은 Task 1 Step 2의 대체 절차다.
 - **과교정:** 표 규칙 때문에 대조군 질문에도 표나 목록이 생길 수 있다. S4로 감시한다. 연구 문서 70행의 "bold as inline heading" 잔여 문제가 커질 수도 있다.
 - **기존 규칙 회귀:** 표와 목록이 늘면 레이블 뒤 대시(연구 문서 §5)와 끝맺음 제안이 다시 나타날 수 있다. S5로 감시한다.
 - **단어 예산:** Phase 2가 끝나도 여유는 2단어다. Phase 3 시도 A 뒤에는 1단어, B까지 하면 7단어다. 다시 쓰는 문구도 600단어를 넘으면 안 된다.
@@ -268,3 +267,4 @@ measure() {
 ## Deviations
 
 - 측정 모델: Opus 5.5 → Sonnet 5.5 (사용자 지시, 구현 시작 전).
+- `offer` 정규식을 넓혔다. 계획의 정규식은 스모크 답변의 끝맺음 제안 7개를 모두 놓쳤다(`06-measurement.md`).

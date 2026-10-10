@@ -1,6 +1,6 @@
 ---
 feature: plain-language-structure
-phase: planning
+phase: implementing
 owner: ajitta
 created: 2026-10-10
 updated: 2026-10-10
@@ -14,3 +14,4 @@ Plain Language 출력 스타일(`src/superclaude/output-styles/plain-language.md
 ## Documents
 
 - [05-plan.md](./05-plan.md): Sonnet 5.5 기준선 측정, 구조 문구 교체, 조건부 문장 길이 문구 교체, 동기화 순서와 통과 기준
+- [06-measurement.md](./06-measurement.md): 측정 환경, 측정 도구 변경, Sonnet 5.5 기준선과 시도별 판정 수치
