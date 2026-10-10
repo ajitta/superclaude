@@ -1,5 +1,5 @@
 ---
-status: implementing
+status: complete
 revised: 2026-10-10
 ---
 
@@ -20,16 +20,16 @@ revised: 2026-10-10
 
 ## Tasks
 
-- [ ] Task 1: 시도 A. `:23` 첫 문장 끝 "do not turn concision into fragments"를 "split a sentence that joins two conditions"로 바꾼다(본문 598 → 599단어).
+- [x] ~~Task 1: 시도 A. `:23` 첫 문장 끝 "do not turn concision into fragments"를 "split a sentence that joins two conditions"로 바꾼다(본문 598 → 599단어).~~
   - `uv run pytest tests/unit/test_output_style_structure.py -q`가 통과해야 한다.
   - `measure p3-a "$P/prompts.tsv" "style"`로 측정하고 위 통과 조건으로 판정한다.
   - 통과하면 Task 2를 건너뛴다(`- [x] ~~…~~`, Deviations에 이유).
-- [ ] Task 2: 시도 B (A가 L1에서만 실패했을 때). `:7` 둘째 문장 "Keep enough detail to be useful; brevity must not make the response abrupt or incomplete."를 "Keep the detail the request needs and no more."로 바꾼다(599 → 593단어). `p3-b`로 측정한다. 과교정이면 B를 되돌린다.
-- [ ] Task 3: 기록과 커밋.
+- [x] ~~Task 2: 시도 B (A가 L1에서만 실패했을 때). `:7` 둘째 문장 "Keep enough detail to be useful; brevity must not make the response abrupt or incomplete."를 "Keep the detail the request needs and no more."로 바꾼다(599 → 593단어). `p3-b`로 측정한다. 과교정이면 B를 되돌린다.~~
+- [x] ~~Task 3: 기록과 커밋.~~
   - 시도별 문구와 수치를 `06-measurement.md`에 적는다.
   - `uv run pytest`가 0으로 끝나고 `make lint`가 통과해야 한다.
   - Commit `fix(output-style): split long sentences in Plain Language`.
-- [ ] Task 4: local scope 동기화.
+- [x] ~~Task 4: local scope 동기화.~~
   - `superclaude doctor --scope local`로 확인한 뒤 `superclaude install --force --scope local`을 실행한다.
   - `diff src/superclaude/output-styles/plain-language.md .claude/output-styles/plain-language.md`의 출력이 없어야 한다.
   - 이 문서를 `status: complete`로 바꾸고 커밋한다.
@@ -48,3 +48,4 @@ A와 B 모두 실패하면 05-plan과 같은 실패 절차를 따른다. src를 
 - 시도 순서: A가 L1과 S4(en-narrative 불릿)에서 함께 실패해 B의 실행 조건(L1만 실패)에 맞지 않았다. A가 S4 실패를 일으킨 것으로 보고, 두 번째 시도는 A+B 대신 B만 적용했다. 세 번째 시도는 "Keep most sentences short"로 다시 썼다.
 - en-narrative 6회: S4 판정이 3회 표본에 흔들려, 수정 전 스타일과 각 시도의 en-narrative를 6회로 늘렸다.
 - 중단: 세 시도 모두 L1에서 실패했다(평균 r 1.158, 1.145, 1.135, 기준선 1.140). src는 되돌렸다. 수치는 `06-measurement.md`.
+- 계획 종료(사용자 결정, 2026-10-10): 세 시도 실패 뒤 문장 길이 지표가 사용자 문제(문단 안에 이어 쓴 조건·분기·순서)를 재지 못한다는 것이 확인됐다. Task 3·4는 하지 않고, 후속은 새 출력 스타일 작업으로 넘긴다.

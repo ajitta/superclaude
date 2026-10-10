@@ -1,5 +1,5 @@
 ---
-status: implementing
+status: complete
 revised: 2026-10-10
 ---
 
@@ -122,9 +122,9 @@ measure() {
 ## Phase 순서
 
 - [x] Phase 1: 측정 도구 확인과 Sonnet 5.5 기준선 측정 (src 변경 없음)
-- [ ] Phase 2: 구조 문구 교체 (`:3`, `:23`, `:33`, `:48`, `output-styles/README.md:15`)
-- [ ] Phase 3: 문장 길이 문구 교체. Task 2 중단 뒤 [05a-plan-sentence-length.md](./05a-plan-sentence-length.md)로 옮겼다.
-- [ ] Phase 4: local scope 동기화와 계획 종료
+- [x] ~~Phase 2: 구조 문구 교체 (`:3`, `:23`, `:33`, `:48`, `output-styles/README.md:15`)~~
+- [x] ~~Phase 3: 문장 길이 문구 교체. Task 2 중단 뒤 [05a-plan-sentence-length.md](./05a-plan-sentence-length.md)로 옮겼다.~~
+- [x] ~~Phase 4: local scope 동기화와 계획 종료~~
 
 ### Task 1: 측정 도구 확인과 기준선 측정
 
@@ -173,18 +173,18 @@ measure() {
 - **`:33`에서 "lists"를 뺀 이유:** 목록을 피하라는 신호를 한 번 더 주기 때문이다.
 - **`:48`의 "form fits content":** 비유가 아닌 문자 그대로의 표현이다.
 
-- [ ] Step 1: 실패하는 테스트는 Task 1의 기준선이다(S1~S3 중 실패한 기준).
-- [ ] Step 2: 위 표대로 교체한다. `README.md:15`도 같은 커밋에서 바꾼다.
-- [ ] Step 3: `uv run pytest tests/unit/test_output_style_structure.py -q`를 실행한다. 단어 한도 테스트와 언어 중립 테스트가 통과해야 한다.
-- [ ] Step 4: 다시 측정한다. `measure p2-1 "$P/prompts.tsv" "style"`을 실행한다. 두 번째, 세 번째 시도는 `p2-2`, `p2-3`이다.
+- [x] ~~Step 1: 실패하는 테스트는 Task 1의 기준선이다(S1~S3 중 실패한 기준).~~
+- [x] ~~Step 2: 위 표대로 교체한다. `README.md:15`도 같은 커밋에서 바꾼다.~~
+- [x] ~~Step 3: `uv run pytest tests/unit/test_output_style_structure.py -q`를 실행한다. 단어 한도 테스트와 언어 중립 테스트가 통과해야 한다.~~
+- [x] ~~Step 4: 다시 측정한다. `measure p2-1 "$P/prompts.tsv" "style"`을 실행한다. 두 번째, 세 번째 시도는 `p2-2`, `p2-3`이다.~~
   - **기본 조건 재측정:** 플러그인 차단이 안 됐거나 `claude --version`이 Task 1과 다르면 `"default style"`로 기본 조건도 다시 돌린다. 이때 S1~S3과 L1은 같은 측정의 기본 조건과 비교한다. 그렇지 않으면 `out-base`의 기본 조건을 쓴다.
   - **판정:** S1~S6이 모두 통과해야 한다.
   - **실패할 때:** 단어 한도 안에서 문구를 바꿔 다시 측정한다. 시도는 최대 3회이고, 시도마다 문구와 수치를 `06-measurement.md`에 남긴다(연구 문서 §5 방식). 3회 안에 통과하지 못하면 "중단 경로"의 실패 절차를 따른다.
-- [ ] Step 5: L1 진입 조건을 판정한다. Step 4에서 통과한 문구로 측정한 값을 쓴다. 목록과 표가 늘면 긴 문장도 같이 줄어들 수 있기 때문이다.
+- [x] ~~Step 5: L1 진입 조건을 판정한다. Step 4에서 통과한 문구로 측정한 값을 쓴다. 목록과 표가 늘면 긴 문장도 같이 줄어들 수 있기 때문이다.~~
   - **진입 조건을 넘으면:** Task 3을 실행한다.
   - **넘지 않으면:** Phase 3 줄과 Task 3의 모든 단계를 `- [x] ~~…~~`로 표시하고, `## Deviations`에 L1 비율과 함께 이유를 적는다.
-- [ ] Step 6: `uv run pytest`가 0으로 끝나고 `make lint`가 통과해야 한다.
-- [ ] Step 7: Commit `fix(output-style): name the shapes that take lists and tables in Plain Language`. `06-measurement.md`도 이 커밋에 함께 넣는다.
+- [x] ~~Step 6: `uv run pytest`가 0으로 끝나고 `make lint`가 통과해야 한다.~~
+- [x] ~~Step 7: Commit `fix(output-style): name the shapes that take lists and tables in Plain Language`. `06-measurement.md`도 이 커밋에 함께 넣는다.~~
 
 ### Task 3: 문장 길이 문구 교체 (조건부)
 
@@ -197,27 +197,27 @@ measure() {
 | A | `:23` 첫 문장 끝 | do not turn concision into fragments | split a sentence that joins two conditions | 598 → 599 |
 | B (A로 부족할 때) | `:7` 둘째 문장 | Keep enough detail to be useful; brevity must not make the response abrupt or incomplete. | Keep the detail the request needs and no more. | 599 → 593 |
 
-- [ ] Step 1: 실패하는 테스트는 Task 2 Step 5에서 r ≥ 1.15였던 프롬프트들이다.
-- [ ] Step 2: 시도 A를 적용한다.
-- [ ] Step 3: `uv run pytest tests/unit/test_output_style_structure.py -q`가 통과해야 한다.
-- [ ] Step 4: `measure p3-a "$P/prompts.tsv" "style"`을 실행한다(기본 조건 재측정 규칙은 Task 2 Step 4와 같다).
+- [x] ~~Step 1: 실패하는 테스트는 Task 2 Step 5에서 r ≥ 1.15였던 프롬프트들이다.~~
+- [x] ~~Step 2: 시도 A를 적용한다.~~
+- [x] ~~Step 3: `uv run pytest tests/unit/test_output_style_structure.py -q`가 통과해야 한다.~~
+- [x] ~~Step 4: `measure p3-a "$P/prompts.tsv" "style"`을 실행한다(기본 조건 재측정 규칙은 Task 2 Step 4와 같다).~~
   - **판정:** L1 통과 조건을 만족하고, S1~S6이 계속 통과해야 한다.
   - **L1만 실패하면:** 시도 B를 더해 `p3-b`로 다시 측정한다.
   - **과교정:** 스타일 `words` 합계가 기본 조건 합계의 70% 아래로 떨어지면 과교정이다. 이 경우 B를 되돌린다.
   - **실패할 때:** A와 B 모두 통과하지 못하면 "중단 경로"의 실패 절차를 따른다.
-- [ ] Step 5: `uv run pytest`가 0으로 끝나고 `make lint`가 통과해야 한다.
-- [ ] Step 6: Commit `fix(output-style): split long sentences in Plain Language`, `06-measurement.md` 포함.
+- [x] ~~Step 5: `uv run pytest`가 0으로 끝나고 `make lint`가 통과해야 한다.~~
+- [x] ~~Step 6: Commit `fix(output-style): split long sentences in Plain Language`, `06-measurement.md` 포함.~~
 
 ### Task 4: 동기화와 계획 종료
 
 **Files:** Modify: `docs/features/plain-language-structure/README.md`, `05-plan.md` (frontmatter)
 
-- [ ] Step 1: 브랜치에서 local scope 설치를 갱신한다(gotcha `sync-scope-creates`, `windows-make-sync-broken`).
+- [x] ~~Step 1: 브랜치에서 local scope 설치를 갱신한다(gotcha `sync-scope-creates`, `windows-make-sync-broken`).~~
   - `superclaude doctor --scope local`로 local 설치가 있는지 확인한 뒤 `superclaude install --force --scope local`을 실행한다.
   - 설치는 작업 트리에서 하므로, 이때 설치되는 내용은 병합될 내용과 같다.
   - `.claude/output-styles/plain-language.md`가 저장소 파일과 같아야 한다(`diff`의 출력이 없어야 함).
-- [ ] Step 2: 이 문서의 체크박스를 모두 체크했는지 확인하고 `status: complete`로 바꾼다. README는 `phase: complete`로 바꾼다.
-- [ ] Step 3: 브랜치에서 Commit `docs(plain-language): close the structure plan`. 측정 디렉터리 `$P`를 지운다.
+- [x] Step 2: 이 문서의 체크박스를 모두 체크했는지 확인하고 `status: complete`로 바꾼다. README는 `phase: complete`로 바꾼다.
+- [x] Step 3: 브랜치에서 Commit `docs(plain-language): close the structure plan`. 측정 디렉터리 `$P`를 지운다.
 
 **체크리스트 밖의 마무리:**
 - 닫는 커밋 다음에 `master`로 `--no-ff` 병합하고 푸시한다. 닫는 커밋이 먼저이므로 병합은 체크박스로 두지 않는다.
@@ -240,7 +240,6 @@ measure() {
 - **측정 해석 (가장 위험한 단계, Task 2 Step 4):** 실행마다 편차가 크다(같은 문구에서 헤더가 0개였다가 5개). 3회 측정으로는 방향만 알 수 있고 크기는 알 수 없다(연구 문서 64행). 회귀 기준은 합계와 허용 폭을 두어 우연한 실패를 줄였다.
 - **과교정:** 표 규칙 때문에 대조군 질문에도 표나 목록이 생길 수 있다. S4로 감시한다. 연구 문서 70행의 "bold as inline heading" 잔여 문제가 커질 수 있다.
 - **기존 규칙 회귀:** 표와 목록이 늘면 레이블 뒤 대시(연구 문서 §5)와 끝맺음 제안이 다시 나타날 수 있다. S5로 감시한다.
-- **단어 예산:** Phase 2 뒤 여유는 2단어다. 다시 쓰는 문구도 600단어를 넘으면 안 된다.
 - **사용자 노출:** `description`은 `/config` picker에 보인다. `name`은 그대로이므로 기존 `outputStyle` 설정은 계속 동작한다.
 - **모델 범위:** Sonnet 5.5만 측정한다. Opus 5.5와 Fable 5.1에서는 효과가 다를 수 있다.
 
@@ -266,6 +265,6 @@ measure() {
 
 ## Deviations
 
-- 측정 모델: Opus 5.5 → Sonnet 5.5 (사용자 지시, 구현 시작 전).
+- 측정 모델: Opus 5.5 → Sonnet 5.5 (사용자 지시).
 - `offer` 정규식을 넓혔다. 계획의 정규식은 스모크 답변의 끝맺음 제안 7개를 모두 놓쳤다(`06-measurement.md`).
-- Task 2 중단: 시도 3회 모두 S1 하위 단계에서 실패했다(S3, S4, S6도 일부). src는 되돌렸다. 시도 3은 교체 범위 밖인 `:7`을 바꿨고, 계획 밖의 원인 분리 측정을 돌렸다. 수치는 `06-measurement.md`.
+- Task 2 중단 뒤 계획 종료(사용자 결정): 시도 3회 모두 S1 하위 단계에서 실패했다(S3, S4, S6도 일부). 시도 3은 교체 범위 밖인 `:7`을 바꿨고, 계획 밖의 원인 분리 측정을 돌렸다. src를 되돌려 동기화는 생략했다. 수치는 `06-measurement.md`.
