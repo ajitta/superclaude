@@ -45,4 +45,6 @@ A와 B 모두 실패하면 05-plan과 같은 실패 절차를 따른다. src를 
 
 ## Deviations
 
-(없음)
+- 시도 순서: A가 L1과 S4(en-narrative 불릿)에서 함께 실패해 B의 실행 조건(L1만 실패)에 맞지 않았다. A가 S4 실패를 일으킨 것으로 보고, 두 번째 시도는 A+B 대신 B만 적용했다. 세 번째 시도는 "Keep most sentences short"로 다시 썼다.
+- en-narrative 6회: S4 판정이 3회 표본에 흔들려, 수정 전 스타일과 각 시도의 en-narrative를 6회로 늘렸다.
+- 중단: 세 시도 모두 L1에서 실패했다(평균 r 1.158, 1.145, 1.135, 기준선 1.140). src는 되돌렸다. 수치는 `06-measurement.md`.
