@@ -123,7 +123,7 @@ measure() {
 
 - [x] Phase 1: 측정 도구 확인과 Sonnet 5.5 기준선 측정 (src 변경 없음)
 - [ ] Phase 2: 구조 문구 교체 (`:3`, `:23`, `:33`, `:48`, `output-styles/README.md:15`)
-- [ ] Phase 3: 문장 길이 문구 교체 (`:23`, 필요하면 `:7`). Phase 2 측정 결과가 L1 진입 조건을 넘을 때만 실행한다.
+- [ ] Phase 3: 문장 길이 문구 교체. Task 2 중단 뒤 [05a-plan-sentence-length.md](./05a-plan-sentence-length.md)로 옮겼다.
 - [ ] Phase 4: local scope 동기화와 계획 종료
 
 ### Task 1: 측정 도구 확인과 기준선 측정

@@ -14,4 +14,5 @@ Plain Language 출력 스타일(`src/superclaude/output-styles/plain-language.md
 ## Documents
 
 - [05-plan.md](./05-plan.md): Sonnet 5.5 기준선 측정, 구조 문구 교체, 조건부 문장 길이 문구 교체, 동기화 순서와 통과 기준
+- [05a-plan-sentence-length.md](./05a-plan-sentence-length.md): Task 2 중단 뒤 문장 길이만 고치는 계획(05-plan Task 3을 옮김)
 - [06-measurement.md](./06-measurement.md): 측정 환경, 측정 도구 변경, Sonnet 5.5 기준선과 시도별 판정 수치
