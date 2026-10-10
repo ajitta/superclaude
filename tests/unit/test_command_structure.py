@@ -20,7 +20,7 @@ from tests.unit.md_helpers import (
 
 COMMANDS_DIR = Path(__file__).parent.parent.parent / "src" / "superclaude" / "commands"
 
-# Agent/skill-only fields that should never appear in command frontmatter
+# Fields SuperClaude commands never carry (agent-only, or valid in CC but excluded by SC policy)
 _SCHEMAS_PATH = (
     Path(__file__).parent.parent.parent / ".claude" / "rules" / "schemas.yaml"
 )
@@ -83,7 +83,7 @@ class TestCommandFrontmatter:
         assert len(fm["description"]) > 10, f"{stem}: description too short"
 
     def test_no_forbidden_fields(self, command):
-        """Commands should not contain agent/skill-only fields."""
+        """Commands should not contain fields listed in forbidden_command_fields."""
         stem, content, fm = command
         found = set(fm.keys()) & FORBIDDEN_FIELDS
         assert not found, f"{stem}: frontmatter contains forbidden field(s): {found}"
