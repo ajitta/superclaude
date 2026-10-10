@@ -1,0 +1,17 @@
+---
+feature: authoring-skill
+phase: design
+owner: ajitta
+created: 2026-10-10
+updated: 2026-10-10
+---
+
+# `sc-author` 스킬
+
+SuperClaude를 설치한 사용자 프로젝트에서 Claude가 읽는 Markdown 문서(skill, subagent, slash command, output style, CLAUDE.md와 `.claude/rules`)를 형식에 맞게 쓰고 고치는 스킬. 본문 형식은 `--md`(기본, Claude Code 공식 권장 구조)와 `--xml`(SuperClaude 컴포넌트 형식) 중 고르고, 결과는 함께 배포하는 `superclaude author-check` 검사기로 확인한다.
+
+계기: SuperClaude 사용자 프로젝트에서 이런 문서를 추가로 만들면 형식 없이 만들어진다(2026-10-10 세션, 사용자 보고). 결정 경위는 [04-design.md](./04-design.md)의 "입력" 절.
+
+## Documents
+
+- [04-design.md](./04-design.md) — 아키텍처 설계: 스킬 구성, 검사기 인터페이스, `skills` 설치 컴포넌트 복원, 저장소 규칙 SSOT 이동. §9 우려 사항은 2026-10-10 인터뷰로 해결 (draft)
