@@ -13,4 +13,4 @@ Plain Language 출력 스타일(`src/superclaude/output-styles/plain-language.md
 
 ## Documents
 
-- [05-plan.md](./05-plan.md): Opus 5.5 기준선 측정, 구조 문구 교체, 조건부 문장 길이 문구 교체, 동기화 순서와 통과 기준
+- [05-plan.md](./05-plan.md): Sonnet 5.5 기준선 측정, 구조 문구 교체, 조건부 문장 길이 문구 교체, 동기화 순서와 통과 기준

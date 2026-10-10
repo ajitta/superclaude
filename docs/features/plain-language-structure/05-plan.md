@@ -9,7 +9,7 @@ revised: 2026-10-10
 
 **Architecture:** 스타일 파일은 Claude Code가 시스템 프롬프트로 그대로 보내는 Markdown 본문이다. 따라서 수정은 문구 교체뿐이다. 효과는 headless `claude -p` A/B 측정으로 판정한다(기존 연구 문서 §3 방식). 본문은 598/600단어여서 문장을 추가할 수 없고, 모든 수정은 기존 문장을 바꾸는 방식으로 한다.
 
-**Tech Stack:** Markdown 출력 스타일, `claude -p` (`claude-opus-5-5`), pytest (`tests/unit/test_output_style_structure.py`), Python 측정 스크립트(커밋하지 않음)
+**Tech Stack:** Markdown 출력 스타일, `claude -p` (`claude-sonnet-5-5`), pytest (`tests/unit/test_output_style_structure.py`), Python 측정 스크립트(커밋하지 않음)
 
 **Branch:** `fix/plain-language-structure`. 모든 명령은 저장소 루트에서 Git Bash로 실행한다.
 
@@ -28,7 +28,7 @@ revised: 2026-10-10
 
 ```bash
 P=~/sc-probes/plain-language-2026-10-10
-M=claude-opus-5-5
+M=claude-sonnet-5-5
 S_DEF='{"enabledPlugins":{"claude-mem@thedotmack":false,"context-mode@context-mode":false}}'
 S_STY='{"outputStyle":"Plain Language","enabledPlugins":{"claude-mem@thedotmack":false,"context-mode@context-mode":false}}'
 mkdir -p "$P/default" "$P/style/.claude/output-styles"
@@ -121,7 +121,7 @@ measure() {
 
 ## Phase 순서
 
-- [ ] Phase 1: 측정 도구 확인과 Opus 5.5 기준선 측정 (src 변경 없음)
+- [ ] Phase 1: 측정 도구 확인과 Sonnet 5.5 기준선 측정 (src 변경 없음)
 - [ ] Phase 2: 구조 문구 교체 (`:3`, `:23`, `:33`, `:48`, `output-styles/README.md:15`)
 - [ ] Phase 3: 문장 길이 문구 교체 (`:23`, 필요하면 `:7`). Phase 2 측정 결과가 L1 진입 조건을 넘을 때만 실행한다.
 - [ ] Phase 4: local scope 동기화와 계획 종료
@@ -142,7 +142,7 @@ measure() {
   - 목록이 있는 답변, 표가 있는 답변, 문단 위주의 답변을 하나씩 골라 모든 지표를 손으로 센다. 스크립트 결과와 다르면 스크립트를 고치고 다시 센다.
 - [ ] Step 4: `measure base "$P/prompts.tsv" "default style"`를 실행한다(8 프롬프트 × 2 조건 × 3회 = 48회).
 - [ ] Step 5: 구조 가설을 판정한다. 스타일 조건이 S1~S3 중 하나 이상에서 실패해야 가설이 확인된다.
-  - **반증되는 경우:** 판정할 셀이 하나도 없거나 스타일 조건이 판정 대상 셀을 모두 통과하면, Opus 5.5에서는 가설이 반증된 것이다. 그러면 "중단 경로"의 반증 절차를 따른다.
+  - **반증되는 경우:** 판정할 셀이 하나도 없거나 스타일 조건이 판정 대상 셀을 모두 통과하면, Sonnet 5.5에서는 가설이 반증된 것이다. 그러면 "중단 경로"의 반증 절차를 따른다.
   - **기록만 하는 값:** S4~S6 값(이후 회귀 기준의 기준값)과 L1 비율은 여기서 기록만 한다.
 - [ ] Step 6: 이 문서를 `status: implementing`, README를 `phase: implementing`으로 바꾼다. `06-measurement.md`에 아래를 기록한다. README `## Documents`에 항목을 추가하고 `updated:`를 갱신한다.
   - `claude --version`과 모델 ID
@@ -151,7 +151,7 @@ measure() {
   - `out-base/metrics.tsv`의 조건별 평균 표
   - S1~S3 판정과 판정에서 뺀 셀
   - S4~S6 기준값과 L1 비율
-- [ ] Step 7: Commit `docs(plain-language): record the Opus 5.5 structure baseline`
+- [ ] Step 7: Commit `docs(plain-language): record the Sonnet 5.5 structure baseline`
 
 ### Task 2: 구조 문구 교체
 
@@ -243,7 +243,7 @@ measure() {
 - **기존 규칙 회귀:** 표와 목록이 늘면 레이블 뒤 대시(연구 문서 §5)와 끝맺음 제안이 다시 나타날 수 있다. S5로 감시한다.
 - **단어 예산:** Phase 2가 끝나도 여유는 2단어다. Phase 3 시도 A 뒤에는 1단어, B까지 하면 7단어다. 다시 쓰는 문구도 600단어를 넘으면 안 된다.
 - **사용자 노출:** `description`은 `/config` picker에 보이는 문구다. `name`은 바꾸지 않으므로 기존 `outputStyle` 설정은 그대로 동작한다.
-- **모델 범위:** Opus 5.5만 측정한다. Fable 5.1은 기본 조건에서도 헤더가 0개였으므로 효과가 다를 수 있다.
+- **모델 범위:** Sonnet 5.5만 측정한다. Opus 5.5와 Fable 5.1에서는 효과가 다를 수 있다.
 
 ## Alternatives not taken
 
@@ -267,4 +267,4 @@ measure() {
 
 ## Deviations
 
-(없음)
+- 측정 모델: Opus 5.5 → Sonnet 5.5 (사용자 지시, 구현 시작 전).
