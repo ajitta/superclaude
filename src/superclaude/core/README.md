@@ -16,7 +16,7 @@ Core files load via `CLAUDE_SC.md` `@import` at session start. Present in **ever
 | PRINCIPLES.md | Software engineering principles and decision frameworks | Always loaded |
 | RULES.md | ~0.9k-token behavioral kernel (scope, verification, destructive-op, project-rules-priority) + on-demand module map | Always loaded |
 | rules/RULES_QUALITY.md | R01–R21 detail + examples, verification_ladder, anti_over_engineering, checklist_scaling, thresholds | On-demand |
-| rules/RULES_DELEGATION.md | sub_agent_decision, delegate packet, agent_routing, workflow fan-out rules | On-demand |
+| rules/RULES_DELEGATION.md | sub_agent_decision, delegate_packet, delegate_return, workflow_delegation, agent_routing | On-demand |
 | rules/RULES_DOCS.md | doc_output_convention, workflow_gates | On-demand |
 | rules/RULES_INTERACTION.md | selection_protocol | On-demand |
 | BUSINESS_SYMBOLS.md | Symbol system for business strategy multi-expert panel | On-demand |
