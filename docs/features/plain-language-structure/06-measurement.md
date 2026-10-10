@@ -97,3 +97,49 @@ revised: 2026-10-10
 | ko-narrative | 40.83 | 32.75 | **1.247** |
 
 r ≥ 1.15인 프롬프트가 5개이고 평균 r은 1.133이다. 수정 전 스타일에서 이미 L1 진입 조건(3개 이상)을 넘는다. 계획대로 진입 판정은 Task 2를 통과한 문구로 측정한 값으로 한다. 스타일의 단어 수 합계는 기본 조건의 0.897배다. 분량은 줄었는데 문장은 길어졌으므로, 만연체 보고는 문장 하나의 길이 문제라는 가설과 맞는다.
+
+## Task 2 시도 (모두 실패, 중단)
+
+기본 조건은 `out-base`를 썼다(플러그인 차단이 되고 `claude --version`이 2.1.296으로 같다). 회귀 기준값은 위 기준선의 스타일 조건이다.
+
+| 시도 | `:23` 등 문구 (계획 표 대비 바뀐 부분) | 본문 단어 |
+|---|---|---|
+| p2-1 | 계획 표 그대로: "Use numbered steps for sequences, with sub-steps nested, bullets for parallel items, tables for comparisons, paragraphs for reasoning, …" | 598 |
+| p2-2 | "with sub-steps nested" → "nesting sub-steps as lists", "tables for comparisons" → "tables to compare options" | 600 |
+| p2-3 | 서식 목록을 `:23`에서 `:7` 첫 문장으로 옮겼다: "Write natural, direct text in the user's language, matching form to content: numbered steps with nested sub-steps for sequences, bullets for parallel items, tables to compare options, paragraphs for reasoning." `:23`에는 "Use headings only when …"만 남기고, `:48`의 "form fits content,"는 뺐다 | 600 |
+
+| 지표 | 기준선 스타일 | p2-1 | p2-2 | p2-3 |
+|---|---|---|---|---|
+| S1 하위 단계 en / ko | 1/3 / 1/6 | 0/3 / 1/3 | 0/3 / 0/3 | 2/3 / 0/3 |
+| S3 causes 목록 en / ko | 3/3 / 3/3 | 3/3 / 2/3 | 2/3 / 2/3 | 1/3 / 2/3 |
+| causes tables 평균 en / ko | 0 / 0 | 1.00 / 0.67 | 1.00 / 1.00 | 1.00 / 1.00 |
+| S4 narrative bullets en / ko (상한 2.00 / 2.67) | 1.00 / 1.67 | 2.00 / 1.00 | **3.00** / 1.00 | **3.67** / **4.33** |
+| S5 offer 합계 (상한 4) | 3 | 2 | 3 | 3 |
+| S6 words 합계 (상한 2899.8) | 2636.2 | **2911.3** | 2821.7 | **2944.0** |
+| L1 r ≥ 1.15 개수 / 평균 r | 5 / 1.133 | 5 / 1.189 | 6 / 1.201 | 4 / 1.172 |
+| 판정 | S1 실패 | S1, S6 실패 | S1, S4 실패 | S1, S3, S4, S6 실패 |
+
+S2(표)는 모든 시도에서 통과했고, emdash는 모든 시도에서 0이다. 표 규칙을 넣으면 원인 목록 질문(causes)까지 표로 답해 단어 수가 늘고 목록이 줄었다. 하위 단계 규칙은 어떤 문구로도 두 언어에서 함께 살아나지 않았다.
+
+## 원인 분리 측정 (계획 밖, steps 프롬프트만)
+
+시도 2 문구를 바탕으로 스타일 본문을 바꾼 사본을 `en-steps`, `ko-steps`에 3회씩 돌렸다. src는 바꾸지 않았다. 수치는 하위 단계가 나온 실행 수(en / ko)다.
+
+| 변형 | 본문 | 하위 단계 |
+|---|---|---|
+| p2-2 | 시도 2 문구 전체 | 0/3 / 0/3 |
+| V1 | "do not turn concision into fragments" 삭제 | 0/3 / 1/3 |
+| V2 | `:7` "prose" → "text" | 0/3 / 1/3 |
+| V4 | "previews of what follows" 삭제 | 1/3 / 0/3 |
+| V5 | AI mannerisms 절 삭제 | 0/3 / 1/3 |
+| V6 | Silent revision 절 삭제 | 1/3 / 1/3 |
+| V7 | Prose 절에서 `:23`만 남김 | 0/3 / 1/3 |
+| V9 | Language, Work reports 절 삭제 | 1/3 / 2/3 |
+| V8 | `:7`과 `:23` 두 문단만 (102단어) | 1/3 / 0/3 |
+| V10 | `:7`만 | 2/3 / 2/3 |
+| V11 | `:23`만 | 2/3 / 3/3 |
+| V3 | "Reply in the language the user writes in." 한 문장만 | 3/3 / 3/3 |
+
+- **스타일 기능 자체는 원인이 아니다:** 본문이 거의 빈 V3에서는 하위 단계가 모두 나온다.
+- **한 문장으로 켜고 끄는 스위치가 없다:** 어느 문장이나 절 하나를 빼도(V1, V2, V4~V7, V9) 살아나지 않는다. `:7`과 `:23`도 각각만 두면(V10, V11) 대체로 나오지만, 둘을 같이 두면(V8) 사라진다. 산문 쪽 지시가 쌓이는 만큼 목록이 줄어드는 누적 효과로 보인다. 다만 셀마다 3회라 방향만 보이고 크기는 알 수 없다.
+- **기본 조건의 "하위 단계"는 대부분 병렬 항목이다:** 기본 조건 답변에서 단계 헤딩 아래 불릿은 "이 명령 하나로 다음이 한꺼번에 처리됩니다" 뒤의 효과 목록이나 "Optional" 팁이다. 실제 하위 동작은 두 조건 모두 코드 블록으로 쓴다. 스타일은 이 병렬 항목을 문단으로 풀어 쓴다.
