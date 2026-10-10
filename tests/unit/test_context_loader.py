@@ -6,6 +6,7 @@ Tests: resolve_flags (alias/fuzzy matching),
 """
 
 import json
+import re
 from pathlib import Path
 
 import superclaude
@@ -350,6 +351,52 @@ class TestCoreLiteSplit:
         kernel = (self.SRC_CORE / "RULES.md").read_text(encoding="utf-8")
         for module in self._modules():
             assert module in kernel, f"kernel module map missing {module}"
+
+    @staticmethod
+    def _top_level_sections(text):
+        """Sections directly under the root tag, minus <role>. Tags sit at a
+        2-space indent at both levels, so nesting is read from line spans."""
+        spans, open_at = [], {}
+        for i, line in enumerate(text.splitlines()):
+            m = re.match(r"^  <(/?)([a-z][a-z_]*)[\s>/]", line)
+            if not m:
+                continue
+            closing, name = m.groups()
+            if closing:
+                spans.append((open_at.pop(name), i, name))
+            elif re.search(rf"</{name}>\s*$", line) or line.rstrip().endswith("/>"):
+                spans.append((i, i, name))
+            else:
+                open_at[name] = i
+        return {
+            name
+            for start, end, name in spans
+            if name != "role" and not any(s < start and end < e for s, e, _ in spans)
+        }
+
+    def test_module_tables_name_each_modules_sections(self):
+        """The kernel table and core/README.md each list every module's
+        sections by hand; a renamed or added section left both stale with
+        nothing failing. A cell is comma-separated section names, each
+        optionally followed by a parenthetical."""
+        row = re.compile(
+            r"^\s*\|\s*(?:core/)?rules/(RULES_\w+\.md)\s*\|([^|]+)\|", re.MULTILINE
+        )
+        for table in ("RULES.md", "README.md"):
+            text = (self.SRC_CORE / table).read_text(encoding="utf-8")
+            rows = dict(row.findall(text))
+            for module in self._modules():
+                name = module.removeprefix("core/rules/")
+                assert name in rows, f"{table}: no row for {name}"
+                cell = re.sub(r"\([^)]*\)", "", rows[name])
+                listed = {s.strip() for s in cell.split(",")}
+                actual = self._top_level_sections(
+                    (self.SRC_CORE / "rules" / name).read_text(encoding="utf-8")
+                )
+                assert listed == actual, (
+                    f"{table} row for {name}: missing {sorted(actual - listed)}, "
+                    f"not a section {sorted(listed - actual)}"
+                )
 
 
 LOADER_SCRIPT = (
