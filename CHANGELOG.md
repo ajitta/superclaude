@@ -6,6 +6,18 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Ver
 
 Releases before 4.19.0 are not listed. Their history is the git log; the upstream-era changelog, last entry 4.2.1, is `CHANGELOG.md` at commit `6b0ac5c3^`.
 
+## [4.25.0] - 2026-10-12
+
+### Changed
+
+- The delegation rules in `core/rules/RULES_DELEGATION.md` are split into top-level sections: `<delegate_packet>` (what a sub-agent prompt carries), `<delegate_return>` (what its summary must cite) and `<workflow_delegation>` (Workflow fan-out). `<sub_agent_decision>` again holds only the spawn decision and its examples. The rules are reworded as full sentences with no line over 460 characters, so Grep content mode no longer hides them.
+- The kernel's Intent Propagation line in `core/RULES.md` keeps the core rule and points to `<delegate_packet>` for the details instead of restating them.
+- The module tables in `core/RULES.md` and `core/README.md` list each rule module's actual top-level sections, and a test now fails when they drift.
+
+### Upgrade notes
+
+- Nothing to do. Re-run `superclaude install` for your scope to pick up the new rule text.
+
 ## [4.24.0] - 2026-10-09
 
 ### Changed
