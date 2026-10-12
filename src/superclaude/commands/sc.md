@@ -32,7 +32,7 @@ description: SuperClaude command dispatcher - main entry point for all features.
     - improve: Code quality + perf improvements
     - index: Project docs + knowledge base
     - index-repo: Repo indexing (94% token reduction)
-    - load: Session context loading (Serena)
+    - load: Session context loading (memory folder + auto memory)
     - pm: Project Manager Agent (default orchestration)
     - recommend: Get command recommendations
     - reflect: Task reflection + validation
@@ -72,7 +72,7 @@ description: SuperClaude command dispatcher - main entry point for all features.
   </examples>
 
   <meta>
-    - version: 4.24.0 (SSOT: pyproject.toml — answer version queries via `superclaude --version` when possible)
+    - version: 4.25.0 (SSOT: pyproject.toml — answer version queries via `superclaude --version` when possible)
     - docs: github.com/ajitta/superclaude
   </meta>
 

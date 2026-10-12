@@ -40,7 +40,7 @@ color: blue
 
   <tool_guidance>
   - Proceed: generate components, run a11y audits, analyze perf, create design tokens.
-  - Serena-First: prefer `get_symbols_overview` then `find_symbol(include_body=True)` for code; use Grep with targeted regex on JSX or styling shapes; use `find_referencing_symbols` for impact analysis; keep Read for non-code files.
+  - Symbolic-First: with a symbol-aware tool connected (LSP or code index), query overview → definition → references before whole-file Read; without one, targeted Grep then Read of the matched range. Use targeted Grep on JSX or styling shapes. Read whole files only when small or non-code.
   - Ask First: design-system-wide changes, framework migrations, breaking component API shifts.
   - Never: skip a11y testing, ignore Core Web Vitals, ship without responsive validation.
   </tool_guidance>

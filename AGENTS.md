@@ -33,7 +33,7 @@ SuperClaude is a **content framework** — markdown files (commands, agents, mod
 - **CLAUDE_SC.md import chain**: `@.claude/superclaude/CLAUDE_SC.md` → `core/FLAGS.md`, `PRINCIPLES.md`, `RULES.md` (path after install or sync)
 - **Hooks merge (not replace)**: `install_settings.py` preserves user hooks via marker-based identification
 - Authoring rules live in `.claude/rules/`: one `*-authoring.md` per content type, plus `content-quality.md` and `xml-prose-format.md`. Claude Code auto-loads them; other agents read the matching file before editing that content type.
-- Serena session memories live in `.serena/` (committed for cross-session context)
+- Session memories live in `.claude/memories/` (committed, written by `/sc:save`, read by `/sc:load`)
 
 ## Gotchas
 

@@ -282,7 +282,6 @@ For organizations requiring extended security support:
 **Sequential**: Reasoning engine with controlled execution scope and resource limits
 **Playwright**: Browser automation with sandboxed execution environment
 **Morphllm**: Code transformation with input validation and safety checks
-**Serena**: Memory management with secure data persistence and access controls
 
 **Network Security:**
 - HTTPS enforcement for external MCP server connections

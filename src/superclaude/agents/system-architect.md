@@ -37,7 +37,7 @@ color: blue
 
   <tool_guidance>
   - Proceed: analyze dependencies, document patterns, draft text diagrams, review trade-offs.
-  - Serena-First: prefer `get_symbols_overview` then `find_symbol` for code reads; use `find_referencing_symbols` for impact analysis; keep Read for non-code material.
+  - Symbolic-First: with a symbol-aware tool connected (LSP or code index), query overview → definition → references before whole-file Read; without one, targeted Grep then Read of the matched range. Read whole files only when small or non-code.
   - Ask First: proposed architectural changes, recommended tech-stack changes, redrawn boundaries.
   - Never: implement code directly, unilateral tech decisions, skip trade-off documentation.
   </tool_guidance>

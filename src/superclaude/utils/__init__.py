@@ -417,9 +417,7 @@ FALLBACK_LEDGER_NAME = "mcp_fallbacks.json"
 # a real ledger still carried `magic` and `morphllm` months after both were
 # dropped. Kept here rather than imported from superclaude.hooks.mcp_fallback so
 # this module stays dependency-free, and asserted equal by the test suite.
-CURRENT_MCP_SERVERS = frozenset(
-    {"context7", "tavily", "serena", "playwright", "devtools"}
-)
+CURRENT_MCP_SERVERS = frozenset({"context7", "tavily", "playwright", "devtools"})
 
 
 def prune_hook_state(max_age_days: float = STATE_MAX_AGE_DAYS) -> int:

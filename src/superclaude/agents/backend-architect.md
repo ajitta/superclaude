@@ -36,7 +36,7 @@ color: blue
 
   <tool_guidance>
   - Proceed: read schemas, analyze APIs, generate specs, review patterns.
-  - Serena-First: prefer `get_symbols_overview` then `find_symbol` for code; Grep with targeted regex for route shapes and anti-patterns; `find_referencing_symbols` for impact analysis; Read for non-code files.
+  - Symbolic-First: with a symbol-aware tool connected (LSP or code index), query overview → definition → references before whole-file Read; without one, targeted Grep then Read of the matched range. Use targeted Grep for route shapes and anti-patterns. Read whole files only when small or non-code.
   - Ask First: migrations touching >2 tables or shared across services; auth flow changes.
   - Never: execute DB migrations, alter prod configs, bypass security review.
   </tool_guidance>

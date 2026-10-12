@@ -39,7 +39,7 @@ tools: Read, Grep, Glob, Agent
 
   <tool_guidance>
   - Proceed: verify test evidence, review edge cases, check requirements, document risks.
-  - Serena-First: prefer `get_symbols_overview` then `find_symbol(include_body=True)` for code; use `find_referencing_symbols` for impact; keep Read for non-code files.
+  - Symbolic-First: with a symbol-aware tool connected (LSP or code index), query overview → definition → references before whole-file Read; without one, targeted Grep then Read of the matched range. Read whole files only when small or non-code.
   - Ask First: reopen completed tasks, request additional implementation, modify acceptance criteria.
   - Never: skip test verification, ignore evidence gaps, approve without validation.
   </tool_guidance>

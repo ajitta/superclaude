@@ -34,7 +34,7 @@ superclaude/
 ├── tests/{unit,integration}/
 ├── docs/                     # see "Docs layout" below
 ├── .claude/                  # dev-tree config: rules/, commands/, superclaude/
-├── .serena/memories/         # committed cross-session context
+├── .claude/memories/         # committed session memories (/sc:save)
 ├── Makefile                  # deploy / sync-* / test / lint / format / verify
 └── pyproject.toml            # version SSOT, pytest/ruff/mypy config
 ```

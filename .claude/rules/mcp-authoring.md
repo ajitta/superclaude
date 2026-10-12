@@ -20,7 +20,7 @@ paths: ["src/superclaude/mcp/**", ".claude/rules/mcp-authoring.md"]
 ## Filename and Location
 
 - Path: `src/superclaude/mcp/MCP_<ServerName>.md` (PascalCase, hyphens ok: `MCP_Chrome-DevTools.md`).
-- Filename stem after `MCP_` = **display name**; lowercase form what `context_loader.py` match against (`mcp/MCP_Serena.md` → `serena`).
+- Filename stem after `MCP_` = **display name**; lowercase form what `context_loader.py` match against (`mcp/MCP_Tavily.md` → `tavily`).
 - Register file in `scripts/context_loader.py` TRIGGER_MAP + INSTRUCTION_MAP (see Wiring below). Unregistered files dead — never load at runtime.
 
 ## No YAML Frontmatter
@@ -74,7 +74,7 @@ MCP docs pure content components. Not auto-discoverable like agents/skills — o
 
 ### Body Rules
 
-- `<component name="...">` match lowercase server identifier used in `context_loader.py` (e.g., `serena`, `context7`, `chrome-devtools`); `type="mcp"` required.
+- `<component name="...">` match lowercase server identifier used in `context_loader.py` (e.g., `tavily`, `playwright`, `chrome-devtools`); `type="mcp"` required.
 - All multi-word tag names use `snake_case`.
 - Required tags: `<role>` (with `<mission>`), `<choose>`, `<bounds>`, `<handoff>`.
 - Optional tags: `<call_order>` (only when call sequence matters — e.g., Context7 resolve→get pair), `<integration_patterns>` (cross-server / cross-command chains), `<examples>` (lookup table), `<example>` (rich illustration).
@@ -96,7 +96,7 @@ If section read like "this is what server is" rather than "this is how I use ser
 
 `scripts/context_loader.py` matches the **user prompt text** (UserPromptSubmit hook only — it does NOT intercept `mcp__<server>__*` tool calls), so a new file must be wired into these maps:
 
-1. **TRIGGER_MAP**: map user flags (`--c7`, `--serena`, …) + keyword regexes to the file. Pick stable flag + add regex row.
+1. **TRIGGER_MAP**: map user flags (`--c7`, `--tavily`, …) + keyword regexes to the file. Pick stable flag + add regex row.
 2. **COMPOSITE_FLAGS**: if the server participates in `--frontend-verify` / `--all-mcp`, add it to the matching composite-flag set so those umbrella flags pull the doc.
 3. **INSTRUCTION_MAP**: one-line summary string (≤120 chars) shown when loader inject this doc — Claude read before body land. An entry here is also what makes the doc Tier 1.
 
@@ -117,8 +117,8 @@ Following rules apply to all components + not restated above. See `.claude/rules
 1. Make `src/superclaude/mcp/MCP_<Server>.md` — no frontmatter, single `<component name="..." type="mcp">` root.
 2. Drop tool inventories, role descriptions, version/install blocks. Keep `<choose>` / integration / `<bounds>` / `<handoff>`.
 3. Wire `scripts/context_loader.py`: TRIGGER_MAP (flag/keyword regex) + INSTRUCTION_MAP (summary), plus COMPOSITE_FLAGS if part of `--frontend-verify`/`--all-mcp`.
-4. Add row to `mcp/README.md` (Core or Plugin table) with flag + one-line mission.
-5. If server core (auto-installed), register in `cli/install_mcp.py::MCP_SERVERS`.
+4. Add a row to the `mcp/README.md` server table with flag + one-line mission.
+5. Register in `cli/install_mcp.py::MCP_SERVERS` when `superclaude mcp` should offer it.
 6. Run `make sync-user` (or scope-equivalent) + exercise trigger — confirm doc land in context.
 
 ## Anti-Patterns

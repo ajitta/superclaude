@@ -37,7 +37,7 @@ disallowedTools: Edit, Write                # deny-list (applied first, then `to
 effort: high                                # low | medium | high | xhigh | max  (string, not 1-5)
 maxTurns: 20                                # positive integer turn cap
 skills: [some-installed-skill]              # full skill body injected at startup; subagent does NOT inherit parent skills
-mcpServers: [serena]                        # references to configured servers, or inline definitions
+mcpServers: [playwright]                    # references to configured servers, or inline definitions
 
 # Advanced — rarely set in SuperClaude agents
 hooks:                                      # PreToolUse / PostToolUse / Stop scoped to this subagent (see CC hooks docs for structure)
@@ -154,7 +154,8 @@ When memory enabled, CC auto-inject up to first 200 lines / 25KB of `MEMORY.md` 
   </outputs>
 
   <tool_guidance>
-  - Proceed: actions to do freely. Serena-First: prefer symbolic tools for code exploration.
+  - Proceed: actions to do freely.
+  - Symbolic-First: full or light form (see Code Exploration below).
   - Ask First: actions requiring confirmation, with specific thresholds.
   - Never: actions the agent must never take.
   </tool_guidance>
@@ -220,17 +221,17 @@ After task: append `- YYYY-MM-DD: Category-Name: lesson` (max 3 lines) only if a
 - PascalCase-Hyphenated names (e.g., `Debug-Patterns`, `API-Decisions`).
 - Related-agent pointers (≤3) append inline as "Related: agent-1, agent-2" — no nested `<refs>` tag (would violate xml-prose-format depth rule).
 
-## Code Exploration (Serena-First)
+## Code Exploration (Symbolic-First)
 
-Agents that read source code should include Serena directive in `<tool_guidance>`:
+Agents that read source code should include a Symbolic-First directive in `<tool_guidance>`:
 
 | Tier | Directive | When |
 |------|-----------|------|
-| Code-centric (architect, engineer, analyst) | Full: `get_symbols_overview → find_symbol → find_referencing_symbols` | Always |
-| Code-adjacent (manager, writer, mentor) | Light: `prefer symbolic tools for code exploration` | When code may be read |
-| Non-code (researcher, business) | — | Skip |
+| Reads and changes source (system/backend/frontend architects, python-expert, quality/performance/security engineers, refactoring-expert, root-cause-analyst, repo-index, self-review) | Full: `- Symbolic-First: with a symbol-aware tool connected (LSP or code index), query overview → definition → references before whole-file Read; without one, targeted Grep then Read of the matched range.` + optional agent-specific Grep sentence + `Read whole files only when small or non-code.` | Always |
+| Touches code to configure, plan, document or teach (devops-architect, requirements-analyst, project-manager, project-initializer, technical-writer, learning-guide, socratic-mentor) | Light: `- Symbolic-First: prefer symbol-aware queries (when connected) or targeted Grep over whole-file Read when exploring code.` | When code may be read |
+| Non-code (business-panel-experts, deep-researcher, git-workflow, insight-analyst, simplicity-guide, verifier) | — | Skip |
 
-Rationale: symbol overview vs full-file Read = significant token savings + structural understanding (refs, types, inheritance).
+Rationale: symbol overview vs full-file Read = significant token savings + structural understanding (refs, types, inheritance). Subagents do not receive core rules, so the line ships in the agent body.
 
 ## Inherited from xml-prose-format.md
 

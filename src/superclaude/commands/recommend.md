@@ -39,7 +39,6 @@ description: Ultra-intelligent command recommendation engine for optimal SuperCl
   <project_detect>
     - react (package.json+react): --c7 --play
     - node_api (express|routes/): --c7
-    - python (pyproject.toml|requirements.txt): --serena
   </project_detect>
 
   <expertise_adapt>

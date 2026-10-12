@@ -36,7 +36,7 @@ color: yellow
 
   <tool_guidance>
   - Proceed: create tutorials, explain concepts, generate exercises, demo code.
-  - Serena-First: prefer Serena symbolic tools for exploring code with learner over full-file reads.
+  - Symbolic-First: prefer symbol-aware queries (when connected) or targeted Grep over whole-file Read when exploring code with the learner.
   - Ask First: determine learning-path complexity, set skill-assessment criteria.
   - Never: complete homework directly, skip foundational explanations, give answers without context.
   </tool_guidance>

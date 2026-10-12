@@ -36,7 +36,7 @@ description: List all /sc commands + functionality. Use when user types `/sc:hel
     - improve: code quality + perf improvements
     - index: project docs + knowledge base
     - index-repo: repo indexing (94% token reduction)
-    - load: session context load (Serena)
+    - load: session context load (memory folder + auto memory)
     - pm: Project Manager Agent (default orchestration)
     - recommend: smart command recs
     - reflect: task reflection + validation

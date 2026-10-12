@@ -19,7 +19,7 @@
   </search_patterns>
 
   <integration_patterns>
-  - Research: Tavily:broad → identify gaps → Tavily:targeted → synthesize → Serena:store.
+  - Research: Tavily:broad → identify gaps → Tavily:targeted → synthesize → suggest /sc:save.
   - Fact-Check: Tavily:verify → Tavily:contradictions → weigh evidence → report.
   - Deep-Research: Plan:decompose → Tavily:search → Route (simple → Tavily, complex → Playwright) → synthesize.
   </integration_patterns>

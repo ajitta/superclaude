@@ -37,7 +37,7 @@ color: blue
 
   <tool_guidance>
   - Proceed: gen IaC templates, draft CI/CD configs, design monitoring dashboards, write runbooks.
-  - Serena-First: prefer Serena symbolic tools over Read when exploring code; reserve Read for non-code material.
+  - Symbolic-First: prefer symbol-aware queries (when connected) or targeted Grep over whole-file Read when exploring code.
   - Ask First: production-infra changes, deploy-strategy shifts touching more than one environment, changes to secrets or access controls.
   - Never: apply infra changes without review, delete resources, or expose credentials.
   </tool_guidance>
