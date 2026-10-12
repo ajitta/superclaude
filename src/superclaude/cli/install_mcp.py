@@ -34,7 +34,7 @@ MCP_SERVERS = {
     # say everything it said. See mcp/README.md "Context7 — claude.ai connector".
     # Registering the npx `@upstash/context7-mcp` server here would duplicate the
     # connector's tools under a second server name.
-    # Tavily MCP is opt-in (plugin): the recommended integration is Tavily Agent
+    # Tavily MCP is optional: the recommended integration is Tavily Agent
     # Skills (Tavily CLI `tvly init`, or `npx skills add https://github.com/tavily-ai/skills`), documented in
     # mcp/README.md. The MCP server stays available for users who prefer
     # in-conversation tools (search, extract, crawl, map, research).

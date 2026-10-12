@@ -67,5 +67,5 @@ Microsoft ships both `@playwright/mcp` (the `--play` server above) and `playwrig
 ## Related
 
 - `core/FLAGS.md` — MCP flag defs + auto-detection
-- `cli/install_mcp.py` — Install registry (`MCP_SERVERS`) for core servers (Context7 deliberately absent — connector, not install target)
+- `cli/install_mcp.py` — Install registry (`MCP_SERVERS`) for the servers `superclaude mcp` offers (Context7 deliberately absent — connector, not install target)
 - `scripts/context_loader.py` — On-demand delivery mechanism

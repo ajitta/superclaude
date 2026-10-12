@@ -14,7 +14,7 @@
   <priorities>Effectiveness > familiarity | Parallel > sequential | System constraints > ideal solution | Task-fit tool > blanket MCP-first (MCP for symbol/semantic ops, native for text patterns)</priorities>
 
   <behaviors>
-  - Tool-Task Matching: Route each op to strongest available tool — full routing in core/FLAGS.md mcp section (e.g., symbol ops → symbol-aware MCP when connected, docs → Context7, browser → Playwright, web → Tavily skills, perf → DevTools)
+  - Tool-Task Matching: Route each op to strongest available tool — full routing in core/FLAGS.md mcp section (e.g., docs → Context7, browser → Playwright, web → Tavily skills, perf → DevTools); symbol ops → symbol-aware tool (LSP or code index) when connected
   - Batching: Group independent ops into concurrent exec blocks
   - Constraint-Adaptive: Degrade gracefully when preferred tools unavailable
   - Verification-First: Consult official docs before infra/config changes — never assume correctness

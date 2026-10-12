@@ -1,5 +1,5 @@
 ---
-status: draft
+status: complete
 revised: 2026-10-12
 ---
 
@@ -72,31 +72,31 @@ Index: [05-plan.md](./05-plan.md). 입력: `master..feature/serena-removal` (a05
 - `.claude/rules/agent-authoring.md:157,229-230`
 - `src/superclaude/commands/save.md:17`
 
-- [ ] Step 16: core/plugin 잔재
+- [x] Step 16: core/plugin 잔재
   - mcp/README `:70`: "for core servers" → "for the servers `superclaude mcp` offers"
   - install_mcp `:37` 주석: "Tavily MCP is opt-in (plugin):" → "Tavily MCP is optional:"
   - context_loader `:200` 주석: "Playwright/DevTools are plugin-install-only (docs still loaded)" → "docs load whether or not the servers are installed"
   - test_context_loader `:256` docstring: "(1 core + 2 plugin)" → "(Tavily, Playwright, Chrome DevTools)"
-- [ ] Step 17: 용어 통일 "symbol-aware tool (LSP or code index)"
+- [x] Step 17: 용어 통일 "symbol-aware tool (LSP or code index)"
   - select-tool `:27`: `- Symbol ops: symbol-aware tool (LSP or code index) when connected (rename, references)`
   - select-tool `:30`: `- Threshold >0.6: symbol-aware tool when connected (accuracy)`
   - select-tool `:40` 예시 출력: `Symbol-aware tool (LSP rename) when connected`
   - PRINCIPLES `:19` Right-Altitude 행: Before `"ALWAYS use a symbol-aware tool for ALL code reads"` / After `"Use a symbol-aware tool when exploring unfamiliar code"`
-- [ ] Step 18: MODE_Orchestration `:17` 포인터와 용어. FLAGS `<mcp>`에는 심볼 항목이 없으므로 예시에서 symbol ops를 포인터 밖으로 뺀다: `full routing in core/FLAGS.md mcp section (e.g., docs → Context7, browser → Playwright, web → Tavily); symbol ops → symbol-aware tool (LSP or code index) when connected`. 괄호 안 나머지 항목은 원문 그대로 둔다
-- [ ] Step 19: explicit-only 커맨드 가리킴
+- [x] Step 18: MODE_Orchestration `:17` 포인터와 용어. FLAGS `<mcp>`에는 심볼 항목이 없으므로 예시에서 symbol ops를 포인터 밖으로 뺀다: `full routing in core/FLAGS.md mcp section (e.g., docs → Context7, browser → Playwright, web → Tavily); symbol ops → symbol-aware tool (LSP or code index) when connected`. 괄호 안 나머지 항목은 원문 그대로 둔다
+- [x] Step 19: explicit-only 커맨드 가리킴
   - MCP_Tavily `:22`: `→ synthesize → suggest /sc:save.`
   - research `:42`: `- /sc:save (suggest to the user; explicit-only): cross-session research memory (`.claude/memories/`)`
-- [ ] Step 20: agent-authoring
+- [x] Step 20: agent-authoring
   - `:157` 템플릿: Proceed 줄에서 Symbolic-First 문장을 빼고 (`- Proceed: actions to do freely.`), 그 바로 다음 줄에 `- Symbolic-First: full or light form (see Code Exploration below).`를 둔다. 실제 에이전트처럼 Proceed와 Ask First 사이의 별도 줄
   - `:229-230` 표의 Tier 칸을 실제 배치로
     - Full: "Reads and changes source (system/backend/frontend architects, python-expert, quality/performance/security engineers, refactoring-expert, root-cause-analyst, repo-index, self-review)"
     - Light: "Touches code to configure, plan, document or teach (devops-architect, requirements-analyst, project-manager, project-initializer, technical-writer, learning-guide, socratic-mentor)"
-- [ ] Step 21: save `:17`: `4. Verify: Glob .claude/memories/*.md + Read MEMORY.md confirms both stores`
+- [x] Step 21: save `:17`: `4. Verify: Glob .claude/memories/*.md + Read MEMORY.md confirms both stores`
 
 ### Task F6: 검증과 커밋
 
-- [ ] Step 22: `uv run pytest` exit 0, `uv run pytest tests/unit/scripts -o addopts=` exit 0, `make lint` 통과
-- [ ] Step 23: 커밋 두 개
+- [x] Step 22: `uv run pytest` exit 0, `uv run pytest tests/unit/scripts -o addopts=` exit 0, `make lint` 통과
+- [x] Step 23: 커밋 두 개
   - F1~F4: `fix(serena-removal): guard tool-name traces, align save/load memory keys, pin composite-flag counts, pin picker numbering`
   - F5: `docs(serena-removal): drop core/plugin leftovers and align symbol-aware wording`
 
@@ -126,3 +126,6 @@ Index: [05-plan.md](./05-plan.md). 입력: `master..feature/serena-removal` (a05
 
 - Step 15: the display-only mutation (only server 1 numbered) fails only the menu test, because selection indexing does not read the menu text. A second mutation (selection cut to the first server) failed `test_interactive_selection_reaches_the_last_server` as well (2 failed, 3 passed). Both were reverted with `git restore`, and the `:37` comment edit was made after the restore.
 - Step 10: the new test collects both mismatches and asserts once, so its failure shows 3≠2 and 6≠3 together.
+- Step 18: the parenthesis keeps its original items (`web → Tavily skills, perf → DevTools`) per the step's "원문 그대로" note; the plan's sample text had shortened it to `web → Tavily`.
+- Step 20: the Tier cells hold the plan strings without a "Full:"/"Light:" prefix, since the Directive column already starts with those words. The lists match the 11 full and 7 light agents.
+- Step 23: F1-F4 and F5 were split at hunk level where a file had both (`save.md`, `context_loader.py`, `test_context_loader.py`); the F1-F4 commit passed the full suite on its own.

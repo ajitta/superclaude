@@ -253,7 +253,7 @@ class TestTriggerMapPaths:
                 )
 
     def test_all_mcp_includes_3_servers(self):
-        """--all-mcp should activate exactly 3 MCP docs (1 core + 2 plugin).
+        """--all-mcp should activate exactly 3 MCP docs (Tavily, Playwright, Chrome DevTools).
         Context7 is not among them: it ships no doc, and --all-mcp reaches it
         through _C7_PATTERN in _EXECUTION_DIRECTIVES instead."""
         all_mcp_paths = {p for p, _ in COMPOSITE_FLAGS["--all-mcp"]}

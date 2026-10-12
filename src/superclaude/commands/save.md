@@ -14,7 +14,7 @@ description: Session lifecycle management with a committed project memory folder
   2. Persist (memory folder): Write .claude/memories/session_[date].md (context) → .claude/memories/learnings_[topic].md (insights) → overwrite .claude/memories/last_session.md (this session's summary) and .claude/memories/next_actions.md (open items); flat basename only, no path segments; create the folder when absent
   3. Persist (auto memory): Write/Edit MEMORY.md + topic files for cross-session continuity
     3.5. Corrections-Review: capture unrecorded user corrections per the /sc:reflect Misunderstanding-Audit step (same feedback-memory fields).
-  4. Verify: Glob .claude/memories/ + Read MEMORY.md confirms both stores
+  4. Verify: Glob .claude/memories/*.md + Read MEMORY.md confirms both stores
   5. Checkpoint: recovery points + progress tracking
   6. Validate: data integrity + no duplicates across stores
   7. Session Goal: if session goal set via /sc:load, evaluate completion status (done/partial/deferred)

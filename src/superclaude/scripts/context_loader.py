@@ -197,7 +197,7 @@ COMPOSITE_FLAGS = {
         ("mcp/MCP_Tavily.md", 1),
         ("mcp/MCP_Playwright.md", 2),
         ("mcp/MCP_Chrome-DevTools.md", 2),
-    ],  # Note: Playwright/DevTools are plugin-install-only (docs still loaded)
+    ],  # Note: docs load whether or not the servers are installed
 }
 
 # v3.1: Hybrid Injection Map

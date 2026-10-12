@@ -1,6 +1,6 @@
 ---
 feature: serena-removal
-phase: implementing
+phase: complete
 owner: ajitta
 created: 2026-10-12
 updated: 2026-10-12

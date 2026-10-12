@@ -154,7 +154,8 @@ When memory enabled, CC auto-inject up to first 200 lines / 25KB of `MEMORY.md` 
   </outputs>
 
   <tool_guidance>
-  - Proceed: actions to do freely. Symbolic-First: prefer symbol-aware queries or targeted Grep for code exploration.
+  - Proceed: actions to do freely.
+  - Symbolic-First: full or light form (see Code Exploration below).
   - Ask First: actions requiring confirmation, with specific thresholds.
   - Never: actions the agent must never take.
   </tool_guidance>
@@ -226,8 +227,8 @@ Agents that read source code should include a Symbolic-First directive in `<tool
 
 | Tier | Directive | When |
 |------|-----------|------|
-| Code-centric (architect, engineer, analyst) | Full: `- Symbolic-First: with a symbol-aware tool connected (LSP or code index), query overview → definition → references before whole-file Read; without one, targeted Grep then Read of the matched range.` + optional agent-specific Grep sentence + `Read whole files only when small or non-code.` | Always |
-| Code-adjacent (manager, writer, mentor) | Light: `- Symbolic-First: prefer symbol-aware queries (when connected) or targeted Grep over whole-file Read when exploring code.` | When code may be read |
+| Reads and changes source (system/backend/frontend architects, python-expert, quality/performance/security engineers, refactoring-expert, root-cause-analyst, repo-index, self-review) | Full: `- Symbolic-First: with a symbol-aware tool connected (LSP or code index), query overview → definition → references before whole-file Read; without one, targeted Grep then Read of the matched range.` + optional agent-specific Grep sentence + `Read whole files only when small or non-code.` | Always |
+| Touches code to configure, plan, document or teach (devops-architect, requirements-analyst, project-manager, project-initializer, technical-writer, learning-guide, socratic-mentor) | Light: `- Symbolic-First: prefer symbol-aware queries (when connected) or targeted Grep over whole-file Read when exploring code.` | When code may be read |
 | Non-code (researcher, business) | — | Skip |
 
 Rationale: symbol overview vs full-file Read = significant token savings + structural understanding (refs, types, inheritance). Subagents do not receive core rules, so the line ships in the agent body.

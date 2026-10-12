@@ -24,10 +24,10 @@ description: Intelligent MCP tool selection based on complexity scoring and oper
 
 
   <decision_matrix>
-    - Symbol ops: symbol-aware MCP when connected (LSP rename, references)
+    - Symbol ops: symbol-aware tool (LSP or code index) when connected (rename, references)
     - Pattern edits: Edit (native) after Grep or a reference query confirms targets
     - Memory ops: /sc:save, /sc:load (`.claude/memories/` + auto memory)
-    - Threshold >0.6: symbol-aware MCP when connected (accuracy)
+    - Threshold >0.6: symbol-aware tool when connected (accuracy)
     - Threshold <0.4: Native tools (speed)
     - Threshold 0.4-0.6: Feature-based selection
     - Fallback: no symbol-aware tool → Native tools (Grep/Glob/Edit)
@@ -37,7 +37,7 @@ description: Intelligent MCP tool selection based on complexity scoring and oper
 
 | Input | Output |
 |---|---|
-| `'rename function across 10 files' --analyze` | Symbol-aware MCP (LSP rename) when connected |
+| `'rename function across 10 files' --analyze` | Symbol-aware tool (LSP rename) when connected |
 | `'update console.log to logger.info' --explain` | Grep targets + Edit (text replace) |
 | `'save project context'` | /sc:save (memory folder) |
 
