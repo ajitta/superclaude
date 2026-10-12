@@ -212,7 +212,6 @@ where superclaude         # Check install path (Windows)
 
 The framework is fully functional without any MCP server. Each one adds a capability its flag switches on:
 
-- **Serena** — symbol-level code navigation and edits, plus cross-session project memory (`--serena`, `/sc:load`, `/sc:save`)
 - **Tavily** — web search / extract / crawl / map / research. Recommended as Agent Skills (Tavily CLI `tvly init`, or `npx skills add https://github.com/tavily-ai/skills`); the MCP server is the optional in-conversation alternative (`--tavily`)
 - **Context7** — official documentation lookup, enabled as a claude.ai connector rather than through `superclaude mcp` (`--c7`)
 - **Playwright**, **Chrome DevTools** — browser automation and performance audits (`--play`, `--perf`)
@@ -333,7 +332,6 @@ superclaude mcp
 **Available servers:**
 - **Tavily** → Web search, extract, crawl, map, research (Deep Research). Recommended: **Agent Skills** via the Tavily CLI (`tvly init` installs them; skills only: `npx skills add https://github.com/tavily-ai/skills`) ([tavily-ai/skills](https://github.com/tavily-ai/skills) · [agent-skills docs](https://docs.tavily.com/documentation/agent-skills)). The `--tavily` MCP server is an optional in-conversation alternative exposing the same five operations as tools.
 - **Context7** → Official documentation lookup. Enabled as a **claude.ai connector** (claude.ai → Settings → Connectors), not via `superclaude mcp` — `--c7` stays as an inline directive in `core/FLAGS.md`; no MCP doc ships for it.
-- **Serena** → Session persistence & semantic code understanding
 - **Playwright** → Cross-browser automation & E2E testing (Microsoft official). MCP: [`microsoft/playwright-mcp`](https://github.com/microsoft/playwright-mcp); CLI + skill alternative preferred for coding agents: [`microsoft/playwright-cli`](https://github.com/microsoft/playwright-cli)
 - **Chrome DevTools** → Performance, Lighthouse, accessibility, and memory profiling (CLS, LCP). Installed as Claude plugin from [`ChromeDevTools/chrome-devtools-mcp`](https://github.com/ChromeDevTools/chrome-devtools-mcp)
 
@@ -449,11 +447,11 @@ superclaude mcp
 <td width="50%">
 
 ### 🧠 **Cross-Session Memory**
-**Research memory through Serena:**
+**Research memory across sessions:**
 - Findings and query formulations saved with `/sc:save`
 - Recalled by `/sc:load` at the next session start
 - Reflection after every hop: assess quality, find gaps, replan
-- Serena optional — without it, research is single-session
+- Saved to `.claude/memories/` (committed) and Claude auto memory
 
 </td>
 </tr>
@@ -491,7 +489,6 @@ Profiles are defined in [`modes/RESEARCH_CONFIG.md`](src/superclaude/modes/RESEA
 The Deep Research system intelligently coordinates multiple tools:
 - **Tavily** (Agent Skills; MCP optional): Primary web search and discovery
 - **Playwright MCP**: Complex content extraction
-- **Serena MCP**: Memory and learning persistence
 - **Context7** (claude.ai connector): Technical documentation lookup
 
 </div>
@@ -543,11 +540,10 @@ Flags are behavioral hints that any `/sc:*` prompt accepts. The model reads them
 | Flag | Server | Use for |
 |------|--------|---------|
 | `--c7` / `--context7` | Context7 | Imports, frameworks, official docs |
-| `--serena` | Serena | Symbol ops, project memory, semantic exploration |
 | `--play` / `--playwright` | Playwright | Browser testing, E2E, visual diffs |
 | `--perf` / `--devtools` | Chrome DevTools | Perf audit, CLS, LCP, metrics |
 | `--tavily` | Tavily | Web search, real-time info, parallel queries |
-| `--frontend-verify` | Combined | Playwright + DevTools + Serena (UI debug) |
+| `--frontend-verify` | Combined | Playwright + DevTools (UI debug) |
 | `--all-mcp` / `--no-mcp` | — | Enable all / disable all (perf priority) |
 
 #### Execution — control how work is done
@@ -580,7 +576,7 @@ Flags are behavioral hints that any `/sc:*` prompt accepts. The model reads them
 /sc:research "Rust async runtime tradeoffs" --depth deep --tavily --c7
 /sc:implement --plan docs/features/user-export/05-plan.md --validate --delegate auto
 /sc:analyze src/auth/ --focus security --scope module
-/sc:improve src/api/handlers.py --loop --iterations 3 --serena
+/sc:improve src/api/handlers.py --loop --iterations 3
 /sc:brainstorm "should we migrate to gRPC?" --vs multi
 ```
 
@@ -638,7 +634,7 @@ MIT — see [`LICENSE`](LICENSE).
 - `/sc:business-panel` — Multi-expert business analysis
 
 ### 🗂️ Session & Memory
-- `/sc:load` — Load session context (Serena + auto memory)
+- `/sc:load` — Load session context (`.claude/memories/` + auto memory)
 - `/sc:save` — Save session context
 - `/sc:insight` — Capture structured insights to JSONL
 
