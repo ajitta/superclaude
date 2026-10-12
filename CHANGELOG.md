@@ -13,6 +13,8 @@ Releases before 4.19.0 are not listed. Their history is the git log; the upstrea
 - `/sc:save` and `/sc:load` keep session memories in `.claude/memories/` (committed with the project) plus Claude auto memory. Each save adds or updates one `session_[date]_[branch-slug].md` record, so parallel branches and worktrees do not conflict on merge. Existing `.serena/memories/` files stay where they are and are no longer read.
 - `superclaude mcp` no longer pre-selects servers: the interactive picker lists every server and installs only the numbers you enter.
 - Agents and R17 say "symbol-aware tool (LSP or code index)" instead of naming a server.
+- The README and the Pages site list three install paths in order: Quick install (the release as-is), Clone install (your own copy from a local clone) and Fork install (that copy in your GitHub fork, the recommended way to customize). The clone and fork paths need only `git`, `uv` and `superclaude`, no `make`. The contributor guide is gone.
+- A tip before the `/goal` example: ask `/btw` which command to run next. It answers from the session without adding to the conversation.
 
 ### Removed
 
