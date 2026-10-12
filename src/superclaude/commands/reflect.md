@@ -1,5 +1,5 @@
 ---
-description: Task reflect + validate use Serena MCP analysis. Use when user type `/sc:reflect` or ask validate multi-step task truly done (assumptions surface, residuals list, gaps name). NO auto-trigger after every task close — routine end-turn summary go inline, not reflection pass.
+description: Task reflect + validate. Use when user type `/sc:reflect` or ask validate multi-step task truly done (assumptions surface, residuals list, gaps name). NO auto-trigger after every task close — routine end-turn summary go inline, not reflection pass.
 ---
 <component name="reflect" type="command">
 
@@ -43,7 +43,6 @@ description: Task reflect + validate use Serena MCP analysis. Use when user type
   <bounds>
     <does>full reflect, cross-session learn, qualitative rule-effect analysis (misread audit + improvement story).</does>
     <never>override done, bypass integrity, quantitative rule stats (delegate to /sc:analyze --focus rules).</never>
-    <fallback>No Serena: use Claude auto memory for session persist.</fallback>
   </bounds>
 
   <handoff next="/sc:improve /sc:troubleshoot"/>

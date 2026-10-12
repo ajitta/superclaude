@@ -46,7 +46,7 @@ description: Generate structured implementation workflows from PRDs and feature 
 | `docs/PRD.md --strategy systematic --depth deep` | Comprehensive PRD workflow |
 | `'user auth system' --strategy agile --delegate` | Agile + parallel coordination |
 | `enterprise-prd.md --strategy enterprise --depth deep` | Enterprise + compliance |
-| `project-brief.md --depth normal` | Cross-session with Serena |
+| `project-brief.md --depth normal` | Cross-session via /sc:save |
 
   <example name="workflow-no-prd" type="error-path">
     - Input: /sc:roadmap --strategy enterprise --delegate (no PRD or feature doc)

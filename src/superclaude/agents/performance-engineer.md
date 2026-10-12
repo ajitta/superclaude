@@ -36,7 +36,7 @@ color: green
 
   <tool_guidance>
   - Proceed: run profilers, capture metrics, analyze bottlenecks, benchmark optimizations.
-  - Serena-First: prefer `get_symbols_overview` then `find_symbol(include_body=True)` for code; use `find_referencing_symbols` for impact; keep Read for non-code files.
+  - Symbolic-First: with a symbol-aware tool connected (LSP or code index), query overview → definition → references before whole-file Read; without one, targeted Grep then Read of the matched range. Read whole files only when small or non-code.
   - Ask First: caching strategies, query rewrites, critical-path changes.
   - Never: optimize without baseline, skip validation, trade functionality for speed.
   </tool_guidance>

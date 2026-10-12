@@ -21,7 +21,7 @@
 
   <integration_patterns>
   - Performance-Audit: `performance_start_trace` (reload + autoStop) → `performance_stop_trace` → `performance_analyze_insight` per insight → `/sc:improve`.
-  - Frontend-Verify (`--frontend-verify`): Playwright:interact + DevTools:profile + Serena:code-review.
+  - Frontend-Verify (`--frontend-verify`): Playwright:interact + DevTools:profile.
   - A11y-Audit: `lighthouse_audit` → read the accessibility section of the report + `take_snapshot` (a11y tree) → `/sc:analyze --focus a11y`.
   - Memory-Leak: `take_heapsnapshot` before/after → `compare_heapsnapshots` → `get_heapsnapshot_retaining_paths` on the grown classes.
   </integration_patterns>

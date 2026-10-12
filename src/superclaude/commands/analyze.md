@@ -50,7 +50,7 @@ description: Code analysis across quality, security, performance, architecture d
 
   <rules_analysis note="--focus rules: rule effectiveness audit">
     Quality (always): Read core/rules/RULES_QUALITY.md (R01–R21 table) → summary: rule count, example coverage, severity distribution
-    Compliance (when data exists): Glob auto memory + list Serena memories → grep `violated_rule: "[RXX]"` → heatmap
+    Compliance (when data exists): Glob auto memory + `.claude/memories/` → grep `violated_rule: "[RXX]"` → heatmap
       Hot (≥2 violations) 🔴: needs examples or clarification → /sc:improve
       Warm (1 violation) 🟡: monitor
       Untagged: corrections without violated_rule field → suggest [R14 Correction Capture] format

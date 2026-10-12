@@ -19,12 +19,6 @@ from .install_settings import _load_settings
 # MCP Server Registry
 # Adapted from commit d4a17fc with modern transport configuration.
 #
-# `category` partitions the registry:
-#   - "core":   auto-suggested for installation; documented in mcp/README.md Core table
-#   - "plugin": opt-in install via `superclaude mcp --servers <name>`; documented in
-#               mcp/README.md Plugin table. Plugin entries do NOT trigger the
-#               serena/uv prerequisite checks unless the user actually selects them.
-#
 # `method` selects the install path:
 #   - "mcp":    `claude mcp add ...` (raw MCP server) — needs `transport`+`command`
 #   - "plugin": `claude plugin marketplace add ...` + `claude plugin install ...`
@@ -40,15 +34,7 @@ MCP_SERVERS = {
     # say everything it said. See mcp/README.md "Context7 — claude.ai connector".
     # Registering the npx `@upstash/context7-mcp` server here would duplicate the
     # connector's tools under a second server name.
-    "serena": {
-        "name": "serena",
-        "description": "Semantic code analysis and intelligent editing (serena-agent on PyPI)",
-        "transport": "stdio",
-        "command": "serena start-mcp-server --context claude-code --project-from-cwd",
-        "category": "core",
-        "method": "mcp",
-    },
-    # Tavily MCP is opt-in (plugin): the recommended integration is Tavily Agent
+    # Tavily MCP is optional: the recommended integration is Tavily Agent
     # Skills (Tavily CLI `tvly init`, or `npx skills add https://github.com/tavily-ai/skills`), documented in
     # mcp/README.md. The MCP server stays available for users who prefer
     # in-conversation tools (search, extract, crawl, map, research).
@@ -57,7 +43,6 @@ MCP_SERVERS = {
         "description": "Web search, extract, crawl, map, research (optional MCP; prefer Tavily Agent Skills — see mcp/README.md)",
         "transport": "stdio",
         "command": "npx -y tavily-mcp@latest",
-        "category": "plugin",
         "method": "mcp",
         "api_key_env": "TAVILY_API_KEY",
         "api_key_description": "Tavily API key for web search (get from https://app.tavily.com)",
@@ -67,13 +52,11 @@ MCP_SERVERS = {
         "description": "Browser automation, E2E testing, network mocking (Microsoft official)",
         "transport": "stdio",
         "command": "npx -y @playwright/mcp@latest",
-        "category": "plugin",
         "method": "mcp",
     },
     "chrome-devtools": {
         "name": "chrome-devtools",
         "description": "Performance, Lighthouse, accessibility, and memory profiling",
-        "category": "plugin",
         "method": "plugin",
         # `plugin_id` is the marketplace plugin name (must match the marketplace.json
         # `plugins[].name` exactly); `name` stays as the user-facing identifier so
@@ -172,8 +155,7 @@ def check_prerequisites(selected_servers: List[str]) -> Tuple[bool, List[str]]:
     """Check if required tools are available.
 
     Checks are scoped to the selection: the Node.js check runs only when an
-    npm-based server is selected, and the serena/uv tooling check only when
-    serena is.
+    npm-based server is selected.
     """
     errors = []
 
@@ -206,41 +188,6 @@ def check_prerequisites(selected_servers: List[str]) -> Tuple[bool, List[str]]:
                     )
         except (subprocess.TimeoutExpired, FileNotFoundError):
             errors.append("Node.js not found - required for npm-based MCP servers")
-
-    # Serena-specific tooling: only relevant when serena will be installed.
-    needs_serena_tooling = "serena" in selected_servers
-    if needs_serena_tooling:
-        # Check uv for Python-based servers (Serena requires uv)
-        uv_ok = False
-        try:
-            result = _run_command(
-                ["uv", "--version"], capture_output=True, text=True, timeout=10
-            )
-            uv_ok = result.returncode == 0
-        except (subprocess.TimeoutExpired, FileNotFoundError):
-            uv_ok = False
-        if not uv_ok:
-            click.echo(
-                "⚠️  uv not found - required to install Serena MCP server", err=True
-            )
-            click.echo(
-                "   Install uv: https://docs.astral.sh/uv/getting-started/installation/",
-                err=True,
-            )
-
-        # Check serena-agent binary on PATH (installed via uv tool install)
-        try:
-            result = _run_command(
-                ["serena", "--version"], capture_output=True, text=True, timeout=10
-            )
-            if result.returncode != 0:
-                raise FileNotFoundError
-        except (subprocess.TimeoutExpired, FileNotFoundError):
-            click.echo("⚠️  serena binary not found - install with:", err=True)
-            click.echo(
-                "   uv tool install -p 3.13 serena-agent && serena init",
-                err=True,
-            )
 
     return len(errors) == 0, errors
 
@@ -516,43 +463,26 @@ def install_mcp_server(
 
 
 def list_available_servers():
-    """List all available MCP servers, grouped by core/plugin category."""
+    """List all available MCP servers."""
     click.echo("📋 Available MCP Servers:\n")
 
-    by_category: Dict[str, List[dict]] = {"core": [], "plugin": []}
     for server_info in MCP_SERVERS.values():
-        category = server_info.get("category", "core")
-        by_category.setdefault(category, []).append(server_info)
+        name = server_info["name"]
+        description = server_info["description"]
+        api_key_note = ""
 
-    headings = {
-        "core": "Core (auto-suggested)",
-        "plugin": "Plugin (opt-in via --servers)",
-    }
+        if "api_key_env" in server_info:
+            api_key_note = f" (requires {server_info['api_key_env']})"
 
-    for category in ("core", "plugin"):
-        servers = by_category.get(category, [])
-        if not servers:
-            continue
-        click.echo(f"━━ {headings.get(category, category)} ━━")
-        for server_info in servers:
-            name = server_info["name"]
-            description = server_info["description"]
-            api_key_note = ""
+        if server_info.get("method") == "plugin":
+            is_installed = check_plugin_installed(server_info.get("plugin_id", name))
+        else:
+            is_installed = check_mcp_server_installed(name)
+        status = "✅ installed" if is_installed else "⬜ not installed"
 
-            if "api_key_env" in server_info:
-                api_key_note = f" (requires {server_info['api_key_env']})"
-
-            if server_info.get("method") == "plugin":
-                is_installed = check_plugin_installed(
-                    server_info.get("plugin_id", name)
-                )
-            else:
-                is_installed = check_mcp_server_installed(name)
-            status = "✅ installed" if is_installed else "⬜ not installed"
-
-            click.echo(f"   {name:25} {status}")
-            click.echo(f"      {description}{api_key_note}")
-        click.echo()
+        click.echo(f"   {name:25} {status}")
+        click.echo(f"      {description}{api_key_note}")
+    click.echo()
 
     click.echo(f"Total: {len(MCP_SERVERS)} servers available")
 
@@ -586,54 +516,32 @@ def install_mcp_servers(
         if not servers_to_install:
             return False, "No valid servers selected"
     else:
-        # Interactive selection — default offer is core servers only.
-        # Plugin servers must be opted into explicitly via --servers.
+        # Interactive selection: every server is listed and nothing is
+        # pre-selected; empty input installs nothing.
         click.echo("📋 Available MCP servers:\n")
 
-        core_servers = [
-            info
-            for info in MCP_SERVERS.values()
-            if info.get("category", "core") == "core"
-        ]
-
-        server_options = []
-        for info in core_servers:
+        all_servers = list(MCP_SERVERS.values())
+        for i, info in enumerate(all_servers, 1):
             api_note = (
                 f" (requires {info['api_key_env']})" if "api_key_env" in info else ""
             )
-            server_options.append(
-                f"{info['name']:25} - {info['description']}{api_note}"
-            )
-
-        for i, option in enumerate(server_options, 1):
-            click.echo(f"   {i}. {option}")
-
-        click.echo("\n   0. Install all core servers")
-
-        plugin_servers = [
-            info for info in MCP_SERVERS.values() if info.get("category") == "plugin"
-        ]
-        if plugin_servers:
-            click.echo("\n💡 Plugin servers (opt-in — install manually):")
-            for info in plugin_servers:
-                name = info["name"]
-                click.echo(f"   • {name:<18}  superclaude mcp --servers {name}")
-            click.echo("   (see 'superclaude mcp --list' for full details)")
+            click.echo(f"   {i}. {info['name']:25} - {info['description']}{api_note}")
         click.echo()
 
         selection = click.prompt(
-            "Select servers to install (comma-separated numbers, or 0 for all core)",
-            default="0",
+            "Select servers to install (comma-separated numbers; empty to cancel)",
+            default="",
+            show_default=False,
         )
 
-        if selection.strip() == "0":
-            servers_to_install = [info["name"] for info in core_servers]
+        if not selection.strip():
+            servers_to_install = []
         else:
             try:
                 indices = [int(x.strip()) for x in selection.split(",")]
-                core_names = [info["name"] for info in core_servers]
+                all_names = [info["name"] for info in all_servers]
                 servers_to_install = [
-                    core_names[i - 1] for i in indices if 0 < i <= len(core_names)
+                    all_names[i - 1] for i in indices if 0 < i <= len(all_names)
                 ]
             except (ValueError, IndexError):
                 return False, "Invalid selection"
@@ -641,7 +549,7 @@ def install_mcp_servers(
     if not servers_to_install:
         return False, "No servers selected"
 
-    # Check prerequisites (after selection so serena-tooling check is conditional)
+    # Check prerequisites (after selection so per-server checks stay scoped)
     success, errors = check_prerequisites(selected_servers=servers_to_install)
     if not success:
         error_msg = "Prerequisites not met:\n" + "\n".join(f"  ❌ {e}" for e in errors)

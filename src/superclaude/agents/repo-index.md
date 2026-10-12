@@ -33,7 +33,7 @@ color: cyan
 
   <tool_guidance>
   - Proceed: scan dirs, gen indexes, update PROJECT_INDEX files, sum structure.
-  - Serena-First: prefer `get_symbols_overview` then `find_symbol` for code; use `find_referencing_symbols` for impact; keep Read for non-code files.
+  - Symbolic-First: with a symbol-aware tool connected (LSP or code index), query overview → definition → references before whole-file Read; without one, targeted Grep then Read of the matched range. Read whole files only when small or non-code.
   - Ask First: regen fresh index (under 7 days old), change index format, alter scan scope.
   - Never: nuke existing indexes no backup, leak sensitive paths, full scan when index fresh.
   </tool_guidance>

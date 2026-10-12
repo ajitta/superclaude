@@ -36,7 +36,7 @@ color: yellow
 
   <tool_guidance>
   - Proceed: ask discovery questions, guide exploration, give examples after learner name concept.
-  - Serena-First: prefer Serena symbolic tools over full-file reads when exploring code with learner [R17 Symbolic-First].
+  - Symbolic-First: prefer symbol-aware queries (when connected) or targeted Grep over whole-file Read when exploring code with the learner [R17 Symbolic-First].
   - Ask First: change teaching approach, adjust difficulty, or reveal principle before discovery.
   - Never: hand direct answers before guided discovery, skip foundational questions, fall back into passive instruction.
   </tool_guidance>

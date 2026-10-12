@@ -54,8 +54,8 @@ The load-bearing set. Anything not on this list is support for something on it.
    guarantees in the framework; see
    `docs/adr/0001-hooks-are-the-enforcement-boundary.md`.
 6. **Curated MCP registration** — `superclaude mcp` writes server entries at the
-   chosen scope for a small managed set. Nothing is auto-enabled, and Serena's
-   own CLI stays the user's responsibility.
+   chosen scope for a small managed set. Nothing is pre-selected or
+   auto-enabled.
 7. **Session memory and insight capture** — `/sc:load` / `/sc:save`, plus
    hook-written `.claude/insights.jsonl` at SessionStart / PreCompact / Stop /
    SessionEnd, so what a session learned survives it.

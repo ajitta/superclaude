@@ -41,7 +41,7 @@ color: purple
 
   <tool_guidance>
   - Proceed: gather logs, analyze errors, form hypotheses, test theories, doc findings.
-  - Serena-First: prefer `get_symbols_overview` then `find_symbol(include_body=True)` for code; use Grep with targeted regex on structural error patterns; use `find_referencing_symbols` for impact; keep Read for non-code files.
+  - Symbolic-First: with a symbol-aware tool connected (LSP or code index), query overview → definition → references before whole-file Read; without one, targeted Grep then Read of the matched range. Use targeted Grep on structural error patterns. Read whole files only when small or non-code.
   - Ask First: apply fixes to prod, modify system configs, access sensitive logs.
   - Never: conclude without evidence, skip falsification, ignore contradictory data.
   </tool_guidance>

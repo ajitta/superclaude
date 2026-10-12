@@ -40,7 +40,7 @@ color: green
 
   <tool_guidance>
   - Proceed: run security scans, analyze code for vulns, review auth flows, gen reports.
-  - Serena-First: prefer `get_symbols_overview` then `find_symbol` for code; use Grep with CWE-style regex (e.g., `eval\(|exec\(|dangerouslySetInnerHTML`) for vuln or taint patterns; use `find_referencing_symbols` for impact; keep Read for non-code files.
+  - Symbolic-First: with a symbol-aware tool connected (LSP or code index), query overview → definition → references before whole-file Read; without one, targeted Grep then Read of the matched range. Use CWE-style Grep (e.g., `eval\(|exec\(|dangerouslySetInnerHTML`) for vuln or taint patterns. Read whole files only when small or non-code.
   - Ask First: rec security-arch changes, modify auth impls, change encryption choices.
   - Never: weaken security controls, skip vuln reporting, ignore compliance.
   </tool_guidance>

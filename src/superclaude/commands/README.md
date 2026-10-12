@@ -15,8 +15,8 @@ Commands managed by Claude Code native command system. Install to `~/.claude/com
 | `/sc:sc` | Command dispatcher — routes to other `/sc:*` commands (explicit-only) |
 | `/sc:help` | Help on SuperClaude usage |
 | `/sc:init` | Interactive project env setup, first-session onboarding |
-| `/sc:load` | Load project context via Serena MCP + auto memory |
-| `/sc:save` | Persist context via Serena MCP + auto memory |
+| `/sc:load` | Load project context via `.claude/memories/` + auto memory |
+| `/sc:save` | Persist context via `.claude/memories/` + auto memory |
 
 ### Development
 

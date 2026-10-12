@@ -39,7 +39,7 @@ description: Deep web research with adaptive planning + smart search. Use when u
     - Tavily: tavily-search, tavily-extract, tavily-research, tavily-crawl, tavily-map (Agent Skills — auto/slash; MCP path exposes the same five as tools)
     - Native: WebSearch/WebFetch (fallback)
     - Read/Write: Report gen
-    - Serena: Cross-session research memory
+    - /sc:save (suggest to the user; explicit-only): cross-session research memory (`.claude/memories/`)
   </tools>
 
   <examples>

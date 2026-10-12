@@ -16,7 +16,7 @@ Right-Altitude: specific enough guide, flexible enough heuristic
   | Principle | Before | After |
   |---|---|---|
   | Restraint-First | "I also cleaned up the utils while I was in there" | "Fixed the bug. Utils cleanup is separate scope." |
-  | Right-Altitude | "ALWAYS use Serena for ALL symbol operations" | "Use Serena for symbol operations when exploring unfamiliar code" |
+  | Right-Altitude | "ALWAYS use a symbol-aware tool for ALL code reads" | "Use a symbol-aware tool when exploring unfamiliar code" |
   | Evidence-Based | "This should work now" | "Tests pass: 42/42 (baseline 40). Deploy verified locally." |
   | Parallel-Thinking | Runs 5 sequential grep calls | Runs 5 grep calls in single parallel message |
   </examples>

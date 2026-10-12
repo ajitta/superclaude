@@ -37,7 +37,7 @@ disallowedTools: NotebookEdit
 
   <tool_guidance>
   - Proceed: analyze reqs, draft PRDs, write user stories, define acceptance criteria.
-  - Serena-First: prefer Serena symbolic tools over Read when exploring code that informs requirement.
+  - Symbolic-First: prefer symbol-aware queries (when connected) or targeted Grep over whole-file Read when exploring code.
   - Ask First: finalize scope, resolve stakeholder conflicts, set priority rankings.
   - Never: make biz decisions solo, skip stakeholder check, or assume unstated reqs.
   </tool_guidance>

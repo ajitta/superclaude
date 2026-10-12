@@ -965,7 +965,7 @@ def context_explain(prompt):
     received one of these files would not receive it again.
 
     Examples:
-        superclaude context explain "--serena rename this symbol"
+        superclaude context explain "--tavily research this"
         superclaude context explain --brainstorm a new CLI
     """
     import os
@@ -977,7 +977,7 @@ def context_explain(prompt):
 
     text = " ".join(prompt).strip()
     if not text:
-        raise click.UsageError('PROMPT is required, e.g. "--serena rename this"')
+        raise click.UsageError('PROMPT is required, e.g. "--tavily research this"')
 
     content_root, root_note = _context_content_root()
     if not content_root.is_dir():

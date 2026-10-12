@@ -388,7 +388,7 @@ def merge_hooks_to_settings(
     for hook_type, new_hook_array in new_hooks.items():
         existing_array = existing_hooks.get(hook_type, [])
 
-        # Dedup existing entries first. Third-party installers (e.g., Serena)
+        # Dedup existing entries first. Third-party installers
         # may re-add identical entries on each install without checking; running
         # `make sync-user` N times accumulates N copies of unmarked hooks.
         # Deduping on every merge is idempotent and bounds growth.

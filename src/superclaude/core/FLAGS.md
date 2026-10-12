@@ -16,11 +16,10 @@
 
   <mcp>
 --c7|--context7: force Context7 lookup — resolve + query before writing or changing library-facing code, incl. refactoring/debugging that the connector's own instructions exclude. Connector-provided (not a `superclaude mcp` server); its server instructions + tool descriptions already cover when-to-use, resolve-then-query order, and the 3-call cap, so no MCP doc ships
---serena: symbol ops, project mem → Serena semantic understanding + Serena-first exploration directive
 --play|--playwright: browser test, E2E, visual → Playwright browser automation
 --perf|--devtools: perf audit, CLS, LCP, metrics → DevTools perf analysis
 --tavily: web search, real-time info → Tavily Agent Skills (tavily-search/extract/crawl/map/research); Tavily MCP optional in-conv alternative
---frontend-verify: UI test, frontend debug → Playwright + DevTools + Serena
+--frontend-verify: UI test, frontend debug → Playwright + DevTools
 --all-mcp: max complexity → enable all MCP servers
 --no-mcp: native-only, perf priority → disable all MCP, use native + WebSearch
   </mcp>

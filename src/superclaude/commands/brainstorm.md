@@ -61,7 +61,7 @@ description: Interactive requirements discovery through Socratic dialogue + syst
 | `'AI project management tool' --strategy systematic --depth deep` | Multi-agent deep analysis |
 | `'real-time collaboration' --strategy agile --delegate` | Parallel frontend/backend/security exploration |
 | `'enterprise data analytics' --strategy enterprise --depth deep` | Compliance + validation |
-| `'mobile monetization' --depth normal` | Cross-session with Serena |
+| `'mobile monetization' --depth normal` | Cross-session via /sc:save |
 | `'API design' --vs cot [k:3] [tau:0.20]` | 3 focused API design perspectives via VS-CoT |
 | `'product ideas' --vs multi [tau:0.01]` | Exhaustive brainstorm: 15 wild ideas (5×3 turns) |
 | `'migration strategy' --vs --depth deep` | Auto-detect VS-CoT, detailed depth, 5 perspectives |

@@ -1,20 +1,20 @@
 ---
-description: Session lifecycle management with Serena MCP + Claude auto memory for context persistence. Use ONLY when user explicitly types `/sc:save` — session-end lifecycle action that writes Serena memories and auto-memory entries. Do NOT auto-trigger on "save this", "remember this", or end-of-task completions.
+description: Session lifecycle management with a committed project memory folder (`.claude/memories/`) + Claude auto memory for context persistence. Use ONLY when user explicitly types `/sc:save` — session-end lifecycle action that writes memory files and auto-memory entries. Do NOT auto-trigger on "save this", "remember this", or end-of-task completions.
 ---
 <component name="save" type="command">
 
   <role command="/sc:save">
-    <mission>Session lifecycle management with Serena MCP + Claude auto memory for context persistence</mission>
+    <mission>Session lifecycle management with a committed project memory folder + Claude auto memory for context persistence</mission>
   </role>
 
   <syntax>/sc:save [--type session|learnings|context|all] [--summarize] [--checkpoint]</syntax>
 
   <flow>
   1. Analyze: session progress + discoveries
-  2. Persist (Serena): write_memory("session_[date]", context) → write_memory("learnings_[topic]", insights); memory tools absent → direct-file fallback (bounds)
-  3. Persist (auto memory): Write/Edit MEMORY.md + topic files for cross-session continuity
+  2. Persist (memory folder): Write .claude/memories/session_[date]_[branch-slug].md — first line `branch: <name> @<short sha>`, then the summary and a `## Next actions` checklist; a second save the same day on the same branch updates it → .claude/memories/learnings_[topic].md (insights); flat basename only, no path segments; create the folder when absent
+  3. Persist (auto memory): Write/Edit MEMORY.md + topic files for cross-session continuity; every worktree of the repo shares this folder, so name the branch in each project entry and Edit the one MEMORY.md line instead of rewriting the file
     3.5. Corrections-Review: capture unrecorded user corrections per the /sc:reflect Misunderstanding-Audit step (same feedback-memory fields).
-  4. Verify: list_memories() (tools absent → Glob `.serena/memories/`) + Read MEMORY.md confirms both stores
+  4. Verify: Glob .claude/memories/*.md + Read MEMORY.md confirms both stores
   5. Checkpoint: recovery points + progress tracking
   6. Validate: data integrity + no duplicates across stores
   7. Session Goal: if session goal set via /sc:load, evaluate completion status (done/partial/deferred)
@@ -34,16 +34,17 @@ description: Session lifecycle management with Serena MCP + Claude auto memory f
   </compaction_strategy>
 
   <storage>
-    Serena (primary): .serena/memories/ — semantic project memories, symbol-aware context
+    Memory folder (primary): .claude/memories/ — one markdown file per memory name, committed with the project
+    Branch slug: `git branch --show-current` with `/` → `-`; detached HEAD → `detached-<short sha>`. Session records are add-only per branch, so parallel branches and worktrees never conflict on merge
     Auto memory (supplementary): ~/.claude/projects/{project}/memory/MEMORY.md (CC-native, per-project, first 200 lines auto-load)
     Topic files: ~/.claude/projects/{project}/memory/{topic}.md (linked from MEMORY.md, load on demand)
     Agent memory: .claude/agent-memory/{name}/MEMORY.md (project-scoped, per-agent)
   </storage>
 
   <outputs note="Per --type flag">
-| Type | Serena Memory | Auto Memory | Content |
+| Type | Memory folder | Auto Memory | Content |
 |---|---|---|---|
-| session | session_[date] | MEMORY.md | Full context |
+| session | session_[date]_[branch-slug] | MEMORY.md | Full context |
 | learnings | learnings_[topic] | topic files | Patterns + insights |
 | context | context_[project] | MEMORY.md | Project state |
 | all | All above | All above | Complete preservation |
@@ -51,10 +52,9 @@ description: Session lifecycle management with Serena MCP + Claude auto memory f
 
 
   <tools>
-  - write_memory/read_memory: Serena semantic persistence (primary)
-  - list_memories: verify Serena memories
-  - Write/Edit: Claude auto memory persistence (supplementary)
-  - Read: verify auto memory content
+  - Write/Edit: memory folder + auto memory persistence
+  - Glob: list memory files
+  - Read: verify both stores
   </tools>
 
   <examples>
@@ -81,9 +81,9 @@ description: Session lifecycle management with Serena MCP + Claude auto memory f
   </gotchas>
 
   <bounds>
-    <does>Serena integration, auto memory sync, auto-checkpoints, discovery preservation.</does>
+    <does>memory folder + auto memory sync, auto-checkpoints, discovery preservation.</does>
     <never>save without validation, override without checkpoint, duplicate across stores.</never>
-    <fallback>Serena memory tools absent (server missing, or connected with `--mode=no-memories`): Write `.serena/memories/<name>.md` directly — flat basename only, no path segments, same names as the memory tools use — plus Claude auto memory (Write/Edit MEMORY.md). Ask user for guidance when uncertain.</fallback>
+    <fallback>Memory folder not writable: auto memory only, and tell the user. Ask user for guidance when uncertain.</fallback>
   </bounds>
 
   <handoff next="/sc:load /sc:reflect"/>

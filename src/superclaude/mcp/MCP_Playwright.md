@@ -35,7 +35,7 @@
   </network_mocking_patterns>
 
   <integration_patterns>
-  - Frontend-Verify (`--frontend-verify`): Playwright:interaction + DevTools:metrics + Serena:code.
+  - Frontend-Verify (`--frontend-verify`): Playwright:interaction + DevTools:metrics.
   - E2E-Suite: `/sc:test --type e2e` → Playwright:execute → screenshot evidence → report.
   - Visual-QA: Playwright:screenshot → Claude:vision → `/sc:review`.
   - A11y-Audit: Playwright:snapshot → assert accessible names → `/sc:analyze --focus a11y`.

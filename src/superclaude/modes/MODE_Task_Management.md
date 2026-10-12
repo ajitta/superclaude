@@ -24,7 +24,7 @@
 | Input | Response |
 |---|---|
 | Implement auth system | Decompose: Phase 1 (data model), Phase 2 (middleware), Phase 3 (endpoints), Phase 4 (tests). Track each phase with memory + tasks. Checkpoint between phases. |
-| Continue from last session | Load: list_memories -> read plan -> ID current phase -> resume from last checkpoint |
+| Continue from last session | Load: Glob .claude/memories/ -> read plan -> ID current phase -> resume from last checkpoint |
   </examples>
 
   <bounds>
