@@ -1,5 +1,5 @@
 ---
-status: complete
+status: implementing
 revised: 2026-10-12
 ---
 
@@ -45,6 +45,7 @@ revised: 2026-10-12
 - [x] Phase C: [05c-plan-installer.md](./05c-plan-installer.md) — 설치기 등록·사전 점검 제거, core/plugin 구분 제거, 설치 문서
 - [x] Phase D: [05d-plan-symbolic-first.md](./05d-plan-symbolic-first.md) — R17, 에이전트 18개, 나머지 콘텐츠의 도구 중립화 + 가드 테스트
 - [x] Phase E: [05e-plan-repo-docs.md](./05e-plan-repo-docs.md) — README·SECURITY·AGENTS·PROJECT_INDEX·mcp-authoring, local scope 재동기화
+- [ ] Phase F: [05f-plan-review-fixes.md](./05f-plan-review-fixes.md) — 독립 리뷰 I1~I4 수정(도구 이름 가드, save/load 키 일치, docstring 숫자 고정, picker 번호 테스트)과 Suggestion 6개
 
 순서 근거: A가 메모리 대체 경로를 먼저 만들어야 B가 /sc:load·/sc:save 주입을 지워도 기능이 비지 않는다. B가 `--serena`를 FLAGS에서 지우기 전에 이를 쓰는 recommend 줄도 B에서 함께 지운다. 가드 테스트는 `src/`의 마지막 phase인 D에서 넣어야 처음부터 끝까지 suite가 green이다.
 
