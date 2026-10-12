@@ -11,8 +11,8 @@ description: Session lifecycle management with a committed project memory folder
 
   <flow>
   1. Analyze: session progress + discoveries
-  2. Persist (memory folder): Write .claude/memories/session_[date].md (context) → .claude/memories/learnings_[topic].md (insights) → overwrite .claude/memories/last_session.md (this session's summary) and .claude/memories/next_actions.md (open items); flat basename only, no path segments; create the folder when absent
-  3. Persist (auto memory): Write/Edit MEMORY.md + topic files for cross-session continuity
+  2. Persist (memory folder): Write .claude/memories/session_[date]_[branch-slug].md — first line `branch: <name> @<short sha>`, then the summary and a `## Next actions` checklist; a second save the same day on the same branch updates it → .claude/memories/learnings_[topic].md (insights); flat basename only, no path segments; create the folder when absent
+  3. Persist (auto memory): Write/Edit MEMORY.md + topic files for cross-session continuity; every worktree of the repo shares this folder, so name the branch in each project entry and Edit the one MEMORY.md line instead of rewriting the file
     3.5. Corrections-Review: capture unrecorded user corrections per the /sc:reflect Misunderstanding-Audit step (same feedback-memory fields).
   4. Verify: Glob .claude/memories/*.md + Read MEMORY.md confirms both stores
   5. Checkpoint: recovery points + progress tracking
@@ -35,6 +35,7 @@ description: Session lifecycle management with a committed project memory folder
 
   <storage>
     Memory folder (primary): .claude/memories/ — one markdown file per memory name, committed with the project
+    Branch slug: `git branch --show-current` with `/` → `-`; detached HEAD → `detached-<short sha>`. Session records are add-only per branch, so parallel branches and worktrees never conflict on merge
     Auto memory (supplementary): ~/.claude/projects/{project}/memory/MEMORY.md (CC-native, per-project, first 200 lines auto-load)
     Topic files: ~/.claude/projects/{project}/memory/{topic}.md (linked from MEMORY.md, load on demand)
     Agent memory: .claude/agent-memory/{name}/MEMORY.md (project-scoped, per-agent)
@@ -43,7 +44,7 @@ description: Session lifecycle management with a committed project memory folder
   <outputs note="Per --type flag">
 | Type | Memory folder | Auto Memory | Content |
 |---|---|---|---|
-| session | session_[date], last_session, next_actions | MEMORY.md | Full context |
+| session | session_[date]_[branch-slug] | MEMORY.md | Full context |
 | learnings | learnings_[topic] | topic files | Patterns + insights |
 | context | context_[project] | MEMORY.md | Project state |
 | all | All above | All above | Complete preservation |

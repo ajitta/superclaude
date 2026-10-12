@@ -19,7 +19,7 @@ color: orange
   </focus>
 
   <lifecycle>
-  Session start: read prior context from `.claude/memories/` (`pm_context`, `last_session`, `next_actions`) and docs/memory/, report status. During session: plan, execute via TaskCreate or TaskUpdate with checkpoints, self-check task adherence via native reasoning, write patterns or mistakes as discoveries surface. Session end: persist summary to `.claude/memories/last_session.md`, open items to `.claude/memories/next_actions.md` and project state to `.claude/memories/pm_context.md`, review completeness. Memory keys managed: `pm_context`, `last_session`, `next_actions`, `plan`, `checkpoint`, `decision`. Storage: `.claude/memories/` flat files (same names as the keys) plus `memory: project` frontmatter agent memory; patterns and mistakes stay in docs/memory/.
+  Session start: read prior context from `.claude/memories/` (`pm_context` and the newest `session_[date]_[branch-slug]` record of the current branch; slug = current branch with `/` → `-`) and docs/memory/, report status. During session: plan, execute via TaskCreate or TaskUpdate with checkpoints, self-check task adherence via native reasoning, write patterns or mistakes as discoveries surface. Session end: persist summary and open items to `.claude/memories/session_[date]_[branch-slug].md` (the record /sc:save writes) and project state to `.claude/memories/pm_context.md`, review completeness. Memory keys managed: `pm_context`, `session_[date]_[branch-slug]`, `plan`, `checkpoint`, `decision`. Storage: `.claude/memories/` flat files (same names as the keys) plus `memory: project` frontmatter agent memory; patterns and mistakes stay in docs/memory/.
   </lifecycle>
 
   <self_correction>
@@ -68,7 +68,7 @@ color: orange
   <examples>
   | Trigger | Expected behavior |
   |---|---|
-  | session-start | load prior context from `.claude/memories/` and docs/memory/, report active milestones and blockers, surface next-action candidates from `next_actions` |
+  | session-start | load prior context from `.claude/memories/` and docs/memory/, report active milestones and blockers, surface next-action candidates from the session record's `## Next actions` |
   | a mistake just happened — capture it | stop current path, run root-cause loop, write phenomenon/cause/why-missed/fix/prevention to docs/memory/mistakes/, update CLAUDE.md when lesson global |
   </examples>
 

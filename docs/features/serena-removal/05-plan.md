@@ -22,7 +22,7 @@ revised: 2026-10-12
     - 과거 기록: `docs/features/*`, `docs/analysis`, `docs/research`, `docs/archive`, `.serena/memories`, `.claude/insights.jsonl`
     - CHANGELOG: Q5 결정. 다음 version-bump 커밋에서 추가한다 (아래 Release note)
 - 메모리 폴더 결정: `.claude/memories/`
-  - 파일 이름은 지금 쓰는 이름 그대로, 평평한 basename: `session_[date].md`, `learnings_[topic].md`, `context_[project].md`, `pm_context.md`, `last_session.md`, `next_actions.md`
+  - 파일 이름은 지금 쓰는 이름 그대로, 평평한 basename: `session_[date].md`, `learnings_[topic].md`, `context_[project].md`, `pm_context.md`, `last_session.md`, `next_actions.md` (Phase G가 `session_[date]_[branch-slug].md` 하나로 바꿈)
   - 근거: SuperClaude가 이미 커밋되는 프로젝트별 데이터를 `.claude/`에 둔다 (`.claude/insights.jsonl`, `scripts/insight_writer.py:55`). SC의 git-exclude 목록(`cli/install_git_exclude.py:87-123`)에도, 이 레포 `.gitignore`의 `.claude/agent-memory*/`에도 걸리지 않는다
 - 도구 중립 문구 결정 (Phase D가 그대로 쓴다)
   - R17: "when exploring unfamiliar code and a symbol-aware tool is connected (LSP or code-index MCP), start with its overview, definition and reference queries rather than reading whole files. Use Grep for text and regex matches, and Read when the file is small, non-code, or already identified."
@@ -46,6 +46,7 @@ revised: 2026-10-12
 - [x] Phase D: [05d-plan-symbolic-first.md](./05d-plan-symbolic-first.md) — R17, 에이전트 18개, 나머지 콘텐츠의 도구 중립화 + 가드 테스트
 - [x] Phase E: [05e-plan-repo-docs.md](./05e-plan-repo-docs.md) — README·SECURITY·AGENTS·PROJECT_INDEX·mcp-authoring, local scope 재동기화
 - [x] Phase F: [05f-plan-review-fixes.md](./05f-plan-review-fixes.md) — 독립 리뷰 I1~I4 수정(도구 이름 가드, save/load 키 일치, docstring 숫자 고정, picker 번호 테스트)과 Suggestion 6개
+- [x] Phase G: [05g-plan-branch-records.md](./05g-plan-branch-records.md) — worktree·여러 브랜치에서 충돌하지 않도록 세션 기록을 `session_[date]_[branch-slug].md` 추가 전용으로
 
 순서 근거: A가 메모리 대체 경로를 먼저 만들어야 B가 /sc:load·/sc:save 주입을 지워도 기능이 비지 않는다. B가 `--serena`를 FLAGS에서 지우기 전에 이를 쓰는 recommend 줄도 B에서 함께 지운다. 가드 테스트는 `src/`의 마지막 phase인 D에서 넣어야 처음부터 끝까지 suite가 green이다.
 
@@ -82,7 +83,7 @@ revised: 2026-10-12
 
 ## Release note (다음 version-bump 커밋의 CHANGELOG `### Changed` / `### Removed`)
 
-- `/sc:save` and `/sc:load` keep session memories in `.claude/memories/` (committed with the project) plus Claude auto memory. Existing `.serena/memories/` files stay where they are and are no longer read.
+- `/sc:save` and `/sc:load` keep session memories in `.claude/memories/` (committed with the project) plus Claude auto memory. Each save adds or updates one `session_[date]_[branch-slug].md` record, so parallel branches and worktrees do not conflict on merge. Existing `.serena/memories/` files stay where they are and are no longer read.
 - Removed: the Serena MCP doc, the `--serena` flag (now plain text with no effect), and Serena registration in `superclaude mcp`. An already registered Serena server keeps working; register or remove it with `claude mcp`.
 - `superclaude mcp` no longer pre-selects servers: the interactive picker lists every server and installs only the numbers you enter.
 - Agents and R17 say "symbol-aware tool (LSP or code index)" instead of naming a server.

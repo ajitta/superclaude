@@ -21,3 +21,4 @@ SuperClaude가 Serena를 이용하고 참조하면서 동작하는 부분을 배
   - [05d-plan-symbolic-first.md](./05d-plan-symbolic-first.md): Phase D, 도구 중립 Symbolic-First와 가드 테스트
   - [05e-plan-repo-docs.md](./05e-plan-repo-docs.md): Phase E, 레포 문서와 local scope 재동기화
   - [05f-plan-review-fixes.md](./05f-plan-review-fixes.md): Phase F, 독립 리뷰 발견(I1~I4)과 고른 Suggestion 수정
+  - [05g-plan-branch-records.md](./05g-plan-branch-records.md): Phase G, worktree·여러 브랜치용 브랜치 단위 세션 기록

@@ -10,7 +10,7 @@ description: Session lifecycle mgmt with the project memory folder (`.claude/mem
   <syntax>/sc:load [target] [--type project|config|deps|checkpoint] [--refresh] [--analyze]</syntax>
 
   <flow>
-  1. Load (memory folder): Glob .claude/memories/*.md → Read pm_context, last_session, next_actions when present; folder absent → skip
+  1. Load (memory folder): Glob .claude/memories/*.md → Read pm_context when present + the newest session_*_[branch-slug].md of the current branch (slug per /sc:save <storage>); none → the newest session_* of any branch, reported as that branch's record; folder absent → skip
   2. Load (auto memory): MEMORY.md (auto-load) + topic files linked from MEMORY.md
   3. Discover: Proj struct + reqs (Glob/Grep/Read)
   4. Activate: Proj context + workflow prep
