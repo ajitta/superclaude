@@ -58,7 +58,7 @@ Microsoft ships both `@playwright/mcp` (the `--play` plugin above) and `playwrig
 
 | Flag | Servers Activated |
 |------|-------------------|
-| `--frontend-verify` | Playwright + DevTools + Serena |
+| `--frontend-verify` | Playwright + DevTools |
 | `--all-mcp` | All available servers |
 | `--no-mcp` | None (native tools + WebSearch only) |
 

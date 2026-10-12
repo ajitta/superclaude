@@ -131,24 +131,24 @@ class TestContextGroupRegistration:
 class TestContextExplain:
     def test_it_names_the_file_and_the_trigger_that_fired(self, project: Path):
         result = CliRunner().invoke(
-            main, ["context", "explain", "--serena rename this symbol"]
+            main, ["context", "explain", "--tavily research this"]
         )
 
         assert result.exit_code == 0, result.output
-        assert "mcp/MCP_Serena.md" in result.output
-        assert "--serena" in result.output
+        assert "mcp/MCP_Tavily.md" in result.output
+        assert "--tavily" in result.output
 
     def test_a_prompt_starting_with_a_flag_is_not_read_as_an_option(
         self, project: Path
     ):
-        """`--serena` must reach the loader, not Click's option parser."""
+        """`--tavily` must reach the loader, not Click's option parser."""
         result = CliRunner().invoke(
-            main, ["context", "explain", "--serena", "rename", "this"]
+            main, ["context", "explain", "--tavily", "research", "this"]
         )
 
         assert result.exit_code == 0, result.output
         assert "no such option" not in result.output
-        assert "mcp/MCP_Serena.md" in result.output
+        assert "mcp/MCP_Tavily.md" in result.output
 
     def test_it_reports_token_cost_against_the_loader_budget(self, project: Path):
         result = CliRunner().invoke(main, ["context", "explain", "--brainstorm a CLI"])
@@ -211,7 +211,7 @@ class TestContextExplain:
         before = _state_snapshot()
 
         result = CliRunner().invoke(
-            main, ["context", "explain", "--serena --play /sc:implement x"]
+            main, ["context", "explain", "--tavily --play /sc:implement x"]
         )
         assert result.exit_code == 0, result.output
 
@@ -223,7 +223,7 @@ class TestContextExplain:
         """Control for the test above: the unsandboxed loader DOES write."""
         before = _state_snapshot()
 
-        _run_loader_directly("--serena --play /sc:implement x", project, "control")
+        _run_loader_directly("--tavily --play /sc:implement x", project, "control")
 
         after = _state_snapshot()
         assert after != before
@@ -233,7 +233,7 @@ class TestContextExplain:
         """The UserPromptSubmit hook runs `superclaude hook context_loader` —
         this package's loader — and explain runs the same file. Naming it keeps
         the report checkable against the source rather than against a claim."""
-        result = CliRunner().invoke(main, ["context", "explain", "--serena rename x"])
+        result = CliRunner().invoke(main, ["context", "explain", "--tavily research x"])
 
         assert result.exit_code == 0, result.output
         assert f"loader:  {LOADER_SCRIPT}" in result.output
@@ -249,7 +249,7 @@ class TestContextContentRoot:
     """
 
     def test_the_project_anchor_beats_the_cwd(self, scoped_install: Path):
-        result = CliRunner().invoke(main, ["context", "explain", "--serena rename x"])
+        result = CliRunner().invoke(main, ["context", "explain", "--tavily research x"])
 
         assert result.exit_code == 0, result.output
         expected = scoped_install / ".claude" / "superclaude"
@@ -258,7 +258,7 @@ class TestContextContentRoot:
     def test_a_disagreement_between_the_anchors_is_never_silent(
         self, scoped_install: Path
     ):
-        result = CliRunner().invoke(main, ["context", "explain", "--serena rename x"])
+        result = CliRunner().invoke(main, ["context", "explain", "--tavily research x"])
 
         assert result.exit_code == 0, result.output
         assert f"$CLAUDE_PROJECT_DIR={scoped_install}" in result.output
@@ -272,7 +272,7 @@ class TestContextContentRoot:
         monkeypatch.delenv("CLAUDE_PROJECT_DIR", raising=False)
         monkeypatch.chdir(scoped_install)
 
-        result = CliRunner().invoke(main, ["context", "explain", "--serena rename x"])
+        result = CliRunner().invoke(main, ["context", "explain", "--tavily research x"])
 
         assert result.exit_code == 0, result.output
         expected = scoped_install / ".claude" / "superclaude"
@@ -285,7 +285,7 @@ class TestContextContentRoot:
         """It is the loader's own first priority, so it stays the CLI's too."""
         monkeypatch.setenv("SUPERCLAUDE_PATH", str(CONTENT_ROOT))
 
-        result = CliRunner().invoke(main, ["context", "explain", "--serena rename x"])
+        result = CliRunner().invoke(main, ["context", "explain", "--tavily research x"])
 
         assert result.exit_code == 0, result.output
         assert f"content: {CONTENT_ROOT}" in result.output
@@ -299,7 +299,7 @@ class TestContextReset:
         monkeypatch.setenv("CLAUDE_CODE_SESSION_ID", "s1")
         cache = context_cache_file("s1")
         cache.parent.mkdir(parents=True, exist_ok=True)
-        cache.write_text("mcp/MCP_Serena.md", encoding="utf-8")
+        cache.write_text("mcp/MCP_Tavily.md", encoding="utf-8")
 
         result = CliRunner().invoke(main, ["context", "reset"])
 
@@ -364,7 +364,7 @@ class TestContextReset:
         )
         cache = context_cache_file()
         cache.parent.mkdir(parents=True, exist_ok=True)
-        cache.write_text("mcp/MCP_Serena.md", encoding="utf-8")
+        cache.write_text("mcp/MCP_Tavily.md", encoding="utf-8")
 
         result = CliRunner().invoke(main, ["context", "reset", "--session", "///"])
 

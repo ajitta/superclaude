@@ -10,7 +10,7 @@ Modes:
 
 v3.1 Features:
 - Hybrid injection: Mode files → full .md, MCP files → short instructions
-  (Serena + Tavily get Tier 1 INSTRUCTION_MAP strings due to behavioral patterns)
+  (Tavily gets a Tier 1 INSTRUCTION_MAP string due to behavioral patterns)
 - Composite flags: --frontend-verify (3 MCP), --all-mcp (6 MCP)
 - --no-mcp: suppresses all mcp/ context loading
 - Tightened TRIGGER_MAP regex (no generic single words)
@@ -108,11 +108,6 @@ TRIGGER_MAP = [
     #
     # MCP servers — behavioral MCPs at P1, tool MCPs at P2
     (
-        r"(serena|symbol ops|rename.?symbol|safe.?delete|lsp|--serena|/sc:load|/sc:save)",
-        "mcp/MCP_Serena.md",
-        1,
-    ),
-    (
         r"(tavily|fact.?check|/sc:research|--tavily)",
         "mcp/MCP_Tavily.md",
         1,
@@ -197,10 +192,8 @@ COMPOSITE_FLAGS = {
     "--frontend-verify": [
         ("mcp/MCP_Playwright.md", 1),
         ("mcp/MCP_Chrome-DevTools.md", 1),
-        ("mcp/MCP_Serena.md", 2),
     ],
     "--all-mcp": [
-        ("mcp/MCP_Serena.md", 1),
         ("mcp/MCP_Tavily.md", 1),
         ("mcp/MCP_Playwright.md", 2),
         ("mcp/MCP_Chrome-DevTools.md", 2),
@@ -209,20 +202,11 @@ COMPOSITE_FLAGS = {
 
 # v3.1: Hybrid Injection Map
 # Only entries reachable by _get_injection_tier() belong here:
-#   - Behavioral MCPs (Serena, Tavily) → Tier 1 via their INSTRUCTION_MAP entry
+#   - Behavioral MCPs (Tavily) → Tier 1 via their INSTRUCTION_MAP entry
 #   - Tool MCPs and core files use TIER_0_MAP (Tier 0) instead — do NOT duplicate here
 # Mode files → always Tier 2 (full .md injection)
 INSTRUCTION_MAP = {
     # Behavioral MCPs — complex decision rules and workflow patterns
-    "mcp/MCP_Serena.md": (
-        "Serena: symbol ops (find_symbol, replace_symbol_body, get_symbols_overview, "
-        "insert_before/after_symbol, find_referencing_symbols, find_declaration, find_implementations, "
-        "rename_symbol, safe_delete_symbol, get_diagnostics_for_file, replace_in_files). "
-        "Workflow: get_symbols_overview → find_symbol(name_path, include_body=True) → edit. "
-        "Decision: symbol meaning (references, types, rename, delete) → Serena; text patterns → native Grep/Edit. "
-        "Memory: list_memories → read/write/edit/rename/delete_memory. Project auto-active via --project-from-cwd; run onboarding only if list_memories returns none. "
-        "Prioritize symbolic tools over full file reads."
-    ),
     "mcp/MCP_Tavily.md": (
         "Tavily web access — primary path is the Tavily Agent Skills (install: Tavily CLI + "
         "`tvly init`, or `npx skills add https://github.com/tavily-ai/skills`): tavily-search (web search), "
@@ -240,7 +224,7 @@ INSTRUCTION_MAP = {
 }
 
 # v3.2: Tier 0 — 1-line summaries for tool MCPs (Claude already has tool descriptions)
-# Behavioral MCPs (Serena, Tavily) are NOT here — they use INSTRUCTION_MAP (Tier 1)
+# Behavioral MCPs (Tavily) are NOT here — they use INSTRUCTION_MAP (Tier 1)
 TIER_0_MAP = {
     "mcp/MCP_Playwright.md": "Playwright: playwright-cli skill if installed, else MCP browser_* (--caps). navigate → assert.",
     "mcp/MCP_Chrome-DevTools.md": "DevTools: CWV via perf trace, Lighthouse a11y/SEO, heap-snapshot diff. trace → analyze → optimize.",
@@ -354,7 +338,6 @@ VALID_FLAGS = {
     "token-efficient",
     "c7",
     "context7",
-    "serena",
     "play",
     "playwright",
     "perf",
@@ -699,7 +682,7 @@ def check_mcp_fallbacks(
     """
     notifications = []
     for context_file, _ in contexts:
-        # Extract MCP name from path like "mcp/MCP_Serena.md"
+        # Extract MCP name from path like "mcp/MCP_Tavily.md"
         if context_file.startswith("mcp/MCP_"):
             mcp_name = context_file.replace("mcp/MCP_", "").replace(".md", "").lower()
             # Map special names
@@ -867,8 +850,6 @@ _EXECUTION_DIRECTIVES = {
             f"</sc-directive>"
         )
     ),
-    # --serena directive removed: INSTRUCTION_MAP[mcp/MCP_Serena.md] (Tier 1)
-    # already provides workflow + decision rules. Avoids ~85 token duplicate.
     _C7_PATTERN: (
         lambda m: (
             f'<sc-directive flag="{m.group(0).lower()}">'

@@ -68,8 +68,8 @@ class TestResolveFlags:
     # --- Valid flags pass through unchanged ---
 
     def test_valid_flag_unchanged(self):
-        prompt, notes = resolve_flags("analyze --serena --tavily --c7")
-        assert prompt == "analyze --serena --tavily --c7"
+        prompt, notes = resolve_flags("analyze --tavily --c7")
+        assert prompt == "analyze --tavily --c7"
         assert notes == []
 
     def test_no_flags_returns_unchanged(self):
@@ -95,8 +95,8 @@ class TestResolveFlags:
     # --- Multiple flags ---
 
     def test_multiple_valid_flags_pass_through(self):
-        prompt, notes = resolve_flags("go --vs --delegate --serena")
-        assert prompt == "go --vs --delegate --serena"
+        prompt, notes = resolve_flags("go --vs --delegate --tavily")
+        assert prompt == "go --vs --delegate --tavily"
         assert notes == []
 
     def test_mixed_valid_and_unknown(self):
@@ -108,7 +108,7 @@ class TestResolveFlags:
     # --- Edge cases ---
 
     def test_flag_with_value_preserved(self):
-        prompt, notes = resolve_flags("run --concurrency 5 --serena")
+        prompt, notes = resolve_flags("run --concurrency 5 --tavily")
         assert "--concurrency 5" in prompt
         assert notes == []
 
@@ -123,7 +123,7 @@ class TestResolveFlags:
 class TestTieredInjection:
     """Test 3-tier context injection system."""
 
-    # Expected MCP docs (4 total: 2 tool + 2 behavioral; Sequential and
+    # Expected MCP docs (3 total: 2 tool + 1 behavioral; Sequential and
     # Context7 removed — Context7 is a claude.ai connector that ships its own
     # server instructions, so no doc and no Tier 0 hint)
     EXPECTED_TOOL_MCPS = {
@@ -131,7 +131,6 @@ class TestTieredInjection:
         "mcp/MCP_Chrome-DevTools.md",
     }
     EXPECTED_BEHAVIORAL_MCPS = {
-        "mcp/MCP_Serena.md",
         "mcp/MCP_Tavily.md",
     }
 
@@ -143,7 +142,7 @@ class TestTieredInjection:
             )
 
     def test_behavioral_mcp_gets_tier_1(self):
-        """Behavioral MCPs (Serena, Tavily) should get Tier 1."""
+        """Behavioral MCPs (Tavily) should get Tier 1."""
         for mcp in self.EXPECTED_BEHAVIORAL_MCPS:
             assert _get_injection_tier(mcp, verbose=False) == 1, (
                 f"{mcp} should be Tier 1"
@@ -158,7 +157,7 @@ class TestTieredInjection:
     def test_verbose_context_forces_tier_2(self):
         """--verbose-context should force Tier 2 for everything."""
         assert _get_injection_tier("mcp/MCP_Playwright.md", verbose=True) == 2
-        assert _get_injection_tier("mcp/MCP_Serena.md", verbose=True) == 2
+        assert _get_injection_tier("mcp/MCP_Tavily.md", verbose=True) == 2
         assert _get_injection_tier("modes/MODE_Brainstorming.md", verbose=True) == 2
 
     def test_tier_0_and_instruction_map_no_conflicting_keys(self):
@@ -196,12 +195,6 @@ class TestTieredInjection:
         assert "--caps" in hint or "caps" in hint, (
             "Playwright hint should mention capability system"
         )
-
-    def test_instruction_map_serena_mentions_safe_delete(self):
-        """Serena INSTRUCTION_MAP should mention key symbol operations."""
-        hint = INSTRUCTION_MAP["mcp/MCP_Serena.md"]
-        assert "find_symbol" in hint
-        assert "replace_symbol_body" in hint
 
     def test_verbose_context_in_valid_flags(self):
         """--verbose-context should be a valid flag."""
@@ -259,29 +252,28 @@ class TestTriggerMapPaths:
                     f"Morphllm found in COMPOSITE_FLAGS[{flag}]: {path}"
                 )
 
-    def test_all_mcp_includes_4_servers(self):
-        """--all-mcp should activate exactly 4 MCP docs (2 core + 2 plugin).
+    def test_all_mcp_includes_3_servers(self):
+        """--all-mcp should activate exactly 3 MCP docs (1 core + 2 plugin).
         Context7 is not among them: it ships no doc, and --all-mcp reaches it
         through _C7_PATTERN in _EXECUTION_DIRECTIVES instead."""
         all_mcp_paths = {p for p, _ in COMPOSITE_FLAGS["--all-mcp"]}
-        assert len(all_mcp_paths) == 4, (
-            f"Expected 4 MCP docs in --all-mcp, got {len(all_mcp_paths)}"
+        assert len(all_mcp_paths) == 3, (
+            f"Expected 3 MCP docs in --all-mcp, got {len(all_mcp_paths)}"
         )
 
-    def test_frontend_verify_includes_3_servers(self):
-        """--frontend-verify should activate Playwright + DevTools + Serena."""
+    def test_frontend_verify_includes_2_servers(self):
+        """--frontend-verify should activate Playwright + DevTools."""
         fv_paths = {p for p, _ in COMPOSITE_FLAGS["--frontend-verify"]}
         assert fv_paths == {
             "mcp/MCP_Playwright.md",
             "mcp/MCP_Chrome-DevTools.md",
-            "mcp/MCP_Serena.md",
         }
 
     def test_trigger_map_mcp_count(self):
-        """TRIGGER_MAP should have entries for exactly 4 MCP docs (Context7 has none)."""
+        """TRIGGER_MAP should have entries for exactly 3 MCP docs (Context7 has none)."""
         mcp_paths = {path for _, path, _ in TRIGGER_MAP if path.startswith("mcp/")}
-        assert len(mcp_paths) == 4, (
-            f"Expected 4 MCP trigger paths, got {len(mcp_paths)}: {mcp_paths}"
+        assert len(mcp_paths) == 3, (
+            f"Expected 3 MCP trigger paths, got {len(mcp_paths)}: {mcp_paths}"
         )
 
 
@@ -451,7 +443,7 @@ class TestSessionScopedCache:
     loaded for both, and the second is silently starved (A3).
     """
 
-    PROMPT = "analyze this --serena"
+    PROMPT = "analyze this --tavily"
 
     @staticmethod
     def _project(tmp_path: Path) -> Path:
@@ -691,6 +683,24 @@ class TestContext7HasNoDocOnlyAFlag:
         assert "mcp/MCP_Context7.md" not in TIER_0_MAP
         assert "mcp/MCP_Context7.md" not in INSTRUCTION_MAP
         assert all(path != "mcp/MCP_Context7.md" for _, path, _ in TRIGGER_MAP)
+
+    def test_removed_symbol_server_doc_ships_nowhere(self):
+        """The symbol-server doc was deleted along with its flag, injection
+        and fallback hint; no map, flag set or server roster may keep it."""
+        from superclaude.hooks.mcp_fallback import MCP_FALLBACKS
+        from superclaude.utils import CURRENT_MCP_SERVERS
+
+        doc = "mcp/MCP_Serena.md"
+        mcp_dir = Path(__file__).resolve().parents[2] / "src" / "superclaude" / "mcp"
+        assert not (mcp_dir / "MCP_Serena.md").exists()
+        assert doc not in TIER_0_MAP
+        assert doc not in INSTRUCTION_MAP
+        assert all(path != doc for _, path, _ in TRIGGER_MAP)
+        assert all(doc not in files for files in COMPOSITE_FLAGS.values())
+        assert "serena" not in VALID_FLAGS
+        assert "serena" not in MCP_FALLBACKS
+        assert "serena" not in CURRENT_MCP_SERVERS
+        assert resolve_flags("analyze --serena x") == ("analyze --serena x", [])
 
     def test_typed_c7_still_forces_a_lookup(self, monkeypatch, capsys):
         out = self._emit("--c7 add stripe checkout to this route", monkeypatch, capsys)

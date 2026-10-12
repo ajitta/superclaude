@@ -86,7 +86,6 @@ class TestMcpFallback:
         expected_mcps = [
             "context7",
             "tavily",
-            "serena",
             "playwright",
             "devtools",
         ]
@@ -148,8 +147,8 @@ class TestFallbackLedgerPruning:
             tmp_path,
             monkeypatch,
             {
-                "old-session": {"serena": self._stamp(90)},
-                "recent-session": {"serena": self._stamp(1)},
+                "old-session": {"tavily": self._stamp(90)},
+                "recent-session": {"tavily": self._stamp(1)},
             },
         )
 
@@ -165,7 +164,7 @@ class TestFallbackLedgerPruning:
         from superclaude.utils import prune_fallback_ledger
 
         path = self._ledger(
-            tmp_path, monkeypatch, {"live": {"serena": self._stamp(90)}}
+            tmp_path, monkeypatch, {"live": {"tavily": self._stamp(90)}}
         )
 
         prune_fallback_ledger(session_id="live")
@@ -182,6 +181,7 @@ class TestFallbackLedgerPruning:
             monkeypatch,
             {
                 "live": {
+                    "tavily": self._stamp(0),
                     "serena": self._stamp(0),
                     "magic": self._stamp(0),
                     "morphllm": self._stamp(0),
@@ -191,7 +191,7 @@ class TestFallbackLedgerPruning:
 
         prune_fallback_ledger(session_id="live")
 
-        assert set(json.loads(path.read_text(encoding="utf-8"))["live"]) == {"serena"}
+        assert set(json.loads(path.read_text(encoding="utf-8"))["live"]) == {"tavily"}
 
     def test_emptied_session_is_removed(self, tmp_path, monkeypatch):
         import json

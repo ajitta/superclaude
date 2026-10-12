@@ -79,7 +79,6 @@ class TestMCPWiring:
     # instructions and tool descriptions carry the guidance a doc would.
     EXPECTED_MCP_DOCS = [
         "MCP_Playwright.md",
-        "MCP_Serena.md",
         "MCP_Tavily.md",
         "MCP_Chrome-DevTools.md",
     ]

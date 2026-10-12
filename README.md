@@ -25,7 +25,7 @@
 
 | Commands | Agents | Modes | MCP Servers |
 |:--------:|:------:|:-----:|:-----------:|
-| **37**   | **24** | **8** | **4**       |
+| **37**   | **24** | **8** | **3**       |
 | Slash    | Domain-expert | Behavioral | Integrations |
 
 </div>
@@ -516,7 +516,7 @@ The Deep Research system intelligently coordinates multiple tools:
 | Slash commands (37) | [`src/superclaude/commands/`](src/superclaude/commands) · `superclaude install --list-all` |
 | Agents (24) | [`src/superclaude/agents/`](src/superclaude/agents) |
 | Modes (8) | [`src/superclaude/modes/`](src/superclaude/modes) |
-| MCP servers (4) | [`src/superclaude/mcp/`](src/superclaude/mcp) |
+| MCP servers (3) | [`src/superclaude/mcp/`](src/superclaude/mcp) |
 | Hooks (registry + scripts) | [`src/superclaude/cli/hook_dispatch.py`](src/superclaude/cli/hook_dispatch.py) · [`src/superclaude/hooks/hooks.json`](src/superclaude/hooks/hooks.json) · [`src/superclaude/scripts/`](src/superclaude/scripts) |
 | Architecture decisions | [`docs/adr/`](docs/adr) |
 | Feature work (discovery → plan → retrospective) | [`docs/features/`](docs/features) |
