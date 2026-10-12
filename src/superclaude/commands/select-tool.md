@@ -24,27 +24,27 @@ description: Intelligent MCP tool selection based on complexity scoring and oper
 
 
   <decision_matrix>
-    - Symbol ops: Serena (LSP, navigation)
-    - Pattern edits: Edit (native) after Grep/Serena confirms targets
-    - Memory ops: Serena (persistence)
-    - Threshold >0.6: Serena (accuracy)
+    - Symbol ops: symbol-aware MCP when connected (LSP rename, references)
+    - Pattern edits: Edit (native) after Grep or a reference query confirms targets
+    - Memory ops: /sc:save, /sc:load (`.claude/memories/` + auto memory)
+    - Threshold >0.6: symbol-aware MCP when connected (accuracy)
     - Threshold <0.4: Native tools (speed)
     - Threshold 0.4-0.6: Feature-based selection
-    - Fallback: Serena unavailable → Native tools (Grep/Glob/Edit)
+    - Fallback: no symbol-aware tool → Native tools (Grep/Glob/Edit)
   </decision_matrix>
 
   <examples>
 
 | Input | Output |
 |---|---|
-| `'rename function across 10 files' --analyze` | Serena (LSP, semantic) |
+| `'rename function across 10 files' --analyze` | Symbol-aware MCP (LSP rename) when connected |
 | `'update console.log to logger.info' --explain` | Grep targets + Edit (text replace) |
-| `'save project context'` | Serena (memory direct) |
+| `'save project context'` | /sc:save (memory folder) |
 
   <example name="wrong-tool-choice" type="error-path">
     - Input: /sc:select-tool 'rename a variable across the project' → suggests Grep + Edit
     - Why wrong: Variable rename = semantic op. Plain text replace risks aliasing matches in strings/comments.
-    - Correct: Serena (LSP rename) for semantic ops; reserve Grep+Edit for unambiguous text patterns.
+    - Correct: symbol-aware rename (LSP) when connected; otherwise Grep every occurrence and review each before Edit; reserve plain Grep+Edit for unambiguous text patterns.
   </example>
   </examples>
 

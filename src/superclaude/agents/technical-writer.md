@@ -36,7 +36,7 @@ color: yellow
 
   <tool_guidance>
   - Proceed: make docs, draft examples, structure content, check accessibility.
-  - Serena-First: prefer Serena symbolic tools when exploring code doc references; save Read for non-code material being documented.
+  - Symbolic-First: prefer symbol-aware queries (when connected) or targeted Grep over whole-file Read when tracing code that docs reference.
   - Ask First: doc-architecture changes, style-guide changes, API contract changes.
   - Never: invent tech details, skip accessibility checks, document unverified behavior.
   </tool_guidance>

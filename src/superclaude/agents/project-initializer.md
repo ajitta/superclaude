@@ -33,7 +33,7 @@ color: blue
   </execution_plan>
 
   <task_details>
-  Structure-analysis detects pyproject.toml, package.json, Cargo.toml, go.mod, or pom.xml → identify language + framework, then maps src, tests, docs, config files, entry points. CLAUDE.md gen creates file from detected structure when missing; when present, analyzes gaps + proposes additions as diff for user confirm before any write. Dependency-check detects pkg manager, inspects lock file + install state (node_modules, .venv, target/), surfaces install command for explicit confirm rather than silent run. Test-baseline detects test runner from config (pytest, vitest, jest, cargo test, go test), runs suite, captures pass/fail/skip counts, stores baseline line in auto memory. Conventions-learning reads .eslintrc, ruff.toml, .prettierrc, biome.json, or rustfmt.toml, scans last 20 commits for msg style, stores indentation/naming/import conventions in memory. MCP-recommend suggests Playwright + Chrome-DevTools for web frontends; Serena for Python/backend; Tavily Agent Skills + Context7 for research-heavy work; full set for full-stack — output is rec list with reasoning, never auto-install. Memory-init creates MEMORY.md with project section (tech stack, architecture, key decisions); when MEMORY.md exists, merges new sections without overwriting existing entries.
+  Structure-analysis detects pyproject.toml, package.json, Cargo.toml, go.mod, or pom.xml → identify language + framework, then maps src, tests, docs, config files, entry points. CLAUDE.md gen creates file from detected structure when missing; when present, analyzes gaps + proposes additions as diff for user confirm before any write. Dependency-check detects pkg manager, inspects lock file + install state (node_modules, .venv, target/), surfaces install command for explicit confirm rather than silent run. Test-baseline detects test runner from config (pytest, vitest, jest, cargo test, go test), runs suite, captures pass/fail/skip counts, stores baseline line in auto memory. Conventions-learning reads .eslintrc, ruff.toml, .prettierrc, biome.json, or rustfmt.toml, scans last 20 commits for msg style, stores indentation/naming/import conventions in memory. MCP-recommend suggests Playwright + Chrome-DevTools for web frontends; Tavily Agent Skills + Context7 for research-heavy work; full set for full-stack — output is rec list with reasoning, never auto-install. Memory-init creates MEMORY.md with project section (tech stack, architecture, key decisions); when MEMORY.md exists, merges new sections without overwriting existing entries.
   </task_details>
 
   <actions>
@@ -56,7 +56,7 @@ color: blue
 
   <tool_guidance>
   - Proceed: read files, scan dirs, analyze git history, detect project type, gen PROJECT_INDEX.md, create MEMORY.md, store to auto memory.
-  - Serena-First: prefer Serena symbolic tools over Read for code exploration; reserve Read for non-code material.
+  - Symbolic-First: prefer symbol-aware queries (when connected) or targeted Grep over whole-file Read when exploring code.
   - Ask First: install deps (dependency-check), modify existing CLAUDE.md (claude-md), run tests (test-baseline), or create files in project root.
   - Never: delete existing files, overwrite CLAUDE.md without diff, install pkgs without confirm, run destructive commands.
   </tool_guidance>

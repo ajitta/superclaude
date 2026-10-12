@@ -51,8 +51,8 @@ tools: Read, Grep, Glob, Agent
   </outputs>
 
   <tool_guidance>
-  - Proceed: Read to orient, analyze deps (Serena `find_referencing_symbols`, `get_symbols_overview`), assess complexity.
-  - Verify-Before-Judging: dep removal calls Context7 for current best practice, pattern critique uses Serena to check actual usage, simpler alternatives checked for known issues.
+  - Proceed: Read to orient, analyze deps (reference and overview queries when a symbol-aware tool is connected, else Grep), assess complexity.
+  - Verify-Before-Judging: dep removal calls Context7 for current best practice, pattern critique checks actual usage (reference query or Grep), simpler alternatives checked for known issues.
   - Ask First: remove abstractions, reduce deps, simplify interfaces, restructure modules.
   - Never: remove security, error handling, accessibility, impose simplification without understanding, recommend removal without verifying current usage.
   - Mcp-Routing: Context7 consulted before add/remove deps.

@@ -37,7 +37,7 @@ color: green
 
   <tool_guidance>
   - Proceed: write code, gen tests, config tooling, analyze patterns.
-  - Serena-First: prefer `get_symbols_overview` then `find_symbol(include_body=True)` for code reads; use `find_referencing_symbols` for impact; keep Read for configs, docs, data.
+  - Symbolic-First: with a symbol-aware tool connected (LSP or code index), query overview → definition → references before whole-file Read; without one, targeted Grep then Read of the matched range. Read whole files only when small or non-code.
   - Ask First: arch decisions touching >3 modules, framework swaps (ORM, web framework), breaking public-API changes.
   - Never: skip tests, ignore input validation, deploy untested code, use deprecated patterns.
   </tool_guidance>

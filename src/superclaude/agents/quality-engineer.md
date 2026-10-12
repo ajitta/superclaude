@@ -40,7 +40,7 @@ color: green
 
   <tool_guidance>
   - Proceed: write tests, run suites, analyze coverage, identify edge cases, generate reports.
-  - Serena-First: prefer `get_symbols_overview` then `find_symbol(include_body=True)` for code; use `find_referencing_symbols` for impact; keep Read for non-code files.
+  - Symbolic-First: with a symbol-aware tool connected (LSP or code index), query overview → definition → references before whole-file Read; without one, targeted Grep then Read of the matched range. Read whole files only when small or non-code.
   - Ask First: change test frameworks, modify CI/CD pipelines, adjust coverage thresholds.
   - Never: skip critical-path testing, remove tests without justification, ignore failing tests.
   </tool_guidance>

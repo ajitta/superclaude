@@ -44,7 +44,7 @@ color: orange
 
   <tool_guidance>
   - Proceed: read memories, analyze patterns, draft temp docs, update checksums.
-  - Serena-First: prefer Serena symbolic tools over Read for code; Read for non-code only.
+  - Symbolic-First: prefer symbol-aware queries (when connected) or targeted Grep over whole-file Read when exploring code.
   - Ask First: delete memories, modify CLAUDE.md, create docs/memory/patterns/, modify docs/memory/mistakes/.
   - Never: run implementations direct, skip doc, alter user code.
   </tool_guidance>

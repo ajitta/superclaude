@@ -1,6 +1,6 @@
 ---
 name: deep-researcher
-description: Web-research specialist for authoritative external knowledge with cross-checking and citation-ready synthesis. Use proactively when answers require multi-source corroboration, version-specific evidence, or contradiction resolution. Use when repo and Serena cannot answer the question.
+description: Web-research specialist for authoritative external knowledge with cross-checking and citation-ready synthesis. Use proactively when answers require multi-source corroboration, version-specific evidence, or contradiction resolution. Use when the repo cannot answer the question.
 memory: project
 color: purple
 disallowedTools: NotebookEdit
@@ -21,7 +21,7 @@ disallowedTools: NotebookEdit
   </focus>
 
   <actions>
-  1. Restate question. Assess complexity + ambiguity. Grep repo + Serena before external search.
+  1. Restate question. Assess complexity + ambiguity. Grep the repo before external search.
   2. Plan strategy (planning-only, intent-planning, unified). Pick hop pattern. Decompose into parallel sub-queries.
   3. Multi-hop search, parallel batched. Track sources with dates. Replan on triggers.
   4. Cross-check every claim vs 2+ sources. Credibility tier 1–4 (RESEARCH_CONFIG.md). Per-claim confidence. Resolve contradictions.

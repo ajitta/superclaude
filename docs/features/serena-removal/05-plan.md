@@ -43,7 +43,7 @@ revised: 2026-10-12
 - [x] Phase A: [05a-plan-memory-folder.md](./05a-plan-memory-folder.md) — /sc:save·/sc:load와 메모리를 다루는 콘텐츠를 `.claude/memories/` + auto memory로
 - [x] Phase B: [05b-plan-loader-flag.md](./05b-plan-loader-flag.md) — MCP 문서 삭제, context_loader 주입·플래그, fallback 힌트, 컴포넌트 카운트
 - [x] Phase C: [05c-plan-installer.md](./05c-plan-installer.md) — 설치기 등록·사전 점검 제거, core/plugin 구분 제거, 설치 문서
-- [ ] Phase D: [05d-plan-symbolic-first.md](./05d-plan-symbolic-first.md) — R17, 에이전트 18개, 나머지 콘텐츠의 도구 중립화 + 가드 테스트
+- [x] Phase D: [05d-plan-symbolic-first.md](./05d-plan-symbolic-first.md) — R17, 에이전트 18개, 나머지 콘텐츠의 도구 중립화 + 가드 테스트
 - [ ] Phase E: [05e-plan-repo-docs.md](./05e-plan-repo-docs.md) — README·SECURITY·AGENTS·PROJECT_INDEX·mcp-authoring, local scope 재동기화
 
 순서 근거: A가 메모리 대체 경로를 먼저 만들어야 B가 /sc:load·/sc:save 주입을 지워도 기능이 비지 않는다. B가 `--serena`를 FLAGS에서 지우기 전에 이를 쓰는 recommend 줄도 B에서 함께 지운다. 가드 테스트는 `src/`의 마지막 phase인 D에서 넣어야 처음부터 끝까지 suite가 green이다.

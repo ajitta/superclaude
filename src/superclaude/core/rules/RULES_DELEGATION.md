@@ -58,6 +58,6 @@
 
   <agent_routing note="Single-trigger only — compound requests route via <sub_agent_decision>">
   When agents overlap on a single verb, prefer the agent whose description matches explicit evidence in the request (cited metric, named library, stated scope). When that leaves it unresolved, state the options with a 1-line rationale each and pick one.
-  Research SC-norm: repo before web — try Grep/Serena before delegating to deep-researcher, which is only for external knowledge not in the repo.
+  Research SC-norm: repo before web — try Grep and connected symbol-aware tools before delegating to deep-researcher, which is only for external knowledge not in the repo.
   </agent_routing>
 </component>

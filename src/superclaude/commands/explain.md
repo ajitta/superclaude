@@ -49,7 +49,7 @@ description: Give clear explain of code, concepts, system behavior with edu clar
 
 
   <gotchas>
-  - serena-first: Use Serena symbolic tools for code explore, not full file read
+  - symbolic-first: prefer symbol-aware queries (when connected) or targeted Grep for code exploration, not full file read
   - audience: Check user context/memory for expertise level before pick explain depth
   </gotchas>
 

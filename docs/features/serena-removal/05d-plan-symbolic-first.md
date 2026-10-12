@@ -1,5 +1,5 @@
 ---
-status: draft
+status: complete
 revised: 2026-10-12
 ---
 
@@ -11,12 +11,12 @@ Index: [05-plan.md](./05-plan.md). 결정 근거: 01-discovery Q2·P5·P8. 문�
 
 **Files:** Create: `tests/unit/test_shipped_content_server_neutral.py`
 
-- [ ] Step 1: 테스트 작성
+- [x] Step 1: 테스트 작성
   - `src/superclaude/` 아래 파일을 걷는다. `__pycache__`와 `.pyc`는 건너뛰고, UTF-8로 읽히지 않는 파일도 건너뛴다
   - 각 파일 내용을 casefold한 문자열에 `"serena"`가 없어야 한다. 실패 메시지는 파일 경로와 줄 번호를 모두 나열한다
   - 모듈 docstring: 이 이름은 01-discovery Q2~Q5 결정으로 배포 콘텐츠에서 빠졌다는 것과 `docs/features/serena-removal/` 링크
   - 허용 목록 없음 (index Deviations P8)
-- [ ] Step 2: `uv run pytest tests/unit/test_shipped_content_server_neutral.py -v` → FAIL. 실패 목록이 아래 Task D2~D3의 파일과 정확히 같은지 대조한다. 다르면 목록에 없는 파일을 이 phase에 추가하고 deviation으로 적는다
+- [x] Step 2: `uv run pytest tests/unit/test_shipped_content_server_neutral.py -v` → FAIL. 실패 목록이 아래 Task D2~D3의 파일과 정확히 같은지 대조한다. 다르면 목록에 없는 파일을 이 phase에 추가하고 deviation으로 적는다
 
 ### Task D2: R17과 에이전트 18개
 
@@ -25,8 +25,8 @@ Index: [05-plan.md](./05-plan.md). 결정 근거: 01-discovery Q2·P5·P8. 문�
 - 아래 표의 에이전트 18개
 - `.claude/rules/agent-authoring.md:40,157,223-233`
 
-- [ ] Step 3: R17 본문을 Shared rules의 R17 문구로 바꾼다. 태그 `[R17 Symbolic-First] 🟡`는 그대로
-- [ ] Step 4: 에이전트 `<tool_guidance>`의 `- Serena-First: ...` 줄을 다음 표대로 바꾼다. full/light 문구는 Shared rules 정의 그대로, "고유 문구"는 기존 줄에서 옮겨 온다
+- [x] Step 3: R17 본문을 Shared rules의 R17 문구로 바꾼다. 태그 `[R17 Symbolic-First] 🟡`는 그대로
+- [x] Step 4: 에이전트 `<tool_guidance>`의 `- Serena-First: ...` 줄을 다음 표대로 바꾼다. full/light 문구는 Shared rules 정의 그대로, "고유 문구"는 기존 줄에서 옮겨 온다
 
 | 에이전트 (줄) | 형 | 고유 문구 (full 형의 가운데에 넣음) |
 |---|---|---|
@@ -40,8 +40,8 @@ Index: [05-plan.md](./05-plan.md). 결정 근거: 01-discovery Q2·P5·P8. 문�
 | learning-guide (:39), socratic-mentor (:39) | light | 끝에 "with the learner". socratic-mentor는 `[R17 Symbolic-First]` 태그 유지 |
 | technical-writer (:39) | light | 끝에 "when tracing code that docs reference" |
 
-- [ ] Step 5: project-initializer `:36`의 MCP 추천 문장에서 "Serena for Python/backend; " 구절만 삭제 (나머지 추천 그대로)
-- [ ] Step 6: `.claude/rules/agent-authoring.md`
+- [x] Step 5: project-initializer `:36`의 MCP 추천 문장에서 "Serena for Python/backend; " 구절만 삭제 (나머지 추천 그대로)
+- [x] Step 6: `.claude/rules/agent-authoring.md`
   - `:40` 예시 `mcpServers: [serena]` → `mcpServers: [playwright]`
   - `:157` 템플릿 → `- Proceed: actions to do freely. Symbolic-First: prefer symbol-aware queries or targeted Grep for code exploration.`
   - `:223-233` 절 제목 "Code Exploration (Symbolic-First)". 표의 Full/Light 지시를 Shared rules의 full/light 문구로 바꾼다. Rationale 줄에 "subagents do not receive core rules, so the line ships in the agent body" 한 문장 추가
@@ -55,7 +55,7 @@ Index: [05-plan.md](./05-plan.md). 결정 근거: 01-discovery Q2·P5·P8. 문�
 - `src/superclaude/agents/deep-researcher.md:3,24`, `simplicity-guide.md:54-55`
 - `src/superclaude/scripts/file_size_guard.py:5`
 
-- [ ] Step 7: 편집
+- [x] Step 7: 편집
   - PRINCIPLES `:19` Right-Altitude 행: Before `"ALWAYS use symbol tools for ALL code reads"` / After `"Use symbol tools when exploring unfamiliar code"`
   - RULES_DELEGATION `:61`: "try Grep and connected symbol-aware tools before delegating to deep-researcher"
   - MODE_Orchestration `:17` 예시: "symbol ops → symbol-aware MCP when connected"
@@ -75,8 +75,16 @@ Index: [05-plan.md](./05-plan.md). 결정 근거: 01-discovery Q2·P5·P8. 문�
 
 ### Task D4: 검증과 커밋
 
-- [ ] Step 8: `uv run pytest tests/unit/test_shipped_content_server_neutral.py tests/unit/test_agent_structure.py tests/unit/test_command_structure.py -v` → PASS
-- [ ] Step 9: `uv run pytest tests/unit/scripts -o addopts=` exit 0 (file_size_guard)
-- [ ] Step 10: 에이전트 description 길이 확인: `test_agent_structure.py`가 상한을 검사한다. deep-researcher는 줄어들기만 한다
-- [ ] Step 11: `uv run pytest` exit 0, `make lint` 통과
-- [ ] Step 12: 커밋 `refactor(agents): make Symbolic-First tool-neutral; guard shipped content against server names`
+- [x] Step 8: `uv run pytest tests/unit/test_shipped_content_server_neutral.py tests/unit/test_agent_structure.py tests/unit/test_command_structure.py -v` → PASS
+- [x] Step 9: `uv run pytest tests/unit/scripts -o addopts=` exit 0 (file_size_guard)
+- [x] Step 10: 에이전트 description 길이 확인: `test_agent_structure.py`가 상한을 검사한다. deep-researcher는 줄어들기만 한다
+- [x] Step 11: `uv run pytest` exit 0, `make lint` 통과
+- [x] Step 12: 커밋 `refactor(agents): make Symbolic-First tool-neutral; guard shipped content against server names`
+
+## Deviations
+
+- Full-form agents with their own Grep phrase: the phrase is its own sentence, "Use <phrase>.", between the shared full-form sentence and "Read whole files only when small or non-code."
+- technical-writer: the light form's "when exploring code" is replaced by the agent's tail rather than followed by it, so the line reads "... over whole-file Read when tracing code that docs reference." (appending gave "when exploring code when tracing ...").
+- agent-authoring.md `:225`: "include Serena directive" → "include a Symbolic-First directive"; the Full cell writes the agent part as "+ optional agent-specific Grep sentence +". Both sit in the planned `:223-233` range without spelled-out wording.
+- explain.md gotcha label `serena-first` → `symbolic-first` (no test references the label).
+- Step 2: the guard's failure list (28 files, 38 lines) matched D2–D3 exactly; no extra files.
