@@ -10,7 +10,6 @@
     <img src="https://github.com/ajitta/superclaude/actions/workflows/test.yml/badge.svg" alt="Tests">
   </a>
   <img src="https://img.shields.io/badge/license-MIT-yellow.svg" alt="License">
-  <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs Welcome">
 </p>
 
 </div>
@@ -44,9 +43,76 @@ Claude Code reads those files at session start, which is how the framework chang
 
 ---
 
-## 📖 **For developers & contributors**
+## 🍴 **Recommended: fork and make it your own**
 
-**Essential reading when working in this repo:**
+`superclaude` is meant as a starting point. The intended way to use it is to fork the repository, change the markdown to fit how you work, and run your own copy. Every step below needs only `git`, [uv](https://docs.astral.sh/uv/getting-started/installation/) and the `superclaude` CLI.
+
+#### **1. Fork, then clone your fork**
+
+[Fork the repository](https://github.com/ajitta/superclaude/fork) on GitHub. Copying only the `stable` branch, the default, is enough: it holds the latest release.
+
+```bash
+git clone https://github.com/<your-account>/superclaude.git
+cd superclaude
+```
+
+No GitHub account? Clone this repository instead: `git clone -b stable https://github.com/ajitta/superclaude.git`.
+
+#### **2. Set up the environment**
+
+```bash
+uv venv -p 3.13
+uv pip install -e ".[dev]"
+```
+
+Don't run `uv sync`: it removes the dev tools installed above, and the tests stop running.
+
+#### **3. Run the CLI from your clone**
+
+```bash
+uv tool install --force --editable .
+```
+
+`superclaude` now reads your clone, so later edits need no reinstall. Moving or deleting the clone breaks the CLI and its hooks. If your shell can't find `superclaude`, run `uv tool update-shell` and open a new terminal.
+
+#### **4. Install the content**
+
+```bash
+superclaude install --scope user       # or, inside a project: --scope project / --scope local
+```
+
+The scopes are explained in the [CLI scope summary](#cli-scope-summary). Restart Claude Code afterwards.
+
+#### **5. Edit, then sync**
+
+Change the files under `src/superclaude/` (commands, agents, modes, rules, output styles), copy them into the scope you use, and restart Claude Code:
+
+```bash
+superclaude update --scope user
+```
+
+#### **6. Run the tests**
+
+The markdown is tested too (counts, cross-references, structure), so run them after content edits as well:
+
+```bash
+uv run pytest
+```
+
+#### **7. Pull in new releases**
+
+Commit your edits first. Then merge the new release, resolve any conflicts with your changes, reinstall the CLI in case dependencies changed, and refresh each scope you installed:
+
+```bash
+git remote add upstream https://github.com/ajitta/superclaude.git   # once
+git pull --no-rebase upstream stable
+uv tool install --force --editable .
+superclaude update --scope user
+```
+
+To remove everything, see [Uninstall](#uninstall). If you have `make`, `make deploy`, `make sync-user` and `make test` wrap these commands; see the `Makefile`.
+
+**Files to read before you customize:**
 
 | File | Purpose |
 |------|---------|
@@ -63,6 +129,8 @@ Claude Code reads those files at session start, which is how the framework chang
 
 ### **Current Stable Version (v4.26.0)**
 
+Use the release as-is, without editing it. To customize it, see [Recommended: fork and make it your own](#-recommended-fork-and-make-it-your-own) above.
+
 `superclaude` ships markdown content (commands, agents, modes, MCP docs, core rules, hooks) plus a small CLI that copies it into Claude Code's content directories.
 
 #### **1. Install the CLI**
@@ -71,7 +139,7 @@ Claude Code reads those files at session start, which is how the framework chang
 uv tool install -p 3.13 git+https://github.com/ajitta/superclaude.git@stable
 ```
 
-No clone needed. `stable` is the latest release; to pin one, replace `@stable` with its tag, `@v<version>` (see [Releases](https://github.com/ajitta/superclaude/releases)). If your shell then can't find `superclaude`, run `uv tool update-shell` and open a new terminal. Working on SuperClaude itself? See *For contributors/developers* below.
+No clone needed. `stable` is the latest release; to pin one, replace `@stable` with its tag, `@v<version>` (see [Releases](https://github.com/ajitta/superclaude/releases)). If your shell then can't find `superclaude`, run `uv tool update-shell` and open a new terminal.
 
 #### **2. Install framework content with `superclaude install`**
 
@@ -173,40 +241,6 @@ The uninstall is marker-based: it removes only the hooks and the `@superclaude/C
 | `user` | `~/.claude/` | Personal global install (default — daily use) |
 | `project` | `./.claude/` (committed) | Team-shared, checked into git |
 | `local` | `./.claude/` (kept out of git via `.git/info/exclude`) | Personal install inside a team repo (uses `settings.local.json`, `CLAUDE.local.md`) |
-
-**For contributors/developers:**
-```bash
-# Initial setup (editable mode for development)
-git clone -b master https://github.com/ajitta/superclaude.git   # the default branch is stable (releases)
-cd superclaude
-uv venv -p 3.13                        # uv pip install needs a venv to install into
-uv pip install -e ".[dev]"
-
-# Development cycle
-uv run superclaude install --list-all  # Test changes immediately
-uv run pytest tests/ -v                 # Run tests
-
-# Deploy CLI as a global uv tool (editable). Content sync is a separate step.
-make deploy
-
-# Sync framework content to a scope (force-sync — for headless `claude -p`)
-make sync-user      # → ~/.claude/        (global, recommended for daily use)
-make sync-project   # → ./.claude/        (team-shared, committed)
-make sync-local     # → ./.claude/        (local-only, excluded from git per clone)
-
-# Verify installation
-uv tool list              # List installed tools
-which superclaude         # Check install path (Linux/Mac)
-where superclaude         # Check install path (Windows)
-```
-
-| Stage | Command | Description |
-|-------|---------|-------------|
-| Dev/Test | `uv run superclaude ...` | Test in repo (editable) |
-| Deploy CLI | `make deploy` | `uv tool install --force --editable .` |
-| Sync content | `make sync-user` / `sync-project` / `sync-local` | Force-sync markdown/scripts to chosen scope |
-| Use | `superclaude ...` | Run from anywhere |
-| Uninstall | `make uninstall-user` / `uninstall-project` / `uninstall-local` | Scope-explicit removal |
 
 ### **Optional MCP servers**
 

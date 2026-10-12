@@ -1,5 +1,5 @@
 ---
-status: draft
+status: implementing
 revised: 2026-10-12
 ---
 
@@ -43,13 +43,13 @@ revised: 2026-10-12
 
 **Files:** Modify: `README.md:13`, `README.md:47-76`, `README.md:177-209` | Create: `tests/unit/test_install_docs.py`
 
-- [ ] Step 1: 실패하는 테스트 작성 — `tests/unit/test_install_docs.py`
+- [x] Step 1: 실패하는 테스트 작성 — `tests/unit/test_install_docs.py`
   - `test_readme_recommends_fork_first`: `## 🍴 **Recommended: fork and make it your own**`의 위치 < `## ⚡ **Quick Installation**`의 위치 (둘 다 존재해야 함)
   - `test_install_doc_has_no_contributor_path[README.md]`: `re.search(r"contributor|pull request|PRs-welcome", text, re.I)` 없음
   - `test_fork_path_needs_no_make[README.md]`: 추천 섹션(새 제목 ~ `## ⚡`) 안에 `re.search(r"(?m)^\s*make\s", section)` 없음 — 코드 블록의 `make` 명령 줄만 걸리고, 산문의 인라인 `` `make deploy` `` 안내 한 줄은 통과
   - 문서 목록은 `_INSTALL_DOCS = {"README.md": ...}` 형태로 두고 Phase 2에서 Pages를 추가
-- [ ] Step 2: `uv run pytest tests/unit/test_install_docs.py -q` → 3 failed 확인 (`no_make`는 섹션이 없어 실패 — 섹션 부재도 실패로 처리)
-- [ ] Step 3: README 수정
+- [x] Step 2: `uv run pytest tests/unit/test_install_docs.py -q` → 3 failed 확인 (`no_make`는 섹션이 없어 실패 — 섹션 부재도 실패로 처리)
+- [x] Step 3: README 수정
   - 13행 "PRs welcome" 배지 삭제
   - 47-60 `## 📖 For developers & contributors` 삭제 → 표는 새 섹션으로 이동
   - Quick Installation 바로 앞에 새 섹션:
@@ -71,8 +71,8 @@ revised: 2026-10-12
   - Quick Installation 첫 문단 앞에 한 줄: "Use the release as-is, without editing it. To customize, see *Recommended* above."
   - 74행 끝 "Working on SuperClaude itself? See *For contributors/developers* below." 삭제
   - 177-209 `**For contributors/developers:**` 블록 + 표 삭제 (새 섹션으로 흡수됨 — 같은 명령을 두 곳에 두지 않음)
-- [ ] Step 4: `uv run pytest` → exit 0 (`test_version_consistency.py`의 `@stable` URL·버전·개수 테스트 포함)
-- [ ] Step 5: Commit `docs(install): recommend forking first in the README`
+- [x] Step 4: `uv run pytest` → exit 0 (`test_version_consistency.py`의 `@stable` URL·버전·개수 테스트 포함)
+- [x] Step 5: Commit `docs(install): recommend forking first in the README`
 
 ## Phase 2: Pages
 
