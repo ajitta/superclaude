@@ -1,8 +1,10 @@
-"""The install docs recommend forking first (docs/features/fork-first-install).
+"""The install docs offer three paths in order (docs/features/fork-first-install).
 
-README.md and the Pages site put "fork it and run your own copy" ahead of the
-release install, drop the contributor path (the project has no contributors),
-and keep the fork path free of ``make``, which many machines lack (Windows).
+README.md and the Pages site list Quick install (the release as-is), then Clone
+install (your own copy from a local clone), then Fork install (that copy in your
+GitHub fork, the recommended one). They drop the contributor path (the project
+has no contributors) and keep the clone and fork paths free of ``make``, which
+many machines lack (Windows).
 """
 
 from __future__ import annotations
@@ -16,58 +18,65 @@ _ROOT = Path(__file__).resolve().parents[2]
 _README = _ROOT / "README.md"
 _PAGES = _ROOT / "docs" / "index.html"
 
-_FORK_HEADING = "## 🍴 **Recommended: fork and make it your own**"
-_QUICK_HEADING = "## ⚡ **Quick Installation**"
+# Install paths in their required order, as each doc marks their start.
+_README_PATHS = (
+    "## ⚡ **Quick Installation**",
+    "## 📥 **Clone install**",
+    "## 🍴 **Fork install (recommended)**",
+)
+_PAGES_PATHS = (
+    '<section id="install"',
+    '<section id="develop"',
+    '<section id="fork"',
+)
+_PAGES_NAV = ('href="#install"', 'href="#develop"', 'href="#fork"')
 
 
-def _readme_fork_section(text: str) -> str:
-    start, end = text.find(_FORK_HEADING), text.find(_QUICK_HEADING)
-    assert start != -1, f"README.md lacks {_FORK_HEADING!r}"
-    assert end != -1, f"README.md lacks {_QUICK_HEADING!r}"
-    return text[start:end]
+def _positions(text: str, markers: tuple, doc: str) -> list:
+    found = [text.find(m) for m in markers]
+    missing = [m for m, i in zip(markers, found) if i == -1]
+    assert not missing, f"{doc} lacks {missing}"
+    return found
 
 
-def _pages_fork_section(text: str) -> str:
-    start = text.find('<section id="develop"')
-    assert start != -1, 'docs/index.html lacks <section id="develop">'
-    end = text.find("<section", start + 1)
+def _readme_custom_paths(text: str) -> str:
+    """Clone install through the end of Fork install."""
+    start = _positions(text, _README_PATHS, "README.md")[1]
+    end = text.find("\n## ", text.find(_README_PATHS[2]) + 1)
     return text[start:] if end == -1 else text[start:end]
 
 
-# doc name -> (path, fork-section extractor, pattern of a make command line)
+def _pages_custom_paths(text: str) -> str:
+    """The #develop (clone) and #fork sections."""
+    start = _positions(text, _PAGES_PATHS, "docs/index.html")[1]
+    end = text.find("<section", text.find(_PAGES_PATHS[2]) + 1)
+    return text[start:] if end == -1 else text[start:end]
+
+
+# doc name -> (path, clone+fork extractor, pattern of a make command line)
 _INSTALL_DOCS = {
-    "README.md": (_README, _readme_fork_section, re.compile(r"(?m)^\s*make\s")),
-    "docs/index.html": (_PAGES, _pages_fork_section, re.compile(r"<code>make\s")),
+    "README.md": (_README, _readme_custom_paths, re.compile(r"(?m)^\s*make\s")),
+    "docs/index.html": (_PAGES, _pages_custom_paths, re.compile(r"<code>make\s")),
 }
 
 _CONTRIBUTOR_RE = re.compile(r"contributor|pull request|PRs-welcome", re.I)
 
 
-def test_readme_recommends_fork_first():
+def test_readme_orders_quick_clone_fork():
     text = _README.read_text(encoding="utf-8")
-    fork, quick = text.find(_FORK_HEADING), text.find(_QUICK_HEADING)
-    assert fork != -1, f"README.md lacks {_FORK_HEADING!r}"
-    assert quick != -1, f"README.md lacks {_QUICK_HEADING!r}"
-    assert fork < quick, (
-        "README.md: the fork section must come before Quick Installation"
-    )
+    found = _positions(text, _README_PATHS, "README.md")
+    assert found == sorted(found), "README.md: order must be Quick, Clone, Fork install"
 
 
-def test_pages_recommends_fork_first():
+def test_pages_orders_quick_clone_fork():
     text = _PAGES.read_text(encoding="utf-8")
-    develop, install = (
-        text.find('<section id="develop"'),
-        text.find('<section id="install"'),
+    found = _positions(text, _PAGES_PATHS, "docs/index.html")
+    assert found == sorted(found), (
+        "docs/index.html: sections must be install, develop, fork"
     )
-    assert develop != -1 and install != -1, "docs/index.html lost #develop or #install"
-    assert develop < install, "docs/index.html: #develop must come before #install"
     nav = text[text.find("<nav") : text.find("</nav>")]
-    assert nav.find('href="#develop"') < nav.find('href="#install"'), (
-        "docs/index.html: the nav must list #develop before #install"
-    )
-    assert 'class="button" href="#develop"' in text, (
-        "docs/index.html: the hero button must lead to #develop"
-    )
+    links = _positions(nav, _PAGES_NAV, "the docs/index.html nav")
+    assert links == sorted(links), "docs/index.html: nav must list Install, Clone, Fork"
 
 
 @pytest.mark.parametrize("name", list(_INSTALL_DOCS))
@@ -78,8 +87,10 @@ def test_install_doc_has_no_contributor_path(name: str):
 
 
 @pytest.mark.parametrize("name", list(_INSTALL_DOCS))
-def test_fork_path_needs_no_make(name: str):
+def test_clone_and_fork_paths_need_no_make(name: str):
     path, section_of, make_re = _INSTALL_DOCS[name]
     section = section_of(path.read_text(encoding="utf-8"))
     hit = make_re.search(section)
-    assert hit is None, f"{name}: the fork path runs make: {hit.group(0).strip()!r}"
+    assert hit is None, (
+        f"{name}: the clone/fork path runs make: {hit.group(0).strip()!r}"
+    )

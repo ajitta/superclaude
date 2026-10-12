@@ -97,6 +97,21 @@ revised: 2026-10-12
 - [x] Step 5: 브라우저 확인 — `docs/index.html`을 로컬로 열어: nav 순서, hero 버튼 이동 대상, 섹션 순서, 375px 폭에서 가로 스크롤 없음, 라이트·다크 둘 다
 - [x] Step 6: Commit `docs(pages): put the fork-and-customize path first`
 
+## Phase 3: 재구성 — Quick → Clone → Fork (사용자 피드백 2026-10-12)
+
+사용자: "마음에 들지 않는다.. 1. QUICK INSTALL, 2. CLONE INSTALL, 3. FORK INSTALL 이순서로 하자. 다음 스텝을 '/btw'로 제안받는 팁을 추가하자 '/goal'을 이용하는 방법 서술 앞에. 예시를 포함하여"
+
+Phase 1-2의 "포크를 맨 앞" 배치(P1·P6, hero 버튼)를 대체한다. 기여자 문구 제거(P4)와 `make` 없는 경로(P8)는 유지.
+
+**Files:** Modify: `README.md`, `docs/index.html` | Test: `tests/unit/test_install_docs.py`
+
+- [x] Step 1: README — `## ⚡ Quick Installation` → `## 📥 Clone install`(7단계 + 커스텀 전에 읽을 파일 표) → `## 🍴 Fork install (recommended)`(Clone install과 다른 점 4개: fork, 자기 포크 clone, `git push`, `upstream`에서 릴리스). Quick Installation 첫머리에 세 경로 번호 목록
+- [x] Step 2: Pages — 섹션 `#install` → `#develop`(Clone install) → `#fork`(신규, Fork install). nav `Install · Clone · Fork`, hero 버튼은 원래대로 `#install` "Get started"
+- [x] Step 3: `/btw` 팁 — README·Pages 모두 `/goal` 서술 바로 앞, 예시 `/btw based on what we just did, which /sc command should I run next, and why?`. 내용 근거: code.claude.com/docs/en/interactive-mode "Side questions with /btw"(대화 기록에 안 남음, 대화 전체를 봄, 도구 없음, 작업 중에도 실행)
+- [x] Step 4: 테스트 교체 — 순서(README 제목 3개, Pages 섹션·nav), 기여자 문구, Clone·Fork 구간의 `make` 명령 줄 (6건)
+- [x] Step 5: `uv run pytest` exit 0 · `make lint` · `ruff format --check` · 헤드리스 Chrome 320px 305 / 375px 360(넘침 없음) + 데스크톱 스크린샷
+- [x] Step 6: Commit `docs(install): order the install paths quick, clone, fork; add the /btw tip`
+
 ## Deviations
 
 - Phase 2 Step 3: 계획의 hint "Clone `https://github.com/ajitta/superclaude.git` with `-b stable`"는 인라인 `<code>` URL이 줄바꿈되지 않아 320px에서 가로 넘침(scrollWidth 344, master 305) → URL을 "this repository" 링크로 바꿈. 측정(헤드리스 Chrome, iframe 폭): 320px 305, 375px 360 — 넘침 없음
@@ -104,7 +119,8 @@ revised: 2026-10-12
 
 ## Release note (다음 version-bump 커밋의 CHANGELOG `### Changed`)
 
-- The README and the Pages site now recommend forking the repository and running your own copy as the first install path. Installing the release unchanged with `uv tool install …@stable` stays as the second path. The contributor guide is gone; the files worth reading before you customize moved into the fork section.
+- The README and the Pages site list three install paths in order: Quick install (the release as-is), Clone install (your own copy from a local clone) and Fork install (that copy in your GitHub fork, the recommended way to customize). The clone and fork paths need only `git`, `uv` and `superclaude`, no `make`. The contributor guide is gone.
+- A tip before the `/goal` example: ask `/btw` which command to run next. It answers from the session without adding to the conversation.
 
 ## 범위 밖
 
