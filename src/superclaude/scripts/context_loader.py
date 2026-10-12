@@ -1062,11 +1062,32 @@ def _emit_prompt_command_reference(prompt: str) -> None:
     print()
 
 
+# Claude Code fires UserPromptSubmit for turns the harness inserts too: a
+# sub-agent's hand-back and a background task's notification arrive as the
+# `prompt`, so a filename or flag name in a report triggered docs and directives
+# nobody typed. The hook input's `source` field marks these as "system", but
+# CC 2.1.296 does not send it yet; until it does, the wrapper each one starts
+# with is the only marker. The /goal notice quotes the goal condition without
+# its slash, so `sc:implement --plan <file>` read as the global --plan and told
+# the auto-continuing session to wait for approval.
+_HARNESS_TURN_PREFIXES = (
+    "<agent-message ",
+    "<task-notification>",
+    "A session-scoped Stop hook is now active",
+)
+
+
+def _is_harness_turn(prompt: str, source: object) -> bool:
+    """True when the harness, not the user, wrote this prompt."""
+    return source == "system" or prompt.lstrip().startswith(_HARNESS_TURN_PREFIXES)
+
+
 def _parse_hook_input(stdin_data: str) -> tuple[str, str | None]:
     """Split hook stdin into (prompt, CC session_id or None).
 
     The prompt is the JSON "prompt" field, else the raw text (stdin that is not
-    a JSON object is itself the prompt). The session id keys mcp_fallback's
+    a JSON object is itself the prompt). A harness-inserted turn yields an empty
+    prompt, since the user typed none of it. The session id keys mcp_fallback's
     once-per-session dedup to the real Claude Code session, so hints re-arm each
     session instead of once per machine.
     """
@@ -1075,10 +1096,13 @@ def _parse_hook_input(stdin_data: str) -> tuple[str, str | None]:
     except (json.JSONDecodeError, TypeError):
         data = None
     if not isinstance(data, dict):
-        return stdin_data, None
+        return ("" if _is_harness_turn(stdin_data, None) else stdin_data), None
     session_id = data.get("session_id")
+    prompt = data.get("prompt", stdin_data)
+    if isinstance(prompt, str) and _is_harness_turn(prompt, data.get("source")):
+        prompt = ""
     return (
-        data.get("prompt", stdin_data),
+        prompt,
         session_id if isinstance(session_id, str) and session_id else None,
     )
 

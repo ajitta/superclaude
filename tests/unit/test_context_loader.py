@@ -42,6 +42,43 @@ class TestParseHookInput:
     def test_empty_session_id_returns_none(self):
         assert _parse_hook_input(json.dumps({"session_id": ""}))[1] is None
 
+    def test_system_source_yields_empty_prompt(self):
+        stdin = json.dumps({"session_id": "s", "prompt": "--loop", "source": "system"})
+        assert _parse_hook_input(stdin) == ("", "s")
+
+    def test_user_source_keeps_prompt(self):
+        stdin = json.dumps({"prompt": "--loop", "source": "user"})
+        assert _parse_hook_input(stdin) == ("--loop", None)
+
+    def test_harness_wrappers_yield_empty_prompt(self):
+        for prompt in (HAND_BACK_PROMPT, TASK_NOTIFICATION_PROMPT, GOAL_NOTICE_PROMPT):
+            assert _parse_hook_input(json.dumps({"prompt": prompt}))[0] == ""
+
+    def test_wrapper_not_at_start_keeps_prompt(self):
+        prompt = f"explain this report:\n{HAND_BACK_PROMPT}"
+        assert _parse_hook_input(json.dumps({"prompt": prompt}))[0] == prompt
+
+
+# Shapes copied from CC 2.1.296 transcripts (queued_command prompts): a
+# sub-agent hand-back and a background task notification.
+HAND_BACK_PROMPT = (
+    '<agent-message from="a1b2c3">\n[Subagent hand-back] The text below is the '
+    "final report of a subagent this session delegated to.\n  Found "
+    "src/superclaude/agents/business-panel-experts.md; try --loop next.\n"
+    "</agent-message>"
+)
+TASK_NOTIFICATION_PROMPT = (
+    "<task-notification>\n<task-id>a1b2c3</task-id>\n<status>completed</status>\n"
+    "<result>This agent's report was delivered to you as a message from "
+    '"a1b2c3" (its SubagentHandback call).</result>\n</task-notification>'
+)
+# The /goal activation notice, which quotes the condition the user set.
+GOAL_NOTICE_PROMPT = (
+    'A session-scoped Stop hook is now active with condition: "sc:implement '
+    '--plan docs/features/x/05-plan.md --delegate auto". Briefly acknowledge '
+    "the goal, then immediately start (or continue) working toward it."
+)
+
 
 class TestResolveFlags:
     """Test flag alias resolution and fuzzy matching."""
@@ -1075,3 +1112,36 @@ class TestPromptCommandReferenceInjection:
         out = self._emit("/sc:prompt ./x.md", monkeypatch, capsys, Path("/ref.md"), {})
 
         assert "anchors have moved" in out
+
+
+class TestHarnessTurnsInjectNothing:
+    """A sub-agent report or task notification is not the user's prompt.
+
+    CC fires UserPromptSubmit for both, so the filename business-panel-experts.md
+    in a report injected MODE_Business_Panel and a quoted --loop emitted its
+    directive, though the user typed neither.
+    """
+
+    @staticmethod
+    def _project(tmp_path: Path) -> Path:
+        (tmp_path / ".claude" / "superclaude").mkdir(parents=True, exist_ok=True)
+        return tmp_path
+
+    def test_hand_back_and_notification_inject_nothing(self, tmp_path: Path):
+        project = self._project(tmp_path)
+        prompts = (HAND_BACK_PROMPT, TASK_NOTIFICATION_PROMPT, GOAL_NOTICE_PROMPT)
+        for i, prompt in enumerate(prompts):
+            assert run_loader(prompt, project, session_id=f"s{i}") == ""
+
+    def test_same_text_typed_by_the_user_still_triggers(self, tmp_path: Path):
+        """Control: the report body without its wrapper does trigger."""
+        body = HAND_BACK_PROMPT.split("\n", 1)[1]
+        out = run_loader(body, self._project(tmp_path), session_id="s")
+        assert "MODE_Business_Panel.md" in out
+        assert 'flag="--loop"' in out
+
+    def test_goal_notice_unwrapped_emits_plan_directive(self, tmp_path: Path):
+        """Control: without the notice prefix, the quoted --plan fires."""
+        body = GOAL_NOTICE_PROMPT.split(": ", 1)[1]
+        out = run_loader(body, self._project(tmp_path), session_id="s")
+        assert 'flag="--plan"' in out
