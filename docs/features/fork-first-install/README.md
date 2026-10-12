@@ -1,6 +1,6 @@
 ---
 feature: fork-first-install
-phase: implementing
+phase: complete
 owner: ajitta
 created: 2026-10-12
 updated: 2026-10-12
@@ -15,4 +15,4 @@ README.md와 Pages(`docs/index.html`)의 설치 안내에서 "포크해서 자�
 
 ## Documents
 
-- [05-plan.md](./05-plan.md) — 구현 계획: README·Pages 재배치, 기여자 문구 제거, 순서·문구 가드 테스트 (draft)
+- [05-plan.md](./05-plan.md) — 구현 계획: README·Pages 재배치, 기여자 문구 제거, 순서·문구 가드 테스트 (complete)

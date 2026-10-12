@@ -14,6 +14,7 @@ import pytest
 
 _ROOT = Path(__file__).resolve().parents[2]
 _README = _ROOT / "README.md"
+_PAGES = _ROOT / "docs" / "index.html"
 
 _FORK_HEADING = "## 🍴 **Recommended: fork and make it your own**"
 _QUICK_HEADING = "## ⚡ **Quick Installation**"
@@ -26,9 +27,17 @@ def _readme_fork_section(text: str) -> str:
     return text[start:end]
 
 
+def _pages_fork_section(text: str) -> str:
+    start = text.find('<section id="develop"')
+    assert start != -1, 'docs/index.html lacks <section id="develop">'
+    end = text.find("<section", start + 1)
+    return text[start:] if end == -1 else text[start:end]
+
+
 # doc name -> (path, fork-section extractor, pattern of a make command line)
 _INSTALL_DOCS = {
     "README.md": (_README, _readme_fork_section, re.compile(r"(?m)^\s*make\s")),
+    "docs/index.html": (_PAGES, _pages_fork_section, re.compile(r"<code>make\s")),
 }
 
 _CONTRIBUTOR_RE = re.compile(r"contributor|pull request|PRs-welcome", re.I)
@@ -39,7 +48,26 @@ def test_readme_recommends_fork_first():
     fork, quick = text.find(_FORK_HEADING), text.find(_QUICK_HEADING)
     assert fork != -1, f"README.md lacks {_FORK_HEADING!r}"
     assert quick != -1, f"README.md lacks {_QUICK_HEADING!r}"
-    assert fork < quick, "README.md: the fork section must come before Quick Installation"
+    assert fork < quick, (
+        "README.md: the fork section must come before Quick Installation"
+    )
+
+
+def test_pages_recommends_fork_first():
+    text = _PAGES.read_text(encoding="utf-8")
+    develop, install = (
+        text.find('<section id="develop"'),
+        text.find('<section id="install"'),
+    )
+    assert develop != -1 and install != -1, "docs/index.html lost #develop or #install"
+    assert develop < install, "docs/index.html: #develop must come before #install"
+    nav = text[text.find("<nav") : text.find("</nav>")]
+    assert nav.find('href="#develop"') < nav.find('href="#install"'), (
+        "docs/index.html: the nav must list #develop before #install"
+    )
+    assert 'class="button" href="#develop"' in text, (
+        "docs/index.html: the hero button must lead to #develop"
+    )
 
 
 @pytest.mark.parametrize("name", list(_INSTALL_DOCS))

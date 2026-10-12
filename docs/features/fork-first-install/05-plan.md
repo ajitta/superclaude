@@ -1,5 +1,5 @@
 ---
-status: implementing
+status: complete
 revised: 2026-10-12
 ---
 
@@ -78,11 +78,11 @@ revised: 2026-10-12
 
 **Files:** Modify: `docs/index.html:125-131`, `:142`, `:170-177`, `:278-325`, `:335` | Test: `tests/unit/test_install_docs.py`
 
-- [ ] Step 1: 실패하는 테스트 추가
+- [x] Step 1: 실패하는 테스트 추가
   - `test_pages_recommends_fork_first`: `id="develop"` 위치 < `id="install"` 위치, nav에서 `href="#develop"` < `href="#install"`, hero `class="button" href="#develop"`
   - `_INSTALL_DOCS`에 `docs/index.html` 추가 → 기여자 문구·`make` 테스트가 Pages도 검사. Pages의 추천 섹션 = `id="develop"`부터 다음 `<section` 전까지, 검사 패턴 `<code>make\s`
-- [ ] Step 2: `uv run pytest tests/unit/test_install_docs.py -q` → Pages 2건 failed 확인 (`no_make[Pages]`는 현재도 통과 — 현재 Pages 커스텀 섹션에 `make` 없음)
-- [ ] Step 3: `docs/index.html` 수정
+- [x] Step 2: `uv run pytest tests/unit/test_install_docs.py -q` → Pages 2건 failed 확인 (`no_make[Pages]`는 현재도 통과 — 현재 Pages 커스텀 섹션에 `make` 없음)
+- [x] Step 3: `docs/index.html` 수정
   - `<section id="develop" …>` 블록 전체(278-325)를 `<section id="install" …>`(170) 바로 앞으로 이동
   - 제목 "Customize your own copy" → "Make it your own (recommended)", 소개 문단에 "권장 사용법" 한 줄
   - "Clone the repository" 단계 → "Fork, then clone your fork": `git clone https://github.com/<your-account>/superclaude.git`. hint: GitHub 계정이 없으면 `git clone -b stable https://github.com/ajitta/superclaude.git`. PR 문장("Sending pull requests? …") 삭제
@@ -93,9 +93,14 @@ revised: 2026-10-12
   - hero: 버튼 `href="#develop"` 라벨 "Make it your own", 옆에 텍스트 링크 "or install the release as-is" → `#install` (GitHub 링크 유지)
   - `#install` 소개의 "Want to change the framework and run your own version? See …" → "This installs the release unchanged. To customize it, see Make it your own."
   - origin 335행 "contributor guidance" → "the customization guide"
-- [ ] Step 4: `uv run pytest` → exit 0 (`test_portable_skills.py::test_install_docs_match_the_marketplace`, `@stable` URL 테스트 포함)
-- [ ] Step 5: 브라우저 확인 — `docs/index.html`을 로컬로 열어: nav 순서, hero 버튼 이동 대상, 섹션 순서, 375px 폭에서 가로 스크롤 없음, 라이트·다크 둘 다
-- [ ] Step 6: Commit `docs(pages): put the fork-and-customize path first`
+- [x] Step 4: `uv run pytest` → exit 0 (`test_portable_skills.py::test_install_docs_match_the_marketplace`, `@stable` URL 테스트 포함)
+- [x] Step 5: 브라우저 확인 — `docs/index.html`을 로컬로 열어: nav 순서, hero 버튼 이동 대상, 섹션 순서, 375px 폭에서 가로 스크롤 없음, 라이트·다크 둘 다
+- [x] Step 6: Commit `docs(pages): put the fork-and-customize path first`
+
+## Deviations
+
+- Phase 2 Step 3: 계획의 hint "Clone `https://github.com/ajitta/superclaude.git` with `-b stable`"는 인라인 `<code>` URL이 줄바꿈되지 않아 320px에서 가로 넘침(scrollWidth 344, master 305) → URL을 "this repository" 링크로 바꿈. 측정(헤드리스 Chrome, iframe 폭): 320px 305, 375px 360 — 넘침 없음
+- Phase 2 Step 5: "라이트·다크 둘 다" 확인은 해당 없음 — Pages에 `prefers-color-scheme` 스타일이 없음(master도 0건). 라이트만 확인
 
 ## Release note (다음 version-bump 커밋의 CHANGELOG `### Changed`)
 
