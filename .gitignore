@@ -122,6 +122,8 @@ poetry.lock
 .serena/*
 !.serena/memories/
 .superclaude/
+# local issue tracker (docs/agents/issue-tracker.md); never committed
+/.scratch/
 *.backup
 *.bak
 
