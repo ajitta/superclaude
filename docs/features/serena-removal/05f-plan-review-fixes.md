@@ -18,48 +18,48 @@ Index: [05-plan.md](./05-plan.md). 입력: `master..feature/serena-removal` (a05
 
 **Files:** Modify: `tests/unit/test_shipped_content_server_neutral.py`, `src/superclaude/core/rules/RULES_QUALITY.md:34`, `src/superclaude/modes/MODE_Task_Management.md:27`
 
-- [ ] Step 1: 가드 확장
+- [x] Step 1: 가드 확장
   - `FORBIDDEN = "serena"`를 토큰 튜플로: `("serena", "write_memory", "read_memory", "list_memories", "find_symbol", "get_symbols_overview", "find_referencing_symbols")`. 줄마다 casefold 후 각 토큰을 검사하고, 실패 메시지는 `path:line: token`
   - 모듈 docstring: 이름뿐 아니라 그 서버의 메모리·심볼 도구 이름도 막는다는 문장 추가
   - 테스트 이름 `test_shipped_content_names_no_server` 유지
-- [ ] Step 2: `uv run pytest tests/unit/test_shipped_content_server_neutral.py -v` → FAIL, 실패 목록이 정확히 `RULES_QUALITY.md:34`와 `MODE_Task_Management.md:27` 두 줄
-- [ ] Step 3: 편집
+- [x] Step 2: `uv run pytest tests/unit/test_shipped_content_server_neutral.py -v` → FAIL, 실패 목록이 정확히 `RULES_QUALITY.md:34`와 `MODE_Task_Management.md:27` 두 줄
+- [x] Step 3: 편집
   - RULES_QUALITY `:34` Right 칸: `symbol overview → definition query (targeted Grep when no symbol-aware tool is connected)`. 나머지 칸 그대로
   - MODE_Task_Management `:27` Response 칸: `Load: Glob .claude/memories/ -> read plan -> ID current phase -> resume from last checkpoint`
-- [ ] Step 4: Step 2 명령 → PASS
+- [x] Step 4: Step 2 명령 → PASS
 
 ### Task F2: save와 load의 메모리 이름 (I2)
 
 **Files:** Modify: `tests/unit/test_session_memory_folder.py`, `src/superclaude/commands/save.md:14,46`, `src/superclaude/agents/project-manager.md:22`
 
-- [ ] Step 5: 테스트 `test_every_key_load_reads_has_a_writer` 추가
+- [x] Step 5: 테스트 `test_every_key_load_reads_has_a_writer` 추가
   - load.md `<flow>` 1단계 줄에서 `Read ` 와 ` when present` 사이의 키 목록을 뽑는다 (지금 `pm_context, last_session, next_actions`). 목록이 비면 실패
   - 각 키가 save.md에 `.claude/memories/<key>.md`로 나오거나, project-manager.md의 `Session end:` 문장에 `.claude/memories/<key>.md`로 나와야 한다
-- [ ] Step 6: `uv run pytest tests/unit/test_session_memory_folder.py -v` → 새 테스트 FAIL (`pm_context`, `last_session`, `next_actions` 모두 writer 없음)
-- [ ] Step 7: 편집
+- [x] Step 6: `uv run pytest tests/unit/test_session_memory_folder.py -v` → 새 테스트 FAIL (`pm_context`, `last_session`, `next_actions` 모두 writer 없음)
+- [x] Step 7: 편집
   - save `:14` 2단계: `2. Persist (memory folder): Write .claude/memories/session_[date].md (context) → .claude/memories/learnings_[topic].md (insights) → overwrite .claude/memories/last_session.md (this session's summary) and .claude/memories/next_actions.md (open items); flat basename only, no path segments; create the folder when absent`
   - save `<outputs>` session 행의 Memory folder 칸: `session_[date], last_session, next_actions`
   - project-manager `:22` `Session end: persist summary to `.claude/memories/`, review completeness.` → `Session end: persist summary to `.claude/memories/last_session.md`, open items to `.claude/memories/next_actions.md` and project state to `.claude/memories/pm_context.md`, review completeness.` (Memory keys·Storage 문장 그대로)
-- [ ] Step 8: Step 6 명령 → PASS
+- [x] Step 8: Step 6 명령 → PASS
 
 ### Task F3: 합성 플래그 docstring 숫자 (I3)
 
 **Files:** Modify: `tests/unit/test_context_loader.py` (TestTriggerMapPaths 안), `src/superclaude/scripts/context_loader.py:14`, `docs/features/serena-removal/05b-plan-loader-flag.md` Deviations
 
-- [ ] Step 9: 테스트 `test_module_docstring_counts_match_composite_flags` 추가: `context_loader.__doc__`에서 `--frontend-verify (N MCP)`, `--all-mcp (N MCP)`의 N을 정규식으로 뽑아 `len(COMPOSITE_FLAGS[flag])`와 비교. 두 패턴 중 하나라도 못 찾으면 실패
-- [ ] Step 10: `uv run pytest tests/unit/test_context_loader.py -k docstring_counts -v` → FAIL (3 ≠ 2, 6 ≠ 3)
-- [ ] Step 11: context_loader `:14` → `- Composite flags: --frontend-verify (2 MCP), --all-mcp (3 MCP)`
-- [ ] Step 12: 05b Deviations의 "Not changed: the `context_loader.py:14` docstring counts ..." 줄을 바로잡는다: "`context_loader.py:14` docstring counts were not changed in this phase. `--frontend-verify (3 MCP)` was right before it and went stale when the server left; `--all-mcp (6 MCP)` was already off. Both fixed in Phase F (Task F3)."
-- [ ] Step 13: Step 10 명령 → PASS, `uv run pytest tests/unit/scripts -o addopts=` exit 0
+- [x] Step 9: 테스트 `test_module_docstring_counts_match_composite_flags` 추가: `context_loader.__doc__`에서 `--frontend-verify (N MCP)`, `--all-mcp (N MCP)`의 N을 정규식으로 뽑아 `len(COMPOSITE_FLAGS[flag])`와 비교. 두 패턴 중 하나라도 못 찾으면 실패
+- [x] Step 10: `uv run pytest tests/unit/test_context_loader.py -k docstring_counts -v` → FAIL (3 ≠ 2, 6 ≠ 3)
+- [x] Step 11: context_loader `:14` → `- Composite flags: --frontend-verify (2 MCP), --all-mcp (3 MCP)`
+- [x] Step 12: 05b Deviations의 "Not changed: the `context_loader.py:14` docstring counts ..." 줄을 바로잡는다: "`context_loader.py:14` docstring counts were not changed in this phase. `--frontend-verify (3 MCP)` was right before it and went stale when the server left; `--all-mcp (6 MCP)` was already off. Both fixed in Phase F (Task F3)."
+- [x] Step 13: Step 10 명령 → PASS, `uv run pytest tests/unit/scripts -o addopts=` exit 0
 
 ### Task F4: picker 번호 테스트 (I4)
 
 **Files:** Modify: `tests/unit/test_install_mcp_interactive.py`
 
-- [ ] Step 14: 테스트 보강
+- [x] Step 14: 테스트 보강
   - `test_interactive_menu_lists_every_server_without_default`: 이름만 보는 루프를 `for i, info in enumerate(install_mcp.MCP_SERVERS.values(), 1): assert f"{i}. {info['name']}" in out`로 바꾸고 `assert prompt_kwargs.get("show_default") is False` 추가
   - 새 테스트 `test_interactive_selection_reaches_the_last_server`: prompt가 `str(len(MCP_SERVERS))`를 돌려주고 `check_prerequisites`·`install_mcp_server`를 stub. 설치 호출이 마지막 서버 하나뿐
-- [ ] Step 15: 지금 코드에서는 PASS다 (동작은 이미 맞음). 회귀를 잡는지 변이로 확인한다
+- [x] Step 15: 지금 코드에서는 PASS다 (동작은 이미 맞음). 회귀를 잡는지 변이로 확인한다
   - `install_mcp.py`의 메뉴 루프를 첫 서버만 번호를 붙이도록 임시로 고친다 (나머지는 `   - name` 형태) → `uv run pytest tests/unit/test_install_mcp_interactive.py` → 두 테스트 FAIL
   - `git restore src/superclaude/cli/install_mcp.py`로 되돌리고 `git diff --stat src/superclaude/cli/install_mcp.py`가 비었는지 확인 → PASS
 
@@ -121,3 +121,8 @@ Index: [05-plan.md](./05-plan.md). 입력: `master..feature/serena-removal` (a05
 3. `git grep -n -E "write_memory|read_memory|list_memories|find_symbol|get_symbols_overview|find_referencing_symbols" -- src/` → 출력 없음
 4. `git grep -n -i -E "core servers|opt-in \(plugin\)|plugin-install-only|1 core \+ 2 plugin" -- src/ tests/unit/test_context_loader.py` → 출력 없음
 5. `uv run pytest` exit 0, `uv run pytest tests/unit/scripts -o addopts=` exit 0, `make lint` → All checks passed!
+
+## Deviations
+
+- Step 15: the display-only mutation (only server 1 numbered) fails only the menu test, because selection indexing does not read the menu text. A second mutation (selection cut to the first server) failed `test_interactive_selection_reaches_the_last_server` as well (2 failed, 3 passed). Both were reverted with `git restore`, and the `:37` comment edit was made after the restore.
+- Step 10: the new test collects both mismatches and asserts once, so its failure shows 3≠2 and 6≠3 together.

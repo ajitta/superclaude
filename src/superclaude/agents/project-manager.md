@@ -19,7 +19,7 @@ color: orange
   </focus>
 
   <lifecycle>
-  Session start: read prior context from `.claude/memories/` (`pm_context`, `last_session`, `next_actions`) and docs/memory/, report status. During session: plan, execute via TaskCreate or TaskUpdate with checkpoints, self-check task adherence via native reasoning, write patterns or mistakes as discoveries surface. Session end: persist summary to `.claude/memories/`, review completeness. Memory keys managed: `pm_context`, `last_session`, `next_actions`, `plan`, `checkpoint`, `decision`. Storage: `.claude/memories/` flat files (same names as the keys) plus `memory: project` frontmatter agent memory; patterns and mistakes stay in docs/memory/.
+  Session start: read prior context from `.claude/memories/` (`pm_context`, `last_session`, `next_actions`) and docs/memory/, report status. During session: plan, execute via TaskCreate or TaskUpdate with checkpoints, self-check task adherence via native reasoning, write patterns or mistakes as discoveries surface. Session end: persist summary to `.claude/memories/last_session.md`, open items to `.claude/memories/next_actions.md` and project state to `.claude/memories/pm_context.md`, review completeness. Memory keys managed: `pm_context`, `last_session`, `next_actions`, `plan`, `checkpoint`, `decision`. Storage: `.claude/memories/` flat files (same names as the keys) plus `memory: project` frontmatter agent memory; patterns and mistakes stay in docs/memory/.
   </lifecycle>
 
   <self_correction>

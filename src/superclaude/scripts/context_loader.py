@@ -11,7 +11,7 @@ Modes:
 v3.1 Features:
 - Hybrid injection: Mode files → full .md, MCP files → short instructions
   (Tavily gets a Tier 1 INSTRUCTION_MAP string due to behavioral patterns)
-- Composite flags: --frontend-verify (3 MCP), --all-mcp (6 MCP)
+- Composite flags: --frontend-verify (2 MCP), --all-mcp (3 MCP)
 - --no-mcp: suppresses all mcp/ context loading
 - Tightened TRIGGER_MAP regex (no generic single words)
 - Session dedup via cache file, cross-platform compatible

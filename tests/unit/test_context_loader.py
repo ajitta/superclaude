@@ -276,6 +276,22 @@ class TestTriggerMapPaths:
             f"Expected 3 MCP trigger paths, got {len(mcp_paths)}: {mcp_paths}"
         )
 
+    def test_module_docstring_counts_match_composite_flags(self):
+        """The module docstring's per-flag MCP counts follow COMPOSITE_FLAGS."""
+        from superclaude.scripts import context_loader as cl
+
+        doc = cl.__doc__ or ""
+        mismatches = []
+        for flag in ("--frontend-verify", "--all-mcp"):
+            match = re.search(re.escape(flag) + r" \((\d+) MCP\)", doc)
+            assert match, f"module docstring names no '{flag} (N MCP)' count"
+            if int(match.group(1)) != len(COMPOSITE_FLAGS[flag]):
+                mismatches.append(
+                    f"{flag}: docstring {match.group(1)} != "
+                    f"COMPOSITE_FLAGS {len(COMPOSITE_FLAGS[flag])}"
+                )
+        assert not mismatches, "\n".join(mismatches)
+
 
 class TestCoreLiteSplit:
     """Drift guards for the Phase 2-1 core-lite split: kernel token budget,

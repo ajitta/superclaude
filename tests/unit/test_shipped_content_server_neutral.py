@@ -4,14 +4,23 @@ Shipped content names no symbol or memory MCP server.
 The Serena server was dropped from everything under `src/superclaude/` by the
 01-discovery Q2-Q5 decisions: code exploration is the tool-neutral
 Symbolic-First rule, and session memory lives in `.claude/memories/` plus
-Claude auto memory. This guard keeps the name from coming back. It has no
+Claude auto memory. This guard keeps the name from coming back, and the
+names of that server's memory and symbol tools with it. It has no
 allowlist. Background: docs/features/serena-removal/
 """
 
 from pathlib import Path
 
 SRC = Path(__file__).parent.parent.parent / "src" / "superclaude"
-FORBIDDEN = "serena"
+FORBIDDEN = (
+    "serena",
+    "write_memory",
+    "read_memory",
+    "list_memories",
+    "find_symbol",
+    "get_symbols_overview",
+    "find_referencing_symbols",
+)
 
 
 def _shipped_files() -> list[Path]:
@@ -32,8 +41,10 @@ def test_shipped_content_names_no_server() -> None:
             text = path.read_text(encoding="utf-8")
         except UnicodeDecodeError:
             continue
+        rel = path.relative_to(SRC.parent.parent).as_posix()
         for lineno, line in enumerate(text.splitlines(), start=1):
-            if FORBIDDEN in line.casefold():
-                rel = path.relative_to(SRC.parent.parent).as_posix()
-                hits.append(f"{rel}:{lineno}")
+            folded = line.casefold()
+            for token in FORBIDDEN:
+                if token in folded:
+                    hits.append(f"{rel}:{lineno}: {token}")
     assert not hits, "server name found in shipped content:\n" + "\n".join(hits)

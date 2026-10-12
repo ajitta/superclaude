@@ -93,4 +93,4 @@ Index: [05-plan.md](./05-plan.md). 결정 근거: 01-discovery Q4·Q5·P3·P9.
 - Extra file `README.md:28,519`: the MCP count in the badge table and the docs table went 4 → 3. `tests/unit/test_version_consistency.py` ties both to the tree, and no phase listed them.
 - Extra tests in `tests/unit/test_context_loader.py` whose counts followed the deleted doc: `test_all_mcp_includes_3_servers` (was 4), `test_frontend_verify_includes_2_servers` (was 3), `test_trigger_map_mcp_count` (4 → 3), and the class comment "3 total: 2 tool + 1 behavioral".
 - `test_context_loader.py:71-72`: that example already had `--tavily`, so it became `"analyze --tavily --c7"` instead of a duplicate flag.
-- Not changed: the `context_loader.py:14` docstring counts ("--frontend-verify (3 MCP), --all-mcp (6 MCP)") name no server and were already off before this phase; out of scope.
+- `context_loader.py:14` docstring counts were not changed in this phase. `--frontend-verify (3 MCP)` was right before it and went stale when the server left; `--all-mcp (6 MCP)` was already off. Both fixed in Phase F (Task F3).

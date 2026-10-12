@@ -11,7 +11,7 @@ description: Session lifecycle management with a committed project memory folder
 
   <flow>
   1. Analyze: session progress + discoveries
-  2. Persist (memory folder): Write .claude/memories/session_[date].md (context) → .claude/memories/learnings_[topic].md (insights); flat basename only, no path segments; create the folder when absent
+  2. Persist (memory folder): Write .claude/memories/session_[date].md (context) → .claude/memories/learnings_[topic].md (insights) → overwrite .claude/memories/last_session.md (this session's summary) and .claude/memories/next_actions.md (open items); flat basename only, no path segments; create the folder when absent
   3. Persist (auto memory): Write/Edit MEMORY.md + topic files for cross-session continuity
     3.5. Corrections-Review: capture unrecorded user corrections per the /sc:reflect Misunderstanding-Audit step (same feedback-memory fields).
   4. Verify: Glob .claude/memories/ + Read MEMORY.md confirms both stores
@@ -43,7 +43,7 @@ description: Session lifecycle management with a committed project memory folder
   <outputs note="Per --type flag">
 | Type | Memory folder | Auto Memory | Content |
 |---|---|---|---|
-| session | session_[date] | MEMORY.md | Full context |
+| session | session_[date], last_session, next_actions | MEMORY.md | Full context |
 | learnings | learnings_[topic] | topic files | Patterns + insights |
 | context | context_[project] | MEMORY.md | Project state |
 | all | All above | All above | Complete preservation |

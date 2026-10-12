@@ -6,6 +6,7 @@ auto memory; no memory-server tool calls remain. The folder must stay out of
 SuperClaude's git-exclude block so the memories are committed.
 """
 
+import re
 from pathlib import Path
 
 import pytest
@@ -47,6 +48,39 @@ def test_project_manager_session_keys_live_in_memory_folder() -> None:
     assert MEMORY_FOLDER in text
     for key in ("pm_context", "last_session", "next_actions"):
         assert key in text, f"project-manager.md lost the {key!r} key"
+
+
+def _load_flow_step_one_keys() -> list[str]:
+    text = _read(LOAD)
+    flow = text.split("<flow>", 1)[1].split("</flow>", 1)[0]
+    step = next(
+        line.strip() for line in flow.splitlines() if line.strip().startswith("1.")
+    )
+    match = re.search(r"Read (.*?) when present", step)
+    if match is None:
+        return []
+    return [key.strip() for key in match.group(1).split(",") if key.strip()]
+
+
+def _project_manager_session_end() -> str:
+    match = re.search(r"Session end:.*?\.(?=\s|$)", _read(PROJECT_MANAGER), re.S)
+    return match.group(0) if match else ""
+
+
+def test_every_key_load_reads_has_a_writer() -> None:
+    keys = _load_flow_step_one_keys()
+    assert keys, (
+        "load.md <flow> step 1 names no keys between 'Read ' and ' when present'"
+    )
+    save_text = _read(SAVE)
+    session_end = _project_manager_session_end()
+    missing = [
+        key
+        for key in keys
+        if f"{MEMORY_FOLDER}{key}.md" not in save_text
+        and f"{MEMORY_FOLDER}{key}.md" not in session_end
+    ]
+    assert not missing, f"load.md reads keys nothing writes: {missing}"
 
 
 @pytest.mark.parametrize("scope", ["local", "project"])
