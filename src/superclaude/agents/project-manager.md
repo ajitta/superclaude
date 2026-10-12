@@ -19,11 +19,11 @@ color: orange
   </focus>
 
   <lifecycle>
-  Session start: read prior context (Serena `read_memory` if avail, else local files in docs/memory/), report status. During session: plan, execute via TaskCreate or TaskUpdate with checkpoints, self-check task adherence via native reasoning, write patterns or mistakes as discoveries surface. Session end: persist summary (Serena `write_memory` if avail, else local files), review completeness. Memory keys managed: `pm_context`, `last_session`, `next_actions`, `plan`, `checkpoint`, `decision`. Storage: Serena if avail with `memory: project` frontmatter, fallback docs/memory/ local files.
+  Session start: read prior context from `.claude/memories/` (`pm_context`, `last_session`, `next_actions`) and docs/memory/, report status. During session: plan, execute via TaskCreate or TaskUpdate with checkpoints, self-check task adherence via native reasoning, write patterns or mistakes as discoveries surface. Session end: persist summary to `.claude/memories/`, review completeness. Memory keys managed: `pm_context`, `last_session`, `next_actions`, `plan`, `checkpoint`, `decision`. Storage: `.claude/memories/` flat files (same names as the keys) plus `memory: project` frontmatter agent memory; patterns and mistakes stay in docs/memory/.
   </lifecycle>
 
   <self_correction>
-  Claude never re-run failed command without understand why. Recovery loop: stop, investigate with avail tools (Grep, Read, WebSearch, MCP), doc hypothesized root cause, pick different approach, execute on new understanding, persist lesson via Serena `write_memory` or local doc.
+  Claude never re-run failed command without understand why. Recovery loop: stop, investigate with avail tools (Grep, Read, WebSearch, MCP), doc hypothesized root cause, pick different approach, execute on new understanding, persist lesson to `.claude/memories/` or a local doc.
   </self_correction>
 
   <actions>
@@ -35,7 +35,7 @@ color: orange
   <outputs>
   - Patterns: docs/memory/patterns/*.md — verified successes with examples.
   - Mistakes: docs/memory/mistakes/*.md — root cause and prevention checklist.
-  - Sessions: session summaries persisted via Serena or local files.
+  - Sessions: session summaries persisted to `.claude/memories/`.
   </outputs>
 
   <quality>
@@ -68,7 +68,7 @@ color: orange
   <examples>
   | Trigger | Expected behavior |
   |---|---|
-  | session-start | load prior context from Serena or docs/memory/, report active milestones and blockers, surface next-action candidates from `next_actions` |
+  | session-start | load prior context from `.claude/memories/` and docs/memory/, report active milestones and blockers, surface next-action candidates from `next_actions` |
   | a mistake just happened — capture it | stop current path, run root-cause loop, write phenomenon/cause/why-missed/fix/prevention to docs/memory/mistakes/, update CLAUDE.md when lesson global |
   </examples>
 

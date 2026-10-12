@@ -1,22 +1,21 @@
 ---
-description: Session lifecycle mgmt with Serena MCP + Claude auto memory for proj context load. Use ONLY when user explicitly type `/sc:load` — session-start action prime context from Serena memory + proj state. Do NOT auto-trigger on session resume or "let's continue".
+description: Session lifecycle mgmt with the project memory folder (`.claude/memories/`) + Claude auto memory for proj context load. Use ONLY when user explicitly type `/sc:load` — session-start action prime context from memory files + proj state. Do NOT auto-trigger on session resume or "let's continue".
 ---
 <component name="load" type="command">
 
   <role command="/sc:load">
-    <mission>Session lifecycle mgmt with Serena MCP + Claude auto memory for proj context load</mission>
+    <mission>Session lifecycle mgmt with the project memory folder + Claude auto memory for proj context load</mission>
   </role>
 
   <syntax>/sc:load [target] [--type project|config|deps|checkpoint] [--refresh] [--analyze]</syntax>
 
   <flow>
-  1. Initialize: MCP auto-activate from CWD
-  2. Load (Serena): list_memories() (none → onboarding()) → read_memory("pm_context") → read_memory("last_session") → read_memory("next_actions"); memory tools absent → direct-file fallback (bounds)
-  3. Load (auto memory): MEMORY.md (auto-load) + topic files linked from MEMORY.md
-  4. Discover: Proj struct + reqs (get_symbols_overview, Read/Grep/Glob)
-  5. Activate: Proj context + workflow prep
-  6. Validate: Context integrity + session ready
-  7. Session Goal (optional): If user give goal, record as 1-line objective. Show as reminder when context > 60%.
+  1. Load (memory folder): Glob .claude/memories/*.md → Read pm_context, last_session, next_actions when present; folder absent → skip
+  2. Load (auto memory): MEMORY.md (auto-load) + topic files linked from MEMORY.md
+  3. Discover: Proj struct + reqs (Glob/Grep/Read)
+  4. Activate: Proj context + workflow prep
+  5. Validate: Context integrity + session ready
+  6. Session Goal (optional): If user give goal, record as 1-line objective. Show as reminder when context > 60%.
   </flow>
 
   <flags>
@@ -26,14 +25,13 @@ description: Session lifecycle mgmt with Serena MCP + Claude auto memory for pro
   </flags>
 
   <storage>
-    Storage locations (Serena primary / auto memory / topic files / agent memory): SSOT in /sc:save <storage> — installed sibling commands/sc/save.md.
+    Storage locations (memory folder / auto memory / topic files / agent memory): SSOT in /sc:save <storage> — installed sibling commands/sc/save.md.
   </storage>
 
 
   <tools>
-  - list_memories/read_memory: Serena memory retrieval
-  - get_symbols_overview: Serena struct analysis (use native Glob for dir listing)
-  - Read/Grep/Glob: Auto memory + proj file analysis
+  - Glob/Read: memory folder + auto memory + proj file analysis
+  - Grep: proj file analysis
   - Write: Checkpoint create
   </tools>
 
@@ -41,7 +39,7 @@ description: Session lifecycle mgmt with Serena MCP + Claude auto memory for pro
 
 | Input | Output |
 |---|---|
-| `/sc:load` | Current dir + Serena memory + auto memory |
+| `/sc:load` | Current dir + memory folder + auto memory |
 | `/path/to/project --type project --analyze` | Specific proj + analysis |
 | `session_123 --type checkpoint` | Restore checkpoint |
 | `--type deps --refresh` | Fresh dep analysis |
@@ -57,13 +55,13 @@ description: Session lifecycle mgmt with Serena MCP + Claude auto memory for pro
 
   <gotchas>
   - stale-memory: Verify loaded memory vs current file state before act on it
-  - dual-persistence: Check both Serena memory + auto memory for full context
+  - dual-persistence: Check both the memory folder and auto memory for full context
   </gotchas>
 
   <bounds>
-    <does>Serena integration, auto memory load, cross-session persist, context load.</does>
+    <does>memory folder + auto memory load, cross-session persist, context load.</does>
     <never>modify struct, load without validation, override without checkpoint.</never>
-    <fallback>Serena memory tools absent (server missing, or connected with `--mode=no-memories`): Glob + Read `.serena/memories/*.md` directly — plain markdown, same names as the memory tools use — plus Claude auto memory + Read CLAUDE.md/PLANNING.md/TASK.md, Glob for struct. Ask user for guidance when uncertain.</fallback>
+    <fallback>Memory folder absent: auto memory + Read CLAUDE.md/PLANNING.md/TASK.md, Glob for struct. Ask user for guidance when uncertain.</fallback>
   </bounds>
 
   <handoff next="/sc:analyze /sc:index-repo /sc:task"/>

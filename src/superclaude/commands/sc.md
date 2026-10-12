@@ -32,7 +32,7 @@ description: SuperClaude command dispatcher - main entry point for all features.
     - improve: Code quality + perf improvements
     - index: Project docs + knowledge base
     - index-repo: Repo indexing (94% token reduction)
-    - load: Session context loading (Serena)
+    - load: Session context loading (memory folder + auto memory)
     - pm: Project Manager Agent (default orchestration)
     - recommend: Get command recommendations
     - reflect: Task reflection + validation

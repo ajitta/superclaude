@@ -359,7 +359,7 @@ class TestCommandFlagsAreDefined:
 
 
 # A flow step's label: the text before the first ":" on a numbered <flow> line,
-# parenthetical dropped ("1. Load (Serena): ..." -> "load").
+# parenthetical dropped ("1. Load (memory folder): ..." -> "load").
 _FLOW_LABEL = re.compile(r"^\s*\d+(?:\.\d+)?\.\s+(.+?):", re.MULTILINE)
 # "the Analyze step", "the /sc:brainstorm Decision-mode tag step",
 # "the Test, Fix and Verify steps". A label never crosses another "the", so
