@@ -63,7 +63,9 @@ def _load_flow_step_one_keys() -> list[str]:
 
 
 def _project_manager_session_end() -> str:
-    match = re.search(r"Session end:.*?\.(?=\s|$)", _read(PROJECT_MANAGER), re.S)
+    # Up to the next sentence start (". " + capital) or the end of the line, so
+    # an abbreviation such as "e.g." inside the sentence does not cut it short.
+    match = re.search(r"Session end:.*?(?=\.\s+[A-Z]|$)", _read(PROJECT_MANAGER), re.M)
     return match.group(0) if match else ""
 
 

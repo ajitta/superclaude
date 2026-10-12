@@ -229,7 +229,7 @@ Agents that read source code should include a Symbolic-First directive in `<tool
 |------|-----------|------|
 | Reads and changes source (system/backend/frontend architects, python-expert, quality/performance/security engineers, refactoring-expert, root-cause-analyst, repo-index, self-review) | Full: `- Symbolic-First: with a symbol-aware tool connected (LSP or code index), query overview → definition → references before whole-file Read; without one, targeted Grep then Read of the matched range.` + optional agent-specific Grep sentence + `Read whole files only when small or non-code.` | Always |
 | Touches code to configure, plan, document or teach (devops-architect, requirements-analyst, project-manager, project-initializer, technical-writer, learning-guide, socratic-mentor) | Light: `- Symbolic-First: prefer symbol-aware queries (when connected) or targeted Grep over whole-file Read when exploring code.` | When code may be read |
-| Non-code (researcher, business) | — | Skip |
+| Non-code (business-panel-experts, deep-researcher, git-workflow, insight-analyst, simplicity-guide, verifier) | — | Skip |
 
 Rationale: symbol overview vs full-file Read = significant token savings + structural understanding (refs, types, inheritance). Subagents do not receive core rules, so the line ships in the agent body.
 
