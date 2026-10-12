@@ -125,9 +125,10 @@
       <nav aria-label="Main navigation">
         <a href="#framework">Framework</a>
         <a href="#install">Install</a>
+        <a href="#develop">Clone</a>
+        <a href="#fork">Fork</a>
         <a href="#commands">Commands</a>
         <a href="#plugins">Plugin</a>
-        <a href="#develop">Develop</a>
         <a href="https://github.com/ajitta/superclaude">GitHub ↗</a>
       </nav>
     </div>
@@ -173,7 +174,7 @@
           <h2>Install the CLI and content</h2>
           <p>No clone needed. Install <a href="https://docs.astral.sh/uv/getting-started/installation/">uv</a> if you don't have it, install the CLI from the latest release with it, then install the framework content into a scope.</p>
           <p><code>@stable</code> always points at the <a href="https://github.com/ajitta/superclaude/releases">latest release</a>. To pin one, replace it with that release's tag, <code>@v&lt;version&gt;</code>.</p>
-          <p>Want to change the framework and run your own version? See <a href="#develop">Customize your own copy</a>.</p>
+          <p>This runs the release unchanged. To edit your own copy, see <a href="#develop">Clone install</a>, or <a href="#fork">Fork install</a> to keep that copy on GitHub.</p>
           <a href="https://github.com/ajitta/superclaude#-quick-installation">Full installation and scope options ↗</a>
         </div>
         <div>
@@ -216,6 +217,95 @@
       </div>
     </section>
 
+    <section id="develop" class="content install develop">
+      <div class="wrap">
+        <div>
+          <h2>Clone install</h2>
+          <p>Run your own copy from a local clone and edit the commands, agents, modes, or rules. The content is markdown under <code>src/superclaude/</code>. No GitHub account is needed, and every step needs only <code>git</code>, <a href="https://docs.astral.sh/uv/getting-started/installation/">uv</a> and the <code>superclaude</code> CLI. To keep your copy on GitHub, see <a href="#fork">Fork install</a>.</p>
+          <a href="https://github.com/ajitta/superclaude#-clone-install">Full guide in the README ↗</a>
+        </div>
+        <div>
+          <ol class="steps">
+            <li>
+              <h3>Clone the repository</h3>
+              <p class="hint">This starts from the latest release.</p>
+              <div class="cmd"><code>git clone -b stable https://github.com/ajitta/superclaude.git</code></div>
+              <div class="cmd"><code>cd superclaude</code></div>
+            </li>
+            <li>
+              <h3>Set up the environment</h3>
+              <div class="cmd"><code>uv venv -p 3.13</code></div>
+              <div class="cmd"><code>uv pip install -e ".[dev]"</code></div>
+              <p class="hint">Don't run <code>uv sync</code>: it removes the dev tools installed above, and the tests stop running.</p>
+            </li>
+            <li>
+              <h3>Run the CLI from your clone</h3>
+              <div class="cmd"><code>uv tool install --force --editable .</code></div>
+              <p class="hint"><code>superclaude</code> now reads your clone, so later edits need no reinstall, but moving or deleting the clone breaks the CLI and its hooks. If you installed the release before, this replaces it.</p>
+            </li>
+            <li>
+              <h3>Install the content</h3>
+              <div class="cmd"><code>superclaude install --scope user</code></div>
+              <p class="hint">For a committed team install, or personal files inside one project, run it in that project with <code>--scope project</code> or <code>--scope local</code>. Restart Claude Code afterwards.</p>
+            </li>
+            <li>
+              <h3>Edit, then sync into a scope</h3>
+              <p class="hint">After changing files under <code>src/superclaude/</code>, copy them into the scope you use, then restart Claude Code. For a project or local install, run it in that project with <code>--scope project</code> or <code>--scope local</code>.</p>
+              <div class="cmd"><code>superclaude update --scope user</code></div>
+            </li>
+            <li>
+              <h3>Run the tests</h3>
+              <p class="hint">The markdown is tested too (counts, cross-references, structure), so run them after content edits as well.</p>
+              <div class="cmd"><code>uv run pytest</code></div>
+            </li>
+          </ol>
+          <div class="update">
+            <h3>Update to a new release</h3>
+            <p class="hint">Commit your edits, then merge the new release into your clone. Resolve any conflicts with your changes, reinstall the CLI in case dependencies changed, and refresh each scope you installed:</p>
+            <div class="cmd"><code>git pull --no-rebase origin stable</code></div>
+            <div class="cmd"><code>uv tool install --force --editable .</code></div>
+            <div class="cmd"><code>superclaude update --scope user</code></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="fork" class="content install">
+      <div class="wrap">
+        <div>
+          <h2>Fork install (recommended)</h2>
+          <p>A clone install whose copy lives in your own GitHub fork: your edits are backed up, and you can use the same copy on every machine. Follow <a href="#develop">Clone install</a> with these changes.</p>
+          <a href="https://github.com/ajitta/superclaude#-fork-install-recommended">Full guide in the README ↗</a>
+        </div>
+        <div>
+          <ol class="steps">
+            <li>
+              <h3>Fork the repository</h3>
+              <p class="hint"><a href="https://github.com/ajitta/superclaude/fork">Fork it on GitHub</a> before you clone. Copying only the <code>stable</code> branch, the default, is enough.</p>
+            </li>
+            <li>
+              <h3>Clone your fork instead</h3>
+              <div class="cmd"><code>git clone https://github.com/&lt;your-account&gt;/superclaude.git</code></div>
+              <div class="cmd"><code>cd superclaude</code></div>
+            </li>
+            <li>
+              <h3>Push your edits</h3>
+              <p class="hint">After committing your edits, push them to your fork:</p>
+              <div class="cmd"><code>git push</code></div>
+            </li>
+          </ol>
+          <div class="update">
+            <h3>Update to a new release</h3>
+            <p class="hint">Add this repository as <code>upstream</code> once, then pull new releases from it instead of <code>origin</code>:</p>
+            <div class="cmd"><code>git remote add upstream https://github.com/ajitta/superclaude.git</code></div>
+            <div class="cmd"><code>git pull --no-rebase upstream stable</code></div>
+            <div class="cmd"><code>uv tool install --force --editable .</code></div>
+            <div class="cmd"><code>superclaude update --scope user</code></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <section id="commands" class="content">
       <div class="wrap examples">
         <div>
@@ -227,6 +317,11 @@
           <div class="example"><div class="cmd cmd-light"><code>/sc:plan</code></div><p>Turn a task into an implementation plan.</p></div>
           <div class="example"><div class="cmd cmd-light"><code>/sc:implement</code></div><p>Work through the implementation.</p></div>
           <div class="example"><div class="cmd cmd-light"><code>/sc:review</code></div><p>Review code, a plan, or a design.</p></div>
+          <div class="goal">
+            <h3>Ask what to do next</h3>
+            <p>Claude Code's <a href="https://code.claude.com/docs/en/interactive-mode"><code>/btw</code></a> asks a side question. It answers from the conversation so far, works while Claude is still busy, and never enters the conversation history. It has no tools, so it answers only from what the session already holds:</p>
+            <div class="cmd cmd-light"><code>/btw based on what we just did, which /sc command should I run next, and why?</code></div>
+          </div>
           <div class="goal">
             <h3>Run a command toward a goal</h3>
             <p>Claude Code's <a href="https://code.claude.com/docs/en/goal"><code>/goal</code></a> sets a completion condition, and Claude keeps working turn after turn until a separate model judges it met. The condition is also Claude's first instruction, so a command named in it runs as part of the goal:</p>
@@ -275,54 +370,6 @@
       </div>
     </section>
 
-    <section id="develop" class="content install develop">
-      <div class="wrap">
-        <div>
-          <h2>Customize your own copy</h2>
-          <p>For developers who want to change the commands, agents, modes, or rules and run their own version. Clone the repository, point the <code>superclaude</code> CLI at your clone, and copy your edits into a scope. The content is markdown under <code>src/superclaude/</code>.</p>
-          <a href="https://github.com/ajitta/superclaude#-for-developers--contributors">Developer guide in the README ↗</a>
-        </div>
-        <div>
-          <ol class="steps">
-            <li>
-              <h3>Clone the repository</h3>
-              <p class="hint">This starts from the latest release. To keep your changes on GitHub, fork it first and clone your fork instead; its default branch is <code>stable</code>. Sending pull requests? Untick "Copy the stable branch only" when you fork and clone with <code>-b master</code>; they target <code>master</code>.</p>
-              <div class="cmd"><code>git clone -b stable https://github.com/ajitta/superclaude.git</code></div>
-              <div class="cmd"><code>cd superclaude</code></div>
-            </li>
-            <li>
-              <h3>Set up the environment</h3>
-              <div class="cmd"><code>uv venv -p 3.13</code></div>
-              <div class="cmd"><code>uv pip install -e ".[dev]"</code></div>
-              <p class="hint">Don't run <code>uv sync</code>: it removes the dev tools installed above, and the tests stop running.</p>
-            </li>
-            <li>
-              <h3>Run the CLI from your clone</h3>
-              <div class="cmd"><code>uv tool install --force --editable .</code></div>
-              <p class="hint">This replaces a release install. <code>superclaude</code> now reads your clone, so later edits need no reinstall, but moving or deleting the clone breaks the CLI and its hooks. To go back to the release, rerun the CLI command from the Install section with <code>--force</code>.</p>
-            </li>
-            <li>
-              <h3>Edit, then sync into a scope</h3>
-              <p class="hint">After changing files under <code>src/superclaude/</code>, copy them into the scope you use, then restart Claude Code. For a project or local install, run it in that project with <code>--scope project</code> or <code>--scope local</code>.</p>
-              <div class="cmd"><code>superclaude update --scope user</code></div>
-            </li>
-            <li>
-              <h3>Run the tests</h3>
-              <p class="hint">The markdown is tested too (counts, cross-references, structure), so run them after content edits as well.</p>
-              <div class="cmd"><code>uv run pytest</code></div>
-            </li>
-          </ol>
-          <div class="update">
-            <h3>Update to a new release</h3>
-            <p class="hint">Commit your edits, then merge the new release into your clone. Resolve any conflicts with your changes, reinstall the CLI in case dependencies changed, and refresh each scope you installed:</p>
-            <div class="cmd"><code>git pull --no-rebase https://github.com/ajitta/superclaude.git stable</code></div>
-            <div class="cmd"><code>uv tool install --force --editable .</code></div>
-            <div class="cmd"><code>superclaude update --scope user</code></div>
-          </div>
-        </div>
-      </div>
-    </section>
-
     <section class="origin">
       <div class="wrap">
         <h2>About this project</h2>
@@ -332,7 +379,7 @@
   </main>
   <footer>
     <div class="wrap">
-      <p>Source, installation details, architecture, and contributor guidance are maintained in the repository.</p>
+      <p>Source, installation details, architecture, and the customization guide are maintained in the repository.</p>
       <a href="https://github.com/ajitta/superclaude">View source on GitHub ↗</a>
     </div>
   </footer>

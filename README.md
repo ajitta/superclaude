@@ -10,7 +10,6 @@
     <img src="https://github.com/ajitta/superclaude/actions/workflows/test.yml/badge.svg" alt="Tests">
   </a>
   <img src="https://img.shields.io/badge/license-MIT-yellow.svg" alt="License">
-  <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs Welcome">
 </p>
 
 </div>
@@ -44,24 +43,15 @@ Claude Code reads those files at session start, which is how the framework chang
 
 ---
 
-## 📖 **For developers & contributors**
-
-**Essential reading when working in this repo:**
-
-| File | Purpose |
-|------|---------|
-| [`CLAUDE.md`](CLAUDE.md) | Project-specific rules: env (UV), make targets, how to run the tests, git workflow |
-| [`src/superclaude/ARCHITECTURE.md`](src/superclaude/ARCHITECTURE.md) | Content-framework taxonomy — directory roles, delivery pipelines, content types |
-| [`src/superclaude/CLAUDE_SC.md`](src/superclaude/CLAUDE_SC.md) | The always-loaded import chain → `core/FLAGS.md`, `PRINCIPLES.md`, `RULES.md` |
-| [`.claude/rules/`](.claude/rules) | Authoring specs for agents/commands/modes |
-| [`.claude/rules/gotchas/`](.claude/rules/gotchas) | Project-specific traps (e.g. *do not Read sub-agent `*.output` files*) |
-| [`SECURITY.md`](SECURITY.md) | Security disclosure policy |
-
-> Claude Code auto-loads `CLAUDE.md` and the `core/` import chain at session start, so the rules apply to every interaction inside this repo.
-
 ## ⚡ **Quick Installation**
 
 ### **Current Stable Version (v4.26.0)**
+
+There are three ways to install, from quickest to most customizable:
+
+1. **Quick install** (this section) runs the release as-is.
+2. **[Clone install](#-clone-install)** runs your own copy from a local clone, so you can edit the commands, agents, modes and rules.
+3. **[Fork install](#-fork-install-recommended)** is a clone install whose copy lives in your own GitHub fork. It is the recommended way to make the framework your own.
 
 `superclaude` ships markdown content (commands, agents, modes, MCP docs, core rules, hooks) plus a small CLI that copies it into Claude Code's content directories.
 
@@ -71,7 +61,7 @@ Claude Code reads those files at session start, which is how the framework chang
 uv tool install -p 3.13 git+https://github.com/ajitta/superclaude.git@stable
 ```
 
-No clone needed. `stable` is the latest release; to pin one, replace `@stable` with its tag, `@v<version>` (see [Releases](https://github.com/ajitta/superclaude/releases)). If your shell then can't find `superclaude`, run `uv tool update-shell` and open a new terminal. Working on SuperClaude itself? See *For contributors/developers* below.
+No clone needed. `stable` is the latest release; to pin one, replace `@stable` with its tag, `@v<version>` (see [Releases](https://github.com/ajitta/superclaude/releases)). If your shell then can't find `superclaude`, run `uv tool update-shell` and open a new terminal.
 
 #### **2. Install framework content with `superclaude install`**
 
@@ -129,6 +119,12 @@ Restart Claude Code, then try a few:
 - `/sc:insight` — Capture structured session insights to JSONL
 - `/sc:help` — List all 37 commands
 
+Not sure what to run next? Ask a side question with [`/btw`](https://code.claude.com/docs/en/interactive-mode). It answers from the conversation so far, works while Claude is still busy, and never enters the conversation history. It has no tools, so it answers only from what the session already holds:
+
+```
+/btw based on what we just did, which /sc command should I run next, and why?
+```
+
 To keep a command running until a result holds, put it in a [`/goal`](https://code.claude.com/docs/en/goal). `/goal` sets a completion condition, and Claude keeps working turn after turn until a separate model judges it met. The condition is also Claude's first instruction, so a command named in it runs as part of the goal:
 
 ```
@@ -174,40 +170,6 @@ The uninstall is marker-based: it removes only the hooks and the `@superclaude/C
 | `project` | `./.claude/` (committed) | Team-shared, checked into git |
 | `local` | `./.claude/` (kept out of git via `.git/info/exclude`) | Personal install inside a team repo (uses `settings.local.json`, `CLAUDE.local.md`) |
 
-**For contributors/developers:**
-```bash
-# Initial setup (editable mode for development)
-git clone -b master https://github.com/ajitta/superclaude.git   # the default branch is stable (releases)
-cd superclaude
-uv venv -p 3.13                        # uv pip install needs a venv to install into
-uv pip install -e ".[dev]"
-
-# Development cycle
-uv run superclaude install --list-all  # Test changes immediately
-uv run pytest tests/ -v                 # Run tests
-
-# Deploy CLI as a global uv tool (editable). Content sync is a separate step.
-make deploy
-
-# Sync framework content to a scope (force-sync — for headless `claude -p`)
-make sync-user      # → ~/.claude/        (global, recommended for daily use)
-make sync-project   # → ./.claude/        (team-shared, committed)
-make sync-local     # → ./.claude/        (local-only, excluded from git per clone)
-
-# Verify installation
-uv tool list              # List installed tools
-which superclaude         # Check install path (Linux/Mac)
-where superclaude         # Check install path (Windows)
-```
-
-| Stage | Command | Description |
-|-------|---------|-------------|
-| Dev/Test | `uv run superclaude ...` | Test in repo (editable) |
-| Deploy CLI | `make deploy` | `uv tool install --force --editable .` |
-| Sync content | `make sync-user` / `sync-project` / `sync-local` | Force-sync markdown/scripts to chosen scope |
-| Use | `superclaude ...` | Run from anywhere |
-| Uninstall | `make uninstall-user` / `uninstall-project` / `uninstall-local` | Scope-explicit removal |
-
 ### **Optional MCP servers**
 
 The framework is fully functional without any MCP server. Each one adds a capability its flag switches on:
@@ -217,6 +179,107 @@ The framework is fully functional without any MCP server. Each one adds a capabi
 - **Playwright**, **Chrome DevTools** — browser automation and performance audits (`--play`, `--perf`)
 
 Source of truth for each server's usage: `src/superclaude/mcp/MCP_*.md` and `src/superclaude/mcp/README.md`.
+
+## 📥 **Clone install**
+
+Run your own copy from a local clone of this repository and edit it. No GitHub account is needed, and every step needs only `git`, [uv](https://docs.astral.sh/uv/getting-started/installation/) and the `superclaude` CLI. To keep your copy on GitHub, use [Fork install](#-fork-install-recommended) instead.
+
+#### **1. Clone the repository**
+
+```bash
+git clone -b stable https://github.com/ajitta/superclaude.git
+cd superclaude
+```
+
+`stable` is the latest release.
+
+#### **2. Set up the environment**
+
+```bash
+uv venv -p 3.13
+uv pip install -e ".[dev]"
+```
+
+Don't run `uv sync`: it removes the dev tools installed above, and the tests stop running.
+
+#### **3. Run the CLI from your clone**
+
+```bash
+uv tool install --force --editable .
+```
+
+`superclaude` now reads your clone, so later edits need no reinstall. Moving or deleting the clone breaks the CLI and its hooks. If you installed the release before, this replaces it. If your shell can't find `superclaude`, run `uv tool update-shell` and open a new terminal.
+
+#### **4. Install the content**
+
+```bash
+superclaude install --scope user       # or, inside a project: --scope project / --scope local
+```
+
+The scopes are explained in the [CLI scope summary](#cli-scope-summary). Restart Claude Code afterwards.
+
+#### **5. Edit, then sync**
+
+Change the files under `src/superclaude/` (commands, agents, modes, rules, output styles), copy them into the scope you use, and restart Claude Code:
+
+```bash
+superclaude update --scope user
+```
+
+#### **6. Run the tests**
+
+The markdown is tested too (counts, cross-references, structure), so run them after content edits as well:
+
+```bash
+uv run pytest
+```
+
+#### **7. Pull in new releases**
+
+Commit your edits first. Then merge the new release, resolve any conflicts with your changes, reinstall the CLI in case dependencies changed, and refresh each scope you installed:
+
+```bash
+git pull --no-rebase origin stable
+uv tool install --force --editable .
+superclaude update --scope user
+```
+
+To remove everything, see [Uninstall](#uninstall). If you have `make`, `make deploy`, `make sync-user` and `make test` wrap these commands; see the `Makefile`.
+
+**Files to read before you customize:**
+
+| File | Purpose |
+|------|---------|
+| [`CLAUDE.md`](CLAUDE.md) | Project-specific rules: env (UV), make targets, how to run the tests, git workflow |
+| [`src/superclaude/ARCHITECTURE.md`](src/superclaude/ARCHITECTURE.md) | Content-framework taxonomy — directory roles, delivery pipelines, content types |
+| [`src/superclaude/CLAUDE_SC.md`](src/superclaude/CLAUDE_SC.md) | The always-loaded import chain → `core/FLAGS.md`, `PRINCIPLES.md`, `RULES.md` |
+| [`.claude/rules/`](.claude/rules) | Authoring specs for agents/commands/modes |
+| [`.claude/rules/gotchas/`](.claude/rules/gotchas) | Project-specific traps (e.g. *do not Read sub-agent `*.output` files*) |
+| [`SECURITY.md`](SECURITY.md) | Security disclosure policy |
+
+> Claude Code auto-loads `CLAUDE.md` and the `core/` import chain at session start, so the rules apply to every interaction inside this repo.
+
+## 🍴 **Fork install (recommended)**
+
+A clone install whose copy lives in your own GitHub fork: your edits are backed up, and you can use the same copy on every machine. Follow [Clone install](#-clone-install) with these changes:
+
+1. Before step 1, [fork the repository](https://github.com/ajitta/superclaude/fork) on GitHub. Copying only the `stable` branch, the default, is enough.
+2. In step 1, clone your fork instead:
+
+   ```bash
+   git clone https://github.com/<your-account>/superclaude.git
+   cd superclaude
+   ```
+
+3. After committing your edits, push them to your fork with `git push`.
+4. In step 7, add this repository as `upstream` once, then pull new releases from it:
+
+   ```bash
+   git remote add upstream https://github.com/ajitta/superclaude.git   # once
+   git pull --no-rebase upstream stable
+   uv tool install --force --editable .
+   superclaude update --scope user
+   ```
 
 ---
 
