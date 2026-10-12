@@ -6,6 +6,23 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Ver
 
 Releases before 4.19.0 are not listed. Their history is the git log; the upstream-era changelog, last entry 4.2.1, is `CHANGELOG.md` at commit `6b0ac5c3^`.
 
+## [4.26.0] - 2026-10-12
+
+### Changed
+
+- `/sc:save` and `/sc:load` keep session memories in `.claude/memories/` (committed with the project) plus Claude auto memory. Each save adds or updates one `session_[date]_[branch-slug].md` record, so parallel branches and worktrees do not conflict on merge. Existing `.serena/memories/` files stay where they are and are no longer read.
+- `superclaude mcp` no longer pre-selects servers: the interactive picker lists every server and installs only the numbers you enter.
+- Agents and R17 say "symbol-aware tool (LSP or code index)" instead of naming a server.
+
+### Removed
+
+- The Serena MCP doc, the `--serena` flag (now plain text with no effect), and Serena registration in `superclaude mcp`. An already registered Serena server keeps working; register or remove it with `claude mcp`.
+
+### Upgrade notes
+
+- Re-run `superclaude install` for your scope to pick up the new commands, agents and rules.
+- `/sc:load` does not read `.serena/memories/`. To carry a session record over, copy the parts you need into a `.claude/memories/session_*.md` file.
+
 ## [4.25.0] - 2026-10-12
 
 ### Changed
