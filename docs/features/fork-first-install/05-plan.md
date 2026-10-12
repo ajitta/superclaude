@@ -28,6 +28,7 @@ revised: 2026-10-12
 | P5 | 저장소 파일 표(CLAUDE.md, ARCHITECTURE.md, rules …) | 버리지 않고 추천 섹션 안 "커스텀 전에 읽을 파일"로 옮김 — 포크 주인에게 필요한 정보 |
 | P6 | Pages `#develop` id | 유지 (외부 링크 보존), 보이는 제목·nav 라벨만 바꿈 |
 | P7 | `.github/PULL_REQUEST_TEMPLATE.md` | 범위 밖. 남겨 둠 (아래 "범위 밖") |
+| P8 | `make`가 없는 사용자 (Windows 기본 환경 등) | 추천 경로의 명령은 `uv`·`git`·`superclaude`만 쓴다. `make` 표(기존 README 203-209)는 옮기지 않고 삭제, 대신 README 산문 한 줄: "Have `make`? `make deploy`, `make sync-user` and `make test` wrap the same commands (see `Makefile`)." Pages에는 `make` 언급 없음. 테스트가 추천 섹션의 `make` 명령 줄을 막음 |
 
 ## 파일 지도
 
@@ -45,8 +46,9 @@ revised: 2026-10-12
 - [ ] Step 1: 실패하는 테스트 작성 — `tests/unit/test_install_docs.py`
   - `test_readme_recommends_fork_first`: `## 🍴 **Recommended: fork and make it your own**`의 위치 < `## ⚡ **Quick Installation**`의 위치 (둘 다 존재해야 함)
   - `test_install_doc_has_no_contributor_path[README.md]`: `re.search(r"contributor|pull request|PRs-welcome", text, re.I)` 없음
+  - `test_fork_path_needs_no_make[README.md]`: 추천 섹션(새 제목 ~ `## ⚡`) 안에 `re.search(r"(?m)^\s*make\s", section)` 없음 — 코드 블록의 `make` 명령 줄만 걸리고, 산문의 인라인 `` `make deploy` `` 안내 한 줄은 통과
   - 문서 목록은 `_INSTALL_DOCS = {"README.md": ...}` 형태로 두고 Phase 2에서 Pages를 추가
-- [ ] Step 2: `uv run pytest tests/unit/test_install_docs.py -q` → 2 failed 확인
+- [ ] Step 2: `uv run pytest tests/unit/test_install_docs.py -q` → 3 failed 확인 (`no_make`는 섹션이 없어 실패 — 섹션 부재도 실패로 처리)
 - [ ] Step 3: README 수정
   - 13행 "PRs welcome" 배지 삭제
   - 47-60 `## 📖 For developers & contributors` 삭제 → 표는 새 섹션으로 이동
@@ -63,8 +65,9 @@ revised: 2026-10-12
     7. Pull new releases           git remote add upstream https://github.com/ajitta/superclaude.git (한 번)
                                    git pull --no-rebase upstream stable → 충돌 해결 → 3, 5 다시
     + "Files to read before you customize" 표 (기존 47-60 표)
-    + make 단축 표 (기존 203-209: deploy, sync-*, uninstall-*)
+    + 산문 한 줄: make가 있으면 같은 명령의 단축 (P8). make 표는 옮기지 않음
     ```
+  - 단계의 모든 명령은 `make` 없이 실행 가능해야 함 (P8): 제거는 `superclaude uninstall --scope <s>` + `uv tool uninstall superclaude` (Quick Installation의 Uninstall 절 재사용, 링크만)
   - Quick Installation 첫 문단 앞에 한 줄: "Use the release as-is, without editing it. To customize, see *Recommended* above."
   - 74행 끝 "Working on SuperClaude itself? See *For contributors/developers* below." 삭제
   - 177-209 `**For contributors/developers:**` 블록 + 표 삭제 (새 섹션으로 흡수됨 — 같은 명령을 두 곳에 두지 않음)
@@ -77,8 +80,8 @@ revised: 2026-10-12
 
 - [ ] Step 1: 실패하는 테스트 추가
   - `test_pages_recommends_fork_first`: `id="develop"` 위치 < `id="install"` 위치, nav에서 `href="#develop"` < `href="#install"`, hero `class="button" href="#develop"`
-  - `_INSTALL_DOCS`에 `docs/index.html` 추가 → 기여자 문구 테스트가 Pages도 검사
-- [ ] Step 2: `uv run pytest tests/unit/test_install_docs.py -q` → Pages 2건 failed 확인
+  - `_INSTALL_DOCS`에 `docs/index.html` 추가 → 기여자 문구·`make` 테스트가 Pages도 검사. Pages의 추천 섹션 = `id="develop"`부터 다음 `<section` 전까지, 검사 패턴 `<code>make\s`
+- [ ] Step 2: `uv run pytest tests/unit/test_install_docs.py -q` → Pages 2건 failed 확인 (`no_make[Pages]`는 현재도 통과 — 현재 Pages 커스텀 섹션에 `make` 없음)
 - [ ] Step 3: `docs/index.html` 수정
   - `<section id="develop" …>` 블록 전체(278-325)를 `<section id="install" …>`(170) 바로 앞으로 이동
   - 제목 "Customize your own copy" → "Make it your own (recommended)", 소개 문단에 "권장 사용법" 한 줄
@@ -101,7 +104,7 @@ revised: 2026-10-12
 ## 범위 밖
 
 - `.github/PULL_REQUEST_TEMPLATE.md`: 기여자 흔적이지만 설치 가이드가 아님. 지울지는 따로 결정
-- README 하단 "What's new in this fork" 등 다른 섹션, Pages 디자인(CSS) 변경
+- README 하단 "What's new in this fork" 등 다른 섹션, Pages 디자인(CSS) 변경. 참고: 그 안 "Scope-Explicit Deployment"(README 384-386)는 `make` 타깃만 나열함 — 설치 안내가 아닌 기능 소개라 이번엔 그대로 둠
 - `make release`·Pages 재배포: Pages는 `stable`에서 나오므로 merge만으로는 사이트가 안 바뀜 — 다음 릴리스 때 반영
 
 ## Risks
@@ -121,7 +124,7 @@ revised: 2026-10-12
 
 ## Proof
 
-- `uv run pytest` → exit 0, 신규 `tests/unit/test_install_docs.py` 4건 pass (Phase 1의 2건 + Phase 2의 2건, 문구 테스트는 문서별 parametrize)
+- `uv run pytest` → exit 0, 신규 `tests/unit/test_install_docs.py` 6건 pass (문서 2개 × 순서·기여자 문구·`make` 없음, 문서별 parametrize)
 - `make lint` → `All checks passed!`
 - `grep -n -i "contributor\|pull request\|PRs-welcome" README.md docs/index.html` → 출력 없음
 - 브라우저: Pages 로컬 파일에서 nav·hero·섹션 순서, 375px, 라이트·다크
