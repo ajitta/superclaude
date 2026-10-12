@@ -67,6 +67,11 @@ def _project_manager_session_end() -> str:
     return match.group(0) if match else ""
 
 
+# Keys only the project-manager agent writes; /sc:save writes every other key
+# /sc:load reads by name.
+PROJECT_MANAGER_ONLY_KEYS = {"pm_context"}
+
+
 def test_every_key_load_reads_has_a_writer() -> None:
     keys = _load_flow_step_one_keys()
     assert keys, (
@@ -75,12 +80,17 @@ def test_every_key_load_reads_has_a_writer() -> None:
     save_text = _read(SAVE)
     session_end = _project_manager_session_end()
     missing = [
-        key
+        f"{key} (save.md)"
         for key in keys
-        if f"{MEMORY_FOLDER}{key}.md" not in save_text
+        if key not in PROJECT_MANAGER_ONLY_KEYS
+        and f"{MEMORY_FOLDER}{key}.md" not in save_text
+    ] + [
+        f"{key} (project-manager.md Session end)"
+        for key in keys
+        if key in PROJECT_MANAGER_ONLY_KEYS
         and f"{MEMORY_FOLDER}{key}.md" not in session_end
     ]
-    assert not missing, f"load.md reads keys nothing writes: {missing}"
+    assert not missing, f"load.md reads keys their owner does not write: {missing}"
 
 
 @pytest.mark.parametrize("scope", ["local", "project"])
