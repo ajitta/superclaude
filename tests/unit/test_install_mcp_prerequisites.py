@@ -16,7 +16,7 @@ from superclaude.cli import install_mcp
 
 
 def _fake_run(node_version: str | None):
-    """Build a `_run_command` stand-in: claude/uv/serena succeed, node reports a version."""
+    """Build a `_run_command` stand-in: claude succeeds, node reports a version."""
 
     def run(cmd, **kwargs):
         tool = cmd[0]
@@ -53,32 +53,30 @@ def test_node_version_ok_returns_none_when_unparseable():
     assert install_mcp._node_version_ok("") is None
 
 
-def test_every_registry_server_except_serena_needs_node():
+def test_every_registry_server_needs_node():
     """Playwright and Tavily run via npx; chrome-devtools is a plugin that does too."""
     needs = {
         name: install_mcp._server_needs_node(name) for name in install_mcp.MCP_SERVERS
     }
     assert needs == {
-        "serena": False,
         "tavily": True,
         "playwright": True,
         "chrome-devtools": True,
     }
 
 
-def test_serena_only_selection_skips_node_check():
-    """A Python-only install on old Node must not be blocked by the npm gate."""
-    with patch.object(install_mcp, "_run_command", _fake_run("v18.20.0")):
-        ok, errors = install_mcp.check_prerequisites(selected_servers=["serena"])
-    assert ok is True
-    assert errors == []
+def test_prerequisites_never_probe_uv():
+    calls = []
+    run = _fake_run("v22.12.0")
 
+    def recording_run(cmd, **kwargs):
+        calls.append(cmd)
+        return run(cmd, **kwargs)
 
-def test_serena_only_selection_tolerates_missing_node():
-    with patch.object(install_mcp, "_run_command", _fake_run(None)):
-        ok, errors = install_mcp.check_prerequisites(selected_servers=["serena"])
-    assert ok is True
-    assert errors == []
+    with patch.object(install_mcp, "_run_command", recording_run):
+        install_mcp.check_prerequisites(selected_servers=list(install_mcp.MCP_SERVERS))
+    assert calls, "check_prerequisites made no calls"
+    assert not [cmd for cmd in calls if cmd[0] == "uv"]
 
 
 @pytest.mark.parametrize("selection", [["playwright"], ["tavily"], ["chrome-devtools"]])
@@ -91,7 +89,7 @@ def test_npm_server_selection_rejects_old_node(selection):
     assert install_mcp.NODE_VERSION_REQUIREMENT in errors[0]
 
 
-@pytest.mark.parametrize("selection", [["playwright"], ["serena", "chrome-devtools"]])
+@pytest.mark.parametrize("selection", [["playwright"], ["chrome-devtools"]])
 def test_npm_server_selection_accepts_supported_node(selection):
     with patch.object(install_mcp, "_run_command", _fake_run("v22.12.0")):
         ok, errors = install_mcp.check_prerequisites(selected_servers=selection)

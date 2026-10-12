@@ -42,7 +42,7 @@ revised: 2026-10-12
 
 - [x] Phase A: [05a-plan-memory-folder.md](./05a-plan-memory-folder.md) — /sc:save·/sc:load와 메모리를 다루는 콘텐츠를 `.claude/memories/` + auto memory로
 - [x] Phase B: [05b-plan-loader-flag.md](./05b-plan-loader-flag.md) — MCP 문서 삭제, context_loader 주입·플래그, fallback 힌트, 컴포넌트 카운트
-- [ ] Phase C: [05c-plan-installer.md](./05c-plan-installer.md) — 설치기 등록·사전 점검 제거, core/plugin 구분 제거, 설치 문서
+- [x] Phase C: [05c-plan-installer.md](./05c-plan-installer.md) — 설치기 등록·사전 점검 제거, core/plugin 구분 제거, 설치 문서
 - [ ] Phase D: [05d-plan-symbolic-first.md](./05d-plan-symbolic-first.md) — R17, 에이전트 18개, 나머지 콘텐츠의 도구 중립화 + 가드 테스트
 - [ ] Phase E: [05e-plan-repo-docs.md](./05e-plan-repo-docs.md) — README·SECURITY·AGENTS·PROJECT_INDEX·mcp-authoring, local scope 재동기화
 

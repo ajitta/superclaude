@@ -102,18 +102,13 @@ Every hook command is `superclaude hook <name>` — no interpreter path, no scri
 
 #### **3. Install MCP servers (optional)**
 
-> **Serena prerequisite.** Serena's CLI is **not** installed by `superclaude` — install it yourself first per [upstream's installation guide](https://oraios.github.io/serena/) (`uvx`/`pipx`). `superclaude mcp` only handles MCP registration + recommended hooks.
-
 ```bash
-superclaude mcp                        # interactive picker (default scope: user)
+superclaude mcp                        # interactive picker (installs only what you pick; default scope: user)
 superclaude mcp --list                 # list available servers
 superclaude mcp --servers tavily playwright
-superclaude mcp --servers serena       # register Serena (CLI must already be installed)
 superclaude mcp --scope project        # write to ./.mcp.json (team-shared)
 superclaude mcp --scope local          # per-project block inside ~/.claude.json
 ```
-
-> **Serena init/stale-entry issues?** See [`docs/troubleshooting/serena-installation.md`](docs/troubleshooting/serena-installation.md).
 
 #### **4. Verify**
 
@@ -512,7 +507,6 @@ The Deep Research system intelligently coordinates multiple tools:
 | Architecture & directory roles | [`src/superclaude/ARCHITECTURE.md`](src/superclaude/ARCHITECTURE.md) |
 | Project rules, build & test loop | [`CLAUDE.md`](CLAUDE.md) |
 | Project-specific gotchas | [`.claude/rules/gotchas/`](.claude/rules/gotchas) |
-| Serena MCP troubleshooting | [`docs/troubleshooting/serena-installation.md`](docs/troubleshooting/serena-installation.md) |
 | Slash commands (37) | [`src/superclaude/commands/`](src/superclaude/commands) · `superclaude install --list-all` |
 | Agents (24) | [`src/superclaude/agents/`](src/superclaude/agents) |
 | Modes (8) | [`src/superclaude/modes/`](src/superclaude/modes) |
