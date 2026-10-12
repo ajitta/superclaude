@@ -6,6 +6,17 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Ver
 
 Releases before 4.19.0 are not listed. Their history is the git log; the upstream-era changelog, last entry 4.2.1, is `CHANGELOG.md` at commit `6b0ac5c3^`.
 
+## [4.26.1] - 2026-10-12
+
+### Fixed
+
+- The `verifier` agent loads again. Its frontmatter was not valid YAML, so Claude Code had left it out of the agent list since 4.22.0.
+- The context loader hook skips turns that Claude Code writes itself: sub-agent results, task notifications and the `/goal` notice. A file or flag name in that text no longer loads modes, rule modules or directives that nobody typed (for example, a sub-agent report that named `business-panel-experts.md` loaded the business panel mode).
+
+### Upgrade notes
+
+- Re-run `superclaude install` for your scope to pick up the fixed agent.
+
 ## [4.26.0] - 2026-10-12
 
 ### Changed
