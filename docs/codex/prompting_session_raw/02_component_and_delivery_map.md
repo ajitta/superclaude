@@ -124,13 +124,15 @@ Evaluation
 
 ### `skills/`
 
-- 역할: hook, invocation blocking, allowed-tools, script execution 또는
-  auto-invoked reference knowledge.
-- 전달: 디렉터리 전체가 설치되어 `SKILL.md`, scripts, references, assets가 함께
-  살아야 함.
-- 위험: description budget/trigger, `context: fork` 의존성, script template path,
-  side-effect skill의 자동 호출, 배포 artifact 누락.
-- 검증 초점: 구조 + canary + hook/script + clean package install.
+- 역할: 사용자가 호출하는 스킬. 지금은 `sc-author` 하나: `SKILL.md` 절차 +
+  `references/` 묶음, `disable-model-invocation: true`.
+- 전달: `skills` 디렉터리 컴포넌트. 디렉터리 단위 copytree, 대상
+  `.claude/skills/`는 사용자·다른 도구와 공유하므로 uninstall·drift·git-exclude는
+  배포한 디렉터리 이름만 다룸.
+- 위험: `fields.yaml`이 스킬(설치본)과 검사기(패키지 사본) 두 곳에서 읽힘 →
+  install 없이 CLI만 올리면 어긋남(verify-drift가 잡음). 공유 디렉터리 삭제 범위.
+- 검증 초점: `tests/unit/test_install_skills_component.py`,
+  `tests/unit/test_sc_author_skill.py`, 스킬 자신에 대한 `author-check`.
 
 ### `mcp/`
 

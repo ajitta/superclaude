@@ -710,6 +710,10 @@ MIT — see [`LICENSE`](LICENSE).
 - `/sc:select-tool` — Intelligent MCP tool selection
 - `/sc:sc` — Command dispatcher (routes to the other `/sc:*` commands)
 
+### ✍️ Authoring (skill)
+- `/sc-author` — Write or revise a file Claude reads as instructions (skill, subagent, command, output style, CLAUDE.md, `.claude/rules`, and others). It follows your project's existing documents, proposes no-op and harmful sentences for removal with evidence, and writes only after you approve the diff. `--md` (default) or `--xml` body. User-invoked only; installed to `.claude/skills/sc-author/`.
+- `superclaude author-check <path>` — The validator `/sc-author` runs: frontmatter fields, references, XML structure, broken pointers; `--with <file>` adds the documents loaded together for conflict and duplicate checks. Exit 1 on errors.
+
 **Source files:** [`src/superclaude/commands/`](src/superclaude/commands) — each command is a single markdown file with frontmatter. After install, run `superclaude install --list-all` for a full inventory.
 
 </details>

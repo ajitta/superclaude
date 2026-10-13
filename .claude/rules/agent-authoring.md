@@ -109,7 +109,7 @@ No add `effort: xhigh` because domain "feels" coding-heavy — session default c
 | Extended | 25-30 | Deep research, complex debugging |
 | Unlimited | *omit* | Orchestrators (project-manager) |
 
-**`skills`** — full skill body inject at startup (~500 tokens each). Subagent **not** inherit skills from parent — list explicit. No preload skills with `disable-model-invocation: true` (CC skip and warn to debug log). SuperClaude ships no skills of its own — names refer to skills installed in `~/.claude/skills/` or `.claude/skills/`.
+**`skills`** — full skill body inject at startup (~500 tokens each). Subagent **not** inherit skills from parent — list explicit. No preload skills with `disable-model-invocation: true` (CC skip and warn to debug log). SuperClaude's only skill, `sc-author`, sets `disable-model-invocation: true`, so it cannot be preloaded; names refer to skills installed in `~/.claude/skills/` or `.claude/skills/`.
 
 **`model`** — omit it: no shipped agent pins a model, and an omitted field follows Claude Code's subagent resolution order. Resolution order and the Fable opt-in paths: `agents/README.md` Model Routing (SSOT).
 

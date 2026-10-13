@@ -26,7 +26,7 @@ uv run superclaude install --list-all      # Test CLI changes
 
 ## Architecture
 
-SuperClaude is a **content framework** — markdown files (commands, agents, modes, output styles, MCP docs, core config) installed into `~/.claude/` to configure Claude Code's behavior. Ships a CLI (`superclaude`) and a pytest plugin for auto-markers.
+SuperClaude is a **content framework** — markdown files (commands, agents, skills, modes, output styles, MCP docs, core config) installed into `~/.claude/` to configure Claude Code's behavior. Ships a CLI (`superclaude`) and a pytest plugin for auto-markers.
 
 **Full taxonomy:** `src/superclaude/ARCHITECTURE.md` (directory roles, delivery pipelines, content types).
 

@@ -12,6 +12,7 @@ modes/          Mindset overlay     Mood/Posture    On-demand (context_loader)
 agents/         Domain expert       Specialist      CC-native delegation
 output-styles/  Response voice      House style     CC-native, user-selected (/config)
 commands/       Workflow entry      Menu item       CC-native /sc:*
+skills/         Authoring aid       Style guide     CC-native, user-invoked (/sc-author)
 mcp/            Tool docs+config    Tool manual     context_loader + install_mcp
 scripts/        Hook infra          Plumbing        hooks.json → settings.json
 ```
@@ -64,6 +65,12 @@ Claude Code output styles: Markdown with YAML frontmatter that replaces the tone
 User-facing workflow entry points accessible as `/sc:*` slash commands. Managed by Claude Code's native command system — installed to `~/.claude/commands/sc/`.
 
 **Contract:** Commands define what to do, not how to think. They route to agents, activate modes, and orchestrate tool usage. Each command has syntax, flow steps, and handoff chains.
+
+### skills/ — WRITE INSTRUCTION DOCS
+
+Claude Code skills, one directory each: `SKILL.md` plus the reference files it links. Installed to `<scope>/skills/<name>/`, the directory Claude Code scans natively and shares with the user's own skills, so install, uninstall and drift touch only the directory names SuperClaude ships. The one skill, `sc-author`, is user-invoked (`disable-model-invocation: true`) and runs the `superclaude author-check` validator.
+
+**Contract:** References are written for the projects SuperClaude is installed into, from Anthropic's published guidance listed in each file's `sources` — not from `.claude/rules/`, which is this repository's own convention. Rules: `.claude/rules/skill-authoring.md`.
 
 ### mcp/ — TOOL REFERENCE
 
@@ -122,7 +129,7 @@ Session Start
 |-----------|--------------|---------|--------|
 | **Always loaded** | core/ (FLAGS, PRINCIPLES, RULES kernel) | Session start | ~140 lines via @import |
 | **On-demand** | modes/, mcp/, core/rules/, core/BUSINESS_SYMBOLS | Flag/keyword in prompt | 8K token budget (context_loader) |
-| **CC-native** | agents/, commands/, output-styles/ | Auto-delegation, /sc:*, selected style | Managed by Claude Code runtime |
+| **CC-native** | agents/, commands/, output-styles/, skills/ | Auto-delegation, /sc:*, selected style, /sc-author | Managed by Claude Code runtime |
 
 ## Naming Trinity
 
@@ -154,6 +161,7 @@ Each content type has a dedicated authoring guide:
 | modes/ | `.claude/rules/mode-authoring.md` | `tests/unit/test_mode_structure.py` |
 | core/ | N/A (framework maintainers only) | N/A |
 | mcp/ | `.claude/rules/mcp-authoring.md` | `tests/unit/test_content_structure.py` |
+| skills/ | `.claude/rules/skill-authoring.md` | `tests/unit/test_sc_author_skill.py` |
 | scripts/ | Standard Python/shell conventions | `tests/unit/` (per-script) |
 
 Cross-cutting body-format rule: `.claude/rules/xml-prose-format.md` governs XML body prose style for all component bodies under `src/superclaude/` (agents/commands/modes/mcp/core). Authoring meta-docs themselves are exempt — they may use plain Markdown.
