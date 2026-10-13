@@ -588,7 +588,16 @@ def verify_drift_cmd(scope: str | None, verbose: bool):
     default=None,
     help="Body format (default: xml when the body starts with a tag)",
 )
-def author_check_cmd(path: str, type_: str | None, fmt: str | None):
+@click.option(
+    "--with",
+    "with_paths",
+    multiple=True,
+    type=click.Path(exists=True, dir_okay=False),
+    help="Another document loaded together with PATH (repeatable; N3, N4)",
+)
+def author_check_cmd(
+    path: str, type_: str | None, fmt: str | None, with_paths: tuple[str, ...]
+):
     """
     Check a file Claude reads as instructions (used by /sc-author).
 
@@ -597,17 +606,22 @@ def author_check_cmd(path: str, type_: str | None, fmt: str | None):
     message`, then `N errors, M warnings`.
 
     Rules: F (frontmatter fields), R (skill references), S (size, emphasis),
-    X (XML structure, with --format xml or an XML body).
+    X (XML structure, with --format xml or an XML body), N (pointers to
+    nothing, tools an agent lacks; with --with, conflicting or repeated
+    instructions across the documents loaded together).
 
     Exit: 0 no errors, 1 errors found, 2 usage error.
 
     Examples:
         superclaude author-check .claude/agents/reviewer.md
         superclaude author-check .claude/skills/deploy/SKILL.md --format xml
+        superclaude author-check CLAUDE.md --with .claude/rules/testing.md
     """
     from .author_check import check, summary
 
-    findings = check(Path(path), type_=type_, fmt=fmt)
+    findings = check(
+        Path(path), type_=type_, fmt=fmt, with_paths=[Path(p) for p in with_paths]
+    )
     for finding in findings:
         click.echo(finding.render())
     click.echo(summary(findings))

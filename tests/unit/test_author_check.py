@@ -51,6 +51,9 @@ class Case:
     fmt: str | None = None
     extra_bad: dict = field(default_factory=dict)
     extra_good: dict = field(default_factory=dict)
+    # Load-set documents passed as --with (rel path -> text).
+    with_bad: dict = field(default_factory=dict)
+    with_good: dict = field(default_factory=dict)
 
 
 CASES = {
@@ -130,6 +133,34 @@ CASES = {
         "<style>\nBe brief.\n</style>\n",
         fmt="xml",
     ),
+    "N1": Case(
+        "docs/guide.md",
+        "See [setup](setup.md#install) first.\n",
+        "See [setup](setup.md#install) first.\n",
+        extra_bad={"docs/setup.md": "# Setup\n## Configure\n"},
+        extra_good={"docs/setup.md": "# Setup\n## Install\n"},
+    ),
+    "N2": Case(
+        ".claude/agents/a.md",
+        _fm(name="reviewer", description="Reviews.", tools="Read, Grep")
+        + "Run the suite with `Bash`.\n",
+        _fm(name="reviewer", description="Reviews.", tools="Read, Grep, Bash")
+        + "Run the suite with `Bash`.\n",
+    ),
+    "N3": Case(
+        "CLAUDE.md",
+        "- Always: run the tests\n",
+        "- Always: run the tests\n",
+        with_bad={".claude/rules/testing.md": "## Never\n- Run the tests.\n"},
+    ),
+    "N4": Case(
+        "CLAUDE.md",
+        "Run the full test suite before every commit.\n",
+        "Run the full test suite before every commit.\n",
+        with_bad={
+            ".claude/rules/testing.md": "- run the full test suite before every commit\n"
+        },
+    ),
 }
 # X7 passes when the same output style is checked as md.
 _GOOD_FMT = {"X7": "md"}
@@ -148,9 +179,11 @@ def _run_case(tmp_path: Path, code: str, which: str) -> list:
     extra = case.extra_bad if which == "bad" else case.extra_good
     for rel, text in extra.items():
         _write(root, rel, text)
+    with_docs = case.with_bad if which == "bad" else case.with_good
+    with_paths = [_write(root, rel, text) for rel, text in with_docs.items()]
     target = _write(root, case.rel, case.bad if which == "bad" else case.good)
     fmt = _GOOD_FMT.get(code, case.fmt) if which == "good" else case.fmt
-    return check(target, type_=case.type_, fmt=fmt)
+    return check(target, type_=case.type_, fmt=fmt, with_paths=with_paths)
 
 
 class TestFieldsYaml:
@@ -294,6 +327,139 @@ class TestRules:
         assert not [f for f in check(target) if f.code.startswith("F")]
 
 
+class TestLoadSet:
+    """N3 and N4 compare the target with its load set; nothing else does."""
+
+    def _pair(self, tmp_path, target_text, other_text):
+        target = _write(tmp_path, "CLAUDE.md", target_text)
+        other = _write(tmp_path, "other.md", other_text)
+        return target, other
+
+    def test_n3_needs_the_other_document_in_with(self, tmp_path):
+        target, other = self._pair(
+            tmp_path, "- Always: run tests\n", "- Never: run tests\n"
+        )
+        assert [f for f in check(target, with_paths=[other]) if f.code == "N3"]
+        assert not [f for f in check(target) if f.code == "N3"]
+
+    @pytest.mark.parametrize(
+        ("allow", "forbid"),
+        [
+            ("## Always\n- Run **tests**.\n", "## Never\n- run tests\n"),
+            ("**Ask First**\n- push to main\n", "- Never: push to main, delete data\n"),
+            ("<does>\n- edit config\n</does>\n", "<never>\n- edit config\n</never>\n"),
+            ("- Do: open a pull request\n", "## Don't\n- Open a pull request!\n"),
+        ],
+    )
+    def test_n3_slot_shapes(self, tmp_path, allow, forbid):
+        target, other = self._pair(tmp_path, allow, forbid)
+        assert [f for f in check(target, with_paths=[other]) if f.code == "N3"]
+
+    def test_n3_within_one_document(self, tmp_path):
+        text = "- Always: run tests\n- Never: run tests\n"
+        target = _write(tmp_path, "CLAUDE.md", text)
+        assert [f for f in check(target) if f.code == "N3"]
+
+    def test_n3_same_slot_is_not_a_conflict(self, tmp_path):
+        target, other = self._pair(
+            tmp_path, "- Never: run tests\n", "- Never: run tests\n"
+        )
+        assert not [f for f in check(target, with_paths=[other]) if f.code == "N3"]
+
+    def test_n4_short_sentences_and_code_are_ignored(self, tmp_path):
+        target, other = self._pair(
+            tmp_path,
+            "Run the tests now.\n```\nrun the full suite before every commit\n```\n",
+            "Run the tests now.\nrun the full suite before every commit\n",
+        )
+        assert not [f for f in check(target, with_paths=[other]) if f.code == "N4"]
+
+    def test_n4_frontmatter_is_ignored(self, tmp_path):
+        target, other = self._pair(
+            tmp_path,
+            _fm(paths=["src/**"]) + "Body.\n",
+            "paths: ['src/**'] and some more words here\n",
+        )
+        assert not [f for f in check(target, with_paths=[other]) if f.code == "N4"]
+
+
+class TestDanglingPointers:
+    def test_n1_missing_link_target(self, tmp_path):
+        target = _write(tmp_path, "docs/guide.md", "See [x](gone.md).\n")
+        assert [(f.code, f.severity) for f in check(target)] == [("N1", "error")]
+
+    def test_n1_same_file_anchor(self, tmp_path):
+        text = "# Guide\n## Set up\nSee [s](#set-up), [t](#nope).\n"
+        target = _write(tmp_path, "docs/guide.md", text)
+        assert [f.message for f in check(target) if f.code == "N1"] == [
+            "`#nope` has no matching heading"
+        ]
+
+    def test_n1_urls_are_not_checked(self, tmp_path):
+        target = _write(
+            tmp_path, "docs/guide.md", "See [x](https://example.com/a.md).\n"
+        )
+        assert not check(target)
+
+    def test_n1_memory_import_line(self, tmp_path):
+        target = _write(tmp_path, "CLAUDE.md", "@docs/gone.md\n- rule\n")
+        found = [(f.code, f.line, f.severity) for f in check(target)]
+        assert found == [("N1", 1, "error")]
+
+    def test_n1_skill_links_are_r1_only(self, tmp_path):
+        text = _fm(description="Does x.") + "Read [a](references/gone.md)\n"
+        target = _write(tmp_path, ".claude/skills/x/SKILL.md", text)
+        assert [f.code for f in check(target)] == ["R1"]
+
+    def test_n1_inline_code_path_is_a_warning(self, tmp_path):
+        import subprocess
+
+        subprocess.run(["git", "init", "-q", str(tmp_path)], check=True)
+        _write(tmp_path, "src/app/main.py", "")
+        target = _write(
+            tmp_path,
+            "docs/guide.md",
+            "Edit `src/app/main.py:3` not `src/app/gone.py`.\n",
+        )
+        found = [(f.code, f.severity, f.message) for f in check(target)]
+        assert found == [
+            (
+                "N1",
+                "warning",
+                "`src/app/gone.py` does not exist (from the repository root)",
+            )
+        ]
+
+    @pytest.mark.parametrize(
+        "token",
+        ["<name>/x.md", "docs/*.md", "{a}/b.py", "$HOME/x.md", "README", "~/x/y.md"],
+    )
+    def test_n1_placeholders_are_skipped(self, tmp_path, token):
+        target = _write(tmp_path, "docs/guide.md", f"See `{token}`.\n")
+        assert not [f for f in check(target) if f.code == "N1"]
+
+    def test_n2_skips_agents_without_tools(self, tmp_path):
+        target = _write(tmp_path, ".claude/agents/a.md", _AGENT + "Use `Bash`.\n")
+        assert not [f for f in check(target) if f.code == "N2"]
+
+    def test_n2_mcp_tool(self, tmp_path):
+        call = "Call `mcp__example__lookup`.\n"
+        bad = _fm(name="r", description="Reviews.", tools="Read") + call
+        good = (
+            _fm(name="r", description="Reviews.", tools="Read, mcp__example__lookup")
+            + call
+        )
+        assert [
+            f.code for f in check(_write(tmp_path, "a/.claude/agents/a.md", bad))
+        ] == ["N2"]
+        assert not check(_write(tmp_path, "b/.claude/agents/a.md", good))
+
+    def test_n2_only_agents(self, tmp_path):
+        text = _fm(description="Does x.", **{"allowed-tools": "Read"}) + "Use `Bash`.\n"
+        target = _write(tmp_path, ".claude/skills/x/SKILL.md", text)
+        assert not [f for f in check(target) if f.code == "N2"]
+
+
 class TestCli:
     def _invoke(self, *args):
         return CliRunner().invoke(main, ["author-check", *args])
@@ -320,6 +486,18 @@ class TestCli:
 
     def test_missing_path_exit_2(self, tmp_path):
         assert self._invoke(str(tmp_path / "nope.md")).exit_code == 2
+
+    def test_missing_with_path_exit_2(self, tmp_path):
+        target = _write(tmp_path, "docs/guide.md", "x\n")
+        result = self._invoke(str(target), "--with", str(tmp_path / "nope.md"))
+        assert result.exit_code == 2
+
+    def test_with_reaches_the_rules(self, tmp_path):
+        target = _write(tmp_path, "CLAUDE.md", "- Always: run tests\n")
+        other = _write(tmp_path, "other.md", "- Never: run tests\n")
+        result = self._invoke(str(target), "--with", str(other))
+        assert result.exit_code == 1
+        assert " N3 error: " in result.output
 
     def test_unknown_type_exit_2(self, tmp_path):
         target = _write(tmp_path, "docs/guide.md", "x\n")

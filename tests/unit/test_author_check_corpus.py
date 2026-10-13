@@ -32,3 +32,20 @@ def test_xml_structure_rules_pass(path):
         if f.code in ("X1", "X2") and f.severity == "error"
     ]
     assert not errors, "\n".join(errors)
+
+
+# Errors from the pointer and tool rules (N1, N2) that are real breaks in the
+# shipped content, as `parent/name:code`. A new break or a fixed one both turn
+# this red. Inline-code paths are warnings and stay out of it: they are often
+# examples or runtime files.
+EXPECTED_N_ERRORS: set[str] = set()
+
+
+def test_pointer_and_tool_errors_are_the_known_set():
+    found = {
+        f"{p.parent.name}/{p.name}:{f.code}"
+        for p in _CORPUS
+        for f in check(p)
+        if f.code in ("N1", "N2") and f.severity == "error"
+    }
+    assert found == EXPECTED_N_ERRORS

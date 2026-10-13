@@ -13,6 +13,8 @@ about what a sentence means stays with the skill's references/quality.md.
 from __future__ import annotations
 
 import re
+import subprocess
+from collections.abc import Iterable
 from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
@@ -42,6 +44,12 @@ RULES = {
     "X1": "error",  # (xml) not exactly one root element, or bare text outside it
     "X2": "error",  # (xml) unbalanced or misnested tags
     "X7": "error",  # (xml) output styles take a plain body
+    # N: no-op candidates. N1 is an error for links and imports, a warning for
+    # a path in inline code (it may be an example).
+    "N1": "error",  # points at nothing
+    "N2": "error",  # agent body names a tool its `tools` does not grant
+    "N3": "error",  # same item under opposite slots in the load set
+    "N4": "warning",  # same sentence twice in the load set
 }
 
 # A tag is `<name ...>`, `</name>` or `<name/>`. Prose like `<3`, `<5KB` or `<=`
@@ -457,10 +465,263 @@ def _check_xml(doc: _Doc, type_: str, report: _Report) -> None:
         report.add("X1", where, f"{len(roots)} root elements; an XML body has one")
 
 
+# --- N: no-op candidates -----------------------------------------------------
+
+# Slot labels: what a heading, bold label, `Label: a, b` line or XML element
+# name says about the items under it.
+_SLOTS = {
+    "always": "allow",
+    "do": "allow",
+    "does": "allow",
+    "proceed": "allow",
+    "ask first": "confirm",
+    "ask_first": "confirm",
+    "never": "forbid",
+    "dont": "forbid",
+    "do not": "forbid",
+}
+_LABEL_WORDS = r"always|does|do not|don't|dont|do|proceed|ask first|never"
+_HEADING_RE = re.compile(r"^\s{0,3}(#{1,6})\s+(.*?)\s*#*\s*$")
+_BOLD_LABEL_RE = re.compile(rf"^\s*\*\*({_LABEL_WORDS})\*\*\s*:?\s*$", re.I)
+_LABEL_LINE_RE = re.compile(
+    rf"^\s*(?:[-*+]\s+)?\**({_LABEL_WORDS})\**\s*:\s*(.+)$", re.I
+)
+_LIST_ITEM_RE = re.compile(r"^\s*(?:[-*+]|\d+[.)])\s+(.*)$")
+_SLOT_ELEMENT_RE = re.compile(
+    r"<(always|does|do|proceed|ask_first|never|dont)(?:\s[^<>]*)?>(.*?)</\1>",
+    re.S | re.I,
+)
+_LINE_PREFIX_RE = re.compile(r"^\s*(?:[-*+]\s+|\d+[.)]\s+|#{1,6}\s+|>\s*)*")
+_SENTENCE_SPLIT_RE = re.compile(r"(?<=[.!?])\s+")
+_MIN_SENTENCE_WORDS = 5
+_IMPORT_TOKEN_RE = re.compile(r"(?:^|(?<=\s))@([^\s`]+\.[A-Za-z0-9]+)")
+_CODE_PATH_RE = re.compile(r"^[\w.-]+(?:/[\w.-]+)+\.[A-Za-z0-9]+$")
+_TOOL_TOKEN_RE = re.compile(r"^([A-Z][A-Za-z]+)(\(.*\))?$")
+_MCP_TOKEN_RE = re.compile(r"^mcp__([\w-]+)__[\w-]+$")
+
+
+def _normalize(text: str) -> str:
+    text = re.sub(r"[*_`]", "", text.lower())
+    text = re.sub(r"[^\w\s]", "", text)
+    return " ".join(text.split())
+
+
+def _slot_of(label: str) -> str:
+    return _SLOTS[_normalize(label)]
+
+
+def _slot_items(doc: _Doc) -> list[tuple[str, str, str, int]]:
+    """(slot, label, normalized item, line) for every item under a slot label."""
+    body = _mask_comments(mask_code(doc.body, inline=False))
+    found = []
+    slot = label = None
+    from_heading = False
+    for number, line in enumerate(body.split("\n"), doc.body_start):
+        heading = _HEADING_RE.match(line)
+        if heading:
+            text = _normalize(heading.group(2))
+            slot, label = (
+                (_SLOTS[text], heading.group(2)) if text in _SLOTS else (None, None)
+            )
+            from_heading = True
+            continue
+        bold = _BOLD_LABEL_RE.match(line)
+        if bold:
+            slot, label, from_heading = _slot_of(bold.group(1)), bold.group(1), False
+            continue
+        labelled = _LABEL_LINE_RE.match(line)
+        if labelled:
+            for part in re.split(r"[,;]", labelled.group(2)):
+                if _normalize(part):
+                    found.append(
+                        (
+                            _slot_of(labelled.group(1)),
+                            labelled.group(1),
+                            _normalize(part),
+                            number,
+                        )
+                    )
+            continue
+        item = _LIST_ITEM_RE.match(line)
+        if item and slot:
+            if _normalize(item.group(1)):
+                found.append((slot, label, _normalize(item.group(1)), number))
+        elif line.strip() and not from_heading:
+            slot = label = None
+    for match in _SLOT_ELEMENT_RE.finditer(body):
+        element = match.group(1)
+        start = doc.body_start + body.count("\n", 0, match.start(2))
+        for offset, line in enumerate(match.group(2).split("\n")):
+            item = _LIST_ITEM_RE.match(line)
+            text = _normalize(item.group(1) if item else line)
+            if text:
+                found.append(
+                    (_SLOTS[_normalize(element)], element, text, start + offset)
+                )
+    return found
+
+
+def _check_conflicts(doc: _Doc, others: list[_Doc], report: _Report) -> None:
+    occurrences: dict[str, list[tuple[str, str, str, int]]] = {}
+    for d in [doc, *others]:
+        for slot, label, item, line in _slot_items(d):
+            occurrences.setdefault(item, []).append((slot, label, str(d.path), line))
+    for item, places in occurrences.items():
+        for slot, label, path, line in places:
+            if path != str(doc.path):
+                continue
+            other = next((p for p in places if p[0] != slot), None)
+            if other:
+                where = "here" if other[2] == path else other[2]
+                report.add(
+                    "N3",
+                    line,
+                    f"`{item}` is under {label} here and under {other[1]} at "
+                    f"{where}:{other[3]} — one of the two is always wrong",
+                )
+
+
+def _sentences(doc: _Doc) -> list[tuple[str, int]]:
+    body = _mask_comments(mask_code(doc.body, inline=False))
+    found = []
+    for number, line in enumerate(body.split("\n"), doc.body_start):
+        line = TAG_RE.sub(" ", _LINE_PREFIX_RE.sub("", line))
+        for sentence in _SENTENCE_SPLIT_RE.split(line):
+            text = _normalize(sentence)
+            if len(text.split()) >= _MIN_SENTENCE_WORDS:
+                found.append((text, number))
+    return found
+
+
+def _check_duplicates(doc: _Doc, others: list[_Doc], report: _Report) -> None:
+    seen: dict[str, str] = {}
+    for other in others:
+        for text, line in _sentences(other):
+            seen.setdefault(text, f"{other.path}:{line}")
+    for text, line in _sentences(doc):
+        if text in seen:
+            report.add(
+                "N4", line, f"same sentence as {seen[text]} — both are loaded together"
+            )
+        else:
+            seen[text] = f"line {line}"
+
+
+def _headings(path: Path) -> set[str]:
+    text = mask_code(path.read_text(encoding="utf-8"), inline=False)
+    slugs = set()
+    for line in text.split("\n"):
+        heading = _HEADING_RE.match(line)
+        if heading:
+            title = heading.group(2).lower()
+            slugs.add(re.sub(r"[^\w\- ]", "", title).replace(" ", "-"))
+    return slugs
+
+
+@lru_cache(maxsize=64)
+def _repo_root(directory: Path) -> Path:
+    try:
+        result = subprocess.run(
+            ["git", "rev-parse", "--show-toplevel"],
+            cwd=directory,
+            capture_output=True,
+            text=True,
+            timeout=10,
+        )
+    except (OSError, subprocess.SubprocessError):
+        return Path.cwd()
+    if result.returncode != 0 or not result.stdout.strip():
+        return Path.cwd()
+    return Path(result.stdout.strip())
+
+
+def _check_pointers(doc: _Doc, type_: str, report: _Report) -> None:
+    base = doc.path.parent
+    body = mask_code(doc.body)
+    for number, line in enumerate(body.split("\n"), doc.body_start):
+        for match in _MD_LINK_RE.finditer(line):
+            target = match.group(1)
+            if re.match(r"^[a-z][a-z0-9+.-]*:", target, re.I):
+                continue
+            file_part, _, anchor = target.partition("#")
+            linked = (base / file_part) if file_part else doc.path
+            if not linked.exists():
+                if type_ != "skill":  # R1 reports these for a skill
+                    report.add("N1", number, f"`{file_part}` does not exist")
+                continue
+            if anchor and linked.suffix == ".md" and anchor not in _headings(linked):
+                report.add("N1", number, f"`#{anchor}` has no matching heading")
+        if type_ == "memory":
+            for match in _IMPORT_TOKEN_RE.finditer(line):
+                target = match.group(1)
+                resolved = (
+                    Path(target).expanduser()
+                    if target.startswith("~")
+                    else base / target
+                )
+                if not resolved.exists():
+                    report.add("N1", number, f"import `@{target}` does not exist")
+    root = None
+    code_view = mask_code(doc.body, inline=False)
+    for number, line in enumerate(code_view.split("\n"), doc.body_start):
+        for match in _INLINE_CODE_RE.finditer(line):
+            token = match.group(2).strip()
+            token = re.sub(r":\d+(-\d+)?$", "", token.split("#", 1)[0])
+            if not _CODE_PATH_RE.match(token) or token.startswith(".."):
+                continue
+            root = root or _repo_root(base.resolve())
+            if not (root / token).exists():
+                report.add(
+                    "N1",
+                    number,
+                    f"`{token}` does not exist (from the repository root)",
+                    severity="warning",
+                )
+
+
+def _check_tools(doc: _Doc, report: _Report) -> None:
+    tools = (doc.frontmatter or {}).get("tools")
+    if tools is None:
+        return
+    entries = tools if isinstance(tools, list) else str(tools).split(",")
+    granted = {str(e).split("(", 1)[0].strip() for e in entries if str(e).strip()}
+    servers = {
+        re.sub(r"__\*?$", "", g)[len("mcp__") :]
+        for g in granted
+        if (g.startswith("mcp__") and g.count("__") == 1) or g.endswith("__*")
+    }
+    known = set(load_fields()["tool_names"])
+    code_view = mask_code(doc.body, inline=False)
+    for number, line in enumerate(code_view.split("\n"), doc.body_start):
+        for match in _INLINE_CODE_RE.finditer(line):
+            token = match.group(2).strip()
+            tool = _TOOL_TOKEN_RE.match(token)
+            mcp = _MCP_TOKEN_RE.match(token)
+            if tool and tool.group(1) in known and tool.group(1) not in granted:
+                name = tool.group(1)
+            elif mcp and token not in granted and mcp.group(1) not in servers:
+                name = token
+            else:
+                continue
+            report.add(
+                "N2",
+                number,
+                f"`{name}` is named here but not in `tools` — an instruction to "
+                "use it cannot run, one to avoid it changes nothing",
+            )
+
+
 def check(
-    path: Path, type_: str | None = None, fmt: str | None = None
+    path: Path,
+    type_: str | None = None,
+    fmt: str | None = None,
+    with_paths: Iterable[Path] = (),
 ) -> list[Finding]:
-    """Run every rule that applies to `path` and return the findings in order."""
+    """Run every rule that applies to `path` and return the findings in order.
+
+    `with_paths` is the load set: the other documents Claude reads together
+    with this one. Only N3 and N4 look at them.
+    """
     path = Path(path)
     type_ = type_ or infer_type(path)
     doc = _split(path)
@@ -472,6 +733,12 @@ def check(
     fmt = fmt or infer_format(doc.body)
     if fmt == "xml":
         _check_xml(doc, type_, report)
+    _check_pointers(doc, type_, report)
+    if type_ == "agent":
+        _check_tools(doc, report)
+    others = [_split(Path(p)) for p in with_paths]
+    _check_conflicts(doc, others, report)
+    _check_duplicates(doc, others, report)
     return report.findings
 
 
