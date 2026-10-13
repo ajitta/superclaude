@@ -1,6 +1,6 @@
 ---
 sources:
-  - {url: "https://code.claude.com/docs/en/skills", retrieved: 2026-10-13}
+  - {url: "https://code.claude.com/docs/en/skills", retrieved: 2026-10-14}
   - {url: "https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices", retrieved: 2026-10-13}
 ---
 
@@ -53,4 +53,5 @@ description: <What it does, in a few words>. Use when <the requests, file types 
 - A reference file over 100 lines gets a table of contents at the top.
 - Paths use forward slashes, also on Windows.
 - Say whether a bundled script is to be run ("Run `scripts/<name>.py`") or read ("See `scripts/<name>.py` for the algorithm").
+- A step that runs a command-line program (a search CLI the person set up, a build or test runner) names the command in the body. `allowed-tools` does not limit which tools the skill can use; it only skips the permission prompt for what it lists, during the turn that invokes the skill. Pre-approve that command narrowly (`Bash(<command> *)`), not all of `Bash`. `disallowed-tools` removes tools, so it must not list one a step needs. With `context: fork` the skill runs as the subagent named in `agent`, with that subagent's tools: a read-only one such as `Explore` cannot run the command.
 - `disable-model-invocation: true` stops Claude from loading the skill on its own. For a skill that deploys, commits or sends something, that leaves the timing to the person.
