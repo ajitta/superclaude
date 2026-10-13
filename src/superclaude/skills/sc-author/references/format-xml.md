@@ -6,7 +6,7 @@ sources:
 
 # XML body
 
-Read this only when the body is XML (`--xml`, or an existing file whose body starts with a tag).
+Read this only when the body is XML: `--xml`, an existing file whose body starts with a tag, or a new file in a project whose documents of the same type have XML bodies.
 
 ## When tags help
 

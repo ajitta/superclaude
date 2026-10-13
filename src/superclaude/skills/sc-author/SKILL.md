@@ -17,14 +17,15 @@ Works on any file Claude reads as instructions or context. A new document follow
 1. **Resolve** what is being written.
    - Type: from the arguments, else from the request; ask when it is unclear. Known types are skill, agent, command, output-style and memory (CLAUDE.md, CLAUDE.local.md, AGENTS.md, `.claude/rules/`). Any other file Claude reads as instructions is `generic`: no type reference and no field checks; the rest of this procedure still applies.
    - Path: for a new file, the type's `location` in `fields.yaml`. Project scope, unless the person says the document is for them alone (then the `~/.claude/` location).
-   - Format: `--xml` or `--md` when given. Otherwise an existing file keeps its current format and a new file is md.
+   - Format: `--xml` or `--md` when given. Otherwise an existing file keeps its current format, and a new file takes the format of the project's existing documents of the same type (settled in step 3); md only when the project has none. When those documents disagree, ask.
    - A new command: say that Claude Code recommends a skill for new work (same frontmatter, plus supporting files) and let the person choose.
    - `--xml` for an output style: continue in md and say why in one line (output styles take a plain body).
 2. **Load-set**: decide which documents Claude reads together with this one, and which tool reads it, using "Load set" in `quality.md`. Show the list in one line. The checker's conflict and duplicate rules see only this list, so a document left out of it is a conflict nobody checks.
 3. **Load** what the work needs:
    - the type's reference (none for generic) and `quality.md`
    - `format-xml.md` when the format is xml
-   - one or two existing documents of the same type in the project, when there are any. Show in one line what will be matched: language, terminology, heading or tag shape, section layout, the frontmatter fields actually used.
+   - one or two existing documents of the same type in the project, when there are any. Show in one line what will be matched: format (md or XML body), language, terminology, heading or tag shape, section layout, the frontmatter fields actually used.
+   - `format-xml.md` also when those documents have XML bodies and no flag was given.
 4. **Draft** or audit, then the common pass:
    - New document: write it in the project's conventions from step 3. Use the type's fallback template only when the project has no document of that type.
    - Existing document: start from its current content.

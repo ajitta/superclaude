@@ -55,7 +55,9 @@ Index: [05-plan.md](./05-plan.md). 계약: [04-design.md](./04-design.md) C7 "�
 판정 (Step 7):
 - 성공 조건 충족: 스킬 run이 `author-check`를 실제로 실행했고(transcript), 평문 run은 실행하지 않음 → `disable-model-invocation` 동작 확인
 - 효과 주장은 이 프로브로 증명되지 않음: 평문 run도 `author-check`를 통과. 차이는 검사기 밖에 있음 — 평문 run은 프로젝트의 기존 agent를 보고 이 저장소 고유 XML 골격(`<component>`, `<tool_guidance>`, `[R06 Scope]` 태그 인용 포함)을 그대로 복사, 스킬 run은 references 기준의 짧은 md 본문
-- 관찰된 설계 긴장 (미해결, 사용자 결정 필요): 첫 실행(run1)에서 스킬은 "프로젝트 agent 24개가 XML인데 새 파일은 md 기본"이라며 `--xml` 여부를 물었음. Resolve의 "새 파일은 md"(D2)와 Load의 "프로젝트 관례 우선"(D19)이 형식 기본값에서 부딪힘
+- 관찰된 설계 긴장 (D21로 해소, 아래): 첫 실행(run1)에서 스킬은 "프로젝트 agent 24개가 XML인데 새 파일은 md 기본"이라며 `--xml` 여부를 물었음. Resolve의 "새 파일은 md"(D2)와 Load의 "프로젝트 관례 우선"(D19)이 형식 기본값에서 부딪힘
+
+D21 적용 후 재실행 (2026-10-14, `--canary --task sc-author-skill`, run3): 3/3, 결과 파일은 프로젝트 agent와 같은 XML 본문 58줄, `author-check --format xml` → 0 errors, 0 warnings. 위 "설계 긴장"은 D21로 해소
 
 ## Deviations
 

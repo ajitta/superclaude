@@ -30,7 +30,7 @@ revised: 2026-10-13
 | D15 | Resolve 다음 Load-set: 함께 로드되는 문서 = no-op·모순 판정 범위 | [03](./03-analysis.md) §2, 04b §3 |
 | D16 | 검사기 N1–N4: 같은 입력에 같은 답인 것만 | 03 §3.1, [04a](./04a-design-checker.md) |
 | D17 | 판단형 검사는 `quality.md`(D12와 함께), 검사기와 분리 | 03 §3.2–3.4, 04b §4–5 |
-| D18–D20 | XML 구조 규칙만 · 프로젝트 관례 우선 · rules는 references의 원본 아님 | [05-plan.md](./05-plan.md) "구현 시작 결정" |
+| D18–D21 | XML 구조 규칙만 · 프로젝트 관례 우선 · rules는 references의 원본 아님 · 형식 기본값도 프로젝트 (D2 대체) | [05-plan.md](./05-plan.md) "구현 시작 결정" |
 
 - 리뷰 전 설계(커밋 `49e0402c`)의 "XML·품질 규칙 원본을 배포 파일로 옮기고 저장소 rules가 `@import`" 안은 D10으로 폐기
 
