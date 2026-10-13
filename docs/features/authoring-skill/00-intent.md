@@ -3,7 +3,7 @@ status: approved-for-plan
 revised: 2026-10-13
 ---
 
-# Intent: SuperClaude 사용자 프로젝트에서 skill·agent·command 문서를 형식에 맞게 만드는 스킬
+# Intent: SuperClaude 사용자 프로젝트에서 Claude가 읽는 지시·컨텍스트 문서를 형식에 맞게 만드는 스킬
 
 Author: ajitta.
 
@@ -12,6 +12,10 @@ Author: ajitta.
 ## Problem
 "superclaude를 설치하여 사용하는 프로젝트에서 추가로 만들 때 너무 형식없이 만들어져"
 - 대상 문서: skill, agent, command, output style, memory(CLAUDE.md, CLAUDE.local.md, AGENTS.md, `.claude/rules/*.md`)
+- 범위 확대 (2026-10-13): "authoring의 범위를 rule파일 claude.md, agent.md, mode, output style , mcp가이드 모든 claude에게 읽혀서 지시, 혹은 컨텍스트 내용으로 들어가는 모든 것을 포함하려고 해"
+  - 유형을 정해 늘리는 것이 목적이 아니다: "mode, mcp, hook 에 대해 해당 대상을 명시적으로 규정해서 superclaude에 맞추려는 목적이 아니다. claude에게 읽히는 지시 컨텍스트 문서를 authoring하는 문제이다."
+  - 예로 든 것: rule 파일, CLAUDE.md, agent, mode, output style, MCP 가이드, skill 부속 파일, hook 주입 문구, 서브에이전트 프롬프트, auto memory `MEMORY.md`
+- 근거로 든 사례: "지금 이 프로젝트의 rules, claude.md, agent.md, 메모리 내용만 봐도 NO-OP의 가능성이 있는 지시가 많아."
 - 형식이 어긋나도 드러나지 않음: Claude Code는 잘못된 frontmatter나 지원하지 않는 필드를 오류 없이 무시한다
 
 ## Proposed outcome
@@ -29,7 +33,8 @@ Author: ajitta.
 - SuperClaude를 설치(`superclaude install`)한 사용자 프로젝트에서 자기 컴포넌트를 만드는 사용자
 - SuperClaude 배포판: 이 스킬이 설치본에 들어간다
 
-범위 밖: SuperClaude 자체 콘텐츠 작성(저장소 `.claude/rules/`가 맡음), mode·MCP 문서, hook 작성, claude.ai·Codex 이식.
+범위 밖: SuperClaude 자체 콘텐츠 작성(저장소 `.claude/rules/`가 맡음), claude.ai·Codex 이식.
+- SuperClaude 자체 문서 (2026-10-13): "sc 자체 문서는 포함하지 않는다. sc 프로젝트를 위한 내용은 이 프로젝트에만 남아 있어. 이것을 설치해서 사용하는 프로젝트에서 사용자가 command, agent, skill 등을 확장할 수 있게 하려고 하는 것이다." 위 근거 사례(이 저장소의 no-op)는 문제를 보여 주는 예일 뿐 작업 대상이 아니다
 
 ## Constraints
 - "스킬을 명시적으로 발동시킨다. 자동 발동이 아니다."
@@ -43,4 +48,5 @@ Author: ajitta.
 - 최신 가이드 기준: "이 skill제작, prompt가이드는 빠르게 업데이트되고 있어서 항상 claude의 최신 모델 기준이어야한다. fable, opus, sonnet의 최신 버전 기준의 가이드를 이용해야돼. stale된것 들로 만들면 안된다."
 
 ## Open questions
-없음. 2026-10-13에 두 질문(lean-author와의 분담, 명시 호출만으로 충분한지)에 답을 받아 Proposed outcome과 Constraints에 옮겼다.
+- 2026-10-13의 두 질문(lean-author와의 분담, 명시 호출만으로 충분한지)은 답을 받아 Proposed outcome과 Constraints에 옮겼다.
+- 사용자 질문 "이 스킬이 완성되면 rules의 authoring 관련 문서는 필요 없어지지 않아?"는 범위 밖 결정("sc 프로젝트를 위한 내용은 이 프로젝트에만 남아 있어")으로 답이 됨: 저장소 rules는 남는다.

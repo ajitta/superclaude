@@ -25,6 +25,7 @@ revised: 2026-10-13
 | D10 | **references는 사용자 프로젝트용으로 독립 작성.** 저장소 rules(`xml-prose-format.md`, `content-quality.md`)는 그대로 두고 import 관계도 두지 않음 | 리뷰 후 사용자: rules와 "비슷하지만 다르게 만들어야" → 독자·형식 범위·기본 형식이 다름 (§9) |
 | D11 | 예시는 필요할 때만 3–5개 (references·만드는 문서) | 2026-10-13 사용자, Anthropic 가이드 |
 | D12 | 최신 Fable·Opus·Sonnet 가이드 기준 → 출처 기록 + 모델 지원이 바뀌면 테스트가 갱신 강제 | 2026-10-13 사용자: "stale된것 들로 만들면 안된다" |
+| D13 | 대상은 유형 목록이 아니라 Claude가 지시·컨텍스트로 읽는 모든 문서. 공통 작업은 재형식화 + no-op 제거, 유형별 계약(frontmatter·위치)은 알려진 유형에만 덧붙임 (§2) | 2026-10-13 사용자: "claude에게 읽히는 지시 컨텍스트 문서를 authoring하는 문제이다" |
 
 - 리뷰 전 설계(커밋 `49e0402c`)의 "XML·품질 규칙 원본을 배포 파일로 옮기고 저장소 rules가 `@import`" 안은 D10으로 폐기
 
@@ -45,17 +46,17 @@ revised: 2026-10-13
 
 포함:
 - 문서 유형 5종: `skill`, `agent`, `command`, `output-style`, `memory`(CLAUDE.md, CLAUDE.local.md, AGENTS.md, `.claude/rules/*.md`)
+- D13 (설계 반영 전, §9 남은 미결): 위 5종 밖이라도 Claude가 지시·컨텍스트로 읽는 문서면 대상 (예: mode·MCP 가이드, skill 부속 파일, hook 주입 문구, 서브에이전트 프롬프트, auto memory). 유형을 새로 정의하지 않고 공통 작업(재형식화 + no-op 제거)만 적용
 - 새로 쓰기 + 기존 파일 고치기(감사 → diff → 승인 → 쓰기)
 - 형식 선택: `--md` | `--xml` | 미지정
 - 기계 검사: frontmatter, 필드, 길이, 참조, XML 구조
 - `skills` 설치 컴포넌트 (install / uninstall / git-exclude / verify-drift / inventory)
 
 제외:
-- mode, MCP 문서: SuperClaude `context_loader` 전용 개념
-- hooks 작성: `update-config` 스킬이 담당
+- hook 설정·스크립트: `update-config` 스킬이 담당 (Claude가 읽는 텍스트가 아님)
 - 평범한 요청("에이전트 만들어줘")에서 자동 적용: D4로 제외 (§8)
 - claude.ai·Codex 이식성: `portable-skills/` 경로가 따로 있음
-- SuperClaude 자체 콘텐츠 작성: 저장소 `.claude/rules/`가 담당 (D10)
+- SuperClaude 자체 콘텐츠 작성: 저장소 `.claude/rules/`가 담당 (D10). 2026-10-13 재확인: 대상은 설치한 프로젝트에서 사용자가 확장하는 문서
 
 ## 3. 아키텍처
 
@@ -312,7 +313,11 @@ description 작성 기준 (`quality.md`, 출처 충돌의 해소): 능력은 몇
 | S7 `yaml.safe_load` | C4 |
 | S8 AGENTS.md를 memory에 포함할지 | 포함 (§2, C4 추론, C3 함정) |
 
-남은 미결 사항: 없음. plan에서 확인: PowerShell 허용 규칙 문법.
+남은 미결 사항 (D13, plan 전에 설계 갱신):
+- 설계 중심 이동: 유형별 템플릿(C3) 중심 → 공통 작업(재형식화 + no-op 제거) 중심. C2 흐름, `quality.md`의 위치, 유형을 모르는 문서의 처리
+- no-op 판정 기준과 근거: 무엇을 기계로 잡고(중복, 없어진 대상을 가리키는 문장), 무엇을 판단에 맡기며, 제거가 결과를 바꾸지 않는다는 근거를 어떻게 남기나
+
+plan에서 확인: PowerShell 허용 규칙 문법.
 
 ## 10. 요구사항 커버리지
 
@@ -327,5 +332,6 @@ description 작성 기준 (`quality.md`, 출처 충돌의 해소): 능력은 몇
 | XML 규칙 검증 | C4 X1-X7, C7 |
 | 예시는 필요할 때 3–5개 | D11, C1, C3, C7 |
 | 최신 Fable·Opus·Sonnet 가이드, stale 금지 | D12, §1, C1, C3, C6, C7 |
+| Claude가 지시·컨텍스트로 읽는 모든 문서 | D13, §2 — 컴포넌트 설계는 §9 남은 미결 |
 
-9/9 반영.
+9/10 반영, D13은 설계 갱신 대기.
