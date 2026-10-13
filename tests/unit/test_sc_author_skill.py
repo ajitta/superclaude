@@ -1,0 +1,113 @@
+"""Structure of the shipped /sc-author skill and its references.
+
+The references are written for the projects SuperClaude is installed into,
+from Anthropic's published guidance (each file's `sources`), not from this
+repository's rules files (docs/features/authoring-skill/05-plan.md D18-D20).
+"""
+
+import re
+from pathlib import Path
+
+import pytest
+import yaml
+
+from superclaude.cli.author_check import check, mask_code
+
+_SRC = Path(__file__).resolve().parents[2] / "src" / "superclaude"
+_SKILL = _SRC / "skills" / "sc-author"
+_REFS_DIR = _SKILL / "references"
+REFS = [
+    "skill.md",
+    "agent.md",
+    "command.md",
+    "output-style.md",
+    "memory.md",
+    "format-xml.md",
+    "quality.md",
+]
+_MODEL_ID = re.compile(r"claude-[a-z0-9]+(?:-[0-9]+)+")
+
+
+def _frontmatter(path: Path) -> dict:
+    match = re.match(r"\A---\n(.*?)\n---\n", path.read_text(encoding="utf-8"), re.S)
+    assert match, f"{path.name} has no frontmatter"
+    return yaml.safe_load(match.group(1)) or {}
+
+
+def _section(text: str, heading: str) -> str:
+    match = re.search(
+        rf"^## {re.escape(heading)}\s*$(.*?)(?=^## |\Z)", text, re.M | re.S
+    )
+    assert match, f"no `## {heading}` section"
+    return match.group(1)
+
+
+def _prompt_model_ids() -> set[str]:
+    """Model IDs /sc:prompt resolves to: where the repository adds a new model."""
+    text = (_SRC / "commands" / "prompt.md").read_text(encoding="utf-8")
+    return set(re.findall(r"→ '(claude-[a-z0-9-]+)'", text))
+
+
+class TestReferences:
+    @pytest.mark.parametrize("name", REFS)
+    def test_exists_with_sources(self, name):
+        sources = _frontmatter(_REFS_DIR / name).get("sources")
+        assert sources, f"{name}: no `sources`"
+        for source in sources:
+            assert str(source["url"]).startswith("https://"), source
+            assert re.fullmatch(r"\d{4}-\d{2}-\d{2}", str(source["retrieved"]))
+
+    def test_model_rows_follow_sc_prompt(self):
+        """A model /sc:prompt supports needs its row, read from its guide."""
+        text = (_REFS_DIR / "quality.md").read_text(encoding="utf-8")
+        rows = set()
+        for line in _section(text, "Model differences").splitlines():
+            if line.startswith("|"):
+                first = line.strip("|").split("|")[0]
+                rows.update(_MODEL_ID.findall(first))
+        assert rows == _prompt_model_ids(), (
+            "/sc:prompt supports a model quality.md has no row for (or the "
+            "reverse) — re-read that model's prompting guide, update the row "
+            "and its `sources` date"
+        )
+
+    @pytest.mark.parametrize("name", REFS)
+    def test_example_count(self, name):
+        text = mask_code((_REFS_DIR / name).read_text(encoding="utf-8"))
+        count = len(re.findall(r"<example[\s>]", text))
+        assert count in (0, 3, 4, 5), f"{name}: {count} examples (0 or 3-5)"
+
+    def test_quality_judgment_sections(self):
+        text = (_REFS_DIR / "quality.md").read_text(encoding="utf-8")
+        for heading in (
+            "Load set",
+            "Judgment questions",
+            "Keep",
+            "Harm",
+            "Removal evidence",
+            "Model differences",
+        ):
+            assert re.search(rf"^## {heading}\s*$", text, re.M), heading
+
+    @pytest.mark.parametrize("name", REFS)
+    def test_passes_the_checker(self, name):
+        errors = [
+            f.render()
+            for f in check(_REFS_DIR / name, type_="generic")
+            if f.severity == "error"
+        ]
+        assert not errors, "\n".join(errors)
+
+    def test_no_superclaude_vocabulary(self):
+        """D20: the references carry nothing from this repository's own rules."""
+        banned = re.compile(
+            r"/sc:|<component|<handoff|<bounds|RULES_|CLAUDE_SC|\bR\d{2}\b", re.I
+        )
+        hits = []
+        for path in sorted(_REFS_DIR.iterdir()):
+            text = path.read_text(encoding="utf-8")
+            for number, line in enumerate(text.splitlines(), 1):
+                cleaned = re.sub(r"superclaude author-check", "", line, flags=re.I)
+                if banned.search(cleaned) or "superclaude" in cleaned.lower():
+                    hits.append(f"{path.name}:{number}: {line.strip()}")
+        assert not hits, "\n".join(hits)
