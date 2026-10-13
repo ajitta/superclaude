@@ -1,6 +1,6 @@
 ---
 status: draft
-revised: 2026-10-10
+revised: 2026-10-13
 ---
 
 # `sc-author` 스킬 — 설계
@@ -23,6 +23,8 @@ revised: 2026-10-10
 | D8 | `--xml` 허용 범위: skill·agent·command·memory. output style만 md 고정 | 인터뷰 |
 | D9 | 스킬 이름 `sc-author` (`/sc-author`) | 인터뷰 |
 | D10 | **references는 사용자 프로젝트용으로 독립 작성.** 저장소 rules(`xml-prose-format.md`, `content-quality.md`)는 그대로 두고 import 관계도 두지 않음 | 리뷰 후 사용자: rules와 "비슷하지만 다르게 만들어야" → 독자·형식 범위·기본 형식이 다름 (§9) |
+| D11 | 예시는 필요할 때만 3–5개 (references·만드는 문서) | 2026-10-13 사용자, Anthropic 가이드 |
+| D12 | 최신 Fable·Opus·Sonnet 가이드 기준 → 출처 기록 + 모델 지원이 바뀌면 테스트가 갱신 강제 | 2026-10-13 사용자: "stale된것 들로 만들면 안된다" |
 
 - 리뷰 전 설계(커밋 `49e0402c`)의 "XML·품질 규칙 원본을 배포 파일로 옮기고 저장소 rules가 `@import`" 안은 D10으로 폐기
 
@@ -32,6 +34,12 @@ revised: 2026-10-10
 - Claude Code skills / sub-agents / output-styles / memory — `code.claude.com/docs/en/{skills,sub-agents,output-styles,memory}`
 - Prompting best practices — `platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices`
 - `anthropics/skills` skill-creator, `obra/superpowers` writing-skills, `anthropics/claude-plugins-official` plugin-dev·claude-md-management
+
+모델별 최신 가이드 (D12, 2026-10-13. 구현 시 재조회):
+
+- Opus 5.5, Sonnet 5.5 — `platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-{opus,sonnet}-5-5`
+- Fable 5.1 — `claude-api` 스킬 model-migration reference (`/sc:prompt`와 같음). URL은 plan에서 확인
+- 모델 목록 = `/sc:prompt` Resolve의 모델 ID (저장소가 새 모델을 넣는 곳)
 
 ## 2. 범위
 
@@ -111,6 +119,9 @@ src/superclaude/skills/sc-author/
 - 100줄 넘는 참고 파일은 맨 위에 목차
 - md 형식 규칙은 별도 파일 없이 각 `<type>.md` 템플릿에 포함 (§8)
 - 경로 표기: `${CLAUDE_SKILL_DIR}/references/<file>` (Claude Code가 본문에서 치환)
+- 출처 기록 (D12): 참고 파일마다 맨 위에 `sources:` (URL + 조회일)
+- 모델별 기준은 `quality.md` "모델별 차이"(모델 ID별 행) 한 곳에만, 다른 곳엔 버전 번호 없음
+- 예시 (D11): 필요한 곳에만, 넣으면 서로 다른 경우를 덮는 3–5개
 
 ### C2. SKILL.md 계약
 
@@ -151,7 +162,7 @@ description 초안 (영어 — 배포 콘텐츠는 언어 중립):
 | `fields.yaml` | 유형별 `location`, `required`, `optional`, `unsupported`(그 유형에서 Claude Code가 무시하는 필드), 길이 상한, 출처 URL + 조회일 | Resolve, Check(검사기) |
 | `<type>.md` | 언제 이 유형을 쓰나(다른 유형과 구분) · md 본문 템플릿 · 유형 함정 | Load |
 | `format-xml.md` | XML 본문 규칙 + skill/agent/command/memory 골격 | Load (`--xml`) |
-| `quality.md` | 삭제 테스트, 트리거·설명문, 절차·참고 분리, 강한 용어, 내용 수명, 강조 대신 이유, 긍정형, 일관 용어, 예시 | Audit, Draft 마무리 |
+| `quality.md` | 삭제 테스트, 트리거·설명문, 절차·참고 분리, 강한 용어, 내용 수명, 강조 대신 이유, 긍정형, 일관 용어, 예시(D11), 모델별 차이(D12) | Audit, Draft 마무리 |
 
 유형 함정 (각 `<type>.md`에 들어갈 핵심):
 - skill: description은 3인칭, 능력+트리거, 절차 요약 금지 · 본문 <500줄 · 참고 1단계 · 부작용 있는 작업은 `disable-model-invocation: true`
@@ -164,44 +175,7 @@ description 작성 기준 (`quality.md`, 출처 충돌의 해소): 능력은 몇
 
 ### C4. 검사기 `superclaude author-check`
 
-```
-superclaude author-check <path> [--type skill|agent|command|output-style|memory]
-                                [--format md|xml]
-```
-
-- `--type` 생략 → 경로로 추론: `*/skills/*/SKILL.md` → skill, `*/agents/*.md` → agent, `*/commands/**.md` → command, `*/output-styles/*.md` → output-style, `CLAUDE.md`·`CLAUDE.local.md`·`AGENTS.md`·`*/rules/**.md` → memory → 실패면 exit 2
-- `--format` 생략 → frontmatter, 빈 줄, HTML 주석(`<!-- -->`), `@path` import 줄을 건너뛴 첫 줄이 태그면 xml, 아니면 md
-- 태그 인식: `</?[a-z][a-z0-9_]*(\s[^>]*)?/?>` 패턴만 태그. `<3`, `<5KB`, `<=` 같은 산문 표기는 텍스트. 코드 펜스·인라인 코드는 가린 뒤 검사
-- frontmatter 파싱: `yaml.safe_load` (남의 저장소 문서를 검사할 수 있음)
-- 링크 해석: `${CLAUDE_SKILL_DIR}`를 검사 대상 스킬 디렉터리로 치환한 뒤 존재 확인
-- 출력: 한 줄에 하나 `path:line: CODE message`, 마지막 줄 요약 `N errors, M warnings`
-- exit: 0 = error 없음 · 1 = error 있음 · 2 = 사용법 오류·추론 실패
-- 의존성: 표준 라이브러리 + PyYAML(이미 의존성)
-- 위치: `src/superclaude/cli/author_check.py` + `main.py`에 click 명령 등록 (기존 `verify-drift`와 같은 평면 이름)
-
-규칙:
-
-| 코드 | 등급 | 조건 |
-|---|---|---|
-| F1 | error | frontmatter 없음(필요한 유형) 또는 YAML 파싱 실패 — Claude Code는 이 경우 필드 없이 조용히 로드 |
-| F2 | error | `required` 필드 누락 |
-| F3 | error | 그 유형의 `unsupported` 필드 사용 (예: command의 `name`·`paths`) — 조용히 무시됨 |
-| F4 | warning | `fields.yaml`에 없는 필드 — Claude Code가 새 필드를 추가했을 수 있으므로 error 아님 |
-| F5 | error | 이름 규칙 위반 (skill: 소문자·숫자·하이픈, ≤64 / agent: `:` 금지) |
-| F6 | error | skill `description` + `when_to_use` > 1,536자 (목록에서 잘림) |
-| F7 | warning | description 1인칭·2인칭 ("I can", "You can") |
-| R1 | error | SKILL.md가 링크한 참고 파일 없음 |
-| R2 | warning | 참고 파일이 다른 참고 파일을 링크 (깊이 >1) |
-| R3 | warning | 100줄 넘는 참고 파일에 목차 없음 |
-| S1 | warning | 길이 초과: SKILL.md >500줄, CLAUDE.md·rules >200줄 |
-| S2 | warning | 대문자 강조어(MUST, ALWAYS, NEVER, CRITICAL, IMPORTANT) 3회 이상 |
-| X1 | error | (xml) 루트 요소가 정확히 하나가 아님, 또는 루트 밖에 맨 텍스트. memory는 루트 앞의 `@path` 줄·HTML 주석 허용 |
-| X2 | error | (xml) 태그 짝 불일치·잘못된 중첩 |
-| X3 | error | (xml) 태그 이름이 `snake_case` 아님 |
-| X4 | error | (xml) 요소 중첩이 4단 초과 (root → section → sub → item) |
-| X5 | warning | (xml) `<example>` 밖 본문에 Markdown 헤더 |
-| X6 | error | (xml) 슬롯 이름 `<should>`·`<avoid>` (모델이 선택 사항으로 읽음) |
-| X7 | error | `--format xml`인데 output-style 유형 (D8 범위 밖) |
+인터페이스(인자, 유형·형식 추론, 태그 인식, 출력, exit 코드)와 규칙 F1–F7, R1–R3, S1–S2, X1–X7: [04a-design-checker.md](./04a-design-checker.md)
 
 ### C5. `skills` 설치 컴포넌트
 
@@ -226,7 +200,7 @@ superclaude author-check <path> [--type skill|agent|command|output-style|memory]
 
 | 파일 | 변경 |
 |---|---|
-| `.claude/rules/skill-authoring.md` (신규) | 저장소 규칙 "콘텐츠 유형마다 `*-authoring.md`" 준수. SuperClaude가 배포하는 스킬의 규칙: 이름 `sc-` 접두어, CC 전용 필드 허용, references는 사용자 프로젝트 독자용으로 독립 작성(D10), `content-quality.md`·`xml-prose-format.md`의 원칙을 바꾸면 `quality.md`·`format-xml.md`에 같은 변경이 필요한지 확인 |
+| `.claude/rules/skill-authoring.md` (신규) | 저장소 규칙 "콘텐츠 유형마다 `*-authoring.md`" 준수. SuperClaude가 배포하는 스킬의 규칙: 이름 `sc-` 접두어, CC 전용 필드 허용, references는 사용자 프로젝트 독자용으로 독립 작성(D10), `content-quality.md`·`xml-prose-format.md`의 원칙을 바꾸면 `quality.md`·`format-xml.md`에 같은 변경이 필요한지 확인, `/sc:prompt`에 새 모델을 넣으면 `quality.md` 모델별 차이도 갱신 (C7) |
 | `.claude/rules/schemas.yaml` 주석 | `forbidden_command_fields`(SuperClaude 정책)와 `fields.yaml`(Claude Code가 지원하는 필드)의 관계 한 줄 |
 | `AGENTS.md` Architecture | 설치되는 콘텐츠 목록 "(commands, agents, modes, output styles, MCP docs, core config)"에 skills 추가 |
 | `agent-authoring.md:112`, `install_paths.py:186` | "ships no skills" 문구 갱신 |
@@ -243,6 +217,8 @@ superclaude author-check <path> [--type skill|agent|command|output-style|memory]
 | 검사기 규칙 | 단위 테스트: 규칙 코드마다 위반 픽스처 1 + 통과 픽스처 1 | 모든 코드가 의도한 등급으로 발화 |
 | 검사기 오탐 | 회귀 말뭉치: 배포되는 `src/superclaude/agents/*.md`, `commands/*.md`에 `--format xml`로 실행 | X1-X6 error 0 (산문 속 `<3`·`<5KB` 포함 문서가 이미 있음: `agents/project-manager.md:77`, `commands/pm.md:43`, `commands/index-repo.md:18`) |
 | 스킬 구조 | 단위 테스트 + 자기 검사: `author-check`를 배포 스킬 자신에 실행 | error 0 |
+| 가이드 최신성 (D12) | 단위 테스트: `quality.md` 모델별 차이의 모델 ID 집합 = `/sc:prompt` Resolve의 집합, 참고 파일마다 `sources` 있음 | 같음 + 누락 0 (모델 지원 변경 시 red, 날짜 경과로는 안 됨) |
+| 예시 개수 (D11) | 단위 테스트: 참고 파일마다 예시 블록 수 | 0개 또는 3–5개 |
 | 설치 | install/uninstall 테스트: 3개 scope, 제3자 스킬 보존, local git-exclude 항목 | 기존 설치 테스트 + 신규 통과 |
 | 효과 | `evals/tasks.yaml` 프로브, `sc-full` arm 안에서 비교: 같은 요청을 평문으로 vs `/sc-author`로 | `/sc-author` 쪽만 `author-check` exit 0 + 유형별 필수 구조 존재 → 차이가 스킬에서 나옴 |
 | 명시 호출 | 같은 arm에서 평문 "agent 만들어줘" 실행 | 스킬 미발동 (`disable-model-invocation` 동작 확인) |
@@ -289,7 +265,7 @@ superclaude author-check <path> [--type skill|agent|command|output-style|memory]
 | C4 검사기 | Claude Code가 잘못된 필드·YAML을 오류 없이 무시 → 실패가 안 보임; XML 검증 요구(D6) | 유지 |
 | C5 skills 컴포넌트 | 스킬이 설치되지 않음 | 유지 |
 | C6 skill-authoring.md | 저장소 규칙 "유형마다 `*-authoring.md`" 위반, references와 rules가 말없이 어긋남 | 유지 |
-| C7 프로브 | "형식 개선" 주장에 근거 없음 (R15) | 유지 |
+| C7 프로브·최신성 테스트 | "형식 개선" 주장에 근거 없음 (R15), 새 모델이 나와도 references가 낡은 채 남음 (D12) | 유지 |
 
 ## 8. 미룬 것 (deferred)
 
@@ -301,6 +277,7 @@ superclaude author-check <path> [--type skill|agent|command|output-style|memory]
 | 저장소 테스트가 검사기 재사용 | SuperClaude 콘텐츠 규칙이 더 엄격, 기존 테스트로 충분 | 두 쪽 XML 검사가 어긋날 때 |
 | 시간 민감 표현 검사 | 오탐 위험 대비 근거 부족 | 실제 사례가 쌓일 때 |
 | `--json` 출력 | 소비자 없음 | CI 연동 요청 시 |
+| 호출마다 최신 가이드 조회 | 비용·네트워크 의존, 갱신은 C7이 강제 | 테스트 통과 뒤 낡은 기준 발견 시 |
 
 ## 9. 결정 기록
 
@@ -311,7 +288,7 @@ superclaude author-check <path> [--type skill|agent|command|output-style|memory]
 | 1 | skills 레이어 삭제(2026-08-31)를 되돌림 | 진행, 디렉터리 컴포넌트 하나로 제한. 이번엔 참고 파일 묶음이 실제로 필요 (D5) |
 | 2 | 다른 명령은 `/sc:*`, 일반 스킬 이름엔 콜론 불가 | `sc-author` (D9). `sc-` 접두어가 공유 디렉터리에서 사용자 스킬과의 충돌 방지 |
 | 3 | 자동 트리거 비용 | 리뷰 후 명시 호출로 바뀌어 해소 (D4) |
-| 4 | `fields.yaml` 수명 | 미등록 필드 = warning(F4), 출처 URL·조회일 기록, 갱신 주기 미정 |
+| 4 | `fields.yaml` 수명 | 미등록 필드 = warning(F4), 출처 URL·조회일 기록. 갱신 시점: `/sc:prompt` 모델 지원 변경 시 (D12, C7) |
 | 5 | 품질 원칙의 원본 위치 | 리뷰 후 독립 작성으로 바뀜 (D10) |
 | 6 | description 작성법 출처 충돌 | C3 "description 작성 기준" |
 | 7 | `--xml` 범위 | memory 허용, output style만 md (D8) |
@@ -348,5 +325,7 @@ superclaude author-check <path> [--type skill|agent|command|output-style|memory]
 | 스킬로 배포, 명시 호출 | C1, C2 frontmatter, C5, D4 |
 | references는 rules와 다르게 독립 작성 | C1, C6, D10 |
 | XML 규칙 검증 | C4 X1-X7, C7 |
+| 예시는 필요할 때 3–5개 | D11, C1, C3, C7 |
+| 최신 Fable·Opus·Sonnet 가이드, stale 금지 | D12, §1, C1, C3, C6, C7 |
 
-7/7 반영.
+9/9 반영.

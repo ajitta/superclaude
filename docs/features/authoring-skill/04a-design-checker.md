@@ -1,0 +1,49 @@
+---
+status: draft
+revised: 2026-10-13
+---
+
+# `sc-author` 설계 — C4 검사기
+
+[04-design.md](./04-design.md)의 C4를 크기 때문에 나눈 문서. 결정(D1–D12)과 다른 컴포넌트는 본 문서에 있다.
+
+## 인터페이스
+
+```
+superclaude author-check <path> [--type skill|agent|command|output-style|memory]
+                                [--format md|xml]
+```
+
+- `--type` 생략 → 경로로 추론: `*/skills/*/SKILL.md` → skill, `*/agents/*.md` → agent, `*/commands/**.md` → command, `*/output-styles/*.md` → output-style, `CLAUDE.md`·`CLAUDE.local.md`·`AGENTS.md`·`*/rules/**.md` → memory → 실패면 exit 2
+- `--format` 생략 → frontmatter, 빈 줄, HTML 주석(`<!-- -->`), `@path` import 줄을 건너뛴 첫 줄이 태그면 xml, 아니면 md
+- 태그 인식: `</?[a-z][a-z0-9_]*(\s[^>]*)?/?>` 패턴만 태그. `<3`, `<5KB`, `<=` 같은 산문 표기는 텍스트. 코드 펜스·인라인 코드는 가린 뒤 검사
+- frontmatter 파싱: `yaml.safe_load` (남의 저장소 문서를 검사할 수 있음)
+- 링크 해석: `${CLAUDE_SKILL_DIR}`를 검사 대상 스킬 디렉터리로 치환한 뒤 존재 확인
+- 출력: 한 줄에 하나 `path:line: CODE message`, 마지막 줄 요약 `N errors, M warnings`
+- exit: 0 = error 없음 · 1 = error 있음 · 2 = 사용법 오류·추론 실패
+- 의존성: 표준 라이브러리 + PyYAML(이미 의존성)
+- 위치: `src/superclaude/cli/author_check.py` + `main.py`에 click 명령 등록 (기존 `verify-drift`와 같은 평면 이름)
+
+## 규칙
+
+| 코드 | 등급 | 조건 |
+|---|---|---|
+| F1 | error | frontmatter 없음(필요한 유형) 또는 YAML 파싱 실패 — Claude Code는 이 경우 필드 없이 조용히 로드 |
+| F2 | error | `required` 필드 누락 |
+| F3 | error | 그 유형의 `unsupported` 필드 사용 (예: command의 `name`·`paths`) — 조용히 무시됨 |
+| F4 | warning | `fields.yaml`에 없는 필드 — Claude Code가 새 필드를 추가했을 수 있으므로 error 아님 |
+| F5 | error | 이름 규칙 위반 (skill: 소문자·숫자·하이픈, ≤64 / agent: `:` 금지) |
+| F6 | error | skill `description` + `when_to_use` > 1,536자 (목록에서 잘림) |
+| F7 | warning | description 1인칭·2인칭 ("I can", "You can") |
+| R1 | error | SKILL.md가 링크한 참고 파일 없음 |
+| R2 | warning | 참고 파일이 다른 참고 파일을 링크 (깊이 >1) |
+| R3 | warning | 100줄 넘는 참고 파일에 목차 없음 |
+| S1 | warning | 길이 초과: SKILL.md >500줄, CLAUDE.md·rules >200줄 |
+| S2 | warning | 대문자 강조어(MUST, ALWAYS, NEVER, CRITICAL, IMPORTANT) 3회 이상 |
+| X1 | error | (xml) 루트 요소가 정확히 하나가 아님, 또는 루트 밖에 맨 텍스트. memory는 루트 앞의 `@path` 줄·HTML 주석 허용 |
+| X2 | error | (xml) 태그 짝 불일치·잘못된 중첩 |
+| X3 | error | (xml) 태그 이름이 `snake_case` 아님 |
+| X4 | error | (xml) 요소 중첩이 4단 초과 (root → section → sub → item) |
+| X5 | warning | (xml) `<example>` 밖 본문에 Markdown 헤더 |
+| X6 | error | (xml) 슬롯 이름 `<should>`·`<avoid>` (모델이 선택 사항으로 읽음) |
+| X7 | error | `--format xml`인데 output-style 유형 (D8 범위 밖) |
