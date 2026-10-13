@@ -19,11 +19,11 @@ CLAUDE.md is context, not enforced configuration. To block an action whatever Cl
 - User-level rules load before project rules; neither overrides the other.
 - Auto memory: the first 200 lines or 25KB of MEMORY.md load each session; topic files load only when opened.
 
-## Match the project first
+## Project format and language
 
-Read the project's CLAUDE.md and one or two rules files and match their language, heading layout, bullet style and how they group instructions. A new instruction goes where similar ones already are. With no CLAUDE.md, start from the template below.
+Read the project's CLAUDE.md and one or two rules files for their format and language, and put a new instruction where similar ones already are. A new file takes its structure from the template below.
 
-## Fallback template (md)
+## Template (md)
 
 ```markdown
 # <Project>

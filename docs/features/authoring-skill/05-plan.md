@@ -34,9 +34,10 @@ revised: 2026-10-14
 | # | 결정 | 바뀌는 곳 |
 |---|---|---|
 | D18 | `--xml` 검사는 어떤 XML 본문에도 성립하는 구조 규칙만: X1(루트 하나), X2(태그 짝), X7(output-style 제외). X3–X6(snake_case, 4단 깊이, `<example>` 밖 헤더, `<should>`·`<avoid>`)은 이 저장소 `xml-prose-format.md`의 관례라 삭제. 태그 이름·깊이·섹션은 대상 프로젝트의 기존 문서를 따름 (사용자 선택 "구조 규칙만") | 04a 규칙표, 05a, 05d `format-xml.md` |
-| D19 | 프로젝트 관례 우선: Load 단계에서 같은 유형의 기존 문서 1–2개와 load-set 문서를 읽고 언어·용어·헤딩/태그 모양·섹션 구성을 맞춤. references 템플릿은 프로젝트에 같은 유형 문서가 없을 때만 (사용자 선택 "프로젝트 관례 우선") | 04-design C2 3·4단계, 05d 템플릿 절, 05e |
+| D19 | (D22로 축소) 프로젝트 관례 우선: Load 단계에서 같은 유형의 기존 문서 1–2개와 load-set 문서를 읽고 언어·용어·헤딩/태그 모양·섹션 구성을 맞춤. references 템플릿은 프로젝트에 같은 유형 문서가 없을 때만 (사용자 선택 "프로젝트 관례 우선") | 04-design C2 3·4단계, 05d 템플릿 절, 05e |
 | D21 | 형식 기본값은 프로젝트를 따른다: 플래그 없는 새 파일은 같은 유형 기존 문서의 형식(md 또는 XML 본문), 그런 문서가 없을 때만 md, 기존 문서끼리 다르면 질문. 기존 파일은 현재 형식 유지(그대로). D2 "기본은 `--md`"를 대체 (2026-10-14 사용자: "default는 해당 프로젝트의 형식을 따라간다.", 05g 프로브에서 본 D2·D19 충돌의 해소) | SKILL.md Resolve·Load, `format-xml.md` 첫 줄 |
 | D20 | references의 출처는 외부 문서(`sources`)와 이 설계의 결정뿐. 저장소 rules(`content-quality.md`, `xml-prose-format.md`, `*-authoring.md`, core rules)의 절 구성·문체·용어를 옮기지 않음. SuperClaude 고유 어휘(`/sc:` 명령, `<component>`·`<handoff>` 골격, R 코드, `RULES_*`, `CLAUDE_SC`)가 배포 references에 없음을 테스트로 고정. `skill-authoring.md`의 "rules를 바꾸면 references도 확인" 동기화 줄은 삭제 (rules가 references의 원본이 아님) | 04-design C3 `quality.md` 행·C6 첫 행, 05d, 05f |
+| D22 | 구조는 references가 정한다: 같은 유형 기존 문서에서는 형식(md 또는 XML 본문)과 언어만 가져오고, 섹션·태그 이름·용어·필드는 유형 reference의 템플릿과 pitfalls에서. 컨텍스트에 이미 있는 authoring 규칙(예: 프로젝트의 `.claude/rules/*-authoring.md`)은 그 프로젝트 자체 파일용이라 이 문서에 적용하지 않고, reference와 어긋나면 hand-off에 적음. D19를 축소 (2026-10-14 사용자: "skill의 reference가 있고 이것을 참조하여 제작해야하는데 rules authoring을 이용해서 만들어지는 문제", 선택 A; marx 실행 때 `content-quality.md`·`skill-authoring.md`가 컨텍스트에 있었고 기존 SC agent의 `<component>` 골격을 따라감) | SKILL.md 첫 단락·Load·Draft·승인 메시지 Match 줄, 유형 references의 "Project format and language" 절, `format-xml.md` "Tags and sections", `quality.md` Project fit |
 
 ## Phases
 

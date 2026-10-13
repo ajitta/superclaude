@@ -1,6 +1,6 @@
 ---
 name: sc-author
-description: Writes or revises a skill, subagent, slash command, output style, CLAUDE.md, .claude/rules file or any other file Claude reads as instructions - valid frontmatter, a body in the project's own conventions and format (--md or --xml to choose one), no-op and harmful sentences proposed for removal with evidence, and a validator pass.
+description: Writes or revises a skill, subagent, slash command, output style, CLAUDE.md, .claude/rules file or any other file Claude reads as instructions - valid frontmatter, a body built from the type's reference in the project's format and language (--md or --xml to choose one), no-op and harmful sentences proposed for removal with evidence, and a validator pass.
 disable-model-invocation: true
 argument-hint: "[skill|agent|command|output-style|memory|<path>] [what to write or change] [--md|--xml]"
 allowed-tools:
@@ -12,7 +12,7 @@ allowed-tools:
 
 Arguments: $ARGUMENTS
 
-Works on any file Claude reads as instructions or context. A new document follows the project's existing conventions; an existing one is reformatted and pruned. Nothing is written before the person approves the diff.
+Works on any file Claude reads as instructions or context. A new document is built from this skill's references, in the project's format and language; an existing one is reformatted and pruned. Authoring rules already in context, such as a project's `.claude/rules/*-authoring.md`, are written for that project's own files: they do not shape this document, and a conflict between one and a reference is named in the hand-off. Nothing is written before the person approves the diff.
 
 1. **Resolve** what is being written.
    - Type: from the arguments, else from the request; ask when it is unclear. Known types are skill, agent, command, output-style and memory (CLAUDE.md, CLAUDE.local.md, AGENTS.md, `.claude/rules/`). Any other file Claude reads as instructions is `generic`: no type reference and no field checks; the rest of this procedure still applies.
@@ -24,15 +24,15 @@ Works on any file Claude reads as instructions or context. A new document follow
 3. **Load** what the work needs:
    - the type's reference (none for generic) and `quality.md`
    - `format-xml.md` when the format is xml
-   - one or two existing documents of the same type in the project, when there are any, for what the draft will match: format (md or XML body), language, terminology, heading or tag shape, section layout, the frontmatter fields actually used.
+   - one or two existing documents of the same type in the project, when there are any, for two things only: format (md or XML body) and language. Sections, tag names, terms and fields come from the type's reference.
    - `format-xml.md` also when those documents have XML bodies and no flag was given.
 4. **Draft** or audit, then the common pass:
-   - New document: write it in the project's conventions from step 3. Use the type's fallback template only when the project has no document of that type.
+   - New document: start from the type's template and pitfalls, in the format and language from step 3.
    - Existing document: start from its current content.
    - Reformat into the chosen format. Reformatting moves sentences; it deletes none.
    - Collect removal candidates sentence by sentence against the load set: the checker's N findings (run step 6 early for them) and the "Judgment questions" in `quality.md`. A new draft gets this pass too, before it is shown: its own sections are part of the load set.
    - Report harm first ("Harm" in `quality.md`), then checker candidates, then judgment candidates, each with its evidence ("Removal evidence"). Leave alone what "Keep" describes.
-   - Show the diff. The message that shows it opens with three lines: **Resolve** (type, path, format, new or existing), **Load set** (each document by path, and which tool reads it), **Match** (the documents step 3 read and what was matched, or "fallback template"). They are the person's only way to catch a wrong path or a document missing from the checks. Write only after the person approves, and drop the candidates they reject.
+   - Show the diff. The message that shows it opens with three lines: **Resolve** (type, path, format, new or existing), **Load set** (each document by path, and which tool reads it), **Match** (the documents step 3 read and the format and language taken from them, or "none"). They are the person's only way to catch a wrong path or a document missing from the checks. Write only after the person approves, and drop the candidates they reject.
    - Text embedded in code (a hook's injected string, a prompt inside a script) gets the judgment questions only: the checker does not run on it, and the hand-off says so.
 5. **Neighbors**: compare the name and description with the skills and subagents already listed in this session's context. On an overlap, make the description say when to pick this one instead. Do not open their files for this.
 6. **Check**: run

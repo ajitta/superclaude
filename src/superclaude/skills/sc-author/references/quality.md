@@ -128,4 +128,4 @@ What each model does by default, for the "restated default" question. A cell tha
 | Load set | Which documents are read with this one, and by which tool? |
 | No-op | For each sentence: does a judgment question say it changes nothing? |
 | Harm | Does any sentence call for wrong work, a check that cannot run, or contradict another? |
-| Project fit | Does the result match the project's language, terms and layout? |
+| Project fit | Is the result in the project's format and language, with its structure from the type's reference? |
