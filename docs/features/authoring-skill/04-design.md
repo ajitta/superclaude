@@ -26,6 +26,10 @@ revised: 2026-10-13
 | D11 | 예시는 필요할 때만 3–5개 (references·만드는 문서) | 2026-10-13 사용자, Anthropic 가이드 |
 | D12 | 최신 Fable·Opus·Sonnet 가이드 기준 → 출처 기록 + 모델 지원이 바뀌면 테스트가 갱신 강제 | 2026-10-13 사용자: "stale된것 들로 만들면 안된다" |
 | D13 | 대상은 유형 목록이 아니라 Claude가 지시·컨텍스트로 읽는 모든 문서. 공통 작업은 재형식화 + no-op 제거, 유형별 계약(frontmatter·위치)은 알려진 유형에만 덧붙임 (§2) | 2026-10-13 사용자: "claude에게 읽히는 지시 컨텍스트 문서를 authoring하는 문제이다" |
+| D14 | 중심 = 공통 pass(재형식화 + no-op 제거). 유형별 처리는 기계적 계약 있는 유형만, 나머지 `generic` | [04b](./04b-design-common-pass.md) §1–2 |
+| D15 | Resolve 다음 Load-set: 함께 로드되는 문서 = no-op·모순 판정 범위 | [03](./03-analysis.md) §2, 04b §3 |
+| D16 | 검사기 N1–N4: 같은 입력에 같은 답인 것만 | 03 §3.1, [04a](./04a-design-checker.md) |
+| D17 | 판단형 검사는 `quality.md`(D12와 함께), 검사기와 분리 | 03 §3.2–3.4, 04b §4–5 |
 
 - 리뷰 전 설계(커밋 `49e0402c`)의 "XML·품질 규칙 원본을 배포 파일로 옮기고 저장소 rules가 `@import`" 안은 D10으로 폐기
 
@@ -46,7 +50,7 @@ revised: 2026-10-13
 
 포함:
 - 문서 유형 5종: `skill`, `agent`, `command`, `output-style`, `memory`(CLAUDE.md, CLAUDE.local.md, AGENTS.md, `.claude/rules/*.md`)
-- D13 (설계 반영 전, §9 남은 미결): 위 5종 밖이라도 Claude가 지시·컨텍스트로 읽는 문서면 대상 (예: mode·MCP 가이드, skill 부속 파일, hook 주입 문구, 서브에이전트 프롬프트, auto memory). 유형을 새로 정의하지 않고 공통 작업(재형식화 + no-op 제거)만 적용
+- D13 (설계: D14, 04b): 위 5종 밖이라도 Claude가 지시·컨텍스트로 읽는 문서면 대상 (예: mode·MCP 가이드, skill 부속 파일, hook 주입 문구, 서브에이전트 프롬프트, auto memory). 유형을 새로 정의하지 않고 공통 작업(재형식화 + no-op 제거)만 적용
 - 새로 쓰기 + 기존 파일 고치기(감사 → diff → 승인 → 쓰기)
 - 형식 선택: `--md` | `--xml` | 미지정
 - 기계 검사: frontmatter, 필드, 길이, 참조, XML 구조
@@ -85,11 +89,13 @@ flowchart TD
   A["사용자: /sc-author 인자"] --> R["Resolve: type, path, format, new|existing"]
   R -->|"command + new"| P["skill 권장 → 사용자 선택"]
   R -->|"--xml + output-style"| M["md로 진행 + 안내"]
-  R --> L["Load: references/&lt;type&gt;.md (+ format-xml.md)"]
+  R --> LS["Load-set: 함께 로드되는 문서 (D15)"]
+  LS --> L["Load: references/&lt;type&gt;.md (+ format-xml.md)"]
   L -->|new| D["Draft"]
-  L -->|existing| AU["Audit 보고 → diff → 승인"]
-  D --> N["Neighbors: 컨텍스트의 스킬·에이전트 목록과 겹침 확인"]
-  AU --> N
+  L -->|existing| AU["Audit"]
+  D --> CP["공통 pass (D14): 재형식화 → no-op 후보 → 승인"]
+  AU --> CP
+  CP --> N["Neighbors: 컨텍스트의 스킬·에이전트 목록과 겹침 확인"]
   N --> C["Check: superclaude author-check"]
   C -->|"error"| FIX["수정"] --> C
   C -->|"clean (warning만)"| H["Hand-off: 새 세션 시험 프롬프트 2-3개"]
@@ -133,37 +139,37 @@ frontmatter:
 | `name` | `sc-author` → 호출 `/sc-author` |
 | `description` | `/` 메뉴에 보이는 한 줄 능력 설명. 모델 컨텍스트에 안 들어가므로 트리거·부정 게이트 불필요 |
 | `disable-model-invocation` | `true` (D4) — 모델 목록에서 빠짐 → 목록 예산 비용 0, 오발동 0 |
-| `argument-hint` | `[skill|agent|command|output-style|memory] [무엇을] [--md|--xml]` |
+| `argument-hint` | `[skill|agent|command|output-style|memory|<path>] [무엇을] [--md|--xml]` |
 | `allowed-tools` | `Bash(superclaude author-check *)` + Windows용 PowerShell 규칙 (문법은 plan에서 확인, §9 R-S2) |
 
 description 초안 (영어 — 배포 콘텐츠는 언어 중립):
 
-> Write or revise a skill, subagent, slash command, output style, CLAUDE.md or .claude/rules file with valid frontmatter, a consistent body (--md default, --xml for XML bodies) and a validator pass.
+> Write or revise a skill, subagent, slash command, output style, CLAUDE.md, .claude/rules file or any other file Claude reads as instructions: valid frontmatter, a consistent body (--md default, --xml for XML bodies), no-op sentences removed and a validator pass.
 
 본문 절차 (Numbered, 각 단계는 라벨로 시작):
 
 1. Resolve
-   - type: 인자 → 요청 문맥 → 모호하면 질문
+   - type: 인자 → 요청 문맥 → 모호하면 질문 · 5종 밖 → `generic`(D14)
    - path: 유형별 기본 위치(`fields.yaml`의 `location`) + scope(project 기본, 사용자가 개인용이라 하면 user)
    - format: `--xml` | `--md` | 미지정 → 기존 파일이면 현재 형식, 새 파일이면 md
    - `command` + 새 파일 → "Claude Code는 새 작업에 skill 권장" 안내 후 선택받기
    - `--xml` + `output-style` → md로 진행, 이유 한 줄 안내 (D8)
-2. Load: `references/<type>.md` + (xml이면) `references/format-xml.md`
-3. Draft | Audit
-   - new → 템플릿으로 초안
-   - existing → `quality.md` 체크리스트 + 검사기로 감사 보고 → diff 제시 → 승인 후 쓰기
-4. Neighbors: 컨텍스트에 이미 있는 스킬 목록·에이전트 목록으로 이름과 트리거 겹침 확인 → 겹치면 description에 구분 문구. 파일은 읽지 않음
-5. Check: `superclaude author-check <path> --type <t> --format <f>` → error 수정 → 재실행 (상한 3)
-6. Hand-off: 새 세션에서 돌릴 프롬프트 2-3개 제시 (발동해야 할 것 1-2 + 비슷하지만 발동하면 안 되는 것 1). 만든 문서가 명시 호출 전용이면 호출 예시만
+2. Load-set (D15): 함께 로드되는 문서 + 읽는 쪽 확정 → 한 줄 표시 (04b §3)
+3. Load: `references/<type>.md`(generic이면 없음) + `quality.md` + (xml이면) `references/format-xml.md`
+4. Draft | Audit → 공통 pass (D14, 04b §1)
+   - new → 템플릿 초안 · existing → 현재 내용 → 재형식화 → no-op 후보 → diff → 승인 후 쓰기
+5. Neighbors: 컨텍스트에 이미 있는 스킬 목록·에이전트 목록으로 이름과 트리거 겹침 확인 → 겹치면 description에 구분 문구. 파일은 읽지 않음
+6. Check: `superclaude author-check <path> --type <t> --format <f> --with <load-set>` → error 수정 → 재실행 (상한 3)
+7. Hand-off: 새 세션에서 돌릴 프롬프트 2-3개 제시 (발동해야 할 것 1-2 + 비슷하지만 발동하면 안 되는 것 1). 만든 문서가 명시 호출 전용이면 호출 예시만
 
 ### C3. 참고 파일 계약
 
 | 파일 | 담는 것 | 읽는 시점 |
 |---|---|---|
-| `fields.yaml` | 유형별 `location`, `required`, `optional`, `unsupported`(그 유형에서 Claude Code가 무시하는 필드), 길이 상한, 출처 URL + 조회일 | Resolve, Check(검사기) |
+| `fields.yaml` | 유형별 `location`, `required`, `optional`, `unsupported`(그 유형에서 Claude Code가 무시하는 필드), 길이 상한, `tool_names`(N2), 출처 URL + 조회일 | Resolve, Check(검사기) |
 | `<type>.md` | 언제 이 유형을 쓰나(다른 유형과 구분) · md 본문 템플릿 · 유형 함정 | Load |
 | `format-xml.md` | XML 본문 규칙 + skill/agent/command/memory 골격 | Load (`--xml`) |
-| `quality.md` | 삭제 테스트, 트리거·설명문, 절차·참고 분리, 강한 용어, 내용 수명, 강조 대신 이유, 긍정형, 일관 용어, 예시(D11), 모델별 차이(D12) | Audit, Draft 마무리 |
+| `quality.md` | 삭제 테스트, 트리거·설명문, 절차·참고 분리, 강한 용어, 내용 수명, 강조 대신 이유, 긍정형, 일관 용어, 예시(D11), 모델별 차이(D12), 로드 방식(D15), 판단 항목(D17, 04b §5) | Load-set, 공통 pass |
 
 유형 함정 (각 `<type>.md`에 들어갈 핵심):
 - skill: description은 3인칭, 능력+트리거, 절차 요약 금지 · 본문 <500줄 · 참고 1단계 · 부작용 있는 작업은 `disable-model-invocation: true`
@@ -176,7 +182,7 @@ description 작성 기준 (`quality.md`, 출처 충돌의 해소): 능력은 몇
 
 ### C4. 검사기 `superclaude author-check`
 
-인터페이스(인자, 유형·형식 추론, 태그 인식, 출력, exit 코드)와 규칙 F1–F7, R1–R3, S1–S2, X1–X7: [04a-design-checker.md](./04a-design-checker.md)
+인터페이스(인자, 유형·형식 추론, `--with`, 태그 인식, 출력, exit 코드)와 규칙 F1–F7, R1–R3, S1–S2, X1–X7, N1–N4: [04a-design-checker.md](./04a-design-checker.md)
 
 ### C5. `skills` 설치 컴포넌트
 
@@ -217,6 +223,8 @@ description 작성 기준 (`quality.md`, 출처 충돌의 해소): 능력은 몇
 |---|---|---|
 | 검사기 규칙 | 단위 테스트: 규칙 코드마다 위반 픽스처 1 + 통과 픽스처 1 | 모든 코드가 의도한 등급으로 발화 |
 | 검사기 오탐 | 회귀 말뭉치: 배포되는 `src/superclaude/agents/*.md`, `commands/*.md`에 `--format xml`로 실행 | X1-X6 error 0 (산문 속 `<3`·`<5KB` 포함 문서가 이미 있음: `agents/project-manager.md:77`, `commands/pm.md:43`, `commands/index-repo.md:18`) |
+| N 규칙 (D15·D16) | 같은 문장 쌍을 `--with` 안팎에 두기 + 위 말뭉치에 N1·N2 | N3·N4는 `--with` 안에서만 발화, 말뭉치 error는 실제로 끊긴 것만 |
+| 판단 항목 (D17) | `quality.md`에 판정 질문·남길 것·해로움 절 | 누락 0 |
 | 스킬 구조 | 단위 테스트 + 자기 검사: `author-check`를 배포 스킬 자신에 실행 | error 0 |
 | 가이드 최신성 (D12) | 단위 테스트: `quality.md` 모델별 차이의 모델 ID 집합 = `/sc:prompt` Resolve의 집합, 참고 파일마다 `sources` 있음 | 같음 + 누락 0 (모델 지원 변경 시 red, 날짜 경과로는 안 됨) |
 | 예시 개수 (D11) | 단위 테스트: 참고 파일마다 예시 블록 수 | 0개 또는 3–5개 |
@@ -250,9 +258,11 @@ description 작성 기준 (`quality.md`, 출처 충돌의 해소): 능력은 몇
 | command | skill과 동일 | `format-xml.md` 골격 |
 | output-style | 일반 산문 | 미지원 → md (X7) |
 | memory | 헤딩 + 불릿 | `@path` 줄(있으면) + XML 루트 하나 (X1 예외). rules·import되는 파일은 루트만 |
+| generic (D14) | 헤딩 + 불릿 | XML 루트 하나 |
 
 - frontmatter는 형식과 무관하게 YAML
 - 기존 파일 + 플래그 없음 → 현재 형식 유지 (섞인 형식 방지)
+- 형식 전환은 문장을 지우지 않음. 삭제는 승인된 no-op 후보만 (04b §1)
 - memory XML 근거: SuperClaude의 `CLAUDE_SC.md`는 `@` 줄만 두고 XML은 import되는 core 파일에 있음 → 이 구성이 실제로 동작 중
 
 ## 7. 필요성 검사 (R18)
@@ -265,6 +275,7 @@ description 작성 기준 (`quality.md`, 출처 충돌의 해소): 능력은 몇
 | C1 `quality.md` | 기존 파일 감사 기준 없음 | 유지 |
 | C4 검사기 | Claude Code가 잘못된 필드·YAML을 오류 없이 무시 → 실패가 안 보임; XML 검증 요구(D6) | 유지 |
 | C5 skills 컴포넌트 | 스킬이 설치되지 않음 | 유지 |
+| D15·D16 load-set, N1–N4 | 해로움(03 §3.4)이 감사에 안 보임 | 유지 |
 | C6 skill-authoring.md | 저장소 규칙 "유형마다 `*-authoring.md`" 위반, references와 rules가 말없이 어긋남 | 유지 |
 | C7 프로브·최신성 테스트 | "형식 개선" 주장에 근거 없음 (R15), 새 모델이 나와도 references가 낡은 채 남음 (D12) | 유지 |
 
@@ -313,11 +324,15 @@ description 작성 기준 (`quality.md`, 출처 충돌의 해소): 능력은 몇
 | S7 `yaml.safe_load` | C4 |
 | S8 AGENTS.md를 memory에 포함할지 | 포함 (§2, C4 추론, C3 함정) |
 
-남은 미결 사항 (D13, plan 전에 설계 갱신):
-- 설계 중심 이동: 유형별 템플릿(C3) 중심 → 공통 작업(재형식화 + no-op 제거) 중심. C2 흐름, `quality.md`의 위치, 유형을 모르는 문서의 처리
-- no-op 판정 기준과 근거: 무엇을 기계로 잡고(중복, 없어진 대상을 가리키는 문장), 무엇을 판단에 맡기며, 제거가 결과를 바꾸지 않는다는 근거를 어떻게 남기나
+D13 미결 해소:
 
-plan에서 확인: PowerShell 허용 규칙 문법.
+- 설계 중심 이동, C2 흐름, `quality.md` 위치 → D14, D15 (C2, C3)
+- 유형을 모르는 문서 → D14 `generic` (04a, §6)
+- 기계 판정(중복, 없어진 대상) → D16 · 판단 판정, 제거 근거 → D17 (04b §4–5)
+
+plan에서 확인:
+- PowerShell `allowed-tools` 문법 (C2, §5)
+- Fable 5.1 가이드 URL (§1)
 
 ## 10. 요구사항 커버리지
 
@@ -332,6 +347,9 @@ plan에서 확인: PowerShell 허용 규칙 문법.
 | XML 규칙 검증 | C4 X1-X7, C7 |
 | 예시는 필요할 때 3–5개 | D11, C1, C3, C7 |
 | 최신 Fable·Opus·Sonnet 가이드, stale 금지 | D12, §1, C1, C3, C6, C7 |
-| Claude가 지시·컨텍스트로 읽는 모든 문서 | D13, §2 — 컴포넌트 설계는 §9 남은 미결 |
+| Claude가 지시·컨텍스트로 읽는 모든 문서 | D13, D14, §2, §6, 04b §2 |
+| 재형식화 + no-op 제거 중심 | D14, C2, 04b |
+| 판정 범위 = load-set | D15, C2 |
+| 기계 / 판단 분리 | D16, D17, C7 |
 
-9/10 반영, D13은 설계 갱신 대기.
+13/13 반영.
