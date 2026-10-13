@@ -10,18 +10,11 @@ sources:
 
 A skill holds the instructions for one kind of task. Claude loads its body only when someone invokes it or its description matches the task, so it suits a procedure or reference material that is needed sometimes. What every session should know belongs in CLAUDE.md; what must happen every time belongs in a hook.
 
-## Match the project first
+## Project format and language
 
-Read one or two existing skills in the project (`.claude/skills/*/SKILL.md`) and match them:
+Read one or two existing skills in the project (`.claude/skills/*/SKILL.md`) for their format and language only. Steps, supporting-file layout and fields come from this file; a field the project uses that `fields.yaml` does not list for skills is reported as a candidate, not copied.
 
-- language and terminology
-- how steps are written (numbered list, headed sections, checklist)
-- how supporting files are named, placed and linked
-- the frontmatter fields they actually use
-
-A field the project uses that `fields.yaml` does not list for skills is not copied; report it as a candidate instead. With no skill in the project, start from the template below.
-
-## Fallback template (md)
+## Template (md)
 
 ```markdown
 ---

@@ -9,11 +9,11 @@ sources:
 
 A subagent runs a focused task in a fresh context window with its own system prompt, tools and model, and returns a summary to the main conversation. It suits work that would flood the main conversation (wide searches, long logs) or that needs a restricted tool set.
 
-## Match the project first
+## Project format and language
 
-Read one or two existing subagents in the project (`.claude/agents/*.md`) and match their language, section layout, how they state what to return, and the frontmatter fields they use. A field `fields.yaml` does not list for agents is not copied; report it. With no subagent in the project, start from the template below.
+Read one or two existing subagents in the project (`.claude/agents/*.md`) for their format and language only. Sections, how the return is stated and fields come from this file; a field `fields.yaml` does not list for agents is reported, not copied.
 
-## Fallback template (md)
+## Template (md)
 
 ```markdown
 ---

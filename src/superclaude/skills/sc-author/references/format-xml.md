@@ -22,13 +22,13 @@ These hold for any XML body, whatever its tag names:
 
 Angle brackets in prose (`<3`, `<5KB`), in code, and placeholders inside a sentence (`docs/<name>/`) are text, not tags.
 
-## Everything else follows the project
+## Tags and sections
 
-Tag names, nesting depth, which sections exist and their order come from the project's existing XML documents of the same type. Read one or two and reuse their names and layout. With none, name each part for what it holds, and keep the skeleton below as the starting point.
+When the project's documents of this type have XML bodies, the draft is XML too, but its tag names and sections come from the type's reference, not from those documents: name each part for what it holds, starting from the skeleton below.
 
 Converting a body between md and XML moves sentences into or out of tags; it removes none. Deleting a sentence is a separate step that needs approval.
 
-## Fallback skeletons
+## Skeletons
 
 Skill or command body (frontmatter stays YAML above it):
 

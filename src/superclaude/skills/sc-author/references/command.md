@@ -9,11 +9,11 @@ sources:
 
 A file in `.claude/commands/` still works as a `/` command, but Claude Code recommends a skill for new work: a skill takes the same frontmatter and can also bundle supporting files. When a new command is requested, say this and let the person choose. Revising an existing command file stays a command.
 
-## Match the project first
+## Project format and language
 
-Read one or two existing command files in the project (`.claude/commands/*.md`) and match their language, how arguments are used (`$ARGUMENTS`, `$1`), section layout and the frontmatter fields they use. A field `fields.yaml` does not list for commands is not copied; report it. With no command in the project, start from the template below.
+Read one or two existing command files in the project (`.claude/commands/*.md`) for their format and language only. Sections, argument handling and fields come from this file; a field `fields.yaml` does not list for commands is reported, not copied.
 
-## Fallback template (md)
+## Template (md)
 
 ```markdown
 ---

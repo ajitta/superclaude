@@ -14,11 +14,11 @@ An output style sets Claude's role, tone and response format for every response 
 - something that must happen every time: a hook
 - a helper with its own tools for a focused task: a subagent
 
-## Match the project first
+## Project language
 
-Read the project's existing styles (`.claude/output-styles/*.md`) and match their language and how they phrase instructions. With none, start from the template below.
+Read the project's existing styles (`.claude/output-styles/*.md`) for their language only; an output style is always md. The structure comes from the template below.
 
-## Fallback template (md)
+## Template (md)
 
 ```markdown
 ---
