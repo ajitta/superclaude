@@ -111,3 +111,44 @@ class TestReferences:
                 if banned.search(cleaned) or "superclaude" in cleaned.lower():
                     hits.append(f"{path.name}:{number}: {line.strip()}")
         assert not hits, "\n".join(hits)
+
+
+class TestSkillManifest:
+    _PATH = _SKILL / "SKILL.md"
+    _STEPS = ("Resolve", "Load-set", "Load", "Draft", "Neighbors", "Check", "Hand-off")
+
+    def _body(self) -> str:
+        text = self._PATH.read_text(encoding="utf-8")
+        return re.sub(r"\A---\n.*?\n---\n", "", text, flags=re.S)
+
+    def test_frontmatter(self):
+        fm = _frontmatter(self._PATH)
+        assert fm["name"] == "sc-author"
+        assert fm["disable-model-invocation"] is True
+        assert fm.get("argument-hint")
+        tools = fm["allowed-tools"]
+        tools = tools if isinstance(tools, list) else str(tools).split()
+        assert "Bash(superclaude author-check *)" in tools
+        assert "PowerShell(superclaude author-check *)" in tools
+        description = str(fm["description"])
+        assert len(description) <= 1536
+        assert not re.match(r"\s*(I|You|We)\b", description)
+
+    def test_body_size(self):
+        assert len(self._body().strip().splitlines()) <= 150
+
+    def test_steps_in_order(self):
+        labels = re.findall(r"^\d+\.\s+\**([A-Z][\w-]*)", self._body(), re.M)
+        assert tuple(labels) == self._STEPS
+
+    def test_links_every_reference(self):
+        body = self._body()
+        for name in [*REFS, "fields.yaml"]:
+            assert f"${{CLAUDE_SKILL_DIR}}/references/{name}" in body, name
+
+    def test_check_step_passes_the_load_set(self):
+        assert re.search(r"superclaude author-check [^\n]*--with", self._body())
+
+    def test_passes_the_checker(self):
+        findings = check(self._PATH)
+        assert not [f.render() for f in findings if f.severity == "error"]
