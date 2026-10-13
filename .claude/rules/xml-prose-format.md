@@ -91,7 +91,7 @@ When section has **fixed small set of named slots** that need (a) multi-line pro
 Slot labels are **directives, not hedging**. `<does>` (declarative present-tense — what Claude actually does), `<never>` (absolute prohibition — current Claude models follow; "should not" get dropped as optional), `<fallback>` (escalation posture). Legacy `<should>`/`<avoid>` labels rejected by structural test suite — current Claude models read "should" as optional, spec own load-bearing-voice rule applies to slot labels too.
 
 Use this form when:
-- Section sits next to Labeled section using same `- Label:` shape and Claude must not conflate them (measured boundary blur — see commit `S390`).
+- Section sits next to Labeled section using same `- Label:` shape and Claude must not conflate them (measured boundary blur — claude-mem session `S390`, not in git).
 - Any one slot reasonably needs multi-line prose that wouldn't fit single `- Label:` line.
 - Label set fixed and small (2-4 slots).
 

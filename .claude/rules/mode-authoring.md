@@ -27,7 +27,7 @@ name: brainstorming
 
 ## The 4-Axis Requirement
 
-Every mode **must** define all four axes (per `.claude/rules/xml-prose-format.md`):
+Every mode **must** define all four axes (enforced by `tests/unit/test_mode_structure.py`):
 
 | Axis | Tag | Purpose | Style |
 |------|-----|---------|-------|
@@ -103,7 +103,7 @@ Note: symbol systems and abbreviation maps as an *output contract* were removed 
 
 ## Supporting Config Files
 
-Operational parameters too detailed for mode itself go in sibling `type="config"` files (e.g., `RESEARCH_CONFIG.md` — depth profiles, confidence thresholds). Not subject to mode validation (no 4-axis requirement), validated by `test_content_structure.py`.
+Operational parameters too detailed for mode itself go in sibling `type="config"` files (e.g., `RESEARCH_CONFIG.md` — depth profiles, confidence thresholds). Not subject to mode validation (no 4-axis requirement); only the cross-reference check (`test_cross_references.py`) reads them.
 
 ## Inherited from xml-prose-format.md
 
