@@ -321,3 +321,51 @@ tasks:
       # as paths or dotted module names.
       - {type: output_regex, tag: success,
          pattern: '\b(orders|billing|inventory|reports)\.py\b|\bshop[./](orders|billing|inventory|reports)\b'}
+
+  # ── sc-author: effect and explicit invocation (authoring-skill 05g) ──────
+  # Same request through /sc-author and in plain words, sc-full arm only. The
+  # plain run measures what happens without the skill (its author-check result
+  # is data, not a target) and must not run the skill's checker: the skill is
+  # disable-model-invocation, so a plain request never reaches it.
+  # The target sits in agents/, not .claude/agents/: .claude is a protected path
+  # that headless runs may write only under bypassPermissions. Headless has no
+  # approval turn, so both prompts carry the same pre-approval sentence.
+  - id: sc-author-skill
+    canary: true
+    canary_only: true
+    fixture: fixtures/sc-author
+    setup:
+      - [git, init, -b, main]
+      - [git, add, -A]
+      - [git, -c, user.email=eval@local, -c, user.name=eval, commit, -m, baseline]
+    allowed_tools: [Bash, PowerShell, Read, Edit, Write, Grep, Glob, Skill]
+    max_turns: 20
+    prompt: >
+      /sc-author agent a subagent at agents/sql-migration-reviewer.md (a
+      staging copy, moved into .claude/agents/ later) that reviews SQL
+      migrations in migrations/ for destructive statements. Approved in
+      advance: write the file without asking for confirmation.
+    checks:
+      - {type: file_exists_glob, tag: success, pattern: 'agents/sql-migration-reviewer.md'}
+      - {type: cmd_ok, tag: success, cmd: [superclaude, author-check, agents/sql-migration-reviewer.md]}
+      - {type: transcript_regex, tag: verification, pattern: 'author-check'}
+
+  - id: sc-author-plain
+    canary: true
+    canary_only: true
+    fixture: fixtures/sc-author
+    setup:
+      - [git, init, -b, main]
+      - [git, add, -A]
+      - [git, -c, user.email=eval@local, -c, user.name=eval, commit, -m, baseline]
+    allowed_tools: [Bash, PowerShell, Read, Edit, Write, Grep, Glob, Skill]
+    max_turns: 20
+    prompt: >
+      Create a subagent at agents/sql-migration-reviewer.md (a staging copy,
+      moved into .claude/agents/ later) that reviews SQL migrations in
+      migrations/ for destructive statements. Approved in advance: write the
+      file without asking for confirmation.
+    checks:
+      - {type: file_exists_glob, tag: success, pattern: 'agents/sql-migration-reviewer.md'}
+      - {type: cmd_ok, tag: success, cmd: [superclaude, author-check, agents/sql-migration-reviewer.md]}
+      - {type: transcript_not_regex, tag: scope, pattern: 'author-check'}

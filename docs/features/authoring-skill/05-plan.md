@@ -1,5 +1,5 @@
 ---
-status: draft
+status: complete
 revised: 2026-10-13
 ---
 
@@ -45,7 +45,7 @@ revised: 2026-10-13
 - [x] Phase D: [05d-plan-references.md](./05d-plan-references.md) — 유형 참고 5개, `format-xml.md`, `quality.md` + 최신성·예시 개수 테스트
 - [x] Phase E: [05e-plan-skill-body.md](./05e-plan-skill-body.md) — `SKILL.md` + 구조 테스트 + 자기 검사
 - [x] Phase F: [05f-plan-repo-docs.md](./05f-plan-repo-docs.md) — C6 저장소 쪽 변경과 README
-- [ ] Phase G: [05g-plan-probes.md](./05g-plan-probes.md) — `evals/tasks.yaml` 효과·명시 호출 프로브와 실행 기록
+- [x] Phase G: [05g-plan-probes.md](./05g-plan-probes.md) — `evals/tasks.yaml` 효과·명시 호출 프로브와 실행 기록
 
 순서 근거:
 - A가 `src/superclaude/skills/sc-author/`를 처음 만든다 (`fields.yaml`). C의 `COMPONENTS["skills"]`는 소스 디렉터리가 있어야 `tests/integration/test_cross_directory_refs.py:164` 가 green
