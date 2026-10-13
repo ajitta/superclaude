@@ -1,6 +1,6 @@
 ---
-status: draft
-revised: 2026-10-13
+status: complete
+revised: 2026-10-14
 ---
 
 # `sc-author` 분석 — no-op 판정 기준

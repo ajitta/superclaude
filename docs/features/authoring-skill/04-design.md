@@ -1,6 +1,6 @@
 ---
-status: draft
-revised: 2026-10-13
+status: complete
+revised: 2026-10-14
 ---
 
 # `sc-author` 스킬 — 설계
@@ -14,7 +14,7 @@ revised: 2026-10-13
 | # | 결정 | 근거 |
 |---|---|---|
 | D1 | 배포판(`superclaude install`)에 넣는다. 대상은 SuperClaude를 설치한 사용자 프로젝트 | 사용자: "superclaude를 설치하여 사용하는 프로젝트에서 추가로 만들 때 너무 형식없이 만들어져" |
-| D2 | 기본 형식은 Claude Code·Anthropic 공식 권장 구조(`--md`) | 사용자 선택 |
+| D2 | 기본 형식은 Claude Code·Anthropic 공식 권장 구조(`--md`) — D21로 대체 | 사용자 선택 |
 | D3 | `--xml` 플래그로 SuperClaude식 XML 본문도 지원 | 사용자 요청 |
 | D4 | **명시 호출만** (`/sc-author`). 모델 자동 발동 없음 → `disable-model-invocation: true` | 리뷰 후 사용자: "스킬을 명시적으로 발동시킨다. 자동 발동이 아니다." (처음엔 자동 트리거였음) |
 | D5 | 커맨드가 아니라 스킬로 배포 | 사용자: "skill이 더 좋지 않아?" → 참고 파일 묶음이 핵심 |
@@ -145,14 +145,14 @@ frontmatter:
 
 description 초안 (영어 — 배포 콘텐츠는 언어 중립):
 
-> Write or revise a skill, subagent, slash command, output style, CLAUDE.md, .claude/rules file or any other file Claude reads as instructions: valid frontmatter, a consistent body (--md default, --xml for XML bodies), no-op sentences removed and a validator pass.
+> Write or revise a skill, subagent, slash command, output style, CLAUDE.md, .claude/rules file or any other file Claude reads as instructions: valid frontmatter, a consistent body (the project's own format by default, --md or --xml to choose one), no-op sentences removed and a validator pass.
 
 본문 절차 (Numbered, 각 단계는 라벨로 시작):
 
 1. Resolve
    - type: 인자 → 요청 문맥 → 모호하면 질문 · 5종 밖 → `generic`(D14)
    - path: 유형별 기본 위치(`fields.yaml`의 `location`) + scope(project 기본, 사용자가 개인용이라 하면 user)
-   - format: `--xml` | `--md` | 미지정 → 기존 파일이면 현재 형식, 새 파일이면 md
+   - format: `--xml` | `--md` | 미지정 → 기존 파일이면 현재 형식, 새 파일이면 같은 유형 기존 문서의 형식, 그런 문서가 없을 때만 md (D21)
    - `command` + 새 파일 → "Claude Code는 새 작업에 skill 권장" 안내 후 선택받기
    - `--xml` + `output-style` → md로 진행, 이유 한 줄 안내 (D8)
 2. Load-set (D15): 함께 로드되는 문서 + 읽는 쪽 확정 → 한 줄 표시 (04b §3)
