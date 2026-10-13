@@ -22,6 +22,8 @@ Author: ajitta.
 
 배포 단위는 스킬: "skill이 더 좋지 않아?"
 
+다른 도구로 만든 문서도 대상이다: "해당 스킬 혹은 도구를 이용하여 만들어도 재 형식화및 검증을 거치려는 의도이다."
+
 ## Affected users and systems
 - SuperClaude를 설치(`superclaude install`)한 사용자 프로젝트에서 자기 컴포넌트를 만드는 사용자
 - SuperClaude 배포판: 이 스킬이 설치본에 들어간다
@@ -30,10 +32,12 @@ Author: ajitta.
 
 ## Constraints
 - "스킬을 명시적으로 발동시킨다. 자동 발동이 아니다."
+  - 이유: "skill-creater 류의 meta skill이 이미 많다. 최대한 호환되거나, 충돌되지 않고"
   - 그래서 `/sc-author` 없이 평범하게 요청하면("에이전트 만들어줘") 증상이 그대로 남는다. 받아들인 한계 (04-design.md §8)
+- SuperClaude와 결합한다: "superclaude와 결합이 용이한 sc-author를 만드는 것이다."
+  - `lean-author`(독립 플러그인, `github.com/ajitta/lean-author`)와 나누는 이유: "lean-author는 superclaude에 종속적이지 않다. 처리할 수 있는 하네스도 없다. 스킬, 에이전트를 만드는 가이드를 제대로 지키는지 확인 불가."
 - references는 저장소 rules와 "비슷하지만 다르게 만들어야" 한다: 사용자 프로젝트를 독자로 따로 쓰고, 저장소 rules를 import하지 않는다
 - `--xml` 범위: skill·agent·command·memory. output style은 md만
 
 ## Open questions
-- `lean-author`와 무엇을 나눠 맡는가. 그쪽 intent(`github.com/ajitta/lean-author` `docs/00-intent.md`, 2026-10-12)도 문제 1번이 같다("agent·skill·command를 만들면 형식 없이 만들어진다"). 다른 점은 SuperClaude 없이도 설치하는 독립 플러그인이라는 것이고, 두 문서 모두 "다른 방향"이라고만 적었다. sc-author만 맡는 몫이 무엇인지, 둘을 합칠지는 정하지 않았다.
-- 성공 기준을 무엇으로 볼 것인가. 보고된 증상은 평범한 요청에서 생기는데, 명시 호출만으로 해결하는 것은 `/sc-author`를 불렀을 때의 형식뿐이다. 그 범위면 충분한지는 not stated.
+없음. 2026-10-13에 두 질문(lean-author와의 분담, 명시 호출만으로 충분한지)에 답을 받아 Proposed outcome과 Constraints에 옮겼다.
