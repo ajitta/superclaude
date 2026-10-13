@@ -23,6 +23,7 @@ Author: ajitta.
 배포 단위는 스킬: "skill이 더 좋지 않아?"
 
 다른 도구로 만든 문서도 대상이다: "해당 스킬 혹은 도구를 이용하여 만들어도 재 형식화및 검증을 거치려는 의도이다."
+- 역할 분담: "skill-creator 종류가 충분히 잘 만들거라고 생각한다. 그것을 재형식화하고 no-op들을 제거하는 과정이라고 생각하는 것이 맞다." sc-author는 내용을 새로 짓기보다 형식을 맞추고 결과를 바꾸지 않는 문장을 걷어낸다
 
 ## Affected users and systems
 - SuperClaude를 설치(`superclaude install`)한 사용자 프로젝트에서 자기 컴포넌트를 만드는 사용자
@@ -32,12 +33,14 @@ Author: ajitta.
 
 ## Constraints
 - "스킬을 명시적으로 발동시킨다. 자동 발동이 아니다."
-  - 이유: "skill-creater 류의 meta skill이 이미 많다. 최대한 호환되거나, 충돌되지 않고"
+  - 이유: "skill-creater 류의 meta skill이 이미 많다." 그런 스킬과 발동이 겹치지 않게 한다 ("호환"은 모호하다는 지적으로 위 역할 분담으로 대체, 2026-10-13)
   - 그래서 `/sc-author` 없이 평범하게 요청하면("에이전트 만들어줘") 증상이 그대로 남는다. 받아들인 한계 (04-design.md §8)
 - SuperClaude와 결합한다: "superclaude와 결합이 용이한 sc-author를 만드는 것이다."
   - `lean-author`(독립 플러그인, `github.com/ajitta/lean-author`)와 나누는 이유: "lean-author는 superclaude에 종속적이지 않다. 처리할 수 있는 하네스도 없다. 스킬, 에이전트를 만드는 가이드를 제대로 지키는지 확인 불가."
 - references는 저장소 rules와 "비슷하지만 다르게 만들어야" 한다: 사용자 프로젝트를 독자로 따로 쓰고, 저장소 rules를 import하지 않는다
 - `--xml` 범위: skill·agent·command·memory. output style은 md만
+- 예시: "레퍼런스 문서에 예시를 넣을 필요가 있다면 3-5개 수준" (Anthropic 가이드)
+- 최신 가이드 기준: "이 skill제작, prompt가이드는 빠르게 업데이트되고 있어서 항상 claude의 최신 모델 기준이어야한다. fable, opus, sonnet의 최신 버전 기준의 가이드를 이용해야돼. stale된것 들로 만들면 안된다."
 
 ## Open questions
 없음. 2026-10-13에 두 질문(lean-author와의 분담, 명시 호출만으로 충분한지)에 답을 받아 Proposed outcome과 Constraints에 옮겼다.
