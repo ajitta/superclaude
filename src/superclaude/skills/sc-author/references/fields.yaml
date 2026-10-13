@@ -1,0 +1,95 @@
+# Frontmatter fields Claude Code reads, per document type.
+#
+# Read by /sc-author (where a new file goes, which fields to write) and by
+# `superclaude author-check` (rules F1-F7 and N2). A field listed nowhere for its
+# type is reported as a warning, not an error: Claude Code may have added it
+# after the retrieval dates below. Claude Code ignores unknown or misspelled
+# fields without an error, which is why they are checked at all.
+#
+# Types without an entry here (any other file Claude reads as instructions) get
+# no field checks.
+
+sources:
+  - {url: "https://code.claude.com/docs/en/skills", retrieved: 2026-10-13}
+  - {url: "https://code.claude.com/docs/en/sub-agents", retrieved: 2026-10-13}
+  - {url: "https://code.claude.com/docs/en/output-styles", retrieved: 2026-10-13}
+  - {url: "https://code.claude.com/docs/en/memory", retrieved: 2026-10-13}
+  - {url: "https://code.claude.com/docs/en/tools-reference", retrieved: 2026-10-13}
+  - {url: "https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices", retrieved: 2026-10-13}
+
+# Built-in tool names, as written in permission rules and a subagent's `tools`.
+tool_names: [
+  Agent, Artifact, AskUserQuestion, Bash, CronCreate, CronDelete, CronList,
+  Edit, EndConversation, EnterPlanMode, EnterWorktree, ExitPlanMode,
+  ExitWorktree, Glob, Grep, ListAgents, ListMcpResourcesTool, LSP, Monitor,
+  NotebookEdit, PowerShell, PushNotification, Read, ReadMcpResourceTool,
+  RemoteTrigger, ReportFindings, ScheduleWakeup, SendFeedback, SendMessage,
+  SendUserFile, ShareOnboardingGuide, Skill, SubagentHandback, TaskCreate,
+  TaskGet, TaskList, TaskOutput, TaskStop, TaskUpdate, TodoWrite, ToolSearch,
+  WaitForMcpServers, WebFetch, WebSearch, Workflow, Write,
+]
+
+types:
+  skill:
+    location: [".claude/skills/<name>/SKILL.md", "~/.claude/skills/<name>/SKILL.md"]
+    # Every field is optional; without `description` Claude cannot tell when to use it.
+    frontmatter: optional
+    required: []
+    optional: [
+      name, description, when_to_use, argument-hint, arguments,
+      disable-model-invocation, user-invocable, allowed-tools, disallowed-tools,
+      model, effort, context, agent, background, hooks, paths, shell, metadata,
+      license, compatibility,
+    ]
+    unsupported: []
+    # name: lowercase letters, digits and hyphens (best practices).
+    # listing_chars: description + when_to_use is cut at this length in the skill listing.
+    limits: {name_chars: 64, listing_chars: 1536, body_lines: 500}
+
+  agent:
+    location: [".claude/agents/<name>.md", "~/.claude/agents/<name>.md"]
+    frontmatter: required
+    required: [name, description]
+    optional: [
+      tools, disallowedTools, model, permissionMode, maxTurns, skills,
+      mcpServers, hooks, memory, background, omitClaudeMd, effort, isolation,
+      color, initialPrompt, experimental,
+    ]
+    unsupported: []
+    # name: no ":" (reserved for plugin-scoped names), cannot start with "-".
+    limits: {name_chars: 256}
+
+  command:
+    location: [".claude/commands/<name>.md", "~/.claude/commands/<name>.md"]
+    # Same frontmatter as a skill except `name` and `paths`. Skills are preferred for new work.
+    frontmatter: optional
+    required: []
+    optional: [
+      description, when_to_use, argument-hint, arguments,
+      disable-model-invocation, user-invocable, allowed-tools, disallowed-tools,
+      model, effort, context, agent, background, hooks, shell, metadata,
+      license, compatibility,
+    ]
+    unsupported: [name, paths]
+    limits: {}
+
+  output-style:
+    location: [".claude/output-styles/<name>.md", "~/.claude/output-styles/<name>.md"]
+    frontmatter: optional
+    required: []
+    optional: [name, description, keep-coding-instructions, force-for-plugin]
+    unsupported: []
+    limits: {}
+
+  memory:
+    location: [
+      CLAUDE.md, .claude/CLAUDE.md, CLAUDE.local.md, AGENTS.md,
+      ".claude/rules/<name>.md", ~/.claude/CLAUDE.md,
+    ]
+    # `paths` is the only field read, and only in .claude/rules/ files.
+    frontmatter: optional
+    required: []
+    optional: [paths]
+    unsupported: []
+    # lines: target size per file; longer files reduce adherence.
+    limits: {lines: 200}

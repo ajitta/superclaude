@@ -39,7 +39,7 @@ revised: 2026-10-13
 
 ## Phases
 
-- [ ] Phase A: [05a-plan-checker-core.md](./05a-plan-checker-core.md) — `fields.yaml`, `author-check` 인터페이스·유형/형식 추론·F/R/S/X 규칙, XML 회귀 말뭉치
+- [x] Phase A: [05a-plan-checker-core.md](./05a-plan-checker-core.md) — `fields.yaml`, `author-check` 인터페이스·유형/형식 추론·F/R/S/X 규칙, XML 회귀 말뭉치
 - [ ] Phase B: [05b-plan-checker-noop.md](./05b-plan-checker-noop.md) — `--with`와 N1–N4, N 규칙 말뭉치
 - [ ] Phase C: [05c-plan-skills-component.md](./05c-plan-skills-component.md) — `skills` 디렉터리 컴포넌트: install, uninstall, git-exclude, verify-drift, inventory
 - [ ] Phase D: [05d-plan-references.md](./05d-plan-references.md) — 유형 참고 5개, `format-xml.md`, `quality.md` + 최신성·예시 개수 테스트

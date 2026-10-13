@@ -570,6 +570,51 @@ def verify_drift_cmd(scope: str | None, verbose: bool):
         sys.exit(1)
 
 
+@main.command(name="author-check")
+@click.argument("path", type=click.Path(exists=True, dir_okay=False))
+@click.option(
+    "--type",
+    "type_",
+    type=click.Choice(
+        ["skill", "agent", "command", "output-style", "memory", "generic"]
+    ),
+    default=None,
+    help="Document type (default: inferred from the path)",
+)
+@click.option(
+    "--format",
+    "fmt",
+    type=click.Choice(["md", "xml"]),
+    default=None,
+    help="Body format (default: xml when the body starts with a tag)",
+)
+def author_check_cmd(path: str, type_: str | None, fmt: str | None):
+    """
+    Check a file Claude reads as instructions (used by /sc-author).
+
+    Claude Code ignores a bad frontmatter field or a broken reference without
+    an error; this reports them. One finding per line, `path:line: CODE grade:
+    message`, then `N errors, M warnings`.
+
+    Rules: F (frontmatter fields), R (skill references), S (size, emphasis),
+    X (XML structure, with --format xml or an XML body).
+
+    Exit: 0 no errors, 1 errors found, 2 usage error.
+
+    Examples:
+        superclaude author-check .claude/agents/reviewer.md
+        superclaude author-check .claude/skills/deploy/SKILL.md --format xml
+    """
+    from .author_check import check, summary
+
+    findings = check(Path(path), type_=type_, fmt=fmt)
+    for finding in findings:
+        click.echo(finding.render())
+    click.echo(summary(findings))
+    if any(f.severity == "error" for f in findings):
+        sys.exit(1)
+
+
 @main.command(
     context_settings={"ignore_unknown_options": True, "allow_extra_args": True},
     add_help_option=False,
