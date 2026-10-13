@@ -3,7 +3,7 @@ feature: authoring-skill
 phase: design
 owner: ajitta
 created: 2026-10-10
-updated: 2026-10-10
+updated: 2026-10-13
 ---
 
 # `sc-author` 스킬
@@ -14,4 +14,5 @@ SuperClaude를 설치한 사용자 프로젝트에서 Claude가 읽는 Markdown 
 
 ## Documents
 
+- [00-intent.md](./00-intent.md) — 문제, 원하는 결과, 영향 범위, 제약, 미결 질문. 설계 뒤에 04-design.md에 인용된 사용자 말로 다시 구성 (2026-10-13)
 - [04-design.md](./04-design.md) — 아키텍처 설계: 스킬 구성, 검사기 인터페이스, `skills` 설치 컴포넌트 복원, 검증 방법. 2026-10-10 인터뷰와 `/sc:review` 결과 반영 (draft)
