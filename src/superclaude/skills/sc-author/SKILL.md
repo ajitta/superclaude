@@ -30,7 +30,7 @@ Works on any file Claude reads as instructions or context. A new document follow
    - New document: write it in the project's conventions from step 3. Use the type's fallback template only when the project has no document of that type.
    - Existing document: start from its current content.
    - Reformat into the chosen format. Reformatting moves sentences; it deletes none.
-   - Collect removal candidates sentence by sentence against the load set: the checker's N findings (run step 6 early for them) and the "Judgment questions" in `quality.md`.
+   - Collect removal candidates sentence by sentence against the load set: the checker's N findings (run step 6 early for them) and the "Judgment questions" in `quality.md`. A new draft gets this pass too, before it is shown: its own sections are part of the load set.
    - Report harm first ("Harm" in `quality.md`), then checker candidates, then judgment candidates, each with its evidence ("Removal evidence"). Leave alone what "Keep" describes.
    - Show the diff. Write only after the person approves, and drop the candidates they reject.
    - Text embedded in code (a hook's injected string, a prompt inside a script) gets the judgment questions only: the checker does not run on it, and the hand-off says so.

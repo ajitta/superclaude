@@ -1,7 +1,7 @@
 ---
 sources:
   - {url: "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices", retrieved: 2026-10-14}
-  - {url: "https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices", retrieved: 2026-10-13}
+  - {url: "https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices", retrieved: 2026-10-14}
   - {url: "https://code.claude.com/docs/en/memory", retrieved: 2026-10-13}
   - {url: "https://code.claude.com/docs/en/sub-agents", retrieved: 2026-10-13}
   - {url: "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-5-5", retrieved: 2026-10-14}
@@ -62,6 +62,7 @@ Ask these of each sentence, not of a whole rule: one sentence of a rule can be a
 - Vague: does it name an observable trigger, a concrete target or a threshold? No: candidate, or a rewrite that adds one.
 - Enforced elsewhere: does a hook, test or linter catch it inside the author's normal loop, before the mistake costs anything, with a failure message that says how to fix it? All three yes: candidate. Any no: keep.
 - Fact or reason: does the fact change a decision the reader makes? No: candidate.
+- Repeated in other words: does another sentence in this document or the load set already give the same instruction, for example a numbered step restating a rule or the output layout? Yes: candidate; keep the copy where a reader looks for it. The checker finds only word-for-word repeats.
 
 <example>
 Sentence: "Run independent tool calls in parallel."

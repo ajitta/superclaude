@@ -1,6 +1,6 @@
 ---
 sources:
-  - {url: "https://code.claude.com/docs/en/sub-agents", retrieved: 2026-10-13}
+  - {url: "https://code.claude.com/docs/en/sub-agents", retrieved: 2026-10-14}
 ---
 
 # Subagent
@@ -40,6 +40,8 @@ You are <role> for <project or area>.
 - The CLAUDE.md hierarchy and project rules, unless `omitClaudeMd: true`. Auto memory and the output style are not loaded (except in a fork).
 
 So the body states the task context that is not in CLAUDE.md, and does not repeat what CLAUDE.md already gives it.
+
+When the task takes everything it needs from the delegation message and nothing from the project's CLAUDE.md files, offer `omitClaudeMd: true`: the subagent then starts without the user, project and local CLAUDE.md files (managed policy files still load). A rule that must still reach it goes in the delegation message; the main conversation keeps the full CLAUDE.md when it reads the result.
 
 ## Pitfalls
 
