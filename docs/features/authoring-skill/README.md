@@ -1,6 +1,6 @@
 ---
 feature: authoring-skill
-phase: design
+phase: planning
 owner: ajitta
 created: 2026-10-10
 updated: 2026-10-13
@@ -19,3 +19,11 @@ SuperClaude를 설치한 사용자 프로젝트에서 Claude가 지시·컨텍�
 - [04-design.md](./04-design.md) — 아키텍처 설계: 스킬 구성, 검사기 인터페이스, `skills` 설치 컴포넌트 복원, 검증 방법. 2026-10-10 인터뷰와 `/sc:review` 결과 반영, 2026-10-13 예시 개수(D11)·최신 모델 가이드(D12), 공통 pass·load-set·검사기 N 규칙(D14–D17) 추가 (draft)
   - [04a-design-checker.md](./04a-design-checker.md) — C4 검사기 `superclaude author-check`: 인터페이스와 규칙 F1–F7, R1–R3, S1–S2, X1–X7, N1–N4. 크기 때문에 나눔 (draft)
   - [04b-design-common-pass.md](./04b-design-common-pass.md) — 공통 pass(재형식화 + no-op 제거), load-set, 기계 판정과 `quality.md` 판단 항목의 경계 (D14–D17). 크기 때문에 나눔 (draft)
+- [05-plan.md](./05-plan.md) — 구현 plan 색인: 공통 규칙, §9 미결 해소(PowerShell 허용 규칙, Fable 5.1 가이드 URL), phase 순서, 위험, 택하지 않은 안, 완료 증명, release note (draft)
+  - [05a-plan-checker-core.md](./05a-plan-checker-core.md) — Phase A: `fields.yaml`, `author-check` 인터페이스·추론·F/R/S/X, XML 회귀 말뭉치
+  - [05b-plan-checker-noop.md](./05b-plan-checker-noop.md) — Phase B: `--with`, N1–N4, N 규칙 말뭉치
+  - [05c-plan-skills-component.md](./05c-plan-skills-component.md) — Phase C: `skills` 디렉터리 컴포넌트 (install, uninstall, git-exclude, verify-drift, inventory)
+  - [05d-plan-references.md](./05d-plan-references.md) — Phase D: 유형 참고 5개, `format-xml.md`, `quality.md`, 최신성·예시 개수 테스트
+  - [05e-plan-skill-body.md](./05e-plan-skill-body.md) — Phase E: `SKILL.md`, 구조 테스트, 자기 검사
+  - [05f-plan-repo-docs.md](./05f-plan-repo-docs.md) — Phase F: C6 저장소 쪽 변경과 README
+  - [05g-plan-probes.md](./05g-plan-probes.md) — Phase G: `evals` 효과·명시 호출 프로브와 실행 기록
