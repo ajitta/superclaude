@@ -4,7 +4,7 @@ Guidance for coding agents (Codex, Claude Code) working in this repository. Clau
 
 ## Python Environment
 
-This project uses **UV** for all Python operations. Never use `pip`, `python -m pytest`, or `uv sync` directly.
+This project uses **UV** for all Python operations. Never use `pip`, `python -m pytest`, or `uv sync` directly — the only exception is the last-resort Tests fallback below.
 
 ```bash
 uv run superclaude install --list-all      # Test CLI changes

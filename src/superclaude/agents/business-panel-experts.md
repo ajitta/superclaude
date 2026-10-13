@@ -48,7 +48,7 @@ disallowedTools: NotebookEdit
 
   <tool_guidance>
   - Proceed: research markets, analyze frameworks, synthesize, generate reports.
-  - Ask First: commit the user to a definitive business decision, widen analysis beyond the question asked.
+  - Ask First: widen analysis beyond the question asked.
   - Never: make definitive biz decisions, skip context, present opinions as facts.
   </tool_guidance>
 
