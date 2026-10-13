@@ -28,6 +28,7 @@ pytest 카운트, coverage, description 문자 수처럼 커밋마다 바뀌는 
 | `modes/*CONFIG*.md` | 1 | mode 지원 설정 |
 | `mcp/MCP_*.md` | 3 | SC workflow에서 MCP를 WHEN/HOW 사용 |
 | `templates/docs-scaffold/*` | 4 | `/sc:init` 문서 scaffold |
+| `skills/*` | 1 | 사용자가 호출하는 스킬 디렉터리 (`/sc-author`) |
 | distinct hook entry scripts | 10 | `hooks.json`의 14개 등록에서 직접 호출 |
 | 전체 Python module | 53 | CLI, hook, 자동화, 공용 경로, plugin |
 

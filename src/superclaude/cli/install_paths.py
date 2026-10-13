@@ -21,9 +21,11 @@ from superclaude.utils import detect_scope, same_dir
 # Note: the hook registration is handled separately by install_hooks()
 #
 # Two target kinds. `commands/sc`, `superclaude/*`: SuperClaude-only directories,
-# removed wholesale on uninstall. `agents`, `output-styles`: Claude Code's own
-# content directories, shared with the user's files, so install and uninstall
-# touch only the filenames this release ships (SHARED_TARGET_COMPONENTS).
+# removed wholesale on uninstall. `agents`, `output-styles`, `skills`: Claude
+# Code's own content directories, shared with the user's files, so install and
+# uninstall touch only the names this release ships (SHARED_TARGET_COMPONENTS).
+# `templates` and `skills` install one source subdirectory per unit
+# (DIRECTORY_COMPONENTS); the others install files.
 COMPONENTS = {
     "commands": ("commands", "commands/sc", "Slash commands"),
     "agents": ("agents", "agents", "Agent definitions"),
@@ -36,13 +38,21 @@ COMPONENTS = {
         "superclaude/templates",
         "Doc scaffold templates (consumed by /sc:init, not slash commands)",
     ),
+    "skills": ("skills", "skills", "Skills (user-invoked; /sc-author)"),
 }
 
 
 # Components whose target directory Claude Code reads for the user's own files
-# too. Uninstall removes only the shipped filenames there, and a local-scope
-# install git-excludes them file by file, never the directory.
-SHARED_TARGET_COMPONENTS = ("agents", "output-styles")
+# too. Uninstall removes only the shipped names there, and a local-scope install
+# git-excludes them name by name, never the directory.
+SHARED_TARGET_COMPONENTS = ("agents", "output-styles", "skills")
+
+# Components that ship one subdirectory per unit and copy it whole. For these a
+# shipped name is a directory name, not a .md filename.
+DIRECTORY_COMPONENTS = ("templates", "skills")
+
+# Files a directory component never installs, and drift never compares.
+DIRECTORY_IGNORE = ("__pycache__", "*.pyc", ".DS_Store")
 
 
 def md_names(directory: Path) -> set:
@@ -56,6 +66,27 @@ def md_names(directory: Path) -> set:
 def shipped_md_names(component: str) -> set:
     """Filenames of the .md files a component ships, README excluded."""
     return md_names(_get_source_dir(component))
+
+
+def dir_names(directory: Path) -> set:
+    """Names of a directory's subdirectories, `_` and `.` prefixed ones excluded.
+
+    A missing directory has none.
+    """
+    if not directory.exists():
+        return set()
+    return {
+        d.name
+        for d in directory.iterdir()
+        if d.is_dir() and not d.name.startswith(("_", "."))
+    }
+
+
+def shipped_names(component: str) -> set:
+    """The names a component installs: directories or .md filenames."""
+    if component in DIRECTORY_COMPONENTS:
+        return dir_names(_get_source_dir(component))
+    return shipped_md_names(component)
 
 
 def get_base_path(scope: str = "user") -> Path:
@@ -182,9 +213,9 @@ def _get_target_dir(component: str, base_path: Path) -> Path:
     return base_path / target_subdir
 
 
-# Skills shipped by releases before the skills layer was deleted. SuperClaude
-# ships no skills now, so there is no source dir to diff against — the names are
-# listed literally. Both install and uninstall prune them: without the install
+# Skills shipped by releases before the skills layer was deleted. Their sources
+# are gone, so the names are listed literally; the current `skills` component
+# never ships these names. Both install and uninstall prune them: without the install
 # side, an upgrade leaves the directories in place, the two auto-invocable ones
 # (confidence-check, verbalized-sampling) keep firing with no source left to
 # explain them, and a local-scope install no longer git-excludes them, so they

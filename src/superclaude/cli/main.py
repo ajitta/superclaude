@@ -506,8 +506,9 @@ def verify_drift_cmd(scope: str | None, verbose: bool):
     - DRIFTED: installed file differs from source
     - EXTRA: installed file has no source counterpart
 
-    Coverage: component .md files (incl. core/rules/) and CLAUDE_SC.md.
-    Not checked: templates/ and the merged hooks.json.
+    Coverage: component .md files (incl. core/rules/), every file of the
+    shipped templates and skills, and CLAUDE_SC.md.
+    Not checked: the merged hooks.json.
 
     Examples:
         superclaude verify-drift

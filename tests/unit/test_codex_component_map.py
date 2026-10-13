@@ -24,7 +24,7 @@ from pathlib import Path
 
 import pytest
 
-from superclaude.cli.install_paths import COMPONENTS
+from superclaude.cli.install_paths import COMPONENTS, dir_names
 
 _ROOT = Path(__file__).resolve().parents[2]
 _PKG = _ROOT / "src" / "superclaude"
@@ -84,6 +84,7 @@ def _actual_counts() -> dict[str, int]:
                 if p.is_file()
             ]
         ),
+        "skills/*": len(dir_names(_component_dir("skills"))),
         "distinct hook entry scripts": distinct_hooks,
         "전체 Python module": len(list(_PKG.rglob("*.py"))),
     }
@@ -101,6 +102,7 @@ _ROW_KEYS = {
     "`modes/*CONFIG*.md`": "modes/*CONFIG*.md",
     "`mcp/MCP_*.md`": "mcp/MCP_*.md",
     "`templates/docs-scaffold/*`": "templates/docs-scaffold/*",
+    "`skills/*`": "skills/*",
     "distinct hook entry scripts": "distinct hook entry scripts",
     "전체 Python module": "전체 Python module",
 }

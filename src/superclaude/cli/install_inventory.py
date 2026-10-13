@@ -14,14 +14,17 @@ from superclaude.utils import is_superclaude_hook, settings_filename
 
 from .install_paths import (
     COMPONENTS,
+    DIRECTORY_COMPONENTS,
     SHARED_TARGET_COMPONENTS,
     _get_package_root,
     _get_source_dir,
     _get_target_dir,
+    dir_names,
     find_legacy_skills,
     get_base_path,
     md_names,
     shipped_md_names,
+    shipped_names,
 )
 from .install_settings import (
     _hook_script_id,
@@ -104,17 +107,6 @@ def _hook_identity_counts(hooks_section: dict, superclaude_only: bool) -> Counte
     return counts
 
 
-def _source_dir_names(source_dir: Path) -> set:
-    """Names of the subdirectories a component ships (templates)."""
-    if not source_dir.exists():
-        return set()
-    return {
-        d.name
-        for d in source_dir.iterdir()
-        if d.is_dir() and not d.name.startswith(("_", "."))
-    }
-
-
 def _hook_registration_report(hooks_json: Path, settings_file: Path) -> Dict[str, int]:
     """Compare shipped hook identities against registered ones.
 
@@ -172,14 +164,14 @@ def list_all_components(
         target_dir = _get_target_dir(component, base_path)
 
         # Count source files (excluding README.md and __init__.py).
-        # templates installs per-subdirectory (copytree), so count
-        # subdirectories — not top-level *.md, which templates has none of.
+        # Directory components install per subdirectory (copytree), so count
+        # subdirectories — not top-level *.md, which they have none of.
         #
         # Both sides are counted by *name*, and the installed side is the
         # intersection with the source, so a directory SuperClaude does not ship
         # is never counted as installed.
-        if component == "templates":
-            source_names = _source_dir_names(source_dir)
+        if component in DIRECTORY_COMPONENTS:
+            source_names = dir_names(source_dir)
             installed_count = sum(
                 1 for name in source_names if (target_dir / name).is_dir()
             )
@@ -234,11 +226,12 @@ def list_all_components(
 def _uninstall_shared_component(
     component: str, base_path: Path, dry_run: bool
 ) -> Tuple[int, int, int, List[str]]:
-    """Remove a component's shipped files from a directory the user also writes to.
+    """Remove a component's shipped entries from a directory the user also writes to.
 
-    ``agents/`` and ``output-styles/`` are Claude Code's own content directories:
-    the user's hand-written agents and styles sit next to what SuperClaude
-    installed, so only the filenames this release ships are removed, and the
+    ``agents/``, ``output-styles/`` and ``skills/`` are Claude Code's own content
+    directories: the user's own agents, styles and skills, and other tools'
+    skills, sit next to what SuperClaude installed, so only the names this
+    release ships are removed (files, or whole directories for skills), and the
     directory goes only once it is empty.
 
     Returns:
@@ -249,11 +242,13 @@ def _uninstall_shared_component(
     if not target_dir.exists():
         return 0, 1, 0, [f"⏭️  Not found: {target_dir}/"]
 
+    is_dir = component in DIRECTORY_COMPONENTS
     present = [
         target_dir / name
-        for name in sorted(shipped_md_names(component))
-        if (target_dir / name).is_file()
+        for name in sorted(shipped_names(component))
+        if (target_dir / name).is_dir() == is_dir and (target_dir / name).exists()
     ]
+    kind = "dir(s)" if is_dir else "file(s)"
     if not present:
         return 0, 1, 0, [f"⏭️  No SC {label} found in: {target_dir}/"]
 
@@ -263,13 +258,16 @@ def _uninstall_shared_component(
             0,
             0,
             [
-                f"[DRY-RUN] Would remove: {len(present)} SC {label} file(s) "
+                f"[DRY-RUN] Would remove: {len(present)} SC {label} {kind} "
                 f"from {target_dir}/"
             ],
         )
     try:
-        for f in present:
-            f.unlink()
+        for entry in present:
+            if is_dir:
+                shutil.rmtree(entry)
+            else:
+                entry.unlink()
         if not any(target_dir.iterdir()):
             target_dir.rmdir()
             return 1, 0, 0, [f"✅ Removed: {target_dir}/ (empty after SC cleanup)"]
@@ -278,7 +276,7 @@ def _uninstall_shared_component(
             0,
             0,
             [
-                f"✅ Removed: {len(present)} SC {label} file(s) from {target_dir}/ "
+                f"✅ Removed: {len(present)} SC {label} {kind} from {target_dir}/ "
                 "(preserved non-SC files)"
             ],
         )
@@ -379,7 +377,8 @@ def uninstall_all(
         skipped += 1
 
     # 3. Remove shipped files from the directories Claude Code shares with the
-    #    user's own content (agents/, output-styles/); user-added files stay.
+    #    user's own content (agents/, output-styles/, skills/); user-added
+    #    entries stay.
     for component in SHARED_TARGET_COMPONENTS:
         c_removed, c_skipped, c_failed, c_messages = _uninstall_shared_component(
             component, base_path, dry_run
