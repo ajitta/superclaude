@@ -54,7 +54,7 @@ CC read `description` verbatim to decide delegation. Two parts:
 - **Persona** — noun phrase name the expert ("Expert code reviewer", "Debugging specialist for errors and test failures").
 - **Trigger phrase** — when to delegate, in CC idiom: *"Use proactively for X."*, *"Use immediately after Y."*, *"Use when Z."*
 
-Skip emoji, version tag, colon-prefix keyword list — description is sentence read by parent classifier; write sentence. Legacy `(triggers - kw1, kw2)` shorthand parse but classify less reliable than CC-idiom sentence. One to three sentences total; longer description improve delegation accuracy, cost nothing at runtime.
+Skip emoji, version tag, colon-prefix keyword list — description is sentence read by parent classifier; write sentence. Legacy `(triggers - kw1, kw2)` shorthand parse but classify less reliable than CC-idiom sentence. One to three sentences total; description sit in parent context every turn, so extra words must sharpen when-to-delegate (`content-quality.md` §1).
 
 Canonical patterns (from CC docs):
 - `Expert code review specialist. Proactively reviews code for quality, security, and maintainability. Use immediately after writing or modifying code.`
@@ -197,7 +197,7 @@ When memory enabled, CC auto-inject up to first 200 lines / 25KB of `MEMORY.md` 
 - All multi-word tag names use `snake_case` (`tool_guidance`, `memory_guide`).
 - Short enums: **Numbered** (`1.` ordered procedures: `<actions>`), **Plain with checkbox** (`- [ ]` verification-pending criteria: `<checklist>`), **Labeled** (`- Label:` fixed-set labels: `<tool_guidance>` Proceed/Ask First/Never), **Named** (`- identifier-name:` per-item identifiers: `<focus>`, `<outputs>`, `<gotchas>`, `<memory_guide>`).
 - `<examples>` — compact markdown table with minimal separators `|---|---|` for short uniform rows. For rich illustration (code block, narrative, multi-turn prose), use standalone `<example>` tag — body is free-form prose, not lock to `user:` / `assistant:` shape. `<examples>` and `<example>` are two distinct constructs (see xml-prose-format.md).
-- `<bounds>` — sub-tag form: `<does>` / `<never>` / `<fallback>` (each tag body is prose sentence). `<does>` + `<never>` required; `<fallback>` recommended (agents long-lived; explicit recovery posture high-leverage). Sub-tag form keep `<bounds>` structurally distinct from `<tool_guidance>` (commit `S390` measured Claude conflate the two when both used `- Label:` lines).
+- `<bounds>` — sub-tag form: `<does>` / `<never>` / `<fallback>` (each tag body is prose sentence). `<does>` + `<never>` required; `<fallback>` recommended (agents long-lived; explicit recovery posture high-leverage). Sub-tag form keep `<bounds>` structurally distinct from `<tool_guidance>` (session `S390`, a claude-mem record not in git, measured Claude conflate the two when both used `- Label:` lines).
 - `<handoff>` — 2-3 natural next commands.
 - `note=` attribute restrict to scope / safety / version / reference / quantified constraint (see xml-prose-format.md "Attributes vs. Body").
 - **Voice — third person.** Write "Claude does X", "the agent avoids Y" — never "you" or "I". Body is agent full system prompt (not instructions addressed to model), so it read as behavioral spec for persona.
