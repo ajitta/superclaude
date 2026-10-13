@@ -20,11 +20,11 @@ Works on any file Claude reads as instructions or context. A new document follow
    - Format: `--xml` or `--md` when given. Otherwise an existing file keeps its current format, and a new file takes the format of the project's existing documents of the same type (settled in step 3); md only when the project has none. When those documents disagree, ask.
    - A new command: say that Claude Code recommends a skill for new work (same frontmatter, plus supporting files) and let the person choose.
    - `--xml` for an output style: continue in md and say why in one line (output styles take a plain body).
-2. **Load-set**: decide which documents Claude reads together with this one, and which tool reads it, using "Load set" in `quality.md`. Show the list in one line. The checker's conflict and duplicate rules see only this list, so a document left out of it is a conflict nobody checks.
+2. **Load-set**: decide which documents Claude reads together with this one, and which tool reads it, using "Load set" in `quality.md`. The checker's conflict and duplicate rules see only this list, so a document left out of it is a conflict nobody checks.
 3. **Load** what the work needs:
    - the type's reference (none for generic) and `quality.md`
    - `format-xml.md` when the format is xml
-   - one or two existing documents of the same type in the project, when there are any. Show in one line what will be matched: format (md or XML body), language, terminology, heading or tag shape, section layout, the frontmatter fields actually used.
+   - one or two existing documents of the same type in the project, when there are any, for what the draft will match: format (md or XML body), language, terminology, heading or tag shape, section layout, the frontmatter fields actually used.
    - `format-xml.md` also when those documents have XML bodies and no flag was given.
 4. **Draft** or audit, then the common pass:
    - New document: write it in the project's conventions from step 3. Use the type's fallback template only when the project has no document of that type.
@@ -32,7 +32,7 @@ Works on any file Claude reads as instructions or context. A new document follow
    - Reformat into the chosen format. Reformatting moves sentences; it deletes none.
    - Collect removal candidates sentence by sentence against the load set: the checker's N findings (run step 6 early for them) and the "Judgment questions" in `quality.md`. A new draft gets this pass too, before it is shown: its own sections are part of the load set.
    - Report harm first ("Harm" in `quality.md`), then checker candidates, then judgment candidates, each with its evidence ("Removal evidence"). Leave alone what "Keep" describes.
-   - Show the diff. Write only after the person approves, and drop the candidates they reject.
+   - Show the diff. The message that shows it opens with three lines: **Resolve** (type, path, format, new or existing), **Load set** (each document by path, and which tool reads it), **Match** (the documents step 3 read and what was matched, or "fallback template"). They are the person's only way to catch a wrong path or a document missing from the checks. Write only after the person approves, and drop the candidates they reject.
    - Text embedded in code (a hook's injected string, a prompt inside a script) gets the judgment questions only: the checker does not run on it, and the hand-off says so.
 5. **Neighbors**: compare the name and description with the skills and subagents already listed in this session's context. On an overlap, make the description say when to pick this one instead. Do not open their files for this.
 6. **Check**: run

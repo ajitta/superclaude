@@ -1,9 +1,9 @@
 ---
 feature: authoring-skill
-phase: implementing
+phase: complete
 owner: ajitta
 created: 2026-10-10
-updated: 2026-10-13
+updated: 2026-10-14
 ---
 
 # `sc-author` 스킬
