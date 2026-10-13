@@ -1,6 +1,6 @@
 ---
-status: draft
-revised: 2026-10-13
+status: complete
+revised: 2026-10-14
 ---
 
 # `sc-author` 설계 — C4 검사기

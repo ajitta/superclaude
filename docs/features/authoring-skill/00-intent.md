@@ -21,7 +21,7 @@ Author: ajitta.
 ## Proposed outcome
 `/sc-author`로 만들거나 고친 문서가:
 1. Claude Code가 실제로 읽는 필드만 쓴다
-2. 본문이 한 형식을 따른다: 기본은 Claude Code·Anthropic 공식 권장 구조(`--md`, 사용자 선택), `--xml`이면 SuperClaude식 XML 본문(사용자 요청), 플래그 없이 기존 파일을 고치면 그 파일의 현재 형식
+2. 본문이 한 형식을 따른다: 기본은 Claude Code·Anthropic 공식 권장 구조(`--md`, 사용자 선택), `--xml`이면 SuperClaude식 XML 본문(사용자 요청), 플래그 없이 기존 파일을 고치면 그 파일의 현재 형식 (2026-10-14 D21로 바뀜: 플래그 없는 새 파일은 같은 유형 기존 문서의 형식, 그런 문서가 없을 때만 `--md`)
 3. XML 규칙을 포함한 기계 검사를 통과한다 (사용자: XML 규칙 검증 필요)
 
 배포 단위는 스킬: "skill이 더 좋지 않아?"
