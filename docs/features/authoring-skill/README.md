@@ -17,7 +17,7 @@ SuperClaude를 설치한 사용자 프로젝트에서 Claude가 지시·컨텍�
 - [00-intent.md](./00-intent.md) — 문제, 원하는 결과, 영향 범위, 제약, 미결 질문. 설계 뒤에 04-design.md에 인용된 사용자 말로 다시 구성 (2026-10-13)
 - [03-analysis.md](./03-analysis.md) — no-op 판정 기준: 이 저장소 문서 표본(rules, CLAUDE.md·AGENTS.md·core, agent, auto memory)에서 뽑은 분류, 로드 집합, 기계 판정과 판단 판정, 남길 것, 해로움 검사 (draft)
 - [04-design.md](./04-design.md) — 아키텍처 설계: 스킬 구성, 검사기 인터페이스, `skills` 설치 컴포넌트 복원, 검증 방법. 2026-10-10 인터뷰와 `/sc:review` 결과 반영, 2026-10-13 예시 개수(D11)·최신 모델 가이드(D12), 공통 pass·load-set·검사기 N 규칙(D14–D17) 추가 (draft)
-  - [04a-design-checker.md](./04a-design-checker.md) — C4 검사기 `superclaude author-check`: 인터페이스와 규칙 F1–F7, R1–R3, S1–S2, X1–X7, N1–N4. 크기 때문에 나눔 (draft)
+  - [04a-design-checker.md](./04a-design-checker.md) — C4 검사기 `superclaude author-check`: 인터페이스와 규칙 F1–F7, R1–R3, S1–S2, X1·X2·X7, N1–N4. 크기 때문에 나눔 (draft)
   - [04b-design-common-pass.md](./04b-design-common-pass.md) — 공통 pass(재형식화 + no-op 제거), load-set, 기계 판정과 `quality.md` 판단 항목의 경계 (D14–D17). 크기 때문에 나눔 (draft)
 - [05-plan.md](./05-plan.md) — 구현 plan 색인: 공통 규칙, §9 미결 해소(PowerShell 허용 규칙, Fable 5.1 가이드 URL), phase 순서, 위험, 택하지 않은 안, 완료 증명, release note (draft)
   - [05a-plan-checker-core.md](./05a-plan-checker-core.md) — Phase A: `fields.yaml`, `author-check` 인터페이스·추론·F/R/S/X, XML 회귀 말뭉치

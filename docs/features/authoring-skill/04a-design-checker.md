@@ -43,10 +43,7 @@ superclaude author-check <path> [--type skill|agent|command|output-style|memory|
 | S2 | warning | 대문자 강조어(MUST, ALWAYS, NEVER, CRITICAL, IMPORTANT) 3회 이상 |
 | X1 | error | (xml) 루트 요소가 정확히 하나가 아님, 또는 루트 밖에 맨 텍스트. memory는 루트 앞의 `@path` 줄·HTML 주석 허용 |
 | X2 | error | (xml) 태그 짝 불일치·잘못된 중첩 |
-| X3 | error | (xml) 태그 이름이 `snake_case` 아님 |
-| X4 | error | (xml) 요소 중첩이 4단 초과 (root → section → sub → item) |
-| X5 | warning | (xml) `<example>` 밖 본문에 Markdown 헤더 |
-| X6 | error | (xml) 슬롯 이름 `<should>`·`<avoid>` (모델이 선택 사항으로 읽음) |
+| X3–X6 | — | 삭제 (D18, [05-plan.md](./05-plan.md) "구현 시작 결정"): snake_case·깊이·헤더·슬롯 이름은 이 저장소 관례. 태그 이름·깊이·섹션은 대상 프로젝트의 기존 문서를 따름 |
 | X7 | error | `--format xml`인데 output-style 유형 (D8 범위 밖) |
 | N1 | error · warning | 가리키는 곳 없음. error: Markdown 링크 대상, `path#anchor`의 앵커(대상 헤딩), memory `@path` import 줄 (R1이 잡는 SKILL.md 링크는 제외). warning: 인라인 코드 속 경로(`/`와 확장자 포함, `<`·`*`·`{`·`$` 자리표시자 없음)가 저장소 루트(`git rev-parse --show-toplevel`, 없으면 현재 디렉터리) 기준으로 없음 — 예시 경로일 수 있음 |
 | N2 | error | agent에 `tools`가 있는데 본문 인라인 코드 속 도구 이름(`fields.yaml` `tool_names`)·`mcp__<server>__<tool>`이 `tools`에 없음 — 쓰라는 지시면 실행 불가, 쓰지 말라는 지시면 no-op. `tools`가 없으면(전부 상속) 검사 안 함 |

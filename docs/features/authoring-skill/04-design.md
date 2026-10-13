@@ -30,6 +30,7 @@ revised: 2026-10-13
 | D15 | Resolve 다음 Load-set: 함께 로드되는 문서 = no-op·모순 판정 범위 | [03](./03-analysis.md) §2, 04b §3 |
 | D16 | 검사기 N1–N4: 같은 입력에 같은 답인 것만 | 03 §3.1, [04a](./04a-design-checker.md) |
 | D17 | 판단형 검사는 `quality.md`(D12와 함께), 검사기와 분리 | 03 §3.2–3.4, 04b §4–5 |
+| D18–D20 | XML 구조 규칙만 · 프로젝트 관례 우선 · rules는 references의 원본 아님 | [05-plan.md](./05-plan.md) "구현 시작 결정" |
 
 - 리뷰 전 설계(커밋 `49e0402c`)의 "XML·품질 규칙 원본을 배포 파일로 옮기고 저장소 rules가 `@import`" 안은 D10으로 폐기
 
@@ -182,7 +183,7 @@ description 작성 기준 (`quality.md`, 출처 충돌의 해소): 능력은 몇
 
 ### C4. 검사기 `superclaude author-check`
 
-인터페이스(인자, 유형·형식 추론, `--with`, 태그 인식, 출력, exit 코드)와 규칙 F1–F7, R1–R3, S1–S2, X1–X7, N1–N4: [04a-design-checker.md](./04a-design-checker.md)
+인터페이스(인자, 유형·형식 추론, `--with`, 태그 인식, 출력, exit 코드)와 규칙 F1–F7, R1–R3, S1–S2, X1·X2·X7, N1–N4: [04a-design-checker.md](./04a-design-checker.md)
 
 ### C5. `skills` 설치 컴포넌트
 
@@ -207,7 +208,7 @@ description 작성 기준 (`quality.md`, 출처 충돌의 해소): 능력은 몇
 
 | 파일 | 변경 |
 |---|---|
-| `.claude/rules/skill-authoring.md` (신규) | 저장소 규칙 "콘텐츠 유형마다 `*-authoring.md`" 준수. SuperClaude가 배포하는 스킬의 규칙: 이름 `sc-` 접두어, CC 전용 필드 허용, references는 사용자 프로젝트 독자용으로 독립 작성(D10), `content-quality.md`·`xml-prose-format.md`의 원칙을 바꾸면 `quality.md`·`format-xml.md`에 같은 변경이 필요한지 확인, `/sc:prompt`에 새 모델을 넣으면 `quality.md` 모델별 차이도 갱신 (C7) |
+| `.claude/rules/skill-authoring.md` (신규) | 저장소 규칙 "콘텐츠 유형마다 `*-authoring.md`" 준수. SuperClaude가 배포하는 스킬의 규칙: 이름 `sc-` 접두어, CC 전용 필드 허용, references는 사용자 프로젝트 독자용으로 독립 작성(D10), `/sc:prompt`에 새 모델을 넣으면 `quality.md` 모델별 차이도 갱신 (C7) |
 | `.claude/rules/schemas.yaml` 주석 | `forbidden_command_fields`(SuperClaude 정책)와 `fields.yaml`(Claude Code가 지원하는 필드)의 관계 한 줄 |
 | `AGENTS.md` Architecture | 설치되는 콘텐츠 목록 "(commands, agents, modes, output styles, MCP docs, core config)"에 skills 추가 |
 | `agent-authoring.md:112`, `install_paths.py:186` | "ships no skills" 문구 갱신 |
@@ -222,7 +223,7 @@ description 작성 기준 (`quality.md`, 출처 충돌의 해소): 능력은 몇
 | 대상 | 방법 | 완료 조건 |
 |---|---|---|
 | 검사기 규칙 | 단위 테스트: 규칙 코드마다 위반 픽스처 1 + 통과 픽스처 1 | 모든 코드가 의도한 등급으로 발화 |
-| 검사기 오탐 | 회귀 말뭉치: 배포되는 `src/superclaude/agents/*.md`, `commands/*.md`에 `--format xml`로 실행 | X1-X6 error 0 (산문 속 `<3`·`<5KB` 포함 문서가 이미 있음: `agents/project-manager.md:77`, `commands/pm.md:43`, `commands/index-repo.md:18`) |
+| 검사기 오탐 | 회귀 말뭉치: 배포되는 `src/superclaude/agents/*.md`, `commands/*.md`에 `--format xml`로 실행 | X1·X2 error 0 (산문 속 `<3`·`<5KB` 포함 문서가 이미 있음: `agents/project-manager.md:77`, `commands/pm.md:43`, `commands/index-repo.md:18`) |
 | N 규칙 (D15·D16) | 같은 문장 쌍을 `--with` 안팎에 두기 + 위 말뭉치에 N1·N2 | N3·N4는 `--with` 안에서만 발화, 말뭉치 error는 실제로 끊긴 것만 |
 | 판단 항목 (D17) | `quality.md`에 판정 질문·남길 것·해로움 절 | 누락 0 |
 | 스킬 구조 | 단위 테스트 + 자기 검사: `author-check`를 배포 스킬 자신에 실행 | error 0 |
@@ -344,7 +345,7 @@ plan에서 확인:
 | `--xml` / `--md` 파라미터 | C2 Resolve, §6, D8 |
 | 스킬로 배포, 명시 호출 | C1, C2 frontmatter, C5, D4 |
 | references는 rules와 다르게 독립 작성 | C1, C6, D10 |
-| XML 규칙 검증 | C4 X1-X7, C7 |
+| XML 규칙 검증 | C4 X1·X2·X7 (D18), C7 |
 | 예시는 필요할 때 3–5개 | D11, C1, C3, C7 |
 | 최신 Fable·Opus·Sonnet 가이드, stale 금지 | D12, §1, C1, C3, C6, C7 |
 | Claude가 지시·컨텍스트로 읽는 모든 문서 | D13, D14, §2, §6, 04b §2 |

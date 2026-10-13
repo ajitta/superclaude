@@ -18,6 +18,7 @@ revised: 2026-10-13
 - `src/superclaude/` 아래 `.py`를 더하는 phase는 같은 커밋에서 `docs/codex/prompting_session_raw/02_component_and_delivery_map.md` §1 "전체 Python module" 행을 다시 센다: `uv run python -c "from pathlib import Path; print(len(list(Path('src/superclaude').rglob('*.py'))))"` (gotcha `codex-module-count-drift`)
 - 배포 콘텐츠(SKILL.md, references)는 영어로 쓴다 (04-design C2: 배포 콘텐츠는 언어 중립)
 - 배포 콘텐츠는 저장소 파일을 링크하지 않는다 (gotcha `install-tree-boundary`). 저장소 `.claude/rules/`는 고치지 않고 import하지 않는다 (D10). 예외: C6에서 정한 `skill-authoring.md` 신설, `agent-authoring.md:112` 문구, `schemas.yaml` 주석
+- 배포 콘텐츠는 저장소 rules의 형식(압축 문체, 섹션 순서, 골격)과 내용을 옮기지 않는다. 기준은 설치된 각 프로젝트 (D18–D20)
 - `tests/unit/test_shipped_content_server_neutral.py`의 금지어(`serena`, `write_memory`, `read_memory`, `list_memories`, `find_symbol`, `get_symbols_overview`, `find_referencing_symbols`)는 references 예시에도 쓰지 않는다. N2 예시의 MCP 도구 이름은 `mcp__example__lookup` 같은 가상 이름으로
 - 외부 문서 조회(D12)는 구현 시점에 다시 하고, 조회일을 `sources`에 남긴다. 기억한 값으로 필드 목록을 채우지 않는다
 
@@ -25,6 +26,16 @@ revised: 2026-10-13
 
 - PowerShell 허용 규칙 문법: `PowerShell(superclaude author-check *)`. 근거: `code.claude.com/docs/en/permissions` "PowerShell" 절, "PowerShell permission rules use the same shape as Bash rules" (2026-10-13 조회). SKILL.md `allowed-tools`에 `Bash(superclaude author-check *)`와 함께 둔다
 - Fable 5.1 가이드 URL: `https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-fable-5-1` (2026-10-13 조회, 제목 "Prompting Claude Fable 5.1"). Opus 5.5·Sonnet 5.5와 같은 경로 형식
+
+## 구현 시작 결정 (2026-10-13)
+
+`/sc:implement` 호출 시 사용자: "참조하는 rules파일들의 formatter와 내용을 그냥 가져오면 안된다. rules파일들은 이 프로젝트에 종속된 파일들이고 만들고자하는 것은 설치되는 각각의 프로젝트를 기준으로 맥락이 맞게 생성시키는 것이다"
+
+| # | 결정 | 바뀌는 곳 |
+|---|---|---|
+| D18 | `--xml` 검사는 어떤 XML 본문에도 성립하는 구조 규칙만: X1(루트 하나), X2(태그 짝), X7(output-style 제외). X3–X6(snake_case, 4단 깊이, `<example>` 밖 헤더, `<should>`·`<avoid>`)은 이 저장소 `xml-prose-format.md`의 관례라 삭제. 태그 이름·깊이·섹션은 대상 프로젝트의 기존 문서를 따름 (사용자 선택 "구조 규칙만") | 04a 규칙표, 05a, 05d `format-xml.md` |
+| D19 | 프로젝트 관례 우선: Load 단계에서 같은 유형의 기존 문서 1–2개와 load-set 문서를 읽고 언어·용어·헤딩/태그 모양·섹션 구성을 맞춤. references 템플릿은 프로젝트에 같은 유형 문서가 없을 때만 (사용자 선택 "프로젝트 관례 우선") | 04-design C2 3·4단계, 05d 템플릿 절, 05e |
+| D20 | references의 출처는 외부 문서(`sources`)와 이 설계의 결정뿐. 저장소 rules(`content-quality.md`, `xml-prose-format.md`, `*-authoring.md`, core rules)의 절 구성·문체·용어를 옮기지 않음. SuperClaude 고유 어휘(`/sc:` 명령, `<component>`·`<handoff>` 골격, R 코드, `RULES_*`, `CLAUDE_SC`)가 배포 references에 없음을 테스트로 고정. `skill-authoring.md`의 "rules를 바꾸면 references도 확인" 동기화 줄은 삭제 (rules가 references의 원본이 아님) | 04-design C3 `quality.md` 행·C6 첫 행, 05d, 05f |
 
 ## Phases
 
@@ -72,7 +83,7 @@ revised: 2026-10-13
    - `superclaude verify-drift --scope local` → exit 0, `skills` 행 OK
    - `superclaude uninstall --scope local` → `.claude/skills/sc-author/` 없음, `.claude/skills/other/SKILL.md` 남음
 5. `uv run python evals/run_eval.py --canary --task sc-author-skill --task sc-author-plain` → `sc-author-skill`의 `author-check` 확인 통과, `sc-author-plain`의 `author-check` 미실행 확인 통과. 결과는 05g "Results"에 기록
-6. (사용자, Claude Code 재시작 후) 실제 세션에서 `/sc-author agent <설명>` 한 번 → Resolve 한 줄, Load-set 한 줄, diff 승인 요청, `author-check` 실행이 보임
+6. (사용자, Claude Code 재시작 후) 실제 세션에서 `/sc-author agent <설명>` 한 번 → Resolve 한 줄, Load-set 한 줄, 같은 유형 기존 문서를 읽음(있으면, D19), diff 승인 요청, `author-check` 실행이 보임
 
 ## Release note (다음 version-bump 커밋의 CHANGELOG `### Added`)
 

@@ -17,7 +17,8 @@ Index: [05-plan.md](./05-plan.md). 계약: [04-design.md](./04-design.md) C6 표
 - [ ] Step 2: 내용 (C6 첫 행)
   - SuperClaude가 배포하는 스킬: 이름 `sc-` 접두어(공유 `.claude/skills/`에서 충돌 방지), 사이드 이펙트·메타 스킬은 `disable-model-invocation: true`, CC 전용 frontmatter 허용
   - references는 사용자 프로젝트 독자용으로 독립 작성, 이 저장소 rules를 링크·import하지 않음 (D10, `install-tree-boundary`)
-  - 동기화 확인: `content-quality.md`·`xml-prose-format.md`의 원칙을 바꾸면 `references/quality.md`·`format-xml.md`에 같은 변경이 필요한지 확인. `/sc:prompt`에 모델을 넣으면 `quality.md` Model differences 행도 (`tests/unit/test_sc_author_skill.py`가 red로 알림)
+  - references의 원본은 각 파일 `sources`의 외부 문서. 이 저장소 rules(`content-quality.md`, `xml-prose-format.md` 등)는 원본이 아니므로 rules를 바꿔도 references를 따라 바꾸지 않는다 (D20). 생성 결과의 기준은 설치된 각 프로젝트의 관례 (D19)
+  - `/sc:prompt`에 모델을 넣으면 `quality.md` Model differences 행도 갱신 (`tests/unit/test_sc_author_skill.py`가 red로 알림)
   - `fields.yaml`이 검사기 데이터라는 점: 필드를 바꾸면 `uv run pytest tests/unit/test_author_check.py`
   - 구조 테스트 위치: `tests/unit/test_sc_author_skill.py`, `tests/unit/test_author_check.py`
 

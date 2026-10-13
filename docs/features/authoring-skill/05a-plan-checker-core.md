@@ -51,7 +51,7 @@ Index: [05-plan.md](./05-plan.md). 계약: [04a-design-checker.md](./04a-design-
 **Files:** Modify: `src/superclaude/cli/author_check.py` | Test: `tests/unit/test_author_check.py`
 
 - [ ] Step 9: 실패하는 테스트 `TestRules`
-  - 모듈 상수 `RULES: dict[str, str]` (코드 → 기본 등급). 이 phase에서는 F1–F7, R1–R3, S1–S2, X1–X7
+  - 모듈 상수 `RULES: dict[str, str]` (코드 → 기본 등급). 이 phase에서는 F1–F7, R1–R3, S1–S2, X1, X2, X7 (X3–X6은 D18로 없음)
   - 테스트 표 `CASES = {code: Case(rel_path, type, format, bad, good)}`: 규칙 코드마다 위반 텍스트 1 + 통과 텍스트 1 (C7 "규칙 코드마다 위반 픽스처 1 + 통과 픽스처 1"). `tmp_path`에 써서 실행
   - `test_bad_fires`: bad → 그 코드가 `RULES` 등급으로 나옴. `test_good_silent`: good → 그 코드가 안 나옴
   - `test_every_rule_has_case`: `set(CASES) == set(RULES)` → 새 코드를 추가하고 케이스를 빠뜨리면 red
@@ -59,8 +59,7 @@ Index: [05-plan.md](./05-plan.md). 계약: [04a-design-checker.md](./04a-design-
     - F6: description + when_to_use 1,536자 통과, 1,537자 error
     - S2: 대문자 강조어 2회 통과, 3회 warning
     - X1: memory xml에서 루트 앞 `@path` 줄·HTML 주석은 통과. skill xml에서 루트 밖 맨 텍스트는 error
-    - X4: root → section → sub → item(4단) 통과, 5단 error
-    - X5: `<example>` 안의 `#` 헤더는 통과
+    - X2: 코드 펜스·인라인 코드 속 짝 없는 태그는 통과 (마스킹), 산문 속 `<3`은 통과
     - R1: SKILL.md 본문의 `${CLAUDE_SKILL_DIR}/references/x.md`는 스킬 디렉터리로 치환해 존재 확인 (04a 링크 해석)
     - R2·R3는 SKILL.md가 링크한 참고 파일을 열어서 판정 (깊이 1까지만 따라감)
 - [ ] Step 10: `uv run pytest tests/unit/test_author_check.py -k Rules -v` → FAIL
@@ -87,7 +86,7 @@ Index: [05-plan.md](./05-plan.md). 계약: [04a-design-checker.md](./04a-design-
 
 **Files:** Create: `tests/unit/test_author_check_corpus.py`
 
-- [ ] Step 17: `src/superclaude/agents/*.md`, `src/superclaude/commands/*.md`(README 제외)를 `--format xml`로 검사해 X1–X6 error가 0인지 확인하는 parametrize 테스트. 이미 산문 속 `<3`·`<5KB`가 있는 파일: `agents/project-manager.md:77`, `commands/pm.md:43`, `commands/index-repo.md:18` (04-design C7)
+- [ ] Step 17: `src/superclaude/agents/*.md`, `src/superclaude/commands/*.md`(README 제외)를 `--format xml`로 검사해 X1·X2 error가 0인지 확인하는 parametrize 테스트. 이미 산문 속 `<3`·`<5KB`가 있는 파일: `agents/project-manager.md:77`, `commands/pm.md:43`, `commands/index-repo.md:18` (04-design C7)
 - [ ] Step 18: `uv run pytest tests/unit/test_author_check_corpus.py -v`
   - 실패하면 줄을 열어 원인을 가린다: 검사기 오탐 → 검사기 수정 / 콘텐츠가 실제로 규칙 위반 → 콘텐츠는 고치지 않고 그 파일·코드를 테스트의 `KNOWN` 표에 이유와 함께 고정하고 `## Deviations`에 기록
 - [ ] Step 19: PASS

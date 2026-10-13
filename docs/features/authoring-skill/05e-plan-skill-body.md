@@ -31,8 +31,8 @@ Index: [05-plan.md](./05-plan.md). 계약: [04-design.md](./04-design.md) C2(fro
 - [ ] Step 6: 본문 절차 (C2 1–7, 각 단계는 라벨로 시작하는 번호 목록. 판단 기준은 참고 파일로 넘기고 본문에는 절차만)
   1. Resolve: type(인자 → 문맥 → 모호하면 질문, 5종 밖이면 `generic`), path(`fields.yaml` `location` + scope, 기본 project), format(`--xml`|`--md`|미지정 → 기존 파일은 현재 형식, 새 파일은 md). `command` + 새 파일 → skill 권장 안내 후 선택받기. `--xml` + output-style → md로 진행하고 이유 한 줄
   2. Load-set: `quality.md` "Load set"으로 함께 로드되는 문서와 읽는 쪽을 정해 한 줄로 보여 줌. 이 목록이 N3·N4의 유일한 입력이라는 이유를 한 줄로 (04b §7)
-  3. Load: `references/<type>.md`(generic이면 없음) + `quality.md` + (xml이면) `format-xml.md`
-  4. Draft | Audit → 공통 pass: 재형식화(아무것도 지우지 않음) → 후보 수집(검사기 N + `quality.md` Judgment questions) → 보고 순서 Harm → 기계 후보 → 판단 후보 → diff → 승인 후 쓰기. 코드 안 문구(hook 주입 문자열 등)는 판단 항목만 (04b §2)
+  3. Load: `references/<type>.md`(generic이면 없음) + `quality.md` + (xml이면) `format-xml.md` + 프로젝트의 같은 유형 기존 문서 1–2개(있으면, D19). 맞출 관례(언어, 용어, 헤딩/태그 모양, 섹션 구성)를 한 줄로 보여 줌
+  4. Draft | Audit → 공통 pass: 새 문서는 프로젝트 관례로 쓰고 템플릿은 같은 유형 문서가 없을 때만 (D19). 재형식화(아무것도 지우지 않음) → 후보 수집(검사기 N + `quality.md` Judgment questions) → 보고 순서 Harm → 기계 후보 → 판단 후보 → diff → 승인 후 쓰기. 코드 안 문구(hook 주입 문자열 등)는 판단 항목만 (04b §2)
   5. Neighbors: 컨텍스트에 이미 있는 스킬·에이전트 목록으로 이름·트리거 겹침 확인, 파일은 읽지 않음
   6. Check: `superclaude author-check <path> --type <t> --format <f> --with <load-set …>` → error 수정 → 재실행, 상한 3회. 넘으면 남은 error를 보고하고 멈춤. 명령이 없으면(`command not found`) 기계 검사를 하지 않았다고 Hand-off에 쓴다
   7. Hand-off: 새 세션 시험 프롬프트 2–3개 (발동해야 할 것 1–2 + 비슷하지만 발동하면 안 되는 것 1). 명시 호출 전용 문서면 호출 예시만. 기계 검사를 못 한 항목을 밝힘
