@@ -18,6 +18,7 @@ from collections.abc import Iterable
 from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
+from urllib.parse import unquote
 
 import yaml
 
@@ -54,7 +55,19 @@ RULES = {
 
 # A tag is `<name ...>`, `</name>` or `<name/>`. Prose like `<3`, `<5KB` or `<=`
 # is text. Tag names follow the project, so hyphens are allowed.
-TAG_RE = re.compile(r"<(/?)([a-z][a-z0-9_-]*)(\s[^<>]*?)?(/?)>")
+TAG_RE = re.compile(r"<(/?)([A-Za-z][A-Za-z0-9_-]*)(\s[^<>]*?)?(/?)>")
+
+# A Markdown file may open with HTML (a centered logo, a badge row). Those
+# tags do not make it an XML body, and HTML void elements never close.
+_HTML_TAGS = frozenset(
+    "a abbr article aside audio b blockquote br center code details div em "
+    "figcaption figure footer h1 h2 h3 h4 h5 h6 header hr i img kbd li main "
+    "nav ol p picture pre section small source span strong sub summary sup "
+    "table tbody td th thead tr u ul video".split()
+)
+_HTML_VOID = frozenset(
+    "area base br col embed hr img input link meta param source track wbr".split()
+)
 
 _FENCE_RE = re.compile(r"^\s*(`{3,}|~{3,})")
 _INLINE_CODE_RE = re.compile(r"(`+)(.+?)\1")
@@ -154,12 +167,26 @@ def infer_format(body: str) -> str:
         stripped = line.strip()
         if not stripped or _IMPORT_LINE_RE.match(line):
             continue
-        return "xml" if TAG_RE.match(stripped) else "md"
+        tag = TAG_RE.match(stripped)
+        return "xml" if tag and tag.group(2).lower() not in _HTML_TAGS else "md"
     return "md"
 
 
+class NotTextError(ValueError):
+    """The file is not UTF-8 text, so no rule can read it."""
+
+
+def read_text(path: Path) -> str:
+    """UTF-8 text with a leading BOM dropped and newlines normalized."""
+    try:
+        text = path.read_bytes().decode("utf-8-sig")
+    except UnicodeDecodeError as exc:
+        raise NotTextError(f"{path}: not UTF-8 text ({exc.reason})") from exc
+    return text.replace("\r\n", "\n")
+
+
 def _split(path: Path) -> _Doc:
-    text = path.read_text(encoding="utf-8").replace("\r\n", "\n")
+    text = read_text(path)
     lines = text.split("\n")
     if lines[0].strip() != "---":
         return _Doc(path, text, False, None, None, {}, text, 1)
@@ -297,7 +324,8 @@ def _links(text: str, start: int) -> list[tuple[str, int]]:
             if target and not re.match(r"^[a-z][a-z0-9+.-]*:", target, re.I):
                 found.append((target, number))
         for match in _SKILL_DIR_REF_RE.finditer(line):
-            found.append(("${CLAUDE_SKILL_DIR}/" + match.group(1), number))
+            target = match.group(1).rstrip(".,;:")
+            found.append(("${CLAUDE_SKILL_DIR}/" + target, number))
     return found
 
 
@@ -309,6 +337,7 @@ def _resolve(target: str, base: Path, skill_dir: Path) -> Path:
 
 def _check_refs(doc: _Doc, report: _Report) -> None:
     skill_dir = doc.path.parent
+    opened = set()
     for target, line in _links(doc.body, doc.body_start):
         resolved = _resolve(target, skill_dir, skill_dir)
         if not resolved.exists():
@@ -316,11 +345,13 @@ def _check_refs(doc: _Doc, report: _Report) -> None:
             continue
         if resolved.suffix != ".md" or resolved == doc.path:
             continue
-        _check_reference_file(resolved, skill_dir, report)
+        if resolved.resolve() not in opened:
+            opened.add(resolved.resolve())
+            _check_reference_file(resolved, skill_dir, report)
 
 
 def _check_reference_file(path: Path, skill_dir: Path, report: _Report) -> None:
-    text = path.read_text(encoding="utf-8").replace("\r\n", "\n")
+    text = read_text(path)
     for target, line in _links(text, 1):
         resolved = _resolve(target, path.parent, skill_dir).resolve()
         if resolved != path.resolve() and resolved.exists():
@@ -404,8 +435,15 @@ def _check_xml(doc: _Doc, type_: str, report: _Report) -> None:
     # `docs/<slug>/`, `--scope <glob>` or "see the <storage> section" is text, not
     # markup: an opening tag in the middle of a line is an element only when it
     # closes on that same line. Block elements open at the start of a line.
+    # An HTML void element (`<img>`, `<br>`) never closes, unless the body uses
+    # the same name as a real element (`<meta>…</meta>`).
+    closed = {m.group(2) for m in TAG_RE.finditer(body) if m.group(1)}
+
+    def is_void(name: str) -> bool:
+        return name.lower() in _HTML_VOID and name not in closed
+
     def is_placeholder(match: re.Match) -> bool:
-        if match.group(1) or match.group(4):
+        if match.group(1) or match.group(4) or is_void(match.group(2)):
             return False
         line_start = body.rfind("\n", 0, match.start()) + 1
         if not body[line_start : match.start()].strip():
@@ -424,6 +462,7 @@ def _check_xml(doc: _Doc, type_: str, report: _Report) -> None:
         if not stack:
             outside.append((cursor, match.start()))
         closing, name, selfclose = match.group(1), match.group(2), match.group(4)
+        selfclose = selfclose or is_void(name)
         line = line_of(match.start())
         if closing:
             if stack and stack[-1][0] == name:
@@ -607,14 +646,25 @@ def _check_duplicates(doc: _Doc, others: list[_Doc], report: _Report) -> None:
             seen[text] = f"line {line}"
 
 
-def _headings(path: Path) -> set[str]:
-    text = mask_code(path.read_text(encoding="utf-8"), inline=False)
-    slugs = set()
+def _headings(path: Path) -> set[str] | None:
+    """Anchor slugs as GitHub makes them: a repeated heading gets `-1`, `-2`.
+
+    None when the file cannot be read as text: its anchors go unchecked.
+    """
+    try:
+        text = mask_code(read_text(path), inline=False)
+    except NotTextError:
+        return None
+    slugs: set[str] = set()
+    seen: dict[str, int] = {}
     for line in text.split("\n"):
         heading = _HEADING_RE.match(line)
         if heading:
             title = heading.group(2).lower()
-            slugs.add(re.sub(r"[^\w\- ]", "", title).replace(" ", "-"))
+            slug = re.sub(r"[^\w\- ]", "", title).replace(" ", "-")
+            count = seen.get(slug, 0)
+            seen[slug] = count + 1
+            slugs.add(f"{slug}-{count}" if count else slug)
     return slugs
 
 
@@ -643,24 +693,42 @@ def _check_pointers(doc: _Doc, type_: str, report: _Report) -> None:
             target = match.group(1)
             if re.match(r"^[a-z][a-z0-9+.-]*:", target, re.I):
                 continue
-            file_part, _, anchor = target.partition("#")
-            linked = (base / file_part) if file_part else doc.path
+            file_part, _, anchor = (unquote(p) for p in target.partition("#"))
+            if file_part.startswith("/"):
+                linked = _repo_root(base.resolve()) / file_part.lstrip("/")
+            else:
+                linked = (base / file_part) if file_part else doc.path
             if not linked.exists():
                 if type_ != "skill":  # R1 reports these for a skill
                     report.add("N1", number, f"`{file_part}` does not exist")
                 continue
-            if anchor and linked.suffix == ".md" and anchor not in _headings(linked):
+            slugs = _headings(linked) if anchor and linked.suffix == ".md" else None
+            if slugs is not None and anchor not in slugs:
                 report.add("N1", number, f"`#{anchor}` has no matching heading")
         if type_ == "memory":
-            for match in _IMPORT_TOKEN_RE.finditer(line):
-                target = match.group(1)
+            whole = _IMPORT_LINE_RE.match(line)
+            targets = (
+                [(line.strip()[1:], "error")]
+                if whole
+                else [
+                    (m.group(1), "warning")
+                    for m in _IMPORT_TOKEN_RE.finditer(line)
+                    if "/" in m.group(1)
+                ]
+            )
+            for target, severity in targets:
                 resolved = (
                     Path(target).expanduser()
                     if target.startswith("~")
                     else base / target
                 )
                 if not resolved.exists():
-                    report.add("N1", number, f"import `@{target}` does not exist")
+                    report.add(
+                        "N1",
+                        number,
+                        f"import `@{target}` does not exist",
+                        severity=severity,
+                    )
     root = None
     code_view = mask_code(doc.body, inline=False)
     for number, line in enumerate(code_view.split("\n"), doc.body_start):
@@ -670,7 +738,7 @@ def _check_pointers(doc: _Doc, type_: str, report: _Report) -> None:
             if not _CODE_PATH_RE.match(token) or token.startswith(".."):
                 continue
             root = root or _repo_root(base.resolve())
-            if not (root / token).exists():
+            if not ((root / token).exists() or (base / token).exists()):
                 report.add(
                     "N1",
                     number,

@@ -611,18 +611,26 @@ def author_check_cmd(
     nothing, tools an agent lacks; with --with, conflicting or repeated
     instructions across the documents loaded together).
 
-    Exit: 0 no errors, 1 errors found, 2 usage error.
+    Exit: 0 no errors, 1 errors found, 2 usage error or a file that is not
+    UTF-8 text.
 
     Examples:
         superclaude author-check .claude/agents/reviewer.md
         superclaude author-check .claude/skills/deploy/SKILL.md --format xml
         superclaude author-check CLAUDE.md --with .claude/rules/testing.md
     """
-    from .author_check import check, summary
+    from .author_check import NotTextError, check, summary
 
-    findings = check(
-        Path(path), type_=type_, fmt=fmt, with_paths=[Path(p) for p in with_paths]
-    )
+    try:
+        findings = check(
+            Path(path),
+            type_=type_,
+            fmt=fmt,
+            with_paths=[Path(p) for p in with_paths],
+        )
+    except NotTextError as exc:
+        click.echo(f"Error: {exc}", err=True)
+        sys.exit(2)
     for finding in findings:
         click.echo(finding.render())
     click.echo(summary(findings))

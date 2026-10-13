@@ -1,6 +1,6 @@
 ---
 status: complete
-revised: 2026-10-13
+revised: 2026-10-14
 ---
 
 # `sc-author` 스킬 Implementation Plan
@@ -86,8 +86,31 @@ revised: 2026-10-13
 5. `uv run python evals/run_eval.py --canary --task sc-author-skill --task sc-author-plain` → `sc-author-skill`의 `author-check` 확인 통과, `sc-author-plain`의 `author-check` 미실행 확인 통과. 결과는 05g "Results"에 기록
 6. (사용자, Claude Code 재시작 후) 실제 세션에서 `/sc-author agent <설명>` 한 번 → Resolve 한 줄, Load-set 한 줄, 같은 유형 기존 문서를 읽음(있으면, D19), diff 승인 요청, `author-check` 실행이 보임
 
+## Review (2026-10-14)
+
+`/sc:review`: an independent reviewer read `764bead8..62ccdca2` against this plan, with no Critical findings. `/sc:improve --loop` then fixed them in one iteration; the second iteration only added this record. Same session, user additions: (a) remove anything in the skill that holds only inside this repository, (b) skip `author-check` when `superclaude` is absent, (c) suggest an audit of the result (`/doctor prompt-audit <path>`).
+
+| # | Finding | Outcome |
+|---|---|---|
+| 1 | D21 missed the description, README and release note | reworded in all three |
+| 2 | N1 false errors: duplicate-heading anchors, percent-encoded targets, root-relative links, `@name` mentions | GitHub slugs with `-1` suffixes, `unquote`, `/path` from the repo root; a mid-sentence `@token` counts only when path-like, as a warning |
+| 3 | Markdown that opens with HTML was inferred as XML (`README.md`: 8 errors) | first tag an HTML element → md; void elements close themselves unless the body closes that name (`<meta>…</meta>` in `commands/sc.md`); `README.md` now 0 errors |
+| 4 | Check step "fix each error" vs the approval invariant (04b §1) — also in 04-design C2 step 6 | only F/R/X errors are fixed directly; N findings go back to step 4 as candidates. This overrides 04-design C2 step 6 |
+| 5 | non-UTF-8 input crashed (traceback, exit 1) | `NotTextError` → message, exit 2; a linked file that is not text leaves its anchors unchecked |
+| 6 | R1 took trailing punctuation | stripped |
+| 7 | R2/R3 repeated per link | once per file |
+| 8 | inline-code paths only from the repo root | also from the document's folder |
+| 9 | uppercase tag names ignored | `TAG_RE` takes any case (D18) |
+| 10 | UTF-8 BOM hid the frontmatter | read as `utf-8-sig` |
+| 11 | a file named `skills/sc-author` was "skipped" | fails with "exists and is not a directory", with or without `--force` |
+| 12 | test gaps | expected line per rule case, uninstall over a symlink (Linux CI), git-missing fallback, docstring corrected |
+| 13 | skill counts in always-loaded docs | "only skill" / "The one skill" reworded |
+| (a) | repo-only references in the skill | none found; the vocabulary test now covers SKILL.md too (`src/superclaude`, `docs/features`, gotchas paths added) |
+| (b) | no `superclaude` | step 6 is skipped and the hand-off says so |
+| (c) | audit of the result | hand-off suggests `/doctor prompt-audit <path>` (CC memory docs: takes a file or directory, reports, changes nothing until asked) and, for a skill whose check was skipped, `claude plugin validate <skills directory>` (CC skills docs: finds frontmatter that does not parse). `/skill-doctor` only lists unused skills, so it is not suggested |
+
 ## Release note (다음 version-bump 커밋의 CHANGELOG `### Added`)
 
-- `/sc-author` skill: write or revise any file Claude reads as instructions (skills, subagents, slash commands, output styles, CLAUDE.md, AGENTS.md, `.claude/rules`, and other instruction docs). It reformats the body (`--md` default, `--xml` for XML bodies), proposes no-op and harmful sentences for removal with evidence, and asks before writing. User-invoked only.
+- `/sc-author` skill: write or revise any file Claude reads as instructions (skills, subagents, slash commands, output styles, CLAUDE.md, AGENTS.md, `.claude/rules`, and other instruction docs). It reformats the body in the project's own format for that type (`--md` or `--xml` to choose), proposes no-op and harmful sentences for removal with evidence, and asks before writing. User-invoked only.
 - `superclaude author-check <path>`: validates frontmatter fields, references, XML structure and broken pointers in such files. Exit 1 on errors.
 - Installs now include a `skills` component (`.claude/skills/sc-author/`). Uninstall removes only that directory; other skills stay. `verify-drift` now also checks installed templates.

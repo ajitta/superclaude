@@ -68,7 +68,7 @@ User-facing workflow entry points accessible as `/sc:*` slash commands. Managed 
 
 ### skills/ — WRITE INSTRUCTION DOCS
 
-Claude Code skills, one directory each: `SKILL.md` plus the reference files it links. Installed to `<scope>/skills/<name>/`, the directory Claude Code scans natively and shares with the user's own skills, so install, uninstall and drift touch only the directory names SuperClaude ships. The one skill, `sc-author`, is user-invoked (`disable-model-invocation: true`) and runs the `superclaude author-check` validator.
+Claude Code skills, one directory each: `SKILL.md` plus the reference files it links. Installed to `<scope>/skills/<name>/`, the directory Claude Code scans natively and shares with the user's own skills, so install, uninstall and drift touch only the directory names SuperClaude ships. `sc-author` is user-invoked (`disable-model-invocation: true`) and runs the `superclaude author-check` validator.
 
 **Contract:** References are written for the projects SuperClaude is installed into, from Anthropic's published guidance listed in each file's `sources` — not from `.claude/rules/`, which is this repository's own convention. Rules: `.claude/rules/skill-authoring.md`.
 

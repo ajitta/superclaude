@@ -191,6 +191,12 @@ def install_component(
             if sub_dir.name.startswith(("_", ".")):
                 continue
             target_sub = target_dir / sub_dir.name
+            if target_sub.exists() and not target_sub.is_dir():
+                failed += 1
+                failed_names.append(
+                    f"{sub_dir.name}: {target_sub} exists and is not a directory"
+                )
+                continue
             if target_sub.exists() and not force:
                 skipped += 1
                 continue

@@ -162,6 +162,28 @@ CASES = {
         },
     ),
 }
+# Line each violating case reports its code on.
+LINES = {
+    "F1": 1,
+    "F2": 1,
+    "F3": 2,
+    "F4": 4,
+    "F5": 2,
+    "F6": 2,
+    "F7": 2,
+    "R1": 4,
+    "R2": 1,
+    "R3": 1,
+    "S1": 1,
+    "S2": 1,
+    "X1": 7,
+    "X2": 2,
+    "X7": 1,
+    "N1": 1,
+    "N2": 6,
+    "N3": 1,
+    "N4": 1,
+}
 # X7 passes when the same output style is checked as md.
 _GOOD_FMT = {"X7": "md"}
 
@@ -282,7 +304,12 @@ class TestRules:
         assert not [f for f in findings if f.code == code], findings
 
     def test_every_rule_has_case(self):
-        assert set(CASES) == set(RULES)
+        assert set(CASES) == set(RULES) == set(LINES)
+
+    @pytest.mark.parametrize("code", sorted(CASES))
+    def test_bad_line(self, tmp_path, code):
+        lines = [f.line for f in _run_case(tmp_path, code, "bad") if f.code == code]
+        assert lines[0] == LINES[code], lines
 
     def test_yaml_parse_failure_is_f1(self, tmp_path):
         target = _write(tmp_path, ".claude/agents/a.md", "---\nname: [a\n---\nBody\n")
@@ -458,6 +485,107 @@ class TestDanglingPointers:
         text = _fm(description="Does x.", **{"allowed-tools": "Read"}) + "Use `Bash`.\n"
         target = _write(tmp_path, ".claude/skills/x/SKILL.md", text)
         assert not [f for f in check(target) if f.code == "N2"]
+
+
+class TestReviewFixes:
+    """Inputs an independent review found misjudged (2026-10-14)."""
+
+    def test_duplicate_heading_suffix(self, tmp_path):
+        target = _write(tmp_path, "d.md", "## Dup\n## Dup\n[c](#dup-1) [d](#dup)\n")
+        assert not [f for f in check(target) if f.code == "N1"]
+
+    def test_percent_encoded_anchor_and_path(self, tmp_path):
+        _write(tmp_path, "docs/my guide.md", "## 설치 방법\n")
+        text = "[a](docs/my%20guide.md#%EC%84%A4%EC%B9%98-%EB%B0%A9%EB%B2%95)\n"
+        target = _write(tmp_path, "index.md", text)
+        assert not [f for f in check(target) if f.code == "N1"]
+
+    def test_root_relative_link(self, tmp_path):
+        import subprocess
+
+        subprocess.run(["git", "init", "-q", str(tmp_path)], check=True)
+        _write(tmp_path, "docs/guide.md", "# Guide\n")
+        target = _write(tmp_path, "sub/page.md", "[g](/docs/guide.md)\n")
+        assert not [f for f in check(target) if f.code == "N1"]
+
+    def test_mention_is_not_an_import(self, tmp_path):
+        target = _write(tmp_path, "CLAUDE.md", "Ask @jane.doe for access.\n")
+        assert not [f for f in check(target) if f.code == "N1"]
+
+    def test_inline_path_import_is_a_warning(self, tmp_path):
+        target = _write(tmp_path, "CLAUDE.md", "See @docs/gone.md for more.\n")
+        found = [(f.code, f.severity) for f in check(target)]
+        assert found == [("N1", "warning")]
+
+    def test_html_led_markdown_is_md(self, tmp_path):
+        text = '<p align="center"><img src="logo.png"></p>\n\n# Project\n'
+        target = _write(tmp_path, "README.md", text)
+        assert infer_format(text) == "md"
+        assert not [f for f in check(target) if f.code.startswith("X")]
+
+    def test_void_elements_close_themselves(self, tmp_path):
+        text = '<guide>\n<img src="a.png">\n<br>\n</guide>\n'
+        target = _write(tmp_path, "docs/guide.md", text)
+        assert not [f for f in check(target, fmt="xml") if f.code in ("X1", "X2")]
+
+    def test_void_name_used_as_element(self, tmp_path):
+        text = "<guide>\n<meta>\nx\n</meta>\n</guide>\n"
+        target = _write(tmp_path, "docs/guide.md", text)
+        assert not [f for f in check(target, fmt="xml") if f.code in ("X1", "X2")]
+
+    def test_uppercase_tags(self, tmp_path):
+        target = _write(tmp_path, "docs/guide.md", "<Root>\n<Step>x</Step>\n</Root>\n")
+        assert not [f for f in check(target, fmt="xml") if f.code in ("X1", "X2")]
+
+    def test_bom_frontmatter_is_read(self, tmp_path):
+        target = tmp_path / ".claude" / "agents" / "a.md"
+        target.parent.mkdir(parents=True)
+        target.write_bytes(b"\xef\xbb\xbf---\nname: r\n---\nBody\n")
+        assert [f.code for f in check(target)] == ["F2"]
+
+    def test_not_utf8_is_an_input_error(self, tmp_path):
+        target = tmp_path / "latin1.md"
+        target.write_bytes(b"caf\xe9\n")
+        with pytest.raises(author_check.NotTextError):
+            check(target)
+        result = CliRunner().invoke(main, ["author-check", str(target)])
+        assert result.exit_code == 2
+        assert "not UTF-8 text" in result.output
+
+    def test_r1_ignores_trailing_punctuation(self, tmp_path):
+        _write(tmp_path, ".claude/skills/x/references/a.md", "A.\n")
+        text = (
+            _fm(description="Does x.")
+            + "Read ${CLAUDE_SKILL_DIR}/references/a.md, then stop.\n"
+        )
+        target = _write(tmp_path, ".claude/skills/x/SKILL.md", text)
+        assert not [f for f in check(target) if f.code == "R1"]
+
+    def test_r2_reported_once_per_file(self, tmp_path):
+        _write(tmp_path, ".claude/skills/x/references/a.md", "See [b](b.md)\n")
+        _write(tmp_path, ".claude/skills/x/references/b.md", "B.\n")
+        links = "[a](references/a.md) and [a](references/a.md)\n"
+        target = _write(
+            tmp_path, ".claude/skills/x/SKILL.md", _fm(description="Does x.") + links
+        )
+        assert len([f for f in check(target) if f.code == "R2"]) == 1
+
+    def test_inline_path_relative_to_document(self, tmp_path):
+        _write(tmp_path, "pkg/references/a.md", "A.\n")
+        target = _write(tmp_path, "pkg/guide.md", "Read `references/a.md` first.\n")
+        assert not [f for f in check(target) if f.code == "N1"]
+
+    def test_repo_root_without_git(self, tmp_path, monkeypatch):
+        def no_git(*args, **kwargs):
+            raise OSError("git not found")
+
+        author_check._repo_root.cache_clear()
+        monkeypatch.setattr(author_check.subprocess, "run", no_git)
+        monkeypatch.chdir(tmp_path)
+        try:
+            assert author_check._repo_root(tmp_path) == Path.cwd()
+        finally:
+            author_check._repo_root.cache_clear()
 
 
 class TestCli:

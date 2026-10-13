@@ -101,13 +101,17 @@ class TestReferences:
     def test_no_superclaude_vocabulary(self):
         """D20: the references carry nothing from this repository's own rules."""
         banned = re.compile(
-            r"/sc:|<component|<handoff|<bounds|RULES_|CLAUDE_SC|\bR\d{2}\b", re.I
+            r"/sc:|<component|<handoff|<bounds|RULES_|CLAUDE_SC|\bR\d{2}\b"
+            r"|src/superclaude|docs/features|\.claude/rules/gotchas",
+            re.I,
         )
         hits = []
-        for path in sorted(_REFS_DIR.iterdir()):
+        # SKILL.md too: the installed skill must not depend on this repository.
+        for path in [_SKILL / "SKILL.md", *sorted(_REFS_DIR.iterdir())]:
             text = path.read_text(encoding="utf-8")
             for number, line in enumerate(text.splitlines(), 1):
                 cleaned = re.sub(r"superclaude author-check", "", line, flags=re.I)
+                cleaned = re.sub(r"\bsc-author\b", "", cleaned)
                 if banned.search(cleaned) or "superclaude" in cleaned.lower():
                     hits.append(f"{path.name}:{number}: {line.strip()}")
         assert not hits, "\n".join(hits)
@@ -145,6 +149,11 @@ class TestSkillManifest:
         body = self._body()
         for name in [*REFS, "fields.yaml"]:
             assert f"${{CLAUDE_SKILL_DIR}}/references/{name}" in body, name
+
+    def test_check_step_skips_without_the_checker(self):
+        body = self._body()
+        assert re.search(r"not found, skip this step", body)
+        assert "/doctor prompt-audit <path>" in body
 
     def test_check_step_passes_the_load_set(self):
         assert re.search(r"superclaude author-check [^\n]*--with", self._body())

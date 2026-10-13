@@ -1,6 +1,6 @@
 ---
 name: sc-author
-description: Writes or revises a skill, subagent, slash command, output style, CLAUDE.md, .claude/rules file or any other file Claude reads as instructions - valid frontmatter, a body in the project's own conventions (--md default, --xml for XML bodies), no-op and harmful sentences proposed for removal with evidence, and a validator pass.
+description: Writes or revises a skill, subagent, slash command, output style, CLAUDE.md, .claude/rules file or any other file Claude reads as instructions - valid frontmatter, a body in the project's own conventions and format (--md or --xml to choose one), no-op and harmful sentences proposed for removal with evidence, and a validator pass.
 disable-model-invocation: true
 argument-hint: "[skill|agent|command|output-style|memory|<path>] [what to write or change] [--md|--xml]"
 allowed-tools:
@@ -37,8 +37,15 @@ Works on any file Claude reads as instructions or context. A new document follow
 5. **Neighbors**: compare the name and description with the skills and subagents already listed in this session's context. On an overlap, make the description say when to pick this one instead. Do not open their files for this.
 6. **Check**: run
    `superclaude author-check <path> --type <type> --format <md|xml> --with <each load-set document>`
-   Fix each error and run it again, three runs at most, then report what is left. Report warnings without forcing them to zero. If the command is not found, do not claim a check: say in the hand-off that the machine checks did not run.
-7. **Hand-off**: give two or three prompts to try in a fresh session: one or two that should trigger the document and one similar that should not. For a document invoked only by hand, give the invocation instead. Name anything that was not machine-checked.
+   - Fix F, R and X errors (fields, references, XML structure) and run it again, three runs at most, then report what is left.
+   - An N finding means changing or removing a sentence: it goes back to step 4 as a candidate and waits for approval, like any other.
+   - Report warnings without forcing them to zero.
+   - When `superclaude author-check` is not found, skip this step. Do not claim a check that did not run; the hand-off says the machine checks were skipped.
+7. **Hand-off**:
+   - Two or three prompts to try in a fresh session: one or two that should trigger the document and one similar that should not. For a document invoked only by hand, give the invocation instead.
+   - Suggest `/doctor prompt-audit <path>`, Claude Code's own audit of instruction files (outdated or conflicting instructions, references to files or commands that do not exist); it reports and changes nothing until asked.
+   - For a skill whose step 6 was skipped, also suggest `claude plugin validate <skills directory>`, which finds SKILL.md frontmatter that does not parse.
+   - Name anything that was not machine-checked.
 
 ## Reference files
 

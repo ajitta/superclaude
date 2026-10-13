@@ -3,7 +3,8 @@
 
 That directory also holds the user's own skills and other tools' skills, so
 install, uninstall, git-exclude and drift all touch only the directory names
-SuperClaude ships. Every test here plants a third-party skill next to ours.
+SuperClaude ships. Tests that could reach past those names plant a
+third-party skill next to ours and check it survives.
 """
 
 import os
@@ -96,6 +97,18 @@ class TestInstall:
         assert (outside / "keep.txt").read_text(encoding="utf-8") == "keep"
 
 
+class TestFileInTheWay:
+    def test_file_named_like_the_skill_fails_loudly(self, tmp_path):
+        blocker = tmp_path / "skills" / "sc-author"
+        blocker.parent.mkdir(parents=True)
+        blocker.write_text("not a directory", encoding="utf-8")
+        for force in (False, True):
+            installed, skipped, failed, names = _install(tmp_path, force=force)
+            assert (installed, skipped, failed) == (0, 0, 1)
+            assert "is not a directory" in names[0]
+        assert blocker.read_text(encoding="utf-8") == "not a directory"
+
+
 class TestUninstall:
     def test_removes_only_shipped_skills(self, tmp_path):
         other = _plant_other(tmp_path)
@@ -122,6 +135,17 @@ class TestUninstall:
         uninstall_all(base_path=tmp_path, scope="local")
         assert not (tmp_path / "skills" / "sc-author").exists()
         assert other.exists()
+
+    @pytest.mark.skipif(sys.platform == "win32", reason="symlinks need privileges")
+    def test_symlinked_skill_dir_keeps_its_target(self, tmp_path):
+        outside = tmp_path / "outside"
+        outside.mkdir()
+        (outside / "keep.txt").write_text("keep", encoding="utf-8")
+        base = tmp_path / "base"
+        (base / "skills").mkdir(parents=True)
+        os.symlink(outside, base / "skills" / "sc-author")
+        _uninstall_shared_component("skills", base, False)
+        assert (outside / "keep.txt").read_text(encoding="utf-8") == "keep"
 
 
 class TestGitExclude:
