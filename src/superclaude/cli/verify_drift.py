@@ -4,20 +4,25 @@ Drift Detection for SuperClaude Installation
 Compares source files against installed files to detect drift
 (content mismatches, missing files, extra files).
 
-Coverage boundary: component *.md files (COMPONENTS, incl. core/rules/) and
-CLAUDE_SC.md only. templates/ and the merged hooks.json are NOT
-drift-checked. Restated for the user in the `superclaude verify-drift`
-help text; keep the two in step.
+Coverage boundary: component *.md files (COMPONENTS, incl. core/rules/),
+every file under each shipped directory of a directory component (templates,
+skills) and CLAUDE_SC.md. The merged hooks.json is NOT drift-checked.
+Restated for the user in the `superclaude verify-drift` help text; keep the
+two in step.
 """
 
+from fnmatch import fnmatch
 from pathlib import Path
 from typing import Any, Dict
 
 from .install_paths import (
     COMPONENTS,
+    DIRECTORY_COMPONENTS,
+    DIRECTORY_IGNORE,
     _get_package_root,
     _get_source_dir,
     _get_target_dir,
+    dir_names,
     md_names,
 )
 
@@ -70,6 +75,9 @@ def _check_component(component: str, base_path: Path) -> Dict[str, str]:
     if not source_dir.exists():
         return results
 
+    if component in DIRECTORY_COMPONENTS:
+        return _check_directory_component(source_dir, target_dir)
+
     # Standard components: compare .md files (skip README)
     source_files = md_names(source_dir)
 
@@ -99,6 +107,40 @@ def _check_component(component: str, base_path: Path) -> Dict[str, str]:
         for filename in sorted(md_names(rules_tgt) - src_rules):
             results[f"rules/{filename}"] = EXTRA
 
+    return results
+
+
+def _files_under(root: Path) -> set:
+    """Relative posix paths of the files under root that install would copy."""
+    if not root.is_dir():
+        return set()
+    found = set()
+    for path in root.rglob("*"):
+        if not path.is_file():
+            continue
+        rel = path.relative_to(root)
+        if any(fnmatch(part, pat) for part in rel.parts for pat in DIRECTORY_IGNORE):
+            continue
+        found.add(rel.as_posix())
+    return found
+
+
+def _check_directory_component(source_dir: Path, target_dir: Path) -> Dict[str, str]:
+    """Compare each shipped subdirectory file by file, keyed `<dir>/<path>`.
+
+    EXTRA is looked for only inside the shipped directories: the target may be
+    shared (`.claude/skills/`), and anything else there belongs to someone else.
+    """
+    results = {}
+    for name in sorted(dir_names(source_dir)):
+        source_files = _files_under(source_dir / name)
+        target_files = _files_under(target_dir / name)
+        for rel in sorted(source_files):
+            results[f"{name}/{rel}"] = _compare_files(
+                source_dir / name / rel, target_dir / name / rel
+            )
+        for rel in sorted(target_files - source_files):
+            results[f"{name}/{rel}"] = EXTRA
     return results
 
 

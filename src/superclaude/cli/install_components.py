@@ -20,6 +20,8 @@ from superclaude.utils import (
 from .install_git_exclude import add_git_exclude, find_team_ignores
 from .install_paths import (
     COMPONENTS,
+    DIRECTORY_COMPONENTS,
+    DIRECTORY_IGNORE,
     _get_package_root,
     _get_source_dir,
     _get_target_dir,
@@ -180,15 +182,21 @@ def install_component(
                 failed += 1
                 failed_names.append(f"rules/{source_file.name}: {e}")
 
-    # templates/ holds nested doc-scaffold directories consumed by
-    # /sc:init (not slash commands). Copy each subdirectory verbatim.
-    if component == "templates":
+    # Directory components install one source subdirectory per unit, copied
+    # whole: templates for /sc:init, skills for /sc-author.
+    if component in DIRECTORY_COMPONENTS:
         for sub_dir in source_dir.iterdir():
             if not sub_dir.is_dir():
                 continue
             if sub_dir.name.startswith(("_", ".")):
                 continue
             target_sub = target_dir / sub_dir.name
+            if target_sub.exists() and not target_sub.is_dir():
+                failed += 1
+                failed_names.append(
+                    f"{sub_dir.name}: {target_sub} exists and is not a directory"
+                )
+                continue
             if target_sub.exists() and not force:
                 skipped += 1
                 continue
@@ -202,7 +210,7 @@ def install_component(
                 shutil.copytree(
                     sub_dir,
                     target_sub,
-                    ignore=shutil.ignore_patterns("__pycache__", "*.pyc", ".DS_Store"),
+                    ignore=shutil.ignore_patterns(*DIRECTORY_IGNORE),
                 )
                 installed += 1
             except Exception as e:

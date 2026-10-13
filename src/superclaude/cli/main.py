@@ -506,8 +506,9 @@ def verify_drift_cmd(scope: str | None, verbose: bool):
     - DRIFTED: installed file differs from source
     - EXTRA: installed file has no source counterpart
 
-    Coverage: component .md files (incl. core/rules/) and CLAUDE_SC.md.
-    Not checked: templates/ and the merged hooks.json.
+    Coverage: component .md files (incl. core/rules/), every file of the
+    shipped templates and skills, and CLAUDE_SC.md.
+    Not checked: the merged hooks.json.
 
     Examples:
         superclaude verify-drift
@@ -567,6 +568,73 @@ def verify_drift_cmd(scope: str | None, verbose: bool):
             f"{result['total_missing']} missing, {result['total_extra']} extra"
         )
         click.echo("   Run 'superclaude install --force' to re-sync")
+        sys.exit(1)
+
+
+@main.command(name="author-check")
+@click.argument("path", type=click.Path(exists=True, dir_okay=False))
+@click.option(
+    "--type",
+    "type_",
+    type=click.Choice(
+        ["skill", "agent", "command", "output-style", "memory", "generic"]
+    ),
+    default=None,
+    help="Document type (default: inferred from the path)",
+)
+@click.option(
+    "--format",
+    "fmt",
+    type=click.Choice(["md", "xml"]),
+    default=None,
+    help="Body format (default: xml when the body starts with a tag)",
+)
+@click.option(
+    "--with",
+    "with_paths",
+    multiple=True,
+    type=click.Path(exists=True, dir_okay=False),
+    help="Another document loaded together with PATH (repeatable; N3, N4)",
+)
+def author_check_cmd(
+    path: str, type_: str | None, fmt: str | None, with_paths: tuple[str, ...]
+):
+    """
+    Check a file Claude reads as instructions (used by /sc-author).
+
+    Claude Code ignores a bad frontmatter field or a broken reference without
+    an error; this reports them. One finding per line, `path:line: CODE grade:
+    message`, then `N errors, M warnings`.
+
+    Rules: F (frontmatter fields), R (skill references), S (size, emphasis),
+    X (XML structure, with --format xml or an XML body), N (pointers to
+    nothing, tools an agent lacks; with --with, conflicting or repeated
+    instructions across the documents loaded together).
+
+    Exit: 0 no errors, 1 errors found, 2 usage error or a file that is not
+    UTF-8 text.
+
+    Examples:
+        superclaude author-check .claude/agents/reviewer.md
+        superclaude author-check .claude/skills/deploy/SKILL.md --format xml
+        superclaude author-check CLAUDE.md --with .claude/rules/testing.md
+    """
+    from .author_check import NotTextError, check, summary
+
+    try:
+        findings = check(
+            Path(path),
+            type_=type_,
+            fmt=fmt,
+            with_paths=[Path(p) for p in with_paths],
+        )
+    except NotTextError as exc:
+        click.echo(f"Error: {exc}", err=True)
+        sys.exit(2)
+    for finding in findings:
+        click.echo(finding.render())
+    click.echo(summary(findings))
+    if any(f.severity == "error" for f in findings):
         sys.exit(1)
 
 

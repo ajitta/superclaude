@@ -182,6 +182,7 @@ class TestInstallPathsMapping:
             "modes",
             "mcp",
             "templates",
+            "skills",
         }
         assert set(COMPONENTS.keys()) == expected
 

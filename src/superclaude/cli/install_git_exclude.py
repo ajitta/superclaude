@@ -46,7 +46,12 @@ import subprocess
 from pathlib import Path
 from typing import List, Optional, Tuple
 
-from .install_paths import COMPONENTS, SHARED_TARGET_COMPONENTS, shipped_md_names
+from .install_paths import (
+    COMPONENTS,
+    DIRECTORY_COMPONENTS,
+    SHARED_TARGET_COMPONENTS,
+    shipped_names,
+)
 
 MARKER_START = "# >>> superclaude >>>"
 MARKER_END = "# <<< superclaude <<<"
@@ -92,8 +97,9 @@ _PROJECT_SCOPE_ENTRIES = [
 def _collect_entries(scope: str = "local") -> List[str]:
     """Enumerate the paths a scope's exclude block should carry.
 
-    Agents and output styles are listed per-file so team-shared content in
-    ``.claude/agents/`` and ``.claude/output-styles/`` keeps working. Commands
+    Agents, output styles and skills are listed by shipped name (file, or
+    directory for skills) so team-shared content in ``.claude/agents/``,
+    ``.claude/output-styles/`` and ``.claude/skills/`` keeps working. Commands
     and the superclaude core live in SC-only subdirectories, so directory-level
     ignores are safe there.
 
@@ -109,8 +115,9 @@ def _collect_entries(scope: str = "local") -> List[str]:
     # filenames, never the directory.
     for component in SHARED_TARGET_COMPONENTS:
         target_subdir = COMPONENTS[component][1]
-        for name in sorted(shipped_md_names(component)):
-            entries.append(f".claude/{target_subdir}/{name}")
+        suffix = "/" if component in DIRECTORY_COMPONENTS else ""
+        for name in sorted(shipped_names(component)):
+            entries.append(f".claude/{target_subdir}/{name}{suffix}")
 
     entries.append(".claude/agent-memory-local/")
     entries.append(".claude/agent-memory/")
