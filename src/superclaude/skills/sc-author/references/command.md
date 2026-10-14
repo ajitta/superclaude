@@ -1,6 +1,6 @@
 ---
 sources:
-  - {url: "https://code.claude.com/docs/en/skills", retrieved: 2026-10-13}
+  - {url: "https://code.claude.com/docs/en/skills", retrieved: 2026-10-14}
 ---
 
 # Slash command
@@ -11,7 +11,7 @@ A file in `.claude/commands/` still works as a `/` command, but Claude Code reco
 
 ## Project format and language
 
-Read one or two existing command files in the project (`.claude/commands/*.md`) for their format and language only. Sections, argument handling and fields come from this file; a field `fields.yaml` does not list for commands is reported, not copied.
+Read one or two existing command files in the project (`.claude/commands/**/*.md`) for their format and language only. Search the subfolders too: a subfolder is a namespace (`component.md` in a `frontend` subfolder is `/frontend:component`), and a project may keep all its commands in one. Sections, argument handling and fields come from this file; a field `fields.yaml` does not list for commands is reported, not copied.
 
 ## Template (md)
 
