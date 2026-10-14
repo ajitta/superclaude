@@ -14,7 +14,7 @@ paths: ["src/superclaude/**", ".claude/rules/*.md", "CLAUDE.md", "AGENTS.md", "R
 
 Model-invoked descriptions sit in the system prompt permanently; user-invoked ones cost the user memory instead. Not a correctness question — a trade-off: context load on the model vs cognitive load on the user. Decide per component, deliberately.
 
-- Side-effect workflow (deploy, commit, release) → user-invoked (`disable-model-invocation: true`).
+- Workflow with a confirmed side effect — found in use or reported: a run Claude started on its own (nobody asked for it) deployed, committed, published or changed files → user-invoked (`disable-model-invocation: true`), citing where it was found or reported. A possible side effect alone is not enough: keep it model-invocable and gate it in the description and the body's confirmations, so delegated runs still reach it.
 - Domain knowledge → model-invoked only when its trigger conditions are distinguishable from every neighbor's.
 - Description must answer: "when THIS one and not the adjacent one?" Overlapping descriptions = misfire risk both ways (wrong pick, no pick).
 

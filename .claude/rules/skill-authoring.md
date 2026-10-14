@@ -9,7 +9,7 @@ Skills SuperClaude ships under `src/superclaude/skills/<name>/`, installed by th
 ## Naming and invocation
 
 - Directory and `name` start with `sc-` (`sc-author`): `.claude/skills/` is shared with the user's own skills and other tools, and the prefix keeps ours from colliding. Commands keep `/sc:*`; a skill name cannot contain `:`.
-- A skill with side effects, or a meta skill that overlaps other authoring tools, sets `disable-model-invocation: true`.
+- A skill with a confirmed side effect (found in use or reported, `content-quality.md` §1 Trigger), or a meta skill that overlaps other authoring tools, sets `disable-model-invocation: true`.
 - Claude Code-only frontmatter fields are allowed (no portability target).
 
 ## References
