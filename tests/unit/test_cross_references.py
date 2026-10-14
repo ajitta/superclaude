@@ -4,6 +4,7 @@ Cross-reference integrity linter for SuperClaude content files.
 Validates:
 - Handoff targets: <handoff next="/sc:X"> → commands/X.md exists
 - Agent trigger uniqueness: no duplicate trigger keywords across agents
+- Rule citations: every [RNN Name] / RNN in shipped .md → defined in RULES_QUALITY.md
 """
 
 import re
@@ -20,6 +21,7 @@ COMMANDS_DIR = _SRC / "commands"
 AGENTS_DIR = _SRC / "agents"
 MODES_DIR = _SRC / "modes"
 FLAGS_FILE = _SRC / "core" / "FLAGS.md"
+RULES_QUALITY_FILE = _SRC / "core" / "rules" / "RULES_QUALITY.md"
 
 # Template patterns that are NOT real handoff targets
 HANDOFF_SKIP_PATTERNS = {
@@ -117,3 +119,55 @@ class TestAgentTriggerUniqueness:
         assert not duplicates, "Duplicate trigger keywords found:\n" + "\n".join(
             f"  '{k}': {v}" for k, v in sorted(duplicates.items())
         )
+
+
+# ─── Rule Citations ──────────────────────────────────────────────
+
+SHIPPED_MD_FILES = sorted(_SRC.rglob("*.md"))
+SHIPPED_MD_IDS = [f.relative_to(_SRC).as_posix() for f in SHIPPED_MD_FILES]
+
+
+def _defined_rules() -> dict[str, str]:
+    """Map rule ID → name (e.g. 'R06' → 'Scope') from RULES_QUALITY.md."""
+    content = RULES_QUALITY_FILE.read_text(encoding="utf-8")
+    return dict(re.findall(r"^\[(R\d{2}) ([^\]]+)\]", content, re.MULTILINE))
+
+
+DEFINED_RULES = _defined_rules()
+
+# "R06 (Scope)" — a Title Case parenthetical is a rule name; a lowercase one
+# ("R03 (pre-fix diagnosis)") is a description and is not compared.
+_PAREN_NAME = re.compile(r"\b(R\d{2}) \(((?:[A-Z][\w-]*)(?: [A-Z][\w-]*)*)\)")
+
+
+def test_rule_definitions_found():
+    """Guard against a vacuous pass if the definition format or path changes."""
+    assert DEFINED_RULES, (
+        "no [RNN Name] definitions extracted from RULES_QUALITY.md — "
+        "definition format or file location changed; fix this test's regex/path"
+    )
+
+
+@pytest.mark.parametrize("path", SHIPPED_MD_FILES, ids=SHIPPED_MD_IDS)
+def test_rule_citations_defined(path: Path):
+    """Every rule citation in shipped content must match a defined rule.
+
+    Full tag: [RNN Name] must equal the definition, so a renamed rule
+    (e.g. [R06 Scope] → [R06 Restraint]) fails until citations are re-synced.
+    Paren name: RNN (Name) in Title Case must name the defined rule too.
+    Bare ID: RNN (as in "apply R18" or "R01–R21") must be a defined ID.
+    """
+    content = path.read_text(encoding="utf-8")
+    full_tags = {f"[{rid} {name}]" for rid, name in DEFINED_RULES.items()}
+    bad_tags = set(re.findall(r"\[R\d+ [^\]]*\]", content)) - full_tags
+    bad_names = {
+        f"{rid} ({name})"
+        for rid, name in _PAREN_NAME.findall(content)
+        if DEFINED_RULES.get(rid) != name
+    }
+    bad_ids = set(re.findall(r"\bR\d{2}\b", content)) - DEFINED_RULES.keys()
+    assert not bad_tags and not bad_names and not bad_ids, (
+        f"{path.relative_to(_SRC).as_posix()}: rule citations not defined in "
+        f"RULES_QUALITY.md — tags {sorted(bad_tags)}, "
+        f"paren names {sorted(bad_names)}, ids {sorted(bad_ids)}"
+    )
