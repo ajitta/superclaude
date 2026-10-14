@@ -33,6 +33,7 @@ keep-coding-instructions: true
 ## Pitfalls
 
 - `keep-coding-instructions` defaults to `false`: a custom style then drops Claude Code's built-in software engineering instructions (scoping changes, comments, verifying work). Set it to `true` when Claude still writes code in this style.
+- The style applies to every response in the session, also to ones outside its purpose. A rule meant for one kind of response names when it applies ("When you review a migration, open with the findings"); without that, "open every reply with the findings" also governs an answer to an unrelated question.
 - The body is plain prose. An XML body is not used for output styles.
 - Field names are lowercase with hyphens. A misspelled field is ignored without an error; YAML that does not parse loads the style under its file name with no fields.
 - The terminal reads style files at startup: after creating or editing one, restart Claude Code.
