@@ -50,12 +50,12 @@ description: Code analysis across quality, security, performance, architecture d
 
   <rules_analysis note="--focus rules: rule effectiveness audit">
     Quality (always): Read core/rules/RULES_QUALITY.md (R01–R21 table) → summary: rule count, example coverage, severity distribution
-    Compliance (when data exists): Glob auto memory + `.claude/memories/` → grep `violated_rule: "[RXX]"` → heatmap
+    Compliance (when data exists): Glob auto memory + `.claude/memories/` → grep `violated_rule: "[RNN Name]"` → heatmap
       Hot (≥2 violations) 🔴: needs examples or clarification → /sc:improve
       Warm (1 violation) 🟡: monitor
       Untagged: corrections without violated_rule field → suggest [R14 Correction Capture] format
     Maturity label: Stage 1 (rules defined) | Stage 2 (rules + examples) | Stage 3 (rules + tracking) | Stage 4 (rules + iteration)
-    Empty data: report "Stage N" + guide: "To bootstrap tracking, follow [R14 Correction Capture] Correction Capture format when correcting Claude's behavior"
+    Empty data: report "Stage N" + guide: "To bootstrap tracking, follow the [R14 Correction Capture] format when correcting Claude's behavior"
   </rules_analysis>
 
   <examples>

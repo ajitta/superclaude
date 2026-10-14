@@ -39,7 +39,7 @@
   </examples>
   </core_rules>
 
-  <anti_over_engineering note="Enforcement: R06 (Scope) + R18 (Necessity Test)">
+  <anti_over_engineering note="Enforcement: [R06 Scope] + [R18 Necessity Test]">
 Bug fix ≠ cleanup | Unchanged code untouched | Exception: design doc explicit scope adjacent improvements → in-scope
 Dep gate before add library: lines actually used | DIY cost | 6-month safety — reject if ≤3 lines used or maintenance unclear
 Dep red flags (any → reconsider): <10% of the library used | no release in a year | single maintainer | 50+ transitive deps | "everyone uses it" as the only reason | replaceable with a native API
@@ -91,7 +91,7 @@ Do NOT simplify (complexity = essential): Security/auth | Accessibility/WCAG | C
   Skip protocol: state which level skipped and why (cost, infra unavailable, scoped out by user) — silent skip violates R15.
   </verification_ladder>
 
-  <anti_misunderstanding note="Enforcement: R12 (Clarification) + R13 (Intent Verification) + R14 (Correction Capture)">
+  <anti_misunderstanding note="Enforcement: [R12 Clarification] + [R13 Intent Verification] + [R14 Correction Capture]">
 Same mistake twice = missing rule: if feedback memory already covers pattern, propose addition to the matching `core/rules/` module (RULES.md kernel only for its four rule classes)
 Scope words matter: "add" = new | "improve" = enhance existing | "fix" = repair broken | "strengthen" = reinforce existing | "adjust/readjust" = review applicability, not necessarily change
 Unverified numbers: prefix estimates with ~, distinguish from measured/coded values — never state estimate as fact

@@ -135,9 +135,13 @@ def _defined_rules() -> dict[str, str]:
 
 DEFINED_RULES = _defined_rules()
 
-# "R06 (Scope)" — a Title Case parenthetical is a rule name; a lowercase one
-# ("R03 (pre-fix diagnosis)") is a description and is not compared.
-_PAREN_NAME = re.compile(r"\b(R\d{2}) \(((?:[A-Z][\w-]*)(?: [A-Z][\w-]*)*)\)")
+_FULL_TAG = re.compile(r"\[R\d+ [^\]]*\]")
+_RANGE = re.compile(r"\b(R\d{2})[–-](R\d{2})\b")
+_BARE_ID = re.compile(r"\bR\d{2}\b")
+
+# Bare IDs allowed outside the definition file: the text that holds them.
+# insight.md: the insights.jsonl `rule` field stores the bare ID ("R18").
+_BARE_ID_ALLOWED = {"commands/insight.md": ["rule (R13, R18...)"]}
 
 
 def test_rule_definitions_found():
@@ -150,24 +154,32 @@ def test_rule_definitions_found():
 
 @pytest.mark.parametrize("path", SHIPPED_MD_FILES, ids=SHIPPED_MD_IDS)
 def test_rule_citations_defined(path: Path):
-    """Every rule citation in shipped content must match a defined rule.
+    """Rules are cited as [RNN Name], matching the definition in RULES_QUALITY.md.
 
-    Full tag: [RNN Name] must equal the definition, so a renamed rule
-    (e.g. [R06 Scope] → [R06 Restraint]) fails until citations are re-synced.
-    Paren name: RNN (Name) in Title Case must name the defined rule too.
-    Bare ID: RNN (as in "apply R18" or "R01–R21") must be a defined ID.
+    A renamed rule (e.g. [R06 Scope] → [R06 Restraint]) fails until citations
+    are re-synced. A bare RNN is allowed only inside RULES_QUALITY.md (names
+    on the same page), in a range (R01–R21), or in _BARE_ID_ALLOWED — and
+    there it must still be a defined ID.
     """
+    rel = path.relative_to(_SRC).as_posix()
     content = path.read_text(encoding="utf-8")
     full_tags = {f"[{rid} {name}]" for rid, name in DEFINED_RULES.items()}
-    bad_tags = set(re.findall(r"\[R\d+ [^\]]*\]", content)) - full_tags
-    bad_names = {
-        f"{rid} ({name})"
-        for rid, name in _PAREN_NAME.findall(content)
-        if DEFINED_RULES.get(rid) != name
-    }
-    bad_ids = set(re.findall(r"\bR\d{2}\b", content)) - DEFINED_RULES.keys()
-    assert not bad_tags and not bad_names and not bad_ids, (
-        f"{path.relative_to(_SRC).as_posix()}: rule citations not defined in "
-        f"RULES_QUALITY.md — tags {sorted(bad_tags)}, "
-        f"paren names {sorted(bad_names)}, ids {sorted(bad_ids)}"
+    bad_tags = set(_FULL_TAG.findall(content)) - full_tags
+
+    rest = _FULL_TAG.sub("", content)
+    listed_ids = {rid for pair in _RANGE.findall(rest) for rid in pair}
+    rest = _RANGE.sub("", rest)
+    allowed = _BARE_ID_ALLOWED.get(rel, [])
+    for text in allowed:
+        listed_ids |= set(_BARE_ID.findall(text))
+        rest = rest.replace(text, "")
+    bare = set(_BARE_ID.findall(rest))
+    in_definition_file = path == RULES_QUALITY_FILE
+
+    undefined = (listed_ids | bare) - DEFINED_RULES.keys()
+    bare_outside = set() if in_definition_file else bare
+    assert not bad_tags and not undefined and not bare_outside, (
+        f"{rel}: rule citations must be [RNN Name] matching RULES_QUALITY.md — "
+        f"mismatched tags {sorted(bad_tags)}, undefined ids {sorted(undefined)}, "
+        f"bare ids {sorted(bare_outside)}"
     )

@@ -64,7 +64,7 @@ description: Design system architecture, APIs and component interfaces as specs 
 
 
   <gotchas>
-  - over-architect: Apply R18 necessity test to each proposed component. Only design what needed now
+  - over-architect: Apply [R18 Necessity Test] to each proposed component. Only design what needed now
   - existing-check: Check if design doc already exist for this topic before creating new one
   - workflow-fanout: fan-out subagents RETURN design markdown — subprocess writes discarded; main loop performs the Write per outputs routing (full rule: core/rules/RULES_DELEGATION.md)
   </gotchas>

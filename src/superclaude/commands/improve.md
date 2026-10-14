@@ -34,7 +34,7 @@ description: Apply systematic improvements to code quality, performance, and mai
 
 
   <gotchas>
-  - necessity-test: Apply R18 before proposing improvements. "safer/better" alone insufficient justification
+  - necessity-test: Apply [R18 Necessity Test] before proposing improvements. "safer/better" alone insufficient justification
   - halo-improvement: When improving target A, do not also rewrite adjacent function B because it "looks worse by comparison". Each improvement must be user's explicit target, not bundled cleanup of nearby code that suddenly looks dated next to improved code.
   </gotchas>
 

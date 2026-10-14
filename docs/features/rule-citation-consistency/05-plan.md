@@ -1,5 +1,5 @@
 ---
-status: draft
+status: implementing
 revised: 2026-10-14
 ---
 
@@ -40,8 +40,8 @@ revised: 2026-10-14
 
 ## Phase 0: 선행 조건과 브랜치
 
-- [ ] `test/rule-citation-scope`(규칙 인용 테스트를 `src/superclaude` 전체로 확장, 괄호 이름 검사 추가)를 커밋하고 master에 병합한다. 이 계획의 Task 1.1이 그 테스트를 고친다.
-- [ ] master에서 `git switch -c refactor/rule-citations`.
+- [x] `test/rule-citation-scope`(규칙 인용 테스트를 `src/superclaude` 전체로 확장, 괄호 이름 검사 추가)를 커밋하고 master에 병합한다. 이 계획의 Task 1.1이 그 테스트를 고친다.
+- [x] master에서 `git switch -c refactor/rule-citations`.
 
 ## Phase 1: 인용 형식 통일 (커밋 1개)
 
@@ -49,11 +49,11 @@ revised: 2026-10-14
 
 **Files:** `tests/unit/test_cross_references.py` (`test_rule_citations_defined`, `_PAREN_NAME`)
 
-- [ ] Step 1: 번호만 쓴 인용을 결정의 예외 세 가지 밖에서 실패로 바꾼다.
+- [x] Step 1: 번호만 쓴 인용을 결정의 예외 세 가지 밖에서 실패로 바꾼다.
   - 예외 1은 파일 경로로(`core/rules/RULES_QUALITY.md`), 예외 2는 범위 정규식 `R\d{2}[–-]R\d{2}`를 먼저 지워서, 예외 3은 `{"commands/insight.md": ["rule (R13, R18...)"]}` 허용 목록으로 처리한다.
   - 번호+이름 검사(`[RNN Name]`이 정의와 일치)는 유지한다. 예외 1 파일 안의 번호도 정의된 번호여야 한다는 검사는 유지한다.
-- [ ] Step 2: `_PAREN_NAME`과 `bad_names`를 지운다. 괄호 이름 5곳은 Task 1.2에서 `[RNN Name]`으로 바뀌므로 필요 없다.
-- [ ] Step 3: `uv run pytest tests/unit/test_cross_references.py -q -k rule` → 실패 목록이 Task 1.2의 파일 목록과 같은지 확인한다.
+- [x] Step 2: `_PAREN_NAME`과 `bad_names`를 지운다. 괄호 이름 5곳은 Task 1.2에서 `[RNN Name]`으로 바뀌므로 필요 없다.
+- [x] Step 3: `uv run pytest tests/unit/test_cross_references.py -q -k rule` → 실패 목록이 Task 1.2의 파일 목록과 같은지 확인한다.
 
 ### Task 1.2: 콘텐츠를 표준 형식으로 (green)
 
@@ -79,10 +79,10 @@ revised: 2026-10-14
 | `commands/analyze.md:53` | `` grep `violated_rule: "[RXX]"` `` | `` grep `violated_rule: "[RNN Name]"` `` (R14가 정한 기록 형식) |
 | `commands/analyze.md:58` | `follow [R14 Correction Capture] Correction Capture format` | `follow the [R14 Correction Capture] format` |
 
-- [ ] Step 1: 표대로 고친다. XML 속성 값(`note="…"`) 안의 대괄호는 그대로 둬도 파싱에 문제가 없는지 `uv run pytest tests/unit/test_content_structure.py -q`로 확인한다.
-- [ ] Step 2: `uv run pytest tests/unit/test_cross_references.py -q -k rule` → 전부 통과.
-- [ ] Step 3: 잡는지 확인. `commands/improve.md` 끝에 `Apply R18.`을 붙이면 실패하고, `[R06 Restraint]`도 실패하는지 본다. 확인 뒤 `git checkout -- src/superclaude/commands/improve.md`.
-- [ ] Step 4: `uv run pytest` exit 0, `make format`, `make lint`. 커밋 `refactor(content): cite rules as [RNN Name] everywhere`.
+- [x] Step 1: 표대로 고친다. XML 속성 값(`note="…"`) 안의 대괄호는 그대로 둬도 파싱에 문제가 없는지 `uv run pytest tests/unit/test_content_structure.py -q`로 확인한다.
+- [x] Step 2: `uv run pytest tests/unit/test_cross_references.py -q -k rule` → 전부 통과.
+- [x] Step 3: 잡는지 확인. `commands/improve.md`를 임시 파일로 복사해 두고, 끝에 `Apply R18.`을 붙이면 실패하고 `[R06 Restraint]`도 실패하는지 본다. 확인 뒤 복사본으로 되돌린다(`git checkout --`는 Step 1의 수정까지 지운다).
+- [x] Step 4: `uv run pytest` exit 0, `make format`, `make lint`. 커밋 `refactor(content): cite rules as [RNN Name] everywhere`.
 
 ## Phase 2: 커널과 RULES_QUALITY 중복 정리 (커밋 1개)
 
@@ -120,3 +120,8 @@ revised: 2026-10-14
 - `uv run pytest tests/unit/test_cross_references.py -q -k rule` 통과, Task 1.2 Step 3의 두 가지 위반이 각각 실패로 잡힘.
 - 예외 세 곳 밖에서 번호만 쓴 인용 0건: Task 1.1 테스트가 그 검사다.
 - Phase 2 전후 `RULES_QUALITY.md` 바이트 수와 `core/RULES.md` 무변경(`git diff --stat master -- src/superclaude/core/RULES.md` 빈 출력).
+
+## Deviations
+
+- Task 1.2 Step 3: 계획대로 `git checkout --`로 되돌리자 Step 1에서 고친 `improve.md` 한 줄까지 HEAD로 돌아갔다. 다시 고치고, Step 3의 복원 방법을 복사본 방식으로 바꿨다.
+- Task 1.1: 예외 3(`_BARE_ID_ALLOWED`)과 범위 안의 번호도 정의된 번호인지 검사한다. 계획은 예외 1 파일만 이 검사를 명시했다.
