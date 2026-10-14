@@ -59,6 +59,38 @@ Index: [05-plan.md](./05-plan.md). 계약: [04-design.md](./04-design.md) C7 "�
 
 D21 적용 후 재실행 (2026-10-14, `--canary --task sc-author-skill`, run3): 3/3, 결과 파일은 프로젝트 agent와 같은 XML 본문 58줄, `author-check --format xml` → 0 errors, 0 warnings. 위 "설계 긴장"은 D21로 해소
 
+D22 적용 후 효과 재측정 (2026-10-14, run4, 두 과제, sonnet, 기본 effort, runs-dir `C:/tmp/sc-evals/sc-author-run4`). `author-check`만으로는 두 run이 갈리지 않으므로(run2) 두 과제에 골격 검사를 추가: 결과 파일에 `<component`, `<mission>`, `<bounds>`, `[Rnn`이 없어야 통과 (`evals/tasks.yaml`, D22 "구조는 references")
+
+| task | checks | turns | 시간 | out tokens | cost | 결과 파일 | `author-check` | 골격 검사 |
+|---|---|---|---|---|---|---|---|---|
+| sc-author-skill | 4/4 | 12 | 64.5s | 3,318 | $0.30 | XML 본문 31줄, `<agent>/<role>/<task>/<return>` | 0 errors, 0 warnings | 통과 |
+| sc-author-plain | 3/4 | 7 | 31.4s | 1,994 | $0.23 | XML 본문 50줄, `<component>`·`<mission>`·`<bounds>` | 0 errors, 0 warnings | 실패 (설치된 SC agent 골격 복사) |
+
+판정: 효과가 이 프로브에서 처음으로 측정됨. 두 run 모두 프로젝트 형식(XML)을 따르지만, 스킬 run만 references의 구조를 쓰고 평문 run은 설치된 SC agent 골격을 복사한다. 1회 실행이라 비율이 아닌 관찰이다. 검사는 SC 골격의 부재만 보며, 문서 품질 전반을 재지는 않는다
+
+나머지 유형 (2026-10-14, run5, 과제 8개, sonnet, 기본 effort, runs-dir `C:/tmp/sc-evals/sc-author-run5`). 유형마다 같은 쌍에 reference에서 가져온 검사 하나를 실행 전에 정해 추가 (command: `name` 필드 없음 · output-style: `keep-coding-instructions: true` · skill: description에 "Use when" · rules: frontmatter는 `paths`만)
+
+| 유형 | skill run | plain run | 차이 |
+|---|---|---|---|
+| command | 5/5, md 19줄 | 5/5, md 41줄 | 검사로는 없음. 평문 run도 SC command 골격을 복사하지 않음 |
+| output-style | 5/5, 22줄 | 5/5, 38줄 | 검사로는 없음 (설치된 `plain-language.md`가 이미 reference 형태) |
+| skill | 4/5, 20줄 | 5/5, 28줄 | 스킬 run 실패는 검사가 좁아서: description이 "Use before applying migrations, or when asked…" (언제 쓰는지는 있음) |
+| memory (rules) | 5/5, 6줄 | 5/5, 10줄 | 검사로는 없음. 스킬 run만 규칙마다 이유와 확인 가능한 표지(`-- ROLLBACK:`)를 씀 |
+
+내용 감사 (run4·run5 결과 파일 10개, `quality.md` 감사 표와 유형 reference 기준):
+
+- agent: 평문 run에 모순 1 (`DROP TABLE`은 critical인데 `DROP ... IF EXISTS`는 low), 출력 형식 불일치 1 (Confidence를 정의하고 행 형식에는 없음), 중복 1 (`<mindset>`과 `<never>`). 스킬 run은 이런 결함이 없고, "Ask for a rollback note"에서 누구에게 묻는지 모호한 문장 1
+- command: 두 run 모두 사용 가능. 스킬 run은 `DROP INDEX`를 전부 잡고 여러 줄에 걸친 문장을 다루지 않음. 평문 run은 결과가 없어도 "Review HIGH findings…" 줄을 출력하고, 마지막 문장 "Say so if the scan covered no such cases"가 모호함
+- output-style: 스킬 run이 더 나쁨. "Open every reply with the findings"가 세션의 모든 응답에 걸려, 리뷰가 아닌 응답에도 findings를 먼저 쓰라고 함. 평문 run은 "When reviewing a SQL migration"으로 범위를 좁히고 코드 작업을 따로 다룸
+- skill: 둘 다 사용 가능. 평문 run의 `allowed-tools: Read, Grep, Glob`는 권한 프롬프트가 없는 도구라 no-op이고, 건너뛸 규칙 하나가 탐지 목록 안에 들어 있음. 스킬 run의 "only the not-yet-applied ones"는 적용 여부를 알 방법을 주지 않음
+- memory: 둘 다 올바름. 스킬 run은 이유를 붙이고(quality.md "Give the reason") 표지를 정함, 평문 run은 이유 없는 짧은 규칙
+
+감사 후 조치 (2026-10-14):
+- output-style 범위 과잉 → `references/output-style.md` Pitfalls에 "스타일은 세션의 모든 응답에 걸린다, 한 종류의 응답용 규칙은 언제 적용되는지 밝힌다" 한 줄 추가. 재실행(run6, `sc-author-output-style-skill`, runs-dir `C:/tmp/sc-evals/sc-author-run6`): 5/5, 본문이 "When you review a migration"과 "Everything else"(리뷰 밖에서는 평소대로) 절로 나뉨
+- skill 검사가 좁음 → 정규식을 `use (when|before|for|after)`로 넓힘. run5 스킬 run 파일에 다시 돌려 통과. 검사를 결과를 본 뒤 고친 것이므로 `tasks.yaml` 주석에 그 사실을 적음
+
+판정: references 구조의 효과는 agent에서만 검사로 보임. 나머지 유형은 평문 run도 SC 골격을 복사하지 않아 같은 검사로는 갈리지 않음. 내용 품질은 agent·memory에서 스킬 쪽이 낫고, command·skill은 비슷하며, output-style은 평문 쪽이 나음 (스킬 run이 범위를 과하게 잡음). 각 1회 실행
+
 ## Deviations
 
 - 대상 경로를 `.claude/agents/`에서 `agents/sql-migration-reviewer.md`로 옮김: 첫 실행(run1)에서 평문 run의 Write가 권한 프롬프트로 막힘. `.claude`는 protected path라 headless에서 프롬프트 없이 쓰려면 `bypassPermissions`가 필요하고, 문서는 그 모드를 컨테이너·VM용으로 한정함 → 권한을 올리지 않고 경로를 옮김. 검사기는 `/agents/*.md`를 agent로 추론하므로 검사 내용은 같음
