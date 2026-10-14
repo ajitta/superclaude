@@ -1,4 +1,4 @@
-"""Unit tests for SuperClaude install_settings module.
+"""Unit tests for superclaude install_settings module.
 
 Tests hook identification, merge logic, and settings management.
 """
@@ -168,7 +168,7 @@ class TestMergeHookArrays:
         """A script this release ships and the install lacks is added, not skipped.
 
         Superseding the old contract, which returned `existing` untouched the
-        moment any SuperClaude hook was present. That froze an install's hook set
+        moment any superclaude hook was present. That froze an install's hook set
         while its content kept updating, and is how a shipped hook stayed
         unregistered in a real install for weeks.
         """
@@ -598,7 +598,7 @@ class TestHookDedup:
 class TestNewlyShippedHookReachesAnExistingInstall:
     """A hook added in a later release must reach an install that predates it.
 
-    The merge used to skip a whole event type once any SuperClaude hook existed
+    The merge used to skip a whole event type once any superclaude hook existed
     under it, so an install updated without --force froze its hook set at
     whatever was written first while its markdown kept updating. That is how
     prettier_hook.py ended up shipped-but-unregistered in a real install with
@@ -713,7 +713,7 @@ class TestNewlyShippedHookReachesAnExistingInstall:
         assert settings_file.read_text(encoding="utf-8") == once
 
     def test_user_hooks_survive(self, base_path: Path):
-        """A non-SuperClaude entry under the same event type is untouched."""
+        """A non-superclaude entry under the same event type is untouched."""
         from superclaude.cli.install_settings import merge_hooks_to_settings
 
         user_entry = {
@@ -734,8 +734,8 @@ class TestInnerHookOwnership:
     """Ownership is per inner hook, not per outer entry.
 
     One Claude settings entry carries a single matcher and a list of inner
-    hooks, so a user's own command can sit next to a SuperClaude one. Judging
-    the whole entry SuperClaude-owned made `--force` and `uninstall` delete the
+    hooks, so a user's own command can sit next to a superclaude one. Judging
+    the whole entry superclaude-owned made `--force` and `uninstall` delete the
     user's command with it — silently, and against the docstring's own promise
     to preserve user hooks.
     """
@@ -771,7 +771,7 @@ class TestInnerHookOwnership:
         assert "npm run user-lint" in commands
         assert any("/new/superclaude/scripts/prettier_hook.py" in c for c in commands)
         assert not any(c.startswith("python .../") for c in commands), (
-            "the previous SuperClaude command survived a force merge"
+            "the previous superclaude command survived a force merge"
         )
 
     def test_force_keeps_a_leading_user_hook_too(self):
@@ -953,7 +953,7 @@ class TestForceSweepsRetiredEvents:
     """`--force` means "replace with what this release ships", everywhere.
 
     The merge walked only the event types present in the new config, so a
-    SuperClaude hook left on an event a later release dropped kept firing — and
+    superclaude hook left on an event a later release dropped kept firing — and
     kept calling a script that is no longer shipped.
     """
 
@@ -1371,3 +1371,22 @@ class TestMergeWritesOnlyWhenTheHooksChange:
 
         assert ok, message
         assert "rewritten" not in message, message
+
+
+class TestRemoveClaudeMdImport:
+    """Uninstall takes the import's heading with it, old spelling included."""
+
+    @pytest.mark.parametrize("heading", ["# SuperClaude Framework", "# superclaude"])
+    def test_heading_removed_with_the_import(self, tmp_path: Path, heading: str):
+        from superclaude.cli.install_settings import remove_claude_md_import
+
+        claude_md = tmp_path / "CLAUDE.md"
+        claude_md.write_text(
+            f"# My notes\nkeep this\n\n{heading}\n@superclaude/CLAUDE_SC.md\n",
+            encoding="utf-8",
+        )
+
+        ok, message = remove_claude_md_import(tmp_path, scope="user")
+
+        assert ok, message
+        assert claude_md.read_text(encoding="utf-8") == "# My notes\nkeep this\n"

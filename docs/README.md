@@ -1,6 +1,6 @@
 # docs/
 
-Working artifacts for SuperClaude development. **Not** user-facing product docs.
+Working artifacts for superclaude development. **Not** user-facing product docs.
 
 User-facing documentation is the framework content itself — its SSOT lives in `src/superclaude/`:
 

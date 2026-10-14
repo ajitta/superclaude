@@ -1,4 +1,4 @@
-# SuperClaude Hooks
+# superclaude Hooks
 
 Event-driven automation hooks for Claude Code integration.
 
@@ -96,7 +96,7 @@ Every command is `superclaude hook <name>` — the console script, dispatched in
 
 ### Runtime Variables (Claude Code)
 
-SuperClaude's own commands use none of these — `superclaude hook <name>` carries no path to substitute. They are available to any command Claude Code runs:
+superclaude's own commands use none of these — `superclaude hook <name>` carries no path to substitute. They are available to any command Claude Code runs:
 
 | Variable | Description |
 |----------|-------------|

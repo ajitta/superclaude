@@ -1,5 +1,5 @@
 """
-SuperClaude Framework Test Suite
+superclaude Test Suite
 
 Test organization:
 - unit/ - Unit tests for individual components

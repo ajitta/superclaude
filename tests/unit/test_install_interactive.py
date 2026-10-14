@@ -148,7 +148,7 @@ class TestUnattendedInstall:
         assert "No input available for the wizard" in result.output, (
             "the wizard died on EOF instead of falling back"
         )
-        assert "Installing SuperClaude components" in result.output, (
+        assert "Installing superclaude components" in result.output, (
             "the command exited without reaching the install"
         )
 
@@ -194,7 +194,7 @@ class TestScopeHintWording:
             )
 
         assert result.exit_code == 1
-        assert "Installing SuperClaude components" not in result.output
+        assert "Installing superclaude components" not in result.output
         mock_install_all.assert_not_called()
 
 
@@ -251,7 +251,7 @@ class TestCancellingNeverInstalls:
 
         assert result.exit_code == 0, result.output
         assert "No input available for the wizard" in result.output
-        assert "Installing SuperClaude components" in result.output
+        assert "Installing superclaude components" in result.output
 
     def test_answers_provided_run_the_wizard(self, runner, tmp_path, mock_install_all):
         """Piped answers are input, so the wizard must still open for them."""

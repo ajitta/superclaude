@@ -24,7 +24,7 @@ effort_values:
 
 # Command frontmatter forbidden fields — these belong on agents/skills, not commands.
 # Source: .claude/rules/command-authoring.md "Forbidden fields" list.
-# SuperClaude policy for its own commands; the fields Claude Code supports per
+# superclaude policy for its own commands; the fields Claude Code supports per
 # type are in src/superclaude/skills/sc-author/references/fields.yaml.
 forbidden_command_fields:
   - name           # derived from filename

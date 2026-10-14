@@ -1267,7 +1267,7 @@ def _committed_repo(tmp_path, monkeypatch):
 
 
 class TestFrameworkStateIsNotAUserChange:
-    """SuperClaude's own runtime files must not read as "the session changed code".
+    """superclaude's own runtime files must not read as "the session changed code".
 
     The gate asked whether `git status --porcelain` printed anything. In a
     project- or local-scope install the framework writes its context cache,

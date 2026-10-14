@@ -41,4 +41,4 @@ Rules:
 - `refuted` requires both colliding statements quoted verbatim under Open questions or Thesis, plus the user's attempted reconciliation. Without that, it is `open`.
 - `risky` means load-bearing *and* doubtful. Address risky assumptions first in the next step.
 - More than one delegated decision: add "Recheck the delegated decisions before building" to the next step.
-- In a repository that uses SuperClaude, a suitable next step is `/sc:design` or `/sc:review` on the brief. Suggest it; don't run it.
+- In a repository that uses superclaude, a suitable next step is `/sc:design` or `/sc:review` on the brief. Suggest it; don't run it.

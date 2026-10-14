@@ -4,9 +4,9 @@ paths: ["src/superclaude/agents/**", "src/superclaude/commands/**", "src/supercl
 
 # XML Prose Format Rules
 
-> Body-format spec for SuperClaude content components — agent / command / mode bodies under `src/superclaude/`. Derive from Claude.ai system-prompt prose style, adapt with minimal `-` line list so short labeled enums stay readable without verbose XML containers.
+> Body-format spec for superclaude content components — agent / command / mode bodies under `src/superclaude/`. Derive from Claude.ai system-prompt prose style, adapt with minimal `-` line list so short labeled enums stay readable without verbose XML containers.
 > Format-only — content/policy of any specific component out of scope.
-> **Scope.** Rule govern component bodies. `*-authoring.md` meta-docs in `.claude/rules/` document rule for human authors, may use plain Markdown (headers, tables) — they not themselves SuperClaude components.
+> **Scope.** Rule govern component bodies. `*-authoring.md` meta-docs in `.claude/rules/` document rule for human authors, may use plain Markdown (headers, tables) — they not themselves superclaude components.
 
 ## Design Goals
 

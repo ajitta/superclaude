@@ -1,6 +1,6 @@
-# SuperClaude Content Framework Architecture
+# superclaude Content Framework Architecture
 
-Single source of truth for the SuperClaude content framework taxonomy, delivery pipelines, and directory roles.
+Single source of truth for the superclaude content framework taxonomy, delivery pipelines, and directory roles.
 
 ## Framework Taxonomy
 
@@ -25,7 +25,7 @@ Only three hooks are mechanically enforced — `file_size_guard.py` (blocks Read
 
 ### core/ — WHO WE ARE
 
-Always-applied principles and rules that define SuperClaude's identity. Loaded via `CLAUDE_SC.md` `@import` at session start.
+Always-applied principles and rules that define superclaude's identity. Loaded via `CLAUDE_SC.md` `@import` at session start.
 
 **Sub-roles:**
 - **Always-loaded** — FLAGS.md, PRINCIPLES.md, RULES.md (imported by CLAUDE_SC.md, present in every session). RULES.md is a ~0.9k-token kernel (Phase 2-1 core-lite split, measurement-gated by the evals/ 4×7 matrix): four rule classes whose loss is most expensive, plus a map of the on-demand modules.
@@ -56,7 +56,7 @@ Domain expert agents with specialized knowledge, behaviors, and tool preferences
 
 ### output-styles/ — HOW EVERY RESPONSE READS
 
-Claude Code output styles: Markdown with YAML frontmatter that replaces the tone and format instructions in Claude Code's system prompt for every response. Installed to `<scope>/output-styles/`, the directory Claude Code scans natively; the user selects one via `/config` → **Output style**, which writes `outputStyle` to `.claude/settings.local.json`. Nothing in SuperClaude loads or injects them.
+Claude Code output styles: Markdown with YAML frontmatter that replaces the tone and format instructions in Claude Code's system prompt for every response. Installed to `<scope>/output-styles/`, the directory Claude Code scans natively; the user selects one via `/config` → **Output style**, which writes `outputStyle` to `.claude/settings.local.json`. Nothing in superclaude loads or injects them.
 
 **Contract:** Plain Markdown prose, not the `<component>` pattern. `keep-coding-instructions: true` always, so Claude Code's own software-engineering instructions survive. Language-neutral: the style ships to every user, so it names patterns, never one language's phrases. A style shapes voice for every turn; a mode shapes mindset for a task.
 
@@ -68,9 +68,9 @@ User-facing workflow entry points accessible as `/sc:*` slash commands. Managed 
 
 ### skills/ — WRITE INSTRUCTION DOCS
 
-Claude Code skills, one directory each: `SKILL.md` plus the reference files it links. Installed to `<scope>/skills/<name>/`, the directory Claude Code scans natively and shares with the user's own skills, so install, uninstall and drift touch only the directory names SuperClaude ships. `sc-author` is user-invoked (`disable-model-invocation: true`) and runs the `superclaude author-check` validator.
+Claude Code skills, one directory each: `SKILL.md` plus the reference files it links. Installed to `<scope>/skills/<name>/`, the directory Claude Code scans natively and shares with the user's own skills, so install, uninstall and drift touch only the directory names superclaude ships. `sc-author` is user-invoked (`disable-model-invocation: true`) and runs the `superclaude author-check` validator.
 
-**Contract:** References are written for the projects SuperClaude is installed into, from Anthropic's published guidance listed in each file's `sources` — not from `.claude/rules/`, which is this repository's own convention. Rules: `.claude/rules/skill-authoring.md`.
+**Contract:** References are written for the projects superclaude is installed into, from Anthropic's published guidance listed in each file's `sources` — not from `.claude/rules/`, which is this repository's own convention. Rules: `.claude/rules/skill-authoring.md`.
 
 ### mcp/ — TOOL REFERENCE
 
@@ -80,7 +80,7 @@ Documentation and configuration for MCP (Model Context Protocol) servers. Server
 
 ### scripts/ — INFRASTRUCTURE
 
-Python and shell scripts that power SuperClaude's hook system, context loading, and session management. Every `hooks.json` command is `superclaude hook <name>` (registry: `cli/hook_dispatch.py`, dispatched in `cli/entry.py` ahead of the click app), so Claude Code's hook runtime runs the copy inside the installed package — nothing is copied into the install tree and no command carries an interpreter or a path.
+Python and shell scripts that power superclaude's hook system, context loading, and session management. Every `hooks.json` command is `superclaude hook <name>` (registry: `cli/hook_dispatch.py`, dispatched in `cli/entry.py` ahead of the click app), so Claude Code's hook runtime runs the copy inside the installed package — nothing is copied into the install tree and no command carries an interpreter or a path.
 
 **Contract:** Scripts are infrastructure plumbing — they should be invisible to the user. They handle context injection, session initialization, and formatting hooks.
 

@@ -1,10 +1,10 @@
-# SuperClaude Core
+# superclaude Core
 
-Framework DNA — always-on principles + rules define SuperClaude identity.
+Framework DNA — always-on principles + rules define superclaude identity.
 
 ## Content Delivery
 
-Core files load via `CLAUDE_SC.md` `@import` at session start. Present in **every** Claude Code session where SuperClaude installed.
+Core files load via `CLAUDE_SC.md` `@import` at session start. Present in **every** Claude Code session where superclaude installed.
 
 **Exceptions (on-demand, injected by `context_loader.py`):** `rules/` modules load when their domain triggers (implement/review work, delegation, doc production, /sc: commands); BUSINESS_SYMBOLS.md loads when business-symbol / panel-example / `--structured` patterns match.
 

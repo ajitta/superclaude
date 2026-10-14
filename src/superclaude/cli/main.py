@@ -1,7 +1,7 @@
 """
-SuperClaude CLI Main Entry Point
+superclaude CLI Main Entry Point
 
-Provides command-line interface for SuperClaude operations.
+Provides command-line interface for superclaude operations.
 """
 
 import re
@@ -14,10 +14,10 @@ from superclaude import __version__
 
 
 @click.group()
-@click.version_option(version=__version__, prog_name="SuperClaude")
+@click.version_option(version=__version__, prog_name="superclaude")
 def main():
     """
-    SuperClaude - AI-enhanced development framework for Claude Code
+    superclaude - AI-enhanced development framework for Claude Code
 
     A pytest plugin providing PM Agent capabilities and optional skills system.
     """
@@ -99,7 +99,7 @@ def install(
     force: bool, list_only: bool, list_all: bool, scope: str, interactive: bool
 ):
     """
-    Install all SuperClaude components to Claude Code
+    Install all superclaude components to Claude Code
 
     Installs:
     - Slash commands to commands/sc/
@@ -185,7 +185,7 @@ def install(
     # List all components mode
     if list_all:
         components = list_all_components(base_path=base_path, scope=scope)
-        click.echo(f"📋 SuperClaude Components (scope: {scope}):\n")
+        click.echo(f"📋 superclaude Components (scope: {scope}):\n")
         for name, info in components.items():
             status = f"{info['installed']}/{info['available']}"
             icon = (
@@ -232,7 +232,7 @@ def install(
         click.echo()
 
     # Install all components
-    click.echo(f"📦 Installing SuperClaude components (scope: {scope})...")
+    click.echo(f"📦 Installing superclaude components (scope: {scope})...")
     click.echo()
 
     success, message = install_all(base_path=base_path, force=force, scope=scope)
@@ -269,24 +269,24 @@ def install(
 @click.option(
     "--remove-mcp",
     is_flag=True,
-    help="Also remove SuperClaude-registered MCP servers (default: keep, since MCP is shared across tools)",
+    help="Also remove superclaude-registered MCP servers (default: keep, since MCP is shared across tools)",
 )
 def uninstall(
     scope: str, dry_run: bool, yes: bool, keep_settings: bool, remove_mcp: bool
 ):
     """
-    Uninstall all SuperClaude components from Claude Code
+    Uninstall all superclaude components from Claude Code
 
     Removes:
     - superclaude/ directory (core, modes, mcp, templates)
     - commands/sc/ directory (slash commands)
     - shipped files in agents/ and output-styles/ (your own files stay)
     - hooks/hooks.json file
-    - SuperClaude hooks from settings.json (preserves user hooks)
+    - superclaude hooks from settings.json (preserves user hooks)
     - @superclaude import from CLAUDE.md
 
     Preserved by default (opt-in removal):
-    - MCP servers registered by SuperClaude — shared with other CC tools/agents.
+    - MCP servers registered by superclaude — shared with other CC tools/agents.
       Use --remove-mcp to clean them at the given scope (preserves user-added servers).
 
     Scopes:
@@ -300,7 +300,7 @@ def uninstall(
         superclaude uninstall --scope project  # Uninstall from current project
         superclaude uninstall --scope local    # Uninstall personal install (cleans .gitignore)
         superclaude uninstall --keep-settings  # Keep settings.json hooks
-        superclaude uninstall --remove-mcp     # Also remove SuperClaude-registered MCP servers
+        superclaude uninstall --remove-mcp     # Also remove superclaude-registered MCP servers
     """
     keep_mcp = not remove_mcp
     from .install_inventory import uninstall_all
@@ -323,13 +323,13 @@ def uninstall(
 
     # Confirmation prompt (unless --yes)
     if not yes:
-        click.echo(f"⚠️  This will remove SuperClaude from {base_path}")
+        click.echo(f"⚠️  This will remove superclaude from {base_path}")
         click.echo("   User hooks in settings.json will be preserved.\n")
         if not click.confirm("Do you want to continue?"):
             click.echo("❌ Uninstall cancelled")
             return
 
-    click.echo(f"🗑️  Uninstalling SuperClaude components (scope: {scope})...")
+    click.echo(f"🗑️  Uninstalling superclaude components (scope: {scope})...")
     click.echo()
 
     success, message = uninstall_all(
@@ -400,7 +400,7 @@ def mcp(servers, list_only, scope, dry_run):
 )
 def update(scope: str):
     """
-    Update SuperClaude commands to latest version
+    Update superclaude commands to latest version
 
     Re-installs all components to match the current package version.
     This is a convenience command equivalent to 'install --force'.
@@ -419,7 +419,7 @@ def update(scope: str):
 
     base_path = get_base_path(scope)
 
-    click.echo(f"🔄 Updating SuperClaude to version {__version__} (scope: {scope})...")
+    click.echo(f"🔄 Updating superclaude to version {__version__} (scope: {scope})...")
     click.echo()
 
     success, message = install_all(base_path=base_path, force=True, scope=scope)
@@ -444,11 +444,11 @@ def update(scope: str):
 )
 def doctor(verbose: bool, scope: str | None):
     """
-    Check SuperClaude installation health
+    Check superclaude installation health
 
     Verifies:
         - pytest plugin loaded correctly
-        - SuperClaude hooks registered in the scope's settings file
+        - superclaude hooks registered in the scope's settings file
         - `superclaude` resolvable on PATH, which every hook command needs
         - CLAUDE_SC.md installed and imported
 
@@ -466,7 +466,7 @@ def doctor(verbose: bool, scope: str | None):
     results = run_doctor(scope=scope)
 
     click.echo(
-        f"🔍 SuperClaude Doctor (scope: {results['scope']} — {results['base_path']})\n"
+        f"🔍 superclaude Doctor (scope: {results['scope']} — {results['base_path']})\n"
     )
 
     # Display results
@@ -484,7 +484,7 @@ def doctor(verbose: bool, scope: str | None):
     passed = sum(1 for check in results["checks"] if check["passed"])
 
     if passed == total:
-        click.echo("✅ SuperClaude is healthy")
+        click.echo("✅ superclaude is healthy")
     else:
         click.echo(f"⚠️  {total - passed}/{total} checks failed")
         sys.exit(1)

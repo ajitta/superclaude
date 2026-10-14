@@ -1,5 +1,5 @@
 """
-Cross-reference integrity linter for SuperClaude content files.
+Cross-reference integrity linter for superclaude content files.
 
 Validates:
 - Handoff targets: <handoff next="/sc:X"> → commands/X.md exists

@@ -1,5 +1,5 @@
 """
-Listing & Uninstallation for SuperClaude
+Listing & Uninstallation for superclaude
 
 Handles listing available/installed components and full uninstallation.
 """
@@ -169,7 +169,7 @@ def list_all_components(
         # subdirectories — not top-level *.md, which they have none of.
         #
         # Both sides are counted by *name*, and the installed side is the
-        # intersection with the source, so a directory SuperClaude does not ship
+        # intersection with the source, so a directory superclaude does not ship
         # is never counted as installed.
         if component in DIRECTORY_COMPONENTS:
             source_names = dir_names(source_dir)
@@ -231,7 +231,7 @@ def _uninstall_shared_component(
 
     ``agents/``, ``output-styles/`` and ``skills/`` are Claude Code's own content
     directories: the user's own agents, styles and skills, and other tools'
-    skills, sit next to what SuperClaude installed, so only the names this
+    skills, sit next to what superclaude installed, so only the names this
     release ships are removed (files, or whole directories for skills), and the
     directory goes only once it is empty.
 
@@ -293,15 +293,15 @@ def uninstall_all(
     keep_mcp: bool = True,
 ) -> Tuple[bool, str]:
     """
-    Uninstall all SuperClaude components.
+    Uninstall all superclaude components.
 
     This function removes:
     1. .claude/superclaude/ directory (entire directory) and commands/sc/
     2. The shipped files in agents/ and output-styles/ (user files preserved)
     3. .claude/hooks/hooks.json file
-    4. SuperClaude hooks from settings.json (preserves user hooks)
+    4. superclaude hooks from settings.json (preserves user hooks)
     5. @superclaude import from CLAUDE.md
-    6. MCP servers registered by SuperClaude at the given scope
+    6. MCP servers registered by superclaude at the given scope
        (scope-aware; user-added servers are preserved)
 
     Args:
@@ -312,7 +312,7 @@ def uninstall_all(
         keep_mcp: If True (default), don't remove MCP server registrations.
             MCP servers are a shared CC resource — other tools/agents may
             rely on them, so we preserve them by default. Pass False (via
-            `uninstall --remove-mcp`) to also clean SuperClaude-registered
+            `uninstall --remove-mcp`) to also clean superclaude-registered
             servers at this scope.
 
     Returns:
@@ -403,7 +403,7 @@ def uninstall_all(
                     shutil.rmtree(d)
                 messages.append(
                     f"✅ Removed: {len(stale)} skill(s) from a pre-removal release "
-                    f"(preserved non-SuperClaude skills)"
+                    f"(preserved non-superclaude skills)"
                 )
                 removed += 1
             except OSError as e:
@@ -473,7 +473,7 @@ def uninstall_all(
                 messages.append(f"❌ Failed to remove {state_dir}: {e}")
                 failed += 1
 
-    # 6. Remove SuperClaude hooks from settings file (preserve user hooks)
+    # 6. Remove superclaude hooks from settings file (preserve user hooks)
     filename = settings_filename(scope)
     if keep_settings:
         messages.append(f"⏭️  Skipped: {filename} hooks (--keep-settings)")
@@ -495,11 +495,11 @@ def uninstall_all(
                     )
                     if sc_hook_count > 0:
                         messages.append(
-                            f"[DRY-RUN] Would remove {sc_hook_count} SuperClaude hooks from {filename}"
+                            f"[DRY-RUN] Would remove {sc_hook_count} superclaude hooks from {filename}"
                         )
                         removed += 1
                     else:
-                        messages.append(f"⏭️  No SuperClaude hooks in {filename}")
+                        messages.append(f"⏭️  No superclaude hooks in {filename}")
                         skipped += 1
                 else:
                     messages.append(f"⏭️  No hooks section in {filename}")
@@ -528,11 +528,11 @@ def uninstall_all(
             content = claude_md_target.read_text(encoding="utf-8")
             if "@superclaude" in content or "@.claude/superclaude" in content:
                 messages.append(
-                    f"[DRY-RUN] Would remove SuperClaude import from {claude_md_label}"
+                    f"[DRY-RUN] Would remove superclaude import from {claude_md_label}"
                 )
                 removed += 1
             else:
-                messages.append(f"⏭️  No SuperClaude import in {claude_md_label}")
+                messages.append(f"⏭️  No superclaude import in {claude_md_label}")
                 skipped += 1
         else:
             messages.append(f"⏭️  No {claude_md_label} found")
@@ -581,7 +581,7 @@ def uninstall_all(
             else:
                 failed += 1
 
-    # 9. Remove SuperClaude-registered MCP servers (scope-aware, preserves user servers)
+    # 9. Remove superclaude-registered MCP servers (scope-aware, preserves user servers)
     if keep_mcp:
         messages.append(
             "⏭️  Skipped: MCP server cleanup (default; pass --remove-mcp to clean)"
@@ -598,7 +598,7 @@ def uninstall_all(
         )
         messages.extend(mcp_messages)
         if mcp_removed == 0 and mcp_failed == 0:
-            messages.append(f"⏭️  No SuperClaude MCP servers at {scope} scope")
+            messages.append(f"⏭️  No superclaude MCP servers at {scope} scope")
             skipped += 1
         else:
             removed += mcp_removed

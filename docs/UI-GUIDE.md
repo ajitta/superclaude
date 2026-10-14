@@ -28,7 +28,7 @@ ANSI styling, no rendering library: output is plain `click.echo`.
 ### Command banners
 
 One banner as the first line of a command, verb-shaped, with the scope in
-parentheses: `📦 Installing SuperClaude components (scope: user)...`
+parentheses: `📦 Installing superclaude components (scope: user)...`
 
 | Glyph | Command family |
 |---|---|
@@ -110,7 +110,7 @@ implementation: banner with scope, glyph + width-aligned description + count,
 `└─` detail line, and a second `└─` only when there is drift to report.
 
 ```text
-📋 SuperClaude Components (scope: user):
+📋 superclaude Components (scope: user):
 
    ✅ Slash commands                           [36/36]
       └─ ~/.claude/commands/sc

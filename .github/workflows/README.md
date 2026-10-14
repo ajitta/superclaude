@@ -10,7 +10,7 @@
   - `tests/unit/scripts` in a separate pytest process (the default run skips it through `--ignore` in pyproject addopts)
 - **checks**: Python 3.10
   - `ruff check` and `ruff format --check` over `src/` and `tests/`
-  - Pytest plugin loads (its `SuperClaude: ` report header)
+  - Pytest plugin loads (its `superclaude: ` report header)
   - `superclaude install --scope user` followed by `superclaude doctor`
 
 `make release` runs `make ci` after its local checks and stops unless the run is green; a commit that already has a green run is not re-run.
@@ -28,7 +28,7 @@ The same checks, run locally before pushing:
 uv run pytest                                  # full suite
 uv run pytest tests/unit/scripts -o addopts=   # scripts tests
 make lint                                      # ruff check (format check runs in CI)
-uv run pytest --collect-only -q | grep "^SuperClaude: "   # plugin loads
+uv run pytest --collect-only -q | grep "^superclaude: "   # plugin loads
 uv run superclaude doctor --verbose
 ```
 

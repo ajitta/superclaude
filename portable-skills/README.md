@@ -1,6 +1,6 @@
 # Portable skills
 
-Skills here follow the [Agent Skills spec](https://agentskills.io/specification) subset that **every** target accepts, so one folder runs in Claude (chat, desktop, mobile, Claude Code, cloud sessions) and in Codex. They are separate from the SuperClaude framework: `superclaude install` does not install them, and nothing in `src/superclaude` depends on them.
+Skills here follow the [Agent Skills spec](https://agentskills.io/specification) subset that **every** target accepts, so one folder runs in Claude (chat, desktop, mobile, Claude Code, cloud sessions) and in Codex. They are separate from the superclaude framework: `superclaude install` does not install them, and nothing in `src/superclaude` depends on them.
 
 | Skill | What it does | Pick it when |
 |---|---|---|

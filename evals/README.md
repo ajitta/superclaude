@@ -1,4 +1,4 @@
-# SuperClaude Eval Harness
+# superclaude Eval Harness
 
 4-arm behavioral eval (roadmap Phase 1-1) + model-release canary suite
 (Phase 1-2). Dev-only tooling — not shipped by the installer.

@@ -1,4 +1,4 @@
-# SuperClaude Agents
+# superclaude Agents
 
 Domain expert agents — AI agent defs for task-based auto-delegation.
 

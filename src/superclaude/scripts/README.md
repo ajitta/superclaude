@@ -1,4 +1,4 @@
-# SuperClaude Scripts
+# superclaude Scripts
 
 Hook infra — Python + shell scripts for context loading, session mgmt, automation.
 
@@ -13,7 +13,7 @@ Run by the Claude Code hook runtime as `superclaude hook <name>` (registry: `../
 | Script | Purpose |
 |--------|---------|
 | `context_loader.py` | Dynamic context file loading — TRIGGER_MAP matching, session dedup, 8K token budget, hybrid injection. Dry run: `superclaude context explain "<prompt>"` |
-| `session_init.py` | Session init — load SuperClaude context at startup |
+| `session_init.py` | Session init — load superclaude context at startup |
 | `memory_staleness.py` | SessionStart warning for auto-memory entries whose `verified:` date is stale (`SUPERCLAUDE_MEMORY_STALE_DAYS`, default 90) |
 | `insight_writer.py` | Insight capture/harvest for `/sc:insight` — SessionStart pending-count, PreCompact/SessionEnd transcript harvest |
 | `prettier_hook.py` | Code formatting hook via Prettier |

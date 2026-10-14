@@ -2,7 +2,7 @@
 
 ## 🔒 Reporting Security Vulnerabilities
 
-SuperClaude Framework prioritizes security through secure-by-design principles, comprehensive input validation, and responsible vulnerability management. We are committed to maintaining a secure development platform while enabling powerful AI-assisted workflows.
+superclaude prioritizes security through secure-by-design principles, comprehensive input validation, and responsible vulnerability management. We are committed to maintaining a secure development platform while enabling powerful AI-assisted workflows.
 
 **Security Commitment:**
 - Timely response to security reports (48-72 hours)
@@ -12,10 +12,10 @@ SuperClaude Framework prioritizes security through secure-by-design principles, 
 
 ### Responsible Disclosure
 
-**Primary Contact:** anton.knoery@gmail.com (monitored by maintainers)
+**Primary Contact:** GitHub [private vulnerability reporting](https://github.com/ajitta/superclaude/security/advisories/new) (monitored by maintainers)
 
 **Process:**
-1. **Report**: Send detailed vulnerability report to anton.knoery@gmail.com
+1. **Report**: Send a detailed vulnerability report through [private vulnerability reporting](https://github.com/ajitta/superclaude/security/advisories/new)
 2. **Acknowledgment**: We'll confirm receipt within 48 hours
 3. **Investigation**: Initial assessment within 72 hours
 4. **Coordination**: Work together on fix development and testing
@@ -39,7 +39,7 @@ SuperClaude Framework prioritizes security through secure-by-design principles, 
 ### What to Include
 
 **Essential Information:**
-- SuperClaude version: `SuperClaude --version`
+- superclaude version: `superclaude --version`
 - Operating system and version
 - Python version: `python3 --version`
 - Claude Code version: `claude --version`
@@ -56,7 +56,7 @@ SuperClaude Framework prioritizes security through secure-by-design principles, 
 
 **Vulnerability Report Template:**
 ```
-**SuperClaude Version:** [version]
+**superclaude Version:** [version]
 **Environment:** [OS, Python version, Claude Code version]
 
 **Vulnerability Summary:**
@@ -343,7 +343,7 @@ For organizations requiring extended security support:
 ### For Users
 
 **Installation Security:**
-- Download SuperClaude only from official sources (PyPI, npm, GitHub releases)
+- Download superclaude only from official sources (PyPI, npm, GitHub releases)
 - Verify package signatures and checksums when available
 - Use virtual environments to isolate dependencies
 - Keep Python, Node.js, and system packages updated
@@ -355,9 +355,9 @@ For organizations requiring extended security support:
 - Enable only needed MCP servers to minimize attack surface
 
 **Project Security:**
-- Never run SuperClaude with elevated privileges unless absolutely necessary
+- Never run superclaude with elevated privileges unless absolutely necessary
 - Review generated code before execution, especially for external API calls
-- Use version control to track all SuperClaude-generated changes
+- Use version control to track all superclaude-generated changes
 - Regularly backup project configurations and important data
 
 **Network Security:**
@@ -531,7 +531,7 @@ Security researchers who responsibly disclose vulnerabilities are recognized in:
 - Priority review for future security research and contributions
 
 **Current Incentive Structure:**
-SuperClaude Framework currently operates as an open-source project without monetary bug bounty rewards. Recognition focuses on professional acknowledgment and community contribution value.
+superclaude currently operates as an open-source project without monetary bug bounty rewards. Recognition focuses on professional acknowledgment and community contribution value.
 
 **Future Incentive Considerations:**
 As the project grows and secures funding:
@@ -597,7 +597,7 @@ As the project grows and secures funding:
 
 ### Security Team
 **Primary Security Contact:**
-- **Email**: anton.knoery@gmail.com
+- **Report**: https://github.com/ajitta/superclaude/security/advisories/new
 - **Monitored By**: Core maintainers and security-focused contributors
 - **Response Time**: 48-72 hours for initial acknowledgment
 - **Escalation**: Direct maintainer contact for critical issues requiring immediate attention
@@ -609,25 +609,25 @@ As the project grows and secures funding:
 - **Community Security Liaisons**: Interface with security researchers and community
 
 **GitHub Security Integration:**
-- **Security Advisories**: https://github.com/SuperClaude-Org/SuperClaude_Framework/security/advisories
+- **Security Advisories**: https://github.com/ajitta/superclaude/security/advisories
 - **Security Policy**: Available in repository security tab
 - **Vulnerability Reporting**: GitHub's private vulnerability reporting system
 - **Security Team**: GitHub team with security focus and escalation procedures
 
 **Encrypted Communication:**
 For sensitive security discussions requiring encrypted communication:
-- **GPG Key**: Available upon request to anton.knoery@gmail.com
+- **GPG Key**: Available upon request through a private vulnerability report
 - **Signal**: Secure messaging coordination available for complex cases
 - **Private Channels**: Dedicated security discussion channels for verified researchers
 
 **Emergency Contact:**
 For critical vulnerabilities requiring immediate attention:
-- **Priority Email**: anton.knoery@gmail.com (monitored continuously)
+- **Priority Channel**: [private vulnerability reporting](https://github.com/ajitta/superclaude/security/advisories/new)
 - **Escalation Path**: Direct maintainer contact information provided upon first contact
 
 ### General Security Questions
 **General Security Questions:**
-- **GitHub Discussions**: https://github.com/SuperClaude-Org/SuperClaude_Framework/discussions
+- **GitHub Discussions**: https://github.com/ajitta/superclaude/discussions
 - **Community Forums**: Security-focused discussion threads
 - **Documentation**: [Security Best Practices](docs/Reference/quick-start-practices.md#security-practices)
 - **Issue Tracker**: Non-sensitive security configuration questions
@@ -719,7 +719,7 @@ For organizations requiring dedicated security support:
 
 **Security Policy Maintenance:**
 
-**Last Updated**: December 2024 (SuperClaude Framework v4.0)
+**Last Updated**: December 2024 (superclaude v4.0)
 **Next Review**: March 2025 (Quarterly review cycle)
 **Version**: 4.1.5 (Updated for v4 architectural changes)
 
@@ -737,7 +737,7 @@ For organizations requiring dedicated security support:
 
 **Security Contributor Acknowledgments:**
 
-SuperClaude Framework's security posture benefits from community-driven security research, responsible disclosure, and collaborative improvement efforts.
+superclaude's security posture benefits from community-driven security research, responsible disclosure, and collaborative improvement efforts.
 
 **Security Contributors:**
 - Security researchers who responsibly disclose vulnerabilities
@@ -746,13 +746,13 @@ SuperClaude Framework's security posture benefits from community-driven security
 - Documentation contributors who improve security guidance and best practices
 
 **Recognition:**
-- [GitHub Contributors](https://github.com/SuperClaude-Org/SuperClaude_Framework/graphs/contributors) - Complete contributor recognition
+- [GitHub Contributors](https://github.com/ajitta/superclaude/graphs/contributors) - Complete contributor recognition
 - Security advisories include researcher acknowledgment and credit
 - Annual security report highlights significant security contributions
 - Community discussions celebrate helpful security guidance and support
 
 **Ongoing Security Community:**
-The SuperClaude security community continues growing through shared commitment to secure AI-assisted development workflows. Security-focused contributions, from vulnerability reports to secure coding practices, strengthen the framework for all users.
+The superclaude security community continues growing through shared commitment to secure AI-assisted development workflows. Security-focused contributions, from vulnerability reports to secure coding practices, strengthen the framework for all users.
 
 **Join Security Efforts:**
 Whether you're reporting security issues, improving security documentation, or contributing security-focused code, your efforts help build more secure software development tools for the entire community.

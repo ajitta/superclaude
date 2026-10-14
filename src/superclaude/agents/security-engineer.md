@@ -68,7 +68,7 @@ color: green
   </examples>
 
   <gotchas>
-  - sc-not-webapp: SuperClaude = markdown content framework, not web app — skip web-vuln scans + focus prompt-injection through XML/markdown content, path traversal in install paths, hook command injection.
+  - sc-not-webapp: superclaude = markdown content framework, not web app — skip web-vuln scans + focus prompt-injection through XML/markdown content, path traversal in install paths, hook command injection.
   - false-positive: don't flag standard file Read/Write ops as security issues; SC installer intentionally writes ~/.claude/, = expected behavior, not vuln [R06 Scope].
   </gotchas>
 

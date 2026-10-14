@@ -243,7 +243,7 @@ class TestEntryFastPath:
     ):
         """`~/.local/bin` is a shared user bin; a stray `json.py` there would
         shadow the stdlib for every hook. The old form ran from a directory
-        SuperClaude owned, and entry keeps that property."""
+        superclaude owned, and entry keeps that property."""
         import sys as _sys
 
         from superclaude.cli import entry
@@ -266,7 +266,7 @@ class TestEntryFastPath:
             tmp_path,
         )
         assert result.returncode == 0, result.stderr
-        assert "SuperClaude, version" in result.stdout
+        assert "superclaude, version" in result.stdout
 
 
 class TestClickRegistration:

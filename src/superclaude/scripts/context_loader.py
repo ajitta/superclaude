@@ -254,7 +254,7 @@ _INLINE_CODE_RE = re.compile(r"`[^`\n]+`")
 _BLOCKQUOTE_RE = re.compile(r"^\s*>.*$", re.MULTILINE)
 _WORD_RE = re.compile(r"[A-Za-z][\w.-]*")
 
-# Runners whose own options collide with SuperClaude names. A runner anywhere
+# Runners whose own options collide with superclaude names. A runner anywhere
 # ahead of the option on its line claims it — `run pytest --no-parallel for me`
 # is as much pytest's flag as `pytest --no-parallel` is. That over-reaches on a
 # line like "explain how python handles --loop", and the trade is deliberate:
@@ -745,7 +745,7 @@ def output_inject_mode(
     )
     if verbose:
         print(
-            "<!-- SuperClaude --verbose-context: forcing full .md injection for "
+            "<!-- superclaude --verbose-context: forcing full .md injection for "
             f"{len(contexts)} file(s). Expect 5-10x token inflation vs default tiers. -->"
         )
         print()
@@ -958,8 +958,8 @@ _BUNDLED_REF_GLOB = "claude/bundled-skills/*/*/claude-api/shared/model-migration
 def migration_reference_roots() -> list[Path]:
     """Every .claude directory Claude Code can load the claude-api skill from.
 
-    The install scope of SuperClaude says nothing about where the skill lives:
-    a user-scope SuperClaude sits beside a project-scope skill, and
+    The install scope of superclaude says nothing about where the skill lives:
+    a user-scope superclaude sits beside a project-scope skill, and
     CLAUDE_CONFIG_DIR moves the user directory. Search all of them.
     """
     candidates = [claude_base(), project_root() / ".claude"]
@@ -1087,7 +1087,7 @@ def _emit_prompt_command_reference(prompt: str) -> None:
         path = None
     if path is None:
         print(
-            "<!-- SuperClaude /sc-prompt: no claude-api model-migration reference "
+            "<!-- superclaude /sc-prompt: no claude-api model-migration reference "
             "in the project, user or CLAUDE_CONFIG_DIR .claude directories or in "
             "Claude Code's bundled skills — the "
             "skill's mirror file for the target is authoritative, and the report states "
@@ -1098,7 +1098,7 @@ def _emit_prompt_command_reference(prompt: str) -> None:
     ranges = migration_reference_ranges(path)
     if not ranges:
         print(
-            f"<!-- SuperClaude /sc-prompt: claude-api model-migration reference at "
+            f"<!-- superclaude /sc-prompt: claude-api model-migration reference at "
             f"{path} — its model anchors have moved, so locate the target's "
             "behavioral-shifts section by hand before trusting the mirror files. -->"
         )
@@ -1108,7 +1108,7 @@ def _emit_prompt_command_reference(prompt: str) -> None:
         f"'{model}' {', '.join(spans)}" for model, spans in ranges.items()
     )
     print(
-        f"<!-- SuperClaude /sc-prompt: claude-api model-migration reference at "
+        f"<!-- superclaude /sc-prompt: claude-api model-migration reference at "
         f"{path} — {located}. Read the target model's section before applying "
         "the delta; on conflict it wins over the skill's mirror files. "
         "A target missing from the ranges above has no section here, so its "
@@ -1177,7 +1177,7 @@ def main() -> None:
     prompt, flag_notifications = resolve_flags(prompt)
     if flag_notifications:
         for note in flag_notifications:
-            print(f"<!-- SuperClaude flag: {note} -->")
+            print(f"<!-- superclaude flag: {note} -->")
         print()
 
     # Execution flag directives (inline behavioral hints — no file injection)
@@ -1186,7 +1186,7 @@ def main() -> None:
     # An unknown /sc: name must not read as a real command
     command_notes, unresolved_commands = resolve_command_name(prompt)
     for note in command_notes:
-        print(f"<!-- SuperClaude command: {note} -->")
+        print(f"<!-- superclaude command: {note} -->")
     if command_notes:
         print()
 

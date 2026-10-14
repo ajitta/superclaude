@@ -1,5 +1,5 @@
 """
-Pytest configuration and shared fixtures for SuperClaude tests
+Pytest configuration and shared fixtures for superclaude tests
 """
 
 import pytest

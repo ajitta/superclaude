@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""SuperClaude SessionStart initialization script (Python)
+"""superclaude SessionStart initialization script (Python)
 
 Auto-executed when Claude Code session starts.
 Cross-platform compatible (Windows/macOS/Linux).
@@ -29,7 +29,7 @@ def get_install_status() -> str:
     try:
         from superclaude.utils import claude_base, detect_scope
     except ImportError:
-        return "⚠️ SuperClaude: install status unavailable"
+        return "⚠️ superclaude: install status unavailable"
 
     base = claude_base()
     # A two-way user/project test reported a local install as "project scope".
@@ -48,12 +48,12 @@ def get_install_status() -> str:
 
     if not commands:
         return (
-            f"⚠️ SuperClaude: no commands installed at {scope} scope "
+            f"⚠️ superclaude: no commands installed at {scope} scope "
             f"({base}) — run `superclaude install`"
         )
 
     agent_word = "agent" if agents == 1 else "agents"
-    return f"🛠️ SuperClaude: {commands} commands, {agents} {agent_word} ({scope} scope)"
+    return f"🛠️ superclaude: {commands} commands, {agents} {agent_word} ({scope} scope)"
 
 
 PR_STATUS_TTL_SECONDS = 600

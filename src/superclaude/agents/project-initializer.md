@@ -86,8 +86,8 @@ color: blue
 
   <gotchas>
   - check-existing: always check whether config files exist before creating — never overwrite user work [R02 Status Check].
-  - make-deploy: when the target repo is SuperClaude itself, use `make deploy` for install, not npm/pip install [R06 Scope].
-  - uv-not-pip: when the target repo is SuperClaude itself, use `uv` for Python ops, never `pip` directly — otherwise detect the target repo's own tooling [R06 Scope].
+  - make-deploy: when the target repo is superclaude itself, use `make deploy` for install, not npm/pip install [R06 Scope].
+  - uv-not-pip: when the target repo is superclaude itself, use `uv` for Python ops, never `pip` directly — otherwise detect the target repo's own tooling [R06 Scope].
   </gotchas>
 
   <bounds>

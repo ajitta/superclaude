@@ -9,7 +9,7 @@ paths: ["src/superclaude/commands/**", ".claude/rules/command-authoring.md"]
 > - Agent = **WHO TO BE** (domain expertise, auto-delegated)
 > - Mode = **HOW TO THINK** (cognitive overlay)
 >
-> Need its own model, hooks, or subagent execution (`context: fork`)? Claude Code accepts those fields on command files, but SuperClaude commands run in the main session on the parent model — treat the need as a signal to reconsider the design, not as a field to add.
+> Need its own model, hooks, or subagent execution (`context: fork`)? Claude Code accepts those fields on command files, but superclaude commands run in the main session on the parent model — treat the need as a signal to reconsider the design, not as a field to add.
 
 ## YAML Frontmatter
 
@@ -28,8 +28,8 @@ Never add — SSOT: `.claude/rules/schemas.yaml` (`forbidden_command_fields`):
 - `name` — derived from filename (e.g., `build.md` → `/sc:build`)
 - `permissionMode`, `memory`, `color` — agent-only
 - `autonomy` — not official CC field
-- `model`, `context`, `agent`, `hooks` — CC accepts them on command files; SuperClaude keeps commands on the parent model in the main session (see the decision gate above)
-- `disable-model-invocation` — CC accepts it; SuperClaude keeps every command reachable by delegation (see Trigger Policy)
+- `model`, `context`, `agent`, `hooks` — CC accepts them on command files; superclaude keeps commands on the parent model in the main session (see the decision gate above)
+- `disable-model-invocation` — CC accepts it; superclaude keeps every command reachable by delegation (see Trigger Policy)
 
 ## Trigger Policy (auto vs on-request)
 
@@ -140,7 +140,7 @@ Rules below apply to all components, not restated above. See `.claude/rules/xml-
 |-------------|-----------|-----|
 | `name:` in frontmatter | Filename is the command name | Remove |
 | `permissionMode:` | Agent-only, ignored for commands | Remove |
-| `model:`, `hooks:` or `context:` | Valid in CC, but SuperClaude commands stay on the parent model in the main session | Remove |
+| `model:`, `hooks:` or `context:` | Valid in CC, but superclaude commands stay on the parent model in the main session | Remove |
 | Vague description | Poor `/menu` display | Be specific: "Build X with Y" |
 | Missing `<bounds>` | No scope/safety boundary | Add `<does>`/`<never>` |
 | Mission doesn't match description | Confusing inconsistency | Align ≥30% word overlap |

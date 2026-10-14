@@ -238,7 +238,7 @@ class TestMain:
             main()
 
         out = capsys.readouterr().out
-        assert "SuperClaude:" in out
+        assert "superclaude:" in out
         assert "Core Services Available" not in out
 
 

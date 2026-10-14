@@ -1,4 +1,4 @@
-"""MCP Fallback Hint Tracker for SuperClaude
+"""MCP Fallback Hint Tracker for superclaude
 
 Tracks per-session fallback hints so each MCP's fallback guidance is shown once.
 

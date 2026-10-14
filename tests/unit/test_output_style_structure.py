@@ -83,7 +83,7 @@ class TestBody:
         name, _fields, body = style
         assert "<component" not in body, (
             f"{name}: output styles are sent verbatim as prose; "
-            "the <component> XML pattern is for SuperClaude-loaded content"
+            "the <component> XML pattern is for superclaude-loaded content"
         )
 
     def test_within_per_request_budget(self, style):

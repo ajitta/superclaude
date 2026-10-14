@@ -1,10 +1,10 @@
 ---
-description: Recommend the best SuperClaude command for a situation. Use when asked which /sc:* command fits. Not for a request whose command is already obvious — run that command.
+description: Recommend the best superclaude command for a situation. Use when asked which /sc:* command fits. Not for a request whose command is already obvious — run that command.
 ---
 <component name="recommend" type="command">
 
   <role command="/sc:recommend">
-    <mission>Ultra-smart cmd rec engine for best SuperClaude cmd pick</mission>
+    <mission>Ultra-smart cmd rec engine for best superclaude cmd pick</mission>
   </role>
 
   <syntax>/sc:recommend [request] [--estimate] [--alternatives] [--expertise beginner|intermediate|expert]</syntax>

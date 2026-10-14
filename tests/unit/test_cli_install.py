@@ -284,7 +284,7 @@ class TestFrameworkArtifactsAlwaysUpdate:
     installed script copy that did not implement it: argparse exit 2, the
     blocking code on `Stop`, on every turn) cannot recur: the script and the
     registration come from the same install. What is still on disk per
-    install, hooks.json, is SuperClaude-owned output, not user-editable content,
+    install, hooks.json, is superclaude-owned output, not user-editable content,
     so `--force` keeps its meaning for settings, commands, agents and core only.
     """
 
@@ -400,7 +400,7 @@ class TestFrameworkArtifactsAlwaysUpdate:
 class TestHookRegistrationIsCheckedByIdentity:
     """`N/N ✅` has to mean the shipped hooks are the registered hooks.
 
-    The row compared two integers. Fourteen obsolete SuperClaude hooks and
+    The row compared two integers. Fourteen obsolete superclaude hooks and
     fourteen shipped ones read as `14/14 ✅`, certifying an install whose
     settings pointed at scripts this release no longer has — the exact state a
     `--force` install could not clear.
@@ -513,7 +513,7 @@ class TestHookRegistrationIsCheckedByIdentity:
 
         _success, message = uninstall_all(base_path=base, scope="user", dry_run=True)
 
-        assert "2 SuperClaude hooks" in message, message
+        assert "2 superclaude hooks" in message, message
 
 
 class TestFailuresReachTheSummary:
@@ -743,7 +743,7 @@ class TestUnshippedFilesArePrunedOnUpgrade:
 
     Installing copies files, so without a prune an upgrade leaves the old ones:
     /sc:spawn kept running its pre-removal body, and MCP_Serena.md outlived the
-    Serena removal. In the directories only SuperClaude writes, anything the
+    Serena removal. In the directories only superclaude writes, anything the
     source no longer ships goes; in the shared agents/ only the names listed in
     RETIRED_AGENT_FILES do.
     """
@@ -793,7 +793,7 @@ class TestUnshippedFilesArePrunedOnUpgrade:
         install_all(base_path=tmp_path, force=True, scope="project")
 
         for rel in self.KEPT:
-            assert (tmp_path / rel).exists(), f"{rel} was not SuperClaude's to remove"
+            assert (tmp_path / rel).exists(), f"{rel} was not superclaude's to remove"
 
     def test_uninstall_removes_retired_agents(self, tmp_path):
         """Uninstall removes only shipped agent names; a retired one needs the list."""
@@ -828,7 +828,7 @@ class TestUnshippedFilesArePrunedOnUpgrade:
         for rel in self.UNSHIPPED:
             assert not (base / rel).exists(), f"{rel} survived the update"
         for rel in self.KEPT:
-            assert (base / rel).exists(), f"{rel} was not SuperClaude's to remove"
+            assert (base / rel).exists(), f"{rel} was not superclaude's to remove"
         assert "no longer ships" in result.output
 
 
@@ -1274,7 +1274,7 @@ class TestOutputStylesInstallIntoClaudeCodesDirectory:
 
     @pytest.mark.parametrize("component_dir", ["agents", "output-styles"])
     def test_uninstall_leaves_a_user_readme_alone(self, tmp_path, component_dir):
-        """README.md is never shipped, so it is never SuperClaude's to remove.
+        """README.md is never shipped, so it is never superclaude's to remove.
 
         The agents-only uninstall built its removal set from the source glob
         including README.md, so a hand-written `.claude/agents/README.md` was

@@ -64,7 +64,7 @@ tasks:
       - [git, add, -A]
       - [git, -c, user.email=eval@local, -c, user.name=eval, commit, -m, baseline]
     prompt: >
-      This repo's team wants SuperClaude content shared with every teammate via
+      This repo's team wants superclaude content shared with every teammate via
       git, not installed per-person. State the exact install command with the
       right scope, and explain in one sentence where the files land. Do not run it.
     checks:

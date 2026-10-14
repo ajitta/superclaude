@@ -1,5 +1,5 @@
 """
-SuperClaude pytest plugin
+superclaude pytest plugin
 
 Auto-loaded when superclaude is installed.
 Provides auto-markers for test directory conventions.
@@ -13,7 +13,7 @@ import pytest
 
 
 def pytest_configure(config):
-    """Register SuperClaude custom markers."""
+    """Register superclaude custom markers."""
     config.addinivalue_line("markers", "unit: Unit tests")
     config.addinivalue_line("markers", "integration: Integration tests")
     config.addinivalue_line("markers", "hallucination: Hallucination detection tests")
@@ -21,10 +21,10 @@ def pytest_configure(config):
 
 
 def pytest_report_header(config):
-    """Add SuperClaude version to pytest header."""
+    """Add superclaude version to pytest header."""
     from . import __version__
 
-    return f"SuperClaude: {__version__}"
+    return f"superclaude: {__version__}"
 
 
 def pytest_collection_modifyitems(config, items):

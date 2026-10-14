@@ -1,14 +1,14 @@
 """
-Per-clone git exclude management for SuperClaude.
+Per-clone git exclude management for superclaude.
 
 Writes and removes a marker-delimited block of patterns into the per-clone
 local exclude file (``.git/info/exclude``) — NOT the team-shared
-``.gitignore`` — so SuperClaude's install artifacts are ignored without
+``.gitignore`` — so superclaude's install artifacts are ignored without
 polluting team-shared ignore rules. Per-clone is the whole point: every
 teammate's own install writes their own block, with no coordination.
 
 CC natively gitignores only ``settings.local.json``; for the rest of the
-SuperClaude content (agents/skills/commands/superclaude/etc.) we manage
+superclaude content (agents/skills/commands/superclaude/etc.) we manage
 the exclude file ourselves.
 
 The block is scope-dependent. Local scope excludes everything it installs —
@@ -21,7 +21,7 @@ script path — so each teammate's install writes the same bytes.
 The block is generated file-by-file from the shipped source inventory so
 team-shared files co-located in the same directories (e.g. a team-authored
 ``.claude/agents/team-reviewer.md``) are not ignored — only files
-SuperClaude actually installs are listed.
+superclaude actually installs are listed.
 
 Backward-compat: the marker convention matches the previous
 ``.gitignore``-targeted implementation, so a legacy block found in
@@ -291,7 +291,7 @@ def _migrate_legacy_gitignore(project_root: Path) -> Optional[str]:
 
 
 def add_git_exclude(project_root: Path, scope: str = "local") -> Tuple[bool, str]:
-    """Add/refresh the SuperClaude block in ``.git/info/exclude``.
+    """Add/refresh the superclaude block in ``.git/info/exclude``.
 
     Idempotent by marker: an existing block is replaced so subsequent
     installs pick up newly shipped agents, and so switching scope in place
@@ -341,7 +341,7 @@ def add_git_exclude(project_root: Path, scope: str = "local") -> Tuple[bool, str
 
 
 def remove_git_exclude(project_root: Path) -> Tuple[bool, str]:
-    """Remove the SuperClaude block from ``.git/info/exclude``.
+    """Remove the superclaude block from ``.git/info/exclude``.
 
     Also removes a legacy block from ``<root>/.gitignore`` if present.
     The exclude file itself is preserved (only the marker block is
@@ -397,7 +397,7 @@ def _parse_check_ignore(stdout: str) -> List[Tuple[str, str, str]]:
     is printed by `-v` as the winning rule, yet it means the path is NOT
     ignored — reporting it would tell the user to delete the whitelist that
     makes the file committable. A rule from an `info/exclude` file is per-clone
-    (SuperClaude's own block, or the user's), not a team rule, so it is not what
+    (superclaude's own block, or the user's), not a team rule, so it is not what
     this check is about.
     """
     found: List[Tuple[str, str, str]] = []
