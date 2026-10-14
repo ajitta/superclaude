@@ -229,11 +229,12 @@ LEGACY_SKILL_NAMES = (
 )
 
 
-# Command files a release moved out of commands/sc. Installing copies files and
+# Command files a release removed from commands/sc. Installing copies files and
 # deletes none, so an upgrade would leave the old command beside its successor:
 # /sc:prompt, auto-invocable, kept firing with the pre-skill body next to the
-# sc-prompt skill. Uninstall removes commands/sc whole, so only install prunes.
-RETIRED_COMMAND_FILES = ("prompt.md",)
+# sc-prompt skill, and workflow.md outlived its rename to roadmap.md (16b89c0).
+# Uninstall removes commands/sc whole, so only install prunes.
+RETIRED_COMMAND_FILES = ("prompt.md", "workflow.md")
 
 
 def find_retired_commands(base_path: Path) -> list:
