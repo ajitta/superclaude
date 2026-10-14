@@ -229,21 +229,50 @@ LEGACY_SKILL_NAMES = (
 )
 
 
-# Command files a release removed from commands/sc. Installing copies files and
-# deletes none, so an upgrade would leave the old command beside its successor:
-# /sc:prompt, auto-invocable, kept firing with the pre-skill body next to the
-# sc-prompt skill, and workflow.md outlived its rename to roadmap.md (16b89c0).
-# Uninstall removes commands/sc whole, so only install prunes.
-RETIRED_COMMAND_FILES = ("prompt.md", "workflow.md")
+# Agent files a release removed. agents/ is shared with the user's own agents, so
+# the names are listed literally, as LEGACY_SKILL_NAMES is for skills/.
+RETIRED_AGENT_FILES = ("deep-research.md",)
 
 
-def find_retired_commands(base_path: Path) -> list:
-    """Installed command files a later release moved out of commands/sc."""
-    commands_dir = base_path / "commands" / "sc"
+def find_unshipped(base_path: Path) -> list:
+    """Installed files and directories this release no longer ships.
+
+    Installing copies and deletes nothing, so an upgrade left a removed command
+    running beside its successor (/sc:spawn, /sc:prompt) and the doc of a removed
+    MCP server on disk. Only SuperClaude writes commands/sc and superclaude/ (uninstall
+    removes both whole), so there anything the source does not ship is stale. In
+    the shared directories only RETIRED_AGENT_FILES names are; legacy skills have
+    their own list and helper. Non-.md files and superclaude/scripts/ are never
+    returned: a legacy hook registration may still run the script copies.
+    """
+    found = []
+    for component in COMPONENTS:
+        if component in SHARED_TARGET_COMPONENTS:
+            continue
+        target_dir = _get_target_dir(component, base_path)
+        if component in DIRECTORY_COMPONENTS:
+            found.extend(
+                target_dir / name
+                for name in sorted(dir_names(target_dir) - shipped_names(component))
+            )
+            continue
+        dirs = [(target_dir, _get_source_dir(component))]
+        if component == "core":
+            dirs.append((target_dir / "rules", _get_source_dir(component) / "rules"))
+        for target, source in dirs:
+            found.extend(
+                target / name for name in sorted(md_names(target) - md_names(source))
+            )
+    return found + find_retired_agents(base_path)
+
+
+def find_retired_agents(base_path: Path) -> list:
+    """Installed agent files a later release removed."""
+    agents_dir = _get_target_dir("agents", base_path)
     return [
-        commands_dir / name
-        for name in RETIRED_COMMAND_FILES
-        if (commands_dir / name).is_file()
+        agents_dir / name
+        for name in RETIRED_AGENT_FILES
+        if (agents_dir / name).is_file()
     ]
 
 

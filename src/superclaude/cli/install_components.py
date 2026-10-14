@@ -26,7 +26,7 @@ from .install_paths import (
     _get_source_dir,
     _get_target_dir,
     find_legacy_skills,
-    find_retired_commands,
+    find_unshipped,
     probe_console_script,
 )
 from .install_settings import (
@@ -481,18 +481,21 @@ def install_all(
             total_failed += 1
             messages.append(f"❌ Legacy skill cleanup: {e}")
 
-    # Same upgrade path for command files a release moved elsewhere.
-    retired_commands = find_retired_commands(base_path)
-    if retired_commands:
+    # Same upgrade path for files a release stopped shipping.
+    unshipped = find_unshipped(base_path)
+    if unshipped:
         try:
-            for f in retired_commands:
-                f.unlink()
+            for p in unshipped:
+                if p.is_dir() and not p.is_symlink():
+                    shutil.rmtree(p)
+                else:
+                    p.unlink()
             messages.append(
-                f"🧹 Removed {len(retired_commands)} command(s) a later release moved"
+                f"🧹 Removed {len(unshipped)} file(s) this release no longer ships"
             )
         except OSError as e:
             total_failed += 1
-            messages.append(f"❌ Retired command cleanup: {e}")
+            messages.append(f"❌ Unshipped file cleanup: {e}")
 
     # Install each component
     for component, (_, _, description) in COMPONENTS.items():

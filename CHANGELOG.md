@@ -6,6 +6,12 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Ver
 
 Releases before 4.19.0 are not listed. Their history is the git log; the upstream-era changelog, last entry 4.2.1, is `CHANGELOG.md` at commit `6b0ac5c3^`.
 
+## [Unreleased]
+
+### Fixed
+
+- Install removes files the release no longer ships. Installing used to copy only, so an upgrade kept removed commands (`/sc:spawn`) and removed MCP, mode and core docs. In `commands/sc/` and `superclaude/`, which only SuperClaude writes, any `.md` file or template folder the source does not ship is removed. In `agents/`, which is shared with your own agents, only the retired `deep-research.md` is removed, by install and by uninstall.
+
 ## [4.27.0] - 2026-10-14
 
 ### Added
