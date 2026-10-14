@@ -811,6 +811,26 @@ class TestUnshippedFilesArePrunedOnUpgrade:
 
         assert "no longer ships" not in message
 
+    def test_update_removes_them(self, tmp_path, monkeypatch):
+        """`superclaude update` is the upgrade command, so it must prune too."""
+        from click.testing import CliRunner
+
+        from superclaude.cli.main import main
+
+        monkeypatch.setattr(Path, "home", staticmethod(lambda: tmp_path / "home"))
+        monkeypatch.chdir(tmp_path)
+        base = tmp_path / ".claude"
+        self._seed(base, [*self.UNSHIPPED, *self.KEPT])
+
+        result = CliRunner().invoke(main, ["update", "--scope", "project"])
+
+        assert result.exit_code == 0, result.output
+        for rel in self.UNSHIPPED:
+            assert not (base / rel).exists(), f"{rel} survived the update"
+        for rel in self.KEPT:
+            assert (base / rel).exists(), f"{rel} was not SuperClaude's to remove"
+        assert "no longer ships" in result.output
+
 
 class TestHookCommandsCarryNoMachineBytes:
     """The registration is the same bytes on every machine, at every scope.
