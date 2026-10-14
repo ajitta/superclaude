@@ -650,3 +650,57 @@ tasks:
     checks:
       - {type: skill_not_called, tag: scope, pattern: '^sc:'}
       - {type: git_diff_max_files, tag: scope, value: 0}
+
+  # ── sc-prompt: description trigger ──────────────────────────────────────
+  # The skill is model-invocable and its description says "rewrite or tune a
+  # prompt for Claude". The trigger probe asks for exactly that in plain words
+  # and must reach the skill through the Skill tool without writing a file (no
+  # --out). The two look-alikes must not start it: a chat message to polish
+  # (every user message is also a "prompt") and a prompt for a non-Claude model.
+  - id: sc-prompt-trigger
+    canary: true
+    canary_only: true
+    fixture: fixtures/sc-prompt
+    setup:
+      - [git, init, -b, main]
+      - [git, add, -A]
+      - [git, -c, user.email=eval@local, -c, user.name=eval, commit, -m, baseline]
+    allowed_tools: [Bash, PowerShell, Read, Edit, Write, Grep, Glob, Skill]
+    prompt: >
+      Tune prompts/agent.md, the system prompt of our coding agent, for
+      Claude Sonnet 5.5. Show me the rewrite here; don't edit the file.
+    checks:
+      - {type: skill_called, tag: success, pattern: '^sc-prompt$'}
+      - {type: git_diff_max_files, tag: scope, value: 0}
+
+  - id: sc-prompt-lookalike-message
+    canary: true
+    canary_only: true
+    fixture: fixtures/sc-prompt
+    setup:
+      - [git, init, -b, main]
+      - [git, add, -A]
+      - [git, -c, user.email=eval@local, -c, user.name=eval, commit, -m, baseline]
+    allowed_tools: [Bash, PowerShell, Read, Edit, Write, Grep, Glob, Skill]
+    prompt: >
+      Polish this message before I post it to the team channel: "hey all,
+      deploy moved to thursday, pls check ur PRs are merged by wed eod".
+    checks:
+      - {type: skill_not_called, tag: scope, pattern: '^sc-prompt$'}
+      - {type: git_diff_max_files, tag: scope, value: 0}
+
+  - id: sc-prompt-lookalike-other-model
+    canary: true
+    canary_only: true
+    fixture: fixtures/sc-prompt
+    setup:
+      - [git, init, -b, main]
+      - [git, add, -A]
+      - [git, -c, user.email=eval@local, -c, user.name=eval, commit, -m, baseline]
+    allowed_tools: [Bash, PowerShell, Read, Edit, Write, Grep, Glob, Skill]
+    prompt: >
+      We are moving our coding agent to GPT-5. Improve prompts/agent.md for
+      it and show me the rewrite here; don't edit the file.
+    checks:
+      - {type: skill_not_called, tag: scope, pattern: '^sc-prompt$'}
+      - {type: git_diff_max_files, tag: scope, value: 0}

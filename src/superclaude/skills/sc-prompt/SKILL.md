@@ -1,6 +1,6 @@
 ---
 name: sc-prompt
-description: Rewrites one prompt for Opus 5.5, Sonnet 5.5, Opus 5 or Fable 5.1 - strips folklore, applies model deltas, marks missing context. Use when asked to tune a prompt. Not for prompt-engineering questions or repo-wide audits (`/claude-api prompt-audit`).
+description: Rewrites a prompt written for a Claude 5-family model - strips folklore, applies the target model's deltas, marks missing context. Use when asked to rewrite or tune a prompt for Claude. Not for prompt-engineering questions or repo-wide audits (`/claude-api prompt-audit`).
 argument-hint: "[prompt-text|path] [--model opus55|sonnet55|opus5|fable51] [--target cc|api] [--out path]"
 ---
 
