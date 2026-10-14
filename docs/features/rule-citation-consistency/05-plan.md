@@ -50,7 +50,7 @@ revised: 2026-10-14
 **Files:** `tests/unit/test_cross_references.py` (`test_rule_citations_defined`, `_PAREN_NAME`)
 
 - [x] Step 1: 번호만 쓴 인용을 결정의 예외 세 가지 밖에서 실패로 바꾼다.
-  - 예외 1은 파일 경로로(`core/rules/RULES_QUALITY.md`), 예외 2는 범위 정규식 `R\d{2}[–-]R\d{2}`를 먼저 지워서, 예외 3은 `{"commands/insight.md": ["rule (R13, R18...)"]}` 허용 목록으로 처리한다.
+  - 예외 1은 파일 경로로(`core/rules/RULES_QUALITY.md`), 예외 2는 범위 정규식 `R\d{2}[–-]R\d{2}`를 먼저 지워서, 예외 3은 `{"commands/insight.md": ["rule (R13, R18...)"]}`(Phase 3부터 키는 레포 루트 기준 `src/superclaude/commands/insight.md`) 허용 목록으로 처리한다.
   - 번호+이름 검사(`[RNN Name]`이 정의와 일치)는 유지한다. 예외 1 파일 안의 번호도 정의된 번호여야 한다는 검사는 유지한다.
 - [x] Step 2: `_PAREN_NAME`과 `bad_names`를 지운다. 괄호 이름 5곳은 Task 1.2에서 `[RNN Name]`으로 바뀌므로 필요 없다.
 - [x] Step 3: `uv run pytest tests/unit/test_cross_references.py -q -k rule` → 실패 목록이 Task 1.2의 파일 목록과 같은지 확인한다.
@@ -106,6 +106,14 @@ revised: 2026-10-14
 - [x] `.claude/rules/` 인용: 규칙 인용 테스트가 `.claude/rules/**/*.md`도 검사한다(테스트 ID는 레포 루트 기준 경로). 번호만 쓴 3곳을 `[RNN Name]`으로 고쳤다(`gotchas/authoring.md` R21(320자 entry 예산 때문에 "Passive rules (R21) fire"를 "[R21 Failure-Forward] fires"로; 근거 절 § P-R21도 R21 하나의 측정), `gotchas/general.md` 머리말 R19, `gotchas/README.md` R19). 허용 목록에 둔 곳: `general.md`의 `rule-tag-vs-concept`(번호 자체를 grep하는 이야기), `authoring.md`의 `§ P-R21`(연구 문서의 절 이름). 범위 `R01-R21`은 예외 2로 통과.
 - [x] `docs/` 인용: 검사만 하고 고치지 않는다. archive 밖에서 정의와 맞지 않는 인용은 없다. `socratic-brainstorm-skill/03-analysis.md`의 R10·R11은 그 문서의 요구사항 번호이고, 이 계획서의 R04 등은 빈 번호를 설명하는 글이다. `docs/archive/`는 당시 있던 규칙(R04 Planning 등)을 인용한다. 날짜가 박힌 기록이라 지금 규칙 이름으로 고쳐 쓰면 기록이 틀어지므로 테스트도 두지 않는다.
 - [x] 30KB 경계 표기: 코드(`SIZE_THRESHOLD = 30_000`, `size >= SIZE_THRESHOLD`)에 맞춰 ">30KB"·"above 30KB"를 "≥30KB"·"30KB or more"로 고쳤다(`hooks/hooks.json:82`, `scripts/README.md:22`, `ARCHITECTURE.md:22`, `scripts/file_size_guard.py:4`, 레포 `README.md:360`, `evals/fixtures/large-file/gen_fixture.py:5`). `tests/unit/test_file_size_guard.py::test_threshold_described_as_inclusive`가 `src/superclaude`와 `README.md`에서 그 표기를 막는다. 날짜가 박힌 `docs/adr/0001`, `docs/research`의 표기와 설치본(`.claude/hooks/hooks.json`, `.claude/settings.local.json`, 다음 sync가 갱신)은 그대로 둔다.
+
+## Phase 4: 리뷰 반영 (2026-10-14 `/sc:review`, 커밋 1개)
+
+- [x] I1: `RULES_QUALITY.md`가 커널 섹션을 가리키는 `` kernel `<X>` `` 5곳을 검사하는 테스트가 없었다. `test_quality_kernel_pointers_resolve`가 각 `<X>`가 `core/RULES.md`의 태그로 있는지 본다.
+- [x] I2: guard의 차단 메시지가 정확히 30,000바이트 파일에 "File is 29KB … exceeds safe Read threshold (30KB)"를 냈다. 크기를 SIZE_THRESHOLD와 같은 10진 KB(`size // 1000`)로 보이고 "at or over the safe Read threshold (30KB)"로 바꿨다. 경계 표기 테스트는 "exceeds … 30KB"도 막는다. 처음 넣은 패턴은 줄바꿈을 넘지 못해, 두 줄로 나뉜 메시지 문자열(옛 문구 포함)을 놓쳤다. 그래서 패턴이 줄을 넘게 했고, `test_code_file_at_threshold`가 실제 메시지에 "30KB (30,000 bytes)"와 "at or over"가 있는지 본다.
+- [x] S1: `_BARE_ID_ALLOWED`의 문자열이 파일에서 사라지면 테스트가 실패한다(낡은 예외 방지).
+- [x] S2: 인용 형식을 `.claude/rules/xml-prose-format.md`의 Quoting and Reference Conventions 표에 한 줄로 적었다.
+- [x] S3: Task 1.1 Step 1의 예외 3 키는 Phase 3부터 레포 루트 기준(`src/superclaude/commands/insight.md`)이다. 그 줄에 표시했다.
 
 ## Risks
 

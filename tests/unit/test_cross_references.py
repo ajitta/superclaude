@@ -22,6 +22,7 @@ AGENTS_DIR = _SRC / "agents"
 MODES_DIR = _SRC / "modes"
 FLAGS_FILE = _SRC / "core" / "FLAGS.md"
 RULES_QUALITY_FILE = _SRC / "core" / "rules" / "RULES_QUALITY.md"
+RULES_KERNEL_FILE = _SRC / "core" / "RULES.md"
 
 # Template patterns that are NOT real handoff targets
 HANDOFF_SKIP_PATTERNS = {
@@ -162,6 +163,23 @@ def test_rule_definitions_found():
     )
 
 
+def test_quality_kernel_pointers_resolve():
+    """RULES_QUALITY.md lines that defer to the kernel ("kernel `<scope_discipline>`")
+    must name a section that exists in core/RULES.md; a renamed kernel section
+    would otherwise leave those rules pointing at nothing."""
+    pointers = set(
+        re.findall(r"kernel `<(\w+)>`", RULES_QUALITY_FILE.read_text(encoding="utf-8"))
+    )
+    assert pointers, "no kernel `<section>` pointers found in RULES_QUALITY.md"
+    kernel_tags = set(
+        re.findall(r"<(\w+)[\s>]", RULES_KERNEL_FILE.read_text(encoding="utf-8"))
+    )
+    assert pointers <= kernel_tags, (
+        f"RULES_QUALITY.md points to kernel sections missing from core/RULES.md: "
+        f"{sorted(pointers - kernel_tags)}"
+    )
+
+
 @pytest.mark.parametrize("path", CITING_MD_FILES, ids=CITING_MD_IDS)
 def test_rule_citations_defined(path: Path):
     """Rules are cited as [RNN Name], matching the definition in RULES_QUALITY.md.
@@ -180,6 +198,8 @@ def test_rule_citations_defined(path: Path):
     listed_ids = {rid for pair in _RANGE.findall(rest) for rid in pair}
     rest = _RANGE.sub("", rest)
     allowed = _BARE_ID_ALLOWED.get(rel, [])
+    stale = [text for text in allowed if text not in content]
+    assert not stale, f"{rel}: _BARE_ID_ALLOWED entries no longer in the file: {stale}"
     for text in allowed:
         listed_ids |= set(_BARE_ID.findall(text))
         rest = rest.replace(text, "")

@@ -199,6 +199,7 @@ Read attribute value aloud. If it sound like short label or filename, it attribu
 | Tool / button names | bare or quoted | `thumbs down` button, `tool_search` |
 | Reminder / classifier names | comma-separated bare list | `image_reminder, cyber_warning, …` |
 | Dynamic variables | double curly braces | `{{currentDateTime}}` |
+| Rule citations | full tag, name as defined in `core/rules/RULES_QUALITY.md`; bare ID only in that file or a range (`tests/unit/test_cross_references.py` enforces) | `[R18 Necessity Test]` |
 
 ## Cross-References
 

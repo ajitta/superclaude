@@ -183,6 +183,9 @@ class TestBlock:
         path = _create_file(temp_dir, "exact.py", 30_000)
         result = run_guard({"file_path": path})
         assert result["decision"] == "block"
+        # Same unit and inclusive wording as the threshold it enforces
+        assert "30KB (30,000 bytes)" in result["reason"]
+        assert "at or over" in result["reason"]
 
 
 class TestBlockMessage:
@@ -204,7 +207,7 @@ class TestBlockMessage:
     def test_message_includes_size(self, temp_dir):
         path = _create_file(temp_dir, "big.py", 50_000)
         result = run_guard({"file_path": path})
-        assert "48KB" in result["reason"]  # 50000 // 1024 = 48
+        assert "50KB" in result["reason"]  # decimal KB: 50000 // 1000
 
 
 def test_threshold_described_as_inclusive():
@@ -215,7 +218,7 @@ def test_threshold_described_as_inclusive():
         for p in (repo / "src" / "superclaude").rglob("*")
         if p.suffix in {".md", ".json", ".py"} and "__pycache__" not in p.parts
     ]
-    pattern = re.compile(r">\s?30\s?KB|above 30\s?KB")
+    pattern = re.compile(r">\s?30\s?KB|above 30\s?KB|exceeds?\b[\s\S]{0,60}?\b30\s?KB")
     hits = [
         f"{p.relative_to(repo).as_posix()}: {m.group(0)}"
         for p in targets
