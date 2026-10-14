@@ -590,6 +590,12 @@ class TestCommandNameResolution:
         )
         assert "/sc:workflow" in out and "/sc:roadmap" in out
 
+    def test_command_turned_skill_names_the_skill(self, tmp_path: Path):
+        """/sc:prompt became the sc-prompt skill; no command is left to inject."""
+        out = run_loader("/sc:prompt ./sys.md", self._project(tmp_path), "s1")
+        assert "/sc:prompt was renamed" in out and "/sc-prompt" in out
+        assert "context-inject" not in out
+
     def test_unresolvable_name_injects_no_command_context(self, tmp_path: Path):
         """Silence plus 1,469 bytes of context is the worst of both."""
         out = run_loader("/sc:zzzzzz now", self._project(tmp_path), "s1")
@@ -908,9 +914,9 @@ class TestShippedCommandFlags:
 
 
 class TestMigrationReferenceResolution:
-    """/sc:prompt's model facts live outside the install tree.
+    """/sc-prompt's model facts live outside the install tree.
 
-    The command ships a mirror of the claude-api model-migration reference and
+    The skill ships a mirror of the claude-api model-migration reference and
     that mirror is authoritative only while the reference is unreachable. The
     rule is enforceable only if the reference is located at invocation time, so
     these cover the three states the hook can inject: located, absent, and
@@ -1088,7 +1094,7 @@ class TestPromptCommandReferenceInjection:
 
     def test_located_reference_names_path_and_ranges(self, monkeypatch, capsys):
         out = self._emit(
-            "/sc:prompt ./x.md",
+            "/sc-prompt ./x.md",
             monkeypatch,
             capsys,
             Path("/ref.md"),
@@ -1097,10 +1103,10 @@ class TestPromptCommandReferenceInjection:
 
         assert str(Path("/ref.md")) in out
         assert "'claude-opus-5' L10-20" in out
-        assert "wins over the mirror table" in out
+        assert "wins over the skill's mirror files" in out
 
     def test_absent_reference_hands_the_mirror_authority(self, monkeypatch, capsys):
-        out = self._emit("/sc:prompt ./x.md", monkeypatch, capsys, None)
+        out = self._emit("/sc-prompt ./x.md", monkeypatch, capsys, None)
 
         assert "no claude-api model-migration reference" in out
         assert "authoritative" in out
@@ -1109,7 +1115,7 @@ class TestPromptCommandReferenceInjection:
     def test_renamed_anchors_are_reported_not_silently_mirrored(
         self, monkeypatch, capsys
     ):
-        out = self._emit("/sc:prompt ./x.md", monkeypatch, capsys, Path("/ref.md"), {})
+        out = self._emit("/sc-prompt ./x.md", monkeypatch, capsys, Path("/ref.md"), {})
 
         assert "anchors have moved" in out
 

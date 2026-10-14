@@ -38,7 +38,7 @@ COMPONENTS = {
         "superclaude/templates",
         "Doc scaffold templates (consumed by /sc:init, not slash commands)",
     ),
-    "skills": ("skills", "skills", "Skills (user-invoked; /sc-author)"),
+    "skills": ("skills", "skills", "Skills (/sc-author, /sc-prompt)"),
 }
 
 
@@ -227,6 +227,23 @@ LEGACY_SKILL_NAMES = (
     "simplicity-coach",
     "verbalized-sampling",
 )
+
+
+# Command files a release moved out of commands/sc. Installing copies files and
+# deletes none, so an upgrade would leave the old command beside its successor:
+# /sc:prompt, auto-invocable, kept firing with the pre-skill body next to the
+# sc-prompt skill. Uninstall removes commands/sc whole, so only install prunes.
+RETIRED_COMMAND_FILES = ("prompt.md",)
+
+
+def find_retired_commands(base_path: Path) -> list:
+    """Installed command files a later release moved out of commands/sc."""
+    commands_dir = base_path / "commands" / "sc"
+    return [
+        commands_dir / name
+        for name in RETIRED_COMMAND_FILES
+        if (commands_dir / name).is_file()
+    ]
 
 
 def find_legacy_skills(base_path: Path) -> list:

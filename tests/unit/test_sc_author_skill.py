@@ -43,8 +43,8 @@ def _section(text: str, heading: str) -> str:
 
 
 def _prompt_model_ids() -> set[str]:
-    """Model IDs /sc:prompt resolves to: where the repository adds a new model."""
-    text = (_SRC / "commands" / "prompt.md").read_text(encoding="utf-8")
+    """Model IDs /sc-prompt resolves to: where the repository adds a new model."""
+    text = (_SRC / "skills" / "sc-prompt" / "SKILL.md").read_text(encoding="utf-8")
     return set(re.findall(r"→ '(claude-[a-z0-9-]+)'", text))
 
 
@@ -58,7 +58,7 @@ class TestReferences:
             assert re.fullmatch(r"\d{4}-\d{2}-\d{2}", str(source["retrieved"]))
 
     def test_model_rows_follow_sc_prompt(self):
-        """A model /sc:prompt supports needs its row, read from its guide."""
+        """A model /sc-prompt supports needs its row, read from its guide."""
         text = (_REFS_DIR / "quality.md").read_text(encoding="utf-8")
         rows = set()
         for line in _section(text, "Model differences").splitlines():
@@ -66,7 +66,7 @@ class TestReferences:
                 first = line.strip("|").split("|")[0]
                 rows.update(_MODEL_ID.findall(first))
         assert rows == _prompt_model_ids(), (
-            "/sc:prompt supports a model quality.md has no row for (or the "
+            "/sc-prompt supports a model quality.md has no row for (or the "
             "reverse) — re-read that model's prompting guide, update the row "
             "and its `sources` date"
         )

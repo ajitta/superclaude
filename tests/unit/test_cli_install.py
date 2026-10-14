@@ -738,6 +738,40 @@ class TestLegacySkillsArePrunedOnUpgrade:
         assert "pre-removal" not in message
 
 
+class TestRetiredCommandsArePrunedOnUpgrade:
+    """A command a release moved out of commands/sc must not survive an upgrade.
+
+    Installing copies files and deletes none, so /sc:prompt — auto-invocable —
+    would keep firing with its pre-skill body beside the sc-prompt skill.
+    """
+
+    def _seed(self, base_path: Path) -> Path:
+        commands = base_path / "commands" / "sc"
+        commands.mkdir(parents=True, exist_ok=True)
+        (commands / "prompt.md").write_text("old body", encoding="utf-8")
+        return commands
+
+    def test_install_removes_them(self, tmp_path):
+        from superclaude.cli.install_components import install_all
+
+        commands = self._seed(tmp_path)
+
+        success, message = install_all(base_path=tmp_path, force=True, scope="project")
+
+        assert success is True
+        assert not (commands / "prompt.md").exists()
+        assert (commands / "analyze.md").exists()
+        assert "a later release moved" in message
+        assert (tmp_path / "skills" / "sc-prompt" / "SKILL.md").exists()
+
+    def test_a_clean_install_says_nothing_about_them(self, tmp_path):
+        from superclaude.cli.install_components import install_all
+
+        _success, message = install_all(base_path=tmp_path, force=True, scope="project")
+
+        assert "a later release moved" not in message
+
+
 class TestHookCommandsCarryNoMachineBytes:
     """The registration is the same bytes on every machine, at every scope.
 

@@ -26,6 +26,7 @@ from .install_paths import (
     _get_source_dir,
     _get_target_dir,
     find_legacy_skills,
+    find_retired_commands,
     probe_console_script,
 )
 from .install_settings import (
@@ -183,7 +184,7 @@ def install_component(
                 failed_names.append(f"rules/{source_file.name}: {e}")
 
     # Directory components install one source subdirectory per unit, copied
-    # whole: templates for /sc:init, skills for /sc-author.
+    # whole: templates for /sc:init, skills for /sc-author and /sc-prompt.
     if component in DIRECTORY_COMPONENTS:
         for sub_dir in source_dir.iterdir():
             if not sub_dir.is_dir():
@@ -479,6 +480,19 @@ def install_all(
         except OSError as e:
             total_failed += 1
             messages.append(f"❌ Legacy skill cleanup: {e}")
+
+    # Same upgrade path for command files a release moved elsewhere.
+    retired_commands = find_retired_commands(base_path)
+    if retired_commands:
+        try:
+            for f in retired_commands:
+                f.unlink()
+            messages.append(
+                f"🧹 Removed {len(retired_commands)} command(s) a later release moved"
+            )
+        except OSError as e:
+            total_failed += 1
+            messages.append(f"❌ Retired command cleanup: {e}")
 
     # Install each component
     for component, (_, _, description) in COMPONENTS.items():
