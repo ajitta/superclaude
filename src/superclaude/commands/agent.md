@@ -1,5 +1,5 @@
 ---
-description: Session controller orchestrating investigation, implementation, and review workflows. Use ONLY when user explicitly types `/sc:agent` — drives multi-phase orchestration. Do NOT auto-trigger when single sub-agent invocation suffices; use Agent tool directly for one-off delegations.
+description: Session controller that orchestrates investigation, implementation, and review workflows across phases. On request only — the user's /sc:agent or a workflow step that names it. Not for a single sub-agent task — call the Agent tool directly.
 ---
 <component name="agent" type="command">
 

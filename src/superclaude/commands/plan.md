@@ -1,5 +1,5 @@
 ---
-description: Make detailed impl plans with TDD tasks, exact file paths, verify commands. Use ONLY when user explicitly types `/sc:plan` — commits a plan doc under docs/plans/, so a wrong fire skips the approval gate and creates files unasked. NOT auto-trigger on "what's the plan" / "how should we approach this" — those get 2-3 sentence inline answer, not plan file.
+description: Write detailed implementation plans with TDD tasks, exact file paths and verify commands, committed under docs/plans/. On request only — the user's /sc:plan or a workflow step that names it. Not for "what's the plan?" — answer in 2-3 sentences inline.
 ---
 <component name="plan" type="command">
 

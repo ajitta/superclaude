@@ -1,5 +1,5 @@
 ---
-description: Apply systematic improvements to code quality, performance, and maintainability. Use ONLY when user explicitly types `/sc:improve` — mutates code across multiple files, wrong fire cost a revert. Do NOT auto-trigger on "improve this function", "rename this variable", or small single-file refactors — those direct edits.
+description: Apply systematic improvements to code quality, performance, and maintainability across multiple files. On request only — the user's /sc:improve or a workflow step that names it. Not for one function or a small refactor — edit directly.
 ---
 <component name="improve" type="command">
 

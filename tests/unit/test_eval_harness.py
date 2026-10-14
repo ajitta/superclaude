@@ -621,3 +621,45 @@ def test_report_header_and_results_json_record_permission_mode(tmp_path):
     plain = run_eval.TaskResult(arm="sc-full", task_id="t")
     report = run_eval.write_report([plain], tmp_path)
     assert "Permission mode: default (flag omitted)" in report
+
+
+def test_skill_checks_match_skill_tool_calls():
+    """skill_called / skill_not_called read the Skill tool calls the transcript
+    recorded — the delegated-command probes depend on it."""
+    import json
+
+    run_eval = _import_run_eval()
+    res = run_eval.TaskResult(arm="sc-full", task_id="probe")
+
+    def use(uid, skill):
+        block = {
+            "type": "tool_use",
+            "id": uid,
+            "name": "Skill",
+            "input": {"skill": skill},
+        }
+        return {"type": "assistant", "message": {"content": [block]}}
+
+    def result(uid, is_error):
+        block = {"type": "tool_result", "tool_use_id": uid, "is_error": is_error}
+        return {"type": "user", "message": {"content": [block]}}
+
+    # sc:git refused (disable-model-invocation answers with an error result),
+    # sc:load ran: only the run counts; both count as activation attempts.
+    events = [
+        use("a", "sc:git"),
+        result("a", True),
+        use("b", "sc:load"),
+        result("b", False),
+    ]
+    run_eval._parse_stream("\n".join(json.dumps(e) for e in events), res)
+    assert res.skills_called == ["sc:load"]
+    assert res.sc_activations == 2
+    ws = Path(".")
+    called = {"type": "skill_called", "pattern": "^sc:load$"}
+    assert run_eval._check_one(called, "skill_called", ws, "", "", res.skills_called)[0]
+    not_called = {"type": "skill_not_called", "pattern": "^sc:"}
+    assert not run_eval._check_one(
+        not_called, "skill_not_called", ws, "", "", res.skills_called
+    )[0]
+    assert run_eval._check_one(not_called, "skill_not_called", ws, "", "", [])[0]

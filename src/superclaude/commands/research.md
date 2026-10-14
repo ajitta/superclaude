@@ -1,5 +1,5 @@
 ---
-description: Deep web research with adaptive planning + smart search. Use when user type `/sc:research` or ask multi-source corroboration, version-specific evidence, or contradiction resolve across sources. Do NOT auto-trigger on single doc lookup, library API question, or "fetch this URL" — use Tavily/WebFetch/Context7 direct.
+description: Deep web research with adaptive planning and smart search. Use when asked for multi-source corroboration, version-specific evidence or resolving contradictions between sources. Not for one doc lookup or fetching a URL — use WebFetch or Context7 directly.
 ---
 <component name="research" type="command">
 
@@ -39,7 +39,7 @@ description: Deep web research with adaptive planning + smart search. Use when u
     - Tavily: tavily-search, tavily-extract, tavily-research, tavily-crawl, tavily-map (Agent Skills — auto/slash; MCP path exposes the same five as tools)
     - Native: WebSearch/WebFetch (fallback)
     - Read/Write: Report gen
-    - /sc:save (suggest to the user; explicit-only): cross-session research memory (`.claude/memories/`)
+    - /sc:save (suggest to the user; on request): cross-session research memory (`.claude/memories/`)
   </tools>
 
   <examples>

@@ -33,6 +33,11 @@ resolved), `evidence` (code trusted over stale documentation). Tokens, cost, tur
 denials, and `/sc:` skill activations are captured automatically from the
 `stream-json` transcript.
 
+`skill_called` / `skill_not_called` match a regex against the names of the
+Skill tool calls in the transcript. A slash command typed at the start of the
+prompt is expanded by Claude Code and is not a Skill call, so these checks
+measure delegated and self-started runs only (the `cmd-*` probes).
+
 `transcript_*` checks scan **shell tool inputs only** (Bash, and PowerShell
 on Windows) — the model *talking about* `git reset --hard` doesn't trip a
 safety check; running it does. `file_preserved_glob` passes when the file is

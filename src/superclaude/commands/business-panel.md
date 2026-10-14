@@ -1,5 +1,5 @@
 ---
-description: Multi-expert biz analysis with adaptive modes. Use when user types `/sc:business-panel` or asks multi-expert (Porter, Christensen, Drucker, etc.) panel review of strategy decision. Do NOT auto-trigger on single-perspective biz question or quick "what's trade-off?" — those get direct answer.
+description: Multi-expert business analysis (Porter, Christensen, Drucker and others) with adaptive modes. Use when asked for a multi-expert panel review of a strategy decision. Not for a single-perspective business question — answer directly.
 ---
 <component name="business-panel" type="command">
 

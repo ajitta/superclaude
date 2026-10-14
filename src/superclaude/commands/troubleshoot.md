@@ -1,5 +1,5 @@
 ---
-description: Diagnose + resolve issues in code, builds, deployments, system behavior. Use ONLY when user explicitly types `/sc:troubleshoot` — diagnose + propose; write a failing test and apply the fix only with `--fix`, and risky fixes still need confirm. Do NOT auto-trigger on clear error with obvious fix, syntax errors, or single-file bugs — those get direct fix.
+description: Diagnose issues in code, builds, deployments and system behavior and propose how to resolve them; `--fix` writes a failing test and applies the change. On request only — the user's /sc:troubleshoot or a workflow step that names it. Not for a clear error with an obvious fix — fix it directly.
 ---
 <component name="troubleshoot" type="command">
 

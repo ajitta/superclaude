@@ -1,5 +1,5 @@
 ---
-description: SuperClaude command dispatcher - main entry point for all features. Use ONLY when the user explicitly types `/sc:sc` — this is a meta-dispatcher that routes to other /sc:* commands. Do NOT auto-trigger; if intent matches a specific /sc:* command, invoke that one directly.
+description: SuperClaude command dispatcher that routes to the other /sc:* commands. On request only — the user's /sc:sc or a workflow step that names it. Not for a request that matches one command — run that command.
 ---
 <component name="sc" type="command">
 

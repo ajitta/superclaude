@@ -1,5 +1,5 @@
 ---
-description: Repo index, 94% token cut (58K→3K). Use ONLY when user type `/sc:index-repo` — make compact PROJECT_INDEX briefing for token-cheap navigation. NOT auto-fire on routine code look or "what in repo?" — use Glob/Grep direct.
+description: Build a compact PROJECT_INDEX briefing of the repo for token-cheap navigation. On request only — the user's /sc:index-repo or a workflow step that names it. Not for a routine code lookup — use Glob or Grep.
 ---
 <component name="index-repo" type="command">
 

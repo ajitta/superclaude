@@ -36,3 +36,4 @@ forbidden_command_fields:
   - context        # valid in CC; SC commands run in the main session
   - agent          # valid in CC; SC commands run in the main session
   - hooks          # valid in CC; SC commands run in the main session
+  - disable-model-invocation # valid in CC; blocks delegated runs (Skill tool, subagent preload) — commands gate by description tier

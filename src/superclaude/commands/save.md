@@ -1,5 +1,5 @@
 ---
-description: Session lifecycle management with a committed project memory folder (`.claude/memories/`) + Claude auto memory for context persistence. Use ONLY when user explicitly types `/sc:save` — session-end lifecycle action that writes memory files and auto-memory entries. Do NOT auto-trigger on "save this", "remember this", or end-of-task completions.
+description: Save session context to the committed project memory folder (.claude/memories/) and Claude auto memory. On request only — the user's /sc:save or a workflow step that names it. Not for "remember this" or the end of a task — keep working.
 ---
 <component name="save" type="command">
 

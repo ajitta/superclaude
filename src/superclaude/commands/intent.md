@@ -1,5 +1,5 @@
 ---
-description: Capture a request as an intent record in the requester's own words — problem, proposed outcome, affected users and systems, constraints, open questions — before any analysis. Use ONLY when user explicitly types `/sc:intent` — writes docs/features/<slug>/00-intent.md, so a wrong fire creates a file unasked. Do NOT auto-trigger on "I want X" statements, feature ideas mentioned in passing, or requests to explore or design — those get a direct answer or /sc:brainstorm.
+description: Record a request in the requester's own words (problem, outcome, affected users, constraints, open questions) as docs/features/<slug>/00-intent.md. On request only — the user's /sc:intent or a workflow step that names it. Not for ideas mentioned in passing — answer directly or use /sc:brainstorm.
 ---
 <component name="intent" type="command">
 

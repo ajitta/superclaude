@@ -1,5 +1,5 @@
 ---
-description: Orchestrate sub-agents, manage workflows, and document learnings for continuous improvement. Use ONLY when the user explicitly types `/sc:pm` — spawns sub-agents, so a wrong fire costs tokens and leaves their side effects behind. Do NOT auto-trigger on a single sub-agent delegation, small workflow, or one-off task tracking — use direct Agent tool calls instead.
+description: Orchestrate sub-agents, manage workflows, and document learnings. On request only — the user's /sc:pm or a workflow step that names it. Not for one sub-agent delegation or small task tracking — call the Agent tool directly.
 ---
 <component name="pm" type="command">
 

@@ -35,12 +35,18 @@ COMMAND_IDS = [f.stem for f in COMMAND_FILES]
 
 # Command descriptions are model-facing: /sc:* commands are exposed to the model,
 # which decides whether to invoke them. Every description encodes an invocation
-# contract — a positive cue (references its own /sc:<name>) and a negative gate
-# ("Do NOT auto-trigger on …" / "NOT auto-fire on …") that stops the model
-# over-firing the command on adjacent phrasing. Hallucination-priming vocab is
-# deliberately NOT checked for commands: that failure mode is agent-persona-
-# specific (107-trial study); commands are user-invoked workflows, not personas.
-NEGATIVE_TRIGGER_GATE = re.compile(r"auto-?(trigger|fire)", re.IGNORECASE)
+# contract — one tier sentence ("Use when asked …" for auto-invocable commands,
+# the ON_REQUEST sentence for commands that run only when the user types them or
+# a workflow step names them) and a "Not for …" negative gate that stops the
+# model over-firing the command on adjacent phrasing. The listing that carries
+# these descriptions has a shared character budget, hence the length cap.
+# Hallucination-priming vocab is deliberately NOT checked for commands: that
+# failure mode is agent-persona-specific (107-trial study); commands are
+# workflows, not personas.
+NEGATIVE_TRIGGER_GATE = re.compile(r"\bNot for\b")
+AUTO_TIER = "Use when asked"
+ON_REQUEST = "On request only — the user's /sc:{stem} or a workflow step that names it."
+DESCRIPTION_MAX_CHARS = 300
 
 # A command doc that tells the model to run a superclaude script with a bare
 # `python`/`python3` prescribes an invocation that only resolves by luck of
@@ -93,29 +99,39 @@ class TestCommandInvocationContract:
     """Command descriptions are a model-facing invocation contract.
 
     /sc:* commands are exposed to the model, which decides whether to invoke
-    them; every description references its own slash command (positive cue) and
-    carries a 'Do NOT auto-trigger' negative gate (prevents over-firing). These
-    deterministic lints guard that contract — the command-shaped counterpart to
-    the agent description-interface lint (test_agent_structure.py). See
-    docs/research/agent-native-design-ajitta-2026-05-31.md (P1-B extension).
+    them; every description states its tier (auto, or on request with its own
+    /sc:<name>) and carries a 'Not for …' negative gate (prevents over-firing).
+    These deterministic lints guard that contract — the command-shaped
+    counterpart to the agent description-interface lint (test_agent_structure.py).
+    See docs/research/agent-native-design-ajitta-2026-05-31.md (P1-B extension).
     """
 
-    def test_description_references_own_slash_command(self, command):
+    def test_description_states_one_invocation_tier(self, command):
         stem, content, fm = command
         desc = fm.get("description", "")
-        assert f"/sc:{stem}" in desc, (
-            f"{stem}: description does not reference its own '/sc:{stem}' "
-            f"invocation. The model reads the description to route slash commands; "
-            f"the positive cue must name the command."
+        tiers = [AUTO_TIER in desc, ON_REQUEST.format(stem=stem) in desc]
+        assert sum(tiers) == 1, (
+            f"{stem}: description must carry exactly one tier sentence — "
+            f"'{AUTO_TIER} …' or '{ON_REQUEST.format(stem=stem)}'. An on-request "
+            f"command must still accept a workflow step that names it, so "
+            f"delegated runs reach it."
         )
 
     def test_description_has_negative_trigger_gate(self, command):
         stem, content, fm = command
         desc = fm.get("description", "")
         assert NEGATIVE_TRIGGER_GATE.search(desc), (
-            f"{stem}: description has no 'Do NOT auto-trigger …' negative gate. "
-            f"Without it the model may over-invoke this command on adjacent "
-            f"phrasing instead of waiting for explicit /sc:{stem}."
+            f"{stem}: description has no 'Not for …' negative gate. Without it "
+            f"the model may invoke this command on adjacent phrasing."
+        )
+
+    def test_description_fits_the_listing_budget(self, command):
+        stem, content, fm = command
+        desc = fm.get("description", "")
+        assert len(desc) <= DESCRIPTION_MAX_CHARS, (
+            f"{stem}: description is {len(desc)} chars (max "
+            f"{DESCRIPTION_MAX_CHARS}). Every command shares the skill listing's "
+            f"character budget; cut rationale, keep purpose, tier and gate."
         )
 
 

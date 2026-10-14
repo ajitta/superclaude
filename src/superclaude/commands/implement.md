@@ -1,5 +1,5 @@
 ---
-description: Feature + code impl with smart agent delegate + MCP. Use ONLY when user explicit type `/sc:implement` — run multi-step impl flow with sub-agent delegate. NO auto-trigger on routine "add func", "fix bug", or single-file edit — handle direct without implement orchestrate.
+description: Feature and code implementation with sub-agent delegation and MCP integration. On request only — the user's /sc:implement or a workflow step that names it. Not for a routine function, bug fix or single-file edit — edit directly.
 ---
 <component name="implement" type="command">
 

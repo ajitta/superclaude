@@ -1,5 +1,5 @@
 ---
-description: Session lifecycle mgmt with the project memory folder (`.claude/memories/`) + Claude auto memory for proj context load. Use ONLY when user explicitly type `/sc:load` — session-start action prime context from memory files + proj state. Do NOT auto-trigger on session resume or "let's continue".
+description: Load session context from the project memory folder (.claude/memories/) and Claude auto memory. On request only — the user's /sc:load or a workflow step that names it. Not for resuming work or "let's continue" — keep working.
 ---
 <component name="load" type="command">
 

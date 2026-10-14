@@ -6,6 +6,17 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Ver
 
 Releases before 4.19.0 are not listed. Their history is the git log; the upstream-era changelog, last entry 4.2.1, is `CHANGELOG.md` at commit `6b0ac5c3^`.
 
+## [Unreleased]
+
+### Changed
+
+- Every `/sc:` command can now be run by delegation: another command, a workflow step or a sub-agent that names `/sc:X` reaches it through the Skill tool. `/sc:git` and `/sc:auto-improve` no longer set `disable-model-invocation`. Commands that change files, write committed docs or start sub-agents still never start on Claude's own judgment: their description says "On request only — the user's /sc:X or a workflow step that names it."
+- Command descriptions are shorter: purpose, when to use, and one "Not for …" line, at most 300 characters each, about 30% shorter in total. They share the skill listing's budget with every other skill you have installed, so less of the listing gets dropped.
+
+### Upgrade notes
+
+- Re-run `superclaude install` for your scope to pick up the new descriptions.
+
 ## [4.26.1] - 2026-10-12
 
 ### Fixed

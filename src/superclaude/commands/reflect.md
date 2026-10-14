@@ -1,5 +1,5 @@
 ---
-description: Task reflect + validate. Use when user type `/sc:reflect` or ask validate multi-step task truly done (assumptions surface, residuals list, gaps name). NO auto-trigger after every task close — routine end-turn summary go inline, not reflection pass.
+description: Reflect on and validate a multi-step task — surface assumptions, list residuals, name gaps. Use when asked whether a task is truly done. Not for the routine end-of-turn summary.
 ---
 <component name="reflect" type="command">
 

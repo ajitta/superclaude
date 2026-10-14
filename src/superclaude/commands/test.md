@@ -1,5 +1,5 @@
 ---
-description: Execute tests with coverage analysis and automated quality reporting. Use ONLY when user explicitly types `/sc:test` — runs full test orchestration with coverage. Do NOT auto-trigger on "run the tests", "run pytest", or executing single test file — invoke pytest/jest/etc. directly via Bash.
+description: Execute tests with coverage analysis and quality reporting. On request only — the user's /sc:test or a workflow step that names it. Not for "run the tests" or one test file — run pytest, jest or similar with Bash.
 ---
 <component name="test" type="command">
 

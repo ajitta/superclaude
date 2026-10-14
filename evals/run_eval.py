@@ -96,6 +96,11 @@ class TaskResult:
     duration_s: float = 0.0
     permission_denials: int = 0
     sc_activations: int = 0
+    # Skill names of the Skill tool calls that ran (non-error tool_result), in
+    # order — what skill_called / skill_not_called match. A refused call is
+    # left out; sc_activations still counts attempts. A slash command typed at
+    # the start of the prompt is expanded, not called, so it never appears.
+    skills_called: list[str] = field(default_factory=list)
     error: str = ""
     # stop_details.category when the model refused the turn ("" otherwise).
     # A refusal is also recorded in `error`, so ok/gates_ok stay false.
@@ -345,6 +350,10 @@ def _parse_stream(stream: str, res: TaskResult) -> tuple[str, str]:
     stream-json transcript."""
     result_text = ""
     bash_inputs: list[str] = []
+    # Skill tool_use id -> skill name, until its tool_result arrives. Claude
+    # Code answers a call it refuses (disable-model-invocation, unknown skill)
+    # with an error result, so only a non-error result counts as a run.
+    pending_skills: dict[str, str] = {}
     for line in stream.splitlines():
         try:
             event = json.loads(line)
@@ -383,10 +392,19 @@ def _parse_stream(stream: str, res: TaskResult) -> tuple[str, str]:
                 # either must trip the transcript gates.
                 if name in ("Bash", "PowerShell"):
                     bash_inputs.append(tool_input.get("command", ""))
-                if name == "Skill" and str(tool_input.get("skill", "")).startswith(
-                    "sc:"
-                ):
-                    res.sc_activations += 1
+                if name == "Skill":
+                    skill = str(tool_input.get("skill", ""))
+                    pending_skills[block.get("id", "")] = skill
+                    if skill.startswith("sc:"):
+                        res.sc_activations += 1
+        elif etype == "user":
+            content = (event.get("message") or {}).get("content")
+            for block in content if isinstance(content, list) else []:
+                if block.get("type") != "tool_result":
+                    continue
+                skill = pending_skills.pop(block.get("tool_use_id", ""), None)
+                if skill is not None and not block.get("is_error"):
+                    res.skills_called.append(skill)
     return result_text, "\n".join(bash_inputs)
 
 
@@ -398,7 +416,9 @@ def _run_checks(
 ) -> None:
     for check in task.get("checks", []):
         ctype, tag = check["type"], check.get("tag", "untagged")
-        passed, detail = _check_one(check, ctype, ws, result_text, bash_inputs)
+        passed, detail = _check_one(
+            check, ctype, ws, result_text, bash_inputs, res.skills_called
+        )
         res.checks.append(
             CheckResult(
                 tag=tag,
@@ -435,7 +455,12 @@ def _stashed_files(ws: Path) -> set[str]:
 
 
 def _check_one(
-    check: dict, ctype: str, ws: Path, result_text: str, bash_inputs: str
+    check: dict,
+    ctype: str,
+    ws: Path,
+    result_text: str,
+    bash_inputs: str,
+    skills_called: list[str] | None = None,
 ) -> tuple[bool, str]:
     if ctype == "cmd_ok":
         proc = _run(_pin_python(check["cmd"]), cwd=ws)
@@ -482,6 +507,12 @@ def _check_one(
     if ctype == "transcript_not_regex":
         m = re.search(check["pattern"], bash_inputs)
         return m is None, m.group(0) if m else ""
+    if ctype == "skill_called":
+        hits = [s for s in skills_called or [] if re.search(check["pattern"], s)]
+        return bool(hits), f"called={skills_called or []}"
+    if ctype == "skill_not_called":
+        hits = [s for s in skills_called or [] if re.search(check["pattern"], s)]
+        return not hits, f"called={skills_called or []}"
     if ctype == "citation_lines":
         return _check_citations(check, result_text)
     raise ValueError(f"unknown check type: {ctype}")
