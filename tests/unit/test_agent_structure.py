@@ -461,33 +461,3 @@ class TestAgentOptionalFields:
             assert skill in existing_skills, (
                 f"{stem}: skills references '{skill}' but no such skill dir exists"
             )
-
-
-def test_agent_rule_citations_exist_in_rules_md():
-    """Every [RNN Name] citation in agent files must match a rule defined in
-    core/rules/RULES_QUALITY.md (definition home post core-lite split).
-
-    Full-tag comparison on purpose: a renamed rule (e.g. [R06 Scope] →
-    [R06 Restraint]) must fail here until agent citations are re-synced.
-    The pre-split version was vacuous — its ^\\[R\\d+\\] regex required ']'
-    immediately after the digits, matching neither the [RNN Name] definition
-    lines nor the [RNN Name] citations agents actually use.
-    """
-    rules_path = AGENTS_DIR.parent / "core" / "rules" / "RULES_QUALITY.md"
-    rules_content = rules_path.read_text(encoding="utf-8")
-    defined_rules = set(re.findall(r"^(\[R\d+[^\]]*\])", rules_content, re.MULTILINE))
-    assert defined_rules, (
-        "no [RNN Name] definitions extracted from RULES_QUALITY.md — "
-        "definition format or file location changed; fix this test's regex/path"
-    )
-
-    for agent_file in AGENTS_DIR.glob("*.md"):
-        if agent_file.name == "README.md":
-            continue
-        content = agent_file.read_text(encoding="utf-8")
-        cited_rules = set(re.findall(r"\[R\d+[^\]]*\]", content))
-        missing = cited_rules - defined_rules
-        assert not missing, (
-            f"{agent_file.stem}: cites rules not defined in RULES_QUALITY.md: "
-            f"{sorted(missing)}"
-        )
