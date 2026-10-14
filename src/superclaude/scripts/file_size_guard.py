@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """PreToolUse hook that blocks Read calls on large files to prevent token explosion.
 
-Proactive token conservation: blocks full-file reads above 30KB, pushing the
+Proactive token conservation: blocks full-file reads of 30KB or more, pushing the
 model toward symbol-aware tools, Grep, or paginated Read instead.
 
 Threshold: 30KB (token conservation, not CC hard limit).
@@ -63,16 +63,16 @@ JSON_EXTENSIONS = {".json", ".jsonl", ".ndjson"}
 
 def _block_message(size: int, ext: str) -> str:
     """Generate context-aware block message based on file extension."""
-    size_kb = size // 1024
+    size_kb = size // 1000  # decimal KB, the unit SIZE_THRESHOLD uses
     if ext in JSON_EXTENSIONS:
         return (
-            f"File is {size_kb}KB ({size:,} bytes) — exceeds safe Read threshold "
-            f"(30KB). Use jq to query specific fields (e.g., jq '.key' file{ext}) "
+            f"File is {size_kb}KB ({size:,} bytes) — at or over the safe Read "
+            f"threshold (30KB). Use jq to query specific fields (e.g., jq '.key' file{ext}) "
             f"or Read with limit parameter (e.g., limit=500)."
         )
     return (
-        f"File is {size_kb}KB ({size:,} bytes) — exceeds safe Read threshold "
-        f"(30KB). Use limit parameter (e.g., limit=500) or Grep to search "
+        f"File is {size_kb}KB ({size:,} bytes) — at or over the safe Read "
+        f"threshold (30KB). Use limit parameter (e.g., limit=500) or Grep to search "
         f"for specific content."
     )
 

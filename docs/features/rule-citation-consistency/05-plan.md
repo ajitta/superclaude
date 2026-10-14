@@ -1,5 +1,5 @@
 ---
-status: draft
+status: complete
 revised: 2026-10-14
 ---
 
@@ -35,13 +35,13 @@ revised: 2026-10-14
 
 - insights.jsonl `rule` 필드(번호만)와 R14 `violated_rule`(`[RNN Name]`)의 기록 형식 차이. 저장 데이터 형식이라 별도 결정이 필요하다. 기존 데이터에 정의 없는 `R10`이 1건 있다.
 - 비어 있는 번호(R04, R05, R07~R11)의 재번호. `violated_rule`·insights 기록이 번호에 묶여 있어 다시 매기면 과거 기록이 틀어진다.
-- `.claude/rules/`(레포 전용 규칙)와 `docs/`의 인용. 배포 콘텐츠가 아니다.
-- 30KB 경계 표기(`scripts/README.md:22`, `hooks/hooks.json:82`의 ">30KB" vs 코드 `>=`).
+- ~~`.claude/rules/`(레포 전용 규칙)와 `docs/`의 인용~~ → Phase 3으로 옮김.
+- ~~30KB 경계 표기~~ → Phase 3으로 옮김.
 
 ## Phase 0: 선행 조건과 브랜치
 
-- [ ] `test/rule-citation-scope`(규칙 인용 테스트를 `src/superclaude` 전체로 확장, 괄호 이름 검사 추가)를 커밋하고 master에 병합한다. 이 계획의 Task 1.1이 그 테스트를 고친다.
-- [ ] master에서 `git switch -c refactor/rule-citations`.
+- [x] `test/rule-citation-scope`(규칙 인용 테스트를 `src/superclaude` 전체로 확장, 괄호 이름 검사 추가)를 커밋하고 master에 병합한다. 이 계획의 Task 1.1이 그 테스트를 고친다.
+- [x] master에서 `git switch -c refactor/rule-citations`.
 
 ## Phase 1: 인용 형식 통일 (커밋 1개)
 
@@ -49,11 +49,11 @@ revised: 2026-10-14
 
 **Files:** `tests/unit/test_cross_references.py` (`test_rule_citations_defined`, `_PAREN_NAME`)
 
-- [ ] Step 1: 번호만 쓴 인용을 결정의 예외 세 가지 밖에서 실패로 바꾼다.
-  - 예외 1은 파일 경로로(`core/rules/RULES_QUALITY.md`), 예외 2는 범위 정규식 `R\d{2}[–-]R\d{2}`를 먼저 지워서, 예외 3은 `{"commands/insight.md": ["rule (R13, R18...)"]}` 허용 목록으로 처리한다.
+- [x] Step 1: 번호만 쓴 인용을 결정의 예외 세 가지 밖에서 실패로 바꾼다.
+  - 예외 1은 파일 경로로(`core/rules/RULES_QUALITY.md`), 예외 2는 범위 정규식 `R\d{2}[–-]R\d{2}`를 먼저 지워서, 예외 3은 `{"commands/insight.md": ["rule (R13, R18...)"]}`(Phase 3부터 키는 레포 루트 기준 `src/superclaude/commands/insight.md`) 허용 목록으로 처리한다.
   - 번호+이름 검사(`[RNN Name]`이 정의와 일치)는 유지한다. 예외 1 파일 안의 번호도 정의된 번호여야 한다는 검사는 유지한다.
-- [ ] Step 2: `_PAREN_NAME`과 `bad_names`를 지운다. 괄호 이름 5곳은 Task 1.2에서 `[RNN Name]`으로 바뀌므로 필요 없다.
-- [ ] Step 3: `uv run pytest tests/unit/test_cross_references.py -q -k rule` → 실패 목록이 Task 1.2의 파일 목록과 같은지 확인한다.
+- [x] Step 2: `_PAREN_NAME`과 `bad_names`를 지운다. 괄호 이름 5곳은 Task 1.2에서 `[RNN Name]`으로 바뀌므로 필요 없다.
+- [x] Step 3: `uv run pytest tests/unit/test_cross_references.py -q -k rule` → 실패 목록이 Task 1.2의 파일 목록과 같은지 확인한다.
 
 ### Task 1.2: 콘텐츠를 표준 형식으로 (green)
 
@@ -79,10 +79,10 @@ revised: 2026-10-14
 | `commands/analyze.md:53` | `` grep `violated_rule: "[RXX]"` `` | `` grep `violated_rule: "[RNN Name]"` `` (R14가 정한 기록 형식) |
 | `commands/analyze.md:58` | `follow [R14 Correction Capture] Correction Capture format` | `follow the [R14 Correction Capture] format` |
 
-- [ ] Step 1: 표대로 고친다. XML 속성 값(`note="…"`) 안의 대괄호는 그대로 둬도 파싱에 문제가 없는지 `uv run pytest tests/unit/test_content_structure.py -q`로 확인한다.
-- [ ] Step 2: `uv run pytest tests/unit/test_cross_references.py -q -k rule` → 전부 통과.
-- [ ] Step 3: 잡는지 확인. `commands/improve.md` 끝에 `Apply R18.`을 붙이면 실패하고, `[R06 Restraint]`도 실패하는지 본다. 확인 뒤 `git checkout -- src/superclaude/commands/improve.md`.
-- [ ] Step 4: `uv run pytest` exit 0, `make format`, `make lint`. 커밋 `refactor(content): cite rules as [RNN Name] everywhere`.
+- [x] Step 1: 표대로 고친다. XML 속성 값(`note="…"`) 안의 대괄호는 그대로 둬도 파싱에 문제가 없는지 `uv run pytest tests/unit/test_content_structure.py -q`로 확인한다.
+- [x] Step 2: `uv run pytest tests/unit/test_cross_references.py -q -k rule` → 전부 통과.
+- [x] Step 3: 잡는지 확인. `commands/improve.md`를 임시 파일로 복사해 두고, 끝에 `Apply R18.`을 붙이면 실패하고 `[R06 Restraint]`도 실패하는지 본다. 확인 뒤 복사본으로 되돌린다(`git checkout --`는 Step 1의 수정까지 지운다).
+- [x] Step 4: `uv run pytest` exit 0, `make format`, `make lint`. 커밋 `refactor(content): cite rules as [RNN Name] everywhere`.
 
 ## Phase 2: 커널과 RULES_QUALITY 중복 정리 (커밋 1개)
 
@@ -90,16 +90,30 @@ revised: 2026-10-14
 
 **Files:** `src/superclaude/core/rules/RULES_QUALITY.md:11,15,18,19,20`
 
-- [ ] Step 1: 줄이기 전 크기를 기록한다. `wc -c src/superclaude/core/rules/RULES_QUALITY.md`.
-- [ ] Step 2: 각 줄을 `[RNN Name] 🔴|🟡: kernel <섹션 이름> + <커널에 없는 내용>` 형식으로 줄인다. 태그(`[RNN Name]`)와 중요도 표시는 그대로 둔다. 테스트가 정의를 이 줄에서 읽고, R14 `violated_rule`과 `/sc:analyze --focus rules`가 이 태그를 쓴다.
+- [x] Step 1: 줄이기 전 크기를 기록한다. `wc -c src/superclaude/core/rules/RULES_QUALITY.md`.
+- [x] Step 2: 각 줄을 `[RNN Name] 🔴|🟡: kernel <섹션 이름> + <커널에 없는 내용>` 형식으로 줄인다. 태그(`[RNN Name]`)와 중요도 표시는 그대로 둔다. 테스트가 정의를 이 줄에서 읽고, R14 `violated_rule`과 `/sc:analyze --focus rules`가 이 태그를 쓴다.
   - R06 → `kernel <scope_discipline>`; 남길 것: `0 unsolicited files, 0 adjacent refactors`
   - R15 → `kernel <verification_before_completion>`; 남길 것: `<verification_ladder>` 참조, `If unable to verify at all, state "verification not possible: [reason]"`
   - R18 → `kernel <scope_discipline>`; 남길 것: `Require: specific failure scenario, quantitative evidence, or user-facing impact. "Deferred to post-MVP review" is valid design decision`
   - R19 → `kernel <project_rules_priority>`; 남길 것: 같은 발견이 두 번째일 때, 형식 `name: description`, 없으면 `paths:` frontmatter로 생성, 사용자 승인, 애매하면 project, framework `<gotchas>`에 있으면 skip
   - R20 → `kernel <verification_before_completion>`; 남길 것: `>3 steps or ambiguous outcome` 기준, 예시 3개, `--loop` 수렴 판정, skip 목록
-- [ ] Step 3: 줄인 뒤 크기를 다시 재고 차이를 커밋 본문에 적는다.
-- [ ] Step 4: 커널 `core/RULES.md`는 바꾸지 않는다. `git diff --stat`에 `core/RULES.md`가 없어야 한다.
-- [ ] Step 5: `uv run pytest` exit 0(특히 `tests/unit/test_context_loader.py`의 core-lite 가드), `make lint`. 커밋 `refactor(rules): RULES_QUALITY points to the kernel for rules it already states`.
+- [x] Step 3: 줄인 뒤 크기를 다시 재고 차이를 커밋 본문에 적는다.
+- [x] Step 4: 커널 `core/RULES.md`는 바꾸지 않는다. `git diff --stat`에 `core/RULES.md`가 없어야 한다.
+- [x] Step 5: `uv run pytest` exit 0(특히 `tests/unit/test_context_loader.py`의 core-lite 가드), `make lint`. 커밋 `refactor(rules): RULES_QUALITY points to the kernel for rules it already states`.
+
+## Phase 3: 범위 밖에서 옮겨 온 후속 (2026-10-14 사용자 요청, 커밋 1개)
+
+- [x] `.claude/rules/` 인용: 규칙 인용 테스트가 `.claude/rules/**/*.md`도 검사한다(테스트 ID는 레포 루트 기준 경로). 번호만 쓴 3곳을 `[RNN Name]`으로 고쳤다(`gotchas/authoring.md` R21(320자 entry 예산 때문에 "Passive rules (R21) fire"를 "[R21 Failure-Forward] fires"로; 근거 절 § P-R21도 R21 하나의 측정), `gotchas/general.md` 머리말 R19, `gotchas/README.md` R19). 허용 목록에 둔 곳: `general.md`의 `rule-tag-vs-concept`(번호 자체를 grep하는 이야기), `authoring.md`의 `§ P-R21`(연구 문서의 절 이름). 범위 `R01-R21`은 예외 2로 통과.
+- [x] `docs/` 인용: 검사만 하고 고치지 않는다. archive 밖에서 정의와 맞지 않는 인용은 없다. `socratic-brainstorm-skill/03-analysis.md`의 R10·R11은 그 문서의 요구사항 번호이고, 이 계획서의 R04 등은 빈 번호를 설명하는 글이다. `docs/archive/`는 당시 있던 규칙(R04 Planning 등)을 인용한다. 날짜가 박힌 기록이라 지금 규칙 이름으로 고쳐 쓰면 기록이 틀어지므로 테스트도 두지 않는다.
+- [x] 30KB 경계 표기: 코드(`SIZE_THRESHOLD = 30_000`, `size >= SIZE_THRESHOLD`)에 맞춰 ">30KB"·"above 30KB"를 "≥30KB"·"30KB or more"로 고쳤다(`hooks/hooks.json:82`, `scripts/README.md:22`, `ARCHITECTURE.md:22`, `scripts/file_size_guard.py:4`, 레포 `README.md:360`, `evals/fixtures/large-file/gen_fixture.py:5`). `tests/unit/test_file_size_guard.py::test_threshold_described_as_inclusive`가 `src/superclaude`와 `README.md`에서 그 표기를 막는다. 날짜가 박힌 `docs/adr/0001`, `docs/research`의 표기와 설치본(`.claude/hooks/hooks.json`, `.claude/settings.local.json`, 다음 sync가 갱신)은 그대로 둔다.
+
+## Phase 4: 리뷰 반영 (2026-10-14 `/sc:review`, 커밋 1개)
+
+- [x] I1: `RULES_QUALITY.md`가 커널 섹션을 가리키는 `` kernel `<X>` `` 5곳을 검사하는 테스트가 없었다. `test_quality_kernel_pointers_resolve`가 각 `<X>`가 `core/RULES.md`의 태그로 있는지 본다.
+- [x] I2: guard의 차단 메시지가 정확히 30,000바이트 파일에 "File is 29KB … exceeds safe Read threshold (30KB)"를 냈다. 크기를 SIZE_THRESHOLD와 같은 10진 KB(`size // 1000`)로 보이고 "at or over the safe Read threshold (30KB)"로 바꿨다. 경계 표기 테스트는 "exceeds … 30KB"도 막는다. 처음 넣은 패턴은 줄바꿈을 넘지 못해, 두 줄로 나뉜 메시지 문자열(옛 문구 포함)을 놓쳤다. 그래서 패턴이 줄을 넘게 했고, `test_code_file_at_threshold`가 실제 메시지에 "30KB (30,000 bytes)"와 "at or over"가 있는지 본다.
+- [x] S1: `_BARE_ID_ALLOWED`의 문자열이 파일에서 사라지면 테스트가 실패한다(낡은 예외 방지).
+- [x] S2: 인용 형식을 `.claude/rules/xml-prose-format.md`의 Quoting and Reference Conventions 표에 한 줄로 적었다.
+- [x] S3: Task 1.1 Step 1의 예외 3 키는 Phase 3부터 레포 루트 기준(`src/superclaude/commands/insight.md`)이다. 그 줄에 표시했다.
 
 ## Risks
 
@@ -120,3 +134,9 @@ revised: 2026-10-14
 - `uv run pytest tests/unit/test_cross_references.py -q -k rule` 통과, Task 1.2 Step 3의 두 가지 위반이 각각 실패로 잡힘.
 - 예외 세 곳 밖에서 번호만 쓴 인용 0건: Task 1.1 테스트가 그 검사다.
 - Phase 2 전후 `RULES_QUALITY.md` 바이트 수와 `core/RULES.md` 무변경(`git diff --stat master -- src/superclaude/core/RULES.md` 빈 출력).
+
+## Deviations
+
+- Task 1.2 Step 3: 계획대로 `git checkout --`로 되돌리자 Step 1에서 고친 `improve.md` 한 줄까지 HEAD로 돌아갔다. 다시 고치고, Step 3의 복원 방법을 복사본 방식으로 바꿨다.
+- Task 1.1: 예외 3(`_BARE_ID_ALLOWED`)과 범위 안의 번호도 정의된 번호인지 검사한다. 계획은 예외 1 파일만 이 검사를 명시했다.
+- Task 2.1: 실측 절약은 298바이트(`RULES_QUALITY.md` 12,832 → 12,534, 약 75토큰)로, 근거 절의 추정 약 0.5KB보다 작다. R19·R20은 커널에 없는 세부가 대부분이라 거의 줄지 않았다. 이 변경의 주된 효과는 크기보다 규칙마다 서술 위치를 하나로 두는 것(content-quality 4절 Duplication)이다.

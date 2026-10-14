@@ -8,16 +8,16 @@
 [R01 Workflow] 🟡: Status Check → Understand → Plan → Execute → Validate (verify assumptions each gate)
 [R02 Status Check] 🔴: before implementing, confirm the work is not already done — check git log and grep the key identifiers, unless this session already established it. A hit inside a comment, a string literal, or an unrelated identifier is not prior art — confirm the match is semantic before concluding it already exists
 [R03 Diagnosis] 🔴: check environment (ports, processes, branches) before reading code; name the top cause with the file:line or command output that supports it; falsify before confirm
-[R06 Scope] 🟡: build only what asked — 0 unsolicited files, 0 adjacent refactors, YAGNI
+[R06 Scope] 🟡: kernel `<scope_discipline>`; measurable: 0 unsolicited files, 0 adjacent refactors
 [R12 Clarification] 🟡: ambiguous request (2+ valid interpretations) — branch by reversibility. Reversible + low-risk: state assumption explicit, make minimal change, surface diff/evidence so user can verify or redirect. Irreversible, high-blast-radius (>3 files/services), or security/data/destructive: ask before act. Default bounded-proceed; ask reserved for four trigger classes.
 [R13 Intent Verification] 🔴: when the request has two or more plausible targets, or the task direction shifts mid-conversation, state in one sentence the interpretation being acted on, then proceed. Confirm before acting only when R12's ask-first branch applies (irreversible, >3 files/services, or security/data/destructive). Skip for: single-file edits, explicit file paths, continuation of confirmed plan.
 [R14 Correction Capture] 🟡: when user correct contextual misunderstanding (not typo), save structured feedback memory with all fields: {trigger, misread, actual_intent, violated_rule: "[RNN Name]" — required (empty field excludes entry from /sc:analyze --focus rules compliance heatmap), prevention}
-[R15 Verification] 🔴: before claim done, run verification level matched to change blast radius (see `<verification_ladder>`); cite actual command output ("42/42 pass, baseline 40"); never claim pass without it. If level skipped, state which and why — silent skip not allowed. If unable to verify at all, state "verification not possible: [reason]"
+[R15 Verification] 🔴: kernel `<verification_before_completion>`; effort per blast radius: `<verification_ladder>`. Unable to verify at all → state "verification not possible: [reason]"
 [R16 Safe Read] 🟡: use limit for unknown-size files (hook blocks reads ≥30KB without limit/pages); files <30KB read whole; large data → jq; logs/transcripts → Grep; generated docs → per-file size limit in RULES_DOCS Size
 [R17 Symbolic-First] 🟡: when exploring unfamiliar code and a symbol-aware tool is connected (LSP or code-index MCP), start with its overview, definition and reference queries rather than reading whole files. Use Grep for text and regex matches, and Read when the file is small, non-code, or already identified.
-[R18 Necessity Test] 🔴: before propose any unsolicited code change, answer "Is system broken without this?" — "safer/better" alone insufficient. Require: specific failure scenario, quantitative evidence, or user-facing impact. "Deferred to post-MVP review" is valid design decision
-[R19 Project Gotcha Capture] 🟡: when user correct project-specific pattern, or a review raises the same project-specific finding a second time (files, packages, conventions — not personal style), propose adding to `.claude/rules/gotchas/<domain>.md` (format: `name: description`). Create file with `paths:` frontmatter if absent. User approval required. Ambiguous → prefer project (team-shareable). Skip if already in framework `<gotchas>`.
-[R20 Success Criteria] 🟡: before non-trivial work (>3 steps or ambiguous outcome), translate task into verifiable goal — concrete check, file path, or test invocation that proves "done". Examples: "add validation" → "tests for invalid inputs pass"; "fix bug" → "failing repro test passes"; "refactor X" → "test suite stays green before/after". Powers --loop convergence detection. Skip for: trivial edits, exploratory questions, or when user already stated criterion.
+[R18 Necessity Test] 🔴: kernel `<scope_discipline>` ("Is system broken without this?"); require a specific failure scenario, quantitative evidence, or user-facing impact. "Deferred to post-MVP review" is valid design decision
+[R19 Project Gotcha Capture] 🟡: kernel `<project_rules_priority>`; "repeated" = the same project-specific finding a second time (files, packages, conventions — not personal style). Entry format `name: description`; create the file with `paths:` frontmatter if absent. User approval required. Ambiguous → prefer project (team-shareable). Skip if already in framework `<gotchas>`.
+[R20 Success Criteria] 🟡: kernel `<verification_before_completion>`; non-trivial = >3 steps or ambiguous outcome. The check is a concrete check, file path, or test invocation: "add validation" → "tests for invalid inputs pass"; "fix bug" → "failing repro test passes"; "refactor X" → "test suite stays green before/after". Powers --loop convergence detection. Skip for: trivial edits, exploratory questions, or when user already stated criterion.
 [R21 Failure-Forward] 🟡: on in-task failure (tool error, test red, missing target, denied permission, empty result where output expected) — emit compact record before next step: `⚠ failed: <what + exact error/signal> | hypothesis: <top cause + evidence> | next: <bounded recovery OR structured stop>`. Then take ONE bounded recovery probe (different approach, not identical retry) OR surface a structured stop if recovery needs user input. Never: silently retry identical action, fabricate output past the failure, stall with no record. Cap: 2 recovery attempts on same failure → escalate to structured stop. Fires only on unexpected progress-blocking failure, not expected/handled errors. Distinct from R03 (pre-fix diagnosis), R15 (success verification), askuserquestion-rejection-fallback (AskUserQuestion-only).
   <examples>
   | Scenario | Wrong | Right | Rule |
@@ -39,7 +39,7 @@
   </examples>
   </core_rules>
 
-  <anti_over_engineering note="Enforcement: R06 (Scope) + R18 (Necessity Test)">
+  <anti_over_engineering note="Enforcement: [R06 Scope] + [R18 Necessity Test]">
 Bug fix ≠ cleanup | Unchanged code untouched | Exception: design doc explicit scope adjacent improvements → in-scope
 Dep gate before add library: lines actually used | DIY cost | 6-month safety — reject if ≤3 lines used or maintenance unclear
 Dep red flags (any → reconsider): <10% of the library used | no release in a year | single maintainer | 50+ transitive deps | "everyone uses it" as the only reason | replaceable with a native API
@@ -91,7 +91,7 @@ Do NOT simplify (complexity = essential): Security/auth | Accessibility/WCAG | C
   Skip protocol: state which level skipped and why (cost, infra unavailable, scoped out by user) — silent skip violates R15.
   </verification_ladder>
 
-  <anti_misunderstanding note="Enforcement: R12 (Clarification) + R13 (Intent Verification) + R14 (Correction Capture)">
+  <anti_misunderstanding note="Enforcement: [R12 Clarification] + [R13 Intent Verification] + [R14 Correction Capture]">
 Same mistake twice = missing rule: if feedback memory already covers pattern, propose addition to the matching `core/rules/` module (RULES.md kernel only for its four rule classes)
 Scope words matter: "add" = new | "improve" = enhance existing | "fix" = repair broken | "strengthen" = reinforce existing | "adjust/readjust" = review applicability, not necessarily change
 Unverified numbers: prefix estimates with ~, distinguish from measured/coded values — never state estimate as fact

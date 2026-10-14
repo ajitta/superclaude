@@ -27,7 +27,7 @@
   <execution>
 --delegate [auto|files|folders]: sub-agent parallel delegation. Triggers + direct-vs-sub-agent decision matrix + Agent-tool-vs-Workflow boundary: core/rules/RULES_DELEGATION.md `<sub_agent_decision>` (SSOT; context_loader injects it on delegation contexts).
 --concurrency [n]: 1-15 (advisory; loader no clamp) → batch independent tool calls into single msg (e.g. 5 parallel Grep calls). Batches tool-calls-per-message, NOT processes — buys no process parallelism; Workflow fan-out process cap min(16, cpu-2) is harness-fixed and wins on process count.
---loop: iter improve — (1) state verifiable success criteria up-front (R20); (2) exec → self-eval vs criteria → find gaps → re-exec; (3) brief 1-line delta per iter ("iter N: <what changed>"); (4) stop when criteria met OR no meaningful improve OR 5-iter safety cap hit. Report total iter count + final criteria-met status when done.
+--loop: iter improve — (1) state verifiable success criteria up-front ([R20 Success Criteria]); (2) exec → self-eval vs criteria → find gaps → re-exec; (3) brief 1-line delta per iter ("iter N: <what changed>"); (4) stop when criteria met OR no meaningful improve OR 5-iter safety cap hit. Report total iter count + final criteria-met status when done.
 --iterations [n]: fixed iter count — exec improve cycle exactly N times. After each iter, briefly state what changed. Do not stop early even if output seems good.
 --plan: lightweight pre-impl planning → 5-line plan (goal, approach, files, risks, verification), wait user approval before exec
 --validate: risk >0.7, usage >75%, prod → pre-exec risk assessment

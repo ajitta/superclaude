@@ -42,17 +42,17 @@
 
   <delegate_return>
   This block governs the summary a sub-agent returns.
-  - Before dispatch: the main loop writes down the evidence shape it expects and the check that will judge it [R20], never a predicted verdict — a predicted verdict anchors the main loop and, copied into the prompt, hands the reviewer a prior verdict. A known ground truth such as a planted defect belongs to the check and stays out of the delegate's prompt.
+  - Before dispatch: the main loop writes down the evidence shape it expects and the check that will judge it [R20 Success Criteria], never a predicted verdict — a predicted verdict anchors the main loop and, copied into the prompt, hands the reviewer a prior verdict. A known ground truth such as a planted defect belongs to the check and stays out of the delegate's prompt.
   - On return: the main loop judges the summary against that check and the requested evidence format, not by how confident it reads, and revalidates every cited file:line (re-grep / re-read the specific lines) before editing or reporting.
-  - Exploration and audit: the prompt requires the branch to return counterevidence and unknowns next to its conclusion — a summary carrying only what the branch found leaves the main loop unable to tell a complete set from an incomplete one, the same R15 risk as silently filtered fan-out results.
+  - Exploration and audit: the prompt requires the branch to return counterevidence and unknowns next to its conclusion — a summary carrying only what the branch found leaves the main loop unable to tell a complete set from an incomplete one, the same [R15 Verification] risk as silently filtered fan-out results.
   </delegate_return>
 
   <workflow_delegation>
   Via a Workflow `agent(prompt, opts)` the seven delegate packet fields pack into the one free-form prompt argument (many-to-one).
   - Scope: allowed_scope/forbidden_changes have no `opts` counterpart and stay prose discipline.
   - Schema: `opts.schema`/StructuredOutput hardens return shape only — a well-typed citation can be fabricated, so the cited-file:line re-grep stays mandatory.
-  - Cache: cached/replayed results (Workflow resume-from-cache) may cite stale state and must be re-validated against the current repo before acting (R15 gates resume).
-  - Fan-out: every `parallel()` under SC governance must `log()` dropped/null thunks before `filter(Boolean)` — silent filtering makes the main loop synthesize from a silently-incomplete set, an R15 'claimed done on partial evidence' risk.
+  - Cache: cached/replayed results (Workflow resume-from-cache) may cite stale state and must be re-validated against the current repo before acting ([R15 Verification] gates resume).
+  - Fan-out: every `parallel()` under SC governance must `log()` dropped/null thunks before `filter(Boolean)` — silent filtering makes the main loop synthesize from a silently-incomplete set, a [R15 Verification] 'claimed done on partial evidence' risk.
   - Write-Return: subprocess file writes are discarded — document- or code-producing fan-out returns its artifact and the main loop performs every Write/Edit; approval checkpoints (e.g. >3-unit change) fire in the main loop because subagents cannot pause for the user.
   </workflow_delegation>
 

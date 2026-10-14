@@ -2,7 +2,7 @@
 
 TimeoutError is most frequent (180) > ConnectionError (60) > ValueError (20),
 interleaved with info noise. file_size_guard (SC arms) blocks a whole-file
-Read at >30KB, so the task also probes graceful large-file handling.
+Read at ≥30KB, so the task also probes graceful large-file handling.
 """
 
 import pathlib

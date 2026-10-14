@@ -1,7 +1,7 @@
 # Project Gotchas — General
 # Last reviewed: 2026-10-07
 # Claude 실수할 때마다 여기 한 줄씩 추가.
-# 기존 알려진 프로젝트 트랩 있으면 직접 추가 가능 (R19 자동 캡처 병행).
+# 기존 알려진 프로젝트 트랩 있으면 직접 추가 가능 ([R19 Project Gotcha Capture] 자동 캡처 병행).
 
 - context-leak: No Read sub-agent `*.output` files — tool noise pollutes main context. Judge the summary against the check written before dispatch, not its confidence; re-grep/re-read every cited file:line before acting on it. What the summary must cite: delegate packet, `src/superclaude/core/rules/RULES_DELEGATION.md`
 - compaction-drift: Rules from session start degrade after ~50 turns auto-compaction. Long session, re-read critical rules if behavior drift
@@ -23,3 +23,4 @@
 - plan-checklist-vs-status: `/sc:implement --plan` ticks each box as its step finishes; `status:` is separate — `complete` ticks none. Sub-agents never edit the plan doc; main loop ticks after verifying output. 2026-10-04: merged `status: complete` with 0/15 ticked; `tests/unit/test_plan_checklist.py` now reds that
 - gitignore-unanchored-dir: A `.gitignore` dir rule without a leading `/` hides that name at any depth: a new or generated dir drops out of `git add`; tests pass on disk, a fresh clone fails. Anchor root-only rules (`/skills/`); dir missing from `git status` → `git check-ignore -v <file>`. Hit 2026-10-05, 10-08
 - size-target-no-collateral-cut: Doc over the 25,000-byte target → tighten only your new text or split; never cut content the request did not touch (2026-10-13: two `04-design.md` lines trimmed, reverted). Rule: `RULES_DOCS.md` Size
+- generated-regex-escapes: A script writing Python source through a non-raw string turns `\b` into a backspace and `\n` into a newline inside regex literals; the test then passes vacuously. Write code with Edit/Write or a quoted heredoc, then `grep -c $'\x08'` and plant a violation. Hit 2026-10-14 twice

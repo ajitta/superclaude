@@ -51,7 +51,7 @@ description: Feature and code implementation with sub-agent delegation and MCP i
 
 
   <gotchas>
-  - status-check: Run R02 status check pre-impl. Grep for existing func first
+  - status-check: Run [R02 Status Check] pre-impl. Grep for existing func first
   - scope-discipline: Build only what asked. Zero unsolicited files, zero adjacent refactors
   - workflow-fanout: fan-out subagents RETURN code/results — subprocess writes discarded; main loop applies edits and runs the >3-file checkpoint (the Checkpoint step) (full rule: core/rules/RULES_DELEGATION.md)
   </gotchas>

@@ -357,7 +357,7 @@ This fork is a personal, opinionated reshape of the framework: different MCP set
 ### 🛡️ **Hook-Enforced Safety**
 Rules that must hold are enforced by hooks, not prose:
 - **destructive_guard** → blocks force-push to `main`/`master`, asks on `reset --hard` / `clean -f` / `branch -D`
-- **file_size_guard** → blocks unbounded `Read` on files >30KB
+- **file_size_guard** → blocks unbounded `Read` on files ≥30KB
 - **loop_guard** → circuit breaker on repeated failing edits
 
 Every hook runs as `superclaude hook <name>` (a console entry, dispatched before the CLI loads), so hooks cost ~20 ms and `settings.json` carries no machine-specific bytes. Hooks merge into your `settings.json` — your existing hooks are preserved. See `docs/adr/0001-hooks-are-the-enforcement-boundary.md`.

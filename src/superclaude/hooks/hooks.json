@@ -79,7 +79,7 @@
         "matcher": "Read",
         "hooks": [
           {
-            "_comment": "[superclaude] safety — blocks Read on files >30KB for token conservation",
+            "_comment": "[superclaude] safety — blocks Read on files ≥30KB for token conservation",
             "type": "command",
             "command": "superclaude hook file_size_guard",
             "timeout": 5
