@@ -1,5 +1,5 @@
 ---
-status: implementing
+status: complete
 revised: 2026-10-14
 ---
 
@@ -90,16 +90,16 @@ revised: 2026-10-14
 
 **Files:** `src/superclaude/core/rules/RULES_QUALITY.md:11,15,18,19,20`
 
-- [ ] Step 1: 줄이기 전 크기를 기록한다. `wc -c src/superclaude/core/rules/RULES_QUALITY.md`.
-- [ ] Step 2: 각 줄을 `[RNN Name] 🔴|🟡: kernel <섹션 이름> + <커널에 없는 내용>` 형식으로 줄인다. 태그(`[RNN Name]`)와 중요도 표시는 그대로 둔다. 테스트가 정의를 이 줄에서 읽고, R14 `violated_rule`과 `/sc:analyze --focus rules`가 이 태그를 쓴다.
+- [x] Step 1: 줄이기 전 크기를 기록한다. `wc -c src/superclaude/core/rules/RULES_QUALITY.md`.
+- [x] Step 2: 각 줄을 `[RNN Name] 🔴|🟡: kernel <섹션 이름> + <커널에 없는 내용>` 형식으로 줄인다. 태그(`[RNN Name]`)와 중요도 표시는 그대로 둔다. 테스트가 정의를 이 줄에서 읽고, R14 `violated_rule`과 `/sc:analyze --focus rules`가 이 태그를 쓴다.
   - R06 → `kernel <scope_discipline>`; 남길 것: `0 unsolicited files, 0 adjacent refactors`
   - R15 → `kernel <verification_before_completion>`; 남길 것: `<verification_ladder>` 참조, `If unable to verify at all, state "verification not possible: [reason]"`
   - R18 → `kernel <scope_discipline>`; 남길 것: `Require: specific failure scenario, quantitative evidence, or user-facing impact. "Deferred to post-MVP review" is valid design decision`
   - R19 → `kernel <project_rules_priority>`; 남길 것: 같은 발견이 두 번째일 때, 형식 `name: description`, 없으면 `paths:` frontmatter로 생성, 사용자 승인, 애매하면 project, framework `<gotchas>`에 있으면 skip
   - R20 → `kernel <verification_before_completion>`; 남길 것: `>3 steps or ambiguous outcome` 기준, 예시 3개, `--loop` 수렴 판정, skip 목록
-- [ ] Step 3: 줄인 뒤 크기를 다시 재고 차이를 커밋 본문에 적는다.
-- [ ] Step 4: 커널 `core/RULES.md`는 바꾸지 않는다. `git diff --stat`에 `core/RULES.md`가 없어야 한다.
-- [ ] Step 5: `uv run pytest` exit 0(특히 `tests/unit/test_context_loader.py`의 core-lite 가드), `make lint`. 커밋 `refactor(rules): RULES_QUALITY points to the kernel for rules it already states`.
+- [x] Step 3: 줄인 뒤 크기를 다시 재고 차이를 커밋 본문에 적는다.
+- [x] Step 4: 커널 `core/RULES.md`는 바꾸지 않는다. `git diff --stat`에 `core/RULES.md`가 없어야 한다.
+- [x] Step 5: `uv run pytest` exit 0(특히 `tests/unit/test_context_loader.py`의 core-lite 가드), `make lint`. 커밋 `refactor(rules): RULES_QUALITY points to the kernel for rules it already states`.
 
 ## Risks
 
@@ -125,3 +125,4 @@ revised: 2026-10-14
 
 - Task 1.2 Step 3: 계획대로 `git checkout --`로 되돌리자 Step 1에서 고친 `improve.md` 한 줄까지 HEAD로 돌아갔다. 다시 고치고, Step 3의 복원 방법을 복사본 방식으로 바꿨다.
 - Task 1.1: 예외 3(`_BARE_ID_ALLOWED`)과 범위 안의 번호도 정의된 번호인지 검사한다. 계획은 예외 1 파일만 이 검사를 명시했다.
+- Task 2.1: 실측 절약은 298바이트(`RULES_QUALITY.md` 12,832 → 12,534, 약 75토큰)로, 근거 절의 추정 약 0.5KB보다 작다. R19·R20은 커널에 없는 세부가 대부분이라 거의 줄지 않았다. 이 변경의 주된 효과는 크기보다 규칙마다 서술 위치를 하나로 두는 것(content-quality 4절 Duplication)이다.
