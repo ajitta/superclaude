@@ -245,6 +245,7 @@ class TestInferType:
         [
             ("x/.claude/skills/foo/SKILL.md", "skill"),
             ("x/.claude/agents/a.md", "agent"),
+            ("x/.claude/agents/review/a.md", "agent"),
             ("x/.claude/commands/g/c.md", "command"),
             ("x/.claude/output-styles/s.md", "output-style"),
             ("CLAUDE.md", "memory"),

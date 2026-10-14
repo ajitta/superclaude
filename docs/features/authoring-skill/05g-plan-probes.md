@@ -89,6 +89,8 @@ D22 적용 후 효과 재측정 (2026-10-14, run4, 두 과제, sonnet, 기본 ef
 - output-style 범위 과잉 → `references/output-style.md` Pitfalls에 "스타일은 세션의 모든 응답에 걸린다, 한 종류의 응답용 규칙은 언제 적용되는지 밝힌다" 한 줄 추가. 재실행(run6, `sc-author-output-style-skill`, runs-dir `C:/tmp/sc-evals/sc-author-run6`): 5/5, 본문이 "When you review a migration"과 "Everything else"(리뷰 밖에서는 평소대로) 절로 나뉨
 - skill 검사가 좁음 → 정규식을 `use (when|before|for|after)`로 넓힘. run5 스킬 run 파일에 다시 돌려 통과. 검사를 결과를 본 뒤 고친 것이므로 `tasks.yaml` 주석에 그 사실을 적음
 
+- command 하위 폴더 누락 (reflect에서 발견) → run5 스킬 run이 `.claude/commands/*.md`만 찾아 `.claude/commands/sc/`의 XML command를 못 보고 md로 씀 (D21 위반). `references/command.md`·`agent.md`를 `**/*.md`로 (CC 문서: command 하위 폴더는 네임스페이스, `.claude/agents/`는 재귀 스캔), `author-check`의 agent 경로 추론도 하위 폴더 허용. 재실행(run7, `sc-author-command-skill`, runs-dir `C:/tmp/sc-evals/sc-author-run7`): 5/5, `.claude/commands/sc/explain.md`를 읽고 XML 본문(`<instructions>/<context>/<steps>`, SC 골격 없음)으로 씀
+
 판정: references 구조의 효과는 agent에서만 검사로 보임. 나머지 유형은 평문 run도 SC 골격을 복사하지 않아 같은 검사로는 갈리지 않음. 내용 품질은 agent·memory에서 스킬 쪽이 낫고, command·skill은 비슷하며, output-style은 평문 쪽이 나음 (스킬 run이 범위를 과하게 잡음). 각 1회 실행
 
 ## Deviations

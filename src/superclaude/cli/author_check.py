@@ -121,7 +121,7 @@ def infer_type(path: Path) -> str:
     posix = "/" + path.as_posix().lstrip("/")
     if path.name == "SKILL.md" and "/skills/" in posix:
         return "skill"
-    if re.search(r"/agents/[^/]+\.md$", posix):
+    if re.search(r"/agents/.+\.md$", posix):
         return "agent"
     if re.search(r"/commands/.+\.md$", posix):
         return "command"
