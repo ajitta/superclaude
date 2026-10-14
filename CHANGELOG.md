@@ -14,6 +14,11 @@ Releases before 4.19.0 are not listed. Their history is the git log; the upstrea
 - Command descriptions are shorter: purpose, when to use, and one "Not for …" line, at most 300 characters each, about 30% shorter in total. They share the skill listing's budget with every other skill you have installed, so less of the listing gets dropped.
 - `/sc:prompt` is now the `/sc-prompt` skill. Each run loads the procedure and only the target model's facts, not every model's: about 20 KB instead of 30 KB. Typing `/sc:prompt` tells you the new name.
 
+### Fixed
+
+- `/sc-prompt` finds the claude-api reference that Claude Code bundles, so a machine without the claude-api plugin reads the current model facts instead of the skill's own copy.
+- Install removes the leftover `commands/sc/workflow.md` from before its rename to `/sc:roadmap`.
+
 ### Upgrade notes
 
 - Re-run `superclaude install` for your scope to pick up the new descriptions. The install also removes the old `commands/sc/prompt.md`, which would otherwise keep running beside the new skill.

@@ -1076,6 +1076,67 @@ class TestMigrationReferenceResolution:
         assert cl.find_migration_reference([tmp_path]) is None
 
 
+class TestBundledMigrationReference:
+    """Claude Code's own extracted claude-api skill, used when none is installed.
+
+    A machine with no plugin copy always fell back to the mirror while the
+    reference sat under <temp>/claude/bundled-skills/<cc-version>/<hash>/.
+    """
+
+    @staticmethod
+    def _bundled(temp: Path, version: str) -> Path:
+        ref = temp / "claude" / "bundled-skills" / version / "abc123"
+        ref = ref / "claude-api" / "shared" / "model-migration.md"
+        ref.parent.mkdir(parents=True)
+        ref.write_text(version, encoding="utf-8")
+        return ref
+
+    def test_highest_claude_code_version_wins_over_mtime(self, tmp_path):
+        import os
+
+        from superclaude.scripts import context_loader as cl
+
+        newer = self._bundled(tmp_path, "2.1.296")
+        os.utime(newer, (1, 1))
+        self._bundled(tmp_path, "2.1.99")
+        self._bundled(tmp_path, "not-a-version")
+
+        assert cl.find_bundled_reference([tmp_path]) == newer
+
+    def test_used_only_when_no_installed_copy(self, tmp_path, monkeypatch):
+        from superclaude.scripts import context_loader as cl
+
+        installed_root = tmp_path / "home"
+        temp = tmp_path / "temp"
+        bundled = self._bundled(temp, "2.1.296")
+        monkeypatch.setattr(cl, "migration_reference_roots", lambda: [installed_root])
+        monkeypatch.setattr(cl, "bundled_reference_roots", lambda: [temp])
+
+        assert cl.find_migration_reference() == bundled
+
+        installed = installed_root / "skills" / "claude-api" / "shared"
+        installed.mkdir(parents=True)
+        (installed / "model-migration.md").write_text("x", encoding="utf-8")
+
+        assert cl.find_migration_reference() == installed / "model-migration.md"
+
+    def test_explicit_roots_skip_the_bundled_copy(self, tmp_path, monkeypatch):
+        from superclaude.scripts import context_loader as cl
+
+        temp = tmp_path / "temp"
+        self._bundled(temp, "2.1.296")
+        monkeypatch.setattr(cl, "bundled_reference_roots", lambda: [temp])
+
+        assert cl.find_migration_reference([tmp_path / "empty"]) is None
+
+    def test_claude_code_tmpdir_is_searched_first(self, tmp_path, monkeypatch):
+        from superclaude.scripts import context_loader as cl
+
+        monkeypatch.setenv("CLAUDE_CODE_TMPDIR", str(tmp_path))
+
+        assert cl.bundled_reference_roots()[0] == tmp_path
+
+
 class TestPromptCommandReferenceInjection:
     """What the hook prints for each of those states."""
 

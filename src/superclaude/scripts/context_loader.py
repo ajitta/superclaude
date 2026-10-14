@@ -23,6 +23,7 @@ import json
 import os
 import re
 import sys
+import tempfile
 from pathlib import Path
 
 # v2.2.0: MCP fallback notification support
@@ -945,6 +946,14 @@ _MIGRATION_REF_ANCHORS = (
 )
 _MIGRATION_REF_SECTION = "### Behavioral shifts (prompt-tunable)"
 
+# Claude Code also ships claude-api as a bundled skill, extracted on use to
+# <temp>/claude/bundled-skills/<cc-version>/<hash>/, where <temp> is
+# CLAUDE_CODE_TMPDIR or the system temp directory. Without this lookup a machine
+# with no plugin copy always fell back to the mirror while the reference sat on
+# disk. The layout is Claude Code's own and undocumented: if it moves, nothing
+# matches and the mirror carries the rewrite, as before.
+_BUNDLED_REF_GLOB = "claude/bundled-skills/*/*/claude-api/shared/model-migration.md"
+
 
 def migration_reference_roots() -> list[Path]:
     """Every .claude directory Claude Code can load the claude-api skill from.
@@ -968,9 +977,12 @@ def migration_reference_roots() -> list[Path]:
 def find_migration_reference(roots: list[Path] | None = None) -> Path | None:
     """Locate the claude-api model-migration reference on this machine.
 
-    Newest mtime wins: the marketplace clone auto-updates, and a plugin-cache
-    copy pinned to an older release can sit beside it.
+    An installed copy comes first, newest mtime winning: the marketplace clone
+    auto-updates, and a plugin-cache copy pinned to an older release can sit
+    beside it. With none installed, Claude Code's bundled copy is used. Explicit
+    roots search only those roots.
     """
+    search_bundled = roots is None
     if roots is None:
         roots = migration_reference_roots()
     found: list[Path] = []
@@ -982,7 +994,44 @@ def find_migration_reference(roots: list[Path] | None = None) -> Path | None:
                 continue
     # A file that vanishes between glob and stat raises OSError, which the one
     # caller already treats as "no reference found".
-    return max(found, key=lambda p: p.stat().st_mtime, default=None)
+    newest = max(found, key=lambda p: p.stat().st_mtime, default=None)
+    if newest is None and search_bundled:
+        return find_bundled_reference()
+    return newest
+
+
+def bundled_reference_roots() -> list[Path]:
+    """Temp directories Claude Code may have extracted its bundled skills to."""
+    roots: list[Path] = []
+    for value in (os.environ.get("CLAUDE_CODE_TMPDIR"), tempfile.gettempdir()):
+        if value and Path(value) not in roots:
+            roots.append(Path(value))
+    return roots
+
+
+def find_bundled_reference(roots: list[Path] | None = None) -> Path | None:
+    """The bundled claude-api reference of the highest Claude Code version.
+
+    Every Claude Code version extracts its own copy and old ones stay, so the
+    version directory decides, not mtime: an old version can be extracted
+    again after a newer one.
+    """
+    if roots is None:
+        roots = bundled_reference_roots()
+    best: tuple[tuple[int, ...], Path] | None = None
+    for root in roots:
+        try:
+            matches = [p for p in root.glob(_BUNDLED_REF_GLOB) if p.is_file()]
+        except OSError:
+            continue
+        for path in matches:
+            version = path.parents[3].name
+            if not re.fullmatch(r"\d+(?:\.\d+)*", version):
+                continue
+            key = tuple(int(part) for part in version.split("."))
+            if best is None or key > best[0]:
+                best = (key, path)
+    return best[1] if best else None
 
 
 def migration_reference_ranges(path: Path) -> dict[str, list[str]]:
@@ -1039,7 +1088,8 @@ def _emit_prompt_command_reference(prompt: str) -> None:
     if path is None:
         print(
             "<!-- SuperClaude /sc-prompt: no claude-api model-migration reference "
-            "in the project, user or CLAUDE_CONFIG_DIR .claude directories — the "
+            "in the project, user or CLAUDE_CONFIG_DIR .claude directories or in "
+            "Claude Code's bundled skills — the "
             "skill's mirror file for the target is authoritative, and the report states "
             "that the reference was not read. -->"
         )
