@@ -24,12 +24,12 @@
 
 | Commands | Agents | Modes | MCP Servers |
 |:--------:|:------:|:-----:|:-----------:|
-| **37**   | **24** | **8** | **3**       |
+| **36**   | **24** | **8** | **3**       |
 | Slash    | Domain-expert | Behavioral | Integrations |
 
 </div>
 
-37 slash commands cover the development lifecycle from brainstorming to deployment. 8 behavioral modes auto-load on matching flags and keywords.
+36 slash commands cover the development lifecycle from brainstorming to deployment. 8 behavioral modes auto-load on matching flags and keywords.
 
 ---
 
@@ -80,7 +80,7 @@ What gets installed (per scope):
 
 ```
 <scope>/
-├── commands/sc/        # 37 slash commands (/sc:plan, /sc:implement, …)
+├── commands/sc/        # 36 slash commands (/sc:plan, /sc:implement, …)
 ├── agents/             # 24 agent definitions
 ├── output-styles/      # output styles (pick one via /config → Output style)
 ├── superclaude/        # core rules, modes, mcp docs
@@ -117,7 +117,7 @@ Restart Claude Code, then try a few:
 - `/sc:review` — Multi-dimensional review (code/plan/design)
 - `/sc:research` — Deep web research (Tavily-enhanced)
 - `/sc:insight` — Capture structured session insights to JSONL
-- `/sc:help` — List all 37 commands
+- `/sc:help` — List all 36 commands
 
 Not sure what to run next? Ask a side question with [`/btw`](https://code.claude.com/docs/en/interactive-mode). It answers from the conversation so far, works while Claude is still busy, and never enters the conversation history. It has no tools, so it answers only from what the session already holds:
 
@@ -567,7 +567,7 @@ The Deep Research system intelligently coordinates multiple tools:
 | Architecture & directory roles | [`src/superclaude/ARCHITECTURE.md`](src/superclaude/ARCHITECTURE.md) |
 | Project rules, build & test loop | [`CLAUDE.md`](CLAUDE.md) |
 | Project-specific gotchas | [`.claude/rules/gotchas/`](.claude/rules/gotchas) |
-| Slash commands (37) | [`src/superclaude/commands/`](src/superclaude/commands) · `superclaude install --list-all` |
+| Slash commands (36) | [`src/superclaude/commands/`](src/superclaude/commands) · `superclaude install --list-all` |
 | Agents (24) | [`src/superclaude/agents/`](src/superclaude/agents) |
 | Modes (8) | [`src/superclaude/modes/`](src/superclaude/modes) |
 | MCP servers (3) | [`src/superclaude/mcp/`](src/superclaude/mcp) |
@@ -706,13 +706,13 @@ MIT — see [`LICENSE`](LICENSE).
 - `/sc:init` — Interactive project environment setup
 - `/sc:index` / `/sc:index-repo` — Repository indexing (94% token reduction)
 - `/sc:recommend` — Command recommendation engine
-- `/sc:prompt` — Rewrite a prompt for Claude Opus 5.5 / Sonnet 5.5 / Fable 5.1. On an Opus 5.5 or Sonnet 5.5 session, pass a prompt that asks for written-out reasoning as a file path: pasted inline, it can be declined before the command runs
 - `/sc:select-tool` — Intelligent MCP tool selection
 - `/sc:sc` — Command dispatcher (routes to the other `/sc:*` commands)
 
-### ✍️ Authoring (skill)
+### ✍️ Skills
 - `/sc-author` — Write or revise a file Claude reads as instructions (skill, subagent, command, output style, CLAUDE.md, `.claude/rules`, and others). It follows your project's existing documents, proposes no-op and harmful sentences for removal with evidence, and writes only after you approve the diff. The body follows your project's format for that type; `--md` or `--xml` chooses one. User-invoked only; installed to `.claude/skills/sc-author/`.
 - `superclaude author-check <path>` — The validator `/sc-author` runs: frontmatter fields, references, XML structure, broken pointers; `--with <file>` adds the documents loaded together for conflict and duplicate checks. Exit 1 on errors.
+- `/sc-prompt` — Rewrite a prompt for Claude Opus 5.5 / Sonnet 5.5 / Opus 5 / Fable 5.1: strip folklore that degrades the target, apply its model-specific deltas, mark missing context as `[FILL: …]` placeholders. Replaces the `prompt` slash command of earlier releases. On an Opus 5.5 or Sonnet 5.5 session, pass a prompt that asks for written-out reasoning as a file path: pasted inline, it can be declined before the skill runs. Installed to `.claude/skills/sc-prompt/`.
 
 **Source files:** [`src/superclaude/commands/`](src/superclaude/commands) — each command is a single markdown file with frontmatter. After install, run `superclaude install --list-all` for a full inventory.
 

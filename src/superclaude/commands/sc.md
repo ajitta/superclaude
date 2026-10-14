@@ -52,7 +52,6 @@ description: SuperClaude command dispatcher that routes to the other /sc:* comma
     - review: Code review with structured feedback
     - auto-improve: Autonomous overnight code improvement loop (Karpathy AutoResearch)
     - promote-feature: Promote standalone docs into a feature folder
-    - prompt: Rewrite a prompt for Opus 5.5 / Sonnet 5.5 / Fable 5.1
   </commands>
 
   <examples>

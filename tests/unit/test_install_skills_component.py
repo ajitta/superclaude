@@ -32,6 +32,7 @@ from superclaude.cli.verify_drift import DRIFTED, EXTRA, MISSING, verify_drift
 
 _SOURCE = _get_source_dir("skills") / "sc-author"
 _FIELDS = Path("references") / "fields.yaml"
+_N = len(shipped_names("skills"))
 
 
 def _plant_other(base: Path) -> Path:
@@ -54,14 +55,14 @@ class TestRegistry:
         assert "skills" in SHARED_TARGET_COMPONENTS
 
     def test_shipped_names(self):
-        assert shipped_names("skills") == {"sc-author"}
+        assert shipped_names("skills") == {"sc-author", "sc-prompt"}
         assert shipped_names("agents") == shipped_md_names("agents")
 
 
 class TestInstall:
     def test_copies_the_directory(self, tmp_path):
         installed, _, failed, names = _install(tmp_path)
-        assert (installed, failed) == (1, 0), names
+        assert (installed, failed) == (_N, 0), names
         copy = tmp_path / "skills" / "sc-author" / _FIELDS
         assert copy.read_bytes() == (_SOURCE / _FIELDS).read_bytes()
 
@@ -77,7 +78,7 @@ class TestInstall:
         copy.write_text("edited", encoding="utf-8")
 
         _, skipped, _, _ = _install(tmp_path)
-        assert skipped == 1
+        assert skipped == _N
         assert copy.read_text(encoding="utf-8") == "edited"
 
         _install(tmp_path, force=True)
@@ -104,7 +105,7 @@ class TestFileInTheWay:
         blocker.write_text("not a directory", encoding="utf-8")
         for force in (False, True):
             installed, skipped, failed, names = _install(tmp_path, force=force)
-            assert (installed, skipped, failed) == (0, 0, 1)
+            assert (installed, skipped, failed) == (_N - 1, 0, 1)
             assert "is not a directory" in names[0]
         assert blocker.read_text(encoding="utf-8") == "not a directory"
 
@@ -197,7 +198,7 @@ class TestInventory:
     def test_counts_shipped_directories_only(self, tmp_path):
         _plant_other(tmp_path)
         before = list_all_components(tmp_path, scope="local")["skills"]
-        assert (before["available"], before["installed"]) == (1, 0)
+        assert (before["available"], before["installed"]) == (_N, 0)
         _install(tmp_path)
         after = list_all_components(tmp_path, scope="local")["skills"]
-        assert (after["available"], after["installed"]) == (1, 1)
+        assert (after["available"], after["installed"]) == (_N, _N)

@@ -21,14 +21,14 @@ pytest 카운트, coverage, description 문자 수처럼 커밋마다 바뀌는 
 |---|---:|---|
 | `agents/*.md` | 24 | 도메인 전문성, WHO TO BE |
 | `output-styles/*.md` | 1 | Claude Code output style, HOW EVERY RESPONSE READS |
-| `commands/*.md` | 37 | `/sc:*` 사용자 workflow, WHAT TO DO |
+| `commands/*.md` | 36 | `/sc:*` 사용자 workflow, WHAT TO DO |
 | `core` always-loaded | 3 | FLAGS, PRINCIPLES, RULES kernel |
 | `core/rules/*.md` | 4 | on-demand 상세 규칙 |
 | `modes/MODE_*.md` | 8 | 인지 자세, HOW TO THINK |
 | `modes/*CONFIG*.md` | 1 | mode 지원 설정 |
 | `mcp/MCP_*.md` | 3 | SC workflow에서 MCP를 WHEN/HOW 사용 |
 | `templates/docs-scaffold/*` | 4 | `/sc:init` 문서 scaffold |
-| `skills/*` | 1 | 사용자가 호출하는 스킬 디렉터리 (`/sc-author`) |
+| `skills/*` | 2 | 스킬 디렉터리 (`/sc-author`, `/sc-prompt`) |
 | distinct hook entry scripts | 10 | `hooks.json`의 14개 등록에서 직접 호출 |
 | 전체 Python module | 53 | CLI, hook, 자동화, 공용 경로, plugin |
 
@@ -124,15 +124,17 @@ Evaluation
 
 ### `skills/`
 
-- 역할: 사용자가 호출하는 스킬. 지금은 `sc-author` 하나: `SKILL.md` 절차 +
-  `references/` 묶음, `disable-model-invocation: true`.
+- 역할: `SKILL.md` 절차 + `references/` 묶음. `sc-author`는
+  `disable-model-invocation: true`, `sc-prompt`는 model-invocable(모델별 mirror와
+  근거를 references로 분리한 전 `/sc:prompt`).
 - 전달: `skills` 디렉터리 컴포넌트. 디렉터리 단위 copytree, 대상
   `.claude/skills/`는 사용자·다른 도구와 공유하므로 uninstall·drift·git-exclude는
   배포한 디렉터리 이름만 다룸.
 - 위험: `fields.yaml`이 스킬(설치본)과 검사기(패키지 사본) 두 곳에서 읽힘 →
   install 없이 CLI만 올리면 어긋남(verify-drift가 잡음). 공유 디렉터리 삭제 범위.
 - 검증 초점: `tests/unit/test_install_skills_component.py`,
-  `tests/unit/test_sc_author_skill.py`, 스킬 자신에 대한 `author-check`.
+  `tests/unit/test_sc_author_skill.py`, `tests/unit/test_sc_prompt_skill.py`,
+  스킬 자신에 대한 `author-check`.
 
 ### `mcp/`
 

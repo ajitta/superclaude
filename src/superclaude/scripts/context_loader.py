@@ -451,11 +451,13 @@ def resolve_flags(prompt: str) -> tuple[str, list[str]]:
     return corrected, notifications
 
 
-# Commands renamed out from under their users. /sc:workflow was typed 25 times
-# after commands/workflow.md was deleted in 16b89c0 and reborn as roadmap with no
-# alias behind it.
+# Commands renamed out from under their users, mapped to what to type now.
+# /sc:workflow was typed 25 times after commands/workflow.md was deleted in
+# 16b89c0 and reborn as roadmap with no alias behind it. /sc:prompt became the
+# sc-prompt skill, which a skill name cannot spell with a colon.
 RETIRED_COMMANDS: dict[str, str] = {
-    "workflow": "roadmap",
+    "workflow": "/sc:roadmap",
+    "prompt": "/sc-prompt",
 }
 
 _COMMAND_TOKEN_RE = re.compile(r"/sc:([a-zA-Z][\w-]*)")
@@ -559,8 +561,11 @@ def resolve_command_name(prompt: str) -> tuple[list[str], set[str]]:
 
         if name in RETIRED_COMMANDS:
             replacement = RETIRED_COMMANDS[name]
-            notifications.append(f"/sc:{name} was renamed. Use /sc:{replacement}.")
-            if replacement not in known:
+            notifications.append(f"/sc:{name} was renamed. Use {replacement}.")
+            # Only a /sc: replacement has command context to stand in for the
+            # old name; a skill replacement leaves the old token resolving to
+            # nothing.
+            if replacement.removeprefix("/sc:") not in known:
                 unresolved.add(name)
             continue
 
@@ -907,16 +912,16 @@ def _emit_execution_directives(prompt: str, session_id: str | None = None) -> No
             print()
 
 
-# /sc:prompt takes its per-model direction from the claude-api skill's
+# /sc-prompt takes its per-model direction from the claude-api skill's
 # model-migration reference, which lives outside the install tree at a path that
-# differs by machine and by scope. The command ships a mirror of that reference
+# differs by machine and by scope. The skill ships a mirror of that reference
 # and the mirror is authoritative only while the reference is unreachable or
 # has no section for the target — a
 # rule prose alone cannot enforce, since the model cannot prefer a file nobody
 # told it the location of. Resolving it here turns the rule into an injected
 # fact and hands over the line ranges, so the read costs one Read instead of a
 # glob and two greps.
-_PROMPT_COMMAND_PATTERN = re.compile(r"/sc:prompt\b")
+_PROMPT_COMMAND_PATTERN = re.compile(r"/sc-prompt\b")
 
 _MIGRATION_REF_GLOBS = (
     "plugins/marketplaces/*/skills/claude-api/shared/model-migration.md",
@@ -985,7 +990,7 @@ def migration_reference_ranges(path: Path) -> dict[str, list[str]]:
 
     One range per model section: from its behavioral-shifts heading to the end
     of that section. Empty when the reference has renamed or dropped those
-    headings — drift the command has to see rather than mirror silently.
+    headings — drift the skill has to see rather than mirror silently.
     """
     try:
         lines = path.read_text(encoding="utf-8").splitlines()
@@ -1018,13 +1023,13 @@ def migration_reference_ranges(path: Path) -> dict[str, list[str]]:
         # The range runs from the shifts heading to the end of the model's
         # section, not to the next "###": the sub-sections that follow it (the
         # migration checklist, the long-running-agent recommendations) carry
-        # direction the command's table mirrors.
+        # direction the skill's mirror files carry.
         ranges.setdefault(model, []).append(f"L{section + 1}-{end}")
     return ranges
 
 
 def _emit_prompt_command_reference(prompt: str) -> None:
-    """Tell /sc:prompt where its model facts live, or that they are not here."""
+    """Tell /sc-prompt where its model facts live, or that they are not here."""
     if not _PROMPT_COMMAND_PATTERN.search(scannable_prompt(prompt)):
         return
     try:
@@ -1033,9 +1038,9 @@ def _emit_prompt_command_reference(prompt: str) -> None:
         path = None
     if path is None:
         print(
-            "<!-- SuperClaude /sc:prompt: no claude-api model-migration reference "
+            "<!-- SuperClaude /sc-prompt: no claude-api model-migration reference "
             "in the project, user or CLAUDE_CONFIG_DIR .claude directories — the "
-            "mirror table in the command is authoritative, and the report states "
+            "skill's mirror file for the target is authoritative, and the report states "
             "that the reference was not read. -->"
         )
         print()
@@ -1043,9 +1048,9 @@ def _emit_prompt_command_reference(prompt: str) -> None:
     ranges = migration_reference_ranges(path)
     if not ranges:
         print(
-            f"<!-- SuperClaude /sc:prompt: claude-api model-migration reference at "
+            f"<!-- SuperClaude /sc-prompt: claude-api model-migration reference at "
             f"{path} — its model anchors have moved, so locate the target's "
-            "behavioral-shifts section by hand before trusting the mirror table. -->"
+            "behavioral-shifts section by hand before trusting the mirror files. -->"
         )
         print()
         return
@@ -1053,11 +1058,11 @@ def _emit_prompt_command_reference(prompt: str) -> None:
         f"'{model}' {', '.join(spans)}" for model, spans in ranges.items()
     )
     print(
-        f"<!-- SuperClaude /sc:prompt: claude-api model-migration reference at "
+        f"<!-- SuperClaude /sc-prompt: claude-api model-migration reference at "
         f"{path} — {located}. Read the target model's section before applying "
-        "the delta; on conflict it wins over the mirror table in the command. "
+        "the delta; on conflict it wins over the skill's mirror files. "
         "A target missing from the ranges above has no section here, so its "
-        "mirror column carries the rewrite. -->"
+        "mirror file carries the rewrite. -->"
     )
     print()
 
@@ -1135,9 +1140,9 @@ def main() -> None:
     if command_notes:
         print()
 
-    # /sc:prompt sources its per-model facts from outside the install tree;
+    # /sc-prompt sources its per-model facts from outside the install tree;
     # resolving the reference here is what makes "upstream wins over the mirror"
-    # actionable instead of a rule the command has to remember.
+    # actionable instead of a rule the skill has to remember.
     _emit_prompt_command_reference(prompt)
 
     # Check triggers and get contexts to load
