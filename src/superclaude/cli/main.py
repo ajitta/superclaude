@@ -396,7 +396,7 @@ def mcp(servers, list_only, scope, dry_run):
     "--scope",
     default="user",
     type=click.Choice(["user", "project", "local"]),
-    help="Installation scope: user (~/.claude/) or project (./.claude/)",
+    help="Installation scope: user (~/.claude/), project (./.claude/ team-shared content), or local (./.claude/ personal, gitignored)",
 )
 def update(scope: str):
     """
@@ -408,6 +408,7 @@ def update(scope: str):
     Scopes:
     - user (default): Update ~/.claude/
     - project: Update ./.claude/
+    - local: Update ./.claude/ (personal, gitignored)
 
     Example:
         superclaude update
