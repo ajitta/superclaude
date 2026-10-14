@@ -11,7 +11,7 @@ Releases before 4.19.0 are not listed. Their history is the git log; the upstrea
 ### Changed
 
 - Every `/sc:` command can now be run by delegation: another command, a workflow step or a sub-agent that names `/sc:X` reaches it through the Skill tool. `/sc:git` and `/sc:auto-improve` no longer set `disable-model-invocation`. Commands that change files, write committed docs or start sub-agents still never start on Claude's own judgment: their description says "On request only — the user's /sc:X or a workflow step that names it."
-- Command descriptions are shorter: purpose, when to use, and one "Not for …" line, at most 300 characters each (37 commands, 12,142 → 8,677 characters). They share the skill listing's budget with every other skill you have installed, so less of the listing gets dropped.
+- Command descriptions are shorter: purpose, when to use, and one "Not for …" line, at most 300 characters each, about 30% shorter in total. They share the skill listing's budget with every other skill you have installed, so less of the listing gets dropped.
 
 ### Upgrade notes
 
