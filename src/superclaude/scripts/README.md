@@ -19,7 +19,7 @@ Run by the Claude Code hook runtime as `superclaude hook <name>` (registry: `../
 | `prettier_hook.py` | Code formatting hook via Prettier |
 | `test_runner_hook.py` | Test execution hook (`SUPERCLAUDE_AUTO_TEST=0` to disable) |
 | `context_reset.py` | Reset context loader state for fresh sessions. Manual: `superclaude context reset` |
-| `file_size_guard.py` | Blocks Read on files >30KB to save tokens (`SUPERCLAUDE_SIZE_GUARD=0` to disable) |
+| `file_size_guard.py` | Blocks Read on files ≥30KB to save tokens (`SUPERCLAUDE_SIZE_GUARD=0` to disable) |
 | `loop_guard.py` | Circuit breaker — blocks Edit/Write/Bash after 5 identical errors in 15 min (`SUPERCLAUDE_LOOP_GUARD=0` to disable) |
 | `destructive_guard.py` | Blocks irreversibly destructive Bash commands (`rm -rf /`, force-push to main/master) — stdlib-only, cannot fail open on missing jq/grep |
 

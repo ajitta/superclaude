@@ -35,8 +35,8 @@ revised: 2026-10-14
 
 - insights.jsonl `rule` 필드(번호만)와 R14 `violated_rule`(`[RNN Name]`)의 기록 형식 차이. 저장 데이터 형식이라 별도 결정이 필요하다. 기존 데이터에 정의 없는 `R10`이 1건 있다.
 - 비어 있는 번호(R04, R05, R07~R11)의 재번호. `violated_rule`·insights 기록이 번호에 묶여 있어 다시 매기면 과거 기록이 틀어진다.
-- `.claude/rules/`(레포 전용 규칙)와 `docs/`의 인용. 배포 콘텐츠가 아니다.
-- 30KB 경계 표기(`scripts/README.md:22`, `hooks/hooks.json:82`의 ">30KB" vs 코드 `>=`).
+- ~~`.claude/rules/`(레포 전용 규칙)와 `docs/`의 인용~~ → Phase 3으로 옮김.
+- ~~30KB 경계 표기~~ → Phase 3으로 옮김.
 
 ## Phase 0: 선행 조건과 브랜치
 
@@ -100,6 +100,12 @@ revised: 2026-10-14
 - [x] Step 3: 줄인 뒤 크기를 다시 재고 차이를 커밋 본문에 적는다.
 - [x] Step 4: 커널 `core/RULES.md`는 바꾸지 않는다. `git diff --stat`에 `core/RULES.md`가 없어야 한다.
 - [x] Step 5: `uv run pytest` exit 0(특히 `tests/unit/test_context_loader.py`의 core-lite 가드), `make lint`. 커밋 `refactor(rules): RULES_QUALITY points to the kernel for rules it already states`.
+
+## Phase 3: 범위 밖에서 옮겨 온 후속 (2026-10-14 사용자 요청, 커밋 1개)
+
+- [x] `.claude/rules/` 인용: 규칙 인용 테스트가 `.claude/rules/**/*.md`도 검사한다(테스트 ID는 레포 루트 기준 경로). 번호만 쓴 3곳을 `[RNN Name]`으로 고쳤다(`gotchas/authoring.md` R21(320자 entry 예산 때문에 "Passive rules (R21) fire"를 "[R21 Failure-Forward] fires"로; 근거 절 § P-R21도 R21 하나의 측정), `gotchas/general.md` 머리말 R19, `gotchas/README.md` R19). 허용 목록에 둔 곳: `general.md`의 `rule-tag-vs-concept`(번호 자체를 grep하는 이야기), `authoring.md`의 `§ P-R21`(연구 문서의 절 이름). 범위 `R01-R21`은 예외 2로 통과.
+- [x] `docs/` 인용: 검사만 하고 고치지 않는다. archive 밖에서 정의와 맞지 않는 인용은 없다. `socratic-brainstorm-skill/03-analysis.md`의 R10·R11은 그 문서의 요구사항 번호이고, 이 계획서의 R04 등은 빈 번호를 설명하는 글이다. `docs/archive/`는 당시 있던 규칙(R04 Planning 등)을 인용한다. 날짜가 박힌 기록이라 지금 규칙 이름으로 고쳐 쓰면 기록이 틀어지므로 테스트도 두지 않는다.
+- [x] 30KB 경계 표기: 코드(`SIZE_THRESHOLD = 30_000`, `size >= SIZE_THRESHOLD`)에 맞춰 ">30KB"·"above 30KB"를 "≥30KB"·"30KB or more"로 고쳤다(`hooks/hooks.json:82`, `scripts/README.md:22`, `ARCHITECTURE.md:22`, `scripts/file_size_guard.py:4`, 레포 `README.md:360`, `evals/fixtures/large-file/gen_fixture.py:5`). `tests/unit/test_file_size_guard.py::test_threshold_described_as_inclusive`가 `src/superclaude`와 `README.md`에서 그 표기를 막는다. 날짜가 박힌 `docs/adr/0001`, `docs/research`의 표기와 설치본(`.claude/hooks/hooks.json`, `.claude/settings.local.json`, 다음 sync가 갱신)은 그대로 둔다.
 
 ## Risks
 

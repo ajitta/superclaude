@@ -1,7 +1,7 @@
 # Project Gotchas — General
 # Last reviewed: 2026-10-07
 # Claude 실수할 때마다 여기 한 줄씩 추가.
-# 기존 알려진 프로젝트 트랩 있으면 직접 추가 가능 (R19 자동 캡처 병행).
+# 기존 알려진 프로젝트 트랩 있으면 직접 추가 가능 ([R19 Project Gotcha Capture] 자동 캡처 병행).
 
 - context-leak: No Read sub-agent `*.output` files — tool noise pollutes main context. Judge the summary against the check written before dispatch, not its confidence; re-grep/re-read every cited file:line before acting on it. What the summary must cite: delegate packet, `src/superclaude/core/rules/RULES_DELEGATION.md`
 - compaction-drift: Rules from session start degrade after ~50 turns auto-compaction. Long session, re-read critical rules if behavior drift

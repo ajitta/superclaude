@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """PreToolUse hook that blocks Read calls on large files to prevent token explosion.
 
-Proactive token conservation: blocks full-file reads above 30KB, pushing the
+Proactive token conservation: blocks full-file reads of 30KB or more, pushing the
 model toward symbol-aware tools, Grep, or paginated Read instead.
 
 Threshold: 30KB (token conservation, not CC hard limit).

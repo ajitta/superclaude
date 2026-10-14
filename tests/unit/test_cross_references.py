@@ -123,8 +123,12 @@ class TestAgentTriggerUniqueness:
 
 # ─── Rule Citations ──────────────────────────────────────────────
 
-SHIPPED_MD_FILES = sorted(_SRC.rglob("*.md"))
-SHIPPED_MD_IDS = [f.relative_to(_SRC).as_posix() for f in SHIPPED_MD_FILES]
+_REPO = _SRC.parent.parent
+# Shipped content plus the repo's own authoring rules and gotchas.
+CITING_MD_FILES = sorted(_SRC.rglob("*.md")) + sorted(
+    (_REPO / ".claude" / "rules").rglob("*.md")
+)
+CITING_MD_IDS = [f.relative_to(_REPO).as_posix() for f in CITING_MD_FILES]
 
 
 def _defined_rules() -> dict[str, str]:
@@ -140,8 +144,14 @@ _RANGE = re.compile(r"\b(R\d{2})[–-](R\d{2})\b")
 _BARE_ID = re.compile(r"\bR\d{2}\b")
 
 # Bare IDs allowed outside the definition file: the text that holds them.
-# insight.md: the insights.jsonl `rule` field stores the bare ID ("R18").
-_BARE_ID_ALLOWED = {"commands/insight.md": ["rule (R13, R18...)"]}
+_BARE_ID_ALLOWED = {
+    # The insights.jsonl `rule` field stores the bare ID ("R18").
+    "src/superclaude/commands/insight.md": ["rule (R13, R18...)"],
+    # The gotcha is about grepping the bare ID itself.
+    ".claude/rules/gotchas/general.md": [r"(e.g., \bR18\b)", "but R15 appear once"],
+    # A section anchor in a research doc, not a rule citation.
+    ".claude/rules/gotchas/authoring.md": ["§ P-R21"],
+}
 
 
 def test_rule_definitions_found():
@@ -152,7 +162,7 @@ def test_rule_definitions_found():
     )
 
 
-@pytest.mark.parametrize("path", SHIPPED_MD_FILES, ids=SHIPPED_MD_IDS)
+@pytest.mark.parametrize("path", CITING_MD_FILES, ids=CITING_MD_IDS)
 def test_rule_citations_defined(path: Path):
     """Rules are cited as [RNN Name], matching the definition in RULES_QUALITY.md.
 
@@ -161,7 +171,7 @@ def test_rule_citations_defined(path: Path):
     on the same page), in a range (R01–R21), or in _BARE_ID_ALLOWED — and
     there it must still be a defined ID.
     """
-    rel = path.relative_to(_SRC).as_posix()
+    rel = path.relative_to(_REPO).as_posix()
     content = path.read_text(encoding="utf-8")
     full_tags = {f"[{rid} {name}]" for rid, name in DEFINED_RULES.items()}
     bad_tags = set(_FULL_TAG.findall(content)) - full_tags
