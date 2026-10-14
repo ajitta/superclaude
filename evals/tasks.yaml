@@ -330,6 +330,9 @@ tasks:
   # The target sits in agents/, not .claude/agents/: .claude is a protected path
   # that headless runs may write only under bypassPermissions. Headless has no
   # approval turn, so both prompts carry the same pre-approval sentence.
+  # The skeleton check is the effect measure (D22): structure comes from the
+  # skill's references, so the skill run must not copy the installed SC agent
+  # skeleton; the plain run is expected to copy it (run2, 05g Results).
   - id: sc-author-skill
     canary: true
     canary_only: true
@@ -348,6 +351,8 @@ tasks:
     checks:
       - {type: file_exists_glob, tag: success, pattern: 'agents/sql-migration-reviewer.md'}
       - {type: cmd_ok, tag: success, cmd: [superclaude, author-check, agents/sql-migration-reviewer.md]}
+      - {type: cmd_ok, tag: success,
+         cmd: [python, -c, "import pathlib,re,sys; t=pathlib.Path('agents/sql-migration-reviewer.md').read_text(encoding='utf-8'); sys.exit(1 if re.search(r'<component|<mission>|<bounds>|\\[R\\d\\d', t) else 0)"]}
       - {type: transcript_regex, tag: verification, pattern: 'author-check'}
 
   - id: sc-author-plain
@@ -368,4 +373,213 @@ tasks:
     checks:
       - {type: file_exists_glob, tag: success, pattern: 'agents/sql-migration-reviewer.md'}
       - {type: cmd_ok, tag: success, cmd: [superclaude, author-check, agents/sql-migration-reviewer.md]}
+      - {type: cmd_ok, tag: success,
+         cmd: [python, -c, "import pathlib,re,sys; t=pathlib.Path('agents/sql-migration-reviewer.md').read_text(encoding='utf-8'); sys.exit(1 if re.search(r'<component|<mission>|<bounds>|\\[R\\d\\d', t) else 0)"]}
+      - {type: transcript_not_regex, tag: scope, pattern: 'author-check'}
+
+  # The same pair for the other types. Each pair adds one check taken from the
+  # type's reference (command: no `name` field; output-style:
+  # keep-coding-instructions true; skill: description says when to use it,
+  # "Use when/before/for/after"; rules file: `paths` is the only frontmatter
+  # field). The checks were fixed before the first run (05g run5); the skill
+  # check was widened after "Use before applying…" failed it. Staging paths as
+  # above.
+  - id: sc-author-command-skill
+    canary: true
+    canary_only: true
+    fixture: fixtures/sc-author
+    setup:
+      - [git, init, -b, main]
+      - [git, add, -A]
+      - [git, -c, user.email=eval@local, -c, user.name=eval, commit, -m, baseline]
+    allowed_tools: [Bash, PowerShell, Read, Edit, Write, Grep, Glob, Skill]
+    max_turns: 20
+    prompt: >
+      /sc-author command a slash command at commands/migration-check.md (a
+      staging copy, moved into .claude/commands/ later) that checks the SQL
+      migrations in migrations/ for destructive statements and prints a
+      summary. Keep it a command file, not a skill. Approved in advance: write
+      the file without asking for confirmation.
+    checks:
+      - {type: file_exists_glob, tag: success, pattern: 'commands/migration-check.md'}
+      - {type: cmd_ok, tag: success, cmd: [superclaude, author-check, commands/migration-check.md]}
+      - {type: cmd_ok, tag: success,
+         cmd: [python, -c, "import pathlib,re,sys; t=pathlib.Path('commands/migration-check.md').read_text(encoding='utf-8'); sys.exit(1 if re.search(r'<component|<mission>|<bounds>|\\[R\\d\\d', t) else 0)"]}
+      - {type: cmd_ok, tag: success,
+         cmd: [python, -c, "import pathlib,re,sys; t=pathlib.Path('commands/migration-check.md').read_text(encoding='utf-8'); fm=t.split('---')[1] if t.startswith('---') else ''; sys.exit(1 if re.search(r'(?m)^name:', fm) else 0)"]}
+      - {type: transcript_regex, tag: verification, pattern: 'author-check'}
+
+  - id: sc-author-command-plain
+    canary: true
+    canary_only: true
+    fixture: fixtures/sc-author
+    setup:
+      - [git, init, -b, main]
+      - [git, add, -A]
+      - [git, -c, user.email=eval@local, -c, user.name=eval, commit, -m, baseline]
+    allowed_tools: [Bash, PowerShell, Read, Edit, Write, Grep, Glob, Skill]
+    max_turns: 20
+    prompt: >
+      Create a slash command at commands/migration-check.md (a staging copy,
+      moved into .claude/commands/ later) that checks the SQL migrations in
+      migrations/ for destructive statements and prints a summary. Keep it a
+      command file, not a skill. Approved in advance: write the file without
+      asking for confirmation.
+    checks:
+      - {type: file_exists_glob, tag: success, pattern: 'commands/migration-check.md'}
+      - {type: cmd_ok, tag: success, cmd: [superclaude, author-check, commands/migration-check.md]}
+      - {type: cmd_ok, tag: success,
+         cmd: [python, -c, "import pathlib,re,sys; t=pathlib.Path('commands/migration-check.md').read_text(encoding='utf-8'); sys.exit(1 if re.search(r'<component|<mission>|<bounds>|\\[R\\d\\d', t) else 0)"]}
+      - {type: cmd_ok, tag: success,
+         cmd: [python, -c, "import pathlib,re,sys; t=pathlib.Path('commands/migration-check.md').read_text(encoding='utf-8'); fm=t.split('---')[1] if t.startswith('---') else ''; sys.exit(1 if re.search(r'(?m)^name:', fm) else 0)"]}
+      - {type: transcript_not_regex, tag: scope, pattern: 'author-check'}
+
+  - id: sc-author-output-style-skill
+    canary: true
+    canary_only: true
+    fixture: fixtures/sc-author
+    setup:
+      - [git, init, -b, main]
+      - [git, add, -A]
+      - [git, -c, user.email=eval@local, -c, user.name=eval, commit, -m, baseline]
+    allowed_tools: [Bash, PowerShell, Read, Edit, Write, Grep, Glob, Skill]
+    max_turns: 20
+    prompt: >
+      /sc-author output-style an output style at
+      output-styles/migration-reviewer.md (a staging copy, moved into
+      .claude/output-styles/ later) for reviewing SQL migrations: findings
+      first, a severity label on each, no praise. Claude still writes and
+      fixes code while this style is on. Approved in advance: write the file
+      without asking for confirmation.
+    checks:
+      - {type: file_exists_glob, tag: success, pattern: 'output-styles/migration-reviewer.md'}
+      - {type: cmd_ok, tag: success, cmd: [superclaude, author-check, output-styles/migration-reviewer.md]}
+      - {type: cmd_ok, tag: success,
+         cmd: [python, -c, "import pathlib,re,sys; t=pathlib.Path('output-styles/migration-reviewer.md').read_text(encoding='utf-8'); sys.exit(1 if re.search(r'<component|<mission>|<bounds>|\\[R\\d\\d', t) else 0)"]}
+      - {type: cmd_ok, tag: success,
+         cmd: [python, -c, "import pathlib,re,sys; t=pathlib.Path('output-styles/migration-reviewer.md').read_text(encoding='utf-8'); sys.exit(0 if re.search(r'(?m)^keep-coding-instructions: *true', t) else 1)"]}
+      - {type: transcript_regex, tag: verification, pattern: 'author-check'}
+
+  - id: sc-author-output-style-plain
+    canary: true
+    canary_only: true
+    fixture: fixtures/sc-author
+    setup:
+      - [git, init, -b, main]
+      - [git, add, -A]
+      - [git, -c, user.email=eval@local, -c, user.name=eval, commit, -m, baseline]
+    allowed_tools: [Bash, PowerShell, Read, Edit, Write, Grep, Glob, Skill]
+    max_turns: 20
+    prompt: >
+      Create an output style at output-styles/migration-reviewer.md (a staging
+      copy, moved into .claude/output-styles/ later) for reviewing SQL
+      migrations: findings first, a severity label on each, no praise. Claude
+      still writes and fixes code while this style is on. Approved in advance:
+      write the file without asking for confirmation.
+    checks:
+      - {type: file_exists_glob, tag: success, pattern: 'output-styles/migration-reviewer.md'}
+      - {type: cmd_ok, tag: success, cmd: [superclaude, author-check, output-styles/migration-reviewer.md]}
+      - {type: cmd_ok, tag: success,
+         cmd: [python, -c, "import pathlib,re,sys; t=pathlib.Path('output-styles/migration-reviewer.md').read_text(encoding='utf-8'); sys.exit(1 if re.search(r'<component|<mission>|<bounds>|\\[R\\d\\d', t) else 0)"]}
+      - {type: cmd_ok, tag: success,
+         cmd: [python, -c, "import pathlib,re,sys; t=pathlib.Path('output-styles/migration-reviewer.md').read_text(encoding='utf-8'); sys.exit(0 if re.search(r'(?m)^keep-coding-instructions: *true', t) else 1)"]}
+      - {type: transcript_not_regex, tag: scope, pattern: 'author-check'}
+
+  - id: sc-author-skill-skill
+    canary: true
+    canary_only: true
+    fixture: fixtures/sc-author
+    setup:
+      - [git, init, -b, main]
+      - [git, add, -A]
+      - [git, -c, user.email=eval@local, -c, user.name=eval, commit, -m, baseline]
+    allowed_tools: [Bash, PowerShell, Read, Edit, Write, Grep, Glob, Skill]
+    max_turns: 20
+    prompt: >
+      /sc-author skill a skill at skills/migration-check/SKILL.md (a staging
+      copy, moved into .claude/skills/ later) that checks the SQL migrations in
+      migrations/ for destructive statements before they are applied. Approved
+      in advance: write the file without asking for confirmation.
+    checks:
+      - {type: file_exists_glob, tag: success, pattern: 'skills/migration-check/SKILL.md'}
+      - {type: cmd_ok, tag: success, cmd: [superclaude, author-check, skills/migration-check/SKILL.md]}
+      - {type: cmd_ok, tag: success,
+         cmd: [python, -c, "import pathlib,re,sys; t=pathlib.Path('skills/migration-check/SKILL.md').read_text(encoding='utf-8'); sys.exit(1 if re.search(r'<component|<mission>|<bounds>|\\[R\\d\\d', t) else 0)"]}
+      - {type: cmd_ok, tag: success,
+         cmd: [python, -c, "import pathlib,re,sys; t=pathlib.Path('skills/migration-check/SKILL.md').read_text(encoding='utf-8'); sys.exit(0 if re.search(r'(?mi)^description:.*use (when|before|for|after)', t) else 1)"]}
+      - {type: transcript_regex, tag: verification, pattern: 'author-check'}
+
+  - id: sc-author-skill-plain
+    canary: true
+    canary_only: true
+    fixture: fixtures/sc-author
+    setup:
+      - [git, init, -b, main]
+      - [git, add, -A]
+      - [git, -c, user.email=eval@local, -c, user.name=eval, commit, -m, baseline]
+    allowed_tools: [Bash, PowerShell, Read, Edit, Write, Grep, Glob, Skill]
+    max_turns: 20
+    prompt: >
+      Create a skill at skills/migration-check/SKILL.md (a staging copy, moved
+      into .claude/skills/ later) that checks the SQL migrations in migrations/
+      for destructive statements before they are applied. Approved in advance:
+      write the file without asking for confirmation.
+    checks:
+      - {type: file_exists_glob, tag: success, pattern: 'skills/migration-check/SKILL.md'}
+      - {type: cmd_ok, tag: success, cmd: [superclaude, author-check, skills/migration-check/SKILL.md]}
+      - {type: cmd_ok, tag: success,
+         cmd: [python, -c, "import pathlib,re,sys; t=pathlib.Path('skills/migration-check/SKILL.md').read_text(encoding='utf-8'); sys.exit(1 if re.search(r'<component|<mission>|<bounds>|\\[R\\d\\d', t) else 0)"]}
+      - {type: cmd_ok, tag: success,
+         cmd: [python, -c, "import pathlib,re,sys; t=pathlib.Path('skills/migration-check/SKILL.md').read_text(encoding='utf-8'); sys.exit(0 if re.search(r'(?mi)^description:.*use (when|before|for|after)', t) else 1)"]}
+      - {type: transcript_not_regex, tag: scope, pattern: 'author-check'}
+
+  - id: sc-author-memory-skill
+    canary: true
+    canary_only: true
+    fixture: fixtures/sc-author
+    setup:
+      - [git, init, -b, main]
+      - [git, add, -A]
+      - [git, -c, user.email=eval@local, -c, user.name=eval, commit, -m, baseline]
+    allowed_tools: [Bash, PowerShell, Read, Edit, Write, Grep, Glob, Skill]
+    max_turns: 20
+    prompt: >
+      /sc-author memory a rules file at rules/migrations.md (a staging copy,
+      moved into .claude/rules/ later) with instructions that apply only when
+      Claude works on files in migrations/: never edit a migration that has
+      been applied, add a new one instead; every destructive statement needs a
+      rollback note. Approved in advance: write the file without asking for
+      confirmation.
+    checks:
+      - {type: file_exists_glob, tag: success, pattern: 'rules/migrations.md'}
+      - {type: cmd_ok, tag: success, cmd: [superclaude, author-check, rules/migrations.md]}
+      - {type: cmd_ok, tag: success,
+         cmd: [python, -c, "import pathlib,re,sys; t=pathlib.Path('rules/migrations.md').read_text(encoding='utf-8'); sys.exit(1 if re.search(r'<component|<mission>|<bounds>|\\[R\\d\\d', t) else 0)"]}
+      - {type: cmd_ok, tag: success,
+         cmd: [python, -c, "import pathlib,re,sys; t=pathlib.Path('rules/migrations.md').read_text(encoding='utf-8'); fm=t.split('---')[1] if t.startswith('---') else ''; keys=re.findall(r'(?m)^([A-Za-z][A-Za-z_-]*):', fm); sys.exit(0 if keys==['paths'] else 1)"]}
+      - {type: transcript_regex, tag: verification, pattern: 'author-check'}
+
+  - id: sc-author-memory-plain
+    canary: true
+    canary_only: true
+    fixture: fixtures/sc-author
+    setup:
+      - [git, init, -b, main]
+      - [git, add, -A]
+      - [git, -c, user.email=eval@local, -c, user.name=eval, commit, -m, baseline]
+    allowed_tools: [Bash, PowerShell, Read, Edit, Write, Grep, Glob, Skill]
+    max_turns: 20
+    prompt: >
+      Create a rules file at rules/migrations.md (a staging copy, moved into
+      .claude/rules/ later) with instructions that apply only when Claude works
+      on files in migrations/: never edit a migration that has been applied,
+      add a new one instead; every destructive statement needs a rollback note.
+      Approved in advance: write the file without asking for confirmation.
+    checks:
+      - {type: file_exists_glob, tag: success, pattern: 'rules/migrations.md'}
+      - {type: cmd_ok, tag: success, cmd: [superclaude, author-check, rules/migrations.md]}
+      - {type: cmd_ok, tag: success,
+         cmd: [python, -c, "import pathlib,re,sys; t=pathlib.Path('rules/migrations.md').read_text(encoding='utf-8'); sys.exit(1 if re.search(r'<component|<mission>|<bounds>|\\[R\\d\\d', t) else 0)"]}
+      - {type: cmd_ok, tag: success,
+         cmd: [python, -c, "import pathlib,re,sys; t=pathlib.Path('rules/migrations.md').read_text(encoding='utf-8'); fm=t.split('---')[1] if t.startswith('---') else ''; keys=re.findall(r'(?m)^([A-Za-z][A-Za-z_-]*):', fm); sys.exit(0 if keys==['paths'] else 1)"]}
       - {type: transcript_not_regex, tag: scope, pattern: 'author-check'}
