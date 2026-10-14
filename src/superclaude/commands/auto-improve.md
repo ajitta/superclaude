@@ -1,6 +1,5 @@
 ---
-description: Autonomous overnight code improvement loop driven by objective metric (Karpathy AutoResearch pattern). Use ONLY when user explicit type `/sc:auto-improve` — run long unattended loop mutate code, implicit trigger unsafe. Do NOT auto-trigger on phrase like "improve the code", "make it better", "optimize this".
-disable-model-invocation: true
+description: Autonomous overnight code improvement loop driven by an objective metric (Karpathy AutoResearch pattern), mutating code unattended in an isolated worktree. On request only — the user's /sc:auto-improve or a workflow step that names it. Not for "improve this" or "optimize this" — edit directly.
 ---
 
 <component name="auto-improve" type="command">

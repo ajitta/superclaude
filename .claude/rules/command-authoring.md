@@ -29,22 +29,24 @@ Never add — SSOT: `.claude/rules/schemas.yaml` (`forbidden_command_fields`):
 - `permissionMode`, `memory`, `color` — agent-only
 - `autonomy` — not official CC field
 - `model`, `context`, `agent`, `hooks` — CC accepts them on command files; SuperClaude keeps commands on the parent model in the main session (see the decision gate above)
+- `disable-model-invocation` — CC accepts it; SuperClaude keeps every command reachable by delegation (see Trigger Policy)
 
-## Trigger Policy (auto vs explicit-only)
+## Trigger Policy (auto vs on-request)
 
-Commands install as CC skills — the harness exposes each `description` to the model, which decides invocation from conversation context. Model judgment, not regex/hooks. The description is therefore a **model-facing invocation contract** with two deliberate tiers:
+Commands install as CC skills — the harness lists each `description` for the model, which decides invocation from conversation context. Model judgment, not regex/hooks. The description is therefore a **model-facing invocation contract**. Every command stays model-invocable so a workflow step, another command or a sub-agent (Skill tool) can run it; the tier sentence says when the model may start it:
 
-| Tier | Positive cue pattern | Use for | Examples |
+| Tier | Tier sentence | Use for | Examples |
 |---|---|---|---|
-| Auto-triggerable | "Use when user types `/sc:X`, asks 'Y', or …" | Read/analysis workflows — false fire cheap | analyze, troubleshoot, brainstorm, review |
-| Explicit-only | "Use ONLY when user explicitly types `/sc:X`" | Destructive, expensive, or long-running orchestration — false fire costly | cleanup, build, implement, test |
+| Auto | "Use when asked …" (natural request, no `/sc:X` needed — a typed `/sc:X` runs without the description) | Read/analysis workflows — false fire cheap | analyze, explain, review, research |
+| On-request | "On request only — the user's /sc:X or a workflow step that names it." (exact sentence) | Mutates files, writes committed artifacts, orchestrates sub-agents, long-running loops | cleanup, build, implement, plan, auto-improve |
 
 Rules:
 
-- **Both tiers require a negative gate** ("Do NOT auto-trigger on …") naming cheap look-alike requests and their direct alternative. Mechanically enforced: `tests/unit/test_command_structure.py` (`test_description_references_own_slash_command`, `test_description_has_negative_trigger_gate`).
-- **Tier choice heuristic**: command mutates files, runs multi-agent orchestration, or writes committed artifacts → explicit-only. Read-only analysis or console-only output → auto-triggerable is safe.
-- **Explicit-only is wording-level steering, not a hard block.** For a guaranteed block, add `disable-model-invocation: true` — CC strips the description from the model's skill list entirely, so the model cannot invoke it at all — only the user can, by typing the command. Not in `forbidden_command_fields`; shipped example: `auto-improve.md` (unattended code-mutation loop). Prefer wording tier unless a false fire is unacceptable.
-- **Flipping tiers = description edit only**: rewrite the positive cue, keep the negative gate, stay ≤1024 chars (Agent Skills spec cap; CC itself truncates `description` + `when_to_use` at 1,536 chars in the skill listing). Then `uv run pytest tests/unit/test_command_structure.py` + re-sync (`superclaude install --force --scope user`; `make sync-user` may fail on Windows — see gotchas/general.md).
+- **Shape**: `<purpose — verb-led, what it does and writes>. <tier sentence>. Not for <cheap look-alike> — <direct alternative>.` ≤300 chars. No rationale ("so a wrong fire …"): it costs listing budget and routes nothing. Mechanically enforced: `tests/unit/test_command_structure.py` (`test_description_states_one_invocation_tier`, `test_description_has_negative_trigger_gate`, `test_description_fits_the_listing_budget`).
+- **Why the cap**: every model-invocable description shares the skill listing's character budget (1% of the context window, 8,000-char fallback); on overflow CC drops descriptions of the least-used skills first.
+- **Tier choice heuristic**: command mutates files, runs multi-agent orchestration, or writes committed artifacts → on-request. Read-only analysis or console-only output → auto.
+- **No `disable-model-invocation`** (in `forbidden_command_fields`): it removes the description from the listing and blocks delegated runs and sub-agent preload. On-request wording is the gate; confirmations for risky operations live in the body (`<approval_required>`, `<bounds>`).
+- **Flipping tiers = description edit only**: swap the tier sentence, keep the negative gate and the 300-char cap. Then `uv run pytest tests/unit/test_command_structure.py` + re-sync (`superclaude install --force --scope user`; `make sync-user` may fail on Windows — see gotchas/general.md).
 
 ## XML Template
 

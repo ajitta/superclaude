@@ -1,6 +1,5 @@
 ---
-description: Git ops with smart commit msgs + workflow optim. Use ONLY when user explicit type `/sc:git` — invoking it select the workflow only; push --force, reset --hard and rebase each still need their own confirm naming operation + target. NO auto-trigger on raw git cmds like "git status", "git log", "git diff", "git push", nor on "commit this" / "write a PR body" — invoke via Bash direct.
-disable-model-invocation: true
+description: Git operations with smart commit messages and workflow guidance; push --force, reset --hard and rebase each still need their own confirmation. On request only — the user's /sc:git or a workflow step that names it. Not for raw git commands or "commit this" — run git with Bash.
 ---
 <component name="git" type="command">
 

@@ -1,5 +1,5 @@
 ---
-description: Build, compile, package projects with smart err handling + optimize. Use ONLY when user type `/sc:build` — orchestrate build pipeline with err analysis. NO auto-trigger on single build cmd (npm run build, cargo build) — use Bash direct.
+description: Build, compile and package projects with error analysis and optimization. On request only — the user's /sc:build or a workflow step that names it. Not for a single build command (npm run build, cargo build) — run it with Bash.
 ---
 <component name="build" type="command">
 

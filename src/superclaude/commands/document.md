@@ -1,5 +1,5 @@
 ---
-description: Gen focused docs for components, functions, APIs, features. Use ONLY when user explicitly types `/sc:document` — `--type inline` writes docstrings into source files, wrong fire cost a revert. NOT auto-trigger on add single docstring, fix comment typo, or update one README line — those direct edits.
+description: Generate focused docs for components, functions, APIs and features; `--type inline` writes docstrings into source files. On request only — the user's /sc:document or a workflow step that names it. Not for one docstring, comment or README line — edit directly.
 ---
 <component name="document" type="command">
 

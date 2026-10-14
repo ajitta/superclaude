@@ -1,5 +1,5 @@
 ---
-description: Code analysis across quality, security, performance, architecture domains. Use when user types `/sc:analyze`, asks "audit", "review codebase for X", or names multiple analysis dimensions one request. Do NOT auto-trigger on reading single file, looking up symbol, or "what does this function do" — those direct reads, not multi-domain analysis.
+description: Code analysis across quality, security, performance, architecture domains. Use when asked to audit a codebase or to analyze several of these dimensions in one request. Not for reading one file or explaining one function — read it directly.
 ---
 <component name="analyze" type="command">
 
