@@ -96,9 +96,10 @@ class TaskResult:
     duration_s: float = 0.0
     permission_denials: int = 0
     sc_activations: int = 0
-    # Every Skill tool call's skill name, in order — what skill_called /
-    # skill_not_called match. A slash command typed at the start of the prompt
-    # is expanded by the harness, not called, so it never appears here.
+    # Skill names of the Skill tool calls that ran (non-error tool_result), in
+    # order — what skill_called / skill_not_called match. A refused call is
+    # left out; sc_activations still counts attempts. A slash command typed at
+    # the start of the prompt is expanded, not called, so it never appears.
     skills_called: list[str] = field(default_factory=list)
     error: str = ""
     # stop_details.category when the model refused the turn ("" otherwise).
@@ -349,6 +350,10 @@ def _parse_stream(stream: str, res: TaskResult) -> tuple[str, str]:
     stream-json transcript."""
     result_text = ""
     bash_inputs: list[str] = []
+    # Skill tool_use id -> skill name, until its tool_result arrives. Claude
+    # Code answers a call it refuses (disable-model-invocation, unknown skill)
+    # with an error result, so only a non-error result counts as a run.
+    pending_skills: dict[str, str] = {}
     for line in stream.splitlines():
         try:
             event = json.loads(line)
@@ -389,9 +394,17 @@ def _parse_stream(stream: str, res: TaskResult) -> tuple[str, str]:
                     bash_inputs.append(tool_input.get("command", ""))
                 if name == "Skill":
                     skill = str(tool_input.get("skill", ""))
-                    res.skills_called.append(skill)
+                    pending_skills[block.get("id", "")] = skill
                     if skill.startswith("sc:"):
                         res.sc_activations += 1
+        elif etype == "user":
+            content = (event.get("message") or {}).get("content")
+            for block in content if isinstance(content, list) else []:
+                if block.get("type") != "tool_result":
+                    continue
+                skill = pending_skills.pop(block.get("tool_use_id", ""), None)
+                if skill is not None and not block.get("is_error"):
+                    res.skills_called.append(skill)
     return result_text, "\n".join(bash_inputs)
 
 

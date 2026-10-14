@@ -630,19 +630,31 @@ def test_skill_checks_match_skill_tool_calls():
 
     run_eval = _import_run_eval()
     res = run_eval.TaskResult(arm="sc-full", task_id="probe")
-    stream = json.dumps(
-        {
-            "type": "assistant",
-            "message": {
-                "content": [
-                    {"type": "tool_use", "name": "Skill", "input": {"skill": "sc:load"}}
-                ]
-            },
+
+    def use(uid, skill):
+        block = {
+            "type": "tool_use",
+            "id": uid,
+            "name": "Skill",
+            "input": {"skill": skill},
         }
-    )
-    run_eval._parse_stream(stream, res)
+        return {"type": "assistant", "message": {"content": [block]}}
+
+    def result(uid, is_error):
+        block = {"type": "tool_result", "tool_use_id": uid, "is_error": is_error}
+        return {"type": "user", "message": {"content": [block]}}
+
+    # sc:git refused (disable-model-invocation answers with an error result),
+    # sc:load ran: only the run counts; both count as activation attempts.
+    events = [
+        use("a", "sc:git"),
+        result("a", True),
+        use("b", "sc:load"),
+        result("b", False),
+    ]
+    run_eval._parse_stream("\n".join(json.dumps(e) for e in events), res)
     assert res.skills_called == ["sc:load"]
-    assert res.sc_activations == 1
+    assert res.sc_activations == 2
     ws = Path(".")
     called = {"type": "skill_called", "pattern": "^sc:load$"}
     assert run_eval._check_one(called, "skill_called", ws, "", "", res.skills_called)[0]
