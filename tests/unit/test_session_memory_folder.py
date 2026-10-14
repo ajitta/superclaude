@@ -3,7 +3,7 @@ Session memory lives in the committed project folder `.claude/memories/`.
 
 /sc:save and /sc:load read and write plain markdown files there plus Claude
 auto memory; no memory-server tool calls remain. The folder must stay out of
-SuperClaude's git-exclude block so the memories are committed.
+superclaude's git-exclude block so the memories are committed.
 
 Session state goes into an add-only record named by date and branch. A
 fixed-name file that every save overwrites conflicts on merge as soon as two

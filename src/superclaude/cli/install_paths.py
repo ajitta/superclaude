@@ -1,5 +1,5 @@
 """
-Path Resolution for SuperClaude Installation
+Path Resolution for superclaude Installation
 
 Provides path constants and resolution functions used by all install modules.
 Leaf dependency: imports no other cli module, so every install module can import
@@ -20,7 +20,7 @@ from superclaude.utils import detect_scope, same_dir
 # Component definitions: (source_subdir, target_subdir, description)
 # Note: the hook registration is handled separately by install_hooks()
 #
-# Two target kinds. `commands/sc`, `superclaude/*`: SuperClaude-only directories,
+# Two target kinds. `commands/sc`, `superclaude/*`: superclaude-only directories,
 # removed wholesale on uninstall. `agents`, `output-styles`, `skills`: Claude
 # Code's own content directories, shared with the user's files, so install and
 # uninstall touch only the names this release ships (SHARED_TARGET_COMPONENTS).
@@ -239,7 +239,7 @@ def find_unshipped(base_path: Path) -> list:
 
     Installing copies and deletes nothing, so an upgrade left a removed command
     running beside its successor (/sc:spawn, /sc:prompt) and the doc of a removed
-    MCP server on disk. Only SuperClaude writes commands/sc and superclaude/ (uninstall
+    MCP server on disk. Only superclaude writes commands/sc and superclaude/ (uninstall
     removes both whole), so there anything the source does not ship is stale. In
     the shared directories only RETIRED_AGENT_FILES names are; legacy skills have
     their own list and helper. Non-.md files and superclaude/scripts/ are never

@@ -57,7 +57,7 @@ def _quote_path(path) -> str:
 
 
 def detect_authoring_test(file_path: str) -> str | None:
-    """If a SuperClaude .md authoring file was edited, return targeted pytest cmd."""
+    """If a superclaude .md authoring file was edited, return targeted pytest cmd."""
     path = Path(file_path)
     if path.suffix.lower() != ".md":
         return None

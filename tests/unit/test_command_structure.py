@@ -20,7 +20,7 @@ from tests.unit.md_helpers import (
 
 COMMANDS_DIR = Path(__file__).parent.parent.parent / "src" / "superclaude" / "commands"
 
-# Fields SuperClaude commands never carry (agent-only, or valid in CC but excluded by SC policy)
+# Fields superclaude commands never carry (agent-only, or valid in CC but excluded by SC policy)
 _SCHEMAS_PATH = (
     Path(__file__).parent.parent.parent / ".claude" / "rules" / "schemas.yaml"
 )

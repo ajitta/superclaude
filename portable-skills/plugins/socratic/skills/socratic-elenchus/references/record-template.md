@@ -41,4 +41,4 @@ Rules:
 - **stopped before testing**: the user stopped while the current definition was still untested. Name which definitions fell before that.
 - Quote definitions verbatim when the user stated them in one message. Otherwise paraphrase without quotation marks.
 - If an empirical fact would settle part of X (counts, costs, who actually comes), put it under "To check": the fact, not a plan.
-- In a repository that uses SuperClaude, a later `/sc:brainstorm` or `/sc:design` can start from the ideas born. Mention it only if the user asks what's next.
+- In a repository that uses superclaude, a later `/sc:brainstorm` or `/sc:design` can start from the ideas born. Mention it only if the user asks what's next.

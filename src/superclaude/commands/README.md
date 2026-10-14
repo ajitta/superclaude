@@ -1,4 +1,4 @@
-# SuperClaude Commands
+# superclaude Commands
 
 Workflow entry points — user-facing slash commands Claude Code.
 
@@ -13,7 +13,7 @@ Commands managed by Claude Code native command system. Install to `~/.claude/com
 | Command | Description |
 |---------|-------------|
 | `/sc:sc` | Command dispatcher — routes to other `/sc:*` commands (on request) |
-| `/sc:help` | Help on SuperClaude usage |
+| `/sc:help` | Help on superclaude usage |
 | `/sc:init` | Interactive project env setup, first-session onboarding |
 | `/sc:load` | Load project context via `.claude/memories/` + auto memory |
 | `/sc:save` | Persist context via `.claude/memories/` + auto memory |

@@ -1,5 +1,5 @@
 """
-Content usage audit tests for SuperClaude.
+Content usage audit tests for superclaude.
 
 Validates:
 - All MODE_*.md files are mapped in TRIGGER_MAP

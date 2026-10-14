@@ -4,7 +4,7 @@ Regression target: four of the six checks read ~/.claude unconditionally. On a
 local-scope install that made CLAUDE_SC.md and the CLAUDE.md import report a
 correct install as broken, while the skills and hooks checks passed by
 inspecting another tool's skills directory and another tool's hook
-registrations — a 4/6 score in which no check had looked at SuperClaude.
+registrations — a 4/6 score in which no check had looked at superclaude.
 """
 
 from __future__ import annotations
@@ -24,7 +24,7 @@ SC_HOOK_EVENTS = ["SessionStart", "UserPromptSubmit", "PostToolUse", "PreToolUse
 
 
 def _sc_hook_entry(script: str) -> dict:
-    """A hook entry the marker check attributes to SuperClaude."""
+    """A hook entry the marker check attributes to superclaude."""
     return {
         "matcher": "*",
         "hooks": [
@@ -52,7 +52,7 @@ def _write_settings(path: Path, hooks: dict) -> None:
 
 
 class TestHooksCheck:
-    """The hooks check reads this scope's settings file, SuperClaude entries only."""
+    """The hooks check reads this scope's settings file, superclaude entries only."""
 
     def test_local_scope_reads_settings_local_json(self, tmp_path: Path):
         _write_settings(

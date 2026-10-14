@@ -1,5 +1,5 @@
 """
-MCP Server Installation Module for SuperClaude
+MCP Server Installation Module for superclaude
 
 Installs and manages MCP servers using the latest Claude Code API.
 Based on the installer logic from commit d4a17fc but adapted for modern Claude Code.
@@ -586,7 +586,7 @@ def uninstall_mcp_servers(
     dry_run: bool = False,
 ) -> Tuple[int, int, int, List[str]]:
     """
-    Remove SuperClaude-registered MCP servers from the given scope.
+    Remove superclaude-registered MCP servers from the given scope.
 
     Only servers in the MCP_SERVERS registry are considered — user-added
     servers at the same scope are left untouched.

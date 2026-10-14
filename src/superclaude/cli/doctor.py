@@ -1,13 +1,13 @@
 """
-SuperClaude Doctor Command
+superclaude Doctor Command
 
-Health check for SuperClaude installation.
+Health check for superclaude installation.
 
 Every check that touches disk is scope-parameterised. Four of the six used to
 read ~/.claude unconditionally, so on a local- or project-scope install two
 reported a healthy install as broken and the other two passed by reading another
 tool's skills and another tool's hooks — a 4/6 score in which no check had
-actually looked at SuperClaude.
+actually looked at superclaude.
 """
 
 import json
@@ -46,7 +46,7 @@ def _repair_command(scope: str, base_path: Path) -> str:
 
 def run_doctor(scope: str | None = None) -> Dict[str, Any]:
     """
-    Run SuperClaude health checks
+    Run superclaude health checks
 
     Every check returns its own "details" list; rendering them is the caller's
     choice, which is why no verbose flag is taken here.
@@ -79,7 +79,7 @@ def run_doctor(scope: str | None = None) -> Dict[str, Any]:
 
 def _check_pytest_plugin() -> Dict[str, Any]:
     """
-    Check that the SuperClaude pytest plugin's entry point is registered
+    Check that the superclaude pytest plugin's entry point is registered
 
     Returns:
         Check result dict
@@ -91,9 +91,9 @@ def _check_pytest_plugin() -> Dict[str, Any]:
         "name": "pytest plugin loaded",
         "passed": found,
         "details": [
-            "SuperClaude pytest plugin is active"
+            "superclaude pytest plugin is active"
             if found
-            else "SuperClaude plugin not found in pytest plugins"
+            else "superclaude plugin not found in pytest plugins"
         ],
     }
 
@@ -168,9 +168,9 @@ def _check_console_entry() -> Dict[str, Any]:
 
 def _check_hooks_installed(base_path: Path, scope: str) -> Dict[str, Any]:
     """
-    Check that SuperClaude's hooks are registered in this scope's settings file.
+    Check that superclaude's hooks are registered in this scope's settings file.
 
-    Only entries the marker check attributes to SuperClaude count. Asking merely
+    Only entries the marker check attributes to superclaude count. Asking merely
     whether an event array is non-empty passed on hooks belonging to unrelated
     plugins, certifying an install whose own hooks were absent.
 
@@ -225,7 +225,7 @@ def _check_hooks_installed(base_path: Path, scope: str) -> Dict[str, Any]:
         "name": label,
         "passed": False,
         "details": [
-            f"No SuperClaude hook registered for: {', '.join(missing)}",
+            f"No superclaude hook registered for: {', '.join(missing)}",
             f"Checked {settings_file} — {_repair_command(scope, base_path)}",
         ],
     }

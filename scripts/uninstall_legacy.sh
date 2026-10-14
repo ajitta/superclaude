@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
-# SuperClaude Legacy Cleanup Script
-# Removes old SuperClaude-related files from ~/.claude
+# superclaude Legacy Cleanup Script
+# Removes old superclaude-related files from ~/.claude
 #
 
 set -euo pipefail
@@ -9,7 +9,7 @@ set -euo pipefail
 CLAUDE_DIR="$HOME/.claude"
 BACKUP_DIR="$HOME/.claude-superclaude-backup-$(date +%Y%m%d_%H%M%S)"
 
-echo "🧹 SuperClaude Legacy Cleanup"
+echo "🧹 superclaude Legacy Cleanup"
 echo "=============================="
 echo ""
 
@@ -19,12 +19,12 @@ if [[ ! -d "$CLAUDE_DIR" ]]; then
     exit 0
 fi
 
-# List of SuperClaude-related files/directories to remove
+# List of superclaude-related files/directories to remove
 SUPERCLAUDE_ITEMS=(
-    # SuperClaude plugin (if exists)
+    # superclaude plugin (if exists)
     "plugins/superclaude@superclaude"
 
-    # Legacy SuperClaude configs (if any)
+    # Legacy superclaude configs (if any)
     "superclaude.json"
     "superclaude_config.json"
 )
@@ -46,7 +46,7 @@ backup_and_remove() {
     return 1
 }
 
-echo "🔍 Scanning for SuperClaude files..."
+echo "🔍 Scanning for superclaude files..."
 echo ""
 
 FOUND_COUNT=0
@@ -56,7 +56,7 @@ for item in "${SUPERCLAUDE_ITEMS[@]}"; do
     fi
 done
 
-# Clean up settings.json if it contains SuperClaude plugin reference
+# Clean up settings.json if it contains superclaude plugin reference
 SETTINGS_FILE="$CLAUDE_DIR/settings.json"
 if [[ -f "$SETTINGS_FILE" ]]; then
     if grep -q "superclaude@superclaude" "$SETTINGS_FILE" 2>/dev/null; then
@@ -64,7 +64,7 @@ if [[ -f "$SETTINGS_FILE" ]]; then
         mkdir -p "$BACKUP_DIR"
         cp "$SETTINGS_FILE" "$BACKUP_DIR/settings.json"
 
-        echo "🧹 Removing SuperClaude plugin from settings.json"
+        echo "🧹 Removing superclaude plugin from settings.json"
         # Use Python to properly manipulate JSON
         python3 - <<'PYEOF' "$SETTINGS_FILE"
 import json
@@ -76,7 +76,7 @@ try:
     with open(settings_file, 'r') as f:
         settings = json.load(f)
 
-    # Remove SuperClaude plugin
+    # Remove superclaude plugin
     if 'enabledPlugins' in settings:
         if 'superclaude@superclaude' in settings['enabledPlugins']:
             del settings['enabledPlugins']['superclaude@superclaude']
@@ -102,7 +102,7 @@ echo ""
 echo "=============================="
 
 if [[ $FOUND_COUNT -eq 0 ]]; then
-    echo "✅ No SuperClaude files found - already clean!"
+    echo "✅ No superclaude files found - already clean!"
     rmdir "$BACKUP_DIR" 2>/dev/null || true
 else
     echo "🎉 Cleanup complete!"
@@ -110,7 +110,7 @@ else
     echo "📦 Backup saved to:"
     echo "   $BACKUP_DIR"
     echo ""
-    echo "Removed $FOUND_COUNT SuperClaude-related item(s)"
+    echo "Removed $FOUND_COUNT superclaude-related item(s)"
 fi
 
 echo ""

@@ -1,6 +1,6 @@
-# SuperClaude Output Styles
+# superclaude Output Styles
 
-Claude Code output styles — Markdown files with YAML frontmatter that replace the tone and format instructions in Claude Code's system prompt for every response. Read natively by Claude Code, not by SuperClaude's own loaders.
+Claude Code output styles — Markdown files with YAML frontmatter that replace the tone and format instructions in Claude Code's system prompt for every response. Read natively by Claude Code, not by superclaude's own loaders.
 
 ## Content Delivery
 

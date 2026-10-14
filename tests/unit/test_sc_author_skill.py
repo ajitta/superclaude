@@ -1,6 +1,6 @@
 """Structure of the shipped /sc-author skill and its references.
 
-The references are written for the projects SuperClaude is installed into,
+The references are written for the projects superclaude is installed into,
 from Anthropic's published guidance (each file's `sources`), not from this
 repository's rules files (docs/features/authoring-skill/05-plan.md D18-D20).
 """

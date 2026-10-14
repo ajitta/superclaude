@@ -24,7 +24,7 @@ DEFAULT_THRESHOLD_DAYS = 90
 ENV_THRESHOLD = "SUPERCLAUDE_MEMORY_STALE_DAYS"
 # Path.home(), not claude_base(): this directory belongs to Claude Code, which
 # always writes auto-memory under ~/.claude/projects/ regardless of the scope
-# SuperClaude was installed into. Only the project anchor below is ours.
+# superclaude was installed into. Only the project anchor below is ours.
 HOME_PROJECTS = Path.home() / ".claude" / "projects"
 VERIFIED_RE = re.compile(r"^verified:\s*(\d{4}-\d{2}-\d{2})\s*$", re.MULTILINE)
 

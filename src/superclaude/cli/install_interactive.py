@@ -104,7 +104,7 @@ def _show_preview(base_path: Path, scope: str, force: bool) -> None:
 
 def run_interactive_install() -> int:
     """Drive the interactive install. Returns process exit code."""
-    click.echo("🪄  SuperClaude interactive installer")
+    click.echo("🪄  superclaude interactive installer")
     click.echo()
 
     scope = _prompt_scope()
@@ -127,7 +127,7 @@ def run_interactive_install() -> int:
     from .install_components import install_all
 
     click.echo()
-    click.echo(f"📦 Installing SuperClaude components (scope: {scope})...")
+    click.echo(f"📦 Installing superclaude components (scope: {scope})...")
     click.echo()
     success, message = install_all(base_path=base_path, force=force, scope=scope)
     click.echo(message)

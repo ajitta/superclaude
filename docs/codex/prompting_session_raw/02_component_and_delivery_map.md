@@ -138,7 +138,7 @@ Evaluation
 
 ### `mcp/`
 
-- 역할: 도구 inventory가 아니라 SuperClaude workflow 안에서 서버를 선택하고
+- 역할: 도구 inventory가 아니라 superclaude workflow 안에서 서버를 선택하고
   조합하는 기준.
 - 전달: `context_loader.py`의 trigger, instruction, composite mapping.
 - 위험: 파일만 있고 mapping이 없는 dead content, CC native 설명 중복, setup/version

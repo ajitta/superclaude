@@ -1,4 +1,4 @@
-# SuperClaude Modes
+# superclaude Modes
 
 Mindset overlays — situational cog frameworks that modify Claude thinking, comms, priorities.
 

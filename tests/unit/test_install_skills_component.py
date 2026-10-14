@@ -1,9 +1,9 @@
-"""The `skills` directory component: SuperClaude's skills in Claude Code's shared
+"""The `skills` directory component: superclaude's skills in Claude Code's shared
 `.claude/skills/`.
 
 That directory also holds the user's own skills and other tools' skills, so
 install, uninstall, git-exclude and drift all touch only the directory names
-SuperClaude ships. Tests that could reach past those names plant a
+superclaude ships. Tests that could reach past those names plant a
 third-party skill next to ours and check it survives.
 """
 

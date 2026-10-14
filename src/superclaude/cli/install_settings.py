@@ -1,5 +1,5 @@
 """
-Settings, Hooks & CLAUDE.md Management for SuperClaude Installation
+Settings, Hooks & CLAUDE.md Management for superclaude Installation
 
 Handles settings.json merge/unmerge, hook identification, and CLAUDE.md import management.
 This is a leaf dependency with no internal imports.
@@ -146,7 +146,7 @@ def _dedup_hook_array(hooks: List[dict]) -> List[dict]:
 
 
 def _split_entry(hook_entry: dict) -> Tuple[List[dict], List[dict]]:
-    """Split one entry's inner hooks into (SuperClaude's, the user's).
+    """Split one entry's inner hooks into (superclaude's, the user's).
 
     An entry whose own `_comment` carries the marker was written whole by this
     installer, so everything inside it is ours.
@@ -162,7 +162,7 @@ def _split_entry(hook_entry: dict) -> Tuple[List[dict], List[dict]]:
 
 
 def _strip_sc_inner_hooks(hook_array: List[dict]) -> Tuple[List[dict], bool]:
-    """Remove SuperClaude inner hooks, keeping entries that still hold user ones.
+    """Remove superclaude inner hooks, keeping entries that still hold user ones.
 
     Entry order is preserved, so a user hook stays where the user put it. An
     entry left with nothing inside is dropped rather than written back empty.
@@ -193,8 +193,8 @@ def _merge_hook_arrays(
 
     Args:
         existing: Existing hooks array from settings.json
-        new_hooks: New SuperClaude hooks to add
-        force: If True, replace existing SuperClaude hooks
+        new_hooks: New superclaude hooks to add
+        force: If True, replace existing superclaude hooks
         stats: When given, ``stats["rewritten"]`` accumulates how many legacy
             commands the non-force merge rewrote to the console form
 
@@ -326,14 +326,14 @@ def merge_hooks_to_settings(
     """
     Merge hooks.json content into settings.json.
 
-    This function merges SuperClaude hooks into the settings.json file,
+    This function merges superclaude hooks into the settings.json file,
     preserving any existing user hooks.
 
     Args:
         base_path: Installation base path (.claude directory)
         hooks_config: Parsed hooks.json content
         scope: Installation scope ("user", "project", or "target")
-        force: Replace existing SuperClaude hooks if True
+        force: Replace existing superclaude hooks if True
 
     Returns:
         Tuple of (success, message)
@@ -366,7 +366,7 @@ def merge_hooks_to_settings(
 
     # `--force` means "replace with what this release ships", and that has to
     # include events this release no longer ships. Walking only the new config's
-    # event types left a SuperClaude hook on a retired event firing forever,
+    # event types left a superclaude hook on a retired event firing forever,
     # calling a script that is not installed any more. User hooks on the same
     # event are kept by the same inner-hook rule as everywhere else.
     if force:
@@ -425,7 +425,7 @@ def uninstall_hooks_from_settings(
     base_path: Path, scope: str = "user"
 ) -> Tuple[bool, str]:
     """
-    Remove SuperClaude hooks from settings.json (or settings.local.json for local scope),
+    Remove superclaude hooks from settings.json (or settings.local.json for local scope),
     preserving user hooks.
 
     Args:
@@ -449,7 +449,7 @@ def uninstall_hooks_from_settings(
     existing_hooks = settings["hooks"]
     cleaned_any = False
 
-    # Remove SuperClaude hooks from each hook type, per inner hook: a user
+    # Remove superclaude hooks from each hook type, per inner hook: a user
     # command sharing an entry with ours has to survive uninstall.
     for hook_type, hook_array in list(existing_hooks.items()):
         if not isinstance(hook_array, list):
@@ -476,7 +476,7 @@ def uninstall_hooks_from_settings(
             settings_file.unlink()
             return (
                 True,
-                f"SuperClaude hooks removed and empty {filename} deleted",
+                f"superclaude hooks removed and empty {filename} deleted",
             )
         except OSError as e:
             return False, f"Failed to delete empty {settings_file}: {e}"
@@ -488,9 +488,9 @@ def uninstall_hooks_from_settings(
         return False, save_msg
 
     if cleaned_any:
-        return True, f"SuperClaude hooks removed from {settings_file}"
+        return True, f"superclaude hooks removed from {settings_file}"
     else:
-        return True, f"No SuperClaude hooks found in {filename}"
+        return True, f"No superclaude hooks found in {filename}"
 
 
 def _claude_md_target(base_path: Path, scope: str) -> Tuple[Path, str]:
@@ -573,7 +573,7 @@ def update_claude_md_import(base_path: Path, scope: str = "user") -> Tuple[bool,
         if import_line not in content:
             if not content.endswith("\n"):
                 content += "\n"
-            content += f"\n# SuperClaude Framework\n{import_line}\n"
+            content += f"\n# superclaude\n{import_line}\n"
 
         claude_md.write_text(content, encoding="utf-8")
         return True, f"{target_label} updated with CLAUDE_SC.md import"
@@ -585,7 +585,7 @@ def update_claude_md_import(base_path: Path, scope: str = "user") -> Tuple[bool,
         )
         content = f"""{header}
 
-# SuperClaude Framework
+# superclaude
 {import_line}
 """
         claude_md.parent.mkdir(parents=True, exist_ok=True)
@@ -614,13 +614,11 @@ def remove_claude_md_import(base_path: Path, scope: str = "user") -> Tuple[bool,
         content = claude_md.read_text(encoding="utf-8")
         original_content = content
 
-        # Remove SuperClaude import lines and related comments (all variants)
-        content = re.sub(
-            r"# SuperClaude Framework\n@\.claude/superclaude/[^\n]+\n?", "", content
-        )
-        content = re.sub(
-            r"# SuperClaude Framework\n@superclaude/[^\n]+\n?", "", content
-        )
+        # Remove superclaude import lines and related comments (all variants).
+        # "# SuperClaude Framework" is the heading older installs wrote.
+        heading = r"# (?:SuperClaude Framework|superclaude)\n"
+        content = re.sub(heading + r"@\.claude/superclaude/[^\n]+\n?", "", content)
+        content = re.sub(heading + r"@superclaude/[^\n]+\n?", "", content)
         content = re.sub(r"@\.claude/superclaude/[^\n]+\n?", "", content)
         content = re.sub(r"@superclaude/[^\n]+\n?", "", content)
         content = re.sub(r"@superclaude\\[^\n]+\n?", "", content)
@@ -630,7 +628,7 @@ def remove_claude_md_import(base_path: Path, scope: str = "user") -> Tuple[bool,
         stripped = content.strip()
 
         if content == original_content:
-            return True, f"No SuperClaude import found in {target_label}"
+            return True, f"No superclaude import found in {target_label}"
 
         # For local/project scope: if CLAUDE.md/CLAUDE.local.md has no user content
         # (empty or only the SC-created header), remove it entirely.
@@ -644,7 +642,7 @@ def remove_claude_md_import(base_path: Path, scope: str = "user") -> Tuple[bool,
             return True, f"{target_label} removed (no user content after SC cleanup)"
 
         claude_md.write_text(stripped + "\n", encoding="utf-8")
-        return True, f"SuperClaude import removed from {target_label}"
+        return True, f"superclaude import removed from {target_label}"
 
     except Exception as e:
         return False, f"Failed to update {target_label}: {e}"

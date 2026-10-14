@@ -4,7 +4,7 @@ paths: ["src/superclaude/mcp/**", ".claude/rules/mcp-authoring.md"]
 
 # MCP Authoring Rules
 
-> **Decision gate:** Make `MCP_*.md` for **SuperClaude workflow guidance** layered on top of MCP server.
+> **Decision gate:** Make `MCP_*.md` for **superclaude workflow guidance** layered on top of MCP server.
 > - MCP doc = **WHEN/HOW to combine** with `/sc:*` commands + other servers (workflow patterns, decision tables)
 > - NOT tool catalog — CC native MCP server description + `ToolSearch` already expose every tool, params, usage hint.
 >

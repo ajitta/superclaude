@@ -203,7 +203,7 @@ def _set_core_import(ws: Path, enabled: bool) -> None:
     )
     lines = [ln for ln in lines if IMPORT_LINE not in ln]
     if enabled:
-        lines += ["", "# SuperClaude Framework", IMPORT_LINE]
+        lines += ["", "# superclaude", IMPORT_LINE]
     text = "\n".join(lines).strip()
     if text:
         claude_md.write_text(text + "\n", encoding="utf-8")

@@ -1,4 +1,4 @@
-"""Shared utility functions for SuperClaude.
+"""Shared utility functions for superclaude.
 
 Runtime paths resolve here and nowhere else. Two classes, opposite lifetimes:
 
@@ -147,7 +147,7 @@ def claude_base() -> Path:
     return Path.home() / ".claude"
 
 
-# Markers identifying a hook registration as SuperClaude's. Hoisted here from
+# Markers identifying a hook registration as superclaude's. Hoisted here from
 # install_settings because scope detection needs the same judgement: which
 # settings file the *installer* wrote is the only signal that separates local
 # from project scope reliably. Every marker is anchored — bare script names like
@@ -188,11 +188,11 @@ def is_legacy_hook_command(command: str) -> bool:
 
 
 def is_superclaude_inner_hook(hook: dict) -> bool:
-    """Whether one inner hook is SuperClaude's, judged on its own command.
+    """Whether one inner hook is superclaude's, judged on its own command.
 
     The unit that matters for ownership. A settings entry carries one matcher
     and a list of inner hooks, so a user's own command can sit beside a
-    SuperClaude one; judging the whole entry deleted the user's command along
+    superclaude one; judging the whole entry deleted the user's command along
     with ours on `--force` and on uninstall.
     """
     cmd = hook.get("command", "")
@@ -206,15 +206,15 @@ def is_superclaude_inner_hook(hook: dict) -> bool:
 
 
 def is_superclaude_hook(hook_entry: dict) -> bool:
-    """Whether a settings hook entry belongs to SuperClaude.
+    """Whether a settings hook entry belongs to superclaude.
 
     Args:
         hook_entry: A hook entry dict with a "hooks" array
 
     Returns:
         True if any hook command runs `superclaude hook`, references a legacy
-        SuperClaude scripts path (template or resolved) or carries an anchored
-        SuperClaude marker, or a `_comment` carries the `[superclaude]` tag
+        superclaude scripts path (template or resolved) or carries an anchored
+        superclaude marker, or a `_comment` carries the `[superclaude]` tag
     """
     comment = hook_entry.get("_comment", "")
     if any(marker in comment for marker in SUPERCLAUDE_HOOK_MARKERS):
@@ -224,7 +224,7 @@ def is_superclaude_hook(hook_entry: dict) -> bool:
 
 
 def _has_superclaude_hooks(settings_file: Path) -> bool:
-    """Whether a settings file carries at least one SuperClaude hook entry."""
+    """Whether a settings file carries at least one superclaude hook entry."""
     try:
         settings = json.loads(settings_file.read_text(encoding="utf-8"))
     except (OSError, UnicodeDecodeError, json.JSONDecodeError):
@@ -251,7 +251,7 @@ def detect_scope(root: Path | None = None) -> str:
     them**, strongest first, because the two earlier orderings each got a real
     case wrong by trusting a weak signal:
 
-    1. A settings file carrying SuperClaude hooks. Only ``install`` writes
+    1. A settings file carrying superclaude hooks. Only ``install`` writes
        these, and only local scope uses ``settings.local.json`` — the one
        signal that cannot be produced by hand.
     2. ``$HOME`` itself. ``~/.claude/CLAUDE.md`` carries the same import line a
@@ -399,7 +399,7 @@ def hook_state_dir() -> Path:
 STATE_MAX_AGE_DAYS = 7
 
 # Filenames the sweep owns. Anything else sharing the directory is left alone —
-# the state dir is SuperClaude's, but deleting by prefix rather than by directory
+# the state dir is superclaude's, but deleting by prefix rather than by directory
 # means a file put there deliberately later is not collected by surprise.
 _PRUNABLE_PREFIXES = (
     "claude_context_",

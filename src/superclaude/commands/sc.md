@@ -1,10 +1,10 @@
 ---
-description: SuperClaude command dispatcher that routes to the other /sc:* commands. On request only — the user's /sc:sc or a workflow step that names it. Not for a request that matches one command — run that command.
+description: superclaude command dispatcher that routes to the other /sc:* commands. On request only — the user's /sc:sc or a workflow step that names it. Not for a request that matches one command — run that command.
 ---
 <component name="sc" type="command">
 
   <role command="/sc:sc">
-    <mission>SuperClaude command dispatcher - main entry for all features</mission>
+    <mission>superclaude command dispatcher - main entry for all features</mission>
   </role>
 
   <syntax>/sc:[command] [args...]</syntax>

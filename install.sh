@@ -1,12 +1,12 @@
 #!/bin/bash
 ################################################################################
-# SuperClaude Framework Installation Script
+# superclaude Installation Script
 ################################################################################
 #
-# This script installs SuperClaude Framework directly from the Git repository.
+# This script installs superclaude directly from the Git repository.
 # It performs the following steps:
 #   1. Checks prerequisites (Python 3.10+, UV package manager)
-#   2. Installs SuperClaude package in editable mode
+#   2. Installs superclaude package in editable mode
 #   3. Installs all components to ~/.claude/:
 #      - commands/sc/   : 30+ slash commands
 #      - agents/        : Agent definitions
@@ -157,7 +157,7 @@ install_uv() {
     print_step "Installing UV package manager..."
 
     if ! confirm "Would you like to install UV now?"; then
-        print_error "UV is required for SuperClaude installation"
+        print_error "UV is required for superclaude installation"
         print_info "You can install UV manually: curl -LsSf https://astral.sh/uv/install.sh | sh"
         exit 1
     fi
@@ -188,30 +188,30 @@ install_uv() {
 ################################################################################
 
 install_package() {
-    print_step "Installing SuperClaude package..."
+    print_step "Installing superclaude package..."
 
     cd "$PROJECT_ROOT"
 
     # Check if pyproject.toml exists
     if [ ! -f "pyproject.toml" ]; then
         print_error "pyproject.toml not found in $PROJECT_ROOT"
-        print_info "Are you running this script from the SuperClaude repository root?"
+        print_info "Are you running this script from the superclaude repository root?"
         exit 1
     fi
 
     # Install in editable mode with dev dependencies
     print_info "Running: uv pip install -e \".[dev]\""
     if uv pip install -e ".[dev]"; then
-        print_success "SuperClaude package installed successfully"
+        print_success "superclaude package installed successfully"
     else
-        print_error "Failed to install SuperClaude package"
+        print_error "Failed to install superclaude package"
         print_info "Try running manually: uv pip install -e \".[dev]\""
         exit 1
     fi
 }
 
 install_commands() {
-    print_step "Installing SuperClaude components..."
+    print_step "Installing superclaude components..."
 
     local target_path
     local effective_scope="$INSTALL_SCOPE"
@@ -304,7 +304,7 @@ verify_installation() {
 
 show_help() {
     cat << EOF
-SuperClaude Framework Installation Script
+superclaude Installation Script
 
 Usage:
     ./install.sh [OPTIONS]
@@ -321,7 +321,7 @@ Options:
     --help             Show this help message
 
 Description:
-    Installs SuperClaude Framework directly from the Git repository.
+    Installs superclaude directly from the Git repository.
     Performs installation in editable/development mode with all features.
 
 Requirements:
@@ -338,7 +338,7 @@ Examples:
     ./install.sh --target ~/projects/myapp --force  # Force install to target
 
 For more information:
-    https://github.com/SuperClaude-Org/SuperClaude_Framework
+    https://github.com/ajitta/superclaude
 EOF
     exit 0
 }
@@ -392,9 +392,9 @@ main() {
 
     # Print header
     clear
-    print_header "🚀 SuperClaude Framework Installation"
+    print_header "🚀 superclaude Installation"
     echo ""
-    print_info "This script will install SuperClaude Framework in development mode"
+    print_info "This script will install superclaude in development mode"
     print_info "Installation location: $PROJECT_ROOT"
     if [ -n "$INSTALL_TARGET" ]; then
         print_info "Target directory: $INSTALL_TARGET/.claude/"
@@ -426,7 +426,7 @@ main() {
     echo ""
 
     # Phase 2: Install package
-    print_header "📦 Phase 2: Installing SuperClaude Package"
+    print_header "📦 Phase 2: Installing superclaude Package"
     install_package
     echo ""
 
@@ -443,7 +443,7 @@ main() {
     # Phase 5: Next steps
     print_header "🎉 Installation Complete!"
     echo ""
-    print_success "SuperClaude Framework is now installed!"
+    print_success "superclaude is now installed!"
     echo ""
     print_info "Next Steps:"
     echo "  1. Run health check:        uv run superclaude doctor"
@@ -477,7 +477,7 @@ main() {
     echo "  • User Guide:   docs/user-guide/"
     echo "  • Commands:     docs/reference/commands-list.md"
     echo ""
-    print_success "Happy coding with SuperClaude! 🚀"
+    print_success "Happy coding with superclaude! 🚀"
     echo ""
 }
 

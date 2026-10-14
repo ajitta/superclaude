@@ -1,4 +1,4 @@
-# SuperClaude MCP Server Documentation
+# superclaude MCP Server Documentation
 
 Tool ref — docs + config for integrated MCP servers.
 
@@ -16,7 +16,7 @@ MCP docs load on-demand via `context_loader.py` through flag/keyword triggers. S
 | Chrome DevTools | `--perf` | `chrome-devtools-mcp` v1.9.0 | Perf traces, Lighthouse (a11y/SEO/best-practices), heap-snapshot memory analysis |
 | Tavily | `--tavily` | `tavily-mcp` v0.2.22 (npm) | Web search, extract, crawl, map, research — optional in-conv MCP; prefer Tavily Agent Skills (below) |
 
-Server **launch flags** (token-saving `--slim`, `--persistent` profiles, `--test-id-attribute`, `--secrets`, timeouts) are upstream package options set in the MCP client config, not SuperClaude behavior — read the package's own README for the current set. The `MCP_*.md` docs deliberately carry none of them (`.claude/rules/mcp-authoring.md` trim rule: no version/install/setup blocks).
+Server **launch flags** (token-saving `--slim`, `--persistent` profiles, `--test-id-attribute`, `--secrets`, timeouts) are upstream package options set in the MCP client config, not superclaude behavior — read the package's own README for the current set. The `MCP_*.md` docs deliberately carry none of them (`.claude/rules/mcp-authoring.md` trim rule: no version/install/setup blocks).
 
 ## Context7 — claude.ai connector
 

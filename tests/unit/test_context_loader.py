@@ -606,14 +606,14 @@ class TestCommandNameResolution:
 
     def test_real_command_stays_silent(self, tmp_path: Path):
         out = run_loader("/sc:analyze this module", self._project(tmp_path), "s1")
-        assert "SuperClaude command:" not in out
+        assert "superclaude command:" not in out
         assert "context-inject" in out, "a real command lost its context"
 
     def test_one_notice_per_prompt(self, tmp_path: Path):
         out = run_loader(
             "/sc:analayze then /sc:analayze again", self._project(tmp_path), "s1"
         )
-        assert out.count("SuperClaude command:") == 1
+        assert out.count("superclaude command:") == 1
 
 
 class TestRetiredFlagNotices:
@@ -632,25 +632,25 @@ class TestRetiredFlagNotices:
 
     def test_retired_think_flag_redirects(self, tmp_path: Path):
         out = run_loader("--think-hard about this", self._project(tmp_path), "s1")
-        assert out.count("SuperClaude flag:") == 1
+        assert out.count("superclaude flag:") == 1
         assert "--think-hard" in out and "effort" in out
 
     def test_retired_seq_flag_redirects(self, tmp_path: Path):
         """--seq outlived Sequential MCP; the notice has to say where it went."""
         out = run_loader("--seq debug this", self._project(tmp_path), "s1")
-        assert out.count("SuperClaude flag:") == 1
+        assert out.count("superclaude flag:") == 1
         assert "--seq" in out and "native reasoning" in out.lower()
 
     def test_typo_of_a_retired_flag_redirects(self, tmp_path: Path):
         """--parellel has no valid flag within edit distance 2, so it stayed silent."""
         out = run_loader("--parellel please", self._project(tmp_path), "s1")
-        assert out.count("SuperClaude flag:") == 1
+        assert out.count("superclaude flag:") == 1
         assert "--delegate" in out or "--concurrency" in out
 
     def test_native_controls_stay_silent(self, tmp_path: Path):
         for prompt in ("--effort high", "--ultrathink about it"):
             out = run_loader(prompt, self._project(tmp_path), "s1")
-            assert "SuperClaude flag:" not in out, f"{prompt} produced a notice"
+            assert "superclaude flag:" not in out, f"{prompt} produced a notice"
 
     def test_valid_flag_typo_still_suggests(self, tmp_path: Path):
         """The existing fuzzy fallback must survive the retired-flag pass."""

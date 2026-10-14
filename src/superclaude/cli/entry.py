@@ -19,7 +19,7 @@ def main() -> int:
     # sys.path. For `~/.local/bin/superclaude` that is a general-purpose user bin
     # shared with uv, pipx and the user's own scripts, so a stray `json.py` or
     # `re.py` there would shadow the stdlib for every hook. The previous form
-    # ran from a directory SuperClaude owned; dropping the entry keeps that.
+    # ran from a directory superclaude owned; dropping the entry keeps that.
     if sys.argv and sys.argv[0] and os.path.isfile(sys.argv[0]):
         script_dir = os.path.dirname(os.path.abspath(sys.argv[0]))
         if sys.path and os.path.abspath(sys.path[0] or os.curdir) == script_dir:

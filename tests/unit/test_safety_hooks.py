@@ -1,4 +1,4 @@
-"""Unit tests for the SuperClaude safety hooks.
+"""Unit tests for the superclaude safety hooks.
 
 Covers the previously-untested safety surface flagged by the 2026-06-05 audit
 (MP-TESTCOV / docs/archive/analysis/superclaude-audit-vs-superpowers-ajitta-2026-06-05.md):

@@ -6,7 +6,7 @@
   <thinking>
   - Self-Examination: Analyze decision logic + reasoning chains
   - Pattern-Detection: Spot recurring cog/behavior patterns
-  - Framework-Compliance: Check vs SuperClaude standards
+  - Framework-Compliance: Check vs superclaude standards
   - Learning-Focus: Extract insights for cont. improvement
   </thinking>
 

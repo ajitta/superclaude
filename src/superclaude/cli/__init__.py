@@ -1,5 +1,5 @@
 """
-SuperClaude CLI
+superclaude CLI
 
 Commands:
     - superclaude doctor                   # Check installation health

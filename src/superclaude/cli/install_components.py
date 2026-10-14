@@ -1,5 +1,5 @@
 """
-Component Installation & Orchestration for SuperClaude
+Component Installation & Orchestration for superclaude
 
 Handles installing individual components, hooks/scripts, CLAUDE_SC.md,
 and the top-level install_all orchestration.
@@ -273,7 +273,7 @@ def install_hooks(
 
     Args:
         base_path: Base installation path
-        force: Replace this scope's SuperClaude hook registrations
+        force: Replace this scope's superclaude hook registrations
         scope: Installation scope ("user", "project", or "local")
 
     Returns:
@@ -392,7 +392,7 @@ def _console_script_warnings() -> List[str]:
 
 
 def _registered_sc_commands(settings_file: Path) -> List[str]:
-    """Commands of every SuperClaude-owned inner hook in a settings file."""
+    """Commands of every superclaude-owned inner hook in a settings file."""
     hooks = _load_settings(settings_file).get("hooks", {})
     if not isinstance(hooks, dict):
         return []
@@ -443,7 +443,7 @@ def install_all(
     base_path: Path, force: bool = False, scope: str = "user"
 ) -> Tuple[bool, str]:
     """
-    Install all SuperClaude components.
+    Install all superclaude components.
 
     Args:
         base_path: Base installation path

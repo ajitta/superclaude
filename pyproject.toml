@@ -9,9 +9,9 @@ description = "AI-enhanced development framework for Claude Code - pytest plugin
 readme = "README.md"
 license = {text = "MIT"}
 authors = [
-    {name = "Kazuki Nakai"},
-    {name = "NomenAK", email = "anton.knoery@gmail.com"},
-    {name = "Mithun Gowda B", email = "mithungowda.b7411@gmail.com"}
+    {name = "ajitta", email = "ajitta@gmail.com"},
+    {name = "chosh1179"},
+    {name = "Claude"}
 ]
 requires-python = ">=3.10"
 keywords = ["claude", "ai", "automation", "framework", "pytest", "plugin", "testing", "development"]

@@ -59,7 +59,7 @@ def usage() -> str:
     names = "\n".join(f"  {name}" for name in sorted(HOOKS))
     return (
         "usage: superclaude hook <name> [args...]\n\n"
-        "Run one SuperClaude hook script. This is what every command in\n"
+        "Run one superclaude hook script. This is what every command in\n"
         "hooks.json / settings.json invokes; stdin, stdout and the exit code\n"
         "are the script's own.\n\n"
         f"hooks:\n{names}\n"

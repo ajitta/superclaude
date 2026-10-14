@@ -1,5 +1,5 @@
 ---
-description: List all /sc commands and what each one does. Use when asked which SuperClaude commands exist. Not for "help me" with a task — help with the task directly.
+description: List all /sc commands and what each one does. Use when asked which superclaude commands exist. Not for "help me" with a task — help with the task directly.
 ---
 
 <component name="help" type="command">
@@ -16,7 +16,7 @@ description: List all /sc commands and what each one does. Use when asked which 
   </flow>
 
   <flags>
-  - --flags: Render the flag list from core/FLAGS.md (always loaded in context) — one line per flag, grouped by modes / MCP / execution / output. Effort levels are Claude Code native, not managed by SuperClaude.
+  - --flags: Render the flag list from core/FLAGS.md (always loaded in context) — one line per flag, grouped by modes / MCP / execution / output. Effort levels are Claude Code native, not managed by superclaude.
   </flags>
 
   <commands>

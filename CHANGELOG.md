@@ -6,6 +6,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Ver
 
 Releases before 4.19.0 are not listed. Their history is the git log; the upstream-era changelog, last entry 4.2.1, is `CHANGELOG.md` at commit `6b0ac5c3^`.
 
+## [Unreleased]
+
+### Changed
+
+- The project is named `superclaude` in CLI output, hook notices and installed content (`superclaude --version` prints `superclaude, version <x>`; the pytest report header reads `superclaude: <x>`). Install writes the CLAUDE.md import under a `# superclaude` heading; uninstall also removes the older `# SuperClaude Framework` heading.
+- Package authors are ajitta, chosh1179 and Claude. `SECURITY.md` sends reports to this repository's GitHub private vulnerability reporting instead of the upstream maintainer's email.
+- Portable `socratic` plugin 1.0.1: the two skill templates spell the name `superclaude`.
+
 ## [4.27.1] - 2026-10-14
 
 ### Changed

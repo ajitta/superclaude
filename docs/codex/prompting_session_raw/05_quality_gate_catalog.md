@@ -1,11 +1,11 @@
 ---
-title: SuperClaude 품질 게이트 카탈로그
+title: superclaude 품질 게이트 카탈로그
 status: working-guide
 last_verified: 2026-08-22
 measured_at: 5b6dc5b
 ---
 
-# SuperClaude 품질 게이트 카탈로그
+# superclaude 품질 게이트 카탈로그
 
 기준선 수치는 이 문서에 두지 않는다. 현재 baseline과 재측정 명령은
 [`08_current_findings_and_backlog.md`](08_current_findings_and_backlog.md)의 `F-006`,

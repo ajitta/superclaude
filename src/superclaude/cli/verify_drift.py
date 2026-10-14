@@ -1,5 +1,5 @@
 """
-Drift Detection for SuperClaude Installation
+Drift Detection for superclaude Installation
 
 Compares source files against installed files to detect drift
 (content mismatches, missing files, extra files).

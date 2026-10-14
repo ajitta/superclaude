@@ -1,12 +1,12 @@
 ---
-title: SuperClaude 개선·검증 가이드
+title: superclaude 개선·검증 가이드
 status: verified-guide
 last_verified: 2026-08-22
 measured_at: 5b6dc5b
 scope: src/superclaude
 ---
 
-# SuperClaude 개선·검증 가이드
+# superclaude 개선·검증 가이드
 
 이 디렉터리는 원문 세션의 프롬프트·에이전트 엔지니어링 원칙을 현재
 `src/superclaude/` 구조에 맞게 변환한 작업용 문서 묶음이다. 목적은

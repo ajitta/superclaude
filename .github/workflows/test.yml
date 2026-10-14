@@ -42,7 +42,7 @@ jobs:
 
       - name: Verify package installation
         run: |
-          python -c "import superclaude; print(f'SuperClaude {superclaude.__version__} installed')"
+          python -c "import superclaude; print(f'superclaude {superclaude.__version__} installed')"
 
       - name: Run tests
         run: |
@@ -91,7 +91,7 @@ jobs:
         # pm_agent fixtures went with b8cd144). Only the plugin prints the
         # header, so it proves the plugin itself loaded.
         run: |
-          pytest --collect-only -q -p no:cacheprovider | grep -q "^SuperClaude: "
+          pytest --collect-only -q -p no:cacheprovider | grep -q "^superclaude: "
 
       - name: Install to user scope
         run: |

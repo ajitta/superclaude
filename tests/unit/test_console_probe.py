@@ -34,7 +34,7 @@ def _fake_run(has_hook: bool, version: str | None):
         if argv[1:] == ["--version"]:
             return SimpleNamespace(
                 returncode=0,
-                stdout=f"SuperClaude, version {version}\n" if version else "",
+                stdout=f"superclaude, version {version}\n" if version else "",
             )
         raise AssertionError(argv)
 

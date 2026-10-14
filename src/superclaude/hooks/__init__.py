@@ -1,4 +1,4 @@
-"""SuperClaude hooks package: mcp_fallback (once-per-session MCP hints).
+"""superclaude hooks package: mcp_fallback (once-per-session MCP hints).
 
 Import the submodule directly. This file runs before any submodule, so it
 deliberately imports and re-exports nothing: context_loader reaches

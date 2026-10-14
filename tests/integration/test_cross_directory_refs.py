@@ -144,7 +144,7 @@ class TestSkillAgentRouting:
     each skill's `agent:` field points to an actual agents/*.md file.
     """
 
-    # Claude Code built-in agent types (no .md file in SuperClaude agents/)
+    # Claude Code built-in agent types (no .md file in superclaude agents/)
     BUILTIN_AGENTS = {"general-purpose"}
 
     def test_skill_agent_field_has_matching_file(self):

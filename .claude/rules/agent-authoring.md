@@ -11,13 +11,13 @@ paths: ["src/superclaude/agents/**", ".claude/rules/agent-authoring.md"]
 
 > **What CC load.** Subagent session hold only markdown body (system prompt) plus min env context — *not* parent CC system prompt, *not* parent skills. Write body self-contained. Subagent no spawn more subagents (only main thread can, via `--agent` + `Agent` in `tools`); design each agent return one summary, no nested delegation.
 
-> **No recreate built-ins.** CC ship `Explore` (read-only codebase search, Haiku), `Plan` (read-only research for plan mode), `general-purpose` (full-tool multi-step), `statusline-setup`, `Claude Code Guide`. New SuperClaude agent must add domain-specific value past these; agent that just "search codebase" or "research before act" duplicate `Explore`/`Plan` and bloat registry.
+> **No recreate built-ins.** CC ship `Explore` (read-only codebase search, Haiku), `Plan` (read-only research for plan mode), `general-purpose` (full-tool multi-step), `statusline-setup`, `Claude Code Guide`. New superclaude agent must add domain-specific value past these; agent that just "search codebase" or "research before act" duplicate `Explore`/`Plan` and bloat registry.
 
 > **Body run two modes.** Same file run as delegated subagent (body = system prompt for isolated session) OR as whole session via `claude --agent <name>` (body replace CC default system prompt). Write body read coherent both modes — no phrasing that assume parent ("when delegated to you", "the calling Claude"); prefer persona statements ("Claude operates as …", "the agent's mission is …").
 
 ## YAML Frontmatter
 
-CC need only `name` + `description`. Rest optional, inherit from parent. SuperClaude also need `memory` + `color` for installer.
+CC need only `name` + `description`. Rest optional, inherit from parent. superclaude also need `memory` + `color` for installer.
 
 ```yaml
 ---
@@ -25,7 +25,7 @@ CC need only `name` + `description`. Rest optional, inherit from parent. SuperCl
 name: agent-name                            # lowercase letters and hyphens; matches filename
 description: Expert X. Use proactively for Y. Use immediately after Z.
 
-# Required by SuperClaude
+# Required by superclaude
 memory: project                             # source value always "project"; installer rewrites to user/local per scope
 color: blue                                 # role-group mapping below
 
@@ -39,7 +39,7 @@ maxTurns: 20                                # positive integer turn cap
 skills: [some-installed-skill]              # full skill body injected at startup; subagent does NOT inherit parent skills
 mcpServers: [playwright]                    # references to configured servers, or inline definitions
 
-# Advanced — rarely set in SuperClaude agents
+# Advanced — rarely set in superclaude agents
 hooks:                                      # PreToolUse / PostToolUse / Stop scoped to this subagent (see CC hooks docs for structure)
 background: false                           # always run as a background task
 isolation: worktree                         # spawn in a temporary git worktree (isolated repo copy)
@@ -86,7 +86,7 @@ Description sentence read verbatim into subagent system prompt header — word s
 | General | `disallowedTools` | `NotebookEdit` | Code edits OK, no notebook edits |
 | Full access | *(omit both)* | — | Implementation agents |
 
-CC permit both `tools` and `disallowedTools` together (deny applied first, then allow resolved against remaining pool — tool listed in both is removed). **SuperClaude convention: pick one form per agent for readability — never mix.**
+CC permit both `tools` and `disallowedTools` together (deny applied first, then allow resolved against remaining pool — tool listed in both is removed). **superclaude convention: pick one form per agent for readability — never mix.**
 
 **Spawn restrictions (orchestrators only).** `tools: Agent(worker, researcher)` allow-list which subagent types can spawn. Take effect only when agent run as main thread (`claude --agent <name>`); no effect inside regular subagent (subagent no spawn subagent). Bare `Agent` allow any; omit `Agent` from `tools` disable spawning entirely.
 
@@ -109,19 +109,19 @@ No add `effort: xhigh` because domain "feels" coding-heavy — session default c
 | Extended | 25-30 | Deep research, complex debugging |
 | Unlimited | *omit* | Orchestrators (project-manager) |
 
-**`skills`** — full skill body inject at startup (~500 tokens each). Subagent **not** inherit skills from parent — list explicit. No preload skills with `disable-model-invocation: true` (CC skip and warn to debug log). SuperClaude's `sc-author` skill sets `disable-model-invocation: true`, so it cannot be preloaded; names refer to skills installed in `~/.claude/skills/` or `.claude/skills/`.
+**`skills`** — full skill body inject at startup (~500 tokens each). Subagent **not** inherit skills from parent — list explicit. No preload skills with `disable-model-invocation: true` (CC skip and warn to debug log). superclaude's `sc-author` skill sets `disable-model-invocation: true`, so it cannot be preloaded; names refer to skills installed in `~/.claude/skills/` or `.claude/skills/`.
 
 **`model`** — omit it: no shipped agent pins a model, and an omitted field follows Claude Code's subagent resolution order. Resolution order and the Fable opt-in paths: `agents/README.md` Model Routing (SSOT).
 
 **`permissionMode`** — most agents inherit (omit). Use `plan` for read-only research agents that no accept edits. `bypassPermissions` write to `.git`, `.claude`, `.vscode` etc. without prompt — never set on source-shipped agent. Parent `bypassPermissions` / `acceptEdits` / `auto` modes take precedence, override subagent setting.
 
-**`color`** — SSOT: `.claude/rules/schemas.yaml` (`agent_colors`). CC accept `red, blue, green, yellow, purple, orange, pink, cyan`. SuperClaude role-group mapping use six of these:
+**`color`** — SSOT: `.claude/rules/schemas.yaml` (`agent_colors`). CC accept `red, blue, green, yellow, purple, orange, pink, cyan`. superclaude role-group mapping use six of these:
 `architecture` → blue | `engineering` → green | `research` → purple | `documentation` → yellow | `management` → orange | `indexing` → cyan
-(`red`, `pink` are valid CC colors but not currently mapped to SuperClaude role group.)
+(`red`, `pink` are valid CC colors but not currently mapped to superclaude role group.)
 
 **`mcpServers`** — inherit from parent by default. Specify only to add server absent from parent or to scope inline definition. To keep MCP server out of main conversation entirely (avoid its tool descriptions consuming parent context), define inline here so it connect only when subagent run.
 
-**`memory`** — need by SuperClaude. Source files always use `memory: project`; installer rewrite at install time:
+**`memory`** — need by superclaude. Source files always use `memory: project`; installer rewrite at install time:
 - `user` install → `memory: user`, files at `~/.claude/agent-memory/<agent>/`
 - `project` install → unchanged, files at `.claude/agent-memory/<agent>/`
 - `local` install → `memory: local`, files at `.claude/agent-memory-local/<agent>/`
@@ -251,7 +251,7 @@ Rules below apply to all components, not restated above. See `.claude/rules/xml-
 3. Pick tool access pattern — one of `tools` or `disallowedTools`, never both.
 4. Set `maxTurns`; omit `effort` unless measured evidence justify it.
 5. Pick `color` by role group; omit `model` (see the `model` field rule above).
-6. `skills:` preloads an installed skill's body. SuperClaude ships none — only name one that is actually installed in the target scope.
+6. `skills:` preloads an installed skill's body. superclaude ships none — only name one that is actually installed in the target scope.
 7. Add `<memory_guide>` (required) and `<gotchas>` (recommended).
 8. Run `uv run pytest tests/unit/test_agent_structure.py -v`.
 9. Update `src/superclaude/agents/README.md` table.

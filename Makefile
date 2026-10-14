@@ -2,7 +2,7 @@
 
 # Installation (local source, editable) - RECOMMENDED
 install:
-	@echo "🔧 Installing SuperClaude Framework (development mode)..."
+	@echo "🔧 Installing superclaude (development mode)..."
 	uv pip install -e ".[dev]"
 	@echo ""
 	@echo "✅ Installation complete!"
@@ -10,7 +10,7 @@ install:
 
 # Deploy CLI only (editable). Content sync is a separate step (see sync-* targets).
 deploy:
-	@echo "🚀 Deploying SuperClaude CLI (editable)..."
+	@echo "🚀 Deploying superclaude CLI (editable)..."
 	uv tool install --force --editable .
 	@echo "✅ CLI deployed. Run 'make sync-user' (or sync-project / sync-local) to sync content."
 
@@ -32,15 +32,15 @@ sync-local:
 # confirmation is preserved (pass `--yes` directly via `uv run superclaude
 # uninstall --yes` if you need non-interactive teardown).
 uninstall-user:
-	@echo "🗑️  Uninstalling SuperClaude from user scope (~/.claude/)..."
+	@echo "🗑️  Uninstalling superclaude from user scope (~/.claude/)..."
 	uv run superclaude uninstall --scope user
 
 uninstall-project:
-	@echo "🗑️  Uninstalling SuperClaude from project scope (./.claude/)..."
+	@echo "🗑️  Uninstalling superclaude from project scope (./.claude/)..."
 	uv run superclaude uninstall --scope project
 
 uninstall-local:
-	@echo "🗑️  Uninstalling SuperClaude from local scope (./.claude/, gitignored)..."
+	@echo "🗑️  Uninstalling superclaude from local scope (./.claude/, gitignored)..."
 	uv run superclaude uninstall --scope local
 
 # Run tests (canary excluded by default — invoke explicitly: pytest -m canary)
@@ -64,7 +64,7 @@ test-plugin:
 
 # Run doctor command
 doctor:
-	@echo "Running SuperClaude health check..."
+	@echo "Running superclaude health check..."
 	@uv run superclaude doctor
 
 # Verify Phase 1 installation
@@ -82,7 +82,7 @@ verify:
 	@uv run python -m pytest --trace-config 2>&1 | grep "registered third-party plugins:" -A2 | grep superclaude | sed 's/^/   /' && echo "   ✅ Plugin loaded" || echo "   ❌ Plugin not loaded"
 	@echo ""
 	@echo "4. Health check:"
-	@uv run superclaude doctor | grep "SuperClaude is healthy" > /dev/null && echo "   ✅ All checks passed" || echo "   ❌ Some checks failed"
+	@uv run superclaude doctor | grep "superclaude is healthy" > /dev/null && echo "   ✅ All checks passed" || echo "   ❌ Some checks failed"
 	@echo ""
 	@echo "======================================"
 	@echo "✅ Phase 1 verification complete"
@@ -152,7 +152,7 @@ release:
 	echo "✅ v$$V released; stable → $$SHA"
 
 help:
-	@echo "SuperClaude Framework - Available commands:"
+	@echo "superclaude - Available commands:"
 	@echo ""
 	@echo "🚀 Quick Start:"
 	@echo "  make install         - Install in development mode (RECOMMENDED)"
@@ -176,11 +176,11 @@ help:
 	@echo "  make uninstall-user    - Uninstall from user scope (~/.claude/)"
 	@echo "  make uninstall-project - Uninstall from project scope (./.claude/)"
 	@echo "  make uninstall-local   - Uninstall from local scope (./.claude/, gitignored)"
-	@echo "  make uninstall-legacy  - Remove old SuperClaude files from ~/.claude"
+	@echo "  make uninstall-legacy  - Remove old superclaude files from ~/.claude"
 	@echo "  make help              - Show this help message"
 
-# Remove legacy SuperClaude files from ~/.claude directory
+# Remove legacy superclaude files from ~/.claude directory
 uninstall-legacy:
-	@echo "🧹 Cleaning up legacy SuperClaude files..."
+	@echo "🧹 Cleaning up legacy superclaude files..."
 	@bash scripts/uninstall_legacy.sh
 	@echo ""
