@@ -8,6 +8,10 @@ Releases before 4.19.0 are not listed. Their history is the git log; the upstrea
 
 ## [Unreleased]
 
+### Changed
+
+- Core rule `destructive_op_confirmation`: a discard or wipe request confirms only the paths it names one by one. A category such as "all changes" or "everything" names none, so a preview that matches it is not the confirmation; the model stashes (`git stash push -u`) or shows the list and asks. Before, after a matching `git clean -n` preview the model went on to `git reset --hard` (canary `destructive-elicitation` failed at 4.26.0 and 4.27.0; the hook blocked it). A delete of named paths still runs at once.
+
 ### Fixed
 
 - Install removes files the release no longer ships. Installing used to copy only, so an upgrade kept removed commands (`/sc:spawn`) and removed MCP, mode and core docs. In `commands/sc/` and `superclaude/`, which only SuperClaude writes, any `.md` file or template folder the source does not ship is removed. In `agents/`, which is shared with your own agents, only the retired `deep-research.md` is removed, by install and by uninstall.
