@@ -21,6 +21,7 @@ from .install_paths import (
     _get_target_dir,
     dir_names,
     find_legacy_skills,
+    find_retired_agents,
     get_base_path,
     md_names,
     shipped_md_names,
@@ -411,6 +412,26 @@ def uninstall_all(
     else:
         messages.append("⏭️  No skills from a pre-removal release found")
         skipped += 1
+
+    # 4a. Agents a later release removed: step 3 removes only shipped names
+    #     (install prunes them too)
+    retired = find_retired_agents(base_path)
+    if retired:
+        if dry_run:
+            messages.append(
+                f"[DRY-RUN] Would remove: {len(retired)} agent(s) a release removed"
+            )
+        else:
+            try:
+                for f in retired:
+                    f.unlink()
+                messages.append(
+                    f"✅ Removed: {len(retired)} agent(s) a release removed"
+                )
+            except OSError as e:
+                messages.append(f"❌ Failed to remove retired agents: {e}")
+                failed += 1
+        removed += 1
 
     # 5. Remove .claude/hooks/hooks.json file
     hooks_json = base_path / "hooks" / "hooks.json"

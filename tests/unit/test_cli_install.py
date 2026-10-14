@@ -738,41 +738,78 @@ class TestLegacySkillsArePrunedOnUpgrade:
         assert "pre-removal" not in message
 
 
-class TestRetiredCommandsArePrunedOnUpgrade:
-    """A command a release removed from commands/sc must not survive an upgrade.
+class TestUnshippedFilesArePrunedOnUpgrade:
+    """A file a release stopped shipping must not survive an upgrade.
 
-    Installing copies files and deletes none, so /sc:prompt — auto-invocable —
-    would keep firing with its pre-skill body beside the sc-prompt skill.
+    Installing copies files, so without a prune an upgrade leaves the old ones:
+    /sc:spawn kept running its pre-removal body, and MCP_Serena.md outlived the
+    Serena removal. In the directories only SuperClaude writes, anything the
+    source no longer ships goes; in the shared agents/ only the names listed in
+    RETIRED_AGENT_FILES do.
     """
 
-    def _seed(self, base_path: Path) -> Path:
-        commands = base_path / "commands" / "sc"
-        commands.mkdir(parents=True, exist_ok=True)
-        for name in ("prompt.md", "workflow.md"):
-            (commands / name).write_text("old body", encoding="utf-8")
-        return commands
+    UNSHIPPED = (
+        "commands/sc/spawn.md",
+        "commands/sc/prompt.md",
+        "commands/sc/workflow.md",
+        "superclaude/core/CORE.md",
+        "superclaude/core/rules/RULES_OLD.md",
+        "superclaude/modes/MODE_UNIFIED.md",
+        "superclaude/mcp/MCP_Serena.md",
+        "superclaude/templates/old-scaffold/x.md",
+        "agents/deep-research.md",
+    )
+    KEPT = (
+        "agents/my-own-agent.md",
+        "commands/sc/notes.txt",
+        "superclaude/scripts/legacy_hook.py",
+    )
 
-    def test_install_removes_them(self, tmp_path):
-        from superclaude.cli.install_components import install_all
+    def _seed(self, base_path: Path, paths) -> None:
+        for rel in paths:
+            f = base_path / rel
+            f.parent.mkdir(parents=True, exist_ok=True)
+            f.write_text("old body", encoding="utf-8")
 
-        commands = self._seed(tmp_path)
+    @pytest.mark.parametrize("force", [True, False])
+    def test_install_removes_them(self, tmp_path, force):
+        self._seed(tmp_path, self.UNSHIPPED)
 
-        success, message = install_all(base_path=tmp_path, force=True, scope="project")
+        success, message = install_all(base_path=tmp_path, force=force, scope="project")
 
         assert success is True
-        assert not (commands / "prompt.md").exists()
-        assert not (commands / "workflow.md").exists()
-        assert (commands / "roadmap.md").exists()
-        assert (commands / "analyze.md").exists()
-        assert "a later release moved" in message
-        assert (tmp_path / "skills" / "sc-prompt" / "SKILL.md").exists()
+        for rel in self.UNSHIPPED:
+            assert not (tmp_path / rel).exists(), f"{rel} survived the upgrade"
+        assert not (tmp_path / "superclaude/templates/old-scaffold").exists()
+        assert (tmp_path / "commands/sc/roadmap.md").exists()
+        assert (tmp_path / "superclaude/core/rules/RULES_DOCS.md").exists()
+        assert (tmp_path / "skills/sc-prompt/SKILL.md").exists()
+        assert "no longer ships" in message
+
+    def test_install_keeps_what_superclaude_does_not_own(self, tmp_path):
+        """Other agents, non-.md files and the legacy hook script copies stay."""
+        self._seed(tmp_path, [*self.UNSHIPPED, *self.KEPT])
+
+        install_all(base_path=tmp_path, force=True, scope="project")
+
+        for rel in self.KEPT:
+            assert (tmp_path / rel).exists(), f"{rel} was not SuperClaude's to remove"
+
+    def test_uninstall_removes_retired_agents(self, tmp_path):
+        """Uninstall removes only shipped agent names; a retired one needs the list."""
+        from superclaude.cli.install_inventory import uninstall_all
+
+        self._seed(tmp_path, ["agents/deep-research.md", "agents/my-own-agent.md"])
+
+        uninstall_all(base_path=tmp_path, dry_run=False)
+
+        assert not (tmp_path / "agents/deep-research.md").exists()
+        assert (tmp_path / "agents/my-own-agent.md").exists()
 
     def test_a_clean_install_says_nothing_about_them(self, tmp_path):
-        from superclaude.cli.install_components import install_all
-
         _success, message = install_all(base_path=tmp_path, force=True, scope="project")
 
-        assert "a later release moved" not in message
+        assert "no longer ships" not in message
 
 
 class TestHookCommandsCarryNoMachineBytes:
