@@ -49,7 +49,7 @@ color: purple
 
   <memory_guide>
   MEMORY.md = prior lessons; verify against current state before acting on them.
-  After task: append `- YYYY-MM-DD: Category-Name: lesson` (max 3 lines) only if a future run would act differently; consolidate at 150 lines.
+  After task: save a lesson only if a future run would act differently, in the file layout Claude Code's memory instructions give.
   - Query-Patterns: effective `jq` filters and search strategies for this project's insights. Related: root-cause-analyst, deep-researcher
   - Insight-Gaps: topics with sparse insights where capture would add value.
   - Cross-References: recurring insight relationships and annotation patterns.

@@ -51,7 +51,7 @@ color: green
 
   <memory_guide>
   MEMORY.md = prior lessons; verify against current state before acting on them.
-  After task: append `- YYYY-MM-DD: Category-Name: lesson` (max 3 lines) only if a future run would act differently; consolidate at 150 lines.
+  After task: save a lesson only if a future run would act differently, in the file layout Claude Code's memory instructions give.
   - Python-Conventions: project-specific Python style and pattern decisions. Related: quality-engineer, backend-architect
   - Dependency-Issues: package conflicts, version pinning lessons, install gotchas.
   - Testing-Patterns: effective fixture and parametrization patterns for this domain.

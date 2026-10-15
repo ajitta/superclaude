@@ -331,6 +331,13 @@ class TestAgentMinimumContent:
             )
 
 
+MEMORY_PROTOCOL = [
+    "MEMORY.md = prior lessons; verify against current state before acting on them.",
+    "After task: save a lesson only if a future run would act differently, "
+    "in the file layout Claude Code's memory instructions give.",
+]
+
+
 class TestAgentMemoryGuide:
     """Validate <memory_guide> section in every agent file."""
 
@@ -358,12 +365,21 @@ class TestAgentMemoryGuide:
         """
         stem, content, _ = agent
         mg = extract_xml_content(content, "memory_guide") or ""
-        assert "YYYY-MM-DD" in mg, (
-            f"{stem}: memory_guide missing write-protocol entry-format line"
+        lines = [line.strip() for line in mg.strip().splitlines()]
+        assert lines[:2] == MEMORY_PROTOCOL, (
+            f"{stem}: memory_guide must open with the verbatim protocol header "
+            f"from .claude/rules/agent-authoring.md, got {lines[:2]}"
         )
-        assert "150 lines" in mg, (
-            f"{stem}: memory_guide missing consolidation threshold line"
-        )
+
+    def test_memory_guide_leaves_layout_to_claude_code(self, agent):
+        """Claude Code's memory instructions own the file layout (MEMORY.md as
+        index). A superclaude entry format contradicted them and lost."""
+        stem, content, _ = agent
+        mg = extract_xml_content(content, "memory_guide") or ""
+        for stale in ("YYYY-MM-DD", "consolidate at"):
+            assert stale not in mg, (
+                f"{stem}: memory_guide restates a file layout ('{stale}')"
+            )
 
     def test_memory_guide_has_refs(self, agent):
         """memory_guide must reference at least one related agent inline as 'Related: agent-1, ...'
