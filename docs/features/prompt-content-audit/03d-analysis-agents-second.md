@@ -21,7 +21,7 @@
 | 심각도 | path:line | 근거 인용 | 왜 문제인가 | 제안 | 상태 |
 |---|---|---|---|---|---|
 | High | security-engineer.md:71-72 | "superclaude = markdown content framework, not web app — skip web-vuln scans" | 조건이 없어서 사용자의 웹앱에서도 OWASP/웹 취약점 스캔을 건너뛴다. :49 체크리스트 "OWASP Top 10 reviewed"와 정면으로 충돌한다 | 삭제하거나 "when the target repo is superclaude itself"로 조건 부여 (project-initializer:89처럼) | 재확인, **P0 적용** |
-| High | (전반부) backend-architect.md:67-68, frontend-architect.md:71-72 | "SC CLI use Click…", "no-frontend-on-sc" | 같은 누수 패턴이다. 사용자 프로젝트에서는 무의미한 토큰이고 잘못 일반화될 위험이 있다 | 조건 부여 또는 저장소 로컬 규칙으로 이동 | **P0 적용** |
+| Med | (전반부) backend-architect.md:67-68, frontend-architect.md:71-72 | "SC CLI use Click…", "no-frontend-on-sc" | 같은 누수 패턴이다. 사용자 프로젝트에서는 무의미한 토큰이고 잘못 일반화될 위험이 있다 | 조건 부여 또는 저장소 로컬 규칙으로 이동 | **P0 적용** |
 | High | self-review.md:6 vs :44, :65, :70 | `tools: Read, Grep, Glob, Agent` / "'42/42 pass' requires running tests" | Bash가 없어 테스트를 실행할 수 없다. 모델은 UNVERIFIED를 남발하거나 부모가 전한 주장을 증거로 받아들인다 | 테스트 실행은 verifier 담당으로 명시하거나 읽기 전용 Bash 허용 | 재확인, **P0 적용** (출력이 손에 없으면 UNVERIFIED라고 명시) |
 | High → Low | simplicity-guide.md:6, :55, :86, :91 | "docs check delegated via Agent" | 서브에이전트는 하위 서브에이전트를 띄울 수 없고 WebSearch/WebFetch도 없다 | tools에 Web 계열 추가, 또는 "서브에이전트 모드에서는 unverified로 보고"를 기본으로 | **재평가로 강등**: `--agent` 모드의 정식 패턴이고 :55에 "else reports it unverified"가 이미 있다 (03-analysis §3) |
 | High | socratic-mentor.md:22-27, requirements-analyst.md:24 | "Lead with observation questions…", "Drive structured discovery questions" | 서브에이전트는 요약 하나만 반환한다. 다회차 문답이 불가능해 답을 지어내거나(:42 "assume unstated reqs" 금지 위반) 질문 목록만 반환한다 | description에 "invoke via `claude --agent` / main thread"(project-manager 방식)를 넣거나 "질문 목록 반환 후 종료"를 명시 | P1 |
@@ -31,10 +31,10 @@
 | Med | quality-engineer.md:38, security-engineer.md:38, self-review.md:37 | "never pre-filters under guidance like 'focus on real issues'" | 사용자가 "critical만"이라고 명시해도 무시하는 것으로 읽힌다. 직접 호출하면 걸러 줄 후속 단계가 없어 사소한 지적까지 목록으로 쏟아진다 | "사용자가 범위를 명시하면 따르고 제외한 건수만 보고" 예외 추가 | P1 |
 | Med | refactoring-expert.md:23, :48 | "Grab baseline complexity metric", "Post-change metric better than baseline" | 측정 도구가 지정되지 않았는데 개선을 요구한다. 모델이 cyclomatic 수치를 지어낼 위험이 크다 | 도구(radon/lizard 등) 실행 출력만 인정, 없으면 "estimated" 표기 | P1 |
 | Med | refactoring-expert.md:40 vs :77 | "3+ files" vs "3+ modules" | Ask First 기준이 다르다 | 하나로 통일 | P1 |
-| Med | 공통: Ask First / "ask user" (12개 전부) | "Ask First: modify CI/CD…", "ask user when…" | 서브에이전트는 실행 중에 물을 수 없다. 멈출지, 진행할지, 무엇을 반환할지 정의되어 있지 않다 | 공통 한 줄: "Ask First에 해당하면 제안 행동과 질문을 최종 보고에 담고 중단" | P1 |
+| High | 공통: Ask First / "ask user" (12개 전부) | "Ask First: modify CI/CD…", "ask user when…" | 서브에이전트는 실행 중에 물을 수 없다. 멈출지, 진행할지, 무엇을 반환할지 정의되어 있지 않다 | 공통 한 줄: "Ask First에 해당하면 제안 행동과 질문을 최종 보고에 담고 중단" | P1 |
 | Med | 전보체: technical-writer.md:3, :10-11 / socratic-mentor.md:3 / security-engineer.md:3 / root-cause-analyst.md:3 / simplicity-guide.md:12 | "Technical writer make clear, full docs", "Claude no simplify what no understand" | 뜻은 대체로 복원되지만, 사용자용 문서나 PRD, 학습 대화가 깨진 문장으로 나올 위험이 있다. verifier, system-architect와 문체가 다르다 | 사용자 대면 출력을 내는 agent부터 정상 문법으로 | P2 |
 | Low | technical-writer.md:68 | "core/rules/RULES_DOCS.md" | 사용자 프로젝트의 서브에이전트에서는 경로가 해석되지 않는다(규칙 내용이 인라인되어 있어 피해는 작다) | 경로 참조 삭제 | P2 |
-| Low | [R06]·[R15] 등 22곳 이상, socratic-mentor.md:39 [R17] | "[R06 Scope]" | 서브에이전트에서 해석되지 않는 태그다. 대부분 문장 자체가 뜻을 담아 무해한 잡음이다 | 유지하거나 제거로 토큰 절약 | P1 (03-analysis P-5) |
+| Med | [R06]·[R15] 등 22곳 이상, socratic-mentor.md:39 [R17] | "[R06 Scope]" | 서브에이전트에서 해석되지 않는 태그다. 대부분 문장 자체가 뜻을 담아 무해한 잡음이다 | 유지하거나 제거로 토큰 절약 | P1 (03-analysis P-5) |
 | Low | verifier.md:3, :64-66 | 4문장 description / "foo-ajitta-2026-10-07.md", "intent-command" | description이 길지만 부정 조건 덕분에 라우팅 품질은 높다. 예시는 저장소 고유 이름이다 | 예시를 `<slug>` 등으로 일반화 | P1 |
 
 ## 라우팅 충돌

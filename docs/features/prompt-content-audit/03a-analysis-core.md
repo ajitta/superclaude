@@ -10,7 +10,7 @@
 ## 요약
 
 - `CLAUDE_SC.md`가 import하는 것은 FLAGS·PRINCIPLES·RULES 3개다. 약 10.5KB, 대략 2.7k 토큰으로 추정한다.
-- **가장 큰 위험: 항상 로드되는 텍스트가 on-demand 내용을 전제한다.** R-ID, 모드 동작, 검증 단계표가 여기에 해당한다. `context_loader.py:166-182`의 트리거는 `/sc:` 명령과 플래그에만 반응한다. 그래서 평범한 자연어 세션에서는 이 참조들이 빈 상태가 된다.
+- **가장 큰 위험: 항상 로드되는 텍스트가 on-demand 내용을 전제한다.** R-ID, 모드 동작, 검증 단계표가 여기에 해당한다. `context_loader.py:166-182`의 트리거는 대부분 `/sc:` 명령과 플래그 중심이다(자연어 트리거는 :173 `sub.?agent|worktree`, :178 plan/spec 작성 등 일부). 특히 R12가 정의된 RULES_QUALITY는 명령·플래그로만 주입된다. 그래서 평범한 자연어 세션에서는 이 참조들이 빈 상태가 된다.
 - **그다음 위험:**
   - "언제 질문하나"가 PRINCIPLES와 R12 사이에서 서로 반대다.
   - 모델이 측정할 수 없는 수치 조건(ctx %, risk 0.7)이 있다.
@@ -26,11 +26,11 @@
 | Med-High | RULES.md:16 | "describes a problem… the deliverable is the assessment: report findings and stop" | Claude Code에서 "CI 테스트가 깨져" 같은 문제 서술은 흔히 수정 요청이다. 모델이 문자 그대로 따라 멈출 수 있다 | "요청 형태가 불명확할 때"로 한정하고 이유 추가 | **재평가 후 보류** (03-analysis §3) |
 | Med | FLAGS.md:13 ↔ 40 | "ctx >75%" vs "Manual/proactive trigger >=60% ctx" | 같은 Token_Efficiency인데 기준치가 다르다 | 하나로 통일 | P1 |
 | Med | FLAGS.md:33-34 | "risk >0.7, usage >75%" | 모델은 risk 점수를 계산할 수 없다. "usage"가 컨텍스트인지 쿼터인지도 불명확하다 | 관찰 가능한 조건(prod 대상, 파괴적 명령 등)으로 교체 | P1 |
-| Med | FLAGS.md:18, 29, 35, 40 | "Connector-provided (not a `superclaude mcp` server)… so no MCP doc ships", "loader no clamp", "INSTRUCTION_MAP", "ultracode" | 유지보수자용 메모와 미정의 용어(ultracode는 commands/task.md에만 있음)가 매 세션 토큰을 쓰지만 모델 행동에는 쓸모가 없다 | 제거하거나 README로 이동 (상시 비용 약 15~20% 절감 추정) | P1 |
+| Med | FLAGS.md:18, 29, 35, 40 | "Connector-provided (not a `superclaude mcp` server)… so no MCP doc ships", "loader no clamp", "INSTRUCTION_MAP", "ultracode" | 유지보수자용 메모와 미정의 용어(ultracode는 commands/task.md에만 정의되어 있고, MODE_Token_Efficiency.md:23에 정의 없이 등장)가 매 세션 토큰을 쓰지만 모델 행동에는 쓸모가 없다 | 제거하거나 README로 이동 (상시 비용 약 15~20% 절감 추정) | P1 |
 | Med | RULES_QUALITY.md:9,10,13,18 ↔ RULES.md:7 | R02/R03/R13/R18 "🔴" | 범례상 🔴는 "Security, data safety — always protect"다. 보안이 아닌 규칙이 "항상" 등급이 되어 R02 상태 확인과 R03 환경 점검이 사소한 수정에까지 과적용된다 | 등급 의미를 분리하거나 🟡로 조정 | P2 |
 | Med | RULES.md:21 ↔ RULES_QUALITY.md:85 | "Never claim work complete without running… (tests, build…)" | 평범한 세션에서는 검증 단계표의 Level 0(문서 변경은 정적 검사만)이 보이지 않는다. 그래서 오타 수정에도 테스트를 돌린다 | 커널에 "docs-only = inspection" 한 구절 추가 | P1 |
 | Med | RULES.md:9 | "include the user request verbatim… leaves out the rationale… that come with the artifact rather than in it" | "verbatim"과 "제외"가 충돌하는 것처럼 읽히고 구문 파싱도 어렵다. 둘을 화해시키는 규칙(마커 치환)은 on-demand에만 있다 | "verbatim, 단 리뷰 위임 시 판정부는 마커로 치환"으로 명시. 위치도 priority_system 밖으로 이동 | P1 |
-| Med | RULES.md:34 | "installed under .claude/superclaude/core/rules/" | user 범위로 설치하면 경로가 `~/.claude/...`다(install_components.py:236). 모델이 프로젝트 상대경로로 Read하다 실패한다 | 두 경로를 모두 명시. 핵심 지시가 `note` 속성 안에 있으므로 본문으로 승격 | P1 |
+| Med | RULES.md:34 | "installed under .claude/superclaude/core/rules/" | user 범위로 설치하면 경로가 `~/.claude/superclaude/...`다(`context_loader.py:84-85`). 모델이 프로젝트 상대경로로 Read하다 실패한다 | 두 경로를 모두 명시. 핵심 지시가 `note` 속성 안에 있으므로 본문으로 승격 | P1 |
 | Med | RULES_DOCS.md:27, 67, 74; RULES_DELEGATION.md:15, 25 | "Legacy pre-cutoff (2026-05-18)", "…-ajitta-2026-03-20.md", "caught 3 critical reversals", "reviewing the project's own framework/config" | 이 저장소의 이력과 사용자명이 다른 사용자 프로젝트로 배포된다. 날짜 cutoff는 다른 프로젝트에서 의미가 없다 | 일반화하거나 삭제 | P1 |
 | Low-Med | RULES_QUALITY.md:12 | "ask reserved for four trigger classes" | 본문에는 3개(혹은 5개)만 나열되어 개수가 맞지 않는다 | 개수를 고치거나 목록화 | P2 |
 | Low-Med | RULES_QUALITY.md:32 ↔ 13 | Intent Verification 예시가 "…Correct?"로 끝남 | 규칙은 "해석을 밝히고 진행"인데 예시는 질문으로 끝나서, 예시를 따라 과하게 확인한다 | 예시를 "state + proceed"로 바꾸거나, auth는 보안이므로 묻는다는 이유를 명시 | P2 |

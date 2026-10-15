@@ -14,10 +14,10 @@
 | 6 | `agents/project-initializer.md` 예시 | "onboard me" 예시를 "메뉴에 온보딩 프리셋을 미리 선택해 제시하고, 사용자 확인 후 실행"으로 바꿨다 | 03c High: 예시가 `<never>auto-execute without menu`를 위반했다 |
 | 7 | `modes/MODE_Business_Panel.md` 예시 | 두 예시를 Synthesis-First 순서와 라우팅 표(Market entry = Porter + Kim, Debate; Communication = Doumont + Godin, Socratic)에 맞게 재작성했다 | 03b High ×2 |
 | 8 | `modes/MODE_Verbalized_Sampling.md` `<output_format>` | `p=`/`confidence`와 라벨을 각 후보 본문 **뒤**의 닫는 줄로 옮겼다. 이유도 적었다: 먼저 쓴 확률이나 라벨이 본문을 그쪽으로 끌어간다 | 03b High: :21 "only AFTER the text exists"와 포맷이 모순됐다 |
-| 9 | `skills/sc-author/references/quality.md` 예시 | Opus 5만 기본으로 검증한다고 한정했다. Opus 5.5는 "guide에 기본값 없음 → 실제 실행으로 판단", Sonnet 5.5는 구체적 검사로 교체 | 03f High: 같은 파일 :116 표와 모순됐다 |
+| 9 | `skills/sc-author/references/quality.md` 예시 | Opus 5만 기본으로 검증한다고 한정하고, Opus 5.5에 "guide에 기본값 없음 → 실제 실행으로 판단"을 추가했다. Sonnet 5.5 판정(구체적 검사로 교체)은 기존 문구를 유지했다 | 03f High: 같은 파일 :116 표와 모순됐다 |
 | 10 | `core/PRINCIPLES.md:11` | Assumption-Surfacing에 R12의 가역성 분기를 넣었다: 가역적이면 해석을 밝히고 진행, 비가역·>3 files/services·보안/데이터/파괴적 작업이면 먼저 질문 | 03a High: 항상 로드되는 텍스트가 on-demand R12와 반대 기준을 제시했다 |
 
-차이는 10 files, +16/−16이다. 추가된 문장은 조건절이나 사실 정정뿐이고 새 규칙은 없다.
+차이는 10 files, +16/−16이다. 추가된 문장은 조건절과 사실 정정이 대부분이다. 예외로 PRINCIPLES:11은 on-demand R12의 ask-first 기준(>3 files/services, 보안·데이터·파괴적 작업)을 항상 로드되는 커널로 복제했다. 커널 입장에서는 새 규칙이다.
 
 ## 보류한 항목
 
@@ -41,3 +41,4 @@
 - **canary 미실행:** core(`PRINCIPLES.md`)가 바뀌었으므로 `make release` 전에 `make canary-gates`를 돌리고 보고서를 확인해야 한다.
 - **행동 변화 미측정:** 이번 수정은 정적 감사에 근거했다. 저장소의 `content-quality.md` Improvement Workflow는 관찰된 실패를 우선한다. 그래서 P0 범위를 "규칙과 직접 모순되는 예시·서술의 정정"과 "배포 누수의 조건화"로 한정했다. 행동 변화는 측정하지 않았다.
 - **P1·P2:** 03-analysis §4에 남아 있다.
+- **리뷰 반영:** 이 표에서 9행(quality.md)을 제외한 모든 행의 문구를 독립 리뷰 후 다시 고쳤다. 관찰 가능한 조건으로 바꾸고, Business_Panel은 Synthesis를 마지막에 두는 쪽으로 정리했다. 상세는 [09-review.md](./09-review.md).

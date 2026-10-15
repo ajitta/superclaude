@@ -8,7 +8,7 @@
 |---|---|
 | 대문자 강조어(NEVER/MUST/ALWAYS/CRITICAL/IMPORTANT) | agents 0, modes 0, mcp 0, core 1, skills 6 |
 | 화살표·이모지 기호 | core 158, agents 74, mcp 66, modes 45, skills 4 |
-| agents에 쓰인 R-ID 태그 | 22개 파일, 약 60회. 가장 많은 것은 `[R06 Scope]` 25회, `[R15 Verification]` 10회, `[R18 Necessity Test]` 9회, `[R02 Status Check]` 9회 |
+| agents에 쓰인 R-ID 태그 | 22개 파일, 44회. `[R06 Scope]` 22회, `[R02 Status Check]` 7회, `[R15 Verification]` 5회, `[R18 Necessity Test]` 5회 (`grep -ohE '\[R[0-9]{2}[^]]*\]' agents/*.md \| sort \| uniq -c`) |
 | `<handoff next="/sc:…">`가 있는 agent | 24/24. 참조하는 명령은 모두 `commands/`에 실재 |
 | description에 "Use proactively/immediately"가 있는 agent | 21/24 |
 | 구세대 관용구 ("You are an expert", "think step by step", "ultrathink") | 0회. sc-prompt가 이를 제거 대상으로 설명하는 문장만 있음 |
@@ -23,7 +23,7 @@
   - `backend-architect.md:67-68` ("SC CLI use Click…")
   - `frontend-architect.md:71-72`
   - `RULES_DOCS.md`의 "Legacy pre-cutoff (2026-05-18)"와 `-ajitta-` 파일명 예시
-  - `RULES_DELEGATION.md:15,25`의 저장소 이력 ("caught 3 critical reversals")
+  - `RULES_DOCS.md:74`의 저장소 이력 ("caught 3 critical reversals")와 `RULES_DELEGATION.md:15,25`의 자기 저장소 전제 ("reviewing the project's own framework/config")
   - `verifier.md:64-66`의 예시 파일명
 - 비교: `project-initializer.md:89-90`은 이미 "when the target repo is superclaude itself" 조건을 붙여 두었다. 이 형태가 모범이다.
 - 처리: agent 3개는 P0에서 조건을 붙였다. RULES_DOCS/RULES_DELEGATION은 P1.
@@ -48,13 +48,13 @@
   - P0에서 고쳤다. 테스트 출력이 손에 있어야 하고, 이 agent는 테스트를 실행할 수 없으므로 출력이 없으면 UNVERIFIED다.
 - **재평가로 판정을 바꾼 항목: `simplicity-guide.md`의 Agent 위임.**
   - 서브에이전트 감사는 "서브에이전트는 Agent를 쓸 수 없어 경로가 막힌다"(High)고 판정했다.
-  - 그러나 `.claude/rules/agent-authoring.md`의 Tool access 표는 `Read, Grep, Glob, Agent`를 정식 패턴으로 둔다. `--agent` 메인 스레드 모드에서는 Agent가 동작한다.
+  - 그러나 `.claude/rules/agent-authoring.md`의 Spawn restrictions 절은 `tools`의 `Agent`가 `claude --agent` 메인 스레드 모드에서만 효력이 있다고 적는다(같은 파일 :12 "Subagent no spawn more subagents"). 즉 Agent는 그 모드를 위한 것이고, 서브에이전트에서 못 쓰는 것은 설계상 전제다. 다만 같은 표의 문서 확인용 권장 패턴은 "Read-only + web"(WebSearch/WebFetch 포함)이라, simplicity-guide가 Web 도구 없이 문서 확인을 요구하는 점은 남는다.
   - 본문 :55도 이미 "else reports it unverified"로 서브에이전트 모드의 대체 경로를 적고 있다.
   - 그래서 Low로 낮추고 수정하지 않았다.
 
 ### P-4. 예시가 규칙과 반대 — High
 
-현행 모델은 규칙 문장보다 예시와 출력 템플릿을 우선 모방한다. 아래 네 곳 모두 원문에서 재확인했고 P0에서 고쳤다.
+현행 모델은 규칙 문장보다 예시와 출력 템플릿을 우선 모방하는 경향이 있다(감사자 판단이며 이번 작업에서 측정하지 않음). 아래 네 곳 모두 원문에서 재확인했고 P0에서 고쳤다.
 
 | 위치 | 규칙 | 충돌하는 예시·템플릿 |
 |---|---|---|
@@ -77,13 +77,13 @@
 
 ### P-6. "Use proactively" 남발과 라우팅 충돌 — Med-High (P1)
 
-- 24개 중 21개 agent의 description에 있다. 현행 모델은 이 문구를 문자 그대로 따르고, 모든 agent에 있으니 우선순위 신호로 작동하지 않는다.
+- 24개 중 21개 agent의 description에 있다. 현행 모델은 이 문구를 문자 그대로 따를 가능성이 높고(측정하지 않은 추정), 모든 agent에 있으니 우선순위 신호로 작동하지 않는다.
 - 겹치는 지점:
   - **구현 직후:** quality-engineer, refactoring-expert, security-engineer, project-manager가 동시에 호출된다.
   - **auth 작업:** security, system-architect, quality, simplicity, self-review, backend 6개가 겹친다.
   - **세션 시작:** repo-index, project-initializer, 내장 Explore가 겹친다.
 - 모범 사례: verifier의 "Not for…" 부정 조건이 라우팅 품질을 높인다. 다른 agent description의 템플릿으로 쓸 만하다.
-- 저장소 규칙과의 충돌: 저장소의 `agent-authoring.md`는 "Use proactively for…"를 표준 트리거 문형으로 가르친다. 이 제안은 그 규칙의 개정을 뜻한다. 규칙과 `tests/unit/test_agent_structure.py::TestAgentDescriptionInterface`(트리거 문형 존재 검사)를 함께 바꿔야 한다.
+- 저장소 규칙과의 충돌: 저장소의 `agent-authoring.md`는 "Use proactively for…"를 표준 트리거 문형으로 가르친다. 이 제안은 그 규칙의 개정을 뜻한다. 규칙 문서를 함께 개정해야 한다. 테스트 `tests/unit/test_agent_structure.py::TestAgentDescriptionInterface`의 정규식(`\bUse (proactiv\w*|immediat\w*|when|for|after)\b`, :68)은 "Use when"도 허용하므로 바꿀 필요가 없다.
 
 ### P-7. 모델이 측정할 수 없는 조건 — Med (P1)
 
@@ -116,7 +116,7 @@
 | 원 판정 | 항목 | 보류 사유 |
 |---|---|---|
 | Med-High (core) | `RULES.md:16` "describes a problem… the deliverable is the assessment: report findings and stop"이 "CI 깨졌어" 같은 수정 요청을 막는다 | 원문이 이미 "rather than requesting a change"로 한정한다. canary `problem-statement-not-request`(`evals/tasks.yaml`)가 이 행동을 보호한다. 관찰된 실패가 없다. 저장소의 `content-quality.md` Improvement Workflow는 "Observe a real failure — never improve speculatively"를 요구한다 |
-| High (agents 후반) | simplicity-guide의 Agent 위임 불가 | P-3 참조. `--agent` 모드의 정식 패턴이고, 서브에이전트용 대체 경로가 이미 적혀 있다 |
+| High (agents 후반) | simplicity-guide의 Agent 위임 불가 | P-3 참조. `tools`의 Agent는 `--agent` 메인 스레드 모드용이고, 서브에이전트용 대체 경로("else reports it unverified")가 이미 적혀 있다. Web 도구 부재는 P1로 남김 |
 | High (agents 전반) | git-workflow에 `disallowedTools` 복구 | `672055ce`에서 의도적으로 제거됐다. memory가 켜진 agent에서 Write/Edit를 deny하면 MEMORY.md 쓰기와 충돌할 수 있는지 확인되지 않았다. 본문만 사실대로 고쳤다 |
 
 ## 4. 제안
@@ -132,16 +132,19 @@
 
 5. 24개 agent 공통으로 서브에이전트 실행 규칙 한 줄을 넣는다(P-2).
 6. "Use proactively"는 2~3개만 남기고, 나머지는 "Use when the user asks…" + "Not for…" 형태로 바꾼다. `agent-authoring.md`와 description 테스트를 함께 개정한다(P-6).
-7. agent 본문의 R-ID 태그를 지우거나 한 줄 근거 문장으로 바꾼다. initializer의 R06 오기부터 처리한다(P-5).
+7. agent 본문의 R-ID 태그(Med)를 지우거나 한 줄 근거 문장으로 바꾼다. initializer의 R06 오기부터 처리한다. 항상 로드되는 PRINCIPLES·RULES 커널의 R-ID(03a, High)도 같은 방식으로 처리한다(P-5).
 8. FLAGS의 측정 불가 조건을 관찰 가능한 조건(prod 대상, 파괴적 명령 등)으로 바꾸고, ctx 기준치를 하나로 통일한다(P-7).
 9. FLAGS의 모드 항목에 "사용자가 입력하는 플래그"임을 명시하거나, 자동 감지 시 해당 MODE 파일을 Read하도록 지시한다. `RULES.md:34`에 user 범위 설치 경로를 추가한다(P-5).
-10. RULES_DOCS/RULES_DELEGATION의 저장소 이력과 사용자명을 일반화한다(P-1).
-11. 영역별 Med 항목(03a–03f)을 처리한다. 대표 항목:
+10. RULES_DOCS/RULES_DELEGATION의 저장소 이력과 사용자명, verifier 예시의 저장소 고유 파일명을 일반화한다(P-1).
+11. High이지만 아직 미처리인 영역별 항목:
+    - sc-prompt mirror가 금지된 이전 모델 섹션 이월을 수행함(03e)
+    - sc-prompt Fable 블록이 원문 없이 의역만 있어 문안을 지어내게 함(03e)
+    - sc-author checker를 승인 전 새 파일에 실행할 수 없음(03f)
+    - VS 템플릿을 출력할지, 스스로 따를지, 하위 호출에 보낼지 모호함(03b)
+12. 영역별 Med 항목(03a–03f)을 처리한다. 대표 항목:
     - repo-index 7일 재사용 규칙 vs "always regen" 모순
     - technical-writer description vs 본문 모순
     - Tavily never/prefer 모순
-    - sc-prompt mirror의 이월 규칙 위반
-    - sc-author checker를 새 파일에 실행할 수 없음
 
 ### P2 — 품질
 

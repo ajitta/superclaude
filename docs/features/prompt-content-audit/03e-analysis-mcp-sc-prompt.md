@@ -30,7 +30,7 @@
 | Med | MCP_Tavily.md:8 ↔ :38 | "never>single-page extract (use native `WebFetch`)" ↔ "Prefer … `tavily-extract`" | 같은 문서가 단일 페이지 추출을 금지하면서 동시에 권장한다 | never를 "MCP 경로에서만"으로 한정 | P1 |
 | Med | MCP_Tavily.md:3, 12 ↔ :38 | mission = MCP, "Prefer the Tavily Agent Skills … the primary integration" | 최우선 권고가 `<fallback>` 슬롯에 있다. 모델은 `<choose>`를 먼저 읽고 MCP를 고른다 | skills 우선 권고를 `<choose>`로 이동 | P1 |
 | Med | MCP_Tavily.md:12 | "install per `mcp/README.md`" | README는 설치 대상에서 제외된다(`install_components.py:142`). 사용자 프로젝트에서는 존재하지 않는 참조다 | 설치 명령을 인라인으로 쓰거나 URL로 | P1 |
-| Med | MCP_Playwright.md:50-53 ↔ :13-17, install_mcp.py:54 | `browser_route`, `browser_network_state_set`, `browser_cookie_set` | 이 도구들은 opt-in caps에 속하는데 superclaude는 `--caps` 없이 설치한다. 예시 4개 중 3개가 기본 환경에 없는 도구를 쓰고, 모델은 그것을 모방한다 | 해당 행에 `(--caps=network/storage)` 표기 | P1 |
+| Med | MCP_Playwright.md:50-53 ↔ :13-17, install_mcp.py:54 | `browser_route`, `browser_network_state_set`, `browser_cookie_set` | 이 도구들은 opt-in caps에 속하는데 superclaude는 `--caps` 없이 설치한다. 예시 6개(:48-53) 중 3개가 caps 표기 없이 기본 환경에 없는 도구를 쓰고(1개는 `(--caps=testing)` 표기가 있음), 모델은 그것을 모방한다 | 해당 행에 `(--caps=network/storage)` 표기 | P1 |
 | Med | MCP_Chrome-DevTools.md:7 ↔ :8, MCP_Playwright.md:59 | INP 측정(인터랙션 필요) ↔ "never … live browser interact"; Playwright fallback "Chrome DevTools MCP for browser work" | 절대 표현을 문자 그대로 따르면 INP 측정 중에 Playwright로 전환한다. 두 파일의 fallback 방향도 서로 반대다 | never를 "E2E 시나리오 작성"으로 좁히고 이유 추가 | P1 |
 | Med | SKILL.md:58 | "caps starve reasoning on hard problems" | 출력 길이 상한이 추론을 굶긴다는 것은 thinking이 없던 3.x 시절의 CoT 논리다. 대상 모델은 thinking 블록에서 추론하므로 근거가 낡았다 | 근거를 "범위·깊이 판단 왜곡" 등으로 교체하거나 행 재검토 | P2 |
 | Med | SKILL.md:20, 49-50, 66 | "Claude Code already injects …", `reasoning_extraction` decline, Fable "cannot turn thinking off", "prefill errors on every target" | 구체적인 사실 주장인데 mirror나 evidence에 근거가 없다(opus.md, fable-5-1.md에 해당 내용 없음). Step 6의 "documented model behavior"를 단정으로 채우게 된다 | 행마다 출처 섹션을 표기하거나 mirror로 옮겨 적기 | P1 |
@@ -55,7 +55,7 @@
   - Numeric caps 행의 근거는 3.x 시절 논리다.
   - Severity filters와 Step choreography 행은 4.x 시절 일반론으로 보이는데 근거 표기가 없다.
   - 반대로 다음 방향은 현행 모델과 맞다: thinking 주문(incantation) 삭제, prefill을 structured outputs로 대체, effort를 조절 수단으로 사용.
-- **자기 일관성:** 본문은 "Emphasis inflation"과 "Prohibition walls"를 제거 대상으로 정했다. 그런데 자기 Gotchas와 Steps에서 `Never`를 8회 이상 쓴다. 대부분 이유가 함께 있어 심각하지는 않다.
+- **자기 일관성:** 본문은 "Emphasis inflation"과 "Prohibition walls"를 제거 대상으로 정했다. 그런데 자기 Gotchas와 Steps 두 절에서 never를 대소문자 무시 6회(대문자 `Never` 2회), 파일 전체로는 16회(대문자 6회) 쓴다. 대부분 이유가 함께 있어 심각하지는 않다.
 
 ## 강점
 
@@ -64,7 +64,7 @@
 - **sc-prompt:**
   - description에 트리거와 제외 범위가 명확하다.
   - references를 대상 모델별로 필요할 때만 읽어 단계적 로딩이 잘 되어 있다.
-  - "Clean prompt → no diff", "Context is never cruft"가 억지 diff를 막는다.
+  - :95 "Report the prompt as clean and emit no diff"와 "Context is never cruft"가 억지 diff를 막는다.
   - Opus와 Sonnet에서 검증 지시 방향이 반대라는 것을 명시한다.
 
 ## 미확인 범위
