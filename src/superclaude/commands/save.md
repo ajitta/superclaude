@@ -38,7 +38,7 @@ description: Save session context to the committed project memory folder (.claud
     Branch slug: `git branch --show-current` with `/` → `-`; detached HEAD → `detached-<short sha>`. Session records are add-only per branch, so parallel branches and worktrees never conflict on merge
     Auto memory (supplementary): ~/.claude/projects/{project}/memory/MEMORY.md (CC-native, per-project, first 200 lines auto-load)
     Topic files: ~/.claude/projects/{project}/memory/{topic}.md (linked from MEMORY.md, load on demand)
-    Agent memory: .claude/agent-memory/{name}/MEMORY.md (project-scoped, per-agent)
+    Agent memory: per agent, kept by Claude Code (not written by /sc:save); location follows the agent's `memory:` scope — user ~/.claude/agent-memory/{name}/, project .claude/agent-memory/{name}/, local .claude/agent-memory-local/{name}/
   </storage>
 
   <outputs note="Per --type flag">

@@ -275,6 +275,64 @@ class TestAgentMemoryDirectory:
         assert (base / "agent-memory-local").is_dir()
 
 
+class TestAgentMemoryScopeConflict:
+    """Project and local scope share `./.claude/agents`; installing one over the
+    other moved every agent's memory store with no word about it."""
+
+    @staticmethod
+    def _memory_values(base):
+        return {
+            line
+            for f in (base / "agents").glob("*.md")
+            for line in f.read_text(encoding="utf-8").splitlines()
+            if line.startswith("memory:")
+        }
+
+    def test_another_scope_is_refused_and_nothing_changes(self, tmp_path):
+        base = tmp_path / ".claude"
+        assert install_all(base_path=base, force=True, scope="local")[0]
+
+        success, message = install_all(base_path=base, force=True, scope="project")
+
+        assert not success
+        assert "memory: local" in message and "--scope local" in message
+        assert self._memory_values(base) == {"memory: local"}
+
+    def test_the_same_scope_reinstalls(self, tmp_path):
+        base = tmp_path / ".claude"
+        assert install_all(base_path=base, force=True, scope="local")[0]
+
+        success, message = install_all(base_path=base, force=True, scope="local")
+
+        assert success, message
+
+    def test_a_legacy_untracked_project_value_upgrades(self, tmp_path):
+        """Installs before the scope rewrite (v4.20.1) carry `memory: project`."""
+        base = tmp_path / ".claude"
+        assert install_all(base_path=base, force=True, scope="project")[0]
+
+        success, message = install_all(base_path=base, force=True, scope="local")
+
+        assert success, message
+        assert self._memory_values(base) == {"memory: local"}
+
+    def test_a_tracked_project_install_is_refused(self, tmp_path):
+        import subprocess
+
+        subprocess.run(["git", "init", "-q", str(tmp_path)], check=True)
+        base = tmp_path / ".claude"
+        assert install_all(base_path=base, force=True, scope="project")[0]
+        subprocess.run(
+            ["git", "-C", str(tmp_path), "add", ".claude/agents"], check=True
+        )
+
+        success, message = install_all(base_path=base, force=True, scope="local")
+
+        assert not success
+        assert "memory: project" in message, message
+        assert self._memory_values(base) == {"memory: project"}
+
+
 class TestFrameworkArtifactsAlwaysUpdate:
     """hooks.json is a build output, so an upgrade must refresh it.
 

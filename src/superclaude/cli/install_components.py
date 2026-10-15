@@ -6,6 +6,7 @@ and the top-level install_all orchestration.
 """
 
 import json
+import re
 import shutil
 from pathlib import Path
 from typing import List, Tuple
@@ -25,9 +26,11 @@ from .install_paths import (
     _get_package_root,
     _get_source_dir,
     _get_target_dir,
+    _run,
     find_legacy_skills,
     find_unshipped,
     probe_console_script,
+    shipped_names,
 )
 from .install_settings import (
     CLAUDE_SC_IMPORT,
@@ -64,6 +67,54 @@ _AGENT_MEMORY_DIRS = {
     "project": "agent-memory",
     "local": "agent-memory-local",
 }
+
+
+_AGENT_MEMORY_LINE = re.compile(r"^memory: *(\S+) *$", re.MULTILINE)
+
+
+def find_agent_memory_conflict(base_path: Path, scope: str) -> str | None:
+    """Explain why installing ``scope`` here would move agent memory, or None.
+
+    Project and local scope both install to ``./.claude/agents``, and a local
+    install at $HOME shares ``~/.claude/agents`` with user scope, so one scope
+    installed over another rewrites the same agent files. With --force every
+    agent's `memory:` moves to the new scope's store (over a team's committed
+    project install that also dirties tracked files); without it the files keep
+    the old value while the new scope's store is created and never used.
+
+    `memory: project` counts only when the agent files are tracked by git, the
+    mark of a team's project install: user and local installs made before the
+    scope rewrite (v4.20.1) carry it too, and upgrading those must keep working.
+    """
+    agents_dir = _get_target_dir("agents", base_path)
+    found: dict = {}
+    for name in sorted(shipped_names("agents")):
+        path = agents_dir / name
+        try:
+            match = _AGENT_MEMORY_LINE.search(path.read_text(encoding="utf-8"))
+        except (OSError, UnicodeDecodeError):
+            continue
+        if match and match.group(1) != scope:
+            found.setdefault(match.group(1), []).append(path)
+
+    project_files = found.get("project")
+    if project_files:
+        tracked = _run(
+            ["git", "-C", str(base_path.parent), "ls-files", "--"]
+            + [str(p) for p in project_files]
+        )
+        if not (tracked and tracked.returncode == 0 and tracked.stdout.strip()):
+            del found["project"]
+
+    if not found:
+        return None
+    other = ", ".join(sorted(found))
+    return (
+        f"❌ The agents in {agents_dir} were installed for scope '{other}' "
+        f"(memory: {other}). Installing scope '{scope}' over them would move "
+        f"where every agent keeps its memory. Install with --scope {other}, or "
+        f"run 'superclaude uninstall --scope {other}' first."
+    )
 
 
 def ensure_agent_memory_dir(base_path: Path, scope: str) -> Path | None:
@@ -453,6 +504,10 @@ def install_all(
     Returns:
         Tuple of (success: bool, message: str)
     """
+    conflict = find_agent_memory_conflict(base_path, scope)
+    if conflict:
+        return False, conflict
+
     messages = []
     total_installed = 0
     total_skipped = 0
