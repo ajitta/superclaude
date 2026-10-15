@@ -65,6 +65,13 @@ FORBIDDEN_DESC_PATTERNS = [
 # Case-sensitive on capital "Use" to avoid matching mid-sentence "use for ...";
 # \w* tolerates the caveman-compressed forms shipped in agents (proactive,
 # immediate) alongside the canonical proactively / immediately.
+# Shipped verbatim at the end of every agent's Ask First line.
+SUBAGENT_ASK_SENTENCE = (
+    "As a delegated subagent Claude cannot ask mid-task: it stops before such an "
+    "action and returns the proposed action and the question in its report, "
+    "unless the task text already names that action."
+)
+
 CC_IDIOM_TRIGGER = re.compile(r"\bUse (proactiv\w*|immediat\w*|when|for|after)\b")
 
 
@@ -222,6 +229,28 @@ class TestAgentCrossFieldConsistency:
         assert "Proceed" in tg or "Ask First" in tg or "Never" in tg, (
             f"{stem}: tool_guidance missing behavioral rules (Proceed/Ask First/Never)"
         )
+
+    def test_ask_first_states_subagent_behavior(self, agent):
+        """A delegated subagent cannot ask the user mid-run.
+
+        Without a stated behavior the model either stops with nothing to show or
+        assumes the answer and acts, breaking Ask First (prompt-content audit
+        P-2). The same sentence ships in every agent; agent-authoring.md holds it.
+        """
+        stem, content, _ = agent
+        tg = extract_xml_content(content, "tool_guidance") or ""
+        ask_first = re.search(r"^\s*- Ask First:.*$", tg, re.MULTILINE)
+        assert ask_first, f"{stem}: tool_guidance has no Ask First line"
+        assert SUBAGENT_ASK_SENTENCE in ask_first.group(0), (
+            f"{stem}: Ask First line lacks the delegated-subagent sentence"
+        )
+
+    def test_body_has_no_rule_id_tags(self, agent):
+        """R-IDs are defined in core/rules/RULES_QUALITY.md, which never reaches
+        a subagent, so a tag like [R06 Scope] in an agent body resolves to nothing."""
+        stem, content, _ = agent
+        tags = re.findall(r"\[R\d{2}[^\]]*\]", content)
+        assert not tags, f"{stem}: R-ID tags in body {tags}; write the meaning as words"
 
     def test_mission_appears_in_description(self, agent):
         """Mission text should be reflected in the frontmatter description."""
