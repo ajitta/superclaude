@@ -84,7 +84,7 @@ types:
   memory:
     location: [
       CLAUDE.md, .claude/CLAUDE.md, CLAUDE.local.md, AGENTS.md,
-      ".claude/rules/<name>.md", ~/.claude/CLAUDE.md,
+      ".claude/rules/<name>.md", ~/.claude/CLAUDE.md, "~/.claude/rules/<name>.md",
     ]
     # `paths` is the only field read, and only in .claude/rules/ files.
     frontmatter: optional

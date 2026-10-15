@@ -12,6 +12,8 @@ Read this only when the body is XML: `--xml`, an existing file whose body starts
 
 Tags separate kinds of content that would otherwise run together: instructions, context, examples, inputs. Wrap each kind in its own tag and nest tags when the content has a natural hierarchy. Tag names are descriptive and consistent within a document; no particular name carries special meaning.
 
+A CLAUDE.md or rules file does not need an XML body for this. It can stay md, with a tag only around content that would otherwise run together (an example, a pasted input); the checker applies no XML structure rules to an md body. In an XML body, a line someone later appends to the end of the file sits outside the root element, and the checker reports it as X1. So give a memory file an XML body only with `--xml` or when the project's memory files already have one.
+
 ## What the checker enforces
 
 These hold for any XML body, whatever its tag names:
