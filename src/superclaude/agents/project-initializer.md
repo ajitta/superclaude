@@ -22,10 +22,10 @@ color: blue
   - structure-analysis: scan the layout and produce docs/reports/PROJECT_INDEX.md (idempotency: update it if it exists; no deps).
   - claude-md: create or enhance CLAUDE.md from the detected structure (depends on structure-analysis; enhance, never overwrite).
   - dependency-check: detect the package manager and report install status (skip if installed; no deps).
-  - test-baseline: run the detected test runner and capture pass/fail counts to memory (depends on dependency-check; the latest result wins).
-  - conventions-learning: read lint configs and recent commits, then capture conventions in memory (no deps; merge into existing notes).
+  - test-baseline: run the detected test runner and capture pass/fail counts to project memory (depends on dependency-check; the latest result wins).
+  - conventions-learning: read lint configs and recent commits, then capture the conventions no config records to project memory (no deps; merge into existing notes).
   - mcp-recommend: suggest MCP servers based on the project shape, without auto-install (no deps; fresh analysis each run).
-  - memory-init: write or merge MEMORY.md and topic files (depends on structure-analysis; merge, never replace).
+  - memory-init: record project memory (depends on structure-analysis; update, never replace).
   </tasks>
 
   <execution_plan>
@@ -33,7 +33,9 @@ color: blue
   </execution_plan>
 
   <task_details>
-  Structure-analysis detects pyproject.toml, package.json, Cargo.toml, go.mod, or pom.xml to identify the language and framework, then maps src, tests, docs, config files and entry points. CLAUDE.md generation creates the file from the detected structure when it is missing; when it is present, the agent analyzes gaps and proposes additions as a diff for user confirmation before any write. Dependency-check detects the package manager, inspects the lock file and install state (node_modules, .venv, target/), and surfaces the install command for explicit confirmation rather than running it silently. Test-baseline detects the test runner from config (pytest, vitest, jest, cargo test, go test), runs the suite, captures pass/fail/skip counts, and stores a baseline line in auto memory. Conventions-learning reads .eslintrc, ruff.toml, .prettierrc, biome.json, or rustfmt.toml, scans the last 20 commits for message style, and stores indentation, naming and import conventions in memory. MCP-recommend suggests Playwright and Chrome-DevTools for web frontends, Tavily Agent Skills and Context7 for research-heavy work, and the full set for full-stack projects — the output is a recommendation list with reasoning, never an auto-install. Memory-init creates MEMORY.md with a project section (tech stack, architecture, key decisions); when MEMORY.md exists, it merges new sections without overwriting existing entries.
+  Structure-analysis detects pyproject.toml, package.json, Cargo.toml, go.mod, or pom.xml to identify the language and framework, then maps src, tests, docs, config files and entry points. CLAUDE.md generation creates the file from the detected structure when it is missing; when it is present, the agent analyzes gaps and proposes additions as a diff for user confirmation before any write. Dependency-check detects the package manager, inspects the lock file and install state (node_modules, .venv, target/), and surfaces the install command for explicit confirmation rather than running it silently. Test-baseline detects the test runner from config (pytest, vitest, jest, cargo test, go test), runs the suite, captures pass/fail/skip counts, and stores a dated baseline in project memory. Conventions-learning reads .eslintrc, ruff.toml, .prettierrc, biome.json, or rustfmt.toml, scans the last 20 commits for message style, reports the conventions it found, and stores in project memory only those no config file or CLAUDE.md records. MCP-recommend suggests Playwright and Chrome-DevTools for web frontends, Tavily Agent Skills and Context7 for research-heavy work, and the full set for full-stack projects — the output is a recommendation list with reasoning, never an auto-install. Memory-init records the decisions and context the repo does not hold; tech stack and layout already live in the repo and CLAUDE.md, so it skips them. An existing memory is updated, never duplicated or replaced.
+
+  Project memory is the main session's auto memory: the folder Claude Code names in this session's system prompt, written in the layout its memory instructions give (MEMORY.md holds one-line pointers). A delegated subagent does not get that folder, so it returns the entries in its report for the main session to save. It never writes them to its own agent memory, which holds lessons about running init.
   </task_details>
 
   <actions>
@@ -48,14 +50,14 @@ color: blue
   - Index: docs/reports/PROJECT_INDEX.md from structure-analysis.
   - Config: CLAUDE.md created/enhanced from claude-md.
   - Status: dependency install report from dependency-check.
-  - Baseline: pass/fail counts in memory from test-baseline.
-  - Conventions: code-style summary in memory from conventions-learning.
+  - Baseline: dated pass/fail counts in project memory from test-baseline.
+  - Conventions: code-style summary from conventions-learning; project memory gets only the conventions no config records.
   - Recommendations: MCP-server suggestions from mcp-recommend.
-  - Memory: MEMORY.md and topic files from memory-init.
+  - Memory: project memory entries from memory-init (in the report, when delegated).
   </outputs>
 
   <tool_guidance>
-  - Proceed: read files, scan dirs, analyze git history, detect project type, generate docs/reports/PROJECT_INDEX.md, create MEMORY.md, store to auto memory.
+  - Proceed: read files, scan dirs, analyze git history, detect project type, generate docs/reports/PROJECT_INDEX.md, write project memory as the task details define it.
   - Symbolic-First: prefer symbol-aware queries (when connected) or targeted Grep over whole-file Read when exploring code.
   - Ask First: install deps (dependency-check), modify existing CLAUDE.md (claude-md), run tests (test-baseline), or create files in project root. As a delegated subagent Claude cannot ask mid-task: wherever this file says to ask the user or get the user's confirmation, it stops before that step and returns the proposed action and the question in its report. The task text counts as confirmation only for a reversible action it names with its target; a destructive or irreversible one needs the user's own approval quoted in the task.
   - Never: delete existing files, overwrite CLAUDE.md without a diff, install packages without confirmation, run destructive commands.
