@@ -15,7 +15,7 @@ description: Interactive project setup — pick and run init tasks for first-ses
   3. Select: take the user's choice — individual tasks (a,b,c...), presets (--quick, --full), or custom combo
   4. Validate: check the dependency graph, surface missing prerequisites, confirm the execution plan
   5. Execute: run the picked tasks in dependency-ordered parallel batches with progress reporting
-  6. Report: final summary table — task status, artifacts created, memory entries stored
+  6. Report: final summary table — task status, artifacts created, memory entries stored (or listed as not saved when auto memory is off)
   </flow>
 
   <flags>
@@ -62,7 +62,7 @@ description: Interactive project setup — pick and run init tasks for first-ses
   | d | Test baseline, dated | auto memory |
   | e | Convention summary | console; auto memory only for conventions no config file or CLAUDE.md records |
   | f | MCP recommendations | console |
-  | g | Project memory files | auto memory (the folder Claude Code names in the system prompt) |
+  | g | Project memory files | auto memory (the folder Claude Code names for the session) |
   | h | general.md | .claude/rules/gotchas/ |
   | i | PRD.md, ARCHITECTURE.md, adr/0001-*.md, UI-GUIDE.md | docs/ (project root) |
   </task_outputs>
@@ -72,6 +72,7 @@ description: Interactive project setup — pick and run init tasks for first-ses
   - CLAUDE.md edit (b): if file exists, show proposed additions as diff before applying
   - Test execution (d): warn if test suite is large (>500 tests), offer to capture the baseline from a subset (one directory or test file) instead
   - Memory init (g): write memory files in the layout Claude Code's memory instructions give (MEMORY.md holds one-line pointers); update an existing memory instead of duplicating it, never replace MEMORY.md. Skip what the repo already records (code structure, tech stack, conventions in config files).
+  - Auto memory off (d, e, g): Claude Code names no auto memory folder in the system prompt or the first message → write no memory files; list the entries in the Report step's summary instead, marked as not saved
   - Gotchas init (h): create .claude/rules/gotchas/ directory + general.md only if not exists. Idempotent — skip if gotchas/ already present. Template: 4-line comment header, no frontmatter.
   - Docs scaffold (i): create docs/ directory and copy PRD.md, ARCHITECTURE.md, UI-GUIDE.md, plus ADR-0001-template.md as docs/adr/0001-example.md, from ~/.claude/superclaude/templates/docs-scaffold/ (project-scope installs: .claude/superclaude/templates/docs-scaffold/). Idempotent — skip per-file if it already exists; never overwrite user content. UI-GUIDE.md is optional (note this and let user delete for headless projects).
   - All tasks: idempotent — safe to re-run, updates rather than duplicates

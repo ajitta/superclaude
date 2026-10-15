@@ -14,7 +14,7 @@ description: Save session context to the committed project memory folder (.claud
   2. Persist (memory folder): Write .claude/memories/session_[date]_[branch-slug].md — first line `branch: <name> @<short sha>`, then the summary and a `## Next actions` checklist; a second save the same day on the same branch updates it → .claude/memories/learnings_[topic].md (insights); flat basename only, no path segments; create the folder when absent
   3. Persist (auto memory): save the durable facts a later session needs (the no-ephemeral gotcha) to the auto memory folder, in the file layout Claude Code's memory instructions give; every worktree of the repo shares this folder, so name the branch in each project entry and Edit the one MEMORY.md line instead of rewriting the file
     3.5. Corrections-Review: capture each user correction not yet recorded as a feedback memory whose body names the broken rule as `violated_rule: "[RNN Name]"` [R14 Correction Capture].
-    3.6. Auto memory off: the system prompt names no auto memory folder (setting, safe mode, or a model without it) → skip the Persist (auto memory) step and write each correction from 3.5 to .claude/memories/learnings_corrections.md instead, so /sc:analyze still finds its `violated_rule` line
+    3.6. Auto memory off: Claude Code names no auto memory folder anywhere in the session's context, neither in the system prompt nor in the first message (an agent's own agent memory folder does not count; for example the `autoMemoryEnabled` setting, `CLAUDE_CODE_DISABLE_AUTO_MEMORY`, or a self-hosted session turns it off) → skip the Persist (auto memory) step and write each correction from 3.5 to .claude/memories/learnings_corrections.md instead, so /sc:analyze still finds its `violated_rule` line
   4. Verify: Glob .claude/memories/*.md + Read MEMORY.md confirms both stores (auto memory off: the memory folder only)
   5. Checkpoint: recovery points + progress tracking
   6. Validate: data integrity + no duplicates across stores
@@ -37,7 +37,7 @@ description: Save session context to the committed project memory folder (.claud
   <storage>
     Memory folder (primary): .claude/memories/ — one markdown file per memory name, committed with the project
     Branch slug: `git branch --show-current` with `/` → `-`; detached HEAD → `detached-<short sha>`. Session records are add-only per branch, so parallel branches and worktrees never conflict on merge
-    Auto memory (supplementary): the folder Claude Code names in the system prompt (CC-native, per-project; moves with the `autoMemoryDirectory` setting) — MEMORY.md is its index and loads automatically, memory files are read on demand
+    Auto memory (supplementary): the folder Claude Code names for the session, in the system prompt or the first message (CC-native, per-project; moves with the `autoMemoryDirectory` setting) — MEMORY.md is its index and loads automatically, memory files are read on demand
     Agent memory: per agent, kept by Claude Code (not written by /sc:save); location follows the agent's `memory:` scope — user ~/.claude/agent-memory/{name}/, project .claude/agent-memory/{name}/, local .claude/agent-memory-local/{name}/
   </storage>
 
@@ -48,7 +48,7 @@ description: Save session context to the committed project memory folder (.claud
 | learnings | learnings_[topic] | Patterns + insights |
 | context | context_[project] | Project state |
 | all | All above | Complete preservation |
-Every type also saves its durable facts to auto memory as memory files; MEMORY.md holds only their one-line pointers.
+Every type also saves its durable facts to auto memory as memory files, unless auto memory is off; MEMORY.md holds only their one-line pointers.
   </outputs>
 
 
@@ -77,7 +77,7 @@ Every type also saves its durable facts to auto memory as memory files; MEMORY.m
 
 
   <gotchas>
-  - no-ephemeral: auto memory (MEMORY.md, topic files) keeps only what a later session on any branch needs; this session's progress and next actions belong in the session_ file.
+  - no-ephemeral: auto memory (MEMORY.md and its memory files) keeps only what a later session on any branch needs; this session's progress and next actions belong in the session_ file.
   - verify-value: before saving, ask "Will this be useful in future conversation?" If no, skip
   </gotchas>
 
