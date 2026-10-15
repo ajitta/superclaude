@@ -130,28 +130,28 @@
 
 ### P1 — 구조
 
-5. 24개 agent 공통으로 서브에이전트 실행 규칙 한 줄을 넣는다(P-2).
+5. **(완료, 61b4d570·5bf1f22e)** 24개 agent 공통으로 서브에이전트 실행 규칙 한 줄을 넣는다(P-2).
 6. **(완료, 25c1ceea — security-engineer 1개만 유지)** "Use proactively"는 2~3개만 남기고, 나머지는 "Use when the user asks…" + "Not for…" 형태로 바꾼다. `agent-authoring.md`와 description 테스트를 함께 개정한다(P-6).
-7. agent 본문의 R-ID 태그(Med)를 지우거나 한 줄 근거 문장으로 바꾼다. initializer의 R06 오기부터 처리한다. 항상 로드되는 PRINCIPLES·RULES 커널의 R-ID(03a, High)도 같은 방식으로 처리한다(P-5).
-8. FLAGS의 측정 불가 조건을 관찰 가능한 조건(prod 대상, 파괴적 명령 등)으로 바꾸고, ctx 기준치를 하나로 통일한다(P-7).
-9. FLAGS의 모드 항목에 "사용자가 입력하는 플래그"임을 명시하거나, 자동 감지 시 해당 MODE 파일을 Read하도록 지시한다. `RULES.md:34`에 user 범위 설치 경로를 추가한다(P-5).
+7. **(완료, 61b4d570; 커널은 범례로 처리 df0b8738)** agent 본문의 R-ID 태그(Med)를 지우거나 한 줄 근거 문장으로 바꾼다. initializer의 R06 오기부터 처리한다. 항상 로드되는 PRINCIPLES·RULES 커널의 R-ID(03a, High)도 같은 방식으로 처리한다(P-5).
+8. **(완료, df0b8738)** FLAGS의 측정 불가 조건을 관찰 가능한 조건(prod 대상, 파괴적 명령 등)으로 바꾸고, ctx 기준치를 하나로 통일한다(P-7).
+9. **(완료, df0b8738·5bf1f22e)** FLAGS의 모드 항목에 "사용자가 입력하는 플래그"임을 명시하거나, 자동 감지 시 해당 MODE 파일을 Read하도록 지시한다. `RULES.md:34`에 user 범위 설치 경로를 추가한다(P-5).
 10. **(완료, 9a247cb6·f2da52b1)** RULES_DOCS/RULES_DELEGATION의 저장소 이력과 사용자명, verifier 예시의 저장소 고유 파일명을 일반화한다(P-1).
-11. High이지만 아직 미처리인 영역별 항목:
+11. **(완료, 1172b4fb·8b3eb320·b79567ca)** High이지만 아직 미처리인 영역별 항목:
     - sc-prompt mirror가 금지된 이전 모델 섹션 이월을 수행함(03e)
     - sc-prompt Fable 블록이 원문 없이 의역만 있어 문안을 지어내게 함(03e)
     - sc-author checker를 승인 전 새 파일에 실행할 수 없음(03f)
     - VS 템플릿을 출력할지, 스스로 따를지, 하위 호출에 보낼지 모호함(03b)
-12. 영역별 Med 항목(03a–03f)을 처리한다. 대표 항목:
+12. **(완료, 08b)** 영역별 Med 항목(03a–03f)을 처리한다. 대표 항목:
     - repo-index 7일 재사용 규칙 vs "always regen" 모순
     - technical-writer description vs 본문 모순
     - Tavily never/prefer 모순
 
 ### P2 — 품질
 
-12. 사용자 대면 출력을 내는 agent·mode부터 전보체를 정상 문장으로 바꾼다(P-8).
-13. 🔴를 보안 전용으로 되돌리고 등급 표기를 분리한다(P-9).
-14. sc-author의 구세대 관습을 조건부로 완화한다: 예시 3~5개 의무, 문서 전체를 루트 요소 하나로 감싸기, 100줄 넘으면 목차 필수(03f).
-15. 확신도 낮은 사실 주장을 재확인한다: `/doctor prompt-audit`의 실재 여부, memory import "four hops", `fields.yaml`의 일부 필드(03f).
+12. **(완료, 08b — commands 일부 축약은 Low로 남음)** 사용자 대면 출력을 내는 agent·mode부터 전보체를 정상 문장으로 바꾼다(P-8).
+13. **(완료, df0b8738)** 🔴를 보안 전용으로 되돌리고 등급 표기를 분리한다(P-9).
+14. **(완료, b79567ca)** sc-author의 구세대 관습을 조건부로 완화한다: 예시 3~5개 의무, 문서 전체를 루트 요소 하나로 감싸기, 100줄 넘으면 목차 필수(03f).
+15. **(완료, b79567ca — code.claude.com 문서로 확인)** 확신도 낮은 사실 주장을 재확인한다: `/doctor prompt-audit`의 실재 여부, memory import "four hops", `fields.yaml`의 일부 필드(03f).
 
 ### 릴리스 전 필수
 

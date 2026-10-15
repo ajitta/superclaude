@@ -27,6 +27,11 @@ updated: 2026-10-15
   - 처리 결과:
     - 03-analysis §4 P1의 일부(측정 불가 조건, 저장소 이력 누수, core/rules 쪽 참조 문제)를 함께 처리했다.
     - 나머지 보류 항목은 08a에 있다.
+- **3차 라운드**([08b](./08b-implementation-p1p2.md), [09b](./09b-review-p1p2.md)): 03-analysis §4의 남은 P1·P2와 03a–03f 미처리 행, 08a 보류 목록을 처리했다.
+  - 24개 agent의 Ask First에 서브에이전트 규칙을 고정 문장으로 넣고(테스트로 고정), R-ID 태그를 지웠다.
+  - FLAGS의 측정 불가 조건과 유지보수자 메모를 정리하고, 🔴를 보안 전용으로 되돌렸다.
+  - 독립 리뷰가 새 문제 High 2건(Ask First 문장이 부모 문장만으로 파괴적 작업 허용, sc-prompt 이월 예외)을 찾아 반영했다.
+  - 남은 결정 1건(Opus 5의 `reasoning_extraction`)과 canary 미실행은 08b에 있다.
 
 ## 방법
 
@@ -72,3 +77,5 @@ updated: 2026-10-15
 - [03i-analysis-commands.md](./03i-analysis-commands.md): 2차 — commands 37개, 출력 스타일, 명령 간 일관성 감사
 - [08a-implementation-rules-commands.md](./08a-implementation-rules-commands.md): 2차 적용 커밋, 보류 항목, 검증
 - [09a-review-rules-commands.md](./09a-review-rules-commands.md): 2차 수정 독립 리뷰와 반영 내역
+- [08b-implementation-p1p2.md](./08b-implementation-p1p2.md): 3차 — 남은 P1·P2 적용 커밋, 결정, 보류, 검증
+- [09b-review-p1p2.md](./09b-review-p1p2.md): 3차 수정 독립 리뷰와 반영 내역
