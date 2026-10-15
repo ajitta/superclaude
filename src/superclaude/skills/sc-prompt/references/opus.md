@@ -9,7 +9,7 @@ sources:
 
 # Opus: 'claude-opus-5' and 'claude-opus-5-5'
 
-Each row compresses the reference's `### Behavioral shifts (prompt-tunable)` for Opus 5 down to direction. For 'claude-opus-5-5' each row is marked `(carried from Opus 5; not confirmed for 5.5)`, except clauses marked `(Opus 5.5 prompting guide)`, which come from that guide and the Opus 5.5 What's new page, not from the reference. Lines marked `(Opus 5.5 migration guide)` come from that page. A row marked `(--target api only)` applies only on that target.
+Each row compresses the reference's `### Behavioral shifts (prompt-tunable)` for Opus 5 down to direction. For 'claude-opus-5-5' each row is marked `(carried from Opus 5; not confirmed for 5.5)` and is reported as a candidate, not applied (SKILL.md), except clauses marked `(Opus 5.5 prompting guide)`, which come from that guide and the Opus 5.5 What's new page, not from the reference. Lines marked `(Opus 5.5 migration guide)` come from that page. A row marked `(--target api only)` applies only on that target.
 
 ## Behavioral delta
 

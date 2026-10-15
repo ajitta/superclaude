@@ -175,7 +175,7 @@ TRIGGER_MAP = [
         1,
     ),
     (
-        r"(/sc:(analyze|document|plan|design|brainstorm|intent|roadmap|index|index-repo|estimate|save|research|promote-feature)|/sc:cleanup\b.*--type\s+(docs|all)|implementation plan|design spec|write.{0,12}(plan|spec)|\b(claude|agents)\.md\b|\.claude/rules/)",
+        r"(/sc:(analyze|document|plan|design|brainstorm|intent|roadmap|index|index-repo|estimate|save|research|promote-feature)|/sc:cleanup\b.*--type\s+(docs|all)|implementation plan|design spec|write.{0,12}(plan|spec)|\b(add|append|write|record|put|save|update|edit|capture)\b[^.\n]{0,60}(\b(claude|agents)\.md\b|\.claude/rules/)|(\b(claude|agents)\.md|\.claude/rules/\S*)[^.\n]{0,20}(추가|기록|수정|업데이트|반영|저장|넣))",
         "core/rules/RULES_DOCS.md",
         1,
     ),

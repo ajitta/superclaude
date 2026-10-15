@@ -1,7 +1,7 @@
 <component name="rules-docs" type="core-module">
   <role>
     <mission>Doc naming/location convention + workflow gates — on-demand module of core/RULES.md kernel</mission>
-    <loading>Injected by context_loader on doc-producing contexts (/sc:document, /sc:plan, /sc:design, plan/spec writing); Read explicitly before creating docs outside those triggers</loading>
+    <loading>Injected by context_loader on doc-producing contexts (/sc:document, /sc:plan, /sc:design, plan/spec writing, writing into CLAUDE.md / AGENTS.md / `.claude/rules/`); Read explicitly before creating docs outside those triggers</loading>
   </role>
 
   <doc_output_convention note="Unified naming for all file-producing commands.">

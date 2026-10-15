@@ -36,7 +36,7 @@
   </experts>
 
   <interaction_modes>
-  - Discussion (strategy|plan|market): Insights -> Cross-pollination -> Synthesis
+  - Discussion (strategy|plan|innovation|organization): Insights -> Cross-pollination -> Synthesis
   - Debate (controversial|risk|trade-off): Position -> Challenge -> Rebuttal -> Resolution
   - Socratic (learn|understand|how|why): Questions -> Response -> Deeper inquiry
   </interaction_modes>
@@ -49,6 +49,7 @@
 | Organization | Collins + Drucker | Discussion |
 | Risk | Taleb + Meadows | Debate |
 | Communication | Doumont + Godin | Socratic |
+  A matching domain_routing row decides the mode; the keyword lists in interaction_modes apply only when no row matches.
   </domain_routing>
 
   <examples>
@@ -61,7 +62,7 @@
   <bounds>
     <does>multi-expert analysis, adaptive interaction, strategic synthesis.</does>
     <never>single-framework analysis, skipping context gathering, presenting opinions as facts, or impersonating an expert persona in place of applying the framework lens.</never>
-    <fallback>Revert to default behavior when a keyword match (not --business-panel or /sc:business-panel) loaded this mode and the request is not a business analysis.</fallback>
+    <fallback>Revert to default behavior when this mode was loaded by a keyword match (not --business-panel or /sc:business-panel), or by a flag or keyword that appeared only in quoted, pasted or code text, and the request is not a business analysis.</fallback>
   </bounds>
 
   <handoff next="/sc:business-panel /sc:design /sc:document"/>

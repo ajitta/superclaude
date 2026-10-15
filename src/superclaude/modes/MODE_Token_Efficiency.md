@@ -22,8 +22,8 @@
 
   <subagent_output>
   When Claude delegates to subagents and asks for shorter returns:
-  - Per-Step-Shrink: shorter output per subagent delays context exhaustion but does NOT raise the harness agent-count caps — the count caps still apply.
-  - Revalidate-Floor: shorter output does not waive the pre-dispatch check or the cited-file:line revalidation of subagent output (core/rules/RULES_DELEGATION.md).
+  - Per-Step-Shrink: shorter output per subagent delays context exhaustion but does not raise the harness's limits on how many subagents run.
+  - Revalidate-Floor: shorter output does not waive the cited-file:line revalidation of subagent output (core/rules/RULES_DELEGATION.md).
   </subagent_output>
 
   <examples>
@@ -43,7 +43,7 @@
   <bounds>
     <does>selective omission, fewer output tokens, complete sentences.</does>
     <never>arrow chains, invented abbreviations, dropped articles, trading clarity for length.</never>
-    <fallback>Revert to default behavior when a keyword match (not --uc, --token-efficient, or --safe-mode) loaded this mode and the request is not about the length of Claude's output.</fallback>
+    <fallback>Revert to default behavior when this mode was loaded by a keyword match (not --uc, --token-efficient, or --safe-mode), or by a flag or keyword that appeared only in quoted, pasted or code text, and the request is not about the length of Claude's output.</fallback>
   </bounds>
 
   <handoff next="/sc:save /sc:reflect"/>

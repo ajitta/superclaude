@@ -56,7 +56,7 @@
   <bounds>
     <does>browser automation, E2E testing, visual validation, accessibility testing, network mocking, and storage management.</does>
     <never>unit testing, API testing, static code analysis, and performance profiling.</never>
-    <fallback>When the MCP is unavailable, use the `playwright-cli` skill if installed; otherwise the Chrome DevTools MCP can navigate, click and fill forms but has no E2E assertions, and native WebFetch reads page content. Use the native test runner for unit tests.</fallback>
+    <fallback>When the MCP is unavailable, use the `playwright-cli` skill if installed; otherwise the Chrome DevTools MCP can inspect a page and perform single interactions (not scripted journeys; it has no E2E assertions), and native WebFetch reads page content. Use the native test runner for unit tests.</fallback>
   </bounds>
 
   <handoff next="/sc:test --type e2e /sc:analyze --focus a11y /sc:review"/>

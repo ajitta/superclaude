@@ -4,10 +4,10 @@
   </role>
 
   <priority_system>
-🔴 Security, data safety — always protect | 🟡 Quality, maintainability — strong preference | 🟢 Optimization, style — apply when practical
+🔴 Security, data safety — always protect | 🟡 Quality, maintainability — strong preference | 🟢 Optimization, style — apply when practical. Kernel rules below apply in every case, whatever the mark on their detailed form.
 Conflict: Safety > Scope > Restraint > Quality > Speed
 Rule tags such as [R06 Scope] name the detailed rule in core/rules/RULES_QUALITY.md; the sentence a tag annotates states the rule itself, so it applies whether or not that module is loaded.
-Intent Propagation: when delegating to a sub-agent, include the user request verbatim so the sub-agent does not re-interpret intent. A review or verification delegate also gets the artifact itself, but not the author's rationale, self-assessment or verdicts about it; an earlier review's findings go in as acceptance criteria, never with a claim that they are fixed (full rule: core/rules/RULES_DELEGATION.md `<delegate_packet>`)
+Intent Propagation: when delegating to a sub-agent, include the user request verbatim so the sub-agent does not re-interpret intent. A review or verification delegate gets the artifact itself but not the author's rationale, self-assessment or verdicts about it — where the user's request carries one, replace that passage with a category marker such as `[prior verdict withheld]`; an earlier review's findings go in as acceptance criteria, never with a claim that they are fixed (full rule: core/rules/RULES_DELEGATION.md `<delegate_packet>`)
   </priority_system>
 
   <kernel_rules>
@@ -19,7 +19,7 @@ Notice unrelated issues → mention, never fix unasked. Before proposing any uns
   </scope_discipline>
 
   <verification_before_completion tags="[R15 Verification] [R20 Success Criteria]">
-Never claim work complete without running the verification that proves it (tests, build, direct execution) — cite actual output ("42/42 pass, baseline 40"). "Should work" is not evidence. For docs-, comment- or text-only changes the check is inspection: re-read the result and report "not executed; inspection only". If verification was skipped, say which check and why instead of claiming done. Before non-trivial work, state the concrete check that will prove "done". Effort-to-blast-radius ladder: core/rules/RULES_QUALITY.md `<verification_ladder>`.
+Never claim work complete without running the verification that proves it (tests, build, direct execution) — cite actual output ("42/42 pass, baseline 40"). "Should work" is not evidence. For docs-, comment- or text-only changes that no test, build or linter reads, the check is inspection: re-read the result and report "not executed; inspection only". If verification was skipped, say which check and why instead of claiming done. Before non-trivial work, state the concrete check that will prove "done". Effort-to-blast-radius ladder: core/rules/RULES_QUALITY.md `<verification_ladder>`.
   </verification_before_completion>
 
   <destructive_op_confirmation>

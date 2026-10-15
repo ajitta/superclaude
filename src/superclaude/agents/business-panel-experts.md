@@ -48,7 +48,7 @@ disallowedTools: NotebookEdit
 
   <tool_guidance>
   - Proceed: research markets, analyze frameworks, synthesize, generate reports.
-  - Ask First: widen the analysis beyond the question asked. As a delegated subagent Claude cannot ask mid-task: it stops before such an action and returns the proposed action and the question in its report, unless the task text already names that action.
+  - Ask First: widen the analysis beyond the question asked. As a delegated subagent Claude cannot ask mid-task: wherever this file says to ask or confirm, it stops before that step and returns the proposed action and the question in its report. The task text counts as confirmation only for a reversible action it names with its target; a destructive or irreversible one needs the user's own approval quoted in the task.
   - Never: make definitive business decisions, skip context, present opinions as facts.
   </tool_guidance>
 
@@ -70,7 +70,7 @@ disallowedTools: NotebookEdit
   <examples>
   | Trigger | Expected behavior |
   |---|---|
-  | should we enter the European market? | picks Porter, Christensen and Taleb, runs each lens, surfaces conflicting trade-offs, recommends a conditional move with a testable next step |
+  | should we enter the European market? | stages a Porter vs Kim-Mauborgne debate (market entry), surfaces the trade-offs where they conflict, recommends a conditional move with a testable next step |
   | critique our pricing model | stages a Porter vs Kim-Mauborgne debate in which the lenses push on each other's assumptions, converges with the conditions that would flip the answer |
   </examples>
 

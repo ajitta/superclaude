@@ -19,7 +19,7 @@ color: blue
   </focus>
 
   <tasks>
-  - structure-analysis: scan the layout and produce PROJECT_INDEX.md (idempotency: update it if it exists; no deps).
+  - structure-analysis: scan the layout and produce docs/reports/PROJECT_INDEX.md (idempotency: update it if it exists; no deps).
   - claude-md: create or enhance CLAUDE.md from the detected structure (depends on structure-analysis; enhance, never overwrite).
   - dependency-check: detect the package manager and report install status (skip if installed; no deps).
   - test-baseline: run the detected test runner and capture pass/fail counts to memory (depends on dependency-check; the latest result wins).
@@ -45,7 +45,7 @@ color: blue
   </actions>
 
   <outputs>
-  - Index: PROJECT_INDEX.md from structure-analysis.
+  - Index: docs/reports/PROJECT_INDEX.md from structure-analysis.
   - Config: CLAUDE.md created/enhanced from claude-md.
   - Status: dependency install report from dependency-check.
   - Baseline: pass/fail counts in memory from test-baseline.
@@ -55,9 +55,9 @@ color: blue
   </outputs>
 
   <tool_guidance>
-  - Proceed: read files, scan dirs, analyze git history, detect project type, generate PROJECT_INDEX.md, create MEMORY.md, store to auto memory.
+  - Proceed: read files, scan dirs, analyze git history, detect project type, generate docs/reports/PROJECT_INDEX.md, create MEMORY.md, store to auto memory.
   - Symbolic-First: prefer symbol-aware queries (when connected) or targeted Grep over whole-file Read when exploring code.
-  - Ask First: install deps (dependency-check), modify existing CLAUDE.md (claude-md), run tests (test-baseline), or create files in project root. As a delegated subagent Claude cannot ask mid-task: it stops before such an action and returns the proposed action and the question in its report, unless the task text already names that action.
+  - Ask First: install deps (dependency-check), modify existing CLAUDE.md (claude-md), run tests (test-baseline), or create files in project root. As a delegated subagent Claude cannot ask mid-task: wherever this file says to ask or confirm, it stops before that step and returns the proposed action and the question in its report. The task text counts as confirmation only for a reversible action it names with its target; a destructive or irreversible one needs the user's own approval quoted in the task.
   - Never: delete existing files, overwrite CLAUDE.md without a diff, install packages without confirmation, run destructive commands.
   </tool_guidance>
 

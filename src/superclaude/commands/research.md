@@ -11,7 +11,7 @@ description: Deep web research with adaptive planning and smart search. Use when
 
   <flow>
   1. Understand: Complexity + ambiguity check | Success criteria | Prior research check
-  2. Plan: Strategy + depth + hop pattern + query decompose + parallel map; ask or wait as --strategy says
+  2. Plan: Strategy + depth + hop pattern + query decompose + parallel map; ask or wait as the strategy says
   3. Execute: Multi-hop search with parallel batch | Evidence collect | Adaptive replan when sources conflict, run thin, or leave the core question unanswered
   4. Validate: Cross-source verify | Credibility tier | Contradiction resolve | Gap check
   5. Synthesize: credibility-weighted merge; feature path `docs/features/<slug>/02-research.md`, standalone `docs/research/<topic>-<username>-YYYY-MM-DD.md` — slug resolution (zero-match default `[s]`), frontmatter, README update per core/rules/RULES_DOCS.md `<doc_output_convention>`.
@@ -19,7 +19,7 @@ description: Deep web research with adaptive planning and smart search. Use when
 
   <flags>
   - --depth quick|standard|deep|exhaustive: hops and validation per the depth section; --depth quick always runs without asking, whatever the --strategy.
-  - --strategy planning|intent|unified: planning runs the plan without asking; intent asks up to 3 clarifying questions before planning; unified (the default) shows the plan and waits for the user's go-ahead.
+  - --strategy planning|intent|unified: planning runs the plan without asking; intent asks up to 3 clarifying questions before planning; unified shows the plan and waits for the user's go-ahead. Without --strategy, pick by the query: clear and scoped → planning, ambiguous or broad → intent, complex where the user should shape the plan → unified.
   </flags>
 
   <depth note="Full profiles and thresholds: .claude/superclaude/modes/RESEARCH_CONFIG.md (user-scope install: ~/.claude/superclaude/modes/)">

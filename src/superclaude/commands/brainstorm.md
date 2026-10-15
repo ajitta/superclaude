@@ -73,13 +73,13 @@ description: Interactive requirements discovery through Socratic dialogue + syst
   </examples>
 
   <gotchas>
-  - evidence-fabrication: No construct hypothetical failure scenarios to justify pre-existing rec. Evidence (code, config, measurements) must precede proposals.
+  - evidence-fabrication: Do not construct hypothetical failure scenarios to justify a recommendation already made. Evidence (code, config, measurements) must precede proposals.
   - analysis-loop: If reasoning hit same conclusion twice on same question, kill that line of analysis + move to next topic.
   - skip-review: do not route to /sc:plan while the spec is `status: draft` or its Self-Review Iteration Log has no /sc:review round. The gate is hard, not advisory.
   </gotchas>
 
   <bounds>
-    <does>turns ambiguous requests into concrete requirements, uses multi-agent and MCP analysis, persists across sessions, and runs a self-review before the implementation handoff.</does>
+    <does>turns ambiguous requests into concrete requirements, uses multi-agent and MCP analysis, persists across sessions, and routes the spec to /sc:review before the plan handoff.</does>
     <never>implements without discovery, overrides the user's vision, bypasses systematic exploration, or routes directly to /sc:plan without /sc:review.</never>
   </bounds>
 

@@ -146,7 +146,7 @@ When memory is enabled, CC auto-injects up to the first 200 lines / 25KB of `MEM
   <tool_guidance>
   - Proceed: actions to do freely.
   - Symbolic-First: full or light form (see Code Exploration below).
-  - Ask First: actions requiring confirmation, with specific thresholds. As a delegated subagent Claude cannot ask mid-task: it stops before such an action and returns the proposed action and the question in its report, unless the task text already names that action.
+  - Ask First: actions requiring confirmation, with specific thresholds. As a delegated subagent Claude cannot ask mid-task: wherever this file says to ask or confirm, it stops before that step and returns the proposed action and the question in its report. The task text counts as confirmation only for a reversible action it names with its target; a destructive or irreversible one needs the user's own approval quoted in the task.
   - Never: actions the agent must never take.
   </tool_guidance>
 
@@ -191,7 +191,7 @@ When memory is enabled, CC auto-injects up to the first 200 lines / 25KB of `MEM
 - `<handoff>` — 2-3 natural next commands.
 - The `note=` attribute is restricted to scope / safety / version / reference / quantified constraint (see xml-prose-format.md "Attributes vs. Body").
 - **Voice — third person.** Write "Claude does X", "the agent avoids Y" — never "you" or "I". Third person is this repo's convention for consistency across agents; the same body runs as a subagent and via `claude --agent`.
-- **Ask First line.** End it with the template's delegated-subagent sentence, verbatim (`test_agent_structure.py::test_ask_first_states_subagent_behavior` pins it). A delegated subagent has no follow-up turn to ask in; without a stated behavior it either stops with nothing to show or assumes the answer and acts.
+- **Ask First line.** End it with the template's delegated-subagent sentence, verbatim (`test_agent_structure.py::test_ask_first_states_subagent_behavior` pins it). A delegated subagent has no follow-up turn to ask in; without a stated behavior it either stops with nothing to show or assumes the answer and acts. The parent's task text is not the user: it confirms only a reversible action named with its target, so a parent's paraphrase cannot authorize what the kernel's destructive-op rule reserves for the user. Put an agent's core deliverable (a recommendation, a ranking, a plan) under Proceed, and only its application under Ask First, or every delegated run stops before producing it.
 - **Interactive agents.** An agent whose procedure waits for the user (a menu, questions, a draft to approve) states the subagent case at that step: ``As a delegated subagent (one reply, no follow-up turns), Claude returns <the menu / the questions / the draft> and stops; the back-and-forth runs when the agent is the main session (`claude --agent <name>`).`` A delegated run gets one reply, read by the parent rather than the user, so an unstated case leaves the agent waiting for an answer that never comes or inventing one.
 - **No R-ID tags.** State a rule's meaning in words, never as a `[Rnn Name]` tag: R-IDs are defined in `core/rules/RULES_QUALITY.md`, an on-demand module that never reaches a subagent, so the tag resolves to nothing (`test_agent_structure.py::test_body_has_no_rule_id_tags`).
 

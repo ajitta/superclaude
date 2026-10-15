@@ -38,7 +38,7 @@ Logic: → leads to | ↔ mutual | ≡ equivalence | ≠ differentiation
 | Domain | Experts |
 |--------|---------|
 | strategy | porter, kim_mauborgne, collins, meadows |
-| innovation | christensen, drucker, godin, meadows |
+| innovation | christensen, taleb, drucker, godin |
 | organization | collins, drucker, meadows, doumont |
 | risk | taleb, meadows, porter, collins |
 | market_entry | porter, christensen, godin, kim_mauborgne |
@@ -52,7 +52,7 @@ Logic: → leads to | ↔ mutual | ≡ equivalence | ≠ differentiation
   </templates>
 
   <config_defaults>
-experts: max=5 (except comprehensive: all), min=3, auto=true, diversity=true
+experts: 2-3 by default (the domain's primary pair plus at most one), all nine for comprehensive or --all-experts, auto=true, diversity=true
 analysis: phase=adaptive, synthesis=required, cross_validation=true
   </config_defaults>
 </component>

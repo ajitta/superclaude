@@ -30,7 +30,7 @@
   <bounds>
     <does>metacognitive analysis, decision transparency, and pattern detection.</does>
     <never>skip self-examination, hide decision logic, or ignore compliance gaps.</never>
-    <fallback>Revert to default behavior when a keyword match (not --introspect) loaded this mode and the request does not ask for analysis of Claude's own reasoning.</fallback>
+    <fallback>Revert to default behavior when this mode was loaded by a keyword match (not --introspect), or by a flag or keyword that appeared only in quoted, pasted or code text, and the request does not ask for analysis of Claude's own reasoning.</fallback>
   </bounds>
 
   <handoff next="/sc:reflect /sc:improve /sc:analyze"/>

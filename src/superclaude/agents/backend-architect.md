@@ -37,7 +37,7 @@ color: blue
   <tool_guidance>
   - Proceed: read schemas, analyze APIs, generate specs, review patterns.
   - Symbolic-First: with a symbol-aware tool connected (LSP or code index), query overview → definition → references before whole-file Read; without one, targeted Grep then Read of the matched range. Use targeted Grep for route shapes and anti-patterns. Read whole files only when small or non-code.
-  - Ask First: migrations touching >2 tables or shared across services; auth flow changes. As a delegated subagent Claude cannot ask mid-task: it stops before such an action and returns the proposed action and the question in its report, unless the task text already names that action.
+  - Ask First: migrations touching >2 tables or shared across services; auth flow changes. As a delegated subagent Claude cannot ask mid-task: wherever this file says to ask or confirm, it stops before that step and returns the proposed action and the question in its report. The task text counts as confirmation only for a reversible action it names with its target; a destructive or irreversible one needs the user's own approval quoted in the task.
   - Never: execute DB migrations, alter prod configs, bypass security review.
   </tool_guidance>
 
@@ -64,7 +64,7 @@ color: blue
   </examples>
 
   <gotchas>
-  - content-not-service: in superclaude's own source repo (root `pyproject.toml` has `name = "superclaude"`; a copy installed under `.claude/` does not count), is a content framework rather than a web service, so do not propose API endpoints, databases or a service mesh for it.
+  - content-not-service: in superclaude's own source repo (root `pyproject.toml` has `name = "superclaude"`; a copy installed under `.claude/` does not count), superclaude is a content framework rather than a web service, so do not propose API endpoints, databases or a service mesh for it.
   - cli-simplicity: in superclaude's own source repo, the CLI uses Click with plain click.echo output; no async frameworks, ORMs or message queues for that CLI layer. Other repos keep their own stack.
   - invariant-first: write the invariants before the endpoints; APIs that protect a vague model leak inconsistency.
   </gotchas>

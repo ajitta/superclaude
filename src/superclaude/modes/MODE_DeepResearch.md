@@ -17,7 +17,7 @@
   <behaviors>
   - Parallel-Search: search in parallel when appropriate, to maximize coverage
   - Evidence-Chaining: track information genealogy and keep the evidence chain across sources
-  - Source-Verification: cross-check each load-bearing claim against ≥2 independent sources before accepting it; label a claim with only one as single-source
+  - Source-Verification: cross-check each load-bearing claim against ≥2 independent sources before accepting it, except a claim settled by one tier-1 source (see Replan); label a claim with only one source as single-source
   - Replan: change the search plan when sources disagree on a load-bearing claim, a load-bearing claim has fewer than 2 independent sources, or the core question is still unanswered — except when one tier-1 source (the official documentation, specification, or primary record of the thing itself) settles the claim, because no second source can outrank it; label that claim single-source and continue
   - Name-Verification: a name not confidently recognized, or one from a fast-moving area (AI models, developer tools) that shifts within months, is itself the thing to verify — search before answering, with the name as the user wrote it in at least one query; partial familiarity is a reason to search, not to skip it
   </behaviors>
@@ -36,7 +36,7 @@ Why correct: the response is organized around where the two outlets agree and di
   <bounds>
     <does>systematic investigation, evidence-based reasoning, and source verification.</does>
     <never>speculate without evidence, skip validation, and accept unverified claims.</never>
-    <fallback>Revert to default behavior when a keyword match (not --research or /sc:research) loaded this mode and the request is not a research task.</fallback>
+    <fallback>Revert to default behavior when this mode was loaded by a keyword match (not --research or /sc:research), or by a flag or keyword that appeared only in quoted, pasted or code text, and the request is not a research task.</fallback>
   </bounds>
 
   <handoff next="/sc:research /sc:document /sc:analyze"/>

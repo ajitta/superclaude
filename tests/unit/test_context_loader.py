@@ -389,13 +389,20 @@ class TestCoreLiteSplit:
             "add this rule to CLAUDE.md",
             "update AGENTS.md with the new test command",
             "record it in .claude/rules/gotchas/testing.md",
+            "이 규칙을 CLAUDE.md에 추가해",
         ):
             routed = {path for p, path, _pr in TRIGGER_MAP if p.search(prompt.lower())}
             assert "core/rules/RULES_DOCS.md" in routed, prompt
-        routed = {
-            path for p, path, _pr in TRIGGER_MAP if p.search("fix the parser bug")
-        }
-        assert "core/rules/RULES_DOCS.md" not in routed
+        # A mention alone costs ~2.5K tokens for nothing: CLAUDE.md is named in
+        # ordinary prompts all the time.
+        for prompt in (
+            "fix the parser bug",
+            "follow the conventions in CLAUDE.md and fix the login bug",
+            "what does claude.md say about tests?",
+            "see AGENTS.md for the build command",
+        ):
+            routed = {path for p, path, _pr in TRIGGER_MAP if p.search(prompt.lower())}
+            assert "core/rules/RULES_DOCS.md" not in routed, prompt
 
     def test_rule_modules_inject_full_md(self):
         """Rule modules carry behavioral content — must stay Tier 2 (full .md),

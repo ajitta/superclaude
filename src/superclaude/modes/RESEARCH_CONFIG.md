@@ -4,7 +4,7 @@
   </role>
 
   <defaults>
-planning: unified for /sc:research without --strategy (--depth quick runs without asking); otherwise chosen by query clarity per the strategies table, so a clear query runs without waiting for approval | max_hops: 5 | memory: true | parallel: true (DEFAULT)
+planning: chosen by query clarity per the strategies table when no --strategy is given, so a clear query runs without waiting for approval (--depth quick always runs without asking) | max_hops: 5 | memory: true | parallel: true (DEFAULT)
   </defaults>
 
   <parallel_rules>
@@ -43,7 +43,7 @@ assess_quality | id_gaps | maybe_replan | tweak_strategy
   </tool_routing>
 
   <gates>
-planning: objectives+strategy+criteria | execution: each load-bearing claim has ≥2 independent sources (a claim with only one is labeled single-source), no open contradiction on a load-bearing claim | synthesis: coherence+clarity
+planning: objectives+strategy+criteria | execution: each load-bearing claim has ≥2 independent sources, except a claim settled by one tier-1 source (a claim with only one source is labeled single-source), no open contradiction on a load-bearing claim | synthesis: coherence+clarity
   </gates>
 
   <credibility>
