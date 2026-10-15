@@ -8,7 +8,7 @@ updated: 2026-10-15
 
 # `src/superclaude` 프롬프트 콘텐츠 감사 (Opus 5.5 / Sonnet 5.5 / Fable 5.1 기준)
 
-`src/superclaude/`의 agents, modes, core rules, mcp, skills를 감사했다. 질문은 하나다: 현행 Claude 모델이 마크다운·XML 콘텐츠를 **작성자 의도대로 인식하는가**. 코드 동작은 범위 밖이다.
+`src/superclaude/`의 agents, modes, core rules, mcp, skills를 감사했다(1차). 2차에서는 core/rules 모듈을 심층 감사하고, 저장소 로컬 작성 규칙(`.claude/rules/`, gotchas)과 commands·output-style을 감사했다. 질문은 하나다: 현행 Claude 모델이 마크다운·XML 콘텐츠를 **작성자 의도대로 인식하는가**. 코드 동작은 범위 밖이다.
 
 ## 요약
 
@@ -19,6 +19,14 @@ updated: 2026-10-15
   3. 단발 서브에이전트 실행 모델과 맞지 않는 대화형 본문
 - **가장 시급했던 항목**은 `security-engineer.md`의 gotcha였다. "superclaude = … not web app — skip web-vuln scans"가 조건 없이 모든 사용자 프로젝트로 배포되고 있었다. P0에서 수정했다.
 - **P0(작은 수정, 큰 효과)는 브랜치 `fix/prompt-content-audit`에 적용했다** ([08-implementation.md](./08-implementation.md)). P1·P2는 [03-analysis.md](./03-analysis.md)의 제안 목록으로 남아 있다.
+- **2차 라운드**([03g](./03g-analysis-core-rules.md)–[03i](./03i-analysis-commands.md), [08a](./08a-implementation-rules-commands.md), [09a](./09a-review-rules-commands.md)):
+  - 가장 큰 문제는 세 가지였다.
+    - brainstorm→plan 게이트를 실제로 수행하는 명령이 없었다.
+    - select-tool이 폐기된 Serena/Morphllm 결정표를 그대로 쓰고 있었다.
+    - 저장소 작성 규칙이 "Use proactively"·maxTurns·잘못된 동기화 명령을 가르치고, 축약 문체를 배포 콘텐츠로 퍼뜨렸다.
+  - 처리 결과:
+    - 03-analysis §4 P1의 일부(측정 불가 조건, 저장소 이력 누수, core/rules 쪽 참조 문제)를 함께 처리했다.
+    - 나머지 보류 항목은 08a에 있다.
 
 ## 방법
 
@@ -59,3 +67,8 @@ updated: 2026-10-15
 - [03f-analysis-sc-author.md](./03f-analysis-sc-author.md): sc-author 스킬과 그것이 가르치는 작성 가이드의 건전성
 - [08-implementation.md](./08-implementation.md): P0 적용 내역, 재평가로 보류한 항목, 검증 결과
 - [09-review.md](./09-review.md): P0 수정에 대한 독립 리뷰와 문서 사실 검증, 반영 내역
+- [03g-analysis-core-rules.md](./03g-analysis-core-rules.md): 2차 — core/rules 모듈 4개 심층 감사
+- [03h-analysis-repo-rules.md](./03h-analysis-repo-rules.md): 2차 — `.claude/rules/` 작성 규칙과 gotchas 감사
+- [03i-analysis-commands.md](./03i-analysis-commands.md): 2차 — commands 37개, 출력 스타일, 명령 간 일관성 감사
+- [08a-implementation-rules-commands.md](./08a-implementation-rules-commands.md): 2차 적용 커밋, 보류 항목, 검증
+- [09a-review-rules-commands.md](./09a-review-rules-commands.md): 2차 수정 독립 리뷰와 반영 내역
