@@ -32,10 +32,10 @@
 
 | 항목 | 사유 / 필요한 결정 |
 |---|---|
-| author-check X1이 memory 파일에도 단일 루트를 강제 | 코드 변경. format-xml.md는 이제 memory를 기본 md로 두고 XML 본문은 선택으로 설명한다 |
-| commands의 남은 축약(help·implement·init의 impl/deps/exec 등), pm description의 Direct 전략 누락 | Low |
+| author-check X1이 memory 파일에도 단일 루트를 강제 | **종결(코드 변경 없음).** X1은 XML 본문에만 적용되고 md 본문에는 구조 규칙이 없다. format-xml.md가 memory를 기본 md로 두고, XML 본문에서 덧붙인 줄을 X1이 잡는 것을 의도된 검사로 설명한다 |
+| commands의 남은 축약(help·implement·init의 impl/deps/exec 등), pm description의 Direct 전략 누락 | **처리.** help·sc·implement·init·brainstorm·task의 축약을 풀고, pm description에 direct 전략을 넣었다(Low 후속 커밋) |
 | `skill.md:45` "may read … only partially" | 현행 공식 best-practices 가이드가 같은 말을 한다(sc-author 작업자 확인) |
-| FLAGS `Scope: system > project > module > file` | 뜻(넓은 범위 우선인지)을 원문에서 확정할 수 없다 |
+| FLAGS `Scope: system > project > module > file` | **삭제.** v3부터 이어진 줄로 뜻을 확정할 수 없고, `--scope`는 값 하나만 받아 충돌 상황이 없다. 상시 로드 비용만 든다 |
 | analyze.md의 🔴🟡🟢 심각도 표기 | 명령 출력용 심각도라 커널 범례와 별개로 둠 |
 
 ## 검증

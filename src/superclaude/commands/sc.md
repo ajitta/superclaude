@@ -26,10 +26,10 @@ description: superclaude command dispatcher that routes to the other /sc:* comma
     - document: Focused doc generation
     - estimate: Dev effort/complexity estimates
     - explain: Code + concept explanations
-    - git: Smart git ops + PR integration
+    - git: Git operations with PR integration
     - help: Full command reference
     - implement: Feature implementation + MCP integration
-    - improve: Code quality + perf improvements
+    - improve: Code quality and performance improvements
     - index: Project docs + knowledge base
     - index-repo: Compact repo index (~3KB) for cheap navigation
     - load: Session context loading (memory folder + auto memory)

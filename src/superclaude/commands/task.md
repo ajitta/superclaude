@@ -14,7 +14,7 @@ description: Execute complex tasks as a tracked Epic → Story → Task hierarch
   2. Decompose: Break into Epic → Story → Task hierarchy; each task starts open with an empty evidence note in its TaskCreate description
   3. Strategy: Pick execution order (sequential for deps, parallel for independent, adaptive for mixed)
   4. Checkpoint: Changes affect >3 files → present numbered plan → wait for user approval
-  5. Execute: Intelligent delegation + parallel where possible
+  5. Execute: delegate where a specialist fits and run independent tasks in parallel
   6. Validate: Quality gates + completion verification — a task is marked completed in TaskUpdate only when its evidence note cites the check that passed (exit code, test output, observed outcome); a sub-agent's result is a claim to check, not evidence
   7. Cleanup: With --cleanup, delete completed and cancelled tasks and list stale and blocked ones, per the task cleanup section
   </flow>

@@ -10,13 +10,13 @@ description: Feature and code implementation with sub-agent delegation and MCP i
   <syntax>/sc:implement [feature] [--plan docs/plans/...] [--type component|api|service|feature] [--framework react|vue|express] [--safe] [--with-tests]</syntax>
 
   <flow>
-  1. Load: If --plan given, read plan doc + extract tasks; a split plan's index is read here and each phase file it links when that phase starts, so the Checkpoint step covers the index's phase list; else analyze reqs + tech context
+  1. Load: If --plan given, read plan doc + extract tasks; a split plan's index is read here and each phase file it links when that phase starts, so the Checkpoint step covers the index's phase list; otherwise analyze the requirements and technical context
   2. Plan: Approach + delegate to agents; verify simplest viable approach pre-build; with --plan, follow the plan's task order exactly
   3. Checkpoint: Without --plan, changes that hit more than 3 files → show a numbered plan and wait for user approval before editing. With --plan, invoking on that plan is the approval: proceed, and ask only before departing from the plan
-  4. Execute: Code + framework best practices; with --plan, work through the tasks in order and check each box as the Integrate step describes
+  4. Execute: write the code following the framework's conventions; with --plan, work through the tasks in order and check each box as the Integrate step describes
   5. Phase Gate: After each phase/task group — build + run, then: "Does this already solve the next phase's problem?" If yes, skip with reason
-  6. Validate: Security + quality checks; run verify cmd per task
-  7. Integrate: Docs + test recs; report any blockers hit. With --plan, record every departure from the plan under a "Deviations" heading in the plan doc, in the same commit as the code, and check a box only when the code backs it (a task dropped by decision becomes `- [x] ~~task~~` with its reason under Deviations) — `status: complete` with an open box is a defect. With a split plan, a phase's Deviations go in its phase file; a finished phase file gets `status: complete` and its box in the index (linked from the phase file's header) is checked; the index gets `status: complete` when its last box is checked. The first checked box sets the plan (index) to `status: implementing`; in a feature folder, set the README `phase:` to `implementing` then and to `complete` when the plan (index) reaches `status: complete`
+  6. Validate: security and quality checks; run each task's verify command
+  7. Integrate: docs and test recommendations; report any blockers hit. With --plan, record every departure from the plan under a "Deviations" heading in the plan doc, in the same commit as the code, and check a box only when the code backs it (a task dropped by decision becomes `- [x] ~~task~~` with its reason under Deviations) — `status: complete` with an open box is a defect. With a split plan, a phase's Deviations go in its phase file; a finished phase file gets `status: complete` and its box in the index (linked from the phase file's header) is checked; the index gets `status: complete` when its last box is checked. The first checked box sets the plan (index) to `status: implementing`; in a feature folder, set the README `phase:` to `implementing` then and to `complete` when the plan (index) reaches `status: complete`
   </flow>
 
   <flags>

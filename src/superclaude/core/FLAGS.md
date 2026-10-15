@@ -48,7 +48,6 @@ Note: match flags to session type — analysis/discussion sessions rarely need -
   - Safety First: --safe-mode > --validate > optimization
   - Explicit Override: user flags > auto-detection
   - MCP: --no-mcp overrides individual MCP flags; when a requested MCP server is unavailable, say so once and fall back to native tools
-  - Scope: system > project > module > file
   </priority_rules>
 
 </component>

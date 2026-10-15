@@ -1,5 +1,5 @@
 ---
-description: Orchestrate sub-agents by brainstorm or wave strategy, manage workflows, and document learnings. On request only — the user's /sc:pm or a workflow step that names it. Not for one sub-agent call — the Agent tool; one task from scope to review — /sc:agent; a tracked task hierarchy — /sc:task.
+description: Route a request by brainstorm, direct or wave strategy, orchestrate sub-agents, and document learnings. On request only — the user's /sc:pm or a workflow step that names it. Not for one sub-agent call — the Agent tool; one task from scope to review — /sc:agent; a tracked task hierarchy — /sc:task.
 ---
 <component name="pm" type="command">
 

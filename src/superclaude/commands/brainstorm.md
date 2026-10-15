@@ -11,7 +11,7 @@ description: Interactive requirements discovery through Socratic dialogue + syst
 
   <flow>
   1. Explore: Socratic dialogue + systematic questioning. When the slug folder holds `00-intent.md`, read it first and keep its wording as the anchor; 01-discovery records an "Intent coverage" table mapping each of its five fields to how discovery made it concrete.
-  2. Analyze: Multi-agent coord + domain expertise. With --vs, gen k perspectives with probs + landscape synth; --depth tune detail (shallow→brief, normal→balanced, deep→detailed).
+  2. Analyze: multi-agent coordination with domain expertise. With --vs, generate k perspectives with probabilities and a landscape synthesis; --depth tunes detail (shallow→brief, normal→balanced, deep→detailed).
   3. Validate: Feasibility check + requirement validation.
   4. Specify: feature path `docs/features/<slug>/01-discovery.md`, standalone `docs/specs/<topic>-discovery-<username>-YYYY-MM-DD.md` — slug resolution (zero-match default `[f]`), frontmatter, README update per core/rules/RULES_DOCS.md `<doc_output_convention>`.
   5. Approve: Show spec for user review — no proceed without confirm.
@@ -49,7 +49,7 @@ description: Interactive requirements discovery through Socratic dialogue + syst
   </outputs>
 
   <tools>
-  - Read/Write/Edit: Requirements docs + spec gen
+  - Read/Write/Edit: requirements docs and spec generation
   - TaskCreate/TaskUpdate: Multi-phase exploration tracking
   - Agent: Parallel exploration + multi-agent
   - WebSearch / Tavily search skill: Market research + tech validation
