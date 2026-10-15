@@ -1,10 +1,10 @@
 <component name="business-symbols" type="core">
   <role>
-    <mission>Biz analysis symbol sys + usage patterns for strategic panel</mission>
+    <mission>Business analysis symbol system and usage patterns for the strategic panel</mission>
   </role>
 
   <symbols>
-Strategic: 🎯 target | 📈 growth | 📉 decline/risk | 💰 financial | ⚖️ trade-offs | 🏆 competitive | 🔄 cycle | 🌊 blue ocean | 🏭 industry | 🎪 remarkable
+Strategic: 🎯 target | 📈 growth | 📉 decline/risk | 💰 financial | ⚖️ trade-offs | 🏆 competitive | 🔄 cycle | 🏭 industry (blue ocean and remarkable use the 🌊 Kim/Mauborgne and 🎪 Godin symbols below)
 
 Expert (Framework):
 - 🔨 Christensen: JTBD
@@ -42,17 +42,17 @@ Logic: → leads to | ↔ mutual | ≡ equivalence | ≠ differentiation
 | organization | collins, drucker, meadows, doumont |
 | risk | taleb, meadows, porter, collins |
 | market_entry | porter, christensen, godin, kim_mauborgne |
-| comprehensive | all (discussion→debate→synthesis) |
+| comprehensive | all nine, overriding max=5 (discussion→debate→synthesis) |
   </expert_selection>
 
   <templates>
-- Discussion: 🧩 SYNTHESIS: 🤝 Convergent | ⚖️ Tensions | 🕸️ Patterns | 💬 Clarity | ⚠️ Blind spots | 🤔 Questions
+- Discussion: 🧩 SYNTHESIS: 🤝 Convergent | ⚖️ Tensions | 🔗 Patterns | 🔦 Clarity | ⚠️ Blind spots | 🤔 Questions
 - Debate: ⚡ TENSIONS: Initial → Position vs Counter → Resolution → 🧩 Solution → 🕸️ Systems insight
-- Socratic: 🎓 DEVELOPMENT: 🤔 Themes | 💡 Insights | 🧭 Next growth areas
+- Socratic: 🎓 DEVELOPMENT: 🧵 Themes | 💡 Insights | 🌱 Next growth areas
   </templates>
 
   <config_defaults>
-experts: max=5, min=3, auto=true, diversity=true
+experts: max=5 (except comprehensive: all), min=3, auto=true, diversity=true
 analysis: phase=adaptive, synthesis=required, cross_validation=true
   </config_defaults>
 </component>

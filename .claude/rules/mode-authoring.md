@@ -49,7 +49,7 @@ Every mode **must** define all four axes (enforced by `tests/unit/test_mode_stru
   </role>
 
   <thinking>
-  - Principle-Name: explanation in prose (3-5 items)
+  - Principle-Name: explanation in prose (usually 3-5; fewer when the mode is narrow)
   </thinking>
 
   <communication>Short directives in full words, joined by | on one line.</communication>
@@ -57,7 +57,7 @@ Every mode **must** define all four axes (enforced by `tests/unit/test_mode_stru
   <priorities>Trade-off A > Trade-off B | C > D | E > F.</priorities>
 
   <behaviors>
-  - Pattern-Name: concrete behavioral description (3-5 items)
+  - Pattern-Name: concrete behavioral description (usually 3-5; fewer when the mode is narrow)
   </behaviors>
 
   <!-- optional — only if it states directives the 4 axes miss; see note above -->

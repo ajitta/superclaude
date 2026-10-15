@@ -1,15 +1,15 @@
 <component name="research-config" type="config">
   <role>
-    <mission>Deep research config + strategy settings</mission>
+    <mission>Deep research configuration and strategy settings</mission>
   </role>
 
   <defaults>
-planning: unified | max_hops: 5 | memory: true | parallel: true (DEFAULT)
+planning: unified for /sc:research without --strategy (--depth quick runs without asking); otherwise chosen by query clarity per the strategies table, so a clear query runs without waiting for approval | max_hops: 5 | memory: true | parallel: true (DEFAULT)
   </defaults>
 
   <parallel_rules>
-- Mandatory: Many searches | Batch extracts | Indep analyses | Non-dep hops
-- Sequential only: Explicit dep | Rate limit | User ask
+- Mandatory: Many searches | Batch extracts | Independent analyses | Independent hops
+- Sequential only: Explicit dependency | Rate limit | User request
 - Batch: searches=5, extractions=3, analyses=2, group_by=domain|complexity|resource
   </parallel_rules>
 
@@ -38,7 +38,7 @@ assess_quality | id_gaps | maybe_replan | tweak_strategy
 | Tool | Primary Use | Fallback |
 |------|-------------|----------|
 | tavily | Search, static HTML, public content | native WebSearch, alt queries |
-| playwright | JS need, dynamic, auth, interactive | tavily extraction |
+| playwright | JS required, dynamic, auth, interactive | tavily extraction |
 | context7 | Tech docs, API refs, framework guides | tavily search |
   </tool_routing>
 
@@ -73,7 +73,7 @@ planning: objectives+strategy+criteria | execution: each load-bearing claim has 
   </output_formats>
 
   <replanning>
-replan when: sources disagree on a load-bearing claim | a load-bearing claim has fewer than 2 independent sources | the core question is still unanswered
+replan when: sources disagree on a load-bearing claim | a load-bearing claim has fewer than 2 independent sources, unless one tier-1 source (the official documentation, specification, or primary record of the thing itself) settles it — no second source can outrank that, so label the claim single-source and continue | the core question is still unanswered
   </replanning>
 
   <errors>

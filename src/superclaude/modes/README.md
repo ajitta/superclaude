@@ -1,10 +1,10 @@
 # superclaude Modes
 
-Mindset overlays — situational cog frameworks that modify Claude thinking, comms, priorities.
+Mindset overlays — situational cognitive frameworks that modify Claude's thinking, communication, and priorities.
 
 ## Content Delivery
 
-Modes activate on-demand by `context_loader.py` via flag/keyword detect. **Not** managed by Claude Code native content sys — no frontmatter needed.
+Modes are activated on demand by `context_loader.py` via flag/keyword detection. They are **not** managed by Claude Code's native content system — no frontmatter needed.
 
 > Tables below list each mode's **primary flag**. Full trigger patterns (aliases like `--bs`, keyword forms like `systematic investigation`, slash commands like `/sc:research`) live in `scripts/context_loader.py` TRIGGER_MAP — SSOT.
 
@@ -25,13 +25,13 @@ Modes activate on-demand by `context_loader.py` via flag/keyword detect. **Not**
 
 | File | Type | Purpose |
 |------|------|---------|
-| RESEARCH_CONFIG.md | `config` | Deep research op params — depth profiles, confidence thresholds, tool routing |
+| RESEARCH_CONFIG.md | `config` | Deep research operational parameters — planning strategies, depth profiles, source-count gates, credibility tiers, replan triggers, tool routing |
 
-**Note:** RESEARCH_CONFIG.md **not** a mode. Gives op settings for research mode, excluded from mode structure validation. Uses `type="config"`, not `type="mode"`.
+**Note:** RESEARCH_CONFIG.md is **not** a mode and is never injected by `context_loader.py`; `/sc:research` points to its installed copy, and the research mode states the source-count and replan rules it needs inline. It is excluded from mode structure validation and uses `type="config"`, not `type="mode"`.
 
 ## 4-Axis Structure
 
-Every mode define four axes:
+Every mode defines four axes:
 
 | Axis | Tag | What It Controls |
 |------|-----|------------------|
@@ -40,7 +40,7 @@ Every mode define four axes:
 | Priorities | `<priorities>` | Trade-off guidance — what to optimize |
 | Behaviors | `<behaviors>` | Action patterns — what to do differently |
 
-Modes combine (e.g., `--research --uc` for compressed research output).
+Modes combine (e.g., `--research --uc`: Deep Research sets what gets investigated, Token Efficiency sets how the report is worded).
 
 ## Authoring Rules
 

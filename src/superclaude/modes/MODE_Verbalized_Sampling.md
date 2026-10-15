@@ -1,23 +1,23 @@
 <component name="verbalized-sampling" type="mode">
   <role>
-    <mission>Distribution-level answering — gen k candidate responses with post-hoc probabilities instead of collapsing to one modal answer</mission>
+    <mission>Distribution-level answering — generate k candidate responses with post-hoc probabilities instead of collapsing to one modal answer</mission>
   </role>
 
   <thinking>
-  - Distribution over Point: query asks for a landscape, not a single best answer
+  - Distribution over Point: the query asks for a landscape, not a single best answer
   - Tails over Mode: post-training (RLHF, SFT-only, DPO alike) collapses output toward the typical response; repeated calls or higher temperature alone cannot recover the tails — one call describing the distribution can
   - Framework Diversity over Wording Diversity: candidates differing only in phrasing are not candidates
   - Describe then Label: what emerged decides the label, never the reverse
   </thinking>
 
-  <communication>Present k candidates as a set, not a ranking | Numeric probability per candidate, assigned after gen | Synthesis maps the landscape, user picks | State variant + tau + k so the run is reproducible</communication>
+  <communication>Present k candidates as a set, not a ranking | Numeric probability per candidate, assigned after generation | Synthesis maps the landscape, and the user picks | State the variant, tau, and k so the run is reproducible</communication>
 
   <priorities>Genuine divergence > pleasant coverage | Validated elicitation pattern > improvised phrasing | Complete distribution > detailed single candidate | User's choice > model's verdict</priorities>
 
   <behaviors>
-  - Detect: parse `--vs [standard|cot|multi]`, brackets `[k:N] [tau:N] [turns:N] [no-synthesis]`, NL diversity words → resolve variant + params
+  - Detect: parse `--vs [standard|cot|multi]`, the brackets `[k:N] [tau:N] [turns:N] [no-synthesis]`, and natural-language diversity words, then resolve the variant and params
   - Route: creative (write/design/brainstorm) → Standard | analytical/decision (analyze/compare/evaluate) → CoT | exhaustive ("all options", "every angle") → Multi | factual single-answer → no overlay (see fallback) | ambiguous → CoT
-  - Generate: run the template verbatim for the chosen variant — a fixed recipe keeps runs reproducible; the validated core is the elicitation pattern (k candidates, each with a verbalized probability, under a tail constraint, in one call), not magic wording
+  - Generate: follow the chosen variant's template verbatim as Claude's own instruction for this response — the template is not printed in the output and not sent to a subagent; a fixed recipe keeps runs reproducible; the validated core is the elicitation pattern (k candidates, each with a verbalized probability, under a tail constraint, in one call), not magic wording
   - Label: attach probabilities and descriptive names only AFTER the text exists
   - Synthesize: close with the landscape block unless `[no-synthesis]`
   </behaviors>
@@ -49,7 +49,7 @@ Precedence: explicit flags > brackets > NL hints > variant defaults > global def
 
 **VS-CoT** (recommended default — the paper's quality-diversity Pareto winner; Standard is the cost pick, 1.12x direct vs CoT's 1.51x in the paper's one measured condition): "First, briefly analyze what genuinely distinct perspectives, frameworks, or assumptions could lead to different answers for this query. Consider different value weightings, evidence bases, and methodological lenses. Then, generate {k} responses with their probabilities, ensuring each candidate reflects a genuinely distinct perspective from your analysis. Each response should include reasoning (brief), text, and probability. Please sample at random from {tail_instruction}." + query
 
-**VS-Multi** (per turn): T1 "Generate {k} responses with their confidence levels to: [query]" → T2 "Generate {k} MORE responses DIFFERENT from your previous ones, with confidence levels." → T3+ "Generate {k} responses exploring perspectives NOT YET covered, with confidence levels." Synthesis once, after all turns.
+**VS-Multi** (a "turn" is a `### Turn N` section inside the same response, not a separate user turn): T1 "Generate {k} responses with their confidence levels to: [query]" → T2 "Generate {k} MORE responses DIFFERENT from your previous ones, with confidence levels." → T3+ "Generate {k} responses exploring perspectives NOT YET covered, with confidence levels." Synthesis once, after all turns. A reply ends before the last turn only on the token cutoff (see the token-cutoff gotcha).
 
 Probability word: "probability" for Standard/CoT, "confidence" for Multi — the paper's 7-way wording ablation found no significant overall effect; this pairing matches its best-performing tendencies.
 
@@ -72,11 +72,11 @@ Synthesis block: **Convergence** (what most agree on — likely robust) | **Key 
   - population-sim: VS overdisperses vs real survey data (SD-ratio 0.4–0.56 → 1.26–1.37 across 3 model families) — present output as an idea landscape, never as a representative population/customer/voter distribution without calibration against held-out data
   - long-form: very long single VS outputs are untested (authors' own guidance) and collapse recurs inside one large output — run VS at idea/outline level, let the user pick, expand the winner in default single-answer mode
   - synthesis-verdict: synthesis is a landscape map, not a recommendation. User chooses
-  - token-cutoff: long distributions (k≥6, turns≥4, or detailed framework analyses) can hit the reply-token cap mid-stream. Mitigate: (1) drop k to 4-5 unless "wild"/exhaustive was explicit; (2) on k+turns overflow, emit one perspective per turn and close with a `[CONTINUE]` marker so the next turn resumes at N+1; (3) skip synthesis when near the cap — surface the raw distribution and offer synthesis on follow-up
+  - token-cutoff: long distributions (k≥6, turns≥4, or detailed framework analyses) can hit the reply-token cap mid-stream. Mitigate: (1) drop k to 4-5 unless "wild"/exhaustive was explicit; (2) on k+turns overflow, emit one `### Turn N` section per reply and close each reply with a `[CONTINUE]` marker so the next reply resumes at Turn N+1 — the only case where `[CONTINUE]` is used; (3) skip synthesis when near the cap — surface the raw distribution and offer synthesis on follow-up
   </gotchas>
 
   <bounds>
-    <does>distribution-level gen, multi-variant routing, post-hoc probability labeling, landscape synthesis.</does>
+    <does>distribution-level generation, multi-variant routing, post-hoc probability labeling, landscape synthesis.</does>
     <never>collapse to a single answer while the overlay is active, pre-assign perspective roles, claim the probabilities are calibrated or reuse them as population-frequency or fact-confidence estimates.</never>
     <fallback>Revert to default single-answer behavior when the query wants one answer or has one verifiable truth (factual/information-seeking) — on an explicit `--vs` there, state the quality trade-off in one line and proceed (user flags win) — and when expanding a candidate the user picked.</fallback>
   </bounds>

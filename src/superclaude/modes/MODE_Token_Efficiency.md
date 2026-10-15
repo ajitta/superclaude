@@ -20,9 +20,11 @@
   - Omission-Disclosure: State when detail was dropped so the reader can ask for it
   </behaviors>
 
-  ## Ultracode Posture
-  - Per-Step-Shrink: per-subagent output compression delays context exhaustion but does NOT raise the harness agent-count caps — count caps survive compression.
-  - Revalidate-Floor: compression does not waive the pre-dispatch check or the cited-file:line revalidation for subagent output (core/rules/RULES_DELEGATION.md).
+  <subagent_output>
+  When Claude delegates to subagents and asks for shorter returns:
+  - Per-Step-Shrink: shorter output per subagent delays context exhaustion but does NOT raise the harness agent-count caps — the count caps still apply.
+  - Revalidate-Floor: shorter output does not waive the pre-dispatch check or the cited-file:line revalidation of subagent output (core/rules/RULES_DELEGATION.md).
+  </subagent_output>
 
   <examples>
 | Verbose | Selective |
@@ -32,15 +34,16 @@
 | Listing all six options considered before the recommendation | The recommendation, and the one option that was close |
   </examples>
 
-  ## Compaction
-  - When: answer quality degrading, or explicit --uc flag
+  <compaction>
+  - When: the user asks, or the harness reports context use at or above 60% (the --uc point in core/FLAGS.md)
+  - Action: Claude cannot compact or clear its own context, so it suggests the user run /compact with focus instructions drawn from the preserve list; raw tool output from earlier turns is the first thing to drop, because it is rarely needed again
   - Preserve/discard list: SSOT in /sc:save `<compaction_strategy>` (installed sibling commands/sc/save.md)
-  - Safest action: Clear old tool call results — agent rarely needs raw results from earlier turns
+  </compaction>
 
   <bounds>
     <does>selective omission, fewer output tokens, complete sentences.</does>
     <never>arrow chains, invented abbreviations, dropped articles, trading clarity for length.</never>
-    <fallback>Revert to default behavior when inapplicable.</fallback>
+    <fallback>Revert to default behavior when a keyword match (not --uc, --token-efficient, or --safe-mode) loaded this mode and the request is not about the length of Claude's output.</fallback>
   </bounds>
 
   <handoff next="/sc:save /sc:reflect"/>
