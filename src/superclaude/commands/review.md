@@ -1,11 +1,11 @@
 ---
-description: Review a work product (code, plan, design, spec) for quality, correctness and alignment, with structured feedback. Use when asked for a second opinion or an independent review. Not for a casual "does this look right?" — answer briefly.
+description: Review a work product (code, plan, design, spec) for quality, correctness and alignment, with structured feedback. Use when asked for a second opinion or an independent review. Not for a codebase-wide audit across domains — /sc:analyze; a casual "does this look right?" — answer briefly.
 ---
 
 <component name="review" type="command">
 
   <role command="/sc:review">
-    <mission>Review work product — code, plan, design, spec — for quality, correctness, alignment. Structured feedback.</mission>
+    <mission>Review a work product (code, plan, design, spec) for quality, correctness and alignment, with structured feedback.</mission>
   </role>
 
   <syntax>/sc:review [target] [--scope pr|diff|file|branch|plan|design|spec] [--structured] [--audit-delegated]</syntax>
@@ -13,10 +13,10 @@ description: Review a work product (code, plan, design, spec) for quality, corre
   <flow>
   1. Scope: pick review range — PR/diff/file/branch for code, or plan/design/spec doc path
   2. Gather: read target artifact + related context (spec/plan if reviewing code; parent spec if reviewing plan; requirements if reviewing design; `00-intent.md` from the feature folder when present). Find in docs/specs/ or docs/plans/ if present
-  3. Review: Dim 1 (spec fidelity) — artifact match intent (the spec, and the feature's `00-intent.md` when present)? Dim 2 (artifact quality) — correctness for code, planning rigor for plan, architectural soundness for design, requirement coverage for spec. Dim 3 (always-loaded docs) — did the change make CLAUDE.md, AGENTS.md, `.claude/rules/**` or any file the session-start import chain pulls in stale (a command, path, count or convention they state)? Report as a finding. No spec → weight shift to Dim 2
-  4. Challenge: before categorize, answer plain — What condition make approach fail? What gap easy to miss? What hardest to change 6 months from now?
-  5. Categorize: group finding as Critical (must fix) | Important (should fix) | Suggestion (nice to have)
-  6. Verify: evidence fit artifact type — tests+lint for code, executability+completeness for plan, trade-off rationale for design, acceptance criteria for spec
+  3. Review: Dim 1 (spec fidelity) — does the artifact match the intent (the spec, and the feature's `00-intent.md` when present)? Dim 2 (artifact quality) — correctness for code, planning rigor for plan, architectural soundness for design, requirement coverage for spec. Dim 3 (always-loaded docs) — did the change make CLAUDE.md, AGENTS.md, `.claude/rules/**` or any file the session-start import chain pulls in stale (a command, path, count or convention they state)? Report as a finding. With no spec, shift the weight to Dim 2
+  4. Challenge: before categorizing, answer in plain words — Under what condition does the approach fail? What gap is easy to miss? What will be hardest to change 6 months from now?
+  5. Categorize: group each finding as Critical (must fix) | Important (should fix) | Suggestion (nice to have)
+  6. Verify: the evidence fits the artifact type — tests+lint for code, executability+completeness for plan, trade-off rationale for design, acceptance criteria for spec
   7. Process: classify each finding as a change request, a concern or a question; verify it against the source of truth (file:line, test output) and withdraw or downgrade any finding the evidence does not support
   8. Delegated-decision audit (--audit-delegated): when called on spec with "Resolved Decisions" table, scope review to ONLY row where `mode` is `delegated` (per the /sc:brainstorm Decision-mode tag step heuristic). Recorded choice already read in the Gather step, so re-eval goes to one isolated delegate (independent stream, not a double-check) under delegate packet rule in core/rules/RULES_DELEGATION.md: it gets each delegated Q and its options as recorded (where spec records none, the Q alone, delegate forms own candidates, report notes it), never the recorded choice or a ★/recommendation marker. Limit: a delegate that can read the repo can still find the recorded choice; its files inspected and commands run show whether it did, and the report says so. Surface for each: original Q, delegate's pick, recorded choice, agree/differ; a row whose recorded outcome defers the choice compares against the option the spec recommended, or reports the pick alone when none was recommended. Other row skipped. Delegated decision historically need explicit audit; user-confirmed choice already pass direct user judgment.
   9. Spec gate: when the target is a `status: draft` spec (--scope spec, or a discovery spec path the Scope step picked), once the user has resolved the findings, append this round to the spec's "Self-Review Iteration Log" section (v1→vN delta); with no Critical finding open and the user's go-ahead, set `status: approved-for-plan`. Without that go-ahead the status stays draft.
@@ -31,21 +31,21 @@ description: Review a work product (code, plan, design, spec) for quality, corre
   <outputs>
   | Artifact | Purpose |
   |---|---|
-  | Review summary | Categorized finding (critical/important/suggestion) |
-  | Action items | Required change before merge/approval |
-  | Verification | Evidence fit artifact type (test output, plan executability, design rationale) |
+  | Review summary | Categorized findings (critical/important/suggestion) |
+  | Action items | Changes required before merge/approval |
+  | Verification | Evidence that fits the artifact type (test output, plan executability, design rationale) |
   </outputs>
 
 
   <tools>
-  - Grep: search pattern across changed file
-  - Read: examine file content + context
-  - Bash: run test + lint command
+  - Grep: search patterns across changed files
+  - Read: examine file content and context
+  - Bash: run test and lint commands
   - Agent: dispatch isolated reviewer subagent for big review (--structured) and for the --audit-delegated re-eval (the Delegated-decision audit step); Read the delegate packet rule in core/rules/RULES_DELEGATION.md before dispatch, since it sets what the reviewer's prompt leaves out
   </tools>
 
   <focus_agent_mapping>
-  When domain context suggest specialist review, delegate to:
+  When the domain context suggests a specialist review, delegate to:
   security → @security-engineer | performance → @performance-engineer | quality → @quality-engineer | architecture → @system-architect
   </focus_agent_mapping>
 
@@ -70,13 +70,13 @@ description: Review a work product (code, plan, design, spec) for quality, corre
 
   <gotchas>
   - scope-focus: with --scope diff|pr|branch, review the changed lines and the code they affect; a file, directory or doc target is reviewed whole
-  - no-unsolicited-fixes: flag issue but no fix unless asked
+  - no-unsolicited-fixes: flag issues but do not fix them unless asked
   </gotchas>
 
   <bounds>
     <does>work-product review (code/plan/design/spec), quality analysis, security scan, spec+quality review plus a staleness check on always-loaded docs.</does>
     <never>auto-merge, auto-approve, or modify the artifact without explicit permission; the one exception is the user-approved log entry and status update in the Spec gate step.</never>
-    <fallback>No spec: weight review toward artifact quality dim.</fallback>
+    <fallback>No spec: weight the review toward the artifact quality dimension.</fallback>
   </bounds>
 
   <handoff next="/sc:implement /sc:test /sc:troubleshoot"/>

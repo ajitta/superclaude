@@ -4,7 +4,7 @@ description: Feature and code implementation with sub-agent delegation and MCP i
 <component name="implement" type="command">
 
   <role command="/sc:implement">
-    <mission>Feature + code impl with smart agent delegate + MCP integration</mission>
+    <mission>Feature and code implementation with agent delegation and MCP integration</mission>
   </role>
 
   <syntax>/sc:implement [feature] [--plan docs/plans/...] [--type component|api|service|feature] [--framework react|vue|express] [--safe] [--with-tests]</syntax>
@@ -43,8 +43,8 @@ description: Feature and code implementation with sub-agent delegation and MCP i
 | `dashboard widget --framework vue` | C7 Vue patterns |
   <example name="scope-creep" type="error-path">
     - Input: /sc:implement 'add logout button' (agent also refactors auth module and adds session management)
-    - Why wrong: Impl past requested scope. "Add logout button" no authorize refactor adjacent code.
-    - Correct: Impl only logout button. Suggest separate tasks for auth refactor + session mgmt.
+    - Why wrong: the change goes past the requested scope. "Add logout button" does not authorize refactoring adjacent code.
+    - Correct: Implement only the logout button. Suggest separate tasks for the auth refactor and session management.
   </example>
 
   </examples>
@@ -57,8 +57,8 @@ description: Feature and code implementation with sub-agent delegation and MCP i
   </gotchas>
 
   <bounds>
-    <does>smart impl, framework best practices, + full testing.</does>
-    <never>arch decisions without consult, conflict with security, + override safety.</never>
+    <does>implements following framework best practices, with full testing.</does>
+    <never>makes architecture decisions without consultation, conflicts with security, or overrides safety.</never>
   </bounds>
 
   <handoff next="/sc:test /sc:build"/>

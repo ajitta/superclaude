@@ -4,7 +4,7 @@ description: Load session context from the project memory folder (.claude/memori
 <component name="load" type="command">
 
   <role command="/sc:load">
-    <mission>Session lifecycle mgmt with the project memory folder + Claude auto memory for proj context load</mission>
+    <mission>Session lifecycle management with the project memory folder and Claude auto memory for loading project context</mission>
   </role>
 
   <syntax>/sc:load [target] [--type project|config|deps|checkpoint] [--refresh] [--analyze]</syntax>
@@ -12,9 +12,9 @@ description: Load session context from the project memory folder (.claude/memori
   <flow>
   1. Load (memory folder): Glob .claude/memories/*.md → Read pm_context when present + the newest session_*_[branch-slug].md of the current branch (slug per /sc:save <storage>); none → the newest session_* of any branch, reported as that branch's record; folder absent → skip
   2. Load (auto memory): MEMORY.md (auto-load) + topic files linked from MEMORY.md
-  3. Discover: Proj struct + reqs (Glob/Grep/Read)
-  4. Activate: Proj context + workflow prep
-  5. Validate: Context integrity + session ready
+  3. Discover: project structure and requirements (Glob/Grep/Read)
+  4. Activate: project context and workflow preparation
+  5. Validate: context integrity and session readiness
   6. Session Goal (optional): if the user gives a goal, record it as a 1-line objective; restate it when the work changes direction and before /sc:save.
   </flow>
 
@@ -30,9 +30,9 @@ description: Load session context from the project memory folder (.claude/memori
 
 
   <tools>
-  - Glob/Read: memory folder + auto memory + proj file analysis
-  - Grep: proj file analysis
-  - Write: Checkpoint create
+  - Glob/Read: memory folder, auto memory and project file analysis
+  - Grep: project file analysis
+  - Write: checkpoint creation
   </tools>
 
   <examples>
@@ -40,28 +40,28 @@ description: Load session context from the project memory folder (.claude/memori
 | Input | Output |
 |---|---|
 | `/sc:load` | Current dir + memory folder + auto memory |
-| `/path/to/project --type project --analyze` | Specific proj + analysis |
+| `/path/to/project --type project --analyze` | Specific project with analysis |
 | `session_123 --type checkpoint` | Restore checkpoint |
 | `--type deps --refresh` | Fresh dep analysis |
 
   <example name="load-wrong-project" type="error-path">
     - Input: /sc:load /path/to/wrong/project --type project
-    - Why wrong: Load context for wrong proj pollute session with irrelevant info.
-    - Correct: Verify proj path first (ls, git remote -v), then /sc:load with confirmed path.
+    - Why wrong: loading context for the wrong project pollutes the session with irrelevant information.
+    - Correct: verify the project path first (ls, git remote -v), then run /sc:load with the confirmed path.
   </example>
 
   </examples>
 
 
   <gotchas>
-  - stale-memory: Verify loaded memory vs current file state before act on it
+  - stale-memory: verify loaded memory against the current file state before acting on it
   - dual-persistence: Check both the memory folder and auto memory for full context
   </gotchas>
 
   <bounds>
-    <does>memory folder + auto memory load, cross-session persist, context load.</does>
-    <never>modify struct, load without validation, override without checkpoint.</never>
-    <fallback>Memory folder absent: auto memory + Read CLAUDE.md/PLANNING.md/TASK.md, Glob for struct. Ask user for guidance when uncertain.</fallback>
+    <does>loads the memory folder and auto memory, persists context across sessions.</does>
+    <never>modifies project structure, loads without validation, or overrides without a checkpoint.</never>
+    <fallback>Memory folder absent: auto memory + Read CLAUDE.md/PLANNING.md/TASK.md, Glob for the project structure. Ask the user for guidance when uncertain.</fallback>
   </bounds>
 
   <handoff next="/sc:analyze /sc:index-repo /sc:task"/>

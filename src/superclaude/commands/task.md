@@ -1,5 +1,5 @@
 ---
-description: Execute complex tasks with workflow management and sub-agent delegation, updating tracked task state. On request only — the user's /sc:task or a workflow step that names it. Not for single-step actions or small TODOs — do them directly.
+description: Execute complex tasks as a tracked Epic → Story → Task hierarchy with sub-agent delegation. On request only — the user's /sc:task or a workflow step that names it. Not for single-step actions or small TODOs — do them directly; specialist waves — /sc:pm; one task from scope to review — /sc:agent.
 ---
 <component name="task" type="command">
 
@@ -70,14 +70,14 @@ description: Execute complex tasks with workflow management and sub-agent delega
 
 
   <gotchas>
-  - task-count: No excessive sub-tasks. Break into 3-7 tasks max per feature
+  - task-count: avoid excessive sub-tasks; break each feature into at most 3-7 tasks
   - already-done: Check git log and existing code before creating implementation tasks
-  - workflow-task-state: Under ultracode Workflow fan-out, harness task-state may not survive the subagent boundary — the main loop owns TaskCreate/TaskUpdate and the >3-file approval checkpoint (the Checkpoint step); subagents return task results and cannot pause for input
+  - workflow-task-state: Under a Workflow-tool fan-out, harness task-state may not survive the subagent boundary — the main loop owns TaskCreate/TaskUpdate and the >3-file approval checkpoint (the Checkpoint step); subagents return task results and cannot pause for input
   </gotchas>
 
   <bounds>
     <does>complex task coordination, hierarchical breakdown, dependency analysis, task cleanup.</does>
-    <never>simple single-file tasks, compromise quality, operate without validation.</never>
+    <never>takes on simple single-file tasks, compromises quality, or operates without validation.</never>
   </bounds>
 
   <handoff next="/sc:test /sc:implement"/>

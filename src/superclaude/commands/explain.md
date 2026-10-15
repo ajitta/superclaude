@@ -4,7 +4,7 @@ description: Give clear explanations of code, concepts and system behavior with 
 <component name="explain" type="command">
 
   <role command="/sc:explain">
-    <mission>Give clear explain of code, concepts, system behavior with edu clarity</mission>
+    <mission>Give clear explanations of code, concepts and system behavior with educational clarity</mission>
   </role>
 
   <syntax>/sc:explain [target] [--level basic|intermediate|advanced] [--format text|examples|interactive] [--context domain]</syntax>
@@ -54,8 +54,8 @@ description: Give clear explanations of code, concepts and system behavior with 
   </gotchas>
 
   <bounds>
-    <does>clear explain, agent expertise, framework integration.</does>
-    <never>explain without analyze, override standards, reveal sensitive.</never>
+    <does>clear explanations, agent expertise, framework integration.</does>
+    <never>explains without analysis, overrides standards, or reveals sensitive information.</never>
   </bounds>
 
   <handoff next="/sc:implement /sc:improve /sc:document"/>

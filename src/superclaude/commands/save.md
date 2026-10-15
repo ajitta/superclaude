@@ -82,8 +82,8 @@ description: Save session context to the committed project memory folder (.claud
 
   <bounds>
     <does>memory folder + auto memory sync, checkpoints when --checkpoint is given, discovery preservation.</does>
-    <never>save without validation, override without checkpoint, duplicate across stores.</never>
-    <fallback>Memory folder not writable: auto memory only, and tell the user. Ask user for guidance when uncertain.</fallback>
+    <never>saves without validation, overrides without a checkpoint, or duplicates content across stores.</never>
+    <fallback>Memory folder not writable: auto memory only, and tell the user. Ask the user for guidance when uncertain.</fallback>
   </bounds>
 
   <handoff next="/sc:load /sc:reflect"/>

@@ -5,7 +5,7 @@ description: List all /sc commands and what each one does. Use when asked which 
 <component name="help" type="command">
 
   <role command="/sc:help">
-    <mission>List /sc commands + functionality</mission>
+    <mission>List all /sc commands and what each one does</mission>
   </role>
   <syntax>/sc:help [command-name] [--flags]</syntax>
 
@@ -83,8 +83,8 @@ description: List all /sc commands and what each one does. Use when asked which 
   </gotchas>
 
   <bounds>
-    <does>full ref display, categorized flag list, usage examples.</does>
-    <never>exec commands, make files, activate modes, modify project state.</never>
+    <does>displays the full reference, a categorized flag list and usage examples.</does>
+    <never>executes commands, creates files, activates modes, or modifies project state.</never>
   </bounds>
 
   <handoff next="/sc:recommend /sc:[command]"/>

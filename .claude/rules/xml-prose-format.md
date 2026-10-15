@@ -194,7 +194,7 @@ A `note=` attribute is allowed only when it carries one of: scope qualifier, saf
 | Model identifier strings | single quotes | `'claude-opus-5-5'` |
 | UI / product feature names | double quotes | `"settings"`, `"user preferences"` |
 | Tool names | bare | `Grep`, `TaskCreate` |
-| Rule citations | full tag, name as defined in `core/rules/RULES_QUALITY.md`; bare ID only in that file or a range (`tests/unit/test_cross_references.py` enforces) | `[R18 Necessity Test]` |
+| Rule citations | full tag, name as defined in `core/rules/RULES_QUALITY.md`; bare ID only in that file or a range (`tests/unit/test_cross_references.py` enforces). Agent bodies cite no R-ID: write the meaning in words (agent-authoring.md) | `[R18 Necessity Test]` |
 
 ## Cross-References
 

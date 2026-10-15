@@ -4,7 +4,7 @@ description: Interactive project setup — pick and run init tasks for first-ses
 <component name="init" type="command">
 
   <role command="/sc:init">
-    <mission>Interactive project env setup with selectable init tasks for first-session onboarding</mission>
+    <mission>Interactive project environment setup with selectable init tasks for first-session onboarding</mission>
   </role>
 
   <syntax>/sc:init [tasks] [--quick] [--full]</syntax>
@@ -117,9 +117,9 @@ description: Interactive project setup — pick and run init tasks for first-ses
   </gotchas>
 
   <bounds>
-    <does>interactive task menu, dep-aware exec, parallel batching, idempotent setup, safe env init.</does>
-    <never>auto-exec without selection, overwrite existing files, install without confirm, skip dep validation.</never>
-    <fallback>Ask user when project type undetectable or existing config clash with proposed setup.</fallback>
+    <does>interactive task menu, dependency-aware execution, parallel batching, idempotent setup, safe environment init.</does>
+    <never>auto-executes tasks the user did not select, overwrites existing files, installs without confirmation, or skips dependency validation.</never>
+    <fallback>Ask the user when the project type is undetectable or existing config clashes with the proposed setup.</fallback>
   </bounds>
 
   <handoff next="/sc:load /sc:implement /sc:test"/>

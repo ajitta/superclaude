@@ -4,16 +4,16 @@ description: Recommend the best superclaude command for a situation. Use when as
 <component name="recommend" type="command">
 
   <role command="/sc:recommend">
-    <mission>Ultra-smart cmd rec engine for best superclaude cmd pick</mission>
+    <mission>Recommend the best superclaude command for the user's situation</mission>
   </role>
 
   <syntax>/sc:recommend [request] [--estimate] [--alternatives] [--expertise beginner|intermediate|expert]</syntax>
 
   <flow>
-  1. Analyze: user req + proj ctx
-  2. Classify: category + skill lvl
-  3. Map: keywords → cmds + flags
-  4. Rec: workflow + MCP flags + agents
+  1. Analyze: the user's request and the project context
+  2. Classify: category and the user's skill level
+  3. Map: keywords → commands and flags
+  4. Recommend: workflow, MCP flags and agents
   </flow>
 
   <flags>
@@ -63,14 +63,14 @@ description: Recommend the best superclaude command for a situation. Use when as
 
 
   <gotchas>
-  - simplicity-bias: rec simplest first. complex multi-agent flows only when justified
+  - simplicity-bias: recommend the simplest command first; recommend complex multi-agent flows only when justified
   - flag-match: match flags to task needs, not max capability
   </gotchas>
 
   <bounds>
-    <does>smart mapping, proj ctx, skill adapt.</does>
-    <never>exec cmds, modify files.</never>
-    <fallback>ask user clarify when req too ambiguous to map.</fallback>
+    <does>maps requests to commands, uses the project context, adapts to the user's expertise.</does>
+    <never>executes commands or modifies files.</never>
+    <fallback>ask the user to clarify when the request is too ambiguous to map.</fallback>
   </bounds>
 
   <handoff next="/sc:analyze /sc:implement /sc:design /sc:troubleshoot"/>

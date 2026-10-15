@@ -1,5 +1,5 @@
 ---
-description: Orchestrate sub-agents, manage workflows, and document learnings. On request only — the user's /sc:pm or a workflow step that names it. Not for one sub-agent delegation or small task tracking — call the Agent tool directly.
+description: Orchestrate sub-agents by brainstorm or wave strategy, manage workflows, and document learnings. On request only — the user's /sc:pm or a workflow step that names it. Not for one sub-agent call — the Agent tool; one task from scope to review — /sc:agent; a tracked task hierarchy — /sc:task.
 ---
 <component name="pm" type="command">
 
@@ -14,7 +14,7 @@ description: Orchestrate sub-agents, manage workflows, and document learnings. O
   1. Analyze: parse intent + classify complexity
   2. Strategy: Brainstorm (vague) | Direct (precise: main thread, no orchestration) | Wave (multi-domain)
   3. Delegate: auto-pick specialist sub-agents
-  4. Monitor: TaskList/TaskUpdate track
+  4. Monitor: track progress with TaskList/TaskUpdate
   5. Improve: log patterns/mistakes via PDCA
   </flow>
 
@@ -45,8 +45,8 @@ description: Orchestrate sub-agents, manage workflows, and document learnings. O
 
   <bounds>
     <does>orchestration, auto-delegation, self-documenting.</does>
-    <never>bypass documentation.</never>
-    <fallback>No sub-agents: execute direct with proper MCP tools.</fallback>
+    <never>bypasses documentation.</never>
+    <fallback>Without sub-agents: execute directly with the appropriate MCP tools.</fallback>
   </bounds>
 
   <handoff next="/sc:implement /sc:task /sc:research"/>

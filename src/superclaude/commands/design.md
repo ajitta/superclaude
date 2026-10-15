@@ -71,7 +71,7 @@ description: Design system architecture, APIs and component interfaces as specs 
 
   <bounds>
     <does>comprehensive specs, multi-format output, validation.</does>
-    <never>generate impl code, modify existing arch, violate constraints.</never>
+    <never>generates implementation code, modifies the existing architecture, or violates constraints.</never>
   </bounds>
 
   <handoff next="/sc:plan /sc:implement /sc:roadmap"/>

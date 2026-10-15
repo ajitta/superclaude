@@ -40,7 +40,7 @@ description: Apply systematic improvements to code quality, performance, and mai
 
   <bounds>
     <does>systematic improvements and safe refactoring.</does>
-    <never>risky changes without confirm and arch changes without analysis.</never>
+    <never>makes risky changes without confirmation, or architecture changes without analysis.</never>
     <fallback>Ask user when improvement scope exceeds target boundary.</fallback>
   </bounds>
 

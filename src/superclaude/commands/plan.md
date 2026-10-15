@@ -4,7 +4,7 @@ description: Write detailed implementation plans with TDD tasks, exact file path
 <component name="plan" type="command">
 
   <role command="/sc:plan">
-    <mission>Make detailed impl plans with TDD tasks, exact file paths, verify commands</mission>
+    <mission>Write detailed implementation plans with TDD tasks, exact file paths and verify commands</mission>
   </role>
 
   <syntax>/sc:plan [spec-or-topic] [--from docs/specs/...] [--output docs/plans/...] [--phases N] [--pr-bundle]</syntax>
@@ -89,9 +89,9 @@ Plan footer:
   </gotchas>
 
   <bounds>
-    <does>plan make, task decompose, file map, TDD structure.</does>
-    <never>write impl code, exec tasks, skip spec review.</never>
-    <fallback>Ask user for spec clarify when reqs ambiguous.</fallback>
+    <does>writes plans, decomposes tasks, maps files, and structures tasks as TDD steps.</does>
+    <never>writes implementation code, executes tasks, or skips spec review.</never>
+    <fallback>Ask the user to clarify the spec when requirements are ambiguous.</fallback>
   </bounds>
 
   <handoff next="/sc:implement /sc:brainstorm"/>

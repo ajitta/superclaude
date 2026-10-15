@@ -12,7 +12,7 @@ description: Systematic code cleanup — remove dead code and optimize project s
   <flow>
   1. Analyze: find cleanup candidates and check each one is safe to change.
   2. Plan: pick the approach and decide whether to delegate to an agent.
-  3. Execute: clean per --type. For --type docs, run the checks in the validator checks section in order (R1 standalone-valid, R2 cross-feature `[[...]]` flag, R3 slug-overlap promotion suggestion, then the slug-duplicate lint and README index regeneration).
+  3. Execute: clean per --type. For --type docs, run the checks in the validator checks section in order (cross-link-form flags `[[...]]` links, slug-overlap suggests promotions, then slug-duplicate-lint and readme-regen).
   4. Validate: confirm no functionality was lost (tests pass).
   5. Report: summarize the changes and recommend follow-up maintenance.
   </flow>
@@ -32,7 +32,7 @@ description: Systematic code cleanup — remove dead code and optimize project s
 | code | Remove dead code | Console: removed items + line count |
 | imports | Remove unused imports | Console: removed imports per file |
 | files | List orphan and empty files; delete each batch after the user confirms it | Console: listed paths + deleted file list |
-| docs | R1-R3 validator (standalone docs valid, cross-link form, slug-overlap) + slug-duplicate lint; with --apply, frontmatter shape fixes + README index regeneration | Console: violations + promotion candidates + changed files (with --apply) |
+| docs | Doc validator (cross-link form, slug-overlap) + slug-duplicate lint; with --apply, frontmatter shape fixes + README index regeneration | Console: violations + promotion candidates + changed files (with --apply) |
 | all | All above | Console: combined summary |
   </outputs>
 
@@ -46,11 +46,10 @@ description: Systematic code cleanup — remove dead code and optimize project s
   </tools>
 
   <validator_checks note="--type docs only">
-    - R1-standalone-valid: a standalone doc in `docs/{specs,plans,research,analysis}/` is valid on its own; it is flagged only when R3 finds a second doc with its slug. No date cutoff applies.
-    - R2-cross-feature-link-form: Grep `\[\[[a-z0-9-]+\]\]` pattern across `docs/features/*/*.md` (skip fenced code blocks to avoid false positives on syntax examples). Each match = warning "use relative path per core/rules/RULES_DOCS.md cross-links rule (`../<other-slug>/NN-<phase>.md`); slug refs not supported". Standalone-doc matches not flagged (legacy tolerated).
-    - R3-slug-overlap: Build slug set from (a) `docs/features/<slug>/` dir names + (b) standalone filename slugs (extract per `<slug>-<suffix?>-<username>-YYYY-MM-DD.md` pattern, strip suffix/username/date). Any slug appearing in ≥2 places = "consider promotion" suggestion — surface as "candidate: /sc:promote-feature <slug>". Suggestion-only; never auto-migrate.
-    - R-existing-slug-lint: Pre-existing per core/rules/RULES_DOCS.md `<doc_output_convention>` formatter mention. Detects same slug used by two standalone docs of same type.
-    - R-existing-readme-regen: Auto-regenerate `docs/features/*/README.md` `## Documents` section from current file list when running with `--apply` flag. Read-only with `--dry-run`.
+    - cross-link-form: Grep `\[\[[a-z0-9-]+\]\]` pattern across `docs/features/*/*.md` (skip fenced code blocks to avoid false positives on syntax examples). Each match = warning "use relative path per core/rules/RULES_DOCS.md cross-links rule (`../<other-slug>/NN-<phase>.md`); slug refs not supported". Standalone-doc matches not flagged (legacy tolerated).
+    - slug-overlap: Build slug set from (a) `docs/features/<slug>/` dir names + (b) standalone filename slugs (extract per `<slug>-<suffix?>-<username>-YYYY-MM-DD.md` pattern, strip suffix/username/date). Any slug appearing in ≥2 places = "consider promotion" suggestion — surface as "candidate: /sc:promote-feature <slug>". Suggestion-only; never auto-migrate. A standalone doc in `docs/{specs,plans,research,analysis}/` is valid on its own and is flagged only by this check; no date cutoff applies.
+    - slug-duplicate-lint: the formatter check that core/rules/RULES_DOCS.md `<doc_output_convention>` names; detects the same slug used by two standalone docs of the same type.
+    - readme-regen: Auto-regenerate `docs/features/*/README.md` `## Documents` section from current file list when running with `--apply` flag. Read-only with `--dry-run`.
   </validator_checks>
 
   <examples>
@@ -77,8 +76,8 @@ description: Systematic code cleanup — remove dead code and optimize project s
   <gotchas>
   - scope-check: clean only files in the requested scope; never touch adjacent directories.
   - verify-unused: confirm a file is truly unused (grep for references) before listing it for deletion.
-  - code-block-false-positive: R2 `[[...]]` pattern matches markdown wiki-syntax but also literal `[[...]]` examples inside fenced code blocks; pre-filter ` ``` ` blocks before matching to avoid noise.
-  - slug-overlap-noise: R3 may flag legitimately distinct features sharing kebab prefix (e.g., `auth-flow` vs `auth-v2`). Output is suggestion-only; user judges per case. False positives are tolerable.
+  - code-block-false-positive: the cross-link-form `[[...]]` pattern matches markdown wiki-syntax but also literal `[[...]]` examples inside fenced code blocks; pre-filter ` ``` ` blocks before matching to avoid noise.
+  - slug-overlap-noise: the slug-overlap check may flag legitimately distinct features sharing kebab prefix (e.g., `auth-flow` vs `auth-v2`). Output is suggestion-only; user judges per case. False positives are tolerable.
   - manual-gate: the --type docs validator never auto-migrates. Without --apply it only reports; --apply is required for any change and is limited to frontmatter shape fixes and README `## Documents` regeneration. Bulk promotion is /sc:promote-feature scope.
   </gotchas>
 

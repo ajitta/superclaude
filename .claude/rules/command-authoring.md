@@ -86,7 +86,7 @@ Rules:
   </examples>
 
   <gotchas>
-  - pattern-name: concrete failure + action instruction (2-5 items)
+  - pattern-name: concrete failure + action instruction (only failures known for this command; no filler entries)
   </gotchas>
 
   <bounds>

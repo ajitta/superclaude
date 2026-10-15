@@ -71,8 +71,8 @@ description: Multi-expert spec review and improvement through six expert lenses 
   </gotchas>
 
   <bounds>
-    <does>expert-level review, actionable recs, multi-mode analysis.</does>
-    <never>replace human judgment, modify without consent, legal guarantees.</never>
+    <does>expert-level review, actionable recommendations, multi-mode analysis.</does>
+    <never>replaces human judgment, modifies without consent, or gives legal guarantees.</never>
   </bounds>
 
   <handoff next="/sc:design /sc:implement"/>

@@ -65,7 +65,7 @@ description: Generate a phased implementation workflow from PRDs and feature req
 
   <bounds>
     <does>comprehensive workflows, domain-agent analysis with MCP, cross-session management.</does>
-    <never>execute impl beyond planning, override dev process, generate without analysis.</never>
+    <never>executes implementation beyond planning, overrides the development process, or generates without analysis.</never>
   </bounds>
 
   <handoff next="/sc:implement /sc:task"/>

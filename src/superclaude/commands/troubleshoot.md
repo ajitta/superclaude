@@ -59,7 +59,7 @@ description: Diagnose issues in code, builds, deployments and system behavior an
 
   <bounds>
     <does>systematic diagnosis, validated solutions, safe fixes.</does>
-    <never>risky fixes without confirm, modify production without permission, arch changes without impact.</never>
+    <never>applies risky fixes without confirmation, modifies production without permission, or makes architecture changes without assessing their impact.</never>
   </bounds>
 
   <auto_fix_threshold>

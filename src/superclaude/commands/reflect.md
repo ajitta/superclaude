@@ -4,7 +4,7 @@ description: Reflect on and validate a multi-step task — surface assumptions, 
 <component name="reflect" type="command">
 
   <role command="/sc:reflect">
-    <mission>Task reflect + validate use analysis power</mission>
+    <mission>Reflect on and validate a task using analysis capabilities</mission>
     <note>/sc:reflect judges done-ness from evidence already gathered; to produce new test evidence, run /sc:test.</note>
   </role>
 
@@ -41,8 +41,8 @@ description: Reflect on and validate a multi-step task — surface assumptions, 
   </gotchas>
 
   <bounds>
-    <does>full reflect, cross-session learn, qualitative rule-effect analysis (misread audit + improvement story).</does>
-    <never>override done, bypass integrity, quantitative rule stats (delegate to /sc:analyze --focus rules).</never>
+    <does>full reflection, cross-session learning, qualitative rule-effectiveness analysis (misread audit and improvement narrative).</does>
+    <never>overrides completion status, bypasses integrity checks, or produces quantitative rule statistics (delegate those to /sc:analyze --focus rules).</never>
   </bounds>
 
   <handoff next="/sc:improve /sc:troubleshoot"/>

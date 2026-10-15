@@ -1,5 +1,5 @@
 ---
-description: Code analysis across quality, security, performance, architecture domains. Use when asked to audit a codebase or to analyze several of these dimensions in one request. Not for reading one file or explaining one function — read it directly.
+description: Code analysis across quality, security, performance, architecture domains, with severity-rated findings. Use when asked to audit a codebase or to analyze several of these dimensions in one request. Not for one diff, PR, plan or spec — /sc:review; reading one file or function — read it directly.
 ---
 <component name="analyze" type="command">
 
@@ -77,13 +77,13 @@ description: Code analysis across quality, security, performance, architecture d
   </examples>
 
   <gotchas>
-  - evidence-fabrication: Do not construct hypothetical failure scenarios to justify pre-existing recommendation. Evidence (code, config, measurements) must precede proposals.
-  - analysis-loop: If reasoning reaches same conclusion twice on same question, terminate that line of analysis, move to next topic.
+  - evidence-fabrication: Do not construct hypothetical failure scenarios to justify a pre-existing recommendation. Evidence (code, config, measurements) must precede proposals.
+  - analysis-loop: If reasoning reaches the same conclusion twice on the same question, end that line of analysis and move to the next topic.
   </gotchas>
 
   <bounds>
     <does>static analysis, severity-rated findings, detailed reports, quantitative rules audit (counts, frequencies, heatmaps via --focus rules).</does>
-    <never>dynamic/runtime analysis, modify code, analyze external deps, qualitative rule-effectiveness narrative (delegate to /sc:reflect).</never>
+    <never>performs dynamic/runtime analysis, modifies code, analyzes external dependencies, or writes the qualitative rule-effectiveness narrative (delegate that to /sc:reflect).</never>
   </bounds>
 
 

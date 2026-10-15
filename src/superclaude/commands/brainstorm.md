@@ -67,7 +67,7 @@ description: Interactive requirements discovery through Socratic dialogue + syst
 | `'migration strategy' --vs --depth deep` | Auto-detect VS-CoT, detailed depth, 5 perspectives |
   <example name="brainstorm-then-implement" type="error-path">
     - Input: /sc:brainstorm 'auth system' (then immediately start coding without user confirm)
-    - Why wrong: Brainstorm = discovery-only. Impl without user confirm direction violate exploration contract.
+    - Why wrong: Brainstorm = discovery-only. Implementing before the user confirms the direction violates the exploration contract.
     - Correct: Finish brainstorm → user confirms direction → /sc:review on the spec → /sc:design or /sc:plan
   </example>
   </examples>
@@ -79,8 +79,8 @@ description: Interactive requirements discovery through Socratic dialogue + syst
   </gotchas>
 
   <bounds>
-    <does>ambiguous→concrete, multi-agent+MCP, cross-session persistence, + self-review precede impl handoff.</does>
-    <never>impl without discovery, override user vision, bypass systematic exploration, + route direct to /sc:plan without /sc:review.</never>
+    <does>turns ambiguous requests into concrete requirements, uses multi-agent and MCP analysis, persists across sessions, and runs a self-review before the implementation handoff.</does>
+    <never>implements without discovery, overrides the user's vision, bypasses systematic exploration, or routes directly to /sc:plan without /sc:review.</never>
   </bounds>
 
   <handoff next="/sc:review /sc:plan /sc:design /sc:research"/>

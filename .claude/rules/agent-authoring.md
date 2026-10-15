@@ -132,26 +132,26 @@ When memory is enabled, CC auto-injects up to the first 200 lines / 25KB of `MEM
   </role>
 
   <focus>
-  - Category: specific capabilities (3-5 items)
+  - Category: specific capabilities (usually 3-5 items; fewer when the domain is narrow)
   </focus>
 
   <actions>
-  1. Verb-leading description of the step (4-5 steps; sequence is load-bearing).
+  1. Verb-leading description of the step (as many steps as the procedure has; sequence is load-bearing).
   </actions>
 
   <outputs>
-  - Type: deliverable purpose (3-4 items)
+  - Type: deliverable purpose (one item per deliverable the agent produces)
   </outputs>
 
   <tool_guidance>
   - Proceed: actions to do freely.
   - Symbolic-First: full or light form (see Code Exploration below).
-  - Ask First: actions requiring confirmation, with specific thresholds (run as a delegated subagent, the agent cannot ask: it stops before the action and reports it as needing confirmation).
+  - Ask First: actions requiring confirmation, with specific thresholds. As a delegated subagent Claude cannot ask mid-task: it stops before such an action and returns the proposed action and the question in its report, unless the task text already names that action.
   - Never: actions the agent must never take.
   </tool_guidance>
 
   <checklist>
-  - [ ] Concrete, verifiable completion criterion stated as one line (3-5 items)
+  - [ ] Concrete, verifiable completion criterion stated as one line (usually 3-5; fewer when the domain is narrow)
   </checklist>
 
   <memory_guide>
@@ -168,7 +168,7 @@ When memory is enabled, CC auto-injects up to the first 200 lines / 25KB of `MEM
   </examples>
 
   <gotchas>
-  - pattern-name: concrete failure + action instruction (2-5 items)
+  - pattern-name: concrete failure + action instruction (only failures known for this domain; no filler entries)
   </gotchas>
 
   <bounds>
@@ -191,6 +191,9 @@ When memory is enabled, CC auto-injects up to the first 200 lines / 25KB of `MEM
 - `<handoff>` — 2-3 natural next commands.
 - The `note=` attribute is restricted to scope / safety / version / reference / quantified constraint (see xml-prose-format.md "Attributes vs. Body").
 - **Voice — third person.** Write "Claude does X", "the agent avoids Y" — never "you" or "I". Third person is this repo's convention for consistency across agents; the same body runs as a subagent and via `claude --agent`.
+- **Ask First line.** End it with the template's delegated-subagent sentence, verbatim (`test_agent_structure.py::test_ask_first_states_subagent_behavior` pins it). A delegated subagent has no follow-up turn to ask in; without a stated behavior it either stops with nothing to show or assumes the answer and acts.
+- **Interactive agents.** An agent whose procedure waits for the user (a menu, questions, a draft to approve) states the subagent case at that step: ``As a delegated subagent (one reply, no follow-up turns), Claude returns <the menu / the questions / the draft> and stops; the back-and-forth runs when the agent is the main session (`claude --agent <name>`).`` A delegated run gets one reply, read by the parent rather than the user, so an unstated case leaves the agent waiting for an answer that never comes or inventing one.
+- **No R-ID tags.** State a rule's meaning in words, never as a `[Rnn Name]` tag: R-IDs are defined in `core/rules/RULES_QUALITY.md`, an on-demand module that never reaches a subagent, so the tag resolves to nothing (`test_agent_structure.py::test_body_has_no_rule_id_tags`).
 
 ## Memory Guide (required)
 
@@ -207,7 +210,7 @@ After task: append `- YYYY-MM-DD: Category-Name: lesson` (max 3 lines) only if a
 
 **Rules.**
 - Protocol header (2 lines above, verbatim identical in every agent) precedes the category list. The protocol ships in every body so it holds when CLAUDE.md is omitted (`omitClaudeMd`) or superclaude is not installed. Capture triggers worth remembering: user corrections, decisions with rationale, recurring patterns (3+), unexpected discoveries.
-- 3-5 categories, specific to the agent's domain.
+- Usually 3-5 categories, specific to the agent's domain; fewer when the domain is narrow (`test_memory_guide_has_categories` requires at least 2).
 - PascalCase-Hyphenated names (e.g., `Debug-Patterns`, `API-Decisions`).
 - Related-agent pointers (≤3) are appended inline as "Related: agent-1, agent-2" — no nested `<refs>` tag (would violate xml-prose-format depth rule).
 

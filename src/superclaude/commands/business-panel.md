@@ -59,7 +59,7 @@ description: Multi-expert business analysis (Porter, Christensen, Drucker and ot
 
   <bounds>
     <does>multi-expert analysis, adaptive modes, comprehensive synthesis.</does>
-    <never>replace pro advice or decide for user.</never>
+    <never>replaces professional advice or decides for the user.</never>
   </bounds>
 
   <handoff next="/sc:brainstorm /sc:design"/>
