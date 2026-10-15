@@ -15,7 +15,7 @@ description: Load session context from the project memory folder (.claude/memori
   3. Discover: Proj struct + reqs (Glob/Grep/Read)
   4. Activate: Proj context + workflow prep
   5. Validate: Context integrity + session ready
-  6. Session Goal (optional): If user give goal, record as 1-line objective. Show as reminder when context > 60%.
+  6. Session Goal (optional): if the user gives a goal, record it as a 1-line objective; restate it when the work changes direction and before /sc:save.
   </flow>
 
   <flags>

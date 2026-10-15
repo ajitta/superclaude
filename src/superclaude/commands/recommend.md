@@ -30,10 +30,16 @@ description: Recommend the best superclaude command for a situation. Use when as
     - web (website|frontend|ui|react): /sc:implement --type component --with-tests
     - api (api|backend|server): /sc:design --type api
     - ml (machine learning|ai|model): /sc:analyze --focus quality --c7
-    - learn (how|explain|tutorial): /sc:explain --level basic --format examples
+    - learn (explain|tutorial|what is): /sc:explain --level basic --format examples
     - cleanup (refactor|dead code|tech debt): /sc:cleanup --type code --safe
-    - plan (workflow|plan|phases): /sc:roadmap --strategy systematic
+    - plan (plan|tasks from a spec): /sc:plan
+    - roadmap (PRD|phases|roadmap): /sc:roadmap --strategy systematic
+    - review (review|second opinion|check this PR): /sc:review
+    - research (research|compare sources|latest version): /sc:research
+    - idea (vague idea|not sure what to build): /sc:brainstorm
     - deploy (deploy|ci|cd|pipeline): /sc:build --type prod --optimize
+
+    Not in this map: choose from the /sc:help command list; keywords are a starting point, not a lookup.
   </keyword_map>
 
   <project_detect>

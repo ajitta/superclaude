@@ -4,26 +4,26 @@ description: Deep web research with adaptive planning and smart search. Use when
 <component name="research" type="command">
 
   <role command="/sc:research">
-    <mission>Deep web research with adaptive plan + smart search</mission>
+    <mission>Deep web research with adaptive planning and smart search</mission>
   </role>
 
   <syntax>/sc:research "[query]" [--depth quick|standard|deep|exhaustive] [--strategy planning|intent|unified]</syntax>
 
   <flow>
   1. Understand: Complexity + ambiguity check | Success criteria | Prior research check
-  2. Plan: Strategy + depth + hop pattern + query decompose + parallel map
+  2. Plan: Strategy + depth + hop pattern + query decompose + parallel map; ask or wait as --strategy says
   3. Execute: Multi-hop search with parallel batch | Evidence collect | Adaptive replan when sources conflict, run thin, or leave the core question unanswered
   4. Validate: Cross-source verify | Credibility tier | Contradiction resolve | Gap check
   5. Synthesize: credibility-weighted merge; feature path `docs/features/<slug>/02-research.md`, standalone `docs/research/<topic>-<username>-YYYY-MM-DD.md` — slug resolution (zero-match default `[s]`), frontmatter, README update per core/rules/RULES_DOCS.md `<doc_output_convention>`.
   </flow>
 
   <flags>
-  - --depth quick|standard|deep|exhaustive: hops and validation per the depth profiles section.
-  - --strategy planning|intent|unified: planning, intent and unified as defined in modes/RESEARCH_CONFIG.md (unified is the default).
+  - --depth quick|standard|deep|exhaustive: hops and validation per the depth section; --depth quick always runs without asking, whatever the --strategy.
+  - --strategy planning|intent|unified: planning runs the plan without asking; intent asks up to 3 clarifying questions before planning; unified (the default) shows the plan and waits for the user's go-ahead.
   </flags>
 
-  <depth note="See modes/RESEARCH_CONFIG.md for full profiles, hop config, thresholds">
-    quick: 1 hop, auto plan, summary | standard: 2-3 hops, full plan, report
+  <depth note="Full profiles and thresholds: .claude/superclaude/modes/RESEARCH_CONFIG.md (user-scope install: ~/.claude/superclaude/modes/)">
+    quick: 1 hop, runs without asking, summary | standard: 2-3 hops, full plan, report
     deep: 3-4 hops, mid-checkpoints | exhaustive: 5+ hops, subagent delegate
   </depth>
 
@@ -35,7 +35,7 @@ description: Deep web research with adaptive planning and smart search. Use when
   </outputs>
 
 
-  <tools note="Routing in modes/RESEARCH_CONFIG.md tool_routing">
+  <tools note="Routing: tool_routing in the RESEARCH_CONFIG.md named in the depth note">
     - Tavily: tavily-search, tavily-extract, tavily-research, tavily-crawl, tavily-map (Agent Skills — auto/slash; MCP path exposes the same five as tools)
     - Native: WebSearch/WebFetch (fallback)
     - Read/Write: Report gen
@@ -50,13 +50,13 @@ description: Deep web research with adaptive planning and smart search. Use when
   </examples>
 
   <gotchas>
-  - single-source: No conclude from 1 source. Cross-verify ≥2 sources
-  - source-quality: No Wikipedia/Reddit as primary. Cross-check with primary sources
+  - single-source: each load-bearing claim needs ≥2 independent sources; label a claim with only one as single-source.
+  - source-quality: never use Wikipedia or Reddit as a primary source; cross-check them against primary sources.
   </gotchas>
 
   <bounds>
-    <does>current info, smart search, evidence-based, adaptive replan.</does>
-    <never>claims without sources, skip validate, restricted content, carry raw payloads between hops.</never>
+    <does>finds current information, searches across sources, grounds claims in evidence, replans adaptively.</does>
+    <never>makes claims without sources, skips validation, accesses restricted content, or carries raw payloads between hops.</never>
   </bounds>
 
   <handoff next="/sc:design /sc:implement /sc:brainstorm"/>

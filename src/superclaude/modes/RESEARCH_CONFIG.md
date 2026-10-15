@@ -43,7 +43,7 @@ assess_quality | id_gaps | maybe_replan | tweak_strategy
   </tool_routing>
 
   <gates>
-planning: objectives+strategy+criteria | execution: ≥3 independent sources, no open contradiction on a load-bearing claim | synthesis: coherence+clarity
+planning: objectives+strategy+criteria | execution: each load-bearing claim has ≥2 independent sources (a claim with only one is labeled single-source), no open contradiction on a load-bearing claim | synthesis: coherence+clarity
   </gates>
 
   <credibility>
@@ -73,7 +73,7 @@ planning: objectives+strategy+criteria | execution: ≥3 independent sources, no
   </output_formats>
 
   <replanning>
-replan when: sources disagree on a load-bearing claim | fewer than 3 independent sources | the core question is still unanswered
+replan when: sources disagree on a load-bearing claim | a load-bearing claim has fewer than 2 independent sources | the core question is still unanswered
   </replanning>
 
   <errors>

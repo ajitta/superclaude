@@ -70,7 +70,7 @@ description: Interactive project setup — pick and run init tasks for first-ses
   <safety_rules>
   - Dependency install (c): show command, require user confirmation before executing
   - CLAUDE.md edit (b): if file exists, show proposed additions as diff before applying
-  - Test execution (d): warn if test suite is large (>500 tests), offer --quick test flag
+  - Test execution (d): warn if test suite is large (>500 tests), offer to capture the baseline from a subset (one directory or test file) instead
   - Memory init (g): merge with existing MEMORY.md, never replace
   - Gotchas init (h): create .claude/rules/gotchas/ directory + general.md only if not exists. Idempotent — skip if gotchas/ already present. Template: 4-line comment header, no frontmatter.
   - Docs scaffold (i): create docs/ directory and copy PRD.md, ARCHITECTURE.md, UI-GUIDE.md, plus ADR-0001-template.md as docs/adr/0001-example.md, from ~/.claude/superclaude/templates/docs-scaffold/ (project-scope installs: .claude/superclaude/templates/docs-scaffold/). Idempotent — skip per-file if it already exists; never overwrite user content. UI-GUIDE.md is optional (note this and let user delete for headless projects).

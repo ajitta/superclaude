@@ -15,7 +15,7 @@ description: Record a request in the requester's own words (problem, outcome, af
   3. Draft: Fill the five items quoting the user's wording; a field the user never addressed reads "not stated". No solutions, alternatives, architecture, or added scope. One page at most.
   4. Approve: Show the draft; the user corrects the sentences. Nothing is written without confirmation.
   5. Save: feature path `docs/features/<slug>/00-intent.md` — slug resolution (zero match → new feature folder; intent has no standalone path), frontmatter `status: approved-for-plan` (the Approve step precedes the write) + `revised: <today>`, README update per core/rules/RULES_DOCS.md `<doc_output_convention>`; a folder created here gets its README with `phase: intent`.
-  6. Handoff: Large work goes to /sc:brainstorm, Medium to /sc:plan (tiers per core/rules/RULES_QUALITY.md `<checklist_scaling>`), each with 00-intent.md as input.
+  6. Handoff: An open solution space or several affected systems → /sc:brainstorm; a clear direction → /sc:plan (/sc:design for interface or architecture work); each takes 00-intent.md as input.
   </flow>
 
   <outputs>
@@ -36,7 +36,7 @@ description: Record a request in the requester's own words (problem, outcome, af
   |---|---|
   | `/sc:intent 'exports time out for big customers'` | Two questions (affected systems, constraints) → `docs/features/export-timeouts/00-intent.md` |
   | `/sc:intent 'hook output must not block the prompt'` with `docs/features/hook-latency/` present | Exact slug match: `00-intent.md` added to that folder, its README gets the entry |
-  | `/sc:intent 'rename this variable'` | Trivial: no file; says the request needs no intent record and answers it directly |
+  | `/sc:intent 'rename this variable'` | Settled by one small change: no file; says the request needs no intent record and answers it directly |
 
   <example name="intent-skeleton">
 # Intent: title in the requester's words
@@ -70,7 +70,7 @@ What the requester could not answer.
   <bounds>
     <does>captures the request verbatim, asks only about the empty items, and saves after approval.</does>
     <never>proposes solutions, alternatives or architecture, widens scope, saves before approval, or runs discovery in brainstorm's place.</never>
-    <fallback>a Trivial or Small request (a rename, a one-file fix, a question with one answer) gets no file — say so and answer it directly.</fallback>
+    <fallback>a request settled by one small change or one reply (a rename, a one-file fix, a question with one answer) gets no file — say so and answer it directly.</fallback>
   </bounds>
 
   <handoff next="/sc:brainstorm /sc:plan /sc:design"/>

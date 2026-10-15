@@ -7,33 +7,34 @@ description: Execute complex tasks with workflow management and sub-agent delega
     <mission>Execute complex tasks with intelligent workflow management and delegation</mission>
   </role>
 
-  <syntax>/sc:task [action] [target] [--strategy sequential|parallel|adaptive] [--delegate] [--cleanup]</syntax>
+  <syntax>/sc:task [action] [target] [--strategy sequential|parallel|adaptive] [--delegate] [--cleanup] [--dry-run]</syntax>
 
   <flow>
   1. Analyze: Parse requirements + dependency mapping
-  2. Decompose: Break into Epic → Story → Task hierarchy; each task is a contract that starts `status: fail` with an empty `evidence` list
+  2. Decompose: Break into Epic → Story → Task hierarchy; each task starts open with an empty evidence note in its TaskCreate description
   3. Strategy: Pick execution order (sequential for deps, parallel for independent, adaptive for mixed)
   4. Checkpoint: Changes affect >3 files → present numbered plan → wait for user approval
   5. Execute: Intelligent delegation + parallel where possible
-  6. Validate: Quality gates + completion verification — a task flips to `pass` (completed in TaskUpdate) only when its `evidence` cites the check that passed (exit code, test output, observed outcome); a sub-agent's result is a claim to check, not evidence
-  7. Cleanup: Auto-remove stale/completed tasks (--cleanup)
+  6. Validate: Quality gates + completion verification — a task is marked completed in TaskUpdate only when its evidence note cites the check that passed (exit code, test output, observed outcome); a sub-agent's result is a claim to check, not evidence
+  7. Cleanup: With --cleanup, delete completed and cancelled tasks and list stale and blocked ones, per the task cleanup section
   </flow>
 
   <flags>
   - --strategy sequential|parallel|adaptive: force the execution order the Strategy step otherwise picks.
-  - --cleanup: stale and completed task removal, per the task cleanup section.
+  - --cleanup: task cleanup, per the task cleanup section.
+  - --dry-run: with cleanup or --cleanup, list what would be deleted and delete nothing.
   </flags>
 
   <task_cleanup>
-    <description>Auto task cleanup via TaskUpdate delete feature</description>
+    <description>Task cleanup via TaskUpdate delete</description>
     <cleanable_states>
-      - completed: Finished tasks
-      - cancelled: User-cancelled tasks
-      - stale: Pending > 24 hours, no progress
-      - blocked: Tasks blocked by unresolved deps
+      - completed: finished tasks; deleted.
+      - cancelled: user-cancelled tasks; deleted.
+      - stale: pending with no progress since an earlier session; listed, and deleted only after the user confirms.
+      - blocked: listed with the unresolved dependency; never deleted automatically.
     </cleanable_states>
     <usage>
-      - /sc:task cleanup: Run auto task cleanup
+      - /sc:task cleanup: Run task cleanup
       - /sc:task cleanup --dry-run: Preview, no deletion
     </usage>
   </task_cleanup>
@@ -49,7 +50,7 @@ description: Execute complex tasks with workflow management and sub-agent delega
     - Hierarchy: Epic → Story → Task → Subtask
     - Strategy: Sequential (strict deps) | Parallel (independent streams) | Adaptive (discover then parallelize)
     - Dependency: Analyze deps before execution — detect circular deps, present resolution options
-    - Cleanup: Stale detection → auto-delete → report
+    - Cleanup: Delete completed/cancelled → list stale and blocked → delete stale only on user confirm → report
   </patterns>
 
   <examples>
@@ -62,7 +63,7 @@ description: Execute complex tasks with workflow management and sub-agent delega
 
 | Input | Output |
 |---|---|
-| `cleanup` | Auto-remove stale/completed tasks |
+| `cleanup` | Delete completed/cancelled tasks; list stale and blocked ones |
 | `cleanup --dry-run` | Preview cleanup, no deletion |
 
   </examples>
@@ -75,7 +76,7 @@ description: Execute complex tasks with workflow management and sub-agent delega
   </gotchas>
 
   <bounds>
-    <does>complex task coordination, hierarchical breakdown, dependency analysis, auto cleanup.</does>
+    <does>complex task coordination, hierarchical breakdown, dependency analysis, task cleanup.</does>
     <never>simple single-file tasks, compromise quality, operate without validation.</never>
   </bounds>
 

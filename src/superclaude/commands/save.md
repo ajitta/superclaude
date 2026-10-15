@@ -13,7 +13,7 @@ description: Save session context to the committed project memory folder (.claud
   1. Analyze: session progress + discoveries
   2. Persist (memory folder): Write .claude/memories/session_[date]_[branch-slug].md — first line `branch: <name> @<short sha>`, then the summary and a `## Next actions` checklist; a second save the same day on the same branch updates it → .claude/memories/learnings_[topic].md (insights); flat basename only, no path segments; create the folder when absent
   3. Persist (auto memory): Write/Edit MEMORY.md + topic files for cross-session continuity; every worktree of the repo shares this folder, so name the branch in each project entry and Edit the one MEMORY.md line instead of rewriting the file
-    3.5. Corrections-Review: capture unrecorded user corrections per the /sc:reflect Misunderstanding-Audit step (same feedback-memory fields).
+    3.5. Corrections-Review: capture each user correction not yet recorded as a feedback memory with the fields {trigger, misread, actual_intent, violated_rule: "[RNN Name]", prevention} [R14 Correction Capture].
   4. Verify: Glob .claude/memories/*.md + Read MEMORY.md confirms both stores
   5. Checkpoint: recovery points + progress tracking
   6. Validate: data integrity + no duplicates across stores
@@ -61,7 +61,7 @@ description: Save session context to the committed project memory folder (.claud
 
 | Input | Output |
 |---|---|
-| `/sc:save` | Auto-checkpoint if >30min session |
+| `/sc:save` | Session record for the current branch + one-line MEMORY.md pointer |
 | `--type all --checkpoint` | Complete preservation + recovery |
 | `--summarize` | Summary + learning patterns |
 | `--type learnings` | Patterns + insights only |
@@ -76,12 +76,12 @@ description: Save session context to the committed project memory folder (.claud
 
 
   <gotchas>
-  - no-ephemeral: do not save current-conversation task details as persistent memory
+  - no-ephemeral: auto memory (MEMORY.md, topic files) keeps only what a later session on any branch needs; this session's progress and next actions belong in the session_ file.
   - verify-value: before saving, ask "Will this be useful in future conversation?" If no, skip
   </gotchas>
 
   <bounds>
-    <does>memory folder + auto memory sync, auto-checkpoints, discovery preservation.</does>
+    <does>memory folder + auto memory sync, checkpoints when --checkpoint is given, discovery preservation.</does>
     <never>save without validation, override without checkpoint, duplicate across stores.</never>
     <fallback>Memory folder not writable: auto memory only, and tell the user. Ask user for guidance when uncertain.</fallback>
   </bounds>

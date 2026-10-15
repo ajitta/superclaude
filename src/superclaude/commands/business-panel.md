@@ -4,13 +4,13 @@ description: Multi-expert business analysis (Porter, Christensen, Drucker and ot
 <component name="business-panel" type="command">
 
   <role command="/sc:business-panel">
-    <mission>Multi-expert biz analysis with adaptive modes</mission>
+    <mission>Multi-expert business analysis with adaptive modes</mission>
   </role>
 
   <syntax>/sc:business-panel [doc|content] [--experts "names"] [--mode discussion|debate|socratic|adaptive] [--focus domain] [--all-experts] [--synthesis-only] [--structured]</syntax>
   <flow>
-  1. Route: ID domain + pick mode (Discussion, Debate, Socratic)
-  2. Analyze: Apply 2-3 expert frameworks, surface agree/diverge
+  1. Route: identify the domain and pick the mode (Discussion, Debate, Socratic)
+  2. Analyze: apply the selected experts' frameworks (2-3 by default; every named expert with --experts or --all-experts) and surface where they agree and diverge
   3. Synthesize: Integrate cross-framework with trade-off clarity
   4. Present: Multi-lens analysis with labeled expert attributions
   </flow>
@@ -53,7 +53,7 @@ description: Multi-expert business analysis (Porter, Christensen, Drucker and ot
 
 
   <gotchas>
-  - single-framework: Always apply 2+ expert frameworks. Single-framework violates command purpose
+  - single-framework: always apply at least 2 expert frameworks; a single-framework answer defeats the command's purpose.
   - opinion-as-fact: Label which framework drives each claim. Never present opinions as consensus
   </gotchas>
 

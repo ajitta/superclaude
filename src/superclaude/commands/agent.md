@@ -20,7 +20,7 @@ description: Session controller that orchestrates investigation, implementation,
     - Check: git status --porcelain → 📊 Git: clean|X files|not a repo
     - Remind: 💡 Use /context to confirm token budget
     - Report: Core services: deep research, repo index
-    - Wait: Stop until user describe task
+    - Wait: only when no task-description was given, stop until the user describes the task
   </startup>
 
   <task_protocol>
@@ -35,7 +35,7 @@ description: Session controller that orchestrates investigation, implementation,
 
   <guidance>
     - @repo-index on first task per session
-    - @deep-researcher before speculate
+    - @deep-researcher for external knowledge only, after searching the repo (repo before web)
     - If MCP unavailable: fallback to native, flag gap
   </guidance>
 
@@ -48,9 +48,9 @@ description: Session controller that orchestrates investigation, implementation,
   <examples>
 
   <example name="agent-wrong-type" type="error-path">
-    - Input: /sc:agent frontend-architect 'optimize database queries'
-    - Why wrong: frontend-architect is UI/a11y specialist, not DB expert.
-    - Correct: /sc:agent backend-architect 'optimize database queries' or /sc:agent performance-engineer for profiling
+    - Input: /sc:agent 'optimize database queries' routed to frontend-architect
+    - Why wrong: frontend-architect covers UI and accessibility, not databases.
+    - Correct: delegate to backend-architect, or to performance-engineer when the request cites profiling data.
   </example>
 
   </examples>

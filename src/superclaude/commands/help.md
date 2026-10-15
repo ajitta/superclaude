@@ -11,7 +11,7 @@ description: List all /sc commands and what each one does. Use when asked which 
 
 
   <flow>
-  1. Display: full command list
+  1. Display: no argument → the full command list and the scope map; a command-name → that command's syntax, its flags, and the "Not for" line of its description; --flags → the flag list per the flags section
   2. Complete: end after display
   </flow>
 
@@ -35,9 +35,9 @@ description: List all /sc commands and what each one does. Use when asked which 
     - implement: feature impl + MCP integration
     - improve: code quality + perf improvements
     - index: project docs + knowledge base
-    - index-repo: repo indexing (94% token reduction)
+    - index-repo: compact repo index (~3KB) for cheap navigation
     - load: session context load (memory folder + auto memory)
-    - pm: Project Manager Agent (default orchestration)
+    - pm: multi-agent orchestration for 3+ independent streams (on request)
     - recommend: smart command recs
     - reflect: task reflection + validation
     - research: deep web research, parallel search

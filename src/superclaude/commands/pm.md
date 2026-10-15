@@ -12,7 +12,7 @@ description: Orchestrate sub-agents, manage workflows, and document learnings. O
 
   <flow>
   1. Analyze: parse intent + classify complexity
-  2. Strategy: Brainstorm (vague) | Direct (precise) | Wave (multi-domain)
+  2. Strategy: Brainstorm (vague) | Direct (precise: main thread, no orchestration) | Wave (multi-domain)
   3. Delegate: auto-pick specialist sub-agents
   4. Monitor: TaskList/TaskUpdate track
   5. Improve: log patterns/mistakes via PDCA
@@ -25,22 +25,22 @@ description: Orchestrate sub-agents, manage workflows, and document learnings. O
 
   <patterns>
     - Vague: requirements-analyst → system-architect → specialists
-    - Clear: c7 → refactoring-expert → quality-engineer
+    - Clear: work directly in the main thread; delegate only when the request splits into 3+ independent streams
     - Complex: Wave1(backend) → Wave2(frontend) → Wave3(integration) → Wave4(test/security)
   </patterns>
 
   <examples>
   | Input | Output |
   |---|---|
-  | `'Build auth system'` | brainstorm: req-analyst → sys-arch → [backend ‖ security] → frontend |
-  | `'Fix LoginForm.tsx:45'` | direct: c7 → refactoring-expert → quality-engineer |
+  | `'Build auth system'` | brainstorm: requirements-analyst → system-architect → [backend-architect ‖ security-engineer] → frontend-architect |
+  | `'Fix LoginForm.tsx:45'` | not pm: edit directly (single file, <3 steps) |
   | `'Real-time chat + video'` | wave: W1(WebSocket ‖ WebRTC) → W2(UI) → W3(E2E) → W4(security ‖ quality) |
   </examples>
 
 
 
   <gotchas>
-  - direct-work-first: no orchestrate simple task (<3 steps). Do direct per sub_agent_decision rules
+  - direct-work-first: a simple task (single file, <3 steps) is not orchestrated; work on it directly per the direct-work rules in core/rules/RULES_DELEGATION.md.
   </gotchas>
 
   <bounds>

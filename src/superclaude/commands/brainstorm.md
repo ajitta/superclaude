@@ -15,9 +15,9 @@ description: Interactive requirements discovery through Socratic dialogue + syst
   3. Validate: Feasibility check + requirement validation.
   4. Specify: feature path `docs/features/<slug>/01-discovery.md`, standalone `docs/specs/<topic>-discovery-<username>-YYYY-MM-DD.md` — slug resolution (zero-match default `[f]`), frontmatter, README update per core/rules/RULES_DOCS.md `<doc_output_convention>`.
   5. Approve: Show spec for user review — no proceed without confirm.
-  6. Self-review (hard gate): emit handoff "Run /sc:review on this spec before /sc:plan. Plan handoff is gated on review." Rules below.
+  6. Self-review (hard gate): the spec stays `status: draft`; emit "Run /sc:review --scope spec <path> before /sc:plan." Claude does not review the spec itself in place of /sc:review. Rules in the self-review section below.
   7. Decision-mode tag: tag each Resolved Decision as confirmed or delegated. Heuristic below.
-  8. Handoff: Route to /sc:review (mandatory) → /sc:plan after status reach approved-for-plan. With delegated decisions, prefer /sc:review --audit-delegated.
+  8. Handoff: Route to /sc:review --scope spec (mandatory); /sc:plan follows once /sc:review has set `status: approved-for-plan`. With delegated decisions, add --audit-delegated to the /sc:review call.
   </flow>
 
   <flags>
@@ -26,9 +26,9 @@ description: Interactive requirements discovery through Socratic dialogue + syst
   </flags>
 
   <self_review>
-  Required hard gate before /sc:plan handoff — self-review caught 3 critical reversals on user-approved spec where soft rec alone would ship silent regressions, so gate not advisory.
+  Required hard gate before /sc:plan handoff, because a spec the user approved can still carry reversed decisions that only an independent review catches; the gate is not advisory.
 
-  Direct route to /sc:plan from the Approve step forbidden. After each review round, append §"Self-Review Iteration Log" section to spec recording v1→vN delta.
+  A direct route to /sc:plan from the Approve step is forbidden. /sc:review records each round in the spec's "Self-Review Iteration Log" section (v1→vN delta) and sets `status: approved-for-plan` when the gate passes; brainstorm writes neither.
   </self_review>
 
   <decision_modes>
@@ -68,14 +68,14 @@ description: Interactive requirements discovery through Socratic dialogue + syst
   <example name="brainstorm-then-implement" type="error-path">
     - Input: /sc:brainstorm 'auth system' (then immediately start coding without user confirm)
     - Why wrong: Brainstorm = discovery-only. Impl without user confirm direction violate exploration contract.
-    - Correct: Finish brainstorm → show options → user confirm → handoff to /sc:design or /sc:implement
+    - Correct: Finish brainstorm → user confirms direction → /sc:review on the spec → /sc:design or /sc:plan
   </example>
   </examples>
 
   <gotchas>
   - evidence-fabrication: No construct hypothetical failure scenarios to justify pre-existing rec. Evidence (code, config, measurements) must precede proposals.
   - analysis-loop: If reasoning hit same conclusion twice on same question, kill that line of analysis + move to next topic.
-  - skip-review: do NOT route to /sc:plan when status: draft AND no /sc:review iteration logged. Hard gate, not advisory. Brainstorm output without self-review round has shipped silent reversals before.
+  - skip-review: do not route to /sc:plan while the spec is `status: draft` or its Self-Review Iteration Log has no /sc:review round. The gate is hard, not advisory.
   </gotchas>
 
   <bounds>

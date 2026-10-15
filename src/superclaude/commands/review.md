@@ -17,8 +17,9 @@ description: Review a work product (code, plan, design, spec) for quality, corre
   4. Challenge: before categorize, answer plain — What condition make approach fail? What gap easy to miss? What hardest to change 6 months from now?
   5. Categorize: group finding as Critical (must fix) | Important (should fix) | Suggestion (nice to have)
   6. Verify: evidence fit artifact type — tests+lint for code, executability+completeness for plan, trade-off rationale for design, acceptance criteria for spec
-  7. Process: each finding — classify (change request vs concern vs question) → verify against source of truth → propose fix or push back with evidence
+  7. Process: classify each finding as a change request, a concern or a question; verify it against the source of truth (file:line, test output) and withdraw or downgrade any finding the evidence does not support
   8. Delegated-decision audit (--audit-delegated): when called on spec with "Resolved Decisions" table, scope review to ONLY row where `mode` is `delegated` (per the /sc:brainstorm Decision-mode tag step heuristic). Recorded choice already read in the Gather step, so re-eval goes to one isolated delegate (independent stream, not a double-check) under delegate packet rule in core/rules/RULES_DELEGATION.md: it gets each delegated Q and its options as recorded (where spec records none, the Q alone, delegate forms own candidates, report notes it), never the recorded choice or a ★/recommendation marker. Limit: a delegate that can read the repo can still find the recorded choice; its files inspected and commands run show whether it did, and the report says so. Surface for each: original Q, delegate's pick, recorded choice, agree/differ; a row whose recorded outcome defers the choice compares against the option the spec recommended, or reports the pick alone when none was recommended. Other row skipped. Delegated decision historically need explicit audit; user-confirmed choice already pass direct user judgment.
+  9. Spec gate: with --scope spec on a `status: draft` spec, once the user has resolved the findings, append this round to the spec's "Self-Review Iteration Log" section (v1→vN delta); with no Critical finding open and the user's go-ahead, set `status: approved-for-plan`. Without that go-ahead the status stays draft.
   </flow>
 
   <flags>
@@ -58,23 +59,23 @@ description: Review a work product (code, plan, design, spec) for quality, corre
   | `/sc:review --scope design docs/specs/bar.md` | Review design: goal fit + trade-offs + architectural gaps |
   | `/sc:review --scope branch --structured` | Review with subagent dispatch |
 
-  <example name="pushback-protocol" type="info">
-    When review finding wrong, push back with evidence:
-    - "This breaks test_X because [reason]. See [file:line]"
-    - "Module B uses [different pattern]. Not applicable here."
-    - "No current consumer for this abstraction. Deferring per YAGNI."
+  <example name="finding-self-check" type="info">
+    Before reporting, the reviewer checks each finding against the source:
+    - Keep: "This breaks test_X because [reason]. See [file:line]" — the evidence is cited.
+    - Withdraw: the finding assumed pattern A, but module B uses [different pattern] at [file:line].
+    - Downgrade to Suggestion: the proposed abstraction has no current consumer, so it is not a must-fix.
   </example>
   </examples>
 
 
   <gotchas>
-  - scope-focus: review only changed code, not whole file or module
+  - scope-focus: with --scope diff|pr|branch, review the changed lines and the code they affect; a file, directory or doc target is reviewed whole
   - no-unsolicited-fixes: flag issue but no fix unless asked
   </gotchas>
 
   <bounds>
     <does>work-product review (code/plan/design/spec), quality analysis, security scan, spec+quality review plus a staleness check on always-loaded docs.</does>
-    <never>auto-merge, auto-approve, modify artifact without explicit permission.</never>
+    <never>auto-merge, auto-approve, or modify the artifact without explicit permission; the one exception is the user-approved log entry and status update in the Spec gate step.</never>
     <fallback>No spec: weight review toward artifact quality dim.</fallback>
   </bounds>
 

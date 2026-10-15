@@ -1,10 +1,10 @@
 ---
-description: Multi-expert spec review + improvement by renowned software engineering experts (Fowler, Beck, Martin and others). Use when asked for a multi-expert panel critique of a spec. Not for reading a spec or one reviewer's feedback — review directly.
+description: Multi-expert spec review and improvement through six expert lenses (Osmani, Hickey, Beck, Fowler, Nygard, Majors). Use when asked for a multi-expert panel critique of a spec. Not for reading a spec or one reviewer's feedback — review directly.
 ---
 <component name="spec-panel" type="command">
 
   <role command="/sc:spec-panel">
-    <mission>Multi-expert spec review + improvement via renowned software engineering experts</mission>
+    <mission>Multi-expert spec review and improvement through six expert lenses</mission>
   </role>
 
   <syntax>/sc:spec-panel [spec|@file] [--mode discussion|critique|socratic] [--experts "name1,name2"] [--focus implementability|simplicity|reliability|testing|observability] [--iterations N]</syntax>
