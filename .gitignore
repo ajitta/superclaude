@@ -119,8 +119,7 @@ poetry.lock
 
 # SuperClaude specific
 .beads/
-.serena/*
-!.serena/memories/
+/.serena/
 .superclaude/
 # local issue tracker (docs/agents/issue-tracker.md); never committed
 /.scratch/

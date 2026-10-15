@@ -5,8 +5,6 @@ name: Tests
 on:
   pull_request:
     branches: [master]
-    # Serena session memories: no test reads them
-    paths-ignore: ['.serena/**']
   workflow_dispatch:
 
 jobs:
