@@ -56,9 +56,9 @@ description: Autonomous overnight code improvement loop driven by an objective m
   | Input | Output |
   |---|---|
   | `/sc:auto-improve . --eval-cmd 'python eval.py' --metric 'pass_rate' --budget 4h --scope 'src/**'` | 4h loop optimising pass_rate inside src/ |
-  | `/sc:auto-improve . --eval-cmd 'python bench.py' --metric 'latency_p99' --budget 1h --mutator-model fable` | 1h flagship-model latency optimisation |
+  | `/sc:auto-improve . --eval-cmd 'python bench.py' --metric 'latency_p99' --budget 1h` | 1h latency optimisation with the default mutator model |
   | `/sc:auto-improve . --status` | print most-recent run summary |
-  | `/sc:auto-improve . --eval-cmd 'echo {\"x\":1}' --metric 'x' --dry-run` | record baseline only, no mutations |
+  | `/sc:auto-improve . --eval-cmd "echo '{\"x\":1}'" --metric 'x' --dry-run` | record baseline only, no mutations |
   </examples>
 
   <bounds>

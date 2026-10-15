@@ -1,5 +1,5 @@
 ---
-description: Design system architecture, APIs and component interfaces as specs committed under docs/specs/. On request only — the user's /sc:design or a workflow step that names it. Not for structuring one function or a small sketch — answer inline.
+description: Design system architecture, APIs and component interfaces as specs written as a doc (feature folder or docs/specs/). On request only — the user's /sc:design or a workflow step that names it. Not for structuring one function or a small sketch — answer inline.
 ---
 <component name="design" type="command">
 
@@ -16,7 +16,7 @@ description: Design system architecture, APIs and component interfaces as specs 
   4. Constraints: Document operational params that constrain design — queue/buffer sizes, connection pool limits, external API batch limits, timeout values
   5. Necessity: For each proposed component, apply [R18 Necessity Test] — defer components lacking specific failure scenario, quantitative evidence, or user-facing impact
   6. Concerns: List every point where two constraints or policies conflict, or where the design cannot satisfy the intent — the owner resolves these before /sc:plan
-  7. Validate: Requirements coverage ≥90%, maintainability check
+  7. Validate: List each requirement from the input doc beside the design section that covers it; a requirement no section covers goes under Areas of concern. Check maintainability
   8. Document: feature path `docs/features/<slug>/04-design.md`, standalone `docs/specs/<topic>-design-<username>-YYYY-MM-DD.md` — slug resolution (zero-match default `[f]`), frontmatter, README update per core/rules/RULES_DOCS.md `<doc_output_convention>`. Plus diagrams.
   </flow>
 
@@ -71,7 +71,7 @@ description: Design system architecture, APIs and component interfaces as specs 
 
   <bounds>
     <does>comprehensive specs, multi-format output, validation.</does>
-    <never>generate impl code, modify existing arch, violate constraints.</never>
+    <never>generates implementation code, modifies the existing architecture, or violates constraints.</never>
   </bounds>
 
   <handoff next="/sc:plan /sc:implement /sc:roadmap"/>

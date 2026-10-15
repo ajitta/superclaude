@@ -5,13 +5,13 @@ description: List all /sc commands and what each one does. Use when asked which 
 <component name="help" type="command">
 
   <role command="/sc:help">
-    <mission>List /sc commands + functionality</mission>
+    <mission>List all /sc commands and what each one does</mission>
   </role>
   <syntax>/sc:help [command-name] [--flags]</syntax>
 
 
   <flow>
-  1. Display: full command list
+  1. Display: no argument → the full command list and the scope map; a command-name → that command's syntax, its flags, and the "Not for" line of its description; --flags → the flag list per the flags section
   2. Complete: end after display
   </flow>
 
@@ -28,27 +28,27 @@ description: List all /sc commands and what each one does. Use when asked which 
     - cleanup: dead code removal + structure optimization
     - design: system architecture + API design
     - document: focused doc generation
-    - estimate: dev effort/complexity estimates
+    - estimate: development effort and complexity estimates
     - explain: code + concept explanations
-    - git: smart git ops + PR integration
+    - git: git operations with PR integration
     - help: this command ref
-    - implement: feature impl + MCP integration
-    - improve: code quality + perf improvements
+    - implement: feature implementation with MCP integration
+    - improve: code quality and performance improvements
     - index: project docs + knowledge base
-    - index-repo: repo indexing (94% token reduction)
+    - index-repo: compact repo index (~3KB) for cheap navigation
     - load: session context load (memory folder + auto memory)
-    - pm: Project Manager Agent (default orchestration)
-    - recommend: smart command recs
+    - pm: multi-agent orchestration for 3+ independent streams (on request)
+    - recommend: command recommendations for a request
     - reflect: task reflection + validation
     - research: deep web research, parallel search
     - save: session context persistence
-    - select-tool: smart MCP tool select
+    - select-tool: MCP tool selection for a task
     - sc: command dispatcher (main entry)
     - spec-panel: multi-expert spec review
-    - task: complex task workflow mgmt
-    - test: test exec + coverage analysis
+    - task: tracked task hierarchy for complex work
+    - test: test execution and coverage analysis
     - troubleshoot: issue diagnosis + fix
-    - roadmap: PRD → impl task plan
+    - roadmap: PRD → implementation task plan
     - init: interactive project env setup
     - insight: capture structured session insights
     - intent: capture a request in the requester's own words before analysis
@@ -60,8 +60,8 @@ description: List all /sc commands and what each one does. Use when asked which 
 
   <scope_map>
   Analysis: analyze (static quality metrics) | review (PR/diff-level) | reflect (post-impl self-check)
-  Project mgmt: task (single-session tracking) | pm (multi-session orchestration)
-  Impl: implement (write/modify code) | build (compile, package)
+  Project management: task (single-session tracking) | pm (multi-session orchestration)
+  Implementation: implement (write/modify code) | build (compile, package)
   Docs: document (prose for humans) | index (structured knowledge base) | index-repo (repo catalog)
   Discovery: intent (request in the requester's words, before analysis) | brainstorm (Socratic requirements) | research (evidence-based investigation)
   Advisory: business-panel (market/strategy) | spec-panel (tech spec review)
@@ -83,8 +83,8 @@ description: List all /sc commands and what each one does. Use when asked which 
   </gotchas>
 
   <bounds>
-    <does>full ref display, categorized flag list, usage examples.</does>
-    <never>exec commands, make files, activate modes, modify project state.</never>
+    <does>displays the full reference, a categorized flag list and usage examples.</does>
+    <never>executes commands, creates files, activates modes, or modifies project state.</never>
   </bounds>
 
   <handoff next="/sc:recommend /sc:[command]"/>

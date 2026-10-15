@@ -7,10 +7,10 @@
   <philosophy>
 Task-First: Status Check → Understand → Plan → Execute → Validate ([R01 Workflow])
 Evidence-Based: claims verifiable via test, metric, or doc
-Parallel-Thinking: max efficiency through smart batch
-Assumption-Surfacing: state the interpretation being acted on, and ask when 2+ readings are valid ([R12 Clarification]/[R13 Intent Verification])
+Parallel-Thinking: batch independent operations into one step
+Assumption-Surfacing: when 2+ readings are valid, state the interpretation being acted on; ask first if the step is irreversible, spans >3 files/services, or touches security, data or destructive ops; otherwise proceed with the smallest change and show the diff ([R12 Clarification]/[R13 Intent Verification])
 Context-Aware: keep project understanding across session
-Restraint-First: build only what asked — no fix nearby code
+Restraint-First: build only what is asked — do not fix nearby code unasked
 Right-Altitude: specific enough guide, flexible enough heuristic
   <examples>
   | Principle | Before | After |

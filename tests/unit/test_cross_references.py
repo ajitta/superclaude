@@ -149,7 +149,7 @@ _BARE_ID_ALLOWED = {
     # The insights.jsonl `rule` field stores the bare ID ("R18").
     "src/superclaude/commands/insight.md": ["rule (R13, R18...)"],
     # The gotcha is about grepping the bare ID itself.
-    ".claude/rules/gotchas/general.md": [r"(e.g., \bR18\b)", "but R15 appear once"],
+    ".claude/rules/gotchas/general.md": [r"(e.g., \bR18\b)"],
     # A section anchor in a research doc, not a rule citation.
     ".claude/rules/gotchas/authoring.md": ["§ P-R21"],
 }

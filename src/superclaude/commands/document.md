@@ -4,17 +4,17 @@ description: Generate focused docs for components, functions, APIs and features;
 <component name="document" type="command">
 
   <role command="/sc:document">
-    <mission>Gen focused docs for components, functions, APIs, features</mission>
+    <mission>Generate focused docs for components, functions, APIs and features</mission>
   </role>
 
   <syntax>/sc:document [target] [--type inline|external|api|guide] [--style brief|detailed]</syntax>
 
   <flow>
-  1. Analyze: Component structure + interfaces
-  2. Identify: Audience + requirements
-  3. Generate: Content by type + style (see outputs)
-  4. Format: Consistent structure
-  5. Integrate: Project doc ecosystem
+  1. Analyze: read the component structure and its interfaces.
+  2. Identify: name the audience and what it needs.
+  3. Generate: write content by type and style (see outputs).
+  4. Format: apply a consistent structure.
+  5. Integrate: link the result into the project's existing docs.
   </flow>
 
   <flags>
@@ -25,9 +25,9 @@ description: Generate focused docs for components, functions, APIs and features;
   <outputs note="Per --type flag">
 | Type | Output | Metrics |
 |---|---|---|
-| inline | JSDoc/docstring in source files | coverage ≥80% |
-| external | `docs/reports/<COMPONENT>_DOCS.md` (living doc, per-component) | all public APIs |
-| api | `docs/reports/API.md` (living doc, project-wide) | endpoints 100% |
+| inline | JSDoc/docstring in source files | documented public symbols / total public symbols, both counted |
+| external | `docs/reports/<COMPONENT>_DOCS.md` (living doc, per-component) | documented public APIs / total public APIs, both counted |
+| api | `docs/reports/API.md` (living doc, project-wide; shared with /sc:index --type api, so an existing file is updated in place) | documented endpoints / total endpoints, both counted |
 | guide | `docs/reports/<TOPIC>_GUIDE.md` (living doc, per-topic) | install+usage+examples |
   </outputs>
 
@@ -36,6 +36,7 @@ description: Generate focused docs for components, functions, APIs and features;
   - Read: Component + existing docs
   - Grep: Ref extraction
   - Write: Doc file creation
+  - Edit: inline docstrings + in-place updates of existing docs
   - Glob: Multi-file organization
   </tools>
 
@@ -50,21 +51,21 @@ description: Generate focused docs for components, functions, APIs and features;
 
   <example name="document-unstable-code" type="error-path">
     - Input: /sc:document src/api --type api --style detailed (during active refactoring)
-    - Why wrong: Doc code mid-refactor → docs stale immediately.
-    - Correct: Finish refactor first, then /sc:document for stable API surface.
+    - Why wrong: documenting code mid-refactor leaves the docs stale immediately.
+    - Correct: finish the refactor first, then run /sc:document on the stable API surface.
   </example>
 
   </examples>
 
 
   <gotchas>
-  - no-unsolicited: No create doc files unless explicit request
+  - no-unsolicited: create a doc file only for the --type the user asked for; never add extra doc files.
   - naming: Follow doc_output_convention from core/rules/RULES_DOCS.md — file outputs are living docs (UPPER_SNAKE in docs/reports/, no date/username)
   </gotchas>
 
   <bounds>
-    <does>focused docs, multi-format, ecosystem integration.</does>
-    <never>doc without analysis, override standards, expose sensitive details.</never>
+    <does>writes focused docs in several formats and links them into the project's docs.</does>
+    <never>documents without analysis, overrides project doc standards, or exposes sensitive details.</never>
   </bounds>
 
   <handoff next="/sc:implement /sc:improve"/>

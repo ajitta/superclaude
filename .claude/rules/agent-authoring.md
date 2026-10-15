@@ -4,26 +4,26 @@ paths: ["src/superclaude/agents/**", ".claude/rules/agent-authoring.md"]
 
 # Agent Authoring Rules
 
-> **Decision gate.** Make agent for **domain expertise** that CC auto-delegate on description match.
+> **Decision gate.** Create an agent when the work needs **domain expertise** that Claude Code should delegate to automatically when a request matches the agent's description.
 > - Agent = **WHO TO BE** (domain expert persona)
 > - Command = **WHAT TO DO** (user-invoked workflow)
 > - Mode = **HOW TO THINK** (cognitive overlay)
 
-> **What CC load.** Subagent session hold only markdown body (system prompt) plus min env context — *not* parent CC system prompt, *not* parent skills. Write body self-contained. Subagent no spawn more subagents (only main thread can, via `--agent` + `Agent` in `tools`); design each agent return one summary, no nested delegation.
+> **What Claude Code loads.** A subagent session gets the agent's markdown body as its system prompt plus minimal environment context. It does not get the parent's Claude Code system prompt or the parent's skills; whether it gets CLAUDE.md (and through it the superclaude kernel) depends on Claude Code and on the agent frontmatter field `omitClaudeMd`, and the on-demand rule modules never reach it. Write the body self-contained. A subagent cannot spawn further subagents (only a main thread can, via `--agent` with `Agent` in `tools`), so each agent returns one summary with no nested delegation.
 
-> **No recreate built-ins.** CC ship `Explore` (read-only codebase search, Haiku), `Plan` (read-only research for plan mode), `general-purpose` (full-tool multi-step), `statusline-setup`, `Claude Code Guide`. New superclaude agent must add domain-specific value past these; agent that just "search codebase" or "research before act" duplicate `Explore`/`Plan` and bloat registry.
+> **Don't recreate built-ins.** CC ships `Explore` (read-only codebase search, Haiku), `Plan` (read-only research for plan mode), `general-purpose` (full-tool multi-step), `statusline-setup`, and `Claude Code Guide`. A new superclaude agent must add domain-specific value beyond these; an agent that just "searches the codebase" or "researches before acting" duplicates `Explore`/`Plan` and bloats the registry.
 
-> **Body run two modes.** Same file run as delegated subagent (body = system prompt for isolated session) OR as whole session via `claude --agent <name>` (body replace CC default system prompt). Write body read coherent both modes — no phrasing that assume parent ("when delegated to you", "the calling Claude"); prefer persona statements ("Claude operates as …", "the agent's mission is …").
+> **Bodies run in two modes.** The same file runs as a delegated subagent (body = system prompt for an isolated session) OR as the whole session via `claude --agent <name>` (body replaces CC's default system prompt). Write the body to read coherently in both modes — no phrasing that assumes a parent ("when delegated to you", "the calling Claude"); prefer persona statements ("Claude operates as …", "the agent's mission is …").
 
 ## YAML Frontmatter
 
-CC need only `name` + `description`. Rest optional, inherit from parent. superclaude also need `memory` + `color` for installer.
+CC requires only `name` and `description`. The rest are optional and inherit from the parent. superclaude also requires `memory` and `color` for the installer.
 
 ```yaml
 ---
 # Required by CC
 name: agent-name                            # lowercase letters and hyphens; matches filename
-description: Expert X. Use proactively for Y. Use immediately after Z.
+description: <Domain> specialist for <distinguishing task>. Use when <signal no neighbor agent covers>. Not for <look-alike> — <neighbor>.
 
 # Required by superclaude
 memory: project                             # source value always "project"; installer rewrites to user/local per scope
@@ -35,7 +35,6 @@ permissionMode: default                     # default | acceptEdits | auto | don
 tools: Read, Grep, Glob, Agent              # allow-list (comma-separated)
 disallowedTools: Edit, Write                # deny-list (applied first, then `tools` resolved against remainder)
 effort: high                                # low | medium | high | xhigh | max  (string, not 1-5)
-maxTurns: 20                                # positive integer turn cap
 skills: [some-installed-skill]              # full skill body injected at startup; subagent does NOT inherit parent skills
 mcpServers: [playwright]                    # references to configured servers, or inline definitions
 
@@ -44,95 +43,87 @@ hooks:                                      # PreToolUse / PostToolUse / Stop sc
 background: false                           # always run as a background task
 isolation: worktree                         # spawn in a temporary git worktree (isolated repo copy)
 initialPrompt:                              # auto-submitted as first user turn when run as main session via --agent
+omitClaudeMd: true                          # subagent starts without CLAUDE.md (and so without the superclaude kernel)
 ---
 ```
 
 ### Description writing
 
-CC read `description` verbatim to decide delegation. Two parts:
+CC reads `description` verbatim to decide delegation. Three parts:
 
-- **Persona** — noun phrase name the expert ("Expert code reviewer", "Debugging specialist for errors and test failures").
-- **Trigger phrase** — when to delegate, in CC idiom: *"Use proactively for X."*, *"Use immediately after Y."*, *"Use when Z."*
+- **Persona** — a noun phrase naming the expert ("Expert code reviewer", "Debugging specialist for errors and test failures").
+- **Trigger phrase** — the signal in a request that this agent covers and its neighbors do not: *"Use when Z."* Write *"Use proactively …"* or *"Use immediately after …"* only when the agent must run unasked, and name the event it follows: when most agents claim proactivity the phrase stops separating them, and overlapping triggers fire several agents for one request (docs/features/prompt-content-audit/).
+- **Negative gate** — when a neighbor shares the verb, add *"Not for <look-alike> — <neighbor>."* (verifier's description is the model).
 
-Skip emoji, version tag, colon-prefix keyword list — description is sentence read by parent classifier; write sentence. Legacy `(triggers - kw1, kw2)` shorthand parse but classify less reliable than CC-idiom sentence. One to three sentences total; description sit in parent context every turn, so extra words must sharpen when-to-delegate (`content-quality.md` §1).
+Skip emoji, version tags, and colon-prefixed keyword lists — the description is a sentence read by the parent's classifier; write a sentence. The legacy `(triggers - kw1, kw2)` shorthand is parsed but classifies less reliably than a CC-idiomatic sentence. One to three sentences total; the description sits in the parent's context every turn, so extra words must sharpen when-to-delegate (`content-quality.md` §1).
 
-Canonical patterns (from CC docs):
-- `Expert code review specialist. Proactively reviews code for quality, security, and maintainability. Use immediately after writing or modifying code.`
-- `Debugging specialist for errors, test failures, and unexpected behavior. Use proactively when encountering any issues.`
-- `Data analysis expert for SQL queries, BigQuery operations, and data insights. Use proactively for data analysis tasks and queries.`
+Patterns:
+- `Debugging specialist for errors and test failures. Use when a test fails or a stack trace is pasted and the cause is unknown. Not for slow code — performance-engineer.`
+- `Data analysis expert for SQL queries and BigQuery operations. Use when the request names a query, table or dataset. Not for schema design — backend-architect.`
 
 #### Vocabulary cautions
 
-Description sentence read verbatim into subagent system prompt header — word shift measurably change behavior. Empirical findings from agent-naming experiment series (107 trials, see `docs/research/2026-05-06-agent-naming-findings/`):
+The description sentence is read verbatim into the subagent's system prompt header — wording shifts measurably change behavior. Empirical findings from the agent-naming experiment series (107 trials, see `docs/research/2026-05-06-agent-naming-findings/`):
 
-- **No past-implying phrasing.** `following X practices`, `deep production experience`, `pragmatic tradeoff judgment` — these prime "continuation of prior work" frame, produce 5/5 and 3/3 context-hallucination rates on long-output tasks (subagent fabricate preexisting files, prior fixes, even narrate edits to own definition file). `engineer` and `senior-python-engineer` rename pairs break from this alone, body unchanged.
-- **Prefer forward-looking voice.** `learning to apply X`, `grounded in X`, `with deep mastery and seasoned judgment` — these no trigger failure mode (0/3 hallucinations).
-- **Description is lever for over-engineering.** Add Zen-of-Python clause ("simple is better than complex; values minimal solutions, the smallest abstraction; code that any junior can read") to same agent name reduce over-engineering signals 25–73% (chars −25%, classes −58%, decorators −65%, TypeVar −100% across 15 trials). Use this lever before rename if goal is anti-overengineering.
-- **`hypothesis`-style advanced patterns sticky** — directive phrasing only reduce unprompted property-based test usage ~20%. Some priors need explicit prohibition (`Do not use property-based testing libraries unless asked.`) not soft directive.
+- **No past-implying phrasing.** `following X practices`, `deep production experience`, `pragmatic tradeoff judgment` — these prime a "continuation of prior work" frame and produced 5/5 and 3/3 context-hallucination rates on long-output tasks (subagents fabricated preexisting files and prior fixes, and even narrated edits to their own definition file). The `engineer` and `senior-python-engineer` rename pairs broke from this alone, body unchanged.
+- **Prefer forward-looking voice.** `learning to apply X`, `grounded in X`, `with deep mastery and seasoned judgment` — these did not trigger the failure mode (0/3 hallucinations).
+- **Description is a lever for over-engineering.** Adding a Zen-of-Python clause ("simple is better than complex; values minimal solutions, the smallest abstraction; code that any junior can read") to the same agent name reduced over-engineering signals 25–73% (chars −25%, classes −58%, decorators −65%, TypeVar −100% across 15 trials). Use this lever before a rename if the goal is anti-overengineering.
+- **`hypothesis`-style advanced patterns are sticky** — directive phrasing only reduced unprompted property-based test usage by ~20%. Some priors need an explicit prohibition (`Do not use property-based testing libraries unless asked.`), not a soft directive.
 
-> **Enforced.** Forbidden exemplars (`following X practices`, `deep production experience`, `pragmatic tradeoff judgment`) + presence of a CC-idiom trigger are checked by `tests/unit/test_agent_structure.py::TestAgentDescriptionInterface` (deterministic, default `make test`). Add newly-proven exemplars to `FORBIDDEN_DESC_PATTERNS`.
+> **Enforced.** Forbidden exemplars (`following X practices`, `deep production experience`, `pragmatic tradeoff judgment`) and the presence of a CC-idiom trigger are checked by `tests/unit/test_agent_structure.py::TestAgentDescriptionInterface` (deterministic, default `make test`). Add newly-proven exemplars to `FORBIDDEN_DESC_PATTERNS`.
 
 ### Field reference
 
-**Forbidden in source.** `autonomy` (not CC field). Any field not in CC documented agent spec.
+**Forbidden in source.** `autonomy` (not a CC field). Any field not in CC's documented agent spec.
 
 **Tool access.** Five canonical patterns:
 
 | Pattern | Field | Value | When |
 |---------|-------|-------|------|
-| Read-only + web | `tools` | `Read, Grep, Glob, Agent, WebSearch, WebFetch` | Plan/review/research (fails closed — **preferred**) |
+| Read-only + web | `tools` | `Read, Grep, Glob, Agent, WebSearch, WebFetch` | Plan/review/research (fails closed) |
 | Read-only minimal | `tools` | `Read, Grep, Glob, Agent` | No web access needed |
-| Execute-only | `disallowedTools` | `Edit, Write, NotebookEdit` | Runs commands, never edits files (e.g., git-workflow) |
+| Execute-only | `disallowedTools` | `Edit, Write, NotebookEdit` | Runs commands, never edits files |
 | General | `disallowedTools` | `NotebookEdit` | Code edits OK, no notebook edits |
 | Full access | *(omit both)* | — | Implementation agents |
 
-CC permit both `tools` and `disallowedTools` together (deny applied first, then allow resolved against remaining pool — tool listed in both is removed). **superclaude convention: pick one form per agent for readability — never mix.**
+A `tools` list drops every MCP tool it does not name: commit `672055ce` stripped `tools`/`disallowedTools` from all agents for that reason, so set one only when the agent needs no MCP. CC permits both `tools` and `disallowedTools` together (deny is applied first, then allow is resolved against the remaining pool — a tool listed in both is removed). **superclaude convention: pick one form per agent for readability — never mix.**
 
-**Spawn restrictions (orchestrators only).** `tools: Agent(worker, researcher)` allow-list which subagent types can spawn. Take effect only when agent run as main thread (`claude --agent <name>`); no effect inside regular subagent (subagent no spawn subagent). Bare `Agent` allow any; omit `Agent` from `tools` disable spawning entirely.
+**Spawn restrictions (orchestrators only).** `tools: Agent(worker, researcher)` allow-lists which subagent types can be spawned. It takes effect only when the agent runs as the main thread (`claude --agent <name>`); it has no effect inside a regular subagent (subagents cannot spawn subagents). Bare `Agent` allows any; omitting `Agent` from `tools` disables spawning entirely.
 
-**`effort`** (CC v2.1.69+) — **omit by default.** Inherit from parent unless measured evidence show specific value materially change output for agent domain. String values only; `xhigh`/`max` availability and the default level depend on model + CC version — check current docs, not a pinned value.
+**`effort`** — **omit by default.** Inherit from the parent unless measured evidence shows a specific value materially changes output for the agent's domain. String values only; `xhigh`/`max` availability and the default level depend on the model and CC version — check current docs, not a pinned value.
 
 Precedence: `CLAUDE_CODE_EFFORT_LEVEL` env > frontmatter > session > model default.
 
-When `xhigh` worth setting: reserve `xhigh` ('extra') / `max` for difficult tasks or long-running async work — not as a blanket coding baseline. If a session runs at `low`/`medium`, the model under-thinks edge cases; two safe paths to raise it:
-1. **Session-level (preferred).** `CLAUDE_CODE_EFFORT_LEVEL=xhigh` or pick `xhigh` at session start — uniform, respect user cost-vs-quality choice.
-2. **Agent-level override.** `effort: xhigh` only when measured quality regression at session default justify it.
+When `xhigh` is worth setting: reserve `xhigh` ('extra') / `max` for difficult tasks or long-running async work — not as a blanket coding baseline. If a session runs at `low`/`medium`, the model under-thinks edge cases; two safe paths to raise it:
+1. **Session-level (preferred).** `CLAUDE_CODE_EFFORT_LEVEL=xhigh` or pick `xhigh` at session start — uniform, and respects the user's cost-vs-quality choice.
+2. **Agent-level override.** `effort: xhigh` only when measured quality regression at the session default justifies it.
 
-No add `effort: xhigh` because domain "feels" coding-heavy — session default cover that. Inherit-by-default keep cost control with user (commit `8edd05d`).
+Don't add `effort: xhigh` because the domain "feels" coding-heavy — the session default covers that. Inherit-by-default keeps cost control with the user (commit `8edd05d`).
 
-**`maxTurns`** — turn-limit safety net:
-
-| Category | maxTurns | When |
-|----------|----------|------|
-| Quick | 10 | Scanning, mechanical ops |
-| Standard | 15-20 | Most agents |
-| Extended | 25-30 | Deep research, complex debugging |
-| Unlimited | *omit* | Orchestrators (project-manager) |
-
-**`skills`** — full skill body inject at startup (~500 tokens each). Subagent **not** inherit skills from parent — list explicit. No preload skills with `disable-model-invocation: true` (CC skip and warn to debug log). superclaude's `sc-author` skill sets `disable-model-invocation: true`, so it cannot be preloaded; names refer to skills installed in `~/.claude/skills/` or `.claude/skills/`.
+**`skills`** — the full skill body is injected at startup (~500 tokens each). Subagents do **not** inherit skills from the parent — list them explicitly. Do not preload skills with `disable-model-invocation: true` (CC skips them and warns to the debug log). superclaude's `sc-author` skill sets `disable-model-invocation: true`, so it cannot be preloaded; names refer to skills installed in `~/.claude/skills/` or `.claude/skills/`.
 
 **`model`** — omit it: no shipped agent pins a model, and an omitted field follows Claude Code's subagent resolution order. Resolution order and the Fable opt-in paths: `agents/README.md` Model Routing (SSOT).
 
-**`permissionMode`** — most agents inherit (omit). Use `plan` for read-only research agents that no accept edits. `bypassPermissions` write to `.git`, `.claude`, `.vscode` etc. without prompt — never set on source-shipped agent. Parent `bypassPermissions` / `acceptEdits` / `auto` modes take precedence, override subagent setting.
+**`permissionMode`** — most agents inherit (omit). Use `plan` for read-only research agents that do not accept edits. `bypassPermissions` writes to `.git`, `.claude`, `.vscode` etc. without prompting — never set it on a source-shipped agent. Parent `bypassPermissions` / `acceptEdits` / `auto` modes take precedence and override the subagent's setting.
 
-**`color`** — SSOT: `.claude/rules/schemas.yaml` (`agent_colors`). CC accept `red, blue, green, yellow, purple, orange, pink, cyan`. superclaude role-group mapping use six of these:
+**`color`** — SSOT: `.claude/rules/schemas.yaml` (`agent_colors`). CC accepts `red, blue, green, yellow, purple, orange, pink, cyan`. The superclaude role-group mapping uses six of these:
 `architecture` → blue | `engineering` → green | `research` → purple | `documentation` → yellow | `management` → orange | `indexing` → cyan
-(`red`, `pink` are valid CC colors but not currently mapped to superclaude role group.)
+(`red`, `pink` are valid CC colors but not currently mapped to a superclaude role group.)
 
-**`mcpServers`** — inherit from parent by default. Specify only to add server absent from parent or to scope inline definition. To keep MCP server out of main conversation entirely (avoid its tool descriptions consuming parent context), define inline here so it connect only when subagent run.
+**`mcpServers`** — inherited from the parent by default. Specify it only to add a server absent from the parent or to scope an inline definition. To keep an MCP server out of the main conversation entirely (avoid its tool descriptions consuming parent context), define it inline here so it connects only when the subagent runs.
 
-**`memory`** — need by superclaude. Source files always use `memory: project`; installer rewrite at install time:
+**`memory`** — required by superclaude. Source files always use `memory: project`; the installer rewrites it at install time:
 - `user` install → `memory: user`, files at `~/.claude/agent-memory/<agent>/`
 - `project` install → unchanged, files at `.claude/agent-memory/<agent>/`
 - `local` install → `memory: local`, files at `.claude/agent-memory-local/<agent>/`
 
-When memory enabled, CC auto-inject up to first 200 lines / 25KB of `MEMORY.md` into subagent prompt and auto-enable Read/Write/Edit for memory file management. See `cli/install_components.py::_rewrite_agent_memory_scope`.
+When memory is enabled, CC auto-injects up to the first 200 lines / 25KB of `MEMORY.md` into the subagent's prompt and auto-enables Read/Write/Edit for memory file management. See `cli/install_components.py::_rewrite_agent_memory_scope`.
 
-**Working directory.** Subagent start in parent CWD. `cd` **not** persist between Bash/PowerShell tool calls within subagent, never affect parent. For repo-isolating task, set `isolation: worktree` and CC make temporary git worktree (clean up auto if subagent make no changes).
+**Working directory.** Subagents start in the parent's CWD. `cd` does **not** persist between Bash/PowerShell tool calls within a subagent and never affects the parent. For repo-isolating tasks, set `isolation: worktree` and CC creates a temporary git worktree (cleaned up automatically if the subagent makes no changes).
 
 ## XML Body Structure
 
-> Conform to `.claude/rules/xml-prose-format.md`: single root, `snake_case` section tags, short-line lists (**Numbered** `1.` for ordered procedures, or `-` prefix as **Plain with checkbox**, **Labeled**, **Named** per item type), sub-tag form for fixed labeled slots (`<bounds>` → `<does>`/`<never>`/`<fallback>`), compact tables for dense lookups (`<examples>`), and standalone `<example>` for rich multi-line illustrations.
+> Conforms to `.claude/rules/xml-prose-format.md`: single root, `snake_case` section tags, short-line lists (**Numbered** `1.` for ordered procedures, or `-` prefix as **Plain with checkbox**, **Labeled**, **Named** per item type), sub-tag form for fixed labeled slots (`<bounds>` → `<does>`/`<never>`/`<fallback>`), compact tables for dense lookups (`<examples>`), and standalone `<example>` for rich multi-line illustrations.
 
 ```xml
 <component name="agent-name" type="agent">
@@ -142,26 +133,26 @@ When memory enabled, CC auto-inject up to first 200 lines / 25KB of `MEMORY.md` 
   </role>
 
   <focus>
-  - Category: specific capabilities (3-5 items)
+  - Category: specific capabilities (usually 3-5 items; fewer when the domain is narrow)
   </focus>
 
   <actions>
-  1. Verb-leading description of the step (4-5 steps; sequence is load-bearing).
+  1. Verb-leading description of the step (as many steps as the procedure has; sequence is load-bearing).
   </actions>
 
   <outputs>
-  - Type: deliverable purpose (3-4 items)
+  - Type: deliverable purpose (one item per deliverable the agent produces)
   </outputs>
 
   <tool_guidance>
   - Proceed: actions to do freely.
   - Symbolic-First: full or light form (see Code Exploration below).
-  - Ask First: actions requiring confirmation, with specific thresholds.
+  - Ask First: actions requiring confirmation, with specific thresholds. As a delegated subagent Claude cannot ask mid-task: wherever this file says to ask the user or get the user's confirmation, it stops before that step and returns the proposed action and the question in its report. The task text counts as confirmation only for a reversible action it names with its target; a destructive or irreversible one needs the user's own approval quoted in the task.
   - Never: actions the agent must never take.
   </tool_guidance>
 
   <checklist>
-  - [ ] Concrete, verifiable completion criterion stated as one line (3-5 items)
+  - [ ] Concrete, verifiable completion criterion stated as one line (usually 3-5; fewer when the domain is narrow)
   </checklist>
 
   <memory_guide>
@@ -178,7 +169,7 @@ When memory enabled, CC auto-inject up to first 200 lines / 25KB of `MEMORY.md` 
   </examples>
 
   <gotchas>
-  - pattern-name: concrete failure + action instruction (2-5 items)
+  - pattern-name: concrete failure + action instruction (only failures known for this domain; no filler entries)
   </gotchas>
 
   <bounds>
@@ -193,14 +184,17 @@ When memory enabled, CC auto-inject up to first 200 lines / 25KB of `MEMORY.md` 
 
 ### XML Rules
 
-- `<mission>` — share ≥30% significant words with `description`.
+- `<mission>` — shares ≥30% significant words with `description`.
 - All multi-word tag names use `snake_case` (`tool_guidance`, `memory_guide`).
 - Short enums: **Numbered** (`1.` ordered procedures: `<actions>`), **Plain with checkbox** (`- [ ]` verification-pending criteria: `<checklist>`), **Labeled** (`- Label:` fixed-set labels: `<tool_guidance>` Proceed/Ask First/Never), **Named** (`- identifier-name:` per-item identifiers: `<focus>`, `<outputs>`, `<gotchas>`, `<memory_guide>`).
-- `<examples>` — compact markdown table with minimal separators `|---|---|` for short uniform rows. For rich illustration (code block, narrative, multi-turn prose), use standalone `<example>` tag — body is free-form prose, not lock to `user:` / `assistant:` shape. `<examples>` and `<example>` are two distinct constructs (see xml-prose-format.md).
-- `<bounds>` — sub-tag form: `<does>` / `<never>` / `<fallback>` (each tag body is prose sentence). `<does>` + `<never>` required; `<fallback>` recommended (agents long-lived; explicit recovery posture high-leverage). Sub-tag form keep `<bounds>` structurally distinct from `<tool_guidance>` (session `S390`, a claude-mem record not in git, measured Claude conflate the two when both used `- Label:` lines).
+- `<examples>` — compact markdown table with minimal separators `|---|---|` for short uniform rows. For rich illustrations (code blocks, narrative, multi-turn prose), use a standalone `<example>` tag — its body is free-form prose, not locked to a `user:` / `assistant:` shape. `<examples>` and `<example>` are two distinct constructs (see xml-prose-format.md).
+- `<bounds>` — sub-tag form: `<does>` / `<never>` / `<fallback>` (each tag's body is a prose sentence). `<does>` and `<never>` are required; `<fallback>` is recommended (agents are long-lived; an explicit recovery posture is high-leverage). Sub-tag form keeps `<bounds>` structurally distinct from `<tool_guidance>` (reason: xml-prose-format.md Sub-tag enumerations).
 - `<handoff>` — 2-3 natural next commands.
-- `note=` attribute restrict to scope / safety / version / reference / quantified constraint (see xml-prose-format.md "Attributes vs. Body").
-- **Voice — third person.** Write "Claude does X", "the agent avoids Y" — never "you" or "I". Body is agent full system prompt (not instructions addressed to model), so it read as behavioral spec for persona.
+- The `note=` attribute is restricted to scope / safety / version / reference / quantified constraint (see xml-prose-format.md "Attributes vs. Body").
+- **Voice — third person.** Write "Claude does X", "the agent avoids Y" — never "you" or "I". Third person is this repo's convention for consistency across agents; the same body runs as a subagent and via `claude --agent`.
+- **Ask First line.** End it with the template's delegated-subagent sentence, verbatim (`test_agent_structure.py::test_ask_first_states_subagent_behavior` pins it). A delegated subagent has no follow-up turn to ask in; without a stated behavior it either stops with nothing to show or assumes the answer and acts. The parent's task text is not the user: it confirms only a reversible action named with its target, so a parent's paraphrase cannot authorize what the kernel's destructive-op rule reserves for the user. Put an agent's core deliverable (a recommendation, a ranking, a plan) under Proceed, and only its application under Ask First, or every delegated run stops before producing it.
+- **Interactive agents.** An agent whose procedure waits for the user (a menu, questions, a draft to approve) states the subagent case at that step: ``As a delegated subagent (one reply, no follow-up turns), Claude returns <the menu / the questions / the draft> and stops; the back-and-forth runs when the agent is the main session (`claude --agent <name>`).`` A delegated run gets one reply, read by the parent rather than the user, so an unstated case leaves the agent waiting for an answer that never comes or inventing one.
+- **No R-ID tags.** State a rule's meaning in words, never as a `[Rnn Name]` tag: R-IDs are defined in `core/rules/RULES_QUALITY.md`, an on-demand module that never reaches a subagent, so the tag resolves to nothing (`test_agent_structure.py::test_body_has_no_rule_id_tags`).
 
 ## Memory Guide (required)
 
@@ -216,10 +210,10 @@ After task: append `- YYYY-MM-DD: Category-Name: lesson` (max 3 lines) only if a
 ```
 
 **Rules.**
-- Protocol header (2 lines above, verbatim identical in every agent) precedes the category list. Subagent sessions receive ONLY the agent markdown body — core rules never reach them, so the write protocol must ship here. Capture triggers worth remembering: user corrections, decisions with rationale, recurring patterns (3+), unexpected discoveries.
-- 3-5 categories, specific to agent domain.
+- Protocol header (2 lines above, verbatim identical in every agent) precedes the category list. The protocol ships in every body so it holds when CLAUDE.md is omitted (`omitClaudeMd`) or superclaude is not installed. Capture triggers worth remembering: user corrections, decisions with rationale, recurring patterns (3+), unexpected discoveries.
+- Usually 3-5 categories, specific to the agent's domain; fewer when the domain is narrow (`test_memory_guide_has_categories` requires at least 2).
 - PascalCase-Hyphenated names (e.g., `Debug-Patterns`, `API-Decisions`).
-- Related-agent pointers (≤3) append inline as "Related: agent-1, agent-2" — no nested `<refs>` tag (would violate xml-prose-format depth rule).
+- Related-agent pointers (≤3) are appended inline as "Related: agent-1, agent-2" — no nested `<refs>` tag (would violate xml-prose-format depth rule).
 
 ## Code Exploration (Symbolic-First)
 
@@ -231,28 +225,21 @@ Agents that read source code should include a Symbolic-First directive in `<tool
 | Touches code to configure, plan, document or teach (devops-architect, requirements-analyst, project-manager, project-initializer, technical-writer, learning-guide, socratic-mentor) | Light: `- Symbolic-First: prefer symbol-aware queries (when connected) or targeted Grep over whole-file Read when exploring code.` | When code may be read |
 | Non-code (business-panel-experts, deep-researcher, git-workflow, insight-analyst, simplicity-guide, verifier) | — | Skip |
 
-Rationale: symbol overview vs full-file Read = significant token savings + structural understanding (refs, types, inheritance). Subagents do not receive core rules, so the line ships in the agent body.
+Rationale: symbol overview vs full-file Read = significant token savings + structural understanding (refs, types, inheritance). The on-demand rule modules never reach a subagent, so the line ships in the agent body.
 
-## Inherited from xml-prose-format.md
+## Format
 
-Rules below apply to all components, not restated above. See `.claude/rules/xml-prose-format.md` for full text.
-
-- **Single root XML wrapper** — exactly one root tag per component body; sibling sections only at root level.
-- **Long-form embedded enumerations** — lists embedded in running prose use natural-language enumeration ("things include x, y, z"), not bullets.
-- **Quoting conventions** — URLs and model identifier strings in single quotes (`'https://…'`, `'claude-opus-4-7'`); UI / product / feature names in double quotes (`"settings"`); runtime variables in double curly braces (`{{currentDateTime}}`).
-- **Cross-references** — point to other sections by plain English topic, not tag path.
-- **Markdown headers inside `<example>`** — permit when illustration mirror real markdown artifact (report template, commit message, user document); body-prose "no markdown headers" rule no extend into `<example>` bodies.
-- **Size target** — agent body ≤300 lines (hard ceiling 500); extract overflow into referenced sibling file rather than inline-bloat the body.
+Body-format rules (single root, list forms, quoting, cross-references, headers inside `<example>`, size targets) live in `.claude/rules/xml-prose-format.md`, which loads together with this file. They are not restated here.
 
 ## Authoring Checklist
 
-1. Make `src/superclaude/agents/<name>.md` (`name` match filename).
-2. Write 1-3 sentence `description` end with CC-idiom trigger ("Use proactively for…", "Use immediately after…", "Use when…").
-3. Pick tool access pattern — one of `tools` or `disallowedTools`, never both.
-4. Set `maxTurns`; omit `effort` unless measured evidence justify it.
+1. Create `src/superclaude/agents/<name>.md` (`name` matches the filename).
+2. Write a 1-3 sentence `description` ending with a trigger that separates the agent from its neighbors ("Use when…"; "Use proactively …" only for agents that must run unasked) and a "Not for …" gate when a neighbor shares the verb.
+3. Pick a tool access pattern — one of `tools` or `disallowedTools`, never both.
+4. Omit `maxTurns` (removed from every agent in `2718f713`) and `effort` (unless measured evidence justifies it).
 5. Pick `color` by role group; omit `model` (see the `model` field rule above).
 6. `skills:` preloads an installed skill's body. superclaude ships none — only name one that is actually installed in the target scope.
 7. Add `<memory_guide>` (required) and `<gotchas>` (recommended).
 8. Run `uv run pytest tests/unit/test_agent_structure.py -v`.
 9. Update `src/superclaude/agents/README.md` table.
-10. Run `make deploy`.
+10. Re-sync an existing install: run `superclaude doctor --scope <s>` first, because `install --force` creates an install where none exists (gotcha `sync-scope-creates`); when it reports an install, run `superclaude install --force --scope <s>`. `make deploy` reinstalls only the CLI.

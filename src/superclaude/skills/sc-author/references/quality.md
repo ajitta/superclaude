@@ -36,7 +36,7 @@ Each point names the guide section it comes from.
 - Match specificity to fragility: exact commands for fragile, order-dependent operations; general direction where many approaches work. (Skill best practices, "Set appropriate degrees of freedom")
 - Use one term for one thing throughout. (Skill best practices, "Use consistent terminology")
 - Leave out information that expires with a date; keep old behavior in a clearly marked old-patterns section if it is still needed. (Skill best practices, "Avoid time-sensitive information")
-- Examples steer format and tone reliably: 3 to 5, relevant and varied, each wrapped in `<example>` tags. (Prompting best practices, "Use examples effectively")
+- Examples steer format and tone reliably. When the output format or tone must be pinned, or an example shows what prose cannot, use 3 to 5, relevant and varied, each wrapped in `<example>` tags; otherwise the document needs none. (Prompting best practices, "Use examples effectively")
 
 ## Load set
 
@@ -58,7 +58,7 @@ Check who reads the file. Another tool may read only AGENTS.md; a line that chan
 
 Ask these of each sentence, not of a whole rule: one sentence of a rule can be a no-op while the next adds behavior.
 
-- Restated default: would Claude or the harness do this anyway? The answer can differ per model, so the evidence is the harness's own text, a row in Model differences, or a run with and without the sentence. Yes: candidate.
+- Restated default: would Claude or the harness do this anyway? The answer can differ per model, so the evidence is the harness's own text, a row in Model differences, or a run with and without the sentence. Yes for every model that may read the document: candidate. Otherwise keep it (Model differences says how to judge when the reader is unknown).
 - Vague: does it name an observable trigger, a concrete target or a threshold? No: candidate, or a rewrite that adds one.
 - Enforced elsewhere: does a hook, test or linter catch it inside the author's normal loop, before the mistake costs anything, with a failure message that says how to fix it? All three yes: candidate. Any no: keep.
 - Fact or reason: does the fact change a decision the reader makes? No: candidate.
@@ -72,8 +72,8 @@ Verdict: candidate. Evidence: the harness text.
 
 <example>
 Sentence: "Double-check your answer before responding."
-Question: restated default. Opus 5 and Opus 5.5 already verify; Sonnet 5.5 at low effort may skip a real check.
-Verdict: candidate on Opus; on Sonnet, replace it with the concrete check to run.
+Question: restated default. Opus 5 already verifies; the Opus 5.5 guide states no verification default (Model differences, below); Sonnet 5.5 at low effort may skip a real check.
+Verdict: candidate only for a document that Opus 5 alone reads; on Opus 5.5, judge from a run; on Sonnet 5.5, replace it with the concrete check to run. When the reading model is unknown, keep it as that concrete check.
 </example>
 
 <example>
@@ -110,6 +110,8 @@ Report these before any no-op candidate. A stale sentence often does more damage
 ## Model differences
 
 What each model does by default, for the "restated default" question. A cell that says "not stated" means the model's guide does not cover it: judge from a run, not from this table.
+
+The table is reference, not a verdict. A row decides only for a document that one model alone reads, such as a subagent whose `model` field names it. When the reading model is unknown or several models read the document, judge for the model that needs the sentence most, and keep the sentence if any of them needs it.
 
 | Model | Verification | Scope | Progress updates | Length and format | Subagents |
 |---|---|---|---|---|---|

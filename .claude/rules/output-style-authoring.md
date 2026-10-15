@@ -29,7 +29,7 @@ keep-coding-instructions: true
 
 - Plain Markdown prose, not the `<component>` XML pattern. Claude Code sends the body verbatim as system-prompt instructions; `.claude/rules/xml-prose-format.md` does not apply.
 - **Language-neutral.** The style ships to every superclaude user. No text in a specific natural language other than English, no example phrases from one language, and no rule that only makes sense for one language. Say "the user's language", not a language name. `tests/unit/test_output_style_structure.py` fails on any letter outside the Latin script (Hangul, kana, CJK, Cyrillic, Greek alike).
-- Declarative present tense. Editing warnings over banned-word lists: name the pattern ("decorative contrast") and give at most one or two English examples of it.
+- Imperative or declarative voice, no hedging. Editing warnings over banned-word lists: name the pattern ("decorative contrast") and give at most one or two English examples of it.
 - Body under ~600 words — it is sent with every request.
 - Every sentence passes the deletion test in `.claude/rules/content-quality.md`: a rule that restates what Claude Code's default instructions already say costs tokens every turn and changes nothing.
 

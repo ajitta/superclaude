@@ -4,16 +4,16 @@ description: Recommend the best superclaude command for a situation. Use when as
 <component name="recommend" type="command">
 
   <role command="/sc:recommend">
-    <mission>Ultra-smart cmd rec engine for best superclaude cmd pick</mission>
+    <mission>Recommend the best superclaude command for the user's situation</mission>
   </role>
 
   <syntax>/sc:recommend [request] [--estimate] [--alternatives] [--expertise beginner|intermediate|expert]</syntax>
 
   <flow>
-  1. Analyze: user req + proj ctx
-  2. Classify: category + skill lvl
-  3. Map: keywords → cmds + flags
-  4. Rec: workflow + MCP flags + agents
+  1. Analyze: the user's request and the project context
+  2. Classify: category and the user's skill level
+  3. Map: keywords → commands and flags
+  4. Recommend: workflow, MCP flags and agents
   </flow>
 
   <flags>
@@ -30,10 +30,16 @@ description: Recommend the best superclaude command for a situation. Use when as
     - web (website|frontend|ui|react): /sc:implement --type component --with-tests
     - api (api|backend|server): /sc:design --type api
     - ml (machine learning|ai|model): /sc:analyze --focus quality --c7
-    - learn (how|explain|tutorial): /sc:explain --level basic --format examples
+    - learn (explain|tutorial|what is): /sc:explain --level basic --format examples
     - cleanup (refactor|dead code|tech debt): /sc:cleanup --type code --safe
-    - plan (workflow|plan|phases): /sc:roadmap --strategy systematic
+    - plan (plan|tasks from a spec): /sc:plan
+    - roadmap (PRD|phases|roadmap): /sc:roadmap --strategy systematic
+    - review (review|second opinion|check this PR): /sc:review
+    - research (research|compare sources|latest version): /sc:research
+    - idea (vague idea|not sure what to build): /sc:brainstorm
     - deploy (deploy|ci|cd|pipeline): /sc:build --type prod --optimize
+
+    Not in this map: choose from the /sc:help command list; keywords are a starting point, not a lookup.
   </keyword_map>
 
   <project_detect>
@@ -57,14 +63,14 @@ description: Recommend the best superclaude command for a situation. Use when as
 
 
   <gotchas>
-  - simplicity-bias: rec simplest first. complex multi-agent flows only when justified
+  - simplicity-bias: recommend the simplest command first; recommend complex multi-agent flows only when justified
   - flag-match: match flags to task needs, not max capability
   </gotchas>
 
   <bounds>
-    <does>smart mapping, proj ctx, skill adapt.</does>
-    <never>exec cmds, modify files.</never>
-    <fallback>ask user clarify when req too ambiguous to map.</fallback>
+    <does>maps requests to commands, uses the project context, adapts to the user's expertise.</does>
+    <never>executes commands or modifies files.</never>
+    <fallback>ask the user to clarify when the request is too ambiguous to map.</fallback>
   </bounds>
 
   <handoff next="/sc:analyze /sc:implement /sc:design /sc:troubleshoot"/>

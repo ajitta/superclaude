@@ -61,7 +61,7 @@ Commands managed by Claude Code native command system. Install to `~/.claude/com
 |---------|-------------|
 | `/sc:git` | Git ops with smart commits + workflow |
 | `/sc:review` | Code review with structured feedback |
-| `/sc:pm` | Project Manager Agent orchestration |
+| `/sc:pm` | Multi-agent orchestration by brainstorm, direct or wave strategy (on request) |
 
 ### Advisory Panels
 
@@ -76,7 +76,7 @@ Commands managed by Claude Code native command system. Install to `~/.claude/com
 |---------|-------------|
 | `/sc:agent` | Session controller — investigation, impl, review |
 | `/sc:recommend` | Smart command recommendation engine |
-| `/sc:select-tool` | MCP tool select via complexity scoring |
+| `/sc:select-tool` | MCP tool selection by task type |
 | `/sc:index` | Gen project docs + knowledge base |
 
 ## Authoring Rules

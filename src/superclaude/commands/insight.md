@@ -4,7 +4,7 @@ description: Capture structured session insights to .claude/insights.jsonl, or l
 <component name="insight" type="command">
 
   <role command="/sc:insight">
-    <mission>Capture structured session insights to per-project JSONL for human + tool analysis</mission>
+    <mission>Capture structured session insights to per-project JSONL for human and tool analysis</mission>
   </role>
 
   <syntax>/sc:insight [text] [--list] [--query key=value] [--stats] [--review]</syntax>
@@ -111,8 +111,8 @@ description: Capture structured session insights to .claude/insights.jsonl, or l
 
   <bounds>
     <does>structured capture via script, list/query/stats, pending review/promote/discard, append-only storage.</does>
-    <never>modify existing insights, load to LLM context, replace auto memory, hand-edit insights.jsonl.</never>
-    <fallback>If insights.jsonl missing, script make it on first append.</fallback>
+    <never>modifies existing insights, loads them into LLM context, replaces auto memory, or hand-edits insights.jsonl.</never>
+    <fallback>If insights.jsonl is missing, the script creates it on the first append.</fallback>
   </bounds>
 
   <handoff next="/sc:save /sc:analyze"/>

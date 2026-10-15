@@ -28,7 +28,7 @@ Applies beyond skills: command/agent/mode bodies over size target (xml-prose-for
 
 The model already knows software engineering. One verified term replaces a paragraph: *vertical slice*, *keystone interface*, *idempotent*, *invariant*, *red-green-refactor*, *evidence-first review*. Long behavioral explanation that a domain term covers → use the term.
 
-**Hide future steps.** Multi-phase flows rush the middle when the agent sees the end goal. Split phases so the questioning step doesn't know a plan document comes later; each phase gets only its own goal.
+**Phase isolation.** When an early phase must not optimize for a later artifact (a questioning step rushing toward the plan document), put the later phase in a separate file loaded after the early phase ends. A single command body that lists every step cannot hide them; do not try.
 
 Test: can this explanation collapse into one term the model already knows?
 
@@ -63,7 +63,7 @@ A sentence that can become false without anyone editing it does not belong in an
 
 ## Improvement Workflow
 
-1. Observe a real failure (wrong invocation, missed step, inconsistent output) — never improve speculatively.
+1. Observe a real failure (wrong invocation, missed step, inconsistent output) before adding or rewording; deleting sediment or no-op sentences found by grep (§4) needs no failure.
 2. Find the proven engineering concept that addresses it.
 3. Compress it into the strong term the model already knows.
 4. Keep only minimum procedure in the body; move the rest to `references/`.

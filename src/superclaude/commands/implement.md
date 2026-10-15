@@ -4,19 +4,19 @@ description: Feature and code implementation with sub-agent delegation and MCP i
 <component name="implement" type="command">
 
   <role command="/sc:implement">
-    <mission>Feature + code impl with smart agent delegate + MCP integration</mission>
+    <mission>Feature and code implementation with agent delegation and MCP integration</mission>
   </role>
 
   <syntax>/sc:implement [feature] [--plan docs/plans/...] [--type component|api|service|feature] [--framework react|vue|express] [--safe] [--with-tests]</syntax>
 
   <flow>
-  1. Load: If --plan given, read plan doc + extract tasks; a split plan's index is read here and each phase file it links when that phase starts, so the Checkpoint step covers the index's phase list; else analyze reqs + tech context
-  2. Plan: Approach + delegate to agents; verify simplest viable approach pre-build; for plan mode, follow task order exact
-  3. Checkpoint: If changes hit >3 files → show numbered plan → wait user approval pre-edit
-  4. Execute: Code + framework best practices; for plan mode, mark tasks done as go
+  1. Load: If --plan given, read plan doc + extract tasks; a split plan's index is read here and each phase file it links when that phase starts, so the Checkpoint step covers the index's phase list; otherwise analyze the requirements and technical context
+  2. Plan: Approach + delegate to agents; verify simplest viable approach pre-build; with --plan, follow the plan's task order exactly
+  3. Checkpoint: Without --plan, changes that hit more than 3 files → show a numbered plan and wait for user approval before editing. With --plan, invoking on that plan is the approval: proceed, and ask only before departing from the plan
+  4. Execute: write the code following the framework's conventions; with --plan, work through the tasks in order and check each box as the Integrate step describes
   5. Phase Gate: After each phase/task group — build + run, then: "Does this already solve the next phase's problem?" If yes, skip with reason
-  6. Validate: Security + quality checks; run verify cmd per task
-  7. Integrate: Docs + test recs; report any blockers hit. For plan mode, record every departure from the plan under a "Deviations" heading in the plan doc, in the same commit as the code, and check a box only when the code backs it (a task dropped by decision becomes `- [x] ~~task~~` with its reason under Deviations) — `status: complete` with an open box is a defect. With a split plan, a phase's Deviations go in its phase file; a finished phase file gets `status: complete` and its box in the index (linked from the phase file's header) is checked; the index gets `status: complete` when its last box is checked
+  6. Validate: security and quality checks; run each task's verify command
+  7. Integrate: docs and test recommendations; report any blockers hit. With --plan, record every departure from the plan under a "Deviations" heading in the plan doc, in the same commit as the code, and check a box only when the code backs it (a task dropped by decision becomes `- [x] ~~task~~` with its reason under Deviations) — `status: complete` with an open box is a defect. With a split plan, a phase's Deviations go in its phase file; a finished phase file gets `status: complete` and its box in the index (linked from the phase file's header) is checked; the index gets `status: complete` when its last box is checked. The first checked box sets the plan (index) to `status: implementing`; in a feature folder, set the README `phase:` to `implementing` then and to `complete` when the plan (index) reaches `status: complete`
   </flow>
 
   <flags>
@@ -43,8 +43,8 @@ description: Feature and code implementation with sub-agent delegation and MCP i
 | `dashboard widget --framework vue` | C7 Vue patterns |
   <example name="scope-creep" type="error-path">
     - Input: /sc:implement 'add logout button' (agent also refactors auth module and adds session management)
-    - Why wrong: Impl past requested scope. "Add logout button" no authorize refactor adjacent code.
-    - Correct: Impl only logout button. Suggest separate tasks for auth refactor + session mgmt.
+    - Why wrong: the change goes past the requested scope. "Add logout button" does not authorize refactoring adjacent code.
+    - Correct: Implement only the logout button. Suggest separate tasks for the auth refactor and session management.
   </example>
 
   </examples>
@@ -57,8 +57,8 @@ description: Feature and code implementation with sub-agent delegation and MCP i
   </gotchas>
 
   <bounds>
-    <does>smart impl, framework best practices, + full testing.</does>
-    <never>arch decisions without consult, conflict with security, + override safety.</never>
+    <does>implements following framework best practices, with full testing.</does>
+    <never>makes architecture decisions without consultation, conflicts with security, or overrides safety.</never>
   </bounds>
 
   <handoff next="/sc:test /sc:build"/>

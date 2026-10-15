@@ -5,14 +5,14 @@
   </role>
 
   <sub_agent_decision>
-  Axis: this section governs the single-delegate primitive (one Agent-tool subagent — whether/with-what-intent to spawn). Authoring a multi-subagent Workflow (`parallel`/`pipeline` fan-out) is the orthogonal harness execution layer: SC decides whether to fan out, the Workflow tool executes it. Both axes apply together; neither overrides the other.
+  Axis: this section governs the single-delegate primitive (one Agent-tool subagent — whether/with-what-intent to spawn). When the harness exposes the Workflow tool, authoring a multi-subagent Workflow (`parallel`/`pipeline` fan-out) is the orthogonal execution layer: these rules decide whether to fan out, the Workflow tool executes it. Both axes apply together; neither overrides the other.
   - Direct work: single file edit, <3 steps, sequential dep, simple search, context already loaded
-  - Sub-agent: 3+ independent parallel streams, different expertise domains, >20K tokens exploration, isolated failure OK
-  - Never sub-agent: the task needs recent conversation context, the work is sequential (A→B), or it is doable directly in under 30s
+  - Sub-agent: 3+ independent parallel streams, different expertise domains, exploration large enough to flood the main context (dozens of files or long logs), isolated failure OK
+  - Never sub-agent: the task needs recent conversation context, the work is sequential (A→B), or it is doable directly in a few tool calls
   - Spawn discipline: work finishable in a handful of tool calls stays in the main loop. Never spawn a sub-agent unasked to verify or double-check work the main loop already did — added spawns need an independent stream, not extra assurance. One sub-agent when one can finish the task. Prefer explicit invocation (direct Agent tool call or `--delegate auto`) over relying on auto-spawn.
   - Model: omit the Agent tool's `model` parameter so the delegate falls through to its own frontmatter model, `CLAUDE_CODE_SUBAGENT_MODEL`, or the session model, in that order; pass a model only when the user asked for it for that work. Fable is the case that matters: it is priced above Opus 5.5, and headless runs can bill it to usage credits without a consent prompt.
-  - Run-alongside: while a delegate runs, continue main-loop work that does not depend on its result (the Agent tool returns immediately and notifies on completion); never redo the delegated work in the main loop, and wait only when the next step needs the result. For follow-up work in the same stream, continue the existing delegate with SendMessage rather than spawning a fresh one — its context is intact and cached.
-  - Worktree-parallel: when the user waits on a long in-progress iteration (spec authoring, deep research, multi-phase plan), propose a worktree-isolated agent (EnterWorktree) for independent side-work — e.g., reviewing the project's own framework/config or drafting follow-up tickets. Split file-edit surfaces so the streams cannot conflict on merge. Decline when the side-work needs current conversation state or the main iteration ends within 5 minutes.
+  - Run-alongside: while a delegate runs, continue main-loop work that does not depend on its result (a delegate running in the background reports completion as a notification); never redo the delegated work in the main loop, and wait only when the next step needs the result. For follow-up work in the same stream, continue the existing delegate with SendMessage rather than spawning a fresh one — its context is intact and cached.
+  - Worktree-parallel: when the user waits on a long in-progress iteration (spec authoring, deep research, multi-phase plan), propose a worktree-isolated agent (EnterWorktree) for independent side-work — e.g., reviewing an unrelated config area or drafting follow-up tickets. Split file-edit surfaces so the streams cannot conflict on merge. Decline when the side-work needs current conversation state or the main iteration is about to finish.
   <examples>
   | Task | Decision | Why |
   |---|---|---|
@@ -22,7 +22,7 @@
   | "Research React 19 + Vue 4 + Svelte 5" | 3 sub-agents | Independent, context-isolating |
   | "Run tests and check results" | Direct | Fast, needs main context |
   | "Refactor 2 functions in one file" | Direct | Small scope, even though parallel-capable |
-  | Waiting 10min on doc generation, want own harness reviewed | Worktree-isolated agent | Two file surfaces, no merge conflict |
+  | Waiting 10min on doc generation, want an unrelated config area reviewed | Worktree-isolated agent | Two file surfaces, no merge conflict |
   </examples>
   </sub_agent_decision>
 
@@ -47,17 +47,17 @@
   - Exploration and audit: the prompt requires the branch to return counterevidence and unknowns next to its conclusion — a summary carrying only what the branch found leaves the main loop unable to tell a complete set from an incomplete one, the same [R15 Verification] risk as silently filtered fan-out results.
   </delegate_return>
 
-  <workflow_delegation>
+  <workflow_delegation note="Applies only when the Workflow tool is available; otherwise skip this block.">
   Via a Workflow `agent(prompt, opts)` the seven delegate packet fields pack into the one free-form prompt argument (many-to-one).
   - Scope: allowed_scope/forbidden_changes have no `opts` counterpart and stay prose discipline.
   - Schema: `opts.schema`/StructuredOutput hardens return shape only — a well-typed citation can be fabricated, so the cited-file:line re-grep stays mandatory.
   - Cache: cached/replayed results (Workflow resume-from-cache) may cite stale state and must be re-validated against the current repo before acting ([R15 Verification] gates resume).
-  - Fan-out: every `parallel()` under SC governance must `log()` dropped/null thunks before `filter(Boolean)` — silent filtering makes the main loop synthesize from a silently-incomplete set, a [R15 Verification] 'claimed done on partial evidence' risk.
-  - Write-Return: subprocess file writes are discarded — document- or code-producing fan-out returns its artifact and the main loop performs every Write/Edit; approval checkpoints (e.g. >3-unit change) fire in the main loop because subagents cannot pause for the user.
+  - Fan-out: every `parallel()` governed by these rules must `log()` dropped/null thunks before `filter(Boolean)` — silent filtering makes the main loop synthesize from a silently-incomplete set, a [R15 Verification] 'claimed done on partial evidence' risk.
+  - Write-Return: subprocess file writes are discarded — document- or code-producing fan-out returns its artifact and the main loop performs every Write/Edit; approval checkpoints (e.g. a change touching >3 files/modules/services) fire in the main loop because subagents cannot pause for the user.
   </workflow_delegation>
 
   <agent_routing note="Single-trigger only — compound requests route via <sub_agent_decision>">
   When agents overlap on a single verb, prefer the agent whose description matches explicit evidence in the request (cited metric, named library, stated scope). When that leaves it unresolved, state the options with a 1-line rationale each and pick one.
-  Research SC-norm: repo before web — try Grep and connected symbol-aware tools before delegating to deep-researcher, which is only for external knowledge not in the repo.
+  Research norm: repo before web — try Grep and connected symbol-aware tools before delegating to deep-researcher, which is only for external knowledge not in the repo.
   </agent_routing>
 </component>

@@ -4,18 +4,18 @@ description: Interactive project setup — pick and run init tasks for first-ses
 <component name="init" type="command">
 
   <role command="/sc:init">
-    <mission>Interactive project env setup with selectable init tasks for first-session onboarding</mission>
+    <mission>Interactive project environment setup with selectable init tasks for first-session onboarding</mission>
   </role>
 
   <syntax>/sc:init [tasks] [--quick] [--full]</syntax>
 
   <flow>
-  1. Detect: scan project root for lang/framework markers (pyproject.toml, package.json, Cargo.toml, go.mod)
-  2. Present: show interactive task menu with descriptions, deps, detected project context
-  3. Select: take user choice — individual tasks (a,b,c...), presets (--quick, --full), or custom combo
-  4. Validate: check dep graph, surface missing prereqs, confirm exec plan
-  5. Execute: run picked tasks in dep-aware parallel batches with progress reporting
-  6. Report: final summary table — task status, artifacts made, memory entries stored
+  1. Detect: scan the project root for language and framework markers (pyproject.toml, package.json, Cargo.toml, go.mod)
+  2. Present: show the interactive task menu with descriptions, dependencies and the detected project context
+  3. Select: take the user's choice — individual tasks (a,b,c...), presets (--quick, --full), or custom combo
+  4. Validate: check the dependency graph, surface missing prerequisites, confirm the execution plan
+  5. Execute: run the picked tasks in dependency-ordered parallel batches with progress reporting
+  6. Report: final summary table — task status, artifacts created, memory entries stored
   </flow>
 
   <flags>
@@ -70,7 +70,7 @@ description: Interactive project setup — pick and run init tasks for first-ses
   <safety_rules>
   - Dependency install (c): show command, require user confirmation before executing
   - CLAUDE.md edit (b): if file exists, show proposed additions as diff before applying
-  - Test execution (d): warn if test suite is large (>500 tests), offer --quick test flag
+  - Test execution (d): warn if test suite is large (>500 tests), offer to capture the baseline from a subset (one directory or test file) instead
   - Memory init (g): merge with existing MEMORY.md, never replace
   - Gotchas init (h): create .claude/rules/gotchas/ directory + general.md only if not exists. Idempotent — skip if gotchas/ already present. Template: 4-line comment header, no frontmatter.
   - Docs scaffold (i): create docs/ directory and copy PRD.md, ARCHITECTURE.md, UI-GUIDE.md, plus ADR-0001-template.md as docs/adr/0001-example.md, from ~/.claude/superclaude/templates/docs-scaffold/ (project-scope installs: .claude/superclaude/templates/docs-scaffold/). Idempotent — skip per-file if it already exists; never overwrite user content. UI-GUIDE.md is optional (note this and let user delete for headless projects).
@@ -117,9 +117,9 @@ description: Interactive project setup — pick and run init tasks for first-ses
   </gotchas>
 
   <bounds>
-    <does>interactive task menu, dep-aware exec, parallel batching, idempotent setup, safe env init.</does>
-    <never>auto-exec without selection, overwrite existing files, install without confirm, skip dep validation.</never>
-    <fallback>Ask user when project type undetectable or existing config clash with proposed setup.</fallback>
+    <does>interactive task menu, dependency-aware execution, parallel batching, idempotent setup, safe environment init.</does>
+    <never>auto-executes tasks the user did not select, overwrites existing files, installs without confirmation, or skips dependency validation.</never>
+    <fallback>Ask the user when the project type is undetectable or existing config clashes with the proposed setup.</fallback>
   </bounds>
 
   <handoff next="/sc:load /sc:implement /sc:test"/>

@@ -4,7 +4,7 @@ Domain expert agents — AI agent defs for task-based auto-delegation.
 
 ## Content Delivery
 
-Agents managed by Claude Code native delegation. Auto-pick from task keywords in `description` frontmatter. Install to `~/.claude/agents/` on `superclaude install`.
+Agents managed by Claude Code native delegation. Claude Code delegates when a request matches the "Use when …" trigger in an agent's `description` frontmatter and is not a look-alike that the description's "Not for … — <neighbor>" gate sends to another agent. `self-review` and `verifier` run only when the user explicitly asks for them. Install to `~/.claude/agents/` on `superclaude install`.
 
 ## Available Agents
 
@@ -68,7 +68,7 @@ Agents managed by Claude Code native delegation. Auto-pick from task keywords in
 
 | Agent | Description |
 |-------|-------------|
-| `self-review` | Post-impl validation + reflexion |
+| `self-review` | Independent second pass on a finished work product (plan, design, code) + reflexion; invoked explicitly |
 | `repo-index` | Repo indexing + codebase briefing |
 | `verifier` | Run-and-report check of shipped behavior against its plan doc; report-only, invoked explicitly |
 
@@ -119,9 +119,27 @@ Agents declare persistent memory via `memory` frontmatter. Source files ship `me
 1. **Uncertainty**: scope unclear → escalate to `ask_first`
 2. **Cross-boundary**: action hits another agent domain → escalate
 3. **Risk**: >10% chance of breaking change → escalate
-4. **Context pressure**: context >85% → compress output, don't skip steps
+4. **Context pressure**: harness-reported context usage ≥60% (the --uc point) → compress output, don't skip steps; with no reported figure, don't estimate one
 
 ## Cross-Agent Conflict Resolution
+
+Routing overlaps — requests two agents could both claim. The split is set by the `Not for … — <neighbor>` gate in the named descriptions (SSOT: change the description first, then this row):
+
+| Overlap | Goes to | Gate in |
+|---|---|---|
+| cross-service topology vs one service's API or schema | system-architect / backend-architect | both |
+| deploy pipelines vs service API design | devops-architect / backend-architect | both |
+| slow code vs functional bug | performance-engineer / root-cause-analyst | both |
+| application performance, measured UI performance regressions | performance-engineer, not devops-architect or frontend-architect | devops-architect, frontend-architect |
+| web research vs past project insights | deep-researcher / insight-analyst | both |
+| learning a concept vs being questioned toward it vs reference docs | learning-guide / socratic-mentor / technical-writer | learning-guide, socratic-mentor, technical-writer |
+| restructuring existing code vs preventing complexity before it is written | refactoring-expert / simplicity-guide | both |
+| language-neutral test strategy vs Python test implementation | quality-engineer / python-expert | python-expert |
+| test plan vs run-and-report against a plan | quality-engineer / verifier | quality-engineer, verifier |
+| second-pass review vs run-and-report evidence | self-review / verifier | self-review, verifier |
+| general review vs security audit | self-review / security-engineer | both |
+| specs and acceptance criteria vs architecture choice vs business strategy | requirements-analyst / system-architect / business-panel-experts | requirements-analyst |
+| repo setup vs indexing a repo already set up | project-initializer / repo-index | project-initializer |
 
 Agents give conflicting recs → resolve via:
 

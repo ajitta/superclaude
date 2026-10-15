@@ -28,8 +28,8 @@ MCP_FALLBACK_FILE = hook_state_dir() / "mcp_fallbacks.json"
 MCP_FALLBACKS: dict[str, str] = {
     "context7": "Tavily/WebSearch",
     "tavily": "Tavily Agent Skills (tvly CLI), then native WebSearch",
-    "playwright": "playwright-cli skill if installed, else DevTools MCP (--devtools) or native WebFetch (install either: mcp/README.md 'Playwright — CLI or MCP')",
-    "devtools": "Playwright (install plugin: superclaude mcp --servers chrome-devtools)",
+    "playwright": "playwright-cli skill if installed, else DevTools MCP (--devtools) or native WebFetch (install the MCP: superclaude mcp --servers playwright)",
+    "devtools": "Playwright MCP (--play); to add DevTools: superclaude mcp --servers chrome-devtools",
 }
 
 

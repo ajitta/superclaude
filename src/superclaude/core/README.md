@@ -6,7 +6,7 @@ Framework DNA — always-on principles + rules define superclaude identity.
 
 Core files load via `CLAUDE_SC.md` `@import` at session start. Present in **every** Claude Code session where superclaude installed.
 
-**Exceptions (on-demand, injected by `context_loader.py`):** `rules/` modules load when their domain triggers (implement/review work, delegation, doc production, /sc: commands); BUSINESS_SYMBOLS.md loads when business-symbol / panel-example / `--structured` patterns match.
+**Exceptions (on-demand, injected by `context_loader.py`):** `rules/` modules load when their domain triggers (implement/review work, delegation, doc production or a request to write into CLAUDE.md / AGENTS.md / `.claude/rules/`, /sc: commands); BUSINESS_SYMBOLS.md loads on business-symbol / panel-example patterns or `/sc:business-panel --structured`.
 
 ## Files
 

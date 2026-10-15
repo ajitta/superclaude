@@ -10,7 +10,7 @@ description: superclaude command dispatcher that routes to the other /sc:* comma
   <syntax>/sc:[command] [args...]</syntax>
   <flow>
   1. Parse: identify /sc: subcommand + flags from input
-  2. Route: dispatch to matching command file in commands/sc/
+  2. Route: invoke the matching /sc:<name> command via the Skill tool; an unknown name → list the closest command names
   3. Execute: run command with args + flags
   </flow>
 
@@ -26,14 +26,14 @@ description: superclaude command dispatcher that routes to the other /sc:* comma
     - document: Focused doc generation
     - estimate: Dev effort/complexity estimates
     - explain: Code + concept explanations
-    - git: Smart git ops + PR integration
+    - git: Git operations with PR integration
     - help: Full command reference
     - implement: Feature implementation + MCP integration
-    - improve: Code quality + perf improvements
+    - improve: Code quality and performance improvements
     - index: Project docs + knowledge base
-    - index-repo: Repo indexing (94% token reduction)
+    - index-repo: Compact repo index (~3KB) for cheap navigation
     - load: Session context loading (memory folder + auto memory)
-    - pm: Project Manager Agent (default orchestration)
+    - pm: Multi-agent orchestration for 3+ independent streams (on request)
     - recommend: Get command recommendations
     - reflect: Task reflection + validation
     - research: Deep web research with parallel search
@@ -60,7 +60,7 @@ description: superclaude command dispatcher that routes to the other /sc:* comma
 |---|---|
 | `/sc:research React 18 features` | Deep research |
 | `/sc:index-repo` | Create project index |
-| `/sc:agent deep-research` | Launch agent |
+| `/sc:agent 'research React 18 features'` | Clarify scope, then delegate to deep-researcher |
 | `/sc:recommend` | Get suggestions |
 
   <example name="unknown-command" type="error-path">

@@ -11,7 +11,7 @@ A subagent runs a focused task in a fresh context window with its own system pro
 
 ## Project format and language
 
-Read one or two existing subagents in the project (`.claude/agents/**/*.md`) for their format and language only. Claude Code scans `.claude/agents/` recursively, so search the subfolders too. Sections, how the return is stated and fields come from this file; a field `fields.yaml` does not list for agents is reported, not copied.
+Read one or two existing subagents in the project (`.claude/agents/**/*.md`) for their format and language only. Claude Code scans `.claude/agents/` recursively, so search the subfolders too. Sections, how the return is stated and fields come from this file unless the person chose the project's convention for a conflict; a field `fields.yaml` does not list for agents is reported, not copied.
 
 ## Template (md)
 

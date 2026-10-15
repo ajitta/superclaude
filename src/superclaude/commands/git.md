@@ -4,54 +4,53 @@ description: Git operations with smart commit messages and workflow guidance; pu
 <component name="git" type="command">
 
   <role command="/sc:git">
-    <mission>Git ops with smart commit msgs + workflow optim</mission>
+    <mission>Git operations with smart commit messages and workflow guidance</mission>
   </role>
 
   <syntax>/sc:git [operation] [args] [--smart-commit] [--interactive] [--pr-status] [--from-pr PR#|URL]</syntax>
 
   <flow>
-  1. Analyze: Repo state + changes
-  2. Validate: Op fit
-  3. Execute: Git cmd + auto
-  4. Optimize: Smart commits + patterns
-  5. Report: Status + next
+  1. Analyze: read the repo state and pending changes.
+  2. Validate: check that the operation fits that state.
+  3. Execute: run the git command.
+  4. Optimize: draft commit messages and suggest workflow patterns.
+  5. Report: show the resulting status and the next step.
   </flow>
 
   <flags>
   - --smart-commit: draft a conventional-commit message from the staged diff and show it before committing.
   - --interactive: walk through the operation step by step and confirm each decision (e.g. conflict resolution) with the user.
   - --pr-status: the PR review status check in the PR status integration section.
-  - --from-pr <PR#|URL>: checks out the PR branch and loads its context; see the from_pr section.
+  - --from-pr <PR#|URL>: with a clean working tree, run `gh pr checkout <PR>` and read `gh pr view <PR> --json title,body,comments,files`; with uncommitted changes, first ask whether to stash them or stop. See the from_pr section.
   </flags>
 
 
   <tools>
-  - Bash: Git cmd exec
-  - Read: Repo state analysis
-  - Grep: Log parse + status
-  - Write: Commit msg gen
+  - Bash: run git and gh commands
+  - Read: inspect repo files
+  - Grep: parse log and status output
   </tools>
 
   <pr_status_integration>
     <description>PR review status indicator</description>
     <command>gh pr view --json state,reviewDecision,isDraft</command>
     <states>
-      - APPROVED: Ready merge (green dot)
-      - CHANGES_REQUESTED: Fix feedback first (red dot)
-      - REVIEW_REQUIRED: Wait review (yellow dot)
-      - DRAFT: Not ready (gray dot)
+      - APPROVED: ready to merge (green dot)
+      - CHANGES_REQUESTED: address the feedback first (red dot)
+      - REVIEW_REQUIRED: waiting for review (yellow dot)
+      - DRAFT: not ready (gray dot)
     </states>
     <usage>
-      - /sc:git --pr-status: Show cur branch PR state
+      - /sc:git --pr-status: show the current branch's PR state
     </usage>
   </pr_status_integration>
 
   <from_pr>
-    <description>Resume session linked to PR # or URL</description>
+    <description>Check out a PR by number or URL and load its context into this session</description>
     <usage>
-      - `claude --from-pr 123`: Checkout PR branch + load ctx
-      - `claude --from-pr https://github.com/org/repo/pull/123`: From URL
-      - Auto-link: Sessions auto-linked to PRs made via `gh pr create`
+      - /sc:git --from-pr 123: check out PR #123 and read its title, body, comments and changed files
+      - /sc:git --from-pr https://github.com/org/repo/pull/123: same, from the URL
+      - `claude --from-pr <PR>` is a start-up option the user runs in their terminal; never run it from Bash.
     </usage>
   </from_pr>
 
@@ -59,30 +58,30 @@ description: Git operations with smart commit messages and workflow guidance; pu
 
 | Input | Output |
 |---|---|
-| `status` | State analysis + recs |
+| `status` | State analysis + recommendations |
 | `commit --smart-commit` | Conventional commit |
 | `merge feature-branch --interactive` | Guided merge |
-| `--pr-status` | Cur branch PR review state |
-| `--from-pr 123` | Resume from PR #123 |
+| `--pr-status` | Current branch PR review state |
+| `--from-pr 123` | PR #123 checked out + its context loaded |
 
   <example name="force-push-main" type="error-path">
     - Input: /sc:git push --force origin main
-    - Why wrong: Force-push main/master destroy team work + irreversible.
-    - Correct: Make feature branch, push there, open PR for main.
+    - Why wrong: force-pushing main/master destroys teammates' work and cannot be undone.
+    - Correct: create a feature branch, push there, and open a PR into main.
   </example>
 
   </examples>
 
 
   <gotchas>
-  - new-commit: Make new commits, never amend unless asked
+  - new-commit: make new commits; never amend unless asked.
   - retest-after-merge: re-run the test suite AFTER a merge lands. Both sides green does not mean the merge is green — semantic conflicts pass textual merge
   - base-branch-confirm: auto-detect `main` vs `master`, then confirm with the user before merging. Stops merges into the wrong base
   </gotchas>
 
   <bounds>
-    <does>smart git ops, conventional commits, flow guide, PR status check.</does>
-    <never>change config without auth, destruct without confirm, complex merge needing manual.</never>
+    <does>runs git operations, writes conventional commits, guides workflow, checks PR status.</does>
+    <never>changes git config without permission, runs destructive operations without confirmation, or resolves complex merges that need manual review.</never>
   </bounds>
 
   <safety_rules>

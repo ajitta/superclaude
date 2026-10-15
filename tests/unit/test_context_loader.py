@@ -382,6 +382,30 @@ class TestCoreLiteSplit:
                     f"{prompt!r} does not inject RULES_DOCS"
                 )
 
+    def test_always_loaded_doc_edits_load_rules_docs(self):
+        """RULES_DOCS carries Durability routing for text written into files the
+        session always loads; a prompt naming one of them must inject it."""
+        for prompt in (
+            "add this rule to CLAUDE.md",
+            "update AGENTS.md with the new test command",
+            "record it in .claude/rules/gotchas/testing.md",
+            "이 규칙을 CLAUDE.md에 추가해",
+            "add a note to ~/.claude/CLAUDE.md",
+            "add this to ./CLAUDE.md",
+        ):
+            routed = {path for p, path, _pr in TRIGGER_MAP if p.search(prompt.lower())}
+            assert "core/rules/RULES_DOCS.md" in routed, prompt
+        # A mention alone costs ~2.5K tokens for nothing: CLAUDE.md is named in
+        # ordinary prompts all the time.
+        for prompt in (
+            "fix the parser bug",
+            "follow the conventions in CLAUDE.md and fix the login bug",
+            "what does claude.md say about tests?",
+            "see AGENTS.md for the build command",
+        ):
+            routed = {path for p, path, _pr in TRIGGER_MAP if p.search(prompt.lower())}
+            assert "core/rules/RULES_DOCS.md" not in routed, prompt
+
     def test_rule_modules_inject_full_md(self):
         """Rule modules carry behavioral content — must stay Tier 2 (full .md),
         never silently downgraded to instruction-string tiers."""
@@ -1212,3 +1236,16 @@ class TestHarnessTurnsInjectNothing:
         body = GOAL_NOTICE_PROMPT.split(": ", 1)[1]
         out = run_loader(body, self._project(tmp_path), session_id="s")
         assert 'flag="--plan"' in out
+
+
+def test_structured_flag_loads_business_symbols_only_for_business_panel():
+    """`--structured` means isolated review in /sc:review; only the business panel's
+    `--structured` asks for the business symbol system."""
+    patterns = [p for p, path, _ in TRIGGER_MAP if path == "core/BUSINESS_SYMBOLS.md"]
+    assert patterns
+
+    def loads(prompt):
+        return any(re.search(p, prompt) for p in patterns)
+
+    assert loads("/sc:business-panel plan.md --structured")
+    assert not loads("/sc:review --scope branch --structured")

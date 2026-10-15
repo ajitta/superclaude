@@ -12,14 +12,14 @@ agent_colors:
   management: orange       # orchestration, business, review, simplicity
   indexing: cyan           # repository scanning
 
-# Effort enum — adaptive reasoning depth (CC v2.1.69+).
+# Effort enum — adaptive reasoning depth.
 # Optional field on agents; validated only when present. Source: .claude/rules/agent-authoring.md.
 # Availability gates are model-generation-specific — verify against current model docs, not pinned versions here.
 effort_values:
   - low       # mechanical/structured tasks
   - medium    # standard design + analysis
   - high      # complex reasoning, deep debugging (typical flagship default)
-  - xhigh     # difficult tasks + long-running async work (CC 2.1.111+; model-gated)
+  - xhigh     # difficult tasks + long-running async work (model-gated)
   - max       # multi-perspective synthesis (model-gated)
 
 # Command frontmatter forbidden fields — these belong on agents/skills, not commands.

@@ -4,63 +4,62 @@ description: Build, compile and package projects with error analysis and optimiz
 <component name="build" type="command">
 
   <role command="/sc:build">
-    <mission>Build, compile, package projects with smart err handling + optimize</mission>
+    <mission>Build, compile and package projects with error analysis and optimization</mission>
   </role>
 
   <syntax>/sc:build [target] [--type dev|prod|test] [--clean] [--optimize] [--verbose]</syntax>
 
   <flow>
-  1. Analyze: Structure, configs, deps
-  2. Validate: Env + toolchain ready
-  3. Execute: Build + real-time monitor
-  4. Optimize: Artifacts + bundle size (if --optimize)
-  5. Package: Artifacts + gen report
+  1. Analyze: read the project structure, build config and dependencies.
+  2. Validate: confirm the environment and toolchain are ready.
+  3. Execute: run the build and watch its output.
+  4. Optimize: check artifacts and bundle size (only with --optimize).
+  5. Package: collect the artifacts and report the result in the console.
   </flow>
 
   <flags>
-  - --type dev|prod|test: build variant; artifact directory and report per the outputs table.
-  - --clean: delete the output directory of the chosen --type (dist-dev/, dist/ or dist-test/) before building; nothing outside it, and never git clean.
+  - --type dev|prod|test: build variant passed to the project's build tool; console report per the outputs table.
+  - --clean: before building, delete only the output directory the project's build config names (outDir, target/, build/); if the config names none, ask which directory to delete; never git clean.
   - --optimize: runs the Optimize step.
   - --verbose: run the build tool in its verbose mode and report the full output, not a summary.
   </flags>
 
-  <outputs note="Per --type flag">
+  <outputs note="Per --type flag; console only, no report file">
 | Type | Artifacts | Report |
 |---|---|---|
-| dev | `dist-dev/` (tool-generated) | Console: build output + warnings |
-| prod | `dist/` (tool-generated) | Console: bundle size + optimization summary |
-| test | `dist-test/` (tool-generated) | Console: build output + test config |
+| dev | output directory named in the build config (tool-generated) | Console: build output + warnings |
+| prod | output directory named in the build config (tool-generated) | Console: bundle size + optimization summary |
+| test | output directory named in the build config (tool-generated) | Console: build output + test config |
   </outputs>
 
 
   <tools>
-  - Bash: Build exec
-  - Read: Config analysis
-  - Grep: Err parse
-  - Glob: Artifact discover
-  - Write: Build reports
+  - Bash: run the build
+  - Read: read the build config
+  - Grep: parse errors
+  - Glob: find artifacts
   </tools>
 
   <examples>
 
 | Input | Output |
 |---|---|
-| `/sc:build` | Default build + report |
+| `/sc:build` | Default build + console report |
 | `--type prod --clean --optimize` | Production artifacts |
 | `frontend --verbose` | Detailed component build |
 | `--type dev --verbose` | Dev build + detailed output |
 
   <example name="build-failure-retry" type="error-path">
-    - Input: /sc:build --type prod (after build fail with missing dep)
-    - Why wrong: Retry same build without fix root cause waste tokens + time.
-    - Correct: Investigate err → fix dep (npm install / uv add) → then /sc:build --type prod
+    - Input: /sc:build --type prod (after the build failed with a missing dependency)
+    - Why wrong: retrying the same build without fixing the root cause wastes tokens and time.
+    - Correct: read the error, report the missing dependency and the install command for the project's package manager, and stop — /sc:build never installs dependencies. Rerun /sc:build --type prod after the user installs it.
   </example>
 
   </examples>
 
   <bounds>
-    <does>exec build, err analysis, optimize recs.</does>
-    <never>modify build config, install deps, deploy.</never>
+    <does>runs builds, analyzes build errors, recommends optimizations, reports in the console.</does>
+    <never>modifies build config, installs dependencies, deploys, or writes a report file.</never>
   </bounds>
 
   <handoff next="/sc:test /sc:troubleshoot"/>

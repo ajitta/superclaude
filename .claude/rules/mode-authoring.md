@@ -4,16 +4,16 @@ paths: ["src/superclaude/modes/**", ".claude/rules/mode-authoring.md"]
 
 # Mode Authoring Rules
 
-> **Decision gate:** Create mode only for **cognitive posture** — how Claude thinks, communicates, prioritizes.
+> **Decision gate:** Create a mode only for **cognitive posture** — how Claude thinks, communicates, and prioritizes.
 > - Mode = **HOW TO THINK** (mindset)
 > - Command = **WHAT TO DO** (workflow)
 > - Agent = **WHO TO BE** (domain expertise)
 
-Mindset-shifting overlay, not procedure. Injected on-demand by `context_loader.py` TRIGGER_MAP.
+Mindset-shifting overlay, not a procedure. Injected on-demand by `context_loader.py` TRIGGER_MAP.
 
 ## No Frontmatter
 
-Modes not CC-native — no YAML frontmatter. Start directly with `<component>`.
+Modes are not CC-native — no YAML frontmatter. Start directly with `<component>`.
 
 ```markdown
 <!-- WRONG -->
@@ -32,7 +32,7 @@ Every mode **must** define all four axes (enforced by `tests/unit/test_mode_stru
 | Axis | Tag | Purpose | Style |
 |------|-----|---------|-------|
 | **Thinking** | `<thinking>` | Cognitive principles — how to reason | 3-5 `- Principle: explanation` lines |
-| **Communication** | `<communication>` | Expression style — how to present | Single-line prose with directives joined by " \| " |
+| **Communication** | `<communication>` | Expression style — how to present | One line: short directives in full words (no abbreviations), joined by " \| " |
 | **Priorities** | `<priorities>` | Trade-offs — what to optimize | Single-line prose with `A > B` pairs joined by " \| " |
 | **Behaviors** | `<behaviors>` | Action patterns — what to do | 3-5 `- Pattern-Name: description` lines |
 
@@ -49,15 +49,15 @@ Every mode **must** define all four axes (enforced by `tests/unit/test_mode_stru
   </role>
 
   <thinking>
-  - Principle-Name: explanation in prose (3-5 items)
+  - Principle-Name: explanation in prose (usually 3-5; fewer when the mode is narrow)
   </thinking>
 
-  <communication>Style directives joined by | pipes on a single prose line.</communication>
+  <communication>Short directives in full words, joined by | on one line.</communication>
 
   <priorities>Trade-off A > Trade-off B | C > D | E > F.</priorities>
 
   <behaviors>
-  - Pattern-Name: concrete behavioral description (3-5 items)
+  - Pattern-Name: concrete behavioral description (usually 3-5; fewer when the mode is narrow)
   </behaviors>
 
   <!-- optional — only if it states directives the 4 axes miss; see note above -->
@@ -82,13 +82,13 @@ Every mode **must** define all four axes (enforced by `tests/unit/test_mode_stru
 
 ## Naming
 
-- Filename: `MODE_PascalCase.md` (e.g., `MODE_Brainstorming.md`)
+- Filename: `MODE_<Name>.md`, capitalized words joined by `_` (e.g., `MODE_Brainstorming.md`, `MODE_Task_Management.md`); `MODE_DeepResearch.md` predates the `_` form and keeps its name
 - Component name: lowercase-hyphenated (e.g., `name="brainstorming"`)
 - Component type: always `type="mode"`
 
 ## Content Boundaries
 
-**Allowed** (if essential to mindset):
+**Allowed** (if essential to the mindset):
 - Expert framework mappings (Business Panel mode)
 - Domain vocabulary tables where the terms are the mindset
 
@@ -103,29 +103,22 @@ Note: symbol systems and abbreviation maps as an *output contract* were removed 
 
 ## Supporting Config Files
 
-Operational parameters too detailed for mode itself go in sibling `type="config"` files (e.g., `RESEARCH_CONFIG.md` — depth profiles, confidence thresholds). Not subject to mode validation (no 4-axis requirement); only the cross-reference check (`test_cross_references.py`) reads them.
+Operational parameters too detailed for the mode itself go in sibling `type="config"` files (e.g., `RESEARCH_CONFIG.md` — depth profiles, confidence thresholds). They are not subject to mode validation (no 4-axis requirement); only the cross-reference check (`test_cross_references.py`) reads them.
 
-## Inherited from xml-prose-format.md
+## Format
 
-Rules apply to all components, not restated above. See `.claude/rules/xml-prose-format.md` for full text.
-
-- **Single root XML wrapper** — exactly one root tag per component body; sibling sections only at root level.
-- **Long-form embedded enumerations** — lists embedded in running prose use natural-language enumeration ("things include x, y, z"), not bullets.
-- **Quoting conventions** — URLs and model identifier strings in single quotes (`'https://…'`, `'claude-opus-4-7'`); UI / product / feature names in double quotes (`"settings"`); runtime variables in double curly braces (`{{currentDateTime}}`).
-- **Cross-references** — point to other sections by plain English topic, not tag path.
-- **Markdown headers inside `<example>`** — permitted when illustration mirrors real markdown artifact (report template, commit message, user document); body-prose "no markdown headers" rule does not extend into `<example>` bodies.
-- **Size target** — mode body ≤300 lines (hard ceiling 500); extract overflow into referenced sibling file rather than inline-bloating body.
+Body-format rules (single root, list forms, quoting, cross-references, headers inside `<example>`, size targets) live in `.claude/rules/xml-prose-format.md`, which loads together with this file. They are not restated here.
 
 ## Checklist
 
-1. Create `src/superclaude/modes/MODE_PascalCase.md` starting with `<component>`
+1. Create `src/superclaude/modes/MODE_<Name>.md` starting with `<component>`
 2. Define all 4 axes: thinking, communication, priorities, behaviors
-3. Add `<bounds>` sub-tag form `<does>` / `<never>` / `<fallback>` (each tag's body is prose sentence; `<does>` + `<never>` required; `<fallback>` recommended for modes — explicit recovery when overlay doesn't apply) and `<handoff>`
+3. Add `<bounds>` sub-tag form `<does>` / `<never>` / `<fallback>` (each tag's body is a prose sentence; `<does>` and `<never>` are required; `<fallback>` is recommended for modes — explicit recovery when the overlay doesn't apply) and `<handoff>`
 4. Add trigger to `scripts/context_loader.py` TRIGGER_MAP
 5. Add flag to `core/FLAGS.md` modes section
 6. Run `uv run pytest tests/unit/test_mode_structure.py -v`
 7. Update `modes/README.md` table
-8. Run `make deploy`
+8. Re-sync an existing install: run `superclaude doctor --scope <s>` first, because `install --force` creates an install where none exists (gotcha `sync-scope-creates`); when it reports an install, run `superclaude install --force --scope <s>`. `make deploy` reinstalls only the CLI.
 
 ## Anti-Patterns
 

@@ -11,13 +11,13 @@ description: Interactive requirements discovery through Socratic dialogue + syst
 
   <flow>
   1. Explore: Socratic dialogue + systematic questioning. When the slug folder holds `00-intent.md`, read it first and keep its wording as the anchor; 01-discovery records an "Intent coverage" table mapping each of its five fields to how discovery made it concrete.
-  2. Analyze: Multi-agent coord + domain expertise. With --vs, gen k perspectives with probs + landscape synth; --depth tune detail (shallow→brief, normal→balanced, deep→detailed).
+  2. Analyze: multi-agent coordination with domain expertise. With --vs, generate k perspectives with probabilities and a landscape synthesis; --depth tunes detail (shallow→brief, normal→balanced, deep→detailed).
   3. Validate: Feasibility check + requirement validation.
   4. Specify: feature path `docs/features/<slug>/01-discovery.md`, standalone `docs/specs/<topic>-discovery-<username>-YYYY-MM-DD.md` — slug resolution (zero-match default `[f]`), frontmatter, README update per core/rules/RULES_DOCS.md `<doc_output_convention>`.
   5. Approve: Show spec for user review — no proceed without confirm.
-  6. Self-review (hard gate): emit handoff "Run /sc:review on this spec before /sc:plan. Plan handoff is gated on review." Rules below.
+  6. Self-review (hard gate): the spec stays `status: draft`; emit "Run /sc:review --scope spec <path> before /sc:plan." Claude does not review the spec itself in place of /sc:review. Rules in the self-review section below.
   7. Decision-mode tag: tag each Resolved Decision as confirmed or delegated. Heuristic below.
-  8. Handoff: Route to /sc:review (mandatory) → /sc:plan after status reach approved-for-plan. With delegated decisions, prefer /sc:review --audit-delegated.
+  8. Handoff: Route to /sc:review --scope spec (mandatory); /sc:plan follows once /sc:review has set `status: approved-for-plan`. With delegated decisions, add --audit-delegated to the /sc:review call.
   </flow>
 
   <flags>
@@ -26,9 +26,9 @@ description: Interactive requirements discovery through Socratic dialogue + syst
   </flags>
 
   <self_review>
-  Required hard gate before /sc:plan handoff — self-review caught 3 critical reversals on user-approved spec where soft rec alone would ship silent regressions, so gate not advisory.
+  Required hard gate before /sc:plan handoff, because a spec the user approved can still carry reversed decisions that only an independent review catches; the gate is not advisory.
 
-  Direct route to /sc:plan from the Approve step forbidden. After each review round, append §"Self-Review Iteration Log" section to spec recording v1→vN delta.
+  A direct route to /sc:plan from the Approve step is forbidden. /sc:review records each round in the spec's "Self-Review Iteration Log" section (v1→vN delta) and sets `status: approved-for-plan` when the gate passes; brainstorm writes neither.
   </self_review>
 
   <decision_modes>
@@ -49,7 +49,7 @@ description: Interactive requirements discovery through Socratic dialogue + syst
   </outputs>
 
   <tools>
-  - Read/Write/Edit: Requirements docs + spec gen
+  - Read/Write/Edit: requirements docs and spec generation
   - TaskCreate/TaskUpdate: Multi-phase exploration tracking
   - Agent: Parallel exploration + multi-agent
   - WebSearch / Tavily search skill: Market research + tech validation
@@ -67,20 +67,20 @@ description: Interactive requirements discovery through Socratic dialogue + syst
 | `'migration strategy' --vs --depth deep` | Auto-detect VS-CoT, detailed depth, 5 perspectives |
   <example name="brainstorm-then-implement" type="error-path">
     - Input: /sc:brainstorm 'auth system' (then immediately start coding without user confirm)
-    - Why wrong: Brainstorm = discovery-only. Impl without user confirm direction violate exploration contract.
-    - Correct: Finish brainstorm → show options → user confirm → handoff to /sc:design or /sc:implement
+    - Why wrong: Brainstorm = discovery-only. Implementing before the user confirms the direction violates the exploration contract.
+    - Correct: Finish brainstorm → user confirms direction → /sc:review on the spec → /sc:design or /sc:plan
   </example>
   </examples>
 
   <gotchas>
-  - evidence-fabrication: No construct hypothetical failure scenarios to justify pre-existing rec. Evidence (code, config, measurements) must precede proposals.
+  - evidence-fabrication: Do not construct hypothetical failure scenarios to justify a recommendation already made. Evidence (code, config, measurements) must precede proposals.
   - analysis-loop: If reasoning hit same conclusion twice on same question, kill that line of analysis + move to next topic.
-  - skip-review: do NOT route to /sc:plan when status: draft AND no /sc:review iteration logged. Hard gate, not advisory. Brainstorm output without self-review round has shipped silent reversals before.
+  - skip-review: do not route to /sc:plan while the spec is `status: draft` or its Self-Review Iteration Log has no /sc:review round. The gate is hard, not advisory.
   </gotchas>
 
   <bounds>
-    <does>ambiguous→concrete, multi-agent+MCP, cross-session persistence, + self-review precede impl handoff.</does>
-    <never>impl without discovery, override user vision, bypass systematic exploration, + route direct to /sc:plan without /sc:review.</never>
+    <does>turns ambiguous requests into concrete requirements, uses multi-agent and MCP analysis, persists across sessions, and routes the spec to /sc:review before the plan handoff.</does>
+    <never>implements without discovery, overrides the user's vision, bypasses systematic exploration, or routes directly to /sc:plan without /sc:review.</never>
   </bounds>
 
   <handoff next="/sc:review /sc:plan /sc:design /sc:research"/>

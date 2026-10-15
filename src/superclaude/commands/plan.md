@@ -1,16 +1,16 @@
 ---
-description: Write detailed implementation plans with TDD tasks, exact file paths and verify commands, committed under docs/plans/. On request only — the user's /sc:plan or a workflow step that names it. Not for "what's the plan?" — answer in 2-3 sentences inline.
+description: Write detailed implementation plans with TDD tasks, exact file paths and verify commands, written as a doc (feature folder or docs/plans/). On request only — the user's /sc:plan or a workflow step that names it. Not for "what's the plan?" — answer in 2-3 sentences inline.
 ---
 <component name="plan" type="command">
 
   <role command="/sc:plan">
-    <mission>Make detailed impl plans with TDD tasks, exact file paths, verify commands</mission>
+    <mission>Write detailed implementation plans with TDD tasks, exact file paths and verify commands</mission>
   </role>
 
   <syntax>/sc:plan [spec-or-topic] [--from docs/specs/...] [--output docs/plans/...] [--phases N] [--pr-bundle]</syntax>
 
   <flow>
-  1. Load: Read spec/reqs (from --from path or user desc) and the feature folder's `00-intent.md` when present
+  1. Load: Read the source: the --from doc; else the feature folder's `04-design.md` (fallback `01-discovery.md`); else the user's description. Also read the feature folder's `00-intent.md` when present. Whatever the source, a discovery spec that is still `status: draft` (the --from doc, or the feature folder's `01-discovery.md`, even when `04-design.md` exists) → stop and point to `/sc:review --scope spec <path>` (the review gate). A design doc with unresolved "Areas of concern" → say so and ask whether to plan anyway
   2. Map: List files to create/modify + their jobs
   3. Decompose: Break to phases (default) — each phase = single-commit unit on feature branch, ordered by dep (Phase-vs-PR naming: see gotchas).
   4. Template: Add plan header (goal, arch, tech stack) and footer (risks, alternatives not taken, proof) — one line or "none" for risks and alternatives is acceptable for Small scope; proof always names the command and its expected output
@@ -48,14 +48,16 @@ Plan header:
   **Architecture:** [2-3 sentences]
   **Tech Stack:** [Key technologies]
 
-Task format:
-  ### Task N: [Component]
+Phase and task format (one commit per phase, after its last task):
+  ## Phase N: [name] (one commit)
+  ### Task N.M: [Component]
   **Files:** Create: path | Modify: path:lines | Test: path
   - [ ] Step 1: Write failing test
   - [ ] Step 2: Verify it fails
   - [ ] Step 3: Write minimal implementation
   - [ ] Step 4: Verify it passes
-  - [ ] Step 5: Commit
+  (after the phase's last task)
+  - [ ] Commit Phase N: [commit message]
 
 Plan footer:
   ## Risks
@@ -69,7 +71,7 @@ Plan footer:
   <examples>
   | Input | Output |
   |---|---|
-  | `/sc:plan --from docs/specs/auth-design-ajitta-2026-03-17.md` | TDD plan with Phase 1..N (single-branch default) |
+  | `/sc:plan --from docs/specs/auth-design-jdoe-2026-03-17.md` | TDD plan with Phase 1..N (single-branch default) |
   | `/sc:plan 'add user profiles'` | Plan from desc, Phase framing |
   | `/sc:plan --from REQUIREMENTS.md --output docs/plans/profiles.md` | Custom output path |
   | `/sc:plan --from docs/specs/big-refactor.md --pr-bundle` | Multi-PR plan (separate review cycles per change-set; opt-in) |
@@ -82,14 +84,14 @@ Plan footer:
   <gotchas>
   - existing-plan: Check if plan already exist for this feature before make new one
   - scope-match: Plan scope must match user req. No expand to adjacent features
-  - phase-vs-pr: Default to "Phase N" framing — single-branch, single-review-cycle exec. Reserve "PR N" for real multi-PR work (--pr-bundle), where each change-set get own review cycle. Naming match reality — past 4-PR plans actually ran as 4 phase commits on 1 branch.
+  - phase-vs-pr: Default to "Phase N" framing — single-branch, single-review-cycle exec. Reserve "PR N" for real multi-PR work (--pr-bundle), where each change-set gets its own review cycle, so the name matches how the work will run.
   - workflow-fanout: fan-out subagents RETURN plan markdown — subprocess writes discarded; main loop performs the Write per outputs routing (full rule: core/rules/RULES_DELEGATION.md)
   </gotchas>
 
   <bounds>
-    <does>plan make, task decompose, file map, TDD structure.</does>
-    <never>write impl code, exec tasks, skip spec review.</never>
-    <fallback>Ask user for spec clarify when reqs ambiguous.</fallback>
+    <does>writes plans, decomposes tasks, maps files, and structures tasks as TDD steps.</does>
+    <never>writes implementation code, executes tasks, or skips spec review.</never>
+    <fallback>Ask the user to clarify the spec when requirements are ambiguous.</fallback>
   </bounds>
 
   <handoff next="/sc:implement /sc:brainstorm"/>

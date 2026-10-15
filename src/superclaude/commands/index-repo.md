@@ -4,7 +4,7 @@ description: Build a compact PROJECT_INDEX briefing of the repo for token-cheap 
 <component name="index-repo" type="command">
 
   <role command="/sc:index-repo">
-    <mission>Repo index, 94% token cut (58K→3K)</mission>
+    <mission>Build a compact repo index (~3KB) for token-cheap navigation</mission>
   </role>
 
   <syntax>/sc:index-repo [mode=create|update|quick]</syntax>
@@ -15,7 +15,7 @@ description: Build a compact PROJECT_INDEX briefing of the repo for token-cheap 
   3. Extract: entry points + modules + APIs + deps
   4. Generate: docs/reports/PROJECT_INDEX.md (human summary)
   5. Generate: docs/reports/PROJECT_INDEX.json (machine, full detail)
-  6. Validate: both files exist + size <5KB each
+  6. Validate: confirm both files exist and each is under 5KB; report the measured byte size of each.
   </flow>
 
 
@@ -23,6 +23,7 @@ description: Build a compact PROJECT_INDEX briefing of the repo for token-cheap 
   - Glob: parallel structure scan (code|docs|config|tests|scripts)
   - Read: pull metadata
   - Write: make index
+  - Bash: find the git repo root and files changed since the last index (mode=update)
   </tools>
 
   <patterns>
@@ -47,20 +48,20 @@ description: Build a compact PROJECT_INDEX briefing of the repo for token-cheap 
 
   <example name="index-outside-repo" type="error-path">
     - Input: /sc:index-repo (run outside a git repo)
-    - Why wrong: Repo index need git repo for structure scan + change detect.
-    - Correct: Go to git repo first, or use /sc:index for non-repo dir.
+    - Why wrong: the repo index needs a git repo for the structure scan and change detection.
+    - Correct: move into a git repo first, or use /sc:index for a non-repo directory.
   </example>
   </examples>
 
 
   <gotchas>
-  - token-target: Aim 94% cut (58K→3K). No verbose index
-  - structure-only: Output file structure + role, not content
+  - token-target: keep the index compact (~3KB for the .md); report the measured byte size of each file, never a percentage cut.
+  - structure-only: output the file structure and each file's role, not file content.
   </gotchas>
 
   <bounds>
-    <does>94% token cut, parallel scan, human output.</does>
-    <never>modify source, exceed 5KB.</never>
+    <does>builds a compact index, scans in parallel, writes a human-readable summary, reports measured byte sizes.</does>
+    <never>modifies source files or writes an index file over 5KB.</never>
   </bounds>
 
   <handoff next="/sc:analyze /sc:index"/>

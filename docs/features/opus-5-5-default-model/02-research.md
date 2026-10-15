@@ -37,7 +37,7 @@ Source: [Prompting Claude Opus 5.5](https://platform.claude.com/docs/en/build-wi
 - **Unattended runs stop early.** "Some of those updates end the turn with text rather than a tool call." The guide supplies a paragraph for fully unattended harnesses only, not human-in-the-loop ones.
 - **It acts before looking** on multi-app work. The guide gives an "explore broadly with tool calls" line.
 - **It uses elapsed-time signals.** In lead-plus-subagent setups a time budget speeds up the work through more parallel calls.
-- **Refusal categories:** biology safeguards are the same as Fable 5.1's and are new relative to Opus 5; cyber stays; `reasoning_extraction` is new.
+- **Refusal categories:** biology safeguards are the same as Fable 5.1's and are new relative to Opus 5; cyber stays; `reasoning_extraction` is new. (Corrected 2026-10-15: not new — What's new in Claude Opus 5.5 says "As on Claude Opus 5, … may be declined with the `reasoning_extraction` category".)
 - **Safety** (system card p.94): its rate of "overeager or destructive actions is the lowest among our recent models."
 - **Writing** (announcement): it "puts the most important information up front, is less likely to use jargon or idiosyncratic phrases, and follows the writing rules you give it."
 

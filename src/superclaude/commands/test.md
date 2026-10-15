@@ -73,8 +73,8 @@ description: Execute tests with coverage analysis and quality reporting. On requ
   </gotchas>
 
   <bounds>
-    <does>execute existing tests, coverage reports, failure analysis, root-cause fixes when --fix is given.</does>
-    <never>generate test cases outside an explicit --tdd request, modify framework config, destructive changes.</never>
+    <does>executes existing tests, reports coverage, analyzes failures, and fixes root causes when --fix is given.</does>
+    <never>generates test cases outside an explicit --tdd request, modifies framework config, or makes destructive changes.</never>
   </bounds>
 
   <handoff next="/sc:troubleshoot /sc:implement"/>

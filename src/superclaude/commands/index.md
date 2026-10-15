@@ -4,17 +4,17 @@ description: Generate project documentation and a knowledge base under docs/repo
 <component name="index" type="command">
 
   <role command="/sc:index">
-    <mission>Generate comprehensive project documentation and knowledge base with intelligent organization</mission>
+    <mission>Generate project documentation and a knowledge base under docs/reports/</mission>
   </role>
 
   <syntax>/sc:index [target] [--type docs|api|structure|readme] [--format md|json|yaml]</syntax>
 
   <flow>
-  1. Analyze: Project structure + key components
-  2. Organize: Intelligent patterns + cross-refs
-  3. Generate: Type-specific documentation (see outputs)
-  4. Validate: Completeness + metrics per type
-  5. Maintain: Preserve <!-- MANUAL --> marked sections
+  1. Analyze: read the project structure and key components.
+  2. Organize: group content by component and add cross-references.
+  3. Generate: write type-specific documentation (see outputs).
+  4. Validate: check completeness against the metric for the type.
+  5. Maintain: preserve sections marked <!-- MANUAL -->.
   </flow>
 
   <flags>
@@ -25,10 +25,10 @@ description: Generate project documentation and a knowledge base under docs/repo
   <outputs note="Per --type flag">
 | Type | Output File | Metrics |
 |---|---|---|
-| docs | docs/reports/KNOWLEDGE.md | coverage ≥80% |
-| api | docs/reports/API.md | endpoints 100% |
+| docs | docs/reports/KNOWLEDGE.md | documented modules / total modules, both counted |
+| api | docs/reports/API.md; if it exists (e.g. from /sc:document --type api), update the endpoint list in place | documented endpoints / total endpoints, both counted |
 | structure | docs/reports/STRUCTURE.md | depth ≤4 levels |
-| readme | README.md | sections: install, usage, api |
+| readme | README.md; in an existing README edit only the install, usage and api sections and show the diff | sections: install, usage, api |
   </outputs>
 
   <distinction note="vs /sc:index-repo">
@@ -40,6 +40,7 @@ description: Generate project documentation and a knowledge base under docs/repo
   <tools>
   - Read/Grep/Glob: Structure analysis + content extraction
   - Write: Doc creation + cross-referencing
+  - Edit: in-place updates of an existing API.md or README.md
   - TaskCreate/TaskUpdate: Multi-component progress
   - Agent: Large-scale doc delegation
   </tools>
@@ -67,7 +68,7 @@ description: Generate project documentation and a knowledge base under docs/repo
   </gotchas>
 
   <bounds>
-    <does>comprehensive docs, multi-agent, framework patterns.</does>
+    <does>writes project docs per type, delegates large indexes to agents, follows the project's framework patterns.</does>
     <never>override manual docs, generate without analysis, bypass standards.</never>
   </bounds>
 
