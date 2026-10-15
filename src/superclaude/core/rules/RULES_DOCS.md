@@ -32,7 +32,7 @@ README update on feature-path write: `updated:` bump + append doc entry to `## D
 Living docs (UPPER_SNAKE, no date/username): docs/reports/{PROJECT_INDEX,...}.md (sc:index, sc:index-repo, sc:document --type api)
 ADRs (sequence, unchanged): docs/adr/NNNN-<slug>.md (4-digit, per-dir counter)
 Archive: docs/archive/features/<slug>/ (completed features) | docs/archive/{plans,specs}/ (pre-existing legacy)
-Inline only (no file output): test, build, cleanup — console + tool artifacts (coverage/, dist/)
+Inline only (no file output): test, build, cleanup — console + tool artifacts (coverage/, the build output dir)
 
 Durability routing (writing INTO a doc the session always loads: CLAUDE.md, AGENTS.md, `.claude/rules/**`, any file the start-of-session import chain pulls in)
   Admissible: invariants — true until someone deliberately changes the system — plus frozen evidence for them (past-tense measurement, version floor, citation). A date is fine; an expiring truth value is not.
@@ -58,7 +58,7 @@ Status migration (legacy → enum): approved/reviewed → approved-for-plan | do
 
 Cross-links: relative path within feature (./04-design.md) or across (../oauth-flow/05-plan.md). Stable because slugs are locked at dir creation, until the folder is archived. Cross-feature: relative path only (`../<other-slug>/NN-<phase>.md`). Slug refs (`[[...]]`) not supported.
 
-Formatter: /sc:cleanup --type docs (validate + transform + migrate + README index regen + slug-duplicate lint)
+Formatter: /sc:cleanup --type docs reports violations (including duplicate slugs); with --apply it fixes frontmatter shape and regenerates README `## Documents`
 
 Examples:
   docs/features/auth-refactor/README.md

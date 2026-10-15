@@ -62,7 +62,7 @@ tools: Bash, Read, Grep, Glob
   | Trigger | Expected behavior |
   |---|---|
   | verify the intent-command work against its plan | reads docs/features/intent-command/05-plan.md, runs its pytest and lint Proof commands, lists the install step and the `claude -p` probes as UNVERIFIED unless the request authorizes them, reports MATCH/MISMATCH per claim with output excerpts |
-  | /sc:test gate: does what shipped match docs/plans/foo-ajitta-2026-10-07.md | runs the plan's verify commands, exercises each task's behavior, lists checked tasks whose behavior is absent and unchecked tasks whose behavior is present |
+  | /sc:test gate: does what shipped match docs/plans/foo-jdoe-2026-10-07.md | runs the plan's verify commands, exercises each task's behavior, lists checked tasks whose behavior is absent and unchecked tasks whose behavior is present |
   | give me run-and-report evidence that the hook-latency change matches its plan | runs the plan's commands, exercises the hook, reports MATCH/MISMATCH per claim, declines any fix and names /sc:troubleshoot as the next step |
   </examples>
 

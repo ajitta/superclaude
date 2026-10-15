@@ -60,7 +60,7 @@ description: Generate a phased implementation workflow from PRDs and feature req
   <gotchas>
   - scope-match: Workflow scope must match PRD or feature request exactly
   - step-granularity: Each workflow step independently verifiable
-  - name-vs-harness-tool: /sc:roadmap (SC content command — authors a PRD→task plan document) is distinct from the harness Workflow tool (deterministic multi-subagent execution). This command writes a plan; agents it consults return analysis only, and it never runs a fan-out that executes the work.
+  - name-vs-harness-tool: /sc:roadmap (superclaude command — authors a PRD→task plan document) is distinct from the harness Workflow tool (deterministic multi-subagent execution). This command writes a plan; agents it consults return analysis only, and it never runs a fan-out that executes the work.
   </gotchas>
 
   <bounds>

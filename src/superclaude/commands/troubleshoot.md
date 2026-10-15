@@ -13,7 +13,7 @@ description: Diagnose issues in code, builds, deployments and system behavior an
   1. Reproduce: Confirm failure — read full error, identify exact trigger, verify consistent
   2. Investigate: Check git log/diff, trace data flow, find working examples
   3. Hypothesize: Form specific hypothesis ("X causes Y because Z") — max 3 cycles before escalate to user
-  4. Confirm: Test hypothesis by changing one variable at a time; check environment before code
+  4. Confirm: Test hypothesis by changing one variable at a time; when the symptom could come from the runtime, check the environment before code
   5. Test: Write a failing test that reproduces the exact bug (required before any fix) and commit it, so the proof outlives a reset — commit only that test file (`git add <test path>`) with a message naming the bug; if other changes are staged or the current branch is the default branch, ask first
   6. Fix: Apply single change addressing root cause — no "while I'm here" fixes
   7. Verify: Failing test passes, all existing tests pass, no regressions

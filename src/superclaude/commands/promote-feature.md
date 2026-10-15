@@ -48,7 +48,7 @@ description: Promote standalone docs sharing a slug (docs/specs/, docs/plans/ an
   |---|---|
   | `/sc:promote-feature auth-refactor` | Dry-run: list candidate files + intended target paths |
   | `/sc:promote-feature auth-refactor --apply` | Move files, scaffold README, emit inbound warnings |
-  | `/sc:promote-feature payment-api --from docs/specs/payment-api-design-ajitta-2026-04-10.md` | Promote single explicit file as primary `04-design.md` |
+  | `/sc:promote-feature payment-api --from docs/specs/payment-api-design-jdoe-2026-04-10.md` | Promote single explicit file as primary `04-design.md` |
 
   <example name="slug-collision" type="error-path">
     - Input: /sc:promote-feature auth-refactor --apply (when docs/features/auth-refactor/ already exists)
