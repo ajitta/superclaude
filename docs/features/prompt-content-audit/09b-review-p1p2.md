@@ -36,7 +36,7 @@
 
 | 지적 | 사유 |
 |---|---|
-| Opus 5의 `reasoning_extraction` 범주 | 근거가 엇갈림. 결정 필요 (08b 보류 표) |
+| Opus 5의 `reasoning_extraction` 범주 | 이후 사용자 결정으로 반영(08b 주요 결정). What's new in Opus 5.5의 "As on Claude Opus 5" 문장이 근거 |
 | commands의 남은 축약, pm description의 Direct 전략, implement.md의 `[R02 Status Check]` | Low. implement는 메인 스레드이고 `/sc:implement`가 RULES_QUALITY를 주입하므로 태그가 해석된다 |
 | `.claude/agents/frontend-architect.md`(설치본)에 WCAG 2.1 | 설치본은 추적되지 않음. `make sync-local` 대상 |
 

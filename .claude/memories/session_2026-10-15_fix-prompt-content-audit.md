@@ -30,7 +30,7 @@ branch: fix/prompt-content-audit @23350fc1+ (base master @0c63688d, not pushed, 
 - Hermes execute_code kernel state resets between calls: keep helpers in a scratch module and import
 
 ## Next actions
-- [ ] Decide: Opus 5 `reasoning_extraction` (sc-prompt SKILL.md:49, utils/__init__.py:308-310, evals/run_eval.py:316-318 say Opus 5 lacks it; the Opus 5.5 migration guide reads otherwise)
+- [x] Opus 5 `reasoning_extraction`: user decided per What's new in Opus 5.5 ("As on Claude Opus 5 … `reasoning_extraction`"); sc-prompt row deletes write-outs for every target; docstrings + 02-research corrected
 - [ ] `make canary-gates` (inside Claude Code add `EVAL_ARGS="--runs-dir <dir outside ~/.claude>"`) plus sc-author-* tasks; watch Ask First stops, research strategy, RULES_INTERACTION menus, plan/review gates. Delete runs dirs afterwards (they copy `.credentials.json`)
 - [ ] Merge to master when canary is green (version bump only at release)
 - [ ] Low leftovers (08b): commands abbreviations (help/implement/init), pm description Direct strategy, author-check X1 single root for memory files (code), FLAGS `Scope:` ordering meaning

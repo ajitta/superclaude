@@ -25,13 +25,13 @@
 - **CLAUDE.md 편집 시 RULES_DOCS.** 쓰기 동사와 파일 이름이 함께 나올 때만 주입한다(영어·한국어). 단순 언급은 주입하지 않는다(세션당 약 2.5K 토큰). 음성 테스트 포함.
 - **/sc:research 기본 전략.** unified(계획을 보여 주고 승인 대기)에서 질의 명확도에 따른 선택으로 바꿨다. 명확한 질의가 승인 대기로 멈추던 문제(03b)다. **행동 변화.**
 - **sc-prompt 이월 행.** `(carried from <model>; not confirmed for 5.5)` 행은 적용하지 않고 후보로만 보고한다. Opus 5.5의 self-check 삭제도 후보 보고로 바뀌었다. **행동 변화.**
+- **Opus 5의 `reasoning_extraction`(사용자 결정).** What's new in Claude Opus 5.5가 "As on Claude Opus 5, … may be declined with the `reasoning_extraction` category"라고 명시한다(2026-10-15 확인). sc-prompt SKILL.md의 Reasoning write-out 행은 이제 모든 대상에서 삭제하고, Opus 5에서 thinking을 끈 경우 write-out 대신 thinking을 켜라고 한다. opus.md 거절 줄에 원문 인용, `utils/__init__.py`·`evals/run_eval.py` docstring("Opus 5 has reasoning_extraction but not bio"), `opus-5-5-default-model/02-research.md:40`에 정정 주석. **행동 변화**(Opus 5 대상 프롬프트에서 write-out 문장도 삭제).
 - **refactoring-expert 기준치.** "3+ files"를 "more than three files"로 되돌렸다. 압축 이전 원문(`db6e2898^`)의 값이다.
 
 ## 보류한 항목
 
 | 항목 | 사유 / 필요한 결정 |
 |---|---|
-| sc-prompt SKILL.md:49 "Opus 5 has no such category"(`reasoning_extraction`) | 근거가 엇갈린다. 저장소(`opus-5-5-default-model/02-research.md:40`, `utils/__init__.py:308-310`, `evals/run_eval.py:316-318`)는 5.5에서 새로 생겼다고 하고, Opus 5.5 migration guide 문장은 Opus 5에도 있다고 읽힌다. 세 곳을 함께 바꿀지 결정 필요 |
 | author-check X1이 memory 파일에도 단일 루트를 강제 | 코드 변경. format-xml.md는 이제 memory를 기본 md로 두고 XML 본문은 선택으로 설명한다 |
 | commands의 남은 축약(help·implement·init의 impl/deps/exec 등), pm description의 Direct 전략 누락 | Low |
 | `skill.md:45` "may read … only partially" | 현행 공식 best-practices 가이드가 같은 말을 한다(sc-author 작업자 확인) |

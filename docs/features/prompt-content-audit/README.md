@@ -31,7 +31,7 @@ updated: 2026-10-15
   - 24개 agent의 Ask First에 서브에이전트 규칙을 고정 문장으로 넣고(테스트로 고정), R-ID 태그를 지웠다.
   - FLAGS의 측정 불가 조건과 유지보수자 메모를 정리하고, 🔴를 보안 전용으로 되돌렸다.
   - 독립 리뷰가 새 문제 High 2건(Ask First 문장이 부모 문장만으로 파괴적 작업 허용, sc-prompt 이월 예외)을 찾아 반영했다.
-  - 남은 결정 1건(Opus 5의 `reasoning_extraction`)과 canary 미실행은 08b에 있다.
+  - Opus 5의 `reasoning_extraction`은 공식 문서("As on Claude Opus 5")에 따라 있는 것으로 정정했다. canary 미실행은 08b에 있다.
 
 ## 방법
 
