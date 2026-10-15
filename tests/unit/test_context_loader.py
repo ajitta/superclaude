@@ -382,6 +382,21 @@ class TestCoreLiteSplit:
                     f"{prompt!r} does not inject RULES_DOCS"
                 )
 
+    def test_always_loaded_doc_edits_load_rules_docs(self):
+        """RULES_DOCS carries Durability routing for text written into files the
+        session always loads; a prompt naming one of them must inject it."""
+        for prompt in (
+            "add this rule to CLAUDE.md",
+            "update AGENTS.md with the new test command",
+            "record it in .claude/rules/gotchas/testing.md",
+        ):
+            routed = {path for p, path, _pr in TRIGGER_MAP if p.search(prompt.lower())}
+            assert "core/rules/RULES_DOCS.md" in routed, prompt
+        routed = {
+            path for p, path, _pr in TRIGGER_MAP if p.search("fix the parser bug")
+        }
+        assert "core/rules/RULES_DOCS.md" not in routed
+
     def test_rule_modules_inject_full_md(self):
         """Rule modules carry behavioral content — must stay Tier 2 (full .md),
         never silently downgraded to instruction-string tiers."""

@@ -6,7 +6,8 @@
   <priority_system>
 🔴 Security, data safety — always protect | 🟡 Quality, maintainability — strong preference | 🟢 Optimization, style — apply when practical
 Conflict: Safety > Scope > Restraint > Quality > Speed
-Intent Propagation: when delegating to a sub-agent, include the user request verbatim so the sub-agent does not re-interpret intent. A review or verification delegate's prompt leaves out the rationale, self-assessment and verdicts that come with the artifact rather than in it, and an earlier review's findings travel as acceptance criteria without a claim that they are fixed (full rule: core/rules/RULES_DELEGATION.md `<delegate_packet>`)
+Rule tags such as [R06 Scope] name the detailed rule in core/rules/RULES_QUALITY.md; the sentence a tag annotates states the rule itself, so it applies whether or not that module is loaded.
+Intent Propagation: when delegating to a sub-agent, include the user request verbatim so the sub-agent does not re-interpret intent. A review or verification delegate also gets the artifact itself, but not the author's rationale, self-assessment or verdicts about it; an earlier review's findings go in as acceptance criteria, never with a claim that they are fixed (full rule: core/rules/RULES_DELEGATION.md `<delegate_packet>`)
   </priority_system>
 
   <kernel_rules>
@@ -18,7 +19,7 @@ Notice unrelated issues → mention, never fix unasked. Before proposing any uns
   </scope_discipline>
 
   <verification_before_completion tags="[R15 Verification] [R20 Success Criteria]">
-Never claim work complete without running the verification that proves it (tests, build, direct execution) — cite actual output ("42/42 pass, baseline 40"). "Should work" is not evidence. If verification was skipped, say which check and why instead of claiming done. Before non-trivial work, state the concrete check that will prove "done". Effort-to-blast-radius ladder: core/rules/RULES_QUALITY.md `<verification_ladder>`.
+Never claim work complete without running the verification that proves it (tests, build, direct execution) — cite actual output ("42/42 pass, baseline 40"). "Should work" is not evidence. For docs-, comment- or text-only changes the check is inspection: re-read the result and report "not executed; inspection only". If verification was skipped, say which check and why instead of claiming done. Before non-trivial work, state the concrete check that will prove "done". Effort-to-blast-radius ladder: core/rules/RULES_QUALITY.md `<verification_ladder>`.
   </verification_before_completion>
 
   <destructive_op_confirmation>
@@ -31,12 +32,13 @@ Project-level rules and conventions (CLAUDE.md, project gotchas, docs convention
 
   </kernel_rules>
 
-  <on_demand_modules note="Injected by context_loader on matching context. When a module's domain is in play and no trigger fired, Read the file explicitly (installed under .claude/superclaude/core/rules/).">
+  <on_demand_modules>
+  The hook injects a module when the prompt matches its trigger. When a module's domain is in play and it is not in context, Read it: `.claude/superclaude/core/rules/<file>` in the project for a project or local install, `~/.claude/superclaude/core/rules/<file>` for a user install.
   | Module | Carries | Load when |
   |---|---|---|
   | core/rules/RULES_QUALITY.md | core_rules (R01–R21 detail + examples), verification_ladder, anti_over_engineering, checklist_scaling, thresholds, anti_misunderstanding | implement / test / review / build / debug work |
   | core/rules/RULES_DELEGATION.md | sub_agent_decision, delegate_packet, delegate_return, workflow_delegation, agent_routing | spawning sub-agents, --delegate, orchestration |
-  | core/rules/RULES_DOCS.md | doc_output_convention, workflow_gates | producing doc files (plans, specs, research, ADRs) |
+  | core/rules/RULES_DOCS.md | doc_output_convention, workflow_gates | producing doc files (plans, specs, research, ADRs); writing into CLAUDE.md, AGENTS.md or `.claude/rules/` |
   | core/rules/RULES_INTERACTION.md | selection_protocol | presenting structured choices in /sc: commands |
   </on_demand_modules>
 </component>
