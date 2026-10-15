@@ -21,7 +21,7 @@ paths: ["src/superclaude/mcp/**", ".claude/rules/mcp-authoring.md"]
 
 - Path: `src/superclaude/mcp/MCP_<ServerName>.md` (PascalCase, hyphens ok: `MCP_Chrome-DevTools.md`).
 - Filename stem after `MCP_` = **display name**; lowercase form what `context_loader.py` match against (`mcp/MCP_Tavily.md` → `tavily`).
-- Register file in `scripts/context_loader.py` TRIGGER_MAP + INSTRUCTION_MAP (see Wiring below). Unregistered files dead — never load at runtime.
+- Register the file in `scripts/context_loader.py` TRIGGER_MAP (see Wiring below); a file with no TRIGGER_MAP entry never loads.
 
 ## No YAML Frontmatter
 
@@ -77,7 +77,7 @@ MCP docs pure content components. Not auto-discoverable like agents/skills — o
 - `<component name="...">` match lowercase server identifier used in `context_loader.py` (e.g., `tavily`, `playwright`, `chrome-devtools`); `type="mcp"` required.
 - All multi-word tag names use `snake_case`.
 - Required tags: `<role>` (with `<mission>`), `<choose>`, `<bounds>`, `<handoff>`.
-- Optional tags: `<call_order>` (only when call sequence matters — e.g., Context7 resolve→get pair), `<integration_patterns>` (cross-server / cross-command chains), `<examples>` (lookup table), `<example>` (rich illustration).
+- Optional tags: `<call_order>` (only when call sequence matters — e.g., a resolve→query pair), `<integration_patterns>` (cross-server / cross-command chains), `<examples>` (lookup table), `<example>` (rich illustration).
 - `<choose>` — sub-tag form `<use>` / `<never>`, each body prose sentence. Mirror `<bounds>` slot-tag discipline; declarative voice, no hedging vocab (no `Avoid:` / `should:`). Sub-tag form keep `<choose>` structurally distinct from neighbor Labeled sections.
 - `<bounds>` — sub-tag form `<does>` / `<never>` / `<fallback>`. `<fallback>` = native-tool or alternate-server escape hatch (load-bearing for MCP docs — readers need know what do when server wrong or unavailable).
 - `<handoff next="...">` — 2-3 natural next `/sc:*` commands.
@@ -88,7 +88,7 @@ MCP docs pure content components. Not auto-discoverable like agents/skills — o
 - **No `<tools>` inventory tables.** List every tool with params duplicate CC MCP server description + `ToolSearch` output, cost tokens, rot when server add/rename tools. Drop them.
 - **No `<role>` body beyond `<mission>`.** Server own description ("what it does") belong to CC; SC doc add workflow value, not tool overview.
 - **No version/install/setup blocks.** Install live in `cli/install_mcp.py`. Per-server setup hints belong in `mcp/README.md` if anywhere.
-- **No "Token Management" / token-budget sections** unless budget server-specific + non-obvious (Context7 per-call token cap = only confirmed exception today).
+- **No "Token Management" / token-budget sections** unless the budget is server-specific and non-obvious.
 
 If section read like "this is what server is" rather than "this is how I use server inside SC", cut it.
 
@@ -98,28 +98,22 @@ If section read like "this is what server is" rather than "this is how I use ser
 
 1. **TRIGGER_MAP**: map user flags (`--c7`, `--tavily`, …) + keyword regexes to the file. Pick stable flag + add regex row.
 2. **COMPOSITE_FLAGS**: if the server participates in `--frontend-verify` / `--all-mcp`, add it to the matching composite-flag set so those umbrella flags pull the doc.
-3. **INSTRUCTION_MAP**: one-line summary string (≤120 chars) shown when loader inject this doc — Claude read before body land. An entry here is also what makes the doc Tier 1.
+3. **INSTRUCTION_MAP / TIER_0_MAP**: by default the loader injects this string *instead of* the body — Tier 1 for behavioral docs (INSTRUCTION_MAP), a Tier 0 one-line hint for tool MCPs (TIER_0_MAP; never both). The body is injected only with `--verbose-context`, or when the file is in neither map (Tier 2). Put what the model must know by default into the string.
 
-Add `MCP_<X>.md` with no entries in these maps + it sit on disk forever, unloaded.
+A file with no TRIGGER_MAP entry sits on disk unloaded.
 
-## Inherited from xml-prose-format.md
+## Format
 
-Following rules apply to all components + not restated above. See `.claude/rules/xml-prose-format.md` for full text.
-
-- **Single root XML wrapper** — exactly one root tag per component body; sibling sections only at root level.
-- **Long-form embedded enumerations** — lists embedded in running prose use natural-language enumeration ("things include x, y, z"), not bullets.
-- **Quoting conventions** — URLs + model identifier strings in single quotes (`'https://…'`, `'claude-opus-4-7'`); UI / product / feature names in double quotes (`"settings"`); runtime variables in double curly braces (`{{currentDateTime}}`).
-- **Cross-references** — point to other sections by plain English topic, not by tag path.
-- **Markdown headers inside `<example>`** — permitted when illustration mirror real markdown artifact (report template, commit message, user document); body-prose "no markdown headers" rule no extend into `<example>` bodies.
+Body-format rules (single root, list forms, quoting, cross-references, headers inside `<example>`, size targets) live in `.claude/rules/xml-prose-format.md`, which loads together with this file. They are not restated here.
 
 ## Checklist
 
 1. Make `src/superclaude/mcp/MCP_<Server>.md` — no frontmatter, single `<component name="..." type="mcp">` root.
 2. Drop tool inventories, role descriptions, version/install blocks. Keep `<choose>` / integration / `<bounds>` / `<handoff>`.
-3. Wire `scripts/context_loader.py`: TRIGGER_MAP (flag/keyword regex) + INSTRUCTION_MAP (summary), plus COMPOSITE_FLAGS if part of `--frontend-verify`/`--all-mcp`.
+3. Wire `scripts/context_loader.py`: TRIGGER_MAP (flag/keyword regex) + the INSTRUCTION_MAP or TIER_0_MAP string, plus COMPOSITE_FLAGS if part of `--frontend-verify`/`--all-mcp`.
 4. Add a row to the `mcp/README.md` server table with flag + one-line mission.
 5. Register in `cli/install_mcp.py::MCP_SERVERS` when `superclaude mcp` should offer it.
-6. Run `make sync-user` (or scope-equivalent) + exercise trigger — confirm doc land in context.
+6. Re-sync an existing install: run `superclaude doctor --scope <s>` first, because `install --force` creates an install where none exists (gotcha `sync-scope-creates`); `make deploy` reinstalls only the CLI. Then exercise the trigger and confirm the string (or body) lands in context.
 
 ## Anti-Patterns
 

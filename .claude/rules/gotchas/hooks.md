@@ -3,11 +3,11 @@ paths: ["src/superclaude/scripts/**", "src/superclaude/hooks/**", "src/superclau
 ---
 
 # Project Gotchas — Hook Scripts & Path Resolution
-# Last reviewed: 2026-10-07
+# Last reviewed: 2026-10-15
 # Python runtime traps in hook scripts + CLI. Content-authoring traps live in authoring.md.
 
 - script-needs-console-entry: `~/.claude/superclaude/` ships content, not the package — `python3 X.py` on a script importing `superclaude.*` → ModuleNotFoundError. A script with a human path (hooks use `superclaude hook <name>`) needs a console subcommand (`superclaude insight`); documenting a file path is the bug.
-
+- hook-console-entry: Run a hook by hand as `echo '<event JSON>' | superclaude hook <name>` (registry `cli/hook_dispatch.py`, source `src/superclaude/scripts/`); a leftover `~/.claude/superclaude/scripts/` dir gets no new copies and is kept on purpose (hook-upgrade-live-session).
 - hook-path-scope: Hook scripts and their imports resolve `.claude` via `superclaude.utils` (`project_root()`, `claude_base()`, `hook_state_dir()`); `Path.home()`/`Path.cwd()` there is the bug. Hook CWD ≠ project root (CC documented) → silent wrong scope; `$HOME` puts local-scope state where uninstall cannot reach.
 - worktree-anchor-split: Linked worktree: CC reads settings from the MAIN worktree but sets `$CLAUDE_PROJECT_DIR` to the LINKED one (2026-09-05: `claude_base()` fell silent to `~/.claude`). Fix: path-free `superclaude hook <name>` + `utils.main_worktree_root()` hop; `project_root()` keeps the linked one by design.
 - worktree-anchor-undocumented: `main_worktree_root()` rests on unpublished behavior (`findCanonicalGitRoot`, 2.1.261: settings resolve to the canonical root). If CC ever anchors on the linked tree, `claude_base()` picks the wrong install. Worktree hooks misbehave? Check: does `~/.claude.json` list only the MAIN root?

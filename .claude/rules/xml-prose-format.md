@@ -4,16 +4,16 @@ paths: ["src/superclaude/agents/**", "src/superclaude/commands/**", "src/supercl
 
 # XML Prose Format Rules
 
-> Body-format spec for superclaude content components — agent / command / mode bodies under `src/superclaude/`. Derive from Claude.ai system-prompt prose style, adapt with minimal `-` line list so short labeled enums stay readable without verbose XML containers.
+> Body-format spec for superclaude content components — agent / command / mode bodies under `src/superclaude/`. XML sections hold prose, with short `-`/`1.` lists for small enumerations so they stay readable without verbose XML containers.
 > Format-only — content/policy of any specific component out of scope.
-> **Scope.** Rule govern component bodies. `*-authoring.md` meta-docs in `.claude/rules/` document rule for human authors, may use plain Markdown (headers, tables) — they not themselves superclaude components.
+> **Scope.** These rules govern component bodies. The `*-authoring.md` files in `.claude/rules/` describe the rules for authors and may use plain Markdown (headers, tables); they are not superclaude components.
 
 ## Design Goals
 
 - **Prose first.** Structured forms only where prose mush distinct items together.
 - **Token-efficient.** Pick simplest form that preserve readability — never reach for heavier construct than content need.
 - **One canonical shape per concept.** No parallel "options"; rule below pick one form per situation.
-- **Declarative voice load-bearing, not stylistic.** Current Claude models read instructions literally and drop hedging ("should", "might", "consider") as optional. Third-person + imperative-as-statement make rule actually fire — see Anthropic prompting best-practices at 'https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices'.
+- **Direct voice.** Current Claude models follow instructions literally: state the behavior and, where it is not obvious, the reason. Hedged wording ("consider", "might") leaves the choice to the model; use it only when the choice is meant to be the model's. Third person is this repo's convention.
 
 ## Section Ordering
 
@@ -31,22 +31,22 @@ Ordering recommended, not mechanical. Component whose primary content is example
 
 ## Root Structure
 
-- Exactly one root XML wrapper tag (e.g., `<component name="…" type="…">`, `<claude_behavior>`).
+- Exactly one root XML wrapper tag (e.g., `<component name="…" type="…">`).
 - Root contains only sibling section tags — no bare prose at root level.
 - All content live inside section tags or nested sub-tags.
 
 ## Section Tags
 
-- `snake_case` names that name the domain (`tool_guidance`, `memory_guide`, `refusal_handling`, `tone_and_formatting`, …).
+- `snake_case` names that name the domain (`tool_guidance`, `memory_guide`, `checklist`, `doc_output_convention`, …).
 - Tag name describes topic, not directive style.
 - Top-level sections are flat siblings under root.
-- **Maximum nesting depth: 3 levels** (root → section → sub-section → list-item). Level 3 reserved for plural↔singular list containers (see below). Plain sub-sections stop at level 2.
+- **Maximum nesting depth: 3 levels below the root** (root → section → sub-section → list item). Level 3 reserved for plural↔singular list containers (see below). Plain sub-sections stop at level 2.
 
 ## Sub-Sections (Nested Tags)
 
 - Use sub-section tag only when parent section contains genuinely distinct sub-domains.
 - Sub-section body is prose — typically single framing sentence (e.g., `<mission>`, `<mindset>`) or framing sentence followed by paragraphs. Don't open with list.
-- High-priority sub-sections may use `critical_*` prefix (e.g., `critical_child_safety_instructions`), may include leading callout sentence before rules.
+- High-priority sub-sections may use the `critical_*` prefix and may open with a callout sentence before the rules.
 
 ## Content Inside Tags
 
@@ -88,14 +88,14 @@ When section has **fixed small set of named slots** that need (a) multi-line pro
 </bounds>
 ```
 
-Slot labels are **directives, not hedging**. `<does>` (declarative present-tense — what Claude actually does), `<never>` (absolute prohibition — current Claude models follow; "should not" get dropped as optional), `<fallback>` (escalation posture). Legacy `<should>`/`<avoid>` labels rejected by structural test suite — current Claude models read "should" as optional, spec own load-bearing-voice rule applies to slot labels too.
+Slot labels are **directives, not hedging**. `<does>` (declarative present-tense — what Claude actually does), `<never>` (out-of-scope actions; give the reason when it is not obvious), `<fallback>` (escalation posture). Legacy `<should>`/`<avoid>` labels are rejected by the structural tests: a slot label states what Claude does, not what it might do.
 
 Use this form when:
-- Section sits next to Labeled section using same `- Label:` shape and Claude must not conflate them (measured boundary blur — claude-mem session `S390`, not in git).
+- Section sits next to Labeled section using same `- Label:` shape and Claude must not conflate them (Claude conflated the two when both used `- Label:` lines).
 - Any one slot reasonably needs multi-line prose that wouldn't fit single `- Label:` line.
 - Label set fixed and small (2-4 slots).
 
-Sub-tag bodies are prose, not lists. Depth stays at 2 (root → section → sub-section).
+Sub-tag bodies are prose, not lists. Sub-tags sit two levels below the root (root → section → sub-tag).
 
 ### Compact tables (`<examples>` and similar dense lookups)
 
@@ -118,12 +118,9 @@ Tables not exclusive to `<examples>`. Any dense-lookup tag with ≥6 entries tha
 
 When single example need multi-paragraph prose, code block, before/after comparison, `user:` / `assistant:` turn, or attribute framing, use `<example>` directly as standalone tag. One or more `<example>` siblings can appear under root or under another organizing parent.
 
-`<example>` body is **free-form prose** — pick whichever shape fit illustration. Format does not prescribe specific structure; common shapes include:
+`<example>` body is **free-form prose** — pick whichever shape fits the illustration. Markdown headers (`#`, `##`) are permitted inside `<example>` bodies when the illustration mirrors a real markdown artifact (report template, user-facing document, commit message); the "no markdown headers" rule applies to component-body prose, not to content quoted inside an example. Common shapes:
 
-Markdown headers (`#`, `##`) permitted inside `<example>` bodies when illustration mirror real markdown artifact (e.g., report template, user-facing document, commit message). "No markdown headers" rule applies to component-body prose, not to content quoted inside example.
-
-
-```xml
+````xml
 <example name="code-shape">
 A typical refactor extracts cohesive helpers from a long method:
 
@@ -150,7 +147,7 @@ assistant: Identifies the strongest violation first, proposes a single-responsib
 - Why wrong: retrying the same build without fixing the root cause wastes tokens and time.
 - Correct: investigate the error, fix the dependency, then re-run /sc:build.
 </example>
-```
+````
 
 Anti-pattern shape use Labeled-line form (`- Input:` / `- Why wrong:` / `- Correct:`) — fixed-set Labeled list inside `<example>` that document error path. Use when example need to contrast wrong-vs-right behavior in three short lines; promote to narrative-shape if any line need multi-line prose.
 
@@ -170,7 +167,7 @@ Lists embedded inside running prose written as natural-language enumerations ("t
 
 ### Use an attribute when
 
-- Value is **short identifier** (≤30 chars, no full sentences): `name`, `type`, `path`, `level`, `next`, `servers`, `version`, `lang`.
+- Value is **short identifier** (≤30 chars, no full sentences; a `next` list of /sc: commands is exempt from the length limit): `name`, `type`, `path`, `level`, `next`, `servers`, `version`, `lang`.
 - Value is **structural metadata** that name or scope tag rather than describe behavior — e.g., `<example name="solid-violation">`, `<handoff next="/sc:improve /sc:test"/>`.
 - Self-closing tag convey all needed information without body — e.g., `<handoff next="..."/>`.
 
@@ -194,11 +191,9 @@ Read attribute value aloud. If it sound like short label or filename, it attribu
 | What | Convention | Example |
 |------|------------|---------|
 | URLs | single quotes | `'https://docs.claude.com'` |
-| Model identifier strings | single quotes | `'claude-opus-4-7'` |
+| Model identifier strings | single quotes | `'claude-opus-5-5'` |
 | UI / product feature names | double quotes | `"settings"`, `"user preferences"` |
 | Tool / button names | bare or quoted | `thumbs down` button, `tool_search` |
-| Reminder / classifier names | comma-separated bare list | `image_reminder, cyber_warning, …` |
-| Dynamic variables | double curly braces | `{{currentDateTime}}` |
 | Rule citations | full tag, name as defined in `core/rules/RULES_QUALITY.md`; bare ID only in that file or a range (`tests/unit/test_cross_references.py` enforces) | `[R18 Necessity Test]` |
 
 ## Cross-References
@@ -277,14 +272,14 @@ When component exceed target: extract reference material (long examples, deep ta
 1. Wrap body in one root tag with identifier attributes (`name`, `type`).
 2. Split top-level concerns into `snake_case` section tags.
 3. Order sections stable→task-specific: identity → critical safety → core rules → tool/flag guidance → examples → gotchas → bounds → handoff.
-4. Nest sub-sections only when section has ≥2 distinct sub-domains; depth 2 max for plain sub-sections.
+4. Nest sub-sections only when a section has ≥2 distinct sub-domains; plain sub-sections sit at most two levels below the root.
 5. Default to prose paragraphs.
 6. For 3-5 short enum items, use prefixed line: **Numbered** (`1.`) for ordered procedures, **Plain** / **Labeled** / **Named** (`-`) per item type. Skip prefix for free-form prose.
 7. For fixed small set of named slots that need multi-line prose or distinct shape from neighboring Labeled list, use sub-tags (e.g., `<does>`/`<never>`/`<fallback>`) instead of `- Label:` lines. Sub-tag labels are directives — never use hedging verbs (`<should>`, `<avoid>`).
 8. For dense fixed-shape data, use compact markdown table inside `<examples>`, or inside any dense-lookup tag with ≥6 fixed-shape entries. For rich multi-line illustration, use standalone `<example>` instead.
 9. Other plural↔singular containers (depth 3) reserved for genuinely multi-line list items.
 10. Keep attributes for short identifiers and structural metadata; move guidance prose into tag body.
-11. Use third-person ("Claude") and declarative voice — current Claude models drop hedging.
-12. Quote URLs and model strings in single quotes; UI/feature names in double quotes; runtime values in `{{variable}}`.
+11. Use third person ("Claude", repo convention) and direct voice; hedge only when the choice is meant to be the model's.
+12. Quote URLs and model strings in single quotes; UI/feature names in double quotes.
 13. Reserve `critical_*` tag prefix for safety-critical sub-sections; place early in body so partial-read previews catch them.
 14. Stay within size target for component type; extract overflow into referenced sibling file.

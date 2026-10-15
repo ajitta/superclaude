@@ -43,10 +43,10 @@ Commands install as CC skills — the harness lists each `description` for the m
 Rules:
 
 - **Shape**: `<purpose — verb-led, what it does and writes>. <tier sentence>. Not for <cheap look-alike> — <direct alternative>.` ≤300 chars. No rationale ("so a wrong fire …"): it costs listing budget and routes nothing. Mechanically enforced: `tests/unit/test_command_structure.py` (`test_description_states_one_invocation_tier`, `test_description_has_negative_trigger_gate`, `test_description_fits_the_listing_budget`).
-- **Why the cap**: every model-invocable description shares the skill listing's character budget (1% of the context window, 8,000-char fallback); on overflow CC drops descriptions of the least-used skills first.
+- **Why the cap**: all model-invocable descriptions share one listing budget, so long descriptions crowd out others (current limits: `src/superclaude/skills/sc-author/references/fields.yaml`).
 - **Tier choice heuristic**: command mutates files, runs multi-agent orchestration, or writes committed artifacts → on-request. Read-only analysis or console-only output → auto.
 - **No `disable-model-invocation`** (in `forbidden_command_fields`): it removes the description from the listing and blocks delegated runs and sub-agent preload. On-request wording is the gate; confirmations for risky operations live in the body (`<approval_required>`, `<bounds>`). Exception: a side effect found in use or reported (`content-quality.md` §1 Trigger) — that command gets the field with the report cited, and the `schemas.yaml` lint changes in the same commit.
-- **Flipping tiers = description edit only**: swap the tier sentence, keep the negative gate and the 300-char cap. Then `uv run pytest tests/unit/test_command_structure.py` + re-sync (`superclaude install --force --scope user`; `make sync-user` may fail on Windows — see gotchas/general.md).
+- **Flipping tiers = description edit only**: swap the tier sentence, keep the negative gate and the 300-char cap. Then `uv run pytest tests/unit/test_command_structure.py`. Re-sync an existing install: run `superclaude doctor --scope <s>` first, because `install --force` creates an install where none exists (gotcha `sync-scope-creates`); `make deploy` reinstalls only the CLI.
 
 ## XML Template
 
@@ -109,30 +109,23 @@ Rules:
 - `<flow>` — ≥2 numbered steps in execution order; a step that anything points at starts with `N. Label:`
 - Step pointers — anywhere in the body, point at a flow step as `the <Label> step`, or `the /sc:<name> <Label> step` for another command's flow, never by number. `test_command_structure.py` rejects `step <N>` and resolves each such label; a bare label (`after Confirm`) goes unchecked.
 - `<flags>` — every `<syntax>` flag that is not a core/FLAGS.md global gets one `- --name <value>: behavior` line; `- --name` is what the hook and `test_command_structure.py` parse. A flag already defined elsewhere in the body (a flow step, `<outputs>`, a gotcha) gets a line pointing to it (a flow step by its label, a section by topic), not a restatement. A global name the command gives its own meaning is defined here too (`test_command_structure.py` catches a `<syntax>` value core/FLAGS.md does not allow, including any value for a global that takes none; a redefinition without a value, such as reflect's `--validate`, goes unchecked), and inside this command the hook then stops injecting that name's global directive (implement's `--plan` takes a plan path, not the global 5-line plan). A pointer takes one of these forms, which `test_command_structure.py` resolves: `the <Label> step` (see Step pointers), `the <topic> section|table`, `the <name> gotcha`, `the <name> pattern`, `the <topic> threshold`, `the <Tool> entry in the tools section`; a pointer in any other form goes unchecked.
-- `<bounds>` — sub-tag form: `<does>` / `<never>` / `<fallback>` (each body prose sentence). `<does>` + `<never>` required; `<fallback>` optional (use when out-of-scope handling non-obvious). Sub-tag form keeps `<bounds>` structurally distinct from `<tool_guidance>` (session `S390`, a claude-mem record not in git, measured Claude conflating two when both used `- Label:` lines)
+- `<bounds>` — sub-tag form: `<does>` / `<never>` / `<fallback>` (each body prose sentence). `<does>` + `<never>` required; `<fallback>` optional (use when out-of-scope handling non-obvious). Sub-tag form keeps `<bounds>` structurally distinct from `<tool_guidance>`; Claude conflated the two when both used `- Label:` lines (xml-prose-format.md Sub-tag enumerations)
 - `<handoff next="...">` — 2-3 natural next commands
 - Optional: `<flags>` (required once `<syntax>` offers a non-global flag), `<outputs>`, `<tools>`, `<gotchas>`, `<examples>`
 
-## Inherited from xml-prose-format.md
+## Format
 
-Rules below apply to all components, not restated above. See `.claude/rules/xml-prose-format.md` for full text.
-
-- **Single root XML wrapper** — exactly one root tag per component body; sibling sections only at root level.
-- **Long-form embedded enumerations** — lists embedded in running prose use natural-language enumeration ("things include x, y, z"), not bullets.
-- **Quoting conventions** — URLs + model identifier strings in single quotes (`'https://…'`, `'claude-opus-4-7'`); UI / product / feature names in double quotes (`"settings"`); runtime variables in double curly braces (`{{currentDateTime}}`).
-- **Cross-references** — point to other sections by plain English topic, not by tag path.
-- **Markdown headers inside `<example>`** — permitted when illustration mirrors real markdown artifact (report template, commit message, user document); body-prose "no markdown headers" rule does not extend into `<example>` bodies.
-- **Size target** — command body ≤200 lines (hard ceiling 300); extract overflow into referenced sibling file, not inline-bloat body.
+Body-format rules (single root, list forms, quoting, cross-references, headers inside `<example>`, size targets) live in `.claude/rules/xml-prose-format.md`, which loads together with this file. They are not restated here.
 
 ## Checklist
 
 1. Create `src/superclaude/commands/<name>.md` with frontmatter + XML; define every non-global `<syntax>` flag in `<flags>`
 2. Verify `<component name="...">` matches filename
-3. Write specific `description` (shown in `/menu`) — pick trigger tier + negative gate per "Trigger Policy"
+3. Write a specific `description` (shown in the `/` command picker and the skill listing) — pick trigger tier + negative gate per "Trigger Policy"
 4. Add `<gotchas>` for project-specific failure patterns
 5. Run `uv run pytest tests/unit/test_command_structure.py -v`
 6. Update `src/superclaude/commands/README.md` table
-7. Run `make deploy`
+7. Re-sync an existing install: run `superclaude doctor --scope <s>` first, because `install --force` creates an install where none exists (gotcha `sync-scope-creates`); `make deploy` reinstalls only the CLI.
 
 ## Anti-Patterns
 
@@ -141,7 +134,7 @@ Rules below apply to all components, not restated above. See `.claude/rules/xml-
 | `name:` in frontmatter | Filename is the command name | Remove |
 | `permissionMode:` | Agent-only, ignored for commands | Remove |
 | `model:`, `hooks:` or `context:` | Valid in CC, but superclaude commands stay on the parent model in the main session | Remove |
-| Vague description | Poor `/menu` display | Be specific: "Build X with Y" |
+| Vague description | Misrouted invocations and an unclear picker entry | Be specific: "Build X with Y" |
 | Missing `<bounds>` | No scope/safety boundary | Add `<does>`/`<never>` |
 | Mission doesn't match description | Confusing inconsistency | Align ≥30% word overlap |
 | Decorative `note=` XML attrs | Unparsed boilerplate, token waste | See xml-prose-format.md "Attributes vs. Body" — `note=` only for scope/safety/version/reference/quantified constraint |
