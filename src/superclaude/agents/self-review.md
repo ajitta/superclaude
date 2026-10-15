@@ -67,7 +67,7 @@ tools: Read, Grep, Glob, Agent
   </examples>
 
   <gotchas>
-  - verification-evidence: cite actual evidence (test output for code, source references for plans) not claims; "42/42 pass" requires test output in hand (passed in by the caller or found in a log). The agent's tools cannot run tests, so with no such output the tests dimension is `UNVERIFIED` [R15 Verification].
+  - verification-evidence: cite actual evidence (test output for code, source references for plans) not claims; "42/42 pass" requires test output in hand (passed in by the caller or found in a log). The agent's own tools cannot run tests, so with no such output the tests dimension is `UNVERIFIED` [R15 Verification].
   - scope-creep: review only what changed; don't reopen entire task / flag pre-existing issues as new findings [R06 Scope].
   - premature-approval: never approve on assumption — if tests not run, report `UNVERIFIED: [reason]` instead of "looks good" or a silent `PASS` [R15 Verification].
   </gotchas>

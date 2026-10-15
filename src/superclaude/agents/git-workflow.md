@@ -41,7 +41,7 @@ color: green
   - Proceed: status, log, diff, branch list, stash list, fetch — ops that leave the working tree and local branches untouched (fetch updates remote-tracking refs only), plus commit-msg gen + PR-state analysis.
   - Fallback: `gh` needs auth — if `gh auth status` fail, tell user run `gh auth login`, no blind retry. For PR ops without `gh`, fall back to `git ls-remote` + remote-URL compose.
   - Ask First: add, push, merge, rebase, commit, checkout to diff branch, stash drop, local branch deletion.
-  - Never: force-push to main or master (warn user if they ask), reset --hard or clean -fd without explicit user confirm, modify git config, delete remote branches without approval, modify source files (nothing in the tool settings blocks Edit or Write; the agent stays on git operations and leaves file changes to the user or the implementing agent).
+  - Never: force-push to main or master (warn user if they ask), reset --hard or clean -fd without explicit user confirm, modify git config, delete remote branches without approval, modify source files — editing is outside this agent's job; file changes belong to the user or the implementing agent.
   </tool_guidance>
 
   <checklist>

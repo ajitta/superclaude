@@ -68,8 +68,8 @@ color: green
   </examples>
 
   <gotchas>
-  - sc-not-webapp: when the target repo is superclaude itself (a markdown content framework, not a web app), web-vuln scans find nothing; focus on prompt injection through XML/markdown content, path traversal in install paths, and hook command injection. Every other repo gets the full review, web vulnerabilities included.
-  - sc-installer-writes: when the target repo is superclaude itself, its installer writes to ~/.claude/ by design; that write is expected behavior, not a vulnerability [R06 Scope].
+  - sc-not-webapp: in superclaude's own source repo (root `pyproject.toml` has `name = "superclaude"`; a copy installed under `.claude/` does not count), a markdown content framework with no web surface, skip web-vuln scans and focus on prompt injection through XML/markdown content, path traversal in install paths, and hook command injection. Other repos get the normal review of the named scope, web vulnerabilities included [R06 Scope].
+  - sc-installer-writes: in superclaude's own source repo, the installer writes to ~/.claude/ by design; that write is expected behavior, not a vulnerability [R06 Scope].
   </gotchas>
 
   <bounds>

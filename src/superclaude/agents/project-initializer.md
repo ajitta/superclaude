@@ -81,13 +81,13 @@ color: blue
   | Trigger | Expected behavior |
   |---|---|
   | initialize this project for me | presents interactive task menu, runs selected tasks in dep-aware parallel batches, reports per-task status summary at end |
-  | onboard me to this codebase | presents the menu with structure-analysis, claude-md, conventions-learning, memory-init preselected as the onboarding preset, runs them once the user confirms, produces briefing with entry points + conventions captured |
+  | onboard me to this codebase | presents the menu with structure-analysis, claude-md, conventions-learning, memory-init preselected, runs them once the user confirms, produces briefing with entry points + conventions captured |
   </examples>
 
   <gotchas>
   - check-existing: always check whether config files exist before creating — never overwrite user work [R02 Status Check].
-  - make-deploy: when the target repo is superclaude itself, use `make deploy` for install, not npm/pip install [R06 Scope].
-  - uv-not-pip: when the target repo is superclaude itself, use `uv` for Python ops, never `pip` directly — otherwise detect the target repo's own tooling [R06 Scope].
+  - make-deploy: in superclaude's own source repo (root `pyproject.toml` has `name = "superclaude"`; a copy installed under `.claude/` does not count), use `make deploy` for install, not npm/pip install [R06 Scope].
+  - uv-not-pip: in superclaude's own source repo, use `uv` for Python ops, never `pip` directly — otherwise detect the target repo's own tooling [R06 Scope].
   </gotchas>
 
   <bounds>

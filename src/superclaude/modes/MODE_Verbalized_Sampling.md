@@ -57,7 +57,7 @@ Provenance: the tail-instruction wording above is the authors' reference-repo re
   </templates>
 
   <output_format>
-Header `Variant: {variant} | tau={tau} | k={k}` (+ `| turns={turns}` for Multi), then per candidate `### Response N` + text, closed by a line `p={probability} — {descriptive label}` written after the text, since a probability or label written first steers the text toward it (CoT adds a brief **Reasoning** line).
+Header `Variant: {variant} | tau={tau} | k={k}` (+ `| turns={turns}` for Multi), then per candidate `### Response N` + text, closed by a line `p={probability} — {descriptive label}` written after the text, since a probability or label written first steers the text toward it. CoT puts a brief **Reasoning** line before the text.
 
 VS-Multi groups by turn instead: `### Turn N`, then per candidate `#### N.N` + text, closed by `confidence: {level} — {label}`.
 

@@ -68,8 +68,8 @@ color: blue
   </examples>
 
   <gotchas>
-  - no-frontend-on-sc: when the target repo is superclaude itself, it has no UI components; its markdown content is not frontend work [R06 Scope].
-  - plain-cli-output: when the target repo is superclaude itself, its CLI prints with plain click.echo and declares no UI dependency, so React/Vue recommendations do not apply to it [R06 Scope].
+  - no-frontend-on-sc: superclaude's own source repo (root `pyproject.toml` has `name = "superclaude"`; a copy installed under `.claude/` does not count) has no UI components; its markdown content is not frontend work [R06 Scope].
+  - plain-cli-output: in superclaude's own source repo, the CLI prints with plain click.echo and declares no UI dependency, so React/Vue recommendations do not apply to it [R06 Scope].
   - vitals-or-it-didnt-happen: never claim perf improvement without measured before/after.
   </gotchas>
 

@@ -64,8 +64,8 @@ color: blue
   </examples>
 
   <gotchas>
-  - content-not-service: when the target repo is superclaude itself (a content framework, not a web service), do not propose API endpoints, databases or a service mesh for it [R06 Scope].
-  - cli-simplicity: when the target repo is superclaude itself, its CLI uses Click with plain click.echo output; no async frameworks, ORMs or message queues for that CLI layer. Other repos keep their own stack [R06 Scope].
+  - content-not-service: in superclaude's own source repo (root `pyproject.toml` has `name = "superclaude"`; a copy installed under `.claude/` does not count), a content framework rather than a web service, do not propose API endpoints, databases or a service mesh for it [R06 Scope].
+  - cli-simplicity: in superclaude's own source repo, the CLI uses Click with plain click.echo output; no async frameworks, ORMs or message queues for that CLI layer. Other repos keep their own stack [R06 Scope].
   - invariant-first: write invariants before endpoints. APIs protecting vague model leak inconsistency.
   </gotchas>
 
