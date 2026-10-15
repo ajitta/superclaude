@@ -7,7 +7,7 @@ branch: fix/prompt-content-audit @23350fc1+ (base master @0c63688d, not pushed, 
 - Feature folder `docs/features/prompt-content-audit/` (README `phase: implementing`) is the record: README → 03 (round 1 summary; §4 P0/P1/P2 all marked done) → 03a–03f (round 1 areas) → 03g–03i (round 2) → 08/08a/08b implementation → 09/09a/09b independent reviews
 - Round 3 (08b, 09b) closed the remaining P1/P2 items and the 08a deferred list
 - Last full run: `uv run pytest` 3539 passed / 3 skipped; `tests/unit/scripts` 149 passed; `make lint` clean. Worktree clean
-- NOT done: `make canary-gates`; merge to master; `make sync-local` (local `.claude/` install still has the old content — not tracked by git)
+- Canary green at 6bf62236: canary-gates 4 tasks / 7 hard gates pass; sc-author-* ×10, destructive-named-path, probe-introspect-marker, implement-checkpoint pass (08b). NOT done: merge to master; `make sync-local` (local `.claude/` install still has the old content — not tracked by git)
 
 ## What changed (commits, oldest first)
 - aa5b0e87, 42f9045e: round 1 P0 — superclaude-only gotchas made conditional, example↔rule conflicts, PRINCIPLES R12 reversibility branch
@@ -31,6 +31,6 @@ branch: fix/prompt-content-audit @23350fc1+ (base master @0c63688d, not pushed, 
 
 ## Next actions
 - [x] Opus 5 `reasoning_extraction`: user decided per What's new in Opus 5.5 ("As on Claude Opus 5 … `reasoning_extraction`"); sc-prompt row deletes write-outs for every target; docstrings + 02-research corrected
-- [ ] `make canary-gates` (inside Claude Code add `EVAL_ARGS="--runs-dir <dir outside ~/.claude>"`) plus sc-author-* tasks; watch Ask First stops, research strategy, RULES_INTERACTION menus, plan/review gates. Delete runs dirs afterwards (they copy `.credentials.json`)
+- [x] `make canary-gates` + sc-author-* and risk-flagged tasks — all pass (runs dirs deleted)
 - [ ] Merge to master when canary is green (version bump only at release)
-- [ ] Low leftovers (08b): commands abbreviations (help/implement/init), pm description Direct strategy, author-check X1 single root for memory files (code), FLAGS `Scope:` ordering meaning
+- [x] Low leftovers (08b) — done in 6bf62236
