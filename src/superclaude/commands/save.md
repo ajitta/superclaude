@@ -12,8 +12,8 @@ description: Save session context to the committed project memory folder (.claud
   <flow>
   1. Analyze: session progress + discoveries
   2. Persist (memory folder): Write .claude/memories/session_[date]_[branch-slug].md — first line `branch: <name> @<short sha>`, then the summary and a `## Next actions` checklist; a second save the same day on the same branch updates it → .claude/memories/learnings_[topic].md (insights); flat basename only, no path segments; create the folder when absent
-  3. Persist (auto memory): Write/Edit MEMORY.md + topic files for cross-session continuity; every worktree of the repo shares this folder, so name the branch in each project entry and Edit the one MEMORY.md line instead of rewriting the file
-    3.5. Corrections-Review: capture each user correction not yet recorded as a feedback memory with the fields {trigger, misread, actual_intent, violated_rule: "[RNN Name]", prevention} [R14 Correction Capture].
+  3. Persist (auto memory): save the durable facts a later session needs (the no-ephemeral gotcha) to the auto memory folder, in the file layout Claude Code's memory instructions give; every worktree of the repo shares this folder, so name the branch in each project entry and Edit the one MEMORY.md line instead of rewriting the file
+    3.5. Corrections-Review: capture each user correction not yet recorded as a feedback memory whose body names the broken rule as `violated_rule: "[RNN Name]"` [R14 Correction Capture].
   4. Verify: Glob .claude/memories/*.md + Read MEMORY.md confirms both stores
   5. Checkpoint: recovery points + progress tracking
   6. Validate: data integrity + no duplicates across stores
@@ -36,18 +36,18 @@ description: Save session context to the committed project memory folder (.claud
   <storage>
     Memory folder (primary): .claude/memories/ — one markdown file per memory name, committed with the project
     Branch slug: `git branch --show-current` with `/` → `-`; detached HEAD → `detached-<short sha>`. Session records are add-only per branch, so parallel branches and worktrees never conflict on merge
-    Auto memory (supplementary): ~/.claude/projects/{project}/memory/MEMORY.md (CC-native, per-project, first 200 lines auto-load)
-    Topic files: ~/.claude/projects/{project}/memory/{topic}.md (linked from MEMORY.md, load on demand)
+    Auto memory (supplementary): the folder Claude Code names in the system prompt (CC-native, per-project; moves with the `autoMemoryDirectory` setting) — MEMORY.md is its index and loads automatically, memory files are read on demand
     Agent memory: per agent, kept by Claude Code (not written by /sc:save); location follows the agent's `memory:` scope — user ~/.claude/agent-memory/{name}/, project .claude/agent-memory/{name}/, local .claude/agent-memory-local/{name}/
   </storage>
 
   <outputs note="Per --type flag">
-| Type | Memory folder | Auto Memory | Content |
-|---|---|---|---|
-| session | session_[date]_[branch-slug] | MEMORY.md | Full context |
-| learnings | learnings_[topic] | topic files | Patterns + insights |
-| context | context_[project] | MEMORY.md | Project state |
-| all | All above | All above | Complete preservation |
+| Type | Memory folder | Content |
+|---|---|---|
+| session | session_[date]_[branch-slug] | Full context |
+| learnings | learnings_[topic] | Patterns + insights |
+| context | context_[project] | Project state |
+| all | All above | Complete preservation |
+Every type also saves its durable facts to auto memory as memory files; MEMORY.md holds only their one-line pointers.
   </outputs>
 
 
