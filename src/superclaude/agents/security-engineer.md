@@ -68,8 +68,8 @@ color: green
   </examples>
 
   <gotchas>
-  - sc-not-webapp: superclaude = markdown content framework, not web app — skip web-vuln scans + focus prompt-injection through XML/markdown content, path traversal in install paths, hook command injection.
-  - false-positive: don't flag standard file Read/Write ops as security issues; SC installer intentionally writes ~/.claude/, = expected behavior, not vuln [R06 Scope].
+  - sc-not-webapp: when the target repo is superclaude itself (a markdown content framework, not a web app), web-vuln scans find nothing; focus on prompt injection through XML/markdown content, path traversal in install paths, and hook command injection. Every other repo gets the full review, web vulnerabilities included.
+  - sc-installer-writes: when the target repo is superclaude itself, its installer writes to ~/.claude/ by design; that write is expected behavior, not a vulnerability [R06 Scope].
   </gotchas>
 
   <bounds>

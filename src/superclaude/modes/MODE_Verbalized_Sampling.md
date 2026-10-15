@@ -57,9 +57,9 @@ Provenance: the tail-instruction wording above is the authors' reference-repo re
   </templates>
 
   <output_format>
-Header `Variant: {variant} | tau={tau} | k={k}` (+ `| turns={turns}` for Multi), then per candidate `### Response N (p={probability})` + post-hoc descriptive label + text (CoT adds a brief **Reasoning** line).
+Header `Variant: {variant} | tau={tau} | k={k}` (+ `| turns={turns}` for Multi), then per candidate `### Response N` + text, closed by a line `p={probability} — {descriptive label}` written after the text, since a probability or label written first steers the text toward it (CoT adds a brief **Reasoning** line).
 
-VS-Multi groups by turn instead: `### Turn N` then `#### N.N (confidence: {level}) — {label}`.
+VS-Multi groups by turn instead: `### Turn N`, then per candidate `#### N.N` + text, closed by `confidence: {level} — {label}`.
 
 Synthesis block: **Convergence** (what most agree on — likely robust) | **Key Divergence** (where they disagree + what drives it) | **Landscape Map** (Response N optimizes X at cost of Y) | **Blind Spots** (perspectives absent from the set).
   </output_format>

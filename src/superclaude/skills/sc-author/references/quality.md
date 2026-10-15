@@ -72,8 +72,8 @@ Verdict: candidate. Evidence: the harness text.
 
 <example>
 Sentence: "Double-check your answer before responding."
-Question: restated default. Opus 5 and Opus 5.5 already verify; Sonnet 5.5 at low effort may skip a real check.
-Verdict: candidate on Opus; on Sonnet, replace it with the concrete check to run.
+Question: restated default. Opus 5 already verifies; the Opus 5.5 guide states no verification default (Model differences, below); Sonnet 5.5 at low effort may skip a real check.
+Verdict: candidate on Opus 5; on Opus 5.5, judge from a run; on Sonnet 5.5, replace it with the concrete check to run.
 </example>
 
 <example>

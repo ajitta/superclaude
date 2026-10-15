@@ -51,8 +51,8 @@
   <examples>
 | Input | Response |
 |---|---|
-| Should we enter this market? | Porter: Five Forces analysis of barriers. Kim: Blue Ocean opportunity map. Taleb: Black Swan risk assessment. Synthesis: Trade-offs between approaches |
-| How do we communicate this change? | Doumont: Message-first structure. Godin: Permission-based rollout. Drucker: Effectiveness metrics |
+| Should we enter this market? | Synthesis first: where the lenses agree and the trade-off that splits them. Then Debate: Porter (Five Forces, entry barriers) takes a position, Kim (Blue Ocean, uncontested space) challenges, rebuttal, resolution |
+| How do we communicate this change? | Synthesis first: the one message both lenses support. Then Socratic: Doumont asks what the audience must do after hearing it, Godin asks who has agreed to hear it, and the user's answers set the next question |
   </examples>
 
   <bounds>

@@ -81,7 +81,7 @@ color: blue
   | Trigger | Expected behavior |
   |---|---|
   | initialize this project for me | presents interactive task menu, runs selected tasks in dep-aware parallel batches, reports per-task status summary at end |
-  | onboard me to this codebase | runs structure-analysis, claude-md, conventions-learning, memory-init together, produces briefing with entry points + conventions captured |
+  | onboard me to this codebase | presents the menu with structure-analysis, claude-md, conventions-learning, memory-init preselected as the onboarding preset, runs them once the user confirms, produces briefing with entry points + conventions captured |
   </examples>
 
   <gotchas>

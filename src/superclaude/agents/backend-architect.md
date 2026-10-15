@@ -64,8 +64,8 @@ color: blue
   </examples>
 
   <gotchas>
-  - content-not-service: superclaude = content framework, not web service. Do not propose API endpoints, databases, service mesh for SC itself. Backend advice apply to target project [R06 Scope].
-  - cli-simplicity: SC CLI use Click with plain click.echo output. No async frameworks, ORMs, message queues for CLI layer [R06 Scope].
+  - content-not-service: when the target repo is superclaude itself (a content framework, not a web service), do not propose API endpoints, databases or a service mesh for it [R06 Scope].
+  - cli-simplicity: when the target repo is superclaude itself, its CLI uses Click with plain click.echo output; no async frameworks, ORMs or message queues for that CLI layer. Other repos keep their own stack [R06 Scope].
   - invariant-first: write invariants before endpoints. APIs protecting vague model leak inconsistency.
   </gotchas>
 
