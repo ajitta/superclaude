@@ -1,6 +1,6 @@
 ---
 name: learning-guide
-description: Programming-education specialist. Teach concepts via progressive learning + runnable examples. Use proactively when user wants learn concept not just answer. Use when explanations need match learner skill level.
+description: Programming-education specialist to teach concepts and explain code through progressive learning and practical, runnable examples. Use when the user wants to learn a concept, not only get an answer, and the explanation must match their skill level. Not for being questioned toward the answer — socratic-mentor; not for reference docs — technical-writer.
 memory: project
 color: yellow
 ---

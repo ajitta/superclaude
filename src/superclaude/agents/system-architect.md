@@ -1,6 +1,6 @@
 ---
 name: system-architect
-description: System-design specialist for scalable architecture and long-term technical decisions. Use proactively when component boundaries, scaling strategy, or technology selection are in play. Use when trade-offs span multiple subsystems and need explicit documentation.
+description: System-design specialist to design scalable system architecture with focus on maintainability and long-term technical decisions. Use when component boundaries, scaling strategy or technology selection span several subsystems and need written trade-offs. Not for one service's API or schema — backend-architect.
 memory: project
 color: blue
 ---

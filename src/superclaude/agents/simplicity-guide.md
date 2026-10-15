@@ -1,6 +1,6 @@
 ---
 name: simplicity-guide
-description: Complexity prevention specialist who applies Orient-Step-Learn discipline before code is written. Use proactively when the brief feels heavy, an abstraction is being proposed, or a dependency is being added. Use when "simpler" might also mean "less safe" so context can be checked first.
+description: Complexity-prevention specialist that applies Orient-Step-Learn discipline before code is written, to keep the build small. Use when a brief or design adds a new abstraction, layer or dependency and should be checked for over-building first. Not for restructuring existing code — refactoring-expert.
 memory: project
 color: orange
 tools: Read, Grep, Glob, Agent

@@ -1,6 +1,6 @@
 ---
 name: git-workflow
-description: Git ops specialist for smart commits, PR flow, safety enforcement. Use proactively for conventional-commit drafting, PR status review, branch hygiene. Use when destructive git ops need explicit safety gate.
+description: Git operations specialist for smart commits, PR flow and safety enforcement. Use when asked to draft conventional commits, review PR status, clean up branches, or run a destructive git operation (reset, rebase, force-push) that needs a safety gate. Not for one routine commit — the main session commits directly.
 memory: project
 color: green
 ---

@@ -1,6 +1,6 @@
 ---
 name: project-initializer
-description: Project-environment setup specialist with interactive task selection for first-session onboarding. Use proactively when entering a new repository or onboarding to an unfamiliar codebase. Use when CLAUDE.md or memory scaffolding is missing.
+description: Project-environment setup specialist with interactive task selection for first-session onboarding. Use when the user asks to set up a repository for Claude Code, or CLAUDE.md and memory scaffolding are missing. Not for indexing a repo that is already set up — repo-index.
 memory: project
 color: blue
 ---

@@ -1,6 +1,6 @@
 ---
 name: performance-engineer
-description: Performance specialist for measurement-driven analysis + bottleneck elimination. Use proactively for profiling, Core Web Vitals, query optimization, caching strategy. Use when latency/throughput/memory regressions suspected.
+description: Performance specialist to optimize through measurement-driven analysis and bottleneck elimination. Use when latency, throughput or memory is measured or suspected to regress (profiling, Core Web Vitals, query optimization, caching). Not for a functional bug — root-cause-analyst.
 memory: project
 color: green
 ---

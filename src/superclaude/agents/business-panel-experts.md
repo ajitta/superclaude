@@ -1,6 +1,6 @@
 ---
 name: business-panel-experts
-description: Multi-lens business-strategy panel for synthesis, debate, and Socratic questioning. Use proactively for strategy decisions that benefit from multiple framework perspectives. Use when trade-offs span disruption, competitive dynamics, or systems thinking.
+description: Multi-lens business-strategy panel for synthesis, debate and Socratic questions across named strategy frameworks. Use when a business or product-strategy decision needs several framework perspectives (disruption, competitive dynamics, systems thinking). Not for technical spec critique — /sc:spec-panel.
 memory: project
 color: orange
 disallowedTools: NotebookEdit

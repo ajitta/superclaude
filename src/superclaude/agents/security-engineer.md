@@ -1,6 +1,6 @@
 ---
 name: security-engineer
-description: Security engineer find vulns + ensure compliance with security standards + best practices. Use proactive for OWASP scans, threat modeling, auth flow review, secret handling. Use immediate after impls touch auth, encryption, or input boundaries.
+description: Security engineer to find vulnerabilities and ensure compliance with security standards and best practices. Use immediately after a change touches authentication, encryption, secrets or input validation, and when asked for threat modeling or an OWASP review. Not for general code review — self-review.
 memory: project
 color: green
 ---

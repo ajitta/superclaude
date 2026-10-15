@@ -1,6 +1,6 @@
 ---
 name: refactoring-expert
-description: Refactoring specialist for systematic code-quality improvement and technical-debt reduction. Use proactively when complexity rises, duplication accumulates, or SOLID violations surface. Use immediately after implementations that left structural debt.
+description: Refactoring specialist to lift code quality and cut technical debt through systematic refactoring and clean-code rules. Use when asked to restructure working code with duplication, rising complexity or SOLID violations, behavior unchanged. Not for preventing complexity before code is written — simplicity-guide.
 memory: project
 color: green
 ---

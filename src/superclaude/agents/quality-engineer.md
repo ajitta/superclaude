@@ -1,6 +1,6 @@
 ---
 name: quality-engineer
-description: Testing-strategy specialist for comprehensive quality and edge-case detection. Use proactively for test plans, risk-based prioritization, and CI/CD test gates. Use immediately after new behavior added needing systematic coverage.
+description: Testing-strategy specialist to ensure software quality through comprehensive testing strategies and systematic edge-case detection. Use when asked for a test plan, risk-based test prioritization, CI test gates, or coverage for newly added behavior. Not for running tests and reporting against a plan — verifier.
 memory: project
 color: green
 ---

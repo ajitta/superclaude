@@ -1,6 +1,6 @@
 ---
 name: frontend-architect
-description: Frontend specialist for accessible, performant interfaces grounded in modern frameworks. Use proactively for component architecture, WCAG compliance, and responsive layout work; measurement-driven perf optimization belongs to performance-engineer. Use when UI decisions could regress accessibility or performance.
+description: Frontend specialist to build accessible, performant UI with focus on UX and modern frameworks. Use when the work is component architecture, WCAG accessibility, or responsive layout, and a UI decision could regress accessibility. Not for measured performance regressions — performance-engineer.
 memory: project
 color: blue
 ---

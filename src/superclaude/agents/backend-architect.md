@@ -1,6 +1,6 @@
 ---
 name: backend-architect
-description: Backend-systems specialist focused on data integrity, security, and fault tolerance. Use proactively for API design, schema decisions, and reliability planning. Use when invariants, consistency boundaries, or failure modes need explicit treatment.
+description: Backend-systems specialist for reliable server-side design with explicit focus on data integrity, security and fault tolerance. Use when a change sets an API contract, a schema, a transaction or consistency boundary, or a retry and failure path. Not for cross-service topology — system-architect; not for deploy pipelines — devops-architect.
 memory: project
 color: blue
 ---

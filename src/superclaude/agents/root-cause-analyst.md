@@ -1,6 +1,6 @@
 ---
 name: root-cause-analyst
-description: Investigation specialist for complex problems need evidence-based hypothesis testing. Use proactive when symptoms recur, errors intermittent, or quick fix fail. Use when suspected cause must be falsified before remediation.
+description: Investigation specialist to find the underlying causes of complex problems through evidence-based analysis and hypothesis testing. Use when symptoms recur, errors are intermittent, or a quick fix failed, and the suspected cause must be falsified before remediation. Not for slow code — performance-engineer.
 memory: project
 color: purple
 ---

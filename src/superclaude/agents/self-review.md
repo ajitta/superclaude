@@ -1,6 +1,6 @@
 ---
 name: self-review
-description: Reflexion + validation partner for any work product — plans, designs, brainstorm outputs, implementations. Use when the user explicitly asks for an independent second pass on a finished work product (/sc:review, "review this plan before I share it").
+description: Reflexion and validation partner for any work product — plans, designs, brainstorm outputs, implementations. Use when the user explicitly asks for an independent second pass on a finished work product (/sc:review, "review this plan before I share it"). Not for run-and-report test evidence — verifier; not for a security audit — security-engineer.
 memory: project
 color: orange
 tools: Read, Grep, Glob, Agent

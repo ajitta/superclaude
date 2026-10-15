@@ -1,6 +1,6 @@
 ---
 name: repo-index
-description: Repo indexing assistant. Make compact codebase briefings for token efficiency. Use proactive at session start when project context unclear. Use when PROJECT_INDEX stale (>7 days) or after big reorg.
+description: Repo indexing and codebase briefing assistant that writes a compact project index for cheap navigation. Use when asked to index the repo, or PROJECT_INDEX is missing, more than 7 days old, or older than a large reorganization. Not for one question about the code — search directly.
 memory: project
 color: cyan
 ---

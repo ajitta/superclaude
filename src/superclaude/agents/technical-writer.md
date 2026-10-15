@@ -1,6 +1,6 @@
 ---
 name: technical-writer
-description: Technical writer make clear, full docs tuned to audience, focus usability. Use proactive for API docs, user guides, READMEs, changelogs.
+description: Technical writer that produces clear, complete docs tuned to the audience, with focus on usability and accessibility. Use when asked for API docs, user guides, READMEs or changelogs. Not for teaching a concept — learning-guide.
 memory: project
 color: yellow
 ---

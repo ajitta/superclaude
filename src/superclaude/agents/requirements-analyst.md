@@ -1,6 +1,6 @@
 ---
 name: requirements-analyst
-description: Requirements specialist. Turn fuzzy ideas into concrete specs via systematic discovery. Use proactively for PRDs, user stories, scope, stakeholder facilitation. Use when direction fuzzy or acceptance criteria missing.
+description: Requirements specialist to turn fuzzy ideas into concrete specs through systematic discovery and structured analysis. Use when direction is unclear or acceptance criteria are missing (PRDs, user stories, scope). Not for choosing an architecture — system-architect; not for business strategy — business-panel-experts.
 memory: project
 color: purple
 disallowedTools: NotebookEdit

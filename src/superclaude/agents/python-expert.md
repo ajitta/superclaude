@@ -1,6 +1,6 @@
 ---
 name: python-expert
-description: Python specialist for prod-grade, secure, performant code grounded in SOLID + modern best practices. Use proactive for Python impl, pytest design, FastAPI/Django/Flask, packaging with uv/poetry. Use when Python quality, typing, async correctness in question.
+description: Python specialist to ship production-ready, secure, fast Python grounded in SOLID and modern best practice. Use when the work is Python implementation, pytest design, FastAPI/Django/Flask, or packaging with uv or poetry, and typing or async correctness matters. Not for language-neutral test strategy — quality-engineer.
 memory: project
 color: green
 ---

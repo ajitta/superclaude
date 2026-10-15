@@ -27,7 +27,12 @@ Standalone (single-doc one-off): docs/<type>/<slug>-<suffix?>-<username>-YYYY-MM
   Docs written before the project adopted this convention stay in place; no bulk move.
 
 Slug resolution (file-producing commands): derive a kebab-case slug from the command's topic and compare it with the directory names under docs/features/. One name equals the slug → write there without asking. Names that contain the slug or are contained in it → ask the user to pick. No match → ask `[f]` new feature folder / `[s]` standalone, pre-selecting the command default: `[f]` for brainstorm, design, plan, roadmap; `[s]` for analyze, research. When asking is not possible (sub-agent, headless run), use the default and state the chosen path in the reply.
-README update on feature-path write: `updated:` bump + append doc entry to `## Documents` + advance `phase:` if status enum moved. Standalone path: no README update.
+README update on feature-path write: `updated:` bump + append doc entry to `## Documents` + set `phase:` from the phase mapping below. Standalone path: no README update.
+Phase mapping (README `phase:` = the furthest stage the folder has reached; it never moves back, so a late `01a-discovery` during implementation leaves `implementing`):
+  00-intent written → intent | 01-discovery written → discovery | 04-design written → design | 05-plan written → planning
+  first plan box checked (plan `status: implementing`) → implementing | plan (index) `status: complete` → complete
+  02-research, 03-analysis, 06+ docs and `deprecated` docs never move it; a folder they create starts at discovery
+  abandoned: only when the user says the feature is dropped
 
 Living docs (UPPER_SNAKE, no date/username): docs/reports/{PROJECT_INDEX,...}.md (sc:index, sc:index-repo, sc:document --type api)
 ADRs (sequence, unchanged): docs/adr/NNNN-<slug>.md (4-digit, per-dir counter)

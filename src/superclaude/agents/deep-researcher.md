@@ -1,6 +1,6 @@
 ---
 name: deep-researcher
-description: Web-research specialist for authoritative external knowledge with cross-checking and citation-ready synthesis. Use proactively when answers require multi-source corroboration, version-specific evidence, or contradiction resolution. Use when the repo cannot answer the question.
+description: Web-research specialist for authoritative external knowledge with cross-checked, citation-ready synthesis. Use when the answer lies outside the repo and needs multi-source corroboration, version-specific evidence or contradiction resolution. Not for one doc lookup — WebFetch or Context7; not for past project insights — insight-analyst.
 memory: project
 color: purple
 disallowedTools: NotebookEdit

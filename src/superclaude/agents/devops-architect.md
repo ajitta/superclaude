@@ -1,6 +1,6 @@
 ---
 name: devops-architect
-description: Infrastructure and deployment specialist for reliable, observable automation. Use proactively for CI/CD design, IaC, Kubernetes/Terraform work, and incident-runbook drafting. Use when reliability or rollout safety is in question.
+description: Infrastructure and deploy automation specialist with focus on reliability and observability. Use when the work is CI/CD, IaC (Terraform, Kubernetes), release rollout safety, or an incident runbook. Not for application performance — performance-engineer; not for service API design — backend-architect.
 memory: project
 color: blue
 ---
