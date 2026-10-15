@@ -118,7 +118,7 @@ Body-format rules (single root, list forms, quoting, cross-references, headers i
 5. Add flag to `core/FLAGS.md` modes section
 6. Run `uv run pytest tests/unit/test_mode_structure.py -v`
 7. Update `modes/README.md` table
-8. Re-sync an existing install: run `superclaude doctor --scope <s>` first, because `install --force` creates an install where none exists (gotcha `sync-scope-creates`); `make deploy` reinstalls only the CLI.
+8. Re-sync an existing install: run `superclaude doctor --scope <s>` first, because `install --force` creates an install where none exists (gotcha `sync-scope-creates`); when it reports an install, run `superclaude install --force --scope <s>`. `make deploy` reinstalls only the CLI.
 
 ## Anti-Patterns
 

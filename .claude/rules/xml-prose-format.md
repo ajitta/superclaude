@@ -91,7 +91,7 @@ When a section has a **fixed small set of named slots** that need (a) multi-line
 Slot labels are **directives, not hedging**. `<does>` (declarative present-tense — what Claude actually does), `<never>` (out-of-scope actions; give the reason when it is not obvious), `<fallback>` (escalation posture). Legacy `<should>`/`<avoid>` labels are rejected by the structural tests: a slot label states what Claude does, not what it might do.
 
 Use this form when:
-- The section sits next to a Labeled section using the same `- Label:` shape and Claude must not conflate them (Claude conflated the two when both used `- Label:` lines).
+- The section sits next to a Labeled section using the same `- Label:` shape and the two must stay distinct (repo convention, from a session observation not recorded in git in which Claude conflated two `- Label:` sections).
 - Any one slot reasonably needs multi-line prose that wouldn't fit a single `- Label:` line.
 - The label set is fixed and small (2-4 slots).
 
@@ -193,7 +193,7 @@ A `note=` attribute is allowed only when it carries one of: scope qualifier, saf
 | URLs | single quotes | `'https://docs.claude.com'` |
 | Model identifier strings | single quotes | `'claude-opus-5-5'` |
 | UI / product feature names | double quotes | `"settings"`, `"user preferences"` |
-| Tool / button names | bare or quoted | `thumbs down` button, `tool_search` |
+| Tool names | bare | `Grep`, `TaskCreate` |
 | Rule citations | full tag, name as defined in `core/rules/RULES_QUALITY.md`; bare ID only in that file or a range (`tests/unit/test_cross_references.py` enforces) | `[R18 Necessity Test]` |
 
 ## Cross-References

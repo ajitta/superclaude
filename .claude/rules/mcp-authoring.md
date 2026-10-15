@@ -96,7 +96,7 @@ If a section reads like "this is what the server is" rather than "this is how I 
 
 `scripts/context_loader.py` matches the **user prompt text** (UserPromptSubmit hook only — it does NOT intercept `mcp__<server>__*` tool calls), so a new file must be wired into these maps:
 
-1. **TRIGGER_MAP**: map user flags (`--c7`, `--tavily`, …) and keyword regexes to the file. Pick a stable flag and add a regex row.
+1. **TRIGGER_MAP**: map user flags (`--tavily`, `--play`, …) and keyword regexes to the file. Pick a stable flag and add a regex row.
 2. **COMPOSITE_FLAGS**: if the server participates in `--frontend-verify` / `--all-mcp`, add it to the matching composite-flag set so those umbrella flags pull the doc.
 3. **INSTRUCTION_MAP / TIER_0_MAP**: by default the loader injects this string *instead of* the body — Tier 1 for behavioral docs (INSTRUCTION_MAP), a Tier 0 one-line hint for tool MCPs (TIER_0_MAP; never both). The body is injected only with `--verbose-context`, or when the file is in neither map (Tier 2). Put what the model must know by default into the string.
 
@@ -113,7 +113,7 @@ Body-format rules (single root, list forms, quoting, cross-references, headers i
 3. Wire `scripts/context_loader.py`: TRIGGER_MAP (flag/keyword regex) and the INSTRUCTION_MAP or TIER_0_MAP string, plus COMPOSITE_FLAGS if part of `--frontend-verify`/`--all-mcp`.
 4. Add a row to the `mcp/README.md` server table with the flag and a one-line mission.
 5. Register in `cli/install_mcp.py::MCP_SERVERS` when `superclaude mcp` should offer it.
-6. Re-sync an existing install: run `superclaude doctor --scope <s>` first, because `install --force` creates an install where none exists (gotcha `sync-scope-creates`); `make deploy` reinstalls only the CLI. Then exercise the trigger and confirm the string (or body) lands in context.
+6. Re-sync an existing install: run `superclaude doctor --scope <s>` first, because `install --force` creates an install where none exists (gotcha `sync-scope-creates`); when it reports an install, run `superclaude install --force --scope <s>`. `make deploy` reinstalls only the CLI. Then exercise the trigger and confirm the string (or body) lands in context.
 
 ## Anti-Patterns
 
@@ -122,7 +122,7 @@ Body-format rules (single root, list forms, quoting, cross-references, headers i
 | `<tools>` table listing every tool | Duplicates CC's MCP description / ToolSearch | Remove; keep only `<call_order>` if sequence is load-bearing |
 | `<role>` paragraph describing the server | CC's MCP server description already does this | Trim `<role>` to a single `<mission>` line |
 | Adding YAML frontmatter | Breaks single-root XML invariant; loader ignores it | Remove frontmatter |
-| File present, no `context_loader.py` entry | File never loads | Wire TRIGGER_MAP and INSTRUCTION_MAP (plus COMPOSITE_FLAGS if applicable) |
+| File present, no `context_loader.py` entry | File never loads | Wire TRIGGER_MAP and the INSTRUCTION_MAP or TIER_0_MAP string (plus COMPOSITE_FLAGS if applicable) |
 | Install/setup instructions in body | Wrong layer; rots fast | Move to `cli/install_mcp.py` or `mcp/README.md` |
 | Decorative `note=` XML attributes | Token waste | See xml-prose-format.md "Attributes vs. Body" — `note=` only for scope/safety/version/reference/quantified constraint |
 | Generic "use this server for hard problems" | Vague trigger; no value over CC native | Replace with concrete trigger contexts in `<choose>` and chained `/sc:*` patterns in `<integration_patterns>` |

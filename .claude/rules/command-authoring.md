@@ -43,10 +43,10 @@ Commands install as CC skills — the harness lists each `description` for the m
 Rules:
 
 - **Shape**: `<purpose — verb-led, what it does and writes>. <tier sentence>. Not for <cheap look-alike> — <direct alternative>.` ≤300 chars. No rationale ("so a wrong fire …"): it costs listing budget and routes nothing. Mechanically enforced: `tests/unit/test_command_structure.py` (`test_description_states_one_invocation_tier`, `test_description_has_negative_trigger_gate`, `test_description_fits_the_listing_budget`).
-- **Why the cap**: all model-invocable descriptions share one listing budget, so long descriptions crowd out others (current limits: `src/superclaude/skills/sc-author/references/fields.yaml`).
+- **Why the cap**: all model-invocable descriptions share one listing budget, so long descriptions crowd out others (per-entry cap: `listing_chars` in `src/superclaude/skills/sc-author/references/fields.yaml`).
 - **Tier choice heuristic**: command mutates files, runs multi-agent orchestration, or writes committed artifacts → on-request. Read-only analysis or console-only output → auto.
 - **No `disable-model-invocation`** (in `forbidden_command_fields`): it removes the description from the listing and blocks delegated runs and sub-agent preload. On-request wording is the gate; confirmations for risky operations live in the body (`<approval_required>`, `<bounds>`). Exception: a side effect found in use or reported (`content-quality.md` §1 Trigger) — that command gets the field with the report cited, and the `schemas.yaml` lint changes in the same commit.
-- **Flipping tiers = description edit only**: swap the tier sentence, keep the negative gate and the 300-char cap. Then `uv run pytest tests/unit/test_command_structure.py`. Re-sync an existing install: run `superclaude doctor --scope <s>` first, because `install --force` creates an install where none exists (gotcha `sync-scope-creates`); `make deploy` reinstalls only the CLI.
+- **Flipping tiers = description edit only**: swap the tier sentence, keep the negative gate and the 300-char cap. Then `uv run pytest tests/unit/test_command_structure.py`. Re-sync an existing install: run `superclaude doctor --scope <s>` first, because `install --force` creates an install where none exists (gotcha `sync-scope-creates`); when it reports an install, run `superclaude install --force --scope <s>`. `make deploy` reinstalls only the CLI.
 
 ## XML Template
 
@@ -109,7 +109,7 @@ Rules:
 - `<flow>` — ≥2 numbered steps in execution order; a step that anything points at starts with `N. Label:`
 - Step pointers — anywhere in the body, point at a flow step as `the <Label> step`, or `the /sc:<name> <Label> step` for another command's flow, never by number. `test_command_structure.py` rejects `step <N>` and resolves each such label; a bare label (`after Confirm`) goes unchecked.
 - `<flags>` — every `<syntax>` flag that is not a core/FLAGS.md global gets one `- --name <value>: behavior` line; `- --name` is what the hook and `test_command_structure.py` parse. A flag already defined elsewhere in the body (a flow step, `<outputs>`, a gotcha) gets a line pointing to it (a flow step by its label, a section by topic), not a restatement. A global name the command gives its own meaning is defined here too (`test_command_structure.py` catches a `<syntax>` value core/FLAGS.md does not allow, including any value for a global that takes none; a redefinition without a value, such as reflect's `--validate`, goes unchecked), and inside this command the hook then stops injecting that name's global directive (implement's `--plan` takes a plan path, not the global 5-line plan). A pointer takes one of these forms, which `test_command_structure.py` resolves: `the <Label> step` (see Step pointers), `the <topic> section|table`, `the <name> gotcha`, `the <name> pattern`, `the <topic> threshold`, `the <Tool> entry in the tools section`; a pointer in any other form goes unchecked.
-- `<bounds>` — sub-tag form: `<does>` / `<never>` / `<fallback>` (each body is a prose sentence). `<does>` and `<never>` are required; `<fallback>` is optional (use it when out-of-scope handling is non-obvious). Sub-tag form keeps `<bounds>` structurally distinct from `<tool_guidance>`; Claude conflated the two when both used `- Label:` lines (xml-prose-format.md Sub-tag enumerations)
+- `<bounds>` — sub-tag form: `<does>` / `<never>` / `<fallback>` (each body is a prose sentence). `<does>` and `<never>` are required; `<fallback>` is optional (use it when out-of-scope handling is non-obvious). Sub-tag form keeps `<bounds>` structurally distinct from `<tool_guidance>` (reason: xml-prose-format.md Sub-tag enumerations)
 - `<handoff next="...">` — 2-3 natural next commands
 - Optional: `<flags>` (required once `<syntax>` offers a non-global flag), `<outputs>`, `<tools>`, `<gotchas>`, `<examples>`
 
@@ -125,7 +125,7 @@ Body-format rules (single root, list forms, quoting, cross-references, headers i
 4. Add `<gotchas>` for project-specific failure patterns
 5. Run `uv run pytest tests/unit/test_command_structure.py -v`
 6. Update `src/superclaude/commands/README.md` table
-7. Re-sync an existing install: run `superclaude doctor --scope <s>` first, because `install --force` creates an install where none exists (gotcha `sync-scope-creates`); `make deploy` reinstalls only the CLI.
+7. Re-sync an existing install: run `superclaude doctor --scope <s>` first, because `install --force` creates an install where none exists (gotcha `sync-scope-creates`); when it reports an install, run `superclaude install --force --scope <s>`. `make deploy` reinstalls only the CLI.
 
 ## Anti-Patterns
 

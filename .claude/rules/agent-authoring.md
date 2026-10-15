@@ -9,7 +9,7 @@ paths: ["src/superclaude/agents/**", ".claude/rules/agent-authoring.md"]
 > - Command = **WHAT TO DO** (user-invoked workflow)
 > - Mode = **HOW TO THINK** (cognitive overlay)
 
-> **What Claude Code loads.** A subagent session gets the agent's markdown body as its system prompt plus minimal environment context. It does not get the parent's Claude Code system prompt or the parent's skills; whether it gets CLAUDE.md (and through it the superclaude kernel) depends on Claude Code settings such as `omitClaudeMd`, and the on-demand rule modules never reach it. Write the body self-contained. A subagent cannot spawn further subagents (only a main thread can, via `--agent` with `Agent` in `tools`), so each agent returns one summary with no nested delegation.
+> **What Claude Code loads.** A subagent session gets the agent's markdown body as its system prompt plus minimal environment context. It does not get the parent's Claude Code system prompt or the parent's skills; whether it gets CLAUDE.md (and through it the superclaude kernel) depends on Claude Code and on the agent frontmatter field `omitClaudeMd`, and the on-demand rule modules never reach it. Write the body self-contained. A subagent cannot spawn further subagents (only a main thread can, via `--agent` with `Agent` in `tools`), so each agent returns one summary with no nested delegation.
 
 > **Don't recreate built-ins.** CC ships `Explore` (read-only codebase search, Haiku), `Plan` (read-only research for plan mode), `general-purpose` (full-tool multi-step), `statusline-setup`, and `Claude Code Guide`. A new superclaude agent must add domain-specific value beyond these; an agent that just "searches the codebase" or "researches before acting" duplicates `Explore`/`Plan` and bloats the registry.
 
@@ -99,11 +99,11 @@ When `xhigh` is worth setting: reserve `xhigh` ('extra') / `max` for difficult t
 
 Don't add `effort: xhigh` because the domain "feels" coding-heavy — the session default covers that. Inherit-by-default keeps cost control with the user (commit `8edd05d`).
 
-**`skills`** — the full skill body is injected at startup (~500 tokens each). Subagents do **not** inherit skills from the parent — list them explicitly. Skills with `disable-model-invocation: true` cannot be preloaded (CC skips them and warns to the debug log). superclaude's `sc-author` skill sets `disable-model-invocation: true`, so it cannot be preloaded; names refer to skills installed in `~/.claude/skills/` or `.claude/skills/`.
+**`skills`** — the full skill body is injected at startup (~500 tokens each). Subagents do **not** inherit skills from the parent — list them explicitly. Do not preload skills with `disable-model-invocation: true` (CC skips them and warns to the debug log). superclaude's `sc-author` skill sets `disable-model-invocation: true`, so it cannot be preloaded; names refer to skills installed in `~/.claude/skills/` or `.claude/skills/`.
 
 **`model`** — omit it: no shipped agent pins a model, and an omitted field follows Claude Code's subagent resolution order. Resolution order and the Fable opt-in paths: `agents/README.md` Model Routing (SSOT).
 
-**`permissionMode`** — most agents inherit (omit). Use `plan` for read-only research agents that should not accept edits. `bypassPermissions` writes to `.git`, `.claude`, `.vscode` etc. without prompting — never set it on a source-shipped agent. Parent `bypassPermissions` / `acceptEdits` / `auto` modes take precedence and override the subagent's setting.
+**`permissionMode`** — most agents inherit (omit). Use `plan` for read-only research agents that do not accept edits. `bypassPermissions` writes to `.git`, `.claude`, `.vscode` etc. without prompting — never set it on a source-shipped agent. Parent `bypassPermissions` / `acceptEdits` / `auto` modes take precedence and override the subagent's setting.
 
 **`color`** — SSOT: `.claude/rules/schemas.yaml` (`agent_colors`). CC accepts `red, blue, green, yellow, purple, orange, pink, cyan`. The superclaude role-group mapping uses six of these:
 `architecture` → blue | `engineering` → green | `research` → purple | `documentation` → yellow | `management` → orange | `indexing` → cyan
@@ -187,7 +187,7 @@ When memory is enabled, CC auto-injects up to the first 200 lines / 25KB of `MEM
 - All multi-word tag names use `snake_case` (`tool_guidance`, `memory_guide`).
 - Short enums: **Numbered** (`1.` ordered procedures: `<actions>`), **Plain with checkbox** (`- [ ]` verification-pending criteria: `<checklist>`), **Labeled** (`- Label:` fixed-set labels: `<tool_guidance>` Proceed/Ask First/Never), **Named** (`- identifier-name:` per-item identifiers: `<focus>`, `<outputs>`, `<gotchas>`, `<memory_guide>`).
 - `<examples>` — compact markdown table with minimal separators `|---|---|` for short uniform rows. For rich illustrations (code blocks, narrative, multi-turn prose), use a standalone `<example>` tag — its body is free-form prose, not locked to a `user:` / `assistant:` shape. `<examples>` and `<example>` are two distinct constructs (see xml-prose-format.md).
-- `<bounds>` — sub-tag form: `<does>` / `<never>` / `<fallback>` (each tag's body is a prose sentence). `<does>` and `<never>` are required; `<fallback>` is recommended (agents are long-lived; an explicit recovery posture is high-leverage). Sub-tag form keeps `<bounds>` structurally distinct from `<tool_guidance>`; Claude conflated the two when both used `- Label:` lines (xml-prose-format.md Sub-tag enumerations).
+- `<bounds>` — sub-tag form: `<does>` / `<never>` / `<fallback>` (each tag's body is a prose sentence). `<does>` and `<never>` are required; `<fallback>` is recommended (agents are long-lived; an explicit recovery posture is high-leverage). Sub-tag form keeps `<bounds>` structurally distinct from `<tool_guidance>` (reason: xml-prose-format.md Sub-tag enumerations).
 - `<handoff>` — 2-3 natural next commands.
 - The `note=` attribute is restricted to scope / safety / version / reference / quantified constraint (see xml-prose-format.md "Attributes vs. Body").
 - **Voice — third person.** Write "Claude does X", "the agent avoids Y" — never "you" or "I". Third person is this repo's convention for consistency across agents; the same body runs as a subagent and via `claude --agent`.
@@ -238,4 +238,4 @@ Body-format rules (single root, list forms, quoting, cross-references, headers i
 7. Add `<memory_guide>` (required) and `<gotchas>` (recommended).
 8. Run `uv run pytest tests/unit/test_agent_structure.py -v`.
 9. Update `src/superclaude/agents/README.md` table.
-10. Re-sync an existing install: run `superclaude doctor --scope <s>` first, because `install --force` creates an install where none exists (gotcha `sync-scope-creates`); `make deploy` reinstalls only the CLI.
+10. Re-sync an existing install: run `superclaude doctor --scope <s>` first, because `install --force` creates an install where none exists (gotcha `sync-scope-creates`); when it reports an install, run `superclaude install --force --scope <s>`. `make deploy` reinstalls only the CLI.

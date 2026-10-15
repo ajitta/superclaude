@@ -3,6 +3,7 @@
 # Always loaded: one line per trap Claude repeated in this repo. Entries are proposed by [R19 Project Gotcha Capture] or added by hand.
 
 - context-leak: Never Read a sub-agent's `*.output` file — tool noise floods the main context. Judge the summary against the check written before dispatch, not its confidence; re-read every cited file:line before acting. Contract: `src/superclaude/core/rules/RULES_DELEGATION.md`
+- compaction-drift: In a long session, rules read at session start fade after auto-compaction; when behavior drifts from a rule, re-read the rule file instead of relying on the compacted summary.
 - rule-tag-vs-concept: To count where a rule is cited, grep its exact tag (e.g., \bR18\b), not its concept word: "verification" matches prose all over the tree, the tag matches only citations.
 - find-all-copies-first: Before editing a file that may exist in more than one copy (generated artifact, vendored file, the installed copy under `.claude/superclaude/`), grep its basename across the repo, confirm the copy count, and edit the source copy.
 - grep-longline-blindspot: Grep `content` mode hides lines of ~460+ chars (`N:[Omitted long matching line]`; older CC: no match). `description:` lines are this shape — a content-mode miss is NOT evidence of absence; sweep with `files_with_matches`. Repro (ASCII, 2026-10-14): `src/superclaude/agents/verifier.md:3`
