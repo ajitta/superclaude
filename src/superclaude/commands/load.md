@@ -10,8 +10,8 @@ description: Load session context from the project memory folder (.claude/memori
   <syntax>/sc:load [target] [--type project|config|deps|checkpoint] [--refresh] [--analyze]</syntax>
 
   <flow>
-  1. Load (memory folder): Glob .claude/memories/*.md → Read pm_context when present + the newest session_*_[branch-slug].md of the current branch (slug per /sc:save <storage>); none → the newest session_* of any branch, reported as that branch's record; folder absent → skip
-  2. Load (auto memory): MEMORY.md (auto-load) + topic files linked from MEMORY.md
+  1. Load (memory folder): Glob .claude/memories/*.md → Read pm_context when present + learnings_corrections when present (corrections /sc:save keeps there while auto memory is off) + the newest session_*_[branch-slug].md of the current branch (slug per /sc:save <storage>); none → the newest session_* of any branch, reported as that branch's record; folder absent → skip
+  2. Load (auto memory): MEMORY.md is already in context (Claude Code loads it); Read a memory file it points to only when that pointer bears on the session's work
   3. Discover: project structure and requirements (Glob/Grep/Read)
   4. Activate: project context and workflow preparation
   5. Validate: context integrity and session readiness
@@ -25,7 +25,7 @@ description: Load session context from the project memory folder (.claude/memori
   </flags>
 
   <storage>
-    Storage locations (memory folder / auto memory / topic files / agent memory): SSOT in /sc:save <storage> — installed sibling commands/sc/save.md.
+    Storage locations (memory folder / auto memory / agent memory): SSOT in /sc:save <storage> — installed sibling commands/sc/save.md.
   </storage>
 
 

@@ -53,7 +53,7 @@ color: green
 
   <memory_guide>
   MEMORY.md = prior lessons; verify against current state before acting on them.
-  After task: append `- YYYY-MM-DD: Category-Name: lesson` (max 3 lines) only if a future run would act differently; consolidate at 150 lines.
+  After task: save a lesson only if a future run would act differently, in the file layout Claude Code's memory instructions give.
   - Branch-Strategy: branching model, names, protection rules. Related: devops-architect
   - Merge-Issues: recurring merge-conflict patterns and the resolution strategies that worked.
   - Ci-Integration: commit-hook behavior + CI-pipeline expectations + gotchas.

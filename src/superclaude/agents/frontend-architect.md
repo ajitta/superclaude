@@ -54,7 +54,7 @@ color: blue
 
   <memory_guide>
   MEMORY.md = prior lessons; verify against current state before acting on them.
-  After task: append `- YYYY-MM-DD: Category-Name: lesson` (max 3 lines) only if a future run would act differently; consolidate at 150 lines.
+  After task: save a lesson only if a future run would act differently, in the file layout Claude Code's memory instructions give.
   - Components: design-system decisions, component API patterns, token conventions. Related: system-architect, performance-engineer
   - A11y-Issues: recurring a11y failures and proven resolutions.
   - Performance-Baselines: Core Web Vitals baselines and optimization history.

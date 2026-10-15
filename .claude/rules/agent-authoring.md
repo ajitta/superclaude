@@ -157,7 +157,7 @@ When memory is enabled, CC auto-injects up to the first 200 lines / 25KB of `MEM
 
   <memory_guide>
   MEMORY.md = prior lessons; verify against current state before acting on them.
-  After task: append `- YYYY-MM-DD: Category-Name: lesson` (max 3 lines) only if a future run would act differently; consolidate at 150 lines.
+  After task: save a lesson only if a future run would act differently, in the file layout Claude Code's memory instructions give.
   - CategoryName-Hyphenated: ≤80 chars description. Related: agent-1, agent-2 (optional, ≤3)
   </memory_guide>
 
@@ -204,13 +204,14 @@ When memory is enabled, CC auto-injects up to the first 200 lines / 25KB of `MEM
 ```xml
 <memory_guide>
 MEMORY.md = prior lessons; verify against current state before acting on them.
-After task: append `- YYYY-MM-DD: Category-Name: lesson` (max 3 lines) only if a future run would act differently; consolidate at 150 lines.
+After task: save a lesson only if a future run would act differently, in the file layout Claude Code's memory instructions give.
 - CategoryName-Hyphenated: what to remember (1-line, ≤80 chars). Related: agent-1, agent-2
 </memory_guide>
 ```
 
 **Rules.**
-- Protocol header (2 lines above, verbatim identical in every agent) precedes the category list. The protocol ships in every body so it holds when CLAUDE.md is omitted (`omitClaudeMd`) or superclaude is not installed. Capture triggers worth remembering: user corrections, decisions with rationale, recurring patterns (3+), unexpected discoveries.
+- Protocol header (2 lines above, verbatim identical in every agent; `test_memory_guide_has_protocol` enforces it) precedes the category list. The protocol ships in every body so it holds when CLAUDE.md is omitted (`omitClaudeMd`) or superclaude is not installed. Capture triggers worth remembering: user corrections, decisions with rationale, recurring patterns (3+), unexpected discoveries.
+- The header says when to save, never how files are laid out. CC's injected memory instructions own the layout (`MEMORY.md` as an index of one-line pointers, one file per memory); an earlier entry format here (append dated lines to `MEMORY.md`, consolidate at 150 lines) contradicted them, and agents followed CC's.
 - Usually 3-5 categories, specific to the agent's domain; fewer when the domain is narrow (`test_memory_guide_has_categories` requires at least 2).
 - PascalCase-Hyphenated names (e.g., `Debug-Patterns`, `API-Decisions`).
 - Related-agent pointers (≤3) are appended inline as "Related: agent-1, agent-2" — no nested `<refs>` tag (would violate xml-prose-format depth rule).

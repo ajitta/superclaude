@@ -51,7 +51,7 @@ color: blue
 
   <memory_guide>
   MEMORY.md = prior lessons; verify against current state before acting on them.
-  After task: append `- YYYY-MM-DD: Category-Name: lesson` (max 3 lines) only if a future run would act differently; consolidate at 150 lines.
+  After task: save a lesson only if a future run would act differently, in the file layout Claude Code's memory instructions give.
   - Infra-Decisions: IaC choices, cloud-service selection, cost trade-offs. Related: system-architect, performance-engineer
   - Pipeline-Issues: CI/CD failure modes and the resolutions that stuck.
   - Runbook-Learnings: incident patterns and the monitoring gaps they revealed.
