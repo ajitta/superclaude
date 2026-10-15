@@ -568,6 +568,7 @@ The Deep Research system intelligently coordinates multiple tools:
 | Project rules, build & test loop | [`CLAUDE.md`](CLAUDE.md) |
 | Project-specific gotchas | [`.claude/rules/gotchas/`](.claude/rules/gotchas) |
 | Slash commands (36) | [`src/superclaude/commands/`](src/superclaude/commands) · `superclaude install --list-all` |
+| Orchestration commands — `/sc:agent` vs `/sc:pm` vs `/sc:task` | [`docs/reports/ORCHESTRATION_COMMANDS.md`](docs/reports/ORCHESTRATION_COMMANDS.md) |
 | Agents (24) | [`src/superclaude/agents/`](src/superclaude/agents) |
 | Modes (8) | [`src/superclaude/modes/`](src/superclaude/modes) |
 | MCP servers (3) | [`src/superclaude/mcp/`](src/superclaude/mcp) |
@@ -692,6 +693,8 @@ MIT — see [`LICENSE`](LICENSE).
 - `/sc:task` — Task tracking
 - `/sc:auto-improve` — Autonomous metric-driven improvement loop
 
+> `/sc:pm`, `/sc:task` and `/sc:agent` overlap on "analyze → delegate → track". Which one to use, with examples: [Orchestration commands: `/sc:agent` vs `/sc:pm` vs `/sc:task`](docs/reports/ORCHESTRATION_COMMANDS.md).
+
 ### 🔍 Research & Analysis
 - `/sc:research` — Deep web research
 - `/sc:business-panel` — Multi-expert business analysis
@@ -702,7 +705,7 @@ MIT — see [`LICENSE`](LICENSE).
 - `/sc:insight` — Capture structured insights to JSONL
 
 ### 🎯 Utilities
-- `/sc:agent` — Session controller: investigate → implement → review orchestration
+- `/sc:agent` — Session controller: investigate → implement → review orchestration ([vs `/sc:pm` / `/sc:task`](docs/reports/ORCHESTRATION_COMMANDS.md))
 - `/sc:init` — Interactive project environment setup
 - `/sc:index` / `/sc:index-repo` — Project docs and a compact repo index for cheap navigation
 - `/sc:recommend` — Command recommendation engine
