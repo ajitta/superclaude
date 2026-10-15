@@ -14,7 +14,8 @@ description: Save session context to the committed project memory folder (.claud
   2. Persist (memory folder): Write .claude/memories/session_[date]_[branch-slug].md — first line `branch: <name> @<short sha>`, then the summary and a `## Next actions` checklist; a second save the same day on the same branch updates it → .claude/memories/learnings_[topic].md (insights); flat basename only, no path segments; create the folder when absent
   3. Persist (auto memory): save the durable facts a later session needs (the no-ephemeral gotcha) to the auto memory folder, in the file layout Claude Code's memory instructions give; every worktree of the repo shares this folder, so name the branch in each project entry and Edit the one MEMORY.md line instead of rewriting the file
     3.5. Corrections-Review: capture each user correction not yet recorded as a feedback memory whose body names the broken rule as `violated_rule: "[RNN Name]"` [R14 Correction Capture].
-  4. Verify: Glob .claude/memories/*.md + Read MEMORY.md confirms both stores
+    3.6. Auto memory off: the system prompt names no auto memory folder (setting, safe mode, or a model without it) → skip the Persist (auto memory) step and write each correction from 3.5 to .claude/memories/learnings_corrections.md instead, so /sc:analyze still finds its `violated_rule` line
+  4. Verify: Glob .claude/memories/*.md + Read MEMORY.md confirms both stores (auto memory off: the memory folder only)
   5. Checkpoint: recovery points + progress tracking
   6. Validate: data integrity + no duplicates across stores
   7. Session Goal: if session goal set via /sc:load, evaluate completion status (done/partial/deferred)
