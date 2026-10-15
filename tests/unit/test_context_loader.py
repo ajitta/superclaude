@@ -1212,3 +1212,16 @@ class TestHarnessTurnsInjectNothing:
         body = GOAL_NOTICE_PROMPT.split(": ", 1)[1]
         out = run_loader(body, self._project(tmp_path), session_id="s")
         assert 'flag="--plan"' in out
+
+
+def test_structured_flag_loads_business_symbols_only_for_business_panel():
+    """`--structured` means isolated review in /sc:review; only the business panel's
+    `--structured` asks for the business symbol system."""
+    patterns = [p for p, path, _ in TRIGGER_MAP if path == "core/BUSINESS_SYMBOLS.md"]
+    assert patterns
+
+    def loads(prompt):
+        return any(re.search(p, prompt) for p in patterns)
+
+    assert loads("/sc:business-panel plan.md --structured")
+    assert not loads("/sc:review --scope branch --structured")

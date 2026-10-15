@@ -125,7 +125,7 @@ TRIGGER_MAP = [
     ),
     # Business symbols - supplementary reference
     (
-        r"(business.?symbol|strategic.?symbol|business.?example|panel.?example|--structured)",
+        r"(business.?symbol|strategic.?symbol|business.?example|panel.?example|/sc:business-panel\b.*--structured)",
         "core/BUSINESS_SYMBOLS.md",
         3,
     ),

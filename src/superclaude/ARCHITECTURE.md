@@ -30,7 +30,7 @@ Always-applied principles and rules that define superclaude's identity. Loaded v
 **Sub-roles:**
 - **Always-loaded** — FLAGS.md, PRINCIPLES.md, RULES.md (imported by CLAUDE_SC.md, present in every session). RULES.md is a ~0.9k-token kernel (Phase 2-1 core-lite split, measurement-gated by the evals/ 4×7 matrix): four rule classes whose loss is most expensive, plus a map of the on-demand modules.
 - **On-demand rule modules** — core/rules/RULES_{QUALITY,DELEGATION,DOCS,INTERACTION}.md — full R01–R21 detail, verification ladder, delegation matrix, doc conventions, selection protocol. Injected as full .md by context_loader on matching context (implement/review, delegation, doc-producing, /sc: commands); readable explicitly when no trigger fired.
-- **On-demand reference** — BUSINESS_SYMBOLS.md (loaded by context_loader on business-symbol/example keywords or `--structured` — not by `--business-panel`, which loads only MODE_Business_Panel.md)
+- **On-demand reference** — BUSINESS_SYMBOLS.md (loaded by context_loader on business-symbol/example keywords or `/sc:business-panel --structured` — not by `--business-panel`, which loads only MODE_Business_Panel.md)
 
 **Contract:** Files in core/ define framework-wide behavior. Always-loaded files must be concise — they consume context in every session.
 
