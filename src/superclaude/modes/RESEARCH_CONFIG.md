@@ -43,7 +43,7 @@ assess_quality | id_gaps | maybe_replan | tweak_strategy
   </tool_routing>
 
   <gates>
-planning: objectives+strategy+criteria | execution: each load-bearing claim has ≥2 independent sources, except a claim settled by one tier-1 source (a claim with only one source is labeled single-source), no open contradiction on a load-bearing claim | synthesis: coherence+clarity
+planning: objectives+strategy+criteria | execution: each load-bearing claim has ≥2 independent sources, except a claim settled by one primary source (the official documentation, specification, or primary record of the thing itself); a claim with only one source is labeled single-source, no open contradiction on a load-bearing claim | synthesis: coherence+clarity
   </gates>
 
   <credibility>
@@ -73,7 +73,7 @@ planning: objectives+strategy+criteria | execution: each load-bearing claim has 
   </output_formats>
 
   <replanning>
-replan when: sources disagree on a load-bearing claim | a load-bearing claim has fewer than 2 independent sources, unless one tier-1 source (the official documentation, specification, or primary record of the thing itself) settles it — no second source can outrank that, so label the claim single-source and continue | the core question is still unanswered
+replan when: sources disagree on a load-bearing claim | a load-bearing claim has fewer than 2 independent sources, unless one primary source (the official documentation, specification, or primary record of the thing itself) settles it — no second source can outrank that, so label the claim single-source and continue | the core question is still unanswered
   </replanning>
 
   <errors>

@@ -18,7 +18,7 @@ updated: 2026-10-15
   2. 예시와 규칙의 충돌 (현행 모델은 예시를 우선 모방하는 경향이 있다고 판단)
   3. 단발 서브에이전트 실행 모델과 맞지 않는 대화형 본문
 - **가장 시급했던 항목**은 `security-engineer.md`의 gotcha였다. "superclaude = … not web app — skip web-vuln scans"가 조건 없이 모든 사용자 프로젝트로 배포되고 있었다. P0에서 수정했다.
-- **P0(작은 수정, 큰 효과)는 브랜치 `fix/prompt-content-audit`에 적용했다** ([08-implementation.md](./08-implementation.md)). P1·P2는 [03-analysis.md](./03-analysis.md)의 제안 목록으로 남아 있다.
+- **P0(작은 수정, 큰 효과)는 브랜치 `fix/prompt-content-audit`에 적용했다** ([08-implementation.md](./08-implementation.md)). P1·P2는 3차 라운드에서 처리했다([08b](./08b-implementation-p1p2.md)).
 - **2차 라운드**([03g](./03g-analysis-core-rules.md)–[03i](./03i-analysis-commands.md), [08a](./08a-implementation-rules-commands.md), [09a](./09a-review-rules-commands.md)):
   - 가장 큰 문제는 세 가지였다.
     - brainstorm→plan 게이트를 실제로 수행하는 명령이 없었다.

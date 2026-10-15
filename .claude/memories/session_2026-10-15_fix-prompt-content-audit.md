@@ -32,5 +32,7 @@ branch: fix/prompt-content-audit @23350fc1+ (base master @0c63688d, not pushed, 
 ## Next actions
 - [x] Opus 5 `reasoning_extraction`: user decided per What's new in Opus 5.5 ("As on Claude Opus 5 … `reasoning_extraction`"); sc-prompt row deletes write-outs for every target; docstrings + 02-research corrected
 - [x] `make canary-gates` + sc-author-* and risk-flagged tasks — all pass (runs dirs deleted)
-- [ ] Merge to master when canary is green (version bump only at release)
+- [x] Final pre-merge review (3 reviewers, whole branch): "fix then merge", no Blocker/High; all findings applied (09b). Merged to master with --no-ff (not pushed)
+- [ ] Push master / release when the user asks (version bump only at release; `make release` needs CANARY_OK=1 since core changed)
+- [ ] `make sync-local` to refresh this repo's installed `.claude/` copy
 - [x] Low leftovers (08b) — done in 6bf62236

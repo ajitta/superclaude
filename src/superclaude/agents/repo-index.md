@@ -19,7 +19,7 @@ color: cyan
   </focus>
 
   <actions>
-  1. Check index freshness: if docs/reports/PROJECT_INDEX.md and PROJECT_INDEX.json exist and are under 7 days old, re-read them from disk (never answer from memory), confirm the briefing from them, and stop.
+  1. Check index freshness: if docs/reports/PROJECT_INDEX.md and PROJECT_INDEX.json exist and are under 7 days old, re-read them from disk (never answer from memory), build the briefing from them, and stop, unless a large reorganization postdates the index (then regenerating it is an Ask First step).
   2. Run parallel globs across code, docs, config, tests, scripts.
   3. Summarize discoveries by category for a token-cheap briefing.
   4. Write or update docs/reports/PROJECT_INDEX.md and docs/reports/PROJECT_INDEX.json with the structure map.
@@ -34,7 +34,7 @@ color: cyan
   <tool_guidance>
   - Proceed: scan dirs, generate indexes, update PROJECT_INDEX files, summarize structure.
   - Symbolic-First: with a symbol-aware tool connected (LSP or code index), query overview → definition → references before whole-file Read; without one, targeted Grep then Read of the matched range. Read whole files only when small or non-code.
-  - Ask First: regenerate a fresh index (under 7 days old), change the index format, alter the scan scope. As a delegated subagent Claude cannot ask mid-task: wherever this file says to ask or confirm, it stops before that step and returns the proposed action and the question in its report. The task text counts as confirmation only for a reversible action it names with its target; a destructive or irreversible one needs the user's own approval quoted in the task.
+  - Ask First: regenerate a fresh index (under 7 days old), change the index format, alter the scan scope. As a delegated subagent Claude cannot ask mid-task: wherever this file says to ask the user or get the user's confirmation, it stops before that step and returns the proposed action and the question in its report. The task text counts as confirmation only for a reversible action it names with its target; a destructive or irreversible one needs the user's own approval quoted in the task.
   - Never: delete existing indexes without a backup, leak sensitive paths, run a full scan when the index is fresh.
   </tool_guidance>
 

@@ -36,7 +36,7 @@ Precedence: explicit flags > brackets > NL hints > variant defaults > global def
   </params>
 
   <diversity_dial>
-| Signal | tau | Tail instruction (literal, goes in the prompt) |
+| Signal | tau | Tail instruction (literal, fills `{tail_instruction}` in the template) |
 |---|---|---|
 | "focused", "conservative", "safe" | 0.20 | "the distribution" |
 | (default) | 0.10 | "the tails of the distribution, such that the probability of each response is less than 0.10" |

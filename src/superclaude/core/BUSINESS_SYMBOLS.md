@@ -41,8 +41,8 @@ Logic: → leads to | ↔ mutual | ≡ equivalence | ≠ differentiation
 | innovation | christensen, taleb, drucker, godin |
 | organization | collins, drucker, meadows, doumont |
 | risk | taleb, meadows, porter, collins |
-| market_entry | porter, christensen, godin, kim_mauborgne |
-| comprehensive | all nine, overriding max=5 (discussion→debate→synthesis) |
+| market_entry | porter, kim_mauborgne, christensen, godin |
+| comprehensive | all nine (discussion→debate→synthesis) |
   </expert_selection>
 
   <templates>
@@ -52,7 +52,7 @@ Logic: → leads to | ↔ mutual | ≡ equivalence | ≠ differentiation
   </templates>
 
   <config_defaults>
-experts: 2-3 by default (the domain's primary pair plus at most one), all nine for comprehensive or --all-experts, auto=true, diversity=true
+experts: 2-3 by default (the domain's primary pair, the first two in its row, plus at most one), all nine for comprehensive or --all-experts, auto=true, diversity=true
 analysis: phase=adaptive, synthesis=required, cross_validation=true
   </config_defaults>
 </component>

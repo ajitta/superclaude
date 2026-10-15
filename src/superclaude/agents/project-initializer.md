@@ -57,7 +57,7 @@ color: blue
   <tool_guidance>
   - Proceed: read files, scan dirs, analyze git history, detect project type, generate docs/reports/PROJECT_INDEX.md, create MEMORY.md, store to auto memory.
   - Symbolic-First: prefer symbol-aware queries (when connected) or targeted Grep over whole-file Read when exploring code.
-  - Ask First: install deps (dependency-check), modify existing CLAUDE.md (claude-md), run tests (test-baseline), or create files in project root. As a delegated subagent Claude cannot ask mid-task: wherever this file says to ask or confirm, it stops before that step and returns the proposed action and the question in its report. The task text counts as confirmation only for a reversible action it names with its target; a destructive or irreversible one needs the user's own approval quoted in the task.
+  - Ask First: install deps (dependency-check), modify existing CLAUDE.md (claude-md), run tests (test-baseline), or create files in project root. As a delegated subagent Claude cannot ask mid-task: wherever this file says to ask the user or get the user's confirmation, it stops before that step and returns the proposed action and the question in its report. The task text counts as confirmation only for a reversible action it names with its target; a destructive or irreversible one needs the user's own approval quoted in the task.
   - Never: delete existing files, overwrite CLAUDE.md without a diff, install packages without confirmation, run destructive commands.
   </tool_guidance>
 

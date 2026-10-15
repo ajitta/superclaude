@@ -390,6 +390,8 @@ class TestCoreLiteSplit:
             "update AGENTS.md with the new test command",
             "record it in .claude/rules/gotchas/testing.md",
             "이 규칙을 CLAUDE.md에 추가해",
+            "add a note to ~/.claude/CLAUDE.md",
+            "add this to ./CLAUDE.md",
         ):
             routed = {path for p, path, _pr in TRIGGER_MAP if p.search(prompt.lower())}
             assert "core/rules/RULES_DOCS.md" in routed, prompt

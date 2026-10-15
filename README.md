@@ -294,12 +294,12 @@ The framework's value comes from chaining commands. Each chain has gates: a step
 | **Trivial** | Typo · 1-line fix · rename · obvious bug with known fix | Direct edit. No `/sc:*` needed. |
 | **Small** | Single file · ≤ 50 added lines · clear scope | Direct request (or `/sc:improve`) with the global **`--plan`** (5-line plan, approve) → `/sc:test` |
 | **Medium** | 3–10 files · multi-purpose · clear requirements | `/sc:plan` → `/sc:implement --plan` → `/sc:test` → `/sc:reflect` (optional: `/sc:intent` first) |
-| **Large** | > 10 files · cross-cutting · ambiguous scope · new system | `/sc:intent` → `/sc:brainstorm` → `/sc:design` → `/sc:review` → `/sc:plan` → `/sc:implement --plan` → `/sc:test` → `/sc:reflect` |
+| **Large** | > 10 files · cross-cutting · ambiguous scope · new system | `/sc:intent` → `/sc:brainstorm` → `/sc:review --scope spec` → `/sc:design` → `/sc:plan` → `/sc:implement --plan` → `/sc:test` → `/sc:reflect` |
 
 #### The full chain (large tasks)
 
 ```text
-/sc:intent   →   /sc:brainstorm   →   /sc:design   →   /sc:review   →   /sc:plan   →   /sc:implement --plan   →   /sc:test   →   /sc:reflect
+/sc:intent   →   /sc:brainstorm   →   /sc:review --scope spec   →   /sc:design   →   /sc:plan   →   /sc:implement --plan   →   /sc:test   →   /sc:reflect
    capture          discover           specify          gate              decompose       build (TDD)                 verify        learn
    (own words)      (Socratic)         (architecture)   (multi-lens)      (phases)        (per task)                  (baseline)    (capture)
 ```
@@ -371,7 +371,7 @@ Every hook runs as `superclaude hook <name>` (a console entry, dispatched before
 - Deep Research agent for autonomous web research
 - Security/performance/quality engineers catch real issues
 - Frontend / backend / system architect for design work
-- Single-trigger disambiguation matrix in core/rules/RULES_DELEGATION.md
+- Routing-overlap table ("Cross-Agent Conflict Resolution") in src/superclaude/agents/README.md
 
 </td>
 </tr>
@@ -482,7 +482,7 @@ superclaude mcp
 **Three intelligent strategies:**
 - **Planning-Only**: Direct execution for clear queries
 - **Intent-Planning**: Clarification for ambiguous requests
-- **Unified**: Collaborative plan refinement (default)
+- **Unified**: Collaborative plan refinement (without --strategy, the strategy is chosen by query clarity: clear → planning, ambiguous → intent, complex → unified)
 
 </td>
 <td width="50%">
@@ -529,7 +529,7 @@ superclaude mcp
 # Controlled depth — pass flags after the query
 /sc:research "quantum computing breakthroughs" --depth exhaustive
 
-# Strategy selection: planning | intent | unified (default)
+# Strategy selection: planning | intent | unified (default: chosen by query clarity)
 /sc:research "market analysis" --strategy planning
 
 # Pick the sources explicitly
@@ -593,7 +593,7 @@ Flags are behavioral hints that any `/sc:*` prompt accepts. The model reads them
 | `--research` | Need evidence, citations, external knowledge | Systematic investigation, evidence-based reasoning |
 | `--business-panel` | Strategy/market/competitive analysis | Multi-expert business analysis & synthesis |
 | `--introspect` | Stuck, error recovery, "why is it doing X?" | Surfaces decision logic, assumptions and alternatives (🎯⚡📊💡 markers) |
-| `--task-manage` | >3 steps · >2 dirs · >3 files | Hierarchical task organization + persistent memory checkpoints |
+| `--task-manage` | >3 steps · >2 dirs · >3 files | Hierarchical task tracking with phase checkpoints (in-session task tools; /sc:save across sessions) |
 | `--orchestrate` | Multi-tool, parallel, perf-sensitive | Tool-matrix optimization |
 | `--token-efficient` / `--uc` | Context ≥ 60 % or large ops (auto with `--safe-mode`) | Selective omission — drop what does not change the next action; never compress what stays |
 | `--vs [standard\|cot\|multi]` | "Multiple perspectives", brainstorm options | Verbalized sampling — probability-weighted candidates. Sub-params: `[k:3-7] [tau:0.01-0.20] [turns:2-5] [no-synthesis]` |
@@ -618,7 +618,7 @@ Flags are behavioral hints that any `/sc:*` prompt accepts. The model reads them
 | `--loop` | Iterative improvement — repeat until no meaningful improvement found |
 | `--iterations [n]` | Fixed iteration count — exactly N cycles, with per-iteration delta report |
 | `--plan` | 5-line plan (goal · approach · files · risks · verification) before execution |
-| `--validate` | Pre-execution risk assessment (risk > 0.7, prod) |
+| `--validate` | Pre-execution risk assessment (production, irreversible/destructive, migrations, shared infra) |
 | `--safe-mode` | Max validation, conservative behavior, auto `--uc` |
 | `--verbose-context` | Force full `.md` injection (bypass short-instruction map) |
 
@@ -661,7 +661,7 @@ MIT — see [`LICENSE`](LICENSE).
 - `/sc:brainstorm` — Structured brainstorming through Socratic dialogue
 - `/sc:design` — System architecture, APIs, component interfaces
 - `/sc:plan` — Detailed implementation plans with TDD tasks
-- `/sc:estimate` — Time/effort estimation
+- `/sc:estimate` — Relative effort sizing (S/M/L/XL)
 - `/sc:spec-panel` — Multi-expert specification review
 - `/sc:roadmap` — Phased implementation workflow from a PRD or feature doc
 
@@ -704,7 +704,7 @@ MIT — see [`LICENSE`](LICENSE).
 ### 🎯 Utilities
 - `/sc:agent` — Session controller: investigate → implement → review orchestration
 - `/sc:init` — Interactive project environment setup
-- `/sc:index` / `/sc:index-repo` — Repository indexing (94% token reduction)
+- `/sc:index` / `/sc:index-repo` — Project docs and a compact repo index for cheap navigation
 - `/sc:recommend` — Command recommendation engine
 - `/sc:select-tool` — Intelligent MCP tool selection
 - `/sc:sc` — Command dispatcher (routes to the other `/sc:*` commands)

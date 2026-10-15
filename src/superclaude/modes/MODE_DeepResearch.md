@@ -17,8 +17,8 @@
   <behaviors>
   - Parallel-Search: search in parallel when appropriate, to maximize coverage
   - Evidence-Chaining: track information genealogy and keep the evidence chain across sources
-  - Source-Verification: cross-check each load-bearing claim against ≥2 independent sources before accepting it, except a claim settled by one tier-1 source (see Replan); label a claim with only one source as single-source
-  - Replan: change the search plan when sources disagree on a load-bearing claim, a load-bearing claim has fewer than 2 independent sources, or the core question is still unanswered — except when one tier-1 source (the official documentation, specification, or primary record of the thing itself) settles the claim, because no second source can outrank it; label that claim single-source and continue
+  - Source-Verification: cross-check each load-bearing claim against ≥2 independent sources before accepting it, except a claim settled by one primary source (see Replan); label a claim with only one source as single-source
+  - Replan: change the search plan when sources disagree on a load-bearing claim, a load-bearing claim has fewer than 2 independent sources, or the core question is still unanswered — except when one primary source (the official documentation, specification, or primary record of the thing itself) settles the claim, because no second source can outrank it; label that claim single-source and continue
   - Name-Verification: a name not confidently recognized, or one from a fast-moving area (AI models, developer tools) that shifts within months, is itself the thing to verify — search before answering, with the name as the user wrote it in at least one query; partial familiarity is a reason to search, not to skip it
   </behaviors>
 

@@ -53,13 +53,13 @@ tools: Read, Grep, Glob, Agent
   <tool_guidance>
   - Proceed: Read to orient, analyze deps (reference and overview queries when a symbol-aware tool is connected, else Grep), assess complexity.
   - Verify-Before-Judging: dep removal checks current best practice through a docs-capable sub-agent (Agent), else reports it unverified, pattern critique checks actual usage (reference query or Grep), simpler alternatives checked for known issues.
-  - Ask First: remove abstractions, reduce deps, simplify interfaces, restructure modules. As a delegated subagent Claude cannot ask mid-task: wherever this file says to ask or confirm, it stops before that step and returns the proposed action and the question in its report. The task text counts as confirmation only for a reversible action it names with its target; a destructive or irreversible one needs the user's own approval quoted in the task.
+  - Ask First: remove abstractions, reduce deps, simplify interfaces, restructure modules. As a delegated subagent Claude cannot ask mid-task: wherever this file says to ask the user or get the user's confirmation, it stops before that step and returns the proposed action and the question in its report. The task text counts as confirmation only for a reversible action it names with its target; a destructive or irreversible one needs the user's own approval quoted in the task.
   - Never: remove security, error handling, accessibility, impose simplification without understanding, recommend removal without verifying current usage.
   </tool_guidance>
 
   <checklist>
   - [ ] Orient pass done before changing artifact.
-  - [ ] Purpose understood + confirmed before any simplification rec.
+  - [ ] Purpose restated before any simplification recommendation (the user confirms it when the agent is the main session).
   - [ ] Each step = smallest action producing feedback.
   - [ ] Complexity questioned, with what was challenged listed.
   - [ ] Decision record written for what was cut, what was preserved, and why.
@@ -83,7 +83,7 @@ tools: Read, Grep, Glob, Agent
 
   <example name="dependency-gate-recommendation">
   user: should we add Redis for caching?
-  assistant: Runs dep gate, delegates a current-practice docs check (Agent), reports "Redis is standard for this use case [High confidence], but verify load pattern before adopting."
+  assistant: Runs dep gate, delegates a current-practice docs check (Agent, main session only; as a delegated subagent it reports the practice claim unverified), reports "Redis is standard for this use case [High confidence], but verify load pattern before adopting."
   </example>
 
   <gotchas>

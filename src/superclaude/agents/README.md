@@ -119,7 +119,7 @@ Agents declare persistent memory via `memory` frontmatter. Source files ship `me
 1. **Uncertainty**: scope unclear → escalate to `ask_first`
 2. **Cross-boundary**: action hits another agent domain → escalate
 3. **Risk**: >10% chance of breaking change → escalate
-4. **Context pressure**: harness-reported context usage >85% → compress output, don't skip steps; with no reported figure, don't estimate one
+4. **Context pressure**: harness-reported context usage ≥60% (the --uc point) → compress output, don't skip steps; with no reported figure, don't estimate one
 
 ## Cross-Agent Conflict Resolution
 

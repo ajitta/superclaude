@@ -20,7 +20,7 @@ description: Systematic code cleanup — remove dead code and optimize project s
   <flags>
   - --type code|imports|files|docs|all: what to clean; actions per type in the outputs table and the Execute step.
   - --safe: change only the safe tier of the auto-fix threshold (unused imports, dead variables); list approval-required items (file deletions, exported functions, config files, shared modules) without changing them; unrelated to the global --safe-mode.
-  - --aggressive: also change approval-required items, each after the user approves it; remove code with no static reference only after a search for dynamic references (string lookups, reflection, config) finds none.
+  - --aggressive: also change approval-required items once the user approves them (per the auto-fix threshold: file deletions take one confirmation per batch); remove code with no static reference only after a search for dynamic references (string lookups, reflection, config) finds none.
   - --interactive: show each change group and apply it only after the user accepts it; under --dry-run nothing is applied and the accepted groups form the preview.
   - --dry-run: read-only preview for any --type, nothing applied; for --type docs, what it reports is in the validator checks section.
   - --apply: required for any --type docs change; without it --type docs only reports. Changes are limited to frontmatter shape and README `## Documents` regeneration; see the manual-gate gotcha.

@@ -40,6 +40,23 @@
 | commands의 남은 축약, pm description의 Direct 전략, implement.md의 `[R02 Status Check]` | Low. implement는 메인 스레드이고 `/sc:implement`가 RULES_QUALITY를 주입하므로 태그가 해석된다 |
 | `.claude/agents/frontend-architect.md`(설치본)에 WCAG 2.1 | 설치본은 추적되지 않음. `make sync-local` 대상 |
 
+## 병합 전 최종 리뷰
+
+브랜치 전체(`master..HEAD`)를 리뷰어 3명이 최종 상태 기준으로 다시 봤다(core·modes·loader / agents / commands·skills·docs). 세 명 모두 "수정 후 병합", Blocker·High 없음. 반영한 지적:
+
+| 심각도 | 지적 | 반영 |
+|---|---|---|
+| Med | 고정 Ask First 문장의 "ask or confirm"이 '검증'의 뜻인 confirm(테스트로 확인 등)까지 멈춤 지점으로 만듦 | "ask the user or get the user's confirmation"으로 좁힘(24개 agent, 테스트, 작성 규칙) |
+| Med | system-architect의 핵심 산출물(제안)이 Ask First에 남음; simplicity-guide 체크리스트의 "confirmed before any rec" | 적용만 Ask First, 제안은 산출물. 체크리스트는 "restated", 사용자 확인은 메인 세션에서 |
+| Med | `/sc:research` 경로에서 단일 출처 예외가 MODE·RESEARCH_CONFIG에만 있고 command·agent에는 없음; "tier-1" 정의가 표와 괄호에서 다름 | 예외를 "primary source (공식 문서·명세·1차 기록)"로 이름 붙여 research.md, deep-researcher, MODE, RESEARCH_CONFIG에 통일 |
+| Med | sc-prompt 이월 행 규칙에 대상 조건이 없어 Opus 5 자신의 delta까지 막힘 | "For a 5.5 target …; for 'claude-opus-5' the Opus rows apply as written" |
+| Med | design을 거치면 plan이 draft discovery를 검사하지 않아 review 게이트 우회; README 체인이 brainstorm→design→review | plan은 출처와 무관하게 폴더의 draft discovery에서 멈춤. README 체인을 brainstorm→review(spec)→design→plan으로 |
+| Med | review step 8이 delegated 행만 리뷰해 전체 리뷰 없이 Spec gate 통과 가능 | "in addition to the Review step" |
+| Med | root README의 research 기본 전략(unified), --validate 기준(risk > 0.7), --task-manage, estimate, index-repo 94% | 현재 동작으로 갱신 |
+| Low | loader 트리거가 `~/.claude/CLAUDE.md`, `./CLAUDE.md`를 놓침(점이 든 경로) | `(?:[^.\n]|\.(?=\S))`로 경로 안 점 허용, 양성 테스트 2건 |
+| Low | BUSINESS_SYMBOLS의 삭제된 `max=5` 참조, market_entry 순서와 primary pair | 정리, "primary pair = 행의 처음 두 명" |
+| Low | core/README·agents/README·commands/README 설명, docstring의 Opus 5 `bio` 단정, VS "goes in the prompt", project-manager의 `/sc:pm` 본문 로드 주장, repo-index 재편 후 신선 인덱스, verifier description 4문장, `omitClaudeMd` 템플릿 누락, review handoff에 `/sc:plan` 없음, cleanup 확인 단위, 테스트 상수 위치, root README의 RULES_DELEGATION 매트릭스 참조, 이 README의 "P1·P2 남음" | 모두 반영 |
+
 ## 검증 (반영 후)
 
 `uv run pytest -q` 3539 passed, 3 skipped. scripts 149 passed. lint 통과.

@@ -36,7 +36,7 @@ color: purple
   <tool_guidance>
   - Proceed: run `jq` queries on .claude/insights.jsonl, apply semantic relevance, format results, read insight context.
   - Fallback: if `jq` is unavailable, use a Python one-liner (`python -c "import json; ..."`) or Grep with JSON-line patterns, and state that structured filtering was reduced.
-  - Ask First: append annotation entries — the user must confirm each relevance link before the append. As a delegated subagent Claude cannot ask mid-task: wherever this file says to ask or confirm, it stops before that step and returns the proposed action and the question in its report. The task text counts as confirmation only for a reversible action it names with its target; a destructive or irreversible one needs the user's own approval quoted in the task.
+  - Ask First: append annotation entries — the user must confirm each relevance link before the append. As a delegated subagent Claude cannot ask mid-task: wherever this file says to ask the user or get the user's confirmation, it stops before that step and returns the proposed action and the question in its report. The task text counts as confirmation only for a reversible action it names with its target; a destructive or irreversible one needs the user's own approval quoted in the task.
   - Never: modify or delete existing insight entries, search across projects, auto-trigger on session start.
   </tool_guidance>
 

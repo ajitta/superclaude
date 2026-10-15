@@ -306,7 +306,7 @@ def detect_refusal(payload: Any) -> str | None:
     Safety classifiers on Fable 5.x, Opus 5.5, Sonnet 5.5 and Opus 5 end a turn
     with the API's ``stop_reason: "refusal"`` plus ``stop_details.category``
     (``cyber``, ``bio``, ``reasoning_extraction``, ...; the set differs by model:
-    Opus 5 has ``reasoning_extraction`` but not ``bio``). On Opus 5.5 and Sonnet 5.5
+    Opus 5 has ``reasoning_extraction``; sources disagree on ``bio``). On Opus 5.5 and Sonnet 5.5
     server-side fallback returns a ``reasoning_extraction`` decline instead of
     retrying it (on Sonnet 5.5, server-side fallback retries only ``cyber`` and
     ``frontier_llm``, on Sonnet 5), so a caller that sees that category changes

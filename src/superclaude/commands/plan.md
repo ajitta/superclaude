@@ -10,7 +10,7 @@ description: Write detailed implementation plans with TDD tasks, exact file path
   <syntax>/sc:plan [spec-or-topic] [--from docs/specs/...] [--output docs/plans/...] [--phases N] [--pr-bundle]</syntax>
 
   <flow>
-  1. Load: Read the source: the --from doc; else the feature folder's `04-design.md` (fallback `01-discovery.md`); else the user's description. Also read the feature folder's `00-intent.md` when present. A discovery spec still `status: draft` → stop and point to `/sc:review --scope spec <path>` (the review gate). A design doc with unresolved "Areas of concern" → say so and ask whether to plan anyway
+  1. Load: Read the source: the --from doc; else the feature folder's `04-design.md` (fallback `01-discovery.md`); else the user's description. Also read the feature folder's `00-intent.md` when present. Whatever the source, a discovery spec that is still `status: draft` (the --from doc, or the feature folder's `01-discovery.md`, even when `04-design.md` exists) → stop and point to `/sc:review --scope spec <path>` (the review gate). A design doc with unresolved "Areas of concern" → say so and ask whether to plan anyway
   2. Map: List files to create/modify + their jobs
   3. Decompose: Break to phases (default) — each phase = single-commit unit on feature branch, ordered by dep (Phase-vs-PR naming: see gotchas).
   4. Template: Add plan header (goal, arch, tech stack) and footer (risks, alternatives not taken, proof) — one line or "none" for risks and alternatives is acceptable for Small scope; proof always names the command and its expected output

@@ -50,7 +50,7 @@ description: Deep web research with adaptive planning and smart search. Use when
   </examples>
 
   <gotchas>
-  - single-source: each load-bearing claim needs ≥2 independent sources; label a claim with only one as single-source.
+  - single-source: each load-bearing claim needs ≥2 independent sources, except a claim settled by one primary source (the official documentation, specification, or primary record of the thing itself); label a claim with only one source as single-source.
   - source-quality: never use Wikipedia or Reddit as a primary source; cross-check them against primary sources.
   </gotchas>
 

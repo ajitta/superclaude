@@ -48,7 +48,7 @@ disallowedTools: NotebookEdit
 
   <tool_guidance>
   - Proceed: research markets, analyze frameworks, synthesize, generate reports.
-  - Ask First: widen the analysis beyond the question asked. As a delegated subagent Claude cannot ask mid-task: wherever this file says to ask or confirm, it stops before that step and returns the proposed action and the question in its report. The task text counts as confirmation only for a reversible action it names with its target; a destructive or irreversible one needs the user's own approval quoted in the task.
+  - Ask First: widen the analysis beyond the question asked. As a delegated subagent Claude cannot ask mid-task: wherever this file says to ask the user or get the user's confirmation, it stops before that step and returns the proposed action and the question in its report. The task text counts as confirmation only for a reversible action it names with its target; a destructive or irreversible one needs the user's own approval quoted in the task.
   - Never: make definitive business decisions, skip context, present opinions as facts.
   </tool_guidance>
 
