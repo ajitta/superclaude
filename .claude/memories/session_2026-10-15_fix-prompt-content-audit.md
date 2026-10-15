@@ -1,13 +1,13 @@
-branch: fix/prompt-content-audit @23350fc1+ (base master @0c63688d, not pushed, no upstream)
+branch: fix/prompt-content-audit @fb2f7422, merged into master @d3feaf49 (--no-ff); master pushed (origin/master @b1db7ffd, checked 2026-10-15)
 
 # Session 2026-10-15 — fix/prompt-content-audit (prompt-content audit, rounds 1–3)
 
 ## Where it stands
 - Static audit of shipped markdown/XML content for Opus 5.5 / Sonnet 5.5 / Fable 5.1: does the model read it as intended. Code behavior out of scope. Audited independently of the installed superclaude (isolated sub-agents; no installed `~/.claude` or `.claude/superclaude` content read as reference)
-- Feature folder `docs/features/prompt-content-audit/` (README `phase: implementing`) is the record: README → 03 (round 1 summary; §4 P0/P1/P2 all marked done) → 03a–03f (round 1 areas) → 03g–03i (round 2) → 08/08a/08b implementation → 09/09a/09b independent reviews
+- Feature folder `docs/features/prompt-content-audit/` (README `phase: complete`) is the record: README → 03 (round 1 summary; §4 P0/P1/P2 all marked done) → 03a–03f (round 1 areas) → 03g–03i (round 2) → 08/08a/08b implementation → 09/09a/09b independent reviews
 - Round 3 (08b, 09b) closed the remaining P1/P2 items and the 08a deferred list
 - Last full run: `uv run pytest` 3539 passed / 3 skipped; `tests/unit/scripts` 149 passed; `make lint` clean. Worktree clean
-- Canary green at 6bf62236: canary-gates 4 tasks / 7 hard gates pass; sc-author-* ×10, destructive-named-path, probe-introspect-marker, implement-checkpoint pass (08b). NOT done: merge to master; `make sync-local` (local `.claude/` install still has the old content — not tracked by git)
+- Canary green at 6bf62236: canary-gates 4 tasks / 7 hard gates pass; sc-author-* ×10, destructive-named-path, probe-introspect-marker, implement-checkpoint pass (08b). Merged and pushed; local `.claude/` install matches src (checked 2026-10-15). NOT done: release
 
 ## What changed (commits, oldest first)
 - aa5b0e87, 42f9045e: round 1 P0 — superclaude-only gotchas made conditional, example↔rule conflicts, PRINCIPLES R12 reversibility branch
@@ -32,7 +32,8 @@ branch: fix/prompt-content-audit @23350fc1+ (base master @0c63688d, not pushed, 
 ## Next actions
 - [x] Opus 5 `reasoning_extraction`: user decided per What's new in Opus 5.5 ("As on Claude Opus 5 … `reasoning_extraction`"); sc-prompt row deletes write-outs for every target; docstrings + 02-research corrected
 - [x] `make canary-gates` + sc-author-* and risk-flagged tasks — all pass (runs dirs deleted)
-- [x] Final pre-merge review (3 reviewers, whole branch): "fix then merge", no Blocker/High; all findings applied (09b). Merged to master with --no-ff (not pushed)
-- [ ] Push master / release when the user asks (version bump only at release; `make release` needs CANARY_OK=1 since core changed)
-- [ ] `make sync-local` to refresh this repo's installed `.claude/` copy
+- [x] Final pre-merge review (3 reviewers, whole branch): "fix then merge", no Blocker/High; all findings applied (09b). Merged to master with --no-ff
+- [x] Push master — origin/master @b1db7ffd
+- [ ] Release when the user asks (version bump only at release; `make release` needs CANARY_OK=1 since core changed)
+- [x] `make sync-local` — installed `.claude/` copy matches src (checked 2026-10-15)
 - [x] Low leftovers (08b) — done in 6bf62236
