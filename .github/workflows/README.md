@@ -2,7 +2,7 @@
 
 ## test.yml
 
-**Triggers**: `make ci` and `make release` (both dispatch it on `origin/master` and wait), manual dispatch (`gh workflow run Tests --ref <branch>`), and pull requests to `master` except those that only change `.serena/` (session memories, which no test reads). A push does not run it: users get `stable`, the default branch, so `master` is checked when a release is cut.
+**Triggers**: `make ci` and `make release` (both dispatch it on `origin/master` and wait), manual dispatch (`gh workflow run Tests --ref <branch>`), and pull requests to `master`. A push does not run it: users get `stable`, the default branch, so `master` is checked when a release is cut.
 
 **Jobs**:
 - **test**: Python 3.10 and 3.13 (the oldest supported version and the newest)
