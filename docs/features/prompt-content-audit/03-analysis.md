@@ -131,11 +131,11 @@
 ### P1 — 구조
 
 5. 24개 agent 공통으로 서브에이전트 실행 규칙 한 줄을 넣는다(P-2).
-6. "Use proactively"는 2~3개만 남기고, 나머지는 "Use when the user asks…" + "Not for…" 형태로 바꾼다. `agent-authoring.md`와 description 테스트를 함께 개정한다(P-6).
+6. **(완료, 25c1ceea — security-engineer 1개만 유지)** "Use proactively"는 2~3개만 남기고, 나머지는 "Use when the user asks…" + "Not for…" 형태로 바꾼다. `agent-authoring.md`와 description 테스트를 함께 개정한다(P-6).
 7. agent 본문의 R-ID 태그(Med)를 지우거나 한 줄 근거 문장으로 바꾼다. initializer의 R06 오기부터 처리한다. 항상 로드되는 PRINCIPLES·RULES 커널의 R-ID(03a, High)도 같은 방식으로 처리한다(P-5).
 8. FLAGS의 측정 불가 조건을 관찰 가능한 조건(prod 대상, 파괴적 명령 등)으로 바꾸고, ctx 기준치를 하나로 통일한다(P-7).
 9. FLAGS의 모드 항목에 "사용자가 입력하는 플래그"임을 명시하거나, 자동 감지 시 해당 MODE 파일을 Read하도록 지시한다. `RULES.md:34`에 user 범위 설치 경로를 추가한다(P-5).
-10. RULES_DOCS/RULES_DELEGATION의 저장소 이력과 사용자명, verifier 예시의 저장소 고유 파일명을 일반화한다(P-1).
+10. **(완료, 9a247cb6·f2da52b1)** RULES_DOCS/RULES_DELEGATION의 저장소 이력과 사용자명, verifier 예시의 저장소 고유 파일명을 일반화한다(P-1).
 11. High이지만 아직 미처리인 영역별 항목:
     - sc-prompt mirror가 금지된 이전 모델 섹션 이월을 수행함(03e)
     - sc-prompt Fable 블록이 원문 없이 의역만 있어 문안을 지어내게 함(03e)
