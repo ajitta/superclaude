@@ -4,7 +4,7 @@ paths: ["src/superclaude/commands/**", ".claude/rules/command-authoring.md"]
 
 # Command Authoring Rules
 
-> **Decision gate:** Make command for **user-facing workflow entry** (`/sc:*` slash commands).
+> **Decision gate:** Create a command for **user-facing workflow entry** (`/sc:*` slash commands).
 > - Command = **WHAT TO DO** (ordered workflow)
 > - Agent = **WHO TO BE** (domain expertise, auto-delegated)
 > - Mode = **HOW TO THINK** (cognitive overlay)
@@ -13,7 +13,7 @@ paths: ["src/superclaude/commands/**", ".claude/rules/command-authoring.md"]
 
 ## YAML Frontmatter
 
-Minimal — only `description` required. Commands inherit all tools + parent model.
+Minimal — only `description` is required. Commands inherit all tools and the parent model.
 
 ```yaml
 ---
@@ -23,11 +23,11 @@ description: One-line purpose of this slash command  # required, >10 chars, acti
 
 ### Forbidden fields
 
-Never add — SSOT: `.claude/rules/schemas.yaml` (`forbidden_command_fields`):
+Never add these — SSOT: `.claude/rules/schemas.yaml` (`forbidden_command_fields`):
 
 - `name` — derived from filename (e.g., `build.md` → `/sc:build`)
 - `permissionMode`, `memory`, `color` — agent-only
-- `autonomy` — not official CC field
+- `autonomy` — not an official CC field
 - `model`, `context`, `agent`, `hooks` — CC accepts them on command files; superclaude keeps commands on the parent model in the main session (see the decision gate above)
 - `disable-model-invocation` — CC accepts it; superclaude keeps every command reachable by delegation (see Trigger Policy)
 
@@ -37,7 +37,7 @@ Commands install as CC skills — the harness lists each `description` for the m
 
 | Tier | Tier sentence | Use for | Examples |
 |---|---|---|---|
-| Auto | "Use when asked …" (natural request, no `/sc:X` needed — a typed `/sc:X` runs without the description) | Read/analysis workflows — false fire cheap | analyze, explain, review, research |
+| Auto | "Use when asked …" (natural request, no `/sc:X` needed — a typed `/sc:X` runs without the description) | Read/analysis workflows — a false fire is cheap | analyze, explain, review, research |
 | On-request | "On request only — the user's /sc:X or a workflow step that names it." (exact sentence) | Mutates files, writes committed artifacts, orchestrates sub-agents, long-running loops | cleanup, build, implement, plan, auto-improve |
 
 Rules:
@@ -103,13 +103,13 @@ Rules:
 - `<component name="...">` matches filename stem, `type="command"`
 - All multi-word tag names use `snake_case`
 - Short enums: **Numbered** (`1.` for ordered procedures: `<flow>`), **Labeled** (`- Label:` fixed-set labels: `<tool_guidance>` Proceed/Ask First/Never), **Named** (`- identifier-name:` per-item identifiers: `<outputs>`, `<tools>`, `<gotchas>`)
-- `<examples>` — compact markdown table, minimal separators `|---|---|` for short uniform rows. For richer illustrations (code blocks, narrative, multi-turn prose), use standalone `<example>` tag — body free-form prose, not locked to `user:` / `assistant:` shape. `<examples>` and `<example>` are two distinct constructs (see xml-prose-format.md)
-- `<role command="/sc:command-name">` — `command` attribute carries slash identifier (matches filename stem); body contains `<mission>` only. Per xml-prose-format "Attributes vs. Body", short identifiers belong as attributes.
+- `<examples>` — compact markdown table with minimal separators `|---|---|` for short uniform rows. For richer illustrations (code blocks, narrative, multi-turn prose), use a standalone `<example>` tag — its body is free-form prose, not locked to a `user:` / `assistant:` shape. `<examples>` and `<example>` are two distinct constructs (see xml-prose-format.md)
+- `<role command="/sc:command-name">` — `command` attribute carries the slash identifier (matches filename stem); body contains `<mission>` only. Per xml-prose-format "Attributes vs. Body", short identifiers belong as attributes.
 - `<mission>` — shares ≥30% significant words with frontmatter `description`
 - `<flow>` — ≥2 numbered steps in execution order; a step that anything points at starts with `N. Label:`
 - Step pointers — anywhere in the body, point at a flow step as `the <Label> step`, or `the /sc:<name> <Label> step` for another command's flow, never by number. `test_command_structure.py` rejects `step <N>` and resolves each such label; a bare label (`after Confirm`) goes unchecked.
 - `<flags>` — every `<syntax>` flag that is not a core/FLAGS.md global gets one `- --name <value>: behavior` line; `- --name` is what the hook and `test_command_structure.py` parse. A flag already defined elsewhere in the body (a flow step, `<outputs>`, a gotcha) gets a line pointing to it (a flow step by its label, a section by topic), not a restatement. A global name the command gives its own meaning is defined here too (`test_command_structure.py` catches a `<syntax>` value core/FLAGS.md does not allow, including any value for a global that takes none; a redefinition without a value, such as reflect's `--validate`, goes unchecked), and inside this command the hook then stops injecting that name's global directive (implement's `--plan` takes a plan path, not the global 5-line plan). A pointer takes one of these forms, which `test_command_structure.py` resolves: `the <Label> step` (see Step pointers), `the <topic> section|table`, `the <name> gotcha`, `the <name> pattern`, `the <topic> threshold`, `the <Tool> entry in the tools section`; a pointer in any other form goes unchecked.
-- `<bounds>` — sub-tag form: `<does>` / `<never>` / `<fallback>` (each body prose sentence). `<does>` + `<never>` required; `<fallback>` optional (use when out-of-scope handling non-obvious). Sub-tag form keeps `<bounds>` structurally distinct from `<tool_guidance>`; Claude conflated the two when both used `- Label:` lines (xml-prose-format.md Sub-tag enumerations)
+- `<bounds>` — sub-tag form: `<does>` / `<never>` / `<fallback>` (each body is a prose sentence). `<does>` and `<never>` are required; `<fallback>` is optional (use it when out-of-scope handling is non-obvious). Sub-tag form keeps `<bounds>` structurally distinct from `<tool_guidance>`; Claude conflated the two when both used `- Label:` lines (xml-prose-format.md Sub-tag enumerations)
 - `<handoff next="...">` — 2-3 natural next commands
 - Optional: `<flags>` (required once `<syntax>` offers a non-global flag), `<outputs>`, `<tools>`, `<gotchas>`, `<examples>`
 
@@ -119,9 +119,9 @@ Body-format rules (single root, list forms, quoting, cross-references, headers i
 
 ## Checklist
 
-1. Create `src/superclaude/commands/<name>.md` with frontmatter + XML; define every non-global `<syntax>` flag in `<flags>`
+1. Create `src/superclaude/commands/<name>.md` with frontmatter and XML; define every non-global `<syntax>` flag in `<flags>`
 2. Verify `<component name="...">` matches filename
-3. Write a specific `description` (shown in the `/` command picker and the skill listing) — pick trigger tier + negative gate per "Trigger Policy"
+3. Write a specific `description` (shown in the `/` command picker and the skill listing) — pick a trigger tier and a negative gate per "Trigger Policy"
 4. Add `<gotchas>` for project-specific failure patterns
 5. Run `uv run pytest tests/unit/test_command_structure.py -v`
 6. Update `src/superclaude/commands/README.md` table

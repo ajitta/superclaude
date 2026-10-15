@@ -4,16 +4,16 @@ paths: ["src/superclaude/modes/**", ".claude/rules/mode-authoring.md"]
 
 # Mode Authoring Rules
 
-> **Decision gate:** Create mode only for **cognitive posture** — how Claude thinks, communicates, prioritizes.
+> **Decision gate:** Create a mode only for **cognitive posture** — how Claude thinks, communicates, and prioritizes.
 > - Mode = **HOW TO THINK** (mindset)
 > - Command = **WHAT TO DO** (workflow)
 > - Agent = **WHO TO BE** (domain expertise)
 
-Mindset-shifting overlay, not procedure. Injected on-demand by `context_loader.py` TRIGGER_MAP.
+Mindset-shifting overlay, not a procedure. Injected on-demand by `context_loader.py` TRIGGER_MAP.
 
 ## No Frontmatter
 
-Modes not CC-native — no YAML frontmatter. Start directly with `<component>`.
+Modes are not CC-native — no YAML frontmatter. Start directly with `<component>`.
 
 ```markdown
 <!-- WRONG -->
@@ -88,7 +88,7 @@ Every mode **must** define all four axes (enforced by `tests/unit/test_mode_stru
 
 ## Content Boundaries
 
-**Allowed** (if essential to mindset):
+**Allowed** (if essential to the mindset):
 - Expert framework mappings (Business Panel mode)
 - Domain vocabulary tables where the terms are the mindset
 
@@ -103,7 +103,7 @@ Note: symbol systems and abbreviation maps as an *output contract* were removed 
 
 ## Supporting Config Files
 
-Operational parameters too detailed for mode itself go in sibling `type="config"` files (e.g., `RESEARCH_CONFIG.md` — depth profiles, confidence thresholds). Not subject to mode validation (no 4-axis requirement); only the cross-reference check (`test_cross_references.py`) reads them.
+Operational parameters too detailed for the mode itself go in sibling `type="config"` files (e.g., `RESEARCH_CONFIG.md` — depth profiles, confidence thresholds). They are not subject to mode validation (no 4-axis requirement); only the cross-reference check (`test_cross_references.py`) reads them.
 
 ## Format
 
@@ -113,7 +113,7 @@ Body-format rules (single root, list forms, quoting, cross-references, headers i
 
 1. Create `src/superclaude/modes/MODE_<Name>.md` starting with `<component>`
 2. Define all 4 axes: thinking, communication, priorities, behaviors
-3. Add `<bounds>` sub-tag form `<does>` / `<never>` / `<fallback>` (each tag's body is prose sentence; `<does>` + `<never>` required; `<fallback>` recommended for modes — explicit recovery when overlay doesn't apply) and `<handoff>`
+3. Add `<bounds>` sub-tag form `<does>` / `<never>` / `<fallback>` (each tag's body is a prose sentence; `<does>` and `<never>` are required; `<fallback>` is recommended for modes — explicit recovery when the overlay doesn't apply) and `<handoff>`
 4. Add trigger to `scripts/context_loader.py` TRIGGER_MAP
 5. Add flag to `core/FLAGS.md` modes section
 6. Run `uv run pytest tests/unit/test_mode_structure.py -v`
