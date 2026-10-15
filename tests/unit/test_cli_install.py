@@ -329,8 +329,42 @@ class TestAgentMemoryScopeConflict:
         success, message = install_all(base_path=base, force=True, scope="local")
 
         assert not success
-        assert "memory: project" in message, message
+        assert "memory: project" in message and "--scope project" in message
+        # Uninstalling a team's committed install deletes its tracked files.
+        assert "uninstall" not in message, message
         assert self._memory_values(base) == {"memory: project"}
+
+    def test_a_tracked_legacy_user_install_upgrades(self, tmp_path):
+        """A dotfiles repo tracking ~/.claude is no team install."""
+        import subprocess
+
+        subprocess.run(["git", "init", "-q", str(tmp_path)], check=True)
+        base = tmp_path / ".claude"
+        assert install_all(base_path=base, force=True, scope="project")[0]
+        subprocess.run(
+            ["git", "-C", str(tmp_path), "add", ".claude/agents"], check=True
+        )
+
+        success, message = install_all(base_path=base, force=True, scope="user")
+
+        assert success, message
+        assert self._memory_values(base) == {"memory: user"}
+
+    def test_mixed_scopes_name_each_uninstall(self, tmp_path):
+        base = tmp_path / ".claude"
+        assert install_all(base_path=base, force=True, scope="local")[0]
+        agent = next((base / "agents").glob("*.md"))
+        agent.write_text(
+            agent.read_text(encoding="utf-8").replace("memory: local", "memory: user"),
+            encoding="utf-8",
+        )
+
+        success, message = install_all(base_path=base, force=True, scope="project")
+
+        assert not success
+        assert "'superclaude uninstall --scope local'" in message, message
+        assert "'superclaude uninstall --scope user'" in message, message
+        assert "--scope local, user" not in message, message
 
 
 class TestFrameworkArtifactsAlwaysUpdate:

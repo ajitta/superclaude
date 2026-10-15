@@ -85,6 +85,8 @@ def find_agent_memory_conflict(base_path: Path, scope: str) -> str | None:
     `memory: project` counts only when the agent files are tracked by git, the
     mark of a team's project install: user and local installs made before the
     scope rewrite (v4.20.1) carry it too, and upgrading those must keep working.
+    A user install never counts it — `.claude` at $HOME is user scope (see
+    `detect_scope`), and a dotfiles repo tracking it is no team install.
     """
     agents_dir = _get_target_dir("agents", base_path)
     found: dict = {}
@@ -99,7 +101,7 @@ def find_agent_memory_conflict(base_path: Path, scope: str) -> str | None:
 
     project_files = found.get("project")
     if project_files:
-        tracked = _run(
+        tracked = scope != "user" and _run(
             ["git", "-C", str(base_path.parent), "ls-files", "--"]
             + [str(p) for p in project_files]
         )
@@ -108,13 +110,22 @@ def find_agent_memory_conflict(base_path: Path, scope: str) -> str | None:
 
     if not found:
         return None
-    other = ", ".join(sorted(found))
-    return (
-        f"❌ The agents in {agents_dir} were installed for scope '{other}' "
-        f"(memory: {other}). Installing scope '{scope}' over them would move "
-        f"where every agent keeps its memory. Install with --scope {other}, or "
-        f"run 'superclaude uninstall --scope {other}' first."
+    lead = (
+        f"❌ The agents in {agents_dir} were installed for another scope "
+        f"({', '.join(f'memory: {s}' for s in sorted(found))}). Installing "
+        f"scope '{scope}' over them would move where every agent keeps its memory."
     )
+    if "project" in found:
+        # Uninstalling would delete the team's committed files from the tree.
+        return f"{lead} They are a committed team install: use --scope project."
+    others = sorted(found)
+    if len(others) == 1:
+        return (
+            f"{lead} Install with --scope {others[0]}, or run "
+            f"'superclaude uninstall --scope {others[0]}' first."
+        )
+    steps = " and ".join(f"'superclaude uninstall --scope {s}'" for s in others)
+    return f"{lead} Run {steps} first."
 
 
 def ensure_agent_memory_dir(base_path: Path, scope: str) -> Path | None:
