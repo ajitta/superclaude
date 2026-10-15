@@ -1,10 +1,10 @@
 # superclaude MCP Server Documentation
 
-Tool ref — docs + config for integrated MCP servers.
+Tool reference: documentation and configuration for the integrated MCP servers. This README is not installed; the `MCP_*.md` docs are.
 
 ## Content Delivery
 
-MCP docs load on-demand via `context_loader.py` through flag/keyword triggers. Servers in the table below install via `superclaude mcp`: the interactive picker lists them all and installs only the numbers entered, or name them with `--servers`. Context7 + Tavily are externally provided — see their sections below.
+MCP docs load on-demand via `context_loader.py` through flag/keyword triggers. Servers in the table below install via `superclaude mcp`: the interactive picker lists them all and installs only the numbers entered, or name them with `--servers`. Context7 and Tavily are externally provided — see their sections below.
 
 ## Available MCP Servers
 
@@ -14,7 +14,7 @@ MCP docs load on-demand via `context_loader.py` through flag/keyword triggers. S
 |--------|------|-------------------|---------|
 | Playwright | `--play` | `@playwright/mcp` v0.0.81 (Microsoft official) | Browser automation, E2E testing, network mocking — CLI alternative: `playwright-cli` + its skill (below) |
 | Chrome DevTools | `--perf` | `chrome-devtools-mcp` v1.9.0 | Perf traces, Lighthouse (a11y/SEO/best-practices), heap-snapshot memory analysis |
-| Tavily | `--tavily` | `tavily-mcp` v0.2.22 (npm) | Web search, extract, crawl, map, research — optional in-conv MCP; prefer Tavily Agent Skills (below) |
+| Tavily | `--tavily` | `tavily-mcp` v0.2.22 (npm) | Web search, extract, crawl, map, research — optional in-conversation MCP; prefer the Tavily Agent Skills (below) |
 
 Server **launch flags** (token-saving `--slim`, `--persistent` profiles, `--test-id-attribute`, `--secrets`, timeouts) are upstream package options set in the MCP client config, not superclaude behavior — read the package's own README for the current set. The `MCP_*.md` docs deliberately carry none of them (`.claude/rules/mcp-authoring.md` trim rule: no version/install/setup blocks).
 
@@ -60,12 +60,12 @@ Microsoft ships both `@playwright/mcp` (the `--play` server above) and `playwrig
 
 | From → To | Purpose |
 |-----------|---------|
-| Tavily → Context7 | Updates searched → stable docs given |
-| Tavily → Playwright | URLs found → complex content extracted |
-| Playwright → DevTools | Flow automated → perf analyzed |
+| Tavily → Context7 | Recent updates found → stable docs looked up |
+| Tavily → Playwright | URLs found → complex page content extracted |
+| Playwright → DevTools | Flow automated → performance analyzed |
 
 ## Related
 
-- `core/FLAGS.md` — MCP flag defs + auto-detection
+- `core/FLAGS.md` — MCP flag definitions and auto-detection
 - `cli/install_mcp.py` — Install registry (`MCP_SERVERS`) for the servers `superclaude mcp` offers (Context7 deliberately absent — connector, not install target)
 - `scripts/context_loader.py` — On-demand delivery mechanism

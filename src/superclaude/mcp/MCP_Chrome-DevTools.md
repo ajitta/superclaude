@@ -1,11 +1,11 @@
 <component name="chrome-devtools" type="mcp">
   <role>
-    <mission>Browser debug, perf analysis, a11y audit, mem profiling via Chrome DevTools Protocol</mission>
+    <mission>Browser debugging, performance analysis, accessibility auditing and memory profiling via the Chrome DevTools Protocol</mission>
   </role>
 
   <choose>
-  <use>Core Web Vitals measure (CLS, LCP, INP, TTFB) via `performance_start_trace` → `performance_stop_trace` → `performance_analyze_insight`, Lighthouse audits over a11y / SEO / best-practices via `lighthouse_audit` (it excludes performance — traces carry that), heap-snapshot mem analysis with `compare_heapsnapshots` + retainer/retaining-path queries, auto WCAG a11y checks on live pages, network req-timing + bundle-size + cache-behavior inspect, and `pageId`-routed multi-agent flows on diff pages.</use>
-  <never>live browser interact or E2E user-journey scripts (use Playwright via `--play`), static code analysis (use native Claude for code review), and server-side backend profile (use native tools — `perf`, flamegraph).</never>
+  <use>Core Web Vitals measurement (CLS, LCP, INP, TTFB) via `performance_start_trace` → `performance_stop_trace` → `performance_analyze_insight`, including the clicks or typing an INP reading needs during the trace; Lighthouse audits over accessibility, SEO and best practices via `lighthouse_audit` (it excludes performance — traces carry that); heap-snapshot memory analysis with `compare_heapsnapshots` and retainer and retaining-path queries; automated WCAG accessibility checks on live pages; inspection of network request timing, bundle size and cache behavior; and `pageId`-routed multi-agent workflows on different pages.</use>
+  <never>scripted E2E user journeys or test suites (use Playwright via `--play`, which asserts page state; DevTools drives the page only as far as a measurement needs), static code analysis (use native Claude for code review), and server-side backend profiling (use native tools — `perf`, flamegraph).</never>
   </choose>
 
   <cwv_thresholds>
@@ -36,9 +36,9 @@
   </examples>
 
   <bounds>
-    <does>perf profile, Lighthouse audits, Core Web Vitals, mem analysis, a11y audit, network inspect, and multi-agent pageId routing.</does>
-    <never>live browser interact, E2E test, static code analysis, and backend profile.</never>
-    <fallback>Use Playwright for E2E, native Claude for code review.</fallback>
+    <does>performance profiling, Lighthouse audits, Core Web Vitals, memory analysis, accessibility auditing, network inspection, and multi-agent pageId routing.</does>
+    <never>scripted E2E journeys and tests, static code analysis, and backend profiling.</never>
+    <fallback>Use Playwright for E2E journeys and tests, native Claude for code review.</fallback>
   </bounds>
 
   <handoff next="/sc:analyze --focus perf /sc:improve --type performance /sc:troubleshoot"/>

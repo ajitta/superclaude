@@ -1,18 +1,18 @@
 <component name="tavily" type="mcp">
   <role>
-    <mission>Web search + real-time info retrieval for research + current events</mission>
+    <mission>Web search and real-time information retrieval for research and current events</mission>
   </role>
 
   <choose>
-  <use>structured multi-source web search with advanced filter (domain include/exclude, time/date range, raw-content depth) beyond native `WebSearch`; multi-source research with synthesized output; post-knowledge-cutoff current-info lookup.</use>
-  <never>single-page extract (use native `WebFetch`); code gen or local file ops.</never>
+  <use>the Tavily Agent Skills first when they are installed (the six operation skills `tavily-search`, `tavily-extract`, `tavily-crawl`, `tavily-map`, `tavily-research` and `tavily-dynamic-search`; `tavily-cli` and `tavily-best-practices` cover setup and reference): they filter results before they enter context and can save crawl output as local markdown. This MCP covers the same work when the skills are absent: structured multi-source web search with advanced filters (domain include/exclude, time and date ranges, raw-content depth) beyond native `WebSearch`, multi-source research with synthesized output, and lookups of current information past the knowledge cutoff.</use>
+  <never>single-page extraction through the MCP's `tavily_extract` (use native `WebFetch`, or the `tavily-extract` skill where installed), and code generation or local file operations.</never>
   </choose>
 
   <search_patterns>
-  This doc covers the optional in-conversation MCP path. `tavily-mcp` exposes `tavily_search`, `tavily_extract`, `tavily_crawl`, `tavily_map` and `tavily_research`; the Tavily Agent Skills (install per `mcp/README.md`) cover the same operations plus `tavily-dynamic-search` for filtering large results outside the context window. Pattern set below applies to `tavily_search`.
+  This doc covers the optional in-conversation MCP path. `tavily-mcp` exposes `tavily_search`, `tavily_extract`, `tavily_crawl`, `tavily_map` and `tavily_research`; the Tavily Agent Skills (install guide: 'https://docs.tavily.com/documentation/agent-skills') cover the same operations plus `tavily-dynamic-search` for filtering large results outside the context window. The patterns below apply to `tavily_search`.
 
   - Basic: query → ranked results.
-  - Domain: query + `include_domains:[arxiv,github]`.
+  - Domain: query + `include_domains:["arxiv.org","github.com"]`.
   - Time: query + `time_range:week`.
   - Date: query + `start_date` / `end_date`.
   - Deep: query + `include_raw_content:true`.
@@ -33,9 +33,9 @@
   </examples>
 
   <bounds>
-    <does>web search, multi-source synthesis, current info retrieval.</does>
-    <never>code gen, local file ops.</never>
-    <fallback>Prefer the Tavily Agent Skills — the six operation skills (`tavily-search`, `tavily-extract`, `tavily-crawl`, `tavily-map`, `tavily-research`, `tavily-dynamic-search`; `tavily-cli` and `tavily-best-practices` are setup and reference) — the primary integration: results are filtered before they enter context and crawl output can be saved as local markdown. MCP unavailable and skills not installed → native WebSearch for simple queries, WebFetch for single pages.</fallback>
+    <does>web search, multi-source synthesis, and current information retrieval.</does>
+    <never>code generation and local file operations.</never>
+    <fallback>When neither the skills nor the MCP is available, use native WebSearch for simple queries and WebFetch for single pages.</fallback>
   </bounds>
 
   <handoff next="/sc:research /sc:analyze"/>
