@@ -366,6 +366,39 @@ class TestAgentMemoryScopeConflict:
         assert "'superclaude uninstall --scope user'" in message, message
         assert "--scope local, user" not in message, message
 
+    def test_a_value_naming_no_scope_is_ignored(self, tmp_path):
+        """A hand-edited value names no store; advising `--scope none` is invalid."""
+        base = tmp_path / ".claude"
+        assert install_all(base_path=base, force=True, scope="local")[0]
+        agent = next((base / "agents").glob("*.md"))
+        agent.write_text(
+            agent.read_text(encoding="utf-8").replace("memory: local", "memory: none"),
+            encoding="utf-8",
+        )
+
+        success, message = install_all(base_path=base, force=True, scope="local")
+
+        assert success, message
+        assert "--scope none" not in message, message
+
+    @pytest.mark.parametrize("value", ['"user"', "'user'", "user  # personal"])
+    def test_a_quoted_or_commented_scope_still_counts(self, tmp_path, value):
+        """YAML reads these as `user`, so Claude Code keeps memory in user scope."""
+        base = tmp_path / ".claude"
+        assert install_all(base_path=base, force=True, scope="local")[0]
+        agent = next((base / "agents").glob("*.md"))
+        agent.write_text(
+            agent.read_text(encoding="utf-8").replace(
+                "memory: local", f"memory: {value}"
+            ),
+            encoding="utf-8",
+        )
+
+        success, message = install_all(base_path=base, force=True, scope="local")
+
+        assert not success
+        assert "memory: user" in message and "--scope user" in message, message
+
 
 class TestFrameworkArtifactsAlwaysUpdate:
     """hooks.json is a build output, so an upgrade must refresh it.

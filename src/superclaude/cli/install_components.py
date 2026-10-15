@@ -69,7 +69,10 @@ _AGENT_MEMORY_DIRS = {
 }
 
 
-_AGENT_MEMORY_LINE = re.compile(r"^memory: *(\S+) *$", re.MULTILINE)
+# The value as YAML reads it: optional matching quotes, optional trailing comment.
+_AGENT_MEMORY_LINE = re.compile(
+    r"""^memory:[ \t]+(["']?)([^\s"'#]+)\1(?:[ \t]+#.*)?[ \t]*$""", re.MULTILINE
+)
 
 
 def find_agent_memory_conflict(base_path: Path, scope: str) -> str | None:
@@ -87,6 +90,10 @@ def find_agent_memory_conflict(base_path: Path, scope: str) -> str | None:
     scope rewrite (v4.20.1) carry it too, and upgrading those must keep working.
     A user install never counts it — `.claude` at $HOME is user scope (see
     `detect_scope`), and a dotfiles repo tracking it is no team install.
+
+    A value that names no scope (a hand edit) names no store to move away
+    from, and advice built from it would be an invalid `--scope`, so it is
+    ignored.
     """
     agents_dir = _get_target_dir("agents", base_path)
     found: dict = {}
@@ -96,8 +103,9 @@ def find_agent_memory_conflict(base_path: Path, scope: str) -> str | None:
             match = _AGENT_MEMORY_LINE.search(path.read_text(encoding="utf-8"))
         except (OSError, UnicodeDecodeError):
             continue
-        if match and match.group(1) != scope:
-            found.setdefault(match.group(1), []).append(path)
+        value = match.group(2) if match else None
+        if value and value != scope and value in _AGENT_MEMORY_DIRS:
+            found.setdefault(value, []).append(path)
 
     project_files = found.get("project")
     if project_files:
