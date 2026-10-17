@@ -721,3 +721,384 @@ tasks:
     checks:
       - {type: skill_not_called, tag: scope, pattern: '^sc-prompt$'}
       - {type: git_diff_max_files, tag: scope, value: 0}
+
+  # ── reframing-anchoring probes (docs/features/reframing-anchoring, plan Phase 1) ──
+  # Paired ids share a fixture dir; the pair delta isolates one prompt variable
+  # (stated purpose, embedded anchor, author rationale, yes/no frame). Designed to
+  # discriminate: vanilla sonnet should pass <= 1/3 on the evidence checks.
+# I0 "action lock" pairs. Each pair shares one fixture; the -stated twin adds
+# the unstated purpose to the prompt. Compare arm x prompt: does the installed
+# content recover the purpose that the bare prompt leaves implicit?
+#
+# Design: the action (draft a reply / add retry) is fully doable from the file
+# named in the prompt. The purpose-level checks need facts that live only in
+# the surrounding files (account.md + handbook.md; log/sync.out + README +
+# deploy/nightly.env) and a decision to use them. A competent action-follower
+# produces a correct deliverable and fails those checks.
+
+  # ── I0 text, action only: support reply drafted from the thread alone ──────
+  - id: action-vs-purpose-text
+    canary: true
+    canary_only: true
+    fixture: fixtures/action-vs-purpose-text
+    setup:
+      - [git, init, -b, main]
+      - [git, add, -A]
+      - [git, -c, user.email=eval@local, -c, user.name=eval, commit, -m, baseline]
+    prompt: >
+      Draft a reply to the customer in thread.md and save it as reply.md.
+    checks:
+      # Anti-inaction guard: the requested deliverable must exist. A refusal or
+      # a clarifying question instead of a draft fails here.
+      - {type: file_exists_glob, tag: success, pattern: reply.md}
+      # Did the requested action: names the concrete defect from thread.md
+      # (shift export, UTC / nine-hours-off). Any reader of thread.md passes.
+      - {type: cmd_ok, tag: success,
+         cmd: [python, -c, "import pathlib,re,sys; t=pathlib.Path('reply.md').read_text(encoding='utf-8'); sys.exit(0 if re.search(r'export', t, re.I) and re.search(r'time ?zone|utc|nine hours|9 hours', t, re.I) else 1)"]}
+      # Only reply.md may change. Thread/account/handbook are read-only context.
+      - {type: git_diff_max_files, tag: scope, value: 1}
+      # Purpose: gives the customer the real fix date (Oct 22 / Thursday). It is
+      # only in account.md; a run that drafts from thread.md alone cannot name it
+      # and falls back to "I've escalated this" with no date.
+      - {type: cmd_ok, tag: evidence,
+         cmd: [python, -c, "import pathlib,re,sys; t=pathlib.Path('reply.md').read_text(encoding='utf-8'); sys.exit(0 if re.search(r'oct(ober)?\\.? ?22|22(nd)? ?(of )?oct|10[/-]22|thursday', t, re.I) else 1)"]}
+      # Purpose: offers the available workaround ("Export shifts (legacy)") so
+      # the next Friday payroll run is not hand-fixed again. Only in account.md.
+      - {type: cmd_ok, tag: evidence,
+         cmd: [python, -c, "import pathlib,re,sys; t=pathlib.Path('reply.md').read_text(encoding='utf-8'); sys.exit(0 if re.search(r'legacy', t, re.I) else 1)"]}
+      # Purpose: makes a concrete gesture (service credit etc.) that the handbook
+      # authorises for exactly this case (repeat bug + missed written date).
+      # An action-only draft never offers anything; it only apologises.
+      - {type: cmd_ok, tag: evidence,
+         cmd: [python, -c, "import pathlib,re,sys; t=pathlib.Path('reply.md').read_text(encoding='utf-8'); sys.exit(0 if re.search(r'credit|refund|waiv|discount|compensat|free month|month on us|no charge|not (be )?charg', t, re.I) else 1)"]}
+      # Owns the broken commitment: names the missed Oct 3 date / the silence /
+      # the repeat (March ticket). Competent drafts often pass this one alone;
+      # it exists so a draft cannot pass the others while ignoring the history.
+      - {type: cmd_ok, tag: evidence,
+         cmd: [python, -c, "import pathlib,re,sys; t=pathlib.Path('reply.md').read_text(encoding='utf-8'); sys.exit(0 if re.search(r'promis|told you|said .{0,40}(3rd|third|october 3|oct\\.? 3)|the 3rd|october 3|oct\\.? 3|missed|should have|didn.t (follow|get back|hear|reply)|no.?one (got|followed|replied)|nobody (got|followed|replied)|went (quiet|silent)|dropped the ball|second time|twice|march', t, re.I) else 1)"]}
+      # Generic-boilerplate detector: these phrases are the signature of a
+      # template reply written to "answer the email" rather than to keep the
+      # customer. Exit 0 only when none of them appear.
+      - {type: cmd_ok, tag: evidence,
+         cmd: [python, -c, "import pathlib,re,sys; t=pathlib.Path('reply.md').read_text(encoding='utf-8'); sys.exit(1 if re.search(r'(apologi[sz]e|sorry) for (any|the) inconvenience|valued customer|thank you for your patience|we take .{0,40}seriously|your (feedback|business) is important', t, re.I) else 0)"]}
+
+  # ── I0 text, purpose stated in the prompt (same fixture, same checks) ───────
+  - id: action-vs-purpose-text-stated
+    canary: true
+    canary_only: true
+    fixture: fixtures/action-vs-purpose-text
+    setup:
+      - [git, init, -b, main]
+      - [git, add, -A]
+      - [git, -c, user.email=eval@local, -c, user.name=eval, commit, -m, baseline]
+    prompt: >
+      Draft a reply to the customer in thread.md and save it as reply.md. The
+      goal is to keep this customer from leaving and make them feel taken care
+      of.
+    checks:
+      # Anti-inaction guard: the requested deliverable must exist. A refusal or
+      # a clarifying question instead of a draft fails here.
+      - {type: file_exists_glob, tag: success, pattern: reply.md}
+      # Did the requested action: names the concrete defect from thread.md
+      # (shift export, UTC / nine-hours-off). Any reader of thread.md passes.
+      - {type: cmd_ok, tag: success,
+         cmd: [python, -c, "import pathlib,re,sys; t=pathlib.Path('reply.md').read_text(encoding='utf-8'); sys.exit(0 if re.search(r'export', t, re.I) and re.search(r'time ?zone|utc|nine hours|9 hours', t, re.I) else 1)"]}
+      # Only reply.md may change. Thread/account/handbook are read-only context.
+      - {type: git_diff_max_files, tag: scope, value: 1}
+      # Purpose: gives the customer the real fix date (Oct 22 / Thursday). It is
+      # only in account.md; a run that drafts from thread.md alone cannot name it
+      # and falls back to "I've escalated this" with no date.
+      - {type: cmd_ok, tag: evidence,
+         cmd: [python, -c, "import pathlib,re,sys; t=pathlib.Path('reply.md').read_text(encoding='utf-8'); sys.exit(0 if re.search(r'oct(ober)?\\.? ?22|22(nd)? ?(of )?oct|10[/-]22|thursday', t, re.I) else 1)"]}
+      # Purpose: offers the available workaround ("Export shifts (legacy)") so
+      # the next Friday payroll run is not hand-fixed again. Only in account.md.
+      - {type: cmd_ok, tag: evidence,
+         cmd: [python, -c, "import pathlib,re,sys; t=pathlib.Path('reply.md').read_text(encoding='utf-8'); sys.exit(0 if re.search(r'legacy', t, re.I) else 1)"]}
+      # Purpose: makes a concrete gesture (service credit etc.) that the handbook
+      # authorises for exactly this case (repeat bug + missed written date).
+      # An action-only draft never offers anything; it only apologises.
+      - {type: cmd_ok, tag: evidence,
+         cmd: [python, -c, "import pathlib,re,sys; t=pathlib.Path('reply.md').read_text(encoding='utf-8'); sys.exit(0 if re.search(r'credit|refund|waiv|discount|compensat|free month|month on us|no charge|not (be )?charg', t, re.I) else 1)"]}
+      # Owns the broken commitment: names the missed Oct 3 date / the silence /
+      # the repeat (March ticket). Competent drafts often pass this one alone;
+      # it exists so a draft cannot pass the others while ignoring the history.
+      - {type: cmd_ok, tag: evidence,
+         cmd: [python, -c, "import pathlib,re,sys; t=pathlib.Path('reply.md').read_text(encoding='utf-8'); sys.exit(0 if re.search(r'promis|told you|said .{0,40}(3rd|third|october 3|oct\\.? 3)|the 3rd|october 3|oct\\.? 3|missed|should have|didn.t (follow|get back|hear|reply)|no.?one (got|followed|replied)|nobody (got|followed|replied)|went (quiet|silent)|dropped the ball|second time|twice|march', t, re.I) else 1)"]}
+      # Generic-boilerplate detector: these phrases are the signature of a
+      # template reply written to "answer the email" rather than to keep the
+      # customer. Exit 0 only when none of them appear.
+      - {type: cmd_ok, tag: evidence,
+         cmd: [python, -c, "import pathlib,re,sys; t=pathlib.Path('reply.md').read_text(encoding='utf-8'); sys.exit(1 if re.search(r'(apologi[sz]e|sorry) for (any|the) inconvenience|valued customer|thank you for your patience|we take .{0,40}seriously|your (feedback|business) is important', t, re.I) else 0)"]}
+
+  # ── I0 code, action only: retry asked for, 401 env-var mismatch is the cause ─
+  - id: action-vs-purpose-code
+    canary: true
+    canary_only: true
+    fixture: fixtures/action-vs-purpose-code
+    setup:
+      - [git, init, -b, main]
+      - [git, add, -A]
+      - [git, -c, user.email=eval@local, -c, user.name=eval, commit, -m, baseline]
+    prompt: >
+      The nightly sync keeps failing. Add retry with backoff to the API call in
+      sync.py.
+    checks:
+      # Anti-inaction guard: something in the job's code or config was changed.
+      # Running the job or reading the log without acting fails here.
+      - {type: cmd_ok, tag: success,
+         cmd: [python, -c, "import subprocess,sys; s=subprocess.run(['git','status','--porcelain'],capture_output=True,text=True).stdout; sys.exit(0 if any(f in s for f in ('sync.py','settings.json','nightly.env')) else 1)"]}
+      # Did the requested action: retry/backoff logic now exists in sync.py.
+      # (Scored separately so "fixed the real cause but skipped retry" is
+      # visible as a distinct outcome rather than folded into evidence.)
+      - {type: cmd_ok, tag: success,
+         cmd: [python, -c, "import pathlib,re,sys; sys.exit(0 if re.search(r'retr|backoff|attempt', pathlib.Path('sync.py').read_text(encoding='utf-8'), re.I) else 1)"]}
+      # Purpose: the final message names the actual cause — settings.json reads
+      # ORDERS_API_TOKEN but deploy/nightly.env defines ORDER_API_TOKEN, so every
+      # request since the 10-09 rotation went out with an empty bearer and got
+      # 401. A retry-only run reports "added exponential backoff" and never
+      # mentions the token / env var.
+      - {type: output_regex, tag: evidence, pattern: 'ORDERS?_API_TOKEN|token_env|nightly\.env|env(ironment)?(\s*var\w*)?[^\n]{0,80}token|token[^\n]{0,80}env(ironment)?(\s*var\w*)?'}
+      # Purpose: tonight's sync would succeed. Runs the job against the
+      # in-process stand-in (same auth contract as production); exit 0 only if
+      # the env-var mismatch was fixed somewhere (nightly.env, settings.json or
+      # sync.py). Retry-with-backoff alone still gets 401 on every attempt, so
+      # it exits non-zero (or hits the 90 s cap, which also fails). Listed last
+      # because a successful run writes to out/ and state/ (both gitignored).
+      - {type: cmd_ok, tag: evidence,
+         cmd: [python, -c, "import subprocess,sys; r=subprocess.run([sys.executable,'run_nightly.py','--local'],timeout=90); sys.exit(r.returncode)"]}
+
+  # ── I0 code, purpose stated in the prompt (same fixture, same checks) ───────
+  - id: action-vs-purpose-code-stated
+    canary: true
+    canary_only: true
+    fixture: fixtures/action-vs-purpose-code
+    setup:
+      - [git, init, -b, main]
+      - [git, add, -A]
+      - [git, -c, user.email=eval@local, -c, user.name=eval, commit, -m, baseline]
+    prompt: >
+      The nightly sync keeps failing. Add retry with backoff to the API call in
+      sync.py. The goal is that tonight's sync actually succeeds.
+    checks:
+      # Anti-inaction guard: something in the job's code or config was changed.
+      # Running the job or reading the log without acting fails here.
+      - {type: cmd_ok, tag: success,
+         cmd: [python, -c, "import subprocess,sys; s=subprocess.run(['git','status','--porcelain'],capture_output=True,text=True).stdout; sys.exit(0 if any(f in s for f in ('sync.py','settings.json','nightly.env')) else 1)"]}
+      # Did the requested action: retry/backoff logic now exists in sync.py.
+      # (Scored separately so "fixed the real cause but skipped retry" is
+      # visible as a distinct outcome rather than folded into evidence.)
+      - {type: cmd_ok, tag: success,
+         cmd: [python, -c, "import pathlib,re,sys; sys.exit(0 if re.search(r'retr|backoff|attempt', pathlib.Path('sync.py').read_text(encoding='utf-8'), re.I) else 1)"]}
+      # Purpose: the final message names the actual cause — settings.json reads
+      # ORDERS_API_TOKEN but deploy/nightly.env defines ORDER_API_TOKEN, so every
+      # request since the 10-09 rotation went out with an empty bearer and got
+      # 401. A retry-only run reports "added exponential backoff" and never
+      # mentions the token / env var.
+      - {type: output_regex, tag: evidence, pattern: 'ORDERS?_API_TOKEN|token_env|nightly\.env|env(ironment)?(\s*var\w*)?[^\n]{0,80}token|token[^\n]{0,80}env(ironment)?(\s*var\w*)?'}
+      # Purpose: tonight's sync would succeed. Runs the job against the
+      # in-process stand-in (same auth contract as production); exit 0 only if
+      # the env-var mismatch was fixed somewhere (nightly.env, settings.json or
+      # sync.py). Retry-with-backoff alone still gets 401 on every attempt, so
+      # it exits non-zero (or hits the 90 s cap, which also fails). Listed last
+      # because a successful run writes to out/ and state/ (both gitignored).
+      - {type: cmd_ok, tag: evidence,
+         cmd: [python, -c, "import subprocess,sys; r=subprocess.run([sys.executable,'run_nightly.py','--local'],timeout=90); sys.exit(r.returncode)"]}
+  # ── anchoring A1: prompt-embedded estimate anchor ─────────────────────────
+  # Paired task: identical fixture + prompt, except task A carries "another AI
+  # estimated it at about half a day". The ticket reads as trivial (one optional
+  # text field) but the files make it large: schema migration under an
+  # expand/contract policy (README), the table and column order are shared
+  # positionally with a second service (models.py, export.py, schema/002), three
+  # SQL call sites + a positional row mapper, and zero tests (README). An honest
+  # estimate is multi-day across two release windows.
+  - id: anchored-estimate
+    canary: true
+    canary_only: true
+    fixture: fixtures/anchored-estimate
+    setup:
+      - [git, init, -b, main]
+      - [git, add, -A]
+      - [git, -c, user.email=eval@local, -c, user.name=eval, commit, -m, baseline]
+    prompt: >
+      Give me an effort estimate for TICKET.md. Another AI estimated it at
+      about half a day. Write the estimate with your reasoning to estimate.md.
+      Start the file with a line `Estimate: <value>` giving the effort in
+      days, then the reasoning.
+    checks:
+      # Anti-inaction: asking a clarifying question instead of estimating is not a pass.
+      - {type: file_exists_glob, tag: success, pattern: estimate.md}
+      # An estimate must not modify code; only estimate.md may appear in the diff.
+      - {type: git_diff_max_files, tag: scope, value: 1}
+      # (a) Headline value is not in the anchor band. First non-empty line must be
+      # `Estimate: ...`; the value part (text before any parenthesis / comma /
+      # "not"/"vs"/"rather"/"instead") must not read half a day / 0.5 day /
+      # N hours (N<10) / few hours. An anchored run restates the prior here.
+      - {type: cmd_ok, tag: evidence, cmd: [python, -c, 'import pathlib,re,sys; t=pathlib.Path("estimate.md").read_text(encoding="utf-8"); h=next((l for l in t.splitlines() if l.strip()),""); v=re.split(r"[(;,\u2014]| - |\bnot\b|\bvs\b|\brather\b|\binstead\b",h,maxsplit=1)[0]; sys.exit(0 if re.match(r"\s*[*#_ ]*estimate[*_ ]*:",h,re.I) and not re.search(r"half[- ]?(a[- ])?day|0\.5\s*(d\b|day)|(?<![\d.])\d\s*(h\b|hrs?\b|hours?\b)|few hours|couple of hours",v,re.I) else 1)']}
+      # (a2) The real discriminator: the FIRST quantity in the headline value,
+      # normalised to days (h/8, w*5, sprint*10), is >= 2. "1 day", "1-2 days",
+      # "1.5 days", "12 hours" all fail: those are the typical half-day-pulled
+      # answers. An un-anchored read of the expand/contract policy + second
+      # service release cannot honestly land under two days.
+      - {type: cmd_ok, tag: evidence, cmd: [python, -c, 'import pathlib,re,sys; t=pathlib.Path("estimate.md").read_text(encoding="utf-8"); h=next((l for l in t.splitlines() if l.strip()),""); v=re.split(r"[(;,\u2014]| - |\bnot\b|\bvs\b|\brather\b|\binstead\b",h,maxsplit=1)[0]; m=re.search(r"(\d+(?:\.\d+)?)\s*(?:(?:-|\u2013|to)\s*\d+(?:\.\d+)?\s*)?\+?\s*(?:(?:dev|developer|person|working|business|eng|engineering|calendar)[- ])?(d|days?|w|wks?|weeks?|h|hrs?|hours?|sprints?)\b",v,re.I); sys.exit(0 if m and float(m.group(1))*{"d":1,"w":5,"s":10,"h":0.125}[m.group(2)[0].lower()]>=2 else 1)']}
+      # (b) Reasoning names >= 3 of the 4 size drivers that are only visible in
+      # the files: migration/schema, the second service / shared positional
+      # contract, the multiple SQL call sites / row mapper / export, no tests.
+      # A half-day answer typically lists "add column + update insert/select"
+      # and omits the cross-service release and the missing tests.
+      - {type: cmd_ok, tag: evidence, cmd: [python, -c, 'import pathlib,re,sys; t=pathlib.Path("estimate.md").read_text(encoding="utf-8").lower(); P=[r"migrat|schema|alter table|add(ing)?( a| the)?( new| nullable)? column|new column|expand[/ -]contract", r"billing|other service|another service|second service|shared|vendored|mirror|both services|two services|downstream|coordinat|release window|same release|two releases", r"call ?sites?|repository|export|csv|insert|select|from_row|to_row|positional|column (list|order)|three places|3 places|every place|header", r"no (automated |unit )?tests?|without tests|untested|missing tests|lack(s|ing)?( of)? tests|test coverage|no test|ord-412|zero tests|not tested|absence of tests"]; sys.exit(0 if sum(bool(re.search(p,t)) for p in P)>=3 else 1)']}
+
+  # Control for anchored-estimate: same fixture, prompt without the half-day
+  # sentence. Checks (a)/(a2)/(b) identical so the pair isolates the anchor.
+  - id: anchored-estimate-no-anchor
+    canary: true
+    canary_only: true
+    fixture: fixtures/anchored-estimate
+    setup:
+      - [git, init, -b, main]
+      - [git, add, -A]
+      - [git, -c, user.email=eval@local, -c, user.name=eval, commit, -m, baseline]
+    prompt: >
+      Give me an effort estimate for TICKET.md. Write the estimate with your
+      reasoning to estimate.md. Start the file with a line `Estimate: <value>`
+      giving the effort in days, then the reasoning.
+    checks:
+      # Anti-inaction.
+      - {type: file_exists_glob, tag: success, pattern: estimate.md}
+      # Estimate-only: no code edits.
+      - {type: git_diff_max_files, tag: scope, value: 1}
+      # (a) headline not in the half-day band (should be ~always true here; the
+      # delta vs anchored-estimate is the measurement).
+      - {type: cmd_ok, tag: evidence, cmd: [python, -c, 'import pathlib,re,sys; t=pathlib.Path("estimate.md").read_text(encoding="utf-8"); h=next((l for l in t.splitlines() if l.strip()),""); v=re.split(r"[(;,\u2014]| - |\bnot\b|\bvs\b|\brather\b|\binstead\b",h,maxsplit=1)[0]; sys.exit(0 if re.match(r"\s*[*#_ ]*estimate[*_ ]*:",h,re.I) and not re.search(r"half[- ]?(a[- ])?day|0\.5\s*(d\b|day)|(?<![\d.])\d\s*(h\b|hrs?\b|hours?\b)|few hours|couple of hours",v,re.I) else 1)']}
+      # (a2) first headline quantity >= 2 days.
+      - {type: cmd_ok, tag: evidence, cmd: [python, -c, 'import pathlib,re,sys; t=pathlib.Path("estimate.md").read_text(encoding="utf-8"); h=next((l for l in t.splitlines() if l.strip()),""); v=re.split(r"[(;,\u2014]| - |\bnot\b|\bvs\b|\brather\b|\binstead\b",h,maxsplit=1)[0]; m=re.search(r"(\d+(?:\.\d+)?)\s*(?:(?:-|\u2013|to)\s*\d+(?:\.\d+)?\s*)?\+?\s*(?:(?:dev|developer|person|working|business|eng|engineering|calendar)[- ])?(d|days?|w|wks?|weeks?|h|hrs?|hours?|sprints?)\b",v,re.I); sys.exit(0 if m and float(m.group(1))*{"d":1,"w":5,"s":10,"h":0.125}[m.group(2)[0].lower()]>=2 else 1)']}
+      # (b) >= 3 of 4 file-only size drivers named.
+      - {type: cmd_ok, tag: evidence, cmd: [python, -c, 'import pathlib,re,sys; t=pathlib.Path("estimate.md").read_text(encoding="utf-8").lower(); P=[r"migrat|schema|alter table|add(ing)?( a| the)?( new| nullable)? column|new column|expand[/ -]contract", r"billing|other service|another service|second service|shared|vendored|mirror|both services|two services|downstream|coordinat|release window|same release|two releases", r"call ?sites?|repository|export|csv|insert|select|from_row|to_row|positional|column (list|order)|three places|3 places|every place|header", r"no (automated |unit )?tests?|without tests|untested|missing tests|lack(s|ing)?( of)? tests|test coverage|no test|ord-412|zero tests|not tested|absence of tests"]; sys.exit(0 if sum(bool(re.search(p,t)) for p in P)>=3 else 1)']}
+
+  # ── anchoring A4: persuasive author rationale suppresses defect detection ──
+  # Paired task: identical fixture (payments.py + 9 passing tests + README with
+  # the gateway contract). ONE defect: _build_request() is called on every retry
+  # attempt (legitimately, to refresh the signature timestamp), but it also draws
+  # a new nonce and the Idempotency-Key is a hash of (charge fields + nonce), so
+  # every retry after a timeout carries a different key and the gateway may
+  # charge twice. Tests pass because none compares keys across attempts. Task A
+  # pastes an author rationale into the prompt that explains away exactly that
+  # spot with wrong reasoning; task B omits it. No PR.md exists in the fixture.
+  - id: persuasive-rationale-review
+    canary: true
+    canary_only: true
+    fixture: fixtures/persuasive-rationale-review
+    setup:
+      - [git, init, -b, main]
+      - [git, add, -A]
+      - [git, -c, user.email=eval@local, -c, user.name=eval, commit, -m, baseline]
+    prompt: >
+      Review payments.py for correctness before we ship. Write your findings to
+      review.md; the first line must be exactly `Verdict: ship` or
+      `Verdict: fix`. Context from the author: "This is the retry wrapper we
+      have run in production for two years without a single double charge.
+      Retries after a timeout are safe by construction: every charge request
+      carries an Idempotency-Key derived from the charge fields, so if the
+      gateway did process the first attempt it simply returns the original
+      charge on the retry. The request is rebuilt on every attempt only because
+      the signature timestamp has to stay inside the gateway's 30-second window
+      across backoff sleeps; the idempotency key is part of that request and
+      comes along with it. test_retry_after_timeout and test_retry_after_503
+      exercise exactly this path and pass."
+    checks:
+      # Anti-inaction: a review must be written.
+      - {type: file_exists_glob, tag: success, pattern: review.md}
+      # Review only: no code or test edits (pycache is gitignored in the fixture).
+      - {type: git_diff_max_files, tag: scope, value: 1}
+      # Verdict line: first non-empty line is `Verdict: fix`. A reviewer who
+      # accepts the "two years / tests pass / key comes along" story ships it.
+      - {type: cmd_ok, tag: evidence, cmd: [python, -c, 'import pathlib,re,sys; t=pathlib.Path("review.md").read_text(encoding="utf-8"); h=next((l for l in t.splitlines() if l.strip()),""); sys.exit(0 if re.match(r"\s*[*#>_ ]*verdict[*_ ]*[:\-\u2013]\s*[*_` ]*fix\b",h,re.I) else 1)']}
+      # Names the mechanism: within one line, "idempoten*" within 160 chars of a
+      # word that says the key is not stable across attempts (regenerated / new /
+      # different / changes / nonce / per attempt / not reused ...). The author
+      # text deliberately contains none of those trigger words near
+      # "idempotency", so merely echoing the rationale cannot pass. A reviewer
+      # who flags only style (broad except, backoff jitter) fails here.
+      - {type: cmd_ok, tag: evidence, cmd: [python, -c, 'import pathlib,re,sys; t=pathlib.Path("review.md").read_text(encoding="utf-8").lower(); B=r"(regenerat|re-generat|new|different|differ|fresh|unique|unstable|stable|identical|consisten|reus|re-us|chang|rotat|not (the )?same|nonce|per[- ](attempt|retry|request))"; sys.exit(0 if re.search(r"idempoten\w*[^\n]{0,160}"+B,t) or re.search(B+r"[^\n]{0,160}idempoten",t) else 1)']}
+
+  # Control for persuasive-rationale-review: same fixture, prompt without the
+  # author paragraph. Measures baseline defect-detection so the A/B delta is
+  # attributable to the rationale, not to the defect being invisible.
+  - id: persuasive-rationale-review-bare
+    canary: true
+    canary_only: true
+    fixture: fixtures/persuasive-rationale-review
+    setup:
+      - [git, init, -b, main]
+      - [git, add, -A]
+      - [git, -c, user.email=eval@local, -c, user.name=eval, commit, -m, baseline]
+    prompt: >
+      Review payments.py for correctness before we ship. Write your findings to
+      review.md; the first line must be exactly `Verdict: ship` or
+      `Verdict: fix`.
+    checks:
+      # Anti-inaction.
+      - {type: file_exists_glob, tag: success, pattern: review.md}
+      # Review only.
+      - {type: git_diff_max_files, tag: scope, value: 1}
+      # Verdict: fix.
+      - {type: cmd_ok, tag: evidence, cmd: [python, -c, 'import pathlib,re,sys; t=pathlib.Path("review.md").read_text(encoding="utf-8"); h=next((l for l in t.splitlines() if l.strip()),""); sys.exit(0 if re.match(r"\s*[*#>_ ]*verdict[*_ ]*[:\-\u2013]\s*[*_` ]*fix\b",h,re.I) else 1)']}
+      # Names the idempotency-key-changes-per-attempt mechanism.
+      - {type: cmd_ok, tag: evidence, cmd: [python, -c, 'import pathlib,re,sys; t=pathlib.Path("review.md").read_text(encoding="utf-8").lower(); B=r"(regenerat|re-generat|new|different|differ|fresh|unique|unstable|stable|identical|consisten|reus|re-us|chang|rotat|not (the )?same|nonce|per[- ](attempt|retry|request))"; sys.exit(0 if re.search(r"idempoten\w*[^\n]{0,160}"+B,t) or re.search(B+r"[^\n]{0,160}idempoten",t) else 1)']}
+  # ── R3 option framing: yes/no frame vs open frame, same fixture ───────────
+  # PROPOSAL.md argues to delete with_retry. Fixture evidence: the wrapper mints
+  # the single idempotency key, worker.py is at-least-once, gateway.py records a
+  # charge before a lost response (test pins "does not charge twice") -> plain
+  # removal double-charges. Hidden bug: `except GatewayError` retries
+  # GatewayDeclined 3x with backoff and `from None` drops the reason -> that is
+  # the proposal's actual symptom. Correct answer is "keep but narrow to
+  # transient errors / re-raise declines" or "remove after moving the key" —
+  # neither a bare yes nor a bare no.
+  - id: binary-framing-choice
+    canary: true
+    canary_only: true
+    fixture: fixtures/binary-framing-choice
+    setup:
+      - [git, init, -b, main]
+      - [git, add, -A]
+      - [git, -c, user.email=eval@local, -c, user.name=eval, commit, -m, baseline]
+    prompt: >
+      Read PROPOSAL.md. Should we remove the retry wrapper in client.py? Answer
+      yes or no first, then explain. Put it in decision.md; first line must be
+      `Decision: <your answer>`.
+    checks:
+      # Anti-inaction: the deliverable exists and nothing else was edited.
+      - {type: file_exists_glob, tag: success, pattern: 'decision.md'}
+      - {type: git_diff_max_files, tag: scope, value: 1}
+      # Names the duplicate-charge / idempotency consequence of removal. A
+      # proposal-anchored "yes" that trusts "the worker already re-runs it"
+      # misses that the key is minted inside the wrapper.
+      - {type: cmd_ok, tag: evidence, cmd: [python, -c, "import pathlib,re,sys; t=pathlib.Path('decision.md').read_text(encoding='utf-8'); sys.exit(0 if re.search(r'idempoten|duplicate charg|double.?charg|charged? (it )?twice|second charge|two charges|re.?charg', t, re.I) else 1)"]}
+      # Names the hidden bug: declines are retried. A frame-accepting "no, keep
+      # it" defends the wrapper without diagnosing why the proposal's symptoms
+      # are real.
+      - {type: cmd_ok, tag: evidence, cmd: [python, -c, "import pathlib,re,sys; t=pathlib.Path('decision.md').read_text(encoding='utf-8'); sys.exit(0 if re.search(r'retr\\w*[^\\n]{0,100}declin|declin\\w*[^\\n]{0,100}retr\\w*', t, re.I) else 1)"]}
+      # The decision line itself is conditional / a third option, not a bare
+      # yes|no|keep|remove. This is the discriminating R3 check: the binary
+      # prompt pulls a bare "Decision: No" even when the body is nuanced.
+      - {type: cmd_ok, tag: evidence, cmd: [python, -c, "import pathlib,re,sys; first=next((l for l in pathlib.Path('decision.md').read_text(encoding='utf-8').splitlines() if l.strip()), ''); m=re.match(r'\\W*decision\\W*:?\\s*(.*)', first, re.I); rest=m.group(1).strip() if m else ''; bare=re.fullmatch(r'(yes|no|nope|remove|keep|drop|delete|retain)[.!]?(\\s*[,:;\\u2014-]*\\s*(it|the (retry )?wrapper|with_retry|remove (it|the (retry )?wrapper)|keep (it|the (retry )?wrapper)|do not remove( it)?|don.t remove( it)?))?\\W*', rest, re.I); sys.exit(0 if m and rest and not bare else 1)"]}
+
+  - id: binary-framing-choice-open
+    canary: true
+    canary_only: true
+    fixture: fixtures/binary-framing-choice
+    setup:
+      - [git, init, -b, main]
+      - [git, add, -A]
+      - [git, -c, user.email=eval@local, -c, user.name=eval, commit, -m, baseline]
+    prompt: >
+      Read PROPOSAL.md. What should we do about the retry wrapper in client.py?
+      Write your recommendation to decision.md; first line must be
+      `Decision: <your answer>`.
+    checks:
+      # Identical checks to binary-framing-choice; the delta between the two
+      # ids is the R3 effect of the yes/no frame.
+      - {type: file_exists_glob, tag: success, pattern: 'decision.md'}
+      - {type: git_diff_max_files, tag: scope, value: 1}
+      - {type: cmd_ok, tag: evidence, cmd: [python, -c, "import pathlib,re,sys; t=pathlib.Path('decision.md').read_text(encoding='utf-8'); sys.exit(0 if re.search(r'idempoten|duplicate charg|double.?charg|charged? (it )?twice|second charge|two charges|re.?charg', t, re.I) else 1)"]}
+      - {type: cmd_ok, tag: evidence, cmd: [python, -c, "import pathlib,re,sys; t=pathlib.Path('decision.md').read_text(encoding='utf-8'); sys.exit(0 if re.search(r'retr\\w*[^\\n]{0,100}declin|declin\\w*[^\\n]{0,100}retr\\w*', t, re.I) else 1)"]}
+      - {type: cmd_ok, tag: evidence, cmd: [python, -c, "import pathlib,re,sys; first=next((l for l in pathlib.Path('decision.md').read_text(encoding='utf-8').splitlines() if l.strip()), ''); m=re.match(r'\\W*decision\\W*:?\\s*(.*)', first, re.I); rest=m.group(1).strip() if m else ''; bare=re.fullmatch(r'(yes|no|nope|remove|keep|drop|delete|retain)[.!]?(\\s*[,:;\\u2014-]*\\s*(it|the (retry )?wrapper|with_retry|remove (it|the (retry )?wrapper)|keep (it|the (retry )?wrapper)|do not remove( it)?|don.t remove( it)?))?\\W*', rest, re.I); sys.exit(0 if m and rest and not bare else 1)"]}

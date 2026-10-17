@@ -663,3 +663,29 @@ def test_skill_checks_match_skill_tool_calls():
         not_called, "skill_not_called", ws, "", "", res.skills_called
     )[0]
     assert run_eval._check_one(not_called, "skill_not_called", ws, "", "", [])[0]
+
+
+def test_git_changed_ignores_framework_state_files(tmp_path):
+    """The sc-full arm's insight hook appends to .claude/insights.pending.jsonl
+    during a run. That is arm plumbing, not model behavior: a task that writes
+    one deliverable must still pass `git_diff_max_files: 1` on sc-full."""
+    sys.path.insert(0, str(EVALS_DIR))
+    try:
+        import run_eval
+    finally:
+        sys.path.remove(str(EVALS_DIR))
+    ws = tmp_path
+    (ws / ".claude").mkdir()
+    (ws / ".claude" / "insights.pending.jsonl").write_text("{}" + chr(10))
+    (ws / "keep.md").write_text("baseline" + chr(10))
+    git = ["git", "-c", "user.email=t@local", "-c", "user.name=t"]
+    run_eval._run([*git, "init", "-q", "-b", "main"], cwd=ws)
+    run_eval._run([*git, "add", "-A"], cwd=ws)
+    run_eval._run([*git, "commit", "-q", "-m", "baseline"], cwd=ws)
+    (ws / ".claude" / "insights.pending.jsonl").write_text(
+        "{}" + chr(10) + "{}" + chr(10)
+    )
+    (ws / "reply.md").write_text("deliverable" + chr(10))
+    assert run_eval._git_changed(ws) == {"reply.md"}
+    check = {"type": "git_diff_max_files", "value": 1}
+    assert run_eval._check_one(check, "git_diff_max_files", ws, "", "")[0]

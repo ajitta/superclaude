@@ -536,7 +536,16 @@ def _git_changed(ws: Path) -> set[str]:
         line[3:].split(" -> ")[-1].strip().strip('"')
         for line in proc.stdout.splitlines()
         if line.strip()
-    }
+    } - FRAMEWORK_STATE_FILES
+
+
+# Files the installed framework's own hooks write into the workspace during a
+# run (insight_writer appends on PostToolUse). They are arm plumbing, not model
+# behavior, so diff-size checks must not count them: every sc-full task that
+# writes a file otherwise fails `git_diff_max_files` by one.
+FRAMEWORK_STATE_FILES = frozenset(
+    {".claude/insights.jsonl", ".claude/insights.pending.jsonl"}
+)
 
 
 def _git_baseline(ws: Path) -> set[str]:

@@ -1,0 +1,7 @@
+{
+  "base_url": "https://api.orders.example.net/v2",
+  "token_env": "ORDERS_API_TOKEN",
+  "page_size": 200,
+  "timeout_seconds": 30,
+  "watermark_file": "state/watermark.txt"
+}
