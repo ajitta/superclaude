@@ -8,7 +8,7 @@ updated: 2026-10-18
 
 # 03. Deferred items — evidence for a later decision
 
-Scope: the six deletion/shrink candidates the owner deferred in `00-intent.md:45-49` (Q3, Q5, Q6, Q7). This file records what exists today, with `path:line`, so a later round can decide. It carries no proposal. Line numbers come from commit `5f7c205e` (branch `fix/lean-round-2`); for files dirty in the working tree at the time of writing (`src/superclaude/scripts/context_loader.py`, `src/superclaude/cli/main.py`, `tests/unit/test_context_loader.py`) the numbers are from `git show HEAD:<path>`.
+Scope: the six deletion/shrink candidates the owner deferred (plus one budget item found during B4, §7) in `00-intent.md:45-49` (Q3, Q5, Q6, Q7). This file records what exists today, with `path:line`, so a later round can decide. It carries no proposal. Line numbers come from commit `5f7c205e` (branch `fix/lean-round-2`); for files dirty in the working tree at the time of writing (`src/superclaude/scripts/context_loader.py`, `src/superclaude/cli/main.py`, `tests/unit/test_context_loader.py`) the numbers are from `git show HEAD:<path>`.
 
 ## 1. `commands/sc.md` (dispatcher, 3,799 B)
 
@@ -123,6 +123,19 @@ Shared prose: detection markers (`init.md:13` / `project-initializer.md:36`), id
 | Related pins | `test_agent_structure.py:228-233` requires Proceed/Ask First/Never in `<tool_guidance>`; `agent-authoring.md:213` notes the memory protocol header is likewise verbatim-pinned (`test_memory_guide_has_protocol`) |
 
 `00-intent.md:49` and `README.md:19` (lean-round) place the shortening in separate B5 work, "retaining leaf safety semantics and Ask-First checks; no hoisting".
+
+## 7. `RULES_QUALITY.md` size vs the 8K budget on `/sc:analyze --delegate`
+
+| Fact | Evidence |
+|---|---|
+| Prompt `/sc:analyze --delegate` matches four rule modules | `superclaude context explain "/sc:analyze --delegate"` with `SUPERCLAUDE_PATH=src/superclaude` at `67215cd7`: RULES_QUALITY ~3,245 tokens, RULES_DELEGATION ~2,180, RULES_DOCS ~2,534, RULES_INTERACTION ~282 (P2) |
+| Budget | `CLAUDE_CONTEXT_MAX_TOKENS` default 8,000 (`context_loader.py`, `utils.int_env` fallback) |
+| Before B4 (`30a08be3`) | injected QUALITY, DELEGATION, INTERACTION (~5,820); dropped RULES_DOCS |
+| After B4 | injected QUALITY, DELEGATION, RULES_DOCS (~7,959); dropped RULES_INTERACTION |
+| What fitting all four would take | the set is ~8,241 tokens; ~275 tokens (~1,100 characters) would have to leave RULES_QUALITY beyond the duplicate removal already done — i.e. cutting rules, not repeats |
+| Mitigation already in place | since 4.28.0 the loader marks a context as loaded only after it is injected, so the dropped file stays eligible on the next prompt that triggers it |
+
+Not measured: whether RULES_INTERACTION's ~280 tokens change behavior on a `--delegate` analysis, or what a larger default budget would cost. Any further cut to RULES_QUALITY is a rule removal and falls under `03-analysis.md` §5 ("no deletion on 'the model already does this' without measurement").
 
 ## Not checked
 

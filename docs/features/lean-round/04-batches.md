@@ -38,7 +38,7 @@ Done: parallel_ab (`aggregate(out, observations)` — defect 9; `--` before the 
 
 Deviations from the audit, with reason: `author_check.TYPES`/`FORMATS` were deleted rather than reused in `main.py` — a module-level import of `author_check` pulls `yaml` and raised `import superclaude.cli.main` from ~70 ms to ~125 ms, and `main.py` is the fallback path for `superclaude hook`. The `context explain` matched-text refactor was excluded by the plan (contradiction already resolved).
 
-In flight at the time of writing (separate commit when green): shared `git_repo` fixture (seven builders), safe in-function import hoists in tests, TRIGGER_MAP undocumented alternatives (04b #8) with positive/negative tests, dead `stop_hook_active` check in the PostToolUse hooks.
+Follow-up commit `2fd5a2b2` (24 files, +326 / −533): shared `git_repo`/`init_git_repo`/`isolated_git_config` in `tests/conftest.py` replacing seven builders; 162 safe in-function imports hoisted (198 left: module not imported at top; 1 deliberate); TRIGGER_MAP undocumented alternatives removed (04b #8: `vs-(cot|multi|standard)`, `strategic.?symbol`, `business.?example`, `analyze reasoning`, and the over-broad `multi.?expert`; `business.?symbol`, `panel.?example`, `self.?analysis`, `fact.?check` kept — each is documented) with 5 negative + 10 positive realistic-prompt tests; dead `stop_hook_active` check removed from the two PostToolUse hooks.
 
 Not done, by decision or constraint: `.gitignore` duplicates and `.black/` (file held by another session), `frozenset("…".split())` rewrites (cosmetic), Makefile help generation, CI workflow edits (not in the plan), `tests/unit/scripts` default exclusion (04 §2 #12 — the native crash was not re-investigated).
 
@@ -50,4 +50,4 @@ Skipped inside B4, each a decision rather than a consolidation: `memory_guide` h
 
 ## B6 so far
 
-`core/` changed in B4 (`RULES_QUALITY.md`, `BUSINESS_SYMBOLS.md`), so `make canary-gates` is required before release; it was started after the B4 commit (4 sessions, sonnet, low effort). Result goes to `05-release-gate.md`. Spot check (I0 two tasks + existing canaries, Q1 budget) is pending.
+`core/` changed in B4, so `make canary-gates` was run after the B4 commit: 7/7. Spot check and attribution: [05-release-gate.md](./05-release-gate.md).
