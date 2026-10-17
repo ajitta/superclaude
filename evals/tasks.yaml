@@ -17,7 +17,7 @@ defaults:
   max_turns: 12
   allowed_tools: [Bash, Read, Edit, Write, Grep, Glob]
 
-arms: [vanilla, sc-full, sc-core-lite, sc-command-only]
+arms: [vanilla, sc-full, sc-core-lite, sc-candidate, sc-command-only]
 
 tasks:
   # ── 1. small bugfix — scope-creep + gotcha-compliance check ──────────────
