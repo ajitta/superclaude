@@ -7,7 +7,8 @@ State transitions:
                                         |   / repeated smoke_fail -> REPORT
 
 The coordinator owns:
-  - worktree lifecycle (create on entry, cleanup on exit)
+  - worktree lifecycle (created on entry; kept after exit so the user can
+    inspect results.tsv and the git lineage)
   - PID file on loop start / removal on exit
   - the four guards
   - results.tsv writes (single writer)
@@ -99,7 +100,7 @@ class Coordinator:
             plateau.record(self._baseline_metric or 0.0)
 
             while True:
-                if not budget.check().pass_:
+                if not budget.check():
                     break
                 if not self._run_smoke():
                     self._consecutive_smoke_fails += 1
@@ -118,7 +119,7 @@ class Coordinator:
                         commit_hash="-",
                     )
                     self._cycle_id += 1
-                    if stop or not budget.check().pass_:
+                    if stop or not budget.check():
                         break
                     continue
                 self._consecutive_smoke_fails = 0
@@ -182,7 +183,7 @@ class Coordinator:
             timeout=self.config.cycle_timeout_seconds,
             cwd=str(self._worktree.path),
         )
-        return gate.check().pass_
+        return gate.check()
 
     def _run_mutator_cycle(
         self,
@@ -233,8 +234,7 @@ class Coordinator:
             self._cycle_id += 1
             return "continue"
 
-        verdict = regression.check_score(eval_result.metric_value)
-        if not verdict.pass_:
+        if not regression.check_score(eval_result.metric_value):
             self._git_rollback()
             self._record_row(
                 status="regressed",
@@ -247,7 +247,7 @@ class Coordinator:
             self._cycle_id += 1
             # Feed plateau detector so a streak of regressions still terminates.
             self._record_regression_for_plateau(plateau, eval_result.metric_value)
-            if not plateau.check().pass_:
+            if not plateau.check():
                 return "stop"
             return "continue"
 
@@ -267,7 +267,7 @@ class Coordinator:
             if eval_result.metric_value > (self._baseline_metric or 0.0):
                 self._baseline_metric = eval_result.metric_value
                 regression.baseline = eval_result.metric_value
-        if not plateau.check().pass_:
+        if not plateau.check():
             return "stop"
         return "continue"
 
@@ -374,9 +374,9 @@ class Coordinator:
         return self._worktree.path / "auto_improve.pid"
 
 
-def status_mode(config: CoordinatorConfig) -> str:
+def status_mode(repo_root: Path) -> str:
     """Read the most-recent worktree's results.tsv (if any) and emit summary."""
-    worktrees_dir = config.repo_root / ".worktrees"
+    worktrees_dir = repo_root / ".worktrees"
     if not worktrees_dir.exists():
         return "# auto-improve summary\n\n_No prior runs._"
     candidates = sorted(

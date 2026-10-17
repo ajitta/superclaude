@@ -86,9 +86,28 @@ def _ensure_parent(path: Path) -> None:
 
 def _now_iso() -> str:
     """ISO 8601 with second precision and colon offset (matches existing schema)."""
-    now = _dt.datetime.now().astimezone()
-    s = now.strftime("%Y-%m-%dT%H:%M:%S%z")
-    return s[:-2] + ":" + s[-2:] if s[-5] in "+-" else s
+    return _dt.datetime.now().astimezone().isoformat(timespec="seconds")
+
+
+def _read_jsonl(path: Path) -> list[dict]:
+    """Every parseable row in ``path``; a missing file or a bad line reads as nothing."""
+    if not path.exists():
+        return []
+    out: list[dict] = []
+    with path.open(encoding="utf-8") as f:
+        for line in f:
+            try:
+                out.append(json.loads(line))
+            except json.JSONDecodeError:
+                continue
+    return out
+
+
+def _write_jsonl(path: Path, entries: list[dict], mode: str = "a") -> None:
+    _ensure_parent(path)
+    with path.open(mode, encoding="utf-8") as f:
+        for e in entries:
+            f.write(json.dumps(e, ensure_ascii=False) + "\n")
 
 
 def _git_user() -> str:
@@ -182,34 +201,24 @@ def cmd_append(args: argparse.Namespace) -> int:
                 return 2
         cleaned.append(entry)
 
-    _ensure_parent(_insight_file())
-    with _insight_file().open("a", encoding="utf-8") as f:
-        for entry in cleaned:
-            f.write(json.dumps(entry, ensure_ascii=False) + "\n")
+    _write_jsonl(_insight_file(), cleaned)
 
     print(f"appended {len(cleaned)} insight(s) to {_insight_file()}")
     return 0
 
 
 def _annotation_target_exists(ref_ts: str) -> bool:
-    if not _insight_file().exists():
-        return False
-    with _insight_file().open(encoding="utf-8") as f:
-        for line in f:
-            try:
-                d = json.loads(line)
-            except json.JSONDecodeError:
-                continue
-            if d.get("ts") == ref_ts and d.get("type") != "annotation":
-                return True
-    return False
+    return any(
+        d.get("ts") == ref_ts and d.get("type") != "annotation"
+        for d in _read_jsonl(_insight_file())
+    )
 
 
 # ---------- read paths ----------
 
 
 def cmd_list(args: argparse.Namespace) -> int:
-    rows = _read_pending(_insight_file())
+    rows = _read_jsonl(_insight_file())
     if not rows:
         print("(no insights yet)")
         return 0
@@ -220,7 +229,7 @@ def cmd_list(args: argparse.Namespace) -> int:
 
 
 def cmd_query(args: argparse.Namespace) -> int:
-    rows = _read_pending(_insight_file())
+    rows = _read_jsonl(_insight_file())
     if not rows:
         print("(no insights yet)")
         return 0
@@ -239,7 +248,7 @@ def cmd_query(args: argparse.Namespace) -> int:
 
 
 def cmd_stats(args: argparse.Namespace) -> int:
-    rows = _read_pending(_insight_file())
+    rows = _read_jsonl(_insight_file())
     if not rows:
         print("(no insights yet)")
         return 0
@@ -312,13 +321,7 @@ def cmd_harvest(args: argparse.Namespace) -> int:
     pending_path = _pending_file()
 
     existing_uuids: set[str] = set(_read_harvest_ledger())
-    if pending_path.exists():
-        with pending_path.open(encoding="utf-8") as f:
-            for line in f:
-                try:
-                    existing_uuids.add(json.loads(line).get("uuid", ""))
-                except json.JSONDecodeError:
-                    continue
+    existing_uuids.update(e.get("uuid", "") for e in _read_jsonl(pending_path))
 
     new_entries: list[dict] = []
     awaiting_reply = False
@@ -427,10 +430,7 @@ def cmd_harvest(args: argparse.Namespace) -> int:
     if not new_entries:
         return 0
 
-    _ensure_parent(pending_path)
-    with pending_path.open("a", encoding="utf-8") as f:
-        for e in new_entries:
-            f.write(json.dumps(e, ensure_ascii=False) + "\n")
+    _write_jsonl(pending_path, new_entries)
     _extend_harvest_ledger([e["uuid"] for e in new_entries])
 
     if not getattr(args, "quiet", False):
@@ -443,33 +443,16 @@ def cmd_harvest(args: argparse.Namespace) -> int:
 # ---------- review / promote / pending-count ----------
 
 
-def _read_pending(path: Path | None = None) -> list[dict]:
-    path = path if path is not None else _pending_file()
-    if not path.exists():
-        return []
-    out: list[dict] = []
-    with path.open(encoding="utf-8") as f:
-        for line in f:
-            try:
-                out.append(json.loads(line))
-            except json.JSONDecodeError:
-                continue
-    return out
-
-
 def _write_pending(entries: list[dict]) -> None:
     if not entries:
         if _pending_file().exists():
             _pending_file().unlink()
         return
-    _ensure_parent(_pending_file())
-    with _pending_file().open("w", encoding="utf-8") as f:
-        for e in entries:
-            f.write(json.dumps(e, ensure_ascii=False) + "\n")
+    _write_jsonl(_pending_file(), entries, mode="w")
 
 
 def cmd_review(args: argparse.Namespace) -> int:
-    pending = _read_pending()
+    pending = _read_jsonl(_pending_file())
     if not pending:
         print("(no pending insights)")
         return 0
@@ -486,7 +469,7 @@ def cmd_review(args: argparse.Namespace) -> int:
 
 
 def cmd_promote(args: argparse.Namespace) -> int:
-    pending = _read_pending()
+    pending = _read_jsonl(_pending_file())
     if args.index < 0 or args.index >= len(pending):
         print(
             f"promote: index {args.index} out of range (have {len(pending)})",
@@ -534,7 +517,7 @@ def cmd_discard(args: argparse.Namespace) -> int:
     leaving the SessionStart notice permanently lit. No ledger write here: the
     uuid was filed at harvest time, so a discarded row stays discarded.
     """
-    pending = _read_pending()
+    pending = _read_jsonl(_pending_file())
     try:
         indices = sorted(
             {int(tok) for tok in str(args.index).split(",") if tok.strip()},
@@ -573,7 +556,7 @@ def cmd_discard(args: argparse.Namespace) -> int:
 def cmd_pending_count(args: argparse.Namespace) -> int:
     # Same resolver as cmd_harvest, so the SessionStart notice always reads the
     # pending file harvest wrote.
-    n = len(_read_pending())
+    n = len(_read_jsonl(_pending_file()))
     if n > 0:
         print(f"🟡 {n} pending insight(s) — run /sc:insight --review")
     return 0
@@ -854,60 +837,53 @@ def build_parser(prog: str = "insight_writer") -> argparse.ArgumentParser:
 
 
 def main(argv: list[str] | None = None, prog: str = "insight_writer") -> int:
-    # Special hook entry points: when invoked from SessionStart/PreCompact/
-    # SessionEnd/Stop hooks, the harness pipes JSON to stdin. Parse it to
-    # extract session_id / cwd / reason|trigger / stop_hook_active automatically.
     if argv is None:
         argv = sys.argv[1:]
 
-    if argv and argv[0] == "request-from-hook":
+    # Hook entry points: SessionStart/PreCompact/SessionEnd/Stop pipe the event
+    # JSON to stdin. The subcommands take a plain Namespace, so it is built from
+    # the payload here rather than rendered to argv and parsed back.
+    if argv and argv[0] in (
+        "request-from-hook",
+        "harvest-from-hook",
+        "pending-count-from-hook",
+    ):
         try:
             data = json.loads(sys.stdin.read() or "{}")
         except json.JSONDecodeError:
             data = {}
-        argv = [
-            "request",
-            "--session-id",
-            str(data.get("session_id", "")),
-            "--cwd",
-            str(data.get("cwd", os.getcwd())),
-        ]
-        if data.get("transcript_path"):
-            argv += ["--transcript-path", str(data["transcript_path"])]
-        if data.get("stop_hook_active"):
-            argv.append("--stop-hook-active")
-
-    if argv and argv[0] in ("harvest-from-hook", "pending-count-from-hook"):
-        try:
-            data = json.loads(sys.stdin.read() or "{}")
-        except json.JSONDecodeError:
+        if not isinstance(data, dict):
             data = {}
+        session_id = str(data.get("session_id", ""))
         cwd = str(data.get("cwd", os.getcwd()))
+        transcript_path = (
+            str(data["transcript_path"]) if data.get("transcript_path") else None
+        )
+        if argv[0] == "request-from-hook":
+            return cmd_request(
+                argparse.Namespace(
+                    session_id=session_id,
+                    cwd=cwd,
+                    transcript_path=transcript_path,
+                    stop_hook_active=bool(data.get("stop_hook_active")),
+                )
+            )
         if argv[0] == "pending-count-from-hook":
             # SessionStart is the only event that runs before the session can
             # change anything, so the baseline is recorded here rather than in a
             # fifteenth hook and a second interpreter spawn.
-            cmd_session_baseline(
-                argparse.Namespace(session_id=str(data.get("session_id", "")))
+            cmd_session_baseline(argparse.Namespace(session_id=session_id))
+            return cmd_pending_count(argparse.Namespace())
+        # SessionEnd carries 'reason', PreCompact 'trigger'.
+        source = data.get("reason") or data.get("trigger") or "other"
+        return cmd_harvest(
+            argparse.Namespace(
+                source=str(source),
+                session_id=session_id,
+                cwd=cwd,
+                transcript_path=transcript_path,
             )
-            argv = ["pending-count"]
-        else:
-            source = (
-                data.get("reason")  # SessionEnd
-                or data.get("trigger")  # PreCompact
-                or "other"
-            )
-            argv = [
-                "harvest",
-                "--source",
-                str(source),
-                "--session-id",
-                str(data.get("session_id", "")),
-                "--cwd",
-                cwd,
-            ]
-            if data.get("transcript_path"):
-                argv += ["--transcript-path", str(data["transcript_path"])]
+        )
 
     args = build_parser(prog).parse_args(argv)
     return args.fn(args)

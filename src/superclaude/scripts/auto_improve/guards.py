@@ -5,7 +5,10 @@
 - RegressionBlock   : score < baseline -> rollback signal
 - SmokeGate         : per-cycle smoke check before mutation
 
-All guards expose the common GuardVerdict interface.
+Every check returns a bool: True = keep going, False = the guard tripped.
+The coordinator decides what to write to results.tsv for each stop (the
+mutation rationale for a regression, a fixed desc for a smoke failure), so
+the guards carry no reason text of their own.
 """
 
 from __future__ import annotations
@@ -13,24 +16,15 @@ from __future__ import annotations
 import subprocess
 import time
 from collections import deque
-from dataclasses import dataclass
 from typing import Optional
-
-
-@dataclass(frozen=True)
-class GuardVerdict:
-    pass_: bool
-    reason: str
 
 
 class BudgetGuard:
     def __init__(self, deadline_monotonic: float):
         self.deadline = deadline_monotonic
 
-    def check(self) -> GuardVerdict:
-        if time.monotonic() < self.deadline:
-            return GuardVerdict(pass_=True, reason="budget remaining")
-        return GuardVerdict(pass_=False, reason="budget exhausted")
+    def check(self) -> bool:
+        return time.monotonic() < self.deadline
 
 
 class PlateauDetector:
@@ -48,32 +42,18 @@ class PlateauDetector:
             self._scores.clear()
             self._scores.append(score)
 
-    def check(self) -> GuardVerdict:
-        if len(self._scores) < self.window:
-            return GuardVerdict(pass_=True, reason="window not yet full")
-        # Window is full and best did not change while it filled -> plateau.
-        return GuardVerdict(
-            pass_=False, reason=f"plateau: {self.window} cycles without improvement"
-        )
+    def check(self) -> bool:
+        # Window full and best did not change while it filled -> plateau.
+        return len(self._scores) < self.window
 
 
 class RegressionBlock:
     def __init__(self, baseline: float):
         self.baseline = baseline
 
-    def check_score(self, score: Optional[float]) -> GuardVerdict:
-        if score is None:
-            return GuardVerdict(
-                pass_=False, reason="metric extraction failed (treated as regression)"
-            )
-        if score < self.baseline:
-            return GuardVerdict(
-                pass_=False,
-                reason=f"regression: {score} < baseline {self.baseline}",
-            )
-        return GuardVerdict(
-            pass_=True, reason=f"score {score} >= baseline {self.baseline}"
-        )
+    def check_score(self, score: Optional[float]) -> bool:
+        # A missing metric (extraction failed) is treated as a regression.
+        return score is not None and score >= self.baseline
 
 
 class SmokeGate:
@@ -95,7 +75,7 @@ class SmokeGate:
         self.timeout = timeout
         self.cwd = cwd
 
-    def check(self) -> GuardVerdict:
+    def check(self) -> bool:
         cmd = self.smoke_cmd if self.smoke_cmd else self.eval_cmd
         try:
             proc = subprocess.run(
@@ -107,9 +87,5 @@ class SmokeGate:
                 cwd=self.cwd,
             )
         except subprocess.TimeoutExpired:
-            return GuardVerdict(pass_=False, reason="smoke timed out")
-        if proc.returncode != 0:
-            return GuardVerdict(
-                pass_=False, reason=f"smoke failed (exit {proc.returncode})"
-            )
-        return GuardVerdict(pass_=True, reason="smoke ok")
+            return False
+        return proc.returncode == 0

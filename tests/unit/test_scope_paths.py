@@ -21,6 +21,8 @@ from superclaude.utils import (
     settings_filename,
 )
 
+_SRC = Path(__file__).resolve().parents[2] / "src"
+
 
 def _make_scoped_install(root: Path) -> Path:
     """Create the marker a project/local scope install leaves behind."""
@@ -41,11 +43,11 @@ def _register_hooks(base: Path, filename: str) -> None:
     (base / filename).write_text(SC_HOOK_SETTINGS, encoding="utf-8")
 
 
-def _make_user_install(home: Path, monkeypatch) -> Path:
-    """Install at user scope in a fake home, and point Path.home() at it.
+def _make_user_install(home: Path) -> Path:
+    """Install at user scope in ``home`` (pass the ``sandbox_home`` fixture).
 
     Includes the ~/.claude/CLAUDE.md that installing at user scope writes. That
-    file is the reason a fake home is needed rather than a bare directory: its
+    file is the reason a home is needed rather than a bare directory: its
     import line is identical to the one a project-scope install writes, so any
     test using a marker-only fixture cannot see the two being confused.
     """
@@ -54,7 +56,6 @@ def _make_user_install(home: Path, monkeypatch) -> Path:
         "@superclaude/CLAUDE_SC.md\n", encoding="utf-8"
     )
     _register_hooks(home / ".claude", "settings.json")
-    monkeypatch.setattr(Path, "home", staticmethod(lambda: home))
     return home / ".claude"
 
 
@@ -175,7 +176,7 @@ class TestContextCacheKeying:
         Only the filename is asserted; the directory is covered by
         TestHookStateDir.
         """
-        from superclaude.scripts.context_reset import get_cache_file
+        from superclaude.utils import context_cache_file as get_cache_file
 
         subdir = tmp_path / "src" / "deep"
         subdir.mkdir(parents=True)
@@ -190,7 +191,7 @@ class TestContextCacheKeying:
 
     def test_cache_file_follows_project_not_cwd(self, tmp_path: Path, monkeypatch):
         """Two projects must not share one dedup cache file."""
-        from superclaude.scripts.context_reset import get_cache_file
+        from superclaude.utils import context_cache_file as get_cache_file
 
         other = tmp_path / "other"
         other.mkdir()
@@ -203,7 +204,7 @@ class TestContextCacheKeying:
 
     def test_cache_file_carries_the_session(self, tmp_path: Path, monkeypatch):
         """A session id in the payload names a file of its own."""
-        from superclaude.scripts.context_reset import get_cache_file
+        from superclaude.utils import context_cache_file as get_cache_file
 
         monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(tmp_path))
 
@@ -218,10 +219,8 @@ class TestContextCacheKeying:
         session to re-inject contexts it already holds — the same starvation,
         pointed the other way.
         """
-        from superclaude.scripts.context_reset import (
-            get_cache_file,
-            reset_context_cache,
-        )
+        from superclaude.scripts.context_reset import reset_context_cache
+        from superclaude.utils import context_cache_file as get_cache_file
 
         monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(tmp_path))
 
@@ -380,15 +379,9 @@ class TestStateHygiene:
 
     def test_session_init_does_not_reset_blind(self):
         """One reset per SessionStart, by the hook that knows the session."""
-        from pathlib import Path as _Path
-
-        source = (
-            _Path(__file__).parent.parent.parent
-            / "src"
-            / "superclaude"
-            / "scripts"
-            / "session_init.py"
-        ).read_text(encoding="utf-8")
+        source = (_SRC / "superclaude" / "scripts" / "session_init.py").read_text(
+            encoding="utf-8"
+        )
 
         assert "reset_context_cache()" not in source, (
             "session_init still resets the cache without a session id"
@@ -409,11 +402,9 @@ class TestImportingAHookWritesNothing:
         import os
         import subprocess
         import sys
-        from pathlib import Path as _Path
 
         home = tmp_path / "home"
         home.mkdir()
-        src = _Path(__file__).parent.parent.parent / "src"
 
         result = subprocess.run(
             [sys.executable, "-c", "import superclaude.scripts.context_loader"],
@@ -425,7 +416,7 @@ class TestImportingAHookWritesNothing:
                 "PATH": os.environ.get("PATH", ""),
                 "HOME": str(home),
                 "USERPROFILE": str(home),
-                "PYTHONPATH": str(src),
+                "PYTHONPATH": str(_SRC),
             },
         )
 
@@ -450,36 +441,30 @@ class TestDetectScope:
 
         assert detect_scope() == "user"
 
-    def test_home_scoped_install_is_user_not_project(self, tmp_path: Path, monkeypatch):
+    def test_home_scoped_install_is_user_not_project(self, sandbox_home: Path):
         """~/.claude/CLAUDE.md holds the same import a project install writes.
 
         Without a home guard the project branch matched it and named the default
         install scope "project" — the one value the reporting commands exist to
         state correctly.
         """
-        home = tmp_path / "home"
-        home.mkdir()
-        _make_user_install(home, monkeypatch)
+        _make_user_install(sandbox_home)
 
-        assert detect_scope(home) == "user"
+        assert detect_scope(sandbox_home) == "user"
 
-    def test_local_install_rooted_at_home_is_local_not_user(
-        self, tmp_path: Path, monkeypatch
-    ):
+    def test_local_install_rooted_at_home_is_local_not_user(self, sandbox_home: Path):
         """Installing local scope at $HOME is legal, so the home guard is not first.
 
         With the guard ahead of the CLAUDE.local.md test, this read as user
         scope and doctor went looking in settings.json and ~/.claude/CLAUDE.md
         while the install had written settings.local.json and ~/CLAUDE.local.md.
         """
-        home = tmp_path / "home"
-        home.mkdir()
+        home = sandbox_home
         _make_scoped_install(home)
         (home / "CLAUDE.local.md").write_text(
             "@.claude/superclaude/CLAUDE_SC.md\n", encoding="utf-8"
         )
         _register_hooks(home / ".claude", "settings.local.json")
-        monkeypatch.setattr(Path, "home", staticmethod(lambda: home))
 
         assert detect_scope(home) == "local"
 
@@ -548,13 +533,10 @@ class TestScopeSignalRanking:
     """
 
     def test_project_install_survives_a_personal_claude_local_md(
-        self, tmp_path: Path, monkeypatch
+        self, sandbox_home: Path
     ):
         """CLAUDE.local.md is hand-authored — this repo's CLAUDE.md says to write it."""
-        home = tmp_path / "home"
-        home.mkdir()
-        monkeypatch.setattr(Path, "home", staticmethod(lambda: home))
-        project = home / "team"
+        project = sandbox_home / "team"
         _make_scoped_install(project)
         (project / ".claude" / "CLAUDE.md").write_text(
             "@superclaude/CLAUDE_SC.md\n", encoding="utf-8"
@@ -566,13 +548,8 @@ class TestScopeSignalRanking:
 
         assert detect_scope(project) == "project"
 
-    def test_local_hooks_outrank_a_project_import_line(
-        self, tmp_path: Path, monkeypatch
-    ):
-        home = tmp_path / "home"
-        home.mkdir()
-        monkeypatch.setattr(Path, "home", staticmethod(lambda: home))
-        project = home / "proj"
+    def test_local_hooks_outrank_a_project_import_line(self, sandbox_home: Path):
+        project = sandbox_home / "proj"
         _make_scoped_install(project)
         (project / ".claude" / "CLAUDE.md").write_text(
             "@superclaude/CLAUDE_SC.md\n", encoding="utf-8"
@@ -581,12 +558,9 @@ class TestScopeSignalRanking:
 
         assert detect_scope(project) == "local"
 
-    def test_foreign_hooks_are_not_evidence(self, tmp_path: Path, monkeypatch):
+    def test_foreign_hooks_are_not_evidence(self, sandbox_home: Path):
         """Another plugin's hooks in settings.local.json must not name the scope."""
-        home = tmp_path / "home"
-        home.mkdir()
-        monkeypatch.setattr(Path, "home", staticmethod(lambda: home))
-        project = home / "proj"
+        project = sandbox_home / "proj"
         _make_scoped_install(project)
         (project / ".claude" / "settings.local.json").write_text(
             '{"hooks": {"SessionStart": [{"matcher": "*", "hooks": '
@@ -600,13 +574,10 @@ class TestScopeSignalRanking:
         assert detect_scope(project) == "project"
 
     def test_import_lines_still_decide_when_no_hooks_are_registered(
-        self, tmp_path: Path, monkeypatch
+        self, sandbox_home: Path
     ):
         """install --keep-settings leaves the weaker signals as the only ones."""
-        home = tmp_path / "home"
-        home.mkdir()
-        monkeypatch.setattr(Path, "home", staticmethod(lambda: home))
-        project = home / "proj"
+        project = sandbox_home / "proj"
         _make_scoped_install(project)
         (project / "CLAUDE.local.md").write_text(
             "@.claude/superclaude/CLAUDE_SC.md\n", encoding="utf-8"
@@ -614,18 +585,13 @@ class TestScopeSignalRanking:
 
         assert detect_scope(project) == "local"
 
-    def test_unparseable_settings_file_is_not_hook_evidence(
-        self, tmp_path: Path, monkeypatch
-    ):
+    def test_unparseable_settings_file_is_not_hook_evidence(self, sandbox_home: Path):
         """A corrupt file must not win the top rung and outrank a real import.
 
         Its bare existence is still the last-resort tiebreak, which is why this
         pins the ranking rather than the file being ignored outright.
         """
-        home = tmp_path / "home"
-        home.mkdir()
-        monkeypatch.setattr(Path, "home", staticmethod(lambda: home))
-        project = home / "proj"
+        project = sandbox_home / "proj"
         _make_scoped_install(project)
         (project / ".claude" / "settings.local.json").write_text(
             "{not json", encoding="utf-8"
@@ -717,9 +683,7 @@ class TestResolveReportingTarget:
         assert scope == "local"
         assert base_path == tmp_path / ".claude"
 
-    def test_falls_back_to_user_scope_outside_any_install(
-        self, tmp_path: Path, monkeypatch
-    ):
+    def test_falls_back_to_user_scope_outside_any_install(self, sandbox_home: Path):
         """The real walk-up, not a stub: it must not mistake $HOME for a project.
 
         Stubbing find_install_root to None here is what let the bug ship — the
@@ -727,10 +691,8 @@ class TestResolveReportingTarget:
         """
         from superclaude.cli.install_paths import resolve_reporting_target
 
-        home = tmp_path / "home"
-        home.mkdir()
-        base = _make_user_install(home, monkeypatch)
-        elsewhere = home / "repos" / "unrelated" / "src"
+        base = _make_user_install(sandbox_home)
+        elsewhere = sandbox_home / "repos" / "unrelated" / "src"
         elsewhere.mkdir(parents=True)
 
         scope, base_path = resolve_reporting_target(start=elsewhere)
@@ -738,9 +700,7 @@ class TestResolveReportingTarget:
         assert scope == "user"
         assert base_path == base
 
-    def test_home_is_a_candidate_and_is_named_user_scope(
-        self, tmp_path: Path, monkeypatch
-    ):
+    def test_home_is_a_candidate_and_is_named_user_scope(self, sandbox_home: Path):
         """Skipping $HOME made detect_scope's local-at-home branch unreachable.
 
         $HOME is now an ordinary candidate; naming it correctly is
@@ -751,16 +711,14 @@ class TestResolveReportingTarget:
             resolve_reporting_target,
         )
 
-        home = tmp_path / "home"
-        home.mkdir()
-        base = _make_user_install(home, monkeypatch)
-        deep = home / "repos" / "unrelated"
+        base = _make_user_install(sandbox_home)
+        deep = sandbox_home / "repos" / "unrelated"
         deep.mkdir(parents=True)
 
-        assert find_install_root(deep) == home
+        assert find_install_root(deep) == sandbox_home
         assert resolve_reporting_target(start=deep) == ("user", base)
 
-    def test_local_install_at_home_reaches_the_cli(self, tmp_path: Path, monkeypatch):
+    def test_local_install_at_home_reaches_the_cli(self, sandbox_home: Path):
         """detect_scope and resolve_reporting_target must not disagree.
 
         They did: detect_scope supported a local install at $HOME and had a
@@ -769,26 +727,20 @@ class TestResolveReportingTarget:
         """
         from superclaude.cli.install_paths import resolve_reporting_target
 
-        home = tmp_path / "home"
-        home.mkdir()
+        home = sandbox_home
         _make_scoped_install(home)
         _register_hooks(home / ".claude", "settings.local.json")
-        monkeypatch.setattr(Path, "home", staticmethod(lambda: home))
         deep = home / "work"
         deep.mkdir()
 
         assert detect_scope(home) == "local"
         assert resolve_reporting_target(start=deep) == ("local", home / ".claude")
 
-    def test_a_project_install_under_home_is_still_found(
-        self, tmp_path: Path, monkeypatch
-    ):
+    def test_a_project_install_under_home_is_still_found(self, sandbox_home: Path):
         from superclaude.cli.install_paths import find_install_root
 
-        home = tmp_path / "home"
-        home.mkdir()
-        _make_user_install(home, monkeypatch)
-        project = home / "repos" / "myproject"
+        _make_user_install(sandbox_home)
+        project = sandbox_home / "repos" / "myproject"
         project.mkdir(parents=True)
         _make_scoped_install(project)
 
@@ -810,15 +762,12 @@ class TestResolveReportingTarget:
         assert base_path == tmp_path / ".claude"
 
     def test_explicit_local_scope_names_the_cwd_when_no_install_is_found(
-        self, tmp_path: Path, monkeypatch
+        self, sandbox_home: Path, monkeypatch
     ):
         """--scope local with nothing installed points where install would write."""
         from superclaude.cli.install_paths import resolve_reporting_target
 
-        home = tmp_path / "home"
-        home.mkdir()
-        monkeypatch.setattr(Path, "home", staticmethod(lambda: home))
-        elsewhere = home / "repos" / "unrelated"
+        elsewhere = sandbox_home / "repos" / "unrelated"
         elsewhere.mkdir(parents=True)
         monkeypatch.chdir(elsewhere)
 
@@ -854,14 +803,9 @@ class TestResolveReportingTarget:
         assert find_install_root(deep) is None
         assert resolve_reporting_target(start=deep) == ("user", home / ".claude")
 
-    def test_walk_up_reaches_root_when_start_is_outside_home(
-        self, tmp_path: Path, monkeypatch
-    ):
+    def test_walk_up_reaches_root_when_start_is_outside_home(self, tmp_path: Path):
         from superclaude.cli.install_paths import find_install_root
 
-        home = tmp_path / "home"
-        home.mkdir()
-        monkeypatch.setattr(Path, "home", staticmethod(lambda: home))
         project = tmp_path / "srv" / "app"
         (project / "src").mkdir(parents=True)
         _make_scoped_install(project)
@@ -911,9 +855,6 @@ class TestLinkedWorktreeAnchors:
         self, tmp_path, monkeypatch
     ):
         main, linked = _make_linked_worktree(tmp_path)
-        home = tmp_path / "home"
-        (home / ".claude").mkdir(parents=True)
-        monkeypatch.setattr(Path, "home", staticmethod(lambda: home))
         monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(linked))
 
         assert claude_base() == main / ".claude"
@@ -929,9 +870,6 @@ class TestLinkedWorktreeAnchors:
         self, tmp_path, monkeypatch
     ):
         main, linked = _make_linked_worktree(tmp_path)
-        home = tmp_path / "home"
-        (home / ".claude").mkdir(parents=True)
-        monkeypatch.setattr(Path, "home", staticmethod(lambda: home))
         monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(linked))
 
         assert hook_state_dir() == main / ".claude" / ".superclaude_hooks"
@@ -949,15 +887,12 @@ class TestLinkedWorktreeAnchors:
         assert project_key() != main_key
 
     def test_main_worktree_without_an_install_falls_back_to_user_scope(
-        self, tmp_path, monkeypatch
+        self, tmp_path, sandbox_home, monkeypatch
     ):
         _main, linked = _make_linked_worktree(tmp_path, with_install=False)
-        home = tmp_path / "home"
-        (home / ".claude").mkdir(parents=True)
-        monkeypatch.setattr(Path, "home", staticmethod(lambda: home))
         monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(linked))
 
-        assert claude_base() == home / ".claude"
+        assert claude_base() == sandbox_home / ".claude"
 
 
 class TestMainWorktreeRoot:

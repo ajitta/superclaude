@@ -14,6 +14,14 @@ import json
 import subprocess
 import sys
 
+from superclaude.utils import (
+    atomic_write_json,
+    claude_base,
+    detect_scope,
+    hook_state_dir,
+    project_key,
+)
+
 
 def get_install_status() -> str:
     """One line describing the install that is actually present.
@@ -26,11 +34,6 @@ def get_install_status() -> str:
     Returns:
         A single status line, never empty
     """
-    try:
-        from superclaude.utils import claude_base, detect_scope
-    except ImportError:
-        return "⚠️ superclaude: install status unavailable"
-
     base = claude_base()
     # A two-way user/project test reported a local install as "project scope".
     # The two share <project>/.claude, so only detect_scope() separates them.
@@ -66,8 +69,6 @@ def _pr_cache_path():
     ``superclaude uninstall`` reaches it. Keyed by ``project_key()`` because a
     user-scope install shares one state directory across every project.
     """
-    from superclaude.utils import hook_state_dir, project_key
-
     return hook_state_dir() / f"pr_status_{project_key()}.json"
 
 
@@ -89,7 +90,7 @@ def _read_pr_cache(branch: str) -> str | None:
             return None
         line = entry.get("line")
         return line if isinstance(line, str) else None
-    except (OSError, json.JSONDecodeError, AttributeError, ImportError):
+    except (OSError, json.JSONDecodeError, AttributeError):
         return None
 
 
@@ -98,8 +99,6 @@ def _write_pr_cache(branch: str, line: str) -> None:
     import time
 
     try:
-        from superclaude.utils import atomic_write_json
-
         path = _pr_cache_path()
         data = {}
         if path.is_file():
@@ -111,7 +110,7 @@ def _write_pr_cache(branch: str, line: str) -> None:
                 data = {}
         data[branch] = {"ts": time.time(), "line": line}
         atomic_write_json(path, data)
-    except (OSError, ImportError, TypeError):
+    except (OSError, TypeError):
         pass
 
 

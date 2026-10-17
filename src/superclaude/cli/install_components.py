@@ -11,7 +11,6 @@ import shutil
 from pathlib import Path
 from typing import List, Tuple
 
-from superclaude import __version__
 from superclaude.utils import (
     is_legacy_hook_command,
     is_superclaude_hook,
@@ -27,6 +26,7 @@ from .install_paths import (
     _get_source_dir,
     _get_target_dir,
     _run,
+    console_script_problems,
     find_legacy_skills,
     find_unshipped,
     probe_console_script,
@@ -338,14 +338,13 @@ def install_hooks(
         scope: Installation scope ("user", "project", or "local")
 
     Returns:
-        Tuple of (installed_count, skipped_count, failed_count, messages)
+        Tuple of (installed_count, failed_count, messages)
     """
     package_root = _get_package_root()
     hooks_source = package_root / "hooks"
     hooks_target = base_path / "hooks"
 
     installed = 0
-    skipped = 0
     failed = 0
     messages = []
 
@@ -354,14 +353,14 @@ def install_hooks(
     hooks_json_file = hooks_source / "hooks.json"
     if not hooks_json_file.exists():
         messages.append("hooks.json not found, skipping hooks configuration")
-        return installed, skipped, failed, messages
+        return installed, failed, messages
 
     try:
         hooks_content = hooks_json_file.read_text(encoding="utf-8")
     except OSError as e:
         failed += 1
         messages.append(f"Failed to read hooks.json: {e}")
-        return installed, skipped, failed, messages
+        return installed, failed, messages
 
     # 1. Copy hooks.json to <base>/hooks/hooks.json. Build output, not user
     # content: rewritten regardless of --force so the file on disk describes
@@ -406,7 +405,7 @@ def install_hooks(
             _legacy_scripts_notice(legacy_scripts, base_path / settings_filename(scope))
         )
 
-    return installed, skipped, failed, messages
+    return installed, failed, messages
 
 
 def _console_script_warnings() -> List[str]:
@@ -421,35 +420,10 @@ def _console_script_warnings() -> List[str]:
     proxy: the hook shell inherits the launching shell's PATH (measured
     2026-09-05 on macOS; Windows unmeasured), not this process's.
     """
-    probe = probe_console_script()
-    where = probe["path"]
-    fix = (
-        "put this release's console script on PATH "
-        "(uv: `uv tool update-shell`; pipx: `pipx ensurepath`)"
-    )
-    if where is None:
-        excluded = (
-            f" `{probe['excluded']}` was left out of the search: Claude Code's shell "
-            "sees it only while that environment is active there."
-            if probe["excluded"]
-            else ""
-        )
-        return [
-            "⚠️  `superclaude` is not on PATH. Every hook runs `superclaude hook "
-            f"<name>` and exits 127 where Claude Code cannot find it — {fix}.{excluded}"
-        ]
-    if not probe["has_hook"]:
-        return [
-            f"⚠️  PATH resolves `superclaude` to {where}, which has no `hook` "
-            f"subcommand ({probe['version'] or 'unknown version'}); every hook exits "
-            f"2 there, the blocking code. Upgrade that install or {fix}."
-        ]
-    if probe["version"] and probe["version"] != __version__:
-        return [
-            f"⚠️  PATH resolves `superclaude` to {where} (version {probe['version']}), "
-            f"not this install ({__version__}); Claude Code runs that version's hooks."
-        ]
-    return []
+    problems = console_script_problems(probe_console_script())
+    if not problems:
+        return []
+    return ["⚠️  " + ". ".join(problems) + "."]
 
 
 def _registered_sc_commands(settings_file: Path) -> List[str]:
@@ -582,7 +556,7 @@ def install_all(
                 messages.append(f"   - {name}")
 
     # Install the hook registration
-    hooks_installed, _, hooks_failed, hooks_messages = install_hooks(
+    hooks_installed, hooks_failed, hooks_messages = install_hooks(
         base_path, force, scope
     )
     total_installed += hooks_installed

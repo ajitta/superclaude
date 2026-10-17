@@ -14,7 +14,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-from superclaude.utils import project_root
+from superclaude.utils import project_root, read_hook_input
 
 PRETTIER_EXTENSIONS = {".ts", ".tsx", ".js", ".jsx"}
 
@@ -34,43 +34,39 @@ def _find_prettier() -> str | None:
 
 
 def main() -> None:
+    data = read_hook_input()
+    if data is None:
+        return
+
+    # Prevent infinite loops when Claude is stopping
+    if data.get("stop_hook_active"):
+        return
+
+    file_path = data.get("tool_input", {}).get("file_path", "")
+    if not file_path:
+        return
+
+    path = Path(file_path)
+    if path.suffix.lower() not in PRETTIER_EXTENSIONS:
+        return
+
+    prettier = _find_prettier()
+    if prettier is None:
+        return  # prettier not installed — silent skip
+
+    cmd = [prettier, "--write", str(path)]
     try:
-        stdin_data = sys.stdin.read() if not sys.stdin.isatty() else ""
-        if not stdin_data:
-            return
-
-        data = json.loads(stdin_data)
-
-        # Prevent infinite loops when Claude is stopping
-        if data.get("stop_hook_active"):
-            return
-
-        file_path = data.get("tool_input", {}).get("file_path", "")
-        if not file_path:
-            return
-
-        path = Path(file_path)
-        if path.suffix.lower() not in PRETTIER_EXTENSIONS:
-            return
-
-        prettier = _find_prettier()
-        if prettier is None:
-            return  # prettier not installed — silent skip
-
-        cmd = [prettier, "--write", str(path)]
         result = subprocess.run(cmd, capture_output=True, timeout=30)
-
-        if result.returncode == 0:
-            # Structured output so Claude knows formatting occurred
-            msg = json.dumps({"systemMessage": f"Formatted {path.name} with prettier"})
-            print(msg)
-
-    except json.JSONDecodeError:
-        pass
     except subprocess.TimeoutExpired:
         print("prettier hook: timeout", file=sys.stderr)
+        return
     except OSError:
-        pass  # prettier not installed — silent skip
+        return  # prettier not runnable — silent skip
+
+    if result.returncode == 0:
+        # Structured output so Claude knows formatting occurred
+        msg = json.dumps({"systemMessage": f"Formatted {path.name} with prettier"})
+        print(msg)
 
 
 if __name__ == "__main__":

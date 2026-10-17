@@ -11,6 +11,8 @@ from pathlib import Path
 
 import pytest
 
+from tests.unit.md_helpers import split_frontmatter
+
 # --- Path constants ---
 CONTENT_ROOT = Path(__file__).parent.parent.parent / "src" / "superclaude"
 AGENTS_DIR = CONTENT_ROOT / "agents"
@@ -45,14 +47,9 @@ def parse_hooks_json_script_refs() -> list[str]:
 
 def parse_skill_agent_field(skill_manifest: Path) -> str | None:
     """Extract 'agent:' value from SKILL.md YAML frontmatter."""
-    content = skill_manifest.read_text(encoding="utf-8")
-    if not content.startswith("---"):
+    frontmatter, _ = split_frontmatter(skill_manifest.read_text(encoding="utf-8"))
+    if frontmatter is None:
         return None
-    # Find frontmatter block
-    parts = content.split("---", 2)
-    if len(parts) < 3:
-        return None
-    frontmatter = parts[1]
     match = re.search(r"^\s*agent:\s*(.+)$", frontmatter, re.MULTILINE)
     if match:
         return match.group(1).strip()
@@ -64,8 +61,6 @@ def parse_skill_agent_field(skill_manifest: Path) -> str | None:
 # `model:` fields (Apr 2026). TestModelRouting was deleted alongside.
 
 
-# --- Collected file lists for parametrize ---
-COMMAND_FILES = sorted(f for f in COMMANDS_DIR.glob("*.md") if f.name != "README.md")
 SKILL_MANIFESTS = sorted(SKILLS_DIR.glob("*/SKILL.md"))
 
 

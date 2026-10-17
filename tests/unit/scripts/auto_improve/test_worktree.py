@@ -25,43 +25,15 @@ def repo(tmp_path):
 
 
 def test_create_worktree_at_expected_path(repo):
-    mgr = WorktreeManager(repo)
-    wt = mgr.create()
-    try:
-        assert wt.path.parent.name == ".worktrees"
-        assert wt.path.name.startswith("auto-improve-")
-        assert (wt.path / "README.md").exists()
-    finally:
-        mgr.cleanup(wt)
+    wt = WorktreeManager(repo).create()
+    assert wt.path.parent.name == ".worktrees"
+    assert wt.path.name.startswith("auto-improve-")
+    assert (wt.path / "README.md").exists()
+    assert wt.results_tsv_path == wt.path / "results.tsv"
 
 
-def test_cleanup_removes_worktree(repo):
-    mgr = WorktreeManager(repo)
-    wt = mgr.create()
-    path = wt.path
-    assert path.exists()
-    mgr.cleanup(wt)
-    assert not path.exists()
-
-
-def test_init_creates_results_tsv_inside_worktree(repo):
-    mgr = WorktreeManager(repo)
-    wt = mgr.create()
-    try:
-        wt.init_results_tsv()
-        tsv = wt.results_tsv_path
-        assert tsv.exists()
-        assert tsv.parent == wt.path
-        first_line = tsv.read_text(encoding="utf-8").splitlines()[0]
-        assert first_line.startswith("# cycle_id")
-    finally:
-        mgr.cleanup(wt)
-
-
-def test_main_repo_unmodified_after_create_cleanup(repo):
+def test_main_repo_unmodified_after_create(repo):
     snapshot = sorted(p.name for p in repo.iterdir() if p.name != ".worktrees")
-    mgr = WorktreeManager(repo)
-    wt = mgr.create()
-    mgr.cleanup(wt)
+    WorktreeManager(repo).create()
     after = sorted(p.name for p in repo.iterdir() if p.name != ".worktrees")
     assert snapshot == after

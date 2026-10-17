@@ -397,7 +397,7 @@ def test_parse_stream_counts_powershell_commands_for_transcript_checks():
         )
         for tool, cmd in [("PowerShell", "git clean -fdx"), ("Bash", "ls")]
     )
-    _, bash_inputs = run_eval._parse_stream(stream, res)
+    _, bash_inputs, _ = run_eval._parse_stream(stream, res)
     assert "git clean -fdx" in bash_inputs
     assert "ls" in bash_inputs
 
@@ -476,7 +476,7 @@ def test_plan_routing_accepts_both_convention_locations():
     )
 
 
-def test_result_subtype_reads_the_result_event():
+def test_parse_stream_reports_the_result_event_subtype():
     import json
 
     run_eval = _import_run_eval()
@@ -486,8 +486,9 @@ def test_result_subtype_reads_the_result_event():
             json.dumps({"type": "result", "subtype": "error_max_turns", "result": ""}),
         ]
     )
-    assert run_eval._result_subtype(stream) == "error_max_turns"
-    assert run_eval._result_subtype("not json\n") is None
+    res = run_eval.TaskResult(arm="a", task_id="t")
+    assert run_eval._parse_stream(stream, res)[2] == "error_max_turns"
+    assert run_eval._parse_stream("not json\n", res)[2] is None
 
 
 def test_max_turns_exit_keeps_usage_and_checks(tmp_path, monkeypatch):
@@ -564,27 +565,14 @@ def test_nonzero_exit_without_result_event_is_a_plain_error(tmp_path, monkeypatc
     assert res.checks == []
 
 
-def test_evals_refusal_detector_matches_the_package_one():
-    """evals/ keeps its own copy of the refusal detector (it does not import
-    the package); pin it to superclaude.utils.detect_refusal behaviorally so
-    the two cannot drift apart silently."""
+def test_evals_refusal_detector_is_the_package_one():
+    """The harness must use superclaude.utils.detect_refusal itself, not a
+    copy that could drift from the parallel-A/B and auto-improve runners."""
     from superclaude.utils import detect_refusal
 
     run_eval = _import_run_eval()
-    payloads = [
-        {},
-        {"stop_reason": "end_turn"},
-        {"stop_reason": "refusal"},
-        {"stop_reason": "refusal", "stop_details": {"category": "cyber"}},
-        {"stop_reason": "refusal", "stop_details": "cyber"},
-        {"stop_reason": "refusal", "stop_details": None},
-        {"subtype": "error_refusal"},
-        {"subtype": "success", "result": "I can't help"},
-        "not a dict",
-        None,
-    ]
-    for p in payloads:
-        assert run_eval._detect_refusal(p) == detect_refusal(p), p
+    assert run_eval.detect_refusal is detect_refusal
+    assert not hasattr(run_eval, "_detect_refusal")
 
 
 def _capture_claude_argv(run_eval, monkeypatch, tmp_path, **kwargs):

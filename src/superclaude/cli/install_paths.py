@@ -15,6 +15,7 @@ import sys
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
+from superclaude import __version__
 from superclaude.utils import detect_scope, same_dir
 
 # Component definitions: (source_subdir, target_subdir, description)
@@ -346,3 +347,44 @@ def probe_console_script() -> Dict[str, Any]:
     match = re.search(r"version\s+(\S+)", version_run.stdout if version_run else "")
     probe["version"] = match.group(1) if match else None
     return probe
+
+
+CONSOLE_SCRIPT_FIX = (
+    "Put this release's console script on PATH ahead of any other "
+    "(uv: `uv tool update-shell`; pipx: `pipx ensurepath`)"
+)
+
+
+def console_script_problems(probe: Dict[str, Any]) -> List[str]:
+    """Why the probed `superclaude` cannot run this release's hooks, one line each.
+
+    Empty when it can. The last line is the repair. One wording for `doctor`
+    (a failed check's details) and `install` (one warning line), so the two
+    never disagree about the same probe.
+    """
+    where = probe["path"]
+    if where is None:
+        lines = [
+            "`superclaude` not found on PATH: every `superclaude hook <name>` "
+            "registration exits 127 in Claude Code"
+        ]
+        if probe["excluded"]:
+            lines.append(
+                f"{probe['excluded']} was left out of the search — Claude Code's "
+                "shell sees it only while that environment is active there"
+            )
+        return [*lines, CONSOLE_SCRIPT_FIX]
+    if not probe["has_hook"]:
+        return [
+            f"{where} has no `hook` subcommand "
+            f"({probe['version'] or 'unknown version'}): every hook exits 2 "
+            "there, the blocking code",
+            CONSOLE_SCRIPT_FIX,
+        ]
+    if probe["version"] and probe["version"] != __version__:
+        return [
+            f"{where} is version {probe['version']}; this install is "
+            f"{__version__} — Claude Code runs that version's hooks",
+            CONSOLE_SCRIPT_FIX,
+        ]
+    return []

@@ -664,7 +664,7 @@ class TestReadPaths:
         assert capsys.readouterr().out.count("(no insights yet)") == 2
 
 
-# ---------- harvest-from-hook argv translation (S3) ----------
+# ---------- hook entry points: stdin payload → Namespace (S3) ----------
 
 
 class TestHarvestFromHook:
@@ -766,6 +766,59 @@ class _StdinMock:
         return self._text
 
 
+class TestRequestFromHook:
+    def test_payload_becomes_the_request_namespace(self, workdir, monkeypatch):
+        # The hook path hands cmd_request a Namespace built from stdin, with the
+        # same field set the `request` subcommand's parser would have produced.
+        seen = []
+        monkeypatch.setattr(iw, "cmd_request", lambda args: (seen.append(args), 0)[1])
+        payload = json.dumps(
+            {
+                "session_id": "sess1",
+                "cwd": str(workdir),
+                "transcript_path": "t.jsonl",
+                "stop_hook_active": True,
+            }
+        )
+        monkeypatch.setattr("sys.stdin", _StdinMock(payload))
+        assert iw.main(["request-from-hook"]) == 0
+        assert vars(seen[0]) == {
+            "session_id": "sess1",
+            "cwd": str(workdir),
+            "transcript_path": "t.jsonl",
+            "stop_hook_active": True,
+        }
+
+    def test_malformed_payload_defaults(self, workdir, monkeypatch):
+        seen = []
+        monkeypatch.setattr(iw, "cmd_request", lambda args: (seen.append(args), 0)[1])
+        monkeypatch.setattr("sys.stdin", _StdinMock("not-json {garbage"))
+        assert iw.main(["request-from-hook"]) == 0
+        ns = seen[0]
+        assert (ns.session_id, ns.cwd, ns.transcript_path, ns.stop_hook_active) == (
+            "",
+            str(workdir),
+            None,
+            False,
+        )
+
+
+class TestJsonlHelpers:
+    def test_read_skips_bad_lines_and_missing_file(self, tmp_path):
+        p = tmp_path / "x.jsonl"
+        assert iw._read_jsonl(p) == []
+        p.write_text('{"a": 1}\nnot json\n\n{"b": 2}\n', encoding="utf-8")
+        assert iw._read_jsonl(p) == [{"a": 1}, {"b": 2}]
+
+    def test_write_appends_by_default_and_creates_parent(self, tmp_path):
+        p = tmp_path / "nested" / "x.jsonl"
+        iw._write_jsonl(p, [{"a": "한"}])
+        iw._write_jsonl(p, [{"b": 2}])
+        assert p.read_text(encoding="utf-8") == '{"a": "한"}\n{"b": 2}\n'
+        iw._write_jsonl(p, [{"c": 3}], mode="w")
+        assert iw._read_jsonl(p) == [{"c": 3}]
+
+
 class TestPendingCountFromHook:
     def test_project_root_wins_over_stdin_cwd(self, workdir, monkeypatch, capsys):
         # The stdin payload's cwd is the *session* cwd and may be a
@@ -809,9 +862,16 @@ class TestPendingCountFromHook:
 
 class TestTimestampFormat:
     def test_colon_offset_format(self):
+        from datetime import datetime
+
         s = iw._now_iso()
-        # ISO 8601 with colon offset: ...+HH:MM or ...-HH:MM
+        # ISO 8601 with colon offset: ...+HH:MM or ...-HH:MM, no microseconds
         assert re.match(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}[+-]\d{2}:\d{2}$", s), s
+        # The offset is the local one, not a naive timestamp or UTC
+        assert (
+            datetime.fromisoformat(s).utcoffset()
+            == datetime.now().astimezone().utcoffset()
+        )
 
     def test_consecutive_calls_monotonic(self):
         # Sanity: two calls produce parseable, ordered timestamps

@@ -1421,3 +1421,43 @@ class TestRemoveClaudeMdImport:
 
         assert ok, message
         assert claude_md.read_text(encoding="utf-8") == "# My notes\nkeep this\n"
+
+
+class TestCheckClaudeMdImport:
+    """Both path spellings of the import line count: a file written on
+    Windows may carry backslashes, and Claude Code resolves either."""
+
+    @pytest.mark.parametrize(
+        ("scope", "line"),
+        [
+            ("user", "@superclaude/CLAUDE_SC.md"),
+            ("user", "@superclaude\\CLAUDE_SC.md"),
+            ("local", "@.claude/superclaude/CLAUDE_SC.md"),
+            ("local", "@.claude\\superclaude\\CLAUDE_SC.md"),
+        ],
+        ids=["user-slash", "user-backslash", "local-slash", "local-backslash"],
+    )
+    def test_either_separator_is_detected(self, tmp_path: Path, scope, line):
+        from superclaude.cli.install_settings import check_claude_md_import
+
+        base = tmp_path / ".claude"
+        base.mkdir()
+        target = (
+            tmp_path / "CLAUDE.local.md" if scope == "local" else base / "CLAUDE.md"
+        )
+        target.write_text(f"# Project\n\n{line}\n", encoding="utf-8")
+
+        has_import, message = check_claude_md_import(base, scope)
+        assert has_import, message
+        assert "already imports" in message
+
+    def test_a_different_import_is_not_this_one(self, tmp_path: Path):
+        from superclaude.cli.install_settings import check_claude_md_import
+
+        base = tmp_path / ".claude"
+        base.mkdir()
+        (base / "CLAUDE.md").write_text("@other/CLAUDE_SC.md\n", encoding="utf-8")
+
+        has_import, message = check_claude_md_import(base, "user")
+        assert not has_import
+        assert "does not import" in message

@@ -34,7 +34,13 @@ from superclaude.hooks.mcp_fallback import MCP_FALLBACKS, check_mcp_and_notify
 # context_loader`, i.e. under the console script's own interpreter, which has
 # the package. Silently degrading here would put state and content lookups in
 # the wrong scope.
-from superclaude.utils import claude_base, context_cache_file, int_env, project_root
+from superclaude.utils import (
+    claude_base,
+    context_cache_file,
+    int_env,
+    project_root,
+    read_hook_stdin,
+)
 
 # Configuration
 INJECT_MODE = os.environ.get("CLAUDE_CONTEXT_INJECT", "1").lower() in (
@@ -384,18 +390,13 @@ RETIRED_FLAGS: dict[str, str] = {
 }
 
 
-def resolve_flags(prompt: str) -> tuple[str, list[str]]:
-    """Resolve flag typos in a prompt.
-
-    Returns:
-        Tuple of (corrected_prompt, list of notification messages)
-    """
+def resolve_flags(prompt: str) -> list[str]:
+    """Notification messages for retired, misspelled or unknown flags in a prompt."""
     # difflib (3.8ms) is only reached on the unrecognized-flag path. This hook
     # runs on every prompt, and most prompts carry no misspelled flag.
     import difflib
 
     notifications: list[str] = []
-    corrected = prompt
     scannable = scannable_prompt(prompt)
     declared: set[str] | None = None
 
@@ -447,7 +448,7 @@ def resolve_flags(prompt: str) -> tuple[str, list[str]]:
                 f"--{flag} is not a recognized flag. Did you mean: {suggestions}?"
             )
 
-    return corrected, notifications
+    return notifications
 
 
 # Commands renamed out from under their users, mapped to what to type now.
@@ -978,11 +979,7 @@ def migration_reference_roots() -> list[Path]:
     if config_dir:
         candidates.append(Path(config_dir))
     candidates.append(Path.home() / ".claude")
-    roots: list[Path] = []
-    for root in candidates:
-        if root not in roots:
-            roots.append(root)
-    return roots
+    return list(dict.fromkeys(candidates))
 
 
 def find_migration_reference(roots: list[Path] | None = None) -> Path | None:
@@ -1013,11 +1010,8 @@ def find_migration_reference(roots: list[Path] | None = None) -> Path | None:
 
 def bundled_reference_roots() -> list[Path]:
     """Temp directories Claude Code may have extracted its bundled skills to."""
-    roots: list[Path] = []
-    for value in (os.environ.get("CLAUDE_CODE_TMPDIR"), tempfile.gettempdir()):
-        if value and Path(value) not in roots:
-            roots.append(Path(value))
-    return roots
+    values = (os.environ.get("CLAUDE_CODE_TMPDIR"), tempfile.gettempdir())
+    return list(dict.fromkeys(Path(v) for v in values if v))
 
 
 def find_bundled_reference(roots: list[Path] | None = None) -> Path | None:
@@ -1175,8 +1169,7 @@ def _parse_hook_input(stdin_data: str) -> tuple[str, str | None]:
 
 def main() -> None:
     # Read and parse JSON input from Claude Code
-    stdin_data = sys.stdin.read() if not sys.stdin.isatty() else ""
-    prompt, session_id = _parse_hook_input(stdin_data)
+    prompt, session_id = _parse_hook_input(read_hook_stdin())
     # Pin the dedup cache before anything reads it — a concurrent session in the
     # same project must not consume the injections meant for this one.
     resolve_cache_file(session_id)
@@ -1185,7 +1178,7 @@ def main() -> None:
         return
 
     # v3.2: Resolve flag typos before processing
-    prompt, flag_notifications = resolve_flags(prompt)
+    flag_notifications = resolve_flags(prompt)
     if flag_notifications:
         for note in flag_notifications:
             print(f"<!-- superclaude flag: {note} -->")

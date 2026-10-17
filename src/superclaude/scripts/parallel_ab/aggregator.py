@@ -2,11 +2,10 @@
 
 from __future__ import annotations
 
-import json
 from pathlib import Path
 from typing import Iterable
 
-from .observation import Observation, validate
+from .observation import Observation
 
 FIXED_COLS = (
     "variant",
@@ -19,35 +18,22 @@ FIXED_COLS = (
 )
 
 
-def aggregate(obs_dir: Path) -> tuple[Path, Path]:
-    """Read every ``obs-*.json`` under *obs_dir* and emit matrix.md + decision.md.
+def aggregate(out_dir: Path, observations: Iterable[Observation]) -> tuple[Path, Path]:
+    """Render *observations* (this run's, any order) to matrix.md + decision.md
+    under *out_dir*; return the two paths.
 
-    Returns the two output paths. Raises :class:`FileNotFoundError` if no
-    observation files are present.
+    The ``obs-*.json`` files on disk are for the human reader only and are
+    never read back, so a stale file from an earlier run cannot enter the
+    matrix or the decision.
     """
-    obs_dir = Path(obs_dir)
-    obs_paths = sorted(obs_dir.glob("obs-*.json"))
-    if not obs_paths:
-        raise FileNotFoundError(f"no obs-*.json files in {obs_dir}")
+    out_dir = Path(out_dir)
+    obs_list = sorted(observations, key=lambda o: o.variant_id)
 
-    obs_list: list[Observation] = []
-    for p in obs_paths:
-        data = json.loads(p.read_text(encoding="utf-8"))
-        obs_list.append(validate(data))
-    obs_list.sort(key=lambda o: o.variant_id)
-
-    matrix_path = obs_dir / "matrix.md"
-    decision_path = obs_dir / "decision.md"
+    matrix_path = out_dir / "matrix.md"
+    decision_path = out_dir / "decision.md"
     matrix_path.write_text(_render_matrix(obs_list), encoding="utf-8")
     decision_path.write_text(_render_decision(obs_list), encoding="utf-8")
     return matrix_path, decision_path
-
-
-def _axes_columns(obs_list: Iterable[Observation]) -> list[str]:
-    keys: set[str] = set()
-    for o in obs_list:
-        keys.update(o.axes.keys())
-    return sorted(keys)
 
 
 def _tools_summary(obs: Observation) -> str:
@@ -56,7 +42,7 @@ def _tools_summary(obs: Observation) -> str:
     return ", ".join(f"{tc.name}×{tc.count}" for tc in obs.tool_calls)
 
 
-def _row(obs: Observation, axes_cols: list[str]) -> str:
+def _row(obs: Observation) -> str:
     sha_short = obs.final_output_sha256[:8] if obs.final_output_sha256 else "—"
     exit_cell = obs.exit_status
     if obs.refusal_category:
@@ -70,17 +56,13 @@ def _row(obs: Observation, axes_cols: list[str]) -> str:
         _tools_summary(obs),
         sha_short,
     ]
-    for col in axes_cols:
-        cells.append(obs.axes.get(col, "—"))
     return "| " + " | ".join(cells) + " |"
 
 
 def _render_matrix(obs_list: list[Observation]) -> str:
-    axes_cols = _axes_columns(obs_list)
-    header_cells = list(FIXED_COLS) + axes_cols
-    header = "| " + " | ".join(header_cells) + " |"
-    sep = "|" + "|".join(["---"] * len(header_cells)) + "|"
-    rows = [_row(o, axes_cols) for o in obs_list]
+    header = "| " + " | ".join(FIXED_COLS) + " |"
+    sep = "|" + "|".join(["---"] * len(FIXED_COLS)) + "|"
+    rows = [_row(o) for o in obs_list]
     return "\n".join([header, sep, *rows]) + "\n"
 
 

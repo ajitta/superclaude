@@ -87,76 +87,55 @@ class TestResolveFlags:
 
     def test_ultrathink_not_remapped(self):
         """ultrathink is a CC native deep-reasoning trigger, not an SC alias."""
-        prompt, notes = resolve_flags("analyze code --ultrathink")
-        assert prompt == "analyze code --ultrathink"
-        assert notes == []
+        assert resolve_flags("analyze code --ultrathink") == []
 
     def test_fast_not_remapped(self):
         """fast is a CC native fast-mode toggle, not an SC flag."""
-        prompt, notes = resolve_flags("analyze code --fast")
-        assert "--fast" in prompt
-        assert notes == []
+        assert resolve_flags("analyze code --fast") == []
 
     def test_removed_alias_parallel_no_auto_remap(self):
-        """--parallel removed as alias; prompt is not silently rewritten."""
-        prompt, notes = resolve_flags("analyze code --parallel")
-        assert "--parallel" in prompt  # preserved verbatim
-        assert "--delegate" not in prompt  # no hidden remap
-        # Fuzzy may or may not suggest; either way, no silent rewrite occurred
+        """--parallel removed as alias: the user gets a retired notice, not a remap."""
+        notes = resolve_flags("analyze code --parallel")
+        assert len(notes) == 1 and "--parallel was retired" in notes[0]
 
     # --- Valid flags pass through unchanged ---
 
     def test_valid_flag_unchanged(self):
-        prompt, notes = resolve_flags("analyze --tavily --c7")
-        assert prompt == "analyze --tavily --c7"
-        assert notes == []
+        assert resolve_flags("analyze --tavily --c7") == []
 
     def test_no_flags_returns_unchanged(self):
-        prompt, notes = resolve_flags("just a normal prompt")
-        assert prompt == "just a normal prompt"
-        assert notes == []
+        assert resolve_flags("just a normal prompt") == []
 
     # --- Fuzzy matching ---
 
     def test_fuzzy_suggests_close_match(self):
-        prompt, notes = resolve_flags("run --tavilyy")
+        notes = resolve_flags("run --tavilyy")
         # Should suggest --tavily as a close match
         assert len(notes) == 1
         assert "not a recognized flag" in notes[0]
         assert "--tavily" in notes[0]
 
     def test_totally_unknown_flag_no_suggestion(self):
-        prompt, notes = resolve_flags("run --xyzzy123")
-        # Too different from any valid flag — may or may not suggest
-        # At minimum, prompt should be unchanged
-        assert "--xyzzy123" in prompt
+        # Too different from any valid flag — may or may not suggest, never raises
+        assert isinstance(resolve_flags("run --xyzzy123"), list)
 
     # --- Multiple flags ---
 
     def test_multiple_valid_flags_pass_through(self):
-        prompt, notes = resolve_flags("go --vs --delegate --tavily")
-        assert prompt == "go --vs --delegate --tavily"
-        assert notes == []
+        assert resolve_flags("go --vs --delegate --tavily") == []
 
     def test_mixed_valid_and_unknown(self):
-        prompt, notes = resolve_flags("run --delegate --xyzbogus --tavily")
-        assert "--delegate" in prompt
-        assert "--tavily" in prompt
-        assert "--xyzbogus" in prompt  # unknown flag preserved
+        notes = resolve_flags("run --delegate --xyzbogus --tavily")
+        assert all(n.startswith("--xyzbogus") for n in notes)  # valid flags silent
 
     # --- Edge cases ---
 
     def test_flag_with_value_preserved(self):
-        prompt, notes = resolve_flags("run --concurrency 5 --tavily")
-        assert "--concurrency 5" in prompt
-        assert notes == []
+        assert resolve_flags("run --concurrency 5 --tavily") == []
 
     def test_case_insensitive_flag_detection(self):
         """Valid flags in prompt are lowercased for matching."""
-        prompt, notes = resolve_flags("run --Delegate")
-        # --Delegate matches VALID_FLAGS via lowercase → passes through unchanged
-        assert "--Delegate" in prompt
-        assert notes == []
+        assert resolve_flags("run --Delegate") == []
 
 
 class TestTieredInjection:
@@ -702,7 +681,7 @@ class TestFlagsAreReadWhereTheyAreUsed:
     def _notices(self, prompt):
         from superclaude.scripts.context_loader import resolve_flags
 
-        return resolve_flags(prompt)[1]
+        return resolve_flags(prompt)
 
     def test_a_shell_command_option_is_left_alone(self):
         for line in (
@@ -789,7 +768,7 @@ class TestContext7HasNoDocOnlyAFlag:
         assert "serena" not in VALID_FLAGS
         assert "serena" not in MCP_FALLBACKS
         assert "serena" not in CURRENT_MCP_SERVERS
-        assert resolve_flags("analyze --serena x") == ("analyze --serena x", [])
+        assert resolve_flags("analyze --serena x") == []
 
     def test_typed_c7_still_forces_a_lookup(self, monkeypatch, capsys):
         out = self._emit("--c7 add stripe checkout to this route", monkeypatch, capsys)
@@ -881,23 +860,23 @@ class TestCommandDeclaredFlags:
 
     def test_declared_flag_gets_no_typo_notice(self, tmp_path, monkeypatch):
         cl = self._fake_command(tmp_path, monkeypatch)
-        assert cl.resolve_flags("/sc:fake build it --safe")[1] == []
+        assert cl.resolve_flags("/sc:fake build it --safe") == []
 
     def test_command_name_case_does_not_matter(self, tmp_path, monkeypatch):
         cl = self._fake_command(tmp_path, monkeypatch)
-        assert cl.resolve_flags("/sc:FAKE build it --safe")[1] == []
+        assert cl.resolve_flags("/sc:FAKE build it --safe") == []
 
     def test_undeclaring_command_still_gets_the_notice(self, tmp_path, monkeypatch):
         cl = self._fake_command(tmp_path, monkeypatch)
-        assert len(cl.resolve_flags("/sc:other --safe")[1]) == 1
+        assert len(cl.resolve_flags("/sc:other --safe")) == 1
 
     def test_bare_flag_still_gets_the_notice(self, tmp_path, monkeypatch):
         cl = self._fake_command(tmp_path, monkeypatch)
-        assert len(cl.resolve_flags("--safe go")[1]) == 1
+        assert len(cl.resolve_flags("--safe go")) == 1
 
     def test_global_typo_is_still_caught_inside_a_command(self, tmp_path, monkeypatch):
         cl = self._fake_command(tmp_path, monkeypatch)
-        assert len(cl.resolve_flags("/sc:fake --instrospect")[1]) == 1
+        assert len(cl.resolve_flags("/sc:fake --instrospect")) == 1
 
     def test_declared_flag_suppresses_the_global_directive(
         self, tmp_path, monkeypatch, capsys
@@ -932,7 +911,7 @@ class TestShippedCommandFlags:
     def test_implement_safe_is_not_a_typo(self, monkeypatch):
         cl = self._cl(monkeypatch)
         prompt = "/sc:implement auth API --type api --safe --with-tests"
-        assert cl.resolve_flags(prompt)[1] == []
+        assert cl.resolve_flags(prompt) == []
 
     def test_implement_plan_is_not_the_global_plan(self, monkeypatch, capsys):
         cl = self._cl(monkeypatch)

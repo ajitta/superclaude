@@ -29,7 +29,6 @@ def _variant(id_: str = "A", flag: str = "--vs[k:5]") -> Variant:
 
 def _cfg(bare: bool = True, oauth_fallback: bool = True) -> RunnerCfg:
     return RunnerCfg(
-        cli="claude -p",
         model="claude-haiku-4-5",
         timeout_seconds=60,
         bare=bare,
@@ -43,12 +42,23 @@ def _json_stdout(
     output_tokens: int = 3200,
     tools: list[dict] | None = None,
 ) -> bytes:
-    payload = {
-        "result": text,
-        "usage": {"input_tokens": input_tokens, "output_tokens": output_tokens},
-        "tools_used": tools or [],
-    }
-    return json.dumps(payload).encode("utf-8")
+    """stream-json stdout: one assistant event (its tool_use blocks are
+    expanded from *tools* ``{name, count}`` pairs) and one result event."""
+    content = [
+        {"type": "tool_use", "id": f"t{i}", "name": t["name"], "input": {}}
+        for t in (tools or [])
+        for i in range(int(t["count"]))
+    ]
+    events = [
+        {"type": "assistant", "message": {"role": "assistant", "content": content}},
+        {
+            "type": "result",
+            "subtype": "success",
+            "result": text,
+            "usage": {"input_tokens": input_tokens, "output_tokens": output_tokens},
+        },
+    ]
+    return ("\n".join(json.dumps(e) for e in events) + "\n").encode("utf-8")
 
 
 class _FakeSpawner:
@@ -159,7 +169,7 @@ async def test_timeout_produces_timeout_obs(tmp_path: Path):
 
 
 @pytest.mark.asyncio
-async def test_tool_calls_parsed_from_json(tmp_path: Path):
+async def test_tool_calls_counted_from_assistant_tool_use_blocks(tmp_path: Path):
     tools = [{"name": "Grep", "count": 3}, {"name": "Read", "count": 2}]
     spawner = _FakeSpawner(
         [
@@ -212,8 +222,9 @@ def test_build_cmd_suppresses_bare_for_slash_command():
 def test_build_cmd_prompt_concatenates_input_flag_extra_args():
     v = Variant(id="X", flag="--vs", extra_args="--explain")
     cmd = _build_cmd(v, _scenario(), _cfg(bare=False))
-    # prompt is the last argument
+    # prompt is the last argument, after the `--` option terminator
     prompt = cmd[-1]
+    assert cmd[-2] == "--"
     assert "/sc:brainstorm rate limiter" in prompt
     assert "--vs" in prompt
     assert "--explain" in prompt
@@ -222,7 +233,17 @@ def test_build_cmd_prompt_concatenates_input_flag_extra_args():
 def test_build_cmd_empty_flag_no_double_space():
     v = Variant(id="X", flag="", extra_args="")
     cmd = _build_cmd(v, _scenario(), _cfg(bare=False))
-    assert cmd[-1] == "/sc:brainstorm rate limiter"
+    assert cmd[-2:] == ["--", "/sc:brainstorm rate limiter"]
+
+
+def test_build_cmd_flag_first_prompt_is_not_parsed_as_option():
+    # SC flags are typed first ("--introspect analyze X"); without `--` the
+    # claude CLI reads them as its own options and dies before a turn.
+    flag_first = Scenario(input="--introspect analyze auth.py", baseline_skill=None)
+    cmd = _build_cmd(_variant(flag=""), flag_first, _cfg(bare=True))
+    assert cmd[-2:] == ["--", "--introspect analyze auth.py"]
+    # every claude option comes before the terminator
+    assert cmd.index("--bare") < cmd.index("--")
 
 
 def test_looks_like_auth_fail_detects_keywords():
@@ -257,9 +278,9 @@ def test_parse_output_extracts_usage_and_tools():
 
 
 def test_parse_output_extracts_is_error_flag():
-    err_payload = json.dumps({"result": "rate limited", "is_error": True}).encode(
-        "utf-8"
-    )
+    err_payload = json.dumps(
+        {"type": "result", "result": "rate limited", "is_error": True}
+    ).encode("utf-8")
     assert _parse_output(err_payload).is_error is True
     # absent key defaults to False
     assert _parse_output(_json_stdout()).is_error is False
@@ -268,7 +289,9 @@ def test_parse_output_extracts_is_error_flag():
 @pytest.mark.asyncio
 async def test_run_variant_marks_json_is_error_as_error(tmp_path: Path):
     # claude -p can return rc=0 with is_error=true (API-level failure)
-    payload = json.dumps({"result": "overloaded", "is_error": True}).encode("utf-8")
+    payload = json.dumps(
+        {"type": "result", "result": "overloaded", "is_error": True}
+    ).encode("utf-8")
     spawner = _FakeSpawner([SpawnResult(stdout=payload, stderr=b"", returncode=0)])
     obs = await run_variant(_variant(), _scenario(), _cfg(), tmp_path, spawner=spawner)
     assert obs.exit_status == "error"
@@ -284,7 +307,6 @@ def _refusal_stdout(category: str | None = "cyber") -> bytes:
         "result": "I can't help with that request.",
         "stop_reason": "refusal",
         "usage": {"input_tokens": 900, "output_tokens": 40},
-        "tools_used": [],
     }
     if category is not None:
         payload["stop_details"] = {"category": category}
@@ -339,9 +361,12 @@ def test_parse_output_non_dict_stop_details_yields_unknown(details):
 def test_parse_output_near_miss_is_not_a_refusal():
     # Refusal-sounding text with a normal stop_reason must not trip the detector:
     # it keys on the API fields, not on the wording of the answer.
-    payload = json.loads(_json_stdout(text="I can't help with that, but here is why."))
-    payload["stop_reason"] = "end_turn"
-    payload["subtype"] = "success"
+    payload = {
+        "type": "result",
+        "subtype": "success",
+        "result": "I can't help with that, but here is why.",
+        "stop_reason": "end_turn",
+    }
     assert _parse_output(json.dumps(payload).encode("utf-8")).refusal_category is None
 
 
@@ -427,7 +452,7 @@ def test_stream_parse_recovers_category_from_assistant_message():
     assert parsed.input_tokens == 700 and parsed.output_tokens == 90
 
 
-def test_stream_parse_counts_tool_use_blocks_when_result_has_no_tools_used():
+def test_stream_parse_counts_tool_use_blocks_per_name():
     parsed = _parse_output(_stream_stdout())
     assert parsed.refusal_category is None
     assert parsed.tool_calls == (
@@ -446,9 +471,13 @@ def test_stream_parse_skips_non_json_lines():
     assert _parse_output(raw).refusal_category == "cyber"
 
 
-def test_single_object_json_still_parses():
-    # The legacy --output-format json shape stays supported for old observations.
-    parsed = _parse_output(_json_stdout(tools=[{"name": "Read", "count": 2}]))
-    assert parsed.text == "hello"
-    assert parsed.tool_calls == (ToolCall(name="Read", count=2),)
-    assert parsed.refusal_category is None
+def test_stream_without_result_event_parses_best_effort():
+    # Killed mid-run: assistant events arrived, the result never did.
+    raw = _stream_stdout().splitlines()[:-1]
+    parsed = _parse_output(b"\n".join(raw))
+    assert parsed.tool_calls == (
+        ToolCall(name="Grep", count=1),
+        ToolCall(name="Read", count=2),
+    )
+    assert parsed.input_tokens == 0 and parsed.output_tokens == 0
+    assert parsed.is_error is False

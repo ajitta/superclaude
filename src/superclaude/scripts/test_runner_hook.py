@@ -17,6 +17,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from superclaude.utils import read_hook_input
+
 # File extensions that should trigger test runs
 SOURCE_EXTENSIONS = {
     ".py",
@@ -195,13 +197,11 @@ def main() -> None:
     if os.environ.get("SUPERCLAUDE_AUTO_TEST", "1") == "0":
         return
 
+    data = read_hook_input()
+    if data is None:
+        return
+
     try:
-        stdin_data = sys.stdin.read() if not sys.stdin.isatty() else ""
-        if not stdin_data:
-            return
-
-        data = json.loads(stdin_data)
-
         # Prevent infinite loops when Claude is stopping
         if data.get("stop_hook_active"):
             return
@@ -258,8 +258,6 @@ def main() -> None:
             )
             print(msg)
 
-    except json.JSONDecodeError:
-        print("test hook: invalid JSON input", file=sys.stderr)
     except subprocess.TimeoutExpired:
         print("test hook: timeout after 120s", file=sys.stderr)
     except OSError as e:

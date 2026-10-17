@@ -23,7 +23,6 @@ def test_loads_minimal_valid_spec():
     assert spec.scenario.baseline_skill == "brainstorm"
     assert len(spec.variants) == 1
     assert spec.variants[0].id == "A"
-    assert spec.runner.cli == "claude -p"
     assert spec.runner.model == "claude-haiku-4-5"
 
 

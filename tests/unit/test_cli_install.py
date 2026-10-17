@@ -144,6 +144,19 @@ class TestInstallCommandsEdgeCases:
         assert commands_dir.exists()
 
 
+def _count_hooks(hooks_json) -> int:
+    """Inner hook commands across every event array of a hooks.json."""
+    import json
+
+    config = json.loads(hooks_json.read_text(encoding="utf-8"))
+    return sum(
+        len(entry.get("hooks", []))
+        for array in config.get("hooks", {}).values()
+        if isinstance(array, list)
+        for entry in array
+    )
+
+
 class TestRegisteredHookVisibility:
     """--list-all must show what Claude Code will actually run.
 
@@ -183,14 +196,15 @@ class TestRegisteredHookVisibility:
 
     def test_shipped_count_comes_from_hooks_json(self):
         """Every inner hook across every event type counts once."""
-        from superclaude.cli.install_inventory import _count_shipped_hooks
         from superclaude.cli.install_paths import _get_package_root
 
-        shipped = _count_shipped_hooks(_get_package_root() / "hooks" / "hooks.json")
+        shipped = _count_hooks(_get_package_root() / "hooks" / "hooks.json")
         assert shipped >= 10, f"expected the full shipped hook set, got {shipped}"
 
     def test_registered_count_ignores_user_hooks(self, tmp_path):
-        from superclaude.cli.install_inventory import _count_registered_hooks
+        """A user's own hook in the same array is neither registered nor
+        obsolete — it is not superclaude's."""
+        from superclaude.cli.install_inventory import list_all_components
 
         base = self._install(tmp_path, ["prettier_hook.py", "loop_guard.py"])
         import json
@@ -201,7 +215,9 @@ class TestRegisteredHookVisibility:
         )
         (base / "settings.json").write_text(json.dumps(settings), encoding="utf-8")
 
-        assert _count_registered_hooks(base / "settings.json") == 2
+        row = list_all_components(base_path=base, scope="user")["hooks_registered"]
+        assert row["installed"] == 2
+        assert row["obsolete"] == 0
 
     def test_frozen_install_shows_a_shortfall(self, tmp_path):
         """The row is the signal: fewer registered than shipped."""
@@ -417,7 +433,7 @@ class TestFrameworkArtifactsAlwaysUpdate:
         from superclaude.cli.install_components import install_hooks
 
         base = tmp_path / ".claude"
-        _installed, _skipped, failed, messages = install_hooks(
+        _installed, failed, messages = install_hooks(
             base_path=base, force=True, scope="user"
         )
 
@@ -440,7 +456,7 @@ class TestFrameworkArtifactsAlwaysUpdate:
         legacy.mkdir(parents=True)
         (legacy / "loop_guard.py").write_text("# previous release\n", encoding="utf-8")
 
-        _installed, _skipped, failed, messages = install_hooks(
+        _installed, failed, messages = install_hooks(
             base_path=base, force=True, scope="user"
         )
 
@@ -458,7 +474,7 @@ class TestFrameworkArtifactsAlwaysUpdate:
         stale = hooks_target / "hooks.json"
         stale.write_text('{"hooks": {}}\n', encoding="utf-8")
 
-        _installed, _skipped, failed, messages = install_hooks(
+        _installed, failed, messages = install_hooks(
             base_path=base, force=False, scope="user"
         )
 
@@ -545,13 +561,10 @@ class TestHookRegistrationIsCheckedByIdentity:
         return base
 
     def test_obsolete_hooks_do_not_read_as_installed(self, tmp_path):
-        from superclaude.cli.install_inventory import (
-            _count_shipped_hooks,
-            list_all_components,
-        )
+        from superclaude.cli.install_inventory import list_all_components
         from superclaude.cli.install_paths import _get_package_root
 
-        shipped = _count_shipped_hooks(_get_package_root() / "hooks" / "hooks.json")
+        shipped = _count_hooks(_get_package_root() / "hooks" / "hooks.json")
         base = self._base(
             tmp_path,
             {
@@ -1000,7 +1013,7 @@ class TestHookCommandsCarryNoMachineBytes:
         from superclaude.cli.install_components import install_hooks
 
         base = tmp_path / ".claude"
-        _installed, _skipped, failed, messages = install_hooks(
+        _installed, failed, messages = install_hooks(
             base_path=base, force=True, scope=scope
         )
 
@@ -1028,7 +1041,7 @@ class TestHookCommandsCarryNoMachineBytes:
         ):
             base = tmp_path / machine / "checkout" / ".claude"
             monkeypatch.setattr(sys, "executable", interpreter)
-            _installed, _skipped, failed, messages = install_hooks(
+            _installed, failed, messages = install_hooks(
                 base_path=base, force=True, scope="project"
             )
             assert failed == 0, messages
@@ -1112,9 +1125,7 @@ class TestUpgradeFromALegacyRegistration:
             base, ["destructive_guard", "loop_guard"], "/opt/py/bin/python3"
         )
 
-        _i, _s, failed, messages = install_hooks(
-            base_path=base, force=False, scope="user"
-        )
+        _i, failed, messages = install_hooks(base_path=base, force=False, scope="user")
 
         assert failed == 0, messages
         commands = _sc_commands(base, "user")
@@ -1131,7 +1142,7 @@ class TestUpgradeFromALegacyRegistration:
         base = tmp_path / ".claude"
         _legacy_registration(base, ["loop_guard"], "/opt/py/bin/python3")
 
-        _i, _s, _f, messages = install_hooks(base_path=base, force=False, scope="user")
+        _i, _f, messages = install_hooks(base_path=base, force=False, scope="user")
 
         notice = [m for m in messages if m.startswith("ℹ️")]
         assert len(notice) == 1, messages
@@ -1148,7 +1159,7 @@ class TestUpgradeFromALegacyRegistration:
         base = tmp_path / ".claude"
         _legacy_registration(base, ["retired_thing"], "/opt/py/bin/python3")
 
-        _i, _s, _f, messages = install_hooks(base_path=base, force=False, scope="user")
+        _i, _f, messages = install_hooks(base_path=base, force=False, scope="user")
 
         notice = [m for m in messages if m.startswith("ℹ️")]
         assert len(notice) == 1, messages
@@ -1170,7 +1181,7 @@ class TestConsoleScriptWarning:
         from superclaude.cli import install_components
 
         monkeypatch.setattr(install_components, "probe_console_script", lambda: probe)
-        _i, _s, _f, messages = install_components.install_hooks(
+        _i, _f, messages = install_components.install_hooks(
             base_path=tmp_path / ".claude", force=True, scope="user"
         )
         return [m for m in messages if m.startswith("⚠️")]

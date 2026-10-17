@@ -142,3 +142,22 @@ def test_read_all_returns_inserted_rows(tsv_path):
     assert len(rows) == 3
     assert rows[0].status == "baseline"
     assert rows[2].metric_value == 2.0
+
+
+def test_from_tsv_line_restores_column_types():
+    # Field annotations are strings under `from __future__ import annotations`;
+    # the parser must still resolve them to real int/float coercions.
+    line = (
+        "7	2026-04-27T02:50:00Z	"
+        + "a" * 40
+        + "	0.5	baseline	seed	12	3"
+    )
+    row = ResultRow.from_tsv_line(line)
+    assert (row.cycle_id, row.metric_value, row.tokens_used, row.wall_seconds) == (
+        7,
+        0.5,
+        12,
+        3,
+    )
+    assert isinstance(row.cycle_id, int) and isinstance(row.wall_seconds, int)
+    assert isinstance(row.metric_value, float) and isinstance(row.timestamp, str)

@@ -18,17 +18,15 @@ from pathlib import Path
 import pytest
 from click.testing import CliRunner
 
-REPO_ROOT = Path(__file__).resolve().parents[2]
+from tests.unit.cli_helpers import all_output
 
-
-def _all_output(result) -> str:
-    """stdout + stderr — argparse writes usage errors to stderr."""
-    text = result.output or ""
-    try:
-        text += result.stderr or ""
-    except ValueError:  # stderr not captured separately on older Click
-        pass
-    return text
+SCRIPTS_README = (
+    Path(__file__).resolve().parents[2]
+    / "src"
+    / "superclaude"
+    / "scripts"
+    / "README.md"
+)
 
 
 class TestPassthroughSubcommands:
@@ -49,8 +47,8 @@ class TestPassthroughSubcommands:
 
         result = CliRunner().invoke(cli, ["auto-improve", "--help"])
 
-        assert result.exit_code == 0, _all_output(result)
-        output = _all_output(result)
+        assert result.exit_code == 0, all_output(result)
+        output = all_output(result)
         assert "usage: superclaude auto-improve" in output, output
         assert "-m superclaude.scripts" not in output, output
 
@@ -59,8 +57,8 @@ class TestPassthroughSubcommands:
 
         result = CliRunner().invoke(cli, ["parallel-ab", "--help"])
 
-        assert result.exit_code == 0, _all_output(result)
-        output = _all_output(result)
+        assert result.exit_code == 0, all_output(result)
+        output = all_output(result)
         assert "usage: superclaude parallel-ab" in output, output
         assert "-m superclaude.scripts" not in output, output
 
@@ -74,23 +72,23 @@ class TestPassthroughSubcommands:
             cli, ["auto-improve", "--project", str(tmp_path), "--status"]
         )
 
-        assert result.exit_code == 0, _all_output(result)
-        assert "No prior runs" in _all_output(result)
+        assert result.exit_code == 0, all_output(result)
+        assert "No prior runs" in all_output(result)
 
     def test_auto_improve_missing_required_flags_exits_2(self, tmp_path):
         from superclaude.cli.main import main as cli
 
         result = CliRunner().invoke(cli, ["auto-improve", "--project", str(tmp_path)])
 
-        assert result.exit_code == 2, _all_output(result)
-        assert "--eval-cmd and --metric are required" in _all_output(result)
+        assert result.exit_code == 2, all_output(result)
+        assert "--eval-cmd and --metric are required" in all_output(result)
 
     def test_parallel_ab_missing_spec_exits_2(self):
         from superclaude.cli.main import main as cli
 
         result = CliRunner().invoke(cli, ["parallel-ab"])
 
-        assert result.exit_code == 2, _all_output(result)
+        assert result.exit_code == 2, all_output(result)
 
     def test_parallel_ab_unknown_option_reaches_worker_not_click(self):
         # ignore_unknown_options must route the error to argparse; Click's own
@@ -99,8 +97,8 @@ class TestPassthroughSubcommands:
 
         result = CliRunner().invoke(cli, ["parallel-ab", "--nope"])
 
-        assert result.exit_code == 2, _all_output(result)
-        assert "superclaude parallel-ab" in _all_output(result)
+        assert result.exit_code == 2, all_output(result)
+        assert "superclaude parallel-ab" in all_output(result)
 
 
 # The README must never hand a reader a bare `python -m superclaude.scripts.<pkg>`
@@ -154,17 +152,13 @@ class TestScriptsReadmeDocumentsConsoleEntries:
     """The README row for parallel_ab is its only documented entry point."""
 
     def test_readme_names_console_entries(self):
-        text = (REPO_ROOT / "src" / "superclaude" / "scripts" / "README.md").read_text(
-            encoding="utf-8"
-        )
+        text = SCRIPTS_README.read_text(encoding="utf-8")
 
         assert "superclaude auto-improve" in text
         assert "superclaude parallel-ab" in text
 
     def test_readme_never_prescribes_bare_module_invocation(self):
-        text = (REPO_ROOT / "src" / "superclaude" / "scripts" / "README.md").read_text(
-            encoding="utf-8"
-        )
+        text = SCRIPTS_README.read_text(encoding="utf-8")
 
         offenders = _bare_module_prescriptions(text)
         assert offenders == [], offenders
@@ -229,3 +223,58 @@ class TestScriptsReadmeDocumentsConsoleEntries:
 )
 def test_bare_module_prescription_discriminates(passage, is_prescription):
     assert bool(_bare_module_prescriptions(passage)) is is_prescription
+
+
+class TestUninstallOutput:
+    """`uninstall` prints the same lines around one `uninstall_all` call in
+    every mode; the dry run and the real run differ only in the banner, the
+    `dry_run=` argument, and that a dry run never exits 1."""
+
+    @staticmethod
+    def _run(monkeypatch, args, success=True, stdin=None):
+        from superclaude.cli import install_inventory
+        from superclaude.cli.main import main as cli
+
+        calls = []
+
+        def stub(**kwargs):
+            calls.append(kwargs)
+            return success, f"stub-message dry_run={kwargs['dry_run']}"
+
+        monkeypatch.setattr(install_inventory, "uninstall_all", stub)
+        monkeypatch.setattr(
+            "superclaude.cli.install_paths.get_base_path", lambda scope: Path("/base")
+        )
+        result = CliRunner().invoke(
+            cli, ["uninstall", "--scope", "user", *args], input=stdin
+        )
+        return result, calls
+
+    def test_dry_run_prints_the_banner_and_the_message(self, monkeypatch):
+        result, calls = self._run(monkeypatch, ["--dry-run"], success=False)
+
+        assert result.output == (
+            "🔍 Dry-run mode: Showing what would be removed (scope: user)\n\n"
+            "stub-message dry_run=True\n"
+        )
+        assert result.exit_code == 0, "a dry run reports, it does not fail"
+        assert [c["dry_run"] for c in calls] == [True]
+
+    def test_real_run_prints_the_banner_and_exits_1_on_failure(self, monkeypatch):
+        result, calls = self._run(monkeypatch, ["--yes"], success=False)
+
+        assert result.output == (
+            "🗑️  Uninstalling superclaude components (scope: user)...\n\n"
+            "stub-message dry_run=False\n"
+        )
+        assert result.exit_code == 1
+        assert [c["dry_run"] for c in calls] == [False]
+
+    def test_declined_confirmation_calls_nothing(self, monkeypatch):
+        result, calls = self._run(monkeypatch, [], stdin="n\n")
+
+        assert result.output.endswith(
+            "Do you want to continue? [y/N]: n\n❌ Uninstall cancelled\n"
+        )
+        assert result.exit_code == 0
+        assert calls == []

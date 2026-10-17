@@ -16,6 +16,7 @@ script code — hook CWD is not guaranteed to be the project root. See
 import json
 import os
 import re
+import sys
 import time
 from pathlib import Path
 from typing import Any
@@ -25,6 +26,32 @@ from typing import Any
 # `tempfile` alone is 3.0ms of it — spent even on the read-only PreToolUse paths
 # that never write state. Keep new module-level imports out of here for the same
 # reason.
+
+
+def read_hook_stdin() -> str:
+    """Raw text Claude Code piped to a hook; "" on a tty or an unreadable stdin."""
+    try:
+        return sys.stdin.read() if not sys.stdin.isatty() else ""
+    except (OSError, ValueError):
+        return ""
+
+
+def read_hook_input() -> dict | None:
+    """The JSON object Claude Code piped to a hook, or None.
+
+    None covers every "nothing to act on" case a hook must stay silent for: a
+    tty, empty stdin, text that is not JSON, and JSON that is not an object.
+    A PreToolUse hook allows by printing nothing, so callers return on None
+    rather than printing a decision (see hooks/README.md).
+    """
+    raw = read_hook_stdin()
+    if not raw.strip():
+        return None
+    try:
+        data = json.loads(raw)
+    except ValueError:
+        return None
+    return data if isinstance(data, dict) else None
 
 
 def int_env(name: str, default: int) -> int:
@@ -377,8 +404,8 @@ def detect_refusal(payload: Any) -> str | None:
     is not ``is_error``: the CLI returns rc=0 with the refusal text in
     ``result``, which is why that text must never pass as a normal answer.
 
-    Shared by the parallel-A/B runner and the auto-improve mutator; the eval
-    harness under ``evals/`` keeps a copy pinned to this one by a test.
+    Shared by the parallel-A/B runner, the auto-improve mutator and the eval
+    harness under ``evals/`` (a test pins that the harness imports this one).
     """
     if not isinstance(payload, dict):
         return None

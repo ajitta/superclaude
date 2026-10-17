@@ -47,7 +47,8 @@ leaves the decision to the normal permission flow.
 import json
 import os
 import re
-import sys
+
+from superclaude.utils import read_hook_input
 
 # rm patterns mirror the original hooks.json shell regex verbatim.
 # Force-push pattern (widened 2026-07-02): lookaheads accept the force flag
@@ -105,34 +106,27 @@ def main() -> None:
     if os.environ.get("SUPERCLAUDE_DESTRUCTIVE_GUARD", "1") == "0":
         return
 
-    try:
-        stdin_data = sys.stdin.read() if not sys.stdin.isatty() else ""
-        if not stdin_data:
-            return
-
-        data = json.loads(stdin_data)
-        command = data.get("tool_input", {}).get("command", "")
-
-        if is_destructive(command):
-            print(json.dumps({"decision": "block", "reason": _BLOCK_REASON}))
-            return
-
-        if is_warn(command):
-            print(
-                json.dumps(
-                    {
-                        "hookSpecificOutput": {
-                            "hookEventName": "PreToolUse",
-                            "permissionDecision": "ask",
-                            "permissionDecisionReason": _WARN_REASON,
-                        }
-                    }
-                )
-            )
-
-    except json.JSONDecodeError:
-        # Malformed hook input — fail open (consistent with file_size_guard/loop_guard)
+    data = read_hook_input()
+    if data is None:
         return
+    command = data.get("tool_input", {}).get("command", "")
+
+    if is_destructive(command):
+        print(json.dumps({"decision": "block", "reason": _BLOCK_REASON}))
+        return
+
+    if is_warn(command):
+        print(
+            json.dumps(
+                {
+                    "hookSpecificOutput": {
+                        "hookEventName": "PreToolUse",
+                        "permissionDecision": "ask",
+                        "permissionDecisionReason": _WARN_REASON,
+                    }
+                }
+            )
+        )
 
 
 if __name__ == "__main__":

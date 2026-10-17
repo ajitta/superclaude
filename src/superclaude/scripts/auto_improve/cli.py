@@ -94,12 +94,7 @@ def main(argv: list[str] | None = None, prog: str = "auto_improve") -> int:
     repo = Path(args.project).resolve()
 
     if args.status:
-        cfg = CoordinatorConfig(
-            repo_root=repo,
-            eval_cmd="",
-            metric_path="",
-        )
-        sys.stdout.write(status_mode(cfg))
+        sys.stdout.write(status_mode(repo))
         sys.stdout.write("\n")
         return 0
 
@@ -121,7 +116,7 @@ def main(argv: list[str] | None = None, prog: str = "auto_improve") -> int:
         coord.run_baseline_only()
     else:
         coord.run()
-    sys.stdout.write(status_mode(cfg))
+    sys.stdout.write(status_mode(repo))
     sys.stdout.write("\n")
     return 0
 

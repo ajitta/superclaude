@@ -7,7 +7,7 @@ import json
 import re
 import sys
 import time
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Awaitable, Callable
 
@@ -41,7 +41,6 @@ class ParsedResult:
     input_tokens: int = 0
     output_tokens: int = 0
     tool_calls: tuple[ToolCall, ...] = ()
-    axes: dict[str, str] = field(default_factory=dict)
     is_error: bool = False
     # None = no refusal; otherwise the stop_details.category or "unknown".
     refusal_category: str | None = None
@@ -75,9 +74,9 @@ def _is_slash_command(text: str) -> bool:
 
 
 def _build_cmd(variant: Variant, scenario: Scenario, cfg: RunnerCfg) -> list[str]:
-    base = cfg.cli.split()  # "claude -p" → ["claude", "-p"]
     cmd: list[str] = [
-        *base,
+        "claude",
+        "-p",
         "--model",
         cfg.model,
         # stream-json (which needs --verbose under -p) exposes the assistant
@@ -92,7 +91,10 @@ def _build_cmd(variant: Variant, scenario: Scenario, cfg: RunnerCfg) -> list[str
     if cfg.bare and not _is_slash_command(scenario.input):
         cmd.append("--bare")
     prompt_parts = [s for s in (scenario.input, variant.flag, variant.extra_args) if s]
-    cmd.append(" ".join(prompt_parts))
+    # `--` ends option parsing: a prompt that starts with an SC flag
+    # ("--introspect analyze X") would otherwise be read as a claude option
+    # and the run would die before any turn (same fix as evals/run_eval.py).
+    cmd += ["--", " ".join(prompt_parts)]
     return cmd
 
 
@@ -104,14 +106,8 @@ def _looks_like_auth_fail(stderr: bytes) -> bool:
 
 
 def _parse_events(text: str) -> list[dict]:
-    """Return the JSON objects in *text*: one for ``--output-format json``,
-    one per line for ``stream-json``. Non-JSON lines are skipped."""
-    try:
-        whole = json.loads(text)
-    except (json.JSONDecodeError, ValueError):
-        whole = None
-    if isinstance(whole, dict):
-        return [whole]
+    """Return the ``stream-json`` events in *text*, one per line; non-JSON
+    lines (CLI warnings) are skipped."""
     events: list[dict] = []
     for line in text.splitlines():
         line = line.strip()
@@ -131,11 +127,9 @@ def _parse_output(stdout: bytes) -> ParsedResult:
     events = _parse_events(text)
     if not events:
         return ParsedResult(text=text)
-    result = next((e for e in reversed(events) if e.get("type") == "result"), None)
-    if result is None:
-        # single-object json output has no `type`; a stream without a result
-        # event (killed mid-run) parses as best-effort from what arrived.
-        result = events[-1] if len(events) == 1 else {}
+    # A stream without a result event (killed mid-run) parses best-effort
+    # from the assistant messages that did arrive.
+    result = next((e for e in reversed(events) if e.get("type") == "result"), {})
     assistant_msgs = [
         e.get("message") or {} for e in events if e.get("type") == "assistant"
     ]
@@ -143,21 +137,13 @@ def _parse_output(stdout: bytes) -> ParsedResult:
     result_text = str(result.get("result") or result.get("output") or text)
     usage = result.get("usage") or {}
 
-    tools_raw = result.get("tools_used") or []
-    if tools_raw:
-        tool_calls = tuple(
-            ToolCall(name=str(t.get("name", "")), count=int(t.get("count", 0)))
-            for t in tools_raw
-            if isinstance(t, dict)
-        )
-    else:
-        counts: dict[str, int] = {}
-        for msg in assistant_msgs:
-            for block in msg.get("content") or []:
-                if isinstance(block, dict) and block.get("type") == "tool_use":
-                    name = str(block.get("name", ""))
-                    counts[name] = counts.get(name, 0) + 1
-        tool_calls = tuple(ToolCall(name=n, count=c) for n, c in sorted(counts.items()))
+    counts: dict[str, int] = {}
+    for msg in assistant_msgs:
+        for block in msg.get("content") or []:
+            if isinstance(block, dict) and block.get("type") == "tool_use":
+                name = str(block.get("name", ""))
+                counts[name] = counts.get(name, 0) + 1
+    tool_calls = tuple(ToolCall(name=n, count=c) for n, c in sorted(counts.items()))
 
     # Assistant messages carry the category; the result object only confirms
     # the refusal, so it never downgrades a category already found.
@@ -254,7 +240,6 @@ async def run_variant(
         tokens=Tokens(input=parsed.input_tokens, output=parsed.output_tokens),
         tool_calls=parsed.tool_calls,
         final_output_sha256=compute_sha256(parsed.text),
-        axes=parsed.axes,
         refusal_category=parsed.refusal_category or "",
     )
     return _write_obs(obs, out_dir)

@@ -189,57 +189,40 @@ def _strip_one_block(
 def _resolve_git_exclude_file(project_root: Path) -> Optional[Path]:
     """Resolve the ``info/exclude`` git actually reads for a project root.
 
-    Returns None for non-git directories or malformed worktree pointers.
-    Handles three cases:
+    ``git rev-parse --git-path info/exclude`` answers for every layout git
+    knows: a regular ``.git/`` directory, a linked worktree (the COMMON
+    directory's file — git resolves ``info/exclude`` through ``commondir``, so
+    the per-worktree ``info/exclude`` is dead), a submodule's or
+    ``--separate-git-dir`` pointer file. It fails (rc 128) for a malformed
+    ``.git`` file and for a stale worktree whose repository moved or was
+    deleted, which is the None this returns: no git directory may be conjured
+    for them by ``add_git_exclude``'s ``mkdir(parents=True)``.
 
-    - ``.git/`` is a directory (regular repo) → ``<root>/.git/info/exclude``
-    - ``.git`` is a file (``gitdir:`` pointer) → the gitdir's ``commondir``
-      file, when present, names the common git directory and the answer is
-      ``<commondir>/info/exclude``: git resolves ``info/exclude`` through the
-      common dir (per file: ``info/sparse-checkout`` stays per-worktree), so a
-      linked worktree's own ``info/exclude`` is dead. Without a
-      ``commondir`` the gitdir is complete on its own (a submodule's
-      ``.git/modules/<name>``) and its ``info/exclude`` is the one git reads.
-      A ``commondir`` naming a directory that no longer exists → None, like a
-      malformed pointer: a stale worktree (its repository moved or deleted)
-      must not have a git directory conjured for it by ``mkdir(parents=True)``.
-    - neither exists                           → None
+    ``<root>/.git`` must exist, else git would walk up to an enclosing
+    repository whose exclude file is not this project's. Install is not a hot
+    path, so the subprocess is affordable here; ``utils.main_worktree_root``
+    (called from hooks) keeps its plain file reads.
 
-    Plain file reads, no ``git`` subprocess — the same two hops as
-    ``superclaude.utils.main_worktree_root``, which answers a different
-    question (the main worktree's root, not its git directory: a bare
-    repository's worktrees have a common dir with no worktree above it).
+    Returns None for non-git directories, when git is unavailable, and for
+    every git failure.
     """
-    git_path = project_root / ".git"
-    if git_path.is_dir():
-        return git_path / "info" / "exclude"
-    if git_path.is_file():
-        try:
-            content = git_path.read_text(encoding="utf-8").strip()
-        except OSError:
-            return None
-        prefix = "gitdir: "
-        if not content.startswith(prefix):
-            return None
-        git_dir_str = content[len(prefix) :].strip()
-        git_dir = Path(git_dir_str)
-        if not git_dir.is_absolute():
-            git_dir = (project_root / git_dir).resolve()
-        if not git_dir.is_dir():
-            return None
-        try:
-            common = (git_dir / "commondir").read_text(encoding="utf-8").strip()
-        except OSError:
-            common = ""
-        if common:
-            common_dir = Path(common)
-            if not common_dir.is_absolute():
-                common_dir = (git_dir / common_dir).resolve()
-            if not common_dir.is_dir():
-                return None
-            git_dir = common_dir
-        return git_dir / "info" / "exclude"
-    return None
+    if not (project_root / ".git").exists():
+        return None
+    try:
+        result = subprocess.run(
+            ["git", "-C", str(project_root), "rev-parse", "--git-path", "info/exclude"],
+            capture_output=True,
+            text=True,
+            timeout=15,
+        )
+    except (OSError, subprocess.TimeoutExpired):
+        return None
+    if result.returncode != 0:
+        return None
+    exclude_file = Path(result.stdout.strip())
+    if exclude_file.is_absolute():
+        return exclude_file
+    return project_root / exclude_file
 
 
 def has_legacy_gitignore_block(project_root: Path) -> bool:

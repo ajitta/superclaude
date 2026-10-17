@@ -11,6 +11,9 @@ Releases before 4.19.0 are not listed. Their history is the git log; the upstrea
 ### Changed
 
 - `SECURITY.md` is a one-page policy: where to report, what is supported, what the install and hooks write on your machine. The upstream-era text (bug bounty, 4.1.x support table, checklists) is gone.
+- Every hook reads its stdin through one `utils.read_hook_input`; malformed or non-object input is ignored silently by all of them (`test-runner` no longer writes `invalid JSON input` to stderr).
+- `superclaude install` and `superclaude doctor` report a missing or foreign `superclaude` on PATH with the same wording; install's version-mismatch warning now carries the repair hint too.
+- `superclaude auto-improve`: guards return plain booleans (the `GuardVerdict` type is gone); the unused `WorktreeManager.cleanup` and `Worktree.init_results_tsv` are removed — worktrees were already kept after a run.
 
 ### Fixed
 
@@ -20,7 +23,9 @@ Releases before 4.19.0 are not listed. Their history is the git log; the upstrea
 - `superclaude auto-improve` without `--smoke-cmd` runs the eval command as the smoke check under `--cycle-timeout` instead of a fixed 30 s, and stops after five consecutive `smoke_fail` cycles (the plateau window; the last results.tsv row says so). An eval slower than 30 s used to time out every cycle all night without ever calling the mutator.
 - The `auto-improve` mutator runs `claude -p` with `--permission-mode acceptEdits` instead of `bypassPermissions`: edits inside its worktree are accepted, an edit outside it is denied. The unattended loop could previously write anywhere the user can.
 - A malformed `CLAUDE_CONTEXT_MAX_TOKENS` (`8k`, empty) no longer crashes the prompt hook on every prompt; the loader and `superclaude context explain` fall back to 8000.
+- `parallel-ab` passes the scenario prompt after `--`, so an input that starts with a flag (`--introspect analyze X`) is no longer parsed as a `claude` option; and it builds `matrix.md`/`decision.md` from this run's observations only — a leftover `obs-*.json` from a removed or renamed variant no longer enters the matrix or the recommended winner. Observation JSON no longer carries the always-empty `axes`, `files_touched` and `clarifying_questions` keys.
 - `evals/run_eval.py` deletes the per-arm copies of `~/.claude/.credentials.json` it makes under `<runs-dir>/config/` when the run ends, including on error. They used to stay in the runs directory (by default the system temp dir) after every run.
+
 
 ### Removed
 

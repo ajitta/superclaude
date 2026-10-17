@@ -225,9 +225,8 @@ def test_each_cycle_writes_exactly_one_results_tsv_row(repo):
 
 
 def test_status_mode_skips_loop(repo):
-    cfg = _make_config(repo)
     # No active worktree -> status should still produce output without raising
-    out = status_mode(cfg)
+    out = status_mode(repo)
     assert "auto-improve" in out.lower()
 
 

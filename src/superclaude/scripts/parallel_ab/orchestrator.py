@@ -84,7 +84,7 @@ async def orchestrate(
     tasks = [
         _run_one(runner_fn, v, spec.scenario, runner_cfg, out) for v in spec.variants
     ]
-    await asyncio.gather(*tasks)
+    observations = await asyncio.gather(*tasks)
 
-    _matrix, decision = aggregate(out)
+    _matrix, decision = aggregate(out, observations)
     return decision
