@@ -24,13 +24,13 @@ R3 첫 줄 검사는 프롬프트의 명시적 yes/no 요구와 충돌하므로 
 - [02-discriminability.md](./02-discriminability.md): 최초 판별력 측정 (예비 해석; 02a의 정정 우선)
 - [02a-measurement.md](./02a-measurement.md): 유지한 120세션 집계, 측정 한계와 해석 정정
 - [03-analysis.md](./03-analysis.md): 종합 판정, 직접 재현, 보고서 권고의 채택·보류 기준
-- [03a-analysis-core.md](./03a-analysis-core.md): core 분류 원자료
-- [03b-analysis-modes-skills.md](./03b-analysis-modes-skills.md): modes·skills 분류 원자료
-- [03c-analysis-agents-first.md](./03c-analysis-agents-first.md), [03d-analysis-agents-second.md](./03d-analysis-agents-second.md): agents 분류 원자료
-- [03e-analysis-commands-first.md](./03e-analysis-commands-first.md), [03f-analysis-commands-second.md](./03f-analysis-commands-second.md): commands 분류 원자료
-- [04-ponytail-audit.md](./04-ponytail-audit.md): 구현 6축 감사·복구 보고서 검증 원자료
+- [03a-analysis-core-1.md](./03a-analysis-core-1.md), [-2](./03a-analysis-core-2.md): core 분류 원자료 (크기 분할, 내용 불변)
+- [03b-analysis-modes-skills-1.md](./03b-analysis-modes-skills-1.md), [-2](./03b-analysis-modes-skills-2.md), [-3](./03b-analysis-modes-skills-3.md): modes·skills 분류 원자료
+- [03c-analysis-agents-first-1.md](./03c-analysis-agents-first-1.md), [-2](./03c-analysis-agents-first-2.md), [-3](./03c-analysis-agents-first-3.md); [03d-analysis-agents-second-1.md](./03d-analysis-agents-second-1.md), [-2](./03d-analysis-agents-second-2.md), [-3](./03d-analysis-agents-second-3.md): agents 분류 원자료
+- [03e-analysis-commands-first-1.md](./03e-analysis-commands-first-1.md), [-2](./03e-analysis-commands-first-2.md), [-3](./03e-analysis-commands-first-3.md); [03f-analysis-commands-second-1.md](./03f-analysis-commands-second-1.md), [-2](./03f-analysis-commands-second-2.md): commands 분류 원자료
+- [04-ponytail-audit-1.md](./04-ponytail-audit-1.md) (§1 04a 검증), [-2](./04-ponytail-audit-2.md) (§2 6축 감사): 구현 6축 감사·복구 보고서 검증 원자료
 - [04a-ponytail-lean-recovered.md](./04a-ponytail-lean-recovered.md): 2026-10-17 00:35 세션 복구본; 04에서 검증, 삭제 승인 아님
-- [04b-ponytail-content-structure.md](./04b-ponytail-content-structure.md): 콘텐츠 구조 lean adaptation 원자료
+- [04b-ponytail-content-structure-1.md](./04b-ponytail-content-structure-1.md), [-2](./04b-ponytail-content-structure-2.md): 콘텐츠 구조 lean adaptation 원자료
 - [05-options.md](./05-options.md): 4개 재구성 대안, 권한 경계, 실험 예산, Q1–Q4 결정 기록
 - [06-pilot.md](./06-pilot.md): `purpose_before_action` 커널 규칙 파일럿 (sc-full vs sc-candidate, 24세션): 0/12 → 11/12, 경계 검사, 비용
 - [07-release-gate.md](./07-release-gate.md): 커널 변경 후 `make canary-gates` 결과 (7/7 hard gates, sonnet)

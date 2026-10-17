@@ -10,7 +10,7 @@ updated: 2026-10-17
 
 Source: Hermes session `20261017_003505_fbbe88` ("ponytail 스킬로 프로젝트 감사"), final assistant message, recovered verbatim from the Hermes session store on 2026-10-17. Base: `master` `7a6f771f` (4.27.2). Four sub-agents audited cli / hook scripts + utils / eval tooling / packaging + CI + tests for over-engineering only (no bug, security, load, test or speed axis). Items the 2026-10-03 audit decided to keep were excluded by the auditor.
 
-Status: **unverified input** for Phase 3 of the reframing-anchoring plan. No file was changed by the audit. Every item below is re-checked with a whole-tree grep in `04-ponytail-audit.md` before any cut.
+Status: **unverified input** for Phase 3 of the reframing-anchoring plan. No file was changed by the audit. Every item below is re-checked with a whole-tree grep in `04-ponytail-audit-1.md` before any cut.
 
 ---
 
