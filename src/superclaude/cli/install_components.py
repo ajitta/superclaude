@@ -41,10 +41,6 @@ from .install_settings import (
     update_claude_md_import,
 )
 
-# All MCP docs are now operational guides (workflow patterns, decision rules, integration strategies)
-# complementing CC's native tool search which handles tool discovery.
-MCP_DOCS_SKIP: set = set()
-
 
 def _rewrite_agent_memory_scope(content: str, scope: str) -> str:
     """Rewrite agent frontmatter `memory:` to match install scope.
@@ -60,8 +56,8 @@ def _rewrite_agent_memory_scope(content: str, scope: str) -> str:
 
 
 # Where each scope's agents keep memory, per .claude/rules/agent-authoring.md.
-# `target` is absent deliberately: it has no documented memory location, and
-# guessing one would scatter agent memory into an arbitrary directory.
+# Unknown scopes (the removed `target`) have no entry on purpose: guessing a
+# location would scatter agent memory into an arbitrary directory.
 _AGENT_MEMORY_DIRS = {
     "user": "agent-memory",
     "project": "agent-memory",
@@ -210,11 +206,6 @@ def install_component(
     for source_file in source_dir.glob("*.md"):
         # Skip README files
         if source_file.stem.upper() == "README":
-            continue
-
-        # Skip redundant MCP docs (MCP auto-mode provides tool descriptions)
-        if component == "mcp" and source_file.name in MCP_DOCS_SKIP:
-            skipped += 1
             continue
 
         target_file = target_dir / source_file.name
@@ -518,7 +509,7 @@ def install_all(
     Args:
         base_path: Base installation path
         force: Force reinstall if components exist
-        scope: Installation scope ("user", "project", or "target")
+        scope: Installation scope ("user", "project", or "local")
 
     Returns:
         Tuple of (success: bool, message: str)

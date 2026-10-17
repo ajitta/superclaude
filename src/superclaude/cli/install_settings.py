@@ -359,7 +359,7 @@ def merge_hooks_to_settings(
     Args:
         base_path: Installation base path (.claude directory)
         hooks_config: Parsed hooks.json content
-        scope: Installation scope ("user", "project", or "target")
+        scope: Installation scope ("user", "project", or "local")
         force: Replace existing superclaude hooks if True
 
     Returns:
@@ -371,7 +371,6 @@ def merge_hooks_to_settings(
           command is `superclaude hook <name>`, so the file is the same bytes
           on every checkout and stays tracked)
         - local: Merges to ./.claude/settings.local.json (CC auto-gitignores)
-        - target: Merges to {target}/.claude/settings.json
     """
     filename = settings_filename(scope)
     settings_file = base_path / filename

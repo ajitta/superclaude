@@ -32,11 +32,6 @@ uv run pytest --collect-only -q | grep "^superclaude: "   # plugin loads
 uv run superclaude doctor --verbose
 ```
 
-CI does not run coverage. To view it locally:
-```bash
-uv run pytest --cov=superclaude --cov-report=html
-```
-
 ## Troubleshooting
 
 ### Tests fail locally but pass in CI (or vice versa)

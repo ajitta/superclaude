@@ -185,7 +185,6 @@ def list_all_components(
 
         result[component] = {
             "description": description,
-            "source_path": str(source_dir),
             "target_path": str(target_dir),
             "available": source_count,
             "installed": installed_count,
@@ -198,7 +197,6 @@ def list_all_components(
 
     result["hooks"] = {
         "description": "Hook configuration",
-        "source_path": str(hooks_source),
         "target_path": str(hooks_target),
         "available": 1 if (hooks_source / "hooks.json").exists() else 0,
         "installed": 1 if hooks_json_installed else 0,
@@ -212,7 +210,6 @@ def list_all_components(
     report = _hook_registration_report(hooks_source / "hooks.json", settings_file)
     result["hooks_registered"] = {
         "description": "Hooks registered in settings",
-        "source_path": str(hooks_source / "hooks.json"),
         "target_path": str(settings_file),
         "available": report["shipped"],
         "installed": report["matched"],

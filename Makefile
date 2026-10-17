@@ -1,4 +1,4 @@
-.PHONY: install deploy sync-user sync-project sync-local uninstall-user uninstall-project uninstall-local test test-scripts test-plugin doctor verify verify-drift canary-gates clean lint format ci release uninstall-legacy help
+.PHONY: install deploy sync-user sync-project sync-local uninstall-user uninstall-project uninstall-local test test-scripts test-plugin doctor verify-drift canary-gates clean lint format ci release uninstall-legacy help
 
 # Installation (local source, editable) - RECOMMENDED
 install:
@@ -6,7 +6,7 @@ install:
 	uv pip install -e ".[dev]"
 	@echo ""
 	@echo "✅ Installation complete!"
-	@echo "   Run 'make verify' to check installation"
+	@echo "   Run 'make doctor' to check installation"
 
 # Deploy CLI only (editable). Content sync is a separate step (see sync-* targets).
 deploy:
@@ -66,26 +66,6 @@ test-plugin:
 doctor:
 	@echo "Running superclaude health check..."
 	@uv run superclaude doctor
-
-# Verify Phase 1 installation
-verify:
-	@echo "🔍 Phase 1 Installation Verification"
-	@echo "======================================"
-	@echo ""
-	@echo "1. Package location:"
-	@uv run python -c "import superclaude; print(f'   {superclaude.__file__}')"
-	@echo ""
-	@echo "2. Package version:"
-	@uv run superclaude --version | sed 's/^/   /'
-	@echo ""
-	@echo "3. Pytest plugin:"
-	@uv run python -m pytest --trace-config 2>&1 | grep "registered third-party plugins:" -A2 | grep superclaude | sed 's/^/   /' && echo "   ✅ Plugin loaded" || echo "   ❌ Plugin not loaded"
-	@echo ""
-	@echo "4. Health check:"
-	@uv run superclaude doctor | grep "superclaude is healthy" > /dev/null && echo "   ✅ All checks passed" || echo "   ❌ Some checks failed"
-	@echo ""
-	@echo "======================================"
-	@echo "✅ Phase 1 verification complete"
 
 # Release gate: the canary tasks that carry the hard gates, sonnet (run_eval default), low effort.
 # The full canary is for model releases: uv run python evals/run_eval.py --canary --model <new>
@@ -157,7 +137,6 @@ help:
 	@echo "🚀 Quick Start:"
 	@echo "  make install         - Install in development mode (RECOMMENDED)"
 	@echo "  make deploy          - Deploy as global uv tool"
-	@echo "  make verify          - Verify installation is working"
 	@echo ""
 	@echo "🔧 Development:"
 	@echo "  make test            - Run test suite (tests/unit/scripts excluded)"

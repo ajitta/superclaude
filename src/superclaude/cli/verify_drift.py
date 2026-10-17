@@ -167,7 +167,6 @@ def verify_drift(base_path: Path, verbose: bool = False) -> Dict[str, Any]:
         Dict with drift results per component and totals.
     """
     components = {}
-    total_ok = 0
     total_drifted = 0
     total_missing = 0
     total_extra = 0
@@ -187,16 +186,13 @@ def verify_drift(base_path: Path, verbose: bool = False) -> Dict[str, Any]:
             "files": file_results if verbose else {},
         }
 
-        total_ok += ok
         total_drifted += drifted
         total_missing += missing
         total_extra += extra
 
     # Check CLAUDE_SC.md
     sc_status = _check_claude_sc_md(base_path)
-    if sc_status == OK:
-        total_ok += 1
-    elif sc_status == DRIFTED:
+    if sc_status == DRIFTED:
         total_drifted += 1
     elif sc_status == MISSING:
         total_missing += 1
@@ -204,7 +200,6 @@ def verify_drift(base_path: Path, verbose: bool = False) -> Dict[str, Any]:
     return {
         "components": components,
         "claude_sc_md": sc_status,
-        "total_ok": total_ok,
         "total_drifted": total_drifted,
         "total_missing": total_missing,
         "total_extra": total_extra,

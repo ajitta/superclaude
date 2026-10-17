@@ -6,6 +6,18 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Ver
 
 Releases before 4.19.0 are not listed. Their history is the git log; the upstream-era changelog, last entry 4.2.1, is `CHANGELOG.md` at commit `6b0ac5c3^`.
 
+## [Unreleased]
+
+### Changed
+
+- `SECURITY.md` is a one-page policy: where to report, what is supported, what the install and hooks write on your machine. The upstream-era text (bug bounty, 4.1.x support table, checklists) is gone.
+
+### Removed
+
+- `make verify` (a banner that repeated `make doctor` and `superclaude --version`). `make install` now points to `make doctor`.
+- `pytest-cov` from the dev extras and the `[tool.coverage.*]` config: nothing in the Makefile or CI invoked it. `uv pip install -e ".[dev]"` installs one package fewer; run `uv run pytest` as before.
+- `docs/experiments/sc-prompt-opus55-probe-2026-09-23/` (41 files of raw output from a one-off `/sc:prompt` probe on 2026-09-23; the analysis of that date is `docs/features/opus-5-5-default-model/03-analysis.md`).
+
 ## [4.28.0] - 2026-10-17
 
 ### Changed
