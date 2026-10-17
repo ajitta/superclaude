@@ -8,6 +8,10 @@ Releases before 4.19.0 are not listed. Their history is the git log; the upstrea
 
 ## [Unreleased]
 
+### Changed
+
+- Core kernel (`core/RULES.md`) gains `purpose_before_action`: before acting on a request that is more than one reply or one obvious edit, Claude states in one line the result the named action is for (a hypothesis from the request and the workspace, not a rewording of the user), reads what tells whether the action produces that result rather than only the file the request names, and makes that result the check that proves "done". When the evidence shows the named action cannot produce the result, it says so, does the action where it still helps, and makes the smallest further change inside the files the task already touches or the error names; anything beyond that, or irreversible, is proposed, not made. `scope_discipline` now reads "every changed line traces to the request or to the result it is for". Measured before shipping: on two action-only tasks (a customer reply whose facts sat in a sibling file; a "add retry" request whose real cause was an env-var mismatch), sonnet and opus went from 0/12 to 11/12 with this rule and nothing else changed; +12–21% session input from the extra reading (`docs/features/reframing-anchoring/06-pilot.md`). The always-loaded chain grows by ~1.1 KB.
+
 ### Fixed
 
 - The `destructive_guard`, `loop_guard` and `file_size_guard` hooks print nothing for a tool call they let through. They used to print the legacy `{"decision": "approve"}`, which Claude Code maps to `permissionDecision: "allow"` and so skipped your own permission prompt for every Bash, Edit, Write and Read call while superclaude was installed (your `permissions.deny`/`ask` rules still applied). The block and ask outputs are unchanged. If you relied on the hooks to auto-approve, Claude Code now asks as it does without superclaude.

@@ -38,35 +38,30 @@ def test_arms_match_harness_constant():
     assert set(TASKS["arms"]) == harness_arms
 
 
-# The sc-candidate arm is the shipped kernel plus ONE rule under trial. The
+# The sc-candidate arm is the shipped kernel plus the rule(s) under trial. The
 # delta lives here, in the test, so the arm can never drift from RULES.md
 # unnoticed: an edit to either file fails this test until the candidate is
 # regenerated (RULES.md + delta) or the trial is closed (shipped or dropped).
-CANDIDATE_BLOCK = """  <purpose_before_action tags="[R20 Success Criteria]">
-A request names an action ("add retry to the API call", "draft a reply in thread.md"); the result the action is for is usually unstated. Before acting on a request that is more than one reply or one obvious edit: state in one line, as a hypothesis from the request and the workspace rather than as the user's words, the result the action is meant to produce; read what tells whether the named action produces it — the log, the config the error names, the sibling file the thread refers to — not only the file the request names; and make that result the concrete check that proves "done". Where the evidence shows the named action cannot produce the result, say so, do the named action when it still helps, and make the smallest further change inside the files the task already touches or the error names; a change beyond that, or an irreversible one, is proposed with the evidence, not made. Where the user has stated the result, use it unchanged.
-  </purpose_before_action>
-
-"""
-CANDIDATE_SCOPE_OLD = (
-    'Build only what is asked. No speculative features, no drive-by refactors, no "improvements" '
-    "to adjacent code. Every changed line traces to the request.\n"
-)
-CANDIDATE_SCOPE_NEW = (
-    'Build only what is asked. No speculative features, no drive-by refactors, no "improvements" '
-    "to adjacent code. Every changed line traces to the request or to the result it is for "
-    "(purpose_before_action).\n"
-)
+#
+# Trial log:
+#   2026-10-17 `purpose_before_action` — 0/12 → 11/12 on the two action-vs-
+#   purpose tasks (docs/features/reframing-anchoring/06-pilot.md); shipped
+#   into core/RULES.md the same day. Delta is now empty: candidate == shipped.
+#   To open the next trial, put the inserted text in CANDIDATE_INSERTS and
+#   regenerate evals/arms/RULES_CANDIDATE.md.
+CANDIDATE_INSERTS: list[
+    tuple[str, str]
+] = []  # (anchor in RULES.md, text inserted after it)
 
 
-def test_candidate_arm_is_shipped_kernel_plus_one_delta():
+def test_candidate_arm_is_shipped_kernel_plus_trial_delta():
     shipped = (
         EVALS_DIR.parent / "src" / "superclaude" / "core" / "RULES.md"
     ).read_text(encoding="utf-8")
-    anchor = "  <kernel_rules>\n\n"
-    assert shipped.count(anchor) == 1 and shipped.count(CANDIDATE_SCOPE_OLD) == 1
-    expected = shipped.replace(anchor, anchor + CANDIDATE_BLOCK).replace(
-        CANDIDATE_SCOPE_OLD, CANDIDATE_SCOPE_NEW
-    )
+    expected = shipped
+    for anchor, inserted in CANDIDATE_INSERTS:
+        assert expected.count(anchor) == 1, anchor
+        expected = expected.replace(anchor, anchor + inserted)
     candidate = (EVALS_DIR / "arms" / "RULES_CANDIDATE.md").read_bytes()
     assert b"\r\n" not in candidate
     assert candidate.decode("utf-8") == expected

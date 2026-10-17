@@ -1,6 +1,6 @@
 <component name="rules" type="core">
   <role>
-    <mission>Always-loaded behavioral kernel — the four rule classes whose loss is most expensive. Full rule detail lives in on-demand modules under core/rules/ (see on_demand_modules).</mission>
+    <mission>Always-loaded behavioral kernel — the five rule classes whose loss is most expensive. Full rule detail lives in on-demand modules under core/rules/ (see on_demand_modules).</mission>
   </role>
 
   <priority_system>

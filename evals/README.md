@@ -10,7 +10,7 @@
 | vanilla | bare Claude Code, no SC content |
 | sc-full | full `superclaude install --scope project` |
 | sc-core-lite | full install, `core/RULES.md` swapped for `arms/RULES_KERNEL.md`. Phase 2-1 hypothesis CONFIRMED + shipped 2026-07-03 — shipped RULES.md is now itself a kernel, so this arm measures kernel-without-modules vs sc-full's kernel+routed-modules (routing-value probe) |
-| sc-candidate | full install, `core/RULES.md` swapped for `arms/RULES_CANDIDATE.md` — the shipped kernel plus one rule under trial (`tests/unit/test_eval_harness.py` pins the file as RULES.md + that delta). sc-full vs sc-candidate isolates the rule: same hooks, same modules, same install. Current trial: `purpose_before_action` (`docs/features/reframing-anchoring/05-options.md`) |
+| sc-candidate | full install, `core/RULES.md` swapped for `arms/RULES_CANDIDATE.md` — the shipped kernel plus the rule(s) under trial (`tests/unit/test_eval_harness.py` `CANDIDATE_INSERTS` pins the file as RULES.md + that delta; empty between trials). sc-full vs sc-candidate isolates the rule: same hooks, same modules, same install. First trial `purpose_before_action` shipped 2026-10-17 (`docs/features/reframing-anchoring/06-pilot.md`) |
 | sc-command-only | full install, always-loaded core import stripped from CLAUDE.md |
 
 Isolation: every arm runs with `CLAUDE_CONFIG_DIR` pointing at an empty
