@@ -35,7 +35,7 @@ def run_guard(tool_input: dict, env_override: dict | None = None) -> dict:
         text=True,
         env=env,
     )
-    return json.loads(result.stdout.strip())
+    return json.loads(result.stdout.strip() or "{}")
 
 
 @pytest.fixture
@@ -53,12 +53,13 @@ def _create_file(temp_dir: Path, name: str, size: int) -> str:
 
 
 class TestApprove:
-    """Tests where the guard should approve (allow) the Read."""
+    """Reads the guard lets through: it prints nothing, so the normal
+    permission flow applies (a legacy `approve` would skip the prompt)."""
 
     def test_small_file_exempt(self, temp_dir):
         path = _create_file(temp_dir, "small.py", 3_000)
         result = run_guard({"file_path": path})
-        assert result["decision"] == "approve"
+        assert result == {}  # silent: Claude Code's own permission flow decides
 
     def test_invalid_json_on_stdin_fails_open(self):
         result = subprocess.run(
@@ -67,67 +68,67 @@ class TestApprove:
             capture_output=True,
             text=True,
         )
-        assert json.loads(result.stdout.strip()) == {"decision": "approve"}
+        assert result.stdout.strip() == ""
 
     def test_with_limit_parameter(self, temp_dir):
         path = _create_file(temp_dir, "big.py", 35_000)
         result = run_guard({"file_path": path, "limit": 500})
-        assert result["decision"] == "approve"
+        assert result == {}  # silent: Claude Code's own permission flow decides
 
     def test_with_pages_parameter(self, temp_dir):
         path = _create_file(temp_dir, "doc.pdf", 35_000)
         result = run_guard({"file_path": path, "pages": "1-5"})
-        assert result["decision"] == "approve"
+        assert result == {}  # silent: Claude Code's own permission flow decides
 
     def test_config_yaml_under_threshold(self, temp_dir):
         path = _create_file(temp_dir, "config.yaml", 20_000)
         result = run_guard({"file_path": path})
-        assert result["decision"] == "approve"
+        assert result == {}  # silent: Claude Code's own permission flow decides
 
     def test_config_json_under_threshold(self, temp_dir):
         path = _create_file(temp_dir, "settings.json", 25_000)
         result = run_guard({"file_path": path})
-        assert result["decision"] == "approve"
+        assert result == {}  # silent: Claude Code's own permission flow decides
 
     def test_config_toml_under_threshold(self, temp_dir):
         path = _create_file(temp_dir, "pyproject.toml", 10_000)
         result = run_guard({"file_path": path})
-        assert result["decision"] == "approve"
+        assert result == {}  # silent: Claude Code's own permission flow decides
 
     def test_config_env_under_threshold(self, temp_dir):
         path = _create_file(temp_dir, ".env", 1_000)
         result = run_guard({"file_path": path})
-        assert result["decision"] == "approve"
+        assert result == {}  # silent: Claude Code's own permission flow decides
 
     def test_binary_file(self, temp_dir):
         path = _create_file(temp_dir, "image.png", 1_000_000)
         result = run_guard({"file_path": path})
-        assert result["decision"] == "approve"
+        assert result == {}  # silent: Claude Code's own permission flow decides
 
     def test_env_var_disabled(self, temp_dir):
         path = _create_file(temp_dir, "big.py", 50_000)
         result = run_guard(
             {"file_path": path}, env_override={"SUPERCLAUDE_SIZE_GUARD": "0"}
         )
-        assert result["decision"] == "approve"
+        assert result == {}  # silent: Claude Code's own permission flow decides
 
     def test_empty_input(self):
         result = run_guard({})
-        assert result["decision"] == "approve"
+        assert result == {}  # silent: Claude Code's own permission flow decides
 
     def test_no_file_path(self):
         result = run_guard({"file_path": ""})
-        assert result["decision"] == "approve"
+        assert result == {}  # silent: Claude Code's own permission flow decides
 
     def test_nonexistent_file(self):
         result = run_guard({"file_path": "/nonexistent/path/file.py"})
-        assert result["decision"] == "approve"
+        assert result == {}  # silent: Claude Code's own permission flow decides
 
     def test_file_between_5kb_and_30kb_with_limit(self, temp_dir):
         """Code file between 5-30KB with limit should pass."""
         path = _create_file(temp_dir, "medium.py", 15_000)
         result = run_guard({"file_path": path, "limit": 500})
-        assert result["decision"] == "approve"
+        assert result == {}  # silent: Claude Code's own permission flow decides
 
 
 class TestBlock:
@@ -175,8 +176,8 @@ class TestBlock:
         path = _create_file(temp_dir, "module.py", 15_000)
         result = run_guard({"file_path": path})
         # 15KB code file is between 5KB (small exempt) and 30KB (threshold)
-        # Should approve because it's under SIZE_THRESHOLD
-        assert result["decision"] == "approve"
+        # Under SIZE_THRESHOLD: no decision printed
+        assert result == {}  # silent: Claude Code's own permission flow decides
 
     def test_code_file_at_threshold(self, temp_dir):
         """File exactly at 30KB threshold — should block."""

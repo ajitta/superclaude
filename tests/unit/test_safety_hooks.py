@@ -83,12 +83,11 @@ class TestDestructiveGuard:
         assert out["decision"] == "block"
         assert "destructive" in out["reason"]
 
-    def test_main_approves_via_stdin(self, monkeypatch, capsys):
+    def test_main_silent_on_safe_command(self, monkeypatch, capsys):
         payload = json.dumps({"tool_input": {"command": "git push origin main"}})
         monkeypatch.setattr("sys.stdin", io.StringIO(payload))
         destructive_guard.main()
-        out = json.loads(capsys.readouterr().out)
-        assert out["decision"] == "approve"
+        assert capsys.readouterr().out == ""
 
     def test_main_opt_out(self, monkeypatch, capsys):
         monkeypatch.setenv("SUPERCLAUDE_DESTRUCTIVE_GUARD", "0")
@@ -97,14 +96,12 @@ class TestDestructiveGuard:
             io.StringIO(json.dumps({"tool_input": {"command": "rm -rf /"}})),
         )
         destructive_guard.main()
-        out = json.loads(capsys.readouterr().out)
-        assert out["decision"] == "approve"  # disabled -> never blocks
+        assert capsys.readouterr().out == ""  # disabled -> never blocks
 
     def test_main_malformed_fails_open(self, monkeypatch, capsys):
         monkeypatch.setattr("sys.stdin", io.StringIO("{ not json"))
         destructive_guard.main()
-        out = json.loads(capsys.readouterr().out)
-        assert out["decision"] == "approve"
+        assert capsys.readouterr().out == ""
 
 
 class TestDestructiveGuardWarnTier:
@@ -182,8 +179,7 @@ class TestDestructiveGuardWarnTier:
         payload = json.dumps({"tool_input": {"command": "git clean -fd"}})
         monkeypatch.setattr("sys.stdin", io.StringIO(payload))
         destructive_guard.main()
-        out = json.loads(capsys.readouterr().out)
-        assert out["decision"] == "approve"
+        assert capsys.readouterr().out == ""
 
 
 class TestLoopGuardAtomicWrite:
@@ -220,3 +216,24 @@ class TestLoopGuardAtomicWrite:
         p = tmp_path / "state.json"
         p.write_text("{ broken json", encoding="utf-8")
         assert loop_guard._load_state(p) == {"entries": []}
+
+
+def test_no_shipped_hook_prints_approve():
+    """No hook script may emit the legacy ``{"decision": "approve"}``.
+
+    The official hooks reference maps ``approve`` to ``permissionDecision:
+    "allow"``, which skips Claude Code's own permission prompt. A guard that
+    printed it on every call it did not block turned the prompt off for all
+    Bash, Edit, Write and Read calls (2026-10-17 audit). Allowing is done by
+    printing nothing; this test pins that for every script, including ones
+    added later. Docstrings may mention the word; code may not emit it.
+    """
+    import ast
+
+    offenders = []
+    for script in sorted(_SCRIPTS.rglob("*.py")):
+        tree = ast.parse(script.read_text(encoding="utf-8"))
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Constant) and node.value == "approve":
+                offenders.append(f"{script.relative_to(_SCRIPTS)}:{node.lineno}")
+    assert not offenders, f"hook code still emits approve: {offenders}"

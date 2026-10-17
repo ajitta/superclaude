@@ -482,13 +482,15 @@ def run_loader(
     prompt: str,
     project_dir: Path,
     session_id: str | None = None,
+    env_override: dict[str, str] | None = None,
 ) -> str:
     """Invoke context_loader.py as Claude Code does; return its stdout.
 
     ``SUPERCLAUDE_PATH`` pins the content root so injection does not depend on
     what happens to be installed on the machine running the suite, and the
     ``.claude/superclaude`` marker under ``project_dir`` keeps ``claude_base()``
-    — and therefore all hook state — inside the sandbox.
+    — and therefore all hook state — inside the sandbox. ``env_override`` sets
+    loader knobs such as ``CLAUDE_CONTEXT_MAX_TOKENS`` for one run.
     """
     import os
     import subprocess
@@ -497,6 +499,8 @@ def run_loader(
     env = os.environ.copy()
     env["CLAUDE_PROJECT_DIR"] = str(project_dir)
     env["SUPERCLAUDE_PATH"] = str(CONTENT_ROOT)
+    if env_override:
+        env.update(env_override)
     payload: dict[str, str] = {"prompt": prompt}
     if session_id is not None:
         payload["session_id"] = session_id
@@ -1236,6 +1240,100 @@ class TestHarnessTurnsInjectNothing:
         body = GOAL_NOTICE_PROMPT.split(": ", 1)[1]
         out = run_loader(body, self._project(tmp_path), session_id="s")
         assert 'flag="--plan"' in out
+
+
+class TestCacheRecordsOnlyDeliveredContexts:
+    """The dedup cache records a context when it is injected, not when it matches.
+
+    2026-10-17 audit: ``check_triggers`` wrote every matched file to the cache
+    before ``output_inject_mode`` applied the token budget. A module the budget
+    skipped was therefore "loaded" for the rest of the session and never
+    injected again — on exactly the busy prompts that triggered three rule
+    modules at once.
+    """
+
+    # QUALITY (~3.4k tokens) fits a 4000-token budget; DELEGATION (~2.2k) and
+    # DOCS (~2.5k) are then over budget and skipped.
+    BUDGET = {"CLAUDE_CONTEXT_MAX_TOKENS": "4000"}
+    BUSY = "/sc:analyze --delegate the auth module and write up the plan"
+    FOLLOW_UP = "spawn a sub-agent for the second half"
+
+    @staticmethod
+    def _project(tmp_path: Path) -> Path:
+        (tmp_path / ".claude" / "superclaude").mkdir(parents=True, exist_ok=True)
+        return tmp_path
+
+    def test_budget_skipped_context_is_injected_on_the_next_prompt(self, tmp_path):
+        project = self._project(tmp_path)
+
+        first = run_loader(self.BUSY, project, session_id="s", env_override=self.BUDGET)
+        assert "Budget exceeded" in first, first
+        assert "RULES_DELEGATION.md" in first.split("Budget exceeded", 1)[1]
+        assert '<context-inject file="core/rules/RULES_DELEGATION.md"' not in first
+
+        second = run_loader(
+            self.FOLLOW_UP, project, session_id="s", env_override=self.BUDGET
+        )
+        assert '<context-inject file="core/rules/RULES_DELEGATION.md"' in second, (
+            "a context the budget dropped was recorded as loaded and never injected"
+        )
+
+    def test_delivered_context_is_still_deduped(self, tmp_path):
+        project = self._project(tmp_path)
+
+        first = run_loader(self.BUSY, project, session_id="s", env_override=self.BUDGET)
+        assert '<context-inject file="core/rules/RULES_QUALITY.md"' in first
+
+        repeat = run_loader(
+            self.BUSY, project, session_id="s", env_override=self.BUDGET
+        )
+        assert '<context-inject file="core/rules/RULES_QUALITY.md"' not in repeat
+
+
+class TestQuotedTriggersInjectNothing:
+    """A flag or keyword inside code, a quote or an external runner's command
+    line is mentioned, not used. ``scannable_prompt`` already blanks those
+    regions for flag notices and execution directives; the 2026-10-17 audit
+    found ``check_triggers`` matching the raw prompt, so a fenced example of
+    ``--brainstorm`` injected the whole mode.
+    """
+
+    @staticmethod
+    def _project(tmp_path: Path) -> Path:
+        (tmp_path / ".claude" / "superclaude").mkdir(parents=True, exist_ok=True)
+        return tmp_path
+
+    def test_fenced_flag_does_not_load_the_mode(self, tmp_path):
+        prompt = (
+            "Review this transcript:\n```\nsc --brainstorm --play\n```\nIs it right?"
+        )
+        out = run_loader(prompt, self._project(tmp_path), session_id="s")
+        assert "MODE_Brainstorming.md" not in out
+        assert "MCP_Playwright" not in out
+
+    def test_inline_code_keyword_does_not_load_the_module(self, tmp_path):
+        prompt = "the log line says `sub-agent returned` — what does that mean?"
+        out = run_loader(prompt, self._project(tmp_path), session_id="s")
+        assert "RULES_DELEGATION.md" not in out
+
+    def test_blockquoted_flag_in_korean_does_not_load_the_mode(self, tmp_path):
+        prompt = "이 메시지를 번역해 줘:\n> 다음에는 --brainstorm 으로 시작하세요"
+        out = run_loader(prompt, self._project(tmp_path), session_id="s")
+        assert "MODE_Brainstorming.md" not in out
+
+    def test_typed_flag_still_loads_the_mode(self, tmp_path):
+        out = run_loader(
+            "--brainstorm 새 CLI 설계를 시작하자",
+            self._project(tmp_path),
+            session_id="s",
+        )
+        assert "MODE_Brainstorming.md" in out
+
+    def test_typed_keyword_still_loads_the_module(self, tmp_path):
+        out = run_loader(
+            "spawn a sub-agent for the tests", self._project(tmp_path), session_id="s"
+        )
+        assert "RULES_DELEGATION.md" in out
 
 
 def test_structured_flag_loads_business_symbols_only_for_business_panel():
