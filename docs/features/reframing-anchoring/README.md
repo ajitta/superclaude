@@ -13,9 +13,9 @@ related: ../prompt-content-audit/, ../over-engineering-audit/, ../../research/pe
 
 ## Status
 
-Phase 4 대안 비교·사용자 결정 대기. 브랜치 `feature/reframing-anchoring`, 기준 HEAD `7a6f771f`. 기존 20세션 + 판별력 24세션 + 확장 100세션 = 144/180 사용. 6개 콘텐츠 분류·2개 ponytail 보고서 수신 후 핵심 판정 검증; [03-analysis.md](./03-analysis.md)의 정정·보류 판정이 개별 보고서의 심각도·삭제 권고에 우선한다.
+Phase 5 파일럿 완료, Q4(커널 반영) 결정 대기. 브랜치 `feature/reframing-anchoring`, 기준 HEAD `7a6f771f`. 세션 168/180 사용(기준선 20 + 판별력 24 + 확장 100 + 파일럿 24). Q1 수정 4건 커밋, `sc-candidate` arm 커밋; `src/superclaude/core/RULES.md`는 아직 미변경. 6개 콘텐츠 분류·2개 ponytail 보고서 수신 후 핵심 판정 검증; [03-analysis.md](./03-analysis.md)의 정정·보류 판정이 개별 보고서의 심각도·삭제 권고에 우선한다.
 
-R3 첫 줄 검사는 프롬프트의 명시적 yes/no 요구와 충돌하므로 판단 실패의 증거에서 제외했다. I0 개입의 효과는 아직 측정하지 않았다. 최신 문헌 추가 조사·MCP/출력 스타일 의미 감사 등 잔여 범위가 있으며, 전체 연구·감사가 끝났다는 뜻은 아니다. 프레임워크 소스 수정·대량 삭제·커밋·푸시는 미실행.
+R3 첫 줄 검사는 프롬프트의 명시적 yes/no 요구와 충돌하므로 판단 실패의 증거에서 제외했다. I0 개입은 파일럿 1회(규칙 1개, 과제 2개, 모델 2개, 3회)로만 측정했다 — 일반화·Fable·일상 요청에의 부작용은 미측정. 최신 문헌 추가 조사·MCP/출력 스타일 의미 감사 등 잔여 범위가 있으며, 전체 연구·감사가 끝났다는 뜻은 아니다. 대량 삭제·푸시·릴리스는 미실행.
 
 ## Documents
 
@@ -31,4 +31,5 @@ R3 첫 줄 검사는 프롬프트의 명시적 yes/no 요구와 충돌하므로 
 - [04-ponytail-audit.md](./04-ponytail-audit.md): 구현 6축 감사·복구 보고서 검증 원자료
 - [04a-ponytail-lean-recovered.md](./04a-ponytail-lean-recovered.md): 2026-10-17 00:35 세션 복구본; 04에서 검증, 삭제 승인 아님
 - [04b-ponytail-content-structure.md](./04b-ponytail-content-structure.md): 콘텐츠 구조 lean adaptation 원자료
-- [05-options.md](./05-options.md): 4개 재구성 대안, 권한 경계, 실험 예산, Q1·Q2 결정
+- [05-options.md](./05-options.md): 4개 재구성 대안, 권한 경계, 실험 예산, Q1–Q4 결정 기록
+- [06-pilot.md](./06-pilot.md): `purpose_before_action` 커널 규칙 파일럿 (sc-full vs sc-candidate, 24세션): 0/12 → 11/12, 경계 검사, 비용

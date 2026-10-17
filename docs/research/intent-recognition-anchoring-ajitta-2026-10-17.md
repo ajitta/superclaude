@@ -33,8 +33,13 @@ From `02a-measurement.md`, 120 retained sessions:
 - Yes/no framing: the first-line check contradicted the prompt's own "answer yes or no first"; the substantive checks passed in every run. Not evidence of decision bias.
 - Shipped framework vs vanilla: no I0 improvement; +75% (sonnet) / +54% (opus) recorded session input.
 
-## 4. Open
+## 4. Pilot result (2026-10-17, 24 sessions)
 
-- Pilot of the `purpose_before_action` kernel rule (sc-full vs sc-candidate, 24 sessions) — results to be appended here and in `05-options.md`.
+`docs/features/reframing-anchoring/06-pilot.md`: with one kernel rule (`purpose_before_action`, +1,056 bytes) and everything else identical, the two action-only I0 tasks went from 0/6 (shipped kernel) to 11/12 (candidate) across sonnet and opus; the candidate changed only files the task or the error named; +12% (sonnet) / +21% (opus) session input from the extra reading. One rule, two synthetic tasks — the harness-level caution from T1 stands for tasks whose purpose is not discoverable in the workspace.
+
+## 5. Open
+
+- Ship decision for `core/RULES.md` and `make canary-gates` (4 sessions) before release; 12 sessions remain of 180.
 - T1 body: which eight models; whether any intervention short of training moved the score; TiGanEval task shapes to compare with this repo's fixtures.
 - Harder A1/A4 fixtures before claiming either effect is absent on current models.
+- Harm on ordinary requests (over-reading, slower one-line edits) under the rule: unmeasured.

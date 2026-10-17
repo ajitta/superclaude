@@ -1,6 +1,6 @@
 ---
 feature: reframing-anchoring
-status: decided-pilot-running
+status: pilot-complete-awaiting-ship-decision
 revised: 2026-10-17
 ---
 
@@ -11,8 +11,9 @@ revised: 2026-10-17
 | Question | Decision | Applied |
 |---|---|---|
 | Q1 prerequisite repairs | Approved as recommended: source + tests only, installed configs untouched, other lean cuts excluded | Hooks print nothing on allow (`destructive_guard`, `loop_guard`, `file_size_guard`); `merge_hooks_to_settings` refuses a non-object settings file; `context_loader` caches only delivered contexts and matches triggers on the scannable prompt; `context explain` mirrors it. 12 new tests, red→green; CHANGELOG `[Unreleased]`. |
-| Q2 direction | Alternative 4 as recommended: one thin common transition in the kernel, measured before anything ships | Trial rule `purpose_before_action` lives in `evals/arms/RULES_CANDIDATE.md` (shipped `RULES.md` + 1,056 bytes; `test_candidate_arm_is_shipped_kernel_plus_one_delta` pins the delta). New harness arm `sc-candidate`. `src/superclaude/core/RULES.md` is unchanged until the pilot reads out. Pilot: 2 I0 tasks × {sc-full, sc-candidate} × {sonnet, opus} × 3 = 24 sessions under the repaired hooks. |
+| Q2 direction | Alternative 4 as recommended: one thin common transition in the kernel, measured before anything ships | Trial rule `purpose_before_action` lives in `evals/arms/RULES_CANDIDATE.md` (shipped `RULES.md` + 1,056 bytes; `test_candidate_arm_is_shipped_kernel_plus_one_delta` pins the delta). New harness arm `sc-candidate`. `src/superclaude/core/RULES.md` is unchanged until the pilot reads out. Pilot: 2 I0 tasks × {sc-full, sc-candidate} × {sonnet, opus} × 3 = 24 sessions under the repaired hooks. **Result: 0/12 → 11/12** ([06-pilot.md](./06-pilot.md)). |
 | Q3 deferred cuts | Deferred behind Q2 as recommended | No lean cut applied. |
+| Q4 ship the rule to `core/RULES.md` | pending | — |
 
 ## Goal
 
