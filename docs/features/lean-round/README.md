@@ -1,6 +1,6 @@
 ---
 feature: lean-round
-phase: intent
+phase: implementation
 owner: ajitta
 created: 2026-10-18
 updated: 2026-10-18
@@ -12,7 +12,7 @@ Apply verified implementation simplifications and routing-preserving content con
 
 ## Status
 
-Phase 0: Q1–Q8 accepted in chat on 2026-10-18. Branch: `fix/lean-round-2`, based on `30a08be3` (v4.28.0); `master` and `origin/master` were 0/0 after fetch. Intent and decision records are seeded; implementation batches have not started. No commit, merge, push, release, or installed-content update has been performed.
+Q1–Q8 accepted in chat on 2026-10-18. Branch `fix/lean-round-2` on `30a08be3` (v4.28.0). B0–B4 are committed, one commit per batch ([04-batches.md](./04-batches.md)); the local-scope install is re-synced with no drift. B6: `make canary-gates` running after the `core/` edits; spot check pending. Not done: merge, push, version bump, release.
 
 Working plan: `.hermes/plans/2026-10-18_001500-lean-round.md` (v3; v2 preserved alongside it). The [intent record](./00-intent.md) preserves the approved decisions independently of that local plan.
 
@@ -25,6 +25,8 @@ Headless budget: **0/40 used** in this round. Planned checks: 4 gate sessions + 
 - [00-intent.md](./00-intent.md): original request, purpose, constraints, and Q1–Q8 decisions.
 - [01-kernel-footprint.md](./01-kernel-footprint.md): measured always-loaded import footprint and token-estimation limits.
 - [02-b0-doc-split.md](./02-b0-doc-split.md): B0 — size split of the eight oversized prior-round docs (content unchanged).
+- [03-deferred-evidence.md](./03-deferred-evidence.md): evidence (path:line) for the six deferred deletion/shrink candidates; no proposal.
+- [04-batches.md](./04-batches.md): B1–B4 commits, per-defect red evidence, deviations from the audit, what was skipped and why.
 
 ## Prior audit evidence
 
