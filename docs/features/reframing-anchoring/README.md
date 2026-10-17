@@ -13,7 +13,7 @@ related: ../prompt-content-audit/, ../over-engineering-audit/, ../../research/pe
 
 ## Status
 
-Phase 5 파일럿 완료, Q4(커널 반영) 결정 대기. 브랜치 `feature/reframing-anchoring`, 기준 HEAD `7a6f771f`. 세션 168/180 사용(기준선 20 + 판별력 24 + 확장 100 + 파일럿 24). Q1 수정 4건 커밋, `sc-candidate` arm 커밋; `src/superclaude/core/RULES.md`는 아직 미변경. 6개 콘텐츠 분류·2개 ponytail 보고서 수신 후 핵심 판정 검증; [03-analysis.md](./03-analysis.md)의 정정·보류 판정이 개별 보고서의 심각도·삭제 권고에 우선한다.
+Phase 6 완료: `purpose_before_action`을 `core/RULES.md`에 반영(`123c6a22`), `make canary-gates` 7/7 통과([07-release-gate.md](./07-release-gate.md)). 브랜치 `feature/reframing-anchoring`, 기준 HEAD `7a6f771f`. 세션 172/180 사용(기준선 20 + 판별력 24 + 확장 100 + 파일럿 24 + 게이트 4). 남은 것: 머지·푸시·릴리스(각각 지시 때), Q3 lean 삭제(보류). 6개 콘텐츠 분류·2개 ponytail 보고서 수신 후 핵심 판정 검증; [03-analysis.md](./03-analysis.md)의 정정·보류 판정이 개별 보고서의 심각도·삭제 권고에 우선한다.
 
 R3 첫 줄 검사는 프롬프트의 명시적 yes/no 요구와 충돌하므로 판단 실패의 증거에서 제외했다. I0 개입은 파일럿 1회(규칙 1개, 과제 2개, 모델 2개, 3회)로만 측정했다 — 일반화·Fable·일상 요청에의 부작용은 미측정. 최신 문헌 추가 조사·MCP/출력 스타일 의미 감사 등 잔여 범위가 있으며, 전체 연구·감사가 끝났다는 뜻은 아니다. 대량 삭제·푸시·릴리스는 미실행.
 
@@ -33,3 +33,4 @@ R3 첫 줄 검사는 프롬프트의 명시적 yes/no 요구와 충돌하므로 
 - [04b-ponytail-content-structure.md](./04b-ponytail-content-structure.md): 콘텐츠 구조 lean adaptation 원자료
 - [05-options.md](./05-options.md): 4개 재구성 대안, 권한 경계, 실험 예산, Q1–Q4 결정 기록
 - [06-pilot.md](./06-pilot.md): `purpose_before_action` 커널 규칙 파일럿 (sc-full vs sc-candidate, 24세션): 0/12 → 11/12, 경계 검사, 비용
+- [07-release-gate.md](./07-release-gate.md): 커널 변경 후 `make canary-gates` 결과 (7/7 hard gates, sonnet)
