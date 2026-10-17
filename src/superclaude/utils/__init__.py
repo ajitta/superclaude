@@ -27,6 +27,20 @@ from typing import Any
 # reason.
 
 
+def int_env(name: str, default: int) -> int:
+    """Read an integer knob from the environment; a missing or malformed value
+    (``8k``, an empty string) yields ``default`` instead of a ValueError. The
+    prompt hook reads its budget at import, so a typo in a shell profile would
+    otherwise fail every prompt until found."""
+    raw = os.environ.get(name)
+    if raw is None:
+        return default
+    try:
+        return int(raw.strip())
+    except ValueError:
+        return default
+
+
 def atomic_write_json(path: Path, data: Any, indent: int | None = 2) -> None:
     """Write JSON data atomically using temp file + os.replace.
 
@@ -69,6 +83,50 @@ def project_root() -> Path:
         $CLAUDE_PROJECT_DIR if set, else the current working directory
     """
     return Path(os.environ.get("CLAUDE_PROJECT_DIR") or Path.cwd())
+
+
+# Claude Code's own encoder, read out of the installed CLI binary
+# (~/.local/bin/claude, 2026-10-15 build): `e.replace(/[^a-zA-Z0-9]/g,"-")`.
+_CLAUDE_PROJECTS_DIR_RE = re.compile(r"[^A-Za-z0-9]")
+
+
+def claude_projects_dir_name(cwd: str) -> str:
+    """Folder name Claude Code gives ``cwd`` under ``~/.claude/projects/``.
+
+    Claude Code stores transcripts and auto-memory under
+    ``~/.claude/projects/<encoded cwd>/``. The rule — every character outside
+    ``[A-Za-z0-9]`` becomes one ``-``, no coalescing, no case folding — was
+    derived on 2026-10-18 from two sources, not assumed:
+
+    1. All 98 folder names present in the author's ``~/.claude/projects/``,
+       matched back to their real cwds. They show ``:``, ``\\``, ``/``, ``.``
+       and ``_`` each becoming one ``-`` (``C:\\Users\\ajitta\\.claude\\...`` →
+       ``C--Users-ajitta--claude-...``; mkdtemp suffixes drawn from
+       ``[a-z0-9_]`` stored with ``-`` where ``_`` was), letters keeping their
+       case (one folder starts ``c--Users-`` from a lowercase drive letter),
+       and no hashing or truncation up to the longest observed name (164).
+    2. The encoder function in the installed CLI binary, which is literally
+       ``replace(/[^a-zA-Z0-9]/g,"-")`` followed by a truncation that only
+       applies past 200 characters.
+
+    The two earlier copies in ``memory_staleness`` and ``insight_writer``
+    replaced only ``:``, ``\\`` and ``/``, so any project whose path contained
+    a dot (``.claude/worktrees/...``, ``.config``) resolved to a folder that
+    does not exist: the staleness scan found nothing and never warned, and the
+    transcript fallback found no transcript.
+
+    Not replicated: the CLI's >200-character truncation (``slice(0, 200)`` plus
+    a base-36 hash of the original path). The hash function was not identified
+    in the binary, and no path on this machine reaches that length; a cwd that
+    does will resolve to a non-existent folder, as before.
+
+    Args:
+        cwd: Absolute session or project path, as Claude Code received it
+
+    Returns:
+        The encoded folder name (not a full path)
+    """
+    return _CLAUDE_PROJECTS_DIR_RE.sub("-", cwd)
 
 
 def main_worktree_root(root: Path) -> Path | None:

@@ -1042,12 +1042,12 @@ def context_explain(prompt):
         superclaude context explain "--tavily research this"
         superclaude context explain --brainstorm a new CLI
     """
-    import os
+    from ..utils import int_env
 
     # Mirrors context_loader.MAX_TOKENS_ESTIMATE, which that module freezes at
     # import: reading the env here is what keeps the reported budget equal to
     # the one the freshly-started child actually enforced.
-    budget = int(os.environ.get("CLAUDE_CONTEXT_MAX_TOKENS", "8000"))
+    budget = int_env("CLAUDE_CONTEXT_MAX_TOKENS", 8000)
 
     text = " ".join(prompt).strip()
     if not text:

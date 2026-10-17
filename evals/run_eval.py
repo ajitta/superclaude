@@ -770,46 +770,53 @@ def main() -> int:
     print(f"runs dir: {runs_dir}\narms: {arms}\ntasks: {[t['id'] for t in tasks]}")
 
     results: list[TaskResult] = []
-    for arm in arms:
-        config_dir = runs_dir / "config" / arm
-        config_dir.mkdir(parents=True, exist_ok=True)
-        if creds is not None:
-            # Auth is CLAUDE_CONFIG_DIR-scoped; credentials only — settings.json
-            # or CLAUDE.md from the real config dir would contaminate the arm.
-            shutil.copy2(creds, config_dir / creds.name)
-        for task in tasks:
-            label = f"[{arm}/{task['id']}]"
-            try:
-                ws = build_workspace(arm, task, runs_dir, superclaude_bin)
-            except (RuntimeError, subprocess.TimeoutExpired) as exc:
-                print(f"{label} BUILD FAIL: {exc}")
-                results.append(
-                    TaskResult(
-                        arm=arm,
-                        task_id=task["id"],
-                        error=f"build: {exc}",
-                        permission_mode=args.permission_mode or "",
+    # The per-arm credential copies are live OAuth tokens; they must not outlive
+    # the run (the runs dir defaults to the system temp dir).
+    try:
+        for arm in arms:
+            config_dir = runs_dir / "config" / arm
+            config_dir.mkdir(parents=True, exist_ok=True)
+            if creds is not None:
+                # Auth is CLAUDE_CONFIG_DIR-scoped; credentials only — settings.json
+                # or CLAUDE.md from the real config dir would contaminate the arm.
+                shutil.copy2(creds, config_dir / creds.name)
+            for task in tasks:
+                label = f"[{arm}/{task['id']}]"
+                try:
+                    ws = build_workspace(arm, task, runs_dir, superclaude_bin)
+                except (RuntimeError, subprocess.TimeoutExpired) as exc:
+                    print(f"{label} BUILD FAIL: {exc}")
+                    results.append(
+                        TaskResult(
+                            arm=arm,
+                            task_id=task["id"],
+                            error=f"build: {exc}",
+                            permission_mode=args.permission_mode or "",
+                        )
                     )
+                    continue
+                if args.dry_run:
+                    print(f"{label} build ok: {ws}")
+                    continue
+                res = run_task(
+                    arm,
+                    task,
+                    ws,
+                    config_dir,
+                    runs_dir / arm / "logs",
+                    claude_bin,
+                    args.model,
+                    defaults,
+                    args.effort,
+                    args.permission_mode,
                 )
-                continue
-            if args.dry_run:
-                print(f"{label} build ok: {ws}")
-                continue
-            res = run_task(
-                arm,
-                task,
-                ws,
-                config_dir,
-                runs_dir / arm / "logs",
-                claude_bin,
-                args.model,
-                defaults,
-                args.effort,
-                args.permission_mode,
-            )
-            results.append(res)
-            status = "ok" if res.ok else (res.error or "checks failed")
-            print(f"{label} {status} ({res.duration_s}s, {res.tokens_out} out-tokens)")
+                results.append(res)
+                status = "ok" if res.ok else (res.error or "checks failed")
+                print(
+                    f"{label} {status} ({res.duration_s}s, {res.tokens_out} out-tokens)"
+                )
+    finally:
+        shutil.rmtree(runs_dir / "config", ignore_errors=True)
 
     if args.dry_run:
         print("dry run complete — workspaces built, no API calls made")

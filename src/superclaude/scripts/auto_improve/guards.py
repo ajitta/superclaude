@@ -77,9 +77,11 @@ class RegressionBlock:
 
 
 class SmokeGate:
-    """Runs a fast pre-cycle check; falls back to eval_cmd with short timeout."""
+    """Runs a pre-cycle check; falls back to eval_cmd under the same timeout.
 
-    FALLBACK_TIMEOUT_S = 30
+    The fallback used to be capped at a fixed 30 s, so an eval that passed the
+    baseline under the cycle timeout timed out on every cycle's smoke check.
+    """
 
     def __init__(
         self,
@@ -95,14 +97,13 @@ class SmokeGate:
 
     def check(self) -> GuardVerdict:
         cmd = self.smoke_cmd if self.smoke_cmd else self.eval_cmd
-        timeout = self.timeout if self.smoke_cmd else self.FALLBACK_TIMEOUT_S
         try:
             proc = subprocess.run(
                 cmd,
                 shell=True,
                 capture_output=True,
                 text=True,
-                timeout=timeout,
+                timeout=self.timeout,
                 cwd=self.cwd,
             )
         except subprocess.TimeoutExpired:

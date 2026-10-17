@@ -2,7 +2,7 @@
 
 Covers: append (escaping, validation, annotation refs), harvest (marker
 detection, dedup, isMeta/assistant skip), review/promote round-trip,
-pending-count, _encode_cwd matching Claude Code's projects-dir scheme.
+pending-count, _project_dir using the shared Claude Code projects-dir encoder.
 """
 
 from __future__ import annotations
@@ -28,22 +28,40 @@ def workdir(tmp_path, monkeypatch):
     return tmp_path
 
 
-# ---------- _encode_cwd ----------
+# ---------- _project_dir (shared Claude Code projects-dir encoder) ----------
 
 
-class TestEncodeCwd:
-    def test_windows_double_dash_after_drive(self):
+class TestProjectDir:
+    def test_windows_double_dash_after_drive(self, monkeypatch):
+        monkeypatch.setattr(Path, "home", lambda: Path("H:/fakehome"))
         # ':\' becomes '--' (each separator → one dash, no coalescing)
-        assert iw._encode_cwd(r"C:\Users\ajitta") == "C--Users-ajitta"
+        assert iw._project_dir(r"C:\Users\ajitta").name == "C--Users-ajitta"
 
-    def test_unix_path(self):
-        assert iw._encode_cwd("/home/ajitta/repo") == "-home-ajitta-repo"
+    def test_unix_path(self, monkeypatch):
+        monkeypatch.setattr(Path, "home", lambda: Path("H:/fakehome"))
+        assert iw._project_dir("/home/ajitta/repo").name == "-home-ajitta-repo"
 
-    def test_real_project_path(self):
-        # Matches the directory name observed in ~/.claude/projects/
+    def test_dotted_path_matches_observed_folder(self, monkeypatch):
+        monkeypatch.setattr(Path, "home", lambda: Path("H:/fakehome"))
+        # Observed in ~/.claude/projects/: '.' is encoded too. Keeping it named
+        # a folder Claude Code never creates, so the transcript fallback found
+        # nothing for any dotted cwd.
         assert (
-            iw._encode_cwd(r"C:\Users\ajitta\Repos\ajitta\superclaude")
-            == "C--Users-ajitta-Repos-ajitta-superclaude"
+            iw._project_dir(r"C:\Users\ajitta\.claude\mem-observer\sessions").name
+            == "C--Users-ajitta--claude-mem-observer-sessions"
+        )
+
+    def test_uses_shared_encoder(self, monkeypatch):
+        from superclaude.utils import claude_projects_dir_name
+
+        fake_home = Path("H:/fakehome")
+        monkeypatch.setattr(Path, "home", lambda: fake_home)
+        cwd = r"C:\Users\x\my_repo\.worktrees\a"
+        assert iw._project_dir(cwd) == (
+            fake_home / ".claude" / "projects" / claude_projects_dir_name(cwd)
+        )
+        assert not hasattr(iw, "_encode_cwd"), (
+            "insight_writer must not keep its own copy of the encoder"
         )
 
 
@@ -205,7 +223,7 @@ def _harvest(workdir: Path, monkeypatch, session_id: str, source: str = "clear")
     monkeypatch.setattr(Path, "home", lambda: fake_home)
 
     cwd_str = str(workdir)
-    project_dir = fake_home / ".claude" / "projects" / iw._encode_cwd(cwd_str)
+    project_dir = iw._project_dir(cwd_str)
     return argparse.Namespace(
         cwd=cwd_str,
         session_id=session_id,
@@ -949,7 +967,7 @@ class TestFindTranscriptFallback:
         fake_home = workdir / "fakehome"
         monkeypatch.setattr(Path, "home", lambda: fake_home)
         cwd = str(workdir)
-        pdir = fake_home / ".claude" / "projects" / iw._encode_cwd(cwd)
+        pdir = iw._project_dir(cwd)
         pdir.mkdir(parents=True)
         old = pdir / "old.jsonl"
         new = pdir / "new.jsonl"
@@ -969,7 +987,7 @@ class TestFindTranscriptFallback:
         fake_home = workdir / "fakehome"
         monkeypatch.setattr(Path, "home", lambda: fake_home)
         cwd = str(workdir)
-        pdir = fake_home / ".claude" / "projects" / iw._encode_cwd(cwd)
+        pdir = iw._project_dir(cwd)
         pdir.mkdir(parents=True)
         only = pdir / "only.jsonl"
         only.write_text("{}\n", encoding="utf-8")

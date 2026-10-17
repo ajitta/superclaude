@@ -22,7 +22,7 @@ description: Autonomous overnight code improvement loop driven by an objective m
   - --eval-cmd <sh>: command that measures the metric each cycle; runs unsandboxed; see the Phase 0 confirm step and the eval-cmd-blast-radius gotcha.
   - --metric <jmespath>: objective metric the loop optimises, recorded as metric_value in results.tsv; required by the Parse step.
   - --budget <dur>: wall-clock limit for the whole loop (default 8h).
-  - --smoke-cmd <sh>: health check run at the start of each cycle; a failing check logs `smoke_fail` and skips that cycle.
+  - --smoke-cmd <sh>: health check run at the start of each cycle; a failing check logs `smoke_fail` and skips that cycle; five consecutive failures (the plateau window) stop the loop. Without it the eval command itself is the check, under `--cycle-timeout`.
   - --cycle-timeout <sec>: timeout for each smoke, mutate and eval step (default 600).
   - --mutator-model <model>: model for the mutator agent; see the mutator-model-freeform gotcha.
   - --scope <glob>: glob limiting the files the mutator edits (advisory, default `**`); unrelated to the global --scope.

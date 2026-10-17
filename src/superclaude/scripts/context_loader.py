@@ -34,7 +34,7 @@ from superclaude.hooks.mcp_fallback import MCP_FALLBACKS, check_mcp_and_notify
 # context_loader`, i.e. under the console script's own interpreter, which has
 # the package. Silently degrading here would put state and content lookups in
 # the wrong scope.
-from superclaude.utils import claude_base, context_cache_file, project_root
+from superclaude.utils import claude_base, context_cache_file, int_env, project_root
 
 # Configuration
 INJECT_MODE = os.environ.get("CLAUDE_CONTEXT_INJECT", "1").lower() in (
@@ -42,9 +42,7 @@ INJECT_MODE = os.environ.get("CLAUDE_CONTEXT_INJECT", "1").lower() in (
     "true",
     "yes",
 )  # Default: inject
-MAX_TOKENS_ESTIMATE = int(
-    os.environ.get("CLAUDE_CONTEXT_MAX_TOKENS", "8000")
-)  # ~8K tokens
+MAX_TOKENS_ESTIMATE = int_env("CLAUDE_CONTEXT_MAX_TOKENS", 8000)  # ~8K tokens
 CHARS_PER_TOKEN = 4  # Rough estimate
 
 # Dedup cache file, keyed on (project, Claude Code session) and stored in the

@@ -7,23 +7,40 @@ import json
 import shutil
 import subprocess
 import sys
+from pathlib import Path
 
 import pytest
 
 from superclaude.scripts import test_runner_hook as hook
 
 
-def _run_main(monkeypatch, capsys, file_path, completed):
+def _feed_stdin(monkeypatch, file_path):
     payload = json.dumps({"tool_name": "Edit", "tool_input": {"file_path": file_path}})
     monkeypatch.setattr(sys, "stdin", io.StringIO(payload))
     monkeypatch.setenv("SUPERCLAUDE_AUTO_TEST", "1")
+
+
+def _run_main(monkeypatch, capsys, file_path, completed):
+    _feed_stdin(monkeypatch, file_path)
     monkeypatch.setattr(
-        hook, "detect_test_command", lambda p: "uv run python -m pytest"
+        hook, "detect_test_command", lambda p: ("uv run python -m pytest", Path("."))
     )
     monkeypatch.setattr(hook.subprocess, "run", lambda *a, **k: completed)
     hook.main()
     out = capsys.readouterr().out.strip()
     return json.loads(out)["systemMessage"] if out else ""
+
+
+def _capture_run(monkeypatch):
+    """Replace subprocess.run; return the list of (cmd, kwargs) it received."""
+    calls = []
+
+    def fake_run(cmd, **kwargs):
+        calls.append((cmd, kwargs))
+        return _completed(0)
+
+    monkeypatch.setattr(hook.subprocess, "run", fake_run)
+    return calls
 
 
 def _completed(rc, stdout="", stderr=""):
@@ -132,6 +149,79 @@ class TestMainMessages:
         msg = _run_main(monkeypatch, capsys, str(tmp_path / "ops.py"), _completed(0))
 
         assert msg.startswith("Tests passed")
+
+
+class TestCommandRunsInDetectedProject:
+    """Finding 8: the command must run in the directory whose marker was found,
+    not in the hook's own CWD (a monorepo root may have no test script)."""
+
+    def test_npm_subproject(self, monkeypatch, capsys, tmp_path):
+        (tmp_path / "package.json").write_text(json.dumps({"name": "root"}))
+        api = tmp_path / "packages" / "api"
+        (api / "src").mkdir(parents=True)
+        (api / "package.json").write_text(
+            json.dumps({"name": "api", "scripts": {"test": "jest"}})
+        )
+        edited = api / "src" / "x.ts"
+        edited.write_text("")
+        calls = _capture_run(monkeypatch)
+        _feed_stdin(monkeypatch, str(edited))
+
+        hook.main()
+
+        assert len(calls) == 1
+        cmd, kwargs = calls[0]
+        assert cmd == "npm test --silent"
+        assert Path(kwargs["cwd"]).resolve() == api.resolve()
+
+    def test_python_subproject(self, monkeypatch, capsys, tmp_path):
+        (tmp_path / ".git").mkdir()
+        svc = tmp_path / "services" / "worker"
+        (svc / "pkg").mkdir(parents=True)
+        (svc / "pyproject.toml").write_text("[project]\nname = 'worker'\n")
+        edited = svc / "pkg" / "ops.py"
+        edited.write_text("")
+        calls = _capture_run(monkeypatch)
+        _feed_stdin(monkeypatch, str(edited))
+
+        hook.main()
+
+        assert len(calls) == 1
+        cmd, kwargs = calls[0]
+        assert cmd.startswith("uv run python -m pytest")
+        assert Path(kwargs["cwd"]).resolve() == svc.resolve()
+
+    def test_make_subproject(self, monkeypatch, capsys, tmp_path):
+        lib = tmp_path / "lib"
+        lib.mkdir()
+        (lib / "Makefile").write_text("test:\n\ttrue\n")
+        edited = lib / "a.c"
+        edited.write_text("")
+        calls = _capture_run(monkeypatch)
+        _feed_stdin(monkeypatch, str(edited))
+
+        hook.main()
+
+        assert len(calls) == 1
+        cmd, kwargs = calls[0]
+        assert cmd == "make test"
+        assert Path(kwargs["cwd"]).resolve() == lib.resolve()
+
+    def test_authoring_test_runs_at_pyproject_root(self, tmp_path):
+        root = tmp_path / "superclaude"
+        (root / "agents").mkdir(parents=True)
+        (root / "pyproject.toml").write_text("")
+        edited = root / "agents" / "x.md"
+        edited.write_text("")
+
+        result = hook.detect_authoring_test(str(edited))
+
+        assert result is not None
+        cmd, cwd = result
+        assert cmd == (
+            "uv run python -m pytest tests/unit/test_agent_structure.py --tb=short -q"
+        )
+        assert Path(cwd).resolve() == root.resolve()
 
 
 @pytest.mark.skipif(shutil.which("make") is None, reason="make not installed")

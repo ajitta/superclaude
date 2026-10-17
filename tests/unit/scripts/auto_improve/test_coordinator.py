@@ -171,6 +171,36 @@ def test_smoke_fail_skips_cycle_no_mutation_attempted(repo):
     assert mut.call_count == 0
 
 
+def test_consecutive_smoke_failures_stop_the_loop(repo):
+    """A smoke gate that fails every cycle (e.g. eval slower than the gate's
+    timeout) used to write smoke_fail rows until the budget ran out and never
+    reach the mutator. After plateau_window failures in a row run() must end."""
+    cfg = _make_config(repo, budget_seconds=3600, plateau_window=3)
+    calls = {"n": 0}
+
+    def always_fail(self):
+        calls["n"] += 1
+        if calls["n"] > 20:
+            raise AssertionError("smoke_fail streak did not stop the loop")
+        return False
+
+    with (
+        patch(
+            "superclaude.scripts.auto_improve.coordinator.run_eval",
+            return_value=_eval_result(10.0),
+        ),
+        patch.object(Coordinator, "_run_smoke", always_fail),
+        patch.object(Coordinator, "_invoke_mutator") as mut,
+    ):
+        c = Coordinator(cfg)
+        cycles = c.run()
+    assert mut.call_count == 0
+    assert cycles == 1 + cfg.plateau_window  # baseline + smoke_fail cycles
+    rows = ResultsTsv(c.tsv_path).read_all()
+    assert [r.status for r in rows][1:] == ["smoke_fail"] * cfg.plateau_window
+    assert "stopping" in rows[-1].desc
+
+
 def test_each_cycle_writes_exactly_one_results_tsv_row(repo):
     cfg = _make_config(repo, budget_seconds=120, plateau_window=2)
     eval_results = [

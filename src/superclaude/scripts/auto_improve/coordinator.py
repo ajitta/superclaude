@@ -3,7 +3,8 @@
 State transitions:
     INIT -> CONFIRM -> BASELINE -> LOOP[smoke -> mutate -> eval -> commit/rollback]
                           |             |
-                          +-> exit≠0    +-> plateau / budget / regression -> REPORT
+                          +-> exit≠0    +-> plateau / budget / regression
+                                        |   / repeated smoke_fail -> REPORT
 
 The coordinator owns:
   - worktree lifecycle (create on entry, cleanup on exit)
@@ -68,6 +69,11 @@ class Coordinator:
         self._baseline_metric: Optional[float] = None
         self._cycle_id: int = 0
         self._consecutive_refusals: int = 0
+        # Streak of smoke_fail cycles; reset by any passing smoke check. A
+        # gate that fails every cycle (eval slower than the gate's timeout,
+        # broken worktree) would otherwise write smoke_fail rows until the
+        # budget ran out and never reach the mutator.
+        self._consecutive_smoke_fails: int = 0
 
     # --- public entry points ---
 
@@ -96,18 +102,26 @@ class Coordinator:
                 if not budget.check().pass_:
                     break
                 if not self._run_smoke():
+                    self._consecutive_smoke_fails += 1
+                    stop = self._consecutive_smoke_fails >= self.config.plateau_window
                     self._record_row(
                         status="smoke_fail",
-                        desc="smoke gate failed",
+                        desc=(
+                            f"smoke gate failed ({self._consecutive_smoke_fails} "
+                            "consecutive; stopping)"
+                            if stop
+                            else "smoke gate failed"
+                        ),
                         metric=0.0,
                         tokens=0,
                         wall=0,
                         commit_hash="-",
                     )
                     self._cycle_id += 1
-                    if not budget.check().pass_:
+                    if stop or not budget.check().pass_:
                         break
                     continue
+                self._consecutive_smoke_fails = 0
                 mut = self._run_mutator_cycle(regression, plateau)
                 if mut == "stop":
                     break

@@ -718,3 +718,43 @@ def test_git_changed_ignores_framework_state_files(tmp_path):
     assert run_eval._git_changed(ws) == {"reply.md"}
     check = {"type": "git_diff_max_files", "value": 1}
     assert run_eval._check_one(check, "git_diff_max_files", ws, "", "")[0]
+
+
+def test_credential_copies_do_not_outlive_the_run(monkeypatch, tmp_path):
+    """Arm isolation copies ~/.claude/.credentials.json into
+    <runs-dir>/config/<arm>/; the copies must be gone when main() returns,
+    including when a workspace build fails."""
+    run_eval = _import_run_eval()
+    creds = tmp_path / "home" / ".credentials.json"
+    creds.parent.mkdir()
+    creds.write_text("{" + '"token": "secret"' + "}")
+    runs_dir = tmp_path / "runs"
+
+    def fail_build(*_a, **_k):
+        raise RuntimeError("no build in tests")
+
+    monkeypatch.setattr(run_eval, "_which", lambda name: name)
+    monkeypatch.setattr(run_eval, "_credentials_file", lambda: creds)
+    monkeypatch.setattr(run_eval, "build_workspace", fail_build)
+    monkeypatch.setattr(run_eval, "write_report", lambda *_a, **_k: "")
+    monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+    monkeypatch.delenv("CLAUDE_CODE_OAUTH_TOKEN", raising=False)
+    task_id = next(t["id"] for t in TASKS["tasks"] if not t.get("canary_only"))
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "run_eval.py",
+            "--arms",
+            "vanilla",
+            "--task",
+            task_id,
+            "--runs-dir",
+            str(runs_dir),
+        ],
+    )
+
+    run_eval.main()
+
+    assert not list(runs_dir.rglob(".credentials.json"))
+    assert creds.exists()  # the source is untouched

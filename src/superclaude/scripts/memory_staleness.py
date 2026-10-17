@@ -18,7 +18,7 @@ import sys
 from datetime import date, datetime
 from pathlib import Path
 
-from superclaude.utils import project_root
+from superclaude.utils import claude_projects_dir_name, project_root
 
 DEFAULT_THRESHOLD_DAYS = 90
 ENV_THRESHOLD = "SUPERCLAUDE_MEMORY_STALE_DAYS"
@@ -27,20 +27,6 @@ ENV_THRESHOLD = "SUPERCLAUDE_MEMORY_STALE_DAYS"
 # superclaude was installed into. Only the project anchor below is ours.
 HOME_PROJECTS = Path.home() / ".claude" / "projects"
 VERIFIED_RE = re.compile(r"^verified:\s*(\d{4}-\d{2}-\d{2})\s*$", re.MULTILINE)
-
-
-def encode_project_path(cwd: str) -> str:
-    """Encode an absolute path the way CC names project memory directories.
-
-    CC collapses the drive-letter `:\\` (or `:/`) into `--`, then replaces
-    remaining path separators with `-`. Example:
-    ``C:\\Users\\ajitta\\Repos\\ajitta\\superclaude``
-        → ``C--Users-ajitta-Repos-ajitta-superclaude``
-    """
-    normalized = cwd.replace("\\", "/")
-    normalized = normalized.replace(":/", "--")
-    normalized = normalized.replace("/", "-")
-    return normalized
 
 
 def resolve_threshold() -> int:
@@ -95,9 +81,10 @@ def project_memory_dir() -> Path:
     Anchored on ``project_root()``, not the hook's CWD: CC encodes the project
     root into the directory name, so a hook firing from a subdirectory would
     encode a path that has no memory directory and the scan would silently
-    return nothing.
+    return nothing. The name itself comes from ``claude_projects_dir_name``,
+    the one encoder shared with insight_writer.
     """
-    return HOME_PROJECTS / encode_project_path(str(project_root())) / "memory"
+    return HOME_PROJECTS / claude_projects_dir_name(str(project_root())) / "memory"
 
 
 def main() -> int:

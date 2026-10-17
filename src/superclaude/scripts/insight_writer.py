@@ -20,8 +20,11 @@ Hook integration:
     SessionEnd / PreCompact → harvest-from-hook (stdin JSON: reason/trigger + cwd)
     SessionStart            → pending-count-from-hook (stdin JSON: cwd)
 
-Transcript discovery: ~/.claude/projects/<encoded-cwd>/<session_id>.jsonl
-where encoded-cwd replaces [:\\/] with '-'.
+Transcript discovery: the hook payload's `transcript_path` is the preferred
+source and is used whenever the file exists (see cmd_harvest). Only when it is
+absent or stale does the harvester fall back to rebuilding
+~/.claude/projects/<encoded-cwd>/<session_id>.jsonl, where encoded-cwd comes
+from superclaude.utils.claude_projects_dir_name (every non-alphanumeric → '-').
 """
 
 from __future__ import annotations
@@ -38,6 +41,7 @@ from collections import Counter
 from pathlib import Path
 
 from superclaude.utils import (
+    claude_projects_dir_name,
     hook_state_dir,
     project_key,
     project_root,
@@ -99,16 +103,15 @@ def _git_user() -> str:
     return os.environ.get("USER") or os.environ.get("USERNAME") or "unknown"
 
 
-def _encode_cwd(cwd: str) -> str:
-    """Replicate Claude Code's projects-dir encoding: each [:\\/] → '-' (no coalescing).
-
-    e.g. 'C:\\Users\\ajitta' → 'C--Users-ajitta' (':\\' becomes '--').
-    """
-    return re.sub(r"[:\\/]", "-", cwd)
-
-
 def _project_dir(cwd: str) -> Path:
-    return Path.home() / ".claude" / "projects" / _encode_cwd(cwd)
+    """Claude Code's transcript directory for ``cwd``.
+
+    Fallback path only: cmd_harvest reads the hook payload's ``transcript_path``
+    first and comes here when that file is missing. The folder name is the
+    shared encoder's — a private copy here once left ``.`` unencoded and found
+    no transcript for any dotted cwd.
+    """
+    return Path.home() / ".claude" / "projects" / claude_projects_dir_name(cwd)
 
 
 def _find_transcript(session_id: str | None, cwd: str) -> Path | None:

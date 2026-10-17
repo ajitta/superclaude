@@ -12,6 +12,16 @@ Releases before 4.19.0 are not listed. Their history is the git log; the upstrea
 
 - `SECURITY.md` is a one-page policy: where to report, what is supported, what the install and hooks write on your machine. The upstream-era text (bug bounty, 4.1.x support table, checklists) is gone.
 
+### Fixed
+
+- `superclaude hook prettier` finds a project-local prettier on Windows: it resolves `prettier` through `shutil.which` against `<project>/node_modules/.bin` then `PATH`, which picks `prettier.cmd` on Windows and the script elsewhere. Before, the hook ran the POSIX script directly, Windows rejected it (`WinError 193`), and the hook swallowed that as "prettier not installed" — so it formatted nothing whenever prettier was installed locally. The `npx prettier` fallback is gone: with no prettier found the hook exits silently.
+- `superclaude hook test-runner` runs the detected test command in the project it detected (the directory holding the `pyproject.toml`, `package.json` or `Makefile` nearest the edited file), not in the hook's own working directory. In a monorepo the npm/pytest run used to execute at the root and report a result for the wrong project. `make -C <dir> test` became `make test` run in that directory.
+- The `memory_staleness` hook and `insight_writer` compute Claude Code's project folder name (`~/.claude/projects/<encoded cwd>`) the way Claude Code does — every non-alphanumeric character becomes `-`, so a cwd containing `.` or `_` now resolves (`C:\Users\me\.claude\worktrees\x` → `C--Users-me--claude-worktrees-x`). Before, both replaced only `:`, `\` and `/`, so for any dotted path the stale-memory warning never fired and the transcript fallback found nothing. Derived from the 98 project folders on the maintainer's machine and the CLI's own encoder; paths over 200 characters (which Claude Code truncates and hashes) are not handled.
+- `superclaude auto-improve` without `--smoke-cmd` runs the eval command as the smoke check under `--cycle-timeout` instead of a fixed 30 s, and stops after five consecutive `smoke_fail` cycles (the plateau window; the last results.tsv row says so). An eval slower than 30 s used to time out every cycle all night without ever calling the mutator.
+- The `auto-improve` mutator runs `claude -p` with `--permission-mode acceptEdits` instead of `bypassPermissions`: edits inside its worktree are accepted, an edit outside it is denied. The unattended loop could previously write anywhere the user can.
+- A malformed `CLAUDE_CONTEXT_MAX_TOKENS` (`8k`, empty) no longer crashes the prompt hook on every prompt; the loader and `superclaude context explain` fall back to 8000.
+- `evals/run_eval.py` deletes the per-arm copies of `~/.claude/.credentials.json` it makes under `<runs-dir>/config/` when the run ends, including on error. They used to stay in the runs directory (by default the system temp dir) after every run.
+
 ### Removed
 
 - `make verify` (a banner that repeated `make doctor` and `superclaude --version`). `make install` now points to `make doctor`.

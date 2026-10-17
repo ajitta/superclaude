@@ -193,3 +193,15 @@ def test_mutator_refusal_with_blank_result_reports_refusal_not_r3(tmp_path):
     assert result.refused is True
     assert "refused" in (result.error or "")
     assert "R3" not in (result.error or "")
+
+
+def test_mutator_runs_under_accept_edits_not_bypass(tmp_path):
+    """Unattended for hours with Edit/Write: acceptEdits auto-accepts edits
+    inside the worktree (cwd + --add-dir) and lets Claude Code deny the rest;
+    bypassPermissions would let an absolute-path edit reach the main tree."""
+    with patch("subprocess.run") as run:
+        run.return_value = _completed(_fake_claude_response("x"))
+        Mutator().mutate(worktree_path=tmp_path)
+    cmd = run.call_args.args[0]
+    assert cmd[cmd.index("--permission-mode") + 1] == "acceptEdits"
+    assert "bypassPermissions" not in cmd

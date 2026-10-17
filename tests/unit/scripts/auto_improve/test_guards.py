@@ -106,6 +106,23 @@ def test_smoke_gate_falls_back_to_eval_cmd(tmp_path):
     assert g.check().pass_ is True
 
 
+def test_smoke_gate_fallback_uses_configured_timeout():
+    """Without --smoke-cmd the gate runs eval_cmd; it must honour the
+    configured (cycle) timeout. A fixed 30 s cap made every cycle of a 45 s
+    eval time out -> smoke_fail, even though the baseline had passed under
+    the 600 s cycle timeout.
+    """
+    from unittest.mock import MagicMock, patch
+
+    g = SmokeGate(smoke_cmd=None, eval_cmd="eval", timeout=45)
+    with patch(
+        "superclaude.scripts.auto_improve.guards.subprocess.run",
+        return_value=MagicMock(returncode=0),
+    ) as run:
+        assert g.check().pass_ is True
+    assert run.call_args.kwargs["timeout"] == 45
+
+
 def test_smoke_gate_runs_in_specified_cwd(tmp_path):
     """SmokeGate must run in the worktree, not the worker's launch dir.
     Regression guard: a misconfigured cwd previously produced thousands

@@ -9,6 +9,8 @@ import json
 import re
 from pathlib import Path
 
+import pytest
+
 import superclaude
 from superclaude.scripts.context_loader import (
     COMPOSITE_FLAGS,
@@ -1347,3 +1349,30 @@ def test_structured_flag_loads_business_symbols_only_for_business_panel():
 
     assert loads("/sc:business-panel plan.md --structured")
     assert not loads("/sc:review --scope branch --structured")
+
+
+class TestBudgetEnvParsing:
+    """A malformed CLAUDE_CONTEXT_MAX_TOKENS must not crash the prompt hook
+    at import — that would surface as a hook error on every prompt and inject
+    nothing until the shell profile is fixed. Bad values fall back to 8000."""
+
+    @pytest.mark.parametrize("bad", ["8k", "", " "])
+    def test_loader_survives_a_malformed_budget(self, tmp_path: Path, bad: str):
+        project = tmp_path / "proj"
+        (project / ".claude" / "superclaude").mkdir(parents=True)
+        out = run_loader(
+            "--brainstorm a CLI",
+            project,
+            env_override={"CLAUDE_CONTEXT_MAX_TOKENS": bad},
+        )
+        assert "MODE_Brainstorming.md" in out
+
+    def test_int_env_falls_back_on_garbage(self, monkeypatch: pytest.MonkeyPatch):
+        from superclaude.utils import int_env
+
+        monkeypatch.setenv("SC_TEST_INT", "12")
+        assert int_env("SC_TEST_INT", 8000) == 12
+        monkeypatch.setenv("SC_TEST_INT", "8k")
+        assert int_env("SC_TEST_INT", 8000) == 8000
+        monkeypatch.delenv("SC_TEST_INT")
+        assert int_env("SC_TEST_INT", 8000) == 8000
