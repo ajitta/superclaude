@@ -41,6 +41,10 @@ def _load_settings(settings_file: Path) -> dict:
     """
     Load settings.json file, returning empty dict if not exists or invalid.
 
+    Read-only callers (inventory, doctor, MCP listing) use this. A writer must
+    call ``_unwritable_settings`` first: writing hooks into the {} this returns
+    for an unparseable file replaces the user's whole settings file with hooks.
+
     Args:
         settings_file: Path to settings.json
 
@@ -52,9 +56,32 @@ def _load_settings(settings_file: Path) -> dict:
 
     try:
         with open(settings_file, "r", encoding="utf-8") as f:
-            return json.load(f)
+            data = json.load(f)
     except (json.JSONDecodeError, IOError):
         return {}
+    return data if isinstance(data, dict) else {}
+
+
+def _unwritable_settings(settings_file: Path) -> Optional[str]:
+    """Why ``settings_file`` must not be rewritten, or None when it may be.
+
+    A missing file is writable (install creates it). An existing file that is
+    not a JSON object — a trailing comma, a comment, an empty file, an array —
+    is not: the 2026-10-17 audit reproduced ``superclaude install`` turning
+    ``{"permissions": ..., "model": "opus",}`` into a file holding only hooks.
+    """
+    if not settings_file.exists():
+        return None
+    try:
+        with open(settings_file, "r", encoding="utf-8") as f:
+            data = json.load(f)
+    except (json.JSONDecodeError, IOError) as e:
+        return f"{settings_file} is not valid JSON ({e}); fix it or move it aside"
+    if not isinstance(data, dict):
+        return (
+            f"{settings_file} is valid JSON but not an object; fix it or move it aside"
+        )
+    return None
 
 
 def _save_settings(settings_file: Path, settings: dict) -> Tuple[bool, str]:
@@ -352,6 +379,12 @@ def merge_hooks_to_settings(
 
     if not new_hooks:
         return True, "No hooks to merge"
+
+    # Never merge into a file that cannot be read back as an object: the {}
+    # _load_settings returns for it would be written over the user's config.
+    problem = _unwritable_settings(settings_file)
+    if problem:
+        return False, problem
 
     # Load existing settings
     settings = _load_settings(settings_file)

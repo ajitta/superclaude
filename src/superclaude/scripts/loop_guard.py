@@ -11,6 +11,12 @@ Contract:
 State lives at <claude_base>/.superclaude_hooks/loop_guard_<project_key>.json —
 ephemeral, regenerable, and removed by ``superclaude uninstall`` with the rest of
 the scope. Fail-open on any error. Opt out with SUPERCLAUDE_LOOP_GUARD=0.
+
+Output: only a block prints anything. An allowed call, a PostToolUse
+record, the opt-out and every failure path print nothing — the legacy
+`{"decision": "approve"}` maps to permissionDecision "allow" (official
+hooks reference) and would skip Claude Code's permission prompt for every
+Edit, Write and Bash call this hook sees.
 """
 
 from __future__ import annotations
@@ -29,10 +35,6 @@ WINDOW_SECONDS = 15 * 60
 
 def _state_path() -> Path:
     return hook_state_dir() / f"loop_guard_{project_key()}.json"
-
-
-def _approve() -> None:
-    print(json.dumps({"decision": "approve"}))
 
 
 def _block(reason: str) -> None:
@@ -128,7 +130,6 @@ def _handle_post(data: dict) -> None:
         entries = [e for e in entries if e.get("signature") != sig]
     state["entries"] = entries
     _save_state(path, state)
-    _approve()
 
 
 def _handle_pre(data: dict) -> None:
@@ -149,25 +150,20 @@ def _handle_pre(data: dict) -> None:
             f"tool, a different file/command, or ask the user for guidance "
             f"before retrying. (Set SUPERCLAUDE_LOOP_GUARD=0 to disable.)"
         )
-        return
-    _approve()
 
 
 def main() -> None:
     try:
         if os.environ.get("SUPERCLAUDE_LOOP_GUARD", "1") == "0":
-            _approve()
             return
 
         stdin_data = sys.stdin.read() if not sys.stdin.isatty() else ""
         if not stdin_data.strip():
-            _approve()
             return
 
         try:
             data = json.loads(stdin_data)
         except json.JSONDecodeError:
-            _approve()
             return
 
         event = data.get("hook_event_name", "")
@@ -175,11 +171,9 @@ def main() -> None:
             _handle_pre(data)
         elif event == "PostToolUse":
             _handle_post(data)
-        else:
-            _approve()
     except Exception:
         # Catch-all fail-open — never break the user's flow
-        _approve()
+        return
 
 
 if __name__ == "__main__":

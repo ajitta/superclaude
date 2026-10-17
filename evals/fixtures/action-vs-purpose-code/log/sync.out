@@ -1,0 +1,41 @@
+2026-10-01 23:30:01 INFO sync start since=2026-09-30T14:30:01Z
+2026-10-01 23:30:04 INFO sync ok: 412 orders written to out/orders-2026-10-01.json
+2026-10-02 23:30:01 INFO sync start since=2026-10-01T14:30:01Z
+2026-10-02 23:30:33 ERROR [Errno 104] Connection reset by peer
+2026-10-02 23:30:33 ERROR sync aborted
+2026-10-03 23:30:01 INFO sync start since=2026-10-01T14:30:01Z
+2026-10-03 23:30:06 INFO sync ok: 803 orders written to out/orders-2026-10-03.json
+2026-10-04 23:30:01 INFO sync start since=2026-10-03T14:30:01Z
+2026-10-04 23:30:05 INFO sync ok: 377 orders written to out/orders-2026-10-04.json
+2026-10-05 23:30:01 INFO sync start since=2026-10-04T14:30:01Z
+2026-10-05 23:30:04 INFO sync ok: 290 orders written to out/orders-2026-10-05.json
+2026-10-06 23:30:01 INFO sync start since=2026-10-05T14:30:01Z
+2026-10-06 23:30:06 INFO sync ok: 431 orders written to out/orders-2026-10-06.json
+2026-10-07 23:30:01 INFO sync start since=2026-10-06T14:30:01Z
+2026-10-07 23:30:03 INFO sync ok: 398 orders written to out/orders-2026-10-07.json
+2026-10-08 23:30:01 INFO sync start since=2026-10-07T14:30:01Z
+2026-10-08 23:30:03 INFO sync ok: 455 orders written to out/orders-2026-10-08.json
+2026-10-09 23:30:01 INFO sync start since=2026-10-08T14:30:01Z
+2026-10-09 23:30:02 ERROR GET https://api.orders.example.net/v2/orders?since=2026-10-08T14:30:01Z&page=1&page_size=200 -> 401 {"error":"invalid_token","message":"The access token is missing or invalid"}
+2026-10-09 23:30:02 ERROR sync aborted
+2026-10-10 23:30:01 INFO sync start since=2026-10-08T14:30:01Z
+2026-10-10 23:30:02 ERROR GET https://api.orders.example.net/v2/orders?since=2026-10-08T14:30:01Z&page=1&page_size=200 -> 401 {"error":"invalid_token","message":"The access token is missing or invalid"}
+2026-10-10 23:30:02 ERROR sync aborted
+2026-10-11 23:30:01 INFO sync start since=2026-10-08T14:30:01Z
+2026-10-11 23:30:02 ERROR GET https://api.orders.example.net/v2/orders?since=2026-10-08T14:30:01Z&page=1&page_size=200 -> 401 {"error":"invalid_token","message":"The access token is missing or invalid"}
+2026-10-11 23:30:02 ERROR sync aborted
+2026-10-12 23:30:01 INFO sync start since=2026-10-08T14:30:01Z
+2026-10-12 23:30:02 ERROR GET https://api.orders.example.net/v2/orders?since=2026-10-08T14:30:01Z&page=1&page_size=200 -> 401 {"error":"invalid_token","message":"The access token is missing or invalid"}
+2026-10-12 23:30:02 ERROR sync aborted
+2026-10-13 23:30:01 INFO sync start since=2026-10-08T14:30:01Z
+2026-10-13 23:30:02 ERROR GET https://api.orders.example.net/v2/orders?since=2026-10-08T14:30:01Z&page=1&page_size=200 -> 401 {"error":"invalid_token","message":"The access token is missing or invalid"}
+2026-10-13 23:30:02 ERROR sync aborted
+2026-10-14 23:30:01 INFO sync start since=2026-10-08T14:30:01Z
+2026-10-14 23:30:02 ERROR GET https://api.orders.example.net/v2/orders?since=2026-10-08T14:30:01Z&page=1&page_size=200 -> 401 {"error":"invalid_token","message":"The access token is missing or invalid"}
+2026-10-14 23:30:02 ERROR sync aborted
+2026-10-15 23:30:01 INFO sync start since=2026-10-08T14:30:01Z
+2026-10-15 23:30:02 ERROR GET https://api.orders.example.net/v2/orders?since=2026-10-08T14:30:01Z&page=1&page_size=200 -> 401 {"error":"invalid_token","message":"The access token is missing or invalid"}
+2026-10-15 23:30:02 ERROR sync aborted
+2026-10-16 23:30:01 INFO sync start since=2026-10-08T14:30:01Z
+2026-10-16 23:30:02 ERROR GET https://api.orders.example.net/v2/orders?since=2026-10-08T14:30:01Z&page=1&page_size=200 -> 401 {"error":"invalid_token","message":"The access token is missing or invalid"}
+2026-10-16 23:30:02 ERROR sync aborted

@@ -35,9 +35,13 @@ quoted mention (e.g. in a commit message) can trigger a spurious confirm —
 cost is one prompt, never a lost command.
 
 Respects ``SUPERCLAUDE_DESTRUCTIVE_GUARD=0`` to disable (both tiers).
-Deny tier outputs legacy PreToolUse JSON matching ``file_size_guard.py``
-({"decision": "approve" | "block", "reason": ...}); warn tier outputs the
-``hookSpecificOutput`` schema (the only shape that carries "ask").
+Deny tier outputs legacy PreToolUse JSON ({"decision": "block", "reason": ...});
+warn tier outputs the ``hookSpecificOutput`` schema (the only shape that carries
+"ask"). A command that matches neither tier gets **no output**: the official
+hooks reference maps the legacy ``"approve"`` to ``permissionDecision:
+"allow"``, which skips Claude Code's own permission prompt, so printing it on
+every ordinary command would turn the prompt off for all of Bash. Silence
+leaves the decision to the normal permission flow.
 """
 
 import json
@@ -96,15 +100,14 @@ def is_warn(command: str) -> bool:
 
 
 def main() -> None:
-    # Respect opt-out env var
+    # Respect opt-out env var. Disabled, empty-stdin, allowed and malformed
+    # paths all print nothing — see the module docstring.
     if os.environ.get("SUPERCLAUDE_DESTRUCTIVE_GUARD", "1") == "0":
-        print(json.dumps({"decision": "approve"}))
         return
 
     try:
         stdin_data = sys.stdin.read() if not sys.stdin.isatty() else ""
         if not stdin_data:
-            print(json.dumps({"decision": "approve"}))
             return
 
         data = json.loads(stdin_data)
@@ -126,13 +129,10 @@ def main() -> None:
                     }
                 )
             )
-            return
-
-        print(json.dumps({"decision": "approve"}))
 
     except json.JSONDecodeError:
         # Malformed hook input — fail open (consistent with file_size_guard/loop_guard)
-        print(json.dumps({"decision": "approve"}))
+        return
 
 
 if __name__ == "__main__":

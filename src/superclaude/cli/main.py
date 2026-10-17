@@ -987,13 +987,18 @@ def _attribute_triggers(prompt: str) -> dict[str, str]:
 
     The loader stays the authority on WHICH files inject; this only explains
     WHY, by reading context_loader's own TRIGGER_MAP and COMPOSITE_FLAGS. The
-    lowercased raw prompt and the composites-before-patterns order mirror
+    lowercased *scannable* prompt (quoted and fenced text blanked, as
+    ``check_triggers`` does) and the composites-before-patterns order mirror
     ``check_triggers``; a file the loader emitted with no attribution is
     reported as such rather than guessed at.
     """
-    from superclaude.scripts.context_loader import COMPOSITE_FLAGS, TRIGGER_MAP
+    from superclaude.scripts.context_loader import (
+        COMPOSITE_FLAGS,
+        TRIGGER_MAP,
+        scannable_prompt,
+    )
 
-    lowered = prompt.lower()
+    lowered = scannable_prompt(prompt).lower()
     attribution: dict[str, str] = {}
     for flag, entries in COMPOSITE_FLAGS.items():
         if flag in lowered:

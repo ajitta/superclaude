@@ -626,10 +626,19 @@ def estimate_tokens(content: str) -> int:
 
 
 def check_triggers(prompt: str) -> list[tuple[str, int]]:
-    """Check prompt against triggers and return contexts to load with priorities."""
+    """Check prompt against triggers and return contexts to load with priorities.
+
+    Matches the *scannable* prompt — fenced and inline code, blockquotes and
+    external runners' command lines are blanked first, the same filter the flag
+    notices and execution directives use — so a quoted `--brainstorm` in a
+    pasted transcript does not inject the mode. Returns what matched and is not
+    yet in the session cache; it does NOT write the cache. The output function
+    that actually delivers a context marks it loaded, so a file the token
+    budget skips stays eligible for the next prompt.
+    """
     contexts_to_load = []
     loaded = get_loaded_contexts()
-    prompt_lower = prompt.lower()
+    prompt_lower = scannable_prompt(prompt).lower()
 
     # --no-mcp: suppress all MCP context loading
     no_mcp = bool(re.search(r"--no-mcp", prompt_lower))
@@ -640,7 +649,7 @@ def check_triggers(prompt: str) -> list[tuple[str, int]]:
         if no_mcp and context_file.startswith("mcp/"):
             return
         contexts_to_load.append((context_file, priority))
-        loaded.add(context_file)
+        loaded.add(context_file)  # local dedup across composite + pattern hits
 
     # Composite flags (one flag → multiple files)
     for flag, files in COMPOSITE_FLAGS.items():
@@ -652,10 +661,6 @@ def check_triggers(prompt: str) -> list[tuple[str, int]]:
     for pattern, context_file, priority in TRIGGER_MAP:
         if pattern.search(prompt_lower):
             _add_context(context_file, priority)
-
-    # Batch write to cache (single I/O instead of per-context)
-    if contexts_to_load:
-        mark_as_loaded([ctx for ctx, _ in contexts_to_load])
 
     # Sort by priority (lower number = higher priority)
     contexts_to_load.sort(key=lambda x: x[1])
@@ -671,6 +676,9 @@ def output_directive_mode(contexts: list[tuple[str, int]]) -> None:
         print()
         print("INSTRUCTION: Use Read tool to load the <context-load> files above.")
         print("These provide detailed guidance for the detected domain.")
+        # Marks the directive as emitted; whether Claude followed it with a
+        # Read is not observable here.
+        mark_as_loaded([ctx for ctx, _ in contexts])
 
 
 def check_mcp_fallbacks(
@@ -818,6 +826,11 @@ def output_inject_mode(
         if skipped_files:
             skipped_names = ", ".join(f for f, _, _ in skipped_files)
             print(f"<!-- ⚠️ Budget exceeded: skipped {skipped_names} -->")
+
+    # Cache only what was printed. A budget-skipped or missing file is not in
+    # context, so it must stay eligible for the next prompt (one batch write).
+    if loaded_files:
+        mark_as_loaded([ctx for ctx, _ in loaded_files])
 
 
 # Context7 ships as a claude.ai connector whose server instructions and tool

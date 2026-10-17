@@ -9,7 +9,10 @@ Bypass: limit parameter, pages parameter (PDF), binary extensions, files
         under 30KB.
 
 Respects SUPERCLAUDE_SIZE_GUARD=0 env var to disable.
-Outputs structured JSON for Claude Code PreToolUse hook protocol.
+Prints {"decision": "block", "reason": ...} for a blocked Read and nothing
+otherwise: the legacy "approve" maps to permissionDecision "allow" (official
+hooks reference), which would skip Claude Code's own permission prompt for
+every Read this hook lets through.
 """
 
 import json
@@ -106,8 +109,6 @@ def main() -> None:
 
     if reason:
         print(json.dumps({"decision": "block", "reason": reason}))
-    else:
-        print(json.dumps({"decision": "approve"}))
 
 
 if __name__ == "__main__":

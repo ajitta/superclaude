@@ -6,6 +6,19 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Ver
 
 Releases before 4.19.0 are not listed. Their history is the git log; the upstream-era changelog, last entry 4.2.1, is `CHANGELOG.md` at commit `6b0ac5c3^`.
 
+## [Unreleased]
+
+### Changed
+
+- Core kernel (`core/RULES.md`) gains `purpose_before_action`: before acting on a request that is more than one reply or one obvious edit, Claude states in one line the result the named action is for (a hypothesis from the request and the workspace, not a rewording of the user), reads what tells whether the action produces that result rather than only the file the request names, and makes that result the check that proves "done". When the evidence shows the named action cannot produce the result, it says so, does the action where it still helps, and makes the smallest further change inside the files the task already touches or the error names; anything beyond that, or irreversible, is proposed, not made. `scope_discipline` now reads "every changed line traces to the request or to the result it is for". Measured before shipping: on two action-only tasks (a customer reply whose facts sat in a sibling file; a "add retry" request whose real cause was an env-var mismatch), sonnet and opus went from 0/12 to 11/12 with this rule and nothing else changed; +12–21% session input from the extra reading (`docs/features/reframing-anchoring/06-pilot.md`). The always-loaded chain grows by ~1.1 KB.
+
+### Fixed
+
+- The `destructive_guard`, `loop_guard` and `file_size_guard` hooks print nothing for a tool call they let through. They used to print the legacy `{"decision": "approve"}`, which Claude Code maps to `permissionDecision: "allow"` and so skipped your own permission prompt for every Bash, Edit, Write and Read call while superclaude was installed (your `permissions.deny`/`ask` rules still applied). The block and ask outputs are unchanged. If you relied on the hooks to auto-approve, Claude Code now asks as it does without superclaude.
+- `superclaude install` refuses to merge hooks into a `settings.json` (or `settings.local.json`) that is not a JSON object — a trailing comma, a comment, an empty file, an array — and names the file. Before, it replaced the whole file with the hooks section, dropping `permissions`, `model` and every other key.
+- The prompt hook (`context_loader`) marks a context file as loaded only after it is actually injected. A file skipped by the token budget (`⚠️ Budget exceeded`) used to be recorded as loaded and was never injected again in that session; on `/sc:analyze --delegate` that was `RULES_DOCS.md` for the whole session.
+- Trigger keywords and flags inside fenced code, inline code, blockquotes or an external runner's command line no longer inject a mode or rule module (a pasted transcript containing `--brainstorm` loaded `MODE_Brainstorming.md`). The same filter already applied to flag notices and execution directives; `superclaude context explain` attributes triggers the same way.
+
 ## [4.27.2] - 2026-10-16
 
 ### Changed

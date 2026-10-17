@@ -282,6 +282,37 @@ class TestMergeHooksToSettings:
             }
         }
 
+    @pytest.mark.parametrize(
+        "content",
+        [
+            '{"permissions": {"ask": ["Bash"]}, "model": "opus",}',  # trailing comma
+            '{"permissions": {"ask": ["Bash"]}, // a comment\n "model": "opus"}',
+            "",  # empty file
+            '["not", "an", "object"]',  # valid JSON, wrong root
+        ],
+    )
+    def test_unparseable_settings_left_untouched(self, base_path: Path, content):
+        """A settings file that is not a JSON object is never rewritten.
+
+        2026-10-17 audit: `_load_settings` returned {} for an unparseable file,
+        the merge added hooks to that {} and wrote it back, so one trailing
+        comma in a hand-edited settings.json silently dropped the user's
+        permissions, model and every other key. The install must fail and name
+        the file instead.
+        """
+        from superclaude.cli.install_settings import merge_hooks_to_settings
+
+        settings_file = base_path / "settings.json"
+        settings_file.write_text(content, encoding="utf-8")
+
+        success, msg = merge_hooks_to_settings(
+            base_path, self._sc_hooks_config(), scope="user"
+        )
+
+        assert success is False
+        assert "settings.json" in msg and "JSON" in msg
+        assert settings_file.read_text(encoding="utf-8") == content
+
     def test_creates_settings_from_scratch(self, base_path: Path):
         """Creates settings.json when it doesn't exist."""
         from superclaude.cli.install_settings import merge_hooks_to_settings

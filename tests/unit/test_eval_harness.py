@@ -38,6 +38,35 @@ def test_arms_match_harness_constant():
     assert set(TASKS["arms"]) == harness_arms
 
 
+# The sc-candidate arm is the shipped kernel plus the rule(s) under trial. The
+# delta lives here, in the test, so the arm can never drift from RULES.md
+# unnoticed: an edit to either file fails this test until the candidate is
+# regenerated (RULES.md + delta) or the trial is closed (shipped or dropped).
+#
+# Trial log:
+#   2026-10-17 `purpose_before_action` — 0/12 → 11/12 on the two action-vs-
+#   purpose tasks (docs/features/reframing-anchoring/06-pilot.md); shipped
+#   into core/RULES.md the same day. Delta is now empty: candidate == shipped.
+#   To open the next trial, put the inserted text in CANDIDATE_INSERTS and
+#   regenerate evals/arms/RULES_CANDIDATE.md.
+CANDIDATE_INSERTS: list[
+    tuple[str, str]
+] = []  # (anchor in RULES.md, text inserted after it)
+
+
+def test_candidate_arm_is_shipped_kernel_plus_trial_delta():
+    shipped = (
+        EVALS_DIR.parent / "src" / "superclaude" / "core" / "RULES.md"
+    ).read_text(encoding="utf-8")
+    expected = shipped
+    for anchor, inserted in CANDIDATE_INSERTS:
+        assert expected.count(anchor) == 1, anchor
+        expected = expected.replace(anchor, anchor + inserted)
+    candidate = (EVALS_DIR / "arms" / "RULES_CANDIDATE.md").read_bytes()
+    assert b"\r\n" not in candidate
+    assert candidate.decode("utf-8") == expected
+
+
 def test_all_check_types_implemented():
     source = (EVALS_DIR / "run_eval.py").read_text(encoding="utf-8")
     implemented = set(re.findall(r'ctype == "(\w+)"', source))
@@ -663,3 +692,29 @@ def test_skill_checks_match_skill_tool_calls():
         not_called, "skill_not_called", ws, "", "", res.skills_called
     )[0]
     assert run_eval._check_one(not_called, "skill_not_called", ws, "", "", [])[0]
+
+
+def test_git_changed_ignores_framework_state_files(tmp_path):
+    """The sc-full arm's insight hook appends to .claude/insights.pending.jsonl
+    during a run. That is arm plumbing, not model behavior: a task that writes
+    one deliverable must still pass `git_diff_max_files: 1` on sc-full."""
+    sys.path.insert(0, str(EVALS_DIR))
+    try:
+        import run_eval
+    finally:
+        sys.path.remove(str(EVALS_DIR))
+    ws = tmp_path
+    (ws / ".claude").mkdir()
+    (ws / ".claude" / "insights.pending.jsonl").write_text("{}" + chr(10))
+    (ws / "keep.md").write_text("baseline" + chr(10))
+    git = ["git", "-c", "user.email=t@local", "-c", "user.name=t"]
+    run_eval._run([*git, "init", "-q", "-b", "main"], cwd=ws)
+    run_eval._run([*git, "add", "-A"], cwd=ws)
+    run_eval._run([*git, "commit", "-q", "-m", "baseline"], cwd=ws)
+    (ws / ".claude" / "insights.pending.jsonl").write_text(
+        "{}" + chr(10) + "{}" + chr(10)
+    )
+    (ws / "reply.md").write_text("deliverable" + chr(10))
+    assert run_eval._git_changed(ws) == {"reply.md"}
+    check = {"type": "git_diff_max_files", "value": 1}
+    assert run_eval._check_one(check, "git_diff_max_files", ws, "", "")[0]

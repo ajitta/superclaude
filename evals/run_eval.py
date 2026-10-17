@@ -6,6 +6,10 @@ Runs each task from tasks.yaml in an isolated temp workspace OUTSIDE the repo
   vanilla          bare Claude Code, no SC content
   sc-full          full project-scope install
   sc-core-lite     full install, RULES.md swapped for arms/RULES_KERNEL.md
+  sc-candidate     full install, RULES.md swapped for arms/RULES_CANDIDATE.md
+                   (the shipped kernel plus one rule under trial; the only
+                   difference from sc-full, so sc-full vs sc-candidate measures
+                   that rule alone under identical hooks)
   sc-command-only  full install, always-loaded core import stripped
 
 Arm isolation: CLAUDE_CONFIG_DIR points at an empty per-arm dir (keeps the
@@ -48,8 +52,9 @@ import yaml
 
 EVALS_DIR = Path(__file__).resolve().parent
 KERNEL_FILE = EVALS_DIR / "arms" / "RULES_KERNEL.md"
+CANDIDATE_FILE = EVALS_DIR / "arms" / "RULES_CANDIDATE.md"
 IMPORT_LINE = "@.claude/superclaude/CLAUDE_SC.md"
-ARMS = ("vanilla", "sc-full", "sc-core-lite", "sc-command-only")
+ARMS = ("vanilla", "sc-full", "sc-core-lite", "sc-candidate", "sc-command-only")
 # `claude -p --permission-mode` values; None leaves the flag off (CLI default).
 PERMISSION_MODES = (  # `claude --help` 2.1.292; omit the flag for the CLI default
     "acceptEdits",
@@ -182,6 +187,10 @@ def build_workspace(arm: str, task: dict, runs_dir: Path, superclaude_bin: str) 
             )
         if arm == "sc-core-lite":
             marker.write_text(KERNEL_FILE.read_text(encoding="utf-8"), encoding="utf-8")
+        elif arm == "sc-candidate":
+            marker.write_text(
+                CANDIDATE_FILE.read_text(encoding="utf-8"), encoding="utf-8"
+            )
         _set_core_import(ws, enabled=arm != "sc-command-only")
 
     for step in task.get("setup", []):
@@ -536,7 +545,16 @@ def _git_changed(ws: Path) -> set[str]:
         line[3:].split(" -> ")[-1].strip().strip('"')
         for line in proc.stdout.splitlines()
         if line.strip()
-    }
+    } - FRAMEWORK_STATE_FILES
+
+
+# Files the installed framework's own hooks write into the workspace during a
+# run (insight_writer appends on PostToolUse). They are arm plumbing, not model
+# behavior, so diff-size checks must not count them: every sc-full task that
+# writes a file otherwise fails `git_diff_max_files` by one.
+FRAMEWORK_STATE_FILES = frozenset(
+    {".claude/insights.jsonl", ".claude/insights.pending.jsonl"}
+)
 
 
 def _git_baseline(ws: Path) -> set[str]:

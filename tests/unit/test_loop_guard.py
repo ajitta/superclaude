@@ -6,8 +6,11 @@ Contract:
   are purged.
 - PreToolUse reads the state and blocks if the prospective call's signature
   has accumulated >=5 error entries in the window.
-- Env var SUPERCLAUDE_LOOP_GUARD=0 disables the guard (always approve).
-- Failure modes (bad stdin, write failure, etc.) fail open (approve).
+- Env var SUPERCLAUDE_LOOP_GUARD=0 disables the guard (never blocks).
+- Failure modes (bad stdin, write failure, etc.) fail open: the hook prints
+  nothing, so Claude Code's own permission flow decides. A legacy
+  `{"decision": "approve"}` would skip that prompt (official hooks
+  reference: approve maps to permissionDecision allow).
 - State file is scoped to <claude_base>/.superclaude_hooks/loop_guard_<key>.json.
 """
 
@@ -105,16 +108,16 @@ def project_dir(tmp_path):
 
 
 class TestApprove:
-    """PreToolUse approves by default."""
+    """PreToolUse stays silent by default."""
 
     def test_fresh_state_approves(self, project_dir):
         result = run_guard(pre_event("Bash", "ls -la"), project_dir)
-        assert result["decision"] == "approve"
+        assert result == {}  # silent: Claude Code's own permission flow decides
 
     def test_post_event_approves(self, project_dir):
         """PostToolUse never blocks — it only records."""
         result = run_guard(post_event("Bash", "false", "command failed"), project_dir)
-        assert result["decision"] == "approve"
+        assert result == {}  # silent: Claude Code's own permission flow decides
 
     def test_successful_post_does_not_record(self, project_dir):
         """PostToolUse without error signal must not increment counters."""
@@ -124,22 +127,22 @@ class TestApprove:
             "tool_input": {"command": "ls"},
             "tool_response": {"exit_code": 0, "stdout": "ok"},
         }
-        # 10 successes, then a pre-event on the same command → approve
+        # 10 successes, then a pre-event on the same command → silent
         for _ in range(10):
             run_guard(good, project_dir)
         result = run_guard(pre_event("Bash", "ls"), project_dir)
-        assert result["decision"] == "approve"
+        assert result == {}  # silent: Claude Code's own permission flow decides
 
     def test_unknown_event_approves(self, project_dir):
         result = run_guard(
             {"hook_event_name": "Something", "tool_name": "Bash"},
             project_dir,
         )
-        assert result["decision"] == "approve"
+        assert result == {}  # silent: Claude Code's own permission flow decides
 
     def test_empty_stdin_approves(self, project_dir):
         result = run_guard({}, project_dir)
-        assert result["decision"] == "approve"
+        assert result == {}  # silent: Claude Code's own permission flow decides
 
 
 class TestBlockAfterRepeats:
@@ -161,7 +164,7 @@ class TestBlockAfterRepeats:
                 post_event("Bash", "make broken", "undefined symbol xyz"), project_dir
             )
         result = run_guard(pre_event("Bash", "make broken"), project_dir)
-        assert result["decision"] == "approve"
+        assert result == {}  # silent: Claude Code's own permission flow decides
 
     def test_block_message_is_actionable(self, project_dir):
         for _ in range(BLOCK_THRESHOLD):
@@ -183,12 +186,8 @@ class TestStateIsolation:
         for _ in range(4):
             run_guard(post_event("Bash", "cmd-A", "err-A"), project_dir)
         run_guard(post_event("Bash", "cmd-B", "err-B"), project_dir)
-        assert (
-            run_guard(pre_event("Bash", "cmd-A"), project_dir)["decision"] == "approve"
-        )
-        assert (
-            run_guard(pre_event("Bash", "cmd-B"), project_dir)["decision"] == "approve"
-        )
+        assert run_guard(pre_event("Bash", "cmd-A"), project_dir) == {}
+        assert run_guard(pre_event("Bash", "cmd-B"), project_dir) == {}
 
     def test_successful_call_resets_signature(self, project_dir):
         """4 errors, 1 success on same signature, 4 more errors → no block."""
@@ -205,20 +204,18 @@ class TestStateIsolation:
         for _ in range(4):
             run_guard(post_event("Bash", "flaky", "transient error"), project_dir)
         result = run_guard(pre_event("Bash", "flaky"), project_dir)
-        assert result["decision"] == "approve"
+        assert result == {}  # silent: Claude Code's own permission flow decides
 
     def test_different_tools_do_not_cross_pollute(self, project_dir):
         """5 Edit errors on foo.py must not block Bash on foo.py."""
         for _ in range(BLOCK_THRESHOLD):
             run_guard(post_event("Edit", "foo.py", "string not found"), project_dir)
-        assert (
-            run_guard(pre_event("Bash", "foo.py"), project_dir)["decision"] == "approve"
-        )
+        assert run_guard(pre_event("Bash", "foo.py"), project_dir) == {}
 
 
 class TestEnvOptOut:
     def test_env_var_disables_guard(self, project_dir):
-        """SUPERCLAUDE_LOOP_GUARD=0 → always approve regardless of state."""
+        """SUPERCLAUDE_LOOP_GUARD=0 → never blocks regardless of state."""
         for _ in range(BLOCK_THRESHOLD):
             run_guard(post_event("Bash", "make broken", "err"), project_dir)
         result = run_guard(
@@ -226,7 +223,7 @@ class TestEnvOptOut:
             project_dir,
             env_override={"SUPERCLAUDE_LOOP_GUARD": "0"},
         )
-        assert result["decision"] == "approve"
+        assert result == {}  # silent: Claude Code's own permission flow decides
 
 
 class TestSlidingWindow:
@@ -247,7 +244,7 @@ class TestSlidingWindow:
         }
         state_path.write_text(json.dumps(state))
         result = run_guard(pre_event("Bash", "make broken"), project_dir)
-        assert result["decision"] == "approve"
+        assert result == {}  # silent: Claude Code's own permission flow decides
 
     def test_recent_entries_still_block(self, project_dir):
         state_path = state_file(project_dir)
@@ -273,12 +270,12 @@ class TestFailureModes:
         state_path = state_file(project_dir)
         state_path.write_text("not valid json {{{")
         result = run_guard(pre_event("Bash", "ls"), project_dir)
-        assert result["decision"] == "approve"
+        assert result == {}  # silent: Claude Code's own permission flow decides
 
     def test_missing_claude_dir_auto_creates(self, tmp_path):
         """If .claude/ missing, guard should not crash — create on write."""
         result = run_guard(post_event("Bash", "foo", "err"), tmp_path)
-        assert result["decision"] == "approve"
+        assert result == {}  # silent: Claude Code's own permission flow decides
 
 
 class TestNoRealHomeFootprint:

@@ -28,7 +28,7 @@ Only three hooks are mechanically enforced — `file_size_guard.py` (blocks Read
 Always-applied principles and rules that define superclaude's identity. Loaded via `CLAUDE_SC.md` `@import` at session start.
 
 **Sub-roles:**
-- **Always-loaded** — FLAGS.md, PRINCIPLES.md, RULES.md (imported by CLAUDE_SC.md, present in every session). RULES.md is a ~0.9k-token kernel (Phase 2-1 core-lite split, measurement-gated by the evals/ 4×7 matrix): four rule classes whose loss is most expensive, plus a map of the on-demand modules.
+- **Always-loaded** — FLAGS.md, PRINCIPLES.md, RULES.md (imported by CLAUDE_SC.md, present in every session). RULES.md is a ~1.5k-token kernel (Phase 2-1 core-lite split, measurement-gated by the evals/ 4×7 matrix): five rule classes whose loss is most expensive — purpose_before_action (added 2026-10-17 after the sc-full vs sc-candidate pilot, `docs/features/reframing-anchoring/06-pilot.md`), scope, verification, destructive-op confirmation, project-rules priority — plus a map of the on-demand modules.
 - **On-demand rule modules** — core/rules/RULES_{QUALITY,DELEGATION,DOCS,INTERACTION}.md — full R01–R21 detail, verification ladder, delegation matrix, doc conventions, selection protocol. Injected as full .md by context_loader on matching context (implement/review, delegation, doc-producing, /sc: commands); readable explicitly when no trigger fired.
 - **On-demand reference** — BUSINESS_SYMBOLS.md (loaded by context_loader on business-symbol/example keywords or `/sc:business-panel --structured` — not by `--business-panel`, which loads only MODE_Business_Panel.md)
 
