@@ -13,6 +13,7 @@ so they are loaded by file path rather than as a package.
 
 from __future__ import annotations
 
+import ast
 import importlib.util
 import io
 import json
@@ -228,8 +229,6 @@ def test_no_shipped_hook_prints_approve():
     printing nothing; this test pins that for every script, including ones
     added later. Docstrings may mention the word; code may not emit it.
     """
-    import ast
-
     offenders = []
     for script in sorted(_SCRIPTS.rglob("*.py")):
         tree = ast.parse(script.read_text(encoding="utf-8"))

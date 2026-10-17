@@ -4,15 +4,29 @@ Unit tests for CLI install command
 Tests the command installation functionality.
 """
 
+import builtins
+import json
+import os
+import re
+import subprocess
+import sys
 from pathlib import Path
 
 import pytest
 
-from superclaude.cli.install_components import install_all
+from superclaude.cli.install_components import (
+    ensure_agent_memory_dir,
+    install_all,
+    install_hooks,
+)
 from superclaude.cli.install_inventory import (
+    list_all_components,
     list_available_commands,
     list_installed_commands,
+    uninstall_all,
 )
+
+_PACKAGE_ROOT = Path(__file__).resolve().parents[2] / "src" / "superclaude"
 
 
 class TestInstallCommands:
@@ -146,8 +160,6 @@ class TestInstallCommandsEdgeCases:
 
 def _count_hooks(hooks_json) -> int:
     """Inner hook commands across every event array of a hooks.json."""
-    import json
-
     config = json.loads(hooks_json.read_text(encoding="utf-8"))
     return sum(
         len(entry.get("hooks", []))
@@ -169,8 +181,6 @@ class TestRegisteredHookVisibility:
     SC = "~/.claude/superclaude/scripts"
 
     def _install(self, tmp_path, registered: list[str]):
-        import json
-
         base = tmp_path / ".claude"
         (base / "hooks").mkdir(parents=True)
         (base / "hooks" / "hooks.json").write_text("{}", encoding="utf-8")
@@ -204,11 +214,7 @@ class TestRegisteredHookVisibility:
     def test_registered_count_ignores_user_hooks(self, tmp_path):
         """A user's own hook in the same array is neither registered nor
         obsolete — it is not superclaude's."""
-        from superclaude.cli.install_inventory import list_all_components
-
         base = self._install(tmp_path, ["prettier_hook.py", "loop_guard.py"])
-        import json
-
         settings = json.loads((base / "settings.json").read_text(encoding="utf-8"))
         settings["hooks"]["PostToolUse"].append(
             {"matcher": "Edit", "hooks": [{"command": "npm run lint"}]}
@@ -221,8 +227,6 @@ class TestRegisteredHookVisibility:
 
     def test_frozen_install_shows_a_shortfall(self, tmp_path):
         """The row is the signal: fewer registered than shipped."""
-        from superclaude.cli.install_inventory import list_all_components
-
         base = self._install(tmp_path, ["prettier_hook.py"])
         row = list_all_components(base_path=base, scope="user")["hooks_registered"]
 
@@ -232,8 +236,6 @@ class TestRegisteredHookVisibility:
         )
 
     def test_local_scope_reads_settings_local(self, tmp_path):
-        from superclaude.cli.install_inventory import list_all_components
-
         base = self._install(tmp_path, ["prettier_hook.py"])
         (base / "settings.local.json").write_text(
             (base / "settings.json").read_text(encoding="utf-8"), encoding="utf-8"
@@ -256,16 +258,12 @@ class TestAgentMemoryDirectory:
     """
 
     def test_each_scope_gets_its_own_root(self, tmp_path):
-        from superclaude.cli.install_components import ensure_agent_memory_dir
-
         base = tmp_path / ".claude"
         assert ensure_agent_memory_dir(base, "user").name == "agent-memory"
         assert ensure_agent_memory_dir(base, "project").name == "agent-memory"
         assert ensure_agent_memory_dir(base, "local").name == "agent-memory-local"
 
     def test_directory_is_created(self, tmp_path):
-        from superclaude.cli.install_components import ensure_agent_memory_dir
-
         base = tmp_path / ".claude"
         created = ensure_agent_memory_dir(base, "local")
 
@@ -273,8 +271,6 @@ class TestAgentMemoryDirectory:
 
     def test_unknown_scope_creates_nothing(self, tmp_path):
         """`target` scope has no documented memory location — do not guess one."""
-        from superclaude.cli.install_components import ensure_agent_memory_dir
-
         base = tmp_path / ".claude"
         assert ensure_agent_memory_dir(base, "target") is None
         assert not (base / "agent-memory").exists()
@@ -282,8 +278,6 @@ class TestAgentMemoryDirectory:
 
     def test_install_makes_it(self, tmp_path):
         """End to end: a local install leaves the store its agents point at."""
-        from superclaude.cli.install_components import install_all
-
         base = tmp_path / ".claude"
         success, message = install_all(base_path=base, force=True, scope="local")
 
@@ -333,8 +327,6 @@ class TestAgentMemoryScopeConflict:
         assert self._memory_values(base) == {"memory: local"}
 
     def test_a_tracked_project_install_is_refused(self, tmp_path):
-        import subprocess
-
         subprocess.run(["git", "init", "-q", str(tmp_path)], check=True)
         base = tmp_path / ".claude"
         assert install_all(base_path=base, force=True, scope="project")[0]
@@ -352,8 +344,6 @@ class TestAgentMemoryScopeConflict:
 
     def test_a_tracked_legacy_user_install_upgrades(self, tmp_path):
         """A dotfiles repo tracking ~/.claude is no team install."""
-        import subprocess
-
         subprocess.run(["git", "init", "-q", str(tmp_path)], check=True)
         base = tmp_path / ".claude"
         assert install_all(base_path=base, force=True, scope="project")[0]
@@ -430,8 +420,6 @@ class TestFrameworkArtifactsAlwaysUpdate:
     """
 
     def test_no_script_copies_are_installed(self, tmp_path):
-        from superclaude.cli.install_components import install_hooks
-
         base = tmp_path / ".claude"
         _installed, failed, messages = install_hooks(
             base_path=base, force=True, scope="user"
@@ -449,8 +437,6 @@ class TestFrameworkArtifactsAlwaysUpdate:
         session blocks every tool call until restart. The install says what
         they are and when to remove them.
         """
-        from superclaude.cli.install_components import install_hooks
-
         base = tmp_path / ".claude"
         legacy = base / "superclaude" / "scripts"
         legacy.mkdir(parents=True)
@@ -466,8 +452,6 @@ class TestFrameworkArtifactsAlwaysUpdate:
         assert notice and "restart" in notice[0].lower(), messages
 
     def test_stale_hooks_json_is_replaced_without_force(self, tmp_path):
-        from superclaude.cli.install_components import install_hooks
-
         base = tmp_path / ".claude"
         hooks_target = base / "hooks"
         hooks_target.mkdir(parents=True)
@@ -491,15 +475,10 @@ class TestFrameworkArtifactsAlwaysUpdate:
         to a hook that forwards them, and a subcommand has to be one the shipped
         script's own parser accepts.
         """
-        import json
-        import re
-        from pathlib import Path
-
         from superclaude.cli.hook_dispatch import HOOKS
 
-        package_root = Path(__file__).parent.parent.parent / "src" / "superclaude"
         config = json.loads(
-            (package_root / "hooks" / "hooks.json").read_text(encoding="utf-8")
+            (_PACKAGE_ROOT / "hooks" / "hooks.json").read_text(encoding="utf-8")
         )
 
         unsupported = []
@@ -524,7 +503,7 @@ class TestFrameworkArtifactsAlwaysUpdate:
                         )
                         continue
 
-                    source = (package_root / "scripts" / f"{name}.py").read_text(
+                    source = (_PACKAGE_ROOT / "scripts" / f"{name}.py").read_text(
                         encoding="utf-8"
                     )
                     for token in tokens:
@@ -550,8 +529,6 @@ class TestHookRegistrationIsCheckedByIdentity:
     SC = "~/.claude/superclaude/scripts"
 
     def _base(self, tmp_path, hooks: dict):
-        import json
-
         base = tmp_path / ".claude"
         (base / "hooks").mkdir(parents=True)
         (base / "hooks" / "hooks.json").write_text("{}", encoding="utf-8")
@@ -561,7 +538,6 @@ class TestHookRegistrationIsCheckedByIdentity:
         return base
 
     def test_obsolete_hooks_do_not_read_as_installed(self, tmp_path):
-        from superclaude.cli.install_inventory import list_all_components
         from superclaude.cli.install_paths import _get_package_root
 
         shipped = _count_hooks(_get_package_root() / "hooks" / "hooks.json")
@@ -588,8 +564,6 @@ class TestHookRegistrationIsCheckedByIdentity:
         assert row["missing"] == shipped
 
     def test_a_matching_registration_counts(self, tmp_path):
-        from superclaude.cli.install_inventory import list_all_components
-
         base = self._base(
             tmp_path,
             {
@@ -608,8 +582,6 @@ class TestHookRegistrationIsCheckedByIdentity:
         assert row["obsolete"] == 0
 
     def test_a_duplicate_registration_is_named(self, tmp_path):
-        from superclaude.cli.install_inventory import list_all_components
-
         base = self._base(
             tmp_path,
             {
@@ -632,8 +604,6 @@ class TestHookRegistrationIsCheckedByIdentity:
 
     def test_dry_run_uninstall_counts_inner_hooks(self, tmp_path):
         """`--dry-run` said "N hooks" while counting entries, so it under-reported."""
-        from superclaude.cli.install_inventory import uninstall_all
-
         base = self._base(
             tmp_path,
             {
@@ -665,8 +635,6 @@ class TestFailuresReachTheSummary:
     """
 
     def test_a_blocked_memory_directory_fails_the_install(self, tmp_path):
-        from superclaude.cli.install_components import install_all
-
         base = tmp_path / ".claude"
         base.mkdir(parents=True)
         # A regular file where the store belongs: mkdir raises FileExistsError.
@@ -679,13 +647,9 @@ class TestFailuresReachTheSummary:
 
     def test_an_unsupported_scope_is_not_a_failure(self, tmp_path):
         """`target` has no documented store; absence by design is not an error."""
-        from superclaude.cli.install_components import ensure_agent_memory_dir
-
         assert ensure_agent_memory_dir(tmp_path / ".claude", "target") is None
 
     def test_a_healthy_install_still_reports_success(self, tmp_path):
-        from superclaude.cli.install_components import install_all
-
         success, message = install_all(
             base_path=tmp_path / ".claude", force=True, scope="local"
         )
@@ -834,8 +798,6 @@ class TestLegacySkillsArePrunedOnUpgrade:
             (d / "SKILL.md").write_text("---\nname: x\n---\n", encoding="utf-8")
 
     def test_install_removes_them(self, tmp_path):
-        from superclaude.cli.install_components import install_all
-
         self._seed(tmp_path, self.LEGACY)
 
         success, _ = install_all(base_path=tmp_path, force=True, scope="project")
@@ -848,8 +810,6 @@ class TestLegacySkillsArePrunedOnUpgrade:
 
     def test_install_preserves_skills_superclaude_never_shipped(self, tmp_path):
         """.claude/skills is shared; only the exact shipped names may be touched."""
-        from superclaude.cli.install_components import install_all
-
         self._seed(tmp_path, [*self.LEGACY, "someone-elses-skill"])
 
         install_all(base_path=tmp_path, force=True, scope="project")
@@ -857,8 +817,6 @@ class TestLegacySkillsArePrunedOnUpgrade:
         assert (tmp_path / "skills" / "someone-elses-skill" / "SKILL.md").exists()
 
     def test_uninstall_removes_them_too(self, tmp_path):
-        from superclaude.cli.install_inventory import uninstall_all
-
         self._seed(tmp_path, [*self.LEGACY, "someone-elses-skill"])
 
         uninstall_all(base_path=tmp_path, dry_run=False)
@@ -869,8 +827,6 @@ class TestLegacySkillsArePrunedOnUpgrade:
 
     def test_a_clean_install_says_nothing_about_them(self, tmp_path):
         """No legacy dirs present -> no cleanup line in the summary."""
-        from superclaude.cli.install_components import install_all
-
         _success, message = install_all(base_path=tmp_path, force=True, scope="project")
 
         assert "pre-removal" not in message
@@ -935,8 +891,6 @@ class TestUnshippedFilesArePrunedOnUpgrade:
 
     def test_uninstall_removes_retired_agents(self, tmp_path):
         """Uninstall removes only shipped agent names; a retired one needs the list."""
-        from superclaude.cli.install_inventory import uninstall_all
-
         self._seed(tmp_path, ["agents/deep-research.md", "agents/my-own-agent.md"])
 
         uninstall_all(base_path=tmp_path, dry_run=False)
@@ -991,8 +945,6 @@ class TestHookCommandsCarryNoMachineBytes:
         asserting on the intermediate artifact would keep this test green
         through a regression in the merge path.
         """
-        import json
-
         from superclaude.utils import settings_filename
 
         config = json.loads(
@@ -1008,10 +960,6 @@ class TestHookCommandsCarryNoMachineBytes:
 
     @pytest.mark.parametrize("scope", ["user", "project", "local"])
     def test_every_command_is_the_bare_console_entry(self, tmp_path, scope):
-        import sys
-
-        from superclaude.cli.install_components import install_hooks
-
         base = tmp_path / ".claude"
         _installed, failed, messages = install_hooks(
             base_path=base, force=True, scope=scope
@@ -1030,10 +978,6 @@ class TestHookCommandsCarryNoMachineBytes:
     def test_two_machines_write_byte_identical_settings(self, tmp_path, monkeypatch):
         """Project scope's whole promise: two developers, two interpreters, two
         checkout paths, one committed settings.json with no diff between them."""
-        import sys
-
-        from superclaude.cli.install_components import install_hooks
-
         written = []
         for machine, interpreter in (
             ("alice", "/opt/homebrew/bin/python3.13"),
@@ -1055,7 +999,6 @@ class TestHookCommandsCarryNoMachineBytes:
         assert written[0] == written[1]
 
     def test_the_installed_hooks_json_is_the_shipped_one_verbatim(self, tmp_path):
-        from superclaude.cli.install_components import install_hooks
         from superclaude.cli.install_paths import _get_package_root
 
         base = tmp_path / ".claude"
@@ -1068,8 +1011,6 @@ class TestHookCommandsCarryNoMachineBytes:
 def _legacy_registration(base: Path, names: list[str], interpreter: str) -> None:
     """A settings.json the previous release would have written: resolved
     interpreter plus a script copy under <base>/superclaude/scripts/."""
-    import json
-
     scripts = base / "superclaude" / "scripts"
     scripts.mkdir(parents=True, exist_ok=True)
     entries = []
@@ -1094,8 +1035,6 @@ def _legacy_registration(base: Path, names: list[str], interpreter: str) -> None
 
 
 def _sc_commands(base: Path, scope: str) -> list[str]:
-    import json
-
     from superclaude.utils import settings_filename
 
     config = json.loads((base / settings_filename(scope)).read_text(encoding="utf-8"))
@@ -1118,8 +1057,6 @@ class TestUpgradeFromALegacyRegistration:
     """
 
     def test_non_force_rewrites_every_legacy_command(self, tmp_path):
-        from superclaude.cli.install_components import install_hooks
-
         base = tmp_path / ".claude"
         _legacy_registration(
             base, ["destructive_guard", "loop_guard"], "/opt/py/bin/python3"
@@ -1137,8 +1074,6 @@ class TestUpgradeFromALegacyRegistration:
     def test_notice_says_remove_after_restart_once_nothing_runs_the_copies(
         self, tmp_path
     ):
-        from superclaude.cli.install_components import install_hooks
-
         base = tmp_path / ".claude"
         _legacy_registration(base, ["loop_guard"], "/opt/py/bin/python3")
 
@@ -1154,8 +1089,6 @@ class TestUpgradeFromALegacyRegistration:
     ):
         """A hook this release no longer ships stays in its legacy form on a
         non-force install, so the copies it runs must stay too."""
-        from superclaude.cli.install_components import install_hooks
-
         base = tmp_path / ".claude"
         _legacy_registration(base, ["retired_thing"], "/opt/py/bin/python3")
 
@@ -1268,8 +1201,6 @@ class TestRegistrationFilesAreWrittenWithLF:
     def test_settings_json_writer_pins_newline_and_encoding(
         self, tmp_path, monkeypatch
     ):
-        import os
-
         from superclaude import utils
 
         seen = {}
@@ -1286,8 +1217,6 @@ class TestRegistrationFilesAreWrittenWithLF:
         assert seen.get("encoding") == "utf-8", seen
 
     def test_hooks_json_copy_pins_newline_and_encoding(self, tmp_path, monkeypatch):
-        import builtins
-
         from superclaude.cli import install_components
 
         seen = {}
@@ -1311,30 +1240,13 @@ class TestTeamIgnoreOfTheRegistrationIsReported:
     but a team-level .gitignore can still hide it — this repository's own
     .gitignore does — and the install used to say nothing."""
 
-    @staticmethod
-    def _isolated_repo(tmp_path, monkeypatch):
-        """The developer's global excludes file must not decide these tests."""
-        import subprocess
-
-        empty = tmp_path / "empty-gitconfig"
-        empty.write_text("", encoding="utf-8")
-        monkeypatch.setenv("GIT_CONFIG_GLOBAL", str(empty))
-        monkeypatch.setenv("GIT_CONFIG_NOSYSTEM", "1")
-        repo = tmp_path / "repo"
-        repo.mkdir()
-        subprocess.run(["git", "init", "-q", str(repo)], check=True)
-        return repo
-
-    def test_install_all_names_the_rule(self, tmp_path, monkeypatch):
-        from superclaude.cli.install_components import install_all
-
-        repo = self._isolated_repo(tmp_path, monkeypatch)
-        (repo / ".gitignore").write_text(
+    def test_install_all_names_the_rule(self, git_repo):
+        (git_repo / ".gitignore").write_text(
             "# team rules\n.claude/settings.json\n", encoding="utf-8"
         )
 
         _ok, message = install_all(
-            base_path=repo / ".claude", force=True, scope="project"
+            base_path=git_repo / ".claude", force=True, scope="project"
         )
 
         assert ".gitignore:2 ignores .claude/settings.json" in message, message
@@ -1342,13 +1254,9 @@ class TestTeamIgnoreOfTheRegistrationIsReported:
             line for line in message.splitlines() if "ignores" in line
         ], "hooks.json is not ignored here and must not be reported"
 
-    def test_a_clean_repo_gets_no_ignore_warning(self, tmp_path, monkeypatch):
-        from superclaude.cli.install_components import install_all
-
-        repo = self._isolated_repo(tmp_path, monkeypatch)
-
+    def test_a_clean_repo_gets_no_ignore_warning(self, git_repo):
         _ok, message = install_all(
-            base_path=repo / ".claude", force=True, scope="project"
+            base_path=git_repo / ".claude", force=True, scope="project"
         )
 
         assert "ignores .claude/" not in message, message
@@ -1366,27 +1274,16 @@ class TestOutputStylesInstallIntoClaudeCodesDirectory:
     SHIPPED = "plain-language.md"
 
     def test_install_copies_the_style_where_claude_code_scans(self, tmp_path):
-        from superclaude.cli.install_components import install_all
-
         success, message = install_all(base_path=tmp_path, force=True, scope="project")
 
         assert success is True, message
         installed = tmp_path / "output-styles" / self.SHIPPED
         assert installed.is_file()
         assert "Output styles: 1 installed" in message
-        source = (
-            Path(__file__).parents[2]
-            / "src"
-            / "superclaude"
-            / "output-styles"
-            / self.SHIPPED
-        )
+        source = _PACKAGE_ROOT / "output-styles" / self.SHIPPED
         assert installed.read_bytes() == source.read_bytes(), "copied verbatim"
 
     def test_listing_counts_it(self, tmp_path):
-        from superclaude.cli.install_components import install_all
-        from superclaude.cli.install_inventory import list_all_components
-
         install_all(base_path=tmp_path, force=True, scope="project")
         row = list_all_components(base_path=tmp_path, scope="project")["output-styles"]
 
@@ -1394,9 +1291,6 @@ class TestOutputStylesInstallIntoClaudeCodesDirectory:
         assert row["installed"] == row["available"]
 
     def test_uninstall_removes_only_the_shipped_style(self, tmp_path):
-        from superclaude.cli.install_components import install_all
-        from superclaude.cli.install_inventory import uninstall_all
-
         install_all(base_path=tmp_path, force=True, scope="project")
         own = tmp_path / "output-styles" / "my-team-voice.md"
         own.write_text("---\nname: Team Voice\n---\nBe terse.\n", encoding="utf-8")
@@ -1416,9 +1310,6 @@ class TestOutputStylesInstallIntoClaudeCodesDirectory:
         including README.md, so a hand-written `.claude/agents/README.md` was
         deleted on uninstall. The shared helper excludes it for both directories.
         """
-        from superclaude.cli.install_components import install_all
-        from superclaude.cli.install_inventory import uninstall_all
-
         install_all(base_path=tmp_path, force=True, scope="project")
         readme = tmp_path / component_dir / "README.md"
         readme.write_text("# our team's notes\n", encoding="utf-8")
@@ -1428,9 +1319,6 @@ class TestOutputStylesInstallIntoClaudeCodesDirectory:
         assert readme.is_file(), f"{component_dir}/README.md was never shipped"
 
     def test_uninstall_drops_the_directory_once_empty(self, tmp_path):
-        from superclaude.cli.install_components import install_all
-        from superclaude.cli.install_inventory import uninstall_all
-
         install_all(base_path=tmp_path, force=True, scope="project")
 
         uninstall_all(base_path=tmp_path, scope="project")
@@ -1438,9 +1326,6 @@ class TestOutputStylesInstallIntoClaudeCodesDirectory:
         assert not (tmp_path / "output-styles").exists()
 
     def test_dry_run_names_it_without_removing(self, tmp_path):
-        from superclaude.cli.install_components import install_all
-        from superclaude.cli.install_inventory import uninstall_all
-
         install_all(base_path=tmp_path, force=True, scope="project")
 
         _ok, message = uninstall_all(base_path=tmp_path, scope="project", dry_run=True)
@@ -1449,7 +1334,6 @@ class TestOutputStylesInstallIntoClaudeCodesDirectory:
         assert (tmp_path / "output-styles" / self.SHIPPED).is_file()
 
     def test_verify_drift_covers_it(self, tmp_path):
-        from superclaude.cli.install_components import install_all
         from superclaude.cli.verify_drift import verify_drift
 
         install_all(base_path=tmp_path, force=True, scope="project")

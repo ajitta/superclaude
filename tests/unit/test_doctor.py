@@ -17,6 +17,7 @@ from superclaude.cli.doctor import (
     _check_claude_sc_md,
     _check_console_entry,
     _check_hooks_installed,
+    _repair_command,
     run_doctor,
 )
 
@@ -232,8 +233,6 @@ class TestRepairCommandNamesWhereToRun:
     """
 
     def test_scoped_repair_names_the_project_directory(self, tmp_path: Path):
-        from superclaude.cli.doctor import _repair_command
-
         base = tmp_path / "proj" / ".claude"
 
         hint = _repair_command("local", base)
@@ -242,8 +241,6 @@ class TestRepairCommandNamesWhereToRun:
         assert str(tmp_path / "proj") in hint
 
     def test_user_scope_repair_needs_no_location(self, tmp_path: Path):
-        from superclaude.cli.doctor import _repair_command
-
         hint = _repair_command("user", Path.home() / ".claude")
 
         assert "--scope user" in hint

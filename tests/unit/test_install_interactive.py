@@ -9,7 +9,7 @@ import pytest
 from click.testing import CliRunner
 
 from superclaude.cli import install_interactive
-from superclaude.cli.main import main
+from superclaude.cli.main import install, main
 
 
 @pytest.fixture
@@ -137,10 +137,6 @@ class TestUnattendedInstall:
     """
 
     def test_bare_install_completes_without_a_terminal(self):
-        from click.testing import CliRunner
-
-        from superclaude.cli.main import install
-
         # No input at all: every prompt reads EOF, exactly as in CI.
         result = CliRunner().invoke(install, [], input="")
 
@@ -153,10 +149,6 @@ class TestUnattendedInstall:
         )
 
     def test_explicit_flag_still_opens_the_wizard(self, sandbox_home):
-        from click.testing import CliRunner
-
-        from superclaude.cli.main import install
-
         answers = "\n" * 4 + "n\n"
         result = CliRunner().invoke(install, ["-i"], input=answers)
 
@@ -167,10 +159,8 @@ class TestScopeHintWording:
     """The hint has to read as a note, not as an instruction to start over."""
 
     def test_hint_leads_with_the_action_taken(self):
-        from pathlib import Path as _Path
-
         source = (
-            _Path(__file__).parent.parent.parent
+            Path(__file__).parent.parent.parent
             / "src"
             / "superclaude"
             / "cli"
@@ -243,10 +233,6 @@ class TestCancellingNeverInstalls:
 
     def test_no_input_at_all_still_installs_the_default(self, runner, tmp_path):
         """CI, a pipe, `claude -p`: the bare command must still finish."""
-        from click.testing import CliRunner
-
-        from superclaude.cli.main import install
-
         result = CliRunner().invoke(install, [], input="")
 
         assert result.exit_code == 0, result.output

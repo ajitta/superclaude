@@ -9,15 +9,22 @@ user scope and a subdirectory CWD silently loaded user-scope content.
 
 from __future__ import annotations
 
+import os
+import subprocess
+import sys
+import time
 from pathlib import Path
 
 from superclaude.utils import (
     claude_base,
+    context_cache_file,
     detect_scope,
     hook_state_dir,
     main_worktree_root,
     project_key,
     project_root,
+    prune_hook_state,
+    same_dir,
     settings_filename,
 )
 
@@ -176,40 +183,34 @@ class TestContextCacheKeying:
         Only the filename is asserted; the directory is covered by
         TestHookStateDir.
         """
-        from superclaude.utils import context_cache_file as get_cache_file
-
         subdir = tmp_path / "src" / "deep"
         subdir.mkdir(parents=True)
         monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(tmp_path))
 
         monkeypatch.chdir(tmp_path)
-        from_root = get_cache_file()
+        from_root = context_cache_file()
         monkeypatch.chdir(subdir)
 
-        assert get_cache_file() == from_root
+        assert context_cache_file() == from_root
         assert from_root.name == f"claude_context_{project_key()}.txt"
 
     def test_cache_file_follows_project_not_cwd(self, tmp_path: Path, monkeypatch):
         """Two projects must not share one dedup cache file."""
-        from superclaude.utils import context_cache_file as get_cache_file
-
         other = tmp_path / "other"
         other.mkdir()
 
         monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(tmp_path))
-        first = get_cache_file()
+        first = context_cache_file()
         monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(other))
 
-        assert get_cache_file() != first
+        assert context_cache_file() != first
 
     def test_cache_file_carries_the_session(self, tmp_path: Path, monkeypatch):
         """A session id in the payload names a file of its own."""
-        from superclaude.utils import context_cache_file as get_cache_file
-
         monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(tmp_path))
 
-        scoped = get_cache_file("sess-A")
-        assert scoped != get_cache_file()
+        scoped = context_cache_file("sess-A")
+        assert scoped != context_cache_file()
         assert scoped.name.endswith("_sess-A.txt")
 
     def test_reset_spares_a_concurrent_session(self, tmp_path: Path, monkeypatch):
@@ -220,13 +221,12 @@ class TestContextCacheKeying:
         pointed the other way.
         """
         from superclaude.scripts.context_reset import reset_context_cache
-        from superclaude.utils import context_cache_file as get_cache_file
 
         monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(tmp_path))
 
-        mine = get_cache_file("sess-A")
-        theirs = get_cache_file("sess-B")
-        legacy = get_cache_file()
+        mine = context_cache_file("sess-A")
+        theirs = context_cache_file("sess-B")
+        legacy = context_cache_file()
         for path in (mine, theirs, legacy):
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_text("modes/MODE_Brainstorming.md", encoding="utf-8")
@@ -291,16 +291,11 @@ class TestHookStatePruning:
 
     @staticmethod
     def _age(path: Path, days: float) -> Path:
-        import os
-        import time
-
         old = time.time() - days * 86400
         os.utime(path, (old, old))
         return path
 
     def test_aged_state_is_removed(self, tmp_path: Path, monkeypatch):
-        from superclaude.utils import hook_state_dir, prune_hook_state
-
         monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(tmp_path))
         state = hook_state_dir()
         state.mkdir(parents=True, exist_ok=True)
@@ -319,8 +314,6 @@ class TestHookStatePruning:
 
     def test_unknown_files_are_left_alone(self, tmp_path: Path, monkeypatch):
         """The sweep deletes state it recognises, not whatever shares the dir."""
-        from superclaude.utils import hook_state_dir, prune_hook_state
-
         monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(tmp_path))
         state = hook_state_dir()
         state.mkdir(parents=True, exist_ok=True)
@@ -337,8 +330,6 @@ class TestHookStatePruning:
         self, tmp_path: Path, monkeypatch
     ):
         """mcp_fallbacks.json is pruned by entry, so the file itself stays."""
-        from superclaude.utils import hook_state_dir, prune_hook_state
-
         monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(tmp_path))
         state = hook_state_dir()
         state.mkdir(parents=True, exist_ok=True)
@@ -354,7 +345,6 @@ class TestHookStatePruning:
     def test_session_start_sweeps(self, tmp_path: Path, monkeypatch):
         """The sweep is wired to the hook that already runs at session start."""
         from superclaude.scripts.context_reset import reset_context_cache
-        from superclaude.utils import hook_state_dir
 
         monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(tmp_path))
         state = hook_state_dir()
@@ -399,10 +389,6 @@ class TestImportingAHookWritesNothing:
     """
 
     def test_context_loader_creates_nothing_on_import(self, tmp_path):
-        import os
-        import subprocess
-        import sys
-
         home = tmp_path / "home"
         home.mkdir()
 
@@ -607,8 +593,6 @@ class TestSameDir:
     """same_dir is public because install_paths needs the same comparison."""
 
     def test_resolves_symlinks(self, tmp_path: Path):
-        from superclaude.utils import same_dir
-
         real = tmp_path / "real"
         real.mkdir()
         link = tmp_path / "link"
@@ -617,8 +601,6 @@ class TestSameDir:
         assert same_dir(link, real) is True
 
     def test_different_directories_are_not_the_same(self, tmp_path: Path):
-        from superclaude.utils import same_dir
-
         left = tmp_path / "a"
         right = tmp_path / "b"
         left.mkdir()

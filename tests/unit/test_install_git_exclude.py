@@ -7,45 +7,17 @@ non-git silent skip, and worktree pointer-file handling.
 
 from __future__ import annotations
 
-import subprocess
 from pathlib import Path
 
 import pytest
 
-_GIT_IDENTITY = [
-    "-c",
-    "user.email=t@t",
-    "-c",
-    "user.name=t",
-    "-c",
-    "commit.gpgsign=false",
-]
-
-
-def _git(*args: str) -> None:
-    subprocess.run(["git", *_GIT_IDENTITY, *args], check=True, capture_output=True)
+from tests.conftest import git, init_git_repo
 
 
 @pytest.fixture(autouse=True)
-def _isolated_git_config(tmp_path: Path, monkeypatch) -> None:
+def _isolated_git_config(isolated_git_config) -> None:
     """The developer's global git config (templates, excludes file) must not
-    decide these tests; the resolver asks git itself, so repos are real."""
-    empty = tmp_path / "empty-gitconfig"
-    empty.write_text("", encoding="utf-8")
-    monkeypatch.setenv("GIT_CONFIG_GLOBAL", str(empty))
-    monkeypatch.setenv("GIT_CONFIG_NOSYSTEM", "1")
-
-
-def _git_init(path: Path) -> Path:
-    path.mkdir(parents=True, exist_ok=True)
-    _git("init", "-q", str(path))
-    return path
-
-
-@pytest.fixture
-def git_repo(tmp_path: Path) -> Path:
-    """A project root with a regular ``.git/`` directory."""
-    return _git_init(tmp_path)
+    decide any test here; the resolver asks git itself, so repos are real."""
 
 
 @pytest.fixture
@@ -69,10 +41,9 @@ def worktree_dir(tmp_path: Path) -> Path:
     The per-worktree ``info/`` is created so a regression back to it has
     somewhere to land and the assertions can see it.
     """
-    main = _git_init(tmp_path / "main")
-    _git("-C", str(main), "commit", "-q", "--allow-empty", "-m", "init")
+    main = init_git_repo(tmp_path / "main")
     worktree_root = tmp_path / "feature"
-    _git("-C", str(main), "worktree", "add", "-q", str(worktree_root))
+    git("-C", str(main), "worktree", "add", "-q", str(worktree_root))
     (main / ".git" / "worktrees" / "feature" / "info").mkdir(exist_ok=True)
     return worktree_root
 
@@ -132,7 +103,7 @@ class TestResolveGitExcludeFile:
         gitdir.parent.mkdir()
         root = tmp_path / "wt"
         root.mkdir()
-        _git("init", "-q", f"--separate-git-dir={gitdir}", str(root))
+        git("init", "-q", f"--separate-git-dir={gitdir}", str(root))
         assert (root / ".git").is_file()
         from superclaude.cli.install_git_exclude import _resolve_git_exclude_file
 
@@ -531,21 +502,15 @@ class TestMarkerGenerationMigration:
         assert "user-pattern" in content
 
 
-def _real_repo(tmp_path: Path, monkeypatch) -> Path:
-    """A repository for `git check-ignore`; global config is shut out by the
-    module's autouse fixture so a machine-wide excludes file cannot decide."""
-    return _git_init(tmp_path)
-
-
 class TestFindTeamIgnores:
     """`git check-ignore -v` names the rule that hides a registration file."""
 
     def test_a_gitignore_rule_is_reported_with_its_source_and_line(
-        self, tmp_path: Path, monkeypatch
+        self, git_repo: Path
     ):
         from superclaude.cli.install_git_exclude import find_team_ignores
 
-        repo = _real_repo(tmp_path, monkeypatch)
+        repo = git_repo
         (repo / ".gitignore").write_text(
             "# team rules\n.claude/settings.json\n", encoding="utf-8"
         )
@@ -556,30 +521,22 @@ class TestFindTeamIgnores:
 
         assert found == [(".gitignore", "2", ".claude/settings.json")]
 
-    def test_nothing_ignored_is_an_empty_list(self, tmp_path: Path, monkeypatch):
+    def test_nothing_ignored_is_an_empty_list(self, git_repo: Path):
         from superclaude.cli.install_git_exclude import find_team_ignores
 
-        assert (
-            find_team_ignores(
-                _real_repo(tmp_path, monkeypatch), [".claude/settings.json"]
-            )
-            == []
-        )
+        assert find_team_ignores(git_repo, [".claude/settings.json"]) == []
 
-    def test_a_tracked_file_is_never_reported(self, tmp_path: Path, monkeypatch):
+    def test_a_tracked_file_is_never_reported(self, git_repo: Path):
         """git's own rule: an already-committed registration stays quiet even
         when a later ignore rule matches it."""
-        import subprocess
-
         from superclaude.cli.install_git_exclude import find_team_ignores
 
-        repo = _real_repo(tmp_path, monkeypatch)
+        repo = git_repo
         target = repo / ".claude" / "settings.json"
         target.parent.mkdir(parents=True)
         target.write_text("{}", encoding="utf-8")
-        git = ["git", "-C", str(repo), "-c", "user.email=t@t", "-c", "user.name=t"]
-        subprocess.run([*git, "add", ".claude/settings.json"], check=True)
-        subprocess.run([*git, "commit", "-q", "-m", "track"], check=True)
+        git("-C", str(repo), "add", ".claude/settings.json")
+        git("-C", str(repo), "commit", "-q", "-m", "track")
         (repo / ".gitignore").write_text(".claude/settings.json\n", encoding="utf-8")
 
         assert find_team_ignores(repo, [".claude/settings.json"]) == []
@@ -589,15 +546,13 @@ class TestFindTeamIgnores:
 
         assert find_team_ignores(tmp_path, [".claude/settings.json"]) == []
 
-    def test_a_negation_that_whitelists_the_file_is_not_an_ignore(
-        self, tmp_path: Path, monkeypatch
-    ):
+    def test_a_negation_that_whitelists_the_file_is_not_an_ignore(self, git_repo: Path):
         """`.claude/*` + `!.claude/settings.json` is the common way to commit the
         registration while hiding the rest of .claude; check-ignore -v prints the
         negation as the winning rule, and it must not be reported as hiding."""
         from superclaude.cli.install_git_exclude import find_team_ignores
 
-        repo = _real_repo(tmp_path, monkeypatch)
+        repo = git_repo
         (repo / ".gitignore").write_text(
             ".claude/*\n!.claude/settings.json\n", encoding="utf-8"
         )
@@ -608,12 +563,10 @@ class TestFindTeamIgnores:
 
         assert found == [(".gitignore", "1", ".claude/hooks/hooks.json")]
 
-    def test_a_per_clone_exclude_rule_is_not_a_team_rule(
-        self, tmp_path: Path, monkeypatch
-    ):
+    def test_a_per_clone_exclude_rule_is_not_a_team_rule(self, git_repo: Path):
         from superclaude.cli.install_git_exclude import find_team_ignores
 
-        repo = _real_repo(tmp_path, monkeypatch)
+        repo = git_repo
         (repo / ".git" / "info").mkdir(exist_ok=True)
         (repo / ".git" / "info" / "exclude").write_text(
             ".claude/settings.json\n", encoding="utf-8"

@@ -5,6 +5,8 @@ Tests mcp_fallback.py functionality for first-time-only notifications.
 
 from __future__ import annotations
 
+import json
+from datetime import datetime, timedelta
 from pathlib import Path
 from unittest.mock import patch
 
@@ -121,8 +123,6 @@ class TestFallbackLedgerPruning:
     """
 
     def _ledger(self, tmp_path, monkeypatch, data):
-        import json
-
         from superclaude.utils import hook_state_dir
 
         monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(tmp_path))
@@ -134,13 +134,9 @@ class TestFallbackLedgerPruning:
 
     @staticmethod
     def _stamp(days_ago: int) -> str:
-        from datetime import datetime, timedelta
-
         return (datetime.now() - timedelta(days=days_ago)).isoformat()
 
     def test_aged_sessions_are_dropped(self, tmp_path, monkeypatch):
-        import json
-
         from superclaude.utils import prune_fallback_ledger
 
         path = self._ledger(
@@ -159,8 +155,6 @@ class TestFallbackLedgerPruning:
         assert "recent-session" in data
 
     def test_current_session_survives_regardless_of_age(self, tmp_path, monkeypatch):
-        import json
-
         from superclaude.utils import prune_fallback_ledger
 
         path = self._ledger(
@@ -172,8 +166,6 @@ class TestFallbackLedgerPruning:
         assert "live" in json.loads(path.read_text(encoding="utf-8"))
 
     def test_retired_servers_are_dropped(self, tmp_path, monkeypatch):
-        import json
-
         from superclaude.utils import prune_fallback_ledger
 
         path = self._ledger(
@@ -194,8 +186,6 @@ class TestFallbackLedgerPruning:
         assert set(json.loads(path.read_text(encoding="utf-8"))["live"]) == {"tavily"}
 
     def test_emptied_session_is_removed(self, tmp_path, monkeypatch):
-        import json
-
         from superclaude.utils import prune_fallback_ledger
 
         path = self._ledger(tmp_path, monkeypatch, {"live": {"magic": self._stamp(0)}})

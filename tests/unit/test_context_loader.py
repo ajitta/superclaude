@@ -1317,6 +1317,135 @@ class TestQuotedTriggersInjectNothing:
         assert "RULES_DELEGATION.md" in out
 
 
+class TestUndocumentedTriggerAlternativesDoNotFire:
+    """Trigger alternatives nobody is told to type were cut (content-structure
+    audit 04b §2 (1)). A phrase documented nowhere under ``src/superclaude``
+    cannot be a deliberate request for a mode, and ``multi-expert`` is the
+    vocabulary of both panels (spec-panel.md and business-panel.md), so it
+    injected the business roster into a spec critique. Each removed phrase
+    gets a plain-prose negative; the alternatives kept in the same entry get a
+    positive so the cut cannot silently widen.
+    """
+
+    @staticmethod
+    def _project(tmp_path: Path) -> Path:
+        (tmp_path / ".claude" / "superclaude").mkdir(parents=True, exist_ok=True)
+        return tmp_path
+
+    # --- modes/MODE_Verbalized_Sampling.md: `vs-(cot|multi|standard)` removed
+
+    def test_hyphenated_vs_label_does_not_load_verbalized_sampling(self, tmp_path):
+        prompt = "Explain what VS-CoT and VS-Multi mean in the paper's table 3"
+        out = run_loader(prompt, self._project(tmp_path), session_id="s")
+        assert "MODE_Verbalized_Sampling.md" not in out
+
+    def test_vs_flag_still_loads_verbalized_sampling(self, tmp_path):
+        out = run_loader(
+            "--vs cot pick a name for the new CLI",
+            self._project(tmp_path),
+            session_id="s",
+        )
+        assert "MODE_Verbalized_Sampling.md" in out
+
+    def test_multiple_perspectives_still_loads_verbalized_sampling(self, tmp_path):
+        out = run_loader(
+            "give me multiple perspectives on the caching design",
+            self._project(tmp_path),
+            session_id="s",
+        )
+        assert "MODE_Verbalized_Sampling.md" in out
+
+    def test_diverse_responses_still_loads_verbalized_sampling(self, tmp_path):
+        out = run_loader(
+            "I want diverse responses to the onboarding question",
+            self._project(tmp_path),
+            session_id="s",
+        )
+        assert "MODE_Verbalized_Sampling.md" in out
+
+    # --- core/BUSINESS_SYMBOLS.md: `strategic.?symbol`, `business.?example` removed
+
+    def test_strategic_symbol_does_not_load_business_symbols(self, tmp_path):
+        prompt = "Add a strategic symbol to the roadmap legend in docs/roadmap.md"
+        out = run_loader(prompt, self._project(tmp_path), session_id="s")
+        assert "BUSINESS_SYMBOLS.md" not in out
+
+    def test_business_example_does_not_load_business_symbols(self, tmp_path):
+        prompt = "Write a business example for the onboarding tutorial"
+        out = run_loader(prompt, self._project(tmp_path), session_id="s")
+        assert "BUSINESS_SYMBOLS.md" not in out
+
+    def test_business_symbol_still_loads_business_symbols(self, tmp_path):
+        out = run_loader(
+            "use the business symbol system for the summary",
+            self._project(tmp_path),
+            session_id="s",
+        )
+        assert "BUSINESS_SYMBOLS.md" in out
+
+    def test_structured_business_panel_still_loads_business_symbols(self, tmp_path):
+        out = run_loader(
+            "/sc:business-panel docs/strategy.md --structured",
+            self._project(tmp_path),
+            session_id="s",
+        )
+        assert "BUSINESS_SYMBOLS.md" in out
+
+    # --- modes/MODE_Introspection.md: `analyze reasoning` removed
+
+    def test_analyze_reasoning_does_not_load_introspection(self, tmp_path):
+        prompt = "Analyze reasoning errors in this proof of the lemma"
+        out = run_loader(prompt, self._project(tmp_path), session_id="s")
+        assert "MODE_Introspection.md" not in out
+
+    def test_introspect_flag_still_loads_introspection(self, tmp_path):
+        out = run_loader(
+            "--introspect why did the last fix miss the root cause?",
+            self._project(tmp_path),
+            session_id="s",
+        )
+        assert "MODE_Introspection.md" in out
+
+    def test_self_analysis_still_loads_introspection(self, tmp_path):
+        out = run_loader(
+            "do a self-analysis of the refactor decision you just made",
+            self._project(tmp_path),
+            session_id="s",
+        )
+        assert "MODE_Introspection.md" in out
+
+    # --- modes/MODE_Business_Panel.md: `multi.?expert` removed (cross-domain)
+
+    def test_multi_expert_spec_critique_does_not_load_business_panel(self, tmp_path):
+        prompt = "Run a multi-expert spec critique of docs/spec.md"
+        out = run_loader(prompt, self._project(tmp_path), session_id="s")
+        assert "MODE_Business_Panel.md" not in out
+
+    def test_business_panel_flag_still_loads_business_panel(self, tmp_path):
+        out = run_loader(
+            "--business-panel evaluate the pricing change",
+            self._project(tmp_path),
+            session_id="s",
+        )
+        assert "MODE_Business_Panel.md" in out
+
+    def test_business_panel_phrase_still_loads_business_panel(self, tmp_path):
+        out = run_loader(
+            "convene the business panel on our market entry plan",
+            self._project(tmp_path),
+            session_id="s",
+        )
+        assert "MODE_Business_Panel.md" in out
+
+    def test_strategic_analysis_still_loads_business_panel(self, tmp_path):
+        out = run_loader(
+            "give me a strategic analysis of the subscription pivot",
+            self._project(tmp_path),
+            session_id="s",
+        )
+        assert "MODE_Business_Panel.md" in out
+
+
 def test_structured_flag_loads_business_symbols_only_for_business_panel():
     """`--structured` means isolated review in /sc:review; only the business panel's
     `--structured` asks for the business symbol system."""

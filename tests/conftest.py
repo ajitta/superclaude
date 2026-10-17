@@ -2,7 +2,62 @@
 Pytest configuration and shared fixtures for superclaude tests
 """
 
+import subprocess
+from pathlib import Path
+
 import pytest
+
+
+def git(*args: str, cwd: Path | None = None) -> subprocess.CompletedProcess:
+    """Run git, raise on failure, keep its chatter out of the test output."""
+    return subprocess.run(
+        ["git", *args], cwd=cwd, check=True, capture_output=True, text=True
+    )
+
+
+def init_git_repo(
+    path: Path, *, commit: bool = True, files: dict[str, str] | None = None
+) -> Path:
+    """A real repository at *path* on branch ``main``, by default with one commit.
+
+    Identity and ``commit.gpgsign=false`` go into the repo-local config rather
+    than ``-c`` flags so they also cover the git calls the code under test
+    makes inside the repo (worktree manager, coordinator, insight writer).
+    *files* (name -> text, default ``README.md``) are written and committed
+    when *commit* is true.
+    """
+    path.mkdir(parents=True, exist_ok=True)
+    git("init", "-q", "-b", "main", str(path))
+    for key, value in (
+        ("user.email", "t@t"),
+        ("user.name", "t"),
+        ("commit.gpgsign", "false"),
+    ):
+        git("-C", str(path), "config", key, value)
+    if commit:
+        for name, text in (files or {"README.md": "seed\n"}).items():
+            target = path / name
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_text(text, encoding="utf-8")
+        git("-C", str(path), "add", "-A")
+        git("-C", str(path), "commit", "-q", "-m", "seed")
+    return path
+
+
+@pytest.fixture
+def isolated_git_config(tmp_path_factory, monkeypatch) -> None:
+    """Shut out the developer's global git config (templates, excludes file,
+    identity) so git's own answers in these tests come from the repo alone."""
+    empty = tmp_path_factory.mktemp("gitconfig") / "empty-gitconfig"
+    empty.write_text("", encoding="utf-8")
+    monkeypatch.setenv("GIT_CONFIG_GLOBAL", str(empty))
+    monkeypatch.setenv("GIT_CONFIG_NOSYSTEM", "1")
+
+
+@pytest.fixture
+def git_repo(tmp_path: Path, isolated_git_config) -> Path:
+    """``tmp_path`` as a committed git repository with global config shut out."""
+    return init_git_repo(tmp_path)
 
 
 @pytest.fixture(autouse=True)

@@ -1,6 +1,8 @@
 """Tests for the 4-guard suite — design §3.5 Guards."""
 
+import sys
 import time
+from unittest.mock import MagicMock, patch
 
 from superclaude.scripts.auto_improve.guards import (
     BudgetGuard,
@@ -80,16 +82,12 @@ def test_regression_block_handles_none_score():
 def test_smoke_gate_uses_explicit_smoke_cmd(tmp_path):
     script = tmp_path / "ok.py"
     script.write_text("import sys; sys.exit(0)", encoding="utf-8")
-    import sys
-
     cmd = f'"{sys.executable}" "{script}"'
     g = SmokeGate(smoke_cmd=cmd, eval_cmd="should-not-run", timeout=5)
     assert g.check() is True
 
 
 def test_smoke_gate_falls_back_to_eval_cmd(tmp_path):
-    import sys
-
     script = tmp_path / "ok.py"
     script.write_text("import sys; sys.exit(0)", encoding="utf-8")
     cmd = f'"{sys.executable}" "{script}"'
@@ -103,8 +101,6 @@ def test_smoke_gate_fallback_uses_configured_timeout():
     eval time out -> smoke_fail, even though the baseline had passed under
     the 600 s cycle timeout.
     """
-    from unittest.mock import MagicMock, patch
-
     g = SmokeGate(smoke_cmd=None, eval_cmd="eval", timeout=45)
     with patch(
         "superclaude.scripts.auto_improve.guards.subprocess.run",
@@ -119,8 +115,6 @@ def test_smoke_gate_runs_in_specified_cwd(tmp_path):
     Regression guard: a misconfigured cwd previously produced thousands
     of fast smoke_fail cycles per minute (eval.py not found in worker dir).
     """
-    import sys
-
     (tmp_path / "marker.py").write_text("import sys; sys.exit(0)", encoding="utf-8")
     cmd = f'"{sys.executable}" marker.py'
     g = SmokeGate(smoke_cmd=None, eval_cmd=cmd, timeout=5, cwd=str(tmp_path))
@@ -128,8 +122,6 @@ def test_smoke_gate_runs_in_specified_cwd(tmp_path):
 
 
 def test_smoke_gate_fails_on_nonzero_exit(tmp_path):
-    import sys
-
     script = tmp_path / "fail.py"
     script.write_text("import sys; sys.exit(1)", encoding="utf-8")
     cmd = f'"{sys.executable}" "{script}"'

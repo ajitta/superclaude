@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import subprocess
 from unittest.mock import MagicMock, patch
 
 from superclaude.scripts.auto_improve.mutator import (
@@ -128,9 +129,7 @@ def test_mutator_passes_timeout_to_subprocess(tmp_path):
 
 
 def test_mutator_returns_error_on_timeout(tmp_path):
-    import subprocess as _sp
-
-    with patch("subprocess.run", side_effect=_sp.TimeoutExpired("claude", 5)):
+    with patch("subprocess.run", side_effect=subprocess.TimeoutExpired("claude", 5)):
         result = Mutator(timeout=5).mutate(worktree_path=tmp_path)
     assert result.error is not None
     assert "timeout" in result.error.lower()

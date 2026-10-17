@@ -3,8 +3,6 @@
 
 Runs prettier on edited files with supported extensions.
 Cross-platform compatible (Windows/macOS/Linux).
-
-Checks stop_hook_active to prevent infinite loops (Claude Code best practice).
 """
 
 import json
@@ -36,10 +34,6 @@ def _find_prettier() -> str | None:
 def main() -> None:
     data = read_hook_input()
     if data is None:
-        return
-
-    # Prevent infinite loops when Claude is stopping
-    if data.get("stop_hook_active"):
         return
 
     file_path = data.get("tool_input", {}).get("file_path", "")

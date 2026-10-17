@@ -19,6 +19,7 @@ Releases before 4.19.0 are not listed. Their history is the git log; the upstrea
 - The `project-manager` agent records patterns and mistakes in `.claude/memories/learnings_<topic>.md` — where `/sc:save` writes — instead of a `docs/memory/` folder nothing else used.
 - `/sc:roadmap` stops on a `status: draft` source spec and points to `/sc:review --scope spec`, as `/sc:plan` already did.
 - Command files lost `<tools>` lists that only enumerated Claude Code's native tools (whole section in 10 commands, trimmed to instruction-carrying lines in 9) and `<examples>` rows whose output cell only restated the flag (33 rows in 12 commands). `MODE_Orchestration.md` defers the Write-Return and Schema-vs-Evidence rules to `RULES_DELEGATION.md` instead of restating them. Nothing changes which file loads when.
+- The prompt hook no longer injects `MODE_Business_Panel.md` on the phrase "multi-expert" — it is how both the business panel and the spec panel describe themselves, so it fired on spec critiques too. `--business-panel`, "business panel", "strategic analysis" and `/sc:business-panel` still load it. Four trigger phrases that no content file ever told a user to type are gone: the `VS-CoT`/`VS-Multi`/`VS-Standard` labels (type `--vs`), "strategic symbol" and "business example" (`--structured` or "business symbol"), "analyze reasoning" (`--introspect` or "self-analysis").
 
 ### Fixed
 
@@ -29,6 +30,7 @@ Releases before 4.19.0 are not listed. Their history is the git log; the upstrea
 - The `auto-improve` mutator runs `claude -p` with `--permission-mode acceptEdits` instead of `bypassPermissions`: edits inside its worktree are accepted, an edit outside it is denied. The unattended loop could previously write anywhere the user can.
 - A malformed `CLAUDE_CONTEXT_MAX_TOKENS` (`8k`, empty) no longer crashes the prompt hook on every prompt; the loader and `superclaude context explain` fall back to 8000.
 - `parallel-ab` passes the scenario prompt after `--`, so an input that starts with a flag (`--introspect analyze X`) is no longer parsed as a `claude` option; and it builds `matrix.md`/`decision.md` from this run's observations only — a leftover `obs-*.json` from a removed or renamed variant no longer enters the matrix or the recommended winner. Observation JSON no longer carries the always-empty `axes`, `files_touched` and `clarifying_questions` keys.
+- `prettier` and `test-runner` hooks dropped a `stop_hook_active` check that could never be true: Claude Code sets that field only for Stop/SubagentStop hooks.
 - `evals/run_eval.py` deletes the per-arm copies of `~/.claude/.credentials.json` it makes under `<runs-dir>/config/` when the run ends, including on error. They used to stay in the runs directory (by default the system temp dir) after every run.
 
 

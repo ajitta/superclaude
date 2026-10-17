@@ -7,13 +7,17 @@ pending-count, _project_dir using the shared Claude Code projects-dir encoder.
 
 from __future__ import annotations
 
+import argparse
 import json
+import os
 import re
+from datetime import datetime
 from pathlib import Path
 
 import pytest
 
 from superclaude.scripts import insight_writer as iw
+from tests.conftest import init_git_repo
 
 
 @pytest.fixture
@@ -69,8 +73,6 @@ class TestProjectDir:
 
 
 def _run_append(json_str: str) -> int:
-    import argparse
-
     return iw.cmd_append(argparse.Namespace(json=json_str))
 
 
@@ -217,8 +219,6 @@ def _make_transcript(project_dir: Path, session_id: str, records: list[dict]) ->
 
 def _harvest(workdir: Path, monkeypatch, session_id: str, source: str = "clear"):
     """Invoke harvest with a fake home so we can place transcripts."""
-    import argparse
-
     fake_home = workdir / "fakehome"
     monkeypatch.setattr(Path, "home", lambda: fake_home)
 
@@ -329,7 +329,6 @@ class TestHarvest:
         # No project dir at all
         fake_home = workdir / "fakehome"
         monkeypatch.setattr(Path, "home", lambda: fake_home)
-        import argparse
 
         rc = iw.cmd_harvest(
             argparse.Namespace(cwd=str(workdir), session_id="missing", source="clear")
@@ -360,8 +359,6 @@ class TestHarvest:
 
 class TestReviewPromote:
     def test_review_empty(self, workdir, capsys):
-        import argparse
-
         rc = iw.cmd_review(argparse.Namespace())
         assert rc == 0
         assert "no pending" in capsys.readouterr().out
@@ -386,8 +383,6 @@ class TestReviewPromote:
         iw.cmd_harvest(ns)
         assert (workdir / ".claude" / "insights.pending.jsonl").exists()
 
-        import argparse
-
         rc = iw.cmd_promote(
             argparse.Namespace(
                 index=0, type="discovery", insight=None, tags="harvest,a"
@@ -406,8 +401,6 @@ class TestReviewPromote:
         assert not (workdir / ".claude" / "insights.pending.jsonl").exists()
 
     def test_promote_index_out_of_range(self, workdir, capsys):
-        import argparse
-
         rc = iw.cmd_promote(
             argparse.Namespace(index=99, type="discovery", insight=None, tags=None)
         )
@@ -415,8 +408,6 @@ class TestReviewPromote:
         assert "out of range" in capsys.readouterr().err
 
     def test_pending_count_zero_silent(self, workdir, capsys):
-        import argparse
-
         rc = iw.cmd_pending_count(argparse.Namespace(cwd=None))
         assert rc == 0
         assert capsys.readouterr().out == ""
@@ -437,7 +428,6 @@ class TestReviewPromote:
         )
         iw.cmd_harvest(ns)
         capsys.readouterr()  # drain harvest output
-        import argparse
 
         iw.cmd_pending_count(argparse.Namespace(cwd=None))
         out = capsys.readouterr().out
@@ -471,8 +461,6 @@ def _seed_pending(workdir, monkeypatch, markers: list[str]):
 
 class TestDiscard:
     def test_discard_single_index(self, workdir, monkeypatch):
-        import argparse
-
         pending_file = _seed_pending(workdir, monkeypatch, ["keep me", "drop me"])
         rc = iw.cmd_discard(argparse.Namespace(index="1"))
         assert rc == 0
@@ -486,8 +474,6 @@ class TestDiscard:
     def test_discard_multiple_indices_are_all_dropped(self, workdir, monkeypatch):
         # Ascending input: the pops must run descending or the shift drops the
         # wrong rows — the exact footgun that motivated multi-index support.
-        import argparse
-
         pending_file = _seed_pending(workdir, monkeypatch, ["a", "b", "c", "d"])
         rc = iw.cmd_discard(argparse.Namespace(index="0,1,2"))
         assert rc == 0
@@ -499,23 +485,17 @@ class TestDiscard:
         assert [r["raw_text"] for r in rows] == ["d"]
 
     def test_discard_removes_pending_file_when_emptied(self, workdir, monkeypatch):
-        import argparse
-
         pending_file = _seed_pending(workdir, monkeypatch, ["only one"])
         assert iw.cmd_discard(argparse.Namespace(index="0")) == 0
         assert not pending_file.exists()
 
     def test_discard_does_not_append_to_insights(self, workdir, monkeypatch):
-        import argparse
-
         _seed_pending(workdir, monkeypatch, ["noise"])
         iw.cmd_discard(argparse.Namespace(index="0"))
         assert not (workdir / ".claude" / "insights.jsonl").exists()
 
     def test_discard_out_of_range_drops_nothing(self, workdir, monkeypatch, capsys):
         # All-or-nothing: index 0 is valid but must survive the rejected batch.
-        import argparse
-
         pending_file = _seed_pending(workdir, monkeypatch, ["a", "b"])
         rc = iw.cmd_discard(argparse.Namespace(index="0,99"))
         assert rc == 2
@@ -528,8 +508,6 @@ class TestDiscard:
         assert len(rows) == 2
 
     def test_discard_rejects_non_integer_index(self, workdir, monkeypatch, capsys):
-        import argparse
-
         pending_file = _seed_pending(workdir, monkeypatch, ["a"])
         rc = iw.cmd_discard(argparse.Namespace(index="0,oops"))
         assert rc == 2
@@ -537,8 +515,6 @@ class TestDiscard:
         assert pending_file.exists()
 
     def test_discard_empty_index_is_rejected(self, workdir, monkeypatch, capsys):
-        import argparse
-
         _seed_pending(workdir, monkeypatch, ["a"])
         rc = iw.cmd_discard(argparse.Namespace(index=","))
         assert rc == 2
@@ -548,8 +524,6 @@ class TestDiscard:
         # The harvest ledger files uuids at harvest time, so discard needs no
         # ledger write of its own — a re-harvest of the same transcript must
         # not resurrect the row the user threw away.
-        import argparse
-
         pending_file = _seed_pending(workdir, monkeypatch, ["noise"])
         iw.cmd_discard(argparse.Namespace(index="0"))
         assert not pending_file.exists()
@@ -559,8 +533,6 @@ class TestDiscard:
         assert not pending_file.exists(), "a discarded marker came back as pending"
 
     def test_discard_echoes_text_before_dropping(self, workdir, monkeypatch, capsys):
-        import argparse
-
         _seed_pending(workdir, monkeypatch, ["the only surviving copy"])
         iw.cmd_discard(argparse.Namespace(index="0"))
         assert "the only surviving copy" in capsys.readouterr().out
@@ -611,8 +583,6 @@ class TestReadPaths:
         path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
     def test_list_prints_the_last_rows(self, capsys):
-        import argparse
-
         assert iw.cmd_list(argparse.Namespace(limit=3)) == 0
         assert capsys.readouterr().out.splitlines() == [
             "2026-10-01T11:00:00+09:00 [unknown] [decision] no author",
@@ -621,8 +591,6 @@ class TestReadPaths:
         ]
 
     def test_query_matches_a_field_and_a_tag(self, capsys):
-        import argparse
-
         assert iw.cmd_query(argparse.Namespace(expr="type=feedback")) == 0
         matched = capsys.readouterr().out
         assert matched.count('"type": "feedback"') == 2
@@ -635,15 +603,11 @@ class TestReadPaths:
         assert capsys.readouterr().out.count('"insight"') == 1
 
     def test_query_rejects_a_bad_expression(self, capsys):
-        import argparse
-
         assert iw.cmd_query(argparse.Namespace(expr="a-b=1")) == 2
         assert iw.cmd_query(argparse.Namespace(expr="nokey")) == 2
         assert capsys.readouterr().out == ""
 
     def test_stats_counts_types_and_hides_annotations_by_default(self, capsys):
-        import argparse
-
         assert iw.cmd_stats(argparse.Namespace(all=False)) == 0
         out = capsys.readouterr().out
         assert "     2  feedback" in out
@@ -656,8 +620,6 @@ class TestReadPaths:
         assert "Total: 4" in out
 
     def test_an_empty_history_says_so(self, workdir, capsys):
-        import argparse
-
         (workdir / ".claude" / "insights.jsonl").unlink()
         assert iw.cmd_list(argparse.Namespace(limit=5)) == 0
         assert iw.cmd_stats(argparse.Namespace(all=False)) == 0
@@ -862,8 +824,6 @@ class TestPendingCountFromHook:
 
 class TestTimestampFormat:
     def test_colon_offset_format(self):
-        from datetime import datetime
-
         s = iw._now_iso()
         # ISO 8601 with colon offset: ...+HH:MM or ...-HH:MM, no microseconds
         assert re.match(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}[+-]\d{2}:\d{2}$", s), s
@@ -875,8 +835,6 @@ class TestTimestampFormat:
 
     def test_consecutive_calls_monotonic(self):
         # Sanity: two calls produce parseable, ordered timestamps
-        from datetime import datetime
-
         s1 = iw._now_iso()
         s2 = iw._now_iso()
         # fromisoformat handles colon offset directly
@@ -1034,10 +992,8 @@ class TestFindTranscriptFallback:
         old.write_text("{}\n", encoding="utf-8")
         new.write_text("{}\n", encoding="utf-8")
         # Force mtimes so 'new' is newer
-        import os as _os
-
-        _os.utime(old, (1000, 1000))
-        _os.utime(new, (2000, 2000))
+        os.utime(old, (1000, 1000))
+        os.utime(new, (2000, 2000))
         # No session_id supplied → fallback to most-recent
         result = iw._find_transcript(None, cwd)
         assert result is not None
@@ -1144,8 +1100,6 @@ class TestAppendDoesNotMutateInput:
         _run_append(json.dumps(original))  # JSON serialization already insulates
         # The defensive copy primarily protects in-process reuse; verify the
         # internal append helper does not back-mutate when called with a dict ref
-        import argparse
-
         live = {"type": "discovery", "insight": "live"}
         live_copy = dict(live)
         iw.cmd_append(argparse.Namespace(json=json.dumps(live)))
@@ -1278,8 +1232,6 @@ class TestInsightRequestHook:
     """A Stop hook is the only producer that does not have to be typed."""
 
     def _run(self, workdir, monkeypatch, dirty=True, stop_hook_active=False):
-        import argparse
-
         monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(workdir))
         monkeypatch.delenv("SUPERCLAUDE_INSIGHT_PROMPT", raising=False)
         monkeypatch.setattr(iw, "_session_changed_code", lambda _session: dirty)
@@ -1316,8 +1268,6 @@ class TestInsightRequestHook:
         assert capsys.readouterr().out.strip() == ""
 
     def test_opt_out_is_honoured(self, workdir, monkeypatch, capsys):
-        import argparse
-
         monkeypatch.setenv("SUPERCLAUDE_INSIGHT_PROMPT", "0")
         monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(workdir))
         monkeypatch.setattr(iw, "_session_changed_code", lambda _session: True)
@@ -1327,19 +1277,11 @@ class TestInsightRequestHook:
         assert capsys.readouterr().out.strip() == ""
 
 
-def _committed_repo(tmp_path, monkeypatch):
-    """A real git repository with one commit, anchored for the hook resolvers."""
-    import subprocess
-
-    for cmd in (
-        ["git", "init", "-q"],
-        ["git", "config", "user.email", "test@example.com"],
-        ["git", "config", "user.name", "test"],
-    ):
-        subprocess.run(cmd, cwd=tmp_path, check=True)
-    (tmp_path / "tracked.txt").write_text("hello\n", encoding="utf-8")
-    subprocess.run(["git", "add", "-A"], cwd=tmp_path, check=True)
-    subprocess.run(["git", "commit", "-qm", "base"], cwd=tmp_path, check=True)
+@pytest.fixture
+def committed_repo(tmp_path, monkeypatch, isolated_git_config):
+    """The shared builder with a tracked file to dirty, anchored for the hook
+    resolvers."""
+    init_git_repo(tmp_path, files={"tracked.txt": "hello\n"})
     monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(tmp_path))
     return tmp_path
 
@@ -1356,50 +1298,45 @@ class TestFrameworkStateIsNotAUserChange:
     by hand.
     """
 
-    def test_runtime_cache_is_ignored(self, tmp_path, monkeypatch):
+    def test_runtime_cache_is_ignored(self, committed_repo):
         import superclaude.scripts.insight_writer as iw
 
-        repo = _committed_repo(tmp_path, monkeypatch)
-        state = repo / ".claude" / ".superclaude_hooks"
+        state = committed_repo / ".claude" / ".superclaude_hooks"
         state.mkdir(parents=True)
         (state / "claude_context_abc.txt").write_text("cached\n", encoding="utf-8")
 
         assert iw._status_lines() == []
 
-    def test_pending_insights_are_ignored(self, tmp_path, monkeypatch):
+    def test_pending_insights_are_ignored(self, committed_repo):
         import superclaude.scripts.insight_writer as iw
 
-        repo = _committed_repo(tmp_path, monkeypatch)
-        (repo / ".claude").mkdir()
-        (repo / ".claude" / "insights.pending.jsonl").write_text(
+        (committed_repo / ".claude").mkdir()
+        (committed_repo / ".claude" / "insights.pending.jsonl").write_text(
             '{"text": "x"}\n', encoding="utf-8"
         )
 
         assert iw._status_lines() == []
 
-    def test_agent_memory_is_ignored(self, tmp_path, monkeypatch):
+    def test_agent_memory_is_ignored(self, committed_repo):
         import superclaude.scripts.insight_writer as iw
 
-        repo = _committed_repo(tmp_path, monkeypatch)
-        memory = repo / ".claude" / "agent-memory" / "system-architect"
+        memory = committed_repo / ".claude" / "agent-memory" / "system-architect"
         memory.mkdir(parents=True)
         (memory / "notes.md").write_text("note\n", encoding="utf-8")
 
         assert iw._status_lines() == []
 
-    def test_a_real_edit_still_counts(self, tmp_path, monkeypatch):
+    def test_a_real_edit_still_counts(self, committed_repo):
         import superclaude.scripts.insight_writer as iw
 
-        repo = _committed_repo(tmp_path, monkeypatch)
-        (repo / "tracked.txt").write_text("edited\n", encoding="utf-8")
+        (committed_repo / "tracked.txt").write_text("edited\n", encoding="utf-8")
 
         assert iw._status_lines()
 
-    def test_a_new_source_file_still_counts(self, tmp_path, monkeypatch):
+    def test_a_new_source_file_still_counts(self, committed_repo):
         import superclaude.scripts.insight_writer as iw
 
-        repo = _committed_repo(tmp_path, monkeypatch)
-        (repo / "new_module.py").write_text("x = 1\n", encoding="utf-8")
+        (committed_repo / "new_module.py").write_text("x = 1\n", encoding="utf-8")
 
         assert iw._status_lines()
 
@@ -1413,14 +1350,15 @@ class TestSessionBaselineDecidesTheAsk:
     asks the question the prompt text actually claims to ask.
     """
 
-    def test_pre_existing_dirt_does_not_trigger(self, tmp_path, monkeypatch, capsys):
+    def test_pre_existing_dirt_does_not_trigger(
+        self, monkeypatch, committed_repo, capsys
+    ):
         import superclaude.scripts.insight_writer as iw
 
-        repo = _committed_repo(tmp_path, monkeypatch)
         monkeypatch.setattr(
-            iw, "hook_state_dir", lambda: tmp_path / ".git" / "sc-state"
+            iw, "hook_state_dir", lambda: committed_repo / ".git" / "sc-state"
         )
-        (repo / "tracked.txt").write_text(
+        (committed_repo / "tracked.txt").write_text(
             "dirty before the session\n", encoding="utf-8"
         )
 
@@ -1433,19 +1371,18 @@ class TestSessionBaselineDecidesTheAsk:
             "a session that changed nothing was asked for a lesson"
         )
 
-    def test_a_change_after_the_baseline_triggers(self, tmp_path, monkeypatch, capsys):
-        import json
-
+    def test_a_change_after_the_baseline_triggers(
+        self, monkeypatch, committed_repo, capsys
+    ):
         import superclaude.scripts.insight_writer as iw
 
-        repo = _committed_repo(tmp_path, monkeypatch)
         monkeypatch.setattr(
-            iw, "hook_state_dir", lambda: tmp_path / ".git" / "sc-state"
+            iw, "hook_state_dir", lambda: committed_repo / ".git" / "sc-state"
         )
 
         iw.main(["session-baseline", "--session-id", "s2"])
         capsys.readouterr()
-        (repo / "tracked.txt").write_text(
+        (committed_repo / "tracked.txt").write_text(
             "changed during the session\n", encoding="utf-8"
         )
 
@@ -1455,18 +1392,15 @@ class TestSessionBaselineDecidesTheAsk:
         assert payload["decision"] == "block"
 
     def test_without_a_baseline_it_falls_back_to_the_proxy(
-        self, tmp_path, monkeypatch, capsys
+        self, monkeypatch, committed_repo, capsys
     ):
         """An install whose SessionStart hook is not registered still works."""
-        import json
-
         import superclaude.scripts.insight_writer as iw
 
-        repo = _committed_repo(tmp_path, monkeypatch)
         monkeypatch.setattr(
-            iw, "hook_state_dir", lambda: tmp_path / ".git" / "sc-state"
+            iw, "hook_state_dir", lambda: committed_repo / ".git" / "sc-state"
         )
-        (repo / "tracked.txt").write_text("dirty\n", encoding="utf-8")
+        (committed_repo / "tracked.txt").write_text("dirty\n", encoding="utf-8")
 
         iw.main(["request", "--session-id", "s3"])
 
@@ -1723,8 +1657,6 @@ class TestHarvestRemembersWhatItPromoted:
     """
 
     def test_a_promoted_marker_is_not_harvested_again(self, workdir, monkeypatch):
-        import argparse
-
         ns, pdir = _harvest(workdir, monkeypatch, "sess1")
         _make_transcript(
             pdir,
@@ -1766,8 +1698,6 @@ class TestTranscriptComesFromThePayload:
     """
 
     def test_the_given_path_wins_over_the_guess(self, workdir, monkeypatch):
-        import argparse
-
         _ns, pdir = _harvest(workdir, monkeypatch, "sess1")
         _make_transcript(
             pdir,
@@ -1817,8 +1747,6 @@ class TestStopCollectsItsOwnAnswer:
     """
 
     def test_the_next_stop_harvests_the_reply(self, workdir, monkeypatch, capsys):
-        import argparse
-
         _ns, pdir = _harvest(workdir, monkeypatch, "sess-answer")
         monkeypatch.setattr(iw, "_session_changed_code", lambda _session: True)
         monkeypatch.delenv("SUPERCLAUDE_INSIGHT_PROMPT", raising=False)
@@ -1856,8 +1784,6 @@ class TestStopCollectsItsOwnAnswer:
         assert _pending_texts(workdir) == ["the answer must survive a lost SessionEnd"]
 
     def test_it_collects_only_once(self, workdir, monkeypatch, capsys):
-        import argparse
-
         _ns, pdir = _harvest(workdir, monkeypatch, "sess-once")
         monkeypatch.setattr(iw, "_session_changed_code", lambda _session: True)
         monkeypatch.delenv("SUPERCLAUDE_INSIGHT_PROMPT", raising=False)

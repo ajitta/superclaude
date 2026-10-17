@@ -6,7 +6,6 @@ Cross-platform compatible (Windows/macOS/Linux).
 
 Only runs when a source code file is edited (not configs, docs, etc.).
 Respects SUPERCLAUDE_AUTO_TEST=0 env var to disable.
-Checks stop_hook_active to prevent infinite loops (Claude Code best practice).
 Outputs structured JSON systemMessage so Claude can react to results.
 """
 
@@ -202,10 +201,6 @@ def main() -> None:
         return
 
     try:
-        # Prevent infinite loops when Claude is stopping
-        if data.get("stop_hook_active"):
-            return
-
         file_path = data.get("tool_input", {}).get("file_path", "")
 
         detected = detect_authoring_test(file_path)

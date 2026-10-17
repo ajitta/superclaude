@@ -2,13 +2,13 @@
 
 from __future__ import annotations
 
-import subprocess
 from pathlib import Path
 from unittest.mock import patch
 
 import pytest
 
 from superclaude.scripts.auto_improve.coordinator import (
+    MAX_CONSECUTIVE_REFUSALS,
     Coordinator,
     CoordinatorConfig,
     status_mode,
@@ -16,21 +16,13 @@ from superclaude.scripts.auto_improve.coordinator import (
 from superclaude.scripts.auto_improve.eval_runner import EvalResult
 from superclaude.scripts.auto_improve.mutator import MutationResult
 from superclaude.scripts.auto_improve.results_tsv import ResultsTsv
-
-
-def _git(args, cwd):
-    return subprocess.run(args, cwd=cwd, capture_output=True, text=True, check=True)
+from tests.conftest import init_git_repo
 
 
 @pytest.fixture
-def repo(tmp_path):
-    _git(["git", "init", "-b", "main"], cwd=tmp_path)
-    _git(["git", "config", "user.email", "t@e.com"], cwd=tmp_path)
-    _git(["git", "config", "user.name", "T"], cwd=tmp_path)
-    (tmp_path / "README.md").write_text("seed", encoding="utf-8")
-    _git(["git", "add", "."], cwd=tmp_path)
-    _git(["git", "commit", "-m", "seed"], cwd=tmp_path)
-    return tmp_path
+def repo(tmp_path, isolated_git_config):
+    """The shared builder, seeded with the exact bytes the rollback test asserts."""
+    return init_git_repo(tmp_path, files={"README.md": "seed"})
 
 
 def _make_config(repo: Path, **overrides) -> CoordinatorConfig:
@@ -300,8 +292,6 @@ def test_consecutive_refusals_stop_the_loop(repo):
     """A refusal on the mutator prompt is deterministic; after
     MAX_CONSECUTIVE_REFUSALS in a row the loop stops instead of spending the
     whole budget on identical refusals."""
-    from superclaude.scripts.auto_improve.coordinator import MAX_CONSECUTIVE_REFUSALS
-
     cfg = _make_config(repo, budget_seconds=3600)
     with (
         patch(
@@ -327,8 +317,6 @@ def test_consecutive_refusals_stop_the_loop(repo):
 
 
 def test_non_refused_error_resets_the_refusal_streak(repo):
-    from superclaude.scripts.auto_improve.coordinator import MAX_CONSECUTIVE_REFUSALS
-
     cfg = _make_config(repo, budget_seconds=3600)
     refused = MutationResult(
         rationale="",

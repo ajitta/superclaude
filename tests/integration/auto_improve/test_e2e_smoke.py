@@ -12,25 +12,8 @@ from __future__ import annotations
 import subprocess
 import sys
 
-import pytest
 
-
-def _git(args, cwd):
-    return subprocess.run(args, cwd=cwd, capture_output=True, text=True, check=True)
-
-
-@pytest.fixture
-def repo(tmp_path):
-    _git(["git", "init", "-b", "main"], cwd=tmp_path)
-    _git(["git", "config", "user.email", "t@e.com"], cwd=tmp_path)
-    _git(["git", "config", "user.name", "T"], cwd=tmp_path)
-    (tmp_path / "README.md").write_text("seed\n", encoding="utf-8")
-    _git(["git", "add", "."], cwd=tmp_path)
-    _git(["git", "commit", "-m", "seed"], cwd=tmp_path)
-    return tmp_path
-
-
-def test_e2e_dry_run_baseline(repo, tmp_path):
+def test_e2e_dry_run_baseline(git_repo, tmp_path):
     eval_script = tmp_path / "eval.py"
     eval_script.write_text(
         'import sys, json; sys.stdout.write(json.dumps({"passed": 1}))',
@@ -44,7 +27,7 @@ def test_e2e_dry_run_baseline(repo, tmp_path):
             "-m",
             "superclaude.scripts.auto_improve",
             "--project",
-            str(repo),
+            str(git_repo),
             "--eval-cmd",
             eval_cmd,
             "--metric",
@@ -59,7 +42,7 @@ def test_e2e_dry_run_baseline(repo, tmp_path):
     )
     assert proc.returncode == 0, f"stderr: {proc.stderr}"
 
-    worktrees = sorted((repo / ".worktrees").iterdir())
+    worktrees = sorted((git_repo / ".worktrees").iterdir())
     assert len(worktrees) == 1
     tsv = (worktrees[0] / "results.tsv").read_text(encoding="utf-8").splitlines()
     assert tsv[0].startswith("# cycle_id")
@@ -72,14 +55,14 @@ def test_e2e_dry_run_baseline(repo, tmp_path):
     assert "baseline" in proc.stdout.lower()
 
 
-def test_status_mode_after_no_run(repo):
+def test_status_mode_after_no_run(git_repo):
     proc = subprocess.run(
         [
             sys.executable,
             "-m",
             "superclaude.scripts.auto_improve",
             "--project",
-            str(repo),
+            str(git_repo),
             "--status",
         ],
         capture_output=True,

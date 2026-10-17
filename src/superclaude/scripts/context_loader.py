@@ -127,9 +127,12 @@ TRIGGER_MAP = [
         "mcp/MCP_Chrome-DevTools.md",
         2,
     ),
-    # Business symbols - supplementary reference
+    # Business symbols - supplementary reference. "business symbol" is the
+    # wording of business-panel.md's --structured flag and FLAGS.md; the
+    # "panel-example" path is what core/README.md documents. Nothing documents
+    # "strategic symbol" or "business example", so those alternatives were cut.
     (
-        r"(business.?symbol|strategic.?symbol|business.?example|panel.?example|/sc:business-panel\b.*--structured)",
+        r"(business.?symbol|panel.?example|/sc:business-panel\b.*--structured)",
         "core/BUSINESS_SYMBOLS.md",
         3,
     ),
@@ -137,13 +140,17 @@ TRIGGER_MAP = [
     (r"(--brainstorm|--bs)", "modes/MODE_Brainstorming.md", 1),
     # `--vs` is declared a mode flag in core/FLAGS.md <modes>; the NL forms stay
     # multi-word on purpose — a bare "vs" is a comparison preposition, not a trigger.
+    # The hyphenated labels (VS-CoT, VS-Multi) are the mode's own section names,
+    # not a documented way to ask for it; `--vs cot` is covered by `--vs\b`.
     (
-        r"(--vs\b|verbalized.?sampling|vs-(cot|multi|standard)|multiple perspectives|diverse responses)",
+        r"(--vs\b|verbalized.?sampling|multiple perspectives|diverse responses)",
         "modes/MODE_Verbalized_Sampling.md",
         1,
     ),
+    # `self-analysis` is the FLAGS.md description of --introspect; nothing in the
+    # content tree tells a user to say "analyze reasoning".
     (
-        r"(--introspect|self.?analysis|analyze reasoning)",
+        r"(--introspect|self.?analysis)",
         "modes/MODE_Introspection.md",
         2,
     ),
@@ -159,8 +166,11 @@ TRIGGER_MAP = [
         "modes/MODE_DeepResearch.md",
         1,
     ),
+    # "multi-expert" is the vocabulary of both panels (spec-panel.md and
+    # business-panel.md describe themselves with it), so it routed a spec
+    # critique to the business roster; the flag, the phrase and the command stay.
     (
-        r"(--business-panel|business.?panel|multi.?expert|strategic.?analysis|/sc:business-panel)",
+        r"(--business-panel|business.?panel|strategic.?analysis|/sc:business-panel)",
         "modes/MODE_Business_Panel.md",
         1,
     ),
