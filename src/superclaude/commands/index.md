@@ -38,11 +38,8 @@ description: Generate project documentation and a knowledge base under docs/repo
 
 
   <tools>
-  - Read/Grep/Glob: Structure analysis + content extraction
   - Write: Doc creation + cross-referencing
   - Edit: in-place updates of an existing API.md or README.md
-  - TaskCreate/TaskUpdate: Multi-component progress
-  - Agent: Large-scale doc delegation
   </tools>
 
   <examples>

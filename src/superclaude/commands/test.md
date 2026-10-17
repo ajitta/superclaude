@@ -37,10 +37,6 @@ description: Execute tests with coverage analysis and quality reporting. On requ
 
 
   <tools>
-  - Bash: Test runner execution
-  - Glob: Test discovery + patterns
-  - Grep: Result parsing + failure analysis
-  - Write: Coverage reports + summaries
   - Agent: dispatch the `verifier` agent for a fresh-context run-and-report pass — it runs the project's commands, exercises the changed behavior, compares with the plan doc (05-plan.md Proof section and task list) and reports every mismatch without fixing; its description limits it to explicit requests for run-and-report evidence
   </tools>
 
@@ -54,9 +50,6 @@ description: Execute tests with coverage analysis and quality reporting. On requ
 | Input | Output |
 |---|---|
 | `/sc:test` | All tests + basic coverage |
-| `src/components --type unit --coverage` | Targeted coverage |
-| `--type e2e` | Playwright browser testing |
-| `--watch --fix` | Continuous + auto-fix |
 | `--tdd src/auth/` | RED-GREEN-REFACTOR cycle for auth module |
 
   <example name="retry-without-diagnosis" type="error-path">

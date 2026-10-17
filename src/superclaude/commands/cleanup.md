@@ -38,11 +38,7 @@ description: Systematic code cleanup — remove dead code and optimize project s
 
 
   <tools>
-  - Read/Grep/Glob: analyze and detect patterns
-  - Edit: apply safe changes
   - Bash: delete files the user confirmed
-  - TaskCreate/TaskUpdate: track progress
-  - Agent: delegate large-scale cleanups
   </tools>
 
   <validator_checks note="--type docs only">
@@ -56,10 +52,6 @@ description: Systematic code cleanup — remove dead code and optimize project s
 
 | Input | Output |
 |---|---|
-| `src/ --type code --safe` | Conservative cleanup |
-| `--type imports --safe` | Unused import analysis |
-| `--type all --interactive` | Multi-domain with guidance |
-| `components/ --aggressive` | Thorough cleanup |
 | `--type docs --dry-run` | Preview what --apply would change, nothing applied |
 | `--type docs` | Report doc violations and promotion candidates, no changes |
 | `--type docs --apply` | Fix frontmatter shape + regenerate README `## Documents` |

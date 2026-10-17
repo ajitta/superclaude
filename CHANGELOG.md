@@ -14,6 +14,11 @@ Releases before 4.19.0 are not listed. Their history is the git log; the upstrea
 - Every hook reads its stdin through one `utils.read_hook_input`; malformed or non-object input is ignored silently by all of them (`test-runner` no longer writes `invalid JSON input` to stderr).
 - `superclaude install` and `superclaude doctor` report a missing or foreign `superclaude` on PATH with the same wording; install's version-mismatch warning now carries the repair hint too.
 - `superclaude auto-improve`: guards return plain booleans (the `GuardVerdict` type is gone); the unused `WorktreeManager.cleanup` and `Worktree.init_results_tsv` are removed — worktrees were already kept after a run.
+- `core/rules/RULES_QUALITY.md` states the >3-files ask-first rule once (it was restated three times); on `/sc:analyze --delegate` the loader now fits `RULES_DOCS.md` into the 8K budget — `RULES_INTERACTION.md` (~280 tokens) is the file that no longer fits on that prompt.
+- The business-panel expert roster lives only in `agents/business-panel-experts.md`; `MODE_Business_Panel.md` and `core/BUSINESS_SYMBOLS.md` point to it instead of repeating it. Triggers and flags are unchanged.
+- The `project-manager` agent records patterns and mistakes in `.claude/memories/learnings_<topic>.md` — where `/sc:save` writes — instead of a `docs/memory/` folder nothing else used.
+- `/sc:roadmap` stops on a `status: draft` source spec and points to `/sc:review --scope spec`, as `/sc:plan` already did.
+- Command files lost `<tools>` lists that only enumerated Claude Code's native tools (whole section in 10 commands, trimmed to instruction-carrying lines in 9) and `<examples>` rows whose output cell only restated the flag (33 rows in 12 commands). `MODE_Orchestration.md` defers the Write-Return and Schema-vs-Evidence rules to `RULES_DELEGATION.md` instead of restating them. Nothing changes which file loads when.
 
 ### Fixed
 

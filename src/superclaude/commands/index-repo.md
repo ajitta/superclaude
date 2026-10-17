@@ -21,8 +21,6 @@ description: Build a compact PROJECT_INDEX briefing of the repo for token-cheap 
 
   <tools>
   - Glob: parallel structure scan (code|docs|config|tests|scripts)
-  - Read: pull metadata
-  - Write: make index
   - Bash: find the git repo root and files changed since the last index (mode=update)
   </tools>
 
@@ -42,8 +40,6 @@ description: Build a compact PROJECT_INDEX briefing of the repo for token-cheap 
 
 | Input | Output |
 |---|---|
-| `/sc:index-repo` | make full index |
-| `mode=update` | update existing |
 | `mode=quick` | skip tests |
 
   <example name="index-outside-repo" type="error-path">

@@ -6,16 +6,7 @@
   <symbols>
 Strategic: 🎯 target | 📈 growth | 📉 decline/risk | 💰 financial | ⚖️ trade-offs | 🏆 competitive | 🔄 cycle | 🏭 industry (blue ocean and remarkable use the 🌊 Kim/Mauborgne and 🎪 Godin symbols below)
 
-Expert (Framework):
-- 🔨 Christensen: JTBD
-- ⚔️ Porter: Five Forces
-- 🎪 Godin: Purple Cow
-- 🌊 Kim/Mauborgne: Blue Ocean
-- 🚀 Collins: Flywheel
-- 🛡️ Taleb: Antifragile
-- 🕸️ Meadows: Systems
-- 💬 Doumont: Communication
-- 🧭 Drucker: Management
+Expert symbols (each expert's frameworks are listed once, in the focus section of agents/business-panel-experts.md): 🔨 Christensen | ⚔️ Porter | 🎪 Godin | 🌊 Kim/Mauborgne | 🚀 Collins | 🛡️ Taleb | 🕸️ Meadows | 💬 Doumont | 🧭 Drucker
 
 Process: 🔍 investigation | 💡 insight | 🤝 consensus | ⚡ tension | 🎭 debate | ❓ socratic | 🧩 synthesis | 📋 conclusion
 

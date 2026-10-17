@@ -11,22 +11,21 @@
 
   <communication>Explain tool selection rationale when non-obvious | Report parallel execution plans before running | Surface constraint-driven trade-offs</communication>
 
-  <priorities>Effectiveness > familiarity | Parallel > sequential | System constraints > ideal solution | Task-fit tool > blanket MCP-first (symbol-aware tool (LSP or code index) for symbol/semantic ops, native for text patterns)</priorities>
+  <priorities>Effectiveness > familiarity | Parallel > sequential | System constraints > ideal solution | Task-fit tool > blanket MCP-first</priorities>
 
   <behaviors>
-  - Tool-Task Matching: Route each operation to the strongest available tool — full routing in core/FLAGS.md mcp section (e.g., docs → Context7, browser → Playwright, web → Tavily skills, perf → DevTools); symbol ops → symbol-aware tool (LSP or code index) when connected
+  - Tool-Task Matching: Route each operation to the strongest available tool — full routing in core/FLAGS.md mcp section (e.g., docs → Context7, browser → Playwright, web → Tavily skills, perf → DevTools); symbol ops → symbol-aware tool (LSP or code index) when connected, native tools for text patterns
   - Batching: Group independent operations into concurrent execution blocks
   - Constraint-Adaptive: Degrade gracefully when preferred tools are unavailable
   - Verification-First: Consult official docs before infra/config changes — never assume correctness
   </behaviors>
 
   <fan_out_execution>
-  This section applies only when the harness exposes the Workflow tool (it appears in the tool list); otherwise independent streams go to Agent-tool delegates. Posture for the Workflow tool — the deterministic multi-subagent executor the framework governs in policy (delegation decision, Delegate packet, verification ladder) but ships no runtime for. Author a Workflow when work splits into 3+ independent streams or the exploration is large enough to flood the main context; use a single Agent-tool delegate for one stream; stay solo on trivial or conversational turns.
+  This section applies only when the harness exposes the Workflow tool (it appears in the tool list); otherwise independent streams go to Agent-tool delegates. Posture for the Workflow tool — the deterministic multi-subagent executor the framework governs in policy (delegation decision, Delegate packet, verification ladder) but ships no runtime for. Whether to fan out at all follows the sub-agent decision in core/rules/RULES_DELEGATION.md; one stream gets a single Agent-tool delegate; trivial or conversational turns stay solo.
   - Pipeline-Default: chain dependent stages with pipeline (no barrier, stages stream); reserve parallel (full barrier — every thunk finishes before continuing) for genuinely independent streams that must rejoin.
   - Packet-Prompt: the Workflow executor forwards no parent intent or system prompt — the Delegate packet (core/rules/RULES_DELEGATION.md) travels in each agent() prompt.
   - Cap-Aware: author for the harness's own limits on parallel subagents, not the requested width; --concurrency sets tool calls per message and does not raise those limits.
-  - Write-Return: subprocess file writes are discarded — fan-out RETURNS artifacts, main loop performs every Write; approval checkpoints fire in the main loop (full rule: core/rules/RULES_DELEGATION.md).
-  - Schema-vs-Evidence: opts.schema hardens return shape only, never evidence truth — cited-file:line revalidation per core/rules/RULES_DELEGATION.md stays mandatory.
+  - Write-Return and Schema-vs-Evidence: as core/rules/RULES_DELEGATION.md workflow delegation states them — fan-out returns artifacts and the main loop performs every Write and approval checkpoint; a schema hardens return shape, never evidence truth.
   - Context-Carry: mode and MCP injection is main-loop-only; a subagent needing Context7 or Tavily gets it named in the agent() prompt, never auto-injected.
   </fan_out_execution>
 

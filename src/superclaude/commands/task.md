@@ -39,13 +39,6 @@ description: Execute complex tasks as a tracked Epic → Story → Task hierarch
     </usage>
   </task_cleanup>
 
-  <tools>
-  - TaskCreate/TaskUpdate: Epic → Story → Task hierarchy
-  - Agent: Sub-agent delegation for parallel work
-  - Read/Write/Edit: Implementation + coordination
-  - Grep/Glob: Dependency mapping
-  </tools>
-
   <patterns>
     - Hierarchy: Epic → Story → Task → Subtask
     - Strategy: Sequential (strict deps) | Parallel (independent streams) | Adaptive (discover then parallelize)
@@ -67,7 +60,6 @@ description: Execute complex tasks as a tracked Epic → Story → Task hierarch
 | `cleanup --dry-run` | Preview cleanup, no deletion |
 
   </examples>
-
 
   <gotchas>
   - task-count: avoid excessive sub-tasks; break each feature into at most 3-7 tasks

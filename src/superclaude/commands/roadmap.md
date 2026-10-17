@@ -10,7 +10,7 @@ description: Generate a phased implementation workflow from PRDs and feature req
   <syntax>/sc:roadmap [prd-file|feature] [--strategy systematic|agile|enterprise] [--depth shallow|normal|deep] [--delegate]</syntax>
 
   <flow>
-  1. Analyze: Parse PRD + understand requirements
+  1. Analyze: Parse PRD + understand requirements. A source spec that is still `status: draft` → stop and point to `/sc:review --scope spec <path>` (the same review gate /sc:plan applies)
   2. Plan: Workflow structure + dependency mapping
   3. Consult: Domain agents may be consulted for analysis; they return findings, and the main loop writes the doc
   4. Sequence: Order the workflow steps and their task dependencies; nothing is executed
@@ -33,10 +33,7 @@ description: Generate a phased implementation workflow from PRDs and feature req
 
 
   <tools>
-  - Read/Write/Edit: PRD analysis + workflow docs
-  - TaskCreate/TaskUpdate: Multi-phase progress tracking
   - Agent: Domain-agent analysis; agents return findings, the main loop writes the doc
-  - WebSearch: Tech research + framework validation
   </tools>
 
   <examples>

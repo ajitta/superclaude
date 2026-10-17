@@ -34,13 +34,6 @@ description: Write detailed implementation plans with TDD tasks, exact file path
   | Standalone path: `docs/plans/<feature-name>-<username>-YYYY-MM-DD.md` | One-off plan, no related work expected |
   </outputs>
 
-
-  <tools>
-  - Read: Spec + codebase analysis
-  - Grep/Glob: File structure map
-  - Write: Plan doc make
-  </tools>
-
   <templates>
 Plan header:
   # [Feature] Implementation Plan
@@ -79,7 +72,6 @@ Plan footer:
   </examples>
 
   <size_note>Per-file size limit and the by-phase split of an over-limit plan: core/rules/RULES_DOCS.md `<doc_output_convention>` (Size).</size_note>
-
 
   <gotchas>
   - existing-plan: Check if plan already exist for this feature before make new one

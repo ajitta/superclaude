@@ -32,14 +32,6 @@ description: Build, compile and package projects with error analysis and optimiz
 | test | output directory named in the build config (tool-generated) | Console: build output + test config |
   </outputs>
 
-
-  <tools>
-  - Bash: run the build
-  - Read: read the build config
-  - Grep: parse errors
-  - Glob: find artifacts
-  </tools>
-
   <examples>
 
 | Input | Output |

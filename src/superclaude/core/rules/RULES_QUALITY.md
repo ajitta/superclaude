@@ -10,7 +10,7 @@
 [R03 Diagnosis] 🟡: when the symptom could come from the runtime (service errors, connection or startup failures, behavior that differs across machines or branches), check ports, processes, branch and env vars before reading code; name the top cause with the file:line or command output that supports it; falsify before confirm
 [R06 Scope] 🟡: kernel `<scope_discipline>`; measurable: 0 unsolicited files, 0 adjacent refactors
 [R12 Clarification] 🟡: ambiguous request (2+ valid interpretations) — branch by reversibility. Reversible + low-risk: state assumption explicit, make minimal change, surface diff/evidence so user can verify or redirect. Irreversible, high-blast-radius (>3 files/services), or security/data/destructive: ask before act. Default: bounded proceed; ask only in the cases just listed.
-[R13 Intent Verification] 🟡: when the request has two or more plausible targets, or the task direction shifts mid-conversation, state in one sentence the interpretation being acted on, then proceed. Confirm before acting only when R12's ask-first branch applies (irreversible, >3 files/services, or security/data/destructive). Skip for: single-file edits, explicit file paths, continuation of confirmed plan.
+[R13 Intent Verification] 🟡: when the request has two or more plausible targets, or the task direction shifts mid-conversation, state in one sentence the interpretation being acted on, then proceed. Confirm before acting only when R12's ask-first branch applies. Skip for: single-file edits, explicit file paths, continuation of confirmed plan.
 [R14 Correction Capture] 🟡: when user correct contextual misunderstanding (not typo), save a feedback memory in the layout Claude Code's memory instructions give, stating the prevention, what was misread and what was meant; its body carries `violated_rule: "[RNN Name]"` — required (without it the entry drops out of the /sc:analyze --focus rules compliance heatmap). Auto memory off (no auto memory folder named in the system prompt or the first message) → .claude/memories/learnings_corrections.md
 [R15 Verification] 🟡: kernel `<verification_before_completion>`; effort per blast radius: `<verification_ladder>`. Unable to verify at all → state "verification not possible: [reason]"
 [R16 Safe Read] 🟡: use limit for unknown-size files (hook blocks reads ≥30KB without limit/pages); files <30KB read whole; large data → jq; logs/transcripts → Grep; generated docs → per-file size limit in RULES_DOCS Size
@@ -29,7 +29,7 @@
   | User: "rename `cfg` to something clearer" (low-risk, reversible) | Asks: "what name?" before any change | Picks `config`, makes the rename, surfaces diff: "redirect if you wanted a different name" | Clarification 🟡 |
   | 42/42 tests pass | "All tests pass" | "42/42 pass (baseline: 40, +2 new)" | Verification 🟡 |
   | 33/42 tests pass after change | "33/42 pass" — ships | "33/42 pass; 7 pre-existing failures unchanged from baseline, 2 new regressions in auth — block until resolved" | Verification 🟡 |
-  | User: "restructure the auth module" (moves files across src/auth/: >3 files in a security area → ask-first) | Starts moving files | "To confirm: reorganize file structure of src/auth/, not rewrite logic. Correct?" | Intent Verification 🟡 |
+  | User: "restructure the auth module" (>3 files in a security area → ask-first) | Starts moving files | "To confirm: reorganize file structure of src/auth/, not rewrite logic. Correct?" | Intent Verification 🟡 |
   | User corrects: "no, the API routes" | Switches files silently | Saves feedback memory: confirm the target subtree before editing (read 'restructure auth' as middleware, meant API routes); violated_rule: "[R13 Intent Verification]" | Correction Capture 🟡 |
   | Exploring unfamiliar class | Read entire 500-line file | symbol overview → definition query (targeted Grep when no symbol-aware tool is connected) | Symbolic-First 🟡 |
   | Model proposes adding retry logic | "This would be more resilient" | "System works without this. No failure scenario → SKIP." | Necessity Test 🟡 |
@@ -59,13 +59,8 @@ Do NOT simplify (complexity = essential): Security/auth | Accessibility/WCAG | C
   </anti_over_engineering>
 
   <thresholds>
-  - Scope tiers: see <checklist_scaling> (single source)
-  - Ask-first trigger: >3 units of impact (files, modules, services, tables, endpoints) — unit depends on agent domain
+  - Ask-first trigger ([R12 Clarification]): >3 units of impact — the unit depends on the agent domain (files, modules, services, tables, endpoints; backend-architect uses ">2 tables" because DB migration blast radius differs from file count)
   - Sub-agent trigger: 3+ independent parallel streams OR exploration large enough to flood the main context (see core/rules/RULES_DELEGATION.md `<sub_agent_decision>`)
-  - Intent verification: two or more plausible targets, or mid-conversation direction shift (see [R13 Intent Verification])
-  - Status check: duplicate-work check before implementation (see [R02 Status Check])
-  - Read budget: see [R16 Safe Read] (hook blocks ≥30KB without limit)
-  Variance expected for domain semantics (e.g., backend-architect uses ">2 tables" because DB migration blast radius differs from file count).
   </thresholds>
 
   <checklist_scaling>

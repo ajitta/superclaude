@@ -41,8 +41,6 @@ description: Load session context from the project memory folder (.claude/memori
 |---|---|
 | `/sc:load` | Current dir + memory folder + auto memory |
 | `/path/to/project --type project --analyze` | Specific project with analysis |
-| `session_123 --type checkpoint` | Restore checkpoint |
-| `--type deps --refresh` | Fresh dep analysis |
 
   <example name="load-wrong-project" type="error-path">
     - Input: /sc:load /path/to/wrong/project --type project

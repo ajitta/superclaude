@@ -39,21 +39,7 @@ description: Design system architecture, APIs and component interfaces as specs 
   Required in every type: an "Areas of concern" section listing policy conflicts and unmet intent, or "none".
   </outputs>
 
-
-  <tools>
-  - Read: Requirements analysis
-  - Grep/Glob: System structure investigation
-  - Write: Design documentation
-  - Bash: External design tools
-  </tools>
-
   <examples>
-| Input | Output |
-|---|---|
-| `user-mgmt --type architecture --format diagram` | System architecture |
-| `payment-api --type api --format spec` | API specification |
-| `notification-service --type component --format code` | Component interface |
-| `e-commerce-db --type database --format diagram` | Schema design |
   <example name="design-without-requirements" type="error-path">
     - Input: /sc:design payment-api --type api (no context about payment provider or requirements)
     - Why wrong: Design without requirements lead to assumptions that may not match business needs.
@@ -61,7 +47,6 @@ description: Design system architecture, APIs and component interfaces as specs 
   </example>
 
   </examples>
-
 
   <gotchas>
   - over-architect: Apply [R18 Necessity Test] to each proposed component. Only design what needed now

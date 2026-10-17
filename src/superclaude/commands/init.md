@@ -89,7 +89,6 @@ description: Interactive project setup — pick and run init tasks for first-ses
 
 
   <tools>
-  - Read/Grep/Glob: Project detection and analysis
   - Write/Edit: CLAUDE.md, PROJECT_INDEX.md, auto memory files
   - Bash: Dependency installation, test execution, git history analysis
   - Agent(repo-index): Delegate structure analysis for task (a)

@@ -33,16 +33,6 @@ description: Code analysis across quality, security, performance, architecture d
   | `report` (standalone path) | `docs/analysis/<target>-<username>-YYYY-MM-DD.md` | Full report, one-off analysis |
   </outputs>
 
-
-
-  <tools>
-  - Glob: File discovery
-  - Grep: Pattern analysis
-  - Read: Source inspection
-  - Bash: External tools
-  - Write: Report generation (--format json|report)
-  </tools>
-
   <focus_agent_mapping>
   When --focus specified and task benefits from specialist depth, delegate to corresponding agent:
   security → @security-engineer | perf → @performance-engineer | quality → @quality-engineer | arch → @system-architect | a11y → @frontend-architect
@@ -85,7 +75,6 @@ description: Code analysis across quality, security, performance, architecture d
     <does>static analysis, severity-rated findings, detailed reports, quantitative rules audit (counts, frequencies, heatmaps via --focus rules).</does>
     <never>performs dynamic/runtime analysis, modifies code, analyzes external dependencies, or writes the qualitative rule-effectiveness narrative (delegate that to /sc:reflect).</never>
   </bounds>
-
 
   <handoff next="/sc:plan /sc:improve /sc:cleanup /sc:implement"/>
 </component>
