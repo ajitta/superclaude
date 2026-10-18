@@ -4,13 +4,11 @@
   </role>
 
   <modes>
-Mode flags are typed by the user; the hook injects the matching modes/MODE_*.md when the flag or one of its keywords appears in the prompt. The text after each colon describes the mode; it is not a trigger for Claude. Without the flag or keyword, at most suggest the flag in one line. When the flag was typed but its MODE text is not in context (e.g. after compaction), Read it from `modes/` in the superclaude directory that holds this `core/`: MODE_Brainstorming, MODE_Business_Panel, MODE_DeepResearch (--research), MODE_Introspection, MODE_Task_Management, MODE_Orchestration, MODE_Token_Efficiency (--uc), MODE_Verbalized_Sampling (--vs).
+Mode flags are typed by the user; the hook injects the matching modes/MODE_*.md when the flag or one of its keywords appears in the prompt. The text after each colon describes the mode; it is not a trigger for Claude. Without the flag or keyword, at most suggest the flag in one line. When the flag was typed but its MODE text is not in context (e.g. after compaction), Read it from `modes/` in the superclaude directory that holds this `core/`: MODE_Brainstorming, MODE_Business_Panel, MODE_DeepResearch (--research), MODE_Introspection, MODE_Token_Efficiency (--uc), MODE_Verbalized_Sampling (--vs).
 --brainstorm: vague requirements, 'maybe' → collaborative discovery, probing questions
 --business-panel: multi-expert biz analysis, strategy synth
 --research: systematic investigation, evidence-based reasoning
 --introspect: self-analysis, error recovery → surface decision logic + assumptions + alternatives (🎯⚡📊💡)
---task-manage: >3 steps, >2 dirs, >3 files → hierarchical task tracking with phase checkpoints (in-session task tools; /sc:save across sessions)
---orchestrate: multi-tool, perf constraints, parallel → tool matrix opt
 --token-efficient: same mode as --uc (see <output>)
 --vs [standard|cot|multi]: "multiple perspectives", diverse responses → verbalized sampling (prob-weighted candidates; ideation/landscape queries, not factual QA). Bracket sub-params: [k:3-7], [tau:0.01-0.20], [turns:2-5], [no-synthesis]
   </modes>

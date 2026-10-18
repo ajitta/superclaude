@@ -6,6 +6,12 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Ver
 
 Releases before 4.19.0 are not listed. Their history is the git log; the upstream-era changelog, last entry 4.2.1, is `CHANGELOG.md` at commit `6b0ac5c3^`.
 
+## [Unreleased]
+
+### Removed
+
+- `MODE_Task_Management.md` and `MODE_Orchestration.md`, with their flags `--task-manage` and `--orchestrate`. Measured by ablation (`docs/features/purpose-boundary/01-measurement.md` §Item 2, n=6): with the text in context, neither mode produced its own behaviors — no phase-structured report, no `/sc:save` suggestion, no stated parallel plan in any run. Both flags now answer with a redirect notice instead of silence: in-session task tools, `/sc:save` and `/sc:task` for task management; `/sc:select-tool`, the `core/FLAGS.md` mcp section and `--delegate` / `--concurrency` for tool routing and fan-out. The one Orchestration rule with no other home (Workflow `pipeline()` for dependent stages, `parallel()` only for streams that must rejoin) moved into `core/rules/RULES_DELEGATION.md` `<workflow_delegation>`. 6 modes now. The next `superclaude install` prunes the two installed files. The `sc-no-modes` eval arm and the `mode-task-manage` / `mode-orchestrate` tasks that measured them retire with them (dev-only).
+
 ## [4.29.0] - 2026-10-18
 
 ### Removed

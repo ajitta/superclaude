@@ -650,6 +650,20 @@ class TestRetiredFlagNotices:
         assert out.count("superclaude flag:") == 1
         assert "--seq" in out and "native reasoning" in out.lower()
 
+    def test_retired_task_manage_flag_redirects(self, tmp_path: Path):
+        """MODE_Task_Management.md is gone; the flag names the task tools and /sc:save."""
+        out = run_loader("implement it --task-manage", self._project(tmp_path), "s1")
+        assert out.count("superclaude flag:") == 1
+        assert "--task-manage" in out and "/sc:save" in out
+        assert "<context-inject" not in out
+
+    def test_retired_orchestrate_flag_redirects(self, tmp_path: Path):
+        """MODE_Orchestration.md is gone; the flag names /sc:select-tool."""
+        out = run_loader("fix all three --orchestrate", self._project(tmp_path), "s1")
+        assert out.count("superclaude flag:") == 1
+        assert "--orchestrate" in out and "/sc:select-tool" in out
+        assert "<context-inject" not in out
+
     def test_typo_of_a_retired_flag_redirects(self, tmp_path: Path):
         """--parellel has no valid flag within edit distance 2, so it stayed silent."""
         out = run_loader("--parellel please", self._project(tmp_path), "s1")

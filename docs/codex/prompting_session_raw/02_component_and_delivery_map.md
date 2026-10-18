@@ -24,7 +24,7 @@ pytest 카운트, coverage, description 문자 수처럼 커밋마다 바뀌는 
 | `commands/*.md` | 35 | `/sc:*` 사용자 workflow, WHAT TO DO |
 | `core` always-loaded | 3 | FLAGS, PRINCIPLES, RULES kernel |
 | `core/rules/*.md` | 4 | on-demand 상세 규칙 |
-| `modes/MODE_*.md` | 8 | 인지 자세, HOW TO THINK |
+| `modes/MODE_*.md` | 6 | 인지 자세, HOW TO THINK |
 | `modes/*CONFIG*.md` | 1 | mode 지원 설정 |
 | `mcp/MCP_*.md` | 3 | SC workflow에서 MCP를 WHEN/HOW 사용 |
 | `templates/docs-scaffold/*` | 4 | `/sc:init` 문서 scaffold |

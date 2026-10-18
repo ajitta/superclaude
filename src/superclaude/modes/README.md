@@ -16,8 +16,6 @@ Modes are activated on demand by `context_loader.py` via flag/keyword detection.
 | Business Panel | `--business-panel` | Multi-expert business analysis with adaptive interaction |
 | Deep Research | `--research` | Research mindset for systematic investigation |
 | Introspection | `--introspect` | Meta-cognitive analysis and reasoning optimization |
-| Orchestration | `--orchestrate` | Intelligent tool selection and resource efficiency |
-| Task Management | `--task-manage` | Hierarchical task organization with persistent memory |
 | Token Efficiency | `--token-efficient` / `--uc` | Selective omission for fewer output tokens without loss of clarity |
 | Verbalized Sampling | `--vs` | Distribution-level answering — k candidates with post-hoc probabilities |
 

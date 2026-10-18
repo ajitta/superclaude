@@ -24,12 +24,12 @@
 
 | Commands | Agents | Modes | MCP Servers |
 |:--------:|:------:|:-----:|:-----------:|
-| **35**   | **24** | **8** | **3**       |
+| **35**   | **24** | **6** | **3**       |
 | Slash    | Domain-expert | Behavioral | Integrations |
 
 </div>
 
-35 slash commands cover the development lifecycle from brainstorming to deployment. 8 behavioral modes auto-load on matching flags and keywords.
+35 slash commands cover the development lifecycle from brainstorming to deployment. 6 behavioral modes auto-load on matching flags and keywords.
 
 ---
 
@@ -404,13 +404,11 @@ superclaude mcp
 <td width="50%">
 
 ### 🎯 **Behavioral Modes**
-**8 adaptive modes** for different contexts:
+**6 adaptive modes** for different contexts:
 - **Brainstorming** → Socratic discovery for vague requests
 - **Business Panel** → Multi-expert strategic analysis
 - **Deep Research** → Autonomous web research
-- **Orchestration** → Efficient tool coordination
 - **Token-Efficiency** → selective omission under context pressure (`--uc`): drop what does not change the next action, never compress what stays
-- **Task Management** → Systematic organization
 - **Introspection** → Meta-cognitive analysis & error recovery
 - **Verbalized Sampling** → Probability-weighted candidate distributions (`--vs`)
 
@@ -570,7 +568,7 @@ The Deep Research system intelligently coordinates multiple tools:
 | Slash commands (35) | [`src/superclaude/commands/`](src/superclaude/commands) · `superclaude install --list-all` |
 | Orchestration commands — `/sc:agent` vs `/sc:pm` vs `/sc:task` | [`docs/reports/ORCHESTRATION_COMMANDS.md`](docs/reports/ORCHESTRATION_COMMANDS.md) |
 | Agents (24) | [`src/superclaude/agents/`](src/superclaude/agents) |
-| Modes (8) | [`src/superclaude/modes/`](src/superclaude/modes) |
+| Modes (6) | [`src/superclaude/modes/`](src/superclaude/modes) |
 | MCP servers (3) | [`src/superclaude/mcp/`](src/superclaude/mcp) |
 | Hooks (registry + scripts) | [`src/superclaude/cli/hook_dispatch.py`](src/superclaude/cli/hook_dispatch.py) · [`src/superclaude/hooks/hooks.json`](src/superclaude/hooks/hooks.json) · [`src/superclaude/scripts/`](src/superclaude/scripts) |
 | Architecture decisions | [`docs/adr/`](docs/adr) |
@@ -594,8 +592,6 @@ Flags are behavioral hints that any `/sc:*` prompt accepts. The model reads them
 | `--research` | Need evidence, citations, external knowledge | Systematic investigation, evidence-based reasoning |
 | `--business-panel` | Strategy/market/competitive analysis | Multi-expert business analysis & synthesis |
 | `--introspect` | Stuck, error recovery, "why is it doing X?" | Surfaces decision logic, assumptions and alternatives (🎯⚡📊💡 markers) |
-| `--task-manage` | >3 steps · >2 dirs · >3 files | Hierarchical task tracking with phase checkpoints (in-session task tools; /sc:save across sessions) |
-| `--orchestrate` | Multi-tool, parallel, perf-sensitive | Tool-matrix optimization |
 | `--token-efficient` / `--uc` | Context ≥ 60 % or large ops (auto with `--safe-mode`) | Selective omission — drop what does not change the next action; never compress what stays |
 | `--vs [standard\|cot\|multi]` | "Multiple perspectives", brainstorm options | Verbalized sampling — probability-weighted candidates. Sub-params: `[k:3-7] [tau:0.01-0.20] [turns:2-5] [no-synthesis]` |
 

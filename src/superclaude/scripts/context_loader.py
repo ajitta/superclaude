@@ -154,13 +154,11 @@ TRIGGER_MAP = [
         "modes/MODE_Introspection.md",
         2,
     ),
-    (r"(--task-manage)", "modes/MODE_Task_Management.md", 2),
     (
         r"(--uc|--ultracompressed|token.?efficient|--token-efficient|--safe-mode)",
         "modes/MODE_Token_Efficiency.md",
         1,
     ),
-    (r"(--orchestrate|tool.?select|/sc:select-tool)", "modes/MODE_Orchestration.md", 2),
     (
         r"(--research|deep.?research|systematic.?investigation|/sc:research)",
         "modes/MODE_DeepResearch.md",
@@ -348,8 +346,6 @@ VALID_FLAGS = {
     "business-panel",
     "research",
     "introspect",
-    "task-manage",
-    "orchestrate",
     "token-efficient",
     "c7",
     "context7",
@@ -397,6 +393,18 @@ RETIRED_FLAGS: dict[str, str] = {
     # engine, and Claude 5-family models already think between tool calls natively.
     "seq": "Sequential MCP removed — native reasoning covers it; use /effort for depth.",
     "sequential": "Sequential MCP removed — native reasoning covers it; use /effort for depth.",
+    # Both modes retired after an ablation (docs/features/purpose-boundary/
+    # 01-measurement.md §Item 2): with the text in context, the mode's own
+    # behaviors appeared in 0/6 runs. The work they named lives in commands
+    # and core/FLAGS.md.
+    "task-manage": (
+        "Task Management mode removed — in-session task tools and /sc:save "
+        "cover it; /sc:task for a tracked hierarchy."
+    ),
+    "orchestrate": (
+        "Orchestration mode removed — /sc:select-tool and the core/FLAGS.md mcp "
+        "section cover tool routing; --delegate / --concurrency for fan-out."
+    ),
 }
 
 
