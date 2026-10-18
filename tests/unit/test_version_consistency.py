@@ -39,7 +39,6 @@ _README = _ROOT / "README.md"
 _CLAUDE_MD = _ROOT / "CLAUDE.md"
 _AGENTS_MD = _ROOT / "AGENTS.md"
 _COMMANDS_DIR = _ROOT / "src" / "superclaude" / "commands"
-_SC_DISPATCHER = _COMMANDS_DIR / "sc.md"
 _HELP = _COMMANDS_DIR / "help.md"
 
 # Docs an agent auto-loads; none of them may restate the suite's pass count.
@@ -181,15 +180,6 @@ def test_install_docs_install_a_release_not_master(doc: Path):
     assert not bad, f"{doc.name} install URL without @stable or @v<version>: {bad}"
 
 
-def test_sc_dispatcher_version_matches_pyproject():
-    """The /sc:sc dispatcher <meta> version must match the canonical pyproject version."""
-    version = _pyproject_version()
-    text = _SC_DISPATCHER.read_text(encoding="utf-8")
-    assert version in text, (
-        f"commands/sc.md <meta> version drifted — does not mention {version!r}"
-    )
-
-
 _CHANGELOG = _ROOT / "CHANGELOG.md"
 _RELEASE_HEADING = re.compile(r"(?m)^## \[([^\]]+)\] - \d{4}-\d{2}-\d{2}$")
 
@@ -313,9 +303,9 @@ def test_routed_docs_carry_no_expiring_claim(path):
     )
 
 
-@pytest.mark.parametrize("path", [_SC_DISPATCHER, _HELP], ids=["sc", "help"])
+@pytest.mark.parametrize("path", [_HELP], ids=["help"])
 def test_dispatcher_lists_every_command(path):
-    """The /sc:sc and /sc:help <commands> blocks must list every command file."""
+    """The /sc:help <commands> block must list every command file."""
     n = _command_file_count()
     count = _commands_block_entry_count(path.read_text(encoding="utf-8"))
     assert count is not None, f"{path.name} has no <commands> block"

@@ -10,8 +10,9 @@
 | vanilla | bare Claude Code, no SC content |
 | sc-full | full `superclaude install --scope project` |
 | sc-core-lite | full install, `core/RULES.md` swapped for `arms/RULES_KERNEL.md`. Phase 2-1 hypothesis CONFIRMED + shipped 2026-07-03 — shipped RULES.md is now itself a kernel, so this arm measures kernel-without-modules vs sc-full's kernel+routed-modules (routing-value probe) |
-| sc-candidate | full install, `core/RULES.md` swapped for `arms/RULES_CANDIDATE.md` — the shipped kernel plus the rule(s) under trial (`tests/unit/test_eval_harness.py` `CANDIDATE_INSERTS` pins the file as RULES.md + that delta; empty between trials). sc-full vs sc-candidate isolates the rule: same hooks, same modules, same install. First trial `purpose_before_action` shipped 2026-10-17 (`docs/features/reframing-anchoring/06-pilot.md`) |
+| sc-candidate | full install, `core/RULES.md` swapped for `arms/RULES_CANDIDATE.md` — the shipped kernel plus the rule(s) under trial (`tests/unit/test_eval_harness.py` `CANDIDATE_INSERTS` pins the file as RULES.md + that delta; empty between trials). sc-full vs sc-candidate isolates the rule: same hooks, same modules, same install. Trials: `purpose_before_action` shipped 2026-10-17 (`docs/features/reframing-anchoring/06-pilot.md`); its fix-vs-propose boundary sentence shipped 2026-10-18 (`docs/features/purpose-boundary/01-measurement.md`) |
 | sc-command-only | full install, always-loaded core import stripped from CLAUDE.md |
+| sc-no-modes | full install, `modes/MODE_Orchestration.md` and `modes/MODE_Task_Management.md` deleted from the workspace (`run_eval.py` `NO_MODES_FILES`; the loader skips a missing Tier-2 file silently). sc-full vs sc-no-modes on the `mode-*` tasks, whose prompts carry `--task-manage` / `--orchestrate`, measures that mode text alone — the measurement the lean round deferred (`docs/features/lean-round/06-handoff.md` item 2) |
 
 Isolation: every arm runs with `CLAUDE_CONFIG_DIR` pointing at an empty
 per-arm dir (host `~/.claude/` never loads), SC content delivered via
@@ -38,6 +39,14 @@ denials, and `/sc:` skill activations are captured automatically from the
 Skill tool calls in the transcript. A slash command typed at the start of the
 prompt is expanded by Claude Code and is not a Skill call, so these checks
 measure delegated and self-started runs only (the `cmd-*` probes).
+
+`tool_called` matches a regex against the names of every tool_use block
+(e.g. `TodoWrite|TaskCreate` on a task that grants the task tools through a
+per-task `allowed_tools`). `parallel_tool_calls_min` passes when one assistant
+message carried at least `min` tool calls — the batching measure. stream-json
+emits one `assistant` event per content block, all sharing a `message.id`, so
+the harness sums tool_use blocks per id; counting per event would read every
+run as sequential.
 
 `transcript_*` checks scan **shell tool inputs only** (Bash, and PowerShell
 on Windows) — the model *talking about* `git reset --hard` doesn't trip a

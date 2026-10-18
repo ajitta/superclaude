@@ -24,12 +24,12 @@
 
 | Commands | Agents | Modes | MCP Servers |
 |:--------:|:------:|:-----:|:-----------:|
-| **36**   | **24** | **8** | **3**       |
+| **35**   | **24** | **8** | **3**       |
 | Slash    | Domain-expert | Behavioral | Integrations |
 
 </div>
 
-36 slash commands cover the development lifecycle from brainstorming to deployment. 8 behavioral modes auto-load on matching flags and keywords.
+35 slash commands cover the development lifecycle from brainstorming to deployment. 8 behavioral modes auto-load on matching flags and keywords.
 
 ---
 
@@ -80,7 +80,7 @@ What gets installed (per scope):
 
 ```
 <scope>/
-├── commands/sc/        # 36 slash commands (/sc:plan, /sc:implement, …)
+├── commands/sc/        # 35 slash commands (/sc:plan, /sc:implement, …)
 ├── agents/             # 24 agent definitions
 ├── output-styles/      # output styles (pick one via /config → Output style)
 ├── superclaude/        # core rules, modes, mcp docs
@@ -117,7 +117,7 @@ Restart Claude Code, then try a few:
 - `/sc:review` — Multi-dimensional review (code/plan/design)
 - `/sc:research` — Deep web research (Tavily-enhanced)
 - `/sc:insight` — Capture structured session insights to JSONL
-- `/sc:help` — List all 36 commands
+- `/sc:help` — List all 35 commands
 
 Not sure what to run next? Ask a side question with [`/btw`](https://code.claude.com/docs/en/interactive-mode). It answers from the conversation so far, works while Claude is still busy, and never enters the conversation history. It has no tools, so it answers only from what the session already holds:
 
@@ -567,7 +567,7 @@ The Deep Research system intelligently coordinates multiple tools:
 | Architecture & directory roles | [`src/superclaude/ARCHITECTURE.md`](src/superclaude/ARCHITECTURE.md) |
 | Project rules, build & test loop | [`CLAUDE.md`](CLAUDE.md) |
 | Project-specific gotchas | [`.claude/rules/gotchas/`](.claude/rules/gotchas) |
-| Slash commands (36) | [`src/superclaude/commands/`](src/superclaude/commands) · `superclaude install --list-all` |
+| Slash commands (35) | [`src/superclaude/commands/`](src/superclaude/commands) · `superclaude install --list-all` |
 | Orchestration commands — `/sc:agent` vs `/sc:pm` vs `/sc:task` | [`docs/reports/ORCHESTRATION_COMMANDS.md`](docs/reports/ORCHESTRATION_COMMANDS.md) |
 | Agents (24) | [`src/superclaude/agents/`](src/superclaude/agents) |
 | Modes (8) | [`src/superclaude/modes/`](src/superclaude/modes) |
@@ -710,7 +710,6 @@ MIT — see [`LICENSE`](LICENSE).
 - `/sc:index` / `/sc:index-repo` — Project docs and a compact repo index for cheap navigation
 - `/sc:recommend` — Command recommendation engine
 - `/sc:select-tool` — Intelligent MCP tool selection
-- `/sc:sc` — Command dispatcher (routes to the other `/sc:*` commands)
 
 ### ✍️ Skills
 - `/sc-author` — Write or revise a file Claude reads as instructions (skill, subagent, command, output style, CLAUDE.md, `.claude/rules`, and others). It follows your project's existing documents, proposes no-op and harmful sentences for removal with evidence, and writes only after you approve the diff. The body follows your project's format for that type; `--md` or `--xml` chooses one. User-invoked only; installed to `.claude/skills/sc-author/`.
