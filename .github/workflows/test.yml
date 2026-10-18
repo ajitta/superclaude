@@ -25,10 +25,13 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
+      # SHA-pinned: astral-sh/setup-uv publishes no major-version tags past v7
+      # (`@v10` does not resolve), and its README pins the full commit. Cache is
+      # off because `uv pip install --system` does not read uv.lock.
       - name: Install UV
-        run: |
-          curl -LsSf https://astral.sh/uv/install.sh | sh
-          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+        uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
+        with:
+          enable-cache: false
 
       - name: Verify UV installation
         run: uv --version
@@ -43,8 +46,9 @@ jobs:
           python -c "import superclaude; print(f'superclaude {superclaude.__version__} installed')"
 
       - name: Run tests
+        # -v --tb=short come from pyproject addopts; only color is CI-specific.
         run: |
-          pytest -v --tb=short --color=yes
+          pytest --color=yes
 
       # tests/unit/scripts is excluded from the default run via pyproject addopts
       # --ignore (it triggers a Windows-only native abort under memory pressure).
@@ -67,10 +71,13 @@ jobs:
         with:
           python-version: "3.10"
 
+      # SHA-pinned: astral-sh/setup-uv publishes no major-version tags past v7
+      # (`@v10` does not resolve), and its README pins the full commit. Cache is
+      # off because `uv pip install --system` does not read uv.lock.
       - name: Install UV
-        run: |
-          curl -LsSf https://astral.sh/uv/install.sh | sh
-          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+        uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
+        with:
+          enable-cache: false
 
       - name: Install dependencies
         run: |
