@@ -1,6 +1,6 @@
 ---
 feature: test-exclusion-lift
-phase: handoff
+phase: closed
 owner: ajitta
 created: 2026-10-19
 updated: 2026-10-19
@@ -12,7 +12,7 @@ Decide on evidence whether `tests/unit/scripts/` rejoins the default `pytest` ru
 
 ## Status
 
-Lifted on fix/test-exclusion-lift from master fe3195c1: intent b54f21fb, Dependabot 10697cd1, lift 3e64dc82. Rule: eight full runs with the directory included (six sequential, two concurrent) all exit 0 — 8/8 clean, 3870 passed each. Default `uv run pytest` now runs 3870 tests (+140); CI run 39153742114 green with the isolated step removed. Sessions: 0. **Unmerged**; merge and push await the owner's instruction. No release (test/CI config only; CHANGELOG carries a contributor note).
+Lifted on fix/test-exclusion-lift from master fe3195c1: intent b54f21fb, Dependabot 10697cd1, lift 3e64dc82. Rule: eight full runs with the directory included (six sequential, two concurrent) all exit 0 — 8/8 clean, 3870 passed each. Default `uv run pytest` now runs 3870 tests (+140); CI run 39153742114 green with the isolated step removed. Sessions: 0. Merged into master at 09ea2e74 and pushed (post-merge full suite 3870 passed). No release: test/CI config only; the CHANGELOG contributor note ships with the next release.
 
 ## Documents
 

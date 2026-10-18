@@ -8,7 +8,7 @@ updated: 2026-10-19
 
 # 02. Handoff — what remains after test-exclusion-lift
 
-This round lifted the `tests/unit/scripts` exclusion on an eight-run rule, added Dependabot for the pinned actions and dropped the `frozenset` item ([01-verification.md](./01-verification.md)). Commits b54f21fb, 10697cd1, 3e64dc82 on fix/test-exclusion-lift from master fe3195c1. Sessions: **0**. Delivery state: [README.md](./README.md) §Status. A new session inherits no execution authorization.
+This round lifted the `tests/unit/scripts` exclusion on an eight-run rule, added Dependabot for the pinned actions and dropped the `frozenset` item ([01-verification.md](./01-verification.md)). Commits b54f21fb, 10697cd1, 3e64dc82 on fix/test-exclusion-lift from master fe3195c1. Sessions: **0**. Delivered: merged into master at 09ea2e74 and pushed; no release needed. A new session inherits no execution authorization.
 
 ## Candidates
 
