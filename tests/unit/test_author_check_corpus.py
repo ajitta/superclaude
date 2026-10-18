@@ -9,7 +9,7 @@ from pathlib import Path
 
 import pytest
 
-from superclaude.cli.author_check import check
+from superclaude.cli.author_check import _split, check, infer_format
 
 _SRC = Path(__file__).resolve().parents[2] / "src" / "superclaude"
 _CORPUS = sorted(
@@ -22,6 +22,14 @@ _CORPUS = sorted(
 
 def test_corpus_is_not_empty():
     assert len(_CORPUS) > 10
+
+
+@pytest.mark.parametrize("path", _CORPUS, ids=lambda p: f"{p.parent.name}/{p.name}")
+def test_corpus_bodies_infer_as_xml(path):
+    """The structure tests force `fmt="xml"`; this pins what the auto path
+    infers, so a format-inference change that flips a shipped file to `md`
+    (and silently skips its X1/X2 checks) turns red here."""
+    assert infer_format(_split(path).body) == "xml"
 
 
 @pytest.mark.parametrize("path", _CORPUS, ids=lambda p: f"{p.parent.name}/{p.name}")
