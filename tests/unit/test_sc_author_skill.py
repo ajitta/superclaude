@@ -9,9 +9,9 @@ import re
 from pathlib import Path
 
 import pytest
-import yaml
 
 from superclaude.cli.author_check import check, mask_code
+from tests.unit.md_helpers import load_frontmatter, markdown_body
 
 _SRC = Path(__file__).resolve().parents[2] / "src" / "superclaude"
 _SKILL = _SRC / "skills" / "sc-author"
@@ -26,12 +26,6 @@ REFS = [
     "quality.md",
 ]
 _MODEL_ID = re.compile(r"claude-[a-z0-9]+(?:-[0-9]+)+")
-
-
-def _frontmatter(path: Path) -> dict:
-    match = re.match(r"\A---\n(.*?)\n---\n", path.read_text(encoding="utf-8"), re.S)
-    assert match, f"{path.name} has no frontmatter"
-    return yaml.safe_load(match.group(1)) or {}
 
 
 def _section(text: str, heading: str) -> str:
@@ -51,7 +45,7 @@ def _prompt_model_ids() -> set[str]:
 class TestReferences:
     @pytest.mark.parametrize("name", REFS)
     def test_exists_with_sources(self, name):
-        sources = _frontmatter(_REFS_DIR / name).get("sources")
+        sources = load_frontmatter(_REFS_DIR / name).get("sources")
         assert sources, f"{name}: no `sources`"
         for source in sources:
             assert str(source["url"]).startswith("https://"), source
@@ -121,12 +115,8 @@ class TestSkillManifest:
     _PATH = _SKILL / "SKILL.md"
     _STEPS = ("Resolve", "Load-set", "Load", "Draft", "Neighbors", "Check", "Hand-off")
 
-    def _body(self) -> str:
-        text = self._PATH.read_text(encoding="utf-8")
-        return re.sub(r"\A---\n.*?\n---\n", "", text, flags=re.S)
-
     def test_frontmatter(self):
-        fm = _frontmatter(self._PATH)
+        fm = load_frontmatter(self._PATH)
         assert fm["name"] == "sc-author"
         assert fm["disable-model-invocation"] is True
         assert fm.get("argument-hint")
@@ -139,24 +129,28 @@ class TestSkillManifest:
         assert not re.match(r"\s*(I|You|We)\b", description)
 
     def test_body_size(self):
-        assert len(self._body().strip().splitlines()) <= 150
+        assert len(markdown_body(self._PATH).strip().splitlines()) <= 150
 
     def test_steps_in_order(self):
-        labels = re.findall(r"^\d+\.\s+\**([A-Z][\w-]*)", self._body(), re.M)
+        labels = re.findall(
+            r"^\d+\.\s+\**([A-Z][\w-]*)", markdown_body(self._PATH), re.M
+        )
         assert tuple(labels) == self._STEPS
 
     def test_links_every_reference(self):
-        body = self._body()
+        body = markdown_body(self._PATH)
         for name in [*REFS, "fields.yaml"]:
             assert f"${{CLAUDE_SKILL_DIR}}/references/{name}" in body, name
 
     def test_check_step_skips_without_the_checker(self):
-        body = self._body()
+        body = markdown_body(self._PATH)
         assert re.search(r"not found, skip this step", body)
         assert "/doctor prompt-audit <path>" in body
 
     def test_check_step_passes_the_load_set(self):
-        assert re.search(r"superclaude author-check [^\n]*--with", self._body())
+        assert re.search(
+            r"superclaude author-check [^\n]*--with", markdown_body(self._PATH)
+        )
 
     def test_passes_the_checker(self):
         findings = check(self._PATH)

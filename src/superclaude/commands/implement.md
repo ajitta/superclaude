@@ -27,13 +27,6 @@ description: Feature and code implementation with sub-agent delegation and MCP i
   - --with-tests: write tests for the new behavior with the code and run them in the Validate step.
   </flags>
 
-  <tools>
-  - Write/Edit: Code gen
-  - Read/Grep/Glob: Project analysis
-  - TaskCreate/TaskUpdate: Multi-file progress
-  - Agent: Large-scale delegate
-  </tools>
-
   <examples>
 | Input | Output |
 |---|---|
@@ -48,7 +41,6 @@ description: Feature and code implementation with sub-agent delegation and MCP i
   </example>
 
   </examples>
-
 
   <gotchas>
   - status-check: Run [R02 Status Check] pre-impl. Grep for existing func first

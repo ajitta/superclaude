@@ -78,6 +78,19 @@ async def test_orchestrate_emits_matrix_and_decision(tmp_path: Path):
 
 
 @pytest.mark.asyncio
+async def test_stale_obs_file_from_earlier_run_is_not_aggregated(tmp_path: Path):
+    # A variant removed from the spec leaves its obs-*.json behind; the matrix
+    # and decision must come from this run's observations only.
+    spec = _write_spec(tmp_path, n=2)
+    stale = Observation(variant_id="old", exit_status="ok", wall_seconds=0.1)
+    emit(stale, tmp_path / "obs-old.json")
+    decision = await orchestrate(spec, runner_fn=_make_fake_runner())
+    matrix = (decision.parent / "matrix.md").read_text(encoding="utf-8")
+    assert "| old |" not in matrix
+    assert "**old**" not in decision.read_text(encoding="utf-8")
+
+
+@pytest.mark.asyncio
 async def test_too_many_variants_raises(tmp_path: Path, monkeypatch):
     monkeypatch.setenv("AB_MAX_PARALLEL", "2")
     spec = _write_spec(tmp_path, n=5)

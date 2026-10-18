@@ -23,11 +23,15 @@ from __future__ import annotations
 
 import json
 import os
-import sys
 import time
 from pathlib import Path
 
-from superclaude.utils import atomic_write_json, hook_state_dir, project_key
+from superclaude.utils import (
+    atomic_write_json,
+    hook_state_dir,
+    project_key,
+    read_hook_input,
+)
 
 BLOCK_THRESHOLD = 5
 WINDOW_SECONDS = 15 * 60
@@ -157,13 +161,8 @@ def main() -> None:
         if os.environ.get("SUPERCLAUDE_LOOP_GUARD", "1") == "0":
             return
 
-        stdin_data = sys.stdin.read() if not sys.stdin.isatty() else ""
-        if not stdin_data.strip():
-            return
-
-        try:
-            data = json.loads(stdin_data)
-        except json.JSONDecodeError:
+        data = read_hook_input()
+        if data is None:
             return
 
         event = data.get("hook_event_name", "")

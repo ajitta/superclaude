@@ -34,7 +34,13 @@ from superclaude.hooks.mcp_fallback import MCP_FALLBACKS, check_mcp_and_notify
 # context_loader`, i.e. under the console script's own interpreter, which has
 # the package. Silently degrading here would put state and content lookups in
 # the wrong scope.
-from superclaude.utils import claude_base, context_cache_file, project_root
+from superclaude.utils import (
+    claude_base,
+    context_cache_file,
+    int_env,
+    project_root,
+    read_hook_stdin,
+)
 
 # Configuration
 INJECT_MODE = os.environ.get("CLAUDE_CONTEXT_INJECT", "1").lower() in (
@@ -42,9 +48,7 @@ INJECT_MODE = os.environ.get("CLAUDE_CONTEXT_INJECT", "1").lower() in (
     "true",
     "yes",
 )  # Default: inject
-MAX_TOKENS_ESTIMATE = int(
-    os.environ.get("CLAUDE_CONTEXT_MAX_TOKENS", "8000")
-)  # ~8K tokens
+MAX_TOKENS_ESTIMATE = int_env("CLAUDE_CONTEXT_MAX_TOKENS", 8000)  # ~8K tokens
 CHARS_PER_TOKEN = 4  # Rough estimate
 
 # Dedup cache file, keyed on (project, Claude Code session) and stored in the
@@ -123,9 +127,12 @@ TRIGGER_MAP = [
         "mcp/MCP_Chrome-DevTools.md",
         2,
     ),
-    # Business symbols - supplementary reference
+    # Business symbols - supplementary reference. "business symbol" is the
+    # wording of business-panel.md's --structured flag and FLAGS.md; the
+    # "panel-example" path is what core/README.md documents. Nothing documents
+    # "strategic symbol" or "business example", so those alternatives were cut.
     (
-        r"(business.?symbol|strategic.?symbol|business.?example|panel.?example|/sc:business-panel\b.*--structured)",
+        r"(business.?symbol|panel.?example|/sc:business-panel\b.*--structured)",
         "core/BUSINESS_SYMBOLS.md",
         3,
     ),
@@ -133,13 +140,17 @@ TRIGGER_MAP = [
     (r"(--brainstorm|--bs)", "modes/MODE_Brainstorming.md", 1),
     # `--vs` is declared a mode flag in core/FLAGS.md <modes>; the NL forms stay
     # multi-word on purpose — a bare "vs" is a comparison preposition, not a trigger.
+    # The hyphenated labels (VS-CoT, VS-Multi) are the mode's own section names,
+    # not a documented way to ask for it; `--vs cot` is covered by `--vs\b`.
     (
-        r"(--vs\b|verbalized.?sampling|vs-(cot|multi|standard)|multiple perspectives|diverse responses)",
+        r"(--vs\b|verbalized.?sampling|multiple perspectives|diverse responses)",
         "modes/MODE_Verbalized_Sampling.md",
         1,
     ),
+    # `self-analysis` is the FLAGS.md description of --introspect; nothing in the
+    # content tree tells a user to say "analyze reasoning".
     (
-        r"(--introspect|self.?analysis|analyze reasoning)",
+        r"(--introspect|self.?analysis)",
         "modes/MODE_Introspection.md",
         2,
     ),
@@ -155,8 +166,11 @@ TRIGGER_MAP = [
         "modes/MODE_DeepResearch.md",
         1,
     ),
+    # "multi-expert" is the vocabulary of both panels (spec-panel.md and
+    # business-panel.md describe themselves with it), so it routed a spec
+    # critique to the business roster; the flag, the phrase and the command stay.
     (
-        r"(--business-panel|business.?panel|multi.?expert|strategic.?analysis|/sc:business-panel)",
+        r"(--business-panel|business.?panel|strategic.?analysis|/sc:business-panel)",
         "modes/MODE_Business_Panel.md",
         1,
     ),
@@ -386,18 +400,13 @@ RETIRED_FLAGS: dict[str, str] = {
 }
 
 
-def resolve_flags(prompt: str) -> tuple[str, list[str]]:
-    """Resolve flag typos in a prompt.
-
-    Returns:
-        Tuple of (corrected_prompt, list of notification messages)
-    """
+def resolve_flags(prompt: str) -> list[str]:
+    """Notification messages for retired, misspelled or unknown flags in a prompt."""
     # difflib (3.8ms) is only reached on the unrecognized-flag path. This hook
     # runs on every prompt, and most prompts carry no misspelled flag.
     import difflib
 
     notifications: list[str] = []
-    corrected = prompt
     scannable = scannable_prompt(prompt)
     declared: set[str] | None = None
 
@@ -449,7 +458,7 @@ def resolve_flags(prompt: str) -> tuple[str, list[str]]:
                 f"--{flag} is not a recognized flag. Did you mean: {suggestions}?"
             )
 
-    return corrected, notifications
+    return notifications
 
 
 # Commands renamed out from under their users, mapped to what to type now.
@@ -980,11 +989,7 @@ def migration_reference_roots() -> list[Path]:
     if config_dir:
         candidates.append(Path(config_dir))
     candidates.append(Path.home() / ".claude")
-    roots: list[Path] = []
-    for root in candidates:
-        if root not in roots:
-            roots.append(root)
-    return roots
+    return list(dict.fromkeys(candidates))
 
 
 def find_migration_reference(roots: list[Path] | None = None) -> Path | None:
@@ -1015,11 +1020,8 @@ def find_migration_reference(roots: list[Path] | None = None) -> Path | None:
 
 def bundled_reference_roots() -> list[Path]:
     """Temp directories Claude Code may have extracted its bundled skills to."""
-    roots: list[Path] = []
-    for value in (os.environ.get("CLAUDE_CODE_TMPDIR"), tempfile.gettempdir()):
-        if value and Path(value) not in roots:
-            roots.append(Path(value))
-    return roots
+    values = (os.environ.get("CLAUDE_CODE_TMPDIR"), tempfile.gettempdir())
+    return list(dict.fromkeys(Path(v) for v in values if v))
 
 
 def find_bundled_reference(roots: list[Path] | None = None) -> Path | None:
@@ -1177,8 +1179,7 @@ def _parse_hook_input(stdin_data: str) -> tuple[str, str | None]:
 
 def main() -> None:
     # Read and parse JSON input from Claude Code
-    stdin_data = sys.stdin.read() if not sys.stdin.isatty() else ""
-    prompt, session_id = _parse_hook_input(stdin_data)
+    prompt, session_id = _parse_hook_input(read_hook_stdin())
     # Pin the dedup cache before anything reads it — a concurrent session in the
     # same project must not consume the injections meant for this one.
     resolve_cache_file(session_id)
@@ -1187,7 +1188,7 @@ def main() -> None:
         return
 
     # v3.2: Resolve flag typos before processing
-    prompt, flag_notifications = resolve_flags(prompt)
+    flag_notifications = resolve_flags(prompt)
     if flag_notifications:
         for note in flag_notifications:
             print(f"<!-- superclaude flag: {note} -->")

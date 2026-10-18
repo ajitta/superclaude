@@ -6,6 +6,7 @@ Every rule code has one violating and one passing case (CASES), and
 """
 
 import re
+import subprocess
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -440,8 +441,6 @@ class TestDanglingPointers:
         assert [f.code for f in check(target)] == ["R1"]
 
     def test_n1_inline_code_path_is_a_warning(self, tmp_path):
-        import subprocess
-
         subprocess.run(["git", "init", "-q", str(tmp_path)], check=True)
         _write(tmp_path, "src/app/main.py", "")
         target = _write(
@@ -502,8 +501,6 @@ class TestReviewFixes:
         assert not [f for f in check(target) if f.code == "N1"]
 
     def test_root_relative_link(self, tmp_path):
-        import subprocess
-
         subprocess.run(["git", "init", "-q", str(tmp_path)], check=True)
         _write(tmp_path, "docs/guide.md", "# Guide\n")
         target = _write(tmp_path, "sub/page.md", "[g](/docs/guide.md)\n")

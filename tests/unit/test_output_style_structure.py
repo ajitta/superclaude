@@ -21,6 +21,8 @@ from pathlib import Path
 
 import pytest
 
+from tests.unit.md_helpers import split_frontmatter
+
 STYLES_DIR = (
     Path(__file__).parent.parent.parent / "src" / "superclaude" / "output-styles"
 )
@@ -30,17 +32,16 @@ STYLE_IDS = [f.stem for f in STYLE_FILES]
 # Sent with every request: the budget is a token cost every turn, not a style choice.
 MAX_BODY_WORDS = 600
 
-_FRONTMATTER = re.compile(r"\A---\n(.*?)\n---\n(.*)\Z", re.DOTALL)
-
 
 def _split(text: str) -> tuple[dict[str, str], str]:
-    m = _FRONTMATTER.match(text)
-    assert m, "no YAML frontmatter"
+    # Every line is a field, colon or not: a stray line is an unknown field.
+    raw, body = split_frontmatter(text)
+    assert raw is not None, "no YAML frontmatter"
     fields: dict[str, str] = {}
-    for line in m.group(1).splitlines():
+    for line in raw.splitlines():
         key, _, value = line.partition(":")
         fields[key.strip()] = value.strip()
-    return fields, m.group(2)
+    return fields, body
 
 
 @pytest.fixture(params=STYLE_FILES, ids=STYLE_IDS)

@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import re
 import subprocess
+from bisect import bisect_right
 from collections.abc import Iterable
 from dataclasses import dataclass
 from functools import lru_cache
@@ -23,9 +24,6 @@ from urllib.parse import unquote
 import yaml
 
 from .install_paths import _get_package_root
-
-TYPES = ("skill", "agent", "command", "output-style", "memory", "generic")
-FORMATS = ("md", "xml")
 
 # Code -> grade. Every code has a violating and a passing case in
 # tests/unit/test_author_check.py.
@@ -423,14 +421,7 @@ def _check_xml(doc: _Doc, type_: str, report: _Report) -> None:
         position += len(line) + 1
 
     def line_of(index: int) -> int:
-        low, high = 0, len(offsets) - 1
-        while low < high:
-            mid = (low + high + 1) // 2
-            if offsets[mid] <= index:
-                low = mid
-            else:
-                high = mid - 1
-        return low + doc.body_start
+        return bisect_right(offsets, index) - 1 + doc.body_start
 
     # `docs/<slug>/`, `--scope <glob>` or "see the <storage> section" is text, not
     # markup: an opening tag in the middle of a line is an element only when it

@@ -8,7 +8,7 @@ from typing import Any
 
 import yaml
 
-ALLOWED_RUNNER_CLI = {"claude -p"}
+RUNNER_CLI = "claude -p"  # the only runner; `runner.cli` in a spec is optional
 DEFAULT_TIMEOUT_SECONDS = 60
 
 
@@ -31,7 +31,6 @@ class Variant:
 
 @dataclass(frozen=True)
 class RunnerCfg:
-    cli: str
     model: str
     timeout_seconds: int = DEFAULT_TIMEOUT_SECONDS
     bare: bool = True
@@ -91,13 +90,10 @@ def load_spec(path: Path) -> ABSpec:
     runner_raw = raw.get("runner") or {}
     if not isinstance(runner_raw, dict):
         raise SpecError("runner must be a mapping")
-    cli = _require(runner_raw, "cli", "runner")
-    if cli not in ALLOWED_RUNNER_CLI:
-        raise SpecError(
-            f"runner.cli must be one of {sorted(ALLOWED_RUNNER_CLI)}; got {cli!r}"
-        )
+    cli = runner_raw.get("cli", RUNNER_CLI)
+    if cli != RUNNER_CLI:
+        raise SpecError(f"runner.cli must be {RUNNER_CLI!r}; got {cli!r}")
     runner = RunnerCfg(
-        cli=cli,
         model=_require(runner_raw, "model", "runner"),
         timeout_seconds=int(runner_raw.get("timeout_seconds", DEFAULT_TIMEOUT_SECONDS)),
         bare=bool(runner_raw.get("bare", True)),

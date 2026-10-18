@@ -24,13 +24,6 @@ description: Git operations with smart commit messages and workflow guidance; pu
   - --from-pr <PR#|URL>: with a clean working tree, run `gh pr checkout <PR>` and read `gh pr view <PR> --json title,body,comments,files`; with uncommitted changes, first ask whether to stash them or stop. See the from_pr section.
   </flags>
 
-
-  <tools>
-  - Bash: run git and gh commands
-  - Read: inspect repo files
-  - Grep: parse log and status output
-  </tools>
-
   <pr_status_integration>
     <description>PR review status indicator</description>
     <command>gh pr view --json state,reviewDecision,isDraft</command>
@@ -59,8 +52,6 @@ description: Git operations with smart commit messages and workflow guidance; pu
 | Input | Output |
 |---|---|
 | `status` | State analysis + recommendations |
-| `commit --smart-commit` | Conventional commit |
-| `merge feature-branch --interactive` | Guided merge |
 | `--pr-status` | Current branch PR review state |
 | `--from-pr 123` | PR #123 checked out + its context loaded |
 
@@ -71,7 +62,6 @@ description: Git operations with smart commit messages and workflow guidance; pu
   </example>
 
   </examples>
-
 
   <gotchas>
   - new-commit: make new commits; never amend unless asked.

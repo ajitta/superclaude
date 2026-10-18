@@ -25,14 +25,6 @@ description: Diagnose issues in code, builds, deployments and system behavior an
   - --fix: run the Test, Fix and Verify steps; without it, stop after the Confirm step and propose the fix. A fix in the approval-required tier of the auto-fix threshold still waits for confirmation.
   </flags>
 
-  <tools>
-  - Read: Log analysis + state examination
-  - Bash: Diagnostic command execution
-  - Grep: Error pattern detection
-  - Write: Diagnostic reports + documentation
-  </tools>
-
-
   <examples>
 
 | Input | Output |

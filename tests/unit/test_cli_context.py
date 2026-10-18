@@ -480,3 +480,15 @@ class TestScriptsReadmeDocumentsTheConsoleEntries:
 )
 def test_bare_script_prescription_discriminates(passage, is_prescription):
     assert bool(_bare_script_prescriptions(passage)) is is_prescription
+
+
+class TestExplainBudgetParsing:
+    def test_a_malformed_budget_falls_back_instead_of_crashing(
+        self, project: Path, monkeypatch: pytest.MonkeyPatch
+    ):
+        monkeypatch.setenv("CLAUDE_CONTEXT_MAX_TOKENS", "8k")
+
+        result = CliRunner().invoke(main, ["context", "explain", "--brainstorm a CLI"])
+
+        assert result.exit_code == 0, result.output
+        assert "budget:  8000 tokens" in result.output

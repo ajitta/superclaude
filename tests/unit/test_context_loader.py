@@ -9,6 +9,8 @@ import json
 import re
 from pathlib import Path
 
+import pytest
+
 import superclaude
 from superclaude.scripts.context_loader import (
     COMPOSITE_FLAGS,
@@ -85,76 +87,55 @@ class TestResolveFlags:
 
     def test_ultrathink_not_remapped(self):
         """ultrathink is a CC native deep-reasoning trigger, not an SC alias."""
-        prompt, notes = resolve_flags("analyze code --ultrathink")
-        assert prompt == "analyze code --ultrathink"
-        assert notes == []
+        assert resolve_flags("analyze code --ultrathink") == []
 
     def test_fast_not_remapped(self):
         """fast is a CC native fast-mode toggle, not an SC flag."""
-        prompt, notes = resolve_flags("analyze code --fast")
-        assert "--fast" in prompt
-        assert notes == []
+        assert resolve_flags("analyze code --fast") == []
 
     def test_removed_alias_parallel_no_auto_remap(self):
-        """--parallel removed as alias; prompt is not silently rewritten."""
-        prompt, notes = resolve_flags("analyze code --parallel")
-        assert "--parallel" in prompt  # preserved verbatim
-        assert "--delegate" not in prompt  # no hidden remap
-        # Fuzzy may or may not suggest; either way, no silent rewrite occurred
+        """--parallel removed as alias: the user gets a retired notice, not a remap."""
+        notes = resolve_flags("analyze code --parallel")
+        assert len(notes) == 1 and "--parallel was retired" in notes[0]
 
     # --- Valid flags pass through unchanged ---
 
     def test_valid_flag_unchanged(self):
-        prompt, notes = resolve_flags("analyze --tavily --c7")
-        assert prompt == "analyze --tavily --c7"
-        assert notes == []
+        assert resolve_flags("analyze --tavily --c7") == []
 
     def test_no_flags_returns_unchanged(self):
-        prompt, notes = resolve_flags("just a normal prompt")
-        assert prompt == "just a normal prompt"
-        assert notes == []
+        assert resolve_flags("just a normal prompt") == []
 
     # --- Fuzzy matching ---
 
     def test_fuzzy_suggests_close_match(self):
-        prompt, notes = resolve_flags("run --tavilyy")
+        notes = resolve_flags("run --tavilyy")
         # Should suggest --tavily as a close match
         assert len(notes) == 1
         assert "not a recognized flag" in notes[0]
         assert "--tavily" in notes[0]
 
     def test_totally_unknown_flag_no_suggestion(self):
-        prompt, notes = resolve_flags("run --xyzzy123")
-        # Too different from any valid flag — may or may not suggest
-        # At minimum, prompt should be unchanged
-        assert "--xyzzy123" in prompt
+        # Too different from any valid flag — may or may not suggest, never raises
+        assert isinstance(resolve_flags("run --xyzzy123"), list)
 
     # --- Multiple flags ---
 
     def test_multiple_valid_flags_pass_through(self):
-        prompt, notes = resolve_flags("go --vs --delegate --tavily")
-        assert prompt == "go --vs --delegate --tavily"
-        assert notes == []
+        assert resolve_flags("go --vs --delegate --tavily") == []
 
     def test_mixed_valid_and_unknown(self):
-        prompt, notes = resolve_flags("run --delegate --xyzbogus --tavily")
-        assert "--delegate" in prompt
-        assert "--tavily" in prompt
-        assert "--xyzbogus" in prompt  # unknown flag preserved
+        notes = resolve_flags("run --delegate --xyzbogus --tavily")
+        assert all(n.startswith("--xyzbogus") for n in notes)  # valid flags silent
 
     # --- Edge cases ---
 
     def test_flag_with_value_preserved(self):
-        prompt, notes = resolve_flags("run --concurrency 5 --tavily")
-        assert "--concurrency 5" in prompt
-        assert notes == []
+        assert resolve_flags("run --concurrency 5 --tavily") == []
 
     def test_case_insensitive_flag_detection(self):
         """Valid flags in prompt are lowercased for matching."""
-        prompt, notes = resolve_flags("run --Delegate")
-        # --Delegate matches VALID_FLAGS via lowercase → passes through unchanged
-        assert "--Delegate" in prompt
-        assert notes == []
+        assert resolve_flags("run --Delegate") == []
 
 
 class TestTieredInjection:
@@ -700,7 +681,7 @@ class TestFlagsAreReadWhereTheyAreUsed:
     def _notices(self, prompt):
         from superclaude.scripts.context_loader import resolve_flags
 
-        return resolve_flags(prompt)[1]
+        return resolve_flags(prompt)
 
     def test_a_shell_command_option_is_left_alone(self):
         for line in (
@@ -787,7 +768,7 @@ class TestContext7HasNoDocOnlyAFlag:
         assert "serena" not in VALID_FLAGS
         assert "serena" not in MCP_FALLBACKS
         assert "serena" not in CURRENT_MCP_SERVERS
-        assert resolve_flags("analyze --serena x") == ("analyze --serena x", [])
+        assert resolve_flags("analyze --serena x") == []
 
     def test_typed_c7_still_forces_a_lookup(self, monkeypatch, capsys):
         out = self._emit("--c7 add stripe checkout to this route", monkeypatch, capsys)
@@ -879,23 +860,23 @@ class TestCommandDeclaredFlags:
 
     def test_declared_flag_gets_no_typo_notice(self, tmp_path, monkeypatch):
         cl = self._fake_command(tmp_path, monkeypatch)
-        assert cl.resolve_flags("/sc:fake build it --safe")[1] == []
+        assert cl.resolve_flags("/sc:fake build it --safe") == []
 
     def test_command_name_case_does_not_matter(self, tmp_path, monkeypatch):
         cl = self._fake_command(tmp_path, monkeypatch)
-        assert cl.resolve_flags("/sc:FAKE build it --safe")[1] == []
+        assert cl.resolve_flags("/sc:FAKE build it --safe") == []
 
     def test_undeclaring_command_still_gets_the_notice(self, tmp_path, monkeypatch):
         cl = self._fake_command(tmp_path, monkeypatch)
-        assert len(cl.resolve_flags("/sc:other --safe")[1]) == 1
+        assert len(cl.resolve_flags("/sc:other --safe")) == 1
 
     def test_bare_flag_still_gets_the_notice(self, tmp_path, monkeypatch):
         cl = self._fake_command(tmp_path, monkeypatch)
-        assert len(cl.resolve_flags("--safe go")[1]) == 1
+        assert len(cl.resolve_flags("--safe go")) == 1
 
     def test_global_typo_is_still_caught_inside_a_command(self, tmp_path, monkeypatch):
         cl = self._fake_command(tmp_path, monkeypatch)
-        assert len(cl.resolve_flags("/sc:fake --instrospect")[1]) == 1
+        assert len(cl.resolve_flags("/sc:fake --instrospect")) == 1
 
     def test_declared_flag_suppresses_the_global_directive(
         self, tmp_path, monkeypatch, capsys
@@ -930,7 +911,7 @@ class TestShippedCommandFlags:
     def test_implement_safe_is_not_a_typo(self, monkeypatch):
         cl = self._cl(monkeypatch)
         prompt = "/sc:implement auth API --type api --safe --with-tests"
-        assert cl.resolve_flags(prompt)[1] == []
+        assert cl.resolve_flags(prompt) == []
 
     def test_implement_plan_is_not_the_global_plan(self, monkeypatch, capsys):
         cl = self._cl(monkeypatch)
@@ -1336,6 +1317,135 @@ class TestQuotedTriggersInjectNothing:
         assert "RULES_DELEGATION.md" in out
 
 
+class TestUndocumentedTriggerAlternativesDoNotFire:
+    """Trigger alternatives nobody is told to type were cut (content-structure
+    audit 04b §2 (1)). A phrase documented nowhere under ``src/superclaude``
+    cannot be a deliberate request for a mode, and ``multi-expert`` is the
+    vocabulary of both panels (spec-panel.md and business-panel.md), so it
+    injected the business roster into a spec critique. Each removed phrase
+    gets a plain-prose negative; the alternatives kept in the same entry get a
+    positive so the cut cannot silently widen.
+    """
+
+    @staticmethod
+    def _project(tmp_path: Path) -> Path:
+        (tmp_path / ".claude" / "superclaude").mkdir(parents=True, exist_ok=True)
+        return tmp_path
+
+    # --- modes/MODE_Verbalized_Sampling.md: `vs-(cot|multi|standard)` removed
+
+    def test_hyphenated_vs_label_does_not_load_verbalized_sampling(self, tmp_path):
+        prompt = "Explain what VS-CoT and VS-Multi mean in the paper's table 3"
+        out = run_loader(prompt, self._project(tmp_path), session_id="s")
+        assert "MODE_Verbalized_Sampling.md" not in out
+
+    def test_vs_flag_still_loads_verbalized_sampling(self, tmp_path):
+        out = run_loader(
+            "--vs cot pick a name for the new CLI",
+            self._project(tmp_path),
+            session_id="s",
+        )
+        assert "MODE_Verbalized_Sampling.md" in out
+
+    def test_multiple_perspectives_still_loads_verbalized_sampling(self, tmp_path):
+        out = run_loader(
+            "give me multiple perspectives on the caching design",
+            self._project(tmp_path),
+            session_id="s",
+        )
+        assert "MODE_Verbalized_Sampling.md" in out
+
+    def test_diverse_responses_still_loads_verbalized_sampling(self, tmp_path):
+        out = run_loader(
+            "I want diverse responses to the onboarding question",
+            self._project(tmp_path),
+            session_id="s",
+        )
+        assert "MODE_Verbalized_Sampling.md" in out
+
+    # --- core/BUSINESS_SYMBOLS.md: `strategic.?symbol`, `business.?example` removed
+
+    def test_strategic_symbol_does_not_load_business_symbols(self, tmp_path):
+        prompt = "Add a strategic symbol to the roadmap legend in docs/roadmap.md"
+        out = run_loader(prompt, self._project(tmp_path), session_id="s")
+        assert "BUSINESS_SYMBOLS.md" not in out
+
+    def test_business_example_does_not_load_business_symbols(self, tmp_path):
+        prompt = "Write a business example for the onboarding tutorial"
+        out = run_loader(prompt, self._project(tmp_path), session_id="s")
+        assert "BUSINESS_SYMBOLS.md" not in out
+
+    def test_business_symbol_still_loads_business_symbols(self, tmp_path):
+        out = run_loader(
+            "use the business symbol system for the summary",
+            self._project(tmp_path),
+            session_id="s",
+        )
+        assert "BUSINESS_SYMBOLS.md" in out
+
+    def test_structured_business_panel_still_loads_business_symbols(self, tmp_path):
+        out = run_loader(
+            "/sc:business-panel docs/strategy.md --structured",
+            self._project(tmp_path),
+            session_id="s",
+        )
+        assert "BUSINESS_SYMBOLS.md" in out
+
+    # --- modes/MODE_Introspection.md: `analyze reasoning` removed
+
+    def test_analyze_reasoning_does_not_load_introspection(self, tmp_path):
+        prompt = "Analyze reasoning errors in this proof of the lemma"
+        out = run_loader(prompt, self._project(tmp_path), session_id="s")
+        assert "MODE_Introspection.md" not in out
+
+    def test_introspect_flag_still_loads_introspection(self, tmp_path):
+        out = run_loader(
+            "--introspect why did the last fix miss the root cause?",
+            self._project(tmp_path),
+            session_id="s",
+        )
+        assert "MODE_Introspection.md" in out
+
+    def test_self_analysis_still_loads_introspection(self, tmp_path):
+        out = run_loader(
+            "do a self-analysis of the refactor decision you just made",
+            self._project(tmp_path),
+            session_id="s",
+        )
+        assert "MODE_Introspection.md" in out
+
+    # --- modes/MODE_Business_Panel.md: `multi.?expert` removed (cross-domain)
+
+    def test_multi_expert_spec_critique_does_not_load_business_panel(self, tmp_path):
+        prompt = "Run a multi-expert spec critique of docs/spec.md"
+        out = run_loader(prompt, self._project(tmp_path), session_id="s")
+        assert "MODE_Business_Panel.md" not in out
+
+    def test_business_panel_flag_still_loads_business_panel(self, tmp_path):
+        out = run_loader(
+            "--business-panel evaluate the pricing change",
+            self._project(tmp_path),
+            session_id="s",
+        )
+        assert "MODE_Business_Panel.md" in out
+
+    def test_business_panel_phrase_still_loads_business_panel(self, tmp_path):
+        out = run_loader(
+            "convene the business panel on our market entry plan",
+            self._project(tmp_path),
+            session_id="s",
+        )
+        assert "MODE_Business_Panel.md" in out
+
+    def test_strategic_analysis_still_loads_business_panel(self, tmp_path):
+        out = run_loader(
+            "give me a strategic analysis of the subscription pivot",
+            self._project(tmp_path),
+            session_id="s",
+        )
+        assert "MODE_Business_Panel.md" in out
+
+
 def test_structured_flag_loads_business_symbols_only_for_business_panel():
     """`--structured` means isolated review in /sc:review; only the business panel's
     `--structured` asks for the business symbol system."""
@@ -1347,3 +1457,30 @@ def test_structured_flag_loads_business_symbols_only_for_business_panel():
 
     assert loads("/sc:business-panel plan.md --structured")
     assert not loads("/sc:review --scope branch --structured")
+
+
+class TestBudgetEnvParsing:
+    """A malformed CLAUDE_CONTEXT_MAX_TOKENS must not crash the prompt hook
+    at import — that would surface as a hook error on every prompt and inject
+    nothing until the shell profile is fixed. Bad values fall back to 8000."""
+
+    @pytest.mark.parametrize("bad", ["8k", "", " "])
+    def test_loader_survives_a_malformed_budget(self, tmp_path: Path, bad: str):
+        project = tmp_path / "proj"
+        (project / ".claude" / "superclaude").mkdir(parents=True)
+        out = run_loader(
+            "--brainstorm a CLI",
+            project,
+            env_override={"CLAUDE_CONTEXT_MAX_TOKENS": bad},
+        )
+        assert "MODE_Brainstorming.md" in out
+
+    def test_int_env_falls_back_on_garbage(self, monkeypatch: pytest.MonkeyPatch):
+        from superclaude.utils import int_env
+
+        monkeypatch.setenv("SC_TEST_INT", "12")
+        assert int_env("SC_TEST_INT", 8000) == 12
+        monkeypatch.setenv("SC_TEST_INT", "8k")
+        assert int_env("SC_TEST_INT", 8000) == 8000
+        monkeypatch.delenv("SC_TEST_INT")
+        assert int_env("SC_TEST_INT", 8000) == 8000

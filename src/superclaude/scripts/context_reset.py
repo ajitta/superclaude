@@ -10,24 +10,14 @@ Registered in hooks.json with matcher: "clear" and "compact".
 
 from __future__ import annotations
 
-import json
 import sys
-from pathlib import Path
 
 from superclaude.utils import (
     context_cache_file,
     prune_fallback_ledger,
     prune_hook_state,
+    read_hook_input,
 )
-
-
-def get_cache_file(session_id: str | None = None) -> Path:
-    """Get the context_loader cache file for this project and session.
-
-    Omitting the session id yields the project-only name, which is both the
-    pre-session-keying filename and the loader's own fallback.
-    """
-    return context_cache_file(session_id)
 
 
 def reset_context_cache(session_id: str | None = None) -> bool:
@@ -49,9 +39,9 @@ def reset_context_cache(session_id: str | None = None) -> bool:
     prune_fallback_ledger(session_id)
 
     removed = False
-    targets = [get_cache_file(session_id)]
+    targets = [context_cache_file(session_id)]
     if session_id:
-        targets.append(get_cache_file())
+        targets.append(context_cache_file())
     for target in targets:
         if not target.exists():
             continue
@@ -64,19 +54,12 @@ def reset_context_cache(session_id: str | None = None) -> bool:
 
 
 def main() -> None:
-    # Read SessionStart hook input from stdin
-    try:
-        stdin_data = sys.stdin.read() if not sys.stdin.isatty() else ""
-        if not stdin_data:
-            return
-
-        data = json.loads(stdin_data)
-        source = data.get("source", "")
-        session_id = data.get("session_id")
-    except (json.JSONDecodeError, OSError):
-        # If we can't read input, reset cache defensively
-        source = "unknown"
-        session_id = None
+    # Read SessionStart hook input from stdin; nothing to reset without it
+    data = read_hook_input()
+    if data is None:
+        return
+    source = data.get("source", "")
+    session_id = data.get("session_id")
 
     # 'startup' = fresh session (no conversation history) → LLM hasn't seen prior emits
     # 'clear'   = /clear erased history → same situation

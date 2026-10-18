@@ -95,8 +95,6 @@ description: Capture structured session insights to .claude/insights.jsonl, or l
   | `/sc:insight` | Model propose 3-7 insights from session → user approve → script append |
   | `/sc:insight "abbreviation false positive risk"` | Shape as discovery → script append |
   | `/sc:insight --list` | Recent 20 insights formatted |
-  | `/sc:insight --query type=feedback` | All feedback-type insights |
-  | `/sc:insight --query tags=rules` | All insights tagged "rules" |
   | `/sc:insight --stats` | Type counts |
   | `/sc:insight --review` | List pending markers; propose structured promote (or discard) for each |
   </examples>

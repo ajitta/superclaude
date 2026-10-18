@@ -11,13 +11,13 @@ from pathlib import Path
 
 import pytest
 
+from tests.conftest import git, init_git_repo
 
-@pytest.fixture
-def git_repo(tmp_path: Path) -> Path:
-    """A bare-minimum project root with a regular ``.git/`` directory."""
-    (tmp_path / ".git").mkdir()
-    (tmp_path / ".git" / "info").mkdir()
-    return tmp_path
+
+@pytest.fixture(autouse=True)
+def _isolated_git_config(isolated_git_config) -> None:
+    """The developer's global git config (templates, excludes file) must not
+    decide any test here; the resolver asks git itself, so repos are real."""
 
 
 @pytest.fixture
@@ -38,25 +38,13 @@ def worktree_dir(tmp_path: Path) -> Path:
         tmp_path/main/.git/worktrees/feature/info/   ← present; its exclude is never read
         tmp_path/feature/.git                        ← worktree pointer file
 
-    The ``commondir`` file is what git itself writes; the per-worktree
-    ``info/`` is created too so a regression back to it has somewhere to
-    land and the assertions can see it.
+    The per-worktree ``info/`` is created so a regression back to it has
+    somewhere to land and the assertions can see it.
     """
-    main = tmp_path / "main"
-    main.mkdir()
-    main_gitdir = main / ".git"
-    main_gitdir.mkdir()
-    (main_gitdir / "info").mkdir()
-    worktree_gitdir = main_gitdir / "worktrees" / "feature"
-    worktree_gitdir.mkdir(parents=True)
-    (worktree_gitdir / "info").mkdir()
-    (worktree_gitdir / "commondir").write_text("../..\n", encoding="utf-8")
-
+    main = init_git_repo(tmp_path / "main")
     worktree_root = tmp_path / "feature"
-    worktree_root.mkdir()
-    (worktree_root / ".git").write_text(
-        f"gitdir: {worktree_gitdir}\n", encoding="utf-8"
-    )
+    git("-C", str(main), "worktree", "add", "-q", str(worktree_root))
+    (main / ".git" / "worktrees" / "feature" / "info").mkdir(exist_ok=True)
     return worktree_root
 
 
@@ -72,6 +60,16 @@ class TestResolveGitExcludeFile:
 
         assert _resolve_git_exclude_file(non_git_dir) is None
 
+    def test_a_subdirectory_of_a_repository_is_not_a_root(self, git_repo: Path):
+        """``git rev-parse`` would walk up to the enclosing repository; its
+        exclude file is not this project's (the block's patterns are
+        root-relative), so a root without its own ``.git`` is not git."""
+        from superclaude.cli.install_git_exclude import _resolve_git_exclude_file
+
+        sub = git_repo / "sub"
+        sub.mkdir()
+        assert _resolve_git_exclude_file(sub) is None
+
     def test_worktree_pointer_resolves_to_the_common_info_exclude(
         self, worktree_dir: Path
     ):
@@ -83,57 +81,75 @@ class TestResolveGitExcludeFile:
 
         result = _resolve_git_exclude_file(worktree_dir)
         expected = worktree_dir.parent / "main" / ".git" / "info" / "exclude"
-        assert result == expected.resolve()
+        assert result.resolve() == expected.resolve()
         assert "worktrees" not in result.parts
 
-    def test_absolute_commondir_is_followed(self, tmp_path: Path):
+    def test_absolute_commondir_is_followed(self, worktree_dir: Path):
         """``commondir`` may be absolute (worktrees can live anywhere)."""
-        common = tmp_path / "elsewhere" / "repo.git"
-        (common / "info").mkdir(parents=True)
-        gitdir = common / "worktrees" / "wt"
-        gitdir.mkdir(parents=True)
-        (gitdir / "commondir").write_text(f"{common}\n", encoding="utf-8")
-        root = tmp_path / "wt"
-        root.mkdir()
-        (root / ".git").write_text(f"gitdir: {gitdir}\n", encoding="utf-8")
+        main_gitdir = worktree_dir.parent / "main" / ".git"
+        commondir = main_gitdir / "worktrees" / "feature" / "commondir"
+        commondir.write_text(f"{main_gitdir.resolve().as_posix()}\n", encoding="utf-8")
         from superclaude.cli.install_git_exclude import _resolve_git_exclude_file
 
-        assert _resolve_git_exclude_file(root) == common / "info" / "exclude"
+        result = _resolve_git_exclude_file(worktree_dir)
+        assert result.resolve() == (main_gitdir / "info" / "exclude").resolve()
 
     def test_pointer_without_commondir_uses_the_gitdir_itself(self, tmp_path: Path):
-        """A submodule's ``.git`` is also a pointer file, but its gitdir
-        (``.git/modules/<name>``) is a complete git directory with no
-        ``commondir`` — its own ``info/exclude`` is the one git reads."""
-        superproject = tmp_path / "super"
-        gitdir = superproject / ".git" / "modules" / "sub"
-        (gitdir / "info").mkdir(parents=True)
-        root = superproject / "sub"
+        """A ``--separate-git-dir`` checkout (like a submodule's
+        ``.git/modules/<name>``) has a pointer file whose gitdir is a complete
+        git directory with no ``commondir`` — its own ``info/exclude`` is the
+        one git reads."""
+        gitdir = tmp_path / "elsewhere" / "repo.git"
+        gitdir.parent.mkdir()
+        root = tmp_path / "wt"
         root.mkdir()
-        (root / ".git").write_text("gitdir: ../.git/modules/sub\n", encoding="utf-8")
+        git("init", "-q", f"--separate-git-dir={gitdir}", str(root))
+        assert (root / ".git").is_file()
         from superclaude.cli.install_git_exclude import _resolve_git_exclude_file
 
-        assert _resolve_git_exclude_file(root) == gitdir.resolve() / "info" / "exclude"
+        result = _resolve_git_exclude_file(root)
+        assert result.resolve() == (gitdir / "info" / "exclude").resolve()
 
-    def test_stale_commondir_returns_none_and_creates_nothing(self, tmp_path: Path):
+    def test_stale_commondir_returns_none_and_creates_nothing(self, worktree_dir: Path):
         """A worktree whose repository moved or was deleted still has a
         ``commondir``; following it blindly had ``add_git_exclude`` mkdir the
         vanished git directory and report success (probed 2026-09-05)."""
-        gone = tmp_path / "GONE" / "repo.git"
-        gitdir = tmp_path / "stale-gitdir"
-        gitdir.mkdir()
-        (gitdir / "commondir").write_text(f"{gone}\n", encoding="utf-8")
-        root = tmp_path / "wt"
-        root.mkdir()
-        (root / ".git").write_text(f"gitdir: {gitdir}\n", encoding="utf-8")
+        gone = worktree_dir.parent / "GONE" / "repo.git"
+        commondir = (
+            worktree_dir.parent
+            / "main"
+            / ".git"
+            / "worktrees"
+            / "feature"
+            / "commondir"
+        )
+        commondir.write_text(f"{gone.as_posix()}\n", encoding="utf-8")
         from superclaude.cli.install_git_exclude import (
             _resolve_git_exclude_file,
             add_git_exclude,
         )
 
-        assert _resolve_git_exclude_file(root) is None
-        ok, msg = add_git_exclude(root)
+        assert _resolve_git_exclude_file(worktree_dir) is None
+        ok, msg = add_git_exclude(worktree_dir)
         assert ok and "Not a git repository" in msg
         assert not gone.exists(), "conjured a git directory for a stale worktree"
+
+    def test_stale_pointer_file_returns_none_and_creates_nothing(
+        self, worktree_dir: Path
+    ):
+        """The repository a worktree's ``.git`` file points into moved
+        (``git rev-parse`` exits 128): nothing to write, nothing conjured."""
+        main = worktree_dir.parent / "main"
+        main.rename(worktree_dir.parent / "moved")
+        from superclaude.cli.install_git_exclude import (
+            _resolve_git_exclude_file,
+            add_git_exclude,
+        )
+
+        assert _resolve_git_exclude_file(worktree_dir) is None
+        ok, msg = add_git_exclude(worktree_dir)
+        assert ok and "Not a git repository" in msg
+        assert not main.exists(), "conjured a git directory for a stale worktree"
 
     def test_malformed_git_pointer_file_returns_none(self, tmp_path: Path):
         (tmp_path / ".git").write_text("not a gitdir pointer\n", encoding="utf-8")
@@ -281,7 +297,7 @@ class TestRemoveLocalGitExclude:
 
         ok, msg = remove_git_exclude(git_repo)
         assert ok
-        assert "no SC local block" in msg.lower() or "not found" in msg.lower()
+        assert "had no sc block" in msg.lower() or "not found" in msg.lower()
 
     def test_non_git_dir_is_success(self, non_git_dir: Path):
         from superclaude.cli.install_git_exclude import remove_git_exclude
@@ -486,29 +502,15 @@ class TestMarkerGenerationMigration:
         assert "user-pattern" in content
 
 
-def _real_repo(tmp_path: Path, monkeypatch) -> Path:
-    """A real repository — `git check-ignore` needs one, the fake `.git/` of
-    the `git_repo` fixture is not enough. The developer's global git config is
-    shut out so a machine-wide excludes file cannot decide these tests."""
-    import subprocess
-
-    empty = tmp_path / "empty-gitconfig"
-    empty.write_text("", encoding="utf-8")
-    monkeypatch.setenv("GIT_CONFIG_GLOBAL", str(empty))
-    monkeypatch.setenv("GIT_CONFIG_NOSYSTEM", "1")
-    subprocess.run(["git", "init", "-q", str(tmp_path)], check=True)
-    return tmp_path
-
-
 class TestFindTeamIgnores:
     """`git check-ignore -v` names the rule that hides a registration file."""
 
     def test_a_gitignore_rule_is_reported_with_its_source_and_line(
-        self, tmp_path: Path, monkeypatch
+        self, git_repo: Path
     ):
         from superclaude.cli.install_git_exclude import find_team_ignores
 
-        repo = _real_repo(tmp_path, monkeypatch)
+        repo = git_repo
         (repo / ".gitignore").write_text(
             "# team rules\n.claude/settings.json\n", encoding="utf-8"
         )
@@ -519,30 +521,22 @@ class TestFindTeamIgnores:
 
         assert found == [(".gitignore", "2", ".claude/settings.json")]
 
-    def test_nothing_ignored_is_an_empty_list(self, tmp_path: Path, monkeypatch):
+    def test_nothing_ignored_is_an_empty_list(self, git_repo: Path):
         from superclaude.cli.install_git_exclude import find_team_ignores
 
-        assert (
-            find_team_ignores(
-                _real_repo(tmp_path, monkeypatch), [".claude/settings.json"]
-            )
-            == []
-        )
+        assert find_team_ignores(git_repo, [".claude/settings.json"]) == []
 
-    def test_a_tracked_file_is_never_reported(self, tmp_path: Path, monkeypatch):
+    def test_a_tracked_file_is_never_reported(self, git_repo: Path):
         """git's own rule: an already-committed registration stays quiet even
         when a later ignore rule matches it."""
-        import subprocess
-
         from superclaude.cli.install_git_exclude import find_team_ignores
 
-        repo = _real_repo(tmp_path, monkeypatch)
+        repo = git_repo
         target = repo / ".claude" / "settings.json"
         target.parent.mkdir(parents=True)
         target.write_text("{}", encoding="utf-8")
-        git = ["git", "-C", str(repo), "-c", "user.email=t@t", "-c", "user.name=t"]
-        subprocess.run([*git, "add", ".claude/settings.json"], check=True)
-        subprocess.run([*git, "commit", "-q", "-m", "track"], check=True)
+        git("-C", str(repo), "add", ".claude/settings.json")
+        git("-C", str(repo), "commit", "-q", "-m", "track")
         (repo / ".gitignore").write_text(".claude/settings.json\n", encoding="utf-8")
 
         assert find_team_ignores(repo, [".claude/settings.json"]) == []
@@ -552,15 +546,13 @@ class TestFindTeamIgnores:
 
         assert find_team_ignores(tmp_path, [".claude/settings.json"]) == []
 
-    def test_a_negation_that_whitelists_the_file_is_not_an_ignore(
-        self, tmp_path: Path, monkeypatch
-    ):
+    def test_a_negation_that_whitelists_the_file_is_not_an_ignore(self, git_repo: Path):
         """`.claude/*` + `!.claude/settings.json` is the common way to commit the
         registration while hiding the rest of .claude; check-ignore -v prints the
         negation as the winning rule, and it must not be reported as hiding."""
         from superclaude.cli.install_git_exclude import find_team_ignores
 
-        repo = _real_repo(tmp_path, monkeypatch)
+        repo = git_repo
         (repo / ".gitignore").write_text(
             ".claude/*\n!.claude/settings.json\n", encoding="utf-8"
         )
@@ -571,12 +563,10 @@ class TestFindTeamIgnores:
 
         assert found == [(".gitignore", "1", ".claude/hooks/hooks.json")]
 
-    def test_a_per_clone_exclude_rule_is_not_a_team_rule(
-        self, tmp_path: Path, monkeypatch
-    ):
+    def test_a_per_clone_exclude_rule_is_not_a_team_rule(self, git_repo: Path):
         from superclaude.cli.install_git_exclude import find_team_ignores
 
-        repo = _real_repo(tmp_path, monkeypatch)
+        repo = git_repo
         (repo / ".git" / "info").mkdir(exist_ok=True)
         (repo / ".git" / "info" / "exclude").write_text(
             ".claude/settings.json\n", encoding="utf-8"

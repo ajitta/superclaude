@@ -15,10 +15,13 @@ from importlib.metadata import entry_points
 from pathlib import Path
 from typing import Any, Dict
 
-from superclaude import __version__
 from superclaude.utils import is_superclaude_hook, settings_filename
 
-from .install_paths import probe_console_script, resolve_reporting_target
+from .install_paths import (
+    console_script_problems,
+    probe_console_script,
+    resolve_reporting_target,
+)
 
 
 def _repair_command(scope: str, base_path: Path) -> str:
@@ -117,50 +120,14 @@ def _check_console_entry() -> Dict[str, Any]:
     """
     label = "superclaude on PATH"
     probe = probe_console_script()
-    where = probe["path"]
-    fix = (
-        "Put this release's console script on PATH ahead of any other "
-        "(uv: `uv tool update-shell`; pipx: `pipx ensurepath`)"
-    )
-    if where is None:
-        details = [
-            "`superclaude` not found on PATH: every `superclaude hook <name>` "
-            "registration exits 127 in Claude Code",
-            fix,
-        ]
-        if probe["excluded"]:
-            details.insert(
-                1,
-                f"{probe['excluded']} was left out of the search — Claude Code's "
-                "shell sees it only while that environment is active there",
-            )
-        return {"name": label, "passed": False, "details": details}
-    if not probe["has_hook"]:
-        return {
-            "name": label,
-            "passed": False,
-            "details": [
-                f"{where} has no `hook` subcommand "
-                f"({probe['version'] or 'unknown version'}): every hook exits 2 "
-                "there, the blocking code",
-                fix,
-            ],
-        }
-    if probe["version"] and probe["version"] != __version__:
-        return {
-            "name": label,
-            "passed": False,
-            "details": [
-                f"{where} is version {probe['version']}; this install is "
-                f"{__version__} — Claude Code runs that version's hooks",
-                fix,
-            ],
-        }
+    problems = console_script_problems(probe)
+    if problems:
+        return {"name": label, "passed": False, "details": problems}
     return {
         "name": label,
         "passed": True,
         "details": [
-            f"Hook commands run `superclaude hook <name>` — {where} "
+            f"Hook commands run `superclaude hook <name>` — {probe['path']} "
             f"({probe['version'] or 'version unknown'})"
         ],
     }

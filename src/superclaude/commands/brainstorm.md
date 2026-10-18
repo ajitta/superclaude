@@ -49,9 +49,6 @@ description: Interactive requirements discovery through Socratic dialogue + syst
   </outputs>
 
   <tools>
-  - Read/Write/Edit: requirements docs and spec generation
-  - TaskCreate/TaskUpdate: Multi-phase exploration tracking
-  - Agent: Parallel exploration + multi-agent
   - WebSearch / Tavily search skill: Market research + tech validation
   </tools>
 

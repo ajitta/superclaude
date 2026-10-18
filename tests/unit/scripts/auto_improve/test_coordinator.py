@@ -2,13 +2,13 @@
 
 from __future__ import annotations
 
-import subprocess
 from pathlib import Path
 from unittest.mock import patch
 
 import pytest
 
 from superclaude.scripts.auto_improve.coordinator import (
+    MAX_CONSECUTIVE_REFUSALS,
     Coordinator,
     CoordinatorConfig,
     status_mode,
@@ -16,21 +16,13 @@ from superclaude.scripts.auto_improve.coordinator import (
 from superclaude.scripts.auto_improve.eval_runner import EvalResult
 from superclaude.scripts.auto_improve.mutator import MutationResult
 from superclaude.scripts.auto_improve.results_tsv import ResultsTsv
-
-
-def _git(args, cwd):
-    return subprocess.run(args, cwd=cwd, capture_output=True, text=True, check=True)
+from tests.conftest import init_git_repo
 
 
 @pytest.fixture
-def repo(tmp_path):
-    _git(["git", "init", "-b", "main"], cwd=tmp_path)
-    _git(["git", "config", "user.email", "t@e.com"], cwd=tmp_path)
-    _git(["git", "config", "user.name", "T"], cwd=tmp_path)
-    (tmp_path / "README.md").write_text("seed", encoding="utf-8")
-    _git(["git", "add", "."], cwd=tmp_path)
-    _git(["git", "commit", "-m", "seed"], cwd=tmp_path)
-    return tmp_path
+def repo(tmp_path, isolated_git_config):
+    """The shared builder, seeded with the exact bytes the rollback test asserts."""
+    return init_git_repo(tmp_path, files={"README.md": "seed"})
 
 
 def _make_config(repo: Path, **overrides) -> CoordinatorConfig:
@@ -171,6 +163,36 @@ def test_smoke_fail_skips_cycle_no_mutation_attempted(repo):
     assert mut.call_count == 0
 
 
+def test_consecutive_smoke_failures_stop_the_loop(repo):
+    """A smoke gate that fails every cycle (e.g. eval slower than the gate's
+    timeout) used to write smoke_fail rows until the budget ran out and never
+    reach the mutator. After plateau_window failures in a row run() must end."""
+    cfg = _make_config(repo, budget_seconds=3600, plateau_window=3)
+    calls = {"n": 0}
+
+    def always_fail(self):
+        calls["n"] += 1
+        if calls["n"] > 20:
+            raise AssertionError("smoke_fail streak did not stop the loop")
+        return False
+
+    with (
+        patch(
+            "superclaude.scripts.auto_improve.coordinator.run_eval",
+            return_value=_eval_result(10.0),
+        ),
+        patch.object(Coordinator, "_run_smoke", always_fail),
+        patch.object(Coordinator, "_invoke_mutator") as mut,
+    ):
+        c = Coordinator(cfg)
+        cycles = c.run()
+    assert mut.call_count == 0
+    assert cycles == 1 + cfg.plateau_window  # baseline + smoke_fail cycles
+    rows = ResultsTsv(c.tsv_path).read_all()
+    assert [r.status for r in rows][1:] == ["smoke_fail"] * cfg.plateau_window
+    assert "stopping" in rows[-1].desc
+
+
 def test_each_cycle_writes_exactly_one_results_tsv_row(repo):
     cfg = _make_config(repo, budget_seconds=120, plateau_window=2)
     eval_results = [
@@ -195,9 +217,8 @@ def test_each_cycle_writes_exactly_one_results_tsv_row(repo):
 
 
 def test_status_mode_skips_loop(repo):
-    cfg = _make_config(repo)
     # No active worktree -> status should still produce output without raising
-    out = status_mode(cfg)
+    out = status_mode(repo)
     assert "auto-improve" in out.lower()
 
 
@@ -271,8 +292,6 @@ def test_consecutive_refusals_stop_the_loop(repo):
     """A refusal on the mutator prompt is deterministic; after
     MAX_CONSECUTIVE_REFUSALS in a row the loop stops instead of spending the
     whole budget on identical refusals."""
-    from superclaude.scripts.auto_improve.coordinator import MAX_CONSECUTIVE_REFUSALS
-
     cfg = _make_config(repo, budget_seconds=3600)
     with (
         patch(
@@ -298,8 +317,6 @@ def test_consecutive_refusals_stop_the_loop(repo):
 
 
 def test_non_refused_error_resets_the_refusal_streak(repo):
-    from superclaude.scripts.auto_improve.coordinator import MAX_CONSECUTIVE_REFUSALS
-
     cfg = _make_config(repo, budget_seconds=3600)
     refused = MutationResult(
         rationale="",

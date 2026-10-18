@@ -11,9 +11,10 @@ from pathlib import Path
 
 import pytest
 
+from tests.unit.md_helpers import split_frontmatter
+
 _REPO = Path(__file__).resolve().parents[2]
 _PLAN_GLOBS = ("docs/features/*/*plan*.md", "docs/plans/*.md")
-_FRONTMATTER = re.compile(r"\A---\n(.*?)\n---\n", re.S)
 _STATUS = re.compile(r"^status:\s*['\"]?([A-Za-z-]+)", re.M)
 _OPEN_BOX = re.compile(r"^\s*- \[ \]", re.M)
 
@@ -29,8 +30,8 @@ def _complete_plans() -> list[Path]:
     """Filter at collection so plans still in progress add no skips."""
     complete = []
     for plan in _plan_docs():
-        frontmatter = _FRONTMATTER.match(plan.read_text(encoding="utf-8"))
-        status = frontmatter and _STATUS.search(frontmatter.group(1))
+        frontmatter, _ = split_frontmatter(plan.read_text(encoding="utf-8"))
+        status = frontmatter and _STATUS.search(frontmatter)
         if status and status.group(1).lower() == "complete":
             complete.append(plan)
     return complete

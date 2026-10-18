@@ -36,13 +36,6 @@ description: Multi-expert business analysis (Porter, Christensen, Drucker and ot
 
   <examples>
 
-| Input | Output |
-|---|---|
-| `market-analysis.md --mode discussion --focus strategy` | Collaborative expert analysis |
-| `'SaaS pricing strategy' --experts "porter,godin" --mode debate` | Adversarial pricing analysis |
-| `startup-pitch.md --mode socratic --all-experts` | Deep questioning with all 9 experts |
-| `competitive-landscape.md --synthesis-only` | Summary synthesis only |
-
   <example name="panel-technical-question" type="error-path">
     - Input: /sc:business-panel 'how to fix my React useState bug'
     - Why wrong: Panel gives strategy analysis, not tech debug. Wrong tool for code.

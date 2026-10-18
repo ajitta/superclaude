@@ -41,7 +41,6 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = [
-    "pytest-cov>=4.0.0",
     "pytest-asyncio>=0.23.0",
     "ruff>=0.1.0",
     "mypy>=1.0",
@@ -91,29 +90,6 @@ addopts = [
     # stack buffer overrun) during collection/run. Re-enable once root cause fixed.
     "--ignore=tests/unit/scripts",
 ]
-
-[tool.coverage.run]
-source = ["src/superclaude"]
-omit = [
-    "*/tests/*",
-    "*/test_*",
-    "*/__pycache__/*",
-    "*/.*"
-]
-
-[tool.coverage.report]
-exclude_lines = [
-    "pragma: no cover",
-    "def __repr__",
-    "if self.debug:",
-    "if settings.DEBUG",
-    "raise AssertionError",
-    "raise NotImplementedError",
-    "if 0:",
-    "if __name__ == .__main__.:",
-    "if TYPE_CHECKING:",
-]
-show_missing = true
 
 [tool.ruff]
 line-length = 88

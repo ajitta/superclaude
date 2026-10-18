@@ -17,8 +17,9 @@ every Read this hook lets through.
 
 import json
 import os
-import sys
 from pathlib import Path
+
+from superclaude.utils import read_hook_input
 
 # 30KB — proactive token conservation threshold
 SIZE_THRESHOLD = 30_000
@@ -100,11 +101,11 @@ def main() -> None:
     reason = None
     # Respect opt-out env var
     if os.environ.get("SUPERCLAUDE_SIZE_GUARD", "1") != "0":
+        data = read_hook_input()
         try:
-            stdin_data = sys.stdin.read() if not sys.stdin.isatty() else ""
-            if stdin_data:
-                reason = _block_reason(json.loads(stdin_data).get("tool_input", {}))
-        except (json.JSONDecodeError, OSError):
+            if data is not None:
+                reason = _block_reason(data.get("tool_input", {}))
+        except OSError:
             pass  # Don't block on hook errors — fail open
 
     if reason:

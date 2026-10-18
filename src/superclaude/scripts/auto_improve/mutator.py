@@ -78,8 +78,12 @@ class Mutator:
             ALLOWED_TOOLS,
             "--model",
             self.model,
+            # acceptEdits: edits inside cwd/--add-dir are auto-accepted, an
+            # edit outside them is denied (nobody answers prompts under -p).
+            # bypassPermissions would let an absolute-path Write reach the main
+            # working tree, which the rollback never touches.
             "--permission-mode",
-            "bypassPermissions",
+            "acceptEdits",
             "--add-dir",
             str(worktree_path),
         ]

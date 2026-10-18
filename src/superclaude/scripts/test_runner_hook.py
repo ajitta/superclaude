@@ -6,17 +6,17 @@ Cross-platform compatible (Windows/macOS/Linux).
 
 Only runs when a source code file is edited (not configs, docs, etc.).
 Respects SUPERCLAUDE_AUTO_TEST=0 env var to disable.
-Checks stop_hook_active to prevent infinite loops (Claude Code best practice).
 Outputs structured JSON systemMessage so Claude can react to results.
 """
 
 import json
 import os
 import re
-import shlex
 import subprocess
 import sys
 from pathlib import Path
+
+from superclaude.utils import read_hook_input
 
 # File extensions that should trigger test runs
 SOURCE_EXTENSIONS = {
@@ -48,16 +48,8 @@ AUTHORING_TEST_MAP = {
 }
 
 
-def _quote_path(path) -> str:
-    """Quote a path for shell=True subprocess. shlex.quote produces POSIX
-    single-quotes that Windows shells (cmd.exe, MSYS make) don't interpret —
-    they reach make/pytest as literal characters and break path parsing on
-    drive-letter colons."""
-    return f'"{path}"' if os.name == "nt" else shlex.quote(str(path))
-
-
-def detect_authoring_test(file_path: str) -> str | None:
-    """If a superclaude .md authoring file was edited, return targeted pytest cmd."""
+def detect_authoring_test(file_path: str) -> tuple[str, Path] | None:
+    """If a superclaude .md authoring file was edited, return (pytest cmd, cwd)."""
     path = Path(file_path)
     if path.suffix.lower() != ".md":
         return None
@@ -68,7 +60,10 @@ def detect_authoring_test(file_path: str) -> str | None:
         if segment in parts:
             for parent in path.resolve().parents:
                 if (parent / "pyproject.toml").exists():
-                    return f"uv run python -m pytest {_quote_path(parent / test_file)} --tb=short -q"
+                    return (
+                        f"uv run python -m pytest {test_file} --tb=short -q",
+                        parent,
+                    )
             return None
     return None
 
@@ -146,26 +141,31 @@ def _npm_has_test_script(package_json: Path) -> bool:
     return bool(script.strip()) and _NPM_PLACEHOLDER not in script
 
 
-def detect_test_command(file_path: str) -> str | None:
-    """Detect the appropriate test command based on project files."""
+def detect_test_command(file_path: str) -> tuple[str, Path] | None:
+    """Detect the test command and the project directory to run it in.
+
+    The directory is the one whose marker file was found, so a sub-project
+    in a monorepo runs its own suite rather than whatever lives at the
+    hook's CWD.
+    """
     path = Path(file_path).resolve()
 
     # Walk up to find project root indicators
     for parent in [path.parent, *path.parents]:
         if (parent / "pyproject.toml").exists() or (parent / "setup.py").exists():
             if (parent / "Makefile").exists():
-                return f"make -C {_quote_path(parent)} test"
-            return "uv run python -m pytest --tb=short -q"
+                return "make test", parent
+            return "uv run python -m pytest --tb=short -q", parent
 
         if (parent / "package.json").exists():
             # `npm test --silent` prints nothing when the script is missing,
             # so check the script before running rather than parse its output.
             if not _npm_has_test_script(parent / "package.json"):
                 return None
-            return "npm test --silent"
+            return "npm test --silent", parent
 
         if (parent / "Makefile").exists():
-            return f"make -C {_quote_path(parent)} test"
+            return "make test", parent
 
         # Stop at git root
         if (parent / ".git").exists():
@@ -196,30 +196,26 @@ def main() -> None:
     if os.environ.get("SUPERCLAUDE_AUTO_TEST", "1") == "0":
         return
 
+    data = read_hook_input()
+    if data is None:
+        return
+
     try:
-        stdin_data = sys.stdin.read() if not sys.stdin.isatty() else ""
-        if not stdin_data:
-            return
-
-        data = json.loads(stdin_data)
-
-        # Prevent infinite loops when Claude is stopping
-        if data.get("stop_hook_active"):
-            return
-
         file_path = data.get("tool_input", {}).get("file_path", "")
 
-        test_cmd = detect_authoring_test(file_path)
-        if test_cmd is None:
+        detected = detect_authoring_test(file_path)
+        if detected is None:
             if not should_run(file_path):
                 return
-            test_cmd = detect_test_command(file_path)
-        if not test_cmd:
+            detected = detect_test_command(file_path)
+        if not detected:
             return
+        test_cmd, cwd = detected
 
         result = subprocess.run(
             test_cmd,
             shell=True,
+            cwd=cwd,
             capture_output=True,
             text=True,
             timeout=120,
@@ -257,8 +253,6 @@ def main() -> None:
             )
             print(msg)
 
-    except json.JSONDecodeError:
-        print("test hook: invalid JSON input", file=sys.stderr)
     except subprocess.TimeoutExpired:
         print("test hook: timeout after 120s", file=sys.stderr)
     except OSError as e:

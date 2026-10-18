@@ -244,18 +244,16 @@ class TestEntryFastPath:
         """`~/.local/bin` is a shared user bin; a stray `json.py` there would
         shadow the stdlib for every hook. The old form ran from a directory
         superclaude owned, and entry keeps that property."""
-        import sys as _sys
-
         from superclaude.cli import entry
 
         shim = tmp_path / "bin" / "superclaude"
         shim.parent.mkdir()
         shim.write_text("#!/usr/bin/env python\n", encoding="utf-8")
-        monkeypatch.setattr(_sys, "argv", [str(shim), "hook", "--help"])
-        monkeypatch.setattr(_sys, "path", [str(shim.parent), *_sys.path])
+        monkeypatch.setattr(sys, "argv", [str(shim), "hook", "--help"])
+        monkeypatch.setattr(sys, "path", [str(shim.parent), *sys.path])
 
         assert entry.main() == 0
-        assert str(shim.parent) not in _sys.path
+        assert str(shim.parent) not in sys.path
 
     def test_everything_else_reaches_the_click_app(self, tmp_path):
         result = _run_entry(

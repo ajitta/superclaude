@@ -50,6 +50,8 @@ from pathlib import Path
 
 import yaml
 
+from superclaude.utils import detect_refusal
+
 EVALS_DIR = Path(__file__).resolve().parent
 KERNEL_FILE = EVALS_DIR / "arms" / "RULES_KERNEL.md"
 CANDIDATE_FILE = EVALS_DIR / "arms" / "RULES_CANDIDATE.md"
@@ -269,16 +271,8 @@ def run_task(
 
     started = time.monotonic()
     try:
-        proc = subprocess.run(
-            cmd,
-            cwd=str(ws),
-            capture_output=True,
-            text=True,
-            check=False,
-            timeout=task.get("timeout", DEFAULT_TASK_TIMEOUT),
-            env=env,
-            encoding="utf-8",
-            errors="replace",
+        proc = _run(
+            cmd, cwd=ws, timeout=task.get("timeout", DEFAULT_TASK_TIMEOUT), env=env
         )
     except subprocess.TimeoutExpired:
         res.error = "task timeout"
@@ -287,7 +281,7 @@ def run_task(
 
     log_dir.mkdir(parents=True, exist_ok=True)
     (log_dir / f"{task['id']}.stream.jsonl").write_text(proc.stdout, encoding="utf-8")
-    result_text, bash_inputs = _parse_stream(proc.stdout, res)
+    result_text, bash_inputs, subtype = _parse_stream(proc.stdout, res)
     if proc.returncode != 0:
         # A non-zero exit with a result event is a session that ran and ended
         # on a terminal condition such as `error_max_turns` (exit 1). The
@@ -295,7 +289,6 @@ def run_task(
         # event still carries usage, so the checks and the cost stay in the
         # record; the error keeps ok/gates_ok false so the run never reads as
         # a clean pass. Without a result event nothing ran: report and stop.
-        subtype = _result_subtype(proc.stdout)
         if subtype is None:
             res.error = f"claude rc={proc.returncode}: {proc.stderr[-400:]}"
             return res
@@ -303,46 +296,6 @@ def run_task(
             res.error = f"claude rc={proc.returncode}: {subtype}"
     _run_checks(task, ws, result_text, bash_inputs, res)
     return res
-
-
-def _result_subtype(stream: str) -> str | None:
-    """The `subtype` of the stream's result event, or None when there is none."""
-    for line in stream.splitlines():
-        try:
-            event = json.loads(line)
-        except json.JSONDecodeError:
-            continue
-        if event.get("type") == "result":
-            return str(event.get("subtype") or "result")
-    return None
-
-
-def _detect_refusal(payload: dict) -> str | None:
-    """Return the refusal category when *payload* records a model refusal.
-
-    Safety classifiers on Fable 5.x, Opus 5.5, Sonnet 5.5 and Opus 5 end a turn
-    with the API's ``stop_reason: "refusal"`` and ``stop_details.category``
-    (cyber, bio, reasoning_extraction, ...; the set differs by model: Opus 5 has
-    reasoning_extraction; sources disagree on bio). On Opus 5.5 and Sonnet 5.5 server-side
-    fallback returns a reasoning_extraction decline instead of retrying it
-    (on Sonnet 5.5, server-side fallback retries only cyber and frontier_llm, on
-    Sonnet 5), so a caller that sees that category changes the prompt. In stream-json the ``assistant`` events carry
-    the API message object with both fields, so the category comes from there.
-    The ``result`` event carries a top-level ``stop_reason`` but no
-    ``stop_details`` (Claude Code 2.1.258 result schema), so a result-level
-    refusal reports ``"unknown"`` and must never override a category already
-    captured. A ``subtype`` naming a refusal also counts, as a fallback.
-    """
-    if not isinstance(payload, dict):
-        return None
-    refused = payload.get("stop_reason") == "refusal" or "refusal" in str(
-        payload.get("subtype") or ""
-    )
-    if not refused:
-        return None
-    details = payload.get("stop_details") or {}
-    category = details.get("category") if isinstance(details, dict) else None
-    return str(category) if category else "unknown"
 
 
 def _mark_refusal(res: TaskResult, category: str) -> None:
@@ -354,10 +307,12 @@ def _mark_refusal(res: TaskResult, category: str) -> None:
     res.error = f"refusal (category={category})"
 
 
-def _parse_stream(stream: str, res: TaskResult) -> tuple[str, str]:
+def _parse_stream(stream: str, res: TaskResult) -> tuple[str, str, str | None]:
     """Extract final result text, usage metrics, and Bash tool inputs from a
-    stream-json transcript."""
+    stream-json transcript. The third value is the result event's `subtype`
+    (None when the stream has no result event, i.e. nothing ran)."""
     result_text = ""
+    subtype: str | None = None
     bash_inputs: list[str] = []
     # Skill tool_use id -> skill name, until its tool_result arrives. Claude
     # Code answers a call it refuses (disable-model-invocation, unknown skill)
@@ -371,7 +326,8 @@ def _parse_stream(stream: str, res: TaskResult) -> tuple[str, str]:
         etype = event.get("type")
         if etype == "result":
             result_text = event.get("result") or ""
-            category = _detect_refusal(event)
+            subtype = str(event.get("subtype") or "result")
+            category = detect_refusal(event)
             if category is not None:
                 _mark_refusal(res, category)
             # A refusal is the more specific signal; keep it over the generic
@@ -388,7 +344,7 @@ def _parse_stream(stream: str, res: TaskResult) -> tuple[str, str]:
             res.permission_denials = len(event.get("permission_denials") or [])
         elif etype == "assistant":
             message = event.get("message") or {}
-            category = _detect_refusal(message)
+            category = detect_refusal(message)
             if category is not None:
                 _mark_refusal(res, category)
             for block in message.get("content", []):
@@ -414,7 +370,7 @@ def _parse_stream(stream: str, res: TaskResult) -> tuple[str, str]:
                 skill = pending_skills.pop(block.get("tool_use_id", ""), None)
                 if skill is not None and not block.get("is_error"):
                     res.skills_called.append(skill)
-    return result_text, "\n".join(bash_inputs)
+    return result_text, "\n".join(bash_inputs), subtype
 
 
 # ── checks ───────────────────────────────────────────────────────────────────
@@ -770,46 +726,53 @@ def main() -> int:
     print(f"runs dir: {runs_dir}\narms: {arms}\ntasks: {[t['id'] for t in tasks]}")
 
     results: list[TaskResult] = []
-    for arm in arms:
-        config_dir = runs_dir / "config" / arm
-        config_dir.mkdir(parents=True, exist_ok=True)
-        if creds is not None:
-            # Auth is CLAUDE_CONFIG_DIR-scoped; credentials only — settings.json
-            # or CLAUDE.md from the real config dir would contaminate the arm.
-            shutil.copy2(creds, config_dir / creds.name)
-        for task in tasks:
-            label = f"[{arm}/{task['id']}]"
-            try:
-                ws = build_workspace(arm, task, runs_dir, superclaude_bin)
-            except (RuntimeError, subprocess.TimeoutExpired) as exc:
-                print(f"{label} BUILD FAIL: {exc}")
-                results.append(
-                    TaskResult(
-                        arm=arm,
-                        task_id=task["id"],
-                        error=f"build: {exc}",
-                        permission_mode=args.permission_mode or "",
+    # The per-arm credential copies are live OAuth tokens; they must not outlive
+    # the run (the runs dir defaults to the system temp dir).
+    try:
+        for arm in arms:
+            config_dir = runs_dir / "config" / arm
+            config_dir.mkdir(parents=True, exist_ok=True)
+            if creds is not None:
+                # Auth is CLAUDE_CONFIG_DIR-scoped; credentials only — settings.json
+                # or CLAUDE.md from the real config dir would contaminate the arm.
+                shutil.copy2(creds, config_dir / creds.name)
+            for task in tasks:
+                label = f"[{arm}/{task['id']}]"
+                try:
+                    ws = build_workspace(arm, task, runs_dir, superclaude_bin)
+                except (RuntimeError, subprocess.TimeoutExpired) as exc:
+                    print(f"{label} BUILD FAIL: {exc}")
+                    results.append(
+                        TaskResult(
+                            arm=arm,
+                            task_id=task["id"],
+                            error=f"build: {exc}",
+                            permission_mode=args.permission_mode or "",
+                        )
                     )
+                    continue
+                if args.dry_run:
+                    print(f"{label} build ok: {ws}")
+                    continue
+                res = run_task(
+                    arm,
+                    task,
+                    ws,
+                    config_dir,
+                    runs_dir / arm / "logs",
+                    claude_bin,
+                    args.model,
+                    defaults,
+                    args.effort,
+                    args.permission_mode,
                 )
-                continue
-            if args.dry_run:
-                print(f"{label} build ok: {ws}")
-                continue
-            res = run_task(
-                arm,
-                task,
-                ws,
-                config_dir,
-                runs_dir / arm / "logs",
-                claude_bin,
-                args.model,
-                defaults,
-                args.effort,
-                args.permission_mode,
-            )
-            results.append(res)
-            status = "ok" if res.ok else (res.error or "checks failed")
-            print(f"{label} {status} ({res.duration_s}s, {res.tokens_out} out-tokens)")
+                results.append(res)
+                status = "ok" if res.ok else (res.error or "checks failed")
+                print(
+                    f"{label} {status} ({res.duration_s}s, {res.tokens_out} out-tokens)"
+                )
+    finally:
+        shutil.rmtree(runs_dir / "config", ignore_errors=True)
 
     if args.dry_run:
         print("dry run complete — workspaces built, no API calls made")

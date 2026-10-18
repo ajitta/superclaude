@@ -14,16 +14,7 @@ import pytest
 from click.testing import CliRunner
 
 from superclaude.scripts.auto_improve.cli import _build_parser, _parse_duration
-
-
-def _all_output(result) -> str:
-    """stdout + stderr — argparse writes usage errors to stderr."""
-    text = result.output or ""
-    try:
-        text += result.stderr or ""
-    except ValueError:  # stderr not captured separately on older Click
-        pass
-    return text
+from tests.unit.cli_helpers import all_output
 
 
 # Accepted spellings. These are the CONTRACT — the non-positive guard below is
@@ -117,6 +108,6 @@ class TestParserWiring:
             ],
         )
 
-        assert result.exit_code == 2, _all_output(result)
-        assert "argument --budget:" in _all_output(result)
+        assert result.exit_code == 2, all_output(result)
+        assert "argument --budget:" in all_output(result)
         assert not (tmp_path / ".worktrees").exists()

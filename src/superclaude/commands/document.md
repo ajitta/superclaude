@@ -33,11 +33,8 @@ description: Generate focused docs for components, functions, APIs and features;
 
 
   <tools>
-  - Read: Component + existing docs
-  - Grep: Ref extraction
   - Write: Doc file creation
   - Edit: inline docstrings + in-place updates of existing docs
-  - Glob: Multi-file organization
   </tools>
 
   <examples>
@@ -45,7 +42,6 @@ description: Generate focused docs for components, functions, APIs and features;
 | Input | Output |
 |---|---|
 | `src/auth/login.js --type inline` | JSDoc comments |
-| `src/api --type api --style detailed` | API reference |
 | `payment-module --type guide --style brief` | User docs |
 | `components/ --type external` | Component library docs |
 

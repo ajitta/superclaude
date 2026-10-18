@@ -359,7 +359,7 @@ def merge_hooks_to_settings(
     Args:
         base_path: Installation base path (.claude directory)
         hooks_config: Parsed hooks.json content
-        scope: Installation scope ("user", "project", or "target")
+        scope: Installation scope ("user", "project", or "local")
         force: Replace existing superclaude hooks if True
 
     Returns:
@@ -371,7 +371,6 @@ def merge_hooks_to_settings(
           command is `superclaude hook <name>`, so the file is the same bytes
           on every checkout and stays tracked)
         - local: Merges to ./.claude/settings.local.json (CC auto-gitignores)
-        - target: Merges to {target}/.claude/settings.json
     """
     filename = settings_filename(scope)
     settings_file = base_path / filename
@@ -565,16 +564,10 @@ def check_claude_md_import(base_path: Path, scope: str = "user") -> Tuple[bool, 
     except (OSError, UnicodeDecodeError):
         return False, f"{target_label} is unreadable"
 
-    # Check for import pattern (with or without leading @, cross-platform paths)
-    escaped = re.escape(import_line)
-    patterns = [
-        escaped,
-        escaped.replace("/", r"\\"),  # Windows backslash variant
-    ]
-
-    for pattern in patterns:
-        if re.search(pattern, content):
-            return True, f"{target_label} already imports CLAUDE_SC.md"
+    # The import line, with either path separator: a Windows-authored file may
+    # carry `@.claude\superclaude\CLAUDE_SC.md`.
+    if import_line in content or import_line.replace("/", "\\") in content:
+        return True, f"{target_label} already imports CLAUDE_SC.md"
 
     return False, f"{target_label} does not import CLAUDE_SC.md"
 

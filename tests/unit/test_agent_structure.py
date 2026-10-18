@@ -15,9 +15,11 @@ from tests.unit.md_helpers import (
     extract_xml_attr,
     extract_xml_content,
     parse_frontmatter,
+    split_frontmatter,
 )
 
-AGENTS_DIR = Path(__file__).parent.parent.parent / "src" / "superclaude" / "agents"
+_REPO = Path(__file__).resolve().parents[2]
+AGENTS_DIR = _REPO / "src" / "superclaude" / "agents"
 
 VALID_PERMISSION_MODES = {
     "acceptEdits",
@@ -29,13 +31,11 @@ VALID_PERMISSION_MODES = {
 }
 VALID_MEMORY_SCOPES = {"user", "project", "local"}
 
-_SCHEMAS_PATH = (
-    Path(__file__).parent.parent.parent / ".claude" / "rules" / "schemas.yaml"
-)
+_SCHEMAS_PATH = _REPO / ".claude" / "rules" / "schemas.yaml"
 _SCHEMAS = yaml.safe_load(_SCHEMAS_PATH.read_text(encoding="utf-8"))
 VALID_COLORS = set(_SCHEMAS["agent_colors"].values())
 VALID_EFFORT_VALUES = set(_SCHEMAS["effort_values"])
-SKILLS_DIR = Path(__file__).parent.parent.parent / "src" / "superclaude" / "skills"
+SKILLS_DIR = _REPO / "src" / "superclaude" / "skills"
 # All agent .md files (excluding README and _ prefixed test agents)
 AGENT_FILES = sorted(
     [
@@ -94,9 +94,10 @@ class TestAgentFrontmatter:
         stem, content, fm = agent
         assert fm, f"{stem}: missing YAML frontmatter (--- block)"
 
-    def test_has_name(self, agent):
+    @pytest.mark.parametrize("field", ["name", "memory", "color"])
+    def test_has_required_field(self, agent, field):
         stem, content, fm = agent
-        assert "name" in fm, f"{stem}: frontmatter missing 'name'"
+        assert field in fm, f"{stem}: frontmatter missing '{field}'"
 
     def test_name_matches_filename(self, agent):
         stem, content, fm = agent
@@ -119,20 +120,12 @@ class TestAgentFrontmatter:
             f"{stem}: permissionMode '{mode}' not in {VALID_PERMISSION_MODES}"
         )
 
-    def test_has_memory(self, agent):
-        stem, content, fm = agent
-        assert "memory" in fm, f"{stem}: frontmatter missing 'memory'"
-
     def test_memory_valid(self, agent):
         stem, content, fm = agent
         scope = fm.get("memory", "")
         assert scope in VALID_MEMORY_SCOPES, (
             f"{stem}: memory '{scope}' not in {VALID_MEMORY_SCOPES}"
         )
-
-    def test_has_color(self, agent):
-        stem, content, fm = agent
-        assert "color" in fm, f"{stem}: frontmatter missing 'color'"
 
     def test_color_valid(self, agent):
         stem, content, fm = agent
@@ -150,13 +143,12 @@ class TestAgentFrontmatter:
 class TestAgentXMLStructure:
     """Validate XML component structure in every agent file."""
 
-    def test_has_component_open(self, agent):
+    @pytest.mark.parametrize(
+        "tag", ["<component", "</component>", "<role>", "<tool_guidance"]
+    )
+    def test_has_section_tag(self, agent, tag):
         stem, content, _ = agent
-        assert "<component" in content, f"{stem}: missing <component> tag"
-
-    def test_has_component_close(self, agent):
-        stem, content, _ = agent
-        assert "</component>" in content, f"{stem}: missing </component>"
+        assert tag in content, f"{stem}: missing {tag} section"
 
     def test_component_name_matches(self, agent):
         stem, content, _ = agent
@@ -168,23 +160,10 @@ class TestAgentXMLStructure:
         ctype = extract_xml_attr(content, "component", "type")
         assert ctype == "agent", f"{stem}: component type='{ctype}', expected 'agent'"
 
-    def test_has_role(self, agent):
+    @pytest.mark.parametrize("tag", ["mission", "mindset"])
+    def test_has_non_empty_section(self, agent, tag):
         stem, content, _ = agent
-        assert "<role>" in content, f"{stem}: missing <role> section"
-
-    def test_has_mission(self, agent):
-        stem, content, _ = agent
-        mission = extract_xml_content(content, "mission")
-        assert mission, f"{stem}: missing or empty <mission>"
-
-    def test_has_mindset(self, agent):
-        stem, content, _ = agent
-        mindset = extract_xml_content(content, "mindset")
-        assert mindset, f"{stem}: missing or empty <mindset>"
-
-    def test_has_tool_guidance(self, agent):
-        stem, content, _ = agent
-        assert "<tool_guidance" in content, f"{stem}: missing <tool_guidance> section"
+        assert extract_xml_content(content, tag), f"{stem}: missing or empty <{tag}>"
 
     def test_has_bounds(self, agent):
         """<bounds> must use sub-tag form: <does>, <never>, optional <fallback>.
@@ -488,10 +467,9 @@ class TestAgentOptionalFields:
         if "skills" not in fm:
             return
         # Parse skill names from raw frontmatter (YAML list items)
-        fm_match = re.match(r"^---\n(.*?)\n---", content, re.DOTALL)
-        if not fm_match:
+        fm_text, _ = split_frontmatter(content)
+        if fm_text is None:
             return
-        fm_text = fm_match.group(1)
         in_skills = False
         skill_names = []
         for line in fm_text.splitlines():

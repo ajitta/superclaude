@@ -5,7 +5,6 @@ import os
 import re
 import subprocess
 import sys
-import tempfile
 from pathlib import Path
 
 import pytest
@@ -38,16 +37,9 @@ def run_guard(tool_input: dict, env_override: dict | None = None) -> dict:
     return json.loads(result.stdout.strip() or "{}")
 
 
-@pytest.fixture
-def temp_dir():
-    """Create a temporary directory for test files."""
-    with tempfile.TemporaryDirectory() as d:
-        yield Path(d)
-
-
-def _create_file(temp_dir: Path, name: str, size: int) -> str:
+def _create_file(tmp_path: Path, name: str, size: int) -> str:
     """Create a temp file of given size and return its path."""
-    path = temp_dir / name
+    path = tmp_path / name
     path.write_bytes(b"x" * size)
     return str(path)
 
@@ -56,9 +48,40 @@ class TestApprove:
     """Reads the guard lets through: it prints nothing, so the normal
     permission flow applies (a legacy `approve` would skip the prompt)."""
 
-    def test_small_file_exempt(self, temp_dir):
-        path = _create_file(temp_dir, "small.py", 3_000)
-        result = run_guard({"file_path": path})
+    @pytest.mark.parametrize(
+        ("name", "size", "extra_input"),
+        [
+            ("small.py", 3_000, {}),
+            ("big.py", 35_000, {"limit": 500}),
+            ("doc.pdf", 35_000, {"pages": "1-5"}),
+            ("config.yaml", 20_000, {}),
+            ("settings.json", 25_000, {}),
+            ("pyproject.toml", 10_000, {}),
+            (".env", 1_000, {}),
+            ("image.png", 1_000_000, {}),
+            # Code file between 5-30KB with limit should pass.
+            ("medium.py", 15_000, {"limit": 500}),
+            # Code file between 5KB (small exempt) and 30KB (threshold) without
+            # limit — intentional friction zone, but under SIZE_THRESHOLD: no
+            # decision printed.
+            ("module.py", 15_000, {}),
+        ],
+        ids=[
+            "small-file-exempt",
+            "with-limit-parameter",
+            "with-pages-parameter",
+            "config-yaml-under-threshold",
+            "config-json-under-threshold",
+            "config-toml-under-threshold",
+            "config-env-under-threshold",
+            "binary-file",
+            "file-between-5kb-and-30kb-with-limit",
+            "code-file-between-5kb-and-30kb",
+        ],
+    )
+    def test_silent_for_exempt_read(self, tmp_path, name, size, extra_input):
+        path = _create_file(tmp_path, name, size)
+        result = run_guard({"file_path": path, **extra_input})
         assert result == {}  # silent: Claude Code's own permission flow decides
 
     def test_invalid_json_on_stdin_fails_open(self):
@@ -70,145 +93,78 @@ class TestApprove:
         )
         assert result.stdout.strip() == ""
 
-    def test_with_limit_parameter(self, temp_dir):
-        path = _create_file(temp_dir, "big.py", 35_000)
-        result = run_guard({"file_path": path, "limit": 500})
-        assert result == {}  # silent: Claude Code's own permission flow decides
-
-    def test_with_pages_parameter(self, temp_dir):
-        path = _create_file(temp_dir, "doc.pdf", 35_000)
-        result = run_guard({"file_path": path, "pages": "1-5"})
-        assert result == {}  # silent: Claude Code's own permission flow decides
-
-    def test_config_yaml_under_threshold(self, temp_dir):
-        path = _create_file(temp_dir, "config.yaml", 20_000)
-        result = run_guard({"file_path": path})
-        assert result == {}  # silent: Claude Code's own permission flow decides
-
-    def test_config_json_under_threshold(self, temp_dir):
-        path = _create_file(temp_dir, "settings.json", 25_000)
-        result = run_guard({"file_path": path})
-        assert result == {}  # silent: Claude Code's own permission flow decides
-
-    def test_config_toml_under_threshold(self, temp_dir):
-        path = _create_file(temp_dir, "pyproject.toml", 10_000)
-        result = run_guard({"file_path": path})
-        assert result == {}  # silent: Claude Code's own permission flow decides
-
-    def test_config_env_under_threshold(self, temp_dir):
-        path = _create_file(temp_dir, ".env", 1_000)
-        result = run_guard({"file_path": path})
-        assert result == {}  # silent: Claude Code's own permission flow decides
-
-    def test_binary_file(self, temp_dir):
-        path = _create_file(temp_dir, "image.png", 1_000_000)
-        result = run_guard({"file_path": path})
-        assert result == {}  # silent: Claude Code's own permission flow decides
-
-    def test_env_var_disabled(self, temp_dir):
-        path = _create_file(temp_dir, "big.py", 50_000)
+    def test_env_var_disabled(self, tmp_path):
+        path = _create_file(tmp_path, "big.py", 50_000)
         result = run_guard(
             {"file_path": path}, env_override={"SUPERCLAUDE_SIZE_GUARD": "0"}
         )
         assert result == {}  # silent: Claude Code's own permission flow decides
 
-    def test_empty_input(self):
-        result = run_guard({})
-        assert result == {}  # silent: Claude Code's own permission flow decides
-
-    def test_no_file_path(self):
-        result = run_guard({"file_path": ""})
-        assert result == {}  # silent: Claude Code's own permission flow decides
-
-    def test_nonexistent_file(self):
-        result = run_guard({"file_path": "/nonexistent/path/file.py"})
-        assert result == {}  # silent: Claude Code's own permission flow decides
-
-    def test_file_between_5kb_and_30kb_with_limit(self, temp_dir):
-        """Code file between 5-30KB with limit should pass."""
-        path = _create_file(temp_dir, "medium.py", 15_000)
-        result = run_guard({"file_path": path, "limit": 500})
+    @pytest.mark.parametrize(
+        "tool_input",
+        [{}, {"file_path": ""}, {"file_path": "/nonexistent/path/file.py"}],
+        ids=["empty-input", "no-file-path", "nonexistent-file"],
+    )
+    def test_silent_without_a_readable_file(self, tool_input):
+        result = run_guard(tool_input)
         assert result == {}  # silent: Claude Code's own permission flow decides
 
 
 class TestBlock:
     """Tests where the guard should block the Read."""
 
-    def test_code_file_over_threshold(self, temp_dir):
-        path = _create_file(temp_dir, "big.py", 35_000)
+    @pytest.mark.parametrize(
+        ("name", "size", "reason_words"),
+        [
+            ("big.py", 35_000, ("30KB", "limit")),
+            ("data.json", 35_000, ("jq",)),
+            ("logs.jsonl", 50_000, ("jq",)),
+            # package-lock.json style — config extension but over threshold.
+            ("package-lock.json", 500_000, ()),
+            # Large YAML over threshold — not exempt.
+            ("huge.yaml", 50_000, ()),
+            ("component.ts", 40_000, ("Grep",)),
+            # File exactly at 30KB threshold — should block, with the same unit
+            # and inclusive wording as the threshold it enforces.
+            ("exact.py", 30_000, ("30KB (30,000 bytes)", "at or over")),
+        ],
+        ids=[
+            "code-file-over-threshold",
+            "json-file-over-threshold",
+            "jsonl-file-over-threshold",
+            "large-config-json",
+            "large-yaml",
+            "ts-file-over-threshold",
+            "code-file-at-threshold",
+        ],
+    )
+    def test_blocks_oversized_read(self, tmp_path, name, size, reason_words):
+        path = _create_file(tmp_path, name, size)
         result = run_guard({"file_path": path})
         assert result["decision"] == "block"
-        assert "30KB" in result["reason"]
-        assert "limit" in result["reason"]
-
-    def test_json_file_over_threshold(self, temp_dir):
-        path = _create_file(temp_dir, "data.json", 35_000)
-        result = run_guard({"file_path": path})
-        assert result["decision"] == "block"
-        assert "jq" in result["reason"]
-
-    def test_jsonl_file_over_threshold(self, temp_dir):
-        path = _create_file(temp_dir, "logs.jsonl", 50_000)
-        result = run_guard({"file_path": path})
-        assert result["decision"] == "block"
-        assert "jq" in result["reason"]
-
-    def test_large_config_json(self, temp_dir):
-        """package-lock.json style — config extension but over threshold."""
-        path = _create_file(temp_dir, "package-lock.json", 500_000)
-        result = run_guard({"file_path": path})
-        assert result["decision"] == "block"
-
-    def test_large_yaml(self, temp_dir):
-        """Large YAML over threshold — not exempt."""
-        path = _create_file(temp_dir, "huge.yaml", 50_000)
-        result = run_guard({"file_path": path})
-        assert result["decision"] == "block"
-
-    def test_ts_file_over_threshold(self, temp_dir):
-        path = _create_file(temp_dir, "component.ts", 40_000)
-        result = run_guard({"file_path": path})
-        assert result["decision"] == "block"
-        assert "Grep" in result["reason"]
-
-    def test_code_file_between_5kb_and_30kb(self, temp_dir):
-        """Code file between 5-30KB without limit — intentional friction zone."""
-        path = _create_file(temp_dir, "module.py", 15_000)
-        result = run_guard({"file_path": path})
-        # 15KB code file is between 5KB (small exempt) and 30KB (threshold)
-        # Under SIZE_THRESHOLD: no decision printed
-        assert result == {}  # silent: Claude Code's own permission flow decides
-
-    def test_code_file_at_threshold(self, temp_dir):
-        """File exactly at 30KB threshold — should block."""
-        path = _create_file(temp_dir, "exact.py", 30_000)
-        result = run_guard({"file_path": path})
-        assert result["decision"] == "block"
-        # Same unit and inclusive wording as the threshold it enforces
-        assert "30KB (30,000 bytes)" in result["reason"]
-        assert "at or over" in result["reason"]
+        for word in reason_words:
+            assert word in result["reason"]
 
 
 class TestBlockMessage:
     """Tests for context-aware block messages."""
 
-    def test_python_file_message(self, temp_dir):
-        path = _create_file(temp_dir, "script.py", 50_000)
+    @pytest.mark.parametrize(
+        ("name", "present", "absent"),
+        [
+            ("script.py", ("limit", "Grep"), ("jq",)),
+            ("data.json", ("jq", "limit"), ()),
+            ("big.py", ("50KB",), ()),  # decimal KB: 50000 // 1000
+        ],
+        ids=["python-file-message", "json-file-message", "message-includes-size"],
+    )
+    def test_message_matches_file_kind(self, tmp_path, name, present, absent):
+        path = _create_file(tmp_path, name, 50_000)
         result = run_guard({"file_path": path})
-        assert "limit" in result["reason"]
-        assert "Grep" in result["reason"]
-        assert "jq" not in result["reason"]
-
-    def test_json_file_message(self, temp_dir):
-        path = _create_file(temp_dir, "data.json", 50_000)
-        result = run_guard({"file_path": path})
-        assert "jq" in result["reason"]
-        assert "limit" in result["reason"]
-
-    def test_message_includes_size(self, temp_dir):
-        path = _create_file(temp_dir, "big.py", 50_000)
-        result = run_guard({"file_path": path})
-        assert "50KB" in result["reason"]  # decimal KB: 50000 // 1000
+        for word in present:
+            assert word in result["reason"]
+        for word in absent:
+            assert word not in result["reason"]
 
 
 def test_threshold_described_as_inclusive():

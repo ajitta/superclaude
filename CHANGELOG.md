@@ -6,6 +6,40 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Ver
 
 Releases before 4.19.0 are not listed. Their history is the git log; the upstream-era changelog, last entry 4.2.1, is `CHANGELOG.md` at commit `6b0ac5c3^`.
 
+## [Unreleased]
+
+### Changed
+
+- `SECURITY.md` is a one-page policy: where to report, what is supported, what the install and hooks write on your machine. The upstream-era text (bug bounty, 4.1.x support table, checklists) is gone.
+- Every hook reads its stdin through one `utils.read_hook_input`; malformed or non-object input is ignored silently by all of them (`test-runner` no longer writes `invalid JSON input` to stderr).
+- `superclaude install` and `superclaude doctor` report a missing or foreign `superclaude` on PATH with the same wording; install's version-mismatch warning now carries the repair hint too.
+- `superclaude auto-improve`: guards return plain booleans (the `GuardVerdict` type is gone); the unused `WorktreeManager.cleanup` and `Worktree.init_results_tsv` are removed — worktrees were already kept after a run.
+- `core/rules/RULES_QUALITY.md` states the >3-files ask-first rule once (it was restated three times); on `/sc:analyze --delegate` the loader now fits `RULES_DOCS.md` into the 8K budget — `RULES_INTERACTION.md` (~280 tokens) is the file that no longer fits on that prompt.
+- The business-panel expert roster lives only in `agents/business-panel-experts.md`; `MODE_Business_Panel.md` and `core/BUSINESS_SYMBOLS.md` point to it instead of repeating it. Triggers and flags are unchanged.
+- The `project-manager` agent records patterns and mistakes in `.claude/memories/learnings_<topic>.md` — where `/sc:save` writes — instead of a `docs/memory/` folder nothing else used.
+- `/sc:roadmap` stops on a `status: draft` source spec and points to `/sc:review --scope spec`, as `/sc:plan` already did.
+- Command files lost `<tools>` lists that only enumerated Claude Code's native tools (whole section in 10 commands, trimmed to instruction-carrying lines in 9) and `<examples>` rows whose output cell only restated the flag (33 rows in 12 commands). `MODE_Orchestration.md` defers the Write-Return and Schema-vs-Evidence rules to `RULES_DELEGATION.md` instead of restating them. Nothing changes which file loads when.
+- The prompt hook no longer injects `MODE_Business_Panel.md` on the phrase "multi-expert" — it is how both the business panel and the spec panel describe themselves, so it fired on spec critiques too. `--business-panel`, "business panel", "strategic analysis" and `/sc:business-panel` still load it. Four trigger phrases that no content file ever told a user to type are gone: the `VS-CoT`/`VS-Multi`/`VS-Standard` labels (type `--vs`), "strategic symbol" and "business example" (`--structured` or "business symbol"), "analyze reasoning" (`--introspect` or "self-analysis").
+
+### Fixed
+
+- `superclaude hook prettier` finds a project-local prettier on Windows: it resolves `prettier` through `shutil.which` against `<project>/node_modules/.bin` then `PATH`, which picks `prettier.cmd` on Windows and the script elsewhere. Before, the hook ran the POSIX script directly, Windows rejected it (`WinError 193`), and the hook swallowed that as "prettier not installed" — so it formatted nothing whenever prettier was installed locally. The `npx prettier` fallback is gone: with no prettier found the hook exits silently.
+- `superclaude hook test-runner` runs the detected test command in the project it detected (the directory holding the `pyproject.toml`, `package.json` or `Makefile` nearest the edited file), not in the hook's own working directory. In a monorepo the npm/pytest run used to execute at the root and report a result for the wrong project. `make -C <dir> test` became `make test` run in that directory.
+- The `memory_staleness` hook and `insight_writer` compute Claude Code's project folder name (`~/.claude/projects/<encoded cwd>`) the way Claude Code does — every non-alphanumeric character becomes `-`, so a cwd containing `.` or `_` now resolves (`C:\Users\me\.claude\worktrees\x` → `C--Users-me--claude-worktrees-x`). Before, both replaced only `:`, `\` and `/`, so for any dotted path the stale-memory warning never fired and the transcript fallback found nothing. Derived from the 98 project folders on the maintainer's machine and the CLI's own encoder; paths over 200 characters (which Claude Code truncates and hashes) are not handled.
+- `superclaude auto-improve` without `--smoke-cmd` runs the eval command as the smoke check under `--cycle-timeout` instead of a fixed 30 s, and stops after five consecutive `smoke_fail` cycles (the plateau window; the last results.tsv row says so). An eval slower than 30 s used to time out every cycle all night without ever calling the mutator.
+- The `auto-improve` mutator runs `claude -p` with `--permission-mode acceptEdits` instead of `bypassPermissions`: edits inside its worktree are accepted, an edit outside it is denied. The unattended loop could previously write anywhere the user can.
+- A malformed `CLAUDE_CONTEXT_MAX_TOKENS` (`8k`, empty) no longer crashes the prompt hook on every prompt; the loader and `superclaude context explain` fall back to 8000.
+- `parallel-ab` passes the scenario prompt after `--`, so an input that starts with a flag (`--introspect analyze X`) is no longer parsed as a `claude` option; and it builds `matrix.md`/`decision.md` from this run's observations only — a leftover `obs-*.json` from a removed or renamed variant no longer enters the matrix or the recommended winner. Observation JSON no longer carries the always-empty `axes`, `files_touched` and `clarifying_questions` keys.
+- `prettier` and `test-runner` hooks dropped a `stop_hook_active` check that could never be true: Claude Code sets that field only for Stop/SubagentStop hooks.
+- `evals/run_eval.py` deletes the per-arm copies of `~/.claude/.credentials.json` it makes under `<runs-dir>/config/` when the run ends, including on error. They used to stay in the runs directory (by default the system temp dir) after every run.
+
+
+### Removed
+
+- `make verify` (a banner that repeated `make doctor` and `superclaude --version`). `make install` now points to `make doctor`.
+- `pytest-cov` from the dev extras and the `[tool.coverage.*]` config: nothing in the Makefile or CI invoked it. `uv pip install -e ".[dev]"` installs one package fewer; run `uv run pytest` as before.
+- `docs/experiments/sc-prompt-opus55-probe-2026-09-23/` (41 files of raw output from a one-off `/sc:prompt` probe on 2026-09-23; the analysis of that date is `docs/features/opus-5-5-default-model/03-analysis.md`).
+
 ## [4.28.0] - 2026-10-17
 
 ### Changed

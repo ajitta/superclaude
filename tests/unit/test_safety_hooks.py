@@ -13,6 +13,7 @@ so they are loaded by file path rather than as a package.
 
 from __future__ import annotations
 
+import ast
 import importlib.util
 import io
 import json
@@ -228,8 +229,6 @@ def test_no_shipped_hook_prints_approve():
     printing nothing; this test pins that for every script, including ones
     added later. Docstrings may mention the word; code may not emit it.
     """
-    import ast
-
     offenders = []
     for script in sorted(_SCRIPTS.rglob("*.py")):
         tree = ast.parse(script.read_text(encoding="utf-8"))
@@ -237,3 +236,39 @@ def test_no_shipped_hook_prints_approve():
             if isinstance(node, ast.Constant) and node.value == "approve":
                 offenders.append(f"{script.relative_to(_SCRIPTS)}:{node.lineno}")
     assert not offenders, f"hook code still emits approve: {offenders}"
+
+
+class TestReadHookInput:
+    """``utils.read_hook_input`` is the one stdin reader every hook shares.
+
+    Each "nothing to act on" shape must come back as None so a PreToolUse hook
+    falls through silently instead of crashing or printing a decision.
+    """
+
+    @pytest.mark.parametrize(
+        "raw",
+        ["", "   \n", "{ not json", '["a", "list"]', '"a string"', "42"],
+        ids=["empty", "blank", "garbage", "list", "string", "number"],
+    )
+    def test_nothing_to_act_on_is_none(self, monkeypatch, raw):
+        from superclaude.utils import read_hook_input
+
+        monkeypatch.setattr("sys.stdin", io.StringIO(raw))
+        assert read_hook_input() is None
+
+    def test_tty_is_none(self, monkeypatch):
+        from superclaude.utils import read_hook_input
+
+        class _Tty(io.StringIO):
+            def isatty(self):
+                return True
+
+        monkeypatch.setattr("sys.stdin", _Tty('{"tool_input": {}}'))
+        assert read_hook_input() is None
+
+    def test_object_is_returned(self, monkeypatch):
+        from superclaude.utils import read_hook_input
+
+        payload = {"tool_input": {"command": "ls"}, "session_id": "s1"}
+        monkeypatch.setattr("sys.stdin", io.StringIO(json.dumps(payload)))
+        assert read_hook_input() == payload

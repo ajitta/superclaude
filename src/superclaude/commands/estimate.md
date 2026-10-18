@@ -21,14 +21,6 @@ description: Give development estimates for tasks, features or projects — effo
   - --breakdown: split the estimate per sub-task instead of giving one total.
   </flags>
 
-
-  <tools>
-  - Read/Grep/Glob: Codebase complexity analysis
-  - TaskCreate/TaskUpdate: Estimation breakdown tracking
-  - Agent: Multi-domain estimation delegation
-  - Bash: Project + dependency analysis
-  </tools>
-
   <examples>
 
 | Input | Output |

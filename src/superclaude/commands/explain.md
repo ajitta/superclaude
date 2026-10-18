@@ -23,21 +23,7 @@ description: Give clear explanations of code, concepts and system behavior with 
   - --format text|examples|interactive: text: prose; examples: lead with runnable examples; interactive: explain in steps with one comprehension question between steps.
   </flags>
 
-
-  <tools>
-  - Read/Grep/Glob: Code analyze + pattern ID
-  - TaskCreate/TaskUpdate: Multi-part explain track
-  - Agent: Complex explain delegate
-  </tools>
-
   <examples>
-
-| Input | Output |
-|---|---|
-| `authentication.js --level basic` | Beginner explain |
-| `react-hooks --level intermediate --context react` | C7 patterns |
-| `microservices-system --level advanced --format interactive` | Arch deep-dive |
-| `jwt-authentication --context security --level basic` | Security concepts |
 
   <example name="explain-without-context" type="error-path">
     - Input: /sc:explain 'the code' --level advanced
@@ -46,7 +32,6 @@ description: Give clear explanations of code, concepts and system behavior with 
   </example>
 
   </examples>
-
 
   <gotchas>
   - symbolic-first: prefer symbol-aware queries (when connected) or targeted Grep for code exploration, not full file read

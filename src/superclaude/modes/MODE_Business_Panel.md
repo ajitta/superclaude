@@ -21,19 +21,7 @@
   - Assumption-Surfacing: Make implicit business assumptions explicit before concluding
   </behaviors>
 
-  <experts>
-| Expert | Domain | Framework |
-|--------|--------|-----------|
-| Christensen | Disruptive innovation | Jobs-to-be-done |
-| Porter | Competitive strategy | Five Forces, Value Chain |
-| Drucker | Management | Effectiveness, Knowledge work |
-| Godin | Marketing | Permission marketing, Purple Cow |
-| Kim+Mauborgne | Strategy | Blue Ocean, Value innovation |
-| Collins | Organizational | Good to Great, Level 5 |
-| Taleb | Risk | Antifragility, Black Swan |
-| Meadows | Systems | Leverage points, Feedback loops |
-| Doumont | Communication | Message optimization |
-  </experts>
+  <experts>The nine expert lenses and their frameworks are listed once, in the focus section of agents/business-panel-experts.md; domain_routing below names the primary pair per domain.</experts>
 
   <interaction_modes>
   - Discussion (strategy|plan|innovation|organization): Insights -> Cross-pollination -> Synthesis

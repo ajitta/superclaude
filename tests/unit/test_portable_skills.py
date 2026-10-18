@@ -24,6 +24,8 @@ from pathlib import Path
 import pytest
 import yaml
 
+from tests.unit.md_helpers import load_frontmatter
+
 _ROOT = Path(__file__).resolve().parents[2]
 _DIR = _ROOT / "portable-skills"
 _SKILLS = sorted(p for p in _DIR.iterdir() if (p / "SKILL.md").is_file())
@@ -63,8 +65,7 @@ def test_manifest_passes():
 
 @pytest.mark.parametrize("skill", _SKILLS, ids=lambda p: p.name)
 def test_frontmatter_parses_as_yaml_with_spec_keys_only(skill):
-    text = (skill / "SKILL.md").read_text(encoding="utf-8")
-    data = yaml.safe_load(text.split("---\n")[1])
+    data = load_frontmatter(skill / "SKILL.md")
     assert set(data) <= _packager().ALLOWED_KEYS
     assert data["name"] == skill.name
     assert 1 <= len(data["description"]) <= 1024
@@ -86,20 +87,37 @@ def test_codex_invocation_name_is_the_folder_name(skill):
     assert f"${skill.name} " in data["interface"]["default_prompt"]
 
 
-def test_validator_rejects_claude_code_only_key(tmp_path):
-    bad = _write_skill(
-        tmp_path,
-        "demo-skill",
-        "name: demo-skill\ndescription: Demo.\ndisable-model-invocation: true\n",
-    )
-    assert any("unexpected frontmatter keys" in e for e in _packager().validate(bad))
-
-
-def test_validator_rejects_name_folder_mismatch(tmp_path):
-    bad = _write_skill(
-        tmp_path, "folder-name", "name: other-name\ndescription: Demo.\n"
-    )
-    assert any("!= folder" in e for e in _packager().validate(bad))
+@pytest.mark.parametrize(
+    ("folder", "front", "message"),
+    [
+        (
+            "demo-skill",
+            "name: demo-skill\ndescription: Demo.\ndisable-model-invocation: true\n",
+            "unexpected frontmatter keys",
+        ),
+        ("folder-name", "name: other-name\ndescription: Demo.\n", "!= folder"),
+        (
+            "demo-skill",
+            "name: demo-skill\ndescription: Demo.\n",
+            "metadata.version missing",
+        ),
+        # `spec-version` must not satisfy the version check.
+        (
+            "demo-skill",
+            'name: demo-skill\ndescription: Demo.\nmetadata:\n  spec-version: "9.9.9"\n',
+            "metadata.version missing",
+        ),
+    ],
+    ids=[
+        "claude-code-only-key",
+        "name-folder-mismatch",
+        "metadata-version-missing",
+        "version-lookalike-key",
+    ],
+)
+def test_validator_rejects(tmp_path, folder, front, message):
+    bad = _write_skill(tmp_path, folder, front)
+    assert any(message in e for e in _packager().validate(bad))
 
 
 @pytest.mark.parametrize("subdir", ["skills", "bin", ".claude-plugin"])
@@ -111,21 +129,6 @@ def test_validator_rejects_layout_breaking_dirs(tmp_path, subdir):
     )
     (bad / subdir).mkdir()
     assert any(f"{subdir}/ must not be" in e for e in _packager().validate(bad))
-
-
-def test_validator_requires_metadata_version(tmp_path):
-    bad = _write_skill(tmp_path, "demo-skill", "name: demo-skill\ndescription: Demo.\n")
-    assert any("metadata.version missing" in e for e in _packager().validate(bad))
-
-
-def test_validator_reads_version_not_a_lookalike_key(tmp_path):
-    """`spec-version` must not satisfy the version check."""
-    bad = _write_skill(
-        tmp_path,
-        "demo-skill",
-        'name: demo-skill\ndescription: Demo.\nmetadata:\n  spec-version: "9.9.9"\n',
-    )
-    assert any("metadata.version missing" in e for e in _packager().validate(bad))
 
 
 def test_validator_rejects_missing_manifest(tmp_path, monkeypatch):

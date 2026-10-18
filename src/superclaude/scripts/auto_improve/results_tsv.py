@@ -5,8 +5,9 @@ Schema (design §4): 8 columns, append-only, single writer.
 
 from __future__ import annotations
 
-from dataclasses import dataclass, fields
+from dataclasses import dataclass
 from pathlib import Path
+from typing import get_type_hints
 
 STATUS_VALUES: frozenset[str] = frozenset(
     {
@@ -68,9 +69,9 @@ class ResultRow:
                 f"expected {len(_COLUMNS)} fields, got {len(parts)} in line {line!r}"
             )
         kwargs: dict[str, object] = {}
+        hints = get_type_hints(cls)  # resolves the string annotations to types
         for col, raw in zip(_COLUMNS, parts):
-            field_type = next(f.type for f in fields(cls) if f.name == col)
-            kwargs[col] = _coerce(raw, field_type)
+            kwargs[col] = _coerce(raw, hints[col])
         return cls(**kwargs)  # type: ignore[arg-type]
 
 
@@ -83,10 +84,10 @@ def _sanitize_field(raw: str) -> str:
     return raw.replace("\t", " ").replace("\r", " ").replace("\n", " ")
 
 
-def _coerce(raw: str, type_hint: object) -> object:
-    if type_hint is int or type_hint == "int":
+def _coerce(raw: str, type_hint: type) -> object:
+    if type_hint is int:
         return int(raw)
-    if type_hint is float or type_hint == "float":
+    if type_hint is float:
         return float(raw)
     return raw
 

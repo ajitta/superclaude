@@ -38,9 +38,6 @@ description: Review a work product (code, plan, design, spec) for quality, corre
 
 
   <tools>
-  - Grep: search patterns across changed files
-  - Read: examine file content and context
-  - Bash: run test and lint commands
   - Agent: dispatch isolated reviewer subagent for big review (--structured) and for the --audit-delegated re-eval (the Delegated-decision audit step); Read the delegate packet rule in core/rules/RULES_DELEGATION.md before dispatch, since it sets what the reviewer's prompt leaves out
   </tools>
 
@@ -53,11 +50,9 @@ description: Review a work product (code, plan, design, spec) for quality, corre
   | Input | Output |
   |---|---|
   | `/sc:review --scope diff` | Review unstaged code changes |
-  | `/sc:review --scope pr 42` | Review PR #42 |
   | `/sc:review src/auth/` | Review all files in auth directory |
   | `/sc:review --scope plan docs/plans/foo.md` | Review plan doc: traceability + gaps + dependencies |
   | `/sc:review --scope design docs/specs/bar.md` | Review design: goal fit + trade-offs + architectural gaps |
-  | `/sc:review --scope branch --structured` | Review with subagent dispatch |
 
   <example name="finding-self-check" type="info">
     Before reporting, the reviewer checks each finding against the source:

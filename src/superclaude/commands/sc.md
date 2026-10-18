@@ -58,10 +58,7 @@ description: superclaude command dispatcher that routes to the other /sc:* comma
 
 | Input | Output |
 |---|---|
-| `/sc:research React 18 features` | Deep research |
-| `/sc:index-repo` | Create project index |
 | `/sc:agent 'research React 18 features'` | Clarify scope, then delegate to deep-researcher |
-| `/sc:recommend` | Get suggestions |
 
   <example name="unknown-command" type="error-path">
     - Input: /sc:deploy (command not exist)

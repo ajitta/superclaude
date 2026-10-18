@@ -76,20 +76,81 @@ def test_scan_handles_malformed_frontmatter(tmp_path: Path) -> None:
     assert mod.scan_stale_entries(tmp_path, threshold_days=90) == []
 
 
-def test_encode_project_path_drive_letter(tmp_path: Path) -> None:
+# Real (cwd → folder) pairs read from ~/.claude/projects/ on the author's
+# machine (98 folders, 2026-10-18) and from the installed CLI's own encoder
+# (`replace(/[^a-zA-Z0-9]/g,"-")`). Each row pins one property of the rule.
+@pytest.mark.parametrize(
+    "cwd,expected",
+    [
+        # drive colon and both separators → '-', letters keep their case
+        (
+            "C:\\Users\\ajitta\\Repos\\ajitta\\superclaude",
+            "C--Users-ajitta-Repos-ajitta-superclaude",
+        ),
+        # '.' → '-'  (the defect: `.claude` used to survive, naming a folder
+        # Claude Code never creates)
+        (
+            "C:\\Users\\ajitta\\.claude\\mem-observer\\sessions",
+            "C--Users-ajitta--claude-mem-observer-sessions",
+        ),
+        # lowercase drive letter is kept as given; dotted path inside a repo
+        (
+            "c:\\Users\\ajitta\\Repos\\ajitta\\superclaude\\.claude\\worktrees\\authoring-skill",
+            "c--Users-ajitta-Repos-ajitta-superclaude--claude-worktrees-authoring-skill",
+        ),
+        # '_' → '-'  (mkdtemp suffixes draw from [a-z0-9_]; the stored names
+        # show '-' where '_' was)
+        (
+            "C:\\Users\\ajitta\\.claude\\tmp\\unknowns-eval-_f5kuegd",
+            "C--Users-ajitta--claude-tmp-unknowns-eval--f5kuegd",
+        ),
+        # POSIX root → leading '-'
+        ("/home/user/repos/proj", "-home-user-repos-proj"),
+    ],
+)
+def test_claude_projects_dir_name_matches_observed_folders(
+    cwd: str, expected: str
+) -> None:
+    from superclaude.utils import claude_projects_dir_name
+
+    assert claude_projects_dir_name(cwd) == expected
+
+
+def test_claude_projects_dir_name_replaces_every_non_alphanumeric() -> None:
+    from superclaude.utils import claude_projects_dir_name
+
+    # No coalescing, no truncation, no case folding: one '-' per character.
+    assert claude_projects_dir_name("a b.c_d-e@f") == "a-b-c-d-e-f"
+    assert claude_projects_dir_name("MiXeD") == "MiXeD"
+
+
+def test_memory_dir_uses_shared_encoder_for_dotted_project(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from superclaude.utils import claude_projects_dir_name
+
     mod = _load_module()
-    # CC encodes: drive colon -> '--', path separators -> '-'
+    project = tmp_path / ".dot_ted.proj"
+    project.mkdir()
+    monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(project))
+    resolved = mod.project_memory_dir()
     assert (
-        mod.encode_project_path("C:\\Users\\ajitta\\Repos\\ajitta\\superclaude")
-        == "C--Users-ajitta-Repos-ajitta-superclaude"
+        resolved
+        == mod.HOME_PROJECTS / claude_projects_dir_name(str(project)) / "memory"
     )
-    # Posix-style normalization
-    assert mod.encode_project_path("/home/user/repos/proj") == "-home-user-repos-proj"
+    assert "." not in resolved.parent.name and "_" not in resolved.parent.name, (
+        f"memory dir keeps characters Claude Code encodes: {resolved.parent.name}"
+    )
+    assert not hasattr(mod, "encode_project_path"), (
+        "memory_staleness must not keep its own copy of the encoder"
+    )
 
 
 def test_memory_dir_anchored_on_project_root_not_cwd(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
+    from superclaude.utils import claude_projects_dir_name
+
     mod = _load_module()
     subdir = tmp_path / "src" / "pkg"
     subdir.mkdir(parents=True)
@@ -98,7 +159,7 @@ def test_memory_dir_anchored_on_project_root_not_cwd(
     # CC encodes the project root into the memory dir name. Anchoring on CWD
     # would encode ...-src-pkg, a directory CC never creates, and the scan
     # would silently find nothing.
-    expected = mod.encode_project_path(str(tmp_path))
+    expected = claude_projects_dir_name(str(tmp_path))
     resolved = mod.project_memory_dir()
     assert resolved == mod.HOME_PROJECTS / expected / "memory"
     assert not resolved.parent.name.endswith("-src-pkg"), (

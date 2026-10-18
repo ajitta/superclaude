@@ -308,41 +308,29 @@ def uninstall(
 
     base_path = get_base_path(scope)
 
-    # Dry-run mode: show what would be removed
     if dry_run:
         click.echo(f"🔍 Dry-run mode: Showing what would be removed (scope: {scope})\n")
-        success, message = uninstall_all(
-            base_path=base_path,
-            scope=scope,
-            dry_run=True,
-            keep_settings=keep_settings,
-            keep_mcp=keep_mcp,
-        )
-        click.echo(message)
-        return
-
-    # Confirmation prompt (unless --yes)
-    if not yes:
-        click.echo(f"⚠️  This will remove superclaude from {base_path}")
-        click.echo("   User hooks in settings.json will be preserved.\n")
-        if not click.confirm("Do you want to continue?"):
-            click.echo("❌ Uninstall cancelled")
-            return
-
-    click.echo(f"🗑️  Uninstalling superclaude components (scope: {scope})...")
-    click.echo()
+    else:
+        # Confirmation prompt (unless --yes)
+        if not yes:
+            click.echo(f"⚠️  This will remove superclaude from {base_path}")
+            click.echo("   User hooks in settings.json will be preserved.\n")
+            if not click.confirm("Do you want to continue?"):
+                click.echo("❌ Uninstall cancelled")
+                return
+        click.echo(f"🗑️  Uninstalling superclaude components (scope: {scope})...")
+        click.echo()
 
     success, message = uninstall_all(
         base_path=base_path,
         scope=scope,
-        dry_run=False,
+        dry_run=dry_run,
         keep_settings=keep_settings,
         keep_mcp=keep_mcp,
     )
-
     click.echo(message)
 
-    if not success:
+    if not success and not dry_run:
         sys.exit(1)
 
 
@@ -1042,12 +1030,12 @@ def context_explain(prompt):
         superclaude context explain "--tavily research this"
         superclaude context explain --brainstorm a new CLI
     """
-    import os
+    from ..utils import int_env
 
     # Mirrors context_loader.MAX_TOKENS_ESTIMATE, which that module freezes at
     # import: reading the env here is what keeps the reported budget equal to
     # the one the freshly-started child actually enforced.
-    budget = int(os.environ.get("CLAUDE_CONTEXT_MAX_TOKENS", "8000"))
+    budget = int_env("CLAUDE_CONTEXT_MAX_TOKENS", 8000)
 
     text = " ".join(prompt).strip()
     if not text:
@@ -1138,7 +1126,8 @@ def context_reset_cmd(session_id):
     """
     import os
 
-    from superclaude.scripts.context_reset import get_cache_file, reset_context_cache
+    from superclaude.scripts.context_reset import reset_context_cache
+    from superclaude.utils import context_cache_file
 
     if session_id:
         source = "--session"
@@ -1151,9 +1140,9 @@ def context_reset_cmd(session_id):
     # De-duplicated because session_slug() strips an id to [A-Za-z0-9_-], so one
     # that sanitizes to empty (`--session '///'`) names the same file twice —
     # printed twice, and counted twice in "reset N cache file(s)".
-    candidates = [get_cache_file(session_id)]
+    candidates = [context_cache_file(session_id)]
     if session_id:
-        candidates.append(get_cache_file())
+        candidates.append(context_cache_file())
     targets = list(dict.fromkeys(candidates))
 
     click.echo(f"session: {session_id or '(none)'} — from {source}")

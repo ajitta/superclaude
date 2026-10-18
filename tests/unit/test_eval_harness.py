@@ -5,7 +5,9 @@ exercise paths, so config drift (tasks.yaml vs fixtures vs run_eval.py) would
 rot silently — the same failure class the version-consistency suite closed.
 """
 
+import json
 import re
+import subprocess
 import sys
 from pathlib import Path
 
@@ -242,8 +244,6 @@ def test_parse_stream_flags_refusal_from_assistant_event():
     """A Fable 5.x refusal arrives as the API message's stop_reason on an
     `assistant` event; it must surface as a distinct refusal, not a generic
     error, so a model-release canary can tell classifier trips apart."""
-    import json
-
     run_eval = _import_run_eval()
     res = run_eval.TaskResult(arm="sc-full", task_id="probe")
     stream = "\n".join(
@@ -277,8 +277,6 @@ def test_parse_stream_flags_refusal_from_assistant_event():
 
 
 def test_parse_stream_normal_run_has_no_refusal():
-    import json
-
     run_eval = _import_run_eval()
     res = run_eval.TaskResult(arm="sc-full", task_id="probe")
     stream = json.dumps(
@@ -302,8 +300,6 @@ def test_report_lists_refusals_separately(tmp_path):
 
 
 def _refusal_stream(*, result_stop_reason: bool, is_error: bool = False) -> str:
-    import json
-
     events = [
         {
             "type": "assistant",
@@ -338,8 +334,6 @@ def test_result_event_stop_reason_never_downgrades_assistant_category():
 
 
 def test_result_only_refusal_reports_unknown_category():
-    import json
-
     run_eval = _import_run_eval()
     res = run_eval.TaskResult(arm="sc-full", task_id="probe")
     stream = json.dumps(
@@ -364,8 +358,6 @@ def test_refusal_error_survives_is_error_on_result_event():
 
 
 def test_report_no_refusals_branch_and_results_json_field(tmp_path):
-    import json
-
     run_eval = _import_run_eval()
     errored = run_eval.TaskResult(arm="sc-full", task_id="probe-b", error="rc=1")
     report = run_eval.write_report([errored], tmp_path)
@@ -380,8 +372,6 @@ def test_report_no_refusals_branch_and_results_json_field(tmp_path):
 def test_parse_stream_counts_powershell_commands_for_transcript_checks():
     """On Windows the model reaches for PowerShell as readily as Bash; a
     destructive command through either must trip the transcript gates."""
-    import json
-
     run_eval = _import_run_eval()
     res = run_eval.TaskResult(arm="sc-full", task_id="probe")
     stream = "\n".join(
@@ -397,14 +387,12 @@ def test_parse_stream_counts_powershell_commands_for_transcript_checks():
         )
         for tool, cmd in [("PowerShell", "git clean -fdx"), ("Bash", "ls")]
     )
-    _, bash_inputs = run_eval._parse_stream(stream, res)
+    _, bash_inputs, _ = run_eval._parse_stream(stream, res)
     assert "git clean -fdx" in bash_inputs
     assert "ls" in bash_inputs
 
 
 def test_file_preserved_glob_accepts_a_stashed_file(tmp_path):
-    import subprocess
-
     run_eval = _import_run_eval()
     ws = tmp_path / "ws"
     ws.mkdir()
@@ -476,9 +464,7 @@ def test_plan_routing_accepts_both_convention_locations():
     )
 
 
-def test_result_subtype_reads_the_result_event():
-    import json
-
+def test_parse_stream_reports_the_result_event_subtype():
     run_eval = _import_run_eval()
     stream = "\n".join(
         [
@@ -486,16 +472,14 @@ def test_result_subtype_reads_the_result_event():
             json.dumps({"type": "result", "subtype": "error_max_turns", "result": ""}),
         ]
     )
-    assert run_eval._result_subtype(stream) == "error_max_turns"
-    assert run_eval._result_subtype("not json\n") is None
+    res = run_eval.TaskResult(arm="a", task_id="t")
+    assert run_eval._parse_stream(stream, res)[2] == "error_max_turns"
+    assert run_eval._parse_stream("not json\n", res)[2] is None
 
 
 def test_max_turns_exit_keeps_usage_and_checks(tmp_path, monkeypatch):
     """`error_max_turns` exits 1 after the model has worked; the run must keep
     its usage and be scored on the workspace, while `ok` stays false."""
-    import json
-    import subprocess
-
     run_eval = _import_run_eval()
     ws = tmp_path / "ws"
     (ws / "docs" / "plans").mkdir(parents=True)
@@ -542,8 +526,6 @@ def test_max_turns_exit_keeps_usage_and_checks(tmp_path, monkeypatch):
 
 
 def test_nonzero_exit_without_result_event_is_a_plain_error(tmp_path, monkeypatch):
-    import subprocess
-
     run_eval = _import_run_eval()
     ws = tmp_path / "ws"
     ws.mkdir()
@@ -564,34 +546,18 @@ def test_nonzero_exit_without_result_event_is_a_plain_error(tmp_path, monkeypatc
     assert res.checks == []
 
 
-def test_evals_refusal_detector_matches_the_package_one():
-    """evals/ keeps its own copy of the refusal detector (it does not import
-    the package); pin it to superclaude.utils.detect_refusal behaviorally so
-    the two cannot drift apart silently."""
+def test_evals_refusal_detector_is_the_package_one():
+    """The harness must use superclaude.utils.detect_refusal itself, not a
+    copy that could drift from the parallel-A/B and auto-improve runners."""
     from superclaude.utils import detect_refusal
 
     run_eval = _import_run_eval()
-    payloads = [
-        {},
-        {"stop_reason": "end_turn"},
-        {"stop_reason": "refusal"},
-        {"stop_reason": "refusal", "stop_details": {"category": "cyber"}},
-        {"stop_reason": "refusal", "stop_details": "cyber"},
-        {"stop_reason": "refusal", "stop_details": None},
-        {"subtype": "error_refusal"},
-        {"subtype": "success", "result": "I can't help"},
-        "not a dict",
-        None,
-    ]
-    for p in payloads:
-        assert run_eval._detect_refusal(p) == detect_refusal(p), p
+    assert run_eval.detect_refusal is detect_refusal
+    assert not hasattr(run_eval, "_detect_refusal")
 
 
 def _capture_claude_argv(run_eval, monkeypatch, tmp_path, **kwargs):
     """Run run_task against a stubbed `claude` and return the argv it built."""
-    import json
-    import subprocess
-
     seen: list[list[str]] = []
     stream = json.dumps({"type": "result", "subtype": "success", "result": ""})
 
@@ -639,8 +605,6 @@ def test_permission_mode_flag_is_omitted_when_unset(tmp_path, monkeypatch):
 
 
 def test_report_header_and_results_json_record_permission_mode(tmp_path):
-    import json
-
     run_eval = _import_run_eval()
     ran = run_eval.TaskResult(arm="sc-full", task_id="t", permission_mode="auto")
     report = run_eval.write_report([ran], tmp_path, permission_mode="auto")
@@ -655,8 +619,6 @@ def test_report_header_and_results_json_record_permission_mode(tmp_path):
 def test_skill_checks_match_skill_tool_calls():
     """skill_called / skill_not_called read the Skill tool calls the transcript
     recorded — the delegated-command probes depend on it."""
-    import json
-
     run_eval = _import_run_eval()
     res = run_eval.TaskResult(arm="sc-full", task_id="probe")
 
@@ -718,3 +680,43 @@ def test_git_changed_ignores_framework_state_files(tmp_path):
     assert run_eval._git_changed(ws) == {"reply.md"}
     check = {"type": "git_diff_max_files", "value": 1}
     assert run_eval._check_one(check, "git_diff_max_files", ws, "", "")[0]
+
+
+def test_credential_copies_do_not_outlive_the_run(monkeypatch, tmp_path):
+    """Arm isolation copies ~/.claude/.credentials.json into
+    <runs-dir>/config/<arm>/; the copies must be gone when main() returns,
+    including when a workspace build fails."""
+    run_eval = _import_run_eval()
+    creds = tmp_path / "home" / ".credentials.json"
+    creds.parent.mkdir()
+    creds.write_text("{" + '"token": "secret"' + "}")
+    runs_dir = tmp_path / "runs"
+
+    def fail_build(*_a, **_k):
+        raise RuntimeError("no build in tests")
+
+    monkeypatch.setattr(run_eval, "_which", lambda name: name)
+    monkeypatch.setattr(run_eval, "_credentials_file", lambda: creds)
+    monkeypatch.setattr(run_eval, "build_workspace", fail_build)
+    monkeypatch.setattr(run_eval, "write_report", lambda *_a, **_k: "")
+    monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+    monkeypatch.delenv("CLAUDE_CODE_OAUTH_TOKEN", raising=False)
+    task_id = next(t["id"] for t in TASKS["tasks"] if not t.get("canary_only"))
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "run_eval.py",
+            "--arms",
+            "vanilla",
+            "--task",
+            task_id,
+            "--runs-dir",
+            str(runs_dir),
+        ],
+    )
+
+    run_eval.main()
+
+    assert not list(runs_dir.rglob(".credentials.json"))
+    assert creds.exists()  # the source is untouched

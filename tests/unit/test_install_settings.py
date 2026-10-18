@@ -816,8 +816,6 @@ class TestInnerHookOwnership:
         assert commands == ["npm run user-lint"]
 
     def test_uninstall_keeps_the_user_hook(self, tmp_path):
-        import json
-
         from superclaude.cli.install_settings import uninstall_hooks_from_settings
 
         base = tmp_path / ".claude"
@@ -989,8 +987,6 @@ class TestForceSweepsRetiredEvents:
     """
 
     def test_a_retired_event_is_removed(self, tmp_path):
-        import json
-
         from superclaude.cli.install_settings import merge_hooks_to_settings
 
         base = tmp_path / ".claude"
@@ -1039,8 +1035,6 @@ class TestForceSweepsRetiredEvents:
         assert "Stop" in events
 
     def test_a_user_hook_on_a_retired_event_survives(self, tmp_path):
-        import json
-
         from superclaude.cli.install_settings import merge_hooks_to_settings
 
         base = tmp_path / ".claude"
@@ -1278,8 +1272,6 @@ class TestHookIdentityAcrossCommandForms:
 
 
 def _shipped_hooks_config() -> dict:
-    import json
-
     root = Path(__file__).resolve().parents[2] / "src" / "superclaude"
     return json.loads((root / "hooks" / "hooks.json").read_text(encoding="utf-8"))
 
@@ -1296,8 +1288,6 @@ class TestMergeWritesOnlyWhenTheHooksChange:
     """
 
     def _settings_with_shipped_hooks(self, base: Path, force_layout: bool) -> bytes:
-        import json
-
         config = _shipped_hooks_config()
         text = json.dumps({"hooks": config["hooks"]}, indent=4, ensure_ascii=False)
         if force_layout:
@@ -1324,8 +1314,6 @@ class TestMergeWritesOnlyWhenTheHooksChange:
         assert "already registered" in message
 
     def test_a_legacy_registration_is_rewritten_and_the_message_says_so(self, tmp_path):
-        import json
-
         from superclaude.cli.install_settings import merge_hooks_to_settings
 
         base = tmp_path / ".claude"
@@ -1372,8 +1360,6 @@ class TestMergeWritesOnlyWhenTheHooksChange:
     ):
         """The count is of rewrites, not of legacy commands that went away for
         any reason: a retired hook `--force` deletes was not rewritten."""
-        import json
-
         from superclaude.cli.install_settings import merge_hooks_to_settings
 
         base = tmp_path / ".claude"
@@ -1421,3 +1407,43 @@ class TestRemoveClaudeMdImport:
 
         assert ok, message
         assert claude_md.read_text(encoding="utf-8") == "# My notes\nkeep this\n"
+
+
+class TestCheckClaudeMdImport:
+    """Both path spellings of the import line count: a file written on
+    Windows may carry backslashes, and Claude Code resolves either."""
+
+    @pytest.mark.parametrize(
+        ("scope", "line"),
+        [
+            ("user", "@superclaude/CLAUDE_SC.md"),
+            ("user", "@superclaude\\CLAUDE_SC.md"),
+            ("local", "@.claude/superclaude/CLAUDE_SC.md"),
+            ("local", "@.claude\\superclaude\\CLAUDE_SC.md"),
+        ],
+        ids=["user-slash", "user-backslash", "local-slash", "local-backslash"],
+    )
+    def test_either_separator_is_detected(self, tmp_path: Path, scope, line):
+        from superclaude.cli.install_settings import check_claude_md_import
+
+        base = tmp_path / ".claude"
+        base.mkdir()
+        target = (
+            tmp_path / "CLAUDE.local.md" if scope == "local" else base / "CLAUDE.md"
+        )
+        target.write_text(f"# Project\n\n{line}\n", encoding="utf-8")
+
+        has_import, message = check_claude_md_import(base, scope)
+        assert has_import, message
+        assert "already imports" in message
+
+    def test_a_different_import_is_not_this_one(self, tmp_path: Path):
+        from superclaude.cli.install_settings import check_claude_md_import
+
+        base = tmp_path / ".claude"
+        base.mkdir()
+        (base / "CLAUDE.md").write_text("@other/CLAUDE_SC.md\n", encoding="utf-8")
+
+        has_import, message = check_claude_md_import(base, "user")
+        assert not has_import
+        assert "does not import" in message

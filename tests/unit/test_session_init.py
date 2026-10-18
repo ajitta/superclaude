@@ -13,6 +13,7 @@ from unittest.mock import patch
 import pytest
 
 from superclaude.scripts.session_init import (
+    get_install_status,
     get_pr_status,
     main,
 )
@@ -274,8 +275,6 @@ class TestInstallStatusLine:
             )
 
     def test_reports_what_is_installed(self, tmp_path: Path, monkeypatch):
-        from superclaude.scripts.session_init import get_install_status
-
         monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(tmp_path))
         base = tmp_path / ".claude"
         (base / "superclaude").mkdir(parents=True)
@@ -297,8 +296,6 @@ class TestInstallStatusLine:
         The banner read `(project scope)` on every local install, which is the
         scope name the user has to pass back to `superclaude install`.
         """
-        from superclaude.scripts.session_init import get_install_status
-
         monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(tmp_path))
         base = tmp_path / ".claude"
         (base / "superclaude").mkdir(parents=True)
@@ -315,8 +312,6 @@ class TestInstallStatusLine:
 
     def test_absent_install_says_so(self, tmp_path: Path, monkeypatch):
         """The line that would have caught `0 installed` the first day."""
-        from superclaude.scripts.session_init import get_install_status
-
         monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(tmp_path))
 
         line = get_install_status()

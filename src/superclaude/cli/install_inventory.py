@@ -10,7 +10,7 @@ from collections import Counter
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
-from superclaude.utils import is_superclaude_hook, settings_filename
+from superclaude.utils import settings_filename
 
 from .install_paths import (
     COMPONENTS,
@@ -57,34 +57,6 @@ def list_installed_commands(base_path: Path) -> List[str]:
         List of installed command names
     """
     return sorted(Path(n).stem for n in md_names(base_path / "commands" / "sc"))
-
-
-def _count_shipped_hooks(hooks_json: Path) -> int:
-    """How many individual hook commands this release ships."""
-    if not hooks_json.exists():
-        return 0
-    try:
-        config = json.loads(hooks_json.read_text(encoding="utf-8"))
-    except (json.JSONDecodeError, OSError):
-        return 0
-    return sum(
-        len(entry.get("hooks", []))
-        for array in config.get("hooks", {}).values()
-        if isinstance(array, list)
-        for entry in array
-    )
-
-
-def _count_registered_hooks(settings_file: Path) -> int:
-    """How many of them are actually wired into this scope's settings file."""
-    settings = _load_settings(settings_file)
-    return sum(
-        len(entry.get("hooks", []))
-        for array in settings.get("hooks", {}).values()
-        if isinstance(array, list)
-        for entry in array
-        if is_superclaude_hook(entry)
-    )
 
 
 def _hook_identity_counts(hooks_section: dict, superclaude_only: bool) -> Counter:
@@ -185,7 +157,6 @@ def list_all_components(
 
         result[component] = {
             "description": description,
-            "source_path": str(source_dir),
             "target_path": str(target_dir),
             "available": source_count,
             "installed": installed_count,
@@ -198,7 +169,6 @@ def list_all_components(
 
     result["hooks"] = {
         "description": "Hook configuration",
-        "source_path": str(hooks_source),
         "target_path": str(hooks_target),
         "available": 1 if (hooks_source / "hooks.json").exists() else 0,
         "installed": 1 if hooks_json_installed else 0,
@@ -212,7 +182,6 @@ def list_all_components(
     report = _hook_registration_report(hooks_source / "hooks.json", settings_file)
     result["hooks_registered"] = {
         "description": "Hooks registered in settings",
-        "source_path": str(hooks_source / "hooks.json"),
         "target_path": str(settings_file),
         "available": report["shipped"],
         "installed": report["matched"],
