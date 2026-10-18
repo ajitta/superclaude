@@ -291,6 +291,12 @@ def run_task(
     env = dict(os.environ)
     env["CLAUDE_CONFIG_DIR"] = str(config_dir)
     env["PATH"] = str(Path(PY_BIN).parent) + os.pathsep + env.get("PATH", "")
+    # The sc-* install carries a Stop hook that asks for one `INSIGHT:` line
+    # after the first code change; headless, that reply becomes the result
+    # event's text and every output_regex check reads it instead of the
+    # report (vanilla has no hook). Plumbing, not behavior under measurement —
+    # off for every arm through the hook's own knob.
+    env["SUPERCLAUDE_INSIGHT_PROMPT"] = "0"
 
     started = time.monotonic()
     try:

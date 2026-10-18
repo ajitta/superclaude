@@ -53,18 +53,14 @@ def test_arms_match_harness_constant():
 #   action-vs-purpose-code (docs/features/lean-round/05-release-gate.md); every
 #   miss names the env-var mismatch and leaves the value uncorrected. Trial: one
 #   sentence after the boundary sentence that counts the file defining a value
-#   the failing call read as a file the error names
-#   (docs/features/purpose-boundary/00-intent.md Q2).
+#   the failing call read as a file the error names. sc-full 3/8 → sc-candidate
+#   8/8 on the sync-succeeds check (docs/features/purpose-boundary/
+#   01-measurement.md); shipped the same day. Delta is now empty.
 #   To open the next trial, put the inserted text in CANDIDATE_INSERTS and
 #   regenerate evals/arms/RULES_CANDIDATE.md.
-CANDIDATE_INSERTS: list[tuple[str, str]] = [
-    (
-        "is proposed with the evidence, not made.",
-        " A value the failing call read — a token, an env var, a path — belongs to"
-        " the files the error names wherever that value is defined, so correcting"
-        " it there is inside that boundary when the edit is reversible.",
-    ),
-]  # (anchor in RULES.md, text inserted after it)
+CANDIDATE_INSERTS: list[
+    tuple[str, str]
+] = []  # (anchor in RULES.md, text inserted after it)
 
 
 def test_candidate_arm_is_shipped_kernel_plus_trial_delta():
@@ -592,6 +588,33 @@ def _capture_claude_argv(run_eval, monkeypatch, tmp_path, **kwargs):
         **kwargs,
     )
     return seen[-1], res
+
+
+def test_insight_request_is_off_for_every_arm(tmp_path, monkeypatch):
+    """The sc-* arms install the Stop hook that asks for one `INSIGHT:` line
+    after the first code change. In a headless run that reply becomes the
+    result event's text, so every output_regex check on an sc arm was reading
+    the insight line instead of the report (vanilla has no hook and is read
+    as-is: an arm asymmetry on top). The harness switches the request off
+    through the hook's own env knob; the hook is plumbing, not behavior under
+    measurement."""
+    run_eval = _import_run_eval()
+    seen_env: list[dict] = []
+    stream = json.dumps({"type": "result", "subtype": "success", "result": ""})
+
+    def fake_run(cmd, **kw):
+        seen_env.append(dict(kw.get("env") or {}))
+        return subprocess.CompletedProcess(cmd, 0, stdout=stream, stderr="")
+
+    monkeypatch.setattr(run_eval.subprocess, "run", fake_run)
+    monkeypatch.delenv("SUPERCLAUDE_INSIGHT_PROMPT", raising=False)
+    ws = tmp_path / "ws"
+    ws.mkdir()
+    task = {"id": "t", "prompt": "do the thing", "checks": []}
+    run_eval.run_task(
+        "sc-full", task, ws, tmp_path / "cfg", tmp_path / "logs", "claude", "m", {}
+    )
+    assert seen_env[-1].get("SUPERCLAUDE_INSIGHT_PROMPT") == "0"
 
 
 def test_permission_mode_flag_is_passed_through_when_set(tmp_path, monkeypatch):
