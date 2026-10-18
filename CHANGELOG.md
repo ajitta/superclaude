@@ -14,9 +14,10 @@ Releases before 4.19.0 are not listed. Their history is the git log; the upstrea
 
 ### Changed
 
+- `core/RULES.md` `<purpose_before_action>`: one sentence after the fix-vs-propose boundary — a value the failing call read (a token, an env var, a path) belongs to the files the error names wherever it is defined, so correcting it there is inside the boundary when the edit is reversible. Measured sc-full vs sc-candidate on the nightly-sync task: 3/8 → 8/8 sessions where the sync actually succeeds (`docs/features/purpose-boundary/01-measurement.md`); every miss before had named the mismatch and left the env value alone.
 - The MCP docs (`mcp/MCP_*.md`, read only under `--verbose-context` or when Claude opens them) lost the sections that described the server rather than its use inside superclaude: the Core Web Vitals threshold table, Playwright's per-capability tool inventory (the `--caps=` opt-in note moved into `<choose>`), and Tavily's `tavily_search` parameter list. −1.8 KB; nothing changes which file loads when.
 - `/sc:init` and the `project-initializer` agent name each other in their descriptions — the same setup menu, run interactively or by delegation.
-- Eval harness (dev-only): `sc-no-modes` arm (full install minus `MODE_Orchestration.md` and `MODE_Task_Management.md`), `tool_called` and `parallel_tool_calls_min` checks (tool calls are summed per `message.id` — stream-json emits one event per content block), and the `mode-task-manage` / `mode-orchestrate` tasks that measure those two modes. The `sc-candidate` arm carries a one-sentence trial for the `purpose_before_action` fix-vs-propose boundary; the shipped kernel is unchanged until the readout.
+- Eval harness (dev-only): `sc-no-modes` arm (full install minus `MODE_Orchestration.md` and `MODE_Task_Management.md`), `tool_called` and `parallel_tool_calls_min` checks (tool calls are summed per `message.id` — stream-json emits one event per content block), and the `mode-task-manage` / `mode-orchestrate` tasks that measure those two modes. The harness also sets `SUPERCLAUDE_INSIGHT_PROMPT=0` for every arm: the Stop hook's `INSIGHT:` request had been replacing the final report as the text that `output_regex` checks read on sc-* arms.
 
 ## [4.28.2] - 2026-10-18
 

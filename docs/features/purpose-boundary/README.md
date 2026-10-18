@@ -1,6 +1,6 @@
 ---
 feature: purpose-boundary
-phase: intent
+phase: readout
 owner: ajitta
 created: 2026-10-18
 updated: 2026-10-18
@@ -12,7 +12,7 @@ Re-measure the `purpose_before_action` fix-vs-propose boundary with one candidat
 
 ## Status
 
-Phase 0. Branch `feature/purpose-boundary` on `a0b7fc9a` (v4.28.2 + handoff docs). Decisions Q1–Q8 taken in chat on 2026-10-18 and recorded in [00-intent.md](./00-intent.md). Session cap 52, used 0.
+Phases 0–3 done on branch `feature/purpose-boundary` (base `a0b7fc9a`). Decisions Q1–Q8 in [00-intent.md](./00-intent.md); measurement in [01-measurement.md](./01-measurement.md) (49 of 52 sessions); readout in [02-readout.md](./02-readout.md): the boundary sentence shipped into `core/RULES.md` (sc-full 3/8 → sc-candidate 8/8), both modes kept by the pre-fixed rule, `/sc:sc` removed, MCP docs trimmed, init pair cross-linked. Not run: canary-gates (4 sessions, cap has 3). Not done: merge, push, release.
 
 Working plan: `.hermes/plans/2026-10-18_211158-handoff-round.md` (v3; v1 and the reviewed v2 preserved alongside it).
 
@@ -21,5 +21,5 @@ Working plan: `.hermes/plans/2026-10-18_211158-handoff-round.md` (v3; v1 and the
 | File | Content |
 |---|---|
 | [00-intent.md](./00-intent.md) | Request, purpose, decision table |
-| 01-measurement.md | Phase 1 results: item 7 per-check table with miss types, item 2 ablation per check (pending) |
-| 02-readout.md | Q7/Q8 applied, what shipped or was deleted (pending) |
+| [01-measurement.md](./01-measurement.md) | Phase 1 results: item 7 per-check table with miss types, item 2 ablation per check, harness findings |
+| [02-readout.md](./02-readout.md) | Q7/Q8 applied, what shipped, what stays open |
