@@ -8,6 +8,10 @@ Releases before 4.19.0 are not listed. Their history is the git log; the upstrea
 
 ## [Unreleased]
 
+### Added
+
+- Eval harness (dev-only): opus-focused unstated-purpose probes and a plain-request control (`docs/features/purpose-opus/`).
+
 ## [4.29.5] - 2026-10-19
 
 ### Changed

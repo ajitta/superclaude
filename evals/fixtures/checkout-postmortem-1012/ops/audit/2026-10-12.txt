@@ -1,0 +1,6 @@
+09:30 deploy search release=2290 by=dave
+13:58 deploy checkout release=4812 by=alice
+14:12 rollback checkout release=4812 to=4811 by=alice
+14:32 rollback checkout complete
+15:07 FLUSHDB sessions-cache (manual) by=carol
+16:40 scale search replicas=3 by=dave

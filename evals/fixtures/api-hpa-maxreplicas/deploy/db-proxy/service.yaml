@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: db-proxy
+spec:
+  selector:
+    app: db-proxy
+  ports:
+    - port: 6432
+      targetPort: 6432

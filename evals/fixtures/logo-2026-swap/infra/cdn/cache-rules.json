@@ -1,0 +1,7 @@
+{
+  "origin": "acme-web-static",
+  "rules": [
+    {"path": "/static/*", "cache_control": "public, max-age=31536000, immutable"},
+    {"path": "/*", "cache_control": "no-cache"}
+  ]
+}

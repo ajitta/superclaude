@@ -1,0 +1,17 @@
+flags:
+  new_checkout:
+    rollout: 100
+    tags: [payments]
+    owner: team-checkout
+  saved_carts:
+    rollout: 100
+    tags: [cart]
+    owner: team-checkout
+  search_v2:
+    rollout: 100
+    tags: [search]
+    owner: team-search
+  dark_mode:
+    rollout: 100
+    tags: [ui]
+    owner: team-web

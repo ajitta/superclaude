@@ -122,6 +122,8 @@ poetry.lock
 .superclaude/
 # local issue tracker (docs/agents/issue-tracker.md); never committed
 /.scratch/
+# local working plans (docs/features/*/ cite them as local to the machine)
+/.hermes/
 *.backup
 *.bak
 

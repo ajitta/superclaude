@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: worker
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: worker
+  template:
+    metadata:
+      labels:
+        app: worker
+    spec:
+      containers:
+        - name: worker
+          image: registry.local/shop/worker:2026.10.14
+          envFrom:
+            - configMapRef:
+                name: worker-env
+          resources:
+            requests:
+              cpu: 250m
+              memory: 256Mi
