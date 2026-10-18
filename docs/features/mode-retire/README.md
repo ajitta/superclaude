@@ -1,6 +1,6 @@
 ---
 feature: mode-retire
-phase: intent
+phase: closed
 owner: ajitta
 created: 2026-10-18
 updated: 2026-10-18
@@ -12,7 +12,9 @@ Retire `MODE_Task_Management.md` and `MODE_Orchestration.md` on the purpose-boun
 
 ## Status
 
-Branch `fix/mode-retire` (base `40746786`). Decisions Q1–Q7 in [00-intent.md](./00-intent.md).
+Phases 0–3 done on branch `fix/mode-retire` (base `40746786`), three commits, full suite green, 0 sessions. Decisions Q1–Q7 in [00-intent.md](./00-intent.md); what was carried, kept and removed in [01-decisions.md](./01-decisions.md); next-round candidates in [02-handoff.md](./02-handoff.md). Not merged or released at close — release needs `make canary-gates` (4 sessions), outside this round's cap.
+
+Working plan: `.hermes/plans/2026-10-18_233018-mode-retire-round.md` (v3; v1 and the reviewed v2 preserved alongside it, local to the machine).
 
 ## Documents
 
