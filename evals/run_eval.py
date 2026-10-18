@@ -7,9 +7,10 @@ Runs each task from tasks.yaml in an isolated temp workspace OUTSIDE the repo
   sc-full          full project-scope install
   sc-core-lite     full install, RULES.md swapped for arms/RULES_KERNEL.md
   sc-candidate     full install, RULES.md swapped for arms/RULES_CANDIDATE.md
-                   (the shipped kernel plus one rule under trial; the only
-                   difference from sc-full, so sc-full vs sc-candidate measures
-                   that rule alone under identical hooks)
+                   (the shipped kernel plus one rule under trial, or minus one
+                   shipped rule for an ablation; the only difference from
+                   sc-full, so sc-full vs sc-candidate measures that rule alone
+                   under identical hooks)
   sc-command-only  full install, always-loaded core import stripped
 
 Arm isolation: CLAUDE_CONFIG_DIR points at an empty per-arm dir (keeps the

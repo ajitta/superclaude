@@ -1,0 +1,9 @@
+# Example tidepool.toml
+
+[storage]
+path = "/var/lib/tidepool"
+compression = "zstd"
+cache_path = "/var/cache/tidepool"
+
+[serve]
+port = 8000

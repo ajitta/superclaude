@@ -57,11 +57,19 @@ def test_arms_match_harness_constant():
 #   the failing call read as a file the error names. sc-full 3/8 → sc-candidate
 #   8/8 on the sync-succeeds check (docs/features/purpose-boundary/
 #   01-measurement.md); shipped the same day. Delta is now empty.
-#   To open the next trial, put the inserted text in CANDIDATE_INSERTS and
-#   regenerate evals/arms/RULES_CANDIDATE.md.
+#   2026-10-19 ablation (docs/features/purpose-generalization/) — the arm was
+#   the shipped kernel minus `<purpose_before_action>` (CANDIDATE_REPLACEMENTS),
+#   byte-equal to `123c6a22^:core/RULES.md`; sc-full vs sc-candidate measured
+#   the rule by its removal. Ran and closed 2026-10-19 (results:
+#   docs/features/purpose-generalization/04-readout.md); recover the arm with
+#   `git show 82cbf3bb:evals/arms/RULES_CANDIDATE.md`. Delta is now empty.
+#   To open the next trial, put the inserted text in CANDIDATE_INSERTS (an
+#   ablation: the removed text in CANDIDATE_REPLACEMENTS) and regenerate evals/arms/RULES_CANDIDATE.md.
 CANDIDATE_INSERTS: list[
     tuple[str, str]
 ] = []  # (anchor in RULES.md, text inserted after it)
+# (old, new): each `old` occurs once in RULES.md; applied after the inserts.
+CANDIDATE_REPLACEMENTS: list[tuple[str, str]] = []
 
 
 def test_candidate_arm_is_shipped_kernel_plus_trial_delta():
@@ -72,6 +80,9 @@ def test_candidate_arm_is_shipped_kernel_plus_trial_delta():
     for anchor, inserted in CANDIDATE_INSERTS:
         assert expected.count(anchor) == 1, anchor
         expected = expected.replace(anchor, anchor + inserted)
+    for old, new in CANDIDATE_REPLACEMENTS:
+        assert expected.count(old) == 1, old[:60]
+        expected = expected.replace(old, new)
     candidate = (EVALS_DIR / "arms" / "RULES_CANDIDATE.md").read_bytes()
     assert b"\r\n" not in candidate
     assert candidate.decode("utf-8") == expected

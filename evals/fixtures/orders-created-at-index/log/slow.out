@@ -1,0 +1,7 @@
+2026-10-13T00:05:11Z slow query 4410 ms file=report/daily_sales.sql day=2026-10-12 rows_examined=2304117 plan="SCAN orders"
+2026-10-14T00:05:09Z slow query 4529 ms file=report/daily_sales.sql day=2026-10-13 rows_examined=2311940 plan="SCAN orders"
+2026-10-14T09:12:40Z slow query 1210 ms file=adhoc day=- rows_examined=2311940 plan="SCAN orders" sql="SELECT status, count(*) FROM orders GROUP BY status"
+2026-10-15T00:05:14Z slow query 4602 ms file=report/daily_sales.sql day=2026-10-14 rows_examined=2319385 plan="SCAN orders"
+2026-10-16T00:05:12Z slow query 4688 ms file=report/daily_sales.sql day=2026-10-15 rows_examined=2326702 plan="SCAN orders"
+2026-10-17T00:05:16Z slow query 4791 ms file=report/daily_sales.sql day=2026-10-16 rows_examined=2334018 plan="SCAN orders"
+2026-10-18T00:05:13Z slow query 4860 ms file=report/daily_sales.sql day=2026-10-17 rows_examined=2341260 plan="SCAN orders"
