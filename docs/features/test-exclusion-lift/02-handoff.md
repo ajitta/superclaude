@@ -8,7 +8,7 @@ updated: 2026-10-19
 
 # 02. Handoff — what remains after test-exclusion-lift
 
-This round lifted the `tests/unit/scripts` exclusion on an eight-run rule, added Dependabot for the pinned actions and dropped the `frozenset` item ([01-verification.md](./01-verification.md)). Commits b54f21fb, 10697cd1, 3e64dc82 on fix/test-exclusion-lift from master fe3195c1. Sessions: **0**. Delivered: merged into master at 09ea2e74 and pushed; no release needed. A new session inherits no execution authorization.
+This round lifted the `tests/unit/scripts` exclusion on an eight-run rule, added Dependabot for the pinned actions and dropped the `frozenset` item ([01-verification.md](./01-verification.md)). Commits b54f21fb, 10697cd1, 3e64dc82 on fix/test-exclusion-lift from master fe3195c1. Sessions: **0**. Delivered: merged into master at 09ea2e74; released as v4.29.3 (d61d79cd), which moved `stable` onto the Dependabot config. A new session inherits no execution authorization.
 
 ## Candidates
 
@@ -18,7 +18,7 @@ This round lifted the `tests/unit/scripts` exclusion on an eight-run rule, added
 | 2 | Stacked-mode prompts exceed the 12,000 default (P2 INTERACTION dropped) | Observation | context-budget-restore `01-verification.md` | Reopen only if a real prompt loses a P1 module |
 | 3 | `_is_multiline_tag` accepts only attribute-shaped continuation lines | Recorded limit | author-check-multiline `02-handoff.md` | Revisit on a user report |
 | 4 | Windows native abort `0xC0000409` recurrence watch | Monitoring | this round's 8/8 clean runs; `git revert 3e64dc82` is the path | If any Windows `uv run pytest` aborts natively: revert, then bisect `tests/unit/scripts/parallel_ab/` under concurrent load; record pytest-asyncio version |
-| 5 | Dependabot activation | Confirmation — **not active yet** | `.github/dependabot.yml` is on master; GitHub reads the file from the **default branch**, which is `stable` (confirmed via `gh api repos/ajitta/superclaude --jq .default_branch`), and `stable` moves only at `make release` | Dependabot starts with the next release (stable → a commit containing the file). Then confirm under Insights → Dependency graph → Dependabot; the first grouped PR targets master and must pass the read-only-token CI. Missed by the plan and its review — recorded here, not in a code change |
+| 5 | Dependabot activation | Confirmation — **active since v4.29.3** (file on the default branch) | `.github/dependabot.yml` is on master; GitHub reads the file from the **default branch**, which is `stable` (confirmed via `gh api repos/ajitta/superclaude --jq .default_branch`), and `stable` moves only at `make release` | Dependabot starts with the next release (stable → a commit containing the file). Then confirm under Insights → Dependency graph → Dependabot; the first grouped PR targets master and must pass the read-only-token CI. Missed by the plan and its review — recorded here, not in a code change |
 
 Dropped this round: `frozenset("…".split())` rewrites (cosmetic, five carries). Recorded keeps stand (finding_policy; `CLAUDE_CONTEXT_MAX_TOKENS` knob; over-engineering-audit D01–D24).
 
