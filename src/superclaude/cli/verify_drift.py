@@ -71,7 +71,7 @@ def _check_component(component: str, base_path: Path) -> Dict[str, str]:
     """Check a single component for drift. Returns {filename: status}."""
     source_dir = _get_source_dir(component)
     target_dir = _get_target_dir(component, base_path)
-    results = {}
+    results: Dict[str, str] = {}
 
     if not source_dir.exists():
         return results

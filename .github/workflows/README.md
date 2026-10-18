@@ -9,6 +9,7 @@
   - Full test suite (including `tests/unit/scripts`, which rejoined the default run in docs/features/test-exclusion-lift)
 - **checks**: Python 3.10
   - `ruff check` and `ruff format --check` over `src/` and `tests/`
+  - `mypy src` (the same check as `make typecheck`)
   - Pytest plugin loads (its `superclaude: ` report header)
   - `superclaude install --scope user` followed by `superclaude doctor`
 
@@ -27,6 +28,7 @@ The same checks, run locally before pushing:
 uv run pytest                                  # full suite
 uv run pytest tests/unit/scripts               # scripts tests only (make test-scripts)
 make lint                                      # ruff check (format check runs in CI)
+make typecheck                                 # mypy src
 uv run pytest --collect-only -q | grep "^superclaude: "   # plugin loads
 uv run superclaude doctor --verbose
 ```

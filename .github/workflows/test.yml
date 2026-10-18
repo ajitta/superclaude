@@ -83,6 +83,11 @@ jobs:
         run: |
           ruff format --check src/ tests/
 
+      - name: Run mypy
+        # Same check as `make typecheck`; src/ is clean, so any error fails.
+        run: |
+          mypy src
+
       - name: Check plugin report header
         # The plugin ships markers and a report header, not fixtures (the
         # pm_agent fixtures went with b8cd144). Only the plugin prints the

@@ -8,7 +8,7 @@ import json
 import shutil
 from collections import Counter
 from pathlib import Path
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 from superclaude.utils import settings_filename
 
@@ -255,7 +255,7 @@ def _uninstall_shared_component(
 
 
 def uninstall_all(
-    base_path: Path = None,
+    base_path: Optional[Path] = None,
     scope: str = "user",
     dry_run: bool = False,
     keep_settings: bool = False,
@@ -559,10 +559,10 @@ def uninstall_all(
     else:
         from .install_mcp import uninstall_mcp_servers
 
-        project_root = base_path.parent if scope in ("project", "local") else None
+        mcp_root = base_path.parent if scope in ("project", "local") else None
         mcp_removed, mcp_skipped, mcp_failed, mcp_messages = uninstall_mcp_servers(
             scope=scope,
-            project_root=project_root,
+            project_root=mcp_root,
             dry_run=dry_run,
         )
         messages.extend(mcp_messages)

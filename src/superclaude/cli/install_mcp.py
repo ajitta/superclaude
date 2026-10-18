@@ -275,7 +275,7 @@ def prompt_for_api_key(
     click.echo(f"   Description: {description}")
 
     if click.confirm(f"   Would you like to set {env_var} now?", default=True):
-        api_key = click.prompt(f"   Enter {env_var}", hide_input=True)
+        api_key: str = click.prompt(f"   Enter {env_var}", hide_input=True)
         return api_key
     else:
         click.echo(

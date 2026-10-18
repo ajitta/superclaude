@@ -152,6 +152,7 @@ class Coordinator:
                     pass
 
     def _record_baseline_or_die(self) -> None:
+        assert self._worktree is not None
         result = run_eval(
             self.config.eval_cmd,
             self.config.metric_path,
@@ -177,6 +178,7 @@ class Coordinator:
         self._cycle_id = 1
 
     def _run_smoke(self) -> bool:
+        assert self._worktree is not None
         gate = SmokeGate(
             smoke_cmd=self.config.smoke_cmd,
             eval_cmd=self.config.eval_cmd,
@@ -215,6 +217,7 @@ class Coordinator:
             return "continue"
         self._consecutive_refusals = 0
 
+        assert self._worktree is not None
         eval_result = run_eval(
             self.config.eval_cmd,
             self.config.metric_path,

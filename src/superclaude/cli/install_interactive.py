@@ -35,7 +35,7 @@ def _prompt_scope() -> str:
     click.echo("Step 1/5: Installation scope")
     for i, (name, desc) in enumerate(SCOPES, start=1):
         click.echo(f"  {i}) {name:7} — {desc}")
-    choice = click.prompt(
+    choice: int = click.prompt(
         "Select scope",
         type=click.IntRange(1, len(SCOPES)),
         default=1,

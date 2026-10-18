@@ -33,4 +33,5 @@ def main() -> int:
 
     from .main import main as cli
 
-    return cli()
+    rc: int = cli()
+    return rc
