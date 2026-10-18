@@ -438,6 +438,109 @@ class TestQuotedTagAttributes:
         assert not [f for f in check(target, fmt="xml") if f.code in ("X1", "X2")]
 
 
+class TestMultilineTagConsumers:
+    """`infer_format` and N4 sentence extraction read a multiline opener the way
+    the structural scan does.
+
+    harness-checker-hygiene widened TAG_RE to multiline attributes but left
+    these two consumers line-oriented: a first root spanning lines inferred
+    `md` (so its unclosed tags went unreported) and the prose after a multiline
+    opener was read with the opener's tail glued on (so N4 missed the
+    duplicate). Both were silent clean results. A multiline span counts as a
+    tag only when it begins a line and its continuation lines are attributes —
+    the placement rule the structural scan already applies — so angle-bracket
+    terms in Markdown prose are not swallowed.
+    """
+
+    SENTENCE = "Run the full test suite before every commit."
+    ROOT = '<component\n  name="x"\n  type="agent">\n<flow>\n- Do the thing.\n</component>\n'
+
+    @pytest.mark.parametrize(
+        "lead",
+        ["", "\n\n", "<!-- generated -->\n", "@.claude/rules/x.md\n"],
+        ids=["bare", "blank-lines", "comment", "import"],
+    )
+    def test_infer_format_multiline_first_root(self, lead):
+        assert infer_format(lead + self.ROOT) == "xml"
+
+    @pytest.mark.parametrize("frontmatter", ["", "---\ntitle: Guide\n---\n"])
+    def test_auto_format_reports_x2_after_multiline_root(self, tmp_path, frontmatter):
+        target = _write(tmp_path, "guide.md", frontmatter + self.ROOT)
+        findings = [f for f in check(target) if f.code == "X2"]
+        offset = frontmatter.count("\n")
+        assert [(f.line, f.message) for f in findings] == [
+            (4 + offset, "`<flow>` is never closed")
+        ]
+
+    @pytest.mark.parametrize("frontmatter", ["", "---\ntitle: Guide\n---\n"])
+    def test_n4_sees_sentence_after_multiline_opener(self, tmp_path, frontmatter):
+        target = _write(
+            tmp_path,
+            "guide.md",
+            frontmatter
+            + f'<guide>\n<step\n note="x">{self.SENTENCE}</step>\n</guide>\n',
+        )
+        other = _write(tmp_path, "other.md", self.SENTENCE + "\n")
+        findings = [f for f in check(target, with_paths=[other]) if f.code == "N4"]
+        assert [f.line for f in findings] == [3 + frontmatter.count("\n")]
+
+    def test_sentence_inside_multiline_attribute_is_not_prose(self, tmp_path):
+        target = _write(
+            tmp_path,
+            "guide.md",
+            f'<guide>\n<step\n note="{self.SENTENCE}">x</step>\n</guide>\n',
+        )
+        other = _write(tmp_path, "other.md", self.SENTENCE + "\n")
+        assert not [f for f in check(target, with_paths=[other]) if f.code == "N4"]
+
+    # ── controls: behavior that must not change ──
+
+    def test_html_led_markdown_with_multiline_div_stays_md(self, tmp_path):
+        body = '<div\n  align="center">\n<img src="logo.png">\n</div>\n\n# Title\n\nProse.\n'
+        assert infer_format(body) == "md"
+        target = _write(tmp_path, "README.md", body)
+        assert not [f for f in check(target) if f.code in ("X1", "X2")]
+
+    def test_prose_angle_bracket_term_does_not_become_a_multiline_tag(self, tmp_path):
+        """Inline code is not masked for N4, and TAG_RE's attribute class admits
+        newlines: a mid-line `<word ` with no `>` on its line followed later by
+        a `>` (blockquote) is one regex match. It is prose, not a tag."""
+        body = (
+            f"# Guide\n\nUse the `<agent-message ` prefix.\n{self.SENTENCE}\n> quoted\n"
+        )
+        target = _write(tmp_path, "guide.md", body)
+        other = _write(tmp_path, "other.md", self.SENTENCE + "\n")
+        findings = [f for f in check(target, with_paths=[other]) if f.code == "N4"]
+        assert [f.line for f in findings] == [4]
+        assert (
+            infer_format(
+                "<custom-note is a term we use\nfor things.\n> quoted\n# Title\n"
+            )
+            == "md"
+        )
+
+    def test_n4_line_numbers_survive_body_level_masking(self, tmp_path):
+        target = _write(
+            tmp_path,
+            "guide.md",
+            f"<guide>\n{self.SENTENCE}\n<step\n note=\"a\"\n other='b'>x</step>\n"
+            f"{self.SENTENCE}\n</guide>\n",
+        )
+        other = _write(tmp_path, "other.md", self.SENTENCE + "\n")
+        findings = [f for f in check(target, with_paths=[other]) if f.code == "N4"]
+        assert [f.line for f in findings] == [2, 6]
+
+    def test_multiline_tag_predicate(self):
+        attrs = '\n note="first <tag>\nthen </tag> >"\n other=\'say "hello"\'\n'
+        body = f"<guide>\n<step{attrs}/>\n</guide>\n"
+        matches = list(author_check.TAG_RE.finditer(body))
+        assert [m.group(2) for m in matches] == ["guide", "step", "guide"]
+        assert author_check._is_multiline_tag(body, matches[1])
+        prose = "a `<agent-message ` prefix.\nMore words here.\n> quoted\n"
+        (match,) = author_check.TAG_RE.finditer(prose)
+        assert not author_check._is_multiline_tag(prose, match)
+
+
 class TestRules:
     @pytest.mark.parametrize("code", sorted(CASES))
     def test_bad_fires(self, tmp_path, code):

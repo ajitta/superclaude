@@ -167,14 +167,55 @@ def _mask_comments(text: str) -> str:
 
 
 def infer_format(body: str) -> str:
-    """xml when the first line after blank, comment and `@path` lines is a tag."""
-    for line in _mask_comments(body).split("\n"):
+    """xml when the first content after blank, comment and `@path` lines is a tag.
+
+    The tag may span lines (`<component\\n  name="x">`); a multiline match counts
+    only when its continuation lines are attributes (`_is_multiline_tag`), so a
+    Markdown file that opens with an angle-bracket term followed by a
+    blockquote stays Markdown.
+    """
+    masked = _mask_comments(body)
+    pos = 0
+    for line in masked.split("\n"):
         stripped = line.strip()
-        if not stripped or _IMPORT_LINE_RE.match(line):
-            continue
-        tag = TAG_RE.match(stripped)
-        return "xml" if tag and tag.group(2).lower() not in _HTML_TAGS else "md"
-    return "md"
+        if stripped and not _IMPORT_LINE_RE.match(line):
+            pos += len(line) - len(line.lstrip())
+            break
+        pos += len(line) + 1
+    else:
+        return "md"
+    tag = TAG_RE.match(masked, pos)
+    if tag and "\n" in tag.group(0) and not _is_multiline_tag(masked, tag):
+        tag = None
+    return "xml" if tag and tag.group(2).lower() not in _HTML_TAGS else "md"
+
+
+# A continuation line inside a multiline opener: one or more `name="value"` /
+# `name='value'` / `name=bare` attributes, optionally followed by the closer
+# `>` or `/>`, or the closer alone. Quoted values are collapsed before this runs,
+# so a value may itself span lines.
+_ATTR_RE_SRC = r"""[A-Za-z_:][\w:.-]*\s*=\s*(?:"[^"]*"|'[^']*'|[^\s"'<>]+)"""
+_ATTR_LINE_RE = re.compile(
+    rf"""^\s*(?:{_ATTR_RE_SRC}(?:\s+{_ATTR_RE_SRC})*)?\s*(?:/?>)?\s*$"""
+)
+_QUOTED_RE = re.compile(r""""[^"]*"|'[^']*'""")
+
+
+def _is_multiline_tag(body: str, match: re.Match) -> bool:
+    """Whether a TAG_RE match that spans lines is a tag rather than prose.
+
+    TAG_RE's attribute class admits newlines, so a mid-line `<word ` with no
+    `>` on its line followed later by a blockquote `>` is one match. The
+    structural scan already treats a mid-line opener as a placeholder; this is
+    the same rule for the line-oriented consumers: the match must start a line
+    (only whitespace before it) and every continuation line must be
+    attribute-shaped or the bare closer.
+    """
+    line_start = body.rfind("\n", 0, match.start()) + 1
+    if body[line_start : match.start()].strip():
+        return False
+    token = _QUOTED_RE.sub('"x"', match.group(0))  # a value may span lines
+    return all(_ATTR_LINE_RE.match(line) for line in token.split("\n")[1:])
 
 
 class NotTextError(ValueError):
@@ -629,11 +670,25 @@ def _check_conflicts(doc: _Doc, others: list[_Doc], report: _Report) -> None:
                 )
 
 
+def _blank_tags(body: str) -> str:
+    """Blank every tag character-for-character except newlines, so line numbers
+    survive. A match that spans lines is blanked only when `_is_multiline_tag`
+    accepts it; otherwise it is prose and stays."""
+
+    def blank(match: re.Match) -> str:
+        token = match.group(0)
+        if "\n" in token and not _is_multiline_tag(body, match):
+            return token
+        return re.sub(r"[^\n]", " ", token)
+
+    return TAG_RE.sub(blank, body)
+
+
 def _sentences(doc: _Doc) -> list[tuple[str, int]]:
-    body = _mask_comments(mask_code(doc.body, inline=False))
+    body = _blank_tags(_mask_comments(mask_code(doc.body, inline=False)))
     found = []
     for number, line in enumerate(body.split("\n"), doc.body_start):
-        line = TAG_RE.sub(" ", _LINE_PREFIX_RE.sub("", line))
+        line = _LINE_PREFIX_RE.sub("", line)
         for sentence in _SENTENCE_SPLIT_RE.split(line):
             text = _normalize(sentence)
             if len(text.split()) >= _MIN_SENTENCE_WORDS:
