@@ -4,24 +4,11 @@
   </role>
 
   <cli_vs_mcp>
-  Decision: `playwright-cli` skill installed → CLI (runs as `Bash(playwright-cli …)`; no tool schemas or a11y trees held in context, one command per action, per-project sessions via `-s=<name>`). Skill absent and the `playwright` MCP server connected → MCP (`browser_*` tools below). Both present and the task keeps one browser alive across many turns — exploratory automation, self-healing tests — → MCP. Server disabled for the current project via `/mcp` → the `browser_*` names do not exist; use the CLI. CLI commands map one-to-one onto the MCP tools; `playwright-cli --help` is the list.
+  Decision: `playwright-cli` skill installed → CLI (runs as `Bash(playwright-cli …)`; no tool schemas or a11y trees held in context, one command per action, per-project sessions via `-s=<name>`). Skill absent and the `playwright` MCP server connected → MCP (the `browser_*` tools). Both present and the task keeps one browser alive across many turns — exploratory automation, self-healing tests — → MCP. Server disabled for the current project via `/mcp` → the `browser_*` names do not exist; use the CLI. CLI commands map one-to-one onto the MCP tools; `playwright-cli --help` is the list.
   </cli_vs_mcp>
 
-  <capability_system>
-  MCP-side tools are grouped into capabilities, enabled with `--caps=`; every group except core is opt-in:
-
-  - core: default — navigation, interaction, snapshots, screenshots, tabs, dialogs, console, network request inspection, WebMCP tool calls.
-  - network: opt-in — `browser_route` mocking and `browser_unroute`, the route list, offline/online state (`browser_network_state_set`).
-  - storage: opt-in — create, read, update and delete for cookies (`browser_cookie_set` and others), localStorage and sessionStorage; storage-state import and export.
-  - testing: opt-in — `browser_verify_*` assertions (element/text/list visible, value) + `browser_generate_locator`.
-  - devtools: opt-in — tracing, video and action recording, highlighting and annotation.
-  - pdf: opt-in — PDF generation.
-  - vision: opt-in — coordinate-based interaction.
-  - config: opt-in — `browser_get_config` to read the running server config.
-  </capability_system>
-
   <choose>
-  <use>end-to-end user-journey validation (login → navigate → action → verify state), testing form input, validation, submission and errors, visual regression via screenshots at responsive breakpoints, accessibility assertions through accessibility snapshots, network-call interception for error-state and offline-mode tests (network capability), and cookie or localStorage manipulation for auth scenarios (storage capability).</use>
+  <use>end-to-end user-journey validation (login → navigate → action → verify state), testing form input, validation, submission and errors, visual regression via screenshots at responsive breakpoints, accessibility assertions through accessibility snapshots, network-call interception for error-state and offline-mode tests (network capability), and cookie or localStorage manipulation for auth scenarios (storage capability). Only the core capability group is on by default; network, storage, testing and the rest are enabled per server with `--caps=`.</use>
   <never>component-level unit tests (use the native test runner — vitest, jest), backend API endpoint tests (use native HTTP tools — curl, fetch), Core Web Vitals or profiling work (use Chrome DevTools `--perf`), and static code-quality review (use native Claude and `/sc:review`).</never>
   </choose>
 

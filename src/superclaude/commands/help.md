@@ -43,7 +43,6 @@ description: List all /sc commands and what each one does. Use when asked which 
     - research: deep web research, parallel search
     - save: session context persistence
     - select-tool: MCP tool selection for a task
-    - sc: command dispatcher (main entry)
     - spec-panel: multi-expert spec review
     - task: tracked task hierarchy for complex work
     - test: test execution and coverage analysis

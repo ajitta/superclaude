@@ -8,8 +8,14 @@ Releases before 4.19.0 are not listed. Their history is the git log; the upstrea
 
 ## [Unreleased]
 
+### Removed
+
+- `/sc:sc`, the command dispatcher. It only routed `/sc:sc <name>` to `/sc:<name>` and repeated the command list that `/sc:help` carries. For a command's syntax, flags and "Not for" line, ask `/sc:help <command-name>`; for the flag list, `/sc:help --flags`. 35 commands now.
+
 ### Changed
 
+- The MCP docs (`mcp/MCP_*.md`, read only under `--verbose-context` or when Claude opens them) lost the sections that described the server rather than its use inside superclaude: the Core Web Vitals threshold table, Playwright's per-capability tool inventory (the `--caps=` opt-in note moved into `<choose>`), and Tavily's `tavily_search` parameter list. −1.8 KB; nothing changes which file loads when.
+- `/sc:init` and the `project-initializer` agent name each other in their descriptions — the same setup menu, run interactively or by delegation.
 - Eval harness (dev-only): `sc-no-modes` arm (full install minus `MODE_Orchestration.md` and `MODE_Task_Management.md`), `tool_called` and `parallel_tool_calls_min` checks (tool calls are summed per `message.id` — stream-json emits one event per content block), and the `mode-task-manage` / `mode-orchestrate` tasks that measure those two modes. The `sc-candidate` arm carries a one-sentence trial for the `purpose_before_action` fix-vs-propose boundary; the shipped kernel is unchanged until the readout.
 
 ## [4.28.2] - 2026-10-18

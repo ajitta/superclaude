@@ -8,17 +8,6 @@
   <never>scripted E2E user journeys or test suites (use Playwright via `--play`, which asserts page state; DevTools drives the page only as far as a measurement needs), static code analysis (use native Claude for code review), and server-side backend profiling (use native tools — `perf`, flamegraph).</never>
   </choose>
 
-  <cwv_thresholds>
-  Google Core Web Vitals thresholds:
-
-  | Metric | Good | Needs Work | Poor |
-  |---|---|---|---|
-  | LCP | < 2.5s | 2.5-4.0s | > 4.0s |
-  | INP | < 200ms | 200-500ms | > 500ms |
-  | CLS | < 0.1 | 0.1-0.25 | > 0.25 |
-  | TTFB | < 800ms | 800-1800ms | > 1800ms |
-  </cwv_thresholds>
-
   <integration_patterns>
   - Performance-Audit: `performance_start_trace` (reload + autoStop) → `performance_stop_trace` → `performance_analyze_insight` per insight → `/sc:improve`.
   - Frontend-Verify (`--frontend-verify`): Playwright:interact + DevTools:profile.

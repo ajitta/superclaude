@@ -8,16 +8,6 @@
   <never>single-page extraction through the MCP's `tavily_extract` (use native `WebFetch`, or the `tavily-extract` skill where installed), and code generation or local file operations.</never>
   </choose>
 
-  <search_patterns>
-  This doc covers the optional in-conversation MCP path. `tavily-mcp` exposes `tavily_search`, `tavily_extract`, `tavily_crawl`, `tavily_map` and `tavily_research`; the Tavily Agent Skills (install guide: 'https://docs.tavily.com/documentation/agent-skills') cover the same operations plus `tavily-dynamic-search` for filtering large results outside the context window. The patterns below apply to `tavily_search`.
-
-  - Basic: query → ranked results.
-  - Domain: query + `include_domains:["arxiv.org","github.com"]`.
-  - Time: query + `time_range:week`.
-  - Date: query + `start_date` / `end_date`.
-  - Deep: query + `include_raw_content:true`.
-  </search_patterns>
-
   <integration_patterns>
   - Research: Tavily:broad → identify gaps → Tavily:targeted → synthesize → suggest /sc:save.
   - Fact-Check: Tavily:verify → Tavily:contradictions → weigh evidence → report.
