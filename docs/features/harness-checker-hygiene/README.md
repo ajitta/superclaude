@@ -1,6 +1,6 @@
 ---
 feature: harness-checker-hygiene
-phase: implementation
+phase: closed
 owner: ajitta
 created: 2026-10-19
 updated: 2026-10-19
@@ -12,12 +12,12 @@ Close candidates 2 and 3 from the [mode-retire handoff](../mode-retire/02-handof
 
 ## Status
 
-Approved on 2026-10-19. Implementation is in progress on fix/harness-checker-hygiene, from master 19a17705. Harness and checker workers have disjoint file ownership; the parent owns integration and per-batch commits. No headless session ceiling, with zero behavioral sessions planned because the acceptance checks are deterministic. Merge, push and release are not authorized.
+Implementation and independent code review complete on fix/harness-checker-hygiene, from master 19a17705. Intent commit: 5bff3e86; harness retirement: 73d41ecb; quoted-attribute fix: 4c0a2c24. Both workers used disjoint file ownership, and the parent verified red-to-green behavior, full-suite success, ruff and both actual CLI modes. The review's optional combined-attribute coverage suggestion was incorporated. No headless behavioral sessions used; no session ceiling was imposed. Not merged, pushed or released; no installation changed.
 
 ## Documents
 
 | File | Content |
 |---|---|
 | [00-intent.md](./00-intent.md) | Original request, approved decisions, scope and limits |
-
-Verification and next-round handoff documents are added after the implementations and checks actually complete.
+| [01-verification.md](./01-verification.md) | Parent red/green evidence, integration checks, review and batch commits |
+| [02-handoff.md](./02-handoff.md) | Remaining candidate 1, deferred multiline limits and delivery status |
