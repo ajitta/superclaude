@@ -39,9 +39,13 @@ def _layout(tmp_path, monkeypatch, *, with_cmd: bool):
     script.write_text(POSIX_SHIM, newline="\n")
     script.chmod(0o755)
     if with_cmd:
-        (bin_dir / "prettier.cmd").write_text(
+        cmd = bin_dir / "prettier.cmd"
+        cmd.write_text(
             '@ECHO off\r\nnode "%~dp0\\..\\prettier\\bin\\prettier.cjs" %*\r\n'
         )
+        # shutil.which needs X_OK even under a patched win32 platform when the
+        # suite runs on Linux (CI); a no-op on Windows.
+        cmd.chmod(0o755)
     elsewhere = tmp_path / "elsewhere"
     elsewhere.mkdir()
     monkeypatch.chdir(elsewhere)
