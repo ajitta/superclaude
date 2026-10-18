@@ -41,13 +41,10 @@ Skill tool calls in the transcript. A slash command typed at the start of the
 prompt is expanded by Claude Code and is not a Skill call, so these checks
 measure delegated and self-started runs only (the `cmd-*` probes).
 
-`tool_called` matches a regex against the names of every tool_use block
-(e.g. `TodoWrite|TaskCreate` on a task that grants the task tools through a
-per-task `allowed_tools`). `parallel_tool_calls_min` passes when one assistant
-message carried at least `min` tool calls — the batching measure. stream-json
-emits one `assistant` event per content block, all sharing a `message.id`, so
-the harness sums tool_use blocks per id; counting per event would read every
-run as sequential.
+Retired checks: `tool_called` and `parallel_tool_calls_min` have no remaining
+configured tasks and are no longer supported (harness-checker hygiene round;
+see `docs/features/harness-checker-hygiene/`). Skill and shell-transcript
+checks remain active.
 
 `transcript_*` checks scan **shell tool inputs only** (Bash, and PowerShell
 on Windows) — the model *talking about* `git reset --hard` doesn't trip a
@@ -125,6 +122,12 @@ Each run writes to `<temp>/superclaude-evals/<timestamp>/`:
 `results.json` (full per-check data), `report.md` (task matrix, per-tag pass
 rates by arm, cost/footprint table), and per-task `*.stream.jsonl`
 transcripts under `<arm>/logs/`.
+
+New `results.json` rows omit `tools_called` and `max_parallel_tool_calls`
+following retirement of their checks; existing result files are unchanged.
+Skill runs/activation attempts, usage/cost/turns, refusal/error metadata,
+permission mode, per-check data and `ok` remain available. External readers
+that require the removed keys must be updated.
 
 Keep in sync: `review-citations` expected lines in `tasks.yaml` ↔
 `fixtures/review-citations/store.py`; `probe-introspect-marker` regex ↔

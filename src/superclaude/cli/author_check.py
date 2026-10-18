@@ -53,7 +53,10 @@ RULES = {
 
 # A tag is `<name ...>`, `</name>` or `<name/>`. Prose like `<3`, `<5KB` or `<=`
 # is text. Tag names follow the project, so hyphens are allowed.
-TAG_RE = re.compile(r"<(/?)([A-Za-z][A-Za-z0-9_-]*)(\s[^<>]*?)?(/?)>")
+# Quoted attribute values are opaque, including literal angle brackets.
+TAG_RE = re.compile(
+    r"""<(/?)([A-Za-z][A-Za-z0-9_-]*)(\s(?:[^<>"']|"[^"]*"|'[^']*')*?)?(/?)>"""
+)
 
 # A Markdown file may open with HTML (a centered logo, a badge row). Those
 # tags do not make it an XML body, and HTML void elements never close.
