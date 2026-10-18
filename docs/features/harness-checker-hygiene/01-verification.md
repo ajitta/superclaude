@@ -29,11 +29,13 @@ Only TAG_RE and its comment changed in author_check.py. Quoted single- and doubl
 
 Regression cases assert whole token/capture groups (including self-closing), both quote forms/opposite quotes, single-line inferred XML and N4 stripping, explicit-XML multiline attributes, real unclosed/misnested/orphan-closing tags and frontmatter-adjusted line numbers. A targeted test checks the real RULES_DELEGATION.md in default and explicit XML modes; that source document was not edited.
 
+Post-merge audit (Fable 5.1, 2026-10-19): an opener with an unbalanced quote in its attributes (`<step note=don't>`) no longer tokenized at all, so the base checker's silent acceptance turned into a misleading "`</step>` has no opening tag" at the closing line. Fixed by a second alternative in the structural scan only (`_STRUCT_RE`; `TAG_RE` and its four groups unchanged): the opener is consumed, paired with its closing tag and reported as X2 "has an unbalanced quote in its attributes" on its own line; mid-line prose keeps the placeholder rule. Red → green: 4 failed / 1 control passed on the merged implementation, 309 passed after. Tokenization of every tracked `*.md` (553 files) differs between the base and the merged `TAG_RE` at exactly one site, the `RULES_DELEGATION.md` `note` attribute.
+
 Existing limits deliberately not expanded: multiline-first-root automatic format inference and multiline-tag N4 stripping. These are pre-existing line-oriented consumer limitations, not regressions introduced here; see the handoff.
 
 ## Parent red → green evidence
 
-The parent temporarily stashed ONLY evals/run_eval.py and src/superclaude/cli/author_check.py after both workers finished, leaving the new tests in place. The original implementations produced **55 failed, 9 passed**, exit 1, across the retirement/schema tests and TestQuotedTagAttributes. The stash restored cleanly, exit 0; no unrelated state was stashed. Local raw output: .hermes/hygiene-parent-red.log.
+The parent temporarily stashed ONLY evals/run_eval.py and src/superclaude/cli/author_check.py after both workers finished, leaving the new tests in place. The original implementations produced **55 failed, 9 passed**, exit 1, across the retirement/schema tests and TestQuotedTagAttributes (before the review's combined-attribute matrix entry; against the final branch the same command gives 60 failed, 10 passed — re-verified in the post-merge audit). The stash restored cleanly, exit 0; no unrelated state was stashed. Local raw output: .hermes/hygiene-parent-red.log.
 
 - Harness retirement/schema cases: 5 original-code failures (two missing ValueErrors, three reports still carrying retired keys).
 - Quoted-attribute matrix: 50 original-code failures and 9 already-passing controls.
