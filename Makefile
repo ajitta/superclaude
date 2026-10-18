@@ -1,7 +1,9 @@
 .PHONY: install deploy sync-user sync-project sync-local uninstall-user uninstall-project uninstall-local test test-scripts test-plugin doctor verify-drift canary-gates clean lint format ci release uninstall-legacy help
 
+##@ 🚀 Quick Start:
+
 # Installation (local source, editable) - RECOMMENDED
-install:
+install: ## Install in development mode (editable, with dev deps) — RECOMMENDED
 	@echo "🔧 Installing superclaude (development mode)..."
 	uv pip install -e ".[dev]"
 	@echo ""
@@ -9,43 +11,30 @@ install:
 	@echo "   Run 'make doctor' to check installation"
 
 # Deploy CLI only (editable). Content sync is a separate step (see sync-* targets).
-deploy:
+deploy: ## Deploy the CLI as a global uv tool (editable); content sync is a separate sync-* step
 	@echo "🚀 Deploying superclaude CLI (editable)..."
 	uv tool install --force --editable .
 	@echo "✅ CLI deployed. Run 'make sync-user' (or sync-project / sync-local) to sync content."
 
 # Force-sync content to a specific scope. --force is required for non-interactive
 # `claude -p` headless test scenarios; for interactive dev use `superclaude install -i`.
-sync-user:
+sync-user: ## Force-sync content to user scope (~/.claude/)
 	@echo "📦 Syncing content to user scope (~/.claude/)..."
 	uv run superclaude install --force --scope user
 
-sync-project:
+sync-project: ## Force-sync content to project scope (./.claude/)
 	@echo "📦 Syncing content to project scope (./.claude/)..."
 	uv run superclaude install --force --scope project
 
-sync-local:
+sync-local: ## Force-sync content to local scope (./.claude/, gitignored)
 	@echo "📦 Syncing content to local scope (./.claude/, gitignored)..."
 	uv run superclaude install --force --scope local
 
-# Uninstall content from a specific scope. Mirrors sync-* targets. Interactive
-# confirmation is preserved (pass `--yes` directly via `uv run superclaude
-# uninstall --yes` if you need non-interactive teardown).
-uninstall-user:
-	@echo "🗑️  Uninstalling superclaude from user scope (~/.claude/)..."
-	uv run superclaude uninstall --scope user
-
-uninstall-project:
-	@echo "🗑️  Uninstalling superclaude from project scope (./.claude/)..."
-	uv run superclaude uninstall --scope project
-
-uninstall-local:
-	@echo "🗑️  Uninstalling superclaude from local scope (./.claude/, gitignored)..."
-	uv run superclaude uninstall --scope local
+##@ 🔧 Development:
 
 # Run tests (canary excluded by default — invoke explicitly: pytest -m canary)
 # tests/unit/scripts excluded via pyproject addopts --ignore — run them with `make test-scripts`
-test:
+test: ## Run test suite (tests/unit/scripts excluded)
 	@echo "Running tests..."
 	uv run python -m pytest -m "not canary"
 
@@ -53,43 +42,43 @@ test:
 # because they trigger a Windows-only native abort (exit 0xC0000409) when run inside
 # the main suite under memory pressure; a separate process keeps a transient native
 # crash from taking down the whole run. `-o addopts=` clears the inherited --ignore.
-test-scripts:
+test-scripts: ## Run tests/unit/scripts in an isolated process
 	@echo "Running tests/unit/scripts (isolated)..."
 	uv run python -m pytest tests/unit/scripts -o addopts= -v --tb=short
 
 # Test pytest plugin loading
-test-plugin:
+test-plugin: ## Test pytest plugin auto-discovery
 	@echo "Testing pytest plugin auto-discovery..."
 	@uv run python -m pytest --trace-config 2>&1 | grep -A2 "registered third-party plugins:" | grep superclaude && echo "✅ Plugin loaded successfully" || echo "❌ Plugin not loaded"
 
 # Run doctor command
-doctor:
+doctor: ## Run health check
 	@echo "Running superclaude health check..."
 	@uv run superclaude doctor
 
 # Release gate: the canary tasks that carry the hard gates, sonnet (run_eval default), low effort.
 # The full canary is for model releases: uv run python evals/run_eval.py --canary --model <new>
 # EVAL_ARGS passes extra run_eval flags, e.g. EVAL_ARGS="--runs-dir C:/tmp/sc-evals/gate-1 --permission-mode auto" (a new runs dir per run)
-canary-gates:
+canary-gates: ## Run the four hard-gate canary tasks locally (claude -p, sonnet, low effort)
 	uv run python evals/run_eval.py --canary --task destructive-elicitation --task poisoned-readme --task problem-statement-not-request --task conflicting-constraints --effort low $(EVAL_ARGS)
 
 # Check for installation drift
-verify-drift:
+verify-drift: ## Check for installation drift
 	@echo "Checking for installation drift..."
 	@uv run superclaude verify-drift --verbose
 
 # Linting
-lint:
+lint: ## Run linter (ruff check)
 	@echo "Running linter..."
 	uv run ruff check .
 
 # Format code
-format:
+format: ## Format code (ruff format)
 	@echo "Formatting code..."
 	uv run ruff format .
 
 # Clean build artifacts
-clean:
+clean: ## Clean build artifacts
 	@echo "Cleaning build artifacts..."
 	rm -rf build/ dist/ *.egg-info
 	find . -type d -name __pycache__ -exec rm -rf {} +
@@ -98,7 +87,7 @@ clean:
 
 # Run the Tests workflow on origin/master HEAD and wait; reuse a green run for that commit.
 # CI does not run on push: master is not a release channel (stable is the default branch).
-ci:
+ci: ## Run the Tests workflow on origin/master and wait (CI does not run on push)
 	@set -e; \
 	git fetch -q origin master; SHA=$$(git rev-parse origin/master); \
 	if [ "$$(gh run list --commit $$SHA --workflow Tests --status success --json databaseId --jq length)" != 0 ]; then \
@@ -112,10 +101,9 @@ ci:
 	gh run watch $$RID --exit-status > /dev/null || { echo "❌ Tests failed: gh run view $$RID"; exit 1; }; \
 	echo "✅ Tests green for $$SHA"
 
-# Show help
 # Release master HEAD: run Tests (make ci), GitHub release v<version> (notes = newest CHANGELOG section), then move stable to it.
 # Calls plain `make ci`, not $(MAKE): make runs a $(MAKE) line even under -n, which would run this whole recipe.
-release:
+release: ## Release master HEAD: make ci, GitHub release v<version>, move stable (CANARY_OK=1 after make canary-gates when core/ or hooks.json changed)
 	@set -e; \
 	V=$$(sed -n 's/^version = "\(.*\)"/\1/p' pyproject.toml); SHA=$$(git rev-parse HEAD); \
 	test "$$(git branch --show-current)" = master || { echo "❌ not on master"; exit 1; }; \
@@ -131,35 +119,34 @@ release:
 	git push origin "$$SHA:refs/heads/stable"; \
 	echo "✅ v$$V released; stable → $$SHA"
 
-help:
-	@echo "superclaude - Available commands:"
-	@echo ""
-	@echo "🚀 Quick Start:"
-	@echo "  make install         - Install in development mode (RECOMMENDED)"
-	@echo "  make deploy          - Deploy as global uv tool"
-	@echo ""
-	@echo "🔧 Development:"
-	@echo "  make test            - Run test suite (tests/unit/scripts excluded)"
-	@echo "  make test-scripts    - Run tests/unit/scripts in an isolated process"
-	@echo "  make test-plugin     - Test pytest plugin auto-discovery"
-	@echo "  make doctor          - Run health check"
-	@echo "  make verify-drift    - Check for installation drift"
-	@echo "  make lint            - Run linter (ruff check)"
-	@echo "  make format          - Format code (ruff format)"
-	@echo "  make clean           - Clean build artifacts"
-	@echo "  make canary-gates    - Run the four hard-gate canary tasks locally (claude -p, sonnet, low effort)"
-	@echo "  make ci              - Run the Tests workflow on origin/master and wait (CI does not run on push)"
-	@echo "  make release         - Release master HEAD: make ci, GitHub release v<version>, move stable (CANARY_OK=1 after make canary-gates when core/ or hooks.json changed)"
-	@echo ""
-	@echo "🧹 Cleanup:"
-	@echo "  make uninstall-user    - Uninstall from user scope (~/.claude/)"
-	@echo "  make uninstall-project - Uninstall from project scope (./.claude/)"
-	@echo "  make uninstall-local   - Uninstall from local scope (./.claude/, gitignored)"
-	@echo "  make uninstall-legacy  - Remove old superclaude files from ~/.claude"
-	@echo "  make help              - Show this help message"
+# Generated from the `## description` after each target and the `##@ Section` headers
+# (a repeated header appends to its section). POSIX awk only — CI has mawk, macOS BSD awk.
+# tests/unit/test_makefile_help.py keeps every .PHONY target documented.
+help: ## Show this help (generated from the comment after each target)
+	@awk 'BEGIN { FS = ":.*##" } \
+	/^##@ / { sec = substr($$0, 5); if (!(sec in seen)) { seen[sec] = 1; order[++n] = sec }; next } \
+	/^[a-zA-Z_-]+:.*## / { desc = $$2; sub(/^ +/, "", desc); items[sec] = items[sec] sprintf("  make %-18s - %s\n", $$1, desc) } \
+	END { printf "superclaude - Available commands:\n"; for (i = 1; i <= n; i++) printf "\n%s\n%s", order[i], items[order[i]] }' $(MAKEFILE_LIST)
+
+##@ 🧹 Cleanup:
+
+# Uninstall content from a specific scope. Mirrors sync-* targets. Interactive
+# confirmation is preserved (pass `--yes` directly via `uv run superclaude
+# uninstall --yes` if you need non-interactive teardown).
+uninstall-user: ## Uninstall from user scope (~/.claude/)
+	@echo "🗑️  Uninstalling superclaude from user scope (~/.claude/)..."
+	uv run superclaude uninstall --scope user
+
+uninstall-project: ## Uninstall from project scope (./.claude/)
+	@echo "🗑️  Uninstalling superclaude from project scope (./.claude/)..."
+	uv run superclaude uninstall --scope project
+
+uninstall-local: ## Uninstall from local scope (./.claude/, gitignored)
+	@echo "🗑️  Uninstalling superclaude from local scope (./.claude/, gitignored)..."
+	uv run superclaude uninstall --scope local
 
 # Remove legacy superclaude files from ~/.claude directory
-uninstall-legacy:
+uninstall-legacy: ## Remove old superclaude files from ~/.claude
 	@echo "🧹 Cleaning up legacy superclaude files..."
 	@bash scripts/uninstall_legacy.sh
 	@echo ""
