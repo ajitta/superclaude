@@ -3,12 +3,12 @@ feature: mode-retire
 phase: handoff
 owner: ajitta
 created: 2026-10-18
-updated: 2026-10-18
+updated: 2026-10-19
 ---
 
 # 02. Handoff — what the next round starts from
 
-State at handoff: branch `fix/mode-retire` on base `40746786` (`master` = `stable` = `v4.29.0` + one docs commit), three commits, full suite green. Headless sessions used: **0** (cap 0). Not merged, not released: `core/FLAGS.md` and `core/rules/RULES_DELEGATION.md` changed, so `make release` demands `make canary-gates` (4 sessions) first — the round ends at the merge the owner requests; the release goes with the next round that has a cap. At release the `CHANGELOG.md` `[Unreleased]` block becomes `[4.29.1] - <date>` (Q7).
+State at handoff: `master` = `stable` = `v4.29.1` (`96619c64`), CI green, local-scope install synced with no drift (the two retired mode files pruned). Headless sessions used: **4** — cap 0 for the work itself, then `make canary-gates` (7/7) when the owner asked for merge + push + release in chat. A new round needs its own cap.
 
 ## Candidates
 
@@ -26,4 +26,4 @@ The lean round's list stands (`frozenset` rewrites, Makefile help from `##` comm
 
 ## How a new session starts a round
 
-Same as [purpose-boundary 03-handoff](../purpose-boundary/03-handoff.md) §"How a new session starts a round": state check → read this file → candidate table and a recommendation → split (measure / cleanup / decide-only / defer) and a session cap → plan per the maintenance skill → kickoff on the owner's word. If this branch is still unmerged, merge it first (full suite, `--no-ff`), then run the post-merge local-scope reinstall (`superclaude install --force --scope local`, `superclaude verify-drift --scope local`) so the two retired modes stop injecting in in-repo sessions.
+Same as [purpose-boundary 03-handoff](../purpose-boundary/03-handoff.md) §"How a new session starts a round": state check → read this file → candidate table and a recommendation → split (measure / cleanup / decide-only / defer) and a session cap → plan per the maintenance skill → kickoff on the owner's word.
