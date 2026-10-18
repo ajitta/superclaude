@@ -8,7 +8,7 @@ updated: 2026-10-19
 
 # 02. Handoff — what remains after context budget restore
 
-This round closes harness-checker-hygiene handoff candidate 1 on fix/context-budget-default from master d995aa1a: the loader's default budget is 12,000 (`DEFAULT_CONTEXT_MAX_TOKENS`), `/sc:analyze --delegate` injects all four rule modules again, and two deterministic tests pin the headroom. Evidence: [01-verification.md](./01-verification.md). Commits: a60b8d17 (intent), 9f0f6ce3 (fix). Headless sessions used: **0** (cap 0). **Unmerged, unreleased**: master is still d995aa1a; stable and v4.29.1 unchanged. The installed local-scope copy already runs the fix through the editable uv tool; no install sync was needed and none was performed. Remaining work is for a new session; this round grants it no execution authorization.
+This round closes harness-checker-hygiene handoff candidate 1 on fix/context-budget-default from master d995aa1a: the loader's default budget is 12,000 (`DEFAULT_CONTEXT_MAX_TOKENS`), `/sc:analyze --delegate` injects all four rule modules again, and two deterministic tests pin the headroom. Evidence: [01-verification.md](./01-verification.md). Commits: a60b8d17 (intent), 9f0f6ce3 (fix). Headless sessions used: **0** (cap 0). Merged into master at 08d7a741 and pushed to origin/master. **Unreleased**: stable and v4.29.1 unchanged. The local-scope install was re-synced and verified drift-free; the installed hook injects all four rule modules on `/sc:analyze --delegate`. Remaining work is for a new session; this round grants it no execution authorization.
 
 ## Candidates
 
@@ -29,4 +29,4 @@ The lean-round small-leftover list and the purpose-boundary frontmatter-yaml.saf
 
 ## Next-round start
 
-Check git state and delivery status (is fix/context-budget-default merged? released?) before relying on this document. Read the candidates, select numbers and a session policy in chat, then compose and independently review the next plan.
+Check git state and delivery status (merged at 08d7a741; released?) before relying on this document. Read the candidates, select numbers and a session policy in chat, then compose and independently review the next plan.

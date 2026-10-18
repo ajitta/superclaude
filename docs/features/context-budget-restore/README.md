@@ -1,6 +1,6 @@
 ---
 feature: context-budget-restore
-phase: handoff
+phase: closed
 owner: ajitta
 created: 2026-10-19
 updated: 2026-10-19
@@ -12,7 +12,7 @@ Close candidate 1 from the [harness-checker-hygiene handoff](../harness-checker-
 
 ## Status
 
-Implemented on fix/context-budget-default from master d995aa1a: intent a60b8d17, fix 9f0f6ce3. Red→green evidence, the before/after `context explain` table and the integration checks are in [01-verification.md](./01-verification.md). Headless sessions used: 0 (owner cap 0). **Unmerged, unreleased**; stable and v4.29.1 unchanged. The installed local-scope copy runs the fix through the editable uv tool without an install sync; `verify-drift --scope local` is clean because no content file changed. `src/superclaude/core/` untouched — no canary gate. Remaining candidates: [02-handoff.md](./02-handoff.md).
+Implemented on fix/context-budget-default from master d995aa1a: intent a60b8d17, fix 9f0f6ce3. Red→green evidence, the before/after `context explain` table and the integration checks are in [01-verification.md](./01-verification.md). Headless sessions used: 0 (owner cap 0). Merged into master at 08d7a741 and pushed to origin/master; the local-scope install was re-synced (`superclaude install --force --scope local`, 83 files, `verify-drift` clean) and the installed hook injects all four rule modules on `/sc:analyze --delegate`. **Unreleased**: stable and v4.29.1 unchanged. `src/superclaude/core/` untouched — no canary gate. Remaining candidates: [02-handoff.md](./02-handoff.md).
 
 ## Documents
 
