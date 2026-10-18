@@ -116,7 +116,6 @@ poetry.lock
 /skills/
 /skills-lock.json
 
-
 # SuperClaude specific
 .beads/
 /.serena/
