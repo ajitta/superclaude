@@ -68,7 +68,7 @@ description: superclaude command dispatcher that routes to the other /sc:* comma
   </examples>
 
   <meta>
-    - version: 4.28.1 (SSOT: pyproject.toml — answer version queries via `superclaude --version` when possible)
+    - version: 4.28.2 (SSOT: pyproject.toml — answer version queries via `superclaude --version` when possible)
     - docs: github.com/ajitta/superclaude
   </meta>
 
