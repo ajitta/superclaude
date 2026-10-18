@@ -14,7 +14,7 @@ Releases before 4.19.0 are not listed. Their history is the git log; the upstrea
 
 ### Fixed
 
-- `superclaude author-check` no longer reports false X2 errors for literal angle brackets inside single- or double-quoted tag attributes, including the `note` attribute in `RULES_DELEGATION.md`. Actual unbalanced or misnested tags still report their original line numbers.
+- `superclaude author-check` no longer reports false X2 errors for literal angle brackets inside single- or double-quoted tag attributes, including the `note` attribute in `RULES_DELEGATION.md`. Actual unbalanced or misnested tags still report their original line numbers. An opener whose attributes hold an unbalanced quote (`<step note=don't>`, previously accepted silently) now reports X2 on its own line instead of surfacing as "has no opening tag" at its closing tag.
 
 ## [4.29.1] - 2026-10-19
 

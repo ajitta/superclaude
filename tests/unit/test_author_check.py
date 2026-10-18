@@ -403,6 +403,40 @@ class TestQuotedTagAttributes:
         )
         assert not [f for f in check(target, fmt="xml") if f.code in ("X1", "X2")]
 
+    @pytest.mark.parametrize(
+        "opener",
+        ["<step note=don't>", '<step note="unclosed>', "<step note='a\" b>"],
+        ids=["apostrophe", "unclosed-double", "mixed"],
+    )
+    def test_unbalanced_quote_reports_the_opener_line(self, tmp_path, opener):
+        """The opener is consumed so the error names it, not its closing tag."""
+        target = _write(
+            tmp_path,
+            "guide.md",
+            f"<guide>\n{opener}\nx\n</step>\n<next>y</next>\n</guide>\n",
+        )
+        findings = [f for f in check(target, fmt="xml") if f.code in ("X1", "X2")]
+        assert [(f.code, f.line, f.message) for f in findings] == [
+            ("X2", 2, "`<step>` has an unbalanced quote in its attributes")
+        ]
+
+    def test_unbalanced_quote_self_closing_does_not_cascade(self, tmp_path):
+        target = _write(
+            tmp_path, "guide.md", "<guide>\n<step note='x/>\n<next>y</next>\n</guide>\n"
+        )
+        findings = [f for f in check(target, fmt="xml") if f.code in ("X1", "X2")]
+        assert [(f.line, f.message) for f in findings] == [
+            (2, "`<step>` has an unbalanced quote in its attributes")
+        ]
+
+    def test_unbalanced_quote_in_mid_line_prose_is_a_placeholder(self, tmp_path):
+        target = _write(
+            tmp_path,
+            "guide.md",
+            "<guide>\nRead the user's <scope value> before <other 'x> runs.\n</guide>\n",
+        )
+        assert not [f for f in check(target, fmt="xml") if f.code in ("X1", "X2")]
+
 
 class TestRules:
     @pytest.mark.parametrize("code", sorted(CASES))
