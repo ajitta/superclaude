@@ -3,9 +3,6 @@
 `--budget` and `--cycle-timeout` both go through `_parse_duration`, which is an
 argparse `type=` converter: everything it rejects becomes a usage error (exit 2)
 with per-argument attribution instead of a traceback or a silently broken run.
-
-Filed at tests/unit/ top level on purpose: pyproject addopts carries
-`--ignore=tests/unit/scripts`, so a guard under tests/unit/scripts/ never runs.
 """
 
 import argparse

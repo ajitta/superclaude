@@ -14,12 +14,12 @@ This round closes lean-round leftovers 1b (Makefile help) and 1c (CI setup-uv) o
 
 | # | Item | Kind of decision | Evidence | What it needs |
 |---|---|---|---|---|
-| 1 | `tests/unit/scripts` default exclusion (`pyproject` addopts `--ignore`) | Investigation first | AGENTS.md; `Makefile` `test-scripts` comment: Windows-only native abort 0xC0000409 under memory pressure | Reproduce on Windows inside the full run before lifting; CI already runs the directory in its own step, so the cost of the exclusion is Windows-local only |
+| 1 | `tests/unit/scripts` default exclusion (`pyproject` addopts `--ignore`) | **Lifted** in [test-exclusion-lift](../test-exclusion-lift/README.md) (3e64dc82) after 8/8 clean Windows runs incl. two concurrent; historical row | AGENTS.md; `Makefile` `test-scripts` comment: Windows-only native abort 0xC0000409 under memory pressure | Reproduce on Windows inside the full run before lifting; CI already runs the directory in its own step, so the cost of the exclusion is Windows-local only |
 | 2 | 198 in-function `superclaude.*` imports in tests | Mechanical cleanup | lean-round `06-handoff.md:31` | Check each for an import-time side effect or circularity reason before hoisting; low value per the lean round |
-| 3 | `frozenset("…".split())` rewrites | Cosmetic | lean-round `04-batches.md:43` | Twice deferred as cosmetic; recommend dropping from the list rather than carrying again |
+| 3 | `frozenset("…".split())` rewrites | **Dropped** from the carried list in test-exclusion-lift (cosmetic, five carries) | lean-round `04-batches.md:43` | Twice deferred as cosmetic; recommend dropping from the list rather than carrying again |
 | 4 | Stacked-mode prompts exceed the 12,000 default (P2 INTERACTION dropped) | Observation | context-budget-restore `01-verification.md` | Reopen only if a real prompt loses a P1 module |
 | 5 | `_is_multiline_tag` accepts only attribute-shaped continuation lines | Recorded limit | author-check-multiline `02-handoff.md` | Revisit on a user report |
-| 6 | Dependabot / action-pin upkeep | Not configured | `.github/` has no `dependabot.yml`; `setup-uv` is SHA-pinned with a `# v10.3.0` comment | Decide whether pinned actions get automated bumps; out of this round's scope |
+| 6 | Dependabot / action-pin upkeep | **Configured** in test-exclusion-lift (10697cd1): `github-actions`, monthly, grouped, target master | `.github/` has no `dependabot.yml`; `setup-uv` is SHA-pinned with a `# v10.3.0` comment | Decide whether pinned actions get automated bumps; out of this round's scope |
 
 Recorded keeps stand (finding_policy; `CLAUDE_CONTEXT_MAX_TOKENS` knob; over-engineering-audit D01–D24).
 

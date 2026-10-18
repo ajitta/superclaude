@@ -1,0 +1,18 @@
+# Keeps the pinned GitHub Actions current. setup-uv is SHA-pinned (the action
+# publishes no major-version tags past v7); Dependabot bumps the SHA and the
+# trailing "# vX.Y.Z" comment together. One grouped PR per month against
+# master (stable is the release channel and must not receive PRs); test.yml
+# runs on pull_request to master with a read-only token, which is enough for
+# the current test/lint jobs.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    target-branch: master
+    groups:
+      actions:
+        patterns: ["*"]
+    commit-message:
+      prefix: "chore(ci)"

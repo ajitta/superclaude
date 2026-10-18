@@ -6,8 +6,7 @@
 
 **Jobs**:
 - **test**: Python 3.10 and 3.13 (the oldest supported version and the newest)
-  - Full test suite
-  - `tests/unit/scripts` in a separate pytest process (the default run skips it through `--ignore` in pyproject addopts)
+  - Full test suite (including `tests/unit/scripts`, which rejoined the default run in docs/features/test-exclusion-lift)
 - **checks**: Python 3.10
   - `ruff check` and `ruff format --check` over `src/` and `tests/`
   - Pytest plugin loads (its `superclaude: ` report header)
@@ -26,7 +25,7 @@ The same checks, run locally before pushing:
 
 ```bash
 uv run pytest                                  # full suite
-uv run pytest tests/unit/scripts -o addopts=   # scripts tests
+uv run pytest tests/unit/scripts               # scripts tests only (make test-scripts)
 make lint                                      # ruff check (format check runs in CI)
 uv run pytest --collect-only -q | grep "^superclaude: "   # plugin loads
 uv run superclaude doctor --verbose
@@ -35,7 +34,7 @@ uv run superclaude doctor --verbose
 ## Troubleshooting
 
 ### Tests fail locally but pass in CI (or vice versa)
-- CI runs on Linux; local development is often on Windows, where `tests/unit/scripts` only runs when invoked separately
+- CI runs on Linux; local development is often on Windows — a Windows-only native abort once kept `tests/unit/scripts` out of the default run (c97705c0); if it returns, `git revert` the lift commit named in docs/features/test-exclusion-lift and bisect `tests/unit/scripts/parallel_ab/`
 - Check the Python version: CI covers 3.10 and 3.13 only
 - Reinstall dependencies: `uv pip install -e ".[dev]"` (never `uv sync`, see AGENTS.md)
 

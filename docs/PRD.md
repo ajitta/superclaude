@@ -109,10 +109,10 @@ The load-bearing set. Anything not on this list is support for something on it.
 
 ## Open Questions
 
-- **`tests/unit/scripts/` is excluded from the default run** (`--ignore` in
-  `pyproject.toml` addopts) after a native crash (exit `0xC0000409`) during
-  collection. Root-cause and re-enable, or delete the suite? — owner:
-  maintainer; decide before the next change to hook scripts.
+- ~~**`tests/unit/scripts/` is excluded from the default run**~~ — resolved 2026-10-19:
+  eight full runs with the directory included (six sequential, two concurrent)
+  reproduced no `0xC0000409` abort on Windows, so the `--ignore` was lifted;
+  see docs/features/test-exclusion-lift/01-verification.md.
 - **ADR backlog.** Other load-bearing decisions — durability routing for
   derived values, scope-explicit installs, the fork divergence itself — are
   recorded only as prose spread across `RULES_DOCS.md` and `README.md`. Promote
