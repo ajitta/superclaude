@@ -292,6 +292,118 @@ class TestTagRecognition:
         assert masked.splitlines()[4] == "c"
 
 
+_QUOTED_TAG_ATTRIBUTES = [
+    ' note="<tag>"',
+    " note='<tag>'",
+    ' note="</tag>"',
+    " note='</tag>'",
+    ' note="a > b"',
+    " note='a > b'",
+    ' note="it\'s <tag>"',
+    " note='say \"<tag>\"'",
+    ' empty="" other=\'\' mode=plain note="a <tag>" ',
+]
+
+
+class TestQuotedTagAttributes:
+    @pytest.mark.parametrize("fmt", [None, "xml"], ids=["inferred", "explicit-xml"])
+    def test_delegation_document_has_no_xml_errors(self, fmt):
+        target = (
+            Path(__file__).resolve().parents[2]
+            / "src/superclaude/core/rules/RULES_DELEGATION.md"
+        )
+        findings = [f for f in check(target, fmt=fmt) if f.code in ("X1", "X2")]
+        assert not findings, [f.render() for f in findings]
+
+    @pytest.mark.parametrize("attrs", _QUOTED_TAG_ATTRIBUTES)
+    @pytest.mark.parametrize("selfclose", ["", "/"])
+    def test_full_token_and_capture_groups(self, attrs, selfclose):
+        token = f"<outer-tag_2{attrs}{selfclose}>"
+        match = author_check.TAG_RE.search(token + "</outer-tag_2>")
+        assert match is not None
+        assert match.group(0) == token
+        assert author_check.TAG_RE.groups == 4
+        assert match.groups() == ("", "outer-tag_2", attrs, selfclose)
+        closing = author_check.TAG_RE.fullmatch("</outer-tag_2>")
+        assert closing is not None
+        assert closing.groups() == ("/", "outer-tag_2", None, "")
+
+    @pytest.mark.parametrize("attrs", _QUOTED_TAG_ATTRIBUTES)
+    def test_single_line_root_infers_xml(self, attrs):
+        assert infer_format(f"<guide{attrs}>\nx\n</guide>\n") == "xml"
+
+    @pytest.mark.parametrize("attrs", _QUOTED_TAG_ATTRIBUTES)
+    @pytest.mark.parametrize("selfclose", ["", "/"])
+    def test_quoted_literals_are_not_structural_tags(self, tmp_path, attrs, selfclose):
+        child = f"<step{attrs}{selfclose}>"
+        if not selfclose:
+            child += "x</step>"
+        target = _write(tmp_path, "guide.md", f"<guide>\n{child}\n</guide>\n")
+        findings = [f for f in check(target, fmt="xml") if f.code in ("X1", "X2")]
+        assert not findings, [f.render() for f in findings]
+
+    def test_multiline_attributes_explicit_xml(self, tmp_path):
+        attrs = '\n note="first <tag>\nthen </tag> >"\n other=\'say "hello"\'\n'
+        token = f"<step{attrs}/>"
+        match = author_check.TAG_RE.fullmatch(token)
+        assert match is not None
+        assert match.groups() == ("", "step", attrs, "/")
+        target = _write(
+            tmp_path, "guide.md", f"<guide>\n{token}\n<next>x</next>\n</guide>\n"
+        )
+        assert not [f for f in check(target, fmt="xml") if f.code in ("X1", "X2")]
+
+    @pytest.mark.parametrize("frontmatter", ["", "---\ntitle: Guide\n---\n"])
+    @pytest.mark.parametrize(
+        ("tail", "expected"),
+        [
+            ("</guide>\n", [("`<step>` is never closed", 2)]),
+            ("", [("`<guide>` is never closed", 1), ("`<step>` is never closed", 2)]),
+            (
+                "</missing>\n</step>\n</guide>\n",
+                [("`</missing>` has no opening tag", 5)],
+            ),
+        ],
+        ids=["misnested", "unclosed", "unmatched-closing"],
+    )
+    def test_real_errors_keep_lines_after_multiline_attributes(
+        self, tmp_path, frontmatter, tail, expected
+    ):
+        body = '<guide>\n<step\n note="<literal> </literal> >">\nx\n' + tail
+        target = _write(tmp_path, "guide.md", frontmatter + body)
+        findings = [f for f in check(target, fmt="xml") if f.code == "X2"]
+        offset = frontmatter.count("\n")
+        assert [(f.message, f.line) for f in findings] == [
+            (message, line + offset) for message, line in expected
+        ]
+
+    @pytest.mark.parametrize("attrs", _QUOTED_TAG_ATTRIBUTES)
+    def test_n4_strips_entire_single_line_attributed_tag(self, tmp_path, attrs):
+        sentence = "Run the full test suite before every commit."
+        target = _write(tmp_path, "guide.md", f"<guide{attrs}>{sentence}</guide>\n")
+        other = _write(tmp_path, "other.md", sentence + "\n")
+        findings = [f for f in check(target, with_paths=[other]) if f.code == "N4"]
+        assert [f.line for f in findings] == [1]
+
+    def test_quoted_closing_tag_does_not_disable_html_void(self, tmp_path):
+        target = _write(
+            tmp_path,
+            "guide.md",
+            '<guide>\n<step note="</img>">x</step>\n<img src="a.png">\n</guide>\n',
+        )
+        assert not [f for f in check(target, fmt="xml") if f.code in ("X1", "X2")]
+
+    def test_comments_and_code_keep_quoted_tags_masked(self, tmp_path):
+        target = _write(
+            tmp_path,
+            "guide.md",
+            '<guide>\n<!-- <broken note="<tag>"> -->\n'
+            '`<broken note="</tag>">`\n```xml\n<broken note="<tag>">\n```\n'
+            "Use docs/<slug>/plan.md and the <storage> section.\n</guide>\n",
+        )
+        assert not [f for f in check(target, fmt="xml") if f.code in ("X1", "X2")]
+
+
 class TestRules:
     @pytest.mark.parametrize("code", sorted(CASES))
     def test_bad_fires(self, tmp_path, code):

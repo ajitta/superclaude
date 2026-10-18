@@ -12,6 +12,10 @@ Releases before 4.19.0 are not listed. Their history is the git log; the upstrea
 
 - Unused dev-only eval checks `tool_called` and `parallel_tool_calls_min` and their exclusive collection state. New `results.json` rows omit `tools_called` and `max_parallel_tool_calls`; existing result files are unchanged. Skill and shell-transcript checks remain supported.
 
+### Fixed
+
+- `superclaude author-check` no longer reports false X2 errors for literal angle brackets inside single- or double-quoted tag attributes, including the `note` attribute in `RULES_DELEGATION.md`. Actual unbalanced or misnested tags still report their original line numbers.
+
 ## [4.29.1] - 2026-10-19
 
 ### Removed
