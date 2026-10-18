@@ -53,6 +53,7 @@
   - Schema: `opts.schema`/StructuredOutput hardens return shape only — a well-typed citation can be fabricated, so the cited-file:line re-grep stays mandatory.
   - Cache: cached/replayed results (Workflow resume-from-cache) may cite stale state and must be re-validated against the current repo before acting ([R15 Verification] gates resume).
   - Fan-out: every `parallel()` governed by these rules must `log()` dropped/null thunks before `filter(Boolean)` — silent filtering makes the main loop synthesize from a silently-incomplete set, a [R15 Verification] 'claimed done on partial evidence' risk.
+  - Pipeline-Default: chain dependent stages with `pipeline()` (no barrier, stages stream); reserve `parallel()` (full barrier — every thunk finishes before continuing) for genuinely independent streams that must rejoin.
   - Write-Return: subprocess file writes are discarded — document- or code-producing fan-out returns its artifact and the main loop performs every Write/Edit; approval checkpoints (e.g. a change touching >3 files/modules/services) fire in the main loop because subagents cannot pause for the user.
   </workflow_delegation>
 

@@ -82,7 +82,7 @@ Every mode **must** define all four axes (enforced by `tests/unit/test_mode_stru
 
 ## Naming
 
-- Filename: `MODE_<Name>.md`, capitalized words joined by `_` (e.g., `MODE_Brainstorming.md`, `MODE_Task_Management.md`); `MODE_DeepResearch.md` predates the `_` form and keeps its name
+- Filename: `MODE_<Name>.md`, capitalized words joined by `_` (e.g., `MODE_Brainstorming.md`, `MODE_Business_Panel.md`); `MODE_DeepResearch.md` predates the `_` form and keeps its name
 - Component name: lowercase-hyphenated (e.g., `name="brainstorming"`)
 - Component type: always `type="mode"`
 
