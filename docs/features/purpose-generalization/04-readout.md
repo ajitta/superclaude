@@ -48,3 +48,9 @@ Overhead on the controls (descriptive): sonnet +1 median turn, +0.5% `tokens_in`
 ## Q11 close
 
 Per Q11(a): the six Phase-2 tasks stay as canary-only probes (≤ 6 sessions per arm on a future `--canary` run); P4, its fixture and all five `-stated` tasks are deleted; `RULES_CANDIDATE.md` is reset to an empty delta (the ablation arm is recoverable with `git show 82cbf3bb:evals/arms/RULES_CANDIDATE.md`).
+
+## Owner ruling after the readout
+
+> 소넷은 포기하고 오퍼스에 집중. 너의 추천대로 진행
+
+Candidates 1 (sonnet D3a) and 2 (sonnet reading depth) are closed without further runs. Candidate 3 (a harder fixture set for opus) becomes the next round; this round merges into master and ships with v4.29.5 (contributor-only: probes and records).
