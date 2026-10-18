@@ -6,6 +6,12 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Ver
 
 Releases before 4.19.0 are not listed. Their history is the git log; the upstream-era changelog, last entry 4.2.1, is `CHANGELOG.md` at commit `6b0ac5c3^`.
 
+## [Unreleased]
+
+### Changed
+
+- Eval harness (dev-only): `sc-no-modes` arm (full install minus `MODE_Orchestration.md` and `MODE_Task_Management.md`), `tool_called` and `parallel_tool_calls_min` checks (tool calls are summed per `message.id` — stream-json emits one event per content block), and the `mode-task-manage` / `mode-orchestrate` tasks that measure those two modes. The `sc-candidate` arm carries a one-sentence trial for the `purpose_before_action` fix-vs-propose boundary; the shipped kernel is unchanged until the readout.
+
 ## [4.28.2] - 2026-10-18
 
 ### Changed

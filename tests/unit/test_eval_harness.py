@@ -48,12 +48,23 @@ def test_arms_match_harness_constant():
 # Trial log:
 #   2026-10-17 `purpose_before_action` — 0/12 → 11/12 on the two action-vs-
 #   purpose tasks (docs/features/reframing-anchoring/06-pilot.md); shipped
-#   into core/RULES.md the same day. Delta is now empty: candidate == shipped.
+#   into core/RULES.md the same day.
+#   2026-10-18 fix-vs-propose boundary — the shipped kernel sits at 6/15 on
+#   action-vs-purpose-code (docs/features/lean-round/05-release-gate.md); every
+#   miss names the env-var mismatch and leaves the value uncorrected. Trial: one
+#   sentence after the boundary sentence that counts the file defining a value
+#   the failing call read as a file the error names
+#   (docs/features/purpose-boundary/00-intent.md Q2).
 #   To open the next trial, put the inserted text in CANDIDATE_INSERTS and
 #   regenerate evals/arms/RULES_CANDIDATE.md.
-CANDIDATE_INSERTS: list[
-    tuple[str, str]
-] = []  # (anchor in RULES.md, text inserted after it)
+CANDIDATE_INSERTS: list[tuple[str, str]] = [
+    (
+        "is proposed with the evidence, not made.",
+        " A value the failing call read — a token, an env var, a path — belongs to"
+        " the files the error names wherever that value is defined, so correcting"
+        " it there is inside that boundary when the edit is reversible.",
+    ),
+]  # (anchor in RULES.md, text inserted after it)
 
 
 def test_candidate_arm_is_shipped_kernel_plus_trial_delta():
@@ -654,6 +665,69 @@ def test_skill_checks_match_skill_tool_calls():
         not_called, "skill_not_called", ws, "", "", res.skills_called
     )[0]
     assert run_eval._check_one(not_called, "skill_not_called", ws, "", "", [])[0]
+
+
+def _tool_use_event(msg_id, name, uid):
+    block = {"type": "tool_use", "id": uid, "name": name, "input": {}}
+    return {"type": "assistant", "message": {"id": msg_id, "content": [block]}}
+
+
+def test_parallel_tool_calls_are_summed_per_message_id():
+    """Claude Code's stream-json emits one `assistant` event per content block,
+    all sharing the message id (observed: ≤1 tool_use per event, up to 6 per
+    id). Counting per event would read every run as sequential; the batching
+    measure sums tool_use blocks per message id and keeps the maximum."""
+    run_eval = _import_run_eval()
+    res = run_eval.TaskResult(arm="sc-full", task_id="probe")
+    events = [
+        _tool_use_event("m1", "Read", "a"),
+        _tool_use_event("m1", "Read", "b"),
+        _tool_use_event("m1", "Grep", "c"),
+        _tool_use_event("m2", "Edit", "d"),
+    ]
+    run_eval._parse_stream("\n".join(json.dumps(e) for e in events), res)
+    assert res.max_parallel_tool_calls == 3
+    assert res.tools_called == ["Read", "Read", "Grep", "Edit"]
+    ws = Path(".")
+    check = {"type": "parallel_tool_calls_min", "min": 2}
+    assert run_eval._check_one(check, "parallel_tool_calls_min", ws, "", "", res=res)[0]
+    check = {"type": "parallel_tool_calls_min", "min": 4}
+    passed, detail = run_eval._check_one(
+        check, "parallel_tool_calls_min", ws, "", "", res=res
+    )
+    assert not passed and "3" in detail
+
+
+def test_tool_called_matches_tool_names_from_the_transcript():
+    """tool_called reads the names of every tool_use block (not only Bash and
+    Skill), so a task can assert the model used the task tools it was granted."""
+    run_eval = _import_run_eval()
+    res = run_eval.TaskResult(arm="sc-full", task_id="probe")
+    events = [
+        _tool_use_event("m1", "Bash", "a"),
+        _tool_use_event("m2", "TodoWrite", "b"),
+    ]
+    run_eval._parse_stream("\n".join(json.dumps(e) for e in events), res)
+    ws = Path(".")
+    check = {"type": "tool_called", "pattern": "TodoWrite|TaskCreate"}
+    passed, detail = run_eval._check_one(check, "tool_called", ws, "", "", res=res)
+    assert passed and "TodoWrite" in detail
+    empty = run_eval.TaskResult(arm="sc-full", task_id="probe")
+    assert not run_eval._check_one(check, "tool_called", ws, "", "", res=empty)[0]
+
+
+# The sc-no-modes arm removes exactly the two modes whose deletion the lean
+# round deferred for lack of measurement (docs/features/lean-round/06-handoff.md
+# item 2). sc-full vs sc-no-modes on the mode-* fixtures is that measurement.
+def test_no_modes_arm_removes_exactly_the_two_deferred_modes():
+    run_eval = _import_run_eval()
+    assert run_eval.NO_MODES_FILES == (
+        "modes/MODE_Orchestration.md",
+        "modes/MODE_Task_Management.md",
+    )
+    for rel in run_eval.NO_MODES_FILES:
+        assert (REPO_ROOT / "src" / "superclaude" / rel).is_file(), rel
+    assert "sc-no-modes" in run_eval.ARMS
 
 
 def test_git_changed_ignores_framework_state_files(tmp_path):
