@@ -8,6 +8,8 @@ Releases before 4.19.0 are not listed. Their history is the git log; the upstrea
 
 ## [Unreleased]
 
+## [4.29.4] - 2026-10-19
+
 ### Added
 
 - `make typecheck` runs mypy over `src/` and fails when the error count exceeds `MYPY_BASELINE` (34) or mypy stops before checking everything. mypy is not clean yet; the target keeps the count from rising.
