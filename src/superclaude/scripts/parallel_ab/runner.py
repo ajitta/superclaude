@@ -129,7 +129,7 @@ def _parse_output(stdout: bytes) -> ParsedResult:
         return ParsedResult(text=text)
     # A stream without a result event (killed mid-run) parses best-effort
     # from the assistant messages that did arrive.
-    result = next((e for e in reversed(events) if e.get("type") == "result"), {})
+    result: dict = next((e for e in reversed(events) if e.get("type") == "result"), {})
     assistant_msgs = [
         e.get("message") or {} for e in events if e.get("type") == "assistant"
     ]

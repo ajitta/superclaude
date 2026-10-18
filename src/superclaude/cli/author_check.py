@@ -118,7 +118,8 @@ class _Doc:
 def load_fields() -> dict:
     """The packaged fields.yaml — the same file the skill's references ship."""
     path = _get_package_root() / "skills" / "sc-author" / "references" / "fields.yaml"
-    return yaml.safe_load(path.read_text(encoding="utf-8"))
+    fields: dict = yaml.safe_load(path.read_text(encoding="utf-8"))
+    return fields
 
 
 def infer_type(path: Path) -> str:
@@ -251,7 +252,7 @@ def _split(path: Path) -> _Doc:
             path, text, True, None, "frontmatter has no closing ---", {}, text, 1
         )
     raw = "\n".join(lines[1:end])
-    field_lines = {}
+    field_lines: dict[str, int] = {}
     for offset, line in enumerate(lines[1:end], start=2):
         key = re.match(r"^([A-Za-z0-9_-]+)\s*:", line)
         if key:
@@ -516,12 +517,12 @@ def _check_xml(doc: _Doc, type_: str, report: _Report) -> None:
             continue
         if not stack:
             outside.append((cursor, match.start()))
-        closing, name, selfclose, unbalanced = tag_parts(match)
-        selfclose = selfclose or is_void(name)
-        line = line_of(match.start())
+        closing, name, selfclose_mark, unbalanced = tag_parts(match)
+        selfclose = bool(selfclose_mark) or is_void(name)
+        line_no = line_of(match.start())
         if unbalanced:
             report.add(
-                "X2", line, f"`<{name}>` has an unbalanced quote in its attributes"
+                "X2", line_no, f"`<{name}>` has an unbalanced quote in its attributes"
             )
         if closing:
             if stack and stack[-1][0] == name:
@@ -532,12 +533,12 @@ def _check_xml(doc: _Doc, type_: str, report: _Report) -> None:
                     report.add("X2", open_line, f"`<{open_name}>` is never closed")
                 stack.pop()
             else:
-                report.add("X2", line, f"`</{name}>` has no opening tag")
+                report.add("X2", line_no, f"`</{name}>` has no opening tag")
         else:
             if not stack:
-                roots.append(line)
+                roots.append(line_no)
             if not selfclose:
-                stack.append((name, line))
+                stack.append((name, line_no))
         cursor = match.end()
     if not stack:
         outside.append((cursor, len(body)))
@@ -685,7 +686,7 @@ def _blank_tags(body: str) -> str:
     accepts it; otherwise it is prose and stays."""
 
     def blank(match: re.Match) -> str:
-        token = match.group(0)
+        token: str = match.group(0)
         if "\n" in token and not _is_multiline_tag(body, match):
             return token
         return re.sub(r"[^\n]", " ", token)

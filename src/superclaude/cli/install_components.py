@@ -315,7 +315,7 @@ def install_claude_sc_md(base_path: Path, force: bool = False) -> Tuple[bool, st
 
 def install_hooks(
     base_path: Path, force: bool = False, scope: str = "user"
-) -> Tuple[int, int, int, List[str]]:
+) -> Tuple[int, int, List[str]]:
     """
     Install the hook registration.
 

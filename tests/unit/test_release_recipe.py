@@ -6,7 +6,6 @@ and v4.29.2 and v4.29.3 shipped GitHub releases with blank notes; nothing failed
 These tests run the recipe's own awk program, so a regression turns them red.
 """
 
-import os
 import re
 import shutil
 import subprocess
@@ -150,38 +149,3 @@ def test_gh_repo_is_owner_slash_name_of_origin(url):
         ["sed", "-E", expr], input=url + "\n", capture_output=True, encoding="utf-8"
     ).stdout.strip()
     assert out == "o/r"
-
-
-# ── make typecheck: a stub `uv` stands in for mypy ──
-
-needs_make = pytest.mark.skipif(
-    shutil.which("make") is None or shutil.which("sh") is None or os.name == "nt",
-    reason="needs make and a POSIX sh",
-)
-
-
-@needs_make
-@pytest.mark.parametrize(
-    ("output", "rc", "ok"),
-    [
-        ("Found 34 errors in 16 files (checked 53 source files)", 1, True),
-        ("Found 1 error in 1 file (checked 53 source files)", 1, True),
-        ("Success: no issues found in 53 source files", 0, True),
-        ("Found 35 errors in 16 files (checked 53 source files)", 1, False),
-        ("Found 2 errors in 1 file (errors prevented further checking)", 2, False),
-        ("Traceback (most recent call last):", 1, False),
-    ],
-)
-def test_typecheck_gate(tmp_path, output, rc, ok):
-    stub = tmp_path / "uv"
-    stub.write_text(f"#!/bin/sh\nprintf '%s\\n' '{output}'\nexit {rc}\n")
-    stub.chmod(0o755)
-    env = {**os.environ, "PATH": f"{tmp_path}{os.pathsep}{os.environ['PATH']}"}
-    env.pop("MYPY_BASELINE", None)
-    proc = subprocess.run(
-        ["make", "-s", "-C", str(ROOT), "typecheck", "MYPY_BASELINE=34"],
-        env=env,
-        capture_output=True,
-        encoding="utf-8",
-    )
-    assert (proc.returncode == 0) is ok, proc.stdout + proc.stderr

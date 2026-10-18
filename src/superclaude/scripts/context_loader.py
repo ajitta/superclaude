@@ -106,7 +106,7 @@ BASE_PATH = _get_base_path()
 # NOTE: Avoid generic single words (edit, test, search, task, docs, debug, ui, etc.)
 #       that cause false positives on normal coding prompts.
 #       Use compound terms (e.g. "browser test" not "test") or explicit flags (--play).
-TRIGGER_MAP = [
+_TRIGGERS = [
     # Priority scheme:
     #   1 = behavioral (complex decision rules, workflow patterns) — survives token budget cuts
     #   2 = operational (tool hints, standard modes) — standard injection
@@ -196,9 +196,9 @@ TRIGGER_MAP = [
 ]
 
 # Pre-compile regex patterns for performance (P2)
-TRIGGER_MAP = [
+TRIGGER_MAP: "list[tuple[re.Pattern[str], str, int]]" = [
     (re.compile(pattern, re.IGNORECASE), path, priority)
-    for pattern, path, priority in TRIGGER_MAP
+    for pattern, path, priority in _TRIGGERS
 ]
 
 # Composite flags: one flag → multiple context files

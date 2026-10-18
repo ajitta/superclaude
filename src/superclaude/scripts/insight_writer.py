@@ -689,7 +689,7 @@ def _session_changed_code(session_id: str | None) -> bool:
         recorded = None
     if not recorded:
         return bool(_status_lines())
-    return current != recorded
+    return bool(current != recorded)
 
 
 def _answer_collected_file(session_id: str | None) -> Path:
@@ -886,7 +886,8 @@ def main(argv: list[str] | None = None, prog: str = "insight_writer") -> int:
         )
 
     args = build_parser(prog).parse_args(argv)
-    return args.fn(args)
+    rc: int = args.fn(args)
+    return rc
 
 
 if __name__ == "__main__":

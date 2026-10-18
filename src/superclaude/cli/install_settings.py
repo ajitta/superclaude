@@ -257,8 +257,8 @@ def _merge_hook_arrays(
     # matcher count, so narrowing `clear|compact|startup` to `clear|startup` keeps
     # the user's matcher instead of appending a second registration that then runs
     # the same hook twice per session.
-    registered_here = Counter()
-    registered_anywhere = Counter()
+    registered_here: Counter[Tuple[str, Tuple[str, str]]] = Counter()
+    registered_anywhere: Counter[Tuple[str, str]] = Counter()
     for entry in existing_sc_hooks:
         matcher = entry.get("matcher", "")
         sc_hooks, _user_hooks = _split_entry(entry)

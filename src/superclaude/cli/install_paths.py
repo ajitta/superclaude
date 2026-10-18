@@ -246,7 +246,7 @@ def find_unshipped(base_path: Path) -> list:
     their own list and helper. Non-.md files and superclaude/scripts/ are never
     returned: a legacy hook registration may still run the script copies.
     """
-    found = []
+    found: List[Path] = []
     for component in COMPONENTS:
         if component in SHARED_TARGET_COMPONENTS:
             continue

@@ -81,17 +81,9 @@ format: ## Format code (ruff format)
 	@echo "Formatting code..."
 	uv run ruff format .
 
-# mypy is not clean yet: hold the error count at or below MYPY_BASELINE so it only
-# goes down. The count varies by one or two with the installed library versions.
-MYPY_BASELINE ?= 34
-typecheck: ## Type-check src/ with mypy; fails when errors exceed MYPY_BASELINE (known debt)
-	@OUT=$$(uv run mypy src 2>&1); RC=$$?; \
-	[ $$RC -le 1 ] || { printf '%s\n' "$$OUT" | tail -5; echo "❌ mypy stopped before checking everything (exit $$RC)"; exit 1; }; \
-	if printf '%s\n' "$$OUT" | grep -q '^Success: no issues found'; then N=0; \
-	else N=$$(printf '%s\n' "$$OUT" | sed -n 's/^Found \([0-9][0-9]*\) errors* in .*/\1/p'); fi; \
-	[ -n "$$N" ] || { printf '%s\n' "$$OUT" | tail -5; echo "❌ mypy did not report a result"; exit 1; }; \
-	echo "mypy: $$N errors (baseline $(MYPY_BASELINE))"; \
-	[ "$$N" -le $(MYPY_BASELINE) ] || { echo "❌ mypy errors rose above $(MYPY_BASELINE): run 'uv run mypy src' and fix the new ones"; exit 1; }
+# Type-check src/ with mypy; CI runs the same check, so it must stay clean.
+typecheck: ## Type-check src/ with mypy (CI runs it; must be clean)
+	uv run mypy src
 
 # Clean build artifacts
 clean: ## Clean build artifacts
