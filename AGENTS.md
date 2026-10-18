@@ -18,6 +18,7 @@ uv run superclaude install --list-all      # Test CLI changes
 ## Code Style
 
 - Run `make format` and `make lint` before committing — CI fails on `ruff format --check` or `ruff check` over `src/` and `tests/`
+- `make typecheck` (mypy, not in CI) must not exceed `MYPY_BASELINE` in the Makefile; lower the baseline when you fix errors, never raise it
 
 ## Developer Environment
 
