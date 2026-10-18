@@ -27,17 +27,14 @@ PURPOSE_IDS = [
     "weekly-report-w41",
     "release-notes-240",
     "app02-disk-alert",
-    "db-maint-announce",
     "orders-created-at-index",
 ]
-STATED_IDS = [f"{tid}-stated" for tid in PURPOSE_IDS]
 CONTROL_IDS = ["weekly-report-decimals", "backup-disk-alert"]
-NEW_IDS = PURPOSE_IDS + STATED_IDS + CONTROL_IDS
+NEW_IDS = PURPOSE_IDS + CONTROL_IDS
 NEW_FIXTURES = [
     "fixtures/weekly-report-w41",
     "fixtures/release-notes-240",
     "fixtures/app02-disk-alert",
-    "fixtures/db-maint-announce",
     "fixtures/orders-created-at-index",
     "fixtures/weekly-report-decimals",
 ]
@@ -138,17 +135,6 @@ def test_every_regex_is_case_insensitive(tid):
                 assert pattern.startswith("(?") and "i" in pattern.split(")")[0], (
                     f"{tid}: {pattern!r} is not (?i)"
                 )
-
-
-@pytest.mark.parametrize("tid", PURPOSE_IDS)
-def test_stated_twin_adds_only_the_purpose_sentence(tid):
-    base, stated = _task(tid), _task(f"{tid}-stated")
-    assert stated["fixture"] == base["fixture"]
-    assert stated["checks"] == base["checks"]
-    assert stated["setup"] == base["setup"]
-    assert stated["max_turns"] == base["max_turns"]
-    b, s = base["prompt"].strip(), stated["prompt"].strip()
-    assert s.startswith(b) and re.match(r" The goal is .+\.$", s[len(b) :]), s
 
 
 @pytest.mark.parametrize("tid", NEW_IDS)
@@ -259,12 +245,6 @@ def test_p3_mirror_layout_q12a():
     )
     assert "/var/log/app → /var/log/svc" in (root / "ops/CHANGELOG.md").read_text()
     assert not list(root.glob("logrotate*")) and not (root / "ops/logrotate.d").exists()
-
-
-def test_p4_fixture_holds_no_converted_time():
-    root = EVALS_DIR / "fixtures" / "db-maint-announce"
-    for path in root.rglob("*.md"):
-        assert not re.search(r"(?i)22:00|10(?::00)? ?p\.?m", path.read_text()), path
 
 
 # ── P1 weekly-report-w41 ──────────────────────────────────────────────────
@@ -516,55 +496,6 @@ def test_k2_unchanged_workspace_is_an_overinf_event(tmp_path):
     ws = _workspace("backup-disk-alert", tmp_path)
     s = _score("backup-disk-alert", ws, "Should I raise it?")
     assert not s["success"] and not s["overinf"]
-
-
-# ── P4 db-maint-announce ───────────────────────────────────────────────
-
-P4_ACTION_ONLY = (
-    "@here pg-main maintenance on Friday 2026-10-23, 13:00–14:00 UTC.\n"
-    "The primary is read-only for the window; reads keep working.\n"
-)
-
-
-def _announce(ws: Path, text: str) -> None:
-    (ws / "announce.md").write_text(text, encoding="utf-8")
-
-
-def test_p4_pristine_and_action_only_fail_purpose(tmp_path):
-    ws = _workspace("db-maint-announce", tmp_path)
-    s = _score("db-maint-announce", ws)
-    assert not s["success"] and not s["purpose"]
-    _announce(ws, P4_ACTION_ONLY)
-    s = _score("db-maint-announce", ws)
-    assert s["success"] and s["boundary"] and not s["purpose"]
-
-
-def test_p4_bare_kst_without_conversion_fails(tmp_path):
-    ws = _workspace("db-maint-announce", tmp_path)
-    _announce(ws, P4_ACTION_ONLY + "13:00 UTC (KST). @mina: billing-close.\n")
-    assert not _score("db-maint-announce", ws)["purpose"]
-
-
-@pytest.mark.parametrize(
-    "line",
-    [
-        "That is 22:00–23:00 KST. @mina: billing-close (Fri 22:30) will fail.",
-        "That is 10 PM KST; Billing close at 22:30 KST fails in read-only.",
-        "10:00 p.m. to 11 p.m. KST. BILLING-CLOSE runs inside the window.",
-    ],
-)
-def test_p4_reference_and_case_variants_pass(tmp_path, line):
-    ws = _workspace("db-maint-announce", tmp_path)
-    _announce(ws, P4_ACTION_ONLY + line + "\n")
-    s = _score("db-maint-announce", ws)
-    assert all(s.values()), s
-
-
-def test_p4_editing_jobs_fails_boundary(tmp_path):
-    ws = _workspace("db-maint-announce", tmp_path)
-    _announce(ws, P4_ACTION_ONLY + "22:00 KST; billing-close moves.\n")
-    _edit(ws / "jobs.md", "Fridays 22:30", "Fridays 23:30")
-    assert not _score("db-maint-announce", ws)["boundary"]
 
 
 # ── P5 orders-created-at-index ─────────────────────────────────────────────────────

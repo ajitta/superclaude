@@ -1,6 +1,6 @@
 ---
 feature: purpose-generalization
-phase: screen
+phase: closed
 owner: ajitta
 created: 2026-10-19
 updated: 2026-10-19
@@ -12,7 +12,7 @@ Does the shipped `purpose_before_action` rule help on unstated-purpose requests 
 
 ## Status
 
-Phase 0 built and frozen by its commit (task ids made neutral before the freeze — see 01 Tasks). Branch `feature/purpose-generalization` from master `b50a1820`. Built: 6 fixture dirs, 12 canary-only tasks, the ablation arm (`evals/arms/RULES_CANDIDATE.md`, byte-equal to `123c6a22^:src/superclaude/core/RULES.md`), and `tests/unit/test_eval_purpose_fixtures.py`. Sessions: 0. The pre-registration in [01-fixtures.md](./01-fixtures.md) is frozen by the Phase 0 commit; nothing in it changes after Phase 1 starts.
+Closed on branch `feature/purpose-generalization` (not yet merged). Frozen spec `82cbf3bb`; 87/90 sessions. Screen kept P1, P2, P3, P5 (P4 dropped at ceiling). Readout ([04](./04-readout.md)): **sonnet D3a** — positive, under-powered (sc-full 5/12 vs sc-ablate 2/12, p = 0.185); **opus D5** — ceiling, non-informative (12/12 vs 8/12); over-inference **O1** — none detected (0/12 vs 0/12, Wilson upper 24%); no boundary failures. No shipped content changed, no release. Q11 cleanup applied: six probes kept, P4 and the `-stated` twins deleted, `RULES_CANDIDATE.md` back to an empty delta.
 
 ## Documents
 
@@ -20,3 +20,6 @@ Phase 0 built and frozen by its commit (task ids made neutral before the freeze 
 |---|---|
 | [00-intent.md](./00-intent.md) | Request, Q1–Q14 decisions, cap, constraints |
 | [01-fixtures.md](./01-fixtures.md) | Pre-registration: prompts, checks, allowed sets, decision rules, Q12 statement, fixture hashes, Phase 1/2 commands |
+| [02-discriminability.md](./02-discriminability.md) | Preflight, screen (sonnet, sc-ablate), host positive control, ledger |
+| [03-measurement.md](./03-measurement.md) | Phase 2 per-fixture tables, miss types, controls, Q8 reachability, cost |
+| [04-readout.md](./04-readout.md) | Rules applied (sonnet D3a, opus D5, O1), limits, next-round candidates, Q11 close |
