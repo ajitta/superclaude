@@ -114,12 +114,6 @@ class TaskResult:
     # left out; sc_activations still counts attempts. A slash command typed at
     # the start of the prompt is expanded, not called, so it never appears.
     skills_called: list[str] = field(default_factory=list)
-    # Name of every tool_use block in order (what tool_called matches), and the
-    # largest number of tool_use blocks that shared one assistant message id —
-    # the batching measure. stream-json splits a message into one event per
-    # content block, so the count is summed per `message.id`, not per event.
-    tools_called: list[str] = field(default_factory=list)
-    max_parallel_tool_calls: int = 0
     error: str = ""
     # stop_details.category when the model refused the turn ("" otherwise).
     # A refusal is also recorded in `error`, so ok/gates_ok stay false.
@@ -336,7 +330,6 @@ def _parse_stream(stream: str, res: TaskResult) -> tuple[str, str, str | None]:
     # Code answers a call it refuses (disable-model-invocation, unknown skill)
     # with an error result, so only a non-error result counts as a run.
     pending_skills: dict[str, str] = {}
-    tool_uses_per_message: dict[str, int] = {}
     for line in stream.splitlines():
         try:
             event = json.loads(line)
@@ -371,12 +364,6 @@ def _parse_stream(stream: str, res: TaskResult) -> tuple[str, str, str | None]:
                     continue
                 name = block.get("name", "")
                 tool_input = block.get("input") or {}
-                res.tools_called.append(name)
-                msg_id = str(message.get("id") or "")
-                tool_uses_per_message[msg_id] = tool_uses_per_message.get(msg_id, 0) + 1
-                res.max_parallel_tool_calls = max(
-                    res.max_parallel_tool_calls, tool_uses_per_message[msg_id]
-                )
                 # Both shell tools count: Claude Code on Windows offers
                 # PowerShell next to Bash, and a destructive command through
                 # either must trip the transcript gates.
@@ -407,7 +394,7 @@ def _run_checks(
     for check in task.get("checks", []):
         ctype, tag = check["type"], check.get("tag", "untagged")
         passed, detail = _check_one(
-            check, ctype, ws, result_text, bash_inputs, res.skills_called, res=res
+            check, ctype, ws, result_text, bash_inputs, res.skills_called
         )
         res.checks.append(
             CheckResult(
@@ -451,7 +438,6 @@ def _check_one(
     result_text: str,
     bash_inputs: str,
     skills_called: list[str] | None = None,
-    res: TaskResult | None = None,
 ) -> tuple[bool, str]:
     if ctype == "cmd_ok":
         proc = _run(_pin_python(check["cmd"]), cwd=ws)
@@ -506,13 +492,6 @@ def _check_one(
         return not hits, f"called={skills_called or []}"
     if ctype == "citation_lines":
         return _check_citations(check, result_text)
-    if ctype == "tool_called":
-        names = res.tools_called if res else []
-        hits = [n for n in names if re.search(check["pattern"], n)]
-        return bool(hits), f"called={sorted(set(names))}"
-    if ctype == "parallel_tool_calls_min":
-        observed = res.max_parallel_tool_calls if res else 0
-        return observed >= check["min"], f"max tool calls in one message: {observed}"
     raise ValueError(f"unknown check type: {ctype}")
 
 

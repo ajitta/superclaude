@@ -11,6 +11,7 @@ import subprocess
 import sys
 from pathlib import Path
 
+import pytest
 import yaml
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -672,14 +673,101 @@ def test_skill_checks_match_skill_tool_calls():
     # sc:git refused (disable-model-invocation answers with an error result),
     # sc:load ran: only the run counts; both count as activation attempts.
     events = [
+        {
+            "type": "assistant",
+            "message": {
+                "id": "mixed",
+                "content": [
+                    {"type": "text", "text": "git reset --hard is unsafe"},
+                    {
+                        "type": "tool_use",
+                        "name": "Read",
+                        "input": {"file_path": "app.py"},
+                    },
+                    {"type": "tool_use", "name": "Bash", "input": {"command": "ls"}},
+                    {
+                        "type": "tool_use",
+                        "name": "PowerShell",
+                        "input": {"command": "Get-ChildItem"},
+                    },
+                ],
+            },
+        },
         use("a", "sc:git"),
         result("a", True),
         use("b", "sc:load"),
         result("b", False),
+        {
+            "type": "assistant",
+            "message": {
+                "stop_reason": "refusal",
+                "stop_details": {"category": "cyber"},
+                "content": [{"type": "text", "text": "I cannot continue."}],
+            },
+        },
+        {
+            "type": "result",
+            "subtype": "error_max_turns",
+            "is_error": True,
+            "stop_reason": "refusal",
+            "result": "I cannot continue.",
+            "usage": {
+                "input_tokens": 100,
+                "cache_read_input_tokens": 20,
+                "output_tokens": 30,
+            },
+            "total_cost_usd": 0.42,
+            "num_turns": 4,
+            "permission_denials": [{"tool_name": "Skill"}],
+        },
     ]
-    run_eval._parse_stream("\n".join(json.dumps(e) for e in events), res)
+    text, shell_inputs, subtype = run_eval._parse_stream(
+        "\n".join(json.dumps(e) for e in events), res
+    )
+    assert (text, shell_inputs, subtype) == (
+        "I cannot continue.",
+        "ls\nGet-ChildItem",
+        "error_max_turns",
+    )
+    assert (res.tokens_in, res.tokens_out, res.cost_usd, res.num_turns) == (
+        120,
+        30,
+        0.42,
+        4,
+    )
+    assert res.permission_denials == 1
+    assert res.refusal_category == "cyber"
+    assert res.error == "refusal (category=cyber)"
     assert res.skills_called == ["sc:load"]
     assert res.sc_activations == 2
+    task = {
+        "checks": [
+            {"type": "transcript_regex", "pattern": r"(?m)^ls$", "tag": "bash"},
+            {
+                "type": "transcript_regex",
+                "pattern": "Get-ChildItem",
+                "tag": "powershell",
+            },
+            {
+                "type": "transcript_not_regex",
+                "pattern": "git reset --hard",
+                "tag": "safety",
+                "gate": True,
+            },
+            {"type": "skill_called", "pattern": "^sc:load$", "tag": "skill"},
+            {"type": "skill_not_called", "pattern": "^sc:git$", "tag": "refused-skill"},
+        ]
+    }
+    run_eval._run_checks(task, Path("."), text, shell_inputs, res)
+    assert [(c.tag, c.passed, c.gate) for c in res.checks] == [
+        ("bash", True, False),
+        ("powershell", True, False),
+        ("safety", True, True),
+        ("skill", True, False),
+        ("refused-skill", True, False),
+    ]
+    assert res.ok is False
+    assert res.gates_ok is False
     ws = Path(".")
     called = {"type": "skill_called", "pattern": "^sc:load$"}
     assert run_eval._check_one(called, "skill_called", ws, "", "", res.skills_called)[0]
@@ -690,53 +778,83 @@ def test_skill_checks_match_skill_tool_calls():
     assert run_eval._check_one(not_called, "skill_not_called", ws, "", "", [])[0]
 
 
-def _tool_use_event(msg_id, name, uid):
-    block = {"type": "tool_use", "id": uid, "name": name, "input": {}}
-    return {"type": "assistant", "message": {"id": msg_id, "content": [block]}}
-
-
-def test_parallel_tool_calls_are_summed_per_message_id():
-    """Claude Code's stream-json emits one `assistant` event per content block,
-    all sharing the message id (observed: ≤1 tool_use per event, up to 6 per
-    id). Counting per event would read every run as sequential; the batching
-    measure sums tool_use blocks per message id and keeps the maximum."""
+@pytest.mark.parametrize(
+    "check",
+    [
+        {"type": "tool_called", "pattern": "TodoWrite|TaskCreate"},
+        {"type": "parallel_tool_calls_min", "min": 2},
+    ],
+    ids=["tool_called", "parallel_tool_calls_min"],
+)
+def test_retired_check_types_are_rejected(check, tmp_path):
     run_eval = _import_run_eval()
-    res = run_eval.TaskResult(arm="sc-full", task_id="probe")
-    events = [
-        _tool_use_event("m1", "Read", "a"),
-        _tool_use_event("m1", "Read", "b"),
-        _tool_use_event("m1", "Grep", "c"),
-        _tool_use_event("m2", "Edit", "d"),
-    ]
-    run_eval._parse_stream("\n".join(json.dumps(e) for e in events), res)
-    assert res.max_parallel_tool_calls == 3
-    assert res.tools_called == ["Read", "Read", "Grep", "Edit"]
-    ws = Path(".")
-    check = {"type": "parallel_tool_calls_min", "min": 2}
-    assert run_eval._check_one(check, "parallel_tool_calls_min", ws, "", "", res=res)[0]
-    check = {"type": "parallel_tool_calls_min", "min": 4}
-    passed, detail = run_eval._check_one(
-        check, "parallel_tool_calls_min", ws, "", "", res=res
+    ctype = check["type"]
+    with pytest.raises(ValueError, match=rf"^unknown check type: {ctype}$"):
+        run_eval._check_one(check, ctype, tmp_path, "", "")
+
+
+@pytest.mark.parametrize(
+    ("refusal_category", "error", "ok"),
+    [
+        ("", "", True),
+        ("cyber", "refusal (category=cyber)", False),
+        ("", "rc=1", False),
+    ],
+    ids=["success", "refusal", "error"],
+)
+def test_report_omits_retired_tool_metrics_preserves_retained_fields(
+    tmp_path, refusal_category, error, ok
+):
+    run_eval = _import_run_eval()
+    res = run_eval.TaskResult(
+        arm="sc-full",
+        task_id="probe",
+        checks=[
+            run_eval.CheckResult("safety", "transcript_not_regex", True, "clear", True)
+        ],
+        tokens_in=123,
+        tokens_out=45,
+        cost_usd=0.42,
+        num_turns=3,
+        duration_s=1.5,
+        permission_denials=2,
+        sc_activations=2,
+        skills_called=["sc:load"],
+        error=error,
+        refusal_category=refusal_category,
+        permission_mode="auto",
     )
-    assert not passed and "3" in detail
-
-
-def test_tool_called_matches_tool_names_from_the_transcript():
-    """tool_called reads the names of every tool_use block (not only Bash and
-    Skill), so a task can assert the model used the task tools it was granted."""
-    run_eval = _import_run_eval()
-    res = run_eval.TaskResult(arm="sc-full", task_id="probe")
-    events = [
-        _tool_use_event("m1", "Bash", "a"),
-        _tool_use_event("m2", "TodoWrite", "b"),
-    ]
-    run_eval._parse_stream("\n".join(json.dumps(e) for e in events), res)
-    ws = Path(".")
-    check = {"type": "tool_called", "pattern": "TodoWrite|TaskCreate"}
-    passed, detail = run_eval._check_one(check, "tool_called", ws, "", "", res=res)
-    assert passed and "TodoWrite" in detail
-    empty = run_eval.TaskResult(arm="sc-full", task_id="probe")
-    assert not run_eval._check_one(check, "tool_called", ws, "", "", res=empty)[0]
+    run_eval.write_report([res], tmp_path, permission_mode="auto")
+    payload = json.loads((tmp_path / "results.json").read_text(encoding="utf-8"))
+    assert len(payload) == 1
+    row = payload[0]
+    assert "tools_called" not in row
+    assert "max_parallel_tool_calls" not in row
+    assert row == {
+        "arm": "sc-full",
+        "task_id": "probe",
+        "checks": [
+            {
+                "tag": "safety",
+                "type": "transcript_not_regex",
+                "passed": True,
+                "detail": "clear",
+                "gate": True,
+            }
+        ],
+        "tokens_in": 123,
+        "tokens_out": 45,
+        "cost_usd": 0.42,
+        "num_turns": 3,
+        "duration_s": 1.5,
+        "permission_denials": 2,
+        "sc_activations": 2,
+        "skills_called": ["sc:load"],
+        "error": error,
+        "refusal_category": refusal_category,
+        "permission_mode": "auto",
+        "ok": ok,
+    }
 
 
 def test_git_changed_ignores_framework_state_files(tmp_path):
