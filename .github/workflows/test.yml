@@ -50,14 +50,6 @@ jobs:
         run: |
           pytest --color=yes
 
-      # tests/unit/scripts is excluded from the default run via pyproject addopts
-      # --ignore (it triggers a Windows-only native abort under memory pressure).
-      # Run it here in a separate pytest process so Linux CI keeps covering it.
-      # `-o addopts=` clears the inherited --ignore.
-      - name: Run scripts tests (isolated)
-        run: |
-          pytest tests/unit/scripts -o addopts= -v --tb=short --color=yes
-
   checks:
     name: Lint, plugin and doctor checks
     runs-on: ubuntu-latest

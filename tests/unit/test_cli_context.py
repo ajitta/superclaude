@@ -9,10 +9,6 @@ Every test pins ``CLAUDE_PROJECT_DIR`` as well as the CWD: ``project_root()``
 reads the env first, so ``monkeypatch.chdir`` alone would let the resolvers
 write into the real repo or the real ``~/.claude``
 (gotchas/hooks.md ``test-anchor-env``).
-
-This module lives at ``tests/unit/`` top level on purpose — ``pyproject.toml``
-carries ``--ignore=tests/unit/scripts``, so a file placed there is collected by
-nothing.
 """
 
 from __future__ import annotations

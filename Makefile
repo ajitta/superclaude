@@ -33,18 +33,16 @@ sync-local: ## Force-sync content to local scope (./.claude/, gitignored)
 ##@ 🔧 Development:
 
 # Run tests (canary excluded by default — invoke explicitly: pytest -m canary)
-# tests/unit/scripts excluded via pyproject addopts --ignore — run them with `make test-scripts`
-test: ## Run test suite (tests/unit/scripts excluded)
+test: ## Run test suite
 	@echo "Running tests..."
 	uv run python -m pytest -m "not canary"
 
-# Run tests/unit/scripts in an ISOLATED pytest process. Excluded from `make test`
-# because they trigger a Windows-only native abort (exit 0xC0000409) when run inside
-# the main suite under memory pressure; a separate process keeps a transient native
-# crash from taking down the whole run. `-o addopts=` clears the inherited --ignore.
-test-scripts: ## Run tests/unit/scripts in an isolated process
-	@echo "Running tests/unit/scripts (isolated)..."
-	uv run python -m pytest tests/unit/scripts -o addopts= -v --tb=short
+# Convenience: just the tests/unit/scripts suite. It was excluded from the default
+# run (c97705c0, a Windows native abort) until docs/features/test-exclusion-lift
+# found no abort in eight full runs; the default run covers it again.
+test-scripts: ## Run only tests/unit/scripts
+	@echo "Running tests/unit/scripts..."
+	uv run python -m pytest tests/unit/scripts
 
 # Test pytest plugin loading
 test-plugin: ## Test pytest plugin auto-discovery

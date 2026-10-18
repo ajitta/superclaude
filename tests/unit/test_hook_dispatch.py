@@ -10,9 +10,6 @@ dispatches ``hook`` before importing click (why and the numbers:
 ``hook_dispatch.py``'s module docstring); one stray import of
 ``superclaude.cli.main`` from that path doubles every hook's cost without
 failing anything.
-
-Filed at tests/unit/ top level on purpose: pyproject addopts carries
-``--ignore=tests/unit/scripts``, so a guard under tests/unit/scripts/ never runs.
 """
 
 from __future__ import annotations

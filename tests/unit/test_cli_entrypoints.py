@@ -7,9 +7,6 @@ outside a checkout raises ModuleNotFoundError. These tests pin the two things
 that break silently: that the subcommands are registered under those exact
 names, and that argv (including `--help` and unknown options) reaches the
 worker's own argparse parser rather than being eaten by Click.
-
-Filed at tests/unit/ top level on purpose: pyproject addopts carries
-`--ignore=tests/unit/scripts`, so a guard under tests/unit/scripts/ never runs.
 """
 
 import re
