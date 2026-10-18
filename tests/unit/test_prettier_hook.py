@@ -43,8 +43,6 @@ def _layout(tmp_path, monkeypatch, *, with_cmd: bool):
         cmd.write_text(
             '@ECHO off\r\nnode "%~dp0\\..\\prettier\\bin\\prettier.cjs" %*\r\n'
         )
-        # shutil.which needs X_OK even under a patched win32 platform when the
-        # suite runs on Linux (CI); a no-op on Windows.
         cmd.chmod(0o755)
     elsewhere = tmp_path / "elsewhere"
     elsewhere.mkdir()
@@ -56,10 +54,17 @@ def _layout(tmp_path, monkeypatch, *, with_cmd: bool):
     return project, bin_dir
 
 
+WINDOWS = sys.platform == "win32"
+
+
 class TestFindPrettier:
+    """Each OS exercises its own real resolution: shutil.which's win32 branch
+    reaches into _winapi (absent on Linux) and its PATHEXT handling differs by
+    Python version, so faking sys.platform is not portable across CI runners."""
+
+    @pytest.mark.skipif(not WINDOWS, reason="Windows .cmd resolution")
     def test_windows_picks_cmd_shim_not_posix_script(self, tmp_path, monkeypatch):
         _, bin_dir = _layout(tmp_path, monkeypatch, with_cmd=True)
-        monkeypatch.setattr(sys, "platform", "win32")
         monkeypatch.setenv(
             "PATHEXT", ".com;.exe;.bat;.cmd"
         )  # lowercase: exact match on case-sensitive FS too
@@ -69,18 +74,18 @@ class TestFindPrettier:
         assert found == str(bin_dir / "prettier.cmd")
         assert os.path.isabs(found)
 
+    @pytest.mark.skipif(not WINDOWS, reason="Windows .cmd resolution")
     def test_windows_ignores_posix_script_when_no_cmd_shim(self, tmp_path, monkeypatch):
         _layout(tmp_path, monkeypatch, with_cmd=False)
-        monkeypatch.setattr(sys, "platform", "win32")
         monkeypatch.setenv(
             "PATHEXT", ".com;.exe;.bat;.cmd"
         )  # lowercase: exact match on case-sensitive FS too
 
         assert hook._find_prettier() is None
 
+    @pytest.mark.skipif(WINDOWS, reason="POSIX script resolution")
     def test_posix_picks_script(self, tmp_path, monkeypatch):
         _, bin_dir = _layout(tmp_path, monkeypatch, with_cmd=True)
-        monkeypatch.setattr(sys, "platform", "linux")
 
         found = hook._find_prettier()
 
