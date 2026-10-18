@@ -8,7 +8,7 @@ updated: 2026-10-19
 
 # 02. Handoff — what remains after harness/checker hygiene
 
-This round implements mode-retire handoff candidates 2 and 3 on fix/harness-checker-hygiene from master 19a17705. Integration tests and deterministic red-to-green evidence are in [01-verification.md](./01-verification.md). Independent code review passed, with its optional combined-attribute coverage suggestion incorporated. Implementation commits: 73d41ecb (harness retirement) and 4c0a2c24 (quoted attributes); intent: 5bff3e86. Headless behavioral sessions used: **0**; the owner imposed no ceiling. Not merged, pushed or released; no installation changed.
+This round implements mode-retire handoff candidates 2 and 3 on fix/harness-checker-hygiene from master 19a17705. Integration tests and deterministic red-to-green evidence are in [01-verification.md](./01-verification.md). Independent code review passed, with its optional combined-attribute coverage suggestion incorporated. Implementation commits: 73d41ecb (harness retirement) and 4c0a2c24 (quoted attributes); intent: 5bff3e86. Headless behavioral sessions used: **0**; the owner imposed no ceiling. Merged into master at 0986f600. Development delivery targets origin/master; the existing local-scope install was synchronized, with no drift and doctor healthy. The installed RULES_DELEGATION.md also passes author-check with zero errors/warnings. No release was requested: stable and tag v4.29.1 remain at 96619c64. Remaining work is explicitly for a new session.
 
 ## Candidates
 
