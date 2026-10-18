@@ -57,6 +57,10 @@ RULES = {
 TAG_RE = re.compile(
     r"""<(/?)([A-Za-z][A-Za-z0-9_-]*)(\s(?:[^<>"']|"[^"]*"|'[^']*')*?)?(/?)>"""
 )
+# An opener whose attributes hold an unbalanced quote (`<step note=don't>`) is
+# not a tag to TAG_RE. The structural scan still consumes it as an opener so the
+# error lands on that line, not on its closing tag. Groups 5-7 mirror 2-4.
+_STRUCT_RE = re.compile(TAG_RE.pattern + r"|<([A-Za-z][A-Za-z0-9_-]*)(\s[^<>]*?)(/?)>")
 
 # A Markdown file may open with HTML (a centered logo, a badge row). Those
 # tags do not make it an XML body, and HTML void elements never close.
@@ -436,28 +440,39 @@ def _check_xml(doc: _Doc, type_: str, report: _Report) -> None:
     def is_void(name: str) -> bool:
         return name.lower() in _HTML_VOID and name not in closed
 
+    def tag_parts(match: re.Match) -> tuple[str, str, str, bool]:
+        """(closing, name, selfclose, unbalanced_quote) for either alternative."""
+        if match.group(5) is not None:
+            return "", match.group(5), match.group(7), True
+        return match.group(1), match.group(2), match.group(4), False
+
     def is_placeholder(match: re.Match) -> bool:
-        if match.group(1) or match.group(4) or is_void(match.group(2)):
+        closing, name, selfclose, _ = tag_parts(match)
+        if closing or selfclose or is_void(name):
             return False
         line_start = body.rfind("\n", 0, match.start()) + 1
         if not body[line_start : match.start()].strip():
             return False
         line_end = body.find("\n", match.end())
         rest = body[match.end() : line_end if line_end != -1 else len(body)]
-        return f"</{match.group(2)}>" not in rest
+        return f"</{name}>" not in rest
 
     stack: list[tuple[str, int]] = []
     roots: list[int] = []
     outside: list[tuple[int, int]] = []
     cursor = 0
-    for match in TAG_RE.finditer(body):
+    for match in _STRUCT_RE.finditer(body):
         if is_placeholder(match):
             continue
         if not stack:
             outside.append((cursor, match.start()))
-        closing, name, selfclose = match.group(1), match.group(2), match.group(4)
+        closing, name, selfclose, unbalanced = tag_parts(match)
         selfclose = selfclose or is_void(name)
         line = line_of(match.start())
+        if unbalanced:
+            report.add(
+                "X2", line, f"`<{name}>` has an unbalanced quote in its attributes"
+            )
         if closing:
             if stack and stack[-1][0] == name:
                 stack.pop()
