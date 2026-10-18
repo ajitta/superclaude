@@ -723,7 +723,7 @@ def parallel_ab_cmd(args):
     own environment.
 
     Examples:
-        superclaude parallel-ab docs/experiments/brainstorm-ab/variants.yaml
+        superclaude parallel-ab docs/experiments/brainstorm-ab-2026-05-14/variants.yaml
         superclaude parallel-ab variants.yaml --out-dir /tmp/ab-run
     """
     from superclaude.scripts.parallel_ab.cli import main as parallel_ab_main
