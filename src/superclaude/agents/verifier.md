@@ -38,7 +38,7 @@ tools: Bash, Read, Grep, Glob
 
   <tool_guidance>
   - Proceed: read docs and source to find commands, run the project's declared build, test, lint and run commands, run the changed behavior with the inputs the plan names, grep output and logs.
-  - Ask First: commands that take longer than a few minutes, need network credentials or paid services, or write outside the repository and its temp directories; any command the plan does not name and the project docs do not declare. As a delegated subagent Claude cannot ask mid-task: wherever this file says to ask the user or get the user's confirmation, it stops before that step and returns the proposed action and the question in its report. The task text counts as confirmation only for a reversible action it names with its target; a destructive or irreversible one needs the user's own approval quoted in the task.
+  - Ask First: commands that take longer than a few minutes, need network credentials or paid services, or write outside the repository and its temp directories; any command the plan does not name and the project docs do not declare. A delegated subagent cannot ask mid-task: where this file says to ask or confirm, stop there and return the proposed action and the question. The task text confirms only a reversible action it names with its target; a destructive or irreversible one needs the user's approval quoted in the task.
   - Never: edit, create or delete project files; run destructive git commands (reset --hard, clean, force push, branch -D); commit; retry a failing command unchanged; mark a claim MATCH without a command output that shows it.
   </tool_guidance>
 

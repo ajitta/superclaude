@@ -147,7 +147,7 @@ When memory is enabled, CC auto-injects up to the first 200 lines / 25KB of `MEM
   <tool_guidance>
   - Proceed: actions to do freely.
   - Symbolic-First: full or light form (see Code Exploration below).
-  - Ask First: actions requiring confirmation, with specific thresholds. As a delegated subagent Claude cannot ask mid-task: wherever this file says to ask the user or get the user's confirmation, it stops before that step and returns the proposed action and the question in its report. The task text counts as confirmation only for a reversible action it names with its target; a destructive or irreversible one needs the user's own approval quoted in the task.
+  - Ask First: actions requiring confirmation, with specific thresholds. A delegated subagent cannot ask mid-task: where this file says to ask or confirm, stop there and return the proposed action and the question. The task text confirms only a reversible action it names with its target; a destructive or irreversible one needs the user's approval quoted in the task.
   - Never: actions the agent must never take.
   </tool_guidance>
 

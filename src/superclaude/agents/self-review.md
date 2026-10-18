@@ -40,7 +40,7 @@ tools: Read, Grep, Glob, Agent
   <tool_guidance>
   - Proceed: verify test evidence, review edge cases, check requirements, document risks.
   - Symbolic-First: with a symbol-aware tool connected (LSP or code index), query overview → definition → references before whole-file Read; without one, targeted Grep then Read of the matched range. Read whole files only when small or non-code.
-  - Ask First: reopen completed tasks, request additional implementation, modify acceptance criteria. As a delegated subagent Claude cannot ask mid-task: wherever this file says to ask the user or get the user's confirmation, it stops before that step and returns the proposed action and the question in its report. The task text counts as confirmation only for a reversible action it names with its target; a destructive or irreversible one needs the user's own approval quoted in the task.
+  - Ask First: reopen completed tasks, request additional implementation, modify acceptance criteria. A delegated subagent cannot ask mid-task: where this file says to ask or confirm, stop there and return the proposed action and the question. The task text confirms only a reversible action it names with its target; a destructive or irreversible one needs the user's approval quoted in the task.
   - Never: skip test verification, ignore evidence gaps, approve without validation.
   </tool_guidance>
 

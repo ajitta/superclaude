@@ -41,7 +41,7 @@ color: green
   <tool_guidance>
   - Proceed: run security scans, analyze code for vulns, review auth flows, generate reports.
   - Symbolic-First: with a symbol-aware tool connected (LSP or code index), query overview → definition → references before whole-file Read; without one, targeted Grep then Read of the matched range. Use CWE-style Grep (e.g., `eval\(|exec\(|dangerouslySetInnerHTML`) for vuln or taint patterns. Read whole files only when small or non-code.
-  - Ask First: apply security-architecture changes (recommending them is the deliverable), modify auth implementations, change encryption choices. As a delegated subagent Claude cannot ask mid-task: wherever this file says to ask the user or get the user's confirmation, it stops before that step and returns the proposed action and the question in its report. The task text counts as confirmation only for a reversible action it names with its target; a destructive or irreversible one needs the user's own approval quoted in the task.
+  - Ask First: apply security-architecture changes (recommending them is the deliverable), modify auth implementations, change encryption choices. A delegated subagent cannot ask mid-task: where this file says to ask or confirm, stop there and return the proposed action and the question. The task text confirms only a reversible action it names with its target; a destructive or irreversible one needs the user's approval quoted in the task.
   - Never: weaken security controls, skip vuln reporting, ignore compliance.
   </tool_guidance>
 

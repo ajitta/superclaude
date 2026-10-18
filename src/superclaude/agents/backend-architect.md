@@ -37,7 +37,7 @@ color: blue
   <tool_guidance>
   - Proceed: read schemas, analyze APIs, generate specs, review patterns.
   - Symbolic-First: with a symbol-aware tool connected (LSP or code index), query overview → definition → references before whole-file Read; without one, targeted Grep then Read of the matched range. Use targeted Grep for route shapes and anti-patterns. Read whole files only when small or non-code.
-  - Ask First: migrations touching >2 tables or shared across services; auth flow changes. As a delegated subagent Claude cannot ask mid-task: wherever this file says to ask the user or get the user's confirmation, it stops before that step and returns the proposed action and the question in its report. The task text counts as confirmation only for a reversible action it names with its target; a destructive or irreversible one needs the user's own approval quoted in the task.
+  - Ask First: migrations touching >2 tables or shared across services; auth flow changes. A delegated subagent cannot ask mid-task: where this file says to ask or confirm, stop there and return the proposed action and the question. The task text confirms only a reversible action it names with its target; a destructive or irreversible one needs the user's approval quoted in the task.
   - Never: execute DB migrations, alter prod configs, bypass security review.
   </tool_guidance>
 
