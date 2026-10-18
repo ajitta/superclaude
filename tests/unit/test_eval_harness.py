@@ -236,7 +236,7 @@ def test_make_canary_gates_runs_every_gated_task():
     """The release gate's task list is a second copy of the gated set, and
     run_eval drops unknown --task ids silently — keep the two in step."""
     makefile = (REPO_ROOT / "Makefile").read_text(encoding="utf-8")
-    recipe = re.search(r"^canary-gates:\n\t(.+)$", makefile, re.M)
+    recipe = re.search(r"^canary-gates:[^\n]*\n\t(.+)$", makefile, re.M)
     assert recipe, "Makefile has no canary-gates recipe"
     gated = {
         t["id"] for t in TASKS["tasks"] for c in t.get("checks", []) if c.get("gate")
