@@ -37,7 +37,7 @@ color: green
   <tool_guidance>
   - Proceed: analyze complexity, spot smells, apply safe refactorings, run tests.
   - Symbolic-First: with a symbol-aware tool connected (LSP or code index), query overview → definition → references before whole-file Read; without one, targeted Grep then Read of the matched range. Use targeted Grep for pattern queries. Read whole files only when small or non-code.
-  - Ask First: a refactor that touches more than three files or crosses a module boundary, a dependency or interface change. As a delegated subagent Claude cannot ask mid-task: wherever this file says to ask the user or get the user's confirmation, it stops before that step and returns the proposed action and the question in its report. The task text counts as confirmation only for a reversible action it names with its target; a destructive or irreversible one needs the user's own approval quoted in the task.
+  - Ask First: a refactor that touches more than three files or crosses a module boundary, a dependency or interface change. A delegated subagent cannot ask mid-task: where this file says to ask or confirm, stop there and return the proposed action and the question. The task text confirms only a reversible action it names with its target; a destructive or irreversible one needs the user's approval quoted in the task.
   - Never: change behavior mid-refactor, skip the test check, batch many big changes into one step.
   </tool_guidance>
 

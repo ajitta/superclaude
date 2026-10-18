@@ -6,6 +6,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Ver
 
 Releases before 4.19.0 are not listed. Their history is the git log; the upstream-era changelog, last entry 4.2.1, is `CHANGELOG.md` at commit `6b0ac5c3^`.
 
+## [Unreleased]
+
+### Changed
+
+- `/sc:git` carries the three safety gotchas that only the `git-workflow` agent had: scan staged files for secrets and never stage `.env`/credential files without a warning, warn before committing or pushing directly on `main`/`master`, check `git stash list` before deleting a worktree. The agent keeps its own copy (a delegated agent never sees the command file); its PR-state list is stated once.
+- The delegated-subagent sentence at the end of every agent's Ask First line is 295 bytes instead of 389 (24 agents, −2.3 KB of per-delegation prompt), same rule: stop where the file says to ask, return the proposed action and the question; the task text confirms only a reversible action it names with its target, a destructive one needs the user's approval quoted in the task.
+
 ## [4.28.1] - 2026-10-18
 
 ### Changed

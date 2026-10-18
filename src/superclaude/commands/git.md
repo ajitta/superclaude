@@ -67,6 +67,9 @@ description: Git operations with smart commit messages and workflow guidance; pu
   - new-commit: make new commits; never amend unless asked.
   - retest-after-merge: re-run the test suite AFTER a merge lands. Both sides green does not mean the merge is green — semantic conflicts pass textual merge
   - base-branch-confirm: auto-detect `main` vs `master`, then confirm with the user before merging. Stops merges into the wrong base
+  - staged-secret-scan: before commit, grep the staged files for API keys, tokens, passwords. Never stage `.env`, `.env.*`, `credentials.json`, `*secret*`, `*token*`; if the user explicitly asks to stage one, warn first.
+  - default-branch-warn: when committing or pushing directly on `master`/`main`, warn and suggest a feature branch first. Not a block; the user may have reason.
+  - stash-before-worktree-delete: check `git stash list` before deleting a worktree and tell the user if entries exist — the delete strands them.
   </gotchas>
 
   <bounds>

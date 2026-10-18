@@ -62,12 +62,10 @@ FORBIDDEN_DESC_PATTERNS = [
 
 # Shipped verbatim at the end of every agent's Ask First line.
 SUBAGENT_ASK_SENTENCE = (
-    "As a delegated subagent Claude cannot ask mid-task: wherever this file says "
-    "to ask the user or get the user's confirmation, it stops before that step and "
-    "returns the proposed action and the question in its report. The task text "
-    "counts as confirmation only for a reversible action it names with its target; "
-    "a destructive or irreversible one needs the user's own approval quoted in the "
-    "task."
+    "A delegated subagent cannot ask mid-task: where this file says to ask or "
+    "confirm, stop there and return the proposed action and the question. The "
+    "task text confirms only a reversible action it names with its target; a "
+    "destructive or irreversible one needs the user's approval quoted in the task."
 )
 
 # CC-idiom delegation trigger — the description must tell the classifier WHEN to
