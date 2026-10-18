@@ -34,7 +34,7 @@ mypy 오류)는 이 문서가 소유한다. 값은 재측정 명령과 마지막
 | F-011 | P1 | REVISE | MCP installer·doctor·pytest plugin의 직접 검증 공백 |
 | F-012 | P1 | CLOSED | publish workflow와 `.env.example` 삭제로 폐기 — §해결된 finding 참조 |
 | F-013 | P2 | REVISE | testing 문서와 실제 UV/pytest 구성이 drift |
-| F-014 | P2 | REVISE | coverage/mypy가 선언적 기대와 실행 가능한 gate로 정렬되지 않음 |
+| F-014 | P2 | REVISE | coverage가 선언적 기대와 실행 가능한 gate로 정렬되지 않음 (mypy는 1f50d5cd에서 clean + CI gate) |
 | F-015 | P1 | CLOSED | `okf/` 삭제로 폐기 — §해결된 finding 참조 |
 | F-016 | P1 | CLOSED | plugin build 경로 삭제로 폐기 — §해결된 finding 참조 |
 
@@ -281,22 +281,17 @@ uv run pytest --cov=superclaude --cov-report=term -q
 coverage target을 `src/superclaude` path로 바꾸면 다른 분모와 결과가 나올 수 있으므로
 baseline 비교에서는 target과 명령을 고정한다.
 
-mypy도 명령을 고정한다. package 전체 실행은 hyphenated skill directory 때문에
-package-name 단계에서 실패하므로, Python 전용 하위 경로를 명시해야 오류 수를 얻는다.
+mypy는 해결됐다. `uv run mypy src`가 clean이고, `make typecheck`와 CI `checks` job
+(`.github/workflows/test.yml` `Run mypy`)이 같은 명령을 hard gate로 실행한다.
 
 ```bash
-uv run mypy src/superclaude
-# exit 2 — "confidence-check is not a valid Python package name"   @5b6dc5b
-
-uv run mypy src/superclaude/cli src/superclaude/utils src/superclaude/hooks
-# Found 35 errors in 10 files (checked 19 source files)             @5b6dc5b
+uv run mypy src
+# Success: no issues found in 53 source files                    @1f50d5cd
 ```
 
-두 번째 명령의 경로 집합이 새 baseline이다. 이전 기록(15 files, 43 errors)은 실행
-경로를 남기지 않아 재현할 수 없으므로 비교 대상으로 쓰지 않는다.
-
-따라서 현재 “90%” 또는 “mypy clean”을 이미 존재하는 hard gate로 주장하지 않는다.
-먼저 측정 범위와 baseline을 정하고, 변경 파일 또는 위험 모듈부터 점진 gate를
+이전 기록(`src/superclaude` exit 2, 하위 경로 35건, 그 전의 15 files/43 errors)은 폐기한다.
+따라서 F-014에 남은 것은 coverage뿐이다. “90%”를 이미 존재하는 hard gate로 주장하지
+않는다. 먼저 측정 범위와 baseline을 정하고, 변경 파일 또는 위험 모듈부터 점진 gate를
 도입한다.
 
 ## 해결된 finding

@@ -10,7 +10,7 @@ Releases before 4.19.0 are not listed. Their history is the git log; the upstrea
 
 ### Changed
 
-- `make typecheck` is a plain `mypy src` run that must be clean, and CI runs the same check. The 33–34 errors held under 4.29.4's `MYPY_BASELINE` are fixed without behavior changes (annotations, local renames, `assert`s where the coordinator's worktree is always set, `yaml` and `jmespath` marked as untyped imports), so the baseline is gone. One annotation was wrong, not just missing: `install_hooks` was declared to return four values and returns three.
+- `make typecheck` is a plain `mypy src` run that must be clean, and CI runs the same check. The 33–34 errors held under 4.29.4's `MYPY_BASELINE` are fixed without behavior changes (annotations, renames of a local in `author_check` and of the raw trigger list in `context_loader`, `assert`s where the coordinator's worktree is always set, `yaml` and `jmespath` marked as untyped imports), so the baseline is gone. One annotation was wrong, not just missing: `install_hooks` was declared to return four values and returns three.
 
 ## [4.29.4] - 2026-10-19
 
