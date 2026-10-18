@@ -1,6 +1,6 @@
 ---
 feature: review-v4.29.3
-phase: fixes
+phase: closed
 owner: ajitta
 created: 2026-10-19
 updated: 2026-10-19
@@ -12,7 +12,7 @@ An independent reviewer (a separate `claude -p --model opus --effort high` run, 
 
 ## Status
 
-Fixes on `fix/review-v4.29.3-findings` from master 00e88353. The v4.29.2 and v4.29.3 release notes on GitHub are filled in from CHANGELOG (1943 / 365 chars, were 1 / 1). Release v4.29.4 needs `make canary-gates` first: `core/rules/RULES_QUALITY.md` changed (R-7).
+Closed. Fixes merged into master at d56826ae (branch from 00e88353; full suite 3891 passed / 3 skipped). The v4.29.2 and v4.29.3 GitHub release notes were filled in from CHANGELOG (1943 / 365 chars, were 1 / 1). `make canary-gates` before release (R-7 touched core): all 7 hard gates passed, 13/13 checks, $0.50. Released as **v4.29.4** (49599e01; master = stable = tag) with `CANARY_OK=1 make release` from this VM — gh now targeted `ajitta/superclaude` through `GH_REPO` although this clone's gh default is the upstream; Tests run 39161327768 green; the v4.29.4 notes carry the 4.29.4 entry. No content install exists on this VM (doctor: none in user/project/local), so none was synced.
 
 ## Documents
 
