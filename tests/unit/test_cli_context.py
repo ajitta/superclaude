@@ -150,12 +150,18 @@ class TestContextExplain:
         assert "no such option" not in result.output
         assert "mcp/MCP_Tavily.md" in result.output
 
-    def test_it_reports_token_cost_against_the_loader_budget(self, project: Path):
+    def test_it_reports_token_cost_against_the_loader_budget(
+        self, project: Path, monkeypatch: pytest.MonkeyPatch
+    ):
+        # The default under test; a developer shell exporting the knob must not
+        # steer it.
+        monkeypatch.delenv("CLAUDE_CONTEXT_MAX_TOKENS", raising=False)
+
         result = CliRunner().invoke(main, ["context", "explain", "--brainstorm a CLI"])
 
         assert result.exit_code == 0, result.output
         assert "modes/MODE_Brainstorming.md" in result.output
-        assert "budget:  8000 tokens" in result.output
+        assert "budget:  12000 tokens" in result.output
         # Tier 2 full-.md injection: the loader declares its own count, so the
         # report must carry a non-zero number rather than a placeholder.
         assert "~0 " not in result.output
@@ -491,4 +497,4 @@ class TestExplainBudgetParsing:
         result = CliRunner().invoke(main, ["context", "explain", "--brainstorm a CLI"])
 
         assert result.exit_code == 0, result.output
-        assert "budget:  8000 tokens" in result.output
+        assert "budget:  12000 tokens" in result.output

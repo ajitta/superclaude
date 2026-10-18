@@ -113,7 +113,7 @@ Session Start
   ▼
 3. context_loader.py → modes/ + mcp/ + core/rules/           ← on-demand by flag/keyword
   │                    (TRIGGER_MAP matching, session dedup,
-  │                     8K token budget, hybrid injection)
+  │                     12K token budget, hybrid injection)
   ▼
 4. User invokes → commands/                                   ← /sc:* slash commands
   │
@@ -128,7 +128,7 @@ Session Start
 | Mechanism | Content Types | Trigger | Budget |
 |-----------|--------------|---------|--------|
 | **Always loaded** | core/ (FLAGS, PRINCIPLES, RULES kernel) | Session start | ~140 lines via @import |
-| **On-demand** | modes/, mcp/, core/rules/, core/BUSINESS_SYMBOLS | Flag/keyword in prompt | 8K token budget (context_loader) |
+| **On-demand** | modes/, mcp/, core/rules/, core/BUSINESS_SYMBOLS | Flag/keyword in prompt | 12K token budget (`DEFAULT_CONTEXT_MAX_TOKENS`, context_loader) |
 | **CC-native** | agents/, commands/, output-styles/, skills/ | Auto-delegation, /sc:*, selected style, /sc-author | Managed by Claude Code runtime |
 
 ## Naming Trinity
