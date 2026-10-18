@@ -739,20 +739,6 @@ def test_tool_called_matches_tool_names_from_the_transcript():
     assert not run_eval._check_one(check, "tool_called", ws, "", "", res=empty)[0]
 
 
-# The sc-no-modes arm removes exactly the two modes whose deletion the lean
-# round deferred for lack of measurement (docs/features/lean-round/06-handoff.md
-# item 2). sc-full vs sc-no-modes on the mode-* fixtures is that measurement.
-def test_no_modes_arm_removes_exactly_the_two_deferred_modes():
-    run_eval = _import_run_eval()
-    assert run_eval.NO_MODES_FILES == (
-        "modes/MODE_Orchestration.md",
-        "modes/MODE_Task_Management.md",
-    )
-    for rel in run_eval.NO_MODES_FILES:
-        assert (REPO_ROOT / "src" / "superclaude" / rel).is_file(), rel
-    assert "sc-no-modes" in run_eval.ARMS
-
-
 def test_git_changed_ignores_framework_state_files(tmp_path):
     """The sc-full arm's insight hook appends to .claude/insights.pending.jsonl
     during a run. That is arm plumbing, not model behavior: a task that writes

@@ -12,7 +12,8 @@
 | sc-core-lite | full install, `core/RULES.md` swapped for `arms/RULES_KERNEL.md`. Phase 2-1 hypothesis CONFIRMED + shipped 2026-07-03 — shipped RULES.md is now itself a kernel, so this arm measures kernel-without-modules vs sc-full's kernel+routed-modules (routing-value probe) |
 | sc-candidate | full install, `core/RULES.md` swapped for `arms/RULES_CANDIDATE.md` — the shipped kernel plus the rule(s) under trial (`tests/unit/test_eval_harness.py` `CANDIDATE_INSERTS` pins the file as RULES.md + that delta; empty between trials). sc-full vs sc-candidate isolates the rule: same hooks, same modules, same install. Trials: `purpose_before_action` shipped 2026-10-17 (`docs/features/reframing-anchoring/06-pilot.md`); its fix-vs-propose boundary sentence shipped 2026-10-18 (`docs/features/purpose-boundary/01-measurement.md`) |
 | sc-command-only | full install, always-loaded core import stripped from CLAUDE.md |
-| sc-no-modes | full install, `modes/MODE_Orchestration.md` and `modes/MODE_Task_Management.md` deleted from the workspace (`run_eval.py` `NO_MODES_FILES`; the loader skips a missing Tier-2 file silently). sc-full vs sc-no-modes on the `mode-*` tasks, whose prompts carry `--task-manage` / `--orchestrate`, measures that mode text alone — the measurement the lean round deferred (`docs/features/lean-round/06-handoff.md` item 2) |
+
+Retired arms: `sc-no-modes` (full install minus `MODE_Orchestration.md` and `MODE_Task_Management.md`) measured those two modes on the `mode-*` tasks in the purpose-boundary round (`docs/features/purpose-boundary/01-measurement.md` §Item 2); the modes were retired on that result and the arm, tasks and fixtures with them (`docs/features/mode-retire/`).
 
 Isolation: every arm runs with `CLAUDE_CONFIG_DIR` pointing at an empty
 per-arm dir (host `~/.claude/` never loads), SC content delivered via

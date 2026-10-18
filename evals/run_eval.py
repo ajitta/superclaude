@@ -11,11 +11,6 @@ Runs each task from tasks.yaml in an isolated temp workspace OUTSIDE the repo
                    difference from sc-full, so sc-full vs sc-candidate measures
                    that rule alone under identical hooks)
   sc-command-only  full install, always-loaded core import stripped
-  sc-no-modes      full install, the two modes whose deletion the lean round
-                   deferred (NO_MODES_FILES) removed from the workspace; the
-                   loader skips a missing Tier-2 file silently, so sc-full vs
-                   sc-no-modes on a prompt carrying --task-manage / --orchestrate
-                   measures that mode text alone
 
 Arm isolation: CLAUDE_CONFIG_DIR points at an empty per-arm dir (keeps the
 host machine's real ~/.claude out of every arm); SC content is delivered via
@@ -67,10 +62,7 @@ ARMS = (
     "sc-core-lite",
     "sc-candidate",
     "sc-command-only",
-    "sc-no-modes",
 )
-# Installed files the sc-no-modes arm deletes (relative to .claude/superclaude).
-NO_MODES_FILES = ("modes/MODE_Orchestration.md", "modes/MODE_Task_Management.md")
 # `claude -p --permission-mode` values; None leaves the flag off (CLI default).
 PERMISSION_MODES = (  # `claude --help` 2.1.292; omit the flag for the CLI default
     "acceptEdits",
@@ -213,9 +205,6 @@ def build_workspace(arm: str, task: dict, runs_dir: Path, superclaude_bin: str) 
             marker.write_text(
                 CANDIDATE_FILE.read_text(encoding="utf-8"), encoding="utf-8"
             )
-        elif arm == "sc-no-modes":
-            for rel in NO_MODES_FILES:
-                (ws / ".claude" / "superclaude" / rel).unlink()
         _set_core_import(ws, enabled=arm != "sc-command-only")
 
     for step in task.get("setup", []):
