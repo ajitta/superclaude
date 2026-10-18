@@ -8,6 +8,8 @@ Releases before 4.19.0 are not listed. Their history is the git log; the upstrea
 
 ## [Unreleased]
 
+## [4.29.2] - 2026-10-19
+
 ### Removed
 
 - Unused dev-only eval checks `tool_called` and `parallel_tool_calls_min` and their exclusive collection state. New `results.json` rows omit `tools_called` and `max_parallel_tool_calls`; existing result files are unchanged. Skill and shell-transcript checks remain supported.
