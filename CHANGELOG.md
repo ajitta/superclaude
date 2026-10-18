@@ -10,6 +10,8 @@ Releases before 4.19.0 are not listed. Their history is the git log; the upstrea
 
 ### Changed
 
+- Eval harness (dev-only): the `sc-candidate` arm can now hold an ablation, the shipped kernel minus a rule (`CANDIDATE_REPLACEMENTS` in `tests/unit/test_eval_harness.py`); it currently holds `core/RULES.md` without `purpose_before_action`, byte-equal to the kernel before that rule. Twelve canary-only tasks probe whether the rule carries beyond its two pilot fixtures: five unstated-purpose fixtures (data report, release notes, disk alert, maintenance announcement, SQL index), a `-stated` twin of each, and two plain-request controls for over-inference (`docs/features/purpose-generalization/`).
+
 - `make typecheck` is a plain `mypy src` run that must be clean, and CI runs the same check. The 33–34 errors held under 4.29.4's `MYPY_BASELINE` are fixed without behavior changes (annotations, renames of a local in `author_check` and of the raw trigger list in `context_loader`, `assert`s where the coordinator's worktree is always set, `yaml` and `jmespath` marked as untyped imports), so the baseline is gone. One annotation was wrong, not just missing: `install_hooks` was declared to return four values and returns three.
 
 ## [4.29.4] - 2026-10-19

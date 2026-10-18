@@ -1,0 +1,9 @@
+Changes since 2.3.0 (git log --oneline v2.3.0..release/2.4, merges removed)
+
+a41c9e2 feat(export): add --since filter to export (#203)
+7d0b513 fix(scheduler): stop double-scheduling jobs after a DST change (#206)
+c2e88f0 docs: document parquet export options (#207)
+5f31a7d refactor(config): unify settings loader (#212)
+9be0d44 feat(cli): add `tidepool doctor` to check config and storage paths (#214)
+e6a2f19 fix(storage): close file handles when a flush fails (#216)
+01c7d85 chore(deps): bump pyarrow to 17.0 (#218)

@@ -1,0 +1,18 @@
+# Disk alerts for app-02. The monitoring pipeline deploys this file on merge.
+host: app-02
+rules:
+  - name: disk-root
+    mount: /
+    threshold_pct: 85
+    for: 10m
+    route: oncall-primary
+  - name: disk-svc-logs
+    mount: /var/log/svc
+    threshold_pct: 80
+    for: 10m
+    route: oncall-primary
+  - name: disk-backup
+    mount: /backup
+    threshold_pct: 80
+    for: 10m
+    route: oncall-primary

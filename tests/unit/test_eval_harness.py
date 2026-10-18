@@ -57,11 +57,49 @@ def test_arms_match_harness_constant():
 #   the failing call read as a file the error names. sc-full 3/8 → sc-candidate
 #   8/8 on the sync-succeeds check (docs/features/purpose-boundary/
 #   01-measurement.md); shipped the same day. Delta is now empty.
+#   2026-10-19 ablation (docs/features/purpose-generalization/) — the arm is
+#   the shipped kernel minus `<purpose_before_action>`, with the two other
+#   lines 123c6a22 changed put back (mission "five" → "four", scope_discipline
+#   "traces to the request."); byte-equal to `123c6a22^:core/RULES.md`.
+#   sc-full vs sc-candidate then measures the rule by its removal. Reset both
+#   lists to empty at the round's close (Q11).
 #   To open the next trial, put the inserted text in CANDIDATE_INSERTS and
 #   regenerate evals/arms/RULES_CANDIDATE.md.
 CANDIDATE_INSERTS: list[
     tuple[str, str]
 ] = []  # (anchor in RULES.md, text inserted after it)
+# (old, new): each `old` occurs once in RULES.md; applied after the inserts.
+CANDIDATE_REPLACEMENTS: list[tuple[str, str]] = [
+    ("the five rule classes", "the four rule classes"),
+    (
+        '  <purpose_before_action tags="[R20 Success Criteria]">\n'
+        'A request names an action ("add retry to the API call", "draft a reply'
+        ' in thread.md"); the result the action is for is usually unstated.'
+        " Before acting on a request that is more than one reply or one obvious"
+        " edit: state in one line, as a hypothesis from the request and the"
+        " workspace rather than as the user's words, the result the action is"
+        " meant to produce; read what tells whether the named action produces it"
+        " — the log, the config the error names, the sibling file the thread"
+        " refers to — not only the file the request names; and make that result"
+        ' the concrete check that proves "done". Where the evidence shows the'
+        " named action cannot produce the result, say so, do the named action"
+        " when it still helps, and make the smallest further change inside the"
+        " files the task already touches or the error names; a change beyond"
+        " that, or an irreversible one, is proposed with the evidence, not made."
+        " A value the failing call read — a token, an env var, a path — belongs"
+        " to the files the error names wherever that value is defined, so"
+        " correcting it there is inside that boundary when the edit is"
+        " reversible. Where the user has stated the result, use it unchanged.\n"
+        "  </purpose_before_action>\n"
+        "\n",
+        "",
+    ),
+    (
+        "Every changed line traces to the request or to the result it is for"
+        " (purpose_before_action).",
+        "Every changed line traces to the request.",
+    ),
+]
 
 
 def test_candidate_arm_is_shipped_kernel_plus_trial_delta():
@@ -72,6 +110,9 @@ def test_candidate_arm_is_shipped_kernel_plus_trial_delta():
     for anchor, inserted in CANDIDATE_INSERTS:
         assert expected.count(anchor) == 1, anchor
         expected = expected.replace(anchor, anchor + inserted)
+    for old, new in CANDIDATE_REPLACEMENTS:
+        assert expected.count(old) == 1, old[:60]
+        expected = expected.replace(old, new)
     candidate = (EVALS_DIR / "arms" / "RULES_CANDIDATE.md").read_bytes()
     assert b"\r\n" not in candidate
     assert candidate.decode("utf-8") == expected
