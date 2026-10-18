@@ -76,12 +76,12 @@ Do NOT simplify (complexity = essential): Security/auth | Accessibility/WCAG | C
   <verification_ladder note="Enforcement: R15 — match verification effort to change blast radius">
   | Level | Trigger | Required check |
   |---|---|---|
-  | 0 | docs/comments/text-only changes | static inspection only; report "not executed; inspection only" |
+  | 0 | docs/comments/text-only changes that no test, build or linter reads | static inspection only; report "not executed; inspection only" |
   | 1 | single-file behavior change, no API/contract touched | typecheck + lint for changed file + unit test for changed module |
   | 2 | multi-file behavior change within one package | affected package's full test set |
   | 3 | crosses an API/DB/auth/queue/browser/payment boundary | integration or e2e for the affected boundary |
   | 4 | cross-cutting refactor, schema/migration, security/auth, release prep, or user-requested | full suite |
-  Escalate a behavior change to Level 4 when it touches authentication/authorization, migrations, security, crypto, or payment code (e.g. `**/security/**`, `**/migrations/**`), even if it looks small. Judge by what the code does, not by substrings such as "author". Docs-only changes stay Level 0.
+  Escalate a behavior change to Level 4 when it touches authentication/authorization, migrations, security, crypto, or payment code (e.g. `**/security/**`, `**/migrations/**`), even if it looks small. Judge by what the code does, not by substrings such as "author". Docs-only changes never escalate to Level 4; one that a test, build or linter reads runs that check.
   Skip protocol: state which level skipped and why (cost, infra unavailable, scoped out by user) — silent skip violates R15.
   </verification_ladder>
 
