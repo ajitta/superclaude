@@ -8,6 +8,8 @@ Releases before 4.19.0 are not listed. Their history is the git log; the upstrea
 
 ## [Unreleased]
 
+## [4.29.3] - 2026-10-19
+
 ### Changed
 
 - Contributors: `uv run pytest` includes `tests/unit/scripts/` again. The `--ignore` added in c97705c0 for a Windows-only native abort (exit 0xC0000409) was retired after eight full runs with the directory included (six sequential, two concurrent) reproduced nothing; `make test-scripts` now just runs that directory, and CI drops its separate step.
