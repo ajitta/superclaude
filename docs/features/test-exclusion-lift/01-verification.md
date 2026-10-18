@@ -61,7 +61,7 @@ Limit: eight runs on one quiet-to-moderately-loaded developer machine do not pro
 
 ## Dependabot (10697cd1)
 
-`.github/dependabot.yml`: `github-actions`, `directory: /`, monthly, `target-branch: master` (stable is the release channel; `test.yml` runs on `pull_request` to master), one grouped PR (`groups.actions.patterns: ["*"]`), prefix `chore(ci)`. YAML parses; schema fields are the documented ones. Dependabot PRs run with a read-only `GITHUB_TOKEN` — sufficient for the current workflow, which uses no secrets and writes nothing. Not verified from here: the repository's "Dependabot version updates" toggle (default on for public repos); confirm after merge under Insights → Dependency graph → Dependabot.
+`.github/dependabot.yml`: `github-actions`, `directory: /`, monthly, `target-branch: master` (stable is the release channel; `test.yml` runs on `pull_request` to master), one grouped PR (`groups.actions.patterns: ["*"]`), prefix `chore(ci)`. YAML parses; schema fields are the documented ones. Dependabot PRs run with a read-only `GITHUB_TOKEN` — sufficient for the current workflow, which uses no secrets and writes nothing. Post-merge check: the file is on master, but GitHub reads `dependabot.yml` from the **default branch** (`stable`, per `gh api repos/ajitta/superclaude --jq .default_branch`), so Dependabot activates only when the next release moves `stable`. The "version updates" toggle itself is not inspectable from here.
 
 ## Dropped
 
