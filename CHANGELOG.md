@@ -14,6 +14,7 @@ Releases before 4.19.0 are not listed. Their history is the git log; the upstrea
 
 ### Fixed
 
+- `/sc:analyze --delegate` dropped `core/rules/RULES_DOCS.md` since v4.29.1: the three priority-1 rule modules it triggers reached 8,015 estimated tokens against the loader's 8,000-token default, so the loader skipped RULES_DOCS and injected the 282-token RULES_INTERACTION instead. The default `CLAUDE_CONTEXT_MAX_TOKENS` is now 12,000 (`DEFAULT_CONTEXT_MAX_TOKENS` in `superclaude.utils`, shared by the hook and `superclaude context explain`), and a test pins the headroom so the next rule edit fails in the suite rather than in the field. The env override is unchanged.
 - `superclaude author-check` no longer reports false X2 errors for literal angle brackets inside single- or double-quoted tag attributes, including the `note` attribute in `RULES_DELEGATION.md`. Actual unbalanced or misnested tags still report their original line numbers. An opener whose attributes hold an unbalanced quote (`<step note=don't>`, previously accepted silently) now reports X2 on its own line instead of surfacing as "has no opening tag" at its closing tag.
 
 ## [4.29.1] - 2026-10-19

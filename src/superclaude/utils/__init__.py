@@ -54,6 +54,17 @@ def read_hook_input() -> dict | None:
     return data if isinstance(data, dict) else None
 
 
+# Default for CLAUDE_CONTEXT_MAX_TOKENS: the on-demand injection budget per
+# prompt (chars/4 estimate), enforced by scripts/context_loader.py and reported
+# by `superclaude context explain`. One constant, not two literals: v4.29.1
+# shipped `/sc:analyze --delegate` dropping RULES_DOCS.md because the three
+# P1 rule modules reached 8,015 tokens against an 8,000 default and nothing
+# tied the number to the content it must hold. 12,000 fits every P1 rule
+# module plus the largest routed mode with headroom —
+# tests/unit/test_context_loader.py pins that.
+DEFAULT_CONTEXT_MAX_TOKENS = 12000
+
+
 def int_env(name: str, default: int) -> int:
     """Read an integer knob from the environment; a missing or malformed value
     (``8k``, an empty string) yields ``default`` instead of a ValueError. The

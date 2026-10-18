@@ -7,6 +7,7 @@ Tests: resolve_flags (alias/fuzzy matching),
 
 import json
 import re
+from collections.abc import Iterable
 from pathlib import Path
 
 import pytest
@@ -20,6 +21,7 @@ from superclaude.scripts.context_loader import (
     VALID_FLAGS,
     _get_injection_tier,
     _parse_hook_input,
+    estimate_tokens,
     resolve_flags,
 )
 
@@ -333,6 +335,45 @@ class TestCoreLiteSplit:
             "(~2k tokens) — move detail into core/rules/ modules instead"
         )
 
+    # Room for ordinary rule edits before the guard trips: mode-retire's +56
+    # tokens in RULES_DELEGATION.md was the edit that shipped the v4.29.1
+    # overflow, so 500 is roughly nine such edits.
+    BUDGET_HEADROOM = 500
+
+    def test_rule_modules_fit_the_default_budget_with_headroom(self):
+        """Every priority-1 rule module plus the largest routed mode must fit
+        the loader's *default* budget with headroom.
+
+        v4.29.1 shipped `/sc:analyze --delegate` dropping RULES_DOCS.md: the
+        three P1 rule modules reached 8,015 estimated tokens against an 8,000
+        default after a +56-token move into RULES_DELEGATION.md, and nothing
+        failed. This guard fails on the edit, not in the field. The mode term is
+        the largest *routed* mode (TRIGGER_MAP ∪ COMPOSITE_FLAGS), not a
+        directory glob — modes/README.md is never injected. Stacking several
+        mode flags on one prompt can still exceed the budget; that costs the
+        P2 RULES_INTERACTION.md, never a P1 module, and is a recorded residual.
+        """
+        from superclaude.utils import DEFAULT_CONTEXT_MAX_TOKENS
+
+        content_root = self.SRC_CORE.parent
+
+        def tokens(rel: str) -> int:
+            return estimate_tokens((content_root / rel).read_text(encoding="utf-8"))
+
+        rules_total = sum(tokens(m) for m in sorted(self._modules()))
+        routed = {path for _p, path, _pr in TRIGGER_MAP} | {
+            path for files in COMPOSITE_FLAGS.values() for path, _pr in files
+        }
+        largest_mode = max(tokens(p) for p in routed if p.startswith("modes/"))
+        total = rules_total + largest_mode + self.BUDGET_HEADROOM
+
+        assert total <= DEFAULT_CONTEXT_MAX_TOKENS, (
+            f"core/rules/ ({rules_total}) + largest routed mode ({largest_mode}) "
+            f"+ headroom ({self.BUDGET_HEADROOM}) = {total} exceeds the default "
+            f"budget {DEFAULT_CONTEXT_MAX_TOKENS}: raise DEFAULT_CONTEXT_MAX_TOKENS "
+            "in superclaude.utils or trim wording — do not delete a rule to fit"
+        )
+
     def test_every_rule_module_is_routed_by_trigger_map(self):
         routed = {
             path for _p, path, _pr in TRIGGER_MAP if path.startswith("core/rules/")
@@ -464,6 +505,7 @@ def run_loader(
     project_dir: Path,
     session_id: str | None = None,
     env_override: dict[str, str] | None = None,
+    env_unset: Iterable[str] = (),
 ) -> str:
     """Invoke context_loader.py as Claude Code does; return its stdout.
 
@@ -471,13 +513,17 @@ def run_loader(
     what happens to be installed on the machine running the suite, and the
     ``.claude/superclaude`` marker under ``project_dir`` keeps ``claude_base()``
     — and therefore all hook state — inside the sandbox. ``env_override`` sets
-    loader knobs such as ``CLAUDE_CONTEXT_MAX_TOKENS`` for one run.
+    loader knobs such as ``CLAUDE_CONTEXT_MAX_TOKENS`` for one run; ``env_unset``
+    removes knobs the developer's shell may export, so a test of the loader's
+    *default* is not steered by the machine it runs on.
     """
     import os
     import subprocess
     import sys
 
     env = os.environ.copy()
+    for name in env_unset:
+        env.pop(name, None)
     env["CLAUDE_PROJECT_DIR"] = str(project_dir)
     env["SUPERCLAUDE_PATH"] = str(CONTENT_ROOT)
     if env_override:
@@ -1473,10 +1519,49 @@ def test_structured_flag_loads_business_symbols_only_for_business_panel():
     assert not loads("/sc:review --scope branch --structured")
 
 
+class TestDefaultBudgetHoldsTheRuleModules:
+    """On the loader's *default* budget, a delegated analysis gets every rule
+    module it triggers.
+
+    v4.29.1 regression: `/sc:analyze --delegate` matches RULES_QUALITY,
+    RULES_DELEGATION and RULES_DOCS (all P1) plus RULES_INTERACTION (P2); the
+    three P1 files reached 8,015 estimated tokens against the 8,000 default, so
+    the loader skipped RULES_DOCS.md and injected the 282-token INTERACTION
+    module in its place. ``env_unset`` keeps a developer's exported
+    CLAUDE_CONTEXT_MAX_TOKENS from masking the default under test.
+    """
+
+    PROMPT = "/sc:analyze --delegate the auth module and write up the plan"
+    MODULES = (
+        "core/rules/RULES_QUALITY.md",
+        "core/rules/RULES_DELEGATION.md",
+        "core/rules/RULES_DOCS.md",
+        "core/rules/RULES_INTERACTION.md",
+    )
+
+    def test_delegated_analysis_injects_every_rule_module(self, tmp_path):
+        project = tmp_path / "proj"
+        (project / ".claude" / "superclaude").mkdir(parents=True)
+
+        out = run_loader(
+            self.PROMPT,
+            project,
+            session_id="s",
+            env_unset=("CLAUDE_CONTEXT_MAX_TOKENS",),
+        )
+
+        for module in self.MODULES:
+            assert f'<context-inject file="{module}"' in out, (
+                f"{module} missing on the default budget"
+            )
+        assert "Budget exceeded" not in out, out
+
+
 class TestBudgetEnvParsing:
     """A malformed CLAUDE_CONTEXT_MAX_TOKENS must not crash the prompt hook
     at import — that would surface as a hook error on every prompt and inject
-    nothing until the shell profile is fixed. Bad values fall back to 8000."""
+    nothing until the shell profile is fixed. Bad values fall back to the
+    default budget."""
 
     @pytest.mark.parametrize("bad", ["8k", "", " "])
     def test_loader_survives_a_malformed_budget(self, tmp_path: Path, bad: str):
