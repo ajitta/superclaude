@@ -1,6 +1,6 @@
 ---
 feature: repo-hygiene
-phase: handoff
+phase: closed
 owner: ajitta
 created: 2026-10-19
 updated: 2026-10-19
@@ -12,7 +12,7 @@ Close two lean-round leftovers: `make help` generated from `##` comments with a 
 
 ## Status
 
-Implemented on fix/repo-hygiene from master b7ac6716: intent 2e043236, Makefile f40257cb, CI cd9f7e63. Guard test red→green, `make -n` over all 21 targets, `gawk --posix` parity and CI run 39151749108 (3 jobs green) are in [01-verification.md](./01-verification.md). Sessions: 0. **Unmerged**; merge and push await the owner's instruction. No release planned (nothing installed changes).
+Implemented on fix/repo-hygiene from master b7ac6716: intent 2e043236, Makefile f40257cb, CI cd9f7e63. Guard test red→green, `make -n` over all 21 targets, `gawk --posix` parity and CI run 39151749108 (3 jobs green) are in [01-verification.md](./01-verification.md). Sessions: 0. Merged into master at e57e003a and pushed (full suite 3730 passed). No release: nothing installed changes; the Makefile help and CI changes reach contributors through master.
 
 ## Documents
 

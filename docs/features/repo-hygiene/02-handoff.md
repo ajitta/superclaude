@@ -8,7 +8,7 @@ updated: 2026-10-19
 
 # 02. Handoff — what remains after repo hygiene
 
-This round closes lean-round leftovers 1b (Makefile help) and 1c (CI setup-uv) on fix/repo-hygiene from master b7ac6716 and records the frontmatter YAML test as already shipped in 3286c3f8. Evidence: [01-verification.md](./01-verification.md). Sessions: **0**. Delivery state: [README.md](./README.md) §Status. A new session inherits no execution authorization from this round.
+This round closes lean-round leftovers 1b (Makefile help) and 1c (CI setup-uv) on fix/repo-hygiene from master b7ac6716 and records the frontmatter YAML test as already shipped in 3286c3f8. Evidence: [01-verification.md](./01-verification.md). Sessions: **0**. Delivered: merged into master at e57e003a and pushed; no release needed. A new session inherits no execution authorization from this round.
 
 ## Candidates
 
