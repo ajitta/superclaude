@@ -208,14 +208,23 @@ def _is_multiline_tag(body: str, match: re.Match) -> bool:
     `>` on its line followed later by a blockquote `>` is one match. The
     structural scan already treats a mid-line opener as a placeholder; this is
     the same rule for the line-oriented consumers: the match must start a line
-    (only whitespace before it) and every continuation line must be
-    attribute-shaped or the bare closer.
+    (only whitespace before it), the rest of its first line after the name must
+    be attribute-shaped (so a line-leading `<draft notes for the team` followed
+    by a `> quoted` line stays prose), and every continuation line must be
+    attribute-shaped or the bare closer. A bare closer with text after it on
+    its line is a blockquote (`<draft` then a `> quoted reply` line), not a closer.
     """
     line_start = body.rfind("\n", 0, match.start()) + 1
     if body[line_start : match.start()].strip():
         return False
     token = _QUOTED_RE.sub('"x"', match.group(0))  # a value may span lines
-    return all(_ATTR_LINE_RE.match(line) for line in token.split("\n")[1:])
+    first, *rest = token.split("\n")
+    if rest and rest[-1].strip() in (">", "/>"):
+        line_end = body.find("\n", match.end())
+        if body[match.end() : line_end if line_end != -1 else None].strip():
+            return False  # `> text` on its own line is a blockquote, not a closer
+    name_end = 1 + len(match.group(1)) + len(match.group(2))
+    return all(_ATTR_LINE_RE.match(line) for line in [first[name_end:], *rest])
 
 
 class NotTextError(ValueError):

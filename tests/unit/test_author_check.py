@@ -540,6 +540,22 @@ class TestMultilineTagConsumers:
         (match,) = author_check.TAG_RE.finditer(prose)
         assert not author_check._is_multiline_tag(prose, match)
 
+    def test_line_leading_prose_term_before_blockquote_stays_md(self, tmp_path):
+        """A line-leading `<word prose` directly followed by a `> quoted` line is
+        one TAG_RE match whose continuation is the bare closer; the prose words
+        on its first line are not attributes, so it is not a tag."""
+        body = "<draft notes for the team\n> quoted reply\n\nSome prose here.\n"
+        assert infer_format(body) == "md"
+        target = _write(tmp_path, "notes.md", body)
+        assert not [f for f in check(target) if f.code in ("X1", "X2")]
+        # the first line is attribute-shaped, but `> text` is a blockquote line
+        assert infer_format("<draft\n> quoted reply\n\nSome prose here.\n") == "md"
+        assert infer_format("<draft x=1\n> quoted reply\n") == "md"
+        # controls: real multiline openers stay tags
+        assert infer_format('<step note="a"\n other="b">x</step>\n') == "xml"
+        assert infer_format('<step\n note="a"\n>\nbody\n</step>\n') == "xml"
+        assert infer_format('<step\n note="a"\n/>\n') == "xml"
+
 
 class TestRules:
     @pytest.mark.parametrize("code", sorted(CASES))

@@ -51,7 +51,7 @@ Rules:
 
 ## XML Template
 
-> Conforms to `.claude/rules/xml-prose-format.md`: single root, `snake_case` section tags, short-line lists (**Numbered** `1.` for ordered procedures, or `-` prefix as **Plain**, **Labeled**, **Named** per item type), plural↔singular containers (`<examples><example>`) for multi-line items.
+> Conforms to `.claude/rules/xml-prose-format.md`: single root, `snake_case` section tags, short-line lists (**Numbered** `1.` for ordered procedures, or `-` prefix as **Plain**, **Labeled**, **Named** per item type), plural↔singular containers (`<scenarios><scenario>`; `<examples>` and `<example>` are two distinct constructs, not a pair) for multi-line items.
 
 ```xml
 <component name="command-name" type="command">

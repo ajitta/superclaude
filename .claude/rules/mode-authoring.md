@@ -40,7 +40,7 @@ Every mode **must** define all four axes (enforced by `tests/unit/test_mode_stru
 
 ## XML Template
 
-> Conforms to `.claude/rules/xml-prose-format.md`: single root, `snake_case` section tags, short-line lists (**Numbered** `1.` for ordered procedures, or `-` prefix as **Plain**, **Labeled**, **Named** per item type), plural↔singular containers (`<examples><example>`) for multi-line items. Modes use **Named** for `<thinking>` (Principle-Name) and `<behaviors>` (Pattern-Name); single-line prose for `<communication>`, `<priorities>`, `<outcomes>`. Modes have no ordered-procedure tag.
+> Conforms to `.claude/rules/xml-prose-format.md`: single root, `snake_case` section tags, short-line lists (**Numbered** `1.` for ordered procedures, or `-` prefix as **Plain**, **Labeled**, **Named** per item type), plural↔singular containers (`<scenarios><scenario>`; `<examples>` and `<example>` are two distinct constructs, not a pair) for multi-line items. Modes use **Named** for `<thinking>` (Principle-Name) and `<behaviors>` (Pattern-Name); single-line prose for `<communication>`, `<priorities>`, `<outcomes>`. Modes have no ordered-procedure tag.
 
 ```xml
 <component name="mode-name" type="mode">

@@ -1,4 +1,10 @@
-.PHONY: install deploy sync-user sync-project sync-local uninstall-user uninstall-project uninstall-local test test-scripts test-plugin doctor verify-drift canary-gates clean lint format ci release uninstall-legacy help
+.PHONY: install deploy sync-user sync-project sync-local uninstall-user uninstall-project uninstall-local test test-scripts test-plugin doctor verify-drift canary-gates clean lint format typecheck ci release uninstall-legacy help
+
+# `ci` and `release` call gh; point it at origin, not at gh's own default repo —
+# a fork clone can default to the upstream (gh repo set-default --view).
+ifndef GH_REPO
+export GH_REPO := $(shell git remote get-url origin 2>/dev/null | sed -E 's#^.*github\.com[:/]##; s#\.git$$##')
+endif
 
 ##@ 🚀 Quick Start:
 
@@ -75,6 +81,18 @@ format: ## Format code (ruff format)
 	@echo "Formatting code..."
 	uv run ruff format .
 
+# mypy is not clean yet: hold the error count at or below MYPY_BASELINE so it only
+# goes down. The count varies by one or two with the installed library versions.
+MYPY_BASELINE ?= 34
+typecheck: ## Type-check src/ with mypy; fails when errors exceed MYPY_BASELINE (known debt)
+	@OUT=$$(uv run mypy src 2>&1); RC=$$?; \
+	[ $$RC -le 1 ] || { printf '%s\n' "$$OUT" | tail -5; echo "❌ mypy stopped before checking everything (exit $$RC)"; exit 1; }; \
+	if printf '%s\n' "$$OUT" | grep -q '^Success: no issues found'; then N=0; \
+	else N=$$(printf '%s\n' "$$OUT" | sed -n 's/^Found \([0-9][0-9]*\) errors* in .*/\1/p'); fi; \
+	[ -n "$$N" ] || { printf '%s\n' "$$OUT" | tail -5; echo "❌ mypy did not report a result"; exit 1; }; \
+	echo "mypy: $$N errors (baseline $(MYPY_BASELINE))"; \
+	[ "$$N" -le $(MYPY_BASELINE) ] || { echo "❌ mypy errors rose above $(MYPY_BASELINE): run 'uv run mypy src' and fix the new ones"; exit 1; }
+
 # Clean build artifacts
 clean: ## Clean build artifacts
 	@echo "Cleaning build artifacts..."
@@ -99,7 +117,7 @@ ci: ## Run the Tests workflow on origin/master and wait (CI does not run on push
 	gh run watch $$RID --exit-status > /dev/null || { echo "❌ Tests failed: gh run view $$RID"; exit 1; }; \
 	echo "✅ Tests green for $$SHA"
 
-# Release master HEAD: run Tests (make ci), GitHub release v<version> (notes = newest CHANGELOG section), then move stable to it.
+# Release master HEAD: run Tests (make ci), GitHub release v<version> (notes = the CHANGELOG entry for <version>; an empty one stops the release), then move stable to it.
 # Calls plain `make ci`, not $(MAKE): make runs a $(MAKE) line even under -n, which would run this whole recipe.
 release: ## Release master HEAD: make ci, GitHub release v<version>, move stable (CANARY_OK=1 after make canary-gates when core/ or hooks.json changed)
 	@set -e; \
@@ -112,7 +130,8 @@ release: ## Release master HEAD: make ci, GitHub release v<version>, move stable
 	if [ -n "$$PREV" ] && [ -n "$$(git diff --name-only $$PREV..HEAD -- src/superclaude/core src/superclaude/hooks/hooks.json)" ] && [ "$$CANARY_OK" != "1" ]; then \
 	  echo "❌ core/ or hooks.json changed since $$PREV — run 'make canary-gates' (local claude -p), read report.md, then re-run with CANARY_OK=1"; exit 1; fi; \
 	make --no-print-directory ci; \
-	awk '/^## \[/{n++; next} n==1' CHANGELOG.md > .release-notes.md; \
+	awk -v v="$$V" 'index($$0, "## [" v "]") == 1 { f = 1; next } /^## \[/ { if (f) exit } f' CHANGELOG.md > .release-notes.md; \
+	grep -q '[^[:space:]]' .release-notes.md || { rm -f .release-notes.md; echo "❌ CHANGELOG.md has no entry for $$V"; exit 1; }; \
 	gh release create "v$$V" --target "$$SHA" --title "v$$V" --notes-file .release-notes.md; rm -f .release-notes.md; \
 	git push origin "$$SHA:refs/heads/stable"; \
 	echo "✅ v$$V released; stable → $$SHA"
