@@ -2,11 +2,24 @@
 
 User-visible changes to this fork of SuperClaude: behavior, commands, flags, CLI subcommands, hooks, make targets, dependencies, and what an upgrade asks of you. Internal refactors and tests are in the commit log.
 
-The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html), and `pyproject.toml` is the version source. A release is tagged `vX.Y.Z`, and the `stable` branch points at the latest one.
+The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html), and `pyproject.toml` is the version source. Releases from 4.20.1 on are tagged `vX.Y.Z` (4.19.0 and 4.20.0 predate tagging), and the `stable` branch points at the latest one.
 
 Releases before 4.19.0 are not listed. Their history is the git log; the upstream-era changelog, last entry 4.2.1, is `CHANGELOG.md` at commit `6b0ac5c3^`.
 
 ## [Unreleased]
+
+### Added
+
+- `make typecheck` runs mypy over `src/` and fails when the error count exceeds `MYPY_BASELINE` (34) or mypy stops before checking everything. mypy is not clean yet; the target keeps the count from rising.
+
+### Fixed
+
+- `make release` takes the GitHub release notes from the CHANGELOG entry of the version being released, and stops before `gh release create` when that entry is empty. It used to take the first `## [` section, which since 4.29.2 is the empty `[Unreleased]` heading, so the v4.29.2 and v4.29.3 releases went out with blank notes (both since filled in from this file).
+- `make ci` and `make release` point `gh` at the `origin` repository through `GH_REPO`. They used gh's default repo, which a fork clone can set to the upstream.
+- `superclaude author-check`: a line-leading `<word prose…` line directly followed by a `> quoted` line is Markdown again, not an unclosed XML tag (an X2 error and exit 1 since 4.29.2). A multiline opener's first line must now hold only attributes after the tag name, like its continuation lines, and a `>` line with text after it is a blockquote, not the opener's closer.
+- Rules: the verification ladder's Level 0 (inspection only) now covers only docs, comment or text changes that no test, build or linter reads, as `RULES.md` already said; a docs change that a test reads runs that check.
+- `superclaude parallel-ab --help` points its example at a variants file that exists.
+- Contributors: the command, mode and MCP authoring rules no longer give `<examples><example>` as a plural↔singular container pair; `xml-prose-format.md` defines them as two distinct constructs.
 
 ## [4.29.3] - 2026-10-19
 
