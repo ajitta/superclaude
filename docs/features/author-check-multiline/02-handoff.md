@@ -8,7 +8,7 @@ updated: 2026-10-19
 
 # 02. Handoff — what remains after author-check multiline + release 4.29.2
 
-This round closes the author-check multiline candidate carried since harness-checker-hygiene (fix a1d6ca7a on fix/author-check-multiline from master 02f31d7b; evidence in [01-verification.md](./01-verification.md)) and releases the accumulated `[Unreleased]` entries as 4.29.2. Headless sessions used: **0**. Delivery state is recorded in [README.md](./README.md) §Status — read it before trusting this file. Remaining work is for a new session; this round grants it no execution authorization.
+This round closes the author-check multiline candidate carried since harness-checker-hygiene (fix a1d6ca7a on fix/author-check-multiline from master 02f31d7b; evidence in [01-verification.md](./01-verification.md)) and releases the accumulated `[Unreleased]` entries as 4.29.2. Headless sessions used: **0**. Delivered: merged at 37a6501b, released as **v4.29.2** at 1f57aa62 (master = stable = tag), local install synced; see [README.md](./README.md) §Status. Remaining work is for a new session; this round grants it no execution authorization.
 
 ## Candidates
 

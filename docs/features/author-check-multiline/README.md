@@ -1,6 +1,6 @@
 ---
 feature: author-check-multiline
-phase: handoff
+phase: closed
 owner: ajitta
 created: 2026-10-19
 updated: 2026-10-19
@@ -12,7 +12,7 @@ Close candidate 1 from the [context-budget-restore handoff](../context-budget-re
 
 ## Status
 
-Implemented on fix/author-check-multiline from master 02f31d7b: intent 252d37b7, fix a1d6ca7a. Red→green evidence, before/after reproductions and the 559-file whole-tree diff (0 differences) are in [01-verification.md](./01-verification.md). Headless sessions used: 0. Merge, push and release 4.29.2 follow per the accepted plan; this line is updated as each lands.
+Implemented on fix/author-check-multiline from master 02f31d7b: intent 252d37b7, fix a1d6ca7a. Red→green evidence, before/after reproductions and the 559-file whole-tree diff (0 differences) are in [01-verification.md](./01-verification.md). Headless sessions used: 0. Merged into master at 37a6501b and pushed; version bump merged at 1f57aa62; **released as v4.29.2** (`make release`: Tests run 39150331450 green, GitHub release created, `stable` → 1f57aa62 — master, stable and the tag share one SHA). Local-scope install re-synced (83 files, `verify-drift` clean, `superclaude --version` 4.29.2). No canary gate was due (`core/` and `hooks.json` unchanged since v4.29.1) and none was run — an explicit decision recorded in 00-intent.md; the release carries the loader-budget change measured deterministically in context-budget-restore.
 
 ## Documents
 
