@@ -424,6 +424,8 @@ def update(scope: str):
         superclaude update
         superclaude update --scope project
     """
+    from superclaude.utils import detect_scope
+
     from .install_components import install_all
     from .install_paths import (
         found_installs_lines,
@@ -437,6 +439,20 @@ def update(scope: str):
     # Update refreshes an install; it never creates one. Run at a local-only
     # project with the default scope, it used to write a full user install
     # into ~/.claude, and from a subdirectory a second, nested project copy.
+    # Project and local share ./.claude, so an install there of the other
+    # scope is no install of this one: `update --scope local` over a project
+    # install created a local one on top of it.
+    found = scope
+    if scope != "user" and has_install(base_path):
+        found = detect_scope(base_path.parent)
+    if found != scope:
+        click.echo(
+            f"❌ The install at {base_path} is a {found} install, not {scope}; "
+            "update refreshes an install and creates none."
+        )
+        for line in found_installs_lines("update"):
+            click.echo(line)
+        sys.exit(1)
     if not has_install(base_path):
         click.echo(
             f"❌ No superclaude install at {scope} scope ({base_path}); update "

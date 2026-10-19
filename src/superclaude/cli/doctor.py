@@ -10,7 +10,6 @@ tool's skills and another tool's hooks — a 4/6 score in which no check had
 actually looked at superclaude.
 """
 
-import json
 from importlib.metadata import entry_points
 from pathlib import Path
 from typing import Any, Dict, List
@@ -30,7 +29,12 @@ from .install_paths import (
     resolve_reporting_target,
     scope_command,
 )
-from .install_settings import _hook_script_id, _split_entry, _unwritable_settings
+from .install_settings import (
+    _hook_script_id,
+    _load_settings,
+    _split_entry,
+    _unwritable_settings,
+)
 
 
 def _repair_command(scope: str, base_path: Path) -> str:
@@ -220,8 +224,7 @@ def _check_hooks_installed(base_path: Path, scope: str) -> Dict[str, Any]:
     if problem:
         return {"name": label, "passed": False, "details": [problem]}
 
-    settings = json.loads(settings_file.read_text(encoding="utf-8"))
-    hooks = settings.get("hooks", {})
+    hooks = _load_settings(settings_file).get("hooks", {})
 
     # A pre-console-entry registration runs a script copy under
     # superclaude/scripts/; with that copy gone python exits 2, the code that

@@ -411,6 +411,29 @@ def test_c03_bad_input_refused_before_any_write(
     assert snapshot(tmp_path) == before
 
 
+@pytest.mark.parametrize("data", [b"", b"\n  \n"], ids=["zero-byte", "whitespace"])
+@pytest.mark.parametrize("scope", SCOPES)
+def test_v4_empty_settings_file_reads_as_an_empty_object(
+    tmp_path: Path, monkeypatch, scope: str, data: bytes
+) -> None:
+    """V-4: `touch settings.json` holds no settings to lose, yet install, doctor
+    and uninstall refused it as invalid JSON."""
+    home, project = sandbox(tmp_path, monkeypatch)
+    base = scope_base(home, project, scope)
+    settings = settings_path(base, scope)
+    settings.parent.mkdir(parents=True)
+    settings.write_bytes(data)
+
+    for command in (["install"], ["doctor"], ["uninstall", "-y"]):
+        result = CliRunner().invoke(main, [*command, "--scope", scope])
+        output = all_output(result)
+        assert result.exit_code == 0, (command, output)
+        assert "not valid JSON" not in output, (command, output)
+        if command == ["install"]:
+            assert json.loads(settings.read_text(encoding="utf-8"))["hooks"], output
+    assert not (base / "superclaude").exists()
+
+
 def _plant_cp949_exclude(project: Path) -> Path:
     exclude = project / ".git" / "info" / "exclude"
     exclude.parent.mkdir(parents=True, exist_ok=True)
@@ -646,6 +669,41 @@ def test_c04_update_from_a_subdirectory_names_the_install_above(
     assert result.exit_code == 1, output
     assert f"'superclaude update --scope local' from {project}" in output, output
     assert snapshot(tmp_path) == before
+
+
+@pytest.mark.parametrize(
+    ("installed", "asked"), [("project", "local"), ("local", "project")]
+)
+def test_v3_update_refuses_another_scopes_install_in_the_same_base(
+    tmp_path: Path, monkeypatch, installed: str, asked: str
+) -> None:
+    """V-3: project and local share ./.claude, so `update --scope local` over an
+    uncommitted project install passed the has-an-install check and created a
+    local install (settings.local.json, CLAUDE.local.md) on top of it."""
+    _home, project, _base = fresh_install(tmp_path, monkeypatch, installed)
+    before = snapshot(tmp_path)
+
+    result = CliRunner().invoke(main, ["update", "--scope", asked])
+
+    output = all_output(result)
+    assert result.exit_code == 1, output
+    assert f"'superclaude update --scope {installed}' from {project}" in output, output
+    assert f"--scope {asked}'" not in output, output
+    assert snapshot(tmp_path) == before
+
+
+@pytest.mark.parametrize("era", ERAS)
+def test_v3_update_still_refreshes_every_era_at_its_scope(
+    tmp_path: Path, monkeypatch, era: str
+) -> None:
+    """The scope check reads the install's own evidence; every captured era's
+    install must read as the scope it was made at, or `update` refuses it."""
+    _home, _project, _base = build_legacy_install(tmp_path, era, monkeypatch)
+
+    result = CliRunner().invoke(main, ["update", "--scope", load_era(era)["scope"]])
+
+    output = all_output(result)
+    assert result.exit_code == 0, output
 
 
 def test_c04_install_force_creating_a_scope_warns(tmp_path: Path, monkeypatch) -> None:
@@ -1003,16 +1061,153 @@ def test_q10_every_retired_name_is_on_a_retired_list() -> None:
     assert retired_names("skills") <= set(install_paths.LEGACY_SKILL_NAMES), REGENERATE
 
 
-def test_q10_guarded_skill_digests_cover_every_shipped_revision() -> None:
-    """A retired skill removed by content matches every SKILL.md revision that
-    shipped under its name, or an upgrade from that revision keeps it."""
+@pytest.mark.parametrize(
+    ("kind", "table", "names"),
+    [
+        ("skill", "RETIRED_SKILL_DIGESTS", "LEGACY_SKILL_NAMES"),
+        ("agent", "RETIRED_AGENT_DIGESTS", "RETIRED_AGENT_FILES"),
+    ],
+)
+def test_q10_retired_digests_cover_every_shipped_revision(
+    kind: str, table: str, names: str
+) -> None:
+    """A retired name is removed by content (V-1), so its table must match every
+    revision that shipped under it, or an upgrade from that revision keeps it."""
     from superclaude.cli import install_paths
 
-    digests = getattr(install_paths, "RETIRED_SKILL_DIGESTS", {})
-    assert digests, "no content-matched retired skills"
+    digests = getattr(install_paths, table, {})
+    assert set(digests) == set(getattr(install_paths, names)), REGENERATE
     for name, listed in digests.items():
-        recorded = {d[:16] for d in HISTORY["retired_skill_digests"][name]}
+        recorded = {d[:16] for d in HISTORY[f"retired_{kind}_digests"][name]}
         assert set(listed) == recorded, (name, REGENERATE)
+
+
+# --- V-1: a retired name is superclaude's only by content (P7) ---------------
+#
+# `pm-agent` and `using-superclaude` are ordinary names; the retired lists
+# removed any file under them, so a user's own agent or skill went at install
+# with no backup. Every retired agent and skill is removed only when its text
+# is a revision superclaude shipped, like the process skills before it.
+
+
+def _plant_same_name_user_content(base: Path) -> dict[Path, bytes]:
+    """The user's own file under every retired agent and skill name."""
+    planted = {}
+    for name in retired_names("agents"):
+        path = base / "agents" / name
+        planted[path] = f"---\nname: {Path(name).stem}\n---\nmy own agent\n".encode()
+    for name in retired_names("skills"):
+        path = base / "skills" / name / "SKILL.md"
+        planted[path] = f"---\nname: {name}\n---\nmy notes\n".encode()
+    for path, data in planted.items():
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(data)
+    return planted
+
+
+@pytest.mark.parametrize(
+    "operation", ["install", "install --force", "update", "uninstall -y"]
+)
+@pytest.mark.parametrize("scope", SCOPES)
+def test_v1_users_own_file_under_a_retired_name_survives(
+    tmp_path: Path, monkeypatch, scope: str, operation: str
+) -> None:
+    """V-1: install deleted the user's own `pm-agent.md`, `deep-research-agent.md`
+    and `skills/using-superclaude/` by name (a team's committed agent too)."""
+    _home, _project, base = fresh_install(tmp_path, monkeypatch, scope)
+    planted = _plant_same_name_user_content(base)
+
+    result = CliRunner().invoke(main, [*operation.split(), "--scope", scope])
+
+    output = all_output(result)
+    assert result.exit_code == 0, output
+    assert {p: p.read_bytes() if p.exists() else None for p in planted} == planted
+
+
+@pytest.mark.parametrize("scope", SCOPES)
+def test_v1_verify_drift_ignores_a_users_file_under_a_retired_name(
+    tmp_path: Path, monkeypatch, scope: str
+) -> None:
+    """V-1: the user's own `pm-agent.md` read as EXTRA, exit 1 forever (C-11)."""
+    _home, _project, base = fresh_install(tmp_path, monkeypatch, scope)
+    _plant_same_name_user_content(base)
+
+    result = CliRunner().invoke(main, ["verify-drift", "--scope", scope, "--verbose"])
+
+    output = all_output(result)
+    assert result.exit_code == 0, output
+    assert "EXTRA" not in output and "RETIRED" not in output, output
+
+
+def _era_retired_files(era: str) -> list[str]:
+    names = {f"agents/{n}" for n in retired_names("agents")} | {
+        f"skills/{n}/SKILL.md" for n in retired_names("skills")
+    }
+    return [
+        key for key in load_era(era)["files"] if key.partition("/.claude/")[2] in names
+    ]
+
+
+@pytest.mark.parametrize("operation", ["update", "uninstall"])
+@pytest.mark.parametrize("era", [era for era in ERAS if _era_retired_files(era)])
+def test_v1_shipped_retired_copies_still_go(
+    tmp_path: Path, monkeypatch, era: str, operation: str
+) -> None:
+    """The content gate keeps removing what superclaude shipped: every captured
+    era's retired agents and skills, as that era's installer wrote them."""
+    _home, _project, base = build_legacy_install(tmp_path, era, monkeypatch)
+    scope = load_era(era)["scope"]
+    assert _left(base)
+
+    if operation == "uninstall":
+        success, message = uninstall_all(base_path=base, scope=scope)
+    else:
+        success, message = install_all(base_path=base, force=True, scope=scope)
+
+    assert success, message
+    assert _left(base) == [], message
+
+
+@pytest.mark.parametrize("scope", ["user", "local"])
+def test_v1_a_retired_agent_rewritten_to_the_scope_still_goes(
+    tmp_path: Path, monkeypatch, scope: str
+) -> None:
+    """Install rewrites `memory: project` to the scope (385baaf2 on), so a user
+    or local copy of a retired agent is not byte-equal to any revision."""
+    from superclaude.cli.install_components import _rewrite_agent_memory_scope
+
+    _home, _project, base = fresh_install(tmp_path, monkeypatch, scope)
+    shipped = _era_blob("b933fd65p-user", "$HOME/.claude/agents/pm-agent.md")
+    rewritten = _rewrite_agent_memory_scope(shipped, scope)
+    assert rewritten != shipped
+    (base / "agents" / "pm-agent.md").write_text(rewritten, "utf-8", newline="")
+
+    success, message = install_all(base_path=base, force=True, scope=scope)
+
+    assert success, message
+    assert not (base / "agents" / "pm-agent.md").exists(), message
+
+
+@pytest.mark.parametrize("scope", ["project", "local"])
+def test_v1_a_retired_skill_with_a_relative_skills_path_still_goes(
+    tmp_path: Path, monkeypatch, scope: str
+) -> None:
+    """Install resolved `{{SKILLS_PATH}}` in SKILL.md (cd2f8aab → b806c61c), to
+    `.claude/skills` at project scope (local too, from 2026-03); the captured
+    eras carry only the absolute form."""
+    _home, _project, base = fresh_install(tmp_path, monkeypatch, scope)
+    shipped = _era_blob(
+        "b933fd65p-user", "$HOME/.claude/skills/confidence-check/SKILL.md"
+    )
+    assert "$HOME/.claude/skills/" in shipped
+    skill = base / "skills" / "confidence-check" / "SKILL.md"
+    skill.parent.mkdir(parents=True)
+    skill.write_text(shipped.replace("$HOME/.claude/skills", ".claude/skills"), "utf-8")
+
+    success, message = uninstall_all(base_path=base, scope=scope)
+
+    assert success, message
+    assert not skill.parent.exists(), message
 
 
 RETIRED_EVENTS = ("Setup", "TeammateIdle", "TaskCompleted")

@@ -15,9 +15,11 @@ Collected:
   - every ``.md`` name under ``src/superclaude/agents/`` and
     ``output-styles/`` and every directory under ``src/superclaude/skills/``,
     with the first and last revision that had it, plus the working tree's;
-  - for each skill not shipped now, the sha256 of every SKILL.md revision
-    (line endings normalised to LF), which the install compares before it
-    removes a directory whose name other skill collections use too;
+  - for each agent and skill not shipped now, the sha256 of every revision of
+    the agent file or SKILL.md (line endings normalised to LF), which install
+    and uninstall compare before they remove a file or directory under that
+    name: the name alone may be the user's own (``pm-agent``) or another skill
+    collection's;
   - every hook event and (event, entry point, subcommand) in every revision of
     ``hooks/hooks.json`` and ``hooks/serena-hooks.json``, and the commands with
     no entry point verbatim.
@@ -142,10 +144,12 @@ def collect_names(rev: str) -> dict:
     return names
 
 
-def skill_digests(rev: str, retired: list) -> dict:
+def retired_digests(rev: str, kind: str, retired: list) -> dict:
     found: dict = {}
     for name in retired:
-        path = f"{DIRS['skills']}/{name}/SKILL.md"
+        path = f"{DIRS[kind]}/{name}"
+        if kind == "skills":
+            path += "/SKILL.md"
         for commit in touching(rev, path):
             if exists(commit, path):
                 found.setdefault(name, set()).add(
@@ -204,7 +208,7 @@ def main(rev: str = "HEAD") -> None:
     head = git("rev-parse", "--short=8", rev).strip()
     names = collect_names(rev)
     current = {kind: set(current_names(kind)) for kind in DIRS}
-    retired_skills = sorted(set(names["skills"]) - current["skills"])
+    retired = {kind: sorted(set(names[kind]) - current[kind]) for kind in DIRS}
     events, ids, inline, now_events, now_ids = collect_hooks(rev)
 
     doc = {
@@ -224,7 +228,8 @@ def main(rev: str = "HEAD") -> None:
             ]
             for kind in DIRS
         },
-        "retired_skill_digests": skill_digests(rev, retired_skills),
+        "retired_agent_digests": retired_digests(rev, "agents", retired["agents"]),
+        "retired_skill_digests": retired_digests(rev, "skills", retired["skills"]),
         "hook_events": [
             {"event": e, "first": v[0], "last": v[1], "shipped_now": e in now_events}
             for e, v in sorted(events.items())

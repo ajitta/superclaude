@@ -171,9 +171,11 @@ def _load_settings(settings_file: Path) -> dict:
 def _unwritable_settings(settings_file: Path) -> Optional[str]:
     """Why ``settings_file`` must not be rewritten, or None when it may be.
 
-    A missing file is writable (install creates it). An existing file that is
-    not a JSON object — a trailing comma, a comment, an empty file, an array —
-    is not: the 2026-10-17 audit reproduced ``superclaude install`` turning
+    A missing file is writable (install creates it), and so is one holding
+    nothing but whitespace (``touch settings.json``): there are no settings to
+    lose, and it reads as ``{}``. An existing file that is not a JSON object — a
+    trailing comma, a comment, an array — is not: the 2026-10-17 audit
+    reproduced ``superclaude install`` turning
     ``{"permissions": ..., "model": "opus",}`` into a file holding only hooks.
     """
     if not settings_file.exists():
@@ -181,6 +183,8 @@ def _unwritable_settings(settings_file: Path) -> Optional[str]:
     problem = _encoding_problem(settings_file)
     if problem:
         return problem
+    if not settings_file.read_bytes().strip():
+        return None
     try:
         with open(settings_file, "r", encoding="utf-8") as f:
             data = json.load(f)

@@ -23,13 +23,13 @@ from .install_paths import (
     COMPONENTS,
     DIRECTORY_COMPONENTS,
     DIRECTORY_IGNORE,
-    RETIRED_AGENT_FILES,
     SHARED_TARGET_COMPONENTS,
     _get_package_root,
     _get_source_dir,
     _get_target_dir,
     dir_names,
     find_legacy_skills,
+    find_retired_agents,
     md_names,
     scope_command,
 )
@@ -41,9 +41,9 @@ DRIFTED = "DRIFTED"  # Content mismatch
 EXTRA = "EXTRA"  # In target but not in source
 RETIRED = "RETIRED"  # A superclaude skill directory no release ships now
 
-# Names a release shipped into a shared directory and this one does not: the
-# only unshipped names there that are superclaude's.
-_RETIRED_FILES = {"agents": RETIRED_AGENT_FILES}
+# The files in a shared directory that a release shipped and this one does
+# not, holding superclaude's text: the only unshipped files there that are ours.
+_RETIRED_FILES = {"agents": find_retired_agents}
 
 
 def _compare_files(source: Path, target: Path) -> str:
@@ -111,7 +111,8 @@ def _check_component(component: str, base_path: Path) -> Dict[str, str]:
     # files too; marking them EXTRA made verify-drift fail on every clean install.
     extra = md_names(target_dir) - source_files
     if component in SHARED_TARGET_COMPONENTS:
-        extra &= set(_RETIRED_FILES.get(component, ()))
+        retired = _RETIRED_FILES.get(component)
+        extra &= {p.name for p in retired(base_path)} if retired else set()
     for filename in sorted(extra):
         results[filename] = EXTRA
 
