@@ -17,7 +17,7 @@ from superclaude.utils import (
     settings_filename,
 )
 
-from .install_git_exclude import add_git_exclude, find_team_ignores
+from .install_git_exclude import add_git_exclude, exclude_problem, find_team_ignores
 from .install_paths import (
     COMPONENTS,
     DIRECTORY_COMPONENTS,
@@ -37,9 +37,36 @@ from .install_settings import (
     _load_settings,
     _split_entry,
     check_claude_md_import,
+    input_problems,
     merge_hooks_to_settings,
     update_claude_md_import,
 )
+
+
+def preflight_inputs(base_path: Path, scope: str, settings: bool = True) -> str | None:
+    """Refusal text when a file this command edits cannot be edited safely, or None.
+
+    Install, update and uninstall call this before their first write or delete:
+    each used to change the tree first and then fail on the input — uninstall
+    deleted every file and then crashed on a UTF-16 settings file, leaving its
+    hooks registered. The files are the scope's settings file (unless
+    ``settings`` is False), its CLAUDE file and, for the scopes that write one,
+    the git exclude file.
+    """
+    problems = input_problems(base_path, scope, settings=settings)
+    if scope in ("local", "project"):
+        problem = exclude_problem(base_path.parent)
+        if problem:
+            problems.append(problem)
+    if not problems:
+        return None
+    return "\n".join(
+        [
+            "❌ Nothing was changed: superclaude edits these files and cannot "
+            "read them safely.",
+            *(f"   - {problem}" for problem in problems),
+        ]
+    )
 
 
 def _rewrite_agent_memory_scope(content: str, scope: str) -> str:
@@ -488,6 +515,10 @@ def install_all(
     Returns:
         Tuple of (success: bool, message: str)
     """
+    refusal = preflight_inputs(base_path, scope)
+    if refusal:
+        return False, refusal
+
     conflict = find_agent_memory_conflict(base_path, scope)
     if conflict:
         return False, conflict

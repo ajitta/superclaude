@@ -221,7 +221,9 @@ class TestRunDoctor:
 
         result = run_doctor()
 
-        assert len(result["checks"]) == 5
+        # The five common checks plus the exclude block local and project write.
+        assert len(result["checks"]) == 6
+        assert len(run_doctor(scope="user")["checks"]) == 5
 
 
 class TestRepairCommandNamesWhereToRun:

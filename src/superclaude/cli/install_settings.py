@@ -5,6 +5,7 @@ Handles settings.json merge/unmerge, hook identification, and CLAUDE.md import m
 This is a leaf dependency with no internal imports.
 """
 
+import codecs
 import copy
 import json
 import re
@@ -25,6 +26,17 @@ from superclaude.utils import (
 # Import line to add to CLAUDE.md
 CLAUDE_SC_IMPORT = "@superclaude/CLAUDE_SC.md"
 
+# The import every release wrote, as a whole line — `@superclaude/CLAUDE_SC.md`
+# (user, project) or `@.claude/superclaude/CLAUDE_SC.md` (local), either path
+# separator — with the heading above it ("# SuperClaude Framework" in older
+# releases). Anchored to the line: matching `@superclaude/` anywhere deleted a
+# user's text from that point on (`docs@superclaude/wiki and stays.` → `docs`).
+SC_IMPORT_RE = re.compile(
+    r"^(?:# (?:SuperClaude Framework|superclaude)\n)?"
+    r"@(?:\.claude[/\\])?superclaude[/\\]CLAUDE_SC\.md[ \t]*(?:\n|\Z)",
+    re.MULTILINE,
+)
+
 # Entry point of a legacy `<interpreter> <dir>/<name>.py [subcommand]` command
 # (releases before the console entry). The current form is
 # utils.CONSOLE_HOOK_RE. Both capture the bare name, so a hook registered
@@ -35,6 +47,43 @@ _HOOK_SCRIPT_RE = re.compile(r"([A-Za-z0-9_]+)\.py(?=\s|$)(.*)$")
 # redirection (`|`, `&&`, `2>>log`) are not subcommands — a user who wraps our
 # command in a pipeline still runs the same hook.
 _SUBCOMMAND_RE = re.compile(r"[A-Za-z0-9_][A-Za-z0-9_-]*")
+
+# Byte-order marks, longest first where one prefixes another.
+_BOMS = (
+    (codecs.BOM_UTF8, "UTF-8 with a byte-order mark"),
+    (codecs.BOM_UTF16_LE, "UTF-16"),
+    (codecs.BOM_UTF16_BE, "UTF-16"),
+)
+
+
+def _encoding_problem(path: Path) -> Optional[str]:
+    """Why ``path`` cannot be edited as UTF-8 text, or None (also when it is missing).
+
+    Every file superclaude edits in place — settings, the CLAUDE file, the git
+    exclude file — is read and written back as UTF-8. One saved in another
+    encoding used to crash the command half-way: uninstall had already deleted
+    the content when it reached a UTF-16 settings file, and install had already
+    written it. A BOM is refused too: ``json`` rejects it, and a rewrite would
+    carry it into the middle of the file. The message names the file and what it
+    is, so the user knows what to re-save.
+    """
+    try:
+        data = path.read_bytes()
+    except FileNotFoundError:
+        return None
+    except OSError as e:
+        return f"{path} cannot be read ({e})"
+    for bom, name in _BOMS:
+        if data.startswith(bom):
+            return f"{path} is {name}; save it as UTF-8 without a BOM"
+    try:
+        data.decode("utf-8")
+    except UnicodeDecodeError as e:
+        return (
+            f"{path} is not UTF-8 (byte 0x{data[e.start]:02x} at offset {e.start}, "
+            "a legacy code page such as cp949 or cp1252?); save it as UTF-8"
+        )
+    return None
 
 
 def _load_settings(settings_file: Path) -> dict:
@@ -57,7 +106,7 @@ def _load_settings(settings_file: Path) -> dict:
     try:
         with open(settings_file, "r", encoding="utf-8") as f:
             data = json.load(f)
-    except (json.JSONDecodeError, IOError):
+    except (ValueError, OSError):  # JSONDecodeError and UnicodeDecodeError
         return {}
     return data if isinstance(data, dict) else {}
 
@@ -72,16 +121,40 @@ def _unwritable_settings(settings_file: Path) -> Optional[str]:
     """
     if not settings_file.exists():
         return None
+    problem = _encoding_problem(settings_file)
+    if problem:
+        return problem
     try:
         with open(settings_file, "r", encoding="utf-8") as f:
             data = json.load(f)
-    except (json.JSONDecodeError, IOError) as e:
+    except (ValueError, OSError) as e:
         return f"{settings_file} is not valid JSON ({e}); fix it or move it aside"
     if not isinstance(data, dict):
         return (
             f"{settings_file} is valid JSON but not an object; fix it or move it aside"
         )
     return None
+
+
+def input_problems(base_path: Path, scope: str, settings: bool = True) -> List[str]:
+    """What stops a command from editing this scope's settings and CLAUDE file.
+
+    Checked before the first write or delete, so a command that cannot finish
+    refuses with nothing changed instead of failing after it has already
+    rewritten or deleted the install. ``settings=False`` leaves the settings
+    file out, for a command that will not touch it (``uninstall
+    --keep-settings``).
+    """
+    problems: List[str] = []
+    if settings:
+        problem = _unwritable_settings(base_path / settings_filename(scope))
+        if problem:
+            problems.append(problem)
+    claude_md, _import_line = _claude_md_target(base_path, scope)
+    problem = _encoding_problem(claude_md)
+    if problem:
+        problems.append(problem)
+    return problems
 
 
 def _save_settings(settings_file: Path, settings: dict) -> Tuple[bool, str]:
@@ -558,11 +631,12 @@ def check_claude_md_import(base_path: Path, scope: str = "user") -> Tuple[bool, 
         return False, f"{target_label} not found"
 
     # doctor delegates this check, and doctor must report rather than traceback:
-    # the code it replaced caught OSError and returned a failing result.
-    try:
-        content = claude_md.read_text(encoding="utf-8")
-    except (OSError, UnicodeDecodeError):
-        return False, f"{target_label} is unreadable"
+    # the code it replaced caught OSError and returned a failing result. A file
+    # install would refuse to edit fails here too, with the same reason.
+    problem = _encoding_problem(claude_md)
+    if problem:
+        return False, problem
+    content = claude_md.read_text(encoding="utf-8")
 
     # The import line, with either path separator: a Windows-authored file may
     # carry `@.claude\superclaude\CLAUDE_SC.md`.
@@ -640,14 +714,7 @@ def remove_claude_md_import(base_path: Path, scope: str = "user") -> Tuple[bool,
         content = claude_md.read_text(encoding="utf-8")
         original_content = content
 
-        # Remove superclaude import lines and related comments (all variants).
-        # "# SuperClaude Framework" is the heading older installs wrote.
-        heading = r"# (?:SuperClaude Framework|superclaude)\n"
-        content = re.sub(heading + r"@\.claude/superclaude/[^\n]+\n?", "", content)
-        content = re.sub(heading + r"@superclaude/[^\n]+\n?", "", content)
-        content = re.sub(r"@\.claude/superclaude/[^\n]+\n?", "", content)
-        content = re.sub(r"@superclaude/[^\n]+\n?", "", content)
-        content = re.sub(r"@superclaude\\[^\n]+\n?", "", content)
+        content = SC_IMPORT_RE.sub("", content)
 
         # Clean up multiple blank lines
         content = re.sub(r"\n{3,}", "\n\n", content)

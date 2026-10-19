@@ -28,6 +28,7 @@ from .install_paths import (
     shipped_names,
 )
 from .install_settings import (
+    SC_IMPORT_RE,
     _hook_script_id,
     _load_settings,
     _split_entry,
@@ -290,6 +291,21 @@ def uninstall_all(
     if base_path is None:
         base_path = get_base_path(scope)
 
+    # Every input is read before the first delete: steps 1-5a delete content,
+    # and a settings or CLAUDE file that step 6 or 7 then cannot read left the
+    # hooks registered and the import pointing at deleted files.
+    from .install_components import preflight_inputs
+
+    refusal = preflight_inputs(base_path, scope, settings=not keep_settings)
+    if refusal:
+        return False, refusal
+    if not keep_mcp:
+        from .install_mcp import claude_cli_missing
+
+        missing = claude_cli_missing()
+        if missing:
+            return False, f"❌ Nothing was changed: {missing}"
+
     messages = []
     removed = 0
     skipped = 0
@@ -495,7 +511,7 @@ def uninstall_all(
     if dry_run:
         if claude_md_target.exists():
             content = claude_md_target.read_text(encoding="utf-8")
-            if "@superclaude" in content or "@.claude/superclaude" in content:
+            if SC_IMPORT_RE.search(content):
                 messages.append(
                     f"[DRY-RUN] Would remove superclaude import from {claude_md_label}"
                 )

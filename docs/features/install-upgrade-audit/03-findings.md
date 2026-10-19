@@ -63,6 +63,20 @@ Matrix evidence: [02](./02-scenarios.md), [02a](./02a-scenarios-edge.md). Code-r
 | C-18 | worktree fixture (with `commondir`, `git-common-dir-paths`): local in the worktree, project in main → the second install warns that it replaces the local block |
 | C-19 | cp949 bytes in `info/exclude` → `add_git_exclude` returns `(False, msg)`, no traceback; doctor fails while the block is missing at local scope |
 
+## P5 status
+
+Tests are in `tests/unit/test_install_upgrade_scenarios.py`; each was seen red before its fix.
+
+| ID | Status | Regression test |
+|---|---|---|
+| C-01 | fixed (P5 group 1) | `test_c01_uninstall_refuses_undecodable_settings_before_deleting` |
+| C-02 | fixed (P5 group 1) | `test_c02_uninstall_refuses_malformed_or_bom_settings` |
+| C-03 | fixed (P5 group 1) | `test_c03_bad_input_refused_before_any_write` |
+| C-19 | fixed (P5 group 1) | `test_c19_undecodable_exclude_refused_before_any_write`, `test_c19_add_git_exclude_reports_undecodable_exclude`, `test_c19_doctor_fails_while_local_exclude_block_missing` |
+| C-07 | fixed (P5 group 1) | `test_c07_import_removal_keeps_user_lines` |
+| C-13 | fixed (P5 group 1) | `test_c13_remove_mcp_keeps_a_foreign_server_of_the_same_name` |
+| C-14 | fixed (P5 group 1) | `test_c14_remove_mcp_without_claude_reports_a_failure`, `test_c14_uninstall_remove_mcp_without_claude_deletes_nothing` |
+
 ## Owner checkpoint
 
 **C-06 needs a decision not covered by Q1–Q16.** `find_agent_memory_conflict` gates `memory: project` on git tracking, so legacy user and local installs can upgrade (install_components.py:84-88). It does not gate `memory: user`, which every agent shipped from `d174e600` to `df5b8a35`, so a project install from that era is refused for good, and the advice names another scope.

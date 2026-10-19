@@ -22,6 +22,7 @@ from .install_paths import (
     probe_console_script,
     resolve_reporting_target,
 )
+from .install_settings import _unwritable_settings
 
 
 def _repair_command(scope: str, base_path: Path) -> str:
@@ -71,6 +72,8 @@ def run_doctor(scope: str | None = None) -> Dict[str, Any]:
         _check_claude_sc_md(base_path, scope),
         _check_claude_md_import(base_path, scope),
     ]
+    if scope in ("local", "project"):
+        checks.append(_check_git_exclude(base_path, scope))
 
     return {
         "checks": checks,
@@ -159,15 +162,13 @@ def _check_hooks_installed(base_path: Path, scope: str) -> Dict[str, Any]:
             "details": [f"{settings_file} not found"],
         }
 
-    try:
-        settings = json.loads(settings_file.read_text(encoding="utf-8"))
-    except (json.JSONDecodeError, OSError):
-        return {
-            "name": label,
-            "passed": False,
-            "details": [f"{filename} is invalid or unreadable"],
-        }
+    # The reason install and uninstall would refuse the file, not a traceback:
+    # a UTF-16 file raised UnicodeDecodeError here, a JSON array AttributeError.
+    problem = _unwritable_settings(settings_file)
+    if problem:
+        return {"name": label, "passed": False, "details": [problem]}
 
+    settings = json.loads(settings_file.read_text(encoding="utf-8"))
     hooks = settings.get("hooks", {})
     expected = ["SessionStart", "UserPromptSubmit", "PostToolUse", "PreToolUse"]
     missing = [
@@ -247,4 +248,56 @@ def _check_claude_md_import(base_path: Path, scope: str) -> Dict[str, Any]:
         "name": f"{target.name} import",
         "passed": has_import,
         "details": [message if has_import else f"{message} ({target})"],
+    }
+
+
+def _check_git_exclude(base_path: Path, scope: str) -> Dict[str, Any]:
+    """
+    Check that the project's git exclude file carries superclaude's block.
+
+    Local scope excludes everything it installs and project scope its runtime
+    state; without the block git sees those files as untracked, one `git add .`
+    from being committed. Install writes the block last, so a non-UTF-8
+    exclude file or an install interrupted at that step left the install
+    without it, and doctor called that healthy.
+
+    Args:
+        base_path: Base installation path of the scope being checked
+        scope: Installation scope ("local" or "project")
+
+    Returns:
+        Check result dict
+    """
+    from .install_git_exclude import (
+        _resolve_git_exclude_file,
+        exclude_problem,
+        has_exclude_block,
+    )
+
+    label = ".git/info/exclude block"
+    project_root = base_path.parent
+    exclude_file = _resolve_git_exclude_file(project_root)
+    if exclude_file is None:
+        return {
+            "name": label,
+            "passed": True,
+            "details": [f"Not a git repository: {project_root}"],
+        }
+    problem = exclude_problem(project_root)
+    if problem:
+        return {"name": label, "passed": False, "details": [problem]}
+    if has_exclude_block(project_root):
+        return {
+            "name": label,
+            "passed": True,
+            "details": [f"superclaude block present in {exclude_file}"],
+        }
+    return {
+        "name": label,
+        "passed": False,
+        "details": [
+            f"No superclaude block in {exclude_file}: git sees the files this "
+            f"{scope} install keeps out of the repository — "
+            f"{_repair_command(scope, base_path)}"
+        ],
     }

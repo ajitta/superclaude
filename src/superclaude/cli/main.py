@@ -330,7 +330,9 @@ def uninstall(
     )
     click.echo(message)
 
-    if not success and not dry_run:
+    # A dry run fails only when uninstall refuses its inputs, and then the real
+    # run would refuse too.
+    if not success:
         sys.exit(1)
 
 

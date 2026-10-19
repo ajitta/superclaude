@@ -8,23 +8,33 @@ exact text in ``_blobs.json``; everything else is a sha256 the builder writes as
 a stub. Machine paths are tokens: ``$HOME``, ``$PROJECT``, ``$PYTHON``,
 ``$UVCACHE``. No network, no git history: the fixtures are the history.
 
-Only behaviour the current code already gets right is asserted here. The
-defects the audit found get their red tests with their fixes
-(docs/features/install-upgrade-audit/03-findings.md).
+The defects the audit found are pinned here by ID, each test written red
+before its fix (docs/features/install-upgrade-audit/03-findings.md).
 """
 
 from __future__ import annotations
 
 import json
 import re
+import shutil
+import subprocess
 import sys
 from pathlib import Path
 
 import pytest
+from click.testing import CliRunner
 
+from superclaude.cli import install_mcp
+from superclaude.cli.doctor import run_doctor
 from superclaude.cli.install_components import install_all
+from superclaude.cli.install_git_exclude import add_git_exclude, remove_git_exclude
+from superclaude.cli.install_inventory import uninstall_all
 from superclaude.cli.install_paths import shipped_names
+from superclaude.cli.install_settings import remove_claude_md_import
+from superclaude.cli.main import main
+from superclaude.utils import settings_filename
 from tests.conftest import init_git_repo
+from tests.unit.cli_helpers import all_output
 
 FIXTURES = Path(__file__).resolve().parents[1] / "fixtures"
 LEGACY = FIXTURES / "legacy_installs"
@@ -36,16 +46,13 @@ def load_era(era: str) -> dict:
     return json.loads((LEGACY / f"{era}.json").read_text(encoding="utf-8"))
 
 
-def build_legacy_install(
-    tmp_path: Path, era: str, monkeypatch
-) -> tuple[Path, Path, Path]:
-    """Lay out ``era``'s captured install under ``tmp_path``; return (home, project, base).
+def sandbox(tmp_path: Path, monkeypatch) -> tuple[Path, Path]:
+    """An empty home and a git project under ``tmp_path``; return (home, project).
 
     HOME and CLAUDE_PROJECT_DIR point into ``tmp_path`` (gotcha test-anchor-env)
     and the project is a real git repository, because the exclude block and the
     agent-memory guard both ask git.
     """
-    doc = load_era(era)
     home = tmp_path / "home"
     project = tmp_path / "project"
     home.mkdir()
@@ -54,6 +61,19 @@ def build_legacy_install(
     monkeypatch.setenv("USERPROFILE", str(home))
     monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(project))
     monkeypatch.chdir(project)
+    return home, project
+
+
+def scope_base(home: Path, project: Path, scope: str) -> Path:
+    return home / ".claude" if scope == "user" else project / ".claude"
+
+
+def build_legacy_install(
+    tmp_path: Path, era: str, monkeypatch
+) -> tuple[Path, Path, Path]:
+    """Lay out ``era``'s captured install under ``tmp_path``; return (home, project, base)."""
+    doc = load_era(era)
+    home, project = sandbox(tmp_path, monkeypatch)
     tokens = {
         "$PYTHON": sys.executable,
         "$UVCACHE": str(tmp_path / "uvcache"),
@@ -81,8 +101,31 @@ def build_legacy_install(
         ((home if root == "$HOME" else project) / rel).mkdir(
             parents=True, exist_ok=True
         )
-    base = home / ".claude" if doc["scope"] == "user" else project / ".claude"
+    return home, project, scope_base(home, project, doc["scope"])
+
+
+def fresh_install(tmp_path: Path, monkeypatch, scope: str) -> tuple[Path, Path, Path]:
+    """This release installed at ``scope`` in a fresh sandbox; return (home, project, base)."""
+    home, project = sandbox(tmp_path, monkeypatch)
+    base = scope_base(home, project, scope)
+    success, message = install_all(base_path=base, force=False, scope=scope)
+    assert success, message
     return home, project, base
+
+
+def snapshot(root: Path) -> dict[str, bytes | None]:
+    """Every file (its bytes) and directory (None) under ``root``.
+
+    Git's own internals are left out, except ``info/exclude``, which install
+    and uninstall edit.
+    """
+    tree: dict[str, bytes | None] = {}
+    for path in sorted(root.rglob("*")):
+        parts = path.relative_to(root).parts
+        if ".git" in parts and parts[-2:] != ("info", "exclude"):
+            continue
+        tree["/".join(parts)] = path.read_bytes() if path.is_file() else None
+    return tree
 
 
 def _commands(settings_file: Path) -> list[str]:
@@ -221,3 +264,333 @@ def test_gitignore_era_block_moves_to_exclude(tmp_path: Path, monkeypatch) -> No
     assert after == "node_modules/\n"
     exclude = (project / ".git" / "info" / "exclude").read_text(encoding="utf-8")
     assert "# >>> superclaude >>>" in exclude
+
+
+# --- C-01, C-02, C-03, C-19: input preflight (Q16 a) -------------------------
+#
+# Every command validates the files it edits before its first write or delete,
+# and refuses one that is not plain UTF-8 or not a JSON object: exit 1, the tree
+# unchanged, the file and its encoding named.
+
+SCOPES = ("user", "project", "local")
+CLAUDE_TEXT = "# 내 규칙\n\n항상 한국어로 답하세요.\n"
+
+
+def _encode(text: str, kind: str) -> bytes:
+    if kind == "trailing-comma":
+        return (text.rstrip().rstrip("}").rstrip() + ",\n}\n").encode("utf-8")
+    if kind == "not-an-object":
+        return b"[]\n"
+    # cp949 cannot hold an em dash; a cp949 editor's save replaces it too.
+    return text.encode(kind, errors="replace")
+
+
+def settings_path(base: Path, scope: str) -> Path:
+    return base / settings_filename(scope)
+
+
+def claude_path(base: Path, scope: str) -> Path:
+    return base.parent / "CLAUDE.local.md" if scope == "local" else base / "CLAUDE.md"
+
+
+def corrupt_settings(settings: Path, kind: str) -> None:
+    """Re-save ``settings`` as ``kind``, with a non-ASCII value so the bytes really differ."""
+    data = json.loads(settings.read_text(encoding="utf-8")) if settings.exists() else {}
+    data["note"] = "한글"
+    settings.parent.mkdir(parents=True, exist_ok=True)
+    settings.write_bytes(
+        _encode(json.dumps(data, ensure_ascii=False, indent=2) + "\n", kind)
+    )
+
+
+def corrupt_claude(claude_md: Path, kind: str) -> None:
+    text = claude_md.read_text(encoding="utf-8") if claude_md.exists() else CLAUDE_TEXT
+    claude_md.parent.mkdir(parents=True, exist_ok=True)
+    claude_md.write_bytes(_encode(CLAUDE_TEXT + "\n" + text, kind))
+
+
+# What the refusal names for each kind of bad input.
+NAMED = {
+    "utf-16": "UTF-16",
+    "utf-8-sig": "byte-order mark",
+    "cp949": "not UTF-8",
+    "trailing-comma": "not valid JSON",
+    "not-an-object": "not an object",
+}
+
+
+@pytest.mark.parametrize("scope", SCOPES)
+@pytest.mark.parametrize("encoding", ["utf-16", "cp949"])
+def test_c01_uninstall_refuses_undecodable_settings_before_deleting(
+    tmp_path: Path, monkeypatch, scope: str, encoding: str
+) -> None:
+    """C-01: a UTF-16 or cp949 settings file used to crash uninstall after it had
+    deleted every file, leaving the hooks registered and CLAUDE.md importing a
+    deleted file."""
+    _home, _project, base = fresh_install(tmp_path, monkeypatch, scope)
+    settings = settings_path(base, scope)
+    corrupt_settings(settings, encoding)
+    before = snapshot(tmp_path)
+
+    success, message = uninstall_all(base_path=base, scope=scope)
+
+    assert not success, message
+    assert str(settings) in message and NAMED[encoding] in message, message
+    assert snapshot(tmp_path) == before
+
+
+@pytest.mark.parametrize("scope", SCOPES)
+@pytest.mark.parametrize("kind", ["trailing-comma", "utf-8-sig"])
+def test_c02_uninstall_refuses_malformed_or_bom_settings(
+    tmp_path: Path, monkeypatch, scope: str, kind: str
+) -> None:
+    """C-02: a settings file that does not parse read as "No hooks", exit 0 —
+    every hook stayed registered while all content was deleted."""
+    _home, _project, base = fresh_install(tmp_path, monkeypatch, scope)
+    settings = settings_path(base, scope)
+    corrupt_settings(settings, kind)
+    before = snapshot(tmp_path)
+
+    success, message = uninstall_all(base_path=base, scope=scope)
+
+    assert not success, message
+    assert "No hooks" not in message
+    assert str(settings) in message and NAMED[kind] in message, message
+    assert snapshot(tmp_path) == before
+
+
+# (file, kind, scope): every bad input once, the scopes rotated between them.
+BAD_INPUTS = [
+    ("settings", "trailing-comma", "user"),
+    ("settings", "utf-8-sig", "project"),
+    ("settings", "utf-16", "local"),
+    ("settings", "cp949", "user"),
+    ("settings", "not-an-object", "project"),
+    ("claude", "cp949", "local"),
+    ("claude", "utf-16", "user"),
+    ("claude", "utf-8-sig", "project"),
+]
+COMMANDS = {
+    "install": ["install"],
+    "update": ["update"],
+    "doctor": ["doctor", "--verbose"],
+    "uninstall-dry-run": ["uninstall", "--dry-run"],
+}
+
+
+@pytest.mark.parametrize("command", list(COMMANDS))
+@pytest.mark.parametrize(("which", "kind", "scope"), BAD_INPUTS, ids=lambda v: str(v))
+def test_c03_bad_input_refused_before_any_write(
+    tmp_path: Path, monkeypatch, command: str, which: str, kind: str, scope: str
+) -> None:
+    """C-03: install and update wrote every file before failing on the input,
+    and doctor and `uninstall --dry-run` raised a traceback."""
+    if command == "install":
+        home, project = sandbox(tmp_path, monkeypatch)
+        base = scope_base(home, project, scope)
+    else:
+        home, project, base = fresh_install(tmp_path, monkeypatch, scope)
+    target = (
+        settings_path(base, scope) if which == "settings" else claude_path(base, scope)
+    )
+    (corrupt_settings if which == "settings" else corrupt_claude)(target, kind)
+    before = snapshot(tmp_path)
+
+    result = CliRunner().invoke(main, [*COMMANDS[command], "--scope", scope])
+
+    output = all_output(result)
+    assert result.exception is None or isinstance(result.exception, SystemExit), output
+    assert result.exit_code == 1, output
+    assert str(target) in output and NAMED[kind] in output, output
+    assert snapshot(tmp_path) == before
+
+
+def _plant_cp949_exclude(project: Path) -> Path:
+    exclude = project / ".git" / "info" / "exclude"
+    exclude.parent.mkdir(parents=True, exist_ok=True)
+    existing = exclude.read_bytes() if exclude.exists() else b""
+    exclude.write_bytes(existing + "# 한글 exclude\nscratch/\n".encode("cp949"))
+    return exclude
+
+
+def test_c19_undecodable_exclude_refused_before_any_write(
+    tmp_path: Path, monkeypatch
+) -> None:
+    """C-19: a non-UTF-8 info/exclude crashed a local install at its last step."""
+    home, project = sandbox(tmp_path, monkeypatch)
+    exclude = _plant_cp949_exclude(project)
+    before = snapshot(tmp_path)
+
+    success, message = install_all(base_path=project / ".claude", scope="local")
+
+    assert not success, message
+    assert str(exclude) in message and "not UTF-8" in message, message
+    assert snapshot(tmp_path) == before
+
+
+def test_c19_add_git_exclude_reports_undecodable_exclude(
+    tmp_path: Path, monkeypatch
+) -> None:
+    _home, project = sandbox(tmp_path, monkeypatch)
+    exclude = _plant_cp949_exclude(project)
+    before = exclude.read_bytes()
+
+    success, message = add_git_exclude(project, "local")
+
+    assert not success, message
+    assert "not UTF-8" in message, message
+    assert exclude.read_bytes() == before
+
+
+def test_c19_doctor_fails_while_local_exclude_block_missing(
+    tmp_path: Path, monkeypatch
+) -> None:
+    """C-19: doctor called a local install healthy while git saw all of it."""
+    _home, project, _base = fresh_install(tmp_path, monkeypatch, "local")
+
+    def exclude_check() -> dict:
+        checks = run_doctor(scope="local")["checks"]
+        found = [c for c in checks if "exclude" in c["name"]]
+        assert len(found) == 1, [c["name"] for c in checks]
+        return found[0]
+
+    assert exclude_check()["passed"]
+    ok, message = remove_git_exclude(project)
+    assert ok, message
+    check = exclude_check()
+    assert not check["passed"], check
+
+
+# --- C-07: import removal anchored to SC's own lines ------------------------
+
+
+@pytest.mark.parametrize(
+    ("scope", "import_line"),
+    [
+        ("user", "@superclaude/CLAUDE_SC.md"),
+        ("local", "@.claude/superclaude/CLAUDE_SC.md"),
+    ],
+)
+def test_c07_import_removal_keeps_user_lines(
+    tmp_path: Path, scope: str, import_line: str
+) -> None:
+    """C-07: any line holding `@superclaude/` lost everything from there to its
+    end — `docs@superclaude/wiki and stays.` became `docs`."""
+    base = tmp_path / ".claude"
+    base.mkdir()
+    user_text = (
+        "# Team notes\n"
+        "Our wiki lives at docs@superclaude/wiki and stays.\n"
+        "see @.claude/superclaude/x\n"
+    )
+    target = claude_path(base, scope)
+    target.write_text(user_text + f"\n# superclaude\n{import_line}\n", encoding="utf-8")
+
+    success, message = remove_claude_md_import(base, scope=scope)
+
+    assert success, message
+    assert target.read_text(encoding="utf-8") == user_text
+
+
+# --- C-13, C-14: `uninstall --remove-mcp` -----------------------------------
+
+FOREIGN_PLAYWRIGHT = {
+    "type": "stdio",
+    "command": "my-own-playwright",
+    "args": ["--mine"],
+}
+# What `claude mcp add ... tavily -- npx -y tavily-mcp@latest` records.
+SC_TAVILY = {
+    "type": "stdio",
+    "command": "npx",
+    "args": ["-y", "tavily-mcp@latest"],
+    "env": {},
+}
+
+
+def write_mcp_servers(home: Path, project: Path, scope: str, servers: dict) -> None:
+    """Register ``servers`` where Claude Code keeps ``scope``'s MCP servers."""
+    if scope == "project":
+        (project / ".mcp.json").write_text(
+            json.dumps({"mcpServers": servers}), encoding="utf-8"
+        )
+        return
+    doc = (
+        {"mcpServers": servers}
+        if scope == "user"
+        else {"projects": {str(project.resolve()): {"mcpServers": servers}}}
+    )
+    (home / ".claude.json").write_text(json.dumps(doc), encoding="utf-8")
+
+
+def record_claude_calls(monkeypatch) -> list[list[str]]:
+    """Answer every `claude` call with success and record its argv."""
+    calls: list[list[str]] = []
+
+    def fake_run(cmd, **_kwargs):
+        calls.append(list(cmd))
+        return subprocess.CompletedProcess(cmd, 0, "", "")
+
+    monkeypatch.setattr(install_mcp, "_run_command", fake_run)
+    monkeypatch.setattr(shutil, "which", lambda name, *a, **k: f"/stub/{name}")
+    return calls
+
+
+@pytest.mark.parametrize("scope", SCOPES)
+def test_c13_remove_mcp_keeps_a_foreign_server_of_the_same_name(
+    tmp_path: Path, monkeypatch, scope: str
+) -> None:
+    """C-13: a user's own `playwright` (their command, not the registry's) was
+    removed at every scope; README says user servers are preserved (Q12 a)."""
+    home, project = sandbox(tmp_path, monkeypatch)
+    write_mcp_servers(
+        home, project, scope, {"playwright": FOREIGN_PLAYWRIGHT, "tavily": SC_TAVILY}
+    )
+    calls = record_claude_calls(monkeypatch)
+
+    _removed, _skipped, failed, messages = install_mcp.uninstall_mcp_servers(
+        scope=scope, project_root=None if scope == "user" else project
+    )
+
+    removes = [c for c in calls if "remove" in c]
+    assert failed == 0, messages
+    assert not [c for c in removes if "playwright" in c], removes
+    assert [c for c in removes if "tavily" in c], removes
+
+
+def _no_claude_on_path(tmp_path: Path, monkeypatch) -> None:
+    empty = tmp_path / "empty-bin"
+    empty.mkdir()
+    monkeypatch.setenv("PATH", str(empty))
+    assert shutil.which("claude") is None
+
+
+def test_c14_remove_mcp_without_claude_reports_a_failure(
+    tmp_path: Path, monkeypatch
+) -> None:
+    """C-14: with no `claude` on PATH the plugin check raised FileNotFoundError."""
+    sandbox(tmp_path, monkeypatch)
+    _no_claude_on_path(tmp_path, monkeypatch)
+
+    _removed, _skipped, failed, messages = install_mcp.uninstall_mcp_servers(
+        scope="user"
+    )
+
+    assert failed == 1, messages
+    assert any("claude" in m and "PATH" in m for m in messages), messages
+
+
+def test_c14_uninstall_remove_mcp_without_claude_deletes_nothing(
+    tmp_path: Path, monkeypatch
+) -> None:
+    """C-14: the traceback came after everything else was deleted, and the
+    summary never printed."""
+    _home, _project, base = fresh_install(tmp_path, monkeypatch, "user")
+    _no_claude_on_path(tmp_path, monkeypatch)
+    before = snapshot(tmp_path)
+
+    success, message = uninstall_all(base_path=base, scope="user", keep_mcp=False)
+
+    assert not success, message
+    assert "claude" in message and "--remove-mcp" in message, message
+    assert snapshot(tmp_path) == before

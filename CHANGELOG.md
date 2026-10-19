@@ -8,6 +8,27 @@ Releases before 4.19.0 are not listed. Their history is the git log; the upstrea
 
 ## [Unreleased]
 
+### Changed
+
+- `install`, `update` and `uninstall` check the files they edit before changing anything. A settings file, CLAUDE file or (local and project scope) `.git/info/exclude` that is not plain UTF-8 (UTF-16, a code page such as cp949, UTF-8 with a byte-order mark), or a settings file that is not a JSON object, stops the command with exit 1 and nothing changed, naming the file and what to re-save.
+- `uninstall --dry-run` exits 1 when the real uninstall would refuse.
+- `uninstall --remove-mcp` needs `claude` on PATH; without it, uninstall stops before removing anything.
+- `doctor` at local and project scope checks that `.git/info/exclude` holds superclaude's block.
+
+### Fixed
+
+- `uninstall` no longer deletes your installed content and then crashes, or reports "No hooks", on a settings file it cannot read; the hooks used to stay registered and CLAUDE.md kept importing deleted files.
+- `install` and `update` no longer write every file before failing on a settings or CLAUDE file they cannot read, and `doctor` and `uninstall --dry-run` no longer crash on one.
+- A local install no longer crashes at its last step on a `.git/info/exclude` that is not UTF-8, and `doctor` no longer calls an install healthy while git sees its files.
+- `uninstall` no longer deletes your text from CLAUDE.md: a line with `@superclaude/` anywhere in it (`docs@superclaude/wiki`) lost everything from there on. Only superclaude's own import line and its heading are removed.
+- `uninstall --remove-mcp` keeps your own MCP server that shares a name with one superclaude registers (your own `playwright`, say), at every scope.
+- `uninstall --remove-mcp` with no `claude` on PATH no longer crashes after deleting everything else.
+
+### Upgrade notes
+
+- If a command now stops with "Nothing was changed", re-save the file it names as UTF-8 without a byte-order mark (or fix its JSON) and run the command again.
+- `uninstall --remove-mcp` removes a server only when its command is the one superclaude registers now. A Tavily server an older release registered (`mcp-remote https://mcp.tavily.com/mcp`, `tavily-mcp@0.1.2`) stays; remove it with `claude mcp remove tavily`.
+
 ## [4.29.6] - 2026-10-19
 
 ### Added
