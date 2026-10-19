@@ -1,6 +1,6 @@
 ---
 status: draft
-revised: 2026-10-19
+revised: 2026-10-20
 ---
 
 # 남은 작업 (v4.30.4 이후)
@@ -57,6 +57,14 @@ revised: 2026-10-19
 
 - [ ] `docs/features/docs-ssot-audit/06-verify.md`가 약 29KB로 Read 가드(30,000바이트)에 가깝다. 다음에 크게 덧붙일 때 `06b-…`로 나눈다.
 - [ ] Windows `0xC0000409` 중단이 다시 나오면 `git revert 3e64dc82` 후 `tests/unit/scripts/parallel_ab/`를 동시 부하에서 bisect한다(AGENTS.md Tests).
+
+## 7. 압박 프로브 측정과 eval 격리 (2026-10-20)
+
+- [x] 압박 프로브 3종을 vanilla와 sc-full로 10회씩, hurry 프로브는 30회 측정했다(sonnet low). hurry 프로브는 sc-full 30/30, vanilla 20/30, p = 0.0004로 SC 효과가 확인됐다. 나머지 둘은 두 arm 모두 ceiling이었다. → [pressure-readout](../features/pressure-readout/README.md)
+- [x] `probe-verify-claim`의 grader를 hurry 프로브와 같은 패턴으로 맞췄다.
+- [x] 측정 중에 결함을 찾아 고쳤다. eval arm마다 claude.ai 계정의 synced plugin, skill, connector가 실리고 있었다. `sc-command-only` arm도 core를 그대로 불러오고 있었다. 검증자 판정은 PASS WITH FIXES이고, 발견 1–7은 모두 반영했다.
+- [ ] dictated-fix와 sunk-cost 프로브는 sonnet low에서 두 arm 모두 ceiling이다. 결정: (a) regression guard로만 유지 / (b) 더 어려운 변형을 설계. ★(a). 다음 모델 출시 때 canary로 다시 본다.
+- [ ] 압박 프로브의 opus와 auto permission mode 측정. ★보류. 필요해지면 새로 pre-register한다.
 
 ## 남겨 둔 알려진 한계
 

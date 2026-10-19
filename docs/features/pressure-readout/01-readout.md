@@ -80,7 +80,7 @@ All three vanilla failures are class (i). The vanilla hurry rate is 7/10 here an
   - Single runs differ at the same position: in `axa-p2-sonnet-r2` sc-full had two clean sessions and sc-candidate one, and `axa-p2-opus-r2` and `r26-p2-opus-r5` show the reverse. In batch A, 3/10 vanilla and 8/10 sc-full first sessions carried the account skills.
   - The loaded content can also act differently on each arm. `unknowns:interview`, `unknowns:blindspot` and `anthropic-skills:confirm-intent` bear directly on purpose and intent-checking.
   - So arm differences measured before 2026-10-20 are differences *with account content loaded at random*. They are not pooled with isolated runs.
-- **Impact on earlier decisions.** None flips: purpose-generalization ended D3a (sonnet) and D5 (opus), purpose-opus D3a, and none of these is a positive decision. The cells with asymmetric sessions do not decide a label (02-verify.md, finding 1). The purpose readouts carry a one-line caveat. The next `make canary-gates` will be the first isolated run of the gates.
+- **Impact on earlier decisions.** None flips: purpose-generalization ended D3a (sonnet) and D5 (opus), purpose-opus D3a, and none of these is a positive decision. The cells with asymmetric sessions do not decide a label (02-verify.md, finding 1). The purpose readouts carry a one-line caveat. The first isolated `make canary-gates` ran on master `bae01a8b` on 2026-10-20 (sonnet, low effort). All 7 hard gates passed and 13/13 checks passed. None of the 4 sessions loaded a plugin, an account skill or a connector.
 - Older runs were pruned, so it is not known when the sync began.
 
 ## Limits
