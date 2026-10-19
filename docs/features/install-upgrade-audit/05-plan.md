@@ -39,8 +39,8 @@ All are hypotheses until §4 verification.
 - [x] P2 Matrix 1 — [02-scenarios.md](./02-scenarios.md), [02a-scenarios-edge.md](./02a-scenarios-edge.md)
 - [x] P3 Review — [03a-findings-review.md](./03a-findings-review.md)
 - [x] P4 Triage — [03-findings.md](./03-findings.md)
-- [ ] P5 Fixes
-- [ ] P6 Matrix 2
+- [x] P5 Fixes — 0054ef0b, e7e72cf4, 7a43ee06; [03-findings.md](./03-findings.md) P5 status
+- [x] P6 Matrix 2 — [04-matrix-run2.md](./04-matrix-run2.md), handoff [04a-handoff.md](./04a-handoff.md)
 - [ ] P7 Verify
 - [ ] P8 Windows (owner)
 - [ ] P9 Release
