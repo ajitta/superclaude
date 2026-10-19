@@ -2428,25 +2428,52 @@ RO_COMMANDS = {
 }
 
 
+def _edited_file(tmp_path: Path, base: Path, scope: str, which: str) -> Path:
+    """The scope's settings, CLAUDE or git exclude file: the files a command edits."""
+    from superclaude.cli.install_settings import _claude_md_target
+
+    if which == "settings":
+        return settings_path(base, scope)
+    if which == "claude":
+        return _claude_md_target(base, scope)[0]
+    return tmp_path / "project" / ".git" / "info" / "exclude"
+
+
+RO_FILES = [
+    (which, scope)
+    for which in ("settings", "claude", "exclude")
+    for scope in SCOPES
+    if which != "exclude" or scope != "user"
+]
+
+
 @_not_root
 @pytest.mark.parametrize("command", list(RO_COMMANDS))
-@pytest.mark.parametrize("scope", SCOPES)
-def test_c21_a_read_only_settings_file_is_refused_before_any_write(
-    tmp_path: Path, monkeypatch, command: str, scope: str
+@pytest.mark.parametrize(("which", "scope"), RO_FILES)
+def test_c21_a_read_only_input_file_is_refused_before_any_write(
+    tmp_path: Path, monkeypatch, command: str, which: str, scope: str
 ) -> None:
     """C-21 (E2-ro-settings): a 0444 settings file was replaced with exit 0, the
     temp-file rename never asking the file. Refused like the other input
-    preflights: exit 1, the file named, nothing written or deleted."""
+    preflights: exit 1, the file named, nothing written or deleted. The CLAUDE
+    file and the git exclude file the same (06c Y-3): a 0444 CLAUDE.md passed
+    the preflight and install wrote 117 files, then died on a traceback."""
     if command == "install":
         home, project = sandbox(tmp_path, monkeypatch)
         base = scope_base(home, project, scope)
-        settings = settings_path(base, scope)
-        settings.parent.mkdir(parents=True, exist_ok=True)
-        settings.write_text('{"model": "opus"}\n', encoding="utf-8")
+        target = _edited_file(tmp_path, base, scope, which)
+        target.parent.mkdir(parents=True, exist_ok=True)
+        if which == "settings":
+            target.write_text('{"model": "opus"}\n', encoding="utf-8")
+        elif which == "claude":
+            target.write_text(CLAUDE_TEXT, encoding="utf-8", newline="")
+        else:
+            target.write_text("*.swp\n", encoding="utf-8")
     else:
         _home, _project, base = fresh_install(tmp_path, monkeypatch, scope)
-        settings = settings_path(base, scope)
-    settings.chmod(0o444)
+        target = _edited_file(tmp_path, base, scope, which)
+    assert target.is_file()
+    target.chmod(0o444)
     before = snapshot(tmp_path)
 
     result = CliRunner().invoke(main, [*RO_COMMANDS[command], "--scope", scope])
@@ -2454,9 +2481,9 @@ def test_c21_a_read_only_settings_file_is_refused_before_any_write(
     output = all_output(result)
     assert result.exception is None or isinstance(result.exception, SystemExit), output
     assert result.exit_code == 1, output
-    assert str(settings) in output and "read-only" in output, output
+    assert target.name in output and "read-only" in output, output
     assert snapshot(tmp_path) == before
-    assert stat.S_IMODE(settings.stat().st_mode) == 0o444
+    assert stat.S_IMODE(target.stat().st_mode) == 0o444
 
 
 @_not_root

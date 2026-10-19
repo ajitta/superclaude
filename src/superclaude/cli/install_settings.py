@@ -174,6 +174,24 @@ def _load_settings(settings_file: Path) -> dict:
     return data if isinstance(data, dict) else {}
 
 
+def _read_only_problem(path: Path) -> Optional[str]:
+    """Why ``path`` cannot be written, or None (also when it is missing).
+
+    Every file superclaude edits in place is checked before the first write: a
+    0444 CLAUDE.md passed the preflight, install wrote its 117 other files and
+    then died on a ``PermissionError`` traceback (06c, Y-3), while the same
+    mode on the settings file was refused up front. ``os.access`` asks the
+    file, not the directory, so the mode the user set is what counts (root,
+    which ``os.access`` always answers yes, is not refused).
+    """
+    if path.exists() and not os.access(path, os.W_OK):
+        mode = stat.S_IMODE(path.stat().st_mode)
+        return (
+            f"{path} is read-only (mode {mode:04o}); make it writable or move it aside"
+        )
+    return None
+
+
 def _unwritable_settings(
     settings_file: Path, *, check_mode: bool = True
 ) -> Optional[str]:
@@ -196,12 +214,10 @@ def _unwritable_settings(
     problem = _encoding_problem(settings_file)
     if problem:
         return problem
-    if check_mode and not os.access(settings_file, os.W_OK):
-        mode = stat.S_IMODE(settings_file.stat().st_mode)
-        return (
-            f"{settings_file} is read-only (mode {mode:04o}); make it writable "
-            "or move it aside"
-        )
+    if check_mode:
+        problem = _read_only_problem(settings_file)
+        if problem:
+            return problem
     if not settings_file.read_bytes().strip():
         return None
     try:
@@ -231,7 +247,7 @@ def input_problems(base_path: Path, scope: str, settings: bool = True) -> List[s
         if problem:
             problems.append(problem)
     claude_md, _import_line = _claude_md_target(base_path, scope)
-    problem = _encoding_problem(claude_md)
+    problem = _encoding_problem(claude_md) or _read_only_problem(claude_md)
     if problem:
         problems.append(problem)
     return problems

@@ -52,7 +52,7 @@ from .install_paths import (
     SHARED_TARGET_COMPONENTS,
     shipped_names,
 )
-from .install_settings import _encoding_problem
+from .install_settings import _encoding_problem, _read_only_problem
 
 MARKER_START = "# >>> superclaude >>>"
 MARKER_END = "# <<< superclaude <<<"
@@ -272,7 +272,7 @@ def exclude_problem(project_root: Path) -> Optional[str]:
     exclude_file = _resolve_git_exclude_file(project_root)
     if exclude_file is None:
         return None
-    return _encoding_problem(exclude_file)
+    return _encoding_problem(exclude_file) or _read_only_problem(exclude_file)
 
 
 def _migrate_legacy_gitignore(project_root: Path) -> Optional[str]:
