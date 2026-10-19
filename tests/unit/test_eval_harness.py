@@ -716,6 +716,32 @@ def test_account_content_stays_out_of_every_arm(tmp_path, monkeypatch):
     assert seen_env[-1].get("ENABLE_CLAUDEAI_MCP_SERVERS") == "false"
 
 
+def test_command_only_arm_strips_every_core_import(tmp_path):
+    """sc-command-only must load no always-on core. A project install writes
+    the import into `.claude/CLAUDE.md` (install_settings), not only the root
+    CLAUDE.md the harness used to strip, so that arm loaded the full core and
+    read as sc-full (docs/features/pressure-readout/02-verify.md)."""
+    from superclaude.cli.install_settings import update_claude_md_import
+
+    run_eval = _import_run_eval()
+    ws = tmp_path / "ws"
+    (ws / ".claude").mkdir(parents=True)
+    ok, _ = update_claude_md_import(ws / ".claude", scope="project")
+    assert ok and "CLAUDE_SC.md" in (ws / ".claude" / "CLAUDE.md").read_text()
+    (ws / "CLAUDE.md").write_text(
+        f"# project notes\n\n{run_eval.IMPORT_LINE}\n", encoding="utf-8"
+    )
+
+    run_eval._set_core_import(ws, enabled=False)
+    for f in (ws / "CLAUDE.md", ws / ".claude" / "CLAUDE.md"):
+        if f.exists():
+            assert "CLAUDE_SC.md" not in f.read_text(encoding="utf-8"), f
+    assert "# project notes" in (ws / "CLAUDE.md").read_text(encoding="utf-8")
+
+    run_eval._set_core_import(ws, enabled=True)
+    assert run_eval.IMPORT_LINE in (ws / "CLAUDE.md").read_text(encoding="utf-8")
+
+
 def test_permission_mode_flag_is_passed_through_when_set(tmp_path, monkeypatch):
     """`--permission-mode auto` must reach the claude -p argv before the `--`
     prompt separator, and be recorded on the result so two runs can be told

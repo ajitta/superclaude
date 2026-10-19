@@ -54,6 +54,7 @@ from pathlib import Path
 
 import yaml
 
+from superclaude.cli.install_settings import remove_claude_md_import
 from superclaude.utils import detect_refusal
 
 EVALS_DIR = Path(__file__).resolve().parent
@@ -217,7 +218,13 @@ def build_workspace(arm: str, task: dict, runs_dir: Path, superclaude_bin: str) 
 def _set_core_import(ws: Path, enabled: bool) -> None:
     """Force the always-loaded core import line present (sc-full/core-lite)
     or absent (sc-command-only) in the workspace CLAUDE.md, regardless of
-    what the installer did."""
+    what the installer did. The project install also writes its own import
+    into `.claude/CLAUDE.md`; sc-command-only removes that one through the
+    installer's own uninstall path, or the arm loads the full core."""
+    if not enabled:
+        ok, msg = remove_claude_md_import(ws / ".claude", scope="project")
+        if not ok:
+            raise RuntimeError(f"core import removal failed in {ws}: {msg}")
     claude_md = ws / "CLAUDE.md"
     lines = (
         claude_md.read_text(encoding="utf-8").splitlines() if claude_md.exists() else []
