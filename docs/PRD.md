@@ -58,8 +58,10 @@ The load-bearing set. Anything not on this list is support for something on it.
    chosen scope for a small managed set. Nothing is pre-selected or
    auto-enabled.
 7. **Session memory and insight capture** — `/sc:load` / `/sc:save`, plus
-   hook-written `.claude/insights.jsonl` at SessionStart / PreCompact / Stop /
-   SessionEnd, so what a session learned survives it.
+   hooks that harvest `INSIGHT:` lines into `.claude/insights.pending.jsonl`
+   (PreCompact, SessionEnd, and the Stop request) and report the pending
+   count at SessionStart; `/sc:insight` and `superclaude insight promote`
+   write `.claude/insights.jsonl`, so what a session learned survives it.
 
 ## MVP Exclusions (Out of Scope)
 

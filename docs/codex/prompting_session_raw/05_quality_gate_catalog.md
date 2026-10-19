@@ -7,6 +7,8 @@ measured_at: 5b6dc5b
 
 # superclaude 품질 게이트 카탈로그
 
+> 2026-10-19: D-09·D-13 항목(테스트 파일 이름, `verify` 타깃)만 재확인 (docs-ssot-audit). 그 밖의 내용은 2026-08-22 검증 그대로다.
+
 기준선 수치는 이 문서에 두지 않는다. 현재 baseline과 재측정 명령은
 [`08_current_findings_and_backlog.md`](08_current_findings_and_backlog.md)의 `F-006`,
 `F-009`, `F-014`가 소유한다.

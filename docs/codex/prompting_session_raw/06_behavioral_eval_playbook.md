@@ -9,6 +9,8 @@ applies_to:
 
 # 행동 평가와 회귀 플레이북
 
+> 2026-10-19: D-08 항목(arms·matrix task 표현)만 재확인 (docs-ssot-audit). 그 밖의 내용은 2026-08-22 검증 그대로다.
+
 ## 1. 평가 계약
 
 ```text

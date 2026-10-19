@@ -25,9 +25,8 @@ in-repo runs read plan/spec docs and false-pass not-yet-installed rules).
 
 `tasks.yaml` defines the matrix tasks (those without `canary_only: true`;
 `run_eval.py` runs each across every arm in `ARMS`) and the canary-only
-tasks: behavior slices, prose-rule probes, the command-checkpoint probe
-(`implement-checkpoint`), the skill and command-routing probes (why a task
-is canary-only: see the group comments in `tasks.yaml`).
+tasks, grouped by the section comments in `tasks.yaml`, which also say why
+each group is canary-only.
 Check `tag`s map to roadmap metrics: `success`, `scope` (unnecessary file
 changes), `verification` (actual-verification-ran), `location` (output
 location accuracy), `gotcha_compliance`, `citation` (file:line accuracy),

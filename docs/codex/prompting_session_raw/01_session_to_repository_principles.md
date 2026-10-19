@@ -1,11 +1,13 @@
 ---
 title: 원문 세션 원칙의 저장소 적용 모델
 status: working-guide
-last_verified: 2026-08-22
+last_verified: 2026-10-19
 scope: src/superclaude
 ---
 
 # 원문 세션 원칙의 저장소 적용 모델
+
+> 2026-10-19: D-08 항목(arms 표현)만 재확인 (docs-ssot-audit). 그 밖의 내용은 2026-08-22 검증 그대로다.
 
 ## 1. 목적과 해석 경계
 
@@ -60,7 +62,7 @@ raw-session idea
 | Multi-agent isolation | agents, delegation rules, worktree patterns | 반환 증거 재검증 | 역할극만을 위해 위임하지 않음 |
 | Hard gate vs soft metric | `evals/tasks.yaml`의 `gate: true`와 태그 지표 | exit code 2/1/0 | hard failure는 평균으로 상쇄 금지 |
 | Golden task | `evals/fixtures/` + `tasks.yaml` | 동일 fixture/arm 비교 | golden answer가 아니라 허용 결과 공간 정의 |
-| Regression / ablation | 4-arm harness, `parallel_ab` | baseline 대비 slice 비교 | 전체 평균만으로 배포 금지 |
+| Regression / ablation | multi-arm harness(`run_eval.py` `ARMS`), `parallel_ab` | baseline 대비 slice 비교 | 전체 평균만으로 배포 금지 |
 | Security outcome | destructive guard, poisoned fixture | 실제 파일·tool input·출력 검사 | 안전하다고 말했는지가 아니라 행동 검사 |
 
 ## 4. 평가 대상은 문장 품질이 아니다

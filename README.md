@@ -503,7 +503,6 @@ superclaude mcp
 - Each load-bearing claim: ≥2 independent sources, or one primary source; otherwise labeled single-source
 - Source credibility tiers 1–4 (academic/official → forums)
 - A contradiction on a load-bearing claim triggers a replan
-- Every claim carries a confidence tag
 
 </td>
 <td width="50%">
@@ -540,7 +539,7 @@ superclaude mcp
 | Depth | Sources | Hops | Best For |
 |:-----:|:-------:|:----:|----------|
 | **Quick** | 10 | 1 | Quick facts, simple queries |
-| **Standard** | 20 | 3 | General research (default) |
+| **Standard** | 20 | 3 | General research |
 | **Deep** | 40 | 4 | Comprehensive analysis |
 | **Exhaustive** | 50+ | 5 | Academic-level research |
 

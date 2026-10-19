@@ -8,6 +8,8 @@ scope: repository-wide evidence relevant to src/superclaude
 
 # 현재 검증 사각지대와 개선 백로그
 
+> 2026-10-19: D-08·D-09·D-12·D-13 항목(F-002, F-005, F-014, F-016의 이름과 명령)만 재확인; 측정치와 `measured_at`은 그대로 (docs-ssot-audit). 그 밖의 내용은 2026-08-22 검증 그대로다.
+
 이 문서는 직접 재현했거나 source/test를 대조해 확인한 사실을 기록한다. 결함 자체는
 수정하지 않는다. 상태가 바뀌면 증거와 함께 항목을 갱신한다.
 
@@ -278,7 +280,7 @@ user home의 `.claude`에 고정해 확인한다. project/local 설치 진단과
 uv run --with pytest-cov pytest --cov=superclaude --cov-report=term -q
 ```
 
-`pytest-cov`는 4.29.0에서 dev extras와 `[tool.coverage.*]` 설정이 제거되었으므로 `--with`로 넣어 재측정한다.
+coverage 플러그인은 4.29.0에서 패키지 의존성과 `[tool.coverage.*]` 설정에서 빠졌으므로 `--with pytest-cov`로 넣어 재측정한다.
 
 coverage target을 `src/superclaude` path로 바꾸면 다른 분모와 결과가 나올 수 있으므로
 baseline 비교에서는 target과 명령을 고정한다.
@@ -353,7 +355,7 @@ repo에 없었고 손으로 유지됐다. 유지하지 않기로 하고 `okf/`�
 원래 판정은 옛 `build-plugin` 타깃이 입력인 `plugins/superclaude/manifest/metadata.json`과
 source payload 없이 exit 2로 끝난다는 것이었다. `plugins/superclaude/`는 b8cd144에서
 삭제됐고 입력을 되살릴 계획이 없어, `build-plugin`, `sync-plugin-repo`, `PLUGIN_*` 변수,
-`scripts/build_superclaude_plugin.py`와 (같이 죽은) `make translate`를 삭제했다.
+`scripts/build_superclaude_plugin.py`와 (같이 죽은) 옛 `translate` 타깃을 삭제했다.
 pytest plugin을 확인하는 `make test-plugin`은 그대로다. repo root `.claude-plugin/` 계획
 (runtime-behavior-audit Task 13)은 별개 경로라 영향이 없다.
 
