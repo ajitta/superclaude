@@ -399,8 +399,10 @@ def uninstall_all(
                 failed += 1
             removed += 1
         else:
+            # Kept lines go out even when a later skill fails: one already
+            # reduced to the user's files is never matched again.
+            notices = []
             try:
-                notices = []
                 for d in stale:
                     kept = remove_legacy_skill(d)
                     if kept:
@@ -409,11 +411,12 @@ def uninstall_all(
                     f"✅ Removed: {len(stale)} skill(s) from a pre-removal release "
                     f"(preserved non-superclaude skills)"
                 )
-                messages.extend(notices)
                 removed += 1
             except OSError as e:
                 messages.append(f"❌ Failed to remove legacy skills: {e}")
                 failed += 1
+            finally:
+                messages.extend(notices)
     else:
         messages.append("⏭️  No skills from a pre-removal release found")
         skipped += 1

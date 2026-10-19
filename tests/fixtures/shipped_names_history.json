@@ -1,5 +1,5 @@
 {
- "generated_from": "git log --first-parent --diff-merges=first-parent HEAD @ 782996c3",
+ "generated_from": "git log --full-history HEAD @ f36d4a0d",
  "generator": "scripts/gen_shipped_names.py (full clone only)",
  "names": {
   "agents": [
@@ -161,7 +161,7 @@
    },
    {
     "name": "verifier.md",
-    "first": "7e353036",
+    "first": "3362816e",
     "last": "00d40c47",
     "shipped_now": true
    }
@@ -219,13 +219,13 @@
    },
    {
     "name": "sc-author",
-    "first": "007be180",
+    "first": "87ea2a13",
     "last": "d3feaf49",
     "shipped_now": true
    },
    {
     "name": "sc-prompt",
-    "first": "a4dcb5ea",
+    "first": "be501b18",
     "last": "d3feaf49",
     "shipped_now": true
    },
@@ -397,6 +397,7 @@
    "633bdf03f2baa723025333a08d79d15b69c0b2bf14974ddfd293a57c019da931",
    "64d151ed5758f017bed54d8184d536e602b50adeaca342ca67934384d12d7e2a",
    "6cf848c110dcc5de485d74bf5c5d57546b929f2b2b949ab72e94bc93d0cffa9c",
+   "6de5472d76632183fec469f858aa6601055f7b0f03da5968d63dc8779eb5501e",
    "6f1805320580cb8f7233fde57b3ede21b9929605635e15b364eb8eb7b4e45d38",
    "6f9774694ca8835e671027b76f9ce3b8a7c699797b78d65f4d6b18e465496800",
    "74aa7d4821df64092624812a8c73b1f3485e93259a4ce0c0a715f66abdeccf4a",
@@ -413,6 +414,7 @@
    "c425e17264998059a0b5008eba585fb1498073e627c8f13c16a4bd23a38dc068",
    "c8836d38511bf20ee5f444f2ce5ba447e79dd613ee9d17ea6ab3ddb724b381c8",
    "d2ab3593cec50d92b79335f35cf0c11bf6a2a80c6f99e7c64cff178dc4f3e65a",
+   "d998d72952ba1c4055d4619d7202436ad3da9bf7ef45afd143436b7976fc4b71",
    "ddbee1d49c7965597b2b9ce51af648f1fa27a5bb8845797a21ff898cfb578958",
    "ec37cb90a65e0d358247cabccd33b4b783dd472fba075ac5b83197d8da06646f",
    "f0c20427c562d6b19cd66c398726e6e18a4e945f59ea20ab9aa1b8cdbf9c44bf"
@@ -431,6 +433,7 @@
    "173a141f20c02783b19103108baa71319f8ce4f4121b83b863199ffc268ee8a5",
    "1df4d47dc8607e16c8dee5383a16ba2d8efb66d022051d1d28f92ceb7991b99f",
    "44b390fc668c130c0cc5622854196de71b340bfa8db3cb7a56f3f24678316200",
+   "4cd166b1989424792dc588ddb686f3b71a0bbf4f0da0f1d2a95be7b36c06cc99",
    "4da78fbc6c104bb4e35dd76f9bcaa253f03b32fadfa290135dd5e2dc4d3fc14b",
    "5b4b05b15a53a8dc3e2f40aa369a01380f3cbca2df25c93eceb0773063e2609c",
    "85b9cb0dac3b3238fe4e545ae29aa2768c459764e418aab3c1fdaf75dce3b5e7",
@@ -464,6 +467,7 @@
    "6e2904b8a9db7ed64247af47bbc2a1d5104881ca4f6f94c97c8797f6925069e6",
    "759133dbc162a83d908e55f92a730263b3ee0e2a206acc10e1a991d8a344b473",
    "a776e69b214cf814350217dd1ca6c030aee2875fd78033e2063cd1ab26ea8827",
+   "aab1c90e60d285bdbb997d1da21a676912c9e8793dae4c853774018b9c9fbcc9",
    "b57a96f73e1b12b2f157251aa41e9390e9a6056433ab197dbccd8fd9e9f43fb5",
    "ef01fd68320fa318d4df99c0de74def92c4f70ff33fe28fdbdcfa43bd576c7b3",
    "effc1fcd33a55d7e57b4a517b630b6b600b7474b2b9d6f27b77b2f1a2d573604",
@@ -528,7 +532,8 @@
    "bcdaa496c26ccb193c5b27807520cb3604a7651cb9c2ee32d30f2c26d14d451c",
    "c34e36fb5f12ac7d225bfe66e3886ed2f26f333ec6ffdc8beb43a1f3406ef322",
    "c5d3a7014d7413c8674e8c053094247b7c4e6908e15553ad257d55a8963ae42a",
-   "e3bffb0ea8da083b97f086e2d34c16d0572a004b41e9eb6ed208baa118a3a895"
+   "e3bffb0ea8da083b97f086e2d34c16d0572a004b41e9eb6ed208baa118a3a895",
+   "eeb3e30bc51ad9e4fac00cd6ea6458082b1f0811fe7028bfdcda1cde244c42f2"
   ],
   "verification-before-completion": [
    "1eadb466bc8378789fc50090f7655cef27333b7b404287d2c00a73162c682d49",
@@ -564,6 +569,7 @@
     "633bdf03f2baa723025333a08d79d15b69c0b2bf14974ddfd293a57c019da931",
     "64d151ed5758f017bed54d8184d536e602b50adeaca342ca67934384d12d7e2a",
     "6cf848c110dcc5de485d74bf5c5d57546b929f2b2b949ab72e94bc93d0cffa9c",
+    "6de5472d76632183fec469f858aa6601055f7b0f03da5968d63dc8779eb5501e",
     "6f1805320580cb8f7233fde57b3ede21b9929605635e15b364eb8eb7b4e45d38",
     "6f9774694ca8835e671027b76f9ce3b8a7c699797b78d65f4d6b18e465496800",
     "74aa7d4821df64092624812a8c73b1f3485e93259a4ce0c0a715f66abdeccf4a",
@@ -580,6 +586,7 @@
     "c425e17264998059a0b5008eba585fb1498073e627c8f13c16a4bd23a38dc068",
     "c8836d38511bf20ee5f444f2ce5ba447e79dd613ee9d17ea6ab3ddb724b381c8",
     "d2ab3593cec50d92b79335f35cf0c11bf6a2a80c6f99e7c64cff178dc4f3e65a",
+    "d998d72952ba1c4055d4619d7202436ad3da9bf7ef45afd143436b7976fc4b71",
     "ddbee1d49c7965597b2b9ce51af648f1fa27a5bb8845797a21ff898cfb578958",
     "ec37cb90a65e0d358247cabccd33b4b783dd472fba075ac5b83197d8da06646f",
     "f0c20427c562d6b19cd66c398726e6e18a4e945f59ea20ab9aa1b8cdbf9c44bf"
@@ -624,6 +631,7 @@
     "173a141f20c02783b19103108baa71319f8ce4f4121b83b863199ffc268ee8a5",
     "1df4d47dc8607e16c8dee5383a16ba2d8efb66d022051d1d28f92ceb7991b99f",
     "44b390fc668c130c0cc5622854196de71b340bfa8db3cb7a56f3f24678316200",
+    "4cd166b1989424792dc588ddb686f3b71a0bbf4f0da0f1d2a95be7b36c06cc99",
     "4da78fbc6c104bb4e35dd76f9bcaa253f03b32fadfa290135dd5e2dc4d3fc14b",
     "5b4b05b15a53a8dc3e2f40aa369a01380f3cbca2df25c93eceb0773063e2609c",
     "85b9cb0dac3b3238fe4e545ae29aa2768c459764e418aab3c1fdaf75dce3b5e7",
@@ -663,6 +671,7 @@
     "6e2904b8a9db7ed64247af47bbc2a1d5104881ca4f6f94c97c8797f6925069e6",
     "759133dbc162a83d908e55f92a730263b3ee0e2a206acc10e1a991d8a344b473",
     "a776e69b214cf814350217dd1ca6c030aee2875fd78033e2063cd1ab26ea8827",
+    "aab1c90e60d285bdbb997d1da21a676912c9e8793dae4c853774018b9c9fbcc9",
     "b57a96f73e1b12b2f157251aa41e9390e9a6056433ab197dbccd8fd9e9f43fb5",
     "ef01fd68320fa318d4df99c0de74def92c4f70ff33fe28fdbdcfa43bd576c7b3",
     "effc1fcd33a55d7e57b4a517b630b6b600b7474b2b9d6f27b77b2f1a2d573604",
@@ -779,7 +788,8 @@
     "bcdaa496c26ccb193c5b27807520cb3604a7651cb9c2ee32d30f2c26d14d451c",
     "c34e36fb5f12ac7d225bfe66e3886ed2f26f333ec6ffdc8beb43a1f3406ef322",
     "c5d3a7014d7413c8674e8c053094247b7c4e6908e15553ad257d55a8963ae42a",
-    "e3bffb0ea8da083b97f086e2d34c16d0572a004b41e9eb6ed208baa118a3a895"
+    "e3bffb0ea8da083b97f086e2d34c16d0572a004b41e9eb6ed208baa118a3a895",
+    "eeb3e30bc51ad9e4fac00cd6ea6458082b1f0811fe7028bfdcda1cde244c42f2"
    ],
    "canary.yaml": [
     "b48022c56de5ffe34e3db78a7f67e43c0bad25768dd2578061333333b82e2f1b"
@@ -854,7 +864,7 @@
   },
   {
    "event": "Stop",
-   "first": "6d6f09ba",
+   "first": "d1b4784e",
    "last": "6feae043",
    "shipped_now": true
   },
@@ -935,6 +945,14 @@
    "shipped_now": true
   },
   {
+   "event": "PreToolUse",
+   "entry_point": "test_file_guard",
+   "subcommand": "check",
+   "first": "3362816e",
+   "last": "3362816e",
+   "shipped_now": false
+  },
+  {
    "event": "SessionEnd",
    "entry_point": "insight_writer",
    "subcommand": "harvest-from-hook",
@@ -970,7 +988,7 @@
    "event": "SessionStart",
    "entry_point": "memory_staleness",
    "subcommand": "",
-   "first": "06113d3f",
+   "first": "01a520bc",
    "last": "9961e620",
    "shipped_now": true
   },
@@ -994,7 +1012,7 @@
    "event": "Stop",
    "entry_point": "insight_writer",
    "subcommand": "request-from-hook",
-   "first": "6d6f09ba",
+   "first": "d1b4784e",
    "last": "9961e620",
    "shipped_now": true
   },
@@ -1025,7 +1043,7 @@
   {
    "event": "PreToolUse",
    "command": "jq -r '.tool_input.command // empty' | head -1 | grep -qE 'rm\\s+-rf\\s+/\\s*$|rm\\s+-rf\\s+/\\*|git\\s+push\\s+.*--force([^-]|$).*(main|master)' && echo 'BLOCKED: destructive command detected (--force-with-lease is allowed)' >&2 && exit 2 || exit 0",
-   "first": "e31caf5d",
+   "first": "bac82037",
    "last": "f823f933"
   },
   {

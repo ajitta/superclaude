@@ -22,6 +22,7 @@ import shutil
 import subprocess
 import sys
 from pathlib import Path
+from typing import NamedTuple
 
 import pytest
 from click.testing import CliRunner
@@ -1226,6 +1227,10 @@ W1_OPERATIONS = ["install", "install --force", "update", "uninstall -y"]
 _KEPT_LINE = re.compile(r"Kept (\d+) file\(s\) in (.+?): ")
 
 
+class _W1Copy(NamedTuple):
+    of: str
+
+
 def _w1_shipped() -> dict[str, str]:
     """W1_SKILL's files as W1_ERA's installer wrote them, by path in the skill."""
     prefix = f"$HOME/.claude/skills/{W1_SKILL}/"
@@ -1239,12 +1244,18 @@ def _w1_shipped() -> dict[str, str]:
 
 
 def _plant_w1_skill(base: Path, case: dict) -> Path:
+    """``add`` maps a path to its text, or to ``_W1Copy(<shipped path>)`` for a
+    copy of that shipped file; ``crlf`` writes every file with CRLF endings."""
     skill = base / "skills" / W1_SKILL
     shipped = _w1_shipped()
-    files = {**shipped, **case["add"]}
+    files = dict(shipped)
+    for rel, text in case["add"].items():
+        files[rel] = shipped[text.of] if isinstance(text, _W1Copy) else text
     for rel, suffix in case["edit"].items():
         files[rel] = shipped[rel] + suffix
     for rel, text in files.items():
+        if case.get("crlf"):
+            text = text.replace("\r\n", "\n").replace("\n", "\r\n")
         (skill / rel).parent.mkdir(parents=True, exist_ok=True)
         (skill / rel).write_text(text, encoding="utf-8", newline="")
     return skill
@@ -1264,6 +1275,24 @@ def _kept_lines(output: str) -> list[str]:
 
 W1_CASES = {
     "shipped-only": {"add": {}, "edit": {}, "kept": set(), "ours": True},
+    # A Windows checkout with core.autocrlf installs CRLF copies.
+    "shipped-only-crlf": {
+        "add": {},
+        "edit": {},
+        "kept": set(),
+        "ours": True,
+        "crlf": True,
+    },
+    # Shipped text at a path that skill never shipped it at is the user's copy.
+    "copy-elsewhere": {
+        "add": {
+            "backup/SKILL.md": _W1Copy("SKILL.md"),
+            "theory.md": _W1Copy("references/theory.md"),
+        },
+        "edit": {},
+        "kept": {"backup/SKILL.md", "theory.md"},
+        "ours": True,
+    },
     "user-file": {
         "add": {"my-notes.md": "my notes\n"},
         "edit": {},
@@ -1497,9 +1526,52 @@ def test_w1_skill_md_is_removed_last(tmp_path: Path, monkeypatch) -> None:
     assert kept == [skill / "my-notes.md"]
 
 
-def test_w1_retired_skill_files_module_is_generated_from_the_fixture() -> None:
-    """cli/retired_skill_files.py is what the generator renders from the
-    shipped-names history; editing either alone fails here."""
+@pytest.mark.parametrize("operation", W1_OPERATIONS)
+@pytest.mark.parametrize("scope", SCOPES)
+def test_w1_a_later_skills_error_keeps_the_earlier_kept_notice(
+    tmp_path: Path, monkeypatch, scope: str, operation: str
+) -> None:
+    """An OSError on the second retired skill dropped the first one's Kept line,
+    and its SKILL.md was already gone, so no later run could say it again."""
+    from superclaude.cli import install_components, install_inventory, install_paths
+
+    _home, _project, base = fresh_install(tmp_path, monkeypatch, scope)
+    skill = _plant_w1_skill(base, W1_CASES["user-file"])
+    other = base / "skills" / "finishing-a-development-branch"
+    other.mkdir(parents=True)
+    (other / "SKILL.md").write_text(
+        _era_blob(W1_ERA, f"$HOME/.claude/skills/{other.name}/SKILL.md"),
+        encoding="utf-8",
+        newline="",
+    )
+    (other / "my-notes.md").write_text("my notes\n", encoding="utf-8")
+    calls: list[Path] = []
+
+    def second_fails(skill_dir: Path) -> int:
+        calls.append(skill_dir)
+        if len(calls) == 2:
+            raise PermissionError(13, "Permission denied", str(skill_dir))
+        return install_paths.remove_legacy_skill(skill_dir)
+
+    for module in (install_components, install_inventory):
+        monkeypatch.setattr(module, "remove_legacy_skill", second_fails)
+
+    result = CliRunner().invoke(main, [*operation.split(), "--scope", scope])
+
+    output = all_output(result)
+    assert len(calls) == 2 and set(calls) == {skill, other}, output
+    assert "Permission denied" in output, output
+    done = calls[0]
+    assert not (done / "SKILL.md").exists(), output
+    kept = _kept_lines(output)
+    assert len(kept) == 1, output
+    count, where = _KEPT_LINE.search(kept[0]).groups()
+    assert int(count) == 1, kept
+    assert where.replace("\\", "/").endswith(f"skills/{done.name}"), kept
+
+
+def _generator():
+    """scripts/gen_shipped_names.py as a module."""
     import importlib.util
 
     script = Path(__file__).resolve().parents[2] / "scripts" / "gen_shipped_names.py"
@@ -1507,6 +1579,13 @@ def test_w1_retired_skill_files_module_is_generated_from_the_fixture() -> None:
     assert spec and spec.loader
     generator = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(generator)
+    return generator
+
+
+def test_w1_retired_skill_files_module_is_generated_from_the_fixture() -> None:
+    """cli/retired_skill_files.py is what the generator renders from the
+    shipped-names history; editing either alone fails here."""
+    generator = _generator()
     from superclaude.cli import install_paths, retired_skill_files
 
     rendered = generator.render_retired_skill_files(HISTORY)
@@ -1517,6 +1596,86 @@ def test_w1_retired_skill_files_module_is_generated_from_the_fixture() -> None:
         assert {d[:16] for d in files["SKILL.md"]} == {
             d[:16] for d in HISTORY["retired_skill_digests"][name]
         }, (name, REGENERATE)
+
+
+def test_w1_the_generator_reads_every_parent_of_a_merge(
+    tmp_path: Path, monkeypatch, isolated_git_config
+) -> None:
+    """The history was read along first parents only, so a revision reachable
+    only through a merge's second parent (a pull of the public master, a branch
+    someone installed from) was missing: confidence-check at c69190a2, four
+    SKILL.md files at 0fb95e7f, whose installs kept the whole retired skill."""
+    generator = _generator()
+    skill = "src/superclaude/skills/old"
+    hooks = "src/superclaude/hooks/hooks.json"
+    no_hooks = '{"hooks": {}}\n'
+    side_hook = json.dumps(
+        {
+            "hooks": {
+                "PreToolUse": [
+                    {
+                        "hooks": [
+                            {"command": "superclaude hook side_guard check"},
+                        ]
+                    }
+                ]
+            }
+        }
+    )
+    repo = init_git_repo(
+        tmp_path / "repo",
+        files={f"{skill}/SKILL.md": "v1\n", f"{skill}/ref.md": "r1\n", hooks: no_hooks},
+    )
+
+    def commit(files: dict[str, str | None], message: str) -> None:
+        for rel, text in files.items():
+            if text is None:
+                shutil.rmtree(repo / rel)
+                continue
+            (repo / rel).parent.mkdir(parents=True, exist_ok=True)
+            (repo / rel).write_text(text, encoding="utf-8")
+        subprocess.run(["git", "add", "-A"], cwd=repo, check=True)
+        subprocess.run(["git", "commit", "-qm", message], cwd=repo, check=True)
+
+    def git(*args: str) -> None:
+        subprocess.run(["git", *args], cwd=repo, check=True, capture_output=True)
+
+    git("checkout", "-qb", "side")
+    commit(
+        {
+            f"{skill}/SKILL.md": "v2\n",
+            f"{skill}/ref.md": "r2\n",
+            "src/superclaude/skills/side-only/SKILL.md": "s\n",
+            hooks: side_hook,
+        },
+        "side",
+    )
+    commit({"src/superclaude/skills/side-only": None, hooks: no_hooks}, "side back")
+    git("checkout", "-q", "main")
+    commit({f"{skill}/SKILL.md": "v3\n"}, "main")
+    # The merge keeps the first parent's tree: path-limited history
+    # simplification drops the side branch as well as --first-parent does.
+    git("merge", "-q", "-s", "ours", "side", "-m", "merge side")
+    commit({skill: None}, "retire old")
+    for kind in generator.DIRS.values():
+        (repo / kind).mkdir(parents=True, exist_ok=True)
+    monkeypatch.setattr(generator, "REPO", repo)
+
+    def digests(*texts: str) -> list[str]:
+        return sorted(hashlib.sha256(t.encode()).hexdigest() for t in texts)
+
+    assert generator.retired_digests("HEAD", "skills", ["old"]) == {
+        "old": digests("v1\n", "v2\n", "v3\n")
+    }
+    assert generator.retired_skill_files("HEAD", ["old"]) == {
+        "old": {
+            "SKILL.md": digests("v1\n", "v2\n", "v3\n"),
+            "ref.md": digests("r1\n", "r2\n"),
+        }
+    }
+    assert set(generator.collect_names("HEAD")["skills"]) == {"old", "side-only"}
+    _events, ids, *_ = generator.collect_hooks("HEAD")
+    assert ("PreToolUse", "side_guard", "check") in ids
 
 
 RETIRED_EVENTS = ("Setup", "TeammateIdle", "TaskCompleted")
@@ -1640,6 +1799,40 @@ def test_c09_retired_serena_hooks_go_only_when_superclaude_wrote_them(
         if any(hook["command"] == SERENA for hook in entry["hooks"])
     ]
     assert serena == [theirs], message
+
+
+@pytest.mark.parametrize("operation", ["install", "install --force", "uninstall -y"])
+def test_c09_a_branch_only_hook_registration_goes(
+    tmp_path: Path, monkeypatch, operation: str
+) -> None:
+    """3362816e registered `test_file_guard check`, reverted 14 minutes later on
+    the same branch: only a first-parent walk of the history missed it, and a
+    sync from that branch left a hook that now exits 1 on every Edit and Write."""
+    _home, _project, base = fresh_install(tmp_path, monkeypatch, "user")
+    data = json.loads((base / "settings.json").read_text(encoding="utf-8"))
+    command = "superclaude hook test_file_guard check"
+    data["hooks"]["PreToolUse"].append(
+        {
+            "matcher": "Edit|Write",
+            "hooks": [
+                {
+                    "_comment": "[superclaude] safety — blocks Edit/Write on test "
+                    "files while `superclaude hook test_file_guard lock` is set",
+                    "type": "command",
+                    "command": command,
+                    "timeout": 5,
+                }
+            ],
+        }
+    )
+    (base / "settings.json").write_text(json.dumps(data), encoding="utf-8")
+
+    result = CliRunner().invoke(main, [*operation.split(), "--scope", "user"])
+
+    assert result.exit_code == 0, all_output(result)
+    settings = base / "settings.json"
+    left = _registrations(settings) if settings.exists() else []
+    assert ("PreToolUse", command) not in left, all_output(result)
 
 
 def test_q13_every_retired_hook_identity_is_listed() -> None:

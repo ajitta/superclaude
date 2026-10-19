@@ -62,6 +62,8 @@ _SUBCOMMAND_RE = re.compile(r"[A-Za-z0-9_][A-Za-z0-9_-]*")
 RETIRED_HOOK_EVENTS = ("Setup", "TaskCompleted", "TeammateIdle")
 # (event, entry point, subcommand), as _hook_script_id reads a command.
 RETIRED_HOOK_IDS = (
+    # 3362816e, reverted on its branch (c147b80c) before the merge
+    ("PreToolUse", "test_file_guard", "check"),
     ("SessionStart", "insight_writer", "pending-count"),
     ("Setup", "session_init", ""),
     ("UserPromptSubmit", "skill_activator", ""),

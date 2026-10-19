@@ -2,10 +2,11 @@
 
     uv run python scripts/gen_shipped_names.py [<rev>]   # from a full clone
 
-Every name and hook identity a release could have installed, from the
-first-parent history of ``<rev>`` (default HEAD; merges diffed against their
-first parent), so a name added and removed inside one unmerged branch never
-counts. ``tests/unit/test_install_upgrade_scenarios.py`` then requires every
+Every name and hook identity an install could hold, from every commit
+reachable from ``<rev>`` (default HEAD), through both parents of a merge: a
+pull's second parent was the public master, and a branch is installed by
+whoever syncs from it. An unmerged branch is not reachable, so it never counts.
+``tests/unit/test_install_upgrade_scenarios.py`` then requires every
 identity not shipped now to be on a retired list in ``cli/install_paths.py``
 or ``cli/install_settings.py``. Regenerate when a test there says the history
 is stale (an agent, output style, skill or hook was added or removed). A
@@ -87,17 +88,12 @@ def is_tree(rev: str, path: str) -> bool:
 
 
 def touching(rev: str, path: str) -> list:
-    """First-parent revisions that changed ``path``, oldest first."""
-    log = git(
-        "log",
-        "--first-parent",
-        "--diff-merges=first-parent",
-        "--reverse",
-        "--format=@%h",
-        rev,
-        "--",
-        path,
-    )
+    """Revisions reachable from ``rev`` that changed ``path``, oldest first.
+
+    ``--full-history`` walks every parent of a merge: path-limited history
+    simplification would drop a side whose changes the merge did not keep.
+    """
+    log = git("log", "--full-history", "--reverse", "--format=@%h", rev, "--", path)
     return [line[1:] for line in log.splitlines() if line.startswith("@")]
 
 
@@ -276,9 +272,7 @@ def main(rev: str = "HEAD") -> None:
     events, ids, inline, now_events, now_ids = collect_hooks(rev)
 
     doc = {
-        "generated_from": (
-            f"git log --first-parent --diff-merges=first-parent {rev} @ {head}"
-        ),
+        "generated_from": f"git log --full-history {rev} @ {head}",
         "generator": "scripts/gen_shipped_names.py (full clone only)",
         "names": {
             kind: [

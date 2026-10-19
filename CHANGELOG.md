@@ -10,7 +10,8 @@ Releases before 4.19.0 are not listed. Their history is the git log; the upstrea
 
 ### Fixed
 
-- `install`, `update` and `uninstall` no longer delete your files inside a leftover skill directory from an older release (`brainstorming`, `verbalized-sampling` and the other retired skills). Only the files superclaude shipped there go. A file you added, a shipped file you edited, a folder of your own and any symlink stay, and the command prints one line per skill saying how many files it kept. `uninstall --dry-run` lists the same. `verify-drift` and `doctor` stop reporting such a directory as retired once only your files are left in it.
+- `install`, `update` and `uninstall` no longer delete your files inside a leftover skill directory from an older release (`brainstorming`, `verbalized-sampling` and the other retired skills). Only the files superclaude shipped there go. A file you added, a shipped file you edited, a folder of yours with files in it and any symlink stay, and the command prints one line per skill saying how many files it kept. `uninstall --dry-run` lists the same. `verify-drift` and `doctor` stop reporting such a directory as retired once only your files are left in it.
+- A retired skill installed from a revision the removal check did not know (`confidence-check` as the public `master` had it on 2026-01-05, and four skills from one branch revision) is now removed like the others; before, its whole directory stayed and kept auto-invoking.
 
 ## [4.30.0] - 2026-10-19
 

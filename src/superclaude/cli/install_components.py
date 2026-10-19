@@ -675,8 +675,10 @@ def install_all(
     # the files superclaude shipped go; one the user added or edited stays.
     stale_skills = find_legacy_skills(base_path)
     if stale_skills:
+        # A skill already reduced to the user's files no longer matches, so its
+        # Kept line is said now or never, even when a later skill fails.
+        notices = []
         try:
-            notices = []
             for d in stale_skills:
                 kept = remove_legacy_skill(d)
                 if kept:
@@ -684,10 +686,11 @@ def install_all(
             messages.append(
                 f"🧹 Removed {len(stale_skills)} skill(s) from a pre-removal release"
             )
-            messages.extend(notices)
         except OSError as e:
             total_failed += 1
             messages.append(f"❌ Legacy skill cleanup: {e}")
+        finally:
+            messages.extend(notices)
 
     # Same upgrade path for files a release stopped shipping.
     unshipped = find_unshipped(base_path)
