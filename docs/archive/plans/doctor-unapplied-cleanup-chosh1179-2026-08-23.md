@@ -1,9 +1,12 @@
 ---
-status: draft
-revised: 2026-08-23
+status: deprecated
+revised: 2026-10-19
 ---
 
+
 # Doctor Cleanup — Unapplied Items
+
+> Deprecated 2026-10-19 (docs-ssot-audit Q5): never implemented; it names `mcp/MCP_Context7.md`, which no longer ships (Context7 is a claude.ai connector). Kept as a record.
 
 A `/doctor` run on 2026-08-23 proposed four phases of cleanup. Phases 1 and 2 were applied
 and committed; phases 3 and 4 were not. This records what is left so it can be applied
