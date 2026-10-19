@@ -42,7 +42,7 @@ branch: master @47f791b5 (== origin/master == stable == v4.31.1); worktree clean
 ## Next actions
 (full list with options and ★: `docs/plans/remaining-work-ajitta-2026-10-19.md`)
 - [x] Windows P8 run done (Hermes on Windows, `07-windows-run.md`): W-3 `info/exclude` CRLF fixed, UTF-8 BOM accepted in settings/CLAUDE files (W6), released v4.30.5 (merge 5705e79a, bump ed0dd74b); 5 haiku sessions
-- [x] C-15 resolved on the other machine: ADR-0002, v4.31.0
+- [x] C-15 resolved: ADR-0002, user scope follows CLAUDE_CONFIG_DIR (Q1 a scrub reported, Q2 a stale ~/.claude install named, Q4 a prose unchanged) — v4.31.0 (merge e04a8e53, bump bf5323d7); 1 haiku E2E session
 - [ ] `probe-verify-claim` keeps the loose `'pytest|python -m pytest'` pattern (passes `pip install pytest`); tighten with the pressure probes' pattern when its comparability across releases no longer matters
 - [ ] Pressure probes are smoke-only (2 runs per task and arm); a 10-run vanilla vs sc-full reading is needed before claiming SC helps under pressure
 - [ ] S3 backlog on hold: C-16, C-17 (`04a-handoff.md` §2)

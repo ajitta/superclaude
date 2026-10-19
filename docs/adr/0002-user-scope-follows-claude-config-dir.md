@@ -1,6 +1,7 @@
 # ADR-0002: User scope follows CLAUDE_CONFIG_DIR
 
 - **Status:** accepted (2026-10-19: Q1 a, Q2 a, Q3 4.31.0, Q4 a — the owner took every recommendation)
+- **Shipped:** v4.31.0 (merge e04a8e53, stable = bf5323d7)
 - **Date:** 2026-10-19
 - **Deciders:** ajitta (owner)
 - **Evidence:** [install-upgrade-audit 07-windows-run](../features/install-upgrade-audit/07-windows-run.md) W7; plan Q15 ([05-plan](../features/install-upgrade-audit/05-plan.md) item 15); C-15 in [04a-handoff §3](../features/install-upgrade-audit/04a-handoff.md)
