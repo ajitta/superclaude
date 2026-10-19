@@ -196,7 +196,7 @@ function Invoke-I2 {
       $other = $d | Where-Object { $_ -notmatch 'settings(\.local)?\.json$|CLAUDE(\.local)?\.md$' }
       Add-Result $id 'tree after uninstall == before install, outside settings/CLAUDE files' (-not $other) ($other -join ', ')
       $m = Test-UserFiles $sb $scope; Add-Result $id 'user files and settings keys intact' (-not $m) ($m -join ', ')
-      Add-Result $id 'settings/CLAUDE bytes identical (C-20/C-21, S3: FAIL tolerated)' (-not $d) ($d -join ', ')
+      Add-Result $id 'settings/CLAUDE bytes identical (C-20/C-21 fixed: PASS expected)' (-not $d) ($d -join ', ')
     } finally { Exit-Sandbox }
   }
 }

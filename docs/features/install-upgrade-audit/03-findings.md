@@ -87,6 +87,8 @@ Tests are in `tests/unit/test_install_upgrade_scenarios.py`; each was seen red b
 | C-11 | fixed (P5 group 3) | `test_c11_users_own_agents_and_styles_are_not_drift`, `test_c11_retired_superclaude_skill_and_agent_are_reported` |
 | C-12 | fixed (P5 group 3); `insights.pending.jsonl` kept and documented in README | `test_c12_uninstall_leaves_no_state_superclaude_made`, `test_c12_uninstall_keeps_what_the_user_put_there`, `test_c12_local_uninstall_warns_when_agent_memory_loses_its_exclude`, `test_c12_empty_local_memory_store_goes_quietly` |
 | C-16 | upgrade note only (Q14 b), CHANGELOG | — |
+| C-20 | fixed after v4.30.1 (branch `fix/install-file-fidelity`): install appends its block in the file's own line ending and touches no other byte; uninstall removes only the import line, the heading directly above it and the one blank line install put before the heading. Residual: a file without a final newline keeps the one the import needed (uninstall cannot tell it from the user's own) | `test_c20_install_appends_only_its_block_and_uninstall_removes_only_it` (U/P/L × crlf, blank-runs, no-final-newline), `test_c20_import_removal_touches_no_other_line`, `test_c20_heading_only_crlf_file_still_goes` |
+| C-21 | fixed after v4.30.1 (same branch): `atomic_write_text` keeps an existing file's mode (a new file gets the umask default, as `open()` would, not 0600); `_save_settings` keeps the indentation (tabs or spaces; a one-line object stays one line), the majority line ending, the trailing-newline state and raw non-ASCII found in the file; a read-only settings file is refused in the input preflight before any write (exit 1, the file named, mode kept). doctor, which writes nothing, does not check the mode. Residuals: a one-line object with no space after `:` or `,`, or nested objects inlined in an otherwise indented file, are re-serialised | `test_c21_settings_keep_their_layout_across_install_and_uninstall` (U/P/L × 6 layouts), `test_c21_settings_keep_their_permission_mode`, `test_c21_a_new_settings_file_gets_the_umask_mode`, `test_c21_a_read_only_settings_file_is_refused_before_any_write` (U/P/L × install, update, uninstall, dry-run), `test_c21_doctor_passes_on_a_read_only_settings_file`; `test_cli_install.py::test_settings_json_writer_pins_newline_and_encoding` accepts `newline=""` |
 
 ## P7 verifier findings
 
@@ -100,6 +102,19 @@ The independent verifier ([06-verify.md](./06-verify.md), @ 1c8b6f19: PASS WITH 
 | V-4 | Low | a 0-byte or whitespace-only `settings.json` was refused as invalid JSON by install, doctor and uninstall | fixed: it reads as `{}` (`_unwritable_settings`; doctor reads through `_load_settings`) | `test_v4_empty_settings_file_reads_as_an_empty_object`; `test_install_settings.py`: `test_empty_settings_file_reads_as_an_empty_object` (the empty case left `test_unparseable_settings_left_untouched`) |
 | V-5 | Low | doctor's new failure on a gone legacy script copy was not in the CHANGELOG | fixed: Changed bullet | — (CHANGELOG) |
 | W-1 | Low | from the re-verify ([06a](./06a-verify-r2.md), @ 87dc7ebd: PASS), not a regression: a retired skill dir whose `SKILL.md` is a shipped revision was removed whole (`rmtree`), so a file the user added there, a shipped file they edited and any symlink went too | fixed after v4.30.0 (branch `fix/retired-skill-user-files`): `gen_shipped_names.py` emits `retired_skill_files` (every file of every revision, by path) and renders `cli/retired_skill_files.py`; install, `update` and uninstall delete only files whose path and text match (placeholders undone in every file), keep the rest and every symlink, remove dirs once empty, `SKILL.md` last, and print one line per skill with the count kept (`uninstall --dry-run` too). `SKILL.md` stays the ownership gate, so verify-drift and doctor report RETIRED exactly while install would act. A symlinked skill dir is never matched (rmtree used to fail on it). Verify ([06b](./06b-verify-w1.md), @ f36d4a0d: PASS WITH FIXES), X-1–X-5 fixed: CRLF and shipped-copy-at-another-path cases (X-1, X-2); a later skill's `OSError` no longer drops an earlier skill's Kept line (X-3); the generator reads both parents of a merge (`--full-history`), adding 5 SKILL.md revisions (c69190a2, 0fb95e7f ×4) and the branch-only hook id `test_file_guard check`, now retired (X-4); CHANGELOG wording (X-5) | `test_w1_retired_skill_loses_only_the_files_superclaude_shipped` (U/P/L × install, `install --force`, `update`, `uninstall -y` × 7 cases), `test_w1_a_symlink_inside_a_retired_skill_is_kept_and_never_followed`, `test_w1_a_symlinked_retired_skill_directory_is_left_alone`, `test_w1_uninstall_dry_run_says_what_stays_and_changes_nothing`, `test_w1_a_second_install_removes_and_reports_nothing`, `test_w1_verify_drift_and_doctor_follow_what_install_removes`, `test_w1_skill_md_is_removed_last`, `test_w1_retired_skill_files_module_is_generated_from_the_fixture`, `test_w1_a_later_skills_error_keeps_the_earlier_kept_notice`, `test_w1_the_generator_reads_every_parent_of_a_merge`, `test_c09_a_branch_only_hook_registration_goes` |
+
+## doctor verify-drift cost on a large skills tree (04a §3 follow-up)
+
+Measured 2026-10-19 on the OCI VM (aarch64, Python 3.11), sandboxed HOME and `CLAUDE_CONFIG_DIR`, a fresh user install, `superclaude doctor --scope user` through the venv console script, best and mean of 5 runs. verify-drift reads only the 14 shipped skill files and lists the rest, so user skills cost a directory walk, not a read.
+
+| Tree under `skills/` | doctor wall time | notes |
+|---|---|---|
+| fresh install (14 files) | 0.11 s best, 0.11 s mean | baseline, mostly interpreter and click start-up |
+| + 2,000 user skill dirs, one `SKILL.md` each (2,014 files) | 0.11 s, 0.11 s | no measurable cost |
+| + 2,000 files inside one shipped skill dir (4,014 files) | 0.16 s, 0.17 s | the walk of a shipped dir reports them EXTRA (2,000) |
+| 2,000 user dirs × 20 files + the 2,000 above (42,014 files) | 0.17 s, 0.17 s | `verify_drift()` in-process: 0.062 s best, 0.067 s mean |
+
+Under the ~1 s bar by an order of magnitude at 40,000 files; no code change. The timing script is not in the repo (one-off, scratch dir of the round).
 
 ## P8 Windows dispatch
 
@@ -136,7 +151,7 @@ The `windows-scenarios` job ([04a](./04a-handoff.md) §1a) runs the scenario mod
 | X4, X5, U5, U7, E5, D1-duplicate, E2 (file, dir, base) | hold |
 | I1 idempotency | holds; `hooks.json` rewritten by design, second `--force` rewrites identical bytes |
 | I4 convergence | every interrupted install or uninstall converges on re-run; only C-12 and C-19 remain |
-| U10 v4.1.9 "deletes nothing foreign" | holds (only C-20 whitespace) |
+| U10 v4.1.9 "deletes nothing foreign" | holds (the C-20 whitespace is fixed, P5 status) |
 | c8e64bac-era `hooks/hooks.json` | handled: overwritten, then removed |
 | U9 conflict guard on `ec6fa7e2^` user and local | holds as documented; the silent memory move is in C-10 |
 
