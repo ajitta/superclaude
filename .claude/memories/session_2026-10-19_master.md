@@ -38,6 +38,7 @@ branch: master @45aabf06 (== origin/master == stable == v4.30.4); worktree clean
 - Status reports full of labels lost the owner mid-round — open each with one plain sentence of what is tested and which step
 
 ## Next actions
+(full list with options and ★: `docs/plans/remaining-work-ajitta-2026-10-19.md`)
 - [ ] Windows: `make sync-*` to 4.30.4 (`superclaude doctor --scope <s>` first); `scripts/install-audit-windows.ps1`; `04a-handoff.md` §1
 - [ ] S3 backlog on hold: C-16, C-17 (`04a-handoff.md` §2); C-15 waits for W7
 - [ ] Unpicked axis: B model-generation re-audit (at the next model). `docs-ssot-audit/06-verify.md` is ~29 KB: split before the next sizable addition
