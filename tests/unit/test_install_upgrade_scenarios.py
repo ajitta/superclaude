@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import re
 import shutil
 import subprocess
@@ -71,6 +72,33 @@ def scope_base(home: Path, project: Path, scope: str) -> Path:
     return home / ".claude" if scope == "user" else project / ".claude"
 
 
+TOKEN_NAMES = ("HOME", "PROJECT", "PYTHON", "UVCACHE")
+# A token and the path under it, as one path: `$HOME/.claude/skills/x`.
+_TOKEN_PATH = re.compile(r"\$(" + "|".join(TOKEN_NAMES) + r")((?:/[A-Za-z0-9_.\-]+)*)")
+
+
+def resolve_tokens(
+    text: str, tokens: dict[str, str], *, as_json: bool = False, sep: str = os.sep
+) -> str:
+    """``text`` with each ``$TOKEN/...`` path replaced by its machine path.
+
+    The whole path takes the platform separator, as the old installer wrote
+    it (``str(Path)``): with the token alone replaced, Windows got
+    `C:\\...\\home/.claude/skills/...`, a form no installer wrote and the
+    retired-skill gate's placeholder undo does not know, so confidence-check
+    and simplicity-coach survived there (run 39208943288). A JSON file carries
+    machine paths as JSON strings: a Windows path's backslashes must be escaped
+    there, as json.dump wrote them, or the fixture is invalid JSON on Windows
+    only.
+    """
+
+    def native(match: re.Match[str]) -> str:
+        path = tokens[match.group(1)] + match.group(2).replace("/", sep)
+        return json.dumps(path)[1:-1] if as_json else path
+
+    return _TOKEN_PATH.sub(native, text)
+
+
 def build_legacy_install(
     tmp_path: Path, era: str, monkeypatch
 ) -> tuple[Path, Path, Path]:
@@ -78,19 +106,11 @@ def build_legacy_install(
     doc = load_era(era)
     home, project = sandbox(tmp_path, monkeypatch)
     tokens = {
-        "$PYTHON": sys.executable,
-        "$UVCACHE": str(tmp_path / "uvcache"),
-        "$PROJECT": str(project),
-        "$HOME": str(home),
+        "PYTHON": sys.executable,
+        "UVCACHE": str(tmp_path / "uvcache"),
+        "PROJECT": str(project),
+        "HOME": str(home),
     }
-
-    def resolve(text: str, *, as_json: bool = False) -> str:
-        # A JSON file carries machine paths as JSON strings: a Windows path's
-        # backslashes must be escaped there, as the old installer's json.dump
-        # wrote them, or the fixture is invalid JSON on Windows only.
-        for token, value in tokens.items():
-            text = text.replace(token, json.dumps(value)[1:-1] if as_json else value)
-        return text
 
     for key, entry in doc["files"].items():
         root, rel = key.split("/", 1)
@@ -98,7 +118,9 @@ def build_legacy_install(
         target.parent.mkdir(parents=True, exist_ok=True)
         if "blob" in entry:
             target.write_text(
-                resolve(BLOBS[entry["blob"]], as_json=rel.endswith(".json")),
+                resolve_tokens(
+                    BLOBS[entry["blob"]], tokens, as_json=rel.endswith(".json")
+                ),
                 encoding="utf-8",
                 newline="",
             )
@@ -180,6 +202,37 @@ def test_fixture_carries_no_machine_data(path: Path) -> None:
     assert "/Users/" not in text
     assert "archive-v0" not in text
     assert _EMAIL.findall(text) == []
+
+
+@pytest.mark.parametrize("as_json", [False, True], ids=["text", "json"])
+def test_fixture_tokens_resolve_to_a_native_path(as_json: bool) -> None:
+    """Windows run 39208943288: `$HOME/.claude/skills/...` became
+    `C:\\...\\home/.claude/skills/...`, a mixed form no installer wrote (each
+    resolved `{{SKILLS_PATH}}` with str(Path)), so no placeholder undo matched
+    and confidence-check and simplicity-coach survived every removal. The
+    path after a token takes the platform separator, whole."""
+    home = r"C:\Users\me\home"
+    text = "run `python $HOME/.claude/skills/x/scripts/a.py` at $HOME now"
+    native = r"C:\Users\me\home\.claude\skills\x\scripts\a.py"
+    if as_json:
+        native = native.replace("\\", "\\\\")
+        home = home.replace("\\", "\\\\")
+
+    out = resolve_tokens(text, {"HOME": r"C:\Users\me\home"}, as_json=as_json, sep="\\")
+
+    assert out == f"run `python {native}` at {home} now"
+    assert resolve_tokens(text, {"HOME": "/h"}, sep="/") == (
+        "run `python /h/.claude/skills/x/scripts/a.py` at /h now"
+    )
+
+
+def test_fixture_blobs_hold_no_token_path_a_native_resolve_would_split() -> None:
+    """Every `$TOKEN/...` path in a blob resolves as one native path: a segment
+    outside [A-Za-z0-9_.-] would end the path early and leave the mixed form."""
+    for blob in BLOBS.values():
+        for found in re.findall(r"\$(?:HOME|PROJECT|PYTHON|UVCACHE)[^\s\"'`<>]*", blob):
+            resolved = resolve_tokens(found, {k: "X" for k in TOKEN_NAMES}, sep="\\")
+            assert "/" not in resolved, found
 
 
 @pytest.mark.parametrize("era", ERAS)
