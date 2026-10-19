@@ -18,9 +18,11 @@ from typing import Any, Dict
 from superclaude.utils import is_superclaude_hook, settings_filename
 
 from .install_paths import (
+    config_dir_warning,
     console_script_problems,
     probe_console_script,
     resolve_reporting_target,
+    scope_command,
 )
 from .install_settings import _unwritable_settings
 
@@ -43,9 +45,7 @@ def _repair_command(scope: str, base_path: Path) -> str:
     Returns:
         A command string safe to follow verbatim
     """
-    if scope == "user":
-        return "run 'superclaude install --scope user'"
-    return f"run 'superclaude install --scope {scope}' from {base_path.parent}"
+    return f"run {scope_command('install', scope, base_path)}"
 
 
 def run_doctor(scope: str | None = None) -> Dict[str, Any]:
@@ -61,9 +61,16 @@ def run_doctor(scope: str | None = None) -> Dict[str, Any]:
 
     Returns:
         Dict with check results, plus the scope and base path they were run
-        against so the caller can name what it inspected
+        against so the caller can name what it inspected. "advisories" lists
+        warnings that do not fail the run.
     """
     scope, base_path = resolve_reporting_target(scope)
+
+    advisories: list[str] = []
+    if scope == "user":
+        warning = config_dir_warning()
+        if warning:
+            advisories.append(warning)
 
     checks = [
         _check_pytest_plugin(),
@@ -78,6 +85,7 @@ def run_doctor(scope: str | None = None) -> Dict[str, Any]:
     return {
         "checks": checks,
         "passed": all(check["passed"] for check in checks),
+        "advisories": advisories,
         "scope": scope,
         "base_path": str(base_path),
     }

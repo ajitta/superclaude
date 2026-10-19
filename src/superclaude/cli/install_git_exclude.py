@@ -187,6 +187,20 @@ def _strip_one_block(
     return after, True
 
 
+def _holds_local_block(content: str) -> bool:
+    """Whether an SC block in ``content`` was written by a local-scope install.
+
+    Only the local block lists ``CLAUDE.local.md``, under either marker
+    generation; the legacy marker text says "(local scope)" for both scopes.
+    """
+    for start_marker, end_marker in _ALL_MARKER_PAIRS:
+        start = content.find(start_marker)
+        end = content.find(end_marker, start) if start != -1 else -1
+        if end != -1 and "CLAUDE.local.md" in content[start:end].splitlines():
+            return True
+    return False
+
+
 def _resolve_git_exclude_file(project_root: Path) -> Optional[Path]:
     """Resolve the ``info/exclude`` git actually reads for a project root.
 
@@ -324,10 +338,12 @@ def add_git_exclude(project_root: Path, scope: str = "local") -> Tuple[bool, str
         messages.append(legacy_msg)
 
     block = _build_block(scope)
+    replaced_local = False
 
     try:
         if exclude_file.exists():
             existing = exclude_file.read_text(encoding="utf-8")
+            replaced_local = scope == "project" and _holds_local_block(existing)
             stripped, had_block = _strip_block(existing)
             base = stripped if had_block else existing
             separator = "" if base.endswith("\n") or not base else "\n"
@@ -341,7 +357,18 @@ def add_git_exclude(project_root: Path, scope: str = "local") -> Tuple[bool, str
         messages.append(
             f".git/info/exclude {action} with SC {scope} block: {exclude_file}"
         )
-        return True, "; ".join(messages)
+        text = "; ".join(messages)
+        if replaced_local:
+            # Last install wins (module docstring), and the project block lists
+            # none of a local install's files: say so rather than un-exclude a
+            # sibling worktree's install silently.
+            text += (
+                "\n⚠️  This replaced a local-scope block. Git reads one exclude "
+                "file for every worktree of this clone, so a local install in "
+                "any worktree is no longer excluded: git now sees its files as "
+                "untracked; keep them out of its commits."
+            )
+        return True, text
     except OSError as e:
         messages.append(f"Failed to write {exclude_file}: {e}")
         return False, "; ".join(messages)

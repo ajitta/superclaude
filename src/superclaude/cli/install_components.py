@@ -14,6 +14,7 @@ from typing import List, Tuple
 from superclaude.utils import (
     is_legacy_hook_command,
     is_superclaude_hook,
+    same_dir,
     settings_filename,
 )
 
@@ -26,10 +27,13 @@ from .install_paths import (
     _get_source_dir,
     _get_target_dir,
     _run,
+    config_dir_warning,
     console_script_problems,
     find_legacy_skills,
     find_unshipped,
+    get_base_path,
     probe_console_script,
+    scope_command,
     shipped_names,
 )
 from .install_settings import (
@@ -98,15 +102,23 @@ _AGENT_MEMORY_LINE = re.compile(
 )
 
 
-def find_agent_memory_conflict(base_path: Path, scope: str) -> str | None:
-    """Explain why installing ``scope`` here would move agent memory, or None.
+def _memory_store(value: str, base_path: Path) -> Path:
+    """Where agents declaring `memory: <value>` keep memory, seen from ``base_path``."""
+    base = get_base_path("user") if value == "user" else base_path
+    return base / _AGENT_MEMORY_DIRS[value]
 
-    Project and local scope both install to ``./.claude/agents``, and a local
-    install at $HOME shares ``~/.claude/agents`` with user scope, so one scope
-    installed over another rewrites the same agent files. With --force every
-    agent's `memory:` moves to the new scope's store (over a team's committed
-    project install that also dirties tracked files); without it the files keep
-    the old value while the new scope's store is created and never used.
+
+def _shares_base(value: str, base_path: Path) -> bool:
+    """Whether an install at scope ``value`` can be the one at ``base_path``.
+
+    Project and local scope install to the `.claude` of the directory they run
+    from, so either can live anywhere; user scope only at ~/.claude.
+    """
+    return value != "user" or same_dir(base_path, get_base_path("user"))
+
+
+def _other_memory_values(base_path: Path, scope: str) -> dict:
+    """The `memory:` values other than ``scope`` in the shipped agents here.
 
     `memory: project` counts only when the agent files are tracked by git, the
     mark of a team's project install: user and local installs made before the
@@ -117,6 +129,9 @@ def find_agent_memory_conflict(base_path: Path, scope: str) -> str | None:
     A value that names no scope (a hand edit) names no store to move away
     from, and advice built from it would be an invalid `--scope`, so it is
     ignored.
+
+    Returns:
+        ``{value: [agent paths]}``
     """
     agents_dir = _get_target_dir("agents", base_path)
     found: dict = {}
@@ -138,25 +153,84 @@ def find_agent_memory_conflict(base_path: Path, scope: str) -> str | None:
         )
         if not (tracked and tracked.returncode == 0 and tracked.stdout.strip()):
             del found["project"]
+    return found
 
+
+def find_agent_memory_conflict(
+    base_path: Path, scope: str, force: bool = False
+) -> str | None:
+    """Explain why installing ``scope`` here would move agent memory, or None.
+
+    Project and local scope both install to ``./.claude/agents``, and a local
+    install at $HOME shares ``~/.claude/agents`` with user scope, so one scope
+    installed over another rewrites the same agent files. With --force every
+    agent's `memory:` moves to the new scope's store (over a team's committed
+    project install that also dirties tracked files); without it the files keep
+    the old value while the new scope's store is created and never used.
+
+    A value naming a scope that cannot live here is no other install: user
+    scope never installs outside ~/.claude. It is an older release's value —
+    every agent shipped `memory: user` from d174e600 to df5b8a35, at every
+    scope. A forced install (``update``) rewrites it and says so
+    (``agent_memory_move_notice``); a non-force one would keep it, so it
+    refuses and names ``update`` for this scope. The advice once named
+    `--scope user` there, which writes or uninstalls another install entirely.
+    Advice never names a scope whose base is not this one.
+    """
+    found = _other_memory_values(base_path, scope)
     if not found:
         return None
+    agents_dir = _get_target_dir("agents", base_path)
+    values = ", ".join(f"memory: {s}" for s in sorted(found))
+    here = sorted(s for s in found if _shares_base(s, base_path))
+    if not here:
+        if force:
+            return None
+        stores = ", ".join(str(_memory_store(s, base_path)) for s in sorted(found))
+        return (
+            f"❌ The agents in {agents_dir} keep their memory in {stores} "
+            f"({values}, from an older release), not in this {scope} install's "
+            f"store, and a non-force install keeps that value. Run "
+            f"{scope_command('update', scope, base_path)} to rewrite `memory:` "
+            f"to {scope}; agents then keep their memory in "
+            f"{_memory_store(scope, base_path)}."
+        )
     lead = (
         f"❌ The agents in {agents_dir} were installed for another scope "
-        f"({', '.join(f'memory: {s}' for s in sorted(found))}). Installing "
-        f"scope '{scope}' over them would move where every agent keeps its memory."
+        f"({values}). Installing scope '{scope}' over them would move where "
+        "every agent keeps its memory."
     )
-    if "project" in found:
+    if "project" in here:
         # Uninstalling would delete the team's committed files from the tree.
-        return f"{lead} They are a committed team install: use --scope project."
-    others = sorted(found)
-    if len(others) == 1:
         return (
-            f"{lead} Install with --scope {others[0]}, or run "
-            f"'superclaude uninstall --scope {others[0]}' first."
+            f"{lead} They are a committed team install: run "
+            f"{scope_command('install', 'project', base_path)} instead."
         )
-    steps = " and ".join(f"'superclaude uninstall --scope {s}'" for s in others)
+    if len(here) == 1:
+        return (
+            f"{lead} Run {scope_command('install', here[0], base_path)} instead, "
+            f"or {scope_command('uninstall', here[0], base_path)} first."
+        )
+    steps = " and ".join(scope_command("uninstall", s, base_path) for s in here)
     return f"{lead} Run {steps} first."
+
+
+def agent_memory_move_notice(base_path: Path, scope: str) -> str | None:
+    """What a forced install's `memory:` rewrite moves, or None.
+
+    Only for the values ``find_agent_memory_conflict`` lets a forced install
+    rewrite: an older release's, naming a store outside this install.
+    """
+    found = _other_memory_values(base_path, scope)
+    moved = sorted(s for s in found if not _shares_base(s, base_path))
+    if not moved:
+        return None
+    sources = ", ".join(str(_memory_store(s, base_path)) for s in moved)
+    return (
+        f"ℹ️  Agent memory moves to {_memory_store(scope, base_path)}: the agents "
+        f"declared {', '.join(f'memory: {s}' for s in moved)} (an older "
+        f"release's value), and what they saved in {sources} stays there."
+    )
 
 
 def ensure_agent_memory_dir(base_path: Path, scope: str) -> Path | None:
@@ -428,9 +502,7 @@ def install_hooks(
 
     legacy_scripts = base_path / "superclaude" / "scripts"
     if legacy_scripts.is_dir():
-        messages.append(
-            _legacy_scripts_notice(legacy_scripts, base_path / settings_filename(scope))
-        )
+        messages.append(_legacy_scripts_notice(legacy_scripts, base_path, scope))
 
     return installed, failed, messages
 
@@ -468,7 +540,7 @@ def _registered_sc_commands(settings_file: Path) -> List[str]:
     ]
 
 
-def _legacy_scripts_notice(legacy_scripts: Path, settings_file: Path) -> str:
+def _legacy_scripts_notice(legacy_scripts: Path, base_path: Path, scope: str) -> str:
     """What to tell the user about script copies a previous release installed.
 
     Never removed by the installer. Whether a running Claude Code session keeps
@@ -481,6 +553,7 @@ def _legacy_scripts_notice(legacy_scripts: Path, settings_file: Path) -> str:
     just written: while any registration still names the copies, telling the
     user to delete them would turn a working install into a blocked one.
     """
+    settings_file = base_path / settings_filename(scope)
     still_used = sum(
         1
         for cmd in _registered_sc_commands(settings_file)
@@ -490,8 +563,8 @@ def _legacy_scripts_notice(legacy_scripts: Path, settings_file: Path) -> str:
         return (
             f"ℹ️  {still_used} registration(s) in {settings_file.name} still run the "
             f"script copies under {legacy_scripts} — do not remove that directory; "
-            "`superclaude install --force` rewrites every registration to "
-            "`superclaude hook <name>`."
+            f"{scope_command('install --force', scope, base_path)} rewrites every "
+            "registration to `superclaude hook <name>`."
         )
     return (
         f"ℹ️  {legacy_scripts} holds script copies from a release whose hooks ran "
@@ -519,11 +592,17 @@ def install_all(
     if refusal:
         return False, refusal
 
-    conflict = find_agent_memory_conflict(base_path, scope)
+    conflict = find_agent_memory_conflict(base_path, scope, force)
     if conflict:
         return False, conflict
 
     messages = []
+    if scope == "user":
+        warning = config_dir_warning()
+        if warning:
+            messages.append(warning)
+    # Read before the agents are rewritten below.
+    memory_moves = agent_memory_move_notice(base_path, scope) if force else None
     total_installed = 0
     total_skipped = 0
     total_failed = 0
@@ -585,6 +664,8 @@ def install_all(
             messages.append(f"❌ {description}: {failed} failed")
             for name in failed_names:
                 messages.append(f"   - {name}")
+        if component == "agents" and memory_moves:
+            messages.append(f"   {memory_moves}")
 
     # Install the hook registration
     hooks_installed, hooks_failed, hooks_messages = install_hooks(
@@ -658,7 +739,10 @@ def install_all(
     messages.append(f"📁 Installation directory: {base_path}")
 
     if total_skipped > 0:
-        messages.append("\n💡 Tip: Use --force to reinstall existing files")
+        messages.append(
+            f"\n💡 Tip: {scope_command('install --force', scope, base_path)} "
+            "reinstalls existing files"
+        )
 
     messages.append("\n🔄 Restart Claude Code to use the new components")
 

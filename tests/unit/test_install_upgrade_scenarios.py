@@ -594,3 +594,305 @@ def test_c14_uninstall_remove_mcp_without_claude_deletes_nothing(
     assert not success, message
     assert "claude" in message and "--remove-mcp" in message, message
     assert snapshot(tmp_path) == before
+
+
+# --- C-04, C-05: `update` and remediation lines stay in scope (Q4 a) ---------
+#
+# `update` refreshes an install and creates none: at a scope with no install it
+# refuses and names the install it found. `install --force` that creates a
+# scope says so. A command printed as advice carries `--scope`, and where to run
+# it when that matters, so following it verbatim acts on the install diagnosed.
+
+# A quoted command a message tells the user to run, and where.
+_ADVICE = re.compile(r"'superclaude [^']*--scope (\w+)'( from \S+)?")
+
+
+def test_c04_update_refuses_a_scope_with_no_install(
+    tmp_path: Path, monkeypatch
+) -> None:
+    """C-04: `update` with no `--scope` at a local-only install created a full
+    user install in ~/.claude (main.py `update`, default user)."""
+    home, project, _base = fresh_install(tmp_path, monkeypatch, "local")
+    before = snapshot(tmp_path)
+
+    result = CliRunner().invoke(main, ["update"])
+
+    output = all_output(result)
+    assert result.exit_code == 1, output
+    assert f"'superclaude update --scope local' from {project}" in output, output
+    assert not (home / ".claude").exists()
+    assert snapshot(tmp_path) == before
+
+
+def test_c04_update_from_a_subdirectory_names_the_install_above(
+    tmp_path: Path, monkeypatch
+) -> None:
+    """`update --scope local` from `src/` wrote a second, nested install there."""
+    _home, project, _base = fresh_install(tmp_path, monkeypatch, "local")
+    sub = project / "src"
+    sub.mkdir()
+    monkeypatch.chdir(sub)
+    before = snapshot(tmp_path)
+
+    result = CliRunner().invoke(main, ["update", "--scope", "local"])
+
+    output = all_output(result)
+    assert result.exit_code == 1, output
+    assert f"'superclaude update --scope local' from {project}" in output, output
+    assert snapshot(tmp_path) == before
+
+
+def test_c04_install_force_creating_a_scope_warns(tmp_path: Path, monkeypatch) -> None:
+    """Q4 a: `install --force` is a refresh; creating a scope with it is the
+    sync-scope-creates trap, so it says so and names the install it found."""
+    home, project, _base = fresh_install(tmp_path, monkeypatch, "local")
+
+    result = CliRunner().invoke(main, ["install", "--force", "--scope", "user"])
+
+    output = all_output(result)
+    assert result.exit_code == 0, output
+    warning = [
+        line
+        for line in output.splitlines()
+        if line.startswith("⚠️") and str(home / ".claude") in line
+    ]
+    assert warning, output
+    assert f"'superclaude update --scope local' from {project}" in output, output
+
+    again = CliRunner().invoke(main, ["install", "--force", "--scope", "user"])
+    assert again.exit_code == 0, all_output(again)
+    assert str(project) not in all_output(again)
+
+
+@pytest.mark.parametrize("scope", SCOPES)
+def test_c05_drift_remediation_carries_the_scope(
+    tmp_path: Path, monkeypatch, scope: str
+) -> None:
+    """C-05: verify-drift advised a bare `install --force`; followed from a local
+    project, it wrote a user install."""
+    _home, project, base = fresh_install(tmp_path, monkeypatch, scope)
+    analyze = base / "commands" / "sc" / "analyze.md"
+    analyze.write_text(
+        analyze.read_text(encoding="utf-8") + "\nlocal edit\n", encoding="utf-8"
+    )
+
+    result = CliRunner().invoke(main, ["verify-drift"])
+
+    output = all_output(result)
+    assert result.exit_code == 1, output
+    assert "'superclaude install --force'" not in output, output
+    advice = _ADVICE.findall(output)
+    assert advice, output
+    for named, where in advice:
+        assert named == scope, output
+        assert where == ("" if scope == "user" else f" from {project}"), output
+
+
+@pytest.mark.parametrize("era", ERAS)
+def test_c05_every_command_install_prints_carries_the_scope(
+    tmp_path: Path, monkeypatch, era: str
+) -> None:
+    """Q4 a: a `superclaude` command in install's output, followed verbatim from
+    any directory, acts on the install it was printed for."""
+    _home, _project, base = build_legacy_install(tmp_path, era, monkeypatch)
+    scope = load_era(era)["scope"]
+
+    _success, message = install_all(base_path=base, force=False, scope=scope)
+
+    named = re.findall(r"superclaude (?:install|update|uninstall)\b[^'`\n]*", message)
+    for command in named:
+        assert f"--scope {scope}" in command, message
+
+
+# --- C-06: the `memory: user` era at project scope (owner ruling b) ----------
+
+
+def _memory_values(base: Path) -> set[str]:
+    return {
+        line
+        for name in shipped_names("agents")
+        if (base / "agents" / name).exists()
+        for line in (base / "agents" / name).read_text(encoding="utf-8").splitlines()
+        if line.startswith("memory:")
+    }
+
+
+def test_c06_memory_user_era_project_install_advises_update_in_scope(
+    tmp_path: Path, monkeypatch
+) -> None:
+    """C-06: a project install from the `memory: user` era was refused for good,
+    and the advice (`--scope user`) wrote or uninstalled the user scope. The
+    refusal stays; the advice stays in this scope."""
+    _home, project, base = build_legacy_install(
+        tmp_path, "d174e600-project", monkeypatch
+    )
+    before = snapshot(tmp_path)
+
+    success, message = install_all(base_path=base, force=False, scope="project")
+
+    assert not success, message
+    assert "--scope user" not in message, message
+    assert f"'superclaude update --scope project' from {project}" in message, message
+    assert snapshot(tmp_path) == before
+
+
+def test_c06_update_rewrites_era_agents_to_the_project_store(
+    tmp_path: Path, monkeypatch
+) -> None:
+    """The advice works: `update --scope project` rewrites `memory:` and says
+    where agent memory moves from and to."""
+    home, _project, base = build_legacy_install(
+        tmp_path, "d174e600-project", monkeypatch
+    )
+    assert _memory_values(base) == {"memory: user"}
+
+    result = CliRunner().invoke(main, ["update", "--scope", "project"])
+
+    output = all_output(result)
+    assert result.exit_code == 0, output
+    assert _memory_values(base) == {"memory: project"}
+    assert str(home / ".claude" / "agent-memory") in output, output
+    assert str(base / "agent-memory") in output, output
+
+
+@pytest.mark.parametrize(
+    ("scope", "planted"), [("project", "user"), ("local", "user"), ("user", "local")]
+)
+def test_c06_conflict_advice_never_names_another_base(
+    tmp_path: Path, monkeypatch, scope: str, planted: str
+) -> None:
+    """Owner rule with C-06: conflict advice never names a scope whose base is
+    not this one. User scope's base is ~/.claude; project and local are the
+    `.claude` of the directory the command runs from, so advice naming them
+    says where."""
+    home, _project, base = fresh_install(tmp_path, monkeypatch, scope)
+    for name in shipped_names("agents"):
+        agent = base / "agents" / name
+        agent.write_text(
+            agent.read_text(encoding="utf-8").replace(
+                f"memory: {scope}\n", f"memory: {planted}\n"
+            ),
+            encoding="utf-8",
+        )
+
+    success, message = install_all(base_path=base, force=False, scope=scope)
+
+    assert not success, message
+    advice = _ADVICE.findall(message)
+    assert advice, message
+    assert len(advice) == message.count("--scope "), message
+    for named, where in advice:
+        if named == "user":
+            assert base == home / ".claude", message
+        else:
+            assert where == f" from {base.parent}", message
+
+
+# --- C-15: CLAUDE_CONFIG_DIR (Q15 b) ------------------------------------------
+
+
+def test_c15_install_and_doctor_name_a_differing_config_dir(
+    tmp_path: Path, monkeypatch
+) -> None:
+    """C-15: with CLAUDE_CONFIG_DIR elsewhere Claude Code never reads ~/.claude,
+    and neither install nor doctor said so."""
+    home, _project = sandbox(tmp_path, monkeypatch)
+    config = tmp_path / "cc"
+    monkeypatch.delenv("CLAUDE_CONFIG_DIR", raising=False)
+    install = CliRunner().invoke(main, ["install", "--scope", "user"])
+    assert install.exit_code == 0, all_output(install)
+    plain = run_doctor(scope="user")
+    monkeypatch.setenv("CLAUDE_CONFIG_DIR", str(config))
+
+    install = CliRunner().invoke(main, ["install", "--force", "--scope", "user"])
+    doctor = CliRunner().invoke(main, ["doctor", "--scope", "user"])
+
+    for result in (install, doctor):
+        output = all_output(result)
+        warned = [line for line in output.splitlines() if "CLAUDE_CONFIG_DIR" in line]
+        assert warned, output
+        assert str(config) in output and str(home / ".claude") in output, output
+    # A warning, not a failed check: the doctor verdict is unchanged.
+    assert [c["passed"] for c in run_doctor(scope="user")["checks"]] == [
+        c["passed"] for c in plain["checks"]
+    ]
+    assert not config.exists()
+
+
+def test_c15_no_warning_when_config_dir_is_the_default(
+    tmp_path: Path, monkeypatch
+) -> None:
+    home, _project = sandbox(tmp_path, monkeypatch)
+    monkeypatch.setenv("CLAUDE_CONFIG_DIR", str(home / ".claude"))
+
+    install = CliRunner().invoke(main, ["install", "--scope", "user"])
+    doctor = CliRunner().invoke(main, ["doctor", "--scope", "user"])
+
+    assert "CLAUDE_CONFIG_DIR" not in all_output(install)
+    assert "CLAUDE_CONFIG_DIR" not in all_output(doctor)
+
+
+# --- C-18: one exclude file per clone ---------------------------------------
+
+
+def add_linked_worktree(main_root: Path, worktree: Path) -> Path:
+    """A linked worktree of ``main_root`` as git lays one out, built by hand.
+
+    ``commondir`` is what makes git read the main repository's ``info/exclude``
+    (gotcha git-common-dir-paths); without it the pointer reads as a submodule.
+    """
+    name = worktree.name
+    admin = main_root / ".git" / "worktrees" / name
+    admin.mkdir(parents=True)
+    (admin / "commondir").write_text("../..\n", encoding="utf-8")
+    (admin / "gitdir").write_text(f"{worktree / '.git'}\n", encoding="utf-8")
+    (admin / "HEAD").write_text(f"ref: refs/heads/{name}\n", encoding="utf-8")
+    worktree.mkdir()
+    (worktree / ".git").write_text(f"gitdir: {admin}\n", encoding="utf-8")
+    return worktree
+
+
+def _ignored(root: Path, path: str) -> bool:
+    return (
+        subprocess.run(
+            ["git", "-C", str(root), "check-ignore", "-q", path], check=False
+        ).returncode
+        == 0
+    )
+
+
+def test_c18_project_install_reports_replacing_a_worktree_local_block(
+    tmp_path: Path, monkeypatch
+) -> None:
+    """C-18: a project install in the main worktree replaced the clone's local
+    block, so the linked worktree's local install became visible to git, and
+    the only output was "refreshed with SC project block"."""
+    _home, project = sandbox(tmp_path, monkeypatch)
+    worktree = add_linked_worktree(project, tmp_path / "wt")
+    common = project / ".git" / "info" / "exclude"
+    git_path = subprocess.run(
+        ["git", "-C", str(worktree), "rev-parse", "--git-path", "info/exclude"],
+        capture_output=True,
+        text=True,
+        check=True,
+    ).stdout.strip()
+    assert Path(git_path).resolve() == common.resolve()
+
+    monkeypatch.chdir(worktree)
+    monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(worktree))
+    ok, message = install_all(base_path=worktree / ".claude", scope="local")
+    assert ok, message
+    assert _ignored(worktree, ".claude/superclaude/CLAUDE_SC.md")
+
+    monkeypatch.chdir(project)
+    monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(project))
+    ok, message = install_all(base_path=project / ".claude", scope="project")
+
+    assert ok, message
+    assert not _ignored(worktree, ".claude/superclaude/CLAUDE_SC.md")
+    warning = [
+        line
+        for line in message.splitlines()
+        if "⚠️" in line and "local" in line and "worktree" in line
+    ]
+    assert warning, message

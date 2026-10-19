@@ -356,7 +356,9 @@ class TestAgentMemoryScopeConflict:
         assert success, message
         assert self._memory_values(base) == {"memory: user"}
 
-    def test_mixed_scopes_name_each_uninstall(self, tmp_path):
+    def test_mixed_scopes_name_only_this_base(self, tmp_path):
+        """`memory: user` outside ~/.claude is no user install: advice naming
+        `--scope user` would act on ~/.claude (C-06, owner ruling b)."""
         base = tmp_path / ".claude"
         assert install_all(base_path=base, force=True, scope="local")[0]
         agent = next((base / "agents").glob("*.md"))
@@ -368,9 +370,9 @@ class TestAgentMemoryScopeConflict:
         success, message = install_all(base_path=base, force=True, scope="project")
 
         assert not success
+        assert "memory: local, memory: user" in message, message
         assert "'superclaude uninstall --scope local'" in message, message
-        assert "'superclaude uninstall --scope user'" in message, message
-        assert "--scope local, user" not in message, message
+        assert "--scope user" not in message, message
 
     def test_a_value_naming_no_scope_is_ignored(self, tmp_path):
         """A hand-edited value names no store; advising `--scope none` is invalid."""
@@ -389,7 +391,10 @@ class TestAgentMemoryScopeConflict:
 
     @pytest.mark.parametrize("value", ['"user"', "'user'", "user  # personal"])
     def test_a_quoted_or_commented_scope_still_counts(self, tmp_path, value):
-        """YAML reads these as `user`, so Claude Code keeps memory in user scope."""
+        """YAML reads these as `user`, so Claude Code keeps memory in user scope.
+
+        A non-force install would keep the value, so it refuses; `update` for
+        this scope is the advice (C-06)."""
         base = tmp_path / ".claude"
         assert install_all(base_path=base, force=True, scope="local")[0]
         agent = next((base / "agents").glob("*.md"))
@@ -400,10 +405,11 @@ class TestAgentMemoryScopeConflict:
             encoding="utf-8",
         )
 
-        success, message = install_all(base_path=base, force=True, scope="local")
+        success, message = install_all(base_path=base, force=False, scope="local")
 
         assert not success
-        assert "memory: user" in message and "--scope user" in message, message
+        assert "memory: user" in message, message
+        assert "'superclaude update --scope local'" in message, message
 
 
 class TestFrameworkArtifactsAlwaysUpdate:

@@ -14,6 +14,11 @@ Releases before 4.19.0 are not listed. Their history is the git log; the upstrea
 - `uninstall --dry-run` exits 1 when the real uninstall would refuse.
 - `uninstall --remove-mcp` needs `claude` on PATH; without it, uninstall stops before removing anything.
 - `doctor` at local and project scope checks that `.git/info/exclude` holds superclaude's block.
+- `update` refuses (exit 1) at a scope with no install, names the install it found and the command for it, and creates nothing; to create an install, use `install`.
+- `install --force` at a scope with no install warns that it creates one and names the installs it found.
+- Every command superclaude prints as advice (verify-drift's re-sync, install's tips, the agent-memory refusal) carries `--scope`, and for project and local scope the directory to run it from.
+- `install`, `update` and `doctor` at user scope warn when `CLAUDE_CONFIG_DIR` points somewhere other than `~/.claude`: Claude Code then does not read the user install. The warning does not fail `doctor`.
+- A project install that replaces a local install's `.git/info/exclude` block (from another worktree of the same clone) warns that the local install's files are now visible to git.
 
 ### Fixed
 
@@ -23,9 +28,14 @@ Releases before 4.19.0 are not listed. Their history is the git log; the upstrea
 - `uninstall` no longer deletes your text from CLAUDE.md: a line with `@superclaude/` anywhere in it (`docs@superclaude/wiki`) lost everything from there on. Only superclaude's own import line and its heading are removed.
 - `uninstall --remove-mcp` keeps your own MCP server that shares a name with one superclaude registers (your own `playwright`, say), at every scope.
 - `uninstall --remove-mcp` with no `claude` on PATH no longer crashes after deleting everything else.
+- `update` with no `--scope` inside a project that has only a local install no longer creates a full user install in `~/.claude`, and `update --scope local` from a subdirectory no longer creates a second install there.
+- `verify-drift` no longer advises a bare `superclaude install --force`, which, followed from a project, wrote a user install.
+- A project install from the `memory: user` era (February 2026) can be upgraded: `install` still refuses, now advising `superclaude update --scope project`, which rewrites the agents' `memory:` and says where agent memory moves. The advice used to name `--scope user`, which acts on `~/.claude` instead.
 
 ### Upgrade notes
 
+- `update` no longer creates an install. If it says "No superclaude install", run the command it names: `update` for the install it found, or `install` to create one.
+- If `install` refuses because agents declare `memory: user` in a project or local install, run `superclaude update --scope <that scope>` from that directory. Agents then keep memory in that install's `agent-memory/`; what they saved in `~/.claude/agent-memory/` stays there.
 - If a command now stops with "Nothing was changed", re-save the file it names as UTF-8 without a byte-order mark (or fix its JSON) and run the command again.
 - `uninstall --remove-mcp` removes a server only when its command is the one superclaude registers now. A Tavily server an older release registered (`mcp-remote https://mcp.tavily.com/mcp`, `tavily-mcp@0.1.2`) stays; remove it with `claude mcp remove tavily`.
 

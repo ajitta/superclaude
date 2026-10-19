@@ -128,7 +128,12 @@ def install(
         list_available_commands,
         list_installed_commands,
     )
-    from .install_paths import get_base_path, resolve_reporting_target
+    from .install_paths import (
+        found_installs_lines,
+        get_base_path,
+        has_install,
+        resolve_reporting_target,
+    )
 
     # Decide whether to run the interactive wizard.
     # Trigger paths:
@@ -229,6 +234,18 @@ def install(
             "alternative: a personal install inside it, auto-gitignored, with its "
             "own settings."
         )
+        click.echo()
+
+    # --force reads as "refresh", so creating a scope with it is usually the
+    # wrong scope: `install --force` from a local project wrote a user install
+    # (gotcha sync-scope-creates). It still installs; it says so first.
+    if force and not has_install(base_path):
+        click.echo(
+            f"⚠️  No superclaude install at {scope} scope ({base_path}): "
+            "--force creates one here."
+        )
+        for line in found_installs_lines("update"):
+            click.echo(line)
         click.echo()
 
     # Install all components
@@ -392,8 +409,9 @@ def update(scope: str):
     """
     Update superclaude commands to latest version
 
-    Re-installs all components to match the current package version.
-    This is a convenience command equivalent to 'install --force'.
+    Re-installs all components to match the current package version, like
+    'install --force', but only where an install exists: at a scope with none
+    it exits 1, names the install it found, and creates nothing.
 
     Scopes:
     - user (default): Update ~/.claude/
@@ -405,9 +423,29 @@ def update(scope: str):
         superclaude update --scope project
     """
     from .install_components import install_all
-    from .install_paths import get_base_path
+    from .install_paths import (
+        found_installs_lines,
+        get_base_path,
+        has_install,
+        scope_command,
+    )
 
     base_path = get_base_path(scope)
+
+    # Update refreshes an install; it never creates one. Run at a local-only
+    # project with the default scope, it used to write a full user install
+    # into ~/.claude, and from a subdirectory a second, nested project copy.
+    if not has_install(base_path):
+        click.echo(
+            f"❌ No superclaude install at {scope} scope ({base_path}); update "
+            "refreshes an install and creates none."
+        )
+        for line in found_installs_lines("update"):
+            click.echo(line)
+        click.echo(
+            f"   To create one here: run {scope_command('install', scope, base_path)}"
+        )
+        sys.exit(1)
 
     click.echo(f"🔄 Updating superclaude to version {__version__} (scope: {scope})...")
     click.echo()
@@ -468,6 +506,12 @@ def doctor(verbose: bool, scope: str | None):
             for detail in check["details"]:
                 click.echo(f"    {detail}")
 
+    # Advisories warn without failing the run, so they print without --verbose.
+    if results["advisories"]:
+        click.echo()
+        for advisory in results["advisories"]:
+            click.echo(advisory)
+
     # Summary
     click.echo()
     total = len(results["checks"])
@@ -506,7 +550,7 @@ def verify_drift_cmd(scope: str | None, verbose: bool):
         superclaude verify-drift --verbose
         superclaude verify-drift --scope project
     """
-    from .install_paths import resolve_reporting_target
+    from .install_paths import resolve_reporting_target, scope_command
     from .verify_drift import OK, verify_drift
 
     # Defaulting to user scope reported a healthy local install as 85 missing
@@ -558,7 +602,9 @@ def verify_drift_cmd(scope: str | None, verbose: bool):
             f"⚠️  Drift detected: {result['total_drifted']} drifted, "
             f"{result['total_missing']} missing, {result['total_extra']} extra"
         )
-        click.echo("   Run 'superclaude install --force' to re-sync")
+        click.echo(
+            f"   Run {scope_command('install --force', scope, base_path)} to re-sync"
+        )
         sys.exit(1)
 
 

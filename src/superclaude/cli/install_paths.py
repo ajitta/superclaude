@@ -13,7 +13,7 @@ import shutil
 import subprocess
 import sys
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 from superclaude import __version__
 from superclaude.utils import detect_scope, same_dir
@@ -170,6 +170,89 @@ def resolve_reporting_target(
         resolved = scope or "user"
         return resolved, get_base_path(resolved)
     return scope or detect_scope(root), root / ".claude"
+
+
+def scope_command(command: str, scope: str, base_path: Path) -> str:
+    """A command to print as advice, safe to follow verbatim from any directory.
+
+    It carries ``--scope``: without it the command means user scope, and
+    following verify-drift's bare ``install --force`` from a local project
+    wrote a user install. Project and local scope write to the ``.claude`` of
+    the directory the command runs from, so for them it also says where.
+
+    Args:
+        command: The subcommand and its flags, e.g. ``"install --force"``
+        scope: Scope the command must act on
+        base_path: That scope's .claude directory
+
+    Returns:
+        ``'superclaude <command> --scope <scope>'``, then ``from <dir>`` for
+        project and local scope
+    """
+    quoted = f"'superclaude {command} --scope {scope}'"
+    if scope == "user":
+        return quoted
+    return f"{quoted} from {base_path.parent}"
+
+
+def has_install(base_path: Path) -> bool:
+    """Whether ``base_path`` holds a superclaude install of any release.
+
+    ``superclaude/`` marks every release since the fork; the v4.1.x pip CLI
+    installed only ``commands/sc/`` (and a skill).
+    """
+    return (base_path / "superclaude").is_dir() or (
+        base_path / "commands" / "sc"
+    ).is_dir()
+
+
+def installs_found(start: Path | None = None) -> List[Tuple[str, Path]]:
+    """The installs a command run from ``start`` could have meant.
+
+    The nearest project or local install at or above ``start``, then the user
+    install. Each is ``(scope, base_path)``; the same directory is listed once.
+    """
+    found: List[Tuple[str, Path]] = []
+    root = find_install_root(start or Path.cwd())
+    if root is not None:
+        found.append((detect_scope(root), root / ".claude"))
+    user = get_base_path("user")
+    if has_install(user) and not any(same_dir(base, user) for _, base in found):
+        found.append(("user", user))
+    return found
+
+
+def found_installs_lines(command: str) -> List[str]:
+    """One line per install ``installs_found`` names, with ``command`` for it."""
+    return [
+        f"   Found a {scope} install at {base}: "
+        f"run {scope_command(command, scope, base)}"
+        for scope, base in installs_found()
+    ]
+
+
+def config_dir_warning() -> Optional[str]:
+    """The warning for a CLAUDE_CONFIG_DIR that is not ~/.claude, or None.
+
+    Claude Code reads its user configuration from CLAUDE_CONFIG_DIR when it is
+    set; user scope installs to ~/.claude regardless, so with the variable set
+    elsewhere a user install is never loaded. Following the variable is an
+    open design question (an ADR), so for now this only says so.
+    """
+    value = os.environ.get("CLAUDE_CONFIG_DIR")
+    if not value:
+        return None
+    config_dir = Path(value).expanduser()
+    user_base = get_base_path("user")
+    if same_dir(config_dir, user_base):
+        return None
+    return (
+        f"⚠️  CLAUDE_CONFIG_DIR is set to {config_dir}: Claude Code reads its user "
+        f"configuration there, but superclaude's user scope is {user_base}, which "
+        "that Claude Code does not read. Start Claude Code without "
+        "CLAUDE_CONFIG_DIR to load this install, or install at --scope project "
+        "or --scope local inside a project."
+    )
 
 
 def _get_package_root() -> Path:

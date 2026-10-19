@@ -76,6 +76,11 @@ Tests are in `tests/unit/test_install_upgrade_scenarios.py`; each was seen red b
 | C-07 | fixed (P5 group 1) | `test_c07_import_removal_keeps_user_lines` |
 | C-13 | fixed (P5 group 1) | `test_c13_remove_mcp_keeps_a_foreign_server_of_the_same_name` |
 | C-14 | fixed (P5 group 1) | `test_c14_remove_mcp_without_claude_reports_a_failure`, `test_c14_uninstall_remove_mcp_without_claude_deletes_nothing` |
+| C-04 | fixed (P5 group 2) | `test_c04_update_refuses_a_scope_with_no_install`, `test_c04_update_from_a_subdirectory_names_the_install_above`, `test_c04_install_force_creating_a_scope_warns` |
+| C-05 | fixed (P5 group 2) | `test_c05_drift_remediation_carries_the_scope`, `test_c05_every_command_install_prints_carries_the_scope` |
+| C-06 | fixed (P5 group 2), ruling (b): non-force install refuses and advises `update --scope <this>`, which proceeds | `test_c06_memory_user_era_project_install_advises_update_in_scope`, `test_c06_update_rewrites_era_agents_to_the_project_store`, `test_c06_conflict_advice_never_names_another_base` |
+| C-15 | fixed (P5 group 2), warning only at user scope | `test_c15_install_and_doctor_name_a_differing_config_dir`, `test_c15_no_warning_when_config_dir_is_the_default` |
+| C-18 | fixed (P5 group 2), reported, not prevented | `test_c18_project_install_reports_replacing_a_worktree_local_block` |
 
 ## Owner checkpoint
 
@@ -86,6 +91,8 @@ Tests are in `tests/unit/test_install_upgrade_scenarios.py`; each was seen red b
 - (c) Status quo.
 
 **Recommended: (b).** The refusal is the guard doing its job: where a team's agent memory lives is the team's call. The defect is advice that sends the user to another scope.
+
+**Ruled (b)** ([00-intent.md](./00-intent.md)); fixed in P5 group 2. For the advice to work, a forced install (`update`) passes the guard when every foreign value names a store outside this install, and states the move.
 
 ## Not reproduced, or holds as designed
 

@@ -138,7 +138,7 @@ Run `/goal` alone to check progress, or `/goal clear` to stop early.
 ```bash
 uv tool upgrade superclaude            # pull the latest release
 superclaude update                     # default: --scope user
-superclaude update --scope project     # (update takes --scope only; use `install --force` to re-copy everything)
+superclaude update --scope project     # refreshes an existing install; refuses where there is none
 ```
 
 #### **Uninstall**
