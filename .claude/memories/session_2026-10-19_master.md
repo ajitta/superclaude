@@ -1,4 +1,4 @@
-branch: master @ed0dd74b (== origin/master == stable == v4.30.5); worktree clean (untracked .hermes/, .ignore belong to other sessions; `/.hermes/` gitignored)
+branch: master @47f791b5 (== origin/master == stable == v4.31.1); worktree clean (untracked .hermes/, .ignore belong to other sessions; `/.hermes/` gitignored)
 
 # Session 2026-10-19 — master (hygiene rounds, a release review, two purpose rounds, the install/upgrade audit, the docs ↔ SSOT audit, a research-hops content round, ten releases)
 
@@ -24,6 +24,8 @@ branch: master @ed0dd74b (== origin/master == stable == v4.30.5); worktree clean
 - 88fe9344 install-file-fidelity (Fable 5.1 high, interactive): W-2 fixture fix; C-20 CLAUDE file kept byte-for-byte (own line ending, uninstall removes only its lines); C-21 settings keep mode/indent/EOL/final newline, read-only settings/CLAUDE/`info/exclude` refused in preflight, symlinked settings written through; advice unified on `update --scope`; doctor verify-drift ~0.1–0.2 s at 42k skill files; verifier 06c PASS WITH FIXES, Y-1–Y-6 applied → 9f4f1ca4 v4.30.2
 - docs-ssot (Fable 5.1 high, interactive): CLI help/pyproject/Makefile name `.git/info/exclude` (not .gitignore), describe a content framework (no PM Agent); README research block cites only RESEARCH_CONFIG; insights credited to `/sc:insight`; hooks/README 14 registrations; PROJECT_INDEX branch model; ARCHITECTURE and core/README cite RULES.md + TestCoreLiteSplit instead of a token figure; two dead draft plans archived → ca425bad v4.30.3 (`CANARY_OK=1`: only core/README.md changed, a repo doc install does not copy)
 - research-hops-evals (Fable 5.1 high): `/sc:research` and `deep-researcher` state RESEARCH_CONFIG's hops (quick 1, standard ≤3, deep ≤4, exhaustive 5; config says a figure is a ceiling), guarded by T4 hop guards; evals arms named by `ARMS`; `destructive-named-path` `canary_only`; canary-gates 13/13; verifier 06a PASS WITH FIXES, R-1–R-6 applied → v4.30.4
+- (other machine) feat/claude-config-dir: user scope follows `CLAUDE_CONFIG_DIR` (ADR-0002, C-15 resolved) → bf5323d7 v4.31.0
+- borrowed-checks (Hermes, from a comparison with mattpocock/skills, addyosmani/agent-skills and pstack — `docs/research/skill-pack-comparison-ajitta-2026-10-19.md`): `tests/unit/test_description_overlap.py` (stemmed TF-IDF cosine of routing text, names left out, cap 0.70, load/save allowed); three `canary_only` pressure probes (hurry, dictated fix, sunk cost; smoke 11/12 on sonnet low); README skill-listing note (budget measured 30,000 chars on haiku/sonnet, CC 2.1.303; SC under 10,000). Verifier `docs/features/borrowed-checks/06-verify.md` PASS WITH FIXES, 1–6 applied → 5b66b7b9, 47f791b5 v4.31.1 (no canary: core/hooks unchanged)
 
 ## Decisions
 - Independent verification per round: separate `claude -p --model opus --effort high` runs, never self-review; reports committed under `docs/features/<slug>/`
@@ -40,7 +42,9 @@ branch: master @ed0dd74b (== origin/master == stable == v4.30.5); worktree clean
 ## Next actions
 (full list with options and ★: `docs/plans/remaining-work-ajitta-2026-10-19.md`)
 - [x] Windows P8 run done (Hermes on Windows, `07-windows-run.md`): W-3 `info/exclude` CRLF fixed, UTF-8 BOM accepted in settings/CLAUDE files (W6), released v4.30.5 (merge 5705e79a, bump ed0dd74b); 5 haiku sessions
-- [ ] C-15 decision now has its input: W7 shows settings, components and user `CLAUDE.md` follow `CLAUDE_CONFIG_DIR` (remaining-work §2: a extend warning / b Q15 (a) ADR / c keep)
+- [x] C-15 resolved on the other machine: ADR-0002, v4.31.0
+- [ ] `probe-verify-claim` keeps the loose `'pytest|python -m pytest'` pattern (passes `pip install pytest`); tighten with the pressure probes' pattern when its comparability across releases no longer matters
+- [ ] Pressure probes are smoke-only (2 runs per task and arm); a 10-run vanilla vs sc-full reading is needed before claiming SC helps under pressure
 - [ ] S3 backlog on hold: C-16, C-17 (`04a-handoff.md` §2)
 - [ ] Unpicked axis: B model-generation re-audit (at the next model). `docs-ssot-audit/06-verify.md` is ~29 KB: split before the next sizable addition
 - [ ] On hold: opus follow-up round on N2/N5; "open the file a reference points to" wording trial; `origin/fix/plain-language-structure` (unmerged WIP, kept)
