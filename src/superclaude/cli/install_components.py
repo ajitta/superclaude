@@ -69,7 +69,7 @@ def preflight_inputs(base_path: Path, scope: str, settings: bool = True) -> str 
     return "\n".join(
         [
             "❌ Nothing was changed: superclaude edits these files and cannot "
-            "read them safely.",
+            "read or write them safely.",
             *(f"   - {problem}" for problem in problems),
         ]
     )

@@ -10,7 +10,9 @@ import copy
 import functools
 import hashlib
 import json
+import os
 import re
+import stat
 from collections import Counter
 from pathlib import Path
 from typing import Callable, List, Optional, Tuple
@@ -19,7 +21,7 @@ from superclaude.utils import (
     CONSOLE_HOOK_RE,
     SUPERCLAUDE_HOOK_MARKERS,
     UNMARKED_SC_HOOK_COMMANDS,
-    atomic_write_json,
+    atomic_write_text,
     is_legacy_hook_command,
     is_superclaude_hook,
     is_superclaude_inner_hook,
@@ -29,16 +31,18 @@ from superclaude.utils import (
 # Import line to add to CLAUDE.md
 CLAUDE_SC_IMPORT = "@superclaude/CLAUDE_SC.md"
 
-# The import every release wrote, as a whole line — `@superclaude/CLAUDE_SC.md`
-# (user, project) or `@.claude/superclaude/CLAUDE_SC.md` (local), either path
-# separator — with the heading above it ("# SuperClaude Framework" in older
-# releases). Anchored to the line: matching `@superclaude/` anywhere deleted a
-# user's text from that point on (`docs@superclaude/wiki and stays.` → `docs`).
-SC_IMPORT_RE = re.compile(
-    r"^(?:# (?:SuperClaude Framework|superclaude)\n)?"
-    r"@(?:\.claude[/\\])?superclaude[/\\]CLAUDE_SC\.md[ \t]*(?:\n|\Z)",
-    re.MULTILINE,
+# The import every release wrote, matched as one whole line of the CLAUDE
+# file with whatever ended it: `@superclaude/CLAUDE_SC.md` (user, project) or
+# `@.claude/superclaude/CLAUDE_SC.md` (local), either path separator (a file
+# authored on Windows may carry backslashes). Install writes it under its
+# heading ("# SuperClaude Framework" in older releases), after one blank line;
+# uninstall removes exactly those lines and nothing else. Anchored to the
+# line: matching `@superclaude/` anywhere deleted a user's text from that
+# point on (`docs@superclaude/wiki and stays.` → `docs`).
+SC_IMPORT_LINE_RE = re.compile(
+    r"@(?:\.claude[/\\])?superclaude[/\\]CLAUDE_SC\.md[ \t]*\r?\n?\Z"
 )
+SC_HEADING_LINE_RE = re.compile(r"# (?:SuperClaude Framework|superclaude)\r?\n?\Z")
 
 # Entry point of a legacy `<interpreter> <dir>/<name>.py [subcommand]` command
 # (releases before the console entry). The current form is
@@ -170,7 +174,9 @@ def _load_settings(settings_file: Path) -> dict:
     return data if isinstance(data, dict) else {}
 
 
-def _unwritable_settings(settings_file: Path) -> Optional[str]:
+def _unwritable_settings(
+    settings_file: Path, *, check_mode: bool = True
+) -> Optional[str]:
     """Why ``settings_file`` must not be rewritten, or None when it may be.
 
     A missing file is writable (install creates it), and so is one holding
@@ -179,12 +185,23 @@ def _unwritable_settings(settings_file: Path) -> Optional[str]:
     trailing comma, a comment, an array — is not: the 2026-10-17 audit
     reproduced ``superclaude install`` turning
     ``{"permissions": ..., "model": "opus",}`` into a file holding only hooks.
+
+    Nor is a read-only file. The atomic write renames a temp file over it, which
+    a writable directory allows, so a 0444 settings file was replaced with exit
+    0: the one way a user has to pin the file was ignored. ``check_mode=False``
+    is for a reader (doctor), which the mode does not concern.
     """
     if not settings_file.exists():
         return None
     problem = _encoding_problem(settings_file)
     if problem:
         return problem
+    if check_mode and not os.access(settings_file, os.W_OK):
+        mode = stat.S_IMODE(settings_file.stat().st_mode)
+        return (
+            f"{settings_file} is read-only (mode {mode:04o}); make it writable "
+            "or move it aside"
+        )
     if not settings_file.read_bytes().strip():
         return None
     try:
@@ -220,9 +237,50 @@ def input_problems(base_path: Path, scope: str, settings: bool = True) -> List[s
     return problems
 
 
+_INDENT_RE = re.compile(r'\n([ \t]+)"')
+
+
+def _settings_text(settings_file: Path, settings: dict) -> str:
+    """``settings`` serialised in the layout ``settings_file`` already has.
+
+    Every write used to re-serialise the file two-space, LF, ASCII-escaped and
+    without a trailing newline, whatever an editor or Claude Code's own
+    settings UI had left (install/upgrade audit, C-21): install dirtied a
+    committed file, and uninstall never gave the original bytes back. Read
+    from the file, cheaply: the first indented line's whitespace (tabs or
+    spaces; a one-line object stays one line), CRLF when it is the majority
+    line ending, a trailing newline when there is one, and raw non-ASCII when
+    the file holds any. A missing or empty file gets two spaces, LF and a
+    trailing newline, as Claude Code writes it.
+    """
+    indent: int | str | None = 2
+    newline = "\n"
+    trailing = True
+    ensure_ascii = True
+    try:
+        text = settings_file.read_bytes().decode("utf-8")
+    except (OSError, UnicodeDecodeError):
+        text = ""
+    if text.strip():
+        trailing = text.endswith("\n")
+        crlf = text.count("\r\n")
+        if crlf > text.count("\n") - crlf:
+            newline = "\r\n"
+        match = _INDENT_RE.search(text)
+        if match:
+            indent = match.group(1) if "\t" in match.group(1) else len(match.group(1))
+        elif text.strip() != "{}" and "\n" not in text.strip():
+            indent = None
+        ensure_ascii = text.isascii()
+    out = json.dumps(settings, indent=indent, ensure_ascii=ensure_ascii)
+    if newline != "\n":
+        out = out.replace("\n", newline)
+    return out + newline if trailing else out
+
+
 def _save_settings(settings_file: Path, settings: dict) -> Tuple[bool, str]:
     """
-    Save settings dict to settings.json file.
+    Save settings dict to settings.json file, keeping its layout and mode.
 
     Args:
         settings_file: Path to settings.json
@@ -233,7 +291,7 @@ def _save_settings(settings_file: Path, settings: dict) -> Tuple[bool, str]:
     """
     try:
         settings_file.parent.mkdir(parents=True, exist_ok=True)
-        atomic_write_json(settings_file, settings)
+        atomic_write_text(settings_file, _settings_text(settings_file, settings))
         return True, f"Settings saved to {settings_file}"
     except IOError as e:
         return False, f"Failed to save settings: {e}"
@@ -779,16 +837,17 @@ def update_claude_md_import(base_path: Path, scope: str = "user") -> Tuple[bool,
     if has_import:
         return True, status
 
-    # Create or update CLAUDE.md / CLAUDE.local.md
+    # Append the block in the file's own line ending, and touch no other byte:
+    # a text-mode read and write turned a CRLF file into LF (install/upgrade
+    # audit, C-20). A file not ending in a newline gets one first, so the
+    # heading starts a line.
     if claude_md.exists():
-        content = claude_md.read_text(encoding="utf-8")
-
-        if import_line not in content:
-            if not content.endswith("\n"):
-                content += "\n"
-            content += f"\n# superclaude\n{import_line}\n"
-
-        claude_md.write_text(content, encoding="utf-8")
+        content = claude_md.read_bytes().decode("utf-8")
+        nl = _line_ending(content)
+        if not content.endswith("\n"):
+            content += nl
+        content += f"{nl}# superclaude{nl}{import_line}{nl}"
+        claude_md.write_bytes(content.encode("utf-8"))
         return True, f"{target_label} updated with CLAUDE_SC.md import"
     else:
         header = (
@@ -804,6 +863,41 @@ def update_claude_md_import(base_path: Path, scope: str = "user") -> Tuple[bool,
         claude_md.parent.mkdir(parents=True, exist_ok=True)
         claude_md.write_text(content, encoding="utf-8")
         return True, f"{target_label} created with CLAUDE_SC.md import"
+
+
+def _line_ending(content: str) -> str:
+    """The line ending ``content`` uses most: CRLF only when it is the majority."""
+    crlf = content.count("\r\n")
+    return "\r\n" if crlf > content.count("\n") - crlf else "\n"
+
+
+def has_sc_import_line(content: str) -> bool:
+    """Whether ``content`` holds superclaude's import on a line of its own."""
+    return any(SC_IMPORT_LINE_RE.match(line) for line in content.splitlines(True))
+
+
+def _strip_sc_import_lines(lines: List[str]) -> Optional[List[str]]:
+    """``lines`` without superclaude's import lines, or None when there is none.
+
+    Each import line goes. The heading directly above it goes with it, and
+    when install wrote the block (heading preceded by one blank line) that
+    blank line too, so the file comes back as it was before install. Every
+    other line, blank-line runs and edges included, is the user's and keeps
+    its bytes (install/upgrade audit, C-20). ``splitlines(keepends=True)``
+    input: each element is one line with its own ending.
+    """
+    kept: List[str] = []
+    found = False
+    for line in lines:
+        if not SC_IMPORT_LINE_RE.match(line):
+            kept.append(line)
+            continue
+        found = True
+        if kept and SC_HEADING_LINE_RE.match(kept[-1]):
+            kept.pop()
+            if kept and kept[-1].rstrip("\r\n") == "":
+                kept.pop()
+    return kept if found else None
 
 
 def remove_claude_md_import(base_path: Path, scope: str = "user") -> Tuple[bool, str]:
@@ -824,17 +918,11 @@ def remove_claude_md_import(base_path: Path, scope: str = "user") -> Tuple[bool,
         return True, f"No {target_label} found (nothing to clean)"
 
     try:
-        content = claude_md.read_text(encoding="utf-8")
-        original_content = content
-
-        content = SC_IMPORT_RE.sub("", content)
-
-        # Clean up multiple blank lines
-        content = re.sub(r"\n{3,}", "\n\n", content)
-        stripped = content.strip()
-
-        if content == original_content:
+        content = claude_md.read_bytes().decode("utf-8")
+        lines = _strip_sc_import_lines(content.splitlines(keepends=True))
+        if lines is None:
             return True, f"No superclaude import found in {target_label}"
+        content = "".join(lines)
 
         # A file holding nothing but the heading install writes when it creates
         # the file is superclaude's: remove it. Local and project scope also
@@ -844,11 +932,12 @@ def remove_claude_md_import(base_path: Path, scope: str = "user") -> Tuple[bool,
             "# Claude Code Configuration (personal, gitignored)",
             "# Claude Code Configuration",
         }
+        stripped = content.strip()
         if stripped in SC_HEADERS or (scope in ("local", "project") and not stripped):
             claude_md.unlink()
             return True, f"{target_label} removed (no user content after SC cleanup)"
 
-        claude_md.write_text(stripped + "\n", encoding="utf-8")
+        claude_md.write_bytes(content.encode("utf-8"))
         return True, f"superclaude import removed from {target_label}"
 
     except Exception as e:

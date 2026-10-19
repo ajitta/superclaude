@@ -20,6 +20,7 @@ import json
 import os
 import re
 import shutil
+import stat
 import subprocess
 import sys
 from pathlib import Path
@@ -34,7 +35,7 @@ from superclaude.cli.install_components import install_all
 from superclaude.cli.install_git_exclude import add_git_exclude, remove_git_exclude
 from superclaude.cli.install_inventory import uninstall_all
 from superclaude.cli.install_paths import shipped_names
-from superclaude.cli.install_settings import remove_claude_md_import
+from superclaude.cli.install_settings import CLAUDE_SC_IMPORT, remove_claude_md_import
 from superclaude.cli.main import main
 from superclaude.utils import settings_filename
 from tests.conftest import init_git_repo
@@ -2204,3 +2205,246 @@ def test_c12_empty_local_memory_store_goes_quietly(tmp_path: Path, monkeypatch) 
     assert success, message
     assert not (base / "agent-memory-local").exists(), message
     assert "⚠️" not in message
+
+
+# --- C-20: the CLAUDE file keeps every byte outside superclaude's block -------
+
+# What `remove_claude_md_import` used to normalise: Windows line endings (the
+# whole file came back LF), runs of blank lines (collapsed to one) and blank
+# edges (stripped).
+C20_TEXTS = {
+    "crlf": "# Team notes\r\n\r\n\r\nkeep the run above\r\n",
+    "blank-runs": "\n\n# Team notes\n\n\n\nkeep the run above\n\n\n",
+    "no-final-newline": "# Team notes\nlast line, no newline",
+}
+
+
+def _import_line(scope: str) -> str:
+    return "@.claude/superclaude/CLAUDE_SC.md" if scope == "local" else CLAUDE_SC_IMPORT
+
+
+@pytest.mark.parametrize("layout", list(C20_TEXTS))
+@pytest.mark.parametrize("scope", SCOPES)
+def test_c20_install_appends_only_its_block_and_uninstall_removes_only_it(
+    tmp_path: Path, monkeypatch, scope: str, layout: str
+) -> None:
+    """C-20: install rewrote a CRLF file as LF; uninstall collapsed blank-line
+    runs and stripped both edges. The block goes in the file's own line ending,
+    and uninstall takes back exactly that block. A file without a final newline
+    keeps the one the import line needed: uninstall cannot tell it from the
+    user's own."""
+    home, project = sandbox(tmp_path, monkeypatch)
+    base = scope_base(home, project, scope)
+    target = claude_path(base, scope)
+    target.parent.mkdir(parents=True, exist_ok=True)
+    text = C20_TEXTS[layout]
+    target.write_bytes(text.encode("utf-8"))
+    nl = "\r\n" if "\r\n" in text else "\n"
+    joined = (text if text.endswith("\n") else text + nl).encode("utf-8")
+
+    success, message = install_all(base_path=base, force=False, scope=scope)
+
+    assert success, message
+    block = f"{nl}# superclaude{nl}{_import_line(scope)}{nl}".encode("utf-8")
+    assert target.read_bytes() == joined + block
+
+    success, message = uninstall_all(base_path=base, scope=scope)
+
+    assert success, message
+    assert target.read_bytes() == joined
+
+
+def _c20_removals(import_line: str) -> list[tuple[str, str, str]]:
+    """(id, before, after) for an import removal that touches nothing else."""
+    block = f"\n# superclaude\n{import_line}\n"
+    middle = f"a\n\n\n{block[1:]}\n\nb\n"
+    return [
+        ("block-mid-file", middle, middle.replace(block, "", 1)),
+        ("import-alone-crlf", f"{import_line}\r\n\r\nMy notes\r\n", "\r\nMy notes\r\n"),
+        (
+            "old-heading-crlf",
+            f"# Mine\r\n\r\n# SuperClaude Framework\r\n{import_line}\r\n",
+            "# Mine\r\n",
+        ),
+        (
+            "trailing-spaces-kept",
+            f"a  \n\n# superclaude\n{import_line}\nb \n",
+            "a  \nb \n",
+        ),
+    ]
+
+
+@pytest.mark.parametrize("scope", ["user", "local"])
+def test_c20_import_removal_touches_no_other_line(tmp_path: Path, scope: str) -> None:
+    import_line = _import_line(scope)
+    base = tmp_path / ".claude"
+    base.mkdir()
+    target = claude_path(base, scope)
+    for case, before, after in _c20_removals(import_line):
+        target.write_bytes(before.encode("utf-8"))
+
+        success, message = remove_claude_md_import(base, scope=scope)
+
+        assert success, (case, message)
+        assert target.read_bytes() == after.encode("utf-8"), case
+
+
+def test_c20_heading_only_crlf_file_still_goes(tmp_path: Path) -> None:
+    """The file install created, saved by an editor with CRLF, is still superclaude's."""
+    base = tmp_path / ".claude"
+    base.mkdir()
+    claude_md = base / "CLAUDE.md"
+    claude_md.write_bytes(
+        f"# Claude Code Configuration\r\n\r\n# superclaude\r\n{CLAUDE_SC_IMPORT}\r\n".encode()
+    )
+
+    success, message = remove_claude_md_import(base, scope="user")
+
+    assert success, message
+    assert not claude_md.exists(), message
+
+
+# --- C-21: settings writes keep mode and layout, and refuse a read-only file --
+
+# Layouts an editor or Claude Code's own settings UI leaves: each must come back
+# byte-for-byte after install and uninstall (I2 check c and d).
+C21_LAYOUTS = {
+    "two-space-newline": '{\n  "model": "opus"\n}\n',
+    "four-space-no-newline": '{\n    "model": "opus"\n}',
+    "tabs-crlf": '{\r\n\t"model": "opus"\r\n}\r\n',
+    "one-line": '{"model": "opus"}',
+    "non-ascii": '{\n  "statusLine": {\n    "command": "echo 안녕"\n  }\n}\n',
+    "escaped": '{\n  "statusLine": {\n    "command": "echo \\uc548\\ub155"\n  }\n}\n',
+}
+_INDENT = re.compile(r'\n([ \t]+)"')
+_not_root = pytest.mark.skipif(
+    getattr(os, "geteuid", lambda: 1)() == 0, reason="root ignores file modes"
+)
+_posix_modes = pytest.mark.skipif(
+    sys.platform == "win32", reason="Windows has only the read-only bit"
+)
+
+
+@pytest.mark.parametrize("layout", list(C21_LAYOUTS))
+@pytest.mark.parametrize("scope", SCOPES)
+def test_c21_settings_keep_their_layout_across_install_and_uninstall(
+    tmp_path: Path, monkeypatch, scope: str, layout: str
+) -> None:
+    """C-21: every settings write re-serialised the file (two-space, LF, no
+    trailing newline, ASCII escapes), so install dirtied a committed file and
+    uninstall never gave the original bytes back."""
+    home, project = sandbox(tmp_path, monkeypatch)
+    base = scope_base(home, project, scope)
+    settings = settings_path(base, scope)
+    settings.parent.mkdir(parents=True, exist_ok=True)
+    original = C21_LAYOUTS[layout].encode("utf-8")
+    settings.write_bytes(original)
+
+    success, message = install_all(base_path=base, force=False, scope=scope)
+
+    assert success, message
+    installed = settings.read_bytes()
+    assert json.loads(installed.decode("utf-8")).get("hooks"), installed
+    assert installed.endswith(b"\n") == original.endswith(b"\n"), installed
+    assert (b"\r\n" in installed) == (b"\r\n" in original), installed
+    indent = _INDENT.search(original.decode("utf-8"))
+    if indent:
+        assert _INDENT.search(installed.decode("utf-8")).group(1) == indent.group(1)
+    else:
+        assert b"\n" not in installed.rstrip(b"\r\n"), installed
+    assert installed.isascii() == original.isascii(), installed
+
+    success, message = uninstall_all(base_path=base, scope=scope)
+
+    assert success, message
+    assert settings.read_bytes() == original
+
+
+@_posix_modes
+@pytest.mark.parametrize("scope", SCOPES)
+def test_c21_settings_keep_their_permission_mode(
+    tmp_path: Path, monkeypatch, scope: str
+) -> None:
+    """C-21: the atomic write left every settings file 0600 (mkstemp), whatever
+    mode the user's file had; a new one gets what a plain open() would."""
+    home, project = sandbox(tmp_path, monkeypatch)
+    base = scope_base(home, project, scope)
+    settings = settings_path(base, scope)
+    settings.parent.mkdir(parents=True, exist_ok=True)
+    settings.write_text('{"model": "opus"}\n', encoding="utf-8")
+    settings.chmod(0o640)
+
+    success, message = install_all(base_path=base, force=False, scope=scope)
+
+    assert success, message
+    assert stat.S_IMODE(settings.stat().st_mode) == 0o640
+
+    success, message = uninstall_all(base_path=base, scope=scope)
+
+    assert success, message
+    assert stat.S_IMODE(settings.stat().st_mode) == 0o640
+
+
+@_posix_modes
+def test_c21_a_new_settings_file_gets_the_umask_mode(
+    tmp_path: Path, monkeypatch
+) -> None:
+    _home, _project, base = fresh_install(tmp_path, monkeypatch, "user")
+    umask = os.umask(0)
+    os.umask(umask)
+
+    assert stat.S_IMODE((base / "settings.json").stat().st_mode) == 0o666 & ~umask
+
+
+RO_COMMANDS = {
+    "install": ["install"],
+    "update": ["update"],
+    "uninstall": ["uninstall", "-y"],
+    "uninstall-dry-run": ["uninstall", "--dry-run"],
+}
+
+
+@_not_root
+@pytest.mark.parametrize("command", list(RO_COMMANDS))
+@pytest.mark.parametrize("scope", SCOPES)
+def test_c21_a_read_only_settings_file_is_refused_before_any_write(
+    tmp_path: Path, monkeypatch, command: str, scope: str
+) -> None:
+    """C-21 (E2-ro-settings): a 0444 settings file was replaced with exit 0, the
+    temp-file rename never asking the file. Refused like the other input
+    preflights: exit 1, the file named, nothing written or deleted."""
+    if command == "install":
+        home, project = sandbox(tmp_path, monkeypatch)
+        base = scope_base(home, project, scope)
+        settings = settings_path(base, scope)
+        settings.parent.mkdir(parents=True, exist_ok=True)
+        settings.write_text('{"model": "opus"}\n', encoding="utf-8")
+    else:
+        _home, _project, base = fresh_install(tmp_path, monkeypatch, scope)
+        settings = settings_path(base, scope)
+    settings.chmod(0o444)
+    before = snapshot(tmp_path)
+
+    result = CliRunner().invoke(main, [*RO_COMMANDS[command], "--scope", scope])
+
+    output = all_output(result)
+    assert result.exception is None or isinstance(result.exception, SystemExit), output
+    assert result.exit_code == 1, output
+    assert str(settings) in output and "read-only" in output, output
+    assert snapshot(tmp_path) == before
+    assert stat.S_IMODE(settings.stat().st_mode) == 0o444
+
+
+@_not_root
+@pytest.mark.parametrize("scope", SCOPES)
+def test_c21_doctor_passes_on_a_read_only_settings_file(
+    tmp_path: Path, monkeypatch, scope: str
+) -> None:
+    """doctor writes nothing, so a file install would refuse to edit is healthy to it."""
+    _home, _project, base = fresh_install(tmp_path, monkeypatch, scope)
+    monkeypatch.delenv("CLAUDE_CONFIG_DIR", raising=False)
+    settings_path(base, scope).chmod(0o444)
+
+    result = run_doctor(scope=scope)
+
+    assert result["passed"], result["checks"]

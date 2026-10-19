@@ -220,7 +220,7 @@ def _check_hooks_installed(base_path: Path, scope: str) -> Dict[str, Any]:
 
     # The reason install and uninstall would refuse the file, not a traceback:
     # a UTF-16 file raised UnicodeDecodeError here, a JSON array AttributeError.
-    problem = _unwritable_settings(settings_file)
+    problem = _unwritable_settings(settings_file, check_mode=False)
     if problem:
         return {"name": label, "passed": False, "details": [problem]}
 
