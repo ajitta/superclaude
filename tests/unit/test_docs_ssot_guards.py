@@ -1,0 +1,425 @@
+"""Docs ↔ SSOT guards (docs/features/docs-ssot-audit, 05-plan §2, T1–T5 and T7).
+
+The audit found 25 places where a document restated a mechanism, a list or
+a number that the code, the Makefile, hooks.json or the tree no longer
+matched, and none of them was in a shape an existing test watched. Each
+test here pins one of those shapes to its source. T6 lives in
+``test_version_consistency.py`` (the no-expiry lint).
+
+Scope is deliberate: README, AGENTS, CLAUDE, the shipped READMEs, the CLI
+help text, the Makefile and the working docs an agent is routed to. Dated
+research, analysis and archive docs are records and stay out.
+"""
+
+from __future__ import annotations
+
+import json
+import re
+from pathlib import Path
+
+import pytest
+from click.testing import CliRunner
+
+from superclaude.cli.hook_dispatch import HOOKS
+from superclaude.cli.install_paths import COMPONENTS
+from superclaude.cli.main import main as cli
+from superclaude.scripts.context_loader import RETIRED_FLAGS
+
+_ROOT = Path(__file__).resolve().parents[2]
+_SRC = _ROOT / "src" / "superclaude"
+_README = _ROOT / "README.md"
+_CODEX = _ROOT / "docs" / "codex" / "prompting_session_raw"
+
+
+def _read(path: Path) -> str:
+    return path.read_text(encoding="utf-8")
+
+
+def _cli_help() -> dict[str, str]:
+    """Every click help text, keyed by command path."""
+    runner = CliRunner()
+    out = {"superclaude": runner.invoke(cli, ["--help"]).output}
+    for name, cmd in cli.commands.items():
+        if name in ("insight", "hook", "auto-improve", "parallel-ab"):
+            continue  # argparse pass-throughs; their help is the script's own
+        out[f"superclaude {name}"] = runner.invoke(cli, [name, "--help"]).output
+        for sub in getattr(cmd, "commands", {}):
+            out[f"superclaude {name} {sub}"] = runner.invoke(
+                cli, [name, sub, "--help"]
+            ).output
+    return out
+
+
+# Docs an agent or a user is routed to as current fact (T2, T3).
+_ROUTED_DOCS = [
+    _README,
+    _ROOT / "AGENTS.md",
+    _ROOT / "CLAUDE.md",
+    _ROOT / "docs" / "README.md",
+    _ROOT / "docs" / "PRD.md",
+    _ROOT / "docs" / "UI-GUIDE.md",
+    *sorted((_ROOT / "docs" / "reports").glob("*.md")),
+    *sorted(_SRC.glob("*/README.md")),
+    _SRC / "ARCHITECTURE.md",
+]
+_CODEX_GUIDES = sorted(_CODEX.glob("0[1-8]_*.md")) + [_CODEX / "README.md"]
+_RULES_DOCS = sorted((_ROOT / ".claude" / "rules").rglob("*.md"))
+
+
+def _sources(extra: list[Path] = ()) -> dict[str, str]:
+    """Routed docs, the Makefile and the CLI help, as {label: text}.
+
+    Whitespace is collapsed, so a phrase Click re-wrapped across two lines of
+    a help text (06-verify Z-5), or one wrapped by hand in a doc, still
+    matches.
+    """
+    out = {str(p.relative_to(_ROOT)): _read(p) for p in [*_ROUTED_DOCS, *extra]}
+    out["Makefile"] = _read(_ROOT / "Makefile")
+    out.update(_cli_help())
+    return {label: re.sub(r"\s+", " ", text) for label, text in out.items()}
+
+
+# --------------------------------------------------------------------- T1 --
+def _hooks_json():
+    return json.loads(_read(_SRC / "hooks" / "hooks.json"))["hooks"]
+
+
+def _registrations() -> list[tuple[str, str]]:
+    return [
+        (event, h["command"])
+        for event, groups in _hooks_json().items()
+        for g in groups
+        for h in g["hooks"]
+    ]
+
+
+def _section(text: str, heading: str) -> str:
+    m = re.search(rf"^## {re.escape(heading)}\n(.*?)(?=^## |\Z)", text, re.M | re.S)
+    assert m, f"no '## {heading}' section"
+    return m.group(1)
+
+
+def test_hooks_readme_lists_every_registration():
+    """hooks/README.md 'Current Hooks' = hooks.json, event by event (D-07)."""
+    section = _section(_read(_SRC / "hooks" / "README.md"), "Current Hooks")
+    headings = set(re.findall(r"^### (\w+)", section, re.M))
+    events = set(_hooks_json())
+    assert headings == events, f"README events {headings} != hooks.json {events}"
+    for event, command in _registrations():
+        event_block = re.search(
+            rf"^### {event}\n(.*?)(?=^### |\Z)", section, re.M | re.S
+        ).group(1)
+        assert f"`{command}`" in event_block, (
+            f"hooks/README.md 'Current Hooks' omits `{command}` under {event}"
+        )
+
+
+def test_scripts_readme_rows_name_every_event():
+    """A scripts/README.md row that names hook events names all of them (D-18)."""
+    rows = _read(_SRC / "scripts" / "README.md").splitlines()
+    events = set(_hooks_json())
+    by_script: dict[str, set[str]] = {}
+    for event, command in _registrations():
+        by_script.setdefault(command.split()[2], set()).add(event)
+    for script, registered in by_script.items():
+        row = next((r for r in rows if f"`{script}.py`" in r), None)
+        assert row, f"scripts/README.md has no row for {script}.py"
+        named = {e for e in events if e in row}
+        if named:
+            assert named == registered, (
+                f"{script}.py row names {sorted(named)}, hooks.json registers "
+                f"it on {sorted(registered)}"
+            )
+
+
+# --------------------------------------------------------------------- T2 --
+# Phrases a release retired or a mechanism replaced; one row each, capped at
+# ten (Q3 b). A row names the finding that put it here. Rows are scoped to
+# the claim's shape, not the bare word (06-verify Z-9): `.gitignore` and
+# `gitignored` are wrong only when they describe the local scope (a legacy
+# `.gitignore` block that install strips is written as "legacy block");
+# `pytest-cov` is wrong only as a dev dependency.
+_LOCAL = r"(?:\blocal\b|CLAUDE\.local\.md|\./\.claude/)"
+_RETIRED_PHRASES = [
+    (
+        rf"{_LOCAL}.{{0,100}}\.gitignore block|\.gitignore block.{{0,100}}{_LOCAL}",
+        "D-01: local scope lives in .git/info/exclude",
+    ),
+    (
+        rf"{_LOCAL}.{{0,100}}\bgitignored\b|\bgitignored\b.{{0,100}}{_LOCAL}",
+        "D-24: local scope is excluded via .git/info/exclude",
+    ),
+    (r"`integration`", "D-02: there is no integration branch"),
+    (
+        r"\bpytest-cov\b(?=.{0,60}\b(?:uninstalled|dev extras|dev deps|toolchain|installs))",
+        "D-12: removed from the dev extras in 4.29.0",
+    ),
+    (r"\bPM Agent\b", "D-15: pm-agent was retired in 4.30.0"),
+    (r"\d+(?:\.\d+)?k-token", "D-06: TestCoreLiteSplit owns the kernel budget"),
+]
+
+
+@pytest.mark.parametrize(
+    ("pattern", "why"),
+    _RETIRED_PHRASES,
+    ids=[w.split(":")[0] for _, w in _RETIRED_PHRASES],
+)
+def test_docs_name_no_retired_phrase(pattern, why):
+    scope = _sources(_CODEX_GUIDES)
+    hits = [
+        f"{label}: {m.group(0)!r}"
+        for label, text in scope.items()
+        for m in re.finditer(pattern, text)
+    ]
+    assert not hits, f"{why}; still stated in: {hits}"
+
+
+def test_docs_name_only_registered_hooks():
+    """`superclaude hook <x>` in a doc names a hook in the registry (D-23)."""
+    scope = _sources([_ROOT / "CHANGELOG.md"])
+    bad = [
+        f"{label}: {m.group(0)}"
+        for label, text in scope.items()
+        for m in re.finditer(r"superclaude hook ([a-z][\w-]*)", text)
+        if m.group(1) not in HOOKS
+    ]
+    assert not bad, f"hook names not in hook_dispatch.HOOKS: {bad}"
+
+
+def _make_targets() -> set[str]:
+    text = _read(_ROOT / "Makefile")
+    return set(re.search(r"^\.PHONY:(.*)$", text, re.M).group(1).split())
+
+
+_TARGET_WORDS = {
+    "verify",
+    "test",
+    "lint",
+    "format",
+    "deploy",
+    "install",
+    "help",
+    "doctor",
+    "clean",
+    "release",
+    "ci",
+    "typecheck",
+    "sync",
+    "check",
+    "build",
+    "canary",
+}
+
+
+def test_docs_name_only_makefile_targets():
+    """`make <target>` in a doc is a .PHONY target (D-13).
+
+    A backticked `make x` is always checked; a bare one only when x is
+    target-shaped (06-verify Z-8).
+    """
+    targets = _make_targets()
+    scope = _sources(_CODEX_GUIDES)
+    bad = []
+    for label, text in scope.items():
+        for m in re.finditer(
+            r"`make ([a-z][a-z0-9-]*)`|(?<![\w/`])make ([a-z][a-z0-9-]*)\b", text
+        ):
+            backticked, bare = m.group(1), m.group(2)
+            t = backticked or bare
+            if t in targets:
+                continue
+            if backticked or t in _TARGET_WORDS or "-" in t:
+                bad.append(f"{label}: make {t}")
+    assert not bad, f"not a Makefile target: {bad}"
+
+
+def test_readme_retired_flags_list_is_complete():
+    """README's retired-flags note names every RETIRED_FLAGS key or the table (D-21)."""
+    line = next(
+        (ln for ln in _read(_README).splitlines() if "Retired flags" in ln), None
+    )
+    assert line, "README.md has no 'Retired flags' note"
+    if "RETIRED_FLAGS" in line:
+        return
+    missing = [
+        f
+        for f in RETIRED_FLAGS
+        if f"--{f}" not in line and not (f.startswith("think") and "--think*" in line)
+    ]
+    assert not missing, f"README retired-flags note omits {missing}"
+
+
+# --------------------------------------------------------------------- T3 --
+_PLACEHOLDER = re.compile(r"[<>{}*…]")
+
+
+def test_doc_test_paths_exist():
+    """Every `tests/…/x.py` a routed doc names exists (D-09)."""
+    scope = {
+        str(p.relative_to(_ROOT)): _read(p)
+        for p in [*_ROUTED_DOCS, *_CODEX_GUIDES, *_RULES_DOCS]
+    }
+    bad = [
+        f"{label}: {m.group(0)}"
+        for label, text in scope.items()
+        for m in re.finditer(r"\btests/[\w./-]+\.py\b", text)
+        if not _PLACEHOLDER.search(m.group(0)) and not (_ROOT / m.group(0)).exists()
+    ]
+    assert not bad, f"test files that do not exist: {bad}"
+
+
+def test_doc_layout_dirs_exist():
+    """docs/README.md Layout and PROJECT_INDEX.md Docs layout = `ls docs/` (D-11).
+
+    Both directions: every listed dir exists, every existing dir is listed
+    (06-verify Z-8).
+    """
+    existing = {p.name for p in (_ROOT / "docs").iterdir() if p.is_dir()}
+    listed = {
+        "docs/README.md": set(
+            re.findall(
+                r"^\| `([\w-]+)/` \|",
+                _section(_read(_ROOT / "docs" / "README.md"), "Layout"),
+                re.M,
+            )
+        ),
+        "PROJECT_INDEX.md": {
+            name
+            for name in re.findall(
+                r"`([\w-]+)/[^`]*`",
+                _section(
+                    _read(_ROOT / "docs" / "reports" / "PROJECT_INDEX.md"),
+                    "Docs layout",
+                ),
+            )
+            if name != "docs"
+        },
+    }
+    bad = []
+    for label, names in listed.items():
+        bad += [
+            f"{label} lists {n}/, which does not exist"
+            for n in sorted(names - existing)
+        ]
+        bad += [f"{label} omits docs/{n}/" for n in sorted(existing - names)]
+    assert not bad, f"docs/ layouts out of sync with the tree: {bad}"
+
+
+def test_doc_rule_file_names_exist():
+    """Every `.claude/rules/<x>.md` a routed doc names exists."""
+    scope = {
+        str(p.relative_to(_ROOT)): _read(p)
+        for p in [*_ROUTED_DOCS, *_CODEX_GUIDES, *_RULES_DOCS]
+    }
+    bad = [
+        f"{label}: {m.group(0)}"
+        for label, text in scope.items()
+        for m in re.finditer(r"\.claude/rules/[\w/-]+\.md", text)
+        if not _PLACEHOLDER.search(m.group(0)) and not (_ROOT / m.group(0)).exists()
+    ]
+    assert not bad, f"rule files that do not exist: {bad}"
+
+
+# --------------------------------------------------------------------- T4 --
+def _config_profiles() -> dict[str, tuple[str, str]]:
+    text = _read(_SRC / "modes" / "RESEARCH_CONFIG.md")
+    block = re.search(r"<depth_profiles>(.*?)</depth_profiles>", text, re.S).group(1)
+    out = {}
+    for name, triple in re.findall(r"^\| (\w+) \| ([\d+]+/\d+/\d+) \|", block, re.M):
+        sources, hops, _iters = triple.split("/")
+        out[name] = (sources, hops)
+    assert out, "RESEARCH_CONFIG.md has no depth_profiles rows"
+    return out
+
+
+def _readme_section(heading_fragment: str) -> str:
+    text = _read(_README)
+    m = re.search(
+        rf"^## [^\n]*{re.escape(heading_fragment)}[^\n]*\n(.*?)(?=^## |\Z)",
+        text,
+        re.M | re.S,
+    )
+    assert m, f"README.md has no '## …{heading_fragment}…' section"
+    return m.group(1)
+
+
+_ALLOWED_DEPTH_COLUMNS = {"Depth", "Sources", "Hops", "Extract", "Best For"}
+
+
+def test_readme_research_table_matches_config():
+    """README's depth table = RESEARCH_CONFIG depth_profiles, no extra columns (D-04)."""
+    section = _readme_section("Deep Research")
+    m = re.search(r"^\| \*?\*?Depth.*?\n(?:\|.*\n)+", section, re.M)
+    assert m, "README Deep Research section has no depth table"
+    lines = m.group(0).strip().splitlines()
+    header = [c.strip().strip("*") for c in lines[0].strip("|").split("|")]
+    extra = set(header) - _ALLOWED_DEPTH_COLUMNS
+    assert not extra, (
+        f"README depth table has columns RESEARCH_CONFIG does not define: {extra}"
+    )
+    config = _config_profiles()
+    for row in lines[2:]:
+        cells = [c.strip().strip("*") for c in row.strip("|").split("|")]
+        profile = cells[0].lower()
+        assert profile in config, (
+            f"README depth row {profile!r} is not a config profile"
+        )
+        assert (cells[1], cells[2]) == config[profile], (
+            f"README {profile}: sources/hops {cells[1]}/{cells[2]} vs config {config[profile]}"
+        )
+
+
+def test_readme_research_section_states_no_undefined_figure():
+    """No confidence or minute figure in README's research section (D-04)."""
+    section = _readme_section("Deep Research")
+    hits = re.findall(r"\b\d\.\d\b|~\d+ ?min\b", section)
+    assert not hits, (
+        f"README Deep Research states figures no shipped file defines: {hits}"
+    )
+
+
+# --------------------------------------------------------------------- T5 --
+def test_readme_command_file_claims_resolve():
+    """'`/sc:x` … `.claude/<file>`' on one README line: commands/x.md names that file (D-05).
+
+    The claimant is the last `/sc:x` on the line, across table cells
+    (06-verify Z-7).
+    """
+    bad = []
+    for line in _read(_README).splitlines():
+        claimant = None
+        for m in re.finditer(r"/sc:([\w-]+)|`(\.claude/[\w./-]+)`", line):
+            if m.group(1):
+                claimant = m.group(1)
+            elif claimant:
+                leaf = m.group(2).rstrip("/").split("/")[-1]
+                body = _read(_SRC / "commands" / f"{claimant}.md")
+                if leaf not in body:
+                    bad.append(f"/sc:{claimant} ↔ {m.group(2)}")
+    assert not bad, f"README credits a command with a file its body never names: {bad}"
+
+
+# --------------------------------------------------------------------- T7 --
+def _component_leaves() -> set[str]:
+    leaves = set()
+    for _, target, _ in COMPONENTS.values():
+        leaves.add(target if target == "commands/sc" else target.split("/")[-1])
+    return leaves
+
+
+def test_install_surfaces_name_every_component():
+    """README's install tree and install/uninstall help name every component dir (D-16)."""
+    text = _read(_README)
+    m = re.search(r"What gets installed.*?```\n(.*?)```", text, re.S)
+    assert m, "README.md has no 'What gets installed' tree"
+    surfaces = {"README.md 'What gets installed'": m.group(1)}
+    help_text = _cli_help()
+    surfaces["superclaude install --help"] = help_text["superclaude install"]
+    surfaces["superclaude uninstall --help"] = help_text["superclaude uninstall"]
+    bad = [
+        f"{label} omits {leaf}"
+        for label, body in surfaces.items()
+        for leaf in sorted(_component_leaves())
+        if leaf not in body
+    ]
+    assert not bad, f"install surfaces missing a component: {bad}"

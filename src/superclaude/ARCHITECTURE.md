@@ -12,7 +12,7 @@ modes/          Mindset overlay     Mood/Posture    On-demand (context_loader)
 agents/         Domain expert       Specialist      CC-native delegation
 output-styles/  Response voice      House style     CC-native, user-selected (/config)
 commands/       Workflow entry      Menu item       CC-native /sc:*
-skills/         Authoring aid       Style guide     CC-native, user-invoked (/sc-author)
+skills/         Authoring aid       Style guide     CC-native, user- or model-invoked (/sc-author, /sc-prompt)
 mcp/            Tool docs+config    Tool manual     context_loader + install_mcp
 scripts/        Hook infra          Plumbing        hooks.json → settings.json
 ```
@@ -28,7 +28,7 @@ Only three hooks are mechanically enforced — `file_size_guard.py` (blocks Read
 Always-applied principles and rules that define superclaude's identity. Loaded via `CLAUDE_SC.md` `@import` at session start.
 
 **Sub-roles:**
-- **Always-loaded** — FLAGS.md, PRINCIPLES.md, RULES.md (imported by CLAUDE_SC.md, present in every session). RULES.md is a ~1.5k-token kernel (Phase 2-1 core-lite split, measurement-gated by the evals/ 4×7 matrix): five rule classes whose loss is most expensive — purpose_before_action (added 2026-10-17 after the sc-full vs sc-candidate pilot, `docs/features/reframing-anchoring/06-pilot.md`), scope, verification, destructive-op confirmation, project-rules priority — plus a map of the on-demand modules.
+- **Always-loaded** — FLAGS.md, PRINCIPLES.md, RULES.md (imported by CLAUDE_SC.md, present in every session). RULES.md is the kernel (Phase 2-1 core-lite split, measurement-gated by the evals/ matrix of its day): the rule classes in its `<kernel_rules>`, those whose loss is most expensive, with the budget pinned by `tests/unit/test_context_loader.py` `TestCoreLiteSplit`, plus a map of the on-demand modules. The latest class, purpose_before_action, was added 2026-10-17 after the sc-full vs sc-candidate pilot (`docs/features/reframing-anchoring/06-pilot.md`).
 - **On-demand rule modules** — core/rules/RULES_{QUALITY,DELEGATION,DOCS,INTERACTION}.md — full R01–R21 detail, verification ladder, delegation matrix, doc conventions, selection protocol. Injected as full .md by context_loader on matching context (implement/review, delegation, doc-producing, /sc: commands); readable explicitly when no trigger fired.
 - **On-demand reference** — BUSINESS_SYMBOLS.md (loaded by context_loader on business-symbol/example keywords or `/sc:business-panel --structured` — not by `--business-panel`, which loads only MODE_Business_Panel.md)
 
@@ -97,7 +97,7 @@ State that is not session-keyed adds `project_key()` to its filename, because a 
 
 ### Python Infrastructure (not content types)
 
-The following directories support the content framework but are not content types themselves: `cli/` (Click-based CLI and installation logic), `hooks/` (hook system integration), and `utils/` (shared utilities). These are documented in the project `AGENTS.md`.
+The following directories support the content framework but are not content types themselves: `cli/` (Click-based CLI and installation logic; `hook_dispatch.py` is the hook registry), `hooks/` (`hooks.json` and the MCP fallback helper), and `utils/` (path resolvers and hook-state helpers). Their contracts live in the module docstrings and `.claude/rules/gotchas/hooks.md`; the developer loop (uv, tests, make targets) is in the project `AGENTS.md`.
 
 ## Content Delivery Pipeline
 
@@ -129,7 +129,7 @@ Session Start
 |-----------|--------------|---------|--------|
 | **Always loaded** | core/ (FLAGS, PRINCIPLES, RULES kernel) | Session start | ~140 lines via @import |
 | **On-demand** | modes/, mcp/, core/rules/, core/BUSINESS_SYMBOLS | Flag/keyword in prompt | 12K token budget (`DEFAULT_CONTEXT_MAX_TOKENS`, context_loader) |
-| **CC-native** | agents/, commands/, output-styles/, skills/ | Auto-delegation, /sc:*, selected style, /sc-author | Managed by Claude Code runtime |
+| **CC-native** | agents/, commands/, output-styles/, skills/ | Auto-delegation, /sc:*, selected style, /sc-author, /sc-prompt | Managed by Claude Code runtime |
 
 ## Naming Trinity
 
@@ -159,7 +159,7 @@ Each content type has a dedicated authoring guide:
 | commands/ | `.claude/rules/command-authoring.md` | `tests/unit/test_command_structure.py` |
 | output-styles/ | `.claude/rules/output-style-authoring.md` | `tests/unit/test_output_style_structure.py` |
 | modes/ | `.claude/rules/mode-authoring.md` | `tests/unit/test_mode_structure.py` |
-| core/ | N/A (framework maintainers only) | N/A |
+| core/ | `.claude/rules/xml-prose-format.md` (framework maintainers only) | `tests/unit/test_cross_references.py` (rule citations, kernel pointers), `tests/unit/test_context_loader.py` (`TestCoreLiteSplit`) |
 | mcp/ | `.claude/rules/mcp-authoring.md` | `tests/unit/test_content_structure.py` |
 | skills/ | `.claude/rules/skill-authoring.md` | `tests/unit/test_sc_author_skill.py` |
 | scripts/ | Standard Python/shell conventions | `tests/unit/` (per-script) |

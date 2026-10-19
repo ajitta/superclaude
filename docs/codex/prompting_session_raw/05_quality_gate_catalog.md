@@ -1,11 +1,13 @@
 ---
 title: superclaude 품질 게이트 카탈로그
 status: working-guide
-last_verified: 2026-08-22
+last_verified: 2026-10-19
 measured_at: 5b6dc5b
 ---
 
 # superclaude 품질 게이트 카탈로그
+
+> 2026-10-19: D-09·D-13 항목(테스트 파일 이름, `verify` 타깃)만 재확인 (docs-ssot-audit). 그 밖의 내용은 2026-08-22 검증 그대로다.
 
 기준선 수치는 이 문서에 두지 않는다. 현재 baseline과 재측정 명령은
 [`08_current_findings_and_backlog.md`](08_current_findings_and_backlog.md)의 `F-006`,
@@ -131,7 +133,7 @@ uv run python evals/run_eval.py \
 
 ```bash
 uv run python evals/run_eval.py --canary --model <pinned-model>
-uv run pytest tests/integration/test_skill_canary.py -m canary -v
+uv run python evals/run_eval.py --canary
 ```
 
 인증·비용이 없는 환경에서는 NOT RUN으로 기록하며 dry-run을 행동 통과로
@@ -209,7 +211,7 @@ PY
 - constraint violation, false completion, security violation은 증가하지 않는다.
 - 변경된 behavior에는 regression fixture가 있다.
 - 실제 실행한 명령, 결과 수, NOT RUN 이유, artifact 위치를 기록한다.
-- `make verify`/`make test-plugin`은 exit propagation이 수정되기 전 evidence-only다.
+- `make test-plugin`은 exit propagation이 수정되기 전 evidence-only다 (옛 `verify` 타깃은 4.29.0에서 제거됨).
 
 ## 3. 구성요소별 gate matrix
 
@@ -236,7 +238,7 @@ PY
 |---|---|
 | agent | `uv run pytest tests/unit/test_agent_structure.py -v` |
 | command | `uv run pytest tests/unit/test_command_structure.py -v` |
-| skill | `uv run pytest tests/unit/test_skill_structure.py -v` |
+| skill | `uv run pytest tests/unit/test_sc_author_skill.py tests/unit/test_sc_prompt_skill.py -v` |
 | mode | `uv run pytest tests/unit/test_mode_structure.py -v` |
 | MCP/mode common | `uv run pytest tests/unit/test_content_structure.py -v` |
 | cross refs | `uv run pytest tests/unit/test_cross_references.py -v` |

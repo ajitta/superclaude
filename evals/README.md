@@ -1,6 +1,6 @@
 # superclaude Eval Harness
 
-4-arm behavioral eval (roadmap Phase 1-1) + model-release canary suite
+Multi-arm behavioral eval (roadmap Phase 1-1) + model-release canary suite
 (Phase 1-2). Dev-only tooling — not shipped by the installer.
 
 ## Arms
@@ -23,10 +23,10 @@ in-repo runs read plan/spec docs and false-pass not-yet-installed rules).
 
 ## Tasks & metrics
 
-`tasks.yaml` defines 7 matrix tasks, 4 canary-only behavior slices (why
-they are canary-only: see the group comment in `tasks.yaml`), 3
-canary-only prose-rule probes, and 1 canary-only command-checkpoint probe
-(`implement-checkpoint`).
+`tasks.yaml` defines the matrix tasks (those without `canary_only: true`;
+`run_eval.py` runs each across every arm in `ARMS`) and the canary-only
+tasks, grouped by the section comments in `tasks.yaml`, which also say why
+each group is canary-only.
 Check `tag`s map to roadmap metrics: `success`, `scope` (unnecessary file
 changes), `verification` (actual-verification-ran), `location` (output
 location accuracy), `gotcha_compliance`, `citation` (file:line accuracy),
@@ -74,7 +74,7 @@ matrix run carries 2 of the 7 gates and `--canary` carries all 7.
 
 ```bash
 uv run python evals/run_eval.py --dry-run     # build + validate everything, zero API calls
-uv run python evals/run_eval.py               # full 4-arm × 7-task matrix
+uv run python evals/run_eval.py               # full matrix: every arm × every matrix task
 uv run python evals/run_eval.py --canary      # canary suite (canary-flagged tasks, sc-full arm)
 uv run python evals/run_eval.py --canary --permission-mode auto   # same suite under auto mode
 uv run python evals/run_eval.py --arms vanilla,sc-full --task bugfix-scope-creep
@@ -82,7 +82,8 @@ uv run python evals/run_eval.py --arms vanilla,sc-full --task bugfix-scope-creep
 
 `--permission-mode auto` reruns the canary under auto mode, whose injected "execute immediately" reminder may override prose stop rules. The `conflicting-constraints` and `problem-statement-not-request` probes measure whether the always-loaded rules' stop behavior survives it (report-and-stop on a problem statement, surfacing a conflicting project rule). `implement-checkpoint` invokes `/sc:implement` on a five-file rename and measures its wait-for-approval checkpoint; brainstorm's and task's checkpoints are not measured yet. The mode is recorded in `results.json` (`permission_mode` per row) and the `report.md` header so two runs can be told apart.
 
-Cost control: a full 4×7 matrix is 28 headless sessions. Start with
+Cost control: a full matrix is one headless session per arm per matrix
+task (`len(ARMS)` × the tasks without `canary_only`). Start with
 `--dry-run`, then one task across two arms, before paying for the matrix.
 
 Model-release canary (Phase 1-2): on each new model release run

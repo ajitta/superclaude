@@ -49,8 +49,6 @@ introducing a ninth one.
 - Detail under an item: 6 spaces then `└─ `.
 - Alignment comes from f-string field widths, not a table library — 40 for
   component descriptions, 25 for agent/skill names, 20 for command names.
-- Section rule inside a long list: `━━ <heading> ━━`.
-- Box-drawing (`┌─┬─┐`) is reserved for the one real matrix, `mcp --list`.
 - Totals go after a blank line: `Total: <n> available, <m> installed`.
 
 ## Component Conventions

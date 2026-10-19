@@ -17,9 +17,10 @@ from superclaude import __version__
 @click.version_option(version=__version__, prog_name="superclaude")
 def main():
     """
-    superclaude - AI-enhanced development framework for Claude Code
+    superclaude - a Claude Code content framework
 
-    A pytest plugin providing PM Agent capabilities and optional skills system.
+    A CLI that installs commands, agents, modes, output styles, rules, skills
+    and hooks into Claude Code's content directories, plus a pytest plugin.
     """
     pass
 
@@ -86,7 +87,7 @@ def _stdin_can_answer() -> bool:
     "--scope",
     default="user",
     type=click.Choice(["user", "project", "local"]),
-    help="Installation scope: user (~/.claude/), project (./.claude/ team-shared content), or local (./.claude/ personal, gitignored)",
+    help="Installation scope: user (~/.claude/), project (./.claude/ team-shared content), or local (./.claude/ personal, kept out of git via .git/info/exclude)",
 )
 @click.option(
     "--interactive",
@@ -106,14 +107,15 @@ def install(
     - Agent definitions to agents/
     - Output styles to output-styles/ (select one via /config)
     - Behavioral modes to superclaude/modes/
-    - Framework files to superclaude/ (core, mcp)
+    - Framework files to superclaude/ (core, mcp, templates)
+    - Skills to skills/ (sc-author, sc-prompt)
 
     Scopes:
     - user (default): Install to ~/.claude/ (global, personal)
     - project: Install to ./.claude/ (team-shared; content AND the hook
       registration are committed — every command is `superclaude hook <name>`,
       so settings.json holds no machine-specific bytes)
-    - local: Install to ./.claude/ (personal in team repo; auto-gitignored, hooks to settings.local.json, CLAUDE.local.md at project root)
+    - local: Install to ./.claude/ (personal in team repo; kept out of git via .git/info/exclude, hooks to settings.local.json, CLAUDE.local.md at project root)
 
     Examples:
         superclaude install
@@ -233,7 +235,7 @@ def install(
         click.echo(
             "💡 Installing at the default user scope → ~/.claude, which applies "
             "in every repository. Since this is a git repo, --scope local is the "
-            "alternative: a personal install inside it, auto-gitignored, with its "
+            "alternative: a personal install inside it, kept out of git via .git/info/exclude, with its "
             "own settings."
         )
         click.echo()
@@ -300,6 +302,7 @@ def uninstall(
     - superclaude/ directory (core, modes, mcp, templates)
     - commands/sc/ directory (slash commands)
     - shipped files in agents/ and output-styles/ (your own files stay)
+    - shipped skill directories in skills/ (your own skills stay)
     - hooks/hooks.json file
     - superclaude hooks from settings.json (preserves user hooks)
     - @superclaude import from CLAUDE.md
@@ -311,13 +314,13 @@ def uninstall(
     Scopes:
     - user (default): Uninstall from ~/.claude/
     - project: Uninstall from ./.claude/ (team-shared)
-    - local: Uninstall from ./.claude/ + remove CLAUDE.local.md + clean .gitignore block
+    - local: Uninstall from ./.claude/ + remove CLAUDE.local.md + remove its .git/info/exclude block
 
     Examples:
         superclaude uninstall --dry-run        # Preview what will be removed
         superclaude uninstall --yes            # Skip confirmation
         superclaude uninstall --scope project  # Uninstall from current project
-        superclaude uninstall --scope local    # Uninstall personal install (cleans .gitignore)
+        superclaude uninstall --scope local    # Uninstall personal install (removes its exclude block)
         superclaude uninstall --keep-settings  # Keep settings.json hooks
         superclaude uninstall --remove-mcp     # Also remove superclaude-registered MCP servers
     """
@@ -405,11 +408,11 @@ def mcp(servers, list_only, scope, dry_run):
     "--scope",
     default="user",
     type=click.Choice(["user", "project", "local"]),
-    help="Installation scope: user (~/.claude/), project (./.claude/ team-shared content), or local (./.claude/ personal, gitignored)",
+    help="Installation scope: user (~/.claude/), project (./.claude/ team-shared content), or local (./.claude/ personal, kept out of git via .git/info/exclude)",
 )
 def update(scope: str):
     """
-    Update superclaude commands to latest version
+    Re-install every component where an install exists
 
     Re-installs all components to match the current package version, like
     'install --force', but only where an install exists: at a scope with none
@@ -418,7 +421,7 @@ def update(scope: str):
     Scopes:
     - user (default): Update ~/.claude/
     - project: Update ./.claude/
-    - local: Update ./.claude/ (personal, gitignored)
+    - local: Update ./.claude/ (personal, kept out of git via .git/info/exclude)
 
     Example:
         superclaude update

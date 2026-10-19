@@ -1,7 +1,7 @@
 ---
 title: 콘텐츠 구성요소 개선 플레이북
 status: working-guide
-last_verified: 2026-08-22
+last_verified: 2026-10-19
 applies_to:
   - src/superclaude/CLAUDE_SC.md
   - src/superclaude/core
@@ -13,6 +13,8 @@ applies_to:
 ---
 
 # 콘텐츠 구성요소 개선 플레이북
+
+> 2026-10-19: D-09 항목(테스트 파일 이름)만 재확인 (docs-ssot-audit). 그 밖의 내용은 2026-08-22 검증 그대로다.
 
 ## 1. 공통 개선 루프
 
@@ -237,9 +239,9 @@ SSOT: `.claude/rules/skill-authoring.md`.
 ### 필수 검증
 
 ```bash
-uv run pytest tests/unit/test_skill_structure.py -v
+uv run pytest tests/unit/test_sc_author_skill.py tests/unit/test_sc_prompt_skill.py -v
 uv run pytest tests/integration/test_cross_directory_refs.py -v
-uv run pytest tests/integration/test_skill_canary.py -m canary -v
+uv run python evals/run_eval.py --canary
 ```
 
 canary는 외부 Claude CLI를 사용하므로 비용·인증이 필요한 조건부 gate다. 최소한

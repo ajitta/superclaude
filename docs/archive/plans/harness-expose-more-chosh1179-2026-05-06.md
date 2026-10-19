@@ -1,9 +1,11 @@
 ---
-status: draft
-revised: 2026-05-06
+status: deprecated
+revised: 2026-10-19
 ---
 
 # Harness-level "Expose more" follow-ups
+
+> Deprecated 2026-10-19 (docs-ssot-audit Q5): never implemented; it names `scripts/diff_exposer.py` and `tests/integration/test_scope_block.py`, which were never built. Kept as a record.
 
 ## Context
 

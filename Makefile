@@ -32,8 +32,8 @@ sync-project: ## Force-sync content to project scope (./.claude/)
 	@echo "📦 Syncing content to project scope (./.claude/)..."
 	uv run superclaude install --force --scope project
 
-sync-local: ## Force-sync content to local scope (./.claude/, gitignored)
-	@echo "📦 Syncing content to local scope (./.claude/, gitignored)..."
+sync-local: ## Force-sync content to local scope (./.claude/, kept out of git via .git/info/exclude)
+	@echo "📦 Syncing content to local scope (./.claude/, kept out of git via .git/info/exclude)..."
 	uv run superclaude install --force --scope local
 
 ##@ 🔧 Development:
@@ -150,8 +150,8 @@ uninstall-project: ## Uninstall from project scope (./.claude/)
 	@echo "🗑️  Uninstalling superclaude from project scope (./.claude/)..."
 	uv run superclaude uninstall --scope project
 
-uninstall-local: ## Uninstall from local scope (./.claude/, gitignored)
-	@echo "🗑️  Uninstalling superclaude from local scope (./.claude/, gitignored)..."
+uninstall-local: ## Uninstall from local scope (./.claude/, kept out of git via .git/info/exclude)
+	@echo "🗑️  Uninstalling superclaude from local scope (./.claude/, kept out of git via .git/info/exclude)..."
 	uv run superclaude uninstall --scope local
 
 # Remove legacy superclaude files from ~/.claude directory

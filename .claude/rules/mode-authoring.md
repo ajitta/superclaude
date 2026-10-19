@@ -103,7 +103,7 @@ Note: symbol systems and abbreviation maps as an *output contract* were removed 
 
 ## Supporting Config Files
 
-Operational parameters too detailed for the mode itself go in sibling `type="config"` files (e.g., `RESEARCH_CONFIG.md` — depth profiles, confidence thresholds). They are not subject to mode validation (no 4-axis requirement); only the cross-reference check (`test_cross_references.py`) reads them.
+Operational parameters too detailed for the mode itself go in sibling `type="config"` files (e.g., `RESEARCH_CONFIG.md` — depth profiles, source gates, credibility tiers, tool routing). They are not subject to mode validation (no 4-axis requirement); only the cross-reference check (`test_cross_references.py`) reads them.
 
 ## Format
 

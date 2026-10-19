@@ -1,7 +1,7 @@
 ---
 title: 런타임·설치·배포 개선 플레이북
 status: working-guide
-last_verified: 2026-08-22
+last_verified: 2026-10-19
 applies_to:
   - src/superclaude/cli
   - src/superclaude/hooks
@@ -12,6 +12,8 @@ applies_to:
 ---
 
 # 런타임·설치·배포 개선 플레이북
+
+> 2026-10-19: D-13·D-24 항목(`verify` 타깃, local scope 표현)만 재확인 (docs-ssot-audit). 그 밖의 내용은 2026-08-22 검증 그대로다.
 
 ## 1. 책임 경계
 
@@ -58,7 +60,7 @@ Claude Code runtime
 |---|---|---|---|
 | user | `~/.claude` | 사용자 전역 | 다른 프로젝트와 runtime state가 섞이지 않게 project key 필요 |
 | project | `./.claude` | git으로 팀 공유 | team-owned 설정과 content |
-| local | `./.claude` | 개인·gitignored | `CLAUDE.local.md`, `.git/info/exclude`, local memory |
+| local | `./.claude` | 개인·`.git/info/exclude` | `CLAUDE.local.md`, `.git/info/exclude`, local memory |
 
 CLI code의 CWD는 사용자가 설치 대상을 선택한 위치이므로 유효하다. hook code의
 CWD는 project root라고 보장되지 않으므로 `superclaude.utils` resolver를 사용한다.
@@ -116,7 +118,7 @@ uv run pytest tests/unit/test_verify_drift.py -v
 uv run pytest tests/unit/test_scope_paths.py -v
 ```
 
-`make verify`와 `make test-plugin`은 현재 내부 실패를 nonzero로 보장하지 않으므로
+`make test-plugin`은 현재 내부 실패를 nonzero로 보장하지 않으므로 (옛 `verify` 타깃은 4.29.0에서 제거됨)
 릴리스 hard gate로 사용하지 않는다. 직접 명령의 exit code를 확인한다.
 
 ## 7. Clean artifact gate

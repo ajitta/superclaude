@@ -72,7 +72,7 @@ superclaude install --scope local      # personal-in-team-repo (./.claude/, kept
                                        #   .git/info/exclude; settings.local.json + CLAUDE.local.md)
 superclaude install --force            # overwrite an existing install
 superclaude install -i                 # interactive wizard (scope → preview → confirm)
-superclaude install --list             # show available components, install nothing
+superclaude install --list             # list the slash commands, install nothing
 superclaude install --list-all         # show every component + its install status
 ```
 
@@ -83,7 +83,8 @@ What gets installed (per scope):
 ├── commands/sc/        # 35 slash commands (/sc:plan, /sc:implement, …)
 ├── agents/             # 24 agent definitions
 ├── output-styles/      # output styles (pick one via /config → Output style)
-├── superclaude/        # core rules, modes, mcp docs
+├── skills/             # sc-author, sc-prompt (shared with your own skills)
+├── superclaude/        # core rules, modes, mcp docs, doc-scaffold templates
 ├── hooks/hooks.json    # SessionStart / PreCompact / SessionEnd / etc.
 └── settings(.local).json  # framework hooks merged in (your existing hooks preserved)
 ```
@@ -250,10 +251,10 @@ To remove everything, see [Uninstall](#uninstall). If you have `make`, `make dep
 
 | File | Purpose |
 |------|---------|
-| [`CLAUDE.md`](CLAUDE.md) | Project-specific rules: env (UV), make targets, how to run the tests, git workflow |
+| [`CLAUDE.md`](CLAUDE.md) → [`AGENTS.md`](AGENTS.md) | Project rules: env (UV), make targets, how to run the tests, git workflow |
 | [`src/superclaude/ARCHITECTURE.md`](src/superclaude/ARCHITECTURE.md) | Content-framework taxonomy — directory roles, delivery pipelines, content types |
 | [`src/superclaude/CLAUDE_SC.md`](src/superclaude/CLAUDE_SC.md) | The always-loaded import chain → `core/FLAGS.md`, `PRINCIPLES.md`, `RULES.md` |
-| [`.claude/rules/`](.claude/rules) | Authoring specs for agents/commands/modes |
+| [`.claude/rules/`](.claude/rules) | Authoring specs, one per content type (agents, commands, modes, MCP docs, output styles, skills), plus the content-quality and format rules |
 | [`.claude/rules/gotchas/`](.claude/rules/gotchas) | Project-specific traps (e.g. *do not Read sub-agent `*.output` files*) |
 | [`SECURITY.md`](SECURITY.md) | Security disclosure policy |
 
@@ -313,7 +314,7 @@ The framework's value comes from chaining commands. Each chain has gates: a step
 | `/sc:plan` | `docs/features/<slug>/05-plan.md` (one-off: `docs/plans/…md`) — phased TDD tasks, file paths, verify cmds | Plan committed |
 | `/sc:implement --plan` | Code + per-phase commits | Implementation complete; plan checkboxes and Deviations match the code |
 | `/sc:test` | Test pass evidence (`42/42 pass, baseline 40`) | Real output, not predictions |
-| `/sc:reflect` | Retrospective + insights captured to `.claude/insights.jsonl` | — |
+| `/sc:reflect` | Retrospective; `/sc:insight` captures insights to `.claude/insights.jsonl` | — |
 
 #### Other common chains
 
@@ -333,7 +334,7 @@ The framework's value comes from chaining commands. Each chain has gates: a step
 - **Skip steps when the input already exists.** If you already have a written spec, jump straight to `/sc:plan`. The gates exist to prevent skipping *unfinished* work, not to force ceremony.
 - **`--plan` flag** on `/sc:implement` makes it consume a committed plan document. Without `--plan`, it works from the latest message.
 - **`/sc:review` scores two dimensions** — fidelity to the spec and quality of the artifact — and groups findings as Critical / Important / Suggestion. Treat its output as a checklist, not a verdict. `--audit-delegated` re-examines only the decisions the model made on your behalf.
-- **`/sc:reflect` writes insights to `.claude/insights.jsonl`** which `/sc:load` later reads — over time the framework remembers what worked.
+- **`/sc:insight` writes insights to `.claude/insights.jsonl`** which `/sc:insight --list` and the `insight-analyst` agent read later — over time the framework remembers what worked.
 
 ---
 
@@ -398,7 +399,7 @@ superclaude mcp
 - **Playwright** → Cross-browser automation & E2E testing (Microsoft official). MCP: [`microsoft/playwright-mcp`](https://github.com/microsoft/playwright-mcp); CLI + skill alternative preferred for coding agents: [`microsoft/playwright-cli`](https://github.com/microsoft/playwright-cli)
 - **Chrome DevTools** → Performance, Lighthouse, accessibility, and memory profiling (CLS, LCP). Installed as Claude plugin from [`ChromeDevTools/chrome-devtools-mcp`](https://github.com/ChromeDevTools/chrome-devtools-mcp)
 
-> Removed in this fork: Morphllm, Mindbase, Airis-Agent, Magic, AST-Grep (native Grep/Edit cover it), Sequential-Thinking (Claude 5-family models reason natively between tool calls — see [`docs/archive/codex/sequential-thinking-validity-2026-08-22/`](docs/archive/codex/sequential-thinking-validity-2026-08-22/)).
+> Removed in this fork: Morphllm, Mindbase, Airis-Agent, Magic, AST-Grep (native Grep/Edit cover it), Sequential-Thinking (Claude 5-family models reason natively between tool calls — see [`docs/archive/codex/sequential-thinking-validity-2026-08-22/`](docs/archive/codex/sequential-thinking-validity-2026-08-22/)), Serena (see [`docs/features/serena-removal/`](docs/features/serena-removal/)).
 
 </td>
 <td width="50%">
@@ -497,12 +498,11 @@ superclaude mcp
 <tr>
 <td width="50%">
 
-### 📊 **Quality Scoring**
-**Confidence-based validation:**
-- Source credibility assessment (0.0-1.0)
-- Coverage completeness tracking
-- Synthesis coherence evaluation
-- Minimum threshold: 0.6, Target: 0.8
+### 📊 **Evidence Rules**
+**Source gates from `RESEARCH_CONFIG.md`:**
+- Each load-bearing claim: ≥2 independent sources, or one primary source; otherwise labeled single-source
+- Source credibility tiers 1–4 (academic/official → forums)
+- A contradiction on a load-bearing claim triggers a replan
 
 </td>
 <td width="50%">
@@ -536,12 +536,12 @@ superclaude mcp
 
 ### **Research Depth Levels**
 
-| Depth | Sources | Hops | Time | Confidence target | Best For |
-|:-----:|:-------:|:----:|:----:|:-----------------:|----------|
-| **Quick** | 10 | 1 | ~2min | 0.6 | Quick facts, simple queries |
-| **Standard** | 20 | 3 | ~5min | 0.7 | General research (default) |
-| **Deep** | 40 | 4 | ~8min | 0.8 | Comprehensive analysis |
-| **Exhaustive** | 50+ | 5 | ~10min | 0.9 | Academic-level research |
+| Depth | Sources | Hops | Best For |
+|:-----:|:-------:|:----:|----------|
+| **Quick** | 10 | 1 | Quick facts, simple queries |
+| **Standard** | 20 | 3 | General research |
+| **Deep** | 40 | 4 | Comprehensive analysis |
+| **Exhaustive** | 50+ | 5 | Academic-level research |
 
 Profiles are defined in [`modes/RESEARCH_CONFIG.md`](src/superclaude/modes/RESEARCH_CONFIG.md).
 
@@ -563,7 +563,7 @@ The Deep Research system intelligently coordinates multiple tools:
 | Topic | Source of truth |
 |-------|-----------------|
 | Architecture & directory roles | [`src/superclaude/ARCHITECTURE.md`](src/superclaude/ARCHITECTURE.md) |
-| Project rules, build & test loop | [`CLAUDE.md`](CLAUDE.md) |
+| Project rules, build & test loop | [`AGENTS.md`](AGENTS.md) (imported by `CLAUDE.md`) |
 | Project-specific gotchas | [`.claude/rules/gotchas/`](.claude/rules/gotchas) |
 | Slash commands (35) | [`src/superclaude/commands/`](src/superclaude/commands) · `superclaude install --list-all` |
 | Orchestration commands — `/sc:agent` vs `/sc:pm` vs `/sc:task` | [`docs/reports/ORCHESTRATION_COMMANDS.md`](docs/reports/ORCHESTRATION_COMMANDS.md) |
@@ -628,7 +628,7 @@ Flags are behavioral hints that any `/sc:*` prompt accepts. The model reads them
 
 > **Priority when flags conflict:** `--safe-mode` > `--validate` > optimization · explicit user flags > auto-detection · `--no-mcp` overrides individual MCP flags.
 
-> **Retired flags** (`--think*`, `--parallel`, `--seq` / `--sequential`) get a redirect notice rather than a rewrite. An unrecognized flag is matched by difflib similarity — not edit distance — first against retired names (cutoff 0.8), then against valid ones (cutoff 0.6), and the closest become a suggestion comment. Nothing is silently rewritten: `context_loader.py` ships an empty alias table.
+> **Retired flags** (`--think*`, `--parallel`, `--seq` / `--sequential`, `--task-manage`, `--orchestrate`) get a redirect notice rather than a rewrite. An unrecognized flag is matched by difflib similarity — not edit distance — first against retired names (cutoff 0.8), then against valid ones (cutoff 0.6), and the closest become a suggestion comment. Nothing is silently rewritten: `context_loader.py` ships an empty alias table.
 
 #### Examples
 

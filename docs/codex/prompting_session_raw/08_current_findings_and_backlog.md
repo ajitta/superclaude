@@ -1,12 +1,14 @@
 ---
 title: 현재 검증 사각지대와 개선 백로그
 status: verified-snapshot
-last_verified: 2026-08-22
+last_verified: 2026-10-19
 measured_at: 5b6dc5b
 scope: repository-wide evidence relevant to src/superclaude
 ---
 
 # 현재 검증 사각지대와 개선 백로그
+
+> 2026-10-19: D-08·D-09·D-12·D-13 항목(F-002, F-005, F-014, F-016의 이름과 명령)만 재확인; 측정치와 `measured_at`은 그대로 (docs-ssot-audit). 그 밖의 내용은 2026-08-22 검증 그대로다.
 
 이 문서는 직접 재현했거나 source/test를 대조해 확인한 사실을 기록한다. 결함 자체는
 수정하지 않는다. 상태가 바뀌면 증거와 함께 항목을 갱신한다.
@@ -22,7 +24,7 @@ mypy 오류)는 이 문서가 소유한다. 값은 재측정 명령과 마지막
 | ID | 우선순위 | 판정 | 내용 |
 |---|---|---|---|
 | F-001 | P0 | FAIL | wheel/sdist에서 `skills/` 전체 누락 |
-| F-002 | P0 | FAIL | `make verify`, `make test-plugin` false-green 가능 |
+| F-002 | P0 | FAIL | `make test-plugin` false-green 가능 (옛 `verify` 타깃은 4.29.0에서 제거됨) |
 | F-003 | P0 | FIXED | 핵심 활성화 실패가 install 성공값에 반영되지 않음 — `f25d91a`/`e360ca5`에서 해결, §해결된 finding 참조 |
 | F-004 | P1 | REVISE | drift/audit가 runtime payload 일부를 의도적으로 제외 |
 | F-005 | P1 | FAIL | skill authoring guide와 validator 정책 충돌 |
@@ -100,7 +102,7 @@ packaged skill 설치가 실패할 수 있다.
 `.claude/rules/skill-authoring.md:89-95,142-145`는 `model`, `context: fork`,
 `agent`를 합법 필드로 설명한다. 반면:
 
-- `tests/unit/test_skill_structure.py:163-168`은 `model`을 금지
+- 당시 `test_skill_structure.py:163-168`(현재 `tests/unit/test_sc_author_skill.py`)은 `model`을 금지
 - 같은 파일 `184-196`은 모든 `context: fork`와 `agent`를 금지
 
 현재 shipped skill에 이 필드가 없어 suite는 green이지만, 문서대로 새 skill을
@@ -275,8 +277,10 @@ user home의 `.claude`에 고정해 확인한다. project/local 설치 진단과
 `coverage.report.fail_under`가 없다.
 
 ```bash
-uv run pytest --cov=superclaude --cov-report=term -q
+uv run --with pytest-cov pytest --cov=superclaude --cov-report=term -q
 ```
+
+coverage 플러그인은 4.29.0에서 패키지 의존성과 `[tool.coverage.*]` 설정에서 빠졌으므로 `--with pytest-cov`로 넣어 재측정한다.
 
 coverage target을 `src/superclaude` path로 바꾸면 다른 분모와 결과가 나올 수 있으므로
 baseline 비교에서는 target과 명령을 고정한다.
@@ -348,10 +352,10 @@ repo에 없었고 손으로 유지됐다. 유지하지 않기로 하고 `okf/`�
 
 **등급:** `[REPO]` · P1 · DIST/TOOL · 폐기 결정 over-engineering-audit D02
 
-원래 판정은 `make build-plugin`이 입력인 `plugins/superclaude/manifest/metadata.json`과
+원래 판정은 옛 `build-plugin` 타깃이 입력인 `plugins/superclaude/manifest/metadata.json`과
 source payload 없이 exit 2로 끝난다는 것이었다. `plugins/superclaude/`는 b8cd144에서
 삭제됐고 입력을 되살릴 계획이 없어, `build-plugin`, `sync-plugin-repo`, `PLUGIN_*` 변수,
-`scripts/build_superclaude_plugin.py`와 (같이 죽은) `make translate`를 삭제했다.
+`scripts/build_superclaude_plugin.py`와 (같이 죽은) 옛 `translate` 타깃을 삭제했다.
 pytest plugin을 확인하는 `make test-plugin`은 그대로다. repo root `.claude-plugin/` 계획
 (runtime-behavior-audit Task 13)은 별개 경로라 영향이 없다.
 
