@@ -1,4 +1,4 @@
-branch: master @45aabf06 (== origin/master == stable == v4.30.4); worktree clean (untracked .hermes/, .ignore belong to other sessions; `/.hermes/` gitignored)
+branch: master @ed0dd74b (== origin/master == stable == v4.30.5); worktree clean (untracked .hermes/, .ignore belong to other sessions; `/.hermes/` gitignored)
 
 # Session 2026-10-19 — master (hygiene rounds, a release review, two purpose rounds, the install/upgrade audit, the docs ↔ SSOT audit, a research-hops content round, ten releases)
 
@@ -39,8 +39,9 @@ branch: master @45aabf06 (== origin/master == stable == v4.30.4); worktree clean
 
 ## Next actions
 (full list with options and ★: `docs/plans/remaining-work-ajitta-2026-10-19.md`)
-- [ ] Windows: `make sync-*` to 4.30.4 (`superclaude doctor --scope <s>` first); `scripts/install-audit-windows.ps1`; `04a-handoff.md` §1
-- [ ] S3 backlog on hold: C-16, C-17 (`04a-handoff.md` §2); C-15 waits for W7
+- [x] Windows P8 run done (Hermes on Windows, `07-windows-run.md`): W-3 `info/exclude` CRLF fixed, UTF-8 BOM accepted in settings/CLAUDE files (W6), released v4.30.5 (merge 5705e79a, bump ed0dd74b); 5 haiku sessions
+- [ ] C-15 decision now has its input: W7 shows settings, components and user `CLAUDE.md` follow `CLAUDE_CONFIG_DIR` (remaining-work §2: a extend warning / b Q15 (a) ADR / c keep)
+- [ ] S3 backlog on hold: C-16, C-17 (`04a-handoff.md` §2)
 - [ ] Unpicked axis: B model-generation re-audit (at the next model). `docs-ssot-audit/06-verify.md` is ~29 KB: split before the next sizable addition
 - [ ] On hold: opus follow-up round on N2/N5; "open the file a reference points to" wording trial; `origin/fix/plain-language-structure` (unmerged WIP, kept)
 - [ ] If a Windows `0xC0000409` abort ever recurs: `git revert 3e64dc82`, bisect parallel_ab under concurrent load

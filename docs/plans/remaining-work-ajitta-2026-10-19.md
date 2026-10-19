@@ -15,7 +15,7 @@ revised: 2026-10-19
 - [x] `scripts/install-audit-windows.ps1`을 Windows PowerShell 5.1과 `pwsh` 7에서 한 번씩 돌리고, 출력된 sandbox의 `results.md`를 붙여 넣는다. 이 스크립트는 Linux에서 작성되어 한 번도 실행된 적이 없으므로, 스크립트 오류는 결함이 아니라 스크립트 버그로 보고한다.
 - [x] W1–W7을 확인한다(약 45분). 질문과 판정 기준은 [04a-handoff §1c](../features/install-upgrade-audit/04a-handoff.md).
 
-**결과 (2026-10-19, [07-windows-run](../features/install-upgrade-audit/07-windows-run.md)):** 새 S2 결함 W-3이 나왔다. Windows에서 install/uninstall이 `.git/info/exclude` 전체를 CRLF로 다시 쓰던 문제로, 지금은 고쳤다. 스크립트 버그 S-1도 고쳤다. W1–W5는 결함 없음. W6에서 Claude Code는 BOM 붙은 settings를 받아들였고, 그래서 3번(BOM 허용)도 반영했다. W7에서는 settings, 컴포넌트, user `CLAUDE.md`가 모두 `CLAUDE_CONFIG_DIR`을 따른다는 것을 확인했다.
+**결과 (2026-10-19, [07-windows-run](../features/install-upgrade-audit/07-windows-run.md)):** 새 S2 결함 W-3이 나왔다. Windows에서 install/uninstall이 `.git/info/exclude` 전체를 CRLF로 다시 쓰던 문제로, 지금은 고쳤다. 스크립트 버그 S-1도 고쳤다. W1–W5는 결함 없음. W6에서 Claude Code는 BOM 붙은 settings를 받아들였고, 그래서 3번(BOM 허용)도 반영했다. W7에서는 settings, 컴포넌트, user `CLAUDE.md`가 모두 `CLAUDE_CONFIG_DIR`을 따른다는 것을 확인했다. **v4.30.5로 릴리스했다** (merge 5705e79a, stable = ed0dd74b).
 
 결정: 언제 할지. ★다음 Windows 세션의 첫 작업. W6과 W7 결과가 2·3번의 입력이다.
 
