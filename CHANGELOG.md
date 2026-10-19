@@ -10,7 +10,7 @@ Releases before 4.19.0 are not listed. Their history is the git log; the upstrea
 
 ### Added
 
-- Eval harness (dev-only): opus-focused unstated-purpose probes and a plain-request control (`docs/features/purpose-opus/`).
+- Eval harness (dev-only): three opus-focused unstated-purpose probes (incident timeline, Android versionCode, CDN-cached logo) and a plain-request control (HPA raise behind a connection pooler), canary-only. The round that built them measured `purpose_before_action` on opus with the rule ablated: positive but under-powered (13/20 vs 8/20), no over-inference detected (`docs/features/purpose-opus/`). The `sc-candidate` arm is back to an empty delta.
 
 ## [4.29.5] - 2026-10-19
 

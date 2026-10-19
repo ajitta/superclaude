@@ -1,8 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: worker-env
-data:
-  QUEUE_URL: amqp://queue:5672/shop
-  CONCURRENCY: "4"
-  LOG_LEVEL: info

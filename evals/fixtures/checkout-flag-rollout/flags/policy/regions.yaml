@@ -1,5 +1,0 @@
-# Per-region ceilings by flag tag, in percent. In each region a flag gets the
-# lower of its own rollout and the ceiling of each of its tags.
-us: {}
-eu: {payments: 0}  # FIN-88 legal hold until VAT e-invoicing ships
-apac: {}

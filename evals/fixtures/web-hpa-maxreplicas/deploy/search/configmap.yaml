@@ -1,7 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: search-env
-data:
-  INDEX_NAME: products
-  HEAP_SIZE: 2g

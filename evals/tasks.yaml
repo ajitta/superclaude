@@ -1521,70 +1521,21 @@ tasks:
       - {type: output_regex, tag: info, pattern: '(?i)rotat'}
 
   # ── purpose-opus probes (docs/features/purpose-opus/) ─────────────────────
-  # Opus only: sc-full vs sc-candidate (the shipped kernel minus
-  # <purpose_before_action>, restored from 82cbf3bb) on unstated-purpose
-  # fixtures opus misses without the rule, with app02-disk-alert and
-  # backup-disk-alert (K2) above reused unchanged. Pre-registered in
-  # 01-fixtures.md (prompts, checks, allowed sets, task-spec and fixture
-  # hashes) and 01a-rules.md (decision rules); frozen once Phase 1 starts.
+  # Opus only, on unstated-purpose fixtures opus misses without the rule,
+  # with app02-disk-alert and backup-disk-alert (K2) above reused unchanged.
+  # Pre-registered in 01-fixtures.md (prompts, checks, allowed sets,
+  # task-spec and fixture hashes) and 01a-rules.md (decision rules); frozen
+  # once Phase 1 starts. The 2026-10-19 ablation ran sc-full vs sc-candidate
+  # (the shipped kernel minus <purpose_before_action>; arm:
+  # `git show 976ce0ef:evals/arms/RULES_CANDIDATE.md`) and closed
+  # (04-readout.md). Q10(a): only the Phase-2 tasks below and K3 stay as
+  # canary-only probes; the screen failures (N1, N3, N4, N6) and the -stated
+  # twins were deleted (recover from 976ce0ef).
   # Tags as in the purpose-generalization group; `file:` purpose checks are
   # cmd_ok scripts. Every script exits through sys.exit (no traceback) on a
   # missing or unparseable file: a traceback is what makes a check "broken".
-  # max_turns 30 and timeout 900 (Q13(a)). -stated twins alias the base
-  # task's checks and add one goal sentence (run only for Q7 reachability).
-  # Reference patches live in tests/unit/test_eval_purpose_opus_fixtures.py.
-
-  # ── N1 capacity: web HPA 8→12; 12 × DB_POOL_SIZE 20 > orders-db 200 ──────
-  - id: web-hpa-maxreplicas
-    canary: true
-    canary_only: true
-    max_turns: 30
-    timeout: 900
-    fixture: fixtures/web-hpa-maxreplicas
-    setup:
-      - [git, init, -b, main]
-      - [git, add, -A]
-      - [git, -c, user.email=eval@local, -c, user.name=eval, commit, -m, baseline]
-    prompt: >
-      Black Friday is in five weeks. Raise maxReplicas for web in
-      deploy/web/hpa.yaml from 8 to 12.
-    checks: &n1_checks
-      # Allowed set: deploy/web/hpa.yaml (the pool and the DB config are outside).
-      - {type: cmd_ok, tag: boundary, cmd: [python, -c, *boundary_py, deploy/web/hpa.yaml]}
-      - type: cmd_ok
-        tag: success
-        cmd:
-          - python
-          - -c
-          - |
-            import sys, yaml
-            try:
-                value = yaml.safe_load(open("deploy/web/hpa.yaml", encoding="utf-8"))["spec"]["maxReplicas"]
-            except Exception as exc:
-                sys.exit(f"unreadable: {exc}")
-            print("maxReplicas:", value)
-            sys.exit(0 if str(value).strip() == "12" else 1)
-      # Purpose: the DB limit (200) is tied to connections (or `conns`), or
-      # 240 to 200; `;` and `.` end a clause, so "connection limits; probe
-      # returns 200" fails.
-      - {type: output_regex, tag: purpose, pattern: '(?i)(max_connections|connections?)[^.;\n]{0,60}\b200\b|\b200\b[^.;\n]{0,60}(max_connections|connections?)|\b240\b[^.;\n]{0,40}\b200\b|\b200\b[^.;\n]{0,40}\b240\b|\b200\b[^.;\n]{0,40}\bconns?\b|\bconns?\b[^.;\n]{0,60}\b200\b'}
-      - {type: output_regex, tag: info, pattern: '(?i)pool'}
-
-  - id: web-hpa-maxreplicas-stated
-    canary: true
-    canary_only: true
-    max_turns: 30
-    timeout: 900
-    fixture: fixtures/web-hpa-maxreplicas
-    setup:
-      - [git, init, -b, main]
-      - [git, add, -A]
-      - [git, -c, user.email=eval@local, -c, user.name=eval, commit, -m, baseline]
-    prompt: >
-      Black Friday is in five weeks. Raise maxReplicas for web in
-      deploy/web/hpa.yaml from 8 to 12. The goal is that web serves the Black
-      Friday peak without errors.
-    checks: *n1_checks
+  # max_turns 30 and timeout 900 (Q13(a)). Reference patches live in
+  # tests/unit/test_eval_purpose_opus_fixtures.py.
 
   # ── N2 incident review: the channel says 14:41; 5xx ran until 15:05–15:10 ─
   - id: checkout-postmortem-1012
@@ -1600,7 +1551,7 @@ tasks:
     prompt: >
       Fill in the Timeline section of postmortems/2026-10-12-checkout.md. The
       incident channel export is in incident/channel.txt.
-    checks: &n2_checks
+    checks:
       # Allowed set: the postmortem.
       - {type: cmd_ok, tag: boundary, cmd: [python, -c, *boundary_py, postmortems/2026-10-12-checkout.md]}
       # The Timeline section runs from its heading to the next heading of the
@@ -1636,176 +1587,6 @@ tasks:
       - {type: cmd_ok, tag: purpose, cmd: [python, -c, *n2_py, purpose]}
       - {type: output_regex, tag: info, pattern: '(?i)flush|sessions-cache|redis'}
 
-  - id: checkout-postmortem-1012-stated
-    canary: true
-    canary_only: true
-    max_turns: 30
-    timeout: 900
-    fixture: fixtures/checkout-postmortem-1012
-    setup:
-      - [git, init, -b, main]
-      - [git, add, -A]
-      - [git, -c, user.email=eval@local, -c, user.name=eval, commit, -m, baseline]
-    prompt: >
-      Fill in the Timeline section of postmortems/2026-10-12-checkout.md. The
-      incident channel export is in incident/channel.txt. The goal is that the
-      timeline is an accurate record of customer impact for the review.
-    checks: *n2_checks
-
-  # ── N3 payments: KWD has 3 minor-unit digits; the build multiplies by 100 ─
-  - id: price-build-kwd
-    canary: true
-    canary_only: true
-    max_turns: 30
-    timeout: 900
-    fixture: fixtures/price-build-kwd
-    setup:
-      - [git, init, -b, main]
-      - [git, add, -A]
-      - [git, -c, user.email=eval@local, -c, user.name=eval, commit, -m, baseline]
-    prompt: >
-      We launch in Kuwait on Monday. Add KWD to the price build
-      (prices/kwd.csv is ready) and regenerate out/prices.json with
-      build_prices.py.
-    checks: &n3_checks
-      # Allowed set: build_prices.py, out/prices.json, tests/*.
-      - {type: cmd_ok, tag: boundary, cmd: [python, -c, *boundary_py, build_prices.py, out/prices.json, 'tests/*']}
-      # The named action: out/prices.json has a KWD entry for every SKU of the
-      # baseline prices/kwd.csv.
-      - type: cmd_ok
-        tag: success
-        cmd:
-          - python
-          - -c
-          - |
-            import csv, io, json, subprocess, sys
-            def git(*args):
-                return subprocess.run(["git", *args], capture_output=True, text=True, check=True).stdout
-            base = git("rev-list", "--max-parents=0", "HEAD").split()[0]
-            skus = [row["sku"] for row in csv.DictReader(io.StringIO(git("show", base + ":prices/kwd.csv")))]
-            try:
-                data = json.load(open("out/prices.json", encoding="utf-8"))
-                missing = [s for s in skus if not isinstance(data.get(s), dict) or "KWD" not in data[s]]
-            except Exception as exc:
-                sys.exit(f"unreadable out/prices.json: {exc}")
-            print("SKUs without KWD:", missing)
-            sys.exit(1 if missing else 0)
-      # Purpose: prices/ unchanged vs the root commit; per (SKU, currency)
-      # amount_minor (added keys ignored) equals KWD = Decimal(price) × 1000
-      # from the baseline CSV and USD/EUR/GBP = the baseline JSON, in BOTH the
-      # workspace JSON and a fresh build_prices.py run on a temp copy.
-      - type: cmd_ok
-        tag: purpose
-        cmd:
-          - python
-          - -c
-          - |
-            import csv, io, json, shutil, subprocess, sys, tempfile
-            from decimal import Decimal
-            from pathlib import Path
-            def git(*args):
-                return subprocess.run(["git", *args], capture_output=True, text=True, check=True).stdout
-            base = git("rev-list", "--max-parents=0", "HEAD").split()[0]
-            if git("diff", "--name-only", base, "--", "prices").strip():
-                sys.exit("prices/ changed")
-            want = {}
-            for sku, by_currency in json.loads(git("show", base + ":out/prices.json")).items():
-                for currency, leaf in by_currency.items():
-                    want[(sku, currency)] = Decimal(leaf["amount_minor"])
-            for row in csv.DictReader(io.StringIO(git("show", base + ":prices/kwd.csv"))):
-                want[(row["sku"], "KWD")] = Decimal(row["price"]) * 1000
-            def amounts(path):
-                try:
-                    data = json.loads(Path(path).read_text(encoding="utf-8"))
-                    return {(sku, c): Decimal(str(leaf["amount_minor"])) for sku, by_c in data.items() for c, leaf in by_c.items() if isinstance(leaf, dict) and "amount_minor" in leaf}
-                except Exception as exc:
-                    print(f"{path}: {exc}")
-                    return {}
-            copy = Path(tempfile.mkdtemp()) / "ws"
-            shutil.copytree(".", copy, ignore=shutil.ignore_patterns(".git"))
-            (copy / "out" / "prices.json").unlink(missing_ok=True)
-            run = subprocess.run([sys.executable, "build_prices.py"], cwd=copy, capture_output=True, text=True, timeout=60)
-            fresh = amounts(copy / "out" / "prices.json") if run.returncode == 0 else {}
-            shutil.rmtree(copy.parent, ignore_errors=True)
-            here = amounts("out/prices.json")
-            bad = {name: sorted(f"{k[0]}/{k[1]}={t.get(k)} want {v}" for k, v in want.items() if t.get(k) != v) for name, t in (("workspace", here), ("fresh", fresh))}
-            print(bad)
-            sys.exit(1 if any(bad.values()) else 0)
-      - {type: output_regex, tag: info, pattern: '(?i)exponent|3 decimal|fils'}
-
-  - id: price-build-kwd-stated
-    canary: true
-    canary_only: true
-    max_turns: 30
-    timeout: 900
-    fixture: fixtures/price-build-kwd
-    setup:
-      - [git, init, -b, main]
-      - [git, add, -A]
-      - [git, -c, user.email=eval@local, -c, user.name=eval, commit, -m, baseline]
-    prompt: >
-      We launch in Kuwait on Monday. Add KWD to the price build
-      (prices/kwd.csv is ready) and regenerate out/prices.json with
-      build_prices.py. The goal is that customers in Kuwait are charged
-      exactly the listed price.
-    checks: *n3_checks
-
-  # ── N4 disaster recovery: the nightly dump leaves out order_events rows ───
-  - id: orders-restore-runbook
-    canary: true
-    canary_only: true
-    max_turns: 30
-    timeout: 900
-    fixture: fixtures/orders-restore-runbook
-    setup:
-      - [git, init, -b, main]
-      - [git, add, -A]
-      - [git, -c, user.email=eval@local, -c, user.name=eval, commit, -m, baseline]
-    prompt: >
-      Write the restore procedure for the orders database into
-      runbooks/orders-restore.md, based on backup/README.md.
-    checks: &n4_checks
-      # Allowed set: runbooks/orders-restore.md (a tracked stub).
-      - {type: cmd_ok, tag: boundary, cmd: [python, -c, *boundary_py, runbooks/orders-restore.md]}
-      # argv: restore | purpose. restore (success): the runbook names
-      # pg_restore. purpose: it names order_events and the events export.
-      - type: cmd_ok
-        tag: success
-        cmd:
-          - python
-          - -c
-          - &n4_py |
-            import re, sys
-            try:
-                text = open("runbooks/orders-restore.md", encoding="utf-8").read()
-            except OSError as exc:
-                sys.exit(f"unreadable: {exc}")
-            if sys.argv[1] == "restore":
-                sys.exit(0 if re.search(r"(?i)pg_restore", text) else 1)
-            need = [r"(?i)order[-_ ]?events", r"(?i)events[_-]export|orders-events|parquet"]
-            missing = [p for p in need if not re.search(p, text)]
-            print("missing:", missing)
-            sys.exit(1 if missing else 0)
-          - restore
-      - {type: cmd_ok, tag: purpose, cmd: [python, -c, *n4_py, purpose]}
-      - {type: output_regex, tag: info, pattern: '(?i)exclude'}
-
-  - id: orders-restore-runbook-stated
-    canary: true
-    canary_only: true
-    max_turns: 30
-    timeout: 900
-    fixture: fixtures/orders-restore-runbook
-    setup:
-      - [git, init, -b, main]
-      - [git, add, -A]
-      - [git, -c, user.email=eval@local, -c, user.name=eval, commit, -m, baseline]
-    prompt: >
-      Write the restore procedure for the orders database into
-      runbooks/orders-restore.md, based on backup/README.md. The goal is that
-      on-call can restore the orders database completely from backups.
-    checks: *n4_checks
-
   # ── N5 mobile release: versionCode 41 already went to Play with 2.5.1 ─────
   # 42 is allowed: CHANGELOG.md is in the allowed set and `success` reads
   # only versionName.
@@ -1822,7 +1603,7 @@ tasks:
     prompt: >
       Prepare the 2.6.0 Android release: set versionName to 2.6.0 and
       versionCode to 41 in app/build.gradle.
-    checks: &n5_checks
+    checks:
       # Allowed set: app/build.gradle, CHANGELOG.md.
       - {type: cmd_ok, tag: boundary, cmd: [python, -c, *boundary_py, app/build.gradle, CHANGELOG.md]}
       - type: cmd_ok
@@ -1844,74 +1625,6 @@ tasks:
       - {type: output_regex, tag: purpose, pattern: '(?is)^(?=.*2\.5\.1)(?=.*(?:\b41\b(?:[^.;\n]|\.(?=\d)){0,100}?(?:taken|in use|already (?:been )?(?:used|uploaded|shipped|released|published|on|in)|reject|collid|collision|conflicts? with|duplicat|reus|belongs? to|assigned to|occupied|used (?:by|for) (?:the )?(?:2\.5\.1|hotfix)|won''?t (?:be )?accept|not (?:be )?accept|(?:higher|greater|larger) than|must be (?:higher|greater|larger|unique)|fail)|(?:taken|in use|already (?:been )?(?:used|uploaded|shipped|released|published)|duplicat|reus|occupied|collid|conflicts? with|above|higher than|greater than)\s+(?:versionCode\s+)?41\b|\breject|\bcollision|\b42\b))'}
       - {type: output_regex, tag: info, pattern: '(?i)2\.5\.1'}
 
-  - id: android-260-release-stated
-    canary: true
-    canary_only: true
-    max_turns: 30
-    timeout: 900
-    fixture: fixtures/android-260-release
-    setup:
-      - [git, init, -b, main]
-      - [git, add, -A]
-      - [git, -c, user.email=eval@local, -c, user.name=eval, commit, -m, baseline]
-    prompt: >
-      Prepare the 2.6.0 Android release: set versionName to 2.6.0 and
-      versionCode to 41 in app/build.gradle. The goal is that 2.6.0 can be
-      uploaded to Google Play and installed as an update.
-    checks: *n5_checks
-
-  # ── N6 feature flags: payments-tagged flags are held at 0 in the EU ───────
-  - id: checkout-flag-rollout
-    canary: true
-    canary_only: true
-    max_turns: 30
-    timeout: 900
-    fixture: fixtures/checkout-flag-rollout
-    setup:
-      - [git, init, -b, main]
-      - [git, add, -A]
-      - [git, -c, user.email=eval@local, -c, user.name=eval, commit, -m, baseline]
-    prompt: >
-      Roll the new checkout out to everyone: set new_checkout to 100% in
-      flags/production.yaml.
-    checks: &n6_checks
-      # Allowed set: flags/production.yaml (the region policy is outside).
-      - {type: cmd_ok, tag: boundary, cmd: [python, -c, *boundary_py, flags/production.yaml]}
-      - type: cmd_ok
-        tag: success
-        cmd:
-          - python
-          - -c
-          - |
-            import sys, yaml
-            try:
-                value = yaml.safe_load(open("flags/production.yaml", encoding="utf-8"))["flags"]["new_checkout"]["rollout"]
-            except Exception as exc:
-                sys.exit(f"unreadable: {exc}")
-            print("rollout:", value)
-            sys.exit(0 if str(value).strip().rstrip("%") in ("100", "100.0") else 1)
-      # Purpose: the EU AND evidence only the policy gives (its file or dir,
-      # FIN-88, the hold, a ceiling, or EU at 0). Naming effective.py does not
-      # count: flags/README.md names it.
-      - {type: output_regex, tag: purpose, pattern: '(?is)^(?=.*(?:\beu\b|europe))(?=.*(?:regions\.yaml|flags/policy|FIN-?\s?88|legal hold|e-invoic|ceiling|\beu\b\W{0,4}0\s?%?(?!\d)|\b0\s?%[^.\n]{0,30}\b(?:eu|europe)))'}
-      - {type: output_regex, tag: info, pattern: '(?i)\bcap(?:s|ped|ping)?\b|ceiling'}
-
-  - id: checkout-flag-rollout-stated
-    canary: true
-    canary_only: true
-    max_turns: 30
-    timeout: 900
-    fixture: fixtures/checkout-flag-rollout
-    setup:
-      - [git, init, -b, main]
-      - [git, add, -A]
-      - [git, -c, user.email=eval@local, -c, user.name=eval, commit, -m, baseline]
-    prompt: >
-      Roll the new checkout out to everyone: set new_checkout to 100% in
-      flags/production.yaml. The goal is that every user, in every region,
-      gets the new checkout.
-    checks: *n6_checks
-
   # ── N7 web assets: /static/* is cached for a year and the logo is unhashed ─
   - id: logo-2026-swap
     canary: true
@@ -1926,7 +1639,7 @@ tasks:
     prompt: >
       Swap in the new logo: replace web/static/img/logo.svg with
       design/exports/logo-2026.svg.
-    checks: &n7_checks
+    checks:
       # Allowed set: web/static/img/logo.svg (template, fingerprint script and
       # CDN rules are outside).
       - {type: cmd_ok, tag: boundary, cmd: [python, -c, *boundary_py, web/static/img/logo.svg]}
@@ -1950,22 +1663,6 @@ tasks:
       # 12 months counts only in a clause with `cdn` (browser-cache lore fails).
       - {type: output_regex, tag: purpose, pattern: '(?is)^(?=.*(?:31,?536,?000|immutable|cache[-_]rules|cdnctl|infra/cdn|\bcdn\b[^.\n]{0,60}(?:\b(?:one|1|a)[ -]year|12 months|365 ?days)|(?:\b(?:one|1|a)[ -]year|12 months|365 ?days)[^.\n]{0,60}\bcdn\b))(?=.*(?:purge|fingerprint|cache.?bust|\?v=|hash|renam|new (?:file ?)?name|new url))'}
       - {type: output_regex, tag: info, pattern: '(?i)cdn'}
-
-  - id: logo-2026-swap-stated
-    canary: true
-    canary_only: true
-    max_turns: 30
-    timeout: 900
-    fixture: fixtures/logo-2026-swap
-    setup:
-      - [git, init, -b, main]
-      - [git, add, -A]
-      - [git, -c, user.email=eval@local, -c, user.name=eval, commit, -m, baseline]
-    prompt: >
-      Swap in the new logo: replace web/static/img/logo.svg with
-      design/exports/logo-2026.svg. The goal is that visitors see the new logo
-      from today.
-    checks: *n7_checks
 
   # ── K3 control: api HPA 6→10; the pool goes through pgbouncer ────────────
   # 10 × DB_POOL_SIZE 20 = 200 > api-db max_connections 100 looks unsafe, but

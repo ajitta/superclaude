@@ -1,2 +1,0 @@
-# m  h  dom mon dow  user      command
-15   2  *   *   *    postgres  /srv/ops/backup/nightly.sh >> /srv/ops/out/nightly.out 2>&1
