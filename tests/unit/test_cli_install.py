@@ -1147,7 +1147,9 @@ class TestUpgradeFromALegacyRegistration:
         notice = [m for m in messages if m.startswith("ℹ️")]
         assert len(notice) == 1, messages
         assert "do not remove" in notice[0]
-        assert "--force" in notice[0]
+        # The refresh install and doctor name too; `install --force` would
+        # also create an install.
+        assert "'superclaude update --scope user'" in notice[0]
         assert (base / "superclaude" / "scripts" / "retired_thing.py").exists()
 
 
