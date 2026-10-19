@@ -14,8 +14,11 @@ Runs each task from tasks.yaml in an isolated temp workspace OUTSIDE the repo
   sc-command-only  full install, always-loaded core import stripped
 
 Arm isolation: CLAUDE_CONFIG_DIR points at an empty per-arm dir (keeps the
-host machine's real ~/.claude out of every arm); SC content is delivered via
-`superclaude install --scope project` into the workspace's ./.claude/.
+host machine's real ~/.claude out of every arm), `--setting-sources
+project,local` keeps the claude.ai account's synced plugins and skills out of
+it, and ENABLE_CLAUDEAI_MCP_SERVERS=false drops the account's connectors; SC
+content is delivered via `superclaude install --scope project` into the
+workspace's ./.claude/.
 
 Usage:
   uv run python evals/run_eval.py --dry-run              # build+validate, no API calls
@@ -266,6 +269,12 @@ def run_task(
         # "execute immediately" reminder that can override prose stop rules,
         # so the gated probes are rerun under it to see which survive.
         *(["--permission-mode", permission_mode] if permission_mode else []),
+        # User settings stay out: with them on, a claude.ai login syncs the
+        # account's plugins and skills into the empty config dir during the
+        # first session, and every later session of the arm loads them.
+        # The sc-* arms' hooks and permissions are project settings.
+        "--setting-sources",
+        "project,local",
         # `--` ends option parsing: prompts that legitimately start with an SC
         # flag (e.g. "--introspect ...") were otherwise parsed as CLI options
         # and the session died before any turn ran.
@@ -281,6 +290,9 @@ def run_task(
     # report (vanilla has no hook). Plumbing, not behavior under measurement —
     # off for every arm through the hook's own knob.
     env["SUPERCLAUDE_INSIGHT_PROMPT"] = "0"
+    # The account's claude.ai MCP connectors load in every session whatever
+    # the config dir holds; same for every arm, still not the arm's content.
+    env["ENABLE_CLAUDEAI_MCP_SERVERS"] = "false"
 
     started = time.monotonic()
     try:
