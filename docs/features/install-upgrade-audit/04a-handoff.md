@@ -14,7 +14,9 @@ P0–P6 ran on Linux. What only the owner can do (Windows), what the round leave
 
 Do it on a branch checkout with a healthy `.venv` (`uv pip install -e ".[dev]"`; AGENTS.md Tests). Use a scratch project, never the real `~/.claude`, for every step that installs.
 
-### 1a. The `workflow_dispatch` job, once (Q2 d)
+### 1a. The `workflow_dispatch` job, once (Q2 d) — done
+
+**Done 2026-10-19.** Dispatched on `fix/install-upgrade-audit`: run 39194238966 failed (16 tests Linux passed: the builder substituted Windows machine paths into the JSON fixtures unescaped, `C:\…`; fixed by JSON-escaping tokens for `.json` targets), then run 39194568039 passed. Later master runs skipped the job, because they were not dispatched with `windows=true`; the master dispatch is `<master run>`. The steps stay as the recipe for the next dispatch.
 
 The `windows-scenarios` job in `.github/workflows/test.yml` runs only `tests/unit/test_install_upgrade_scenarios.py` on `windows-latest`, Python 3.13. The module needs no network, no git history and no asyncio. The job runs only when dispatched with the input set; PRs and `make ci` never start it.
 
@@ -65,14 +67,16 @@ Out of scope by Q1 (a), unchanged: the upstream E0 root files and CLAUDE block (
 
 ## 3. Open items from P5 (owner to confirm or decide)
 
-| Item | Now | Options |
+**Ruled 2026-10-19:** the four P5 calls stay as they are now (BOM in `info/exclude` refused; the older Tavily registrations kept, removed by hand per the CHANGELOG; the C-06 `update` pass confirmed; the C-18 warning one-directional). C-15 stays open, waiting for W7.
+
+| Item | Now | Ruling (2026-10-19) and the alternatives it declined |
 |---|---|---|
-| **BOM in `info/exclude`** (p5-g1) | Refused like a BOM in settings or CLAUDE files (one rule for every file SC edits), although git honours it: P6 confirmed `git check-ignore` matches a BOM'd pattern line, and install exits 1 naming the BOM | keep; or accept a BOM in `info/exclude` only (strip it on read, keep it on write). W6 does not decide this one; git's behaviour already did |
+| **BOM in `info/exclude`** (p5-g1) | Refused like a BOM in settings or CLAUDE files (one rule for every file SC edits), although git honours it: P6 confirmed `git check-ignore` matches a BOM'd pattern line, and install exits 1 naming the BOM | **Decided: keep the refusal.** Declined: accept a BOM in `info/exclude` only (strip it on read, keep it on write). W6 does not decide this one; git's behaviour already did |
 | **Non-UTF-8 user agents** (p5-g1) | **Closed in P6**: not reproduced at U/P/L. The memory scans read only shipped names and catch `UnicodeDecodeError` (install_components.py:139-143, :228-234) | — |
-| **Older Tavily registrations** (p5-g1) | Under Q12 (a), `--remove-mcp` removes only a server whose command matches today's registry. Tavily servers registered by older releases (`npx -y mcp-remote https://mcp.tavily.com/mcp`, `npx -y tavily-mcp@0.1.2`) are kept; the CHANGELOG says how to remove them by hand | keep; or add a historical-command list per server (fits the backlog item "MCP servers dropped from the registry") |
-| **C-06 `update` deviation** (p5-g2) | Ruling (b) said "keep refusing, advise `update --scope project`", but `update` ran the same guard, so the advice would loop. Now a non-force install still refuses, and `update` passes when every foreign `memory:` value names a store outside this base, printing where agent memory moves. That is option (a)'s `update` half | confirm; or change the advice; or give `update` its own flag |
-| **C-18, other direction** (p5-g2) | A project install replacing a worktree's local block is reported. A local install replacing another worktree's project block is not: the local block is a superset, so it hides that worktree's *uncommitted* project content from `git status`. The warning also does not name which worktree holds the install | report the other direction too; naming the worktree needs `git worktree list` plus scope detection |
-| **C-15 scope** (p5-g2) | The `CLAUDE_CONFIG_DIR` warning is given only at user scope, the only base the variable replaces, and only by install and doctor (Q15 b). `uninstall` does not warn, and user-scope MCP servers in `$CLAUDE_CONFIG_DIR/.claude.json` are not covered | extend to uninstall and the MCP reader; otherwise this waits for the W7 answer and the Q15 (a) ADR |
+| **Older Tavily registrations** (p5-g1) | Under Q12 (a), `--remove-mcp` removes only a server whose command matches today's registry. Tavily servers registered by older releases (`npx -y mcp-remote https://mcp.tavily.com/mcp`, `npx -y tavily-mcp@0.1.2`) are kept; the CHANGELOG says how to remove them by hand | **Decided: keep.** Declined: a historical-command list per server (fits the backlog item "MCP servers dropped from the registry") |
+| **C-06 `update` deviation** (p5-g2) | Ruling (b) said "keep refusing, advise `update --scope project`", but `update` ran the same guard, so the advice would loop. Now a non-force install still refuses, and `update` passes when every foreign `memory:` value names a store outside this base, printing where agent memory moves. That is option (a)'s `update` half | **Decided: confirmed.** Declined: changing the advice, or giving `update` its own flag |
+| **C-18, other direction** (p5-g2) | A project install replacing a worktree's local block is reported. A local install replacing another worktree's project block is not: the local block is a superset, so it hides that worktree's *uncommitted* project content from `git status`. The warning also does not name which worktree holds the install | **Decided: stays one-directional.** Declined: reporting the other direction too (naming the worktree needs `git worktree list` plus scope detection) |
+| **C-15 scope** (p5-g2) | The `CLAUDE_CONFIG_DIR` warning is given only at user scope, the only base the variable replaces, and only by install and doctor (Q15 b). `uninstall` does not warn, and user-scope MCP servers in `$CLAUDE_CONFIG_DIR/.claude.json` are not covered | **Open:** waits for the W7 answer and the Q15 (a) ADR. The alternative is to extend the warning to uninstall and the MCP reader now |
 
 Smaller judgement calls, recorded in the P5 reports. Each is a one-line follow-up if the owner wants it:
 
