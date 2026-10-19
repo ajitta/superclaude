@@ -21,6 +21,8 @@ Environment: Windows PowerShell 5.1.26100.9711 and PowerShell 7.6.7, git 2.53.0.
 
 The two full runs differ only in the sandbox paths and the W6 `Out-File` row. U1 (v4.29.5 → current, all three scopes), U4 apart from C-17, and E6 (UTF-16, UTF-8 BOM and cp949 settings × U/P/L × install, update, uninstall, doctor: 36 records, each exit 1 with nothing changed and no traceback) all pass in both shells.
 
+**After the fixes (§4), `-Only I2,E6` on `fix/windows-file-fidelity`:** 51 of 51 PASS in both 5.1 and 7, with the guard reporting the real profile unchanged. I2's `info/exclude` rows now pass, and E6's `utf-8-bom` rows now expect, and get, exit 0 with the BOM kept.
+
 **S-1 (script bug, fixed here).** `Set-Customizations` seeded `settings.json` with `hooks` written inline on one line, inside an otherwise indented file. C-21 re-serialises that shape by design (a recorded residual, [03-findings](./03-findings.md) C-21 row), so the I2 byte check failed because of the seed and not because of anything superclaude did. The seed is now fully indented. With the indented seed, settings bytes come back identical at all three scopes on Windows, so the C-21 fix holds there.
 
 ## 2. W-3: install rewrites `.git/info/exclude` with CRLF on Windows
