@@ -23,8 +23,8 @@ description: Deep web research with adaptive planning and smart search. Use when
   </flags>
 
   <depth note="Full profiles and thresholds: .claude/superclaude/modes/RESEARCH_CONFIG.md (user-scope install: ~/.claude/superclaude/modes/)">
-    quick: 1 hop, runs without asking, summary | standard: 2-3 hops, full plan, report
-    deep: 3-4 hops, mid-checkpoints | exhaustive: 5+ hops, subagent delegate
+    quick: 1 hop, runs without asking, summary | standard: up to 3 hops, full plan, report
+    deep: up to 4 hops, mid-checkpoints | exhaustive: 5 hops (the maximum), subagent delegate
   </depth>
 
   <outputs>
@@ -45,7 +45,7 @@ description: Deep web research with adaptive planning and smart search. Use when
   <examples>
 | Input | Expected behavior |
 |---|---|
-| `/sc:research 'quantum computing breakthroughs 2025'` | standard depth: 2-3 hops, full report |
+| `/sc:research 'quantum computing breakthroughs 2025'` | standard depth: up to 3 hops, full report |
 | `/sc:research 'internal company API migration patterns'` | low-confidence sources → adaptive replan |
   </examples>
 

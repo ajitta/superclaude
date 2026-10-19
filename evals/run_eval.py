@@ -1,4 +1,4 @@
-"""4-arm eval harness (roadmap Phase 1-1) + model-release canary (Phase 1-2).
+"""Eval harness over the arms in ARMS (roadmap Phase 1-1) + model-release canary (Phase 1-2).
 
 Runs each task from tasks.yaml in an isolated temp workspace OUTSIDE the repo
 (probe-observer-effect: repo context contaminates baselines), once per arm:
