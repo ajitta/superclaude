@@ -23,7 +23,7 @@ import shutil
 import stat
 import subprocess
 import sys
-from pathlib import Path
+from pathlib import Path, PureWindowsPath
 from typing import NamedTuple
 
 import pytest
@@ -74,30 +74,39 @@ def scope_base(home: Path, project: Path, scope: str) -> Path:
 
 
 TOKEN_NAMES = ("HOME", "PROJECT", "PYTHON", "UVCACHE")
-# A token and the path under it, as one path: `$HOME/.claude/skills/x`.
-_TOKEN_PATH = re.compile(r"\$(" + "|".join(TOKEN_NAMES) + r")((?:/[A-Za-z0-9_.\-]+)*)")
 
 
-def resolve_tokens(
-    text: str, tokens: dict[str, str], *, as_json: bool = False, sep: str = os.sep
-) -> str:
-    """``text`` with each ``$TOKEN/...`` path replaced by its machine path.
+def fixture_tokens(tmp_path: Path, home: Path, project: Path) -> dict[str, str]:
+    """The machine paths of one sandbox, in the form the old installers wrote.
 
-    The whole path takes the platform separator, as the old installer wrote
-    it (``str(Path)``): with the token alone replaced, Windows got
-    `C:\\...\\home/.claude/skills/...`, a form no installer wrote and the
-    retired-skill gate's placeholder undo does not know, so confidence-check
-    and simplicity-coach survived there (run 39208943288). A JSON file carries
-    machine paths as JSON strings: a Windows path's backslashes must be escaped
-    there, as json.dump wrote them, or the fixture is invalid JSON on Windows
-    only.
+    Every era resolved its placeholders to forward slashes on every platform:
+    `{{SKILLS_PATH}}` and `{{SCRIPTS_PATH}}` in SKILL.md with
+    ``.resolve().as_posix()`` (cd2f8aab → b806c61c), the hook commands'
+    `{{SCRIPTS_PATH}}` and `{{PYTHON_BIN}}` with ``.replace("\\", "/")``.
+    Replacing `$HOME` with ``str(home)`` gave Windows
+    `C:\\...\\home/.claude/skills/...`, a mixed form no installer wrote and the
+    retired-skill gate's placeholder undo does not know, so confidence-check and
+    simplicity-coach survived there (run 39208943288).
     """
+    return {
+        "PYTHON": Path(sys.executable).as_posix(),
+        "UVCACHE": (tmp_path / "uvcache").as_posix(),
+        "PROJECT": project.resolve().as_posix(),
+        "HOME": home.resolve().as_posix(),
+    }
 
-    def native(match: re.Match[str]) -> str:
-        path = tokens[match.group(1)] + match.group(2).replace("/", sep)
-        return json.dumps(path)[1:-1] if as_json else path
 
-    return _TOKEN_PATH.sub(native, text)
+def resolve_tokens(text: str, tokens: dict[str, str], *, as_json: bool = False) -> str:
+    """``text`` with each ``$TOKEN`` replaced by its machine path.
+
+    A JSON file carries machine paths as JSON strings, so the value is
+    JSON-escaped there; with the forward-slash forms of ``fixture_tokens`` that
+    changes nothing, and a value holding a quote or backslash stays valid JSON.
+    """
+    for token in TOKEN_NAMES:
+        value = tokens[token]
+        text = text.replace(f"${token}", json.dumps(value)[1:-1] if as_json else value)
+    return text
 
 
 def build_legacy_install(
@@ -106,12 +115,7 @@ def build_legacy_install(
     """Lay out ``era``'s captured install under ``tmp_path``; return (home, project, base)."""
     doc = load_era(era)
     home, project = sandbox(tmp_path, monkeypatch)
-    tokens = {
-        "PYTHON": sys.executable,
-        "UVCACHE": str(tmp_path / "uvcache"),
-        "PROJECT": str(project),
-        "HOME": str(home),
-    }
+    tokens = fixture_tokens(tmp_path, home, project)
 
     for key, entry in doc["files"].items():
         root, rel = key.split("/", 1)
@@ -205,35 +209,48 @@ def test_fixture_carries_no_machine_data(path: Path) -> None:
     assert _EMAIL.findall(text) == []
 
 
-@pytest.mark.parametrize("as_json", [False, True], ids=["text", "json"])
-def test_fixture_tokens_resolve_to_a_native_path(as_json: bool) -> None:
+def test_fixture_tokens_are_forward_slash_paths(tmp_path: Path) -> None:
     """Windows run 39208943288: `$HOME/.claude/skills/...` became
-    `C:\\...\\home/.claude/skills/...`, a mixed form no installer wrote (each
-    resolved `{{SKILLS_PATH}}` with str(Path)), so no placeholder undo matched
-    and confidence-check and simplicity-coach survived every removal. The
-    path after a token takes the platform separator, whole."""
-    home = r"C:\Users\me\home"
-    text = "run `python $HOME/.claude/skills/x/scripts/a.py` at $HOME now"
-    native = r"C:\Users\me\home\.claude\skills\x\scripts\a.py"
-    if as_json:
-        native = native.replace("\\", "\\\\")
-        home = home.replace("\\", "\\\\")
+    `C:\\...\\home/.claude/skills/...`, so no placeholder undo matched and
+    confidence-check and simplicity-coach survived every removal. The eras
+    wrote forward slashes everywhere (as_posix, `.replace("\\", "/")`)."""
+    tokens = fixture_tokens(tmp_path, tmp_path / "home", tmp_path / "project")
 
-    out = resolve_tokens(text, {"HOME": r"C:\Users\me\home"}, as_json=as_json, sep="\\")
-
-    assert out == f"run `python {native}` at {home} now"
-    assert resolve_tokens(text, {"HOME": "/h"}, sep="/") == (
-        "run `python /h/.claude/skills/x/scripts/a.py` at /h now"
+    assert set(tokens) == set(TOKEN_NAMES)
+    for value in tokens.values():
+        assert "\\" not in value, value
+    assert tokens["HOME"] == (tmp_path / "home").resolve().as_posix()
+    assert (
+        resolve_tokens("$HOME/.claude/skills/x", tokens)
+        == tokens["HOME"] + "/.claude/skills/x"
+    )
+    assert (
+        resolve_tokens('"$HOME"', {**tokens, "HOME": 'C:/a"b'}, as_json=True)
+        == '"C:/a\\"b"'
     )
 
 
-def test_fixture_blobs_hold_no_token_path_a_native_resolve_would_split() -> None:
-    """Every `$TOKEN/...` path in a blob resolves as one native path: a segment
-    outside [A-Za-z0-9_.-] would end the path early and leave the mixed form."""
-    for blob in BLOBS.values():
-        for found in re.findall(r"\$(?:HOME|PROJECT|PYTHON|UVCACHE)[^\s\"'`<>]*", blob):
-            resolved = resolve_tokens(found, {k: "X" for k in TOKEN_NAMES}, sep="\\")
-            assert "/" not in resolved, found
+@pytest.mark.parametrize("era", ["66b37a7ep-user", "b933fd65p-user"])
+@pytest.mark.parametrize("skill", ["confidence-check", "simplicity-coach"])
+def test_fixture_skill_md_passes_the_gate_in_its_windows_form(
+    era: str, skill: str
+) -> None:
+    """The retired-skill gate, simulated for a Windows home on Linux: with the
+    era's forward-slash form, undoing `<base>/skills` as `_placeholder_forms`
+    does with ``as_posix`` yields a shipped SKILL.md digest."""
+    from superclaude.cli.retired_skill_files import RETIRED_SKILL_FILES
+
+    doc = load_era(era)
+    blob = BLOBS[doc["files"][f"$HOME/.claude/skills/{skill}/SKILL.md"]["blob"]]
+    home = PureWindowsPath(r"C:\Users\me\AppData\Local\Temp\pytest-0\test0\home")
+    tokens = {name: "unused" for name in TOKEN_NAMES} | {"HOME": home.as_posix()}
+    written = resolve_tokens(blob, tokens).encode("utf-8")
+    skills = (home / ".claude" / "skills").as_posix().encode("utf-8")
+
+    assert skills in written, written[:200]
+    undone = written.replace(skills, b"{{SKILLS_PATH}}")
+    digest = hashlib.sha256(undone.replace(b"\r\n", b"\n")).hexdigest()[:16]
+    assert digest in RETIRED_SKILL_FILES[skill]["SKILL.md"]
 
 
 @pytest.mark.parametrize("era", ERAS)
