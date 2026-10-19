@@ -1,14 +1,33 @@
 ---
 feature: docs-ssot-audit
 phase: plan
-status: draft
+status: implementing
 created: 2026-10-19
 revised: 2026-10-19
 ---
 
 # 05. Plan — fix groups, guard tests, owner questions
 
-Findings: [03-findings.md](./03-findings.md). Nothing below is done; the round stops here (00 §Rules). The owner's answers to Q1–Q10 open the fix round.
+Findings: [03-findings.md](./03-findings.md). Phases 0–3 stopped here (00 §Rules); the owner's rulings below opened the fix round.
+
+## Owner rulings (2026-10-19)
+
+> Owner ruling: Q1–Q10 all as recommended (Q1 a, Q2 a, Q3 b, Q4 a, Q5 a, Q6 a, Q7 a, Q8 a, Q9 a, Q10 a).
+
+| Q | Decision |
+|---|---|
+| Q1 | (a) fix S2 and S3 in one round on `fix/docs-ssot`, groups G1–G5, one commit each |
+| Q2 | (a) hand-edit `PROJECT_INDEX.md`, add it to T2/T3/T6 |
+| Q3 | (b) all seven guards, T2's phrase table capped at ten entries |
+| Q4 | (a) dated research and analysis docs stay as records |
+| Q5 | (a) the two draft plans become `status: deprecated` under `docs/archive/plans/` |
+| Q6 | (a) delete README's unsupported research numbers; depth table at the config's columns |
+| Q7 | (a) `core/README.md` drops the token figure and class list, points at RULES.md and `TestCoreLiteSplit` |
+| Q8 | (a) rewrite the three CLI/pyproject self-description strings |
+| Q9 | (a) codex guides: fix D-08, D-09, D-12, D-13 only, bump `last_verified` |
+| Q10 | (a) fix `evals/README.md` arms and matrix-task wording in the same round |
+
+Round rules from the ruling: guard tests first and seen red; area tests per commit; full suite, `make format`, `make lint`, `make typecheck` clean at the end; push and dispatch the Tests workflow on the branch; no merge, no version bump, no release; an independent verifier reviews afterwards.
 
 ## Owner summary
 
@@ -19,10 +38,11 @@ Findings: [03-findings.md](./03-findings.md). Nothing below is done; the round s
 
 ## Progress
 
-- [ ] P1 Owner answers Q1–Q10
-- [ ] P2 Fix round on `fix/docs-ssot` (groups G1–G5 below, per Q1)
-- [ ] P3 Guard tests T1–T7 (per Q3), red first against the current text
-- [ ] P4 Full suite, `make lint`, `make format`; merge; one release (Q8 of axis C's policy: one release per round)
+- [x] P1 Owner answers Q1–Q10 (rulings above)
+- [ ] P2 Guard tests T1–T7 (per Q3), red first against the current text
+- [ ] P3 Fix round on `fix/docs-ssot` (groups G1–G5 below, per Q1), one commit per group
+- [ ] P4 Full suite, `make format`, `make lint`, `make typecheck` clean; push; Tests workflow dispatched on the branch and green
+- [ ] P5 Independent verification, then merge and one release (owner; not this round)
 
 ## 1. Fix groups
 

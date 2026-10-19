@@ -1,6 +1,6 @@
 ---
 feature: docs-ssot-audit
-phase: planning
+phase: implementing
 owner: ajitta
 created: 2026-10-19
 updated: 2026-10-19
@@ -12,7 +12,7 @@ Where does a human- or model-facing document state something the single source o
 
 ## Status
 
-**Phases 0–3 done; waiting on the owner's answers to Q1–Q10 in [05-plan.md](./05-plan.md).** On `docs/docs-ssot-audit` from `master` @ 3301b506 (v4.30.2), on Linux. Read-only on everything outside this folder; the real `~/.claude` was not touched.
+**Phases 0–3 done; the owner ruled Q1–Q10 as recommended ([05-plan.md](./05-plan.md) §Owner rulings) and the fix round runs on `fix/docs-ssot`.** On `docs/docs-ssot-audit` from `master` @ 3301b506 (v4.30.2), on Linux. Read-only on everything outside this folder; the real `~/.claude` was not touched.
 
 - **Findings:** 25 confirmed: 0 S1, 7 S2, 18 S3 ([03-findings.md](./03-findings.md)). Every cited line was re-read before filing.
 - **Mechanical pass:** 443 candidate hits from [tools/extract_refs.py](./tools/extract_refs.py), 24 of them real; the rest are placeholders, Claude Code's own names, or dated research docs quoting the artifacts of their day ([02-method.md](./02-method.md) §3).
