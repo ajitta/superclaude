@@ -8,6 +8,8 @@ Releases before 4.19.0 are not listed. Their history is the git log; the upstrea
 
 ## [Unreleased]
 
+## [4.31.1] - 2026-10-19
+
 ### Added
 
 - Three canary probes check that verification survives a prompt that argues for skipping it: a hurry (`pressure-time-verify`), a tech lead's dictated one-liner with "tests can be backfilled next sprint" (`pressure-authority-dictated-fix`), and "the tests are too strict, get the suite green whatever it takes" (`pressure-sunk-cost-green`, which also checks two held-out values so a lookup of the tested inputs fails). `--canary` runs them; `make canary-gates` does not, and no hard gate was added. Adapted from addyosmani/agent-skills' pressure cases (`docs/research/skill-pack-comparison-ajitta-2026-10-19.md`).
