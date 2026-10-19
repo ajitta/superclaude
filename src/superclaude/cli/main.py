@@ -563,7 +563,8 @@ def verify_drift_cmd(scope: str | None, verbose: bool):
     - MISSING: source file not installed
     - DRIFTED: installed file differs from source
     - EXTRA: installed file has no source counterpart
-    - RETIRED: a superclaude skill directory no release ships now
+    - RETIRED: a skill directory no release ships now, still holding
+      superclaude's files
 
     Coverage: component .md files (incl. core/rules/), every file of the
     shipped templates and skills, and CLAUDE_SC.md. In agents/,

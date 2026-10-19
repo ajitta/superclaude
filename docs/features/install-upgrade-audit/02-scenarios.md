@@ -92,7 +92,7 @@ Each scenario runs `seed-C pre` (if C), then the old install, then `seed-C post`
 
 `tests/fixtures/legacy_installs/<era>.json` was captured once by `capture_fixtures.py` from fresh old installs with no C. There are 12 eras: `v4.20.1-user`, `19575ac4p-local`, `19575ac4p-project`, `77b5821c-project`, `ec6fa7e2p-local`, `ec6fa7e2p-user`, `19091b37-user`, `b85651c0p-local`, `b933fd65p-user`, `66b37a7ep-user`, `d174e600-user`, `d174e600-project`. Each file lists every path under `$HOME` and `$PROJECT` (the latter `.git/` excluded, except `info/exclude`).
 
-- **Exact text** is kept for `agents/*.md`, `skills/*/SKILL.md`, `settings(.local).json`, `CLAUDE(.local).md`, `.git/info/exclude` and `.gitignore`. Each is stored once, by digest, in `_blobs.json`, because the same agent text recurs across eras.
+- **Exact text** is kept for `agents/*.md`, `skills/*/SKILL.md`, `settings(.local).json`, `CLAUDE(.local).md`, `.git/info/exclude` and `.gitignore`, and (since the W-1 fix, which removes a retired skill file by file) every file of a retired skill. Each is stored once, by digest, in `_blobs.json`, because the same agent text recurs across eras.
 - **sha256 + size** for everything else; the builder writes a `stub <sha256>` file there.
 - **Tokens** replace machine paths: `$PYTHON` (any interpreter under the uv cache, which is where the uvx archive interpreter lives), `$UVCACHE`, `$PROJECT`, `$HOME`.
 - **Data, not code:** `tests/fixtures/shipped_names_history.json` is the Q10 input ([01a](./01a-inventory-history.md) §3).

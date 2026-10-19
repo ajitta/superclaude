@@ -2,10 +2,11 @@
 
     uv run python scripts/gen_shipped_names.py [<rev>]   # from a full clone
 
-Every name and hook identity a release could have installed, from the
-first-parent history of ``<rev>`` (default HEAD; merges diffed against their
-first parent), so a name added and removed inside one unmerged branch never
-counts. ``tests/unit/test_install_upgrade_scenarios.py`` then requires every
+Every name and hook identity an install could hold, from every commit
+reachable from ``<rev>`` (default HEAD), through both parents of a merge: a
+pull's second parent was the public master, and a branch is installed by
+whoever syncs from it. An unmerged branch is not reachable, so it never counts.
+``tests/unit/test_install_upgrade_scenarios.py`` then requires every
 identity not shipped now to be on a retired list in ``cli/install_paths.py``
 or ``cli/install_settings.py``. Regenerate when a test there says the history
 is stale (an agent, output style, skill or hook was added or removed). A
@@ -20,6 +21,11 @@ Collected:
     and uninstall compare before they remove a file or directory under that
     name: the name alone may be the user's own (``pm-agent``) or another skill
     collection's;
+  - for each skill not shipped now, the same digests of every file of every
+    revision, keyed by its path in the skill directory: install and uninstall
+    remove only those files from a retired skill, so a file the user added or
+    edited there stays. ``cli/retired_skill_files.py`` is written from this
+    table (``render_retired_skill_files``), and a test holds the two equal;
   - every hook event and (event, entry point, subcommand) in every revision of
     ``hooks/hooks.json`` and ``hooks/serena-hooks.json``, and the commands with
     no entry point verbatim.
@@ -36,6 +42,7 @@ from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
 OUT = REPO / "tests" / "fixtures" / "shipped_names_history.json"
+TABLE_OUT = REPO / "src" / "superclaude" / "cli" / "retired_skill_files.py"
 DIRS = {
     "agents": "src/superclaude/agents",
     "output-styles": "src/superclaude/output-styles",
@@ -81,17 +88,12 @@ def is_tree(rev: str, path: str) -> bool:
 
 
 def touching(rev: str, path: str) -> list:
-    """First-parent revisions that changed ``path``, oldest first."""
-    log = git(
-        "log",
-        "--first-parent",
-        "--diff-merges=first-parent",
-        "--reverse",
-        "--format=@%h",
-        rev,
-        "--",
-        path,
-    )
+    """Revisions reachable from ``rev`` that changed ``path``, oldest first.
+
+    ``--full-history`` walks every parent of a merge: path-limited history
+    simplification would drop a side whose changes the merge did not keep.
+    """
+    log = git("log", "--full-history", "--reverse", "--format=@%h", rev, "--", path)
     return [line[1:] for line in log.splitlines() if line.startswith("@")]
 
 
@@ -158,6 +160,64 @@ def retired_digests(rev: str, kind: str, retired: list) -> dict:
     return {name: sorted(values) for name, values in sorted(found.items())}
 
 
+def retired_skill_files(rev: str, retired: list) -> dict:
+    """{skill: {path in the skill dir: [sha256 of every revision]}}."""
+    found: dict = {}
+    for name in retired:
+        path = f"{DIRS['skills']}/{name}"
+        for commit in touching(rev, path):
+            if not is_tree(commit, path):
+                continue
+            listing = git("ls-tree", "-r", "-z", f"{commit}:{path}")
+            for entry in filter(None, listing.split("\0")):
+                meta, rel = entry.split("\t", 1)
+                if meta.split()[1] != "blob":
+                    continue
+                data = subprocess.run(
+                    ["git", "-C", str(REPO), "cat-file", "blob", meta.split()[2]],
+                    capture_output=True,
+                    check=True,
+                ).stdout
+                found.setdefault(name, {}).setdefault(rel, set()).add(
+                    hashlib.sha256(data.replace(b"\r\n", b"\n")).hexdigest()
+                )
+    return {
+        name: {rel: sorted(values) for rel, values in sorted(files.items())}
+        for name, files in sorted(found.items())
+    }
+
+
+def render_retired_skill_files(doc: dict) -> str:
+    """Source of ``cli/retired_skill_files.py`` from the fixture's table."""
+    lines = [
+        '"""Every file of every revision of each retired skill (generated).',
+        "",
+        "Written by scripts/gen_shipped_names.py from",
+        "tests/fixtures/shipped_names_history.json; regenerate, do not edit.",
+        "{skill: {path in the skill directory: sha256 of each revision with LF",
+        "line endings, first 16 hex digits}}, read by",
+        "``install_paths.legacy_skill_files``.",
+        '"""',
+        "",
+        "from typing import Dict, Tuple",
+        "",
+        "RETIRED_SKILL_FILES: Dict[str, Dict[str, Tuple[str, ...]]] = {",
+    ]
+    for name, files in doc["retired_skill_files"].items():
+        lines.append(f"    {json.dumps(name)}: {{")
+        for rel, digests in files.items():
+            short = [json.dumps(d[:16]) for d in digests]
+            if len(short) == 1:
+                lines.append(f"        {json.dumps(rel)}: ({short[0]},),")
+                continue
+            lines.append(f"        {json.dumps(rel)}: (")
+            lines.extend(f"            {d}," for d in short)
+            lines.append("        ),")
+        lines.append("    },")
+    lines.append("}")
+    return "\n".join(lines) + "\n"
+
+
 def hook_rows(config: dict):
     """(event, command) for every inner hook in a parsed hooks file."""
     hooks = config.get("hooks") if isinstance(config, dict) else None
@@ -212,9 +272,7 @@ def main(rev: str = "HEAD") -> None:
     events, ids, inline, now_events, now_ids = collect_hooks(rev)
 
     doc = {
-        "generated_from": (
-            f"git log --first-parent --diff-merges=first-parent {rev} @ {head}"
-        ),
+        "generated_from": f"git log --full-history {rev} @ {head}",
         "generator": "scripts/gen_shipped_names.py (full clone only)",
         "names": {
             kind: [
@@ -230,6 +288,7 @@ def main(rev: str = "HEAD") -> None:
         },
         "retired_agent_digests": retired_digests(rev, "agents", retired["agents"]),
         "retired_skill_digests": retired_digests(rev, "skills", retired["skills"]),
+        "retired_skill_files": retired_skill_files(rev, retired["skills"]),
         "hook_events": [
             {"event": e, "first": v[0], "last": v[1], "shipped_now": e in now_events}
             for e, v in sorted(events.items())
@@ -253,7 +312,9 @@ def main(rev: str = "HEAD") -> None:
     OUT.write_text(
         json.dumps(doc, indent=1, ensure_ascii=False) + "\n", encoding="utf-8"
     )
+    TABLE_OUT.write_text(render_retired_skill_files(doc), encoding="utf-8")
     print(f"wrote {OUT.relative_to(REPO)} from {rev} @ {head}")
+    print(f"wrote {TABLE_OUT.relative_to(REPO)}")
 
 
 if __name__ == "__main__":

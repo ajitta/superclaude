@@ -42,3 +42,4 @@ Does a real user's upgrade (an older SuperClaude install, then the current CLI) 
 | [05b-plan-review-fixes.md](./05b-plan-review-fixes.md) | Plan v2 §4–§5: code review, outputs and fix policy |
 | [06-verify.md](./06-verify.md) | P7 independent verification at 1c8b6f19 (Korean): V-1–V-5 |
 | [06a-verify-r2.md](./06a-verify-r2.md) | P7 re-verify at 87dc7ebd (Korean): PASS, W-1 |
+| [06b-verify-w1.md](./06b-verify-w1.md) | W-1 fix verify at f36d4a0d (Korean): PASS WITH FIXES, X-1–X-5 |

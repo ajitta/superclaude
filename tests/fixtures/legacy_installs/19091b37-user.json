@@ -220,12 +220,10 @@
    "blob": "8d801d7bd789043d"
   },
   "$HOME/.claude/skills/confidence-check/__init__.py": {
-   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-   "size": 0
+   "blob": "e3b0c44298fc1c14"
   },
   "$HOME/.claude/skills/confidence-check/confidence.ts": {
-   "sha256": "c1517ef5dab45c0ff0a3a5379f3117fe10d3cbdb0929e2c04c4ad5c2123a503e",
-   "size": 8721
+   "blob": "c1517ef5dab45c0f"
   },
   "$HOME/.claude/superclaude/CLAUDE_SC.md": {
    "sha256": "6c87bc90d2f5996d6b10638855a683ae093aa3d89e374d75ee229a607c54c1b7",

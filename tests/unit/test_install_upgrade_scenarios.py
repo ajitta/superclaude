@@ -3,10 +3,11 @@
 Each ``tests/fixtures/legacy_installs/<era>.json`` records what a real old
 installer left on disk, captured once from a sandbox run of that release
 (docs/features/install-upgrade-audit/02-scenarios.md). Content the installer
-reads — agents, SKILL.md, settings, CLAUDE files, exclude files — is kept as
-exact text in ``_blobs.json``; everything else is a sha256 the builder writes as
-a stub. Machine paths are tokens: ``$HOME``, ``$PROJECT``, ``$PYTHON``,
-``$UVCACHE``. No network, no git history: the fixtures are the history.
+reads — agents, SKILL.md and every file of a retired skill, settings, CLAUDE
+files, exclude files — is kept as exact text in ``_blobs.json``; everything
+else is a sha256 the builder writes as a stub. Machine paths are tokens:
+``$HOME``, ``$PROJECT``, ``$PYTHON``, ``$UVCACHE``. No network, no git history:
+the fixtures are the history.
 
 The defects the audit found are pinned here by ID, each test written red
 before its fix (docs/features/install-upgrade-audit/03-findings.md).
@@ -21,6 +22,7 @@ import shutil
 import subprocess
 import sys
 from pathlib import Path
+from typing import NamedTuple
 
 import pytest
 from click.testing import CliRunner
@@ -1210,6 +1212,472 @@ def test_v1_a_retired_skill_with_a_relative_skills_path_still_goes(
     assert not skill.parent.exists(), message
 
 
+# --- W-1: a retired skill loses only the files superclaude shipped ------------
+#
+# A retired skill directory whose SKILL.md is superclaude's was removed whole
+# (`rmtree`), with a file the user added there and a shipped file they edited.
+# Now only a file whose path and text are a shipped revision of that skill goes
+# (cli/retired_skill_files.py); the rest stays, directories go once empty, and
+# a symlink is never followed. The ownership gate is still SKILL.md: a skill
+# whose SKILL.md the user edited is theirs, helpers and all.
+
+W1_ERA = "ec6fa7e2p-user"
+W1_SKILL = "verbalized-sampling"
+W1_OPERATIONS = ["install", "install --force", "update", "uninstall -y"]
+_KEPT_LINE = re.compile(r"Kept (\d+) file\(s\) in (.+?): ")
+
+
+class _W1Copy(NamedTuple):
+    of: str
+
+
+def _w1_shipped() -> dict[str, str]:
+    """W1_SKILL's files as W1_ERA's installer wrote them, by path in the skill."""
+    prefix = f"$HOME/.claude/skills/{W1_SKILL}/"
+    files = {
+        key[len(prefix) :]: BLOBS[entry["blob"]]
+        for key, entry in load_era(W1_ERA)["files"].items()
+        if key.startswith(prefix)
+    }
+    assert "SKILL.md" in files and "references/theory.md" in files, files
+    return files
+
+
+def _plant_w1_skill(base: Path, case: dict) -> Path:
+    """``add`` maps a path to its text, or to ``_W1Copy(<shipped path>)`` for a
+    copy of that shipped file; ``crlf`` writes every file with CRLF endings."""
+    skill = base / "skills" / W1_SKILL
+    shipped = _w1_shipped()
+    files = dict(shipped)
+    for rel, text in case["add"].items():
+        files[rel] = shipped[text.of] if isinstance(text, _W1Copy) else text
+    for rel, suffix in case["edit"].items():
+        files[rel] = shipped[rel] + suffix
+    for rel, text in files.items():
+        if case.get("crlf"):
+            text = text.replace("\r\n", "\n").replace("\n", "\r\n")
+        (skill / rel).parent.mkdir(parents=True, exist_ok=True)
+        (skill / rel).write_text(text, encoding="utf-8", newline="")
+    return skill
+
+
+def _tree(skill: Path) -> dict[str, bytes]:
+    return {
+        path.relative_to(skill).as_posix(): path.read_bytes()
+        for path in skill.rglob("*")
+        if path.is_file()
+    }
+
+
+def _kept_lines(output: str) -> list[str]:
+    return [line for line in output.splitlines() if _KEPT_LINE.search(line)]
+
+
+W1_CASES = {
+    "shipped-only": {"add": {}, "edit": {}, "kept": set(), "ours": True},
+    # A Windows checkout with core.autocrlf installs CRLF copies.
+    "shipped-only-crlf": {
+        "add": {},
+        "edit": {},
+        "kept": set(),
+        "ours": True,
+        "crlf": True,
+    },
+    # Shipped text at a path that skill never shipped it at is the user's copy.
+    "copy-elsewhere": {
+        "add": {
+            "backup/SKILL.md": _W1Copy("SKILL.md"),
+            "theory.md": _W1Copy("references/theory.md"),
+        },
+        "edit": {},
+        "kept": {"backup/SKILL.md", "theory.md"},
+        "ours": True,
+    },
+    "user-file": {
+        "add": {"my-notes.md": "my notes\n"},
+        "edit": {},
+        "kept": {"my-notes.md"},
+        "ours": True,
+    },
+    "edited-helper": {
+        "add": {},
+        "edit": {"references/theory.md": "\nmy correction\n"},
+        "kept": {"references/theory.md"},
+        "ours": True,
+    },
+    "nested-user-dir": {
+        "add": {
+            "mine/deeper/notes.txt": "deep notes\n",
+            "references/mine.md": "my reference\n",
+        },
+        "edit": {},
+        "kept": {"mine/deeper/notes.txt", "references/mine.md"},
+        "ours": True,
+    },
+    # SKILL.md edited: the skill is the user's, its unchanged helpers with it.
+    "edited-skill-md": {
+        "add": {},
+        "edit": {"SKILL.md": "\nmy rule\n"},
+        "kept": {
+            "SKILL.md",
+            "references/examples.md",
+            "references/paper-methodology.md",
+            "references/theory.md",
+        },
+        "ours": False,
+    },
+}
+
+
+@pytest.mark.parametrize("case", W1_CASES)
+@pytest.mark.parametrize("operation", W1_OPERATIONS)
+@pytest.mark.parametrize("scope", SCOPES)
+def test_w1_retired_skill_loses_only_the_files_superclaude_shipped(
+    tmp_path: Path, monkeypatch, scope: str, operation: str, case: str
+) -> None:
+    """W-1: a retired skill whose SKILL.md is shipped text was rmtree'd, taking
+    a file the user added there and a shipped file the user edited."""
+    _home, _project, base = fresh_install(tmp_path, monkeypatch, scope)
+    spec = W1_CASES[case]
+    skill = _plant_w1_skill(base, spec)
+    before = _tree(skill)
+
+    result = CliRunner().invoke(main, [*operation.split(), "--scope", scope])
+
+    output = all_output(result)
+    assert result.exit_code == 0, output
+    assert "Traceback" not in output, output
+    after = _tree(skill) if skill.exists() else {}
+    assert after == {rel: before[rel] for rel in spec["kept"]}, output
+    if not spec["kept"]:
+        assert not skill.exists(), output
+    assert not (skill / "references").exists() or any(
+        rel.startswith("references/") for rel in spec["kept"]
+    ), "an emptied directory was left behind"
+    kept = _kept_lines(output)
+    if spec["ours"] and spec["kept"]:
+        assert len(kept) == 1, output
+        count, where = _KEPT_LINE.search(kept[0]).groups()
+        assert int(count) == len(spec["kept"]), kept
+        assert where.replace("\\", "/").endswith(f"skills/{W1_SKILL}"), kept
+    else:
+        assert kept == [], output
+
+
+def _symlink(link: Path, target: Path) -> None:
+    try:
+        link.symlink_to(target, target_is_directory=target.is_dir())
+    except (OSError, NotImplementedError) as e:  # Windows without the privilege
+        pytest.skip(f"cannot create a symlink here: {e}")
+
+
+@pytest.mark.parametrize("operation", ["install", "uninstall -y"])
+@pytest.mark.parametrize("scope", SCOPES)
+def test_w1_a_symlink_inside_a_retired_skill_is_kept_and_never_followed(
+    tmp_path: Path, monkeypatch, scope: str, operation: str
+) -> None:
+    """superclaude never shipped a symlink: one in a retired skill is the
+    user's, even at a shipped path pointing at shipped text, and what it points
+    at is outside the skill."""
+    _home, _project, base = fresh_install(tmp_path, monkeypatch, scope)
+    skill = _plant_w1_skill(base, W1_CASES["shipped-only"])
+    outside = tmp_path / "outside"
+    outside.mkdir()
+    (outside / "theory.md").write_text(
+        _w1_shipped()["references/theory.md"], encoding="utf-8", newline=""
+    )
+    (outside / "SKILL.md").write_text(
+        _w1_shipped()["SKILL.md"], encoding="utf-8", newline=""
+    )
+    outside_before = snapshot(outside)
+    (skill / "references" / "theory.md").unlink()
+    _symlink(skill / "references" / "theory.md", outside / "theory.md")
+    _symlink(skill / "linked", outside)
+
+    result = CliRunner().invoke(main, [*operation.split(), "--scope", scope])
+
+    output = all_output(result)
+    assert result.exit_code == 0, output
+    assert snapshot(outside) == outside_before, output
+    assert (skill / "references" / "theory.md").is_symlink(), output
+    assert (skill / "linked").is_symlink(), output
+    assert not (skill / "SKILL.md").exists(), output
+    assert not (skill / "references" / "examples.md").exists(), output
+    kept = _kept_lines(output)
+    assert len(kept) == 1 and _KEPT_LINE.search(kept[0]).group(1) == "2", output
+
+
+@pytest.mark.parametrize("operation", ["install", "uninstall -y"])
+@pytest.mark.parametrize("scope", SCOPES)
+def test_w1_a_symlinked_retired_skill_directory_is_left_alone(
+    tmp_path: Path, monkeypatch, scope: str, operation: str
+) -> None:
+    """A retired name that is a symlink to a directory elsewhere is the user's
+    link: rmtree refused it (an install failure) and nothing may follow it."""
+    _home, _project, base = fresh_install(tmp_path, monkeypatch, scope)
+    elsewhere = _plant_w1_skill(tmp_path / "elsewhere", W1_CASES["shipped-only"])
+    before = snapshot(elsewhere)
+    link = base / "skills" / W1_SKILL
+    _symlink(link, elsewhere)
+
+    result = CliRunner().invoke(main, [*operation.split(), "--scope", scope])
+
+    output = all_output(result)
+    assert result.exit_code == 0, output
+    assert link.is_symlink(), output
+    assert snapshot(elsewhere) == before, output
+
+
+@pytest.mark.parametrize("case", ["shipped-only", "user-file", "nested-user-dir"])
+@pytest.mark.parametrize("scope", SCOPES)
+def test_w1_uninstall_dry_run_says_what_stays_and_changes_nothing(
+    tmp_path: Path, monkeypatch, scope: str, case: str
+) -> None:
+    home, project, base = fresh_install(tmp_path, monkeypatch, scope)
+    spec = W1_CASES[case]
+    skill = _plant_w1_skill(base, spec)
+    before = (snapshot(home), snapshot(project))
+
+    result = CliRunner().invoke(main, ["uninstall", "--dry-run", "--scope", scope])
+
+    output = all_output(result)
+    assert result.exit_code == 0, output
+    assert (snapshot(home), snapshot(project)) == before, output
+    assert "[DRY-RUN] Would remove: 1 skill(s) from a pre-removal release" in output
+    keep = re.findall(r"\[DRY-RUN\] Would keep (\d+) file\(s\) in (.+?): ", output)
+    if spec["kept"]:
+        assert [int(n) for n, _ in keep] == [len(spec["kept"])], output
+        assert keep[0][1].replace("\\", "/").endswith(f"skills/{W1_SKILL}"), output
+    else:
+        assert keep == [], output
+    assert skill.exists()
+
+
+@pytest.mark.parametrize("scope", SCOPES)
+def test_w1_a_second_install_removes_and_reports_nothing(
+    tmp_path: Path, monkeypatch, scope: str
+) -> None:
+    """Once reduced to the user's files the directory is the user's: a repeat
+    install neither touches it nor mentions it."""
+    _home, _project, base = fresh_install(tmp_path, monkeypatch, scope)
+    spec = {
+        "add": {"my-notes.md": "my notes\n", "mine/notes.txt": "deep\n"},
+        "edit": {"references/theory.md": "\nmy correction\n"},
+    }
+    skill = _plant_w1_skill(base, spec)
+    first = CliRunner().invoke(main, ["install", "--scope", scope])
+    assert first.exit_code == 0, all_output(first)
+    assert len(_kept_lines(all_output(first))) == 1, all_output(first)
+    after_first = _tree(skill)
+    assert set(after_first) == {"my-notes.md", "mine/notes.txt", "references/theory.md"}
+
+    second = CliRunner().invoke(main, ["install", "--scope", scope])
+
+    output = all_output(second)
+    assert second.exit_code == 0, output
+    assert _tree(skill) == after_first, output
+    assert "pre-removal" not in output and _kept_lines(output) == [], output
+
+
+@pytest.mark.parametrize("scope", SCOPES)
+def test_w1_verify_drift_and_doctor_follow_what_install_removes(
+    tmp_path: Path, monkeypatch, scope: str
+) -> None:
+    """RETIRED (and doctor's `retired` advisory) while the skill still holds
+    superclaude's files; none once install has reduced it to the user's."""
+    _home, _project, base = fresh_install(tmp_path, monkeypatch, scope)
+    skill = _plant_w1_skill(
+        base,
+        {
+            "add": {"my-notes.md": "my notes\n"},
+            "edit": {"references/theory.md": "\nmy correction\n"},
+        },
+    )
+    drift = CliRunner().invoke(main, ["verify-drift", "--scope", scope, "--verbose"])
+    assert drift.exit_code == 1, all_output(drift)
+    assert f"{W1_SKILL}/: RETIRED" in all_output(drift), all_output(drift)
+    assert any("1 retired" in a for a in run_doctor(scope=scope)["advisories"])
+
+    install = CliRunner().invoke(main, ["install", "--scope", scope])
+    assert install.exit_code == 0, all_output(install)
+
+    drift = CliRunner().invoke(main, ["verify-drift", "--scope", scope, "--verbose"])
+    output = all_output(drift)
+    assert drift.exit_code == 0, output
+    assert "RETIRED" not in output and W1_SKILL not in output, output
+    assert not any("retired" in a for a in run_doctor(scope=scope)["advisories"])
+    assert set(_tree(skill)) == {"my-notes.md", "references/theory.md"}
+
+
+def test_w1_skill_md_is_removed_last(tmp_path: Path, monkeypatch) -> None:
+    """SKILL.md is what marks the directory superclaude's: removed last, an
+    interrupted removal leaves the rest for the next run to find."""
+    from superclaude.cli.install_paths import legacy_skill_files
+
+    _home, _project, base = fresh_install(tmp_path, monkeypatch, "user")
+    skill = _plant_w1_skill(base, W1_CASES["user-file"])
+
+    ours, kept = legacy_skill_files(skill)
+
+    assert ours[-1] == skill / "SKILL.md"
+    assert sorted(p.relative_to(skill).as_posix() for p in ours) == sorted(
+        _w1_shipped()
+    )
+    assert kept == [skill / "my-notes.md"]
+
+
+@pytest.mark.parametrize("operation", W1_OPERATIONS)
+@pytest.mark.parametrize("scope", SCOPES)
+def test_w1_a_later_skills_error_keeps_the_earlier_kept_notice(
+    tmp_path: Path, monkeypatch, scope: str, operation: str
+) -> None:
+    """An OSError on the second retired skill dropped the first one's Kept line,
+    and its SKILL.md was already gone, so no later run could say it again."""
+    from superclaude.cli import install_components, install_inventory, install_paths
+
+    _home, _project, base = fresh_install(tmp_path, monkeypatch, scope)
+    skill = _plant_w1_skill(base, W1_CASES["user-file"])
+    other = base / "skills" / "finishing-a-development-branch"
+    other.mkdir(parents=True)
+    (other / "SKILL.md").write_text(
+        _era_blob(W1_ERA, f"$HOME/.claude/skills/{other.name}/SKILL.md"),
+        encoding="utf-8",
+        newline="",
+    )
+    (other / "my-notes.md").write_text("my notes\n", encoding="utf-8")
+    calls: list[Path] = []
+
+    def second_fails(skill_dir: Path) -> int:
+        calls.append(skill_dir)
+        if len(calls) == 2:
+            raise PermissionError(13, "Permission denied", str(skill_dir))
+        return install_paths.remove_legacy_skill(skill_dir)
+
+    for module in (install_components, install_inventory):
+        monkeypatch.setattr(module, "remove_legacy_skill", second_fails)
+
+    result = CliRunner().invoke(main, [*operation.split(), "--scope", scope])
+
+    output = all_output(result)
+    assert len(calls) == 2 and set(calls) == {skill, other}, output
+    assert "Permission denied" in output, output
+    done = calls[0]
+    assert not (done / "SKILL.md").exists(), output
+    kept = _kept_lines(output)
+    assert len(kept) == 1, output
+    count, where = _KEPT_LINE.search(kept[0]).groups()
+    assert int(count) == 1, kept
+    assert where.replace("\\", "/").endswith(f"skills/{done.name}"), kept
+
+
+def _generator():
+    """scripts/gen_shipped_names.py as a module."""
+    import importlib.util
+
+    script = Path(__file__).resolve().parents[2] / "scripts" / "gen_shipped_names.py"
+    spec = importlib.util.spec_from_file_location("gen_shipped_names", script)
+    assert spec and spec.loader
+    generator = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(generator)
+    return generator
+
+
+def test_w1_retired_skill_files_module_is_generated_from_the_fixture() -> None:
+    """cli/retired_skill_files.py is what the generator renders from the
+    shipped-names history; editing either alone fails here."""
+    generator = _generator()
+    from superclaude.cli import install_paths, retired_skill_files
+
+    rendered = generator.render_retired_skill_files(HISTORY)
+    committed = Path(retired_skill_files.__file__).read_text(encoding="utf-8")
+    assert committed == rendered, REGENERATE
+    assert set(HISTORY["retired_skill_files"]) == set(install_paths.LEGACY_SKILL_NAMES)
+    for name, files in HISTORY["retired_skill_files"].items():
+        assert {d[:16] for d in files["SKILL.md"]} == {
+            d[:16] for d in HISTORY["retired_skill_digests"][name]
+        }, (name, REGENERATE)
+
+
+def test_w1_the_generator_reads_every_parent_of_a_merge(
+    tmp_path: Path, monkeypatch, isolated_git_config
+) -> None:
+    """The history was read along first parents only, so a revision reachable
+    only through a merge's second parent (a pull of the public master, a branch
+    someone installed from) was missing: confidence-check at c69190a2, four
+    SKILL.md files at 0fb95e7f, whose installs kept the whole retired skill."""
+    generator = _generator()
+    skill = "src/superclaude/skills/old"
+    hooks = "src/superclaude/hooks/hooks.json"
+    no_hooks = '{"hooks": {}}\n'
+    side_hook = json.dumps(
+        {
+            "hooks": {
+                "PreToolUse": [
+                    {
+                        "hooks": [
+                            {"command": "superclaude hook side_guard check"},
+                        ]
+                    }
+                ]
+            }
+        }
+    )
+    repo = init_git_repo(
+        tmp_path / "repo",
+        files={f"{skill}/SKILL.md": "v1\n", f"{skill}/ref.md": "r1\n", hooks: no_hooks},
+    )
+
+    def commit(files: dict[str, str | None], message: str) -> None:
+        for rel, text in files.items():
+            if text is None:
+                shutil.rmtree(repo / rel)
+                continue
+            (repo / rel).parent.mkdir(parents=True, exist_ok=True)
+            (repo / rel).write_text(text, encoding="utf-8")
+        subprocess.run(["git", "add", "-A"], cwd=repo, check=True)
+        subprocess.run(["git", "commit", "-qm", message], cwd=repo, check=True)
+
+    def git(*args: str) -> None:
+        subprocess.run(["git", *args], cwd=repo, check=True, capture_output=True)
+
+    git("checkout", "-qb", "side")
+    commit(
+        {
+            f"{skill}/SKILL.md": "v2\n",
+            f"{skill}/ref.md": "r2\n",
+            "src/superclaude/skills/side-only/SKILL.md": "s\n",
+            hooks: side_hook,
+        },
+        "side",
+    )
+    commit({"src/superclaude/skills/side-only": None, hooks: no_hooks}, "side back")
+    git("checkout", "-q", "main")
+    commit({f"{skill}/SKILL.md": "v3\n"}, "main")
+    # The merge keeps the first parent's tree: path-limited history
+    # simplification drops the side branch as well as --first-parent does.
+    git("merge", "-q", "-s", "ours", "side", "-m", "merge side")
+    commit({skill: None}, "retire old")
+    for kind in generator.DIRS.values():
+        (repo / kind).mkdir(parents=True, exist_ok=True)
+    monkeypatch.setattr(generator, "REPO", repo)
+
+    def digests(*texts: str) -> list[str]:
+        return sorted(hashlib.sha256(t.encode()).hexdigest() for t in texts)
+
+    assert generator.retired_digests("HEAD", "skills", ["old"]) == {
+        "old": digests("v1\n", "v2\n", "v3\n")
+    }
+    assert generator.retired_skill_files("HEAD", ["old"]) == {
+        "old": {
+            "SKILL.md": digests("v1\n", "v2\n", "v3\n"),
+            "ref.md": digests("r1\n", "r2\n"),
+        }
+    }
+    assert set(generator.collect_names("HEAD")["skills"]) == {"old", "side-only"}
+    _events, ids, *_ = generator.collect_hooks("HEAD")
+    assert ("PreToolUse", "side_guard", "check") in ids
+
+
 RETIRED_EVENTS = ("Setup", "TeammateIdle", "TaskCompleted")
 USER_SETUP = {"hooks": [{"type": "command", "command": "~/bin/my-setup.sh"}]}
 USER_IDLE = {"hooks": [{"type": "command", "command": "echo 'my own idle note'"}]}
@@ -1331,6 +1799,40 @@ def test_c09_retired_serena_hooks_go_only_when_superclaude_wrote_them(
         if any(hook["command"] == SERENA for hook in entry["hooks"])
     ]
     assert serena == [theirs], message
+
+
+@pytest.mark.parametrize("operation", ["install", "install --force", "uninstall -y"])
+def test_c09_a_branch_only_hook_registration_goes(
+    tmp_path: Path, monkeypatch, operation: str
+) -> None:
+    """3362816e registered `test_file_guard check`, reverted 14 minutes later on
+    the same branch: only a first-parent walk of the history missed it, and a
+    sync from that branch left a hook that now exits 1 on every Edit and Write."""
+    _home, _project, base = fresh_install(tmp_path, monkeypatch, "user")
+    data = json.loads((base / "settings.json").read_text(encoding="utf-8"))
+    command = "superclaude hook test_file_guard check"
+    data["hooks"]["PreToolUse"].append(
+        {
+            "matcher": "Edit|Write",
+            "hooks": [
+                {
+                    "_comment": "[superclaude] safety — blocks Edit/Write on test "
+                    "files while `superclaude hook test_file_guard lock` is set",
+                    "type": "command",
+                    "command": command,
+                    "timeout": 5,
+                }
+            ],
+        }
+    )
+    (base / "settings.json").write_text(json.dumps(data), encoding="utf-8")
+
+    result = CliRunner().invoke(main, [*operation.split(), "--scope", "user"])
+
+    assert result.exit_code == 0, all_output(result)
+    settings = base / "settings.json"
+    left = _registrations(settings) if settings.exists() else []
+    assert ("PreToolUse", command) not in left, all_output(result)
 
 
 def test_q13_every_retired_hook_identity_is_listed() -> None:

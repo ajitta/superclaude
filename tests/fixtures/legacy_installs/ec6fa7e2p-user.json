@@ -221,8 +221,7 @@
    "blob": "9bdf5abe3e40cf40"
   },
   "$HOME/.claude/skills/confidence-check/__init__.py": {
-   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-   "size": 0
+   "blob": "e3b0c44298fc1c14"
   },
   "$HOME/.claude/skills/finishing-a-development-branch/SKILL.md": {
    "blob": "d138a935e9b790d3"
@@ -231,42 +230,34 @@
    "blob": "ef01fd68320fa318"
   },
   "$HOME/.claude/skills/ship/references/conventions.md": {
-   "sha256": "5b7220530f1f68cd22f1d548ce2a97c2b7f13aa1792fcbe236c453088b4d1903",
-   "size": 901
+   "blob": "5b7220530f1f68cd"
   },
   "$HOME/.claude/skills/simplicity-coach/SKILL.md": {
    "blob": "d0f14dd05b062ab4"
   },
   "$HOME/.claude/skills/simplicity-coach/assets/dependency-audit-checklist.md": {
-   "sha256": "eab907e49a212763b80d9c86d7d169f9104b70cad21ab73f83c56bf45ca35142",
-   "size": 1930
+   "blob": "eab907e49a212763"
   },
   "$HOME/.claude/skills/simplicity-coach/references/orient-step-learn-examples.md": {
-   "sha256": "0b88eae9b8203258934d098295ea5554e7667d324f52cfe114d3e492d357b9d9",
-   "size": 3586
+   "blob": "0b88eae9b8203258"
   },
   "$HOME/.claude/skills/simplicity-coach/references/practices-reference.md": {
-   "sha256": "14e4df704ad91a82cc7835d3ac23d78fd163fe275d0553129bad50bc154d34fb",
-   "size": 3209
+   "blob": "14e4df704ad91a82"
   },
   "$HOME/.claude/skills/simplicity-coach/scripts/dependency-audit.py": {
-   "sha256": "e13713311c34589021ee250c4d363afdde159e1e0942ea5367a56d878a2bc690",
-   "size": 7339
+   "blob": "e13713311c345890"
   },
   "$HOME/.claude/skills/verbalized-sampling/SKILL.md": {
    "blob": "2c21ce95bfe3620d"
   },
   "$HOME/.claude/skills/verbalized-sampling/references/examples.md": {
-   "sha256": "31523f1862bbc169e0d99c2bbd494848bbf54d5464be942688f60482134866e1",
-   "size": 9513
+   "blob": "31523f1862bbc169"
   },
   "$HOME/.claude/skills/verbalized-sampling/references/paper-methodology.md": {
-   "sha256": "1061e09d0978b687a73cd9de5acb1d5e320474b6f83880e23a5a4e2772389546",
-   "size": 3698
+   "blob": "1061e09d0978b687"
   },
   "$HOME/.claude/skills/verbalized-sampling/references/theory.md": {
-   "sha256": "4502263e6f1af28a3d33c08950d55bbaa595ba38070daacf2597744a6204cf5c",
-   "size": 3986
+   "blob": "4502263e6f1af28a"
   },
   "$HOME/.claude/superclaude/CLAUDE_SC.md": {
    "sha256": "83b1b08130108577ca35f0026162542bfedfae1200e4b6ab4e69f9f26705287f",
