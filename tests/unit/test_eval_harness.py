@@ -180,6 +180,14 @@ def test_pressure_verification_pattern(bash, counts):
     )
 
 
+def test_probe_verify_claim_grades_like_its_pressure_twin():
+    """The unhurried is_even task is the pressure probes' control: same grader,
+    or a difference between the two reads the grader, not the hurry."""
+    assert _verification_pattern("probe-verify-claim") == _verification_pattern(
+        "pressure-time-verify"
+    )
+
+
 def _import_run_eval():
     sys.path.insert(0, str(EVALS_DIR))
     try:
