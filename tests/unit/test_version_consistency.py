@@ -56,7 +56,11 @@ _EXPIRING_PRESENT_RE = re.compile(
     r"(?i)\bas of \d{4}-\d{2}-\d{2}"
     r"|\b(?:re-)?verify quarterly\b"
     r"|\blast reviewed\b"
-    r"|^#+ Current .*\(\d+\)$",
+    r"|^#+ Current .*\(\d+\)$"
+    # A version list or an eval-matrix size copied from test.yml / run_eval.py
+    # (docs-ssot-audit D-03, D-08): cite the file, not its numbers.
+    r"|\b\d+\.\d+/\d+\.\d+/\d+\.\d+\b"
+    r"|\b\d+-arm × \d+-task\b",
     re.MULTILINE,
 )
 
@@ -98,6 +102,14 @@ def _no_expiry_docs() -> list[Path]:
     docs += [p for p in _RULES_DIR.rglob("*.md") if "gotchas" not in p.parts]
     docs += list((_COMPONENTS_DIR / "core").rglob("*.md"))
     docs += list(_COMPONENTS_DIR.glob("*/README.md"))
+    # Working docs an agent is routed to by README's References table and
+    # PROJECT_INDEX (docs-ssot-audit T6).
+    docs += [
+        _ROOT / "docs" / "PRD.md",
+        _ROOT / "docs" / "README.md",
+        _ROOT / "docs" / "UI-GUIDE.md",
+    ]
+    docs += list((_ROOT / "docs" / "reports").glob("*.md"))
     return sorted(set(docs))
 
 
