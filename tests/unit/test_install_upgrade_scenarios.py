@@ -801,6 +801,9 @@ def test_c05_drift_remediation_carries_the_scope(
     output = all_output(result)
     assert result.exit_code == 1, output
     assert "'superclaude install --force'" not in output, output
+    # The same command install and doctor name: `update` is the refresh of an
+    # install, where `install --force` would also create one.
+    assert "'superclaude update --scope" in output, output
     advice = _ADVICE.findall(output)
     assert advice, output
     for named, where in advice:

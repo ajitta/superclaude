@@ -617,7 +617,7 @@ def _legacy_scripts_notice(legacy_scripts: Path, base_path: Path, scope: str) ->
         return (
             f"ℹ️  {still_used} registration(s) in {settings_file.name} still run the "
             f"script copies under {legacy_scripts} — do not remove that directory; "
-            f"{scope_command('install --force', scope, base_path)} rewrites every "
+            f"{scope_command('update', scope, base_path)} rewrites every "
             "registration to `superclaude hook <name>`."
         )
     return (
