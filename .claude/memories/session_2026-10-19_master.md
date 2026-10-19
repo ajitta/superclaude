@@ -1,4 +1,4 @@
-branch: master @47f791b5 (== origin/master == stable == v4.31.1); worktree clean (untracked .hermes/, .ignore belong to other sessions; `/.hermes/` gitignored)
+branch: master @686de4c2 (== origin/master; stable == v4.31.1 @47f791b5, master ahead by docs only); worktree clean (untracked .hermes/, .ignore belong to other sessions; `/.hermes/` gitignored)
 
 # Session 2026-10-19 — master (hygiene rounds, a release review, two purpose rounds, the install/upgrade audit, the docs ↔ SSOT audit, a research-hops content round, ten releases)
 
