@@ -43,7 +43,6 @@ Does a real user's upgrade (an older SuperClaude install, then the current CLI) 
 | Q14 | The one-day `.claude/hooks/<x>.py` era: unsupported, with an upgrade note |
 | Q15 | `CLAUDE_CONFIG_DIR`: install and doctor warn when it is set and differs (honouring it goes to an ADR) |
 | Q16 | Encoding preflight: every command validates settings and CLAUDE files before its first write or delete and refuses non-UTF-8 / BOM input (exit 1, nothing changed) |
-
 | C-06 (P4 owner checkpoint) | **(b)**: keep refusing the `memory: user`-era project install, but advise `superclaude update --scope project`; conflict advice never names a scope whose base is not this one. Owner: "b" |
 
 Model sessions: 1 (the P7 independent diff verifier), 2 if it blocks once. Sandbox only — the real `~/.claude` is never touched; no `make sync-*` on this VM.
