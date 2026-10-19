@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "superclaude"
 version = "4.30.2"
-description = "AI-enhanced development framework for Claude Code - pytest plugin with optional skills"
+description = "Claude Code content framework - a CLI that installs commands, agents, modes, rules and hooks, plus a pytest plugin"
 readme = "README.md"
 license = {text = "MIT"}
 authors = [
