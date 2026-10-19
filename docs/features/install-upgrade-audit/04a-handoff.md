@@ -59,6 +59,7 @@ The four remaining matrix FAILs ([04 §4](./04-matrix-run2.md)):
 | C-17 | local and project hook state from `bd356afa` → `52b5517e` in `~/.claude/.superclaude_hooks/` is neither reached nor reported by a local or project uninstall | U4 |
 | C-20 | CLAUDE file normalised: CRLF → LF, blank-line runs collapsed, edges stripped (`remove_claude_md_import`) | U10, E4 ×3, I2 ×3 |
 | C-21 | settings writes leave mode 0600, re-serialise the file with no trailing newline, and replace a 0444 file with exit 0 | E2-ro-settings, I2 ×3 |
+| W-1 | from the P7 re-verifier ([06a](./06a-verify-r2.md)), not a regression (master does the same): a retired skill dir whose `SKILL.md` matches a shipped revision is removed whole (`rmtree`), so a file the user added inside it goes too. Fix: remove only files whose digest matches a shipped revision, then the dir only if empty | — |
 
 Out of scope by Q1 (a), unchanged: the upstream E0 root files and CLAUDE block ([01 §3](./01-inventory.md)); MCP servers dropped from the registry that `--remove-mcp` cannot reach.
 
