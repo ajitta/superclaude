@@ -62,6 +62,7 @@ planning: objectives+strategy+criteria | execution: each load-bearing claim has 
 | standard | 20/3/2 | selective |
 | deep | 40/4/3 | comprehensive |
 | exhaustive | 50+/5/5 | all |
+Hops is a ceiling, not a target: a run stops earlier when reflection after a hop finds the core question answered.
   </depth_profiles>
 
   <output_formats>

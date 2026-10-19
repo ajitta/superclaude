@@ -384,19 +384,55 @@ def test_readme_research_section_states_no_undefined_figure():
 # after the audit, 06-verify "Out-of-scope observations": research.md and
 # deep-researcher.md said 2-3 / 3-4 / 5+ hops against config 3 / 4 / 5).
 _CONFIG = _SRC / "modes" / "RESEARCH_CONFIG.md"
+# A profile is read only as a label ("Standard:", "standard depth"), never as
+# part of a hyphenated name (deep-researcher) or a common phrase (Standard
+# library); the window up to the figure cannot cross a second profile label.
+_PROFILE = r"(?<![\w-])(quick|standard|deep|exhaustive)(?![\w-])"
 _HOP_STATEMENT = re.compile(
-    r"\b(quick|standard|deep|exhaustive)\b[^.|\n]{0,120}?"
-    r"\b(\d+(?:\s*[-\u2013]\s*\d+)?\+?)\s+hops?\b",
+    _PROFILE + r"(?=:| depth\b)"
+    r"(?:(?!" + _PROFILE.replace("(quick", "(?:quick") + r")[^.|\n]){0,120}?"
+    r"\b((?:at least |more than |over )?"
+    r"\d+(?:\s*(?:[-\u2013\u2014]|to)\s*\d+)?\+?)\s+hops?\b",
     re.I,
 )
+
+
+# Probe sentences from the verifier's mutation table (06a-verify-research-hops
+# R-2, R-3): what the hop regex must read, and what it must leave alone.
+_HOP_PROBES = [
+    ("Standard: 2 to 3 hops", [("Standard", "2 to 3")]),
+    ("Standard: 2\u20143 hops", [("Standard", "2\u20143")]),
+    ("Standard: at least 3 hops", [("Standard", "at least 3")]),
+    ("Exhaustive: 5+ hops", [("Exhaustive", "5+")]),
+    ("standard depth: 2-3 hops", [("standard", "2-3")]),
+    ("deep: up to 4 hops, mid-checkpoints", [("deep", "4")]),
+    ("The deep-researcher agent keeps each sub-query within 2 hops.", []),
+    ("Standard library docs rarely need more than 2 hops.", []),
+    ("A quick sanity check first, then the standard run with 3 hops.", []),
+    ("quick: runs without asking, standard: 3 hops", [("standard", "3")]),
+]
+
+
+@pytest.mark.parametrize(
+    ("text", "expected"), _HOP_PROBES, ids=[t for t, _ in _HOP_PROBES]
+)
+def test_hop_statement_regex_reads_profiles_not_words(text, expected):
+    """The hop regex reads a profile label, not an agent name or a common word."""
+    assert _HOP_STATEMENT.findall(text) == expected
 
 
 def test_shipped_hop_counts_match_config():
     """'<profile> … N hops' in a command, agent, mode or README = config, exactly.
 
-    A range ("2-3 hops") or an open end ("5+ hops") never equals the single
-    figure the config states, so both fail here; content either states the
-    config's number or points at the depth_profiles table instead.
+    A range ("2-3", "2–3", "2—3", "2 to 3 hops"), an open end ("5+ hops") or
+    a floor ("at least 3 hops") never equals the single figure the config
+    states, so all fail here; "up to N" and a bare N pass when N is the
+    config's. Content either states the config's number or points at the
+    depth_profiles table instead. Does not catch: a figure written as a word
+    ("three hops"), a figure before its profile ("3 hops at standard depth"),
+    a profile used without a label ("the standard run with 3 hops"), or a
+    figure more than 120 characters or a sentence boundary away from its
+    label ("(e.g. 2-3 hops)").
     """
     config = _config_profiles()
     bad = []
