@@ -41,7 +41,7 @@ Round rules from the ruling: guard tests first and seen red; area tests per comm
 - [x] P1 Owner answers Q1–Q10 (rulings above)
 - [x] P2 Guard tests T1–T7 (per Q3), red first against the current text — `tests/unit/test_docs_ssot_guards.py` plus the T6 extension of `test_version_consistency.py`; 19 red at ff947b33 (17 guards + 2 no-expiry)
 - [x] P3 Fix round on `fix/docs-ssot` (groups G1–G5 below, per Q1), one commit per group — G1 e85dfc45, G2 ee614358, G3 8b0adbb6, G4 9d86be84, G5 5ce02050
-- [ ] P4 Full suite, `make format`, `make lint`, `make typecheck` clean; push; Tests workflow dispatched on the branch and green
+- [x] P4 Full suite (4509 passed, 3 skipped), `make format`, `make lint`, `make typecheck` clean at 4ec7da2e; pushed; Tests workflow run 39224003874 green on that commit (3.10, 3.13, lint/plugin/doctor)
 - [ ] P5 Independent verification, then merge and one release (owner; not this round)
 
 ## Deviations
