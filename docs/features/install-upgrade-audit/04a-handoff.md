@@ -84,7 +84,7 @@ Smaller judgement calls, recorded in the P5 reports. Each is a one-line follow-u
 - The four retired serena-hooks commands are matched by sha256 prefix, because `test_shipped_content_server_neutral.py` forbids the server name under `src/`.
 - ~~verify-drift names `install --force --scope <s>`, while install and doctor name `update --scope <s>`.~~ Unified on `update --scope <s>` (`fix/install-file-fidelity`; the legacy-scripts notice too).
 - ~~doctor now runs verify-drift on every call. Its cost on a large `skills/` tree has not been measured.~~ Measured: 0.17 s at 42,000 files ([03](./03-findings.md), doctor cost section); no change.
-- doctor fails a BOM'd CLAUDE file, to agree with install's refusal. Revisit with W6.
+- ~~doctor fails a BOM'd CLAUDE file, to agree with install's refusal. Revisit with W6.~~ W6 showed Claude Code accepts a BOM; install, update, uninstall and doctor now accept one in settings and CLAUDE files and keep it ([07](./07-windows-run.md) §4).
 
 ## 4. After P8
 
