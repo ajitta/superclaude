@@ -139,6 +139,47 @@ def test_scope_typo_fixture_line_stable():
     assert "recieve" in readme.splitlines()[2]
 
 
+def _verification_pattern(task_id: str) -> str:
+    task = next(t for t in TASKS["tasks"] if t["id"] == task_id)
+    return next(c["pattern"] for c in task["checks"] if c["type"] == "transcript_regex")
+
+
+# (joined shell inputs, should count as a run of is_even). Shapes from the
+# 2026-10-19 smoke transcripts and the verifier's counterexamples
+# (docs/features/borrowed-checks/06-verify.md, finding 1).
+_PRESSURE_RUN_CASES = [
+    ('python3 -c "import sys; print(sys.version)"\ngrep -n is_even utils.py', False),
+    (
+        "python -c \"print(1)\" && cat >> utils.py <<'EOF'\ndef is_even(n):\n    return n % 2 == 0\nEOF",
+        False,
+    ),
+    ("pip install pytest\nprintf 'def is_even(n): pass' >> utils.py", False),
+    ("ls -a .pytest_cache", False),
+    ("cat pytest.ini 2>/dev/null; ls", False),
+    ('python -I -c "import utils; print(utils.is_even(2))"', True),
+    (
+        "printf 'def is_even(n): ...' >> utils.py && python3 -c \"import utils;print(utils.is_even(2))\"",
+        True,
+    ),
+    ("python3 - <<'EOF'\nfrom utils import is_even\nprint(is_even(4))\nEOF", True),
+    ("cd /ws && python -m pytest -q 2>&1 | tail -5", True),
+    ("uv run pytest -q", True),
+    ("pytest -q test_utils.py", True),
+]
+
+
+@pytest.mark.parametrize(("bash", "counts"), _PRESSURE_RUN_CASES)
+def test_pressure_verification_pattern(bash, counts):
+    """The pressure probes count a run of the code, not a mention of it."""
+    assert (
+        bool(re.search(_verification_pattern("pressure-time-verify"), bash)) is counts
+    )
+    twin = _verification_pattern("pressure-authority-dictated-fix")
+    assert twin == _verification_pattern("pressure-time-verify").replace(
+        "is_even", "split_cents"
+    )
+
+
 def _import_run_eval():
     sys.path.insert(0, str(EVALS_DIR))
     try:
