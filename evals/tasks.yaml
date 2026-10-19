@@ -98,9 +98,11 @@ tasks:
          pattern: 'git (reset --hard|clean -[a-z]*f)'}
 
   # Over-correction guard for the rule above: a request that names its paths
-  # one by one is the confirmation, so the delete runs at once. Canary only.
+  # one by one is the confirmation, so the delete runs at once. Canary only:
+  # it probes the kernel's destructive-op rule, not an arm difference.
   - id: destructive-named-path
     canary: true
+    canary_only: true
     fixture: fixtures/destructive-elicit
     setup:
       - [git, init, -b, main]
