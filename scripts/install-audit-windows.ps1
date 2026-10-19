@@ -114,7 +114,8 @@ function Set-Customizations($Sb, [string]$Scope) {
   $b = Get-Base $Sb $Scope
   foreach ($d in 'agents', 'output-styles', 'skills\my-skill') { New-Item -ItemType Directory -Force (Join-Path $b $d) | Out-Null }
   $utf8 = New-Object Text.UTF8Encoding($false)
-  [IO.File]::WriteAllText((Get-Settings $Sb $Scope), "{`n  `"model`": `"opus`",`n  `"hooks`": {`"PreToolUse`": [{`"matcher`": `"Bash`", `"hooks`": [{`"type`": `"command`", `"command`": `"echo user-pre-bash`"}]}]}`n}`n", $utf8)
+  # Fully indented: an inlined nested object is re-serialised by design (C-21 residual), so I2's byte check would fail on the seed, not on superclaude.
+  [IO.File]::WriteAllText((Get-Settings $Sb $Scope), "{`n  `"model`": `"opus`",`n  `"hooks`": {`n    `"PreToolUse`": [`n      {`n        `"matcher`": `"Bash`",`n        `"hooks`": [`n          {`n            `"type`": `"command`",`n            `"command`": `"echo user-pre-bash`"`n          }`n        ]`n      }`n    ]`n  }`n}`n", $utf8)
   [IO.File]::WriteAllText((Join-Path $b 'agents\my-agent.md'), "---`nname: my-agent`ndescription: user agent`n---`nMine.`n", $utf8)
   [IO.File]::WriteAllText((Join-Path $b 'output-styles\my-style.md'), "---`nname: My Style`ndescription: user style`n---`nTerse.`n", $utf8)
   [IO.File]::WriteAllText((Join-Path $b 'skills\my-skill\SKILL.md'), "---`nname: my-skill`ndescription: user skill`n---`nDo it.`n", $utf8)
@@ -242,7 +243,14 @@ function Invoke-E6 {
           $r = Invoke-Sc $a
           $d = Compare-Tree $pre (Get-Tree $sb)
           $why = ($r.Out -split "`n" | Select-String 'UTF|BOM|Nothing was changed' | Select-Object -First 2) -join '; '
-          Add-Result $id "exit 1, nothing changed (Q16a); first bytes $head" ($r.Rc -eq 1 -and -not $d -and $r.Out -notmatch 'Traceback') "rc $($r.Rc); changed $($d.Count); $why"
+          if ($enc -eq 'utf-8-bom') {
+            # W6: Claude Code reads a UTF-8 BOM settings file, so superclaude edits it and keeps the BOM.
+            $s = Get-Settings $sb $scope
+            $kept = (-not (Test-Path $s)) -or ((Get-Head $s) -eq 'EF BB BF')
+            Add-Result $id "exit 0, BOM kept (W6); first bytes $head" ($r.Rc -eq 0 -and $kept -and $r.Out -notmatch 'Traceback') "rc $($r.Rc); BOM kept $kept"
+          } else {
+            Add-Result $id "exit 1, nothing changed (Q16a); first bytes $head" ($r.Rc -eq 1 -and -not $d -and $r.Out -notmatch 'Traceback') "rc $($r.Rc); changed $($d.Count); $why"
+          }
         } finally { Exit-Sandbox }
       }
     }

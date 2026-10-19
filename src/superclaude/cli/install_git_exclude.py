@@ -52,10 +52,31 @@ from .install_paths import (
     SHARED_TARGET_COMPONENTS,
     shipped_names,
 )
-from .install_settings import _encoding_problem, _read_only_problem
+from .install_settings import _encoding_problem, _line_ending, _read_only_problem
 
 MARKER_START = "# >>> superclaude >>>"
 MARKER_END = "# <<< superclaude <<<"
+
+
+def _read_lines_lf(path: Path) -> Tuple[str, str]:
+    """``path``'s text with LF line endings, and the line ending it uses most.
+
+    A text-mode read and write turned git's LF ``info/exclude`` into CRLF on
+    Windows, and a CRLF file into LF elsewhere, so every line of the file
+    changed (Windows P8, W-3). The block logic works on LF text;
+    ``_write_lines`` puts the file's own ending back. A file mixing both
+    endings comes back in its majority ending.
+    """
+    text = path.read_bytes().decode("utf-8")
+    return text.replace("\r\n", "\n"), _line_ending(text)
+
+
+def _write_lines(path: Path, text: str, newline: str) -> None:
+    """Write LF ``text`` to ``path`` in ``newline``, with no platform translation."""
+    if newline != "\n":
+        text = text.replace("\n", newline)
+    path.write_bytes(text.encode("utf-8"))
+
 
 # Marker text from before the block became scope-aware. Kept so an install that
 # predates the rename replaces its block instead of leaving a second one behind.
@@ -285,7 +306,7 @@ def _migrate_legacy_gitignore(project_root: Path) -> Optional[str]:
     if not gitignore.exists():
         return None
     try:
-        existing = gitignore.read_text(encoding="utf-8")
+        existing, newline = _read_lines_lf(gitignore)
     except UnicodeDecodeError:
         # The team's file, in another encoding: rewriting it as UTF-8 would
         # change every byte the team wrote, so only a block in it is reported.
@@ -299,7 +320,7 @@ def _migrate_legacy_gitignore(project_root: Path) -> Optional[str]:
         return None
     try:
         if stripped.strip():
-            gitignore.write_text(stripped, encoding="utf-8")
+            _write_lines(gitignore, stripped, newline)
         else:
             gitignore.unlink()
         return f"Migrated legacy SC block out of {gitignore}"
@@ -341,8 +362,9 @@ def add_git_exclude(project_root: Path, scope: str = "local") -> Tuple[bool, str
     replaced_local = False
 
     try:
+        newline = "\n"
         if exclude_file.exists():
-            existing = exclude_file.read_text(encoding="utf-8")
+            existing, newline = _read_lines_lf(exclude_file)
             replaced_local = scope == "project" and _holds_local_block(existing)
             stripped, had_block = _strip_block(existing)
             base = stripped if had_block else existing
@@ -353,7 +375,7 @@ def add_git_exclude(project_root: Path, scope: str = "local") -> Tuple[bool, str
             exclude_file.parent.mkdir(parents=True, exist_ok=True)
             updated = block
             action = "created"
-        exclude_file.write_text(updated, encoding="utf-8")
+        _write_lines(exclude_file, updated, newline)
         messages.append(
             f".git/info/exclude {action} with SC {scope} block: {exclude_file}"
         )
@@ -407,13 +429,13 @@ def remove_git_exclude(project_root: Path) -> Tuple[bool, str]:
         return False, "; ".join(messages)
 
     try:
-        existing = exclude_file.read_text(encoding="utf-8")
+        existing, newline = _read_lines_lf(exclude_file)
         stripped, had_block = _strip_block(existing)
         if not had_block:
             if not messages:
                 messages.append(f".git/info/exclude had no SC block: {exclude_file}")
             return True, "; ".join(messages)
-        exclude_file.write_text(stripped, encoding="utf-8")
+        _write_lines(exclude_file, stripped, newline)
         messages.append(f".git/info/exclude SC block removed: {exclude_file}")
         return True, "; ".join(messages)
     except OSError as e:

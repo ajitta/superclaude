@@ -363,7 +363,7 @@ def is_superclaude_hook(hook_entry: dict) -> bool:
 def _has_superclaude_hooks(settings_file: Path) -> bool:
     """Whether a settings file carries at least one superclaude hook entry."""
     try:
-        settings = json.loads(settings_file.read_text(encoding="utf-8"))
+        settings = json.loads(settings_file.read_text(encoding="utf-8-sig"))
     except (OSError, UnicodeDecodeError, json.JSONDecodeError):
         return False
     if not isinstance(settings, dict):

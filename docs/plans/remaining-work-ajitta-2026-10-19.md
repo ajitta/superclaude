@@ -11,9 +11,11 @@ revised: 2026-10-19
 
 ## 1. Windows 실기 검증 — 소유자만 가능
 
-- [ ] Windows 설치를 4.30.4로 맞춘다. `superclaude doctor --scope <s>`를 먼저 보고, `make sync-*`로 갱신한다.
-- [ ] `scripts/install-audit-windows.ps1`을 Windows PowerShell 5.1과 `pwsh` 7에서 한 번씩 돌리고, 출력된 sandbox의 `results.md`를 붙여 넣는다. 이 스크립트는 Linux에서 작성되어 한 번도 실행된 적이 없으므로, 스크립트 오류는 결함이 아니라 스크립트 버그로 보고한다.
-- [ ] W1–W7을 확인한다(약 45분). 질문과 판정 기준은 [04a-handoff §1c](../features/install-upgrade-audit/04a-handoff.md).
+- [x] Windows 설치를 4.30.4로 맞춘다. `superclaude doctor --scope <s>`를 먼저 보고, `make sync-*`로 갱신한다. (local scope는 이미 4.30.4, drift 없음)
+- [x] `scripts/install-audit-windows.ps1`을 Windows PowerShell 5.1과 `pwsh` 7에서 한 번씩 돌리고, 출력된 sandbox의 `results.md`를 붙여 넣는다. 이 스크립트는 Linux에서 작성되어 한 번도 실행된 적이 없으므로, 스크립트 오류는 결함이 아니라 스크립트 버그로 보고한다.
+- [x] W1–W7을 확인한다(약 45분). 질문과 판정 기준은 [04a-handoff §1c](../features/install-upgrade-audit/04a-handoff.md).
+
+**결과 (2026-10-19, [07-windows-run](../features/install-upgrade-audit/07-windows-run.md)):** 새 S2 결함 W-3이 나왔다. Windows에서 install/uninstall이 `.git/info/exclude` 전체를 CRLF로 다시 쓰던 문제로, 지금은 고쳤다. 스크립트 버그 S-1도 고쳤다. W1–W5는 결함 없음. W6에서 Claude Code는 BOM 붙은 settings를 받아들였고, 그래서 3번(BOM 허용)도 반영했다. W7에서는 settings, 컴포넌트, user `CLAUDE.md`가 모두 `CLAUDE_CONFIG_DIR`을 따른다는 것을 확인했다.
 
 결정: 언제 할지. ★다음 Windows 세션의 첫 작업. W6과 W7 결과가 2·3번의 입력이다.
 
@@ -21,7 +23,7 @@ revised: 2026-10-19
 
 ## 2. C-15 — `CLAUDE_CONFIG_DIR` 경고 범위
 
-- [ ] W7 결과를 보고 결정한다.
+- [ ] W7 결과를 보고 결정한다. W7 결과: settings, 컴포넌트, user `CLAUDE.md`가 모두 `CLAUDE_CONFIG_DIR`의 디렉터리에서 읽힌다.
 
 지금은 user scope의 install과 doctor만 경고한다. uninstall은 경고하지 않고, `$CLAUDE_CONFIG_DIR/.claude.json`의 user-scope MCP 서버도 다루지 않는다. W7이 "Claude Code는 그 변수의 디렉터리를 읽는다"를 확인하면 Q15 (a) ADR(`get_base_path`가 변수를 따름)의 근거가 된다.
 
@@ -29,7 +31,7 @@ revised: 2026-10-19
 
 ## 3. BOM이 있는 설정 파일 — W6 결과에 따라서만
 
-- [ ] W6 결과를 기록한다.
+- [x] W6 결과를 기록한다. → Claude Code가 BOM을 받아들였다. settings와 CLAUDE 파일의 BOM을 허용하고, 쓸 때도 BOM을 유지하도록 바꿨다(`fix/windows-file-fidelity`).
 
 지금 install은 BOM이 있는 settings·CLAUDE 파일을 거부하고, doctor도 같은 이유로 실패를 낸다. W6에서 Claude Code가 BOM 붙은 `settings.json`을 받아들인다고 나오면 읽기를 `utf-8-sig`로 완화할 수 있다(plan Q16). `info/exclude`의 BOM 거부는 소유자가 유지로 결정했다(04a §3).
 
