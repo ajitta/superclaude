@@ -93,6 +93,11 @@ def atomic_write_text(path: Path, text: str) -> None:
     0600 whatever mode the user had given it (install/upgrade audit, C-21). A
     new file gets what a plain ``open()`` would: 0666 less the umask.
 
+    A symlink stays a symlink: the write goes to the file it points at, with
+    the temp file made in that file's directory. Renaming over the link used to
+    turn a settings file a dotfiles manager symlinks into a plain file, and the
+    repository copy never saw the hooks (06c, Y-1).
+
     Args:
         path: Target file path
         text: The complete file content
@@ -101,6 +106,8 @@ def atomic_write_text(path: Path, text: str) -> None:
     import tempfile
 
     path = Path(path)
+    if path.is_symlink():
+        path = Path(os.path.realpath(path))
     path.parent.mkdir(parents=True, exist_ok=True)
     try:
         mode = stat.S_IMODE(path.stat().st_mode)

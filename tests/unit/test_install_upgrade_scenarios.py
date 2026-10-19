@@ -2472,3 +2472,68 @@ def test_c21_doctor_passes_on_a_read_only_settings_file(
     result = run_doctor(scope=scope)
 
     assert result["passed"], result["checks"]
+
+
+_symlinks = pytest.mark.skipif(
+    sys.platform == "win32", reason="symlinks need a privilege on Windows"
+)
+
+
+@_symlinks
+@pytest.mark.parametrize("scope", SCOPES)
+def test_c21_a_symlinked_settings_file_stays_a_symlink(
+    tmp_path: Path, monkeypatch, scope: str
+) -> None:
+    """06c Y-1: the atomic write renamed its temp file over the link, so a
+    settings file a dotfiles manager symlinks (stow, chezmoi) became a plain
+    file holding the hooks and the repository copy never got them. The write
+    now goes to the link's target and the link stays."""
+    home, project = sandbox(tmp_path, monkeypatch)
+    base = scope_base(home, project, scope)
+    settings = settings_path(base, scope)
+    settings.parent.mkdir(parents=True, exist_ok=True)
+    target = tmp_path / "dotfiles" / "claude" / settings.name
+    target.parent.mkdir(parents=True)
+    original = '{\n\t"model": "opus"\n}\n'.encode("utf-8")
+    target.write_bytes(original)
+    target.chmod(0o640)
+    settings.symlink_to(target)
+
+    success, message = install_all(base_path=base, force=False, scope=scope)
+
+    assert success, message
+    assert settings.is_symlink() and settings.resolve() == target.resolve()
+    installed = target.read_bytes()
+    assert json.loads(installed.decode("utf-8")).get("hooks"), installed
+    assert b'\n\t"' in installed and installed.endswith(b"\n"), installed
+    assert stat.S_IMODE(target.stat().st_mode) == 0o640
+    assert [p.name for p in settings.parent.iterdir() if p.suffix == ".tmp"] == []
+
+    success, message = uninstall_all(base_path=base, scope=scope)
+
+    assert success, message
+    assert settings.is_symlink()
+    assert target.read_bytes() == original
+
+
+@_symlinks
+def test_c21_atomic_write_text_writes_through_a_symlink(tmp_path: Path) -> None:
+    """The temp file is made next to the target, so the rename stays on one
+    filesystem, and the link is what the caller finds afterwards."""
+    from superclaude.utils import atomic_write_text
+
+    target = tmp_path / "store" / "settings.json"
+    target.parent.mkdir()
+    target.write_text("{}", encoding="utf-8")
+    target.chmod(0o600)
+    link = tmp_path / "live" / "settings.json"
+    link.parent.mkdir()
+    link.symlink_to(target)
+
+    atomic_write_text(link, '{"a": 1}\n')
+
+    assert link.is_symlink() and link.readlink() == target
+    assert target.read_text(encoding="utf-8") == '{"a": 1}\n'
+    assert stat.S_IMODE(target.stat().st_mode) == 0o600
+    assert sorted(p.name for p in link.parent.iterdir()) == ["settings.json"]
+    assert sorted(p.name for p in target.parent.iterdir()) == ["settings.json"]
