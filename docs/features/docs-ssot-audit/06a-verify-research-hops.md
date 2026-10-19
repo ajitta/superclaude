@@ -86,3 +86,14 @@ PASS WITH FIXES — 빌더의 다섯 주장은 모두 재현됐다(config 1/3/4/
 - R-1의 실제 행동 영향, 곧 config를 Read하지 않은 main session이 hop 수를 어떻게 고르는지는 측정하지 않았다. 이 판단은 정적 근거(로더와 문서 경로)에 기댄다. 측정하려면 `/sc:research --depth quick` canary probe가 필요한데, `evals/tasks.yaml`에는 research task가 없다.
 - 운영 함정(이 브랜치와 무관): 이 clone에는 local tag `v4.30.3`이 없다. origin에는 ca425bad로 있다. `make release`는 local `git describe`로 PREV를 정하므로 PREV=v4.30.2가 되고, `core/README.md` 변경을 보고 `CANARY_OK=1`을 요구한다. release 전에 `git fetch --tags`를 권한다.
 - Windows CI job은 skipped였다. 변경은 markdown, YAML 주석·flag, 테스트 regex뿐이라 영향은 없다고 본다.
+
+## R-1..R-6 applied
+
+| # | 적용 |
+|---|---|
+| R-1 | `research.md` depth 블록에 config 숫자를 다시 넣었다(quick 1 hop, standard up to 3, deep up to 4, exhaustive 5 (the maximum)); examples 행도 "up to 3 hops". flag 줄 "hops and validation per the depth section"은 다시 참이다. 새 가드가 지킨다 |
+| R-2 | range 형태를 `-`, `–`, `—`, "to"로 넓히고 "at least/more than/over N"도 config 숫자와 다른 값으로 읽어 red. 남은 한계(단어 숫자, 숫자가 앞에 오는 어순, label 없는 profile, 120자·문장 경계)는 docstring "Does not catch"에 적었다 |
+| R-3 | profile은 label 모양(`Profile:`, `profile depth`)으로만 읽고, 하이픈 복합어는 lookaround로 뺀다. window는 둘째 profile label을 넘지 못한다(첫 profile 고정 해소). 검증자의 FN 4·FP 4 probe가 `test_hop_statement_regex_reads_profiles_not_words`로 들어갔다(옛 regex에서 7개 red) |
+| R-4 | `RESEARCH_CONFIG.md` depth_profiles 표 아래 한 문장: "Hops is a ceiling, not a target …". agent·command의 "up to N"은 이제 config를 옮긴 말이다 |
+| R-5 | header: "matrix tasks (no `canary_only`) run once per arm in run_eval.py ARMS; `--canary` runs the canary-flagged tasks on sc-full" |
+| R-6 | 이유를 "an over-correction check added with the 5c7b8ca1 rule change, run per release, not compared across arms"로 바꿨다. 결정: `destructive-elicitation`은 matrix에 남는다(hard gate 2개를 들고 있고 evals/README:70이 그렇게 적는다); 주석과 `evals/README.md`에 예외 한 줄을 적었다 |
