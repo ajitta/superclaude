@@ -39,10 +39,20 @@ Round rules from the ruling: guard tests first and seen red; area tests per comm
 ## Progress
 
 - [x] P1 Owner answers Q1–Q10 (rulings above)
-- [ ] P2 Guard tests T1–T7 (per Q3), red first against the current text
-- [ ] P3 Fix round on `fix/docs-ssot` (groups G1–G5 below, per Q1), one commit per group
+- [x] P2 Guard tests T1–T7 (per Q3), red first against the current text — `tests/unit/test_docs_ssot_guards.py` plus the T6 extension of `test_version_consistency.py`; 19 red at ff947b33 (17 guards + 2 no-expiry)
+- [x] P3 Fix round on `fix/docs-ssot` (groups G1–G5 below, per Q1), one commit per group — G1 e85dfc45, G2 ee614358, G3 8b0adbb6, G4 9d86be84, G5 5ce02050
 - [ ] P4 Full suite, `make format`, `make lint`, `make typecheck` clean; push; Tests workflow dispatched on the branch and green
 - [ ] P5 Independent verification, then merge and one release (owner; not this round)
+
+## Deviations
+
+- **Beyond the findings, caught by the guards while red:** `docs/PRD.md:29` said "gitignored" (T2, same family as D-24) and was reworded; codex `08:351` named a removed `make build-plugin` target (make-target check) and now says "the former `build-plugin` target"; codex `08:103` kept its record of `test_skill_structure.py:163-168` as a dated observation, with the current file named beside it, so the test-path check no longer reads it as a live path.
+- **D-04 shape:** README's "Quality Scoring" block became "Evidence Rules", restating RESEARCH_CONFIG's source-count, credibility-tier and replan rules, rather than being deleted outright; the depth table keeps a "Best For" column (allowed by T4) and drops Time and Confidence target.
+- **D-06 scope:** only `core/README.md` lost its token figure (Q7 a). `ARCHITECTURE.md:31` still says "~1.5k-token kernel … five rule classes"; it is correct today (6,136 bytes) and dated to the 2026-10-17 rule, and T2's token-figure row is scoped to `core/README.md`, so this one copy remains unguarded.
+- **T1's second half** is narrower than §2 proposed: a `scripts/README.md` row is checked only when it names at least one hook event, and then must name all of that script's events; rows that name none (context_loader, the guards) are not forced to.
+- **T3** checks `tests/…/*.py` paths, the two docs/ layouts and `.claude/rules/*.md` names; bare `test_x.py` names are not checked (codex 04 writes a probe file under such a name).
+- **T6** matches version lists only with dots (`3.10/3.11/3.12`), so RESEARCH_CONFIG's `10/1/1` profile triples and dates never hit.
+- The deprecated plans keep their original filenames under `docs/archive/plans/` (the archive's dated files use another shape, but renaming would break the audit's own references).
 
 ## 1. Fix groups
 

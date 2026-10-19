@@ -12,12 +12,13 @@ Where does a human- or model-facing document state something the single source o
 
 ## Status
 
-**Phases 0–3 done; the owner ruled Q1–Q10 as recommended ([05-plan.md](./05-plan.md) §Owner rulings) and the fix round runs on `fix/docs-ssot`.** On `docs/docs-ssot-audit` from `master` @ 3301b506 (v4.30.2), on Linux. Read-only on everything outside this folder; the real `~/.claude` was not touched.
+**Phases 0–3 done; the owner ruled Q1–Q10 as recommended ([05-plan.md](./05-plan.md) §Owner rulings); the fix round on `fix/docs-ssot` landed G1–G5 behind the T1–T7 guards (written red first). Waiting on independent verification, then merge and release (owner).** On `docs/docs-ssot-audit` from `master` @ 3301b506 (v4.30.2), on Linux. Read-only on everything outside this folder; the real `~/.claude` was not touched.
 
 - **Findings:** 25 confirmed: 0 S1, 7 S2, 18 S3 ([03-findings.md](./03-findings.md)). Every cited line was re-read before filing.
 - **Mechanical pass:** 443 candidate hits from [tools/extract_refs.py](./tools/extract_refs.py), 24 of them real; the rest are placeholders, Claude Code's own names, or dated research docs quoting the artifacts of their day ([02-method.md](./02-method.md) §3).
 - **Already guarded:** README counts and roster, the codex inventory table, `/sc:help`'s roster, install-doc ordering, Makefile help, rule citations and handoffs in shipped content ([01-inventory.md](./01-inventory.md) §3). None of the 25 findings is in a guarded shape.
-- **Sessions:** 0 headless; one in-session pass.
+- **Fix round:** `tests/unit/test_docs_ssot_guards.py` (T1–T5, T7) and the T6 extension of `test_version_consistency.py`, 19 red before the fixes; five group commits G1–G5 plus the two draft plans deprecated under `docs/archive/plans/`. Deviations: [05-plan.md](./05-plan.md) §Deviations.
+- **Sessions:** 0 headless; one in-session pass per round.
 
 ## Documents
 

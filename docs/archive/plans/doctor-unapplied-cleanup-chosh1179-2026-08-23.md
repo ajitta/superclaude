@@ -3,7 +3,6 @@ status: deprecated
 revised: 2026-10-19
 ---
 
-
 # Doctor Cleanup — Unapplied Items
 
 > Deprecated 2026-10-19 (docs-ssot-audit Q5): never implemented; it names `mcp/MCP_Context7.md`, which no longer ships (Context7 is a claude.ai connector). Kept as a record.
