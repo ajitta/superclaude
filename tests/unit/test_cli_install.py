@@ -1147,7 +1147,9 @@ class TestUpgradeFromALegacyRegistration:
         notice = [m for m in messages if m.startswith("ℹ️")]
         assert len(notice) == 1, messages
         assert "do not remove" in notice[0]
-        assert "--force" in notice[0]
+        # The refresh install and doctor name too; `install --force` would
+        # also create an install.
+        assert "'superclaude update --scope user'" in notice[0]
         assert (base / "superclaude" / "scripts" / "retired_thing.py").exists()
 
 
@@ -1263,7 +1265,9 @@ class TestRegistrationFilesAreWrittenWithLF:
         monkeypatch.setattr(utils.os, "fdopen", recording_fdopen)
         utils.atomic_write_json(tmp_path / "settings.json", {"hooks": {}})
 
-        assert seen.get("newline") == "\n", seen
+        # "" and "\n" both disable translation: "" writes the text's own line
+        # ending, which lets a CRLF settings file stay CRLF (C-21).
+        assert seen.get("newline") in ("", "\n"), seen
         assert seen.get("encoding") == "utf-8", seen
 
     def test_hooks_json_copy_pins_newline_and_encoding(self, tmp_path, monkeypatch):

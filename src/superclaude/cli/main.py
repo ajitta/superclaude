@@ -581,7 +581,8 @@ def verify_drift_cmd(scope: str | None, verbose: bool):
     from .verify_drift import OK, verify_drift
 
     # Defaulting to user scope reported a healthy local install as 85 missing
-    # files under a "run superclaude install --force" remediation line.
+    # files under a "run superclaude install --force" remediation line. The
+    # advice names `update --scope <s>`, as install and doctor do.
     scope, base_path = resolve_reporting_target(scope)
     click.echo(f"🔍 Checking installation drift (scope: {scope})...\n")
 
@@ -641,9 +642,7 @@ def verify_drift_cmd(scope: str | None, verbose: bool):
             f"{result['total_missing']} missing, {result['total_extra']} extra"
             f"{retired}"
         )
-        click.echo(
-            f"   Run {scope_command('install --force', scope, base_path)} to re-sync"
-        )
+        click.echo(f"   Run {scope_command('update', scope, base_path)} to re-sync")
         sys.exit(1)
 
 

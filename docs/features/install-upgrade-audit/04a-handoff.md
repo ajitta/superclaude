@@ -14,7 +14,9 @@ P0–P6 ran on Linux. What only the owner can do (Windows), what the round leave
 
 Do it on a branch checkout with a healthy `.venv` (`uv pip install -e ".[dev]"`; AGENTS.md Tests). Use a scratch project, never the real `~/.claude`, for every step that installs.
 
-### 1a. The `workflow_dispatch` job, once (Q2 d)
+### 1a. The `workflow_dispatch` job, once (Q2 d) — run, one fixture defect found
+
+**Runs (2026-10-19).** Dispatched on `fix/install-upgrade-audit`: run 39194238966 failed (16 tests Linux passed: the builder substituted Windows machine paths into the JSON fixtures unescaped, `C:\…`; fixed by JSON-escaping tokens for `.json` targets), then run 39194568039 passed. Later master runs skipped the job, because they were not dispatched with `windows=true`. The master dispatch, run 39208943288 (v4.30.1), **failed**: 7 of 330, `confidence-check` and `simplicity-coach` surviving every removal. Fixture defect W-2 ([03](./03-findings.md) P8 section), not a product one; fixed on `fix/install-file-fidelity`: its first dispatch, run 39211000538, failed the same 7 (the first fix used the native separator; the captured eras wrote forward slashes, see W-2 for the unreleased `str` commits), the second, run 39211740467, passed the 7 and failed one other (`test_committed_project_upgrade_drops_machine_paths` looked for `str(project)`, the backslash form, in commands the era wrote with forward slashes; the test now looks for both forms), the third, run 39212220068, **passed** (Windows: 380 passed, 4 skipped; Linux 3.10 and 3.13 green). After the 06c fixes (Y-1–Y-6, HEAD 51a699c2), run 39217375965 **passed** (Windows: 403 passed, 8 skipped, the symlink and POSIX-mode tests skipped there; Linux 3.10 and 3.13: 4485 passed, 3 skipped). The steps stay as the recipe for the next dispatch.
 
 The `windows-scenarios` job in `.github/workflows/test.yml` runs only `tests/unit/test_install_upgrade_scenarios.py` on `windows-latest`, Python 3.13. The module needs no network, no git history and no asyncio. The job runs only when dispatched with the input set; PRs and `make ci` never start it.
 
@@ -34,7 +36,7 @@ The job lives in the existing Tests workflow, not a new file: `workflow_dispatch
 - **Network.** The U1 and U4 old releases (`v4.29.5`, `19575ac4^`) are built with `uvx --from <git archive>`, which needs network.
 - **Run it** from the checkout, once in Windows PowerShell 5.1 and once in `pwsh` 7: `powershell -ExecutionPolicy Bypass -File scripts\install-audit-windows.ps1`. `-Only E6` runs one scenario.
 - **Output.** `results.md` in the printed sandbox root; paste it back.
-- **Expected.** Every row PASS, except the rows marked S3 (C-17 in U4, C-20/C-21 in I2), which are tolerated.
+- **Expected.** Every row PASS, except the row marked S3 (C-17 in U4), which is tolerated. The I2 "settings/CLAUDE bytes identical" row must pass since C-20 and C-21 were fixed (`fix/install-file-fidelity`).
 - **Untested.** It was written on Linux, and no `pwsh` was available, so it has never been run. A script error is a script bug, not a finding: report it with the line.
 
 ### 1c. W1–W7 (plan [05a](./05a-plan-matrix.md) §3)
@@ -51,35 +53,37 @@ The job lives in the existing Tests workflow, not a new file: `workflow_dispatch
 
 ## 2. S3 backlog (Q5 a)
 
-The four remaining matrix FAILs ([04 §4](./04-matrix-run2.md)):
+The four remaining matrix FAILs ([04 §4](./04-matrix-run2.md)); C-20 and C-21 are fixed since, leaving C-16 and C-17:
 
 | ID | Defect | Matrix |
 |---|---|---|
 | C-16 | the `19091b37` `python .claude/hooks/x.py` era: install says nothing, `session_init` runs twice, uninstall leaves 3 commands and `hooks/*.py`. Q14 (b) is met by the CHANGELOG upgrade note; an install-time line naming the 3 commands would close it | U6-19091b37 |
 | C-17 | local and project hook state from `bd356afa` → `52b5517e` in `~/.claude/.superclaude_hooks/` is neither reached nor reported by a local or project uninstall | U4 |
-| C-20 | CLAUDE file normalised: CRLF → LF, blank-line runs collapsed, edges stripped (`remove_claude_md_import`) | U10, E4 ×3, I2 ×3 |
-| C-21 | settings writes leave mode 0600, re-serialise the file with no trailing newline, and replace a 0444 file with exit 0 | E2-ro-settings, I2 ×3 |
+| C-20 | **fixed** (branch `fix/install-file-fidelity`, [03 P5 status](./03-findings.md)). Was: CLAUDE file normalised: CRLF → LF, blank-line runs collapsed, edges stripped (`remove_claude_md_import`). Now install appends its block in the file's own line ending and uninstall removes only that block | U10, E4 ×3, I2 ×3 (d): expected PASS; `test_c20_install_appends_only_its_block_and_uninstall_removes_only_it`, `test_c20_import_removal_touches_no_other_line`, `test_c20_heading_only_crlf_file_still_goes` |
+| C-21 | **fixed** (same branch). Was: settings writes leave mode 0600, re-serialise the file with no trailing newline, and replace a 0444 file with exit 0. Now the mode, indentation, line ending, trailing newline and raw non-ASCII are kept, and a read-only file is refused before any write | E2-ro-settings, I2 ×3 (c): expected PASS; `test_c21_settings_keep_their_layout_across_install_and_uninstall`, `test_c21_settings_keep_their_permission_mode`, `test_c21_a_new_settings_file_gets_the_umask_mode`, `test_c21_a_read_only_settings_file_is_refused_before_any_write`, `test_c21_doctor_passes_on_a_read_only_settings_file` |
 | W-1 | **fixed** (branch `fix/retired-skill-user-files`, [03 P7 section](./03-findings.md)). Was: a retired skill dir whose `SKILL.md` matches a shipped revision is removed whole (`rmtree`), so a file the user added inside it goes too. Now only files whose path and text match a shipped revision go; the rest and every symlink stay, dirs go once empty | `test_w1_retired_skill_loses_only_the_files_superclaude_shipped`, `test_w1_a_symlink_inside_a_retired_skill_is_kept_and_never_followed`, `test_w1_a_symlinked_retired_skill_directory_is_left_alone`, `test_w1_uninstall_dry_run_says_what_stays_and_changes_nothing`, `test_w1_a_second_install_removes_and_reports_nothing`, `test_w1_verify_drift_and_doctor_follow_what_install_removes`, `test_w1_skill_md_is_removed_last`, `test_w1_retired_skill_files_module_is_generated_from_the_fixture`; verify X-1–X-5 ([06b](./06b-verify-w1.md)): `test_w1_a_later_skills_error_keeps_the_earlier_kept_notice`, `test_w1_the_generator_reads_every_parent_of_a_merge`, `test_c09_a_branch_only_hook_registration_goes` |
 
 Out of scope by Q1 (a), unchanged: the upstream E0 root files and CLAUDE block ([01 §3](./01-inventory.md)); MCP servers dropped from the registry that `--remove-mcp` cannot reach.
 
 ## 3. Open items from P5 (owner to confirm or decide)
 
-| Item | Now | Options |
+**Ruled 2026-10-19:** the four P5 calls stay as they are now (BOM in `info/exclude` refused; the older Tavily registrations kept, removed by hand per the CHANGELOG; the C-06 `update` pass confirmed; the C-18 warning one-directional). C-15 stays open, waiting for W7.
+
+| Item | Now | Ruling (2026-10-19) and the alternatives it declined |
 |---|---|---|
-| **BOM in `info/exclude`** (p5-g1) | Refused like a BOM in settings or CLAUDE files (one rule for every file SC edits), although git honours it: P6 confirmed `git check-ignore` matches a BOM'd pattern line, and install exits 1 naming the BOM | keep; or accept a BOM in `info/exclude` only (strip it on read, keep it on write). W6 does not decide this one; git's behaviour already did |
+| **BOM in `info/exclude`** (p5-g1) | Refused like a BOM in settings or CLAUDE files (one rule for every file SC edits), although git honours it: P6 confirmed `git check-ignore` matches a BOM'd pattern line, and install exits 1 naming the BOM | **Decided: keep the refusal.** Declined: accept a BOM in `info/exclude` only (strip it on read, keep it on write). W6 does not decide this one; git's behaviour already did |
 | **Non-UTF-8 user agents** (p5-g1) | **Closed in P6**: not reproduced at U/P/L. The memory scans read only shipped names and catch `UnicodeDecodeError` (install_components.py:139-143, :228-234) | — |
-| **Older Tavily registrations** (p5-g1) | Under Q12 (a), `--remove-mcp` removes only a server whose command matches today's registry. Tavily servers registered by older releases (`npx -y mcp-remote https://mcp.tavily.com/mcp`, `npx -y tavily-mcp@0.1.2`) are kept; the CHANGELOG says how to remove them by hand | keep; or add a historical-command list per server (fits the backlog item "MCP servers dropped from the registry") |
-| **C-06 `update` deviation** (p5-g2) | Ruling (b) said "keep refusing, advise `update --scope project`", but `update` ran the same guard, so the advice would loop. Now a non-force install still refuses, and `update` passes when every foreign `memory:` value names a store outside this base, printing where agent memory moves. That is option (a)'s `update` half | confirm; or change the advice; or give `update` its own flag |
-| **C-18, other direction** (p5-g2) | A project install replacing a worktree's local block is reported. A local install replacing another worktree's project block is not: the local block is a superset, so it hides that worktree's *uncommitted* project content from `git status`. The warning also does not name which worktree holds the install | report the other direction too; naming the worktree needs `git worktree list` plus scope detection |
-| **C-15 scope** (p5-g2) | The `CLAUDE_CONFIG_DIR` warning is given only at user scope, the only base the variable replaces, and only by install and doctor (Q15 b). `uninstall` does not warn, and user-scope MCP servers in `$CLAUDE_CONFIG_DIR/.claude.json` are not covered | extend to uninstall and the MCP reader; otherwise this waits for the W7 answer and the Q15 (a) ADR |
+| **Older Tavily registrations** (p5-g1) | Under Q12 (a), `--remove-mcp` removes only a server whose command matches today's registry. Tavily servers registered by older releases (`npx -y mcp-remote https://mcp.tavily.com/mcp`, `npx -y tavily-mcp@0.1.2`) are kept; the CHANGELOG says how to remove them by hand | **Decided: keep.** Declined: a historical-command list per server (fits the backlog item "MCP servers dropped from the registry") |
+| **C-06 `update` deviation** (p5-g2) | Ruling (b) said "keep refusing, advise `update --scope project`", but `update` ran the same guard, so the advice would loop. Now a non-force install still refuses, and `update` passes when every foreign `memory:` value names a store outside this base, printing where agent memory moves. That is option (a)'s `update` half | **Decided: confirmed.** Declined: changing the advice, or giving `update` its own flag |
+| **C-18, other direction** (p5-g2) | A project install replacing a worktree's local block is reported. A local install replacing another worktree's project block is not: the local block is a superset, so it hides that worktree's *uncommitted* project content from `git status`. The warning also does not name which worktree holds the install | **Decided: stays one-directional.** Declined: reporting the other direction too (naming the worktree needs `git worktree list` plus scope detection) |
+| **C-15 scope** (p5-g2) | The `CLAUDE_CONFIG_DIR` warning is given only at user scope, the only base the variable replaces, and only by install and doctor (Q15 b). `uninstall` does not warn, and user-scope MCP servers in `$CLAUDE_CONFIG_DIR/.claude.json` are not covered | **Open:** waits for the W7 answer and the Q15 (a) ADR. The alternative is to extend the warning to uninstall and the MCP reader now |
 
 Smaller judgement calls, recorded in the P5 reports. Each is a one-line follow-up if the owner wants it:
 
 - `finishing-a-development-branch`, the retired agents and `using-superclaude` are pruned by name only. The ten process-skill names that obra/superpowers also uses go only on a shipped SKILL.md digest.
 - The four retired serena-hooks commands are matched by sha256 prefix, because `test_shipped_content_server_neutral.py` forbids the server name under `src/`.
-- verify-drift names `install --force --scope <s>`, while install and doctor name `update --scope <s>`. Both act on the right scope.
-- doctor now runs verify-drift on every call. Its cost on a large `skills/` tree has not been measured.
+- ~~verify-drift names `install --force --scope <s>`, while install and doctor name `update --scope <s>`.~~ Unified on `update --scope <s>` (`fix/install-file-fidelity`; the legacy-scripts notice too).
+- ~~doctor now runs verify-drift on every call. Its cost on a large `skills/` tree has not been measured.~~ Measured: 0.17 s at 42,000 files ([03](./03-findings.md), doctor cost section); no change.
 - doctor fails a BOM'd CLAUDE file, to agree with install's refusal. Revisit with W6.
 
 ## 4. After P8

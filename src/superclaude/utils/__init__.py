@@ -79,28 +79,47 @@ def int_env(name: str, default: int) -> int:
         return default
 
 
-def atomic_write_json(path: Path, data: Any, indent: int | None = 2) -> None:
-    """Write JSON data atomically using temp file + os.replace.
+def atomic_write_text(path: Path, text: str) -> None:
+    """Write ``text`` as UTF-8 atomically (temp file + os.replace).
 
-    Prevents data corruption from crashes during write by writing to
-    a temporary file first, then atomically replacing the target.
+    Prevents data corruption from crashes during write by writing to a
+    temporary file first, then atomically replacing the target. The text is
+    written byte for byte (no newline translation): the caller decides the
+    line ending, so a project-scope settings.json, committed and promised
+    identical on every teammate's checkout, is not CRLF on Windows.
+
+    The file keeps its permission mode. ``mkstemp`` creates the temp file
+    0600, and replacing the target with it used to leave every settings file
+    0600 whatever mode the user had given it (install/upgrade audit, C-21). A
+    new file gets what a plain ``open()`` would: 0666 less the umask.
+
+    A symlink stays a symlink: the write goes to the file it points at, with
+    the temp file made in that file's directory. Renaming over the link used to
+    turn a settings file a dotfiles manager symlinks into a plain file, and the
+    repository copy never saw the hooks (06c, Y-1).
 
     Args:
         path: Target file path
-        data: JSON-serializable data
-        indent: JSON indentation level
+        text: The complete file content
     """
+    import stat
     import tempfile
 
     path = Path(path)
+    if path.is_symlink():
+        path = Path(os.path.realpath(path))
     path.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        mode = stat.S_IMODE(path.stat().st_mode)
+    except FileNotFoundError:
+        umask = os.umask(0)
+        os.umask(umask)
+        mode = 0o666 & ~umask
     fd, tmp_path = tempfile.mkstemp(dir=path.parent, suffix=".tmp")
     try:
-        # newline pinned: text mode would write CRLF on Windows, and this is
-        # how a project-scope settings.json — committed, and promised identical
-        # on every teammate's checkout — gets written.
-        with os.fdopen(fd, "w", encoding="utf-8", newline="\n") as f:
-            json.dump(data, f, indent=indent)
+        with os.fdopen(fd, "w", encoding="utf-8", newline="") as f:
+            f.write(text)
+        os.chmod(tmp_path, mode)
         os.replace(tmp_path, path)
     except BaseException:
         try:
@@ -108,6 +127,17 @@ def atomic_write_json(path: Path, data: Any, indent: int | None = 2) -> None:
         except OSError:
             pass
         raise
+
+
+def atomic_write_json(path: Path, data: Any, indent: int | None = 2) -> None:
+    """Write JSON data atomically; see ``atomic_write_text`` for the guarantees.
+
+    Args:
+        path: Target file path
+        data: JSON-serializable data
+        indent: JSON indentation level
+    """
+    atomic_write_text(path, json.dumps(data, indent=indent))
 
 
 def project_root() -> Path:

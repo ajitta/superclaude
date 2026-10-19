@@ -43,3 +43,4 @@ Does a real user's upgrade (an older SuperClaude install, then the current CLI) 
 | [06-verify.md](./06-verify.md) | P7 independent verification at 1c8b6f19 (Korean): V-1–V-5 |
 | [06a-verify-r2.md](./06a-verify-r2.md) | P7 re-verify at 87dc7ebd (Korean): PASS, W-1 |
 | [06b-verify-w1.md](./06b-verify-w1.md) | W-1 fix verify at f36d4a0d (Korean): PASS WITH FIXES, X-1–X-5 |
+| [06c-verify-file-fidelity.md](./06c-verify-file-fidelity.md) | C-20, C-21, W-2 fix verify at 9f1bd89d (Korean): PASS WITH FIXES, Y-1–Y-6, and how each was applied |

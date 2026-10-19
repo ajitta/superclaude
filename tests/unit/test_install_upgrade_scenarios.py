@@ -17,11 +17,13 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import re
 import shutil
+import stat
 import subprocess
 import sys
-from pathlib import Path
+from pathlib import Path, PurePath, PureWindowsPath
 from typing import NamedTuple
 
 import pytest
@@ -33,7 +35,7 @@ from superclaude.cli.install_components import install_all
 from superclaude.cli.install_git_exclude import add_git_exclude, remove_git_exclude
 from superclaude.cli.install_inventory import uninstall_all
 from superclaude.cli.install_paths import shipped_names
-from superclaude.cli.install_settings import remove_claude_md_import
+from superclaude.cli.install_settings import CLAUDE_SC_IMPORT, remove_claude_md_import
 from superclaude.cli.main import main
 from superclaude.utils import settings_filename
 from tests.conftest import init_git_repo
@@ -71,26 +73,70 @@ def scope_base(home: Path, project: Path, scope: str) -> Path:
     return home / ".claude" if scope == "user" else project / ".claude"
 
 
+TOKEN_NAMES = ("HOME", "PROJECT", "PYTHON", "UVCACHE")
+
+
+class WindowsEraPath(PureWindowsPath):
+    """A Windows path for code that only reads the path, on any platform.
+
+    ``str`` is the backslash form and ``as_posix`` the forward-slash form, as
+    on Windows, where the two differ; on Linux they are the same string, so a
+    test that must tell them apart (which form a fixture or the product writes
+    or undoes) builds its path from this class. ``resolve``, which a pure path
+    lacks, is the identity: the path stands for an absolute one.
+    """
+
+    def resolve(self, strict: bool = False) -> WindowsEraPath:
+        return self
+
+
+def _era_path(path: PurePath) -> str:
+    """``path`` as the captured eras wrote a resolved placeholder: forward slashes."""
+    return path.as_posix()
+
+
+def fixture_tokens(tmp_path: Path, home: Path, project: Path) -> dict[str, str]:
+    """The machine paths of one sandbox, in the form the captured eras wrote.
+
+    The captured eras (66b37a7e, b933fd65 and later) resolved `{{SKILLS_PATH}}`
+    and `{{SCRIPTS_PATH}}` in SKILL.md with ``.resolve().as_posix()`` (757e3649
+    → b806c61c) and the hook commands' `{{SCRIPTS_PATH}}` and `{{PYTHON_BIN}}`
+    with ``.replace("\\", "/")``: forward slashes on every platform. Only the
+    eight unreleased commits cd2f8aab → e1b2fbe7 wrote ``str(...resolve())``
+    (backslashes on Windows), which `_placeholder_forms` undoes too; no
+    captured era is from them. Replacing `$HOME` with ``str(home)`` gave
+    Windows `C:\\...\\home/.claude/skills/...`, a mixed form no installer wrote
+    and the placeholder undo does not know, so confidence-check and
+    simplicity-coach survived there (run 39208943288).
+    """
+    return {
+        "PYTHON": _era_path(Path(sys.executable)),
+        "UVCACHE": _era_path(tmp_path / "uvcache"),
+        "PROJECT": _era_path(project.resolve()),
+        "HOME": _era_path(home.resolve()),
+    }
+
+
+def resolve_tokens(text: str, tokens: dict[str, str], *, as_json: bool = False) -> str:
+    """``text`` with each ``$TOKEN`` replaced by its machine path.
+
+    A JSON file carries machine paths as JSON strings, so the value is
+    JSON-escaped there; with the forward-slash forms of ``fixture_tokens`` that
+    changes nothing, and a value holding a quote or backslash stays valid JSON.
+    """
+    for token in TOKEN_NAMES:
+        value = tokens[token]
+        text = text.replace(f"${token}", json.dumps(value)[1:-1] if as_json else value)
+    return text
+
+
 def build_legacy_install(
     tmp_path: Path, era: str, monkeypatch
 ) -> tuple[Path, Path, Path]:
     """Lay out ``era``'s captured install under ``tmp_path``; return (home, project, base)."""
     doc = load_era(era)
     home, project = sandbox(tmp_path, monkeypatch)
-    tokens = {
-        "$PYTHON": sys.executable,
-        "$UVCACHE": str(tmp_path / "uvcache"),
-        "$PROJECT": str(project),
-        "$HOME": str(home),
-    }
-
-    def resolve(text: str, *, as_json: bool = False) -> str:
-        # A JSON file carries machine paths as JSON strings: a Windows path's
-        # backslashes must be escaped there, as the old installer's json.dump
-        # wrote them, or the fixture is invalid JSON on Windows only.
-        for token, value in tokens.items():
-            text = text.replace(token, json.dumps(value)[1:-1] if as_json else value)
-        return text
+    tokens = fixture_tokens(tmp_path, home, project)
 
     for key, entry in doc["files"].items():
         root, rel = key.split("/", 1)
@@ -98,7 +144,9 @@ def build_legacy_install(
         target.parent.mkdir(parents=True, exist_ok=True)
         if "blob" in entry:
             target.write_text(
-                resolve(BLOBS[entry["blob"]], as_json=rel.endswith(".json")),
+                resolve_tokens(
+                    BLOBS[entry["blob"]], tokens, as_json=rel.endswith(".json")
+                ),
                 encoding="utf-8",
                 newline="",
             )
@@ -182,6 +230,62 @@ def test_fixture_carries_no_machine_data(path: Path) -> None:
     assert _EMAIL.findall(text) == []
 
 
+def test_fixture_tokens_are_forward_slash_paths(tmp_path: Path) -> None:
+    """Windows run 39208943288: `$HOME/.claude/skills/...` became
+    `C:\\...\\home/.claude/skills/...`, so no placeholder undo matched and
+    confidence-check and simplicity-coach survived every removal. The captured
+    eras wrote forward slashes everywhere (as_posix, `.replace("\\", "/")`).
+    A ``WindowsEraPath`` home shows ``str(home)`` as backslashes on Linux
+    too."""
+    assert _era_path(PureWindowsPath(r"C:\a\home")) == "C:/a/home"
+    windows_home = WindowsEraPath(r"C:\Users\me\home")
+    assert "\\" in str(windows_home)
+    assert (
+        fixture_tokens(tmp_path, windows_home, tmp_path / "project")["HOME"]
+        == "C:/Users/me/home"
+    )
+
+    tokens = fixture_tokens(tmp_path, tmp_path / "home", tmp_path / "project")
+
+    assert set(tokens) == set(TOKEN_NAMES)
+    for value in tokens.values():
+        assert "\\" not in value, value
+    assert tokens["HOME"] == (tmp_path / "home").resolve().as_posix()
+    assert (
+        resolve_tokens("$HOME/.claude/skills/x", tokens)
+        == tokens["HOME"] + "/.claude/skills/x"
+    )
+    assert (
+        resolve_tokens('"$HOME"', {**tokens, "HOME": 'C:/a"b'}, as_json=True)
+        == '"C:/a\\"b"'
+    )
+
+
+@pytest.mark.parametrize("era", ["66b37a7ep-user", "b933fd65p-user"])
+@pytest.mark.parametrize("skill", ["confidence-check", "simplicity-coach"])
+def test_fixture_skill_md_passes_the_gate_in_its_windows_form(
+    era: str, skill: str
+) -> None:
+    """The fixture's SKILL.md for a Windows home, checked against the digest
+    table: with the era's forward-slash form, undoing `<base>/skills` as
+    `_placeholder_forms` does with ``as_posix`` yields a shipped digest. The
+    fixture fix itself (``fixture_tokens`` giving that form) is pinned by
+    `test_fixture_tokens_are_forward_slash_paths`."""
+    from superclaude.cli.retired_skill_files import RETIRED_SKILL_FILES
+
+    doc = load_era(era)
+    blob = BLOBS[doc["files"][f"$HOME/.claude/skills/{skill}/SKILL.md"]["blob"]]
+    home = PureWindowsPath(r"C:\Users\me\AppData\Local\Temp\pytest-0\test0\home")
+    tokens = {name: "unused" for name in TOKEN_NAMES} | {"HOME": _era_path(home)}
+    written = resolve_tokens(blob, tokens).encode("utf-8")
+    skills = _era_path(home / ".claude" / "skills").encode("utf-8")
+
+    assert skills in written, written[:200]
+    undone = written.replace(skills, b"{{SKILLS_PATH}}")
+    digest = hashlib.sha256(undone.replace(b"\r\n", b"\n")).hexdigest()[:16]
+    assert digest in RETIRED_SKILL_FILES[skill]["SKILL.md"]
+
+
 @pytest.mark.parametrize("era", ERAS)
 def test_every_era_builds(tmp_path: Path, monkeypatch, era: str) -> None:
     """Every blob a fixture cites exists, and the built tree is an install."""
@@ -215,14 +319,18 @@ def test_committed_project_upgrade_drops_machine_paths(
     home, project, base = build_legacy_install(
         tmp_path, "19575ac4p-project", monkeypatch
     )
-    assert any(sys.executable in c for c in _commands(base / "settings.json"))
+    # The era wrote the interpreter and the paths with forward slashes on
+    # every platform (fixture_tokens), so the forms to look for are those.
+    tokens = fixture_tokens(tmp_path, home, project)
+    assert any(tokens["PYTHON"] in c for c in _commands(base / "settings.json"))
 
     success, message = install_all(base_path=base, force=False, scope="project")
 
     assert success, message
     text = (base / "settings.json").read_text(encoding="utf-8")
-    assert sys.executable not in text
-    assert str(project) not in text and str(home) not in text
+    for form in (sys.executable, tokens["PYTHON"], str(project), tokens["PROJECT"]):
+        assert form not in text, form
+    assert str(home) not in text and tokens["HOME"] not in text
     assert "superclaude/scripts" not in text
 
 
@@ -747,6 +855,9 @@ def test_c05_drift_remediation_carries_the_scope(
     output = all_output(result)
     assert result.exit_code == 1, output
     assert "'superclaude install --force'" not in output, output
+    # The same command install and doctor name: `update` is the refresh of an
+    # install, where `install --force` would also create one.
+    assert "'superclaude update --scope" in output, output
     advice = _ADVICE.findall(output)
     assert advice, output
     for named, where in advice:
@@ -1194,9 +1305,10 @@ def test_v1_a_retired_agent_rewritten_to_the_scope_still_goes(
 def test_v1_a_retired_skill_with_a_relative_skills_path_still_goes(
     tmp_path: Path, monkeypatch, scope: str
 ) -> None:
-    """Install resolved `{{SKILLS_PATH}}` in SKILL.md (cd2f8aab → b806c61c), to
-    `.claude/skills` at project scope (local too, from 2026-03); the captured
-    eras carry only the absolute form."""
+    """Install resolved `{{SKILLS_PATH}}` in SKILL.md (cd2f8aab → b806c61c:
+    ``str`` until e1b2fbe7, ``as_posix`` from 757e3649), to `.claude/skills`
+    at project scope (local too, from 2026-03); the captured eras carry only
+    the absolute form."""
     _home, _project, base = fresh_install(tmp_path, monkeypatch, scope)
     shipped = _era_blob(
         "b933fd65p-user", "$HOME/.claude/skills/confidence-check/SKILL.md"
@@ -1210,6 +1322,65 @@ def test_v1_a_retired_skill_with_a_relative_skills_path_still_goes(
 
     assert success, message
     assert not skill.parent.exists(), message
+
+
+@pytest.mark.parametrize("scope", ["user", "local"])
+def test_v1_a_retired_skill_in_the_str_era_form_still_goes(
+    tmp_path: Path, monkeypatch, scope: str
+) -> None:
+    """The eight unreleased commits cd2f8aab → e1b2fbe7 resolved
+    `{{SKILLS_PATH}}` with ``str(...resolve())`` and wrote SKILL.md in text
+    mode: backslashes and CRLF on Windows. No captured era is from them, so
+    this writes that form itself. On Linux ``str`` is the ``as_posix`` form;
+    the Windows job is where this pins the ``str`` entry of
+    `_placeholder_forms` end to end."""
+    _home, _project, base = fresh_install(tmp_path, monkeypatch, scope)
+    shipped = _era_blob(
+        "b933fd65p-user", "$HOME/.claude/skills/confidence-check/SKILL.md"
+    )
+    assert "$HOME/.claude/skills/" in shipped
+    skill = base / "skills" / "confidence-check" / "SKILL.md"
+    skill.parent.mkdir(parents=True)
+    text = shipped.replace("$HOME/.claude/skills", str((base / "skills").resolve()))
+    skill.write_bytes(text.replace("\n", "\r\n").encode("utf-8"))
+
+    success, message = uninstall_all(base_path=base, scope=scope)
+
+    assert success, message
+    assert not skill.parent.exists(), message
+
+
+def test_placeholder_forms_undo_the_str_form_on_every_platform(
+    tmp_path: Path,
+) -> None:
+    """`_placeholder_forms` undoes the ``str`` form (backslashes on Windows)
+    as well as ``as_posix``: a SKILL.md from the cd2f8aab → e1b2fbe7 installers
+    on Windows is superclaude's text. `_placeholder_forms` only reads its path,
+    so a ``WindowsEraPath`` skill dir gives the Windows forms on Linux, where
+    only the ``str`` entry matches the file."""
+    from superclaude.cli.install_paths import _is_shipped_skill_file, _placeholder_forms
+    from superclaude.cli.retired_skill_files import RETIRED_SKILL_FILES
+
+    windows_skill_dir = WindowsEraPath(r"C:\Users\me\.claude\skills\confidence-check")
+    skills = str(windows_skill_dir.parent)
+    scripts = str(windows_skill_dir.parent.parent / "superclaude" / "scripts")
+    assert "\\" in skills
+    shipped = _era_blob(
+        "b933fd65p-user", "$HOME/.claude/skills/confidence-check/SKILL.md"
+    )
+    text = shipped.replace("$HOME/.claude/skills", skills)
+    skill_dir = tmp_path / "skills" / "confidence-check"
+    skill_dir.mkdir(parents=True)
+    (skill_dir / "SKILL.md").write_bytes(text.replace("\n", "\r\n").encode("utf-8"))
+    digests = RETIRED_SKILL_FILES["confidence-check"]["SKILL.md"]
+
+    forms = _placeholder_forms(windows_skill_dir)
+
+    assert (skills.encode(), scripts.encode()) in forms
+    assert _is_shipped_skill_file(skill_dir / "SKILL.md", digests, forms)
+    posix_only = [form for form in forms if b"\\" not in form[0]]
+    assert posix_only and len(posix_only) < len(forms)
+    assert not _is_shipped_skill_file(skill_dir / "SKILL.md", digests, posix_only)
 
 
 # --- W-1: a retired skill loses only the files superclaude shipped ------------
@@ -2151,3 +2322,338 @@ def test_c12_empty_local_memory_store_goes_quietly(tmp_path: Path, monkeypatch) 
     assert success, message
     assert not (base / "agent-memory-local").exists(), message
     assert "⚠️" not in message
+
+
+# --- C-20: the CLAUDE file keeps every byte outside superclaude's block -------
+
+# What `remove_claude_md_import` used to normalise: Windows line endings (the
+# whole file came back LF), runs of blank lines (collapsed to one) and blank
+# edges (stripped).
+C20_TEXTS = {
+    "crlf": "# Team notes\r\n\r\n\r\nkeep the run above\r\n",
+    "blank-runs": "\n\n# Team notes\n\n\n\nkeep the run above\n\n\n",
+    "no-final-newline": "# Team notes\nlast line, no newline",
+}
+
+
+def _import_line(scope: str) -> str:
+    return "@.claude/superclaude/CLAUDE_SC.md" if scope == "local" else CLAUDE_SC_IMPORT
+
+
+@pytest.mark.parametrize("layout", list(C20_TEXTS))
+@pytest.mark.parametrize("scope", SCOPES)
+def test_c20_install_appends_only_its_block_and_uninstall_removes_only_it(
+    tmp_path: Path, monkeypatch, scope: str, layout: str
+) -> None:
+    """C-20: install rewrote a CRLF file as LF; uninstall collapsed blank-line
+    runs and stripped both edges. The block goes in the file's own line ending,
+    and uninstall takes back exactly that block. A file without a final newline
+    keeps the one the import line needed: uninstall cannot tell it from the
+    user's own."""
+    home, project = sandbox(tmp_path, monkeypatch)
+    base = scope_base(home, project, scope)
+    target = claude_path(base, scope)
+    target.parent.mkdir(parents=True, exist_ok=True)
+    text = C20_TEXTS[layout]
+    target.write_bytes(text.encode("utf-8"))
+    nl = "\r\n" if "\r\n" in text else "\n"
+    joined = (text if text.endswith("\n") else text + nl).encode("utf-8")
+
+    success, message = install_all(base_path=base, force=False, scope=scope)
+
+    assert success, message
+    block = f"{nl}# superclaude{nl}{_import_line(scope)}{nl}".encode("utf-8")
+    assert target.read_bytes() == joined + block
+
+    success, message = uninstall_all(base_path=base, scope=scope)
+
+    assert success, message
+    assert target.read_bytes() == joined
+
+
+def _c20_removals(import_line: str) -> list[tuple[str, str, str]]:
+    """(id, before, after) for an import removal that touches nothing else."""
+    block = f"\n# superclaude\n{import_line}\n"
+    middle = f"a\n\n\n{block[1:]}\n\nb\n"
+    return [
+        ("block-mid-file", middle, middle.replace(block, "", 1)),
+        ("import-alone-crlf", f"{import_line}\r\n\r\nMy notes\r\n", "\r\nMy notes\r\n"),
+        (
+            "old-heading-crlf",
+            f"# Mine\r\n\r\n# SuperClaude Framework\r\n{import_line}\r\n",
+            "# Mine\r\n",
+        ),
+        (
+            "trailing-spaces-kept",
+            f"a  \n\n# superclaude\n{import_line}\nb \n",
+            "a  \nb \n",
+        ),
+    ]
+
+
+@pytest.mark.parametrize("scope", ["user", "local"])
+def test_c20_import_removal_touches_no_other_line(tmp_path: Path, scope: str) -> None:
+    import_line = _import_line(scope)
+    base = tmp_path / ".claude"
+    base.mkdir()
+    target = claude_path(base, scope)
+    for case, before, after in _c20_removals(import_line):
+        target.write_bytes(before.encode("utf-8"))
+
+        success, message = remove_claude_md_import(base, scope=scope)
+
+        assert success, (case, message)
+        assert target.read_bytes() == after.encode("utf-8"), case
+
+
+def test_c20_heading_only_crlf_file_still_goes(tmp_path: Path) -> None:
+    """The file install created, saved by an editor with CRLF, is still superclaude's."""
+    base = tmp_path / ".claude"
+    base.mkdir()
+    claude_md = base / "CLAUDE.md"
+    claude_md.write_bytes(
+        f"# Claude Code Configuration\r\n\r\n# superclaude\r\n{CLAUDE_SC_IMPORT}\r\n".encode()
+    )
+
+    success, message = remove_claude_md_import(base, scope="user")
+
+    assert success, message
+    assert not claude_md.exists(), message
+
+
+# --- C-21: settings writes keep mode and layout, and refuse a read-only file --
+
+# Layouts an editor or Claude Code's own settings UI leaves: each must come back
+# byte-for-byte after install and uninstall (I2 check c and d).
+C21_LAYOUTS = {
+    "two-space-newline": '{\n  "model": "opus"\n}\n',
+    "four-space-no-newline": '{\n    "model": "opus"\n}',
+    "tabs-crlf": '{\r\n\t"model": "opus"\r\n}\r\n',
+    "one-line": '{"model": "opus"}',
+    "non-ascii": '{\n  "statusLine": {\n    "command": "echo 안녕"\n  }\n}\n',
+    "escaped": '{\n  "statusLine": {\n    "command": "echo \\uc548\\ub155"\n  }\n}\n',
+}
+_INDENT = re.compile(r'\n([ \t]+)"')
+_not_root = pytest.mark.skipif(
+    getattr(os, "geteuid", lambda: 1)() == 0, reason="root ignores file modes"
+)
+_posix_modes = pytest.mark.skipif(
+    sys.platform == "win32", reason="Windows has only the read-only bit"
+)
+
+
+@pytest.mark.parametrize("layout", list(C21_LAYOUTS))
+@pytest.mark.parametrize("scope", SCOPES)
+def test_c21_settings_keep_their_layout_across_install_and_uninstall(
+    tmp_path: Path, monkeypatch, scope: str, layout: str
+) -> None:
+    """C-21: every settings write re-serialised the file (two-space, LF, no
+    trailing newline, ASCII escapes), so install dirtied a committed file and
+    uninstall never gave the original bytes back."""
+    home, project = sandbox(tmp_path, monkeypatch)
+    base = scope_base(home, project, scope)
+    settings = settings_path(base, scope)
+    settings.parent.mkdir(parents=True, exist_ok=True)
+    original = C21_LAYOUTS[layout].encode("utf-8")
+    settings.write_bytes(original)
+
+    success, message = install_all(base_path=base, force=False, scope=scope)
+
+    assert success, message
+    installed = settings.read_bytes()
+    assert json.loads(installed.decode("utf-8")).get("hooks"), installed
+    assert installed.endswith(b"\n") == original.endswith(b"\n"), installed
+    assert (b"\r\n" in installed) == (b"\r\n" in original), installed
+    indent = _INDENT.search(original.decode("utf-8"))
+    if indent:
+        assert _INDENT.search(installed.decode("utf-8")).group(1) == indent.group(1)
+    else:
+        assert b"\n" not in installed.rstrip(b"\r\n"), installed
+    assert installed.isascii() == original.isascii(), installed
+
+    success, message = uninstall_all(base_path=base, scope=scope)
+
+    assert success, message
+    assert settings.read_bytes() == original
+
+
+@_posix_modes
+@pytest.mark.parametrize("scope", SCOPES)
+def test_c21_settings_keep_their_permission_mode(
+    tmp_path: Path, monkeypatch, scope: str
+) -> None:
+    """C-21: the atomic write left every settings file 0600 (mkstemp), whatever
+    mode the user's file had; a new one gets what a plain open() would."""
+    home, project = sandbox(tmp_path, monkeypatch)
+    base = scope_base(home, project, scope)
+    settings = settings_path(base, scope)
+    settings.parent.mkdir(parents=True, exist_ok=True)
+    settings.write_text('{"model": "opus"}\n', encoding="utf-8")
+    settings.chmod(0o640)
+
+    success, message = install_all(base_path=base, force=False, scope=scope)
+
+    assert success, message
+    assert stat.S_IMODE(settings.stat().st_mode) == 0o640
+
+    success, message = uninstall_all(base_path=base, scope=scope)
+
+    assert success, message
+    assert stat.S_IMODE(settings.stat().st_mode) == 0o640
+
+
+@_posix_modes
+def test_c21_a_new_settings_file_gets_the_umask_mode(
+    tmp_path: Path, monkeypatch
+) -> None:
+    _home, _project, base = fresh_install(tmp_path, monkeypatch, "user")
+    umask = os.umask(0)
+    os.umask(umask)
+
+    assert stat.S_IMODE((base / "settings.json").stat().st_mode) == 0o666 & ~umask
+
+
+RO_COMMANDS = {
+    "install": ["install"],
+    "update": ["update"],
+    "uninstall": ["uninstall", "-y"],
+    "uninstall-dry-run": ["uninstall", "--dry-run"],
+}
+
+
+def _edited_file(tmp_path: Path, base: Path, scope: str, which: str) -> Path:
+    """The scope's settings, CLAUDE or git exclude file: the files a command edits."""
+    from superclaude.cli.install_settings import _claude_md_target
+
+    if which == "settings":
+        return settings_path(base, scope)
+    if which == "claude":
+        return _claude_md_target(base, scope)[0]
+    return tmp_path / "project" / ".git" / "info" / "exclude"
+
+
+RO_FILES = [
+    (which, scope)
+    for which in ("settings", "claude", "exclude")
+    for scope in SCOPES
+    if which != "exclude" or scope != "user"
+]
+
+
+@_not_root
+@pytest.mark.parametrize("command", list(RO_COMMANDS))
+@pytest.mark.parametrize(("which", "scope"), RO_FILES)
+def test_c21_a_read_only_input_file_is_refused_before_any_write(
+    tmp_path: Path, monkeypatch, command: str, which: str, scope: str
+) -> None:
+    """C-21 (E2-ro-settings): a 0444 settings file was replaced with exit 0, the
+    temp-file rename never asking the file. Refused like the other input
+    preflights: exit 1, the file named, nothing written or deleted. The CLAUDE
+    file and the git exclude file the same (06c Y-3): a 0444 CLAUDE.md passed
+    the preflight and install wrote 117 files, then died on a traceback."""
+    if command == "install":
+        home, project = sandbox(tmp_path, monkeypatch)
+        base = scope_base(home, project, scope)
+        target = _edited_file(tmp_path, base, scope, which)
+        target.parent.mkdir(parents=True, exist_ok=True)
+        if which == "settings":
+            target.write_text('{"model": "opus"}\n', encoding="utf-8")
+        elif which == "claude":
+            target.write_text(CLAUDE_TEXT, encoding="utf-8", newline="")
+        else:
+            target.write_text("*.swp\n", encoding="utf-8")
+    else:
+        _home, _project, base = fresh_install(tmp_path, monkeypatch, scope)
+        target = _edited_file(tmp_path, base, scope, which)
+    assert target.is_file()
+    target.chmod(0o444)
+    before = snapshot(tmp_path)
+
+    result = CliRunner().invoke(main, [*RO_COMMANDS[command], "--scope", scope])
+
+    output = all_output(result)
+    assert result.exception is None or isinstance(result.exception, SystemExit), output
+    assert result.exit_code == 1, output
+    assert target.name in output and "read-only" in output, output
+    assert snapshot(tmp_path) == before
+    assert stat.S_IMODE(target.stat().st_mode) == 0o444
+
+
+@_not_root
+@pytest.mark.parametrize("scope", SCOPES)
+def test_c21_doctor_passes_on_a_read_only_settings_file(
+    tmp_path: Path, monkeypatch, scope: str
+) -> None:
+    """doctor writes nothing, so a file install would refuse to edit is healthy to it."""
+    _home, _project, base = fresh_install(tmp_path, monkeypatch, scope)
+    monkeypatch.delenv("CLAUDE_CONFIG_DIR", raising=False)
+    settings_path(base, scope).chmod(0o444)
+
+    result = run_doctor(scope=scope)
+
+    assert result["passed"], result["checks"]
+
+
+_symlinks = pytest.mark.skipif(
+    sys.platform == "win32", reason="symlinks need a privilege on Windows"
+)
+
+
+@_symlinks
+@pytest.mark.parametrize("scope", SCOPES)
+def test_c21_a_symlinked_settings_file_stays_a_symlink(
+    tmp_path: Path, monkeypatch, scope: str
+) -> None:
+    """06c Y-1: the atomic write renamed its temp file over the link, so a
+    settings file a dotfiles manager symlinks (stow, chezmoi) became a plain
+    file holding the hooks and the repository copy never got them. The write
+    now goes to the link's target and the link stays."""
+    home, project = sandbox(tmp_path, monkeypatch)
+    base = scope_base(home, project, scope)
+    settings = settings_path(base, scope)
+    settings.parent.mkdir(parents=True, exist_ok=True)
+    target = tmp_path / "dotfiles" / "claude" / settings.name
+    target.parent.mkdir(parents=True)
+    original = '{\n\t"model": "opus"\n}\n'.encode("utf-8")
+    target.write_bytes(original)
+    target.chmod(0o640)
+    settings.symlink_to(target)
+
+    success, message = install_all(base_path=base, force=False, scope=scope)
+
+    assert success, message
+    assert settings.is_symlink() and settings.resolve() == target.resolve()
+    installed = target.read_bytes()
+    assert json.loads(installed.decode("utf-8")).get("hooks"), installed
+    assert b'\n\t"' in installed and installed.endswith(b"\n"), installed
+    assert stat.S_IMODE(target.stat().st_mode) == 0o640
+    assert [p.name for p in settings.parent.iterdir() if p.suffix == ".tmp"] == []
+
+    success, message = uninstall_all(base_path=base, scope=scope)
+
+    assert success, message
+    assert settings.is_symlink()
+    assert target.read_bytes() == original
+
+
+@_symlinks
+def test_c21_atomic_write_text_writes_through_a_symlink(tmp_path: Path) -> None:
+    """The temp file is made next to the target, so the rename stays on one
+    filesystem, and the link is what the caller finds afterwards."""
+    from superclaude.utils import atomic_write_text
+
+    target = tmp_path / "store" / "settings.json"
+    target.parent.mkdir()
+    target.write_text("{}", encoding="utf-8")
+    target.chmod(0o600)
+    link = tmp_path / "live" / "settings.json"
+    link.parent.mkdir()
+    link.symlink_to(target)
+
+    atomic_write_text(link, '{"a": 1}\n')
+
+    assert link.is_symlink() and link.readlink() == target
+    assert target.read_text(encoding="utf-8") == '{"a": 1}\n'
+    assert stat.S_IMODE(target.stat().st_mode) == 0o600
+    assert sorted(p.name for p in link.parent.iterdir()) == ["settings.json"]
+    assert sorted(p.name for p in target.parent.iterdir()) == ["settings.json"]

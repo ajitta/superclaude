@@ -8,6 +8,18 @@ Releases before 4.19.0 are not listed. Their history is the git log; the upstrea
 
 ## [Unreleased]
 
+### Changed
+
+- `install`, `update` and `uninstall` keep your `settings.json` (or `settings.local.json`) as you had it: the file's permission mode (the atomic write used to leave it 0600), its indentation (tabs or spaces; a one-line object stays one line), its line ending, whether it ends with a newline, and non-ASCII text written as is; spacing inside a line, number forms (`1e3`, `1.50`) and escapes (`\/`, `\u00e9` next to raw non-ASCII) are re-serialised. A settings file the install creates ends with a newline and gets the mode a plain file save would, not 0600. The hook state files under `.superclaude_hooks/` (loop-guard history, the PR cache, MCP fallback hints) are created the same way, with the mode your umask gives a new file (typically 0644) instead of 0600; an existing one keeps its mode.
+- `install`, `update` and `uninstall` refuse a read-only settings file, CLAUDE file (`CLAUDE.md`, `CLAUDE.local.md`) or `.git/info/exclude` (exit 1, nothing changed, the file named), like a file they cannot read. Before, the atomic write replaced a `0444` settings file and exited 0, and a `0444` CLAUDE.md let `install` write everything else and then stop with a traceback. `doctor` does not check the mode.
+- `verify-drift`'s re-sync line and `install`'s note on legacy script copies name `superclaude update --scope <scope>`, the same command `install` and `doctor` name, instead of `install --force --scope <scope>`.
+
+### Fixed
+
+- A `settings.json` (or `settings.local.json`) that is a symlink, as a dotfiles manager such as stow or chezmoi leaves it, stays a symlink: `install`, `update` and `uninstall` write to the file it points at. Before, the atomic write replaced the link with a plain file, and the linked file never got the hooks.
+- `install` no longer rewrites a CLAUDE.md or CLAUDE.local.md with Windows line endings as LF: its import block is appended in the file's own line ending and no other byte changes.
+- `uninstall` no longer collapses runs of blank lines or strips the start and end of CLAUDE.md: it removes only superclaude's import line, the heading above it and the blank line install put before the heading. A file that had no final newline keeps the one the import needed.
+
 ## [4.30.1] - 2026-10-19
 
 ### Fixed

@@ -79,8 +79,8 @@ The harness lives outside the repo. Its run-1 copy is kept beside it as `harness
 |---|---|---|---|
 | U6-19091b37 | install output does not name the `.claude/hooks/x.py` commands | C-16 (S3) | Q14 (b): CHANGELOG upgrade note only (p5-g3); backlog |
 | U4 | local uninstall does not report `~/.claude/.superclaude_hooks/` | C-17 (S3) | backlog |
-| U10, E4 ×3, I2 ×3 (d) | CLAUDE file normalised: CRLF → LF, blank-line runs collapsed | C-20 (S3) | backlog |
-| E2-ro-settings, I2 ×3 (c) | settings writes leave mode 0600 and replace a 0444 file with exit 0 | C-21 (S3) | backlog |
+| U10, E4 ×3, I2 ×3 (d) | CLAUDE file normalised: CRLF → LF, blank-line runs collapsed | C-20 (S3) | fixed after v4.30.1 (`fix/install-file-fidelity`); these records should PASS at the next run |
+| E2-ro-settings, I2 ×3 (c) | settings writes leave mode 0600 and replace a 0444 file with exit 0 | C-21 (S3) | fixed after v4.30.1 (same branch); E2-ro-settings now expects exit 1, nothing written, mode 0444 kept |
 
 ## 5. Open items probed
 

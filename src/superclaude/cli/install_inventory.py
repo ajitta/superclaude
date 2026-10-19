@@ -31,10 +31,10 @@ from .install_paths import (
     shipped_names,
 )
 from .install_settings import (
-    SC_IMPORT_RE,
     _hook_script_id,
     _load_settings,
     _split_entry,
+    has_sc_import_line,
     remove_claude_md_import,
     uninstall_hooks_from_settings,
 )
@@ -561,7 +561,7 @@ def uninstall_all(
     if dry_run:
         if claude_md_target.exists():
             content = claude_md_target.read_text(encoding="utf-8")
-            if SC_IMPORT_RE.search(content):
+            if has_sc_import_line(content):
                 messages.append(
                     f"[DRY-RUN] Would remove superclaude import from {claude_md_label}"
                 )

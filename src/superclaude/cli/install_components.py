@@ -69,7 +69,7 @@ def preflight_inputs(base_path: Path, scope: str, settings: bool = True) -> str 
     return "\n".join(
         [
             "❌ Nothing was changed: superclaude edits these files and cannot "
-            "read them safely.",
+            "read or write them safely.",
             *(f"   - {problem}" for problem in problems),
         ]
     )
@@ -617,7 +617,7 @@ def _legacy_scripts_notice(legacy_scripts: Path, base_path: Path, scope: str) ->
         return (
             f"ℹ️  {still_used} registration(s) in {settings_file.name} still run the "
             f"script copies under {legacy_scripts} — do not remove that directory; "
-            f"{scope_command('install --force', scope, base_path)} rewrites every "
+            f"{scope_command('update', scope, base_path)} rewrites every "
             "registration to `superclaude hook <name>`."
         )
     return (
