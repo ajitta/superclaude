@@ -1,4 +1,5 @@
-# 4-arm eval task definitions (roadmap Phase 1-1) + canary suite (Phase 1-2).
+# Eval task definitions, one run per arm in run_eval.py ARMS (roadmap Phase 1-1)
+# + canary suite (Phase 1-2).
 # Consumed by evals/run_eval.py. Fixtures are copied to a temp workspace OUTSIDE
 # the repo before each run (probe-observer-effect: repo context contaminates baselines).
 #
