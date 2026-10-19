@@ -507,10 +507,12 @@ def _placeholder_forms(skill_dir: Path) -> List[Tuple[bytes, bytes]]:
     """What ``{{SKILLS_PATH}}`` and ``{{SCRIPTS_PATH}}`` were resolved to.
 
     Releases cd2f8aab → b806c61c resolved them at install (in SKILL.md, the
-    only file that carried them): the absolute path (``str`` or ``as_posix``)
-    at user scope, and at local scope before 2026-03; the ``.claude/...``
-    relative path otherwise. A copy is compared with each substitution undone
-    too, in every file of the skill.
+    only file that carried them): the absolute path at user scope, and at
+    local scope before 2026-03; the ``.claude/...`` relative path otherwise.
+    The absolute path was ``str(...resolve())`` in the unreleased commits
+    cd2f8aab → e1b2fbe7 (backslashes on Windows) and ``as_posix()`` from
+    757e3649 (forward slashes everywhere), so both forms are undone. A copy is
+    compared with each substitution undone too, in every file of the skill.
     """
     base = skill_dir.parent.parent
     forms = [

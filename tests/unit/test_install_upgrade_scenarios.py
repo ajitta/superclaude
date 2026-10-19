@@ -23,7 +23,7 @@ import shutil
 import stat
 import subprocess
 import sys
-from pathlib import Path, PureWindowsPath
+from pathlib import Path, PurePath, PureWindowsPath
 from typing import NamedTuple
 
 import pytest
@@ -76,23 +76,44 @@ def scope_base(home: Path, project: Path, scope: str) -> Path:
 TOKEN_NAMES = ("HOME", "PROJECT", "PYTHON", "UVCACHE")
 
 
-def fixture_tokens(tmp_path: Path, home: Path, project: Path) -> dict[str, str]:
-    """The machine paths of one sandbox, in the form the old installers wrote.
+class WindowsEraPath(PureWindowsPath):
+    """A Windows path for code that only reads the path, on any platform.
 
-    Every era resolved its placeholders to forward slashes on every platform:
-    `{{SKILLS_PATH}}` and `{{SCRIPTS_PATH}}` in SKILL.md with
-    ``.resolve().as_posix()`` (cd2f8aab → b806c61c), the hook commands'
-    `{{SCRIPTS_PATH}}` and `{{PYTHON_BIN}}` with ``.replace("\\", "/")``.
-    Replacing `$HOME` with ``str(home)`` gave Windows
-    `C:\\...\\home/.claude/skills/...`, a mixed form no installer wrote and the
-    retired-skill gate's placeholder undo does not know, so confidence-check and
+    ``str`` is the backslash form and ``as_posix`` the forward-slash form, as
+    on Windows, where the two differ; on Linux they are the same string, so a
+    test that must tell them apart (which form a fixture or the product writes
+    or undoes) builds its path from this class. ``resolve``, which a pure path
+    lacks, is the identity: the path stands for an absolute one.
+    """
+
+    def resolve(self, strict: bool = False) -> WindowsEraPath:
+        return self
+
+
+def _era_path(path: PurePath) -> str:
+    """``path`` as the captured eras wrote a resolved placeholder: forward slashes."""
+    return path.as_posix()
+
+
+def fixture_tokens(tmp_path: Path, home: Path, project: Path) -> dict[str, str]:
+    """The machine paths of one sandbox, in the form the captured eras wrote.
+
+    The captured eras (66b37a7e, b933fd65 and later) resolved `{{SKILLS_PATH}}`
+    and `{{SCRIPTS_PATH}}` in SKILL.md with ``.resolve().as_posix()`` (757e3649
+    → b806c61c) and the hook commands' `{{SCRIPTS_PATH}}` and `{{PYTHON_BIN}}`
+    with ``.replace("\\", "/")``: forward slashes on every platform. Only the
+    eight unreleased commits cd2f8aab → e1b2fbe7 wrote ``str(...resolve())``
+    (backslashes on Windows), which `_placeholder_forms` undoes too; no
+    captured era is from them. Replacing `$HOME` with ``str(home)`` gave
+    Windows `C:\\...\\home/.claude/skills/...`, a mixed form no installer wrote
+    and the placeholder undo does not know, so confidence-check and
     simplicity-coach survived there (run 39208943288).
     """
     return {
-        "PYTHON": Path(sys.executable).as_posix(),
-        "UVCACHE": (tmp_path / "uvcache").as_posix(),
-        "PROJECT": project.resolve().as_posix(),
-        "HOME": home.resolve().as_posix(),
+        "PYTHON": _era_path(Path(sys.executable)),
+        "UVCACHE": _era_path(tmp_path / "uvcache"),
+        "PROJECT": _era_path(project.resolve()),
+        "HOME": _era_path(home.resolve()),
     }
 
 
@@ -212,8 +233,18 @@ def test_fixture_carries_no_machine_data(path: Path) -> None:
 def test_fixture_tokens_are_forward_slash_paths(tmp_path: Path) -> None:
     """Windows run 39208943288: `$HOME/.claude/skills/...` became
     `C:\\...\\home/.claude/skills/...`, so no placeholder undo matched and
-    confidence-check and simplicity-coach survived every removal. The eras
-    wrote forward slashes everywhere (as_posix, `.replace("\\", "/")`)."""
+    confidence-check and simplicity-coach survived every removal. The captured
+    eras wrote forward slashes everywhere (as_posix, `.replace("\\", "/")`).
+    A ``WindowsEraPath`` home shows ``str(home)`` as backslashes on Linux
+    too."""
+    assert _era_path(PureWindowsPath(r"C:\a\home")) == "C:/a/home"
+    windows_home = WindowsEraPath(r"C:\Users\me\home")
+    assert "\\" in str(windows_home)
+    assert (
+        fixture_tokens(tmp_path, windows_home, tmp_path / "project")["HOME"]
+        == "C:/Users/me/home"
+    )
+
     tokens = fixture_tokens(tmp_path, tmp_path / "home", tmp_path / "project")
 
     assert set(tokens) == set(TOKEN_NAMES)
@@ -235,17 +266,19 @@ def test_fixture_tokens_are_forward_slash_paths(tmp_path: Path) -> None:
 def test_fixture_skill_md_passes_the_gate_in_its_windows_form(
     era: str, skill: str
 ) -> None:
-    """The retired-skill gate, simulated for a Windows home on Linux: with the
-    era's forward-slash form, undoing `<base>/skills` as `_placeholder_forms`
-    does with ``as_posix`` yields a shipped SKILL.md digest."""
+    """The fixture's SKILL.md for a Windows home, checked against the digest
+    table: with the era's forward-slash form, undoing `<base>/skills` as
+    `_placeholder_forms` does with ``as_posix`` yields a shipped digest. The
+    fixture fix itself (``fixture_tokens`` giving that form) is pinned by
+    `test_fixture_tokens_are_forward_slash_paths`."""
     from superclaude.cli.retired_skill_files import RETIRED_SKILL_FILES
 
     doc = load_era(era)
     blob = BLOBS[doc["files"][f"$HOME/.claude/skills/{skill}/SKILL.md"]["blob"]]
     home = PureWindowsPath(r"C:\Users\me\AppData\Local\Temp\pytest-0\test0\home")
-    tokens = {name: "unused" for name in TOKEN_NAMES} | {"HOME": home.as_posix()}
+    tokens = {name: "unused" for name in TOKEN_NAMES} | {"HOME": _era_path(home)}
     written = resolve_tokens(blob, tokens).encode("utf-8")
-    skills = (home / ".claude" / "skills").as_posix().encode("utf-8")
+    skills = _era_path(home / ".claude" / "skills").encode("utf-8")
 
     assert skills in written, written[:200]
     undone = written.replace(skills, b"{{SKILLS_PATH}}")
@@ -1272,9 +1305,10 @@ def test_v1_a_retired_agent_rewritten_to_the_scope_still_goes(
 def test_v1_a_retired_skill_with_a_relative_skills_path_still_goes(
     tmp_path: Path, monkeypatch, scope: str
 ) -> None:
-    """Install resolved `{{SKILLS_PATH}}` in SKILL.md (cd2f8aab → b806c61c), to
-    `.claude/skills` at project scope (local too, from 2026-03); the captured
-    eras carry only the absolute form."""
+    """Install resolved `{{SKILLS_PATH}}` in SKILL.md (cd2f8aab → b806c61c:
+    ``str`` until e1b2fbe7, ``as_posix`` from 757e3649), to `.claude/skills`
+    at project scope (local too, from 2026-03); the captured eras carry only
+    the absolute form."""
     _home, _project, base = fresh_install(tmp_path, monkeypatch, scope)
     shipped = _era_blob(
         "b933fd65p-user", "$HOME/.claude/skills/confidence-check/SKILL.md"
@@ -1288,6 +1322,65 @@ def test_v1_a_retired_skill_with_a_relative_skills_path_still_goes(
 
     assert success, message
     assert not skill.parent.exists(), message
+
+
+@pytest.mark.parametrize("scope", ["user", "local"])
+def test_v1_a_retired_skill_in_the_str_era_form_still_goes(
+    tmp_path: Path, monkeypatch, scope: str
+) -> None:
+    """The eight unreleased commits cd2f8aab → e1b2fbe7 resolved
+    `{{SKILLS_PATH}}` with ``str(...resolve())`` and wrote SKILL.md in text
+    mode: backslashes and CRLF on Windows. No captured era is from them, so
+    this writes that form itself. On Linux ``str`` is the ``as_posix`` form;
+    the Windows job is where this pins the ``str`` entry of
+    `_placeholder_forms` end to end."""
+    _home, _project, base = fresh_install(tmp_path, monkeypatch, scope)
+    shipped = _era_blob(
+        "b933fd65p-user", "$HOME/.claude/skills/confidence-check/SKILL.md"
+    )
+    assert "$HOME/.claude/skills/" in shipped
+    skill = base / "skills" / "confidence-check" / "SKILL.md"
+    skill.parent.mkdir(parents=True)
+    text = shipped.replace("$HOME/.claude/skills", str((base / "skills").resolve()))
+    skill.write_bytes(text.replace("\n", "\r\n").encode("utf-8"))
+
+    success, message = uninstall_all(base_path=base, scope=scope)
+
+    assert success, message
+    assert not skill.parent.exists(), message
+
+
+def test_placeholder_forms_undo_the_str_form_on_every_platform(
+    tmp_path: Path,
+) -> None:
+    """`_placeholder_forms` undoes the ``str`` form (backslashes on Windows)
+    as well as ``as_posix``: a SKILL.md from the cd2f8aab → e1b2fbe7 installers
+    on Windows is superclaude's text. `_placeholder_forms` only reads its path,
+    so a ``WindowsEraPath`` skill dir gives the Windows forms on Linux, where
+    only the ``str`` entry matches the file."""
+    from superclaude.cli.install_paths import _is_shipped_skill_file, _placeholder_forms
+    from superclaude.cli.retired_skill_files import RETIRED_SKILL_FILES
+
+    windows_skill_dir = WindowsEraPath(r"C:\Users\me\.claude\skills\confidence-check")
+    skills = str(windows_skill_dir.parent)
+    scripts = str(windows_skill_dir.parent.parent / "superclaude" / "scripts")
+    assert "\\" in skills
+    shipped = _era_blob(
+        "b933fd65p-user", "$HOME/.claude/skills/confidence-check/SKILL.md"
+    )
+    text = shipped.replace("$HOME/.claude/skills", skills)
+    skill_dir = tmp_path / "skills" / "confidence-check"
+    skill_dir.mkdir(parents=True)
+    (skill_dir / "SKILL.md").write_bytes(text.replace("\n", "\r\n").encode("utf-8"))
+    digests = RETIRED_SKILL_FILES["confidence-check"]["SKILL.md"]
+
+    forms = _placeholder_forms(windows_skill_dir)
+
+    assert (skills.encode(), scripts.encode()) in forms
+    assert _is_shipped_skill_file(skill_dir / "SKILL.md", digests, forms)
+    posix_only = [form for form in forms if b"\\" not in form[0]]
+    assert posix_only and len(posix_only) < len(forms)
+    assert not _is_shipped_skill_file(skill_dir / "SKILL.md", digests, posix_only)
 
 
 # --- W-1: a retired skill loses only the files superclaude shipped ------------
