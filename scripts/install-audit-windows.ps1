@@ -243,7 +243,14 @@ function Invoke-E6 {
           $r = Invoke-Sc $a
           $d = Compare-Tree $pre (Get-Tree $sb)
           $why = ($r.Out -split "`n" | Select-String 'UTF|BOM|Nothing was changed' | Select-Object -First 2) -join '; '
-          Add-Result $id "exit 1, nothing changed (Q16a); first bytes $head" ($r.Rc -eq 1 -and -not $d -and $r.Out -notmatch 'Traceback') "rc $($r.Rc); changed $($d.Count); $why"
+          if ($enc -eq 'utf-8-bom') {
+            # W6: Claude Code reads a UTF-8 BOM settings file, so superclaude edits it and keeps the BOM.
+            $s = Get-Settings $sb $scope
+            $kept = (-not (Test-Path $s)) -or ((Get-Head $s) -eq 'EF BB BF')
+            Add-Result $id "exit 0, BOM kept (W6); first bytes $head" ($r.Rc -eq 0 -and $kept -and $r.Out -notmatch 'Traceback') "rc $($r.Rc); BOM kept $kept"
+          } else {
+            Add-Result $id "exit 1, nothing changed (Q16a); first bytes $head" ($r.Rc -eq 1 -and -not $d -and $r.Out -notmatch 'Traceback') "rc $($r.Rc); changed $($d.Count); $why"
+          }
         } finally { Exit-Sandbox }
       }
     }

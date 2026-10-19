@@ -119,16 +119,20 @@ _BOMS = (
 )
 
 
-def _encoding_problem(path: Path) -> Optional[str]:
+def _encoding_problem(path: Path, *, utf8_bom_ok: bool = False) -> Optional[str]:
     """Why ``path`` cannot be edited as UTF-8 text, or None (also when it is missing).
 
     Every file superclaude edits in place — settings, the CLAUDE file, the git
     exclude file — is read and written back as UTF-8. One saved in another
     encoding used to crash the command half-way: uninstall had already deleted
     the content when it reached a UTF-16 settings file, and install had already
-    written it. A BOM is refused too: ``json`` rejects it, and a rewrite would
-    carry it into the middle of the file. The message names the file and what it
-    is, so the user knows what to re-save.
+    written it. The message names the file and what it is, so the user knows
+    what to re-save.
+
+    ``utf8_bom_ok`` is for the files Claude Code itself reads: it accepts a
+    UTF-8 BOM in them (Windows P8, W6; PowerShell 5.1 and Notepad write one),
+    so superclaude edits around the BOM and keeps it. The git exclude file
+    keeps the refusal (04a §3 ruling).
     """
     try:
         data = path.read_bytes()
@@ -138,6 +142,8 @@ def _encoding_problem(path: Path) -> Optional[str]:
         return f"{path} cannot be read ({e})"
     for bom, name in _BOMS:
         if data.startswith(bom):
+            if utf8_bom_ok and bom == codecs.BOM_UTF8:
+                break
             return f"{path} is {name}; save it as UTF-8 without a BOM"
     try:
         data.decode("utf-8")
@@ -167,7 +173,7 @@ def _load_settings(settings_file: Path) -> dict:
         return {}
 
     try:
-        with open(settings_file, "r", encoding="utf-8") as f:
+        with open(settings_file, "r", encoding="utf-8-sig") as f:
             data = json.load(f)
     except (ValueError, OSError):  # JSONDecodeError and UnicodeDecodeError
         return {}
@@ -211,17 +217,17 @@ def _unwritable_settings(
     """
     if not settings_file.exists():
         return None
-    problem = _encoding_problem(settings_file)
+    problem = _encoding_problem(settings_file, utf8_bom_ok=True)
     if problem:
         return problem
     if check_mode:
         problem = _read_only_problem(settings_file)
         if problem:
             return problem
-    if not settings_file.read_bytes().strip():
+    if not settings_file.read_bytes().removeprefix(codecs.BOM_UTF8).strip():
         return None
     try:
-        with open(settings_file, "r", encoding="utf-8") as f:
+        with open(settings_file, "r", encoding="utf-8-sig") as f:
             data = json.load(f)
     except (ValueError, OSError) as e:
         return f"{settings_file} is not valid JSON ({e}); fix it or move it aside"
@@ -247,7 +253,9 @@ def input_problems(base_path: Path, scope: str, settings: bool = True) -> List[s
         if problem:
             problems.append(problem)
     claude_md, _import_line = _claude_md_target(base_path, scope)
-    problem = _encoding_problem(claude_md) or _read_only_problem(claude_md)
+    problem = _encoding_problem(claude_md, utf8_bom_ok=True) or _read_only_problem(
+        claude_md
+    )
     if problem:
         problems.append(problem)
     return problems
@@ -273,10 +281,14 @@ def _settings_text(settings_file: Path, settings: dict) -> str:
     newline = "\n"
     trailing = True
     ensure_ascii = True
+    bom = ""
     try:
         text = settings_file.read_bytes().decode("utf-8")
     except (OSError, UnicodeDecodeError):
         text = ""
+    if text.startswith("\ufeff"):
+        # W6: Claude Code reads a BOM'd file, so the BOM stays where it was.
+        bom, text = "\ufeff", text[1:]
     if text.strip():
         trailing = text.endswith("\n")
         crlf = text.count("\r\n")
@@ -291,7 +303,7 @@ def _settings_text(settings_file: Path, settings: dict) -> str:
     out = json.dumps(settings, indent=indent, ensure_ascii=ensure_ascii)
     if newline != "\n":
         out = out.replace("\n", newline)
-    return out + newline if trailing else out
+    return bom + (out + newline if trailing else out)
 
 
 def _save_settings(settings_file: Path, settings: dict) -> Tuple[bool, str]:
@@ -820,7 +832,7 @@ def check_claude_md_import(base_path: Path, scope: str = "user") -> Tuple[bool, 
     # doctor delegates this check, and doctor must report rather than traceback:
     # the code it replaced caught OSError and returned a failing result. A file
     # install would refuse to edit fails here too, with the same reason.
-    problem = _encoding_problem(claude_md)
+    problem = _encoding_problem(claude_md, utf8_bom_ok=True)
     if problem:
         return False, problem
     content = claude_md.read_text(encoding="utf-8")

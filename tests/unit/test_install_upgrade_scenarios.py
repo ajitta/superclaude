@@ -15,6 +15,7 @@ before its fix (docs/features/install-upgrade-audit/03-findings.md).
 
 from __future__ import annotations
 
+import codecs
 import hashlib
 import json
 import os
@@ -37,7 +38,7 @@ from superclaude.cli.install_inventory import uninstall_all
 from superclaude.cli.install_paths import shipped_names
 from superclaude.cli.install_settings import CLAUDE_SC_IMPORT, remove_claude_md_import
 from superclaude.cli.main import main
-from superclaude.utils import settings_filename
+from superclaude.utils import detect_scope, settings_filename
 from tests.conftest import init_git_repo
 from tests.unit.cli_helpers import all_output
 
@@ -456,8 +457,8 @@ def test_c01_uninstall_refuses_undecodable_settings_before_deleting(
 
 
 @pytest.mark.parametrize("scope", SCOPES)
-@pytest.mark.parametrize("kind", ["trailing-comma", "utf-8-sig"])
-def test_c02_uninstall_refuses_malformed_or_bom_settings(
+@pytest.mark.parametrize("kind", ["trailing-comma"])
+def test_c02_uninstall_refuses_malformed_settings(
     tmp_path: Path, monkeypatch, scope: str, kind: str
 ) -> None:
     """C-02: a settings file that does not parse read as "No hooks", exit 0 —
@@ -478,13 +479,12 @@ def test_c02_uninstall_refuses_malformed_or_bom_settings(
 # (file, kind, scope): every bad input once, the scopes rotated between them.
 BAD_INPUTS = [
     ("settings", "trailing-comma", "user"),
-    ("settings", "utf-8-sig", "project"),
     ("settings", "utf-16", "local"),
     ("settings", "cp949", "user"),
     ("settings", "not-an-object", "project"),
     ("claude", "cp949", "local"),
     ("claude", "utf-16", "user"),
-    ("claude", "utf-8-sig", "project"),
+    ("claude", "utf-16", "project"),
 ]
 COMMANDS = {
     "install": ["install"],
@@ -2333,6 +2333,8 @@ C20_TEXTS = {
     "crlf": "# Team notes\r\n\r\n\r\nkeep the run above\r\n",
     "blank-runs": "\n\n# Team notes\n\n\n\nkeep the run above\n\n\n",
     "no-final-newline": "# Team notes\nlast line, no newline",
+    # W6: Claude Code reads a BOM'd CLAUDE file; superclaude keeps the BOM.
+    "bom": "\ufeff# Team notes\nkeep the run above\n",
 }
 
 
@@ -2432,6 +2434,8 @@ C21_LAYOUTS = {
     "one-line": '{"model": "opus"}',
     "non-ascii": '{\n  "statusLine": {\n    "command": "echo 안녕"\n  }\n}\n',
     "escaped": '{\n  "statusLine": {\n    "command": "echo \\uc548\\ub155"\n  }\n}\n',
+    # W6: Claude Code reads a BOM'd settings file; superclaude keeps the BOM.
+    "bom": '\ufeff{\n  "model": "opus"\n}\n',
 }
 _INDENT = re.compile(r'\n([ \t]+)"')
 _not_root = pytest.mark.skipif(
@@ -2461,7 +2465,10 @@ def test_c21_settings_keep_their_layout_across_install_and_uninstall(
 
     assert success, message
     installed = settings.read_bytes()
-    assert json.loads(installed.decode("utf-8")).get("hooks"), installed
+    assert json.loads(installed.decode("utf-8-sig")).get("hooks"), installed
+    assert installed.startswith(codecs.BOM_UTF8) == original.startswith(
+        codecs.BOM_UTF8
+    ), installed
     assert installed.endswith(b"\n") == original.endswith(b"\n"), installed
     assert (b"\r\n" in installed) == (b"\r\n" in original), installed
     indent = _INDENT.search(original.decode("utf-8"))
@@ -2657,3 +2664,115 @@ def test_c21_atomic_write_text_writes_through_a_symlink(tmp_path: Path) -> None:
     assert stat.S_IMODE(target.stat().st_mode) == 0o600
     assert sorted(p.name for p in link.parent.iterdir()) == ["settings.json"]
     assert sorted(p.name for p in target.parent.iterdir()) == ["settings.json"]
+
+
+# --- W-3 / W6: Windows P8 run (07-windows-run.md) ---------------------------
+
+W3_TEXTS = {
+    "lf": "# git ls-files --others --exclude-from=.git/info/exclude\n# *~\n",
+    "crlf": "# git ls-files --others --exclude-from=.git/info/exclude\r\n# *~\r\n",
+}
+
+
+@pytest.mark.parametrize("layout", list(W3_TEXTS))
+@pytest.mark.parametrize("scope", ["project", "local"])
+def test_w3_exclude_keeps_its_line_endings_across_install_and_uninstall(
+    tmp_path: Path, monkeypatch, scope: str, layout: str
+) -> None:
+    """W-3: a text-mode read and write turned git's LF ``info/exclude`` into
+    CRLF on Windows (and a CRLF one into LF elsewhere), so every line changed.
+    The block goes in the file's own line ending, and uninstall gives back the
+    original bytes."""
+    _home, project = sandbox(tmp_path, monkeypatch)
+    exclude = project / ".git" / "info" / "exclude"
+    exclude.parent.mkdir(parents=True, exist_ok=True)
+    original = W3_TEXTS[layout].encode("utf-8")
+    exclude.write_bytes(original)
+
+    success, message = install_all(
+        base_path=project / ".claude", force=False, scope=scope
+    )
+
+    assert success, message
+    installed = exclude.read_bytes()
+    assert installed.startswith(original), installed[:200]
+    if layout == "crlf":
+        assert installed.count(b"\r\n") == installed.count(b"\n"), installed
+    else:
+        assert b"\r" not in installed, installed
+
+    success, message = uninstall_all(base_path=project / ".claude", scope=scope)
+
+    assert success, message
+    assert exclude.read_bytes() == original
+
+
+@pytest.mark.parametrize("layout", list(W3_TEXTS))
+def test_w3_legacy_gitignore_migration_touches_only_the_block(
+    tmp_path: Path, monkeypatch, layout: str
+) -> None:
+    """W-3: migrating a legacy block out of the team's committed ``.gitignore``
+    rewrote every line in the platform's line ending."""
+    _home, project = sandbox(tmp_path, monkeypatch)
+    nl = "\r\n" if layout == "crlf" else "\n"
+    team = f"node_modules/{nl}dist/{nl}".encode("utf-8")
+    block = nl.join(["# >>> superclaude >>>", ".claude/commands/sc/"]) + nl
+    block += "# <<< superclaude <<<" + nl
+    gitignore = project / ".gitignore"
+    gitignore.write_bytes(team + nl.encode("utf-8") + block.encode("utf-8"))
+
+    success, message = remove_git_exclude(project)
+
+    assert success, message
+    assert gitignore.read_bytes() == team
+
+
+def test_w6_bom_in_exclude_is_still_refused(tmp_path: Path, monkeypatch) -> None:
+    """04a §3 ruling: the BOM refusal stays for ``info/exclude``; W6 relaxed it
+    only for the files Claude Code reads (settings, CLAUDE files)."""
+    _home, project = sandbox(tmp_path, monkeypatch)
+    exclude = project / ".git" / "info" / "exclude"
+    exclude.parent.mkdir(parents=True, exist_ok=True)
+    exclude.write_bytes(codecs.BOM_UTF8 + b"scratch/\n")
+    before = snapshot(tmp_path)
+
+    success, message = install_all(base_path=project / ".claude", scope="local")
+
+    assert not success, message
+    assert str(exclude) in message and "byte-order mark" in message, message
+    assert snapshot(tmp_path) == before
+
+
+@pytest.mark.parametrize("scope", SCOPES)
+def test_w6_bom_settings_and_claude_file_are_accepted_by_every_command(
+    tmp_path: Path, monkeypatch, scope: str
+) -> None:
+    """W6: Claude Code reads a UTF-8 settings or CLAUDE file that starts with a
+    BOM (PowerShell 5.1 and Notepad write one), so superclaude edits it in place,
+    keeps the BOM, still detects the scope from it, and doctor calls it healthy."""
+    monkeypatch.delenv("CLAUDE_CONFIG_DIR", raising=False)
+    home, project = sandbox(tmp_path, monkeypatch)
+    base = scope_base(home, project, scope)
+    settings = settings_path(base, scope)
+    claude_md = claude_path(base, scope)
+    settings.parent.mkdir(parents=True, exist_ok=True)
+    claude_md.parent.mkdir(parents=True, exist_ok=True)
+    settings_bytes = codecs.BOM_UTF8 + b'{\n  "model": "opus"\n}\n'
+    claude_bytes = codecs.BOM_UTF8 + "# 팀 메모\n".encode("utf-8")
+    settings.write_bytes(settings_bytes)
+    claude_md.write_bytes(claude_bytes)
+
+    for command in (["install"], ["update"], ["doctor", "--verbose"]):
+        result = CliRunner().invoke(main, [*command, "--scope", scope])
+        assert result.exit_code == 0, (command, all_output(result))
+        assert settings.read_bytes().startswith(codecs.BOM_UTF8), command
+        assert claude_md.read_bytes().startswith(codecs.BOM_UTF8), command
+    assert json.loads(settings.read_bytes().decode("utf-8-sig"))["hooks"]
+    if scope != "user":
+        assert detect_scope(project) == scope
+
+    result = CliRunner().invoke(main, ["uninstall", "--scope", scope, "-y"])
+
+    assert result.exit_code == 0, all_output(result)
+    assert settings.read_bytes() == settings_bytes
+    assert claude_md.read_bytes() == claude_bytes

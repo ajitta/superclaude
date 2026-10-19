@@ -8,6 +8,14 @@ Releases before 4.19.0 are not listed. Their history is the git log; the upstrea
 
 ## [Unreleased]
 
+### Changed
+
+- `install`, `update`, `uninstall` and `doctor` accept a settings file or CLAUDE file (`CLAUDE.md`, `CLAUDE.local.md`) saved as UTF-8 with a byte-order mark, as Windows PowerShell 5.1 and Notepad save it. Claude Code reads such a file, so superclaude now edits it in place and keeps the BOM instead of stopping with "Nothing was changed". UTF-16 and code-page files are still refused, and so is a BOM in `.git/info/exclude`.
+
+### Fixed
+
+- On Windows, `install` and `uninstall` no longer rewrite every line of `.git/info/exclude` with CRLF line endings (and elsewhere no longer turn a CRLF file into LF). The superclaude block is written in the file's own line ending, and `uninstall` gives back the original bytes. The same holds for moving an old superclaude block out of `.gitignore`.
+
 ## [4.30.4] - 2026-10-19
 
 ### Changed
