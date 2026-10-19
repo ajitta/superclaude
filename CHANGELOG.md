@@ -8,6 +8,8 @@ Releases before 4.19.0 are not listed. Their history is the git log; the upstrea
 
 ## [Unreleased]
 
+## [4.30.4] - 2026-10-19
+
 ### Changed
 
 - `/sc:research` and the `deep-researcher` agent state the hop count per depth that `RESEARCH_CONFIG` sets: quick 1, standard up to 3, deep up to 4, exhaustive 5. Before they said 2-3, 3-4 and 5+ against a configured maximum of 5. `RESEARCH_CONFIG` now says a profile's hop figure is a ceiling, not a target.
