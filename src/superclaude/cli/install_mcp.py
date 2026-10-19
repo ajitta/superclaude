@@ -15,6 +15,8 @@ from typing import Dict, List, Optional, Tuple
 
 import click
 
+from superclaude.utils import claude_json_path
+
 from .install_settings import _load_settings
 
 # MCP Server Registry
@@ -203,14 +205,14 @@ def _scope_config_path(
     Project root defaults to CWD when omitted.
     """
     if scope == "user":
-        return Path.home() / ".claude.json", ["mcpServers"]
+        return claude_json_path(), ["mcpServers"]
     if scope == "project":
         root = project_root or Path.cwd()
         return root.resolve() / ".mcp.json", ["mcpServers"]
     if scope == "local":
         root = project_root or Path.cwd()
         project_key = str(root.resolve())
-        return Path.home() / ".claude.json", ["projects", project_key, "mcpServers"]
+        return claude_json_path(), ["projects", project_key, "mcpServers"]
     raise ValueError(f"Unknown MCP scope: {scope!r}")
 
 

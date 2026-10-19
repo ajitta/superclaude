@@ -8,6 +8,10 @@ Releases before 4.19.0 are not listed. Their history is the git log; the upstrea
 
 ## [Unreleased]
 
+### Changed
+
+- User scope follows `CLAUDE_CONFIG_DIR` (ADR-0002). When the variable is set, `install`, `update`, `uninstall`, `doctor` and `verify-drift` at `--scope user` use that directory instead of `~/.claude`, because that is where Claude Code reads user settings, commands, agents, skills and `CLAUDE.md`. User-scope MCP servers go to the `.claude.json` inside it. The hooks, `/sc:insight` and the memory-staleness check look there too. Before, a user install with the variable set was never loaded, and `install` and `doctor` only warned. An install already in `~/.claude` stays where it is: `install`, `update` and `doctor` name it, along with the command to remove it (`superclaude uninstall --scope user` with the variable unset). With `CLAUDE_CODE_SUBPROCESS_ENV_SCRUB` on, Claude Code hides the variable from hooks, so they fall back to `~/.claude`; `doctor` says so. Without the variable, nothing changes.
+
 ## [4.30.5] - 2026-10-19
 
 ### Changed

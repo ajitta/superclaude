@@ -243,6 +243,33 @@ def main_worktree_root(root: Path) -> Path | None:
     return common_dir.parent
 
 
+def user_claude_dir() -> Path:
+    """The user ``.claude`` directory Claude Code reads.
+
+    ``$CLAUDE_CONFIG_DIR`` when it is set and non-empty, else ``~/.claude``
+    (ADR-0002). Claude Code reads user settings, components, the user
+    ``CLAUDE.md``, ``.claude.json`` and ``projects/`` from there (P8 W7), so a
+    user-scope install anywhere else is never loaded. Under
+    ``CLAUDE_CODE_SUBPROCESS_ENV_SCRUB=1`` Claude Code removes the variable from
+    hook subprocesses, and a hook falls back to ``~/.claude`` (ADR-0002 Q1 a;
+    doctor says so).
+    """
+    value = os.environ.get("CLAUDE_CONFIG_DIR", "").strip()
+    if value:
+        return Path(value).expanduser().absolute()
+    return Path.home() / ".claude"
+
+
+def claude_json_path() -> Path:
+    """Claude Code's ``.claude.json``: inside ``$CLAUDE_CONFIG_DIR`` when set.
+
+    Without the variable it sits beside ``~/.claude``, not in it.
+    """
+    if os.environ.get("CLAUDE_CONFIG_DIR", "").strip():
+        return user_claude_dir() / ".claude.json"
+    return Path.home() / ".claude.json"
+
+
 def claude_base() -> Path:
     """Resolve the .claude directory of the install whose hooks are running.
 
@@ -260,7 +287,8 @@ def claude_base() -> Path:
 
     Returns:
         Project-local .claude when a scoped install is present, the main
-        worktree's when this is a linked worktree carrying one, else ~/.claude
+        worktree's when this is a linked worktree carrying one, else the user
+        directory (``user_claude_dir``)
     """
     root = project_root() / ".claude"
     if (root / "superclaude").exists():
@@ -270,7 +298,7 @@ def claude_base() -> Path:
         main_base = main_root / ".claude"
         if (main_base / "superclaude").exists():
             return main_base
-    return Path.home() / ".claude"
+    return user_claude_dir()
 
 
 # Markers identifying a hook registration as superclaude's. Hoisted here from

@@ -35,10 +35,16 @@ from superclaude.cli.doctor import run_doctor
 from superclaude.cli.install_components import install_all
 from superclaude.cli.install_git_exclude import add_git_exclude, remove_git_exclude
 from superclaude.cli.install_inventory import uninstall_all
-from superclaude.cli.install_paths import shipped_names
+from superclaude.cli.install_paths import get_base_path, shipped_names
 from superclaude.cli.install_settings import CLAUDE_SC_IMPORT, remove_claude_md_import
 from superclaude.cli.main import main
-from superclaude.utils import detect_scope, settings_filename
+from superclaude.scripts import insight_writer, memory_staleness
+from superclaude.utils import (
+    claude_base,
+    claude_json_path,
+    detect_scope,
+    settings_filename,
+)
 from tests.conftest import init_git_repo
 from tests.unit.cli_helpers import all_output
 
@@ -965,38 +971,63 @@ def test_c06_conflict_advice_never_names_another_base(
             assert where == f" from {base.parent}", message
 
 
-# --- C-15: CLAUDE_CONFIG_DIR (Q15 b) ------------------------------------------
+# --- C-15: user scope follows CLAUDE_CONFIG_DIR (ADR-0002) -------------------
 
 
-def test_c15_install_and_doctor_name_a_differing_config_dir(
+def test_c15_user_scope_installs_where_claude_config_dir_points(
     tmp_path: Path, monkeypatch
 ) -> None:
-    """C-15: with CLAUDE_CONFIG_DIR elsewhere Claude Code never reads ~/.claude,
-    and neither install nor doctor said so."""
+    """ADR-0002: Claude Code reads user settings, components and CLAUDE.md from
+    $CLAUDE_CONFIG_DIR (P8 W7), so a user install goes there; ~/.claude stays
+    untouched, and doctor, verify-drift and uninstall act on the same dir."""
     home, _project = sandbox(tmp_path, monkeypatch)
     config = tmp_path / "cc"
-    monkeypatch.delenv("CLAUDE_CONFIG_DIR", raising=False)
-    install = CliRunner().invoke(main, ["install", "--scope", "user"])
-    assert install.exit_code == 0, all_output(install)
-    plain = run_doctor(scope="user")
     monkeypatch.setenv("CLAUDE_CONFIG_DIR", str(config))
 
-    install = CliRunner().invoke(main, ["install", "--force", "--scope", "user"])
+    install = CliRunner().invoke(main, ["install", "--scope", "user"])
+
+    assert install.exit_code == 0, all_output(install)
+    assert (config / "superclaude" / "CLAUDE_SC.md").is_file()
+    assert json.loads((config / "settings.json").read_text(encoding="utf-8"))["hooks"]
+    assert CLAUDE_SC_IMPORT in (config / "CLAUDE.md").read_text(encoding="utf-8")
+    assert not (home / ".claude").exists()
+    assert "CLAUDE_CONFIG_DIR" not in all_output(install)
+    assert run_doctor(scope="user")["passed"]
+    drift = CliRunner().invoke(main, ["verify-drift", "--scope", "user"])
+    assert drift.exit_code == 0, all_output(drift)
+
+    uninstall = CliRunner().invoke(main, ["uninstall", "--scope", "user", "-y"])
+
+    assert uninstall.exit_code == 0, all_output(uninstall)
+    assert not (config / "superclaude").exists()
+    assert not (home / ".claude").exists()
+
+
+def test_c15_an_install_left_in_home_is_named_not_moved(
+    tmp_path: Path, monkeypatch
+) -> None:
+    """ADR-0002 Q2 (a): an install made before the variable was honoured stays
+    in ~/.claude, where that Claude Code no longer reads it; install and doctor
+    say where it is and how to remove it, and nothing moves it."""
+    home, _project = sandbox(tmp_path, monkeypatch)
+    old = CliRunner().invoke(main, ["install", "--scope", "user"])
+    assert old.exit_code == 0, all_output(old)
+    before = sorted(p.relative_to(home) for p in (home / ".claude").rglob("*"))
+    config = tmp_path / "cc"
+    monkeypatch.setenv("CLAUDE_CONFIG_DIR", str(config))
+
+    install = CliRunner().invoke(main, ["install", "--scope", "user"])
     doctor = CliRunner().invoke(main, ["doctor", "--scope", "user"])
 
     for result in (install, doctor):
         output = all_output(result)
-        warned = [line for line in output.splitlines() if "CLAUDE_CONFIG_DIR" in line]
-        assert warned, output
-        assert str(config) in output and str(home / ".claude") in output, output
-    # A warning, not a failed check: the doctor verdict is unchanged.
-    assert [c["passed"] for c in run_doctor(scope="user")["checks"]] == [
-        c["passed"] for c in plain["checks"]
-    ]
-    assert not config.exists()
+        assert str(home / ".claude") in output, output
+        assert "uninstall --scope user" in output and "unset" in output, output
+    assert run_doctor(scope="user")["passed"]
+    assert sorted(p.relative_to(home) for p in (home / ".claude").rglob("*")) == before
 
 
-def test_c15_no_warning_when_config_dir_is_the_default(
+def test_c15_no_notice_when_config_dir_is_the_default(
     tmp_path: Path, monkeypatch
 ) -> None:
     home, _project = sandbox(tmp_path, monkeypatch)
@@ -1005,8 +1036,56 @@ def test_c15_no_warning_when_config_dir_is_the_default(
     install = CliRunner().invoke(main, ["install", "--scope", "user"])
     doctor = CliRunner().invoke(main, ["doctor", "--scope", "user"])
 
+    assert (home / ".claude" / "superclaude").is_dir()
     assert "CLAUDE_CONFIG_DIR" not in all_output(install)
     assert "CLAUDE_CONFIG_DIR" not in all_output(doctor)
+
+
+@pytest.mark.parametrize("value", ["", "   "])
+def test_c15_an_empty_config_dir_means_home(
+    tmp_path: Path, monkeypatch, value: str
+) -> None:
+    home, _project = sandbox(tmp_path, monkeypatch)
+    monkeypatch.setenv("CLAUDE_CONFIG_DIR", value)
+
+    assert get_base_path("user") == home / ".claude"
+    assert claude_json_path() == home / ".claude.json"
+
+
+def test_c15_doctor_names_the_scrub_that_hides_the_variable_from_hooks(
+    tmp_path: Path, monkeypatch
+) -> None:
+    """ADR-0002 Q1 (a): CLAUDE_CODE_SUBPROCESS_ENV_SCRUB removes the variable
+    from hook subprocesses, so the hooks fall back to ~/.claude."""
+    _home, _project = sandbox(tmp_path, monkeypatch)
+    monkeypatch.setenv("CLAUDE_CONFIG_DIR", str(tmp_path / "cc"))
+    monkeypatch.setenv("CLAUDE_CODE_SUBPROCESS_ENV_SCRUB", "1")
+    CliRunner().invoke(main, ["install", "--scope", "user"])
+
+    advisories = run_doctor(scope="user")["advisories"]
+
+    assert any("CLAUDE_CODE_SUBPROCESS_ENV_SCRUB" in a for a in advisories), advisories
+    monkeypatch.setenv("CLAUDE_CODE_SUBPROCESS_ENV_SCRUB", "0")
+    assert not any(
+        "CLAUDE_CODE_SUBPROCESS_ENV_SCRUB" in a
+        for a in run_doctor(scope="user")["advisories"]
+    )
+
+
+def test_c15_hooks_and_mcp_resolve_the_config_dir(tmp_path: Path, monkeypatch) -> None:
+    """The hook-side resolvers follow the same rule as install: content and
+    state (claude_base), Claude Code's projects/ and .claude.json."""
+    _home, project = sandbox(tmp_path, monkeypatch)
+    config = tmp_path / "cc"
+    monkeypatch.setenv("CLAUDE_CONFIG_DIR", str(config))
+
+    assert claude_base() == config
+    assert insight_writer._project_dir(str(project)).parent == config / "projects"
+    assert memory_staleness.home_projects() == config / "projects"
+    assert install_mcp._scope_config_path("user")[0] == config / ".claude.json"
+    assert install_mcp._scope_config_path("local", project)[0] == (
+        config / ".claude.json"
+    )
 
 
 # --- C-18: one exclude file per clone ---------------------------------------

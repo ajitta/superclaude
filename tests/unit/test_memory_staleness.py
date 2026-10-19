@@ -136,7 +136,7 @@ def test_memory_dir_uses_shared_encoder_for_dotted_project(
     resolved = mod.project_memory_dir()
     assert (
         resolved
-        == mod.HOME_PROJECTS / claude_projects_dir_name(str(project)) / "memory"
+        == mod.home_projects() / claude_projects_dir_name(str(project)) / "memory"
     )
     assert "." not in resolved.parent.name and "_" not in resolved.parent.name, (
         f"memory dir keeps characters Claude Code encodes: {resolved.parent.name}"
@@ -161,7 +161,7 @@ def test_memory_dir_anchored_on_project_root_not_cwd(
     # would silently find nothing.
     expected = claude_projects_dir_name(str(tmp_path))
     resolved = mod.project_memory_dir()
-    assert resolved == mod.HOME_PROJECTS / expected / "memory"
+    assert resolved == mod.home_projects() / expected / "memory"
     assert not resolved.parent.name.endswith("-src-pkg"), (
         f"memory dir followed CWD into the subdirectory: {resolved.parent.name}"
     )

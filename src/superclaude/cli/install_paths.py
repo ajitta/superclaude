@@ -18,7 +18,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 from superclaude import __version__
-from superclaude.utils import detect_scope, same_dir
+from superclaude.utils import detect_scope, same_dir, user_claude_dir
 
 from .retired_skill_files import RETIRED_SKILL_FILES
 
@@ -108,8 +108,8 @@ def get_base_path(scope: str = "user") -> Path:
     """
     if scope in ("project", "local"):
         return Path.cwd() / ".claude"
-    else:  # user (default)
-        return Path.home() / ".claude"
+    else:  # user (default): $CLAUDE_CONFIG_DIR when set (ADR-0002)
+        return user_claude_dir()
 
 
 def find_install_root(start: Path) -> Path | None:
@@ -235,28 +235,38 @@ def found_installs_lines(command: str) -> List[str]:
     ]
 
 
-def config_dir_warning() -> Optional[str]:
-    """The warning for a CLAUDE_CONFIG_DIR that is not ~/.claude, or None.
+def config_dir_notices() -> List[str]:
+    """What a user-scope command says about a CLAUDE_CONFIG_DIR away from ~/.claude.
 
-    Claude Code reads its user configuration from CLAUDE_CONFIG_DIR when it is
-    set; user scope installs to ~/.claude regardless, so with the variable set
-    elsewhere a user install is never loaded. Following the variable is an
-    open design question (an ADR), so for now this only says so.
+    User scope follows the variable (ADR-0002), so with it set the install goes
+    where Claude Code reads. Two things still need saying: an older install
+    left in ~/.claude, which that Claude Code no longer reads (Q2 a: reported,
+    never moved), and ``CLAUDE_CODE_SUBPROCESS_ENV_SCRUB``, which removes the
+    variable from hook subprocesses, so the hooks look in ~/.claude (Q1 a).
     """
-    value = os.environ.get("CLAUDE_CONFIG_DIR")
-    if not value:
-        return None
-    config_dir = Path(value).expanduser()
+    if not os.environ.get("CLAUDE_CONFIG_DIR", "").strip():
+        return []
     user_base = get_base_path("user")
-    if same_dir(config_dir, user_base):
-        return None
-    return (
-        f"⚠️  CLAUDE_CONFIG_DIR is set to {config_dir}: Claude Code reads its user "
-        f"configuration there, but superclaude's user scope is {user_base}, which "
-        "that Claude Code does not read. Start Claude Code without "
-        "CLAUDE_CONFIG_DIR to load this install, or install at --scope project "
-        "or --scope local inside a project."
-    )
+    default = Path.home() / ".claude"
+    if same_dir(user_base, default):
+        return []
+    notices: List[str] = []
+    if has_install(default):
+        notices.append(
+            f"ℹ️  CLAUDE_CONFIG_DIR is set, so user scope is {user_base}. A user "
+            f"install also exists at {default}, which this Claude Code does not "
+            "read; to remove it, run 'superclaude uninstall --scope user' with "
+            "CLAUDE_CONFIG_DIR unset."
+        )
+    scrub = os.environ.get("CLAUDE_CODE_SUBPROCESS_ENV_SCRUB", "").strip().lower()
+    if scrub not in ("", "0", "false", "no", "off"):
+        notices.append(
+            "⚠️  CLAUDE_CODE_SUBPROCESS_ENV_SCRUB removes CLAUDE_CONFIG_DIR from "
+            f"hook subprocesses, so superclaude's hooks look in {default}, not "
+            f"{user_base}, and find no user install. Install at --scope project "
+            "or --scope local inside a project, or turn the scrub off."
+        )
+    return notices
 
 
 def _get_package_root() -> Path:

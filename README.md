@@ -167,7 +167,7 @@ The uninstall is marker-based: it removes only the hooks and the `@superclaude/C
 
 | Scope | Path | When to use |
 |-------|------|-------------|
-| `user` | `~/.claude/` | Personal global install (default — daily use) |
+| `user` | `~/.claude/` (or `$CLAUDE_CONFIG_DIR` when set, the directory Claude Code then reads) | Personal global install (default — daily use) |
 | `project` | `./.claude/` (committed) | Team-shared, checked into git |
 | `local` | `./.claude/` (kept out of git via `.git/info/exclude`) | Personal install inside a team repo (uses `settings.local.json`, `CLAUDE.local.md`) |
 

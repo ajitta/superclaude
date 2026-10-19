@@ -27,7 +27,7 @@ from .install_paths import (
     _get_source_dir,
     _get_target_dir,
     _run,
-    config_dir_warning,
+    config_dir_notices,
     console_script_problems,
     find_legacy_skills,
     find_unshipped,
@@ -652,9 +652,7 @@ def install_all(
 
     messages = []
     if scope == "user":
-        warning = config_dir_warning()
-        if warning:
-            messages.append(warning)
+        messages.extend(config_dir_notices())
     # Read before the agents are rewritten below.
     memory_moves = agent_memory_move_notice(base_path, scope) if force else None
     total_installed = 0

@@ -46,6 +46,7 @@ from superclaude.utils import (
     project_key,
     project_root,
     session_slug,
+    user_claude_dir,
 )
 
 
@@ -130,7 +131,7 @@ def _project_dir(cwd: str) -> Path:
     shared encoder's — a private copy here once left ``.`` unencoded and found
     no transcript for any dotted cwd.
     """
-    return Path.home() / ".claude" / "projects" / claude_projects_dir_name(cwd)
+    return user_claude_dir() / "projects" / claude_projects_dir_name(cwd)
 
 
 def _find_transcript(session_id: str | None, cwd: str) -> Path | None:
