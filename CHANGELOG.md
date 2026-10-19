@@ -8,6 +8,8 @@ Releases before 4.19.0 are not listed. Their history is the git log; the upstrea
 
 ## [Unreleased]
 
+## [4.30.2] - 2026-10-19
+
 ### Changed
 
 - `install`, `update` and `uninstall` keep your `settings.json` (or `settings.local.json`) as you had it: the file's permission mode (the atomic write used to leave it 0600), its indentation (tabs or spaces; a one-line object stays one line), its line ending, whether it ends with a newline, and non-ASCII text written as is; spacing inside a line, number forms (`1e3`, `1.50`) and escapes (`\/`, `\u00e9` next to raw non-ASCII) are re-serialised. A settings file the install creates ends with a newline and gets the mode a plain file save would, not 0600. The hook state files under `.superclaude_hooks/` (loop-guard history, the PR cache, MCP fallback hints) are created the same way, with the mode your umask gives a new file (typically 0644) instead of 0600; an existing one keeps its mode.
