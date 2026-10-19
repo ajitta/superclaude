@@ -8,6 +8,13 @@ Releases before 4.19.0 are not listed. Their history is the git log; the upstrea
 
 ## [Unreleased]
 
+## [4.30.3] - 2026-10-19
+
+### Changed
+
+- `superclaude --help`, `install --help`, `update --help` and `uninstall --help` describe what the CLI actually does. A local install is kept out of git through `.git/info/exclude`, not `.gitignore`, and `uninstall --scope local` removes that exclude block. `install` and `uninstall` list skills and templates among what they install and remove. `update` re-installs every component where an install exists. The tool and the package description call superclaude a Claude Code content framework; the retired PM Agent is no longer mentioned. The `make sync-local` and `make uninstall-local` help says `.git/info/exclude` too.
+- README no longer promises Deep Research confidence thresholds or time estimates that no shipped file defines; the depth table shows what `RESEARCH_CONFIG` sets. It credits `insights.jsonl` to `/sc:insight`, lists `skills/` and templates in the install tree, and lists the retired flags and the removed Serena server.
+
 ## [4.30.2] - 2026-10-19
 
 ### Changed
