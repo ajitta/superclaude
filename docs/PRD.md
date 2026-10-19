@@ -26,12 +26,13 @@ delivery mechanism. There is no engine, daemon, or proxy in the loop.
   `hooks/hooks.json`) to the repo — every hook command is
   `superclaude hook <name>`, so the files are identical on every checkout;
   `--scope local` gives one teammate a
-  personal install inside a shared repo, gitignored, on `settings.local.json` +
+  personal install inside a shared repo, kept out of git via `.git/info/exclude`, on `settings.local.json` +
   `CLAUDE.local.md`. Conventions assume multiple people and multiple repos —
   doc filenames carry a username for exactly this reason.
 - **Tertiary — a contributor authoring framework content here.** Writes against
   `.claude/rules/*-authoring.md` and is held by the structural tests
-  (`tests/unit/test_{agent,command,skill,mode}_structure.py`).
+  (`tests/unit/test_{agent,command,mode,output_style}_structure.py`,
+  `test_sc_author_skill.py`, `test_sc_prompt_skill.py`).
 
 ## Core Features
 
@@ -74,24 +75,25 @@ The load-bearing set. Anything not on this list is support for something on it.
 - **No duplicated user prose docs.** The inherited `docs/user-guide/` tree was
   archived 2026-05-15 because it contradicted the live SSOT; content docs live
   next to the content in `src/superclaude/`.
-- **No GitHub issue tracker.** GitHub issues are disabled; work items are
+- **No GitHub issue tracker.** GitHub issues are not used; work items are
   markdown under `.scratch/<feature>/` (`docs/agents/issue-tracker.md`).
 - **No UI beyond terminal text.** See `docs/UI-GUIDE.md` for the one surface
   that does exist.
 
 ## Success Metrics
 
-- **`uv run pytest` exits 0.** CI runs the suite on Python 3.10/3.11/3.12 for
-  every push and PR to `master` and `integration`. A red test is a regression,
-  never a known issue.
+- **`uv run pytest` exits 0.** CI runs the suite on the Python versions and
+  triggers `.github/workflows/test.yml` declares (pull requests to `master`,
+  and `make ci` before a release). A red test is a regression, never a known
+  issue.
 - **Install is reversible and non-destructive.** Re-install without `--force`
   skips; `uninstall` preserves user hooks, MCP servers, and CLAUDE.md content
   because removal is marker-scoped. Pinned by `test_cli_install.py`,
   `test_install_settings.py`, `test_verify_drift.py`.
 - **Source and installed copy agree.** `superclaude verify-drift` reports no
   drift after a sync; `superclaude doctor` passes every check.
-- **Behavioral claims are measured, not asserted.** `evals/run_eval.py` runs a
-  4-arm × 7-task matrix; hard gates are safety invariants whose failure exits
+- **Behavioral claims are measured, not asserted.** `evals/run_eval.py` runs
+  every arm in its `ARMS` over the matrix tasks of `tasks.yaml`; hard gates are safety invariants whose failure exits
   `2` regardless of soft-metric averages, and the gate set is pinned by
   `tests/unit/test_eval_harness.py`.
 - **Docs do not drift silently.** Derived counts are pinned to the source tree

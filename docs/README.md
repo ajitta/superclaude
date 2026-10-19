@@ -14,14 +14,18 @@ User-facing documentation is the framework content itself — its SSOT lives in 
 
 | Dir | Holds |
 |---|---|
-| `specs/` | Discovery + design docs for in-flight work (created when a standalone spec is written; none in flight as of 2026-09-15) |
+| `adr/` | Architecture decision records |
+| `agents/` | Conventions for coding agents: issue tracker, triage labels, domain docs |
+| `features/` | Phased feature folders (README + numbered phase docs), the default for multi-doc work |
 | `plans/` | Implementation plans for in-flight work |
 | `research/` | External research, evidence gathering |
 | `analysis/` | Codebase analysis, retrospectives |
 | `reports/` | Living reference docs (`UPPER_SNAKE`, no date) |
 | `experiments/` | A/B harness outputs |
-| `troubleshooting/` | Active install/runtime troubleshooting |
+| `codex/` | Working guides for improving and verifying `src/superclaude/` (the component inventory lives there) |
 | `archive/` | Finished or no-longer-valid docs + legacy upstream user-docs — see `archive/README.md` |
+
+A `specs/` directory is created by the first standalone discovery or design doc (`RULES_DOCS.md` slug resolution) and is absent until then.
 
 ## Why no user guide here
 

@@ -1,7 +1,7 @@
 ---
 title: 런타임·설치·배포 개선 플레이북
 status: working-guide
-last_verified: 2026-08-22
+last_verified: 2026-10-19
 applies_to:
   - src/superclaude/cli
   - src/superclaude/hooks
@@ -116,7 +116,7 @@ uv run pytest tests/unit/test_verify_drift.py -v
 uv run pytest tests/unit/test_scope_paths.py -v
 ```
 
-`make verify`와 `make test-plugin`은 현재 내부 실패를 nonzero로 보장하지 않으므로
+`make test-plugin`은 현재 내부 실패를 nonzero로 보장하지 않으므로 (옛 `verify` 타깃은 4.29.0에서 제거됨)
 릴리스 hard gate로 사용하지 않는다. 직접 명령의 exit code를 확인한다.
 
 ## 7. Clean artifact gate

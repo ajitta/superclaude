@@ -1,7 +1,7 @@
 ---
 title: 행동 평가와 회귀 플레이북
 status: working-guide
-last_verified: 2026-08-22
+last_verified: 2026-10-19
 applies_to:
   - evals
   - src/superclaude content behavior
@@ -36,8 +36,8 @@ Actual outcome evaluation
 
 `[REPO]` 현재 `evals/`는 다음을 제공한다.
 
-- 4 arms: `vanilla`, `sc-full`, `sc-core-lite`, `sc-command-only`
-- 7 matrix tasks
+- arms: `evals/run_eval.py`의 `ARMS` 튜플이 정의한다 (`evals/README.md` 표)
+- matrix tasks: `tasks.yaml`에서 `canary_only: true`가 아닌 task
 - canary-flagged sc-full canary (`canary: true` in `evals/tasks.yaml`)
 - `gate: true`로 선언된 7 security/constraint hard gates
 - source와 host user config에서 격리된 임시 workspace

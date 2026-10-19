@@ -58,10 +58,10 @@ superclaude/
 - `adr/` — decision records (the *why*)
 - `codex/prompting_session_raw/` — **component & delivery map is the inventory SSOT**
 - `features/<slug>/` — phased feature folders (README + NN-phase docs)
-- `specs/`, `plans/`, `research/`, `analysis/` — standalone phase docs
+- `plans/`, `research/`, `analysis/` — standalone phase docs (a specs directory appears with the first standalone spec)
 - `reports/` — generated output, including this file
-- `guides/`, `testing/`, `troubleshooting/`, `agents/` — reference material
-- `archive/`, `experiments/`, `mistakes/` — historical
+- `agents/` — conventions for coding agents (issue tracker, triage labels, domain docs)
+- `archive/`, `experiments/` — historical
 
 ## Counting things
 
@@ -98,11 +98,11 @@ uv run superclaude install --list-all  # smoke-test CLI changes
 
 **Do not run `uv sync`.** The dev toolchain lives in
 `[project.optional-dependencies].dev`, not a default group, so `uv sync` prunes
-it — ruff, mypy, pytest-cov and friends get uninstalled and the suite
+it — ruff, mypy and pytest-asyncio get uninstalled and the suite
 stops running. Rebuild the venv with `uv venv && uv pip install -e ".[dev]"`.
 
 ## Git
 
-Branches: `master` ← `integration` ← `feature/*`, `fix/*`, `docs/*`
+Branches: `stable` (release channel, moved only by `make release`) ← `master` (development) ← `feature/*`, `fix/*`, `docs/*` — `AGENTS.md` Git Workflow is the source
 Commits: `feat:`, `fix:`, `docs:`, `refactor:`, `test:`, `chore:` — scope suffix
 common in practice (`fix(cli):`, `refactor(mcp):`).
