@@ -30,7 +30,7 @@ pytest 카운트, coverage, description 문자 수처럼 커밋마다 바뀌는 
 | `templates/docs-scaffold/*` | 4 | `/sc:init` 문서 scaffold |
 | `skills/*` | 2 | 스킬 디렉터리 (`/sc-author`, `/sc-prompt`) |
 | distinct hook entry scripts | 10 | `hooks.json`의 14개 등록에서 직접 호출 |
-| 전체 Python module | 53 | CLI, hook, 자동화, 공용 경로, plugin |
+| 전체 Python module | 54 | CLI, hook, 자동화, 공용 경로, plugin |
 
 ## 2. 전달과 강제 경계
 

@@ -2,8 +2,9 @@
 Path Resolution for superclaude Installation
 
 Provides path constants and resolution functions used by all install modules.
-Leaf dependency: imports no other cli module, so every install module can import
-it without a cycle. superclaude.utils is allowed — it imports nothing from cli.
+Leaf dependency: imports no other cli module but the generated data table
+``retired_skill_files``, so every install module can import it without a cycle.
+superclaude.utils is allowed — it imports nothing from cli.
 """
 
 import functools
@@ -18,6 +19,8 @@ from typing import Any, Dict, List, Optional, Tuple
 
 from superclaude import __version__
 from superclaude.utils import detect_scope, same_dir
+
+from .retired_skill_files import RETIRED_SKILL_FILES
 
 # Component definitions: (source_subdir, target_subdir, description)
 # Note: the hook registration is handled separately by install_hooks()
@@ -312,85 +315,17 @@ def _digests(text: str) -> Tuple[str, ...]:
 # and uninstall remove a file or directory under one of these names only when
 # its text is one of these revisions. Anything else under the name stays.
 #
+# A skill's table covers every file it shipped (RETIRED_SKILL_FILES, generated
+# into retired_skill_files.py); its SKILL.md decides whether the directory is
+# superclaude's at all, and then only the files the table matches go.
+#
 # Without the install side of that prune, an upgrade leaves them in place: the
 # auto-invocable skills (confidence-check, verbalized-sampling,
 # using-superclaude) keep firing with no source left to explain them, and a
 # local-scope install no longer git-excludes them, so they surface as untracked
 # files in a team repo.
 RETIRED_SKILL_DIGESTS = {
-    "brainstorming": _digests("10271c555d435a7b 51fe3e9a91c4ba0c 6ec8d057d2043cc1"),
-    "confidence-check": _digests(
-        """
-        093e2c6cba32d69e 2066f9274d2bdf59 219e6a0312444ad6 3092c4f57bf9cc3c
-        3868d6e216f813f5 41337bf901a80b5a 45925a2f4e9674df 5077c299b15dc3bd
-        51fdef103b4b5615 53d821472b37e9d4 633bdf03f2baa723 64d151ed5758f017
-        6cf848c110dcc5de 6f1805320580cb8f 6f9774694ca8835e 74aa7d4821df6409
-        758f5a51d1a5f887 7b4bebd7802bb937 87f5dcd0938730b4 8d801d7bd789043d
-        98fdabacbe2b1f46 9bdf5abe3e40cf40 9d4ea93588c8744a a84a8d29a4c351bc
-        b7f79438885e7c57 bf94b98d64f55f2b c425e17264998059 c8836d38511bf20e
-        d2ab3593cec50d92 ddbee1d49c796559 ec37cb90a65e0d35 f0c20427c562d6b1
-        """
-    ),
-    "dispatching-parallel-agents": _digests(
-        "5202a10d7bf01a27 885fec2019497e8f fa96fe849432c2f7"
-    ),
-    "executing-plans": _digests("7784bb2723ad9759 b2456676e60c750b f8e715bec50a1224"),
-    "finishing-a-development-branch": _digests(
-        """
-        173a141f20c02783 1df4d47dc8607e16 44b390fc668c130c 4da78fbc6c104bb4
-        5b4b05b15a53a8dc 85b9cb0dac3b3238 aa3c3335d28eb498 aa4665b180099ec4
-        affa2bcac4938e4e b4a4e310571f74bc d138a935e9b790d3 e6ce95f72ec51328
-        f2ba69c806f2b268 f3ff99e7e6428df3 f769e61958babb60
-        """
-    ),
-    "receiving-code-review": _digests(
-        "01aeebd6d8d07c30 6a2e90c6598701db f266ad098558da84"
-    ),
-    "requesting-code-review": _digests(
-        "13b0cd6e4ec39d9f e63ca1f14ff16f31 f6f3b5b56b4d46bd"
-    ),
-    "ship": _digests(
-        """
-        212af326e94dfff6 3caa0bfd7389ee92 47daeca418555ef9 5a5b8547706b1fca
-        656f4fa3c7eddb8f 6dd964673c6fcea6 6e2904b8a9db7ed6 759133dbc162a83d
-        a776e69b214cf814 b57a96f73e1b12b2 ef01fd68320fa318 effc1fcd33a55d7e
-        f250bc99bced709c
-        """
-    ),
-    "simplicity-coach": _digests(
-        """
-        06970b665c30fd19 173f40fe58e80ec8 1e09fd4fa61005b6 314816b5bd012a62
-        316c38c88e4d8a1c 32abc06a93563b9b 36930e07fe01d06d 61c970e49651b13f
-        66440ccb4790d748 668e03b4936311b2 71d33bf2705bf6b6 72d3a708eda46f4a
-        922a7eb18901e37a 99d88c90ab676682 9a6c5c58f098c199 a4bbdc495ff60137
-        b8dba1aa7c811808 c5c7815b44e95400 d0f14dd05b062ab4 dbb5f2f3b8ebc4d4
-        f2fb762d0c48e579 f8f05e0fd2fcf1be f93e363586264f3c fa90ce9d14658226
-        fc23f01090d092da
-        """
-    ),
-    "systematic-debugging": _digests(
-        "2d64bfcd9722c5bd 4f8a6935ab718be5 808f10944972e555"
-    ),
-    "test-driven-development": _digests(
-        "00b8e1038b8f3632 2c6a4f2ecd844437 3d19797a2d43b1b0"
-    ),
-    "using-git-worktrees": _digests(
-        "14b7a72c1a1d9e53 49ab5ba6add4038b b52de69df7b96e67"
-    ),
-    "using-superclaude": _digests(
-        "60f2391008995b87 907aa83297e622a8 a2833a5ea4cbed45 cae1bcd2dc926a8f"
-    ),
-    "verbalized-sampling": _digests(
-        """
-        2c21ce95bfe3620d 2f192421b8da9e42 44fdaf9a497fc4b0 6509d07a8430c964
-        6732ba6645494d3b 7017e4cacc349337 a04ce3628dee4250 bcdaa496c26ccb19
-        c34e36fb5f12ac7d c5d3a7014d7413c8 e3bffb0ea8da083b
-        """
-    ),
-    "verification-before-completion": _digests(
-        "1eadb466bc837878 c1fb276d216b35d0 f05e8dcc020a36cd"
-    ),
-    "writing-plans": _digests("40b4ead954e03b2c 6bc43e1d273d0b8a bd92e4f7cf565177"),
+    name: files["SKILL.md"] for name, files in RETIRED_SKILL_FILES.items()
 }
 LEGACY_SKILL_NAMES = tuple(RETIRED_SKILL_DIGESTS)
 
@@ -480,33 +415,103 @@ def find_legacy_skills(base_path: Path) -> list:
 
     Only the exact shipped names holding a shipped SKILL.md are matched:
     ``.claude/skills`` is shared with every other tool that installs skills, so
-    anything else there is someone else's and must be left alone.
+    anything else there is someone else's and must be left alone. A directory
+    reached through a symlink (or junction) is the user's link, never followed.
+    Once install has reduced one to files superclaude did not ship, it no longer
+    matches: the user's now.
     """
     skills_dir = base_path / "skills"
     return [
         skills_dir / name
         for name in LEGACY_SKILL_NAMES
-        if (skills_dir / name).is_dir() and _is_shipped_skill(skills_dir / name)
+        if (skills_dir / name).is_dir()
+        and not _is_link(skills_dir / name)
+        and _is_shipped_skill(skills_dir / name)
     ]
+
+
+def legacy_skill_files(skill_dir: Path) -> Tuple[List[Path], List[Path]]:
+    """Split a retired skill directory into superclaude's files and the rest.
+
+    A file is superclaude's when its path in the directory and its text are a
+    revision that skill shipped (RETIRED_SKILL_FILES). Everything else is kept:
+    a file the user added, a shipped file they edited, and every symlink —
+    superclaude never shipped one, so one is neither followed nor removed.
+
+    Returns:
+        (superclaude's files, SKILL.md last so an interrupted removal leaves
+        the directory recognisable to the next run; the entries kept)
+    """
+    shipped = RETIRED_SKILL_FILES.get(skill_dir.name, {})
+    forms = _placeholder_forms(skill_dir)
+    ours: List[Path] = []
+    kept: List[Path] = []
+    for path in _entries(skill_dir):
+        rel = path.relative_to(skill_dir).as_posix()
+        if rel in shipped and _is_shipped_skill_file(path, shipped[rel], forms):
+            ours.append(path)
+        else:
+            kept.append(path)
+    ours.sort(key=lambda p: p == skill_dir / "SKILL.md")
+    return ours, kept
+
+
+def remove_legacy_skill(skill_dir: Path) -> int:
+    """Remove superclaude's files from a retired skill, then every directory
+    left empty, deepest first. Returns how many entries were kept."""
+    ours, kept = legacy_skill_files(skill_dir)
+    for path in ours:
+        path.unlink()
+    _remove_empty_dirs(skill_dir)
+    return len(kept)
+
+
+def kept_skill_files_notice(skill_dir: Path, kept: int) -> str:
+    """The line install and uninstall print for a retired skill that stays."""
+    return (
+        f"ℹ️  Kept {kept} file(s) in {skill_dir}: superclaude did not ship them "
+        "(you added or edited them there); the skill's shipped files were removed"
+    )
+
+
+def _is_link(path: Path) -> bool:
+    """A symlink, or on Windows a junction (Python 3.12+ can tell)."""
+    isjunction = getattr(os.path, "isjunction", None)
+    return path.is_symlink() or bool(isjunction and isjunction(path))
+
+
+def _entries(directory: Path) -> List[Path]:
+    """Every non-directory entry under ``directory``; links are entries, not followed."""
+    found: List[Path] = []
+    for child in sorted(directory.iterdir()):
+        if child.is_dir() and not _is_link(child):
+            found.extend(_entries(child))
+        else:
+            found.append(child)
+    return found
+
+
+def _remove_empty_dirs(directory: Path) -> None:
+    for child in directory.iterdir():
+        if child.is_dir() and not _is_link(child):
+            _remove_empty_dirs(child)
+    if not any(directory.iterdir()):
+        directory.rmdir()
 
 
 def _shipped_digest(data: bytes, digests: Tuple[str, ...]) -> bool:
     return hashlib.sha256(data.replace(b"\r\n", b"\n")).hexdigest()[:16] in digests
 
 
-def _is_shipped_skill(skill_dir: Path) -> bool:
-    """Whether a retired skill directory holds superclaude's text (RETIRED_SKILL_DIGESTS).
+def _placeholder_forms(skill_dir: Path) -> List[Tuple[bytes, bytes]]:
+    """What ``{{SKILLS_PATH}}`` and ``{{SCRIPTS_PATH}}`` were resolved to.
 
-    Releases cd2f8aab → b806c61c resolved ``{{SKILLS_PATH}}`` and
-    ``{{SCRIPTS_PATH}}`` in SKILL.md at install: the absolute path (``str`` or
-    ``as_posix``) at user scope, and at local scope before 2026-03; the
-    ``.claude/...`` relative path otherwise. The copy is compared with each of
-    those substitutions undone too.
+    Releases cd2f8aab → b806c61c resolved them at install (in SKILL.md, the
+    only file that carried them): the absolute path (``str`` or ``as_posix``)
+    at user scope, and at local scope before 2026-03; the ``.claude/...``
+    relative path otherwise. A copy is compared with each substitution undone
+    too, in every file of the skill.
     """
-    try:
-        data = (skill_dir / "SKILL.md").read_bytes().replace(b"\r\n", b"\n")
-    except OSError:
-        return False
     base = skill_dir.parent.parent
     forms = [
         (".claude/skills", ".claude/superclaude/scripts"),
@@ -516,14 +521,33 @@ def _is_shipped_skill(skill_dir: Path) -> bool:
             for form in (Path.as_posix, str)
         ),
     ]
+    return [(skills.encode(), scripts.encode()) for skills, scripts in forms]
+
+
+def _is_shipped_skill_file(
+    path: Path, digests: Tuple[str, ...], forms: List[Tuple[bytes, bytes]]
+) -> bool:
+    """Whether ``path`` is a regular file holding one of ``digests``' texts."""
+    if _is_link(path) or not path.is_file():
+        return False
+    try:
+        data = path.read_bytes().replace(b"\r\n", b"\n")
+    except OSError:
+        return False
     candidates = [data] + [
-        data.replace(skills.encode(), b"{{SKILLS_PATH}}").replace(
-            scripts.encode(), b"{{SCRIPTS_PATH}}"
-        )
+        data.replace(skills, b"{{SKILLS_PATH}}").replace(scripts, b"{{SCRIPTS_PATH}}")
         for skills, scripts in forms
     ]
-    digests = RETIRED_SKILL_DIGESTS.get(skill_dir.name, ())
     return any(_shipped_digest(text, digests) for text in candidates)
+
+
+def _is_shipped_skill(skill_dir: Path) -> bool:
+    """Whether a retired skill directory's SKILL.md is superclaude's text."""
+    return _is_shipped_skill_file(
+        skill_dir / "SKILL.md",
+        RETIRED_SKILL_DIGESTS.get(skill_dir.name, ()),
+        _placeholder_forms(skill_dir),
+    )
 
 
 def _is_shipped_agent(agent_file: Path) -> bool:

@@ -23,7 +23,10 @@ from .install_paths import (
     find_legacy_skills,
     find_retired_agents,
     get_base_path,
+    kept_skill_files_notice,
+    legacy_skill_files,
     md_names,
+    remove_legacy_skill,
     shipped_md_names,
     shipped_names,
 )
@@ -383,15 +386,30 @@ def uninstall_all(
             messages.append(
                 f"[DRY-RUN] Would remove: {len(stale)} skill(s) from a pre-removal release"
             )
+            try:
+                for d in stale:
+                    kept = len(legacy_skill_files(d)[1])
+                    if kept:
+                        messages.append(
+                            f"[DRY-RUN] Would keep {kept} file(s) in {d}: superclaude "
+                            "did not ship them (you added or edited them there)"
+                        )
+            except OSError as e:
+                messages.append(f"❌ Failed to read legacy skills: {e}")
+                failed += 1
             removed += 1
         else:
             try:
+                notices = []
                 for d in stale:
-                    shutil.rmtree(d)
+                    kept = remove_legacy_skill(d)
+                    if kept:
+                        notices.append(kept_skill_files_notice(d, kept))
                 messages.append(
                     f"✅ Removed: {len(stale)} skill(s) from a pre-removal release "
                     f"(preserved non-superclaude skills)"
                 )
+                messages.extend(notices)
                 removed += 1
             except OSError as e:
                 messages.append(f"❌ Failed to remove legacy skills: {e}")

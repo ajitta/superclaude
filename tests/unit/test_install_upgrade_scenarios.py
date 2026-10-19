@@ -3,10 +3,11 @@
 Each ``tests/fixtures/legacy_installs/<era>.json`` records what a real old
 installer left on disk, captured once from a sandbox run of that release
 (docs/features/install-upgrade-audit/02-scenarios.md). Content the installer
-reads — agents, SKILL.md, settings, CLAUDE files, exclude files — is kept as
-exact text in ``_blobs.json``; everything else is a sha256 the builder writes as
-a stub. Machine paths are tokens: ``$HOME``, ``$PROJECT``, ``$PYTHON``,
-``$UVCACHE``. No network, no git history: the fixtures are the history.
+reads — agents, SKILL.md and every file of a retired skill, settings, CLAUDE
+files, exclude files — is kept as exact text in ``_blobs.json``; everything
+else is a sha256 the builder writes as a stub. Machine paths are tokens:
+``$HOME``, ``$PROJECT``, ``$PYTHON``, ``$UVCACHE``. No network, no git history:
+the fixtures are the history.
 
 The defects the audit found are pinned here by ID, each test written red
 before its fix (docs/features/install-upgrade-audit/03-findings.md).
@@ -1208,6 +1209,314 @@ def test_v1_a_retired_skill_with_a_relative_skills_path_still_goes(
 
     assert success, message
     assert not skill.parent.exists(), message
+
+
+# --- W-1: a retired skill loses only the files superclaude shipped ------------
+#
+# A retired skill directory whose SKILL.md is superclaude's was removed whole
+# (`rmtree`), with a file the user added there and a shipped file they edited.
+# Now only a file whose path and text are a shipped revision of that skill goes
+# (cli/retired_skill_files.py); the rest stays, directories go once empty, and
+# a symlink is never followed. The ownership gate is still SKILL.md: a skill
+# whose SKILL.md the user edited is theirs, helpers and all.
+
+W1_ERA = "ec6fa7e2p-user"
+W1_SKILL = "verbalized-sampling"
+W1_OPERATIONS = ["install", "install --force", "update", "uninstall -y"]
+_KEPT_LINE = re.compile(r"Kept (\d+) file\(s\) in (.+?): ")
+
+
+def _w1_shipped() -> dict[str, str]:
+    """W1_SKILL's files as W1_ERA's installer wrote them, by path in the skill."""
+    prefix = f"$HOME/.claude/skills/{W1_SKILL}/"
+    files = {
+        key[len(prefix) :]: BLOBS[entry["blob"]]
+        for key, entry in load_era(W1_ERA)["files"].items()
+        if key.startswith(prefix)
+    }
+    assert "SKILL.md" in files and "references/theory.md" in files, files
+    return files
+
+
+def _plant_w1_skill(base: Path, case: dict) -> Path:
+    skill = base / "skills" / W1_SKILL
+    shipped = _w1_shipped()
+    files = {**shipped, **case["add"]}
+    for rel, suffix in case["edit"].items():
+        files[rel] = shipped[rel] + suffix
+    for rel, text in files.items():
+        (skill / rel).parent.mkdir(parents=True, exist_ok=True)
+        (skill / rel).write_text(text, encoding="utf-8", newline="")
+    return skill
+
+
+def _tree(skill: Path) -> dict[str, bytes]:
+    return {
+        path.relative_to(skill).as_posix(): path.read_bytes()
+        for path in skill.rglob("*")
+        if path.is_file()
+    }
+
+
+def _kept_lines(output: str) -> list[str]:
+    return [line for line in output.splitlines() if _KEPT_LINE.search(line)]
+
+
+W1_CASES = {
+    "shipped-only": {"add": {}, "edit": {}, "kept": set(), "ours": True},
+    "user-file": {
+        "add": {"my-notes.md": "my notes\n"},
+        "edit": {},
+        "kept": {"my-notes.md"},
+        "ours": True,
+    },
+    "edited-helper": {
+        "add": {},
+        "edit": {"references/theory.md": "\nmy correction\n"},
+        "kept": {"references/theory.md"},
+        "ours": True,
+    },
+    "nested-user-dir": {
+        "add": {
+            "mine/deeper/notes.txt": "deep notes\n",
+            "references/mine.md": "my reference\n",
+        },
+        "edit": {},
+        "kept": {"mine/deeper/notes.txt", "references/mine.md"},
+        "ours": True,
+    },
+    # SKILL.md edited: the skill is the user's, its unchanged helpers with it.
+    "edited-skill-md": {
+        "add": {},
+        "edit": {"SKILL.md": "\nmy rule\n"},
+        "kept": {
+            "SKILL.md",
+            "references/examples.md",
+            "references/paper-methodology.md",
+            "references/theory.md",
+        },
+        "ours": False,
+    },
+}
+
+
+@pytest.mark.parametrize("case", W1_CASES)
+@pytest.mark.parametrize("operation", W1_OPERATIONS)
+@pytest.mark.parametrize("scope", SCOPES)
+def test_w1_retired_skill_loses_only_the_files_superclaude_shipped(
+    tmp_path: Path, monkeypatch, scope: str, operation: str, case: str
+) -> None:
+    """W-1: a retired skill whose SKILL.md is shipped text was rmtree'd, taking
+    a file the user added there and a shipped file the user edited."""
+    _home, _project, base = fresh_install(tmp_path, monkeypatch, scope)
+    spec = W1_CASES[case]
+    skill = _plant_w1_skill(base, spec)
+    before = _tree(skill)
+
+    result = CliRunner().invoke(main, [*operation.split(), "--scope", scope])
+
+    output = all_output(result)
+    assert result.exit_code == 0, output
+    assert "Traceback" not in output, output
+    after = _tree(skill) if skill.exists() else {}
+    assert after == {rel: before[rel] for rel in spec["kept"]}, output
+    if not spec["kept"]:
+        assert not skill.exists(), output
+    assert not (skill / "references").exists() or any(
+        rel.startswith("references/") for rel in spec["kept"]
+    ), "an emptied directory was left behind"
+    kept = _kept_lines(output)
+    if spec["ours"] and spec["kept"]:
+        assert len(kept) == 1, output
+        count, where = _KEPT_LINE.search(kept[0]).groups()
+        assert int(count) == len(spec["kept"]), kept
+        assert where.replace("\\", "/").endswith(f"skills/{W1_SKILL}"), kept
+    else:
+        assert kept == [], output
+
+
+def _symlink(link: Path, target: Path) -> None:
+    try:
+        link.symlink_to(target, target_is_directory=target.is_dir())
+    except (OSError, NotImplementedError) as e:  # Windows without the privilege
+        pytest.skip(f"cannot create a symlink here: {e}")
+
+
+@pytest.mark.parametrize("operation", ["install", "uninstall -y"])
+@pytest.mark.parametrize("scope", SCOPES)
+def test_w1_a_symlink_inside_a_retired_skill_is_kept_and_never_followed(
+    tmp_path: Path, monkeypatch, scope: str, operation: str
+) -> None:
+    """superclaude never shipped a symlink: one in a retired skill is the
+    user's, even at a shipped path pointing at shipped text, and what it points
+    at is outside the skill."""
+    _home, _project, base = fresh_install(tmp_path, monkeypatch, scope)
+    skill = _plant_w1_skill(base, W1_CASES["shipped-only"])
+    outside = tmp_path / "outside"
+    outside.mkdir()
+    (outside / "theory.md").write_text(
+        _w1_shipped()["references/theory.md"], encoding="utf-8", newline=""
+    )
+    (outside / "SKILL.md").write_text(
+        _w1_shipped()["SKILL.md"], encoding="utf-8", newline=""
+    )
+    outside_before = snapshot(outside)
+    (skill / "references" / "theory.md").unlink()
+    _symlink(skill / "references" / "theory.md", outside / "theory.md")
+    _symlink(skill / "linked", outside)
+
+    result = CliRunner().invoke(main, [*operation.split(), "--scope", scope])
+
+    output = all_output(result)
+    assert result.exit_code == 0, output
+    assert snapshot(outside) == outside_before, output
+    assert (skill / "references" / "theory.md").is_symlink(), output
+    assert (skill / "linked").is_symlink(), output
+    assert not (skill / "SKILL.md").exists(), output
+    assert not (skill / "references" / "examples.md").exists(), output
+    kept = _kept_lines(output)
+    assert len(kept) == 1 and _KEPT_LINE.search(kept[0]).group(1) == "2", output
+
+
+@pytest.mark.parametrize("operation", ["install", "uninstall -y"])
+@pytest.mark.parametrize("scope", SCOPES)
+def test_w1_a_symlinked_retired_skill_directory_is_left_alone(
+    tmp_path: Path, monkeypatch, scope: str, operation: str
+) -> None:
+    """A retired name that is a symlink to a directory elsewhere is the user's
+    link: rmtree refused it (an install failure) and nothing may follow it."""
+    _home, _project, base = fresh_install(tmp_path, monkeypatch, scope)
+    elsewhere = _plant_w1_skill(tmp_path / "elsewhere", W1_CASES["shipped-only"])
+    before = snapshot(elsewhere)
+    link = base / "skills" / W1_SKILL
+    _symlink(link, elsewhere)
+
+    result = CliRunner().invoke(main, [*operation.split(), "--scope", scope])
+
+    output = all_output(result)
+    assert result.exit_code == 0, output
+    assert link.is_symlink(), output
+    assert snapshot(elsewhere) == before, output
+
+
+@pytest.mark.parametrize("case", ["shipped-only", "user-file", "nested-user-dir"])
+@pytest.mark.parametrize("scope", SCOPES)
+def test_w1_uninstall_dry_run_says_what_stays_and_changes_nothing(
+    tmp_path: Path, monkeypatch, scope: str, case: str
+) -> None:
+    home, project, base = fresh_install(tmp_path, monkeypatch, scope)
+    spec = W1_CASES[case]
+    skill = _plant_w1_skill(base, spec)
+    before = (snapshot(home), snapshot(project))
+
+    result = CliRunner().invoke(main, ["uninstall", "--dry-run", "--scope", scope])
+
+    output = all_output(result)
+    assert result.exit_code == 0, output
+    assert (snapshot(home), snapshot(project)) == before, output
+    assert "[DRY-RUN] Would remove: 1 skill(s) from a pre-removal release" in output
+    keep = re.findall(r"\[DRY-RUN\] Would keep (\d+) file\(s\) in (.+?): ", output)
+    if spec["kept"]:
+        assert [int(n) for n, _ in keep] == [len(spec["kept"])], output
+        assert keep[0][1].replace("\\", "/").endswith(f"skills/{W1_SKILL}"), output
+    else:
+        assert keep == [], output
+    assert skill.exists()
+
+
+@pytest.mark.parametrize("scope", SCOPES)
+def test_w1_a_second_install_removes_and_reports_nothing(
+    tmp_path: Path, monkeypatch, scope: str
+) -> None:
+    """Once reduced to the user's files the directory is the user's: a repeat
+    install neither touches it nor mentions it."""
+    _home, _project, base = fresh_install(tmp_path, monkeypatch, scope)
+    spec = {
+        "add": {"my-notes.md": "my notes\n", "mine/notes.txt": "deep\n"},
+        "edit": {"references/theory.md": "\nmy correction\n"},
+    }
+    skill = _plant_w1_skill(base, spec)
+    first = CliRunner().invoke(main, ["install", "--scope", scope])
+    assert first.exit_code == 0, all_output(first)
+    assert len(_kept_lines(all_output(first))) == 1, all_output(first)
+    after_first = _tree(skill)
+    assert set(after_first) == {"my-notes.md", "mine/notes.txt", "references/theory.md"}
+
+    second = CliRunner().invoke(main, ["install", "--scope", scope])
+
+    output = all_output(second)
+    assert second.exit_code == 0, output
+    assert _tree(skill) == after_first, output
+    assert "pre-removal" not in output and _kept_lines(output) == [], output
+
+
+@pytest.mark.parametrize("scope", SCOPES)
+def test_w1_verify_drift_and_doctor_follow_what_install_removes(
+    tmp_path: Path, monkeypatch, scope: str
+) -> None:
+    """RETIRED (and doctor's `retired` advisory) while the skill still holds
+    superclaude's files; none once install has reduced it to the user's."""
+    _home, _project, base = fresh_install(tmp_path, monkeypatch, scope)
+    skill = _plant_w1_skill(
+        base,
+        {
+            "add": {"my-notes.md": "my notes\n"},
+            "edit": {"references/theory.md": "\nmy correction\n"},
+        },
+    )
+    drift = CliRunner().invoke(main, ["verify-drift", "--scope", scope, "--verbose"])
+    assert drift.exit_code == 1, all_output(drift)
+    assert f"{W1_SKILL}/: RETIRED" in all_output(drift), all_output(drift)
+    assert any("1 retired" in a for a in run_doctor(scope=scope)["advisories"])
+
+    install = CliRunner().invoke(main, ["install", "--scope", scope])
+    assert install.exit_code == 0, all_output(install)
+
+    drift = CliRunner().invoke(main, ["verify-drift", "--scope", scope, "--verbose"])
+    output = all_output(drift)
+    assert drift.exit_code == 0, output
+    assert "RETIRED" not in output and W1_SKILL not in output, output
+    assert not any("retired" in a for a in run_doctor(scope=scope)["advisories"])
+    assert set(_tree(skill)) == {"my-notes.md", "references/theory.md"}
+
+
+def test_w1_skill_md_is_removed_last(tmp_path: Path, monkeypatch) -> None:
+    """SKILL.md is what marks the directory superclaude's: removed last, an
+    interrupted removal leaves the rest for the next run to find."""
+    from superclaude.cli.install_paths import legacy_skill_files
+
+    _home, _project, base = fresh_install(tmp_path, monkeypatch, "user")
+    skill = _plant_w1_skill(base, W1_CASES["user-file"])
+
+    ours, kept = legacy_skill_files(skill)
+
+    assert ours[-1] == skill / "SKILL.md"
+    assert sorted(p.relative_to(skill).as_posix() for p in ours) == sorted(
+        _w1_shipped()
+    )
+    assert kept == [skill / "my-notes.md"]
+
+
+def test_w1_retired_skill_files_module_is_generated_from_the_fixture() -> None:
+    """cli/retired_skill_files.py is what the generator renders from the
+    shipped-names history; editing either alone fails here."""
+    import importlib.util
+
+    script = Path(__file__).resolve().parents[2] / "scripts" / "gen_shipped_names.py"
+    spec = importlib.util.spec_from_file_location("gen_shipped_names", script)
+    assert spec and spec.loader
+    generator = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(generator)
+    from superclaude.cli import install_paths, retired_skill_files
+
+    rendered = generator.render_retired_skill_files(HISTORY)
+    committed = Path(retired_skill_files.__file__).read_text(encoding="utf-8")
+    assert committed == rendered, REGENERATE
+    assert set(HISTORY["retired_skill_files"]) == set(install_paths.LEGACY_SKILL_NAMES)
+    for name, files in HISTORY["retired_skill_files"].items():
+        assert {d[:16] for d in files["SKILL.md"]} == {
+            d[:16] for d in HISTORY["retired_skill_digests"][name]
+        }, (name, REGENERATE)
 
 
 RETIRED_EVENTS = ("Setup", "TeammateIdle", "TaskCompleted")

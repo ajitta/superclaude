@@ -9,7 +9,9 @@ every file under each shipped directory of a directory component (templates,
 skills) and CLAUDE_SC.md. The merged hooks.json is NOT drift-checked. In the
 directories Claude Code shares with the user (agents/, output-styles/,
 skills/) only names superclaude shipped count: a retired agent name is EXTRA, a
-retired superclaude skill directory RETIRED, anything else is not ours.
+retired skill directory RETIRED while its SKILL.md is superclaude's (install
+then removes its shipped files; what it keeps is the user's, not drift),
+anything else is not ours.
 Restated for the user in the `superclaude verify-drift` help text; keep the
 two in step.
 """
@@ -39,7 +41,7 @@ OK = "OK"
 MISSING = "MISSING"  # In source but not in target
 DRIFTED = "DRIFTED"  # Content mismatch
 EXTRA = "EXTRA"  # In target but not in source
-RETIRED = "RETIRED"  # A superclaude skill directory no release ships now
+RETIRED = "RETIRED"  # A retired skill directory still holding superclaude's files
 
 # The files in a shared directory that a release shipped and this one does
 # not, holding superclaude's text: the only unshipped files there that are ours.

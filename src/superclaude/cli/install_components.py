@@ -32,7 +32,9 @@ from .install_paths import (
     find_legacy_skills,
     find_unshipped,
     get_base_path,
+    kept_skill_files_notice,
     probe_console_script,
+    remove_legacy_skill,
     scope_command,
     shipped_names,
 )
@@ -669,15 +671,20 @@ def install_all(
 
     # Upgrade path: drop skills a pre-removal release installed. Uninstall prunes
     # them too, but nobody upgrading runs uninstall, and leaving them means the
-    # auto-invocable ones keep firing with no source left to explain them.
+    # auto-invocable ones keep firing with no source left to explain them. Only
+    # the files superclaude shipped go; one the user added or edited stays.
     stale_skills = find_legacy_skills(base_path)
     if stale_skills:
         try:
+            notices = []
             for d in stale_skills:
-                shutil.rmtree(d)
+                kept = remove_legacy_skill(d)
+                if kept:
+                    notices.append(f"   {kept_skill_files_notice(d, kept)}")
             messages.append(
                 f"🧹 Removed {len(stale_skills)} skill(s) from a pre-removal release"
             )
+            messages.extend(notices)
         except OSError as e:
             total_failed += 1
             messages.append(f"❌ Legacy skill cleanup: {e}")

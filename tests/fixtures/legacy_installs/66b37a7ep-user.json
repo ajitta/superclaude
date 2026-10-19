@@ -200,16 +200,13 @@
    "blob": "894b1b3bf60071e4"
   },
   "$HOME/.claude/skills/confidence-check/__init__.py": {
-   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-   "size": 0
+   "blob": "e3b0c44298fc1c14"
   },
   "$HOME/.claude/skills/confidence-check/confidence.ts": {
-   "sha256": "a0b60e99ab360f6dcc6b3d7cfbbd6776813592d41102a23b3176f7c530f1ad2c",
-   "size": 3342
+   "blob": "a0b60e99ab360f6d"
   },
   "$HOME/.claude/skills/confidence-check/scripts/validate_confidence_context.py": {
-   "sha256": "31629b48ced8325a9489d397ba4f07f2c9a63eeab6b6a061b8c9a26230171ea5",
-   "size": 2361
+   "blob": "31629b48ced8325a"
   },
   "$HOME/.claude/skills/ship/SKILL.md": {
    "blob": "47daeca418555ef9"
@@ -218,20 +215,16 @@
    "blob": "9cdc469efb532323"
   },
   "$HOME/.claude/skills/simplicity-coach/assets/dependency-audit-checklist.md": {
-   "sha256": "eab907e49a212763b80d9c86d7d169f9104b70cad21ab73f83c56bf45ca35142",
-   "size": 1930
+   "blob": "eab907e49a212763"
   },
   "$HOME/.claude/skills/simplicity-coach/references/orient-step-learn-examples.md": {
-   "sha256": "0b88eae9b8203258934d098295ea5554e7667d324f52cfe114d3e492d357b9d9",
-   "size": 3586
+   "blob": "0b88eae9b8203258"
   },
   "$HOME/.claude/skills/simplicity-coach/references/practices-reference.md": {
-   "sha256": "14e4df704ad91a82cc7835d3ac23d78fd163fe275d0553129bad50bc154d34fb",
-   "size": 3209
+   "blob": "14e4df704ad91a82"
   },
   "$HOME/.claude/skills/simplicity-coach/scripts/dependency-audit.py": {
-   "sha256": "e13713311c34589021ee250c4d363afdde159e1e0942ea5367a56d878a2bc690",
-   "size": 7339
+   "blob": "e13713311c345890"
   },
   "$HOME/.claude/superclaude/CLAUDE_SC.md": {
    "sha256": "83b1b08130108577ca35f0026162542bfedfae1200e4b6ab4e69f9f26705287f",
