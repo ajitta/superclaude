@@ -23,7 +23,7 @@ revised: 2026-10-19
 
 ## 2. C-15 — `CLAUDE_CONFIG_DIR` 경고 범위
 
-- [ ] W7 결과를 보고 결정한다. W7 결과: settings, 컴포넌트, user `CLAUDE.md`가 모두 `CLAUDE_CONFIG_DIR`의 디렉터리에서 읽힌다.
+- [x] W7 결과를 보고 결정한다. W7 결과: settings, 컴포넌트, user `CLAUDE.md`가 모두 `CLAUDE_CONFIG_DIR`의 디렉터리에서 읽힌다. → (b)로 결정했고 [ADR-0002](../adr/0002-user-scope-follows-claude-config-dir.md)로 구현했다(`feat/claude-config-dir`).
 
 지금은 user scope의 install과 doctor만 경고한다. uninstall은 경고하지 않고, `$CLAUDE_CONFIG_DIR/.claude.json`의 user-scope MCP 서버도 다루지 않는다. W7이 "Claude Code는 그 변수의 디렉터리를 읽는다"를 확인하면 Q15 (a) ADR(`get_base_path`가 변수를 따름)의 근거가 된다.
 
