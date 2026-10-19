@@ -107,3 +107,18 @@ PASS WITH FIXES — C-20, C-21, 안내 문구 통일, doctor 비용은 sandbox�
 - `str` 구간의 Windows 설치를 실제 옛 설치기로 실행하지는 않았다. 해당 커밋의 SKILL.md를 그 시기 코드와 같은 방식(Windows `str` 경로, text mode CRLF)으로 렌더링해 제품 matcher에 넣었다.
 - root 사용자: `os.access`는 root에게 늘 True이므로 root로 실행하면 읽기 전용 거절이 동작하지 않는다(테스트도 root에서는 skip). 확인하지 않았다.
 - macOS ACL, 다른 사용자 소유의 settings 파일, hardlink된 settings 파일(`os.replace`가 link를 끊음)은 재현하지 않았다.
+
+## Y-1..Y-6 applied
+
+Applied on `fix/install-file-fidelity` after this report (2026-10-19); the Linux mutations m16 and m17 are red now, and the two older defects are fixed on the branch rather than deferred.
+
+| # | What changed | Commit | Test |
+|---|---|---|---|
+| Y-1 | `atomic_write_text` resolves a symlink and writes to its target, the temp file made in the target's directory; `atomic_write_json` and every hook-state writer go through it | 491553ef | `test_c21_a_symlinked_settings_file_stays_a_symlink` (U/P/L), `test_c21_atomic_write_text_writes_through_a_symlink` (both red before the fix) |
+| Y-2 | 03 W-2 row, 04a and the `fixture_tokens`, relative-path and `_placeholder_forms` docstrings now say what was established here: cd2f8aab → e1b2fbe7 wrote `str(...resolve())`, 757e3649 → b806c61c `as_posix()`, `_placeholder_forms` undoes both | 35143fec | `test_placeholder_forms_undo_the_str_form_on_every_platform` (a `WindowsEraPath`, a `PureWindowsPath` with an identity `resolve`, so the `str` and `as_posix` forms differ on Linux: m17 red here), `test_v1_a_retired_skill_in_the_str_era_form_still_goes` (user, local; the `str` form and CRLF end to end, told apart from `as_posix` by the Windows job) |
+| Y-3 | `_read_only_problem` helper, called for the settings file (`check_mode`), the CLAUDE file and the git exclude file in the preflight | 4caba09b | `test_c21_a_read_only_input_file_is_refused_before_any_write` (settings, CLAUDE, exclude × U/P/L × install, update, uninstall, dry-run; the CLAUDE and exclude cases red before the fix, the CLAUDE one with the 117-file traceback) |
+| Y-4 | Option (a), documented in CHANGELOG. The 0600 was never a decision, only `mkstemp`'s side effect; the files hold branch names, PR lines, input hashes and server stamps; the directory is the user's own `.claude` tree; and one rule ("a new file gets what a plain save would") is easier to state than a second mode parameter whose callers must each be justified. An existing 0600 file keeps 0600 | (this commit) | `test_c21_a_new_settings_file_gets_the_umask_mode` (unchanged) |
+| Y-5 | `_era_path` (as_posix) is the one place the fixture turns a path into the eras' form; `test_fixture_tokens_are_forward_slash_paths` feeds `fixture_tokens` a `WindowsEraPath` home, so `str(home)` would show backslashes on Linux (m16 red here), and the Windows-form test says what it checks (the digest table, not the fixture fix) | 35143fec | `test_fixture_tokens_are_forward_slash_paths` |
+| Y-6 | 03 C-21 residuals name the number forms, `\/` and `\uXXXX` cases and that uninstall does not give them back; the CHANGELOG first sentence ends "spacing inside a line, number forms and escapes are re-serialised". No code change: keeping `1e3` or `\/` needs a round-tripping JSON parser, not cheap | (this commit) | none (documentation) |
+
+`uv run pytest`, `make format`, `make lint` and `make typecheck` are clean at the end of the series; the Windows dispatch is recorded in [04a](./04a-handoff.md).
