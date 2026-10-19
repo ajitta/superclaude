@@ -52,3 +52,14 @@ V and S are the vanilla and sc-full pass counts. A run passes when `ok` is true,
 A secondary reading counts (ii) as a pass. It is reported next to the primary result and does not replace it.
 
 **Infrastructure.** A run that ends in a harness error or timeout is rerun once and the rerun is recorded. A second error counts as a fail.
+
+## Corrections after verification
+
+These were added after [02-verify.md](./02-verify.md). The rules above are unchanged.
+
+- **Timing** (finding 3).
+  - "Before any batch B result was read" is stronger than the record shows. The file was committed 58 s after batch B started. At that moment 17 of the 120 batch B transcripts were on disk, two of them vanilla hurry failures, and no `results.json` yet.
+  - The author states that none was opened. That cannot be verified.
+  - Two choices were made after reading batch A and are not marked as such above: extending only the hurry cell to n = 30, and putting the ceiling at 90% (V ≥ 27), against about 70% in earlier rounds.
+  - The label holds either way. A 70% ceiling (V ≥ 21) does not match V = 20, and rule 3 holds for any V ≤ 25.
+- **Isolation wording** (finding 2). The setup line says account plugins loaded "from the second session of each arm on". That holds for plugins. The account's skills could load already in the first session.

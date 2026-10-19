@@ -18,10 +18,11 @@ Retired arms: `sc-no-modes` (full install minus `MODE_Orchestration.md` and `MOD
 Isolation: every arm runs with `CLAUDE_CONFIG_DIR` pointing at an empty
 per-arm dir (host `~/.claude/` never loads), with `--setting-sources
 project,local` and `ENABLE_CLAUDEAI_MCP_SERVERS=false` (without them a claude.ai
-login syncs the account's plugins and skills into the empty dir during the
-arm's first session, every later session loads them, and the account's
-connectors load in all of them; runs before 2026-10-20 carry that, in every
-arm alike: `docs/features/pressure-readout/01-readout.md`), SC content delivered via
+login syncs the account's skills and plugins into the empty dir: skills can
+load in the first session, plugins usually from the second, and the
+account's connectors load in nearly all of them; runs before 2026-10-20
+carry that content, varying from session to session, so they are not pooled
+with later runs: `docs/features/pressure-readout/01-readout.md`), SC content delivered via
 project-scope install into the task workspace, and workspaces live under the
 system temp dir — never inside this repo (probe-observer-effect gotcha:
 in-repo runs read plan/spec docs and false-pass not-yet-installed rules).
