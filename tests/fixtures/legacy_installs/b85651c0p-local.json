@@ -1,0 +1,433 @@
+{
+ "backs": "U7: .gitignore block era",
+ "captured": "2026-10-19",
+ "captured_with": "old-install.sh: git archive <ref> | uvx --offline --from <extract> superclaude install --scope <s> </dev/null",
+ "commit": "b341af4b",
+ "empty_dirs": [],
+ "era": "b85651c0p-local",
+ "files": {
+  "$PROJECT/.claude/agents/backend-architect.md": {
+   "blob": "0259c10d74a141ed"
+  },
+  "$PROJECT/.claude/agents/business-panel-experts.md": {
+   "blob": "5d256a7112dfc466"
+  },
+  "$PROJECT/.claude/agents/deep-researcher.md": {
+   "blob": "220185eb87aaec3e"
+  },
+  "$PROJECT/.claude/agents/devops-architect.md": {
+   "blob": "80d8c61ad6a65eb2"
+  },
+  "$PROJECT/.claude/agents/frontend-architect.md": {
+   "blob": "9bf2fca1095cc26e"
+  },
+  "$PROJECT/.claude/agents/git-workflow.md": {
+   "blob": "4b5dfa75ae98f793"
+  },
+  "$PROJECT/.claude/agents/insight-analyst.md": {
+   "blob": "a8204b264c1b7557"
+  },
+  "$PROJECT/.claude/agents/learning-guide.md": {
+   "blob": "2c64edbab24f7a76"
+  },
+  "$PROJECT/.claude/agents/performance-engineer.md": {
+   "blob": "d811cc3b9174d40d"
+  },
+  "$PROJECT/.claude/agents/project-initializer.md": {
+   "blob": "9c7b0890bcfd14b7"
+  },
+  "$PROJECT/.claude/agents/project-manager.md": {
+   "blob": "cc64519e3be5d40b"
+  },
+  "$PROJECT/.claude/agents/python-expert.md": {
+   "blob": "e609d138d06ccf1c"
+  },
+  "$PROJECT/.claude/agents/quality-engineer.md": {
+   "blob": "f91d96de2f4f880f"
+  },
+  "$PROJECT/.claude/agents/refactoring-expert.md": {
+   "blob": "8ad3556ecbae360a"
+  },
+  "$PROJECT/.claude/agents/repo-index.md": {
+   "blob": "350ea4dc4b982238"
+  },
+  "$PROJECT/.claude/agents/requirements-analyst.md": {
+   "blob": "7e72bee517a93c90"
+  },
+  "$PROJECT/.claude/agents/root-cause-analyst.md": {
+   "blob": "791c9e89da40645c"
+  },
+  "$PROJECT/.claude/agents/security-engineer.md": {
+   "blob": "5def231c2b08e3fd"
+  },
+  "$PROJECT/.claude/agents/self-review.md": {
+   "blob": "d76951d6b44e3747"
+  },
+  "$PROJECT/.claude/agents/simplicity-guide.md": {
+   "blob": "2cabe2363f577cd9"
+  },
+  "$PROJECT/.claude/agents/socratic-mentor.md": {
+   "blob": "7abc9f9426c4f188"
+  },
+  "$PROJECT/.claude/agents/system-architect.md": {
+   "blob": "bcd51884a5fe6830"
+  },
+  "$PROJECT/.claude/agents/technical-writer.md": {
+   "blob": "5d36938531bdc580"
+  },
+  "$PROJECT/.claude/commands/sc/agent.md": {
+   "sha256": "613a8b520086e73732ed8638013940a63531d7d37516e886f8e1f37566d7f4b4",
+   "size": 3149
+  },
+  "$PROJECT/.claude/commands/sc/analyze.md": {
+   "sha256": "7c56dfec7c29d4f7826f67cd1c7102ecd82d414db06fa8e4192ab298a7ec1b6c",
+   "size": 4299
+  },
+  "$PROJECT/.claude/commands/sc/auto-improve.md": {
+   "sha256": "4d8c39bad98141daf8f5f51df68cb11492efc6c82d1848894947243d0050e21e",
+   "size": 3448
+  },
+  "$PROJECT/.claude/commands/sc/brainstorm.md": {
+   "sha256": "dcdff9fd203122e3ef5dee5fa3fbf6243e8430c3dfdbf26ffbf36b6945fc5fef",
+   "size": 5609
+  },
+  "$PROJECT/.claude/commands/sc/build.md": {
+   "sha256": "922cc62d3236ca41bfc77938552c06caf114737cb82f4c697a67d6c541430f00",
+   "size": 2412
+  },
+  "$PROJECT/.claude/commands/sc/business-panel.md": {
+   "sha256": "b2e17abd7266e072902064cd84a02eb6b888fef50e4b0c1e06cc989e971f4db7",
+   "size": 3138
+  },
+  "$PROJECT/.claude/commands/sc/cleanup.md": {
+   "sha256": "67ea91477254849fb08af2708c93b6ce0b834f86f43ee76f1c73fb5541f73d96",
+   "size": 3093
+  },
+  "$PROJECT/.claude/commands/sc/design.md": {
+   "sha256": "d5084a9e085a15de7a8b61650e63d721033fa395968eeec3aadc6216c46d2d93",
+   "size": 3362
+  },
+  "$PROJECT/.claude/commands/sc/document.md": {
+   "sha256": "62fbd713220779f5c5e063aaee0952575ba45b6e6daf1decedf8e99077727717",
+   "size": 2550
+  },
+  "$PROJECT/.claude/commands/sc/estimate.md": {
+   "sha256": "abc5dbc0771e9a1f67a612a60a2c1f997337f4d25ffc0cd4f43d0281da71c173",
+   "size": 2328
+  },
+  "$PROJECT/.claude/commands/sc/explain.md": {
+   "sha256": "7bfa5342e94d446119c83494fe11757aedb9f1c1918fb87a5adaf473e9cd067b",
+   "size": 2293
+  },
+  "$PROJECT/.claude/commands/sc/git.md": {
+   "sha256": "00fb8fe58024ecf795bee170141bf7abb699d9aa9553b4c241fa5176d5403036",
+   "size": 3428
+  },
+  "$PROJECT/.claude/commands/sc/help.md": {
+   "sha256": "1e5179244774dfa4e6c7d2f8ef3fe5e7012af928b6f1dc7a981aa9c1bb080f43",
+   "size": 5161
+  },
+  "$PROJECT/.claude/commands/sc/implement.md": {
+   "sha256": "fb1d1338a07ff7ef5e940c2ea34a6aa22e8a22527b2a54c6101b768a78fa616b",
+   "size": 2999
+  },
+  "$PROJECT/.claude/commands/sc/improve.md": {
+   "sha256": "3e19dd7c77b4639b13b24426917cea20152539c0866992b7c2ef9ac64d056278",
+   "size": 1768
+  },
+  "$PROJECT/.claude/commands/sc/index-repo.md": {
+   "sha256": "69d02350557fba07460bacb0baecb38da0170c6bd534d48629435a01f93ec648",
+   "size": 2556
+  },
+  "$PROJECT/.claude/commands/sc/index.md": {
+   "sha256": "176e9128c6a0cf42c927d01f89c24c373f31b3746a7ae1e22c5ec7def93eda0e",
+   "size": 2849
+  },
+  "$PROJECT/.claude/commands/sc/init.md": {
+   "sha256": "137431177a887320ba882b384c5d8daa5d66231223e9e6c2cbfe9346e8fd3c21",
+   "size": 5986
+  },
+  "$PROJECT/.claude/commands/sc/insight.md": {
+   "sha256": "6fb9616a261427c5560c59d4d074d23e391e1250c2c663fd5a64a20a7451c261",
+   "size": 6831
+  },
+  "$PROJECT/.claude/commands/sc/load.md": {
+   "sha256": "2e792d3351f1970a8a53aec884d08846832f93579b8209d26f3dd76468c1be3b",
+   "size": 3383
+  },
+  "$PROJECT/.claude/commands/sc/plan.md": {
+   "sha256": "804b5989cbbad63b95c94cb640aa5e2fd5252218387e94d1ac7e49b954ee8e0b",
+   "size": 3603
+  },
+  "$PROJECT/.claude/commands/sc/pm.md": {
+   "sha256": "e93f568302f211e734ea29bdf317935dbed987e266ad07e23aa8ae80ce34547a",
+   "size": 1914
+  },
+  "$PROJECT/.claude/commands/sc/recommend.md": {
+   "sha256": "b7bea5d8dd0cadd98b2b6d3d4793358209ad544a00f73223c359ea30b2656b86",
+   "size": 2838
+  },
+  "$PROJECT/.claude/commands/sc/reflect.md": {
+   "sha256": "f2533e8a00f377ddc8ff7d174eecf01deea009231dc861d4166ce2b05d65e0ad",
+   "size": 2346
+  },
+  "$PROJECT/.claude/commands/sc/research.md": {
+   "sha256": "829fc2181953d2c50b48b49323c60cd783513f7fbe3f8c8ec52eed328d38e2f6",
+   "size": 2438
+  },
+  "$PROJECT/.claude/commands/sc/review.md": {
+   "sha256": "c7c5ac5ffb8ee599ed67419c97e2fb57e3fab131b4e3458e976958f21093040d",
+   "size": 4433
+  },
+  "$PROJECT/.claude/commands/sc/save.md": {
+   "sha256": "a2a2645bc67401954f3856da21e4fd9aa89557f082157ee1f3a83cc30169b002",
+   "size": 4151
+  },
+  "$PROJECT/.claude/commands/sc/sc.md": {
+   "sha256": "b73db40a8a7799c039095835c9015ef2afd309f89f248202673e9d198893d88b",
+   "size": 3715
+  },
+  "$PROJECT/.claude/commands/sc/select-tool.md": {
+   "sha256": "c40dcb8c548d79918731a7c8c7457a4dd9dd0a59449d0e82d2d710883b6a6836",
+   "size": 2376
+  },
+  "$PROJECT/.claude/commands/sc/spec-panel.md": {
+   "sha256": "9d32deaeb4347fa0899dce6566d71477f56ee094bce85f9df235a60b66f6eb5a",
+   "size": 3118
+  },
+  "$PROJECT/.claude/commands/sc/task.md": {
+   "sha256": "82499963f43602967b210b8a709c2b4f9efb3bff46e8680d9692d41800b9fe15",
+   "size": 3222
+  },
+  "$PROJECT/.claude/commands/sc/test.md": {
+   "sha256": "14f7065fcf989c3a329aef23a74f052d2b871fb9633e2ec55f3d8cb1ae443d65",
+   "size": 2755
+  },
+  "$PROJECT/.claude/commands/sc/troubleshoot.md": {
+   "sha256": "dda5a3352cd20846115b476424a0429a64fdf954c32214ab278ca250bdd83c25",
+   "size": 3225
+  },
+  "$PROJECT/.claude/commands/sc/workflow.md": {
+   "sha256": "1006649bb2d5d1f2fe6a3b16877944d65cb9aca8c4e3824f8522536c3f4460e0",
+   "size": 2782
+  },
+  "$PROJECT/.claude/hooks/hooks.json": {
+   "sha256": "ccce382b0c21c141b6616aef367393b1451d907730daa271a11567339a0ff0ed",
+   "size": 5089
+  },
+  "$PROJECT/.claude/settings.local.json": {
+   "blob": "0238c1989a58e6db"
+  },
+  "$PROJECT/.claude/skills/confidence-check/SKILL.md": {
+   "blob": "3868d6e216f813f5"
+  },
+  "$PROJECT/.claude/skills/confidence-check/__init__.py": {
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "size": 0
+  },
+  "$PROJECT/.claude/skills/confidence-check/canary.yaml": {
+   "sha256": "07d8a56816ff3d143bf06520ba0f2c3b84b826cf886354f33f07af3bc3c9244f",
+   "size": 518
+  },
+  "$PROJECT/.claude/skills/finishing-a-development-branch/SKILL.md": {
+   "blob": "aa4665b180099ec4"
+  },
+  "$PROJECT/.claude/skills/ship/SKILL.md": {
+   "blob": "212af326e94dfff6"
+  },
+  "$PROJECT/.claude/skills/ship/references/conventions.md": {
+   "sha256": "5b7220530f1f68cd22f1d548ce2a97c2b7f13aa1792fcbe236c453088b4d1903",
+   "size": 901
+  },
+  "$PROJECT/.claude/skills/simplicity-coach/SKILL.md": {
+   "blob": "922a7eb18901e37a"
+  },
+  "$PROJECT/.claude/skills/simplicity-coach/assets/dependency-audit-checklist.md": {
+   "sha256": "eab907e49a212763b80d9c86d7d169f9104b70cad21ab73f83c56bf45ca35142",
+   "size": 1930
+  },
+  "$PROJECT/.claude/skills/simplicity-coach/references/orient-step-learn-examples.md": {
+   "sha256": "0b88eae9b8203258934d098295ea5554e7667d324f52cfe114d3e492d357b9d9",
+   "size": 3586
+  },
+  "$PROJECT/.claude/skills/simplicity-coach/references/practices-reference.md": {
+   "sha256": "14e4df704ad91a82cc7835d3ac23d78fd163fe275d0553129bad50bc154d34fb",
+   "size": 3209
+  },
+  "$PROJECT/.claude/skills/simplicity-coach/scripts/dependency-audit.py": {
+   "sha256": "e13713311c34589021ee250c4d363afdde159e1e0942ea5367a56d878a2bc690",
+   "size": 7339
+  },
+  "$PROJECT/.claude/skills/verbalized-sampling/SKILL.md": {
+   "blob": "2f192421b8da9e42"
+  },
+  "$PROJECT/.claude/skills/verbalized-sampling/canary.yaml": {
+   "sha256": "b48022c56de5ffe34e3db78a7f67e43c0bad25768dd2578061333333b82e2f1b",
+   "size": 358
+  },
+  "$PROJECT/.claude/skills/verbalized-sampling/references/examples.md": {
+   "sha256": "c9e60328af18a6cb2d259d3088b9cc52491fd4b5a56219b5cf9eef12d8ee84dd",
+   "size": 9523
+  },
+  "$PROJECT/.claude/skills/verbalized-sampling/references/paper-methodology.md": {
+   "sha256": "1061e09d0978b687a73cd9de5acb1d5e320474b6f83880e23a5a4e2772389546",
+   "size": 3698
+  },
+  "$PROJECT/.claude/skills/verbalized-sampling/references/theory.md": {
+   "sha256": "4502263e6f1af28a3d33c08950d55bbaa595ba38070daacf2597744a6204cf5c",
+   "size": 3986
+  },
+  "$PROJECT/.claude/superclaude/CLAUDE_SC.md": {
+   "sha256": "83b1b08130108577ca35f0026162542bfedfae1200e4b6ab4e69f9f26705287f",
+   "size": 50
+  },
+  "$PROJECT/.claude/superclaude/core/BUSINESS_SYMBOLS.md": {
+   "sha256": "5765308b74a43d50063c6010050976f41571a5b70214a46a90a242d6ce733d7e",
+   "size": 2544
+  },
+  "$PROJECT/.claude/superclaude/core/FLAGS.md": {
+   "sha256": "e16c63f6dd8cf797cf62b8c2cbba12e1bcc0594ba4cf09b70a98d9e39b81279c",
+   "size": 5192
+  },
+  "$PROJECT/.claude/superclaude/core/PRINCIPLES.md": {
+   "sha256": "932e8f768daca0ec5d8d6522a0721555f0018b424893ee3556d08faf44bccf88",
+   "size": 2662
+  },
+  "$PROJECT/.claude/superclaude/core/RULES.md": {
+   "sha256": "ca242eb2ed5af16038a627d3aeca04d989b22f3bc132bdcb4872fb1fbddfc786",
+   "size": 17990
+  },
+  "$PROJECT/.claude/superclaude/mcp/MCP_Chrome-DevTools.md": {
+   "sha256": "605056bbddb8327853edeea612e62063d6674c63c4e0040f314bd67f2e9600af",
+   "size": 2985
+  },
+  "$PROJECT/.claude/superclaude/mcp/MCP_Context7.md": {
+   "sha256": "c6c6b8e1445745a65b8a03751cebfbb1e5a64d1ea277686f714c4a17528dd93b",
+   "size": 2906
+  },
+  "$PROJECT/.claude/superclaude/mcp/MCP_Playwright.md": {
+   "sha256": "c8ac189ea6f6fc9f1fb5710d507cf802cf2de3dfcb0c6221d72f69be8d29a6f9",
+   "size": 3633
+  },
+  "$PROJECT/.claude/superclaude/mcp/MCP_Sequential.md": {
+   "sha256": "97a1dc47bac3de867e8976b4191456bad80cc1a4f3ae6e6e382375b2f114866f",
+   "size": 2972
+  },
+  "$PROJECT/.claude/superclaude/mcp/MCP_Serena.md": {
+   "sha256": "f9513340ed3047c20c0354c6ed242988e5218e6d803864939e32c65b4a340071",
+   "size": 3756
+  },
+  "$PROJECT/.claude/superclaude/mcp/MCP_Tavily.md": {
+   "sha256": "f0a3e410dd1e2f61ef27e58dc6910ff423ea30c933c130191ad6ec449db8bf9e",
+   "size": 2466
+  },
+  "$PROJECT/.claude/superclaude/modes/MODE_Brainstorming.md": {
+   "sha256": "93a5b2fe93a3e5cf55d1222be5ff6712b11834e426d2d140526500a9f64da6f8",
+   "size": 2037
+  },
+  "$PROJECT/.claude/superclaude/modes/MODE_Business_Panel.md": {
+   "sha256": "590ca9f5e62127d67001853434e7f1e2a96cfdd5f1573ee71af3191c4ee258ec",
+   "size": 3323
+  },
+  "$PROJECT/.claude/superclaude/modes/MODE_DeepResearch.md": {
+   "sha256": "f62551819455f4199e9890dbfe8440a13c6f5274fa86058ef8b54b1d65f118e6",
+   "size": 1681
+  },
+  "$PROJECT/.claude/superclaude/modes/MODE_Introspection.md": {
+   "sha256": "7306603da1251f419a03376308e5b5b6c31367f27285b6653508b7bd15fb49bb",
+   "size": 2083
+  },
+  "$PROJECT/.claude/superclaude/modes/MODE_Orchestration.md": {
+   "sha256": "9987ce7586432224a21641189cb36f1a374aeecbdc97f04bd1ddca5ae6dac168",
+   "size": 1657
+  },
+  "$PROJECT/.claude/superclaude/modes/MODE_Task_Management.md": {
+   "sha256": "6e25362ed1886746cd1866a0b357117001cf1869b3b03107902e05ef7c8c9fd1",
+   "size": 1920
+  },
+  "$PROJECT/.claude/superclaude/modes/MODE_Token_Efficiency.md": {
+   "sha256": "c0682cbb9e9807c138b2fe5d38ad0e99aa8be2927c727db61da3ebaea6dd69e4",
+   "size": 3076
+  },
+  "$PROJECT/.claude/superclaude/modes/RESEARCH_CONFIG.md": {
+   "sha256": "da60fa9a25d9e197722d2e6d7f38501566a7a136b5c4da3282dd8713375e037d",
+   "size": 3919
+  },
+  "$PROJECT/.claude/superclaude/scripts/context_loader.py": {
+   "sha256": "b0faf2872c7d866957e0b3931b9a3ed19e2e8ba6fe2ecd94a166face4b74129f",
+   "size": 25694
+  },
+  "$PROJECT/.claude/superclaude/scripts/context_reset.py": {
+   "sha256": "f993a99e6f66b504108b399cde705a427d3031980211e037ee32fe992e9142e8",
+   "size": 2129
+  },
+  "$PROJECT/.claude/superclaude/scripts/file_size_guard.py": {
+   "sha256": "65356e4f5093910b4cba2d318205f6135581ce9a92f6d8239b0f3c1839ab6a6d",
+   "size": 4169
+  },
+  "$PROJECT/.claude/superclaude/scripts/insight_writer.py": {
+   "sha256": "037fda6b2696268568297fe55840ee91a44aad919a645de31b3d00d08d631309",
+   "size": 17492
+  },
+  "$PROJECT/.claude/superclaude/scripts/loop_guard.py": {
+   "sha256": "0218c1cc3bbda875c34620da756b30cf1bac16de1fd8bf8aa9d31602d6bfeecf",
+   "size": 5703
+  },
+  "$PROJECT/.claude/superclaude/scripts/memory_staleness.py": {
+   "sha256": "07ef2251a52aab4d6cb53e2fd04f2c7a7fa34d07755e8da09dc9894b199b5fcf",
+   "size": 3201
+  },
+  "$PROJECT/.claude/superclaude/scripts/prettier_hook.py": {
+   "sha256": "2eae113a058b67dd7280b824e94d34b3597d6347333e7bea322dd64db7567d64",
+   "size": 1972
+  },
+  "$PROJECT/.claude/superclaude/scripts/session-init.sh": {
+   "sha256": "67a72760615a0f82c940d34664770ab506fcd20f46ef35e21fd57ea5437cdc8b",
+   "size": 817
+  },
+  "$PROJECT/.claude/superclaude/scripts/session_init.py": {
+   "sha256": "5d6fe0896c3ad4c83fb3d4aa2e2d5194ce176f098022014073b58370f94f0f92",
+   "size": 5991
+  },
+  "$PROJECT/.claude/superclaude/scripts/skill-activator.sh": {
+   "sha256": "7dfa67be2c8c4d4ad8440678feba75627a9c78ebea9adba99be63131c9ce370f",
+   "size": 1145
+  },
+  "$PROJECT/.claude/superclaude/scripts/test_runner_hook.py": {
+   "sha256": "584daf1f865f94462d57a359f28a0f6f30f2c1c0c9031696f98d6efd08962d6f",
+   "size": 5201
+  },
+  "$PROJECT/.claude/superclaude/scripts/token_estimator.py": {
+   "sha256": "931dc84f521f2eedd1a088481d1e42a3571164da6948c9b0e47c118ec8ab0b95",
+   "size": 6874
+  },
+  "$PROJECT/.claude/superclaude/templates/docs-scaffold/ADR-0001-template.md": {
+   "sha256": "691ec3fa8c24cede3ac61e8eb8a2b57e0e02f9f2606db4963dd3f1e4a73eff44",
+   "size": 759
+  },
+  "$PROJECT/.claude/superclaude/templates/docs-scaffold/ARCHITECTURE.md": {
+   "sha256": "626ced1b3809c6b2df98669d4fe4131967ee0567d7f2eb000f5ec6667c846224",
+   "size": 1458
+  },
+  "$PROJECT/.claude/superclaude/templates/docs-scaffold/PRD.md": {
+   "sha256": "10a654f91ee360961a584fea8b8b181cb121517f3593d8f495883add19c52dab",
+   "size": 1418
+  },
+  "$PROJECT/.claude/superclaude/templates/docs-scaffold/UI-GUIDE.md": {
+   "sha256": "0ac008f548e0bff0d31ef420db472971c905af3653e193def9a16674b6aca53e",
+   "size": 1160
+  },
+  "$PROJECT/.git/info/exclude": {
+   "blob": "6671fe83b7a07c89"
+  },
+  "$PROJECT/.gitignore": {
+   "blob": "c9c0b47186ef60f3"
+  },
+  "$PROJECT/CLAUDE.local.md": {
+   "blob": "935755ec5f70f352"
+  }
+ },
+ "pyproject_version": "4.5.2+ajitta",
+ "ref": "b85651c0^",
+ "scope": "local"
+}

@@ -272,6 +272,15 @@ CONSOLE_HOOK_RE = re.compile(
 # so an upgrade still recognises — and migrates — those registrations.
 _SC_SCRIPTS_PATH_RE = re.compile(r"superclaude[/\\]scripts[/\\]")
 
+# Inline commands a release registered with no marker at all: the
+# `[experimental]` agent-team echoes of d174e600 → 42218e97, whose entry comment
+# lacked the tag. Matched whole, so only these exact commands count as ours and
+# uninstall can reach them.
+UNMARKED_SC_HOOK_COMMANDS = (
+    "echo 'Teammate idle — assign next task'",
+    "echo 'Task completed — aggregate results'",
+)
+
 
 def is_legacy_hook_command(command: str) -> bool:
     """Whether a hook command is a pre-console-entry registration.
@@ -295,6 +304,8 @@ def is_superclaude_inner_hook(hook: dict) -> bool:
     if any(marker in cmd for marker in SUPERCLAUDE_HOOK_MARKERS):
         return True
     if CONSOLE_HOOK_RE.search(cmd) or is_legacy_hook_command(cmd):
+        return True
+    if cmd.strip() in UNMARKED_SC_HOOK_COMMANDS:
         return True
     return any(
         marker in hook.get("_comment", "") for marker in SUPERCLAUDE_HOOK_MARKERS

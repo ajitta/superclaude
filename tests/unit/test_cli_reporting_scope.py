@@ -23,13 +23,7 @@ SC_HOOKS = {
             {
                 "matcher": "*",
                 "hooks": [
-                    {
-                        "type": "command",
-                        "command": (
-                            "$CLAUDE_PROJECT_DIR/.claude/superclaude/scripts/"
-                            "session_init.py"
-                        ),
-                    }
+                    {"type": "command", "command": "superclaude hook session_init"}
                 ],
             }
         ]

@@ -8,6 +8,7 @@ Based on the installer logic from commit d4a17fc but adapted for modern Claude C
 import os
 import platform
 import shlex
+import shutil
 import subprocess
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
@@ -226,6 +227,41 @@ def _mcp_servers_in_scope(
     return data if isinstance(data, dict) else {}
 
 
+def claude_cli_missing() -> Optional[str]:
+    """Why MCP servers cannot be unregistered here, or None when `claude` is on PATH.
+
+    `which`, not a call that raises: on Windows `_run_command` wraps the call in
+    `cmd /c`, so a missing CLI is an exit code there and FileNotFoundError
+    elsewhere — a traceback that `uninstall --remove-mcp` raised after it had
+    deleted everything else.
+    """
+    if shutil.which("claude"):
+        return None
+    return (
+        "`claude` (the Claude Code CLI) is not on PATH, and --remove-mcp needs it "
+        "to unregister servers: install it, or uninstall without --remove-mcp"
+    )
+
+
+def _runs_registry_command(entry: object, command: str) -> bool:
+    """Whether a registered server runs the registry's ``command``.
+
+    The name alone is not ownership: a user's own `playwright` with their own
+    command shares the registry's name, and `uninstall --remove-mcp` removed it
+    at every scope. `claude mcp add ... -- npx -y pkg` records ``command: npx``
+    and ``args: [-y, pkg]``; a Windows registration may wrap it in `cmd /c`.
+    """
+    if not isinstance(entry, dict) or not isinstance(entry.get("command"), str):
+        return False
+    args = entry.get("args") or []
+    if not isinstance(args, list):
+        return False
+    argv = [entry["command"], *(str(arg) for arg in args)]
+    if [part.lower() for part in argv[:2]] == ["cmd", "/c"]:
+        argv = argv[2:]
+    return argv == shlex.split(command)
+
+
 def check_mcp_server_installed(
     server_name: str,
     scope: Optional[str] = None,
@@ -256,7 +292,7 @@ def check_mcp_server_installed(
 
         return server_name.lower() in output.lower()
 
-    except (subprocess.TimeoutExpired, subprocess.SubprocessError):
+    except (subprocess.SubprocessError, OSError):
         return False
 
 
@@ -304,7 +340,7 @@ def check_plugin_installed(plugin_name: str) -> bool:
             if stripped.startswith("❯ ") and needle in stripped:
                 return True
         return False
-    except (subprocess.TimeoutExpired, subprocess.SubprocessError):
+    except (subprocess.SubprocessError, OSError):  # OSError: no `claude` on PATH
         return False
 
 
@@ -588,15 +624,21 @@ def uninstall_mcp_servers(
     """
     Remove superclaude-registered MCP servers from the given scope.
 
-    Only servers in the MCP_SERVERS registry are considered — user-added
-    servers at the same scope are left untouched.
+    Only servers in the MCP_SERVERS registry are considered, and an `mcp`
+    server only when its command is the registry's — user-added servers at the
+    same scope are left untouched, a same-name one included.
 
     Returns (removed, skipped, failed, messages).
     """
+    missing = claude_cli_missing()
+    if missing:
+        return 0, 0, 1, [f"❌ {missing}"]
+
     removed = 0
     skipped = 0
     failed = 0
     messages: List[str] = []
+    in_scope = _mcp_servers_in_scope(scope, project_root)
 
     for key, info in MCP_SERVERS.items():
         server_name = info["name"]
@@ -613,9 +655,14 @@ def uninstall_mcp_servers(
                 skipped += 1
                 continue
         else:
-            if not check_mcp_server_installed(
-                server_name, scope=scope, project_root=project_root
-            ):
+            if server_name not in in_scope:
+                skipped += 1
+                continue
+            if not _runs_registry_command(in_scope[server_name], info["command"]):
+                messages.append(
+                    f"⏭️  Kept MCP server {server_name} (scope: {scope}): its "
+                    "command is not the one superclaude registers"
+                )
                 skipped += 1
                 continue
 

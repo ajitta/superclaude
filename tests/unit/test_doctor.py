@@ -25,15 +25,17 @@ SC_HOOK_EVENTS = ["SessionStart", "UserPromptSubmit", "PostToolUse", "PreToolUse
 
 
 def _sc_hook_entry(script: str) -> dict:
-    """A hook entry the marker check attributes to superclaude."""
+    """A hook entry the marker check attributes to superclaude.
+
+    The console form: a legacy `…/superclaude/scripts/<script>` command with no
+    script copy behind it exits 2 in Claude Code, and doctor fails it.
+    """
     return {
         "matcher": "*",
         "hooks": [
             {
                 "type": "command",
-                "command": (
-                    f"$CLAUDE_PROJECT_DIR/.claude/superclaude/scripts/{script}"
-                ),
+                "command": f"superclaude hook {Path(script).stem}",
             }
         ],
     }
@@ -221,7 +223,9 @@ class TestRunDoctor:
 
         result = run_doctor()
 
-        assert len(result["checks"]) == 5
+        # The five common checks plus the exclude block local and project write.
+        assert len(result["checks"]) == 6
+        assert len(run_doctor(scope="user")["checks"]) == 5
 
 
 class TestRepairCommandNamesWhereToRun:

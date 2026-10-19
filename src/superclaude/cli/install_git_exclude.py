@@ -52,6 +52,7 @@ from .install_paths import (
     SHARED_TARGET_COMPONENTS,
     shipped_names,
 )
+from .install_settings import _encoding_problem
 
 MARKER_START = "# >>> superclaude >>>"
 MARKER_END = "# <<< superclaude <<<"
@@ -186,6 +187,20 @@ def _strip_one_block(
     return after, True
 
 
+def _holds_local_block(content: str) -> bool:
+    """Whether an SC block in ``content`` was written by a local-scope install.
+
+    Only the local block lists ``CLAUDE.local.md``, under either marker
+    generation; the legacy marker text says "(local scope)" for both scopes.
+    """
+    for start_marker, end_marker in _ALL_MARKER_PAIRS:
+        start = content.find(start_marker)
+        end = content.find(end_marker, start) if start != -1 else -1
+        if end != -1 and "CLAUDE.local.md" in content[start:end].splitlines():
+            return True
+    return False
+
+
 def _resolve_git_exclude_file(project_root: Path) -> Optional[Path]:
     """Resolve the ``info/exclude`` git actually reads for a project root.
 
@@ -232,7 +247,7 @@ def has_legacy_gitignore_block(project_root: Path) -> bool:
         return False
     try:
         return _has_any_marker(gitignore.read_text(encoding="utf-8"))
-    except OSError:
+    except (OSError, UnicodeDecodeError):
         return False
 
 
@@ -243,8 +258,21 @@ def has_exclude_block(project_root: Path) -> bool:
         return False
     try:
         return _has_any_marker(exclude_file.read_text(encoding="utf-8"))
-    except OSError:
+    except (OSError, UnicodeDecodeError):
         return False
+
+
+def exclude_problem(project_root: Path) -> Optional[str]:
+    """Why the exclude file git reads for ``project_root`` cannot be edited, or None.
+
+    Install and uninstall rewrite it as UTF-8; one in a legacy code page
+    crashed a local install at its last step, after every other file was
+    written (install_settings._encoding_problem).
+    """
+    exclude_file = _resolve_git_exclude_file(project_root)
+    if exclude_file is None:
+        return None
+    return _encoding_problem(exclude_file)
 
 
 def _migrate_legacy_gitignore(project_root: Path) -> Optional[str]:
@@ -258,6 +286,12 @@ def _migrate_legacy_gitignore(project_root: Path) -> Optional[str]:
         return None
     try:
         existing = gitignore.read_text(encoding="utf-8")
+    except UnicodeDecodeError:
+        # The team's file, in another encoding: rewriting it as UTF-8 would
+        # change every byte the team wrote, so only a block in it is reported.
+        if _has_any_marker(gitignore.read_bytes().decode("utf-8", "replace")):
+            return f"⚠️  {gitignore} is not UTF-8; remove its superclaude block by hand"
+        return None
     except OSError as e:
         return f"⚠️  Could not read legacy {gitignore}: {e}"
     stripped, had_block = _strip_block(existing)
@@ -294,16 +328,22 @@ def add_git_exclude(project_root: Path, scope: str = "local") -> Tuple[bool, str
             f"Not a git repository (skipping exclude setup): {project_root}",
         )
 
+    problem = _encoding_problem(exclude_file)
+    if problem:
+        return False, problem
+
     messages: List[str] = []
     legacy_msg = _migrate_legacy_gitignore(project_root)
     if legacy_msg is not None:
         messages.append(legacy_msg)
 
     block = _build_block(scope)
+    replaced_local = False
 
     try:
         if exclude_file.exists():
             existing = exclude_file.read_text(encoding="utf-8")
+            replaced_local = scope == "project" and _holds_local_block(existing)
             stripped, had_block = _strip_block(existing)
             base = stripped if had_block else existing
             separator = "" if base.endswith("\n") or not base else "\n"
@@ -317,7 +357,18 @@ def add_git_exclude(project_root: Path, scope: str = "local") -> Tuple[bool, str
         messages.append(
             f".git/info/exclude {action} with SC {scope} block: {exclude_file}"
         )
-        return True, "; ".join(messages)
+        text = "; ".join(messages)
+        if replaced_local:
+            # Last install wins (module docstring), and the project block lists
+            # none of a local install's files: say so rather than un-exclude a
+            # sibling worktree's install silently.
+            text += (
+                "\n⚠️  This replaced a local-scope block. Git reads one exclude "
+                "file for every worktree of this clone, so a local install in "
+                "any worktree is no longer excluded: git now sees its files as "
+                "untracked; keep them out of its commits."
+            )
+        return True, text
     except OSError as e:
         messages.append(f"Failed to write {exclude_file}: {e}")
         return False, "; ".join(messages)
@@ -349,6 +400,11 @@ def remove_git_exclude(project_root: Path) -> Tuple[bool, str]:
                 f".git/info/exclude not found (nothing to remove): {exclude_file}"
             )
         return True, "; ".join(messages)
+
+    problem = _encoding_problem(exclude_file)
+    if problem:
+        messages.append(problem)
+        return False, "; ".join(messages)
 
     try:
         existing = exclude_file.read_text(encoding="utf-8")

@@ -28,6 +28,7 @@ from .install_paths import (
     shipped_names,
 )
 from .install_settings import (
+    SC_IMPORT_RE,
     _hook_script_id,
     _load_settings,
     _split_entry,
@@ -267,9 +268,11 @@ def uninstall_all(
     This function removes:
     1. .claude/superclaude/ directory (entire directory) and commands/sc/
     2. The shipped files in agents/ and output-styles/ (user files preserved)
-    3. .claude/hooks/hooks.json file
-    4. superclaude hooks from settings.json (preserves user hooks)
-    5. @superclaude import from CLAUDE.md
+    3. .claude/hooks/hooks.json file, and the agent memory store while empty
+    4. superclaude hooks from settings.json (preserves user hooks; a file left
+       empty is deleted)
+    5. @superclaude import from CLAUDE.md (a file left with only the heading
+       install wrote is deleted)
     6. MCP servers registered by superclaude at the given scope
        (scope-aware; user-added servers are preserved)
 
@@ -289,6 +292,21 @@ def uninstall_all(
     """
     if base_path is None:
         base_path = get_base_path(scope)
+
+    # Every input is read before the first delete: steps 1-5a delete content,
+    # and a settings or CLAUDE file that step 6 or 7 then cannot read left the
+    # hooks registered and the import pointing at deleted files.
+    from .install_components import preflight_inputs
+
+    refusal = preflight_inputs(base_path, scope, settings=not keep_settings)
+    if refusal:
+        return False, refusal
+    if not keep_mcp:
+        from .install_mcp import claude_cli_missing
+
+        missing = claude_cli_missing()
+        if missing:
+            return False, f"❌ Nothing was changed: {missing}"
 
     messages = []
     removed = 0
@@ -442,6 +460,33 @@ def uninstall_all(
                 messages.append(f"❌ Failed to remove {state_dir}: {e}")
                 failed += 1
 
+    # 5b. The agent memory store install creates: removed only while empty, since
+    #     what agents saved there is the user's. Local scope's store loses its
+    #     exclude in step 8, so a store left behind is about to show up in git.
+    from .install_components import _AGENT_MEMORY_DIRS
+
+    memory_dir = base_path / _AGENT_MEMORY_DIRS[scope]
+    if memory_dir.is_dir() and not any(memory_dir.iterdir()):
+        if dry_run:
+            messages.append(f"[DRY-RUN] Would remove empty: {memory_dir}/")
+        else:
+            try:
+                memory_dir.rmdir()
+                messages.append(f"✅ Removed empty: {memory_dir}/")
+            except OSError as e:
+                messages.append(f"❌ Failed to remove {memory_dir}/: {e}")
+                failed += 1
+    elif memory_dir.is_dir() and scope == "local":
+        from .install_git_exclude import _resolve_git_exclude_file
+
+        if _resolve_git_exclude_file(base_path.parent) is not None:
+            messages.append(
+                f"⚠️  {memory_dir}/ holds agent memory and is kept, but the "
+                "exclude block that kept it out of git goes with this uninstall: "
+                "git now sees it as untracked. Delete it, or keep it out of "
+                "commits."
+            )
+
     # 6. Remove superclaude hooks from settings file (preserve user hooks)
     filename = settings_filename(scope)
     if keep_settings:
@@ -495,7 +540,7 @@ def uninstall_all(
     if dry_run:
         if claude_md_target.exists():
             content = claude_md_target.read_text(encoding="utf-8")
-            if "@superclaude" in content or "@.claude/superclaude" in content:
+            if SC_IMPORT_RE.search(content):
                 messages.append(
                     f"[DRY-RUN] Would remove superclaude import from {claude_md_label}"
                 )

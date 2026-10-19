@@ -224,8 +224,9 @@ def test_bare_module_prescription_discriminates(passage, is_prescription):
 
 class TestUninstallOutput:
     """`uninstall` prints the same lines around one `uninstall_all` call in
-    every mode; the dry run and the real run differ only in the banner, the
-    `dry_run=` argument, and that a dry run never exits 1."""
+    every mode; the dry run and the real run differ only in the banner and the
+    `dry_run=` argument. Both exit 1 on failure: a dry run fails only when
+    uninstall refuses its inputs, and then the real run would refuse too."""
 
     @staticmethod
     def _run(monkeypatch, args, success=True, stdin=None):
@@ -254,7 +255,7 @@ class TestUninstallOutput:
             "🔍 Dry-run mode: Showing what would be removed (scope: user)\n\n"
             "stub-message dry_run=True\n"
         )
-        assert result.exit_code == 0, "a dry run reports, it does not fail"
+        assert result.exit_code == 1, "a refused dry run fails like the real run"
         assert [c["dry_run"] for c in calls] == [True]
 
     def test_real_run_prints_the_banner_and_exits_1_on_failure(self, monkeypatch):

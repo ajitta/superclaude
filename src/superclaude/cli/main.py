@@ -128,7 +128,12 @@ def install(
         list_available_commands,
         list_installed_commands,
     )
-    from .install_paths import get_base_path, resolve_reporting_target
+    from .install_paths import (
+        found_installs_lines,
+        get_base_path,
+        has_install,
+        resolve_reporting_target,
+    )
 
     # Decide whether to run the interactive wizard.
     # Trigger paths:
@@ -188,20 +193,22 @@ def install(
         click.echo(f"📋 superclaude Components (scope: {scope}):\n")
         for name, info in components.items():
             status = f"{info['installed']}/{info['available']}"
-            icon = (
-                "✅"
-                if info["installed"] == info["available"] and info["available"] > 0
-                else "⬜"
-            )
-            click.echo(f"   {icon} {info['description']:40} [{status}]")
-            click.echo(f"      └─ {info['target_path']}")
             # Counts alone cannot say whether the registered hooks are the
-            # shipped ones, so name the mismatch when there is one.
+            # shipped ones, so name the mismatch when there is one — and never
+            # tick a row that names one.
             drift = ", ".join(
                 f"{info[key]} {key}"
                 for key in ("missing", "obsolete", "duplicate")
                 if info.get(key)
             )
+            if drift:
+                icon = "⚠️ "
+            elif info["installed"] == info["available"] and info["available"] > 0:
+                icon = "✅"
+            else:
+                icon = "⬜"
+            click.echo(f"   {icon} {info['description']:40} [{status}]")
+            click.echo(f"      └─ {info['target_path']}")
             if drift:
                 click.echo(f"      └─ {drift}")
         return
@@ -229,6 +236,18 @@ def install(
             "alternative: a personal install inside it, auto-gitignored, with its "
             "own settings."
         )
+        click.echo()
+
+    # --force reads as "refresh", so creating a scope with it is usually the
+    # wrong scope: `install --force` from a local project wrote a user install
+    # (gotcha sync-scope-creates). It still installs; it says so first.
+    if force and not has_install(base_path):
+        click.echo(
+            f"⚠️  No superclaude install at {scope} scope ({base_path}): "
+            "--force creates one here."
+        )
+        for line in found_installs_lines("update"):
+            click.echo(line)
         click.echo()
 
     # Install all components
@@ -330,7 +349,9 @@ def uninstall(
     )
     click.echo(message)
 
-    if not success and not dry_run:
+    # A dry run fails only when uninstall refuses its inputs, and then the real
+    # run would refuse too.
+    if not success:
         sys.exit(1)
 
 
@@ -390,8 +411,9 @@ def update(scope: str):
     """
     Update superclaude commands to latest version
 
-    Re-installs all components to match the current package version.
-    This is a convenience command equivalent to 'install --force'.
+    Re-installs all components to match the current package version, like
+    'install --force', but only where an install exists: at a scope with none
+    it exits 1, names the install it found, and creates nothing.
 
     Scopes:
     - user (default): Update ~/.claude/
@@ -402,10 +424,46 @@ def update(scope: str):
         superclaude update
         superclaude update --scope project
     """
+    from superclaude.utils import detect_scope
+
     from .install_components import install_all
-    from .install_paths import get_base_path
+    from .install_paths import (
+        found_installs_lines,
+        get_base_path,
+        has_install,
+        scope_command,
+    )
 
     base_path = get_base_path(scope)
+
+    # Update refreshes an install; it never creates one. Run at a local-only
+    # project with the default scope, it used to write a full user install
+    # into ~/.claude, and from a subdirectory a second, nested project copy.
+    # Project and local share ./.claude, so an install there of the other
+    # scope is no install of this one: `update --scope local` over a project
+    # install created a local one on top of it.
+    found = scope
+    if scope != "user" and has_install(base_path):
+        found = detect_scope(base_path.parent)
+    if found != scope:
+        click.echo(
+            f"❌ The install at {base_path} is a {found} install, not {scope}; "
+            "update refreshes an install and creates none."
+        )
+        for line in found_installs_lines("update"):
+            click.echo(line)
+        sys.exit(1)
+    if not has_install(base_path):
+        click.echo(
+            f"❌ No superclaude install at {scope} scope ({base_path}); update "
+            "refreshes an install and creates none."
+        )
+        for line in found_installs_lines("update"):
+            click.echo(line)
+        click.echo(
+            f"   To create one here: run {scope_command('install', scope, base_path)}"
+        )
+        sys.exit(1)
 
     click.echo(f"🔄 Updating superclaude to version {__version__} (scope: {scope})...")
     click.echo()
@@ -440,6 +498,10 @@ def doctor(verbose: bool, scope: str | None):
         - `superclaude` resolvable on PATH, which every hook command needs
         - CLAUDE_SC.md installed and imported
 
+    Advisories (printed, exit code unchanged): installed files that differ
+    from this release, hook registrations it does not ship, agents keeping
+    memory outside this scope's store.
+
     Scope is detected by walking up from the working directory when not given,
     so a local- or project-scope install is checked where it actually lives,
     including from a subdirectory of the project.
@@ -465,6 +527,13 @@ def doctor(verbose: bool, scope: str | None):
         if verbose and check.get("details"):
             for detail in check["details"]:
                 click.echo(f"    {detail}")
+
+    # Advisories warn without failing the run, so they print without --verbose.
+    if results["advisories"]:
+        click.echo()
+        click.echo("Advisories (these do not fail doctor):")
+        for advisory in results["advisories"]:
+            click.echo(advisory)
 
     # Summary
     click.echo()
@@ -494,9 +563,12 @@ def verify_drift_cmd(scope: str | None, verbose: bool):
     - MISSING: source file not installed
     - DRIFTED: installed file differs from source
     - EXTRA: installed file has no source counterpart
+    - RETIRED: a superclaude skill directory no release ships now
 
     Coverage: component .md files (incl. core/rules/), every file of the
-    shipped templates and skills, and CLAUDE_SC.md.
+    shipped templates and skills, and CLAUDE_SC.md. In agents/,
+    output-styles/ and skills/ your own files are not checked; only names
+    superclaude shipped are.
     Not checked: the merged hooks.json.
 
     Examples:
@@ -504,7 +576,7 @@ def verify_drift_cmd(scope: str | None, verbose: bool):
         superclaude verify-drift --verbose
         superclaude verify-drift --scope project
     """
-    from .install_paths import resolve_reporting_target
+    from .install_paths import resolve_reporting_target, scope_command
     from .verify_drift import OK, verify_drift
 
     # Defaulting to user scope reported a healthy local install as 85 missing
@@ -517,11 +589,11 @@ def verify_drift_cmd(scope: str | None, verbose: bool):
     # Display per-component results
     for comp, data in result["components"].items():
         ok = data["ok"]
-        total = ok + data["drifted"] + data["missing"] + data["extra"]
+        issues = data["drifted"] + data["missing"] + data["extra"] + data["retired"]
+        total = ok + issues
         if total == 0:
             continue
 
-        issues = data["drifted"] + data["missing"] + data["extra"]
         icon = "✅" if issues == 0 else "⚠️"
         click.echo(f"   {icon} {comp:15} {ok}/{total} OK", nl=False)
         parts = []
@@ -531,6 +603,8 @@ def verify_drift_cmd(scope: str | None, verbose: bool):
             parts.append(f"{data['missing']} missing")
         if data["extra"]:
             parts.append(f"{data['extra']} extra")
+        if data["retired"]:
+            parts.append(f"{data['retired']} retired")
         if parts:
             click.echo(f"  ({', '.join(parts)})")
         else:
@@ -539,7 +613,13 @@ def verify_drift_cmd(scope: str | None, verbose: bool):
         # Verbose: show individual files
         if verbose and data.get("files"):
             for fname, status in data["files"].items():
-                s_icon = {"OK": "✅", "DRIFTED": "🔶", "MISSING": "❌", "EXTRA": "➕"}
+                s_icon = {
+                    "OK": "✅",
+                    "DRIFTED": "🔶",
+                    "MISSING": "❌",
+                    "EXTRA": "➕",
+                    "RETIRED": "🗑️",
+                }
                 click.echo(f"      {s_icon.get(status, '?')} {fname}: {status}")
 
     # CLAUDE_SC.md
@@ -552,11 +632,17 @@ def verify_drift_cmd(scope: str | None, verbose: bool):
     if result["clean"]:
         click.echo("✅ No drift detected — installation matches source")
     else:
+        retired = (
+            f", {result['total_retired']} retired" if result["total_retired"] else ""
+        )
         click.echo(
             f"⚠️  Drift detected: {result['total_drifted']} drifted, "
             f"{result['total_missing']} missing, {result['total_extra']} extra"
+            f"{retired}"
         )
-        click.echo("   Run 'superclaude install --force' to re-sync")
+        click.echo(
+            f"   Run {scope_command('install --force', scope, base_path)} to re-sync"
+        )
         sys.exit(1)
 
 

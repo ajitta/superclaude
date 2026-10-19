@@ -6,6 +6,11 @@ on:
   pull_request:
     branches: [master]
   workflow_dispatch:
+    inputs:
+      windows:
+        description: "Also run the install/upgrade scenario module on windows-latest"
+        type: boolean
+        default: false
 
 jobs:
   test:
@@ -102,3 +107,36 @@ jobs:
       - name: Run doctor command
         run: |
           superclaude doctor --verbose --scope user
+
+  # Q2 (d) of docs/features/install-upgrade-audit: dispatch-only, never on a PR
+  # or `make ci` (which dispatches without inputs). Runs `gh workflow run Tests
+  # --ref <branch> -f windows=true`. A job in this file, not a new workflow:
+  # workflow_dispatch reaches only workflows already on the default branch.
+  # The scenario module needs no network, history or asyncio.
+  windows-scenarios:
+    name: Install/upgrade scenarios on Windows
+    if: github.event_name == 'workflow_dispatch' && inputs.windows
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+
+      # SHA-pinned: see the test job.
+      - name: Install UV
+        uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
+        with:
+          enable-cache: false
+
+      - name: Install dependencies
+        run: |
+          uv pip install --system -e ".[dev]"
+
+      - name: Run the scenario module
+        run: |
+          pytest --color=yes tests/unit/test_install_upgrade_scenarios.py

@@ -1,0 +1,824 @@
+{
+ "generated_from": "git log --first-parent --diff-merges=first-parent HEAD @ e69b3f1b",
+ "generator": "scripts/gen_shipped_names.py (full clone only)",
+ "names": {
+  "agents": [
+   {
+    "name": "backend-architect.md",
+    "first": "3762d6ab",
+    "last": "00d40c47",
+    "shipped_now": true
+   },
+   {
+    "name": "business-panel-experts.md",
+    "first": "3762d6ab",
+    "last": "00d40c47",
+    "shipped_now": true
+   },
+   {
+    "name": "deep-research-agent.md",
+    "first": "3762d6ab",
+    "last": "4c5f3d84",
+    "shipped_now": false
+   },
+   {
+    "name": "deep-research.md",
+    "first": "81343a67",
+    "last": "0f5408eb",
+    "shipped_now": false
+   },
+   {
+    "name": "deep-researcher.md",
+    "first": "e4d86aa7",
+    "last": "00d40c47",
+    "shipped_now": true
+   },
+   {
+    "name": "devops-architect.md",
+    "first": "3762d6ab",
+    "last": "00d40c47",
+    "shipped_now": true
+   },
+   {
+    "name": "frontend-architect.md",
+    "first": "3762d6ab",
+    "last": "00d40c47",
+    "shipped_now": true
+   },
+   {
+    "name": "git-workflow.md",
+    "first": "77b1897e",
+    "last": "00d40c47",
+    "shipped_now": true
+   },
+   {
+    "name": "insight-analyst.md",
+    "first": "28287607",
+    "last": "00d40c47",
+    "shipped_now": true
+   },
+   {
+    "name": "learning-guide.md",
+    "first": "3762d6ab",
+    "last": "00d40c47",
+    "shipped_now": true
+   },
+   {
+    "name": "performance-engineer.md",
+    "first": "3762d6ab",
+    "last": "00d40c47",
+    "shipped_now": true
+   },
+   {
+    "name": "pm-agent.md",
+    "first": "3762d6ab",
+    "last": "77b1897e",
+    "shipped_now": false
+   },
+   {
+    "name": "project-initializer.md",
+    "first": "c1470b7f",
+    "last": "00d40c47",
+    "shipped_now": true
+   },
+   {
+    "name": "project-manager.md",
+    "first": "4c5f3d84",
+    "last": "00d40c47",
+    "shipped_now": true
+   },
+   {
+    "name": "python-expert.md",
+    "first": "3762d6ab",
+    "last": "00d40c47",
+    "shipped_now": true
+   },
+   {
+    "name": "quality-engineer.md",
+    "first": "3762d6ab",
+    "last": "00d40c47",
+    "shipped_now": true
+   },
+   {
+    "name": "refactoring-expert.md",
+    "first": "3762d6ab",
+    "last": "00d40c47",
+    "shipped_now": true
+   },
+   {
+    "name": "repo-index.md",
+    "first": "81343a67",
+    "last": "00d40c47",
+    "shipped_now": true
+   },
+   {
+    "name": "requirements-analyst.md",
+    "first": "3762d6ab",
+    "last": "00d40c47",
+    "shipped_now": true
+   },
+   {
+    "name": "root-cause-analyst.md",
+    "first": "3762d6ab",
+    "last": "00d40c47",
+    "shipped_now": true
+   },
+   {
+    "name": "security-engineer.md",
+    "first": "3762d6ab",
+    "last": "00d40c47",
+    "shipped_now": true
+   },
+   {
+    "name": "self-review.md",
+    "first": "81343a67",
+    "last": "00d40c47",
+    "shipped_now": true
+   },
+   {
+    "name": "simplicity-guide.md",
+    "first": "f3ea4b55",
+    "last": "00d40c47",
+    "shipped_now": true
+   },
+   {
+    "name": "socratic-mentor.md",
+    "first": "3762d6ab",
+    "last": "00d40c47",
+    "shipped_now": true
+   },
+   {
+    "name": "system-architect.md",
+    "first": "3762d6ab",
+    "last": "00d40c47",
+    "shipped_now": true
+   },
+   {
+    "name": "technical-writer.md",
+    "first": "3762d6ab",
+    "last": "00d40c47",
+    "shipped_now": true
+   },
+   {
+    "name": "verifier.md",
+    "first": "7e353036",
+    "last": "00d40c47",
+    "shipped_now": true
+   }
+  ],
+  "output-styles": [
+   {
+    "name": "plain-language.md",
+    "first": "84dfa8d9",
+    "last": "d3feaf49",
+    "shipped_now": true
+   }
+  ],
+  "skills": [
+   {
+    "name": "brainstorming",
+    "first": "1777f095",
+    "last": "4229ecb0",
+    "shipped_now": false
+   },
+   {
+    "name": "confidence-check",
+    "first": "c733413d",
+    "last": "13548763",
+    "shipped_now": false
+   },
+   {
+    "name": "dispatching-parallel-agents",
+    "first": "8d9abc25",
+    "last": "4229ecb0",
+    "shipped_now": false
+   },
+   {
+    "name": "executing-plans",
+    "first": "11bccfdd",
+    "last": "4229ecb0",
+    "shipped_now": false
+   },
+   {
+    "name": "finishing-a-development-branch",
+    "first": "3e352fbd",
+    "last": "13548763",
+    "shipped_now": false
+   },
+   {
+    "name": "receiving-code-review",
+    "first": "3e352fbd",
+    "last": "4229ecb0",
+    "shipped_now": false
+   },
+   {
+    "name": "requesting-code-review",
+    "first": "3e352fbd",
+    "last": "4229ecb0",
+    "shipped_now": false
+   },
+   {
+    "name": "sc-author",
+    "first": "007be180",
+    "last": "d3feaf49",
+    "shipped_now": true
+   },
+   {
+    "name": "sc-prompt",
+    "first": "a4dcb5ea",
+    "last": "d3feaf49",
+    "shipped_now": true
+   },
+   {
+    "name": "ship",
+    "first": "e064b436",
+    "last": "13548763",
+    "shipped_now": false
+   },
+   {
+    "name": "simplicity-coach",
+    "first": "f3b5e5aa",
+    "last": "13548763",
+    "shipped_now": false
+   },
+   {
+    "name": "systematic-debugging",
+    "first": "11bccfdd",
+    "last": "4229ecb0",
+    "shipped_now": false
+   },
+   {
+    "name": "test-driven-development",
+    "first": "11bccfdd",
+    "last": "4229ecb0",
+    "shipped_now": false
+   },
+   {
+    "name": "using-git-worktrees",
+    "first": "8d9abc25",
+    "last": "4229ecb0",
+    "shipped_now": false
+   },
+   {
+    "name": "using-superclaude",
+    "first": "8d9abc25",
+    "last": "4229ecb0",
+    "shipped_now": false
+   },
+   {
+    "name": "verbalized-sampling",
+    "first": "1904ee3b",
+    "last": "13548763",
+    "shipped_now": false
+   },
+   {
+    "name": "verification-before-completion",
+    "first": "1777f095",
+    "last": "4229ecb0",
+    "shipped_now": false
+   },
+   {
+    "name": "writing-plans",
+    "first": "1777f095",
+    "last": "4229ecb0",
+    "shipped_now": false
+   }
+  ]
+ },
+ "retired_agent_digests": {
+  "deep-research-agent.md": [
+   "09869b8e4f9b28642ded23d0c22b2fae3a094eb6a75cd3015cd4d3778f2337c8",
+   "18267662f98cae9d24d9867c1207a197a2142b9e6e27599a609075091e4cb7d1",
+   "18a4a54e95be12a53221c6cb84b126125813baa8cd207ac5e5a22a036c209991",
+   "1ab5354faf3686786c60d3f74f15db67bfbe517ddeb8f3dd27193b946cd71ae0",
+   "1fad26d018dbf003ca94b2ded481c916da59e87b47daf112a104441725744825",
+   "29768c28fd3ec088f05ffb097a0f58a1d5be58fc6590cb28698fd120cbfbad5c",
+   "30e0c1a04c05ac28fec9e4d3bc8b124fa9981fc14a40355a83330da5181b79f4",
+   "364dfeeae3d6325c64b966b7cf43d72cf409097f66895f3d7c712d54ccb81107",
+   "37e562c0a9b65eb1ca059b66d17dc5a3764ee00f02b0740c443f77ff1570059c",
+   "38efb390865eea535ee8d9897c4504eb5079da6389a3f670c339af1f4378f306",
+   "3917c07d02cbe8a1a486427cbd0835fda9df5796e01245815ccd59d9aa0afa93",
+   "511166c4acd94b13811a3265e4f120dbfe30b13d753570d94ace4b03f5c0cde9",
+   "512e867f7bc698825c83c2f888e0438f8ce0a37d510a6bc84aeddeb5fbeb5d66",
+   "531d8b8500a27da1d43d8479e30adac216db07b05c138565eb621e43df10d51f",
+   "55be01776b133a155b13da4d65a6724a70772e544d4bc70f55fe51e0b8dba13d",
+   "5d5604f79c3f879a0a1dfbb174aa158d6d0906573fceb99fd8d345b7872441d0",
+   "5f9bce5f9685f941d5556c481905c55d0d8bc7c30613e1c0a295816cdaeebf7d",
+   "792d84e9ae9549037b1bbccaea8f93f94167fe2ad5a982f5b2f62670862e5ebd",
+   "855b33d7fd1b44dfd03ef6aed01cd818ceb43ecc0821e939662648919d899bf7",
+   "879608edb9d04e8a164fb89901b05a059ba4854494e7437766aaa7607195ee2c",
+   "8d9dd01179439f80e85c97a49c3073f6d17dc8262e52aa74dd2c09a95c91d5b6",
+   "90eacdee3c8d08cb43da0190501b2526eadab7297a7269b88215fbd9879e8813",
+   "9dc6d6532365162ea647caa29c77e0746f071dff43e93f428f4e9ef75257a75d",
+   "a5f7e80464dd80d41b8a65ae8190a0139743e2eded5b612251c934ace2bf327e",
+   "b48ad0765e4edf028e7a06b7c5fb8975e4a0e796b991ea96d8c531cb96ad1f09",
+   "c10a866441f9bb79a1c97c61d2cffc7f0d1e2e73c2e843bebf906665334bea41",
+   "c16d817e356d2c7506731372d4404513849dac0793b40ef166d680ba7c8c2050",
+   "d533c74c5082037411e7d2f8f9d5bdd984b20eb6190d5d2f9aa371b6696cc8ae",
+   "d574043ce4469d24e3e12819e589a2c8da7a134d8d568a60dfb6a43cf7eb892e",
+   "dd931b06f8ad33b25d7c26fa96baa89a7d5e6097b656ac45e81e6956bfcbe0ed",
+   "de58ae7232b3855abf57018996fe8a413eec6dc68583c55491e75350bc83e7c0",
+   "ea596e1c754b2c06ae425c5bcb06928b6b7fac2f5ba27b6b0cb5373d75247b67",
+   "eb63f035017085e00a7491f0f1679054cd6614eaf10a8f34e727834ac0cd989c"
+  ],
+  "deep-research.md": [
+   "1966ecf47e84d270ae0655d0a2c1aaea26b93cd2b22d179c2b4243bbf109fb0b",
+   "262002aacdca0942bbf2487ef70f278e26e693d7a912dd861742de1329bd02db",
+   "31d09ec6f550050db20bd08ce3810a60ac0e497b9de8b7a5bacb5f300c22b581",
+   "422c5f47d931af1a42c68b3dab09643ed7d2ce24578daf890a86ab2421c5e750",
+   "6354678e85ecff75696f5e355b606d25a3f59c71a93726fa0f5d3957f8f206b8",
+   "68d65a5dabad21cce78071682dbe2dcbec2f12132af52bc9d170b56cdfb22227",
+   "7218c1b0623527838c1319c68dad253cda641270c542f187ab45277db7a656c6",
+   "76be9ca83fe4f6ca8906e034aafb8113e99e75cd0f0f9dfe59dd61840cfb4b64",
+   "8009fb47730b20a2ff8d793493c9d6820519c7db3012fc542823d55e3a096fe5",
+   "822834affd172b2e74ce963e9451b46b686090171f2710c3edf67f012a875a0f",
+   "88226bc5466a7a5ab1eac5312ccfabccba69f8f68929152e396a7275acbceee5",
+   "8a56ab180ca8e5388f6219b355a9d21fb36b70e9ed3b4ebf4af7e1a5997c35ab",
+   "8ed3526b0dff31a3681c3d3e0ff5755d29bdeb8bec4ef58e3536529560155c77",
+   "a2a38559c3dd866ad689dfc8a6ded6ba8b86960f264afab629a4484c02a04500",
+   "a3b5508f0c357da71afb0d64cc0d86cccdf0fa16fbd0e20b2265d85f031a0ba6",
+   "d1634d46f831a3453c6508cb04f360829b1437c4df871d29cfdbea352442e8aa",
+   "d466654d1e12c808991e6324b22b513177911e2ffe9689a0719bc9ad7843847e",
+   "e28fbda94211ce477f505dd4d0183dfa9b8fb78f52d5b0e51e777cc44d3b008c",
+   "f1cc3609fb00f1a76d7fa0a6b11c46a760c47221a90872f6d135354320908bb1"
+  ],
+  "pm-agent.md": [
+   "0474919bc951eb8dccc82c17efaf969323fed0d7a3ecb5da0db9544cd5e6cd87",
+   "0b876558afde37644fbea3ef3a7bb801e84d329aa7c583afa923836e6d6161cd",
+   "0fe4f3e8ca4ba67280589bff8f8dc30778e92a4e2782a1af88bd3c38a8ed2d3c",
+   "15744c9c9d7badd6e46fb8ea11d69975cfe49f8c9c9be239b9d847ff20c45f9b",
+   "16fb38b1f738fea6061b50b6f37c7392e5146c727e5aaf799d58213ff791ae1d",
+   "1d49ab917ef125b67669a82cb2f07263a7e96f64e569bd7421cfeab4d2dae304",
+   "276b46581782759154191ad5920ff14ba1b27f9b4e9d641dbdc9bbdcfbc8e6e9",
+   "479ad358eb25dc178075be22ebed5b863a48cd1b05bc622f8811b830b65bed65",
+   "4f2355dfc9507c37da7eb117974600dc42f678af7d9f3f25b9e51cce42e90cd2",
+   "5848e5d949f2b544746469b7577d6442b4bbf30f88fefd9922a75f92dba09d8c",
+   "609d5a99b9c57122a030e6d9b010e15485d553792c863137645419254450fdef",
+   "6b5a004782e1d5644c8ac48633aa49d39a9552232ae3249cba88acb6ae9a53b8",
+   "6df064bd80b8815410a3c527f90286981c1f45d6f9cca46056b36e9e32763639",
+   "7dd96a39d49594d4bd62d3bb56d62630f37732cda65fde10d9f6ea22801b7aeb",
+   "8f7bdf6598777ed72ecb204451c6be07538d9797aed254ee168df81d2ff86648",
+   "8ff4b1442b04779664c9411c15695fb62bfc3eba2c5f1dedbc7bd74d11e01aea",
+   "904643b0129f3a103acd328eee452cda19516d13c36c2fd6714c6fd73d05bd66",
+   "918be78e1f6b27bd6718165fe8a4eff7ee0e9ecbbf713295c6ea66ac8ba37c0f",
+   "9434b420c74b044f561fd72de55a8e8fa72083a4f01ca1dd8b98fa9e5514b15b",
+   "959c436f6b70f025adfd0d27df9e0a1dc493e82ef3e730c0a16719ef27cf6a42",
+   "9c262f4c6acf9453a021c814e12c37d9b3efcd780bce7870d7c878f5c4cf3ae3",
+   "b1e57bc824a65ad534dca86626f1bd6203bf4b405441c9b46e0b09a56c6c8b0d",
+   "b6854c410aa74fe16fd8d5ddce4cd045a78c35e2f928f98871aecd94e74d7d37",
+   "be055540223440e905972f5a55492d5b3aa0da268d5208e36192a4b8188003ac",
+   "c46c79b86523fae19556960c6cf913ba350711ead7052b1fef27fe20e1ea0b40",
+   "c900e660b456406e8df1b9b1618c333ea485e147a3b7031c45f2521c957a8582",
+   "d8b22d65d185e1d03f1af88f6df21af4cc6801e98375accfee6f7a2b1e8f623e",
+   "e12d0ede34b5ecff6daf5a4b9900853cd789a8532a251f094153a28641dad31a",
+   "ea7165271c3674287f66d1ae0f1cf32161fc0a54a12f311ede31962586dde150",
+   "ecba634c9d97c4b92b3e02bd881015d20efbf6d2d339214fd56b3a587d668928",
+   "f1b91057416d51c82b8d5289b75aa96f98d2b5e254f9e57d8e6f60ba2ff7669a",
+   "f7482e5724cca723e7cafa41f59ffa7e2282b1e2e96a19c57096fe1218a295a1"
+  ]
+ },
+ "retired_skill_digests": {
+  "brainstorming": [
+   "10271c555d435a7b76a3b66529919ad938b99c7c87be627490d135c55af76fd2",
+   "51fe3e9a91c4ba0ce8a1c53ce7952e4ac72a369ac6ef418d556465f8c72de330",
+   "6ec8d057d2043cc17eca6748a21e3b9fe760544efc21e363bc00e47e27cc339a"
+  ],
+  "confidence-check": [
+   "093e2c6cba32d69efd6ffcc21f9e4c4f979cd25ddfc0dffd6b09dbd1ce8db3c9",
+   "2066f9274d2bdf594f24d6e3cb95dbb965d831abf85546fa77e2d8d400cc31b6",
+   "219e6a0312444ad614182a8709bceb6229ab26a02c30c00d864d946b24269ea6",
+   "3092c4f57bf9cc3c0beee7d8234ff5209db4072c99794b988e9140f4032a118e",
+   "3868d6e216f813f521117ba912acc8c9832b7967a2f2c97c5dd6951d4b25cecd",
+   "41337bf901a80b5a514a028ebc60ebb6d908c51cbe44025b0b60e08231284e8d",
+   "45925a2f4e9674df3a735ec81a8bb019c76e67699dff5024cd6ab0f51f828c3e",
+   "5077c299b15dc3bd28fb81ed1a93aace845680a58ddf05dfc42e518c793568c3",
+   "51fdef103b4b561509c8b3b98ea9187fdcaaf6a028a72ef730cf1b8fb10a27a1",
+   "53d821472b37e9d40ca58bc7fd64f61e18d69a2ef99dedab1824e9df14cf15dd",
+   "633bdf03f2baa723025333a08d79d15b69c0b2bf14974ddfd293a57c019da931",
+   "64d151ed5758f017bed54d8184d536e602b50adeaca342ca67934384d12d7e2a",
+   "6cf848c110dcc5de485d74bf5c5d57546b929f2b2b949ab72e94bc93d0cffa9c",
+   "6f1805320580cb8f7233fde57b3ede21b9929605635e15b364eb8eb7b4e45d38",
+   "6f9774694ca8835e671027b76f9ce3b8a7c699797b78d65f4d6b18e465496800",
+   "74aa7d4821df64092624812a8c73b1f3485e93259a4ce0c0a715f66abdeccf4a",
+   "758f5a51d1a5f8879dcdc8ea9e5c7b564535c15fa9dbc5acc9f859cafa2457e4",
+   "7b4bebd7802bb937342e12b4f58b3944f5e248af5e6831506962c6743b7e8ef0",
+   "87f5dcd0938730b499648eb821d35d522b38f7f1ee703aadc2e24b6d60d91eeb",
+   "8d801d7bd789043d90701483bd47ba0e07c1ac5ffeef431ee131ecf9decfff18",
+   "98fdabacbe2b1f466063abdfcb94ce9e8a6ed2c26ac5a8c67d430bb78c5efb14",
+   "9bdf5abe3e40cf405b509693b5e7b370c050938a30b1b435331a3df0893af752",
+   "9d4ea93588c8744ab4b0f8252ec1174e7f79a256e39bea0f906e6c2ac30212c7",
+   "a84a8d29a4c351bcb64332ba5b119d6b5ae4ae959aef51eb80f6484eac8da5b9",
+   "b7f79438885e7c573e7fdcbb0ccf0ac11dc0a1af3605816d6408b64a68403850",
+   "bf94b98d64f55f2bd1efbd4107f1660b2ebda835e67d0da07bc63c9d769496b9",
+   "c425e17264998059a0b5008eba585fb1498073e627c8f13c16a4bd23a38dc068",
+   "c8836d38511bf20ee5f444f2ce5ba447e79dd613ee9d17ea6ab3ddb724b381c8",
+   "d2ab3593cec50d92b79335f35cf0c11bf6a2a80c6f99e7c64cff178dc4f3e65a",
+   "ddbee1d49c7965597b2b9ce51af648f1fa27a5bb8845797a21ff898cfb578958",
+   "ec37cb90a65e0d358247cabccd33b4b783dd472fba075ac5b83197d8da06646f",
+   "f0c20427c562d6b19cd66c398726e6e18a4e945f59ea20ab9aa1b8cdbf9c44bf"
+  ],
+  "dispatching-parallel-agents": [
+   "5202a10d7bf01a27902a33b4540ec8d99864af8d7745427948a66f1f5181274b",
+   "885fec2019497e8f338cf20b11b861a4935e0a5d793ff24099b9d36a90db5852",
+   "fa96fe849432c2f7e3a0cc3d698019aa74762514a2bfe2849d8540deda49cbd5"
+  ],
+  "executing-plans": [
+   "7784bb2723ad97590498e406825c45332eadd4ae31229fe7ca40eaffd0d465d1",
+   "b2456676e60c750b4bba47f7c733b7f5f84a7365fc2fdeefab90400b8124d1d6",
+   "f8e715bec50a122442a94b83f4bade76955a09d295ab84d4313f7578755c29e6"
+  ],
+  "finishing-a-development-branch": [
+   "173a141f20c02783b19103108baa71319f8ce4f4121b83b863199ffc268ee8a5",
+   "1df4d47dc8607e16c8dee5383a16ba2d8efb66d022051d1d28f92ceb7991b99f",
+   "44b390fc668c130c0cc5622854196de71b340bfa8db3cb7a56f3f24678316200",
+   "4da78fbc6c104bb4e35dd76f9bcaa253f03b32fadfa290135dd5e2dc4d3fc14b",
+   "5b4b05b15a53a8dc3e2f40aa369a01380f3cbca2df25c93eceb0773063e2609c",
+   "85b9cb0dac3b3238fe4e545ae29aa2768c459764e418aab3c1fdaf75dce3b5e7",
+   "aa3c3335d28eb498e49f6c5ed40fc8fd9b20e593a586b7fb25e84c671c29b0dd",
+   "aa4665b180099ec498c9accd8b35353ddc4265d7ed651627fb3e7b3f2114e041",
+   "affa2bcac4938e4e283dace58109681e068d9c9a3e99335b060e02d628680624",
+   "b4a4e310571f74bca4e239ca92d616476b804258ad4cc467baf66f40a8eb49d3",
+   "d138a935e9b790d33a6351f02593ef9ec1c12d8d5b034171bf9c4386d09181ad",
+   "e6ce95f72ec513286f24ab268c14cecff984ca0fc6807948350d5cd01ec6098e",
+   "f2ba69c806f2b268ddf090dfc8b1b8934d91fb91539ae1b4bd97eaf1bd406d46",
+   "f3ff99e7e6428df3a0b8add246fd9961b39f83a5beac1d3481146c044693ba94",
+   "f769e61958babb60179113b5ec3cb1c293ee0eca54f770e4a4fa30fc272644bd"
+  ],
+  "receiving-code-review": [
+   "01aeebd6d8d07c30c26c1be59517dba740f8cd474e6ababc2199e68432639dc0",
+   "6a2e90c6598701dbd079bd0b1e38075d58b20beac3489aad8b587e335897ce2d",
+   "f266ad098558da843b20ab94ee6e378223d1a1d5101c51a6c56b4337b1755239"
+  ],
+  "requesting-code-review": [
+   "13b0cd6e4ec39d9fc5231ad53cc3fea7a6551c823cb50bd7236501556e73c3b5",
+   "e63ca1f14ff16f31bc1817944417dc3c99f47bac9376e1794d166c83453b00c8",
+   "f6f3b5b56b4d46bd74be4d3d75b767c69a44e47c655ddfd08c4900dcea7799f6"
+  ],
+  "ship": [
+   "212af326e94dfff6958d0bc7c7c879777d0fd05d105d86495a408577ad6b441b",
+   "3caa0bfd7389ee9214dbba2d1b28f9f34085efa5a99af2327d585ee61e607205",
+   "47daeca418555ef99336eeb51c86fdfa21402751756074961a1ac65c1b7fa120",
+   "5a5b8547706b1fcae040d6e0d2bdf10d15599a579f96da2235d099a04df1e116",
+   "656f4fa3c7eddb8f4c7075c63baccc43906da7de9558e100808385f2c0a13a79",
+   "6dd964673c6fcea695aec746ebbb1a7bdb76c78828045c57a3b555ac335a975a",
+   "6e2904b8a9db7ed64247af47bbc2a1d5104881ca4f6f94c97c8797f6925069e6",
+   "759133dbc162a83d908e55f92a730263b3ee0e2a206acc10e1a991d8a344b473",
+   "a776e69b214cf814350217dd1ca6c030aee2875fd78033e2063cd1ab26ea8827",
+   "b57a96f73e1b12b2f157251aa41e9390e9a6056433ab197dbccd8fd9e9f43fb5",
+   "ef01fd68320fa318d4df99c0de74def92c4f70ff33fe28fdbdcfa43bd576c7b3",
+   "effc1fcd33a55d7e57b4a517b630b6b600b7474b2b9d6f27b77b2f1a2d573604",
+   "f250bc99bced709c2923469ecc14a0dff970fe0f0c66af7e15bc808ee5e8181c"
+  ],
+  "simplicity-coach": [
+   "06970b665c30fd1956578139e6e184441699babdf7078e14fb4852bf3dc9ec7e",
+   "173f40fe58e80ec8245ffbbc9c640017f01541f27ed8c46a1392703742cc1d68",
+   "1e09fd4fa61005b6ed57e953b70bd49265313f36dfeb8c78ef651939d14aa750",
+   "314816b5bd012a6263bc564d07c224405a518b9c3816041df61f18252229f33b",
+   "316c38c88e4d8a1c882e6a3966ed458b819de6107acbec8f1d56c5788a64a859",
+   "32abc06a93563b9b2ccbefb130efa2081a16b797612c2f7d74a3813a0359c3ef",
+   "36930e07fe01d06d881efaaf15cab462e538997811bee995311bde574e20d0fb",
+   "61c970e49651b13f01cbfca3e8bf0f391f3edcf5db2bbe4c372546f833b10948",
+   "66440ccb4790d7482dc0433189a2e33df453f8d055ad7efe14fb7c0add5cc0d6",
+   "668e03b4936311b2318ad893788532916e6486f00a86b854a329de9b3f193705",
+   "71d33bf2705bf6b6001b6a0c834b9e8134936d4ff0090ab52097ca8400285e4d",
+   "72d3a708eda46f4ac5acad092f76b4194c8bec8cb81862f49575d41e5cda1897",
+   "922a7eb18901e37a24e78892791bda6dcdd518be23783d3d257af0f68ac1ffd0",
+   "99d88c90ab676682c86fe97f0d75b5a1b58495beba7034d26fb72a05d00b89b1",
+   "9a6c5c58f098c1999ec90f09af0c4d19fcb4167d85e9fff85a4820aa42f74287",
+   "a4bbdc495ff60137eb8f9833512653dc641a4a565fdd5e05cf731db8e71d9bcf",
+   "b8dba1aa7c8118085acf9385a9f9c823882e04fcf9c1589afa201af7fc515d57",
+   "c5c7815b44e954006d54c59ec9a5146c36fb90be2ae56e76f6595c8fc89a1645",
+   "d0f14dd05b062ab45116cfaccef73921a5dcdf2ae623ebafd711501a9695106b",
+   "dbb5f2f3b8ebc4d468cebf99328e740c8976e9ccef097c02951368a3fcf7e6a1",
+   "f2fb762d0c48e5790adfbc875f8b3080c9a2a2838052ddb3e8cdf610e849a403",
+   "f8f05e0fd2fcf1bef86d3544ed89adb4d498c94e6b8d2c31c2144a99f8bfd9cb",
+   "f93e363586264f3ce97df01f7a1ee4ed7af10d4b65240e4aa4b0e00c5a66bb09",
+   "fa90ce9d14658226ff51cd1f1ece311e9db02dbab2ef8194e03555a069cff0c1",
+   "fc23f01090d092daa2660045afc5c1865b545c6796641bb0354ec2f4d6e8f8c9"
+  ],
+  "systematic-debugging": [
+   "2d64bfcd9722c5bd9324d1dd1b5bb883c617a0ccef1ec2e4d65ddff6d94e3d57",
+   "4f8a6935ab718be54672f121e0b75b3dc09593113292afcddb01d5df8189bc04",
+   "808f10944972e55549e599284549d4db5bda80c8a3a313f7b4da73459ef172ba"
+  ],
+  "test-driven-development": [
+   "00b8e1038b8f36321ffdfbaa2648086216191a88b53de32fda86bc84a59d1fb5",
+   "2c6a4f2ecd8444376999aa3b166c69a55e24965136d08cf37f9a91c0f2519d7f",
+   "3d19797a2d43b1b0e25f3a5082e10d3dae54590febf1912abab55e7f210597e9"
+  ],
+  "using-git-worktrees": [
+   "14b7a72c1a1d9e53b74d8bca2c0db318263006f42b551a3023bbd44197256434",
+   "49ab5ba6add4038bdae2480dcbb7de56fb300e323ca62ae48375adb38311e781",
+   "b52de69df7b96e6754d8749bee936af0e27dbefa5cbc66d096b037c85e911d64"
+  ],
+  "using-superclaude": [
+   "60f2391008995b8781f8e5c731238f7e3218d974e5bdd6f23e7ce02fe0453c6d",
+   "907aa83297e622a849e3175acfc28c0edc6ae13f8f373466c274c3f006ccd6af",
+   "a2833a5ea4cbed45592b3551781e0c60fbe0eb7fb236d1688a1c966fbfb66f5e",
+   "cae1bcd2dc926a8f39c8b31e6b290c37523f437239b139ba9e243ef4af585c9b"
+  ],
+  "verbalized-sampling": [
+   "2c21ce95bfe3620db4e839efe6b3badc8d85e92595cdce9da0d930ac8ce6a29e",
+   "2f192421b8da9e421052b36c7ad246c14a547ce199d152c924e76c8aae2dd1b0",
+   "44fdaf9a497fc4b04c45c73ac72fe8f8bce5163313e99629f0c93d7b9779bcdb",
+   "6509d07a8430c964660f3b78423be1616d7c258a33cb3715e1f8163d329c3b4d",
+   "6732ba6645494d3b71e9f97b498e6211dcb85965e171e842baa4c96acad6fd23",
+   "7017e4cacc349337517365b0005eb82841873bab88abced04a43f98fbcc423a1",
+   "a04ce3628dee4250a714bc58ecb277715b0cc8913058e0940249e60a5182be07",
+   "bcdaa496c26ccb193c5b27807520cb3604a7651cb9c2ee32d30f2c26d14d451c",
+   "c34e36fb5f12ac7d225bfe66e3886ed2f26f333ec6ffdc8beb43a1f3406ef322",
+   "c5d3a7014d7413c8674e8c053094247b7c4e6908e15553ad257d55a8963ae42a",
+   "e3bffb0ea8da083b97f086e2d34c16d0572a004b41e9eb6ed208baa118a3a895"
+  ],
+  "verification-before-completion": [
+   "1eadb466bc8378789fc50090f7655cef27333b7b404287d2c00a73162c682d49",
+   "c1fb276d216b35d04e5baa688f5c19b60adcae35f2a4d5c25e7fc592a43a7384",
+   "f05e8dcc020a36cdc81a3f19e02aeed47afd951748d56274e40098dcb7600723"
+  ],
+  "writing-plans": [
+   "40b4ead954e03b2cea27a35680b78cff16172daa6bf56907243bed5714b0715a",
+   "6bc43e1d273d0b8a43420e9ac1d063060270a746fd198dac66777ce2412c1e16",
+   "bd92e4f7cf56517761c6f55e4e87349e78f5033d6afd387776ba3e6a2f5c32df"
+  ]
+ },
+ "hook_events": [
+  {
+   "event": "PostToolUse",
+   "first": "dc6e0866",
+   "last": "9961e620",
+   "shipped_now": true
+  },
+  {
+   "event": "PreCompact",
+   "first": "f823f933",
+   "last": "9961e620",
+   "shipped_now": true
+  },
+  {
+   "event": "PreToolUse",
+   "first": "66b37a7e",
+   "last": "6feae043",
+   "shipped_now": true
+  },
+  {
+   "event": "SessionEnd",
+   "first": "f823f933",
+   "last": "9961e620",
+   "shipped_now": true
+  },
+  {
+   "event": "SessionStart",
+   "first": "81343a67",
+   "last": "6feae043",
+   "shipped_now": true
+  },
+  {
+   "event": "Setup",
+   "first": "d174e600",
+   "last": "19716a42",
+   "shipped_now": false
+  },
+  {
+   "event": "Stop",
+   "first": "6d6f09ba",
+   "last": "6feae043",
+   "shipped_now": true
+  },
+  {
+   "event": "TaskCompleted",
+   "first": "d174e600",
+   "last": "b348e247",
+   "shipped_now": false
+  },
+  {
+   "event": "TeammateIdle",
+   "first": "d174e600",
+   "last": "b348e247",
+   "shipped_now": false
+  },
+  {
+   "event": "UserPromptSubmit",
+   "first": "dc6e0866",
+   "last": "9961e620",
+   "shipped_now": true
+  }
+ ],
+ "hook_ids": [
+  {
+   "event": "PostToolUse",
+   "entry_point": "loop_guard",
+   "subcommand": "",
+   "first": "e45d11ad",
+   "last": "9961e620",
+   "shipped_now": true
+  },
+  {
+   "event": "PostToolUse",
+   "entry_point": "prettier_hook",
+   "subcommand": "",
+   "first": "19091b37",
+   "last": "9961e620",
+   "shipped_now": true
+  },
+  {
+   "event": "PostToolUse",
+   "entry_point": "test_runner_hook",
+   "subcommand": "",
+   "first": "133b1f22",
+   "last": "9961e620",
+   "shipped_now": true
+  },
+  {
+   "event": "PreCompact",
+   "entry_point": "insight_writer",
+   "subcommand": "harvest-from-hook",
+   "first": "f823f933",
+   "last": "9961e620",
+   "shipped_now": true
+  },
+  {
+   "event": "PreToolUse",
+   "entry_point": "destructive_guard",
+   "subcommand": "",
+   "first": "79032ccc",
+   "last": "9961e620",
+   "shipped_now": true
+  },
+  {
+   "event": "PreToolUse",
+   "entry_point": "file_size_guard",
+   "subcommand": "",
+   "first": "f78fa698",
+   "last": "9961e620",
+   "shipped_now": true
+  },
+  {
+   "event": "PreToolUse",
+   "entry_point": "loop_guard",
+   "subcommand": "",
+   "first": "e45d11ad",
+   "last": "9961e620",
+   "shipped_now": true
+  },
+  {
+   "event": "SessionEnd",
+   "entry_point": "insight_writer",
+   "subcommand": "harvest-from-hook",
+   "first": "f823f933",
+   "last": "9961e620",
+   "shipped_now": true
+  },
+  {
+   "event": "SessionStart",
+   "entry_point": "context_reset",
+   "subcommand": "",
+   "first": "ade32f16",
+   "last": "9961e620",
+   "shipped_now": true
+  },
+  {
+   "event": "SessionStart",
+   "entry_point": "insight_writer",
+   "subcommand": "pending-count",
+   "first": "f823f933",
+   "last": "79032ccc",
+   "shipped_now": false
+  },
+  {
+   "event": "SessionStart",
+   "entry_point": "insight_writer",
+   "subcommand": "pending-count-from-hook",
+   "first": "12cbcb4f",
+   "last": "9961e620",
+   "shipped_now": true
+  },
+  {
+   "event": "SessionStart",
+   "entry_point": "memory_staleness",
+   "subcommand": "",
+   "first": "06113d3f",
+   "last": "9961e620",
+   "shipped_now": true
+  },
+  {
+   "event": "SessionStart",
+   "entry_point": "session_init",
+   "subcommand": "",
+   "first": "19091b37",
+   "last": "9961e620",
+   "shipped_now": true
+  },
+  {
+   "event": "Setup",
+   "entry_point": "session_init",
+   "subcommand": "",
+   "first": "d174e600",
+   "last": "19716a42",
+   "shipped_now": false
+  },
+  {
+   "event": "Stop",
+   "entry_point": "insight_writer",
+   "subcommand": "request-from-hook",
+   "first": "6d6f09ba",
+   "last": "9961e620",
+   "shipped_now": true
+  },
+  {
+   "event": "UserPromptSubmit",
+   "entry_point": "context_loader",
+   "subcommand": "",
+   "first": "fa768869",
+   "last": "9961e620",
+   "shipped_now": true
+  },
+  {
+   "event": "UserPromptSubmit",
+   "entry_point": "skill_activator",
+   "subcommand": "",
+   "first": "19091b37",
+   "last": "66b37a7e",
+   "shipped_now": false
+  }
+ ],
+ "inline_hook_commands": [
+  {
+   "event": "PostToolUse",
+   "command": "jq -r '.tool_input.file_path' | xargs -I {} sh -c 'echo \"{}\" | grep -qE \"\\.(ts|tsx|js|jsx)$\" && npx prettier --write \"{}\" 2>/dev/null || true'",
+   "first": "dc6e0866",
+   "last": "dc6e0866"
+  },
+  {
+   "event": "PreToolUse",
+   "command": "jq -r '.tool_input.command // empty' | head -1 | grep -qE 'rm\\s+-rf\\s+/\\s*$|rm\\s+-rf\\s+/\\*|git\\s+push\\s+.*--force([^-]|$).*(main|master)' && echo 'BLOCKED: destructive command detected (--force-with-lease is allowed)' >&2 && exit 2 || exit 0",
+   "first": "e31caf5d",
+   "last": "f823f933"
+  },
+  {
+   "event": "PreToolUse",
+   "command": "jq -r '.tool_input.command // empty' | head -1 | grep -qE 'rm\\s+-rf\\s+/\\s*$|rm\\s+-rf\\s+/\\*|git\\s+push\\s+.*--force.*(main|master)' && echo 'BLOCKED: destructive command detected' >&2 && exit 2 || exit 0",
+   "first": "66b37a7e",
+   "last": "e45d11ad"
+  },
+  {
+   "event": "PreToolUse",
+   "command": "serena-hooks auto-approve --client=claude-code",
+   "first": "6feae043",
+   "last": "6feae043"
+  },
+  {
+   "event": "PreToolUse",
+   "command": "serena-hooks remind --client=claude-code",
+   "first": "6feae043",
+   "last": "6feae043"
+  },
+  {
+   "event": "SessionStart",
+   "command": "./scripts/session-init.sh",
+   "first": "81343a67",
+   "last": "dc6e0866"
+  },
+  {
+   "event": "SessionStart",
+   "command": "serena-hooks activate --client=claude-code",
+   "first": "6feae043",
+   "last": "6feae043"
+  },
+  {
+   "event": "Stop",
+   "command": "serena-hooks cleanup --client=claude-code",
+   "first": "6feae043",
+   "last": "6feae043"
+  },
+  {
+   "event": "TaskCompleted",
+   "command": "echo 'Task completed — aggregate results'",
+   "first": "d174e600",
+   "last": "42218e97"
+  },
+  {
+   "event": "TaskCompleted",
+   "command": "echo '[superclaude] Task completed — aggregate results'",
+   "first": "b348e247",
+   "last": "b348e247"
+  },
+  {
+   "event": "TeammateIdle",
+   "command": "echo 'Teammate idle — assign next task'",
+   "first": "d174e600",
+   "last": "42218e97"
+  },
+  {
+   "event": "TeammateIdle",
+   "command": "echo '[superclaude] Teammate idle — assign next task'",
+   "first": "b348e247",
+   "last": "b348e247"
+  },
+  {
+   "event": "UserPromptSubmit",
+   "command": "./scripts/skill-activator.sh",
+   "first": "dc6e0866",
+   "last": "dc6e0866"
+  }
+ ]
+}

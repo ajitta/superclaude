@@ -287,7 +287,6 @@ class TestMergeHooksToSettings:
         [
             '{"permissions": {"ask": ["Bash"]}, "model": "opus",}',  # trailing comma
             '{"permissions": {"ask": ["Bash"]}, // a comment\n "model": "opus"}',
-            "",  # empty file
             '["not", "an", "object"]',  # valid JSON, wrong root
         ],
     )
@@ -312,6 +311,24 @@ class TestMergeHooksToSettings:
         assert success is False
         assert "settings.json" in msg and "JSON" in msg
         assert settings_file.read_text(encoding="utf-8") == content
+
+    @pytest.mark.parametrize("content", ["", "\n  \n"])
+    def test_empty_settings_file_reads_as_an_empty_object(
+        self, base_path: Path, content
+    ):
+        """V-4: `touch settings.json` holds no settings to lose, so the merge
+        writes into {} instead of refusing it as invalid JSON."""
+        from superclaude.cli.install_settings import merge_hooks_to_settings
+
+        settings_file = base_path / "settings.json"
+        settings_file.write_text(content, encoding="utf-8")
+
+        success, msg = merge_hooks_to_settings(
+            base_path, self._sc_hooks_config(), scope="user"
+        )
+
+        assert success is True, msg
+        assert json.loads(settings_file.read_text(encoding="utf-8"))["hooks"]
 
     def test_creates_settings_from_scratch(self, base_path: Path):
         """Creates settings.json when it doesn't exist."""
@@ -468,13 +485,10 @@ class TestMergeHooksToSettings:
         success, _ = uninstall_hooks_from_settings(base_path)
         assert success is True
 
-        settings = json.loads((base_path / "settings.json").read_text())
-        # All hook types should be removed (no user hooks mixed in)
-        assert "TeammateIdle" not in settings.get("hooks", {}), (
-            "TeammateIdle should be removed after uninstall"
-        )
-        assert "TaskCompleted" not in settings.get("hooks", {}), (
-            "TaskCompleted should be removed after uninstall"
+        # Every hook was superclaude's (no user hooks mixed in), so nothing is
+        # left and the file goes, at user scope too (audit C-12, Q11 b).
+        assert not (base_path / "settings.json").exists(), (
+            "TeammateIdle/TaskCompleted echoes should be removed after uninstall"
         )
 
 

@@ -356,7 +356,9 @@ class TestAgentMemoryScopeConflict:
         assert success, message
         assert self._memory_values(base) == {"memory: user"}
 
-    def test_mixed_scopes_name_each_uninstall(self, tmp_path):
+    def test_mixed_scopes_name_only_this_base(self, tmp_path):
+        """`memory: user` outside ~/.claude is no user install: advice naming
+        `--scope user` would act on ~/.claude (C-06, owner ruling b)."""
         base = tmp_path / ".claude"
         assert install_all(base_path=base, force=True, scope="local")[0]
         agent = next((base / "agents").glob("*.md"))
@@ -368,9 +370,9 @@ class TestAgentMemoryScopeConflict:
         success, message = install_all(base_path=base, force=True, scope="project")
 
         assert not success
+        assert "memory: local, memory: user" in message, message
         assert "'superclaude uninstall --scope local'" in message, message
-        assert "'superclaude uninstall --scope user'" in message, message
-        assert "--scope local, user" not in message, message
+        assert "--scope user" not in message, message
 
     def test_a_value_naming_no_scope_is_ignored(self, tmp_path):
         """A hand-edited value names no store; advising `--scope none` is invalid."""
@@ -389,7 +391,10 @@ class TestAgentMemoryScopeConflict:
 
     @pytest.mark.parametrize("value", ['"user"', "'user'", "user  # personal"])
     def test_a_quoted_or_commented_scope_still_counts(self, tmp_path, value):
-        """YAML reads these as `user`, so Claude Code keeps memory in user scope."""
+        """YAML reads these as `user`, so Claude Code keeps memory in user scope.
+
+        A non-force install would keep the value, so it refuses; `update` for
+        this scope is the advice (C-06)."""
         base = tmp_path / ".claude"
         assert install_all(base_path=base, force=True, scope="local")[0]
         agent = next((base / "agents").glob("*.md"))
@@ -400,10 +405,11 @@ class TestAgentMemoryScopeConflict:
             encoding="utf-8",
         )
 
-        success, message = install_all(base_path=base, force=True, scope="local")
+        success, message = install_all(base_path=base, force=False, scope="local")
 
         assert not success
-        assert "memory: user" in message and "--scope user" in message, message
+        assert "memory: user" in message, message
+        assert "'superclaude update --scope local'" in message, message
 
 
 class TestFrameworkArtifactsAlwaysUpdate:
@@ -773,6 +779,18 @@ class TestWritePathKeepsTheShellAnchor:
         assert (home / ".claude" / "superclaude" / "CLAUDE_SC.md").exists()
 
 
+def _shipped_text(era: str, rel: str) -> str:
+    """``rel`` as ``era``'s installer wrote it (tests/fixtures/legacy_installs).
+
+    A retired agent or skill is superclaude's only when its text is a revision
+    superclaude shipped, so a test that expects one removed seeds that text.
+    """
+    legacy = Path(__file__).resolve().parents[1] / "fixtures" / "legacy_installs"
+    files = json.loads((legacy / f"{era}.json").read_text(encoding="utf-8"))["files"]
+    blobs = json.loads((legacy / "_blobs.json").read_text(encoding="utf-8"))
+    return blobs[files[f"$HOME/.claude/{rel}"]["blob"]]
+
+
 class TestLegacySkillsArePrunedOnUpgrade:
     """Skills from a pre-removal release must not survive an upgrade.
 
@@ -795,7 +813,12 @@ class TestLegacySkillsArePrunedOnUpgrade:
         for name in names:
             d = base_path / "skills" / name
             d.mkdir(parents=True, exist_ok=True)
-            (d / "SKILL.md").write_text("---\nname: x\n---\n", encoding="utf-8")
+            text = (
+                _shipped_text("ec6fa7e2p-user", f"skills/{name}/SKILL.md")
+                if name in self.LEGACY
+                else "---\nname: x\n---\n"
+            )
+            (d / "SKILL.md").write_text(text, encoding="utf-8", newline="")
 
     def test_install_removes_them(self, tmp_path):
         self._seed(tmp_path, self.LEGACY)
@@ -815,6 +838,17 @@ class TestLegacySkillsArePrunedOnUpgrade:
         install_all(base_path=tmp_path, force=True, scope="project")
 
         assert (tmp_path / "skills" / "someone-elses-skill" / "SKILL.md").exists()
+
+    def test_install_preserves_a_users_skill_under_a_retired_name(self, tmp_path):
+        """The name alone is not superclaude's: only a shipped SKILL.md is."""
+        mine = tmp_path / "skills" / "ship" / "SKILL.md"
+        mine.parent.mkdir(parents=True)
+        mine.write_text("---\nname: ship\n---\nmy release checklist\n", "utf-8")
+
+        install_all(base_path=tmp_path, force=True, scope="project")
+        uninstall_all(base_path=tmp_path, dry_run=False)
+
+        assert mine.read_text(encoding="utf-8").endswith("my release checklist\n")
 
     def test_uninstall_removes_them_too(self, tmp_path):
         self._seed(tmp_path, [*self.LEGACY, "someone-elses-skill"])
@@ -838,8 +872,8 @@ class TestUnshippedFilesArePrunedOnUpgrade:
     Installing copies files, so without a prune an upgrade leaves the old ones:
     /sc:spawn kept running its pre-removal body, and MCP_Serena.md outlived the
     Serena removal. In the directories only superclaude writes, anything the
-    source no longer ships goes; in the shared agents/ only the names listed in
-    RETIRED_AGENT_FILES do.
+    source no longer ships goes; in the shared agents/ only a file under a
+    RETIRED_AGENT_FILES name holding a text superclaude shipped does.
     """
 
     UNSHIPPED = (
@@ -863,7 +897,12 @@ class TestUnshippedFilesArePrunedOnUpgrade:
         for rel in paths:
             f = base_path / rel
             f.parent.mkdir(parents=True, exist_ok=True)
-            f.write_text("old body", encoding="utf-8")
+            text = (
+                _shipped_text("19091b37-user", rel)
+                if rel == "agents/deep-research.md"
+                else "old body"
+            )
+            f.write_text(text, encoding="utf-8", newline="")
 
     @pytest.mark.parametrize("force", [True, False])
     def test_install_removes_them(self, tmp_path, force):
@@ -897,6 +936,17 @@ class TestUnshippedFilesArePrunedOnUpgrade:
 
         assert not (tmp_path / "agents/deep-research.md").exists()
         assert (tmp_path / "agents/my-own-agent.md").exists()
+
+    def test_a_users_agent_under_a_retired_name_stays(self, tmp_path):
+        """V-1: `pm-agent.md` is a common name; the user's own is not ours."""
+        mine = tmp_path / "agents" / "pm-agent.md"
+        mine.parent.mkdir(parents=True)
+        mine.write_text("---\nname: pm-agent\n---\nmine\n", encoding="utf-8")
+
+        install_all(base_path=tmp_path, force=True, scope="project")
+        uninstall_all(base_path=tmp_path, dry_run=False)
+
+        assert mine.read_text(encoding="utf-8").endswith("mine\n")
 
     def test_a_clean_install_says_nothing_about_them(self, tmp_path):
         _success, message = install_all(base_path=tmp_path, force=True, scope="project")
