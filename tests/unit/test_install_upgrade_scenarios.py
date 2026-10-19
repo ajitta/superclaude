@@ -286,14 +286,18 @@ def test_committed_project_upgrade_drops_machine_paths(
     home, project, base = build_legacy_install(
         tmp_path, "19575ac4p-project", monkeypatch
     )
-    assert any(sys.executable in c for c in _commands(base / "settings.json"))
+    # The era wrote the interpreter and the paths with forward slashes on
+    # every platform (fixture_tokens), so the forms to look for are those.
+    tokens = fixture_tokens(tmp_path, home, project)
+    assert any(tokens["PYTHON"] in c for c in _commands(base / "settings.json"))
 
     success, message = install_all(base_path=base, force=False, scope="project")
 
     assert success, message
     text = (base / "settings.json").read_text(encoding="utf-8")
-    assert sys.executable not in text
-    assert str(project) not in text and str(home) not in text
+    for form in (sys.executable, tokens["PYTHON"], str(project), tokens["PROJECT"]):
+        assert form not in text, form
+    assert str(home) not in text and tokens["HOME"] not in text
     assert "superclaude/scripts" not in text
 
 

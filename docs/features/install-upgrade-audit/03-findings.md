@@ -114,7 +114,7 @@ Measured 2026-10-19 on the OCI VM (aarch64, Python 3.11), sandboxed HOME and `CL
 | + 2,000 files inside one shipped skill dir (4,014 files) | 0.16 s, 0.17 s | the walk of a shipped dir reports them EXTRA (2,000) |
 | 2,000 user dirs × 20 files + the 2,000 above (42,014 files) | 0.17 s, 0.17 s | `verify_drift()` in-process: 0.062 s best, 0.067 s mean |
 
-Under the ~1 s bar by an order of magnitude at 40,000 files; no code change. The timing script is not in the repo (one-off, scratch dir of the round).
+Under the ~1 s bar by an order of magnitude at 40,000 files; no code change. In the timing sandbox doctor exited 1 on every run because its PATH probe (gotcha `doctor-path-probe-is-proxy`) failed under the stripped PATH; every other check and the drift advisory ran, and with the venv on PATH the same install reads healthy. The timing script is not in the repo (one-off, scratch dir of the round).
 
 ## P8 Windows dispatch
 
