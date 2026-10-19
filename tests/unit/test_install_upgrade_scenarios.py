@@ -82,9 +82,12 @@ def build_legacy_install(
         "$HOME": str(home),
     }
 
-    def resolve(text: str) -> str:
+    def resolve(text: str, *, as_json: bool = False) -> str:
+        # A JSON file carries machine paths as JSON strings: a Windows path's
+        # backslashes must be escaped there, as the old installer's json.dump
+        # wrote them, or the fixture is invalid JSON on Windows only.
         for token, value in tokens.items():
-            text = text.replace(token, value)
+            text = text.replace(token, json.dumps(value)[1:-1] if as_json else value)
         return text
 
     for key, entry in doc["files"].items():
@@ -93,7 +96,9 @@ def build_legacy_install(
         target.parent.mkdir(parents=True, exist_ok=True)
         if "blob" in entry:
             target.write_text(
-                resolve(BLOBS[entry["blob"]]), encoding="utf-8", newline=""
+                resolve(BLOBS[entry["blob"]], as_json=rel.endswith(".json")),
+                encoding="utf-8",
+                newline="",
             )
         else:
             target.write_text(f"stub {entry['sha256']}\n", encoding="utf-8")
