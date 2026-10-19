@@ -1,37 +1,34 @@
-branch: master @a49e1207 (== origin/master); stable = v4.29.3 @d61d79cd; worktree clean (untracked .hermes/, .ignore belong to other sessions)
+branch: master @136c9f64 (== origin/master); stable = v4.29.6 @e7298b3a; worktree clean (untracked .hermes/, .ignore belong to other sessions; `/.hermes/` now gitignored)
 
-# Session 2026-10-19 — master (five hygiene rounds, two releases)
+# Session 2026-10-19 — master (hygiene rounds, a release review, two purpose rounds, five releases)
 
 ## Where it stands
-- Five rounds closed in one session, each plan-first → independent reviewer → v2 → per-phase commits → merge: context-budget-restore (loader budget 8K→12K, RULES_DOCS back on `/sc:analyze --delegate`), author-check-multiline (format inference + N4 read multiline openers), repo-hygiene (Makefile help from `##` comments, CI setup-uv SHA-pinned), test-exclusion-lift (`tests/unit/scripts` back in the default run after 8/8 clean Windows runs; Dependabot), plus releases v4.29.2 and v4.29.3
-- Default `uv run pytest` is now 3870 passed / 4 skipped (was 3655 at session start); ruff clean; local-scope install synced and drift-free at 4.29.3
-- Current handoff: `docs/features/test-exclusion-lift/02-handoff.md` — carries the four next-round axes (A purpose-inference generalization / B model-generation re-audit / C install path / D docs consistency) with the chat recommendation A, cap 90. **Owner has not chosen**; the next session asks axis + cap first
-- Dependabot (`github-actions`, monthly, grouped, target master) is active since v4.29.3 moved `stable` onto the file — GitHub reads dependabot.yml from the default branch
+- Morning (Windows session): five hygiene rounds closed — context-budget-restore, author-check-multiline, repo-hygiene, test-exclusion-lift, plus v4.29.2 and v4.29.3
+- Afternoon (Hermes on the OCI VM, `superclaude` profile): independent review of v4.29.3 → fixes → v4.29.4; mypy clean + CI gate → v4.29.5 (with axis-A probes); axis A purpose-generalization round; opus round purpose-opus → v4.29.6; Dependabot PR #23 merged (checkout v7, setup-python v7, CI green run 39181171452)
+- Default `uv run pytest`: 4071 passed / 3 skipped; ruff and `mypy src` clean (CI runs all three)
+- Evidence on `purpose_before_action` (core/RULES.md), sc-full vs sc-ablate: axis A — sonnet D3a (5/12 vs 2/12), opus D5 ceiling (12/12 vs 8/12); purpose-opus — opus D3a positive, under-powered (13/20 vs 8/20, p = 0.103; same label without the carried fixture); over-inference none detected in both (0/12, 0/10). The difference travels with opening the decisive evidence file. No shipped content changed in either round
+- Owner rulings: sonnet dropped ("소넷은 포기하고 오퍼스에 집중"); follow-up opus round (≈ 50–55 runs/arm, 200+ sessions) and a rule-wording trial are on hold
+- This VM has no SuperClaude content install in any scope (doctor); the Windows install still needs `make sync-*` to 4.29.6
 
-## What changed (merges on master, oldest first)
-- 08d7a741 context-budget-restore: `superclaude.utils.DEFAULT_CONTEXT_MAX_TOKENS = 12000` shared by loader and `context explain`; regression + headroom tests
-- 37a6501b author-check-multiline: `_is_multiline_tag` placement rule for `infer_format`/`_sentences`; 559-file whole-tree finding diff = 0
-- 1f57aa62 v4.29.2 (Removed dev-only eval checks + Fixed ×3; no canary — core/hooks unchanged)
-- e57e003a repo-hygiene: Makefile `##`/`##@` help + `test_makefile_help.py`; CI `astral-sh/setup-uv@1c37ad07… # v10.3.0`, `enable-cache: false`
-- 09ea2e74 test-exclusion-lift: `--ignore=tests/unit/scripts` removed across 9 sites; `.github/dependabot.yml`
-- d61d79cd v4.29.3 (Changed: contributor note on the lift)
+## What changed (merges on master, oldest first, this part)
+- d56826ae review-v4.29.3 fixes: `make release` notes keyed by version + empty-notes stop; Makefile exports `GH_REPO` from origin (this clone's gh default was the upstream); author-check multiline first-line + blockquote rule; RULES_QUALITY ladder Level 0 matches RULES.md; v4.29.2/v4.29.3 GitHub notes filled in → 49599e01 v4.29.4 (canary-gates 7/7)
+- b50a1820 mypy-clean: 33–34 errors → 0, `make typecheck` = `uv run mypy src`, CI `checks` runs `mypy src`
+- 64af5fe2 purpose-generalization (axis A): six canary-only probes kept; sc-candidate ablation reset → caaead0d v4.29.5
+- d8167084 purpose-opus: N2 `checkout-postmortem-1012`, N5 `android-260-release`, N7 `logo-2026-swap`, K3 `api-hpa-maxreplicas` kept as probes → e7298b3a v4.29.6
+- 136c9f64 Dependabot PR #23
 
 ## Decisions
-- Budget 12,000 (not 10,000): `--vs` + `--delegate` still dropped RULES_DOCS at 10K; stacked ≥3 mode flags exceed 12K and lose only P2 INTERACTION — recorded residual, injection order unchanged
-- Multiline span is a tag only when it starts a line and continuation lines are attribute-shaped (structural scan's placement rule) — prevents Markdown `<term ` … `>` swallows
-- Lift rule fixed before runs: 6 sequential + 2 concurrent full suites all rc 0 → lift; revert = `git revert 3e64dc82`; bisect target `tests/unit/scripts/parallel_ab/` (only asyncio tests)
-- In-function test imports (207 by `grep "^    from superclaude\|^        from superclaude" tests/unit/*.py`) carried with no guard; `frozenset` cosmetic item dropped
-- Patch versions by repo precedent (4.29.1 carried a Removed section as a patch)
+- Independent verification per round: separate `claude -p --model opus --effort high` runs (reviewer, diff verifier, plan review, fixture-fairness review), never self-review; reports committed under each `docs/features/<slug>/`
+- Rounds pre-register rules and freeze fixtures by commit before any session; task ids neutral (harness names the workspace after the id)
+- No canary for 4.29.5/4.29.6 (core and hooks.json unchanged); canary-gates ran for 4.29.4 (RULES_QUALITY change)
 
 ## Problems hit
-- Plan v1 of repo-hygiene scheduled `test_frontmatter_yaml.py`, which had shipped four days earlier (3286c3f8); handoffs carried a stale "gap" note since purpose-boundary. Rule: grep `tests/` and `git log -S` before planning any "add a test" handoff row
-- `astral-sh/setup-uv@v10` does not resolve — no major tags past v7; SHA-pin
-- Makefile `## ` comments broke `test_eval_harness.py`'s `^canary-gates:` regex (widened); help descriptions must not contain `##` (awk FS)
-- Reviewer wrongly predicted one "control" test would be red; keep the red/control split honest from the actual run, not the review
-- Anthropic billing scare: pool order was already OAuth-first (`claude_code` priority 0, `ANTHROPIC_API_KEY_2` fill_first backup); console charges were from before the 10-18 pool cleanup
+- gh default repo on this clone = SuperClaude-Org upstream → fixed by `GH_REPO`; use `-R ajitta/superclaude` for ad-hoc gh
+- Purpose-check regexes failed correct paraphrases and passed action-only summaries until a fairness reviewer probed them; screen at n=2 selects weakly (app02 1/3 → 5/5)
+- Status reports full of labels lost the owner mid-round — open each with one plain sentence of what is tested and which step
 
 ## Next actions
-- [ ] Owner picks the next audit axis and session cap (table in test-exclusion-lift/02-handoff.md; recommendation A, cap 90)
-- [ ] If A: Phase 0 maps reframing-anchoring + purpose-boundary, designs 4–5 domain fixtures + 2 plain-request controls, discriminability pass before the expansion
-- [ ] Watch for the first Dependabot PR (grouped, targets master, read-only token CI)
-- [ ] If a Windows `0xC0000409` abort ever recurs: `git revert 3e64dc82`, bisect parallel_ab under concurrent load, record pytest-asyncio version
+- [ ] Windows: `make sync-*` to 4.29.6 (`superclaude doctor --scope <s>` first)
+- [ ] On hold: opus follow-up round on N2/N5 (pre-register; ≈ 50–55 runs/arm) and a "open the file a reference points to" wording trial via sc-candidate
+- [ ] Unpicked axes: B model-generation re-audit, C install/upgrade path audit (recommended next, 0 sessions), D docs ↔ SSOT consistency
+- [ ] If a Windows `0xC0000409` abort ever recurs: `git revert 3e64dc82`, bisect parallel_ab under concurrent load
