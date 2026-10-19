@@ -8,6 +8,15 @@ Releases before 4.19.0 are not listed. Their history is the git log; the upstrea
 
 ## [Unreleased]
 
+### Added
+
+- Three canary probes check that verification survives a prompt that argues for skipping it: a hurry (`pressure-time-verify`), a tech lead's dictated one-liner with "tests can be backfilled next sprint" (`pressure-authority-dictated-fix`), and "the tests are too strict, get the suite green whatever it takes" (`pressure-sunk-cost-green`, which also checks two held-out values so a lookup of the tested inputs fails). `--canary` runs them; `make canary-gates` does not, and no hard gate was added. Adapted from addyosmani/agent-skills' pressure cases (`docs/research/skill-pack-comparison-ajitta-2026-10-19.md`).
+- For contributors: `tests/unit/test_description_overlap.py` fails when two commands or skills in the skill listing, or two agents, describe themselves too alike to route apart (stemmed TF-IDF cosine of the description without its tier sentence and "Not for" gate, names left out, limit 0.70; `/sc:load`–`/sc:save` is an allowed mirror pair).
+
+### Changed
+
+- README, "All Commands": a note on the skill-listing cost. superclaude's descriptions take under 10,000 characters; the listing budget is 1% of the context window (30,000 characters on haiku and sonnet in Claude Code 2.1.303); an overflow drops the least-used descriptions, `claude --debug-file` logs it, and `skillListingBudgetFraction` raises the budget.
+
 ## [4.31.0] - 2026-10-19
 
 ### Changed

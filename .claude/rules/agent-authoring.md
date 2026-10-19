@@ -70,7 +70,7 @@ The description sentence is read verbatim into the subagent's system prompt head
 - **Description is a lever for over-engineering.** Adding a Zen-of-Python clause ("simple is better than complex; values minimal solutions, the smallest abstraction; code that any junior can read") to the same agent name reduced over-engineering signals 25–73% (chars −25%, classes −58%, decorators −65%, TypeVar −100% across 15 trials). Use this lever before a rename if the goal is anti-overengineering.
 - **`hypothesis`-style advanced patterns are sticky** — directive phrasing only reduced unprompted property-based test usage by ~20%. Some priors need an explicit prohibition (`Do not use property-based testing libraries unless asked.`), not a soft directive.
 
-> **Enforced.** Forbidden exemplars (`following X practices`, `deep production experience`, `pragmatic tradeoff judgment`) and the presence of a CC-idiom trigger are checked by `tests/unit/test_agent_structure.py::TestAgentDescriptionInterface` (deterministic, default `make test`). Add newly-proven exemplars to `FORBIDDEN_DESC_PATTERNS`.
+> **Enforced.** Forbidden exemplars (`following X practices`, `deep production experience`, `pragmatic tradeoff judgment`) and the presence of a CC-idiom trigger are checked by `tests/unit/test_agent_structure.py::TestAgentDescriptionInterface` (deterministic, default `make test`). Add newly-proven exemplars to `FORBIDDEN_DESC_PATTERNS`. Pairwise overlap with the other agents (description minus the "Not for" gate, stemmed TF-IDF cosine without the names, fail at 0.70) is checked by `tests/unit/test_description_overlap.py`; on a failure, sharpen the distinguishing task, never the threshold.
 
 ### Field reference
 
