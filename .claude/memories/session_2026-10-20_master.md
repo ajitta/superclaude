@@ -14,7 +14,7 @@ branch: master @bae01a8b (== origin/master; stable == v4.31.1 @47f791b5, master 
 - The verifier (headless opus high, `02-verify.md`) said PASS WITH FIXES; findings 1–7 applied. The purpose-generalization and purpose-opus 04 readouts carry a contamination caveat (no label flips).
 - First isolated `make canary-gates`: 7/7 gates, 13/13 checks, 0 contaminated sessions.
 - Full suite 4555 passed / 3 skipped; ruff, mypy clean. No release: nothing under `src/superclaude` changed, so the `[Unreleased]` entries go out with the next release.
-- GitHub Actions was degraded on 2026-10-20: the branch CI runs sat queued. Master was pushed on a green local suite. Check `gh run list -R ajitta/superclaude --branch master -L 1` once Actions recovers.
+- Master CI green on 8adfdbfc (run 39286058300, after GitHub Actions' degraded spell on 2026-10-20 queued it ~30 min).
 
 ## Decisions
 - Eval runs from before 2026-10-20 carry account content that varied from session to session and between arms. They are not pooled with isolated runs; no rerun now.
@@ -25,8 +25,7 @@ branch: master @bae01a8b (== origin/master; stable == v4.31.1 @47f791b5, master 
 - The gotcha budget is 320 chars per entry (`test_gotcha_budget.py`).
 
 ## Next actions
-(full list: `docs/plans/remaining-work-ajitta-2026-10-19.md` §7)
-- [ ] Confirm the master CI run is green once GitHub Actions recovers
+(full list with options and ★: `docs/plans/remaining-work-ajitta-2026-10-20.md`; the 10-19 list is superseded)
 - [ ] Dictated-fix / sunk-cost probes at ceiling: ★keep as regression guards; re-read at the next model canary
 - [ ] Pressure probes on opus / auto mode: on hold
 - [ ] `bugfix-scope-creep` (matrix task) still has the loose `pytest|python -m pytest` grader; align it when its comparability no longer matters
