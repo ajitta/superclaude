@@ -22,9 +22,9 @@ description: Deep web research with adaptive planning and smart search. Use when
   - --strategy planning|intent|unified: planning runs the plan without asking; intent asks up to 3 clarifying questions before planning; unified shows the plan and waits for the user's go-ahead. Without --strategy, pick by the query: clear and scoped → planning, ambiguous or broad → intent, complex where the user should shape the plan → unified.
   </flags>
 
-  <depth note="Full profiles and thresholds: .claude/superclaude/modes/RESEARCH_CONFIG.md (user-scope install: ~/.claude/superclaude/modes/)">
-    quick: 1 hop, runs without asking, summary | standard: 2-3 hops, full plan, report
-    deep: 3-4 hops, mid-checkpoints | exhaustive: 5+ hops, subagent delegate
+  <depth note="Hop and source budget per profile: depth_profiles in .claude/superclaude/modes/RESEARCH_CONFIG.md (user-scope install: ~/.claude/superclaude/modes/)">
+    quick: runs without asking, summary | standard: full plan, report
+    deep: mid-checkpoints | exhaustive: subagent delegate
   </depth>
 
   <outputs>
@@ -45,7 +45,7 @@ description: Deep web research with adaptive planning and smart search. Use when
   <examples>
 | Input | Expected behavior |
 |---|---|
-| `/sc:research 'quantum computing breakthroughs 2025'` | standard depth: 2-3 hops, full report |
+| `/sc:research 'quantum computing breakthroughs 2025'` | standard depth, full report |
 | `/sc:research 'internal company API migration patterns'` | low-confidence sources → adaptive replan |
   </examples>
 

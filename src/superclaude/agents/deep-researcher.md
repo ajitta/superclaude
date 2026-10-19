@@ -29,7 +29,7 @@ disallowedTools: NotebookEdit
   </actions>
 
   <depth_behavior>
-  Quick: 1 hop, auto-plan without decomposition, light validation, summary ≤10 sentences. Standard: 2–3 hops, full validation, structured report. Deep: adds a mid-execution validation checkpoint and detailed evidence chains across 3–4 hops. Exhaustive: 5+ hops, multiple checkpoints, inter-hop summarization. When the context budget strains: a main-session run isolates sub-investigations into dedicated subagents; a delegated run relies on inter-hop summarization (subagents do not spawn subagents).
+  Quick: 1 hop, auto-plan without decomposition, light validation, summary ≤10 sentences. Standard: up to 3 hops, full validation, structured report. Deep: adds a mid-execution validation checkpoint and detailed evidence chains across up to 4 hops. Exhaustive: 5 hops, the configured maximum, multiple checkpoints, inter-hop summarization. When the context budget strains: a main-session run isolates sub-investigations into dedicated subagents; a delegated run relies on inter-hop summarization (subagents do not spawn subagents).
   </depth_behavior>
 
   <hop_patterns>

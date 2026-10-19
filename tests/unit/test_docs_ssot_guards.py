@@ -1,4 +1,5 @@
-"""Docs ↔ SSOT guards (docs/features/docs-ssot-audit, 05-plan §2, T1–T5 and T7).
+"""Docs ↔ SSOT guards (docs/features/docs-ssot-audit, 05-plan §2, T1–T5 and T7;
+T4 extended by the content round that followed 06-verify).
 
 The audit found 25 places where a document restated a mechanism, a list or
 a number that the code, the Makefile, hooks.json or the tree no longer
@@ -375,6 +376,55 @@ def test_readme_research_section_states_no_undefined_figure():
     hits = re.findall(r"\b\d\.\d\b|~\d+ ?min\b", section)
     assert not hits, (
         f"README Deep Research states figures no shipped file defines: {hits}"
+    )
+
+
+# Shipped prose that may restate a depth profile's hop count: every markdown
+# under src/superclaude/ except the config itself, plus README (content round
+# after the audit, 06-verify "Out-of-scope observations": research.md and
+# deep-researcher.md said 2-3 / 3-4 / 5+ hops against config 3 / 4 / 5).
+_CONFIG = _SRC / "modes" / "RESEARCH_CONFIG.md"
+_HOP_STATEMENT = re.compile(
+    r"\b(quick|standard|deep|exhaustive)\b[^.|\n]{0,120}?"
+    r"\b(\d+(?:\s*[-\u2013]\s*\d+)?\+?)\s+hops?\b",
+    re.I,
+)
+
+
+def test_shipped_hop_counts_match_config():
+    """'<profile> … N hops' in a command, agent, mode or README = config, exactly.
+
+    A range ("2-3 hops") or an open end ("5+ hops") never equals the single
+    figure the config states, so both fail here; content either states the
+    config's number or points at the depth_profiles table instead.
+    """
+    config = _config_profiles()
+    bad = []
+    for path in [*sorted(_SRC.rglob("*.md")), _README]:
+        if path == _CONFIG:
+            continue
+        for profile, figure in _HOP_STATEMENT.findall(_read(path)):
+            expected = config[profile.lower()][1]
+            if figure != expected:
+                bad.append(
+                    f"{path.relative_to(_ROOT)}: {profile} {figure} hops"
+                    f" vs config {expected}"
+                )
+    assert not bad, f"hop counts that drift from RESEARCH_CONFIG depth_profiles: {bad}"
+
+
+def test_hop_config_max_matches_profiles():
+    """RESEARCH_CONFIG's own maxima (hop_config max, defaults max_hops) = the largest profile."""
+    text = _read(_CONFIG)
+    largest = max(int(hops) for _, hops in _config_profiles().values())
+    attr = re.search(r'<hop_config[^>]*\bmax="(\d+)"', text)
+    default = re.search(r"\bmax_hops: (\d+)", text)
+    assert attr and default, "RESEARCH_CONFIG.md lacks hop_config max= or max_hops:"
+    assert int(attr.group(1)) == largest, (
+        f"hop_config max={attr.group(1)} but the deepest profile has {largest} hops"
+    )
+    assert int(default.group(1)) == largest, (
+        f"defaults max_hops: {default.group(1)} but the deepest profile has {largest} hops"
     )
 
 
