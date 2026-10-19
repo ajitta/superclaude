@@ -14,9 +14,9 @@ P0–P6 ran on Linux. What only the owner can do (Windows), what the round leave
 
 Do it on a branch checkout with a healthy `.venv` (`uv pip install -e ".[dev]"`; AGENTS.md Tests). Use a scratch project, never the real `~/.claude`, for every step that installs.
 
-### 1a. The `workflow_dispatch` job, once (Q2 d) — done
+### 1a. The `workflow_dispatch` job, once (Q2 d) — run, one fixture defect found
 
-**Done 2026-10-19.** Dispatched on `fix/install-upgrade-audit`: run 39194238966 failed (16 tests Linux passed: the builder substituted Windows machine paths into the JSON fixtures unescaped, `C:\…`; fixed by JSON-escaping tokens for `.json` targets), then run 39194568039 passed. Later master runs skipped the job, because they were not dispatched with `windows=true`; the master dispatch is `<master run>`. The steps stay as the recipe for the next dispatch.
+**Runs (2026-10-19).** Dispatched on `fix/install-upgrade-audit`: run 39194238966 failed (16 tests Linux passed: the builder substituted Windows machine paths into the JSON fixtures unescaped, `C:\…`; fixed by JSON-escaping tokens for `.json` targets), then run 39194568039 passed. Later master runs skipped the job, because they were not dispatched with `windows=true`. The master dispatch, run 39208943288 (v4.30.1), **failed**: 7 of 330, `confidence-check` and `simplicity-coach` surviving every removal. Fixture defect W-2 ([03](./03-findings.md) P8 section), not a product one; fixed on `fix/install-file-fidelity`, whose dispatch is `<branch run>`. The steps stay as the recipe for the next dispatch.
 
 The `windows-scenarios` job in `.github/workflows/test.yml` runs only `tests/unit/test_install_upgrade_scenarios.py` on `windows-latest`, Python 3.13. The module needs no network, no git history and no asyncio. The job runs only when dispatched with the input set; PRs and `make ci` never start it.
 
