@@ -8,6 +8,8 @@ updated: 2026-10-19
 
 # 04. Readout — rules applied as pre-registered
 
+> **Caveat (2026-10-20).** These sessions ran before the eval harness kept the claude.ai account's content out. Account skills, six synced plugins (among them `unknowns`) and connectors loaded in most sessions, and what loaded varied from session to session and between arms. The labels below stand, because none is a positive decision. Do not pool these counts with isolated runs. Details: [pressure-readout 01](../pressure-readout/01-readout.md#the-isolation-fault-behind-batch-a).
+
 Inputs: [03-measurement.md](./03-measurement.md). Rules: [01a-rules.md](./01a-rules.md), first match wins. k = 4 (n = 20 per arm): ceiling C ≥ 14, h = 4.
 
 ## Purpose

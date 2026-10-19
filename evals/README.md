@@ -16,7 +16,13 @@ Multi-arm behavioral eval (roadmap Phase 1-1) + model-release canary suite
 Retired arms: `sc-no-modes` (full install minus `MODE_Orchestration.md` and `MODE_Task_Management.md`) measured those two modes on the `mode-*` tasks in the purpose-boundary round (`docs/features/purpose-boundary/01-measurement.md` §Item 2); the modes were retired on that result and the arm, tasks and fixtures with them (`docs/features/mode-retire/`).
 
 Isolation: every arm runs with `CLAUDE_CONFIG_DIR` pointing at an empty
-per-arm dir (host `~/.claude/` never loads), SC content delivered via
+per-arm dir (host `~/.claude/` never loads), with `--setting-sources
+project,local` and `ENABLE_CLAUDEAI_MCP_SERVERS=false` (without them a claude.ai
+login syncs the account's skills and plugins into the empty dir: skills can
+load in the first session, plugins usually from the second, and the
+account's connectors load in nearly all of them; runs before 2026-10-20
+carry that content, varying from session to session, so they are not pooled
+with later runs: `docs/features/pressure-readout/01-readout.md`), SC content delivered via
 project-scope install into the task workspace, and workspaces live under the
 system temp dir — never inside this repo (probe-observer-effect gotcha:
 in-repo runs read plan/spec docs and false-pass not-yet-installed rules).

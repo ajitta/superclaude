@@ -180,6 +180,14 @@ def test_pressure_verification_pattern(bash, counts):
     )
 
 
+def test_probe_verify_claim_grades_like_its_pressure_twin():
+    """The unhurried is_even task is the pressure probes' control: same grader,
+    or a difference between the two reads the grader, not the hurry."""
+    assert _verification_pattern("probe-verify-claim") == _verification_pattern(
+        "pressure-time-verify"
+    )
+
+
 def _import_run_eval():
     sys.path.insert(0, str(EVALS_DIR))
     try:
@@ -674,6 +682,64 @@ def test_insight_request_is_off_for_every_arm(tmp_path, monkeypatch):
         "sc-full", task, ws, tmp_path / "cfg", tmp_path / "logs", "claude", "m", {}
     )
     assert seen_env[-1].get("SUPERCLAUDE_INSIGHT_PROMPT") == "0"
+
+
+def test_account_content_stays_out_of_every_arm(tmp_path, monkeypatch):
+    """An empty CLAUDE_CONFIG_DIR is not enough: a claude.ai login syncs the
+    account's plugins and skills into it during the first session (from the
+    second session on they load), and the account's claude.ai MCP connectors
+    load in every session. Leaving user settings out stops the plugin sync,
+    and ENABLE_CLAUDEAI_MCP_SERVERS=false drops the connectors (CC 2.1.303,
+    docs/features/pressure-readout/01-readout.md). Project and local settings
+    stay: the sc-* arms' hooks and permissions live there."""
+    run_eval = _import_run_eval()
+    argv, _ = _capture_claude_argv(run_eval, monkeypatch, tmp_path)
+    i = argv.index("--setting-sources")
+    assert argv[i + 1] == "project,local"
+    assert i < argv.index("--")
+
+    seen_env: list[dict] = []
+    stream = json.dumps({"type": "result", "subtype": "success", "result": ""})
+
+    def fake_run(cmd, **kw):
+        seen_env.append(dict(kw.get("env") or {}))
+        return subprocess.CompletedProcess(cmd, 0, stdout=stream, stderr="")
+
+    monkeypatch.setattr(run_eval.subprocess, "run", fake_run)
+    monkeypatch.setenv("ENABLE_CLAUDEAI_MCP_SERVERS", "true")
+    ws = tmp_path / "ws2"
+    ws.mkdir()
+    task = {"id": "t", "prompt": "do the thing", "checks": []}
+    run_eval.run_task(
+        "vanilla", task, ws, tmp_path / "cfg", tmp_path / "logs", "claude", "m", {}
+    )
+    assert seen_env[-1].get("ENABLE_CLAUDEAI_MCP_SERVERS") == "false"
+
+
+def test_command_only_arm_strips_every_core_import(tmp_path):
+    """sc-command-only must load no always-on core. A project install writes
+    the import into `.claude/CLAUDE.md` (install_settings), not only the root
+    CLAUDE.md the harness used to strip, so that arm loaded the full core and
+    read as sc-full (docs/features/pressure-readout/02-verify.md)."""
+    from superclaude.cli.install_settings import update_claude_md_import
+
+    run_eval = _import_run_eval()
+    ws = tmp_path / "ws"
+    (ws / ".claude").mkdir(parents=True)
+    ok, _ = update_claude_md_import(ws / ".claude", scope="project")
+    assert ok and "CLAUDE_SC.md" in (ws / ".claude" / "CLAUDE.md").read_text()
+    (ws / "CLAUDE.md").write_text(
+        f"# project notes\n\n{run_eval.IMPORT_LINE}\n", encoding="utf-8"
+    )
+
+    run_eval._set_core_import(ws, enabled=False)
+    for f in (ws / "CLAUDE.md", ws / ".claude" / "CLAUDE.md"):
+        if f.exists():
+            assert "CLAUDE_SC.md" not in f.read_text(encoding="utf-8"), f
+    assert "# project notes" in (ws / "CLAUDE.md").read_text(encoding="utf-8")
+
+    run_eval._set_core_import(ws, enabled=True)
+    assert run_eval.IMPORT_LINE in (ws / "CLAUDE.md").read_text(encoding="utf-8")
 
 
 def test_permission_mode_flag_is_passed_through_when_set(tmp_path, monkeypatch):

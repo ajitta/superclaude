@@ -14,8 +14,11 @@ Runs each task from tasks.yaml in an isolated temp workspace OUTSIDE the repo
   sc-command-only  full install, always-loaded core import stripped
 
 Arm isolation: CLAUDE_CONFIG_DIR points at an empty per-arm dir (keeps the
-host machine's real ~/.claude out of every arm); SC content is delivered via
-`superclaude install --scope project` into the workspace's ./.claude/.
+host machine's real ~/.claude out of every arm), `--setting-sources
+project,local` keeps the claude.ai account's synced plugins and skills out of
+it, and ENABLE_CLAUDEAI_MCP_SERVERS=false drops the account's connectors; SC
+content is delivered via `superclaude install --scope project` into the
+workspace's ./.claude/.
 
 Usage:
   uv run python evals/run_eval.py --dry-run              # build+validate, no API calls
@@ -51,6 +54,7 @@ from pathlib import Path
 
 import yaml
 
+from superclaude.cli.install_settings import remove_claude_md_import
 from superclaude.utils import detect_refusal
 
 EVALS_DIR = Path(__file__).resolve().parent
@@ -214,7 +218,13 @@ def build_workspace(arm: str, task: dict, runs_dir: Path, superclaude_bin: str) 
 def _set_core_import(ws: Path, enabled: bool) -> None:
     """Force the always-loaded core import line present (sc-full/core-lite)
     or absent (sc-command-only) in the workspace CLAUDE.md, regardless of
-    what the installer did."""
+    what the installer did. The project install also writes its own import
+    into `.claude/CLAUDE.md`; sc-command-only removes that one through the
+    installer's own uninstall path, or the arm loads the full core."""
+    if not enabled:
+        ok, msg = remove_claude_md_import(ws / ".claude", scope="project")
+        if not ok:
+            raise RuntimeError(f"core import removal failed in {ws}: {msg}")
     claude_md = ws / "CLAUDE.md"
     lines = (
         claude_md.read_text(encoding="utf-8").splitlines() if claude_md.exists() else []
@@ -266,6 +276,12 @@ def run_task(
         # "execute immediately" reminder that can override prose stop rules,
         # so the gated probes are rerun under it to see which survive.
         *(["--permission-mode", permission_mode] if permission_mode else []),
+        # User settings stay out: with them on, a claude.ai login syncs the
+        # account's plugins and skills into the empty config dir during the
+        # first session, and every later session of the arm loads them.
+        # The sc-* arms' hooks and permissions are project settings.
+        "--setting-sources",
+        "project,local",
         # `--` ends option parsing: prompts that legitimately start with an SC
         # flag (e.g. "--introspect ...") were otherwise parsed as CLI options
         # and the session died before any turn ran.
@@ -281,6 +297,9 @@ def run_task(
     # report (vanilla has no hook). Plumbing, not behavior under measurement —
     # off for every arm through the hook's own knob.
     env["SUPERCLAUDE_INSIGHT_PROMPT"] = "0"
+    # The account's claude.ai MCP connectors load in every session whatever
+    # the config dir holds; same for every arm, still not the arm's content.
+    env["ENABLE_CLAUDEAI_MCP_SERVERS"] = "false"
 
     started = time.monotonic()
     try:

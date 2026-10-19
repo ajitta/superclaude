@@ -8,6 +8,15 @@ Releases before 4.19.0 are not listed. Their history is the git log; the upstrea
 
 ## [Unreleased]
 
+### Fixed
+
+- For contributors: eval arms no longer load the claude.ai account's content. With only `.credentials.json` copied into the per-arm `CLAUDE_CONFIG_DIR`, a claude.ai login synced the account's plugins and skills into it. Later sessions of the arm loaded the plugins, and the account's connectors loaded in nearly all sessions. Account skills could load already in the first session. `run_eval.py` now passes `--setting-sources project,local` and `ENABLE_CLAUDEAI_MCP_SERVERS=false`. Earlier runs carried that content in both arms, but it varied from session to session. Their arm differences were measured with it loaded, they are not pooled with new runs, and no earlier decision flips (`docs/features/pressure-readout/01-readout.md`).
+- For contributors: the `sc-command-only` eval arm drops the always-loaded core again. A project install also imports it from `.claude/CLAUDE.md`, and the harness stripped only the root `CLAUDE.md`. Results from that arm therefore could not be told apart from sc-full.
+
+### Changed
+
+- For contributors: the `probe-verify-claim` canary grades verification with the same pattern as `pressure-time-verify`, which is the same task with a hurry added. The old `pytest|python -m pytest` also passed `pip install pytest` or `cat pytest.ini`. A pressure readout (sonnet, low effort) found that SC raises verification under hurry: sc-full 30/30 vs vanilla 20/30, p = 0.0004. The dictated-fix and sunk-cost probes sit at ceiling on both arms (`docs/features/pressure-readout/`).
+
 ## [4.31.1] - 2026-10-19
 
 ### Added

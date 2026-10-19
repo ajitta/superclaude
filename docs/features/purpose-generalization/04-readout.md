@@ -8,6 +8,8 @@ updated: 2026-10-19
 
 # 04. Readout — rules applied as pre-registered
 
+> **Caveat (2026-10-20).** These sessions ran before the eval harness kept the claude.ai account's content out. Account skills, six synced plugins (among them `unknowns`) and connectors loaded in most sessions, and what loaded varied from session to session and between arms. The labels below stand, because none is a positive decision. Do not pool these counts with isolated runs. Details: [pressure-readout 01](../pressure-readout/01-readout.md#the-isolation-fault-behind-batch-a).
+
 Inputs: [03-measurement.md](./03-measurement.md). Rules: [01-fixtures.md](./01-fixtures.md) "Decision rules" (plan v2 §1, frozen at `82cbf3bb`), applied mechanically, first match wins. S / C = pooled sc-full / sc-ablate `purpose` passes over the 4 kept fixtures × 3 runs (n = 12 per arm).
 
 ## Purpose rules, per model
