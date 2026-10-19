@@ -19,6 +19,10 @@ Releases before 4.19.0 are not listed. Their history is the git log; the upstrea
 - Every command superclaude prints as advice (verify-drift's re-sync, install's tips, the agent-memory refusal) carries `--scope`, and for project and local scope the directory to run it from.
 - `install`, `update` and `doctor` at user scope warn when `CLAUDE_CONFIG_DIR` points somewhere other than `~/.claude`: Claude Code then does not read the user install. The warning does not fail `doctor`.
 - A project install that replaces a local install's `.git/info/exclude` block (from another worktree of the same clone) warns that the local install's files are now visible to git.
+- `install` without `--force` still keeps files that exist, and now says how many of them differ from this release and that `superclaude update --scope <scope>` refreshes them; the old "--force reinstalls existing files" tip is gone.
+- `doctor` prints advisories that do not change its exit code: installed files that differ from this release (drifted, missing, retired), hook registrations this release does not ship or misses, and agents keeping memory outside this install's store.
+- `verify-drift` ignores your own files in `agents/`, `output-styles/` and `skills/`. An agent file an older release shipped reads as EXTRA, a leftover superclaude skill directory as RETIRED, and both fail the check.
+- `uninstall` also removes the agent memory store if it is empty, a `~/.claude/CLAUDE.md` holding only the `# Claude Code Configuration` heading install wrote, and a user `settings.json` that held only superclaude hooks.
 
 ### Fixed
 
@@ -31,6 +35,11 @@ Releases before 4.19.0 are not listed. Their history is the git log; the upstrea
 - `update` with no `--scope` inside a project that has only a local install no longer creates a full user install in `~/.claude`, and `update --scope local` from a subdirectory no longer creates a second install there.
 - `verify-drift` no longer advises a bare `superclaude install --force`, which, followed from a project, wrote a user install.
 - A project install from the `memory: user` era (February 2026) can be upgraded: `install` still refuses, now advising `superclaude update --scope project`, which rewrites the agents' `memory:` and says where agent memory moves. The advice used to name `--scope user`, which acts on `~/.claude` instead.
+- `install` (with or without `--force`), `update` and `uninstall` now remove the agents and skills older releases installed and this one dropped: `pm-agent`, `deep-research-agent`, the `using-superclaude` skill that loaded at every session start, and ten process skills such as `brainstorming`. A skill of the same name that is not superclaude's text stays.
+- `install` without `--force` now removes hook registrations no release ships any more: `Setup`, `skill_activator`, `insight_writer pending-count`, the `jq` destructive-command blocker, the `TeammateIdle`/`TaskCompleted` echoes, and superclaude's copies of Serena's hooks. `update` and `uninstall` now catch the echoes too. Your own hooks on those events stay, and old script copies under `superclaude/scripts/` are left alone.
+- `doctor` no longer calls an install healthy with drifted or deleted content, and `install --list-all` no longer puts ✅ beside a hooks row that lists obsolete registrations.
+- `verify-drift` no longer fails forever on your own agents and output styles, and no longer misses leftover superclaude skill directories.
+- `uninstall` no longer leaves an empty `agent-memory/`, a heading-only `~/.claude/CLAUDE.md` or a `{}` settings file behind. At local scope it now warns when `agent-memory-local/` still holds memory, because git stops ignoring it.
 
 ### Upgrade notes
 
@@ -38,6 +47,8 @@ Releases before 4.19.0 are not listed. Their history is the git log; the upstrea
 - If `install` refuses because agents declare `memory: user` in a project or local install, run `superclaude update --scope <that scope>` from that directory. Agents then keep memory in that install's `agent-memory/`; what they saved in `~/.claude/agent-memory/` stays there.
 - If a command now stops with "Nothing was changed", re-save the file it names as UTF-8 without a byte-order mark (or fix its JSON) and run the command again.
 - `uninstall --remove-mcp` removes a server only when its command is the one superclaude registers now. A Tavily server an older release registered (`mcp-remote https://mcp.tavily.com/mcp`, `tavily-mcp@0.1.2`) stays; remove it with `claude mcp remove tavily`.
+- The first `install` or `update` after upgrading removes the retired agents, skills and hook registrations listed under Fixed. If you edited `pm-agent.md`, `deep-research-agent.md`, `using-superclaude` or one of the five skills removed earlier (`confidence-check`, `finishing-a-development-branch`, `ship`, `simplicity-coach`, `verbalized-sampling`) and want to keep it, copy it under another name first.
+- Installs from the January 2026 releases that registered hooks as `python .claude/hooks/<name>.py` (one day, 2026-01-02) or as `./scripts/session-init.sh`, `./scripts/skill-activator.sh` and an inline `jq … npx prettier` command are not upgraded cleanly. Those registrations stay in `settings.json` beside the new ones (`session_init` then runs twice), and `uninstall` leaves them along with `.claude/hooks/*.py`. Delete them from `settings.json`, and delete the `.claude/hooks/*.py` and `*.sh` files, by hand.
 
 ## [4.29.6] - 2026-10-19
 

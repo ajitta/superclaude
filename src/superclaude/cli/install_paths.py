@@ -7,6 +7,7 @@ it without a cycle. superclaude.utils is allowed — it imports nothing from cli
 """
 
 import functools
+import hashlib
 import os
 import re
 import shutil
@@ -303,19 +304,79 @@ def _get_target_dir(component: str, base_path: Path) -> Path:
 # side, an upgrade leaves the directories in place, the two auto-invocable ones
 # (confidence-check, verbalized-sampling) keep firing with no source left to
 # explain them, and a local-scope install no longer git-excludes them, so they
-# surface as untracked files in a team repo.
+# surface as untracked files in a team repo. Every name the full history
+# (tests/fixtures/shipped_names_history.json) marks as no longer shipped is
+# here; a test fails when one is missing.
 LEGACY_SKILL_NAMES = (
     "confidence-check",
     "finishing-a-development-branch",
     "ship",
     "simplicity-coach",
     "verbalized-sampling",
+    # b933fd65: the meta-skill "loaded at session start" and the process skills
+    "using-superclaude",
+    "brainstorming",
+    "dispatching-parallel-agents",
+    "executing-plans",
+    "receiving-code-review",
+    "requesting-code-review",
+    "systematic-debugging",
+    "test-driven-development",
+    "using-git-worktrees",
+    "verification-before-completion",
+    "writing-plans",
 )
+
+# Retired skills whose names another public skill collection (obra/superpowers)
+# also uses: such a directory is superclaude's only when its SKILL.md is a
+# version superclaude shipped — sha256 of the file with LF line endings, first
+# 16 hex digits, one per revision in the history. Anything else under the name
+# is the user's and stays.
+RETIRED_SKILL_DIGESTS = {
+    "brainstorming": ("10271c555d435a7b", "51fe3e9a91c4ba0c", "6ec8d057d2043cc1"),
+    "dispatching-parallel-agents": (
+        "5202a10d7bf01a27",
+        "885fec2019497e8f",
+        "fa96fe849432c2f7",
+    ),
+    "executing-plans": ("7784bb2723ad9759", "b2456676e60c750b", "f8e715bec50a1224"),
+    "receiving-code-review": (
+        "01aeebd6d8d07c30",
+        "6a2e90c6598701db",
+        "f266ad098558da84",
+    ),
+    "requesting-code-review": (
+        "13b0cd6e4ec39d9f",
+        "e63ca1f14ff16f31",
+        "f6f3b5b56b4d46bd",
+    ),
+    "systematic-debugging": (
+        "2d64bfcd9722c5bd",
+        "4f8a6935ab718be5",
+        "808f10944972e555",
+    ),
+    "test-driven-development": (
+        "00b8e1038b8f3632",
+        "2c6a4f2ecd844437",
+        "3d19797a2d43b1b0",
+    ),
+    "using-git-worktrees": (
+        "14b7a72c1a1d9e53",
+        "49ab5ba6add4038b",
+        "b52de69df7b96e67",
+    ),
+    "verification-before-completion": (
+        "1eadb466bc837878",
+        "c1fb276d216b35d0",
+        "f05e8dcc020a36cd",
+    ),
+    "writing-plans": ("40b4ead954e03b2c", "6bc43e1d273d0b8a", "bd92e4f7cf565177"),
+}
 
 
 # Agent files a release removed. agents/ is shared with the user's own agents, so
 # the names are listed literally, as LEGACY_SKILL_NAMES is for skills/.
-RETIRED_AGENT_FILES = ("deep-research.md",)
+RETIRED_AGENT_FILES = ("deep-research.md", "deep-research-agent.md", "pm-agent.md")
 
 
 def find_unshipped(base_path: Path) -> list:
@@ -369,8 +430,22 @@ def find_legacy_skills(base_path: Path) -> list:
     """
     skills_dir = base_path / "skills"
     return [
-        skills_dir / name for name in LEGACY_SKILL_NAMES if (skills_dir / name).is_dir()
+        skills_dir / name
+        for name in LEGACY_SKILL_NAMES
+        if (skills_dir / name).is_dir() and _is_shipped_skill(skills_dir / name)
     ]
+
+
+def _is_shipped_skill(skill_dir: Path) -> bool:
+    """Whether a retired skill directory holds superclaude's text (RETIRED_SKILL_DIGESTS)."""
+    digests = RETIRED_SKILL_DIGESTS.get(skill_dir.name)
+    if digests is None:
+        return True
+    try:
+        text = (skill_dir / "SKILL.md").read_bytes().replace(b"\r\n", b"\n")
+    except OSError:
+        return False
+    return hashlib.sha256(text).hexdigest()[:16] in digests
 
 
 def _run(argv: List[str]) -> Optional[subprocess.CompletedProcess]:

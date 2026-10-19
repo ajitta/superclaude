@@ -14,6 +14,7 @@ before its fix (docs/features/install-upgrade-audit/03-findings.md).
 
 from __future__ import annotations
 
+import hashlib
 import json
 import re
 import shutil
@@ -896,3 +897,555 @@ def test_c18_project_install_reports_replacing_a_worktree_local_block(
         if "⚠️" in line and "local" in line and "worktree" in line
     ]
     assert warning, message
+
+
+# --- C-08, C-09: retired names and hook identities (Q10 a, Q13 a) -------------
+#
+# `shipped_names_history.json` (scripts/gen_shipped_names.py, full history) is
+# the record of everything a release could have installed. Every identity it
+# marks as not shipped now has to be on a retired list, and install (force or
+# not), `update` and uninstall remove what matches, and only what is
+# superclaude's.
+
+HISTORY = json.loads((FIXTURES / "shipped_names_history.json").read_text("utf-8"))
+REGENERATE = (
+    "the shipped-names history is stale or a retired name is unlisted: regenerate "
+    "it from a full clone (uv run python scripts/gen_shipped_names.py), then list "
+    "every identity it marks shipped_now: false"
+)
+
+
+def retired_names(kind: str) -> set[str]:
+    return {row["name"] for row in HISTORY["names"][kind] if not row["shipped_now"]}
+
+
+def _plant_user_content(home: Path) -> None:
+    """A skill and an agent of the user's own next to the legacy install."""
+    skill = home / ".claude" / "skills" / "my-skill"
+    skill.mkdir(parents=True, exist_ok=True)
+    (skill / "SKILL.md").write_text("---\nname: my-skill\n---\nmine\n", "utf-8")
+    (home / ".claude" / "agents" / "my-agent.md").write_text("mine\n", "utf-8")
+
+
+def _left(base: Path) -> list[str]:
+    return sorted(
+        [
+            f"agents/{n}"
+            for n in retired_names("agents")
+            if (base / "agents" / n).exists()
+        ]
+        + [
+            f"skills/{n}"
+            for n in retired_names("skills")
+            if (base / "skills" / n).exists()
+        ]
+    )
+
+
+@pytest.mark.parametrize("operation", ["install", "install --force", "uninstall"])
+def test_c08_retired_agents_and_skills_do_not_survive(
+    tmp_path: Path, monkeypatch, operation: str
+) -> None:
+    """C-08: pm-agent.md, deep-research-agent.md and the 11 b933fd65 process
+    skills (using-superclaude: "Loaded at session start") survived install and
+    uninstall; the user's own skill and agent stay."""
+    home, _project, base = build_legacy_install(tmp_path, "b933fd65p-user", monkeypatch)
+    _plant_user_content(home)
+    assert len(_left(base)) == 17
+
+    if operation == "uninstall":
+        success, message = uninstall_all(base_path=base, scope="user")
+    else:
+        force = operation.endswith("--force")
+        success, message = install_all(base_path=base, force=force, scope="user")
+
+    assert success, message
+    assert _left(base) == [], message
+    assert (base / "skills" / "my-skill" / "SKILL.md").exists()
+    assert (base / "agents" / "my-agent.md").exists()
+
+
+@pytest.mark.parametrize("operation", ["install", "uninstall"])
+def test_c08_another_collections_skill_under_a_retired_name_is_kept(
+    tmp_path: Path, monkeypatch, operation: str
+) -> None:
+    """Ten of the process skills share their names with another public skill
+    collection; a `brainstorming/` that is not superclaude's text is the user's."""
+    home, _project, base = fresh_install(tmp_path, monkeypatch, "user")
+    theirs = base / "skills" / "brainstorming" / "SKILL.md"
+    theirs.parent.mkdir(parents=True)
+    theirs.write_text(
+        "---\nname: brainstorming\ndescription: Use before any creative work\n---\n",
+        "utf-8",
+    )
+
+    if operation == "uninstall":
+        success, message = uninstall_all(base_path=base, scope="user")
+    else:
+        success, message = install_all(base_path=base, force=True, scope="user")
+
+    assert success, message
+    assert theirs.exists(), message
+
+
+def test_q10_every_retired_name_is_on_a_retired_list() -> None:
+    """Q10 a guard: a name any release shipped and this one does not is listed,
+    so install and uninstall can reach it."""
+    from superclaude.cli import install_paths
+
+    assert retired_names("agents") <= set(install_paths.RETIRED_AGENT_FILES), REGENERATE
+    assert retired_names("output-styles") == set(), REGENERATE
+    assert retired_names("skills") <= set(install_paths.LEGACY_SKILL_NAMES), REGENERATE
+
+
+def test_q10_guarded_skill_digests_cover_every_shipped_revision() -> None:
+    """A retired skill removed by content matches every SKILL.md revision that
+    shipped under its name, or an upgrade from that revision keeps it."""
+    from superclaude.cli import install_paths
+
+    digests = getattr(install_paths, "RETIRED_SKILL_DIGESTS", {})
+    assert digests, "no content-matched retired skills"
+    for name, listed in digests.items():
+        recorded = {d[:16] for d in HISTORY["retired_skill_digests"][name]}
+        assert set(listed) == recorded, (name, REGENERATE)
+
+
+RETIRED_EVENTS = ("Setup", "TeammateIdle", "TaskCompleted")
+USER_SETUP = {"hooks": [{"type": "command", "command": "~/bin/my-setup.sh"}]}
+USER_IDLE = {"hooks": [{"type": "command", "command": "echo 'my own idle note'"}]}
+SC_ECHOES = (
+    "echo 'Teammate idle — assign next task'",
+    "echo 'Task completed — aggregate results'",
+)
+_PENDING_COUNT = re.compile(r"pending-count(?!-)")
+
+
+def _plant_retired_neighbours(settings: Path, home: Path) -> None:
+    """User hooks on the retired events, and the pending-count registration of
+    f823f933 → 79032ccc (no captured era carries it)."""
+    data = json.loads(settings.read_text(encoding="utf-8"))
+    hooks = data.setdefault("hooks", {})
+    hooks.setdefault("Setup", []).append(USER_SETUP)
+    hooks.setdefault("TeammateIdle", []).append(USER_IDLE)
+    scripts = home / ".claude" / "superclaude" / "scripts"
+    hooks["SessionStart"].append(
+        {
+            "matcher": "startup",
+            "hooks": [
+                {
+                    "type": "command",
+                    "command": f"python3 {scripts}/insight_writer.py pending-count",
+                }
+            ],
+        }
+    )
+    settings.write_text(json.dumps(data, indent=2), encoding="utf-8")
+
+
+def _registrations(settings: Path) -> list[tuple[str, str]]:
+    data = json.loads(settings.read_text(encoding="utf-8"))
+    return [
+        (event, hook["command"])
+        for event, array in data.get("hooks", {}).items()
+        for entry in array
+        for hook in entry.get("hooks", [])
+    ]
+
+
+@pytest.mark.parametrize("force", [False, True], ids=["install", "force"])
+@pytest.mark.parametrize("era", ["66b37a7ep-user", "d174e600-user", "77b5821c-project"])
+def test_c09_retired_hook_registrations_removed(
+    tmp_path: Path, monkeypatch, era: str, force: bool
+) -> None:
+    """C-09: a non-force install kept `Setup session_init`, `skill_activator`,
+    `insight_writer pending-count` and the jq blocker (in a committed project
+    file too), and every install kept the unmarked `[experimental]` echoes. The
+    user's own hooks on those events stay; superclaude/scripts/ is untouched."""
+    home, _project, base = build_legacy_install(tmp_path, era, monkeypatch)
+    scope = load_era(era)["scope"]
+    settings = settings_path(base, scope)
+    _plant_retired_neighbours(settings, home)
+    scripts = base / "superclaude" / "scripts"
+    scripts_before = snapshot(scripts)
+
+    success, message = install_all(base_path=base, force=force, scope=scope)
+
+    assert success, message
+    left = _registrations(settings)
+    commands = [command for _event, command in left]
+    assert [(e, c) for e, c in left if e in RETIRED_EVENTS and "my" not in c] == [], (
+        message
+    )
+    assert not [c for c in commands if "skill_activator" in c], left
+    assert not [c for c in commands if _PENDING_COUNT.search(c)], left
+    assert not [c for c in commands if c.startswith("jq ")], left
+    assert not [c for c in commands if c in SC_ECHOES], left
+    assert ("Setup", USER_SETUP["hooks"][0]["command"]) in left
+    assert ("TeammateIdle", USER_IDLE["hooks"][0]["command"]) in left
+    assert snapshot(scripts) == scripts_before
+
+
+def test_c09_uninstall_removes_the_unmarked_echoes(tmp_path: Path, monkeypatch) -> None:
+    """The `[experimental]` echoes carried no marker, so uninstall left them."""
+    home, _project, base = build_legacy_install(tmp_path, "d174e600-user", monkeypatch)
+    _plant_retired_neighbours(base / "settings.json", home)
+
+    success, message = uninstall_all(base_path=base, scope="user")
+
+    assert success, message
+    left = _registrations(base / "settings.json")
+    assert sorted(left) == sorted(
+        [
+            ("Setup", USER_SETUP["hooks"][0]["command"]),
+            ("TeammateIdle", USER_IDLE["hooks"][0]["command"]),
+        ]
+    ), message
+
+
+SERENA = "serena-hooks activate --client=claude-code"
+
+
+def test_c09_retired_serena_hooks_go_only_when_superclaude_wrote_them(
+    tmp_path: Path, monkeypatch
+) -> None:
+    """6feae043 → 2a404ecd merged Serena's hooks in `[superclaude]` entries; Serena
+    now installs the same commands itself, unmarked, and those are not ours."""
+    _home, _project, base = fresh_install(tmp_path, monkeypatch, "user")
+    data = json.loads((base / "settings.json").read_text(encoding="utf-8"))
+    ours = {
+        "_comment": "[superclaude] serena-recommended (snapshot 2026-04-27)",
+        "matcher": "",
+        "hooks": [{"type": "command", "command": SERENA}],
+    }
+    theirs = {"matcher": "", "hooks": [{"type": "command", "command": SERENA}]}
+    data["hooks"]["SessionStart"][:0] = [ours, theirs]
+    (base / "settings.json").write_text(json.dumps(data), encoding="utf-8")
+
+    success, message = install_all(base_path=base, force=False, scope="user")
+
+    assert success, message
+    after = json.loads((base / "settings.json").read_text(encoding="utf-8"))
+    serena = [
+        entry
+        for entry in after["hooks"]["SessionStart"]
+        if any(hook["command"] == SERENA for hook in entry["hooks"])
+    ]
+    assert serena == [theirs], message
+
+
+def test_q13_every_retired_hook_identity_is_listed() -> None:
+    """Q10/Q13 guard over every hooks.json revision: each event, entry point and
+    inline command no longer shipped is retired, or named unsupported (Q14 b)."""
+    from superclaude.cli import install_settings
+
+    retired_events = set(getattr(install_settings, "RETIRED_HOOK_EVENTS", ()))
+    retired_ids = set(getattr(install_settings, "RETIRED_HOOK_IDS", ()))
+    retired_commands = set(getattr(install_settings, "RETIRED_HOOK_COMMANDS", ()))
+    digests = set(getattr(install_settings, "RETIRED_HOOK_COMMAND_DIGESTS", ()))
+    unsupported = set(getattr(install_settings, "UNSUPPORTED_HOOK_COMMANDS", ()))
+    events = {r["event"] for r in HISTORY["hook_events"] if not r["shipped_now"]}
+    ids = {
+        (r["event"], r["entry_point"], r["subcommand"])
+        for r in HISTORY["hook_ids"]
+        if not r["shipped_now"]
+    }
+    shipped_ids = {
+        (r["event"], r["entry_point"], r["subcommand"])
+        for r in HISTORY["hook_ids"]
+        if r["shipped_now"]
+    }
+    by_digest = {
+        hashlib.sha256(r["command"].encode("utf-8")).hexdigest()[:16]: r["command"]
+        for r in HISTORY["inline_hook_commands"]
+    }
+    inline = {command for d, command in by_digest.items() if d not in digests}
+
+    assert digests and digests <= set(by_digest), REGENERATE
+    assert events <= retired_events, REGENERATE
+    assert ids <= retired_ids, REGENERATE
+    assert inline <= retired_commands | unsupported, REGENERATE
+    shipped_events = {r["event"] for r in HISTORY["hook_events"] if r["shipped_now"]}
+    assert not retired_events & shipped_events
+    assert not retired_ids & shipped_ids
+
+
+# --- C-11: verify-drift and the shared directories (Q9 a) --------------------
+
+
+def _era_blob(era: str, key: str) -> str:
+    return BLOBS[load_era(era)["files"][key]["blob"]]
+
+
+@pytest.mark.parametrize("scope", SCOPES)
+def test_c11_users_own_agents_and_styles_are_not_drift(
+    tmp_path: Path, monkeypatch, scope: str
+) -> None:
+    """C-11: the user's own agent and style read as EXTRA, so verify-drift
+    exited 1 forever on a clean install."""
+    _home, _project, base = fresh_install(tmp_path, monkeypatch, scope)
+    (base / "agents" / "my-agent.md").write_text("mine\n", encoding="utf-8")
+    (base / "output-styles" / "my-style.md").write_text("mine\n", encoding="utf-8")
+
+    result = CliRunner().invoke(main, ["verify-drift", "--scope", scope, "--verbose"])
+
+    output = all_output(result)
+    assert result.exit_code == 0, output
+    assert "my-agent" not in output and "my-style" not in output, output
+
+
+def test_c11_retired_superclaude_skill_and_agent_are_reported(
+    tmp_path: Path, monkeypatch
+) -> None:
+    """A stale SC skill dir was invisible (EXTRA was looked for only inside
+    shipped skill dirs): it is RETIRED now. An ever-shipped agent name is EXTRA."""
+    home, _project, base = fresh_install(tmp_path, monkeypatch, "user")
+    era = "b933fd65p-user"
+    skill = base / "skills" / "using-superclaude" / "SKILL.md"
+    skill.parent.mkdir(parents=True)
+    skill.write_text(
+        _era_blob(era, "$HOME/.claude/skills/using-superclaude/SKILL.md"), "utf-8"
+    )
+    (base / "agents" / "pm-agent.md").write_text(
+        _era_blob(era, "$HOME/.claude/agents/pm-agent.md"), "utf-8"
+    )
+
+    result = CliRunner().invoke(main, ["verify-drift", "--scope", "user", "--verbose"])
+
+    output = all_output(result)
+    assert result.exit_code == 1, output
+    assert "using-superclaude/: RETIRED" in output, output
+    assert "pm-agent.md: EXTRA" in output, output
+
+
+# --- C-10: stale content reads as stale (Q3 a) --------------------------------
+#
+# A non-force install keeps skip-if-exists, says how many kept files differ and
+# how to refresh them; doctor reports drift, missing content, obsolete hook
+# registrations and agents pointed at another scope's memory as advisories
+# (exit code unchanged); `--list-all` never puts ✅ beside "obsolete".
+
+BASE_CHECKS = ("Hooks in settings.json", "CLAUDE_SC.md", "CLAUDE.md import")
+_DIFFER = re.compile(r"(\d+) installed file\(s\) differ")
+
+
+def _verdicts(result: dict) -> dict[str, bool]:
+    return {c["name"]: c["passed"] for c in result["checks"]}
+
+
+def test_c10_non_force_install_says_how_many_files_differ(
+    tmp_path: Path, monkeypatch
+) -> None:
+    """C-10 / Q3 a: skip semantics stay, and the skipped drift is reported."""
+    from superclaude.cli.verify_drift import verify_drift
+
+    _home, _project, base = build_legacy_install(tmp_path, "v4.20.1-user", monkeypatch)
+
+    success, message = install_all(base_path=base, force=False, scope="user")
+
+    assert success, message
+    drifted = verify_drift(base)["total_drifted"]
+    assert drifted > 0
+    lines = [line for line in message.splitlines() if _DIFFER.search(line)]
+    assert lines, message
+    assert int(_DIFFER.search(lines[0]).group(1)) == drifted, lines
+    assert "'superclaude update --scope user'" in lines[0], lines
+
+
+def test_c10_doctor_advises_on_drift_and_deleted_content(
+    tmp_path: Path, monkeypatch
+) -> None:
+    """C-10: doctor said "healthy" with 76 drifted files and with deleted
+    commands. The verdicts stay; an advisory names the count and the refresh."""
+    _home, _project, base = build_legacy_install(tmp_path, "v4.20.1-user", monkeypatch)
+    install_all(base_path=base, force=False, scope="user")
+
+    result = run_doctor(scope="user")
+
+    assert all(_verdicts(result)[name] for name in BASE_CHECKS), result
+    drift = [a for a in result["advisories"] if _DIFFER.search(a)]
+    assert drift, result["advisories"]
+    assert "'superclaude update --scope user'" in drift[0]
+
+    (base / "commands" / "sc" / "analyze.md").unlink()
+    result = run_doctor(scope="user")
+    assert any("1 missing" in a for a in result["advisories"]), result["advisories"]
+
+
+def _plant_registration(base: Path, command: str) -> None:
+    data = json.loads((base / "settings.json").read_text(encoding="utf-8"))
+    data["hooks"]["UserPromptSubmit"].append(
+        {"hooks": [{"type": "command", "command": command}]}
+    )
+    (base / "settings.json").write_text(json.dumps(data), encoding="utf-8")
+
+
+def test_c10_obsolete_registration_is_an_advisory_and_not_a_tick(
+    tmp_path: Path, monkeypatch
+) -> None:
+    """C-10: `--list-all` put ✅ on a hooks row that named obsolete entries, and
+    doctor was silent about them. (An unknown `superclaude hook` name exits 1,
+    which blocks nothing: an advisory.)"""
+    _home, _project, base = fresh_install(tmp_path, monkeypatch, "user")
+    _plant_registration(base, "superclaude hook dropped_hook")
+
+    advisories = run_doctor(scope="user")["advisories"]
+    listing = CliRunner().invoke(main, ["install", "--list-all", "--scope", "user"])
+
+    assert any("1 obsolete" in a for a in advisories), advisories
+    output = all_output(listing)
+    row = [line for line in output.splitlines() if "Hooks registered" in line]
+    assert row and "✅" not in row[0], output
+
+
+def test_c10_doctor_fails_on_a_registration_whose_script_is_gone(
+    tmp_path: Path, monkeypatch
+) -> None:
+    """C-10, D1-scripts-gone: a legacy registration whose script copy is gone
+    exits 2 in Claude Code, which blocks the prompt; doctor called that healthy."""
+    _home, _project, base = fresh_install(tmp_path, monkeypatch, "user")
+    _plant_registration(base, f"python3 {base}/superclaude/scripts/skill_activator.py")
+
+    result = run_doctor(scope="user")
+
+    hooks = next(c for c in result["checks"] if c["name"] == "Hooks in settings.json")
+    assert not hooks["passed"], hooks
+    assert any("skill_activator" in line for line in hooks["details"]), hooks
+
+
+@pytest.mark.parametrize("scope", ["user", "local"])
+def test_c10_update_says_where_pre_rewrite_agent_memory_moves(
+    tmp_path: Path, monkeypatch, scope: str
+) -> None:
+    """U9: `update` over a pre-v4.20.1 install rewrites `memory: project` to the
+    scope, moving where agents keep memory, and said nothing about it."""
+    _home, _project, base = build_legacy_install(
+        tmp_path, f"ec6fa7e2p-{scope}", monkeypatch
+    )
+    assert _memory_values(base) == {"memory: project"}
+
+    result = CliRunner().invoke(main, ["update", "--scope", scope])
+
+    output = all_output(result)
+    assert result.exit_code == 0, output
+    assert _memory_values(base) == {f"memory: {scope}"}
+    moved = [line for line in output.splitlines() if "Agent memory moves" in line]
+    assert moved and "memory: project" in moved[0], output
+
+
+def test_c10_doctor_labels_its_advisories(tmp_path: Path, monkeypatch) -> None:
+    """The advisory lines say they are advisories, so a passing run reads right."""
+    _home, _project, base = fresh_install(tmp_path, monkeypatch, "user")
+    (base / "commands" / "sc" / "analyze.md").unlink()
+
+    result = CliRunner().invoke(main, ["doctor", "--scope", "user"])
+
+    output = all_output(result)
+    assert "Advisories" in output, output
+
+
+def test_c10_doctor_names_agents_on_another_scopes_memory(
+    tmp_path: Path, monkeypatch
+) -> None:
+    """C-10: a non-force upgrade from before v4.20.1 keeps `memory: project` on
+    every old agent, so agent memory still lands in every project."""
+    _home, _project, base = build_legacy_install(
+        tmp_path, "ec6fa7e2p-user", monkeypatch
+    )
+    success, message = install_all(base_path=base, force=False, scope="user")
+    assert success, message
+
+    advisories = run_doctor(scope="user")["advisories"]
+
+    memory = [a for a in advisories if "memory: project" in a]
+    assert memory, advisories
+    assert "'superclaude update --scope user'" in memory[0]
+
+
+def test_c10_clean_install_has_no_advisory(tmp_path: Path, monkeypatch) -> None:
+    _home, _project, _base = fresh_install(tmp_path, monkeypatch, "user")
+    monkeypatch.delenv("CLAUDE_CONFIG_DIR", raising=False)
+
+    assert run_doctor(scope="user")["advisories"] == []
+
+
+# --- C-12: uninstall leaves no superclaude-made state (Q11 b) ----------------
+
+
+def test_c12_uninstall_leaves_no_state_superclaude_made(
+    tmp_path: Path, monkeypatch
+) -> None:
+    """C-12: after a fresh user install, uninstall left an empty agent-memory/,
+    a CLAUDE.md holding only `# Claude Code Configuration` and a `{}`
+    settings.json the install had created."""
+    _home, _project, base = fresh_install(tmp_path, monkeypatch, "user")
+    assert (base / "agent-memory").is_dir()
+
+    success, message = uninstall_all(base_path=base, scope="user")
+
+    assert success, message
+    assert not (base / "agent-memory").exists(), message
+    assert not (base / "CLAUDE.md").exists(), message
+    assert not (base / "settings.json").exists(), message
+
+
+def test_c12_uninstall_keeps_what_the_user_put_there(
+    tmp_path: Path, monkeypatch
+) -> None:
+    """Q11 b: a memory dir goes only when empty, CLAUDE.md only when it holds
+    nothing but SC's heading, settings.json only when SC's hooks were all of it."""
+    _home, _project, base = fresh_install(tmp_path, monkeypatch, "user")
+    memory = base / "agent-memory" / "verifier" / "MEMORY.md"
+    memory.parent.mkdir(parents=True)
+    memory.write_text("learned\n", encoding="utf-8")
+    claude_md = base / "CLAUDE.md"
+    claude_md.write_text(
+        claude_md.read_text(encoding="utf-8") + "\nAlways answer in Korean.\n", "utf-8"
+    )
+    data = json.loads((base / "settings.json").read_text(encoding="utf-8"))
+    data["model"] = "opus"
+    (base / "settings.json").write_text(json.dumps(data), encoding="utf-8")
+
+    success, message = uninstall_all(base_path=base, scope="user")
+
+    assert success, message
+    assert memory.read_text(encoding="utf-8") == "learned\n"
+    assert "Always answer in Korean." in claude_md.read_text(encoding="utf-8")
+    assert "CLAUDE_SC" not in claude_md.read_text(encoding="utf-8")
+    assert json.loads((base / "settings.json").read_text(encoding="utf-8")) == {
+        "model": "opus"
+    }
+
+
+def test_c12_local_uninstall_warns_when_agent_memory_loses_its_exclude(
+    tmp_path: Path, monkeypatch
+) -> None:
+    """C-12: a non-empty agent-memory-local/ stays, and uninstall removes the
+    exclude block that hid it, with no warning; git then offers it for commit."""
+    _home, project, base = fresh_install(tmp_path, monkeypatch, "local")
+    memory = base / "agent-memory-local" / "verifier" / "MEMORY.md"
+    memory.parent.mkdir(parents=True)
+    memory.write_text("learned\n", encoding="utf-8")
+    assert _ignored(project, ".claude/agent-memory-local/verifier/MEMORY.md")
+
+    success, message = uninstall_all(base_path=base, scope="local")
+
+    assert success, message
+    assert memory.exists()
+    assert not _ignored(project, ".claude/agent-memory-local/verifier/MEMORY.md")
+    warning = [
+        line
+        for line in message.splitlines()
+        if line.startswith("⚠️") and "agent-memory-local" in line
+    ]
+    assert warning, message
+    assert "git" in warning[0]
+
+
+def test_c12_empty_local_memory_store_goes_quietly(tmp_path: Path, monkeypatch) -> None:
+    _home, _project, base = fresh_install(tmp_path, monkeypatch, "local")
+
+    success, message = uninstall_all(base_path=base, scope="local")
+
+    assert success, message
+    assert not (base / "agent-memory-local").exists(), message
+    assert "⚠️" not in message

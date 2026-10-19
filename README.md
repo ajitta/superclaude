@@ -155,7 +155,7 @@ superclaude uninstall --remove-mcp     # also unregister framework-installed MCP
 uv tool uninstall superclaude          # finally, remove the CLI itself
 ```
 
-The uninstall is marker-based: it removes only the hooks and the `@superclaude/CLAUDE_SC.md` import that the installer wrote. User-added hooks, MCP servers, and CLAUDE.md content are preserved unless you explicitly opt out.
+The uninstall is marker-based: it removes only the hooks and the `@superclaude/CLAUDE_SC.md` import that the installer wrote. User-added hooks, MCP servers, and CLAUDE.md content are preserved unless you explicitly opt out. A file or directory left holding only what the installer made goes too: an empty agent-memory store, a `CLAUDE.md` with only its `# Claude Code Configuration` heading, a settings file that held only superclaude hooks. What you or your agents wrote stays: agent memory with content (at local scope uninstall warns that git stops ignoring it), and the per-project `.claude/insights.jsonl` and `.claude/insights.pending.jsonl`.
 
 #### **CLI scope summary**
 

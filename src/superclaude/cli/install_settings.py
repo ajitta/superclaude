@@ -7,15 +7,18 @@ This is a leaf dependency with no internal imports.
 
 import codecs
 import copy
+import functools
+import hashlib
 import json
 import re
 from collections import Counter
 from pathlib import Path
-from typing import List, Optional, Tuple
+from typing import Callable, List, Optional, Tuple
 
 from superclaude.utils import (
     CONSOLE_HOOK_RE,
     SUPERCLAUDE_HOOK_MARKERS,
+    UNMARKED_SC_HOOK_COMMANDS,
     atomic_write_json,
     is_legacy_hook_command,
     is_superclaude_hook,
@@ -47,6 +50,60 @@ _HOOK_SCRIPT_RE = re.compile(r"([A-Za-z0-9_]+)\.py(?=\s|$)(.*)$")
 # redirection (`|`, `&&`, `2>>log`) are not subcommands — a user who wraps our
 # command in a pipeline still runs the same hook.
 _SUBCOMMAND_RE = re.compile(r"[A-Za-z0-9_][A-Za-z0-9_-]*")
+
+# Hook registrations a release shipped and this one does not (Q13). Install —
+# force or not — and uninstall remove a superclaude inner hook that matches:
+# skip-if-registered kept these forever, still running script copies under
+# superclaude/scripts/ that exit 2, the blocking code, once they are gone. A
+# user's own hook on the same event is never touched. Every identity the full
+# history (tests/fixtures/shipped_names_history.json) marks as no longer
+# shipped is in one of these lists, by digest in RETIRED_HOOK_COMMAND_DIGESTS
+# or in UNSUPPORTED_HOOK_COMMANDS; a test fails otherwise.
+RETIRED_HOOK_EVENTS = ("Setup", "TaskCompleted", "TeammateIdle")
+# (event, entry point, subcommand), as _hook_script_id reads a command.
+RETIRED_HOOK_IDS = (
+    ("SessionStart", "insight_writer", "pending-count"),
+    ("Setup", "session_init", ""),
+    ("UserPromptSubmit", "skill_activator", ""),
+)
+# Inline commands, matched whole.
+RETIRED_HOOK_COMMANDS = (
+    # the jq destructive blockers, replaced by `destructive_guard`
+    "jq -r '.tool_input.command // empty' | head -1 | grep -qE "
+    r"'rm\s+-rf\s+/\s*$|rm\s+-rf\s+/\*|git\s+push\s+.*--force([^-]|$).*(main|master)'"
+    " && echo 'BLOCKED: destructive command detected (--force-with-lease is "
+    "allowed)' >&2 && exit 2 || exit 0",
+    "jq -r '.tool_input.command // empty' | head -1 | grep -qE "
+    r"'rm\s+-rf\s+/\s*$|rm\s+-rf\s+/\*|git\s+push\s+.*--force.*(main|master)'"
+    " && echo 'BLOCKED: destructive command detected' >&2 && exit 2 || exit 0",
+    # the agent-team echoes
+    *UNMARKED_SC_HOOK_COMMANDS,
+    "echo '[superclaude] Teammate idle — assign next task'",
+    "echo '[superclaude] Task completed — aggregate results'",
+)
+# The four commands of the second hooks file, hooks/<server>-hooks.json
+# (6feae043 → 2a404ecd), which that MCP server's own CLI installs now. Ours only inside a `[superclaude]`
+# entry; the same command elsewhere is the server's or the user's. Matched by
+# digest (sha256 of the command, first 16 hex digits) because shipped content
+# names no MCP server (test_shipped_content_server_neutral.py).
+RETIRED_HOOK_COMMAND_DIGESTS = (
+    "10956d2eb9974a3b",
+    "6930138fca49261e",
+    "7c637e399af28226",
+    "c6592748289cf003",
+)
+# The 81343a67 → dc6e0866 hooks.json forms: relative script paths and a bare
+# prettier pipeline, never attributable to superclaude once in a settings file
+# (`./scripts/session-init.sh` may well be the user's). Unsupported, like the
+# one-day `.claude/hooks/<x>.py` era (Q14 b); the CHANGELOG upgrade note says
+# how to remove them by hand.
+UNSUPPORTED_HOOK_COMMANDS = (
+    "./scripts/session-init.sh",
+    "./scripts/skill-activator.sh",
+    "jq -r '.tool_input.file_path' | xargs -I {} sh -c 'echo \"{}\" | grep -qE "
+    r'"\.(ts|tsx|js|jsx)$"'
+    ' && npx prettier --write "{}" 2>/dev/null || true\'',
+)
 
 # Byte-order marks, longest first where one prefixes another.
 _BOMS = (
@@ -261,25 +318,67 @@ def _split_entry(hook_entry: dict) -> Tuple[List[dict], List[dict]]:
     return sc_hooks, user_hooks
 
 
-def _strip_sc_inner_hooks(hook_array: List[dict]) -> Tuple[List[dict], bool]:
+def _strip_sc_inner_hooks(
+    hook_array: List[dict], select: Optional[Callable[[dict], bool]] = None
+) -> Tuple[List[dict], bool]:
     """Remove superclaude inner hooks, keeping entries that still hold user ones.
 
     Entry order is preserved, so a user hook stays where the user put it. An
     entry left with nothing inside is dropped rather than written back empty.
+    ``select``, when given, narrows the removal to the superclaude hooks it
+    accepts; the others stay as written.
     """
     kept: List[dict] = []
     changed = False
     for entry in hook_array:
-        sc_hooks, user_hooks = _split_entry(entry)
-        if not sc_hooks:
+        sc_hooks, _user_hooks = _split_entry(entry)
+        removed = {id(h) for h in sc_hooks if select is None or select(h)}
+        if not removed:
             kept.append(entry)
             continue
         changed = True
-        if user_hooks:
+        rest = [h for h in entry.get("hooks", []) if id(h) not in removed]
+        if rest:
             reduced = {key: value for key, value in entry.items() if key != "hooks"}
-            reduced["hooks"] = user_hooks
+            reduced["hooks"] = rest
             kept.append(reduced)
     return kept, changed
+
+
+def _is_retired_hook(event: str, hook: dict) -> bool:
+    """Whether an inner hook on ``event`` is a registration no release ships now."""
+    if event in RETIRED_HOOK_EVENTS:
+        return True
+    command = hook.get("command", "").strip()
+    if command in RETIRED_HOOK_COMMANDS:
+        return True
+    if _command_digest(command) in RETIRED_HOOK_COMMAND_DIGESTS:
+        return True
+    return (event, *_hook_script_id(hook)) in RETIRED_HOOK_IDS
+
+
+def _command_digest(command: str) -> str:
+    return hashlib.sha256(command.encode("utf-8")).hexdigest()[:16]
+
+
+def _strip_retired_hooks(hooks: dict) -> int:
+    """Remove superclaude's retired registrations in place; return how many went."""
+    removed = 0
+    for event, array in list(hooks.items()):
+        if not isinstance(array, list):
+            continue
+        before = sum(len(_split_entry(e)[0]) for e in array if isinstance(e, dict))
+        kept, changed = _strip_sc_inner_hooks(
+            array, functools.partial(_is_retired_hook, event)
+        )
+        if not changed:
+            continue
+        removed += before - sum(len(_split_entry(e)[0]) for e in kept)
+        if kept:
+            hooks[event] = kept
+        else:
+            del hooks[event]
+    return removed
 
 
 def _merge_hook_arrays(
@@ -469,6 +568,10 @@ def merge_hooks_to_settings(
     before = copy.deepcopy(existing_hooks)
     stats: dict = {}
 
+    # Registrations no release ships go first, in both modes: a non-force merge
+    # keeps every existing superclaude entry, so it never reached them.
+    retired = _strip_retired_hooks(existing_hooks)
+
     # `--force` means "replace with what this release ships", and that has to
     # include events this release no longer ships. Walking only the new config's
     # event types left a superclaude hook on a retired event firing forever,
@@ -518,11 +621,14 @@ def merge_hooks_to_settings(
         return False, save_msg
 
     rewritten = stats.get("rewritten", 0)
-    note = (
-        f" ({rewritten} legacy command(s) rewritten to `superclaude hook <name>`)"
-        if rewritten > 0
-        else ""
-    )
+    notes = []
+    if rewritten > 0:
+        notes.append(
+            f"{rewritten} legacy command(s) rewritten to `superclaude hook <name>`"
+        )
+    if retired > 0:
+        notes.append(f"{retired} retired registration(s) removed")
+    note = f" ({'; '.join(notes)})" if notes else ""
     return True, f"Hooks merged to {settings_file}{note}"
 
 
@@ -574,9 +680,10 @@ def uninstall_hooks_from_settings(
     if not existing_hooks:
         del settings["hooks"]
 
-    # For local/project scope: if the settings file is now empty (only SC content), delete it.
-    # User scope is excluded — global settings.json is likely to hold user config independent of SC.
-    if scope in ("local", "project") and not settings:
+    # A settings file left empty holds nothing but what superclaude wrote: delete
+    # it. At user scope only when this run removed our hooks — the global file
+    # usually predates superclaude, and a `{}` the user keeps is not ours to drop.
+    if not settings and (scope in ("local", "project") or cleaned_any):
         try:
             settings_file.unlink()
             return (
@@ -723,14 +830,15 @@ def remove_claude_md_import(base_path: Path, scope: str = "user") -> Tuple[bool,
         if content == original_content:
             return True, f"No superclaude import found in {target_label}"
 
-        # For local/project scope: if CLAUDE.md/CLAUDE.local.md has no user content
-        # (empty or only the SC-created header), remove it entirely.
-        # User scope is excluded — global CLAUDE.md is likely to hold user config independent of SC.
+        # A file holding nothing but the heading install writes when it creates
+        # the file is superclaude's: remove it. Local and project scope also
+        # remove a file left empty; the global ~/.claude/CLAUDE.md usually
+        # predates superclaude, so there only the heading-only file goes.
         SC_HEADERS = {  # noqa: N806 — function-local constant
             "# Claude Code Configuration (personal, gitignored)",
             "# Claude Code Configuration",
         }
-        if scope in ("local", "project") and (not stripped or stripped in SC_HEADERS):
+        if stripped in SC_HEADERS or (scope in ("local", "project") and not stripped):
             claude_md.unlink()
             return True, f"{target_label} removed (no user content after SC cleanup)"
 

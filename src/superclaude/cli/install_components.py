@@ -215,21 +215,73 @@ def find_agent_memory_conflict(
     return f"{lead} Run {steps} first."
 
 
+def _declared_memory(base_path: Path, scope: str) -> dict:
+    """``{value: agent count}`` for every `memory:` value other than ``scope``.
+
+    Unlike ``_other_memory_values`` there is no git gate: this guards nothing,
+    it reports. A user or local install from before the scope rewrite (v4.20.1)
+    keeps `memory: project`, and Claude Code then writes agent memory into
+    every project it runs in.
+    """
+    agents_dir = _get_target_dir("agents", base_path)
+    found: dict = {}
+    for name in sorted(shipped_names("agents")):
+        try:
+            match = _AGENT_MEMORY_LINE.search(
+                (agents_dir / name).read_text(encoding="utf-8")
+            )
+        except (OSError, UnicodeDecodeError):
+            continue
+        value = match.group(2) if match else None
+        if value and value != scope and value in _AGENT_MEMORY_DIRS:
+            found[value] = found.get(value, 0) + 1
+    return found
+
+
+def _store_label(value: str, scope: str, base_path: Path) -> str:
+    """Where agents declaring `memory: <value>` keep memory, said for a user to read."""
+    if value == "user" or scope != "user":
+        return str(_memory_store(value, base_path))
+    # project or local agents installed at user scope resolve against the CWD
+    return f"the .claude/{_AGENT_MEMORY_DIRS[value]}/ of every project"
+
+
 def agent_memory_move_notice(base_path: Path, scope: str) -> str | None:
     """What a forced install's `memory:` rewrite moves, or None.
 
-    Only for the values ``find_agent_memory_conflict`` lets a forced install
-    rewrite: an older release's, naming a store outside this install.
+    Read before the rewrite. ``find_agent_memory_conflict`` has already let the
+    install through, so every value here is an older release's: the era's
+    `memory: user`, or the `memory: project` user and local installs kept from
+    before v4.20.1, which moved silently.
     """
-    found = _other_memory_values(base_path, scope)
-    moved = sorted(s for s in found if not _shares_base(s, base_path))
+    moved = sorted(_declared_memory(base_path, scope))
     if not moved:
         return None
-    sources = ", ".join(str(_memory_store(s, base_path)) for s in moved)
+    sources = ", ".join(_store_label(s, scope, base_path) for s in moved)
     return (
         f"ℹ️  Agent memory moves to {_memory_store(scope, base_path)}: the agents "
         f"declared {', '.join(f'memory: {s}' for s in moved)} (an older "
         f"release's value), and what they saved in {sources} stays there."
+    )
+
+
+def agent_memory_advisory(base_path: Path, scope: str) -> str | None:
+    """Which installed agents keep memory outside this scope's store, or None.
+
+    A non-force install keeps every existing agent and its `memory:` value.
+    """
+    found = _declared_memory(base_path, scope)
+    if not found:
+        return None
+    declared = "; ".join(
+        f"{count} declare `memory: {value}`, so their memory goes to "
+        f"{_store_label(value, scope, base_path)}"
+        for value, count in sorted(found.items())
+    )
+    return (
+        f"ℹ️  Agents in {_get_target_dir('agents', base_path)}: {declared}, not to "
+        f"{_memory_store(scope, base_path)}. Run "
+        f"{scope_command('update', scope, base_path)} to rewrite them."
     )
 
 
@@ -738,11 +790,22 @@ def install_all(
     )
     messages.append(f"📁 Installation directory: {base_path}")
 
-    if total_skipped > 0:
-        messages.append(
-            f"\n💡 Tip: {scope_command('install --force', scope, base_path)} "
-            "reinstalls existing files"
-        )
+    # Skip-if-exists stays (Q3); what it kept that differs from this release is
+    # reported, so a non-force upgrade cannot pass for a current install.
+    if not force:
+        from .verify_drift import verify_drift
+
+        drifted = verify_drift(base_path)["total_drifted"]
+        if drifted:
+            messages.append(
+                f"\nℹ️  {drifted} installed file(s) differ from this release and "
+                "were kept: a non-force install skips files that exist. Run "
+                f"{scope_command('update', scope, base_path)} to refresh them (it "
+                "replaces local edits to superclaude's files)."
+            )
+        memory = agent_memory_advisory(base_path, scope)
+        if memory:
+            messages.append(memory)
 
     messages.append("\n🔄 Restart Claude Code to use the new components")
 

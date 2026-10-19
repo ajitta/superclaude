@@ -81,6 +81,12 @@ Tests are in `tests/unit/test_install_upgrade_scenarios.py`; each was seen red b
 | C-06 | fixed (P5 group 2), ruling (b): non-force install refuses and advises `update --scope <this>`, which proceeds | `test_c06_memory_user_era_project_install_advises_update_in_scope`, `test_c06_update_rewrites_era_agents_to_the_project_store`, `test_c06_conflict_advice_never_names_another_base` |
 | C-15 | fixed (P5 group 2), warning only at user scope | `test_c15_install_and_doctor_name_a_differing_config_dir`, `test_c15_no_warning_when_config_dir_is_the_default` |
 | C-18 | fixed (P5 group 2), reported, not prevented | `test_c18_project_install_reports_replacing_a_worktree_local_block` |
+| C-08 | fixed (P5 group 3); the ten process-skill names obra/superpowers also uses go only when SKILL.md is a shipped revision (digest) | `test_c08_retired_agents_and_skills_do_not_survive`, `test_c08_another_collections_skill_under_a_retired_name_is_kept`, `test_q10_every_retired_name_is_on_a_retired_list`, `test_q10_guarded_skill_digests_cover_every_shipped_revision` |
+| C-09 | fixed (P5 group 3); the E3 relative-path forms are unsupported with C-16 (Q14 b) | `test_c09_retired_hook_registrations_removed`, `test_c09_uninstall_removes_the_unmarked_echoes`, `test_c09_retired_serena_hooks_go_only_when_superclaude_wrote_them`, `test_q13_every_retired_hook_identity_is_listed` |
+| C-10 | fixed (P5 group 3) | `test_c10_non_force_install_says_how_many_files_differ`, `test_c10_doctor_advises_on_drift_and_deleted_content`, `test_c10_obsolete_registration_is_an_advisory_and_not_a_tick`, `test_c10_doctor_names_agents_on_another_scopes_memory`, `test_c10_clean_install_has_no_advisory` |
+| C-11 | fixed (P5 group 3) | `test_c11_users_own_agents_and_styles_are_not_drift`, `test_c11_retired_superclaude_skill_and_agent_are_reported` |
+| C-12 | fixed (P5 group 3); `insights.pending.jsonl` kept and documented in README | `test_c12_uninstall_leaves_no_state_superclaude_made`, `test_c12_uninstall_keeps_what_the_user_put_there`, `test_c12_local_uninstall_warns_when_agent_memory_loses_its_exclude`, `test_c12_empty_local_memory_store_goes_quietly` |
+| C-16 | upgrade note only (Q14 b), CHANGELOG | — |
 
 ## Owner checkpoint
 

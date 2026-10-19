@@ -193,20 +193,22 @@ def install(
         click.echo(f"📋 superclaude Components (scope: {scope}):\n")
         for name, info in components.items():
             status = f"{info['installed']}/{info['available']}"
-            icon = (
-                "✅"
-                if info["installed"] == info["available"] and info["available"] > 0
-                else "⬜"
-            )
-            click.echo(f"   {icon} {info['description']:40} [{status}]")
-            click.echo(f"      └─ {info['target_path']}")
             # Counts alone cannot say whether the registered hooks are the
-            # shipped ones, so name the mismatch when there is one.
+            # shipped ones, so name the mismatch when there is one — and never
+            # tick a row that names one.
             drift = ", ".join(
                 f"{info[key]} {key}"
                 for key in ("missing", "obsolete", "duplicate")
                 if info.get(key)
             )
+            if drift:
+                icon = "⚠️ "
+            elif info["installed"] == info["available"] and info["available"] > 0:
+                icon = "✅"
+            else:
+                icon = "⬜"
+            click.echo(f"   {icon} {info['description']:40} [{status}]")
+            click.echo(f"      └─ {info['target_path']}")
             if drift:
                 click.echo(f"      └─ {drift}")
         return
@@ -480,6 +482,10 @@ def doctor(verbose: bool, scope: str | None):
         - `superclaude` resolvable on PATH, which every hook command needs
         - CLAUDE_SC.md installed and imported
 
+    Advisories (printed, exit code unchanged): installed files that differ
+    from this release, hook registrations it does not ship, agents keeping
+    memory outside this scope's store.
+
     Scope is detected by walking up from the working directory when not given,
     so a local- or project-scope install is checked where it actually lives,
     including from a subdirectory of the project.
@@ -509,6 +515,7 @@ def doctor(verbose: bool, scope: str | None):
     # Advisories warn without failing the run, so they print without --verbose.
     if results["advisories"]:
         click.echo()
+        click.echo("Advisories (these do not fail doctor):")
         for advisory in results["advisories"]:
             click.echo(advisory)
 
@@ -540,9 +547,12 @@ def verify_drift_cmd(scope: str | None, verbose: bool):
     - MISSING: source file not installed
     - DRIFTED: installed file differs from source
     - EXTRA: installed file has no source counterpart
+    - RETIRED: a superclaude skill directory no release ships now
 
     Coverage: component .md files (incl. core/rules/), every file of the
-    shipped templates and skills, and CLAUDE_SC.md.
+    shipped templates and skills, and CLAUDE_SC.md. In agents/,
+    output-styles/ and skills/ your own files are not checked; only names
+    superclaude shipped are.
     Not checked: the merged hooks.json.
 
     Examples:
@@ -563,11 +573,11 @@ def verify_drift_cmd(scope: str | None, verbose: bool):
     # Display per-component results
     for comp, data in result["components"].items():
         ok = data["ok"]
-        total = ok + data["drifted"] + data["missing"] + data["extra"]
+        issues = data["drifted"] + data["missing"] + data["extra"] + data["retired"]
+        total = ok + issues
         if total == 0:
             continue
 
-        issues = data["drifted"] + data["missing"] + data["extra"]
         icon = "✅" if issues == 0 else "⚠️"
         click.echo(f"   {icon} {comp:15} {ok}/{total} OK", nl=False)
         parts = []
@@ -577,6 +587,8 @@ def verify_drift_cmd(scope: str | None, verbose: bool):
             parts.append(f"{data['missing']} missing")
         if data["extra"]:
             parts.append(f"{data['extra']} extra")
+        if data["retired"]:
+            parts.append(f"{data['retired']} retired")
         if parts:
             click.echo(f"  ({', '.join(parts)})")
         else:
@@ -585,7 +597,13 @@ def verify_drift_cmd(scope: str | None, verbose: bool):
         # Verbose: show individual files
         if verbose and data.get("files"):
             for fname, status in data["files"].items():
-                s_icon = {"OK": "✅", "DRIFTED": "🔶", "MISSING": "❌", "EXTRA": "➕"}
+                s_icon = {
+                    "OK": "✅",
+                    "DRIFTED": "🔶",
+                    "MISSING": "❌",
+                    "EXTRA": "➕",
+                    "RETIRED": "🗑️",
+                }
                 click.echo(f"      {s_icon.get(status, '?')} {fname}: {status}")
 
     # CLAUDE_SC.md
@@ -598,9 +616,13 @@ def verify_drift_cmd(scope: str | None, verbose: bool):
     if result["clean"]:
         click.echo("✅ No drift detected — installation matches source")
     else:
+        retired = (
+            f", {result['total_retired']} retired" if result["total_retired"] else ""
+        )
         click.echo(
             f"⚠️  Drift detected: {result['total_drifted']} drifted, "
             f"{result['total_missing']} missing, {result['total_extra']} extra"
+            f"{retired}"
         )
         click.echo(
             f"   Run {scope_command('install --force', scope, base_path)} to re-sync"

@@ -468,13 +468,10 @@ class TestMergeHooksToSettings:
         success, _ = uninstall_hooks_from_settings(base_path)
         assert success is True
 
-        settings = json.loads((base_path / "settings.json").read_text())
-        # All hook types should be removed (no user hooks mixed in)
-        assert "TeammateIdle" not in settings.get("hooks", {}), (
-            "TeammateIdle should be removed after uninstall"
-        )
-        assert "TaskCompleted" not in settings.get("hooks", {}), (
-            "TaskCompleted should be removed after uninstall"
+        # Every hook was superclaude's (no user hooks mixed in), so nothing is
+        # left and the file goes, at user scope too (audit C-12, Q11 b).
+        assert not (base_path / "settings.json").exists(), (
+            "TeammateIdle/TaskCompleted echoes should be removed after uninstall"
         )
 
 

@@ -6,7 +6,10 @@ Compares source files against installed files to detect drift
 
 Coverage boundary: component *.md files (COMPONENTS, incl. core/rules/),
 every file under each shipped directory of a directory component (templates,
-skills) and CLAUDE_SC.md. The merged hooks.json is NOT drift-checked.
+skills) and CLAUDE_SC.md. The merged hooks.json is NOT drift-checked. In the
+directories Claude Code shares with the user (agents/, output-styles/,
+skills/) only names superclaude shipped count: a retired agent name is EXTRA, a
+retired superclaude skill directory RETIRED, anything else is not ours.
 Restated for the user in the `superclaude verify-drift` help text; keep the
 two in step.
 """
@@ -14,17 +17,21 @@ two in step.
 from collections import Counter
 from fnmatch import fnmatch
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 from .install_paths import (
     COMPONENTS,
     DIRECTORY_COMPONENTS,
     DIRECTORY_IGNORE,
+    RETIRED_AGENT_FILES,
+    SHARED_TARGET_COMPONENTS,
     _get_package_root,
     _get_source_dir,
     _get_target_dir,
     dir_names,
+    find_legacy_skills,
     md_names,
+    scope_command,
 )
 
 # File status constants
@@ -32,6 +39,11 @@ OK = "OK"
 MISSING = "MISSING"  # In source but not in target
 DRIFTED = "DRIFTED"  # Content mismatch
 EXTRA = "EXTRA"  # In target but not in source
+RETIRED = "RETIRED"  # A superclaude skill directory no release ships now
+
+# Names a release shipped into a shared directory and this one does not: the
+# only unshipped names there that are superclaude's.
+_RETIRED_FILES = {"agents": RETIRED_AGENT_FILES}
 
 
 def _compare_files(source: Path, target: Path) -> str:
@@ -77,7 +89,11 @@ def _check_component(component: str, base_path: Path) -> Dict[str, str]:
         return results
 
     if component in DIRECTORY_COMPONENTS:
-        return _check_directory_component(source_dir, target_dir)
+        results = _check_directory_component(source_dir, target_dir)
+        if component == "skills":
+            for skill_dir in find_legacy_skills(base_path):
+                results[f"{skill_dir.name}/"] = RETIRED
+        return results
 
     # Standard components: compare .md files (skip README)
     source_files = md_names(source_dir)
@@ -91,8 +107,12 @@ def _check_component(component: str, base_path: Path) -> Dict[str, str]:
             status = _compare_agent_with_scope_rewrite(source_file, target_file)
         results[filename] = status
 
-    # Check for extra files in target
-    for filename in sorted(md_names(target_dir) - source_files):
+    # Check for extra files in target. A shared directory holds the user's own
+    # files too; marking them EXTRA made verify-drift fail on every clean install.
+    extra = md_names(target_dir) - source_files
+    if component in SHARED_TARGET_COMPONENTS:
+        extra &= set(_RETIRED_FILES.get(component, ()))
+    for filename in sorted(extra):
         results[filename] = EXTRA
 
     # core/rules/ nested modules (Phase 2-1 core-lite split) — compare
@@ -178,6 +198,7 @@ def verify_drift(base_path: Path, verbose: bool = False) -> Dict[str, Any]:
             "drifted": counts[DRIFTED],
             "missing": counts[MISSING],
             "extra": counts[EXTRA],
+            "retired": counts[RETIRED],
             "files": file_results if verbose else {},
         }
         totals.update(counts)
@@ -185,11 +206,36 @@ def verify_drift(base_path: Path, verbose: bool = False) -> Dict[str, Any]:
     sc_status = _check_claude_sc_md(base_path)
     totals[sc_status] += 1
 
+    issues = totals[DRIFTED] + totals[MISSING] + totals[EXTRA] + totals[RETIRED]
     return {
         "components": components,
         "claude_sc_md": sc_status,
         "total_drifted": totals[DRIFTED],
         "total_missing": totals[MISSING],
         "total_extra": totals[EXTRA],
-        "clean": totals[DRIFTED] + totals[MISSING] + totals[EXTRA] == 0,
+        "total_retired": totals[RETIRED],
+        "clean": issues == 0,
     }
+
+
+def drift_advisory(base_path: Path, scope: str) -> Optional[str]:
+    """One line saying how far an install is from this release, or None when clean.
+
+    doctor's advisory tier (Q3): a non-force install keeps every existing file,
+    so an upgraded install can run old content indefinitely while every check
+    passes. Reported, not failed: an edited file is the user's choice.
+    """
+    result = verify_drift(base_path)
+    counts = [
+        (result[f"total_{status}"], status)
+        for status in ("drifted", "missing", "extra", "retired")
+    ]
+    total = sum(count for count, _ in counts)
+    if not total:
+        return None
+    parts = ", ".join(f"{count} {status}" for count, status in counts if count)
+    return (
+        f"ℹ️  {total} installed file(s) differ from this release ({parts}): run "
+        f"{scope_command('update', scope, base_path)} to refresh them (it replaces "
+        "local edits to superclaude's files)."
+    )
