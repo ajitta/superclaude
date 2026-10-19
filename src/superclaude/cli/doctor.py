@@ -22,7 +22,7 @@ from superclaude.utils import (
 
 from .install_paths import (
     _get_package_root,
-    config_dir_warning,
+    config_dir_notices,
     console_script_problems,
     has_install,
     probe_console_script,
@@ -78,9 +78,7 @@ def run_doctor(scope: str | None = None) -> Dict[str, Any]:
 
     advisories: list[str] = []
     if scope == "user":
-        warning = config_dir_warning()
-        if warning:
-            advisories.append(warning)
+        advisories.extend(config_dir_notices())
 
     hooks_check = _check_hooks_installed(base_path, scope)
     checks = [

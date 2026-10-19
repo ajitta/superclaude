@@ -868,13 +868,15 @@ def _context_content_root() -> tuple[Path, str | None]:
     """
     import os
 
+    from superclaude.utils import user_claude_dir
+
     override = os.environ.get("SUPERCLAUDE_PATH")
     if override:
         return Path(override), None
 
     def scoped(base: Path) -> Path:
         local = base / ".claude" / "superclaude"
-        return local if local.is_dir() else Path.home() / ".claude" / "superclaude"
+        return local if local.is_dir() else user_claude_dir() / "superclaude"
 
     anchor = os.environ.get("CLAUDE_PROJECT_DIR")
     if not anchor:

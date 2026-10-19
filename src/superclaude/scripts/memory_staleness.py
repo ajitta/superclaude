@@ -18,14 +18,24 @@ import sys
 from datetime import date, datetime
 from pathlib import Path
 
-from superclaude.utils import claude_projects_dir_name, project_root
+from superclaude.utils import claude_projects_dir_name, project_root, user_claude_dir
 
 DEFAULT_THRESHOLD_DAYS = 90
 ENV_THRESHOLD = "SUPERCLAUDE_MEMORY_STALE_DAYS"
-# Path.home(), not claude_base(): this directory belongs to Claude Code, which
-# always writes auto-memory under ~/.claude/projects/ regardless of the scope
-# superclaude was installed into. Only the project anchor below is ours.
-HOME_PROJECTS = Path.home() / ".claude" / "projects"
+
+
+def home_projects() -> Path:
+    """Claude Code's ``projects/`` directory, where it writes auto memory.
+
+    The user directory, not ``claude_base()``: this directory belongs to Claude
+    Code, which writes auto memory under its own user directory (``~/.claude``,
+    or ``$CLAUDE_CONFIG_DIR`` when set; ADR-0002) whatever scope superclaude was
+    installed into. Only the project anchor below is ours. Resolved per call so
+    a redirected home or config directory is honoured.
+    """
+    return user_claude_dir() / "projects"
+
+
 VERIFIED_RE = re.compile(r"^verified:\s*(\d{4}-\d{2}-\d{2})\s*$", re.MULTILINE)
 
 
@@ -84,7 +94,7 @@ def project_memory_dir() -> Path:
     return nothing. The name itself comes from ``claude_projects_dir_name``,
     the one encoder shared with insight_writer.
     """
-    return HOME_PROJECTS / claude_projects_dir_name(str(project_root())) / "memory"
+    return home_projects() / claude_projects_dir_name(str(project_root())) / "memory"
 
 
 def main() -> int:

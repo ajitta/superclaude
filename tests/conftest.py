@@ -78,6 +78,10 @@ def sandbox_home(tmp_path_factory, monkeypatch):
     home = tmp_path_factory.mktemp("home")
     monkeypatch.setenv("HOME", str(home))
     monkeypatch.setenv("USERPROFILE", str(home))
+    # User scope follows CLAUDE_CONFIG_DIR (ADR-0002): a developer who sets it
+    # would otherwise have every user-scope test write into their real config.
+    monkeypatch.delenv("CLAUDE_CONFIG_DIR", raising=False)
+    monkeypatch.delenv("CLAUDE_CODE_SUBPROCESS_ENV_SCRUB", raising=False)
 
     # Redirecting HOME fixes every path resolved per call. It does nothing for a
     # path resolved at module import, which happens during collection — before
