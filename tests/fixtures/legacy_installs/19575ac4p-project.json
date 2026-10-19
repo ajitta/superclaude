@@ -1,0 +1,389 @@
+{
+ "backs": "U5: committed project install, machine paths",
+ "captured": "2026-10-19",
+ "captured_with": "old-install.sh: git archive <ref> | uvx --offline --from <extract> superclaude install --scope <s> </dev/null",
+ "commit": "b632fd04",
+ "empty_dirs": [
+  "$PROJECT/.claude/agent-memory"
+ ],
+ "era": "19575ac4p-project",
+ "files": {
+  "$PROJECT/.claude/CLAUDE.md": {
+   "blob": "b9d0e50526420fc2"
+  },
+  "$PROJECT/.claude/agents/backend-architect.md": {
+   "blob": "31de5d52c7a46752"
+  },
+  "$PROJECT/.claude/agents/business-panel-experts.md": {
+   "blob": "b825a34eaa58087e"
+  },
+  "$PROJECT/.claude/agents/deep-researcher.md": {
+   "blob": "486e57b471fc32eb"
+  },
+  "$PROJECT/.claude/agents/devops-architect.md": {
+   "blob": "2296274a689e9a9b"
+  },
+  "$PROJECT/.claude/agents/frontend-architect.md": {
+   "blob": "c99879582cefc0c2"
+  },
+  "$PROJECT/.claude/agents/git-workflow.md": {
+   "blob": "6b0c300948273097"
+  },
+  "$PROJECT/.claude/agents/insight-analyst.md": {
+   "blob": "81bafdd75a752163"
+  },
+  "$PROJECT/.claude/agents/learning-guide.md": {
+   "blob": "f6fe5ecf60751a8c"
+  },
+  "$PROJECT/.claude/agents/performance-engineer.md": {
+   "blob": "14b0704cc0657ace"
+  },
+  "$PROJECT/.claude/agents/project-initializer.md": {
+   "blob": "dd9165a5e98ce372"
+  },
+  "$PROJECT/.claude/agents/project-manager.md": {
+   "blob": "6ab687935863d33f"
+  },
+  "$PROJECT/.claude/agents/python-expert.md": {
+   "blob": "261445c4ab99c11f"
+  },
+  "$PROJECT/.claude/agents/quality-engineer.md": {
+   "blob": "114e1510b44d3530"
+  },
+  "$PROJECT/.claude/agents/refactoring-expert.md": {
+   "blob": "f85a77707affb41e"
+  },
+  "$PROJECT/.claude/agents/repo-index.md": {
+   "blob": "ccd10898e6a34582"
+  },
+  "$PROJECT/.claude/agents/requirements-analyst.md": {
+   "blob": "d548c0a7e202f8b3"
+  },
+  "$PROJECT/.claude/agents/root-cause-analyst.md": {
+   "blob": "9f87c9f563451a52"
+  },
+  "$PROJECT/.claude/agents/security-engineer.md": {
+   "blob": "cc1cc1ee54dc86aa"
+  },
+  "$PROJECT/.claude/agents/self-review.md": {
+   "blob": "003edd9e3ec96712"
+  },
+  "$PROJECT/.claude/agents/simplicity-guide.md": {
+   "blob": "83cf061a25e4a3d7"
+  },
+  "$PROJECT/.claude/agents/socratic-mentor.md": {
+   "blob": "9bbd4e6e63d9436e"
+  },
+  "$PROJECT/.claude/agents/system-architect.md": {
+   "blob": "bb4adb10b91bfc10"
+  },
+  "$PROJECT/.claude/agents/technical-writer.md": {
+   "blob": "517a9c4885b66ee2"
+  },
+  "$PROJECT/.claude/commands/sc/agent.md": {
+   "sha256": "3636ae5e1a10d9b7f16e2ff88dd64684a5d55b6816ac6036653b97a60c33df83",
+   "size": 3159
+  },
+  "$PROJECT/.claude/commands/sc/analyze.md": {
+   "sha256": "8c0d7c002456e96587569b47363058cff39000eeb8bc1e04779b8c65c9eb0ca4",
+   "size": 5039
+  },
+  "$PROJECT/.claude/commands/sc/auto-improve.md": {
+   "sha256": "3b7b1da3229bc988dd638efa32c25a82881a878f526705c91bbdcd00aad4e985",
+   "size": 4493
+  },
+  "$PROJECT/.claude/commands/sc/brainstorm.md": {
+   "sha256": "bf0a1bfe70be00856d7cd84175e17380d37ef483910bea230342c4f464a15073",
+   "size": 5497
+  },
+  "$PROJECT/.claude/commands/sc/build.md": {
+   "sha256": "c60b4201eb58191ca549eb003667a5ed60ded3510df33a3bdd1b7999f1e3b63d",
+   "size": 2078
+  },
+  "$PROJECT/.claude/commands/sc/business-panel.md": {
+   "sha256": "e24a04066ba0fe0db0de3205832a509ed88931cba663566f643bd4b452e5ae86",
+   "size": 2920
+  },
+  "$PROJECT/.claude/commands/sc/cleanup.md": {
+   "sha256": "8f0c442af055bbc60676b0ed7efd80e0608e67c207c02fcd56be270ca9ac20e8",
+   "size": 5662
+  },
+  "$PROJECT/.claude/commands/sc/design.md": {
+   "sha256": "82c859225121dee6927ee2c938be06c27959c0f3b76c6e254ef873be2a113bc7",
+   "size": 3779
+  },
+  "$PROJECT/.claude/commands/sc/document.md": {
+   "sha256": "6371ef3f7aba7f870d379581017f3da1b03ee90cbf476f0d9da25dfaf625978f",
+   "size": 2533
+  },
+  "$PROJECT/.claude/commands/sc/estimate.md": {
+   "sha256": "48e79eaa8f632a45ab1757caa5bb487e46aedfda68900ca706ea88bd559205fe",
+   "size": 2129
+  },
+  "$PROJECT/.claude/commands/sc/explain.md": {
+   "sha256": "56d844dbf293238a7f653ca9ce1952094b01c011c6a914764ae9401a34d7b74d",
+   "size": 2174
+  },
+  "$PROJECT/.claude/commands/sc/git.md": {
+   "sha256": "4fa6cc0d5b4c8537e0d9d3d6726fad431d40f5d6f9663987c5e012e587165e80",
+   "size": 3296
+  },
+  "$PROJECT/.claude/commands/sc/help.md": {
+   "sha256": "844f6d56da59b3c4ea97ca2e2f5527fabdde6fbad62db9d25f91b3721b1a823c",
+   "size": 3927
+  },
+  "$PROJECT/.claude/commands/sc/implement.md": {
+   "sha256": "f7d9313c344a922c2597a2e7c0e3e68bf6470b56ed2bbe2487e7c3869f703916",
+   "size": 2906
+  },
+  "$PROJECT/.claude/commands/sc/improve.md": {
+   "sha256": "6d326ff8b15ac0888d98b68048236309200e26fde919fb6b2a4e49a927f123e6",
+   "size": 1875
+  },
+  "$PROJECT/.claude/commands/sc/index-repo.md": {
+   "sha256": "6cffdbdc2096a97456ea3dbc8b68c7402dd8f0c6ef33d09288afb0a2e65895e6",
+   "size": 2319
+  },
+  "$PROJECT/.claude/commands/sc/index.md": {
+   "sha256": "c5cd8e5e8b2c2181415b2ca48cc20444b2efdc1a10cabcc41bac4f3adf2e35ed",
+   "size": 2762
+  },
+  "$PROJECT/.claude/commands/sc/init.md": {
+   "sha256": "19ba62394cb6bcf2611fed9a6574a394be5a5936e5926b3c71cae09d013f669b",
+   "size": 5959
+  },
+  "$PROJECT/.claude/commands/sc/insight.md": {
+   "sha256": "7dbf644651e2cb3d0b7283e0d5c803b9ada97b0d15a000b2cb45b0136e383e4b",
+   "size": 8425
+  },
+  "$PROJECT/.claude/commands/sc/load.md": {
+   "sha256": "c5c5b2af1a5b60b3487c299d4978d83636007fa0486bbeac8ab59b02e51a434c",
+   "size": 2806
+  },
+  "$PROJECT/.claude/commands/sc/plan.md": {
+   "sha256": "b84e4ea55683856bdf50a306075866cab73dd008a657029d7ba816eef170651c",
+   "size": 3914
+  },
+  "$PROJECT/.claude/commands/sc/pm.md": {
+   "sha256": "ffd39ba2e0f5da6eb8f84a5a1207688c42e27ed81932f74e0d29fd8d4c5db2e0",
+   "size": 2012
+  },
+  "$PROJECT/.claude/commands/sc/promote-feature.md": {
+   "sha256": "cebf35ecf927f8cb852fca2d61fcd4f34ac8c9237f4f0b6d97246269b8610a56",
+   "size": 5928
+  },
+  "$PROJECT/.claude/commands/sc/prompt.md": {
+   "sha256": "c560eed1d7958fd18a348786b332f0b9cf870e6658cbd3c60794790dc53258f6",
+   "size": 11054
+  },
+  "$PROJECT/.claude/commands/sc/recommend.md": {
+   "sha256": "12e4967518c452d585ad6b01aa8675512be0427ae139237fa95f926bf9579607",
+   "size": 2859
+  },
+  "$PROJECT/.claude/commands/sc/reflect.md": {
+   "sha256": "a171db7d012e77ada345db9d73477dee6a3df77c25ab3a89c33984c4d3bdf551",
+   "size": 2069
+  },
+  "$PROJECT/.claude/commands/sc/research.md": {
+   "sha256": "113cc422666702e89572dccddbcc9d78e047e5740f610a324eb0c0236859c454",
+   "size": 3021
+  },
+  "$PROJECT/.claude/commands/sc/review.md": {
+   "sha256": "43c1a9d486a72c0248707cd96664f8302e361bc6d43bc144417cf74eccb30bd0",
+   "size": 4648
+  },
+  "$PROJECT/.claude/commands/sc/roadmap.md": {
+   "sha256": "f6fbf73c50eaf5477564d2b02aefb48706beff098e90c161fb5c01f6667ba1ef",
+   "size": 3730
+  },
+  "$PROJECT/.claude/commands/sc/save.md": {
+   "sha256": "c33ced361ef82ebe9da276cdebbd5791bcc20fd879821d2422e4d4060c1b55bc",
+   "size": 4440
+  },
+  "$PROJECT/.claude/commands/sc/sc.md": {
+   "sha256": "1f887d1c3b2f1d498e41f0c568a86af6a539be6ef8acdea5283ba7a2f0b7a0ea",
+   "size": 3736
+  },
+  "$PROJECT/.claude/commands/sc/select-tool.md": {
+   "sha256": "da2852251ce1f08ab7de6e1a980b151f2312bb411c6a0a4d84be9e49f799e721",
+   "size": 2306
+  },
+  "$PROJECT/.claude/commands/sc/spec-panel.md": {
+   "sha256": "9c095d09cf6582f53a2b86bf896242d6ec11a339fae3178910d7ed28bcd6e15d",
+   "size": 3204
+  },
+  "$PROJECT/.claude/commands/sc/task.md": {
+   "sha256": "151811b87de4af85ae3c9e38934504872b20ddd81195fc60ea015697d55c16c5",
+   "size": 3775
+  },
+  "$PROJECT/.claude/commands/sc/test.md": {
+   "sha256": "712c6536e06cf022e4082c9da0f51d4756700debad9c17e0fed09cff5a2bbf52",
+   "size": 2727
+  },
+  "$PROJECT/.claude/commands/sc/troubleshoot.md": {
+   "sha256": "62045d6c1e20345670eec75a770efa570cf0df3257930fc0aff6d358e268b7bf",
+   "size": 3532
+  },
+  "$PROJECT/.claude/hooks/hooks.json": {
+   "sha256": "0ea680499f4660c94f6f8b63ab3366641dca1f49357c8b7beb915bfb48322453",
+   "size": 6163
+  },
+  "$PROJECT/.claude/settings.json": {
+   "blob": "cbd237846a8e2bf5"
+  },
+  "$PROJECT/.claude/superclaude/CLAUDE_SC.md": {
+   "sha256": "83b1b08130108577ca35f0026162542bfedfae1200e4b6ab4e69f9f26705287f",
+   "size": 50
+  },
+  "$PROJECT/.claude/superclaude/core/BUSINESS_SYMBOLS.md": {
+   "sha256": "d325b1bf27b6a555e7413348698d207d000c2d659c9a2b1de757cf5b71e12ca3",
+   "size": 2469
+  },
+  "$PROJECT/.claude/superclaude/core/FLAGS.md": {
+   "sha256": "bad019f06412256c5f2abe910c802404b472edd475668d430a1a1c4d81e78a7b",
+   "size": 4458
+  },
+  "$PROJECT/.claude/superclaude/core/PRINCIPLES.md": {
+   "sha256": "c5c0759275a4508756b7db9d6d193a5fd058b042f02e4485c2b2a8d3f52281b6",
+   "size": 1924
+  },
+  "$PROJECT/.claude/superclaude/core/RULES.md": {
+   "sha256": "8c8dddea8b0a4d10d0043abc56e29621c565e38e24e187464c2d42e2aaf9c481",
+   "size": 3458
+  },
+  "$PROJECT/.claude/superclaude/core/rules/RULES_DELEGATION.md": {
+   "sha256": "b2148b586c31e50454d5c17de7507d9c534e1c18a54e427cb5b9c2d7b43ecc05",
+   "size": 5413
+  },
+  "$PROJECT/.claude/superclaude/core/rules/RULES_DOCS.md": {
+   "sha256": "37e16c7700f93d9006bcccdb55903c053c0060de728848052c76dadfffbf34a2",
+   "size": 6614
+  },
+  "$PROJECT/.claude/superclaude/core/rules/RULES_INTERACTION.md": {
+   "sha256": "a341d524640dbb968dcc90dbe975cafba8395744b1a2833024ed23fc9b0590e6",
+   "size": 751
+  },
+  "$PROJECT/.claude/superclaude/core/rules/RULES_QUALITY.md": {
+   "sha256": "2494150a1175d71323c413e930128d4d4f1171922b8c6fc41df2e0753f3adbb5",
+   "size": 12662
+  },
+  "$PROJECT/.claude/superclaude/mcp/MCP_Chrome-DevTools.md": {
+   "sha256": "6ae1d1ec39163bac6bb5f54828b3b0aef0b76a634606db3ee1931d0663c4ade0",
+   "size": 2460
+  },
+  "$PROJECT/.claude/superclaude/mcp/MCP_Playwright.md": {
+   "sha256": "a68e2d1b6254ef3ea2e4540b56f471cd7dbdd6c818c623c3a6f432f5c39351b2",
+   "size": 2838
+  },
+  "$PROJECT/.claude/superclaude/mcp/MCP_Serena.md": {
+   "sha256": "e975c9d6caa917789d976a1fa36b0f01e22356f5d9c746fb5599e39dccd03401",
+   "size": 3084
+  },
+  "$PROJECT/.claude/superclaude/mcp/MCP_Tavily.md": {
+   "sha256": "79d49695360c5c44af8cb75ea004761f7473812740145fe159a4a913c83e3770",
+   "size": 2220
+  },
+  "$PROJECT/.claude/superclaude/modes/MODE_Brainstorming.md": {
+   "sha256": "5b6f7cf634b8e7e9445f56f316542d004827d519dc894bb3d697cfff848baff4",
+   "size": 1713
+  },
+  "$PROJECT/.claude/superclaude/modes/MODE_Business_Panel.md": {
+   "sha256": "16de2df6de287565418ac95dacfc5200f3f7af7e5a3765ae81bc9f6f64019148",
+   "size": 3150
+  },
+  "$PROJECT/.claude/superclaude/modes/MODE_DeepResearch.md": {
+   "sha256": "60cdc3e67a3b6e61f3da21b848caa51585b8cee5804386ac63c4e391dff26b1d",
+   "size": 3082
+  },
+  "$PROJECT/.claude/superclaude/modes/MODE_Introspection.md": {
+   "sha256": "830682204dd4fcfd0735b9ddce4a2ab3cc15b1cc28bf293991299622ac87233c",
+   "size": 1867
+  },
+  "$PROJECT/.claude/superclaude/modes/MODE_Orchestration.md": {
+   "sha256": "6b66120ed7b72546800657ce04a194b2bf9781421a9a31cb71cf16e36035667a",
+   "size": 3590
+  },
+  "$PROJECT/.claude/superclaude/modes/MODE_Task_Management.md": {
+   "sha256": "517e0788db59e318cc2241121f9d0f8f7820dbf8cd33e1c56b05899181768652",
+   "size": 1727
+  },
+  "$PROJECT/.claude/superclaude/modes/MODE_Token_Efficiency.md": {
+   "sha256": "0f636ce9581143a15bfd52c701f7c81d1d94abb9cf5cb3e2fcc36f3f8da23a2d",
+   "size": 2479
+  },
+  "$PROJECT/.claude/superclaude/modes/MODE_Verbalized_Sampling.md": {
+   "sha256": "2685da3b6fb7f695d589a74fe42dda3ae04a2221aaf7b7692156644c7ce671c3",
+   "size": 8327
+  },
+  "$PROJECT/.claude/superclaude/modes/RESEARCH_CONFIG.md": {
+   "sha256": "f2994d91c29b93347f1a04a2fe12d14ca432f5fc5c4e19bada65999cce04ed30",
+   "size": 3355
+  },
+  "$PROJECT/.claude/superclaude/scripts/context_loader.py": {
+   "sha256": "38680702426464f7c3ba77d6edd4e4725e72535eafca29d63d311fb9c2bfd10b",
+   "size": 39147
+  },
+  "$PROJECT/.claude/superclaude/scripts/context_reset.py": {
+   "sha256": "f20e3417a68d34979c8be09bf3c14cc63f0d74558856b2597267c006a408b92a",
+   "size": 3010
+  },
+  "$PROJECT/.claude/superclaude/scripts/destructive_guard.py": {
+   "sha256": "b874ecbb7598b8a4ae8a1b331f7cd634e85d88a03331a98c05bcb7c713199369",
+   "size": 5888
+  },
+  "$PROJECT/.claude/superclaude/scripts/file_size_guard.py": {
+   "sha256": "a6a8d6ff1220768b915fc7f91a8d1dd19ab3c4f841c71988739f83adb842e149",
+   "size": 4410
+  },
+  "$PROJECT/.claude/superclaude/scripts/insight_writer.py": {
+   "sha256": "aaf9f78e52e0d738a6b5497136263ac88b1aa12e62452a9f5733daf0352f3bd6",
+   "size": 36738
+  },
+  "$PROJECT/.claude/superclaude/scripts/loop_guard.py": {
+   "sha256": "54158813f151cb52d9c264abba600a097379b9cad2f43f7e524aa881a6a82c70",
+   "size": 6779
+  },
+  "$PROJECT/.claude/superclaude/scripts/memory_staleness.py": {
+   "sha256": "672973eda29d5fc282e48fb44bcea2ae77ab75d22c4da9c76d38d6041ef7526c",
+   "size": 3800
+  },
+  "$PROJECT/.claude/superclaude/scripts/prettier_hook.py": {
+   "sha256": "ae34de7cd951ae42debf32607e40aa8aa8f7edfaa1b79eac0c542e54bb4d07d0",
+   "size": 1973
+  },
+  "$PROJECT/.claude/superclaude/scripts/session_init.py": {
+   "sha256": "73b7f50ecc215ad92285998718e590583f59bfe1cfb7b9fd380caa3427862645",
+   "size": 9747
+  },
+  "$PROJECT/.claude/superclaude/scripts/test_runner_hook.py": {
+   "sha256": "c03747ff3b6f25ca4f6fcb66fe831d01cb4c1d84adbae4c4fa250cf8b7481e67",
+   "size": 5236
+  },
+  "$PROJECT/.claude/superclaude/scripts/token_estimator.py": {
+   "sha256": "80c9c1b9379e8a2d80bb9396de7ddc96ce337c25c9860c7ba726fcd810c6c89e",
+   "size": 6861
+  },
+  "$PROJECT/.claude/superclaude/templates/docs-scaffold/ADR-0001-template.md": {
+   "sha256": "691ec3fa8c24cede3ac61e8eb8a2b57e0e02f9f2606db4963dd3f1e4a73eff44",
+   "size": 759
+  },
+  "$PROJECT/.claude/superclaude/templates/docs-scaffold/ARCHITECTURE.md": {
+   "sha256": "db2d7c458b21bc3c0729dd5a11a11c851f936c2f570e7a9aa7a51bfa43c7a5f6",
+   "size": 1458
+  },
+  "$PROJECT/.claude/superclaude/templates/docs-scaffold/PRD.md": {
+   "sha256": "10a654f91ee360961a584fea8b8b181cb121517f3593d8f495883add19c52dab",
+   "size": 1418
+  },
+  "$PROJECT/.claude/superclaude/templates/docs-scaffold/UI-GUIDE.md": {
+   "sha256": "0ac008f548e0bff0d31ef420db472971c905af3653e193def9a16674b6aca53e",
+   "size": 1160
+  },
+  "$PROJECT/.git/info/exclude": {
+   "blob": "5940663b79902839"
+  }
+ },
+ "pyproject_version": "4.9.0+ajitta",
+ "ref": "19575ac4^",
+ "scope": "project"
+}

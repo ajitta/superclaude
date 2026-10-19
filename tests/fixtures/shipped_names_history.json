@@ -1,0 +1,544 @@
+{
+ "generated_from": "git log --first-parent --diff-merges=first-parent master @ 1dd9622c",
+ "generator": "docs/features/install-upgrade-audit (harness gen_shipped_names.py; full clone only)",
+ "names": {
+  "agents": [
+   {
+    "name": "backend-architect.md",
+    "first": "3762d6ab",
+    "last": "00d40c47",
+    "shipped_now": true
+   },
+   {
+    "name": "business-panel-experts.md",
+    "first": "3762d6ab",
+    "last": "00d40c47",
+    "shipped_now": true
+   },
+   {
+    "name": "deep-research-agent.md",
+    "first": "3762d6ab",
+    "last": "4c5f3d84",
+    "shipped_now": false
+   },
+   {
+    "name": "deep-research.md",
+    "first": "81343a67",
+    "last": "0f5408eb",
+    "shipped_now": false
+   },
+   {
+    "name": "deep-researcher.md",
+    "first": "e4d86aa7",
+    "last": "00d40c47",
+    "shipped_now": true
+   },
+   {
+    "name": "devops-architect.md",
+    "first": "3762d6ab",
+    "last": "00d40c47",
+    "shipped_now": true
+   },
+   {
+    "name": "frontend-architect.md",
+    "first": "3762d6ab",
+    "last": "00d40c47",
+    "shipped_now": true
+   },
+   {
+    "name": "git-workflow.md",
+    "first": "77b1897e",
+    "last": "00d40c47",
+    "shipped_now": true
+   },
+   {
+    "name": "insight-analyst.md",
+    "first": "28287607",
+    "last": "00d40c47",
+    "shipped_now": true
+   },
+   {
+    "name": "learning-guide.md",
+    "first": "3762d6ab",
+    "last": "00d40c47",
+    "shipped_now": true
+   },
+   {
+    "name": "performance-engineer.md",
+    "first": "3762d6ab",
+    "last": "00d40c47",
+    "shipped_now": true
+   },
+   {
+    "name": "pm-agent.md",
+    "first": "3762d6ab",
+    "last": "77b1897e",
+    "shipped_now": false
+   },
+   {
+    "name": "project-initializer.md",
+    "first": "c1470b7f",
+    "last": "00d40c47",
+    "shipped_now": true
+   },
+   {
+    "name": "project-manager.md",
+    "first": "4c5f3d84",
+    "last": "00d40c47",
+    "shipped_now": true
+   },
+   {
+    "name": "python-expert.md",
+    "first": "3762d6ab",
+    "last": "00d40c47",
+    "shipped_now": true
+   },
+   {
+    "name": "quality-engineer.md",
+    "first": "3762d6ab",
+    "last": "00d40c47",
+    "shipped_now": true
+   },
+   {
+    "name": "refactoring-expert.md",
+    "first": "3762d6ab",
+    "last": "00d40c47",
+    "shipped_now": true
+   },
+   {
+    "name": "repo-index.md",
+    "first": "81343a67",
+    "last": "00d40c47",
+    "shipped_now": true
+   },
+   {
+    "name": "requirements-analyst.md",
+    "first": "3762d6ab",
+    "last": "00d40c47",
+    "shipped_now": true
+   },
+   {
+    "name": "root-cause-analyst.md",
+    "first": "3762d6ab",
+    "last": "00d40c47",
+    "shipped_now": true
+   },
+   {
+    "name": "security-engineer.md",
+    "first": "3762d6ab",
+    "last": "00d40c47",
+    "shipped_now": true
+   },
+   {
+    "name": "self-review.md",
+    "first": "81343a67",
+    "last": "00d40c47",
+    "shipped_now": true
+   },
+   {
+    "name": "simplicity-guide.md",
+    "first": "f3ea4b55",
+    "last": "00d40c47",
+    "shipped_now": true
+   },
+   {
+    "name": "socratic-mentor.md",
+    "first": "3762d6ab",
+    "last": "00d40c47",
+    "shipped_now": true
+   },
+   {
+    "name": "system-architect.md",
+    "first": "3762d6ab",
+    "last": "00d40c47",
+    "shipped_now": true
+   },
+   {
+    "name": "technical-writer.md",
+    "first": "3762d6ab",
+    "last": "00d40c47",
+    "shipped_now": true
+   },
+   {
+    "name": "verifier.md",
+    "first": "7e353036",
+    "last": "00d40c47",
+    "shipped_now": true
+   }
+  ],
+  "output-styles": [
+   {
+    "name": "plain-language.md",
+    "first": "84dfa8d9",
+    "last": "d3feaf49",
+    "shipped_now": true
+   }
+  ],
+  "skills": [
+   {
+    "name": "brainstorming",
+    "first": "1777f095",
+    "last": "4229ecb0",
+    "shipped_now": false
+   },
+   {
+    "name": "confidence-check",
+    "first": "c733413d",
+    "last": "13548763",
+    "shipped_now": false
+   },
+   {
+    "name": "dispatching-parallel-agents",
+    "first": "8d9abc25",
+    "last": "4229ecb0",
+    "shipped_now": false
+   },
+   {
+    "name": "executing-plans",
+    "first": "11bccfdd",
+    "last": "4229ecb0",
+    "shipped_now": false
+   },
+   {
+    "name": "finishing-a-development-branch",
+    "first": "3e352fbd",
+    "last": "13548763",
+    "shipped_now": false
+   },
+   {
+    "name": "receiving-code-review",
+    "first": "3e352fbd",
+    "last": "4229ecb0",
+    "shipped_now": false
+   },
+   {
+    "name": "requesting-code-review",
+    "first": "3e352fbd",
+    "last": "4229ecb0",
+    "shipped_now": false
+   },
+   {
+    "name": "sc-author",
+    "first": "007be180",
+    "last": "d3feaf49",
+    "shipped_now": true
+   },
+   {
+    "name": "sc-prompt",
+    "first": "a4dcb5ea",
+    "last": "d3feaf49",
+    "shipped_now": true
+   },
+   {
+    "name": "ship",
+    "first": "e064b436",
+    "last": "13548763",
+    "shipped_now": false
+   },
+   {
+    "name": "simplicity-coach",
+    "first": "f3b5e5aa",
+    "last": "13548763",
+    "shipped_now": false
+   },
+   {
+    "name": "systematic-debugging",
+    "first": "11bccfdd",
+    "last": "4229ecb0",
+    "shipped_now": false
+   },
+   {
+    "name": "test-driven-development",
+    "first": "11bccfdd",
+    "last": "4229ecb0",
+    "shipped_now": false
+   },
+   {
+    "name": "using-git-worktrees",
+    "first": "8d9abc25",
+    "last": "4229ecb0",
+    "shipped_now": false
+   },
+   {
+    "name": "using-superclaude",
+    "first": "8d9abc25",
+    "last": "4229ecb0",
+    "shipped_now": false
+   },
+   {
+    "name": "verbalized-sampling",
+    "first": "1904ee3b",
+    "last": "13548763",
+    "shipped_now": false
+   },
+   {
+    "name": "verification-before-completion",
+    "first": "1777f095",
+    "last": "4229ecb0",
+    "shipped_now": false
+   },
+   {
+    "name": "writing-plans",
+    "first": "1777f095",
+    "last": "4229ecb0",
+    "shipped_now": false
+   }
+  ]
+ },
+ "hook_events": [
+  {
+   "event": "PostToolUse",
+   "first": "dc6e0866",
+   "last": "9961e620",
+   "shipped_now": true
+  },
+  {
+   "event": "PreCompact",
+   "first": "f823f933",
+   "last": "9961e620",
+   "shipped_now": true
+  },
+  {
+   "event": "PreToolUse",
+   "first": "66b37a7e",
+   "last": "9961e620",
+   "shipped_now": true
+  },
+  {
+   "event": "SessionEnd",
+   "first": "f823f933",
+   "last": "9961e620",
+   "shipped_now": true
+  },
+  {
+   "event": "SessionStart",
+   "first": "81343a67",
+   "last": "9961e620",
+   "shipped_now": true
+  },
+  {
+   "event": "Setup",
+   "first": "d174e600",
+   "last": "19716a42",
+   "shipped_now": false
+  },
+  {
+   "event": "Stop",
+   "first": "6d6f09ba",
+   "last": "9961e620",
+   "shipped_now": true
+  },
+  {
+   "event": "TaskCompleted",
+   "first": "d174e600",
+   "last": "b348e247",
+   "shipped_now": false
+  },
+  {
+   "event": "TeammateIdle",
+   "first": "d174e600",
+   "last": "b348e247",
+   "shipped_now": false
+  },
+  {
+   "event": "UserPromptSubmit",
+   "first": "dc6e0866",
+   "last": "9961e620",
+   "shipped_now": true
+  }
+ ],
+ "hook_ids": [
+  {
+   "event": "PostToolUse",
+   "entry_point": "loop_guard",
+   "subcommand": "",
+   "first": "e45d11ad",
+   "last": "9961e620",
+   "shipped_now": true
+  },
+  {
+   "event": "PostToolUse",
+   "entry_point": "prettier_hook",
+   "subcommand": "",
+   "first": "19091b37",
+   "last": "9961e620",
+   "shipped_now": true
+  },
+  {
+   "event": "PostToolUse",
+   "entry_point": "test_runner_hook",
+   "subcommand": "",
+   "first": "133b1f22",
+   "last": "9961e620",
+   "shipped_now": true
+  },
+  {
+   "event": "PreCompact",
+   "entry_point": "insight_writer",
+   "subcommand": "harvest-from-hook",
+   "first": "f823f933",
+   "last": "9961e620",
+   "shipped_now": true
+  },
+  {
+   "event": "PreToolUse",
+   "entry_point": "destructive_guard",
+   "subcommand": "",
+   "first": "79032ccc",
+   "last": "9961e620",
+   "shipped_now": true
+  },
+  {
+   "event": "PreToolUse",
+   "entry_point": "file_size_guard",
+   "subcommand": "",
+   "first": "f78fa698",
+   "last": "9961e620",
+   "shipped_now": true
+  },
+  {
+   "event": "PreToolUse",
+   "entry_point": "loop_guard",
+   "subcommand": "",
+   "first": "e45d11ad",
+   "last": "9961e620",
+   "shipped_now": true
+  },
+  {
+   "event": "SessionEnd",
+   "entry_point": "insight_writer",
+   "subcommand": "harvest-from-hook",
+   "first": "f823f933",
+   "last": "9961e620",
+   "shipped_now": true
+  },
+  {
+   "event": "SessionStart",
+   "entry_point": "context_reset",
+   "subcommand": "",
+   "first": "ade32f16",
+   "last": "9961e620",
+   "shipped_now": true
+  },
+  {
+   "event": "SessionStart",
+   "entry_point": "insight_writer",
+   "subcommand": "pending-count",
+   "first": "f823f933",
+   "last": "79032ccc",
+   "shipped_now": false
+  },
+  {
+   "event": "SessionStart",
+   "entry_point": "insight_writer",
+   "subcommand": "pending-count-from-hook",
+   "first": "12cbcb4f",
+   "last": "9961e620",
+   "shipped_now": true
+  },
+  {
+   "event": "SessionStart",
+   "entry_point": "memory_staleness",
+   "subcommand": "",
+   "first": "06113d3f",
+   "last": "9961e620",
+   "shipped_now": true
+  },
+  {
+   "event": "SessionStart",
+   "entry_point": "session_init",
+   "subcommand": "",
+   "first": "19091b37",
+   "last": "9961e620",
+   "shipped_now": true
+  },
+  {
+   "event": "Setup",
+   "entry_point": "session_init",
+   "subcommand": "",
+   "first": "d174e600",
+   "last": "19716a42",
+   "shipped_now": false
+  },
+  {
+   "event": "Stop",
+   "entry_point": "insight_writer",
+   "subcommand": "request-from-hook",
+   "first": "6d6f09ba",
+   "last": "9961e620",
+   "shipped_now": true
+  },
+  {
+   "event": "UserPromptSubmit",
+   "entry_point": "context_loader",
+   "subcommand": "",
+   "first": "fa768869",
+   "last": "9961e620",
+   "shipped_now": true
+  },
+  {
+   "event": "UserPromptSubmit",
+   "entry_point": "skill_activator",
+   "subcommand": "",
+   "first": "19091b37",
+   "last": "66b37a7e",
+   "shipped_now": false
+  }
+ ],
+ "inline_hook_commands": [
+  {
+   "event": "PostToolUse",
+   "command": "jq -r '.tool_input.file_path' | xargs -I {} sh -c 'echo \"{}\" | grep -qE \"\\.(ts|tsx|js|jsx)$\" && npx prettier --write \"{}\" 2>/dev/null || true'",
+   "first": "dc6e0866",
+   "last": "dc6e0866"
+  },
+  {
+   "event": "PreToolUse",
+   "command": "jq -r '.tool_input.command // empty' | head -1 | grep -qE 'rm\\s+-rf\\s+/\\s*$|rm\\s+-rf\\s+/\\*|git\\s+push\\s+.*--force([^-]|$).*(main|master)' && echo 'BLOCKED: destructive command detected (--force-with-lease is allowed)' >&2 && exit 2 || exit 0",
+   "first": "e31caf5d",
+   "last": "f823f933"
+  },
+  {
+   "event": "PreToolUse",
+   "command": "jq -r '.tool_input.command // empty' | head -1 | grep -qE 'rm\\s+-rf\\s+/\\s*$|rm\\s+-rf\\s+/\\*|git\\s+push\\s+.*--force.*(main|master)' && echo 'BLOCKED: destructive command detected' >&2 && exit 2 || exit 0",
+   "first": "66b37a7e",
+   "last": "e45d11ad"
+  },
+  {
+   "event": "SessionStart",
+   "command": "./scripts/session-init.sh",
+   "first": "81343a67",
+   "last": "dc6e0866"
+  },
+  {
+   "event": "TaskCompleted",
+   "command": "echo 'Task completed — aggregate results'",
+   "first": "d174e600",
+   "last": "42218e97"
+  },
+  {
+   "event": "TaskCompleted",
+   "command": "echo '[superclaude] Task completed — aggregate results'",
+   "first": "b348e247",
+   "last": "b348e247"
+  },
+  {
+   "event": "TeammateIdle",
+   "command": "echo 'Teammate idle — assign next task'",
+   "first": "d174e600",
+   "last": "42218e97"
+  },
+  {
+   "event": "TeammateIdle",
+   "command": "echo '[superclaude] Teammate idle — assign next task'",
+   "first": "b348e247",
+   "last": "b348e247"
+  },
+  {
+   "event": "UserPromptSubmit",
+   "command": "./scripts/skill-activator.sh",
+   "first": "dc6e0866",
+   "last": "dc6e0866"
+  }
+ ]
+}
