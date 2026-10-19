@@ -59,8 +59,8 @@ _EXPIRING_PRESENT_RE = re.compile(
     r"|^#+ Current .*\(\d+\)$"
     # A version list or an eval-matrix size copied from test.yml / run_eval.py
     # (docs-ssot-audit D-03, D-08): cite the file, not its numbers.
-    r"|\b\d+\.\d+/\d+\.\d+/\d+\.\d+\b"
-    r"|\b\d+-arm × \d+-task\b",
+    r"|\b\d+\.\d+/\d+\.\d+(?:/\d+\.\d+)*\b"
+    r"|\b\d+-arm\b",
     re.MULTILINE,
 )
 
@@ -110,6 +110,7 @@ def _no_expiry_docs() -> list[Path]:
         _ROOT / "docs" / "UI-GUIDE.md",
     ]
     docs += list((_ROOT / "docs" / "reports").glob("*.md"))
+    docs += [_ROOT / "evals" / "README.md"]  # the eval SSOT doc PRD cites (Z-8)
     return sorted(set(docs))
 
 

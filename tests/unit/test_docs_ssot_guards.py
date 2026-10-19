@@ -67,11 +67,16 @@ _RULES_DOCS = sorted((_ROOT / ".claude" / "rules").rglob("*.md"))
 
 
 def _sources(extra: list[Path] = ()) -> dict[str, str]:
-    """Routed docs, the Makefile and the CLI help, as {label: text}."""
+    """Routed docs, the Makefile and the CLI help, as {label: text}.
+
+    Whitespace is collapsed, so a phrase Click re-wrapped across two lines of
+    a help text (06-verify Z-5), or one wrapped by hand in a doc, still
+    matches.
+    """
     out = {str(p.relative_to(_ROOT)): _read(p) for p in [*_ROUTED_DOCS, *extra]}
     out["Makefile"] = _read(_ROOT / "Makefile")
     out.update(_cli_help())
-    return out
+    return {label: re.sub(r"\s+", " ", text) for label, text in out.items()}
 
 
 # --------------------------------------------------------------------- T1 --
@@ -129,13 +134,26 @@ def test_scripts_readme_rows_name_every_event():
 
 # --------------------------------------------------------------------- T2 --
 # Phrases a release retired or a mechanism replaced; one row each, capped at
-# ten (Q3 b). A row names the finding that put it here.
+# ten (Q3 b). A row names the finding that put it here. Rows are scoped to
+# the claim's shape, not the bare word (06-verify Z-9): `.gitignore` and
+# `gitignored` are wrong only when they describe the local scope (a legacy
+# `.gitignore` block that install strips is written as "legacy block");
+# `pytest-cov` is wrong only as a dev dependency.
+_LOCAL = r"(?:\blocal\b|CLAUDE\.local\.md|\./\.claude/)"
 _RETIRED_PHRASES = [
-    (r"\.gitignore block", "D-01: local scope lives in .git/info/exclude"),
-    (r"\bgitignored\b", "D-24: local scope is excluded via .git/info/exclude"),
+    (
+        rf"{_LOCAL}.{{0,100}}\.gitignore block|\.gitignore block.{{0,100}}{_LOCAL}",
+        "D-01: local scope lives in .git/info/exclude",
+    ),
+    (
+        rf"{_LOCAL}.{{0,100}}\bgitignored\b|\bgitignored\b.{{0,100}}{_LOCAL}",
+        "D-24: local scope is excluded via .git/info/exclude",
+    ),
     (r"`integration`", "D-02: there is no integration branch"),
-    (r"\bpytest-cov\b", "D-12: removed from the dev extras in 4.29.0"),
-    (r"\bmake verify\b(?!-)", "D-13: `make verify` was removed in 4.29.0"),
+    (
+        r"\bpytest-cov\b(?=.{0,60}\b(?:uninstalled|dev extras|dev deps|toolchain|installs))",
+        "D-12: removed from the dev extras in 4.29.0",
+    ),
     (r"\bPM Agent\b", "D-15: pm-agent was retired in 4.30.0"),
     (r"\d+(?:\.\d+)?k-token", "D-06: TestCoreLiteSplit owns the kernel budget"),
 ]
@@ -147,11 +165,7 @@ _RETIRED_PHRASES = [
     ids=[w.split(":")[0] for _, w in _RETIRED_PHRASES],
 )
 def test_docs_name_no_retired_phrase(pattern, why):
-    scope = _sources()
-    if pattern.endswith("k-token"):
-        scope = {
-            k: v for k, v in scope.items() if k == "src/superclaude/core/README.md"
-        }
+    scope = _sources(_CODEX_GUIDES)
     hits = [
         f"{label}: {m.group(0)!r}"
         for label, text in scope.items()
@@ -198,14 +212,23 @@ _TARGET_WORDS = {
 
 
 def test_docs_name_only_makefile_targets():
-    """`make <target>` in a doc is a .PHONY target (D-13)."""
+    """`make <target>` in a doc is a .PHONY target (D-13).
+
+    A backticked `make x` is always checked; a bare one only when x is
+    target-shaped (06-verify Z-8).
+    """
     targets = _make_targets()
     scope = _sources(_CODEX_GUIDES)
     bad = []
     for label, text in scope.items():
-        for m in re.finditer(r"(?<![\w/])make ([a-z][a-z0-9-]*)\b", text):
-            t = m.group(1)
-            if (t in _TARGET_WORDS or "-" in t) and t not in targets:
+        for m in re.finditer(
+            r"`make ([a-z][a-z0-9-]*)`|(?<![\w/`])make ([a-z][a-z0-9-]*)\b", text
+        ):
+            backticked, bare = m.group(1), m.group(2)
+            t = backticked or bare
+            if t in targets:
+                continue
+            if backticked or t in _TARGET_WORDS or "-" in t:
                 bad.append(f"{label}: make {t}")
     assert not bad, f"not a Makefile target: {bad}"
 
@@ -246,17 +269,40 @@ def test_doc_test_paths_exist():
 
 
 def test_doc_layout_dirs_exist():
-    """The docs/ layouts in docs/README.md and PROJECT_INDEX.md name real dirs (D-11)."""
+    """docs/README.md Layout and PROJECT_INDEX.md Docs layout = `ls docs/` (D-11).
+
+    Both directions: every listed dir exists, every existing dir is listed
+    (06-verify Z-8).
+    """
+    existing = {p.name for p in (_ROOT / "docs").iterdir() if p.is_dir()}
+    listed = {
+        "docs/README.md": set(
+            re.findall(
+                r"^\| `([\w-]+)/` \|",
+                _section(_read(_ROOT / "docs" / "README.md"), "Layout"),
+                re.M,
+            )
+        ),
+        "PROJECT_INDEX.md": {
+            name
+            for name in re.findall(
+                r"`([\w-]+)/[^`]*`",
+                _section(
+                    _read(_ROOT / "docs" / "reports" / "PROJECT_INDEX.md"),
+                    "Docs layout",
+                ),
+            )
+            if name != "docs"
+        },
+    }
     bad = []
-    layout = _section(_read(_ROOT / "docs" / "README.md"), "Layout")
-    for name in re.findall(r"^\| `([\w-]+)/` \|", layout, re.M):
-        if not (_ROOT / "docs" / name).is_dir():
-            bad.append(f"docs/README.md: {name}/")
-    index = _ROOT / "docs" / "reports" / "PROJECT_INDEX.md"
-    for name in re.findall(r"`([\w-]+)/`", _section(_read(index), "Docs layout")):
-        if name != "docs" and not (_ROOT / "docs" / name).is_dir():
-            bad.append(f"PROJECT_INDEX.md: {name}/")
-    assert not bad, f"docs/ directories that do not exist: {bad}"
+    for label, names in listed.items():
+        bad += [
+            f"{label} lists {n}/, which does not exist"
+            for n in sorted(names - existing)
+        ]
+        bad += [f"{label} omits docs/{n}/" for n in sorted(existing - names)]
+    assert not bad, f"docs/ layouts out of sync with the tree: {bad}"
 
 
 def test_doc_rule_file_names_exist():
@@ -334,19 +380,22 @@ def test_readme_research_section_states_no_undefined_figure():
 
 # --------------------------------------------------------------------- T5 --
 def test_readme_command_file_claims_resolve():
-    """'`/sc:x` … `.claude/<file>`' in one README cell: commands/x.md names that file (D-05)."""
+    """'`/sc:x` … `.claude/<file>`' on one README line: commands/x.md names that file (D-05).
+
+    The claimant is the last `/sc:x` on the line, across table cells
+    (06-verify Z-7).
+    """
     bad = []
     for line in _read(_README).splitlines():
-        for cell in line.split("|"):
-            claimant = None
-            for m in re.finditer(r"/sc:([\w-]+)|`(\.claude/[\w./-]+)`", cell):
-                if m.group(1):
-                    claimant = m.group(1)
-                elif claimant:
-                    leaf = m.group(2).rstrip("/").split("/")[-1]
-                    body = _read(_SRC / "commands" / f"{claimant}.md")
-                    if leaf not in body:
-                        bad.append(f"/sc:{claimant} ↔ {m.group(2)}")
+        claimant = None
+        for m in re.finditer(r"/sc:([\w-]+)|`(\.claude/[\w./-]+)`", line):
+            if m.group(1):
+                claimant = m.group(1)
+            elif claimant:
+                leaf = m.group(2).rstrip("/").split("/")[-1]
+                body = _read(_SRC / "commands" / f"{claimant}.md")
+                if leaf not in body:
+                    bad.append(f"/sc:{claimant} ↔ {m.group(2)}")
     assert not bad, f"README credits a command with a file its body never names: {bad}"
 
 
