@@ -650,7 +650,7 @@ MIT — see [`LICENSE`](LICENSE).
 
 ## 📋 **All Commands**
 
-> **Skill-listing cost.** Every `/sc:` command stays model-invocable, so each turn Claude Code shows its description in the skill listing, next to your own skills and plugins. superclaude's descriptions take under 10,000 characters together. The listing has a budget, 1% of the context window (30,000 characters on haiku and sonnet in Claude Code 2.1.303). When everything installed goes over it, Claude Code drops the descriptions of the least-used entries. Those entries are then picked less often from a plain request; typing `/sc:<name>` still works. `/doctor` shows the listing size, and `skillListingBudgetFraction` in settings (for example `0.02`) raises the budget.
+> **Skill-listing cost.** Every `/sc:` command stays model-invocable, so each turn Claude Code shows its description in the skill listing, next to your own skills and plugins. superclaude's descriptions take under 10,000 characters together. The listing has a budget, 1% of the context window (30,000 characters on haiku and sonnet in Claude Code 2.1.303). When everything installed goes over it, Claude Code drops the descriptions of the least-used entries. Those entries are then picked less often from a plain request; typing `/sc:<name>` still works. `claude --debug-file <file>` logs `Skill listing over budget` with the sizes when that happens, and `skillListingBudgetFraction` in settings (for example `0.02`) raises the budget.
 
 <details>
 <summary><b>Click to expand full command list</b></summary>
