@@ -8,6 +8,8 @@ Releases before 4.19.0 are not listed. Their history is the git log; the upstrea
 
 ## [Unreleased]
 
+## [4.30.0] - 2026-10-19
+
 ### Changed
 
 - `install`, `update` and `uninstall` check the files they edit before changing anything. A settings file, CLAUDE file or (local and project scope) `.git/info/exclude` that is not plain UTF-8 (UTF-16, a code page such as cp949, UTF-8 with a byte-order mark), or a settings file that is not a JSON object, stops the command with exit 1 and nothing changed, naming the file and what to re-save. An empty or whitespace-only settings file reads as `{}`.
