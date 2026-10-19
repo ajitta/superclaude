@@ -135,3 +135,25 @@ PASS WITH FIXES — D-01–D-24 수정은 SSOT와 맞고, 가드 19개가 ff947b
 - in-scope 문서 전체를 정독하지는 않았다. extractor 잔여 후보 전부와 결함 부류별 grep(gitignore, integration, arm/task 숫자, pytest-cov, make verify, k-token, PM Agent, 버전 목록, insights.jsonl, Serena)으로 표본 검사했다.
 - 범위 밖이지만 shipped content 안에서 서로 어긋나는 것 두 가지: `commands/research.md:26-27`과 `deep-researcher.md:32`는 standard/deep/exhaustive를 "2-3 / 3-4 / 5+ hops"라고 하는데 `RESEARCH_CONFIG.md`는 3 / 4 / 5(`hop_config max="5"`)다. README는 config를 따른다. `evals/tasks.yaml:1`은 "4-arm eval task definitions"라고 하고, `:99-100`은 `destructive-named-path`를 "Canary only."라고 하지만 이 task에는 `canary_only`가 없어 matrix에서 돈다(`run_eval.py:692`).
 - 운영 함정(이 브랜치와 무관): 이 checkout은 `remote.upstream.gh-resolved = base`라서 `-R` 없는 `gh`가 `SuperClaude-Org/SuperClaude_Framework`를 가리킨다(`gh run view 39224003874` → 404, `-R ajitta/superclaude`로는 성공). `make ci`/`make release`의 `gh` 호출에는 `-R`이 없다. 이 머신에서 release하기 전에 `gh repo set-default ajitta/superclaude`를 권한다.
+
+## Z-1..Z-12 applied (builder, 2026-10-19)
+
+Owner rule: every recommendation applied as written, Z-6 included. Guard changes were seen red first (against the docs at 7b7decb6, or against the verifier's mutation where the current docs were already clean) before the doc fix turned them green.
+
+| Z | Applied as | Commit | Test / evidence |
+|---|---|---|---|
+| Z-1 | README "Evidence Rules" bullet 4 (confidence tag) removed; the Q6 rewrite recorded beside the ruling in 05-plan | dca2235e, 05-plan in the audit commit after it | T4 green; the claim shape (a rule attributed to the config) has no mechanical guard |
+| Z-2 | `.claude/rules/mode-authoring.md:106` → "depth profiles, source gates, credibility tiers, tool routing" | dca2235e | `test_mode_structure.py`, `test_cross_references.py` green |
+| Z-3 | PRD core feature 7 → hooks harvest into `insights.pending.jsonl` and report the count; `/sc:insight` and `promote` write `insights.jsonl` | dca2235e | T6 green; checked against `insight_writer.py` `_pending_file`, `cmd_harvest`, `cmd_request`, `promote` |
+| Z-4 | 05-plan §4 rewritten: release with `CANARY_OK=1`, reason "core/README.md is a repo doc, no model-facing behavior change" | audit commit after dca2235e | Claim verified: sandboxed `install --scope user` wrote FLAGS, PRINCIPLES, RULES, BUSINESS_SYMBOLS and `rules/` under `core/`, no README; `CLAUDE_SC.md` imports three files; `context_loader.py` names no README |
+| Z-5 | `_sources()` collapses whitespace for every source | f3b38534 | Mutation "plus a pytest plugin with PM Agent." in the `main` docstring → D-15 red (was green before) |
+| Z-6 | `ARCHITECTURE.md:31` describes RULES.md by `<kernel_rules>` and the `TestCoreLiteSplit` budget; T2's k-token row applies to every routed doc | test f3b38534 (red on ARCHITECTURE), doc dca2235e | D-06 red at f3b38534, green at dca2235e; putting "~1.5k-token" back → red |
+| Z-7 | T5 keeps the claimant per line across cells | f3b38534 | Mutation: README:316 back to "`/sc:reflect` \| Retrospective + insights captured to `.claude/insights.jsonl`" → red (was green) |
+| Z-8 | D-13 phrase row removed; backticked `make x` always checked; T6 covers `evals/README.md`, two-element version lists and `N-arm`; T3 layout checks both directions (and reads nested paths like `codex/prompting_session_raw/`); codex 08 names the removed `translate` target as removed | f3b38534, dca2235e | `make translate` red at f3b38534, green after; mutations `3.10/3.13` in PRD, `4-arm × 7-task` in evals/README, `make translate` in PRD, a dropped `adr/` Layout row → all red |
+| Z-9 | 03-findings D-01 evidence names `_migrate_legacy_gitignore`; the `.gitignore block` and `gitignored` rows need a local-scope context, the `pytest-cov` row a dev-dependency context | rows f3b38534, evidence in the audit commit | Originals (uninstall help "clean .gitignore block", CLAUDE.md "(gitignored)", PRD:29, PROJECT_INDEX "pytest-cov and friends get uninstalled") → red; "`uv.lock` is gitignored" in AGENTS and "`--with pytest-cov`" in PRD → green |
+| Z-10 | codex 04:61 → `.git/info/exclude`; 01:63 → multi-arm harness (`ARMS`); the six guides whose `last_verified` moved carry a one-line "only these items re-checked" note; codex guides are in the phrase scope | scope f3b38534 (red on codex 04), docs dca2235e | D-24 red at f3b38534, green at dca2235e; mutation back → red |
+| Z-11 | README depth table: "(default)" removed from Standard | dca2235e | T4 green; no guard (the "Best For" column is free text by design) |
+| Z-12 | evals/README: canary-only tasks grouped by `tasks.yaml` section comments, no list | dca2235e | T6 green on evals/README; `test_eval_harness.py` green |
+
+Out-of-scope observations (research.md / deep-researcher hop ranges vs RESEARCH_CONFIG; `tasks.yaml:1` "4-arm"; `destructive-named-path` "Canary only" without `canary_only`; `gh` default repo) were not acted on in this round: the first two are shipped-content disagreements for a content round, the last is now set (`gh repo set-default ajitta/superclaude`, per the owner).
+

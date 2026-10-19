@@ -21,7 +21,7 @@ Findings: [03-findings.md](./03-findings.md). Phases 0–3 stopped here (00 §Ru
 | Q3 | (b) all seven guards, T2's phrase table capped at ten entries |
 | Q4 | (a) dated research and analysis docs stay as records |
 | Q5 | (a) the two draft plans become `status: deprecated` under `docs/archive/plans/` |
-| Q6 | (a) delete README's unsupported research numbers; depth table at the config's columns |
+| Q6 | (a) delete README's unsupported research numbers; depth table at the config's columns — applied as a rewrite of the block to the config's own source gates rather than a bare deletion (Deviations); the one bullet the config does not state was removed under Z-1 |
 | Q7 | (a) `core/README.md` drops the token figure and class list, points at RULES.md and `TestCoreLiteSplit` |
 | Q8 | (a) rewrite the three CLI/pyproject self-description strings |
 | Q9 | (a) codex guides: fix D-08, D-09, D-12, D-13 only, bump `last_verified` |
@@ -48,10 +48,11 @@ Round rules from the ruling: guard tests first and seen red; area tests per comm
 
 - **Beyond the findings, caught by the guards while red:** `docs/PRD.md:29` said "gitignored" (T2, same family as D-24) and was reworded; codex `08:351` named a removed `make build-plugin` target (make-target check) and now says "the former `build-plugin` target"; codex `08:103` kept its record of `test_skill_structure.py:163-168` as a dated observation, with the current file named beside it, so the test-path check no longer reads it as a live path.
 - **D-04 shape:** README's "Quality Scoring" block became "Evidence Rules", restating RESEARCH_CONFIG's source-count, credibility-tier and replan rules, rather than being deleted outright; the depth table keeps a "Best For" column (allowed by T4) and drops Time and Confidence target.
-- **D-06 scope:** only `core/README.md` lost its token figure (Q7 a). `ARCHITECTURE.md:31` still says "~1.5k-token kernel … five rule classes"; it is correct today (6,136 bytes) and dated to the 2026-10-17 rule, and T2's token-figure row is scoped to `core/README.md`, so this one copy remains unguarded.
+- **D-06 scope:** at first only `core/README.md` lost its token figure (Q7 a) and T2's token row was scoped to that file. The verifier (06-verify Z-6) called the `ARCHITECTURE.md:31` copy the same defect class; the owner extended Q7 to it, so it now describes RULES.md by its `<kernel_rules>` and the `TestCoreLiteSplit` budget, and the token row covers every routed doc.
 - **T1's second half** is narrower than §2 proposed: a `scripts/README.md` row is checked only when it names at least one hook event, and then must name all of that script's events; rows that name none (context_loader, the guards) are not forced to.
 - **T3** checks `tests/…/*.py` paths, the two docs/ layouts and `.claude/rules/*.md` names; bare `test_x.py` names are not checked (codex 04 writes a probe file under such a name).
 - **T6** matches version lists only with dots (`3.10/3.11/3.12`), so RESEARCH_CONFIG's `10/1/1` profile triples and dates never hit.
+- **Verifier round (06-verify, Z-1–Z-12):** all twelve applied as recommended; the table at the end of [06-verify.md](./06-verify.md) names the commit and the test per item. New guard behaviour was seen red first against the docs at 7b7decb6 (ARCHITECTURE's token figure, codex 04's local row, codex 08's `make translate` and pytest-cov sentence) or against the verifier's mutations where the current docs were already clean.
 - The deprecated plans keep their original filenames under `docs/archive/plans/` (the archive's dated files use another shape, but renaming would break the audit's own references).
 
 ## 1. Fix groups
@@ -99,6 +100,6 @@ Not proposed: a generic "every backticked path resolves" lint over `docs/` (216 
 
 - No doc edit in this round: the branch holds this folder and `tools/` only.
 - Prose-only fixes still run the full suite before merge (`test_version_consistency` reads README, CLAUDE, AGENTS and the shipped READMEs; `test_install_docs` reads README's install sections).
-- `make release`'s canary gate watches `src/superclaude/core` and `hooks.json`; neither is in G1–G5 (the `cli/main.py` edits are docstrings), so no canary run is needed.
+- **`make release` will stop at the canary gate** (`Makefile` release recipe): `git diff --name-only v4.30.2..fix/docs-ssot -- src/superclaude/core src/superclaude/hooks/hooks.json` lists `src/superclaude/core/README.md` (G3, D-06), and the gate decides by path. Release with `CANARY_OK=1` and give the reason in the commit or release note: **"core/README.md is a repo doc, no model-facing behavior change"**. Verified 2026-10-19: a sandboxed `superclaude install --scope user` (HOME in a temp dir) wrote `core/{FLAGS,PRINCIPLES,RULES,BUSINESS_SYMBOLS}.md` and `core/rules/`, no README (`install_components.py` skips `README` stems); `CLAUDE_SC.md` imports only FLAGS, PRINCIPLES and RULES; `context_loader.py` names no README. `hooks.json` is unchanged. (06-verify Z-4)
 - Do not "fix" a dated research doc, a CHANGELOG entry about a past release, or an external claim (03 §Out of scope).
 - Do not add a lint whose false-positive rate was measured above zero in 02 §3 without the class filter that removed it.
