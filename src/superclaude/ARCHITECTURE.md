@@ -12,7 +12,7 @@ modes/          Mindset overlay     Mood/Posture    On-demand (context_loader)
 agents/         Domain expert       Specialist      CC-native delegation
 output-styles/  Response voice      House style     CC-native, user-selected (/config)
 commands/       Workflow entry      Menu item       CC-native /sc:*
-skills/         Authoring aid       Style guide     CC-native, user-invoked (/sc-author)
+skills/         Authoring aid       Style guide     CC-native, user- or model-invoked (/sc-author, /sc-prompt)
 mcp/            Tool docs+config    Tool manual     context_loader + install_mcp
 scripts/        Hook infra          Plumbing        hooks.json → settings.json
 ```
@@ -97,7 +97,7 @@ State that is not session-keyed adds `project_key()` to its filename, because a 
 
 ### Python Infrastructure (not content types)
 
-The following directories support the content framework but are not content types themselves: `cli/` (Click-based CLI and installation logic), `hooks/` (hook system integration), and `utils/` (shared utilities). These are documented in the project `AGENTS.md`.
+The following directories support the content framework but are not content types themselves: `cli/` (Click-based CLI and installation logic; `hook_dispatch.py` is the hook registry), `hooks/` (`hooks.json` and the MCP fallback helper), and `utils/` (path resolvers and hook-state helpers). Their contracts live in the module docstrings and `.claude/rules/gotchas/hooks.md`; the developer loop (uv, tests, make targets) is in the project `AGENTS.md`.
 
 ## Content Delivery Pipeline
 
@@ -129,7 +129,7 @@ Session Start
 |-----------|--------------|---------|--------|
 | **Always loaded** | core/ (FLAGS, PRINCIPLES, RULES kernel) | Session start | ~140 lines via @import |
 | **On-demand** | modes/, mcp/, core/rules/, core/BUSINESS_SYMBOLS | Flag/keyword in prompt | 12K token budget (`DEFAULT_CONTEXT_MAX_TOKENS`, context_loader) |
-| **CC-native** | agents/, commands/, output-styles/, skills/ | Auto-delegation, /sc:*, selected style, /sc-author | Managed by Claude Code runtime |
+| **CC-native** | agents/, commands/, output-styles/, skills/ | Auto-delegation, /sc:*, selected style, /sc-author, /sc-prompt | Managed by Claude Code runtime |
 
 ## Naming Trinity
 
@@ -159,7 +159,7 @@ Each content type has a dedicated authoring guide:
 | commands/ | `.claude/rules/command-authoring.md` | `tests/unit/test_command_structure.py` |
 | output-styles/ | `.claude/rules/output-style-authoring.md` | `tests/unit/test_output_style_structure.py` |
 | modes/ | `.claude/rules/mode-authoring.md` | `tests/unit/test_mode_structure.py` |
-| core/ | N/A (framework maintainers only) | N/A |
+| core/ | `.claude/rules/xml-prose-format.md` (framework maintainers only) | `tests/unit/test_cross_references.py` (rule citations, kernel pointers), `tests/unit/test_context_loader.py` (`TestCoreLiteSplit`) |
 | mcp/ | `.claude/rules/mcp-authoring.md` | `tests/unit/test_content_structure.py` |
 | skills/ | `.claude/rules/skill-authoring.md` | `tests/unit/test_sc_author_skill.py` |
 | scripts/ | Standard Python/shell conventions | `tests/unit/` (per-script) |

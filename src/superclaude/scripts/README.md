@@ -13,9 +13,9 @@ Run by the Claude Code hook runtime as `superclaude hook <name>` (registry: `../
 | Script | Purpose |
 |--------|---------|
 | `context_loader.py` | Dynamic context file loading — TRIGGER_MAP matching, session dedup, 12K token budget (`DEFAULT_CONTEXT_MAX_TOKENS` in `superclaude.utils`, env `CLAUDE_CONTEXT_MAX_TOKENS`), hybrid injection. Dry run: `superclaude context explain "<prompt>"` |
-| `session_init.py` | Session init — load superclaude context at startup |
+| `session_init.py` | SessionStart: the install-status line and the PR-review status line |
 | `memory_staleness.py` | SessionStart warning for auto-memory entries whose `verified:` date is stale (`SUPERCLAUDE_MEMORY_STALE_DAYS`, default 90) |
-| `insight_writer.py` | Insight capture/harvest for `/sc:insight` — SessionStart pending-count, PreCompact/SessionEnd transcript harvest |
+| `insight_writer.py` | Insight capture/harvest for `/sc:insight` — SessionStart pending-count, PreCompact/SessionEnd transcript harvest, Stop request for one INSIGHT: line (`SUPERCLAUDE_INSIGHT_PROMPT=0` to disable) |
 | `prettier_hook.py` | Code formatting hook via Prettier |
 | `test_runner_hook.py` | Test execution hook (`SUPERCLAUDE_AUTO_TEST=0` to disable) |
 | `context_reset.py` | Reset context loader state for fresh sessions. Manual: `superclaude context reset` |

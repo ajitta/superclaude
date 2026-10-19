@@ -63,6 +63,10 @@ Every command is `superclaude hook <name>` — the console script, dispatched in
 - `superclaude hook test_runner_hook` (matcher `Edit|Write`, async)
 - `superclaude hook loop_guard` (matcher `Edit|Write|Bash`)
 
+### Stop
+
+- `superclaude hook insight_writer request-from-hook` — asks for one INSIGHT: line when the tree changed, once per session (`SUPERCLAUDE_INSIGHT_PROMPT=0` to disable)
+
 ## Configuration Structure
 
 ```json

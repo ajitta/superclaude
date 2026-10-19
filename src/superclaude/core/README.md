@@ -14,7 +14,7 @@ Core files load via `CLAUDE_SC.md` `@import` at session start. Present in **ever
 |------|------|----------|
 | FLAGS.md | Behavioral flags, mode triggers, MCP routing, execution + output flags | Always loaded |
 | PRINCIPLES.md | Software engineering principles and decision frameworks | Always loaded |
-| RULES.md | ~0.9k-token behavioral kernel (scope, verification, destructive-op, project-rules-priority) + on-demand module map | Always loaded |
+| RULES.md | Behavioral kernel — the rule classes whose loss is most expensive (`<kernel_rules>` in the file) + on-demand module map; its token budget is pinned by `tests/unit/test_context_loader.py` `TestCoreLiteSplit` | Always loaded |
 | rules/RULES_QUALITY.md | core_rules (R01–R21 detail + examples), verification_ladder, anti_over_engineering, checklist_scaling, thresholds, anti_misunderstanding | On-demand |
 | rules/RULES_DELEGATION.md | sub_agent_decision, delegate_packet, delegate_return, workflow_delegation, agent_routing | On-demand |
 | rules/RULES_DOCS.md | doc_output_convention, workflow_gates | On-demand |
