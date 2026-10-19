@@ -63,6 +63,12 @@ def test_arms_match_harness_constant():
 #   the rule by its removal. Ran and closed 2026-10-19 (results:
 #   docs/features/purpose-generalization/04-readout.md); recover the arm with
 #   `git show 82cbf3bb:evals/arms/RULES_CANDIDATE.md`. Delta is now empty.
+#   2026-10-19 ablation reopened for the opus round (docs/features/purpose-
+#   opus/) — the same arm, restored byte-equal from 82cbf3bb (sha256
+#   16474d5a…, `cmp` equal to `123c6a22^:core/RULES.md`), with the same
+#   CANDIDATE_REPLACEMENTS. Ran and closed 2026-10-19 (results:
+#   docs/features/purpose-opus/04-readout.md); recover the arm with
+#   `git show 976ce0ef:evals/arms/RULES_CANDIDATE.md`. Delta is now empty.
 #   To open the next trial, put the inserted text in CANDIDATE_INSERTS (an
 #   ablation: the removed text in CANDIDATE_REPLACEMENTS) and regenerate evals/arms/RULES_CANDIDATE.md.
 CANDIDATE_INSERTS: list[

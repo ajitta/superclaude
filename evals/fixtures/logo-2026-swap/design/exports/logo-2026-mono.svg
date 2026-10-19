@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="120" height="32" viewBox="0 0 120 32">
+  <circle cx="16" cy="16" r="16" fill="#000"/>
+  <path d="M9 22 16 8l7 14z" fill="#fff"/>
+  <text x="40" y="23" font-family="Inter, sans-serif" font-size="20" font-weight="600" fill="#000">acme</text>
+</svg>

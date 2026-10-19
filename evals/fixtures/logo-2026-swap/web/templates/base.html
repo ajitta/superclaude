@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>{% block title %}Acme{% endblock %}</title>
+  <link rel="stylesheet" href="{{ asset('css/site.css') }}">
+</head>
+<body>
+  <header><a href="/"><img src="/static/img/logo.svg" alt="Acme" height="32"></a></header>
+  <main>{% block content %}{% endblock %}</main>
+  <script src="{{ asset('js/app.js') }}"></script>
+</body>
+</html>

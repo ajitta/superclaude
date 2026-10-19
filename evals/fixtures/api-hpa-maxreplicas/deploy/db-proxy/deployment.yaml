@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: db-proxy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: db-proxy
+  template:
+    metadata:
+      labels:
+        app: db-proxy
+    spec:
+      containers:
+        - name: pgbouncer
+          image: registry.local/infra/pgbouncer:1.23
+          ports:
+            - containerPort: 6432
+          volumeMounts:
+            - name: config
+              mountPath: /etc/pgbouncer/pgbouncer.ini
+              subPath: pgbouncer.ini
+            - name: userlist
+              mountPath: /etc/pgbouncer/userlist.txt
+              subPath: userlist.txt
+      volumes:
+        - name: config
+          configMap:
+            name: db-proxy-config
+        - name: userlist
+          secret:
+            secretName: db-proxy-userlist

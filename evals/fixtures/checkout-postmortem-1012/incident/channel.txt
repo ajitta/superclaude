@@ -1,0 +1,9 @@
+#inc-2026-10-12-checkout — channel export
+
+13:58 alice: deploying checkout release 4812
+14:06 pagerbot: ALERT checkout 5xx rate above 2% (firing)
+14:09 bob: POST /checkout/confirm failing for me, started with 4812?
+14:12 alice: errors come from the new session serializer, starting rollback of 4812
+14:20 bob: acked the page, watching
+14:32 alice: rollback of 4812 complete, all pods on 4811
+14:41 bob: my test checkouts work again, back to normal, closing
