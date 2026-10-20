@@ -8,6 +8,8 @@ Releases before 4.19.0 are not listed. Their history is the git log; the upstrea
 
 ## [Unreleased]
 
+## [4.34.1] - 2026-10-20
+
 ### Changed
 
 - `/sc:brainstorm` decision modes: an answer in your own words that commits to one choice (the question form's Other text, or a sentence that names or paraphrases one option) is recorded as `confirmed`, with the option it names or, when it names none, your text as the choice. Before, it was tagged `delegated`, and `/sc:review --audit-delegated` could re-decide it between models. A question, a hesitation or a condition ("not sure, maybe b?"), an evaluation alone ("b looks good") and deferring to the ★ ("as recommended") still count as `delegated`. In `/sc:intent --through --ask`, a hesitant Other answer is now `delegated` too; naming the ★ in reply to one question stays `confirmed`.
