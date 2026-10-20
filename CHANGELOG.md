@@ -8,6 +8,8 @@ Releases before 4.19.0 are not listed. Their history is the git log; the upstrea
 
 ## [Unreleased]
 
+## [4.32.0] - 2026-10-20
+
 ### Changed
 
 - Upgrade: `install`, `update` and `uninstall` remove the 19 retired agent files, but only when a file's text matches a revision superclaude shipped. An agent you wrote or edited under one of those names stays. Their agent-memory folders are left alone. Run `superclaude update --scope <scope>`, not a plain `install`: `install` skips files that already exist, so the five kept agents would keep pointing at the retired ones until updated.
