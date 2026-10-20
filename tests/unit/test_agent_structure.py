@@ -415,6 +415,9 @@ class TestAgentMemoryGuide:
                 assert ref in AGENT_IDS, (
                     f"{stem}: memory_guide Related: refs unknown agent '{ref}'"
                 )
+                assert ref not in NO_MEMORY_AGENTS, (
+                    f"{stem}: memory_guide Related: names '{ref}', which keeps no memory"
+                )
 
 
 class TestAgentOptionalFields:

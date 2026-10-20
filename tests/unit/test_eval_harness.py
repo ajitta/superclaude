@@ -1273,6 +1273,12 @@ def _through_state(ws, name):
         memory = ws / ".claude" / "agent-memory" / "self-review"
         memory.mkdir(parents=True)
         (memory / "review_patterns.md").write_text("x\n", encoding="utf-8")
+    if name == "agent memory-local left":
+        with open(ws / ".git" / "info" / "exclude", "a", encoding="utf-8") as f:
+            f.write(".claude/agent-memory-local/\n")
+        memory = ws / ".claude" / "agent-memory-local" / "verifier"
+        memory.mkdir(parents=True)
+        (memory / "x.md").write_text("x\n", encoding="utf-8")
     if name == "empty agent memory dir":
         (ws / ".claude" / "agent-memory-local").mkdir(parents=True)
 
@@ -1296,6 +1302,7 @@ _THROUGH_STATES = {
     "two feature branches": [_P, _P, _F, _F, _F, _F, _F, _P, _P, _F],
     "last step uncommitted": [_P, _P, _P, _P, _P, _P, _P, _F, _P, _P],
     "agent memory left": [_P, _P, _P, _P, _P, _P, _P, _P, _F, _P],
+    "agent memory-local left": [_P, _P, _P, _P, _P, _P, _P, _P, _F, _P],
     "empty agent memory dir": [_P] * 10,
 }
 

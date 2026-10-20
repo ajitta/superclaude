@@ -39,6 +39,18 @@ Changed:
 
 Memory an earlier release already wrote stays where it is. Nothing deletes a user's files.
 
+## Independent review applied
+
+[06i-verify-followups.md](./06i-verify-followups.md) (opus, high effort, own worktree): PASS WITH FIXES, no Critical. It reproduced the gates, the upgrade and the project/local scope conflict with two agents lacking `memory:`, and mutation-checked every new test.
+
+| # | Severity | Finding | Applied |
+|---|---|---|---|
+| 1 | Important | The own-words rule did not exclude deferring to the ★, so "as recommended" could read as `confirmed` and skip the audit; intent's "which those rules leave delegated" was not true of brainstorm's text | brainstorm's own-words case says "deferring to the ★ is not one", and its delegated line lists "as recommended" (in any language) |
+| 2 | Minor | A positive evaluation ("b looks good") could pass as a paraphrase, undoing F3's "an evaluating context picks nothing" | "an evaluation alone, positive or negative, picks nothing", and the picks-nothing cases win over the own-words case |
+| 3 | Minor | The Checkpoint sentence's main clause read as "an answer makes the row confirmed", which would make a hesitant Other text confirmed again | It now reads "Tag each answer under the /sc:brainstorm Decision-mode tag step's rules … naming the ★ in reply to that one question is `confirmed` too" |
+| 4 | Minor | No test covered the `.claude/agent-memory-local` half of the probe check | New end state `agent memory-local left` (only the memory check fails) |
+| 5 | Minor | `repo-index`'s memory guide still named `verifier` under `Related:`; the authoring rule said the protocol header is in "every agent" | `Related: deep-researcher`; "every agent with `memory`"; `test_memory_guide_refs_valid` now fails on a `Related:` naming an agent without memory |
+
 ## Limits
 
 - The own-words rule is wording only. No probe answers a question with an Other text: a headless run cannot answer a form, and the decision-mode probe is deferred.
