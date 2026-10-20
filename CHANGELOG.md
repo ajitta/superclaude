@@ -8,6 +8,8 @@ Releases before 4.19.0 are not listed. Their history is the git log; the upstrea
 
 ## [Unreleased]
 
+## [4.34.0] - 2026-10-20
+
 ### Added
 
 - `/sc:intent --through --ask`: one question round inside the unattended chain. Right after `/sc:brainstorm`, the run asks up to four questions in one form, only about choices that change what you get or see (what counts, what is shown, where output goes), each with the ★ option first. Answers become `confirmed` rows and the spec is rewritten to follow them; build details stay `delegated` for the spec review's audit, and the rest runs as before. A dismissed form waits for answers typed in chat; a form that times out continues with the ★ options delegated. When every decision is answered, the spec review skips the delegated-decision audit. With no way to ask (a headless run) it behaves like plain `--through`. Across the 25 earlier one-prompt chain runs (runs 1–22 and three probe runs in `docs/features/goal-chain/`), all 154 discovery decisions were delegated. The independent audit disagreed on 8; 6 of those were about what the user gets (where a date shows, where export writes, how tags are attached or separated in the CSV) and 2 about tag case matching. The readings two runs asked the user to confirm afterwards were of the first kind too.
