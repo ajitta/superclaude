@@ -56,7 +56,7 @@ Validation: `uv run python -m pytest tests/unit/test_agent_structure.py -v`
 
 ## Agent Memory (v2.1.33)
 
-Agents declare persistent memory via `memory` frontmatter. Source files ship `memory: project`; installer rewrites to match install scope. Full spec (scope→location table, `_rewrite_agent_memory_scope` mechanics, MEMORY.md injection): `.claude/rules/agent-authoring.md` § memory.
+Agents declare persistent memory via `memory` frontmatter. Source files ship `memory: project`; installer rewrites to match install scope. The independent reviewers `self-review` and `verifier` ship no `memory`, so no earlier verdict reaches their next review and they leave no memory folder in the project. Full spec (scope→location table, `_rewrite_agent_memory_scope` mechanics, MEMORY.md injection): `.claude/rules/agent-authoring.md` § memory.
 
 ## Escalation
 

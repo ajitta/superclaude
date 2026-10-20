@@ -285,6 +285,21 @@ class TestAgentMemoryDirectory:
         assert (base / "agent-memory-local").is_dir()
 
 
+def test_install_leaves_independent_reviewers_without_memory(tmp_path):
+    """self-review and verifier ship no `memory:` line and install adds none,
+    so they write no memory folder into the user's repo (goal-chain 06e run 28);
+    the other agents still get the scope's value."""
+    base = tmp_path / ".claude"
+    assert install_all(base_path=base, force=True, scope="user")[0]
+
+    for name in ("self-review", "verifier"):
+        text = (base / "agents" / f"{name}.md").read_text(encoding="utf-8")
+        assert "\nmemory:" not in text, name
+    assert "\nmemory: user\n" in (base / "agents" / "deep-researcher.md").read_text(
+        encoding="utf-8"
+    )
+
+
 class TestAgentMemoryScopeConflict:
     """Project and local scope share `./.claude/agents`; installing one over the
     other moved every agent's memory store with no word about it."""

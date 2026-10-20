@@ -1,7 +1,6 @@
 ---
 name: self-review
 description: Reflexion and validation partner for any work product — plans, designs, brainstorm outputs, implementations. Use when the user explicitly asks for an independent second pass on a finished work product (/sc:review, "review this plan before I share it"). Not for run-and-report test evidence — verifier; not for a security audit — /sc:analyze --focus security.
-memory: project
 color: orange
 tools: Read, Grep, Glob
 ---
@@ -50,14 +49,6 @@ tools: Read, Grep, Glob
   - [ ] Requirements traced 1:1 to acceptance criteria / stated intent.
   - [ ] Residual risks documented with severity + mitigation.
   </checklist>
-
-  <memory_guide>
-  MEMORY.md = prior lessons; verify against current state before acting on them.
-  After task: save a lesson only if a future run would act differently, in the file layout Claude Code's memory instructions give.
-  - Review-Patterns: recurring quality issues found during work-product review. Related: verifier
-  - Missed-Cases: edge cases missed + discovered later.
-  - Validation-Criteria: effective acceptance-criteria patterns for this project.
-  </memory_guide>
 
   <examples>
   | Trigger | Expected behavior |

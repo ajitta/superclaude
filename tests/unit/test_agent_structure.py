@@ -30,6 +30,11 @@ VALID_PERMISSION_MODES = {
     "bypassPermissions",
 }
 VALID_MEMORY_SCOPES = {"user", "project", "local"}
+# Independent reviewers carry no `memory` field: a stored verdict would reach
+# their next review of the same work, and Claude Code adds Write/Edit to any
+# agent with memory, so a read-only reviewer wrote files into the user's repo
+# (docs/features/goal-chain/06e run 28). Per .claude/rules/agent-authoring.md.
+NO_MEMORY_AGENTS = {"self-review", "verifier"}
 
 _SCHEMAS_PATH = _REPO / ".claude" / "rules" / "schemas.yaml"
 _SCHEMAS = yaml.safe_load(_SCHEMAS_PATH.read_text(encoding="utf-8"))
@@ -95,6 +100,9 @@ class TestAgentFrontmatter:
     @pytest.mark.parametrize("field", ["name", "memory", "color"])
     def test_has_required_field(self, agent, field):
         stem, content, fm = agent
+        if field == "memory" and stem in NO_MEMORY_AGENTS:
+            assert field not in fm, f"{stem}: an independent reviewer keeps no memory"
+            return
         assert field in fm, f"{stem}: frontmatter missing '{field}'"
 
     def test_name_matches_filename(self, agent):
@@ -120,6 +128,8 @@ class TestAgentFrontmatter:
 
     def test_memory_valid(self, agent):
         stem, content, fm = agent
+        if stem in NO_MEMORY_AGENTS:
+            return
         scope = fm.get("memory", "")
         assert scope in VALID_MEMORY_SCOPES, (
             f"{stem}: memory '{scope}' not in {VALID_MEMORY_SCOPES}"
@@ -315,15 +325,27 @@ MEMORY_PROTOCOL = [
 ]
 
 
+def test_no_memory_agents_exist():
+    names = {path.stem for path in AGENT_FILES}
+    assert NO_MEMORY_AGENTS <= names, NO_MEMORY_AGENTS - names
+
+
 class TestAgentMemoryGuide:
-    """Validate <memory_guide> section in every agent file."""
+    """Validate <memory_guide> section in every agent with memory."""
 
     def test_has_memory_guide(self, agent):
         stem, content, _ = agent
+        if stem in NO_MEMORY_AGENTS:
+            assert "<memory_guide>" not in content, (
+                f"{stem}: keeps no memory, so no <memory_guide> section"
+            )
+            return
         assert "<memory_guide>" in content, f"{stem}: missing <memory_guide> section"
 
     def test_memory_guide_has_categories(self, agent):
         stem, content, _ = agent
+        if stem in NO_MEMORY_AGENTS:
+            return
         mg = extract_xml_content(content, "memory_guide")
         assert mg, f"{stem}: <memory_guide> is empty"
         categories = [
@@ -341,6 +363,8 @@ class TestAgentMemoryGuide:
         ship inside every agent. Per .claude/rules/agent-authoring.md.
         """
         stem, content, _ = agent
+        if stem in NO_MEMORY_AGENTS:
+            return
         mg = extract_xml_content(content, "memory_guide") or ""
         lines = [line.strip() for line in mg.strip().splitlines()]
         assert lines[:2] == MEMORY_PROTOCOL, (
@@ -366,6 +390,8 @@ class TestAgentMemoryGuide:
         of the category lines.
         """
         stem, content, _ = agent
+        if stem in NO_MEMORY_AGENTS:
+            return
         mg = extract_xml_content(content, "memory_guide") or ""
         # Forbid the legacy nested form.
         assert "<refs " not in mg, (

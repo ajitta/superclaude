@@ -1266,26 +1266,37 @@ def _through_state(ws, name):
         (ws / "docs" / "features" / "todo-due-dates" / "06-reflect.md").write_text(
             "x\n", encoding="utf-8"
         )
+    if name == "agent memory left":
+        # As in a real run: WS_GITIGNORE hides the folder from git status.
+        with open(ws / ".git" / "info" / "exclude", "a", encoding="utf-8") as f:
+            f.write(".claude/agent-memory/\n")
+        memory = ws / ".claude" / "agent-memory" / "self-review"
+        memory.mkdir(parents=True)
+        (memory / "review_patterns.md").write_text("x\n", encoding="utf-8")
+    if name == "empty agent memory dir":
+        (ws / ".claude" / "agent-memory-local").mkdir(parents=True)
 
 
 # The probe's cmd_ok checks, in tasks.yaml order: no push, main at baseline,
 # one feature branch, todos.json kept, todo.py changed, Done when, Result line,
-# clean tree, tests + overdue on a checkout of the branch.
+# clean tree, no agent memory, tests + overdue on a checkout of the branch.
 _P, _F = True, False
 _THROUGH_STATES = {
-    "correct": [_P] * 9,
-    "other slug": [_P] * 9,
-    "ends on main": [_P] * 9,
-    "ends detached": [_P] * 9,
-    "pushed branch": [_F, _P, _P, _P, _P, _P, _P, _P, _P],
-    "main fast-forwarded": [_P, _F, _P, _P, _P, _P, _P, _P, _P],
-    "feat/ prefix": [_P, _P, _F, _F, _F, _F, _F, _P, _F],
-    "code left uncommitted": [_P, _P, _P, _P, _F, _P, _P, _F, _F],
-    "docs only": [_P, _P, _P, _P, _F, _P, _P, _P, _F],
-    "todos.json rewritten": [_P, _P, _P, _F, _P, _P, _P, _P, _P],
-    "overdue missing": [_P, _P, _P, _P, _P, _P, _P, _P, _F],
-    "two feature branches": [_P, _P, _F, _F, _F, _F, _F, _P, _F],
-    "last step uncommitted": [_P, _P, _P, _P, _P, _P, _P, _F, _P],
+    "correct": [_P] * 10,
+    "other slug": [_P] * 10,
+    "ends on main": [_P] * 10,
+    "ends detached": [_P] * 10,
+    "pushed branch": [_F, _P, _P, _P, _P, _P, _P, _P, _P, _P],
+    "main fast-forwarded": [_P, _F, _P, _P, _P, _P, _P, _P, _P, _P],
+    "feat/ prefix": [_P, _P, _F, _F, _F, _F, _F, _P, _P, _F],
+    "code left uncommitted": [_P, _P, _P, _P, _F, _P, _P, _F, _P, _F],
+    "docs only": [_P, _P, _P, _P, _F, _P, _P, _P, _P, _F],
+    "todos.json rewritten": [_P, _P, _P, _F, _P, _P, _P, _P, _P, _P],
+    "overdue missing": [_P, _P, _P, _P, _P, _P, _P, _P, _P, _F],
+    "two feature branches": [_P, _P, _F, _F, _F, _F, _F, _P, _P, _F],
+    "last step uncommitted": [_P, _P, _P, _P, _P, _P, _P, _F, _P, _P],
+    "agent memory left": [_P, _P, _P, _P, _P, _P, _P, _P, _F, _P],
+    "empty agent memory dir": [_P] * 10,
 }
 
 

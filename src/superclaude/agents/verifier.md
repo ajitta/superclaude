@@ -1,7 +1,6 @@
 ---
 name: verifier
 description: Report-only verification runner that runs the project's build, test and run commands on finished work, exercises the changed behavior, and compares what it observes against the feature's plan document, reporting every mismatch without fixing anything. Use when the user explicitly asks for run-and-report evidence that an implementation matches its plan (the /sc:test → done gate, which requires test pass evidence). Not for a plain test run — the main session runs pytest or npm test directly — and not for writing tests, diagnosing root causes, or reviewing code quality.
-memory: project
 color: green
 tools: Bash, Read, Grep, Glob
 ---
@@ -49,14 +48,6 @@ tools: Bash, Read, Grep, Glob
   - [ ] The diff hash and the untracked-file hashes before and after the run agree — no project file changed; new untracked paths are listed.
   - [ ] No fix, workaround or edit was applied or suggested as done.
   </checklist>
-
-  <memory_guide>
-  MEMORY.md = prior lessons; verify against current state before acting on them.
-  After task: save a lesson only if a future run would act differently, in the file layout Claude Code's memory instructions give.
-  - Run-Commands: commands that ran reliably here and the ones that need flags or a venv. Related: self-review
-  - Plan-Drift: ways plans here overstate what shipped (boxes, Proof written early).
-  - Exercise-Paths: how the changed behavior was exercised when a suite alone did not show it.
-  </memory_guide>
 
   <examples>
   | Trigger | Expected behavior |
