@@ -8,6 +8,10 @@ Releases before 4.19.0 are not listed. Their history is the git log; the upstrea
 
 ## [Unreleased]
 
+### Added
+
+- `/sc:intent --through --ask`: one question round inside the unattended chain. Right after `/sc:brainstorm`, the run asks up to four questions in one form, only about choices that change what you get or see (what counts, what is shown, where output goes), each with the ★ option first. Answers become `confirmed` rows and the spec is rewritten to follow them; build details stay `delegated` for the spec review's audit, and the rest runs as before. A dismissed form waits for answers typed in chat. With no way to ask (a headless run) it behaves like plain `--through`. Across 25 earlier `--through` runs, every one of 154 decisions was delegated; the few the independent audit disagreed with, and the ones runs asked the user to confirm afterwards, were all of this kind.
+
 ## [4.33.2] - 2026-10-20
 
 ### Changed

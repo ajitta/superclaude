@@ -344,7 +344,8 @@ Done when: <how you will know it worked>
 ```
 
 - Start Claude Code in auto mode (`claude --permission-mode auto`). In manual mode, each tool call your settings do not allow waits for you.
-- For an ambiguous or large intent, answer the brainstorm questions yourself: run `/sc:intent` without the flag and take the chain step by step.
+- To make the choices that change what you get yourself, add `--ask`: after discovery, the run stops once with up to four questions (★ first), such as "Is a todo due today overdue?". Your answers are recorded as `confirmed` and the spec follows them; build details stay delegated, and the rest runs unattended. In a headless run there is no one to ask, so it behaves like plain `--through`.
+- For an ambiguous or large intent that needs a real back-and-forth, run `/sc:intent` without the flag and take the chain step by step.
 - To have Claude Code restart the run if it stops before the end, wrap it in [`/goal`](https://code.claude.com/docs/en/goal) and add a judging line. The evaluator judges the whole goal text against the transcript, which holds the commands' own approval steps, so say what counts. In testing a hand-written step-list goal, 2 of 4 runs without such a line never finished (one evaluator held on a process sentence, one on a command's approval step); `--through` under `/goal` was run only with the line (2 of 2 met).
 
 ```text

@@ -7,7 +7,7 @@ description: Record a request in the requester's own words (problem, outcome, af
     <mission>Capture a request as an intent record in the requester's own words — problem, proposed outcome, affected users and systems, constraints, open questions — before any analysis</mission>
   </role>
 
-  <syntax>/sc:intent [request] [--through]</syntax>
+  <syntax>/sc:intent [request] [--through] [--ask]</syntax>
 
   <flow>
   1. Capture: Keep the user's request verbatim as the seed. No rewording.
@@ -17,12 +17,14 @@ description: Record a request in the requester's own words (problem, outcome, af
   5. Save: feature path `docs/features/<slug>/00-intent.md` — slug resolution (zero match → new feature folder; intent has no standalone path), frontmatter `status: approved-for-plan` (the Approve step, or with --through the request itself, precedes the write) + `revised: <today>`, README update per core/rules/RULES_DOCS.md `<doc_output_convention>`; a folder created here gets its README with `phase: intent`. With --through, the stop conditions in the --through flag line apply before this write.
   6. Handoff: An open solution space or several affected systems → /sc:brainstorm; a clear direction → /sc:plan (/sc:design for interface or architecture work); each takes 00-intent.md as input.
   7. Branch (--through only, in place of the Handoff step): on the default branch (main, master, or the branch `origin/HEAD` names) create and switch to `feature/<slug>`; on any other branch stay. Note the default branch's sha for the Report step, then commit the Save step's files on that branch.
-  8. Run (--through only): call /sc:brainstorm → /sc:review --scope spec --audit-delegated → /sc:design → /sc:plan → /sc:implement --plan → /sc:review --scope branch → /sc:test → /sc:reflect in that order through the Skill tool, and commit what each command writes on that branch; /sc:reflect's result goes to `06-reflect.md` in the feature folder. The --through request is the user's approval at every step: ask nothing, take the ★ option and record it as delegated. Where a command would ask without a ★: open Areas of concern → plan anyway and list them in the Report step; branch review findings → fix the Critical and Important ones once, then re-run the Proof; reflect's Persist → propose, write nothing. Stop and report instead when a choice cannot be undone or reaches other people, or when a Critical finding or a red Proof remains after one fix round.
-  9. Report (--through only): end with (1) `git log --oneline` for the branch (2) the `status:` line of each doc in the feature folder (3) the plan's `Result:` line (4) the last full test run's exit code and summary line (5) the branch review's Critical count (6) `06-reflect.md`'s gap against Done when, then the branch name, the default branch's sha before the run, and the steps left to the user (merge, push).
+  8. Run (--through only): call /sc:brainstorm → /sc:review --scope spec --audit-delegated → /sc:design → /sc:plan → /sc:implement --plan → /sc:review --scope branch → /sc:test → /sc:reflect in that order through the Skill tool, and commit what each command writes on that branch; /sc:reflect's result goes to `06-reflect.md` in the feature folder. The --through request is the user's approval at every step: ask nothing (with --ask, except once at the Checkpoint step right after /sc:brainstorm), take the ★ option and record it as delegated. Where a command would ask without a ★: open Areas of concern → plan anyway and list them in the Report step; branch review findings → fix the Critical and Important ones once, then re-run the Proof; reflect's Persist → propose, write nothing. Stop and report instead when a choice cannot be undone or reaches other people, or when a Critical finding or a red Proof remains after one fix round.
+  9. Checkpoint (--ask only, inside the Run step, after brainstorm and before the spec review): from the Resolved Decisions /sc:brainstorm wrote, pick the ones that change what the user gets or sees (what counts, what is shown, where output goes, which behavior a case gets), not how it is built; at most four. Ask them in one AskUserQuestion call, each with its options and the ★ one first; when one answer would change another's options, ask the first and leave the dependent one delegated. An answer → that row becomes `confirmed` with the chosen option, and the spec sections that follow from it are rewritten to match; every other row stays `delegated` for the spec review's audit. Commit, then continue the Run step. A declined form → wait for the user's reply: answers in it (numbers, labels or their own words) are applied the same way, a plain go-ahead leaves those rows delegated, and the Run step continues either way. No decision of that kind, or no way to ask (a headless run) → note it and continue as plain --through.
+  10. Report (--through only): end with (1) `git log --oneline` for the branch (2) the `status:` line of each doc in the feature folder (3) the plan's `Result:` line (4) the last full test run's exit code and summary line (5) the branch review's Critical count (6) `06-reflect.md`'s gap against Done when; with --ask, which decisions the user answered and which stayed delegated; then the branch name, the default branch's sha before the run, and the steps left to the user (merge, push).
   </flow>
 
   <flags>
   - --through: skips the Fill step (an empty field reads "not stated") and the Approve step (the request is the approval), saves, then runs the rest of the Large chain on a feature branch to the end: the Branch step, the Run step and the Report step. Before the Save step writes, an existing 00-intent.md in the folder, a slug that only partly matches a folder, or an existing `feature/<slug>` branch while the current branch is a default branch ends the run with nothing written: report which one and stop.
+  - --ask: with --through only; one question round at the Checkpoint step, for the decisions only the user can make. Without --through it is ignored.
   </flags>
 
   <outputs>
@@ -36,7 +38,7 @@ description: Record a request in the requester's own words (problem, outcome, af
   - Edit: an existing folder's README entry
   - Bash: `git config user.name` for the Author line; with --through, the branch switch and commits
   - Skill: with --through, each command the Run step calls
-  - AskUserQuestion: the Fill step
+  - AskUserQuestion: the Fill step; with --ask, the Checkpoint step
   </tools>
 
   <examples>
@@ -46,6 +48,7 @@ description: Record a request in the requester's own words (problem, outcome, af
   | `/sc:intent 'hook output must not block the prompt'` with `docs/features/hook-latency/` present | Exact slug match: `00-intent.md` added to that folder, its README gets the entry |
   | `/sc:intent 'rename this variable'` | Settled by one small change: no file; says the request needs no intent record and answers it directly |
   | `/sc:intent --through 'Problem: no due dates … Done when: overdue lists only past-due todos'` on main | `feature/todo-due-dates` created; 00-intent through reflect committed there with every choice delegated; the Report step's six items, nothing merged or pushed |
+  | `/sc:intent --through --ask '…'` in an interactive session | After discovery, one question form: "Is a todo due today overdue?", "Do done todos count?" (★ first); the answers become `confirmed` rows and the spec follows them; the rest runs as plain --through |
 
   <example name="intent-skeleton">
 # Intent: title in the requester's words
@@ -77,6 +80,7 @@ What the requester could not answer.
   - rephrase-drift: the user's wording gets smoothed into cleaner prose → restore the quoted original.
   - question-flood: questions continue after every item is filled → go to the Draft step; five is a ceiling, not a target.
   - through-on-default: --through commits land on a default branch (the Branch step) → create `feature/<slug>` at the current commit, switch to it and continue there; the Report step says the default branch also holds those commits and gives its sha from before the run, so the user can move it back.
+  - checkpoint-creep: the Checkpoint step asks about storage format, parsing or another build detail → drop it from the form; only choices that change what the user gets or sees qualify.
   - existing-intent: the folder already holds 00-intent.md → show it first; the user picks revising it in place (bump `revised`, no second README entry) or moving it to archive/ per RULES_DOCS Superseded versions; with --through, the run ends instead (the --through flag).
   </gotchas>
 
