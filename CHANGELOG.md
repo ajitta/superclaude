@@ -8,6 +8,8 @@ Releases before 4.19.0 are not listed. Their history is the git log; the upstrea
 
 ## [Unreleased]
 
+## [4.33.1] - 2026-10-20
+
 ### Changed
 
 - `/sc:intent --through`, after an independent review: it does not start (nothing written) when the feature already has an intent record, the slug only partly matches a folder, or `feature/<slug>` exists. It treats the branch `origin/HEAD` names as a default branch too, and its report gives that branch's sha from before the run. Questions the called commands ask without a ★ now have fixed answers: plan despite open Areas of concern and list them, fix Critical and Important branch-review findings once and re-run the Proof, and leave reflect's memory proposals unwritten. A red Proof stops the run after one fix round, and the reflection goes to `06-reflect.md`. `RULES_DOCS.md` names the `--through` request as the intent's approval.
