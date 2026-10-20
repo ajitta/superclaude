@@ -41,3 +41,5 @@ Verdict: PASS WITH FIXES, no Critical. The reviewer rebuilt all 12 rows of the p
 | 8 | Minor | One `CANARY_OK=1` clears both gates; the no-tag message named only `canary-gates` | The message names both targets. One variable stays: AGENTS.md asks for both reports |
 
 A mutation spot check after the change: making the "main at baseline" check always pass turns the `main fast-forwarded` case of the parametrized test red.
+
+Before the 4.33.2 release: `make canary-gates` passed all 7 hard-gate checks (RULES_DOCS changed), and the new `make canary-commands` picked `plan-draft-spec-gate` (4/4) and `intent-through-branch` (13/13, 4.0 min).
