@@ -1,4 +1,4 @@
-branch: master @c95d3427 (== origin/master == stable == v4.33.2); worktree clean (untracked .hermes/, .ignore belong to other sessions)
+branch: master @7cddd8b4 (== origin/master == stable == v4.34.0); worktree clean (untracked .hermes/, .ignore belong to other sessions)
 
 # Session 2026-10-20 — master (pressure-probe readout, eval-arm isolation, agent roster audit → 4.32.0)
 
@@ -66,3 +66,9 @@ branch: master @c95d3427 (== origin/master == stable == v4.33.2); worktree clean
 - `/sc:plan` Save moves the design it read (04-design.md / docs/specs/*-design-*) draft -> approved-for-plan; RULES_DOCS gate allows planning past Areas of concern.
 - Release gate: `make release` also refuses on command-body changes unless CANARY_OK=1; `make canary-commands [BASE=<ref>]` runs probes picked by `evals/changed_command_probes.py` (prompt `/sc:x`, `skill_called sc:x`, or `covers:`). Exits 2 with no tag.
 - Second independent review (06c): PASS WITH FIXES, 2 Important + 6 Minor, all applied (06d). Probe end-state vector test: 13 states. Pre-release: canary-gates 7/7, canary-commands plan-draft-spec-gate 4/4 + intent-through-branch 13/13.
+
+## --through --ask (released as 4.34.0)
+- One AskUserQuestion round right after brainstorm: up to 4 decisions that change what the user gets or sees (counts, included items, output content/destination; not validation/storage/parsing/error wording), star first; answers -> confirmed + spec rewritten; rest delegated; declined form waits for chat answers; timeout/headless -> plain --through; all answered -> spec review without --audit-delegated.
+- Evidence (06e): 25 earlier chain runs, 154 delegated decisions, audit differed on 8 (6 user-facing, 2 tag normalization). Six --ask runs: 4 interactive (sonnet+opus, answers against star reached the code), 2 headless fallback.
+- Third review (06f) PASS WITH FIXES, 2 Important + 6 Minor applied (06g). New probe intent-through-ask-headless. Pre-release canary-gates 7/7, canary-commands 13/13 + 14/14.
+- Open: brainstorm decision modes lack a rule for Other free text outside --through; self-review agent leaves untracked .claude/agent-memory/ in user repos.
