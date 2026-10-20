@@ -20,7 +20,6 @@ from superclaude.cli.install_git_exclude import _collect_entries
 SRC = Path(__file__).parent.parent.parent / "src" / "superclaude"
 SAVE = SRC / "commands" / "save.md"
 LOAD = SRC / "commands" / "load.md"
-PROJECT_MANAGER = SRC / "agents" / "project-manager.md"
 
 MEMORY_FOLDER = ".claude/memories/"
 SESSION_RECORD = "session_[date]_[branch-slug].md"
@@ -51,28 +50,15 @@ def test_save_and_load_use_no_memory_server_tools(path: Path) -> None:
         assert token not in text, f"{path.name} still mentions {token!r}"
 
 
-def test_project_manager_session_keys_live_in_memory_folder() -> None:
-    text = _read(PROJECT_MANAGER)
-    assert MEMORY_FOLDER in text
-    for key in ("pm_context", SESSION_RECORD.removesuffix(".md")):
-        assert key in text, f"project-manager.md lost the {key!r} key"
-
-
 def test_save_writes_a_branch_scoped_session_record() -> None:
     assert f"{MEMORY_FOLDER}{SESSION_RECORD}" in _read(SAVE)
-
-
-def test_project_manager_session_end_writes_the_same_record() -> None:
-    assert f"{MEMORY_FOLDER}{SESSION_RECORD}" in _project_manager_session_end()
 
 
 def test_load_reads_the_record_save_writes() -> None:
     assert SESSION_RECORD_GLOB in _load_flow_step_one()
 
 
-@pytest.mark.parametrize(
-    "path", [SAVE, LOAD, PROJECT_MANAGER], ids=["save", "load", "project-manager"]
-)
+@pytest.mark.parametrize("path", [SAVE, LOAD], ids=["save", "load"])
 def test_no_fixed_name_session_file(path: Path) -> None:
     text = _read(path)
     for name in OVERWRITTEN_NAMES:
@@ -93,24 +79,17 @@ def _load_flow_step_one_keys() -> list[str]:
     return [key.strip() for key in match.group(1).split(",") if key.strip()]
 
 
-def _project_manager_session_end() -> str:
-    # Up to the next sentence start (". " + capital) or the end of the line, so
-    # an abbreviation such as "e.g." inside the sentence does not cut it short.
-    match = re.search(r"Session end:.*?(?=\.\s+[A-Z]|$)", _read(PROJECT_MANAGER), re.M)
-    return match.group(0) if match else ""
-
-
 def test_every_key_load_reads_has_a_writer() -> None:
-    # Fixed-name keys are project state only the project-manager agent writes.
+    # Fixed-name keys load.md reads must be written by /sc:save; the retired
+    # project-manager agent was the only writer of pm_context, so load.md
+    # stopped reading it (docs/features/agent-roster-audit).
     keys = _load_flow_step_one_keys()
     assert keys, (
         "load.md <flow> step 1 names no keys between 'Read ' and ' when present'"
     )
-    session_end = _project_manager_session_end()
-    missing = [key for key in keys if f"{MEMORY_FOLDER}{key}.md" not in session_end]
-    assert not missing, (
-        f"load.md reads keys project-manager.md Session end does not write: {missing}"
-    )
+    save = _read(SAVE)
+    missing = [key for key in keys if f"{MEMORY_FOLDER}{key}.md" not in save]
+    assert not missing, f"load.md reads keys save.md does not write: {missing}"
 
 
 @pytest.mark.parametrize("scope", ["local", "project"])

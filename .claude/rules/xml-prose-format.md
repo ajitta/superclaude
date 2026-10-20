@@ -84,7 +84,7 @@ When a section has a **fixed small set of named slots** that need (a) multi-line
 <bounds>
   <does>refactors with proven patterns; preserves behavior.</does>
   <never>adds features mid-refactor; makes large risky changes.</never>
-  <fallback>escalate to system-architect for boundary changes; ask the user when scope spans more than three modules.</fallback>
+  <fallback>return boundary changes to the main session as an open question; ask the user when scope spans more than three modules.</fallback>
 </bounds>
 ```
 

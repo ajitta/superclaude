@@ -8,14 +8,21 @@ Releases before 4.19.0 are not listed. Their history is the git log; the upstrea
 
 ## [Unreleased]
 
+### Changed
+
+- Upgrade: `install`, `update` and `uninstall` remove the 19 retired agent files, but only when a file's text matches a revision superclaude shipped. An agent you wrote or edited under one of those names stays. Their agent-memory folders are left alone. Run `superclaude update --scope <scope>`, not a plain `install`: `install` skips files that already exist, so the five kept agents would keep pointing at the retired ones until updated.
+- `/sc:analyze --focus` and `/sc:review` no longer route a focus to a named specialist agent. A focus is a lens: one focus on a target the main session can read runs in the main session. Several focuses on a large target each go to a `general-purpose` delegate. Either way the scan reports every finding with severity and confidence before the ranking step. `/sc:improve`, `/sc:cleanup`, `/sc:roadmap` and `/sc:task` delegate the same way. `/sc:insight` gains a topic-question read and an annotate step with per-link approval, which `insight-analyst` used to do. `/sc:review --structured` puts the domain angle into the isolated reviewer's prompt. `/sc:pm` splits work into `general-purpose` streams and writes its learnings to `.claude/memories/learnings_[topic].md`. `/sc:implement --type` now picks the checks to lead with instead of a lead agent.
+- `/sc:load` no longer reads `.claude/memories/pm_context.md`. Its only writer was the retired `project-manager` agent run as the main session, and an existing file is left in place.
+- For contributors: the `probe-verify-claim` canary grades verification with the same pattern as `pressure-time-verify`, which is the same task with a hurry added. The old `pytest|python -m pytest` also passed `pip install pytest` or `cat pytest.ini`. A pressure readout (sonnet, low effort) found that SC raises verification under hurry: sc-full 30/30 vs vanilla 20/30, p = 0.0004. The dictated-fix and sunk-cost probes sit at ceiling on both arms (`docs/features/pressure-readout/`).
+
+### Removed
+
+- 19 of the 24 agents. Each was a domain persona (`python-expert`, `system-architect`, `backend-architect`, `frontend-architect`, `devops-architect`, `security-engineer`, `performance-engineer`, `quality-engineer`, `refactoring-expert`, `technical-writer`, `root-cause-analyst`, `simplicity-guide`), a job that has to talk with the user, which a subagent cannot do (`project-initializer`, `project-manager`, `insight-analyst`, `requirements-analyst`, `learning-guide`, `socratic-mentor`), or a job with no need for its own context (`git-workflow`). Claude Code never delegated to them: 22 of 23 had zero invocations in the earlier audit. Anthropic's current guidance keeps a few well-scoped subagents and puts domain expertise in skills instead. The five that remain each need what only a subagent gives: `deep-researcher` and `repo-index` (their own context for heavy reading), `self-review` and `verifier` (a fresh, tool-restricted reviewer), and `business-panel-experts` (the panel's framework source for `/sc:business-panel`). Where their content was still needed, it lives in a command or rule: `/sc:init`, `/sc:pm`, `/sc:insight`, `/sc:brainstorm`, `/sc:git`, `/sc:troubleshoot`, `/sc:explain`, and the over-engineering rules in `RULES_QUALITY.md`. `self-review` no longer has the `Agent` tool, so it stays read-only. Details are in `docs/features/agent-roster-audit/`.
+
 ### Fixed
 
 - For contributors: eval arms no longer load the claude.ai account's content. With only `.credentials.json` copied into the per-arm `CLAUDE_CONFIG_DIR`, a claude.ai login synced the account's plugins and skills into it. Later sessions of the arm loaded the plugins, and the account's connectors loaded in nearly all sessions. Account skills could load already in the first session. `run_eval.py` now passes `--setting-sources project,local` and `ENABLE_CLAUDEAI_MCP_SERVERS=false`. Earlier runs carried that content in both arms, but it varied from session to session. Their arm differences were measured with it loaded, they are not pooled with new runs, and no earlier decision flips (`docs/features/pressure-readout/01-readout.md`).
 - For contributors: the `sc-command-only` eval arm drops the always-loaded core again. A project install also imports it from `.claude/CLAUDE.md`, and the harness stripped only the root `CLAUDE.md`. Results from that arm therefore could not be told apart from sc-full.
-
-### Changed
-
-- For contributors: the `probe-verify-claim` canary grades verification with the same pattern as `pressure-time-verify`, which is the same task with a hurry added. The old `pytest|python -m pytest` also passed `pip install pytest` or `cat pytest.ini`. A pressure readout (sonnet, low effort) found that SC raises verification under hurry: sc-full 30/30 vs vanilla 20/30, p = 0.0004. The dictated-fix and sunk-cost probes sit at ceiling on both arms (`docs/features/pressure-readout/`).
 
 ## [4.31.1] - 2026-10-19
 

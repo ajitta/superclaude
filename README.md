@@ -24,8 +24,8 @@
 
 | Commands | Agents | Modes | MCP Servers |
 |:--------:|:------:|:-----:|:-----------:|
-| **35**   | **24** | **6** | **3**       |
-| Slash    | Domain-expert | Behavioral | Integrations |
+| **35**   | **5** | **6** | **3**       |
+| Slash    | Isolated workers | Behavioral | Integrations |
 
 </div>
 
@@ -81,7 +81,7 @@ What gets installed (per scope):
 ```
 <scope>/
 ├── commands/sc/        # 35 slash commands (/sc:plan, /sc:implement, …)
-├── agents/             # 24 agent definitions
+├── agents/             # 5 agent definitions
 ├── output-styles/      # output styles (pick one via /config → Output style)
 ├── skills/             # sc-author, sc-prompt (shared with your own skills)
 ├── superclaude/        # core rules, modes, mcp docs, doc-scaffold templates
@@ -334,7 +334,7 @@ The framework's value comes from chaining commands. Each chain has gates: a step
 - **Skip steps when the input already exists.** If you already have a written spec, jump straight to `/sc:plan`. The gates exist to prevent skipping *unfinished* work, not to force ceremony.
 - **`--plan` flag** on `/sc:implement` makes it consume a committed plan document. Without `--plan`, it works from the latest message.
 - **`/sc:review` scores two dimensions** — fidelity to the spec and quality of the artifact — and groups findings as Critical / Important / Suggestion. Treat its output as a checklist, not a verdict. `--audit-delegated` re-examines only the decisions the model made on your behalf.
-- **`/sc:insight` writes insights to `.claude/insights.jsonl`** which `/sc:insight --list` and the `insight-analyst` agent read later — over time the framework remembers what worked.
+- **`/sc:insight` writes insights to `.claude/insights.jsonl`** which `/sc:insight --list` and `--query` read later — over time the framework remembers what worked.
 
 ---
 
@@ -366,13 +366,12 @@ Every hook runs as `superclaude hook <name>` (a console entry, dispatched before
 </td>
 <td width="50%">
 
-### 🤖 **Smarter Agent System**
-**24 specialized agents** with domain expertise:
-- New: **insight-analyst**, **repo-index**, **self-review**, **simplicity-guide**, **technical-writer**, **project-initializer**, **verifier**
-- Deep Research agent for autonomous web research
-- Security/performance/quality engineers catch real issues
-- Frontend / backend / system architect for design work
-- Routing-overlap table ("Cross-Agent Conflict Resolution") in src/superclaude/agents/README.md
+### 🤖 **Fewer, Sharper Agents**
+**5 agents**, each one a job that needs its own context, restricted tools or a fresh view:
+- **deep-researcher** for multi-source web research, **repo-index** for a compact project index
+- **self-review** and **verifier** for an independent second pass and run-and-report evidence (invoked explicitly)
+- **business-panel-experts** for multi-framework strategy analysis
+- Domain knowledge (security, performance, architecture, Python) comes from the model; the checks that apply it live in commands and rules, not in persona agents — why: [agent roster audit](docs/features/agent-roster-audit/)
 
 </td>
 </tr>
@@ -567,7 +566,7 @@ The Deep Research system intelligently coordinates multiple tools:
 | Project-specific gotchas | [`.claude/rules/gotchas/`](.claude/rules/gotchas) |
 | Slash commands (35) | [`src/superclaude/commands/`](src/superclaude/commands) · `superclaude install --list-all` |
 | Orchestration commands — `/sc:agent` vs `/sc:pm` vs `/sc:task` | [`docs/reports/ORCHESTRATION_COMMANDS.md`](docs/reports/ORCHESTRATION_COMMANDS.md) |
-| Agents (24) | [`src/superclaude/agents/`](src/superclaude/agents) |
+| Agents (5) | [`src/superclaude/agents/`](src/superclaude/agents) |
 | Modes (6) | [`src/superclaude/modes/`](src/superclaude/modes) |
 | MCP servers (3) | [`src/superclaude/mcp/`](src/superclaude/mcp) |
 | Hooks (registry + scripts) | [`src/superclaude/cli/hook_dispatch.py`](src/superclaude/cli/hook_dispatch.py) · [`src/superclaude/hooks/hooks.json`](src/superclaude/hooks/hooks.json) · [`src/superclaude/scripts/`](src/superclaude/scripts) |

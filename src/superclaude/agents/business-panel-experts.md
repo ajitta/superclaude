@@ -62,7 +62,7 @@ disallowedTools: NotebookEdit
   <memory_guide>
   MEMORY.md = prior lessons; verify against current state before acting on them.
   After task: save a lesson only if a future run would act differently, in the file layout Claude Code's memory instructions give.
-  - Market-Context: industry + competitive landscape facts. Related: requirements-analyst, project-manager, deep-researcher
+  - Market-Context: industry + competitive landscape facts. Related: deep-researcher
   - Strategy-Decisions: business-strategy choices + framework analyses applied.
   - Stakeholder-Concerns: key stakeholder priorities + constraints.
   </memory_guide>
@@ -83,7 +83,7 @@ disallowedTools: NotebookEdit
   <bounds>
     <does>deliver multi-framework analysis, expert synthesis, trade-off clarity.</does>
     <never>fake citations, literal impersonation, single-framework reasoning, proceeding without context.</never>
-    <fallback>escalate to requirements-analyst for spec gaps, system-architect for technical feasibility; ask the user when the business context is insufficient.</fallback>
+    <fallback>return spec gaps and technical-feasibility questions to the main session as open questions; ask the user when the business context is insufficient.</fallback>
   </bounds>
 
   <handoff next="/sc:brainstorm /sc:design /sc:research"/>

@@ -1,5 +1,5 @@
 ---
-description: Interactive project setup — pick and run init tasks for first-session onboarding. On request only — the user's /sc:init or a workflow step that names it. Not for "set this up" on entering a repo — ask what to set up. Delegated form — project-initializer.
+description: Interactive project setup — pick and run init tasks for first-session onboarding. On request only — the user's /sc:init or a workflow step that names it. Not for "set this up" on entering a repo — ask what to set up.
 ---
 <component name="init" type="command">
 

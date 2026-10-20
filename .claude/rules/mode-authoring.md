@@ -7,7 +7,7 @@ paths: ["src/superclaude/modes/**", ".claude/rules/mode-authoring.md"]
 > **Decision gate:** Create a mode only for **cognitive posture** — how Claude thinks, communicates, and prioritizes.
 > - Mode = **HOW TO THINK** (mindset)
 > - Command = **WHAT TO DO** (workflow)
-> - Agent = **WHO TO BE** (domain expertise)
+> - Agent = **WHO DOES ISOLATED WORK** (own context, restricted tools or a fresh view)
 
 Mindset-shifting overlay, not a procedure. Injected on-demand by `context_loader.py` TRIGGER_MAP.
 

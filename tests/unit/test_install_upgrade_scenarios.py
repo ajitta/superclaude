@@ -1203,10 +1203,11 @@ def test_c08_retired_agents_and_skills_do_not_survive(
 ) -> None:
     """C-08: pm-agent.md, deep-research-agent.md and the 11 b933fd65 process
     skills (using-superclaude: "Loaded at session start") survived install and
-    uninstall; the user's own skill and agent stay."""
+    uninstall; the user's own skill and agent stay. The fixture also holds 15
+    of the 19 persona agents the agent-roster audit retired (32 = 17 + 15)."""
     home, _project, base = build_legacy_install(tmp_path, "b933fd65p-user", monkeypatch)
     _plant_user_content(home)
-    assert len(_left(base)) == 17
+    assert len(_left(base)) == 32
 
     if operation == "uninstall":
         success, message = uninstall_all(base_path=base, scope="user")

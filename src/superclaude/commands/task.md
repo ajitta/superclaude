@@ -1,5 +1,5 @@
 ---
-description: Execute complex tasks as a tracked Epic → Story → Task hierarchy with sub-agent delegation. On request only — the user's /sc:task or a workflow step that names it. Not for single-step actions or small TODOs — do them directly; specialist waves — /sc:pm; one task from scope to review — /sc:agent.
+description: Execute complex tasks as a tracked Epic → Story → Task hierarchy with sub-agent delegation. On request only — the user's /sc:task or a workflow step that names it. Not for single-step actions or small TODOs — do them directly; parallel streams — /sc:pm; one task from scope to review — /sc:agent.
 ---
 <component name="task" type="command">
 
@@ -14,7 +14,7 @@ description: Execute complex tasks as a tracked Epic → Story → Task hierarch
   2. Decompose: Break into Epic → Story → Task hierarchy; each task starts open with an empty evidence note in its TaskCreate description
   3. Strategy: Pick execution order (sequential for deps, parallel for independent, adaptive for mixed)
   4. Checkpoint: Changes affect >3 files → present numbered plan → wait for user approval
-  5. Execute: delegate where a specialist fits and run independent tasks in parallel
+  5. Execute: run independent tasks in parallel, each as one `general-purpose` delegate with its domain checks in the prompt, per core/rules/RULES_DELEGATION.md `<sub_agent_decision>`
   6. Validate: Quality gates + completion verification — a task is marked completed in TaskUpdate only when its evidence note cites the check that passed (exit code, test output, observed outcome); a sub-agent's result is a claim to check, not evidence
   7. Cleanup: With --cleanup, delete completed and cancelled tasks and list stale and blocked ones, per the task cleanup section
   </flow>

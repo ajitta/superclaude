@@ -4,12 +4,12 @@ paths: ["src/superclaude/agents/**", ".claude/rules/agent-authoring.md"]
 
 # Agent Authoring Rules
 
-> **Decision gate.** Create an agent when the work needs **domain expertise** that Claude Code should delegate to automatically when a request matches the agent's description.
-> - Agent = **WHO TO BE** (domain expert persona)
+> **Decision gate.** Create an agent only for a recurring job that needs what only a subagent gives: a context of its own (the job reads far more than it returns — a web sweep, a whole-repo scan), tools restricted to the job (read-only review, run-but-never-edit), or a fresh view that has not seen the author's reasoning (independent review, verification). Domain expertise alone is not a reason: the model already has it, and an expert persona changes tone, not accuracy (`docs/research/persona-anchoring-framing-audit-chosh1179-2026-09-14.md` F1). Put a domain checklist in the command or rule that uses it, where the main session or a `general-purpose` delegate applies it. A job that must talk with the user mid-task (teaching, interactive menus, confirm-each-step) is a command, not an agent: a subagent returns one summary and cannot ask. Keep the roster small — every description competes for delegation, and a sprawling roster makes automatic delegation less reliable (Anthropic, "How and when to use subagents"). The 2026-10 audit cut 24 agents to 5 on this gate: `docs/features/agent-roster-audit/`.
+> - Agent = **WHO DOES ISOLATED WORK** (own context, restricted tools or a fresh view)
 > - Command = **WHAT TO DO** (user-invoked workflow)
 > - Mode = **HOW TO THINK** (cognitive overlay)
 
-> **What Claude Code loads.** A subagent session gets the agent's markdown body as its system prompt plus minimal environment context. It does not get the parent's Claude Code system prompt or the parent's skills; whether it gets CLAUDE.md (and through it the superclaude kernel) depends on Claude Code and on the agent frontmatter field `omitClaudeMd`, and the on-demand rule modules never reach it. Write the body self-contained. A subagent cannot spawn further subagents (only a main thread can, via `--agent` with `Agent` in `tools`), so each agent returns one summary with no nested delegation.
+> **What Claude Code loads.** A subagent session gets the agent's markdown body as its system prompt plus minimal environment context. It does not get the parent's Claude Code system prompt or the parent's skills; whether it gets CLAUDE.md (and through it the superclaude kernel) depends on Claude Code and on the agent frontmatter field `omitClaudeMd`, and the on-demand rule modules never reach it. Write the body self-contained. A subagent whose tool pool includes `Agent` can spawn subagents of its own, up to three layers below the main conversation by default (`CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH`); a reviewer that must stay read-only omits `Agent`, because a spawned `general-purpose` delegate can edit. A body still names no sibling agent to hand work to: open items go back to the main session, which decides what runs next.
 
 > **Don't recreate built-ins.** CC ships `Explore` (read-only codebase search, Haiku), `Plan` (read-only research for plan mode), `general-purpose` (full-tool multi-step), `statusline-setup`, and `Claude Code Guide`. A new superclaude agent must add domain-specific value beyond these; an agent that just "searches the codebase" or "researches before acting" duplicates `Explore`/`Plan` and bloats the registry.
 
@@ -23,7 +23,7 @@ CC requires only `name` and `description`. The rest are optional and inherit fro
 ---
 # Required by CC
 name: agent-name                            # lowercase letters and hyphens; matches filename
-description: <Domain> specialist for <distinguishing task>. Use when <signal no neighbor agent covers>. Not for <look-alike> — <neighbor>.
+description: <Job> for <distinguishing task>. Use when <signal no neighbor covers>. Not for <look-alike> — <neighbor>.
 
 # Required by superclaude
 memory: project                             # source value always "project"; installer rewrites to user/local per scope
@@ -51,15 +51,15 @@ omitClaudeMd: true                          # subagent starts without CLAUDE.md 
 
 CC reads `description` verbatim to decide delegation. Three parts:
 
-- **Persona** — a noun phrase naming the expert ("Expert code reviewer", "Debugging specialist for errors and test failures").
+- **Job** — a noun phrase naming the work the agent does in isolation ("Report-only verification runner", "Web-research specialist for cross-checked synthesis"), not an identity ("senior Python engineer").
 - **Trigger phrase** — the signal in a request that this agent covers and its neighbors do not: *"Use when Z."* Write *"Use proactively …"* or *"Use immediately after …"* only when the agent must run unasked, and name the event it follows: when most agents claim proactivity the phrase stops separating them, and overlapping triggers fire several agents for one request (docs/features/prompt-content-audit/).
 - **Negative gate** — when a neighbor shares the verb, add *"Not for <look-alike> — <neighbor>."* (verifier's description is the model).
 
 Skip emoji, version tags, and colon-prefixed keyword lists — the description is a sentence read by the parent's classifier; write a sentence. The legacy `(triggers - kw1, kw2)` shorthand is parsed but classifies less reliably than a CC-idiomatic sentence. One to three sentences total; the description sits in the parent's context every turn, so extra words must sharpen when-to-delegate (`content-quality.md` §1).
 
 Patterns:
-- `Debugging specialist for errors and test failures. Use when a test fails or a stack trace is pasted and the cause is unknown. Not for slow code — performance-engineer.`
-- `Data analysis expert for SQL queries and BigQuery operations. Use when the request names a query, table or dataset. Not for schema design — backend-architect.`
+- `Read-only reviewer of SQL migrations for lock and rollback risk. Use when a diff adds or edits a migration file. Not for query tuning — /sc:analyze --focus perf.`
+- `Log-triage runner that reads large CI logs and returns only the failing steps with their error lines. Use when a CI run failed and its log is too long to read in the main session. Not for fixing the failure — /sc:troubleshoot.`
 
 #### Vocabulary cautions
 
@@ -80,15 +80,15 @@ The description sentence is read verbatim into the subagent's system prompt head
 
 | Pattern | Field | Value | When |
 |---------|-------|-------|------|
-| Read-only + web | `tools` | `Read, Grep, Glob, Agent, WebSearch, WebFetch` | Plan/review/research (fails closed) |
-| Read-only minimal | `tools` | `Read, Grep, Glob, Agent` | No web access needed |
+| Read-only + web | `tools` | `Read, Grep, Glob, WebSearch, WebFetch` | Plan/review/research (fails closed) |
+| Read-only minimal | `tools` | `Read, Grep, Glob` | No web access needed |
 | Execute-only | `disallowedTools` | `Edit, Write, NotebookEdit` | Runs commands, never edits files |
 | General | `disallowedTools` | `NotebookEdit` | Code edits OK, no notebook edits |
 | Full access | *(omit both)* | — | Implementation agents |
 
 A `tools` list drops every MCP tool it does not name: commit `672055ce` stripped `tools`/`disallowedTools` from all agents for that reason, so set one only when the agent needs no MCP. CC permits both `tools` and `disallowedTools` together (deny is applied first, then allow is resolved against the remaining pool — a tool listed in both is removed). **superclaude convention: pick one form per agent for readability — never mix.**
 
-**Spawn restrictions (orchestrators only).** `tools: Agent(worker, researcher)` allow-lists which subagent types can be spawned. It takes effect only when the agent runs as the main thread (`claude --agent <name>`); it has no effect inside a regular subagent (subagents cannot spawn subagents). Bare `Agent` allows any; omitting `Agent` from `tools` disables spawning entirely.
+**Spawn restrictions (orchestrators only).** `tools: Agent(worker, researcher)` allow-lists which subagent types can be spawned. The type list takes effect only when the agent runs as the main thread (`claude --agent <name>`). In a subagent definition, `Agent` in `tools` lets the subagent spawn subagents within the depth limit, and any type list in parentheses is ignored. Bare `Agent` allows any type; omitting `Agent` from `tools` (or listing it in `disallowedTools`) disables spawning entirely, which is how a read-only reviewer stays read-only.
 
 **`effort`** — **omit by default.** Inherit from the parent unless measured evidence shows a specific value materially changes output for the agent's domain. String values only; `xhigh`/`max` availability and the default level depend on the model and CC version — check current docs, not a pinned value.
 
@@ -175,7 +175,7 @@ When memory is enabled, CC auto-injects up to the first 200 lines / 25KB of `MEM
   <bounds>
     <does>core capabilities described in prose (in-scope).</does>
     <never>out-of-scope actions described in prose.</never>
-    <fallback>escalation path; recommended for agents — long-lived personas benefit from an explicit recovery posture.</fallback>
+    <fallback>what goes back to the main session as an open item, and when to stop and ask; never name a sibling agent to hand work to — the main session decides what runs next.</fallback>
   </bounds>
 
   <handoff next="/sc:command1 /sc:command2"/>
@@ -222,9 +222,9 @@ Agents that read source code should include a Symbolic-First directive in `<tool
 
 | Tier | Directive | When |
 |------|-----------|------|
-| Reads and changes source (system/backend/frontend architects, python-expert, quality/performance/security engineers, refactoring-expert, root-cause-analyst, repo-index, self-review) | Full: `- Symbolic-First: with a symbol-aware tool connected (LSP or code index), query overview → definition → references before whole-file Read; without one, targeted Grep then Read of the matched range.` + optional agent-specific Grep sentence + `Read whole files only when small or non-code.` | Always |
-| Touches code to configure, plan, document or teach (devops-architect, requirements-analyst, project-manager, project-initializer, technical-writer, learning-guide, socratic-mentor) | Light: `- Symbolic-First: prefer symbol-aware queries (when connected) or targeted Grep over whole-file Read when exploring code.` | When code may be read |
-| Non-code (business-panel-experts, deep-researcher, git-workflow, insight-analyst, simplicity-guide, verifier) | — | Skip |
+| Reads source to index or review it (repo-index, self-review) | Full: `- Symbolic-First: with a symbol-aware tool connected (LSP or code index), query overview → definition → references before whole-file Read; without one, targeted Grep then Read of the matched range.` + optional agent-specific Grep sentence + `Read whole files only when small or non-code.` | Always |
+| Touches code only in passing (none shipped today) | Light: `- Symbolic-First: prefer symbol-aware queries (when connected) or targeted Grep over whole-file Read when exploring code.` | When code may be read |
+| Non-code or run-only (business-panel-experts, deep-researcher, verifier) | — | Skip |
 
 Rationale: symbol overview vs full-file Read = significant token savings + structural understanding (refs, types, inheritance). The on-demand rule modules never reach a subagent, so the line ships in the agent body.
 

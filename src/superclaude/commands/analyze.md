@@ -11,8 +11,8 @@ description: Code analysis across quality, security, performance, architecture d
 
   <flow>
   1. Discover: Categorize files by language
-  2. Scan: Domain-specific analysis per --focus
-  3. Evaluate: Prioritized findings + severity (🔴🟡🟢)
+  2. Scan: Domain-specific analysis per --focus; collect every finding, including low-severity and low-confidence ones, each with `severity: {critical|high|medium|low|nit}` and `confidence: {high|medium|low}` — whether the main session or a delegate scans
+  3. Evaluate: rank the collected findings by severity and confidence; a user-stated limit ("critical only") filters here, with the excluded count reported
   4. Recommend: Actionable guidance
   5. Report (`--format report` markdown only): feature path `docs/features/<slug>/03-analysis.md`, standalone `docs/analysis/<target>-<username>-YYYY-MM-DD.md` — slug resolution (zero-match default `[s]`), frontmatter, README update per core/rules/RULES_DOCS.md `<doc_output_convention>`. text/json unchanged (text = console, json = standalone path only).
   6. Bridge: If findings actionable (fixable issues, not informational), suggest: "Would you like to create an implementation plan? → /sc:plan"
@@ -33,10 +33,9 @@ description: Code analysis across quality, security, performance, architecture d
   | `report` (standalone path) | `docs/analysis/<target>-<username>-YYYY-MM-DD.md` | Full report, one-off analysis |
   </outputs>
 
-  <focus_agent_mapping>
-  When --focus specified and task benefits from specialist depth, delegate to corresponding agent:
-  security → @security-engineer | perf → @performance-engineer | quality → @quality-engineer | arch → @system-architect | a11y → @frontend-architect
-  </focus_agent_mapping>
+  <focus_delegation>
+  Each --focus is a lens with its own checks, not an agent. One focus on a target the main session can read runs in the main session. Several focuses on a large target are independent streams: one `general-purpose` delegate per focus under the delegate packet rule in core/rules/RULES_DELEGATION.md, each prompt naming its focus and carrying the Scan step's finding rule, because the Evaluate step does the ranking.
+  </focus_delegation>
 
   <rules_analysis note="--focus rules: rule effectiveness audit">
     Quality (always): Read core/rules/RULES_QUALITY.md (R01–R21 table) → summary: rule count, example coverage, severity distribution

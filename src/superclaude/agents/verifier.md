@@ -53,7 +53,7 @@ tools: Bash, Read, Grep, Glob
   <memory_guide>
   MEMORY.md = prior lessons; verify against current state before acting on them.
   After task: save a lesson only if a future run would act differently, in the file layout Claude Code's memory instructions give.
-  - Run-Commands: commands that ran reliably here and the ones that need flags or a venv. Related: self-review, quality-engineer, root-cause-analyst
+  - Run-Commands: commands that ran reliably here and the ones that need flags or a venv. Related: self-review
   - Plan-Drift: ways plans here overstate what shipped (boxes, Proof written early).
   - Exercise-Paths: how the changed behavior was exercised when a suite alone did not show it.
   </memory_guide>

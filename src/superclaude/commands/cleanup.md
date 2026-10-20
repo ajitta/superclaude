@@ -11,7 +11,7 @@ description: Systematic code cleanup — remove dead code and optimize project s
 
   <flow>
   1. Analyze: find cleanup candidates and check each one is safe to change.
-  2. Plan: pick the approach and decide whether to delegate to an agent.
+  2. Plan: pick the approach and decide whether an independent stream goes to a `general-purpose` delegate.
   3. Execute: clean per --type. For --type docs, run the checks in the validator checks section in order (cross-link-form flags `[[...]]` links, slug-overlap suggests promotions, then slug-duplicate-lint and readme-regen).
   4. Validate: confirm no functionality was lost (tests pass).
   5. Report: summarize the changes and recommend follow-up maintenance.

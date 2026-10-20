@@ -12,7 +12,7 @@ paths: ["src/superclaude/mcp/**", ".claude/rules/mcp-authoring.md"]
 
 | Component | Role |
 |-----------|------|
-| Agent     | WHO TO BE |
+| Agent     | WHO DOES ISOLATED WORK |
 | Command   | WHAT TO DO |
 | Mode      | HOW TO THINK |
 | MCP doc   | WHEN/HOW to use a server in SC workflows |

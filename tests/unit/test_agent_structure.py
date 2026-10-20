@@ -391,45 +391,6 @@ class TestAgentMemoryGuide:
                 )
 
 
-class TestSimplicityGuideSpecific:
-    """Targeted tests for the simplicity-guide agent."""
-
-    @pytest.fixture(autouse=True)
-    def load(self):
-        path = AGENTS_DIR / "simplicity-guide.md"
-        self.content = path.read_text()
-        self.fm = parse_frontmatter(self.content)
-
-    def test_has_osl_core_loop(self):
-        """Orient-Step-Learn is the defining methodology."""
-        assert "Orient-Step-Learn" in self.content
-
-    def test_osl_phases_present(self):
-        for phase in ("Orient:", "Step:", "Learn:"):
-            assert phase in self.content, f"missing OSL phase: {phase}"
-
-    def test_has_anti_patterns(self):
-        assert "<anti_patterns" in self.content
-
-    def test_has_osl_gate_in_checklist(self):
-        """Checkpoints merged into checklist — OSL meta-check preserved."""
-        assert "<checklist" in self.content
-        assert "simplicity" in self.content.lower()
-
-    def test_has_differentiation(self):
-        """Should distinguish itself from adjacent agents."""
-        assert "<differentiation" in self.content
-
-    def test_has_examples(self):
-        assert "<examples>" in self.content
-
-    def test_has_checklist(self):
-        assert "<checklist" in self.content
-
-    def test_dave_thomas_attribution(self):
-        assert "Dave Thomas" in self.content
-
-
 class TestAgentOptionalFields:
     """Validate optional CC-native fields when present (effort, maxTurns, tools, skills)."""
 

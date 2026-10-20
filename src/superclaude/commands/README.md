@@ -86,5 +86,5 @@ Validation: `uv run python -m pytest tests/unit/test_command_structure.py -v`
 
 ## Related
 
-- `agents/` — Domain expert agents commands route to
+- `agents/` — Isolated workers some commands dispatch (research, indexing, review, verification)
 - `modes/` — Cognitive overlays commands activate

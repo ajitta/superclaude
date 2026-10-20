@@ -41,10 +41,9 @@ description: Review a work product (code, plan, design, spec) for quality, corre
   - Agent: dispatch isolated reviewer subagent for big review (--structured) and for the --audit-delegated re-eval (the Delegated-decision audit step); Read the delegate packet rule in core/rules/RULES_DELEGATION.md before dispatch, since it sets what the reviewer's prompt leaves out
   </tools>
 
-  <focus_agent_mapping>
-  When the domain context suggests a specialist review, delegate to:
-  security → @security-engineer | performance → @performance-engineer | quality → @quality-engineer | architecture → @system-architect
-  </focus_agent_mapping>
+  <review_lens>
+  A domain angle (security, performance, quality, architecture) is a lens, not a separate agent: with --structured it goes into the isolated reviewer's prompt as the lens to apply, next to the artifact and its acceptance criteria. The reviewer is the `self-review` agent, whose `<finding_policy>` reports every finding with severity and confidence.
+  </review_lens>
 
   <examples>
   | Input | Output |
