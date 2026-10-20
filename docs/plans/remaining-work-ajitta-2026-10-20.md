@@ -3,20 +3,21 @@ status: draft
 revised: 2026-10-20
 ---
 
-# 남은 작업 (2026-10-20, v4.31.1 이후)
+# 남은 작업 (2026-10-20, v4.32.0 이후)
 
 2026-10-19–20에 작업 세 갈래를 마쳤다.
 - 설치·업그레이드 감사와 Windows 실기 검증: v4.30.5까지 릴리스.
 - `CLAUDE_CONFIG_DIR` 지원(ADR-0002, v4.31.0).
 - 압박 프로브 측정: hurry 프로브에서 sc-full 30/30 vs vanilla 20/30, p = 0.0004. 이때 eval arm 격리 결함 두 개를 찾아 고쳤다.
+- 에이전트 감사: 24개 중 19개 폐기, 5개 유지(v4.32.0, [agent-roster-audit](../features/agent-roster-audit/README.md)).
 
 지금 바로 할 승인된 작업은 없다. 남은 것은 다음 릴리스에 함께 나갈 변경, 다음 모델이 나올 때 할 일, 보류 항목, 정리 작업이다. 지난 목록은 [remaining-work-ajitta-2026-10-19](./remaining-work-ajitta-2026-10-19.md)이고, 이 문서가 그것을 대체한다.
 
 항목마다 소유자 결정이 필요한지와 추천안(★)을 적는다. 세션 상태는 `.claude/memories/session_2026-10-20_master.md`의 Next actions에 같은 목록이 짧게 있다.
 
-## 1. 다음 릴리스에 함께 나갈 것 — 결정 불필요
+## 1. 다음 릴리스에 함께 나갈 것 — 완료
 
-- [ ] CHANGELOG `[Unreleased]`의 contributor용 항목 세 개. 바꾼 것은 eval arm 격리, `sc-command-only`의 core import 제거, `probe-verify-claim` grader다. `src/superclaude` 아래는 바뀌지 않아 이것만으로는 릴리스하지 않는다. 다음 사용자 대상 변경과 함께 나간다. core나 `hooks.json`이 바뀌지 않으면 canary도 필요 없다.
+- [x] CHANGELOG `[Unreleased]`의 contributor용 항목 세 개(eval arm 격리, `sc-command-only` core import 제거, `probe-verify-claim` grader)는 v4.32.0에 함께 나갔다.
 
 ## 2. 압박 프로브 후속 — [pressure-readout](../features/pressure-readout/README.md)
 
