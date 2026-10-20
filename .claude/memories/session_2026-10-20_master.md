@@ -47,4 +47,4 @@ branch: master @48393c16 (== origin/master == stable == v4.32.1); worktree clean
 - canary-gates 7/7 twice (CANARY_OK=1: RULES_DOCS lines), released v4.32.1.
 
 ## Next actions (added)
-- [ ] Follow-ups of the weakness audit: `docs/plans/remaining-work-ajitta-2026-10-20.md` §4a (N4 effect probe, decision-mode probe, held RED clause, delete `origin/docs/superclaude-weakness-research` after the owner confirms)
+- [ ] Follow-ups of the weakness audit: `docs/plans/remaining-work-ajitta-2026-10-20.md` §4a (N4 effect probe, decision-mode probe, held RED clause; `origin/docs/superclaude-weakness-research` deleted after the owner confirmed)
