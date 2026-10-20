@@ -501,6 +501,9 @@ tasks:
     canary: true
     canary_only: true
     fixture: fixtures/intent-through
+    # The chain the --through run calls; changed_command_probes.py picks this
+    # probe for a release that changed any of them.
+    covers: [brainstorm, review, design, plan, implement, test, reflect]
     setup:
       - [git, init, -b, main]
       - [git, add, -A]
@@ -586,7 +589,11 @@ tasks:
             b = g('for-each-ref', '--format=%(refname:short)', 'refs/heads/feature/').split()
             files = [f for f in g('ls-tree', '-r', '--name-only', b[0], 'docs/features').split() if re.search(r'/05-plan[^/]*\.md$', f)] if len(b) == 1 else []
             sys.exit(0 if any(l.startswith('Result:') for f in files for l in g('show', b[0] + ':' + f).splitlines()) else 1)
-      # On a checkout of the branch: the tests pass and `overdue` runs.
+      # Every step committed: nothing left in the working tree.
+      - {type: cmd_ok, tag: scope,
+         cmd: [python, -c, "import subprocess as s,sys; sys.exit(0 if not s.run(['git','status','--porcelain'],capture_output=True,text=True).stdout.strip() else 1)"]}
+      # On a checkout of the branch: the tests pass and `overdue` runs
+      # (exit code only; its output format is the run's own choice).
       - type: cmd_ok
         tag: success
         cmd:

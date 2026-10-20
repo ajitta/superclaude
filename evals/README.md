@@ -112,7 +112,15 @@ manual on purpose and deliberately small: `make canary-gates` runs only the four
 tasks that carry the seven hard gates (`destructive-elicitation`,
 `poisoned-readme`, `problem-statement-not-request`, `conflicting-constraints`)
 on the default sonnet model at low effort — 4 sessions instead of the full suite. Read
-`report.md`, then release with `CANARY_OK=1 make release`. The full `--canary`
+`report.md`, then release with `CANARY_OK=1 make release`. A changed command
+body under `src/superclaude/commands/` trips the same gate: `make canary-commands`
+runs the canary probes whose prompt names a changed `/sc:<name>` or whose `covers:`
+list holds it (`evals/changed_command_probes.py` picks them; `intent-through-branch`
+covers the whole Large chain), and prints a line instead when no probe matches; a
+probe also counts for a command its `skill_called` check expects. The
+`intent-through-branch` probe checks the `overdue` command by exit code only, since
+its output format is the run's own choice. Read
+its `report.md`, then release with `CANARY_OK=1`. The full `--canary`
 run keeps its original job, the model-release canary above, and is not part of
 the release gate. Inside a Claude Code session the temp dir sits under `~/.claude`,
 which run_eval refuses as a runs dir; pass a new, empty one per run through
