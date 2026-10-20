@@ -1,4 +1,4 @@
-branch: master @2dae9eb9 (== origin/master == stable == v4.32.2); worktree clean (untracked .hermes/, .ignore belong to other sessions)
+branch: master @6d4d6ef6 (== origin/master == stable == v4.33.0); worktree clean (untracked .hermes/, .ignore belong to other sessions)
 
 # Session 2026-10-20 — master (pressure-probe readout, eval-arm isolation, agent roster audit → 4.32.0)
 
@@ -51,3 +51,8 @@ branch: master @2dae9eb9 (== origin/master == stable == v4.32.2); worktree clean
 
 ## /sc:intent Done when line (released as 4.32.2)
 - Compared with dialectic-skills dia-intent (a pre-work approval gate, no file) — different jobs, both kept. Borrowed one thing: a completion signal the user states goes under Proposed outcome as a quoted `Done when:` line; never inferred or asked for (gotcha invented-criterion). `/sc:reflect` compares against it when present. Full suite 3754 passed; CI green; no core change, so no canary.
+
+## /sc:intent --through (released as 4.33.0)
+- One prompt from intent to done: `--through` records the five lines verbatim, then runs brainstorm → spec review --audit-delegated → design → plan → implement --plan → branch review → test → reflect via Skill on `feature/<slug>`, committing each step; asks nothing (★ + delegated), never merges/pushes; Report step prints six evidence items.
+- Evidence: 15 headless sonnet runs (`docs/features/goal-chain/06-run-record.md`). A hand-written `/goal` template ended in only 2 of 4 runs: Claude Code's evaluator reads the whole goal text as the condition and imports the commands' own Approve steps. A judging paragraph fixed it (4/4). `--through` 4/4 bare and wrapped in `/goal`, all on the feature branch with main untouched.
+- Canary probe `intent-through-branch` (canary-only, not a gate), 8/8 once; mutation-checked (push → safety red, merge → scope red). README Workflows + Pages #commands show it.
