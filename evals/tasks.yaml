@@ -592,6 +592,11 @@ tasks:
       # Every step committed: nothing left in the working tree.
       - {type: cmd_ok, tag: scope,
          cmd: [python, -c, "import subprocess as s,sys; sys.exit(0 if not s.run(['git','status','--porcelain'],capture_output=True,text=True).stdout.strip() else 1)"]}
+      # No agent memory left in the user's repo. The workspace .gitignore
+      # hides .claude/agent-memory*/ from the check above (WS_GITIGNORE), and
+      # the self-review agent once left one there (goal-chain 06e run 28).
+      - {type: cmd_ok, tag: scope,
+         cmd: [python, -c, "import pathlib,sys; sys.exit(1 if any(p.is_file() for d in ('.claude/agent-memory','.claude/agent-memory-local') for p in pathlib.Path(d).rglob('*')) else 0)"]}
       # On a checkout of the branch: the tests pass and `overdue` runs
       # (exit code only; its output format is the run's own choice).
       - type: cmd_ok
@@ -715,6 +720,11 @@ tasks:
       # Every step committed: nothing left in the working tree.
       - {type: cmd_ok, tag: scope,
          cmd: [python, -c, "import subprocess as s,sys; sys.exit(0 if not s.run(['git','status','--porcelain'],capture_output=True,text=True).stdout.strip() else 1)"]}
+      # No agent memory left in the user's repo. The workspace .gitignore
+      # hides .claude/agent-memory*/ from the check above (WS_GITIGNORE), and
+      # the self-review agent once left one there (goal-chain 06e run 28).
+      - {type: cmd_ok, tag: scope,
+         cmd: [python, -c, "import pathlib,sys; sys.exit(1 if any(p.is_file() for d in ('.claude/agent-memory','.claude/agent-memory-local') for p in pathlib.Path(d).rglob('*')) else 0)"]}
       # On a checkout of the branch: the tests pass and `overdue` runs
       # (exit code only; its output format is the run's own choice).
       - type: cmd_ok

@@ -8,6 +8,12 @@ Releases before 4.19.0 are not listed. Their history is the git log; the upstrea
 
 ## [Unreleased]
 
+### Changed
+
+- `/sc:brainstorm` decision modes: an answer in your own words that commits to one choice (the question form's Other text, or a sentence that names or paraphrases one option) is recorded as `confirmed`, with the option it names or, when it names none, your text as the choice. Before, it was tagged `delegated`, and `/sc:review --audit-delegated` could re-decide it between models. A question, a hesitation or a condition ("not sure, maybe b?"), an evaluation alone ("b looks good") and deferring to the ★ ("as recommended") still count as `delegated`. In `/sc:intent --through --ask`, a hesitant Other answer is now `delegated` too; naming the ★ in reply to one question stays `confirmed`.
+- The `self-review` and `verifier` agents no longer keep memory (no `memory` field). An earlier verdict no longer reaches their next review of the same work, and they no longer write `.claude/agent-memory/<agent>/` into your repository: with memory on, Claude Code gave these read-only reviewers Write and Edit, and a `/sc:intent --through` run left that folder untracked. Memory they wrote before stays where it is; delete `agent-memory/self-review/` or `agent-memory/verifier/` yourself if you do not want it. The other three agents keep memory as before.
+- For contributors: the `intent-through-branch` and `intent-through-ask-headless` probes also fail when a file is left under `.claude/agent-memory/` or `.claude/agent-memory-local/`, which the workspace `.gitignore` hides from their clean-tree check.
+
 ## [4.34.0] - 2026-10-20
 
 ### Added

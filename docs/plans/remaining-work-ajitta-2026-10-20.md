@@ -23,7 +23,7 @@ revised: 2026-10-20
 
 ### 0-1. brainstorm 결정 모드: 선택지 밖의 직접 답(Other)
 
-- [ ] 현상: `--ask` 체크포인트는 "답이면 Other 텍스트도 `confirmed`"로 정했다(`commands/intent.md` Checkpoint 단계). 그런데 `/sc:brainstorm`의 `<decision_modes>`(`commands/brainstorm.md`)에는 Other나 자기 말로 쓴 답에 대한 규칙이 없다. 라벨도 라벨 단어도 아니면 "When neither rule clearly applies, tag delegated"로 떨어진다. 사용자가 직접 새 선택지를 말해도 `delegated`로 기록되고, `--audit-delegated` 감사가 그 행을 모델끼리 다시 정한다. 사용자의 말이 모델 판단으로 덮일 수 있다는 뜻이다. 근거: [06f](../features/goal-chain/06f-verify-ask.md) 발견 3과 "이 브랜치 밖의 메모", run 24의 `D3 기타: …` 답(06e).
+- [x] 현상: `--ask` 체크포인트는 "답이면 Other 텍스트도 `confirmed`"로 정했다(`commands/intent.md` Checkpoint 단계). 그런데 `/sc:brainstorm`의 `<decision_modes>`(`commands/brainstorm.md`)에는 Other나 자기 말로 쓴 답에 대한 규칙이 없다. 라벨도 라벨 단어도 아니면 "When neither rule clearly applies, tag delegated"로 떨어진다. 사용자가 직접 새 선택지를 말해도 `delegated`로 기록되고, `--audit-delegated` 감사가 그 행을 모델끼리 다시 정한다. 사용자의 말이 모델 판단으로 덮일 수 있다는 뜻이다. 근거: [06f](../features/goal-chain/06f-verify-ask.md) 발견 3과 "이 브랜치 밖의 메모", run 24의 `D3 기타: …` 답(06e).
 - 결정: 규칙.
   - ★(a) 하나의 구체적인 선택을 말하는 Other/자기 말 답은 `confirmed`로 두고, 그 텍스트를 선택지로 기록한다. 질문·망설임·조건부("잘 모르겠는데 아마 b?")는 `delegated`.
   - (b) 항상 `delegated`로 두고 감사에 맡긴다. 단순하지만 위의 덮어쓰기 문제가 남는다.
@@ -32,13 +32,15 @@ revised: 2026-10-20
 
 ### 0-2. self-review 에이전트의 메모리 폴더가 사용자 저장소에 남는다
 
-- [ ] 현상: run 28(opus, 06e)에서 branch review를 맡은 `self-review` 에이전트가 `.claude/agent-memory/self-review/review_patterns.md`를 썼다. 이 폴더는 커밋되지 않은 채 남았고, `--through`는 지우지 않고 사용자에게 물었다(삭제는 확인 규칙에 맞는 행동이다). 원인: 에이전트 소스는 모두 `memory: project`이고, project 설치에서는 `.claude/agent-memory/<agent>/`에 쓴다(`.claude/rules/agent-authoring.md` § memory). canary 작업공간은 `WS_GITIGNORE`(`evals/run_eval.py`)가 이 경로를 무시하므로, 새 clean-tree 검사도 이 경우를 보지 못한다.
+- [x] 현상: run 28(opus, 06e)에서 branch review를 맡은 `self-review` 에이전트가 `.claude/agent-memory/self-review/review_patterns.md`를 썼다. 이 폴더는 커밋되지 않은 채 남았고, `--through`는 지우지 않고 사용자에게 물었다(삭제는 확인 규칙에 맞는 행동이다). 원인: 에이전트 소스는 모두 `memory: project`이고, project 설치에서는 `.claude/agent-memory/<agent>/`에 쓴다(`.claude/rules/agent-authoring.md` § memory). canary 작업공간은 `WS_GITIGNORE`(`evals/run_eval.py`)가 이 경로를 무시하므로, 새 clean-tree 검사도 이 경우를 보지 못한다.
 - 관련: 4a절 N4 항목이 이미 "`self-review`가 `memory: project`라서 같은 스펙에 대한 이전 판정을 읽을 수 있다"를 독립성 위험으로 적어 두었다.
 - 결정: 처리 방식. 시작 전에 현재 Claude Code 문서에서 `memory` 범위(user/project/local)와 local 범위가 git에서 어떻게 다뤄지는지 확인한다.
   - ★(a, 잠정) `self-review`(와 `verifier`)는 독립 검토자이므로 이전 판정을 기억하지 않게 한다. superclaude는 `memory` 필드를 필수로 요구하므로(`agent-authoring.md`) 규칙과 installer의 `_rewrite_agent_memory_scope`도 함께 바꿔야 한다.
   - (b) project 설치에서도 검토 에이전트만 `memory: local`로 둔다. 폴더가 `.claude/agent-memory-local/`로 바뀌므로 git에서의 처리를 문서로 먼저 확인한다.
   - (c) 동작은 그대로 두고, `--through`의 Run 단계가 메모리 쓰기를 해당 단계 커밋에 포함하게 한다. CC 설계상 project 메모리는 공유용이지만 feature diff에 무관한 파일이 섞인다.
 - 함께 할 일: 어떤 안이든 probe가 이 경우를 보게 한다. 예: `intent-through-*` probe의 clean-tree 검사가 `.claude/agent-memory/`를 무시하지 않도록 하거나, 별도 검사를 둔다.
+
+0-1·0-2 모두 ★(a)로 결정해 구현했다(2026-10-20). 기록: [goal-chain 06h](../features/goal-chain/06h-other-answers-reviewer-memory.md).
 
 ## 1. 다음 릴리스에 함께 나갈 것 — 완료
 
@@ -70,8 +72,8 @@ revised: 2026-10-20
 
 v4.32.1로 N1–N6을 릴리스했다. 남은 것은 측정과 보류 항목이다. 근거는 [약점 감사](../research/superclaude-weakness-audit-ajitta-2026-10-20.md) §4와 completion-proof의 `06-verify.md`에 있다.
 
-- [ ] N4 효과 프로브: 격리된 draft 스펙 리뷰어가 `00-intent.md`와 스펙 사이의 반전을 잡는지 잰다. `self-review`가 `memory: project`라서 같은 스펙에 대한 이전 판정을 읽을 수 있는 경로도 함께 본다. 결정: 시점. ★다음 모델 canary 때. 서브에이전트를 관찰해야 해서 설계 비용이 크다.
-- [ ] 결정 모드 판정 프로브: "2번", "1번으로", "a로 가자", "추천대로", "not the local cache"를 넣은 여러 턴짜리 프로브. ★보류. 실제로 잘못 분류된 사례가 나오면 그때 만든다.
+- [ ] N4 효과 프로브: 격리된 draft 스펙 리뷰어가 `00-intent.md`와 스펙 사이의 반전을 잡는지 잰다. (`self-review`가 이전 판정을 기억하는 경로는 0-2에서 memory를 없애 닫았다.) 결정: 시점. ★다음 모델 canary 때. 서브에이전트를 관찰해야 해서 설계 비용이 크다.
+- [ ] 결정 모드 판정 프로브: "2번", "1번으로", "a로 가자", "추천대로", "not the local cache", 선택지 밖의 새 선택을 말하는 Other 답("D3 기타: …"), 망설이는 Other 답("잘 모르겠는데 아마 b?")을 넣은 여러 턴짜리 프로브. ★보류. 실제로 잘못 분류된 사례가 나오면 그때 만든다.
 - [ ] "유효한 RED"와 "통과시키려고 기대 결과를 바꾸면 따로 검토" 조항: 관찰된 실패가 없어 보류(`content-quality.md`). ★보류.
 - [x] 원격 브랜치 `origin/docs/superclaude-weakness-research`: 내용이 master에 병합돼 있어 소유자 확인 후 삭제했다(2026-10-20).
 

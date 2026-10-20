@@ -17,7 +17,7 @@ paths: ["src/superclaude/agents/**", ".claude/rules/agent-authoring.md"]
 
 ## YAML Frontmatter
 
-CC requires only `name` and `description`. The rest are optional and inherit from the parent. superclaude also requires `memory` and `color` for the installer.
+CC requires only `name` and `description`. The rest are optional and inherit from the parent. superclaude also requires `color`, and `memory` on every agent but the independent reviewers, which omit it (§ `memory` below).
 
 ```yaml
 ---
@@ -26,7 +26,7 @@ name: agent-name                            # lowercase letters and hyphens; mat
 description: <Job> for <distinguishing task>. Use when <signal no neighbor covers>. Not for <look-alike> — <neighbor>.
 
 # Required by superclaude
-memory: project                             # source value always "project"; installer rewrites to user/local per scope
+memory: project                             # source value always "project"; installer rewrites to user/local per scope; omitted on independent reviewers
 color: blue                                 # role-group mapping below
 
 # Optional — omit to inherit from parent session
@@ -112,12 +112,14 @@ Don't add `effort: xhigh` because the domain "feels" coding-heavy — the sessio
 
 **`mcpServers`** — inherited from the parent by default. Specify it only to add a server absent from the parent or to scope an inline definition. To keep an MCP server out of the main conversation entirely (avoid its tool descriptions consuming parent context), define it inline here so it connects only when the subagent runs.
 
-**`memory`** — required by superclaude. Source files always use `memory: project`; the installer rewrites it at install time:
+**`memory`** — required by superclaude, except on independent reviewers. Source files always use `memory: project`; the installer rewrites it at install time:
 - `user` install → `memory: user`, files at `~/.claude/agent-memory/<agent>/`
 - `project` install → unchanged, files at `.claude/agent-memory/<agent>/`
 - `local` install → `memory: local`, files at `.claude/agent-memory-local/<agent>/`
 
 When memory is enabled, CC auto-injects up to the first 200 lines / 25KB of `MEMORY.md` into the subagent's prompt and auto-enables Read/Write/Edit for memory file management. See `cli/install_components.py::_rewrite_agent_memory_scope`.
+
+Independent reviewers (`self-review`, `verifier`) omit `memory` and `<memory_guide>`, and the installer leaves an agent without the field as it is. A stored verdict would reach the reviewer's next review of the same work, and the auto-enabled Write gave a read-only reviewer a way to write: `self-review` left `.claude/agent-memory/self-review/` untracked in the user's repo during a `/sc:intent --through` run (docs/features/goal-chain/06e, run 28). `NO_MEMORY_AGENTS` in `tests/unit/test_agent_structure.py` lists them.
 
 **Working directory.** Subagents start in the parent's CWD. `cd` does **not** persist between Bash/PowerShell tool calls within a subagent and never affects the parent. For repo-isolating tasks, set `isolation: worktree` and CC creates a temporary git worktree (cleaned up automatically if the subagent makes no changes).
 
@@ -196,7 +198,7 @@ When memory is enabled, CC auto-injects up to the first 200 lines / 25KB of `MEM
 - **Interactive agents.** An agent whose procedure waits for the user (a menu, questions, a draft to approve) states the subagent case at that step: ``As a delegated subagent (one reply, no follow-up turns), Claude returns <the menu / the questions / the draft> and stops; the back-and-forth runs when the agent is the main session (`claude --agent <name>`).`` A delegated run gets one reply, read by the parent rather than the user, so an unstated case leaves the agent waiting for an answer that never comes or inventing one.
 - **No R-ID tags.** State a rule's meaning in words, never as a `[Rnn Name]` tag: R-IDs are defined in `core/rules/RULES_QUALITY.md`, an on-demand module that never reaches a subagent, so the tag resolves to nothing (`test_agent_structure.py::test_body_has_no_rule_id_tags`).
 
-## Memory Guide (required)
+## Memory Guide (required with `memory`)
 
 **Placement.** After `<checklist>`, before `<examples>`.
 
@@ -210,7 +212,7 @@ After task: save a lesson only if a future run would act differently, in the fil
 ```
 
 **Rules.**
-- Protocol header (2 lines above, verbatim identical in every agent; `test_memory_guide_has_protocol` enforces it) precedes the category list. The protocol ships in every body so it holds when CLAUDE.md is omitted (`omitClaudeMd`) or superclaude is not installed. Capture triggers worth remembering: user corrections, decisions with rationale, recurring patterns (3+), unexpected discoveries.
+- Protocol header (2 lines above, verbatim identical in every agent with `memory`; `test_memory_guide_has_protocol` enforces it) precedes the category list. The protocol ships in every body so it holds when CLAUDE.md is omitted (`omitClaudeMd`) or superclaude is not installed. Capture triggers worth remembering: user corrections, decisions with rationale, recurring patterns (3+), unexpected discoveries.
 - The header says when to save, never how files are laid out. CC's injected memory instructions own the layout (`MEMORY.md` as an index of one-line pointers, one file per memory); an earlier entry format here (append dated lines to `MEMORY.md`, consolidate at 150 lines) contradicted them, and agents followed CC's.
 - Usually 3-5 categories, specific to the agent's domain; fewer when the domain is narrow (`test_memory_guide_has_categories` requires at least 2).
 - PascalCase-Hyphenated names (e.g., `Debug-Patterns`, `API-Decisions`).
@@ -240,7 +242,7 @@ Body-format rules (single root, list forms, quoting, cross-references, headers i
 4. Omit `maxTurns` (removed from every agent in `2718f713`) and `effort` (unless measured evidence justifies it).
 5. Pick `color` by role group; omit `model` (see the `model` field rule above).
 6. `skills:` preloads an installed skill's body. superclaude ships none — only name one that is actually installed in the target scope.
-7. Add `<memory_guide>` (required) and `<gotchas>` (recommended).
+7. Add `<memory_guide>` (required unless the agent omits `memory`, see § `memory`) and `<gotchas>` (recommended).
 8. Run `uv run pytest tests/unit/test_agent_structure.py -v`.
 9. Update `src/superclaude/agents/README.md` table.
 10. Re-sync an existing install: run `superclaude doctor --scope <s>` first, because `install --force` creates an install where none exists (gotcha `sync-scope-creates`); when it reports an install, run `superclaude install --force --scope <s>`. `make deploy` reinstalls only the CLI.

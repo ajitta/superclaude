@@ -21,3 +21,5 @@ Can a user type only the intent and have the whole Large chain (`/sc:intent` →
 - [06e-ask-checkpoint.md](./06e-ask-checkpoint.md): `--through --ask`: why one checkpoint, what it does, six runs (four interactive on sonnet and opus with answers against ★, two headless)
 - [06f-verify-ask.md](./06f-verify-ask.md): independent verification of `--through --ask` (Korean): gates, one headless fallback run, the 06e numbers against the record, findings
 - [06g-ask-review-applied.md](./06g-ask-review-applied.md): each finding of the third review (06f) with what changed, and the new `intent-through-ask-headless` probe
+- [06h-other-answers-reviewer-memory.md](./06h-other-answers-reviewer-memory.md): the two follow-ups after 4.34.0: an answer in the user's own words counts as `confirmed`; `self-review` and `verifier` keep no memory, and the `--through` probes check for a memory folder
+- [06i-verify-followups.md](./06i-verify-followups.md): independent verification of 06h (Korean): gates, mutation checks, upgrade and scope-conflict runs in a sandbox, findings on the own-words and ★ wording
