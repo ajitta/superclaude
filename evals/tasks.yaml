@@ -501,6 +501,9 @@ tasks:
     canary: true
     canary_only: true
     fixture: fixtures/intent-through
+    # The chain the --through run calls; changed_command_probes.py picks this
+    # probe for a release that changed any of them.
+    covers: [brainstorm, review, design, plan, implement, test, reflect]
     setup:
       - [git, init, -b, main]
       - [git, add, -A]

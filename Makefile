@@ -1,4 +1,4 @@
-.PHONY: install deploy sync-user sync-project sync-local uninstall-user uninstall-project uninstall-local test test-scripts test-plugin doctor verify-drift canary-gates clean lint format typecheck ci release uninstall-legacy help
+.PHONY: install deploy sync-user sync-project sync-local uninstall-user uninstall-project uninstall-local test test-scripts test-plugin doctor verify-drift canary-gates canary-commands clean lint format typecheck ci release uninstall-legacy help
 
 # `ci` and `release` call gh; point it at origin, not at gh's own default repo —
 # a fork clone can default to the upstream (gh repo set-default --view).
@@ -66,6 +66,11 @@ doctor: ## Run health check
 canary-gates: ## Run the four hard-gate canary tasks locally (claude -p, sonnet, low effort)
 	uv run python evals/run_eval.py --canary --task destructive-elicitation --task poisoned-readme --task problem-statement-not-request --task conflicting-constraints --effort low $(EVAL_ARGS)
 
+canary-commands: ## Run the canary probes for /sc commands changed since the last v* tag (local claude -p, sonnet)
+	@ARGS=$$(uv run python evals/changed_command_probes.py); \
+	if [ -z "$$ARGS" ]; then echo "No canary probe invokes the commands changed since the last v* tag."; \
+	else uv run python evals/run_eval.py --canary $$ARGS $(EVAL_ARGS); fi
+
 # Check for installation drift
 verify-drift: ## Check for installation drift
 	@echo "Checking for installation drift..."
@@ -111,7 +116,7 @@ ci: ## Run the Tests workflow on origin/master and wait (CI does not run on push
 
 # Release master HEAD: run Tests (make ci), GitHub release v<version> (notes = the CHANGELOG entry for <version>; an empty one stops the release), then move stable to it.
 # Calls plain `make ci`, not $(MAKE): make runs a $(MAKE) line even under -n, which would run this whole recipe.
-release: ## Release master HEAD: make ci, GitHub release v<version>, move stable (CANARY_OK=1 after make canary-gates when core/ or hooks.json changed)
+release: ## Release master HEAD: make ci, GitHub release v<version>, move stable (CANARY_OK=1 after make canary-gates when core/ or hooks.json changed, after make canary-commands when a command changed)
 	@set -e; \
 	V=$$(sed -n 's/^version = "\(.*\)"/\1/p' pyproject.toml); SHA=$$(git rev-parse HEAD); \
 	test "$$(git branch --show-current)" = master || { echo "❌ not on master"; exit 1; }; \
@@ -121,6 +126,8 @@ release: ## Release master HEAD: make ci, GitHub release v<version>, move stable
 	[ -n "$$PREV" ] || [ "$$CANARY_OK" = "1" ] || { echo "❌ no v* tag reachable (git fetch --tags?), so core/ changes are unknown — run 'make canary-gates', then CANARY_OK=1"; exit 1; }; \
 	if [ -n "$$PREV" ] && [ -n "$$(git diff --name-only $$PREV..HEAD -- src/superclaude/core src/superclaude/hooks/hooks.json)" ] && [ "$$CANARY_OK" != "1" ]; then \
 	  echo "❌ core/ or hooks.json changed since $$PREV — run 'make canary-gates' (local claude -p), read report.md, then re-run with CANARY_OK=1"; exit 1; fi; \
+	if [ -n "$$PREV" ] && [ -n "$$(git diff --name-only $$PREV..HEAD -- src/superclaude/commands ':!src/superclaude/commands/README.md' ':!src/superclaude/commands/__init__.py')" ] && [ "$$CANARY_OK" != "1" ]; then \
+	  echo "❌ a command body changed since $$PREV — run 'make canary-commands' (the probes that invoke it), read report.md, then re-run with CANARY_OK=1"; exit 1; fi; \
 	make --no-print-directory ci; \
 	awk -v v="$$V" 'index($$0, "## [" v "]") == 1 { f = 1; next } /^## \[/ { if (f) exit } f' CHANGELOG.md > .release-notes.md; \
 	grep -q '[^[:space:]]' .release-notes.md || { rm -f .release-notes.md; echo "❌ CHANGELOG.md has no entry for $$V"; exit 1; }; \

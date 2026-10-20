@@ -1166,3 +1166,117 @@ def test_plan_draft_spec_gate_fails_on_any_plan_or_status_change(tmp_path):
 
     _set_field(plan.parent / "01-discovery.md", "status", "approved-for-plan")
     assert not all(_grade(run_eval, task, ws, stop))
+
+
+def _cmd_ok_results(run_eval, task, ws):
+    return [
+        run_eval._check_one(c, c["type"], ws, "", "")[0]
+        for c in task["checks"]
+        if c["type"] == "cmd_ok"
+    ]
+
+
+def test_intent_through_probe_reads_the_feature_branch(tmp_path):
+    """The probe passes a correct end state on any checkout and fails each break."""
+    run_eval, task, ws = _fixture_ws(tmp_path, "intent-through-branch")
+
+    def git(*args):
+        subprocess.run(
+            ["git", "-c", "user.email=t@e", "-c", "user.name=t", *args],
+            cwd=ws,
+            check=True,
+            capture_output=True,
+        )
+
+    feature = ws / "docs" / "features" / "todo-due-dates"
+    git("checkout", "-q", "-b", "feature/todo-due-dates")
+    feature.mkdir(parents=True)
+    (feature / "00-intent.md").write_text(
+        'Done when: "An overdue command lists only the todos past their due date."\n',
+        encoding="utf-8",
+    )
+    (feature / "05-plan.md").write_text(
+        "## Proof\nResult: abc1234 green\n", encoding="utf-8"
+    )
+    todo = ws / "todo.py"
+    todo.write_text(
+        todo.read_text(encoding="utf-8").replace(
+            "    items = load()\n",
+            "    items = load()\n    if argv and argv[0] == 'overdue':\n        return 0\n",
+            1,
+        ),
+        encoding="utf-8",
+    )
+    git("add", "-A")
+    git("commit", "-qm", "work")
+    assert all(_cmd_ok_results(run_eval, task, ws))
+    git("checkout", "-q", "main")
+    assert all(_cmd_ok_results(run_eval, task, ws)), (
+        "a correct run ending on main failed"
+    )
+
+    git("branch", "feature/other", "feature/todo-due-dates")
+    assert not all(_cmd_ok_results(run_eval, task, ws)), "two feature branches passed"
+    git("branch", "-D", "feature/other")
+
+    git("checkout", "-q", "feature/todo-due-dates")
+    (ws / "todos.json").write_text("[]\n", encoding="utf-8")
+    git("commit", "-qam", "migrate")
+    assert not all(_cmd_ok_results(run_eval, task, ws)), "a rewritten todos.json passed"
+    git("reset", "-q", "--hard", "HEAD~1")
+
+    git("push", "-q", "origin", "feature/todo-due-dates")
+    assert not all(_cmd_ok_results(run_eval, task, ws)), "a pushed branch passed"
+
+
+def test_intent_through_probe_fails_a_docs_only_run(tmp_path):
+    run_eval, task, ws = _fixture_ws(tmp_path, "intent-through-branch")
+    feature = ws / "docs" / "features" / "todo-due-dates"
+    subprocess.run(
+        ["git", "checkout", "-q", "-b", "feature/todo-due-dates"], cwd=ws, check=True
+    )
+    feature.mkdir(parents=True)
+    (feature / "00-intent.md").write_text(
+        "Done when: past their due date\n", encoding="utf-8"
+    )
+    (feature / "05-plan.md").write_text("Result: abc green\n", encoding="utf-8")
+    subprocess.run(["git", "add", "-A"], cwd=ws, check=True)
+    subprocess.run(
+        ["git", "-c", "user.email=t@e", "-c", "user.name=t", "commit", "-qm", "docs"],
+        cwd=ws,
+        check=True,
+    )
+    assert not all(_cmd_ok_results(run_eval, task, ws))
+
+
+def _import_changed_command_probes():
+    sys.path.insert(0, str(EVALS_DIR))
+    try:
+        import changed_command_probes
+    finally:
+        sys.path.remove(str(EVALS_DIR))
+    return changed_command_probes
+
+
+def test_changed_command_probes_match_prompt_and_covers():
+    probes = _import_changed_command_probes()
+    tasks = TASKS["tasks"]
+    assert "intent-through-branch" in probes.probes_for({"intent"}, tasks)
+    assert "intent-through-branch" in probes.probes_for({"design"}, tasks)
+    assert "implement-proof-fail" in probes.probes_for({"implement"}, tasks)
+    fake = [
+        {"id": "a", "canary": True, "prompt": "/sc:plan --from x"},
+        {"id": "b", "prompt": "/sc:plan"},
+        {"id": "c", "canary": True, "prompt": "plain", "covers": ["plan"]},
+    ]
+    assert probes.probes_for({"plan"}, fake) == ["a", "c"]
+    assert probes.probes_for({"git"}, fake) == []
+
+
+def test_covers_names_shipped_commands():
+    commands = REPO_ROOT / "src" / "superclaude" / "commands"
+    for task in TASKS["tasks"]:
+        for name in task.get("covers", []):
+            assert (commands / f"{name}.md").is_file(), (
+                f"{task['id']} covers unknown /sc:{name}"
+            )

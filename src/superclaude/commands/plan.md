@@ -15,7 +15,7 @@ description: Write detailed implementation plans with TDD tasks, exact file path
   3. Decompose: Break to phases (default) — each phase = single-commit unit on feature branch, ordered by dep (Phase-vs-PR naming: see gotchas).
   4. Template: Add plan header (goal, arch, tech stack) and footer (risks, alternatives not taken, proof) — one line or "none" for risks and alternatives is acceptable for Small scope; proof always names the command and its expected output
   5. Interrogate: Answer in the footer what the change could break, which step is riskiest, and which options were not taken and why; a plan an engineer who never saw the conversation could execute is the bar
-  6. Save: feature path `docs/features/<slug>/05-plan.md`, standalone `docs/plans/<feature-name>-<username>-YYYY-MM-DD.md` — slug resolution (zero-match default `[f]`), frontmatter, README update per core/rules/RULES_DOCS.md `<doc_output_convention>`.
+  6. Save: a design doc the plan was built on that is still `status: draft` moves to `approved-for-plan` (bump its `revised`) in the same commit as the plan, since planning on it is its approval; its Areas of concern section keeps any concern the user chose to plan past. Feature path `docs/features/<slug>/05-plan.md`, standalone `docs/plans/<feature-name>-<username>-YYYY-MM-DD.md` — slug resolution (zero-match default `[f]`), frontmatter, README update per core/rules/RULES_DOCS.md `<doc_output_convention>`.
   7. Handoff: Ready for /sc:implement --plan
   </flow>
 

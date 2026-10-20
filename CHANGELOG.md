@@ -8,6 +8,11 @@ Releases before 4.19.0 are not listed. Their history is the git log; the upstrea
 
 ## [Unreleased]
 
+### Changed
+
+- `/sc:plan` moves the design doc it built on from `status: draft` to `approved-for-plan` in the plan's commit. Before, nothing in the chain moved a design doc past `draft`, so a finished feature folder still showed its design as a draft. Open Areas of concern stay listed in the design.
+- For contributors: `make release` also refuses when a command body under `src/superclaude/commands/` changed since the last tag, unless `CANARY_OK=1`. New `make canary-commands` runs the canary probes whose prompt names a changed `/sc:<name>` or whose new `covers:` list holds it (`evals/changed_command_probes.py`), and says so when none does. The `intent-through-branch` probe covers the whole Large chain.
+
 ## [4.33.1] - 2026-10-20
 
 ### Changed
