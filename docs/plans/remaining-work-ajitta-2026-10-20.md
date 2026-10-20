@@ -79,7 +79,7 @@ v4.32.1로 N1–N6을 릴리스했다. 남은 것은 측정과 보류 항목이�
 
 ## 5. 결정이 필요 없는 정리 작업
 
-- [ ] Windows 설치를 최신 릴리스로 맞춘다(`superclaude doctor --scope <s>` → `make sync-*`). 소유자가 Windows 세션에서 한다.
+- [x] Windows 설치를 최신 릴리스로 맞춘다(`superclaude doctor --scope <s>` → `make sync-*`). 소유자가 Windows 세션에서 v4.34.1로 맞췄다(2026-10-21).
 - [ ] `docs/features/docs-ssot-audit/06-verify.md`가 약 29 KB로 Read 가드(30,000바이트)에 가깝다. 다음에 크게 덧붙일 때 `06b-…`로 나눈다.
 - [ ] Windows에서 `0xC0000409` 중단이 다시 나오면 `git revert 3e64dc82`를 하고, `tests/unit/scripts/parallel_ab/`를 동시 부하에서 bisect한다(AGENTS.md Tests).
 
