@@ -8,6 +8,17 @@ Releases before 4.19.0 are not listed. Their history is the git log; the upstrea
 
 ## [Unreleased]
 
+### Changed
+
+- `/sc:implement --plan` closes a plan only after running the command in the plan's `## Proof` footer. It writes `Result: <short sha> — <output>` under the footer in the same commit, and a red or unrunnable Proof keeps the plan at `status: implementing` until you accept it, which is recorded too. When code changes after that sha, for example a fix from the code review, the Proof runs again before the work is called done. Before this, every task box checked was enough for `status: complete` and the feature README's `phase: complete`, even when the check the plan itself named as proof had never run. `RULES_DOCS.md` states the same condition for plan docs.
+- `/sc:review` reviews a `status: draft` spec with the isolated reviewer even without `--structured`, and puts the feature folder's `00-intent.md` verbatim into its acceptance criteria. The spec gate exists so an independent review catches reversed decisions; the default call used to be a self-review in the same context, and an isolated reviewer saw only the spec's own reading of the intent.
+- `/sc:brainstorm` decision modes: a choice counts as `confirmed` only when the reply is the option label alone or bracketed (`b`, `[2]`) or quotes two or more words of the label. A label letter inside a sentence ("I need a minute") no longer counts, number labels are recognized, and a reply that fits neither rule is tagged `delegated`, so `/sc:review --audit-delegated` covers it.
+- README, Workflows: the Large chain gains `/sc:review --scope branch` after `/sc:implement --plan` (optional in the Medium chain), and `/sc:implement` hands off to `/sc:review` first. The gate table no longer calls prose gates hard: they are model-followed, and only the three guard hooks block mechanically (ADR-0001).
+
+### Added
+
+- For contributors: two canary probes measure contracts between commands. `implement-proof-fail` runs `/sc:implement --plan` on a plan whose Proof stays red on code the plan freezes, and passes when neither the plan nor the feature README reaches `complete`. `plan-draft-spec-gate` runs `/sc:plan --from` on a draft discovery spec and passes when no plan is written and the reply points to `/sc:review --scope spec`. `--canary` runs them; `make canary-gates` does not. On sonnet at low effort both sit at ceiling, 10/10 before and after the `/sc:implement` change, so they serve as regression guards; the change shows in the record, where 8 of 10 plans gained a `Result:` line against 0 of 10 before (`docs/features/completion-proof/`).
+
 ## [4.32.0] - 2026-10-20
 
 ### Changed

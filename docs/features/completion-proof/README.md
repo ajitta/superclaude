@@ -14,3 +14,4 @@ The round applies N1–N6 from the [weakness audit](../../research/superclaude-w
 ## Documents
 
 - [00-prereg.md](./00-prereg.md): pre-registered rules for the two probes, written before any run
+- [01-readout.md](./01-readout.md): results — both probes at ceiling on sonnet low (10/10 before and after N2; gate 10/10); N2 changes the record (`Result:` line 0/10 → 8/10)
