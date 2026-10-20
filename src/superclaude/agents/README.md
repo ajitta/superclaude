@@ -1,76 +1,20 @@
 # superclaude Agents
 
-Domain expert agents — AI agent defs for task-based auto-delegation.
+Five subagents, each kept because the work needs something only a subagent gives: a context of its own for high-volume reading, tools restricted to the job, or a reviewer that has not seen the author's reasoning. Domain knowledge the model already has (language, framework, architecture, security practice) is not an agent here; commands and rules carry the checklists, and the main session or a `general-purpose` delegate applies them. The 2026-10 roster audit retired 19 persona agents on that test: docs/features/agent-roster-audit/.
 
 ## Content Delivery
 
-Agents managed by Claude Code native delegation. Claude Code delegates when a request matches the "Use when …" trigger in an agent's `description` frontmatter and is not a look-alike that the description's "Not for … — <neighbor>" gate sends to another agent. `self-review` and `verifier` run only when the user explicitly asks for them. Install to `~/.claude/agents/` on `superclaude install`.
+Agents managed by Claude Code native delegation. Claude Code delegates when a request matches the "Use when …" trigger in an agent's `description` frontmatter and is not a look-alike that the description's "Not for … — <neighbor>" gate sends elsewhere. `self-review` and `verifier` run only when the user explicitly asks for them. Install to `~/.claude/agents/` on `superclaude install`; an upgrade removes a retired agent file only when its text matches a revision superclaude shipped.
 
 ## Available Agents
 
-### Research & Analysis
-
-| Agent | Description |
-|-------|-------------|
-| `deep-researcher` | Web research, cross-check, citation-ready synthesis |
-| `root-cause-analyst` | Systematic diagnosis via hypothesis test |
-| `requirements-analyst` | Requirements via systematic discovery |
-| `insight-analyst` | Surface project insights with contextual analysis |
-
-### Architecture & Design
-
-| Agent | Description |
-|-------|-------------|
-| `system-architect` | System design + long-term arch decisions |
-| `backend-architect` | Backend, API design, data integrity |
-| `frontend-architect` | Frontend arch, a11y, UI patterns |
-| `devops-architect` | Infra, CI/CD, deploy automation |
-
-### Engineering Specialists
-
-| Agent | Description |
-|-------|-------------|
-| `python-expert` | Python best practices, SOLID |
-| `security-engineer` | Security analysis, OWASP, threat modeling |
-| `performance-engineer` | Perf optimization + profiling |
-| `quality-engineer` | Test strategy + edge case detection |
-| `refactoring-expert` | Code quality + tech debt reduction |
-
-### Documentation & Education
-
-| Agent | Description |
-|-------|-------------|
-| `technical-writer` | Tech docs tailored to audience |
-| `learning-guide` | Progressive learning + practical examples |
-| `socratic-mentor` | Teach via guided questioning |
-
-### Project & Business
-
-| Agent | Description |
-|-------|-------------|
-| `project-initializer` | Interactive project setup for first-session onboarding |
-| `project-manager` | Orchestration, workflow mgmt, continuous improvement |
-| `business-panel-experts` | Multi-lens biz strategy synthesis + debate |
-
-### Philosophy & Discipline
-
-| Agent | Description |
-|-------|-------------|
-| `simplicity-guide` | Complexity prevention via Orient-Step-Learn |
-
-### Git & Workflow
-
-| Agent | Description |
-|-------|-------------|
-| `git-workflow` | Git ops with smart commits, PR workflow, safety enforcement |
-
-### Code Quality
-
-| Agent | Description |
-|-------|-------------|
-| `self-review` | Independent second pass on a finished work product (plan, design, code) + reflexion; invoked explicitly |
-| `repo-index` | Repo indexing + codebase briefing |
-| `verifier` | Run-and-report check of shipped behavior against its plan doc; report-only, invoked explicitly |
+| Agent | Why it is a subagent | Description |
+|-------|----------------------|-------------|
+| `deep-researcher` | Isolates many web fetches; returns a cited synthesis | Web research, cross-check, citation-ready synthesis |
+| `repo-index` | Isolates a whole-repo scan; writes one compact index | Repo indexing + codebase briefing |
+| `business-panel-experts` | Long multi-framework analysis in its own context; SSOT of the panel's frameworks for /sc:business-panel | Multi-lens business strategy synthesis + debate |
+| `self-review` | Fresh-context reviewer, read-only tools; invoked explicitly | Independent second pass on a finished work product (plan, design, code) + reflexion |
+| `verifier` | Fresh-context run-and-report, no edit tools; invoked explicitly | Run-and-report check of shipped behavior against its plan doc |
 
 ## Permission Framework
 
@@ -114,48 +58,21 @@ Validation: `uv run python -m pytest tests/unit/test_agent_structure.py -v`
 
 Agents declare persistent memory via `memory` frontmatter. Source files ship `memory: project`; installer rewrites to match install scope. Full spec (scope→location table, `_rewrite_agent_memory_scope` mechanics, MEMORY.md injection): `.claude/rules/agent-authoring.md` § memory.
 
-## Escalation Rules
+## Escalation
 
-1. **Uncertainty**: scope unclear → escalate to `ask_first`
-2. **Cross-boundary**: action hits another agent domain → escalate
-3. **Risk**: >10% chance of breaking change → escalate
-4. **Context pressure**: harness-reported context usage ≥60% (the --uc point) → compress output, don't skip steps; with no reported figure, don't estimate one
+An agent that hits a question outside its job returns it to the main session as an open item; a subagent cannot spawn another subagent, so no agent hands work to a sibling. Scope unclear or a likely breaking change: stop and return the question. Harness-reported context usage ≥60% (the --uc point): compress output, don't skip steps; with no reported figure, don't estimate one.
 
-## Cross-Agent Conflict Resolution
+## Routing Overlaps
 
-Routing overlaps — requests two agents could both claim. The split is set by the `Not for … — <neighbor>` gate in the named descriptions (SSOT: change the description first, then this row):
+The split is set by the `Not for … — <neighbor>` gate in the named descriptions (SSOT: change the description first, then this row):
 
 | Overlap | Goes to | Gate in |
 |---|---|---|
-| cross-service topology vs one service's API or schema | system-architect / backend-architect | both |
-| deploy pipelines vs service API design | devops-architect / backend-architect | both |
-| slow code vs functional bug | performance-engineer / root-cause-analyst | both |
-| application performance, measured UI performance regressions | performance-engineer, not devops-architect or frontend-architect | devops-architect, frontend-architect |
-| web research vs past project insights | deep-researcher / insight-analyst | both |
-| learning a concept vs being questioned toward it vs reference docs | learning-guide / socratic-mentor / technical-writer | learning-guide, socratic-mentor, technical-writer |
-| restructuring existing code vs preventing complexity before it is written | refactoring-expert / simplicity-guide | both |
-| language-neutral test strategy vs Python test implementation | quality-engineer / python-expert | python-expert |
-| test plan vs run-and-report against a plan | quality-engineer / verifier | quality-engineer, verifier |
 | second-pass review vs run-and-report evidence | self-review / verifier | self-review, verifier |
-| general review vs security audit | self-review / security-engineer | both |
-| specs and acceptance criteria vs architecture choice vs business strategy | requirements-analyst / system-architect / business-panel-experts | requirements-analyst |
-| repo setup vs indexing a repo already set up | project-initializer / repo-index | project-initializer |
-
-Agents give conflicting recs → resolve via:
-
-| Conflict | Resolution | Rationale |
-|----------|-----------|-----------|
-| security-engineer vs performance-engineer | security wins | Security constraints non-negotiable |
-| simplicity-guide vs system-architect | data decides — measure complexity vs scale | Neither overrides without evidence |
-| refactoring-expert vs quality-engineer | quality-engineer sets coverage gate, refactoring-expert executes within | Tests define safe refactor boundaries |
-| frontend-architect vs backend-architect | API contract negotiation — both propose, user decides | Interface boundaries need explicit agreement |
-| python-expert vs system-architect | system-architect for cross-lang/service boundaries, python-expert within Python scope | Scope determines authority |
-| devops-architect vs security-engineer | security-engineer for policy, devops-architect for impl | Policy before impl |
-
-**General rule**: Domain specialist wins within domain; cross-domain conflicts escalate to user.
+| web research vs one question about the code | deep-researcher / direct search | deep-researcher |
 
 ## Related
 
-- `commands/` — Workflow entry points routing to agents
+- `commands/` — Workflow entry points; some dispatch these agents
 - `modes/` — Cognitive overlays shaping agent behavior
 - `core/FLAGS.md` — Behavioral flags + execution modes (Model Routing lives in this README's section above)

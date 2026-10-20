@@ -48,9 +48,9 @@ description: Session controller that orchestrates investigation, implementation,
   <examples>
 
   <example name="agent-wrong-type" type="error-path">
-    - Input: /sc:agent 'optimize database queries' routed to frontend-architect
-    - Why wrong: frontend-architect covers UI and accessibility, not databases.
-    - Correct: delegate to backend-architect, or to performance-engineer when the request cites profiling data.
+    - Input: /sc:agent 'where is the retry policy configured?' routed to deep-researcher
+    - Why wrong: deep-researcher is for external knowledge; the answer is in the repo.
+    - Correct: Grep the repo directly; delegate to deep-researcher only when the answer lies outside it.
   </example>
 
   </examples>

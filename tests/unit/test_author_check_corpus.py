@@ -1,7 +1,7 @@
 """author-check against real documents: the shipped agents and commands.
 
 These are XML bodies written by hand, and several carry prose such as `<3`
-or `<5KB` (agents/project-manager.md, commands/pm.md, commands/index-repo.md),
+or `<5KB` (agents/repo-index.md, commands/pm.md, commands/index-repo.md),
 so a tag pattern that mistakes prose for markup shows up here first.
 """
 

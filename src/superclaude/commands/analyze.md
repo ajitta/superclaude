@@ -33,10 +33,9 @@ description: Code analysis across quality, security, performance, architecture d
   | `report` (standalone path) | `docs/analysis/<target>-<username>-YYYY-MM-DD.md` | Full report, one-off analysis |
   </outputs>
 
-  <focus_agent_mapping>
-  When --focus specified and task benefits from specialist depth, delegate to corresponding agent:
-  security → @security-engineer | perf → @performance-engineer | quality → @quality-engineer | arch → @system-architect | a11y → @frontend-architect
-  </focus_agent_mapping>
+  <focus_delegation>
+  Each --focus is a lens with its own checks, not an agent. One focus on a target the main session can read runs in the main session. Several focuses on a large target are independent streams: one `general-purpose` delegate per focus under the delegate packet rule in core/rules/RULES_DELEGATION.md, each prompt naming its focus and asking for every finding with `severity: {critical|high|medium|low|nit}` and `confidence: {high|medium|low}`, unfiltered, because the Evaluate step does the ranking.
+  </focus_delegation>
 
   <rules_analysis note="--focus rules: rule effectiveness audit">
     Quality (always): Read core/rules/RULES_QUALITY.md (R01–R21 table) → summary: rule count, example coverage, severity distribution

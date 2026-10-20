@@ -4,8 +4,8 @@ paths: ["src/superclaude/agents/**", ".claude/rules/agent-authoring.md"]
 
 # Agent Authoring Rules
 
-> **Decision gate.** Create an agent when the work needs **domain expertise** that Claude Code should delegate to automatically when a request matches the agent's description.
-> - Agent = **WHO TO BE** (domain expert persona)
+> **Decision gate.** Create an agent only for a recurring job that needs what only a subagent gives: a context of its own (the job reads far more than it returns — a web sweep, a whole-repo scan), tools restricted to the job (read-only review, run-but-never-edit), or a fresh view that has not seen the author's reasoning (independent review, verification). Domain expertise alone is not a reason: the model already has it, and an expert persona changes tone, not accuracy (`docs/research/persona-anchoring-framing-audit-chosh1179-2026-09-14.md` F1). Put a domain checklist in the command or rule that uses it, where the main session or a `general-purpose` delegate applies it. A job that must talk with the user mid-task (teaching, interactive menus, confirm-each-step) is a command, not an agent: a subagent returns one summary and cannot ask. Keep the roster small — every description competes for delegation, and a sprawling roster makes automatic delegation less reliable (Anthropic, "How and when to use subagents"). The 2026-10 audit cut 24 agents to 5 on this gate: `docs/features/agent-roster-audit/`.
+> - Agent = **WHO DOES ISOLATED WORK** (own context, restricted tools or a fresh view)
 > - Command = **WHAT TO DO** (user-invoked workflow)
 > - Mode = **HOW TO THINK** (cognitive overlay)
 
@@ -23,7 +23,7 @@ CC requires only `name` and `description`. The rest are optional and inherit fro
 ---
 # Required by CC
 name: agent-name                            # lowercase letters and hyphens; matches filename
-description: <Domain> specialist for <distinguishing task>. Use when <signal no neighbor agent covers>. Not for <look-alike> — <neighbor>.
+description: <Job> for <distinguishing task>. Use when <signal no neighbor covers>. Not for <look-alike> — <neighbor>.
 
 # Required by superclaude
 memory: project                             # source value always "project"; installer rewrites to user/local per scope
@@ -51,15 +51,15 @@ omitClaudeMd: true                          # subagent starts without CLAUDE.md 
 
 CC reads `description` verbatim to decide delegation. Three parts:
 
-- **Persona** — a noun phrase naming the expert ("Expert code reviewer", "Debugging specialist for errors and test failures").
+- **Job** — a noun phrase naming the work the agent does in isolation ("Report-only verification runner", "Web-research specialist for cross-checked synthesis"), not an identity ("senior Python engineer").
 - **Trigger phrase** — the signal in a request that this agent covers and its neighbors do not: *"Use when Z."* Write *"Use proactively …"* or *"Use immediately after …"* only when the agent must run unasked, and name the event it follows: when most agents claim proactivity the phrase stops separating them, and overlapping triggers fire several agents for one request (docs/features/prompt-content-audit/).
 - **Negative gate** — when a neighbor shares the verb, add *"Not for <look-alike> — <neighbor>."* (verifier's description is the model).
 
 Skip emoji, version tags, and colon-prefixed keyword lists — the description is a sentence read by the parent's classifier; write a sentence. The legacy `(triggers - kw1, kw2)` shorthand is parsed but classifies less reliably than a CC-idiomatic sentence. One to three sentences total; the description sits in the parent's context every turn, so extra words must sharpen when-to-delegate (`content-quality.md` §1).
 
 Patterns:
-- `Debugging specialist for errors and test failures. Use when a test fails or a stack trace is pasted and the cause is unknown. Not for slow code — performance-engineer.`
-- `Data analysis expert for SQL queries and BigQuery operations. Use when the request names a query, table or dataset. Not for schema design — backend-architect.`
+- `Read-only reviewer of SQL migrations for lock and rollback risk. Use when a diff adds or edits a migration file. Not for query tuning — /sc:analyze --focus perf.`
+- `Log-triage runner that reads large CI logs and returns only the failing steps with their error lines. Use when a CI run failed and its log is too long to read in the main session. Not for fixing the failure — /sc:troubleshoot.`
 
 #### Vocabulary cautions
 
@@ -175,7 +175,7 @@ When memory is enabled, CC auto-injects up to the first 200 lines / 25KB of `MEM
   <bounds>
     <does>core capabilities described in prose (in-scope).</does>
     <never>out-of-scope actions described in prose.</never>
-    <fallback>escalation path; recommended for agents — long-lived personas benefit from an explicit recovery posture.</fallback>
+    <fallback>what goes back to the main session as an open item, and when to stop and ask; a subagent cannot spawn or hand work to another agent, so never name a sibling agent here.</fallback>
   </bounds>
 
   <handoff next="/sc:command1 /sc:command2"/>

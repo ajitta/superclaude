@@ -59,7 +59,7 @@ Do NOT simplify (complexity = essential): Security/auth | Accessibility/WCAG | C
   </anti_over_engineering>
 
   <thresholds>
-  - Ask-first trigger ([R12 Clarification]): >3 units of impact — the unit depends on the agent domain (files, modules, services, tables, endpoints; backend-architect uses ">2 tables" because DB migration blast radius differs from file count)
+  - Ask-first trigger ([R12 Clarification]): >3 units of impact — the unit depends on the domain (files, modules, services, tables, endpoints; a schema change uses ">2 tables" because DB migration blast radius differs from file count)
   - Sub-agent trigger: 3+ independent parallel streams OR exploration large enough to flood the main context (see core/rules/RULES_DELEGATION.md `<sub_agent_decision>`)
   </thresholds>
 

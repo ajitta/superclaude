@@ -19,7 +19,7 @@ pytest 카운트, coverage, description 문자 수처럼 커밋마다 바뀌는 
 
 | 요소 | 현재 수 | 역할 |
 |---|---:|---|
-| `agents/*.md` | 24 | 도메인 전문성, WHO TO BE |
+| `agents/*.md` | 5 | 격리된 작업(독립 컨텍스트, 도구 제한, 독립 검토) |
 | `output-styles/*.md` | 1 | Claude Code output style, HOW EVERY RESPONSE READS |
 | `commands/*.md` | 35 | `/sc:*` 사용자 workflow, WHAT TO DO |
 | `core` always-loaded | 3 | FLAGS, PRINCIPLES, RULES kernel |

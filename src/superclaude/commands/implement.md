@@ -21,7 +21,7 @@ description: Feature and code implementation with sub-agent delegation and MCP i
 
   <flags>
   - --plan <path>: implement from this plan doc in its task order; unrelated to the global --plan, whose 5-line-plan directive does not apply.
-  - --type component|api|service|feature: selects the lead agent: component → frontend-architect, api and service → backend-architect, feature → multi-agent coordination.
+  - --type component|api|service|feature: selects the checks to lead with: component → accessibility, responsive layout and component boundaries; api and service → the API contract, data integrity and error handling; feature → split into independent streams per core/rules/RULES_DELEGATION.md `<sub_agent_decision>`.
   - --framework react|vue|express: follow this framework's conventions and look up its current docs (Context7) before writing framework-facing code.
   - --safe: build the feature without changing existing exported functions, config files or shared modules; a change the feature needs there is shown first and waits for approval; unrelated to the global --safe-mode.
   - --with-tests: write tests for the new behavior with the code and run them in the Validate step.

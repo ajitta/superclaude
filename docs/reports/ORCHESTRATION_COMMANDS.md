@@ -19,7 +19,7 @@ Request
 
 | | `/sc:agent` | `/sc:pm` | `/sc:task` |
 |---|---|---|---|
-| Adds | 5-phase session protocol (Clarify → Plan → Iterate → Implement → Review); `@repo-index` / `@deep-researcher` services | Strategy classification + specialist waves; PDCA learning log (full definition in `agents/project-manager.md`) | Task hierarchy in `TaskCreate`/`TaskUpdate`; `--strategy sequential\|parallel\|adaptive`; `cleanup` sub-command |
+| Adds | 5-phase session protocol (Clarify → Plan → Iterate → Implement → Review); `@repo-index` / `@deep-researcher` services | Strategy classification + parallel streams of `general-purpose` sub-agents; PDCA learning log in `.claude/memories/learnings_[topic].md` | Task hierarchy in `TaskCreate`/`TaskUpdate`; `--strategy sequential\|parallel\|adaptive`; `cleanup` sub-command |
 | Gate | No implementation before scope, success criteria and acceptance checks are confirmed | Simple task → direct work, no orchestration | > 3 files → numbered plan, wait for approval; `completed` only with cited evidence (exit code, test output, observed outcome) |
 | Best when | Vague request, cost of misreading it is high | 3+ independent streams in different expertise domains | Dependency chains, circular-dep risk, work that spans sessions |
 | Wrong when | A spec already exists — Clarify idles | Work is sequential (A → B → C) — nothing to parallelize | Fewer than 3 tasks — overhead only |
@@ -40,7 +40,7 @@ Request
 | Request | Strategy | What happens |
 |---|---|---|
 | `/sc:pm 'real-time chat + video'` | wave | W1 (WebSocket ‖ WebRTC) → W2 UI → W3 E2E → W4 (security ‖ quality) |
-| `/sc:pm 'build an auth system'` (no requirements) | brainstorm | requirements-analyst → system-architect → [backend-architect ‖ security-engineer] → frontend-architect |
+| `/sc:pm 'build an auth system'` (no requirements) | brainstorm | requirements (/sc:brainstorm) → design → [API + data stream ‖ security review stream] → UI stream |
 | `/sc:pm 'audit security + performance + a11y'` | wave, one wave | Three independent domains → three sub-agents at once → merged report |
 | `/sc:pm 'fix LoginForm.tsx:45'` | **not pm** | Single file, < 3 steps → edited directly |
 

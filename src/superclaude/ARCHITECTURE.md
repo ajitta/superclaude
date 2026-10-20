@@ -9,7 +9,7 @@ Content Type    Role                Analogy         Delivery
 ─────────────   ──────────────────  ─────────────   ──────────────────────────
 core/           Framework DNA       Constitution    Always loaded (CLAUDE_SC.md)
 modes/          Mindset overlay     Mood/Posture    On-demand (context_loader)
-agents/         Domain expert       Specialist      CC-native delegation
+agents/         Isolated worker     Contractor      CC-native delegation
 output-styles/  Response voice      House style     CC-native, user-selected (/config)
 commands/       Workflow entry      Menu item       CC-native /sc:*
 skills/         Authoring aid       Style guide     CC-native, user- or model-invoked (/sc-author, /sc-prompt)
@@ -48,11 +48,11 @@ Situational cognitive overlays that modify Claude's thinking, communication, pri
 
 **Contract:** Modes shape mindset, not process. They do not contain step-by-step procedures (→ commands), API references (→ mcp), or tool routing matrices (→ core/FLAGS).
 
-### agents/ — WHO TO BE
+### agents/ — WHO DOES ISOLATED WORK
 
-Domain expert agents with specialized knowledge, behaviors, and tool preferences. Managed by Claude Code's native agent delegation system — auto-selected based on task keywords in the `description` frontmatter field.
+Subagents for jobs that need their own context window (high-volume reading), tools restricted to the job, or a reviewer that has not seen the author's reasoning. Managed by Claude Code's native agent delegation system — selected by the `description` frontmatter field or invoked by name. Domain knowledge the model already has is not an agent; it lives in commands and rules (docs/features/agent-roster-audit/).
 
-**Contract:** Each agent is a self-contained definition with frontmatter (identity + permissions) and XML body (expertise + behavior). Agents receive tasks from commands and produce structured outputs.
+**Contract:** Each agent is a self-contained definition with frontmatter (name, trigger, tool limits) and XML body (job + output shape). Agents receive tasks from commands or the main session and return one structured summary.
 
 ### output-styles/ — HOW EVERY RESPONSE READS
 
@@ -138,12 +138,12 @@ The same domain often has content in three directories serving different roles:
 ```
 Domain: "Research"
   ├── modes/MODE_DeepResearch.md      → HOW TO THINK about research (mindset)
-  ├── agents/deep-researcher.md        → WHO TO BE when researching (agent)
+  ├── agents/deep-researcher.md        → who runs the research, in its own context (agent)
   └── commands/research.md            → WHAT TO DO for a research task (workflow)
 
 Domain: "Business"
   ├── modes/MODE_Business_Panel.md    → HOW TO THINK about business analysis (mindset)
-  ├── agents/business-panel-experts.md → WHO TO BE in a business panel (agent)
+  ├── agents/business-panel-experts.md → who runs the panel, in its own context (agent)
   └── commands/business-panel.md      → WHAT TO DO for business analysis (workflow)
 ```
 

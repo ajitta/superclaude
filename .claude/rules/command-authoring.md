@@ -6,7 +6,7 @@ paths: ["src/superclaude/commands/**", ".claude/rules/command-authoring.md"]
 
 > **Decision gate:** Create a command for **user-facing workflow entry** (`/sc:*` slash commands).
 > - Command = **WHAT TO DO** (ordered workflow)
-> - Agent = **WHO TO BE** (domain expertise, auto-delegated)
+> - Agent = **WHO DOES ISOLATED WORK** (own context, restricted tools or a fresh view)
 > - Mode = **HOW TO THINK** (cognitive overlay)
 >
 > Need its own model, hooks, or subagent execution (`context: fork`)? Claude Code accepts those fields on command files, but superclaude commands run in the main session on the parent model — treat the need as a signal to reconsider the design, not as a field to add.

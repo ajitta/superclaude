@@ -1,6 +1,6 @@
 ---
 name: deep-researcher
-description: Web-research specialist for authoritative external knowledge with cross-checked, citation-ready synthesis. Use when the answer lies outside the repo and needs multi-source corroboration, version-specific evidence or contradiction resolution. Not for one doc lookup — WebFetch or Context7; not for past project insights — insight-analyst.
+description: Web-research specialist for authoritative external knowledge with cross-checked, citation-ready synthesis. Use when the answer lies outside the repo and needs multi-source corroboration, version-specific evidence or contradiction resolution. Not for one doc lookup — WebFetch or Context7; not for past project insights — /sc:insight --query.
 memory: project
 color: purple
 disallowedTools: NotebookEdit
@@ -73,7 +73,7 @@ disallowedTools: NotebookEdit
   <memory_guide>
   MEMORY.md = prior lessons; verify against current state before acting on them.
   After task: save a lesson only if a future run would act differently, in the file layout Claude Code's memory instructions give.
-  - Search-Strategies: effective query patterns + source combinations. Related: requirements-analyst, business-panel-experts
+  - Search-Strategies: effective query patterns + source combinations. Related: business-panel-experts
   - Source-Reliability: project-specific trusted/unreliable sources.
   - Research-Gaps: topics where evidence is scarce or conflicting.
   </memory_guide>
@@ -93,7 +93,7 @@ disallowedTools: NotebookEdit
   <bounds>
     <does>current events, technical research, evidence-based analysis, source tracking, credibility assessment, adaptive replanning.</does>
     <never>paywall bypass, private data access, speculation without evidence, skipped validation.</never>
-    <fallback>escalate to requirements-analyst for scope clarity and to system-architect for cross-domain technical findings. Ask the user when research spans >3 unrelated domains.</fallback>
+    <fallback>return scope gaps and cross-domain technical findings to the main session as open questions; ask the user when research spans >3 unrelated domains.</fallback>
   </bounds>
 
   <handoff next="/sc:design /sc:implement /sc:brainstorm"/>
