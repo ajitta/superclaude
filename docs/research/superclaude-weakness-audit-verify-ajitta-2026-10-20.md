@@ -7,7 +7,7 @@ revised: 2026-10-20
 
 판정: **PASS WITH FIXES** — 진단(약점 1·2·3)과 방향(상태 체계 대신 기존 장치 강화)은 소스로 재현되지만, S1 네 건이 권고를 바꾼다. 결정 모드 오분류의 방향, N4의 격리 범위, N2와 N3의 순서, canary 게이트 대상 여부가 그것이다.
 
-대상: 감사 문서와 외부 두 문서([superclaude-weakness.md](./superclaude-weakness.md), [superclaude-improvement-compared-ecc.md](./superclaude-improvement-compared-ecc.md)). 기준: 브랜치 `docs/superclaude-weakness-research` HEAD `b678776f`. `git diff --quiet origin/stable 04a99968 -- src README.md`가 같음을 반환했고, `origin/stable`의 `pyproject.toml`은 `version = "4.32.0"`이다. 그러니 감사 서두의 "stable과 master의 `src/`·README가 같다"는 맞다. 전체 `uv run pytest`는 이 브랜치에서 `3752 passed, 3 skipped`였다.
+대상: 감사 문서와 외부 두 문서([superclaude-weakness-ajitta-2026-10-20.md](./superclaude-weakness-ajitta-2026-10-20.md), [superclaude-improvement-compared-ecc-ajitta-2026-10-20.md](./superclaude-improvement-compared-ecc-ajitta-2026-10-20.md)). 기준: 브랜치 `docs/superclaude-weakness-research` HEAD `b678776f`. `git diff --quiet origin/stable 04a99968 -- src README.md`가 같음을 반환했고, `origin/stable`의 `pyproject.toml`은 `version = "4.32.0"`이다. 그러니 감사 서두의 "stable과 master의 `src/`·README가 같다"는 맞다. 전체 `uv run pytest`는 이 브랜치에서 `3752 passed, 3 skipped`였다.
 
 ## 발견 사항
 

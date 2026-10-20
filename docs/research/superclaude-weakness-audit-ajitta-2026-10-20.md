@@ -5,9 +5,9 @@ revised: 2026-10-20
 
 # 외부 약점 분석·ECC 대조 개선안 감사와 새 개선안
 
-대상은 같은 브랜치의 두 문서다. [superclaude-weakness.md](./superclaude-weakness.md)(약점 6개)와 [superclaude-improvement-compared-ecc.md](./superclaude-improvement-compared-ecc.md)(3단계 완료 상태, 수용 기준 증거표, RED 통일 등)를 master `04a99968`의 소스와 대조했다. 두 문서가 읽은 `stable`(4.32.0)은 `src/`와 `README.md`가 master와 같아서, 이 감사의 인용도 그대로 `stable`에 맞는다.
+대상은 같은 브랜치의 두 문서다. [superclaude-weakness-ajitta-2026-10-20.md](./superclaude-weakness-ajitta-2026-10-20.md)(약점 6개)와 [superclaude-improvement-compared-ecc-ajitta-2026-10-20.md](./superclaude-improvement-compared-ecc-ajitta-2026-10-20.md)(3단계 완료 상태, 수용 기준 증거표, RED 통일 등)를 master `04a99968`의 소스와 대조했다. 두 문서가 읽은 `stable`(4.32.0)은 `src/`와 `README.md`가 master와 같아서, 이 감사의 인용도 그대로 `stable`에 맞는다.
 
-이 문서의 첫 판(`b678776f`)은 opus high의 독립 검증을 받았다. 판정은 PASS WITH FIXES(S1 4건, S2 11건, S3 4건)였다. 보고서 원문은 [superclaude-weakness-audit-verify-2026-10-20.md](./superclaude-weakness-audit-verify-2026-10-20.md)이고, 반영 내역은 끝의 "검증 반영" 표에 있다.
+이 문서의 첫 판(`b678776f`)은 opus high의 독립 검증을 받았다. 판정은 PASS WITH FIXES(S1 4건, S2 11건, S3 4건)였다. 보고서 원문은 [superclaude-weakness-audit-verify-ajitta-2026-10-20.md](./superclaude-weakness-audit-verify-ajitta-2026-10-20.md)이고, 반영 내역은 끝의 "검증 반영" 표에 있다.
 
 ## 결론
 
@@ -105,7 +105,7 @@ revised: 2026-10-20
 1. N1–N6을 `feature/completion-proof` 한 브랜치로 묶는다. 커맨드 파일 변경은 `.claude/rules/command-authoring.md`의 테스트를 따르고, 통합 시점에 전체 `uv run pytest`를 돌린다.
 2. N6 사전 등록을 쓰고, (i)의 기준선을 N2 반영 전에 먼저 돌린다.
 3. `RULES_DOCS.md`(core) 변경이 있으므로 릴리스 전에 `make canary-gates` 보고서를 읽고 `CANARY_OK=1`로 릴리스한다. 커맨드가 바뀌므로 CHANGELOG `[Unreleased]`에 적고 패치 릴리스를 한다.
-4. 외부 두 문서는 병합할 때 이름 규약에 맞춘다.
+4. 외부 두 문서와 검증 보고서의 파일 이름은 `feature/completion-proof`에서 규약에 맞췄다. 내용은 그대로다.
 
 ## 검증 반영
 
