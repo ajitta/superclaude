@@ -14,3 +14,4 @@ Can a user type only the intent and have the whole Large chain (`/sc:intent` →
 ## Documents
 
 - [06-run-record.md](./06-run-record.md): setup, the prompts, per-run results, the evaluator failure mode and the wording that fixed it
+- [06a-verify-intent-through.md](./06a-verify-intent-through.md): independent verification of `/sc:intent --through` (Korean): gates, one live run, canary mutation check, findings
