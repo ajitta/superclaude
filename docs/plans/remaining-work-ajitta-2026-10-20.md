@@ -13,13 +13,13 @@ revised: 2026-10-20
 
 그 뒤 같은 날 v4.32.2–v4.34.0을 릴리스했다: `/sc:intent`의 `Done when:` 줄, `--through`(의도 한 줄로 체인 끝까지), 독립 검증 세 번과 반영, `/sc:plan`의 design 승인, command 본문 릴리스 게이트(`make canary-commands`), `--through --ask`(결과를 좌우하는 결정만 한 번 묻기). 기록은 [goal-chain](../features/goal-chain/README.md) 06–06g에 있다.
 
-다음 세션이 바로 할 일은 0절의 두 항목이다. 둘 다 소유자 결정이 필요하다. 남은 것은 다음 릴리스에 함께 나갈 변경, 다음 모델이 나올 때 할 일, 보류 항목, 정리 작업이다. 지난 목록은 [remaining-work-ajitta-2026-10-19](./remaining-work-ajitta-2026-10-19.md)이고, 이 문서가 그것을 대체한다.
+0절의 두 항목은 소유자가 ★(a)로 결정해 v4.34.1로 릴리스했다([goal-chain 06h](../features/goal-chain/06h-other-answers-reviewer-memory.md), 독립 검증 06i). 지금 바로 할 일은 없다. 다음 세션은 2–5절에서 소유자가 고른 항목으로 시작한다. 남은 것은 다음 릴리스에 함께 나갈 변경, 다음 모델이 나올 때 할 일, 보류 항목, 정리 작업이다. 지난 목록은 [remaining-work-ajitta-2026-10-19](./remaining-work-ajitta-2026-10-19.md)이고, 이 문서가 그것을 대체한다.
 
 항목마다 소유자 결정이 필요한지와 추천안(★)을 적는다. 세션 상태는 `.claude/memories/session_2026-10-20_master.md`의 Next actions에 같은 목록이 짧게 있다.
 
-## 0. 다음 세션에서 진행할 것 — goal-chain 후속
+## 0. goal-chain 후속 — 완료(v4.34.1)
 
-시작: `cd ~/superclaude && git fetch origin && git checkout master && git merge --ff-only origin/master`, 그다음 [goal-chain 06g](../features/goal-chain/06g-ask-review-applied.md)와 [06e](../features/goal-chain/06e-ask-checkpoint.md)의 Limits를 읽는다. 두 항목 모두 command·agent 본문을 바꾸므로 릴리스 전에 `make canary-commands`를 돌린다(4.33.2부터 게이트가 요구한다).
+시작(기록용): `cd ~/superclaude && git fetch origin && git checkout master && git merge --ff-only origin/master`, 그다음 [goal-chain 06g](../features/goal-chain/06g-ask-review-applied.md)와 [06e](../features/goal-chain/06e-ask-checkpoint.md)의 Limits를 읽는다. 두 항목 모두 command·agent 본문을 바꾸므로 릴리스 전에 `make canary-commands`를 돌린다(4.33.2부터 게이트가 요구한다).
 
 ### 0-1. brainstorm 결정 모드: 선택지 밖의 직접 답(Other)
 

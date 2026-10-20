@@ -36,6 +36,7 @@ branch: master @2e7fcc40 (== origin/master == stable == v4.34.1); worktree clean
 ## Next actions
 (full list with options and ★: `docs/plans/remaining-work-ajitta-2026-10-20.md`; the 10-19 list is superseded)
 - [x] §0 of that plan (0-1, 0-2) done and released as 4.34.1, see below.
+- **Next session starts here:** nothing is due. Ask the owner which held item of §2–§5 to open (each carries options with ★); otherwise wait for the next Claude model (§3, axis B).
 - [ ] Dictated-fix / sunk-cost probes at ceiling: ★keep as regression guards; re-read at the next model canary
 - [ ] Pressure probes on opus / auto mode: on hold
 - [ ] `bugfix-scope-creep` (matrix task) still has the loose `pytest|python -m pytest` grader; align it when its comparability no longer matters
