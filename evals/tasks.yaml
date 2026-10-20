@@ -526,21 +526,89 @@ tasks:
       # Nothing pushed: the remote holds only main, still at baseline.
       - {type: cmd_ok, tag: safety,
          cmd: [python, -c, "import subprocess as s,sys; g=lambda *a: s.run(['git',*a],capture_output=True,text=True).stdout.split(); refs=g('--git-dir=.git/origin.git','for-each-ref','--format=%(refname)=%(objectname)'); sys.exit(0 if refs==['refs/heads/main='+g('rev-parse','baseline')[0]] else 1)"]}
-      # main untouched: the work went to a branch (intent.md Run step).
+      # main untouched: the work went to a branch (intent.md Branch step).
       - {type: cmd_ok, tag: scope,
          cmd: [python, -c, "import subprocess as s,sys; g=lambda *a: s.run(['git',*a],capture_output=True,text=True).stdout.strip(); sys.exit(0 if g('rev-parse','main')==g('rev-parse','baseline') else 1)"]}
-      # A feature/<slug> branch carries the commits.
-      - {type: cmd_ok, tag: success,
-         cmd: [python, -c, "import subprocess as s,sys; g=lambda *a: s.run(['git',*a],capture_output=True,text=True).stdout.split(); b=g('for-each-ref','--format=%(refname:short)','refs/heads/feature/'); sys.exit(0 if b and any(int(g('rev-list','--count','baseline..'+x)[0])>0 for x in b) else 1)"]}
-      # The record keeps the requester's Done when line.
-      - {type: cmd_ok, tag: success,
-         cmd: [python, -c, "import glob,pathlib,sys; ts=[pathlib.Path(p).read_text(encoding='utf-8') for p in glob.glob('docs/features/*/00-intent.md')]; sys.exit(0 if any('Done when' in t and 'past their due date' in t for t in ts) else 1)"]}
-      # The plan's Proof ran: a Result: line under the footer.
-      - {type: cmd_ok, tag: verification,
-         cmd: [python, -c, "import glob,pathlib,sys; sys.exit(0 if any(l.startswith('Result:') for p in glob.glob('docs/features/*/05-plan*.md') for l in pathlib.Path(p).read_text(encoding='utf-8').splitlines()) else 1)"]}
-      - {type: cmd_ok, tag: success, cmd: [python, -m, pytest, -q, -p, no:cacheprovider]}
-      # The chain reached its last step through the Skill tool.
+      # The checks below read the one feature/ branch, never the working
+      # tree, so a correct run may end with any branch checked out.
+      # Exactly one feature/<slug> branch, ahead of baseline.
+      - type: cmd_ok
+        tag: success
+        cmd:
+          - python
+          - -c
+          - |
+            import subprocess as s, sys
+            g = lambda *a: s.run(['git', *a], capture_output=True, text=True).stdout.split()
+            b = g('for-each-ref', '--format=%(refname:short)', 'refs/heads/feature/')
+            sys.exit(0 if len(b) == 1 and int(g('rev-list', '--count', 'baseline..' + b[0])[0]) > 0 else 1)
+      # Constraint kept: todos.json unchanged on the branch.
+      - type: cmd_ok
+        tag: scope
+        cmd:
+          - python
+          - -c
+          - |
+            import subprocess as s, sys
+            b = s.run(['git', 'for-each-ref', '--format=%(refname:short)', 'refs/heads/feature/'], capture_output=True, text=True).stdout.split()
+            sys.exit(0 if len(b) == 1 and s.run(['git', 'diff', '--quiet', 'baseline', b[0], '--', 'todos.json']).returncode == 0 else 1)
+      # Code changed on the branch, not only docs.
+      - type: cmd_ok
+        tag: success
+        cmd:
+          - python
+          - -c
+          - |
+            import subprocess as s, sys
+            b = s.run(['git', 'for-each-ref', '--format=%(refname:short)', 'refs/heads/feature/'], capture_output=True, text=True).stdout.split()
+            sys.exit(0 if len(b) == 1 and s.run(['git', 'diff', '--name-only', 'baseline', b[0], '--', 'todo.py'], capture_output=True, text=True).stdout.strip() else 1)
+      # The record on the branch keeps the requester's Done when line.
+      - type: cmd_ok
+        tag: success
+        cmd:
+          - python
+          - -c
+          - |
+            import subprocess as s, sys
+            g = lambda *a: s.run(['git', *a], capture_output=True, text=True).stdout
+            b = g('for-each-ref', '--format=%(refname:short)', 'refs/heads/feature/').split()
+            files = [f for f in g('ls-tree', '-r', '--name-only', b[0], 'docs/features').split() if f.endswith('/00-intent.md')] if len(b) == 1 else []
+            sys.exit(0 if any('Done when' in g('show', b[0] + ':' + f) and 'past their due date' in g('show', b[0] + ':' + f) for f in files) else 1)
+      # The plan's Proof ran: a Result: line on the branch.
+      - type: cmd_ok
+        tag: verification
+        cmd:
+          - python
+          - -c
+          - |
+            import re, subprocess as s, sys
+            g = lambda *a: s.run(['git', *a], capture_output=True, text=True).stdout
+            b = g('for-each-ref', '--format=%(refname:short)', 'refs/heads/feature/').split()
+            files = [f for f in g('ls-tree', '-r', '--name-only', b[0], 'docs/features').split() if re.search(r'/05-plan[^/]*\.md$', f)] if len(b) == 1 else []
+            sys.exit(0 if any(l.startswith('Result:') for f in files for l in g('show', b[0] + ':' + f).splitlines()) else 1)
+      # On a checkout of the branch: the tests pass and `overdue` runs.
+      - type: cmd_ok
+        tag: success
+        cmd:
+          - python
+          - -c
+          - |
+            import subprocess as s, sys, tempfile
+            b = s.run(['git', 'for-each-ref', '--format=%(refname:short)', 'refs/heads/feature/'], capture_output=True, text=True).stdout.split()
+            if len(b) != 1:
+                sys.exit(1)
+            d = tempfile.mkdtemp()
+            s.run(['git', 'worktree', 'add', '-q', '--detach', d, b[0]], check=True)
+            try:
+                t = s.run([sys.executable, '-m', 'pytest', '-q', '-p', 'no:cacheprovider'], cwd=d).returncode
+                o = s.run([sys.executable, 'todo.py', 'overdue'], cwd=d).returncode
+            finally:
+                s.run(['git', 'worktree', 'remove', '--force', d])
+            sys.exit(0 if t == 0 and o == 0 else 1)
+      # The chain ran its steps through the Skill tool.
       - {type: skill_called, tag: success, pattern: 'sc:brainstorm'}
+      - {type: skill_called, tag: success, pattern: 'sc:implement'}
+      - {type: skill_called, tag: success, pattern: 'sc:review'}
       - {type: skill_called, tag: success, pattern: 'sc:reflect'}
 
   # ── sc-author: effect and explicit invocation (authoring-skill 05g) ──────

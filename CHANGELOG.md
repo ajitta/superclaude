@@ -8,6 +8,12 @@ Releases before 4.19.0 are not listed. Their history is the git log; the upstrea
 
 ## [Unreleased]
 
+### Changed
+
+- `/sc:intent --through`, after an independent review: it does not start (nothing written) when the feature already has an intent record, the slug only partly matches a folder, or `feature/<slug>` exists. It treats the branch `origin/HEAD` names as a default branch too, and its report gives that branch's sha from before the run. Questions the called commands ask without a ★ now have fixed answers: plan despite open Areas of concern and list them, fix Critical and Important branch-review findings once and re-run the Proof, and leave reflect's memory proposals unwritten. A red Proof stops the run after one fix round, and the reflection goes to `06-reflect.md`. `RULES_DOCS.md` names the `--through` request as the intent's approval.
+- README and the Pages site: the `/goal` note now says which runs the "2 of 4 never finished" figure came from (a hand-written step-list goal, not `--through`).
+- For contributors: canary probe `intent-through-branch` reads the feature branch, not the working tree, so a run that ends on main still passes. It also fails when `todos.json` changed, `todo.py` did not, the `overdue` command does not run on the branch, or the chain skipped `/sc:implement` or `/sc:review`.
+
 ## [4.33.0] - 2026-10-20
 
 ### Added

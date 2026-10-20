@@ -332,7 +332,7 @@ The framework's value comes from chaining commands. Each chain has gates: the co
 
 #### One prompt from intent to done
 
-`/sc:intent --through` records the five items in your words, then runs the rest of the Large chain on a `feature/<slug>` branch: brainstorm, spec review with `--audit-delegated`, design, plan, implement, branch review, test and reflect, committing each step. It asks nothing. Every choice takes the ★ option and is recorded as `delegated`, an independent auditor checks those choices, and review and reflect check the result against your recorded words. It never merges, pushes, deploys or deletes. It stops early on a choice that cannot be undone or reaches other people, a Critical finding still open after one fix round, or a red Proof. The last message lists the evidence (branch log, doc statuses, the plan's `Result:` line, the test run, the Critical count, the gap against Done when) and leaves merge and push to you.
+`/sc:intent --through` records the five items in your words, then runs the rest of the Large chain on a `feature/<slug>` branch: brainstorm, spec review with `--audit-delegated`, design, plan, implement, branch review, test and reflect, committing each step. It asks nothing. Every choice takes the ★ option and is recorded as `delegated`, an independent auditor checks those choices, and review and reflect check the result against your recorded words. It never merges, pushes, deploys or deletes. It stops early on a choice that cannot be undone or reaches other people, or a Critical finding or red Proof left after one fix round, and does not start when the feature already has an intent record or a `feature/<slug>` branch. The last message lists the evidence (branch log, doc statuses, the plan's `Result:` line, the test run, the Critical count, the gap against Done when) and leaves merge and push to you.
 
 ```text
 /sc:intent --through
@@ -345,7 +345,7 @@ Done when: <how you will know it worked>
 
 - Start Claude Code in auto mode (`claude --permission-mode auto`). In manual mode, each tool call your settings do not allow waits for you.
 - For an ambiguous or large intent, answer the brainstorm questions yourself: run `/sc:intent` without the flag and take the chain step by step.
-- To have Claude Code restart the run if it stops before the end, wrap it in [`/goal`](https://code.claude.com/docs/en/goal) and add a judging line. The evaluator reads the whole goal text and sees the commands' own approval steps; without that line, it kept runs open waiting for those approvals (2 of 4 never finished in testing).
+- To have Claude Code restart the run if it stops before the end, wrap it in [`/goal`](https://code.claude.com/docs/en/goal) and add a judging line. The evaluator judges the whole goal text against the transcript, which holds the commands' own approval steps, so say what counts. In testing a hand-written step-list goal, 2 of 4 runs without such a line never finished (one evaluator held on a process sentence, one on a command's approval step); `--through` under `/goal` was run only with the line (2 of 2 met).
 
 ```text
 /goal sc:intent --through

@@ -53,7 +53,7 @@ Username: `git config user.name` (lowercase, no spaces) — fallback OS username
 
 Frontmatter rules:
   Feature README: {feature, phase, owner, created, updated, related?}. Phase enum: intent | discovery | design | planning | implementing | complete | abandoned
-  Phase doc (inside feature folder): {status, revised} — new docs start `status: draft` (00-intent: `approved-for-plan`, written only after its Approve step), `revised: <today>`
+  Phase doc (inside feature folder): {status, revised} — new docs start `status: draft` (00-intent: `approved-for-plan`, written only after its Approve step or a `/sc:intent --through` request), `revised: <today>`
   Standalone specs/+plans/: {status, revised}
   Plan docs (feature or standalone): `status: complete` only when every task checkbox is checked (a task dropped by decision: `- [x] ~~task~~`) and, for the plan (index), its `## Proof` footer carries a `Result:` line naming the last commit that changed code, from a green run or with the user's recorded acceptance (/sc:implement Integrate step); departures from the plan, drops included, go under `## Deviations` in the same commit as the code that departed
   Standalone research/+analysis/: optional {status, revised}
@@ -75,7 +75,7 @@ Examples:
 
   <workflow_gates>
     "Committed" names a precondition: when it is unmet, tell the user or offer to commit; do not commit unasked.
-    /sc:intent -> /sc:brainstorm | /sc:plan: User approves the intent text in their own words; file committed before analysis starts
+    /sc:intent -> /sc:brainstorm | /sc:plan: User approves the intent text in their own words (a `--through` request is that approval); file committed before analysis starts
     /sc:brainstorm -> /sc:design: User approves discovery spec before designing
     /sc:brainstorm -> /sc:review: Spec self-review mandatory before /sc:plan handoff, because approved specs can still carry reversed decisions (see the /sc:brainstorm Self-review step)
     /sc:design -> /sc:plan: Design spec committed (components pass [R18 Necessity Test] necessity test, deferred items marked, Areas of concern resolved by the owner)
