@@ -19,3 +19,4 @@ Can a user type only the intent and have the whole Large chain (`/sc:intent` →
 - [06c-verify-round2.md](./06c-verify-round2.md): second independent verification of `v4.33.0..HEAD` (Korean): the 4.33.1 fixes, probe v2, the command release gate and `make canary-commands`, mutation check of the new tests
 - [06d-followups-applied.md](./06d-followups-applied.md): the interactive run, the design-status and release-gate changes, and each second-review finding with what changed
 - [06e-ask-checkpoint.md](./06e-ask-checkpoint.md): `--through --ask`: why one checkpoint, what it does, four runs (two interactive with answers against ★, two headless)
+- [06f-verify-ask.md](./06f-verify-ask.md): independent verification of `--through --ask` (Korean): gates, one headless fallback run, the 06e numbers against the record, findings
