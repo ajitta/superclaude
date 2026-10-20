@@ -286,7 +286,7 @@ A clone install whose copy lives in your own GitHub fork: your edits are backed 
 
 ## 🧭 **Workflows**
 
-The framework's value comes from chaining commands. Each chain has gates: a step's output must be committed (or explicitly approved) before the next step runs. Pick the chain that matches the task's blast radius — don't pay `brainstorm`-level overhead for a typo, and don't skip `design` for a system rewrite.
+The framework's value comes from chaining commands. Each chain has gates: the commands tell the model to stop until a step's output is committed (or explicitly approved). These gates are model-followed prose; only the three guard hooks below block mechanically. Pick the chain that matches the task's blast radius — don't pay `brainstorm`-level overhead for a typo, and don't skip `design` for a system rewrite.
 
 #### By task size
 
@@ -294,25 +294,26 @@ The framework's value comes from chaining commands. Each chain has gates: a step
 |------|---------|-------------------|
 | **Trivial** | Typo · 1-line fix · rename · obvious bug with known fix | Direct edit. No `/sc:*` needed. |
 | **Small** | Single file · ≤ 50 added lines · clear scope | Direct request (or `/sc:improve`) with the global **`--plan`** (5-line plan, approve) → `/sc:test` |
-| **Medium** | 3–10 files · multi-purpose · clear requirements | `/sc:plan` → `/sc:implement --plan` → `/sc:test` → `/sc:reflect` (optional: `/sc:intent` first) |
-| **Large** | > 10 files · cross-cutting · ambiguous scope · new system | `/sc:intent` → `/sc:brainstorm` → `/sc:review --scope spec` → `/sc:design` → `/sc:plan` → `/sc:implement --plan` → `/sc:test` → `/sc:reflect` |
+| **Medium** | 3–10 files · multi-purpose · clear requirements | `/sc:plan` → `/sc:implement --plan` → `/sc:test` → `/sc:reflect` (optional: `/sc:intent` first, `/sc:review --scope branch` before `/sc:test`) |
+| **Large** | > 10 files · cross-cutting · ambiguous scope · new system | `/sc:intent` → `/sc:brainstorm` → `/sc:review --scope spec` → `/sc:design` → `/sc:plan` → `/sc:implement --plan` → `/sc:review --scope branch` → `/sc:test` → `/sc:reflect` |
 
 #### The full chain (large tasks)
 
 ```text
-/sc:intent   →   /sc:brainstorm   →   /sc:review --scope spec   →   /sc:design   →   /sc:plan   →   /sc:implement --plan   →   /sc:test   →   /sc:reflect
-   capture          discover           specify          gate              decompose       build (TDD)                 verify        learn
-   (own words)      (Socratic)         (architecture)   (multi-lens)      (phases)        (per task)                  (baseline)    (capture)
+/sc:intent   →   /sc:brainstorm   →   /sc:review --scope spec   →   /sc:design   →   /sc:plan   →   /sc:implement --plan   →   /sc:review --scope branch   →   /sc:test   →   /sc:reflect
+   capture          discover           specify          gate              decompose       build (TDD)                 code review                   verify        learn
+   (own words)      (Socratic)         (architecture)   (multi-lens)      (phases)        (per task)                  (spec + quality)              (baseline)    (capture)
 ```
 
-| Step | Output | Hard gate before next step |
+| Step | Output | Required before next step (model-followed) |
 |------|--------|----------------------------|
 | `/sc:intent` | `docs/features/<slug>/00-intent.md` — problem, proposed outcome, affected users and systems, constraints, open questions, in the requester's words | User approves the wording; committed before analysis starts |
 | `/sc:brainstorm` | `docs/features/<slug>/01-discovery.md` (one-off: `docs/specs/<slug>-discovery-<user>-<date>.md`) | User approves discovery spec |
 | `/sc:design` | `docs/features/<slug>/04-design.md` (one-off: `docs/specs/…-design-…md`) | Design committed (components pass the [R18] necessity test; Areas of concern resolved) |
-| `/sc:review` | Multi-dimensional review of design/plan | Required — `/sc:brainstorm` hard-blocks `/sc:plan` until this runs |
+| `/sc:review` | Multi-dimensional review of design/plan | Required — the `/sc:plan` Load step stops on a spec still `status: draft`, which only this review clears; a draft spec is always reviewed by an isolated reviewer that gets `00-intent.md` verbatim |
 | `/sc:plan` | `docs/features/<slug>/05-plan.md` (one-off: `docs/plans/…md`) — phased TDD tasks, file paths, verify cmds | Plan committed |
-| `/sc:implement --plan` | Code + per-phase commits | Implementation complete; plan checkboxes and Deviations match the code |
+| `/sc:implement --plan` | Code + per-phase commits | Plan checkboxes and Deviations match the code; the plan's Proof ran at the current commit (`Result:` line) |
+| `/sc:review --scope branch` | Code review against the spec and `00-intent.md`, plus stale always-loaded docs | Critical findings fixed; a fix after the `Result:` commit re-runs the Proof |
 | `/sc:test` | Test pass evidence (`42/42 pass, baseline 40`) | Real output, not predictions |
 | `/sc:reflect` | Retrospective; `/sc:insight` captures insights to `.claude/insights.jsonl` | — |
 
@@ -430,7 +431,7 @@ superclaude mcp
 
 ### 🚦 **Tightened Workflow Gates**
 **Brainstorm → Plan → Implement → Review:**
-- `/sc:brainstorm` hard-blocks `/sc:plan` until `/sc:review` runs
+- `/sc:plan` stops on a draft spec until `/sc:review` clears it (prose gate, measured by the `plan-draft-spec-gate` probe)
 - `/sc:review --audit-delegated` re-examines the decisions the model made on your behalf
 - Plan default: phase framing; opt-in `--pr-bundle` for multi-PR
 - `verified:` convention + SessionStart memory-staleness warning

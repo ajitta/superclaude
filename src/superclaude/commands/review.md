@@ -24,7 +24,7 @@ description: Review a work product (code, plan, design, spec) for quality, corre
 
   <flags>
   - --scope pr|diff|file|branch|plan|design|spec: command-local artifact-type selector, unrelated to the global --scope analysis-boundary enum (file|module|project|system).
-  - --structured: isolated reviewer subagent dispatch, per the Agent entry in the tools section.
+  - --structured: isolated reviewer subagent dispatch, per the Agent entry in the tools section; a `status: draft` spec is always reviewed this way, flag or not.
   - --audit-delegated: delegated-decision audit, per the Delegated-decision audit step.
   </flags>
 
@@ -38,7 +38,7 @@ description: Review a work product (code, plan, design, spec) for quality, corre
 
 
   <tools>
-  - Agent: dispatch isolated reviewer subagent for big review (--structured) and for the --audit-delegated re-eval (the Delegated-decision audit step); Read the delegate packet rule in core/rules/RULES_DELEGATION.md before dispatch, since it sets what the reviewer's prompt leaves out
+  - Agent: dispatch isolated reviewer subagent for big review (--structured), for every `status: draft` spec (the Spec gate step's target; its acceptance criteria carry the feature folder's `00-intent.md` verbatim, so the reviewer checks the spec against the requester's own words and not only against the spec's own reading of them) and for the --audit-delegated re-eval (the Delegated-decision audit step); Read the delegate packet rule in core/rules/RULES_DELEGATION.md before dispatch, since it sets what the reviewer's prompt leaves out
   </tools>
 
   <review_lens>

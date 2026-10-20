@@ -55,7 +55,7 @@ Frontmatter rules:
   Feature README: {feature, phase, owner, created, updated, related?}. Phase enum: intent | discovery | design | planning | implementing | complete | abandoned
   Phase doc (inside feature folder): {status, revised} — new docs start `status: draft` (00-intent: `approved-for-plan`, written only after its Approve step), `revised: <today>`
   Standalone specs/+plans/: {status, revised}
-  Plan docs (feature or standalone): `status: complete` only when every task checkbox is checked (a task dropped by decision: `- [x] ~~task~~`); departures from the plan, drops included, go under `## Deviations` in the same commit as the code that departed
+  Plan docs (feature or standalone): `status: complete` only when every task checkbox is checked (a task dropped by decision: `- [x] ~~task~~`) and the `## Proof` footer carries a `Result:` line from a run at the current commit, or the user's recorded acceptance (/sc:implement Integrate step); departures from the plan, drops included, go under `## Deviations` in the same commit as the code that departed
   Standalone research/+analysis/: optional {status, revised}
   Reports/ADRs: none
 Status enum (per-doc): draft | review | approved-for-plan | implementing | complete | deprecated
