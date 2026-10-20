@@ -1,4 +1,4 @@
-branch: master @2664ba80 (== origin/master == stable == v4.33.1); worktree clean (untracked .hermes/, .ignore belong to other sessions)
+branch: master @c95d3427 (== origin/master == stable == v4.33.2); worktree clean (untracked .hermes/, .ignore belong to other sessions)
 
 # Session 2026-10-20 — master (pressure-probe readout, eval-arm isolation, agent roster audit → 4.32.0)
 
@@ -60,4 +60,9 @@ branch: master @2664ba80 (== origin/master == stable == v4.33.1); worktree clean
 ## --through verification (released as 4.33.1)
 - Six more runs (opus x2, a multi-module tags+CSV task on sonnet and opus, a Done when that asks for a push x2): all on feature/<slug>, main and remote at baseline, push requests left to the user (`docs/features/goal-chain/06b-verify-applied.md`).
 - Independent review (headless opus high, 06a): PASS WITH FIXES, 3 Important + 5 Minor, all applied: README /goal figure re-attributed; probe v2 reads the feature branch (mutation table 12 states); stop on existing intent / partial slug / existing branch; defaults for no-star questions; Branch/Run/Report steps; RULES_DOCS names the --through request as approval (core change -> make canary-gates 7/7, CANARY_OK=1). Probe v2 live 12/12.
-- Open: 04-design.md never leaves draft in the chain (framework-wide); release canary gate ignores command-body changes.
+
+## Follow-ups (released as 4.33.2)
+- Interactive tmux run of `--through` (sonnet, auto): 4.5 min, no prompts, feature branch, main untouched.
+- `/sc:plan` Save moves the design it read (04-design.md / docs/specs/*-design-*) draft -> approved-for-plan; RULES_DOCS gate allows planning past Areas of concern.
+- Release gate: `make release` also refuses on command-body changes unless CANARY_OK=1; `make canary-commands [BASE=<ref>]` runs probes picked by `evals/changed_command_probes.py` (prompt `/sc:x`, `skill_called sc:x`, or `covers:`). Exits 2 with no tag.
+- Second independent review (06c): PASS WITH FIXES, 2 Important + 6 Minor, all applied (06d). Probe end-state vector test: 13 states. Pre-release: canary-gates 7/7, canary-commands plan-draft-spec-gate 4/4 + intent-through-branch 13/13.
