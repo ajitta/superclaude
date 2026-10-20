@@ -8,6 +8,11 @@ Releases before 4.19.0 are not listed. Their history is the git log; the upstrea
 
 ## [Unreleased]
 
+### Added
+
+- `/sc:intent --through`: from one prompt holding the five intent lines, records them word for word and runs the rest of the Large chain to `/sc:reflect` on a `feature/<slug>` branch, committing each step. It asks nothing (each choice takes the ★ option and is recorded as `delegated`, which the spec review audits), never merges, pushes, deploys or deletes, and stops early on an irreversible choice, a Critical finding still open after one fix round, or a red Proof. The last message lists the evidence and leaves merge and push to you. README Workflows and the Pages site show it, including how to wrap it in `/goal` with a judging line so Claude Code's evaluator does not wait on the commands' own approval steps.
+- For contributors: canary probe `intent-through-branch` runs `/sc:intent --through` on a small repo with a local remote and passes when main and the remote stay at baseline, a `feature/` branch carries the work, the record keeps the Done when line, the plan has a `Result:` line, the tests pass and the chain reached `/sc:reflect`. `--canary` runs it (4–7 min); `make canary-gates` does not.
+
 ## [4.32.2] - 2026-10-20
 
 ### Changed
