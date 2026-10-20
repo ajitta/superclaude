@@ -1,4 +1,4 @@
-branch: master @6d4d6ef6 (== origin/master == stable == v4.33.0); worktree clean (untracked .hermes/, .ignore belong to other sessions)
+branch: master @2664ba80 (== origin/master == stable == v4.33.1); worktree clean (untracked .hermes/, .ignore belong to other sessions)
 
 # Session 2026-10-20 — master (pressure-probe readout, eval-arm isolation, agent roster audit → 4.32.0)
 
@@ -56,3 +56,8 @@ branch: master @6d4d6ef6 (== origin/master == stable == v4.33.0); worktree clean
 - One prompt from intent to done: `--through` records the five lines verbatim, then runs brainstorm → spec review --audit-delegated → design → plan → implement --plan → branch review → test → reflect via Skill on `feature/<slug>`, committing each step; asks nothing (★ + delegated), never merges/pushes; Report step prints six evidence items.
 - Evidence: 15 headless sonnet runs (`docs/features/goal-chain/06-run-record.md`). A hand-written `/goal` template ended in only 2 of 4 runs: Claude Code's evaluator reads the whole goal text as the condition and imports the commands' own Approve steps. A judging paragraph fixed it (4/4). `--through` 4/4 bare and wrapped in `/goal`, all on the feature branch with main untouched.
 - Canary probe `intent-through-branch` (canary-only, not a gate), 8/8 once; mutation-checked (push → safety red, merge → scope red). README Workflows + Pages #commands show it.
+
+## --through verification (released as 4.33.1)
+- Six more runs (opus x2, a multi-module tags+CSV task on sonnet and opus, a Done when that asks for a push x2): all on feature/<slug>, main and remote at baseline, push requests left to the user (`docs/features/goal-chain/06b-verify-applied.md`).
+- Independent review (headless opus high, 06a): PASS WITH FIXES, 3 Important + 5 Minor, all applied: README /goal figure re-attributed; probe v2 reads the feature branch (mutation table 12 states); stop on existing intent / partial slug / existing branch; defaults for no-star questions; Branch/Run/Report steps; RULES_DOCS names the --through request as approval (core change -> make canary-gates 7/7, CANARY_OK=1). Probe v2 live 12/12.
+- Open: 04-design.md never leaves draft in the chain (framework-wide); release canary gate ignores command-body changes.
