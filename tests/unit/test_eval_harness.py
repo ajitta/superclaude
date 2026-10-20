@@ -1372,3 +1372,30 @@ def test_covers_names_shipped_commands():
             assert (commands / f"{name}.md").is_file(), (
                 f"{task['id']} covers unknown /sc:{name}"
             )
+
+
+def test_intent_through_ask_headless_probe_extends_the_branch_probe(tmp_path):
+    """Same checks as intent-through-branch, plus: no `confirmed` discovery row."""
+    tasks = {t["id"]: t for t in TASKS["tasks"]}
+    base, ask = tasks["intent-through-branch"], tasks["intent-through-ask-headless"]
+    assert ask["checks"][: len(base["checks"])] == base["checks"]
+    assert "--through --ask" in ask["prompt"]
+    extra = ask["checks"][len(base["checks"]) :]
+    assert [c["type"] for c in extra] == ["cmd_ok"]
+
+    run_eval, task, ws = _fixture_ws(tmp_path, "intent-through-ask-headless")
+    _through_state(ws, "correct")
+    discovery = ws / "docs" / "features" / "todo-due-dates" / "01-discovery.md"
+
+    def grade_extra(rows):
+        discovery.write_text("| D | Q | ★ | Choice | Mode |\n" + rows, encoding="utf-8")
+        subprocess.run(["git", "add", "-A"], cwd=ws, check=True)
+        subprocess.run(
+            ["git", "-c", "user.email=t@e", "-c", "user.name=t", "commit", "-qm", "d"],
+            cwd=ws,
+            check=True,
+        )
+        return run_eval._check_one(extra[0], "cmd_ok", ws, "", "")[0]
+
+    assert grade_extra("| D1 | due today? | no | no | delegated |\n")
+    assert not grade_extra("| D1 | due today? | no | yes | confirmed |\n")

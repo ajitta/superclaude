@@ -119,7 +119,10 @@ list holds it (`evals/changed_command_probes.py` picks them; `intent-through-bra
 covers the whole Large chain), and prints a line instead when no probe matches; a
 probe also counts for a command its `skill_called` check expects. The
 `intent-through-branch` probe checks the `overdue` command by exit code only, since
-its output format is the run's own choice. Read
+its output format is the run's own choice. `intent-through-ask-headless` runs the same
+task with `--ask` and adds one check: headless, no discovery decision may come out
+`confirmed`, so the run must not stop to wait for answers. The question form itself
+needs an interactive session and is checked by hand (`docs/features/goal-chain/06e`). Read
 its `report.md`, then release with `CANARY_OK=1`. The full `--canary`
 run keeps its original job, the model-release canary above, and is not part of
 the release gate. Inside a Claude Code session the temp dir sits under `~/.claude`,
