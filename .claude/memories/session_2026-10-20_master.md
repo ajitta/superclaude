@@ -1,4 +1,4 @@
-branch: master @0b7bd53b (== origin/master == stable == v4.32.0); worktree clean (untracked .hermes/, .ignore belong to other sessions)
+branch: master @48393c16 (== origin/master == stable == v4.32.1); worktree clean (untracked .hermes/, .ignore belong to other sessions)
 
 # Session 2026-10-20 — master (pressure-probe readout, eval-arm isolation, agent roster audit → 4.32.0)
 
@@ -39,3 +39,12 @@ branch: master @0b7bd53b (== origin/master == stable == v4.32.0); worktree clean
 - [ ] Pressure probes on opus / auto mode: on hold
 - [ ] `bugfix-scope-creep` (matrix task) still has the loose `pytest|python -m pytest` grader; align it when its comparability no longer matters
 - [ ] Carried over from 2026-10-19: S3 C-16/C-17 on hold; axis B at the next model; split `docs-ssot-audit/06-verify.md` before a sizable addition; opus N2/N5 round and the "open the referenced file" wording trial on hold; `origin/fix/plain-language-structure` kept; Windows `0xC0000409` → `git revert 3e64dc82`
+
+## Weakness audit → completion-proof (released as 4.32.1)
+- An external weakness analysis + ECC-compared plan (docs/research, renamed to convention) was audited against the source (`superclaude-weakness-audit-ajitta-2026-10-20.md`). Diagnosis mostly right, prescription too heavy: the 3-state lifecycle was rejected (phase never moves back; reflect is an ungated step). The audit was verified by headless opus high: PASS WITH FIXES, 19 findings applied.
+- Shipped: `/sc:implement --plan` closes a plan only after the Proof ran on the last code commit (`Result: <sha> — <output>` in a docs-only commit; a red re-run reopens the plan); a draft spec is always reviewed by the isolated reviewer with `00-intent.md` verbatim; decision-mode default (unclear → delegated, a label with a particle counts); README gates labelled model-followed; Large chain gains `/sc:review --scope branch`; `workflow_gates` updated.
+- Probes `implement-proof-fail`, `plan-draft-spec-gate` (prereg first): ceiling on sonnet low, 10/10 before and after; gate 10/10. After the verifier's F1 the `Result:` sha was right in 10/10 (before the fix: 3 of 8). Verifier on the branch: PASS WITH FIXES, 12 findings applied (`docs/features/completion-proof/06-verify.md`).
+- canary-gates 7/7 twice (CANARY_OK=1: RULES_DOCS lines), released v4.32.1.
+
+## Next actions (added)
+- [ ] Follow-ups of the weakness audit: `docs/plans/remaining-work-ajitta-2026-10-20.md` §4a (N4 effect probe, decision-mode probe, held RED clause, delete `origin/docs/superclaude-weakness-research` after the owner confirms)

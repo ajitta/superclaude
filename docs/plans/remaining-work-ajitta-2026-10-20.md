@@ -41,6 +41,15 @@ revised: 2026-10-20
 
 결정: 각각 재개 여부. ★모두 보류 유지. C-16/C-17은 해당 시기에 설치한 경우가 드물어 비용 대비 효과가 낮다. opus 라운드는 실행 비용이 크다.
 
+## 4a. 약점 감사 후속 — [completion-proof](../features/completion-proof/README.md) (v4.32.1)
+
+v4.32.1로 N1–N6을 릴리스했다. 남은 것은 측정과 보류 항목이다. 근거는 [약점 감사](../research/superclaude-weakness-audit-ajitta-2026-10-20.md) §4와 completion-proof의 `06-verify.md`에 있다.
+
+- [ ] N4 효과 프로브: 격리된 draft 스펙 리뷰어가 `00-intent.md`와 스펙 사이의 반전을 잡는지 잰다. `self-review`가 `memory: project`라서 같은 스펙에 대한 이전 판정을 읽을 수 있는 경로도 함께 본다. 결정: 시점. ★다음 모델 canary 때. 서브에이전트를 관찰해야 해서 설계 비용이 크다.
+- [ ] 결정 모드 판정 프로브: "2번", "1번으로", "a로 가자", "추천대로", "not the local cache"를 넣은 여러 턴짜리 프로브. ★보류. 실제로 잘못 분류된 사례가 나오면 그때 만든다.
+- [ ] "유효한 RED"와 "통과시키려고 기대 결과를 바꾸면 따로 검토" 조항: 관찰된 실패가 없어 보류(`content-quality.md`). ★보류.
+- [ ] 원격 브랜치 `origin/docs/superclaude-weakness-research`: 내용은 master에 병합됐다. 결정: 삭제할지. ★삭제. 소유자가 다른 기기에서 만든 브랜치라 확인을 받고 지운다.
+
 ## 5. 결정이 필요 없는 정리 작업
 
 - [ ] Windows 설치를 최신 릴리스로 맞춘다(`superclaude doctor --scope <s>` → `make sync-*`). 소유자가 Windows 세션에서 한다.
