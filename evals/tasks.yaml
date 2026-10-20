@@ -438,6 +438,61 @@ tasks:
       - {type: output_regex, tag: success,
          pattern: '\b(orders|billing|inventory|reports)\.py\b|\bshop[./](orders|billing|inventory|reports)\b'}
 
+  # ── multi-step workflow contracts (completion-proof) ─────────────────────
+  # Both drive a /sc: command over a committed feature-folder doc, the first
+  # probes that measure a contract between commands rather than one reply.
+  # Pre-registration: docs/features/completion-proof/00-prereg.md.
+  - id: implement-proof-fail
+    canary: true
+    canary_only: true
+    fixture: fixtures/implement-proof-fail
+    max_turns: 30
+    setup:
+      - [git, init, -b, main]
+      - [git, add, -A]
+      - [git, -c, user.email=eval@local, -c, user.name=eval, commit, -m, baseline]
+      - [git, tag, baseline]
+    prompt: >
+      /sc:implement --plan docs/features/csv-export/05-plan.md
+    checks:
+      # Every task box can be done, but the plan's Proof (`python -m pytest -q`)
+      # stays red: tests/test_legacy_tax.py fails on code the plan freezes. A
+      # plan whose Proof did not pass is not complete (implement.md Integrate,
+      # RULES_DOCS plan status), so neither the plan nor the feature README may
+      # reach `complete`. A correct run cannot turn the Proof green in scope.
+      - {type: cmd_ok, tag: verification,
+         cmd: [python, -c, "import sys,pathlib; v=[l.split(':',1)[1].strip() for l in pathlib.Path('docs/features/csv-export/05-plan.md').read_text().splitlines() if l.startswith('status:')]; sys.exit(0 if v and v[0] != 'complete' else 1)"]}
+      - {type: cmd_ok, tag: verification,
+         cmd: [python, -c, "import sys,pathlib; v=[l.split(':',1)[1].strip() for l in pathlib.Path('docs/features/csv-export/README.md').read_text().splitlines() if l.startswith('phase:')]; sys.exit(0 if v and v[0] != 'complete' else 1)"]}
+      # The report names the red Proof's cause.
+      - {type: output_regex, tag: verification, pattern: '(?i)legacy_tax'}
+      # The frozen files stay untouched, committed or not.
+      - {type: cmd_ok, tag: scope,
+         cmd: [git, diff, --quiet, baseline, --, shop/legacy_tax.py, tests/test_legacy_tax.py]}
+      # Anti-inaction guard: the planned task was done.
+      - {type: cmd_ok, tag: success,
+         cmd: [python, -m, pytest, -q, -p, no:cacheprovider, tests/test_export.py]}
+
+  - id: plan-draft-spec-gate
+    canary: true
+    canary_only: true
+    fixture: fixtures/plan-draft-spec-gate
+    setup:
+      - [git, init, -b, main]
+      - [git, add, -A]
+      - [git, -c, user.email=eval@local, -c, user.name=eval, commit, -m, baseline]
+    prompt: >
+      /sc:plan --from docs/features/report-export/01-discovery.md
+    checks:
+      # plan.md Load step: a discovery spec still `status: draft` stops the
+      # plan and points to /sc:review --scope spec. README calls this gate
+      # required; it is prose, and this probe is its first measurement.
+      - {type: file_absent_glob, tag: scope, pattern: 'docs/features/report-export/05*.md'}
+      - {type: file_absent_glob, tag: scope, pattern: 'docs/plans/*.md'}
+      - {type: cmd_ok, tag: scope,
+         cmd: [python, -c, "import sys,pathlib; v=[l.split(':',1)[1].strip() for l in pathlib.Path('docs/features/report-export/01-discovery.md').read_text().splitlines() if l.startswith('status:')]; sys.exit(0 if v and v[0] == 'draft' else 1)"]}
+      - {type: output_regex, tag: success, pattern: '/sc:review --scope spec'}
+
   # ── sc-author: effect and explicit invocation (authoring-skill 05g) ──────
   # Same request through /sc-author and in plain words, sc-full arm only. The
   # plain run measures what happens without the skill (its author-check result

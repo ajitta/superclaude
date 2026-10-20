@@ -12,7 +12,7 @@ description: Review a work product (code, plan, design, spec) for quality, corre
 
   <flow>
   1. Scope: pick review range — PR/diff/file/branch for code, or plan/design/spec doc path
-  2. Gather: read target artifact + related context (spec/plan if reviewing code; parent spec if reviewing plan; requirements if reviewing design; `00-intent.md` from the feature folder when present). Find in docs/specs/ or docs/plans/ if present
+  2. Gather: read target artifact + related context (spec/plan if reviewing code; parent spec if reviewing plan; requirements if reviewing design; `00-intent.md` from the feature folder when present). Find in docs/specs/ or docs/plans/ if present. A `status: draft` spec goes to the isolated reviewer (the Agent entry in the tools section) with the feature folder's `00-intent.md` verbatim among its acceptance criteria, so the reviewer checks the spec against the requester's own words and not only against the spec's own reading of them; a spec with no feature folder goes without it
   3. Review: Dim 1 (spec fidelity) — does the artifact match the intent (the spec, and the feature's `00-intent.md` when present)? Dim 2 (artifact quality) — correctness for code, planning rigor for plan, architectural soundness for design, requirement coverage for spec. Dim 3 (always-loaded docs) — did the change make CLAUDE.md, AGENTS.md, `.claude/rules/**` or any file the session-start import chain pulls in stale (a command, path, count or convention they state)? Report as a finding. With no spec, shift the weight to Dim 2
   4. Challenge: before categorizing, answer in plain words — Under what condition does the approach fail? What gap is easy to miss? What will be hardest to change 6 months from now?
   5. Categorize: group each finding as Critical (must fix) | Important (should fix) | Suggestion (nice to have)
@@ -24,7 +24,7 @@ description: Review a work product (code, plan, design, spec) for quality, corre
 
   <flags>
   - --scope pr|diff|file|branch|plan|design|spec: command-local artifact-type selector, unrelated to the global --scope analysis-boundary enum (file|module|project|system).
-  - --structured: isolated reviewer subagent dispatch, per the Agent entry in the tools section.
+  - --structured: isolated reviewer subagent dispatch, per the Agent entry in the tools section; a `status: draft` spec is always reviewed this way, flag or not.
   - --audit-delegated: delegated-decision audit, per the Delegated-decision audit step.
   </flags>
 
@@ -38,7 +38,7 @@ description: Review a work product (code, plan, design, spec) for quality, corre
 
 
   <tools>
-  - Agent: dispatch isolated reviewer subagent for big review (--structured) and for the --audit-delegated re-eval (the Delegated-decision audit step); Read the delegate packet rule in core/rules/RULES_DELEGATION.md before dispatch, since it sets what the reviewer's prompt leaves out
+  - Agent: dispatch isolated reviewer subagent for big review (--structured), for every `status: draft` spec (the Gather step) and for the --audit-delegated re-eval (the Delegated-decision audit step); Read the delegate packet rule in core/rules/RULES_DELEGATION.md before dispatch, since it sets what the reviewer's prompt leaves out
   </tools>
 
   <review_lens>

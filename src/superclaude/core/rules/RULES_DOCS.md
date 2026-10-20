@@ -55,7 +55,7 @@ Frontmatter rules:
   Feature README: {feature, phase, owner, created, updated, related?}. Phase enum: intent | discovery | design | planning | implementing | complete | abandoned
   Phase doc (inside feature folder): {status, revised} — new docs start `status: draft` (00-intent: `approved-for-plan`, written only after its Approve step), `revised: <today>`
   Standalone specs/+plans/: {status, revised}
-  Plan docs (feature or standalone): `status: complete` only when every task checkbox is checked (a task dropped by decision: `- [x] ~~task~~`); departures from the plan, drops included, go under `## Deviations` in the same commit as the code that departed
+  Plan docs (feature or standalone): `status: complete` only when every task checkbox is checked (a task dropped by decision: `- [x] ~~task~~`) and, for the plan (index), its `## Proof` footer carries a `Result:` line naming the last commit that changed code, from a green run or with the user's recorded acceptance (/sc:implement Integrate step); departures from the plan, drops included, go under `## Deviations` in the same commit as the code that departed
   Standalone research/+analysis/: optional {status, revised}
   Reports/ADRs: none
 Status enum (per-doc): draft | review | approved-for-plan | implementing | complete | deprecated
@@ -82,7 +82,7 @@ Examples:
     /sc:design -> /sc:roadmap: Alternative path when input is a PRD/feature doc rather than a design spec
     /sc:plan -> /sc:implement --plan: Plan document committed to repo
     /sc:roadmap -> /sc:implement: Roadmap tasks defined; implementation proceeds per task list
-    /sc:implement -> /sc:test: Implementation complete; plan doc checkboxes and its Deviations section match the code
+    /sc:implement -> /sc:review --scope branch (Large; optional for Medium) | /sc:test: plan doc checkboxes and its Deviations section match the code; the Proof ran on the last code commit (`Result:` line)
     /sc:test -> done: Test pass evidence required (actual output, not claims)
   </workflow_gates>
 </component>

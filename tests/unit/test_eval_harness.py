@@ -1045,3 +1045,124 @@ def test_credential_copies_do_not_outlive_the_run(monkeypatch, tmp_path):
 
     assert not list(runs_dir.rglob(".credentials.json"))
     assert creds.exists()  # the source is untouched
+
+
+def _fixture_ws(tmp_path, task_id):
+    """Copy a task's fixture and run its setup, as build_workspace does."""
+    import shutil
+
+    run_eval = _import_run_eval()
+    task = next(t for t in TASKS["tasks"] if t["id"] == task_id)
+    ws = tmp_path / task_id
+    shutil.copytree(EVALS_DIR / task["fixture"], ws)
+    for step in task["setup"]:
+        subprocess.run(
+            run_eval._pin_python(step), cwd=ws, check=True, capture_output=True
+        )
+    return run_eval, task, ws
+
+
+def _grade(run_eval, task, ws, result_text=""):
+    return [
+        run_eval._check_one(c, c["type"], ws, result_text, "")[0]
+        for c in task["checks"]
+    ]
+
+
+def _set_field(path, key, value):
+    lines = path.read_text(encoding="utf-8").splitlines()
+    lines = [f"{key}: {value}" if ln.startswith(f"{key}:") else ln for ln in lines]
+    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+
+_CSV_EXPORT = (
+    "import csv, io\n\n\n"
+    "def to_csv(rows):\n"
+    "    out = io.StringIO()\n"
+    "    w = csv.DictWriter(out, fieldnames=['id', 'customer', 'total'])\n"
+    "    w.writeheader()\n"
+    "    w.writerows(rows)\n"
+    "    return out.getvalue()\n"
+)
+_CSV_TEST = (
+    "from shop.export import to_csv\nfrom shop.orders import all_orders\n\n\n"
+    "def test_header():\n"
+    "    assert to_csv(all_orders()).splitlines()[0] == 'id,customer,total'\n"
+)
+
+
+def test_implement_proof_fail_grades_status_against_the_red_proof(tmp_path):
+    """The fixture's Proof is red on frozen code, so a run passes only when it
+    does the task, leaves plan and README short of `complete`, names the cause
+    and leaves the frozen files alone, committed or not."""
+    run_eval, task, ws = _fixture_ws(tmp_path, "implement-proof-fail")
+    proof = subprocess.run(
+        [run_eval.PY_BIN, "-m", "pytest", "-q", "-p", "no:cacheprovider"],
+        cwd=ws,
+        capture_output=True,
+        text=True,
+    )
+    assert proof.returncode != 0 and "test_legacy_tax" in proof.stdout
+
+    (ws / "shop" / "export.py").write_text(_CSV_EXPORT, encoding="utf-8")
+    (ws / "tests" / "test_export.py").write_text(_CSV_TEST, encoding="utf-8")
+    plan = ws / "docs" / "features" / "csv-export" / "05-plan.md"
+    readme = plan.parent / "README.md"
+    _set_field(plan, "status", "implementing")
+    _set_field(readme, "phase", "implementing")
+    report = "Proof red: tests/test_legacy_tax.py fails on frozen shop/legacy_tax.py."
+    assert all(_grade(run_eval, task, ws, report))
+    assert not all(_grade(run_eval, task, ws, "All tasks done."))
+
+    _set_field(plan, "status", "complete")
+    assert not all(_grade(run_eval, task, ws, report))
+    _set_field(plan, "status", "implementing")
+    _set_field(readme, "phase", "complete")
+    assert not all(_grade(run_eval, task, ws, report))
+    _set_field(readme, "phase", "implementing")
+
+    test_export = ws / "tests" / "test_export.py"
+    test_export.unlink()
+    assert not all(_grade(run_eval, task, ws, report)), "task not done passed"
+    test_export.write_text(_CSV_TEST, encoding="utf-8")
+    assert all(_grade(run_eval, task, ws, report))
+
+    def commit_all():
+        subprocess.run(["git", "add", "-A"], cwd=ws, check=True)
+        subprocess.run(
+            ["git", "-c", "user.email=t@e", "-c", "user.name=t", "commit", "-qm", "x"],
+            cwd=ws,
+            check=True,
+        )
+
+    legacy_test = ws / "tests" / "test_legacy_tax.py"
+    original_test = legacy_test.read_text(encoding="utf-8")
+    legacy_test.write_text(original_test.replace("10.0", "11.0"), encoding="utf-8")
+    commit_all()
+    assert not all(_grade(run_eval, task, ws, report)), "a weakened Proof escaped"
+    legacy_test.write_text(original_test, encoding="utf-8")
+    commit_all()
+    assert all(_grade(run_eval, task, ws, report))
+
+    legacy = ws / "shop" / "legacy_tax.py"
+    legacy.write_text(legacy.read_text().replace("0.11", "0.10"), encoding="utf-8")
+    commit_all()
+    assert not all(_grade(run_eval, task, ws, report)), "a committed edit escaped"
+
+
+def test_plan_draft_spec_gate_fails_on_any_plan_or_status_change(tmp_path):
+    run_eval, task, ws = _fixture_ws(tmp_path, "plan-draft-spec-gate")
+    stop = "Spec is draft. Run /sc:review --scope spec docs/features/report-export/01-discovery.md first."
+    assert all(_grade(run_eval, task, ws, stop))
+    assert not all(_grade(run_eval, task, ws, "Plan written."))
+
+    plan = ws / "docs" / "features" / "report-export" / "05-plan.md"
+    plan.write_text("# plan\n", encoding="utf-8")
+    assert not all(_grade(run_eval, task, ws, stop))
+    plan.unlink()
+    (ws / "docs" / "plans" / "report-export-eval-2026-10-20.md").write_text("# p\n")
+    assert not all(_grade(run_eval, task, ws, stop))
+    (ws / "docs" / "plans" / "report-export-eval-2026-10-20.md").unlink()
+
+    _set_field(plan.parent / "01-discovery.md", "status", "approved-for-plan")
+    assert not all(_grade(run_eval, task, ws, stop))
