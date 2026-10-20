@@ -8,6 +8,8 @@ Releases before 4.19.0 are not listed. Their history is the git log; the upstrea
 
 ## [Unreleased]
 
+## [4.32.1] - 2026-10-20
+
 ### Changed
 
 - `/sc:implement --plan` closes a plan only after running the command in the plan's `## Proof` footer. It commits the code, runs the Proof on that commit, and records `Result: <sha> — <output>` under the footer in a docs-only commit. A red or unrunnable Proof is recorded the same way and keeps the plan at `status: implementing` until you accept it. A later code change, for example a fix from the code review, runs the Proof again; a red re-run sets the plan back to `implementing`. Before this, every task box checked was enough for `status: complete` and the feature README's `phase: complete`, even when the check the plan itself named as proof had never run. `RULES_DOCS.md` states the same condition for plan docs.
