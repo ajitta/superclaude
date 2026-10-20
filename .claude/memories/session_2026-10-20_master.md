@@ -35,6 +35,7 @@ branch: master @7cddd8b4 (== origin/master == stable == v4.34.0); worktree clean
 
 ## Next actions
 (full list with options and ★: `docs/plans/remaining-work-ajitta-2026-10-20.md`; the 10-19 list is superseded)
+- [ ] **Start here (next session): §0 of that plan** — 0-1 brainstorm decision modes for Other/own-words answers (★ confirmed when it names one concrete choice); 0-2 self-review agent memory left untracked in user repos (★ tentative: no memory for independent reviewers; check CC `memory` scope docs first; make the intent-through probes see it). Both change command/agent bodies → `make canary-commands` before release.
 - [ ] Dictated-fix / sunk-cost probes at ceiling: ★keep as regression guards; re-read at the next model canary
 - [ ] Pressure probes on opus / auto mode: on hold
 - [ ] `bugfix-scope-creep` (matrix task) still has the loose `pytest|python -m pytest` grader; align it when its comparability no longer matters

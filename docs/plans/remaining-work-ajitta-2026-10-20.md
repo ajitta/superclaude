@@ -3,7 +3,7 @@ status: draft
 revised: 2026-10-20
 ---
 
-# 남은 작업 (2026-10-20, v4.32.0 이후)
+# 남은 작업 (2026-10-20, v4.34.0 이후)
 
 2026-10-19–20에 작업 세 갈래를 마쳤다.
 - 설치·업그레이드 감사와 Windows 실기 검증: v4.30.5까지 릴리스.
@@ -11,9 +11,34 @@ revised: 2026-10-20
 - 압박 프로브 측정: hurry 프로브에서 sc-full 30/30 vs vanilla 20/30, p = 0.0004. 이때 eval arm 격리 결함 두 개를 찾아 고쳤다.
 - 에이전트 감사: 24개 중 19개 폐기, 5개 유지(v4.32.0, [agent-roster-audit](../features/agent-roster-audit/README.md)).
 
-지금 바로 할 승인된 작업은 없다. 남은 것은 다음 릴리스에 함께 나갈 변경, 다음 모델이 나올 때 할 일, 보류 항목, 정리 작업이다. 지난 목록은 [remaining-work-ajitta-2026-10-19](./remaining-work-ajitta-2026-10-19.md)이고, 이 문서가 그것을 대체한다.
+그 뒤 같은 날 v4.32.2–v4.34.0을 릴리스했다: `/sc:intent`의 `Done when:` 줄, `--through`(의도 한 줄로 체인 끝까지), 독립 검증 세 번과 반영, `/sc:plan`의 design 승인, command 본문 릴리스 게이트(`make canary-commands`), `--through --ask`(결과를 좌우하는 결정만 한 번 묻기). 기록은 [goal-chain](../features/goal-chain/README.md) 06–06g에 있다.
+
+다음 세션이 바로 할 일은 0절의 두 항목이다. 둘 다 소유자 결정이 필요하다. 남은 것은 다음 릴리스에 함께 나갈 변경, 다음 모델이 나올 때 할 일, 보류 항목, 정리 작업이다. 지난 목록은 [remaining-work-ajitta-2026-10-19](./remaining-work-ajitta-2026-10-19.md)이고, 이 문서가 그것을 대체한다.
 
 항목마다 소유자 결정이 필요한지와 추천안(★)을 적는다. 세션 상태는 `.claude/memories/session_2026-10-20_master.md`의 Next actions에 같은 목록이 짧게 있다.
+
+## 0. 다음 세션에서 진행할 것 — goal-chain 후속
+
+시작: `cd ~/superclaude && git fetch origin && git checkout master && git merge --ff-only origin/master`, 그다음 [goal-chain 06g](../features/goal-chain/06g-ask-review-applied.md)와 [06e](../features/goal-chain/06e-ask-checkpoint.md)의 Limits를 읽는다. 두 항목 모두 command·agent 본문을 바꾸므로 릴리스 전에 `make canary-commands`를 돌린다(4.33.2부터 게이트가 요구한다).
+
+### 0-1. brainstorm 결정 모드: 선택지 밖의 직접 답(Other)
+
+- [ ] 현상: `--ask` 체크포인트는 "답이면 Other 텍스트도 `confirmed`"로 정했다(`commands/intent.md` Checkpoint 단계). 그런데 `/sc:brainstorm`의 `<decision_modes>`(`commands/brainstorm.md`)에는 Other나 자기 말로 쓴 답에 대한 규칙이 없다. 라벨도 라벨 단어도 아니면 "When neither rule clearly applies, tag delegated"로 떨어진다. 사용자가 직접 새 선택지를 말해도 `delegated`로 기록되고, `--audit-delegated` 감사가 그 행을 모델끼리 다시 정한다. 사용자의 말이 모델 판단으로 덮일 수 있다는 뜻이다. 근거: [06f](../features/goal-chain/06f-verify-ask.md) 발견 3과 "이 브랜치 밖의 메모", run 24의 `D3 기타: …` 답(06e).
+- 결정: 규칙.
+  - ★(a) 하나의 구체적인 선택을 말하는 Other/자기 말 답은 `confirmed`로 두고, 그 텍스트를 선택지로 기록한다. 질문·망설임·조건부("잘 모르겠는데 아마 b?")는 `delegated`.
+  - (b) 항상 `delegated`로 두고 감사에 맡긴다. 단순하지만 위의 덮어쓰기 문제가 남는다.
+  - (c) 새 선택지로 받아 적은 뒤 한 번 더 확인 질문을 한다. 정확하지만 왕복이 하나 늘어난다.
+- 작업(★a일 때): `brainstorm.md` `<decision_modes>`의 confirmed 정의에 한 줄을 더한다. intent Checkpoint의 "even where the /sc:brainstorm Decision-mode tag step would say delegated" 예외가 필요 없어지면 그 구절도 정리한다. 보류 중인 "결정 모드 판정 프로브"(4a절)에 Other 사례를 넣을지 함께 정한다. `uv run pytest tests/unit/test_command_structure.py`, 전체 suite, `make canary-commands`.
+
+### 0-2. self-review 에이전트의 메모리 폴더가 사용자 저장소에 남는다
+
+- [ ] 현상: run 28(opus, 06e)에서 branch review를 맡은 `self-review` 에이전트가 `.claude/agent-memory/self-review/review_patterns.md`를 썼다. 이 폴더는 커밋되지 않은 채 남았고, `--through`는 지우지 않고 사용자에게 물었다(삭제는 확인 규칙에 맞는 행동이다). 원인: 에이전트 소스는 모두 `memory: project`이고, project 설치에서는 `.claude/agent-memory/<agent>/`에 쓴다(`.claude/rules/agent-authoring.md` § memory). canary 작업공간은 `WS_GITIGNORE`(`evals/run_eval.py`)가 이 경로를 무시하므로, 새 clean-tree 검사도 이 경우를 보지 못한다.
+- 관련: 4a절 N4 항목이 이미 "`self-review`가 `memory: project`라서 같은 스펙에 대한 이전 판정을 읽을 수 있다"를 독립성 위험으로 적어 두었다.
+- 결정: 처리 방식. 시작 전에 현재 Claude Code 문서에서 `memory` 범위(user/project/local)와 local 범위가 git에서 어떻게 다뤄지는지 확인한다.
+  - ★(a, 잠정) `self-review`(와 `verifier`)는 독립 검토자이므로 이전 판정을 기억하지 않게 한다. superclaude는 `memory` 필드를 필수로 요구하므로(`agent-authoring.md`) 규칙과 installer의 `_rewrite_agent_memory_scope`도 함께 바꿔야 한다.
+  - (b) project 설치에서도 검토 에이전트만 `memory: local`로 둔다. 폴더가 `.claude/agent-memory-local/`로 바뀌므로 git에서의 처리를 문서로 먼저 확인한다.
+  - (c) 동작은 그대로 두고, `--through`의 Run 단계가 메모리 쓰기를 해당 단계 커밋에 포함하게 한다. CC 설계상 project 메모리는 공유용이지만 feature diff에 무관한 파일이 섞인다.
+- 함께 할 일: 어떤 안이든 probe가 이 경우를 보게 한다. 예: `intent-through-*` probe의 clean-tree 검사가 `.claude/agent-memory/`를 무시하지 않도록 하거나, 별도 검사를 둔다.
 
 ## 1. 다음 릴리스에 함께 나갈 것 — 완료
 
