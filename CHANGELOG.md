@@ -8,6 +8,10 @@ Releases before 4.19.0 are not listed. Their history is the git log; the upstrea
 
 ## [Unreleased]
 
+### Changed
+
+- `/sc:intent` records a completion signal you state (how you will know it worked) as a quoted `Done when:` line under Proposed outcome. It is never inferred and never asked for, so the record stays in your words; without one the line is left out. `/sc:reflect` compares the delivery against that line when it is present, not only against the Proposed outcome prose.
+
 ## [4.32.1] - 2026-10-20
 
 ### Changed
