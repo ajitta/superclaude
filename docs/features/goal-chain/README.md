@@ -20,3 +20,4 @@ Can a user type only the intent and have the whole Large chain (`/sc:intent` →
 - [06d-followups-applied.md](./06d-followups-applied.md): the interactive run, the design-status and release-gate changes, and each second-review finding with what changed
 - [06e-ask-checkpoint.md](./06e-ask-checkpoint.md): `--through --ask`: why one checkpoint, what it does, four runs (two interactive with answers against ★, two headless)
 - [06f-verify-ask.md](./06f-verify-ask.md): independent verification of `--through --ask` (Korean): gates, one headless fallback run, the 06e numbers against the record, findings
+- [06g-ask-review-applied.md](./06g-ask-review-applied.md): each finding of the third review (06f) with what changed, and the new `intent-through-ask-headless` probe

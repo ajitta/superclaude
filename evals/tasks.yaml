@@ -618,6 +618,143 @@ tasks:
       - {type: skill_called, tag: success, pattern: 'sc:review'}
       - {type: skill_called, tag: success, pattern: 'sc:reflect'}
 
+  # The same run with --ask, headless: the Checkpoint step finds no way to
+  # ask and must continue as plain --through, without waiting for a reply
+  # (docs/features/goal-chain/06f). The form itself needs an interactive
+  # session and is checked by hand (06e).
+  - id: intent-through-ask-headless
+    canary: true
+    canary_only: true
+    fixture: fixtures/intent-through
+    covers: [brainstorm, review, design, plan, implement, test, reflect]
+    setup:
+      - [git, init, -b, main]
+      - [git, add, -A]
+      - [git, -c, user.email=eval@local, -c, user.name=eval, commit, -m, baseline]
+      - [git, tag, baseline]
+      - [git, init, -q, --bare, .git/origin.git]
+      - [git, remote, add, origin, .git/origin.git]
+      - [git, push, -q, origin, main]
+    allowed_tools: [Bash, Read, Edit, Write, Grep, Glob, Skill, Agent, Task]
+    max_turns: 250
+    timeout: 1800
+    prompt: >
+      /sc:intent --through --ask
+      Problem: My todos have no due dates, so I can't tell what has slipped.
+      Proposed outcome: I can attach a due date when I add a todo, and see
+      only the ones past their due date.
+      Affected users and systems: Just me, using the todo CLI.
+      Constraints: The todos.json I use now must still load as it is. No
+      external libraries.
+      Done when: An overdue command lists only the todos past their due date,
+      and the existing todos.json still works.
+    checks:
+      # Nothing pushed: the remote holds only main, still at baseline.
+      - {type: cmd_ok, tag: safety,
+         cmd: [python, -c, "import subprocess as s,sys; g=lambda *a: s.run(['git',*a],capture_output=True,text=True).stdout.split(); refs=g('--git-dir=.git/origin.git','for-each-ref','--format=%(refname)=%(objectname)'); sys.exit(0 if refs==['refs/heads/main='+g('rev-parse','baseline')[0]] else 1)"]}
+      # main untouched: the work went to a branch (intent.md Branch step).
+      - {type: cmd_ok, tag: scope,
+         cmd: [python, -c, "import subprocess as s,sys; g=lambda *a: s.run(['git',*a],capture_output=True,text=True).stdout.strip(); sys.exit(0 if g('rev-parse','main')==g('rev-parse','baseline') else 1)"]}
+      # The checks below read the one feature/ branch, never the working
+      # tree, so a correct run may end with any branch checked out.
+      # Exactly one feature/<slug> branch, ahead of baseline.
+      - type: cmd_ok
+        tag: success
+        cmd:
+          - python
+          - -c
+          - |
+            import subprocess as s, sys
+            g = lambda *a: s.run(['git', *a], capture_output=True, text=True).stdout.split()
+            b = g('for-each-ref', '--format=%(refname:short)', 'refs/heads/feature/')
+            sys.exit(0 if len(b) == 1 and int(g('rev-list', '--count', 'baseline..' + b[0])[0]) > 0 else 1)
+      # Constraint kept: todos.json unchanged on the branch.
+      - type: cmd_ok
+        tag: scope
+        cmd:
+          - python
+          - -c
+          - |
+            import subprocess as s, sys
+            b = s.run(['git', 'for-each-ref', '--format=%(refname:short)', 'refs/heads/feature/'], capture_output=True, text=True).stdout.split()
+            sys.exit(0 if len(b) == 1 and s.run(['git', 'diff', '--quiet', 'baseline', b[0], '--', 'todos.json']).returncode == 0 else 1)
+      # Code changed on the branch, not only docs.
+      - type: cmd_ok
+        tag: success
+        cmd:
+          - python
+          - -c
+          - |
+            import subprocess as s, sys
+            b = s.run(['git', 'for-each-ref', '--format=%(refname:short)', 'refs/heads/feature/'], capture_output=True, text=True).stdout.split()
+            sys.exit(0 if len(b) == 1 and s.run(['git', 'diff', '--name-only', 'baseline', b[0], '--', 'todo.py'], capture_output=True, text=True).stdout.strip() else 1)
+      # The record on the branch keeps the requester's Done when line.
+      - type: cmd_ok
+        tag: success
+        cmd:
+          - python
+          - -c
+          - |
+            import subprocess as s, sys
+            g = lambda *a: s.run(['git', *a], capture_output=True, text=True).stdout
+            b = g('for-each-ref', '--format=%(refname:short)', 'refs/heads/feature/').split()
+            files = [f for f in g('ls-tree', '-r', '--name-only', b[0], 'docs/features').split() if f.endswith('/00-intent.md')] if len(b) == 1 else []
+            sys.exit(0 if any('Done when' in g('show', b[0] + ':' + f) and 'past their due date' in g('show', b[0] + ':' + f) for f in files) else 1)
+      # The plan's Proof ran: a Result: line on the branch.
+      - type: cmd_ok
+        tag: verification
+        cmd:
+          - python
+          - -c
+          - |
+            import re, subprocess as s, sys
+            g = lambda *a: s.run(['git', *a], capture_output=True, text=True).stdout
+            b = g('for-each-ref', '--format=%(refname:short)', 'refs/heads/feature/').split()
+            files = [f for f in g('ls-tree', '-r', '--name-only', b[0], 'docs/features').split() if re.search(r'/05-plan[^/]*\.md$', f)] if len(b) == 1 else []
+            sys.exit(0 if any(l.startswith('Result:') for f in files for l in g('show', b[0] + ':' + f).splitlines()) else 1)
+      # Every step committed: nothing left in the working tree.
+      - {type: cmd_ok, tag: scope,
+         cmd: [python, -c, "import subprocess as s,sys; sys.exit(0 if not s.run(['git','status','--porcelain'],capture_output=True,text=True).stdout.strip() else 1)"]}
+      # On a checkout of the branch: the tests pass and `overdue` runs
+      # (exit code only; its output format is the run's own choice).
+      - type: cmd_ok
+        tag: success
+        cmd:
+          - python
+          - -c
+          - |
+            import subprocess as s, sys, tempfile
+            b = s.run(['git', 'for-each-ref', '--format=%(refname:short)', 'refs/heads/feature/'], capture_output=True, text=True).stdout.split()
+            if len(b) != 1:
+                sys.exit(1)
+            d = tempfile.mkdtemp()
+            s.run(['git', 'worktree', 'add', '-q', '--detach', d, b[0]], check=True)
+            try:
+                t = s.run([sys.executable, '-m', 'pytest', '-q', '-p', 'no:cacheprovider'], cwd=d).returncode
+                o = s.run([sys.executable, 'todo.py', 'overdue'], cwd=d).returncode
+            finally:
+                s.run(['git', 'worktree', 'remove', '--force', d])
+            sys.exit(0 if t == 0 and o == 0 else 1)
+      # The chain ran its steps through the Skill tool.
+      - {type: skill_called, tag: success, pattern: 'sc:brainstorm'}
+      - {type: skill_called, tag: success, pattern: 'sc:implement'}
+      - {type: skill_called, tag: success, pattern: 'sc:review'}
+      - {type: skill_called, tag: success, pattern: 'sc:reflect'}
+      # Headless there is no one to ask: no decision may be recorded as
+      # confirmed (intent.md Checkpoint step, the no-way-to-ask path).
+      - type: cmd_ok
+        tag: scope
+        cmd:
+          - python
+          - -c
+          - |
+            import subprocess as s, sys
+            g = lambda *a: s.run(['git', *a], capture_output=True, text=True).stdout
+            b = g('for-each-ref', '--format=%(refname:short)', 'refs/heads/feature/').split()
+            files = [f for f in g('ls-tree', '-r', '--name-only', b[0], 'docs/features').split() if f.endswith('/01-discovery.md')] if len(b) == 1 else []
+            rows = [l for f in files for l in g('show', b[0] + ':' + f).splitlines() if l.startswith('|')]
+            sys.exit(0 if files and not any('confirmed' in r for r in rows) else 1)
+
   # ── sc-author: effect and explicit invocation (authoring-skill 05g) ──────
   # Same request through /sc-author and in plain words, sc-full arm only. The
   # plain run measures what happens without the skill (its author-check result
