@@ -301,8 +301,8 @@ The framework's value comes from chaining commands. Each chain has gates: the co
 
 ```text
 /sc:intent   →   /sc:brainstorm   →   /sc:review --scope spec   →   /sc:design   →   /sc:plan   →   /sc:implement --plan   →   /sc:review --scope branch   →   /sc:test   →   /sc:reflect
-   capture          discover           specify          gate              decompose       build (TDD)                 code review                   verify        learn
-   (own words)      (Socratic)         (architecture)   (multi-lens)      (phases)        (per task)                  (spec + quality)              (baseline)    (capture)
+   capture          discover           gate             specify           decompose       build (TDD)                 code review                   verify        learn
+   (own words)      (Socratic)         (multi-lens)     (architecture)    (phases)        (per task)                  (spec + quality)              (baseline)    (capture)
 ```
 
 | Step | Output | Required before next step (model-followed) |
@@ -312,8 +312,8 @@ The framework's value comes from chaining commands. Each chain has gates: the co
 | `/sc:design` | `docs/features/<slug>/04-design.md` (one-off: `docs/specs/…-design-…md`) | Design committed (components pass the [R18] necessity test; Areas of concern resolved) |
 | `/sc:review` | Multi-dimensional review of design/plan | Required — the `/sc:plan` Load step stops on a spec still `status: draft`, which only this review clears; a draft spec is always reviewed by an isolated reviewer that gets `00-intent.md` verbatim |
 | `/sc:plan` | `docs/features/<slug>/05-plan.md` (one-off: `docs/plans/…md`) — phased TDD tasks, file paths, verify cmds | Plan committed |
-| `/sc:implement --plan` | Code + per-phase commits | Plan checkboxes and Deviations match the code; the plan's Proof ran at the current commit (`Result:` line) |
-| `/sc:review --scope branch` | Code review against the spec and `00-intent.md`, plus stale always-loaded docs | Critical findings fixed; a fix after the `Result:` commit re-runs the Proof |
+| `/sc:implement --plan` | Code + per-phase commits | Plan checkboxes and Deviations match the code; the plan's Proof ran on the last code commit (`Result:` line) |
+| `/sc:review --scope branch` | Code review against the spec and `00-intent.md`, plus stale always-loaded docs | Critical findings fixed; a code change after the `Result:` sha re-runs the Proof |
 | `/sc:test` | Test pass evidence (`42/42 pass, baseline 40`) | Real output, not predictions |
 | `/sc:reflect` | Retrospective; `/sc:insight` captures insights to `.claude/insights.jsonl` | — |
 

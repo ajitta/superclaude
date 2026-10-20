@@ -1,13 +1,11 @@
 ---
-feature: completion-proof
-phase: pre-registration
-status: frozen
-created: 2026-10-20
+status: complete
+revised: 2026-10-20
 ---
 
 # 00. Pre-registration — implement-proof-fail and plan-draft-spec-gate
 
-Written and committed before any run of either probe, smoke runs included.
+Frozen: written and committed before any run of either probe, smoke runs included. Only the frontmatter changed afterwards, to the phase-doc schema (verification F12).
 
 ## Questions
 

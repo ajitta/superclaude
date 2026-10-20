@@ -34,7 +34,7 @@ description: Interactive requirements discovery through Socratic dialogue + syst
   <decision_modes>
   For each user-decided question Qi, record mode in spec's "Resolved Decisions" table as confirmed or delegated.
 
-  - confirmed: the reply picks one option by its label, alone or bracketed (`b`, `[b]`, `2`, `[2]`), OR by ≥2 contiguous words of its label text. A label letter inside a sentence ("I need a minute", "b looks risky") picks nothing.
+  - confirmed: the reply points at one option: its label alone, bracketed, or with a choice word or particle attached in any language (`b`, `[2]`, "go with b", "select: 2"), OR ≥2 contiguous words of its label text used to choose it. A label or label words in a rejecting, evaluating or unrelated context ("not the local cache", "b looks risky", "I need a minute") picks nothing.
   - delegated: bare "yes", "proceed", "looks good", or silent accept of ★. When neither rule clearly applies, tag delegated: the audit then covers the row.
 
   When ≥1 decision delegated, /sc:review handoff (the Handoff step) adds the literal phrase "mandatory: N delegated decisions need independent audit" (N = count of delegated decisions).

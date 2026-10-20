@@ -1121,14 +1121,32 @@ def test_implement_proof_fail_grades_status_against_the_red_proof(tmp_path):
     assert not all(_grade(run_eval, task, ws, report))
     _set_field(readme, "phase", "implementing")
 
+    test_export = ws / "tests" / "test_export.py"
+    test_export.unlink()
+    assert not all(_grade(run_eval, task, ws, report)), "task not done passed"
+    test_export.write_text(_CSV_TEST, encoding="utf-8")
+    assert all(_grade(run_eval, task, ws, report))
+
+    def commit_all():
+        subprocess.run(["git", "add", "-A"], cwd=ws, check=True)
+        subprocess.run(
+            ["git", "-c", "user.email=t@e", "-c", "user.name=t", "commit", "-qm", "x"],
+            cwd=ws,
+            check=True,
+        )
+
+    legacy_test = ws / "tests" / "test_legacy_tax.py"
+    original_test = legacy_test.read_text(encoding="utf-8")
+    legacy_test.write_text(original_test.replace("10.0", "11.0"), encoding="utf-8")
+    commit_all()
+    assert not all(_grade(run_eval, task, ws, report)), "a weakened Proof escaped"
+    legacy_test.write_text(original_test, encoding="utf-8")
+    commit_all()
+    assert all(_grade(run_eval, task, ws, report))
+
     legacy = ws / "shop" / "legacy_tax.py"
     legacy.write_text(legacy.read_text().replace("0.11", "0.10"), encoding="utf-8")
-    subprocess.run(["git", "add", "-A"], cwd=ws, check=True)
-    subprocess.run(
-        ["git", "-c", "user.email=t@e", "-c", "user.name=t", "commit", "-qm", "x"],
-        cwd=ws,
-        check=True,
-    )
+    commit_all()
     assert not all(_grade(run_eval, task, ws, report)), "a committed edit escaped"
 
 
