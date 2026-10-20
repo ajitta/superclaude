@@ -1,5 +1,5 @@
 # Project Gotchas — General
-# Last reviewed: 2026-10-15
+# Last reviewed: 2026-10-20
 # Always loaded: one line per trap Claude repeated in this repo. Entries are proposed by [R19 Project Gotcha Capture] or added by hand.
 
 - context-leak: Never Read a sub-agent's `*.output` file — tool noise floods the main context. Judge the summary against the check written before dispatch, not its confidence; re-read every cited file:line before acting. Contract: `src/superclaude/core/rules/RULES_DELEGATION.md`
@@ -17,3 +17,4 @@
 - gitignore-unanchored-dir: A `.gitignore` dir rule without a leading `/` hides that name at any depth: a new or generated dir drops out of `git add`; tests pass on disk, a fresh clone fails. Anchor root-only rules (`/skills/`); dir missing from `git status` → `git check-ignore -v <file>`. Hit 2026-10-05, 10-08
 - size-target-no-collateral-cut: A doc over the 25,000-byte target: tighten only the text being added, or split the file; never cut or reword content the request did not touch. Rule: `src/superclaude/core/rules/RULES_DOCS.md` Size
 - generated-regex-escapes: A script writing Python source through a non-raw string turns `\b` into a backspace and `\n` into a newline inside regex literals; the test then passes vacuously. Write code with Edit/Write or a quoted heredoc, then `grep -c $'\x08'` and plant a violation. Hit 2026-10-14 twice
+- security-review-scope: No web surface here: a security review skips web-vuln scans and checks prompt injection via shipped XML/markdown, install-path traversal and hook command injection; installer writes to `~/.claude/` are by design. From the retired security-engineer agent

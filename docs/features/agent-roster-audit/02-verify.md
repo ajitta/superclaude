@@ -154,3 +154,19 @@ updated: 2026-10-20
 | C7 pytest, lint, typecheck, format | 재현 | `uv run pytest` → `3752 passed, 3 skipped in 78.65s`, EXIT 0(skip 사유는 확인하지 않음). `make lint` → All checks passed. `make typecheck` → `Success: no issues found in 54 source files`. `ruff format --check src tests` → `222 files already formatted`. `ruff check src tests` 통과 |
 
 검증 환경: scratch는 `/home/ubuntu/.hermes/profiles/superclaude/cache/scratch/verify-roster/`(cfg-user, cfg-project, cfg-local, proj-project, proj-local)이다. 쓴 worktree 두 개(wt-master, wt-head)는 `git worktree remove --force`로 지웠다. 저장소 `git status`는 이 보고서를 빼면 깨끗하다.
+
+## 반영 (빌더, 2026-10-20)
+
+| # | 조치 |
+|---|---|
+| 1 | `agent-authoring.md`의 세 곳(로딩 설명, spawn 제한, `<fallback>` 템플릿), `agents/README.md` Escalation, `00-intent.md` Evidence를 현재 문서(기본 3단 중첩, `Agent`가 tools에 있을 때만)에 맞게 고쳤다. 정본 tool 패턴 두 개(Read-only)에서 `Agent`를 뺐고, `self-review`도 `tools: Read, Grep, Glob`로 바꿨다. 근거는 문서 1070행의 read-only 리뷰어 권고다. |
+| 2 | `improve.md`, `cleanup.md`, `roadmap.md`, `task.md`(flow 5와 description), `agent.md` description, `brainstorm.md` flow 2, `commands/README.md`, `modes/README.md`, `ARCHITECTURE.md:67`. 독립 스트림은 `general-purpose` delegate 하나씩, 도메인 체크는 프롬프트에 넣는 것으로 통일했다. |
+| 3 | `analyze.md` Scan 단계가 경로와 무관하게 finding 규칙(모든 finding, severity·confidence)을 갖는다. Evaluate가 순위를 매기고 사용자 한정을 적용한다. 척도는 critical…nit 하나로 정했다. `<focus_delegation>`은 Scan 규칙을 가리킨다. `/sc:review` `<review_lens>`에는 `--structured` 리뷰어가 `self-review`이고 그 `<finding_policy>`를 쓴다고 적었다. |
+| 4 | `insight.md`: Read modes에 주제 질문 처리와 `--stats --all` 규칙을 넣었다. 새 단계 8 Annotate는 링크마다 `ref_ts`를 그대로(오프셋 형식 포함) 보여 주고, 승인된 것만 append한다. |
+| 5 | `.claude/rules/gotchas/general.md`에 `security-review-scope`를 추가했다. |
+| 6 | Symbolic-First 표를 다섯 에이전트 기준으로 다시 나눴다. |
+| 7 | CHANGELOG Upgrade 항목에 `superclaude update --scope <scope>` 안내를 넣었다. |
+| 8 | 00-intent 행 2는 "among others", latency, 중첩 spawn 인용으로 고쳤다. 행 6은 `code-modernization` 역할명 예외와 skill-local `agents/`를 반영해 완화했다. |
+| 9 | `TestAgentTriggerUniqueness`(빈 입력에서도 통과)를 `TestRetiredAgentNames`로 교체했다. 변이 검사로 `pm.md`에 `python-expert`를 심으면 실패했다. |
+| 10 | CHANGELOG에서 `git-workflow`의 사유를 "자기 컨텍스트가 필요 없는 작업"으로 고쳤다. README의 Python 문구는 "지식은 모델, 체크는 명령·규칙"으로 바꿨다. |
+| 11 | 릴리스 단계에서 처리한다: version bump 브랜치, `make canary-gates`, `CANARY_OK=1`. |

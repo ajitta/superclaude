@@ -371,7 +371,7 @@ Every hook runs as `superclaude hook <name>` (a console entry, dispatched before
 - **deep-researcher** for multi-source web research, **repo-index** for a compact project index
 - **self-review** and **verifier** for an independent second pass and run-and-report evidence (invoked explicitly)
 - **business-panel-experts** for multi-framework strategy analysis
-- Domain knowledge (security, performance, architecture, Python) lives in commands and rules, not in persona agents — why: [agent roster audit](docs/features/agent-roster-audit/)
+- Domain knowledge (security, performance, architecture, Python) comes from the model; the checks that apply it live in commands and rules, not in persona agents — why: [agent roster audit](docs/features/agent-roster-audit/)
 
 </td>
 </tr>

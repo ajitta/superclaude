@@ -11,7 +11,7 @@ description: Apply systematic improvements to code quality, performance, and mai
 
   <flow>
   1. Analyze: ID improvement opportunities
-  2. Plan: Pick approach + delegate to relevant agent
+  2. Plan: pick the approach; delegate only independent streams (one `general-purpose` delegate each, with the --type checks in the prompt)
   3. Execute: Apply improvements per best practices
   4. Validate: Functionality preserved
   5. Document: Summary + future recs

@@ -9,7 +9,7 @@ paths: ["src/superclaude/agents/**", ".claude/rules/agent-authoring.md"]
 > - Command = **WHAT TO DO** (user-invoked workflow)
 > - Mode = **HOW TO THINK** (cognitive overlay)
 
-> **What Claude Code loads.** A subagent session gets the agent's markdown body as its system prompt plus minimal environment context. It does not get the parent's Claude Code system prompt or the parent's skills; whether it gets CLAUDE.md (and through it the superclaude kernel) depends on Claude Code and on the agent frontmatter field `omitClaudeMd`, and the on-demand rule modules never reach it. Write the body self-contained. A subagent cannot spawn further subagents (only a main thread can, via `--agent` with `Agent` in `tools`), so each agent returns one summary with no nested delegation.
+> **What Claude Code loads.** A subagent session gets the agent's markdown body as its system prompt plus minimal environment context. It does not get the parent's Claude Code system prompt or the parent's skills; whether it gets CLAUDE.md (and through it the superclaude kernel) depends on Claude Code and on the agent frontmatter field `omitClaudeMd`, and the on-demand rule modules never reach it. Write the body self-contained. A subagent whose tool pool includes `Agent` can spawn subagents of its own, up to three layers below the main conversation by default (`CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH`); a reviewer that must stay read-only omits `Agent`, because a spawned `general-purpose` delegate can edit. A body still names no sibling agent to hand work to: open items go back to the main session, which decides what runs next.
 
 > **Don't recreate built-ins.** CC ships `Explore` (read-only codebase search, Haiku), `Plan` (read-only research for plan mode), `general-purpose` (full-tool multi-step), `statusline-setup`, and `Claude Code Guide`. A new superclaude agent must add domain-specific value beyond these; an agent that just "searches the codebase" or "researches before acting" duplicates `Explore`/`Plan` and bloats the registry.
 
@@ -80,15 +80,15 @@ The description sentence is read verbatim into the subagent's system prompt head
 
 | Pattern | Field | Value | When |
 |---------|-------|-------|------|
-| Read-only + web | `tools` | `Read, Grep, Glob, Agent, WebSearch, WebFetch` | Plan/review/research (fails closed) |
-| Read-only minimal | `tools` | `Read, Grep, Glob, Agent` | No web access needed |
+| Read-only + web | `tools` | `Read, Grep, Glob, WebSearch, WebFetch` | Plan/review/research (fails closed) |
+| Read-only minimal | `tools` | `Read, Grep, Glob` | No web access needed |
 | Execute-only | `disallowedTools` | `Edit, Write, NotebookEdit` | Runs commands, never edits files |
 | General | `disallowedTools` | `NotebookEdit` | Code edits OK, no notebook edits |
 | Full access | *(omit both)* | — | Implementation agents |
 
 A `tools` list drops every MCP tool it does not name: commit `672055ce` stripped `tools`/`disallowedTools` from all agents for that reason, so set one only when the agent needs no MCP. CC permits both `tools` and `disallowedTools` together (deny is applied first, then allow is resolved against the remaining pool — a tool listed in both is removed). **superclaude convention: pick one form per agent for readability — never mix.**
 
-**Spawn restrictions (orchestrators only).** `tools: Agent(worker, researcher)` allow-lists which subagent types can be spawned. It takes effect only when the agent runs as the main thread (`claude --agent <name>`); it has no effect inside a regular subagent (subagents cannot spawn subagents). Bare `Agent` allows any; omitting `Agent` from `tools` disables spawning entirely.
+**Spawn restrictions (orchestrators only).** `tools: Agent(worker, researcher)` allow-lists which subagent types can be spawned. The type list takes effect only when the agent runs as the main thread (`claude --agent <name>`). In a subagent definition, `Agent` in `tools` lets the subagent spawn subagents within the depth limit, and any type list in parentheses is ignored. Bare `Agent` allows any type; omitting `Agent` from `tools` (or listing it in `disallowedTools`) disables spawning entirely, which is how a read-only reviewer stays read-only.
 
 **`effort`** — **omit by default.** Inherit from the parent unless measured evidence shows a specific value materially changes output for the agent's domain. String values only; `xhigh`/`max` availability and the default level depend on the model and CC version — check current docs, not a pinned value.
 
@@ -175,7 +175,7 @@ When memory is enabled, CC auto-injects up to the first 200 lines / 25KB of `MEM
   <bounds>
     <does>core capabilities described in prose (in-scope).</does>
     <never>out-of-scope actions described in prose.</never>
-    <fallback>what goes back to the main session as an open item, and when to stop and ask; a subagent cannot spawn or hand work to another agent, so never name a sibling agent here.</fallback>
+    <fallback>what goes back to the main session as an open item, and when to stop and ask; never name a sibling agent to hand work to — the main session decides what runs next.</fallback>
   </bounds>
 
   <handoff next="/sc:command1 /sc:command2"/>
@@ -222,9 +222,9 @@ Agents that read source code should include a Symbolic-First directive in `<tool
 
 | Tier | Directive | When |
 |------|-----------|------|
-| Reads and changes source (system/backend/frontend architects, python-expert, quality/performance/security engineers, refactoring-expert, root-cause-analyst, repo-index, self-review) | Full: `- Symbolic-First: with a symbol-aware tool connected (LSP or code index), query overview → definition → references before whole-file Read; without one, targeted Grep then Read of the matched range.` + optional agent-specific Grep sentence + `Read whole files only when small or non-code.` | Always |
-| Touches code to configure, plan, document or teach (devops-architect, requirements-analyst, project-manager, project-initializer, technical-writer, learning-guide, socratic-mentor) | Light: `- Symbolic-First: prefer symbol-aware queries (when connected) or targeted Grep over whole-file Read when exploring code.` | When code may be read |
-| Non-code (business-panel-experts, deep-researcher, git-workflow, insight-analyst, simplicity-guide, verifier) | — | Skip |
+| Reads source to index or review it (repo-index, self-review) | Full: `- Symbolic-First: with a symbol-aware tool connected (LSP or code index), query overview → definition → references before whole-file Read; without one, targeted Grep then Read of the matched range.` + optional agent-specific Grep sentence + `Read whole files only when small or non-code.` | Always |
+| Touches code only in passing (none shipped today) | Light: `- Symbolic-First: prefer symbol-aware queries (when connected) or targeted Grep over whole-file Read when exploring code.` | When code may be read |
+| Non-code or run-only (business-panel-experts, deep-researcher, verifier) | — | Skip |
 
 Rationale: symbol overview vs full-file Read = significant token savings + structural understanding (refs, types, inheritance). The on-demand rule modules never reach a subagent, so the line ships in the agent body.
 

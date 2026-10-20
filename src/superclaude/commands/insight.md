@@ -15,8 +15,9 @@ description: Capture structured session insights to .claude/insights.jsonl, or l
   3. Capture (text): take user text → infer type + tags → shape as JSON → show → append
   4. Dedup: before propose, run `superclaude insight list --limit 20` to check recent entries → skip already-captured topics. For annotations, also check existing ref_ts.
   5. Append: via `superclaude insight append --json '<json>'`, not by hand-writing insights.jsonl. Script enforce schema, escaping, annotation ref check.
-  6. Read modes: `--list`, `--query`, `--stats` read insights.jsonl through the same script.
+  6. Read modes: `--list`, `--query`, `--stats` read insights.jsonl through the same script. A topic question ("what did we learn about X?") has no key=value form: narrow with `--list` or `--query`, then judge relevance in the main session and present each match with its `ts` and why it applies now. `--stats` leaves annotations out unless `--all`; raw line counts include them.
   7. Review mode: `--review` call `superclaude insight review` to list pending markers harvested by SessionEnd/PreCompact hooks. For each wanted entry, propose structured promote (type + tags) + call `superclaude insight promote --index N --type TYPE [--tags a,b]`. Unwanted entries (harvest false positives) drop via `superclaude insight discard --index N[,N]` — show user which ones + why before call, since discard has no undo.
+  8. Annotate (on request): to link a past insight to the current work, show each proposed link — the target entry's `ts` copied exactly as `ref_ts` (offset format included; `+09:00` and `+0900` do not match) and a one-line note — and append only the links the user approves, as `type: annotation` through `superclaude insight append`.
   </flow>
 
   <flags>

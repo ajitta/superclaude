@@ -16,13 +16,13 @@ Base `f467012c`. Rule from the mode-retire round: before a file goes, check each
 |---|---|---|
 | project-manager | Session lifecycle; the only writer of `.claude/memories/pm_context.md`, which `/sc:load` read | `/sc:pm` flow: streams go to `general-purpose`, learnings to `learnings_[topic].md` as `/sc:save --type learnings` writes them. `/sc:load` stops reading `pm_context` (no writer left; an existing file stays on disk). `test_every_key_load_reads_has_a_writer` now checks `save.md`. |
 | project-initializer | Task menu and dependency batches | `/sc:init` is the same menu (its description named the agent as the "delegated form"; that clause is gone). |
-| insight-analyst | Query and annotation over `.claude/insights.jsonl` | `/sc:insight --query`, `--list`, annotation dedup in its flow. `deep-researcher`'s "Not for" gate now points at `/sc:insight --query`. |
+| insight-analyst | Semantic search and annotation with per-link confirmation over `.claude/insights.jsonl`; ref_ts and stats gotchas | Carried into `/sc:insight` (verification finding 4): the Read modes step answers a topic question (narrow with `--list`/`--query`, then judge relevance) and states the `--stats --all` rule; a new Annotate step shows each link with its exact `ref_ts` and appends only approved ones. `deep-researcher`'s "Not for" gate points at `/sc:insight --query`. |
 | requirements-analyst | Discovery dialogue | `/sc:brainstorm`. `/sc:pm`'s vague-request pattern now goes through `/sc:brainstorm` → `/sc:design`. |
 | git-workflow | PR table and git gotchas | Moved to `/sc:git` in the lean round (`d345f8ac`). |
 | learning-guide, socratic-mentor | Teaching styles | `/sc:explain`; Claude Code's built-in Learning and Explanatory output styles (code.claude.com/docs/en/output-styles). |
 | root-cause-analyst | Hypothesis loop, 3-cycle cap | `/sc:troubleshoot` flow steps 3–4 ("max 3 cycles before escalate to user"). |
 | simplicity-guide | Over-building checks, domain exceptions | `RULES_QUALITY.md` `<anti_over_engineering>`: dependency gate, earned-over-premature, "Do NOT simplify" list. |
-| security-, quality-engineer | `<finding_policy>` (report every finding with severity and confidence). It was kept in three copies in the mode-retire round. | `self-review.md` keeps the full text. `/sc:analyze` `<focus_delegation>` puts the same rule in each per-focus delegate's prompt. |
+| security-, quality-engineer | `<finding_policy>` (report every finding with severity and confidence). It was kept in three copies in the mode-retire round. `security-engineer`'s repo-specific threat model (`sc-not-webapp`, `sc-installer-writes`). | `self-review.md` keeps the full text, and `/sc:review` names it as the `--structured` reviewer. `/sc:analyze` Scan step now holds the rule on every path, main session or delegate, with one severity scale (finding 3). The threat model went to `.claude/rules/gotchas/general.md` `security-review-scope` (finding 5). |
 | system-, backend-, frontend-, devops-architect, performance-engineer, python-expert, refactoring-expert, technical-writer | Routing targets in `/sc:analyze`, `/sc:review`, `/sc:implement`, `/sc:pm`, `/sc:agent`. `backend-architect`'s ">2 tables" unit in `RULES_QUALITY.md`. | Routing tables rewritten (next section). The ">2 tables" unit is now stated for "a schema change". |
 
 ## Shipped content changed
@@ -62,3 +62,8 @@ End-to-end check on a scratch `CLAUDE_CONFIG_DIR`:
 - `test_session_memory_folder.py`: the three project-manager tests are gone. The writer check now reads `save.md`.
 - `test_author_check_corpus.py`: the docstring example names `repo-index.md`.
 - `test_install_upgrade_scenarios.py`: the C-08 count is 17 → 32.
+- `test_cross_references.py`: the trigger-uniqueness test, which passed on empty input (no agent uses the `triggers -` form), is replaced by `TestRetiredAgentNames`. That test fails when any shipped `.md` names a name in `install_paths.RETIRED_AGENT_FILES`. Planting `python-expert` in `commands/pm.md` turned it red.
+
+## Verification follow-up
+
+Applied after [02-verify.md](./02-verify.md): self-review loses the `Agent` tool (read-only per the sub-agents doc's own advice); the nesting rule in `agent-authoring.md` follows the current docs; `/sc:improve`, `/sc:cleanup`, `/sc:roadmap`, `/sc:task`, `/sc:brainstorm` and both content READMEs stop promising specialist agents. The applied table is at the end of 02-verify.md.

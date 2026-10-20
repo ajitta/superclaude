@@ -60,7 +60,7 @@ Agents declare persistent memory via `memory` frontmatter. Source files ship `me
 
 ## Escalation
 
-An agent that hits a question outside its job returns it to the main session as an open item; a subagent cannot spawn another subagent, so no agent hands work to a sibling. Scope unclear or a likely breaking change: stop and return the question. Harness-reported context usage ≥60% (the --uc point): compress output, don't skip steps; with no reported figure, don't estimate one.
+An agent that hits a question outside its job returns it to the main session as an open item; no agent hands work to a sibling, because the main session decides what runs next. Nested spawning is possible where `Agent` is in an agent's tools; `self-review` and `verifier` leave it out so they stay read-only and run-only. Scope unclear or a likely breaking change: stop and return the question. Harness-reported context usage ≥60% (the --uc point): compress output, don't skip steps; with no reported figure, don't estimate one.
 
 ## Routing Overlaps
 

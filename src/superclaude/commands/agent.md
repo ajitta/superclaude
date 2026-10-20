@@ -1,5 +1,5 @@
 ---
-description: Session controller that orchestrates investigation, implementation, and review workflows across phases. On request only — the user's /sc:agent or a workflow step that names it. Not for one sub-agent task — call the Agent tool directly; specialist waves — /sc:pm; a tracked task hierarchy — /sc:task.
+description: Session controller that orchestrates investigation, implementation, and review workflows across phases. On request only — the user's /sc:agent or a workflow step that names it. Not for one sub-agent task — call the Agent tool directly; parallel streams — /sc:pm; a tracked task hierarchy — /sc:task.
 ---
 <component name="agent" type="command">
 

@@ -3,17 +3,14 @@ Cross-reference integrity linter for superclaude content files.
 
 Validates:
 - Handoff targets: <handoff next="/sc:X"> → commands/X.md exists
-- Agent trigger uniqueness: no duplicate trigger keywords across agents
+- Retired agents: no shipped .md names an agent install_paths retires
 - Rule citations: every [RNN Name] / RNN in shipped .md → defined in RULES_QUALITY.md
 """
 
 import re
-from collections import defaultdict
 from pathlib import Path
 
 import pytest
-
-from tests.unit.md_helpers import parse_frontmatter
 
 # Directories
 _SRC = Path(__file__).parent.parent.parent / "src" / "superclaude"
@@ -86,40 +83,33 @@ class TestHandoffIntegrity:
             )
 
 
-class TestAgentTriggerUniqueness:
-    """Agent trigger keywords should not have exact duplicates."""
+class TestRetiredAgentNames:
+    """No shipped markdown names a retired agent.
 
-    def test_no_duplicate_triggers(self):
-        """Each trigger keyword should appear in at most one agent's description."""
-        if not AGENTS_DIR.exists():
-            pytest.skip("No agents directory")
+    A retired name in a command or agent body points the model at an agent the
+    install no longer has (docs/features/agent-roster-audit, finding 9). The
+    names come from install_paths.RETIRED_AGENT_FILES, so retiring an agent
+    extends this check without editing it. Description overlap between the
+    agents that remain is checked by test_description_overlap.py.
+    """
 
-        trigger_owners = defaultdict(list)
-        for agent_file in sorted(AGENTS_DIR.glob("*.md")):
-            if agent_file.stem.upper() == "README":
-                continue
-            content = agent_file.read_text(encoding="utf-8")
-            fm = parse_frontmatter(content)
-            desc = fm.get("description", "")
+    # (path under src/superclaude, name) pairs where the word is not the agent.
+    ALLOWED = {("modes/MODE_DeepResearch.md", "deep-research")}
 
-            # Parse "triggers - keyword1, keyword2" from description
-            match = re.search(r"triggers?\s*[-–—]\s*(.+?)(?:\)|$)", desc, re.IGNORECASE)
-            if not match:
-                continue
-            triggers = [
-                t.strip().lower() for t in match.group(1).split(",") if t.strip()
-            ]
-            for trigger in triggers:
-                trigger_owners[trigger].append(agent_file.stem)
+    def test_shipped_markdown_names_no_retired_agent(self):
+        from superclaude.cli.install_paths import RETIRED_AGENT_FILES
 
-        duplicates = {
-            trigger: owners
-            for trigger, owners in trigger_owners.items()
-            if len(owners) > 1
-        }
-        assert not duplicates, "Duplicate trigger keywords found:\n" + "\n".join(
-            f"  '{k}': {v}" for k, v in sorted(duplicates.items())
-        )
+        stems = [name.removesuffix(".md") for name in RETIRED_AGENT_FILES]
+        hits = []
+        for path in sorted(_SRC.rglob("*.md")):
+            rel = path.relative_to(_SRC).as_posix()
+            text = path.read_text(encoding="utf-8")
+            for stem in stems:
+                if (rel, stem) in self.ALLOWED:
+                    continue
+                if re.search(rf"(?<![\w-]){re.escape(stem)}(?![\w-])", text):
+                    hits.append(f"{rel}: {stem}")
+        assert not hits, "retired agent named in shipped content:\n" + "\n".join(hits)
 
 
 # ─── Rule Citations ──────────────────────────────────────────────

@@ -42,7 +42,7 @@ description: Review a work product (code, plan, design, spec) for quality, corre
   </tools>
 
   <review_lens>
-  A domain angle (security, performance, quality, architecture) is a lens, not a separate agent: with --structured it goes into the isolated reviewer's prompt as the lens to apply, next to the artifact and its acceptance criteria.
+  A domain angle (security, performance, quality, architecture) is a lens, not a separate agent: with --structured it goes into the isolated reviewer's prompt as the lens to apply, next to the artifact and its acceptance criteria. The reviewer is the `self-review` agent, whose `<finding_policy>` reports every finding with severity and confidence.
   </review_lens>
 
   <examples>

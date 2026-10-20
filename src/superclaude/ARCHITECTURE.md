@@ -64,7 +64,7 @@ Claude Code output styles: Markdown with YAML frontmatter that replaces the tone
 
 User-facing workflow entry points accessible as `/sc:*` slash commands. Managed by Claude Code's native command system — installed to `~/.claude/commands/sc/`.
 
-**Contract:** Commands define what to do, not how to think. They route to agents, activate modes, and orchestrate tool usage. Each command has syntax, flow steps, and handoff chains.
+**Contract:** Commands define what to do, not how to think. They dispatch agents or `general-purpose` delegates, activate modes, and orchestrate tool usage. Each command has syntax, flow steps, and handoff chains.
 
 ### skills/ — WRITE INSTRUCTION DOCS
 

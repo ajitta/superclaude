@@ -12,7 +12,7 @@ description: Generate a phased implementation workflow from PRDs and feature req
   <flow>
   1. Analyze: Parse PRD + understand requirements. A source spec that is still `status: draft` → stop and point to `/sc:review --scope spec <path>` (the same review gate /sc:plan applies)
   2. Plan: Workflow structure + dependency mapping
-  3. Consult: Domain agents may be consulted for analysis; they return findings, and the main loop writes the doc
+  3. Consult: independent analysis streams may go to `general-purpose` delegates with the domain checks in the prompt; they return findings, and the main loop writes the doc
   4. Sequence: Order the workflow steps and their task dependencies; nothing is executed
   5. Validate: Quality gates + workflow completeness. Write each feature as an unchecked box with an empty `Evidence:` line; the implementing session checks the box only when Evidence cites the check that passed (test output, exit code, observed user flow). The doc's frontmatter status follows core/rules/RULES_DOCS.md and starts as `status: draft`
   6. Document: feature path `docs/features/<slug>/05-plan.md` (or `05<letter>-plan-workflow.md`, first free letter, if primary plan exists per multi-of-same-phase rule), standalone `docs/plans/<topic>-workflow-<username>-YYYY-MM-DD.md` — slug resolution (zero-match default `[f]`), frontmatter, README update per core/rules/RULES_DOCS.md `<doc_output_convention>`.
