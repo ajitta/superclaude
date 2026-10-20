@@ -1176,9 +1176,17 @@ def _cmd_ok_results(run_eval, task, ws):
     ]
 
 
-def test_intent_through_probe_reads_the_feature_branch(tmp_path):
-    """The probe passes a correct end state on any checkout and fails each break."""
-    run_eval, task, ws = _fixture_ws(tmp_path, "intent-through-branch")
+_INTENT_TEXT = (
+    'Done when: "An overdue command lists only the todos past their due date."\n'
+)
+_OVERDUE_PATCH = (
+    "    items = load()\n",
+    "    items = load()\n    if argv and argv[0] == 'overdue':\n        return 0\n",
+)
+
+
+def _through_state(ws, name):
+    """Build one end state of an /sc:intent --through run in the probe workspace."""
 
     def git(*args):
         subprocess.run(
@@ -1188,65 +1196,104 @@ def test_intent_through_probe_reads_the_feature_branch(tmp_path):
             capture_output=True,
         )
 
-    feature = ws / "docs" / "features" / "todo-due-dates"
-    git("checkout", "-q", "-b", "feature/todo-due-dates")
-    feature.mkdir(parents=True)
-    (feature / "00-intent.md").write_text(
-        'Done when: "An overdue command lists only the todos past their due date."\n',
-        encoding="utf-8",
-    )
-    (feature / "05-plan.md").write_text(
-        "## Proof\nResult: abc1234 green\n", encoding="utf-8"
-    )
-    todo = ws / "todo.py"
-    todo.write_text(
-        todo.read_text(encoding="utf-8").replace(
-            "    items = load()\n",
-            "    items = load()\n    if argv and argv[0] == 'overdue':\n        return 0\n",
-            1,
-        ),
-        encoding="utf-8",
-    )
-    git("add", "-A")
-    git("commit", "-qm", "work")
-    assert all(_cmd_ok_results(run_eval, task, ws))
-    git("checkout", "-q", "main")
-    assert all(_cmd_ok_results(run_eval, task, ws)), (
-        "a correct run ending on main failed"
-    )
+    def docs(slug="todo-due-dates"):
+        feature = ws / "docs" / "features" / slug
+        feature.mkdir(parents=True, exist_ok=True)
+        (feature / "00-intent.md").write_text(_INTENT_TEXT, encoding="utf-8")
+        (feature / "05-plan.md").write_text(
+            "## Proof\nResult: abc1234 green\n", encoding="utf-8"
+        )
 
-    git("branch", "feature/other", "feature/todo-due-dates")
-    assert not all(_cmd_ok_results(run_eval, task, ws)), "two feature branches passed"
-    git("branch", "-D", "feature/other")
+    def code():
+        todo = ws / "todo.py"
+        todo.write_text(
+            todo.read_text(encoding="utf-8").replace(*_OVERDUE_PATCH, 1),
+            encoding="utf-8",
+        )
 
-    git("checkout", "-q", "feature/todo-due-dates")
-    (ws / "todos.json").write_text("[]\n", encoding="utf-8")
-    git("commit", "-qam", "migrate")
-    assert not all(_cmd_ok_results(run_eval, task, ws)), "a rewritten todos.json passed"
-    git("reset", "-q", "--hard", "HEAD~1")
+    def correct(branch="feature/todo-due-dates", slug="todo-due-dates"):
+        git("checkout", "-q", "-b", branch)
+        docs(slug)
+        git("add", "-A")
+        git("commit", "-qm", "intent")
+        code()
+        git("commit", "-qam", "work")
 
-    git("push", "-q", "origin", "feature/todo-due-dates")
-    assert not all(_cmd_ok_results(run_eval, task, ws)), "a pushed branch passed"
+    if name == "other slug":
+        correct("feature/due-dates", "due-dates")
+        return
+    if name == "feat/ prefix":
+        correct("feat/todo-due-dates")
+        return
+    if name == "code left uncommitted":
+        git("checkout", "-q", "-b", "feature/todo-due-dates")
+        docs()
+        git("add", "-A")
+        git("commit", "-qm", "intent")
+        code()
+        return
+    if name == "docs only":
+        git("checkout", "-q", "-b", "feature/todo-due-dates")
+        docs()
+        git("add", "-A")
+        git("commit", "-qm", "docs")
+        return
+    if name == "overdue missing":
+        git("checkout", "-q", "-b", "feature/todo-due-dates")
+        docs()
+        with open(ws / "todo.py", "a", encoding="utf-8") as f:
+            f.write("# touched\n")
+        git("add", "-A")
+        git("commit", "-qm", "w")
+        return
+    correct()
+    extra = {
+        "ends on main": [("checkout", "-q", "main")],
+        "ends detached": [("checkout", "-q", "--detach")],
+        "pushed branch": [("push", "-q", "origin", "feature/todo-due-dates")],
+        "main fast-forwarded": [
+            ("checkout", "-q", "main"),
+            ("merge", "-q", "--ff-only", "feature/todo-due-dates"),
+        ],
+        "two feature branches": [("branch", "feature/other")],
+    }.get(name, [])
+    for args in extra:
+        git(*args)
+    if name == "todos.json rewritten":
+        (ws / "todos.json").write_text("[]\n", encoding="utf-8")
+        git("commit", "-qam", "migrate")
+    if name == "last step uncommitted":
+        (ws / "docs" / "features" / "todo-due-dates" / "06-reflect.md").write_text(
+            "x\n", encoding="utf-8"
+        )
 
 
-def test_intent_through_probe_fails_a_docs_only_run(tmp_path):
+# The probe's cmd_ok checks, in tasks.yaml order: no push, main at baseline,
+# one feature branch, todos.json kept, todo.py changed, Done when, Result line,
+# clean tree, tests + overdue on a checkout of the branch.
+_P, _F = True, False
+_THROUGH_STATES = {
+    "correct": [_P] * 9,
+    "other slug": [_P] * 9,
+    "ends on main": [_P] * 9,
+    "ends detached": [_P] * 9,
+    "pushed branch": [_F, _P, _P, _P, _P, _P, _P, _P, _P],
+    "main fast-forwarded": [_P, _F, _P, _P, _P, _P, _P, _P, _P],
+    "feat/ prefix": [_P, _P, _F, _F, _F, _F, _F, _P, _F],
+    "code left uncommitted": [_P, _P, _P, _P, _F, _P, _P, _F, _F],
+    "docs only": [_P, _P, _P, _P, _F, _P, _P, _P, _F],
+    "todos.json rewritten": [_P, _P, _P, _F, _P, _P, _P, _P, _P],
+    "overdue missing": [_P, _P, _P, _P, _P, _P, _P, _P, _F],
+    "two feature branches": [_P, _P, _F, _F, _F, _F, _F, _P, _F],
+    "last step uncommitted": [_P, _P, _P, _P, _P, _P, _P, _F, _P],
+}
+
+
+@pytest.mark.parametrize("state", list(_THROUGH_STATES))
+def test_intent_through_probe_grades_each_end_state(tmp_path, state):
     run_eval, task, ws = _fixture_ws(tmp_path, "intent-through-branch")
-    feature = ws / "docs" / "features" / "todo-due-dates"
-    subprocess.run(
-        ["git", "checkout", "-q", "-b", "feature/todo-due-dates"], cwd=ws, check=True
-    )
-    feature.mkdir(parents=True)
-    (feature / "00-intent.md").write_text(
-        "Done when: past their due date\n", encoding="utf-8"
-    )
-    (feature / "05-plan.md").write_text("Result: abc green\n", encoding="utf-8")
-    subprocess.run(["git", "add", "-A"], cwd=ws, check=True)
-    subprocess.run(
-        ["git", "-c", "user.email=t@e", "-c", "user.name=t", "commit", "-qm", "docs"],
-        cwd=ws,
-        check=True,
-    )
-    assert not all(_cmd_ok_results(run_eval, task, ws))
+    _through_state(ws, state)
+    assert _cmd_ok_results(run_eval, task, ws) == _THROUGH_STATES[state]
 
 
 def _import_changed_command_probes():
@@ -1258,19 +1305,64 @@ def _import_changed_command_probes():
     return changed_command_probes
 
 
-def test_changed_command_probes_match_prompt_and_covers():
+def test_changed_command_probes_match_prompt_skill_checks_and_covers():
     probes = _import_changed_command_probes()
     tasks = TASKS["tasks"]
     assert "intent-through-branch" in probes.probes_for({"intent"}, tasks)
     assert "intent-through-branch" in probes.probes_for({"design"}, tasks)
     assert "implement-proof-fail" in probes.probes_for({"implement"}, tasks)
+    assert "cmd-delegated-load" in probes.probes_for({"load"}, tasks)
     fake = [
         {"id": "a", "canary": True, "prompt": "/sc:plan --from x"},
         {"id": "b", "prompt": "/sc:plan"},
         {"id": "c", "canary": True, "prompt": "plain", "covers": ["plan"]},
+        {
+            "id": "d",
+            "canary": True,
+            "prompt": "plain",
+            "checks": [{"type": "skill_called", "pattern": "^sc:plan$"}],
+        },
+        {
+            "id": "e",
+            "canary": True,
+            "prompt": "plain",
+            "checks": [{"type": "skill_not_called", "pattern": "^sc:plan$"}],
+        },
     ]
-    assert probes.probes_for({"plan"}, fake) == ["a", "c"]
+    assert probes.probes_for({"plan"}, fake) == ["a", "c", "d"]
     assert probes.probes_for({"git"}, fake) == []
+
+
+def test_changed_commands_reads_command_files_since_base(tmp_path):
+    probes = _import_changed_command_probes()
+
+    def git(*args):
+        subprocess.run(
+            ["git", "-c", "user.email=t@e", "-c", "user.name=t", *args],
+            cwd=tmp_path,
+            check=True,
+            capture_output=True,
+        )
+
+    cmds = tmp_path / "src" / "superclaude" / "commands"
+    cmds.mkdir(parents=True)
+    (cmds / "plan.md").write_text("a\n")
+    (cmds / "README.md").write_text("a\n")
+    git("init", "-q", "-b", "main")
+    git("add", "-A")
+    git("commit", "-qm", "base")
+    assert probes.main(["x"], root=tmp_path) == 2, "no v* tag must fail, not pass"
+    git("tag", "v1")
+    (cmds / "README.md").write_text("b\n")
+    (cmds / "__init__.py").write_text("")
+    (tmp_path / "other.md").write_text("b\n")
+    git("add", "-A")
+    git("commit", "-qm", "docs")
+    assert probes.changed_commands("v1", tmp_path) == set()
+    (cmds / "plan.md").write_text("b\n")
+    git("commit", "-qam", "plan")
+    assert probes.changed_commands("v1", tmp_path) == {"plan"}
+    assert probes.main(["x", "no-such-ref"], root=tmp_path) == 2
 
 
 def test_covers_names_shipped_commands():

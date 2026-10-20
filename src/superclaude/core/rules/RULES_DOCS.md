@@ -78,7 +78,7 @@ Examples:
     /sc:intent -> /sc:brainstorm | /sc:plan: User approves the intent text in their own words (a `--through` request is that approval); file committed before analysis starts
     /sc:brainstorm -> /sc:design: User approves discovery spec before designing
     /sc:brainstorm -> /sc:review: Spec self-review mandatory before /sc:plan handoff, because approved specs can still carry reversed decisions (see the /sc:brainstorm Self-review step)
-    /sc:design -> /sc:plan: Design spec committed (components pass [R18 Necessity Test] necessity test, deferred items marked, Areas of concern resolved by the owner)
+    /sc:design -> /sc:plan: Design spec committed (components pass [R18 Necessity Test] necessity test, deferred items marked, Areas of concern resolved by the owner, or planned past by the owner at the /sc:plan Load step)
     /sc:design -> /sc:roadmap: Alternative path when input is a PRD/feature doc rather than a design spec
     /sc:plan -> /sc:implement --plan: Plan document committed to repo
     /sc:roadmap -> /sc:implement: Roadmap tasks defined; implementation proceeds per task list

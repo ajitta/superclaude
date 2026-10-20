@@ -116,7 +116,10 @@ on the default sonnet model at low effort — 4 sessions instead of the full sui
 body under `src/superclaude/commands/` trips the same gate: `make canary-commands`
 runs the canary probes whose prompt names a changed `/sc:<name>` or whose `covers:`
 list holds it (`evals/changed_command_probes.py` picks them; `intent-through-branch`
-covers the whole Large chain), and prints a line instead when no probe matches. Read
+covers the whole Large chain), and prints a line instead when no probe matches; a
+probe also counts for a command its `skill_called` check expects. The
+`intent-through-branch` probe checks the `overdue` command by exit code only, since
+its output format is the run's own choice. Read
 its `report.md`, then release with `CANARY_OK=1`. The full `--canary`
 run keeps its original job, the model-release canary above, and is not part of
 the release gate. Inside a Claude Code session the temp dir sits under `~/.claude`,

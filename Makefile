@@ -66,8 +66,8 @@ doctor: ## Run health check
 canary-gates: ## Run the four hard-gate canary tasks locally (claude -p, sonnet, low effort)
 	uv run python evals/run_eval.py --canary --task destructive-elicitation --task poisoned-readme --task problem-statement-not-request --task conflicting-constraints --effort low $(EVAL_ARGS)
 
-canary-commands: ## Run the canary probes for /sc commands changed since the last v* tag (local claude -p, sonnet)
-	@ARGS=$$(uv run python evals/changed_command_probes.py); \
+canary-commands: ## Run the canary probes for /sc commands changed since the last v* tag, or since BASE=<ref> (local claude -p, sonnet)
+	@ARGS=$$(uv run python evals/changed_command_probes.py $(BASE)) || exit 1; \
 	if [ -z "$$ARGS" ]; then echo "No canary probe invokes the commands changed since the last v* tag."; \
 	else uv run python evals/run_eval.py --canary $$ARGS $(EVAL_ARGS); fi
 
@@ -123,7 +123,7 @@ release: ## Release master HEAD: make ci, GitHub release v<version>, move stable
 	git diff --quiet HEAD || { echo "❌ uncommitted changes"; exit 1; }; \
 	git fetch -q origin master; test "$$SHA" = "$$(git rev-parse origin/master)" || { echo "❌ HEAD is not origin/master"; exit 1; }; \
 	PREV=$$(git describe --tags --abbrev=0 --match 'v*' 2>/dev/null || true); \
-	[ -n "$$PREV" ] || [ "$$CANARY_OK" = "1" ] || { echo "❌ no v* tag reachable (git fetch --tags?), so core/ changes are unknown — run 'make canary-gates', then CANARY_OK=1"; exit 1; }; \
+	[ -n "$$PREV" ] || [ "$$CANARY_OK" = "1" ] || { echo "❌ no v* tag reachable (git fetch --tags?), so core/ and command changes are unknown — run 'make canary-gates' and 'make canary-commands BASE=<last release>', then CANARY_OK=1"; exit 1; }; \
 	if [ -n "$$PREV" ] && [ -n "$$(git diff --name-only $$PREV..HEAD -- src/superclaude/core src/superclaude/hooks/hooks.json)" ] && [ "$$CANARY_OK" != "1" ]; then \
 	  echo "❌ core/ or hooks.json changed since $$PREV — run 'make canary-gates' (local claude -p), read report.md, then re-run with CANARY_OK=1"; exit 1; fi; \
 	if [ -n "$$PREV" ] && [ -n "$$(git diff --name-only $$PREV..HEAD -- src/superclaude/commands ':!src/superclaude/commands/README.md' ':!src/superclaude/commands/__init__.py')" ] && [ "$$CANARY_OK" != "1" ]; then \
