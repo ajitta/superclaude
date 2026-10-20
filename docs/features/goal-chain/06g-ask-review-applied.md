@@ -19,3 +19,5 @@ The independent review of `v4.33.2..HEAD` ([06f-verify-ask.md](./06f-verify-ask.
 | 8 | Minor | `--audit-delegated` was always passed, even with no delegated row left | No delegated row left → the spec review runs without it |
 
 Outside the branch, also applied: RULES_DOCS's `/sc:brainstorm -> /sc:design` gate names the `--through` request as the approval (with `--ask`, the Checkpoint answers). Left open: brainstorm's decision modes have no rule for an Other text outside `--through`.
+
+Before the 4.34.0 release: `make canary-gates` passed all 7 hard-gate checks, and `make canary-commands` ran `intent-through-branch` (13/13, 3.7 min) and the new `intent-through-ask-headless` (14/14, 4.0 min).
