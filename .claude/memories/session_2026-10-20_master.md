@@ -1,6 +1,6 @@
-branch: master @bae01a8b (== origin/master; stable == v4.31.1 @47f791b5, master ahead by contributor-only changes: evals, tests, docs); worktree clean (untracked .hermes/, .ignore belong to other sessions)
+branch: master @0b7bd53b (== origin/master == stable == v4.32.0); worktree clean (untracked .hermes/, .ignore belong to other sessions)
 
-# Session 2026-10-20 — master (pressure-probe readout, eval-arm isolation)
+# Session 2026-10-20 — master (pressure-probe readout, eval-arm isolation, agent roster audit → 4.32.0)
 
 ## Where it stands
 - Pressure probes measured, vanilla vs sc-full, sonnet low (`docs/features/pressure-readout/`):
@@ -16,13 +16,22 @@ branch: master @bae01a8b (== origin/master; stable == v4.31.1 @47f791b5, master 
 - Full suite 4555 passed / 3 skipped; ruff, mypy clean. No release: nothing under `src/superclaude` changed, so the `[Unreleased]` entries go out with the next release.
 - Master CI green on 8adfdbfc (run 39286058300, after GitHub Actions' degraded spell on 2026-10-20 queued it ~30 min).
 
+## Agent roster audit (released as 4.32.0)
+- Retired 19 of 24 agents. 10 were domain personas, 6 were jobs that must talk with the user (a subagent returns one summary), plus git-workflow, root-cause-analyst (→ /sc:troubleshoot) and simplicity-guide (→ RULES_QUALITY). Kept 5: deep-researcher, repo-index, business-panel-experts, self-review, verifier (`docs/features/agent-roster-audit/`).
+- Basis: Anthropic's Skills post (2026-01-22, "stopped building specialized agents"), the sub-agents docs, and "How and when to use subagents" ("Most teams settle on a handful of well-scoped agents"). The repo's own record: 22/23 agents at zero invocations.
+- Upgrade removes retired files by content digest (`RETIRED_AGENT_DIGESTS` regenerated from `gen_shipped_names.py`). An e2e run on a scratch CLAUDE_CONFIG_DIR at user, project and local scope found user-edited copies and agent-memory folders kept.
+- Verifier (headless opus high, `02-verify.md`): PASS-with-fixes, 10 findings, all applied. Main one: current Claude Code lets a subagent spawn subagents up to 3 layers when `Agent` is in its tools. The old "subagents cannot spawn" text in agent-authoring was wrong; self-review dropped `Agent` so it stays read-only.
+- Canary gates 7/7, Windows install/upgrade job green, released v4.32.0 (CANARY_OK=1: one RULES_QUALITY sentence).
+
 ## Decisions
+- Agents: one stays only if its job needs its own context, restricted tools or a fresh reviewer. Domain checklists live in commands and rules, applied by the main session or `general-purpose` delegates. `/sc:load` no longer reads pm_context.
 - Eval runs from before 2026-10-20 carry account content that varied from session to session and between arms. They are not pooled with isolated runs; no rerun now.
 - Pressure-probe readouts use one-sided Fisher with rules written before the data. This prereg was committed 58 s into batch B; its corrections section records that.
 
 ## Problems hit
 - `git checkout -- .`, run from the repo cwd during a scratch check, threw away an uncommitted fix. Commit before running scratch checks from the repo dir.
 - The gotcha budget is 320 chars per entry (`test_gotcha_budget.py`).
+- Reusing a Python variable name across kernel cells wrote the agents README text into a test file. Reverting the file and rebuilding the edit fixed it; use distinct names per edit.
 
 ## Next actions
 (full list with options and ★: `docs/plans/remaining-work-ajitta-2026-10-20.md`; the 10-19 list is superseded)
