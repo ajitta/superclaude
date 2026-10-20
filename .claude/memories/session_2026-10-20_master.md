@@ -1,4 +1,4 @@
-branch: master @48393c16 (== origin/master == stable == v4.32.1); worktree clean (untracked .hermes/, .ignore belong to other sessions)
+branch: master @2dae9eb9 (== origin/master == stable == v4.32.2); worktree clean (untracked .hermes/, .ignore belong to other sessions)
 
 # Session 2026-10-20 — master (pressure-probe readout, eval-arm isolation, agent roster audit → 4.32.0)
 
@@ -48,3 +48,6 @@ branch: master @48393c16 (== origin/master == stable == v4.32.1); worktree clean
 
 ## Next actions (added)
 - [ ] Follow-ups of the weakness audit: `docs/plans/remaining-work-ajitta-2026-10-20.md` §4a (N4 effect probe, decision-mode probe, held RED clause; `origin/docs/superclaude-weakness-research` deleted after the owner confirmed)
+
+## /sc:intent Done when line (released as 4.32.2)
+- Compared with dialectic-skills dia-intent (a pre-work approval gate, no file) — different jobs, both kept. Borrowed one thing: a completion signal the user states goes under Proposed outcome as a quoted `Done when:` line; never inferred or asked for (gotcha invented-criterion). `/sc:reflect` compares against it when present. Full suite 3754 passed; CI green; no core change, so no canary.
