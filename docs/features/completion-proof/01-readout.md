@@ -43,3 +43,13 @@ None. No run failed a check, so there was nothing to classify.
 - One model, one effort, one fixture per probe. A ceiling on sonnet low says nothing about a weaker or differently tuned model; the next model release reruns both through `--canary`.
 - The isolated draft-spec reviewer (`self-review`) has `memory: project`, so it can read an earlier verdict on the same spec from project memory, a path the packet rule's Limit does not cover. Not measured; noted for a future N4 probe.
 - Both probes start the command with a plan or spec already committed. Whether a real session reaches `/sc:review --scope branch` after implementing, or runs the Proof again after a review fix, is not measured.
+
+## After verification (exploratory, not pre-registered)
+
+After the verification's F1 the wording became: commit the code, run the Proof on that clean HEAD, record `Result: <that sha>` in a docs-only commit. `implement-proof-fail` was run 10 more times at **A2** = `ec979bc1`, same setup. This run was not pre-registered; it checks the wording and decides nothing on the probe.
+
+- Pass 10/10, plan status `implementing` 10/10.
+- `Result:` line 10/10, every one red-and-recorded (verification F6 fixed the "no line until accepted" reading).
+- The recorded sha equals the last commit that touched `shop/` or `tests/` in 10 of 10 workspaces, with no uncommitted code left (A: 3 of 8). Every run made the code commit and the docs commit separately.
+
+`make canary-gates` on A2 content: all 7 hard-gate checks passed.

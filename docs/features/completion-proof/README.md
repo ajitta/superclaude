@@ -15,7 +15,7 @@ The round applies N1–N6 from the [weakness audit](../../research/superclaude-w
 
 - [00-prereg.md](./00-prereg.md): pre-registered rules for the two probes, written before any run
 - [06-verify.md](./06-verify.md): independent verification (opus high), PASS WITH FIXES, S1 1 / S2 3 / S3 8; applied below
-- [01-readout.md](./01-readout.md): results — both probes at ceiling on sonnet low (10/10 before and after N2; gate 10/10); N2 changes the record (`Result:` line 0/10 → 8/10)
+- [01-readout.md](./01-readout.md): results — both probes at ceiling on sonnet low (10/10 before and after N2; gate 10/10); after the verification fix every `Result:` line names the tested code commit (10/10)
 
 ## Verification applied
 
