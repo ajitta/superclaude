@@ -305,6 +305,16 @@ class TestAgentMemoryScopeConflict:
     other moved every agent's memory store with no word about it."""
 
     @staticmethod
+    def _memory_agent(base):
+        """An installed agent with a `memory:` line, in a fixed order. The
+        independent reviewers carry none, and glob order differs by platform."""
+        return next(
+            f
+            for f in sorted((base / "agents").glob("*.md"))
+            if "\nmemory:" in f.read_text(encoding="utf-8")
+        )
+
+    @staticmethod
     def _memory_values(base):
         return {
             line
@@ -376,7 +386,7 @@ class TestAgentMemoryScopeConflict:
         `--scope user` would act on ~/.claude (C-06, owner ruling b)."""
         base = tmp_path / ".claude"
         assert install_all(base_path=base, force=True, scope="local")[0]
-        agent = next((base / "agents").glob("*.md"))
+        agent = self._memory_agent(base)
         agent.write_text(
             agent.read_text(encoding="utf-8").replace("memory: local", "memory: user"),
             encoding="utf-8",
@@ -393,7 +403,7 @@ class TestAgentMemoryScopeConflict:
         """A hand-edited value names no store; advising `--scope none` is invalid."""
         base = tmp_path / ".claude"
         assert install_all(base_path=base, force=True, scope="local")[0]
-        agent = next((base / "agents").glob("*.md"))
+        agent = self._memory_agent(base)
         agent.write_text(
             agent.read_text(encoding="utf-8").replace("memory: local", "memory: none"),
             encoding="utf-8",
@@ -412,7 +422,7 @@ class TestAgentMemoryScopeConflict:
         this scope is the advice (C-06)."""
         base = tmp_path / ".claude"
         assert install_all(base_path=base, force=True, scope="local")[0]
-        agent = next((base / "agents").glob("*.md"))
+        agent = self._memory_agent(base)
         agent.write_text(
             agent.read_text(encoding="utf-8").replace(
                 "memory: local", f"memory: {value}"
