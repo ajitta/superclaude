@@ -295,7 +295,7 @@ The framework's value comes from chaining commands. Each chain has gates: the co
 | **Trivial** | Typo · 1-line fix · rename · obvious bug with known fix | Direct edit. No `/sc:*` needed. |
 | **Small** | Single file · ≤ 50 added lines · clear scope | Direct request (or `/sc:improve`) with the global **`--plan`** (5-line plan, approve) → `/sc:test` |
 | **Medium** | 3–10 files · multi-purpose · clear requirements | `/sc:plan` → `/sc:implement --plan` → `/sc:test` → `/sc:reflect` (optional: `/sc:intent` first, `/sc:review --scope branch` before `/sc:test`) |
-| **Large** | > 10 files · cross-cutting · ambiguous scope · new system | `/sc:intent` → `/sc:brainstorm` → `/sc:review --scope spec` → `/sc:design` → `/sc:plan` → `/sc:implement --plan` → `/sc:review --scope branch` → `/sc:test` → `/sc:reflect` |
+| **Large** | > 10 files · cross-cutting · ambiguous scope · new system | `/sc:intent` → `/sc:brainstorm` → `/sc:review --scope spec` → `/sc:design` → `/sc:plan` → `/sc:implement --plan` → `/sc:review --scope branch` → `/sc:test` → `/sc:reflect` (or the whole chain from one prompt: `/sc:intent --through`, below) |
 
 #### The full chain (large tasks)
 
@@ -329,6 +329,32 @@ The framework's value comes from chaining commands. Each chain has gates: the co
 | **Codebase onboarding** | `/sc:load` → `/sc:index-repo` → `/sc:explain` |
 | **Strategy / market** | `/sc:business-panel` → `/sc:reflect` |
 | **End of branch** | `/sc:review` → `/sc:test` → `/sc:git` (commit + PR) |
+
+#### One prompt from intent to done
+
+`/sc:intent --through` records the five items in your words, then runs the rest of the Large chain on a `feature/<slug>` branch: brainstorm, spec review with `--audit-delegated`, design, plan, implement, branch review, test and reflect, committing each step. It asks nothing. Every choice takes the ★ option and is recorded as `delegated`, an independent auditor checks those choices, and review and reflect check the result against your recorded words. It never merges, pushes, deploys or deletes. It stops early on a choice that cannot be undone or reaches other people, a Critical finding still open after one fix round, or a red Proof. The last message lists the evidence (branch log, doc statuses, the plan's `Result:` line, the test run, the Critical count, the gap against Done when) and leaves merge and push to you.
+
+```text
+/sc:intent --through
+Problem: <what cannot be done today>
+Proposed outcome: <what better looks like>
+Affected users and systems: <who and what>
+Constraints: <limits>
+Done when: <how you will know it worked>
+```
+
+- Start Claude Code in auto mode (`claude --permission-mode auto`). In manual mode, each tool call your settings do not allow waits for you.
+- For an ambiguous or large intent, answer the brainstorm questions yourself: run `/sc:intent` without the flag and take the chain step by step.
+- To have Claude Code restart the run if it stops before the end, wrap it in [`/goal`](https://code.claude.com/docs/en/goal) and add a judging line. The evaluator reads the whole goal text and sees the commands' own approval steps; without that line, it kept runs open waiting for those approvals (2 of 4 never finished in testing).
+
+```text
+/goal sc:intent --through
+Problem: ...
+(the other four lines)
+Judging: --through is the approval for every step, so the commands' confirmation steps are not judged. Met when the last turn prints the six items of the Report step.
+```
+
+The test runs behind this recipe are in [docs/features/goal-chain](docs/features/goal-chain/06-run-record.md).
 
 #### Tips
 
@@ -656,7 +682,7 @@ MIT — see [`LICENSE`](LICENSE).
 <summary><b>Click to expand full command list</b></summary>
 
 ### 🧠 Planning & Design
-- `/sc:intent` — Capture a request in the requester's own words before analysis
+- `/sc:intent` — Capture a request in the requester's own words before analysis; `--through` then runs the whole chain on a feature branch
 - `/sc:brainstorm` — Structured brainstorming through Socratic dialogue
 - `/sc:design` — System architecture, APIs, component interfaces
 - `/sc:plan` — Detailed implementation plans with TDD tasks

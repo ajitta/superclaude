@@ -328,6 +328,17 @@
             <div class="cmd cmd-light"><code>/goal sc:review the current diff, fix every finding, and review again until it reports none</code></div>
             <p>Run <code>/goal</code> alone to check progress, or <code>/goal clear</code> to stop early.</p>
           </div>
+          <div class="goal">
+            <h3>Go from intent to done in one prompt</h3>
+            <p><code>/sc:intent --through</code> records your five lines word for word, then runs brainstorm, spec review, design, plan, implement, branch review, test and reflect on a <code>feature/&lt;slug&gt;</code> branch, committing each step. It asks nothing: each choice takes the recommended option and is recorded as delegated for an independent audit. It never merges or pushes. Start Claude Code with <code>claude --permission-mode auto</code>:</p>
+            <div class="cmd"><code>/sc:intent --through
+Problem: what cannot be done today
+Proposed outcome: what better looks like
+Affected users and systems: who and what
+Constraints: limits
+Done when: how you will know it worked</code></div>
+            <p>Wrap it in <code>/goal</code> to restart the run if it stops early, and add a line saying that <code>--through</code> is the approval for every step; without it, the evaluator waits on the commands' own confirmation steps. The full recipe is in the <a href="https://github.com/ajitta/superclaude#-workflows">README</a>.</p>
+          </div>
         </div>
       </div>
     </section>
