@@ -1,4 +1,4 @@
-branch: master @7cddd8b4 (== origin/master == stable == v4.34.0); worktree clean (untracked .hermes/, .ignore belong to other sessions)
+branch: master @2e7fcc40 (== origin/master == stable == v4.34.1); worktree clean (untracked .hermes/, .ignore belong to other sessions)
 
 # Session 2026-10-20 — master (pressure-probe readout, eval-arm isolation, agent roster audit → 4.32.0)
 
@@ -35,7 +35,7 @@ branch: master @7cddd8b4 (== origin/master == stable == v4.34.0); worktree clean
 
 ## Next actions
 (full list with options and ★: `docs/plans/remaining-work-ajitta-2026-10-20.md`; the 10-19 list is superseded)
-- [ ] **Start here (next session): §0 of that plan** — 0-1 brainstorm decision modes for Other/own-words answers (★ confirmed when it names one concrete choice); 0-2 self-review agent memory left untracked in user repos (★ tentative: no memory for independent reviewers; check CC `memory` scope docs first; make the intent-through probes see it). Both change command/agent bodies → `make canary-commands` before release.
+- [x] §0 of that plan (0-1, 0-2) done and released as 4.34.1, see below.
 - [ ] Dictated-fix / sunk-cost probes at ceiling: ★keep as regression guards; re-read at the next model canary
 - [ ] Pressure probes on opus / auto mode: on hold
 - [ ] `bugfix-scope-creep` (matrix task) still has the loose `pytest|python -m pytest` grader; align it when its comparability no longer matters
@@ -72,4 +72,10 @@ branch: master @7cddd8b4 (== origin/master == stable == v4.34.0); worktree clean
 - One AskUserQuestion round right after brainstorm: up to 4 decisions that change what the user gets or sees (counts, included items, output content/destination; not validation/storage/parsing/error wording), star first; answers -> confirmed + spec rewritten; rest delegated; declined form waits for chat answers; timeout/headless -> plain --through; all answered -> spec review without --audit-delegated.
 - Evidence (06e): 25 earlier chain runs, 154 delegated decisions, audit differed on 8 (6 user-facing, 2 tag normalization). Six --ask runs: 4 interactive (sonnet+opus, answers against star reached the code), 2 headless fallback.
 - Third review (06f) PASS WITH FIXES, 2 Important + 6 Minor applied (06g). New probe intent-through-ask-headless. Pre-release canary-gates 7/7, canary-commands 13/13 + 14/14.
-- Open: brainstorm decision modes lack a rule for Other free text outside --through; self-review agent leaves untracked .claude/agent-memory/ in user repos.
+- Open items were closed in 4.34.1 (below).
+
+## Own-words answers, reviewer memory (released as 4.34.1)
+- Owner took ★(a) on both (docs/features/goal-chain/06h). brainstorm: an own-words answer that commits to one choice (Other text, paraphrase) is confirmed; question/hesitation/condition, an evaluation alone and "as recommended" stay delegated. intent Checkpoint tags answers by brainstorm's rules; naming the ★ for one question stays confirmed.
+- self-review and verifier carry no `memory` (no stored verdicts; CC auto-adds Write/Edit to memory agents). CC docs: `local` agent memory is not auto-gitignored, so `memory: local` would not have fixed it. Both --through probes fail on a file under .claude/agent-memory*/.
+- Verifier 06i (headless opus high): PASS WITH FIXES, 1 Important + 4 Minor applied. canary-commands 14/14 + 15/15, twice (before/after fixes).
+- Master CI failed once: three scope-conflict tests edited `next(glob(agents/*.md))`, which on CI was a reviewer without `memory:`. Fixed by picking an agent with a memory line in sorted order. Lesson: tests that pick "any agent" must not assume every agent has a field that is now optional.
