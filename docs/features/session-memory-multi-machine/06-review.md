@@ -71,3 +71,14 @@ revised: 2026-10-21
   - N3: 브랜치를 거를 때 `^branch:`를 Grep으로 한 번에 읽어 기록 전체를 Read하지 않게 했다.
   - N4: "which machine wrote each"로 단수·복수를 맞췄다.
 - 남긴 한계: 정규식 프로브는 같은 창 안에서 짝이 뒤바뀐 답과 올바른 답을 구별하지 못한다(F4 나머지). tasks.yaml 주석에 적었다.
+
+## 4차: 51d61fa4 짧은 확인
+
+- F9·F7·N3·N4는 없어졌다. N1·N2는 지목한 경우는 고쳐졌지만 새 정규식에 틈이 남았다. N2(Important)는 "1. Sync: could not tell whether it is behind" 같은 틀린 답을 통과시켰고, N1은 머리줄 다음에 빈 줄이 있는 올바른 답을 떨어뜨렸다.
+- 반영:
+  - behind 검사는 숫자를 주장에 묶는다(`1|one` + `commits? behind`, 또는 `behind … by 1|one`).
+  - load 프로브는 빈 줄을 포함해 줄바꿈 두 번까지 허용한다.
+  - 테스트는 "a merge, cherry-pick or revert in progress" 문구를 통째로 고정한다.
+  - CHANGELOG에 cherry-pick·revert를 넣었다. load `<tools>`의 Grep 줄에 `^branch:` 용도를 적었다.
+- 검증: 실제 canary 답 2개와 리뷰어가 든 틀린 답 3개를 포함한 9개 사례로 채점했다. 기대대로 6개는 통과, 3개는 실패였다.
+- 여기서 리뷰 반복을 멈췄다. 남은 변경은 프로브 정규식과 문구라 채점·테스트·canary로 기계적으로 확인된다. 2–4차는 점점 정규식의 세부로 좁아졌다.

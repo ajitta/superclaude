@@ -32,7 +32,7 @@ description: Load session context from the project memory folder (.claude/memori
 
   <tools>
   - Glob/Read: memory folder, auto memory and project file analysis
-  - Grep: project file analysis
+  - Grep: project file analysis; the `^branch:` lines of the memory folder's session records
   - Write: checkpoint creation
   - Bash: git branch, rev-parse, fetch and rev-list for the branch slug and the Sync step; git pull only after the user's yes
   </tools>

@@ -143,8 +143,7 @@ def test_save_offers_to_share_and_never_pushes_unasked() -> None:
     # `git add -- <files>` alone would leave a bare `git commit` passing.
     assert re.search(r"git commit [^`]*-- <files>`", step), step
     # Git refuses a partial commit during a merge, cherry-pick or revert.
-    for state in ("merge", "cherry-pick", "revert"):
-        assert state in step, f"save.md Share step names no {state} case"
+    assert "a merge, cherry-pick or revert in progress" in step, step
 
 
 def test_share_runs_after_every_step_that_writes() -> None:
