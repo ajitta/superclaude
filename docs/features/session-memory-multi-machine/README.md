@@ -18,6 +18,7 @@ updated: 2026-10-21
 |---|---|
 | [05-plan.md](./05-plan.md) | 결정, 범위, Phase 0–4 작업, Proof |
 | [06-review.md](./06-review.md) | 독립 리뷰 발견(I-1–I-6, S-1–S-9, N-1–N-2)과 반영 |
+| [06a-verify-independent.md](./06a-verify-independent.md) | 별도 머신·별도 세션(opus high) 독립 검증, v4.34.1..4fd32d90: 조건부 통과, 발견 13개 |
 
 ## 릴리스 뒤 (계획 밖)
 
