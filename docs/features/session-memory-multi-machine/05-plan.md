@@ -145,6 +145,8 @@ revised: 2026-10-21
 - 같은 컴퓨터라도 셸에 따라 `hostname` 결과가 달라질 수 있다(WSL은 Windows와 다른 이름). 다른 이름이면 다른 컴퓨터로 기록될 뿐 충돌은 없다.
 - 공개 저장소에 컴퓨터 이름이 남는다(소유자 결정). fork 사용자도 `.claude/memories/`를 커밋하면 같다 — CHANGELOG 항목이 hostname을 쓴다고 밝힌다.
 
+- 리뷰(06-review.md)에서 남긴 위험: 같은 hostname을 쓰는 두 컴퓨터·컨테이너·macOS의 hostname 변화(S-7), 가장 최근 날짜만 읽어 어제의 다른 컴퓨터 Next actions가 안 보임(S-8), `.claude/` gitignore·pre-commit hook·commitlint와의 충돌(S-9).
+
 ## Alternatives not taken
 
 - hostname 해시 6자: 이름은 숨지만 어느 컴퓨터 기록인지 파일 이름으로 모른다.
