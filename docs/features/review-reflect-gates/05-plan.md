@@ -131,8 +131,7 @@ Phase 2 뒤 프로브에서 `/sc:reflect`가 0/3 그대로였다. 소유자가 2
 - Task 1.2 채점 정규식 두 개를 바꾸기 전 값 3회를 본 뒤 넓혔다. 재리뷰: `round 2` → `round[- ]2`(run 3이 "round-2"라 써서 놓쳤다). 테스트 실행: `\d+ passed`에 `pass(es|ed)? \d+ of \d+`를 더했다(run 1·2가 "passes 2 of 2"). 채점 테스트에 그 표현을 넣었고, 바꾸기 전 3회는 새 정규식으로 다시 채점했다(Measurements).
 - Phase 2 Step 3 뒤 테스트 실행 정규식을 한 번 더 넓혔다: `(of|/)`(run after-2가 "passes 2/2"). 여섯 번 모두 새 정규식으로 다시 채점했다.
 - Phase 4를 더했다. Risks가 범위 밖으로 둔 `test.md` 본문 한 줄을, Phase 2 뒤 측정(0/3)을 보고 소유자가 골랐다.
-- Phase 4 측정 뒤 재리뷰 정규식에 `no review[^.
-]{0,20}after`를 더했다(run body-3이 "No review after the fix"라 써서 놓쳤다). "Review done after the fix"는 여전히 실패하는 것을 채점 테스트에 넣었다.
+- Phase 4 측정 뒤 재리뷰 정규식에 `\bno review\b[^.\n]{0,20}\bafter\b`를 더했다(run body-3이 "No review after the fix"라 써서 놓쳤다). "Review done after the fix"는 여전히 실패하는 것을 채점 테스트에 넣었다.
 
 ## Risks
 
