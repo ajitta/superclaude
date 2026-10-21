@@ -64,6 +64,7 @@ revised: 2026-10-22
 
 - [ ] 전체 suite, `make lint`, `ruff format --check`, `make typecheck`
 - [ ] 독립 검증(headless opus)과 그 반영, Critical·Important가 없을 때까지
+- [ ] 누더기 감사(소유자 지시 2026-10-22): v4.34.1 이후 미출하 작업 전체를 최종 상태로 다시 읽는 독립 감사(headless opus). 반복 수정으로 덧댄 문구, 중복, 예외, 검증기 맞춤 과적합을 찾는다. 보고서는 `docs/analysis/patchwork-audit-ajitta-2026-10-22.md`. 반영 뒤 다시 검증한다
 - [ ] master 병합과 push. 릴리스는 하지 않는다
 
 ## Measurements
