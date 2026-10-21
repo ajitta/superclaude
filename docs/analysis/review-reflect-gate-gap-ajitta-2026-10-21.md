@@ -52,7 +52,7 @@ revised: 2026-10-21
 
 - [x] auto memory `release-needs-complete-plan`에 "반영한 수정은 다시 리뷰한다, reflect는 체인의 단계다"를 더했다(2026-10-21). B의 결정이 나오면 그 규칙을 가리키게 한다.
 
-### D. 계획 `complete`와 reflect의 순서 (후속, 미착수)
+### D. 계획 `complete`와 reflect의 순서 (후속, 설계안: [plan-complete-order](../features/plan-complete-order/04-design.md))
 
 `/sc:implement` Integrate 단계는 Proof가 통과하면 계획을 `status: complete`, feature README를 `phase: complete`로 만든다. 체인에서는 그 뒤에 `/sc:test`와 `/sc:reflect`가 온다. 그래서 reflect 전에 feature가 `complete`로 보인다. B 이전의 `/sc:test -> done`에서도 같았다(review-reflect-gates 리뷰 1차 I-5). `implement.md`, RULES_DOCS의 계획 status 규칙, `workflow_gates`가 `complete`의 위치에 대해 같은 말을 하게 할지는 소유자가 정한다.
 
