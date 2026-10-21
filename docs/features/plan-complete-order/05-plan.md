@@ -72,7 +72,7 @@ revised: 2026-10-22
 - [x] Step 4: `reflect-plan-close` 성공 check를 제안 형태로, 거절 답 셋을 채점 테스트에. 재리뷰 채점 문장을 규칙마다 두세 개로, known misses는 05a로. 죽은 대입, `_probe_checks`의 YAML 재읽기, 주석의 발견 ID
 - [x] Step 5: CHANGELOG 두 항목을 하나로, 기여자 항목 둘을 한 줄로. 분석 문서 B 완료, 이 README 과거형, review-reflect-gates 05-plan의 긴 `Result:` 측정을 05a로
 - [x] Step 6: 변이 16건 모두 red(`$TMPDIR/pco/mutate_clean.py`). 저장된 `reflect-plan-close` run을 새 check로 다시 채점: 바꾼 뒤 3/3 통과, 바꾸기 전 1/1 실패
-- [ ] Commit Phase 4: `refactor: one statement per rule after the patchwork audit; Plan-Close sends to /sc:implement; --through left open`
+- [x] Commit Phase 4: `refactor: one statement per rule after the patchwork audit; Plan-Close sends to /sc:implement; --through left open`
 
 ## Integration (커밋 아님)
 
