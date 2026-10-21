@@ -1,5 +1,5 @@
 ---
-status: draft
+status: approved-for-plan
 revised: 2026-10-22
 ---
 
@@ -76,3 +76,33 @@ B를 권한다. 문제의 뿌리는 "녹색 Proof = 끝"이라는 라벨이다. 
 - 재리뷰가 남은 상태의 `/sc:reflect`는 `complete`로 바꾸지 않는다. 조건이 맞고 사용자가 답하면 바꾼다(새 reflect 프로브).
 - `implement-proof-fail`, `test-reflect-gate`, `test-reflect-gate-complete`가 그대로 통과한다.
 - drift test가 implement.md, reflect.md, RULES_DOCS, README의 `complete` 진입 문장을 고정한다.
+
+## 검증 반영과 확정안 B′ (2026-10-22)
+
+[04a](./04a-design-verify.md)는 "권고 수정"이었다. 소유자는 권고대로 진행하라고 했다. 그래서 B를 04a의 B′로 고쳐 확정한다.
+
+| 04a | 반영 |
+|---|---|
+| 1 (Important) | reflect는 `complete`를 제안만 한다. 쓰는 것은 사용자가 답했을 때뿐이다. f1c067b9 → 81776c29("completion is the owner's call")가 B 원안이 만들 상태였다 |
+| 2 (Important) | `--through`와 headless에서는 쓰지 않는다. `intent.md` Run 단계의 "propose, write nothing"에 이 제안을 넣고, Report 단계의 "steps left to the user"에 계획 `complete`를 더한다. README `--through` 문단도 고친다 |
+| 3 (Important) | 되돌림 경로: `complete` 뒤에 그 계획의 작업에서 Critical·Important가 나오거나 red re-run이면, 계획은 `implementing`으로 돌아간다. README phase는 그대로다(`RULES_DOCS.md:31`). 81776c29의 phase 되돌림은 규칙으로 올리지 않는다 |
+| 4 (Important) | `implement-proof-fail`에 `Result:` 줄이 실패를 기록하고 "(accepted by user)"가 없는지 보는 check를 더한다. status·phase check는 "implement는 `complete`를 쓰지 않는다"를 재므로 남긴다 |
+| 5 (Important) | reflect의 세 조건을 `reflect.md`의 새 단계에 문장 그대로 싣고 `_GATE_PHRASES`로 고정한다 |
+| 6 | 리더 목록: `promote-feature.md:18`, R02(`RULES_QUALITY.md:9`), `intent.md:22` Report, `test_plan_checklist.py`. archive는 사람만 읽는다. 감사 §2의 이유는 ①–④다. reflect 기각 행의 "역할 유지"(`reflect.md:8`)에는 이렇게 답한다: reflect는 `Result:`와 `git log`만 읽고 Proof를 다시 돌리지 않는다. `Result:` 뒤에 코드 커밋이 있으면 `/sc:test`로 돌려보낸다 |
+| 7 | split plan: phase 파일은 지금처럼 끝나면 `complete`이고, index만 기다린다. `RULES_DOCS.md:58`의 작성자 표기를 바꾼다 |
+| 8 | 함께 거짓이 되는 문장(`tasks.yaml` 주석, `test_eval_harness.py` docstring, CHANGELOG `[Unreleased]`)을 고친다. `test-reflect-gate-complete`는 "이미 `complete`인 계획"(옛 설치, 손으로 쓴 값)을 재는 프로브로 남긴다 |
+| 9 | 릴리스: 패치 `Changed`와 upgrade note. 릴리스 자체는 보류 중이다 |
+| 10 | 안 D(게이트를 계획의 상자로)는 넣지 않는다. 상자를 누가 체크하고 누가 `complete`를 쓰는지는 B′와 같은 문제로 남고, "code backs it"(`implement.md:19`)와 맞지 않는다 |
+
+B′의 내용:
+
+- `/sc:implement`는 녹색 Proof 뒤 `Result:` 줄만 쓰고, 계획(index)은 `implementing`에 둔다. `complete`를 쓰지 않는다.
+- `/sc:reflect`의 새 단계 Plan-Close: 계획 문서로 진행한 작업의 계획이 `implementing`이면 세 조건을 본다.
+  1. 상자가 전부 체크되었고, 마지막 코드 커밋을 적은 녹색 `Result:`(또는 사용자의 기록된 수용)가 있다.
+  2. 그 sha 뒤에 코드 커밋이 없다.
+  3. 다음 리뷰 round를 기다리는 Critical·Important 수정이 없다.
+  
+  셋이 맞으면 계획 `complete`와 README `phase: complete`를 docs 전용 커밋으로 제안하고, 사용자가 답할 때만 쓴다. `Result:` 뒤에 코드 커밋이 있으면 `/sc:test`로 보낸다. 그 밖에는 맞지 않는 조건을 말한다.
+- 되돌림: 위 04a 3.
+- 바뀌는 shipped 파일: `implement.md`, `reflect.md`, `intent.md`, `RULES_DOCS.md`(core), README(표 두 행, `--through` 문단).
+- 프로브: `implement-proof-fail` check 하나, 새 `implement-proof-green`(녹색 Proof 뒤에도 `implementing`, `Result:` 있음), 새 `reflect-plan-close`(조건이 맞으면 제안하고, headless라 쓰지 않는다), 새 `reflect-plan-close-review-due`(재리뷰가 남았으면 그것을 말하고 쓰지 않는다).
