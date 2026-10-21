@@ -59,14 +59,17 @@ def load_era(era: str) -> dict:
 
 
 def sandbox(tmp_path: Path, monkeypatch) -> tuple[Path, Path]:
-    """An empty home and a git project under ``tmp_path``; return (home, project).
+    """An empty home under ``tmp_path`` and a git project inside it; return (home, project).
 
     HOME and CLAUDE_PROJECT_DIR point into ``tmp_path`` (gotcha test-anchor-env)
     and the project is a real git repository, because the exclude block and the
-    agent-memory guard both ask git.
+    agent-memory guard both ask git. The project sits inside home, as a real
+    one does: the install walk stops at $HOME, and a project beside the fake
+    home let it climb out of the sandbox to the developer's real install
+    (gotcha sandbox-escapes-home, test_sandbox_walk_stops_at_the_fake_home).
     """
     home = tmp_path / "home"
-    project = tmp_path / "project"
+    project = home / "project"
     home.mkdir()
     init_git_repo(project, commit=False)
     monkeypatch.setenv("HOME", str(home))
@@ -869,6 +872,35 @@ def test_c05_drift_remediation_carries_the_scope(
     for named, where in advice:
         assert named == scope, output
         assert where == ("" if scope == "user" else f" from {project}"), output
+
+
+@pytest.mark.parametrize("scope", SCOPES)
+def test_sandbox_walk_stops_at_the_fake_home(
+    tmp_path: Path, monkeypatch, scope: str
+) -> None:
+    """2026-10-21, Windows: c05[user] failed because sandbox put home and
+    project side by side. The install walk from the project passed the fake
+    $HOME, reached the developer's real ~/.claude/superclaude (pytest's temp
+    root sits under the user profile) and reported it as a healthy project
+    install. A decoy install above the sandbox stands in for that real one on
+    every platform; each scope must find its own install, not the decoy.
+    Only [user] can fail on a side-by-side layout: project and local find
+    their own install in the project before the walk leaves it."""
+    (tmp_path / ".claude" / "superclaude").mkdir(parents=True)
+    _home, _project, base = fresh_install(tmp_path, monkeypatch, scope)
+    analyze = base / "commands" / "sc" / "analyze.md"
+    analyze.write_text(
+        analyze.read_text(encoding="utf-8") + "\nlocal edit\n", encoding="utf-8"
+    )
+
+    result = CliRunner().invoke(main, ["verify-drift"])
+
+    output = all_output(result)
+    assert f"(scope: {scope})" in output, output
+    assert result.exit_code == 1, output
+    # The scope's own install: the one edited file and nothing else. The empty
+    # decoy would read as every file missing.
+    assert "Drift detected: 1 drifted, 0 missing, 0 extra" in output, output
 
 
 @pytest.mark.parametrize("era", ERAS)
@@ -2608,7 +2640,7 @@ RO_COMMANDS = {
 }
 
 
-def _edited_file(tmp_path: Path, base: Path, scope: str, which: str) -> Path:
+def _edited_file(base: Path, scope: str, which: str) -> Path:
     """The scope's settings, CLAUDE or git exclude file: the files a command edits."""
     from superclaude.cli.install_settings import _claude_md_target
 
@@ -2616,7 +2648,7 @@ def _edited_file(tmp_path: Path, base: Path, scope: str, which: str) -> Path:
         return settings_path(base, scope)
     if which == "claude":
         return _claude_md_target(base, scope)[0]
-    return tmp_path / "project" / ".git" / "info" / "exclude"
+    return base.parent / ".git" / "info" / "exclude"
 
 
 RO_FILES = [
@@ -2641,7 +2673,7 @@ def test_c21_a_read_only_input_file_is_refused_before_any_write(
     if command == "install":
         home, project = sandbox(tmp_path, monkeypatch)
         base = scope_base(home, project, scope)
-        target = _edited_file(tmp_path, base, scope, which)
+        target = _edited_file(base, scope, which)
         target.parent.mkdir(parents=True, exist_ok=True)
         if which == "settings":
             target.write_text('{"model": "opus"}\n', encoding="utf-8")
@@ -2651,7 +2683,7 @@ def test_c21_a_read_only_input_file_is_refused_before_any_write(
             target.write_text("*.swp\n", encoding="utf-8")
     else:
         _home, _project, base = fresh_install(tmp_path, monkeypatch, scope)
-        target = _edited_file(tmp_path, base, scope, which)
+        target = _edited_file(base, scope, which)
     assert target.is_file()
     target.chmod(0o444)
     before = snapshot(tmp_path)

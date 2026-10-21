@@ -46,7 +46,8 @@ escalation_condition:
 3. `src/superclaude/ARCHITECTURE.md`에서 component 역할과 delivery를 확인한다.
 4. 콘텐츠면 해당 `.claude/rules/*-authoring.md`와
    `xml-prose-format.md`, `content-quality.md`를 읽는다.
-5. hook/CLI면 `.claude/rules/gotchas/hooks.md`와 관련 테스트를 읽는다.
+5. hook/CLI면 `.claude/rules/gotchas/hooks.md`와 관련 테스트를 읽는다. 테스트를 쓰거나 고치면
+   `.claude/rules/gotchas/tests.md`도 읽는다.
 6. 동일 basename, rule, trigger, threshold의 모든 사본을 검색한다.
 
 Subagent `*.output` 파일을 직접 읽지 않는다. main agent는 위임 전에 기대하는 증거 형태와 판정 기준을
