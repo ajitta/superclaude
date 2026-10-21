@@ -31,6 +31,7 @@ README 작업 크기 표의 Medium·Large 체인은 `/sc:reflect`로 끝나는�
 - [06b-verify-fixes.md](./06b-verify-fixes.md): second independent verification, of the 06a fixes (4223ed1d)
 - [06c-verify-phase10.md](./06c-verify-phase10.md): third independent verification, of the 06b fixes (56da83a1)
 - [06d-verify-phase11.md](./06d-verify-phase11.md): fourth independent verification, of the 06c fixes (32cdb2ab)
+- [06e-verify-phase12.md](./06e-verify-phase12.md): fifth independent verification, of the 06d fixes (1a550a3b); no Critical or Important, rounds end
 
 ## 릴리스 뒤
 

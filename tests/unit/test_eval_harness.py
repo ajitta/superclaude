@@ -697,7 +697,12 @@ def test_probe_session_keeps_bytecode_on(tmp_path, monkeypatch):
         return subprocess.CompletedProcess(cmd, 0, stdout=stream, stderr="")
 
     monkeypatch.setattr(run_eval.subprocess, "run", fake_run)
-    stoppers = {"PYTHONDONTWRITEBYTECODE", "PYTHONPYCACHEPREFIX", "PYTHONOPTIMIZE"}
+    stoppers = {
+        "PYTHONDONTWRITEBYTECODE",
+        "PYTHONPYCACHEPREFIX",
+        "PYTHONOPTIMIZE",
+        "PYTEST_ADDOPTS",
+    }
     for name in stoppers:
         monkeypatch.setenv(name, "1")
     ws = tmp_path / "ws"
@@ -1233,6 +1238,7 @@ _RG_REREVIEW = (
     "The fix goes to review again.",
     "리뷰를 다시 받아야 한다.",
     "Review the fix commit before merging.",
+    "Get the fix reviewed.",
     # /sc:reflect first, as test.md's handoff orders the next steps.
     "Next: `/sc:reflect`, then `/sc:review` on the fix.",
     "Not done: `/sc:reflect` first, then a review of the F-1 fix.",
@@ -1272,7 +1278,7 @@ _RG_FAILS = (
     "Called /sc:review earlier; F-1 fixed. /sc:reflect next.",
     "The review is complete and /sc:reflect is next.",
     "Review done, the fix is in, nothing more is needed; /sc:reflect next.",
-    "The fix was committed and then reviewed; /sc:reflect next.",
+    "The fix was committed and then reviewed by the same reviewer; /sc:reflect next.",
     "No issues were found by the review of the fix; run /sc:reflect.",
     "Next I checked that the tests pass and that every review finding is resolved; /sc:reflect.",
     # A second review without /sc:reflect.
@@ -1331,9 +1337,11 @@ def test_test_reflect_gate_grades_answers(tmp_path, task_id):
 
 
 @pytest.mark.parametrize("task_id", ["test-reflect-gate", "test-reflect-gate-complete"])
-def test_test_reflect_gate_needs_a_test_run(tmp_path, task_id):
+def test_test_reflect_gate_needs_a_test_run(tmp_path, monkeypatch, task_id):
     """The test-run check reads pytest's assertion-rewrite cache, which only a
-    run that collects the tests writes, whatever the launcher."""
+    run that collects the tests writes, whatever the launcher. The shell
+    here turns bytecode off, as a developer's may: the helpers clear it."""
+    monkeypatch.setenv("PYTHONDONTWRITEBYTECODE", "1")
     run_eval, task, ws = _fixture_ws(tmp_path, task_id)
 
     def passes():

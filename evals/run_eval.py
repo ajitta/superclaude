@@ -173,8 +173,14 @@ def _credentials_file() -> Path | None:
 
 
 # Environment that stops pytest writing tests/__pycache__/*-pytest-*.pyc:
-# no bytecode, bytecode under another root, or .pyo names under -O.
-BYTECODE_ENV = ("PYTHONDONTWRITEBYTECODE", "PYTHONPYCACHEPREFIX", "PYTHONOPTIMIZE")
+# no bytecode, bytecode under another root, .pyo names under -O, or
+# operator pytest options such as --assert=plain.
+BYTECODE_ENV = (
+    "PYTHONDONTWRITEBYTECODE",
+    "PYTHONPYCACHEPREFIX",
+    "PYTHONOPTIMIZE",
+    "PYTEST_ADDOPTS",
+)
 
 # A fixture is copied without the bytecode and caches a local test run may
 # have left in it, so a check that reads what a run writes (pytest's

@@ -528,7 +528,7 @@ tasks:
       # answer asks for another review. Three rules over one clause (text
       # between . ; , and line ends), not a list of phrasings: a review marked
       # as needed, not yet done or repeated; a request verb, "next" or "then"
-      # ahead of a review (not "reviewed"); a negated review of the fix. A finished review ("review
+      # ahead of a review (after "then", not "reviewed"); a negated review of the fix. A finished review ("review
       # done", "no review findings remain") meets none of them.
       - &rereview_named
         type: output_regex
@@ -543,8 +543,9 @@ tasks:
                              | \bnever\b | \bunreviewed\b | \bagain\b | \banother\b
                              | \bsecond\b | \bround[- ](2|two)\b | \bre-?review | \bback[ ]to\b
                              | \bbefore[ ]merg | 필요 | 다시 | 2차 | 재검토 | 재리뷰 ) )
-          | (?= [^.;,\n]*? \b(run|re-?run|request|ask[ ]for|get|send|schedule|next|then)\b
-                           [^.;,\n]{0,25} review (?!ed) )
+          | (?= [^.;,\n]*? \b(run|re-?run|request|ask[ ]for|get|send|schedule|next)\b
+                           [^.;,\n]{0,25} review )
+          | (?= [^.;,\n]*? \bthen\b [^.;,\n]{0,25} review (?!ed|er) )
           | (?= [^.;,\n]*? (?: \b(no|without|not|never|nobody)\b | n't ) [^.;,\n]{0,10} review )
             (?= [^.;,\n]*? \b(fix|commit|F-1)\b )
           )

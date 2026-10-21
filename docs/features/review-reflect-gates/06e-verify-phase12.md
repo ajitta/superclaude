@@ -86,3 +86,15 @@ revised: 2026-10-22
 
 - `claude`를 띄울 수 없어, 지운 변수 셋이 실제 프로브 세션의 Bash 도구에서도 빠져 있는지는 보지 않았다.
 - 발견 1의 수정안은 임시 편집으로만 확인했다.
+
+## 반영 (2026-10-22, claude-box, Phase 13)
+
+Critical·Important가 없어 리뷰 round는 여기서 멈춘다(브랜치 규칙). 남은 Suggestion은 고쳤고, 규칙대로 다시 리뷰하지 않는다.
+
+| # | 처리 |
+|---|---|
+| 1 | 반영: 권고대로 `(?!ed|er)`를 "then"에만 둔다. 다른 요청 낱말은 `review`로 되돌려 "get the fix reviewed"가 다시 통과한다. 06d 예문 전체를 `_RG_FAILS`에, "Get the fix reviewed."를 `_RG_REREVIEW`에 넣었다. heldout 값은 그대로다 |
+| 2 | 반영: `BYTECODE_ENV`에 `PYTEST_ADDOPTS`. 프로브 세션과 단위 테스트가 같이 지운다 |
+| 3 | 반영: `test_test_reflect_gate_needs_a_test_run`이 `PYTHONDONTWRITEBYTECODE=1`을 켠 채 돈다. `_clean_env` 필터를 지우면 기본 셸의 CI에서도 red다 |
+| 4 | 반영: 06d 반영 표의 수를 아홉으로 고쳤다. 05a의 Phase 12 서술도 고쳤다 |
+| 이 브랜치 밖 | `PYTHONOPTIMIZE=2`에서 `test_credential_copies_do_not_outlive_the_run` 실패: master부터다. 손대지 않았다 |
